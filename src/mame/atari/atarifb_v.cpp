@@ -56,7 +56,7 @@ void atarifb_state::get_tile_info_common( tile_data &tileinfo, tilemap_memory_in
 	int disable = alpha_videoram[tile_index] & 0x80;
 
 	if (disable)
-		code = 0;   /* I *know* this is a space */
+		code = 0; // I *know* this is a space
 
 	tileinfo.set(0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
 }
@@ -122,7 +122,7 @@ void atarifb_state::video_start()
 {
 	m_alpha1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(atarifb_state::alpha1_get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
 	m_alpha2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(atarifb_state::alpha2_get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
-	m_field_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(atarifb_state::field_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_field_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(atarifb_state::field_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
 }
 
 
@@ -140,7 +140,7 @@ void atarifb_state::draw_playfield_and_alpha( bitmap_ind16 &bitmap, const rectan
 
 	copybitmap(bitmap, m_alpha1_tilemap->pixmap(), 0, 0, 35*8, 1*8, cliprect);
 	copybitmap(bitmap, m_alpha2_tilemap->pixmap(), 0, 0,  0*8, 1*8, cliprect);
-	copyscrollbitmap(bitmap, m_field_tilemap->pixmap(),  1, scroll_x, 1, scroll_y, clip);
+	copyscrollbitmap(bitmap, m_field_tilemap->pixmap(), 1, scroll_x, 1, scroll_y, clip);
 }
 
 

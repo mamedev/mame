@@ -7,8 +7,8 @@
     driver by Aaron Giles
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GRIDLEE_H
-#define MAME_INCLUDES_GRIDLEE_H
+#ifndef MAME_MIDWAY_GRIDLEE_H
+#define MAME_MIDWAY_GRIDLEE_H
 
 #pragma once
 
@@ -48,8 +48,8 @@ public:
 private:
 	uint8_t analog_port_r(offs_t offset);
 	uint8_t random_num_r();
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(cocktail_flip_w);
+	void coin_counter_w(int state);
+	void cocktail_flip_w(int state);
 	void gridlee_videoram_w(offs_t offset, uint8_t data);
 	void gridlee_palette_select_w(uint8_t data);
 	void gridlee_palette(palette_device &palette) const;
@@ -121,4 +121,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GRIDLEE, gridlee_sound_device)
 
-#endif // MAME_INCLUDES_GRIDLEE_H
+#endif // MAME_MIDWAY_GRIDLEE_H

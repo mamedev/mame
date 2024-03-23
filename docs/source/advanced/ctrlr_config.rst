@@ -147,7 +147,7 @@ override the default control assignments for emulated inputs by type:
 .. code-block:: XML
 
     <input>
-        <port type="UI_CONFIGURE">
+        <port type="UI_MENU">
             <newseq type="standard">KEYCODE_TAB OR KEYCODE_1 KEYCODE_5</newseq>
         </port>
         <port type="UI_CANCEL">
@@ -170,7 +170,7 @@ override the default control assignments for emulated inputs by type:
 
 This sets the following default input assignments:
 
-Config Menu (User Interface)
+Show/Hide Menu (User Interface)
     Tab key, or 1 and 2 keys pressed simultaneously
 UI Cancel (User Interface)
     Escape key, or 2 and 6 keys pressed simultaneously
@@ -228,3 +228,36 @@ Here’s an example that overrides defaults for 280-ZZZAP:
 
 This sets the controls to steer left and right to the K and J keys,
 respectively, and disables the toggle setting for the gear shift input.
+
+
+.. _ctrlrcfg-mapdevice:
+
+Assigning input device numbers
+------------------------------
+
+Use ``mapdevice`` elements with ``device`` and ``controller`` attributes to
+assign stable numbers to input devices.  Note that all devices explicitly
+configured in this way must be connected when MAME starts for this to work as
+expected.
+
+Set the ``device`` attribute to the device ID of the input device, and set the
+``controller`` attribute to the desired input device token (device type and
+number).
+
+Here’s an example numbering two light guns and two XInput game controllers:
+
+.. code-block:: XML
+
+    <system name="default">
+        <input>
+            <mapdevice device="VID_D209&amp;PID_1601" controller="GUNCODE_1" />
+            <mapdevice device="VID_D209&amp;PID_1602" controller="GUNCODE_2" />
+            <mapdevice device="XInput Player 1" controller="JOYCODE_1" />
+            <mapdevice device="XInput Player 2" controller="JOYCODE_2" />
+        </input>
+    </system>
+
+MAME applies ``mapdevice`` elements found inside the first applicable ``system``
+element only.  To avoid confusion, it’s simplest to place the ``system`` element
+applying to all systems (``name`` attribute set to ``default``) first in the
+file, and use it to assign input device numbers.

@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger, yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Designer Display series, 6502 and 68000
 (6502-based displayless Designer is in excel.cpp)
 
-*******************************************************************************
+********************************************************************************
 
 Designer 2100 Display (model 6106) overview:
 - 8KB RAM(MS6264L-10), 2*32KB ROM(27C256)
@@ -16,7 +16,7 @@ Designer 2100 Display (model 6106) overview:
 
 Designer 2000 Display (model 6105): same hardware, no bookrom, 3MHz
 
-*******************************************************************************
+********************************************************************************
 
 Designer Mach III Master 2265 (model 6113) overview:
 - 80KB RAM(2*KM6264AL-10, 2*KM62256AP-10), 64KB ROM(2*WSI 27C256L-12)
@@ -33,13 +33,14 @@ Designer Mach IV Master 2325 (model 6129) overview:
 - PCB label 510.1149A01
 - It has a green "Shift" led instead of red, and ROM is not scrambled.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -48,9 +49,9 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_desdis.lh" // clickable
-#include "fidel_desdis_68kg.lh" // clickable
-#include "fidel_desdis_68kr.lh" // clickable
+#include "fidel_desdis.lh"
+#include "fidel_desdis_68kg.lh"
+#include "fidel_desdis_68kr.lh"
 
 
 namespace {
@@ -84,8 +85,11 @@ protected:
 	optional_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
+
+	u8 m_select = 0;
+	u32 m_lcd_data = 0;
 
 	// address maps
 	void fdes2100d_map(address_map &map);
@@ -95,9 +99,6 @@ protected:
 	virtual void control_w(offs_t offset, u8 data);
 	virtual void lcd_w(offs_t offset, u8 data);
 	virtual u8 input_r(offs_t offset);
-
-	u8 m_select = 0;
-	u32 m_lcd_data = 0;
 };
 
 void desdis_state::init_fdes2100d()
@@ -111,6 +112,7 @@ void desdis_state::machine_start()
 	save_item(NAME(m_select));
 	save_item(NAME(m_lcd_data));
 }
+
 
 // Designer Master
 
@@ -154,11 +156,9 @@ void desmas_state::init_fdes2265()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
-
-// TTL/generic
+*******************************************************************************/
 
 void desdis_state::update_lcd()
 {
@@ -186,7 +186,7 @@ void desdis_state::control_w(offs_t offset, u8 data)
 
 	// 74259 Q2: book rom A14
 	if (m_rombank != nullptr)
-		m_rombank->set_entry(~m_select >> 2 & 1);
+		m_rombank->set_entry(m_select >> 2 & 1);
 
 	// 74259 Q3: lcd polarity
 	update_lcd();
@@ -224,15 +224,15 @@ u8 desdis_state::input_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void desdis_state::fdes2100d_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(desdis_state::input_r), FUNC(desdis_state::control_w));
-	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x6000, 0x6007).mirror(0x1ff8).w(FUNC(desdis_state::lcd_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -261,9 +261,9 @@ void desmas_state::fdes2325_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( desdis )
 	PORT_START("IN.0")
@@ -279,13 +279,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void desdis_state::fdes2100d(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
 	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 
@@ -297,12 +297,12 @@ void desdis_state::fdes2100d(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2+4, 9);
 	m_display->set_segmask(0x3c, 0x7f);
 	config.set_default_layout(layout_fidel_desdis);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -311,7 +311,7 @@ void desdis_state::fdes2000d(machine_config &config)
 {
 	fdes2100d(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 3_MHz_XTAL); // R65C02P3
 	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 }
@@ -320,7 +320,7 @@ void desmas_state::fdes2265(machine_config &config)
 {
 	fdes2100d(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config.replace(), m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
 	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2265_map);
 
@@ -335,7 +335,7 @@ void desmas_state::fdes2325(machine_config &config)
 {
 	fdes2265(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68EC020(config.replace(), m_maincpu, 20_MHz_XTAL); // MC68EC020RP25
 	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2325_map);
 
@@ -344,16 +344,24 @@ void desmas_state::fdes2325(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
-ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01 - this dump came from a post-release bugfix by Fidelity
+ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01, serial 000646xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // WSI 27C256L-12
 
 	ROM_REGION( 0x8000, "rombank", 0 )
-	ROM_LOAD("bk3_white.ic10", 0x0000, 0x8000, CRC(3857cc35) SHA1(f073dafb9fd885c7ddb7fbff10e3653f343ef1c6) ) // WSI 27C256L-12
+	ROM_LOAD("bk_3_white.ic10", 0x0000, 0x8000, CRC(3857cc35) SHA1(f073dafb9fd885c7ddb7fbff10e3653f343ef1c6) ) // "
+ROM_END
+
+ROM_START( fdes2100da ) // model 6106, PCB label 510.1130A01, serial 914611xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // Microchip 27C256-15
+
+	ROM_REGION( 0x8000, "rombank", 0 )
+	ROM_LOAD("bk_white.ic10", 0x0000, 0x8000, CRC(10debf37) SHA1(b4ceeeb64436af77ab9b6a34a8d2e39deaf3000d) ) // "
 ROM_END
 
 ROM_START( fdes2000d ) // model 6105, PCB label 510.1130A01
@@ -379,7 +387,7 @@ ROM_END
 
 ROM_START( fdes2325 ) // model 6129, PCB label 510.1149A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("61_29_white.ic10", 0x00000, 0x10000, CRC(f74157e1) SHA1(87f3f2d584e292f81593e053240d022cc477834d) ) // 27c512
+	ROM_LOAD("61_29_white.ic10", 0x00000, 0x10000, CRC(f74157e1) SHA1(87f3f2d584e292f81593e053240d022cc477834d) ) // 27C512
 
 	ROM_REGION( 0x100, "pals", 0 )
 	ROM_LOAD("101-1097a01.ic19", 0x000, 0x100, NO_DUMP ) // PALCE16V8Q-25PC
@@ -389,14 +397,15 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP MACHINE    INPUT   STATE         INIT            COMPANY, FULLNAME, FLAGS
-CONS( 1988, fdes2100d, 0,         0, fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fdes2000d, fdes2100d, 0, fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE    INPUT   CLASS         INIT            COMPANY, FULLNAME, FLAGS
+SYST( 1988, fdes2100d,  0,         0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fdes2100da, fdes2100d, 0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fdes2000d,  fdes2100d, 0,      fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, fdes2265,  0,         0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, fdes2265a, fdes2265,  0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, fdes2325,  fdes2265,  0, fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, fdes2265,   0,         0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, fdes2265a,  fdes2265,  0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, fdes2325,   fdes2265,  0,      fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -14,7 +14,6 @@
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "formats/abcfd2_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
@@ -68,8 +67,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<fd1771_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_dos_rom;
 
 	bool m_cs;

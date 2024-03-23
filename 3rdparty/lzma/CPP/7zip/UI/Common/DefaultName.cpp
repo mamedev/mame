@@ -20,7 +20,7 @@ static UString GetDefaultName3(const UString &fileName,
   
   int dotPos = fileName.ReverseFind_Dot();
   if (dotPos > 0)
-    return fileName.Left(dotPos) + addSubExtension;
+    return fileName.Left((unsigned)dotPos) + addSubExtension;
 
   if (addSubExtension.IsEmpty())
     return fileName + L'~';

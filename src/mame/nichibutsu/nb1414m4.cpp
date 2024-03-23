@@ -31,7 +31,7 @@ Notes:
 #include "nb1414m4.h"
 #include "screen.h"
 
-DEFINE_DEVICE_TYPE(NB1414M4, nb1414m4_device, "nb1414m4", "NB1414M4 Mahjong Custom")
+DEFINE_DEVICE_TYPE(NB1414M4, nb1414m4_device, "nb1414m4", "NB1414M4 Custom")
 
 nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NB1414M4, tag, owner, clock)

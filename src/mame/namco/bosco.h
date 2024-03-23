@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_BOSCO_H
-#define MAME_INCLUDES_BOSCO_H
+#ifndef MAME_NAMCO_BOSCO_H
+#define MAME_NAMCO_BOSCO_H
 
 #pragma once
 
@@ -41,7 +41,7 @@ private:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	void bosco_palette(palette_device &palette) const;
 	uint32_t screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bosco);
+	void screen_vblank_bosco(int state);
 
 	inline void get_tile_info_bosco(tile_data &tileinfo,int tile_index,int ram_offs);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
@@ -54,4 +54,4 @@ private:
 	void bosco_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BOSCO_H
+#endif // MAME_NAMCO_BOSCO_H

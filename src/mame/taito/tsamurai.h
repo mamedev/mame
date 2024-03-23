@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_TSAMURAI_H
-#define MAME_INCLUDES_TSAMURAI_H
+#ifndef MAME_TAITO_TSAMURAI_H
+#define MAME_TAITO_TSAMURAI_H
 
 #pragma once
 
@@ -33,16 +33,15 @@ protected:
 	virtual void video_start() override;
 
 	// common
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(textbank1_w);
+	void nmi_enable_w(int state);
+	void coin1_counter_w(int state);
+	void coin2_counter_w(int state);
+	void textbank1_w(int state);
 	void fg_videoram_w(offs_t offset, uint8_t data);
 
 	// tsamurai and m660 specific
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void fg_colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	void scrolly_w(uint8_t data);
 	void scrollx_w(uint8_t data);
 	void bgcolor_w(uint8_t data);
@@ -59,7 +58,7 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void main_map(address_map &map);
 	void sound1_map(address_map &map);
@@ -158,7 +157,7 @@ protected:
 private:
 
 	// m660 specific
-	DECLARE_WRITE_LINE_MEMBER(textbank2_w);
+	void textbank2_w(int state);
 	uint8_t m660_unknown_d803_r();
 	void m660_sound_command3_w(uint8_t data);
 	uint8_t m660_sound_command3_r();
@@ -175,4 +174,4 @@ private:
 	int m_sound_command3 = 0;
 };
 
-#endif // MAME_INCLUDES_TSAMURAI_H
+#endif // MAME_TAITO_TSAMURAI_H

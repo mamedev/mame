@@ -39,8 +39,8 @@
 #include "emu.h"
 #include "st2205u.h"
 
-#define LOG_DAC (1 << 1U)
-#define LOG_DMA (1 << 2U)
+#define LOG_DAC (1U << 1)
+#define LOG_DMA (1U << 2)
 //#define VERBOSE (LOG_DMA)
 #include "logmacro.h"
 

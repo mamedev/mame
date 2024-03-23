@@ -44,25 +44,25 @@ void atari810_device::mem_map(address_map &map)
 {
 	map(0x0000, 0x0003).mirror(0x167c).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
 	map(0x0080, 0x00ff).mirror(0x1400).ram(); // MCM6810
-	map(0x0100, 0x017f).mirror(0x1480).m(m_pia, FUNC(mos6532_new_device::ram_map));
-	map(0x0300, 0x031f).mirror(0x14e0).m(m_pia, FUNC(mos6532_new_device::io_map));
+	map(0x0100, 0x017f).mirror(0x1480).m(m_pia, FUNC(mos6532_device::ram_map));
+	map(0x0300, 0x031f).mirror(0x14e0).m(m_pia, FUNC(mos6532_device::io_map));
 	map(0x0800, 0x0fff).mirror(0x1000).rom().region("rom", 0);
 }
 
 
-WRITE_LINE_MEMBER(atari810_device::data_out_w)
+void atari810_device::data_out_w(int state)
 {
-	m_pia->pb7_w(state);
+	m_pia->pb_bit_w<7>(state);
 }
 
-WRITE_LINE_MEMBER(atari810_device::command_w)
+void atari810_device::command_w(int state)
 {
-	m_pia->pb6_w(state);
+	m_pia->pb_bit_w<6>(state);
 }
 
-WRITE_LINE_MEMBER(atari810_device::ready_w)
+void atari810_device::ready_w(int state)
 {
-	m_pia->pb1_w(state);
+	m_pia->pb_bit_w<1>(state);
 }
 
 
@@ -86,14 +86,14 @@ void atari810_device::device_add_mconfig(machine_config &config)
 	m6507_device &fdcpu(M6507(config, "fdcpu", 1_MHz_XTAL / 2));
 	fdcpu.set_addrmap(AS_PROGRAM, &atari810_device::mem_map);
 
-	MOS6532_NEW(config, m_pia, 1_MHz_XTAL / 2);
+	MOS6532(config, m_pia, 1_MHz_XTAL / 2);
 	m_pia->pa_rd_callback().set_ioport("SELECT");
 	m_pia->pb_wr_callback().set(FUNC(atari810_device::step_w));
 	//m_pia->irq_wr_callback().set(m_fdc, FUNC(fd1771_device::ip_w));
 
 	FD1771(config, m_fdc, 1_MHz_XTAL);
-	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa7_w));
-	m_fdc->intrq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa6_w));
+	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_device::pa_bit_w<7>));
+	m_fdc->intrq_wr_callback().set(m_pia, FUNC(mos6532_device::pa_bit_w<6>));
 }
 
 

@@ -34,6 +34,9 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class irisha_state : public driver_device
 {
 public:
@@ -55,7 +58,7 @@ private:
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	TIMER_CALLBACK_MEMBER(irisha_key);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -315,7 +318,7 @@ void irisha_state::update_speaker()
 }
 
 
-WRITE_LINE_MEMBER(irisha_state::speaker_w)
+void irisha_state::speaker_w(int state)
 {
 	m_sg1_line = state;
 	update_speaker();
@@ -427,6 +430,9 @@ ROM_START( irisha )
 	ROM_LOAD( "ir_bootm.bin", 0x0000, 0x2000, CRC(7f9f4f0e) SHA1(05f97e1a1d7a15f4451129dba6c0bddc87ea748e))
 	ROM_LOAD( "ir_conou.bin", 0x2000, 0x2000, CRC(bf92beed) SHA1(696c482ba53bc6261db11061ecc7141c67f1d820))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS

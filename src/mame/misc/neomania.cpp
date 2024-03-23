@@ -1,6 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/*
+/**************************************************************************************************
+
+TODO:
+- SIGABRT in pcipc/pciagp trying to execute ppm.exe,
+  in shutms11 will draw "Parallel Port Manager v4.0" then fail on device check.
+\- "Testing I/O board connection"
+   bp 100027e2, edit $25dd11 = 0x02 (board identifier?)
+\- "Testing I/O board communications"
+   bp 10002942 (checks acknowledge from control bit 6 @ $37a, for 0xe0-0xe7. Buffers at $25dd48-4f)
+   Expected ack values: 40 40 00 00 40 00 40 00
+   bp 10002d57,1,{ebx=8;g} for a quick workaround
+\- "Testing I/O board input bits" / "BAD 0 1 2 3     7"
+   Goes ahead in checking each port r/w, TBD
+\- Fails win98 PS/2 PnP afterwards, which isn't supposed to be connected in the first place.
+- Extract "Guard.zip" and understand what is for;
+
+===================================================================================================
+
 Neo Mania:
  The Portuguese (Vila Nova de Gaia) company "Hyper M.A.R." created this machine on 2002 with 40 games,
  and updated it on 2003 increasing the number of games up to 48. There was a latest newer version
@@ -16,11 +33,19 @@ The "NEO MANIA ADAPTER BOARD" contains:
     JMP3 (three positions) - Unknown function
    2 x Coin acceptors ports
    1 x Bank of 8 dipswitches (unknown function)
-*/
+
+C:\Neomania folder contains ppm.exe, which is the driver for the parallel port device.
+It also contains a password protected "Guard.zip", copy protection?
+C:\Windows has driver installs for:
+- a Sound Blaster AudioPCI 128
+- an ATI All-In-Wonder / All-In-Wonder Pro (with leftover "SYSTEM.I~I" footprint with
+  "display.drv=ATI Rage IIC AGP (Português)").
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -28,32 +53,19 @@ class neomania_state : public driver_device
 {
 public:
 	neomania_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void neomania(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void neomania_map(address_map &map);
 };
 
-void neomania_state::video_start()
-{
-}
-
-uint32_t neomania_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void neomania_state::neomania_map(address_map &map)
 {
@@ -63,27 +75,16 @@ static INPUT_PORTS_START( neomania )
 INPUT_PORTS_END
 
 
-void neomania_state::machine_start()
-{
-}
-
-void neomania_state::machine_reset()
-{
-}
-
 void neomania_state::neomania(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM3(config, m_maincpu, 600'000'000); // Exact hardware not specified
+	// Neoemu.exe requires a processor with at least MMX features
+	PENTIUM3(config, m_maincpu, 100'000'000); // Exact hardware not specified
 	m_maincpu->set_addrmap(AS_PROGRAM, &neomania_state::neomania_map);
+	m_maincpu->set_disable();
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(neomania_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -94,11 +95,11 @@ ROM_START( neomania )
 
 	// Different PC motherboards with different configurations.
 	ROM_REGION(0x80000, "bios", 0)
-	ROM_LOAD("pcbios.bin", 0x00000, 0x80000, NO_DUMP) // MB BIOS
+	ROM_LOAD("pcbios.bin", 0x00000, 0x80000, NO_DUMP)
 
 	// Portuguese version with 48 games, from 2003
-	DISK_REGION( "ide:0:hdd:image" ) // From a Norton Ghost recovery image
-	DISK_IMAGE( "neomania", 0, SHA1(4a865d1ed67901b98b37f94cfdd591fad38b404a) )
+	DISK_REGION( "ide:0:hdd" ) // From a Norton Ghost recovery image
+	DISK_IMAGE( "neomania", 0, SHA1(4338be8214ca5a9aa6808a94d73e0820a4d34b98) )
 ROM_END
 
 } // Anonymous namespace

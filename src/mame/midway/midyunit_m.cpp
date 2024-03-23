@@ -21,6 +21,17 @@
 #define SOUND_YAWDIM2               6
 
 
+void midyunit_state::machine_start()
+{
+	m_left_flash.resolve();
+	m_right_flash.resolve();
+	m_left_gun_recoil.resolve();
+	m_right_gun_recoil.resolve();
+	m_left_gun_green_led.resolve();
+	m_left_gun_red_led.resolve();
+	m_right_gun_green_led.resolve();
+	m_right_gun_red_led.resolve();
+}
 
 /*************************************
  *
@@ -139,25 +150,21 @@ void midyunit_state::term2_sound_w(offs_t offset, uint16_t data)
 	/* Flash Lamp Output Data */
 	if  ( ((data & 0x800) != 0x800) && ((data & 0x400) == 0x400 ) )
 	{
-		output().set_value("Left_Flash_1", data & 0x1);
-		output().set_value("Left_Flash_2", (data & 0x2) >> 1);
-		output().set_value("Left_Flash_3", (data & 0x4) >> 2);
-		output().set_value("Left_Flash_4", (data & 0x8) >> 3);
-		output().set_value("Right_Flash_1", (data & 0x10) >> 4);
-		output().set_value("Right_Flash_2", (data & 0x20) >> 5);
-		output().set_value("Right_Flash_3", (data & 0x40) >> 6);
-		output().set_value("Right_Flash_4", (data & 0x80) >> 7);
+		for (int i = 0; i < 4; i++)
+			m_left_flash[i] = BIT(data, i);
+		for (int i = 0; i < 4; i++)
+			m_right_flash[i] = BIT(data, i + 4);
 	}
 
 	/* Gun Output Data */
 	if  ( ((data & 0x800) == 0x800) && ((data & 0x400) != 0x400 ) )
 	{
-		output().set_value("Left_Gun_Recoil", data & 0x1);
-		output().set_value("Right_Gun_Recoil", (data & 0x2) >> 1);
-		output().set_value("Left_Gun_Green_Led", (~data & 0x20) >> 5);
-		output().set_value("Left_Gun_Red_Led", (~data & 0x10) >> 4);
-		output().set_value("Right_Gun_Green_Led", (~data & 0x80) >> 7);
-		output().set_value("Right_Gun_Red_Led", (~data & 0x40) >> 6);
+		m_left_gun_recoil = BIT(data, 0);
+		m_right_gun_recoil = BIT(data, 1);
+		m_left_gun_green_led = BIT(~data, 5);
+		m_left_gun_red_led = BIT(~data, 4);
+		m_right_gun_green_led = BIT(~data, 7);
+		m_right_gun_red_led = BIT(~data, 6);
 	}
 
 	if (offset == 0)
@@ -232,6 +239,13 @@ void midyunit_state::cvsd_protection_w(offs_t offset, uint8_t data)
 	m_cvsd_protection_base[offset] = data;
 }
 
+void midyunit_state::install_hidden_ram(mc6809e_device &cpu, int prot_start, int prot_end)
+{
+	size_t size = 1 + prot_end - prot_start;
+	m_hidden_ram = std::make_unique<uint8_t[]>(size);
+	save_pointer(NAME(m_hidden_ram), size);
+	cpu.space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+}
 
 void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_end)
 {
@@ -292,21 +306,15 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case SOUND_CVSD:
-			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
-			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
-			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+			install_hidden_ram(*m_cvsd_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
-			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
-			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
-			m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+			install_hidden_ram(*m_adpcm_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
-			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
-			m_narc_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+			install_hidden_ram(*m_narc_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:
@@ -485,6 +493,30 @@ void midyunit_state::init_mkyturbo()
 {
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16smo_delegate(*this, FUNC(midyunit_state::mkturbo_prot_r)));
+
+	init_mkyunit();
+}
+
+void midyunit_state::init_mkla3bl()
+{
+	// rearrange GFX so the driver can deal with them
+	uint8_t *gfxrom = memregion("gfx1")->base();
+	std::vector<uint8_t> buffer(0x400000);
+	memcpy(&buffer[0], gfxrom, 0x400000);
+
+	for (int i = 0x000000; i < 0x100000; i++)
+		gfxrom[i] = buffer[0x200000 | ((i & 0xfffff) * 2 + 1)];
+
+	for (int i = 0x100000; i < 0x200000; i++)
+		gfxrom[i] = buffer[(i & 0xfffff) * 2 + 1];
+
+	for (int i = 0x200000; i < 0x300000; i++)
+		gfxrom[i] = buffer[0x200000 | ((i & 0xfffff) * 2)];
+
+	for (int i = 0x300000; i < 0x400000; i++)
+		gfxrom[i] = buffer[(i & 0xfffff) * 2];
+
+	// 0x400000 - 0x5fffff range is already ok
 
 	init_mkyunit();
 }

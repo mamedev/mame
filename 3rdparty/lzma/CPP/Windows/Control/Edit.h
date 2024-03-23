@@ -1,7 +1,7 @@
 // Windows/Control/Edit.h
 
-#ifndef __WINDOWS_CONTROL_EDIT_H
-#define __WINDOWS_CONTROL_EDIT_H
+#ifndef ZIP7_INC_WINDOWS_CONTROL_EDIT_H
+#define ZIP7_INC_WINDOWS_CONTROL_EDIT_H
 
 #include "../Window.h"
 

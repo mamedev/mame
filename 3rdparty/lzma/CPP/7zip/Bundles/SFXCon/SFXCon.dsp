@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "EXTRACT_ONLY" /D "_SFX" /D "NO_READ_FROM_CODER" /Yu"StdAfx.h" /FD /c
+# ADD CPP /nologo /Gr /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "Z7_EXTRACT_ONLY" /D "Z7_SFX" /D "Z7_NO_READ_FROM_CODER" /FAcs /Yu"StdAfx.h" /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x419 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -67,7 +67,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /I "..\..\..\..\\" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "EXTRACT_ONLY" /D "_SFX" /D "NO_READ_FROM_CODER" /Yu"StdAfx.h" /FD /GZ /c
+# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /I "..\..\..\..\\" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "Z7_EXTRACT_ONLY" /D "Z7_SFX" /D "Z7_NO_READ_FROM_CODER" /Yu"StdAfx.h" /FD /GZ /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x419 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -114,6 +114,10 @@ SOURCE=..\..\Archive\Common\CoderMixer2.cpp
 # Begin Source File
 
 SOURCE=..\..\Archive\Common\CoderMixer2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Archive\Common\HandlerOut.h
 # End Source File
 # Begin Source File
 
@@ -253,11 +257,19 @@ SOURCE=..\..\Compress\Bcj2Coder.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Compress\Bcj2Coder.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Compress\Bcj2Register.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\Compress\BcjCoder.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Compress\BcjCoder.h
 # End Source File
 # Begin Source File
 
@@ -281,6 +293,10 @@ SOURCE=..\..\Compress\CopyCoder.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Compress\CopyCoder.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Compress\CopyRegister.cpp
 # End Source File
 # Begin Source File
@@ -293,6 +309,10 @@ SOURCE=..\..\Compress\Lzma2Decoder.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Compress\Lzma2Decoder.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Compress\Lzma2Register.cpp
 # End Source File
 # Begin Source File
@@ -301,11 +321,19 @@ SOURCE=..\..\Compress\LzmaDecoder.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Compress\LzmaDecoder.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Compress\LzmaRegister.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\Compress\PpmdDecoder.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Compress\PpmdDecoder.h
 # End Source File
 # Begin Source File
 
@@ -411,6 +439,14 @@ SOURCE=..\..\..\Windows\Synchronization.cpp
 
 SOURCE=..\..\..\Windows\Synchronization.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\System.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\System.h
+# End Source File
 # End Group
 # Begin Group "Common"
 
@@ -422,6 +458,10 @@ SOURCE=..\..\..\Common\CommandLineParser.cpp
 # Begin Source File
 
 SOURCE=..\..\..\Common\CommandLineParser.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\Common.h
 # End Source File
 # Begin Source File
 
@@ -438,6 +478,18 @@ SOURCE=..\..\..\Common\IntToString.cpp
 # Begin Source File
 
 SOURCE=..\..\..\Common\IntToString.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyBuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyBuffer2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyCom.h
 # End Source File
 # Begin Source File
 
@@ -462,6 +514,10 @@ SOURCE=..\..\..\Common\NewHandler.cpp
 # Begin Source File
 
 SOURCE=..\..\..\Common\NewHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\Sha256Prepare.cpp
 # End Source File
 # Begin Source File
 
@@ -739,6 +795,19 @@ SOURCE=..\..\..\..\C\7zCrcOpt.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\C\7zStream.c
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zTypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zWindows.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\C\Aes.c
 # SUBTRACT CPP /YX /Yc /Yu
 # End Source File
@@ -790,8 +859,16 @@ SOURCE=..\..\..\..\C\BraIA64.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\C\Compiler.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\C\CpuArch.c
 # SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\CpuArch.h
 # End Source File
 # Begin Source File
 
@@ -805,7 +882,18 @@ SOURCE=..\..\..\..\C\Delta.h
 # Begin Source File
 
 SOURCE=..\..\..\..\C\DllSecur.c
+
+!IF  "$(CFG)" == "SFXCon - Win32 Release"
+
+# ADD CPP /O2
 # SUBTRACT CPP /YX /Yc /Yu
+
+!ELSEIF  "$(CFG)" == "SFXCon - Win32 Debug"
+
+# SUBTRACT CPP /YX /Yc /Yu
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -822,12 +910,30 @@ SOURCE=..\..\..\..\C\Lzma2Dec.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\C\Lzma2DecMt.c
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\Lzma2DecMt.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\C\LzmaDec.c
 # SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\C\LzmaDec.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\MtDec.c
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\MtDec.h
 # End Source File
 # Begin Source File
 
@@ -854,6 +960,11 @@ SOURCE=..\..\..\..\C\Sha256.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\C\Sha256Opt.c
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\C\Threads.c
 # SUBTRACT CPP /YX /Yc /Yu
 # End Source File
@@ -862,13 +973,33 @@ SOURCE=..\..\..\..\C\Threads.c
 SOURCE=..\..\..\..\C\Threads.h
 # End Source File
 # End Group
-# Begin Source File
+# Begin Group "7zip"
 
-SOURCE=.\7z.ico
-# End Source File
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\..\Archive\IArchive.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\ICoder.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IDecl.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IPassword.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\IProgress.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\7z.ico
 # End Source File
 # Begin Source File
 

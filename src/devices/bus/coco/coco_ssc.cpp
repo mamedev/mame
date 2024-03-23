@@ -40,8 +40,8 @@
 
 #include "speaker.h"
 
-#define LOG_INTERFACE   (1U <<  1)
-#define LOG_INTERNAL    (1U <<  2)
+#define LOG_INTERFACE   (1U << 1)
+#define LOG_INTERNAL    (1U << 2)
 #define VERBOSE (0)
 // #define VERBOSE (LOG_INTERFACE)
 // #define VERBOSE (LOG_INTERFACE|LOG_INTERNAL)

@@ -13,6 +13,7 @@
 
 #include "emuopts.h"
 #include "fileio.h"
+#include "main.h"
 #include "render.h"
 #include "rendutil.h"
 
@@ -771,8 +772,6 @@ void screen_device::device_resolve_objects()
 	// bind our handlers
 	m_screen_update_ind16.resolve();
 	m_screen_update_rgb32.resolve();
-	m_screen_vblank.resolve_safe();
-	m_scanline_cb.resolve();
 
 	// assign our format to the palette before it starts
 	if (m_palette)
@@ -842,7 +841,7 @@ void screen_device::device_start()
 	m_scanline0_timer = timer_alloc(FUNC(screen_device::first_scanline_tick), this);
 
 	// allocate a timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || !m_scanline_cb.isunset())
 		m_scanline_timer = timer_alloc(FUNC(screen_device::scanline_tick), this);
 
 	// configure the screen with the default parameters
@@ -853,7 +852,7 @@ void screen_device::device_start()
 	m_vblank_end_time = attotime(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || !m_scanline_cb.isunset())
 		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
@@ -888,7 +887,7 @@ void screen_device::device_start()
 	save_item(NAME(m_vblank_end_time));
 	save_item(NAME(m_frame_number));
 	if (m_oldstyle_vblank_supplied)
-		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
+		logerror("%s: Deprecated legacy Old Style screen configured (set_vblank_time), please use set_raw instead.\n",this->tag());
 
 	m_is_primary_screen = (this == screen_device_enumerator(machine().root_device()).first());
 }
@@ -956,7 +955,7 @@ TIMER_CALLBACK_MEMBER(screen_device::scanline_tick)
 		// force a partial update to the current scanline
 		update_partial(param);
 	}
-	if (m_scanline_cb)
+	if (!m_scanline_cb.isunset())
 		m_scanline_cb(param);
 
 	// compute the next visible scanline
@@ -1182,48 +1181,49 @@ bool screen_device::update_partial(int scanline)
 
 	// otherwise, render
 	LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.top(), clip.bottom()));
-	g_profiler.start(PROFILER_VIDEO);
 
 	u32 flags = 0;
-	if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 	{
-		rectangle scan_clip(clip);
-		for (int y = clip.top(); y <= clip.bottom(); y++)
+		auto profile = g_profiler.start(PROFILER_VIDEO);
+		if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 		{
-			scan_clip.sety(y, y);
-			pre_update_scanline(y);
-
-			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-			switch (curbitmap.format())
+			rectangle scan_clip(clip);
+			for (int y = clip.top(); y <= clip.bottom(); y++)
 			{
-				default:
-				case BITMAP_FORMAT_IND16:   flags |= m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y], scan_clip);   break;
-				case BITMAP_FORMAT_RGB32:   flags |= m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y], scan_clip);   break;
-			}
+				scan_clip.sety(y, y);
+				pre_update_scanline(y);
 
-			m_partial_updates_this_frame++;
-		}
-	}
-	else
-	{
-		if (m_type != SCREEN_TYPE_SVG)
-		{
-			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-			switch (curbitmap.format())
-			{
-				default:
-				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+				switch (curbitmap.format())
+				{
+					default:
+					case BITMAP_FORMAT_IND16:   flags |= m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y], scan_clip);   break;
+					case BITMAP_FORMAT_RGB32:   flags |= m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y], scan_clip);   break;
+				}
+
+				m_partial_updates_this_frame++;
 			}
 		}
 		else
 		{
-			flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
+			if (m_type != SCREEN_TYPE_SVG)
+			{
+				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+				switch (curbitmap.format())
+				{
+					default:
+					case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+					case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+				}
+			}
+			else
+			{
+				flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
+			}
+			m_partial_updates_this_frame++;
 		}
-		m_partial_updates_this_frame++;
+		// stop profiling
 	}
-
-	g_profiler.stop();
 
 	// if we modified the bitmap, we have to commit
 	m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
@@ -1295,7 +1295,7 @@ void screen_device::update_now()
 			// if there's something to draw, do it
 			if (!clip.empty())
 			{
-				g_profiler.start(PROFILER_VIDEO);
+				auto profile = g_profiler.start(PROFILER_VIDEO);
 
 				u32 flags = 0;
 				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
@@ -1319,7 +1319,6 @@ void screen_device::update_now()
 					}
 				}
 
-				g_profiler.stop();
 				m_partial_updates_this_frame++;
 
 				// if we modified the bitmap, we have to commit
@@ -1348,7 +1347,7 @@ void screen_device::update_now()
 		// and if there's something to draw, do it
 		if (!clip.empty())
 		{
-			g_profiler.start(PROFILER_VIDEO);
+			auto profile = g_profiler.start(PROFILER_VIDEO);
 
 			LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.bottom(), clip.left(), clip.right()));
 
@@ -1375,7 +1374,6 @@ void screen_device::update_now()
 			}
 
 			m_partial_updates_this_frame++;
-			g_profiler.stop();
 
 			// if we modified the bitmap, we have to commit
 			m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;

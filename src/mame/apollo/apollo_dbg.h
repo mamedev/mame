@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef MAME_MACHINE_APOLLO_DBG_H
-#define MAME_MACHINE_APOLLO_DBG_H
+#ifndef MAME_APOLLO_APOLLO_DBG_H
+#define MAME_APOLLO_APOLLO_DBG_H
 
 #pragma once
 
@@ -18,4 +18,4 @@
 
 int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc);
 
-#endif // MAME_MACHINE_APOLLO_DBG_H
+#endif // MAME_APOLLO_APOLLO_DBG_H

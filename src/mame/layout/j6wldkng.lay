@@ -396,7 +396,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;7 3X Cashpot">
+		<text string="£7 3X Cashpot">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -416,7 +416,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;5 3X Red 7">
+		<text string="£5 3X Red 7">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -436,7 +436,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;2 3x Double Bar">
+		<text string="£2 3x Double Bar">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -456,7 +456,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;1 3x Single Bar">
+		<text string="£1 3x Single Bar">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -476,7 +476,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;4 3x Blue 7">
+		<text string="£4 3x Blue 7">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -496,7 +496,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;3 3x Triple Bar">
+		<text string="£3 3x Triple Bar">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -516,7 +516,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;30 4x Double Bar">
+		<text string="£30 4x Double Bar">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -536,7 +536,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;20 4x Single Bar">
+		<text string="£20 4x Single Bar">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -556,7 +556,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;250 4X Wild King">
+		<text string="£250 4X Wild King">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -576,7 +576,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;150 4x Red 7">
+		<text string="£150 4x Red 7">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -596,7 +596,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;100 4x Blue 7">
+		<text string="£100 4x Blue 7">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -616,7 +616,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;60 4x Triple Bar">
+		<text string="£60 4x Triple Bar">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1092,7 +1092,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1328,7 +1328,7 @@
 		</text>
 	</element>
 	<element name="label_13">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1346,19 +1346,19 @@
 		</text>
 	</element>
 	<element name="label_19">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_20">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_36">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>

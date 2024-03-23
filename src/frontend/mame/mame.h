@@ -6,11 +6,13 @@
 
     Controls execution of the core MAME system.
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_MAME_MAME_H
 #define MAME_FRONTEND_MAME_MAME_H
 
 #pragma once
+
+#include "main.h"
+
 
 namespace sol {
 

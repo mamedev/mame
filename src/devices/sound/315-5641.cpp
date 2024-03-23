@@ -18,8 +18,6 @@ sega_315_5641_pcm_device::sega_315_5641_pcm_device(const machine_config &mconfig
 
 void sega_315_5641_pcm_device::device_start()
 {
-	m_fifocallback.resolve_safe();
-
 	upd7759_device::device_start();
 
 	save_item(NAME(m_fifo_data), 0x40);

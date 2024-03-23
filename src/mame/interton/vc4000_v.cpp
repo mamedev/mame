@@ -350,7 +350,7 @@ void vc4000_state::vc4000_video_w(offs_t offset, uint8_t data)
 }
 
 
-READ_LINE_MEMBER(vc4000_state::vc4000_vsync_r)
+int vc4000_state::vc4000_vsync_r()
 {
 	return m_video.line >= VC4000_END_LINE ? ASSERT_LINE : CLEAR_LINE;
 }

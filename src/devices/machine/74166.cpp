@@ -39,7 +39,7 @@ void ttl166_device::device_add_mconfig(machine_config &config)
 ttl166_device::ttl166_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TTL166, tag, owner, clock),
 	m_timer(*this, "timer"),
-	m_data_cb(*this), m_qh_cb(*this),
+	m_data_cb(*this, 0x00), m_qh_cb(*this),
 	m_data(0x00),
 	m_ser(0), m_clk(0), m_shld(0)
 {
@@ -51,10 +51,6 @@ ttl166_device::ttl166_device(const machine_config &mconfig, const char *tag, dev
 
 void ttl166_device::device_start()
 {
-	// resolve callbacks
-	m_data_cb.resolve_safe(0x00);
-	m_qh_cb.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_data));
 	save_item(NAME(m_ser));
@@ -89,12 +85,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( ttl166_device::qh_output )
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( ttl166_device::serial_w )
+void ttl166_device::serial_w(int state)
 {
 	m_ser = state;
 }
 
-WRITE_LINE_MEMBER( ttl166_device::clock_w )
+void ttl166_device::clock_w(int state)
 {
 	if (m_clk == 0 && state == 1)
 	{
@@ -117,7 +113,7 @@ WRITE_LINE_MEMBER( ttl166_device::clock_w )
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER( ttl166_device::shift_load_w )
+void ttl166_device::shift_load_w(int state)
 {
 	m_shld = state;
 }

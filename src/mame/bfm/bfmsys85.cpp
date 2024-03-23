@@ -124,7 +124,7 @@ private:
 	required_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void watchdog_w(uint8_t data);
 	uint8_t irqlatch_r();
 	void reel12_w(uint8_t data);
@@ -139,8 +139,8 @@ private:
 	void mux_enable_w(uint8_t data);
 	void triac_w(uint8_t data);
 	uint8_t triac_r();
-	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void sys85_data_w(int state);
+	void write_acia_clock(int state);
 	int b85_find_project_string();
 };
 
@@ -151,13 +151,13 @@ private:
 ///////////////////////////////////////////////////////////////////////////
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::sys85_data_w)
+void bfmsys85_state::sys85_data_w(int state)
 {
 	m_sys85_data_line_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::write_acia_clock)
+void bfmsys85_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -613,8 +613,7 @@ ROM_START( b85jpclb )
 	ROM_LOAD( "5p a.bin", 0x8000, 0x008000, CRC(23b4f619) SHA1(03bdb736b260d96435fe1eab028b4e03c5e733f7) )
 	ROM_LOAD( "95715692 jpot 100.bin", 0x6000, 0x002000, CRC(1cd88c27) SHA1(126cc0eba69cce6bd3abad9d2eeff64de3ab2477) )
 	ROM_LOAD( "39350115 jpot 100.bin", 0x8000, 0x008000, CRC(dfb05807) SHA1(2375f30e37c7350ccfeb0483e74b51f4c2a090a0) )
-
-	ROM_END
+ROM_END
 
 ROM_START( b85jpclba )
 	ROM_REGION( 0x10000, "maincpu", 0 )

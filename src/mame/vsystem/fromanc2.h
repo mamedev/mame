@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, Uki
-#ifndef MAME_INCLUDES_FROMANC2_H
-#define MAME_INCLUDES_FROMANC2_H
+#ifndef MAME_VSYSTEM_FROMANC2_H
+#define MAME_VSYSTEM_FROMANC2_H
 
 #pragma once
 
@@ -35,9 +35,9 @@ public:
 	void init_fromanc4();
 	void init_fromanc2();
 
-	DECLARE_READ_LINE_MEMBER(subcpu_int_r);
-	DECLARE_READ_LINE_MEMBER(sndcpu_nmi_r);
-	DECLARE_READ_LINE_MEMBER(subcpu_nmi_r);
+	int subcpu_int_r();
+	int sndcpu_nmi_r();
+	int subcpu_nmi_r();
 
 protected:
 	virtual void machine_reset() override;
@@ -131,4 +131,4 @@ private:
 	void fromancr_main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FROMANC2_H
+#endif // MAME_VSYSTEM_FROMANC2_H

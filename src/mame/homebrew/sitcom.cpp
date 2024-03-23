@@ -78,8 +78,8 @@ protected:
 	void sitcom_io(address_map &map);
 
 	template <unsigned D> void update_ds(offs_t offset, uint16_t data) { m_digits[(D << 2) | offset] = data; }
-	DECLARE_WRITE_LINE_MEMBER(update_rxd)                   { m_rxd = bool(state); }
-	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
+	void update_rxd(int state)          { m_rxd = bool(state); }
+	int sid_line()                      { return m_rxd ? 1 : 0; }
 
 	static void sitcom_null_modem(device_t *device)
 	{
@@ -113,7 +113,7 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(shutter_r);
+	int shutter_r();
 	DECLARE_INPUT_CHANGED_MEMBER(update_shutter);
 	DECLARE_INPUT_CHANGED_MEMBER(update_speed);
 
@@ -263,7 +263,7 @@ void sitcom_timer_state::update_ppi_pb(uint8_t data)
 	m_test_led = BIT(data, 5);
 }
 
-READ_LINE_MEMBER( sitcom_timer_state::shutter_r )
+int sitcom_timer_state::shutter_r()
 {
 	return m_shutter ? 0 : 1;
 }

@@ -33,6 +33,7 @@ public:
 	auto porta_write() { return m_porta_write.bind(); }
 	auto portb_read()  { return m_portb_read.bind(); }
 	auto portb_write() { return m_portb_write.bind(); }
+	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
 
 protected:
 	virtual void device_config_complete() override;
@@ -182,6 +183,9 @@ private:
 	// Port B: 8 bit I/O. Shared with TI4/INT4, TI5/INT5, TI6/INT6, TI7/INT7, TO4, TO5, TO6
 	devcb_read8    m_portb_read;
 	devcb_write8   m_portb_write;
+
+	// analogue inputs, sampled at 10 bits
+	devcb_read16::array<4> m_an_read;
 
 	// I/O Port Control
 	uint8_t   m_port_latch[0xc];

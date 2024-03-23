@@ -21,7 +21,9 @@ enum
 	PCE_CDSYS3U,
 	PCE_POPULOUS,
 	PCE_SF2,
-	PCE_TENNOKOE
+	PCE_TENNOKOE,
+	PCE_ACARD_DUO,
+	PCE_ACARD_PRO
 };
 
 
@@ -33,11 +35,9 @@ public:
 	// construction/destruction
 	virtual ~device_pce_cart_interface();
 
-	// reading and writing
-	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
-	virtual void write_cart(offs_t offset, uint8_t data) {}
+	virtual void install_memory_handlers(address_space &space) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return &m_ram[0]; }
@@ -80,15 +80,18 @@ public:
 	pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pce_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// configuration
+	template <typename T> void set_address_space(T &&tag, int no) { m_address_space.set_tag(std::forward<T>(tag), no); }
+
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return m_interface; }
 	virtual const char *file_extensions() const noexcept override { return "pce,bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
@@ -96,29 +99,19 @@ public:
 
 	void set_intf(const char * interface) { m_interface = interface; }
 
-	// reading and writing
-	uint8_t read_cart(offs_t offset);
-	void write_cart(offs_t offset, uint8_t data);
-
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	const char *m_interface;
 	int m_type;
 	device_pce_cart_interface *m_cart;
+	required_address_space m_address_space;
 };
 
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define PCESLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_PCE_PCE_SLOT_H

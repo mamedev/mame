@@ -85,7 +85,6 @@ private:
 	void irq_mask_w(int state);
 	void nmi_mask_w(int state);
 	void sound_on_w(int state);
-	void flip_screen_w(int state);
 	void coin_lockout_w(int state);
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);

@@ -100,17 +100,17 @@ void wdxt_gen_device::wd1015_io(address_map &map)
 //  WD11C00_17_INTERFACE( host_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wdxt_gen_device::irq5_w )
+void wdxt_gen_device::irq5_w(int state)
 {
 	m_isa->irq5_w(state);
 }
 
-WRITE_LINE_MEMBER( wdxt_gen_device::drq3_w )
+void wdxt_gen_device::drq3_w(int state)
 {
 	m_isa->drq3_w(state);
 }
 
-WRITE_LINE_MEMBER( wdxt_gen_device::mr_w )
+void wdxt_gen_device::mr_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -250,7 +250,7 @@ void wdxt_gen_device::dack_line_w(int line, int state)
 //  wd1015_t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( wdxt_gen_device::wd1015_t1_r )
+int wdxt_gen_device::wd1015_t1_r()
 {
 	return 0; // TODO
 }

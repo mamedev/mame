@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_ALLOCATOR_H_HEADER_GUARD
@@ -31,9 +31,14 @@
 
 #define BX_NEW(_allocator, _type)                 BX_PLACEMENT_NEW(BX_ALLOC(_allocator, sizeof(_type) ), _type)
 #define BX_ALIGNED_NEW(_allocator, _type, _align) BX_PLACEMENT_NEW(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align), _type)
-#define BX_PLACEMENT_NEW(_ptr, _type)             ::new(bx::PlacementNewTag(), _ptr) _type
+#define BX_PLACEMENT_NEW(_ptr, _type)             ::new(bx::PlacementNew, _ptr) _type
 
-namespace bx { struct PlacementNewTag {}; }
+namespace bx
+{
+	struct    PlacementNewTag {};
+	constexpr PlacementNewTag PlacementNew;
+
+} // namespace bx
 
 void* operator new(size_t, bx::PlacementNewTag, void* _ptr);
 void  operator delete(void*, bx::PlacementNewTag, void*) throw();
@@ -47,13 +52,20 @@ namespace bx
 		///
 		virtual ~AllocatorI() = 0;
 
-		/// Allocates, resizes memory block, or frees memory.
+		/// Allocates, resizes, or frees memory block.
 		///
-		/// @param[in] _ptr If _ptr is NULL new block will be allocated.
+		/// @remark
+		///  - Allocate memory block: _ptr == NULL && size > 0
+		///  -   Resize memory block: _ptr != NULL && size > 0
+		///  -     Free memory block: _ptr != NULL && size == 0
+		///
+		/// @param[in] _ptr If _ptr is NULL new block will be allocated. If _ptr is not-NULL, and
+		///   _size is not 0, memory block will be resized.
 		/// @param[in] _size If _ptr is set, and _size is 0, memory will be freed.
 		/// @param[in] _align Alignment.
 		/// @param[in] _file Debug file path info.
 		/// @param[in] _line Debug file line info.
+		///
 		virtual void* realloc(
 			  void* _ptr
 			, size_t _size
@@ -82,9 +94,6 @@ namespace bx
 			, uint32_t _line
 			) override;
 	};
-
-	/// Check if pointer is aligned. _align must be power of two.
-	bool isAligned(const void* _ptr, size_t _align);
 
 	/// Aligns pointer to nearest next aligned address. _align must be power of two.
 	void* alignPtr(

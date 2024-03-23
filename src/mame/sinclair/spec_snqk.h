@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_MACHINE_SPEC_SNQK_H
-#define MAME_MACHINE_SPEC_SNQK_H
+#ifndef MAME_SINCLAIR_SPEC_SNQK_H
+#define MAME_SINCLAIR_SPEC_SNQK_H
 
 #pragma once
 
@@ -164,4 +164,4 @@ enum SPECTRUM_Z80_SNAPSHOT_TYPE {
 #define RAW_HDR    9
 #define RAW_SIZE   (RAW_HDR + 3*SPECTRUM_BANK)
 
-#endif // MAME_MACHINE_SPEC_SNQK_H
+#endif // MAME_SINCLAIR_SPEC_SNQK_H

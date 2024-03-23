@@ -130,7 +130,7 @@ end
 
 local function open_database()
 	-- make sure settings directory exists
-	local dir = emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/timer'
+	local dir = manager.machine.options.entries.homepath:value():match('([^;]+)') .. '/timer'
 	local attr = lfs.attributes(dir)
 	if not attr then
 		lfs.mkdir(dir)

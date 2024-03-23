@@ -58,16 +58,165 @@ Note:
 
 ****************************************************************************/
 
-
 #include "emu.h"
-#include "srmp2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "sound/msm5205.h"
+#include "video/x1_001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+namespace {
+
+class srmp2_state : public driver_device
+{
+public:
+	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_spritegen(*this, "spritegen"),
+		m_msm(*this, "msm"),
+		m_adpcm_rom(*this, "adpcm"),
+		m_mainbank(*this, "mainbank"),
+		m_keys(*this, "KEY%u", 0U),
+		m_service(*this, "SERVICE")
+	{ }
+
+	void mjyuugi(machine_config &config);
+	void srmp2(machine_config &config);
+	void rmgoldyh(machine_config &config);
+	void srmp3(machine_config &config);
+
+private:
+	struct iox_t
+	{
+		int reset = 0, ff_event,ff_1 = 0, protcheck[4]{}, protlatch[4]{};
+		uint8_t data = 0;
+		uint8_t mux = 0;
+		uint8_t ff = 0;
+	};
+
+	required_device<cpu_device> m_maincpu;
+	required_device<x1_001_device> m_spritegen;
+	required_device<msm5205_device> m_msm;
+	required_region_ptr<uint8_t> m_adpcm_rom;
+	optional_memory_bank m_mainbank;
+	required_ioport_array<8> m_keys;
+	required_ioport m_service;
+
+	uint8_t m_color_bank = 0;
+	uint8_t m_gfx_bank = 0;
+	uint8_t m_adpcm_bank = 0;
+	int16_t m_adpcm_data = 0;
+	uint32_t m_adpcm_sptr = 0;
+	uint32_t m_adpcm_eptr = 0;
+	iox_t m_iox;
+
+	// common
+	uint8_t vox_status_r();
+	uint8_t iox_mux_r();
+	uint8_t iox_status_r();
+	void iox_command_w(uint8_t data);
+	void iox_data_w(uint8_t data);
+	void adpcm_int(int state);
+
+	// mjuugi
+	void mjyuugi_flags_w(uint16_t data);
+	void mjyuugi_adpcm_bank_w(uint16_t data);
+	uint8_t mjyuugi_irq2_ack_r(address_space &space);
+	uint8_t mjyuugi_irq4_ack_r(address_space &space);
+
+	// rmgoldyh
+	void rmgoldyh_rombank_w(uint8_t data);
+
+	// srmp2
+	void srmp2_irq2_ack_w(uint8_t data);
+	void srmp2_irq4_ack_w(uint8_t data);
+	void srmp2_flags_w(uint16_t data);
+	void adpcm_code_w(uint8_t data);
+
+	// srmp3
+	void srmp3_rombank_w(uint8_t data);
+	void srmp3_flags_w(uint8_t data);
+	void srmp3_irq_ack_w(uint8_t data);
+
+	virtual void machine_start() override;
+	DECLARE_MACHINE_START(srmp2);
+	void srmp2_palette(palette_device &palette) const;
+	DECLARE_MACHINE_START(srmp3);
+	void srmp3_palette(palette_device &palette) const;
+	DECLARE_MACHINE_START(rmgoldyh);
+	DECLARE_MACHINE_START(mjyuugi);
+
+	uint32_t screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	X1_001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
+
+	uint8_t iox_key_matrix_calc(uint8_t p_side);
+
+	void mjyuugi_map(address_map &map);
+	void rmgoldyh_io_map(address_map &map);
+	void rmgoldyh_map(address_map &map);
+	void srmp2_map(address_map &map);
+	void srmp3_io_map(address_map &map);
+	void srmp3_map(address_map &map);
+};
+
+
+/***************************************************************************
+
+  Video hardware
+
+***************************************************************************/
+
+void srmp2_state::srmp2_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i ^ 0x0f, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
+	}
+}
+
+
+void srmp2_state::srmp3_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i,pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
+	}
+}
+
+X1_001_SPRITE_GFXBANK_CB_MEMBER(srmp2_state::srmp3_gfxbank_callback)
+{
+	return (code & 0x3fff) + ((code & 0x2000) ? (m_gfx_bank<<13) : 0);
+}
+
+
+uint32_t srmp2_state::screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0x1ff, cliprect);
+
+	m_spritegen->set_colorbase(m_color_bank<<5);
+
+	m_spritegen->draw_sprites(screen,bitmap,cliprect,0x1000);
+	return 0;
+}
+
+uint32_t srmp2_state::screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0x1f0, cliprect);
+
+	m_spritegen->draw_sprites(screen,bitmap,cliprect,0x1000);
+	return 0;
+}
 
 
 /***************************************************************************
@@ -226,7 +375,7 @@ void srmp2_state::adpcm_code_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
+void srmp2_state::adpcm_int(int state)
 {
 	if (m_adpcm_sptr)
 	{
@@ -266,19 +415,12 @@ uint8_t srmp2_state::vox_status_r()
 
 uint8_t srmp2_state::iox_key_matrix_calc(uint8_t p_side)
 {
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
-	int i, j, t;
-
-	for (i = 0x00 ; i < 0x20 ; i += 8)
+	for (int i = 0; i < 4; i++)
 	{
-		j = (i / 0x08);
-
-		for (t = 0 ; t < 8 ; t ++)
+		for (int t = 0; t < 8; t ++)
 		{
-			if (!(ioport(keynames[j+p_side])->read() & ( 1 << t )))
-			{
-				return (i + t) | (p_side ? 0x20 : 0x00);
-			}
+			if (!BIT(m_keys[i | (p_side << 2)]->read(), t))
+				return (i << 3) | t | (p_side << 5);
 		}
 	}
 
@@ -288,44 +430,41 @@ uint8_t srmp2_state::iox_key_matrix_calc(uint8_t p_side)
 uint8_t srmp2_state::iox_mux_r()
 {
 	/* first off check any pending protection value */
+	for (int i = 0; i < 4; i++)
 	{
-		int i;
+		if (m_iox.protcheck[i] == -1)
+			continue; //skip
 
-		for(i=0;i<4;i++)
+		if (m_iox.data == m_iox.protcheck[i])
 		{
-			if(m_iox.protcheck[i] == -1)
-				continue; //skip
-
-			if(m_iox.data == m_iox.protcheck[i])
-			{
+			if (!machine().side_effects_disabled())
 				m_iox.data = 0; //clear write latch
-				return m_iox.protlatch[i];
-			}
+			return m_iox.protlatch[i];
 		}
 	}
 
-	if(m_iox.ff == 0)
+	if (m_iox.ff == 0)
 	{
-		if(m_iox.mux != 1 && m_iox.mux != 2 && m_iox.mux != 4)
+		if (m_iox.mux != 1 && m_iox.mux != 2 && m_iox.mux != 4)
 			return 0xff; //unknown command
 
 		/* both side checks */
-		if(m_iox.mux == 1)
+		if (m_iox.mux == 1)
 		{
-			uint8_t p1_side = iox_key_matrix_calc(0);
-			uint8_t p2_side = iox_key_matrix_calc(4);
+			uint8_t const p1_side = iox_key_matrix_calc(0);
+			uint8_t const p2_side = iox_key_matrix_calc(1);
 
-			if(p1_side != 0)
+			if (p1_side != 0)
 				return p1_side;
-
-			return p2_side;
+			else
+				return p2_side;
 		}
 
 		/* check individual input side */
-		return iox_key_matrix_calc((m_iox.mux == 2) ? 0 : 4);
+		return iox_key_matrix_calc((m_iox.mux == 2) ? 0 : 1);
 	}
 
-	return ioport("SERVICE")->read() & 0xff;
+	return m_service->read() & 0xff;
 }
 
 uint8_t srmp2_state::iox_status_r()
@@ -336,10 +475,10 @@ uint8_t srmp2_state::iox_status_r()
 void srmp2_state::iox_command_w(uint8_t data)
 {
 	/*
-	bit wise command port apparently
+	bitwise command port apparently
 	0x01: selects both sides
-	0x02: selects p1 side
-	0x04: selects p2 side
+	0x02: selects 1P side
+	0x04: selects 2P side
 	*/
 
 	m_iox.mux = data;
@@ -411,16 +550,18 @@ void srmp2_state::srmp2_map(address_map &map)
 	map(0xf00000, 0xf00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 }
 
-uint8_t srmp2_state::mjyuugi_irq2_ack_r()
+uint8_t srmp2_state::mjyuugi_irq2_ack_r(address_space &space)
 {
-	m_maincpu->set_input_line(2, CLEAR_LINE);
-	return 0xff; // value returned doesn't matter
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(2, CLEAR_LINE);
+	return space.unmap(); // value returned doesn't matter
 }
 
-uint8_t srmp2_state::mjyuugi_irq4_ack_r()
+uint8_t srmp2_state::mjyuugi_irq4_ack_r(address_space &space)
 {
-	m_maincpu->set_input_line(4, CLEAR_LINE);
-	return 0xff; // value returned doesn't matter
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(4, CLEAR_LINE);
+	return space.unmap(); // value returned doesn't matter
 }
 
 void srmp2_state::mjyuugi_map(address_map &map)
@@ -765,9 +906,9 @@ static INPUT_PORTS_START( srmp3 )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Analyzer")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -786,10 +927,10 @@ static INPUT_PORTS_START( rmgoldyh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Payout")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Memory Clear")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Payout")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Analyzer")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Analyzer")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -798,7 +939,7 @@ static INPUT_PORTS_START( rmgoldyh )
 
 	PORT_INCLUDE( seta_mjctrl )
 
-	// dip sheets available at MameTesters (MT05599)
+	// DIP switch sheets available at MameTesters (MT05599)
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, "Distribution list" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "32:24:16:12:8:4:2:1" )
@@ -1594,13 +1735,14 @@ ROM_START( ponchina )
 	ROM_LOAD( "um2_1_10.u63", 0x080000, 0x080000, CRC(53e643e9) SHA1(3b221217e8f846ae96a9a47149037cea19d97549) )
 ROM_END
 
+} // anonymous namespace
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state, empty_init, ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state, empty_init, ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state, empty_init, ROT0, "Seta (Alba license)", "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )

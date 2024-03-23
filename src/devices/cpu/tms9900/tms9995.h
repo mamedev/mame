@@ -36,16 +36,16 @@ public:
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	// We chose to use a direct method instead of a delegate to keep performance
 	// footprint low; this method may be called very frequently.
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
+	void ready_line(int state);
 
 	// HOLD input line. When asserted (low), the CPU is requested to release the
 	// data and address bus and enter the HOLD state. The entrance of this state
 	// is acknowledged by the HOLDA output line.
-	DECLARE_WRITE_LINE_MEMBER( hold_line );
+	void hold_line(int state);
 
 	// RESET input line. Unlike the standard set_input_line, this input method
 	// is synchronous and will immediately lead to a reset of the CPU.
-	DECLARE_WRITE_LINE_MEMBER( reset_line );
+	void reset_line(int state);
 
 	// Callbacks
 	auto extop_cb() { return m_external_operation.bind(); }
@@ -66,9 +66,9 @@ protected:
 	virtual void        device_start() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t      execute_min_cycles() const noexcept override;
-	virtual uint32_t      execute_max_cycles() const noexcept override;
-	virtual uint32_t      execute_input_lines() const noexcept override;
+	virtual uint32_t    execute_min_cycles() const noexcept override;
+	virtual uint32_t    execute_max_cycles() const noexcept override;
+	virtual uint32_t    execute_input_lines() const noexcept override;
 	virtual void        execute_set_input(int irqline, int state) override;
 	virtual void        execute_run() override;
 

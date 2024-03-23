@@ -11,6 +11,9 @@
 //#include "bus/midi/midi.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class korgdw8k_state : public driver_device
 {
 public:
@@ -84,8 +87,6 @@ void korgdw8k_state::bank_w(u8 data)
 
 void korgdw8k_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
-	map(0x0040, 0x00ff).ram(); // internal RAM
 	map(0x3000, 0x37ff).ram().share("nvram");
 	map(0x3800, 0x3fff).ram();
 	map(0x4040, 0x4040).w(FUNC(korgdw8k_state::dac_w));
@@ -162,6 +163,9 @@ ROM_START(ex8000)
 	ROM_LOAD("hn613256p-cb4_32004088.ic44", 0x10000, 0x08000, CRC(2610d6f6) SHA1(6894b8368f64f62bb541b3f88e58d88f7138b3a5))
 	ROM_LOAD("hn613256p-cb5_32004089.ic43", 0x18000, 0x08000, CRC(0958145d) SHA1(fd7fd60bde8739a937bd0af11caac76e566b4a00))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1985, dw8000,   0,      0, dw8000,   dw8000, korgdw8k_state, empty_init, "Korg",               "DW-8000 Programmable Digital Waveform Synthesizer", MACHINE_IS_SKELETON)
 SYST(1985, dw8000ex, dw8000, 0, dw8000ex, dw8000, korgdw8k_state, empty_init, "Korg / Musitronics", "DW-8000-EX Programmable Digital Waveform Synthesizer", MACHINE_IS_SKELETON)

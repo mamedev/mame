@@ -18,6 +18,9 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/scn_pci.h"
 
+
+namespace {
+
 class tricep_state : public driver_device
 {
 public:
@@ -134,6 +137,9 @@ ROM_START( tricep )
 	ROM_LOAD16_BYTE( "tri2.4_odd.u37",  0x0001, 0x1000, CRC(31eb2dcf) SHA1(2d9df9262ee1096d0398505e10d209201ac49a5d))
 	ROM_LOAD16_BYTE( "tri2.4_even.u36", 0x0000, 0x1000, CRC(4414dcdc) SHA1(00a3d293617dc691748ae85b6ccdd6723daefc0a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

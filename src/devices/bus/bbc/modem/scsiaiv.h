@@ -7,8 +7,8 @@
 **********************************************************************/
 
 
-#ifndef MAME_BUS_BBC_1MHZBUS_SCSIAIV_H
-#define MAME_BUS_BBC_1MHZBUS_SCSIAIV_H
+#ifndef MAME_BUS_BBC_MODEM_SCSIAIV_H
+#define MAME_BUS_BBC_MODEM_SCSIAIV_H
 
 #include "modem.h"
 #include "machine/nscsi_cb.h"
@@ -24,19 +24,19 @@ class bbc_scsiaiv_device:
 {
 public:
 	// construction/destruction
-	bbc_scsiaiv_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	bbc_scsiaiv_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(bsy_w);
-	DECLARE_WRITE_LINE_MEMBER(req_w);
+	void bsy_w(int state);
+	void req_w(int state);
 
 protected:
-	bbc_scsiaiv_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	bbc_scsiaiv_device(const machine_config &mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -55,11 +55,11 @@ private:
 //{
 //public:
 //  // construction/destruction
-//  bbc_vp415_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+//  bbc_vp415_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock);
 //
 //protected:
 //  // optional information overrides
-//  virtual void device_add_mconfig(machine_config& config) override;
+//  virtual void device_add_mconfig(machine_config &config) override;
 //};
 
 
@@ -68,4 +68,4 @@ DECLARE_DEVICE_TYPE(BBC_SCSIAIV, bbc_scsiaiv_device);
 //DECLARE_DEVICE_TYPE(BBC_VP415, bbc_vp415_device);
 
 
-#endif /* MAME_BUS_BBC_1MHZBUS_SCSIAIV_H */
+#endif /* MAME_BUS_BBC_MODEM_SCSIAIV_H */

@@ -93,6 +93,7 @@
     while bit 7 says odd only.
 
 ******************************************************************************
+
     Special Chip 1 and 2 aka VLSI VL2001/2001A Pinout:
                                _______    _______
                              _|*      \__/       |_
@@ -146,6 +147,7 @@ The full silkscreen markings of SC2 (under the "Special Chip 2" sticker, if it i
 <VTi Logo> 242
           VL2001A
           5410-09958
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -188,7 +190,7 @@ void williams2_state::video_start()
 	blitter_init(m_blitter_config, nullptr);
 
 	/* create the tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS,  24,16, 128,16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS, 24,16, 128,16);
 	m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register();
@@ -753,13 +755,13 @@ void williams2_state::blit_window_enable_w(u8 data)
 inline void williams_state::blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte)
 {
 	/* always read from video RAM regardless of the bank setting */
-	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr);   //current pixel values at dest
+	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr); // current pixel values at dest
 
 	int solid = m_blitterram[1];
-	unsigned char keepmask = 0xff;          //what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
+	unsigned char keepmask = 0xff; // what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
 
-	//even pixel (D7-D4)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0))    //FG only and src even pixel=0
+	// even pixel (D7-D4)
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0)) // FG only and src even pixel=0
 	{
 		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_EVEN)
 			keepmask &= 0x0f;
@@ -770,8 +772,8 @@ inline void williams_state::blit_pixel(address_space &space, int dstaddr, int sr
 			keepmask &= 0x0f;
 	}
 
-	//odd pixel (D3-D0)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f))    //FG only and src odd pixel=0
+	// odd pixel (D3-D0)
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f)) // FG only and src odd pixel=0
 	{
 		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD)
 			keepmask &= 0xf0;
@@ -788,9 +790,9 @@ inline void williams_state::blit_pixel(address_space &space, int dstaddr, int sr
 	else
 		curpix |= (srcdata & ~keepmask);
 
-/* if the window is enabled, only blit to videoram below the clipping address */
-/* note that we have to allow blits to non-video RAM (e.g. tileram, Sinistar $DXXX SRAM) because those */
-/* are not blocked by the window enable */
+	/* if the window is enabled, only blit to videoram below the clipping address */
+	/* note that we have to allow blits to non-video RAM (e.g. tileram, Sinistar $DXXX SRAM) because those */
+	/* are not blocked by the window enable */
 	if (!m_blitter_window_enable || dstaddr < m_blitter_clip_address || dstaddr >= 0xc000)
 		space.write_byte(dstaddr, curpix);
 }
@@ -817,12 +819,13 @@ int williams_state::blitter_core(address_space &space, int sstart, int dstart, i
 		/* loop over the width */
 		for (int x = 0; x < w; x++)
 		{
-			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT)) //no shift
+			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT)) // no shift
 			{
 				blit_pixel(space, dest, m_blitter_remap[space.read_byte(source)], controlbyte);
 			}
 			else
-			{   //shift one pixel right
+			{
+				// shift one pixel right
 				pixdata = (pixdata << 8) | m_blitter_remap[space.read_byte(source)];
 				blit_pixel(space, dest, (pixdata >> 4) & 0xff, controlbyte);
 			}

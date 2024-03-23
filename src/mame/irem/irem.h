@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
-#ifndef MAME_AUDIO_IREM_H
-#define MAME_AUDIO_IREM_H
+#ifndef MAME_IREM_IREM_H
+#define MAME_IREM_IREM_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ DECLARE_DEVICE_TYPE(IREM_M62_AUDIO,        m62_audio_device)
 DECLARE_DEVICE_TYPE(IREM_M52_SOUNDC_AUDIO, m52_soundc_audio_device)
 DECLARE_DEVICE_TYPE(IREM_M52_LARGE_AUDIO,  m52_large_audio_device)
 
-#endif // MAME_AUDIO_IREM_H
+#endif // MAME_IREM_IREM_H

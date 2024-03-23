@@ -18,6 +18,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class v0bowl_state : public driver_device
 {
 public:
@@ -152,5 +155,8 @@ ROM_START( v0bowl )
 	// zipped FAT16, filesystem was made with DOS 3.31 but the folders have Windows Thumbs.db files as well.
 	ROM_LOAD( "bowling.001",  0x000000, 0x1e8be000, BAD_DUMP CRC(aebb2b01) SHA1(cd11f74f6512350ac10f822937b8769f552aabf3) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 200?, v0bowl,  0,   v0bowl,  v0bowl, v0bowl_state, empty_init, ROT0, "A1 Amusement One",      "unknown VRender0+ bowling game", MACHINE_IS_SKELETON ) // Return Bowl?

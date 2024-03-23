@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NEXTMO_H
-#define MAME_MACHINE_NEXTMO_H
+#ifndef MAME_NEXT_NEXTMO_H
+#define MAME_NEXT_NEXTMO_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NEXTMO, nextmo_device)
 
-#endif // MAME_MACHINE_NEXTMO_H
+#endif // MAME_NEXT_NEXTMO_H

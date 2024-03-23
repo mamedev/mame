@@ -38,6 +38,8 @@ There is a 4MHz crystal connected to the 9513.
 //#include "bus/s100/s100.h"
 
 
+namespace {
+
 class seattle_comp_state : public driver_device
 {
 public:
@@ -147,6 +149,9 @@ ROM_START( scp300f )
 	ROM_REGION( 0x800, "monitor", 0 )
 	ROM_LOAD( "mon86 v1.5tdd", 0x0000, 0x0800, CRC(7db23169) SHA1(c791b02ca33a4e1f8e95eb541624a59738f378c4))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

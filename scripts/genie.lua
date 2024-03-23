@@ -121,6 +121,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-emulator",
+	description = "Enable building emulator.",
+}
+
+newoption {
 	trigger = "with-tests",
 	description = "Enable building tests.",
 }
@@ -150,11 +155,6 @@ newoption {
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
 	},
-}
-
-newoption {
-	trigger = 'with-bundled-sdl2',
-	description = 'Build bundled SDL2 library',
 }
 
 newoption {
@@ -518,24 +518,7 @@ configuration { "Release", "vs20*" }
 		}
 	end
 
--- Force Visual Studio targets to use bundled SDL2
-if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
-	if _OPTIONS["with-bundled-sdl2"]==nil then
-		_OPTIONS["with-bundled-sdl2"] = "1"
-	end
-end
--- Build SDL2 for Android
-if _OPTIONS["targetos"] == "android" then
-	_OPTIONS["with-bundled-sdl2"] = "1"
-end
-
 configuration {}
-
-if _OPTIONS["osd"] == "uwp" then
-	windowstargetplatformversion("10.0.14393.0")
-	windowstargetplatformminversion("10.0.14393.0")
-	premake._filelevelconfig = true
-end
 
 msgcompile ("Compiling $(subst ../,,$<)...")
 
@@ -551,30 +534,32 @@ msgprecompile ("Precompiling $(subst ../,,$<)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["PROJECT"] ~= nil) then
-	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
-	if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
-		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
-	end
-	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
-	local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
-	local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
-	if os.isfile(subtargetscript) then
-		dofile(subtargetscript)
-	elseif os.isfile(subtargetfilter) then
-		local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
-		local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
-		local OUT_STR = os.outputof(
-			string.format(
-				"%s %s -r %s filterproject -t %s -f %s %s",
-				PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
-		if #OUT_STR == 0 then
-			error("Error creating projects from driver filter file for subtarget " .. _OPTIONS["subtarget"])
+if _OPTIONS["with-emulator"] then
+	if (_OPTIONS["PROJECT"] ~= nil) then
+		PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
+		if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+			error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 		end
-		load(OUT_STR)()
-	else
-		error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+		dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+	elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
+		local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
+		local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
+		if os.isfile(subtargetscript) then
+			dofile(subtargetscript)
+		elseif os.isfile(subtargetfilter) then
+			local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
+			local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
+			local OUT_STR = os.outputof(
+				string.format(
+					"%s %s -r %s filterproject -t %s -f %s %s",
+					PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
+			if #OUT_STR == 0 then
+				error("Error creating projects from driver filter file for subtarget " .. _OPTIONS["subtarget"])
+			end
+			load(OUT_STR)()
+		else
+			error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+		end
 	end
 end
 
@@ -1010,6 +995,7 @@ end
 -- warnings only applicable to C++ compiles
 	buildoptions_cpp {
 		"-Woverloaded-virtual",
+		"-Wvla",
 	}
 
 if _OPTIONS["SANITIZE"] then
@@ -1094,7 +1080,7 @@ end
 				"-Wimplicit-fallthrough",
 			}
 			buildoptions {
-				"-Wno-unused-result", -- needed for fgets,fread on linux
+				"-Wno-error=unused-result", -- needed for fgets,fread on linux
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				"-Wno-array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
@@ -1123,6 +1109,11 @@ end
 				buildoptions {
 					"-Wno-error=maybe-uninitialized",
 					"-Wno-error=uninitialized",   -- netlist
+				}
+			end
+			if version >= 130000 then
+				buildoptions_cpp {
+					"-Wno-xor-used-as-pow",
 				}
 			end
 		end
@@ -1182,6 +1173,9 @@ configuration { "asmjs" }
 		"-std=c++17",
 		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeEiPPc','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
 	}
+	defines {
+		"ASIO_HAS_PTHREADS",
+	}
 	linkoptions {
 		"-Wl,--start-group",
 		"-O" .. _OPTIONS["OPTIMIZE"],
@@ -1233,23 +1227,10 @@ configuration { "asmjs" }
 
 configuration { "android*" }
 	buildoptions {
-		"-Wno-undef",
-		"-Wno-typedef-redefinition",
-		"-Wno-unknown-warning-option",
-		"-Wno-incompatible-ms-struct",
-	}
-	buildoptions_cpp {
-		"-std=c++17",
-		"-Wno-extern-c-compat",
-		"-Wno-tautological-constant-out-of-range-compare",
-		"-Wno-tautological-pointer-compare",
+		"-Wno-error=undef", -- in ASIO
+		"-Wno-error=macro-redefined", -- PAGE_SIZE,PAGE_MASK in fairlight/cmi.cpp
 	}
 	archivesplit_size "20"
-
-configuration { "android-arm64" }
-	buildoptions {
-		"-Wno-asm-operand-widths",
-	}
 
 configuration { "linux-*" }
 		links {
@@ -1267,7 +1248,7 @@ configuration { "linux-*" }
 		end
 
 
-configuration { "netbsd" }
+configuration { "freebsd or netbsd" }
 		flags {
 			"LinkSupportCircularDependencies",
 		}
@@ -1509,32 +1490,34 @@ group "core"
 
 dofile(path.join("src", "emu.lua"))
 
-if (STANDALONE~=true) then
-	dofile(path.join("src", "mame", "frontend.lua"))
-end
-
 group "devices"
 dofile(path.join("src", "devices.lua"))
 devicesProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
-if (STANDALONE~=true) then
-	group "drivers"
-	findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
-end
-
-group "emulator"
-dofile(path.join("src", "main.lua"))
-if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
-	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-		startproject (_OPTIONS["target"])
-	else
-		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+if _OPTIONS["with-emulator"] then
+	if (STANDALONE~=true) then
+		dofile(path.join("src", "mame", "frontend.lua"))
 	end
-else
-	startproject (_OPTIONS["subtarget"])
+
+	if (STANDALONE~=true) then
+		group "drivers"
+		findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
+	end
+
+	group "emulator"
+	dofile(path.join("src", "main.lua"))
+	if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
+		if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+			startproject (_OPTIONS["target"])
+		else
+			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		end
+	else
+		startproject (_OPTIONS["subtarget"])
+	end
+	mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
+	strip()
 end
-mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
-strip()
 
 if _OPTIONS["with-tools"] then
 	group "tools"
@@ -1559,10 +1542,15 @@ function generate_has_header(hashname, hash)
    file:write(string.format("#ifndef GENERATED_HAS_%s_H\n", hashname))
    file:write(string.format("#define GENERATED_HAS_%s_H\n", hashname))
    file:write("\n")
+   active = {}
    for k, v in pairs(hash) do
 	  if v then
-		 file:write(string.format("#define HAS_%s_%s\n", hashname, k))
+		 active[#active+1] = k
 	  end
+   end
+   table.sort(active)
+   for _, k in ipairs(active) do
+	  file:write(string.format("#define HAS_%s_%s\n", hashname, k))
    end
    file:write("\n")
    file:write("#endif\n")

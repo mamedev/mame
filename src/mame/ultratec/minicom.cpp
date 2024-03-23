@@ -37,12 +37,19 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
    * Initial driver skeleton
 */
 
-#define LOG_IO_PORTS 0
-#define PRINTER_ATTACHED 1
-
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "minicom.lh"
+
+#define LOG_IO_PORTS (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
+namespace {
+
+#define PRINTER_ATTACHED 1
 
 class minicom_state : public driver_device
 {
@@ -111,12 +118,12 @@ uint8_t minicom_state::i87c52_p2_r()
 	return 1; //to skip the "NO POWER" warning. I'm not sure why.
 }
 
-#if LOG_IO_PORTS
-static void printbits(uint8_t v) {
-	int i;
-	for(i = 7; i >= 0; i--) putchar('0' + ((v >> i) & 1));
+static void printbits(uint8_t v, char *buf)
+{
+	for (int i = 7; i >= 0; i--)
+		buf[7 - i] = '0' + BIT(v, i);
+	buf[8] = '\0';
 }
-#endif
 
 #define FALLING_EDGE(old_data, new_data, bit) (BIT(old_data ^ new_data, bit) && !BIT(new_data, bit))
 #define RISING_EDGE(old_data, new_data, bit) (BIT(old_data ^ new_data, bit) && BIT(new_data, bit))
@@ -146,15 +153,13 @@ void minicom_state::i87c52_p1_w(uint8_t data)
 {
 	if (data != m_p[1])
 	{
-#if LOG_IO_PORTS
 		uint8_t changed = m_p[1] ^ data;
 		if (changed ^ P1_UNKNOWN_BITS)
 		{
-			printf("Write to P1: %02X changed: (        ) (", data);
-			printbits(changed);
-			printf(") (        ) (        )\n");
+			char bitbuf[9];
+			printbits(changed, bitbuf);
+			LOGMASKED(LOG_IO_PORTS, "Write to P1: %02X changed: (        ) (%s) (        ) (        )\n", data, bitbuf);
 		}
-#endif
 		if (FALLING_EDGE(m_p[1], data, 2))
 		{
 			m_digit_index--;
@@ -168,15 +173,13 @@ void minicom_state::i87c52_p2_w(uint8_t data)
 {
 	if (data != m_p[2])
 	{
-#if LOG_IO_PORTS
 		uint8_t changed = m_p[2] ^ data;
 		if (changed ^ P2_UNKNOWN_BITS)
 		{
-			printf("Write to P2: %02X changed: (        ) (        ) (", data);
-			printbits(changed);
-			printf(") (        )\n");
+			char bitbuf[9];
+			printbits(changed, bitbuf);
+			LOGMASKED(LOG_IO_PORTS, "Write to P2: %02X changed: (        ) (        ) (%s) (        )\n", data, bitbuf);
 		}
-#endif
 		m_p[2] = data;
 	}
 }
@@ -186,14 +189,12 @@ void minicom_state::i87c52_p3_w(uint8_t data)
 	if (data != m_p[3])
 	{
 		uint8_t changed = m_p[3] ^ data;
-#if LOG_IO_PORTS
 		if (changed ^ P3_UNKNOWN_BITS)
 		{
-			printf("Write to P3: %02X changed: (        ) (        ) (        ) (", data);
-			printbits(changed);
-			printf(")\n");
+			char bitbuf[9];
+			printbits(changed, bitbuf);
+			LOGMASKED(LOG_IO_PORTS, "Write to P3: %02X changed: (        ) (        ) (        ) (%s)\n", data, bitbuf);
 		}
-#endif
 
 		if (FALLING_EDGE(m_p[3], data, 4)) //P3.4 = T0
 		{
@@ -248,6 +249,9 @@ ROM_START( mcom4_02 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "ultratec_minicom_iv_20020419.rom",  0x0000, 0x2000, CRC(99b6cc35) SHA1(32577005bf02042f893c8880f8ce5b3d8a5f55f9) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT          COMPANY     FULLNAME                   FLAGS
 COMP( 1997, minicom,  0,      0,      minicom, 0,     minicom_state, init_minicom, "Ultratec", "Minicom IV (1997-08-11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 11th Aug 1997

@@ -33,7 +33,7 @@ protected:
 
 private:
 	optional_region_ptr<u8> m_cgrom_region; // internal chargen ROM
-	u8 m_render_buffer[16*40];
+	u8 m_render_buffer[16*80];
 	u8 m_ddram[80];
 	u8 m_cgram[64];
 	const u8 *m_cgrom;

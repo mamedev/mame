@@ -15,8 +15,7 @@
 
 #include "diserial.h"
 
-class i8251_device :  public device_t,
-	public device_serial_interface
+class i8251_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
@@ -39,14 +38,14 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
-	DECLARE_WRITE_LINE_MEMBER( write_cts );
-	DECLARE_WRITE_LINE_MEMBER( write_dsr );
-	DECLARE_WRITE_LINE_MEMBER( write_txc );
-	DECLARE_WRITE_LINE_MEMBER( write_rxc );
-	DECLARE_WRITE_LINE_MEMBER( write_syn );
+	void write_rxd(int state);
+	void write_cts(int state);
+	void write_dsr(int state);
+	void write_txc(int state);
+	void write_rxc(int state);
+	void write_syn(int state);
 
-	DECLARE_READ_LINE_MEMBER(txrdy_r);
+	int txrdy_r();
 
 protected:
 	enum
@@ -66,8 +65,7 @@ protected:
 			device_t *owner,
 			uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -133,7 +131,7 @@ private:
 
 	/* data being received */
 	uint8_t m_rx_data;
-		/* tx buffer */
+	/* tx buffer */
 	uint8_t m_tx_data;
 	void sync1_w(uint8_t data);
 	void sync2_w(uint8_t data);
@@ -149,7 +147,7 @@ private:
 	u8 m_data_bits_count;
 };
 
-class v5x_scu_device :  public i8251_device
+class v5x_scu_device : public i8251_device
 {
 public:
 	// construction/destruction
@@ -159,6 +157,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -17,6 +17,9 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 class emu2_state : public driver_device
 {
 public:
@@ -325,5 +328,8 @@ ROM_START(emu2)
 	ROM_LOAD("74s472.ic137", 0x000, 0x200, NO_DUMP)
 	ROM_LOAD("74s472.ic135", 0x200, 0x200, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1984, emu2, 0, 0, emu2, emu2, emu2_state, empty_init, "E-mu Systems", "Emulator II", MACHINE_IS_SKELETON)

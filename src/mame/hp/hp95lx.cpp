@@ -76,9 +76,8 @@
 #include "speaker.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -87,6 +86,8 @@
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
+
+namespace {
 
 class hp95lx_state : public driver_device
 {
@@ -144,8 +145,8 @@ protected:
 private:
 	void hp95lx_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
+	void keyboard_clock_w(int state);
+	void keyboard_data_w(int state);
 	uint8_t keyboard_r(offs_t offset);
 	void keyboard_w(offs_t offset, uint8_t data);
 	uint8_t video_r(offs_t offset);
@@ -153,7 +154,7 @@ private:
 	void video_address_w(uint8_t data);
 	uint8_t video_register_r();
 	void video_register_w(uint8_t data);
-	void debug_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void debug_w(offs_t offset, uint8_t data);
 
 	void hp95lx_io(address_map &map);
 	void hp95lx_map(address_map &map);
@@ -546,7 +547,7 @@ void hp95lx_state::keyboard_w(offs_t offset, uint8_t data)
 	m_pic8259->ir1_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(hp95lx_state::keyboard_clock_w)
+void hp95lx_state::keyboard_clock_w(int state)
 {
 	LOGKBD("kbd: KCLK: %d kbit: %d\n", state ? 1 : 0, m_kbit);
 
@@ -578,7 +579,7 @@ WRITE_LINE_MEMBER(hp95lx_state::keyboard_clock_w)
 	m_kclk = (state == ASSERT_LINE) ? true : false;
 }
 
-WRITE_LINE_MEMBER(hp95lx_state::keyboard_data_w)
+void hp95lx_state::keyboard_data_w(int state)
 {
 	LOGKBD("kbd: KDATA: %d\n", state ? 1 : 0);
 	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
@@ -771,6 +772,8 @@ ROM_START( hp95lx )
 
 	ROM_REGION(0x800,"gfx1", ROMREGION_ERASE00)
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS          INIT         COMPANY             FULLNAME    FLAGS

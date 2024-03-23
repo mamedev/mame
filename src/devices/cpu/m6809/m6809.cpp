@@ -22,6 +22,10 @@
 
     History:
 
+January 2023 tlindner:
+    Add 6809 undocumented opcodes as described here:
+    https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours
+
 July 2016 ErikGav:
     Unify with 6309 pairs and quads (A+B=D, E+F=W, D+W=Q)
 
@@ -113,7 +117,9 @@ March 2013 NPW:
 //  PARAMETERS
 //**************************************************************************
 
-#define LOG_INTERRUPTS  0
+#define LOG_INTERRUPTS (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // turn off 'unreferenced label' errors
 #if defined(__GNUC__)
@@ -136,8 +142,8 @@ DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider)
-	: cpu_device(mconfig, type, tag, owner, clock),
+m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider) :
+	cpu_device(mconfig, type, tag, owner, clock),
 	m_lic_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 8, 16),
@@ -158,8 +164,6 @@ void m6809_base_device::device_start()
 	space(AS_PROGRAM).cache(m_mintf->cprogram);
 	space(AS_PROGRAM).specific(m_mintf->program);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_mintf->csprogram);
-
-	m_lic_func.resolve_safe();
 
 	// register our state for the debugger
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc.w).callimport().noshow();
@@ -182,15 +186,28 @@ void m6809_base_device::device_start()
 	// initialize variables
 	m_cc = 0;
 	m_pc.w = 0;
+	m_ppc.w = 0;
 	m_s.w = 0;
 	m_u.w = 0;
 	m_q.q = 0;
 	m_x.w = 0;
 	m_y.w = 0;
 	m_dp = 0;
-	m_reg = 0;
+	m_temp.w = 0;
+	m_opcode = 0;
+
 	m_reg8 = nullptr;
 	m_reg16 = nullptr;
+	m_reg = 0;
+	m_nmi_line = false;
+	m_nmi_asserted = false;
+	m_firq_line = false;
+	m_irq_line = false;
+	m_lds_encountered = false;
+
+	m_state = 0;
+	m_cond = false;
+	m_free_run = false;
 
 	// setup regtable
 	save_item(NAME(m_pc.w));
@@ -204,6 +221,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_cc));
 	save_item(NAME(m_temp.w));
 	save_item(NAME(m_opcode));
+
 	save_item(NAME(m_nmi_asserted));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_firq_line));
@@ -214,6 +232,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_addressing_mode));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_cond));
+	save_item(NAME(m_free_run));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -233,14 +252,14 @@ void m6809_base_device::device_reset()
 	m_firq_line = false;
 	m_irq_line = false;
 	m_lds_encountered = false;
+	m_free_run = false;
 
 	m_dp = 0x00;        // reset direct page register
 
 	m_cc |= CC_I;       // IRQ disabled
 	m_cc |= CC_F;       // FIRQ disabled
 
-	m_pc.b.h = space(AS_PROGRAM).read_byte(VECTOR_RESET_FFFE + 0);
-	m_pc.b.l = space(AS_PROGRAM).read_byte(VECTOR_RESET_FFFE + 1);
+	set_ea(VECTOR_RESET_FFFE);
 
 	// reset sub-instruction state
 	reset_state();
@@ -449,8 +468,7 @@ uint32_t m6809_base_device::execute_input_lines() const noexcept
 
 void m6809_base_device::execute_set_input(int inputnum, int state)
 {
-	if (LOG_INTERRUPTS)
-		logerror("%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, (int) attotime_to_clocks(machine().time()));
+	LOGMASKED(LOG_INTERRUPTS, "%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, attotime_to_clocks(machine().time()));
 
 	switch(inputnum)
 	{
@@ -490,28 +508,51 @@ const char *m6809_base_device::inputnum_string(int inputnum)
 
 
 //-------------------------------------------------
-//  read_exgtfr_register
+//  read_tfr_register
 //-------------------------------------------------
 
-m6809_base_device::exgtfr_register m6809_base_device::read_exgtfr_register(uint8_t reg)
+uint16_t m6809_base_device::read_tfr_exg_816_register(uint8_t reg)
 {
-	exgtfr_register result;
-	result.byte_value = 0xFF;
-	result.word_value = 0x00FF;
+	uint16_t result;
 
 	switch(reg & 0x0F)
 	{
-		case  0: result.word_value = m_q.r.d;   break;  // D
-		case  1: result.word_value = m_x.w;     break;  // X
-		case  2: result.word_value = m_y.w;     break;  // Y
-		case  3: result.word_value = m_u.w;     break;  // U
-		case  4: result.word_value = m_s.w;     break;  // S
-		case  5: result.word_value = m_pc.w;    break;  // PC
-		case  8: result.byte_value = m_q.r.a;   break;  // A
-		case  9: result.byte_value = m_q.r.b;   break;  // B
-		case 10: result.byte_value = m_cc;      break;  // CC
-		case 11: result.byte_value = m_dp;      break;  // DP
+		case  0: result = m_q.r.d;   break;  // D
+		case  1: result = m_x.w;     break;  // X
+		case  2: result = m_y.w;     break;  // Y
+		case  3: result = m_u.w;     break;  // U
+		case  4: result = m_s.w;     break;  // S
+		case  5: result = m_pc.w;    break;  // PC
+		case  8: result = ((uint16_t)0xff00) | m_q.r.a;   break;  // A
+		case  9: result = ((uint16_t)0xff00) | m_q.r.b;   break;  // B
+		case 10: result = ((uint16_t)m_cc) << 8 | m_cc;   break;  // CC
+		case 11: result = ((uint16_t)m_dp) << 8 | m_dp;   break;  // DP
+		default: result = 0xffff; break;
 	}
+
+	return result;
+}
+
+
+uint16_t m6809_base_device::read_exg_168_register(uint8_t reg)
+{
+	uint16_t result;
+
+	switch(reg & 0x0F)
+	{
+		case  0: result = m_q.r.d;   break;  // D
+		case  1: result = m_x.w;     break;  // X
+		case  2: result = m_y.w;     break;  // Y
+		case  3: result = m_u.w;     break;  // U
+		case  4: result = m_s.w;     break;  // S
+		case  5: result = m_pc.w;    break;  // PC
+		case  8: result = ((uint16_t)0xff00) | m_q.r.a;   break;  // A
+		case  9: result = ((uint16_t)0xff00) | m_q.r.b;   break;  // B
+		case 10: result = ((uint16_t)0xff00) | m_cc;   break;  // CC
+		case 11: result = ((uint16_t)0xff00) | m_dp;   break;  // DP
+		default: result = 0xffff; break;
+	}
+
 	return result;
 }
 
@@ -520,20 +561,20 @@ m6809_base_device::exgtfr_register m6809_base_device::read_exgtfr_register(uint8
 //  write_exgtfr_register
 //-------------------------------------------------
 
-void m6809_base_device::write_exgtfr_register(uint8_t reg, m6809_base_device::exgtfr_register value)
+void m6809_base_device::write_exgtfr_register(uint8_t reg, uint16_t value)
 {
 	switch(reg & 0x0F)
 	{
-		case  0: m_q.r.d = value.word_value;    break;  // D
-		case  1: m_x.w   = value.word_value;    break;  // X
-		case  2: m_y.w   = value.word_value;    break;  // Y
-		case  3: m_u.w   = value.word_value;    break;  // U
-		case  4: m_s.w   = value.word_value;    break;  // S
-		case  5: m_pc.w  = value.word_value;    break;  // PC
-		case  8: m_q.r.a = value.byte_value;    break;  // A
-		case  9: m_q.r.b = value.byte_value;    break;  // B
-		case 10: m_cc    = value.byte_value;    break;  // CC
-		case 11: m_dp    = value.byte_value;    break;  // DP
+		case  0: m_q.r.d = value;    break;  // D
+		case  1: m_x.w   = value;    break;  // X
+		case  2: m_y.w   = value;    break;  // Y
+		case  3: m_u.w   = value;    break;  // U
+		case  4: m_s.w   = value;    break;  // S
+		case  5: m_pc.w  = value;    break;  // PC
+		case  8: m_q.r.a = (uint8_t)value; break;  // A
+		case  9: m_q.r.b = (uint8_t)value; break;  // B
+		case 10: m_cc    = (uint8_t)value; break;  // CC
+		case 11: m_dp    = (uint8_t)value; break;  // DP
 	}
 }
 

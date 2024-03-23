@@ -25,7 +25,7 @@ void main()
 {
 	// previously this pass was applied two times with offsets of 0.25, 0.5, 0.75, 1.0
 	// now this pass is applied only once with offsets of 0.25, 0.55, 1.0, 1.6 to achieve the same appearance as before till a maximum defocus of 2.0
-	// 0.075x² + 0.225x + 0.25
+	// 0.075xÂ² + 0.225x + 0.25
 	const vec2 Coord1Offset = vec2(-1.60,  0.25);
 	const vec2 Coord2Offset = vec2(-1.00, -0.55);
 	const vec2 Coord3Offset = vec2(-0.55,  1.00);

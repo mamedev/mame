@@ -12,7 +12,7 @@
 template<int Width, int AddrShift> class handler_entry_read_units : public handler_entry_read<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, address_space *space);
 	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, const handler_entry_read_units *src);
@@ -20,7 +20,9 @@ public:
 	~handler_entry_read_units();
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	uX read_interruptible(offs_t offset, uX mem_mask) const override;
 	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
+	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 
 	std::string name() const override;
 
@@ -54,7 +56,7 @@ private:
 template<int Width, int AddrShift> class handler_entry_write_units : public handler_entry_write<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, address_space *space);
 	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift> &descriptor, u8 ukey, const handler_entry_write_units<Width, AddrShift> *src);
@@ -62,7 +64,9 @@ public:
 	~handler_entry_write_units();
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	void write_interruptible(offs_t offset, uX data, uX mem_mask) const override;
 	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
+	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 
 	std::string name() const override;
 

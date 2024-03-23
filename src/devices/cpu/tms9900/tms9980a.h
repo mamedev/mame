@@ -35,14 +35,12 @@ protected:
 	void        mem_write(void) override;
 	void        acquire_instruction(void) override;
 
-	void        resolve_lines() override;
-
-	uint16_t      read_workspace_register_debug(int reg) override;
+	uint16_t    read_workspace_register_debug(int reg) override;
 	void        write_workspace_register_debug(int reg, uint16_t data) override;
 
-	uint32_t      execute_min_cycles() const noexcept override;
-	uint32_t      execute_max_cycles() const noexcept override;
-	uint32_t      execute_input_lines() const noexcept override;
+	uint32_t    execute_min_cycles() const noexcept override;
+	uint32_t    execute_max_cycles() const noexcept override;
+	uint32_t    execute_input_lines() const noexcept override;
 	void        execute_set_input(int irqline, int state) override;
 
 	// The clock is internally divided by 4

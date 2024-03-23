@@ -33,6 +33,8 @@
 #include "emu.h"
 #include "floppyone.h"
 
+#include "formats/fl1_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS
@@ -193,9 +195,9 @@ void spectrum_flpone_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_flpone_device::romcs)
+bool spectrum_flpone_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_flpone_device::post_opcode_fetch(offs_t offset)

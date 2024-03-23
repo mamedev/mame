@@ -31,12 +31,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_a2gameio_interface overrides
-	virtual DECLARE_READ_LINE_MEMBER(sw0_r) override;
-	virtual DECLARE_READ_LINE_MEMBER(sw1_r) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(an0_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(an1_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(an2_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(an3_w) override;
+	virtual int sw0_r() override;
+	virtual int sw1_r() override;
+	virtual void an0_w(int state) override;
+	virtual void an1_w(int state) override;
+	virtual void an2_w(int state) override;
+	virtual void an3_w(int state) override;
 
 private:
 	required_device<picture_image_device> m_picture;
@@ -75,12 +75,12 @@ void apple2_compeyes_device::device_reset()
 	m_x = m_y = m_an1 = m_an2 = m_an3 = m_level = 0;
 }
 
-READ_LINE_MEMBER(apple2_compeyes_device::sw0_r)
+int apple2_compeyes_device::sw0_r()
 {
 	return 0;
 }
 
-READ_LINE_MEMBER(apple2_compeyes_device::sw1_r)
+int apple2_compeyes_device::sw1_r()
 {
 	// to avoid triggering the self-test on //e, return only 0
 	// for the first 2 seconds of emulation.
@@ -104,7 +104,7 @@ READ_LINE_MEMBER(apple2_compeyes_device::sw1_r)
 	return res;
 }
 
-WRITE_LINE_MEMBER(apple2_compeyes_device::an0_w)
+void apple2_compeyes_device::an0_w(int state)
 {
 	m_x =  m_y = 0;
 
@@ -131,19 +131,19 @@ WRITE_LINE_MEMBER(apple2_compeyes_device::an0_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2_compeyes_device::an1_w)
+void apple2_compeyes_device::an1_w(int state)
 {
 	m_an1 = state;
 	m_level = (128 * m_an2) + (64 * m_an1) + (32 * m_an3);
 }
 
-WRITE_LINE_MEMBER(apple2_compeyes_device::an2_w)
+void apple2_compeyes_device::an2_w(int state)
 {
 	m_an2 = state;
 	m_level = (128 * m_an2) + (64 * m_an1) + (32 * m_an3);
 }
 
-WRITE_LINE_MEMBER(apple2_compeyes_device::an3_w)
+void apple2_compeyes_device::an3_w(int state)
 {
 	m_an3 = state;
 	m_level = (128 * m_an2) + (64 * m_an1) + (32 * m_an3);

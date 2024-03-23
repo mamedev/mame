@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -20,7 +20,7 @@
 #include <sstream>
 #include <fstream>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4702) // unreachable code
 #endif
@@ -35,21 +35,21 @@ static void TestStringStream() {
     {
         StringStreamType iss;
         BasicIStreamWrapper<StringStreamType> is(iss);
-        EXPECT_EQ(0, is.Tell());
+        EXPECT_EQ(0u, is.Tell());
         if (sizeof(Ch) == 1) {
             EXPECT_EQ(0, is.Peek4());
-            EXPECT_EQ(0, is.Tell());
+            EXPECT_EQ(0u, is.Tell());
         }
         EXPECT_EQ(0, is.Peek());
         EXPECT_EQ(0, is.Take());
-        EXPECT_EQ(0, is.Tell());
+        EXPECT_EQ(0u, is.Tell());
     }
 
     {
         Ch s[] = { 'A', 'B', 'C', '\0' };
         StringStreamType iss(s);
         BasicIStreamWrapper<StringStreamType> is(iss);
-        EXPECT_EQ(0, is.Tell());
+        EXPECT_EQ(0u, is.Tell());
         if (sizeof(Ch) == 1) {
             EXPECT_EQ(0, is.Peek4()); // less than 4 bytes
         }
@@ -59,7 +59,7 @@ static void TestStringStream() {
             EXPECT_EQ('A' + i, is.Peek());
             EXPECT_EQ('A' + i, is.Take());
         }
-        EXPECT_EQ(3, is.Tell());
+        EXPECT_EQ(3u, is.Tell());
         EXPECT_EQ(0, is.Peek());
         EXPECT_EQ(0, is.Take());
     }
@@ -72,7 +72,7 @@ static void TestStringStream() {
             const Ch* c = is.Peek4();
             for (int i = 0; i < 4; i++)
                 EXPECT_EQ('A' + i, c[i]);
-            EXPECT_EQ(0, is.Tell());
+            EXPECT_EQ(0u, is.Tell());
         }
         for (int i = 0; i < 5; i++) {
             EXPECT_EQ(static_cast<size_t>(i), is.Tell());
@@ -80,7 +80,7 @@ static void TestStringStream() {
             EXPECT_EQ('A' + i, is.Peek());
             EXPECT_EQ('A' + i, is.Take());
         }
-        EXPECT_EQ(5, is.Tell());
+        EXPECT_EQ(5u, is.Tell());
         EXPECT_EQ(0, is.Peek());
         EXPECT_EQ(0, is.Take());
     }
@@ -129,7 +129,7 @@ TEST(IStreamWrapper, ifstream) {
     Document d;
     EXPECT_TRUE(!d.ParseStream(eis).HasParseError());
     EXPECT_TRUE(d.IsObject());
-    EXPECT_EQ(5, d.MemberCount());
+    EXPECT_EQ(5u, d.MemberCount());
 }
 
 TEST(IStreamWrapper, fstream) {
@@ -140,7 +140,7 @@ TEST(IStreamWrapper, fstream) {
     Document d;
     EXPECT_TRUE(!d.ParseStream(eis).HasParseError());
     EXPECT_TRUE(d.IsObject());
-    EXPECT_EQ(5, d.MemberCount());
+    EXPECT_EQ(5u, d.MemberCount());
 }
 
 // wifstream/wfstream only works on C++11 with codecvt_utf16
@@ -176,6 +176,6 @@ TEST(IStreamWrapper, wfstream) {
 
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif

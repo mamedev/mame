@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "ui/analogipt.h"
 
+#include "ui/textbox.h"
+
 #include <algorithm>
 #include <iterator>
 #include <string>
@@ -18,6 +20,20 @@
 
 
 namespace ui {
+
+namespace {
+
+char const HELP_TEXT[] = N_p("menu-analoginput",
+		"Show/hide settings  \t\t%1$s\n"
+		"Decrease value  \t\t%2$s\n"
+		"Increase value  \t\t%3$s\n"
+		"Restore default value  \t\t%4$s\n"
+		"Previous device  \t\t%5$s\n"
+		"Next device  \t\t%6$s\n"
+		"Return to previous menu  \t\t%7$s");
+
+} // anonymous namespace
+
 
 inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 	: field(f)
@@ -37,13 +53,19 @@ inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 
 inline menu_analog::field_data::field_data(ioport_field &f) noexcept
 	: field(f)
-	, range(f.maxval() - f.minval())
-	, neutral(float(f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) / range)
-	, origin((f.analog_wraps() && (f.defvalue() != f.minval()) && (f.defvalue() != f.maxval())) ? 0.0f : neutral)
+	, range(0.0F)
+	, neutral(0.0F)
+	, origin(0.0F)
 	, shift(0U)
 	, show_neutral((f.defvalue() != f.minval()) && (f.defvalue() != f.maxval()))
 {
 	for (ioport_value m = f.mask(); m && !BIT(m, 0); m >>= 1, ++shift) { }
+	ioport_value const m(f.mask() >> shift);
+	range = (f.maxval() - f.minval()) & m;
+	ioport_value const n((f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) & m);
+	neutral = float(n) / range;
+	if (!f.analog_wraps() || (f.defvalue() == f.minval()) || (f.defvalue() == f.maxval()))
+		origin = neutral;
 }
 
 
@@ -57,7 +79,7 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container &container)
 	, m_hide_menu(false)
 {
 	set_process_flags(PROCESS_LR_REPEAT);
-	set_heading(_("Analog Input Adjustments"));
+	set_heading(_("menu-analoginput", "Analog Input Adjustments"));
 }
 
 
@@ -66,20 +88,27 @@ menu_analog::~menu_analog()
 }
 
 
+void menu_analog::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// space for live display
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
+}
+
+
 void menu_analog::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 	// work out how much space to use for field names
 	float const aspect(machine().render().ui_aspect(&container()));
 	float const extrawidth(0.4f + (((ui().box_lr_border() * 2.0f) + ui().get_line_height()) * aspect));
-	float const nameavail(1.0f - (ui().box_lr_border() * 2.0f * aspect) - extrawidth);
+	float const nameavail(1.0f - (lr_border() * 2.0f) - extrawidth);
 	float namewidth(0.0f);
 	for (field_data &data : m_field_data)
-		namewidth = (std::min)((std::max)(ui().get_string_width(data.field.get().name()), namewidth), nameavail);
+		namewidth = (std::min)((std::max)(get_string_width(data.field.get().name()), namewidth), nameavail);
 
 	// make a box or two
 	rgb_t const fgcolor(ui().colors().text_color());
-	float const lineheight(ui().get_line_height());
-	float const border(ui().box_tb_border());
 	float const boxleft((1.0f - namewidth - extrawidth) / 2.0f);
 	float const boxright(boxleft + namewidth + extrawidth);
 	float boxtop;
@@ -89,22 +118,22 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 	if (m_hide_menu)
 	{
 		if (m_prompt.empty())
-			m_prompt = util::string_format(_("Press %s to show menu"), ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY));
+			m_prompt = util::string_format(_("menu-analoginput", "Press %s to show settings"), ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY));
 		draw_text_box(
 				&m_prompt, &m_prompt + 1,
-				boxleft, boxright, y - top, y - top + lineheight + (border * 2.0f),
+				boxleft, boxright, y - top, y - top + line_height() + (tb_border() * 2.0f),
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-				fgcolor, ui().colors().background_color(), 1.0f);
-		boxtop = y - top + lineheight + (border * 3.0f);
-		firstliney = y - top + lineheight + (border * 4.0f);
-		visible_fields = std::min<int>(m_field_data.size(), int((y2 + bottom - border - firstliney) / lineheight));
-		boxbottom = firstliney + (lineheight * visible_fields) + border;
+				fgcolor, ui().colors().background_color());
+		boxtop = y - top + line_height() + (tb_border() * 3.0f);
+		firstliney = y - top + line_height() + (tb_border() * 4.0f);
+		visible_fields = std::min<int>(m_field_data.size(), int((y2 + bottom - tb_border() - firstliney) / line_height()));
+		boxbottom = firstliney + (line_height() * visible_fields) + tb_border();
 	}
 	else
 	{
-		boxtop = y2 + border;
+		boxtop = y2 + tb_border();
 		boxbottom = y2 + bottom;
-		firstliney = y2 + (border * 2.0f);
+		firstliney = y2 + (tb_border() * 2.0f);
 		visible_fields = m_visible_fields;
 	}
 	ui().draw_outlined_box(container(), boxleft, boxtop, boxright, boxbottom, ui().colors().background_color());
@@ -133,24 +162,24 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 		m_top_field = m_field_data.size() - visible_fields;
 
 	// show live fields
-	namewidth += lineheight * aspect;
-	float const nameleft(boxleft + (ui().box_lr_border() * aspect));
+	namewidth += line_height() * aspect;
+	float const nameleft(boxleft + lr_border());
 	float const indleft(nameleft + namewidth);
 	float const indright(indleft + 0.4f);
 	for (unsigned line = 0; visible_fields > line; ++line)
 	{
 		// draw arrows if scrolling is possible and menu is hidden
-		float const liney(firstliney + (lineheight * line));
+		float const liney(firstliney + (line_height() * line));
 		if (m_hide_menu)
 		{
 			bool const uparrow(!line && m_top_field);
 			bool const downarrow(((visible_fields - 1) == line) && ((m_field_data.size() - 1) > (line + m_top_field)));
 			if (uparrow || downarrow)
 			{
-				float const arrowwidth = lineheight * aspect;
+				float const arrowwidth = line_height() * aspect;
 				draw_arrow(
-						0.5f * (nameleft + indright - arrowwidth), liney + (0.25f * lineheight),
-						0.5f * (nameleft + indright + arrowwidth), liney + (0.75f * lineheight),
+						0.5f * (nameleft + indright - arrowwidth), liney + (0.25f * line_height()),
+						0.5f * (nameleft + indright + arrowwidth), liney + (0.75f * line_height()),
 						fgcolor, line ? (ROT0 ^ ORIENTATION_FLIP_Y) : ROT0);
 				continue;
 			}
@@ -160,22 +189,21 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 		field_data &data(m_field_data[line + m_top_field]);
 		bool const selected(&data.field.get() == selfield);
 		rgb_t const fieldcolor(selected ? ui().colors().selected_color() : fgcolor);
-		ui().draw_text_full(
-				container(),
+		draw_text_normal(
 				data.field.get().name(),
 				nameleft, liney, namewidth,
 				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER,
-				mame_ui_manager::NORMAL, fieldcolor, ui().colors().text_bg_color());
+				fieldcolor);
 
 		ioport_value cur(0U);
 		data.field.get().live().analog->read(cur);
-		cur = (cur >> data.shift) - data.field.get().minval();
+		cur = ((cur >> data.shift) - data.field.get().minval()) & (data.field.get().mask() >> data.shift);
 		float fill(float(cur) / data.range);
 		if (data.field.get().analog_reverse())
 			fill = 1.0f - fill;
 
-		float const indtop(liney + (lineheight * 0.2f));
-		float const indbottom(liney + (lineheight * 0.8f));
+		float const indtop(liney + (line_height() * 0.2f));
+		float const indbottom(liney + (line_height() * 0.8f));
 		if (data.origin > fill)
 			container().add_rect(indleft + (fill * 0.4f), indtop, indleft + (data.origin * 0.4f), indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
@@ -199,142 +227,176 @@ void menu_analog::menu_activated()
 }
 
 
-void menu_analog::handle(event const *ev)
+bool menu_analog::handle(event const *ev)
 {
-	// handle events
-	if (ev)
+	if (!ev)
 	{
-		if (IPT_UI_ON_SCREEN_DISPLAY == ev->iptkey)
+		return false;
+	}
+	else if (IPT_UI_ON_SCREEN_DISPLAY == ev->iptkey)
+	{
+		m_hide_menu = !m_hide_menu;
+		set_process_flags(PROCESS_LR_REPEAT | (m_hide_menu ? (PROCESS_CUSTOM_NAV | PROCESS_CUSTOM_ONLY) : 0));
+		return true;
+	}
+	else if (IPT_UI_HELP == ev->iptkey)
+	{
+		stack_push<menu_fixed_textbox>(
+				ui(),
+				container(),
+				_("menu-analoginput", "Analog Input Adjustments Help"),
+				util::string_format(
+					_("menu-analoginput", HELP_TEXT),
+					ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY),
+					ui().get_general_input_setting(IPT_UI_LEFT),
+					ui().get_general_input_setting(IPT_UI_RIGHT),
+					ui().get_general_input_setting(IPT_UI_CLEAR),
+					ui().get_general_input_setting(IPT_UI_PREV_GROUP),
+					ui().get_general_input_setting(IPT_UI_NEXT_GROUP),
+					ui().get_general_input_setting(IPT_UI_BACK)));
+		return false;
+	}
+	else if (m_hide_menu)
+	{
+		switch (ev->iptkey)
 		{
-			m_hide_menu = !m_hide_menu;
-			set_process_flags(PROCESS_LR_REPEAT | (m_hide_menu ? (PROCESS_CUSTOM_NAV | PROCESS_CUSTOM_ONLY) : 0));
+		case IPT_UI_UP:
+			--m_top_field;
+			return true;
+		case IPT_UI_DOWN:
+			++m_top_field;
+			return true;
+		case IPT_UI_HOME:
+			m_top_field = 0;
+			return true;
+		case IPT_UI_END:
+			m_top_field = m_field_data.size();
+			return true;
+		default:
+			return false;
 		}
-		else if (m_hide_menu)
+	}
+	else if (ev->itemref)
+	{
+		item_data &data(*reinterpret_cast<item_data *>(ev->itemref));
+		int newval(data.cur);
+
+		switch (ev->iptkey)
 		{
-			switch (ev->iptkey)
+		// flip toggles when selected
+		case IPT_UI_SELECT:
+			if (ANALOG_ITEM_REVERSE == data.type)
+				newval = newval ? 0 : 1;
+			break;
+
+		// if cleared, reset to default value
+		case IPT_UI_CLEAR:
+			newval = data.defvalue;
+			break;
+
+		// left decrements
+		case IPT_UI_LEFT:
+			newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
+
+		// right increments
+		case IPT_UI_RIGHT:
+			newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
+
+		// move to first item for previous device
+		case IPT_UI_PREV_GROUP:
 			{
-			case IPT_UI_UP:
-				--m_top_field;
-				break;
-			case IPT_UI_DOWN:
-				++m_top_field;
-				break;
-			case IPT_UI_HOME:
-				m_top_field = 0;
-				break;
-			case IPT_UI_END:
-				m_top_field = m_field_data.size();
-				break;
-			}
-		}
-		else if (ev->itemref)
-		{
-			item_data &data(*reinterpret_cast<item_data *>(ev->itemref));
-			int newval(data.cur);
-
-			switch (ev->iptkey)
-			{
-			// if selected, reset to default value
-			case IPT_UI_SELECT:
-			case IPT_UI_CLEAR:
-				newval = data.defvalue;
-				break;
-
-			// left decrements
-			case IPT_UI_LEFT:
-				newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
-
-			// right increments
-			case IPT_UI_RIGHT:
-				newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
-
-			// move to first item for previous device
-			case IPT_UI_PREV_GROUP:
+				auto current = std::distance(m_item_data.data(), &data);
+				device_t const *dev(&data.field.get().device());
+				bool found_break = false;
+				while (0 < current)
 				{
-					auto current = std::distance(m_item_data.data(), &data);
-					device_t const *dev(&data.field.get().device());
-					bool found_break = false;
-					while (0 < current)
+					if (!found_break)
 					{
-						if (!found_break)
+						device_t const *prev(&m_item_data[--current].field.get().device());
+						if (prev != dev)
 						{
-							device_t const *prev(&m_item_data[--current].field.get().device());
-							if (prev != dev)
-							{
-								dev = prev;
-								found_break = true;
-							}
-						}
-						else if (&m_item_data[current - 1].field.get().device() != dev)
-						{
-							set_selection(&m_item_data[current]);
-							set_top_line(selected_index() - 1);
-							break;
-						}
-						else
-						{
-							--current;
-						}
-						if (found_break && !current)
-						{
-							set_selection(&m_item_data[current]);
-							set_top_line(selected_index() - 1);
-							break;
+							dev = prev;
+							found_break = true;
 						}
 					}
-				}
-				break;
-
-			// move to first item for next device
-			case IPT_UI_NEXT_GROUP:
-				{
-					auto current = std::distance(m_item_data.data(), &data);
-					device_t const *const dev(&data.field.get().device());
-					while (m_item_data.size() > ++current)
+					else if (&m_item_data[current - 1].field.get().device() != dev)
 					{
-						if (&m_item_data[current].field.get().device() != dev)
-						{
-							set_selection(&m_item_data[current]);
-							set_top_line(selected_index() - 1);
-							break;
-						}
+						set_selection(&m_item_data[current]);
+						set_top_line(selected_index() - 1);
+						return true;
+					}
+					else
+					{
+						--current;
+					}
+					if (found_break && !current)
+					{
+						set_selection(&m_item_data[current]);
+						set_top_line(selected_index() - 1);
+						return true;
 					}
 				}
-				break;
 			}
+			break;
 
-			// clamp to range
-			newval = std::clamp(newval, data.min, data.max);
-
-			// if things changed, update
-			if (newval != data.cur)
+		// move to first item for next device
+		case IPT_UI_NEXT_GROUP:
 			{
-				ioport_field::user_settings settings;
-
-				// get the settings and set the new value
-				data.field.get().get_user_settings(settings);
-				switch (data.type)
+				auto current = std::distance(m_item_data.data(), &data);
+				device_t const *const dev(&data.field.get().device());
+				while (m_item_data.size() > ++current)
 				{
-					case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
-					case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
-					case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
-					case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
+					if (&m_item_data[current].field.get().device() != dev)
+					{
+						set_selection(&m_item_data[current]);
+						set_top_line(selected_index() - 1);
+						return true;
+					}
 				}
-				data.field.get().set_user_settings(settings);
-				data.cur = newval;
-
-				// update the menu item
-				ev->item->set_subtext(item_text(data.type, newval));
-				ev->item->set_flags((data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW);
 			}
+			break;
 		}
+
+		// clamp to range
+		newval = std::clamp(newval, data.min, data.max);
+
+		// if things changed, update
+		if (newval != data.cur)
+		{
+			ioport_field::user_settings settings;
+
+			// get the settings and set the new value
+			data.field.get().get_user_settings(settings);
+			switch (data.type)
+			{
+				case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
+				case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
+				case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
+				case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
+			}
+			data.field.get().set_user_settings(settings);
+			data.cur = newval;
+
+			// update the menu item
+			ev->item->set_subtext(item_text(data.type, newval));
+			ev->item->set_flags((data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
 	}
 }
 
 
-void menu_analog::populate(float &customtop, float &custombottom)
+void menu_analog::populate()
 {
 	// loop over input ports
 	if (m_item_data.empty())
@@ -369,22 +431,22 @@ void menu_analog::populate(float &customtop, float &custombottom)
 		{
 		default:
 		case ANALOG_ITEM_KEYSPEED:
-			text = string_format(_("%1$s Increment/Decrement Speed"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Increment/Decrement Speed"), field->name());
 			data.cur = settings.delta;
 			break;
 
 		case ANALOG_ITEM_CENTERSPEED:
-			text = string_format(_("%1$s Auto-centering Speed"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Auto-centering Speed"), field->name());
 			data.cur = settings.centerdelta;
 			break;
 
 		case ANALOG_ITEM_REVERSE:
-			text = string_format(_("%1$s Reverse"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Reverse"), field->name());
 			data.cur = settings.reverse;
 			break;
 
 		case ANALOG_ITEM_SENSITIVITY:
-			text = string_format(_("%1$s Sensitivity"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Sensitivity"), field->name());
 			data.cur = settings.sensitivity;
 			break;
 		}
@@ -399,12 +461,12 @@ void menu_analog::populate(float &customtop, float &custombottom)
 
 	// display a message if there are toggle inputs enabled
 	if (!prev_owner)
-		item_append(_("[no analog inputs are enabled]"), FLAG_DISABLE, nullptr);
+		item_append(_("menu-analoginput", "[no analog inputs are enabled]"), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
 
 	// space for live display
-	custombottom = (ui().get_line_height() * m_visible_fields) + (ui().box_tb_border() * 3.0f);
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
 }
 
 
@@ -456,8 +518,8 @@ void menu_analog::find_fields()
 	}
 
 	// restrict live display to 40% height plus borders
-	if ((ui().get_line_height() * m_field_data.size()) > 0.4f)
-		m_visible_fields = unsigned(0.4f / ui().get_line_height());
+	if ((line_height() * m_field_data.size()) > 0.4f)
+		m_visible_fields = unsigned(0.4f / line_height());
 	else
 		m_visible_fields = m_field_data.size();
 }

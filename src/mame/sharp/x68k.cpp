@@ -125,9 +125,8 @@
 #include "bus/x68k/x68k_neptunex.h"
 #include "bus/x68k/x68k_scsiext.h"
 #include "bus/x68k/x68k_midi.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/scsicd.h"
+#include "bus/nscsi/hd.h"
+#include "bus/nscsi/cd.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -137,9 +136,9 @@
 
 #include "x68000.lh"
 
-#define LOG_FDC (1 << 1)
-#define LOG_SYS (1 << 2)
-#define LOG_IRQ (1 << 3)
+#define LOG_FDC (1U << 1)
+#define LOG_SYS (1U << 2)
+#define LOG_IRQ (1U << 3)
 //#define VERBOSE (LOG_FDC | LOG_SYS | LOG_IRQ)
 #include "logmacro.h"
 
@@ -300,277 +299,76 @@ void x68k_state::set_adpcm()
 {
 	uint32_t rate = adpcm_div[m_adpcm.rate];
 	uint32_t res_clock = adpcm_clock[m_adpcm.clock]/2;
-	m_adpcm_timer->adjust(attotime::from_ticks(rate, res_clock), 0, attotime::from_ticks(rate, res_clock));
+	attotime newperiod = attotime::from_ticks(rate, res_clock);
+	attotime newremain = newperiod;
+	if((m_adpcm_timer->period() != attotime::never) && (m_adpcm_timer->period() != attotime::zero))
+		newremain = newperiod * (m_adpcm_timer->remaining().as_double() / m_adpcm_timer->period().as_double());
+	m_adpcm_timer->adjust(newremain, 0, newperiod);
 }
 
-// Megadrive 3 button gamepad
-// According to XM6, bits 4 and 7 are always 1 (is this correct?)
-// Bits 4 and 5 of PPI port C control each controller's multiplexer
-// Button inputs (Start, A, B and C) are read in bits 5 and 6 (rather than 4
-// and 5 like on a Megadrive)
-
-uint8_t x68k_state::md_3button_r(int port)
-{
-	if(port == 1)
-	{
-		uint8_t porta = m_md3b->read() & 0xff;
-		uint8_t portb = (m_md3b->read() >> 8) & 0xff;
-		if(m_mdctrl.mux1 & 0x10)
-		{
-			return porta | 0x90;
-		}
-		else
-		{
-			return (portb & 0x60) | (porta & 0x03) | 0x90;
-		}
-	}
-	if(port == 2)
-	{
-		uint8_t porta = (m_md3b->read() >> 16) & 0xff;
-		uint8_t portb = (m_md3b->read() >> 24) & 0xff;
-		if(m_mdctrl.mux2 & 0x20)
-		{
-			return porta | 0x90;
-		}
-		else
-		{
-			return (portb & 0x60) | (porta & 0x03) | 0x90;
-		}
-	}
-	return 0xff;
-}
-
-// Megadrive 6 button gamepad
-TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port1_timeout)
-{
-	m_mdctrl.seq1 = 0;
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port2_timeout)
-{
-	m_mdctrl.seq2 = 0;
-}
-
-void x68k_state::md_6button_init()
-{
-	m_mdctrl.io_timeout1 = timer_alloc(FUNC(x68k_state::md_6button_port1_timeout), this);
-	m_mdctrl.io_timeout2 = timer_alloc(FUNC(x68k_state::md_6button_port2_timeout), this);
-}
-
-uint8_t x68k_state::md_6button_r(int port)
-{
-	if(port == 1)
-	{
-		uint8_t porta = m_md6b->read() & 0xff;
-		uint8_t portb = (m_md6b->read() >> 8) & 0xff;
-		uint8_t extra = m_md6b_extra->read() & 0x0f;
-
-		switch(m_mdctrl.seq1)
-		{
-			case 1:
-			default:
-				if(m_mdctrl.mux1 & 0x10)
-				{
-					return porta | 0x90;
-				}
-				else
-				{
-					return (portb & 0x60) | (porta & 0x03) | 0x90;
-				}
-			case 2:
-				if(m_mdctrl.mux1 & 0x10)
-				{
-					return porta | 0x90;
-				}
-				else
-				{
-					return (portb & 0x60) | 0x90;
-				}
-			case 3:
-				if(m_mdctrl.mux1 & 0x10)
-				{
-					return (porta & 0x60) | (extra & 0x0f) | 0x90;
-				}
-				else
-				{
-					return (portb & 0x60) | 0x9f;
-				}
-		}
-	}
-	if(port == 2)
-	{
-		uint8_t porta = (m_md6b->read() >> 16) & 0xff;
-		uint8_t portb = (m_md6b->read() >> 24) & 0xff;
-		uint8_t extra = (m_md6b_extra->read() >> 4) & 0x0f;
-
-		switch(m_mdctrl.seq2)
-		{
-			case 1:
-			default:
-				if(m_mdctrl.mux2 & 0x20)
-				{
-					return porta | 0x90;
-				}
-				else
-				{
-					return (portb & 0x60) | (porta & 0x03) | 0x90;
-				}
-			case 2:
-				if(m_mdctrl.mux2 & 0x20)
-				{
-					return porta | 0x90;
-				}
-				else
-				{
-					return (portb & 0x60) | 0x90;
-				}
-			case 3:
-				if(m_mdctrl.mux2 & 0x20)
-				{
-					return (porta & 0x60) | (extra & 0x0f) | 0x90;
-				}
-				else
-				{
-					return (portb & 0x60) | 0x9f;
-				}
-		}
-	}
-	return 0xff;
-}
-
-// XPD-1LR dual D-pad controller.
-// Sold with Video Game Anthology Vol 4: Libble Rabble.
-// Also compatible with Video Game Anthology Vol 5: Crazy Climber 1 & 2
-// Uses the same input multiplexer hardware as Megadrive controllers
-// Output is the same as for standard controllers, but when ctl is high,
-// the directions refer to the right D-pad, and when low, the left D-pad
-// The buttons are read the same as normal, regardless of ctl.
-uint8_t x68k_state::xpd1lr_r(int port)
-{
-	if(port == 1)
-	{
-		uint8_t porta = m_xpd1lr->read() & 0xff;
-		uint8_t portb = (m_xpd1lr->read() >> 8) & 0xff;
-		if(m_mdctrl.mux1 & 0x10)
-		{
-			return porta;
-		}
-		else
-		{
-			return portb | (porta & 0x60);
-		}
-	}
-	if(port == 2)
-	{
-		uint8_t porta = (m_xpd1lr->read() >> 16) & 0xff;
-		uint8_t portb = (m_xpd1lr->read() >> 24) & 0xff;
-		if(m_mdctrl.mux2 & 0x20)
-		{
-			return porta;
-		}
-		else
-		{
-			return portb | (porta & 0x60);
-		}
-	}
-	return 0xff;
-}
-
-// Judging from the XM6 source code, PPI ports A and B are joystick inputs
+// PPI ports A and B are joystick inputs
 uint8_t x68k_state::ppi_port_a_r()
 {
-	int ctrl = m_ctrltype->read() & 0x0f;
+	// first read the joystick inputs
+	uint8_t const input = m_joy[0]->read();
+	uint8_t result = 0x90 | (BIT(input, 4, 2) << 5) | BIT(input, 0, 4);
 
-	switch(ctrl)
-	{
-		case 0x00:  // standard MSX/FM-Towns joystick
-			if(m_joy.joy1_enable == 0)
-				return m_joy1->read();
-			else
-				return 0xff;
-		case 0x01:  // 3-button Megadrive gamepad
-			return md_3button_r(1);
-		case 0x02:  // 6-button Megadrive gamepad
-			return md_6button_r(1);
-		case 0x03:  // XPD-1LR
-			return xpd1lr_r(1);
-	}
+	// trigger lines can be pulled down by port C outputs
+	result &= ~(BIT(m_ppi_portc, 6, 2) << 5);
 
-	return 0xff;
+	return result;
 }
 
 uint8_t x68k_state::ppi_port_b_r()
 {
-	int ctrl = m_ctrltype->read() & 0xf0;
-
-	switch(ctrl)
-	{
-		case 0x00:  // standard MSX/FM-Towns joystick
-			if(m_joy.joy2_enable == 0)
-				return m_joy2->read();
-			else
-				return 0xff;
-		case 0x10:  // 3-button Megadrive gamepad
-			return md_3button_r(2);
-		case 0x20:  // 6-button Megadrive gamepad
-			return md_6button_r(2);
-		case 0x30:  // XPD-1LR
-			return xpd1lr_r(2);
-	}
-
-	return 0xff;
+	uint8_t const input = m_joy[1]->read();
+	return 0x90 | (BIT(input, 4, 2) << 5) | BIT(input, 0, 4);
 }
 
 uint8_t x68k_state::ppi_port_c_r()
 {
-	return m_ppi_port[2];
+	return m_ppi_portc;
 }
 
 /* PPI port C (Joystick control, R/W)
-   bit 7    - IOC7 - Function B operation of joystick 1 (?)
-   bit 6    - IOC6 - Function A operation of joystick 1 (?)
-   bit 5    - IOC5 - Enable Joystick 2
-   bit 4    - IOC4 - Enable Joystick 1
+   bit 7    - IOC7 - Pull down joystick 1 trigger B (JS pin 7)
+   bit 6    - IOC6 - Pull down joystick 1 trigger A (JS pin 6)
+   bit 5    - IOC5 - Joystick 2 strobe (JT pin 8)
+   bit 4    - IOC4 - Joystick 1 strobe (JS pin 8)
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan (00 = Both, 01 = Right only, 10 = Left only, 11 = Off)
 */
 void x68k_state::ppi_port_c_w(uint8_t data)
 {
 	// ADPCM / Joystick control
-	m_ppi_port[2] = data;
-	if((data & 0x0f) != (m_ppi_prev & 0x0f))
+	if((data & 0x03) != (m_ppi_portc & 0x03))
 	{
 		m_adpcm.pan = data & 0x03;
+		m_adpcm_out[0]->set_gain((m_adpcm.pan & 1) ? 0.0f : 1.0f);
+		m_adpcm_out[1]->set_gain((m_adpcm.pan & 2) ? 0.0f : 1.0f);
+	}
+	if((data & 0x0c) != (m_ppi_portc & 0x0c))
+	{
 		m_adpcm.rate = (data & 0x0c) >> 2;
 		if (m_adpcm.rate == 3)
 			LOGMASKED(LOG_SYS, "PPI: Invalid ADPCM sample rate set.\n");
 
 		set_adpcm();
 		m_okim6258->set_divider(m_adpcm.rate);
-		m_adpcm_out[0]->flt_volume_set_volume((m_adpcm.pan & 1) ? 0.0f : 1.0f);
-		m_adpcm_out[1]->flt_volume_set_volume((m_adpcm.pan & 2) ? 0.0f : 1.0f);
 	}
 
-	// The joystick enable bits also handle the multiplexer for various controllers
-	m_joy.joy1_enable = data & 0x10;
-	m_mdctrl.mux1 = data & 0x10;
-	if((m_ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
-	{
-		m_mdctrl.seq1++;
-		m_mdctrl.io_timeout1->adjust(m_maincpu->cycles_to_attotime(8192));
-	}
+	// Set joystick outputs
+	if(BIT(data, 6) != BIT(m_ppi_portc, 6))
+		m_joy[0]->pin_6_w(BIT(~data, 6));
+	if(BIT(data, 7) != BIT(m_ppi_portc, 7))
+		m_joy[0]->pin_7_w(BIT(~data, 7));
+	if(BIT(data, 4) != BIT(m_ppi_portc, 4))
+		m_joy[0]->pin_8_w(BIT(data, 4));
+	if(BIT(data, 5) != BIT(m_ppi_portc, 5))
+		m_joy[1]->pin_8_w(BIT(data, 5));
 
-	m_joy.joy2_enable = data & 0x20;
-	m_mdctrl.mux2 = data & 0x20;
-	if((m_ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
-	{
-		m_mdctrl.seq2++;
-		m_mdctrl.io_timeout2->adjust(m_maincpu->cycles_to_attotime(8192));
-	}
-	m_ppi_prev = data;
-
-	m_joy.ioc6 = data & 0x40;
-	m_joy.ioc7 = data & 0x80;
+	// update saved value
+	m_ppi_portc = data;
 }
 
 
@@ -584,9 +382,9 @@ void x68k_state::fdc_w(offs_t offset, uint16_t data)
 		x = data & 0x0f;
 		for(drive=0;drive<4;drive++)
 		{
-			if(m_fdc.control_drives & (1 << drive))
+			if(BIT(m_fdc.control_drives, drive) && m_fdc.floppy[drive])
 			{
-				if(!(x & (1 << drive)))  // functions take place on 1->0 transitions of drive bits only
+				if(!BIT(x, drive))  // functions take place on 1->0 transitions of drive bits only
 				{
 					m_fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
 					m_fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
@@ -606,7 +404,7 @@ void x68k_state::fdc_w(offs_t offset, uint16_t data)
 		m_fdc.motor = data & 0x80;
 
 		for(int i = 0; i < 4; i++)
-			if(m_fdc.floppy[i]->exists())
+			if(m_fdc.floppy[i] && m_fdc.floppy[i]->exists())
 				m_fdc.floppy[i]->mon_w(!BIT(data, 7));
 
 		m_access_drv_out[x] = 0;
@@ -630,10 +428,10 @@ uint16_t x68k_state::fdc_r(offs_t offset)
 		ret = 0x00;
 		for(x=0;x<4;x++)
 		{
-			if(m_fdc.control_drives & (1 << x))
+			if(BIT(m_fdc.control_drives, x))
 			{
 				ret = 0x00;
-				if(m_fdc.floppy[x]->exists())
+				if(m_fdc.floppy[x] && m_fdc.floppy[x]->exists())
 				{
 					ret |= 0x80;
 				}
@@ -650,7 +448,7 @@ uint16_t x68k_state::fdc_r(offs_t offset)
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER( x68k_state::fdc_irq )
+void x68k_state::fdc_irq(int state)
 {
 	if((m_ioc.irqstatus & 0x04) && state)
 	{
@@ -914,21 +712,28 @@ TIMER_CALLBACK_MEMBER(x68k_state::bus_error)
 
 void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
-	if(m_bus_error)
-		return;
-	else if(!m_maincpu->executing())
+	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
+	if(!m_maincpu->executing())
 	{
 		m_hd63450->bec_w(0, hd63450_device::ERR_BUS);
 		return;
 	}
+	if(m_maincpu->type() == M68000) {
+		downcast<m68000_device *>(m_maincpu.target())->trigger_bus_error();
+		return;
+	}
+
+	if(m_bus_error)
+		return;
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
-	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
+
+	m68000_musashi_device *cpuptr = downcast<m68000_musashi_device *>(m_maincpu.target());
+	cpuptr->set_buserror_details(address, rw, cpuptr->get_fc());
+	cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	m_bus_error_timer->adjust(cpuptr->cycles_to_attotime(16)); // let rmw cycles complete
 }
 
 uint16_t x68k_state::rom0_r(offs_t offset, uint16_t mem_mask)
@@ -980,7 +785,7 @@ void x68k_state::exp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
-WRITE_LINE_MEMBER(x68k_state::dma_irq)
+void x68k_state::dma_irq(int state)
 {
 	m_dmac_int = state != CLEAR_LINE;
 	update_ipl();
@@ -994,7 +799,7 @@ void x68k_state::dma_end(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(x68k_state::fm_irq)
+void x68k_state::fm_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -1019,7 +824,7 @@ void x68k_state::adpcm_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
+void x68k_state::mfp_irq_callback(int state)
 {
 	m_mfp_int = state;
 	update_ipl();
@@ -1100,7 +905,7 @@ uint8_t x68k_state::iack1()
 }
 
 template <int N>
-WRITE_LINE_MEMBER(x68k_state::irq2_line)
+void x68k_state::irq2_line(int state)
 {
 	m_exp_irq2[N] = (state != CLEAR_LINE);
 	LOGMASKED(LOG_IRQ, "IRQ2-%d %s\n", N + 1, m_exp_irq2[N] ? "asserted" : "cleared");
@@ -1108,7 +913,7 @@ WRITE_LINE_MEMBER(x68k_state::irq2_line)
 }
 
 template <int N>
-WRITE_LINE_MEMBER(x68k_state::irq4_line)
+void x68k_state::irq4_line(int state)
 {
 	m_exp_irq4[N] = (state != CLEAR_LINE);
 	LOGMASKED(LOG_IRQ, "IRQ4-%d %s\n", N + 1, m_exp_irq4[N] ? "asserted" : "cleared");
@@ -1116,7 +921,7 @@ WRITE_LINE_MEMBER(x68k_state::irq4_line)
 }
 
 template <int N>
-WRITE_LINE_MEMBER(x68k_state::nmi_line)
+void x68k_state::nmi_line(int state)
 {
 	m_exp_nmi[N] = (state != CLEAR_LINE);
 	LOGMASKED(LOG_IRQ, "EXNMI %s on expansion %d\n", m_exp_nmi[N] ? "asserted" : "cleared", N + 1);
@@ -1169,7 +974,7 @@ void x68k_state::cpu_space_map(address_map &map)
 	map(0xffffff, 0xffffff).lr8(NAME([] () { return m68000_base_device::autovector(7); }));
 }
 
-WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
+void x68ksupr_state::scsi_irq(int state)
 {
 	LOGMASKED(LOG_IRQ, "SCSI IRQ %s\n", state ? "asserted" : "cleared");
 
@@ -1181,9 +986,10 @@ WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(x68ksupr_state::scsi_drq)
+void x68ksupr_state::scsi_unknown_w(uint8_t data)
 {
-	// TODO
+	// Documentation claims SSTS register is read-only, but x68030 boot code writes #$05 to this address anyway.
+	// Is this an undocumented MB89352 feature, an ASIC register, an original code bug or a bad dump?
 }
 
 void x68k_state::x68k_base_map(address_map &map)
@@ -1237,7 +1043,7 @@ void x68ksupr_state::x68kxvi_map(address_map &map)
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
 	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
-	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask16(0x00ff);
+	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0xea0000, 0xea1fff).rw(FUNC(x68ksupr_state::exp_r), FUNC(x68ksupr_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa89).rw(FUNC(x68ksupr_state::areaset_r), FUNC(x68ksupr_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -1252,45 +1058,15 @@ void x68030_state::x68030_map(address_map &map)
 //  map(0xe8c000, 0xe8dfff).rw(FUNC(x68k_state::x68k_printer_r), FUNC(x68k_state::x68k_printer_w));
 	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(FUNC(x68030_state::adpcm_w)).umask32(0x00ff00ff);
 
-	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0x00ff00ff);
+	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask32(0x00ff00ff);
+	map(0xe9602d, 0xe9602d).w(FUNC(x68030_state::scsi_unknown_w));
 	map(0xea0000, 0xea1fff).noprw();//.rw(FUNC(x68030_state::exp_r), FUNC(x68030_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa8b).rw(FUNC(x68030_state::areaset_r), FUNC(x68030_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
 }
 
 static INPUT_PORTS_START( x68000 )
-	PORT_START("ctrltype")
-	PORT_CONFNAME(0x0f, 0x00, "Joystick Port 1")
-	PORT_CONFSETTING(0x00, "Standard 2-button MSX/FM-Towns joystick")
-	PORT_CONFSETTING(0x01, "3-button Megadrive gamepad")
-	PORT_CONFSETTING(0x02, "6-button Megadrive gamepad")
-	PORT_CONFSETTING(0x03, "XPD-1LR dual D-pad gamepad")
-	PORT_CONFNAME(0xf0, 0x00, "Joystick Port 2")
-	PORT_CONFSETTING(0x00, "Standard 2-button MSX/FM-Towns joystick")
-	PORT_CONFSETTING(0x10, "3-button Megadrive gamepad")
-	PORT_CONFSETTING(0x20, "6-button Megadrive gamepad")
-	PORT_CONFSETTING(0x30, "XPD-1LR dual D-pad gamepad")
 // TODO: Sharp Cyber Stick (CZ-8NJ2) support
-
-	PORT_START( "joy1" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)    PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-
-	PORT_START( "joy2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)    PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
 
 	PORT_START("options")
 	PORT_CONFNAME( 0x02, 0x02, "Enable fake bus errors")
@@ -1306,133 +1082,6 @@ static INPUT_PORTS_START( x68000 )
 
 	PORT_START("mouse3")  // Y-axis
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	// 3-button Megadrive gamepad
-	PORT_START("md3b")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 1 Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 1 Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 1 Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 C Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Start Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
-
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 2 Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 2 Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 2 Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 2 Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 C Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
-
-	// 6-button Megadrive gamepad
-	PORT_START("md6b")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 1 Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 1 Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 1 Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 C Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Start Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 2 Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 2 Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 2 Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 2 Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 C Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-
-	// extra inputs
-	PORT_START("md6b_extra")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Z Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Y Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 X Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Mode Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
-
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Z Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Y Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 X Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Mode Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
-
-	// Dempa/Micomsoft XPD-1LR (dual D-pad gamepad sold with Libble Rabble)
-	PORT_START("xpd1lr")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 1 Left/Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 1 Left/Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 1 Left/Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 1 Left/Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 1 Right/Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 1 Right/Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 1 Right/Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 1 Right/Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
-
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 2 Left/Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 2 Left/Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 2 Left/Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 2 Left/Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 2 Right/Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 2 Right/Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 2 Right/Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 2 Right/Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
-
 INPUT_PORTS_END
 
 void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
@@ -1446,10 +1095,9 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 	}
 }
 
-image_init_result x68k_state::floppy_load(floppy_image_device *dev)
+void x68k_state::floppy_load(floppy_image_device *dev)
 {
 	floppy_load_unload(true, dev);
-	return image_init_result::PASS;
 }
 
 void x68k_state::floppy_unload(floppy_image_device *dev)
@@ -1543,7 +1191,7 @@ void x68k_state::machine_start()
 	m_led_state = 0;
 }
 
-void x68k_state::driver_init()
+void x68k_state::driver_start()
 {
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
@@ -1566,9 +1214,6 @@ void x68k_state::driver_init()
 	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
 	m_bus_error_timer = timer_alloc(FUNC(x68ksupr_state::bus_error), this);
 
-	// Initialise timers for 6-button MD controllers
-	md_6button_init();
-
 	m_sysport.cputype = 0xff;  // 68000, 10MHz
 	m_is_32bit = false;
 
@@ -1577,16 +1222,16 @@ void x68k_state::driver_init()
 	save_item(NAME(m_spritereg));
 }
 
-void x68ksupr_state::driver_init()
+void x68ksupr_state::driver_start()
 {
-	x68k_state::driver_init();
+	x68k_state::driver_start();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-void x68030_state::driver_init()
+void x68030_state::driver_start()
 {
-	x68k_state::driver_init();
+	x68k_state::driver_start();
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }
@@ -1623,6 +1268,9 @@ void x68k_state::x68000_base(machine_config &config)
 	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", keyboard_devices, "x68k"));
 	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::si_w));
 
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "townspad");
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "townspad");
+
 	I8255A(config, m_ppi, 0);
 	m_ppi->in_pa_callback().set(FUNC(x68k_state::ppi_port_a_r));
 	m_ppi->in_pb_callback().set(FUNC(x68k_state::ppi_port_b_r));
@@ -1641,6 +1289,7 @@ void x68k_state::x68000_base(machine_config &config)
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(m_mfpdev, FUNC(mc68901_device::i0_w));
+	m_rtc->set_year_offset(20);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1721,23 +1370,36 @@ void x68k_state::x68000(machine_config &config)
 	X68KHDC(config, "x68k_hdc", 0);
 }
 
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+}
+
 void x68ksupr_state::x68ksupr_base(machine_config &config)
 {
 	x68000_base(config);
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	scsi.set_slot_device(6, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
-	scsi.set_slot_device(7, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
+		[this](device_t *device)
+		{
+			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-	MB89352A(config, m_scsictrl, 40_MHz_XTAL / 8);
-	m_scsictrl->set_scsi_port("scsi");
-	m_scsictrl->irq_cb().set(FUNC(x68ksupr_state::scsi_irq));
-	m_scsictrl->drq_cb().set(FUNC(x68ksupr_state::scsi_drq));
+			spc.set_clock(40_MHz_XTAL / 8);
+			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::scsi_irq));
+			spc.out_dreq_callback().set(m_hd63450, FUNC(hd63450_device::drq1_w));
+		});
+
+	m_hd63450->dma_read<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
+	m_hd63450->dma_write<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
@@ -1771,7 +1433,7 @@ void x68030_state::x68030(machine_config &config)
 
 	m_hd63450->set_clock(50_MHz_XTAL / 4);
 	m_scc->set_clock(20_MHz_XTAL / 4);
-	m_scsictrl->set_clock(20_MHz_XTAL / 4);
+	//m_scsictrl->set_clock(20_MHz_XTAL / 4);
 
 	m_crtc->set_clock_50m(50.35_MHz_XTAL);
 }

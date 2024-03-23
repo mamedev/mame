@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    jedparse.c
+    jedparse.cpp
 
     Parser for .JED files into raw fusemaps.
 
@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
+#include <tuple>
 
 
 
@@ -133,6 +134,7 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 				case 'F':
 					cursrc++;
 					pinfo->explicit_numfuses = data->numfuses = suck_number(&cursrc);
+					if (LOG_PARSE) printf("QF\n  %lu\n", (unsigned long)data->numfuses);
 					break;
 			}
 			break;
@@ -162,7 +164,7 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 				if (*cursrc == '0' || *cursrc == '1')
 				{
 					jed_set_fuse(data, curfuse, *cursrc - '0');
-					if (LOG_PARSE) printf("  fuse %u = %d\n", curfuse, 0);
+					if (LOG_PARSE) printf("  fuse %u = %d\n", curfuse, jed_get_fuse(data, curfuse));
 					if (curfuse >= data->numfuses)
 						data->numfuses = curfuse + 1;
 					curfuse++;
@@ -193,8 +195,8 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 int jed_parse(util::random_read &src, jed_data *result)
 {
 	jed_parse_info pinfo;
-	int i;
 	std::size_t actual;
+	std::error_condition err;
 
 	/* initialize the output and the intermediate info struct */
 	memset(result, 0, sizeof(*result));
@@ -204,8 +206,17 @@ int jed_parse(util::random_read &src, jed_data *result)
 	uint8_t ch;
 	do
 	{
-		if (src.read(&ch, 1, actual) || actual != 1)
+		std::tie(err, actual) = read(src, &ch, 1);
+		if (err)
+		{
+			if (LOG_PARSE) printf("Read error searching for JED start marker\n");
 			return JEDERR_INVALID_DATA;
+		}
+		else if (actual != 1)
+		{
+			if (LOG_PARSE) printf("End of file encountered while searching for JED start marker\n");
+			return JEDERR_INVALID_DATA;
+		}
 	}
 	while (ch != 0x02);
 
@@ -214,15 +225,27 @@ int jed_parse(util::random_read &src, jed_data *result)
 	uint16_t checksum = ch;
 	do
 	{
-		if (src.read(&ch, 1, actual) || actual != 1)
+		std::tie(err, actual) = read(src, &ch, 1);
+		if (err)
+		{
+			if (LOG_PARSE) printf("Read error searching for JED end marker\n");
 			return JEDERR_INVALID_DATA;
+		}
+		else if (actual != 1)
+		{
+			if (LOG_PARSE) printf("End of file encountered while searching for JED end marker\n");
+			return JEDERR_INVALID_DATA;
+		}
 		checksum += ch & 0x7f;
 
 		/* mark end of comment field */
 		if (ch == '*' && startpos == 0)
 		{
 			if (src.tell(startpos))
+			{
+				if (LOG_PARSE) printf("Error getting file position for end of design specification\n");
 				return JEDERR_INVALID_DATA;
+			}
 		}
 	}
 	while (ch != 0x03);
@@ -230,24 +253,41 @@ int jed_parse(util::random_read &src, jed_data *result)
 	/* the ETX becomes the real srcend */
 	uint64_t endpos;
 	if (src.tell(endpos))
+	{
+		if (LOG_PARSE) printf("Error getting file position for end JED data\n");
 		return JEDERR_INVALID_DATA;
+	}
 	endpos--;
 
 	/* see if there is a transmission checksum at the end */
 	uint8_t sumbuf[4];
-	if (!src.read(&sumbuf[0], 4, actual) && actual == 4 && ishex(sumbuf[0]) && ishex(sumbuf[1]) && ishex(sumbuf[2]) && ishex(sumbuf[3]))
+	std::tie(err, actual) = read(src, &sumbuf[0], 4);
+	if (!err && (actual == 4) && ishex(sumbuf[0]) && ishex(sumbuf[1]) && ishex(sumbuf[2]) && ishex(sumbuf[3]))
 	{
 		uint16_t dessum = (hexval(sumbuf[0]) << 12) | (hexval(sumbuf[1]) << 8) | (hexval(sumbuf[2]) << 4) | hexval(sumbuf[3] << 0);
 		if (dessum != 0 && dessum != checksum)
+		{
+			if (LOG_PARSE) printf("Bad transmission checksum %04X (expected %04X)\n", dessum, checksum);
 			return JEDERR_BAD_XMIT_SUM;
+		}
 	}
 
 	/* blast through the comment field */
-	if (startpos == 0 || src.seek(startpos, SEEK_SET))
-		return JEDERR_INVALID_DATA;
+	if (startpos != 0)
+	{
+		if (src.seek(startpos, SEEK_SET))
+		{
+			if (LOG_PARSE) printf("Error seeking start of JED data\n");
+			return JEDERR_INVALID_DATA;
+		}
+	}
 	auto srcdata = std::make_unique<uint8_t[]>(endpos - startpos);
-	if (src.read(&srcdata[0], endpos - startpos, actual) || actual != endpos - startpos)
+	std::tie(err, actual) = read(src, &srcdata[0], endpos - startpos);
+	if (err || ((endpos - startpos) != actual))
+	{
+		if (LOG_PARSE) printf("Error reading JED data\n");
 		return JEDERR_INVALID_DATA;
+	}
 	const uint8_t *cursrc = &srcdata[0];
 	const uint8_t *const srcend = &srcdata[endpos - startpos];
 
@@ -287,10 +327,13 @@ int jed_parse(util::random_read &src, jed_data *result)
 
 	/* validate the checksum */
 	checksum = 0;
-	for (i = 0; i < (result->numfuses + 7) / 8; i++)
+	for (int i = 0; i < ((result->numfuses + 7) / 8); i++)
 		checksum += result->fusemap[i];
 	if (pinfo.checksum != 0 && checksum != pinfo.checksum)
+	{
+		if (LOG_PARSE) printf("Bad fuse checksum %04X (expected %04X)\n", pinfo.checksum, checksum);
 		return JEDERR_BAD_FUSE_SUM;
+	}
 
 	return JEDERR_NONE;
 }
@@ -314,13 +357,13 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 	/* always start the DST with a standard header and an STX */
 	tempbuf[0] = 0x02;
-	sprintf(&tempbuf[1], "JEDEC file generated by jedutil*\n");
+	snprintf(&tempbuf[1], 255, "JEDEC file generated by jedutil*\n");
 	if (curdst + strlen(tempbuf) <= dstend)
 		memcpy(curdst, tempbuf, strlen(tempbuf));
 	curdst += strlen(tempbuf);
 
 	/* append the package information */
-	sprintf(tempbuf, "QF%d*\n", data->numfuses);
+	snprintf(tempbuf, 256, "QF%d*\n", data->numfuses);
 	if (curdst + strlen(tempbuf) <= dstend)
 		memcpy(curdst, tempbuf, strlen(tempbuf));
 	curdst += strlen(tempbuf);
@@ -341,7 +384,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 	defbyte = (ones > zeros) ? 0xff : 0x00;
 
 	/* output the default fuse state */
-	sprintf(tempbuf, "F%d*\n", defbyte & 1);
+	snprintf(tempbuf, 256, "F%d*\n", defbyte & 1);
 	if (curdst + strlen(tempbuf) <= dstend)
 		memcpy(curdst, tempbuf, strlen(tempbuf));
 	curdst += strlen(tempbuf);
@@ -357,10 +400,10 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 			int j;
 
 			/* build up a string of 32 fuses */
-			stroffs = sprintf(tempbuf, "L%05d ", i);
+			stroffs = snprintf(tempbuf, 256, "L%05d ", i);
 			for (j = 0; j < 32 && i+j < data->numfuses; j++)
 				tempbuf[stroffs++] = '0' + jed_get_fuse(data, i + j);
-			stroffs += sprintf(&tempbuf[stroffs], "*\n");
+			stroffs += snprintf(&tempbuf[stroffs], 256-stroffs, "*\n");
 
 			/* append to the buffer */
 			if (curdst + strlen(tempbuf) <= dstend)
@@ -369,7 +412,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 		}
 
 	/* write the checksum */
-	sprintf(tempbuf, "C%04X*\n", checksum);
+	snprintf(tempbuf, 256, "C%04X*\n", checksum);
 	if (curdst + strlen(tempbuf) <= dstend)
 		memcpy(curdst, tempbuf, strlen(tempbuf));
 	curdst += strlen(tempbuf);
@@ -382,7 +425,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 	/* append the ETX and the transmission checksum */
 	tempbuf[0] = 0x03;
-	sprintf(&tempbuf[1], "%04X", checksum);
+	snprintf(&tempbuf[1], 255, "%04X", checksum);
 	if (curdst + strlen(tempbuf) <= dstend)
 		memcpy(curdst, tempbuf, strlen(tempbuf));
 	curdst += strlen(tempbuf);
@@ -400,13 +443,16 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 int jedbin_parse(util::read_stream &src, jed_data *result)
 {
+	std::error_condition err;
+	std::size_t actual;
+
 	/* initialize the output */
 	memset(result, 0, sizeof(*result));
 
 	/* need at least 4 bytes */
 	uint8_t buf[4];
-	std::size_t actual;
-	if (src.read(&buf[0], 4, actual) || actual != 4)
+	std::tie(err, actual) = read(src, &buf[0], 4);
+	if (err || (4 != actual))
 		return JEDERR_INVALID_DATA;
 
 	/* first unpack the number of fuses */
@@ -416,7 +462,8 @@ int jedbin_parse(util::read_stream &src, jed_data *result)
 
 	/* now make sure we have enough data in the source */
 	/* copy in the data */
-	if (src.read(result->fusemap, (result->numfuses + 7) / 8, actual) || actual != (result->numfuses + 7) / 8)
+	std::tie(err, actual) = read(src, result->fusemap, (result->numfuses + 7) / 8);
+	if (err || (((result->numfuses + 7) / 8) != actual))
 		return JEDERR_INVALID_DATA;
 	return JEDERR_NONE;
 }

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_ELAN_EU3A05VID_H
-#define MAME_VIDEO_ELAN_EU3A05VID_H
+#ifndef MAME_TVGAMES_ELAN_EU3A05VID_H
+#define MAME_TVGAMES_ELAN_EU3A05VID_H
 
 #include "elan_eu3a05commonvid.h"
 #include "cpu/m6502/m6502.h"
@@ -24,7 +24,6 @@ public:
 	void set_is_sudoku();
 	void set_is_pvmilfin();
 	void set_use_spritepages() { m_use_spritepages = true; }
-	void set_force_transpen_ff() { m_force_transpen_ff = true; }
 	void set_force_basic_scroll() { m_force_basic_scroll = true; }
 
 protected:
@@ -49,6 +48,7 @@ private:
 	uint8_t m_tile_scroll[4*2]{};
 
 	uint8_t m_splitpos[2]{};
+	uint8_t m_transpen = 0;
 
 	uint16_t get_scroll(int which);
 
@@ -73,6 +73,9 @@ private:
 	uint8_t sprite_gfxbase_lo_r();
 	uint8_t sprite_gfxbase_hi_r();
 
+	uint8_t transpen_r();
+	void transpen_w(uint8_t data);
+
 	uint8_t elan_eu3a05_vidctrl_r();
 	void elan_eu3a05_vidctrl_w(uint8_t data);
 
@@ -89,10 +92,9 @@ private:
 	int m_vrambase;
 	int m_spritebase;
 	bool m_use_spritepages;
-	bool m_force_transpen_ff;
 	bool m_force_basic_scroll;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)
 
-#endif // MAME_VIDEO_ELAN_EU3A05VID_H
+#endif // MAME_TVGAMES_ELAN_EU3A05VID_H

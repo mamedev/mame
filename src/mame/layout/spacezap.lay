@@ -1,20 +1,18 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
 	<element name="overlay">
 
-<!-- backdrop -->
-
+		<!-- backdrop -->
 		<rect>
 			<color red="0.0" green="0.85" blue="0.20" />
 			<bounds x="0" y="0" width="6000" height="6000" />
 		</rect>
 
-<!-- top-left blob -->
-
+		<!-- top-left blob -->
 		<disk>
 			<color red="0.0" green="0.85" blue="0.20" />
 			<bounds x="0" y="0" width="2500" height="2500" />
@@ -52,8 +50,7 @@ license:CC0
 			<bounds x="304" y="304" width="1892" height="1892" />
 		</disk>
 
-<!-- top-right blob -->
-
+		<!-- top-right blob -->
 		<disk>
 			<color red="0.0" green="0.85" blue="0.20" />
 			<bounds x="3500" y="0" width="2500" height="2500" />
@@ -91,8 +88,7 @@ license:CC0
 			<bounds x="3804" y="304" width="1892" height="1892" />
 		</disk>
 
-<!-- bottom-left blob -->
-
+		<!-- bottom-left blob -->
 		<disk>
 			<color red="0.0" green="0.85" blue="0.20" />
 			<bounds x="0" y="3500" width="2500" height="2500" />
@@ -130,8 +126,7 @@ license:CC0
 			<bounds x="304" y="3804" width="1892" height="1892" />
 		</disk>
 
-<!-- bottom-right blob -->
-
+		<!-- bottom-right blob -->
 		<disk>
 			<color red="0.0" green="0.85" blue="0.20" />
 			<bounds x="3500" y="3500" width="2500" height="2500" />
@@ -169,9 +164,8 @@ license:CC0
 			<bounds x="3804" y="3804" width="1892" height="1892" />
 		</disk>
 
-<!-- middle blob - note: it should be a more diamond shape, -->
-<!-- see MT 1064, but MAME internal layout can't do that -->
-
+		<!-- middle blob - note: it should be a more diamond shape, -->
+		<!-- see MT 1064, but MAME internal layout can't do that -->
 		<disk>
 			<color red="0.0" green="0.85" blue="0.2" />
 			<bounds x="2000" y="2000" width="2000" height="2000" />
@@ -204,11 +198,9 @@ license:CC0
 			<color red="1.0" green="0.85" blue="0.2" />
 			<bounds x="2140" y="2140" width="1720" height="1720" />
 		</disk>
-
 	</element>
 
-
-	<view name="Color Overlay">
+	<view name="Color Overlay (For B/W)">
 		<bounds left="0" top="0" right="400" bottom="300" />
 
 		<screen index="0">
@@ -219,4 +211,5 @@ license:CC0
 			<bounds x="-100" y="-150" width="600" height="600" />
 		</element>
 	</view>
+
 </mamelayout>

@@ -50,7 +50,7 @@
 #include "emu.h"
 #include "namco52.h"
 
-WRITE_LINE_MEMBER( namco_52xx_device::reset )
+void namco_52xx_device::reset(int state)
 {
 	// The incoming signal is active low
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
@@ -61,7 +61,7 @@ uint8_t namco_52xx_device::K_r()
 	return m_latched_cmd & 0x0f;
 }
 
-READ_LINE_MEMBER( namco_52xx_device::SI_r )
+int namco_52xx_device::SI_r()
 {
 	return m_si(0) ? 1 : 0;
 }
@@ -111,7 +111,7 @@ TIMER_CALLBACK_MEMBER( namco_52xx_device::write_sync )
 	m_latched_cmd = param;
 }
 
-WRITE_LINE_MEMBER( namco_52xx_device::chip_select )
+void namco_52xx_device::chip_select(int state)
 {
 	m_cpu->set_input_line(0, state);
 }
@@ -135,14 +135,14 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device, "namco52", "Namco 52xx")
 
-namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_52XX, tag, owner, clock),
+namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_52XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
 	m_basenode(0),
 	m_extclock(0),
-	m_romread(*this),
-	m_si(*this),
+	m_romread(*this, 0),
+	m_si(*this, 0),
 	m_latched_cmd(0),
 	m_address(0)
 {
@@ -154,10 +154,6 @@ namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *
 
 void namco_52xx_device::device_start()
 {
-	/* resolve our read/write callbacks */
-	m_romread.resolve_safe(0);
-	m_si.resolve_safe(0);
-
 	/* start the external clock */
 	if (m_extclock != 0)
 	{

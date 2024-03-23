@@ -200,7 +200,7 @@ void c64_turbo232_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sp
 //  acia_irq_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_turbo232_cartridge_device::acia_irq_w )
+void c64_turbo232_cartridge_device::acia_irq_w(int state)
 {
 	switch (m_irq)
 	{

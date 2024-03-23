@@ -5,8 +5,8 @@
     Laser Battle / Lazarian - Cat and Mouse
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LASERBAT_H
-#define MAME_INCLUDES_LASERBAT_H
+#ifndef MAME_ZACCARIA_LASERBAT_H
+#define MAME_ZACCARIA_LASERBAT_H
 
 #pragma once
 
@@ -188,4 +188,4 @@ protected:
 	required_device<zac1b11107_audio_device>    m_audiopcb;
 };
 
-#endif // MAME_INCLUDES_LASERBAT_H
+#endif // MAME_ZACCARIA_LASERBAT_H

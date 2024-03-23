@@ -81,7 +81,7 @@ private:
 	required_device<i2c_24c04_device> m_i2cmem;
 	bool m_shadow;
 
-	DECLARE_WRITE_LINE_MEMBER( netinf_irq_w );
+	void netinf_irq_w(int state);
 };
 
 
@@ -185,7 +185,7 @@ void a2bus_lancegs_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_lancegs_device::netinf_irq_w )
+void a2bus_lancegs_device::netinf_irq_w(int state)
 {
 	if (state) {
 		raise_slot_irq();

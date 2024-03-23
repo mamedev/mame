@@ -109,22 +109,22 @@ Year   Game                PCB                       NOTES
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gaelco_state::coin1_lockout_w)
+void gaelco_state::coin1_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, state);
 }
 
-WRITE_LINE_MEMBER(gaelco_state::coin2_lockout_w)
+void gaelco_state::coin2_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-WRITE_LINE_MEMBER(gaelco_state::coin1_counter_w)
+void gaelco_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(gaelco_state::coin2_counter_w)
+void gaelco_state::coin2_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }

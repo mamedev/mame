@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, David Haywood
-#ifndef MAME_INCLUDES_M62_H
-#define MAME_INCLUDES_M62_H
+#ifndef MAME_IREM_M62_H
+#define MAME_IREM_M62_H
 
 #pragma once
 
@@ -194,4 +194,4 @@ private:
 INPUT_PORTS_EXTERN( m62_common );
 INPUT_PORTS_EXTERN( kungfum );
 
-#endif // MAME_INCLUDES_M62_H
+#endif // MAME_IREM_M62_H

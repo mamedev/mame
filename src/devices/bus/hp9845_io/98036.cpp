@@ -299,7 +299,7 @@ void hp98036_io_card_device::device_reset()
 	int_reset();
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::bit_rate_clock)
+void hp98036_io_card_device::bit_rate_clock(int state)
 {
 	if (m_half_baud) {
 		if (state) {
@@ -313,7 +313,7 @@ WRITE_LINE_MEMBER(hp98036_io_card_device::bit_rate_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::slow_clock)
+void hp98036_io_card_device::slow_clock(int state)
 {
 	switch (m_init_state) {
 	case 0:
@@ -347,7 +347,7 @@ WRITE_LINE_MEMBER(hp98036_io_card_device::slow_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::txd_w)
+void hp98036_io_card_device::txd_w(int state)
 {
 	if (m_loopback) {
 		m_uart->write_rxd(state);
@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER(hp98036_io_card_device::txd_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::dtr_w)
+void hp98036_io_card_device::dtr_w(int state)
 {
 	if (m_loopback) {
 		m_uart->write_dsr(state);
@@ -365,7 +365,7 @@ WRITE_LINE_MEMBER(hp98036_io_card_device::dtr_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::rts_w)
+void hp98036_io_card_device::rts_w(int state)
 {
 	if (m_loopback) {
 		m_uart->write_cts(state);
@@ -374,7 +374,7 @@ WRITE_LINE_MEMBER(hp98036_io_card_device::rts_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::txrdy_w)
+void hp98036_io_card_device::txrdy_w(int state)
 {
 	if (m_txrdy != state) {
 		m_txrdy = state;
@@ -385,7 +385,7 @@ WRITE_LINE_MEMBER(hp98036_io_card_device::txrdy_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::rxrdy_w)
+void hp98036_io_card_device::rxrdy_w(int state)
 {
 	if (m_rxrdy != state) {
 		m_rxrdy = state;
@@ -396,21 +396,21 @@ WRITE_LINE_MEMBER(hp98036_io_card_device::rxrdy_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::rxd_w)
+void hp98036_io_card_device::rxd_w(int state)
 {
 	if (!m_loopback) {
 		m_uart->write_rxd(state);
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::dsr_w)
+void hp98036_io_card_device::dsr_w(int state)
 {
 	if (!m_loopback) {
 		m_uart->write_dsr(state);
 	}
 }
 
-WRITE_LINE_MEMBER(hp98036_io_card_device::cts_w)
+void hp98036_io_card_device::cts_w(int state)
 {
 	if (!m_loopback && !BIT(m_s2_input->read(), 0)) {
 		m_uart->write_cts(state);

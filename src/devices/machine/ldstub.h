@@ -31,18 +31,15 @@ DECLARE_DEVICE_TYPE(PHILIPS_22VP932, philips_22vp932_device)
 
 // ======================> pioneer_pr7820_device
 
-class pioneer_pr7820_device : public laserdisc_device
+class pioneer_pr7820_device : public parallel_laserdisc_device
 {
 public:
 	// construction/destruction
 	pioneer_pr7820_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// input/output
-	uint8_t data_available_r() { return CLEAR_LINE; }
-	uint8_t ready_r() { return ASSERT_LINE; }
-	uint8_t data_r() { return 0; }
-	void data_w(uint8_t data) { }
-	void enter_w(uint8_t data) { }
+	virtual void data_w(uint8_t data) override { }
+	virtual uint8_t data_r() override { return 0; }
 
 protected:
 	// subclass overrides
@@ -54,16 +51,15 @@ protected:
 
 // ======================> philips_22vp932_device
 
-class philips_22vp932_device : public laserdisc_device
+class philips_22vp932_device : public parallel_laserdisc_device
 {
 public:
 	// construction/destruction
 	philips_22vp932_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// input/output
-	uint8_t data_r() { return 0; }
-	void data_w(uint8_t data) { }
-	void enter_w(uint8_t data) { }
+	virtual void data_w(uint8_t data) override { }
+	virtual uint8_t data_r() override { return 0; }
 
 protected:
 	// subclass overrides

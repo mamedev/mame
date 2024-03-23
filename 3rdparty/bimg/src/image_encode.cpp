@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
  */
 
 #include <bimg/encode.h>
@@ -12,7 +12,7 @@
 #include <nvtt/nvtt.h>
 #include <pvrtc/PvrTcEncoder.h>
 #include <edtaa3/edtaa3func.h>
-#include <astc/astc_lib.h>
+#include <astcenc.h>
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4100) // warning C4100: 'alloc_context': unreferenced formal parameter
@@ -41,18 +41,18 @@ namespace bimg
 	};
 	BX_STATIC_ASSERT(Quality::Count == BX_COUNTOF(s_squishQuality) );
 
-	static const ASTC_COMPRESS_MODE s_astcQuality[] =
+	static const float s_astcQuality[] =
 	{
 		// Standard
-		ASTC_COMPRESS_MEDIUM,       // Default
-		ASTC_COMPRESS_THOROUGH,     // Highest
-		ASTC_COMPRESS_FAST,         // Fastest
+		ASTCENC_PRE_MEDIUM,       // Default
+		ASTCENC_PRE_THOROUGH,     // Highest
+		ASTCENC_PRE_FAST,         // Fastest
 		// Normal map
-		ASTC_COMPRESS_MEDIUM,       // Default
-		ASTC_COMPRESS_THOROUGH,     // Highest
-		ASTC_COMPRESS_FAST,         // Fastest
+		ASTCENC_PRE_MEDIUM,       // Default
+		ASTCENC_PRE_THOROUGH,     // Highest
+		ASTCENC_PRE_FAST,         // Fastest
 	};
-	BX_STATIC_ASSERT(Quality::Count == BX_COUNTOF(s_astcQuality));
+	BX_STATIC_ASSERT(Quality::Count == BX_COUNTOF(s_astcQuality) );
 
 	void imageEncodeFromRgba8(bx::AllocatorI* _allocator, void* _dst, const void* _src, uint32_t _width, uint32_t _height, uint32_t _depth, TextureFormat::Enum _format, Quality::Enum _quality, bx::Error* _err)
 	{
@@ -142,25 +142,103 @@ namespace bimg
 				break;
 
 			case TextureFormat::ASTC4x4:
+			case TextureFormat::ASTC5x4:
 			case TextureFormat::ASTC5x5:
+			case TextureFormat::ASTC6x5:
 			case TextureFormat::ASTC6x6:
 			case TextureFormat::ASTC8x5:
 			case TextureFormat::ASTC8x6:
+			case TextureFormat::ASTC8x8:
 			case TextureFormat::ASTC10x5:
+			case TextureFormat::ASTC10x6:
+			case TextureFormat::ASTC10x8:
+			case TextureFormat::ASTC10x10:
+			case TextureFormat::ASTC12x10:
+			case TextureFormat::ASTC12x12:
 				{
 					const bimg::ImageBlockInfo& astcBlockInfo = bimg::getBlockInfo(_format);
 
-					ASTC_COMPRESS_MODE compress_mode = s_astcQuality[_quality];
-					ASTC_DECODE_MODE   decode_mode   = ASTC_DECODE_LDR_LINEAR;
+					astcenc_config config{};
+
+					uint32_t astcFlags = ASTCENC_FLG_SELF_DECOMPRESS_ONLY;
 
 					if (Quality::NormalMapDefault <= _quality)
 					{
-						astc_compress(_width, _height, src, ASTC_ENC_NORMAL_RA, srcPitch, astcBlockInfo.blockWidth, astcBlockInfo.blockHeight, compress_mode, decode_mode, dst);
+						astcFlags |= ASTCENC_FLG_MAP_NORMAL;
+					}
+
+					astcenc_error status = astcenc_config_init(
+						  ASTCENC_PRF_LDR
+						, astcBlockInfo.blockWidth
+						, astcBlockInfo.blockHeight
+						, 1
+						, s_astcQuality[_quality]
+						, astcFlags
+						, &config
+						);
+
+					if (status != ASTCENC_SUCCESS)
+					{
+						BX_TRACE("astc error in config init %s", astcenc_get_error_string(status) );
+						BX_ERROR_SET(_err, BIMG_ERROR, "Unable to initialize astc config!");
+						break;
+					}
+
+					astcenc_context* context;
+					status = astcenc_context_alloc(&config, 1, &context);
+
+					if (status != ASTCENC_SUCCESS)
+					{
+						BX_TRACE("astc error in context alloc %s", astcenc_get_error_string(status) );
+						BX_ERROR_SET(_err, BIMG_ERROR, "Unable to alloc astc context!");
+						break;
+					}
+
+					astcenc_image image{};
+					image.dim_x     = _width;
+					image.dim_y     = _height;
+					image.dim_z     = 1;
+					image.data_type = ASTCENC_TYPE_U8;
+					image.data      = (void**)&src;
+
+					const size_t blockCountX = (_width  + astcBlockInfo.blockWidth  - 1) / astcBlockInfo.blockWidth;
+					const size_t blockCountY = (_height + astcBlockInfo.blockHeight - 1) / astcBlockInfo.blockHeight;
+					const size_t compLen     = blockCountX * blockCountY * 16;
+
+					if (Quality::NormalMapDefault <= _quality)
+					{
+						static const astcenc_swizzle swizzle
+						{  //0001/rrrg swizzle corresponds to ASTC_ENC_NORMAL_RA
+							ASTCENC_SWZ_R,
+							ASTCENC_SWZ_R,
+							ASTCENC_SWZ_R,
+							ASTCENC_SWZ_G,
+						};
+
+						status = astcenc_compress_image(context, &image, &swizzle, dst, compLen, 0);
 					}
 					else
 					{
-						astc_compress(_width, _height, src, ASTC_RGBA, srcPitch, astcBlockInfo.blockWidth, astcBlockInfo.blockHeight, compress_mode, decode_mode, dst);
+						static const astcenc_swizzle swizzle
+						{  //0123/rgba swizzle corresponds to ASTC_RGBA
+							ASTCENC_SWZ_R,
+							ASTCENC_SWZ_G,
+							ASTCENC_SWZ_B,
+							ASTCENC_SWZ_A,
+						};
+
+						status = astcenc_compress_image(context, &image, &swizzle, dst, compLen, 0);
 					}
+
+					if (status != ASTCENC_SUCCESS)
+					{
+						BX_TRACE("astc error in compress image %s", astcenc_get_error_string(status) );
+						BX_ERROR_SET(_err, BIMG_ERROR, "Unable to compress astc image!");
+						astcenc_context_free(context);
+						break;
+					}
+
+					astcenc_context_free(context);
 				}
 				break;
 
@@ -252,11 +330,19 @@ namespace bimg
 			case TextureFormat::PTC14:
 			case TextureFormat::PTC14A:
 			case TextureFormat::ASTC4x4:
+			case TextureFormat::ASTC5x4:
 			case TextureFormat::ASTC5x5:
+			case TextureFormat::ASTC6x5:
 			case TextureFormat::ASTC6x6:
 			case TextureFormat::ASTC8x5:
 			case TextureFormat::ASTC8x6:
+			case TextureFormat::ASTC8x8:
 			case TextureFormat::ASTC10x5:
+			case TextureFormat::ASTC10x6:
+			case TextureFormat::ASTC10x8:
+			case TextureFormat::ASTC10x10:
+			case TextureFormat::ASTC12x10:
+			case TextureFormat::ASTC12x12:
 				{
 					uint8_t* temp = (uint8_t*)BX_ALLOC(_allocator, _width*_height*_depth*4);
 					imageDecodeToRgba8(_allocator, temp, _src, _width, _height, _width*4, _srcFormat);

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license: CC0
+license: CC0-1.0
 copyright-holders: Dirk Best
 
 Casio RZ-1 layout
@@ -50,6 +50,15 @@ Casio RZ-1 layout
 		</rect>
 	</element>
 
+	<element name="led_red" defstate="0">
+		<rect state="0">
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
 	<element name="text_0"><text string="0"><color red="0.15" green="0.11" blue="0.11" /></text></element>
 	<element name="text_1"><text string="1"><color red="0.15" green="0.11" blue="0.11" /></text></element>
 	<element name="text_2"><text string="2"><color red="0.15" green="0.11" blue="0.11" /></text></element>
@@ -64,6 +73,10 @@ Casio RZ-1 layout
 	<element name="text_casio"><text string="CASIO"><color red="0.98" green="0.95" blue="0.89" /></text></element>
 	<element name="text_desc"><text string="DIGITAL SAMPLING RHYTHM COMPOSER"><color red="0.29" green="0.74" blue="0.68" /></text></element>
 	<element name="text_rz1"><text string="RZ-1"><color red="0.29" green="0.74" blue="0.68" /></text></element>
+	<element name="text_instrument_level"><text string="INSTRUMENT LEVEL"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_sampling_white"><text string="SAMPLING"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_level"><text string="LEVEL"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_volume"><text string="VOLUME"><color red="0.98" green="0.95" blue="0.89" /></text></element>
 	<element name="text_song"><text string="SONG"><color red="0.98" green="0.95" blue="0.89" /></text></element>
 	<element name="text_pattern"><text string="PATTERN"><color red="0.98" green="0.95" blue="0.89" /></text></element>
 	<element name="text_edit"><text string="EDIT"><color red="0.98" green="0.95" blue="0.89" /></text></element>
@@ -224,6 +237,13 @@ Casio RZ-1 layout
 		</screen>
 
 		<collection name="Controls">
+
+			<!-- sampling led -->
+
+			<element name="led_sampling" ref="led_red">
+				<bounds x="526" y="35" width="9" height="4" />
+			</element>
+
 			<!-- logo and text top right -->
 
 			<element ref="text_casio">
@@ -234,6 +254,31 @@ Casio RZ-1 layout
 			</element>
 			<element ref="text_rz1">
 				<bounds x="665" y="134" width="59" height="24" />
+			</element>
+
+			<!-- dial labels -->
+
+			<element ref="text_instrument_level">
+				<bounds x="53" y="168" width="378" height="7" />
+			</element>
+			<element ref="teal">
+				<bounds x="53" y="177" width="378" height="1" />
+			</element>
+
+			<element ref="text_sampling_white">
+				<bounds x="502" y="160" width="56" height="7" />
+			</element>
+			<element ref="text_level">
+				<bounds x="502" y="168" width="56" height="7" />
+			</element>
+			<element ref="teal">
+				<bounds x="502" y="177" width="56" height="1" />
+			</element>
+			<element ref="text_volume">
+				<bounds x="560" y="168" width="56" height="7" />
+			</element>
+			<element ref="teal">
+				<bounds x="560" y="177" width="56" height="1" />
 			</element>
 
 			<!-- separator -->

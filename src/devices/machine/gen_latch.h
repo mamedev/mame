@@ -34,7 +34,7 @@ public:
 	auto data_pending_callback() { return m_data_pending_cb.bind(); }
 	void set_separate_acknowledge(bool ack) { m_separate_acknowledge = ack; }
 
-	DECLARE_READ_LINE_MEMBER(pending_r);
+	int pending_r();
 
 	u8 acknowledge_r(address_space &space);
 	void acknowledge_w(u8 data = 0);
@@ -72,8 +72,8 @@ public:
 
 	void preset_w(u8 data = 0xff);
 	void clear_w(u8 data = 0);
-	DECLARE_WRITE_LINE_MEMBER( preset );
-	DECLARE_WRITE_LINE_MEMBER( clear );
+	void preset(int state);
+	void clear(int state);
 
 protected:
 	virtual void device_start() override;
@@ -98,8 +98,8 @@ public:
 
 	void preset_w(u16 data = 0xffff);
 	void clear_w(u16 data = 0);
-	DECLARE_WRITE_LINE_MEMBER( preset );
-	DECLARE_WRITE_LINE_MEMBER( clear );
+	void preset(int state);
+	void clear(int state);
 
 protected:
 	virtual void device_start() override;

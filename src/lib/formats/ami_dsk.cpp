@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/ami_dsk.c
+    formats/ami_dsk.cpp
 
     Amiga disk images
 
@@ -17,22 +17,22 @@ adf_format::adf_format() : floppy_image_format_t()
 {
 }
 
-const char *adf_format::name() const
+const char *adf_format::name() const noexcept
 {
 	return "adf";
 }
 
-const char *adf_format::description() const
+const char *adf_format::description() const noexcept
 {
 	return "Amiga ADF floppy disk image";
 }
 
-const char *adf_format::extensions() const
+const char *adf_format::extensions() const noexcept
 {
 	return "adf";
 }
 
-bool adf_format::supports_save() const
+bool adf_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -49,7 +49,7 @@ int adf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	return 0;
 }
 
-bool adf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool adf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	desc_s sectors[22];
 	uint8_t sectdata[512*22];
@@ -78,20 +78,22 @@ bool adf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 
 	if (!is_hd) {
-		image->set_variant(floppy_image::DSDD);
+		image.set_variant(floppy_image::DSDD);
 		for (int track=0; track < tracks; track++) {
 			for (int side=0; side < 2; side++) {
-				size_t actual;
-				io.read_at((track*2 + side)*512*11, sectdata, 512*11, actual);
+				auto const [err, actual] = read_at(io, (track*2 + side)*512*11, sectdata, 512*11);
+				if (err || (512*11 != actual))
+					return false;
 				generate_track(amiga_11, track, side, sectors, 11, 100000, image);
 			}
 		}
 	} else {
-		image->set_variant(floppy_image::DSHD);
+		image.set_variant(floppy_image::DSHD);
 		for (int track=0; track < tracks; track++) {
 			for (int side=0; side < 2; side++) {
-				size_t actual;
-				io.read_at((track*2 + side)*512*22, sectdata, 512*22, actual);
+				auto const [err, actual] = read_at(io, (track*2 + side)*512*22, sectdata, 512*22);
+				if (err || (512*22 != actual))
+					return false;
 				generate_track(amiga_22, track, side, sectors, 22, 200000, image);
 			}
 		}
@@ -121,11 +123,11 @@ uint32_t adf_format::checksum(const std::vector<bool> &trackbuf, uint32_t pos, i
 	return check & 0x55555555;
 }
 
-bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	uint8_t sectdata[512*22];
 
-	bool const hd = image->get_variant() == floppy_image::DSHD;
+	bool const hd = image.get_variant() == floppy_image::DSHD;
 
 	int const data_track_size = hd ? 512*22 : 512*11;
 
@@ -151,8 +153,8 @@ bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 						*dest++ = val;
 					}
 
-					size_t actual;
-					io.write_at((track*2 + side) * data_track_size, sectdata, data_track_size, actual);
+					// FIXME: check for errors
+					/*auto const [err, actual] =*/ write_at(io, (track*2 + side) * data_track_size, sectdata, data_track_size);
 				}
 		}
 	}

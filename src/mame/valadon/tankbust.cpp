@@ -30,9 +30,9 @@ To do:
 
 
 // configurable logging
-#define LOG_SCROLL     (1U <<  1)
-#define LOG_SOUND      (1U <<  2)
-#define LOG_E0XX       (1U <<  3)
+#define LOG_SCROLL     (1U << 1)
+#define LOG_SOUND      (1U << 2)
+#define LOG_E0XX       (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SCROLL | LOG_SOUND | LOG_E0XX)
 
@@ -120,8 +120,6 @@ private:
 	void port_map_cpu2(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -339,8 +337,6 @@ uint32_t tankbust_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void tankbust_state::machine_start()
 {

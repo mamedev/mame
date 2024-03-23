@@ -28,13 +28,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -52,7 +52,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-/** Retrieve legal native buffer sizes for the specificed device, in sample frames.
+/** Retrieve legal native buffer sizes for the specified device, in sample frames.
 
  @param device The global index of the device about which the query is being made.
  @param minBufferSizeFrames A pointer to the location which will receive the minimum buffer size value.
@@ -68,7 +68,7 @@ extern "C"
  #define that maps PaAsio_GetAvailableLatencyValues to this function for backwards compatibility.
 */
 PaError PaAsio_GetAvailableBufferSizes( PaDeviceIndex device,
-		long *minBufferSizeFrames, long *maxBufferSizeFrames, long *preferredBufferSizeFrames, long *granularity );
+        long *minBufferSizeFrames, long *maxBufferSizeFrames, long *preferredBufferSizeFrames, long *granularity );
 
 
 /** Backwards compatibility alias for PaAsio_GetAvailableBufferSizes
@@ -97,7 +97,7 @@ PaError PaAsio_ShowControlPanel( PaDeviceIndex device, void* systemSpecific );
 PaError PaAsio_GetInputChannelName( PaDeviceIndex device, int channelIndex,
         const char** channelName );
 
-        
+
 /** Retrieve a pointer to a string containing the name of the specified
  input channel. The string is valid until Pa_Terminate is called.
 
@@ -108,11 +108,11 @@ PaError PaAsio_GetOutputChannelName( PaDeviceIndex device, int channelIndex,
 
 
 /** Set the sample rate of an open paASIO stream.
- 
- @param stream The stream to operate on.
- @param sampleRate The new sample rate. 
 
- Note that this function may fail if the stream is alredy running and the 
+ @param stream The stream to operate on.
+ @param sampleRate The new sample rate.
+
+ Note that this function may fail if the stream is already running and the
  ASIO driver does not support switching the sample rate of a running stream.
 
  Returns paIncompatibleStreamHostApi if stream is not a paASIO stream.

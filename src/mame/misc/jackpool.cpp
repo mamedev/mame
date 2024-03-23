@@ -28,6 +28,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class jackpool_state : public driver_device
 {
 public:
@@ -49,7 +51,7 @@ protected:
 
 private:
 	uint8_t jackpool_io_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
+	void map_vreg_w(int state);
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
 	void jackpool_mem(address_map &map);
@@ -140,7 +142,7 @@ uint8_t jackpool_state::jackpool_io_r(offs_t offset)
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER(jackpool_state::map_vreg_w)
+void jackpool_state::map_vreg_w(int state)
 {
 	m_map_vreg = state;
 }
@@ -304,5 +306,8 @@ void jackpool_state::init_jackpool()
 	/* patch NVRAM routine */
 	rom[0x9040/2] = 0x6602;
 }
+
+} // anonymous namespace
+
 
 GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, init_jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",MACHINE_NOT_WORKING )

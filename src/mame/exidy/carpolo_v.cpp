@@ -501,7 +501,7 @@ int carpolo_state::check_sprite_border_collision(uint8_t x1, uint8_t y1, int cod
 }
 
 
-WRITE_LINE_MEMBER(carpolo_state::screen_vblank)
+void carpolo_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

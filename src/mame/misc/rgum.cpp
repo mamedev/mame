@@ -17,6 +17,8 @@ Main components
 
 TODO:
 - stuck at the play screen with 'attendere' (wait) message after coining up;
+- Pressing "pin's switch" causes a "Micro Palline Err" (micro balls error),
+  is this some kind of pachinko-like machine?
 - some devices aren't mapped and others may be mapped wrong.
 */
 
@@ -49,7 +51,7 @@ public:
 
 	void rgum(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(heartbeat_r);
+	int heartbeat_r();
 
 protected:
 	virtual void video_start() override;
@@ -186,7 +188,7 @@ void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10
 }
 
 
-READ_LINE_MEMBER(rgum_state::heartbeat_r)
+int rgum_state::heartbeat_r()
 {
 	return m_hbeat;
 }
@@ -194,17 +196,17 @@ READ_LINE_MEMBER(rgum_state::heartbeat_r)
 
 static INPUT_PORTS_START( rgum )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "PIN'S SW."
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Stop Reel 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Stop Reel 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Stop Reel 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Stop Reel 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pin's Switch")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(rgum_state, heartbeat_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Stop Reel 5") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Stop Reel 5")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "GUM SW."
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gum Switch")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // "PAY LOT"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -358,4 +360,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING )
+GAME( 1993, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

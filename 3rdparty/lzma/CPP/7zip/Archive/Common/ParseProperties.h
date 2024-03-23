@@ -1,6 +1,6 @@
 // ParseProperties.h
 
-#ifndef __PARSE_PROPERTIES_H
-#define __PARSE_PROPERTIES_H
+#ifndef ZIP7_INC_PARSE_PROPERTIES_H
+#define ZIP7_INC_PARSE_PROPERTIES_H
 
 #endif

@@ -96,7 +96,7 @@ static GFXDECODE_START( gfx_pcmda )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER( isa8_mda_device::pc_cpu_line )
+void isa8_mda_device::pc_cpu_line(int state)
 {
 	m_isa->irq7_w(state);
 }
@@ -403,13 +403,13 @@ MC6845_UPDATE_ROW( isa8_hercules_device::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER( isa8_mda_device::hsync_changed )
+void isa8_mda_device::hsync_changed(int state)
 {
 	m_hsync = state ? 1 : 0;
 }
 
 
-WRITE_LINE_MEMBER( isa8_mda_device::vsync_changed )
+void isa8_mda_device::vsync_changed(int state)
 {
 	m_vsync = state ? 0x80 : 0;
 	if ( state )

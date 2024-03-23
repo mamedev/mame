@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_CPS1_H
-#define MAME_INCLUDES_CPS1_H
+#ifndef MAME_CAPCOM_CPS1_H
+#define MAME_CAPCOM_CPS1_H
 
 #pragma once
 
@@ -222,7 +222,7 @@ protected:
 
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
+	void screen_vblank_cps1(int state);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
@@ -333,4 +333,4 @@ INPUT_PORTS_EXTERN( varth );
 INPUT_PORTS_EXTERN( captcomm );
 INPUT_PORTS_EXTERN( wof );
 
-#endif // MAME_INCLUDES_CPS1_H
+#endif // MAME_CAPCOM_CPS1_H

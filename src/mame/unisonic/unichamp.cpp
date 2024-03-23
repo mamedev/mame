@@ -53,6 +53,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class unichamp_state : public driver_device
 {
 public:
@@ -277,6 +279,8 @@ ROM_START(unichamp)
 	//ROM_LOAD16_WORD( "pac-04.bin",   0x1000<<1, 0x1000, CRC(cac09841) SHA1(bc9db83f26ed0810938156db6b104b4576754225))
 	//ROM_LOAD16_WORD( "pac-05.bin",   0x1000<<1, 0x1000, CRC(d54a6090) SHA1(e85593096f43dcf14b08fd2c9fda277008a8df8b))
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 1977, unichamp, 0, 0, unichamp, unichamp, unichamp_state, empty_init, "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )

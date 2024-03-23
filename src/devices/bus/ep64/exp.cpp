@@ -63,11 +63,6 @@ ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_con
 void ep64_expansion_bus_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_wait.resolve_safe();
 }
 
 

@@ -34,9 +34,12 @@ public:
 
 	auto alarm() { return m_out_alarm_cb.bind(); }
 	auto clkout() { return m_out_clkout_cb.bind(); }
+	void set_year_offset(int year) { m_year_offset = year; }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
+
+	virtual void set_current_time(const system_time &systime) override;
 
 protected:
 	// device-level overrides
@@ -69,6 +72,8 @@ private:
 	int m_1hz;                  // 1 Hz condition
 	int m_16hz;                 // 16 Hz condition
 	int m_clkout;               // clock output
+
+	int m_year_offset = 0;
 
 	// timers
 	emu_timer *m_clock_timer;

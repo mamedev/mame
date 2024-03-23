@@ -56,9 +56,9 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( di_w );
+	void di_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( eos_r );
+	int eos_r();
 
 protected:
 	// device-level overrides

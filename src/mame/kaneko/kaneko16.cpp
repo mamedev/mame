@@ -2663,17 +2663,59 @@ ROM_START( berlwallk )
 	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
 ROM_END
 
-ROM_START( packbang ) /* same PCB as Berlin Wall - BW-002 */
+
+/***************************************************************************
+
+                                Pack'n Bang Bang
+
+Pack'n Bang Bang, Kaneko 1994, BW-002 (same PCB as Berlin Wall)
+
+For the final/retail version, the observed differences include:
+ The use of standard production mask ROMs instead of EPROMs
+ Slightly longer more polished DEMO routines
+ These tests have been removed from the test menu:
+   -4- OBJ CHARA. TEST
+   -5- BG 32000 TEST
+   -6- BG CHARA. TEST
+   -7- SPR ANIME TEST
+
+***************************************************************************/
+
+ROM_START( packbang ) /* Final/retail version */
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
-	ROM_LOAD16_BYTE( "bbp0x3.u23", 0x000000, 0x020000, CRC(105e978a) SHA1(d2aa72a25b70726ebe4b16bfe16da149bb37cd85) ) /* hand written checksum on label - 527B */
-	ROM_LOAD16_BYTE( "bbp1x3.u39", 0x000001, 0x020000, CRC(465d36f5) SHA1(d3bc9e5d444e086652d2bc562d9adfb8a1fd0d2d) ) /* hand written checksum on label - C5C8 */
+	ROM_LOAD16_BYTE( "bbp0x3_u23.u23", 0x000000, 0x020000, CRC(8f879c9d) SHA1(07c793f486f2c00624ee5b4d982de42358854ac9) ) /* labeled BBP0X3/U23 */
+	ROM_LOAD16_BYTE( "bbp1x3_u39.u39", 0x000001, 0x020000, CRC(3a90ad84) SHA1(b25d2de8d6ee15822a5f4ca445956cfce3d30cc4) ) /* labeled BBP1X3/U39 */
 
 	ROM_REGION( 0x120000, "kan_spr", 0 )   /* Sprites */
-	ROM_LOAD( "bb.u84",  0x000000, 0x080000, CRC(97837aaa) SHA1(303780621afea01f9e4d1386229c7421307562ec) )
-	ROM_LOAD( "pb_spr_ext_9_20_ver.u83",  0x080000, 0x040000, CRC(666a1217) SHA1(0d7b08d63b229d70b7e9e77a36516a695533c4cb) ) /* hand written label plus checksum BA63 */
+	ROM_LOAD( "bb-u84-007__w22.u84", 0x000000, 0x080000, CRC(97837aaa) SHA1(303780621afea01f9e4d1386229c7421307562ec) ) /* mask ROM */
+	ROM_LOAD( "bbs0x1_u83.u83",      0x080000, 0x040000, CRC(3d95b1e5) SHA1(3bc54b4af4a059feb88779d786798dd06386cc48) ) /* labeled BBS0X1/U83 */
 
 	ROM_REGION( 0x080000, "view2_0", 0 )   /* Tiles */
-	ROM_LOAD( "bbbox1.u77",  0x000000, 0x080000, CRC(b2ffd081) SHA1(e4b8b60ed0c5f2e0709477cc840864e1c0a351ea) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "bbb0x1_u77.u77",  0x000000, 0x080000, CRC(b2ffd081) SHA1(e4b8b60ed0c5f2e0709477cc840864e1c0a351ea) ) // labeled BBB0X1/U77 - 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
+	ROM_LOAD16_BYTE( "bb-u73-004__w19.u73",  0x000000, 0x080000, CRC(896d88cb) SHA1(7546e64149d8d8e3425d9112a7a63b2d2e59b8bb) ) // These are all mask ROMs
+	ROM_LOAD16_BYTE( "bb-u65-001__w16.u65",  0x000001, 0x080000, CRC(fe17c5b5) SHA1(daea65bd87d2137526250d521f36f122f733fd9d) ) // FIXED BITS (xxxxxxx0)
+	ROM_LOAD16_BYTE( "bb-u74-005__w20.u74",  0x100000, 0x080000, CRC(b01e77b9) SHA1(73f3adaf6468f4e9c54bff63268af1765cfc5f67) )
+	ROM_LOAD16_BYTE( "bb-u66-002__w17.u66",  0x100001, 0x080000, CRC(caec5098) SHA1(9966cd643abe498f84a9e01bc32003f4654584de) ) // FIXED BITS (xxxxxxx0)
+	ROM_LOAD16_BYTE( "bb-u75-006__w21.u75",  0x200000, 0x080000, CRC(5cb4669f) SHA1(ab061f5b34435dca46f710ea8118c919a3a9f87c) )
+	ROM_LOAD16_BYTE( "bb-u67-003__w18.u67",  0x200001, 0x080000, CRC(ce5c9417) SHA1(30aca496d1f4218b44a32b3630e58889f0c54564) ) // FIXED BITS (xxxxxxx0)
+
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "bw_u46.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) ) /* labeled BW    /U46 */
+ROM_END
+
+ROM_START( packbangp ) /* prototype version */
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "bbp0x3_527b.u23", 0x000000, 0x020000, CRC(105e978a) SHA1(d2aa72a25b70726ebe4b16bfe16da149bb37cd85) ) /* hand written checksum on label - 527B */
+	ROM_LOAD16_BYTE( "bbp1x3_c5c8.u39", 0x000001, 0x020000, CRC(465d36f5) SHA1(d3bc9e5d444e086652d2bc562d9adfb8a1fd0d2d) ) /* hand written checksum on label - C5C8 */
+
+	ROM_REGION( 0x120000, "kan_spr", 0 )   /* Sprites */
+	ROM_LOAD( "bb.u84",                       0x000000, 0x080000, CRC(97837aaa) SHA1(303780621afea01f9e4d1386229c7421307562ec) )
+	ROM_LOAD( "pb_spr_ext_9_20_ver_ba63.u83", 0x080000, 0x040000, CRC(666a1217) SHA1(0d7b08d63b229d70b7e9e77a36516a695533c4cb) ) /* hand written label plus checksum BA63 */
+
+	ROM_REGION( 0x080000, "view2_0", 0 )   /* Tiles */
+	ROM_LOAD( "bbb0x1.u77",  0x000000, 0x080000, CRC(b2ffd081) SHA1(e4b8b60ed0c5f2e0709477cc840864e1c0a351ea) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x400000, "gfx3", 0 )   /* High Color Background */
 	ROM_LOAD16_BYTE( "bb.u73",  0x000000, 0x080000, CRC(896d88cb) SHA1(7546e64149d8d8e3425d9112a7a63b2d2e59b8bb) )
@@ -4152,6 +4194,41 @@ ROM_START( brapboysp ) /* World 'special version' with EXROM sub board; serial R
 	ROM_LOAD( "rb-002.u45",  0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
 ROM_END
 
+ROM_START( brapboysp2 ) // World (?) 'special version' with EXROM sub board; suffix code N */
+	ROM_REGION( 0x040000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "rb-30n.u61", 0x000000, 0x020000, CRC(632269b0) SHA1(4dfe63b02cb95022b8c439d106b8b28d47b0e1da) ) // EPROM labeled RB-30N/U61 (white label)
+	ROM_LOAD16_BYTE( "rb-31n.u62", 0x000001, 0x020000, CRC(99623650) SHA1(498d58716298ce6e1bb8146a75089301f46079b1) ) // EPROM labeled RB-31N/U62 (white label)
+
+	ROM_REGION( 0x020000, "calc3_rom", 0 )
+	ROM_LOAD( "rb-40n.u33",  0x000000, 0x020000, CRC(313b7a6d) SHA1(59e1ac88c70498a8731dc3b2b01515d0ba1ac65b) ) // EPROM labeled RB-40N/U33 (white label), 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x1000000, "kan_spr", 0 )
+	ROM_LOAD( "rb-020.c2",   0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) ) // rb-020 0013 mask ROM; really at location next to capacitor C2 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-021.u76",  0x100000, 0x100000, CRC(74001407) SHA1(90002056ceb4e0401246950b8c3f996af0a2463c) ) // rb-021 0014 mask ROM
+	ROM_LOAD( "rb-022.u77",  0x200000, 0x100000, CRC(cb3f42dc) SHA1(5415f15621924dd263b8fe7daaf3dc25d470b814) ) // rb-022 0015 mask ROM
+	ROM_LOAD( "rb-023.u78",  0x300000, 0x100000, CRC(0e6530c5) SHA1(72bff46f0672927e540f4f3546ae533dd0a231e0) ) // rb-023 0016 mask ROM
+	ROM_LOAD( "rb-024.u79",  0x400000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) ) // rb-023 0017 w29 mask ROM, both halves identical when dumped as larger
+	ROM_RELOAD( 0x480000,  0x080000 )
+	ROM_LOAD( "rb-25n.c3",   0x500000, 0x040000, CRC(065d9bb5) SHA1(1f5b2f3cc95a4257eeeb9e41f9cc1c68f8118989) ) // EPROM labeled RB-25N (white label), really at location next to capacitor C3 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-26n.c4",   0x540000, 0x040000, CRC(8fac668b) SHA1(0f98f8b0ab366b30b7fb613c910c16ff32d214b7) ) // EPROM labeled RB-26N (white label), really at location next to capacitor C4 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-27n.c5",   0x580000, 0x040000, CRC(fb9ed35f) SHA1(7c1cd1f25febfeaeac4f51ff32b2d35b535d2539) ) // EPROM labeled RB-27N (white label), really at location next to capacitor C5 on Z01DK-EXROM-K daughterboard
+	ROM_LOAD( "rb-28n.c7",   0x5c0000, 0x040000, CRC(13acdcab) SHA1(d2e3e9cfd6b6a61ecb5dde85fd16c13877bd6eb1) ) // EPROM labeled RB-28N (white label), really at location next to capacitor C7 on Z01DK-EXROM-K daughterboard
+
+	ROM_REGION( 0x400000, "view2_0", 0 )
+	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) ) // rb-010 0009 w17 mask ROM
+	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) ) // rb-011 0010 w18 mask ROM
+	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) ) // rb-012 0011 w21 mask ROM
+	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) ) // rb-013 0012 w22 mask ROM
+
+	ROM_REGION( 0x100000, "oki1", 0 )
+	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) ) // rb-000 0006 w28 mask ROM
+	ROM_LOAD( "rb-003.u101", 0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) ) // rb-003 0018 mask ROM
+
+	ROM_REGION( 0x200000, "oki2", 0 )
+	ROM_LOAD( "rb-001.u44",  0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) ) // rb-001 0007 mask ROM
+	ROM_LOAD( "rb-002.u45",  0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) ) // rb-002 0008 w11 mask ROM
+ROM_END
+
 // TODO: the eproms for brapboysj are missing the region-specific numeric suffix;
 // it should be something like -00 or -01 or -10 or -11 or etc
 ROM_START( brapboyspj ) /* Japanese 'special version' with EXROM sub board; serial unknown; suffix codes unknown */
@@ -4301,6 +4378,39 @@ ROM_START( bonkadv )
 ROM_END
 
 
+// Z09AF-003 PCB. No language select (but it has strings in Italian and German?). Also has a much longer list of level titles in ROM (the extra ones don't seem used, though).
+// Handwritten sticker (in Japanese) says: 'Normal board version' 'Sensor sound: English'
+ROM_START( bonkadva )
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "1-13.8",        0x000000, 0x080000, CRC(9a02e4ca) SHA1(5e8cbcedd11e8b3bb6c17da8f33951a08977ba1f) ) // handwritten: PC原人 AT 1/13
+	ROM_LOAD16_BYTE( "1-13.7",        0x000001, 0x080000, CRC(6b0afe3d) SHA1(3cb1063c8c2ac93202ed9141caae810a8f6d9907) ) // handwritten: PC原人 AT 1/13
+
+	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
+	ROM_LOAD16_WORD_SWAP( "9200.124",             0x000000, 0x020000, CRC(9d4e2724) SHA1(9dd43703265e39f876877020a0ac3875de6faa8d) )
+
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
+	ROM_LOAD( "pc100101.37",         0x000000, 0x200000, CRC(c96e7c10) SHA1(607cc7745abc3ff820047e8a00060ece61646623) )
+	ROM_LOAD( "pc200102.40",         0x200000, 0x100000, CRC(c2b7a26a) SHA1(1c8783442e0ccf30c5640866c5493f1dc1dd48f8) )
+	ROM_LOAD( "pc300103.38",         0x300000, 0x100000, CRC(51ee162c) SHA1(b33afc7d1e9f55f191e08472e8c51ca931b0389d) )
+	ROM_LOAD16_BYTE( "pc600106.42",  0x400000, 0x080000, CRC(25877026) SHA1(96814d97e9f9284f98c35edfe5e76677ac50dd97) )
+	ROM_LOAD16_BYTE( "pc700107.43",  0x400001, 0x080000, CRC(bfe21c44) SHA1(9900a6fe4182b720a90d64d368bd0fd08bf936a8) )
+
+	ROM_REGION( 0x200000, "view2_0", 0 )   /* Tiles */
+	ROM_LOAD( "pc400104.51",         0x000000, 0x100000, CRC(3b176f84) SHA1(0ad6fd5f03d275165490881173bafcb0a94762eb) )
+
+	ROM_REGION( 0x200000, "view2_1", 0 )   /* Tiles */
+	ROM_LOAD( "pc500105.55",         0x000000, 0x100000, CRC(bebb3edc) SHA1(e0fed4307316deaeb811ec29f5022adeaf577a95) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "pc604109.101",        0x000000, 0x100000, CRC(76025530) SHA1(e0c8192d783057798eea084aa3e87938f6e01cb7) )
+
+	ROM_REGION( 0x380000, "oki2", 0 )   /* Samples */
+	ROM_LOAD( "pc601106.99",         0x000000, 0x100000, CRC(a893651c) SHA1(d221ce89f19a76be497724f6c16fab82c8a52661) )
+	ROM_LOAD( "pc602107.100",        0x100000, 0x100000, CRC(0fbb23aa) SHA1(69b620375c65246317d7105fbc414f3c36e02b2c) )
+	ROM_LOAD( "pc603108.102",        0x200000, 0x100000, CRC(58458985) SHA1(9a846d604ba901eb2a59d2b6cd9c42e3b43adb6a) )
+	ROM_LOAD( "ekt.103",             0x300000, 0x080000, CRC(d0d4014c) SHA1(2928739ce00c766bfd80a8cc279d3c1f86653890) ) // EEPROM instead of MASK ROM. TODO: verify if ROM loading is correct
+ROM_END
+
 
 void kaneko16_shogwarr_state::init_shogwarr()
 {
@@ -4329,7 +4439,8 @@ void kaneko16_shogwarr_state::init_brapboys()
 GAME( 1991, berlwall,   0,        berlwall, berlwall,  kaneko16_berlwall_state, init_berlwall,  ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, berlwallt,  berlwall, berlwall, berlwallt, kaneko16_berlwall_state, init_berlwallt, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, berlwallk,  berlwall, berlwall, berlwallk, kaneko16_berlwall_state, init_berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, packbang,   0,        berlwall, packbang,  kaneko16_berlwall_state, init_berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
+GAME( 1994, packbang,   0,        berlwall, packbang,  kaneko16_berlwall_state, init_berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
+GAME( 1994, packbangp,  packbang, berlwall, packbang,  kaneko16_berlwall_state, init_berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
 GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
@@ -4342,6 +4453,7 @@ GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          
 GAME( 1993, wingforc,   0,        wingforc, wingforc,  kaneko16_state,          init_bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadva,   bonkadv,  bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Bonk's Adventure (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // shows an upside down KO! sprite, probably cause of check failing. Playable apart from that
 GAME( 1994, bloodwar,   0,        bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodshed version)", MACHINE_SUPPORTS_SAVE ) // shows blood effects like Blood Warrior version
 GAME( 1994, oedfighta,  bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodless version)", MACHINE_SUPPORTS_SAVE ) // shows no blood effects
@@ -4355,10 +4467,11 @@ GAME( 1995, gtmr2,      0,        gtmr2,    gtmr2,     kaneko16_gtmr_state,     
 GAME( 1995, gtmr2a,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, brapboys,   0,        brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboysp,  brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspj, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspu, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboys,   0,        brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)",                MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.xxx.06 string at 0x270
+GAME( 1992, brapboysp,  brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World, newer)", MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.000.08 string at 0x270
+GAME( 1992, brapboysp2, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World, older)", MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.00x.07 string at 0x270
+GAME( 1992, brapboyspj, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)",        MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.000.08 string at 0x270
+GAME( 1992, brapboyspu, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)",           MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.000.08 string at 0x270
 // these 3 are all the same code revision (differ by region byte + extra gfx roms/sample roms)
 GAME( 1992, shogwarr,   0,        shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, shogwarrk,  shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (Korea?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored Japanese flags etc.

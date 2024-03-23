@@ -25,6 +25,17 @@ sampler DiffuseSampler = sampler_state
 	AddressW = CLAMP;
 };
 
+sampler PointSampler = sampler_state
+{
+	Texture   = <Diffuse>;
+	MipFilter = POINT;
+	MinFilter = POINT;
+	MagFilter = POINT;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
 //-----------------------------------------------------------------------------
 // Vertex Definitions
 //-----------------------------------------------------------------------------
@@ -94,6 +105,15 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
+// Pre-scale Pixel Shader (point sampling)
+//-----------------------------------------------------------------------------
+
+float4 ps_point_main(PS_INPUT Input) : COLOR
+{
+	return tex2D(PointSampler, Input.TexCoord);
+}
+
+//-----------------------------------------------------------------------------
 // Pre-scale Technique
 //-----------------------------------------------------------------------------
 
@@ -105,5 +125,16 @@ technique DefaultTechnique
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader  = compile ps_3_0 ps_main();
+	}
+}
+
+technique PointTechnique
+{
+	pass Pass0
+	{
+		Lighting = FALSE;
+
+		VertexShader = compile vs_3_0 vs_main();
+		PixelShader  = compile ps_3_0 ps_point_main();
 	}
 }

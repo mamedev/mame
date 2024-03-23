@@ -145,7 +145,7 @@ void tiamc1_state::tiamc1_control_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
-WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
+void tiamc1_state::pit8253_2_w(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -399,7 +399,6 @@ ROM_START( konek )
 	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
 	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
 	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
-
 ROM_END
 
 ROM_START( sosterm )

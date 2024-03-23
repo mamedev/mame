@@ -73,6 +73,8 @@ exports.author = { name = "Carl" }
 
 local cheat = exports
 
+local reset_subscription, stop_subscription, frame_subscription
+
 function cheat.set_folder(path)
 	cheat.path = path
 end
@@ -130,7 +132,7 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local file = io.open(emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
+		local file = io.open(manager.machine.options.entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "r")
 		if not file then
 			return
 		end
@@ -154,9 +156,10 @@ function cheat.startplugin()
 				end
 			end
 		end
+		local path = manager.machine.options.entries.cheatpath:value():match("([^;]+)")
+		local filepath = path .. "/" .. cheatname .. "_hotkeys.json"
 		if #hotkeys > 0 then
 			local json = require("json")
-			local path = emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)"))
 			local attr = lfs.attributes(path)
 			if not attr then
 				lfs.mkdir(path)
@@ -165,7 +168,7 @@ function cheat.startplugin()
 			end
 			if cheatname:find("/", 1, true) then
 				local softpath = path .. "/" .. cheatname:match("([^/]+)")
-				local attr = lfs.attributes(softpath)
+				attr = lfs.attributes(softpath)
 				if not attr then
 					lfs.mkdir(softpath)
 				elseif attr.mode ~= "directory" then -- uhhh?
@@ -173,10 +176,20 @@ function cheat.startplugin()
 				end
 			end
 
-			local file = io.open(path .. "/" .. cheatname .. "_hotkeys.json", "w+")
+			local file = io.open(filepath, "w+")
 			if file then
 				file:write(json.stringify(hotkeys, {indent = true}))
 				file:close()
+			end
+		else
+			local attr = lfs.attributes(filepath)
+			if attr and (attr.mode == "file") then
+				local json = require("json")
+				local file = io.open(filepath, "w+")
+				if file then
+					file:write(json.stringify(hotkeys, {indent = true}))
+					file:close()
+				end
 			end
 		end
 	end
@@ -703,7 +716,7 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager.machine:popmessage()
 		if hotkeymenu then
-			if event == "cancel" then
+			if event == "back" then
 				hotkeymenu = false
 				return true
 			else
@@ -798,7 +811,7 @@ function cheat.startplugin()
 				return menu_populate()
 			  end, _("Cheat"))
 
-	emu.register_start(function()
+	reset_subscription = emu.add_machine_reset_notifier(function ()
 		if not stop then
 			return
 		end
@@ -821,13 +834,13 @@ function cheat.startplugin()
 		end
 	end)
 
-	emu.register_stop(function()
+	stop_subscription = emu.add_machine_stop_notifier(function ()
 		stop = true
 		consolelog = nil
 		save_hotkeys()
 	end)
 
-	emu.register_frame(function()
+	frame_subscription = emu.add_machine_frame_notifier(function ()
 		if stop then
 			return
 		end

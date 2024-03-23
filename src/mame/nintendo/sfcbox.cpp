@@ -510,9 +510,9 @@ void sfcbox_state::sfcbox(machine_config &config)
 #define SFCBOX_BIOS \
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x20000, "krom", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "2.00", "SFCBox Bios Version 2.00" ) \
+	ROM_SYSTEM_BIOS( 0, "2.00", "SFCBox BIOS Version 2.00" ) \
 	ROMX_LOAD( "krom2.00.ic1", 0x00000, 0x20000, CRC(e31b5580) SHA1(4a6a34a9a94c8249c3b441c2516bdd03e198c458), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS( 1, "1.00", "SFCBox Bios Version 1.00" ) \
+	ROM_SYSTEM_BIOS( 1, "1.00", "SFCBox BIOS Version 1.00" ) \
 	ROMX_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4), ROM_BIOS(1) ) \
 	ROM_REGION( 0x100000, "user3", 0 ) \
 	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )

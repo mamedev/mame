@@ -37,6 +37,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class tulip1_state : public driver_device
 {
 public:
@@ -189,6 +192,9 @@ ROM_START( tulip1 )
 	ROM_LOAD("tulip1_h106.bin", 0x0000, 0x1000, CRC(fdde779d) SHA1(01df551853f117ad91b47e389edf10e0f0d0d4c2))
 	ROM_LOAD("tulip1_h305.bin", 0x1000, 0x2000, CRC(f17f03f1) SHA1(060cca61fadd82fe9917430340bb880478ceeec6))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME            FLAGS
 COMP( 1983, tulip1, 0,      0,      tulip1,  tulip1, tulip1_state, empty_init, "CompuData", "Tulip System I", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

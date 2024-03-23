@@ -43,8 +43,8 @@
 
 Notes:
 
-starfira has one less ROM in total than starfire, but everything passes as
- OK in the ROM test, so it's probably just an earlier revision.
+starfirea has one less ROM in total than starfire, but everything passes as
+OK in the ROM test, so it's probably just an earlier revision.
 
 a Star Fire set with labels r1436-11 to r1445-11 is known to exist.
 
@@ -147,17 +147,17 @@ void fireone_state::music_w(offs_t offset, uint8_t data)
 	m_pit->write(offset, data);
 }
 
-WRITE_LINE_MEMBER(fireone_state::music_a_out_cb)
+void fireone_state::music_a_out_cb(int state)
 {
 	m_music_a->write(state);
 }
 
-WRITE_LINE_MEMBER(fireone_state::music_b_out_cb)
+void fireone_state::music_b_out_cb(int state)
 {
 	m_music_b->write(state);
 }
 
-WRITE_LINE_MEMBER(fireone_state::music_c_out_cb)
+void fireone_state::music_c_out_cb(int state)
 {
 	m_music_c->write(state);
 }
@@ -571,13 +571,15 @@ ROM_START( starfir2 )
 	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) ) /* BPROM type is N82S123 */
 ROM_END
 
+
+
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fireone,  0,        fireone,  fireone,  fireone_state,  empty_init, ROT0, "Exidy", "Fire One", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfire,  0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfirea, starfire, starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fireone,   0,        fireone,  fireone,  fireone_state,  empty_init, ROT0, "Exidy", "Fire One", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfir2,  0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire 2", MACHINE_SUPPORTS_SAVE )

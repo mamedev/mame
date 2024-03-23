@@ -82,42 +82,42 @@ void prof180x_state::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(prof180x_state::c0_flag_w)
+void prof180x_state::c0_flag_w(int state)
 {
 	// C0 (DATA)
 	m_c0 = state;
 }
 
-WRITE_LINE_MEMBER(prof180x_state::c1_flag_w)
+void prof180x_state::c1_flag_w(int state)
 {
 	// C1 (M0)
 	m_c1 = state;
 }
 
-WRITE_LINE_MEMBER(prof180x_state::c2_flag_w)
+void prof180x_state::c2_flag_w(int state)
 {
 	// C2 (M1)
 	m_c2 = state;
 }
 
-WRITE_LINE_MEMBER(prof180x_state::mini_flag_w)
+void prof180x_state::mini_flag_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(prof180x_state::mm0_flag_w)
+void prof180x_state::mm0_flag_w(int state)
 {
 	m_mm0 = state;
 }
 
-WRITE_LINE_MEMBER(prof180x_state::rtc_ce_w)
+void prof180x_state::rtc_ce_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(prof180x_state::peps_flag_w)
+void prof180x_state::peps_flag_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(prof180x_state::mm1_flag_w)
+void prof180x_state::mm1_flag_w(int state)
 {
 	m_mm1 = state;
 }

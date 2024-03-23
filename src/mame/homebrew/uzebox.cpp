@@ -25,6 +25,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180
 
@@ -46,7 +49,7 @@ public:
 	void uzebox(machine_config &config);
 
 private:
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega644_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
 	required_device<snes_control_port_device> m_ctrl1;
@@ -267,7 +270,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
 	else
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -282,14 +285,14 @@ void uzebox_state::uzebox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
-	m_maincpu->gpio_in<AVR8_IO_PORTA>().set(FUNC(uzebox_state::port_a_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(uzebox_state::port_b_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTC>().set(FUNC(uzebox_state::port_c_r));
-	m_maincpu->gpio_in<AVR8_IO_PORTD>().set(FUNC(uzebox_state::port_d_r));
-	m_maincpu->gpio_out<AVR8_IO_PORTA>().set(FUNC(uzebox_state::port_a_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(uzebox_state::port_b_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(uzebox_state::port_c_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(uzebox_state::port_d_w));
+	m_maincpu->gpio_in<atmega644_device::GPIOA>().set(FUNC(uzebox_state::port_a_r));
+	m_maincpu->gpio_in<atmega644_device::GPIOB>().set(FUNC(uzebox_state::port_b_r));
+	m_maincpu->gpio_in<atmega644_device::GPIOC>().set(FUNC(uzebox_state::port_c_r));
+	m_maincpu->gpio_in<atmega644_device::GPIOD>().set(FUNC(uzebox_state::port_d_r));
+	m_maincpu->gpio_out<atmega644_device::GPIOA>().set(FUNC(uzebox_state::port_a_w));
+	m_maincpu->gpio_out<atmega644_device::GPIOB>().set(FUNC(uzebox_state::port_b_w));
+	m_maincpu->gpio_out<atmega644_device::GPIOC>().set(FUNC(uzebox_state::port_c_w));
+	m_maincpu->gpio_out<atmega644_device::GPIOD>().set(FUNC(uzebox_state::port_d_w));
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.99);
@@ -317,6 +320,9 @@ ROM_START( uzebox )
 
 	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME */
 CONS(2010, uzebox, 0,      0,      uzebox,  uzebox, uzebox_state, empty_init, "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)

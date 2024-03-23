@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_INCLUDES_SETA2_H
-#define MAME_INCLUDES_SETA2_H
+#ifndef MAME_SETA_SETA2_H
+#define MAME_SETA_SETA2_H
 
 #pragma once
 
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
+#include "cpu/h8/h83006.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/ticket.h"
@@ -34,7 +35,6 @@ public:
 		m_dispenser(*this, "dispenser"),
 
 		m_x1_bank(*this, "x1_bank_%u", 1U),
-		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram", 0x40000, ENDIANNESS_BIG),
 		m_tileram(*this, "tileram"),
 		m_vregs(*this, "vregs", 0x40, ENDIANNESS_BIG),
@@ -95,12 +95,9 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void sound_bank_w(offs_t offset, uint8_t data);
-
-	INTERRUPT_GEN_MEMBER(seta2_interrupt);
-	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
 
 	void ablastb_map(address_map &map);
 	void grdians_map(address_map &map);
@@ -118,7 +115,7 @@ protected:
 	void x1_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_sub;
+	optional_device<h83007_device> m_sub;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -129,7 +126,6 @@ protected:
 	optional_device<ticket_dispenser_device> m_dispenser;
 
 	optional_memory_bank_array<8> m_x1_bank;
-	optional_shared_ptr<uint16_t> m_nvram;
 	memory_share_creator<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_tileram;
 	memory_share_creator<uint16_t> m_vregs;
@@ -170,8 +166,7 @@ class funcube_state : public seta2_state
 public:
 	funcube_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seta2_state(mconfig, type, tag)
-		, m_outputs(*this, "outputs")
-		, m_funcube_leds(*this, "funcube_leds")
+		, m_nvram(*this, "nvram", 0x180, ENDIANNESS_BIG)
 	{ }
 
 	void funcube(machine_config &config);
@@ -183,30 +178,30 @@ public:
 	void init_funcube2();
 
 private:
+	memory_share_creator<uint8_t> m_nvram;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t nvram_r(offs_t offset);
-	void nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t nvram_r(offs_t offset) { return m_nvram[offset]; }
+	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data; }
+
 	uint32_t debug_r();
-	uint16_t coins_r();
-	void leds_w(uint16_t data);
-	uint16_t outputs_r();
-	void outputs_w(uint16_t data);
-	uint16_t battery_r();
+	uint8_t coins_r();
+	void leds_w(uint8_t data);
+	uint8_t outputs_r();
+	void outputs_w(uint8_t data);
+	uint8_t battery_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
 	void funcube2_map(address_map &map);
-	void funcube2_sub_io(address_map &map);
 	void funcube_map(address_map &map);
-	void funcube_sub_io(address_map &map);
 	void funcube_sub_map(address_map &map);
 
 	void funcube_debug_outputs();
 
-	required_shared_ptr<uint16_t> m_outputs;
-	required_shared_ptr<uint16_t> m_funcube_leds;
+	uint8_t m_outputs, m_funcube_leds;
 	uint64_t m_coin_start_cycles = 0;
 	uint8_t m_hopper_motor = 0;
 };
@@ -248,4 +243,4 @@ private:
 	uint8_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;
 };
 
-#endif // MAME_INCLUDES_SETA2_H
+#endif // MAME_SETA_SETA2_H

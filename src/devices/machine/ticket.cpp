@@ -54,6 +54,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 	, m_power(0)
 	, m_timer(nullptr)
 	, m_output(*this, tag) // TODO: change to "tag:status"
+	, m_dispense_handler(*this) // TODO: can we use m_output for this?
 {
 }
 
@@ -84,7 +85,7 @@ ticket_dispenser_device::~ticket_dispenser_device()
 //  line_r - read the status line
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ticket_dispenser_device::line_r )
+int ticket_dispenser_device::line_r()
 {
 	return m_status ? 1 : 0;
 }
@@ -94,7 +95,7 @@ READ_LINE_MEMBER( ticket_dispenser_device::line_r )
 //  motor_w - write the control line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
+void ticket_dispenser_device::motor_w(int state)
 {
 	// On an activate signal, start dispensing!
 	if (bool(state) == m_motoron)
@@ -181,6 +182,10 @@ TIMER_CALLBACK_MEMBER(ticket_dispenser_device::update_output_state)
 	// update output status
 	m_output = m_status == m_ticketdispensed;
 
+	if (m_hopper_type)
+	{
+		m_dispense_handler(m_status);
+	}
 	// if we just dispensed, increment global count
 	if (m_status == m_ticketdispensed)
 	{

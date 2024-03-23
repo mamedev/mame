@@ -47,7 +47,7 @@
 
 #define PINT_REGISTER(name, desc) \
 	extern const plib::testing::reg_entry<PINT_TESTNAME(name, desc)> PINT_TESTNAME(name, desc  ## _reg); \
-	const plib::testing::reg_entry<PINT_TESTNAME(name, desc)> PINT_TESTNAME(name, desc  ## _reg)(#name, #desc, PINT_LOCATION()); \
+	const plib::testing::reg_entry<PINT_TESTNAME(name, desc)> PINT_TESTNAME(name, desc  ## _reg)(#name, #desc, PINT_LOCATION());
 
 #define PINT_TEST_F(name, desc, base) \
 	class PINT_TESTNAME(name, desc) : public base \
@@ -296,7 +296,7 @@ namespace plib::testing
 		static const char * opstr() { return #op ; } \
 		template <typename T1, typename T2> \
 		bool operator()(const T1 &v1, const T2 &v2) { return v1 op v2; } \
-	}; \
+	};
 
 	DEF_COMP(eq, ==)
 	DEF_COMP(ne, !=)

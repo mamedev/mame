@@ -32,8 +32,8 @@ public:
 	virtual void z80_program_map(address_map &map);
 	virtual void z80_io_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER( int1_w );
-	DECLARE_WRITE_LINE_MEMBER( int2_w );
+	void int1_w(int state);
+	void int2_w(int state);
 
 	void io_map(address_map &map);
 	void program_map(address_map &map);

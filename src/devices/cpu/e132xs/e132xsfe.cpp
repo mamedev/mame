@@ -163,10 +163,10 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	const uint32_t ldstf_code = (gdstf_code + fp) & 0x1f;
 	const uint32_t lsrc_code = (gsrc_code + fp) & 0x1f;
 	const uint32_t lsrcf_code = (gsrcf_code + fp) & 0x1f;
-	const uint32_t ldst_group = 1 + (((FE_DST_CODE + fp) & 0x20) >> 5);
-	const uint32_t ldstf_group = 1 + (((FE_DST_CODE + fp + 1) & 0x20) >> 5);
-	const uint32_t lsrc_group = 1 + (((FE_SRC_CODE + fp) & 0x20) >> 5);
-	const uint32_t lsrcf_group = 1 + ((FE_SRC_CODE + fp + 1) >> 5);
+	const uint32_t ldst_group = BIT(FE_DST_CODE + fp, 5) + 1;
+	const uint32_t ldstf_group = BIT(FE_DST_CODE + fp + 1, 5) + 1;
+	const uint32_t lsrc_group = BIT(FE_SRC_CODE + fp, 5) + 1;
+	const uint32_t lsrcf_group = BIT(FE_SRC_CODE + fp + 1, 5) + 1;
 
 	switch (op >> 8)
 	{

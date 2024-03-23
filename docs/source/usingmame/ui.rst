@@ -20,13 +20,13 @@ The default settings for the most important controls to know when running an
 emulated system, and the settings they correspond to in case you want to change
 them, are as follows:
 
-Scroll Lock, or Forward Delete on macOS (UI Toggle)
+Scroll Lock, or Forward Delete on macOS (Toggle UI Controls)
     For emulated systems with keyboard inputs, enable or disable UI controls.
     (MAME starts with UI controls disabled for systems with keyboard inputs
     unless the :ref:`ui_active option <mame-commandline-uiactive>` is on.)
-Tab (Config Menu)
+Tab (Show/Hide Menu)
     Show or hide the menu during emulation.
-Escape (UI Cancel)
+Escape (UI Back and UI Cancel)
     Return to the system selection menu, or exit if MAME was started with a
     system specified (from the command line or using an
     :ref:`external front-end <frontends>`).
@@ -60,7 +60,7 @@ Return/Enter keypad Enter (UI Select)
     Select the highlighted menu item.
 Forward Delete, or Fn+Delete on some compact keyboards (UI Clear)
     Clear setting or reset to default value.
-Escape (UI Cancel)
+Escape (UI Back and UI Cancel)
     Clear the search if searching the menu, otherwise close the menu, returning
     to the previous menu, or returning to the emulated system in the case of the
     main menu (there’s usually an item at the bottom of the menu for the same
@@ -92,18 +92,24 @@ most important UI controls have joystick assignments by default:
 * Move the first joystick left or right in the X axis to adjust settings.
 * Press the first button on the first joystick to select the highlighted menu
   item.
+* If the first joystick has at least three buttons, press the second button on
+  the first joystick to close the menu, returning to the previous menu, or
+  returning to the emulated system in the case of the main menu (there’s usually
+  an item at the bottom of the menu for the same purpose).
 
-For gamepad-style controllers, the left analog thumb stick usually controls UI
-navigation.  You may find it convenient to assign directional pad controls to UI
-navigation in addition to or in place of the left thumb stick.
+For gamepad-style controllers, the left analog thumb stick and directional pad
+usually control UI navigation.  Depending on the controller, the right analog
+thumb stick, triggers and additional buttons may automatically be assigned to UI
+inputs.  Check the **User Interface** input assignments menu to see how controls
+are assigned.
 
 If you want to be able to use MAME with a game controller without needing a
 keyboard, you’ll need to assign joystick buttons (or combinations of buttons) to
 these controls as well:
 
-* **Config Menu** to show or dismiss the menu during emulation
-* **UI Cancel** to close menus, return to the system selection menu, or exit
-  MAME
+* **Show/Hide Menu** to show or hide the menu during emulation
+* **UI Back** to close menus
+* **UI Cancel** to return to the system selection menu or exit MAME
 * **UI Clear** isn’t essential for basic emulation, but it’s used to clear or
   reset some settings to defaults
 * **UI Home**, **UI End**, **UI Page Up**, **UI Page Down**, **UI Previous
@@ -138,8 +144,8 @@ pointing device:
 * Click toolbar items to select them, or hover over them to see a description.
 
 If you have enough additional mouse buttons, you may want to assign button
-combinations to the **Config Menu**, **Pause** and/or **UI Cancel** inputs to
-make it possible to use MAME without a keyboard.
+combinations to the **Show/Hide Menu**, **Pause**, **UI Back** and/or
+**UI Cancel** inputs to make it possible to use MAME without a keyboard.
 
 
 .. _ui-inptcfg:
@@ -220,10 +226,7 @@ input or a combination of inputs for a logical **and** operation:
 * Press a key or button or move an analog control twice to add a **not** item to
   the **and** operation.  Pressing the same key or button or moving the same
   analog control additional times toggles the **not** on and off.
-* Pressing **UI Cancel** (**Escape** by default) *before* activating any other
-  controls clears the setting or restores the default assignment.
-* Press **UI Cancel** *after* activating another control to leave the setting
-  unchanged.
+* Press **UI Cancel** (**Escape** by default) to leave the setting unchanged.
 * The new setting is shown below the menu.  Wait one second after activating an
   input to accept the new setting.
 
@@ -344,10 +347,7 @@ When you select an axis setting, MAME will wait for you to enter an input:
   direction of the control on or off.
 * When appending to a setting, move an analog control other than the last
   assigned control or press a key or button to add an **or** operation.
-* Pressing **UI Cancel** (**Escape** by default) *before* activating any other
-  controls clears the setting or restores the default assignment.
-* Pressing **UI Cancel** *after* activating another control leaves the setting
-  unchanged.
+* Pressing **UI Cancel** (**Escape** by default) leaves the setting unchanged.
 * The new setting is shown below the menu.  Wait one second after moving an
   analog control to accept the new setting.
 

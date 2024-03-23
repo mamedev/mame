@@ -47,8 +47,11 @@ public:
 	device_rtc_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_rtc_interface();
 
+	// use UTC instead of local time when syncing at startup
+	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
+
 	void set_time(bool update, int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	void set_current_time(const system_time &systime);
+	virtual void set_current_time(const system_time &systime);
 
 	bool has_battery() const { return rtc_battery_backed(); }
 
@@ -72,6 +75,8 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) = 0;
 
 	int m_register[7];
+
+	bool m_use_utc;
 };
 
 // iterator

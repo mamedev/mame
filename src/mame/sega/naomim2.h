@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NAOMIM2_H
-#define MAME_MACHINE_NAOMIM2_H
+#ifndef MAME_SEGA_NAOMIM2_H
+#define MAME_SEGA_NAOMIM2_H
 
 #pragma once
 
@@ -43,4 +43,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAOMI_M2_BOARD, naomi_m2_board)
 
-#endif // MAME_MACHINE_NAOMIM2_H
+#endif // MAME_SEGA_NAOMIM2_H

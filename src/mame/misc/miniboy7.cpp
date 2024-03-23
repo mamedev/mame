@@ -225,6 +225,8 @@ NOTE: 10MHz XTAL verified for Joker Poker, Super Mini-Boy is stated as 12.4725MH
 #include "miniboy7.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(12'472'500)    /* 12.4725 MHz */
 
 
@@ -258,7 +260,7 @@ private:
 	void ay_pa_w(uint8_t data);
 	void ay_pb_w(uint8_t data);
 	uint8_t pia_pb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+	void pia_ca2_w(int state);
 	uint8_t lamp_latch_r();
 
 	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
@@ -467,7 +469,7 @@ uint8_t miniboy7_state::pia_pb_r()
 	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
 }
 
-WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
+void miniboy7_state::pia_ca2_w(int state)
 {
 	m_gpri = state;
 }
@@ -659,7 +661,7 @@ void miniboy7_state::miniboy7(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia6821_device &pia(PIA6821(config, "pia0"));
 	pia.readpa_handler().set_ioport("INPUT1");
 	pia.readpb_handler().set(FUNC(miniboy7_state::pia_pb_r));
 	pia.ca2_handler().set(FUNC(miniboy7_state::pia_ca2_w));
@@ -830,6 +832,8 @@ ROM_START( bejpoker ) /* MVX-001-02 PCB */
 	ROM_LOAD( "j1.7e",    0x0000, 0x0100, CRC(a89e1d80) SHA1(f3f4842729df1fc379a7281edcceb67c4e9558b4) ) /* TBP24S10 BPROM (same data as BPROM from Super Mini-Boy) */
 	ROM_LOAD( "jdx.10f",  0x0100, 0x0100, CRC(2dd8d3ce) SHA1(6e3d67f9c5ccc210963e02e32fceee4859d8e651) ) /* 63S141 BPROM */
 ROM_END
+
+} // anonymous namespace
 
 
 /***********************************

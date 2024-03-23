@@ -18,6 +18,8 @@
 #include "emu.h"
 #include "mccs1850.h"
 
+#include "multibyte.h"
+
 //#define VERBOSE 0
 #include "logmacro.h"
 
@@ -131,8 +133,7 @@ inline void mccs1850_device::check_interrupt()
 		m_ram[REGISTER_STATUS] &= ~STATUS_IT;
 	}
 
-	if(!int_cb.isnull())
-		int_cb(interrupt);
+	int_cb(interrupt);
 }
 
 
@@ -144,8 +145,7 @@ inline void mccs1850_device::set_pse_line(bool state)
 {
 	m_pse = state;
 
-	if(!pse_cb.isnull())
-		pse_cb(m_pse);
+	pse_cb(m_pse);
 }
 
 
@@ -160,10 +160,7 @@ inline uint8_t mccs1850_device::read_register(offs_t offset)
 	case REGISTER_COUNTER_LATCH:
 	case REGISTER_COUNTER_LATCH+3: // Required by the NeXT power on test
 		// load counter value into latch
-		m_ram[REGISTER_COUNTER_LATCH] = m_counter >> 24;
-		m_ram[REGISTER_COUNTER_LATCH + 1] = m_counter >> 16;
-		m_ram[REGISTER_COUNTER_LATCH + 2] = m_counter >> 8;
-		m_ram[REGISTER_COUNTER_LATCH + 3] = m_counter;
+		put_u32be(&m_ram[REGISTER_COUNTER_LATCH], m_counter);
 		break;
 
 	case REGISTER_TEST_1:
@@ -249,7 +246,7 @@ inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
 
 TIMER_CALLBACK_MEMBER(mccs1850_device::advance_seconds)
 {
-	uint32_t alarm = (m_ram[REGISTER_ALARM_LATCH] << 24) | (m_ram[REGISTER_ALARM_LATCH + 1] << 16) | (m_ram[REGISTER_ALARM_LATCH + 2] << 8) | m_ram[REGISTER_ALARM_LATCH + 3];
+	uint32_t alarm = get_u32be(&m_ram[REGISTER_ALARM_LATCH]);
 
 	m_counter++;
 
@@ -318,11 +315,6 @@ void mccs1850_device::rtc_clock_updated(int year, int month, int day, int day_of
 
 void mccs1850_device::device_start()
 {
-	// resolve callbacks
-	int_cb.resolve();
-	pse_cb.resolve();
-	nuc_cb.resolve();
-
 	// allocate timers
 	m_clock_timer = timer_alloc(FUNC(mccs1850_device::advance_seconds), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
@@ -381,8 +373,8 @@ void mccs1850_device::nvram_default()
 
 bool mccs1850_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
+	auto const [err, actual] = read(file, m_ram, RAM_SIZE);
+	return !err && (actual == RAM_SIZE);
 }
 
 
@@ -393,8 +385,8 @@ bool mccs1850_device::nvram_read(util::read_stream &file)
 
 bool mccs1850_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
+	auto const [err, actual] = write(file, m_ram, RAM_SIZE);
+	return !err;
 }
 
 
@@ -402,7 +394,7 @@ bool mccs1850_device::nvram_write(util::write_stream &file)
 //  ce_w - chip enable write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::ce_w )
+void mccs1850_device::ce_w(int state)
 {
 	m_ce = state;
 
@@ -418,7 +410,7 @@ WRITE_LINE_MEMBER( mccs1850_device::ce_w )
 //  sck_w - serial clock write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::sck_w )
+void mccs1850_device::sck_w(int state)
 {
 	if (!m_ce) return;
 
@@ -498,7 +490,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 //  sdo_r - serial data out read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( mccs1850_device::sdo_r )
+int mccs1850_device::sdo_r()
 {
 	if (!m_ce || BIT(m_address, 7))
 	{
@@ -516,7 +508,7 @@ READ_LINE_MEMBER( mccs1850_device::sdo_r )
 //  sdi_w - serial data in write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::sdi_w )
+void mccs1850_device::sdi_w(int state)
 {
 	m_sdi = state;
 }
@@ -526,7 +518,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sdi_w )
 //  pwrsw_w - power switch write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::pwrsw_w )
+void mccs1850_device::pwrsw_w(int state)
 {
 	if (!state)
 	{
@@ -546,7 +538,7 @@ WRITE_LINE_MEMBER( mccs1850_device::pwrsw_w )
 //  por_w - power on reset write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::por_w )
+void mccs1850_device::por_w(int state)
 {
 	if (!state)
 	{
@@ -559,7 +551,7 @@ WRITE_LINE_MEMBER( mccs1850_device::por_w )
 //  test_w - test mode write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::test_w )
+void mccs1850_device::test_w(int state)
 {
 	if (state)
 	{

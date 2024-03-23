@@ -13,8 +13,8 @@
 // Forward declaration(s):
 namespace portaudio
 {
-	class Device;
-	class HostApi;
+    class Device;
+    class HostApi;
 }
 
 // ---------------------------------------------------------------------------------------
@@ -23,39 +23,39 @@ namespace portaudio
 namespace portaudio
 {
 
-	
-	//////
-	/// @brief Iterator class for iterating through all Devices in a System.
-	///
-	/// Devices will be iterated by iterating all Devices in each 
-	/// HostApi in the System. Compliant with the STL bidirectional 
-	/// iterator concept.
-	//////
-	class System::DeviceIterator
-	{
-	public:
-		typedef std::bidirectional_iterator_tag iterator_category;
-		typedef Device value_type;
-		typedef ptrdiff_t difference_type;
-		typedef Device * pointer;
-		typedef Device & reference;
 
-		Device &operator*() const;
-		Device *operator->() const;
+    //////
+    /// @brief Iterator class for iterating through all Devices in a System.
+    ///
+    /// Devices will be iterated by iterating all Devices in each
+    /// HostApi in the System. Compliant with the STL bidirectional
+    /// iterator concept.
+    //////
+    class System::DeviceIterator
+    {
+    public:
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef Device value_type;
+        typedef ptrdiff_t difference_type;
+        typedef Device * pointer;
+        typedef Device & reference;
 
-		DeviceIterator &operator++();
-		DeviceIterator operator++(int);
-		DeviceIterator &operator--();
-		DeviceIterator operator--(int);
+        Device &operator*() const;
+        Device *operator->() const;
 
-		bool operator==(const DeviceIterator &rhs) const;
-		bool operator!=(const DeviceIterator &rhs) const;
+        DeviceIterator &operator++();
+        DeviceIterator operator++(int);
+        DeviceIterator &operator--();
+        DeviceIterator operator--(int);
 
-	private:
-		friend class System;
-		friend class HostApi;
-		Device **ptr_;
-	};
+        bool operator==(const DeviceIterator &rhs) const;
+        bool operator!=(const DeviceIterator &rhs) const;
+
+    private:
+        friend class System;
+        friend class HostApi;
+        Device **ptr_;
+    };
 
 
 } // namespace portaudio
@@ -63,4 +63,3 @@ namespace portaudio
 // ---------------------------------------------------------------------------------------
 
 #endif // INCLUDED_PORTAUDIO_SYSTEMDEVICEITERATOR_HXX
-

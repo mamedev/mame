@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
@@ -39,7 +39,7 @@ TEST_CASE("uint32_cnt")
 	REQUIRE(16 == bx::uint32_cnttz<uint16_t>(0) );
 	REQUIRE( 0 == bx::uint32_cnttz<uint32_t>(1) );
 	REQUIRE(32 == bx::uint32_cnttz<uint32_t>(0) );
-	REQUIRE(31 == bx::uint32_cnttz<uint32_t>(1<<31) );
+	REQUIRE(31 == bx::uint32_cnttz<uint32_t>(1u<<31) );
 	REQUIRE( 0 == bx::uint32_cnttz<uint64_t>(1) );
 	REQUIRE(64 == bx::uint32_cnttz<uint64_t>(0) );
 

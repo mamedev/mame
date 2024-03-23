@@ -91,14 +91,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 texel0 = tex2D(DiffuseSampler, Input.TexCoord01.xy).rgb;
-	float3 texel1 = tex2D(DiffuseSampler, Input.TexCoord01.zw).rgb;
-	float3 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy).rgb;
-	float3 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw).rgb;
+	float4 texel0 = tex2D(DiffuseSampler, Input.TexCoord01.xy);
+	float4 texel1 = tex2D(DiffuseSampler, Input.TexCoord01.zw);
+	float4 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy);
+	float4 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw);
 
-	float3 outTexel = (texel0 + texel1 + texel2 + texel3) / 4.0;
-
-	return float4(outTexel, 1.0f);
+	return (texel0 + texel1 + texel2 + texel3) * 0.25;
 }
 
 //-----------------------------------------------------------------------------

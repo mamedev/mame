@@ -154,7 +154,7 @@
 		<rect state="0">
 			<color red="0.00" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="Angel Islington &#xA3;1.00">
+		<text string="Angel Islington £1.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -198,7 +198,7 @@
 		<rect state="0">
 			<color red="0.00" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="Euston Road &#xA3;1.00">
+		<text string="Euston Road £1.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -218,7 +218,7 @@
 		<rect state="0">
 			<color red="0.00" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="Pentonville Road &#xA3;1.20">
+		<text string="Pentonville Road £1.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -302,7 +302,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.13" blue="0.06"/>
 		</rect>
-		<text string="Vine St &#xA3;2.00">
+		<text string="Vine St £2.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -322,7 +322,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.13" blue="0.06"/>
 		</rect>
-		<text string="M'boro St &#xA3;1.80">
+		<text string="M'boro St £1.80">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -366,7 +366,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.13" blue="0.06"/>
 		</rect>
-		<text string="Bow St &#xA3;1.80">
+		<text string="Bow St £1.80">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -406,7 +406,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="North'land &#xA3;1.60">
+		<text string="North'land £1.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -426,7 +426,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="Whitehall &#xA3;1.40">
+		<text string="Whitehall £1.40">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -466,7 +466,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="Pall Mall &#xA3;1.40">
+		<text string="Pall Mall £1.40">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -510,7 +510,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
-		<text string="Piccadilly &#xA3;2.80">
+		<text string="Piccadilly £2.80">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -598,7 +598,7 @@
 		<rect state="0">
 			<color red="0.06" green="0.00" blue="0.13"/>
 		</rect>
-		<text string="Park Lane &#xA3;4.00">
+		<text string="Park Lane £4.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -666,7 +666,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.00"/>
 		</rect>
-		<text string="Bond St &#xA3;3.00">
+		<text string="Bond St £3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -706,7 +706,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.00"/>
 		</rect>
-		<text string="Oxford St &#xA3;3.00">
+		<text string="Oxford St £3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -726,7 +726,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.00"/>
 		</rect>
-		<text string="Regent St &#xA3;3.00">
+		<text string="Regent St £3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -770,7 +770,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;1.00">
+		<text string="£1.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -790,7 +790,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;8.00">
+		<text string="£8.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -810,7 +810,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;4.00">
+		<text string="£4.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -830,7 +830,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;2.20">
+		<text string="£2.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -850,7 +850,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;2.00">
+		<text string="£2.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -870,7 +870,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;1.60">
+		<text string="£1.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -890,7 +890,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.25" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;1.20">
+		<text string="£1.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1174,7 +1174,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.00"/>
 		</rect>
-		<text string="Strand &#xA3;2.20">
+		<text string="Strand £2.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1222,7 +1222,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="Sq &#xA3;2.60">
+		<text string="Sq £2.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -1242,7 +1242,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
-		<text string="Coventry St &#xA3;2.60">
+		<text string="Coventry St £2.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1302,7 +1302,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.00"/>
 		</rect>
-		<text string="Trafalgar Square &#xA3;2.40">
+		<text string="Trafalgar Square £2.40">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1322,7 +1322,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.00" blue="0.00"/>
 		</rect>
-		<text string="Fleet St &#xA3;2.20">
+		<text string="Fleet St £2.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1770,7 +1770,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1981,7 +1981,7 @@
 		</text>
 	</element>
 	<element name="label_69">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -2005,19 +2005,19 @@
 		</text>
 	</element>
 	<element name="label_78">
-		<text string="1 Station Lit &#xA3;1.00">
+		<text string="1 Station Lit £1.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_79">
-		<text string="2 Stations Lit &#xA3;2.00">
+		<text string="2 Stations Lit £2.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_80">
-		<text string="3 Stations Lit &#xA3;3.00">
+		<text string="3 Stations Lit £3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>

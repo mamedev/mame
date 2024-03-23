@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_CGC7900_H
-#define MAME_INCLUDES_CGC7900_H
+#ifndef MAME_CHROMATICS_CGC7900_H
+#define MAME_CHROMATICS_CGC7900_H
 
 #pragma once
 
@@ -97,7 +97,7 @@ public:
 	u16 sync_r();
 	u16 unmapped_r();
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { irq_encoder(N, state); }
+	template <unsigned N> void irq(int state) { irq_encoder(N, state); }
 
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);
@@ -127,4 +127,4 @@ private:
 	void irq_encoder(int pin, int state);
 };
 
-#endif
+#endif // MAME_CHROMATICS_CGC7900_H

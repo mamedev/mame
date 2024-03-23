@@ -1,0 +1,409 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="abc832_flop" description="Luxor ABC 832 diskettes">
+
+	<software name="abc832">
+		<description>ABC832 Systemskiva v2.5</description>
+		<year>1982</year>
+		<publisher>Luxor</publisher>
+		<info name="usage" value="BYE" />
+		<sharedfeat name="bus_default" value="abc832" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="abc832.img" size="655360" crc="36c1ff01" sha1="7aceaa4bf79301f545ec4b8ca7cbaa7f34fff462"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufd631">
+		<description>Systemskiva v6.31 för UFD-DOS</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<info name="serial" value="68 29251-51" />
+		<info name="usage" value="RUN LIB" />
+		<sharedfeat name="bus_default" value="abc832" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="140772">
+				<rom name="ufd631.td0" size="140772" crc="c767e073" sha1="42fb39f3a9fe5020d339d6b00c13170898a6059e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abcute">
+		<description>ABCUTE Universell Terminalemulator</description>
+		<year>1982</year>
+		<publisher>Sören Tirfing &amp; Kari Dubbelman</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="abcute_2.img" size="655360" crc="2bbcd44c" sha1="3484edf6a60e1c10ac493af055c2bd87d9fb352e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abcute14" cloneof="abcute">
+		<description>ABCUTE Universell Terminalemulator (v1.4)</description>
+		<year>1982</year>
+		<publisher>Sören Tirfing &amp; Kari Dubbelman</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ute_v1.4.img" size="655360" crc="1fc448ad" sha1="03d0595ee6cd08bf7c5bb170463952599ab6367d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asm800">
+		<description>asm800</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="asm800.img" size="655360" crc="5b180f79" sha1="f8cadfbe4e53871ce4d1a67ef0a9d5653d75e1fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asm800a">
+		<description>asm800 (alt)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="asm800_ver1.00_ser.img" size="655360" crc="975a04b2" sha1="f54b2f79306ae3c1b77aaa93fe04224d62b41f20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catext">
+		<description>Extend 800</description>
+		<year>1984</year>
+		<publisher>unknown</publisher>
+		<info name="usage" value="RUN EXTEND" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="catnet_extender.img" size="655360" crc="91d30f01" sha1="8a3f933bb3bdaf6e33b34471a647b8b17eab0935"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eeprom">
+		<description>EEPROM Programmer</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="usage" value="RUN E" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="eeprom_programer" />
+			<dataarea name="flop" size="655360">
+				<rom name="eeprom_programer.img" size="655360" crc="642422a9" sha1="e9b37953454f1ec64e7a578efb30cea0288351d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inprak">
+		<description>Inpräk</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="inprak(orgina).img" size="655360" crc="53a656f7" sha1="7228b99854d1275242b8f55d517a2c06769604af"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="inprak_2.img" size="655360" crc="422e642e" sha1="ca43332383f34c40772a98429d42f5b384705b4a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="inprak_3.img" size="655360" crc="374b18c6" sha1="56d1e76510e4fef0ff7cb9e12d320d8c89af375e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llforth">
+		<description>L&amp;L Forth</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="l_l_forth.img" size="655360" crc="468b1bc9" sha1="fc24a89a645329d82cf301acb20c1d1dafb2fd8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meny0">
+		<description>Meny0 v6.03</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="meny0.img" size="655360" crc="98f211ee" sha1="ad8f079f59973c75dabff069c78c04099c3a6ca4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misc1">
+		<description>Miscellanous 1</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="okand.img" size="655360" crc="64a139ac" sha1="110516288aacf899ae3000dec66ba6bb5f7a1986"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misc2">
+		<description>Miscellanous 2</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="okand2.img" size="655360" crc="62724ace" sha1="56c8d29efa321ab8aa073cacaa9ecec3bb23afd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misc3">
+		<description>Miscellanous 3</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="okand3.img" size="655360" crc="a00d67c2" sha1="c14a2bb65fd0091ac1ea726df0e472bddde41ddc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ord800a">
+		<description>Ord 800 v2.3W</description>
+		<year>198?</year>
+		<publisher>P-Data</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ord800.img" size="655360" crc="af583a00" sha1="e4a219ab384817f682febdf99928a0e5fbdddc0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prod856">
+		<description>Produktion 856</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="produktion856.img" size="655360" crc="667e1323" sha1="4a2505766559180d1779083e8e0f6950cea0beb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prodtest">
+		<description>PUG programutveckling</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="prodtest.img" size="655360" crc="7753ce44" sha1="8d31d748fe47a8d6dac78a13258463d1238d70cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoka">
+		<description>Snoka</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="snoka.img" size="655360" crc="44521ff5" sha1="91a50e97f40f58dce0b7931da5e001f0fc5176be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys850">
+		<description>Systemskiva för ABC850 v6.43</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="systemskiva_850_v6.43.img" size="655360" crc="57d21f9d" sha1="dcb36be1be511455f6d16f24ac1a0f321bb63750"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syshd">
+		<description>Systemskiva HD v6.43</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="systemskiva_hd_643.img" size="655360" crc="58ce9844" sha1="56c64168fe66fe17d7399e93b3da0322182f58c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systrans">
+		<description>Systemskiva Transfor</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="systemskiva_transfor.img" size="655360" crc="b3703430" sha1="b05addc2f7a632cba58381babe4e9953e797bbc3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufd631a">
+		<description>Systemskiva v6.31 för UFD-DOS (alt)</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="systemskiva_ufd_631.img" size="655360" crc="c0893bae" sha1="89863c9b2a0d6400c543060fb82d9b4ce0c4b6cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abc16" supported="no">
+		<description>ABC16</description>
+		<year>1985</year>
+		<publisher>MYAB Mikrokonsult</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<!--
+			Skiva START ABC16
+			MYAB version 1.1 850307
+
+			För ABC-800,802 och 806
+			Format Luxor 832
+			Copyright (C) Luxor
+			MYAB Mikrokonsult AB
+			-->
+			<dataarea name="flop" size="88205">
+				<rom name="disk003.imd" size="88205" crc="c259b9ba" sha1="e40df5ab5eaea8ad30fee948b86ca29df9f1ecfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccdos31" supported="no">
+		<description>Concurrent-DOS v3.1 för ABC16</description>
+		<year>198?</year>
+		<publisher>MYAB Mikrokonsult</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<!--
+			Concurrent-DOS v3.1 för ABC16
+			Boot-disk MYAB XIOS v 1.0 850208
+			Serienr 328-100066
+			För ABC-800,802 och 806
+			Format Luxor 832
+			Copyright (C) Digital Research
+			MYAB Mikrokonsult AB
+			-->
+			<feature name="part_id" value="boot" />
+			<dataarea name="flop" size="104228">
+				<rom name="disk006.imd" size="104228" crc="8d1df685" sha1="a93555788776541a655a22416e0ab04b135f9967"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<!--
+			Hjälp-program (PC-DOS 1.1)
+			För ABC16 och CC-DOS 3.1
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Copyright (C) Digital Research
+			MYAB Mikrokonsult AB
+			-->
+			<feature name="part_id" value="help1" />
+			<dataarea name="flop" size="203098">
+				<rom name="disk004.imd" size="203098" crc="d62f2084" sha1="a060d5235a6907ba654d93b514137673be4c5abd"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<!--
+			Hjälp-program (CP/M-86) Vers 1.1
+			För ABC16 och CC-DOS 3.1
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Copyright (C) Digital Research
+			MYAB Mikrokonsult AB
+			-->
+			<feature name="part_id" value="help2" />
+			<dataarea name="flop" size="270392">
+				<rom name="disk005.imd" size="270392" crc="9393ba53" sha1="920a3e04293fff6ca1dd999d29f92c34f47d0993"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<!--
+			Demo skiva för ABC16
+			SuperCalc 3 och dBASE III
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Demo startas med SCDEMO eller DBDEMO
+			-->
+			<feature name="part_id" value="demo1" />
+			<dataarea name="flop" size="419741">
+				<rom name="disk001.imd" size="419741" crc="94cf7a73" sha1="2bff273a16a86fb313b70d6152f7355d8c47e9f9"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<!--
+			Demo skiva för ABC16
+			WordStar och InfoStar
+
+			Format MYAB/CC-DOS
+			80 Spår Dubbel sida 8 sekt
+			Demo startas med WSINTRO, HELSKRAJ
+			RSTUTOR eller DSTUTOR
+			-->
+			<feature name="part_id" value="demo2" />
+			<dataarea name="flop" size="243463">
+				<rom name="disk002.imd" size="243463" crc="d081be42" sha1="211ed93ab5329d8e0a278d63ad4b5634efa1d710"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccdos41" supported="no">
+		<description>Concurrent-DOS v4.1 för ABC16</description>
+		<year>198?</year>
+		<publisher>MYAB Mikrokonsult</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="137544">
+				<rom name="disk007.imd" size="137544" crc="f08b9876" sha1="9331b3d3cf2eaf1144d5dc5524346391dd32eb4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

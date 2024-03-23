@@ -36,8 +36,10 @@ ds8874_device::ds8874_device(const machine_config &mconfig, const char *tag, dev
 
 void ds8874_device::device_start()
 {
-	// resolve callbacks
-	m_write_output.resolve_safe();
+	// zerofill
+	m_data = 0;
+	m_cp = 0;
+	m_shift = 0xff;
 
 	// register for savestates
 	save_item(NAME(m_data));
@@ -55,7 +57,7 @@ void ds8874_device::refresh_output()
 	m_write_output(m_shift);
 }
 
-WRITE_LINE_MEMBER(ds8874_device::data_w)
+void ds8874_device::data_w(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -69,7 +71,7 @@ WRITE_LINE_MEMBER(ds8874_device::data_w)
 	m_data = state;
 }
 
-WRITE_LINE_MEMBER(ds8874_device::cp_w)
+void ds8874_device::cp_w(int state)
 {
 	state = (state) ? 1 : 0;
 

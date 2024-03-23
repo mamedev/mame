@@ -135,7 +135,7 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 #include "emu.h"
 #include "namco50.h"
 
-WRITE_LINE_MEMBER( namco_50xx_device::reset )
+void namco_50xx_device::reset(int state)
 {
 	// The incoming signal is active low
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
@@ -171,7 +171,7 @@ TIMER_CALLBACK_MEMBER( namco_50xx_device::O_w_sync )
 		m_portO = (m_portO & 0xf0) | (out);
 }
 
-WRITE_LINE_MEMBER( namco_50xx_device::rw )
+void namco_50xx_device::rw(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::rw_sync),this), state);
 }
@@ -181,7 +181,7 @@ TIMER_CALLBACK_MEMBER( namco_50xx_device::rw_sync )
 	m_rw = param;
 }
 
-WRITE_LINE_MEMBER( namco_50xx_device::chip_select )
+void namco_50xx_device::chip_select(int state)
 {
 	m_cpu->set_input_line(0, state);
 }

@@ -46,9 +46,9 @@ protected:
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(snd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(firq_w);
+	void snd_reply_w(int state);
+	void irq_w(int state);
+	void firq_w(int state);
 	void rombank_w(uint8_t data);
 	void dmdbank_w(offs_t offset, uint8_t data);
 

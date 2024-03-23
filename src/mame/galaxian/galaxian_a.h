@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_GALAXIAN_H
-#define MAME_AUDIO_GALAXIAN_H
+#ifndef MAME_GALAXIAN_GALAXIAN_A_H
+#define MAME_GALAXIAN_GALAXIAN_A_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ DECLARE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device)
 DECLARE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device)
 DECLARE_DEVICE_TYPE(SBHOEI_SOUND, sbhoei_sound_device)
 
-#endif // MAME_AUDIO_GALAXIAN_H
+#endif // MAME_GALAXIAN_GALAXIAN_A_H

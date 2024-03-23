@@ -158,11 +158,11 @@ void dmv_k210_device::portc_w(uint8_t data)
 	out_irq(BIT(data, 3));
 }
 
-WRITE_LINE_MEMBER( dmv_k210_device::cent_ack_w )     { if (state) m_portb |= 0x04; else m_portb &= ~0x04; m_ppi->pc6_w(state); }
-WRITE_LINE_MEMBER( dmv_k210_device::cent_slct_w )    { if (state) m_portb |= 0x10; else m_portb &= ~0x10; }
-WRITE_LINE_MEMBER( dmv_k210_device::cent_busy_w )    { if (state) m_portb |= 0x20; else m_portb &= ~0x20; }
-WRITE_LINE_MEMBER( dmv_k210_device::cent_pe_w )      { if (state) m_portb |= 0x40; else m_portb &= ~0x40; }
-WRITE_LINE_MEMBER( dmv_k210_device::cent_fault_w )   { if (state) m_portb |= 0x80; else m_portb &= ~0x80; }
+void dmv_k210_device::cent_ack_w(int state)     { if (state) m_portb |= 0x04; else m_portb &= ~0x04; m_ppi->pc6_w(state); }
+void dmv_k210_device::cent_slct_w(int state)    { if (state) m_portb |= 0x10; else m_portb &= ~0x10; }
+void dmv_k210_device::cent_busy_w(int state)    { if (state) m_portb |= 0x20; else m_portb &= ~0x20; }
+void dmv_k210_device::cent_pe_w(int state)      { if (state) m_portb |= 0x40; else m_portb &= ~0x40; }
+void dmv_k210_device::cent_fault_w(int state)   { if (state) m_portb |= 0x80; else m_portb &= ~0x80; }
 
-WRITE_LINE_MEMBER( dmv_k210_device::cent_autofd_w )  { if (state) m_portc |= 0x02; else m_portc &= ~0x02; }
-WRITE_LINE_MEMBER( dmv_k210_device::cent_init_w )    { if (state) m_portc |= 0x04; else m_portc &= ~0x04; }
+void dmv_k210_device::cent_autofd_w(int state)  { if (state) m_portc |= 0x02; else m_portc &= ~0x02; }
+void dmv_k210_device::cent_init_w(int state)    { if (state) m_portc |= 0x04; else m_portc &= ~0x04; }

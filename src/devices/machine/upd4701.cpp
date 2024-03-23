@@ -35,7 +35,7 @@ upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, d
 	, m_cf(true)
 	, m_cf_cb(*this)
 	, m_sf_cb(*this)
-	, m_open_bus_cb(*this)
+	, m_open_bus_cb(*this, 0)
 {
 }
 
@@ -45,11 +45,6 @@ upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, d
 
 void upd4701_device::device_start()
 {
-	// resolve callbacks
-	m_cf_cb.resolve_safe();
-	m_sf_cb.resolve_safe();
-	m_open_bus_cb.resolve_safe(0);
-
 	// register state for saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_xy));
@@ -77,7 +72,7 @@ void upd4701_device::device_start()
 //  ul_w - write to counter select line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::ul_w)
+void upd4701_device::ul_w(int state)
 {
 	m_ul = state;
 }
@@ -86,7 +81,7 @@ WRITE_LINE_MEMBER(upd4701_device::ul_w)
 //  xy_w - write to byte select line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::xy_w)
+void upd4701_device::xy_w(int state)
 {
 	m_xy = state;
 }
@@ -95,7 +90,7 @@ WRITE_LINE_MEMBER(upd4701_device::xy_w)
 //  cs_w - write to chip select line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::cs_w)
+void upd4701_device::cs_w(int state)
 {
 	if (m_cs != state)
 	{
@@ -124,7 +119,7 @@ WRITE_LINE_MEMBER(upd4701_device::cs_w)
 //  resetx_w - write to X counter reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::resetx_w)
+void upd4701_device::resetx_w(int state)
 {
 	if (m_resetx != state)
 	{
@@ -139,7 +134,7 @@ WRITE_LINE_MEMBER(upd4701_device::resetx_w)
 //  resety_w - write to Y counter reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::resety_w)
+void upd4701_device::resety_w(int state)
 {
 	if (m_resety != state)
 	{
@@ -313,7 +308,7 @@ void upd4701_device::switch_update(u8 mask, bool state)
 //  left_w - update left switch state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::left_w)
+void upd4701_device::left_w(int state)
 {
 	switch_update(4, state);
 }
@@ -322,7 +317,7 @@ WRITE_LINE_MEMBER(upd4701_device::left_w)
 //  right_w - update right switch state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::right_w)
+void upd4701_device::right_w(int state)
 {
 	switch_update(2, state);
 }
@@ -331,7 +326,7 @@ WRITE_LINE_MEMBER(upd4701_device::right_w)
 //  middle_w - update middle switch state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd4701_device::middle_w)
+void upd4701_device::middle_w(int state)
 {
 	switch_update(1, state);
 }
@@ -394,7 +389,7 @@ u8 upd4701_device::read_xy(offs_t offset)
 //  sf_r - read switch flag
 //-------------------------------------------------
 
-READ_LINE_MEMBER(upd4701_device::sf_r)
+int upd4701_device::sf_r()
 {
 	if (m_switches != 0)
 		return 0;
@@ -406,7 +401,7 @@ READ_LINE_MEMBER(upd4701_device::sf_r)
 //  cf_r - read counter flag
 //-------------------------------------------------
 
-READ_LINE_MEMBER(upd4701_device::cf_r)
+int upd4701_device::cf_r()
 {
 	return m_cf;
 }

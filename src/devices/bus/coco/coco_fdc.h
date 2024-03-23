@@ -12,6 +12,7 @@
 #define MAME_BUS_COCO_COCO_FDC_H
 
 #include "cococart.h"
+
 #include "imagedev/floppy.h"
 
 
@@ -26,8 +27,8 @@ class coco_family_fdc_device_base :
 		public device_cococart_interface
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w) { m_intrq = state; update_lines(); }
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w) { m_drq = state; update_lines(); }
+	void fdc_intrq_w(int state) { m_intrq = state; update_lines(); }
+	void fdc_drq_w(int state) { m_drq = state; update_lines(); }
 
 	static void floppy_formats(format_registration &fr);
 
@@ -62,11 +63,9 @@ private:
 };
 
 // device type definitions - CoCo FDC
-DECLARE_DEVICE_TYPE(COCO_FDC,       coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO_FDC_V11,   coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO3_HDB1,     coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO2_HDB1,     coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(CP450_FDC,      coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(CD6809_FDC,     coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO_FDC,   coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO_SCII,  coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(CP450_FDC,  coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(CD6809_FDC, coco_family_fdc_device_base)
 
 #endif // MAME_BUS_COCO_COCO_FDC_H

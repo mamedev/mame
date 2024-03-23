@@ -139,7 +139,7 @@ int gaelco_vram_encryption_device::decrypt(int const enc_prev_word, int const de
 
 uint16_t gaelco_vram_encryption_device::gaelco_decrypt(cpu_device &cpu, int offset, int data)
 {
-	int thispc = cpu.pc();
+	int thispc = cpu.pcbase();
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */

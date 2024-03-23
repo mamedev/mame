@@ -5,8 +5,8 @@
     Cosmic Guerilla & other Universal boards (in cosmic.c)
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COSMIC_H
-#define MAME_INCLUDES_COSMIC_H
+#ifndef MAME_UNIVERSAL_COSMIC_H
+#define MAME_UNIVERSAL_COSMIC_H
 
 #pragma once
 
@@ -49,7 +49,7 @@ public:
 	void init_cosmica();
 	void init_panic();
 
-	DECLARE_WRITE_LINE_MEMBER(panic_coin_inserted);
+	void panic_coin_inserted(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
@@ -119,4 +119,4 @@ private:
 	void panic_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_COSMIC_H
+#endif // MAME_UNIVERSAL_COSMIC_H

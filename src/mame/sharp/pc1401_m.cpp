@@ -65,7 +65,7 @@ uint8_t pc1401_state::in_b_r()
 	return data;
 }
 
-READ_LINE_MEMBER(pc1401_state::reset_r)
+int pc1401_state::reset_r()
 {
 	return (m_extra->read() & 0x02);
 }

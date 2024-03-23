@@ -11,12 +11,10 @@
               * Custom polygon hardware
               * 1 text tilemap
 
-    Gorgon and System 23 use an I/O board based on the Namco C78, which is a Renesas H8/3334 MCU
-    (8-bit version of the H8/3002).
-
-    Super System 23 uses a PIC16Cxx-based I/O board.  In both cases the I/O boards' MCUs apparently are connected
-    to the H8/3002's serial port, similar to System 22 where one 37702 reads the I/O and communicates serially
-    with the second 37702 which is the traditional "subcpu".
+    All games use a JVS I/O board connected to the H8/3002's serial port #0 and requires an I/O board to
+    get past the subcpu check. It's similar to System 22 where one 37702 reads the I/O and communicates
+    serially with the second 37702 which is the traditional "subcpu". Several I/O boards are accepted
+    including TSS-I/O, FCA, ASCA3, ASCA5 and the common JVS I/O boards manufactured by Sega.
 
     NOTES:
     - First 128k of main program ROM is the BIOS, and after that is a 64-bit MIPS ELF image.
@@ -24,18 +22,25 @@
 
     TODO:
     - There are currently no differences seen between System 23 (Time Crisis 2) and
-      Super System 23 (GP500, Final Furlong 2).  These will presumably appear when
+      Super System 23 (500GP, Final Furlong 2). These will presumably appear when
       the 3D hardware is emulated.
 
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
-      and displaying it I'm not going to meddle with it though.
+      and displaying it I'm not going to meddle with it though.  Some newer Namco SS22 games
+      have similar data there.
+      The only difference between motoxgov2a and motoxgov2a2, motoxgov1a and motoxgov1a2,
+      panicprkj and panicprkj2 is this data.
 
-    - Add the sh2 in Gunmen Wars (no ROM, controls the camera)
+    - Improve GMEN hookups/comms.
+
+    - Motocross Go! uses two I/O boards chained and handles JVS differently from other games.
+      Currently its second I/O board isn't connected in the chain and has the main board
+      disable inputs because of this.
 
     - Super System 23 tests irqs in the post.  timecrs2v4a's code can
-    potentially test 7 sources, but only actually test 5.  With each
-    source there is code to clear the interrupt and code to raise it.
-    Levels 0 and 1 are not connected to anything according to the code.
+      potentially test 7 sources, but only actually test 5.  With each
+      source there is code to clear the interrupt and code to raise it.
+      Levels 0 and 1 are not connected to anything according to the code.
 
       VBlank (level 2):
         clear: ad00000a.h = 0
@@ -108,6 +113,23 @@ c8000000:
 ':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
 ':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
 
+    Game status:
+        rapidrvr,v2c        Missing 3d graphics. Coins up. Freezes right when a game starts.
+        rapidrvrp           Same as above but it's possible to enable (glitchy) 3d by entering certain portions of the development menu.
+        finfurl             Missing 3d graphics. Freezes in attract mode but can 'play' the game with missing 3d.
+        motoxgo(all)        Inputs don't respond at all. Hardlocks shortly in atract mode.
+        downhill            Freeze with black screen after POST.
+        downhillu           Heavy gfx glitches. Missing rotary inputs. Random freezes.
+        timecrs2(all)       Playable with some gfx glitches
+        panicprk,j,j2       Freezes during 'SUB-READY WAIT' after POST (see sub_comm_r).
+        gunwars,a           Hardlocks after POST (gmen related?).
+        raceon              Hardlocks after POST (gmen related?).
+        aking               Freezes at the first ingame frame showing the notice screen or test menu. Missing rotary inputs.
+        500gp               Heavy gfx glitches. Possible to coin up but freezes when starting a game as well as in attract.
+        finfurl2,j          Freezes upon the gmen transfering the program to the SH2.
+        crszone(all)        Has its IRQs hardwired different from S23/SS23. Won't advance past interrupt check and skipping POST with
+                            DIP #2 on has it freeze shortly after.
+
 ****************************************************************************
 
 Namco System 23 and Super System 23 Hardware Overview (last updated 7th April 2013 at 12.49am)
@@ -134,6 +156,8 @@ Crisis Zone       Namco, 1999    System 23 Evolution 2
     According to Bandai Namco's website it is indeed SS23, and includes an extra sound board with Zoom Corp. DSP.
 
 A System 23 unit is comprised of some of the following pieces....
+- SYSTEM23 POWER(A) PCB            Small PCB bolted to the metal box only consisting of power in and network in/out. Only Motocross Go! used this as its
+                                   video and sound connectors are mounted on the main board.
 - V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out
                                    (to AMP PCB) used with most of the S23/SS23 games that use a single main PCB and no other control PCBs.
 - V198 EMI PCB                     Small PCB bolted to the metal box with several connectors (power/video/sound etc) plus a couple of extra
@@ -150,6 +174,8 @@ A System 23 unit is comprised of some of the following pieces....
                                    If the FCA PCB is not connected, the game will not advance past the 3rd screen shown below.
 - ASCA-3A PCB / ASCA-4A PCB        This is the standard I/O board used with most of the S23/SS23 games with support for digital and
                                    analog controls (buttons/joysticks/pots etc).
+- V183 AMC PCB                     I/O board only in Motocross Go that controls handlebar and seat force feedback. It's connected as a slave
+                                   I/O board. Half of the board recycles a v145 motor board used in Rave Racer, Ace Driver and Dirt Dash.
 - V185 I/O PCB                     Gun I/O board used with Time Crisis II
 - V221 MIU PCB                     Gun I/O board used with Crisis Zone (System 23 Evolution 2) and Time Crisis 3 (on System 246)
 - SYSTEM23 MEM(M) PCB              Holds mask ROMs for GFX/Sound and associated logic
@@ -172,7 +198,7 @@ The System 23 hardware is the first NAMCO system to require an external 3.3V pow
 was derived from a 5V to 3.3V regulator on systems such as System10/11/12 etc.
 The KEYCUS chip is the familiar MACH211 PLCC44 IC as used on System12. The sound system is also taken from System12.
 
-On bootup, the following happens (on GP500)...
+On bootup, the following happens (on 500GP)...
 
 1st screen - Grey screen with white text
                                "SYSTEM 23 BOOTING     "
@@ -679,7 +705,7 @@ Notes:
       Game             Code and revision
       ----------------------------------
       Angler King      AG1  Ver.A (for Super System 23)
-      GP500            5GP3 Ver.C (for Super System 23)
+      500GP            5GP3 Ver.C (for Super System 23)
       Time Crisis 2    TSS4 Ver.A (for Super System 23)
       Final Furlong 2  FFS1 Ver.A (for Super System 23)
       Final Furlong 2  FFS2 Ver.? (for Super System 23)
@@ -949,6 +975,49 @@ Note both games use a CCD camera for the gun sensor.
 Drive/Feedback PCB
 ------------------
 
+V183 AMC PCB  2473966102 (2473970102)
+|---------------------------------------------------|
+|                                                   |
+|                                                   |
+|                          4.9152MHz              J2|
+|                                     |-----|       |
+|                                     | MCU |       |
+|                                     |     |       |
+|     SS22 FFB                        |-----|       |
+|                      |------|                     |
+|                      |ALTERA|              DSW(4) |
+|                      |EPM7096                     |
+|                      |------|                     |
+|                                                 J4|
+|                                       ADM485      |
+|                 27C1024   62256x2               J5|
+|                                                   |
+|---------------------------------------------------|
+Notes:
+      This board is used only with Motocross Go! to control the steering feedback motor. It communicates as a slave JVS
+      I/O board to both the game board and the ASCA I/O board. Another signal labelled as 'FREEZE/RELAY' connects between
+      this board to its ASCA I/O board.
+
+      MCU      - Fujitsu MB90611A F2MC-16F Family Microcontroller. Clock input 4.9152MHz (QFP100)
+      62256    - 32k x2 SRAM (SOP28)
+      EPM7096  - Altera EPM7064 CPLD labelled 'MG1,P LD0A' (PLCC44)
+      27C1001  - 128k x8 EPROM labelled 'MG1-PRG0' (DIP40)
+      ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
+      J4/J5    - Standard USB A and B connectors.
+      J2       - Ribbon cable connector.
+      SS22 FFB - The recycled System 22 v147 motor drive board portion.
+
+      From testing on an actual Motocross Go! cabinet, the game doesn't like it if this board is disconnected in any way.
+      It needs both an ASCA and AMC I/O board chained in order to fully boot with properly working I/O. The following happens
+      if any portion of an AMC pcb is disconnected (only applies to Motocross Go!).
+
+      AMC board powered off: Board doesn't properly initialize its subcpu giving a 'subcpu timeout'.
+      AMC board powered on, JVS comms disconnected, freeze/relay connected: Board initializes the subcpu properly but
+      intentionally disables inputs.
+      AMC board powered on, JVS comms connected, freeze/relay disconnected: Board initializes the subcpu properly.
+      Main inputs work. Motor doesn't respond (if freeze/relay is reconnected, the motor will respond again).
+
+
 V194 STR PCB
 2487960102 (2487970102)
 |----------------------------------------------------------|
@@ -1004,39 +1073,45 @@ Notes:
       J106            - DC variable power output to feed-back motor
 
 
-Namco Gorgon-based games
-------------------------
+********************************************************************************************
 
-Rapid River, Final Furlong (both Namco, 1997)
+Namco System 22.5 GORgON-based games
+Hardware info by Guru
+---------------------
 
-These games run on hardware called "GORGON". It appears to have similar
-capabilities to System 23 but like Super System 22 has sprites also.
-(System 23 doesn't have sprites). The PCBs are about two times larger
-than System 23.
+Games on this system include....
+Rapid River   (Namco, 1997)
+Final Furlong (Namco, 1997)
 
-The system comprises Main PCB, ROM PCB and I/O PCB all located inside
-a metal box with 3 separate power supplies for 5V, 12V and 3.3V. Main
-input power is 115V.
-Rapid River is controlled by rotating a paddle (for thrust) and turning it
-sideways (moves left/right).
-The rotation action is done with a 5K potentiometer whereby the thrust
-is achieved by moving the pot from full left to full right continuously.
-The left/right turning movement is just another 5K potentiometer connected
-to the column of the paddle center shaft.
-There are also some buttons just for test mode, including SELECT, UP & DOWN
-The player's seat has movement controlled by a compressor and several
-potentiometers. On bootup, the system tests the seat movement and displays
-a warning if it's not working. Pressing START allows the game to continue
-and function normally without the seat movement.
+These games run on hardware called "GORgON". This is half-way hardware after Namco Super System 22 and
+before System 23. It has similar capabilities to System 23 but like Super System 22 it has sprites also, whereas
+System 23 is a full 3D system and doesn't have sprites. The PCBs are about two times larger than System 23.
 
-The other game on this system (Final Furlong) and is a horse racing game.
-To control the horse you rock it forwards and backwards continually (it's very tiring
-to play this game).
-This would activate possibly one or two 5K potentiometers inside the horse body.
-Just like a real horse you need to control the speed so your horse lasts the entire race.
-If you rock too much, a message on screen says 'Too Fast'. To steer the horse turn the
-head sideways using the reins. There would be another 5K potentiometer in the head
-to activate the turning direction.
+For Final Furlong (the first game on this system) the system comprises TWO Main PCBs each with ROM PCB on top.
+There are 2x GORgON AV PCBs plugged directly into each main board providing connectors for power, audio,
+video and comms with 3 separate power supplies for 5V, 12V and 3.3V all located inside a metal box. There is a
+separate external I/O PCB ASCA-1A. This connects to the filter board via RS485 using the USB connector.
+Main input power is 115VAC.
+Final Furlong is a horse racing game.
+To control the horse you rock it forwards and backwards continually (it's very tiring to play this game).
+This activates one 5K-ohm potentiometer inside the horse body. Essentially the pot just moves from one extreme
+to the other. Just like a real horse you need to control the speed so your horse lasts the entire race.
+If you rock too much, a message on screen says 'Too Fast'. To steer the horse turn the head sideways using the reins.
+There is another 5K-ohm potentiometer in the head to activate the turning direction. The head of the horse also has
+two buttons for left and right. This is used to select items and activate the whip. When riding the horse, pressing either
+button activates the whip (i.e. they both do the same thing). To select a different track or different horse turn the head.
+
+For Rapid River there is only one main board and ROM board (linking/networking machines is not possible). The I/O
+board is ASCA-2A and is different to the I/O board used with Final Furlong and plugs directly into the main board.
+This board has the same connectors as the Final Furlong GORgON AV PCB but also has an audio amp and a standard 8 pin
+JVS power connector. The I/O board is located inside the metal box. There are two flat cables on the I/O board joining
+it to the filter board which is bolted to the outside of the metal box.
+Rapid River is controlled by rotating a paddle (for thrust) and turning it sideways (moves left/right).
+The rotation action is done with a 5K-ohm potentiometer whereby the thrust is achieved by moving the pot from full left to
+full right continuously. The left/right turning movement is just another 5K-ohm potentiometer connected to the column of the paddle
+center shaft. There are also some buttons just for test mode, including SELECT, UP & DOWN. The player's seat has movement
+controlled by a compressor and several potentiometers. On bootup, the system tests the seat movement and displays a warning
+if it's not working. Pressing START allows the game to continue and function normally without the seat movement.
 
 
 Main PCB
@@ -1047,25 +1122,25 @@ Main PCB
 |                                   J4                       J5                         J6             |
 |                              |---------|           |---------| |------| |---------|                  |
 |         |---------| |------| |         |           |         | |C401  | |         |HM534251 HM534251 |
-| CXD1178Q|         | |C381  | |  C374   |  |------| |  C417   | |      | |  304    |HM534251 HM534251 |
+| CXD1178Q|         | |C381  | |  C374   |  |------| |  C417   | |      | |  C304   |HM534251 HM534251 |
 |         |  C404   | |      | |         |  |C435  | |         | |------| |         |HM534251 HM534251 |
 |         |         | |------| |         |  |      | |         | |------| |         |                  |
 |         |         |          |---------|  |------| |---------| |C400  | |---------|                  |
 |         |---------|     |---------|       |------|             |      | |---------|                  |
 |                         |         |       |C435  |    341256   |------| |         |HM534251 HM534251 |
-|                         |  C397   |       |      |             |------| |  304    |HM534251 HM534251 |
+|                         |  C397   |       |      |             |------| |  C304   |HM534251 HM534251 |
 |  341256 341256  341256  |         |       |------|    341256   |C401  | |         |HM534251 HM534251 |
 |  M5M51008       341256  |         |     |---------|            |      | |         |                  |
 |                         |---------|     |         | |------|   |------| |---------|                  |
 |  M5M51008       341256         |------| |  C403   | |C406  |   |------| |---------|                  |
 |ADM485              |---------| |C379  | |         | |      |   |C400  | |         |HM534251 HM534251 |
-|                    |         | |      | |         | |------|   |      | |  304    |HM534251 HM534251 |
+|                    |         | |      | |         | |------|   |      | |  C304   |HM534251 HM534251 |
 |    M5M51008        |  C300   | |------| |---------|            |------| |         |HM534251 HM534251 |
 |                    |         | LH540204  LH540204              |------| |         |                  |
 |    M5M51008        |         |341256                 |------|  |C401  | |---------|                  |
 |J1   HCPL0611       |---------|341256                 |C407  |  |      | |---------|                  |
 |         DS8921                  PST575  PST575       |      |  |------| |         |                  |
-|  DS8921                                              |------|  |------| |  304    |HM534251 HM534251 |
+|  DS8921                                              |------|  |------| |  C304   |HM534251 HM534251 |
 |                 M5M51008                                       |C400  | |         |HM534251 HM534251 |
 |       CY7C128             CY2291S                              |      | |         |                  |
 |         |------|M5M51008  14.31818MHz                          |------| |---------|                  |
@@ -1079,56 +1154,67 @@ Main PCB
 |      14.7456MHz          |      |               |--------|     |------|     |         | |NKK      |  |
 |PAL             |-----|   |------|    |------|                   D4516161    |  C413   | |NR4650   |  |
 |                |H8/  |               |C361  |                   D4516161    |         | |LQF-13B  |  |
-|                |3002 |               |      |LC321664                       |         | |         |  |
-|  J10           |-----|               |------|    J8                         |---------| |---------|  |
+|                |3002 |               |      |                               |         | |         |  |
+|  J10           |-----|      LC321664 |------|    J8                         |---------| |---------|  |
 |------------------------------------------------------------------------------------------------------|
 Notes:
-     NKK NR4650 - R4600-based 64bit RISC CPU (Main CPU, QFP208, clock input source = CY2291S)
-     H8/3002  - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100, running at 14.7456MHz)
-     EPM7128  - Altera EPM7128 FPGA labelled 'GOR-M1' (PLCC84)
-     PAL      - PALCE16V8H stamped 'GOR-M3' (PLCC20)
-     HM534251 - Hitachi HM534251 256k x4 Dynamic Video RAM (SOJ28)
-     N341256  - NKK 32k x8 SRAM (SOJ28)
-     M5M5256  - Mitsubishi 32k x8 SRAM (SOP28)
+       NR4650 - NKK NR4650 R4600-based 64-bit RISC CPU (Main CPU, QFP208). Clock input source = CY2291S pin 10
+                R4650 master clock input on pin 185 is 33.3333MHz [66.6666/2; CY2291S output = 66.6666]
+      H8/3002 - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100). Clock input 16.74115MHz. Clock source = ASC2061 MCLKOUT/2
+      EPM7128 - Altera EPM7128 CPLD labelled 'GOR-M1' (PLCC84). This chip controls *MANY* chip-enable and clock signals.
+          PAL - PALCE16V8H stamped 'GOR-M3' (PLCC20)
+     HM534251 - Hitachi HM534251 256kB x4 Dynamic Video RAM (SOJ28)
+      N341256 - NKK 32kB x8 SRAM (SOJ28)
+      M5M5256 - Mitsubishi 32kB x8 SRAM (SOP28)
      D4516161 - NEC uPD4516161AG5-A80 1M x16 (16MBit) SDRAM (SSOP50)
-     LC321664 - Sanyo 64k x16 EDO DRAM (SOJ40)
-     M5M51008 - Mitsubishi 128k x8 SRAM (SOP32)
-     CY7C128  - Cypress 2k x8 SRAM (SOJ28)
+     LC321664 - Sanyo 64kB x16 EDO DRAM (SOJ40)
+     M5M51008 - Mitsubishi 128kB x8 SRAM (SOP32)
+      CY7C128 - Cypress 2kB x8 SRAM (SOJ28)
      LH540204 - Sharp CMOS 4096 x 9 Asynchronous FIFO (PLCC32)
-     2061ASC-1- IC Designs 2061ASC-1 programmable clock generator (SOIC16)
-     DS8921   - Dallas Semiconductor DS8921 RS-422/423 Differential Line Driver and Receiver Pair (SOIC8)
+    2061ASC-1 - IC Designs 2061ASC-1 Programmable Clock Generator (SOIC16). XTAL input = 14.7456MHz
+                This chip uses some internal ROM tables and formulas and is programmed with several registers to generate 2 output clocks.
+                The measured values below can vary depending on the input clock frequency and accuracy tolerance.
+                Measured Outputs: VCLKOUT - 25.9282MHz, MCLKOUT - 33.4823MHz
+      CY2291S - General Purpose EPROM Programmable Clock Generator. Clock input 14.31818MHz
+                Full part number is CY2291SC-221. SC="Special Customer". This is custom-programmed at the factory per Namco specifications.
+                This chip uses some internal ROM tables to generate 6 output clocks. Not all of the outputs are actually used on the PCB.
+                The measured values below can vary depending on the input clock frequency and accuracy tolerance.
+                Measured Outputs: CPUCLK - 66.6666MHz, CLKB - 51.200MHz, CLKA - 20.000MHz , CLKF - none, CLKD - none, CLKC - 40.000MHz
+                The outputs CLKA/C/D/F are not connected.
+       DS8921 - Dallas Semiconductor DS8921 RS-422/423 Differential Line Driver and Receiver Pair (SOIC8)
      HCPL0611 - Fairchild HCPL0611 High Speed 10MBits/sec Logic Gate Optocoupler (SOIC8)
-     ADM485   - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
-     PST575   - System Reset IC (SOIC8)
-     CXD1178Q - Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48)
-     J1       - 64 pin connector for connection of I/O board
+       ADM485 - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+                This is used for I/O PCB communication via H8/3002 signals PB0, P90 and P92.
+       PST575 - System Reset IC (SOIC8)
+     CXD1178Q - Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48). R,G,B Clock inputs 12.800MHz. Source clock is CY2291S CLKB [51.200/4]
+           J1 - 64 pin connector for connection of I/O board
      J4/J5/J6 \
-     J8/J9    / Custom NAMCO connectors for connection of MEM(M1) PCB
-     J10      - Custom NAMCO connector for MSPM(FR) PCB
+        J8/J9 / Custom NAMCO connectors for connection of MEM(M1) PCB
+          J10 - Custom NAMCO connector for MSPM(FR) PCB
 
 
      Namco Custom ICs
      ----------------
-     C300 (QFP160)
-     304  (x4, QFP120)
-     C352 (QFP100)
-     C361 (QFP120)
-     C374 (QFP160)
-     C379 (QFP64)
-     C381 (QFP144)
-     C397 (QFP160)
-     C399 (QFP160)
-     C400 (QFP100)
-     C401 (x4, QFP64)
-     C403 (QFP136)
-     C404 (QFP208)
-     C406 (QFP120)
-     C407 (QFP64)
-     C413 (QFP208)
-     C416 (QFP176)
-     C417 (QFP208)
-     C422 (QFP64)
-     C435 (x2, TQFP144)
+         C300 (QFP160) - Sprite-related functions
+     C304 (x4, QFP120) - Texture-related functions. Grouped with a C400 and C401 for each chip (4 sets).
+         C352 (QFP100) - 32-Voice 4-channel 8-bit PCM Sound. Clock input 25.9282MHz (source = 2061ASC-1 pin 9)
+         C361 (QFP120) - Text / Character Generator + HSync / VSync Generator
+         C374 (QFP160) - Sprite-related functions / Sprite Zoom
+          C379 (QFP64) - Sprite-related functions
+         C381 (QFP144) - Sprite-related functions
+         C397 (QFP160) - Sprite-related functions
+         C399 (QFP160) \ This chip ties all the texture outputs from C304, C400 & C401 together and probably does CPU <> 3D System Communication.
+     C400 (x4, QFP100) | Texture-related functions (these run burning hot then fail.... result = 3D objects all white and no textures ;-)
+      C401 (x4, QFP64) /
+         C403 (QFP136) - Polygon-related functions + FIFO data supply source
+         C404 (QFP208) - GAMMA, Palette, Pixel Mixer, 24-bit RGB output directly to CXD1178Q (8-bits per color)
+         C406 (QFP120) - Polygon-related functions
+          C407 (QFP64) - Polygon-related functions
+         C413 (QFP208) - Memory Controller
+         C416 (QFP176) - CPU <> CPU Communication (R4650 <> H8/3002)
+         C417 (QFP208) - Polygon Generator
+          C422 (QFP64) - RS422 Networking (Twin Cabinet) Communication Controller
+    C435 (x2, TQFP144) - Polygon-related functions
 
 
 Program ROM PCB
@@ -1144,7 +1230,7 @@ MSPM(FR) PCB 8699015200 (8699015100)
 |                    IC2   |
 |--------------------------|
 Notes:
-     J1 -  Connector to plug into Main PCB
+      J1 - Connector to plug into Main PCB
      IC1 \
      IC2 / Main Program  (Fujitsu 29F016 16MBit FlashROM, TSOP48)
      IC3 - Sound Program (Fujitsu 29F400T 4MBit FlashROM, TSOP48)
@@ -1156,6 +1242,7 @@ Notes:
      Rapid River    RD2 Ver.C
      Rapid River    RD3 Ver.C
      Final Furlong  FF2 Ver.A
+
 
 ROM PCB
 -------
@@ -1200,12 +1287,12 @@ MEM(M1) PCB
 |                    J4(MOTION)                          |
 |--------------------------------------------------------|
 Notes:
-     PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
-     PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
-     PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
-     KEYCUS - for Rapid River: MACH211 CPLD stamped 'KC012' (PLCC44)
-     KEYCUS - for Final Furlong: MACH211 CPLD stamped 'KC011' (PLCC44)
-     J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
+        PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
+        PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+        PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+      KEYCUS - for Rapid River: MACH211 CPLD stamped 'KC012' (PLCC44)
+      KEYCUS - for Final Furlong: MACH211 CPLD stamped 'KC011' (PLCC44)
+      J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
      JP1/JP2 \
      JP3/JP4 |
      JP5     | Jumpers to set ROM sizes (32M/64M)
@@ -1214,44 +1301,148 @@ Notes:
 
      ROMs
      ----
-          PT*  - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
-          MT*  - Motion ROMs, sizes configurable to either 32M or 64M (SOP44)
-          CG*  - Texture ROMs, sizes configurable to either 32M or 64M (SOP44)
+           PT* - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
+           MT* - Motion ROMs, sizes configurable to either 32M or 64M (SOP44)
+           CG* - Texture ROMs, sizes configurable to either 32M or 64M (SOP44)
           CCR* - Texture Tilemap ROMs, sizes fixed at 16M (SOP44)
           SPR* - Sprite ROMs, sizes configurable to either 32M or 64M (SOP44)
           WAVE*- Wave ROMs, sizes configurable to either 32M or 64M (SOP44)
 
-I/O PCB
--------
+
+I/O PCBs
+--------
+
+ASCA-1A PCB
+8662968202 (8662978202)
+|--------------------------------------------------------|
+|J105  J104  J103  J102                 J101             |
+|       NJM2904             |-------|                    |
+|                 ADM485    |ALTERA |                    |
+|       NJM2904             |EPM7064|                    |
+|                           |       |                    |
+|                |-------|  |-------|                    |
+|         |---|  |       |                               |
+|         IC13|  | C78   | SW2            LB1235  LB1233 |
+|         |---|  |       |  14.7460MHz       LB1235      |
+|             JP1|-------|                               |
+|         62256            PST592D                       |
+|   MB87078       J106                                   |
+|--------------------------------------------------------|
+Notes:
+     IC13 - Atmel AT29C020 2MBit EEPROM labelled 'ASC1IO-A' (PLCC32)
+      C78 - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
+            Clock input 14.7460MHz
+  EPM7064 - Altera EPM7064LC68-15 CPLD, labelled 'ASCA DR0' (PLCC68)
+  PST592D - System Reset IC (SOIC4)
+    62256 - Hitachi HM62256 32kB x8-bit SRAM
+   ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+  MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
+  NJM2904 - New Japan Radio Co. NJM2904 Dual Operational Amplifier
+   LB1235 - Sanyo LB1235 65V 1.5A 4-channel Darlington Driver
+   LB1233 - Sanyo LB1233 Darlington Transistor Array with Built-in Current Limiting Resistors
+     J101 - 64 pin connector joining to ?
+     J102 - USB-A connector \  both tied together with common connections
+     J103 - USB-B connector /
+     J104 - Dual Red/White RCA Jacks (Twin Stereo Audio)
+     J105 - 9 pin connector
+     J106 - 12 pin connector
+      JP1 - 3 pin jumper labelled 'WE' and 'NC'. Default position is NC. This is used to write enable
+            the EEPROM for factory programming.
+      SW2 - DIP switch with 4 switches (default all off)
+
+This board is used with Final Furlong. This board connects to GORgON AV PCB
+
 
 V187 ASCA-2A PCB
 2477960102 (2477970102)
 |--------------------------------------------------------|
 |                   J105                                 |
 |                           |-------|        14.7456MHz  |
-|   J104                    |ALTERA |    ADM485   PST592 |
+|   J104                    |ALTERA |    ADM485   PST592D|
 |                           |EPM7064|     |-------|      |
 |                           |       |     |       |      |
 |                           |-------|     | C78   |      |
 |     LC78815                             |       |      |
 |                                         |-------|      |
 |     MB87078                              |---|         |
-| LA4705                                   |IC1| 62256   |
-|                                          |---|         |
+| LA4705                       LB1233      |IC1| 62256   |
+|                        LB1235            |---|         |
 |         J101                J102                       |
 |--------------------------------------------------------|
 Notes:
-     IC1  - Atmel AT29C020 2MBit EEPROM labelled 'ASCA1 I/O-A' (PLCC32)
-     C78  - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
-     EPM7064 - Altera EPM7064LC68-15 PLD, labelled 'ASCA DR0' (PLCC68)
-     PST592 - System Reset IC (SOIC4)
-     ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
-     MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
-     LC78815 - Sanyo LM78815 2-Channel 16-Bit D/A Converter (SOIC20)
-     J101 - 34 pin flat cable connector for filter board
-     J102 - 50 pin flat cable connector for filter board
-     J104 - 8 pin power connector (+5V, +12V, +3.3V)
-     J105 - 64 pin connector for connection of Main PCB
+     IC1 - Atmel AT29C020 2MBit EEPROM labelled 'ASCA1 I/O-A' (PLCC32)
+     C78 - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
+           Clock input 14.7456MHz
+ EPM7064 - Altera EPM7064LC68-15 CPLD, labelled 'ASCA DR0' (PLCC68)
+ PST592D - System Reset IC (SOIC4)
+  ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+   62256 - Hitachi HM62256 32kB x8-bit SRAM
+  LB1235 - Sanyo LB1235 65V 1.5A 4-channel Darlington Driver
+  LB1233 - Sanyo LB1233 Darlington Transistor Array with Built-in Current Limiting Resistors
+ MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
+ LC78815 - Sanyo LC78815 2-Channel 16-Bit D/A Converter (SOIC20)
+  LA4705 - Sanyo LA4705 15W 2-channel Power Amplifier
+    J101 - 34 pin flat cable connector for filter board
+    J102 - 50 pin flat cable connector for filter board
+    J104 - 8 pin JVS power connector (+5V, +12V, +3.3V)
+    J105 - 64 pin connector for connection of Main PCB
+
+This board is used with Rapid River but also works with Final Furlong.
+
+
+Other Boards
+------------
+
+GORgON AV PCB
+8664960301 (8664970301)
+|------------------------------------|
+|J2   J3     J4        J5       J6   |
+|            BD-8                    |
+|  PC410  74AC244 NJM2100*           |
+|    74AC00  LC78815       NJM2100*  |
+|             J1    LC78815          |
+|------------------------------------|
+Notes: (* = these parts on bottom side of PCB)
+     J1 - 64 pin connector for connection to Main PCB
+     J2 - 10 pin connector
+     J3 - 15 pin HD15 DSUB connector
+     J4 - Dual Red/White RCA Jacks (Twin Stereo Audio)
+     J5 - USB-A connector
+     J6 - 6 pin power input connector (GND, GND, GND, 5V, 5V, 12V)
+   BD-8 - TDK ZBDS5101-8 Ferrite Bead SMD Array
+  PC410 - Sharp PC410 Photocoupler
+ 74AC00 - 74AC00 Quad 2-Input NAND Gate
+74AC244 - 74AC244 Octal Buffer/Line Driver with Tri-state Outputs
+NJM2100 - New Japan Radio Co. NJM2100 Dual Operational Amplifier
+LC78815 - Sanyo LC78815 2-Channel 16-Bit D/A Converter
+
+This board plugs into the mainboard used for Final Furlong and connects to ASCA-1A I/O PCB.
+
+
+V187 ASCA-2B PCB
+2477960201 (2477970201)
+|-----------------------------------------------|
+|                                               |
+|  J207      J204     J206       J205     J203  |
+|                                               |
+|                                               |
+|                                               |
+|          J202*                    J201*       |
+|-----------------------------------------------|
+Notes: (* = these parts on bottom side of PCB)
+      J201 - 34 pin flat cable connector for connection to ASCA-2A I/O PCB
+      J202 - 50 pin flat cable connector for connection to ASCA-2A I/O PCB
+      J203 - 9 pin connector. Pinout: 1 RED, 2 GREEN, 3 BLUE, 4 GND, 5 CSYNC, 6 SPK L+, 7 SPK R-, 8 SPK R+, 9 SPK L-
+      J204 - 15 pin connector. Pinout: 1 GND, 2 12V, 3 GND, 4 5K-POT, 5 5K-POT, 6 SELECT, 7 NC, 8 NC, 9 UP, 10 5V, 11 NC, 12 NC, 13 LAMP, 14 START, 15 DOWN
+             When wired to Final Furlong changes are: 11 RIGHT, 14 LEFT
+      J205 - 6 pin connector. Pinout: 1 SERVICE, 2 TEST, 3 COIN, 4 GND, 5 NC, 6 NC
+      J206 - 12 pin connector
+      J207 - 12 pin connector. Pinout: 1 SOL FR, 2 SOL FL, 3 SOL RR, 4 SOL RL, 5 12V, 6 NC, 7 5K POT RL, 8 GND, 9 5K POT FR, 10 5K POT FL, 11 5K POT RR, 12 5V
+             FR/FL/RR/RL means Front Left, Front Right, Rear Right, Rear Left. SOL means Solenoid.
+
+This is the filter board bolted to the outside of the metal box for Rapid River. It plugs into V187 ASCA-2A I/O PCB with 2 flat cables.
+It can also be used with Final Furlong when wired correctly.
+
 
 */
 
@@ -1260,7 +1451,7 @@ Notes:
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "namco_settings.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
@@ -1273,6 +1464,8 @@ Notes:
 
 #include <cfloat>
 
+
+namespace {
 
 #define JVSCLOCK    (XTAL(14'745'600))
 
@@ -1435,7 +1628,6 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC.%u", 0),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -1496,18 +1688,18 @@ private:
 	void sharedram_sub_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t sharedram_sub_r(offs_t offset);
 	void sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t mcu_p8_r();
-	void mcu_p8_w(uint16_t data);
-	uint16_t mcu_pa_r();
-	void mcu_pa_w(uint16_t data);
-	uint16_t mcu_pb_r();
-	void mcu_pb_w(uint16_t data);
-	uint16_t mcu_p6_r();
-	void mcu_p6_w(uint16_t data);
-	uint16_t iob_p4_r();
-	void iob_p4_w(uint16_t data);
-	uint16_t iob_p6_r();
-	void iob_p6_w(uint16_t data);
+	uint8_t mcu_p8_r();
+	void mcu_p8_w(uint8_t data);
+	uint8_t mcu_pa_r();
+	void mcu_pa_w(uint8_t data);
+	uint8_t mcu_pb_r();
+	void mcu_pb_w(uint8_t data);
+	uint8_t mcu_p6_r();
+	void mcu_p6_w(uint8_t data);
+	uint8_t iob_p4_r();
+	void iob_p4_w(uint8_t data);
+	uint8_t iob_p6_r();
+	void iob_p6_w(uint8_t data);
 	uint8_t iob_gun_r(offs_t offset);
 	uint16_t iob_analog_r(offs_t offset);
 	void c435_state_pio_w(uint16_t data);
@@ -1518,7 +1710,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
-	DECLARE_WRITE_LINE_MEMBER(sub_irq);
+	void sub_irq(int state);
 	uint8_t nthbyte(const uint32_t *pSource, int offs);
 	uint16_t nthword(const uint32_t *pSource, int offs);
 	inline int32_t u32_to_s24(uint32_t v);
@@ -1555,9 +1747,7 @@ private:
 	void gmen_sh2_map(address_map &map);
 	void gorgon_map(address_map &map);
 	void s23_map(address_map &map);
-	void s23h8iomap(address_map &map);
 	void s23h8rwmap(address_map &map);
-	void s23iobrdiomap(address_map &map);
 	void s23iobrdmap(address_map &map);
 	void motoxgo_exio_map(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
@@ -1574,7 +1764,7 @@ private:
 	required_shared_ptr<uint32_t> m_charram;
 	required_shared_ptr<uint32_t> m_textram;
 	optional_shared_ptr<uint32_t> m_czattr;
-	optional_device<cpu_device> m_gmen_sh2;
+	optional_device<sh7604_device> m_gmen_sh2;
 	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
@@ -1584,7 +1774,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_ioport_array<4> m_adc_ports;
 
 	c404_t m_c404;
 	c361_t m_c361;
@@ -1595,7 +1784,6 @@ private:
 
 	tilemap_t *m_bgtilemap;
 	uint8_t m_jvssense;
-	int32_t m_has_jvsio;
 	uint32_t m_main_irqcause;
 	bool m_ctl_vbl_active;
 	uint8_t m_ctl_led;
@@ -1627,9 +1815,9 @@ private:
 	uint16_t m_c435_buffer[256];
 	int m_c435_buffer_pos;
 
+	uint8_t m_sub_port8;
 	uint8_t m_sub_porta;
 	uint8_t m_sub_portb;
-	uint8_t m_tssio_port_4;
 	output_finder<8> m_lamps;
 };
 
@@ -1742,13 +1930,12 @@ void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param
 	//   line 2: 0 1 -(sy-b)/(sx/t) 0  0 -1 -(sy+b)/(sx/t) 0
 	//   line 3: 0 0 -1             c  0  0              0 sx/t
 
-	char buf[4096];
-	char *p = buf;
-	p += sprintf(p, "projection matrix line:");
+	std::ostringstream buf;
+	buf << "projection matrix line:";
 	for(int i=0; i<8; i++)
-		p += sprintf(p, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
-	p += sprintf(p, "\n");
-	logerror(buf);
+		util::stream_format(buf, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
+	buf << "\n";
+	logerror(std::move(buf).str());
 }
 
 void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
@@ -1757,13 +1944,12 @@ void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 	case 0x0001: c435_state_set_interrupt(param); break;
 	case 0x00c8: c435_state_set_projection_matrix_line(param); break;
 	default: {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(buf, "WARNING: Unhandled state type %04x :", type);
+		std::ostringstream buf;
+		util::stream_format(buf, "WARNING: Unhandled state type %04x :", type);
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
-			p += sprintf(p, " %04x", param[i]);
-		p += sprintf(p, "\n");
-		logerror(buf);
+			util::stream_format(buf, " %04x", param[i]);
+		buf << "\n";
+		logerror(std::move(buf).str());
 		break;
 	}
 	}
@@ -2004,13 +2190,12 @@ void namcos23_state::c435_pio_w(uint16_t data)
 	}
 
 	if(!known) {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(p, "c435 -");
+		std::ostringstream buf;
+		buf << "c435 -";
 		for(int i=0; i<m_c435_buffer_pos; i++)
-			p += sprintf(p, " %04x", m_c435_buffer[i]);
-		p += sprintf(p, "\n");
-		logerror(buf);
+			util::stream_format(buf, " %04x", m_c435_buffer[i]);
+		buf << "\n";
+		logerror(std::move(buf).str());
 	}
 
 	m_c435_buffer_pos = 0;
@@ -2494,10 +2679,11 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 	m_render.count[m_render.cur] = 0;
 }
 
-WRITE_LINE_MEMBER(namcos23_state::sub_irq)
+void namcos23_state::sub_irq(int state)
 {
-	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_IRQ1, state);
 	m_adc->adtrg_w(state);
+	m_sub_port8 = (m_sub_port8 & ~0x02) | (~state << 1 & 2); // IRQ1 pin
 	m_sub_portb = (m_sub_portb & 0x7f) | (state << 7);
 }
 
@@ -2888,7 +3074,7 @@ void namcos23_state::mcuen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	default:
 		// For some reason, the main program write the high 16bits of the
 		// 32 bits words of itself there...
-		//      logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
+		//logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
 		break;
 	}
 }
@@ -2897,7 +3083,6 @@ void namcos23_state::mcuen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 // C?? (unknown comms)
 
 // while getting the subcpu to be ready, panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
-// timecrs2 locks up in a similar way as panicprk, at the beginning of the 2nd level, by reading/writing to this register a couple of times
 uint16_t namcos23_state::sub_comm_r(offs_t offset)
 {
 	// status register
@@ -3038,13 +3223,6 @@ void namcos23_state::sharedram_sub_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
-	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
-	if(!m_has_jvsio) {
-		if((offset == 0x4052/2) && (data == 0x78)) {
-			data = 0;
-		}
-	}
-
 	COMBINE_DATA(&shared16[BYTE_XOR_BE(offset)]);
 }
 
@@ -3069,27 +3247,27 @@ void namcos23_state::sub_interrupt_main_w(offs_t offset, uint16_t data, uint16_t
 
 // Port 6
 
-uint16_t namcos23_state::mcu_p6_r()
+uint8_t namcos23_state::mcu_p6_r()
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
 	return (m_jvssense << 1) | 0xfd;
 }
 
-void namcos23_state::mcu_p6_w(uint16_t data)
+void namcos23_state::mcu_p6_w(uint8_t data)
 {
 	//printf("%02x to port 6\n", data);
 }
 
 
 
-// Port 8, looks like serial comms, where to/from?
+// Port 8
 
-uint16_t namcos23_state::mcu_p8_r()
+uint8_t namcos23_state::mcu_p8_r()
 {
-	return 0x02;
+	return m_sub_port8;
 }
 
-void namcos23_state::mcu_p8_w(uint16_t data)
+void namcos23_state::mcu_p8_w(uint8_t data)
 {
 	;
 }
@@ -3098,12 +3276,12 @@ void namcos23_state::mcu_p8_w(uint16_t data)
 
 // Port A
 
-uint16_t namcos23_state::mcu_pa_r()
+uint8_t namcos23_state::mcu_pa_r()
 {
 	return m_sub_porta;
 }
 
-void namcos23_state::mcu_pa_w(uint16_t data)
+void namcos23_state::mcu_pa_w(uint8_t data)
 {
 	m_rtc->ce_w(data & 1);
 	m_sub_porta = data;
@@ -3115,12 +3293,12 @@ void namcos23_state::mcu_pa_w(uint16_t data)
 
 // Port B
 
-uint16_t namcos23_state::mcu_pb_r()
+uint8_t namcos23_state::mcu_pb_r()
 {
 	return m_sub_portb;
 }
 
-void namcos23_state::mcu_pb_w(uint16_t data)
+void namcos23_state::mcu_pb_w(uint8_t data)
 {
 	m_sub_portb = (m_sub_portb & 0xc0) | (data & 0x3f);
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
@@ -3136,22 +3314,8 @@ void namcos23_state::s23h8rwmap(address_map &map)
 	map(0x300000, 0x300003).noprw(); // seems to be more inputs, maybe false leftover code from System 12?
 	map(0x300010, 0x300011).noprw();
 	map(0x300020, 0x300021).w(FUNC(namcos23_state::sub_interrupt_main_w));
-	map(0x300030, 0x300031).nopw();    // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
+	map(0x300030, 0x300031).nopw(); // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 }
-
-
-void namcos23_state::s23h8iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::mcu_p6_r), FUNC(namcos23_state::mcu_p6_w));
-	map(h8_device::PORT_8, h8_device::PORT_8).rw(FUNC(namcos23_state::mcu_p8_r), FUNC(namcos23_state::mcu_p8_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos23_state::mcu_pa_r), FUNC(namcos23_state::mcu_pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos23_state::mcu_pb_r), FUNC(namcos23_state::mcu_pb_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
-	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
-	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
-	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
-}
-
 
 
 
@@ -3164,15 +3328,13 @@ void namcos23_state::s23h8iomap(address_map &map)
 
 // Port 4
 
-uint16_t namcos23_state::iob_p4_r()
+uint8_t namcos23_state::iob_p4_r()
 {
-	return m_tssio_port_4;
+	return 0;
 }
 
-void namcos23_state::iob_p4_w(uint16_t data)
+void namcos23_state::iob_p4_w(uint8_t data)
 {
-	m_tssio_port_4 = data;
-
 	// bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 	m_jvssense = (data & 0x04) ? 0 : 1;
 }
@@ -3181,7 +3343,7 @@ void namcos23_state::iob_p4_w(uint16_t data)
 
 // Port 6
 
-uint16_t namcos23_state::iob_p6_r()
+uint8_t namcos23_state::iob_p6_r()
 {
 	// d4 is service button
 	uint8_t sb = (ioport("SERVICE")->read() & 1) << 4;
@@ -3190,17 +3352,9 @@ uint16_t namcos23_state::iob_p6_r()
 	return sb | 0;
 }
 
-void namcos23_state::iob_p6_w(uint16_t data)
+void namcos23_state::iob_p6_w(uint8_t data)
 {
 	//printf("iob %02x to port 6\n", data);
-}
-
-
-// Analog Ports
-
-uint16_t namcos23_state::iob_analog_r(offs_t offset)
-{
-	return m_adc_ports[offset].read_safe(0);
 }
 
 
@@ -3208,20 +3362,10 @@ void namcos23_state::s23iobrdmap(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("iocpu", 0);
 	map(0x6000, 0x6001).portr("IN01");
-	map(0x6002, 0x6003).portr("IN23");
+	map(0x6002, 0x6003).portr("IN23").nopw();
 	map(0x6004, 0x6005).nopw();
 	map(0x6006, 0x6007).noprw();
 	map(0xc000, 0xfb7f).ram();
-}
-
-void namcos23_state::s23iobrdiomap(address_map &map)
-{
-	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos23_state::iob_p4_r), FUNC(namcos23_state::iob_p4_w));
-	map(h8_device::PORT_5, h8_device::PORT_5).noprw();   // bit 2 = status LED to indicate transmitting packet to main
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::iob_p6_r), FUNC(namcos23_state::iob_p6_w));
-	map(h8_device::PORT_8, h8_device::PORT_8).noprw();   // unknown - used on ASCA-5 only
-	map(h8_device::PORT_9, h8_device::PORT_9).noprw();   // unknown - used on ASCA-5 only
-	map(h8_device::ADC_0, h8_device::ADC_3).r(FUNC(namcos23_state::iob_analog_r));
 }
 
 
@@ -3263,14 +3407,37 @@ void namcos23_state::timecrs2iobrdmap(address_map &map)
 }
 
 
-
-
-
 /***************************************************************************
 
   Inputs
 
 ***************************************************************************/
+
+static INPUT_PORTS_START( h8analog )
+	PORT_START("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC1")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC2")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC3")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // rear right sensor pot (rapidrvr)
+
+	PORT_START("ADC4")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // rear left sensor pot (rapidrvr)
+
+	PORT_START("ADC5")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // front right sensor pot (rapidrvr)
+
+	PORT_START("ADC6")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM ) // front left sensor pot (rapidrvr)
+
+	PORT_START("ADC7")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( rapidrvr )
 	PORT_START("P1")
@@ -3280,7 +3447,7 @@ static INPUT_PORTS_START( rapidrvr )
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN01")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
+	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Service Up")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Service Down")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Service Enter")
@@ -3316,7 +3483,17 @@ static INPUT_PORTS_START( rapidrvr )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" )
+	PORT_DIPNAME(0x80,  0x80, "Service Mode DIP" ) PORT_DIPLOCATION("DIP:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_INCLUDE( h8analog )
+
+	PORT_MODIFY("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Yaw")
+
+	PORT_MODIFY("ADC1")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Pitch")
 INPUT_PORTS_END
 
 
@@ -3341,7 +3518,6 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_BIT( 0x800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Dev Service B") // + I/O Air Dumper RL
 
 	PORT_MODIFY("IN01")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("User Service Up")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("User Service Down")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("User Service Enter")
@@ -3355,18 +3531,9 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_DIPNAME( 0x40, 0x40, "Dev Service Mode" )  PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" ) PORT_NAME("User Service Mode")
-
-#if 0 // need to hook these up properly
-	PORT_START("ADC.0")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0") // rear r
-	PORT_START("ADC.1")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1") // rear l
-	PORT_START("ADC.2")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2") // front r
-	PORT_START("ADC.3")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3") // front l
-#endif
+	PORT_DIPNAME(0x80,  0x80, "User Service Mode" ) PORT_DIPLOCATION("DIP:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3374,24 +3541,19 @@ static INPUT_PORTS_START( finfurl )
 	PORT_INCLUDE( rapidrvr )
 
 	PORT_MODIFY("IN01")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Whip Button L")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Whip Button R")
 
-#if 0 // need to hook these up properly
-	PORT_START("ADC.0")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0")
-	PORT_START("ADC.1")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1")
-	PORT_START("ADC.2")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2")
-	PORT_START("ADC.3")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3")
-#endif
+	PORT_MODIFY("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Swing")
+
+	PORT_MODIFY("ADC1")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Handle") PORT_REVERSE
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( s23 )
-	// No idea if start is actually there, but we need buttons to pass error screens
+	// Basically a testing grounds for inputs.
 	// You can go to the pcb test mode by pressing P1-A, and it doesn't crash anymore somehow
 	// Use P1-A to select, P1-Sel+P1-A to exit, up/down to navigate
 	PORT_START("P1")
@@ -3406,26 +3568,48 @@ static INPUT_PORTS_START( s23 )
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )   // 0x100 = freeze?
 
 	PORT_START("IN01")
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // gun trigger
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // foot pedal
-	PORT_BIT(0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )    // this is the "coin acceptor connected" signal
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON3)
+	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("User Service Up")
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("User Service Down")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("User Service Enter")
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_BUTTON4)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2)
 
 	PORT_START("IN23")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(3)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(3)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(3)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(3)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_START3)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(3)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(3)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(4)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(4)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(4)
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(4)
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1) // designated coin input for any ASCA pcb
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START4)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(4)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(4)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x01, 0x01, "Service Mode DIP" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3447,11 +3631,31 @@ static INPUT_PORTS_START( s23 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
 
+	PORT_INCLUDE( h8analog )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( timecrs2 )
 	PORT_INCLUDE( s23 )
+
+	PORT_MODIFY("IN01")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
+	PORT_CONFNAME( 0x0004, 0x0004, "Link ID" )
+	PORT_CONFSETTING(      0x0000, "Right/Blue" )
+	PORT_CONFSETTING(      0x0004, "Left/Red" )
+	PORT_BIT(0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this is the "coin acceptor connected" signal
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("User Service Down")
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("User Service Up")
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("User Enter")
+
+	PORT_MODIFY("IN23")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("LIGHTX") // tuned for CRT
 	PORT_BIT( 0xfff, 91+733/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(91, 91+733) PORT_SENSITIVITY(48) PORT_KEYDELTA(12)
@@ -3461,51 +3665,43 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( downhill )
-	PORT_START("P1")
-	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( s23 )
 
-	PORT_START("P2")
-	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("IN01")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Left Brake")
+	PORT_BIT(0xf0fc, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN01")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)      // brake left
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)       // start
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE // test switch
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     // select up
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   // select down
-	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON1) // enter
-	PORT_BIT(0xf00c, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_MODIFY("IN23")
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Right Brake")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0xf3ff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN23")
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON4)     // brake right
-	PORT_BIT(0xfbff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_MODIFY("ADC6")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering")
+INPUT_PORTS_END
 
-	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   // service coin
+static INPUT_PORTS_START( 500gp )
+	PORT_INCLUDE( s23 )
 
-	PORT_START("DSW")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Freeze?" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("IN01")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("View Button")
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Standard ) )
+	PORT_CONFSETTING(      0x0002, "Deluxe")
+	PORT_BIT(0xf0fc, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_MODIFY("IN23")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Speed Sensor")
+	PORT_BIT(0xf6ff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_MODIFY("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Throttle")
+
+	PORT_MODIFY("ADC1")
+	PORT_BIT( 0x2ff, 0x0180, IPT_PEDAL2 )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake")
+
+	PORT_MODIFY("ADC2")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Bank")
 INPUT_PORTS_END
 
 
@@ -3557,41 +3753,12 @@ void namcos23_state::init_s23()
 	m_jvssense = 1;
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
-	m_sub_portb = 0x50;
-	m_tssio_port_4 = 0;
+	m_sub_port8 = 0x02;
 	m_sub_porta = 0;
+	m_sub_portb = 0x50;
 	m_subcpu_running = false;
 	m_render.count[0] = m_render.count[1] = 0;
 	m_render.cur = 0;
-
-	if((!strcmp(machine().system().name, "motoxgo")) ||
-		(!strcmp(machine().system().name, "panicprk")) ||
-		(!strcmp(machine().system().name, "panicprkj")) ||
-		(!strcmp(machine().system().name, "panicprkj2")) ||
-		(!strcmp(machine().system().name, "rapidrvr")) ||
-		(!strcmp(machine().system().name, "rapidrvrv2c")) ||
-		(!strcmp(machine().system().name, "rapidrvrp")) ||
-		(!strcmp(machine().system().name, "finfurl")) ||
-		(!strcmp(machine().system().name, "gunwars")) ||
-		(!strcmp(machine().system().name, "gunwarsa")) ||
-		(!strcmp(machine().system().name, "downhill")) ||
-		(!strcmp(machine().system().name, "downhillu")) ||
-		(!strcmp(machine().system().name, "finfurl2")) ||
-		(!strcmp(machine().system().name, "finfurl2j")) ||
-		(!strcmp(machine().system().name, "raceon")) ||
-		(!strcmp(machine().system().name, "crszone")) ||
-		(!strcmp(machine().system().name, "crszonev4a")) ||
-		(!strcmp(machine().system().name, "crszonev3b")) ||
-		(!strcmp(machine().system().name, "crszonev3b2")) ||
-		(!strcmp(machine().system().name, "crszonev3a")) ||
-		(!strcmp(machine().system().name, "crszonev2a")) ||
-		(!strcmp(machine().system().name, "timecrs2v2b")) ||
-		(!strcmp(machine().system().name, "timecrs2v1b")) ||
-		(!strcmp(machine().system().name, "timecrs2"))) {
-		m_has_jvsio = 1;
-	} else {
-		m_has_jvsio = 0;
-	}
 }
 
 
@@ -3626,30 +3793,54 @@ void namcos23_state::gorgon(machine_config &config)
 
 	H83002(config, m_subcpu, H8CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
+	m_subcpu->read_adc<0>().set_constant(0);
+	m_subcpu->read_adc<1>().set_constant(0);
+	m_subcpu->read_adc<2>().set_constant(0);
+	m_subcpu->read_adc<3>().set_constant(0);
+	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
+	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port7().set_constant(0);
+	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
+	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
+	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));
+	m_subcpu->write_porta().set(FUNC(namcos23_state::mcu_pa_w));
+	m_subcpu->read_portb().set(FUNC(namcos23_state::mcu_pb_r));
+	m_subcpu->write_portb().set(FUNC(namcos23_state::mcu_pb_w));
 
 	// Timer at 115200*16 for the jvs serial clock
-	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
+	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
 	H83334(config, m_iocpu, JVSCLOCK);
 	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
+	m_iocpu->read_adc<0>().set_ioport("ADC0");
+	m_iocpu->read_adc<1>().set_ioport("ADC1");
+	m_iocpu->read_adc<2>().set_ioport("ADC2");
+	m_iocpu->read_adc<3>().set_ioport("ADC3");
+	m_iocpu->read_adc<4>().set_ioport("ADC4");
+	m_iocpu->read_adc<5>().set_ioport("ADC5");
+	m_iocpu->read_adc<6>().set_ioport("ADC6");
+	m_iocpu->read_adc<7>().set_ioport("ADC7");
+	m_iocpu->read_port4().set(FUNC(namcos23_state::iob_p4_r));
+	m_iocpu->write_port4().set(FUNC(namcos23_state::iob_p4_w));
+	m_iocpu->write_port5().set_nop();   // bit 2 = status LED to indicate transmitting packet to main
+	m_iocpu->read_port6().set(FUNC(namcos23_state::iob_p6_r));
+	m_iocpu->write_port6().set(FUNC(namcos23_state::iob_p6_w));
+	m_iocpu->write_port8().set_nop();   // unknown - used on ASCA-5 only
+	m_iocpu->write_port9().set_nop();   // unknown - used on ASCA-5 only
 
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_iocpu->write_sci_tx<0>().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
+	m_subcpu->write_sci_tx<0>().set(m_iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
-	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
+	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
 
-	// FIXME: need better syntax for configuring H8 onboard devices
-	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
-	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
-	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
-	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
+	m_subcpu->write_sci_tx<1>().set(m_settings, FUNC(namco_settings_device::data_w));
+	m_subcpu->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	m_subcpu->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3677,11 +3868,10 @@ void namcos23_state::gorgon(machine_config &config)
 	c352.add_route(3, "rspeaker", 1.00);
 }
 
-
 void namcos23_state::s23(machine_config &config)
 {
 	/* basic machine hardware */
-	R4650BE(config, m_maincpu, BUSCLOCK*4);
+	R4650BE(config, m_maincpu, BUSCLOCK*5);
 	m_maincpu->set_icache_size(8192);   // VERIFIED
 	m_maincpu->set_dcache_size(8192);   // VERIFIED
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23_map);
@@ -3689,30 +3879,54 @@ void namcos23_state::s23(machine_config &config)
 
 	H83002(config, m_subcpu, H8CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
+	m_subcpu->read_adc<0>().set_constant(0);
+	m_subcpu->read_adc<1>().set_constant(0);
+	m_subcpu->read_adc<2>().set_constant(0);
+	m_subcpu->read_adc<3>().set_constant(0);
+	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
+	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
+	m_subcpu->read_port7().set_constant(0);
+	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
+	m_subcpu->write_port8().set(FUNC(namcos23_state::mcu_p8_w));
+	m_subcpu->read_porta().set(FUNC(namcos23_state::mcu_pa_r));
+	m_subcpu->write_porta().set(FUNC(namcos23_state::mcu_pa_w));
+	m_subcpu->read_portb().set(FUNC(namcos23_state::mcu_pb_r));
+	m_subcpu->write_portb().set(FUNC(namcos23_state::mcu_pb_w));
 
 	// Timer at 115200*16 for the jvs serial clock
-	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
+	m_subcpu->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
 	H83334(config, m_iocpu, JVSCLOCK);
 	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
+	m_iocpu->read_adc<0>().set_ioport("ADC0");
+	m_iocpu->read_adc<1>().set_ioport("ADC1");
+	m_iocpu->read_adc<2>().set_ioport("ADC2");
+	m_iocpu->read_adc<3>().set_ioport("ADC3");
+	m_iocpu->read_adc<4>().set_ioport("ADC4");
+	m_iocpu->read_adc<5>().set_ioport("ADC5");
+	m_iocpu->read_adc<6>().set_ioport("ADC6");
+	m_iocpu->read_adc<7>().set_ioport("ADC7");
+	m_iocpu->read_port4().set(FUNC(namcos23_state::iob_p4_r));
+	m_iocpu->write_port4().set(FUNC(namcos23_state::iob_p4_w));
+	m_iocpu->write_port5().set_nop();   // bit 2 = status LED to indicate transmitting packet to main
+	m_iocpu->read_port6().set(FUNC(namcos23_state::iob_p6_r));
+	m_iocpu->write_port6().set(FUNC(namcos23_state::iob_p6_w));
+	m_iocpu->write_port8().set_nop();   // unknown - used on ASCA-5 only
+	m_iocpu->write_port9().set_nop();   // unknown - used on ASCA-5 only
 
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_iocpu->write_sci_tx<0>().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
+	m_subcpu->write_sci_tx<0>().set(m_iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
-	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
+	m_rtc->data_cb().set(m_subcpu, FUNC(h8_device::sci_rx_w<1>));
 
-	// FIXME: need better syntax for configuring H8 onboard devices
-	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
-	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
-	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
-	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
+	m_subcpu->write_sci_tx<1>().set(m_settings, FUNC(namco_settings_device::data_w));
+	m_subcpu->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	m_subcpu->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3756,85 +3970,30 @@ void namcos23_state::timecrs2(machine_config &config)
 	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
 }
 
-void namcos23_state::gmen(machine_config &config)
+void namcos23_state::ss23(machine_config &config)
 {
 	s23(config);
+}
+
+void namcos23_state::gmen(machine_config &config)
+{
+	ss23(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(BUSCLOCK*5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_mips_map);
 
-	SH2(config, m_gmen_sh2, XTAL(28'700'000));
+	SH7604(config, m_gmen_sh2, XTAL(28'700'000));
 	m_gmen_sh2->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_sh2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
 }
 
-void namcos23_state::ss23(machine_config &config)
-{
-	/* basic machine hardware */
-	R4650BE(config, m_maincpu, BUSCLOCK*5);
-	m_maincpu->set_icache_size(8192);   // VERIFIED
-	m_maincpu->set_dcache_size(8192);   // VERIFIED
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23_map);
-	m_maincpu->set_vblank_int("screen", FUNC(namcos23_state::interrupt));
-
-	H83002(config, m_subcpu, H8CLOCK);
-	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
-
-	// Timer at 115200*16 for the jvs serial clock
-	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
-
-	config.set_maximum_quantum(attotime::from_hz(2*115200));
-
-	NAMCO_SETTINGS(config, m_settings, 0);
-
-	RTC4543(config, m_rtc, XTAL(32'768));
-	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
-
-	// FIXME: need better syntax for configuring H8 onboard devices
-	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
-	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
-	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
-	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(VSYNC1);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not in any way accurate
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 639, 0, 479);
-	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
-
-	PALETTE(config, m_palette).set_entries(0x8000);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	c352_device &c352(C352(config, "c352", C352CLOCK, C352DIV));
-	c352.add_route(0, "rspeaker", 1.00);
-	c352.add_route(1, "lspeaker", 1.00);
-	c352.add_route(2, "rspeaker", 1.00);
-	c352.add_route(3, "lspeaker", 1.00);
-}
-
 void namcos23_state::timecrs2v4a(machine_config &config)
 {
 	ss23(config);
-	/* basic machine hardware */
-	H83334(config, m_iocpu, JVSCLOCK);
-	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
 
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	/* basic machine hardware */
+	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
 }
 
 void namcos23_state::ss23e2(machine_config &config)
@@ -3843,13 +4002,6 @@ void namcos23_state::ss23e2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(BUSCLOCK*6);
-
-	H83334(config, m_iocpu, JVSCLOCK);
-	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
-
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 }
 
 // a note about "user1" ROMs:
@@ -4048,7 +4200,7 @@ ROM_START( finfurl )
 	ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
-	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
+	ROM_LOAD( "asc1_io-a.ic13", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )  /* data */
 	ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000000, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
@@ -4239,7 +4391,7 @@ ROM_END
 ROM_START( motoxgov1a )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "mg1vera.ic2",  0x000000, 0x200000, CRC(5ba13d9e) SHA1(7f6484df644772f2478155c05844532f8abbd196) )
-	ROM_LOAD16_BYTE( "mg1vera.ic1",  0x000001, 0x200000, CRC(6b2bda52) SHA1(922ea739c8a62c7147126bf20ed3ffe8faec8842) )
+	ROM_LOAD16_BYTE( "mg1vera.ic1",  0x000001, 0x200000, CRC(193b463e) SHA1(f62eed49f7f8bf01b8b4deb1578ddee1d4a54ca3) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
@@ -4555,8 +4707,14 @@ ROM_START( aking )
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "ag1vera.ic3",   0x000000, 0x080000, CRC(266ac71c) SHA1(648a64adc0e4a2cefd71c31a6a71359b6c196430) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board MB90F574 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
+	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
+
+	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
+
+	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "ag1mtah.2j",  0x0000000, 0x800000, CRC(f2d8ca9d) SHA1(8158d13d74f2aae7c0d1238619ce1ad3a17d8047) )
@@ -4601,8 +4759,14 @@ ROM_START( 500gp )
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "5gp3verc.3",   0x000000, 0x080000, CRC(b323abdf) SHA1(8962e39b48a7074a2d492afb5db3f5f3e5ae2389) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board MB90F574 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
+	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
+
+	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
+
+	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
@@ -5429,39 +5593,41 @@ ROM_START( crszonev2a )
 	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
 ROM_END
 
+} // anonymous namespace
+
 
 /* Games */
-#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-//    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     CLASS,          INIT,     MNTR, COMPANY, FULLNAME,                      FLAGS
-GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
-GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
-GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, init_s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
-GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (World, DH2 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, downhillu,   downhill, s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgo,     0,        motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a2, motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS)
+//    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     CLASS,          INIT,     MNTR, COMPANY, FULLNAME,                                   FLAGS
+GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",             GAME_FLAGS ) // 97/11/27, USA
+GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",          GAME_FLAGS ) // 97/11/27, Europe
+GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, init_s23, ROT0, "Namco", "Rapid River (prototype)",                  GAME_FLAGS ) // 97/11/10, USA
+GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (World, DH2 Ver. A)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, downhillu,   downhill, s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgo,     0,        motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",           GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a2, motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov1a,  motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov1a2, motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",            GAME_FLAGS )
-GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 1)",     GAME_FLAGS )
-GAME( 1997, panicprkj2,  panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 2)",     GAME_FLAGS )
-GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",             GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
-GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver.A)", GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
-GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",   GAME_FLAGS )
-GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
-GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )
-GAME( 1999, crszonev3b2, crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 2)", GAME_FLAGS )
-GAME( 1999, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. A)",   GAME_FLAGS )
-GAME( 1999, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",          GAME_FLAGS )
+GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 1)",   GAME_FLAGS )
+GAME( 1997, panicprkj2,  panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 2)",   GAME_FLAGS )
+GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",          GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",          GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",             GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, 500gp,       0,        ss23,        500gp,     namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",                 GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",          GAME_FLAGS )
+GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",                  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
+GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver.A)",      GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
+GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",        GAME_FLAGS )
+GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",        GAME_FLAGS )
+GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)",    GAME_FLAGS )
+GAME( 1999, crszonev3b2, crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 2)",    GAME_FLAGS )
+GAME( 1999, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. A)",           GAME_FLAGS )
+GAME( 1999, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO2 Ver. A)",        GAME_FLAGS )

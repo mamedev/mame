@@ -60,7 +60,7 @@
 #include "namco53.h"
 
 
-WRITE_LINE_MEMBER( namco_53xx_device::reset )
+void namco_53xx_device::reset(int state)
 {
 	// The incoming signal is active low
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
@@ -105,7 +105,7 @@ void namco_53xx_device::P_w(uint8_t data)
 	m_p(0, data);
 }
 
-WRITE_LINE_MEMBER(namco_53xx_device::chip_select)
+void namco_53xx_device::chip_select(int state)
 {
 	m_cpu->set_input_line(0, state);
 }
@@ -131,8 +131,8 @@ namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *
 	device_t(mconfig, NAMCO_53XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_portO(0),
-	m_k(*this),
-	m_in(*this),
+	m_k(*this, 0),
+	m_in(*this, 0),
 	m_p(*this)
 {
 }
@@ -142,11 +142,6 @@ namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *
 
 void namco_53xx_device::device_start()
 {
-	/* resolve our read/write callbacks */
-	m_k.resolve_safe(0);
-	m_in.resolve_all_safe(0);
-	m_p.resolve_safe();
-
 	save_item(NAME(m_portO));
 }
 

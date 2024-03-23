@@ -67,7 +67,7 @@ if __name__ == '__main__':
     for argno in range(1, len(sys.argv)):
         files_sorted.append(sys.argv[argno])
     files_sorted.sort();
-    print("// license:CC0")
+    print("// license:CC0-1.0")
     print("// copyright-holders:Couriersud")
     print("")
     now = datetime.datetime.now()

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_TWIN16_H
-#define MAME_INCLUDES_TWIN16_H
+#ifndef MAME_KONAMI_TWIN16_H
+#define MAME_KONAMI_TWIN16_H
 
 #pragma once
 
@@ -41,7 +41,7 @@ public:
 	void init_twin16();
 
 	void volume_callback(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
+	void screen_vblank_twin16(int state);
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -106,7 +106,7 @@ protected:
 
 	int set_sprite_timer();
 	void spriteram_process();
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int spriteram_process_enable();
 	void twin16_postload();
 };
@@ -152,4 +152,4 @@ private:
 	uint16_t m_nvram[0x400 * 0x20 / 2]{};
 };
 
-#endif // MAME_INCLUDES_TWIN16_H
+#endif // MAME_KONAMI_TWIN16_H

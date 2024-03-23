@@ -8,6 +8,9 @@
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 
+
+namespace {
+
 class vanguardmk1_state : public driver_device
 {
 public:
@@ -41,6 +44,8 @@ ROM_START(vngrdmk1)
 	ROM_REGION(0x800, "mcu:eeprom", 0)
 	ROM_LOAD( "van24_aug04", 0x000, 0x800, CRC(ce63fcb9) SHA1(8f688e866e8fea888c77aa5be92ad09f684afd59) )
 ROM_END
+
+} // anonymous namespace
 
 
 SYST( 2004?, vngrdmk1, 0, 0, vanguardmk1, vanguardmk1, vanguardmk1_state, empty_init, "EOD Performance Inc.", "Vanguard MK1", MACHINE_IS_SKELETON_MECHANICAL )

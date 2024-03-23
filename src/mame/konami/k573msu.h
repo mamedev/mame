@@ -4,8 +4,8 @@
  * Konami 573 Multi Session Unit
  *
  */
-#ifndef MAME_MACHINE_K573MSU_H
-#define MAME_MACHINE_K573MSU_H
+#ifndef MAME_KONAMI_K573MSU_H
+#define MAME_KONAMI_K573MSU_H
 
 #pragma once
 
@@ -24,4 +24,4 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-#endif // MAME_MACHINE_K573MSU_H
+#endif // MAME_KONAMI_K573MSU_H

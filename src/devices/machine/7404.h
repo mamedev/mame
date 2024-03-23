@@ -69,19 +69,19 @@ public:
 	template <std::size_t Bit> auto y_cb() { return m_y_func[Bit].bind(); }
 
 	// public interfaces
-	DECLARE_WRITE_LINE_MEMBER( a1_w );
-	DECLARE_WRITE_LINE_MEMBER( a2_w );
-	DECLARE_WRITE_LINE_MEMBER( a3_w );
-	DECLARE_WRITE_LINE_MEMBER( a4_w );
-	DECLARE_WRITE_LINE_MEMBER( a5_w );
-	DECLARE_WRITE_LINE_MEMBER( a6_w );
+	void a1_w(int state);
+	void a2_w(int state);
+	void a3_w(int state);
+	void a4_w(int state);
+	void a5_w(int state);
+	void a6_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( y1_r );
-	DECLARE_READ_LINE_MEMBER( y2_r );
-	DECLARE_READ_LINE_MEMBER( y3_r );
-	DECLARE_READ_LINE_MEMBER( y4_r );
-	DECLARE_READ_LINE_MEMBER( y5_r );
-	DECLARE_READ_LINE_MEMBER( y6_r );
+	int y1_r();
+	int y2_r();
+	int y3_r();
+	int y4_r();
+	int y5_r();
+	int y6_r();
 
 protected:
 	void a_w(uint8_t line, uint8_t state);

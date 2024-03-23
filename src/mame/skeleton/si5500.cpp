@@ -15,6 +15,9 @@
 #include "machine/tms9914.h"
 #include "machine/x2201.h"
 
+
+namespace {
+
 class si5500_state : public driver_device
 {
 public:
@@ -36,11 +39,11 @@ protected:
 
 private:
 	void mainic_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(gpib_int_w);
-	DECLARE_WRITE_LINE_MEMBER(acc_int_w);
+	void gpib_int_w(int state);
+	void acc_int_w(int state);
 	u8 gpibpsi_input_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(gpibc_we_w);
-	DECLARE_WRITE_LINE_MEMBER(gpibc_dbin_w);
+	void gpibc_we_w(int state);
+	void gpibc_dbin_w(int state);
 	u8 keypad_r(offs_t offset);
 
 	void mem_map(address_map &map);
@@ -70,12 +73,12 @@ void si5500_state::mainic_w(offs_t offset, u8 data)
 		m_maincpu->set_input_line(INT_9980A_CLEAR, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(si5500_state::gpib_int_w)
+void si5500_state::gpib_int_w(int state)
 {
 	m_mainpsi->set_int_line(4, state);
 }
 
-WRITE_LINE_MEMBER(si5500_state::acc_int_w)
+void si5500_state::acc_int_w(int state)
 {
 	m_mainpsi->set_int_line(5, state);
 }
@@ -99,7 +102,7 @@ u8 si5500_state::gpibpsi_input_r(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
+void si5500_state::gpibc_we_w(int state)
 {
 	if (!state)
 	{
@@ -108,7 +111,7 @@ WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
 	}
 }
 
-WRITE_LINE_MEMBER(si5500_state::gpibc_dbin_w)
+void si5500_state::gpibc_dbin_w(int state)
 {
 	if (state)
 	{
@@ -228,5 +231,8 @@ ROM_START(si5500)
 	ROM_LOAD("m5500dl_7-9-86.u5", 0x1000, 0x1000, CRC(a932e85a) SHA1(f7152ae78bad79b457bb739e7ecc4556ca33cbbc))
 	ROM_LOAD("m5500dl_7-9-86.u6", 0x2000, 0x1000, CRC(3161347d) SHA1(fab6c228a21ef3ecce255079a48ef1697f2c7ccb))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1986, si5500, 0, 0, si5500, si5500, si5500_state, empty_init, "Scientific Instruments", "Model 5500 Temperature Controller", MACHINE_IS_SKELETON)

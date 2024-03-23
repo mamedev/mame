@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_DIGDUG_H
-#define MAME_INCLUDES_DIGDUG_H
+#ifndef MAME_NAMCO_DIGDUG_H
+#define MAME_NAMCO_DIGDUG_H
 
 #pragma once
 
@@ -45,8 +45,8 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void digdug_videoram_w(offs_t offset, uint8_t data);
 	void bg_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tx_color_mode_w);
-	DECLARE_WRITE_LINE_MEMBER(bg_disable_w);
+	void tx_color_mode_w(int state);
+	void bg_disable_w(int state);
 
 	uint8_t earom_read();
 	void earom_write(offs_t offset, uint8_t data);
@@ -55,4 +55,4 @@ private:
 	void digdug_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DIGDUG_H
+#endif // MAME_NAMCO_DIGDUG_H

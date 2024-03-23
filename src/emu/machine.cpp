@@ -20,6 +20,7 @@
 #include "fileio.h"
 #include "http.h"
 #include "image.h"
+#include "main.h"
 #include "natkeyboard.h"
 #include "network.h"
 #include "render.h"
@@ -59,29 +60,28 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: m_side_effects_disabled(0),
-		debug_flags(0),
-		m_config(_config),
-		m_system(_config.gamedrv()),
-		m_manager(manager),
-		m_current_phase(machine_phase::PREINIT),
-		m_paused(false),
-		m_hard_reset_pending(false),
-		m_exit_pending(false),
-		m_soft_reset_timer(nullptr),
-		m_rand_seed(0x9d14abd7),
-		m_ui_active(_config.options().ui_active()),
-		m_basename(_config.gamedrv().name),
-		m_sample_rate(_config.options().sample_rate()),
-		m_saveload_schedule(saveload_schedule::NONE),
-		m_saveload_schedule_time(attotime::zero),
-		m_saveload_searchpath(nullptr),
+	: m_side_effects_disabled(0)
+	, debug_flags(0)
+	, m_config(_config)
+	, m_system(_config.gamedrv())
+	, m_manager(manager)
+	, m_current_phase(machine_phase::PREINIT)
+	, m_paused(false)
+	, m_hard_reset_pending(false)
+	, m_exit_pending(false)
+	, m_soft_reset_timer(nullptr)
+	, m_rand_seed(0x9d14abd7)
+	, m_basename(_config.gamedrv().name)
+	, m_sample_rate(_config.options().sample_rate())
+	, m_saveload_schedule(saveload_schedule::NONE)
+	, m_saveload_schedule_time(attotime::zero)
+	, m_saveload_searchpath(nullptr)
 
-		m_save(*this),
-		m_memory(*this),
-		m_ioport(*this),
-		m_parameters(*this),
-		m_scheduler(*this)
+	, m_save(*this)
+	, m_memory(*this)
+	, m_ioport(*this)
+	, m_parameters(*this)
+	, m_scheduler(*this)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
@@ -124,7 +124,10 @@ std::string running_machine::describe_context() const
 		}
 	}
 
-	return std::string("(no context)");
+	if (m_current_phase == machine_phase::RESET)
+		return std::string("(reset phase)");
+	else
+		return std::string("(no context)");
 }
 
 
@@ -147,12 +150,13 @@ void running_machine::start()
 	// initialize UI input
 	m_ui_input = std::make_unique<ui_input_manager>(*this);
 
-	// init the osd layer
+	// init the OSD layer
 	m_manager.osd().init(*this);
 
-	// create the video manager
+	// create the video manager and UI manager
 	m_video = std::make_unique<video_manager>(*this);
 	m_ui = manager().create_ui(*this);
+	m_ui->set_startup_text("Initializing...", true);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -322,7 +326,7 @@ int running_machine::run(bool quiet)
 		// run the CPUs until a reset or exit
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
-			g_profiler.start(PROFILER_EXTRA);
+			auto profile = g_profiler.start(PROFILER_EXTRA);
 
 			// execute CPUs if not paused
 			if (!m_paused)
@@ -334,8 +338,6 @@ int running_machine::run(bool quiet)
 			// handle save/load
 			if (m_saveload_schedule != saveload_schedule::NONE)
 				handle_saveload();
-
-			g_profiler.stop();
 		}
 		m_manager.http()->clear();
 
@@ -348,29 +350,29 @@ int running_machine::run(bool quiet)
 			nvram_save();
 		m_configuration->save_settings();
 	}
-	catch (emu_fatalerror &fatal)
+	catch (emu_fatalerror const &fatal)
 	{
 		osd_printf_error("Fatal error: %s\n", fatal.what());
 		error = EMU_ERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
 	}
-	catch (emu_exception &)
+	catch (emu_exception const &)
 	{
 		osd_printf_error("Caught unhandled emulator exception\n");
 		error = EMU_ERR_FATALERROR;
 	}
-	catch (binding_type_exception &btex)
+	catch (binding_type_exception const &btex)
 	{
 		osd_printf_error("Error performing a late bind of function expecting type %s to instance of type %s\n", btex.target_type().name(), btex.actual_type().name());
 		error = EMU_ERR_FATALERROR;
 	}
-	catch (tag_add_exception &aex)
+	catch (tag_add_exception const &aex)
 	{
 		osd_printf_error("Tag '%s' already exists in tagged map\n", aex.tag());
 		error = EMU_ERR_FATALERROR;
 	}
-	catch (std::exception &ex)
+	catch (std::exception const &ex)
 	{
 		osd_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
 		error = EMU_ERR_FATALERROR;
@@ -861,6 +863,7 @@ void running_machine::handle_saveload()
 	if (!m_saveload_pending_file.empty())
 	{
 		const char *const opname = (m_saveload_schedule == saveload_schedule::LOAD) ? "load" : "save";
+		const char *const preposname = (m_saveload_schedule == saveload_schedule::LOAD) ? "from" : "to";
 
 		// if there are anonymous timers, we can't save just yet, and we can't load yet either
 		// because the timers might overwrite data we have loaded
@@ -868,7 +871,7 @@ void running_machine::handle_saveload()
 		{
 			// if more than a second has passed, we're probably screwed
 			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
-				popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
+				popmessage("Error: Unable to %s state %s %s due to pending anonymous timers. See error.log for details.", opname, preposname, m_saveload_pending_file);
 			else
 				return; // return without cancelling the operation
 		}
@@ -881,39 +884,36 @@ void running_machine::handle_saveload()
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (!filerr)
 			{
-				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
-
 				// read/write the save state
 				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
 				// handle the result
 				switch (saverr)
 				{
-				case STATERR_ILLEGAL_REGISTRATIONS:
-					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-					break;
-
 				case STATERR_INVALID_HEADER:
-					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
+					popmessage("Error: Unable to %s state %s %s due to an invalid header. Make sure the save state is correct for this system.", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_READ_ERROR:
-					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+					popmessage("Error: Unable to %s state %s %s due to a read error (file is likely corrupt).", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_WRITE_ERROR:
-					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+					popmessage("Error: Unable to %s state %s %s due to a write error. Verify there is enough disk space.", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_NONE:
+				{
+					const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "Loaded" : "Saved";
 					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
+						popmessage("%s state %s %s.\nWarning: Save states are not officially supported for this system.", opnamed, preposname, m_saveload_pending_file);
 					else
-						popmessage("State successfully %s.", opnamed);
+						popmessage("%s state %s %s.", opnamed, preposname, m_saveload_pending_file);
 					break;
+				}
 
 				default:
-					popmessage("Error: Unknown error during state %s.", opnamed);
+					popmessage("Error: Unknown error during %s state %s %s.", opname, preposname, m_saveload_pending_file);
 					break;
 				}
 
@@ -924,11 +924,11 @@ void running_machine::handle_saveload()
 			else if ((openflags == OPEN_FLAG_READ) && (std::errc::no_such_file_or_directory == filerr))
 			{
 				// attempt to load a non-existent savestate, report empty slot
-				popmessage("Error: No savestate file to load.", opname);
+				popmessage("Error: Load state file %s not found.", m_saveload_pending_file);
 			}
 			else
 			{
-				popmessage("Error: Failed to open file for %s operation.", opname);
+				popmessage("Error: Failed to open %s for %s state operation.", m_saveload_pending_file, opname);
 			}
 		}
 	}
@@ -1133,7 +1133,7 @@ void running_machine::nvram_load()
 	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (nvram.nvram_can_save() && !file.open(nvram_filename(nvram.device())))
+		if (nvram.nvram_backup_enabled() && !file.open(nvram_filename(nvram.device())))
 		{
 			if (!nvram.nvram_load(file))
 				osd_printf_error("Error reading NVRAM file %s\n", file.filename());
@@ -1158,8 +1158,17 @@ void running_machine::nvram_save()
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (!file.open(nvram_filename(nvram.device())))
 			{
+				bool error = false;
+
 				if (!nvram.nvram_save(file))
+				{
+					error = true;
 					osd_printf_error("Error writing NVRAM file %s\n", file.filename());
+				}
+
+				// close and perhaps delete the file
+				if (error || file.size() == 0)
+					file.remove_on_close();
 				file.close();
 			}
 		}
@@ -1176,7 +1185,7 @@ void running_machine::popup_clear() const
 	ui().popup_time(0, " ");
 }
 
-void running_machine::popup_message(util::format_argument_pack<std::ostream> const &args) const
+void running_machine::popup_message(util::format_argument_pack<char> const &args) const
 {
 	std::string const temp(string_format(args));
 	ui().popup_time(temp.length() / 40 + 2, "%s", temp);
@@ -1298,7 +1307,7 @@ void running_machine::emscripten_main_loop()
 {
 	running_machine *machine = emscripten_running_machine;
 
-	g_profiler.start(PROFILER_EXTRA);
+	auto profile = g_profiler.start(PROFILER_EXTRA);
 
 	// execute CPUs if not paused
 	if (!machine->m_paused)
@@ -1331,8 +1340,6 @@ void running_machine::emscripten_main_loop()
 	{
 		emscripten_cancel_main_loop();
 	}
-
-	g_profiler.stop();
 }
 
 void running_machine::emscripten_set_running_machine(running_machine *machine)

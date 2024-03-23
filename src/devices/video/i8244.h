@@ -129,7 +129,7 @@ protected:
 	void draw_grid(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void major_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// callbacks
 	devcb_write_line m_irq_func;
@@ -159,17 +159,17 @@ protected:
 	u8 m_collision_map[0x200];
 	u8 m_priority_map[0x200];
 
-	u8 m_x_beam_pos = 0;
-	u8 m_y_beam_pos = 0;
-	u8 m_control_status = 0;
-	u8 m_collision_status = 0;
+	u8 m_x_beam_pos;
+	u8 m_y_beam_pos;
+	u8 m_control_status;
+	u8 m_collision_status;
 
-	bool m_sh_written = false;
-	bool m_sh_pending = false;
-	u8 m_sh_prescaler = 0;
-	u8 m_sh_count = 0;
-	int m_sh_output = 0;
-	u8 m_sh_duty = 0;
+	bool m_sh_written;
+	bool m_sh_pending;
+	u8 m_sh_prescaler;
+	u8 m_sh_count;
+	int m_sh_output;
+	u8 m_sh_duty;
 };
 
 

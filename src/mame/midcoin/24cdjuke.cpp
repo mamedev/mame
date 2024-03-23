@@ -11,7 +11,8 @@ QTY     Type            clock   position        function
 3x      P8255A-5                ic11,ic25,ic31  Programmable Peripheral Interface
 1x      MM5450N                 ic29            LED Display Driver - main
 2x      LM358                   ic64,ic65       Dual Operational Amplifier - sound
-1x      oscillator      6.0MHz  Q1
+1x      oscillator      6.0MHz  Q1              Near MCU
+1x      oscillator      ?MHz    Q2              Near Z80 (ceramic resonator)
 
 ROMs
 QTY     Type                    position        status
@@ -43,7 +44,7 @@ QTY     Type
 1x      red LED (5V)
 1x      red LED (5V)
 1x      red LED (5V)
-1x      16 digits LED display (on solder side), each digit is made by 18 segments
+1x      16 digits VFD (on solder side), each digit is made by 18 segments
 Notes
 
 This is the PCB for one of the first ever CD based Juke Box, made in 1988 by Midcoin, some info here:
@@ -56,6 +57,9 @@ http://www.tilt.it/deb/i-midcoin.html
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "24cdjuke.lh"
+
+
+namespace {
 
 class midcoin24cdjuke_state : public driver_device
 {
@@ -305,7 +309,7 @@ void midcoin24cdjuke_state::midcoin24cdjuke(machine_config &config)
 	ic25.out_pc_callback().set(FUNC(midcoin24cdjuke_state::kb_col_w));
 
 	i8255_device &ic31(I8255A(config, "ic31", 0));
-	ic31.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ic31.out_pb_callback().set([this](uint8_t data) { logerror("%s ic31 write port B: %02X\n", machine().describe_context(), data); });
 	ic31.in_pc_callback().set_ioport("MD4");
 }
 
@@ -323,6 +327,8 @@ ROM_START( 24cdjuke )
 	ROM_LOAD( "m1-7611a-5.ic27", 0x000, 0x100, CRC(29b068e8) SHA1(477e2445c58b7d14c56a3ad4050eb22474d56005) )
 	ROM_LOAD( "m1-7611a-5.ic28", 0x000, 0x100, CRC(29b068e8) SHA1(477e2445c58b7d14c56a3ad4050eb22474d56005) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1988, 24cdjuke, 0, midcoin24cdjuke, midcoin24cdjuke, midcoin24cdjuke_state, empty_init, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text

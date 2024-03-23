@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#ifndef MAME_MACHINE_M1COMM_H
-#define MAME_MACHINE_M1COMM_H
+#ifndef MAME_SEGA_M1COMM_H
+#define MAME_SEGA_M1COMM_H
 
 #pragma once
 
@@ -60,10 +60,10 @@ private:
 	required_device<mb89374_device> m_dlc;
 
 	// MB89374 handler
-	DECLARE_WRITE_LINE_MEMBER(dlc_int7_w);
+	void dlc_int7_w(int state);
 
 	// MB89237A handler
-	DECLARE_WRITE_LINE_MEMBER(dma_hreq_w);
+	void dma_hreq_w(int state);
 	uint8_t dma_mem_r(offs_t offset);
 	void dma_mem_w(offs_t offset, uint8_t data);
 
@@ -109,4 +109,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(M1COMM, m1comm_device)
 
-#endif  // MAME_MACHINE_M1COMM_H
+#endif  // MAME_SEGA_M1COMM_H

@@ -6,8 +6,8 @@
     (32-bit blitter variant)
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_ITECH32_H
-#define MAME_INCLUDES_ITECH32_H
+#ifndef MAME_ITECH_ITECH32_H
+#define MAME_ITECH_ITECH32_H
 
 #pragma once
 
@@ -79,7 +79,7 @@ public:
 	void init_gt3dl();
 	void init_pubball();
 
-	DECLARE_READ_LINE_MEMBER(special_port_r);
+	int special_port_r();
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -184,7 +184,7 @@ protected:
 	void init_gt_common();
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(generate_int1);
+	void generate_int1(int state);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	inline offs_t compute_safe_address(int x, int y);
 	inline void disable_clipping();
@@ -227,9 +227,8 @@ public:
 
 	void drivedge(machine_config &config);
 
-	virtual void driver_init() override;
-
 protected:
+	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -248,7 +247,7 @@ protected:
 	void zbuf_control_w(offs_t offset, u32 data, u32 mem_mask = u32(~0));
 
 	void portb_out(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(turbo_light);
+	void turbo_light(int state);
 
 	void main_map(address_map &map);
 	void tms1_map(address_map &map);
@@ -288,8 +287,8 @@ public:
 	void shoottv(machine_config &config);
 
 private:
-	void driver_init() override;
-	void video_start() override;
+	virtual void driver_start() override;
+	virtual void video_start() override;
 
 	void update_interrupts(int vint, int xint, int qint) override;
 
@@ -304,4 +303,4 @@ private:
 	emu_timer *m_gun_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_ITECH32_H
+#endif // MAME_ITECH_ITECH32_H

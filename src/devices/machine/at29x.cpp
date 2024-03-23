@@ -40,15 +40,15 @@
 #include "emu.h"
 #include "at29x.h"
 
-#define LOG_DETAIL      (1U<<1)     // More detail
-#define LOG_WARN        (1U<<2)     // Warning
-#define LOG_PRG         (1U<<3)     // Programming
-#define LOG_READ        (1U<<4)     // Reading
-#define LOG_WRITE       (1U<<5)     // Writing
-#define LOG_CONFIG      (1U<<6)     // Configuration
-#define LOG_STATE       (1U<<7)     // State machine
+#define LOG_DETAIL      (1U << 1)     // More detail
+#define LOG_WARN        (1U << 2)     // Warning
+#define LOG_PRG         (1U << 3)     // Programming
+#define LOG_READ        (1U << 4)     // Reading
+#define LOG_WRITE       (1U << 5)     // Writing
+#define LOG_CONFIG      (1U << 6)     // Configuration
+#define LOG_STATE       (1U << 7)     // State machine
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -111,8 +111,8 @@ void at29x_device::nvram_default()
 
 bool at29x_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_eememory.get(), m_memory_size+2, actual) && actual == m_memory_size+2;
+	auto const [err, actual] = util::read(file, m_eememory.get(), m_memory_size+2);
+	return !err && (actual == m_memory_size+2);
 }
 
 //-------------------------------------------------
@@ -126,8 +126,8 @@ bool at29x_device::nvram_write(util::write_stream &file)
 	LOGMASKED(LOG_PRG, "Write to NVRAM file\n");
 	m_eememory[0] = m_version;
 
-	size_t actual;
-	return !file.write(m_eememory.get(), m_memory_size+2, actual) && actual == m_memory_size+2;
+	auto const [err, actual] = util::write(file, m_eememory.get(), m_memory_size+2);
+	return !err;
 }
 
 /*

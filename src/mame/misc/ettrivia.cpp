@@ -37,6 +37,8 @@ Notes:
 #include "tilemap.h"
 
 
+namespace {
+
 class ettrivia_state : public driver_device
 {
 public:
@@ -475,6 +477,9 @@ ROM_START( strvmstr )
 	ROM_LOAD( "potprri.lo3",  0x30000, 0x8000, CRC(427eada9) SHA1(bac29ec637a17db95507c68fd73a8ce52744bf8e) )
 	ROM_LOAD( "entrtn.hi3",   0x38000, 0x8000, CRC(a8cf603b) SHA1(6efa5753d8d252452b3f5be8635a28364e4d8de1) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
 GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )

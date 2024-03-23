@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_3DOM2_H
-#define MAME_MACHINE_3DOM2_H
+#ifndef MAME_KONAMI_3DOM2_H
+#define MAME_KONAMI_3DOM2_H
 
 #pragma once
 
@@ -244,12 +244,12 @@ public:
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }
 
-	template<uint32_t line> WRITE_LINE_MEMBER( int_line )
+	template <uint32_t Line> void int_line(int state)
 	{
 		if (state)
-			m_int_status |= 1 << line;
+			m_int_status |= 1 << Line;
 		else
-			m_int_status &= ~(1 << line);
+			m_int_status &= ~(1 << Line);
 
 		update_interrupts();
 	}
@@ -457,9 +457,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-private:
-
 };
 
 
@@ -479,9 +476,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-private:
-
 };
 
 
@@ -726,4 +720,4 @@ DECLARE_DEVICE_TYPE(M2_CTRLPORT, m2_ctrlport_device)
 DECLARE_DEVICE_TYPE(M2_MPEG, m2_mpeg_device)
 DECLARE_DEVICE_TYPE(M2_CDE, m2_cde_device)
 
-#endif // MAME_MACHINE_3DOM2_H
+#endif // MAME_KONAMI_3DOM2_H

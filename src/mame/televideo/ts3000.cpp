@@ -13,6 +13,9 @@ There are 25-pin serial and parallel ports, and a FDC connector. There's an undu
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
+
+namespace {
+
 class ts3000_state : public driver_device
 {
 public:
@@ -54,5 +57,8 @@ ROM_START( ts3000 )
 	ROM_REGION( 0x4000, "roms", 0 )
 	ROM_LOAD( "u25 ver 2.03 bios d.u25", 0x0000, 0x4000, CRC(abaff64c) SHA1(b2f0e73d2a25a03d5bac558580919bd0400f4fcf) ) // The D at the end is handwritten
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 198?, ts3000, 0, 0, ts3000, ts3000, ts3000_state, empty_init, "Televideo", "TS-3000", MACHINE_IS_SKELETON )

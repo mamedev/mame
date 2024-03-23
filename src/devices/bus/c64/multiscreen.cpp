@@ -117,8 +117,8 @@ void c64_multiscreen_cartridge_device::device_add_mconfig(machine_config &config
 	m6802_cpu_device &cpu(M6802(config, MC6802P_TAG, XTAL(4'000'000)));
 	cpu.set_addrmap(AS_PROGRAM, &c64_multiscreen_cartridge_device::multiscreen_mem);
 
-	PIA6821(config, MC6821P_0_TAG, 0);
-	PIA6821(config, MC6821P_1_TAG, 0);
+	PIA6821(config, MC6821P_0_TAG);
+	PIA6821(config, MC6821P_1_TAG);
 }
 
 

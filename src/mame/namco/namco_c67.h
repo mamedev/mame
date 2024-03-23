@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NAMCO_C67_H
-#define MAME_MACHINE_NAMCO_C67_H
+#ifndef MAME_NAMCO_NAMCO_C67_H
+#define MAME_NAMCO_NAMCO_C67_H
 
 #pragma once
 
@@ -22,4 +22,4 @@ DECLARE_DEVICE_TYPE(NAMCO_C67, namco_c67_device)
 
 
 
-#endif // MAME_MACHINE_NAMCO_C67_H
+#endif // MAME_NAMCO_NAMCO_C67_H

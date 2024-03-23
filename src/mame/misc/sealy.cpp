@@ -34,6 +34,9 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 // 13.0 MHz? PCB is labeled with 13.5M
 #define MAIN_CLOCK  13000000
 
@@ -138,6 +141,8 @@ ROM_START( crzyddz )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "3", 0x00000, 0x80000, CRC(cb626168) SHA1(652b20e92c82de480e3cd41c2e3c984fcb0c120a) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )

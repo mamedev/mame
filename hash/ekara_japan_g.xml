@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ekara_japan_g" description="Takara e-kara (Japan) Gold Cartridge series (G-xx / GCxxxx-)">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
@@ -19,15 +19,15 @@ license:CC0
 	G-2  *GC0002-BHT  Best Hit Volume 1
 	G-3  *GC0003-BAT  Best Artist Volume 2
 	G-4  *GC0004-BHT  Best Hit Volume 2
-	G-5   GC0005-TPJ  TV Pop Junior Volume 1
+	G-5  *GC0005-TPJ  TV Pop Junior Volume 1
 	G-6  *GC0006-BHT  Best Hit Volume 3
 	G-7  *GC0007-BAT  Best Artist Volume 3
 	G-8  *GC0008-MIN  mini-moni
-	G-9   GC0009-TPJ  TV Pop Junior Volume 3 (Volume 2 is 'P-2' in 'P' series)
+	G-9  *GC0009-TPJ  TV Pop Junior Volume 3 (Volume 2 is 'P-2' in 'P' series)
 	G-10 *GC0010-BAT  Best Artist Volume 4
 	G-11 *GC0011-TPJ  TV Pop Junior Volume 4
-	G-12  GC0012-BHT  Best Hit Volume 5 (Volume 4 is 'P-1' in 'P' series)
-	G-13  GC0013-     (unknown) Volume 6
+	G-12 *GC0012-BHT  Best Hit Volume 5 (Volume 4 is 'P-1' in 'P' series)
+	G-13 *GC0013-BHT  Best Hit Volume 6
 	G-14 *GC0014-MIN  mini-moni Volume 2
 	G-15 *GC0015-BAT  Best Artist Volume 5
 	G-16 *GC0016-TPJ  TV Pop Junior Volume 5
@@ -86,6 +86,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gc0005">
+		<description>TV Pop Junior Volume 1 (Japan) (GC0005-TPJ)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアVol.1"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0005-tpj.u1" size="0x100000" crc="b1fda1a4" sha1="a135226aa400c5a78060b08d5f64eb6a06c990e7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gc0006">
 		<description>Best Hit Volume 3 (Japan) (GC0006-BHT)</description>
 		<year>2000</year>
@@ -134,6 +146,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gc0009">
+		<description>TV Pop Junior Volume 3 (Japan) (GC0009-TPJ)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアVol.3"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0009-tpj.u1" size="0x100000" crc="aed34640" sha1="2a55eb5e518ca18a5fd66d4e43269954015bb238"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Notes from Sean
 
 	    G10 has a 24LC02, but no 74HC125, and pin 2 isn't connected.
@@ -172,7 +196,31 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gc0012">
+		<description>Best Hit Volume 5 (Japan) (GC0012-BHT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.5"/> <!-- shown as "ベストヒットvol.5" on-screen with Popira -->
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0012-bht.u1" size="0x100000" crc="e68d10ee" sha1="7d91e83420dc8af6f2fad6d5080e491c7ea2e001"/>
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="gc0013">
+		<description>Best Hit Volume 6 (Japan) (GC0013-BHT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.6"/> <!-- shown as "ベストヒットvol.6" on-screen with Popira -->
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0013-bht.u1" size="0x100000" crc="0bc2b917" sha1="fb43650f57e6e90abcb60c15b4a8794649571232"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="gc0014">
 		<description>mini-moni Volume 2 (GC0014-MIN)</description>

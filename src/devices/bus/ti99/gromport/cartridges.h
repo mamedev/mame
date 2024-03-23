@@ -12,12 +12,14 @@
 
 #include "imagedev/cartrom.h"
 #include "machine/tmc0430.h"
-#include "formats/rpk.h"
 
 #include "emuopts.h"
 
 #include "utilfwd.h"
 
+
+// declared in formats/rpk.h
+class rpk_socket;
 
 namespace bus::ti99::gromport {
 
@@ -33,12 +35,12 @@ public:
 	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ready_line);
-	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	void ready_line(int state);
+	void romgq_line(int state);
 
 	void set_gromlines(line_state mline, line_state moline, line_state gsq);
 
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
 	bool    is_available() { return m_pcb != nullptr; }
 	void    set_slot(int i);
@@ -51,7 +53,7 @@ protected:
 	virtual const tiny_rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent
-	image_init_result call_load() override;
+	std::pair<std::error_condition, std::string> call_load() override;
 	void call_unload() override;
 
 	void prepare_cartridge();
@@ -144,9 +146,9 @@ protected:
 	virtual void crureadz(offs_t offset, uint8_t *value);
 	virtual void cruwrite(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	void romgq_line(int state);
 	virtual void set_gromlines(line_state mline, line_state moline, line_state gsq);
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
 	void gromreadz(uint8_t* value);
 	void gromwrite(uint8_t data);

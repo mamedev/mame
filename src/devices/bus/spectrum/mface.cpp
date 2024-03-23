@@ -50,7 +50,7 @@
     This isn't enough to stop the clash so perhaps schematic is for some non-Beta-supporting version or has an error.
     Assume for now the entire joystick is disabled as that's the only way Beta can work.
     Beta support seems limited to Beta v3/plus (TR-DOS 3/4.xx) models, beta128 (TR-DOS 5.xx) doesn't work.
-    Bios rom "mu21e7" has issues with Betaplus, doesn't work with betav3,beta128,betacbi, perhaps it's for some other interface entirely...?
+    BIOS rom "mu21e7" has issues with Betaplus, doesn't work with betav3,beta128,betacbi, perhaps it's for some other interface entirely...?
 
     The enable/disable switch became necessary on later versions as games had started including checks to detect presence of the interface.
     eg. Renegade ("The Hit Squad" re-release) whilst loading, reads from 0x9f specifically to cause the MF (if present) to page in and crash the machine.
@@ -509,9 +509,9 @@ void spectrum_mprint_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_mface_base_device::romcs)
+bool spectrum_mface_base_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_mface_base_device::pre_opcode_fetch(offs_t offset)

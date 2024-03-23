@@ -191,8 +191,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1975, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1975, skywar, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Mirco Games", "Sky War [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, take5, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5 [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1975, tankers, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Tankers [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane", MACHINE_IS_SKELETON )
+//GAME( 1975, skywar, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Mirco Games", "Sky War", MACHINE_IS_SKELETON )
+GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4", MACHINE_IS_SKELETON )
+GAME( 1975, take5, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5", MACHINE_IS_SKELETON )
+//GAME( 1975, tankers, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Tankers", MACHINE_IS_SKELETON )

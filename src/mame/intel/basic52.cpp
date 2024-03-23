@@ -14,17 +14,6 @@ BASIC-31 (and variants) as found on the below url, are homebrews.
 
 https://web.archive.org/web/20110908004037/http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
 
-
-The driver is working, however there are issues with the cpu serial code.
-When started, you are supposed to press Space and the system works out
-the baud rate and boots up.
-
-However, the way the cpu is written, it actually passes bytes around, so
-the auto-speed detection doesn't work as intended. Also the cpu interface
-is horribly outdated and needs to be brought up to date.
-
-The optional eprom presents the ability to bypass the auto-speed problems.
-
 Once the system starts, all input must be in uppercase. Read the manual
 to discover the special features of this Basic.
 
@@ -36,10 +25,13 @@ Sound: BASIC-31 has sound, and BASIC-52 doesn't. The sound command is PWM.
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8255.h"
-#include "machine/terminal.h"
+#include "bus/rs232/terminal.h"
+#include "bus/rs232/rs232.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class basic52_state : public driver_device
 {
@@ -47,7 +39,7 @@ public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
+		, m_serial(*this, "serial")
 		, m_speaker(*this, "speaker")
 	{ }
 
@@ -56,15 +48,15 @@ public:
 
 private:
 	void machine_start() override;
-	void kbd_put(u8 data);
 	void port1_w(u8 data);
-	uint8_t unk_r();
-	uint8_t from_term();
+	uint8_t port3_r();
+	void port3_w(u8 data);
+	void rx_w(int state);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	uint8_t m_term_data = 0U;
+	uint8_t m_port3 = 0U;
 	required_device<mcs51_cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<rs232_port_device> m_serial;
 	required_device<speaker_sound_device> m_speaker;
 };
 
@@ -80,9 +72,6 @@ void basic52_state::io_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
 	// 8000-9FFF is reserved for a plug-in EPROM containing BASIC programs.
-	// We have used this to preset the baud rate and skip the unreliable auto-detect.
-	map(0x8000, 0x8000).lr8(NAME([] () { return 0x31; }));  // we will be manually setting the baud rate
-	map(0x8001, 0x8002).lr8(NAME([] () { return 0xFE; }));  // to the fastest possible
 	map(0xa000, 0xa003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));  // PPI-8255
 }
 
@@ -91,14 +80,9 @@ static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
 
-uint8_t basic52_state::from_term()
+uint8_t basic52_state::port3_r()
 {
-	return m_term_data;
-}
-
-uint8_t basic52_state::unk_r()
-{
-	return m_term_data; // won't boot without this
+	return m_port3;
 }
 
 void basic52_state::port1_w(u8 data)
@@ -106,17 +90,30 @@ void basic52_state::port1_w(u8 data)
 	m_speaker->level_w(BIT(data, 2));
 }
 
-
-void basic52_state::kbd_put(u8 data)
+void basic52_state::port3_w(u8 data)
 {
-	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-	m_term_data = data;
+	// preserve RXD
+	m_port3 = (m_port3 & 1) | (data & ~1);
+
+	m_serial->write_txd(BIT(data, 1));
+}
+
+void basic52_state::rx_w(int state)
+{
+	if (state)
+		m_port3 |= 1;
+	else
+		m_port3 &= ~1;
 }
 
 void basic52_state::machine_start()
 {
-	save_item(NAME(m_term_data));
+	save_item(NAME(m_port3));
+}
+
+static void serial_devices(device_slot_interface &device)
+{
+	device.option_add("terminal", SERIAL_TERMINAL);
 }
 
 void basic52_state::basic31(machine_config &config)
@@ -126,13 +123,11 @@ void basic52_state::basic31(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &basic52_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(basic52_state::port1_w));
-	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::unk_r));
-	m_maincpu->serial_tx_cb().set(m_terminal, FUNC(generic_terminal_device::write));
-	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
+	m_maincpu->port_out_cb<3>().set(FUNC(basic52_state::port3_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::port3_r));
 
-	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(basic52_state::kbd_put));
+	RS232_PORT(config, m_serial, serial_devices, "terminal");
+	m_serial->rxd_handler().set(FUNC(basic52_state::rx_w));
 
 	I8255(config, "ppi8255", 0);
 
@@ -148,9 +143,8 @@ void basic52_state::basic52(machine_config &config)
 	I8052(config.replace(), m_maincpu, XTAL(11'059'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &basic52_state::io_map);
-	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::unk_r));
-	m_maincpu->serial_tx_cb().set(m_terminal, FUNC(generic_terminal_device::write));
-	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
+	m_maincpu->port_out_cb<3>().set(FUNC(basic52_state::port3_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::port3_r));
 }
 
 /* ROM definition */
@@ -171,6 +165,9 @@ ROM_START( basic31 )
 	ROM_SYSTEM_BIOS(1, "v12a", "v 1.2a")
 	ROMX_LOAD( "mcs-51-12a.bin", 0x0000, 0x2000, CRC(225bb2f0) SHA1(46e97643a7a5cb4c278f9e3c73d18cd93209f8bf), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME        FLAGS */

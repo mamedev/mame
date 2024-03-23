@@ -78,7 +78,7 @@ private:
 	uint8_t switches_r();
 	void switches_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
+	void scanline_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
 	void wpc_dcs_map(address_map &map);
@@ -224,7 +224,7 @@ void wpc_dcs_state::watchdog_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_dcs_state::scanline_irq)
+void wpc_dcs_state::scanline_irq(int state)
 {
 	m_firq_src = 0x00;
 	m_maincpu->set_input_line(1, state);

@@ -38,6 +38,9 @@ void asst128_mb_device::map(address_map &map)
 
 DEFINE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device, "asst128_mb", "ASST128_MOTHERBOARD")
 
+
+namespace {
+
 class asst128_state : public driver_device
 {
 public:
@@ -149,6 +152,9 @@ ROM_START( asst128 )
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 	ROM_LOAD( "asst128cg.bin", 0, 0x2000, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY      FULLNAME         FLAGS
 COMP( 198?, asst128, ibm5150, 0,      asst128, 0,     asst128_state, empty_init, "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)

@@ -9,10 +9,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_SHADERMANAGER_H
+#define MAME_RENDER_BGFX_SHADERMANAGER_H
 
-#ifndef __DRAWBGFX_SHADER_MANAGER__
-#define __DRAWBGFX_SHADER_MANAGER__
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -22,21 +22,23 @@
 
 class osd_options;
 
-class shader_manager {
+
+class shader_manager
+{
 public:
 	shader_manager() { }
 	~shader_manager();
 
 	// Getters
-	bgfx::ShaderHandle get_or_load_shader(osd_options &options, std::string name);
-	static bgfx::ShaderHandle load_shader(osd_options &options, std::string name);
-	static bool is_shader_present(osd_options &options, std::string name);
+	bgfx::ShaderHandle get_or_load_shader(const osd_options &options, const std::string &name);
+	static bgfx::ShaderHandle load_shader(const osd_options &options, const std::string &name);
+	static bool is_shader_present(const osd_options &options, const std::string &name);
 
 private:
-	static std::string make_path_string(osd_options &options, std::string name);
-	static const bgfx::Memory* load_mem(std::string name);
+	static std::string make_path_string(const osd_options &options, const std::string &name);
+	static const bgfx::Memory* load_mem(const std::string &name);
 
-	std::map<std::string, bgfx::ShaderHandle>   m_shaders;
+	std::map<std::string, bgfx::ShaderHandle> m_shaders;
 };
 
-#endif // __DRAWBGFX_SHADER_MANAGER__
+#endif // MAME_RENDER_BGFX_SHADERMANAGER_H

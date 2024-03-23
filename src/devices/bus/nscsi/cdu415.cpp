@@ -40,15 +40,10 @@ void cdu415_device::mem_map(address_map &map)
 	map(0x20000, 0x2ffff).rom().region("mcu", 0x10000);
 }
 
-void cdu415_device::io_map(address_map &map)
-{
-}
-
 void cdu415_device::device_add_mconfig(machine_config &config)
 {
 	H83032(config, m_mcu, 10000000);
 	m_mcu->set_addrmap(AS_PROGRAM, &cdu415_device::mem_map);
-	m_mcu->set_addrmap(AS_IO, &cdu415_device::io_map);
 
 	NCR53C94(config, m_scsi, 25'000'000); // Temporary placeholder
 }

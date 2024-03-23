@@ -25,9 +25,12 @@
 #include "rendutil.h"
 #include "uiinput.h"
 
+#include "osdepend.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <type_traits>
 
 
 namespace ui {
@@ -193,8 +196,7 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 
 	// update the menu state
 	m_hide = false;
-	if (m_stack)
-		m_stack->do_handle();
+	bool need_update = m_stack && m_stack->do_handle();
 
 	// clear up anything pending being released
 	clear_free_list();
@@ -214,10 +216,10 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 				m_stack->menu_deactivated();
 			}
 		}
-		return UI_HANDLER_CANCEL;
+		return mame_ui_manager::HANDLER_CANCEL;
 	}
 
-	return 0;
+	return need_update ? mame_ui_manager::HANDLER_UPDATE : 0;
 }
 
 
@@ -238,6 +240,14 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_heading()
 	, m_items()
 	, m_rebuilding(false)
+	, m_last_size(0, 0)
+	, m_last_aspect(0.0F)
+	, m_line_height(0.0F)
+	, m_gutter_width(0.0F)
+	, m_tb_border(0.0F)
+	, m_lr_border(0.0F)
+	, m_lr_arrow_width(0.0F)
+	, m_ud_arrow_width(0.0F)
 	, m_process_flags(0)
 	, m_selected(0)
 	, m_hover(1)
@@ -309,10 +319,13 @@ void menu::set_special_main_menu(bool special)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(menu_item_type type, uint32_t flags)
+int menu::item_append(menu_item_type type, uint32_t flags)
 {
+	assert(menu_item_type::SEPARATOR == type);
 	if (type == menu_item_type::SEPARATOR)
-		item_append(MENU_SEPARATOR_ITEM, flags, nullptr, menu_item_type::SEPARATOR);
+		return item_append(MENU_SEPARATOR_ITEM, flags, nullptr, menu_item_type::SEPARATOR);
+	else
+		return -1;
 }
 
 //-------------------------------------------------
@@ -320,7 +333,7 @@ void menu::item_append(menu_item_type type, uint32_t flags)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
+int menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
 {
 	assert(m_rebuilding);
 
@@ -346,6 +359,8 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 		m_selected = index;
 	if (m_resetpos == (m_items.size() - 1))
 		m_selected = m_items.size() - 1;
+
+	return int(std::make_signed_t<decltype(index)>(index));
 }
 
 
@@ -354,14 +369,26 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 //  item to the end of the menu
 //-------------------------------------------------
 
-void menu::item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type)
+int menu::item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type)
 {
 	if (flags & FLAG_DISABLE)
 		ref = nullptr;
 	else
 		flags |= state ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW;
 
-	item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
+	return item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
+}
+
+
+//-------------------------------------------------
+//  set_custom_space - set space required for
+//  custom rendering above and below menu
+//-------------------------------------------------
+
+void menu::set_custom_space(float top, float bottom)
+{
+	m_customtop = top;
+	m_custombottom = bottom;
 }
 
 
@@ -370,7 +397,7 @@ void menu::item_append_on_off(const std::string &text, bool state, uint32_t flag
 //  and returning any interesting events
 //-------------------------------------------------
 
-const menu::event *menu::process()
+std::pair<const menu::event *, bool> menu::process()
 {
 	// reset the event
 	m_event.iptkey = IPT_INVALID;
@@ -392,6 +419,8 @@ const menu::event *menu::process()
 		container().add_rect(0.0F, 0.0F, 1.0F, 1.0F, rgb_t(114, 0, 0, 0), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// draw the menu proper
+	// FIXME: this should happen after processing events to fix the egregious latency
+	// The main thing preventing this is that mouse handling is mixed up with drawing
 	draw(m_process_flags);
 
 	// process input
@@ -410,11 +439,11 @@ const menu::event *menu::process()
 	{
 		m_event.itemref = get_selection_ref();
 		m_event.item = &m_items[m_selected];
-		return &m_event;
+		return std::make_pair(&m_event, false);
 	}
 	else
 	{
-		return nullptr;
+		return std::make_pair(nullptr, false);
 	}
 }
 
@@ -464,13 +493,7 @@ void menu::draw(uint32_t flags)
 
 	bool const customonly = (flags & PROCESS_CUSTOM_ONLY);
 	bool const noinput = (flags & PROCESS_NOINPUT);
-	float const aspect = machine().render().ui_aspect(&container());
-	float const line_height = ui().get_line_height();
-	float const lr_arrow_width = 0.4F * line_height * aspect;
-	float const ud_arrow_width = line_height * aspect;
-	float const gutter_width = 0.5F * line_height * aspect;
-	float const lr_border = ui().box_lr_border() * aspect;
-	float const max_width = 1.0F - ((lr_border + (aspect * UI_LINE_WIDTH)) * 2.0F);
+	float const max_width = 1.0F - ((lr_border() + (machine().render().ui_aspect(&container()) * UI_LINE_WIDTH)) * 2.0F);
 
 	if (is_special_main_menu())
 		draw_background();
@@ -481,31 +504,34 @@ void menu::draw(uint32_t flags)
 	for (auto const &pitem : m_items)
 	{
 		// compute width of left hand side
-		float total_width = gutter_width + ui().get_string_width(pitem.text()) + gutter_width;
+		float total_width = gutter_width() + get_string_width(pitem.text()) + gutter_width();
 
 		// add in width of right hand side
 		if (!pitem.subtext().empty())
-			total_width += 2.0F * gutter_width + ui().get_string_width(pitem.subtext());
+			total_width += 2.0F * gutter_width() + get_string_width(pitem.subtext());
 		else if (pitem.flags() & FLAG_UI_HEADING)
-			total_width += 4.0F * ud_arrow_width;
+			total_width += 4.0F * ud_arrow_width();
 
 		// track the maximum
 		visible_width = std::max(total_width, visible_width);
 
 		// track the height as well
-		visible_main_menu_height += line_height;
+		visible_main_menu_height += line_height();
 	}
 
 	// lay out the heading if present
 	std::optional<text_layout> heading_layout;
 	if (m_heading)
 	{
-		heading_layout.emplace(ui().create_layout(container(), max_width - (gutter_width * 2.0F), text_layout::text_justify::CENTER));
+		heading_layout.emplace(create_layout(max_width - (gutter_width() * 2.0F), text_layout::text_justify::CENTER));
 		heading_layout->add_text(*m_heading, ui().colors().text_color());
+
+		// readjust visible width if heading width exceeds that of the menu
+		visible_width = std::max(gutter_width() + heading_layout->actual_width() + gutter_width(), visible_width);
 	}
 
 	// account for extra space at the top and bottom
-	float const top_extra_menu_height = m_customtop + (heading_layout ? (heading_layout->actual_height() + (ui().box_tb_border() * 3.0F)) : 0.0F);
+	float const top_extra_menu_height = m_customtop + (heading_layout ? (heading_layout->actual_height() + (tb_border() * 3.0F)) : 0.0F);
 	float const visible_extra_menu_height = top_extra_menu_height + m_custombottom;
 
 	// add a little bit of slop for rounding
@@ -516,36 +542,33 @@ void menu::draw(uint32_t flags)
 	visible_width = std::min(visible_width, max_width);
 
 	// if the menu and extra menu won't fit, take away part of the regular menu, it will scroll
-	if (visible_main_menu_height + visible_extra_menu_height + 2.0F * ui().box_tb_border() > 1.0F)
-		visible_main_menu_height = 1.0F - 2.0F * ui().box_tb_border() - visible_extra_menu_height;
+	if (visible_main_menu_height + visible_extra_menu_height + 2.0F * tb_border() > 1.0F)
+		visible_main_menu_height = 1.0F - 2.0F * tb_border() - visible_extra_menu_height;
 
-	m_visible_lines = std::min(int(std::floor(visible_main_menu_height / line_height)), int(unsigned(m_items.size())));
-	visible_main_menu_height = float(m_visible_lines) * line_height;
+	m_visible_lines = std::min(int(std::floor(visible_main_menu_height / line_height())), int(unsigned(m_items.size())));
+	visible_main_menu_height = float(m_visible_lines) * line_height();
 
 	// compute top/left of inner menu area by centering
 	float const visible_left = (1.0F - visible_width) * 0.5F;
-	float const visible_top = ((1.0F - visible_main_menu_height - visible_extra_menu_height) * 0.5F) + top_extra_menu_height;
+	float const visible_top = std::round((((1.0F - visible_main_menu_height - visible_extra_menu_height) * 0.5F) + top_extra_menu_height) * float(m_last_size.second)) / float(m_last_size.second);
 
 	// first add us a box
-	float const x1 = visible_left - lr_border;
-	float const y1 = visible_top - ui().box_tb_border();
-	float const x2 = visible_left + visible_width + lr_border;
-	float const y2 = visible_top + visible_main_menu_height + ui().box_tb_border();
+	float const x1 = visible_left - lr_border();
+	float const y1 = visible_top - tb_border();
+	float const x2 = visible_left + visible_width + lr_border();
+	float const y2 = visible_top + visible_main_menu_height + tb_border();
 	if (!customonly)
 	{
 		if (heading_layout)
 		{
-			float const heading_width = heading_layout->actual_width();
-			float const heading_left = (1.0F - heading_width) * 0.5F;
-			float const hx1 = std::min(x1, heading_left - gutter_width - lr_border);
-			float const hx2 = std::max(x2, heading_left + heading_width + gutter_width + lr_border);
 			ui().draw_outlined_box(
 					container(),
-					hx1, y1 - top_extra_menu_height,
-					hx2, y1 - m_customtop - ui().box_tb_border(),
+					x1, y1 - top_extra_menu_height,
+					x2, y1 - m_customtop - tb_border(),
 					UI_GREEN_COLOR);
-			heading_layout->emit(container(), (1.0F - heading_layout->width()) * 0.5F, y1 - top_extra_menu_height + ui().box_tb_border());
+			heading_layout->emit(container(), (1.0F - heading_layout->width()) * 0.5F, y1 - top_extra_menu_height + tb_border());
 		}
+
 		ui().draw_outlined_box(
 				container(),
 				x1, y1,
@@ -570,8 +593,8 @@ void menu::draw(uint32_t flags)
 	m_visible_items = m_visible_lines - (show_top_arrow ? 1 : 0) - (show_bottom_arrow ? 1 : 0);
 
 	// determine effective positions taking into account the hilighting arrows
-	float const effective_width = visible_width - 2.0F * gutter_width;
-	float const effective_left = visible_left + gutter_width;
+	float const effective_width = visible_width - 2.0F * gutter_width();
+	float const effective_left = visible_left + gutter_width();
 
 	// locate mouse
 	if (!customonly && !noinput)
@@ -595,8 +618,8 @@ void menu::draw(uint32_t flags)
 			rgb_t bgcolor = ui().colors().text_bg_color();
 			rgb_t fgcolor2 = ui().colors().subitem_color();
 			rgb_t fgcolor3 = ui().colors().clone_color();
-			float const line_y0 = visible_top + (float)linenum * line_height;
-			float const line_y1 = line_y0 + line_height;
+			float const line_y0 = visible_top + (float)linenum * line_height();
+			float const line_y1 = line_y0 + line_height();
 
 			// work out what we're dealing with
 			bool const uparrow = !linenum && show_top_arrow;
@@ -635,10 +658,10 @@ void menu::draw(uint32_t flags)
 			{
 				// if we're on the top line, display the up arrow
 				draw_arrow(
-						0.5F * (x1 + x2) - 0.5F * ud_arrow_width,
-						line_y0 + 0.25F * line_height,
-						0.5F * (x1 + x2) + 0.5F * ud_arrow_width,
-						line_y0 + 0.75F * line_height,
+						0.5F * (x1 + x2) - 0.5F * ud_arrow_width(),
+						line_y0 + 0.25F * line_height(),
+						0.5F * (x1 + x2) + 0.5F * ud_arrow_width(),
+						line_y0 + 0.75F * line_height(),
 						fgcolor,
 						ROT0);
 			}
@@ -646,26 +669,26 @@ void menu::draw(uint32_t flags)
 			{
 				// if we're on the bottom line, display the down arrow
 				draw_arrow(
-						0.5F * (x1 + x2) - 0.5F * ud_arrow_width,
-						line_y0 + 0.25F * line_height,
-						0.5F * (x1 + x2) + 0.5F * ud_arrow_width,
-						line_y0 + 0.75F * line_height,
+						0.5F * (x1 + x2) - 0.5F * ud_arrow_width(),
+						line_y0 + 0.25F * line_height(),
+						0.5F * (x1 + x2) + 0.5F * ud_arrow_width(),
+						line_y0 + 0.75F * line_height(),
 						fgcolor,
 						ROT0 ^ ORIENTATION_FLIP_Y);
 			}
 			else if (pitem.type() == menu_item_type::SEPARATOR)
 			{
 				// if we're just a divider, draw a line
-				container().add_line(visible_left, line_y0 + 0.5F * line_height, visible_left + visible_width, line_y0 + 0.5F * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container().add_line(visible_left, line_y0 + 0.5F * line_height(), visible_left + visible_width, line_y0 + 0.5F * line_height(), UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 			else if (pitem.subtext().empty())
 			{
 				// if we don't have a subitem, just draw the string centered
 				if (pitem.flags() & FLAG_UI_HEADING)
 				{
-					float heading_width = ui().get_string_width(itemtext);
-					container().add_line(visible_left, line_y0 + 0.5F * line_height, visible_left + ((visible_width - heading_width) / 2) - lr_border, line_y0 + 0.5F * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-					container().add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + lr_border, line_y0 + 0.5F * line_height, visible_left + visible_width, line_y0 + 0.5F * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					float heading_width = get_string_width(itemtext);
+					container().add_line(visible_left, line_y0 + 0.5F * line_height(), visible_left + ((visible_width - heading_width) / 2) - lr_border(), line_y0 + 0.5F * line_height(), UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					container().add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + lr_border(), line_y0 + 0.5F * line_height(), visible_left + visible_width, line_y0 + 0.5F * line_height(), UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 				ui().draw_text_full(
 						container(),
@@ -673,7 +696,8 @@ void menu::draw(uint32_t flags)
 						effective_left, line_y0, effective_width,
 						text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
 						mame_ui_manager::NORMAL, fgcolor, bgcolor,
-						nullptr, nullptr);
+						nullptr, nullptr,
+						line_height());
 			}
 			else
 			{
@@ -688,14 +712,15 @@ void menu::draw(uint32_t flags)
 						effective_left, line_y0, effective_width,
 						text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
 						mame_ui_manager::NORMAL, fgcolor, bgcolor,
-						&item_width, nullptr);
+						&item_width, nullptr,
+						line_height());
 
 				if (pitem.flags() & FLAG_COLOR_BOX)
 				{
 					rgb_t color = rgb_t((uint32_t)strtoul(pitem.subtext().c_str(), nullptr, 16));
 
 					// give 2 spaces worth of padding
-					subitem_width = ui().get_string_width("FF00FF00");
+					subitem_width = get_string_width("FF00FF00");
 
 					ui().draw_outlined_box(
 							container(),
@@ -708,10 +733,10 @@ void menu::draw(uint32_t flags)
 					std::string_view subitem_text(pitem.subtext());
 
 					// give 2 spaces worth of padding
-					item_width += 2.0F * gutter_width;
+					item_width += 2.0F * gutter_width();
 
 					// if the subitem doesn't fit here, display dots
-					if (ui().get_string_width(subitem_text) > effective_width - item_width)
+					if (get_string_width(subitem_text) > effective_width - item_width)
 					{
 						subitem_text = "...";
 						if (is_selected(itemnum))
@@ -719,13 +744,13 @@ void menu::draw(uint32_t flags)
 					}
 
 					// customize subitem text color
-					if (!core_stricmp(pitem.subtext().c_str(), _("On")))
+					if (!core_stricmp(pitem.subtext(), _("On")))
 						fgcolor2 = rgb_t(0x00,0xff,0x00);
 
-					if (!core_stricmp(pitem.subtext().c_str(), _("Off")))
+					if (!core_stricmp(pitem.subtext(), _("Off")))
 						fgcolor2 = rgb_t(0xff,0x00,0x00);
 
-					if (!core_stricmp(pitem.subtext().c_str(), _("Auto")))
+					if (!core_stricmp(pitem.subtext(), _("Auto")))
 						fgcolor2 = rgb_t(0xff,0xff,0x00);
 
 					// draw the subitem right-justified
@@ -735,30 +760,31 @@ void menu::draw(uint32_t flags)
 							effective_left + item_width, line_y0, effective_width - item_width,
 							text_layout::text_justify::RIGHT, text_layout::word_wrapping::TRUNCATE,
 							mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor,
-							&subitem_width, nullptr);
+							&subitem_width, nullptr,
+							line_height());
 				}
 
 				// apply arrows
 				if (is_selected(itemnum) && (pitem.flags() & FLAG_LEFT_ARROW))
 				{
-					float const l = effective_left + effective_width - subitem_width - gutter_width;
-					float const r = l + lr_arrow_width;
+					float const l = effective_left + effective_width - subitem_width - gutter_width();
+					float const r = l + lr_arrow_width();
 					draw_arrow(
-								l, line_y0 + 0.1F * line_height, r, line_y0 + 0.9F * line_height,
+								l, line_y0 + 0.1F * line_height(), r, line_y0 + 0.9F * line_height(),
 								fgcolor,
 								ROT90 ^ ORIENTATION_FLIP_X);
-					if (mouse_in_rect(l, line_y0 + 0.1F * line_height, r, line_y0 + 0.9F * line_height))
+					if (mouse_in_rect(l, line_y0 + 0.1F * line_height(), r, line_y0 + 0.9F * line_height()))
 						m_hover = HOVER_UI_LEFT;
 				}
 				if (is_selected(itemnum) && (pitem.flags() & FLAG_RIGHT_ARROW))
 				{
-					float const r = effective_left + effective_width + gutter_width;
-					float const l = r - lr_arrow_width;
+					float const r = effective_left + effective_width + gutter_width();
+					float const l = r - lr_arrow_width();
 					draw_arrow(
-							l, line_y0 + 0.1F * line_height, r, line_y0 + 0.9F * line_height,
+							l, line_y0 + 0.1F * line_height(), r, line_y0 + 0.9F * line_height(),
 							fgcolor,
 							ROT90);
-					if (mouse_in_rect(l, line_y0 + 0.1F * line_height, r, line_y0 + 0.9F * line_height))
+					if (mouse_in_rect(l, line_y0 + 0.1F * line_height(), r, line_y0 + 0.9F * line_height()))
 						m_hover = HOVER_UI_RIGHT;
 				}
 			}
@@ -771,29 +797,25 @@ void menu::draw(uint32_t flags)
 		menu_item const &pitem = selected_item();
 		bool const subitem_invert(pitem.flags() & FLAG_INVERT);
 		auto const linenum = m_selected - top_line;
-		float const line_y = visible_top + (float)linenum * line_height;
-		float target_width, target_height;
+		float const line_y = visible_top + float(linenum) * line_height();
 
 		// compute the multi-line target width/height
-		ui().draw_text_full(
-				container(),
+		auto const [target_width, target_height] = get_text_dimensions(
 				pitem.subtext(),
 				0, 0, visible_width * 0.75F,
-				text_layout::text_justify::RIGHT, text_layout::word_wrapping::WORD,
-				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
-				&target_width, &target_height);
+				text_layout::text_justify::RIGHT, text_layout::word_wrapping::WORD);
 
 		// determine the target location
-		float const target_x = visible_left + visible_width - target_width - lr_border;
-		float target_y = line_y + line_height + ui().box_tb_border();
-		if (target_y + target_height + ui().box_tb_border() > visible_main_menu_height)
-			target_y = line_y - target_height - ui().box_tb_border();
+		float const target_x = visible_left + visible_width - target_width - lr_border();
+		float target_y = line_y + line_height() + tb_border();
+		if (target_y + target_height + tb_border() > visible_main_menu_height)
+			target_y = line_y - target_height - tb_border();
 
 		// add a box around that
 		ui().draw_outlined_box(
 				container(),
-				target_x - lr_border, target_y - ui().box_tb_border(),
-				target_x + target_width + lr_border, target_y + target_height + ui().box_tb_border(),
+				target_x - lr_border(), target_y - tb_border(),
+				target_x + target_width + lr_border(), target_y + target_height + tb_border(),
 				subitem_invert ? ui().colors().selected_bg_color() : ui().colors().background_color());
 
 		ui().draw_text_full(
@@ -807,6 +829,20 @@ void menu::draw(uint32_t flags)
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render(get_selection_ref(), m_customtop, m_custombottom, x1, y1, x2, y2);
+}
+
+void menu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	float const ui_line_height = ui().get_line_height();
+
+	// force whole pixels for line height, gutters and borders
+	m_line_height = std::floor(ui_line_height * float(height)) / float(height);
+	m_gutter_width = std::floor(0.5F * ui_line_height * aspect * float(width)) / float(width);
+	m_tb_border = std::floor(ui().box_tb_border() * float(height)) / float(height);
+	m_lr_border = std::floor(ui().box_lr_border() * aspect * float(width)) / float(width);
+
+	m_lr_arrow_width = 0.4F * m_line_height * aspect;
+	m_ud_arrow_width = m_line_height * aspect;
 }
 
 void menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -923,7 +959,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				ev.iptkey = IPT_UI_SELECT;
 				if (is_last_selected() && m_needs_prev_menu_item)
 				{
-					ev.iptkey = IPT_UI_CANCEL;
+					ev.iptkey = IPT_UI_BACK;
 					stack_pop();
 					if (is_special_main_menu())
 						machine().schedule_exit();
@@ -1002,7 +1038,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	{
 		if (is_last_selected() && m_needs_prev_menu_item)
 		{
-			iptkey = IPT_UI_CANCEL;
+			iptkey = IPT_INVALID;
 			stack_pop();
 			if (is_special_main_menu())
 				machine().schedule_exit();
@@ -1011,7 +1047,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	}
 
 	// UI configure hides the menus
-	if (!(flags & PROCESS_NOKEYS) && exclusive_input_pressed(iptkey, IPT_UI_CONFIGURE, 0) && !m_global_state.stack_has_special_main_menu())
+	if (!(flags & PROCESS_NOKEYS) && exclusive_input_pressed(iptkey, IPT_UI_MENU, 0) && !m_global_state.stack_has_special_main_menu())
 	{
 		if (is_one_shot())
 			stack_pop();
@@ -1024,11 +1060,12 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	if (flags & PROCESS_ONLYCHAR)
 		return;
 
-	// hitting cancel also pops the stack
-	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
+	// hitting back also pops the stack
+	if (exclusive_input_pressed(iptkey, IPT_UI_BACK, 0))
 	{
-		if (!custom_ui_cancel())
+		if (!custom_ui_back())
 		{
+			iptkey = IPT_INVALID;
 			stack_pop();
 			if (is_special_main_menu())
 				machine().schedule_exit();
@@ -1141,10 +1178,6 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 			machine().pause();
 	}
 
-	// handle a toggle cheats request
-	if (machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
-		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
-
 	// see if any other UI keys are pressed
 	if (iptkey == IPT_INVALID)
 	{
@@ -1221,8 +1254,26 @@ void menu::validate_selection(int scandir)
     MENU STACK MANAGEMENT
 ***************************************************************************/
 
-void menu::do_handle()
+bool menu::do_handle()
 {
+	bool need_update = false;
+
+	// let OSD do its thing
+	machine().osd().check_osd_inputs();
+
+	// recompute metrics if necessary
+	render_manager &render(machine().render());
+	render_target &target(render.ui_target());
+	std::pair<uint32_t, uint32_t> const uisize(target.width(), target.height());
+	float const aspect = render.ui_aspect(&container());
+	if ((uisize != m_last_size) || (aspect != m_last_aspect))
+	{
+		m_last_size = uisize;
+		m_last_aspect = aspect;
+		recompute_metrics(uisize.first, uisize.second, aspect);
+		need_update = true;
+	}
+
 	if (m_items.empty())
 	{
 		m_rebuilding = true;
@@ -1233,7 +1284,8 @@ void menu::do_handle()
 				item_append(_("Return to Previous Menu"), 0, nullptr);
 
 			// let implementation add other items
-			populate(m_customtop, m_custombottom);
+			populate();
+			need_update = true;
 		}
 		catch (...)
 		{
@@ -1243,7 +1295,11 @@ void menu::do_handle()
 		}
 		m_rebuilding = false;
 	}
-	handle(process());
+
+	auto [eventptr, changed] = process();
+	need_update = need_update || changed;
+	need_update = handle(eventptr) || need_update;
+	return need_update;
 }
 
 
@@ -1265,6 +1321,16 @@ delegate<uint32_t (render_container &)> menu::get_ui_handler(mame_ui_manager &mu
 /***************************************************************************
     MENU HELPERS
 ***************************************************************************/
+
+//-------------------------------------------------
+//  create_layout
+//-------------------------------------------------
+
+text_layout menu::create_layout(float width, text_layout::text_justify justify, text_layout::word_wrapping wrap)
+{
+	return text_layout(*ui().get_font(), line_height() * m_last_aspect, line_height(), width, justify, wrap);
+}
+
 
 //-------------------------------------------------
 //  highlight
@@ -1294,7 +1360,7 @@ void menu::draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uin
 void menu::extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction)
 {
 	// get the size of the text
-	auto layout = ui().create_layout(container());
+	auto layout = create_layout();
 	layout.add_text(text);
 
 	// position this extra text
@@ -1305,8 +1371,8 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	x1 += ui().box_lr_border() * machine().render().ui_aspect(&container());
-	y1 += ui().box_tb_border();
+	x1 += lr_border();
+	y1 += tb_border();
 
 	// draw the text within it
 	layout.emit(container(), x1, y1);
@@ -1329,14 +1395,14 @@ void menu::draw_background()
 void menu::extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
 	int direction, float &x1, float &y1, float &x2, float &y2)
 {
-	float width = layout.actual_width() + (2 * ui().box_lr_border() * machine().render().ui_aspect(&container()));
+	float width = layout.actual_width() + (2 * lr_border());
 	float maxwidth = std::max(width, origx2 - origx1);
 
 	// compute our bounds
 	x1 = 0.5F - (0.5F * maxwidth);
 	x2 = x1 + maxwidth;
 	y1 = origy + (yspan * direction);
-	y2 = origy + (ui().box_tb_border() * direction);
+	y2 = origy + (tb_border() * direction);
 
 	if (y1 > y2)
 		std::swap(y1, y2);

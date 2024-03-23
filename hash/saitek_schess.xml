@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
-<softwarelist name="saitek_schess" description="Sensor Chess Modules">
+<softwarelist name="saitek_schess" description="Sensor Chess modules">
 
 	<software name="strong">
 		<description>Strong Play Module</description>

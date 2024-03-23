@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -63,7 +63,7 @@ namespace bgfx { namespace gl
 		char* m_canvas;
 	};
 
-	void GlContext::create(uint32_t _width, uint32_t _height)
+	void GlContext::create(uint32_t _width, uint32_t _height, uint32_t /*_flags*/)
 	{
 		// assert?
 		if (m_primary != NULL)
@@ -71,7 +71,23 @@ namespace bgfx { namespace gl
 
 		const char* canvas = (const char*) g_platformData.nwh;
 
-		m_primary = createSwapChain((void*)canvas);
+		EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = (EMSCRIPTEN_WEBGL_CONTEXT_HANDLE) g_platformData.context;
+		if (context > 0)
+		{
+			if (emscripten_webgl_get_context_attributes(context, &s_attrs) >= 0)
+			{
+				import(s_attrs.majorVersion);
+				m_primary = BX_NEW(g_allocator, SwapChainGL)(context, canvas);
+			}
+			else
+			{
+				BX_TRACE("Invalid WebGL context. (Canvas handle: '%s', context handle: %d)", canvas, context);
+			}
+		}
+		else
+		{
+			m_primary = createSwapChain((void*)canvas);
+		}
 
 		if (0 != _width
 		&&  0 != _height)
@@ -121,7 +137,7 @@ namespace bgfx { namespace gl
 
 		s_attrs.minorVersion = 0;
 		const char* canvas = (const char*) _nwh;
-		int error = 0;
+		int32_t error = 0;
 
 		for (int version = 2; version >= 1; --version)
 		{
@@ -138,10 +154,13 @@ namespace bgfx { namespace gl
 
 				return swapChain;
 			}
-			error = (int) context;
+
+			error = (int32_t)context;
 		}
 
 		BX_TRACE("Failed to create WebGL context. (Canvas handle: '%s', last attempt error %d)", canvas, error);
+		BX_UNUSED(error);
+
 		return NULL;
 	}
 

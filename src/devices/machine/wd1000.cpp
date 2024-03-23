@@ -57,10 +57,6 @@ void wd1000_device::set_sector_base(uint32_t base)
 
 void wd1000_device::device_start()
 {
-	// Resolve callbacks
-	m_intrq_cb.resolve();
-	m_drq_cb.resolve();
-
 	// Allocate timers
 	m_seek_timer = timer_alloc(FUNC(wd1000_device::update_seek), this);
 	m_drq_timer = timer_alloc(FUNC(wd1000_device::delayed_drq), this);
@@ -185,8 +181,7 @@ void wd1000_device::set_drq()
 	if ((m_status & S_DRQ) == 0)
 	{
 		m_status |= S_DRQ;
-		if (!m_drq_cb.isnull())
-			m_drq_cb(true);
+		m_drq_cb(true);
 	}
 }
 
@@ -195,8 +190,7 @@ void wd1000_device::drop_drq()
 	if (m_status & S_DRQ)
 	{
 		m_status &= ~S_DRQ;
-		if (!m_drq_cb.isnull())
-			m_drq_cb(false);
+		m_drq_cb(false);
 	}
 }
 
@@ -238,7 +232,7 @@ void wd1000_device::end_command()
 
 int wd1000_device::get_lbasector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 	const auto &info = file->get_info();
 	int lbasector;
 
@@ -573,7 +567,7 @@ void wd1000_device::cmd_restore()
 // so it is not necessary to guard that case in these functions.
 void wd1000_device::cmd_read_sector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 	uint8_t dma = BIT(m_command, 3);
 
 	file->read(get_lbasector(), m_buffer);
@@ -594,7 +588,7 @@ void wd1000_device::cmd_read_sector()
 
 void wd1000_device::cmd_write_sector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 
 	if (m_buffer_index != sector_bytes())
 	{
@@ -608,7 +602,7 @@ void wd1000_device::cmd_write_sector()
 
 void wd1000_device::cmd_format_sector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 	uint8_t buffer[512];
 
 	// The m_buffer appears to be loaded with an interleave table which is

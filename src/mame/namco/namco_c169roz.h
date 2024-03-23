@@ -2,8 +2,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCO_C169ROZ_H
-#define MAME_VIDEO_NAMCO_C169ROZ_H
+#ifndef MAME_NAMCO_NAMCO_C169ROZ_H
+#define MAME_NAMCO_NAMCO_C169ROZ_H
 
 #pragma once
 
@@ -69,5 +69,5 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device)
 
-#endif // MAME_VIDEO_NAMCO_C169ROZ_H
+#endif // MAME_NAMCO_NAMCO_C169ROZ_H
 

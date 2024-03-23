@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Keyboard Component
+    Nintendo Family Computer Keyboard HVC-007 and Data Recorder HVC-008
 
 **********************************************************************/
 
@@ -26,23 +26,22 @@ class nes_fckeybrd_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_exp(offs_t offset) override;
-	virtual void write(uint8_t data) override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cassette_image_device> m_cassette;
-	required_ioport_array<9> m_kbd;
-	uint8_t m_fck_scan, m_fck_mode;
+	required_ioport_array<10> m_kbd;
+	u8 m_fck_scan, m_fck_nibble, m_fck_enable;
 };
 
 

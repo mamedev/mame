@@ -32,18 +32,21 @@
 #include "video/fixfreq.h"
 #include "screen.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
 #define V_TOTAL         (0x105+1)       // 262
 #define H_TOTAL         (0x1C6+1)       // 454
 
-#define HBSTART                 (H_TOTAL)
-#define HBEND                   (80)
-#define VBSTART                 (V_TOTAL)
-#define VBEND                   (16)
+#define HBSTART         (H_TOTAL)
+#define HBEND           (80)
+#define VBSTART         (V_TOTAL)
+#define VBEND           (16)
 
-#define HRES_MULT                   (1)
+#define HRES_MULT       (1)
 // end
 
 
@@ -131,5 +134,7 @@ ROM_START( sburners )
 	ROM_LOAD( "url1.c15",     0x0000, 0x0200, CRC(e7941edb) SHA1(e3661a4b883e827fa8f0e5191007b948159cb3f4) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1975, sburners, 0, sburners, 0, sburners_state, empty_init, ROT0, "Allied Leisure", "Street Burners [TTL]", MACHINE_IS_SKELETON )
+
+GAME( 1975, sburners, 0, sburners, 0, sburners_state, empty_init, ROT0, "Allied Leisure", "Street Burners", MACHINE_IS_SKELETON )

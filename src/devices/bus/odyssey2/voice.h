@@ -36,7 +36,7 @@ public:
 	virtual u8 bus_read() override { return (m_subslot->exists()) ? m_subslot->bus_read() : 0xff; }
 
 	virtual void io_write(offs_t offset, u8 data) override;
-	virtual DECLARE_READ_LINE_MEMBER(t0_read) override;
+	virtual int t0_read() override;
 
 protected:
 	// device-level overrides
@@ -51,6 +51,7 @@ private:
 	required_device<o2_cart_slot_device> m_subslot;
 
 	u8 m_control = 0;
+	bool m_reset = false;
 };
 
 

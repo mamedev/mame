@@ -5,8 +5,8 @@
     Acclaim RAX Sound Board
 
 ****************************************************************************/
-#ifndef MAME_AUDIO_RAX_H
-#define MAME_AUDIO_RAX_H
+#ifndef MAME_SHARED_RAX_H
+#define MAME_SHARED_RAX_H
 
 #pragma once
 
@@ -98,4 +98,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device)
 
-#endif // MAME_AUDIO_RAX_H
+#endif // MAME_SHARED_RAX_H

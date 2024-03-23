@@ -38,9 +38,9 @@ public:
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(clb_w);
-	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
-	DECLARE_WRITE_LINE_MEMBER(dlen_w) { m_dlen = (state) ? 1 : 0; }
+	void clb_w(int state);
+	void data_w(int state) { m_data = (state) ? 1 : 0; }
+	void dlen_w(int state) { m_dlen = (state) ? 1 : 0; }
 
 protected:
 	pcf2100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bpmax, u8 smax);
@@ -54,15 +54,15 @@ protected:
 
 	const u8 m_bpmax; // number of BP pins
 	const u8 m_smax; // number of S pins
-	u64 m_shift = 0;
-	u8 m_count = 0;
-	u8 m_bpout = 0;
-	u32 m_latch[2] = { 0, 0 };
+	u64 m_shift;
+	u8 m_count;
+	u8 m_bpout;
+	u32 m_latch[2];
 
 	// pin state
-	int m_clb = 0;
-	int m_data = 0;
-	int m_dlen = 0;
+	int m_clb;
+	int m_data;
+	int m_dlen;
 
 	// callbacks
 	devcb_write32 m_write_segs;

@@ -67,8 +67,6 @@ r10788_device::r10788_device(const machine_config &mconfig, const char *tag, dev
  */
 void r10788_device::device_start()
 {
-	m_display.resolve();
-
 	save_item(NAME(m_reg));
 	save_item(NAME(m_ktr));
 	save_item(NAME(m_kts));

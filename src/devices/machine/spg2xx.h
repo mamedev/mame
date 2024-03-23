@@ -74,7 +74,7 @@ public:
 	void uart_rx(uint8_t data) { m_spg_io->uart_rx(data); }
 	void spi_rx(int state) { m_spg_io->spi_rx(state); }
 
-	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
+	void vblank(int state) { m_spg_video->vblank(state); }
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
 protected:
@@ -83,14 +83,14 @@ protected:
 	void internal_map(address_map &map);
 
 	void fiq_vector_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
-	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
-	DECLARE_WRITE_LINE_MEMBER(audiochirq_w);
-	DECLARE_WRITE_LINE_MEMBER(timerirq_w);
-	DECLARE_WRITE_LINE_MEMBER(uartirq_w);
-	DECLARE_WRITE_LINE_MEMBER(extirq_w);
-	DECLARE_WRITE_LINE_MEMBER(ffreq1_w);
-	DECLARE_WRITE_LINE_MEMBER(ffreq2_w);
+	void videoirq_w(int state);
+	void audioirq_w(int state);
+	void audiochirq_w(int state);
+	void timerirq_w(int state);
+	void uartirq_w(int state);
+	void extirq_w(int state);
+	void ffreq1_w(int state);
+	void ffreq2_w(int state);
 
 	uint16_t space_r(offs_t offset);
 
@@ -143,7 +143,7 @@ protected:
 	uint8_t eepromx_r() { return m_i2c_r(); }
 
 	void uart_tx_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_uart_tx(offset, data, mem_mask); }
-	DECLARE_WRITE_LINE_MEMBER(spi_tx_w) { m_spi_tx(state); }
+	void spi_tx_w(int state) { m_spi_tx(state); }
 	void cs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_chip_sel(offset, data, mem_mask); }
 };
 

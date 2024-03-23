@@ -17,16 +17,13 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, XAVIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_readregs_cb(*this)
-	, m_readsamples_cb(*this)
+	, m_readregs_cb(*this, 0xff)
+	, m_readsamples_cb(*this, 0x80)
 {
 }
 
 void xavix_sound_device::device_start()
 {
-	m_readregs_cb.resolve_safe(0xff);
-	m_readsamples_cb.resolve_safe(0x80);
-
 	m_stream = stream_alloc(0, 2, 163840);
 }
 
@@ -119,7 +116,6 @@ bool xavix_sound_device::is_voice_enabled(int voice)
 void xavix_sound_device::enable_voice(int voice, bool update_only)
 {
 	m_stream->update();
-
 	int voicemembase = voice * 0x10;
 
 	uint16_t freq_mode = (m_readregs_cb(voicemembase + 0x1) << 8) | (m_readregs_cb(voicemembase + 0x0)); // sample rate maybe?

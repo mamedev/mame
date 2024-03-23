@@ -75,10 +75,6 @@ tvcexp_slot_device::~tvcexp_slot_device()
 void tvcexp_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
 }
 
 /*-------------------------------------------------

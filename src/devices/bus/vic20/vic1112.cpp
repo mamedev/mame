@@ -27,7 +27,7 @@
 DEFINE_DEVICE_TYPE(VIC1112, vic1112_device, "vic1112", "VIC-1112 IEEE-488 Interface")
 
 
-WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )
+void vic1112_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
@@ -85,7 +85,7 @@ void vic1112_device::via0_pb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
+void vic1112_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 

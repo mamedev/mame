@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
--- License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
+-- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
 --
 
 newoption {
@@ -37,7 +37,6 @@ solution "bimg"
 	end
 
 	language "C++"
-	startproject "example-00-helloworld"
 
 MODULE_DIR = path.getabsolute("..")
 BIMG_DIR   = path.getabsolute("..")
@@ -64,11 +63,10 @@ function copyLib()
 end
 
 group "libs"
+dofile(path.join(BX_DIR, "scripts/bx.lua"))
 dofile "bimg.lua"
 dofile "bimg_decode.lua"
 dofile "bimg_encode.lua"
-
-dofile(path.join(BX_DIR, "scripts/bx.lua"))
 
 if _OPTIONS["with-tools"] then
 	group "tools"

@@ -145,10 +145,10 @@ namespace {
 union ADDR_REG
 {
 #ifdef LSB_FIRST
-	struct { uint16_t loword, hiword ; } as16bit;
+	struct { uint16_t loword, hiword; } as16bit;
 	struct { uint8_t addr0, addr1, addr2; } as8bit;
 #else
-	struct { uint16_t hiword, loword ; } as16bit;
+	struct { uint16_t hiword, loword; } as16bit;
 	struct { uint8_t addr2, addr1, addr0; } as8bit;
 #endif
 	uint32_t addr = 0;
@@ -290,10 +290,10 @@ protected:
 	void latch_w(offs_t offset, uint8_t data);
 	uint8_t upd_r();
 	void upd_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void z80_acia_irq(int state);
+	void m6809_data_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -589,7 +589,7 @@ void bfcobra_state::RunBlit()
 					}
 					if( blitter.source.as8bit.addr0 < blitter.step )
 					{
-						blitter.source.as8bit.addr0 -= blitter.step ;
+						blitter.source.as8bit.addr0 -= blitter.step;
 						blitter.source.as8bit.addr0 += blitter.source.as8bit.addr1;
 
 						if ( blitter.modectl & MODE_YFRAC )
@@ -640,7 +640,7 @@ void bfcobra_state::RunBlit()
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
-							blitter.source.as16bit.loword-- ;
+							blitter.source.as16bit.loword--;
 						else
 							blitter.source.as16bit.loword++;
 
@@ -1572,26 +1572,26 @@ void bfcobra_state::init_ram()
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
+void bfcobra_state::z80_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
+void bfcobra_state::m6809_data_irq(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
+void bfcobra_state::data_acia_tx_w(int state)
 {
 	m_data_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
+void bfcobra_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -1808,16 +1808,16 @@ private:
 	void output0_w(uint8_t data);
 	uint8_t input0_r();
 	uint8_t input1_r();
-	DECLARE_WRITE_LINE_MEMBER(z8s180_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_dreq );
+	void z8s180_acia_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
+	void upd7759_generate_dreq(int state);
 	uint32_t screen_update_bfcobjam(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
-	TIMER_CALLBACK_MEMBER( scanline_callback ) ;
+	TIMER_CALLBACK_MEMBER( scanline_callback );
 	void RunBlit();
 	void update_irqs();
-	void genio_w( uint8_t data ) ;
+	void genio_w( uint8_t data );
 	void dotmatrix_w( uint8_t data );
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z8s180_bank(int num, int data);
@@ -1829,7 +1829,7 @@ private:
 
 void bfcobjam_state::init_bfcobjam()
 {
-	m_rompage = 0 ;
+	m_rompage = 0;
 	m_bank_data[0] = 0;
 	m_bank_data[1] = 0;
 	m_bank_data[2] = 0;
@@ -1855,7 +1855,6 @@ void bfcobjam_state::init_bfcobjam()
 	save_item(NAME(m_bank_data));
 	save_item(NAME(m_genio));
 	save_item(NAME(m_global_volume));
-
 }
 
 /*
@@ -1868,8 +1867,7 @@ void bfcobjam_state::RunBlit()
 #define BLITPRG_READ(x)     blitter.x = *(blitter_get_addr(blitter.program.addr++))
 
 	struct bf_blitter_t &blitter = m_blitter;
-	int cycles_used = 0;
-
+	[[maybe_unused]] int cycles_used = 0;
 
 	do
 	{
@@ -1952,7 +1950,7 @@ void bfcobjam_state::RunBlit()
 					}
 					if( blitter.source.as8bit.addr0 < blitter.step )
 					{
-						blitter.source.as8bit.addr0 -= blitter.step ;
+						blitter.source.as8bit.addr0 -= blitter.step;
 						blitter.source.as8bit.addr0 += blitter.source.as8bit.addr1;
 
 						if ( blitter.modectl & MODE_YFRAC )
@@ -2003,7 +2001,7 @@ void bfcobjam_state::RunBlit()
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
-							blitter.source.as16bit.loword-- ;
+							blitter.source.as16bit.loword--;
 						else
 							blitter.source.as16bit.loword++;
 
@@ -2157,9 +2155,9 @@ uint8_t* bfcobjam_state::blitter_get_addr(uint32_t addr)
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
-		addr += m_rompage * 0x10000 ;
+		addr += m_rompage * 0x10000;
 
-		return (uint8_t*)(memregion("user1")->base() + addr );
+		return (uint8_t*)(memregion("user1")->base() + addr);
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -2214,7 +2212,7 @@ uint8_t bfcobjam_state::chipset_r(offs_t offset)
 		}
 		case 0x22:
 		{
-			val = 0x40 | ioport("CJIN2")->read() | ( m_upd7759_int->busy_r() ? 0x20 : 0 ) ;
+			val = 0x40 | ioport("CJIN2")->read() | ( m_upd7759_int->busy_r() ? 0x20 : 0 );
 			break;
 		}
 		default:
@@ -2245,7 +2243,7 @@ void bfcobjam_state::chipset_w(offs_t offset, uint8_t data)
 
 		case 0x07:
 			m_scanline_timer->adjust(m_screen->time_until_pos(data));
-			break ;
+			break;
 
 		case 0x08:
 		{
@@ -2309,7 +2307,7 @@ void bfcobjam_state::chipset_w(offs_t offset, uint8_t data)
 		case 0x22:
 		{
 			m_flip_22 = data;
-			genio_w( data ) ;
+			genio_w( data );
 			break;
 		}
 		default:
@@ -2390,9 +2388,9 @@ void bfcobjam_state::z8s180_bank(int num, int data)
 	}
 	else if (data < 0x08)
 	{
-		uint32_t offset ;
-		offset = m_rompage * 0x10000 ;
-		offset += (data-4) * 0x4000 ;
+		uint32_t offset;
+		offset = m_rompage * 0x10000;
+		offset += (data-4) * 0x4000;
 
 		membank(bank_names[num])->set_base(memregion("user1")->base() + offset);
 	}
@@ -2424,7 +2422,7 @@ TIMER_CALLBACK_MEMBER( bfcobjam_state::scanline_callback )
 	update_irqs();
 }
 
-WRITE_LINE_MEMBER(bfcobjam_state::z8s180_acia_irq)
+void bfcobjam_state::z8s180_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
@@ -2433,7 +2431,7 @@ WRITE_LINE_MEMBER(bfcobjam_state::z8s180_acia_irq)
 
 void bfcobjam_state::rombank_w(uint8_t data)
 {
-	m_rompage = data ;
+	m_rompage = data;
 
 	membank("bank5")->set_entry(m_rompage & 0x0f);
 }
@@ -2454,15 +2452,15 @@ void bfcobjam_state::rombank_w(uint8_t data)
 */
 void bfcobjam_state::output0_w(uint8_t data)
 {
-	uint8_t changed = m_port_0 ^ data ;
-	m_port_0 = data ;
+	uint8_t changed = m_port_0 ^ data;
+	m_port_0 = data;
 
-	dotmatrix_w( data ) ;
+	dotmatrix_w( data );
 
 	//cobra handling of scl and sda is wrong but devices handle it ok
 	//unfortunately mame emulation of i2c 24c08 doesn't :(
 	//we frig the driving of scl/sda to correct this
-	changed &= 0x60 ;
+	changed &= 0x60;
 
 	if( changed == 0x60 )
 	{
@@ -2488,7 +2486,7 @@ void bfcobjam_state::dotmatrix_w( uint8_t data )
 {
 	if( m_dm01 )
 	{
-		data &= 0x1c ;
+		data &= 0x1c;
 
 		if( data != dm_last_data )
 		{
@@ -2497,25 +2495,25 @@ void bfcobjam_state::dotmatrix_w( uint8_t data )
 			}
 			else
 			{
-				m_dm01->reset() ;
+				m_dm01->reset();
 				dm_shift=0;
 				dm_shift_data=0;
 			}
 			if( !(data & 4 ) && ( dm_last_data & 4 ) && data & 0x10 ) // clock is low but was high and out of reset
 			{
-				dm_shift_data <<= 1 ;
+				dm_shift_data <<= 1;
 				if( !(data & 0x08 ))
 				{
-					dm_shift_data |=1 ;
+					dm_shift_data |= 1;
 				}
 				dm_shift++;
 				if( dm_shift == 8 )
 				{
 					dm_shift=0;
-					m_dm01->writedata( dm_shift_data ) ;
+					m_dm01->writedata( dm_shift_data );
 				}
 			}
-			dm_last_data = data ;
+			dm_last_data = data;
 		}
 	}
 }
@@ -2535,13 +2533,9 @@ void bfcobjam_state::aux_upd7759_w(uint8_t data)
 	if( m_aux_upd7759 )
 	{
 		m_aux_upd7759->set_rom_bank((data>>2)&3);
-
 		m_aux_upd7759->port_w((data>>4)&0xf);
-
 		m_aux_upd7759->md_w(1);
-
 		m_aux_upd7759->reset_w(BIT(data, 0));
-
 		m_aux_upd7759->start_w(!BIT(data, 1));
 	}
 }
@@ -2554,7 +2548,7 @@ uint8_t bfcobjam_state::aux_upd7759_r()
 	}
 	else
 	{
-		return 0 ;
+		return 0;
 	}
 }
 
@@ -2569,9 +2563,9 @@ void bfcobjam_state::genio_w( uint8_t data )
 	//bit 6 = ??
 	//bit 7 = ??
 
-	uint8_t changed = m_genio ^ data ;
+	uint8_t changed = m_genio ^ data;
 
-	m_genio = data ;
+	m_genio = data;
 
 	if ( changed & 0x10)
 	{ // digital volume clock line changed
@@ -2612,7 +2606,7 @@ void bfcobjam_state::upd7759_w(uint8_t data)
 	m_upd7759_int->port_w(data);
 }
 
-WRITE_LINE_MEMBER( bfcobjam_state::upd7759_generate_dreq )
+void bfcobjam_state::upd7759_generate_dreq(int state)
 {
 	if( state )
 	{
@@ -2736,13 +2730,13 @@ void bfcobjam_state::machine_reset()
 		m_palette->set_pen_color(pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
-	m_rompage = 0 ;
+	m_rompage = 0;
 	m_bank_data[0] = 0;
 	m_bank_data[1] = 0;
 	m_bank_data[2] = 0;
 	m_bank_data[3] = 0;
 
-	m_genio = 0 ;
+	m_genio = 0;
 	m_global_volume = 0;
 
 	m_ym2413->reset();
@@ -2753,10 +2747,10 @@ void bfcobjam_state::machine_reset()
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	if( m_dm01 )
-		m_dm01->reset() ;
+		m_dm01->reset();
 }
 
-WRITE_LINE_MEMBER(bfcobjam_state::write_acia_clock)
+void bfcobjam_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -2803,7 +2797,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 {
-	bfcobjam( config ) ;
+	bfcobjam( config );
 
 	UPD7759(config, m_aux_upd7759);
 	m_aux_upd7759->add_route(ALL_OUTPUTS, "mono", 0.40);

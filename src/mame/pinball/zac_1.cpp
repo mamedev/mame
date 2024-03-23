@@ -115,11 +115,11 @@ public:
 private:
 	u8 ctrl_r();
 	void ctrl_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(audio_t1_r);
-	DECLARE_READ_LINE_MEMBER(serial_r);
-	DECLARE_WRITE_LINE_MEMBER(serial_w);
-	DECLARE_WRITE_LINE_MEMBER(noise_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	int audio_t1_r();
+	int serial_r();
+	void serial_w(int state);
+	void noise_w(int state);
+	void clock_w(int state);
 	u8 reset_int_r();
 	void reset_int_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
@@ -441,13 +441,13 @@ void zac_1_state::audio_command_w(u8 data)
 }
 
 // Locomotion: The noise and tone represent a steam whistle
-WRITE_LINE_MEMBER( zac_1_state::noise_w )
+void zac_1_state::noise_w(int state)
 {
 	m_noise_state = state;
 	m_speaker->level_w((m_clock_state && m_noise_state) ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER( zac_1_state::clock_w )
+void zac_1_state::clock_w(int state)
 {
 	m_clock_state = state;
 	m_speaker->level_w((m_clock_state && m_noise_state) ? 1 : 0);
@@ -458,7 +458,7 @@ u8 zac_1_state::audio_command_r()
 	return m_soundlatch->read() | (ioport("DSW2")->read() & 0x30);
 }
 
-READ_LINE_MEMBER(zac_1_state::audio_t1_r)
+int zac_1_state::audio_t1_r()
 {
 	return (m_soundlatch->read() == 0);
 }
@@ -497,13 +497,13 @@ void zac_1_state::reset_int_w(u8 data)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-READ_LINE_MEMBER( zac_1_state::serial_r )
+int zac_1_state::serial_r()
 {
 // from printer
 	return 0;
 }
 
-WRITE_LINE_MEMBER( zac_1_state::serial_w )
+void zac_1_state::serial_w(int state)
 {
 // to printer
 }

@@ -5,8 +5,8 @@
     Atari GX2 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ATARIGX2_H
-#define MAME_INCLUDES_ATARIGX2_H
+#ifndef MAME_ATARI_ATARIGX2_H
+#define MAME_ATARI_ATARIGX2_H
 
 #pragma once
 
@@ -86,4 +86,4 @@ private:
 	uint32_t          m_protection_ram[0x1000]{};
 };
 
-#endif // MAME_INCLUDES_ATARIGX2_H
+#endif // MAME_ATARI_ATARIGX2_H

@@ -57,8 +57,9 @@ E I1     Vectored interrupt error
 #include "softlist_dev.h"
 
 #include "formats/m20_dsk.h"
-#include "formats/pc_dsk.h"
 
+
+namespace {
 
 class m20_state : public driver_device
 {
@@ -75,7 +76,6 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
-		m_p_videoram(*this, "videoram"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -94,7 +94,6 @@ private:
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
 
-	required_shared_ptr<uint16_t> m_p_videoram;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start() override;
@@ -104,10 +103,10 @@ private:
 	void i8259_w(offs_t offset, uint16_t data);
 	uint16_t port21_r();
 	void port21_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(int_w);
+	void tty_clock_tick_w(int state);
+	void kbd_clock_tick_w(int state);
+	void timer_tick_w(int state);
+	void int_w(int state);
 	MC6845_UPDATE_ROW(update_row);
 
 	void m20_data_mem(address_map &map);
@@ -132,11 +131,12 @@ MC6845_UPDATE_ROW( m20_state::update_row )
 {
 	uint32_t *p = &bitmap.pix(y);
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint16_t *vram = (uint16_t *)m_ram->pointer();
+	uint16_t offset = ((ma | (ra << 1)) << 4);
 
 	for ( int i = 0; i < x_count; i++ )
 	{
-		uint16_t offset = ((ma | (ra << 1)) << 4) + i;
-		uint16_t data = m_p_videoram[ offset ];
+		uint16_t data = vram[ offset + i ];
 
 		for ( int j = 15; j >= 0; j-- )
 		{
@@ -212,19 +212,19 @@ void m20_state::i8259_w(offs_t offset, uint16_t data)
 	m_i8259->write(offset, (data>>1));
 }
 
-WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
+void m20_state::tty_clock_tick_w(int state)
 {
 	m_ttyi8251->write_txc(state);
 	m_ttyi8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
+void m20_state::kbd_clock_tick_w(int state)
 {
 	m_kbdi8251->write_txc(state);
 	m_kbdi8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( m20_state::timer_tick_w )
+void m20_state::timer_tick_w(int state)
 {
 	/* The output of the 8253 is connected to a 74LS74 flop chip.
 	 * The output of the flop chip is connected to NVI CPU input.
@@ -325,14 +325,12 @@ B/W, 128K cards, 3 cards => 512K of memory:
 void m20_state::m20_program_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x30000, 0x33fff).ram().share("videoram");
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
 }
 
 void m20_state::m20_data_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x30000, 0x33fff).ram().share("videoram");
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
 }
 
@@ -375,10 +373,10 @@ void m20_state::install_memory()
 	pspace.install_ram(0x28000, 0x2bfff, 0, memptr + 0x1c000);
 	dspace.install_ram(0x28000, 0x2bfff, 0, memptr + 0x1c000);
 	/* <2>c000 empty*/
-	/* <3>0000 (video buffer)
+	/* <3>0000 (video buffer) */
 	pspace.install_ram(0x30000, 0x33fff, 0, memptr + 0x0000);
 	dspace.install_ram(0x30000, 0x33fff, 0, memptr + 0x0000);
-	*/
+
 
 	/* <5>0000 */
 	dspace.install_ram(0x50000, 0x53fff, 0, memptr + 0x8000);
@@ -696,7 +694,7 @@ uint16_t m20_state::nviack_r()
 	return 0xffff;
 }
 
-WRITE_LINE_MEMBER(m20_state::int_w)
+void m20_state::int_w(int state)
 {
 	if(m_apb && !m_apb->halted())
 		m_apb->vi_w(state);
@@ -847,6 +845,9 @@ ROM_START(m44) // TODO: implement different hardware. Split to another driver?
 	ROM_REGION( 0x114, "plds", 0 )
 	ROM_LOAD( "pl46.j09", 0x000, 0x114, NO_DUMP ) // PLD, chip type unknown
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
 COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

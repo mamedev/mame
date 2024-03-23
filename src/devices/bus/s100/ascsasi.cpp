@@ -46,8 +46,8 @@ protected:
 	virtual void s100_sout_w(offs_t offset, u8 data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(iio_w);
-	DECLARE_WRITE_LINE_MEMBER(req_w);
+	void iio_w(int state);
+	void req_w(int state);
 	void sasi_sel_pulse();
 	void sasi_rst_pulse();
 	TIMER_CALLBACK_MEMBER(sel_off);
@@ -106,7 +106,7 @@ void asc_sasi_device::device_reset()
 	m_boot = true;
 }
 
-WRITE_LINE_MEMBER(asc_sasi_device::iio_w)
+void asc_sasi_device::iio_w(int state)
 {
 	// Release data bus when I/O is asserted
 	if (state)
@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(asc_sasi_device::iio_w)
 		m_sasi->data_w(7, m_data_latch);
 }
 
-WRITE_LINE_MEMBER(asc_sasi_device::req_w)
+void asc_sasi_device::req_w(int state)
 {
 	// Clear ACK when REQ is negated
 	if (!state)

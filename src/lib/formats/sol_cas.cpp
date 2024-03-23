@@ -36,6 +36,8 @@ SVT - The full explanation may be found on the Solace web site,
 
 #include "sol_cas.h"
 
+#include "multibyte.h"
+
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -82,17 +84,16 @@ static int sol20_output_bit(int16_t *buffer, int sample_pos, bool bit)
 static int sol20_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
 {
 	int samples = 0;
-	uint8_t i;
 
 	/* start */
 	samples += sol20_output_bit (buffer, sample_pos + samples, 0);
 
 	/* data */
-	for (i = 0; i<8; i++)
+	for (uint8_t i = 0; i<8; i++)
 		samples += sol20_output_bit (buffer, sample_pos + samples, (byte >> i) & 1);
 
 	/* stop */
-	for (i = 0; i<2; i++)
+	for (uint8_t i = 0; i<2; i++)
 		samples += sol20_output_bit (buffer, sample_pos + samples, 1);
 
 	return samples;
@@ -157,11 +158,10 @@ static void sol20_scan_to_hex(const uint8_t *bytes)
 static int sol20_read_hex(const uint8_t *bytes, uint8_t numdigits)
 {
 	int data = 0;
-	uint8_t i,chr;
 
-	for (i = 0; i < numdigits; i++)
+	for (uint8_t i = 0; i < numdigits; i++)
 	{
-		chr = bytes[sol20_byte_num];
+		uint8_t chr = bytes[sol20_byte_num];
 		if ((chr >= '0') && (chr <= '9'))
 		{
 			data = (data << 4) | (chr-48);
@@ -196,7 +196,7 @@ static int sol20_read_dec(const uint8_t *bytes)
 static int sol20_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
 	uint32_t sample_count = 0;
-	uint32_t i = 0,t = 0;
+	uint32_t t = 0;
 	uint16_t cc = 0;
 	sol20_byte_num = 1;
 	bool process_d = 0;
@@ -234,7 +234,7 @@ static int sol20_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 
 						sol20_byte_num+=2; // bump to parameter
 						t = sol20_read_dec(bytes) * 140; // convert 10th of seconds to number of ones
-						for (i = 0; i < t; i++)
+						for (uint32_t i = 0; i < t; i++)
 							sample_count += sol20_output_bit(buffer, sample_count, 1);
 						sol20_scan_to_eol(bytes);
 						break;
@@ -248,9 +248,9 @@ static int sol20_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 						}
 
 						sol20_byte_num+=2; // bump to file name
-						for (i = 0; i < 5; i++)
+						for (uint32_t i = 0; i < 5; i++)
 							sol20_header[i] = 0x20;
-						for (i = 0; i < 5; i++)
+						for (uint32_t i = 0; i < 5; i++)
 						{
 							sol20_header[i] = bytes[sol20_byte_num++];
 							if (sol20_header[i] == 0x20)
@@ -261,29 +261,24 @@ static int sol20_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 						sol20_header[6] = sol20_read_hex(bytes, 2);
 						sol20_scan_to_hex(bytes); // bump to length
 						length = sol20_read_hex(bytes, 4);
-						sol20_header[7] = length;
-						sol20_header[8] = length >> 8;
+						put_u16le(&sol20_header[7], length);
 						sol20_scan_to_hex(bytes); // bump to load-address
-						i = sol20_read_hex(bytes, 4);
-						sol20_header[9] = i;
-						sol20_header[10] = i >> 8;
+						put_u16le(&sol20_header[9], sol20_read_hex(bytes, 4));
 						sol20_scan_to_hex(bytes); // bump to exec-address
-						i = sol20_read_hex(bytes, 4);
-						sol20_header[11] = i;
-						sol20_header[12] = i >> 8;
+						put_u16le(&sol20_header[11], sol20_read_hex(bytes, 4));
 						sol20_header[13] = 0;
 						sol20_header[14] = 0;
 						sol20_header[15] = 0;
 						sol20_cksm_byte = 0;
-						for (i = 0; i < 16; i++)
+						for (uint32_t i = 0; i < 16; i++)
 							sol20_cksm_byte = sol20_calc_cksm(sol20_cksm_byte, sol20_header[i]);
 						// write leader
-						for (i = 0; i < 100; i++)
+						for (uint32_t i = 0; i < 100; i++)
 							sample_count += sol20_output_byte(buffer, sample_count, 0);
 						// write SOH
 						sample_count += sol20_output_byte(buffer, sample_count, 1);
 						// write Header
-						for (i = 0; i < 16; i++)
+						for (uint32_t i = 0; i < 16; i++)
 							sample_count += sol20_output_byte(buffer, sample_count, sol20_header[i]);
 						// write checksum
 						sample_count += sol20_output_byte(buffer, sample_count, sol20_cksm_byte);

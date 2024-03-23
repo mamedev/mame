@@ -51,6 +51,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class mjsenpu_state : public driver_device
 {
 public:
@@ -534,6 +537,8 @@ void mjsenpu_state::init_mjsenpu()
 	// not especially effective, might be wrong.
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32smo_delegate(*this, FUNC(mjsenpu_state::mjsenpu_speedup_r)));
 }
+
+} // anonymous namespace
 
 
 GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, init_mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )

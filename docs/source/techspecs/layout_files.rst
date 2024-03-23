@@ -396,8 +396,8 @@ Elements
 ~~~~~~~~
 
 Elements are one of the basic visual objects that may be arranged, along with
-screens, to make up a view.  Elements may be built up one or more *components*,
-but an element is treated as as single surface when building the scene graph
+screens, to make up a view. Elements may be built up of one or more *components*,
+but an element is treated as a single surface when building the scene graph
 and rendering.  An element may be used in multiple views, and may be used
 multiple times within a view.
 
@@ -497,15 +497,15 @@ image
     human-readable SVG graphics.  A ``file`` attribute or ``data`` child element
     must be supplied; it is an error if neither or both are supplied.
 
-    If the ``alphafile`` attribute refers  refers to a file, it must have the
-    same dimensions (in pixels) as the file referred to by the ``file``
-    attribute, and must have a bit depth no greater than eight bits per channel
-    per pixel.  The intensity from this image (brightness) is copied to the
-    alpha channel, with full intensity (white in a greyscale image)
-    corresponding to fully opaque, and black corresponding to fully transparent.
-    The ``alphafile`` attribute will be ignored if the ``file`` attribute refers
-    to an SVG image or the ``data`` child element contains SVG data; it is only
-    used in conjunction with bitmap images.
+    If the ``alphafile`` attribute refers  to a file, it must have the same
+    dimensions (in pixels) as the file referred to by the ``file`` attribute,
+    and must have a bit depth no greater than eight bits per channel per pixel.
+    The intensity from this image (brightness) is copied to the alpha channel,
+    with full intensity (white in a greyscale image) corresponding to fully
+    opaque, and black corresponding to fully transparent. The ``alphafile``
+    attribute will be ignored if the ``file`` attribute refers to an SVG image
+    or the ``data`` child element contains SVG data; it is only used in
+    conjunction with bitmap images.
 
     The image file(s) should be placed in the same directory/archive as the
     layout file.  Image file formats are detected by examining the content of
@@ -731,7 +731,7 @@ screen
 collection
     Adds screens and/or items in a collection that can be shown or hidden by the
     user (see :ref:`layfile-parts-collections`).  The name of the collection is
-    specified using the required ``name`` attribute..  There is a limit of 32
+    specified using the required ``name`` attribute.  There is a limit of 32
     collections per view.
 group
     Adds the content of the group to the view (see :ref:`layfile-parts-groups`).
@@ -1269,7 +1269,7 @@ View item animation
 Items’ colour and position/size within their containing view may be animated.
 This is achieved by supplying multiple ``color`` and/or ``bounds`` child
 elements with ``state`` attributes.  The ``state`` attribute of each ``color``
-or ``bounds`` child element must be a non-negative integer.  Withing a view
+or ``bounds`` child element must be a non-negative integer.  Within a view
 item, no two ``color`` elements may have equal state ``state`` attributes, and
 no two ``bounds`` elements may have equal ``state`` attributes.
 
@@ -1461,33 +1461,36 @@ Example layout files
 These layout files demonstrate various artwork system features.  They are all
 internal layouts included in MAME.
 
-`sstrangr.lay <https://git.redump.net/mame/tree/src/mame/layout/sstrangr.lay?h=mame0235>`_
+`sstrangr.lay <https://git.redump.net/mame/tree/src/mame/layout/sstrangr.lay?h=mame0261>`_
     A simple case of using translucent colour overlays to visually separate and
     highlight elements on a black and white screen.
-`seawolf.lay <https://git.redump.net/mame/tree/src/mame/layout/seawolf.lay?h=mame0235>`_
+`seawolf.lay <https://git.redump.net/mame/tree/src/mame/layout/seawolf.lay?h=mame0261>`_
     This system uses lamps for key gameplay elements.  Blending modes are used
     for the translucent colour overlay placed over the monitor, and the lamps
     reflected in front of the monitor.  Also uses collections to allow parts of
     the layout to be disabled selectively.
-`armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0235>`_
+`armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0261>`_
     This game’s monitor is viewed directly through a translucent colour overlay
     rather than being reflected from inside the cabinet.  This means the overlay
     reflects ambient light as well as affecting the colour of the video image.
     The shapes on the overlay are drawn using embedded SVG images.
-`tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0235>`_
+`tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0261>`_
     A multi-segment alphanumeric display and keypad.  The keys are clickable,
     and provide visual feedback when pressed.
-`esq2by16.lay <https://git.redump.net/mame/tree/src/mame/layout/esq2by16.lay?h=mame0235>`_
+`esq2by16.lay <https://git.redump.net/mame/tree/src/mame/layout/esq2by16.lay?h=mame0261>`_
     Builds up a multi-line dot matrix character display.  Repeats are used to
     avoid repetition for the rows in a character, characters in a line, and
     lines in a page.  Group colors allow a single element to be used for all
     four display colours.
-`cgang.lay <https://git.redump.net/mame/tree/src/mame/layout/cgang.lay?h=mame0235>`_
+`cgang.lay <https://git.redump.net/mame/tree/src/mame/layout/cgang.lay?h=mame0261>`_
     Animates the position of element items to simulate an electromechanical
     shooting gallery game.  Also demonstrates effective use of components to
     build up complex graphics.
-`unkeinv.lay <https://git.redump.net/mame/tree/src/mame/layout/unkeinv.lay?h=mame0235>`_
+`minspace.lay <https://git.redump.net/mame/tree/src/mame/layout/minspace.lay?h=mame0261>`_
     Shows the position of a slider control with LEDs on it.
-`md6802.lay <https://git.redump.net/mame/tree/src/mame/layout/md6802.lay?h=mame0235>`_
+`md6802.lay <https://git.redump.net/mame/tree/src/mame/layout/md6802.lay?h=mame0261>`_
     Effectively using groups as a procedural programming language to build up an
     image of a trainer board.
+`beena.lay <https://git.redump.net/mame/tree/src/mame/layout/beena.lay?h=mame0261>`_
+    Using event-based scripting to dynamically position elements and draw elemnt
+    content programmatically.

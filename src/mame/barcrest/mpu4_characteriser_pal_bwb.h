@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, James Wallace
 
-#ifndef MAME_MACHINE_MPU4_CHARACTERISER_PAL_BWB_H
-#define MAME_MACHINE_MPU4_CHARACTERISER_PAL_BWB_H
+#ifndef MAME_BARCREST_MPU4_CHARACTERISER_PAL_BWB_H
+#define MAME_BARCREST_MPU4_CHARACTERISER_PAL_BWB_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 	uint32_t m_otherkey = 0x00000000;
 };
 
-#endif // MAME_MACHINE_MPU4_CHARACTERISER_PAL_BWB_H
+#endif // MAME_BARCREST_MPU4_CHARACTERISER_PAL_BWB_H

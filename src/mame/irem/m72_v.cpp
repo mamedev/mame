@@ -28,7 +28,7 @@ inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,
 	if (attr & 0x0080) pri = 2;
 	else if (attr & 0x0040) pri = 1;
 	else pri = 0;
-/* attr & 0x0010 is used in bchopper and hharry, more priority? */
+	/* attr & 0x0010 is used in bchopper and hharry, more priority? */
 
 	tileinfo.set(gfxnum,
 			code & 0x3fff,
@@ -67,8 +67,8 @@ TILE_GET_INFO_MEMBER(m72_state::rtype2_get_tile_info)
 	else if (attr & 0x0080) pri = 1;
 	else pri = 0;
 
-/* (m_videoram[N][tile_index+2] & 0x10) is used by majtitle on the green, but it's not clear for what */
-/* (m_videoram[N][tile_index+3] & 0xfe) are used as well */
+	/* (m_videoram[N][tile_index+2] & 0x10) is used by majtitle on the green, but it's not clear for what */
+	/* (m_videoram[N][tile_index+3] & 0xfe) are used as well */
 
 	tileinfo.set(1,
 			code,
@@ -92,6 +92,8 @@ void m72_state::register_savestate()
 	save_item(NAME(m_scrolly));
 }
 
+
+// M72
 
 VIDEO_START_MEMBER(m72_state,m72)
 {
@@ -123,18 +125,32 @@ VIDEO_START_MEMBER(m72_state,m72)
 	register_savestate();
 }
 
-VIDEO_START_MEMBER(m72_state,xmultipl)
+VIDEO_START_MEMBER(m72_state,dbreedm72)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-
-	m_fg_tilemap->set_scrolldx(4,64);
-	m_fg_tilemap->set_scrolldy(-128, 0);
-
-	m_bg_tilemap->set_scrolldx(6,0);
-	m_bg_tilemap->set_scrolldy(-128,-128);
-
+	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // for score bar
 }
 
+VIDEO_START_MEMBER(m72_state,imgfight)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for RAM/ROM & Japan message
+}
+
+VIDEO_START_MEMBER(m72_state,mrheli)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for Japan message
+}
+
+VIDEO_START_MEMBER(m72_state,nspiritj)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for Japan message
+}
+
+
+// M81
 
 VIDEO_START_MEMBER(m72_state,hharry)
 {
@@ -149,22 +165,16 @@ VIDEO_START_MEMBER(m72_state,hharry)
 	m_bg_tilemap->set_scrolldy(-128,16);
 }
 
-VIDEO_START_MEMBER(m72_state,imgfight)
+VIDEO_START_MEMBER(m72_state,xmultipl)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for RAM/ROM & Japan message
-}
 
-VIDEO_START_MEMBER(m72_state,nspiritj)
-{
-	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for Japan message
-}
+	m_fg_tilemap->set_scrolldx(4,64);
+	m_fg_tilemap->set_scrolldy(-128, 0);
 
-VIDEO_START_MEMBER(m72_state,mrheli)
-{
-	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for Japan message
+	m_bg_tilemap->set_scrolldx(6,0);
+	m_bg_tilemap->set_scrolldy(-128,-128);
+
 }
 
 
@@ -180,8 +190,8 @@ VIDEO_START_MEMBER(m72_state,m82)
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
-// The layout ramains 256x64, the right half is just not displayed.
+	// The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
+	// The layout ramains 256x64, the right half is just not displayed.
 	m_bg_tilemap_large = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(m72_state::m82_scan_rows)), 8,8, 128,64);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
@@ -214,6 +224,7 @@ VIDEO_START_MEMBER(m72_state,m82)
 
 
 // M84
+
 VIDEO_START_MEMBER(m72_state,rtype2)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
@@ -238,7 +249,6 @@ VIDEO_START_MEMBER(m72_state,rtype2)
 	register_savestate();
 }
 
-
 VIDEO_START_MEMBER(m72_state,hharryu)
 {
 	VIDEO_START_CALL_MEMBER(rtype2);
@@ -249,7 +259,9 @@ VIDEO_START_MEMBER(m72_state,hharryu)
 	m_bg_tilemap->set_scrolldy(-128,-128);
 }
 
-// m85
+
+// M85
+
 VIDEO_START_MEMBER(m72_state,poundfor)
 {
 	VIDEO_START_CALL_MEMBER(rtype2);
@@ -289,7 +301,7 @@ void m72_state::irq_line_w(u16 data)
 {
 	// KNA70H015(11): ISET
 	m_raster_irq_position = data & 0x1ff;
-//  printf("m_raster_irq_position %04x\n", m_raster_irq_position);
+	// printf("m_raster_irq_position %04x\n", m_raster_irq_position);
 
 	// bchopper title screen jumps around, as does ingame at times, if this isn't done here
 	if (m_upd71059c.found())
@@ -365,14 +377,13 @@ void m72_state::m82_gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 		if (data & 0xff00) m_m82_rowscroll = 1;
 		else m_m82_rowscroll = 0;
 	}
-//  printf("m82_gfx_ctrl_w %04x\n", data);
-
+	// printf("m82_gfx_ctrl_w %04x\n", data);
 }
 
 void m72_state::m82_tm_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_m82_tmcontrol);
-//  printf("tmcontrol %04x\n", m_m82_tmcontrol);
+	// printf("tmcontrol %04x\n", m_m82_tmcontrol);
 }
 
 

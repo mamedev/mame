@@ -8,6 +8,7 @@
 #ifndef MAME_OSD_MODULES_MONITOR_MONITORMODULE_H
 #define MAME_OSD_MODULES_MONITOR_MONITORMODULE_H
 
+#include <cstdint>
 #include <vector>
 
 #include "modules/osdmodule.h"
@@ -53,7 +54,7 @@ public:
 	float aspect() const { return m_aspect; }
 	float pixel_aspect() const { return m_aspect / (float(m_pos_size.width()) / float(m_pos_size.height())); }
 
-	void update_resolution(const int new_width, const int new_height) const { m_pos_size.resize(new_width, new_height); }
+	void update_resolution(const int new_width, const int new_height) { m_pos_size = m_pos_size.resize(new_width, new_height); }
 	void set_aspect(const float a) { m_aspect = a; }
 	bool is_primary() const { return m_is_primary; }
 

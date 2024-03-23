@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Richard Davies
-#ifndef MAME_INCLUDES_PHOENIX_H
-#define MAME_INCLUDES_PHOENIX_H
+#ifndef MAME_PHOENIX_PHOENIX_H
+#define MAME_PHOENIX_PHOENIX_H
 
 #pragma once
 
@@ -24,7 +24,7 @@ public:
 	}
 
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
-	DECLARE_READ_LINE_MEMBER(pleiads_protection_r);
+	int pleiads_protection_r();
 
 	void condor(machine_config &config);
 	void phoenix(machine_config &config);
@@ -69,7 +69,7 @@ private:
 	void pleiads_palette(palette_device &palette) const;
 	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t survival_protection_r();
-	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
+	int survival_sid_callback();
 	void phoenix_memory_map(address_map &map);
 	void pleiads_memory_map(address_map &map);
 	void survival_memory_map(address_map &map);
@@ -89,4 +89,4 @@ private:
 #define VBSTART                 (208)
 #define VBEND                   (0)
 
-#endif // MAME_INCLUDES_PHOENIX_H
+#endif // MAME_PHOENIX_PHOENIX_H

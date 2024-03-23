@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_CMI01A_H
-#define MAME_AUDIO_CMI01A_H
+#ifndef MAME_FAIRLIGHT_CMI01A_H
+#define MAME_FAIRLIGHT_CMI01A_H
 
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
@@ -33,7 +33,6 @@ public:
 	void set_master_osc(double mosc) { m_mosc = mosc; }
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -188,4 +187,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device)
 
-#endif // MAME_AUDIO_CMI01A_H
+#endif // MAME_FAIRLIGHT_CMI01A_H

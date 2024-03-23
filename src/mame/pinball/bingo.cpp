@@ -6,6 +6,9 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/i86/i186.h"
 
+
+namespace {
+
 class bingo_state : public driver_device
 {
 public:
@@ -317,6 +320,8 @@ ROM_START(tripjok)
 	ROM_LOAD( "13006-1", 0x8000, 0x8000, CRC(5682ac90) SHA1(c9fa13c56e9178eb861991fcad6b09fd27cca3cb))
 	ROM_LOAD( "13006-2", 0x0000, 0x4000, CRC(c7104e8f) SHA1(a3737f70cb9c97df24b5da915ef53b6d30f2470d))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1980,  cntinntl,   0,        bingo,  bingo,  bingo_state,  init_bingo,  ROT0, "Bally",            "Continental (Bingo)",                      MACHINE_IS_SKELETON_MECHANICAL)

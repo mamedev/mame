@@ -13,7 +13,6 @@
 #pragma once
 
 #include "flopimg.h"
-#include "flopimg_legacy.h"
 
 
 /***************************************************************************
@@ -22,31 +21,24 @@
 
 ***************************************************************************/
 
-#define APPLE2_NIBBLE_SIZE              416
-#define APPLE2_SMALL_NIBBLE_SIZE        374
-#define APPLE2_STD_TRACK_COUNT          35
-#define APPLE2_TRACK_COUNT              40
-#define APPLE2_SECTOR_COUNT             16
-#define APPLE2_SECTOR_SIZE              256
-
-
+#define APPLE2_NIBBLE_SIZE 416
+#define APPLE2_SMALL_NIBBLE_SIZE 374
+#define APPLE2_STD_TRACK_COUNT 35
+#define APPLE2_TRACK_COUNT 40
+#define APPLE2_SECTOR_COUNT 16
+#define APPLE2_SECTOR_SIZE 256
 
 /**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(apple2);
-
-// new style code
-
 class a2_16sect_format : public floppy_image_format_t
 {
 public:
 	a2_16sect_format(bool prodos_order);
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
-	virtual bool supports_save() const override;
+	virtual bool supports_save() const noexcept override;
 
 private:
 	const bool m_prodos_order;
@@ -58,18 +50,18 @@ class a2_16sect_dos_format : public a2_16sect_format
 {
 public:
 	a2_16sect_dos_format();
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 };
 
 class a2_16sect_prodos_format : public a2_16sect_format
 {
 public:
 	a2_16sect_prodos_format();
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 };
 
 extern const a2_16sect_dos_format FLOPPY_A216S_DOS_FORMAT;
@@ -81,13 +73,13 @@ public:
 	a2_rwts18_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-	virtual bool supports_save() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 
 private:
 	static const desc_e mac_gcr[];
@@ -104,12 +96,12 @@ public:
 	a2_edd_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool supports_save() const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool supports_save() const noexcept override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 
 private:
 	static uint8_t pick(const uint8_t *data, int pos);
@@ -117,48 +109,18 @@ private:
 
 extern const a2_edd_format FLOPPY_EDD_FORMAT;
 
-class a2_woz_format : public floppy_image_format_t
-{
-public:
-	a2_woz_format();
-
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool supports_save() const override;
-
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
-
-private:
-	static const uint8_t signature[8];
-	static const uint8_t signature2[8];
-
-	static uint32_t r32(const std::vector<uint8_t> &data, uint32_t offset);
-	static uint16_t r16(const std::vector<uint8_t> &data, uint32_t offset);
-	static uint8_t r8(const std::vector<uint8_t> &data, uint32_t offset);
-	static void w32(std::vector<uint8_t> &data, int offset, uint32_t value);
-	static void w16(std::vector<uint8_t> &data, int offset, uint16_t value);
-	static uint32_t crc32r(const uint8_t *data, uint32_t size);
-	static uint32_t find_tag(const std::vector<uint8_t> &data, uint32_t tag);
-};
-
-extern const a2_woz_format FLOPPY_WOZ_FORMAT;
-
-
 class a2_nib_format : public floppy_image_format_t
 {
 public:
 	a2_nib_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	virtual bool supports_save() const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool supports_save() const noexcept override;
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 
 
 private:

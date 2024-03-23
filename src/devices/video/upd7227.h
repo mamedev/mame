@@ -30,11 +30,11 @@ public:
 	// inline configuration helpers
 	void set_offsets(int sx, int sy) { m_sx = sx; m_sy = sy; }
 
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( cd_w );
-	DECLARE_WRITE_LINE_MEMBER( sck_w );
-	DECLARE_WRITE_LINE_MEMBER( si_w );
-	DECLARE_READ_LINE_MEMBER( so_r );
+	void cs_w(int state);
+	void cd_w(int state);
+	void sck_w(int state);
+	void si_w(int state);
+	int so_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

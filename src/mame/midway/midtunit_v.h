@@ -7,8 +7,8 @@
 
 **************************************************************************/
 
-#ifndef MAME_VIDEO_MIDTUNIT_H
-#define MAME_VIDEO_MIDTUNIT_H
+#ifndef MAME_MIDWAY_MIDTUNIT_V_H
+#define MAME_MIDWAY_MIDTUNIT_V_H
 
 #pragma once
 
@@ -165,16 +165,16 @@ protected:
 	int32_t m_debug_dma_command;
 #endif
 
-	char m_log_path[2048];
+	std::string m_log_path;
 	bool m_log_png;
 	bool m_log_json;
 	std::unique_ptr<uint64_t[]> m_logged_rom;
 	bitmap_argb32 m_log_bitmap;
 
 	void debug_init();
-	void debug_commands(const std::vector<std::string> &params);
-	void debug_help_command(const std::vector<std::string> &params);
-	void debug_png_dma_command(const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string_view> &params);
+	void debug_help_command(const std::vector<std::string_view> &params);
+	void debug_png_dma_command(const std::vector<std::string_view> &params);
 	void log_bitmap(int command, int bpp, bool skip);
 };
 
@@ -234,4 +234,4 @@ DECLARE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device)
 DECLARE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device)
 DECLARE_DEVICE_TYPE(MIDXUNIT_VIDEO, midxunit_video_device)
 
-#endif // MAME_VIDEO_MIDTUNIT_H
+#endif // MAME_MIDWAY_MIDTUNIT_V_H

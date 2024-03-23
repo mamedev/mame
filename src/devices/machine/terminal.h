@@ -41,7 +41,7 @@ protected:
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void send_key(uint8_t code) { if (!m_keyboard_cb.isnull()) m_keyboard_cb(code); }
+	virtual void send_key(uint8_t code) { m_keyboard_cb(code); }
 
 	TIMER_CALLBACK_MEMBER(bell_off);
 

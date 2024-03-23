@@ -66,9 +66,9 @@ The technical manual describes the game play correctly if the game PCB option sw
 to "hard". If you set the switch to "easy", then the following game-play changes happen:
 
 * FOUR large asteroids begin the game. The second wave of asteroids begins with FIVE, and the
-  subsequent waves start with SIX through NINE large asteroids. In addition, the asteriods move
+  subsequent waves start with SIX through NINE large asteroids. In addition, the asteroids move
   much more slowly across the screen. (If the option switch is set to hard, the waves begin with
-  SIX to NINE large asteriods.)
+  SIX to NINE large asteroids.)
 * The large ships ("death stars") when shot will break up into three slowly-moving diamonds. (If
   the option switch is set to hard, diamonds would immediatly begin chasing the player's
   spaceship at high speed.)
@@ -367,17 +367,17 @@ void asteroid_state::llander_sound(machine_config &config)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(asteroid_state::coin_counter_left_w)
+void asteroid_state::coin_counter_left_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(asteroid_state::coin_counter_center_w)
+void asteroid_state::coin_counter_center_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(asteroid_state::coin_counter_right_w)
+void asteroid_state::coin_counter_right_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(2, state);
 }
@@ -489,7 +489,7 @@ void asteroid_state::llander_map(address_map &map)
  *
  *************************************/
 
-READ_LINE_MEMBER(asteroid_state::clock_r)
+int asteroid_state::clock_r()
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
@@ -856,7 +856,7 @@ void asteroid_state::asteroid_base(machine_config &config)
 	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
 	screen.set_refresh_hz(CLOCK_3KHZ/12/4);
-	screen.set_size(400,300);
+	screen.set_size(400, 300);
 	screen.set_visarea(522, 1566, 394, 1182);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
@@ -1122,7 +1122,7 @@ ROM_START( meteorho )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0100, CRC(9e237193) SHA1(f663e12d5db0fa50ea49d03591475ae0a7168bc0) )
 ROM_END
 
-// The PCB was found inside a "Kasteroides" cab (a Spanish Asteriods bootleg from "Sede 3")
+// The PCB was found inside a "Kasteroides" cab (a Spanish Asteroids bootleg from "Sede 3")
 ROM_START( meteorbl )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2as.12", 0x6800, 0x0400, CRC(cdf720c6) SHA1(85fe748096478e28a06bd98ff3aad73ab21b22a4) )

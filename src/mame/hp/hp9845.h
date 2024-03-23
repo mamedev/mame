@@ -3,8 +3,8 @@
 // *******************************
 // Driver for HP 9845B/C/T systems
 // *******************************
-#ifndef MAME_INCLUDES_HP9845_H
-#define MAME_INCLUDES_HP9845_H
+#ifndef MAME_HP_HP9845_H
+#define MAME_HP_HP9845_H
 
 #pragma once
 
@@ -42,7 +42,7 @@ protected:
 	void kb_irq_clear_w(uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
 
-	DECLARE_WRITE_LINE_MEMBER(prt_irl_w);
+	void prt_irl_w(int state);
 
 	void hp9845_base(machine_config &config);
 	void global_mem_map(address_map &map);
@@ -140,4 +140,4 @@ protected:
 	int m_slot_sc[ 4 ]{};
 };
 
-#endif // MAME_INCLUDES_HP9845_H
+#endif // MAME_HP_HP9845_H

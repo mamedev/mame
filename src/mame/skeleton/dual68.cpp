@@ -17,6 +17,8 @@
 #include "machine/scn_pci.h"
 
 
+namespace {
+
 class dual68_state : public driver_device
 {
 public:
@@ -149,6 +151,9 @@ ROM_START( dual68 )
 	ROM_REGION( 0x10000, "siocpu", ROMREGION_ERASEFF )
 	ROM_LOAD("dual_sio4.bin", 0x0000, 0x0800, CRC(6b0a1965) SHA1(5d2dc6c6a315293ded4b9fc95c8ac1599bf31dd3))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

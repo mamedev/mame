@@ -1,32 +1,40 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/******************************************************************************
+/*******************************************************************************
 
-Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
-* PCB marked PB-123 WIZARD, TIGER
-* Intel P8021 MCU with 1KB internal ROM
-* MM5445N VFD driver, 9-digit alphanumeric display same as snmath
-* 2*TMS6100 (32KB VSM)
-* SC-01-A speech chip
+Tiger Electronics K-2-8: Talking Learning Computer (model 7-230/7-231)
 
 3 models exist:
 - 7-230: darkblue case, toy-ish looks
 - 7-231: gray case, hardware is the same
-- 7-232: this one is completely different hw --> driver tispeak.cpp
+- 7-232: this one is completely different hw --> driver k28m2.cpp
+
+Hardware notes:
+- PCB label: PB-123 WIZARD, TIGER
+- Intel P8021 MCU with 1KB internal ROM
+- MM5445N VFD driver, 9-digit alphanumeric display same as snmath
+- 2*TMS6100 (32KB VSM)
+- SC-01-A speech chip
+- module slot
+
+6 modules were announced (see back of the box), but it's not known if they
+were actually released.
 
 TODO:
-- external module support (no dumps yet)
+- plosive consonants are very difficult to hear, it's an issue in votrax.cpp
+- add module slot
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "machine/tms6100.h"
 #include "video/mm5445.h"
 #include "video/pwm.h"
-#include "machine/tms6100.h"
-#include "machine/timer.h"
 #include "sound/votrax.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -45,7 +53,6 @@ public:
 		m_display(*this, "display"),
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
-		m_onbutton_timer(*this, "on_button"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -64,10 +71,10 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
-	required_device<timer_device> m_onbutton_timer;
 	required_ioport_array<7> m_inputs;
 
 	bool m_power_on = false;
+	attotime m_onbutton_time;
 	u8 m_inp_mux = 0;
 	u8 m_phoneme = 0x3f;
 	int m_speech_strobe = 0;
@@ -82,33 +89,31 @@ private:
 	void power_off();
 };
 
-
-// machine start/reset/power
-
 void k28_state::machine_start()
 {
-	// zerofill
-	m_power_on = false;
-	m_inp_mux = 0;
-	m_phoneme = 0x3f;
-	m_speech_strobe = 0;
-	m_vfd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_power_on));
+	save_item(NAME(m_onbutton_time));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_phoneme));
 	save_item(NAME(m_speech_strobe));
 	save_item(NAME(m_vfd_data));
 }
 
+
+
+/*******************************************************************************
+    Power
+*******************************************************************************/
+
 void k28_state::machine_reset()
 {
+	m_vfd_data = 0;
 	m_power_on = true;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
-	// the game relies on reading the on-button as pressed when it's turned on
-	m_onbutton_timer->adjust(attotime::from_msec(250));
+	// it relies on reading the on-button as pressed when it's turned on
+	m_onbutton_time = machine().time() + attotime::from_msec(250);
 }
 
 INPUT_CHANGED_MEMBER(k28_state::power_on)
@@ -121,13 +126,14 @@ void k28_state::power_off()
 {
 	m_power_on = false;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_display->clear();
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // MM5445 VFD
 
@@ -139,7 +145,7 @@ void k28_state::vfd_output_w(u64 data)
 	m_display->matrix(data >> 16, seg_data);
 
 	// O26: power-off request on falling edge
-	if (~data & m_vfd_data & 0x2000000)
+	if (~data & m_vfd_data & 1 << 25)
 		power_off();
 	m_vfd_data = data;
 }
@@ -179,12 +185,12 @@ u8 k28_state::mcu_p1_r()
 
 	// multiplexed inputs (active low)
 	for (int i = 0; i < 7; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 		{
 			data |= m_inputs[i]->read();
 
 			// force press on-button at boot
-			if (i == 5 && m_onbutton_timer->enabled())
+			if (i == 5 && machine().time() < m_onbutton_time)
 				data |= 1;
 		}
 
@@ -210,9 +216,9 @@ void k28_state::mcu_p2_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( k28 )
 	PORT_START("IN.0")
@@ -233,7 +239,7 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("<")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Erase/Clear")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Erase/Clear")
 
 	PORT_START("IN.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("Menu")
@@ -243,7 +249,7 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_NAME(">")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Enter/Start")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Enter/Start")
 
 	PORT_START("IN.3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("Prompt")
@@ -262,7 +268,7 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 
 	PORT_START("IN.5")
@@ -288,13 +294,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void k28_state::k28(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8021(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->bus_out_cb().set(FUNC(k28_state::mcu_p0_w));
 	m_maincpu->p1_in_cb().set(FUNC(k28_state::mcu_p1_r));
@@ -305,41 +311,39 @@ void k28_state::k28(machine_config &config)
 
 	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
-	TIMER(config, "on_button").configure_generic(nullptr);
-
-	/* video hardware */
+	// video hardware
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0x1ff, 0x3fff);
 	config.set_default_layout(layout_k28);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	VOTRAX_SC01(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
+	VOTRAX_SC01A(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( k28 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "p8021", 0x0000, 0x0400, CRC(15536d20) SHA1(fac98ce652340ffb2d00952697c3a9ce75393fa4) )
+	ROM_LOAD( "p8021_7-230-itl", 0x0000, 0x0400, CRC(15536d20) SHA1(fac98ce652340ffb2d00952697c3a9ce75393fa4) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
-	ROM_LOAD( "cm62050.vsm", 0x0000, 0x4000, CRC(6afb8645) SHA1(e22435568ed11c6516a3b4008131f99cd4e47aa9) )
-	ROM_LOAD( "cm62051.vsm", 0x4000, 0x4000, CRC(0fa61baa) SHA1(831be669423ba60c7f85a896b4b09a1295478bd9) )
+	ROM_LOAD( "cm62050u", 0x0000, 0x4000, CRC(6afb8645) SHA1(e22435568ed11c6516a3b4008131f99cd4e47aa9) )
+	ROM_LOAD( "cm62051u", 0x4000, 0x4000, CRC(0fa61baa) SHA1(831be669423ba60c7f85a896b4b09a1295478bd9) )
 ROM_END
 
 } // anonymous namespace
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1981, k28,  0,      0, k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, k28,  0,      0,      k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

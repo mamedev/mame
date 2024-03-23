@@ -81,8 +81,8 @@
 
 
 // configurable logging
-#define LOG_INPUTS           (1U <<  1)
-#define LOG_CROUPIER_MCU     (1U <<  2)
+#define LOG_INPUTS           (1U << 1)
+#define LOG_CROUPIER_MCU     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_INPUTS | LOG_CROUPIER_MCU)
 
@@ -167,8 +167,6 @@ private:
 	void shinygld_map(address_map &map);
 	void spacewin_map(address_map &map);
 };
-
-// video
 
 
 TILE_GET_INFO_MEMBER(sderby_state::get_bg_tile_info)
@@ -288,8 +286,6 @@ void sderby_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-
-// machine
 
 /***************************
 *       R/W Handlers       *

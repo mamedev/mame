@@ -175,7 +175,7 @@ void vectrex_base_state::screen_configuration()
 
 *********************************************************************/
 
-WRITE_LINE_MEMBER(vectrex_base_state::via_irq)
+void vectrex_base_state::via_irq(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }

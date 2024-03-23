@@ -17,7 +17,7 @@
 #include "k053244_k053245.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/k053252.h"
 #include "machine/watchdog.h"
@@ -30,7 +30,7 @@
 
 
 // configurable logging
-#define LOG_UNKWRITE     (1U <<  1)
+#define LOG_UNKWRITE     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE)
 
@@ -79,7 +79,7 @@ private:
 	void sound_arm_nmi_w(uint8_t data);
 	void z80_nmi_w(int state);
 	uint8_t pip_r();
-	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
+	void irq_ack_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K05324X_CB_MEMBER(sprite_callback);
 	K051316_CB_MEMBER(zoom_callback);
@@ -88,8 +88,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -119,7 +117,6 @@ K05324X_CB_MEMBER(rollerg_state::sprite_callback)
 
 K051316_CB_MEMBER(rollerg_state::zoom_callback)
 {
-	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
 	*color = ((*color & 0x30) >> 4);
 }
@@ -142,8 +139,6 @@ uint32_t rollerg_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void rollerg_state::ext_enable_w(uint8_t data)
 {
@@ -325,7 +320,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(rollerg_state::irq_ack_w)
+void rollerg_state::irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -352,7 +347,7 @@ void rollerg_state::machine_reset()
 void rollerg_state::rollerg(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 24_MHz_XTAL / 8); // divider not verified
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollerg_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rollerg_state::irq0_line_assert));
 	m_maincpu->line().set_membank(m_mainbank).mask(0x07);

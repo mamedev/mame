@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="abc80_rom" description="Luxor ABC 80 memory card ROMs">
+
+	<software name="abcdos">
+		<!-- Scandia Metric FD2 -->
+		<description>ABC-DOS</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+
+		<part name="rom" interface="abc80_dos">
+			<dataarea name="rom" size="0x1000">
+				<rom name="abcdos.3d" size="0x1000" crc="2cb2192f" sha1="a6b3a9587714f8db807c05bee6c71c0684363744"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosdd80">
+		<!-- ABC 830 -->
+		<description>ABC-DOS DD</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+
+		<part name="rom" interface="abc80_dos">
+			<dataarea name="rom" size="0x1000">
+				<rom name="abcdos.3d" size="0x1000" crc="36db4c15" sha1="ae462633f3a9c142bb029beb14749a84681377fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufd20">
+		<!-- ABC 830 -->
+		<description>UFD-DOS v.20</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+
+		<part name="rom" interface="abc80_dos">
+			<dataarea name="rom" size="0x1000">
+				<rom name="abcdos.3d" size="0x1000" crc="69b09c0b" sha1="403997a06cf6495b8fa13dc74eff6a64ef7aa53e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iec">
+		<description>IEC option 4027 v1.02.4b</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+
+		<part name="rom" interface="abc80_iec">
+			<dataarea name="rom" size="0x400">
+				<rom name="abc80-iec-option-4027-ver1.02.4b" size="0x400" crc="b4998599" sha1="1d46d1334599c31025cc8481daa4d38d470a7b48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printer">
+		<description>Printer option 9704</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+
+		<part name="rom" interface="abc80_prn">
+			<dataarea name="rom" size="0x400">
+				<rom name="abc80-printer-option-9704.3b" size="0x400" crc="f2f0d808" sha1="6355495542e77411137426effbe1059532735bb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printera" cloneof="printer">
+		<description>Printer option 9704 0.1</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+
+		<part name="rom" interface="abc80_prn">
+			<dataarea name="rom" size="0x400">
+				<rom name="abc80-printer-option-9704-0.1.3b" size="0x400" crc="5bfaee54" sha1="fc62d8c27c69c7ca0870faa922ccd7aa1b650ecf"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

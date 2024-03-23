@@ -20,6 +20,9 @@
 #include "machine/i2cmem.h"
 #include <algorithm>
 
+
+namespace {
+
 class xavix2_state : public driver_device
 {
 public:
@@ -751,6 +754,8 @@ ROM_START( dombikec )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpbikeconcept.bin", 0x000000, 0x1000000, CRC(3447fce5) SHA1(c7e9e9cd789a17ac886ecf253f67753213cf8d21) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

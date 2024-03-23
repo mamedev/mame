@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_CRIME_H
-#define MAME_VIDEO_CRIME_H
+#ifndef MAME_SGI_CRIME_H
+#define MAME_SGI_CRIME_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SGI_CRIME, crime_device)
 
-#endif // MAME_VIDEO_CRIME_H
+#endif // MAME_SGI_CRIME_H

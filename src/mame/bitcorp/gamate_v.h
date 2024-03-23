@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Peter Wilhelmsen, Kevtris
 
-#ifndef MAME_VIDEO_GAMATE_H
-#define MAME_VIDEO_GAMATE_H
+#ifndef MAME_BITCORP_GAMATE_V_H
+#define MAME_BITCORP_GAMATE_V_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 	int m_displayblank;
 };
 
-#endif // MAME_VIDEO_GAMATE_H
+#endif // MAME_BITCORP_GAMATE_V_H

@@ -12,14 +12,14 @@ OBJS= src/$T.o
 lib: src/lfs.so
 
 src/lfs.so: $(OBJS)
-	MACOSX_DEPLOYMENT_TARGET="10.3"; export MACOSX_DEPLOYMENT_TARGET; $(CC) $(CFLAGS) $(LIB_OPTION) -o src/lfs.so $(OBJS)
+	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET); export MACOSX_DEPLOYMENT_TARGET; $(CC) $(LIB_OPTION) -o src/lfs.so $(OBJS)
 
 test: lib
 	LUA_CPATH=./src/?.so lua tests/test.lua
 
 install:
-	mkdir -p $(LUA_LIBDIR)
-	cp src/lfs.so $(LUA_LIBDIR)
+	mkdir -p $(DESTDIR)$(LUA_LIBDIR)
+	cp src/lfs.so $(DESTDIR)$(LUA_LIBDIR)
 
 clean:
 	rm -f src/lfs.so $(OBJS)

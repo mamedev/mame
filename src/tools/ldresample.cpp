@@ -47,18 +47,18 @@ const uint32_t MINIMUM_SIGNAL_COUNT = 20;
 
 struct movie_info
 {
-	double          framerate;
-	int             iframerate;
-	int             numfields;
-	int             width;
-	int             height;
-	int             samplerate;
-	int             channels;
-	int             interlaced;
-	bitmap_yuy16    bitmap;
-	std::vector<int16_t>   lsound;
-	std::vector<int16_t>   rsound;
-	uint32_t          samples;
+	double                framerate;
+	int                   iframerate;
+	int                   numfields;
+	int                   width;
+	int                   height;
+	int                   samplerate;
+	int                   channels;
+	int                   interlaced;
+	bitmap_yuy16          bitmap;
+	std::vector<int16_t>  lsound;
+	std::vector<int16_t>  rsound;
+	uint32_t              samples;
 };
 
 
@@ -508,6 +508,7 @@ int main(int argc, char *argv[])
 	// verify arguments
 	if (argc < 2)
 		return usage();
+
 	const char *srcfilename = argv[1];
 	const char *dstfilename = (argc < 3) ? nullptr : argv[2];
 	double offset = (argc < 4) ? 0.0 : atof(argv[3]);
@@ -538,9 +539,9 @@ int main(int argc, char *argv[])
 	printf("Sample rate: %dHz\n", info.samplerate);
 	printf("Total fields: %d\n", info.numfields);
 
-	// if we don't have a destination file, scan for edges
 	if (dstfilename == nullptr)
 	{
+		// if we don't have a destination file, scan for edges
 		for (uint32_t fieldnum = 60; fieldnum < info.numfields - 60; fieldnum += 30)
 		{
 			fprintf(stderr, "Field %5d\r", fieldnum);
@@ -548,14 +549,14 @@ int main(int argc, char *argv[])
 			find_edge_near_field(srcfile, fieldnum, info, true, delta);
 		}
 	}
-
-	// otherwise, resample the source to the destination
 	else
 	{
+		// otherwise, resample the source to the destination
+
 		// open the destination file
-		chd_resample_compressor dstfile(srcfile, info, int64_t(offset * 65536.0 * 256.0), int64_t(slope * 65536.0 * 256.0));
-		err = create_chd(dstfile, dstfilename, srcfile, info);
-		if (!dstfile.opened())
+		auto dstfile = std::make_unique<chd_resample_compressor>(srcfile, info, int64_t(offset * 65536.0 * 256.0), int64_t(slope * 65536.0 * 256.0));
+		err = create_chd(*dstfile, dstfilename, srcfile, info);
+		if (!dstfile->opened())
 		{
 			fprintf(stderr, "Unable to create file '%s'\n", dstfilename);
 			return 1;
@@ -564,7 +565,7 @@ int main(int argc, char *argv[])
 		// loop over all the fields in the source file
 		double progress, ratio;
 		osd_ticks_t last_update = 0;
-		while (dstfile.compress_continue(progress, ratio) == chd_file::error::COMPRESSING)
+		while (dstfile->compress_continue(progress, ratio) == chd_file::error::COMPRESSING)
 			if (osd_ticks() - last_update > osd_ticks_per_second() / 4)
 			{
 				last_update = osd_ticks();

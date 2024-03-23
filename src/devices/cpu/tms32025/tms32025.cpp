@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tony La Porta, hap
+// copyright-holders:Tony La Porta
 	/**************************************************************************\
 	*                Texas Instruments TMS320x25 DSP Emulator                  *
 	*                                                                          *
@@ -249,11 +249,11 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_b1(*this, "b1")
 	, m_b2(*this, "b2")
 	, m_b3(*this, "b3")
-	, m_bio_in(*this)
-	, m_hold_in(*this)
+	, m_bio_in(*this, 0xffff)
+	, m_hold_in(*this, 0xffff)
 	, m_hold_ack_out(*this)
 	, m_xf_out(*this)
-	, m_dr_in(*this)
+	, m_dr_in(*this, 0xffff)
 	, m_dx_out(*this)
 	, m_mp_mc(true)
 {
@@ -410,11 +410,11 @@ void tms32025_device::MODIFY_AR_ARP()
 			break;
 
 		case 0x10: /* 001   *-       */
-			m_AR[ARP] -- ;
+			m_AR[ARP]--;
 			break;
 
 		case 0x20: /* 010   *+       */
-			m_AR[ARP] ++ ;
+			m_AR[ARP]++;
 			break;
 
 		case 0x30: /* 011   reserved */
@@ -606,7 +606,7 @@ void tms32025_device::abst()
 		m_ACC.d = -m_ACC.d;
 		if (m_ACC.d == 0x80000000) {
 			SET0(OV_FLAG);
-			if (OVM) m_ACC.d-- ;
+			if (OVM) m_ACC.d--;
 		}
 	}
 	CLR1(C_FLAG);
@@ -714,43 +714,43 @@ void tms32025_device::bacc()
 void tms32025_device::banz()
 {
 	if (m_AR[ARP]) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bbnz()
 {
 	if (TC) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bbz()
 {
 	if (TC == 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bc()
 {
 	if (CARRY) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bgez()
 {
 	if ( (int32_t)(m_ACC.d) >= 0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bgz()
 {
 	if ( (int32_t)(m_ACC.d) > 0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bioz()
 {
 	if (m_bio_in() != CLEAR_LINE) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bit()
@@ -768,7 +768,7 @@ void tms32025_device::bitt()
 void tms32025_device::blez()
 {
 	if ( (int32_t)(m_ACC.d) <= 0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::blkd()
@@ -795,21 +795,21 @@ void tms32025_device::blkp()
 }
 void tms32025_device::blz()
 {
-	if ( (int32_t)(m_ACC.d) <  0 ) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	if ( (int32_t)(m_ACC.d) < 0 ) m_PC = m_cache.read_word(m_PC);
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bnc()
 {
 	if (CARRY == 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bnv()
 {
 	if (OV == 0) m_PC = m_cache.read_word(m_PC);
 	else {
-		m_PC++ ;
+		m_PC++;
 		CLR0(OV_FLAG);
 	}
 	MODIFY_AR_ARP();
@@ -817,7 +817,7 @@ void tms32025_device::bnv()
 void tms32025_device::bnz()
 {
 	if (m_ACC.d != 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bv()
@@ -826,13 +826,13 @@ void tms32025_device::bv()
 		m_PC = m_cache.read_word(m_PC);
 		CLR0(OV_FLAG);
 	}
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::bz()
 {
 	if (m_ACC.d == 0) m_PC = m_cache.read_word(m_PC);
-	else m_PC++ ;
+	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms32025_device::cala()
@@ -842,7 +842,7 @@ void tms32025_device::cala()
 }
 void tms32025_device::call()
 {
-	m_PC++ ;
+	m_PC++;
 	PUSH_STACK(m_PC);
 	m_PC = m_cache.read_word(m_PC - 1);
 	MODIFY_AR_ARP();
@@ -855,18 +855,22 @@ void tms32025_device::cmpr()
 {
 	switch (m_opcode.b.l & 3)
 	{
-		case 00:    if ( (uint16_t)(m_AR[ARP]) == (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
-		case 01:    if ( (uint16_t)(m_AR[ARP]) <  (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
-		case 02:    if ( (uint16_t)(m_AR[ARP])  > (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
-		case 03:    if ( (uint16_t)(m_AR[ARP]) != (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
-					else CLR1(TC_FLAG);
-					break;
+		case 0:
+			if ( (uint16_t)(m_AR[ARP]) == (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
+		case 1:
+			if ( (uint16_t)(m_AR[ARP]) <  (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
+		case 2:
+			if ( (uint16_t)(m_AR[ARP])  > (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
+		case 3:
+			if ( (uint16_t)(m_AR[ARP]) != (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			else CLR1(TC_FLAG);
+			break;
 	}
 }
 void tms32025_device::cnfd()  /** next two fetches need to use previous CNF value ! **/
@@ -1174,8 +1178,8 @@ void tms32025_device::neg()
 		if (OVM) m_ACC.d = 0x7fffffff;
 	}
 	else m_ACC.d = -m_ACC.d;
-	if (m_ACC.d) CLR0(C_FLAG);
-	else SET0(C_FLAG);
+	if (m_ACC.d) CLR1(C_FLAG);
+	else SET1(C_FLAG);
 }
 /*
 void tms32025_device::nop() { }   // NOP is a subset of the MAR instruction
@@ -1660,13 +1664,6 @@ void tms32025_device::device_start()
 		m_program.space().install_rom(0x0000, 0x0fff, memregion("internal")->base());
 	}
 
-	m_bio_in.resolve_safe(0xffff);
-	m_hold_in.resolve_safe(0xffff);
-	m_hold_ack_out.resolve_safe();
-	m_xf_out.resolve_safe();
-	m_dr_in.resolve_safe(0xffff);
-	m_dx_out.resolve_safe();
-
 	m_PREVPC = 0;
 	m_PFC = 0;
 	m_STR0 = 0;
@@ -1854,8 +1851,8 @@ int tms32025_device::process_IRQs()
 
 		if ((m_IFR & 0x01) && (m_imr & 0x01)) {       /* IRQ line 0 */
 			//logerror("TMS32025:  Active INT0\n");
+			standard_irq_callback(0, m_PC);
 			m_PC = 0x0002;
-			standard_irq_callback(0);
 			m_idle = 0;
 			m_IFR &= (~0x01);
 			SET0(INTM_FLAG);
@@ -1863,8 +1860,8 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x02) && (m_imr & 0x02)) {       /* IRQ line 1 */
 			//logerror("TMS32025:  Active INT1\n");
+			standard_irq_callback(1, m_PC);
 			m_PC = 0x0004;
-			standard_irq_callback(1);
 			m_idle = 0;
 			m_IFR &= (~0x02);
 			SET0(INTM_FLAG);
@@ -1872,8 +1869,8 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x04) && (m_imr & 0x04)) {       /* IRQ line 2 */
 			//logerror("TMS32025:  Active INT2\n");
+			standard_irq_callback(2, m_PC);
 			m_PC = 0x0006;
-			standard_irq_callback(2);
 			m_idle = 0;
 			m_IFR &= (~0x04);
 			SET0(INTM_FLAG);
@@ -2057,7 +2054,7 @@ void tms32025_device::execute_run()
 					(this->*s_opcode_main[m_opcode.b.h].function)();
 				}
 				m_init_load_addr = 0;
-				m_RPTC-- ;
+				m_RPTC--;
 			} while ((int8_t)(m_RPTC) != -1);
 			m_RPTC = 0;
 			m_PFC = m_PC;

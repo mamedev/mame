@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_SUPBTIME_H
-#define MAME_INCLUDES_SUPBTIME_H
+#ifndef MAME_DATAEAST_SUPBTIME_H
+#define MAME_DATAEAST_SUPBTIME_H
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
@@ -40,7 +40,7 @@ public:
 	void init_tumblep();
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	uint16_t vblank_ack_r();
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets);
 	uint32_t screen_update_chinatwn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -61,4 +61,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_DATAEAST_SUPBTIME_H

@@ -44,15 +44,10 @@ void crd254sh_device::mem_map(address_map &map)
 	map(0x00000, 0x0ffff).rom().region("mcu", 0);
 }
 
-void crd254sh_device::io_map(address_map &map)
-{
-}
-
 void crd254sh_device::device_add_mconfig(machine_config &config)
 {
 	H83040(config, m_mcu, 20_MHz_XTAL);
 	m_mcu->set_addrmap(AS_PROGRAM, &crd254sh_device::mem_map);
-	m_mcu->set_addrmap(AS_IO, &crd254sh_device::io_map);
 
 	NCR53C94(config, m_scsi, 25_MHz_XTAL); // Placeholder until we implement the real chip
 }

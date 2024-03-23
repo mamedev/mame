@@ -28,6 +28,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class backfire_state : public driver_device
 {
 public:
@@ -61,7 +63,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vbl_interrupt);
+	void vbl_interrupt(int state);
 	void irq_ack_w(uint32_t data);
 	void descramble_sound();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -325,7 +327,7 @@ static GFXDECODE_START( gfx_backfire )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(backfire_state::vbl_interrupt)
+void backfire_state::vbl_interrupt(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
@@ -613,6 +615,9 @@ void backfire_state::init_backfire()
 	descramble_sound();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32smo_delegate(*this, FUNC(backfire_state::backfire_speedup_r)));
 }
+
+} // anonymous namespace
+
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play

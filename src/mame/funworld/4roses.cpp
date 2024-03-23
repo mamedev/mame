@@ -184,6 +184,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(16'000'000)
 
 class _4roses_state : public funworld_state
@@ -195,7 +197,7 @@ public:
 	{
 	}
 
-	void driver_init() override;
+	void driver_init();
 	void _4roses(machine_config &config);
 
 protected:
@@ -216,7 +218,7 @@ public:
 	{
 	}
 
-	void driver_init() override;
+	void driver_init();
 	void rugby(machine_config &config);
 
 private:
@@ -579,6 +581,8 @@ void rugby_state::driver_init()
 	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
 		rom[addr] = bitswap<8>(rom[addr], 6, 7, 4, 5, 2, 3, 0, 1);
 }
+
+} // anonymous namespace
 
 
 /*************************

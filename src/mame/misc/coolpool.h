@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles,Nicola Salmoria
-#ifndef MAME_INCLUDES_COOLPOOL_H
-#define MAME_INCLUDES_COOLPOOL_H
+#ifndef MAME_MISC_COOLPOOL_H
+#define MAME_MISC_COOLPOOL_H
 
 #pragma once
 
@@ -74,7 +74,7 @@ private:
 	void nvram_thrash_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void amerdart_misc_w(uint16_t data);
-	DECLARE_READ_LINE_MEMBER(amerdart_dsp_bio_line_r);
+	int amerdart_dsp_bio_line_r();
 	uint16_t amerdart_trackball_r(offs_t offset);
 	void coolpool_misc_w(uint16_t data);
 	uint16_t dsp_bio_line_r();
@@ -107,4 +107,4 @@ private:
 	void nballsht_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_COOLPOOL_H
+#endif // MAME_MISC_COOLPOOL_H

@@ -7,7 +7,7 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 	if (m_cpuid_id0 == 0)
 	{
 		// this 486 doesn't support the CPUID instruction
-		logerror("CPUID not supported at %08x!\n", m_eip);
+		LOGMASKED(LOG_MSR, "CPUID not supported at %08x!\n", m_eip);
 		i386_trap(6, 0, 0);
 	}
 	else
@@ -324,7 +324,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 					FAULT(FAULT_GP,0)
 				if(modrm >= 0xc0)
 				{
-					logerror("i486: invlpg with modrm %02X\n", modrm);
+					LOGMASKED(LOG_PM_FAULT_UD, "i486: invlpg with modrm %02X\n", modrm);
 					FAULT(FAULT_UD,0)
 				}
 				ea = GetEA(modrm,-1);
@@ -442,7 +442,7 @@ void i386_device::i486_group0F01_32()      // Opcode 0x0f 01
 					FAULT(FAULT_GP,0)
 				if(modrm >= 0xc0)
 				{
-					logerror("i486: invlpg with modrm %02X\n", modrm);
+					LOGMASKED(LOG_PM_FAULT_UD, "i486: invlpg with modrm %02X\n", modrm);
 					FAULT(FAULT_UD,0)
 				}
 				ea = GetEA(modrm,-1);
@@ -458,49 +458,49 @@ void i386_device::i486_group0F01_32()      // Opcode 0x0f 01
 
 void i386_device::i486_bswap_eax()     // Opcode 0x0f 38
 {
-	REG32(EAX) = SWITCH_ENDIAN_32(REG32(EAX));
+	REG32(EAX) = swapendian_int32(REG32(EAX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_ecx()     // Opcode 0x0f 39
 {
-	REG32(ECX) = SWITCH_ENDIAN_32(REG32(ECX));
+	REG32(ECX) = swapendian_int32(REG32(ECX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_edx()     // Opcode 0x0f 3A
 {
-	REG32(EDX) = SWITCH_ENDIAN_32(REG32(EDX));
+	REG32(EDX) = swapendian_int32(REG32(EDX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_ebx()     // Opcode 0x0f 3B
 {
-	REG32(EBX) = SWITCH_ENDIAN_32(REG32(EBX));
+	REG32(EBX) = swapendian_int32(REG32(EBX));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_esp()     // Opcode 0x0f 3C
 {
-	REG32(ESP) = SWITCH_ENDIAN_32(REG32(ESP));
+	REG32(ESP) = swapendian_int32(REG32(ESP));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_ebp()     // Opcode 0x0f 3D
 {
-	REG32(EBP) = SWITCH_ENDIAN_32(REG32(EBP));
+	REG32(EBP) = swapendian_int32(REG32(EBP));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_esi()     // Opcode 0x0f 3E
 {
-	REG32(ESI) = SWITCH_ENDIAN_32(REG32(ESI));
+	REG32(ESI) = swapendian_int32(REG32(ESI));
 	CYCLES(1);     // TODO
 }
 
 void i386_device::i486_bswap_edi()     // Opcode 0x0f 3F
 {
-	REG32(EDI) = SWITCH_ENDIAN_32(REG32(EDI));
+	REG32(EDI) = swapendian_int32(REG32(EDI));
 	CYCLES(1);     // TODO
 }
 
@@ -516,7 +516,7 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 	{
 		case 0:
 			CYCLES(CYCLES_MOV_REG_CR0);
-			if((oldcr ^ m_cr[cr]) & 0x80010000)
+			if((oldcr ^ m_cr[cr]) & (CR0_PG | CR0_WP))
 				vtlb_flush_dynamic();
 			if (PROTECTED_MODE != BIT(data, 0))
 				debugger_privilege_hook();
@@ -528,7 +528,7 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 			break;
 		case 4: CYCLES(1); break; // TODO
 		default:
-			logerror("i386: mov_cr_r32 CR%d!\n", cr);
+			LOGMASKED(LOG_INVALID_OPCODE, "i386: mov_cr_r32 CR%d!\n", cr);
 			return;
 	}
 	m_cr[cr] = data;
@@ -536,5 +536,10 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 
 void i386_device::i486_wait()
 {
+	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	x87_mf_fault();
 }

@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
-
-#ifndef MAME_MACHINE_TEK410X_KEYBOARD_H
-#define MAME_MACHINE_TEK410X_KEYBOARD_H
+#ifndef MAME_TEKTRONIX_TEK410X_KBD_H
+#define MAME_TEKTRONIX_TEK410X_KBD_H
 
 #pragma once
 
@@ -26,13 +25,12 @@ public:
 	auto rdata_callback() { return m_rdata_callback.bind(); }
 
 	// line inputs
-	DECLARE_WRITE_LINE_MEMBER(kdi_w);
-	DECLARE_WRITE_LINE_MEMBER(kdo_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void kdi_w(int state);
+	void kdo_w(int state);
+	void reset_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -66,4 +64,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(TEK410X_KEYBOARD, tek410x_keyboard_device)
 
-#endif // MAME_MACHINE_TEK410X_KEYBOARD_H
+#endif // MAME_TEKTRONIX_TEK410X_KBD_H

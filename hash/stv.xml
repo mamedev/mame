@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     Note: Most games do not support multi cart system - the ones that are has the text "CART-AM" in the header.
     All titles that doesn't support it have a supported="no" flag.
@@ -593,6 +593,28 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Game: Name Club Disney -->
+	<software name="nclubdis" supported="no"> <!-- needs security card -->
+		<description>Name Club Disney (J 980614 V1.000)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="stv_cart">
+			<dataarea name="rom" size="0x3000000">
+				<rom name="ic22" size="0x200000" crc="cfd5eb54" sha1="878195c70ad931d3015d497d2739a0867ff83cf7" offset="0x0200000" loadflag="load16_word_swap" status="baddump" /> <!-- tests bad but believed good, flagged so it gets double checked if possible -->
+				<rom name="ic24" size="0x200000" crc="943682eb" sha1="ad41625244509affe7b6d6caffef58bb7bf75b72" offset="0x0400000" loadflag="load16_word_swap"/>
+				<rom name="ic26" size="0x200000" crc="a17bd53a" sha1="e05079e3bfc7187b70ddc4b48de9e5ffcb19e473" offset="0x0600000" loadflag="load16_word_swap"/>
+				<rom name="ic28" size="0x200000" crc="9a597bff" sha1="8cc265a89bbc42d4e6d55e23a4ed87fc1224c9dc" offset="0x0800000" loadflag="load16_word_swap"/>
+				<rom name="ic30" size="0x200000" crc="3eb020f6" sha1="6b87a6e7ab9eb820b7661fa6ea8c29bf8ead820d" offset="0x0a00000" loadflag="load16_word_swap"/>
+				<rom name="ic32" size="0x200000" crc="ac26d375" sha1="a01125eb4bca7823eb12d4e03d93612e09dcddda" offset="0x0c00000" loadflag="load16_word_swap"/>
+				<rom name="ic34" size="0x200000" crc="e157cd99" sha1="52c976540157cc63c599ee34ec5bade7e489599d" offset="0x0e00000" loadflag="load16_word_swap"/> <!-- 111xxxxxxxxxxxxxxxxxx = 0xFF -->
+				<rom name="ic36" size="0x200000" crc="9a4109e5" sha1="ba59caac5f5a80fc52c507d8a47f322a380aa9a1" offset="0x1000000" loadflag="load16_word_swap"/> <!-- FIXED BITS (11111111), but present -->
+				<rom name="ic23" size="0x200000" crc="9a4109e5" sha1="ba59caac5f5a80fc52c507d8a47f322a380aa9a1" offset="0x1200000" loadflag="load16_word_swap"/> <!-- FIXED BITS (11111111), but present -->
+				<rom name="ic25" size="0x200000" crc="9a4109e5" sha1="ba59caac5f5a80fc52c507d8a47f322a380aa9a1" offset="0x1400000" loadflag="load16_word_swap"/> <!-- FIXED BITS (11111111), but present -->
+				<!-- ic27, ic29, ic31, ic33, ic35, ic37 not populated -->
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Game: Name Club Ver.3 -->
 	<software name="nclubv3" supported="no">
 		<description>Name Club Ver.3 (J 970723 V1.000)</description>
@@ -968,7 +990,7 @@ license:CC0
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: Treasure Hunt -->
-	<software name="thunt" supported="no"  cloneof="sandor">
+	<software name="thunt" supported="no" cloneof="sandor">
 		<description>Puzzle &amp; Action: Treasure Hunt (JUET 970901 V2.00E)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -985,7 +1007,7 @@ license:CC0
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: BoMulEul Chajara -->
-	<software name="thuntk" supported="no"  cloneof="sandor">
+	<software name="thuntk" supported="no" cloneof="sandor">
 		<description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
 		<year>1997</year>
 		<publisher>Sega / Deniam</publisher>

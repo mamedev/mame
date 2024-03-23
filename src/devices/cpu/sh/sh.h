@@ -51,8 +51,8 @@
 #define CPU_TYPE_SH3    (2)
 #define CPU_TYPE_SH4    (3)
 
-#define Rn  ((opcode>>8)&15)
-#define Rm  ((opcode>>4)&15)
+#define REG_N  ((opcode >> 8) & 15)
+#define REG_M  ((opcode >> 4) & 15)
 
 /* Bits in SR */
 #define SH_T   0x00000001
@@ -84,9 +84,9 @@
     MACROS
 ***************************************************************************/
 
-#define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)) // sh2
-#define SH34LE_CODE_XOR(a)  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6)) // naomi
-#define SH34BE_CODE_XOR(a)  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0)) // cave
+#define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2, 0)) // sh2
+#define SH34LE_CODE_XOR(a)  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0, 6)) // naomi
+#define SH34BE_CODE_XOR(a)  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6, 0)) // cave
 
 #define R32(reg)        m_regmap[reg]
 
@@ -168,12 +168,13 @@ public:
 
 	internal_sh2_state *m_sh2_state;
 
-	virtual uint8_t RB(offs_t A) = 0;
-	virtual uint16_t RW(offs_t A) = 0;
-	virtual uint32_t RL(offs_t A) = 0;
-	virtual void WB(offs_t A, uint8_t V) = 0;
-	virtual void WW(offs_t A, uint16_t V) = 0;
-	virtual void WL(offs_t A, uint32_t V) = 0;
+	virtual uint8_t read_byte(offs_t offset) = 0;
+	virtual uint16_t read_word(offs_t offset) = 0;
+	virtual uint32_t read_long(offs_t offset) = 0;
+	virtual uint16_t decrypted_read_word(offs_t offset) = 0;
+	virtual void write_byte(offs_t offset, uint8_t data) = 0;
+	virtual void write_word(offs_t offset, uint16_t data) = 0;
+	virtual void write_long(offs_t offset, uint32_t data) = 0;
 
 	virtual void set_frt_input(int state) = 0;
 	void pulse_frt_input() { set_frt_input(ASSERT_LINE); set_frt_input(CLEAR_LINE); }
@@ -506,4 +507,4 @@ protected:
 	sh_common_execution *m_sh;
 };
 
-#endif // MAME_CPU_SH2_SH2_H
+#endif // MAME_CPU_SH_SH_H

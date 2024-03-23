@@ -26,15 +26,15 @@ cheekyms_audio_device::cheekyms_audio_device(const machine_config &mconfig, cons
 }
 
 
-WRITE_LINE_MEMBER(cheekyms_audio_device::mute_w)        { m_mute->write_line(state);       }
-WRITE_LINE_MEMBER(cheekyms_audio_device::cheese_w)      { m_cheese->write_line(state);     }
-WRITE_LINE_MEMBER(cheekyms_audio_device::music_w)       { m_music->write_line(state);      }
-WRITE_LINE_MEMBER(cheekyms_audio_device::mouse_w)       { m_mouse->write_line(state);      }
-WRITE_LINE_MEMBER(cheekyms_audio_device::hammer_w)      { m_hammer->write_line(state);     }
-WRITE_LINE_MEMBER(cheekyms_audio_device::pest_w)        { m_pest->write_line(state);       }
-WRITE_LINE_MEMBER(cheekyms_audio_device::mouse_dies_w)  { m_mouse_dies->write_line(state); }
-WRITE_LINE_MEMBER(cheekyms_audio_device::pest_dies_w)   { m_pest_dies->write_line(state);  }
-WRITE_LINE_MEMBER(cheekyms_audio_device::coin_extra_w)  { m_coin_extra->write_line(state); }
+void cheekyms_audio_device::mute_w(int state)       { m_mute->write_line(state);       }
+void cheekyms_audio_device::cheese_w(int state)     { m_cheese->write_line(state);     }
+void cheekyms_audio_device::music_w(int state)      { m_music->write_line(state);      }
+void cheekyms_audio_device::mouse_w(int state)      { m_mouse->write_line(state);      }
+void cheekyms_audio_device::hammer_w(int state)     { m_hammer->write_line(state);     }
+void cheekyms_audio_device::pest_w(int state)       { m_pest->write_line(state);       }
+void cheekyms_audio_device::mouse_dies_w(int state) { m_mouse_dies->write_line(state); }
+void cheekyms_audio_device::pest_dies_w(int state)  { m_pest_dies->write_line(state);  }
+void cheekyms_audio_device::coin_extra_w(int state) { m_coin_extra->write_line(state); }
 
 
 void cheekyms_audio_device::device_add_mconfig(machine_config &config)

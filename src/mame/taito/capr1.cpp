@@ -39,6 +39,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class capr1_state : public driver_device
 {
 public:
@@ -261,6 +263,8 @@ ROM_START( cspin2 )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "e30-02.bin",    0x000000, 0x040000, CRC(519e5474) SHA1(04b344b34d780f2f83207bf6eee2573cc0ce421e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1996, cspin2, 0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Spin 2", MACHINE_IS_SKELETON_MECHANICAL )

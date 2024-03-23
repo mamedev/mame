@@ -74,21 +74,21 @@ public:
 	// Set write callback for ACCRQ signal
 	auto accrq_write_cb() { return m_accrq_write_func.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(eoi_w);
-	DECLARE_WRITE_LINE_MEMBER(dav_w);
-	DECLARE_WRITE_LINE_MEMBER(nrfd_w);
-	DECLARE_WRITE_LINE_MEMBER(ndac_w);
-	DECLARE_WRITE_LINE_MEMBER(ifc_w);
-	DECLARE_WRITE_LINE_MEMBER(srq_w);
-	DECLARE_WRITE_LINE_MEMBER(atn_w);
-	DECLARE_WRITE_LINE_MEMBER(ren_w);
+	void eoi_w(int state);
+	void dav_w(int state);
+	void nrfd_w(int state);
+	void ndac_w(int state);
+	void ifc_w(int state);
+	void srq_w(int state);
+	void atn_w(int state);
+	void ren_w(int state);
 
 	// Register access
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
 	// CONT output: true when 9914 is current controller-in-charge
-	DECLARE_READ_LINE_MEMBER(cont_r);
+	int cont_r();
 
 private:
 	// device-level overrides

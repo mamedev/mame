@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Paul Priest
-#ifndef MAME_INCLUDES_PSIKYOSH_H
-#define MAME_INCLUDES_PSIKYOSH_H
+#ifndef MAME_PSIKYO_PSIKYOSH_H
+#define MAME_PSIKYO_PSIKYOSH_H
 
 #pragma once
 
 #include "machine/eepromser.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7604.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -41,9 +41,16 @@ public:
 	void psikyo5(machine_config &config);
 	void psikyo5_mahjong(machine_config &config);
 	void psikyo5_240(machine_config &config);
+	void s1945iiibl(machine_config &config);
+	void s1945iiibla(machine_config &config);
 
 	void init_ps3();
 	void init_ps5();
+	void init_s1945iiibl();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -81,7 +88,7 @@ private:
 	const struct sprite_t *m_sprite_end;
 
 	/* devices */
-	required_device<sh2_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -102,10 +109,8 @@ private:
 	void vidregs_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 mjgtaste_input_r();
 	void eeprom_w(u8 data);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, int alpha);
 	void draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr);
@@ -124,6 +129,8 @@ private:
 	void ps3v1_map(address_map &map);
 	void ps5_map(address_map &map);
 	void ps5_mahjong_map(address_map &map);
+	void s1945iiibl_map(address_map &map);
+	void s1945iiibla_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PSIKYOSH_H
+#endif // MAME_PSIKYO_PSIKYOSH_H

@@ -22,8 +22,6 @@
 class hti_format_t
 {
 public:
-	hti_format_t();
-
 	// Tape position, 1 unit = 1 inch / (968 * 1024)
 	typedef int32_t tape_pos_t;
 
@@ -55,7 +53,6 @@ public:
 	// Iterator to access words on tape
 	typedef tape_track_t::iterator track_iterator_t;
 
-	// Set image format
 	enum image_format_t {
 		// Delta modulation, 16 bits per word, 2 tracks per cartridge
 		// HP 9845 & HP 85
@@ -68,6 +65,16 @@ public:
 		HTI_MANCHESTER_MOD
 	};
 
+	enum adv_res_t
+	{
+		ADV_NO_MORE_DATA,
+		ADV_CONT_DATA,
+		ADV_DISCONT_DATA
+	};
+
+	hti_format_t();
+
+	// Set image format
 	void set_image_format(image_format_t fmt) { m_img_format = fmt; }
 
 	// Return number of tracks
@@ -86,55 +93,48 @@ public:
 	// Return physical length of a 16-bit word on tape
 	tape_pos_t word_length(tape_word_t w) const;
 
-	tape_pos_t farthest_end(const track_iterator_t& it , bool forward) const;
+	tape_pos_t farthest_end(const track_iterator_t &it, bool forward) const;
 
-	static bool pos_offset(tape_pos_t& pos , bool forward , tape_pos_t offset);
+	static bool pos_offset(tape_pos_t &pos, bool forward, tape_pos_t offset);
 
 	// Position of next hole tape will reach in a given direction
-	static tape_pos_t next_hole(tape_pos_t pos , bool forward);
+	static tape_pos_t next_hole(tape_pos_t pos, bool forward);
 
 	// Write a data word on tape
-	void write_word(unsigned track_no , tape_pos_t start , tape_word_t word , tape_pos_t& length , bool forward = true);
+	void write_word(unsigned track_no, tape_pos_t start, tape_word_t word, tape_pos_t &length, bool forward = true);
 	// Write a gap on tape
-	void write_gap(unsigned track_no , tape_pos_t a , tape_pos_t b);
+	void write_gap(unsigned track_no, tape_pos_t a, tape_pos_t b);
 
 	// Check that a section of tape has no data (it's just gap)
-	bool just_gap(unsigned track_no , tape_pos_t a , tape_pos_t b);
+	bool just_gap(unsigned track_no, tape_pos_t a, tape_pos_t b);
 
 	// Return position of next data word in a given direction
-	bool next_data(unsigned track_no , tape_pos_t pos , bool forward , bool inclusive , track_iterator_t& it);
-
-	enum adv_res_t
-	{
-		ADV_NO_MORE_DATA,
-		ADV_CONT_DATA,
-		ADV_DISCONT_DATA
-	};
+	bool next_data(unsigned track_no, tape_pos_t pos, bool forward, bool inclusive, track_iterator_t &it);
 
 	// Advance an iterator to next word of data
-	adv_res_t adv_it(unsigned track_no , bool forward , track_iterator_t& it);
+	adv_res_t adv_it(unsigned track_no, bool forward, track_iterator_t &it);
 
 	// Sync with the preamble of a record
-	bool sync_with_record(unsigned track_no , track_iterator_t& it , unsigned& bit_idx);
+	bool sync_with_record(unsigned track_no, track_iterator_t &it, unsigned &bit_idx);
 
 	// Get a data word from record, after syncing
-	adv_res_t next_word(unsigned track_no , track_iterator_t& it , unsigned& bit_idx , tape_word_t& word);
+	adv_res_t next_word(unsigned track_no, track_iterator_t &it, unsigned &bit_idx, tape_word_t &word);
 
 	// Scan for beginning of next gap in a given direction
-	bool next_gap(unsigned track_no , tape_pos_t& pos , bool forward , tape_pos_t min_gap);
+	bool next_gap(unsigned track_no, tape_pos_t &pos, bool forward, tape_pos_t min_gap);
 
 private:
 	// Content of tape tracks
-	tape_track_t m_tracks[ 2 ];
+	tape_track_t m_tracks[2];
 	// Image format
 	image_format_t m_img_format;
 
-	bool load_track(util::random_read &io , tape_track_t& track , bool old_format);
-	static void dump_sequence(util::random_read_write &io , tape_track_t::const_iterator it_start , unsigned n_words);
+	bool load_track(util::random_read &io, tape_track_t &track, bool old_format);
+	static void dump_sequence(util::random_read_write &io, tape_track_t::const_iterator it_start, unsigned n_words);
 
-	tape_pos_t word_end_pos(const track_iterator_t& it) const;
-	void adjust_it(tape_track_t& track , track_iterator_t& it , tape_pos_t pos) const;
-	static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
+	tape_pos_t word_end_pos(const track_iterator_t &it) const;
+	void adjust_it(tape_track_t &track, track_iterator_t &it, tape_pos_t pos) const;
+	static void ensure_a_lt_b(tape_pos_t &a, tape_pos_t &b);
 };
 
 #endif // MAME_FORMATS_HTI_TAPE_H

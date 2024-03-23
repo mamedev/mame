@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/bw2_dsk.c
+    formats/bw2_dsk.cpp
 
     bw2 format
 
@@ -14,17 +14,17 @@ bw2_format::bw2_format() : upd765_format(formats)
 {
 }
 
-const char *bw2_format::name() const
+const char *bw2_format::name() const noexcept
 {
 	return "bw2";
 }
 
-const char *bw2_format::description() const
+const char *bw2_format::description() const noexcept
 {
 	return "Bondwell 2 disk image";
 }
 
-const char *bw2_format::extensions() const
+const char *bw2_format::extensions() const noexcept
 {
 	return "dsk";
 }

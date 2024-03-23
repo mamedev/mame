@@ -60,12 +60,12 @@ public:
 	// construction/destruction
 	saa5240_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(write_scl);
-	DECLARE_WRITE_LINE_MEMBER(write_sda);
-	DECLARE_READ_LINE_MEMBER(read_sda);
+	void write_scl(int state);
+	void write_sda(int state);
+	int read_sda();
 
-	DECLARE_WRITE_LINE_MEMBER(vcs_w);
-	DECLARE_WRITE_LINE_MEMBER(f6_w);
+	void vcs_w(int state);
+	void f6_w(int state);
 	int get_rgb();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

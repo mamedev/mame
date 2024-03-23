@@ -133,6 +133,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define FIRST_CLOCK     XTAL(5'000'000)
 #define SECOND_CLOCK    XTAL(20'000'000)
 #define CPU_CLOCK       (FIRST_CLOCK)       // verified 5 MHz.
@@ -527,6 +530,8 @@ ROM_START( smotor )
 	ROM_LOAD( "2_gal16v8.k3", 0x0000, 0x0117, NO_DUMP )  // device is dead
 	ROM_LOAD( "3_gal16v8.l2", 0x0000, 0x0117, NO_DUMP )  // device is dead
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

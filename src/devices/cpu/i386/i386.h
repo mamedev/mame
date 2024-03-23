@@ -6,8 +6,8 @@
 #pragma once
 
 // SoftFloat 2 lacks an include guard
-#ifndef softfloat_h
-#define softfloat_h 1
+#ifndef softfloat2_h
+#define softfloat2_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #endif
@@ -59,7 +59,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -225,6 +225,46 @@ protected:
 		FF_DTES64 = 1 << 2,    // 64 Bit DS Area
 		FF_PCLMULQDQ = 1 << 1, // Carryless Multiplication
 		FF_SSE3 = 1 << 0,      // SSE3 Extensions
+	};
+
+	enum CR0_BITS : uint32_t {
+		CR0_PG = (u32)1 << 31, // Paging
+		CR0_CD = 1 << 30,      // Cache disable
+		CR0_NW = 1 << 29,      // Not writethrough
+		CR0_AM = 1 << 18,      // Alignment mask
+		CR0_WP = 1 << 16,      // Write protect
+		CR0_NE = 1 << 5,       // Numeric error
+		CR0_ET = 1 << 4,       // Extension type
+		CR0_TS = 1 << 3,       // Task switched
+		CR0_EM = 1 << 2,       // Emulation
+		CR0_MP = 1 << 1,       // Monitor coprocessor
+		CR0_PE = 1 << 0,       // Protection enabled
+	};
+
+	enum CR3_BITS : uint32_t {
+		CR3_PCD = 1 << 4,
+		CR3_PWT = 1 << 3,
+	};
+
+	enum CR4_BITS : uint32_t {
+		CR4_SMAP = 1 << 21,
+		CR4_SMEP = 1 << 20,
+		CR4_OSXSAVE = 1 << 18,
+		CR4_PCIDE = 1 << 17,
+		CR4_FSGSBASE = 1 << 16,
+		CR4_SMXE = 1 << 14,
+		CR4_VMXE = 1 << 13,
+		CR4_OSXMMEXCPT = 1 << 10,
+		CR4_OSFXSR = 1 << 9,
+		CR4_PCE = 1 << 8,
+		CR4_PGE = 1 << 7,
+		CR4_MCE = 1 << 6,
+		CR4_PAE = 1 << 5,
+		CR4_PSE = 1 << 4,
+		CR4_DE = 1 << 3,
+		CR4_TSD = 1 << 2,
+		CR4_PVI = 1 << 1,
+		CR4_VME = 1 << 0,
 	};
 
 	typedef void (i386_device::*i386_modrm_func)(uint8_t modrm);
@@ -397,7 +437,7 @@ protected:
 	void register_state_i386_x87_xmm();
 	uint32_t i386_translate(int segment, uint32_t ip, int rwn);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
-	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry);
+	bool i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry);
 	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
 	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
@@ -1359,6 +1399,7 @@ protected:
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
 	int x87_dec_stack();
+	int x87_ck_over_stack();
 	int x87_check_exceptions(bool store = false);
 	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);

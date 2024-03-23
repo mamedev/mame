@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="msx2_cass" description="MSX2 cassettes">
@@ -16,9 +16,10 @@ To verify:
 -->
 
 	<software name="chess2">
-		<description>The Chess Game 2 (Euro)</description>
+		<description>The Chess Game 2 (Europe)</description>
 		<year>1986</year>
 		<publisher>Eaglesoft</publisher>
+		<info name="serial" value="1264"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -29,11 +30,11 @@ To verify:
 	</software>
 
 	<software name="leonardo">
-		<description>Leonardo (Jpn)</description>
+		<description>Leonardo (Japan)</description>
 		<year>1987</year>
 		<publisher>Omega System</publisher>
 		<info name="alt_title" value="レオナルド" />
-		<info name="usage" value="Load with CLOAD + RUN"/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="21494">
@@ -43,22 +44,10 @@ To verify:
 	</software>
 
 	<software name="redlight">
-		<description>Red Lights of Amsterdam (Euro)</description>
+		<description>Red Lights of Amsterdam (Europe)</description>
 		<year>1986</year>
 		<publisher>Eaglesoft</publisher>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
-
-		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="172263">
-				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)[run'cas-'].cas" size="172263" crc="443d80f9" sha1="b8323adf0b5c9d05223f3c587d52d94b933c00f6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="redlighta" cloneof="redlight">
-		<description>Red Lights of Amsterdam (Euro, 2 Sides)</description>
-		<year>1986</year>
-		<publisher>Eaglesoft</publisher>
+		<info name="serial" value="1261"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">

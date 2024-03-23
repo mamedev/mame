@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_PROF80MMU_H
-#define MAME_MACHINE_PROF80MMU_H
+#ifndef MAME_CONITEC_PROF80MMU_H
+#define MAME_CONITEC_PROF80MMU_H
 
 #pragma once
 
@@ -26,7 +26,7 @@ public:
 	virtual void z80_program_map(address_map &map);
 
 	void par_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( mme_w );
+	void mme_w(int state);
 
 	void program_map(address_map &map);
 protected:
@@ -52,4 +52,4 @@ DECLARE_DEVICE_TYPE(PROF80_MMU, prof80_mmu_device)
 
 
 
-#endif // MAME_MACHINE_PROF80MMU_H
+#endif // MAME_CONITEC_PROF80MMU_H

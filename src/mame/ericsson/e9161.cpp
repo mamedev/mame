@@ -16,6 +16,8 @@
 #include "video/am8052.h"
 
 
+namespace {
+
 class e9161_state : public driver_device
 {
 public:
@@ -29,35 +31,18 @@ public:
 	void e9161(machine_config &config);
 
 private:
-	u16 berr_r();
-	void berr_w(u16 data);
-
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<hd63450_device> m_dmac;
 };
-
-
-u16 e9161_state::berr_r()
-{
-	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	return 0xffff;
-}
-
-void e9161_state::berr_w(u16 data)
-{
-	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-}
 
 void e9161_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x000007).rom().region("program", 0);
 	map(0x000008, 0x01ffff).ram();
-	map(0x020000, 0x020001).w(FUNC(e9161_state::berr_w));
-	map(0xa00000, 0xa00001).mirror(0x1ffffe).r(FUNC(e9161_state::berr_r));
+	map(0x020000, 0x020001).w(m_maincpu, FUNC(m68000_device::berr_w));
+	map(0xa00000, 0xa00001).mirror(0x1ffffe).r(m_maincpu, FUNC(m68000_device::berr_r));
 	map(0xc00000, 0xc03fff).rom().region("program", 0);
 	map(0xe00000, 0xe03fff).ram();
 	map(0xffe000, 0xffe03f).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
@@ -96,6 +81,8 @@ ROM_START(e9161)
 	ROM_LOAD16_BYTE("e3405_87080_7403.bin", 0x0000, 0x2000, CRC(97f72404) SHA1(ced003ce294cd7370051e1f774d5120062390647))
 	ROM_LOAD16_BYTE("e3405_87080_7303.bin", 0x0001, 0x2000, CRC(ec94aec4) SHA1(f41ae1b7f04ca3a2d0def6ff9aad3ff41782589a))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(198?, e9161, 0, 0, e9161, e9161, e9161_state, empty_init, "Ericsson", "9161 Display Processor Unit", MACHINE_IS_SKELETON)

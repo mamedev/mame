@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_AUDIO_DCS_H
-#define MAME_AUDIO_DCS_H
+#ifndef MAME_SHARED_DCS_H
+#define MAME_SHARED_DCS_H
 
 #pragma once
 
@@ -85,7 +85,7 @@ public:
 	void update_timer_count();
 	TIMER_DEVICE_CALLBACK_MEMBER( internal_timer_callback );
 	void reset_timer();
-	DECLARE_WRITE_LINE_MEMBER(timer_enable_callback);
+	void timer_enable_callback(int state);
 	uint16_t adsp_control_r(offs_t offset);
 	void adsp_control_w(offs_t offset, uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER( dcs_irq );
@@ -417,4 +417,4 @@ DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device)
 
 DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_2CH, dcs2_audio_denver_2ch_device)
 
-#endif // MAME_AUDIO_DCS_H
+#endif // MAME_SHARED_DCS_H

@@ -75,10 +75,10 @@ uint8_t sh7604_wdt_device::read(address_space &space, offs_t offset)
 void sh7604_wdt_device::write(address_space &space, offs_t offset, uint16_t data)
 {
 	uint8_t id_param = data >> 8;
-	switch(id_param)
+	switch (id_param)
 	{
-		case 0xa5: space.write_byte(offset*2+0,data & 0xff); break;
-		case 0x5a: space.write_byte(offset*2+1,data & 0xff); break;
-		default: throw emu_fatalerror("%s: invalid id param write = %02x\n",tag(),id_param);
+		case 0xa5: space.write_byte(offset * 2 + 0, data & 0xff); break;
+		case 0x5a: space.write_byte(offset * 2 + 1, data & 0xff); break;
+		default: throw emu_fatalerror("%s: invalid id param write = %02x\n", tag(), id_param);
 	}
 }

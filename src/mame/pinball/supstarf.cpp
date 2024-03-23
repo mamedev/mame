@@ -23,6 +23,9 @@ TODO:
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+
+namespace {
+
 class supstarf_state : public driver_device
 {
 public:
@@ -42,10 +45,10 @@ private:
 	void psg_latch_w(offs_t offset, u8 data);
 	void port1_w(u8 data);
 	void port2_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(contacts_r);
-	DECLARE_WRITE_LINE_MEMBER(displays_w);
+	int contacts_r();
+	void displays_w(int state);
 	void driver_clk_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER(phase_detect_r);
+	int phase_detect_r();
 	void lights_a_w(u8 data);
 	void lights_b_w(u8 data);
 
@@ -144,12 +147,12 @@ void supstarf_state::port2_w(u8 data)
 	m_latch_select = !BIT(data, 7);
 }
 
-READ_LINE_MEMBER(supstarf_state::contacts_r)
+int supstarf_state::contacts_r()
 {
 	return 1;
 }
 
-WRITE_LINE_MEMBER(supstarf_state::displays_w)
+void supstarf_state::displays_w(int state)
 {
 }
 
@@ -157,7 +160,7 @@ void supstarf_state::driver_clk_w(offs_t offset, u8 data)
 {
 }
 
-READ_LINE_MEMBER(supstarf_state::phase_detect_r)
+int supstarf_state::phase_detect_r()
 {
 	return 0;
 }
@@ -274,6 +277,9 @@ ROM_START(supstarfa)
 	ROM_REGION(0x1000, "soundcpu", 0)
 	ROM_LOAD("2532.ic4", 0x0000, 0x1000, BAD_DUMP CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15)) // D6 stuck high and probably totally garbage
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1986, supstarf,  0,        supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, supstarfa, supstarf, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -87,13 +87,6 @@ a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, cons
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void a1bus_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-}
-
 void a1bus_device::device_start()
 {
 	// clear slot
@@ -140,8 +133,8 @@ void a1bus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 }
 
 // interrupt request from a1bus card
-WRITE_LINE_MEMBER( a1bus_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( a1bus_device::nmi_w ) { m_out_nmi_cb(state); }
+void a1bus_device::irq_w(int state) { m_out_irq_cb(state); }
+void a1bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG A1BUS CARD INTERFACE
@@ -159,7 +152,7 @@ WRITE_LINE_MEMBER( a1bus_device::nmi_w ) { m_out_nmi_cb(state); }
 device_a1bus_card_interface::device_a1bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "a1bus")
 	, m_a1bus_finder(device, finder_base::DUMMY_TAG), m_a1bus(nullptr)
-	, m_a1bus_slottag(nullptr), m_next(nullptr)
+	, m_a1bus_slottag(nullptr)
 {
 }
 

@@ -111,7 +111,7 @@ private:
 	void control_w(u8 data);
 	template<int N> void digit_data_w(u8 data) { m_digit_data[N] = data; }
 	template<int N> void adpcm_data_w(u8 data) { m_adpcm_data[N] = data; }
-	template<int N> DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	template<int N> void adpcm_int(int state);
 
 	u8 m_control = 0;
 	u8 m_digit_data[3] = { 0, 0, 0 };
@@ -207,7 +207,7 @@ void kungfur_state::control_w(u8 data)
 }
 
 template<int N>
-WRITE_LINE_MEMBER(kungfur_state::adpcm_int)
+void kungfur_state::adpcm_int(int state)
 {
 	if (!state)
 		return;

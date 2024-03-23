@@ -67,13 +67,13 @@
     Logging (also see tms9900.cpp)
 */
 
-#define LOG_OP         (1U<<1)   // Current instruction
-#define LOG_MEM        (1U<<6)   // Memory access
-#define LOG_INT        (1U<<8)   // Interrupts
-#define LOG_ADDRESSBUS (1U<<11)  // Address bus operation
+#define LOG_OP         (1U << 1)   // Current instruction
+#define LOG_MEM        (1U << 2)   // Memory access
+#define LOG_INT        (1U << 3)   // Interrupts
+#define LOG_ADDRESSBUS (1U << 4)   // Address bus operation
 
 // Minimum log should be warnings
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 
@@ -93,17 +93,6 @@ tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag,
 tms9981_device::tms9981_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9980a_device(mconfig, TMS9981, tag, owner, clock)
 {
-}
-
-/*
-    External connections
-*/
-void tms9980a_device::resolve_lines()
-{
-	// Resolve our external connections
-	m_external_operation.resolve();
-	m_clock_out_line.resolve();
-	m_holda_line.resolve();
 }
 
 uint16_t tms9980a_device::read_workspace_register_debug(int reg)

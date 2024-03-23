@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#ifndef MAME_INCLUDES_HUEBLER_H
-#define MAME_INCLUDES_HUEBLER_H
+#ifndef MAME_DDR_HUEBLER_H
+#define MAME_DDR_HUEBLER_H
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"
@@ -72,9 +72,9 @@ private:
 
 	// video state
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(cassette_w);
+	void ctc_z0_w(int state);
+	void ctc_z2_w(int state);
+	void cassette_w(int state);
 	void amu880_io(address_map &map);
 	void amu880_mem(address_map &map);
 
@@ -83,4 +83,4 @@ private:
 	bool m_cassbit = false;
 };
 
-#endif
+#endif // MAME_DDR_HUEBLER_H

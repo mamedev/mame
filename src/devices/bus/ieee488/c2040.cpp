@@ -50,6 +50,11 @@
 #include "emu.h"
 #include "c2040.h"
 
+#include "formats/c3040_dsk.h"
+#include "formats/c4040_dsk.h"
+#include "formats/d64_dsk.h"
+#include "formats/g64_dsk.h"
+
 
 
 //**************************************************************************
@@ -171,10 +176,10 @@ const tiny_rom_entry *c4040_device::device_rom_region() const
 void c2040_device::c2040_main_mem(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).mirror(0x0100).m(M6532_0_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x0100).m(M6532_1_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0200, 0x021f).mirror(0x0d60).m(M6532_0_TAG, FUNC(mos6532_new_device::io_map));
-	map(0x0280, 0x029f).mirror(0x0d60).m(M6532_1_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x0100).m(M6532_0_TAG, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x0100).m(M6532_1_TAG, FUNC(mos6532_device::ram_map));
+	map(0x0200, 0x021f).mirror(0x0d60).m(M6532_0_TAG, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0d60).m(M6532_1_TAG, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x13ff).mirror(0x0c00).ram().share("share1");
 	map(0x2000, 0x23ff).mirror(0x0c00).ram().share("share2");
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().share("share3");
@@ -190,9 +195,9 @@ void c2040_device::c2040_main_mem(address_map &map)
 void c2040_device::c2040_fdc_mem(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x003f).mirror(0x0300).m(M6530_TAG, FUNC(mos6530_new_device::ram_map));
+	map(0x0000, 0x003f).mirror(0x0300).m(M6530_TAG, FUNC(mos6530_device::ram_map));
 	map(0x0040, 0x004f).mirror(0x0330).m(M6522_TAG, FUNC(via6522_device::map));
-	map(0x0080, 0x008f).mirror(0x0330).m(M6530_TAG, FUNC(mos6530_new_device::io_map));
+	map(0x0080, 0x008f).mirror(0x0330).m(M6530_TAG, FUNC(mos6530_device::io_map));
 	map(0x0400, 0x07ff).ram().share("share1");
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");
@@ -459,11 +464,11 @@ void c2040_device::add_common_devices(machine_config &config)
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c2040_device::c2040_main_mem);
 
-	MOS6532_NEW(config, m_riot0, XTAL(16'000'000)/16);
+	MOS6532(config, m_riot0, XTAL(16'000'000)/16);
 	m_riot0->pa_rd_callback().set(FUNC(c2040_device::dio_r));
 	m_riot0->pb_wr_callback().set(FUNC(c2040_device::dio_w));
 
-	MOS6532_NEW(config, m_riot1, XTAL(16'000'000)/16);
+	MOS6532(config, m_riot1, XTAL(16'000'000)/16);
 	m_riot1->pa_rd_callback().set(FUNC(c2040_device::riot1_pa_r));
 	m_riot1->pa_wr_callback().set(FUNC(c2040_device::riot1_pa_w));
 	m_riot1->pb_rd_callback().set(FUNC(c2040_device::riot1_pb_r));
@@ -480,16 +485,16 @@ void c2040_device::add_common_devices(machine_config &config)
 	m_via->ca2_handler().set(m_fdc, FUNC(c2040_fdc_device::mode_sel_w));
 	m_via->cb2_handler().set(m_fdc, FUNC(c2040_fdc_device::rw_sel_w));
 
-	MOS6530_NEW(config, m_miot, XTAL(16'000'000)/16);
+	MOS6530(config, m_miot, XTAL(16'000'000)/16);
 	m_miot->pa_wr_callback().set(m_fdc, FUNC(c2040_fdc_device::write));
 	m_miot->pb_wr_callback<0>().set(m_fdc, FUNC(c2040_fdc_device::drv_sel_w));
 	m_miot->pb_wr_callback<1>().set(m_fdc, FUNC(c2040_fdc_device::ds0_w));
 	m_miot->pb_wr_callback<2>().set(m_fdc, FUNC(c2040_fdc_device::ds1_w));
-	m_miot->pb_wr_callback<7>().set_inputline(m_fdccpu, M6502_IRQ_LINE);
 	m_miot->pb_rd_callback<3>().set(m_fdc, FUNC(c2040_fdc_device::wps_r));
+	m_miot->irq_wr_callback().set_inputline(m_fdccpu, M6502_IRQ_LINE);
 
 	C2040_FDC(config, m_fdc, XTAL(16'000'000));
-	m_fdc->sync_wr_callback().set(m_miot, FUNC(mos6530_new_device::pb6_w));
+	m_fdc->sync_wr_callback().set(m_miot, FUNC(mos6530_device::pb_bit_w<6>));
 	m_fdc->ready_wr_callback().set(m_via, FUNC(via6522_device::write_ca1));
 	m_fdc->error_wr_callback().set(m_via, FUNC(via6522_device::write_cb1));
 }
@@ -658,7 +663,7 @@ void c2040_device::device_reset()
 	m_miot->reset();
 	m_via->reset();
 
-	m_riot1->pa7_w(0);
+	m_riot1->pa_bit_w<7>(0);
 
 	// turn off spindle motors
 	m_fdc->mtr0_w(1);
@@ -674,7 +679,7 @@ void c2040_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa7_w(!state);
+	m_riot1->pa_bit_w<7>(!state);
 }
 
 

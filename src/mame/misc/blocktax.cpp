@@ -37,6 +37,8 @@ there is no code to emulate tho as it is all inside the MCU.
 #include "speaker.h"
 
 
+namespace {
+
 class blocktax_state : public driver_device
 {
 public:
@@ -52,7 +54,7 @@ protected:
 
 private:
 	uint32_t screen_update_blocktax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void blocktax_map(address_map &map);
+	[[maybe_unused]] void blocktax_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -106,6 +108,8 @@ ROM_START( blocktax )
 	ROM_LOAD( "2_ht27c020.bin", 0x00000, 0x40000, CRC(4800c3be) SHA1(befaf07a75fe57a910e0a89578bf352102ae773e) )
 	ROM_LOAD( "3_ht27c020.bin", 0x40000, 0x40000, CRC(ea1c66a2) SHA1(d10b9ca56d140235b6f31ab939613784f232caeb) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, empty_init, ROT0, "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )

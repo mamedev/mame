@@ -164,9 +164,6 @@ rc759_kbd_hle_device::rc759_kbd_hle_device(const machine_config &mconfig, const 
 
 void rc759_kbd_hle_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_data));
 	save_item(NAME(m_enabled));

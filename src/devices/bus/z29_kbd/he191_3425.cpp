@@ -75,12 +75,12 @@ void he191_3425_device::mcu_pc_w(u8 data)
 	m_select = data & 0xf;
 }
 
-READ_LINE_MEMBER(he191_3425_device::mcu_t1_r)
+int he191_3425_device::mcu_t1_r()
 {
 	return m_recv_data;
 }
 
-WRITE_LINE_MEMBER(he191_3425_device::shift_reset)
+void he191_3425_device::shift_reset(int state)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, (m_modifiers->read() & 0x06) != 0x00 ? CLEAR_LINE : ASSERT_LINE);
 	reset_from_keyboard((m_modifiers->read() & 0x06) != 0x00);

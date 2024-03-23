@@ -83,26 +83,12 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 	, m_b_state(0)
 	, m_c_count(0)
 	, m_c_state(0)
-	, m_si_callback(*this)
+	, m_si_callback(*this, 0)
 	, m_so_callback(*this)
-	, m_pots(*this)
+	, m_pots(*this, 0)
 {
 	memset(m_reg, 0, sizeof(uint8_t)*8);
 	memset(m_bitswap, 0, sizeof(uint8_t)*256);
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void astrocade_io_device::device_resolve_objects()
-{
-	m_si_callback.resolve_safe(0);
-	m_so_callback.resolve_all_safe();
-	m_pots.resolve_all_safe(0);
 }
 
 

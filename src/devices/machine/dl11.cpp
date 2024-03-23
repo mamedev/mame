@@ -63,11 +63,6 @@ dl11_device::dl11_device(const machine_config &mconfig, const char *tag, device_
 
 void dl11_device::device_start()
 {
-	// resolve callbacks
-	m_write_txd.resolve_safe();
-	m_write_rxrdy.resolve_safe();
-	m_write_txrdy.resolve_safe();
-
 	// save state
 	save_item(NAME(m_rcsr));
 	save_item(NAME(m_rbuf));
@@ -272,7 +267,7 @@ void dl11_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  rxrdy_r - receiver ready
 //-------------------------------------------------
 
-READ_LINE_MEMBER(dl11_device::rxrdy_r)
+int dl11_device::rxrdy_r()
 {
 	return ((m_rcsr & (CSR_DONE | CSR_IE)) == (CSR_DONE | CSR_IE)) ? ASSERT_LINE : CLEAR_LINE;
 }
@@ -282,7 +277,7 @@ READ_LINE_MEMBER(dl11_device::rxrdy_r)
 //  txrdy_r - transmitter empty
 //-------------------------------------------------
 
-READ_LINE_MEMBER(dl11_device::txrdy_r)
+int dl11_device::txrdy_r()
 {
 	return ((m_tcsr & (CSR_DONE | CSR_IE)) == (CSR_DONE | CSR_IE)) ? ASSERT_LINE : CLEAR_LINE;
 }

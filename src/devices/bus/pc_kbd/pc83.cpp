@@ -346,7 +346,7 @@ void ibm_pc_83_keyboard_device::p2_w(uint8_t data)
 //  t0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ibm_pc_83_keyboard_device::t0_r )
+int ibm_pc_83_keyboard_device::t0_r()
 {
 	uint8_t data = 0xff;
 

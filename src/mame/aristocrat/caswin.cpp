@@ -77,6 +77,8 @@ TODO:
 #include "tilemap.h"
 
 
+namespace {
+
 class caswin_state : public driver_device
 {
 public:
@@ -445,6 +447,9 @@ ROM_START( rcasino2 )
 	ROM_LOAD( "mb7051.e9", 0x0000, 0x0020, CRC(93312432) SHA1(3c7abc165e6bc7e0c56ca97d89b0b5e06323b82e) )
 	ROM_LOAD( "mb7051.e8", 0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )

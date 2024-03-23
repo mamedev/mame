@@ -291,7 +291,7 @@ private:
 	bool m_sample_select;
 
 	void sound_bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	void mstworld2_io_map(address_map &map);
 	void pangba_sound_map(address_map &map);
@@ -340,8 +340,6 @@ private:
 	void io_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -428,14 +426,11 @@ void mitchell_state::colorram_w(offs_t offset, uint8_t data)
 
 void mitchell_state::gfxctrl_w(uint8_t data)
 {
-logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
-{
+	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
+
 #if 0
-	char baf[40];
-	sprintf(baf, "%02x", data);
-	popmessage(baf);
+	popmessage("%02x", data);
 #endif
-}
 
 	// bit 0 is unknown (used, maybe back color enable?)
 
@@ -467,11 +462,8 @@ logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
 void mstworld_state::gfxctrl_w(uint8_t data)
 {
 	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
-{
-	char baf[40];
-	sprintf(baf, "%02x", data);
-//  popmessage(baf);
-}
+
+	// popmessage("%02x", data);
 
 	// bit 0 is unknown (used, maybe back color enable?)
 
@@ -548,8 +540,6 @@ uint32_t mitchell_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -1885,7 +1875,7 @@ static GFXDECODE_START( gfx_mstworld2 )
 	GFXDECODE_ENTRY( "sprites", 0, mstworld_spritelayout, 0, 0x40 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(spangbl_state::adpcm_int)
+void spangbl_state::adpcm_int(int state)
 {
 	if (!state)
 		return;
@@ -2326,19 +2316,19 @@ ROM_START( pompingw )
 	ROM_LOAD( "pwj_07.13h", 0x10000, 0x20000, CRC(a9402420) SHA1(2ca3aa59d561826477e3509fcaeeec753d64d419) )
 
 	ROM_REGION( 0x100000, "chars", ROMREGION_ERASEFF )
-	ROM_LOAD( "pw_02.1e", 0x000000, 0x20000, CRC(4b5992e4) SHA1(2071a1fcfc739d7ca837c03133909101b462d5a6) )
-	ROM_LOAD( "pw_03.2e", 0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
+	ROM_LOAD( "pwj_02.1e", 0x000000, 0x20000, CRC(4b5992e4) SHA1(2071a1fcfc739d7ca837c03133909101b462d5a6) )
+	ROM_LOAD( "pwj_03.2e", 0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
 	// 40000-7ffff empty
 	ROM_LOAD( "pwj_04.1g", 0x080000, 0x20000, CRC(01e49081) SHA1(a29ffec199f196a2b3731e4863e863bdd04e2c58) )
-	ROM_LOAD( "pw_05.2g",  0x0a0000, 0x20000, CRC(2fb3db6c) SHA1(328814d28569fec763975a8ae4c2767517a680af) )
+	ROM_LOAD( "pwj_05.2g", 0x0a0000, 0x20000, CRC(2fb3db6c) SHA1(328814d28569fec763975a8ae4c2767517a680af) )
 	// c0000-fffff empty
 
 	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "pw_10.2k", 0x000000, 0x20000, CRC(fdba4f6e) SHA1(9a2412a97682bbd25b8942520a0c02616bd59353) )
-	ROM_LOAD( "pw_9.1k",  0x020000, 0x20000, CRC(39f47a63) SHA1(05675ad45909a7d723acaf4d53b4e588d4e048b9) )
+	ROM_LOAD( "pwj_10.2k", 0x000000, 0x20000, CRC(83a81c02) SHA1(fced1b5798442b7633cef0c5f87546b1845df096) )
+	ROM_LOAD( "pwj_9.1k",  0x020000, 0x20000, CRC(6b628232) SHA1(7b3848f289ad96f314076ddeb8b0a196d5102b36) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "pw_01.1d", 0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
+	ROM_LOAD( "pwj_01.1d", 0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
 ROM_END
 
 ROM_START( pangb )

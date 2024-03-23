@@ -4,7 +4,7 @@
 
     nbmj8688 - Nichibutsu Mahjong games for years 1986-1988
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2000/01/28 -
+    Driver by Takahiro Nogi 2000/01/28 -
 
 ******************************************************************************/
 /******************************************************************************
@@ -2553,6 +2553,8 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
 
 	NB1413M3(config, m_nb1413m3, 0);
+	m_nb1413m3->set_blitter_rom_tag("gfx1");
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
@@ -2613,21 +2615,21 @@ void nbmj8688_state::crystalg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::crystalg_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_CRYSTALG);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_CRYSTALG);
 }
 
 void nbmj8688_state::crystal2(machine_config &config)
 {
 	crystalg(config);
 
-	m_nb1413m3->set_type(NB1413M3_CRYSTAL2);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_CRYSTAL2);
 }
 
 void nbmj8688_state::nightlov(machine_config &config)
 {
 	crystalg(config);
 
-	m_nb1413m3->set_type(NB1413M3_NIGHTLOV);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_NIGHTLOV);
 }
 
 void nbmj8688_state::apparel(machine_config &config)
@@ -2638,7 +2640,7 @@ void nbmj8688_state::apparel(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::secolove_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_APPAREL);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_APPAREL);
 }
 
 void nbmj8688_state::mbmj_h12bit(machine_config &config)
@@ -2657,21 +2659,21 @@ void nbmj8688_state::citylove(machine_config &config)
 {
 	mbmj_h12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_CITYLOVE);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_CITYLOVE);
 }
 
 void nbmj8688_state::mcitylov(machine_config &config)
 {
 	mbmj_h12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_MCITYLOV);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MCITYLOV);
 }
 
 void nbmj8688_state::secolove(machine_config &config)
 {
 	mbmj_h12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_SECOLOVE);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_SECOLOVE);
 }
 
 /*Same as h12bit HW with different sound HW + NMI enable bit*/
@@ -2682,7 +2684,7 @@ void nbmj8688_state::barline(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::barline_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_BARLINE);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_BARLINE);
 
 	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.35);
 
@@ -2710,6 +2712,8 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::p16bit_LCD_io_map);
 
 	NB1413M3(config, m_nb1413m3, 0);
+	m_nb1413m3->set_blitter_rom_tag("gfx1");
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
@@ -2767,56 +2771,56 @@ void nbmj8688_state::bijokkoy(machine_config &config)
 {
 	mbmj_p16bit_LCD(config);
 
-	m_nb1413m3->set_type(NB1413M3_BIJOKKOY);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_BIJOKKOY);
 }
 
 void nbmj8688_state::bijokkog(machine_config &config)
 {
 	mbmj_p16bit_LCD(config);
 
-	m_nb1413m3->set_type(NB1413M3_BIJOKKOG);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_BIJOKKOG);
 }
 
 void nbmj8688_state::housemnq(machine_config &config)
 {
 	mbmj_p16bit_LCD(config);
 
-	m_nb1413m3->set_type(NB1413M3_HOUSEMNQ);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_HOUSEMNQ);
 }
 
 void nbmj8688_state::housemn2(machine_config &config)
 {
 	mbmj_p16bit_LCD(config);
 
-	m_nb1413m3->set_type(NB1413M3_HOUSEMN2);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_HOUSEMN2);
 }
 
 void nbmj8688_state::livegal(machine_config &config)
 {
 	mbmj_p16bit_LCD(config);
 
-	m_nb1413m3->set_type(NB1413M3_LIVEGAL);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_LIVEGAL);
 }
 
 void nbmj8688_state::orangec(machine_config &config)
 {
 	mbmj_p16bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_ORANGEC);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_ORANGEC);
 }
 
 void nbmj8688_state::orangeci(machine_config &config)
 {
 	mbmj_p16bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_ORANGECI);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_ORANGECI);
 }
 
 void nbmj8688_state::vipclub(machine_config &config)
 {
 	mbmj_p16bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_VIPCLUB);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_VIPCLUB);
 }
 
 void nbmj8688_state::seiha(machine_config &config)
@@ -2827,14 +2831,14 @@ void nbmj8688_state::seiha(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::seiha_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_SEIHA);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_SEIHA);
 }
 
 void nbmj8688_state::seiham(machine_config &config)
 {
 	seiha(config);
 
-	m_nb1413m3->set_type(NB1413M3_SEIHAM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_SEIHAM);
 }
 
 void nbmj8688_state::mjgaiden(machine_config &config)
@@ -2846,7 +2850,7 @@ void nbmj8688_state::mjgaiden(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::ojousan_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mjgaiden_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_OJOUSAN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_OJOUSAN);
 }
 
 void nbmj8688_state::iemoto(machine_config &config)
@@ -2857,7 +2861,7 @@ void nbmj8688_state::iemoto(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_IEMOTO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_IEMOTO);
 }
 
 void nbmj8688_state::ojousan(machine_config &config)
@@ -2868,14 +2872,14 @@ void nbmj8688_state::ojousan(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::ojousan_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_OJOUSAN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_OJOUSAN);
 }
 
 void nbmj8688_state::ojousanm(machine_config &config)
 {
 	ojousan(config);
 
-	m_nb1413m3->set_type(NB1413M3_OJOUSANM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_OJOUSANM);
 }
 
 void nbmj8688_state::bikkuri(machine_config &config)
@@ -2886,7 +2890,7 @@ void nbmj8688_state::bikkuri(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::bikkuri_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::bikkuri_io_map);
 
-	// m_nb1413m3->set_type(NB1413M3_TAIWANMB); // what's the correct type here?
+	// m_nb1413m3->set_type(nb1413m3_device::NB1413M3_TAIWANMB); // what's the correct type here?
 }
 
 void nbmj8688_state::swinggal(machine_config &config)
@@ -2901,28 +2905,28 @@ void nbmj8688_state::iemotom(machine_config &config)
 {
 	ojousan(config);
 
-	m_nb1413m3->set_type(NB1413M3_IEMOTOM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_IEMOTOM);
 }
 
 void nbmj8688_state::ryuuha(machine_config &config)
 {
 	ojousan(config);
 
-	m_nb1413m3->set_type(NB1413M3_RYUUHA);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_RYUUHA);
 }
 
 void nbmj8688_state::korinai(machine_config &config)
 {
 	ojousan(config);
 
-	m_nb1413m3->set_type(NB1413M3_KORINAI);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_KORINAI);
 }
 
 void nbmj8688_state::korinaim(machine_config &config)
 {
 	ojousan(config);
 
-	m_nb1413m3->set_type(NB1413M3_KORINAIM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_KORINAIM);
 }
 
 void nbmj8688_state::mbmj_p12bit(machine_config &config)
@@ -2938,35 +2942,35 @@ void nbmj8688_state::kaguya(machine_config &config)
 {
 	mbmj_p12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_KAGUYA);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_KAGUYA);
 }
 
 void nbmj8688_state::kaguya2(machine_config &config)
 {
 	mbmj_p12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_KAGUYA2);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_KAGUYA2);
 }
 
 void nbmj8688_state::kanatuen(machine_config &config)
 {
 	mbmj_p12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_KANATUEN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_KANATUEN);
 }
 
 void nbmj8688_state::kyuhito(machine_config &config)
 {
 	mbmj_p12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_KYUHITO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_KYUHITO);
 }
 
 void nbmj8688_state::idhimitu(machine_config &config)
 {
 	mbmj_p12bit(config);
 
-	m_nb1413m3->set_type(NB1413M3_IDHIMITU);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_IDHIMITU);
 }
 
 void nbmj8688_state::mjsikaku(machine_config &config)
@@ -2977,7 +2981,7 @@ void nbmj8688_state::mjsikaku(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::mjsikaku_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mjsikaku_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MJSIKAKU);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJSIKAKU);
 
 	/* sound hardware */
 	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.7);
@@ -2991,7 +2995,7 @@ void nbmj8688_state::mmsikaku(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mmsikaku_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MMSIKAKU);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MMSIKAKU);
 }
 
 void nbmj8688_state::otonano(machine_config &config)
@@ -3001,14 +3005,14 @@ void nbmj8688_state::otonano(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::otonano_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_OTONANO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_OTONANO);
 }
 
 void nbmj8688_state::mjcamera(machine_config &config)
 {
 	otonano(config);
 
-	m_nb1413m3->set_type(NB1413M3_MJCAMERA);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJCAMERA);
 }
 
 ROM_START( crystalg )
@@ -3935,52 +3939,52 @@ ROM_END
 /* 8-bit palette */
 GAME( 1986, crystalg, 0,        crystalg,        crystalg, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal (Japan 860512)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, crystal2, 0,        crystal2,        crystal2, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal 2 (Japan 860620)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nightlov, 0,        nightlov,        nightlov, nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Night Love (Japan 860705)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nightlov, 0,        nightlov,        nightlov, nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Night Love (Japan 860705, Bet)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, apparel,  0,        apparel,         apparel,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Apparel Night (Japan 860929)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bikkuri,  0,        bikkuri,         bikkuri,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bikkuri Pro Wrestling (Japan 881221, Ver 1.05)", MACHINE_SUPPORTS_SAVE )
 
 /* hybrid 12-bit palette */
 GAME( 1986, citylove, 0,        citylove,        citylove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860908)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mcitylov, citylove, mcitylov,        mcitylov, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love [BET] (Japan 860904)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mcitylov, citylove, mcitylov,        mcitylov, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860904, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, secolove, 0,        secolove,        secolove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Second Love (Japan 861201)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, barline,  0,        barline,         barline,  nbmj8688_state, empty_init,    ROT180, "Nichibutsu",   "Barline (Japan?)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* hybrid 16-bit palette */
 GAME( 1987, seiha,    0,        seiha,           seiha,    nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha (Japan 870725)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, seiham,   seiha,    seiham,          seiham,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha [BET] (Japan 870723)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mjgaiden, 0,        mjgaiden,        ojousan,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Mahjong Gaiden [BET] (Japan 870803)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, seiham,   seiha,    seiham,          seiham,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha (Japan 870723, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mjgaiden, 0,        mjgaiden,        ojousan,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Mahjong Gaiden (Japan 870803)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, iemoto,   0,        iemoto,          iemoto,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871020)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, iemotom,  iemoto,   iemotom,         iemotom,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto [BET] (Japan 871118)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ryuuha,   iemoto,   ryuuha,          ryuuha,   nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Ryuuha [BET] (Japan 871027)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, iemotom,  iemoto,   iemotom,         iemotom,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871118, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ryuuha,   iemoto,   ryuuha,          ryuuha,   nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Ryuuha (Japan 871027)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ojousan,  0,        ojousan,         ojousan,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan (Japan 871204)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojousanm, ojousan,  ojousanm,        ojousanm, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan [BET] (Japan 870108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, swinggal, 0,        swinggal,        ryuuha,   nbmj8688_state, empty_init,    ROT0, "Digital Denshi", "Swing Gal [BET] (Japan 871221)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojousanm, ojousan,  ojousanm,        ojousanm, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan (Japan 870108, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, swinggal, 0,        swinggal,        ryuuha,   nbmj8688_state, empty_init,    ROT0, "Digital Denshi", "Swing Gal (Japan 871221)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, korinai,  0,        korinai,         korinai,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880425)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, korinaim, korinai,  korinaim,        korinaim, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, korinaim, korinai,  korinaim,        korinaim, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880920, medal)", MACHINE_SUPPORTS_SAVE )
 
 /* pure 16-bit palette (+ LCD in some) */
 GAME( 1987, housemnq, 0,        housemnq,        housemnq, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "House Mannequin (Japan 870217)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, housemn2, 0,        housemn2,        housemn2, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "House Mannequin Roppongi Live hen (Japan 870418)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, livegal,  0,        livegal,         livegal,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Live Gal [BET] (Japan 870530)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, livegal,  0,        livegal,         livegal,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Live Gal (Japan 870530)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bijokkoy, 0,        bijokkoy,        bijokkoy, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bijokko Yume Monogatari (Japan 870925)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bijokkog, 0,        bijokkog,        bijokkog, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bijokko Gakuen (Japan 880116)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, orangec,  0,        orangec,         orangec,  nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Orange Club - Maruhi Kagai Jugyou (Japan 880213)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, orangeci, orangec,  orangeci,        orangeci, nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880221)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vipclub,  orangec,  vipclub,         vipclub,  nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880310)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, orangeci, orangec,  orangeci,        orangeci, nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou (Japan 880221)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vipclub,  orangec,  vipclub,         vipclub,  nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou (Japan 880310)", MACHINE_SUPPORTS_SAVE )
 
 /* pure 12-bit palette */
-GAME( 1988, kaguya,   0,        kaguya,          kaguya,   nbmj8688_state, empty_init,    ROT0, "Miki Syouji",    "Mahjong Kaguyahime [BET] (Japan 880521)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, kaguya2,  0,        kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 [BET] (Japan 890829)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, kaguya2f, kaguya2,  kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 Fukkokuban [BET] (Japan 010808)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kanatuen, 0,        kanatuen,        kanatuen, nbmj8688_state, init_kanatuen, ROT0, "Panac",          "Kanatsuen no Onna [BET] (Japan 880905)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kyuhito,  kanatuen, kyuhito,         kyuhito,  nbmj8688_state, init_kyuhito,  ROT0, "Roller Tron",    "Kyukyoku no Hito [BET] (Japan 880824)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, idhimitu, 0,        idhimitu,        idhimitu, nbmj8688_state, init_idhimitu, ROT0, "Digital Soft",   "Idol no Himitsu [BET] (Japan 890304)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kaguya,   0,        kaguya,          kaguya,   nbmj8688_state, empty_init,    ROT0, "Miki Syouji",    "Mahjong Kaguyahime (Japan 880521)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, kaguya2,  0,        kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 (Japan 890829)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, kaguya2f, kaguya2,  kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 Fukkokuban (Japan 010808)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kanatuen, 0,        kanatuen,        kanatuen, nbmj8688_state, init_kanatuen, ROT0, "Panac",          "Kanatsuen no Onna (Japan 880905)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kyuhito,  kanatuen, kyuhito,         kyuhito,  nbmj8688_state, init_kyuhito,  ROT0, "Roller Tron",    "Kyukyoku no Hito (Japan 880824)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, idhimitu, 0,        idhimitu,        idhimitu, nbmj8688_state, init_idhimitu, ROT0, "Digital Soft",   "Idol no Himitsu (Japan 890304)", MACHINE_SUPPORTS_SAVE )
 
 /* pure 12-bit palette + YM3812 instead of AY-3-8910 */
 GAME( 1988, mjsikaku, 0,        mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880908)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjsikakb, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880722)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjsikakc, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880806)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880802)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku [BET] (Japan 880929)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880929, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, otonano,  0,        otonano,         otonano,  nbmj8688_state, empty_init,    ROT0, "Apple",          "Otona no Mahjong (Japan 880628)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjcamera, 0,        mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (set 1) (Japan 881109)", MACHINE_SUPPORTS_SAVE )

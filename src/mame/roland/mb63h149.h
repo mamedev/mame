@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MB63H149_H
-#define MAME_MACHINE_MB63H149_H
+#ifndef MAME_ROLAND_MB63H149_H
+#define MAME_ROLAND_MB63H149_H
 
 #pragma once
 
@@ -33,14 +33,16 @@ public:
 protected:
 	mb63h149_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	// callback objects
 	devcb_write_line m_int_callback;
+
+	// memory array
+	std::unique_ptr<uint8_t []> m_sram;
 };
 
 // ======================> mb63h130_device
@@ -57,4 +59,4 @@ public:
 DECLARE_DEVICE_TYPE(MB63H149, mb63h149_device)
 DECLARE_DEVICE_TYPE(MB63H130, mb63h130_device)
 
-#endif // MAME_MACHINE_MB63H149_H
+#endif // MAME_ROLAND_MB63H149_H

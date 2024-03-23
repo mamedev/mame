@@ -85,30 +85,30 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ca2_w);
+	void ca2_w(int state);
 	void video_w(u8 data);
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
+	void acia1_clock_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	u32 screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// Clocks
 	void write_acia_clocks(int id, int state);
-	DECLARE_WRITE_LINE_MEMBER (write_f1_clock){ write_acia_clocks(mc14411_device::TIMER_F1, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f2_clock){ write_acia_clocks(mc14411_device::TIMER_F2, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f3_clock){ write_acia_clocks(mc14411_device::TIMER_F3, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f4_clock){ write_acia_clocks(mc14411_device::TIMER_F4, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f5_clock){ write_acia_clocks(mc14411_device::TIMER_F5, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f6_clock){ write_acia_clocks(mc14411_device::TIMER_F6, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f7_clock){ write_acia_clocks(mc14411_device::TIMER_F7, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f8_clock){ write_acia_clocks(mc14411_device::TIMER_F8, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f9_clock){ write_acia_clocks(mc14411_device::TIMER_F9, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f10_clock){ write_acia_clocks(mc14411_device::TIMER_F10, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f11_clock){ write_acia_clocks(mc14411_device::TIMER_F11, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f12_clock){ write_acia_clocks(mc14411_device::TIMER_F12, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f13_clock){ write_acia_clocks(mc14411_device::TIMER_F13, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
+	void write_f1_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F1, state); }
+	void write_f2_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F2, state); }
+	void write_f3_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F3, state); }
+	void write_f4_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F4, state); }
+	void write_f5_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F5, state); }
+	void write_f6_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F6, state); }
+	void write_f7_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F7, state); }
+	void write_f8_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F8, state); }
+	void write_f9_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F9, state); }
+	void write_f10_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F10, state); }
+	void write_f11_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F11, state); }
+	void write_f12_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F12, state); }
+	void write_f13_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F13, state); }
+	void write_f14_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F14, state); }
+	void write_f15_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
 	void mem_map(address_map &map);
 
@@ -220,7 +220,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::kansas_r )
 	}
 }
 
-WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
+void proteus3_state::acia1_clock_w(int state)
 {
 	// Save - 8N2 - /16 - 600baud
 	// Load - 8N2 - /1
@@ -257,7 +257,7 @@ void proteus3_state::video_w(u8 data)
 	m_video_data = data;
 }
 
-WRITE_LINE_MEMBER( proteus3_state::ca2_w )
+void proteus3_state::ca2_w(int state)
 {
 	if (state)
 	{
@@ -415,7 +415,7 @@ void proteus3_state::proteus3(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(proteus3_state::video_w));
 	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);

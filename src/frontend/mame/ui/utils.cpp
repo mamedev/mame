@@ -14,6 +14,7 @@
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
+#include "infoxml.h"
 #include "language.h"
 #include "mame.h"
 
@@ -96,6 +97,7 @@ constexpr char const *MACHINE_FILTER_NAMES[machine_filter::COUNT] = {
 		N_p("machine-filter", "Clones"),
 		N_p("machine-filter", "Manufacturer"),
 		N_p("machine-filter", "Year"),
+		N_p("machine-filter", "Source File"),
 		N_p("machine-filter", "Save Supported"),
 		N_p("machine-filter", "Save Unsupported"),
 		N_p("machine-filter", "CHD Required"),
@@ -403,8 +405,8 @@ private:
 			ADD_FILTER
 		};
 
-		virtual void populate(float &customtop, float &custombottom) override;
-		virtual void handle(event const *ev) override;
+		virtual void populate() override;
+		virtual bool handle(event const *ev) override;
 
 		bool set_filter_type(unsigned pos, typename Base::type n)
 		{
@@ -529,7 +531,7 @@ void composite_filter_impl_base<Impl, Base, Type>::show_ui(
 
 
 template <class Impl, class Base, typename Base::type Type>
-void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(float &customtop, float &custombottom)
+void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate()
 {
 	// add items for each active filter
 	unsigned i = 0;
@@ -556,110 +558,111 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 }
 
 template <class Impl, class Base, typename Base::type Type>
-void composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle(event const *ev)
+bool composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle(event const *ev)
 {
-	if (ev && ev->itemref)
+	if (!ev || !ev->itemref)
+		return false;
+
+	m_added = false;
+	bool changed(false);
+	uintptr_t const ref(reinterpret_cast<uintptr_t>(ev->itemref));
+	switch (ev->iptkey)
 	{
-		m_added = false;
-		bool changed(false);
-		uintptr_t const ref(reinterpret_cast<uintptr_t>(ev->itemref));
-		switch (ev->iptkey)
+	case IPT_UI_LEFT:
+	case IPT_UI_RIGHT:
+		if ((FILTER_FIRST <= ref) && (FILTER_LAST >= ref))
 		{
-		case IPT_UI_LEFT:
-		case IPT_UI_RIGHT:
-			if ((FILTER_FIRST <= ref) && (FILTER_LAST >= ref))
+			// change filter type
+			unsigned const pos(ref - FILTER_FIRST);
+			typename Base::type const current(m_parent.m_filters[pos]->get_type());
+			if (IPT_UI_LEFT == ev->iptkey)
 			{
-				// change filter type
-				unsigned const pos(ref - FILTER_FIRST);
-				typename Base::type const current(m_parent.m_filters[pos]->get_type());
-				if (IPT_UI_LEFT == ev->iptkey)
+				typename Base::type n(current);
+				while ((Base::FIRST < n) && !changed)
 				{
-					typename Base::type n(current);
-					while ((Base::FIRST < n) && !changed)
-					{
-						if (m_parent.check_type(pos, --n))
-							changed = set_filter_type(pos, n);
-					}
-				}
-				else
-				{
-					typename Base::type n(current);
-					while ((Base::LAST > n) && !changed)
-					{
-						if (m_parent.check_type(pos, ++n))
-							changed = set_filter_type(pos, n);
-					}
+					if (m_parent.check_type(pos, --n))
+						changed = set_filter_type(pos, n);
 				}
 			}
-			else if ((ADJUST_FIRST <= ref) && (ADJUST_LAST >= ref))
+			else
 			{
-				// change filter value
-				Base &pos(*m_parent.m_filters[ref - ADJUST_FIRST]);
-				changed = (IPT_UI_LEFT == ev->iptkey) ? pos.adjust_left() : pos.adjust_right();
-			}
-			break;
-
-		case IPT_UI_SELECT:
-			if ((FILTER_FIRST <= ref) && (FILTER_LAST >= ref))
-			{
-				// show selector with non-contradictory types
-				std::vector<typename Base::type> types;
-				std::vector<std::string> names;
-				types.reserve(Base::COUNT);
-				names.reserve(Base::COUNT);
-				int sel(-1);
-				unsigned const pos(ref - FILTER_FIRST);
-				typename Base::type const current(m_parent.m_filters[pos]->get_type());
-				for (typename Base::type candidate = Base::FIRST; Base::COUNT > candidate; ++candidate)
+				typename Base::type n(current);
+				while ((Base::LAST > n) && !changed)
 				{
-					if (Impl::type_allowed(pos, candidate))
-					{
-						if (current == candidate)
-							sel = types.size();
-						unsigned i = 0;
-						while ((MAX > i) && m_parent.m_filters[i] && ((pos == i) || !Impl::types_contradictory(m_parent.m_filters[i]->get_type(), candidate)))
-							++i;
-						if ((MAX <= i) || !m_parent.m_filters[i])
-						{
-							types.emplace_back(candidate);
-							names.emplace_back(Base::display_name(candidate));
-						}
-					}
+					if (m_parent.check_type(pos, ++n))
+						changed = set_filter_type(pos, n);
 				}
-				menu::stack_push<menu_selector>(
-						ui(),
-						container(),
-						std::string(ev->item->text()),
-						std::move(names),
-						sel,
-						[this, pos, t = std::move(types)] (int selection)
-						{
-							if (set_filter_type(pos, t[selection]))
-								reset(reset_options::REMEMBER_REF);
-						});
 			}
-			else if ((ADJUST_FIRST <= ref) && (ADJUST_LAST >= ref))
-			{
-				// show selected filter's UI
-				m_parent.m_filters[ref - ADJUST_FIRST]->show_ui(ui(), container(), [this] (Base &filter) { reset(reset_options::REMEMBER_REF); });
-			}
-			else if (REMOVE_FILTER == ref)
-			{
-				changed = drop_last_filter();
-			}
-			else if (ADD_FILTER == ref)
-			{
-				m_added = append_filter();
-			}
-			break;
 		}
+		else if ((ADJUST_FIRST <= ref) && (ADJUST_LAST >= ref))
+		{
+			// change filter value
+			Base &pos(*m_parent.m_filters[ref - ADJUST_FIRST]);
+			changed = (IPT_UI_LEFT == ev->iptkey) ? pos.adjust_left() : pos.adjust_right();
+		}
+		break;
 
-		// rebuild if anything changed
-		if (changed)
-			reset(reset_options::REMEMBER_REF);
-		else if (m_added)
-			reset(reset_options::SELECT_FIRST);
+	case IPT_UI_SELECT:
+		if ((FILTER_FIRST <= ref) && (FILTER_LAST >= ref))
+		{
+			// show selector with non-contradictory types
+			std::vector<typename Base::type> types;
+			std::vector<std::string> names;
+			types.reserve(Base::COUNT);
+			names.reserve(Base::COUNT);
+			int sel(-1);
+			unsigned const pos(ref - FILTER_FIRST);
+			typename Base::type const current(m_parent.m_filters[pos]->get_type());
+			for (typename Base::type candidate = Base::FIRST; Base::COUNT > candidate; ++candidate)
+			{
+				if (Impl::type_allowed(pos, candidate))
+				{
+					if (current == candidate)
+						sel = types.size();
+					unsigned i = 0;
+					while ((MAX > i) && m_parent.m_filters[i] && ((pos == i) || !Impl::types_contradictory(m_parent.m_filters[i]->get_type(), candidate)))
+						++i;
+					if ((MAX <= i) || !m_parent.m_filters[i])
+					{
+						types.emplace_back(candidate);
+						names.emplace_back(Base::display_name(candidate));
+					}
+				}
+			}
+			menu::stack_push<menu_selector>(
+					ui(),
+					container(),
+					std::string(ev->item->text()),
+					std::move(names),
+					sel,
+					[this, pos, t = std::move(types)] (int selection)
+					{
+						if (set_filter_type(pos, t[selection]))
+							reset(reset_options::REMEMBER_REF);
+					});
+		}
+		else if ((ADJUST_FIRST <= ref) && (ADJUST_LAST >= ref))
+		{
+			// show selected filter's UI
+			m_parent.m_filters[ref - ADJUST_FIRST]->show_ui(ui(), container(), [this] (Base &filter) { reset(reset_options::REMEMBER_REF); });
+		}
+		else if (REMOVE_FILTER == ref)
+		{
+			changed = drop_last_filter();
+		}
+		else if (ADD_FILTER == ref)
+		{
+			m_added = append_filter();
+		}
+		break;
 	}
+
+	// rebuild if anything changed
+	if (changed)
+		reset(reset_options::REMEMBER_REF);
+	else if (m_added)
+		reset(reset_options::SELECT_FIRST);
+	return false;
 }
 
 
@@ -796,6 +799,18 @@ public:
 	}
 
 	virtual bool apply(ui_system_info const &system) const override { return !have_choices() || (selection_valid() && (selection_text() == system.driver->year)); }
+};
+
+
+class source_file_machine_filter : public choice_filter_impl_base<machine_filter, machine_filter::SOURCE_FILE>
+{
+public:
+	source_file_machine_filter(machine_filter_data const &data, char const *value, util::core_file *file, unsigned indent)
+		: choice_filter_impl_base<machine_filter, machine_filter::SOURCE_FILE>(data.source_files(), value)
+	{
+	}
+
+	virtual bool apply(ui_system_info const &system) const override { return !have_choices() || (selection_valid() && (selection_text() == info_xml_creator::format_sourcefile(system.driver->type.source()))); }
 };
 
 
@@ -995,8 +1010,8 @@ private:
 			INCLUDE_CLONES
 		};
 
-		virtual void populate(float &customtop, float &custombottom) override;
-		virtual void handle(event const *ev) override;
+		virtual void populate() override;
+		virtual bool handle(event const *ev) override;
 
 		category_machine_filter &m_parent;
 		std::function<void (machine_filter &)> m_handler;
@@ -1028,9 +1043,10 @@ private:
 		}
 	}
 
-	static bool include_clones_default(std::string const &name)
+	static bool include_clones_default(std::string_view name)
 	{
-		return !core_stricmp(name.c_str(), "category.ini") || !core_stricmp(name.c_str(), "alltime.ini");
+		using namespace std::literals;
+		return util::streqlower(name, "category.ini"sv) || util::streqlower(name, "alltime.ini"sv);
 	}
 
 	unsigned m_ini, m_group;
@@ -1046,7 +1062,7 @@ void category_machine_filter::show_ui(mame_ui_manager &mui, render_container &co
 }
 
 
-void category_machine_filter::menu_configure::populate(float &customtop, float &custombottom)
+void category_machine_filter::menu_configure::populate()
 {
 	inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 	unsigned const filecnt(mgr.get_file_count());
@@ -1073,105 +1089,106 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void category_machine_filter::menu_configure::handle(event const *ev)
+bool category_machine_filter::menu_configure::handle(event const *ev)
 {
-	if (ev && ev->itemref)
+	if (!ev || !ev->itemref)
+		return false;
+
+	bool changed(false);
+	uintptr_t const ref(reinterpret_cast<uintptr_t>(ev->itemref));
+	inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
+	switch (ev->iptkey)
 	{
-		bool changed(false);
-		uintptr_t const ref(reinterpret_cast<uintptr_t>(ev->itemref));
-		inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
-		switch (ev->iptkey)
+	case IPT_UI_LEFT:
+		if ((INI_FILE == ref) && m_ini)
 		{
-		case IPT_UI_LEFT:
-			if ((INI_FILE == ref) && m_ini)
-			{
-				--m_ini;
-				changed = true;
-			}
-			else if ((SYSTEM_GROUP == ref) && m_state[m_ini].first)
-			{
-				--m_state[m_ini].first;
-				changed = true;
-			}
-			else if ((INCLUDE_CLONES == ref) && m_state[m_ini].second)
-			{
-				m_state[m_ini].second = false;
-				changed = true;
-			}
-			break;
-		case IPT_UI_RIGHT:
-			if ((INI_FILE == ref) && (mgr.get_file_count() > (m_ini + 1)))
-			{
-				++m_ini;
-				changed = true;
-			}
-			else if ((SYSTEM_GROUP == ref) && (mgr.get_category_count(m_ini) > (m_state[m_ini].first + 1)))
-			{
-				++m_state[m_ini].first;
-				changed = true;
-			}
-			else if ((INCLUDE_CLONES == ref) && !m_state[m_ini].second)
-			{
-				m_state[m_ini].second = true;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_SELECT:
-			if (INI_FILE == ref)
-			{
-				std::vector<std::string> choices;
-				choices.reserve(mgr.get_file_count());
-				for (size_t i = 0; mgr.get_file_count() > i; ++i)
-					choices.emplace_back(mgr.get_file_name(i));
-				menu::stack_push<menu_selector>(
-						ui(),
-						container(),
-						_("Category File"),
-						std::move(choices),
-						m_ini,
-						[this] (int selection)
-						{
-							if (selection != m_ini)
-							{
-								m_ini = selection;
-								reset(reset_options::REMEMBER_REF);
-							}
-						});
-			}
-			else if (SYSTEM_GROUP == ref)
-			{
-				std::vector<std::string> choices;
-				choices.reserve(mgr.get_category_count(m_ini));
-				for (size_t i = 0; mgr.get_category_count(m_ini) > i; ++i)
-					choices.emplace_back(mgr.get_category_name(m_ini, i));
-				menu::stack_push<menu_selector>(
-						ui(),
-						container(),
-						_("Group"),
-						std::move(choices),
-						m_state[m_ini].first,
-						[this] (int selection)
-						{
-							if (selection != m_state[m_ini].first)
-							{
-								m_state[m_ini].first = selection;
-								reset(reset_options::REMEMBER_REF);
-							}
-						});
-			}
-			else if (INCLUDE_CLONES == ref)
-			{
-				m_state[m_ini].second = !m_state[m_ini].second;
-				reset(reset_options::REMEMBER_REF);
-			}
-			break;
+			--m_ini;
+			changed = true;
 		}
+		else if ((SYSTEM_GROUP == ref) && m_state[m_ini].first)
+		{
+			--m_state[m_ini].first;
+			changed = true;
+		}
+		else if ((INCLUDE_CLONES == ref) && m_state[m_ini].second)
+		{
+			m_state[m_ini].second = false;
+			changed = true;
+		}
+		break;
+	case IPT_UI_RIGHT:
+		if ((INI_FILE == ref) && (mgr.get_file_count() > (m_ini + 1)))
+		{
+			++m_ini;
+			changed = true;
+		}
+		else if ((SYSTEM_GROUP == ref) && (mgr.get_category_count(m_ini) > (m_state[m_ini].first + 1)))
+		{
+			++m_state[m_ini].first;
+			changed = true;
+		}
+		else if ((INCLUDE_CLONES == ref) && !m_state[m_ini].second)
+		{
+			m_state[m_ini].second = true;
+			changed = true;
+		}
+		break;
 
-		// rebuild if anything changed
-		if (changed)
+	case IPT_UI_SELECT:
+		if (INI_FILE == ref)
+		{
+			std::vector<std::string> choices;
+			choices.reserve(mgr.get_file_count());
+			for (size_t i = 0; mgr.get_file_count() > i; ++i)
+				choices.emplace_back(mgr.get_file_name(i));
+			menu::stack_push<menu_selector>(
+					ui(),
+					container(),
+					_("Category File"),
+					std::move(choices),
+					m_ini,
+					[this] (int selection)
+					{
+						if (selection != m_ini)
+						{
+							m_ini = selection;
+							reset(reset_options::REMEMBER_REF);
+						}
+					});
+		}
+		else if (SYSTEM_GROUP == ref)
+		{
+			std::vector<std::string> choices;
+			choices.reserve(mgr.get_category_count(m_ini));
+			for (size_t i = 0; mgr.get_category_count(m_ini) > i; ++i)
+				choices.emplace_back(mgr.get_category_name(m_ini, i));
+			menu::stack_push<menu_selector>(
+					ui(),
+					container(),
+					_("Group"),
+					std::move(choices),
+					m_state[m_ini].first,
+					[this] (int selection)
+					{
+						if (selection != m_state[m_ini].first)
+						{
+							m_state[m_ini].first = selection;
+							reset(reset_options::REMEMBER_REF);
+						}
+					});
+		}
+		else if (INCLUDE_CLONES == ref)
+		{
+			m_state[m_ini].second = !m_state[m_ini].second;
 			reset(reset_options::REMEMBER_REF);
+		}
+		break;
 	}
+
+	// rebuild if anything changed
+	if (changed)
+		reset(reset_options::REMEMBER_REF);
+	return false;
 }
 
 
@@ -1224,6 +1241,7 @@ public:
 		case FAVORITE:
 		case MANUFACTURER:
 		case YEAR:
+		case SOURCE_FILE:
 		case CUSTOM:
 		case COUNT:
 			break;
@@ -1233,7 +1251,17 @@ public:
 
 	static bool is_inclusion(type n)
 	{
-		return (CATEGORY == n) || (MANUFACTURER == n) || (YEAR == n);
+		switch (n)
+		{
+		case CATEGORY:
+		case MANUFACTURER:
+		case YEAR:
+		case SOURCE_FILE:
+			return true;
+
+		default:
+			return false;
+		}
 	}
 
 private:
@@ -1599,10 +1627,21 @@ void machine_filter_data::add_year(std::string const &year)
 		m_years.emplace(pos, year);
 }
 
+void machine_filter_data::add_source_file(std::string_view path)
+{
+	std::vector<std::string>::iterator const pos(std::lower_bound(m_source_files.begin(), m_source_files.end(), path));
+	if ((m_source_files.end() == pos) || (*pos != path))
+		m_source_files.emplace(pos, path);
+}
+
 void machine_filter_data::finalise()
 {
+	for (std::string &path : m_source_files)
+		path = info_xml_creator::format_sourcefile(path);
+
 	std::stable_sort(m_manufacturers.begin(), m_manufacturers.end());
 	std::stable_sort(m_years.begin(), m_years.end());
+	std::stable_sort(m_source_files.begin(), m_source_files.end());
 }
 
 std::string machine_filter_data::extract_manufacturer(std::string const &manufacturer)
@@ -1777,6 +1816,8 @@ machine_filter::ptr machine_filter::create(type n, machine_filter_data const &da
 		return std::make_unique<manufacturer_machine_filter>(data, value, file, indent);
 	case YEAR:
 		return std::make_unique<year_machine_filter>(data, value, file, indent);
+	case SOURCE_FILE:
+		return std::make_unique<source_file_machine_filter>(data, value, file, indent);
 	case SAVE:
 		return std::make_unique<save_machine_filter>(data, value, file, indent);
 	case NOSAVE:
@@ -1950,15 +1991,11 @@ extern const char UI_VERSION_TAG[];
 const char UI_VERSION_TAG[] = "# UI INFO ";
 
 // Globals
-uint8_t ui_globals::rpanel = 0;
 uint8_t ui_globals::curdats_view = 0;
 uint8_t ui_globals::cur_sw_dats_total = 0;
 uint8_t ui_globals::curdats_total = 0;
 uint8_t ui_globals::cur_sw_dats_view = 0;
 bool ui_globals::reset = false;
-int ui_globals::visible_main_lines = 0;
-int ui_globals::visible_sw_lines = 0;
-uint16_t ui_globals::panels_status = 0;
 
 char* chartrimcarriage(char str[])
 {
@@ -1969,11 +2006,6 @@ char* chartrimcarriage(char str[])
 	if (pstr)
 		str[pstr - str] = '\0';
 	return str;
-}
-
-const char* strensure(const char* s)
-{
-	return s == nullptr ? "" : s;
 }
 
 int getprecisionchr(const char* s)

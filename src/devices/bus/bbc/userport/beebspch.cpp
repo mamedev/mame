@@ -100,12 +100,12 @@ void bbc_beebspch_device::pb_w(uint8_t data)
 	m_nsp->ald_w(data & 0x3f);
 }
 
-WRITE_LINE_MEMBER(bbc_beebspch_device::cb1_w)
+void bbc_beebspch_device::cb1_w(int state)
 {
 	m_slot->cb1_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_beebspch_device::cb2_w)
+void bbc_beebspch_device::cb2_w(int state)
 {
 	m_slot->cb2_w(state);
 }

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_M24_KBD_H
-#define MAME_MACHINE_M24_KBD_H
+#ifndef MAME_OLIVETTI_M24_KBD_H
+#define MAME_OLIVETTI_M24_KBD_H
 
 #pragma once
 
@@ -15,8 +15,8 @@ public:
 
 	auto out_data_handler() { return m_out_data.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(data_w);
+	void clock_w(int state);
+	void data_w(int state);
 
 protected:
 	virtual void device_start() override;
@@ -40,10 +40,10 @@ private:
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t0_r();
+	int t1_r();
 };
 
 DECLARE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device)
 
-#endif // MAME_MACHINE_M24_KBD_H
+#endif // MAME_OLIVETTI_M24_KBD_H

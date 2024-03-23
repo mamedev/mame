@@ -15,6 +15,8 @@
 #include "debugviewinfo.h"
 
 
+namespace osd::debugger::win {
+
 class logview_info : public debugview_info
 {
 public:
@@ -23,5 +25,7 @@ public:
 
 	void clear();
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_LOGVIEWINFO_H

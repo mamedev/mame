@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, James Wallace
 
-#ifndef MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
-#define MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
+#ifndef MAME_BARCREST_MPU4_CHARACTERISER_PAL_H
+#define MAME_BARCREST_MPU4_CHARACTERISER_PAL_H
 
 #pragma once
 
+#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
@@ -32,6 +33,11 @@ public:
 		m_current_chr_table = table;
 	}
 
+	void set_allow_6800_cheat(bool allow)
+	{
+		m_allow_6800_cheat = allow;
+	}
+
 	void set_allow_6809_cheat(bool allow)
 	{
 		m_allow_6809_cheat = allow;
@@ -50,7 +56,7 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	/* While some games use unique keys and lamp scrambles, several do write the same sequencesand expect the
+	/* While some games use unique keys and lamp scrambles, several do write the same sequences and expect the
 	   same responses.  It is possible PALs were reused.  Sometimes the lamp tables are masked subsets, as
 	   they were handcrafted when the layouts were made, they could also be incorrect in places.
 
@@ -1412,6 +1418,7 @@ private:
 
 	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
 
+	bool m_allow_6800_cheat;
 	bool m_allow_6809_cheat;
 	bool m_allow_68k_cheat;
 
@@ -1428,4 +1435,4 @@ private:
 	uint8_t m_temp_debug_table[64];
 };
 
-#endif // MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
+#endif // MAME_BARCREST_MPU4_CHARACTERISER_PAL_H

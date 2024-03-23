@@ -55,13 +55,19 @@ pcf2112_device::pcf2112_device(const machine_config &mconfig, const char *tag, d
 
 void pcf2100_device::device_start()
 {
-	// resolve callbacks
-	m_write_segs.resolve_safe();
-
 	// timer
 	m_lcd_timer = timer_alloc(FUNC(pcf2100_device::update_output_latches), this);
 	attotime period = attotime::from_hz(clock());
 	m_lcd_timer->adjust(period, 0, period);
+
+	// zerofill
+	m_shift = 0;
+	m_count = 0;
+	m_bpout = 0;
+	std::fill_n(m_latch, std::size(m_latch), 0);
+	m_clb = 0;
+	m_data = 0;
+	m_dlen = 0;
 
 	// register for savestates
 	save_item(NAME(m_shift));
@@ -85,7 +91,7 @@ TIMER_CALLBACK_MEMBER(pcf2100_device::update_output_latches)
 	m_bpout = (m_bpout + 1) % m_bpmax;
 }
 
-WRITE_LINE_MEMBER(pcf2100_device::clb_w)
+void pcf2100_device::clb_w(int state)
 {
 	state = (state) ? 1 : 0;
 	bool rise = state && !m_clb;

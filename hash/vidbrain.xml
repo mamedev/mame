@@ -1,36 +1,33 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
-    Undumped cartridges
+All officially released cartridges have been dumped.
 
-    Money Management Series:
-    APL/S   The Computational Language
+Advertised but never released cartridges:
 
+Money Management Series:
+- VB-59   The Programmable
+- VB-1100 Budget System
+- VB-1200 Information Manager
 
-    Advertised but never released cartridges
+Education Series:
+- ED07    Musicianship 1
+- ED08    Number Cross
+- ED09    Historical Simulation: France in the Old Regime
 
-    Money Management Series:
-    VB-59   The Programmable
-    VB-1100 Budget System
-    VB-1200 Information Manager
-
-    Education Series:
-    ED07    Musicianship 1
-    ED08    Number Cross
-    ED09    Historical Simulation - France in the Old Regime
-
-    Entertainment Series:
-    EN07    Challenge Racer
-    EN08    Music Programmer
-    EN09    Programmable Football
-    EN10    Computer Life
+Entertainment Series:
+- EN07    Challenge Racer
+- EN08    Music Programmer
+- EN09    Programmable Football
+- EN10    Computer Life
 
 -->
+
 <softwarelist name="vidbrain" description="VideoBrain Family Computer cartridges">
 
-	<!-- Communication Series -->
+<!-- Communications Series (orange) -->
 
 	<software name="timeshar" supported="no">
 		<description>Timeshare</description>
@@ -40,13 +37,14 @@ license:CC0
 		<part name="cart" interface="vidbrain_cart">
 			<feature name="slot" value="timeshare" />
 			<dataarea name="rom" size="0x800">
-				<rom name="timeshare (1978)(videobrain computer company)(videobrain)(cart)[cm01].bin" size="0x800" crc="957d7246" sha1="cb8eb48f7bf895b87975f2386451286143087fff" offset="0" />
+				<rom name="uv401c-m01" size="0x800" crc="957d7246" sha1="cb8eb48f7bf895b87975f2386451286143087fff" />
 			</dataarea>
-			<dataarea name="ram" size="0x800"/>
+			<dataarea name="ram" size="0x400"/>
 		</part>
 	</software>
 
-	<!-- Education Series -->
+
+<!-- Education Series (blue) -->
 
 	<software name="musictch">
 		<description>Music Teacher 1</description>
@@ -55,7 +53,7 @@ license:CC0
 		<info name="serial" value="ED01"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="musicteacher1-ed01.bin" size="0x800" crc="c8fee8cd" sha1="1a0a19ecedfb2d918e4e1a4eb604a07dc5e1113f" offset="0" />
+				<rom name="musicteacher1-ed01.bin" size="0x800" crc="c8fee8cd" sha1="1a0a19ecedfb2d918e4e1a4eb604a07dc5e1113f" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +65,7 @@ license:CC0
 		<info name="serial" value="ED02"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="mathtutor1-ed02.bin" size="0x1000" crc="db47f770" sha1="efe9e5f7ee95e157af892b84de5653c0f85a13b0" offset="0" />
+				<rom name="mathtutor1-ed02.bin" size="0x1000" crc="db47f770" sha1="efe9e5f7ee95e157af892b84de5653c0f85a13b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +77,7 @@ license:CC0
 		<info name="serial" value="ED03"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="wordwise1-ed03.bin" size="0x800" crc="d1546212" sha1="91594485442e2dfad059e4ce42aa60b7a0519d91" offset="0" />
+				<rom name="wordwise1-ed03.bin" size="0x800" crc="d1546212" sha1="91594485442e2dfad059e4ce42aa60b7a0519d91" />
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +89,7 @@ license:CC0
 		<info name="serial" value="ED04"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="wordwise2-ed04.bin" size="0x800" crc="4a08e999" sha1="0b17ead29aea643da84d495ebab5220e547abf99" offset="0" />
+				<rom name="wordwise2-ed04.bin" size="0x800" crc="4a08e999" sha1="0b17ead29aea643da84d495ebab5220e547abf99" />
 			</dataarea>
 		</part>
 	</software>
@@ -103,7 +101,7 @@ license:CC0
 		<info name="serial" value="ED05"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="videoartist-ed05.bin" size="0x800" crc="d68795f8" sha1="dfb118d6bba837aa8e6b7feb19be7de40cd1e4fa" offset="0" />
+				<rom name="videoartist-ed05.bin" size="0x800" crc="d68795f8" sha1="dfb118d6bba837aa8e6b7feb19be7de40cd1e4fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -115,12 +113,13 @@ license:CC0
 		<info name="serial" value="ED06"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="lemonadestand-ed06.bin" size="0x1000" crc="27c08d93" sha1="faf47261797692e9081dc24f957f8f38dc1a975d" offset="0" />
+				<rom name="lemonadestand-ed06.bin" size="0x1000" crc="27c08d93" sha1="faf47261797692e9081dc24f957f8f38dc1a975d" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Entertainment Series -->
+
+<!-- Entertainment Series (red) -->
 
 	<software name="gladiatr">
 		<description>Gladiator</description>
@@ -129,7 +128,7 @@ license:CC0
 		<info name="serial" value="EN01"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="gladiator-en01.bin" size="0x1000" crc="e6a88a49" sha1="ffdb06a714cc5bafa980db0742d0364ee5658c05" offset="0" />
+				<rom name="gladiator-en01.bin" size="0x1000" crc="e6a88a49" sha1="ffdb06a714cc5bafa980db0742d0364ee5658c05" />
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +140,7 @@ license:CC0
 		<info name="serial" value="EN02"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="pinball-en02.bin" size="0x800" crc="484331ff" sha1="0bd04368692a55bf89f8ec7ff1a29cff3a398b9f" offset="0" />
+				<rom name="pinball-en02.bin" size="0x800" crc="484331ff" sha1="0bd04368692a55bf89f8ec7ff1a29cff3a398b9f" />
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +152,7 @@ license:CC0
 		<info name="serial" value="EN03"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="tennis-en03.bin" size="0x1000" crc="1942f852" sha1="74e8304d8ad0328655627e21c0305b72c11a5dda" offset="0" />
+				<rom name="tennis-en03.bin" size="0x1000" crc="1942f852" sha1="74e8304d8ad0328655627e21c0305b72c11a5dda" />
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +164,7 @@ license:CC0
 		<info name="serial" value="EN04"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="checkers-en04.bin" size="0x1000" crc="24c53410" sha1="f12f448d1f62b56318cb94b8f802180d561e3ee5" offset="0" />
+				<rom name="checkers-en04.bin" size="0x1000" crc="24c53410" sha1="f12f448d1f62b56318cb94b8f802180d561e3ee5" />
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +176,7 @@ license:CC0
 		<info name="serial" value="EN05"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="blackjack-en05.bin" size="0x800" crc="47f02b92" sha1="23fd10c9674d304f2a0a4ae37e3afb6a25906b1c" offset="0" />
+				<rom name="blackjack-en05.bin" size="0x800" crc="47f02b92" sha1="23fd10c9674d304f2a0a4ae37e3afb6a25906b1c" />
 			</dataarea>
 		</part>
 	</software>
@@ -189,12 +188,33 @@ license:CC0
 		<info name="serial" value="EN06"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="viceversa-en06.bin" size="0x1000" crc="e23504ee" sha1="c5b4b62c9e0db998c2c4df6f71713a1df35c8bf4" offset="0" />
+				<rom name="viceversa-en06.bin" size="0x1000" crc="e23504ee" sha1="c5b4b62c9e0db998c2c4df6f71713a1df35c8bf4" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Money Management Series -->
+
+<!-- Money Management Series (green) -->
+
+	<software name="complang">
+		<description>The Computational Language</description>
+		<year>1978</year>
+		<publisher>VideoBrain Computer Company</publisher>
+		<info name="serial" value="APL/S"/>
+		<part name="cart" interface="vidbrain_cart">
+			<feature name="slot" value="comp_language" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="0310_apls-a.u1"  offset="0x0000" size="0x800" crc="e0b883c8" sha1="30508b45d7120119e081a09433ee1eef4152b11a" />
+				<rom name="0311_apls-b.u4"  offset="0x0800" size="0x800" crc="93c869d2" sha1="4c414d5b1df35dde1d816d502cb85f19977d3a71" />
+				<rom name="0312_apls-c.u3"  offset="0x1000" size="0x800" crc="98fbf99c" sha1="9e45794f5b0f0b321ee7ee8fa7420816ab3ff52a" />
+				<rom name="0313_apls-d.u6"  offset="0x1800" size="0x800" crc="31adadcc" sha1="deb38e30d09e3b8de93d3be4ae9a0f7aae718537" />
+				<rom name="0314_apls-e.u2"  offset="0x2000" size="0x800" crc="47048589" sha1="43417af8a509f971f42616a0b9dbf9af3e977bb3" />
+				<rom name="0315_apls-f.u5"  offset="0x2800" size="0x800" crc="b74e799e" sha1="67694da241fc336c01dfca9a81c0d334f343bb47" />
+				<rom name="0316_apls-g.u11" offset="0x3000" size="0x800" crc="6d5773fa" sha1="96401d934617bbf54af836c1efc0232e9718067b" />
+			</dataarea>
+			<dataarea name="ram" size="0x400"/>
+		</part>
+	</software>
 
 	<software name="financie">
 		<description>Financier</description>
@@ -203,42 +223,43 @@ license:CC0
 		<info name="serial" value="VB-81"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="financier (1978)(videobrain computer company)(videobrain)(cart)[vb-81].bin" size="0x1000" crc="721a4a14" sha1="d3b745106c736dcf44aeca533f22772aabff0a4f" offset="0" />
+				<rom name="financier-vb81.bin" size="0x1000" crc="721a4a14" sha1="d3b745106c736dcf44aeca533f22772aabff0a4f" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="moneymin" supported="no">
-		<description>Money Minder</description>
+	<software name="moneymin">
+		<description>Money Minder</description> <!-- "Money Manager" on title screen -->
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="VB-1000"/>
 		<part name="cart" interface="vidbrain_cart">
-			<feature name="slot" value="moneyminder" />
+			<feature name="slot" value="money_minder" />
 			<dataarea name="rom" size="0x1000">
-				<rom name="moneymanager-vb1000.bin" size="0x1000" crc="4f588081" sha1="afb95754d4710b2989689c877b775706b2a7a43d" offset="0" />
+				<rom name="r2332c_r2319-11" size="0x1000" crc="4f588081" sha1="afb95754d4710b2989689c877b775706b2a7a43d" />
 			</dataarea>
-			<dataarea name="ram" size="0x800"/>
+			<dataarea name="ram" size="0x400"/>
 		</part>
 	</software>
 
 	<software name="infoman" supported="no">
-		<description>Information Manager (Proto)</description>
+		<description>Information Manager (prototype)</description>
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="VB-1200"/>
 		<part name="cart" interface="vidbrain_cart">
-			<feature name="slot" value="infomanager" />
-			<dataarea name="rom" size="0x1800">
-				<rom name="vb1200a_1000-17ff_9_25_78.bin" size="0x800" crc="7fc58830" sha1="39c2821f73c86c3e368fe5429628672cfe594306" offset="0x0000" />
-				<rom name="vb1200c_3000-37ff_9_25_78.bin" size="0x800" crc="e5d18447" sha1="d98b94ae1cce2ce6e6ae933180a7bf001b73932f" offset="0x0800" />
-				<rom name="vb-1200_3800-3fff_9_26_78.bin" size="0x800" crc="df9d9437" sha1="3a38a889b552acaa1a284e2ca7447f142b494737" offset="0x1000" />
+			<feature name="slot" value="info_manager" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="vb1200a_1000-17ff_9_25_78_51" offset="0x0000" size="0x800" crc="7fc58830" sha1="39c2821f73c86c3e368fe5429628672cfe594306" /> <!-- handwritten EPROM labels -->
+				<rom name="vb1200c_3000-37ff_9_25_78_51" offset="0x1000" size="0x800" crc="e5d18447" sha1="d98b94ae1cce2ce6e6ae933180a7bf001b73932f" /> <!-- " -->
+				<rom name="vb-1200_3800-3fff_9_26_78"    offset="0x1800" size="0x800" crc="df9d9437" sha1="3a38a889b552acaa1a284e2ca7447f142b494737" /> <!-- " -->
 			</dataarea>
-			<dataarea name="ram" size="0x800"/>
+			<dataarea name="ram" size="0x400"/>
 		</part>
 	</software>
 
-	<!-- Demonstration Series -->
+
+<!-- Other (yellow) -->
 
 	<software name="demo">
 		<description>Demonstration</description>
@@ -247,8 +268,9 @@ license:CC0
 		<info name="serial" value="ST01"/>
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
-				<rom name="demonstration (197x)(videobrain computer company)(videobrain)(cart)[st01].bin" size="0x1000" crc="a59eb765" sha1="ca8f8d2088477b901d5e7f04a1b6c6b71494eec3" offset="0" />
+				<rom name="demonstration-st01.bin" size="0x1000" crc="a59eb765" sha1="ca8f8d2088477b901d5e7f04a1b6c6b71494eec3" />
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

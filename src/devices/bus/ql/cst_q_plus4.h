@@ -41,10 +41,10 @@ protected:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( exp1_extintl_w ) { m_exp1_extinl = state; update_extintl(); }
-	DECLARE_WRITE_LINE_MEMBER( exp2_extintl_w ) { m_exp2_extinl = state; update_extintl(); }
-	DECLARE_WRITE_LINE_MEMBER( exp3_extintl_w ) { m_exp3_extinl = state; update_extintl(); }
-	DECLARE_WRITE_LINE_MEMBER( exp4_extintl_w ) { m_exp4_extinl = state; update_extintl(); }
+	void exp1_extintl_w(int state) { m_exp1_extinl = state; update_extintl(); }
+	void exp2_extintl_w(int state) { m_exp2_extinl = state; update_extintl(); }
+	void exp3_extintl_w(int state) { m_exp3_extinl = state; update_extintl(); }
+	void exp4_extintl_w(int state) { m_exp4_extinl = state; update_extintl(); }
 
 	void update_extintl() { m_slot->extintl_w(m_exp1_extinl || m_exp2_extinl || m_exp3_extinl || m_exp4_extinl); }
 

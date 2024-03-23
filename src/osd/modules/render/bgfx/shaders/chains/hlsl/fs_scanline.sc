@@ -37,34 +37,15 @@ SAMPLER2D(s_shadow, 1);
 // Scanline Pixel Shader
 //-----------------------------------------------------------------------------
 
-vec2 GetAdjustedCoords(vec2 coord)
-{
-	// center coordinates
-	coord -= 0.5;
-
-	// apply screen scale
-	coord *= u_screen_scale.xy;
-
-	// un-center coordinates
-	coord += 0.5;
-
-	// apply screen offset
-	coord += u_screen_offset.xy;
-
-	return coord;
-}
-
 void main()
 {
-	vec2 BaseCoord = GetAdjustedCoords(v_texcoord0);
-
 	// Color
-	vec4 BaseColor = texture2D(s_tex, BaseCoord);
+	vec4 BaseColor = texture2D(s_tex, v_texcoord0);
 
 	// Clamp
-	if (BaseCoord.x < 0.0 || BaseCoord.y < 0.0 || BaseCoord.x > 1.0 || BaseCoord.y > 1.0)
+	if (v_texcoord0.x < 0.0 || v_texcoord0.y < 0.0 || v_texcoord0.x > 1.0 || v_texcoord0.y > 1.0)
 	{
-		gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 	else
 	{
@@ -76,7 +57,7 @@ void main()
 
 			float ColorBrightness = 0.299 * BaseColor.r + 0.587 * BaseColor.g + 0.114 * BaseColor.b;
 
-			float ScanCoord = BaseCoord.y;
+			float ScanCoord = v_texcoord0.y;
 			ScanCoord += u_swap_xy.x > 0.0
 				? u_quad_dims.x <= u_source_dims.x * 2.0
 					? 0.5 / u_quad_dims.x // uncenter scanlines if the quad is less than twice the size of the source

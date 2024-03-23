@@ -14,6 +14,8 @@
 #include "emuopts.h"
 #include "inputdev.h"
 
+#include "path.h"
+
 
 namespace ui {
 
@@ -95,6 +97,7 @@ menu_load_save_state_base::menu_load_save_state_base(
 	, m_confirm_delete(nullptr)
 	, m_must_exist(must_exist)
 	, m_keys_released(false)
+	, m_slot_selected(INPUT_CODE_INVALID)
 {
 	set_one_shot(one_shot);
 	set_needs_prev_menu_item(!one_shot);
@@ -115,7 +118,7 @@ menu_load_save_state_base::~menu_load_save_state_base()
 //  populate
 //-------------------------------------------------
 
-void menu_load_save_state_base::populate(float &customtop, float &custombottom)
+void menu_load_save_state_base::populate()
 {
 	// build the "filename to code" map, if we have not already (if it were not for the
 	// possibility that the system keyboard can be changed at runtime, I would put this
@@ -221,9 +224,6 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 	if (is_one_shot())
 		item_append(_("Cancel"), 0, nullptr);
 
-	// set up custom render proc
-	custombottom = (2.0f * ui().get_line_height()) + (3.0f * ui().box_tb_border());
-
 	// get ready to poll inputs
 	m_switch_poller.reset();
 	m_keys_released = false;
@@ -234,10 +234,16 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_load_save_state_base::handle(event const *ev)
+bool menu_load_save_state_base::handle(event const *ev)
 {
 	// process the event
-	if (ev && (ev->iptkey == IPT_UI_SELECT))
+	if (INPUT_CODE_INVALID != m_slot_selected)
+	{
+		if (!machine().input().code_pressed(m_slot_selected))
+			stack_pop();
+		return false;
+	}
+	else if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
 		if (ev->itemref)
 		{
@@ -245,10 +251,8 @@ void menu_load_save_state_base::handle(event const *ev)
 			file_entry const &entry = file_entry_from_itemref(ev->itemref);
 			slot_selected(std::string(entry.file_name()));
 		}
-		else
-		{
-			stack_pop();
-		}
+		stack_pop();
+		return false;
 	}
 	else if (ev && (ev->iptkey == IPT_UI_CLEAR))
 	{
@@ -260,15 +264,29 @@ void menu_load_save_state_base::handle(event const *ev)
 					_("Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"),
 					m_confirm_delete->visible_name(),
 					ui().get_general_input_setting(IPT_UI_SELECT),
-					ui().get_general_input_setting(IPT_UI_CANCEL));
+					ui().get_general_input_setting(IPT_UI_BACK));
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 	else if (!m_confirm_delete)
 	{
 		// poll inputs
-		std::string name = poll_inputs();
-		if (!name.empty())
-			try_select_slot(std::move(name));
+		input_code code;
+		std::string name = poll_inputs(code);
+		if (!name.empty() && try_select_slot(std::move(name)))
+		{
+			m_switch_poller.reset();
+			m_slot_selected = code;
+		}
+		return false;
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -292,25 +310,32 @@ std::string menu_load_save_state_base::get_visible_name(const std::string &file_
 //  poll_inputs
 //-------------------------------------------------
 
-std::string menu_load_save_state_base::poll_inputs()
+std::string menu_load_save_state_base::poll_inputs(input_code &code)
 {
-	input_code const code = m_switch_poller.poll();
-	if (INPUT_CODE_INVALID == code)
+	input_code const result = m_switch_poller.poll();
+	if (INPUT_CODE_INVALID == result)
 	{
 		m_keys_released = true;
 	}
 	else if (m_keys_released)
 	{
-		input_item_id const id = code.item_id();
+		input_item_id const id = result.item_id();
 
 		// keyboard A-Z and 0-9
 		if (((ITEM_ID_A <= id) && (ITEM_ID_Z >= id)) || ((ITEM_ID_0 <= id) && (ITEM_ID_9 >= id)))
+		{
+			code = result;
 			return keyboard_input_item_name(id);
+		}
 
 		// joystick buttons
-		if ((DEVICE_CLASS_JOYSTICK == code.device_class()) && (ITEM_CLASS_SWITCH == code.item_class()) && (ITEM_MODIFIER_NONE == code.item_modifier()) && (ITEM_ID_BUTTON1 <= id) && (ITEM_ID_BUTTON32 >= id))
-			return util::string_format("joy%i-%i", code.device_index(), id - ITEM_ID_BUTTON1 + 1);
+		if ((DEVICE_CLASS_JOYSTICK == result.device_class()) && (ITEM_CLASS_SWITCH == result.item_class()) && (ITEM_MODIFIER_NONE == result.item_modifier()) && (ITEM_ID_BUTTON1 <= id) && (ITEM_ID_BUTTON32 >= id))
+		{
+			code = result;
+			return util::string_format("joy%i-%i", result.device_index(), id - ITEM_ID_BUTTON1 + 1);
+		}
 	}
+	code = INPUT_CODE_INVALID;
 	return "";
 }
 
@@ -319,10 +344,17 @@ std::string menu_load_save_state_base::poll_inputs()
 //  try_select_slot
 //-------------------------------------------------
 
-void menu_load_save_state_base::try_select_slot(std::string &&name)
+bool menu_load_save_state_base::try_select_slot(std::string &&name)
 {
 	if (!m_must_exist || is_present(name))
+	{
 		slot_selected(std::move(name));
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -337,9 +369,6 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 
 	// record the last slot touched
 	s_last_file_selected = std::move(name);
-
-	// no matter what, pop out
-	menu::stack_pop();
 }
 
 
@@ -354,12 +383,10 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 		if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 		{
 			// try to remove the file
-			std::string const filename(util::string_format(
-						"%2$s%1$s%3$s%1$s%4$s.sta",
-						PATH_SEPARATOR,
+			std::string const filename(util::path_concat(
 						machine().options().state_directory(),
 						machine().get_statename(machine().options().state_name()),
-						m_confirm_delete->file_name()));
+						m_confirm_delete->file_name() + ".sta"));
 			std::error_condition const err(osd_file::remove(filename));
 			if (err)
 			{
@@ -381,7 +408,7 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 			m_keys_released = false;
 			reset(reset_options::REMEMBER_POSITION);
 		}
-		else if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
+		else if (exclusive_input_pressed(iptkey, IPT_UI_BACK, 0))
 		{
 			// don't delete it - dismiss the prompt
 			m_switch_poller.reset();
@@ -391,10 +418,27 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 		}
 		iptkey = IPT_INVALID;
 	}
+	else if (INPUT_CODE_INVALID != m_slot_selected)
+	{
+		iptkey = IPT_INVALID;
+	}
 	else
 	{
 		menu::handle_keys(flags, iptkey);
 	}
+}
+
+
+//-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_load_save_state_base::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	autopause_menu<>::recompute_metrics(width, height, aspect);
+
+	// set up custom render proc
+	set_custom_space(0.0F, (2.0F * line_height()) + (3.0F * tb_border()));
 }
 
 
@@ -415,7 +459,7 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 	if (selected_item().ref())
 	{
 		if (m_delete_prompt.empty())
-			m_delete_prompt = util::string_format(_("Press %1$s to delete"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));
+			m_delete_prompt = util::string_format(_("Press %1$s to delete"), ui().get_general_input_setting(IPT_UI_CLEAR));
 		text[count++] = m_delete_prompt;
 	}
 
@@ -424,14 +468,14 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 	{
 		draw_text_box(
 				std::begin(text), std::next(std::begin(text), count),
-				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + (count * ui().get_line_height()) + (3.0f * ui().box_tb_border()),
+				origx1, origx2, origy2 + tb_border(), origy2 + (count * line_height()) + (3.0F * tb_border()),
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+				ui().colors().text_color(), ui().colors().background_color());
 	}
 
 	// draw the confirmation prompt if necessary
 	if (!m_confirm_prompt.empty())
-		ui().draw_text_box(container(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5f, 0.5f, ui().colors().background_color());
+		ui().draw_text_box(container(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5F, 0.5F, ui().colors().background_color());
 }
 
 
@@ -461,11 +505,9 @@ const menu_load_save_state_base::file_entry &menu_load_save_state_base::file_ent
 
 std::string menu_load_save_state_base::state_directory() const
 {
-	const char *stateopt = machine().options().state_name();
-	return util::string_format("%s%s%s",
+	return util::path_concat(
 			machine().options().state_directory(),
-			PATH_SEPARATOR,
-			machine().get_statename(stateopt));
+			machine().get_statename(machine().options().state_name()));
 }
 
 

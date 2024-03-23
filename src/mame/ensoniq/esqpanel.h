@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_MACHINE_ESQPANEL_H
-#define MAME_MACHINE_ESQPANEL_H
+#ifndef MAME_ENSONIQ_ESQPANEL_H
+#define MAME_ENSONIQ_ESQPANEL_H
 
 #pragma once
 
@@ -146,4 +146,4 @@ DECLARE_DEVICE_TYPE(ESQPANEL2X40_VFX, esqpanel2x40_vfx_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X40_SQ1, esqpanel2x40_sq1_device)
 DECLARE_DEVICE_TYPE(ESQPANEL2X16_SQ1, esqpanel2x16_sq1_device)
 
-#endif // MAME_MACHINE_ESQPANEL_H
+#endif // MAME_ENSONIQ_ESQPANEL_H

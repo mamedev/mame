@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
@@ -72,8 +72,66 @@ TEST_CASE("vsnprintf f")
 	REQUIRE(test("0001.500", "%08.3f",   1.5) );
 	REQUIRE(test("+001.500", "%+08.3f",  1.5) );
 	REQUIRE(test("-001.500", "%+08.3f", -1.5) );
-	REQUIRE(test("0.003906", "%f",       0.00390625) );
 	REQUIRE(test("0.0039",   "%.4f",     0.00390625) );
+
+	REQUIRE(test("0.003906",     "%f",   0.00390625) );
+	REQUIRE(test("-1.234567e-9", "%f",  -1.234567e-9) );
+
+	REQUIRE(test("-1e-9",            "%.0f",  -1.234567e-9) );
+	REQUIRE(test("-1.2e-9",          "%.1f",  -1.234567e-9) );
+	REQUIRE(test("-1.23e-9",         "%.2f",  -1.234567e-9) );
+	REQUIRE(test("-1.234e-9",        "%.3f",  -1.234567e-9) );
+	REQUIRE(test("-1.2345e-9",       "%.4f",  -1.234567e-9) );
+	REQUIRE(test("-1.23456e-9",      "%.5f",  -1.234567e-9) );
+	REQUIRE(test("-1.234567e-9",     "%.6f",  -1.234567e-9) );
+	REQUIRE(test("-1.2345670e-9",    "%.7f",  -1.234567e-9) );
+	REQUIRE(test("-1.23456700e-9",   "%.8f",  -1.234567e-9) );
+	REQUIRE(test("-1.234567000e-9",  "%.9f",  -1.234567e-9) );
+	REQUIRE(test("-1.2345670000e-9", "%.10f", -1.234567e-9) );
+
+	REQUIRE(test("3.141592",           "%f",    3.1415926535897932) );
+	REQUIRE(test("3.141592",           "%F",    3.1415926535897932) );
+	REQUIRE(test("3",                  "%.0f",  3.1415926535897932) );
+	REQUIRE(test("3.1",                "%.1f",  3.1415926535897932) );
+	REQUIRE(test("3.14",               "%.2f",  3.1415926535897932) );
+	REQUIRE(test("3.141",              "%.3f",  3.1415926535897932) );
+	REQUIRE(test("3.1415",             "%.4f",  3.1415926535897932) );
+	REQUIRE(test("3.14159",            "%.5f",  3.1415926535897932) );
+	REQUIRE(test("3.141592",           "%.6f",  3.1415926535897932) );
+	REQUIRE(test("3.1415926",          "%.7f",  3.1415926535897932) );
+	REQUIRE(test("3.14159265",         "%.8f",  3.1415926535897932) );
+	REQUIRE(test("3.141592653",        "%.9f",  3.1415926535897932) );
+	REQUIRE(test("3.1415926535",       "%.10f", 3.1415926535897932) );
+	REQUIRE(test("3.14159265358",      "%.11f", 3.1415926535897932) );
+	REQUIRE(test("3.141592653589",     "%.12f", 3.1415926535897932) );
+	REQUIRE(test("3.1415926535897",    "%.13f", 3.1415926535897932) );
+	REQUIRE(test("3.14159265358979",   "%.14f", 3.1415926535897932) );
+	REQUIRE(test("3.141592653589793",  "%.15f", 3.1415926535897932) );
+	REQUIRE(test("3.1415926535897930", "%.16f", 3.1415926535897932) );
+	REQUIRE(test("3.1415926535897930", "%.16F", 3.1415926535897932) );
+
+	REQUIRE(test("-3.141592e-9",           "%f",    -3.1415926535897932e-9) );
+	REQUIRE(test("-3.141592E-9",           "%F",    -3.1415926535897932e-9) );
+	REQUIRE(test("-3e-9",                  "%.0f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.1e-9",                "%.1f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.14e-9",               "%.2f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.141e-9",              "%.3f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.1415e-9",             "%.4f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.14159e-9",            "%.5f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.141592e-9",           "%.6f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.1415926e-9",          "%.7f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.14159265e-9",         "%.8f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.141592653e-9",        "%.9f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-3.1415926535e-9",       "%.10f", -3.1415926535897932e-9) );
+	REQUIRE(test("-3.14159265358e-9",      "%.11f", -3.1415926535897932e-9) );
+	REQUIRE(test("-3.141592653589e-9",     "%.12f", -3.1415926535897932e-9) );
+	REQUIRE(test("-3.1415926535897e-9",    "%.13f", -3.1415926535897932e-9) );
+	REQUIRE(test("-3.14159265358979e-9",   "%.14f", -3.1415926535897932e-9) );
+	REQUIRE(test("-3.141592653589793e-9",  "%.15f", -3.1415926535897932e-9) );
+	REQUIRE(test("-3.1415926535897930e-9", "%.16f", -3.1415926535897932e-9) );
+	REQUIRE(test("-3.1415926535897930E-9", "%.16F", -3.1415926535897932e-9) );
+
+	REQUIRE(test("1e-12", "%f", 1e-12));
 
 	REQUIRE(test("0.00390625",          "%.8f",  0.00390625) );
 	REQUIRE(test("-0.00390625",         "%.8f", -0.00390625) );
@@ -179,6 +237,29 @@ TEST_CASE("vsnprintf s")
 	REQUIRE(test("(null)", "%s", NULL) );
 }
 
+TEST_CASE("vsnprintf t")
+{
+	size_t size = size_t(-1);
+
+	REQUIRE(test("-1", "%td", size) );
+
+	REQUIRE(test("3221225472", "%td", size_t(3221225472) ) );
+}
+
+TEST_CASE("vsnprintf n")
+{
+	char temp[64];
+
+	int32_t p0, p1, p2;
+	bx::snprintf(temp, sizeof(temp), "%n", &p0);
+	REQUIRE(0 == p0);
+
+	bx::snprintf(temp, sizeof(temp), "01%n23%n45%n", &p0, &p1, &p2);
+	REQUIRE(2 == p0);
+	REQUIRE(4 == p1);
+	REQUIRE(6 == p2);
+}
+
 TEST_CASE("vsnprintf g")
 {
 	REQUIRE(test("   0.01",  "%7.2g", .01) );
@@ -208,6 +289,11 @@ TEST_CASE("vsnprintf")
 		, hello.getLength(), hello.getPtr()
 		, world.getLength(), world.getPtr()
 		) );
+
+	REQUIRE(test("hello, world!", "%S, %S!"
+		, &hello
+		, &world
+		) );
 }
 
 TEST_CASE("vsnprintf write")
@@ -223,4 +309,16 @@ TEST_CASE("vsnprintf write")
 
 	bx::StringView str(tmp, len);
 	REQUIRE(0 == bx::strCmp(str, "1389") );
+}
+
+TEST_CASE("snprintf invalid")
+{
+	char temp[64];
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-0", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.0", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.0t", 1) );
 }

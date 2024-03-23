@@ -31,6 +31,8 @@ ToDo:
 #include "elekscmp.lh"
 
 
+namespace {
+
 class elekscmp_state : public driver_device
 {
 public:
@@ -51,7 +53,7 @@ private:
 
 	u8 keyboard_r();
 	void hex_display_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER(cass_r);
+	int cass_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	u8 convert_key(u8 data);
@@ -143,7 +145,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( elekscmp_state::kansas_w )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-READ_LINE_MEMBER( elekscmp_state::cass_r )
+int elekscmp_state::cass_r()
 {
 	return m_cassinbit;
 }
@@ -225,6 +227,9 @@ ROM_START( elekscmp )
 	ROM_LOAD( "elbug.002", 0x0200, 0x0200, CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
 	ROM_LOAD( "elbug.003", 0x0400, 0x0200, CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

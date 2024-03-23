@@ -17,12 +17,11 @@
 #include "subor.h"
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(...) do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -232,7 +231,7 @@ void nes_subor2_device::update_banks()
 
 uint8_t nes_subor2_device::read_l(offs_t offset)
 {
-	LOG_MMC("subor2 read_l, offset: %04x\n", offset);
+	LOG("subor2 read_l, offset: %04x\n", offset);
 
 	if (offset == 0x1200)
 	{
@@ -248,7 +247,7 @@ uint8_t nes_subor2_device::read_l(offs_t offset)
 void nes_subor0_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t subor_helper1, subor_helper2;
-	LOG_MMC("subor0 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("subor0 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	m_reg[BIT(offset, 13, 2)] = data;
 	subor_helper1 = ((m_reg[0] ^ m_reg[1]) << 1) & 0x20;
@@ -278,7 +277,7 @@ void nes_subor0_device::write_h(offs_t offset, uint8_t data)
 void nes_subor1_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t subor_helper1, subor_helper2;
-	LOG_MMC("subor1 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("subor1 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	m_reg[BIT(offset, 13, 2)] = data;
 	subor_helper1 = ((m_reg[0] ^ m_reg[1]) << 1) & 0x20;
@@ -307,7 +306,7 @@ void nes_subor1_device::write_h(offs_t offset, uint8_t data)
 
 void nes_subor2_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC("subor2 write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("subor2 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset)
 	{

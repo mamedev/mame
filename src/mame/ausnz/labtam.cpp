@@ -88,9 +88,10 @@ void labtam_state::machine_reset()
 
 static void labtam_cards(device_slot_interface &device)
 {
-	device.option_add("labtam_3232",   LABTAM_3232);
-	device.option_add("labtam_vducom", LABTAM_VDUCOM);
-	device.option_add("labtam_z80sbc", LABTAM_Z80SBC);
+	device.option_add("labtam_3232",    LABTAM_3232);
+	device.option_add("labtam_8086cpu", LABTAM_8086CPU);
+	device.option_add("labtam_vducom",  LABTAM_VDUCOM);
+	device.option_add("labtam_z80sbc",  LABTAM_Z80SBC);
 }
 
 void labtam_state::labtam(machine_config &config)
@@ -100,7 +101,7 @@ void labtam_state::labtam(machine_config &config)
 	MULTIBUS_SLOT(config, "slot:0", m_bus, labtam_cards, nullptr, false);
 	MULTIBUS_SLOT(config, "slot:1", m_bus, labtam_cards, nullptr, false);
 	MULTIBUS_SLOT(config, "slot:2", m_bus, labtam_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:3", m_bus, labtam_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot:3", m_bus, labtam_cards, "labtam_8086cpu", false);
 	MULTIBUS_SLOT(config, "slot:4", m_bus, labtam_cards, "labtam_vducom", false);
 	MULTIBUS_SLOT(config, "slot:5", m_bus, labtam_cards, "labtam_z80sbc", false);
 }

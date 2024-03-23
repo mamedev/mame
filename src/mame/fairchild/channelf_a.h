@@ -2,12 +2,12 @@
 // copyright-holders:Juergen Buchmueller, Frank Palazzolo, Sean Riddle
 /*****************************************************************************
  *
- * audio/channelf.h
+ * fairchild/channelf.h
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_CHANNELF_H
-#define MAME_AUDIO_CHANNELF_H
+#ifndef MAME_FAIRCHILD_CHANNELF_A_H
+#define MAME_FAIRCHILD_CHANNELF_A_H
 
 class channelf_sound_device : public device_t, public device_sound_interface
 {
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CHANNELF_SOUND, channelf_sound_device)
 
-#endif // MAME_AUDIO_CHANNELF_H
+#endif // MAME_FAIRCHILD_CHANNELF_A_H

@@ -68,6 +68,9 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
+
+namespace {
+
 class mt735_state : public driver_device
 {
 public:
@@ -135,5 +138,8 @@ ROM_START( mt735 )
 	ROM_LOAD16_BYTE( "spg_m_e_ic103.bin", 0, 0x20000, CRC(1ab58bc9) SHA1(c10d50f38819c037d28435b77e09f2b6923e8369) )
 	ROM_LOAD16_BYTE( "spg_m_o_ic102.bin", 1, 0x20000, CRC(84d8446b) SHA1(b1cedd8b09556eb8118f79b012aeec5b61e3ff32) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1990, mt735, 0, 0, mt735, mt735, mt735_state, empty_init, "Mannesmann Tally", "MT735", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // Program ROM Datecode: 19901126, Internal Font ROM Datecode: 19900807

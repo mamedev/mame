@@ -21,17 +21,17 @@ public:
 	alpha_8921_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inputs
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
-	DECLARE_WRITE_LINE_MEMBER(load_w);
-	DECLARE_WRITE_LINE_MEMBER(even_w);
-	DECLARE_WRITE_LINE_MEMBER(h_w);
+	void clk_w(int state);
+	void load_w(int state);
+	void even_w(int state);
+	void h_w(int state);
 	void c_w(u32 data);
 
 	// outputs
 	u8 gad_r();
 	u8 gbd_r();
-	DECLARE_READ_LINE_MEMBER(dota_r);
-	DECLARE_READ_LINE_MEMBER(dotb_r);
+	int dota_r();
+	int dotb_r();
 
 protected:
 	// device-level overrides

@@ -16,7 +16,6 @@
 #include "omti8621.h"
 #include "image.h"
 #include "imagedev/harddriv.h"
-#include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/apollo_dsk.h"
 
@@ -53,16 +52,16 @@ public:
 	// construction/destruction
 	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "awd"; }
 	virtual const char *image_type_name() const noexcept override { return "winchester"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -1276,13 +1275,13 @@ void omti8621_device::set_jumper(uint16_t disk_type)
 }
 
 // FDC uses the standard IRQ 6 / DMA 2, doesn't appear to be configurable
-WRITE_LINE_MEMBER( omti8621_device::fdc_irq_w )
+void omti8621_device::fdc_irq_w(int state)
 {
 	if (BIT(m_moten, 3))
 		m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( omti8621_device::fdc_drq_w )
+void omti8621_device::fdc_drq_w(int state)
 {
 	if (BIT(m_moten, 3))
 		m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
@@ -1469,7 +1468,7 @@ void omti_disk_image_device::device_reset()
    disk image create callback
 -------------------------------------------------*/
 
-image_init_result omti_disk_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> omti_disk_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	logerror("device_create_omti_disk: creating OMTI Disk with %d blocks\n", m_sector_count);
 
@@ -1478,12 +1477,9 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 
 	for (int x = 0; x < m_sector_count; x++)
 	{
-		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
-				< OMTI_DISK_SECTOR_SIZE)
-		{
-			return image_init_result::FAIL;
-		}
+		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE) < OMTI_DISK_SECTOR_SIZE)
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }

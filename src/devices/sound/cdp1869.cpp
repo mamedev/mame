@@ -159,13 +159,7 @@ void cdp1869_device::write_page_ram_byte(offs_t pma, uint8_t data)
 
 uint8_t cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd)
 {
-	uint8_t data = 0;
-
-	if (!m_in_char_ram_func.isnull())
-	{
-		data = m_in_char_ram_func(pma, cma, pmd);
-	}
-
+	uint8_t const data = m_in_char_ram_func(pma, cma, pmd);
 	return data;
 }
 
@@ -177,10 +171,7 @@ uint8_t cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd)
 
 void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, uint8_t data)
 {
-	if (!m_out_char_ram_func.isnull())
-	{
-		m_out_char_ram_func(pma, cma, pmd, data);
-	}
+	m_out_char_ram_func(pma, cma, pmd, data);
 }
 
 
@@ -190,13 +181,7 @@ void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, ui
 
 int cdp1869_device::read_pcb(offs_t pma, offs_t cma, uint8_t pmd)
 {
-	int pcb = 0;
-
-	if (!m_in_pcb_func.isnull())
-	{
-		pcb = m_in_pcb_func(pma, cma, pmd);
-	}
-
+	int const pcb = m_in_pcb_func(pma, cma, pmd);
 	return pcb;
 }
 
@@ -355,7 +340,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	device_sound_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),
-	m_read_pal_ntsc(*this),
+	m_read_pal_ntsc(*this, 0),
 	m_write_prd(*this),
 	m_in_pcb_func(*this),
 	m_in_char_ram_func(*this),
@@ -385,11 +370,9 @@ void cdp1869_device::device_add_mconfig(machine_config &config)
 void cdp1869_device::device_start()
 {
 	// resolve callbacks
-	m_read_pal_ntsc.resolve_safe(0);
-	m_write_prd.resolve_safe();
-	m_in_pcb_func.resolve();
-	m_in_char_ram_func.resolve();
-	m_out_char_ram_func.resolve();
+	m_in_pcb_func.resolve_safe(0);
+	m_in_char_ram_func.resolve_safe(0);
+	m_out_char_ram_func.resolve_safe();
 
 	// allocate timers
 	m_prd_timer = timer_alloc(FUNC(cdp1869_device::prd_update), this);

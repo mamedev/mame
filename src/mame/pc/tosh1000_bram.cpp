@@ -56,8 +56,8 @@ void tosh1000_bram_device::nvram_default()
 
 bool tosh1000_bram_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_bram, BRAM_SIZE, actual) && actual == BRAM_SIZE;
+	auto const [err, actual] = util::read(file, m_bram, BRAM_SIZE);
+	return !err && (actual == BRAM_SIZE);
 }
 
 //-------------------------------------------------
@@ -67,8 +67,8 @@ bool tosh1000_bram_device::nvram_read(util::read_stream &file)
 
 bool tosh1000_bram_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_bram, BRAM_SIZE, actual) && actual == BRAM_SIZE;
+	auto const [err, actual] = util::write(file, m_bram, BRAM_SIZE);
+	return !err;
 }
 
 //-------------------------------------------------

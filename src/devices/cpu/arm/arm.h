@@ -41,7 +41,7 @@ protected:
 		ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
 	};
 
-	arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+	arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -64,8 +64,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
-	memory_access<26, 2, 0, ENDIANNESS_LITTLE>::cache m_cachele;
-	memory_access<26, 2, 0, ENDIANNESS_BIG>::cache m_cachebe;
+	memory_access<26, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
 	int m_icount;
 	uint32_t m_sArmRegister[27];
@@ -73,8 +72,6 @@ protected:
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
 	address_space *m_program;
-	std::function<u32 (offs_t)> m_pr32;
-	endianness_t m_endian;
 	copro_type m_copro_type;
 
 	void cpu_write32( int addr, uint32_t data );
@@ -103,15 +100,6 @@ protected:
 };
 
 
-class arm_be_cpu_device : public arm_cpu_device
-{
-public:
-	// construction/destruction
-	arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-DECLARE_DEVICE_TYPE(ARM,    arm_cpu_device)
-DECLARE_DEVICE_TYPE(ARM_BE, arm_be_cpu_device)
+DECLARE_DEVICE_TYPE(ARM, arm_cpu_device)
 
 #endif // MAME_CPU_ARM_ARM_H

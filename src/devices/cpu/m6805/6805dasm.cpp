@@ -183,15 +183,15 @@ offs_t m6805_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 			return 3 | flags | SUPPORTED;
 
 		case md::IDX:   // indexed
-			util::stream_format(stream, "(x)");
+			util::stream_format(stream, ",x");
 			return 1 | flags | SUPPORTED;
 
 		case md::IX1:   // indexed + byte (zero page)
-			util::stream_format(stream, "(x+$%02X)", params.r8(pc+1));
+			util::stream_format(stream, "$%02X,x", params.r8(pc+1));
 			return 2 | flags | SUPPORTED;
 
 		case md::IX2:   // indexed + word (16 bit address)
-			util::stream_format(stream, "(x+$%04X)", params.r16(pc+1));
+			util::stream_format(stream, "$%04X,x", params.r16(pc+1));
 			return 3 | flags | SUPPORTED;
 		}
 

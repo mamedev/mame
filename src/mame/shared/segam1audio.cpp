@@ -110,7 +110,6 @@ segam1audio_device::segam1audio_device(const machine_config &mconfig, const char
 
 void segam1audio_device::device_start()
 {
-	m_rxd_handler.resolve_safe();
 	m_mpcmbank1->configure_entries(0, 4, m_multipcm1_region->base(), 0x100000);
 	m_mpcmbank2->configure_entries(0, 4, m_multipcm2_region->base(), 0x100000);
 }
@@ -134,12 +133,12 @@ void segam1audio_device::m1_snd_mpcm_bnk2_w(uint16_t data)
 	m_mpcmbank2->set_entry(data & 3);
 }
 
-WRITE_LINE_MEMBER(segam1audio_device::write_txd)
+void segam1audio_device::write_txd(int state)
 {
 	m_uart->write_rxd(state);
 }
 
-WRITE_LINE_MEMBER(segam1audio_device::output_txd)
+void segam1audio_device::output_txd(int state)
 {
 	m_rxd_handler(state);
 }

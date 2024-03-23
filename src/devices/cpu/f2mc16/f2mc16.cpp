@@ -231,7 +231,7 @@ void f2mc16_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		if (m_outstanding_irqs)
+		if (m_outstanding_irqs && !m_prefix_valid)
 		{
 			int cpulevel = m_ps >> 13;
 
@@ -247,9 +247,10 @@ void f2mc16_device::execute_run()
 
 		//m_icount--;
 
+		if (!m_prefix_valid)
+			debugger_instruction_hook((m_pcb<<16) | m_pc);
 		u8 opcode = read_8((m_pcb<<16) | m_pc);
 
-		debugger_instruction_hook((m_pcb<<16) | m_pc);
 		switch (opcode)
 		{
 		case 0x00:  // NOP
@@ -3403,7 +3404,7 @@ void f2mc16_device::clear_irq(int vector)
 // note: this function must not use m_tmp16 unless you change RETI
 void f2mc16_device::take_irq(int vector, int level)
 {
-	standard_irq_callback(vector);
+	standard_irq_callback(vector, (m_pcb<<16) | m_pc);
 //  printf("take_irq: vector %d, level %d, old PC = %02x%04x\n", vector, level, m_pcb, m_pc);
 	push_16_ssp(m_acc>>16);
 	push_16_ssp(m_acc & 0xffff);

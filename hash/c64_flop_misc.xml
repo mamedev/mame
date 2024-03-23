@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="c64_flop_misc" description="Commodore 64 miscellaneous disks">
 
@@ -137,7 +137,7 @@ license:CC0
 	<!-- Educational -->
 
 	<software name="kats1">
-		<description>KÄTS-opetuslevy 1 (Fin)</description>
+		<description>KÄTS-opetuslevy 1 (Finland)</description>
 		<year>1989</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -150,7 +150,7 @@ license:CC0
 	</software>
 
 	<software name="kats2">
-		<description>KÄTS-opetuslevy 2 (Fin)</description>
+		<description>KÄTS-opetuslevy 2 (Finland)</description>
 		<year>1989</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -163,7 +163,7 @@ license:CC0
 	</software>
 
 	<software name="kertolas">
-		<description>Kertolasku (Fin)</description>
+		<description>Kertolasku (Finland)</description>
 		<year>1986</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -176,7 +176,7 @@ license:CC0
 	</software>
 
 	<software name="lrsharj">
-		<description>LRS-harjoitus (Fin)</description>
+		<description>LRS-harjoitus (Finland)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -189,7 +189,7 @@ license:CC0
 	</software>
 
 	<software name="opinkirj">
-		<description>Opin kirjoittamaan (Fin)</description>
+		<description>Opin kirjoittamaan (Finland)</description>
 		<year>1985</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -202,7 +202,7 @@ license:CC0
 	</software>
 
 	<software name="opinluk1">
-		<description>Opin lukemaan 1 (Fin)</description>
+		<description>Opin lukemaan 1 (Finland)</description>
 		<year>1985</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -215,7 +215,7 @@ license:CC0
 	</software>
 
 	<software name="opinluk2">
-		<description>Opin lukemaan 2 (Fin)</description>
+		<description>Opin lukemaan 2 (Finland)</description>
 		<year>1985</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -228,7 +228,7 @@ license:CC0
 	</software>
 
 	<software name="psenglsh">
-		<description>PS-English (Fin)</description>
+		<description>PS-English (Finland)</description>
 		<year>1986</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -241,7 +241,7 @@ license:CC0
 	</software>
 
 	<software name="psmemory">
-		<description>PS-Memory (Fin)</description>
+		<description>PS-Memory (Finland)</description>
 		<year>1989</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -254,7 +254,7 @@ license:CC0
 	</software>
 
 	<software name="puventti">
-		<description>Puhuva venttipeli (Fin)</description>
+		<description>Puhuva venttipeli (Finland)</description>
 		<year>1986</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -267,7 +267,7 @@ license:CC0
 	</software>
 
 	<software name="vahennys">
-		<description>Vähennyslasku (Fin)</description>
+		<description>Vähennyslasku (Finland)</description>
 		<year>1986</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -280,7 +280,7 @@ license:CC0
 	</software>
 
 	<software name="valmhrj1">
-		<description>Valmiusharjoituksia 1 (Fin)</description>
+		<description>Valmiusharjoituksia 1 (Finland)</description>
 		<year>198?</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -293,7 +293,7 @@ license:CC0
 	</software>
 
 	<software name="yhteenla">
-		<description>Yhteenlasku (Fin)</description>
+		<description>Yhteenlasku (Finland)</description>
 		<year>198?</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<sharedfeat name="requirement" value="c64_cart:ps64"/>
@@ -837,6 +837,19 @@ license:CC0
 			<feature name="part_id" value="testjoy"/>
 			<dataarea name="flop" size="174848">
 				<rom name="testjoy.d64" size="174848" crc="befdc13e" sha1="2635eb02aace327ded1e4ff9161a069706a2bf05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tibdd001">
+		<description>Games and Utility Disc (v1.1)</description>
+		<year>1991</year>
+		<publisher>TIB</publisher>
+		<sharedfeat name="requirement" value="c64_cart:tibdd001"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dd001boot.img" size="737280" crc="a91cabd1" sha1="6a430a246978f9af418e5c6db618e5cb85affd4e"/>
 			</dataarea>
 		</part>
 	</software>

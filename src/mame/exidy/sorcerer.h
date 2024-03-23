@@ -5,8 +5,8 @@
  * includes/sorcerer.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_SORCERER_H
-#define MAME_INCLUDES_SORCERER_H
+#ifndef MAME_EXIDY_SORCERER_H
+#define MAME_EXIDY_SORCERER_H
 
 #pragma once
 
@@ -183,4 +183,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_SORCERER_H
+#endif // MAME_EXIDY_SORCERER_H

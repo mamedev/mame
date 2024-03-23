@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Angelo Salese
-#ifndef MAME_INCLUDES_TATSUMI_H
-#define MAME_INCLUDES_TATSUMI_H
+#ifndef MAME_TATSUMI_TATSUMI_H
+#define MAME_TATSUMI_TATSUMI_H
 
 #pragma once
 
@@ -112,7 +112,7 @@ private:
 	DECLARE_MACHINE_RESET(apache3);
 	DECLARE_VIDEO_START(apache3);
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
+	void apache3_68000_reset(int state);
 
 	void apache3_68000_map(address_map &map);
 	void apache3_v20_map(address_map &map);
@@ -262,4 +262,4 @@ private:
 	void apply_highlight_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &highlight_bitmap);
 };
 
-#endif // MAME_INCLUDES_TATSUMI_H
+#endif // MAME_TATSUMI_TATSUMI_H

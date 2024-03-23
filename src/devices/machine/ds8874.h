@@ -36,8 +36,8 @@ public:
 	// configuration helpers
 	auto write_output() { return m_write_output.bind(); } // OUT pins
 
-	DECLARE_WRITE_LINE_MEMBER(data_w);
-	DECLARE_WRITE_LINE_MEMBER(cp_w);
+	void data_w(int state);
+	void cp_w(int state);
 
 protected:
 	// device-level overrides
@@ -47,9 +47,9 @@ protected:
 private:
 	void refresh_output();
 
-	int m_data = 0;
-	int m_cp = 0;
-	u16 m_shift = 0xff;
+	int m_data;
+	int m_cp;
+	u16 m_shift;
 
 	// callbacks
 	devcb_write16 m_write_output;

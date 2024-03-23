@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,Paul Priest
-#ifndef MAME_INCLUDES_FUUKIFG2_H
-#define MAME_INCLUDES_FUUKIFG2_H
+#ifndef MAME_FUUKI_FUUKIFG2_H
+#define MAME_FUUKI_FUUKIFG2_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 	emu_timer   *m_raster_interrupt_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_FUUKIFG2_H
+#endif // MAME_FUUKI_FUUKIFG2_H

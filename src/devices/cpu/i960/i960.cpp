@@ -357,20 +357,12 @@ uint32_t i960_cpu_device::get_2_ci(uint32_t opcode)
 
 uint32_t i960_cpu_device::get_disp(uint32_t opcode)
 {
-	uint32_t disp;
-	disp = opcode & 0xffffff;
-	if(disp & 0x00800000)
-		disp |= 0xff000000;
-	return disp-4;
+	return util::sext(opcode, 24) - 4;
 }
 
 uint32_t i960_cpu_device::get_disp_s(uint32_t opcode)
 {
-	uint32_t disp;
-	disp = opcode & 0x1fff;
-	if(disp & 0x00001000)
-		disp |= 0xffffe000;
-	return disp-4;
+	return util::sext(opcode, 13) - 4;
 }
 
 void i960_cpu_device::cmp_s(int32_t v1, int32_t v2)
@@ -1118,14 +1110,16 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, t2>>t1);
+				set_ri(opcode, t1 >= 32 ? 0 : t2>>t1);
 				break;
 
 			case 0xa: // shrdi
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				if(((int32_t)t2) < 0) {
+				if(t1 >= 32)
+					set_ri(opcode, 0);
+				else if(((int32_t)t2) < 0) {
 					if(t2 & ((1<<t1)-1))
 						set_ri(opcode, (((int32_t)t2)>>t1)+1);
 					else
@@ -1138,21 +1132,24 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, ((int32_t)t2)>>t1);
+				if(t1 >= 32)
+					set_ri(opcode, (int32_t)t2 < 0 ? -1 : 0);
+				else
+					set_ri(opcode, ((int32_t)t2)>>t1);
 				break;
 
 			case 0xc: // shlo
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, t2<<t1);
+				set_ri(opcode, t1 >= 32 ? 0 : t2<<t1);
 				break;
 
 			case 0xd: // rotate
 				m_icount--;
 				t1 = get_1_ri(opcode) & 0x1f;
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, (t2<<t1)|(t2>>(32-t1)));
+				set_ri(opcode, rotl_32(t2, t1));
 				break;
 
 			case 0xe: // shli
@@ -1160,7 +1157,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, t2<<t1);
+				set_ri(opcode, (t2 & 0x80000000) | (t1 >= 32 ? 0 : (t2<<t1) & 0x7fffffff)); // sign is preserved
 				break;
 
 			default:
@@ -2271,7 +2268,7 @@ void i960_cpu_device::execute_set_input(int irqline, int state)
 		}
 
 		// and ack it to the core now that it's queued
-		standard_irq_callback(irqline);
+		standard_irq_callback(irqline, m_IP);
 	}
 }
 

@@ -48,13 +48,13 @@ public:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( crs_w );
-	DECLARE_WRITE_LINE_MEMBER( dew_w );
-	DECLARE_WRITE_LINE_MEMBER( lose_w );
-	DECLARE_READ_LINE_MEMBER( tlc_r );
+	void crs_w(int state);
+	void dew_w(int state);
+	void lose_w(int state);
+	int tlc_r();
 	void write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( f1_w );
-	DECLARE_WRITE_LINE_MEMBER( tr6_w );
+	void f1_w(int state);
+	void tr6_w(int state);
 	int get_rgb();
 
 	// NOTE: the following are provided for convenience only, SAA5050 is not a display controller

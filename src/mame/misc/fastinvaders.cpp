@@ -22,6 +22,8 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 #include "screen.h"
 
 
+namespace {
+
 class fastinvaders_state : public driver_device
 {
 public:
@@ -67,14 +69,14 @@ private:
 	void io_e0_w(uint8_t data);
 	void io_f0_w(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(sid_read);
+	int sid_read();
 
 	virtual void video_start() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(count_ar);
-	DECLARE_WRITE_LINE_MEMBER(vsync);
-	DECLARE_WRITE_LINE_MEMBER(hsync);
+	void vsync_w(int state);
+	void hsync_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	void dark_1_clr(uint8_t data);
@@ -354,7 +356,7 @@ void fastinvaders_state::io_f0_w(uint8_t data)
 	m_pic8259->ir6_w(CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(fastinvaders_state::sid_read)
+int fastinvaders_state::sid_read()
 {
 	uint8_t tmp = m_start2_value ? ASSERT_LINE : CLEAR_LINE;
 	m_start2_value = 0;
@@ -440,7 +442,7 @@ INPUT_CHANGED_MEMBER(fastinvaders_state::in6)
 		m_pic8259->ir6_w(HOLD_LINE);
 }
 
-DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::vsync)
+void fastinvaders_state::vsync_w(int state)
 {
 	//logerror("p8257_drq_w\n");
 	if (!state)
@@ -451,12 +453,12 @@ DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::vsync)
 		m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 		//machine().scheduler().abort_timeslice(); // transfer occurs immediately
-		//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
+		//machine().scheduler().perfect_quantum(attotime::from_usec(100)); // smooth things out a bit
 		m_av=0;
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::hsync)
+void fastinvaders_state::hsync_w(int state)
 {
 	//m_hsync=1;
 	if (!state)
@@ -684,8 +686,8 @@ void fastinvaders_state::fastinvaders_6845(machine_config &config)
 	m_crtc6845->set_screen("screen");
 	m_crtc6845->set_show_border_area(false);
 	m_crtc6845->set_char_width(16);
-	m_crtc6845->out_vsync_callback().set(FUNC(fastinvaders_state::vsync));
-	m_crtc6845->out_hsync_callback().set(FUNC(fastinvaders_state::hsync));
+	m_crtc6845->out_vsync_callback().set(FUNC(fastinvaders_state::vsync_w));
+	m_crtc6845->out_hsync_callback().set(FUNC(fastinvaders_state::hsync_w));
 }
 
 void fastinvaders_state::init_fi6845()
@@ -772,6 +774,9 @@ ROM_START( fi6845 )
 	ROM_REGION( 0x0100, "prom", 0 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT         ROT     COMPANY       FULLNAME                        FLAGS
 GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, init_fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

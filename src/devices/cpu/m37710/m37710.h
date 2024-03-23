@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Karl Stenerud, hap
+// copyright-holders:R. Belmont, Karl Stenerud
 #ifndef MAME_CPU_M37710_M37710_H
 #define MAME_CPU_M37710_M37710_H
+
+#pragma once
 
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */

@@ -905,7 +905,7 @@ uint32_t lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(lockon_state::screen_vblank_lockon)
+void lockon_state::screen_vblank_lockon(int state)
 {
 	// on falling edge
 	if (!state)

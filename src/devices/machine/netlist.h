@@ -391,7 +391,7 @@ public:
 		else
 			write(newval);
 	}
-	inline DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	inline void write_line(int state)              { write(state);  }
 	inline void write8(uint8_t data)               { write(data);   }
 	inline void write16(uint16_t data)             { write(data);   }
 	inline void write32(uint32_t data)             { write(data);   }
@@ -492,7 +492,7 @@ public:
 	void write(const uint32_t val);
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
-	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	void write_line(int state)              { write(state);  }
 	void write8(uint8_t data)               { write(data);   }
 	void write16(uint16_t data)             { write(data);   }
 	void write32(uint32_t data)             { write(data);   }
@@ -534,7 +534,7 @@ public:
 	void write(const uint32_t val);
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
-	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	void write_line(int state)              { write(state);  }
 	void write8(uint8_t data)               { write(data);   }
 	void write16(uint16_t data)             { write(data);   }
 	void write32(uint32_t data)             { write(data);   }

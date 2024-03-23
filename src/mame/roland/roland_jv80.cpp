@@ -10,6 +10,9 @@
 #include "cpu/h8500/h8532.h"
 //#include "machine/nvram.h"
 
+
+namespace {
+
 class roland_jv80_state : public driver_device
 {
 public:
@@ -57,6 +60,9 @@ ROM_START(jv880)
 	ROM_LOAD("roland-a_r15209312_lh5375n2.ic27", 0x000000, 0x200000, NO_DUMP)
 	ROM_LOAD("roland-b_r15209313_lh5375n3.ic25", 0x200000, 0x200000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 //SYST(1992, jv80, 0, 0, jv80, jv80, roland_jv80_state, empty_init, "Roland", "JV-80 Multi Timbral Synthesizer", MACHINE_IS_SKELETON)
 SYST(1992, jv880, 0, 0, jv880, jv880, roland_jv80_state, empty_init, "Roland", "JV-880 Multi Timbral Synthesizer Module", MACHINE_IS_SKELETON)

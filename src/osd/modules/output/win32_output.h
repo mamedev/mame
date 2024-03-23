@@ -2,12 +2,14 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  output.h - Win32 implementation of MAME output routines
+//  win32_output.h - Win32 implementation of MAME output routines
 //
 //============================================================
 
-#ifndef __WINDOWS_OUTPUT_H__
-#define __WINDOWS_OUTPUT_H__
+#ifndef MAME_OSD_OUTPUT_WIN32_OUTPUT_H
+#define MAME_OSD_OUTPUT_WIN32_OUTPUT_H
+
+#pragma once
 
 
 //============================================================
@@ -83,8 +85,8 @@
 
 struct copydata_id_string
 {
-	uint32_t      id;                 // ID that was requested
+	uint32_t    id;                 // ID that was requested
 	char        string[1];          // string array containing the data
 };
 
-#endif /* __WINDOWS_OUTPUT_H__ */
+#endif // MAME_OSD_OUTPUT_WIN32_OUTPUT_H

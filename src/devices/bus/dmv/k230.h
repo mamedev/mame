@@ -10,7 +10,7 @@
 #include "cpu/i86/i86.h"
 
 // K234
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 
 // K235
 #include "cpu/nec/nec.h"

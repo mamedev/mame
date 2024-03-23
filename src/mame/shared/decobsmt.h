@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_AUDIO_DECOBSMT_H
-#define MAME_AUDIO_DECOBSMT_H
+#ifndef MAME_SHARED_DECOBSMT_H
+#define MAME_SHARED_DECOBSMT_H
 
 #pragma once
 
@@ -28,7 +28,7 @@ public:
 	u8 bsmt_comms_r();
 	void bsmt_comms_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(bsmt_reset_line);
+	void bsmt_reset_line(int state);
 
 	void bsmt_map(address_map &map);
 	void decobsmt_map(address_map &map);
@@ -55,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DECOBSMT, decobsmt_device)
 
-#endif  // MAME_AUDIO_DECOBSMT_H
+#endif  // MAME_SHARED_DECOBSMT_H

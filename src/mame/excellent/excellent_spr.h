@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_EXCELLENT_SPR_H
-#define MAME_VIDEO_EXCELLENT_SPR_H
+#ifndef MAME_EXCELLENT_EXCELLENT_SPR_H
+#define MAME_EXCELLENT_EXCELLENT_SPR_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(EXCELLENT_SPRITE, excellent_spr_device)
 
-#endif // MAME_VIDEO_EXCELLENT_SPR_H
+#endif // MAME_EXCELLENT_EXCELLENT_SPR_H

@@ -12,21 +12,22 @@ Introduction
 ------------
 
 To show the :ref:`main menu <menus-main>` while running an emulated system in
-MAME, press the **Config Menu** key or button (**Tab** by default).  If the
-emulated system has keyboard inputs, you may need to press the **UI Toggle** key
-or button (**Scroll Lock**, or **Forward Delete** on macOS, by default) to
-enable user interface controls first.  You can dismiss a menu by pressing the
-**UI Cancel** key or button (**Escape** by default).  Dismissing a menu will
-return to its parent menu, or to the running system in the case of the main
-menu.
+MAME, press the **Show/Hide Menu** key or button (**Tab** by default).  If the
+emulated system has keyboard inputs, you may need to press the
+**Toggle UI Controls** key or button (**Scroll Lock**, or **Forward Delete** on
+macOS, by default) to enable user interface controls first.  You can dismiss a
+menu by pressing the **UI Back** key or button (**Escape** by default).
+Dismissing a menu will return to its parent menu, or to the running system in
+the case of the main menu.
 
-You can hide a menu and return to the running system by pressing the **Config
-Menu** key or button.  Pressing the **Config Menu** key or button again will
-jump back to the same menu.  This is useful when testing changes to settings.
+You can hide a menu and return to the running system by pressing the
+**Show/Hide Menu** key or button.  Pressing the **Show/Hide Menu** key or button
+again will jump back to the same menu.  This is useful when testing changes to
+settings.
 
 Emulated system inputs are ignored while menus are displayed.  You can still
 pause or resume the running system while most menus are displayed by pressing
-the **Pause** key or button (**P** on the keyboard by default).
+the **Pause** key or button (**F5** on the keyboard by default).
 
 If you start MAME without specifying a system on the command line, the system
 selection menu will be shown (assuming the
@@ -43,17 +44,17 @@ For more information on navigating menus, :ref:`see the relevant section
 Main menu
 ---------
 
-The main menu is shown when you press the **Config Menu** key or button while
+The main menu is shown when you press the **Show/Hide Menu** key or button while
 running an emulated system or while the system information screen is displayed.
 It provides access to menus used to change settings, control various features,
 and show information about the running system and MAME itself.
 
-If you press the **Config Menu** key or button to show the main menu while the
-system information screen is displayed, the emulated system will not start until
-the main menu is dismissed (either by selecting **Start System**, pressing the
-**UI Cancel** key or button, or pressing the **Config Menu** key or button).
-This can be useful for mounting media images or changing DIP switches and
-machine configuration settings before the emulated system starts.
+If you press the **Show/Hide Menu** key or button to show the main menu while
+the system information screen is displayed, the emulated system will not start
+until the main menu is dismissed (either by selecting **Start System**, pressing
+the **UI Back** key or button, or pressing the **Show/Hide Menu** key or
+button).  This can be useful for mounting media images or changing DIP switches
+and machine configuration settings before the emulated system starts.
 
 Input Settings
     Shows the :ref:`Input Settings <menus-inputopts>` menu, where you can assign
@@ -119,7 +120,7 @@ Crosshair Options
     Shows the Crosshair Options menu, where you can adjust the appearance of
     crosshairs used to show the location of emulated light guns and other
     absolute pointer inputs.  This item is not shown if the emulated system has
-    has no absolute pointer inputs.
+    no absolute pointer inputs.
 Cheat
     Shows the Cheat menu, for controlling the built-in cheat engine.  This item
     is only shown if the built-in chat engine is enabled.  Note that the cheat
@@ -127,13 +128,13 @@ Cheat
 Plugin Options
     Shows the Plugin Options menu, where you can access settings for enabled
     plugins.  This item is not shown if no plugins are enabled, or if the main
-    menu is shown before the emulated system starts (by pressing the Config Menu
-    key/button while the system information screen is displayed).
+    menu is shown before the emulated system starts (by pressing the Show/Hide
+    Menu key/button while the system information screen is displayed).
 External DAT View
     Shows the info viewer, which displays information loaded from various
     external support files.  This item is not shown if the :ref:`data plugin
     <plugins-data>` is not enabled, or if the main menu is shown before the
-    emulated system starts (by pressing the Config Menu key/button while the
+    emulated system starts (by pressing the Show/Hide Menu key/button while the
     system information screen is displayed).
 Add To Favorites/Remove From Favorites
     Adds the running system to the favourites list, or removes it if it’s
@@ -144,13 +145,13 @@ About MAME
 Select New System
     Shows the system selection menu, where you can select a system to start a
     new emulation session.  This item is not shown if the main menu is shown
-    before the emulated system starts (by pressing the Config Menu key/button
+    before the emulated system starts (by pressing the Show/Hide Menu key/button
     while the system information screen is displayed).
 Close Menu/Start System
     Closes the main menu, returning control of the running system.  Shows
     **Start System** if the main menu is shown before the emulated system
-    starts (by pressing the Config Menu key/button while the system information
-    screen is displayed).
+    starts (by pressing the Show/Hide Menu key/button while the system
+    information screen is displayed).
 
 
 .. _menus-inputopts:
@@ -267,8 +268,8 @@ your current settings.  Recognised input devices depend on the
 enabled or disabled using the :ref:`mouse <mame-commandline-nomouse>`,
 :ref:`lightgun <mame-commandline-nolightgun>` and :ref:`joystick
 <mame-commandline-nojoystick>` options.  You can reach the Input Devices menu by
-selecting **Input Devices** from the :ref:`main menu <menus-main>` or the
-General Settings menu.
+selecting **Input Devices** from the :ref:`Input Settings menu
+<menus-inputopts>` or the General Settings menu.
 
 Input devices are grouped by device class (for example keyboards or light guns).
 You can move between device classes using the **Next Group** and **Previous
@@ -280,4 +281,7 @@ each control is displayed on the left and its current state is shown on the
 right.  When an analog axis control is highlighted, its state is also shown in
 graphical form below the menu.  Digital control states are either zero
 (inactive) or one (active).  Analog axis input states range from -65,536 to
-65,536 with the neutral position at zero.
+65,536 with the neutral position at zero.  You can also select **Copy Device
+ID** to copy the device’s ID to the clipboard.  This is useful for setting up
+:ref:`stable controller IDs <devicemap>` in :ref:`controller configuration files
+<ctrlrcfg>`.

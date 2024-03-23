@@ -6,18 +6,17 @@
 
     Controls execution of the core emulator system.
 ***************************************************************************/
-
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_MAIN_H
 #define MAME_EMU_MAIN_H
 
-#include <thread>
-#include <ctime>
+#pragma once
+
+#include "emufwd.h"
+
+#include <memory>
+#include <string>
+#include <vector>
+
 
 //**************************************************************************
 //    CONSTANTS
@@ -55,7 +54,7 @@ public:
 	static void display_ui_chooser(running_machine &machine);
 	static int start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args);
 	static int start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[]);
-	static void draw_user_interface(running_machine& machine);
+	static bool draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
 	static void sound_hook();
@@ -66,10 +65,11 @@ public:
 
 class machine_manager
 {
-	DISABLE_COPYING(machine_manager);
 protected:
 	// construction/destruction
-	machine_manager(emu_options& options, osd_interface& osd);
+	machine_manager(emu_options &options, osd_interface &osd);
+	machine_manager(machine_manager const &) = delete;
+
 public:
 	virtual ~machine_manager();
 

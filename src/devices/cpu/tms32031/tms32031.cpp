@@ -528,12 +528,6 @@ void tms3203x_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
-	// resolve devcb handlers
-	m_xf0_cb.resolve_safe();
-	m_xf1_cb.resolve_safe();
-	m_iack_cb.resolve_safe();
-	m_holda_cb.resolve_safe();
-
 	// set up the internal boot loader ROM
 	if (m_mcbl_mode)
 	{

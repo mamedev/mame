@@ -8,9 +8,10 @@
 
 #include "emu.h"
 #include "emuopts.h"
+
+#include "corestr.h"
+#include "path.h"
 #include "zippath.h"
-#include <algorithm>
-#include <cctype>
 
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device) :
@@ -27,7 +28,7 @@ device_slot_interface::~device_slot_interface()
 }
 
 
-device_slot_interface::slot_option::slot_option(const char *name, const device_type &devtype, bool selectable) :
+device_slot_interface::slot_option::slot_option(const char *name, device_type devtype, bool selectable) :
 	m_name(name),
 	m_devtype(devtype),
 	m_selectable(selectable),
@@ -46,7 +47,7 @@ void device_slot_interface::interface_validity_check(validity_checker &valid) co
 }
 
 
-device_slot_interface::slot_option &device_slot_interface::option_add(const char *name, const device_type &devtype)
+device_slot_interface::slot_option &device_slot_interface::option_add(const char *name, device_type devtype)
 {
 	if (!name || !*name)
 		throw emu_fatalerror("slot '%s' attempt to add option without name\n", device().tag());
@@ -59,7 +60,7 @@ device_slot_interface::slot_option &device_slot_interface::option_add(const char
 }
 
 
-device_slot_interface::slot_option &device_slot_interface::option_add_internal(const char *name, const device_type &devtype)
+device_slot_interface::slot_option &device_slot_interface::option_add_internal(const char *name, device_type devtype)
 {
 	if (!name || !*name)
 		throw emu_fatalerror("slot '%s' attempt to add option without name\n", device().tag());
@@ -72,7 +73,7 @@ device_slot_interface::slot_option &device_slot_interface::option_add_internal(c
 }
 
 
-device_slot_interface::slot_option &device_slot_interface::option_replace(const char *name, const device_type &devtype)
+device_slot_interface::slot_option &device_slot_interface::option_replace(const char *name, device_type devtype)
 {
 	if (!name || !*name)
 		throw emu_fatalerror("slot '%s' attempt to replace option without name\n", device().tag());
@@ -85,7 +86,7 @@ device_slot_interface::slot_option &device_slot_interface::option_replace(const 
 }
 
 
-device_slot_interface::slot_option &device_slot_interface::option_replace_internal(const char *name, const device_type &devtype)
+device_slot_interface::slot_option &device_slot_interface::option_replace_internal(const char *name, device_type devtype)
 {
 	if (!name || !*name)
 		throw emu_fatalerror("slot '%s' attempt to replace option without name\n", device().tag());
@@ -170,6 +171,5 @@ bool get_default_card_software_hook::hashfile_extrainfo(std::string &extrainfo)
 
 bool get_default_card_software_hook::is_filetype(std::string_view candidate_filetype) const
 {
-	return std::equal(m_file_type.begin(), m_file_type.end(), candidate_filetype.begin(), candidate_filetype.end(),
-						[] (unsigned char c1, unsigned char c2) { return std::tolower(c1) == c2; });
+	return util::streqlower(m_file_type, candidate_filetype);
 }

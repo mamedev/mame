@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_TANDY2KB_H
-#define MAME_MACHINE_TANDY2KB_H
+#ifndef MAME_TRS_TANDY2KB_H
+#define MAME_TRS_TANDY2KB_H
 
 #pragma once
 
@@ -37,10 +37,10 @@ public:
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( power_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
+	void power_w(int state);
+	void reset_w(int state);
+	void busy_w(int state);
+	int data_r();
 
 protected:
 	// device-level overrides
@@ -79,4 +79,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TANDY2K_KEYBOARD, tandy2k_keyboard_device)
 
-#endif // MAME_MACHINE_TANDY2KB_H
+#endif // MAME_TRS_TANDY2KB_H

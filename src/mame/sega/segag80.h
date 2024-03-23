@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_SEGAG80V_H
-#define MAME_AUDIO_SEGAG80V_H
+#ifndef MAME_SEGA_SEGAG80_H
+#define MAME_SEGA_SEGAG80_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ DECLARE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device)
 DECLARE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device)
 DECLARE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device)
 
-#endif // MAME_AUDIO_SEGAG80V_H
+#endif // MAME_SEGA_SEGAG80_H

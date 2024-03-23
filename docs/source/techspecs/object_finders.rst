@@ -478,7 +478,7 @@ for all elements of the array):
     };
 
 This finds or creates memory shares with tags ``vram_0`` and ``vram_1``, each of
-of which is 8 KiB organised as 4,096 big-Endian 16-bit words.
+which is 8 KiB organised as 4,096 big-Endian 16-bit words.
 
 
 Optional object finders

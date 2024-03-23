@@ -58,8 +58,8 @@ private:
 	void hvysmsh_oki_0_bank_w(uint32_t data);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
-	void descramble_sound( const char *tag );
+	void vblank_interrupt(int state);
+	void descramble_sound(const char *tag);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
@@ -291,7 +291,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE_LINE_MEMBER(deco156_state::vblank_interrupt)
+void deco156_state::vblank_interrupt(int state)
 {
 	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }

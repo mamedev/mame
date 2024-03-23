@@ -168,6 +168,9 @@ Notes: (All IC's listed for completeness)
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 static INPUT_PORTS_START( mt32 )
 	PORT_START("SC0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
@@ -272,15 +275,21 @@ void mt32_state::machine_reset()
 
 void mt32_state::lcd_ctrl_w(uint8_t data)
 {
+	lcd->cs_w(0);
+	lcd->control_w(data >> 4);
 	lcd->control_w(data);
-	for(int i=0; i != lcd_data_buffer_pos; i++)
+	for(int i=0; i != lcd_data_buffer_pos; i++) {
+		lcd->data_w(lcd_data_buffer[i] >> 4);
 		lcd->data_w(lcd_data_buffer[i]);
+	}
+	lcd->cs_w(1);
 	lcd_data_buffer_pos = 0;
 }
 
 uint8_t mt32_state::lcd_ctrl_r()
 {
-	return lcd->control_r();
+	// Note that this does not read from the actual LCD unit (whose /RD line is pulled high)
+	return 0;
 }
 
 void mt32_state::lcd_data_w(uint8_t data)
@@ -409,6 +418,10 @@ ROM_START( mt32 )
 	ROMX_LOAD(       "mt32_2.0.4.ic28",              0,   0x10000, CRC(59a49d5c) SHA1(2c16432b6c73dd2a3947cba950a0f4c19d6180eb), ROM_BIOS(6) )
 	ROM_IGNORE(0x10000)  // banking needs to be implemented
 
+	ROM_SYSTEM_BIOS( 7, "207", "Firmware 2.0.7" )
+	ROMX_LOAD(       "mt32_2.0.7.ic28",              0,   0x10000, CRC(a016b607) SHA1(47b52adefedaec475c925e54340e37673c11707c), ROM_BIOS(7) )
+	ROM_IGNORE(0x10000)  // banking needs to be implemented
+
 // We need a bios-like selection for these too
 	ROM_REGION( 0x80000, "la32", 0 )
 	// separate PCM Mask ROMs from the MT-32 1.x older PCB
@@ -445,6 +458,9 @@ ROM_START( cm32l )
 	ROM_REGION( 0x8000, "boss", 0 )
 	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) ) // shared with RA-50 and others
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "CM-32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

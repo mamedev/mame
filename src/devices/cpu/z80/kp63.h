@@ -28,14 +28,13 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// input line interface
-	template <int N> DECLARE_WRITE_LINE_MEMBER(gate_w) { write_gate(N, state); }
+	template <int N> void gate_w(int state) { write_gate(N, state); }
 
 protected:
 	// construction/destruction
 	kp63_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 num_counters, u8 mode_mask);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

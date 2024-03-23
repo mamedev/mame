@@ -40,14 +40,13 @@ public:
 	auto chip_select() { return m_chip_sel.bind(); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen,bitmap,cliprect); }
-	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
+	void vblank(int state) { m_spg_video->vblank(state); }
 
 protected:
 	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
 
 	void internal_map(address_map &map);
 
-	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -60,7 +59,7 @@ private:
 	required_device<spg110_audio_device> m_spg_audio;
 
 	uint16_t space_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
+	void audioirq_w(int state);
 
 	devcb_write16 m_porta_out;
 	devcb_write16 m_portb_out;
@@ -80,15 +79,15 @@ private:
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portb_out(offset, data, mem_mask); }
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portc_out(offset, data, mem_mask); }
 
-	DECLARE_WRITE_LINE_MEMBER(ffreq1_w);
-	DECLARE_WRITE_LINE_MEMBER(ffreq2_w);
+	void ffreq1_w(int state);
+	void ffreq2_w(int state);
 
 	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 	void cs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_chip_sel(offset, data, mem_mask); }
 	uint16_t get_pal_r() { return 0; /*m_pal_flag;*/ }
 	void configure_spg_io(spg2xx_io_device* io);
 
-	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
+	void videoirq_w(int state);
 	bool m_is_spiderman;
 };
 

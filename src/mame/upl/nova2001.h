@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki
-#ifndef MAME_INCLUDES_NOVA2001_H
-#define MAME_INCLUDES_NOVA2001_H
+#ifndef MAME_UPL_NOVA2001_H
+#define MAME_UPL_NOVA2001_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 	void raiders5_io(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NOVA2001_H
+#endif // MAME_UPL_NOVA2001_H

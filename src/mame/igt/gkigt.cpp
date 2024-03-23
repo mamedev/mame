@@ -102,6 +102,8 @@ More chips (from eBay auction):
 #include "speaker.h"
 
 
+namespace {
+
 class igt_gameking_state : public driver_device
 {
 public:
@@ -136,7 +138,7 @@ private:
 	uint8_t irq_vector_r();
 	void unk_w(uint8_t data);
 	uint8_t frame_number_r();
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	uint8_t timer_r();
 	uint16_t version_r();
@@ -584,7 +586,7 @@ void igt_gameking_state::machine_reset()
 	m_quart1->ip2_w(1); // needs to be high
 }
 
-WRITE_LINE_MEMBER(igt_gameking_state::vblank_irq)
+void igt_gameking_state::vblank_irq(int state)
 {
 	if (state && BIT(m_irq_enable, 3))
 	{
@@ -693,6 +695,26 @@ ROM_START( ms72c )
 
 	ROM_REGION( 0x20000, "nvram", 0 )
 	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(b5e42dbc) SHA1(f6afadb6877bca2cef40725b001c7918f9c99359) )
+ROM_END
+
+ROM_START( bmoonii )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "base-2b5146ax.u8", 0x00000, 0x80000, CRC(a56e625f) SHA1(f58714dad1788a28acfa0e315730516dc91d60ae) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1-ca5017ax.u21", 0x000000, 0x100000, CRC(bab3994f) SHA1(4ec2cbe92e2f2019970d6bb7fa9fbd767b3001b2) )
+	ROM_LOAD16_BYTE( "gme2-ca5017ax.u5",  0x000001, 0x100000, CRC(f1898f14) SHA1(9bcd4ebe09d6f982cb12dc9a6d070cd1195e3320) )
+
+	ROM_REGION( 0x80000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1-265069ax.u48", 0x000000, 0x40000, CRC(75188c21) SHA1(5e2ff760d68e66369d164c66a97e0fa4edeba101) ) // 1xxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_BYTE( "cg2-265069ax.u47", 0x000001, 0x40000, CRC(cab7ef14) SHA1(5f904230f41ebf40c138c3d58d4dcf80e631b500) ) // 1xxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1-265069ax.u20", 0x000000, 0x080000, CRC(5a5191f4) SHA1(fafc1587b3186f5ecc4cb04529f0fa5d05c3a306) )
+	ROM_LOAD16_BYTE( "px2-265069ax.u4",  0x000001, 0x080000, CRC(65d51a0f) SHA1(487be168f94c815dd3e0a871f1b657795ecf0186) )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "sound-1h5025ax.u6", 0x000000, 0x080000, CRC(2502d6f6) SHA1(efe1177a6c02778df8ed62e52d1083c105ebe2ce) )
 ROM_END
 
 ROM_START( gkigt4 )
@@ -868,6 +890,7 @@ ROM_END
 
 ROM_START( gkkey )
 	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "key00016,1-4002.bin", 0x00000, 0x80000, CRC(97f43f33) SHA1(1485a343f7865f3600ba9cd80eedc489ea75ae40) )
 	ROM_LOAD( "key00017,1-4002.bin", 0x00000, 0x80000, CRC(1579739f) SHA1(7b6257d17f74599a4ada3014d02a2e7c6686ab3f) ) /* non WAP keychip */
 	ROM_LOAD( "key00018,1-4002.bin", 0x00000, 0x80000, CRC(b35b8888) SHA1(60adc02d17ab0a163e9a6bfbac1f46eeb4a77243) ) /* WAP keychip */
 	ROM_LOAD( "key00021,1-4002.bin", 0x00000, 0x80000, CRC(4d1ef12f) SHA1(ab9eebe0ba84d8e27496864adbfe7d1639a6375e) ) /* MD3 WAP keychip & memory clear */
@@ -892,9 +915,8 @@ ROM_START( gkkey )
 	ROM_LOAD( "cvs00080,1-4002.bin", 0x00000, 0x80000, CRC(f58a3040) SHA1(906ed54aeafdf2cf58ee8425405498a8c64b52e1) )
 	ROM_LOAD( "ivc00097,1-4002.bin", 0x00000, 0x80000, CRC(f0a59fd1) SHA1(8e980e9eb80e6899fe3bbcd21ccbd39f9fdccaca) ) /* Vision Ram/E-Square Clear (Replaces IVC00070) */
 
-	ROM_REGION( 0x80000, "miscbad", 0 )
-	// these are also bad dumps, again they never contains the byte value 0x0d (uploaded in ASCII mode with carriage return stripped out?)
-	ROM_LOAD( "key00016,1-4002.bin", 0x00000, 0x07ff9a, BAD_DUMP CRC(80c0c2c4) SHA1(e8df4e516c058aeacf1492151c38b5e73f161c8c) ) // should be 0x80000
+//  ROM_REGION( 0x80000, "miscbad", 0 )
+//  these are also bad dumps, again they never contains the byte value 0x0d (uploaded in ASCII mode with carriage return stripped out?)
 
 	ROM_REGION32_LE( 0x200000, "game", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100000, "cg", ROMREGION_ERASEFF )
@@ -902,8 +924,12 @@ ROM_START( gkkey )
 	ROM_REGION32_LE( 0x200000, "snd", ROMREGION_ERASEFF )
 ROM_END
 
+} // anonymous namespace
+
+
 GAME( 1994, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1994, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

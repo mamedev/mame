@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_DECO_IRQ_H
-#define MAME_MACHINE_DECO_IRQ_H
+#ifndef MAME_DATAEAST_DECO_IRQ_H
+#define MAME_DATAEAST_DECO_IRQ_H
 
 #pragma once
 
@@ -48,9 +48,9 @@ public:
 
 	void raster_irq_ack();
 
-	DECLARE_WRITE_LINE_MEMBER(lightgun1_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(lightgun2_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(lightgun_irq_ack_w);
+	void lightgun1_trigger_w(int state);
+	void lightgun2_trigger_w(int state);
+	void lightgun_irq_ack_w(int state);
 
 protected:
 	// device-level overrides
@@ -89,4 +89,4 @@ private:
 DECLARE_DEVICE_TYPE(DECO_IRQ, deco_irq_device)
 
 
-#endif // MAME_MACHINE_DECO_IRQ_H
+#endif // MAME_DATAEAST_DECO_IRQ_H

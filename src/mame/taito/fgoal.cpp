@@ -46,7 +46,7 @@ public:
 
 	void fgoal(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(_80_r);
+	int _80_r();
 
 protected:
 	virtual void machine_start() override;
@@ -108,8 +108,6 @@ private:
 	void cpu_map(address_map &map);
 };
 
-
-// video
 
 void fgoal_state::color_w(uint8_t data)
 {
@@ -221,8 +219,6 @@ uint32_t fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-// machine
-
 int fgoal_state::intensity(int bits)
 {
 	int v = 0;
@@ -296,7 +292,7 @@ uint8_t fgoal_state::analog_r()
 }
 
 
-READ_LINE_MEMBER(fgoal_state::_80_r)
+int fgoal_state::_80_r()
 {
 	return BIT(m_screen->vpos(), 7);
 }

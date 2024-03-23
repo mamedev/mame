@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_TRS80M2KB_H
-#define MAME_MACHINE_TRS80M2KB_H
+#ifndef MAME_TRS_TRS80M2KB_H
+#define MAME_TRS_TRS80M2KB_H
 
 #pragma once
 
@@ -37,8 +37,8 @@ public:
 
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
+	void busy_w(int state);
+	int data_r();
 
 protected:
 	// device-level overrides
@@ -68,7 +68,7 @@ private:
 
 	uint8_t m_keylatch;
 
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t1_r();
 	uint8_t kb_p0_r();
 	void kb_p1_w(uint8_t data);
 	void kb_p2_w(uint8_t data);
@@ -80,4 +80,4 @@ DECLARE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device)
 
 
 
-#endif // MAME_MACHINE_TRS80M2KB_H
+#endif // MAME_TRS_TRS80M2KB_H

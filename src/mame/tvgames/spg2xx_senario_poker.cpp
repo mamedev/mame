@@ -14,6 +14,8 @@ improve controller hookup / simulation and remove PC-based hacks!
 #include "sentx6p.lh"
 
 
+namespace {
+
 class sentx6p_state : public spg2xx_game_state
 {
 public:
@@ -720,6 +722,9 @@ void sentx6p_state::init_sentx6pd()
 	m_pchackaddress2 = 0xca36;
 	m_controller_sense_addr = 0x1e3a;
 }
+
+} // anonymous namespace
+
 
 CONS( 2004, sentx6p,    0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6p,   "Senario",               "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (US)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a US version, values in USD
 CONS( 2004, sentx6puk,  sentx6p,     0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6puk, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP

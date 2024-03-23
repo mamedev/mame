@@ -57,12 +57,6 @@ isbx_slot_device::isbx_slot_device(const machine_config &mconfig, const char *ta
 void isbx_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_mintr0.resolve_safe();
-	m_write_mintr1.resolve_safe();
-	m_write_mdrqt.resolve_safe();
-	m_write_mwait.resolve_safe();
 }
 
 

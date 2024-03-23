@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_TAITO_F3_H
-#define MAME_INCLUDES_TAITO_F3_H
+#ifndef MAME_TAITO_TAITO_F3_H
+#define MAME_TAITO_TAITO_F3_H
 
 #pragma once
 
@@ -13,55 +13,11 @@
 #include "screen.h"
 #include "tilemap.h"
 
-struct F3config;
-
-/* This it the best way to allow game specific kludges until the system is fully understood */
-enum {
-	/* Early F3 class games, these are not cartridge games and system features may be different */
-	RINGRAGE=0, /* D21 */
-	ARABIANM,   /* D29 */
-	RIDINGF,    /* D34 */
-	GSEEKER,    /* D40 */
-	TRSTAR,     /* D53 */
-	GUNLOCK,    /* D66 */
-	TWINQIX,
-	UNDRFIRE,   /* D67 - Heavily modified F3 hardware (different memory map) */
-	SCFINALS,
-	LIGHTBR,    /* D69 */
-
-	/* D77 - F3 motherboard proms, all following games are 'F3 package system' */
-	/* D78 I CUP */
-	KAISERKN,   /* D84 */
-	DARIUSG,    /* D87 */
-	BUBSYMPH,   /* D90 */
-	SPCINVDX,   /* D93 */
-	HTHERO95,   /* D94 */
-	QTHEATER,   /* D95 */
-	EACTION2,   /* E02 */
-	SPCINV95,   /* E06 */
-	QUIZHUHU,   /* E08 */
-	PBOBBLE2,   /* E10 */
-	GEKIRIDO,   /* E11 */
-	KTIGER2,    /* E15 */
-	BUBBLEM,    /* E21 */
-	CLEOPATR,   /* E28 */
-	PBOBBLE3,   /* E29 */
-	ARKRETRN,   /* E36 */
-	KIRAMEKI,   /* E44 */
-	PUCHICAR,   /* E46 */
-	PBOBBLE4,   /* E49 */
-	POPNPOP,    /* E51 */
-	LANDMAKR,   /* E61 */
-	RECALH,     /* prototype */
-	COMMANDW,   /* prototype */
-	TMDRILL
-};
-
 class taito_f3_state : public driver_device
 {
 public:
-	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -134,6 +90,52 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 
 protected:
+	struct F3config;
+
+	/* This it the best way to allow game specific kludges until the system is fully understood */
+	enum {
+		/* Early F3 class games, these are not cartridge games and system features may be different */
+		RINGRAGE=0, /* D21 */
+		ARABIANM,   /* D29 */
+		RIDINGF,    /* D34 */
+		GSEEKER,    /* D40 */
+		TRSTAR,     /* D53 */
+		GUNLOCK,    /* D66 */
+		TWINQIX,
+		UNDRFIRE,   /* D67 - Heavily modified F3 hardware (different memory map) */
+		SCFINALS,
+		LIGHTBR,    /* D69 */
+
+		/* D77 - F3 motherboard proms, all following games are 'F3 package system' */
+		/* D78 I CUP */
+		KAISERKN,   /* D84 */
+		DARIUSG,    /* D87 */
+		BUBSYMPH,   /* D90 */
+		SPCINVDX,   /* D93 */
+		HTHERO95,   /* D94 */
+		QTHEATER,   /* D95 */
+		EACTION2,   /* E02 */
+		SPCINV95,   /* E06 */
+		QUIZHUHU,   /* E08 */
+		PBOBBLE2,   /* E10 */
+		GEKIRIDO,   /* E11 */
+		KTIGER2,    /* E15 */
+		BUBBLEM,    /* E21 */
+		CLEOPATR,   /* E28 */
+		PBOBBLE3,   /* E29 */
+		ARKRETRN,   /* E36 */
+		KIRAMEKI,   /* E44 */
+		PUCHICAR,   /* E46 */
+		PBOBBLE4,   /* E49 */
+		POPNPOP,    /* E51 */
+		LANDMAKR,   /* E61 */
+		RECALH,     /* prototype */
+		COMMANDW,   /* prototype */
+		TMDRILL
+	};
+
+	static const F3config f3_config_table[];
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -167,25 +169,27 @@ protected:
 
 	struct tempsprite
 	{
-		int code = 0, color = 0;
-		int flipx = 0, flipy = 0;
+		int code = 0;
+		u8 color = 0;
+		bool flipx = 0, flipy = 0;
 		int x = 0, y = 0;
-		int zoomx = 0, zoomy = 0;
-		int pri = 0;
+		u16 zoomx = 0, zoomy = 0;
+		u8 pri = 0;
 	};
 
 	struct f3_playfield_line_inf
 	{
-		int alpha_mode[256]{};
-		int pri[256]{};
+		u8 alpha_mode[256]{};
+		u16 pri[256]{};
 
 		/* use for draw_scanlines */
 		u16 *src[256]{}, *src_s[256]{}, *src_e[256]{};
 		u8 *tsrc[256]{}, *tsrc_s[256]{};
 		int x_count[256]{};
 		u32 x_zoom[256]{};
-		u32 clip0[256]{};
-		u32 clip1[256]{};
+		u32 clip_in[256]{};
+		u32 clip_ex[256]{};
+		u16 pal_add[256]{};
 	};
 
 	struct f3_spritealpha_line_inf
@@ -193,12 +197,10 @@ protected:
 		u16 alpha_level[256]{};
 		u16 spri[256]{};
 		u16 sprite_alpha[256]{};
-		u32 sprite_clip0[256]{};
-		u32 sprite_clip1[256]{};
-		s16 clip0_l[256]{};
-		s16 clip0_r[256]{};
-		s16 clip1_l[256]{};
-		s16 clip1_r[256]{};
+		u32 sprite_clip_in[256]{};
+		u32 sprite_clip_ex[256]{};
+		s16 clip_l[4][256]{};
+		s16 clip_r[4][256]{};
 	};
 
 	int m_game = 0;
@@ -208,28 +210,27 @@ protected:
 	std::unique_ptr<u16[]> m_spriteram16_buffered;
 	u16 m_control_0[8]{};
 	u16 m_control_1[8]{};
-	int m_flipscreen = 0;
+	bool m_flipscreen = false;
 	u8 m_sprite_extra_planes = 0;
 	u8 m_sprite_pen_mask = 0;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
 	u8 m_sprite_pri_usage = 0;
 	bitmap_ind8 m_pri_alp_bitmap;
-	int m_alpha_level_2as = 0;
-	int m_alpha_level_2ad = 0;
-	int m_alpha_level_3as = 0;
-	int m_alpha_level_3ad = 0;
-	int m_alpha_level_2bs = 0;
-	int m_alpha_level_2bd = 0;
-	int m_alpha_level_3bs = 0;
-	int m_alpha_level_3bd = 0;
-	int m_alpha_level_last = 0;
-	int m_width_mask = 0;
-	int m_twidth_mask = 0;
-	int m_twidth_mask_bit = 0;
+	u8 m_alpha_level_2as = 0;
+	u8 m_alpha_level_2ad = 0;
+	u8 m_alpha_level_3as = 0;
+	u8 m_alpha_level_3ad = 0;
+	u8 m_alpha_level_2bs = 0;
+	u8 m_alpha_level_2bd = 0;
+	u8 m_alpha_level_3bs = 0;
+	u8 m_alpha_level_3bd = 0;
+	u16 m_alpha_level_last = 0;
+	u16 m_width_mask = 0;
+	u8 m_twidth_mask = 0;
+	u8 m_twidth_mask_bit = 0;
 	std::unique_ptr<u8[]> m_tile_opaque_sp;
 	std::unique_ptr<u8[]> m_tile_opaque_pf[8];
-	u8 m_add_sat[256][256]{};
 	int m_alpha_s_1_1 = 0;
 	int m_alpha_s_1_2 = 0;
 	int m_alpha_s_1_4 = 0;
@@ -255,12 +256,12 @@ protected:
 	u8 m_tval = 0;
 	u8 m_pdest_2a = 0;
 	u8 m_pdest_2b = 0;
-	int m_tr_2a = 0;
-	int m_tr_2b = 0;
+	s8 m_tr_2a = 0;
+	s8 m_tr_2b = 0;
 	u8 m_pdest_3a = 0;
 	u8 m_pdest_3b = 0;
-	int m_tr_3a = 0;
-	int m_tr_3b = 0;
+	s8 m_tr_3a = 0;
+	s8 m_tr_3b = 0;
 	u16 *m_src[5]{};
 	u16 *m_src_s[5]{};
 	u16 *m_src_e[5]{};
@@ -272,14 +273,15 @@ protected:
 	u8 *m_tsrc_s[5]{};
 	u32 m_x_count[5]{};
 	u32 m_x_zoom[5]{};
+	u16 m_pal_add[5]{};
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
 	std::unique_ptr<f3_playfield_line_inf[]> m_pf_line_inf;
 	std::unique_ptr<f3_spritealpha_line_inf[]> m_sa_line_inf;
 	const F3config *m_game_config = nullptr;
-	int (taito_f3_state::*m_dpix_n[8][16])(u32 s_pix);
-	int (taito_f3_state::**m_dpix_lp[5])(u32 s_pix);
-	int (taito_f3_state::**m_dpix_sp[9])(u32 s_pix);
+	bool (taito_f3_state::*m_dpix_n[8][16])(u32 s_pix);
+	bool (taito_f3_state::**m_dpix_lp[5])(u32 s_pix);
+	bool (taito_f3_state::**m_dpix_sp[9])(u32 s_pix);
 
 	u16 pf_ram_r(offs_t offset);
 	void pf_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -300,15 +302,14 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile_info_text);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void bubsympb_map(address_map &map);
 	void f3_map(address_map &map);
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, int color, int flipx, int flipy, int sx, int sy, u8 pri_dst);
-	inline void f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, int color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, u8 pri_dst);
+	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, u8 color, bool flipx, bool flipy, int sx, int sy, u16 scalex, u16 scaley, u8 pri_dst);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprite_info(const u16 *spriteram16_ptr);
 	void print_debug_info(bitmap_rgb32 &bitmap);
@@ -335,43 +336,45 @@ protected:
 	inline void alpha_blend_3b_0(u32 s);
 	inline void alpha_blend_3b_1(u32 s);
 	inline void alpha_blend_3b_2(u32 s);
-	int dpix_1_noalpha(u32 s_pix);
-	int dpix_ret1(u32 s_pix);
-	int dpix_ret0(u32 s_pix);
-	int dpix_1_1(u32 s_pix);
-	int dpix_1_2(u32 s_pix);
-	int dpix_1_4(u32 s_pix);
-	int dpix_1_5(u32 s_pix);
-	int dpix_1_6(u32 s_pix);
-	int dpix_1_8(u32 s_pix);
-	int dpix_1_9(u32 s_pix);
-	int dpix_1_a(u32 s_pix);
-	int dpix_2a_0(u32 s_pix);
-	int dpix_2a_4(u32 s_pix);
-	int dpix_2a_8(u32 s_pix);
-	int dpix_3a_0(u32 s_pix);
-	int dpix_3a_1(u32 s_pix);
-	int dpix_3a_2(u32 s_pix);
-	int dpix_2b_0(u32 s_pix);
-	int dpix_2b_4(u32 s_pix);
-	int dpix_2b_8(u32 s_pix);
-	int dpix_3b_0(u32 s_pix);
-	int dpix_3b_1(u32 s_pix);
-	int dpix_3b_2(u32 s_pix);
-	int dpix_2_0(u32 s_pix);
-	int dpix_2_4(u32 s_pix);
-	int dpix_2_8(u32 s_pix);
-	int dpix_3_0(u32 s_pix);
-	int dpix_3_1(u32 s_pix);
-	int dpix_3_2(u32 s_pix);
-	inline void dpix_1_sprite(u32 s_pix);
-	inline void dpix_bg(u32 bgcolor);
+	bool dpix_1_noalpha(u32 s_pix);
+	inline bool dpix_ret1(u32 s_pix);
+	inline bool dpix_ret0(u32 s_pix);
+	bool dpix_1_1(u32 s_pix);
+	bool dpix_1_2(u32 s_pix);
+	bool dpix_1_4(u32 s_pix);
+	bool dpix_1_5(u32 s_pix);
+	bool dpix_1_6(u32 s_pix);
+	bool dpix_1_8(u32 s_pix);
+	bool dpix_1_9(u32 s_pix);
+	bool dpix_1_a(u32 s_pix);
+	bool dpix_2a_0(u32 s_pix);
+	bool dpix_2a_4(u32 s_pix);
+	bool dpix_2a_8(u32 s_pix);
+	bool dpix_3a_0(u32 s_pix);
+	bool dpix_3a_1(u32 s_pix);
+	bool dpix_3a_2(u32 s_pix);
+	bool dpix_2b_0(u32 s_pix);
+	bool dpix_2b_4(u32 s_pix);
+	bool dpix_2b_8(u32 s_pix);
+	bool dpix_3b_0(u32 s_pix);
+	bool dpix_3b_1(u32 s_pix);
+	bool dpix_3b_2(u32 s_pix);
+	bool dpix_2_0(u32 s_pix);
+	bool dpix_2_4(u32 s_pix);
+	bool dpix_2_8(u32 s_pix);
+	bool dpix_3_0(u32 s_pix);
+	bool dpix_3_1(u32 s_pix);
+	bool dpix_3_2(u32 s_pix);
+	void dpix_1_sprite(u32 s_pix);
+	void dpix_bg(u32 bgcolor);
 	void init_alpha_blend_func();
-	inline void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const int *sprite, u32 orient, int skip_layer_num);
-	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, u16 *pf_data_n);
-	void calculate_clip(int y, u16 pri, u32* clip0, u32* clip1, int *line_enable);
+	void get_pixmap_pointer(int skip_layer_num, const f3_playfield_line_inf **line_t, int y);
+	void culc_pixmap_pointer(int skip_layer_num);
+	void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const u8 *sprite, u32 orient, int skip_layer_num);
+	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, const u16 *pf_data_n);
+	void calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, u8 &line_enable);
 	void get_spritealphaclip_info();
-	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, u16 *pf_data_n);
+	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, const u16 *pf_data_n);
 	void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -396,4 +399,4 @@ private:
 	void bubsympb_oki_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TAITO_F3_H
+#endif // MAME_TAITO_TAITO_F3_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_INCLUDES_MODEL1_H
-#define MAME_INCLUDES_MODEL1_H
+#ifndef MAME_SEGA_MODEL1_H
+#define MAME_SEGA_MODEL1_H
 
 #pragma once
 
@@ -148,7 +148,7 @@ private:
 	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
+	void screen_vblank_model1(int state);
 
 	struct lightparam_t
 	{
@@ -353,4 +353,4 @@ private:
 	void drive_board_w(uint8_t data);
 };
 
-#endif // MAME_INCLUDES_MODEL1_H
+#endif // MAME_SEGA_MODEL1_H

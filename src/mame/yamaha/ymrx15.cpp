@@ -46,8 +46,6 @@ HD44780_PIXEL_UPDATE(rx15_state::pixel_update)
 
 void rx15_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::hd6301x_io)); // TODO: internalize
-	map(0x0040, 0x00ff).ram(); // TODO: internalize
 	map(0x1000, 0x1000).nopr();
 	map(0x2000, 0x207f).rw(m_ryp4, FUNC(ym2154_device::read), FUNC(ym2154_device::write));
 	map(0x3000, 0x3001).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
@@ -77,7 +75,7 @@ void rx15_state::rx15(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 8);
 	lcdc.set_pixel_update_cb(FUNC(rx15_state::pixel_update));
 

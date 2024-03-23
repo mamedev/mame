@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Compiled by K1W1
 
@@ -76,10 +76,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="barnblst">
+	<software name="barnblst" supported="no">
 		<description>Barnyard Blaster</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Requires unsupported [Atari XG-1 light gun]
+]]></notes>
 		<info name="serial" value="RX8086" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -92,9 +95,13 @@ Compiled by K1W1
 
 	<software name="beefdrop" supported="partial">
 		<description>Beef Drop</description>
-		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
+		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by AtariAge becomes avaialable. -->
 		<year>2005</year>
 		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Hangs during gameplay and attract demo, PC=0x7af4 routine loops forever (X gets corrupt somehow from irq routines, regression)
+Title screen doesn't draw player sprite properly the first time around [GTIA]
+]]></notes>
 		<info name="developer" value="Ken Siders" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -142,10 +149,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bughunt">
+	<software name="bughunt" supported="no">
 		<description>Bug Hunt</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Requires unsupported [Atari XG-1 light gun]
+]]></notes>
 		<info name="serial" value="RX8087" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -156,10 +166,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ccrisis">
+	<software name="ccrisis" supported="no">
 		<description>Castle Crisis</description>
 		<year>2003</year>
-		<publisher>Atari Age</publisher>
+		<publisher>AtariAge</publisher>
+		<notes><![CDATA[
+[ANTIC] playfield height doesn't cover full screen
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
 			<dataarea name="rom" size="32768">
@@ -193,10 +206,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="crimbstr">
+	<software name="crimbstr" supported="no">
 		<description>Crime Buster</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Requires unsupported [Atari XG-1 light gun]
+]]></notes>
 		<info name="serial" value="RX8104" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -207,10 +223,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="crossbow" supported="partial">
+	<software name="crossbow" supported="no">
 		<description>Crossbow</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Requires unsupported [Atari XG-1 light gun]
+]]></notes>
 		<info name="serial" value="RX8088" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -234,10 +253,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="darkcham">
+	<software name="darkcham" supported="partial">
 		<description>Dark Chambers</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+[ANTIC] playfield doesn't mask properly on the right (should match left border), left border display scrolling artifacts
+]]></notes>
 		<info name="serial" value="RX8101" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -272,10 +294,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="dsrtflcn">
+	<software name="dsrtflcn" supported="no">
 		<description>Desert Falcon</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Hangs on gameplay
+]]></notes>
 		<info name="serial" value="RX8089" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -285,10 +310,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fightn">
+	<software name="fightn" supported="partial">
 		<description>Fight Night</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Unsupported character save to [disk]
+]]></notes>
 		<info name="serial" value="RX8085" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -298,10 +326,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fsim2" supported="partial">
+	<software name="fsim2" supported="no">
 		<description>Flight Simulator 2</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Doesn't accept any [keyboard] input when prompted to select monitor type
+]]></notes>
 		<info name="serial" value="RX8091" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -363,10 +394,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="eaglnest">
+	<software name="eaglnest" supported="partial">
 		<description>Into the Eagle's Nest</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Doesn't mask sprites on title screen when exiting attract mode [GTIA] GRACTL
+]]></notes>
 		<info name="serial" value="RX8114" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -376,10 +410,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="karateka">
+	<software name="karateka" supported="no">
 		<description>Karateka</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Crashes during attract
+]]></notes>
 		<info name="serial" value="RX8095" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
@@ -427,10 +464,15 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="midimaze">
-		<description>MIDI Maze (Reproduction)</description>
+	<software name="midimaze" supported="partial">
+		<!-- "Multi-Machine Maze Mayhem" -->
+		<!-- Alt spelling: MIDImaze/XE -->
+		<description>MIDI Maze (v1.00, reproduction)</description>
 		<year>199?</year>
 		<publisher>Video 61 / Atari</publisher>
+		<notes><![CDATA[
+Multiplayer game requiring [XM301], [SX212], [850] or direct connection with another Atari computer. Only solo mode works
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
 			<dataarea name="rom" size="131072">
@@ -443,6 +485,9 @@ Compiled by K1W1
 		<description>MIDI Maze (Prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Multiplayer game requiring [XM301], [SX212], [850] or direct connection with another Atari computer. Only solo mode works
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
 			<dataarea name="rom" size="131072">
@@ -540,10 +585,13 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="thundfox">
+	<software name="thundfox" supported="partial">
 		<description>Thunderfox</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Status bar flickers during gameplay
+]]></notes>
 		<info name="serial" value="RX8113" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />

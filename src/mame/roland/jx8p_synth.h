@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_AUDIO_JX8P_SYNTH_H
-#define MAME_AUDIO_JX8P_SYNTH_H
+#ifndef MAME_ROLAND_JX8P_SYNTH_H
+#define MAME_ROLAND_JX8P_SYNTH_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ protected:
 DECLARE_DEVICE_TYPE(JX8P_SYNTH, jx8p_synth_device)
 DECLARE_DEVICE_TYPE(SUPERJX_SYNTH, superjx_synth_device)
 
-#endif // MAME_AUDIO_JX8P_SYNTH_H
+#endif // MAME_ROLAND_JX8P_SYNTH_H

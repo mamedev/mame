@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_VINO_H
-#define MAME_MACHINE_VINO_H
+#ifndef MAME_SGI_VINO_H
+#define MAME_SGI_VINO_H
 
 #pragma once
 
@@ -252,4 +252,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VINO, vino_device)
 
-#endif // MAME_MACHINE_VINO_H
+#endif // MAME_SGI_VINO_H

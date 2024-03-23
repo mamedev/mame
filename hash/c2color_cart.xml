@@ -1,41 +1,92 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="c2color_cart" description="C2 Color cartridges">
 
 	<!--
-	Chinese name        Pinyin                            English Translation                         Released?   Dumped? Year Released   Cartridge #     Publisher           Notes                                                       Note 2:
-	带龙王封印          Dài Lóngwáng Fēngyìn              The Agreement with the Dragon King          Y           N       2015            1               Baiyi Animation     Not a separate game, an extension for the built in game
-	之翼王的试炼        Zhī Yìwáng De Shì Liàn            The Trials of King Wing                     Y           N       2015            2               Baiyi Animation     Not a separate game, an extension for the built in game
-	之英雄岛之烈焰魔    Zhī Yīngxióng Dǎo Zhī Lièyàn Mó   The Fire Devil of Hero Island               Y           N       2015            3               Baiyi Animation     Not a separate game, an extension for the built in game
-	暗黑势力再临        Ànhēi Shìlì Zài Lín               The Dark Ones Come Again                    Y           Y       2015            4               Baiyi Animation     Not a separate game, an extension for the built in game
-	神秘的龙族之王      Shénmì De Lóngzú Zhī Wáng         The Mysterious King of the Dragon Land      Y           Y       2015            5               Baiyi Animation     Not a separate game, an extension for the built in game
-	植物大战僵尸２      Zhíwù Dàzhàn Jiāngshī 2           Plants vs. Zombies 2                        N           N       N/A             6               PopCap Games        Supposed to be the only standalone game for the C2          Supposed to be released Q1 2016, but never was
-	?                   ?                                 Locke Kingdom search                        N           N       N/A             7               Baiyi Animation     Not a separate game, an extension for the built in game     Mentioned as coming soon in a promotional booklet
+  Pinyin                            English Translation                         Released?   Dumped? Year Released   Cartridge #     Publisher           Chinese Name
+
+  These are not standalone games, but extensions for the built in game
+  Dài Lóngwáng Fēngyìn              The Agreement with the Dragon King          Y           Y       2014            1               Baiyi Animation     带龙王封印
+  Zhī Yìwáng De Shì Liàn            The Trials of King Wing                     Y           Y       2014            2               Baiyi Animation     之翼王的试炼
+  Zhī Yīngxióng Dǎo Zhī Lièyàn Mó   The Fire Devil of Hero Island               Y           Y       2014            3               Baiyi Animation     之英雄岛之烈焰魔
+  Ànhēi Shìlì Zài Lín               The Dark Ones Come Again                    Y           Y       2014            4               Baiyi Animation     暗黑势力再临
+  Shénmì De Lóngzú Zhī Wáng         The Mysterious King of the Dragon Land      Y           Y       2014            5               Baiyi Animation     神秘的龙族之王
+
+  unreleased games:
+
+  Supposed to be the only standalone game for the C2          Supposed to be released Q1 2016, but never was
+  Zhíwù Dàzhàn Jiāngshī 2           Plants vs. Zombies 2                        N           N       N/A             6               PopCap Games        植物大战僵尸２
+
+  Mentioned as coming soon in a promotional booklet (another extension?)
+  ?                                 Locke Kingdom search                        N           N       N/A             7               Baiyi Animation     ?
 	-->
 
-	<software name="darkones" supported="no">
-		<description>Dì 4 dàn: Ànhēi Shìlì Zài Lín</description>
-		<year>2015</year>
+	<!-- see driver for notes about the structure of these, the game ID is at 0x20000 for example -->
+
+	<!-- Green package -->
+	<software name="agree" supported="no">
+		<description>Dì 1 dàn: Dài Lóngwáng Fēngyìn</description>
+		<year>2014</year>
 		<publisher>Baiyi Animation</publisher>
-		<info name="alt_title" value="第４弹：暗黑势力再临"/>
+		<info name="alt_title" value="第1弹：带龙王封印"/>
 		<part name="cart" interface="c2color_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="darkones.bin" size="0x800000" crc="d2735c91" sha1="f71c1cd300893a22e52d046bc9c489e0236c6b88" />
+				<rom name="game1_agree.bin" size="0x800000" crc="e520140f" sha1="4059f9a142238c7976ae59008e92e86170c2eed5" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- Red package -->
+	<software name="kingwing" supported="no">
+		<description>Dì 2 dàn: Zhī Yìwáng De Shì Liàn</description>
+		<year>2014</year>
+		<publisher>Baiyi Animation</publisher>
+		<info name="alt_title" value="第2弹：之翼王的试炼"/>
+		<part name="cart" interface="c2color_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="game2_kingwing.bin" size="0x400000" crc="64bd94ca" sha1="7da9bfddb48c83ade523850c1e714d3e6310b5f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Blue package -->
+	<software name="firedevl" supported="no">
+		<description>Dì 3 dàn: Zhī Yīngxióng Dǎo Zhī Lièyàn Mó</description>
+		<year>2014</year>
+		<publisher>Baiyi Animation</publisher>
+		<info name="alt_title" value="第3弹：之英雄岛之烈焰魔"/>
+		<part name="cart" interface="c2color_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="game3_firedevl.bin" size="0x400000" crc="5b42ec93" sha1="3b2ac207893048ec1a2f1268ccfd7a8e4b64841c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Yellow package -->
+	<software name="darkones" supported="no">
+		<description>Dì 4 dàn: Ànhēi Shìlì Zài Lín</description>
+		<year>2014</year>
+		<publisher>Baiyi Animation</publisher>
+		<info name="alt_title" value="第４弹：暗黑势力再临"/>
+		<part name="cart" interface="c2color_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="game4_darkones.bin" size="0x400000" crc="74acb584" sha1="8c7e8b551dcd801c16bc6db159f0d6c5bf20906a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Black package -->
 	<software name="kingdlnd" supported="no">
 		<description>Dì 5 dàn: Shénmì De Lóngzú Zhī Wáng</description>
-		<year>2015</year>
+		<year>2014</year>
 		<publisher>Baiyi Animation</publisher>
 		<info name="alt_title" value="第５弹：神秘的龙族之王"/>
 		<part name="cart" interface="c2color_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="kingdlnd.bin" size="0x800000" crc="1e20d906" sha1="323df1ce05ff4fc1aaefe3e0e2b929aec40cc230" />
+				<rom name="game5_kingdlnd.bin" size="0x800000" crc="1e20d906" sha1="323df1ce05ff4fc1aaefe3e0e2b929aec40cc230" />
 			</dataarea>
 		</part>
 	</software>

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_CIT101_KBD_H
-#define MAME_MACHINE_CIT101_KBD_H
+#ifndef MAME_CITOH_CIT101_KBD_H
+#define MAME_CITOH_CIT101_KBD_H
 
 #pragma once
 
@@ -33,7 +33,7 @@ public:
 	auto txd_callback() { return m_txd_callback.bind(); }
 
 	// serial line input
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	void write_rxd(int state);
 
 protected:
 	cit101_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -87,4 +87,4 @@ protected:
 DECLARE_DEVICE_TYPE(CIT101_KEYBOARD, cit101_keyboard_device)
 DECLARE_DEVICE_TYPE(CIT101E_KEYBOARD, cit101e_keyboard_device)
 
-#endif
+#endif // MAME_CITOH_CIT101_KBD_H

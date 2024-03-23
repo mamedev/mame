@@ -9,17 +9,17 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_VALUEUNIFORM_H
+#define MAME_RENDER_BGFX_VALUEUNIFORM_H
 
-#ifndef __DRAWBGFX_VALUE_UNIFORM__
-#define __DRAWBGFX_VALUE_UNIFORM__
+#pragma once
 
 #include "entryuniform.h"
 
 class bgfx_value_uniform : public bgfx_entry_uniform
 {
 public:
-	bgfx_value_uniform(bgfx_uniform* uniform, float* values, const int count);
+	bgfx_value_uniform(bgfx_uniform* uniform, const float* values, const int count);
 
 	virtual void bind() override;
 
@@ -28,4 +28,4 @@ private:
 	const int   m_count;
 };
 
-#endif // __DRAWBGFX_VALUE_UNIFORM__
+#endif // MAME_RENDER_BGFX_VALUEUNIFORM_H

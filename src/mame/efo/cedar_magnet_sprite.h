@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_CEDAR_MAGNET_SPRITE_H
-#define MAME_MACHINE_CEDAR_MAGNET_SPRITE_H
+#ifndef MAME_EFO_CEDAR_MAGNET_SPRITE_H
+#define MAME_EFO_CEDAR_MAGNET_SPRITE_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 	required_device_array<z80pio_device, 3> m_pio;
 };
 
-#endif // MAME_MACHINE_CEDAR_MAGNET_SPRITE_H
+#endif // MAME_EFO_CEDAR_MAGNET_SPRITE_H

@@ -99,16 +99,15 @@ baud rate:
 //  CONFIGURABLE LOGGING
 //**************************************************************************
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_INT     (1U <<  3)
-#define LOG_CMD     (1U <<  4)
-#define LOG_TX      (1U <<  5)
-#define LOG_RCV     (1U <<  6)
-#define LOG_CTS     (1U <<  7)
-#define LOG_DCD     (1U <<  8)
-#define LOG_SYNC    (1U <<  9)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_INT     (1U << 3)
+#define LOG_CMD     (1U << 4)
+#define LOG_TX      (1U << 5)
+#define LOG_RCV     (1U << 6)
+#define LOG_CTS     (1U << 7)
+#define LOG_DCD     (1U << 8)
+#define LOG_SYNC    (1U << 9)
 
 //#define VERBOSE (LOG_GENERAL|LOG_SETUP|LOG_READ|LOG_INT|LOG_CMD|LOG_TX|LOG_RCV|LOG_CTS|LOG_DCD|LOG_SYNC)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -478,24 +477,6 @@ scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag,
 scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC8523L, tag, owner, clock, TYPE_SCC8523L)
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - device-specific setup
-//-------------------------------------------------
-void z80scc_device::device_resolve_objects()
-{
-	LOG("%s\n", FUNCNAME);
-
-	// resolve callbacks
-	m_out_txd_cb.resolve_all_safe();
-	m_out_dtr_cb.resolve_all_safe();
-	m_out_rts_cb.resolve_all_safe();
-	m_out_wreq_cb.resolve_all_safe();
-	m_out_sync_cb.resolve_all_safe();
-	m_out_rxdrq_cb.resolve_all_safe();
-	m_out_txdrq_cb.resolve_all_safe();
-	m_out_int_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -1065,10 +1046,8 @@ void z80scc_channel::device_start()
 	m_uart->m_wr0_ptrbits = 0;
 
 	m_rx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 8 : 3;
-	m_rx_fifo_wp = m_rx_fifo_rp = 0;
 
 	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
-	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 	m_rxc   = 0x00;
 	m_txc   = 0x00;
@@ -1149,6 +1128,10 @@ void z80scc_channel::device_reset()
 	// Reset RS232 emulation
 	receive_register_reset();
 	transmit_register_reset();
+
+	// empty fifos
+	m_rx_fifo_wp = m_rx_fifo_rp = 0;
+	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 	// Soft/Channel Reset values (mostly) according to SCC users manual
 	m_wr0   = 0x00;
@@ -1651,7 +1634,7 @@ uint8_t z80scc_channel::do_sccreg_rr14()
 {
 	LOGR("%s\n", FUNCNAME);
 	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
-		return BIT(m_wr7, 6) ? m_wr7 : m_rr10;
+		return BIT(m_wr7p, 6) ? m_wr7p : m_rr10;
 	else
 		return m_rr10;
 }
@@ -1800,24 +1783,17 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		   priority conditions to request interrupts. This command allows the use of the internal
 		   daisy chain (even in systems without an external daisy chain) and is the last operation in
 		   an interrupt service routine. */
-		if (m_uart->m_variant & z80scc_device::SET_NMOS)
+		LOGCMD("Reset Highest IUS\n");
+		// loop over all interrupt sources
+		for (auto & elem : m_uart->m_int_state)
 		{
-			logerror("WR0_RESET_HIGHEST_IUS command not supported on NMOS\n");
-		}
-		else
-		{
-			LOGCMD("Reset Highest IUS\n");
-			// loop over all interrupt sources
-			for (auto & elem : m_uart->m_int_state)
+			// find the first interrupt under service
+			if (elem & Z80_DAISY_IEO)
 			{
-				// find the first interrupt under service
-				if (elem & Z80_DAISY_IEO)
-				{
-					LOGCMD("- found IUS bit to clear\n");
-					elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
-					m_uart->check_interrupts();
-					break;
-				}
+				LOGCMD("- found IUS bit to clear\n");
+				elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
+				m_uart->check_interrupts();
+				break;
 			}
 		}
 		break;
@@ -1918,7 +1894,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 		LOG("- Receiver Interrupt on Special Conditions only\n");
 		break;
 	}
-	if ((data & WR1_RX_INT_MODE_MASK) == WR1_PARITY_IS_SPEC_COND)
+	if (data & WR1_PARITY_IS_SPEC_COND)
 		LOG("- Parity error is a Special Condition\n");
 	m_uart->check_interrupts();
 }
@@ -2015,7 +1991,10 @@ void z80scc_channel::do_sccreg_wr6(uint8_t data)
 void z80scc_channel::do_sccreg_wr7(uint8_t data)
 {
 	LOG("%s(%02x): Receive sync\n", FUNCNAME, data);
-	m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
+	if ((m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30)) && BIT(m_wr15, 0))
+		m_wr7p = data;
+	else
+		m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
 }
 
 /* WR8 is the transmit buffer register */
@@ -2113,7 +2092,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  /RTxC pin.*/
 	switch (data & WR11_RCVCLK_SRC_MASK)
 	{
-	case WR11_RCVCLK_SRC_RTXC: LOG("Receive clock source is RTxC - not implemented\n"); break;
+	case WR11_RCVCLK_SRC_RTXC: LOG("Receive clock source is RTxC\n"); break;
 	case WR11_RCVCLK_SRC_TRXC: LOG("Receive clock source is TRxC - not implemented\n"); break;
 	case WR11_RCVCLK_SRC_BR:   LOG("Receive clock source is Baudrate Generator\n"); break;
 	case WR11_RCVCLK_SRC_DPLL: LOG("Receive clock source is DPLL - not implemented\n"); break;
@@ -2127,7 +2106,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  source of the transmit clocks.*/
 	switch (data & WR11_TRACLK_SRC_MASK)
 	{
-	case WR11_TRACLK_SRC_RTXC: LOG("Transmit clock source is RTxC - not implemented\n"); break;
+	case WR11_TRACLK_SRC_RTXC: LOG("Transmit clock source is RTxC\n"); break;
 	case WR11_TRACLK_SRC_TRXC: LOG("Transmit clock source is TRxC - not implemented\n"); break;
 	case WR11_TRACLK_SRC_BR:   LOG("Transmit clock source is Baudrate Generator\n"); break;
 	case WR11_TRACLK_SRC_DPLL: LOG("Transmit clock source is DPLL - not implemented\n"); break;
@@ -2157,6 +2136,8 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	}
 	else
 		LOG("TRxC pin is Input\n");
+
+	update_serial();
 }
 
 /*WR12 contains the lower byte of the time constant for the baud rate generator. The time constant
@@ -2584,7 +2565,7 @@ void z80scc_channel::receive_data(uint8_t data)
 		// store received character but do not step the fifo
 		m_rx_data_fifo[m_rx_fifo_wp] = data;
 
-		logerror("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
+		LOGRCV("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{
@@ -2816,16 +2797,28 @@ unsigned int z80scc_channel::get_brg_rate()
 	if (m_wr14 & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
 	{
 		rate = owner()->clock() / (brg_const == 0 ? 1 : brg_const);
-		LOG("   - Source bit rate (%d) = PCLK (%d) / (%d)\n", rate, owner()->clock(), brg_const);
+		LOG("   - BRG Source bit rate (%d) = PCLK (%d) / (%d)\n", rate, owner()->clock(), brg_const);
 	}
 	else // Else we use the RTxC as BRG source
 	{
 		unsigned int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
 		rate = source / (brg_const == 0 ? 1 : brg_const);
-		LOG("   - Source bit rate (%d) = RTxC (%d) / (%d)\n", rate, source, brg_const);
+		LOG("   - BRG Source bit rate (%d) = RTxC (%d) / (%d)\n", rate, source, brg_const);
 	}
 
 	return (rate / (2 * get_clock_mode()));
+}
+
+//-------------------------------------------------
+// get_rtxc_rate
+//-------------------------------------------------
+unsigned int z80scc_channel::get_rtxc_rate()
+{
+	unsigned int rate;
+	unsigned int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
+	rate = source / get_clock_mode();
+	LOG("   - RTxC Source bit rate (%d) = RTxC (%d) / (%d)\n", rate, source, get_clock_mode());
+	return rate;
 }
 
 void z80scc_channel::update_baudtimer()
@@ -2914,9 +2907,20 @@ void z80scc_channel::update_serial()
 	}
 	else
 	{
-		LOG("- BRG disabled\n");
-		set_rcv_rate(0);
-		set_tra_rate(0);
+		if ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC &&
+			(m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_RTXC)
+		{
+			m_brg_rate = get_rtxc_rate();
+			LOG("- BRG disabled, clock source RTxC (rate %d, clock %d)\n", m_brg_rate, get_clock_mode());
+			set_rcv_rate(m_brg_rate);
+			set_tra_rate(m_brg_rate);
+		}
+		else
+		{
+			LOG("- BRG disabled and RX/TX clock sources differ, unimplemented: stopping\n");
+			set_rcv_rate(0);
+			set_tra_rate(0);
+		}
 	}
 	// TODO: Check registers for use of RTxC and TRxC, if used as direct Tx and/or Rx clocks set them to value as programmed
 	// in m_uart->txca/txcb and rxca/rxcb respectivelly

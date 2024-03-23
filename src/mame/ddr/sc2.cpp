@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/***************************************************************************
+/*******************************************************************************
 
 Schachcomputer SC 2 (G-5002.500)
 
@@ -27,7 +27,7 @@ Q - Quittierung (enter)
 
 Fidelity CC10 synonyms: RE, LV, RV, PB, ♪, CL, EN
 
-****************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -68,14 +68,14 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
-
-	void main_io(address_map &map);
-	void main_map(address_map &map);
 
 	u8 m_inp_mux = 0;
 	u8 m_digit_data = 0;
+
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 
 	void update_display();
 	u8 pio_port_b_r();
@@ -93,9 +93,9 @@ void sc2_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void sc2_state::update_display()
 {
@@ -138,9 +138,9 @@ u8 sc2_state::speaker_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void sc2_state::main_map(address_map &map)
 {
@@ -158,9 +158,9 @@ void sc2_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sc2 )
 	PORT_START("IN.0")
@@ -185,18 +185,18 @@ static INPUT_PORTS_START( sc2 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, sc2_state, reset_button, 0)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sc2_state::sc2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 9.8304_MHz_XTAL/4); // U880 Z80 clone
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc2_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sc2_state::main_io);
@@ -206,21 +206,21 @@ void sc2_state::sc2(machine_config &config)
 	m_pio->in_pb_callback().set(FUNC(sc2_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(sc2_state::pio_port_b_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_sc2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( sc2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -252,10 +252,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, empty_init, "VEB Funkwerk Erfurt", "Schachcomputer SC 2 (rev. E)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, sc2a, sc2,    0,      sc2,     sc2,   sc2_state, empty_init, "VEB Funkwerk Erfurt", "Schachcomputer SC 2", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, empty_init, "VEB Funkwerk Erfurt", "Schachcomputer SC 2 (rev. E)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, sc2a, sc2,    0,      sc2,     sc2,   sc2_state, empty_init, "VEB Funkwerk Erfurt", "Schachcomputer SC 2", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

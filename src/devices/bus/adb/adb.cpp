@@ -52,8 +52,6 @@ adb_device::adb_device(const machine_config &mconfig, device_type type, const ch
 
 void adb_device::device_start()
 {
-	m_adb_cb.resolve_safe();
-	m_poweron_cb.resolve_safe();
 }
 
 void adb_device::device_reset()

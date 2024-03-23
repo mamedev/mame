@@ -146,7 +146,7 @@ private:
 	uint8_t control_data_r();
 	void adpcm_data_w(uint8_t data);
 	void adpcm_reset_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -211,7 +211,7 @@ void battlera_state::main_portmap(address_map &map)
 /******************************************************************************/
 
 
-WRITE_LINE_MEMBER(battlera_state::adpcm_int)
+void battlera_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;

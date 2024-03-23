@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_AVIGO_H
-#define MAME_INCLUDES_AVIGO_H
+#ifndef MAME_TI_AVIGO_H
+#define MAME_TI_AVIGO_H
 
 #pragma once
 
@@ -60,8 +60,8 @@ protected:
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 
-	DECLARE_WRITE_LINE_MEMBER( tc8521_alarm_int );
-	DECLARE_WRITE_LINE_MEMBER( com_interrupt );
+	void tc8521_alarm_int(int state);
+	void com_interrupt(int state);
 
 	uint8_t key_data_read_r();
 	void set_key_line_w(uint8_t data);
@@ -118,4 +118,4 @@ protected:
 	uint8_t               m_warm_start = 0U;
 };
 
-#endif // MAME_INCLUDES_AVIGO_H
+#endif // MAME_TI_AVIGO_H

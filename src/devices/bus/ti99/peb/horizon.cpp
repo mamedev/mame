@@ -126,16 +126,16 @@
 #include "emu.h"
 #include "horizon.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_32K         (1U<<3)   // 32K optional RAM r/w
-#define LOG_DSR         (1U<<4)   // DSR
-#define LOG_RAM         (1U<<5)   // RAM chips
-#define LOG_ORAM        (1U<<6)   // outside of RAM chips
-#define LOG_CRU         (1U<<7)   // CRU
-#define LOG_PAGE        (1U<<8)   // Page access
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CONFIG      (1U << 2)   // Configuration
+#define LOG_32K         (1U << 3)   // 32K optional RAM r/w
+#define LOG_DSR         (1U << 4)   // DSR
+#define LOG_RAM         (1U << 5)   // RAM chips
+#define LOG_ORAM        (1U << 6)   // outside of RAM chips
+#define LOG_CRU         (1U << 7)   // CRU
+#define LOG_PAGE        (1U << 8)   // Page access
 
-#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -324,7 +324,6 @@ void horizon_ramdisk_device::read_write(offs_t offset, uint8_t *value, bool writ
 */
 void horizon_ramdisk_device::crureadz(offs_t offset, uint8_t *value)
 {
-	return;
 }
 
 /*
@@ -463,8 +462,8 @@ bool horizon_ramdisk_device::nvram_read(util::read_stream &file)
 
 	// Read complete file, at most ramsize+dsrsize
 	// Mind that the configuration may have changed
-	size_t filesize;
-	if (file.read(&buffer[0], ramsize + dsrsize, filesize))
+	auto const [err, filesize] = util::read(file, &buffer[0], ramsize + dsrsize);
+	if (err)
 		return false;
 	int nvramsize = int(filesize) - dsrsize;
 
@@ -493,11 +492,11 @@ bool horizon_ramdisk_device::nvram_write(util::write_stream &file)
 	memcpy(&buffer[ramsize], m_dsrram->pointer(), dsrsize);
 
 	// Store both parts in one file
-	size_t filesize;
-	return !file.write(buffer.get(), ramsize + dsrsize, filesize) && filesize == ramsize + dsrsize;
+	auto const [err, filesize] = util::write(file, buffer.get(), ramsize + dsrsize);
+	return !err;
 }
 
-bool horizon_ramdisk_device::nvram_can_write()
+bool horizon_ramdisk_device::nvram_can_write() const
 {
 	// Do not save if nothing was written. This is helpful to avoid loss of the
 	// contents when the settings were found to be different, and the emulation

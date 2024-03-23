@@ -21,7 +21,7 @@ ym2154_device::ym2154_device(const machine_config &mconfig, const char *tag, dev
 	m_stream(nullptr),
 	m_timer(nullptr),
 	m_update_irq(*this),
-	m_io_read(*this),
+	m_io_read(*this, 0),
 	m_io_write(*this),
 	m_group0_config("group0", ENDIANNESS_LITTLE, 8, 18, 0),
 	m_group1_config("group1", ENDIANNESS_LITTLE, 8, 18, 0),
@@ -50,7 +50,7 @@ u8 ym2154_device::read(offs_t offset)
 		case 0x08: // A/D converter registers
 		case 0x09: // A/D converter registers
 		case 0x0a: // A/D converter registers
-			result = m_io_read.isnull() ? 0 : m_io_read(offset - 1);
+			result = m_io_read(offset - 1);
 			break;
 
 		case 0x0e: // IRQ ack
@@ -90,8 +90,7 @@ void ym2154_device::write(offs_t offset, u8 data)
 				m_timer->enable(false);
 			else if (m_timer_enable && !old)
 				m_timer->adjust((2048 - m_timer_count) * attotime::from_hz(sample_rate()));
-			if (!m_io_write.isnull())
-				m_io_write(0, BIT(data, 4, 4) ^ 0x0f);
+			m_io_write(0, BIT(data, 4, 4) ^ 0x0f);
 			break;
 
 		// output level
@@ -178,11 +177,6 @@ void ym2154_device::device_start()
 {
 	// allocate our timer
 	m_timer = timer_alloc(FUNC(ym2154_device::delayed_irq), this);
-
-	// resolve the handlers
-	m_update_irq.resolve();
-	m_io_read.resolve();
-	m_io_write.resolve();
 
 	// allocate our stream
 	m_stream = stream_alloc(0, 2, sample_rate());

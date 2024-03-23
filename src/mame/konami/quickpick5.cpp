@@ -37,6 +37,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class quickpick5_state : public driver_device
 {
 public:
@@ -56,7 +59,7 @@ public:
 
 	void quickpick5(machine_config &config);
 	void waijockey(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(serial_io_r);
+	int serial_io_r();
 
 private:
 	u32 screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -66,8 +69,8 @@ private:
 	void ccu_int_time_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+	void vbl_ack_w(int state) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	void nmi_ack_w(int state) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	// A0 is inverted to match the Z80's endianness.  Typical Konami.
 	u8 k244_r(offs_t offset) { return m_k053245->k053244_r(offset^1);  }
@@ -85,7 +88,7 @@ private:
 		m_control = data;
 	}
 
-	u8 vram_r(offs_t offset);
+	u8 vram_r(address_space &space, offs_t offset);
 	void vram_w(offs_t offset, u8 data);
 
 	void serial_io_w(u8 data);
@@ -155,7 +158,7 @@ void quickpick5_state::serial_io_w(u8 data)
 	m_sio_prev = data;
 }
 
-READ_LINE_MEMBER(quickpick5_state::serial_io_r)
+int quickpick5_state::serial_io_r()
 {
 	return BIT(m_sio_out, 0);
 }
@@ -187,7 +190,7 @@ void quickpick5_state::ccu_int_time_w(u8 data)
 	m_ccu_int_time = data;
 }
 
-u8 quickpick5_state::vram_r(offs_t offset)
+u8 quickpick5_state::vram_r(address_space &space, offs_t offset)
 {
 	if ((m_control & 0x10) == 0x10)
 	{
@@ -198,7 +201,7 @@ u8 quickpick5_state::vram_r(offs_t offset)
 		}
 		else if ((offset >= 0x8e0) && (offset <= 0x8ff))
 		{
-			return m_k051649->k051649_test_r();
+			return m_k051649->k051649_test_r(space);
 		}
 	}
 
@@ -667,6 +670,8 @@ ROM_START( waijockey )
 	ROM_REGION( 0x20000, "oki", 0 )    // OKIM6295 samples
 	ROM_LOAD( "gs-257-a01.1g", 0x000000, 0x020000, CRC(8ce0e693) SHA1(fad19ba37c7987a4d2797200b96ac9c050eb5d94) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1991, quickp5,   0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_IMPERFECT_GRAPHICS)

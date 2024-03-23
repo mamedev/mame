@@ -94,9 +94,8 @@ VIDEO_START_MEMBER(m90_state,dynablsb)
 void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	uint16_t *spriteram = m_video_data + 0xee00/2;
-	int offs;
 
-	for (offs = 0x1f2/2; offs >= 0; offs -= 3)
+	for (int offs = 0x1f2/2; offs >= 0; offs -= 3)
 	{
 		int x,y,sprite,colour,fx,fy,y_multi,i;
 
@@ -146,17 +145,16 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 
 void m90_state::bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int offs = 0, last_sprite = 0;
+	int offs = 7, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
-
-	while ((offs < m_spriteram.bytes()/2) && (m_spriteram[offs+0] != 0x8000))
+	while ((offs < m_spriteram.length() - 3) && (m_spriteram[offs+0] != 0x8000))
 	{
 		last_sprite = offs;
 		offs += 4;
 	}
 
-	for (offs = last_sprite; offs >= 0; offs -= 4)
+	for (offs = last_sprite; offs >= 7; offs -= 4)
 	{
 		sprite = m_spriteram[offs+1];
 		colour = (m_spriteram[offs+2] >> 9) & 0x0f;
@@ -184,16 +182,16 @@ void m90_state::bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 
 void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int offs = 0, last_sprite = 0;
+	int offs = 7, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
-	while ((offs < m_spriteram.bytes()/2) && (m_spriteram[offs+0] != 0xffff))
+	while ((offs < m_spriteram.length() - 3) && (m_spriteram[offs+0] != 0xffff))
 	{
 		last_sprite = offs;
 		offs += 4;
 	}
 
-	for (offs = last_sprite; offs >= 0; offs -= 4)
+	for (offs = last_sprite; offs >= 7; offs -= 4)
 	{
 		sprite = m_spriteram[offs+1];
 		colour = (m_spriteram[offs+2] >> 9) & 0x0f;

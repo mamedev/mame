@@ -36,27 +36,6 @@ enum
 class sm510_base_device : public cpu_device
 {
 public:
-	// construction/destruction
-	sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
-		cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
-		m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
-		m_prgwidth(prgwidth),
-		m_datawidth(datawidth),
-		m_stack_levels(stack_levels),
-		m_r_mask_option(RMASK_DIRECT),
-		m_lcd_ram_a(*this, "lcd_ram_a"),
-		m_lcd_ram_b(*this, "lcd_ram_b"),
-		m_lcd_ram_c(*this, "lcd_ram_c"),
-		m_write_segs(*this),
-		m_melody_rom(*this, "melody"),
-		m_read_k(*this),
-		m_read_ba(*this),
-		m_read_b(*this),
-		m_write_s(*this),
-		m_write_r(*this)
-	{ }
-
 	// For SM510, SM500, SM5A, R port output is selected with a mask option,
 	// either from the divider or direct contol. Documented options are:
 	// SM510/SM5A: direct control, 2(4096Hz meant for alarm sound)
@@ -87,11 +66,14 @@ public:
 	auto write_segs() { return m_write_segs.bind(); }
 
 protected:
-	// device-level overrides
+	// construction/destruction
+	sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + m_clk_div - 1) / m_clk_div; } // default 2 cycles per machine cycle
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * m_clk_div); } // "
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
@@ -100,19 +82,19 @@ protected:
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
-	virtual void execute_one() { } // -> child class
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override;
+
+	virtual void execute_one() = 0;
 	virtual bool op_argument() { return false; }
 
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
+	virtual void reset_vector() { do_branch(3, 7, 0); }
+	virtual void wakeup_vector() { do_branch(1, 0, 0); } // after halt
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
-
-	virtual void reset_vector() { do_branch(3, 7, 0); }
-	virtual void wakeup_vector() { do_branch(1, 0, 0); } // after halt
 
 	int m_prgwidth;
 	int m_datawidth;

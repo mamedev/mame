@@ -19,6 +19,9 @@
 #include "screen.h"
 #include "softlist.h"
 
+
+namespace {
+
 class kminus_state : public driver_device
 {
 public:
@@ -331,6 +334,8 @@ ROM_START(kminus)
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("kyberware_chargen.u24", 0x0000, 0x1000, CRC(18d9e79e) SHA1(e0a80dab109c0ac8b7f214d597955c97618208b3))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY              FULLNAME       FLAGS

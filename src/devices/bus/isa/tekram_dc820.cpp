@@ -26,7 +26,7 @@
 #include "bus/nscsi/devices.h"
 #include "cpu/i86/i186.h"
 #include "machine/i82355.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 
 DEFINE_DEVICE_TYPE(TEKRAM_DC320B, tekram_dc320b_device, "dc320b", "Tekram DC-320B SCSI Controller")

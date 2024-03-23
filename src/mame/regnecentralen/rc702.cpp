@@ -75,13 +75,13 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 	void port14_w(uint8_t data);
 	void port1c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE_LINE_MEMBER(qbar_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
+	void crtc_drq_w(int state);
+	void hreq_w(int state);
+	void clock_w(int state);
+	void eop_w(int state);
+	void q_w(int state);
+	void qbar_w(int state);
+	void dack1_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void rc702_palette(palette_device &palette) const;
 	void kbd_put(u8 data);
@@ -185,7 +185,7 @@ void rc702_state::machine_start()
 	save_item(NAME(m_dack1));
 }
 
-WRITE_LINE_MEMBER( rc702_state::q_w )
+void rc702_state::q_w(int state)
 {
 	m_q_state = state;
 
@@ -195,7 +195,7 @@ WRITE_LINE_MEMBER( rc702_state::q_w )
 		m_dma->dreq3_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::qbar_w )
+void rc702_state::qbar_w(int state)
 {
 	m_qbar_state = state;
 
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER( rc702_state::qbar_w )
 		m_dma->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
+void rc702_state::crtc_drq_w(int state)
 {
 	m_drq_state = state;
 
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
 		m_dma->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::eop_w )
+void rc702_state::eop_w(int state)
 {
 	if (state == m_eop)
 		return;
@@ -233,7 +233,7 @@ WRITE_LINE_MEMBER( rc702_state::eop_w )
 		m_fdc->tc_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::dack1_w )
+void rc702_state::dack1_w(int state)
 {
 	if (state == m_dack1)
 		return;
@@ -273,13 +273,15 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx = 0;
 
-	if (!vsp)
+	using namespace i8275_attributes;
+
+	if (!BIT(attrcode, VSP))
 		gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		gfx = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
 	// Highlight not used
@@ -293,7 +295,7 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 }
 
 // Baud rate generator. All inputs are 0.614MHz.
-WRITE_LINE_MEMBER( rc702_state::clock_w )
+void rc702_state::clock_w(int state)
 {
 	m_ctc1->trg0(state);
 	m_ctc1->trg1(state);
@@ -303,7 +305,7 @@ WRITE_LINE_MEMBER( rc702_state::clock_w )
 		m_beepcnt--;
 }
 
-WRITE_LINE_MEMBER( rc702_state::hreq_w )
+void rc702_state::hreq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dma->hack_w(state); // tell dma that bus has been granted

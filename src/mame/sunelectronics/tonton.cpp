@@ -31,6 +31,9 @@
 #include "video/v9938.h"
 #include "speaker.h"
 
+
+namespace {
+
 class tonton_state : public driver_device
 {
 public:
@@ -252,6 +255,8 @@ ROM_START( tonton )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tonton.bin",   0x0000, 0x10000, CRC(6c9cacfb) SHA1(21afd5a40b785300b013ac8cb31f5e4f480657ef) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY                   FULLNAME                                  FLAGS

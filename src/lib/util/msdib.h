@@ -36,9 +36,9 @@ enum class msdib_error
 	UNSUPPORTED_FORMAT
 };
 
-msdib_error msdib_verify_header(random_read &fp);
-msdib_error msdib_read_bitmap(random_read &fp, bitmap_argb32 &bitmap);
-msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::uint32_t length, std::uint32_t dirheight = 0U);
+msdib_error msdib_verify_header(random_read &fp) noexcept;
+msdib_error msdib_read_bitmap(random_read &fp, bitmap_argb32 &bitmap) noexcept;
+msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::uint32_t length, std::uint32_t dirheight = 0U) noexcept;
 
 } // namespace util
 

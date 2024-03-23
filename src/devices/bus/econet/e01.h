@@ -23,7 +23,6 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/afs_dsk.h"
 
 class econet_e01_device : public device_t,
 	public device_econet_interface
@@ -55,15 +54,15 @@ protected:
 	virtual void econet_clk(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( adlc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( econet_data_w );
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_en_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
+	void rtc_irq_w(int state);
+	void adlc_irq_w(int state);
+	void econet_data_w(int state);
+	void via_irq_w(int state);
+	void clk_en_w(int state);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void scsi_bsy_w(int state);
+	void scsi_req_w(int state);
 
 	TIMER_CALLBACK_MEMBER(clk_tick);
 
@@ -79,10 +78,6 @@ private:
 	void hdc_data_w(uint8_t data);
 	void hdc_select_w(uint8_t data);
 	void hdc_irq_enable_w(uint8_t data);
-	uint8_t rtc_address_r();
-	void rtc_address_w(uint8_t data);
-	uint8_t rtc_data_r();
-	void rtc_data_w(uint8_t data);
 
 	static void floppy_formats_afs(format_registration &fr);
 

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="megacdj" description="Sega Mega CD (Jpn) CD-ROMs">
+<softwarelist name="megacdj" description="Sega Mega CD (Japan) CD-ROMs">
 
 <!--- Images below are from the REDUMP set (unless otherwise noted) -->
 
@@ -23,14 +23,14 @@ license:CC0
 		<rom name="After Burner III (Japan) (Track 11).bin" size="56189280" crc="5e9e6657" />
 		<rom name="After Burner III (Japan) (Track 12).bin" size="59724336" crc="a4b53073" />
 		-->
-		<description>After Burner III (Jpn)</description>
+		<description>After Burner III (Japan)</description>
 		<year>1992</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68014"/>
-		<info name="disk_ring" value="T-68014P-00039-R2M V, T-68014P-00039-R1M V"/>
 		<info name="release" value="19921218"/>
 		<info name="alt_title" value="アフターバーナーⅢ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-68014P-00039-R2M V, T-68014P-00039-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="after burner iii (japan)" sha1="679964728d2ccc9ddbb298b96d9cd9ebb09bb9db"/>
 			</diskarea>
@@ -43,14 +43,14 @@ license:CC0
 		<rom name="AX-101 (Japan) (Track 1).bin" size="615817104" crc="03cbf674" />
 		<rom name="AX-101 (Japan) (Track 2).bin" size="2352000" crc="3fd8d737" />
 		-->
-		<description>AX-101 (Jpn)</description>
+		<description>AX-101 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6031"/>
-		<info name="disk_ring" value="G-6031P-00174 1"/>
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="AX-101"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6031P-00174 1"/>
 			<diskarea name="cdrom">
 				<disk name="ax-101 (japan)" sha1="0307a310f28bdca4407eea6424ab59750581be57"/>
 			</diskarea>
@@ -80,14 +80,14 @@ license:CC0
 		<rom name="Bari-Arm (Japan) (Track 18).bin" size="11802336" crc="46da7909" />
 		<rom name="Bari-Arm (Japan) (Track 19).bin" size="1505280" crc="f68eb74b" />
 		-->
-		<description>Bari-Arm (Jpn)</description>
+		<description>Bari-Arm (Japan)</description>
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="T-43024"/>
-		<info name="disk_ring" value="T-43024P-00077-R2M V"/>
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="バリ・アーム"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-43024P-00077-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="bari-arm (japan)" sha1="a14d376efd556bf05f37e696c01664b7dfa13dbe"/>
 			</diskarea>
@@ -140,14 +140,14 @@ license:CC0
 		<rom name="Burai - Hachigyoku no Yuushi Densetsu (Japan) (Track 41).bin" size="13458144" crc="91e5797a" />
 		<rom name="Burai - Hachigyoku no Yuushi Densetsu (Japan) (Track 42).bin" size="12343296" crc="b4d2794c" />
 		-->
-		<description>Burai - Yatsudama no Yuushi Densetsu (Jpn)</description>
+		<description>Burai - Yatsudama no Yuushi Densetsu (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6004"/>
-		<info name="disk_ring" value="G-6004P-00012-R2M V"/>
 		<info name="release" value="19920911"/>
 		<info name="alt_title" value="ブライ 八玉の勇士伝説"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6004P-00012-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="burai - hachigyoku no yuushi densetsu (japan)" sha1="fb036bacef4520c93cd3b9d3d2aaa64975e4a113"/>
 			</diskarea>
@@ -216,14 +216,14 @@ license:CC0
 		<rom name="Cosmic Fantasy Stories (Japan) (Track 57).bin" size="9224544" crc="7f4ac50c" />
 		<rom name="Cosmic Fantasy Stories (Japan) (Track 58).bin" size="3130512" crc="f36f7b3c" />
 		-->
-		<description>Cosmic Fantasy Stories (Jpn)</description>
+		<description>Cosmic Fantasy Stories (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49014"/>
-		<info name="disk_ring" value="T-49014P-00010-R2K V, T-49014P-00010-R1K V"/>
 		<info name="release" value="19920327"/>
 		<info name="alt_title" value="コズミックファンタジー Stories"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49014P-00010-R2K V, T-49014P-00010-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="cosmic fantasy stories (japan)" sha1="62bed0d8e461b8b118ce9d7dfc49d7944edf1c23"/>
 			</diskarea>
@@ -267,14 +267,14 @@ license:CC0
 		<rom name="Cyborg 009 (Japan) (Track 32).bin" size="44885568" crc="1cca8c90" />
 		<rom name="Cyborg 009 (Japan) (Track 33).bin" size="1952160" crc="cf515c02" />
 		-->
-		<description>Cyborg 009 (Jpn)</description>
+		<description>Cyborg 009 (Japan)</description>
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49054"/>
-		<info name="disk_ring" value="T-49054P-00081-R1M V"/>
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="サイボーグ009"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49054P-00081-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="cyborg 009 (japan)" sha1="19cdb90db8c92f6baafc188b83e8ea7a67adb6f1"/>
 			</diskarea>
@@ -310,14 +310,14 @@ license:CC0
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan) (Track 24).bin" size="9791376" crc="94656f55" />
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan) (Track 25).bin" size="68835984" crc="ec551c03" />
 		-->
-		<description>Dennin Aleste - Nobunaga and His Ninja Force (Jpn)</description>
+		<description>Dennin Aleste - Nobunaga and His Ninja Force (Japan)</description>
 		<year>1992</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66014"/>
-		<info name="disk_ring" value="T-66014P-00035-R2M V"/>
 		<info name="release" value="19921127"/>
 		<info name="alt_title" value="電忍アレスタ Nobunaga and his Ninja force"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-66014P-00035-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="dennin aleste - nobunaga and his ninja force (japan)" sha1="3c8289dc95e288e1d2e720828cef2177543100f2"/>
 			</diskarea>
@@ -339,14 +339,14 @@ license:CC0
 		<rom name="Detonator Orgun (Japan) (Track 10).bin" size="22092336" crc="121d8502" />
 		<rom name="Detonator Orgun (Japan) (Track 11).bin" size="1477056" crc="8773a91f" />
 		-->
-		<description>Detonator Orgun (Jpn)</description>
+		<description>Detonator Orgun (Japan)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="T-28014"/>
-		<info name="disk_ring" value="T28014P-00019-R1M V"/>
 		<info name="release" value="19920731"/>
 		<info name="alt_title" value="デトネイター・オーガン"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T28014P-00019-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="detonator orgun (japan)" sha1="80a99c378610c903453fbb8efac9325f04db7700"/>
 			</diskarea>
@@ -368,14 +368,14 @@ license:CC0
 		<rom name="Devastator (Japan) (Track 10).bin" size="42049056" crc="b6a26f5b" />
 		<rom name="Devastator (Japan) (Track 11).bin" size="26928048" crc="c405b742" />
 		-->
-		<description>Devastator (Jpn)</description>
+		<description>Devastator (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32074"/>
-		<info name="disk_ring" value="T-32074P-00063-R1M V"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="デバステイター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32074P-00063-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="devastator (japan)" sha1="3859b4eed02a3b9ccbddfe750285f755d85316cb"/>
 			</diskarea>
@@ -388,14 +388,14 @@ license:CC0
 		<rom name="Dragon's Lair (Japan) (En,Ja,Fr,De,It) (Track 1).bin" size="607935552" crc="280750dd" />
 		<rom name="Dragon's Lair (Japan) (En,Ja,Fr,De,It) (Track 2).bin" size="1521744" crc="60eade1a" />
 		-->
-		<description>Dragon's Lair (Jpn)</description>
+		<description>Dragon's Lair (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6035"/>
-		<info name="disk_ring" value="G-6035P-00191 4"/>
 		<info name="release" value="19940603"/>
 		<info name="alt_title" value="ドラゴンズ・レア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6035P-00191 4"/>
 			<diskarea name="cdrom">
 				<disk name="dragon's lair (japan) (en,ja,fr,de,it)" sha1="2277ebfb61ac13ba4c63b7a24c7e9d546c1923be"/>
 			</diskarea>
@@ -419,14 +419,14 @@ license:CC0
 		<rom name="Dynamic Country Club (Japan) (Track 12).bin" size="10315872" crc="22aacaf7" />
 		<rom name="Dynamic Country Club (Japan) (Track 13).bin" size="13425216" crc="3dc87886" />
 		-->
-		<description>Dynamic Country Club (Jpn)</description>
+		<description>Dynamic Country Club (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6017"/>
-		<info name="disk_ring" value="G-6017P-00076-R1M V"/>
 		<info name="release" value="19930716"/>
 		<info name="alt_title" value="ダイナミックカントリークラブ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6017P-00076-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="dynamic country club (japan)" sha1="04e213ea91c03b9aa8a354a2b5f9d42003ca5dbf"/>
 			</diskarea>
@@ -462,14 +462,14 @@ license:CC0
 		<rom name="Earnest Evans (Japan) (Track 24).bin" size="49601328" crc="bde9a2a9" />
 		<rom name="Earnest Evans (Japan) (Track 25).bin" size="46830672" crc="f3e9740d" />
 		-->
-		<description>Earnest Evans (Jpn)</description>
+		<description>Earnest Evans (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32014"/>
-		<info name="disk_ring" value="T-32014P-00007-R1K V"/>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="アーネストエバンス"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32014P-00007-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="earnest evans (japan)" sha1="9f0e70f629e32134a529b2784786cdac07e55780"/>
 			</diskarea>
@@ -515,14 +515,14 @@ license:CC0
 		<rom name="Egawa Suguru no Super League CD (Japan) (Track 34).bin" size="3064656" crc="ff7429af" />
 		<rom name="Egawa Suguru no Super League CD (Japan) (Track 35).bin" size="1815744" crc="2c146ad4" />
 		-->
-		<description>Egawa Suguru no Super League CD (Jpn)</description>
+		<description>Egawa Suguru no Super League CD (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6019"/>
-		<info name="disk_ring" value="G-6019P-00083-R1M V"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="江川卓のスーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6019P-00083-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="egawa suguru no super league cd (japan)" sha1="4062f8fbc43963cc9305e14530379989f9543a30"/>
 			</diskarea>
@@ -562,14 +562,14 @@ license:CC0
 		<rom name="F1 Circus CD (Japan) (Track 28).bin" size="11012064" crc="f1e3d543" />
 		<rom name="F1 Circus CD (Japan) (Track 29).bin" size="1387680" crc="6be88609" />
 		-->
-		<description>F1 Circus CD (Jpn)</description>
+		<description>F1 Circus CD (Japan)</description>
 		<year>1994</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="T-71014"/>
-		<info name="disk_ring" value="T-71014P-00121 1"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="F1サーカスCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-71014P-00121 1"/>
 			<diskarea name="cdrom">
 				<disk name="f1 circus cd (japan)" sha1="e13e963d3386cd38143334011b6a4c239a871bfa"/>
 			</diskarea>
@@ -609,14 +609,14 @@ license:CC0
 		<rom name="Final Fight CD (Japan) (Track 28).bin" size="8897616" crc="385633f7" />
 		<rom name="Final Fight CD (Japan) (Track 29).bin" size="7178304" crc="f8cfa374" />
 		-->
-		<description>Final Fight CD (Jpn)</description>
+		<description>Final Fight CD (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6013"/>
-		<info name="disk_ring" value="G-6013P-00059-R1M V"/>
 		<info name="release" value="19930402"/>
 		<info name="alt_title" value="ファイナルファイトCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6013P-00059-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="final fight cd (japan)" sha1="a67ff6f71659ad6159ab220fa977ea9316ac9f3a"/>
 			</diskarea>
@@ -677,14 +677,14 @@ license:CC0
 		<rom name="Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan) (Track 49).bin" size="7225344" crc="3ca798cf" />
 		<rom name="Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan) (Track 50).bin" size="10548720" crc="09d601aa" />
 		-->
-		<description>Gambler Jikochuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Jpn)</description>
+		<description>Gambler Jikochuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45044"/>
-		<info name="disk_ring" value="T-45044P-00037-R2M V"/>
 		<info name="release" value="19921225"/>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 激闘! 東京マージャンランド編"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45044P-00037-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="gambler jiko chuushinha 2 - gekitou tokyo mahjongland hen (japan)" sha1="12cb45fafb9f63b41551150dc313eba51fa639c9"/>
 			</diskarea>
@@ -726,14 +726,14 @@ license:CC0
 		<rom name="Game no Kandume Vol.1 (Japan) (Track 30).bin" size="19121760" crc="aa75b323" />
 		<rom name="Game no Kandume Vol.1 (Japan) (Track 31).bin" size="1300656" crc="0db9cca1" />
 		-->
-		<description>Game no Kandume Vol.1 (Jpn)</description>
+		<description>Game no Kandume Vol.1 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6032"/>
-		<info name="disk_ring" value="G-6032P-00165 1"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="ゲームのかんづめ VOL.1"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6032P-00165 1"/>
 			<diskarea name="cdrom">
 				<disk name="game no kandume vol.1 (japan)" sha1="88a441b47cc53a088de1b95cc624176895882478"/>
 			</diskarea>
@@ -768,14 +768,14 @@ license:CC0
 		<rom name="Game no Kandume Vol.2 (Japan) (Track 23).bin" size="19121760" crc="aa75b323" />
 		<rom name="Game no Kandume Vol.2 (Japan) (Track 24).bin" size="1420608" crc="e76b47df" />
 		-->
-		<description>Game no Kandume Vol.2 (Jpn)</description>
+		<description>Game no Kandume Vol.2 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6033"/>
-		<info name="disk_ring" value="G-6033P-00166 1"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="ゲームのかんづめ VOL.2"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6033P-00166 1"/>
 			<diskarea name="cdrom">
 				<disk name="game no kandume vol.2 (japan)" sha1="093b5a17ea088fe6714e4a095f5240cb6d918fcd"/>
 			</diskarea>
@@ -824,14 +824,14 @@ license:CC0
 		<rom name="Garou Densetsu Special (Japan) (Track 37).bin" size="3720864" crc="455176b0" />
 		<rom name="Garou Densetsu Special (Japan) (Track 38).bin" size="2034480" crc="652d1e74" />
 		-->
-		<description>Garou Densetsu Special (Jpn)</description>
+		<description>Garou Densetsu Special (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60214"/>
-		<info name="disk_ring" value="T-60214P-R1C V"/>
 		<info name="release" value="19950321"/>
 		<info name="alt_title" value="餓狼伝説スペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60214P-R1C V"/>
 			<diskarea name="cdrom">
 				<disk name="garou densetsu special (japan)" sha1="f1cf0e587163a0df04e2f8b4c35c2607ec1e1182"/>
 			</diskarea>
@@ -879,14 +879,14 @@ license:CC0
 		<rom name="Heavenly Symphony (Japan) (Track 36).bin" size="14866992" crc="108f5a17" />
 		<rom name="Heavenly Symphony (Japan) (Track 37).bin" size="43267392" crc="e55cb55b" />
 		-->
-		<description>Heavenly Symphony (Jpn)</description>
+		<description>Heavenly Symphony (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6034"/>
-		<info name="disk_ring" value="G-6034P-00194-R1M V"/>
 		<info name="release" value="19940423"/>
 		<info name="alt_title" value="ヘブンリー シンフォニー フォームラワン ワールド チャンピオンシップ 1993"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6034P-00194-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="heavenly symphony (japan)" sha1="0b2cbbb78603bd1b9110ffaa6035f89dbb78085a"/>
 			</diskarea>
@@ -913,14 +913,14 @@ license:CC0
 		<rom name="Heavy Nova (Japan) (Track 15).bin" size="27330240" crc="a1b0d2a5" />
 		<rom name="Heavy Nova (Japan) (Track 16).bin" size="13378176" crc="4b4f84d0" />
 		-->
-		<description>Heavy Nova (Jpn)</description>
+		<description>Heavy Nova (Japan)</description>
 		<year>1991</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22014"/>
-		<info name="disk_ring" value="T-22014P-00004-R1K V"/>
 		<info name="release" value="19911212"/>
 		<info name="alt_title" value="ヘビーノバ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-22014P-00004-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="heavy nova (japan)" sha1="aa7a040fc2b8c8d8264f82573dc5e16d31e2ed57"/>
 			</diskarea>
@@ -955,14 +955,14 @@ license:CC0
 		<rom name="Heimdall (Japan) (Track 23).bin" size="2683632" crc="a6a2845f" />
 		<rom name="Heimdall (Japan) (Track 24).bin" size="2681280" crc="8e15cd69" />
 		-->
-		<description>Heimdall (Jpn)</description>
+		<description>Heimdall (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60154"/>
-		<info name="disk_ring" value="T-60054P-00178-R1M V"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="ハイムドール"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60054P-00178-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="heimdall (japan)" sha1="88033b6ffa90da2f8f4c0f7df58c6f1697508a56"/>
 			</diskarea>
@@ -986,14 +986,14 @@ license:CC0
 		<rom name="Jaguar XJ220 (Japan) (En,Ja) (Track 12).bin" size="39231360" crc="945df445" />
 		<rom name="Jaguar XJ220 (Japan) (En,Ja) (Track 13).bin" size="61763520" crc="c9bc9069" />
 		-->
-		<description>Jaguar XJ220 (Jpn)</description>
+		<description>Jaguar XJ220 (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60094"/>
-		<info name="disk_ring" value="T-60094P-00056-R1M V"/>
 		<info name="release" value="19930326"/>
 		<info name="alt_title" value="ジャガーXJ220"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60094P-00056-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="jaguar xj220 (japan) (en,ja)" sha1="ff48724c0c0c7cc4fd831cc8954497c8da8448cb"/>
 			</diskarea>
@@ -1021,14 +1021,14 @@ license:CC0
 		<rom name="Jangou World Cup (Japan) (Track 16).bin" size="33810000" crc="8342332e" />
 		<rom name="Jangou World Cup (Japan) (Track 17).bin" size="26601120" crc="86bbc07d" />
 		-->
-		<description>Jangou World Cup (Jpn)</description>
+		<description>Jangou World Cup (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60124"/>
-		<info name="disk_ring" value="T-60124P-00119 1"/>
 		<info name="release" value="19930827"/>
 		<info name="alt_title" value="雀豪ワールドカップ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60124P-00119 1"/>
 			<diskarea name="cdrom">
 				<disk name="jangou world cup (japan)" sha1="5ce7ade2f0d4ca8b2919db189f5f9e8bfb7aebe4"/>
 			</diskarea>
@@ -1044,14 +1044,14 @@ license:CC0
 		<rom name="Kamen Rider ZO (Japan) (Track 4).bin" size="11449536" crc="42c25462" />
 		<rom name="Kamen Rider ZO (Japan) (Track 5).bin" size="2631888" crc="f11cc7d0" />
 		-->
-		<description>Kamen Rider ZO (Jpn)</description>
+		<description>Kamen Rider ZO (Japan)</description>
 		<year>1994</year>
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="T-141013"/>
-		<info name="disk_ring" value="T-141014P-00192-R1M V"/>
 		<info name="release" value="19940513"/>
 		<info name="alt_title" value="仮面ライダーZO"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-141014P-00192-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="kamen rider zo (japan)" sha1="c5129e3a90f4456bd76fac0f460281da18f8003c"/>
 			</diskarea>
@@ -1087,14 +1087,14 @@ license:CC0
 		<rom name="Keiou Yuugekitai (Japan) (Track 24).bin" size="26556432" crc="5f24b29f" />
 		<rom name="Keiou Yuugekitai (Japan) (Track 25).bin" size="9972480" crc="b8ee9bfd" />
 		-->
-		<description>Keiou Yuugekitai (Jpn)</description>
+		<description>Keiou Yuugekitai (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60114"/>
-		<info name="disk_ring" value="T-60114-00082-R1M V"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="慶応遊撃隊"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60114-00082-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="keiou yuugekitai (japan)" sha1="ef5af443f78c67caba7ec02590a3f3f0af93d387"/>
 			</diskarea>
@@ -1119,14 +1119,14 @@ license:CC0
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan) (Track 13).bin" size="20638800" crc="5e49867e" />
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan) (Track 14).bin" size="15553776" crc="edbdbe07" />
 		-->
-		<description>Lodoss Tou Senki - Eiyuu Sensou (Jpn)</description>
+		<description>Lodoss Tou Senki - Eiyuu Sensou (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6024"/>
-		<info name="disk_ring" value="G-6024P-00198-R2M V"/>
 		<info name="release" value="19940520"/>
 		<info name="alt_title" value="ロードス島戦記 英雄戦争"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6024P-00198-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="lodoss tou senki - eiyuu sensou (japan)" sha1="15ed554b0a63e78648cf496c8b249be35c18420c"/>
 			</diskarea>
@@ -1141,14 +1141,14 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (Japan) (Track 3).bin" size="11769408" crc="ad7b04a0" />
 		<rom name="Lunar - Eternal Blue (Japan) (Track 4).bin" size="1608768" crc="cb94bee5" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, set 1)</description>
+		<description>Lunar - Eternal Blue (Japan, set 1)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
-		<info name="disk_ring" value="T-45074P-00271-R1M V"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45074P-00271-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (japan)" sha1="86472573584d0d94bfb8f13e0f08bc2401d110da"/>
 			</diskarea>
@@ -1211,14 +1211,14 @@ license:CC0
 		<rom name="Lunar - The Silver Star (Japan) (Track 51).bin" size="1611120" crc="5fce5cf1" />
 		<rom name="Lunar - The Silver Star (Japan) (Track 52).bin" size="15299760" crc="d22641d1" />
 		-->
-		<description>Lunar - The Silver Star (Jpn)</description>
+		<description>Lunar - The Silver Star (Japan)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
-		<info name="disk_ring" value="T-45014P-00017-R1M V"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45014P-00017-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (japan)" sha1="ec2bfebf47f6b894f8add0d78962a4e491e4e3ca"/>
 			</diskarea>
@@ -1238,14 +1238,14 @@ license:CC0
 		<rom name="Microcosm (Japan) (Track 8).bin" size="21873600" crc="bba6b7c9" />
 		<rom name="Microcosm (Japan) (Track 9).bin" size="23988048" crc="9956dc95" />
 		-->
-		<description>Microcosm (Jpn)</description>
+		<description>Microcosm (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60164"/>
-		<info name="disk_ring" value="T-60164P-00171-R1M V"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="マイクロコズム"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60164P-00171-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="microcosm (japan)" sha1="7caf9207625e436f1c738e5d3e8705f9a3ed8e1c"/>
 			</diskarea>
@@ -1295,14 +1295,14 @@ license:CC0
 		<rom name="Night Striker (Japan, Korea) (Track 38).bin" size="18599616" crc="27ed2641" />
 		<rom name="Night Striker (Japan, Korea) (Track 39).bin" size="19331088" crc="05bf45d3" />
 		-->
-		<description>Night Striker (Jpn, Kor)</description>
+		<description>Night Striker (Japan, Korea)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11014"/>
-		<info name="disk_ring" value="T-11014P-00062-R1M V"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="ナイトストライカー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-11014P-00062-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="night striker (japan, korea)" sha1="0c8ba1a5ca12ec52de6b2febac14abd5d1126c84"/>
 			</diskarea>
@@ -1319,23 +1319,25 @@ license:CC0
 		<rom name="Night Trap (Japan) (Disc 2) (Track 1).bin" size="514587024" crc="36d7aa8c" />
 		<rom name="Night Trap (Japan) (Disc 2) (Track 2).bin" size="2587200" crc="e575194e" />
 		-->
-		<description>Night Trap (Jpn)</description>
+		<description>Night Trap (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Requires [disc swap]
 ]]></notes>
 		<info name="serial" value="G-6025"/>
-		<info name="disk_ring" value="G-6025P-00148 1 (Disc 1), G-6025P-00149 1 (Disc 2)"/>
 		<info name="release" value="19931119"/>
 		<info name="alt_title" value="ナイトトラップ"/>
 		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<feature name="cd_matrix" value="G-6025P-00148 1"/>
 			<diskarea name="cdrom">
 				<disk name="night trap (japan) (disc 1)" sha1="1d2bd06468ce64f34e06a1ff36cdcf5a8652d65e"/>
 			</diskarea>
 		</part>
-
 		<part name="cdrom2" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<feature name="cd_matrix" value="G-6025P-00149 1"/>
 			<diskarea name="cdrom">
 				<disk name="night trap (japan) (disc 2)" sha1="5d208bbfc2fbe233d53bd9dc6ef2e6d07e2cbc74"/>
 			</diskarea>
@@ -1349,14 +1351,14 @@ Requires [disc swap]
 		<rom name="Nostalgia 1907 (Japan) (Track 1).bin" size="192649968" crc="b1478a7e" />
 		<rom name="Nostalgia 1907 (Japan) (Track 2).bin" size="24710112" crc="747ca04b" />
 		-->
-		<description>Nostalgia 1907 (Jpn)</description>
+		<description>Nostalgia 1907 (Japan)</description>
 		<year>1991</year>
 		<publisher>Takeru</publisher>
 		<info name="serial" value="T-77014"/>
-		<info name="disk_ring" value="T-77014P-00006-R1K V"/>
 		<info name="release" value="19911214"/>
 		<info name="alt_title" value="ノスタルジア1907"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-77014P-00006-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="nostalgia 1907 (japan)" sha1="c6718f18b5720b3c48abf9c8accdf6d7572e4a63"/>
 			</diskarea>
@@ -1370,14 +1372,14 @@ Requires [disc swap]
 		<rom name="Popful Mail (Japan) (Track 2).bin" size="25133472" crc="d044aac3" />
 		<rom name="Popful Mail (Japan) (Track 3).bin" size="42778176" crc="f64659a4" />
 		-->
-		<description>Popful Mail (Jpn)</description>
+		<description>Popful Mail (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6029"/>
-		<info name="disk_ring" value="G-6029P-00190-R1M V"/>
 		<info name="release" value="19940401"/>
 		<info name="alt_title" value="ぽっぷるメイル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6029P-00190-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="popful mail (japan)" sha1="319c69ab64d586ef46a6a2f9c8790c7e94722674"/>
 			</diskarea>
@@ -1413,14 +1415,14 @@ Requires [disc swap]
 		<rom name="Prince of Persia (Japan) (Track 24).bin" size="1662864" crc="56f7c105" />
 		<rom name="Prince of Persia (Japan) (Track 25).bin" size="1660512" crc="227e49ca" />
 		-->
-		<description>Prince of Persia (Jpn)</description>
+		<description>Prince of Persia (Japan)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60014"/>
-		<info name="disk_ring" value="T60014P-00020-R1M V"/>
 		<info name="release" value="19920807"/>
 		<info name="alt_title" value="プリンス・オブ・ペルシャ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T60014P-00020-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="prince of persia (japan)" sha1="db90a82cc35f49356218aa649929d4b1f588ed8b"/>
 			</diskarea>
@@ -1454,14 +1456,14 @@ Requires [disc swap]
 		<rom name="Pro Yakyuu Super League CD (Japan) (Track 22).bin" size="1079568" crc="9563b01f" />
 		<rom name="Pro Yakyuu Super League CD (Japan) (Track 23).bin" size="1136016" crc="7024a847" />
 		-->
-		<description>Pro Yakyuu Super League CD (Jpn)</description>
+		<description>Pro Yakyuu Super League CD (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6010"/>
-		<info name="disk_ring" value="G-6010P-00029-R1M V"/>
 		<info name="release" value="19921030"/>
 		<info name="alt_title" value="プロ野球スーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6010P-00029-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="pro yakyuu super league cd (japan)" sha1="87cf208ad060b8ef6ace3db18824152f45dc91b5"/>
 			</diskarea>
@@ -1513,14 +1515,14 @@ Requires [disc swap]
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 40).bin" size="1067808" crc="81bb73c2" />
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 41).bin" size="1176000" crc="36cf78ed" />
 		-->
-		<description>Quiz Scramble Special (Jpn, rev. B)</description>
+		<description>Quiz Scramble Special (Japan, rev. B)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
-		<info name="disk_ring" value="G-6003P-00014B-R2M V"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6003P-00014B-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="quiz scramble special (japan) (rev b)" sha1="cc636ce3a99a01cdf3d34d93df74b143b6d239b7"/>
 			</diskarea>
@@ -1533,14 +1535,14 @@ Requires [disc swap]
 		<rom name="Capcom no Quiz - Tonosama no Yabou (Japan) (Track 1).bin" size="498555792" crc="ac72da73" />
 		<rom name="Capcom no Quiz - Tonosama no Yabou (Japan) (Track 2).bin" size="2050944" crc="07287a36" />
 		-->
-		<description>Quiz Tonosama no Yabou (Jpn)</description>
+		<description>Quiz Tonosama no Yabou (Japan)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44024"/>
-		<info name="disk_ring" value="T-44024P-00034-R1M V"/>
 		<info name="release" value="19921225"/>
 		<info name="alt_title" value="クイズ殿様の野望"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-44024P-00034-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="capcom no quiz - tonosama no yabou (japan)" sha1="9f09efae7369a1439cd85616c89f5d42a2eb741a"/>
 			</diskarea>
@@ -1576,14 +1578,14 @@ Requires [disc swap]
 		<rom name="Ranma 1-2 - Byakuranaika (Japan) (Track 24).bin" size="16226448" crc="effceb82" />
 		<rom name="Ranma 1-2 - Byakuranaika (Japan) (Track 25).bin" size="18051600" crc="cb75ab7c" />
 		-->
-		<description>Ranma ½ - Byakuranaika (Jpn)</description>
+		<description>Ranma ½ - Byakuranaika (Japan)</description>
 		<year>1993</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="T-25014"/>
-		<info name="disk_ring" value="T-25014P-00060-R3M V, T-25014P-00060-R2M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="らんま½ 白蘭愛歌"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-25014P-00060-R3M V, T-25014P-00060-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="ranma 1-2 - byakuranaika (japan)" sha1="89f733676137b26b304d21eab6c5e50c4ee48389"/>
 			</diskarea>
@@ -1599,14 +1601,14 @@ Requires [disc swap]
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 4).bin" size="24124464" crc="0278c2fd" />
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 5).bin" size="29235360" crc="93ba211d" />
 		-->
-		<description>Rise of the Dragon - A Blade Hunter Mystery (Jpn)</description>
+		<description>Rise of the Dragon - A Blade Hunter Mystery (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6002"/>
-		<info name="disk_ring" value="G-6002P-00023-R1M V"/>
 		<info name="release" value="19920925"/>
 		<info name="alt_title" value="ライズ オブ ザ ドラゴン −ブレイド・ハンター・ミステリ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6002P-00023-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="rise of the dragon - a blade hunter mystery (japan)" sha1="24a8afdc4f413494cd8efd78b035dbdbe25c679c"/>
 			</diskarea>
@@ -1667,14 +1669,14 @@ Requires [disc swap]
 		<rom name="Sangokushi III (Japan) (Track 49).bin" size="15694896" crc="597a794d" />
 		<rom name="Sangokushi III (Japan) (Track 50).bin" size="15052800" crc="083cd29b" />
 		-->
-		<description>Sangokushi III (Jpn)</description>
+		<description>Sangokushi III (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76014"/>
-		<info name="disk_ring" value="T-76014P-00057-R1M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="三國志III"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-76014P-00057-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sangokushi iii (japan)" sha1="4745bf0906999474645e1b4d515bc1b1902ca422"/>
 			</diskarea>
@@ -1697,14 +1699,14 @@ Requires [disc swap]
 		<rom name="Sega Classic Arcade Collection (Japan) (Track 11).bin" size="3709104" crc="cac806ff" />
 		<rom name="Sega Classic Arcade Collection (Japan) (Track 12).bin" size="12169248" crc="46fd5492" />
 		-->
-		<description>Sega Classic Arcade Collection - Limited Edition (Jpn)</description>
+		<description>Sega Classic Arcade Collection - Limited Edition (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
-		<info name="disk_ring" value="G-6012P-00024-2-R2M V, G-6012P-00024-2-R1M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6012P-00024-2-R2M V, G-6012P-00024-2-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sega classic arcade collection (japan)" sha1="c69c436b0159b2e1e5ffaadad37167d2210d8767"/>
 			</diskarea>
@@ -1762,14 +1764,14 @@ Requires [disc swap]
 		<rom name="Seima Densetsu 3x3 Eyes (Japan) (Track 46).bin" size="1495872" crc="cab5acd4" />
 		<rom name="Seima Densetsu 3x3 Eyes (Japan) (Track 47).bin" size="46023936" crc="b4ad07a8" />
 		-->
-		<description>Seima Densetsu 3x3 Eyes (Jpn)</description>
+		<description>Seima Densetsu 3x3 Eyes (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6007"/>
-		<info name="disk_ring" value="G-6007P-00078-R1M V"/>
 		<info name="release" value="19930723"/>
 		<info name="alt_title" value="聖魔伝説 3×3EYES"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6007P-00078-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="seima densetsu 3x3 eyes (japan)" sha1="8a850d7cf8db54c48adb8ae8f485143cd27df8c6"/>
 			</diskarea>
@@ -1865,14 +1867,14 @@ Requires [disc swap]
 		<rom name="Seirei Shinseiki - Fhey Area (Japan) (Track 84).bin" size="23284800" crc="e0a79a6f" />
 		<rom name="Seirei Shinseiki - Fhey Area (Japan) (Track 85).bin" size="51076032" crc="6c6882b3" />
 		-->
-		<description>Seirei Shinseiki - Fhey Area (Jpn)</description>
+		<description>Seirei Shinseiki - Fhey Area (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
-		<info name="disk_ring" value="T-32034P-00009-R2K V, T-32034P-00009-R1K V"/>
 		<info name="release" value="19920218"/>
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32034P-00009-R2K V, T-32034P-00009-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="seirei shinseiki - fhey area (japan)" sha1="0eb59654214bf37e8493ec48f6d4f6cd5077fbb2"/>
 			</diskarea>
@@ -1897,14 +1899,14 @@ Requires [disc swap]
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 13).bin" size="6526800" crc="04008006" />
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 14).bin" size="9523248" crc="6c025c7e" />
 		-->
-		<description>Shadow of the Beast II - Juushin no Jubaku (Jpn)</description>
+		<description>Shadow of the Beast II - Juushin no Jubaku (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60034"/>
-		<info name="disk_ring" value="T-60034P-00233-R2M V"/>
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="シャドー・オブ・ザ・ビーストII 獣神の呪縛"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60034P-00233-R2M V"/>
 			<diskarea name="cdrom">
 				<disk name="shadow of the beast ii - juushin no jubaku (japan)" sha1="87dffb24d18d1e0f61907fd8b25f85c25f1968d8"/>
 			</diskarea>
@@ -1944,14 +1946,14 @@ Requires [disc swap]
 		<rom name="Shin Megami Tensei (Japan) (Track 28).bin" size="16901472" crc="5f027327" />
 		<rom name="Shin Megami Tensei (Japan) (Track 29).bin" size="21358512" crc="c284eb28" />
 		-->
-		<description>Shin Megami Tensei (Jpn)</description>
+		<description>Shin Megami Tensei (Japan)</description>
 		<year>1994</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44044"/>
-		<info name="disk_ring" value="T-44044P-00163 1"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="真・女神転生"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-44044P-00163 1"/>
 			<diskarea name="cdrom">
 				<disk name="shin megami tensei (japan)" sha1="4ef3c263e909471ac27757c16423e66009726544"/>
 			</diskarea>
@@ -1997,14 +1999,14 @@ Requires [disc swap]
 		<rom name="Shining Force CD (Japan) (Track 34).bin" size="1822800" crc="95b82aea" />
 		<rom name="Shining Force CD (Japan) (Track 35).bin" size="19312272" crc="62fd60eb" />
 		-->
-		<description>Shining Force CD (Jpn)</description>
+		<description>Shining Force CD (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6036"/>
-		<info name="disk_ring" value="G-6036P-00226-R1M V"/>
 		<info name="release" value="19940722"/>
 		<info name="alt_title" value="シャイニング・フォースCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6036P-00226-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="shining force cd (japan)" sha1="b6b05a27fddbb742149216961f6e9b917442b768"/>
 			</diskarea>
@@ -2023,14 +2025,14 @@ Requires [disc swap]
 		<rom name="Silpheed (Japan) (Track 7).bin" size="12888960" crc="f0eee386" />
 		<rom name="Silpheed (Japan) (Track 8).bin" size="34835472" crc="43febcf8" />
 		-->
-		<description>Silpheed (Jpn)</description>
+		<description>Silpheed (Japan)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45054"/>
-		<info name="disk_ring" value="T-45054P-00080-R1M V"/>
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="シルフィード"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45054P-00080-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="silpheed (japan)" sha1="3f06c3f2b13f28312748336d324d1b8563a30d86"/>
 			</diskarea>
@@ -2063,14 +2065,14 @@ Requires [disc swap]
 		<rom name="Sol-Feace (Japan) (Track 21).bin" size="16845024" crc="7faff230" />
 		<rom name="Sol-Feace (Japan) (Track 22).bin" size="20932800" crc="d14346cf" />
 		-->
-		<description>Sol-Feace (Jpn)</description>
+		<description>Sol-Feace (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32024"/>
-		<info name="disk_ring" value="T-32024P-00003-R1K V"/>
 		<info name="release" value="19911212"/>
 		<info name="alt_title" value="ソル・フィース"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32024P-00003-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="sol-feace (japan)" sha1="953987cbb5031e1bc6b4efc2f0e25ced3ca79b1e"/>
 			</diskarea>
@@ -2116,14 +2118,14 @@ Requires [disc swap]
 		<rom name="Sonic the Hedgehog CD (Japan) (Track 34).bin" size="16214688" crc="ad32fc11" />
 		<rom name="Sonic the Hedgehog CD (Japan) (Track 35).bin" size="32104800" crc="e63f110d" />
 		-->
-		<description>Sonic The Hedgehog CD (Jpn)</description>
+		<description>Sonic the Hedgehog CD (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6021"/>
-		<info name="disk_ring" value="G-6021P-00128-R1M V"/>
 		<info name="release" value="19930923"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6021P-00128-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="sonic the hedgehog cd (japan)" sha1="5501a5b2b4d324558918f22f9dca0ef8080d0836"/>
 			</diskarea>
@@ -2136,14 +2138,14 @@ Requires [disc swap]
 		<rom name="Star Wars - Rebel Assault (Japan) (Track 1).bin" size="395248896" crc="e49d72d3" />
 		<rom name="Star Wars - Rebel Assault (Japan) (Track 2).bin" size="57795696" crc="ea28d67f" />
 		-->
-		<description>Star Wars - Rebel Assault (Jpn)</description>
+		<description>Star Wars - Rebel Assault (Japan)</description>
 		<year>19??</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60174"/>
-		<info name="disk_ring" value="T-60174P-00232-R1M V"/>
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="スターウォーズ・レベル・アサルト"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60174P-00232-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="star wars - rebel assault (japan)" sha1="5bcc151caa5257bd7bf98bb881069a6fa218c01b"/>
 			</diskarea>
@@ -2156,14 +2158,14 @@ Requires [disc swap]
 		<rom name="Starblade (Japan) (Track 1).bin" size="466669728" crc="239f44d6" />
 		<rom name="Starblade (Japan) (Track 2).bin" size="1528800" crc="9265e140" />
 		-->
-		<description>Starblade (Jpn)</description>
+		<description>Starblade (Japan)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14014"/>
-		<info name="disk_ring" value="T-14014P-00246-R1M V"/>
 		<info name="release" value="19941028"/>
 		<info name="alt_title" value="スターブレード"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-14014P-00246-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="starblade (japan)" sha1="bb1b7beb8e9b20dc18e1031ed57930eaae78c8cb"/>
 			</diskarea>
@@ -2220,14 +2222,14 @@ Requires [disc swap]
 		<rom name="Switch (Japan) (Track 45).bin" size="34835472" crc="ba6b2357" />
 		<rom name="Switch (Japan) (Track 46).bin" size="11856432" crc="acc8f0a5" />
 		-->
-		<description>Switch (Jpn)</description>
+		<description>Switch (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6009"/>
-		<info name="disk_ring" value="G-6009P-00061-R1M V"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="スイッチ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6009P-00061-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="switch (japan)" sha1="19fcbae4e4089774fb76b66592b634f15a77765f"/>
 			</diskarea>
@@ -2247,14 +2249,14 @@ Requires [disc swap]
 		<rom name="Tenbu Mega CD Special (Japan) (Track 8).bin" size="2940000" crc="e49038b7" />
 		<rom name="Tenbu Mega CD Special (Japan) (Track 9).bin" size="3231648" crc="bb700374" />
 		-->
-		<description>Tenbu Mega CD Special (Jpn)</description>
+		<description>Tenbu Mega CD Special (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32084"/>
-		<info name="disk_ring" value="T-32084P-00044-R1M V"/>
 		<info name="release" value="19921225"/>
 		<info name="alt_title" value="天舞メガCDスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32084P-00044-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="tenbu mega cd special (japan)" sha1="e973a5a3d51455b394eecccd99c7b62d407c1a82"/>
 			</diskarea>
@@ -2284,14 +2286,14 @@ Requires [disc swap]
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan) (Track 18).bin" size="35757456" crc="16d2cedc" />
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan) (Track 19).bin" size="33828816" crc="5a99929d" />
 		-->
-		<description>Tenkafubu - Eiyuutachi no Houkou (Jpn)</description>
+		<description>Tenkafubu - Eiyuutachi no Houkou (Japan)</description>
 		<year>1991</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45024"/>
-		<info name="disk_ring" value="T-45024P-00008-R2K V"/>
 		<info name="release" value="19911228"/>
 		<info name="alt_title" value="天下布武 英雄たちの咆哮"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45024P-00008-R2K V"/>
 			<diskarea name="cdrom">
 				<disk name="tenkafubu - eiyuutachi no houkou (japan)" sha1="9a97b0c278d0a5ba7c2df8e7343811f9a0ccd3f2"/>
 			</diskarea>
@@ -2304,14 +2306,14 @@ Requires [disc swap]
 		<rom name="Thunder Storm FX (Japan) (Track 1).bin" size="259446768" crc="5512fd9c" />
 		<rom name="Thunder Storm FX (Japan) (Track 2).bin" size="1653456" crc="bf577267" />
 		-->
-		<description>Thunder Storm FX (Jpn)</description>
+		<description>Thunder Storm FX (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
-		<info name="disk_ring" value="T-32064P-00022-R2M V, T-32064P-00022-R1M V"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32064P-00022-R2M V, T-32064P-00022-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (japan)" sha1="8fa31b15432af06c7471b0ec63c5c9a11a00f2af"/>
 			</diskarea>
@@ -2333,14 +2335,14 @@ Requires [disc swap]
 		<rom name="Thunderhawk (Japan) (Track 10).bin" size="44243472" crc="a674e49f" />
 		<rom name="Thunderhawk (Japan) (Track 11).bin" size="52945872" crc="5229bdbf" />
 		-->
-		<description>Thunderhawk (Jpn)</description>
+		<description>Thunderhawk (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60134"/>
-		<info name="disk_ring" value="T-60134P-00126 2"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="サンダーホーク"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60134P-00126 2"/>
 			<diskarea name="cdrom">
 				<disk name="thunderhawk (japan)" sha1="0e729497bb3ab8c0614c32d1a3f4668584518356"/>
 			</diskarea>
@@ -2353,17 +2355,17 @@ Requires [disc swap]
 		<rom name="Time Gal (Japan) (Track 1).bin" size="304652208" crc="1a756c12" />
 		<rom name="Time Gal (Japan) (Track 2).bin" size="1651104" crc="fd9c4ef7" />
 		-->
-		<description>Time Gal (Jpn)</description>
+		<description>Time Gal (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<notes><![CDATA[
 Black screen, requires sub CPU to be overclocked by 1.5x
 ]]></notes>
 		<info name="serial" value="T-32114"/>
-		<info name="disk_ring" value="T-32114P-00031-R1M V"/>
 		<info name="release" value="19921113"/>
 		<info name="alt_title" value="タイムギャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32114P-00031-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="time gal (japan)" sha1="32fffda2ccc83602a0e6d96a18bb3355a4c3d3d5"/>
 			</diskarea>
@@ -2377,14 +2379,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Track 2).bin" size="21083328" crc="ef56f804" />
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Track 3).bin" size="39774672" crc="5e2d74bf" />
 		-->
-		<description>Urusei Yatsura - Dear My Friends (Jpn)</description>
+		<description>Urusei Yatsura - Dear My Friends (Japan)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45064"/>
-		<info name="disk_ring" value="T-45064P-00195-R1M V"/>
 		<info name="release" value="19940415"/>
 		<info name="alt_title" value="うる星やつら ディア マイ フレンズ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45064P-00195-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="urusei yatsura - dear my friends (japan)" sha1="3d3e05daf5f3c4fe36c1d08eec1017daaac06c9e"/>
 			</diskarea>
@@ -2412,14 +2414,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Vay - Ryuusei no Yoroi (Japan) (Track 16).bin" size="19206432" crc="97d73c99" />
 		<rom name="Vay - Ryuusei no Yoroi (Japan) (Track 17).bin" size="22920240" crc="c5f8063d" />
 		-->
-		<description>Vay - Ryuusei no Yoroi (Jpn)</description>
+		<description>Vay - Ryuusei no Yoroi (Japan)</description>
 		<year>1993</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44014"/>
-		<info name="disk_ring" value="T-44014P-00141 1"/>
 		<info name="release" value="19931022"/>
 		<info name="alt_title" value="Vay 流星の鎧"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-44014P-00141 1"/>
 			<diskarea name="cdrom">
 				<disk name="vay - ryuusei no yoroi (japan)" sha1="6579a8763ae92f61e363b389f4bf1e4da9eb57e8"/>
 			</diskarea>
@@ -2435,14 +2437,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 4).bin" size="33812352" crc="ba656829" />
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 5).bin" size="49968240" crc="678ce0ca" />
 		-->
-		<description>Wakusei Woodstock - Funky Horror Band (Jpn)</description>
+		<description>Wakusei Woodstock - Funky Horror Band (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6001"/>
-		<info name="disk_ring" value="G-6001P-00001-R1K V"/>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="惑星ウッドストック ファンキーホラーバンド"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6001P-00001-R1K V"/>
 			<diskarea name="cdrom">
 				<disk name="wakusei woodstock - funky horror band (japan)" sha1="1bc0d49763960db4e7cd53661f07e9a4cd9f2f7b"/>
 			</diskarea>
@@ -2459,14 +2461,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Wing Commander (Japan) (Track 5).bin" size="7286496" crc="6e9f7d90" />
 		<rom name="Wing Commander (Japan) (Track 6).bin" size="30423120" crc="1890f041" />
 		-->
-		<description>Wing Commander (Jpn)</description>
+		<description>Wing Commander (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6011"/>
-		<info name="disk_ring" value="G-6011P-00175-R1M V"/>
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="ウイングコマンダー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6011P-00175-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wing commander (japan)" sha1="3056c26fda647bc377c9f266df9bc7bda2cd10e4"/>
 			</diskarea>
@@ -2496,14 +2498,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Winning Post (Japan) (Track 18).bin" size="5433120" crc="11927a0d" />
 		<rom name="Winning Post (Japan) (Track 19).bin" size="33570096" crc="6bddf7c6" />
 		-->
-		<description>Winning Post (Jpn)</description>
+		<description>Winning Post (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76044"/>
-		<info name="disk_ring" value="T-76044P-00123 1"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="ウイニングポスト"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-76044P-00123 1"/>
 			<diskarea name="cdrom">
 				<disk name="winning post (japan)" sha1="85f6dfa7125b37f9471206898d3b51e0ea2857f7"/>
 			</diskarea>
@@ -2525,14 +2527,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Wolfchild (Japan) (Track 10).bin" size="1740480" crc="219b4cb2" />
 		<rom name="Wolfchild (Japan) (Track 11).bin" size="19961424" crc="bcedc4fc" />
 		-->
-		<description>Wolfchild (Jpn)</description>
+		<description>Wolfchild (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60104"/>
-		<info name="disk_ring" value="T-60104P-00054-R1M V"/>
 		<info name="release" value="19930319"/>
 		<info name="alt_title" value="ウルフチャイルド"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60104P-00054-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wolfchild (japan)" sha1="42a1505540c34d268809f0199152deaea1ac85dc"/>
 			</diskarea>
@@ -2564,14 +2566,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Wonder Dog (Japan) (Track 20).bin" size="6115200" crc="4636ac6d" />
 		<rom name="Wonder Dog (Japan) (Track 21).bin" size="59449152" crc="e813bb63" />
 		-->
-		<description>Wonder Dog (Jpn)</description>
+		<description>Wonder Dog (Japan)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60074"/>
-		<info name="disk_ring" value="T-60074P-00028-R1M V"/>
 		<info name="release" value="19920925"/>
 		<info name="alt_title" value="ワンダードッグ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-60074P-00028-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="wonder dog (japan)" sha1="04abf554ddfb92e80593787d38018e1673437a99"/>
 			</diskarea>
@@ -2584,14 +2586,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Track 1).bin" size="625389744" crc="e491e189" />
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Track 2).bin" size="7190064" crc="1d6aa9a6" />
 		-->
-		<description>Yumemi Yakata no Monogatari (Jpn)</description>
+		<description>Yumemi Yakata no Monogatari (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6027"/>
-		<info name="disk_ring" value="G-6027P-00142-R1M V"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="夢見館の物語"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6027P-00142-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="yumemi yakata no monogatari (japan)" sha1="dc7c2fbcdb1de77601d4f447a88f0ca6cc9a63f1"/>
 			</diskarea>
@@ -2606,14 +2608,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Yumimi Mix (Japan) (Track 3).bin" size="35872704" crc="43e9be38" />
 		<rom name="Yumimi Mix (Japan) (Track 4).bin" size="14307216" crc="579798ef" />
 		-->
-		<description>Yumimi Mix (Jpn)</description>
+		<description>Yumimi Mix (Japan)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45034"/>
-		<info name="disk_ring" value="T-45034P-00047-R1M V"/>
 		<info name="release" value="19930129"/>
 		<info name="alt_title" value="ゆみみみっくす"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45034P-00047-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="yumimi mix (japan)" sha1="4adc66b222b7a26a3f00be9692a81ad343b07b41"/>
 			</diskarea>
@@ -2682,7 +2684,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="A-Rank Thunder Tanjouhen (1993)(Riot)(NTSC)(JP)(Track 54 of 55)[!].wav" size="27045692" crc="af8a4056" />
 		<rom name="A-Rank Thunder Tanjouhen (1993)(Riot)(NTSC)(JP)(Track 55 of 55)[!].wav" size="42124364" crc="aef65e71" />
 		-->
-		<description>A-Rank Thunder Tanjouhen (Jpn)</description>
+		<description>A-Rank Thunder Tanjouhen (Japan)</description>
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49064"/>
@@ -2738,7 +2740,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="After Armageddon Gaiden - Majuu Toushouden Eclipse (1994)(Sega)(NTSC)(JP)(Track 38 of 39)[!].wav" size="12752588" crc="3fac2053" />
 		<rom name="After Armageddon Gaiden - Majuu Toushouden Eclipse (1994)(Sega)(NTSC)(JP)(Track 39 of 39)[!].wav" size="12188108" crc="3ff8b389" />
 		-->
-		<description>After Armageddon Gaiden - Majuu Toushouden Eclipse (Jpn)</description>
+		<description>After Armageddon Gaiden - Majuu Toushouden Eclipse (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6026"/>
@@ -2772,7 +2774,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Aisle Lord (1992)(Wolf Team)(NTSC)(Jp)(Track 16 of 17)[!].wav" size="45640604" crc="1c985344" />
 		<rom name="Aisle Lord (1992)(Wolf Team)(NTSC)(Jp)(Track 17 of 17)[!].wav" size="3565676" crc="36134764" />
 		-->
-		<description>Aisle Lord (Jpn)</description>
+		<description>Aisle Lord (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32044"/>
@@ -2825,7 +2827,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Alshark (1993)(Polydor K.K.)(NTSC)(JP)(Track 35 of 36)[!].wav" size="23153132" crc="88953ed9" />
 		<rom name="Alshark (1993)(Polydor K.K.)(NTSC)(JP)(Track 36 of 36)[!].wav" size="6199916" crc="b2bb6c5a" />
 		-->
-		<description>Alshark (Jpn)</description>
+		<description>Alshark (Japan)</description>
 		<year>1993</year>
 		<publisher>Polydor K.K.</publisher>
 		<info name="serial" value="T-92014"/>
@@ -2873,7 +2875,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)(Track 30 of 31)[!].wav" size="11106188" crc="be77203b" />
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)(Track 31 of 31)[!].wav" size="29851628" crc="20d88302" />
 		-->
-		<description>Anett Futatabi (Jpn)</description>
+		<description>Anett Futatabi (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
 		<notes><![CDATA[
@@ -2983,7 +2985,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (1993)(KOEI)(NTSC)(JP)(Track 89 of 90)[!].wav" size="66197084" crc="3bc1df1d" />
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (1993)(KOEI)(NTSC)(JP)(Track 90 of 90)[!].wav" size="55761260" crc="9a097866" />
 		-->
-		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76034"/>
@@ -3021,7 +3023,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Arcus I-II-III (1993)(Wolf Team)(NTSC)(JP)(Track 20 of 21)[!].wav" size="20697644" crc="05d83490" />
 		<rom name="Arcus I-II-III (1993)(Wolf Team)(NTSC)(JP)(Track 21 of 21)[!].wav" size="34466252" crc="a3f5623a" />
 		-->
-		<description>Arcus I-II-III (Jpn)</description>
+		<description>Arcus I-II-III (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32094"/>
@@ -3097,7 +3099,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Arislan Senki - The Heroic Legend of Arslan (1993)(Sega)(NTSC)(JP)(Track 58 of 59)[!].wav" size="10066604" crc="5ecd20b6" />
 		<rom name="Arislan Senki - The Heroic Legend of Arslan (1993)(Sega)(NTSC)(JP)(Track 59 of 59)[!].wav" size="2396732" crc="8f3e097d" />
 		-->
-		<description>Arslan Senki - The Heroic Legend of Arslan (Jpn)</description>
+		<description>Arslan Senki - The Heroic Legend of Arslan (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6028"/>
@@ -3151,7 +3153,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Baku-den - The Unbalanced Zone (1994)(Sony)(NTSC)(JP)(Track 36 of 37)[!].wav" size="10685180" crc="8a30a53f" />
 		<rom name="Baku-den - The Unbalanced Zone (1994)(Sony)(NTSC)(JP)(Track 37 of 37)[!].wav" size="2780108" crc="bc78ce37" />
 		-->
-		<description>Baku-den - The Unbalanced Zone (Jpn)</description>
+		<description>Baku-den - The Unbalanced Zone (Japan)</description>
 		<year>1994</year>
 		<publisher>Sony Music Entertainment</publisher>
 		<info name="serial" value="T-145014"/>
@@ -3213,7 +3215,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Battle Fantasy (1994)(Micronet)(NTSC)(JP)(Track 44 of 45)[!].wav" size="4595852" crc="223a7eed" />
 		<rom name="Battle Fantasy (1994)(Micronet)(NTSC)(JP)(Track 45 of 45)[!].wav" size="6954908" crc="95a4fc3e" />
 		-->
-		<description>Battle Fantasy (Jpn)</description>
+		<description>Battle Fantasy (Japan)</description>
 		<year>1994</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22044"/>
@@ -3280,7 +3282,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Battlecorps - 3D Mechanical Battle Simulator (1994)(Victor)(NTSC)(JP)(Track 49 of 50)[!].wav" size="2269724" crc="dddff7ce" />
 		<rom name="Battlecorps - 3D Mechanical Battle Simulator (1994)(Victor)(NTSC)(JP)(Track 50 of 50)[!].wav" size="2577836" crc="7e1015ba" />
 		-->
-		<description>Battlecorps - 3D Mechanical Battle Simulator (Jpn)</description>
+		<description>Battlecorps - 3D Mechanical Battle Simulator (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60194"/>
@@ -3320,7 +3322,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Black Hole Assault (1992)(Micronet)(NTSC)(JP)(Track 22 of 23)[!].wav" size="35270636" crc="5f096446" />
 		<rom name="Black Hole Assault (1992)(Micronet)(NTSC)(JP)(Track 23 of 23)[!].wav" size="33944108" crc="2cf923dd" />
 		-->
-		<description>Black Hole Assault (Jpn)</description>
+		<description>Black Hole Assault (Japan)</description>
 		<year>1992</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22024"/>
@@ -3340,7 +3342,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Captain Tsubasa (1994)(Tecmo)(NTSC)(JP)(Track 2 of 3)[!].wav" size="17943452" crc="9c1e5da1" />
 		<rom name="Captain Tsubasa (1994)(Tecmo)(NTSC)(JP)(Track 3 of 3)[!].wav" size="24726620" crc="8e904660" />
 		-->
-		<description>Captain Tsubasa (Jpn)</description>
+		<description>Captain Tsubasa (Japan)</description>
 		<year>1994</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="T-36014"/>
@@ -3363,7 +3365,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Daihoushinden (1995)(Victor)(NTSC)(JP)(Track 5 of 6)[!].wav" size="26507084" crc="87aba968" />
 		<rom name="Daihoushinden (1995)(Victor)(NTSC)(JP)(Track 6 of 6)[!].wav" size="1237196" crc="3644f956" />
 		-->
-		<description>Daihoushinden (Jpn)</description>
+		<description>Daihoushinden (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60024"/>
@@ -3392,7 +3394,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Dark Wizard - Yomigaeri Shiyami no Madoushi (1993)(Sega)(NTSC)(JP)(Track 11 of 12)[!].wav" size="16972076" crc="5883fffb" />
 		<rom name="Dark Wizard - Yomigaeri Shiyami no Madoushi (1993)(Sega)(NTSC)(JP)(Track 12 of 12)[!].wav" size="46593164" crc="b505c38c" />
 		-->
-		<description>Dark Wizard - Yomigaeri Shiyami no Madoushi (Jpn)</description>
+		<description>Dark Wizard - Yomigaeri Shiyami no Madoushi (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6005"/>
@@ -3423,7 +3425,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Death Bringer - Himerata Monshou - The Knight of Darkness (1992)(Riot)(NTSC)(JP)(Track 13 of 14)[!].wav" size="1512380" crc="96431d34" />
 		<rom name="Death Bringer - Himerata Monshou - The Knight of Darkness (1992)(Riot)(NTSC)(JP)(Track 14 of 14)[!].wav" size="1361852" crc="71311dac" />
 		-->
-		<description>Death Bringer - Himerata Monshou - The Knight of Darkness (Jpn)</description>
+		<description>Death Bringer - Himerata Monshou - The Knight of Darkness (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49034"/>
@@ -3450,14 +3452,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Denei Toshi - Illusion City (1993)(Micro Cabin)(NTSC)(JP)(Track 09 of 10)[!][T-51014P-00066-R2M].wav" size="45022028" crc="6a0765aa" />
 		<rom name="Denei Toshi - Illusion City (1993)(Micro Cabin)(NTSC)(JP)(Track 10 of 10)[!][T-51014P-00066-R2M].wav" size="56146988" crc="02d23f50" />
 		-->
-		<description>Illusion City - Genei Toshi (Jpn)</description>
+		<description>Illusion City - Genei Toshi (Japan)</description>
 		<year>1993</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-51014"/>
-		<info name="disk_ring" value="T-51014P-00066-R2M"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="幻影都市 -ILLUSION CITY-"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-51014P-00066-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="denei toshi - illusion city (1993)(micro cabin)(ntsc)(jp)[t-51014p-00066-r2m]" sha1="8035db298e1d4b5713443a07b1285377c5b59cab"/>
 			</diskarea>
@@ -3470,7 +3472,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Double Switch (1995)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="550866944" crc="165736de" />
 		<rom name="Double Switch (1995)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="1528844" crc="409d75fa" />
 		-->
-		<description>Double Switch (Jpn)</description>
+		<description>Double Switch (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6040"/>
@@ -3494,7 +3496,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)(Track 6 of 7)[!].wav" size="51689948" crc="a9380c6b" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)(Track 7 of 7)[!].wav" size="2940044" crc="aeadf2f5" />
 		-->
-		<description>Dungeon Master II - Skullkeep (Jpn, v1.0)</description>
+		<description>Dungeon Master II - Skullkeep (Japan, v1.0)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60144"/>
@@ -3528,7 +3530,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 15 of 16)[!][Ecco the Dolphin].wav" size="59016428" crc="91778a50" />
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 16 of 16)[!][Ecco the Dolphin].wav" size="40350956" crc="4c9dcf9a" />
 		-->
-		<description>Ecco the Dolphin CD (Jpn, Disc 1 - Ecco the Dolphin)</description>
+		<description>Ecco the Dolphin CD (Japan, Disc 1 - Ecco the Dolphin)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6041"/>
@@ -3562,7 +3564,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 16 of 17)[!][Ecco the Dolphin II].wav" size="49128620" crc="1b3d0b81" />
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 17 of 17)[!][Ecco the Dolphin II].wav" size="10816892" crc="3e9c92a6" />
 		-->
-		<description>Ecco the Dolphin CD (Jpn, Disc 2 - Ecco the Dolphin II)</description>
+		<description>Ecco the Dolphin CD (Japan, Disc 2 - Ecco the Dolphin II)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6041"/>
@@ -3635,7 +3637,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)(Track 55 of 56)[!].wav" size="3069404" crc="b20c4c43" />
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)(Track 56 of 56)[!].wav" size="3979628" crc="3193d019" />
 		-->
-		<description>Eye of the Beholder (Jpn)</description>
+		<description>Eye of the Beholder (Japan)</description>
 		<year>1994</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="T-75014"/>
@@ -3654,7 +3656,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Fahrenheit (1995)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="516972544" crc="3e54d0fa" />
 		<rom name="Fahrenheit (1995)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="1874588" crc="ad809074" />
 		-->
-		<description>Fahrenheit (Jpn)</description>
+		<description>Fahrenheit (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6043"/>
@@ -3717,7 +3719,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Third World War, The (1993)(Micronet)(NTSC)(Jp)(Track 45 of 46)[!].wav" size="1844012" crc="919a20c3" />
 		<rom name="Third World War, The (1993)(Micronet)(NTSC)(Jp)(Track 46 of 46)[!].wav" size="1726412" crc="ccc08967" />
 		-->
-		<description>The IIIrd World War (Jpn)</description>
+		<description>The IIIrd World War (Japan)</description>
 		<year>1993</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22034"/>
@@ -3736,7 +3738,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Ishii Hisaichi no Daisekai (1994)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="7733248" crc="e1f8624a" />
 		<rom name="Ishii Hisaichi no Daisekai (1994)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="769148" crc="bd7489e2" />
 		-->
-		<description>Ishii Hisaichi no Daisekai (Jpn)</description>
+		<description>Ishii Hisaichi no Daisekai (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6016"/>
@@ -3785,7 +3787,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Jurassic Park (1992)(Sega)(NTSC)(JP)(Track 31 of 32)[!].wav" size="17444828" crc="380f8cca" />
 		<rom name="Jurassic Park (1992)(Sega)(NTSC)(JP)(Track 32 of 32)[!].wav" size="2394380" crc="960c51ad" />
 		-->
-		<description>Jurassic Park (Jpn)</description>
+		<description>Jurassic Park (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6038"/>
@@ -3825,7 +3827,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lethal Enforcers (1993)(Konami)(NTSC)(JP)(en)(Track 22 of 23)[!].wav" size="22666268" crc="935af7a1" />
 		<rom name="Lethal Enforcers (1993)(Konami)(NTSC)(JP)(en)(Track 23 of 23)[!].wav" size="37516796" crc="b15e6cdd" />
 		-->
-		<description>Lethal Enforcers (Jpn)</description>
+		<description>Lethal Enforcers (Japan)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95014"/>
@@ -3865,7 +3867,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lethal Enforcers II - The Western (1994)(Konami)(NTSC)(JP)(en)(Track 22 of 23)[!].wav" size="5569580" crc="69ae91a0" />
 		<rom name="Lethal Enforcers II - The Western (1994)(Konami)(NTSC)(JP)(en)(Track 23 of 23)[!].wav" size="6508028" crc="f6cd9ab2" />
 		-->
-		<description>Lethal Enforcers II - The Western (Jpn)</description>
+		<description>Lethal Enforcers II - The Western (Japan)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95034"/>
@@ -3887,14 +3889,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271-R1M].wav" size="11769452" crc="022a2281" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271-R1M].wav" size="1608812" crc="794d7aa9" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, set 2)</description>
+		<description>Lunar - Eternal Blue (Japan, set 2)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
-		<info name="disk_ring" value="T-45074P-00271-R1M"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45074P-00271-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[t-45074p-00271-r1m]" sha1="1aae24f5646879641f47273db530093648093699"/>
 			</diskarea>
@@ -3909,14 +3911,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271A-R1M].wav" size="11769452" crc="da19c77a" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271A-R1M].wav" size="1608812" crc="c980f230" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, set 3)</description>
+		<description>Lunar - Eternal Blue (Japan, set 3)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
-		<info name="disk_ring" value="T-45074P-00271A-R1M"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45074P-00271A-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[t-45074p-00271a-r1m]" sha1="dfe1a6c27af88d8202f5b77aaa81c6661ce8e05f"/>
 			</diskarea>
@@ -3980,14 +3982,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 51 of 52)[!][T-45014P-00017-R1M].wav" size="1611164" crc="d41a33c1" />
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 52 of 52)[!][T-45014P-00017-R1M].wav" size="15299804" crc="43115dd3" />
 		-->
-		<description>Lunar - The Silver Star (Jpn, R1M)</description>
+		<description>Lunar - The Silver Star (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
-		<info name="disk_ring" value="T-45014P-00017-R1M"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45014P-00017-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[t-45014p-00017-r1m]" sha1="5edd3e7a2f928f830abc682375309e78c6b74b1e"/>
 			</diskarea>
@@ -4050,14 +4052,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 51 of 52)[!][T-45014P-00017-R2M].wav" size="1611164" crc="03534eda" />
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 52 of 52)[!][T-45014P-00017-R2M].wav" size="15299804" crc="23d1fa5b" />
 		-->
-		<description>Lunar - The Silver Star (Jpn, R2)</description>
+		<description>Lunar - The Silver Star (Japan, R2)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
-		<info name="disk_ring" value="T-45014P-00017-R2"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-45014P-00017-R2"/>
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[t-45014p-00017-r2m]" sha1="ee5947838910555eedbe419705ecbda732ff641b"/>
 			</diskarea>
@@ -4103,14 +4105,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 34 of 35)[!][T-49024P-00016-R2M].wav" size="1547660" crc="2e120947" />
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 35 of 35)[!][T-49024P-00016-R2M].wav" size="1573532" crc="a86f99bf" />
 		-->
-		<description>Mahou no Shoujo - Silky Lip (Jpn, R2M)</description>
+		<description>Mahou no Shoujo - Silky Lip (Japan, R2M)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49024"/>
-		<info name="disk_ring" value="T-49024P-00016-R2M"/>
 		<info name="release" value="19920619"/>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49024P-00016-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[t-49024p-00016-r2m]" sha1="38f2f195e4c95e27ff7ceb2f8a554ca71f61b004"/>
 			</diskarea>
@@ -4156,14 +4158,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 34 of 35)[!][T-49024P-00016-R1M].wav" size="1547660" crc="2e120947" />
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 35 of 35)[!][T-49024P-00016-R1M].wav" size="1573532" crc="a86f99bf" />
 		-->
-		<description>Mahou no Shoujo - Silky Lip (Jpn, R1M)</description>
+		<description>Mahou no Shoujo - Silky Lip (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49024"/>
-		<info name="disk_ring" value="T-49024P-00016-R1M"/>
 		<info name="release" value="19920619"/>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-49024P-00016-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="mahou no shoujo - silky lip (1992)(riot)(ntsc)(jp)[t-49024p-00016-r1m]" sha1="a432d30104f55e6fc051cc40e0ce6d416bd7b3fc"/>
 			</diskarea>
@@ -4191,7 +4193,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Mega Schwarzschild (1993)(Sega)(NTSC)(JP)(Track 16 of 17)[!].wav" size="40115756" crc="aba41d28" />
 		<rom name="Mega Schwarzschild (1993)(Sega)(NTSC)(JP)(Track 17 of 17)[!].wav" size="35395292" crc="82a9c0a0" />
 		-->
-		<description>Mega Schwarzschild (Jpn)</description>
+		<description>Mega Schwarzschild (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6020"/>
@@ -4254,7 +4256,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)(Track 45 of 46)[!].wav" size="11978780" crc="265ffd1b" />
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)(Track 46 of 46)[!].wav" size="37799036" crc="0b0dd512" />
 		-->
-		<description>Might and Magic III - Isles of Terra (Jpn)</description>
+		<description>Might and Magic III - Isles of Terra (Japan)</description>
 		<year>1993</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68024"/>
@@ -4292,7 +4294,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Mortal Kombat (1994)(Acclaim)(NTSC)(JP)(en)(Track 20 of 21)[!].wav" size="40273340" crc="8ba853c2" />
 		<rom name="Mortal Kombat (1994)(Acclaim)(NTSC)(JP)(en)(Track 21 of 21)[!].wav" size="51974540" crc="de937768" />
 		-->
-		<description>Mortal Kombat (Jpn)</description>
+		<description>Mortal Kombat (Japan)</description>
 		<year>1994</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-81014"/>
@@ -4318,7 +4320,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="NBA Jam (1993)(Acclaim)(NTSC)(Jp)(Track 8 of 9)[!].wav" size="59430380" crc="8c2ae27d" />
 		<rom name="NBA Jam (1993)(Acclaim)(NTSC)(Jp)(Track 9 of 9)[!].wav" size="1905164" crc="34a6ed57" />
 		-->
-		<description>NBA Jam (Jpn)</description>
+		<description>NBA Jam (Japan)</description>
 		<year>1993</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-81034"/>
@@ -4355,7 +4357,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)(Track 19 of 20)[!].wav" size="1775804" crc="9bab569b" />
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)(Track 20 of 20)[!].wav" size="1298348" crc="5981f196" />
 		-->
-		<description>The Ninjawarriors (Jpn)</description>
+		<description>The Ninjawarriors (Japan)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11024"/>
@@ -4385,7 +4387,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)(Track 12 of 13)[!].wav" size="38147132" crc="4a99b106" />
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)(Track 13 of 13)[!].wav" size="20309564" crc="f05b24f0" />
 		-->
-		<description>Nobunaga no Yabou - Haouden (Jpn)</description>
+		<description>Nobunaga no Yabou - Haouden (Japan)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76024"/>
@@ -4408,7 +4410,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 1 of 2)[!].iso" size="408199168" crc="3ecc7df9" />
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 2 of 2)[!].wav" size="1528844" crc="409d75fa" />
 		-->
-		<description>Prize Fighter (Jpn)</description>
+		<description>Prize Fighter (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
@@ -4441,7 +4443,7 @@ Requires [disc swap]
 		<rom name="Psychic Detective Series vol.3 - AYA (1993)(Data West)(NTSC)(JP)(Track 6 of 7)[!].wav" size="34983692" crc="7a211cdc" />
 		<rom name="Psychic Detective Series vol.3 - AYA (1993)(Data West)(NTSC)(JP)(Track 7 of 7)[!].wav" size="58724780" crc="fff3e6a0" />
 		-->
-		<description>Psychic Detective Series vol.3 - AYA (Jpn)</description>
+		<description>Psychic Detective Series vol.3 - AYA (Japan)</description>
 		<year>1993</year>
 		<publisher>Data West</publisher>
 		<info name="serial" value="T-64024"/>
@@ -4465,7 +4467,7 @@ Requires [disc swap]
 		<rom name="Psychic Detective Series vol.4 - Orgel (1993)(Data West)(NTSC)(JP)(Track 6 of 7)[!].wav" size="26570588" crc="31f96ca5" />
 		<rom name="Psychic Detective Series vol.4 - Orgel (1993)(Data West)(NTSC)(JP)(Track 7 of 7)[!].wav" size="28565084" crc="3d533b3d" />
 		-->
-		<description>Psychic Detective Series vol.4 - Orgel (Jpn)</description>
+		<description>Psychic Detective Series vol.4 - Orgel (Japan)</description>
 		<year>1993</year>
 		<publisher>Data West</publisher>
 		<info name="serial" value="T-64034"/>
@@ -4524,14 +4526,14 @@ Requires [disc swap]
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 40 of 41)[!][G-6003P-00014B-R1M].wav" size="1067852" crc="92e6a974" />
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 41 of 41)[!][G-6003P-00014B-R1M].wav" size="1176044" crc="5cf02565" />
 		-->
-		<description>Quiz Scramble Special (Jpn, R1M)</description>
+		<description>Quiz Scramble Special (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
-		<info name="disk_ring" value="G-6003P-00014B-R1M"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6003P-00014B-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[g-6003p-00014b-r1m]" sha1="48f5a84eca3432e0a7d145f7543f300ed326b01a"/>
 			</diskarea>
@@ -4583,14 +4585,14 @@ Requires [disc swap]
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 40 of 41)[!][G-6003P-00014B-R2M].wav" size="1067852" crc="d8ed2233" />
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 41 of 41)[!][G-6003P-00014B-R2M].wav" size="1176044" crc="d95aae43" />
 		-->
-		<description>Quiz Scramble Special (Jpn, R2M)</description>
+		<description>Quiz Scramble Special (Japan, R2M)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
-		<info name="disk_ring" value="G-6003P-00014B-R2M"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6003P-00014B-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="quiz scramble special (1992)(sega)(ntsc)(jp)[g-6003p-00014b-r2m]" sha1="6b39a0b8ea9ee7860b228e5cdb0109421b9a89e9"/>
 			</diskarea>
@@ -4605,7 +4607,7 @@ Requires [disc swap]
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 3 of 4)[!].wav" size="2065100" crc="8ea2a9f5" />
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 4 of 4)[!].wav" size="13702796" crc="f104ca19" />
 		-->
-		<description>Road Blaster FX (Jpn)</description>
+		<description>Road Blaster FX (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<notes><![CDATA[
@@ -4652,7 +4654,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Secret of Monkey Island, The - Monkey Island Yurei - Kaizoku Oosoudou! (1993)(Victor)(NTSC)(JP)(Track 26 of 27)[!].wav" size="11176748" crc="c68d39eb" />
 		<rom name="Secret of Monkey Island, The - Monkey Island Yurei - Kaizoku Oosoudou! (1993)(Victor)(NTSC)(JP)(Track 27 of 27)[!].wav" size="10243004" crc="4f67b8c1" />
 		-->
-		<description>The Secret of Monkey Island - Monkey Island Yurei - Kaizoku Oosoudou! (Jpn)</description>
+		<description>The Secret of Monkey Island - Monkey Island Yurei - Kaizoku Oosoudou! (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60044"/>
@@ -4682,14 +4684,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 11 of 12)[!][compilation][G-6012P-00024-2-R1M].wav" size="3709148" crc="99a3f4e7" />
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 12 of 12)[!][compilation][G-6012P-00024-2-R1M].wav" size="12169292" crc="4df03bd7" />
 		-->
-		<description>Sega Classic Arcade Collection - Limited Edition (Jpn, R1M)</description>
+		<description>Sega Classic Arcade Collection - Limited Edition (Japan, R1M)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
-		<info name="disk_ring" value="G-6012P-00024-2-R1M"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6012P-00024-2-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[compilation][r1m]" sha1="95a970944ed0dd6a27d3795cbf695b0b2b0647e4"/>
 			</diskarea>
@@ -4712,14 +4714,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 11 of 12)[!][compilation][G-6012P-00024-2-R2M].wav" size="3711500" crc="684b3091" />
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 12 of 12)[!][compilation][G-6012P-00024-2-R2M].wav" size="12169292" crc="9406c05f" />
 		-->
-		<description>Sega Classic Arcade Collection - Limited Edition (Jpn, R2M)</description>
+		<description>Sega Classic Arcade Collection - Limited Edition (Japan, R2M)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
-		<info name="disk_ring" value="G-6012P-00024-2-R2M"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="セガクラシック"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="G-6012P-00024-2-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="sega classic arcade collection - limited edition (1992)(sega)(ntsc)(jp)[compilation][r2m]" sha1="7f7e5172ee1263bd3eaf927cf488ec2d6657cbff"/>
 			</diskarea>
@@ -4816,14 +4818,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 84 of 85)[!][T-32034P-00009-R1K].wav" size="23284844" crc="299f46b1" />
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 85 of 85)[!][T-32034P-00009-R1K].wav" size="51076076" crc="967acd0b" />
 		-->
-		<description>Seirei Shinseiki - Fhey Area (Jpn, R1K)</description>
+		<description>Seirei Shinseiki - Fhey Area (Japan, R1K)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
-		<info name="disk_ring" value="T-32034P-00009-R1K"/>
 		<info name="release" value="19920218"/>
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32034P-00009-R1K"/>
 			<diskarea name="cdrom">
 				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[t-32034p-00009-r1k]" sha1="ade3853c78d5b6a0fb12b07377f470875b253609"/>
 			</diskarea>
@@ -4919,14 +4921,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 84 of 85)[!][T-32034P-00009-R2K].wav" size="23284844" crc="507327a8" />
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 85 of 85)[!][T-32034P-00009-R2K].wav" size="51076076" crc="b7b3c759" />
 		-->
-		<description>Seirei Shinseiki - Fhey Area (Jpn, R2K)</description>
+		<description>Seirei Shinseiki - Fhey Area (Japan, R2K)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
-		<info name="disk_ring" value="T-32034P-00009-R2K"/>
 		<info name="release" value="19920218"/>
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T-32034P-00009-R2K"/>
 			<diskarea name="cdrom">
 				<disk name="seirei shinseiki - fhey area (1992)(wolf team)(ntsc)(jp)[t-32034p-00009-r2k]" sha1="5d0fe93b926309238040c94f55c010fb3673851a"/>
 			</diskarea>
@@ -4968,7 +4970,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Sengoku Denshou (1993)(Sammy)(NTSC)(JP)(Track 30 of 31)[!].wav" size="2093324" crc="01968d7e" />
 		<rom name="Sengoku Denshou (1993)(Sammy)(NTSC)(JP)(Track 31 of 31)[!].wav" size="1620572" crc="dec5de32" />
 		-->
-		<description>Sengoku Denshou (Jpn)</description>
+		<description>Sengoku Denshou (Japan)</description>
 		<year>1993</year>
 		<publisher>Sammy</publisher>
 		<info name="serial" value="T-24034"/>
@@ -4988,7 +4990,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Shadowrun (1996)(Compile)(NTSC)(JP)(Track 2 of 3)[!].wav" size="15337436" crc="bb86bcc4" />
 		<rom name="Shadowrun (1996)(Compile)(NTSC)(JP)(Track 3 of 3)[!].wav" size="15690236" crc="27fa7931" />
 		-->
-		<description>Shadowrun (Jpn)</description>
+		<description>Shadowrun (Japan)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66024"/>
@@ -5027,7 +5029,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="SimEarth (1993)(Sega)(NTSC)(JP)(Track 21 of 22)[!].wav" size="36357260" crc="fcdb7789" />
 		<rom name="SimEarth (1993)(Sega)(NTSC)(JP)(Track 22 of 22)[!].wav" size="34967228" crc="712bd72b" />
 		-->
-		<description>SimEarth (Jpn)</description>
+		<description>SimEarth (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6008"/>
@@ -5061,7 +5063,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="SoulStar (1994)(Victor)(NTSC)(JP)(en)(Track 16 of 17)[!].wav" size="39080876" crc="70e33a16" />
 		<rom name="SoulStar (1994)(Victor)(NTSC)(JP)(en)(Track 17 of 17)[!].wav" size="2114492" crc="eb13e846" />
 		-->
-		<description>SoulStar (Jpn)</description>
+		<description>SoulStar (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60184"/>
@@ -5081,14 +5083,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 2)[!][T32064P-00022-R1M].iso" size="225912832" crc="70370315" />
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 2 of 2)[!][T32064P-00022-R1M].wav" size="1300700" crc="39b15913" />
 		-->
-		<description>Thunder Storm FX (Jpn, R1)</description>
+		<description>Thunder Storm FX (Japan, R1)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-32064"/>
-		<info name="disk_ring" value="T32064P-00022-R1M"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T32064P-00022-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[t32064p-00022-r1m]" sha1="ffbb3832ad9873afa1e5d257e2f93fb3d07ca3e3"/>
 			</diskarea>
@@ -5101,14 +5103,14 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 2)[!][T32064P-00022-R2M].iso" size="225912832" crc="70370315" />
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 2 of 2)[!][T32064P-00022-R2M].wav" size="1300700" crc="e511f436" />
 		-->
-		<description>Thunder Storm FX (Jpn, R2)</description>
+		<description>Thunder Storm FX (Japan, R2)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
-		<info name="disk_ring" value="T32064P-00022-R2M"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="T32064P-00022-R2M"/>
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[t32064p-00022-r2m]" sha1="992cb2f5fd2209dd959b351c5d2f7cc548981dc7"/>
 			</diskarea>
@@ -5121,7 +5123,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Tomcat Alley (1994)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="463513600" crc="18499535" />
 		<rom name="Tomcat Alley (1994)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="1985132" crc="f5956250" />
 		-->
-		<description>Tomcat Alley (Jpn)</description>
+		<description>Tomcat Alley (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6039"/>
@@ -5141,7 +5143,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Warau Salesman (1993)(Sega)(NTSC)(JP)(Track 2 of 3)[!].wav" size="1178396" crc="90aba61c" />
 		<rom name="Warau Salesman (1993)(Sega)(NTSC)(JP)(Track 3 of 3)[!].wav" size="1526492" crc="2bee0332" />
 		-->
-		<description>Warau Salesman (Jpn)</description>
+		<description>Warau Salesman (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6006"/>
@@ -5156,6 +5158,92 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 
 
 	<!-- Tosec Demos, Bonus Discs etc. -->
+
+	<software name="heavenlydemo" cloneof="heavenly">
+		<!-- source redump.org
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo).cue" size="6110" crc="7096405f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 01).bin" size="202408416" crc="9b3fb252" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 02).bin" size="16014768" crc="129ed3da" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 03).bin" size="19707408" crc="fc68a898" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 04).bin" size="16753296" crc="32337abf" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 05).bin" size="11658864" crc="93860f87" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 06).bin" size="11228448" crc="56096ca3" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 07).bin" size="17433024" crc="dcfa821f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 08).bin" size="12324480" crc="d395cb4d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 09).bin" size="15462048" crc="c2eb664c" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 10).bin" size="26107200" crc="5686998d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 11).bin" size="11529504" crc="7c24ea79" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 12).bin" size="15377376" crc="3aa5bdc5" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 13).bin" size="21337344" crc="bdbc2d65" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 14).bin" size="2996448" crc="70b00db4" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 15).bin" size="2493120" crc="3f35ceb6" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 16).bin" size="7168896" crc="7707f5e0" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 17).bin" size="3706752" crc="8b741032" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 18).bin" size="2911776" crc="0d2c6519" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 19).bin" size="1117200" crc="421f466c" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 20).bin" size="13032432" crc="7fc3c5a7" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 21).bin" size="10499328" crc="4b6cc7ce" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 22).bin" size="9885456" crc="dad1304f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 23).bin" size="11228448" crc="c73e18cb" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 24).bin" size="10861536" crc="57a73fc5" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 25).bin" size="13220592" crc="58acd55f" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 26).bin" size="11663568" crc="bd80964d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 27).bin" size="11440128" crc="ac0f53d6" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 28).bin" size="11531856" crc="82dc6f50" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 29).bin" size="11195520" crc="4df9fad1" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 30).bin" size="11717664" crc="0cd8fd9b" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 31).bin" size="11865840" crc="18b4441d" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 32).bin" size="11376624" crc="356a93b0" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 33).bin" size="12517344" crc="1b43de31" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 34).bin" size="11983440" crc="7bd0c837" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 35).bin" size="16186464" crc="950b6a34" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 36).bin" size="14866992" crc="108f5a17" />
+		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 37).bin" size="43267392" crc="e55cb55b" />
+		-->
+		<description>Heavenly Symphony - Formula One World Championship 1993 Hibaihin (Japan)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6034"/>
+		<info name="alt_title" value="ヘブンリー シンフォニー フォームラワン ワールド チャンピオンシップ 1993 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6034-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="heavenly symphony - formula one world championship 1993 hibaihin (japan)" sha1="42524a8b0f0232df1519551e492a89300f772ff3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="keiodemo" cloneof="keio">
+		<!-- source redump.org
+		<rom name="Keiou Yuugekitai (Japan) (Demo).cue" size="1895" crc="6a5d99f2" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 01).bin" size="75790848" crc="04c07f7e" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 02).bin" size="1117200" crc="6cdfd209" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 03).bin" size="40720176" crc="1bcab310" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 04).bin" size="45922800" crc="ad73e1e6" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 05).bin" size="49062720" crc="ddb213e4" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 06).bin" size="10125360" crc="bbb14bc6" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 07).bin" size="9974832" crc="f2d4e9f4" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 08).bin" size="7441728" crc="f686ad16" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 09).bin" size="1114848" crc="b370237d" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 10).bin" size="25944912" crc="da153759" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 11).bin" size="19977888" crc="e1c594c9" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 12).bin" size="1756944" crc="0d1c28ad" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 13).bin" size="6851376" crc="9dbc18b5" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 14).bin" size="19714464" crc="cc90cc4f" />
+		<rom name="Keiou Yuugekitai (Japan) (Demo) (Track 15).bin" size="26805744" crc="abbb53dd" />
+		-->
+		<description>Keiou Yuugekitai Taikenban Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-222"/>
+		<info name="alt_title" value="慶応遊撃隊 体験版 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-222-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="keiou yuugekitai taikenban hibaihin (japan)" sha1="51cc65015c31d30d75eddef7aa2c1bfaeb2f48bf"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="lodossdemo" cloneof="lodoss">
 		<!-- source toseciso
@@ -5175,7 +5263,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (demo) (1994)(Sega)(NTSC)(JP)(Track 13 of 14)[!].wav" size="1472396" crc="993eaa8f" />
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (demo) (1994)(Sega)(NTSC)(JP)(Track 14 of 14)[!].wav" size="20638844" crc="8a53ec78" />
 		-->
-		<description>Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (Jpn, demo)</description>
+		<description>Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (Japan, demo)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5194,13 +5282,77 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(Jp)(Track 4 of 5)[!][Premium CD][audio cd].wav" size="64308428" crc="955cbf79" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(Jp)(Track 5 of 5)[!][Premium CD][audio cd].wav" size="12642044" crc="59c495bf" />
 		-->
-		<description>Lunar - Eternal Blue - Premium CD (Jpn) [CD-Audio]</description>
+		<description>Lunar - Eternal Blue - Premium CD (Japan) [CD-Audio]</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue - premium cd (1994)(game arts)(jp)[lunar - eternal blue, t-45074][cd-audio]" sha1="2b22660e21e1262414424df90ec30eac8df638c6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="lunar2demo" cloneof="lunar2">
+		<!-- source redump.org
+		<rom name="Lunar - Eternal Blue (Japan) (Demo).cue" size="240" crc="e130f104" />
+		<rom name="Lunar - Eternal Blue (Japan) (Demo) (Track 1).bin" size="38706864" crc="66c67434" />
+		<rom name="Lunar - Eternal Blue (Japan) (Demo) (Track 2).bin" size="1611120" crc="18661dfb" />
+		-->
+		<description>Lunar - Eternal Blue Hibaihin Auto Demo (Japan)</description>
+		<year>1994</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45074"/>
+		<info name="alt_title" value="ルナ-エターナルブルー 非売品 オートデモ"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45074 MT B01"/>
+			<diskarea name="cdrom">
+				<disk name="lunar - eternal blue hibaihin auto demo (japan)" sha1="cc87b4610877d135207100c2eff7affa572ef56c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="microcosdemo" cloneof="microcos">
+		<!-- source redump.org
+		<rom name="Microcosm (Japan) (Demo).cue" size="1067" crc="512f02d3" />
+		<rom name="Microcosm (Japan) (Demo) (Track 1).bin" size="274203216" crc="5c4ae0c1" />
+		<rom name="Microcosm (Japan) (Demo) (Track 2).bin" size="20993952" crc="5a892270" />
+		<rom name="Microcosm (Japan) (Demo) (Track 3).bin" size="22755600" crc="d4110a7d" />
+		<rom name="Microcosm (Japan) (Demo) (Track 4).bin" size="21873600" crc="2beb48b8" />
+		<rom name="Microcosm (Japan) (Demo) (Track 5).bin" size="35985600" crc="708877db" />
+		<rom name="Microcosm (Japan) (Demo) (Track 6).bin" size="24519600" crc="aa292aba" />
+		<rom name="Microcosm (Japan) (Demo) (Track 7).bin" size="22755600" crc="03a29b6f" />
+		<rom name="Microcosm (Japan) (Demo) (Track 8).bin" size="21873600" crc="bba6b7c9" />
+		<rom name="Microcosm (Japan) (Demo) (Track 9).bin" size="23988048" crc="9956dc95" />
+		-->
+		<description>Microcosm Demo CD (Japan)</description>
+		<year>1994</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-10003"/>
+		<info name="alt_title" value="マイクロコズム デモCD"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-10003-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="microcosm demo cd (japan)" sha1="2983f32c9c63753cc3acbd5160cd830b8b844090"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ntrapdemo" cloneof="ntrap">
+		<!-- source redump.org
+		<rom name="Night Trap (Japan) (Demo).cue" size="243" crc="9dce8d3d" />
+		<rom name="Night Trap (Japan) (Demo) (Track 1).bin" size="615875904" crc="03e24407" />
+		<rom name="Night Trap (Japan) (Demo) (Track 2).bin" size="2587200" crc="1cc25944" />
+		-->
+		<description>Night Trap Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6025"/>
+		<info name="alt_title" value="ナイトトラップ 非売品"/>
+		<part name="cdrom1" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6025-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="night trap hibaihin (japan)" sha1="b852a032c5e49655a060cad7f6e18a205578be1f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5224,12 +5376,144 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)(Track 14 of 15)[!][Original Sound Track Ver. 2][audio cd].wav" size="20655308" crc="ee061041" />
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)(Track 15 of 15)[!][Original Sound Track Ver. 2][audio cd].wav" size="24021020" crc="b25d006c" />
 		-->
-		<description>Nostalgia 1907 in North Atlantic Sea - Original Sound Track Ver. 2 (Jpn) [CD-Audio]</description>
+		<description>Nostalgia 1907 in North Atlantic Sea - Original Sound Track Ver. 2 (Japan) [CD-Audio]</description>
 		<year>1992</year>
 		<publisher>Takeru</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="nostalgia 1907 in north atlantic sea - original sound track ver. 2 (1991)(takeru)(jp)[cd-audio]" sha1="412a33f70581ae445681a39897e42ea9fbf60c50"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="popmaildemo" cloneof="popmail">
+		<!-- source redump.org
+		<rom name="PopfulMail (Japan) (Demo).cue" size="362" crc="9a2711d1" />
+		<rom name="PopfulMail (Japan) (Demo) (Track 1).bin" size="353736096" crc="6ec9ff55" />
+		<rom name="PopfulMail (Japan) (Demo) (Track 2).bin" size="25133472" crc="4afcdca3" />
+		<rom name="PopfulMail (Japan) (Demo) (Track 3).bin" size="42778176" crc="f64659a4" />
+		-->
+		<description>Popful Mail Taikenban Hibaihin (Japan)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6029"/>
+		<info name="alt_title" value="ぽっぷるメイル 体験版 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6029-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="popful mail taikenban hibaihin (japan)" sha1="c09abf833cb576503c745affbfd3d091ccc76a27"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Disc hangs after booting. -->
+	<software name="psychic3demo" cloneof="psychic3" supported="no">
+		<!-- Source: Redump
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Demo).cue" size="274" crc="12b48e06" />
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Demo) (Track 1).bin" size="17324832" crc="91c8008c" />
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Demo) (Track 2).bin" size="6037584" crc="b036819f" />
+		-->
+		<description>Psychic Detective Series vol.3 - AYA Auto Demo (Japan)</description>
+		<year>1993</year>
+		<publisher>Data West</publisher>
+		<info name="serial" value="T-84024 DWMD2905"/>
+		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA AUTO DEMO"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="DWMD-2905"/>
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 3 - aya auto demo (japan)" sha1="5402ed98cd6f980e97473071630362d6f63c5f0e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Disc does not boot due to improper mastering. More info can be found at the Redump link. -->
+	<software name="silpheeddemo" cloneof="silpheed" supported="no">
+		<!-- source redump.org - http://redump.org/disc/39378/
+		<rom name="Silpheed (Japan) (Demo).cue" size="216" crc="84cd95f7" />
+		<rom name="Silpheed (Japan) (Demo) (Track 1).bin" size="369174624" crc="70ab8271" />
+		<rom name="Silpheed (Japan) (Demo) (Track 2).bin" size="1058400" crc="b22e5a2a" />
+		-->
+		<description>Silpheed Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45054"/>
+		<info name="alt_title" value="シルフィード 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45054 MT 1B1 +"/>
+			<diskarea name="cdrom">
+				<disk name="silpheed hibaihin (japan)" sha1="18f438c6fce0f143046fc4eeb15eec6fb47a1631"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="silpheeddemof" cloneof="silpheed" supported="no">
+		<!-- source redump.org
+		<rom name="Silpheed (Japan) (Demo) (Fixed Dump).cue" size="242" crc="87d9d2bb" />
+		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 1).bin" size="369174624" crc="6b59f551" />
+		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 2).bin" size="1058400" crc="648c227c" />
+		-->
+		<description>Silpheed Hibaihin (Japan) (fixed)</description>
+		<year>1993</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45054"/>
+		<info name="alt_title" value="シルフィード 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45054 MT 1B1 +"/>
+			<diskarea name="cdrom">
+				<disk name="silpheed hibaihin (japan) (fixed)" sha1="12c371524399e53978e57b17673265a3d9cf9b80"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="soniccddemo" cloneof="soniccd">
+		<!-- source redump.org
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo).cue" size="4590" crc="c5f52249" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 01).bin" size="129592848" crc="128ac97f" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 02).bin" size="1093680" crc="b5575d36" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 03).bin" size="19077072" crc="fc6ec59e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 04).bin" size="14231952" crc="fb6c1ae5" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 05).bin" size="14827008" crc="1e0d8f87" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 06).bin" size="17567088" crc="acd1383f" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 07).bin" size="13980288" crc="293daff5" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 08).bin" size="14342496" crc="038ddf9e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 09).bin" size="20278944" crc="e4932318" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 10).bin" size="14041440" crc="a583cc24" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 11).bin" size="13653360" crc="c0b8e3ef" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 12).bin" size="18016320" crc="021318e0" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 13).bin" size="13573392" crc="68d8d7de" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 14).bin" size="11411904" crc="ea181442" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 15).bin" size="16231152" crc="092b16d8" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 16).bin" size="10932096" crc="4bd4f694" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 17).bin" size="14048496" crc="9c978637" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 18).bin" size="20137824" crc="ecf914a0" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 19).bin" size="12881904" crc="96c5de23" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 20).bin" size="11783520" crc="6c51ddc6" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 21).bin" size="14942256" crc="98e7a25e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 22).bin" size="11607120" crc="874c1767" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 23).bin" size="12816048" crc="9ec4920e" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 24).bin" size="14088480" crc="a55590e6" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 25).bin" size="14660016" crc="a48ca9dd" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 26).bin" size="5294352" crc="dab24994" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 27).bin" size="5296704" crc="b7a17d88" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 28).bin" size="1458240" crc="6b3db1ca" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 29).bin" size="3988992" crc="c69de397" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 30).bin" size="3869040" crc="7142a282" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 31).bin" size="2008608" crc="59e1254d" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 32).bin" size="21513744" crc="725d71e3" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 33).bin" size="21873600" crc="646b66ee" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 34).bin" size="16214688" crc="ad32fc11" />
+		<rom name="Sonic the Hedgehog CD (Japan) (Demo) (Track 35).bin" size="32104800" crc="e63f110d" />
+		-->
+		<description>Sonic the Hedgehog CD Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6021"/>
+		<info name="alt_title" value="ソニック・ザ・ヘッジホッグCD 非売品"/>
+		<info name="usage" value="Game will not boot if the system backup RAM is not formatted."/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6021-R3M V"/>
+			<diskarea name="cdrom">
+				<disk name="sonic the hedgehog cd hibaihin (japan)" sha1="fc5d4690bfc10e4fe6bb81a753c7750b99c2cb46"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5240,7 +5524,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 1 of 2)[!][audio cd].wav" size="39765308" crc="0a7b2e1e" />
 		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 2 of 2)[!][audio cd].wav" size="47239964" crc="d41f2e03" />
 		-->
-		<description>Tenbu Mega CD Special (Jpn) [CD-Audio]</description>
+		<description>Tenbu Mega CD Special (Japan) [CD-Audio]</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32084"/>
@@ -5251,6 +5535,116 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
+	<software name="thawkdemo" cloneof="thawk">
+		<!-- source redump.org
+		<rom name="Thunderhawk (Japan) (Demo).cue" size="365" crc="9a4d410f" />
+		<rom name="Thunderhawk (Japan) (Demo) (Track 1).bin" size="23204832" crc="be4dae9e" />
+		<rom name="Thunderhawk (Japan) (Demo) (Track 2).bin" size="38539872" crc="89ddd6fb" />
+		<rom name="Thunderhawk (Japan) (Demo) (Track 3).bin" size="40710768" crc="52b325f7" />
+		-->
+		<description>Thunderhawk Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-10002"/>
+		<info name="alt_title" value="サンダーホーク 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-10002-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="thunderhawk hibaihin (japan)" sha1="533205e617a7514de1d9e877c3cc0597ca92e4ea"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="uruseiyademo" cloneof="uruseiya">
+		<!-- source redump.org
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo).cue" size="474" crc="d3d46675" />
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 1).bin" size="6077568" />
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 2).bin" size="21080976" />
+		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Demo) (Track 3).bin" size="6787872" />
+		-->
+		<description>Urusei Yatsura - Dear My Friends Hibaihin (Japan)</description>
+		<year>1994</year>
+		<publisher>Game Arts</publisher>
+		<info name="serial" value="ST-45064"/>
+		<info name="alt_title" value="うる星やつら ディア マイ フレンズ 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="ST-45064P MT B01"/>
+			<diskarea name="cdrom">
+				<disk name="urusei yatsura - dear my friends hibaihin (japan)" sha1="7a96e2445094a93d14934ab454585d4077ecc3ca"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yumemidemo" cloneof="yumemi">
+		<!-- Source: Redump.org
+		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo).cue" size="277" crc="bf0d9c31" />
+		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo) (Track 1).bin" size="625389744" crc="7ed0b9bc" />
+		<rom name="Yumemi Yakata no Monogatari (Japan) (Demo) (Track 2).bin" size="7190064" crc="1d6aa9a6" />
+		-->
+		<description>Yumemi Yakata no Monogatari Hibaihin (Japan)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="SG-6027"/>
+		<info name="alt_title" value="夢見館の物語 非売品"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SG-6027-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="yumemi yakata no monogatari hibaihin (japan)" sha1="b7ac1185ea75ec042e8be9e1bdce091bfb0b906b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wmcolb" cloneof="wmcol">
+		<!-- Source: Redump.org
+		<rom name="WonderMega Collection (Japan) (Rev 2).cue" size="4625" crc="cce652f6" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 01).bin" size="67032000" crc="45fdc758" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 02).bin" size="41103552" crc="4dfccbd1" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 03).bin" size="53978400" crc="2fef586a" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 04).bin" size="50274000" crc="d1302737" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 05).bin" size="44100000" crc="43d25389" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 06).bin" size="16981440" crc="0a87a971" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 07).bin" size="10372320" crc="a78f862a" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 08).bin" size="17068464" crc="b055c714" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 09).bin" size="12634944" crc="e2234b67" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 10).bin" size="20290704" crc="4a0f521b" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 11).bin" size="15612576" crc="fe87ea56" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 12).bin" size="11538912" crc="1b7cac73" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 13).bin" size="11513040" crc="2688ac43" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 14).bin" size="15419712" crc="4845e480" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 15).bin" size="12310368" crc="ec5673c0" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 16).bin" size="23233056" crc="0f93eb7d" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 17).bin" size="22715616" crc="67851c47" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 18).bin" size="8676528" crc="e00850f4" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 19).bin" size="19406352" crc="f61f2ec8" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 20).bin" size="14177856" crc="a6cc0a6c" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 21).bin" size="12350352" crc="855bbd39" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 22).bin" size="13307616" crc="a9c9cfb8" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 23).bin" size="16400496" crc="22c61e2a" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 24).bin" size="6505632" crc="01f7b9bd" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 25).bin" size="18987696" crc="eb170a21" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 26).bin" size="5047392" crc="ff978679" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 27).bin" size="9732576" crc="ec68257e" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 28).bin" size="10941504" crc="94d58ebd" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 29).bin" size="6009360" crc="5d1b2db2" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 30).bin" size="7321776" crc="a087de5f" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 31).bin" size="3944304" crc="853af7cd" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 32).bin" size="3756144" crc="dd717c44" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 33).bin" size="3203424" crc="4f8838eb" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 34).bin" size="5738880" crc="92ee9a3c" />
+		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 35).bin" size="3154032" crc="b70def8c" />
+		-->
+		<description>WonderMega Collection - Game Garden (alt)</description>
+		<year>1992</year>
+		<publisher>Victor Entertainment</publisher>
+		<info name="serial" value="CDS-135"/>
+		<info name="alt_title" value="ワンダーメガ コレクション"/>
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="CDS-135-3-R1M V"/>
+			<diskarea name="cdrom">
+				<disk name="wondermega collection - game garden (japan) (alt)" sha1="968f935a26ed155318382bccf86218a7da5c065b"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- Misc sourced dumps -->
 

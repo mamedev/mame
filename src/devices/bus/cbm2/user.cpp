@@ -62,12 +62,6 @@ cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, cons
 void cbm2_user_port_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_sp.resolve_safe();
-	m_write_cnt.resolve_safe();
-	m_write_flag.resolve_safe();
 }
 
 

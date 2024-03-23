@@ -88,6 +88,8 @@ Roms: row d-e sex a1       - type 27128
 #include "trvmadns.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -428,6 +430,8 @@ ROM_START( trvmadnsa )
 	ROM_REGION(0x2c, "pal", 0)
 	ROM_LOAD("pal10l8_la1.u5", 0x00, 0x2c, CRC(66d6eee0) SHA1(f95d9bfc2a6038237014eec30d859d8b8c296725))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

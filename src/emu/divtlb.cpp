@@ -68,7 +68,7 @@ void device_vtlb_interface::interface_validity_check(validity_checker &valid) co
 		const address_space_config *spaceconfig = intf->space_config(m_space);
 		if (spaceconfig == nullptr)
 			osd_printf_error("No memory address space configuration found for space %d\n", m_space);
-		else if ((1 << spaceconfig->page_shift()) <= VTLB_FLAGS_MASK || spaceconfig->logaddr_width() <= spaceconfig->page_shift())
+		else if ((1 << spaceconfig->page_shift()) <= FLAGS_MASK || spaceconfig->logaddr_width() <= spaceconfig->page_shift())
 			osd_printf_error("Invalid page shift %d for VTLB\n", spaceconfig->page_shift());
 	}
 }
@@ -142,11 +142,10 @@ void device_vtlb_interface::interface_pre_reset()
 //  response to an unmapped access
 //-------------------------------------------------
 
-bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
+bool device_vtlb_interface::vtlb_fill(offs_t address, offs_t taddress, int intention)
 {
 	offs_t tableindex = address >> m_pageshift;
 	vtlb_entry entry = m_table[tableindex];
-	offs_t taddress;
 
 #if PRINTF_TLB
 	osd_printf_debug("vtlb_fill: %08X(%X) ... ", address, intention);
@@ -164,18 +163,8 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 		return false;
 	}
 
-	// ask the CPU core to translate for us
-	taddress = address;
-	if (!device().memory().translate(m_space, intention, taddress))
-	{
-#if PRINTF_TLB
-		osd_printf_debug("failed: no translation\n");
-#endif
-		return false;
-	}
-
 	// if this is the first successful translation for this address, allocate a new entry
-	if ((entry & VTLB_FLAGS_MASK) == 0)
+	if ((entry & FLAGS_MASK) == 0)
 	{
 		int liveindex = m_dynindex;
 
@@ -196,7 +185,7 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 
 		// form a new blank entry
 		entry = (taddress >> m_pageshift) << m_pageshift;
-		entry |= VTLB_FLAG_VALID;
+		entry |= FLAG_VALID;
 
 #if PRINTF_TLB
 		osd_printf_debug("success (%08X), new entry\n", taddress);
@@ -207,7 +196,7 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 	else
 	{
 		assert((entry >> m_pageshift) == (taddress >> m_pageshift));
-		assert(entry & VTLB_FLAG_VALID);
+		assert(entry & FLAG_VALID);
 
 #if PRINTF_TLB
 		osd_printf_debug("success (%08X), existing entry\n", taddress);
@@ -215,7 +204,7 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 	}
 
 	// add the intention to the list of valid intentions and store
-	entry |= 1 << (intention & (TRANSLATE_TYPE_MASK | TRANSLATE_USER_MASK));
+	entry |= 1 << intention;
 	m_table[tableindex] = entry;
 	return true;
 }
@@ -256,7 +245,7 @@ void device_vtlb_interface::vtlb_load(int entrynum, int numpages, offs_t address
 	m_refcnt[tableindex]++;
 
 	// store the raw value, making sure the "fixed" flag is set
-	value |= VTLB_FLAG_FIXED;
+	value |= FLAG_FIXED;
 	m_fixedpages[entrynum] = numpages;
 	for (pagenum = 0; pagenum < numpages; pagenum++)
 		m_table[tableindex + pagenum] = value + (pagenum << m_pageshift);
@@ -283,7 +272,7 @@ void device_vtlb_interface::vtlb_dynload(u32 index, offs_t address, vtlb_entry v
 	m_dynindex = (m_dynindex + 1) % m_dynamic;
 
 	// is entry already live?
-	if (!(entry & VTLB_FLAG_VALID))
+	if (!(entry & FLAG_VALID))
 	{
 		// if an entry already exists at this index, free it
 		if (m_live[liveindex] != 0)
@@ -294,7 +283,7 @@ void device_vtlb_interface::vtlb_dynload(u32 index, offs_t address, vtlb_entry v
 	}
 	// form a new blank entry
 	entry = (address >> m_pageshift) << m_pageshift;
-	entry |= VTLB_FLAG_VALID | value;
+	entry |= FLAG_VALID | value;
 
 #if PRINTF_TLB
 	osd_printf_debug("success (%08X), new entry\n", address);
@@ -356,7 +345,7 @@ void device_vtlb_interface::vtlb_flush_address(offs_t address)
 //  the linear VTLB lookup table
 //-------------------------------------------------
 
-const vtlb_entry *device_vtlb_interface::vtlb_table() const
+const device_vtlb_interface::vtlb_entry *device_vtlb_interface::vtlb_table() const
 {
 	return m_table_base;
 }

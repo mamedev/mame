@@ -51,15 +51,10 @@ void cdu75s_device::mem_map(address_map &map)
 	map(0xc0000, 0xc003f); // CXD1808AQ
 }
 
-void cdu75s_device::io_map(address_map &map)
-{
-}
-
 void cdu75s_device::device_add_mconfig(machine_config &config)
 {
 	H83032(config, m_mcu, 33.8688_MHz_XTAL/2);
 	m_mcu->set_addrmap(AS_PROGRAM, &cdu75s_device::mem_map);
-	m_mcu->set_addrmap(AS_IO, &cdu75s_device::io_map);
 
 	NCR53C94(config, m_scsi, 25'000'000); // FAS204, compatible
 }

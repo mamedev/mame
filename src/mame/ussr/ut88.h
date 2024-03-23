@@ -5,8 +5,8 @@
  * includes/ut88.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_UT88_H
-#define MAME_INCLUDES_UT88_H
+#ifndef MAME_USSR_UT88_H
+#define MAME_USSR_UT88_H
 
 #pragma once
 
@@ -126,4 +126,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_UT88_H
+#endif // MAME_USSR_UT88_H

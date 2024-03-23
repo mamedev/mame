@@ -5,8 +5,8 @@
  *  Implementation of ASIC65
  *
  *************************************/
-#ifndef MAME_MACHINE_ASIC65_H
-#define MAME_MACHINE_ASIC65_H
+#ifndef MAME_ATARI_ASIC65_H
+#define MAME_ATARI_ASIC65_H
 
 #pragma once
 
@@ -73,9 +73,9 @@ private:
 	u16  m_68data;
 	u16  m_tdata;
 
-	DECLARE_READ_LINE_MEMBER( get_bio );
+	int get_bio();
 };
 
 DECLARE_DEVICE_TYPE(ASIC65, asic65_device)
 
-#endif // MAME_MACHINE_ASIC65_H
+#endif // MAME_ATARI_ASIC65_H

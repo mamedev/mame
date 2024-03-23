@@ -26,8 +26,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_AUDIO_BU3905_H
-#define MAME_AUDIO_BU3905_H
+#ifndef MAME_ROLAND_BU3905_H
+#define MAME_ROLAND_BU3905_H
 
 #pragma once
 
@@ -45,7 +45,7 @@ public: // construction/destruction
 
 	void write(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(axi_w);
+	void axi_w(int state);
 
 protected:
 	// device-level overrides
@@ -55,4 +55,4 @@ protected:
 // device type declaration
 DECLARE_DEVICE_TYPE(BU3905, bu3905_device)
 
-#endif // MAME_AUDIO_BU3905_H
+#endif // MAME_ROLAND_BU3905_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_MACHINE_KAY_KBD_H
-#define MAME_MACHINE_KAY_KBD_H
+#ifndef MAME_KAYPRO_KAY_KBD_H
+#define MAME_KAYPRO_KAY_KBD_H
 
 #pragma once
 
@@ -19,7 +19,7 @@ public:
 
 	auto rxd_cb() { return m_rxd_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(txd_w) { m_txd = state ? 1U : 0U; }
+	void txd_w(int state) { m_txd = state ? 1U : 0U; }
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -30,7 +30,7 @@ protected:
 	uint8_t p1_r();
 	uint8_t p2_r();
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t1_r();
 	uint8_t bus_r();
 	void bus_w(uint8_t data);
 
@@ -48,4 +48,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KAYPRO_10_KEYBOARD, kaypro_10_keyboard_device)
 
-#endif // MAME_MACHINE_KAY_KBD_H
+#endif // MAME_KAYPRO_KAY_KBD_H

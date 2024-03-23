@@ -1,31 +1,40 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Kasparov Leonardo, Saitek Kasparov Galileo.
 
 This is SciSys's answer to H+G Mephisto modular chesscomputers, but unlike the
 Mephistos, these boards are actual chesscomputers and not an accessory.
 
+NOTE: In order for NVRAM to work properly, press the STOP button to turn off
+the chesscomputer before exiting MAME. Other than ACL (which is an unemulated
+hardware button that disconnects the battery), there is no known method to
+force a cold boot. So if NVRAM somehow becomes broken, remove the NVRAM files.
+
 They called the expansion capability "OSA", for "Open Systems Architecture".
-A serial port for linking to a PC, and a parallel port for expansion modules.
-The expansion modules are basically entire chesscomputers, making the whole
-thing combined a 'dual brain' chesscomputer. The embedded chess engine is by
-Julio Kaplan and Craig Barnes, same as the one in SciSys Turbo S-24K.
+A serial port for linking to a PC or homecomputer, and a parallel port for
+expansion modules. The expansion modules are basically entire chesscomputers,
+making the whole thing combined a 'dual brain' chesscomputer. The embedded chess
+engine is by Julio Kaplan and Craig Barnes, same as the one in Turbo S-24K.
+
+OSA serial link transmission format: 1 start bit, 8 data bits, 1 stop bit, no
+parity. The default baudrate is 1200. To establish a connection, command "o" must
+be entered first (from eg. a terminal), and then the Comm. LED will turn on.
 
 Hardware notes:
 
 Leonardo (1986):
-- 6301Y0 MCU @ 12MHz
+- HD6301Y0P MCU @ 12MHz
 - 32KB ROM(27C256)
 - 8KB RAM(M5M5165P-15 or compatible)
 - magnet sensors chessboard with 16 leds
 
-The 6301Y0 was seen with internal maskrom serial A96 and B40. It appears to be
-running in mode 1 (expanded mode): the internal ROM is disabled and the MCU can
-be emulated as if it's a HD6303Y. It's not known what's on the internal ROM,
-it could even be from another SciSys chesscomputer.
+The 6301Y0 was seen with internal maskrom serial A96 and B40. It is actually
+one from another SciSys chesscomputer (Turbo 16K or Turbo S-24K). It appears to
+be running in mode 1 (expanded mode): the internal ROM is disabled and the MCU
+can be emulated as if it's a 6303Y.
 
 Galileo (1988):
 - HD6303YP MCU @ 12MHz
@@ -48,18 +57,15 @@ The Sparc module doesn't appear to work with it either. Moreover, the Sparc modu
 manual mentions that for it to work properly on Leonardo, the chesscomputer needs
 to be upgraded with an EMI PCB (power supply related, meaningless for emulation).
 
-TODO:
-- OSA PC link, uses MCU serial interface
-- add nvram (MCU port $14?)
-- add power-off, not useful with missing nvram support
-
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/input_merger.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
@@ -67,8 +73,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_galileo.lh" // clickable
-#include "saitek_leonardo.lh" // clickable
+#include "saitek_galileo.lh"
+#include "saitek_leonardo.lh"
 
 
 namespace {
@@ -84,8 +90,11 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
+		m_rs232(*this, "rs232"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 	void leonardo(machine_config &config);
 	void leonardoa(machine_config &config);
@@ -102,16 +111,22 @@ private:
 	required_device<input_merger_device> m_stb;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	optional_device<speaker_sound_device> m_dac;
+	required_device<speaker_sound_device> m_dac;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<9> m_inputs;
+
+	int m_ack_state = 0;
+	int m_rts_state = 0;
+	u8 m_inp_mux = 0;
+	u8 m_led_data[2] = { };
 
 	void main_map(address_map &map);
 
 	void update_display();
 	void mux_w(u8 data);
 	void leds_w(u8 data);
-	u8 unk_r();
-	void unk_w(u8 data);
+	u8 p1_r();
+	void p1_w(u8 data);
 	void exp_rts_w(int state);
 
 	u8 p2_r();
@@ -120,11 +135,6 @@ private:
 	void p5_w(u8 data);
 	u8 p5_r();
 	void p6_w(u8 data);
-
-	int m_ack_state = 0;
-	int m_rts_state = 0;
-	u8 m_inp_mux = 0;
-	u8 m_led_data[2] = { };
 };
 
 void leo_state::machine_start()
@@ -135,23 +145,35 @@ void leo_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
+
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
+
+// power
+
 void leo_state::machine_reset()
 {
 	m_stb->in_clear<0>();
 }
 
+INPUT_CHANGED_MEMBER(leo_state::go_button)
+{
+	if (newval && m_maincpu->standby())
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		machine_reset();
+	}
+}
 
-
-/******************************************************************************
-    I/O
-******************************************************************************/
 
 // misc
 
 void leo_state::update_display()
 {
 	m_display->matrix_partial(0, 8, 1 << (m_inp_mux & 0xf), m_led_data[0]);
-	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (~m_inp_mux << 2 & 0x300) | m_led_data[1]);
+	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (m_inp_mux << 2 & 0x300) | m_led_data[1]);
 }
 
 void leo_state::mux_w(u8 data)
@@ -159,7 +181,7 @@ void leo_state::mux_w(u8 data)
 	// d0-d3: input/chessboard led mux
 	// d5: button led select
 	// d6,d7: button led data
-	m_inp_mux = data;
+	m_inp_mux = data ^ 0xc0;
 	update_display();
 
 	// d4: speaker out
@@ -168,20 +190,20 @@ void leo_state::mux_w(u8 data)
 
 void leo_state::leds_w(u8 data)
 {
-	// button led data
+	// d0-d7: button led data
 	m_led_data[1] = ~data;
 	update_display();
 }
 
-u8 leo_state::unk_r()
+u8 leo_state::p1_r()
 {
-	// ?
+	// ? this is where 6301 port 1 is, but 6303 doesn't have port 1
 	return 0xff;
 }
 
-void leo_state::unk_w(u8 data)
+void leo_state::p1_w(u8 data)
 {
-	// ?
+	// ? " (toggles bit 0)
 }
 
 void leo_state::exp_rts_w(int state)
@@ -199,86 +221,86 @@ u8 leo_state::p2_r()
 {
 	u8 data = 0;
 
-	// d0-d2: multiplexed inputs
-	u8 mux = (m_inp_mux & 8) ? 8 : (m_inp_mux & 7);
-	data = m_inputs[mux]->read();
+	// P20-P22: multiplexed inputs
+	if ((m_inp_mux & 0xf) <= 8)
+		data = m_inputs[m_inp_mux & 0xf]->read();
 
-	// d3: ?
+	// P23: serial rx
+	data |= m_rs232->rxd_r() << 3;
 
-	return ~data;
+	return ~data ^ 8;
 }
 
 void leo_state::p2_w(u8 data)
 {
-	// d5,d6: chessboard led column data
+	// P24: serial tx (TTL)
+	m_rs232->write_txd(BIT(data, 4));
+
+	// P25,P26: chessboard led column data
 	m_led_data[0] = (m_led_data[0] & ~3) | (~data >> 5 & 3);
 	update_display();
-
-	// other: ?
 }
 
 u8 leo_state::p5_r()
 {
-	// d1: N/C, d4: IS strobe (handled with inputline)
+	// P51: N/C, d4: IS strobe (handled with inputline)
 	return 0xff ^ 0x10;
 }
 
 void leo_state::p5_w(u8 data)
 {
-	// d2: expansion NMI-P
+	// P52: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 2));
 
-	// d3: NAND with STB-P
+	// P53: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// d5: expansion ACK-P (recursive NAND with RTS-P)
+	// P55: expansion ACK-P (recursive NAND with RTS-P)
 	int ack_state = BIT(data, 5);
 	if (m_rts_state || !ack_state)
 		m_expansion->ack_w(ack_state);
 	m_ack_state = ack_state;
 
-	// d6,d7: chessboard led row data
+	// P56,P57: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);
 	update_display();
 
-	// d0: power-off on falling edge
+	// P50: power-off on falling edge
 	m_expansion->pw_w(data & 1);
 }
 
 u8 leo_state::p6_r()
 {
-	// read chessboard sensors and module data
+	// P60-P67: read chessboard sensors and module data
 	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void leo_state::p6_w(u8 data)
 {
-	// module data
+	// P60-P67: module data
 	m_expansion->data_w(data);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void leo_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
-	map(0x0002, 0x0002).rw(FUNC(leo_state::unk_r), FUNC(leo_state::unk_w)); // external
-	map(0x0040, 0x013f).ram(); // internal
-	map(0x4000, 0x5fff).ram();
-	map(0x6000, 0x6000).w(FUNC(leo_state::mux_w));
-	map(0x7000, 0x7000).w(FUNC(leo_state::leds_w));
+	map(0x0002, 0x0002).rw(FUNC(leo_state::p1_r), FUNC(leo_state::p1_w)); // external
+	map(0x4000, 0x5fff).ram().share("nvram");
+	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(leo_state::mux_w));
+	map(0x7000, 0x7000).mirror(0x0fff).w(FUNC(leo_state::leds_w));
 	map(0x8000, 0xffff).rom();
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( leonardo )
 	PORT_START("IN.0")
@@ -329,8 +351,7 @@ static INPUT_PORTS_START( leonardo )
 	PORT_CONFSETTING(    0x04, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("ACL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, leo_state, go_button, 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galileo ) // same buttons, but different locations
@@ -363,20 +384,23 @@ static INPUT_PORTS_START( galileo ) // same buttons, but different locations
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Set Up")
 
 	PORT_MODIFY("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, leo_state, go_button, 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void leo_state::leonardo(machine_config &config)
 {
 	// basic machine hardware
 	HD6303Y(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leo_state::main_map);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6303y_cpu_device::nvram_set_battery));
+	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->in_p2_cb().set(FUNC(leo_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(leo_state::p2_w));
 	m_maincpu->in_p5_cb().set(FUNC(leo_state::p5_r));
@@ -385,13 +409,16 @@ void leo_state::leonardo(machine_config &config)
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
 
 	INPUT_MERGER_ANY_LOW(config, m_stb);
-	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
+	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS3_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+2, 8+2);
@@ -401,10 +428,13 @@ void leo_state::leonardo(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	// expansion module
+	// expansion module (configure after video)
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
 	m_expansion->stb_handler().set(m_stb, FUNC(input_merger_device::in_w<0>));
 	m_expansion->rts_handler().set(FUNC(leo_state::exp_rts_w));
+
+	// rs232 (configure after expansion module)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 void leo_state::leonardoa(machine_config &config)
@@ -421,9 +451,9 @@ void leo_state::galileo(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( leonardo ) // OSA version string: Version 1.4
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -449,13 +479,13 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, leonardo,  0,        0,   leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, leonardoa, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, leonardob, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, leonardo,  0,        0,      leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, leonardoa, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, leonardob, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, galileo,   leonardo, 0,   galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, galileo,   leonardo, 0,      galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

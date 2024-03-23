@@ -274,7 +274,7 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "emu.h"
 #include "namconb1.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "sound/c352.h"
 
 #include "speaker.h"

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCOS2_ROZ_H
-#define MAME_VIDEO_NAMCOS2_ROZ_H
+#ifndef MAME_NAMCO_NAMCOS2_ROZ_H
+#define MAME_NAMCO_NAMCOS2_ROZ_H
 
 #pragma once
 
@@ -43,5 +43,5 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device)
 
-#endif // MAME_VIDEO_NAMCOS2_ROZ_H
+#endif // MAME_NAMCO_NAMCOS2_ROZ_H
 

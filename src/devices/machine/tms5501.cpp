@@ -60,7 +60,7 @@ tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, d
 	device_serial_interface(mconfig, *this),
 	m_write_int(*this),
 	m_write_xmt(*this),
-	m_read_xi(*this),
+	m_read_xi(*this, 0),
 	m_write_xo(*this),
 	m_irq(IRQ_TB),
 	m_rb(0),
@@ -81,12 +81,6 @@ tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, d
 
 void tms5501_device::device_start()
 {
-	// resolve callbacks
-	m_write_int.resolve_safe();
-	m_write_xmt.resolve_safe();
-	m_read_xi.resolve_safe(0);
-	m_write_xo.resolve_safe();
-
 	// create timers
 	m_timer[TIMER_1] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
 	m_timer[TIMER_2] = timer_alloc(FUNC(tms5501_device::timer_expired), this);

@@ -22,8 +22,8 @@ public:
 	// construction/destruction
 	isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1) { m_isa->irq4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2) { m_isa->irq3_w(state); }
+	void pc_com_interrupt_1(int state) { m_isa->irq4_w(state); }
+	void pc_com_interrupt_2(int state) { m_isa->irq3_w(state); }
 
 protected:
 	isa8_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

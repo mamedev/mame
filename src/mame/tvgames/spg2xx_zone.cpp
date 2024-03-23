@@ -8,6 +8,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class wireless60_state : public spg2xx_game_state
 {
 public:
@@ -356,6 +358,9 @@ ROM_START( lx_jg7410 )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "55lv100.u4", 0x0000, 0x8000000, CRC(60476576) SHA1(83592e43d9169c95f6b22903e8d708e96ad02611) )
 ROM_END
+
+} // anonymous namespace
+
 
 // These have games from Waixing and were likely manufactured  by Subor and sold by Ultimate Products Ltd.
 // Many of these games are rewrites of VT1682 based titles, which in turn were based on older NES/VT ones

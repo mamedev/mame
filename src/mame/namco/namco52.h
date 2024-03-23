@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_NAMCO52_H
-#define MAME_AUDIO_NAMCO52_H
+#ifndef MAME_NAMCO_NAMCO52_H
+#define MAME_NAMCO_NAMCO52_H
 
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
@@ -17,8 +17,8 @@ public:
 	auto romread_callback() { return m_romread.bind(); }
 	auto si_callback() { return m_si.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( reset );
-	WRITE_LINE_MEMBER( chip_select );
+	void reset(int state);
+	void chip_select(int state);
 	void write(uint8_t data);
 
 protected:
@@ -45,7 +45,7 @@ private:
 	uint32_t m_address;
 
 	uint8_t K_r();
-	DECLARE_READ_LINE_MEMBER( SI_r );
+	int SI_r();
 	uint8_t R0_r();
 	uint8_t R1_r();
 	void P_w(uint8_t data);
@@ -62,4 +62,4 @@ DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)
 #define NAMCO_52XX_P_DATA(base)     (base)
 
 
-#endif  // MAME_AUDIO_NAMCO52_H
+#endif  // MAME_NAMCO_NAMCO52_H

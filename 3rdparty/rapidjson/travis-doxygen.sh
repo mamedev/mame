@@ -4,12 +4,10 @@
 
 set -e
 
-DOXYGEN_VER=doxygen-1.8.7
-DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
-DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
-DOXYGEN_BIN="/usr/local/bin/doxygen"
+DOXYGEN_VER=1_8_16
+DOXYGEN_URL="https://codeload.github.com/doxygen/doxygen/tar.gz/Release_${DOXYGEN_VER}"
 
-: ${GITHUB_REPO:="miloyip/rapidjson"}
+: ${GITHUB_REPO:="Tencent/rapidjson"}
 GITHUB_HOST="github.com"
 GITHUB_CLONE="git://${GITHUB_HOST}/${GITHUB_REPO}"
 GITHUB_URL="https://${GITHUB_HOST}/${GITHUB_PUSH-${GITHUB_REPO}}"
@@ -48,9 +46,17 @@ abort() {
 # install doxygen binary distribution
 doxygen_install()
 {
-	wget -O - "${DOXYGEN_URL}" | \
-		tar xz -C ${TMPDIR-/tmp} ${DOXYGEN_VER}/bin/doxygen
-    export PATH="${TMPDIR-/tmp}/${DOXYGEN_VER}/bin:$PATH"
+	cd ${TMPDIR-/tmp}
+	curl ${DOXYGEN_URL} -o doxygen.tar.gz
+	tar zxvf doxygen.tar.gz
+	mkdir doxygen_build
+	cd doxygen_build
+	cmake ../doxygen-Release_${DOXYGEN_VER}/
+	make
+    
+	export PATH="${TMPDIR-/tmp}/doxygen_build/bin:$PATH"
+	
+	cd ../../
 }
 
 doxygen_run()
@@ -66,7 +72,7 @@ gh_pages_prepare()
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
 	git --version
-	git clone -b gh-pages "${GITHUB_CLONE}" html
+	git clone --single-branch -b gh-pages "${GITHUB_CLONE}" html
 	cd html
 	# setup git config (with defaults)
 	git config user.name "${GIT_NAME-travis}"

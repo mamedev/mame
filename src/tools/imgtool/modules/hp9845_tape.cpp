@@ -112,10 +112,10 @@
 #include "filter.h"
 
 #include "formats/hti_tape.h"
-#include "formats/imageutl.h"
 
 #include "corefile.h"
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "opresolv.h"
 
 #include <bitset>
@@ -1344,7 +1344,7 @@ static imgtoolerr_t hp9845data_read_file(imgtool::partition &partition, const ch
 		if (!get_record_part(*inp_data , tmp , 2)) {
 			return IMGTOOLERR_READERROR;
 		}
-		rec_type = (uint16_t)pick_integer_be(tmp , 0 , 2);
+		rec_type = get_u16be(&tmp[ 0 ]);
 		switch (rec_type) {
 		case REC_TYPE_EOR:
 			// End of record: just skip it
@@ -1367,7 +1367,7 @@ static imgtoolerr_t hp9845data_read_file(imgtool::partition &partition, const ch
 			if (!get_record_part(*inp_data , tmp , 2)) {
 				return IMGTOOLERR_READERROR;
 			}
-			tmp_len = (unsigned)pick_integer_be(tmp , 0 , 2);
+			tmp_len = get_u16be(&tmp [ 0 ]);
 
 			if (rec_type == REC_TYPE_FULLSTR || rec_type == REC_TYPE_1STSTR) {
 				accum_len = tmp_len;
@@ -1415,7 +1415,7 @@ static bool split_string_n_dump(const char *s , imgtool::stream &dest)
 		unsigned free_len = len_to_eor(dest);
 		if (free_len <= 4) {
 			// Not enough free space at end of current record: fill with EORs
-			place_integer_be(tmp , 0 , 2 , REC_TYPE_EOR);
+			put_u16be(&tmp[ 0 ] , REC_TYPE_EOR);
 			while (free_len) {
 				if (dest.write(tmp , 2) != 2) {
 					return false;
@@ -1428,8 +1428,8 @@ static bool split_string_n_dump(const char *s , imgtool::stream &dest)
 				// Free space to EOR enough for what's left of string
 				break;
 			}
-			place_integer_be(tmp , 0 , 2 , rec_type);
-			place_integer_be(tmp , 2 , 2 , s_len);
+			put_u16be(&tmp[ 0 ] , rec_type);
+			put_u16be(&tmp[ 2 ] , s_len);
 			if (dest.write(tmp , 4) != 4 ||
 				dest.write(s, s_part_len) != s_part_len) {
 				return false;
@@ -1441,8 +1441,8 @@ static bool split_string_n_dump(const char *s , imgtool::stream &dest)
 		}
 	}
 
-	place_integer_be(tmp , 0 , 2 , at_least_one ? REC_TYPE_ENDSTR : REC_TYPE_FULLSTR);
-	place_integer_be(tmp , 2 , 2 , s_len);
+	put_u16be(&tmp[ 0 ] , at_least_one ? REC_TYPE_ENDSTR : REC_TYPE_FULLSTR);
+	put_u16be(&tmp[ 2 ] , s_len);
 	if (dest.write(tmp , 4) != 4 ||
 		dest.write(s , s_len) != s_len) {
 		return false;
@@ -1498,7 +1498,7 @@ static imgtoolerr_t hp9845data_write_file(imgtool::partition &partition, const c
 	// Fill free space of last record with EOFs
 	unsigned free_len = len_to_eor(*out_data);
 	uint8_t tmp[ 2 ];
-	place_integer_be(tmp , 0 , 2 , REC_TYPE_EOF);
+	put_u16be(&tmp[ 0 ] , REC_TYPE_EOF);
 
 	while (free_len) {
 		if (out_data->write(tmp , 2 ) != 2) {

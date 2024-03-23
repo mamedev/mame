@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:ElSemi
+// copyright-holders:ElSemi, Angelo Salese
 #ifndef MAME_VIDEO_VRENDER0_H
 #define MAME_VIDEO_VRENDER0_H
 
@@ -93,6 +93,10 @@ private:
 
 	uint16_t *m_DrawDest;       //!< frameram pointer to draw buffer area
 	uint16_t *m_DisplayDest;    //!< frameram pointer to display buffer area
+	bool m_flip_sync = false;
+
+	emu_timer *m_pipeline_timer;
+	TIMER_CALLBACK_MEMBER(pipeline_cb);
 };
 
 DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)

@@ -346,16 +346,19 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 	if (is_contended(offset)) content_early();
 	content_early(1);
 
-	unsigned char Changed = m_port_fe_data^data;
+	u8 changed = m_port_fe_data ^ data;
 
-	/* border colour changed? */
-	if ((Changed & 0x07)!=0) m_screen->update_now();
+	/* D0-D2: border colour changed? */
+	if (changed & 0x07) m_screen->update_now();
 
-	/* DAC output state */
-	if ((Changed & (1<<4))!=0) m_speaker->level_w(BIT(data, 4));
+	/* D3-D4: MIC+DAC output state */
+	if (changed & 0x18)
+	{
+		/* D3: write cassette data */
+		if (BIT(changed, 3)) m_cassette->output(BIT(data, 3) ? -1.0 : +1.0);
 
-	/* write cassette data */
-	if ((Changed & (1<<3))!=0) m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
+		m_speaker->level_w(BIT(data, 3, 2));
+	}
 
 	// Some exp devices use ula port unused bits 5-7:
 	// Beta v2/3/plus use bit 7, Beta clones use bits 6 and 7
@@ -506,16 +509,30 @@ uint8_t spectrum_state::floating_bus_r()
 	*  Note, some were later re-released as "fixed" +2A compatible versions with the floating bus code removed (Arkanoid, Cobra, others?).
 	*/
 
-	uint8_t data = 0xff;
-	int hpos = m_screen->hpos();
-	int vpos = m_screen->vpos();
+	u8 data = 0xff;
+	u64 vpos = m_screen->vpos();
 
 	// peek into attribute ram when beam is in display area
 	// ula always returns ff when in border area (or h/vblank)
-
 	rectangle screen = get_screen_area();
-	if (screen.contains(hpos, vpos))
-		data = m_screen_location[0x1800 + (((vpos - screen.top()) / 8) * 32) + ((hpos - screen.left()) / 8)];
+	if (!m_contention_pattern.empty() && vpos >= screen.top() && vpos <= screen.bottom())
+	{
+		u64 now = m_maincpu->total_cycles() - m_int_at;
+		u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
+		u64 ct = cf + screen.width() * m_maincpu->clock() / m_screen->clock();
+		if (cf <= now && now < ct)
+		{
+			u64 clocks = now - cf;
+			if (!BIT(clocks, 2))
+			{
+				u16 y = vpos - screen.top();
+				u16 x = (clocks >> 2) + BIT(clocks, 1);
+				data = clocks & 1
+					? m_screen_location[0x1800 + (((y & 0xf8) << 2) | x)]
+					: m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | x];
+			}
+		}
+	}
 
 	return data;
 }
@@ -611,7 +628,7 @@ INPUT_PORTS_START( spectrum )
 	PORT_START("LINE0") /* 0xFEFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)     PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    \xC2\xA3   EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)    PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0xA3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"x    X    £      EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)  PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(U'£')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)     PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)      PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
 
@@ -807,7 +824,9 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	static const double speaker_levels[4] = { 0.0, 0.33, 0.66, 1.0 };
+	m_speaker->set_levels(4, speaker_levels);
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, "kempjoy");
@@ -916,8 +935,10 @@ ROM_START(spectrum)
 	ROMX_LOAD("diagrom.v51",0x0000,0x4000, CRC(83034df6) SHA1(e57b2c8a8e3563ea02a20eecd1d4cb6be9f9c2df), ROM_BIOS(27))
 	ROM_SYSTEM_BIOS(28, "diagv56", "DiagROM v1.56")
 	ROMX_LOAD("diagrom.v56",0x0000,0x4000, CRC(0ed22f7a) SHA1(37caf0bbc2d023ca5afaa12b3856ac90dbc83c51), ROM_BIOS(28))
-	ROM_SYSTEM_BIOS(29, "alford37", "Brian Alford's Test ROM v0.37")
-	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(29))
+	ROM_SYSTEM_BIOS(29, "diagv59", "DiagROM v1.59")
+	ROMX_LOAD("diagrom.v59",0x0000,0x4000, CRC(90e2ca5a) SHA1(dac1f877cbfdd516a8bf6336d8eff5902bd06438), ROM_BIOS(29))
+	ROM_SYSTEM_BIOS(30, "alford37", "Brian Alford's Test ROM v0.37")
+	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(30))
 ROM_END
 
 ROM_START(specide)
@@ -1135,6 +1156,17 @@ ROM_START(zvezda)
 	ROM_LOAD( "2764-far-cpu_blue.bin", 0x2000, 0x2000, CRC(ebab64bc) SHA1(8c98a8b6e927b02cf602c20a1b50838e60f7785b))
 ROM_END
 
+ROM_START(santaka2)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "01.01.d29", 0x0000, 0x0800, CRC(537db879) SHA1(601c69c8f9c77cb00ccd653a0ac0922044c13c86))
+	ROM_LOAD( "01.02.d30", 0x0800, 0x0800, CRC(6b5178bc) SHA1(ef5417e24cb80b3f417054a3ef89af5bbef94598))
+	ROM_LOAD( "01.03.d31", 0x1000, 0x0800, CRC(379c0032) SHA1(a10ebcd8b990ce26ec54dadf5c70b9c6eab7d314))
+	ROM_LOAD( "01.04.d32", 0x1800, 0x0800, CRC(765fc052) SHA1(40085c34fccb9b2274fe0887efa532e3771ffaf7))
+	ROM_LOAD( "01.05.d33", 0x2000, 0x0800, CRC(c177cd1e) SHA1(8dc8f0e086bdcdc1c60b9e7a1b4a1a6799e8f0bd))
+	ROM_LOAD( "01.06.d34", 0x2800, 0x0800, CRC(69072150) SHA1(0edd6db5e5b6f65921ec5c87d6d0d4ef3b3a9c03))
+	ROM_LOAD( "01.07.d35", 0x3000, 0x0800, CRC(2cb5126d) SHA1(1b951ca8172ce2e7912df9ab3713f48d247311a4))
+	ROM_LOAD( "01.08.d36", 0x3800, 0x0800, CRC(4d6e54cb) SHA1(7f01b9b0790064024012430fe47710e4fb905360))
+ROM_END
 
 /*  Any clone known to have the same "floating bus" behaviour as official Sinclair models should be changed to use the "spectrum" machine  */
 
@@ -1174,3 +1206,4 @@ COMP( 1990, compani1, spectrum, 0,      spectrum_clone, spectrum,  spectrum_stat
 COMP( 1990, spektrbk, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Spektr BK-001",         0 )
 COMP( 1989, sintez2,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Signal",                "Sintez 2",              0 )
 COMP( 1990, zvezda,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Zvezda",                0 )
+COMP( 1991, santaka2, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Santaka-002",           0 )

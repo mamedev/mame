@@ -5,8 +5,8 @@
      Microprose Games 3D hardware
 
 *************************************************************************/
-#ifndef MAME_AUDIO_MICRO3D_H
-#define MAME_AUDIO_MICRO3D_H
+#ifndef MAME_MISC_MICRO3D_A_H
+#define MAME_MISC_MICRO3D_A_H
 
 #pragma once
 
@@ -45,23 +45,23 @@ private:
 		void init(double fs);
 		void recompute(double k, double q, double fc);
 
-		float history[2 * 2]{};
-		float coef[4 * 2 + 1]{};
-		double fs = 0;
-		biquad proto_coef[2]{};
+		float history[2 * 2];
+		float coef[4 * 2 + 1];
+		double fs;
+		biquad proto_coef[2];
 	};
 
 	struct m3d_filter_state
 	{
 		void configure(double r, double c);
 
-		double      capval = 0;
-		double      exponent = 0;
+		double capval;
+		double exponent;
 	};
 
-	u8      m_dac_data = 0;
+	u8      m_dac_data;
 
-	u8      m_dac[4]{};
+	u8      m_dac[4];
 
 	float   m_gain;
 	u32     m_noise_shift;
@@ -75,4 +75,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MICRO3D_SOUND, micro3d_sound_device)
 
-#endif // MAME_AUDIO_MICRO3D_H
+#endif // MAME_MISC_MICRO3D_A_H

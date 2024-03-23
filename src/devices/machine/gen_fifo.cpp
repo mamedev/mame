@@ -49,9 +49,6 @@ template<typename T> void generic_fifo_device_base<T>::clear()
 
 template<typename T> void generic_fifo_device_base<T>::device_start()
 {
-	m_empty_cb.resolve_safe();
-	m_full_cb.resolve_safe();
-
 	m_sync_empty = timer_alloc(FUNC(generic_fifo_device_base<T>::sync_empty), this);
 	m_sync_full = timer_alloc(FUNC(generic_fifo_device_base<T>::sync_full), this);
 

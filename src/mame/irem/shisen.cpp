@@ -81,8 +81,6 @@ private:
 };
 
 
-// video
-
 void shisen_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -146,13 +144,10 @@ uint32_t shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// this game doesn't have cocktail mode so if there's software control we don't know where it is mapped.
 	flip_screen_set(~m_dsw2->read() & 1);
 
-
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-
-// machine
 
 void shisen_state::main_prg_map(address_map &map)
 {

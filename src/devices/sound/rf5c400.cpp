@@ -349,7 +349,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	}
 }
 
-void rf5c400_device::rom_bank_updated()
+void rf5c400_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

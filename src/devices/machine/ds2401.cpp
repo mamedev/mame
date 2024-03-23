@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "machine/ds2401.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL 0
 
 inline void ds2401_device::verboselog(int n_level, const char *s_fmt, ...)
@@ -167,7 +169,7 @@ TIMER_CALLBACK_MEMBER(ds2401_device::main_tick)
 	}
 }
 
-WRITE_LINE_MEMBER( ds2401_device::write )
+void ds2401_device::write(int state)
 {
 	verboselog(1, "write(%d)\n", state);
 
@@ -227,7 +229,7 @@ WRITE_LINE_MEMBER( ds2401_device::write )
 	m_rx = state;
 }
 
-READ_LINE_MEMBER( ds2401_device::read )
+int ds2401_device::read()
 {
 	verboselog(2, "read %d\n", m_tx && m_rx);
 	return m_tx && m_rx;

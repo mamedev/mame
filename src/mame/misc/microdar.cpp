@@ -67,9 +67,12 @@ ________________________________________________________________________________
 |  YES  | Far West            | Compumatic        | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
 |  YES  | Minidart            | Compumatic        | Compumatic Microdard-V6 PCB. Atmel AT89S51 instead of the REF34 MCU | Darts                      |
 |  NO   | Party Darts         | Compumatic        | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
+|  NO   | Compudar            | Compumatic        | Standard Microdar with Philips REF34VA                              | Darts                      |
 |  YES  | Diana Bifuca        | Compumatic/Bifuca | Standard Microdar SPD with Philips REF34VA. "Bifuca" string on ROM  | Darts                      |
 |  YES  | Diana Olakoa        | Compumatic/Olaoka | Compumatic Microdard-V5 PCB (REF0034 + REF0032 + REF0096)           | Darts                      |
 |  YES  | Covidarts           | Covielsa          | Not from Compumatic, but similar hardware. 80C31 (ROMless MCU)      | Darts                      |
+|  NO   | Top Darts           | unknown           | Large PCB that combines a Microdar PCB with the LED control PCB     | Darts                      |
+|  NO   | Western Darts       | unknown           | Standard Microdar with Philips REF34VA                              | Darts                      |
 |  NO   | Diamant             | unknown           | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                      |
 |  NO   | Tiger Dart          | unknown           | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
 |  NO   | Champion            | unknown           | ProSPDP PCB. https://www.recreativas.org/champion-6137-compumatic   | Darts                      |
@@ -82,6 +85,9 @@ ________________________________________________________________________________
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
+
+
+namespace {
 
 class microdar_state : public driver_device
 {
@@ -491,6 +497,8 @@ ROM_START(covidarts)
 	ROM_REGION(0x117, "plds", 0)
 	ROM_LOAD("palce16v8h-25.ic7", 0x000, 0x117, BAD_DUMP CRC(3a35a751) SHA1(e39fc8784d94ff09e0ff814f469ce23e52bb35fd)) // Bruteforced and verified OK
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(199?, dibifuca,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                          MACHINE_IS_SKELETON_MECHANICAL)

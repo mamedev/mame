@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PRIMO_H
-#define MAME_INCLUDES_PRIMO_H
+#ifndef MAME_MICROKEY_PRIMO_H
+#define MAME_MICROKEY_PRIMO_H
 
 #pragma once
 
@@ -59,7 +59,7 @@ private:
 	void machine_start() override;
 	DECLARE_MACHINE_RESET(primob);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void update_memory();
 	void common_machine_init();
 	void setup_pss(uint8_t* snapshot_data, uint32_t snapshot_size);
@@ -95,4 +95,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_PRIMO_H
+#endif // MAME_MICROKEY_PRIMO_H

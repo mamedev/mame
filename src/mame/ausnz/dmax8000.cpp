@@ -58,7 +58,7 @@ private:
 	void port0d_w(u8 data);
 	void port14_w(u8 data);
 	void port40_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_drq_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -72,7 +72,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( dmax8000_state::fdc_drq_w )
+void dmax8000_state::fdc_drq_w(int state)
 {
 	if (state) printf("DRQ ");
 }

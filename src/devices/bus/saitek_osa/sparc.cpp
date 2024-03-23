@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/***************************************************************************
+/*******************************************************************************
 
 Saitek OSA Module: Kasparov Sparc (1993)
 
@@ -30,13 +30,13 @@ TODO:
   maybe cpu cache related?
 - opening book moves take 3 around seconds per ply, should be almost immediate
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "sparc.h"
 
 
-DEFINE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device, "osa_sparc", "Sparc")
+DEFINE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device, "osa_sparc", "Saitek OSA Sparc")
 
 
 //-------------------------------------------------
@@ -189,5 +189,5 @@ void saitekosa_sparc_device::nmi_w(int state)
 void saitekosa_sparc_device::ack_w(int state)
 {
 	if (state != m_expansion->ack_state())
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }

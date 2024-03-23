@@ -9,6 +9,8 @@
 --
 ---------------------------------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
+
 project ("emu")
 uuid ("e6fa15e4-a354-4526-acef-13c8e80fcacf")
 kind (LIBTYPE)
@@ -144,6 +146,8 @@ files {
 	MAME_DIR .. "src/emu/emumem_hep.h",
 	MAME_DIR .. "src/emu/emumem_het.cpp",
 	MAME_DIR .. "src/emu/emumem_het.h",
+	MAME_DIR .. "src/emu/emumem_hws.cpp",
+	MAME_DIR .. "src/emu/emumem_hws.h",
 	MAME_DIR .. "src/emu/emuopts.cpp",
 	MAME_DIR .. "src/emu/emuopts.h",
 	MAME_DIR .. "src/emu/emupal.cpp",
@@ -161,6 +165,7 @@ files {
 	MAME_DIR .. "src/emu/ioport.cpp",
 	MAME_DIR .. "src/emu/ioport.h",
 	MAME_DIR .. "src/emu/inpttype.ipp",
+	MAME_DIR .. "src/emu/inpttype.h",
 	MAME_DIR .. "src/emu/logmacro.h",
 	MAME_DIR .. "src/emu/machine.cpp",
 	MAME_DIR .. "src/emu/machine.h",
@@ -305,6 +310,7 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "triphsxs"),
 	layoutbuildtask("emu/layout", "quadhsxs"),
 }
+end
 
 project ("precompile")
 uuid ("a6fb15d4-b123-4445-acef-13c8e80fcacf")

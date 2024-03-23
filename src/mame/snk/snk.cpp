@@ -855,13 +855,13 @@ TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
 }
 
 
-WRITE_LINE_MEMBER(snk_state::ymirq_callback_1 )
+void snk_state::ymirq_callback_1(int state)
 {
 	if (state)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_ASSERT);
 }
 
-WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
+void snk_state::ymirq_callback_2(int state)
 {
 	if (state)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM2IRQ_ASSERT);
@@ -874,7 +874,7 @@ void snk_state::snk_soundlatch_w(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
-READ_LINE_MEMBER(snk_state::sound_busy_r)
+int snk_state::sound_busy_r()
 {
 	return (m_sound_status & 4) ? 1 : 0;
 }

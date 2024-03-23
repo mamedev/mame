@@ -51,8 +51,8 @@ protected:
 
 	const u8 m_cmax; // number of COL pins
 	const u8 m_smax; // number of SEG pins
-	u8 m_mode = 0;
-	u8 m_cout = 0;
+	u8 m_mode;
+	u8 m_cout;
 	u8 m_ram[0x80];
 
 	// callbacks

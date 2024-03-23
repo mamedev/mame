@@ -8,7 +8,7 @@
 
 #include "qbus.h"
 #include "machine/mc68901.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 
 //**************************************************************************

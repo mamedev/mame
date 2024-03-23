@@ -18,6 +18,7 @@
 
 #include "drivenum.h"
 #include "fileio.h"
+#include "main.h"
 #include "uiinput.h"
 
 #include "util/corestr.h"
@@ -74,6 +75,14 @@ menu_audit::~menu_audit()
 }
 
 
+void menu_audit::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, (line_height() * 1.0F) + (tb_border() * 3.0F));
+}
+
+
 void menu_audit::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 	switch (m_phase)
@@ -83,9 +92,9 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 		{
 			draw_text_box(
 					&m_prompt, &m_prompt + 1,
-					x, x2, y2 + ui().box_tb_border(), y2 + bottom,
+					x, x2, y2 + tb_border(), y2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
+					ui().colors().text_color(), UI_GREEN_COLOR);
 		}
 		break;
 
@@ -107,7 +116,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 					container(),
 					std::move(text).str(),
 					text_layout::text_justify::CENTER,
-					0.5f, 0.5f,
+					0.5F, 0.5F,
 					ui().colors().background_color());
 		}
 		break;
@@ -118,31 +127,30 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 				util::string_format(
 					_("Cancel audit?\n\nPress %1$s to cancel\nPress %2$s to continue"),
 					ui().get_general_input_setting(IPT_UI_SELECT),
-					ui().get_general_input_setting(IPT_UI_CANCEL)),
+					ui().get_general_input_setting(IPT_UI_BACK)),
 				text_layout::text_justify::CENTER,
-				0.5f, 0.5f,
+				0.5F, 0.5F,
 				UI_RED_COLOR);
 		break;
 	}
 }
 
 
-bool menu_audit::custom_ui_cancel()
+bool menu_audit::custom_ui_back()
 {
 	return m_phase != phase::CONFIRMATION;
 }
 
 
-void menu_audit::populate(float &customtop, float &custombottom)
+void menu_audit::populate()
 {
 	if (m_unavailable && (m_availablesorted.size() != m_unavailable))
 		item_append(util::string_format(_("Audit media for %1$u systems marked unavailable"), m_unavailable), 0, ITEMREF_START_FAST);
 	item_append(util::string_format(_("Audit media for all %1$u systems"), m_availablesorted.size()), 0, ITEMREF_START_FULL);
 	item_append(menu_item_type::SEPARATOR, 0);
-	custombottom = (ui().get_line_height() * 1.0f) + (ui().box_tb_border() * 3.0f);
 }
 
-void menu_audit::handle(event const *ev)
+bool menu_audit::handle(event const *ev)
 {
 	switch (m_phase)
 	{
@@ -154,10 +162,11 @@ void menu_audit::handle(event const *ev)
 				set_process_flags(PROCESS_CUSTOM_ONLY | PROCESS_NOINPUT);
 				m_phase = phase::AUDIT;
 				m_fast = ITEMREF_START_FAST == ev->itemref;
-				m_prompt = util::string_format(_("Press %1$s to cancel\n"), ui().get_general_input_setting(IPT_UI_CANCEL));
+				m_prompt = util::string_format(_("Press %1$s to cancel\n"), ui().get_general_input_setting(IPT_UI_BACK));
 				m_future.resize(std::thread::hardware_concurrency());
 				for (auto &future : m_future)
 					future = std::async(std::launch::async, [this] () { return do_audit(); });
+				return true;
 			}
 		}
 		break;
@@ -177,19 +186,23 @@ void menu_audit::handle(event const *ev)
 			}
 			stack_pop();
 		}
-		else if (machine().ui_input().pressed(IPT_UI_CANCEL))
+		else if (machine().ui_input().pressed(IPT_UI_BACK))
 		{
 			if (phase::AUDIT == m_phase)
 				m_phase = phase::CANCELLATION;
 			else
 				m_phase = phase::AUDIT;
+			return true;
 		}
 		else if ((phase::CANCELLATION == m_phase) && machine().ui_input().pressed(IPT_UI_SELECT))
 		{
 			m_cancel.store(true);
+			return true;
 		}
 		break;
 	}
+
+	return false;
 }
 
 bool menu_audit::do_audit()

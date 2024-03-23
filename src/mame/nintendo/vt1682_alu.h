@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_VT1682_ALU_H
-#define MAME_MACHINE_VT1682_ALU_H
+#ifndef MAME_NINTENDO_VT1682_ALU_H
+#define MAME_NINTENDO_VT1682_ALU_H
 
 #pragma once
 
@@ -47,4 +47,4 @@ private:
 	uint8_t m_alu_out[6];
 };
 
-#endif // MAME_MACHINE_VT1682_ALU_H
+#endif // MAME_NINTENDO_VT1682_ALU_H

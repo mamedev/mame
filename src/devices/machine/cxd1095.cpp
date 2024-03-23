@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(CXD1095, cxd1095_device, "cxd1095", "CXD1095 I/O Expander")
 
 cxd1095_device::cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CXD1095, tag, owner, clock)
-	, m_input_cb(*this)
+	, m_input_cb(*this, 0)
 	, m_output_cb(*this)
 {
 }
@@ -46,10 +46,6 @@ cxd1095_device::cxd1095_device(const machine_config &mconfig, const char *tag, d
 
 void cxd1095_device::device_start()
 {
-	// resolve callbacks
-	m_input_cb.resolve_all();
-	m_output_cb.resolve_all();
-
 	std::fill(std::begin(m_data_latch), std::end(m_data_latch), 0);
 
 	// save state
@@ -80,7 +76,7 @@ u8 cxd1095_device::read(offs_t offset)
 			input_mask &= 0x0f;
 
 		// read through callback if port not configured entirely for output
-		if (input_mask != 0 && !m_input_cb[offset].isnull())
+		if (input_mask != 0 && !m_input_cb[offset].isunset())
 			input_data = m_input_cb[offset](0, input_mask) & input_mask;
 		else if (m_data_dir[offset] == 0xff)
 			logerror("Reading from undefined input port %c\n", 'A' + offset);
@@ -111,7 +107,7 @@ void cxd1095_device::write(offs_t offset, u8 data)
 
 		// send output through callback
 		u8 dataout = data & ~m_data_dir[offset];
-		if (!m_output_cb[offset].isnull())
+		if (!m_output_cb[offset].isunset())
 			m_output_cb[offset](0, dataout, ~m_data_dir[offset]);
 		else
 			logerror("Writing %02X to undefined output port %c\n", dataout, 'A' + offset);

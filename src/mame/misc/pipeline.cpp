@@ -236,7 +236,7 @@ TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
 void pipeline_state::protection_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::protection_deferred_w),this), data);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 u8 pipeline_state::sound_data_r()

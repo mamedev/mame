@@ -22,6 +22,10 @@
     types include MSM2128-15RS and HM6116P-3). A third 4016-like RAM (usually
     SY2158A-2) is used for the row buffer, with A8-A10 tied to GND.
 
+    To initialize EAROM settings on the WY-50, hold down the G key while
+    booting. The equivalent procedure on the WY-75 uses 5 on the numeric
+    keypad instead.
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -30,8 +34,13 @@
 #include "machine/er1400.h"
 #include "machine/scn_pci.h"
 #include "wy50kb.h"
+#include "sound/beep.h"
 #include "video/scn2674.h"
 #include "screen.h"
+#include "speaker.h"
+
+
+namespace {
 
 class wy50_state : public driver_device
 {
@@ -43,6 +52,8 @@ public:
 		, m_earom(*this, "earom")
 		, m_pvtc(*this, "pvtc")
 		, m_sio(*this, "sio")
+		, m_beep(*this, "beep")
+		, m_aux(*this, "aux")
 		, m_chargen(*this, "chargen")
 		, m_videoram(*this, "videoram%u", 0U)
 	{
@@ -57,7 +68,7 @@ protected:
 private:
 	u8 pvtc_videoram_r(offs_t offset);
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
-	DECLARE_WRITE_LINE_MEMBER(mbc_attr_clock_w);
+	void mbc_attr_clock_w(int state);
 
 	u8 pvtc_r(offs_t offset);
 	void pvtc_w(offs_t offset, u8 data);
@@ -68,6 +79,7 @@ private:
 	void earom_w(u8 data);
 	u8 p1_r();
 	void p1_w(u8 data);
+	u8 p3_r();
 
 	void prg_map(address_map &map);
 	void io_map(address_map &map);
@@ -78,6 +90,8 @@ private:
 	required_device<er1400_device> m_earom;
 	required_device<scn2672_device> m_pvtc;
 	required_device<scn2661b_device> m_sio;
+	required_device<beep_device> m_beep;
+	required_device<rs232_port_device> m_aux;
 
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_videoram;
@@ -165,7 +179,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 }
 
-WRITE_LINE_MEMBER(wy50_state::mbc_attr_clock_w)
+void wy50_state::mbc_attr_clock_w(int state)
 {
 	if (state)
 		m_last_row_attr = m_cur_attr;
@@ -218,29 +232,33 @@ void wy50_state::earom_w(u8 data)
 	// Bit 3 = EAROM C2
 	// Bit 4 = EAROM C1
 	// Bit 5 = UPCHAR/NORM
+	m_earom->data_w(BIT(data, 3) ? BIT(data, 0) : 1);
 	m_earom->clock_w(BIT(data, 1));
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
 	m_earom->c1_w(BIT(data, 4));
-	m_earom->data_w(BIT(data, 3) ? BIT(data, 0) : 0);
 	m_font2 = BIT(data, 5);
 }
 
 u8 wy50_state::p1_r()
 {
-	// P1.0 = AUX RDY
+	// P1.0 = AUX RDY (DTR)
 	// P1.1 = NVD OUT
 	// P1.4 = KEY (inverted, active high)
-	return 0xed | (m_earom->data_r() << 1) | (m_keyboard->sense_r() ? 0x00 : 0x10);
+	return 0xe4 | m_aux->dsr_r() | (m_earom->data_r() << 1) | (m_keyboard->sense_r() ? 0x00 : 0x10);
 }
 
 void wy50_state::p1_w(u8 data)
 {
 	// P1.2 = EXFONT
-	// P1.3 = AUX RTS
+	// P1.3 = AUX RTS (DSR)
 	// P1.5 = BEEPER
 	// P1.6 = REV/DIM PROT
 	// P1.7 (inverted) = 80/132
+
+	m_aux->write_dtr(BIT(data, 3));
+
+	m_beep->set_state(BIT(data, 5));
 
 	m_rev_prot = BIT(data, 6);
 
@@ -250,6 +268,11 @@ void wy50_state::p1_w(u8 data)
 		m_pvtc->set_character_width(m_is_132 ? 9 : 10);
 		m_pvtc->set_unscaled_clock(68.85_MHz_XTAL / (m_is_132 ? 18 : 30));
 	}
+}
+
+u8 wy50_state::p3_r()
+{
+	return m_aux->rxd_r() | 0xfe;
 }
 
 void wy50_state::prg_map(address_map &map)
@@ -285,6 +308,8 @@ void wy50_state::wy50(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &wy50_state::io_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(wy50_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(wy50_state::p1_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(wy50_state::p3_r));
+	m_maincpu->port_out_cb<3>().set(m_aux, FUNC(rs232_port_device::write_txd)).bit(1);
 
 	WY50_KEYBOARD(config, m_keyboard);
 
@@ -316,6 +341,12 @@ void wy50_state::wy50(machine_config &config)
 	modem.rxd_handler().set(m_sio, FUNC(scn2661b_device::rxd_w));
 	modem.cts_handler().set(m_sio, FUNC(scn2661b_device::cts_w));
 	modem.dcd_handler().set(m_sio, FUNC(scn2661b_device::dcd_w));
+
+	RS232_PORT(config, m_aux, default_rs232_devices, "loopback");
+
+	SPEAKER(config, "speaker").front_center();
+	// Star Micronics QMB06 PZT Buzzer (2048Hz peak) + LC filter, output frequency is approximated here
+	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "speaker", 0.10);
 }
 
 ROM_START(wy50)
@@ -336,6 +367,9 @@ ROM_START(wy75) // 8031, green, 101-key detached keyboard
 	ROM_REGION16_LE(0xc8, "earom", 0)
 	ROM_LOAD("default.bin", 0x00, 0xc8, CRC(0efeff07) SHA1(304e07ef87a4b107700273321a1d4e34a56d6821))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, wy50, 0, 0, wy50, wy50, wy50_state, empty_init, "Wyse Technology", "WY-50 (Rev. E)", MACHINE_IS_SKELETON)
 COMP(1984, wy75, 0, 0, wy50, wy50, wy50_state, empty_init, "Wyse Technology", "WY-75 (Rev. H)", MACHINE_IS_SKELETON)

@@ -5,8 +5,8 @@
     Slapshot / Operation Wolf 3
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SLAPSHOT_H
-#define MAME_INCLUDES_SLAPSHOT_H
+#ifndef MAME_TAITO_SLAPSHOT_H
+#define MAME_TAITO_SLAPSHOT_H
 
 #pragma once
 
@@ -38,7 +38,7 @@ public:
 	void opwolf3(machine_config &config);
 	void slapshot(machine_config &config);
 
-	void driver_init() override;
+	void driver_init();
 
 protected:
 	virtual void machine_start() override;
@@ -101,7 +101,7 @@ private:
 	void coin_control_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
+	void screen_vblank_no_buffer(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 *primasks, int y_offset);
 	void handle_sprite_buffering();
 	void update_sprites_active_area();
@@ -113,4 +113,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SLAPSHOT_H
+#endif // MAME_TAITO_SLAPSHOT_H

@@ -6,8 +6,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_K1GE_H
-#define MAME_VIDEO_K1GE_H
+#ifndef MAME_SNK_K1GE_H
+#define MAME_SNK_K1GE_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 DECLARE_DEVICE_TYPE(K1GE, k1ge_device)
 DECLARE_DEVICE_TYPE(K2GE, k2ge_device)
 
-#endif // MAME_VIDEO_K1GE_H
+#endif // MAME_SNK_K1GE_H

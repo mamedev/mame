@@ -19,6 +19,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class adm36_state : public driver_device
 {
 public:
@@ -87,7 +89,7 @@ u8 adm36_state::pio_pb_r()
 
 void adm36_state::pio_pb_w(u8 data)
 {
-	m_earom->clock_w(!BIT(data, 4));
+	m_earom->clock_w(BIT(data, 4));
 	m_earom->c3_w(BIT(data, 3));
 	m_earom->c2_w(BIT(data, 2));
 	m_earom->c1_w(BIT(data, 1));
@@ -196,6 +198,8 @@ ROM_START(adm36)
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("u56.bin", 0x0000, 0x1000, CRC(70e46897) SHA1(85b4360912fc05243b3b2df29bde5a3def94086b))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1981, adm36, 0, 0, adm36, adm36, adm36_state, empty_init, "Lear Siegler", "ADM 36 Video Display Terminal", MACHINE_IS_SKELETON)

@@ -20,10 +20,11 @@
 	"vertex": "chains/crt-geom/vs_gaussx",
 	"fragment": "chains/crt-geom/fs_gaussx",
 	"uniforms": [
-		{ "name": "s_tex",       "type": "int",  "values": [ 0 ] },
-		{ "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-		{ "name": "u_width",     "type": "vec4", "values": [ 2.0, 0.0, 0.0, 0.0 ] },
-		{ "name": "u_aspect",    "type": "vec4", "values": [ 1.0,0.75, 0.0, 0.0 ] },
-		{ "name": "u_gamma",     "type": "vec4", "values": [ 2.2, 0.0, 0.0, 0.0 ] }
+		{ "name": "s_tex",           "type": "int",  "values": [ 0 ] },
+		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0,  0.0, 0.0 ] },
+		{ "name": "u_width",         "type": "vec4", "values": [ 2.0, 0.0,  0.0, 0.0 ] },
+		{ "name": "u_aspect",        "type": "vec4", "values": [ 1.0, 0.75, 0.0, 0.0 ] },
+		{ "name": "u_gamma",         "type": "vec4", "values": [ 2.2, 0.0,  0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0,  0.0, 0.0 ] }
 	]
 }

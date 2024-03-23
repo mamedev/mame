@@ -118,6 +118,8 @@ TODO:
  */
 
 
+namespace {
+
 class pasogo_state : public driver_device
 {
 public:
@@ -582,6 +584,9 @@ void pasogo_state::pasogo(machine_config &config)
 ROM_START( pasogo )
 	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
 CONS( 1996, pasogo, 0,      0,      pasogo,  pasogo, pasogo_state, empty_init, "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)

@@ -141,6 +141,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class manohman_state : public driver_device
 {
 public:
@@ -273,6 +275,8 @@ ROM_START( backgamn )
 	ROM_LOAD16_BYTE( "b_f2_i.bin",  0x00000, 0x10000, CRC(9e42937c) SHA1(85d462a560b85b03ee9d341e18815b7c396118ac) )
 	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

@@ -120,7 +120,7 @@ How the architecture works:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/ram.h"
 #include "machine/am9513.h"
 #include "machine/i82586.h"
@@ -130,6 +130,9 @@ How the architecture works:
 #include "machine/input_merger.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
+
+
+namespace {
 
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
@@ -184,7 +187,7 @@ private:
 	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t ethernet_r();
 	void ethernet_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ethernet_int_w);
+	void ethernet_int_w(int state);
 	uint16_t edlc_mmu_r(offs_t offset, uint16_t mem_mask);
 	void edlc_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
@@ -516,7 +519,7 @@ void sun2_state::ethernet_w(uint8_t data)
 	m_maincpu->set_input_line(M68K_IRQ_3, BIT(m_ethernet_status, 0) && BIT(m_ethernet_status, 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(sun2_state::ethernet_int_w)
+void sun2_state::ethernet_int_w(int state)
 {
 	if (state)
 	{
@@ -823,6 +826,9 @@ ROM_START( sun2_50 )
 	ROM_REGION(0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD("sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

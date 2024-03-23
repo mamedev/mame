@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
-<softwarelist name="mephisto_mm1" description="Mephisto MM I Modules">
+<softwarelist name="mephisto_mm1" description="Mephisto MM I modules">
 
 <!-- HG 170 module is exclusively used with MM I -->
 

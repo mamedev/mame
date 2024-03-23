@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Joakim Larsson Edstrom
-/******************************************************************************
+/*******************************************************************************
 
 Applied Concepts Destiny Prodigy
 Like most other chess computers by ACI, it was also distributed by Chafitz.
 
 The chess engine is Morphy, which in turn is based on Sargon 2.5.
 
-*******************************************************************************
+Not counting The Mate, a chess game with chessboard peripheral for the Apple II,
+this is the only known Destiny series chesscomputer. ACI also announced Destiny
+Laser Chess, but it was never released.
+
+********************************************************************************
 
 PCB notes:
 
@@ -61,7 +65,7 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
   VIA  :     PB4 PB5 PA0 PA1 PA2 PA3 PA4 PA5 PA6       PA7
   74145:  Q8                                       Q9      - used to decode/ground one half of the KPAD at a time
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -72,7 +76,7 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
 #include "speaker.h"
 
 // internal artwork
-#include "aci_prodigy.lh" // clickable
+#include "aci_prodigy.lh"
 
 
 namespace {
@@ -104,6 +108,11 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_select = 0;
+	u8 m_led_data = 0;
+	u8 m_shift_data = 0;
+	u8 m_shift_clock = 0;
+
 	void main_map(address_map &map);
 
 	// I/O handlers
@@ -114,11 +123,6 @@ private:
 
 	void shift_clock_w(int state);
 	void shift_data_w(int state);
-
-	u8 m_select = 0;
-	u8 m_led_data = 0;
-	u8 m_shift_data = 0;
-	u8 m_shift_clock = 0;
 };
 
 void prodigy_state::machine_start()
@@ -132,9 +136,9 @@ void prodigy_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // 6522 ports
 
@@ -202,9 +206,9 @@ void prodigy_state::control_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void prodigy_state::main_map(address_map &map)
 {
@@ -216,9 +220,9 @@ void prodigy_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( prodigy )
 	PORT_START("IN.0")
@@ -248,13 +252,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void prodigy_state::prodigy(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prodigy_state::main_map);
 
@@ -270,21 +274,21 @@ void prodigy_state::prodigy(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0xf, 0xff);
 	config.set_default_layout(layout_aci_prodigy);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( prodigy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -295,9 +299,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, prodigy, 0,      0, prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts", "Destiny Prodigy", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts", "Destiny Prodigy", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

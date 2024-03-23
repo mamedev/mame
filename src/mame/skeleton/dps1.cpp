@@ -56,7 +56,7 @@ private:
 	void portbe_w(u8 data);
 	u8 portff_r();
 	void portff_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_drq_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -158,7 +158,7 @@ void dps1_state::portff_w(u8 data)
 }
 
 // do dma
-WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
+void dps1_state::fdc_drq_w(int state)
 {
 	if (state)
 	{

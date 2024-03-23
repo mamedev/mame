@@ -5,8 +5,8 @@
     Turret Tower hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_TURRETT_H
-#define MAME_INCLUDES_TURRETT_H
+#ifndef MAME_NAMCO_TURRETT_H
+#define MAME_NAMCO_TURRETT_H
 
 #pragma once
 
@@ -55,8 +55,8 @@ private:
 	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t int_r();
 	void int_w(uint32_t data);
-	DECLARE_READ_LINE_MEMBER(sbrc2_r);
-	DECLARE_READ_LINE_MEMBER(sbrc3_r);
+	int sbrc2_r();
+	int sbrc3_r();
 
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	INTERRUPT_GEN_MEMBER(vblank);
@@ -145,4 +145,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TURRETT, turrett_device)
 
-#endif // MAME_INCLUDES_TURRETT_H
+#endif // MAME_NAMCO_TURRETT_H

@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(BBC_SCSIAIV, bbc_scsiaiv_device, "bbc_scsiaiv", "Acorn AIV SC
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void bbc_scsiaiv_device::device_add_mconfig(machine_config& config)
+void bbc_scsiaiv_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
@@ -36,7 +36,7 @@ void bbc_scsiaiv_device::device_add_mconfig(machine_config& config)
 		});
 }
 
-//void bbc_vp415_device::device_add_mconfig(machine_config& config)
+//void bbc_vp415_device::device_add_mconfig(machine_config &config)
 //{
 //  bbc_scsiaiv_device::device_add_mconfig(config);
 //
@@ -54,19 +54,19 @@ void bbc_scsiaiv_device::device_add_mconfig(machine_config& config)
 //  bbc_scsiaiv_device - constructor
 //-------------------------------------------------
 
-bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config &mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_modem_interface(mconfig, *this)
 	, m_scsi(*this, "scsi:7:scsicb")
 {
 }
 
-bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: bbc_scsiaiv_device(mconfig, BBC_SCSIAIV, tag, owner, clock)
 {
 }
 
-//bbc_vp415_device::bbc_vp415_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+//bbc_vp415_device::bbc_vp415_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock)
 //  : bbc_scsiaiv_device(mconfig, BBC_VP415, tag, owner, clock)
 //{
 //}
@@ -128,12 +128,12 @@ void bbc_scsiaiv_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_scsiaiv_device::bsy_w)
+void bbc_scsiaiv_device::bsy_w(int state)
 {
 	m_scsi->sel_w(0);
 }
 
-WRITE_LINE_MEMBER(bbc_scsiaiv_device::req_w)
+void bbc_scsiaiv_device::req_w(int state)
 {
 	m_scsi->ack_w(0);
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Dick Smith catalog numbers, taken from advertisements:
 
@@ -57,6 +57,17 @@ X-6203 : Chess
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="aworm.bin" size="0x4000" crc="0cbaa1cf" sha1="95bffb44e66d78c3caee834fd53a876d113e3d25"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arabiced">
+		<description>Arabic Editor</description>
+		<year>198?</year>
+		<publisher>Ecico</publisher>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="arabic_editor.bin" size="0x4000" crc="a0a534a9" sha1="3c463071d49adf7914ea6dd62beab284bb3c4e22"/>
 			</dataarea>
 		</part>
 	</software>

@@ -19,12 +19,12 @@ class abc800_format : public wd177x_format
 public:
 	abc800_format();
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 
 protected:
-	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
+	virtual int get_image_offset(const format &f, int head, int track) const override;
 
 private:
 	static const format formats[];

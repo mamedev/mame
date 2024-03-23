@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#ifndef MAME_INCLUDES_ATOM_H
-#define MAME_INCLUDES_ATOM_H
+#ifndef MAME_ACORN_ATOM_H
+#define MAME_ACORN_ATOM_H
 
 #pragma once
 
@@ -36,9 +36,6 @@
 #define CENTRONICS_TAG  "centronics"
 #define BASERAM_TAG     "baseram"
 
-
-#define X1  XTAL(3'579'545)    // MC6847 Clock
-#define X2  XTAL(4'000'000)           // CPU Clock - a divider reduces it to 1MHz
 
 class atom_state : public driver_device
 {
@@ -84,8 +81,8 @@ protected:
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
 	uint8_t vdg_videoram_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	void atom_8271_interrupt_callback(int state);
+	void motor_w(int state);
 
 	/* keyboard state */
 	u8 m_keylatch = 0U;
@@ -98,9 +95,9 @@ protected:
 	/* devices */
 	bool m_previous_i8271_int_state = false;
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(cassette_output_tick);
+	void cassette_output_tick(int state);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device &slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void atom_mem(address_map &map);
@@ -143,4 +140,4 @@ private:
 	void atomeb_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ATOM_H
+#endif // MAME_ACORN_ATOM_H

@@ -20,7 +20,6 @@
     *Muscle Ranking Spray Hitter
      Muscle Ranking Struck Out
      Neratte Don Don
-     Pikkari Chance
     *Run Run Puppy / らんらんぱぴぃ
      Soreike! Hanapuu
 
@@ -39,15 +38,20 @@
 **************************************************************************/
 
 #include "emu.h"
+
+#include "bus/ata/ataintf.h"
+#include "bus/ata/hdd.h"
 #include "cpu/sh/sh3comn.h"
 #include "cpu/sh/sh4.h"
-#include "bus/ata/ataintf.h"
-#include "machine/ataflash.h"
 #include "machine/s3520cf.h"
 #include "machine/ticket.h"
 #include "sound/ymz280b.h"
+
 #include "speaker.h"
 #include "screen.h"
+
+
+namespace {
 
 class gsan_state : public driver_device
 {
@@ -118,7 +122,7 @@ protected:
 	void gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	u16 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 	void do_render(bool vbkem);
 	void draw_quad_tex(u16 cmd, u16 *data);
 	void draw_quad_bin(u16 cmd, u16 *data);
@@ -398,7 +402,7 @@ void gsan_state::gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(gsan_state::vblank)
+void gsan_state::vblank(int state)
 {
 	if (state)
 	{
@@ -1028,7 +1032,7 @@ void gsan_state::machine_reset()
 
 static void gsan_devices(device_slot_interface &device)
 {
-	device.option_add("cfcard", ATA_FLASH_PCCARD);
+	device.option_add("cfcard", ATA_CF);
 }
 
 void gsan_state::gsan(machine_config &config)
@@ -1098,7 +1102,7 @@ ROM_START( ddrkids )
 	ROM_REGION( 0x0f, "rtc", ROMREGION_ERASE00 )
 	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(96a2e20b) SHA1(e857d915b1ddcb34f4dfb63b1cd743a439776009) )
 
-	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "gqan4_b-005", 0, SHA1(6f9b190e06607766dea348f22f536aa1eb1336b5) )
 ROM_END
 
@@ -1109,7 +1113,7 @@ ROM_START( musclhit )
 	ROM_REGION( 0x0f, "rtc", 0 )
 	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(17614a6a) SHA1(f4714659937e7dd3eedc18bbedc4b3000134df16) )
 
-	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "gsan6_a-213", 0, SHA1(d9e7a350428d1621fc70e81561390c01837a94c0) )
 ROM_END
 
@@ -1120,9 +1124,11 @@ ROM_START( runpuppy )
 	ROM_REGION( 0x0f, "rtc", 0 )
 	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(907eb7d3) SHA1(bdbe3618a2c6dd3fb66f8e4c0226c5d827e38d67) )
 
-	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "an10311003", 0, SHA1(5f972e29c201cdd6697f25140b37a11f02b605f5) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

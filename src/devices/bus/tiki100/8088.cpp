@@ -36,6 +36,10 @@ ROM_START( tiki100_8088 )
 
 	ROM_REGION( 0x100, "u26", 0 )
 	ROM_LOAD( "53ls140.u26", 0x000, 0x100, CRC(fc5902e1) SHA1(afb9cb54ab6fc449e7544ddb3cbebc3770c4f937) )
+
+	ROM_REGION( 0x2000, "pals", 0 )
+	ROM_LOAD( "8088_pal16l2.u38.jed",    0x0000, 0x031f, CRC(d7f6abfe) SHA1(df58cecf1f99182820bcbf24c58b44d205668963) )
+	ROM_LOAD( "8088_pal16r6a-2.u47.jed", 0x1000, 0x0b06, CRC(ecd32454) SHA1(b6d4a7a3eb29d97971443b8a31ec5a4ce5ced0d8) )
 ROM_END
 
 

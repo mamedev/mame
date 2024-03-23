@@ -44,11 +44,11 @@ device_apf_cart_interface::~device_apf_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_apf_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_apf_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(APFSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -144,19 +144,16 @@ static const char *apf_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result apf_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> apf_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size > 0x3800)
-		{
-			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an APF cart");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Image exceeds the expected size for an APF cartridge (14K)");
 
-		m_cart->rom_alloc(size, tag());
+		m_cart->rom_alloc(size);
 
 		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), size);
@@ -186,11 +183,9 @@ image_init_result apf_cart_slot_device::call_load()
 		}
 
 		//printf("Type: %s\n", apf_get_slot(m_type));
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

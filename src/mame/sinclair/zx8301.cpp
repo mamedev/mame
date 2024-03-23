@@ -133,9 +133,6 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 
 void zx8301_device::device_start()
 {
-	// resolve callbacks
-	m_write_vsync.resolve_safe();
-
 	// allocate timers
 	m_vsync_timer = timer_alloc(FUNC(zx8301_device::output_vsync), this);
 	m_flash_timer = timer_alloc(FUNC(zx8301_device::toggle_flash), this);

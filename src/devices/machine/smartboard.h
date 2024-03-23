@@ -47,13 +47,13 @@ private:
 	u8 spawn_cb(offs_t offset);
 
 	// i/o lines
-	int m_data0 = 0;
-	int m_data1 = 0;
-	int m_output = 0;
+	int m_data0;
+	int m_data1;
+	int m_output;
 
 	// internal use
-	bool m_scan_pending = false;
-	u32 m_pos = 0;
+	bool m_scan_pending;
+	u32 m_pos;
 	u32 m_squares[64]; // board state
 };
 

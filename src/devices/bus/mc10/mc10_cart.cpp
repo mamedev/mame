@@ -27,6 +27,10 @@
         16  A3                 33  GND
         17  A5                 34  GND
 
+    Alice 32 and Alice 90 have 2 more pins:
+        35  IRQ (optional)
+        36  SOUND
+
     SEL is an input to the MC-10 that allows the cartridge to remove
     the internal chips from the bus.
 
@@ -36,6 +40,7 @@
 #include "mc10_cart.h"
 
 #include "mcx128.h"
+#include "multiports_ext.h"
 #include "pak.h"
 #include "ram.h"
 
@@ -60,8 +65,8 @@ mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const 
 	device_single_card_slot_interface<device_mc10cart_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
 	m_nmi_callback(*this),
-	m_cart(nullptr),
-	m_memspace(*this, finder_base::DUMMY_TAG, -1)
+	m_memspace(*this, finder_base::DUMMY_TAG, -1),
+	m_cart(nullptr)
 {
 }
 
@@ -71,7 +76,6 @@ mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const 
 
 void mc10cart_slot_device::device_start()
 {
-	m_nmi_callback.resolve_safe();
 	m_cart = get_card_device();
 }
 
@@ -88,35 +92,30 @@ void mc10cart_slot_device::set_nmi_line(int state)
 //  call_load
 //-------------------------------------------------
 
-image_init_result mc10cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> mc10cart_slot_device::call_load()
 {
 	if (!m_cart)
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 
 	memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
 	if (loaded_through_softlist() && !romregion)
-	{
-		seterror(image_error::INVALIDIMAGE, "Software list item has no 'rom' data area");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::BADSOFTWARE, "Software list item has no 'rom' data area");
 
 	u32 const len(loaded_through_softlist() ? romregion->bytes() : length());
 	if (len > m_cart->max_rom_length())
 	{
-		seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Unsupported cartridge size (must be no more than %u bytes)", m_cart->max_rom_length()));
 	}
 
 	if (!loaded_through_softlist())
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
-		romregion = machine().memory().region_alloc(subtag("rom").c_str(), len, 1, ENDIANNESS_BIG);
+		romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_BIG);
 		u32 const cnt(fread(romregion->base(), len));
 		if (cnt != len)
-		{
-			seterror(image_error::UNSPECIFIED, "Error reading cartridge file");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading cartridge file");
 	}
 
 	return m_cart->load();
@@ -189,9 +188,9 @@ int device_mc10cart_interface::max_rom_length() const
     load
 -------------------------------------------------*/
 
-image_init_result device_mc10cart_interface::load()
+std::pair<std::error_condition, std::string> device_mc10cart_interface::load()
 {
-	return image_init_result::FAIL;
+	return std::make_pair(image_error::UNSUPPORTED, std::string());
 }
 
 //-------------------------------------------------
@@ -204,6 +203,7 @@ void mc10_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("mcx128", MC10_PAK_MCX128);
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
+	device.option_add("multi", ALICE_MULTIPORTS_EXT);
 }
 
 //-------------------------------------------------
@@ -216,6 +216,7 @@ void alice_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("alice128", ALICE_PAK_MCX128);
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
+	device.option_add("multi", ALICE_MULTIPORTS_EXT);
 }
 
 //-------------------------------------------------
@@ -227,4 +228,5 @@ void alice32_cart_add_basic_devices(device_slot_interface &device)
 	// basic devices
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
+	device.option_add("multi", ALICE_MULTIPORTS_EXT);
 }

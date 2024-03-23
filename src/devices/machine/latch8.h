@@ -48,25 +48,25 @@ public:
 
 	// read bit x
 	// FIXME: does not honour read callbacks or XOR mask
-	DECLARE_READ_LINE_MEMBER( bit0_r ) { return BIT(m_value, 0); }
-	DECLARE_READ_LINE_MEMBER( bit1_r ) { return BIT(m_value, 1); }
-	DECLARE_READ_LINE_MEMBER( bit2_r ) { return BIT(m_value, 2); }
-	DECLARE_READ_LINE_MEMBER( bit3_r ) { return BIT(m_value, 3); }
-	DECLARE_READ_LINE_MEMBER( bit4_r ) { return BIT(m_value, 4); }
-	DECLARE_READ_LINE_MEMBER( bit5_r ) { return BIT(m_value, 5); }
-	DECLARE_READ_LINE_MEMBER( bit6_r ) { return BIT(m_value, 6); }
-	DECLARE_READ_LINE_MEMBER( bit7_r ) { return BIT(m_value, 7); }
+	int bit0_r() { return BIT(m_value, 0); }
+	int bit1_r() { return BIT(m_value, 1); }
+	int bit2_r() { return BIT(m_value, 2); }
+	int bit3_r() { return BIT(m_value, 3); }
+	int bit4_r() { return BIT(m_value, 4); }
+	int bit5_r() { return BIT(m_value, 5); }
+	int bit6_r() { return BIT(m_value, 6); }
+	int bit7_r() { return BIT(m_value, 7); }
 
 	// read inverted bit
 	// FIXME: does not honour read callbacks or XOR mask
-	DECLARE_READ_LINE_MEMBER( bit0_q_r ) { return BIT(~m_value, 0); }
-	DECLARE_READ_LINE_MEMBER( bit1_q_r ) { return BIT(~m_value, 1); }
-	DECLARE_READ_LINE_MEMBER( bit2_q_r ) { return BIT(~m_value, 2); }
-	DECLARE_READ_LINE_MEMBER( bit3_q_r ) { return BIT(~m_value, 3); }
-	DECLARE_READ_LINE_MEMBER( bit4_q_r ) { return BIT(~m_value, 4); }
-	DECLARE_READ_LINE_MEMBER( bit5_q_r ) { return BIT(~m_value, 5); }
-	DECLARE_READ_LINE_MEMBER( bit6_q_r ) { return BIT(~m_value, 6); }
-	DECLARE_READ_LINE_MEMBER( bit7_q_r ) { return BIT(~m_value, 7); }
+	int bit0_q_r() { return BIT(~m_value, 0); }
+	int bit1_q_r() { return BIT(~m_value, 1); }
+	int bit2_q_r() { return BIT(~m_value, 2); }
+	int bit3_q_r() { return BIT(~m_value, 3); }
+	int bit4_q_r() { return BIT(~m_value, 4); }
+	int bit5_q_r() { return BIT(~m_value, 5); }
+	int bit6_q_r() { return BIT(~m_value, 6); }
+	int bit7_q_r() { return BIT(~m_value, 7); }
 
 	// write bit x from data into bit determined by offset
 	// latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset)

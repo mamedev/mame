@@ -36,6 +36,9 @@
 #include "bus/generic/carts.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 class bbcbc_state : public driver_device
 {
 public:
@@ -173,6 +176,9 @@ ROM_START( bbcbc )
 	ROM_LOAD("br_4_1.ic3", 0x0000, 0x2000, CRC(7c880d75) SHA1(954db096bd9e8edfef72946637a12f1083841fb0))
 	ROM_LOAD("br_4_2.ic4", 0x2000, 0x2000, CRC(16a33aef) SHA1(9529f9f792718a3715af2063b91a5fb18f741226))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

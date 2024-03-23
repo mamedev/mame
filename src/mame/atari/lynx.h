@@ -5,8 +5,8 @@
  Atari Lynx
 
 ******************************************************************************/
-#ifndef MAME_INCLUDES_LYNX_H
-#define MAME_INCLUDES_LYNX_H
+#ifndef MAME_ATARI_LYNX_H
+#define MAME_ATARI_LYNX_H
 
 #pragma once
 
@@ -302,7 +302,7 @@ private:
 	void uart_reset();
 	void interrupt_set(u8 line);
 	void interrupt_update();
-	image_verify_result verify_cart(char *header, int kind);
+	std::pair<std::error_condition, std::string> verify_cart(const char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 
@@ -410,4 +410,4 @@ private:
 #define SCB_STRETCH     0x0F    // L H H/V Size Adder
 #define SCB_TILT        0x11    // L,H H Position Adder
 
-#endif // MAME_INCLUDES_LYNX_H
+#endif // MAME_ATARI_LYNX_H

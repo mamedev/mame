@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_DAI_SND_H
-#define MAME_AUDIO_DAI_SND_H
+#ifndef MAME_DAI_DAI_SND_H
+#define MAME_DAI_DAI_SND_H
 
 
 // ======================> dai_sound_device
@@ -18,9 +18,9 @@ public:
 	// construction/destruction
 	dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
+	void set_input_ch0(int state);
+	void set_input_ch1(int state);
+	void set_input_ch2(int state);
 	void set_volume(offs_t offset, uint8_t data);
 
 protected:
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DAI_SOUND, dai_sound_device)
 
-#endif // MAME_AUDIO_DAI_SND_H
+#endif // MAME_DAI_DAI_SND_H

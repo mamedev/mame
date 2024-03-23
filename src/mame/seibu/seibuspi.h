@@ -150,7 +150,7 @@ protected:
 	u32 rf2_speedup_r();
 	u32 rfjet_speedup_r();
 
-	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
+	void ymf_irqhandler(int state);
 
 	void set_layer_offsets();
 	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, bitmap_ind8 &primap, u8 primask);

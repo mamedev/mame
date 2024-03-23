@@ -21,17 +21,18 @@
  *
  *************************************/
 
-/* define these to 0 to disable, or to 1 to enable */
-#define LOG_KEYCARDS        0
-#define LOG_KEYCARDS_FULL   0
-#define LOG_BANKSWITCHING_M 0
-#define LOG_BANKSWITCHING_S 0
-#define LOG_SOUNDPORT       0
-#define LOG_EEPROM          0
-#define LOG_BATTERY_RAM     0
-#define LOG_XROM            0
+#define LOG_WARN            (1U << 1)
+#define LOG_KEYCARDS        (1U << 2)
+#define LOG_KEYCARDS_FULL   (1U << 3)
+#define LOG_BANKSWITCHING_M (1U << 4)
+#define LOG_BANKSWITCHING_S (1U << 5)
+#define LOG_SOUNDPORT       (1U << 6)
+#define LOG_EEPROM          (1U << 7)
+#define LOG_BATTERY_RAM     (1U << 8)
+#define LOG_XROM            (1U << 9)
 
-
+#define VERBOSE             LOG_WARN
+#include "logmacro.h"
 
 /* Internal routines */
 
@@ -272,7 +273,7 @@ u8 ataxx_state::indyheat_analog_r(offs_t offset)
 		return 0;
 
 	case 3:
-		logerror("Unexpected analog read(%02X)\n", 8 + offset);
+		LOGMASKED(LOG_WARN, "Unexpected analog read(%02X)\n", 8 + offset);
 		break;
 	}
 	return 0xff;
@@ -290,7 +291,7 @@ void ataxx_state::indyheat_analog_w(offs_t offset, u8 data)
 		case 0:
 		case 1:
 		case 2:
-			logerror("Unexpected analog write(%02X) = %02X\n", 8 + offset, data);
+			LOGMASKED(LOG_WARN, "Unexpected analog write(%02X) = %02X\n", 8 + offset, data);
 			break;
 	}
 }
@@ -459,9 +460,8 @@ INTERRUPT_GEN_MEMBER(leland_state::leland_master_interrupt)
 void leland_state::leland_master_alt_bankswitch_w(u8 data)
 {
 	/* update any bankswitching */
-	if (LOG_BANKSWITCHING_M)
-		if ((m_alternate_bank ^ data) & 0x0f)
-			logerror("%04X:alternate_bank = %02X\n", m_master->pc(), data & 0x0f);
+	if ((m_alternate_bank ^ data) & 0x0f)
+		LOGMASKED(LOG_BANKSWITCHING_M, "%04X:alternate_bank = %02X\n", m_master->pc(), data & 0x0f);
 	m_alternate_bank = data & 15;
 	(this->*m_update_master_bank)();
 }
@@ -558,7 +558,7 @@ void leland_state::viper_bankswitch()
 	address = &m_master_base[bank_list[m_alternate_bank & 3]];
 	if (bank_list[m_alternate_bank & 3] >= m_master_base.length())
 	{
-		logerror("%s:Master bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 3);
+		LOGMASKED(LOG_WARN, "%s:Master bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 3);
 		address = &m_master_base[bank_list[0]];
 	}
 	m_master_bankslot[0]->set_base(address);
@@ -579,7 +579,7 @@ void leland_state::offroad_bankswitch()
 	address = &m_master_base[bank_list[m_alternate_bank & 7]];
 	if (bank_list[m_alternate_bank & 7] >= m_master_base.length())
 	{
-		logerror("%s:Master bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 7);
+		LOGMASKED(LOG_WARN, "%s:Master bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 7);
 		address = &m_master_base[bank_list[0]];
 	}
 	m_master_bankslot[0]->set_base(address);
@@ -604,7 +604,7 @@ void ataxx_state::ataxx_bankswitch()
 	address = &m_master_base[bank_list[m_master_bank & 15]];
 	if (bank_list[m_master_bank & 15] >= m_master_base.length())
 	{
-		logerror("%s:Master bank %02X out of range!\n", machine().describe_context(), m_master_bank & 15);
+		LOGMASKED(LOG_WARN, "%s:Master bank %02X out of range!\n", machine().describe_context(), m_master_bank & 15);
 		address = &m_master_base[bank_list[0]];
 	}
 	m_master_bankslot[0]->set_base(address);
@@ -816,14 +816,14 @@ void leland_state::ataxx_init_eeprom(const u16 *data)
 u8 ataxx_state::eeprom_r()
 {
 	int port = m_io_in[2]->read();
-	if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
+	LOGMASKED(LOG_EEPROM, "%s:EE read\n", machine().describe_context());
 	return port;
 }
 
 
 void ataxx_state::eeprom_w(u8 data)
 {
-	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
+	LOGMASKED(LOG_EEPROM, "%s:EE write %d%d%d\n", machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 	m_eeprom->di_write (BIT(data, 4));
 	m_eeprom->clk_write(BIT(data, 5));
@@ -842,11 +842,11 @@ void leland_state::leland_battery_ram_w(offs_t offset, u8 data)
 {
 	if (m_battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", m_master->pc(), offset, data);
+		LOGMASKED(LOG_BATTERY_RAM, "%04X:BatteryW@%04X=%02X\n", m_master->pc(), offset, data);
 		m_battery_ram[offset] = data;
 	}
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", m_master->pc(), offset);
+		LOGMASKED(LOG_WARN, "%04X:BatteryW@%04X (invalid!)\n", m_master->pc(), offset);
 }
 
 
@@ -854,7 +854,7 @@ void ataxx_state::ataxx_battery_ram_w(offs_t offset, u8 data)
 {
 	if (m_battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", m_master->pc(), offset, data);
+		LOGMASKED(LOG_BATTERY_RAM, "%04X:BatteryW@%04X=%02X\n", m_master->pc(), offset, data);
 		m_battery_ram[offset] = data;
 	}
 	else if ((m_master_bank & 0x30) == 0x20)
@@ -863,7 +863,7 @@ void ataxx_state::ataxx_battery_ram_w(offs_t offset, u8 data)
 		m_tilemap->mark_tile_dirty(((m_master_bank & 0x80) << 8) | offset);
 	}
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", m_master->pc(), offset);
+		LOGMASKED(LOG_WARN, "%04X:BatteryW@%04X (invalid!)\n", m_master->pc(), offset);
 }
 
 
@@ -920,7 +920,7 @@ int leland_state::keycard_r()
 {
 	int result = 0;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_r)\n", machine().describe_context());
+	LOGMASKED(LOG_KEYCARDS_FULL, "  (%s:keycard_r)\n", machine().describe_context());
 
 	/* if we have a valid keycard read state, we're reading from the keycard */
 	if (m_keycard_state & 0x80)
@@ -929,12 +929,12 @@ int leland_state::keycard_r()
 		if (m_keycard_bit == 1)
 		{
 			m_keycard_shift = 0xff;  /* no data, but this is where we would clock it in */
-			if (LOG_KEYCARDS) logerror("  (clocked in %02X)\n", m_keycard_shift);
+			LOGMASKED(LOG_KEYCARDS, "  (clocked in %02X)\n", m_keycard_shift);
 		}
 
 		/* clock in the bit */
 		result = (~m_keycard_shift & 1) << ((m_keycard_state >> 4) & 3);
-		if (LOG_KEYCARDS) logerror("  (read %02X)\n", result);
+		LOGMASKED(LOG_KEYCARDS, "  (read %02X)\n", result);
 	}
 	return result;
 }
@@ -944,20 +944,20 @@ void leland_state::keycard_w(int data)
 	int new_state = data & 0xb0;
 	int new_clock = data & 0x40;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_w=%02X)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_KEYCARDS_FULL, "  (%s:keycard_w=%02X)\n", machine().describe_context(), data);
 
 	/* check for going active */
 	if (!m_keycard_state && new_state)
 	{
 		m_keycard_command[0] = m_keycard_command[1] = m_keycard_command[2] = 0;
-		if (LOG_KEYCARDS) logerror("keycard going active (state=%02X)\n", new_state);
+		LOGMASKED(LOG_KEYCARDS, "keycard going active (state=%02X)\n", new_state);
 	}
 
 	/* check for going inactive */
 	else if (m_keycard_state && !new_state)
 	{
 		m_keycard_command[0] = m_keycard_command[1] = m_keycard_command[2] = 0;
-		if (LOG_KEYCARDS) logerror("keycard going inactive\n");
+		LOGMASKED(LOG_KEYCARDS, "keycard going inactive\n");
 	}
 
 	/* check for clocks */
@@ -973,7 +973,7 @@ void leland_state::keycard_w(int data)
 		/* look for a bit write */
 		else if (!new_clock && !m_keycard_clock && !(data & 0x80))
 		{
-			if (LOG_KEYCARDS) logerror("  (write %02X)\n", data);
+			LOGMASKED(LOG_KEYCARDS, "  (write %02X)\n", data);
 
 			m_keycard_shift &= ~0x80;
 			if (data & (1 << ((new_state >> 4) & 3)))
@@ -982,13 +982,13 @@ void leland_state::keycard_w(int data)
 			/* clock out the data on the last bit */
 			if (m_keycard_bit == 7)
 			{
-				if (LOG_KEYCARDS) logerror("  (clocked out %02X)\n", m_keycard_shift);
+				LOGMASKED(LOG_KEYCARDS, "  (clocked out %02X)\n", m_keycard_shift);
 				m_keycard_command[0] = m_keycard_command[1];
 				m_keycard_command[1] = m_keycard_command[2];
 				m_keycard_command[2] = m_keycard_shift;
 				if (m_keycard_command[0] == 0x62 && m_keycard_command[1] == 0x00 && m_keycard_command[2] == 0x80)
 				{
-					if (LOG_KEYCARDS) logerror("  (got command $62)\n");
+					LOGMASKED(LOG_KEYCARDS, "  (got command $62)\n");
 				}
 			}
 		}
@@ -999,7 +999,7 @@ void leland_state::keycard_w(int data)
 	{
 		/* only an error if the selected bit changes; read/write transitions are okay */
 		if ((new_state & 0x30) != (m_keycard_state & 0x30))
-			if (LOG_KEYCARDS) logerror("ERROR: Caught keycard state transition %02X -> %02X\n", m_keycard_state, new_state);
+			LOGMASKED(LOG_KEYCARDS, "ERROR: Caught keycard state transition %02X -> %02X\n", m_keycard_state, new_state);
 	}
 
 	m_keycard_state = new_state;
@@ -1052,9 +1052,8 @@ void leland_state::master_analog_key_w(offs_t offset, u8 data)
 			m_analog_result = m_io_an[data & 15]->read();
 
 			/* update top board banking for some games */
-			if (LOG_BANKSWITCHING_M)
-				if ((m_top_board_bank ^ data) & 0xc0)
-					logerror("%04X:top_board_bank = %02X\n", m_master->pc(), data & 0xc0);
+			if ((m_top_board_bank ^ data) & 0xc0)
+				LOGMASKED(LOG_BANKSWITCHING_M, "%04X:top_board_bank = %02X\n", m_master->pc(), data & 0xc0);
 			m_top_board_bank = data & 0xc0;
 			(this->*m_update_master_bank)();
 			break;
@@ -1109,11 +1108,11 @@ u8 leland_state::leland_master_input_r(offs_t offset)
 
 		case 0x11:  /* /GIN1 */
 			result = m_io_in[3]->read();
-			if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
+			LOGMASKED(LOG_EEPROM, "%s:EE read\n", machine().describe_context());
 			break;
 
 		default:
-			logerror("Master I/O read offset %02X\n", offset);
+			LOGMASKED(LOG_WARN, "Master I/O read offset %02X\n", offset);
 			break;
 	}
 	return result;
@@ -1130,7 +1129,7 @@ void leland_state::leland_master_output_w(offs_t offset, u8 data)
 			m_slave->set_input_line(INPUT_LINE_NMI, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 			m_slave->set_input_line(0, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
-			if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
+			LOGMASKED(LOG_EEPROM, "%s:EE write %d%d%d\n", machine().describe_context(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 			m_eeprom->di_write (BIT(data, 4));
 			m_eeprom->clk_write(BIT(data, 5));
@@ -1154,7 +1153,7 @@ void leland_state::leland_master_output_w(offs_t offset, u8 data)
 			break;
 
 		default:
-			logerror("Master I/O write offset %02X=%02X\n", offset, data);
+			LOGMASKED(LOG_WARN, "Master I/O write offset %02X=%02X\n", offset, data);
 			break;
 	}
 }
@@ -1177,7 +1176,7 @@ u8 ataxx_state::ataxx_master_input_r(offs_t offset)
 			break;
 
 		default:
-			logerror("Master I/O read offset %02X\n", offset);
+			LOGMASKED(LOG_WARN, "Master I/O read offset %02X\n", offset);
 			break;
 	}
 	return result;
@@ -1196,9 +1195,8 @@ void ataxx_state::ataxx_master_output_w(offs_t offset, u8 data)
 			break;
 
 		case 0x04:  /* /MBNK */
-			if (LOG_BANKSWITCHING_M)
-				if ((m_master_bank ^ data) & 0xff)
-					logerror("%04X:master_bank = %02X\n", m_master->pc(), data & 0xff);
+			if ((m_master_bank ^ data) & 0xff)
+				LOGMASKED(LOG_BANKSWITCHING_M, "%04X:master_bank = %02X\n", m_master->pc(), data & 0xff);
 			m_master_bank = data;
 			ataxx_bankswitch();
 			break;
@@ -1214,7 +1212,7 @@ void ataxx_state::ataxx_master_output_w(offs_t offset, u8 data)
 			break;
 
 		default:
-			logerror("Master I/O write offset %02X=%02X\n", offset, data);
+			LOGMASKED(LOG_WARN, "Master I/O write offset %02X=%02X\n", offset, data);
 			break;
 	}
 }
@@ -1251,22 +1249,22 @@ void ataxx_state::paletteram_and_misc_w(offs_t offset, u8 data)
 	else if (offset == 0x7fc)
 	{
 		m_xrom1_addr = (m_xrom1_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM1 address low write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom1_addr);
+		LOGMASKED(LOG_XROM, "%04X:XROM1 address low write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom1_addr);
 	}
 	else if (offset == 0x7fd)
 	{
 		m_xrom1_addr = (m_xrom1_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM1 address high write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom1_addr);
+		LOGMASKED(LOG_XROM, "%04X:XROM1 address high write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom1_addr);
 	}
 	else if (offset == 0x7fe)
 	{
 		m_xrom2_addr = (m_xrom2_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM2 address low write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom2_addr);
+		LOGMASKED(LOG_XROM, "%04X:XROM2 address low write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom2_addr);
 	}
 	else if (offset == 0x7ff)
 	{
 		m_xrom2_addr = (m_xrom2_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM2 address high write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom2_addr);
+		LOGMASKED(LOG_XROM, "%04X:XROM2 address high write = %02X (addr=%04X)\n", m_master->pc(), data, m_xrom2_addr);
 	}
 	else
 		m_extra_tram[offset] = data;
@@ -1280,13 +1278,13 @@ u8 ataxx_state::paletteram_and_misc_r(offs_t offset)
 	else if (offset == 0x7fc || offset == 0x7fd)
 	{
 		int result = m_xrom_base[0x00000 | m_xrom1_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM1 read(%d) = %02X (addr=%04X)\n", m_master->pc(), offset - 0x7fc, result, m_xrom1_addr);
+		LOGMASKED(LOG_XROM, "%04X:XROM1 read(%d) = %02X (addr=%04X)\n", m_master->pc(), offset - 0x7fc, result, m_xrom1_addr);
 		return result;
 	}
 	else if (offset == 0x7fe || offset == 0x7ff)
 	{
 		int result = m_xrom_base[0x20000 | m_xrom2_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM2 read(%d) = %02X (addr=%04X)\n", m_master->pc(), offset - 0x7fc, result, m_xrom2_addr);
+		LOGMASKED(LOG_XROM, "%04X:XROM2 read(%d) = %02X (addr=%04X)\n", m_master->pc(), offset - 0x7fc, result, m_xrom2_addr);
 		return result;
 	}
 	else
@@ -1317,9 +1315,8 @@ void leland_state::sound_port_w(u8 data)
 	m_dac_control = data & 3;
 
 	/* some bankswitching occurs here */
-	if (LOG_BANKSWITCHING_M)
-		if ((m_sound_port_bank ^ data) & 0x24)
-			logerror("%s:sound_port_bank = %02X\n", machine().describe_context(), data & 0x24);
+	if ((m_sound_port_bank ^ data) & 0x24)
+		LOGMASKED(LOG_BANKSWITCHING_M, "%s:sound_port_bank = %02X\n", machine().describe_context(), data & 0x24);
 	m_sound_port_bank = data & 0x24;
 	(this->*m_update_master_bank)();
 }
@@ -1338,12 +1335,12 @@ void leland_state::slave_small_banksw_w(u8 data)
 
 	if (bankaddress >= m_slave_base.length())
 	{
-		logerror("%04X:Slave bank %02X out of range!", m_slave->pc(), data & 1);
+		LOGMASKED(LOG_WARN, "%04X:Slave bank %02X out of range!", m_slave->pc(), data & 1);
 		bankaddress = 0x10000;
 	}
 	m_slave_bankslot->set_base(&m_slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data & 1, bankaddress);
+	LOGMASKED(LOG_BANKSWITCHING_S, "%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data & 1, bankaddress);
 }
 
 
@@ -1353,12 +1350,12 @@ void leland_state::slave_large_banksw_w(u8 data)
 
 	if (bankaddress >= m_slave_base.length())
 	{
-		logerror("%04X:Slave bank %02X out of range!", m_slave->pc(), data & 15);
+		LOGMASKED(LOG_WARN, "%04X:Slave bank %02X out of range!", m_slave->pc(), data & 15);
 		bankaddress = 0x10000;
 	}
 	m_slave_bankslot->set_base(&m_slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data & 15, bankaddress);
+	LOGMASKED(LOG_BANKSWITCHING_S, "%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data & 15, bankaddress);
 }
 
 
@@ -1377,12 +1374,12 @@ void leland_state::ataxx_slave_banksw_w(u8 data)
 
 	if (bankaddress >= m_slave_base.length())
 	{
-		logerror("%04X:Slave bank %02X out of range!", m_slave->pc(), data & 0x3f);
+		LOGMASKED(LOG_WARN, "%04X:Slave bank %02X out of range!", m_slave->pc(), data & 0x3f);
 		bankaddress = 0x2000;
 	}
 	m_slave_bankslot->set_base(&m_slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data, bankaddress);
+	LOGMASKED(LOG_BANKSWITCHING_S, "%04X:Slave bank = %02X (%05X)\n", m_slave->pc(), data, bankaddress);
 }
 
 

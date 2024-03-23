@@ -45,13 +45,55 @@
 #include "emu.h"
 #include "pc9821.h"
 
+uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	if(m_video_ff[DISPLAY_REG] != 0)
+	{
+		// PEGC 256 mode is linear VRAM picked from a specific VRAM buffer.
+		// It doesn't latch values from GDC, it runs on its own renderer instead.
+		// Is the DAC really merging two pixels not unlike VGA correlated Mode 13h?
+		// https://github.com/joncampbell123/dosbox-x/issues/1289#issuecomment-543025016
+		// TODO: getter cliprect from bitmap GDC
+		if (m_ex_video_ff[ANALOG_256_MODE])
+		{
+			rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+			u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+			int base_y = cliprect.min_y;
+
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			{
+				for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+				{
+					u32 address = (y - base_y) * (640 / 8) + (x / 8);
+					for(int xi = 0; xi < 8; xi += 2)
+					{
+						int res_x = x + xi;
+						int res_y = y;
+
+						u16 pen = ext_gvram[(address << 2) + (xi >> 1) + (m_vram_disp * 0x20000)];
+
+						bitmap.pix(res_y, res_x + 0) = palette[(pen & 0xff) + 0x20];
+						bitmap.pix(res_y, res_x + 1) = palette[(pen >> 8) + 0x20];
+					}
+				}
+			}
+		}
+		else
+			m_hgdc[1]->screen_update(screen, bitmap, cliprect);
+	}
+	m_hgdc[0]->screen_update(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+// old code, for consultation
+#if 0
 UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pegc_display_pixels )
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		// PEGC mode is linear VRAM picked from a specific VRAM buffer.
-		// It still latches addresses from μPD7220, and applies some shuffling around.
-		// Is the DAC really merging two pixels not unlike VGA correlated Mode 13h?
 		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
 
@@ -69,6 +111,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pegc_display_pixels )
 	else
 		pc9801_state::hgdc_display_pixels(bitmap, y, x, address);
 }
+#endif
 
 void pc9821_state::pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -665,7 +708,7 @@ void pc9821_state::pc9821(machine_config &config)
 
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
 
-	m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
+//  m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
 }
 
 void pc9821_mate_a_state::pc9821as(machine_config &config)

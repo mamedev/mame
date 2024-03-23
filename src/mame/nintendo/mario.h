@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-#ifndef MAME_INCLUDES_MARIO_H
-#define MAME_INCLUDES_MARIO_H
+#ifndef MAME_NINTENDO_MARIO_H
+#define MAME_NINTENDO_MARIO_H
 
 #pragma once
 
@@ -117,18 +117,18 @@ private:
 	int m_monitor;
 
 	bool      m_nmi_mask = false;
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void nmi_mask_w(int state);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 	void mario_videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(gfx_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
+	void gfx_bank_w(int state);
+	void palette_bank_w(int state);
 	void mario_scroll_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_w);
+	void flip_w(int state);
 	uint8_t mario_sh_p1_r();
 	uint8_t mario_sh_p2_r();
-	DECLARE_READ_LINE_MEMBER(mario_sh_t0_r);
-	DECLARE_READ_LINE_MEMBER(mario_sh_t1_r);
+	int mario_sh_t0_r();
+	int mario_sh_t1_r();
 	uint8_t mario_sh_tune_r(offs_t offset);
 	void mario_sh_p1_w(uint8_t data);
 	void mario_sh_p2_w(uint8_t data);
@@ -141,7 +141,7 @@ private:
 	virtual void sound_reset() override;
 	void mario_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void mario_sh_sound_w(uint8_t data);
 	void mario_sh1_w(uint8_t data);
 	void mario_sh2_w(uint8_t data);
@@ -157,4 +157,4 @@ private:
 	void masao_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MARIO_H
+#endif // MAME_NINTENDO_MARIO_H

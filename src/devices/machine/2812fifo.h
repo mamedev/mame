@@ -42,14 +42,14 @@ public:
 
 	// control signal interface
 	void d_w(u8 data) { m_d = data; }
-	DECLARE_WRITE_LINE_MEMBER(mr_w);
-	DECLARE_WRITE_LINE_MEMBER(pl_w);
-	DECLARE_WRITE_LINE_MEMBER(pd_w);
-	DECLARE_WRITE_LINE_MEMBER(oe_w);
+	void mr_w(int state);
+	void pl_w(int state);
+	void pd_w(int state);
+	void oe_w(int state);
 	u8 q_r() const { return m_oe ? m_data[LENGTH - 1] : 0xff; }
-	DECLARE_READ_LINE_MEMBER(ir_r) const { return BIT(m_control, 0); }
-	DECLARE_READ_LINE_MEMBER(or_r) const { return BIT(m_control, LENGTH - 1); }
-	DECLARE_READ_LINE_MEMBER(flag_r);
+	int ir_r() const { return BIT(m_control, 0); }
+	int or_r() const { return BIT(m_control, LENGTH - 1); }
+	int flag_r();
 
 	// read/write interface
 	u8 read();

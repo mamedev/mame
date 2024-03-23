@@ -5,8 +5,8 @@
     Kick Goal - Action Hollywood
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_KICKGOAL_H
-#define MAME_INCLUDES_KICKGOAL_H
+#ifndef MAME_TCH_KICKGOAL_H
+#define MAME_TCH_KICKGOAL_H
 
 #pragma once
 
@@ -121,4 +121,4 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 };
 
-#endif // MAME_INCLUDES_KICKGOAL_H
+#endif // MAME_TCH_KICKGOAL_H

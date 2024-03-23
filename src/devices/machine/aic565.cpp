@@ -49,21 +49,6 @@ aic565_device::aic565_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void aic565_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_hrst_callback.resolve_safe();
-	m_srst_callback.resolve_safe();
-	m_irq_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

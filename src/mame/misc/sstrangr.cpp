@@ -333,6 +333,8 @@ TODO:
 #include "sstrangr.lh"
 
 
+namespace {
+
 class sstrangr_state : public driver_device
 {
 public:
@@ -684,6 +686,8 @@ ROM_START( sstrangr2 )
 	ROM_REGION( 0x0400, "proms", 0 )        // color maps player 1/player 2
 	ROM_LOAD( "2708.15",      0x0000, 0x0400, CRC(c176a89d) SHA1(955dd540dc3787091c3f34ae122a13e6b7523414) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )

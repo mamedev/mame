@@ -45,6 +45,8 @@
 #include "emu.h"
 #include "sixword.h"
 
+#include "formats/swd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS
@@ -266,9 +268,9 @@ void spectrum_swiftdisc2_device::device_reset()
 //  IMPLEMENTATION (swiftdisc)
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_swiftdisc_device::romcs)
+bool spectrum_swiftdisc_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_swiftdisc_device::post_opcode_fetch(offs_t offset)

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
+
 /*************************************************************************
 
-    audio\triplhnt.cpp
+    atari\triplhnt_a.cpp
 
 *************************************************************************/
 #include "emu.h"
-#include "triplhnt.h"
-#include "sound/discrete.h"
+
+#include "triplhnt_a.h"
 
 
 const char *const triplhnt_sample_names[] =

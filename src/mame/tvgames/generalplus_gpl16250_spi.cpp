@@ -17,6 +17,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class generalplus_gpspispi_game_state : public gcm394_game_state
 {
 public:
@@ -106,12 +108,12 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machine_config &config)
@@ -181,6 +183,8 @@ void generalplus_gpspispi_game_state::init_spi()
 	internal[0x7ffe] = vectorbase + 0x1c;
 	internal[0x7fff] = vectorbase + 0x1e;
 }
+
+} // anonymous namespace
 
 
 CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state , init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

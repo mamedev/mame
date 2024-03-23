@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
-#ifndef MAME_INCLUDES_SYSTEM1_H
-#define MAME_INCLUDES_SYSTEM1_H
+#ifndef MAME_SEGA_SYSTEM1_H
+#define MAME_SEGA_SYSTEM1_H
 
 #pragma once
 
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "sound/sn76496.h"
 #include "machine/z80pio.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -27,6 +28,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
+		m_sn(*this, "sn%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -51,6 +53,7 @@ public:
 	void sys1ppisx_315_5064(machine_config &config);
 	void sys2_317_0007(machine_config &config);
 	void sys1piox_315_5110(machine_config &config);
+	void sys1piox_315_5111(machine_config &config);
 	void sys1piox_315_5065(machine_config &config);
 	void sys2m(machine_config &config);
 	void sys1ppix_315_5178(machine_config &config);
@@ -70,7 +73,7 @@ public:
 	void sys1piox_315_5135(machine_config &config);
 	void sys2rowxboot(machine_config &config);
 	void sys1piox_315_5102(machine_config &config);
-	void sys1piosx_315_spat(machine_config &config);
+	void sys1piosx_315_5096(machine_config &config);
 	void sys2x(machine_config &config);
 	void sys1piox_315_5051(machine_config &config);
 	void sys1piox_315_5098(machine_config &config);
@@ -134,6 +137,7 @@ private:
 	u8 m_tilemap_pages = 0;
 
 	// protection, miscs
+	u8 m_adjust_cycles = 0;
 	u8 m_mute_xor = 0;
 	u8 m_dakkochn_mux_data = 0;
 	u8 m_mcu_control = 0;
@@ -162,6 +166,7 @@ private:
 	void sound_control_w(u8 data);
 
 	// misc handlers
+	void adjust_cycles(u8 data);
 	void mcu_control_w(u8 data);
 	u8 mcu_io_r(offs_t offset);
 	void mcu_io_w(offs_t offset, u8 data);
@@ -204,6 +209,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
+	required_device_array<sn76489a_device, 2> m_sn;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -244,4 +250,4 @@ private:
 	void system1_ppi_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SYSTEM1_H
+#endif // MAME_SEGA_SYSTEM1_H

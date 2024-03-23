@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_AUDIO_ELAN_EU3A05_H
-#define MAME_AUDIO_ELAN_EU3A05_H
+#ifndef MAME_TVGAMES_ELAN_EU3A05_A_H
+#define MAME_TVGAMES_ELAN_EU3A05_A_H
 
 #include "sound/okiadpcm.h"
 
@@ -86,4 +86,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device)
 
-#endif // MAME_AUDIO_RAD_EU3A05_H
+#endif // MAME_TVGAMES_RAD_EU3A05_A_H

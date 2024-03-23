@@ -9,10 +9,15 @@
 #ifndef __WIN_D3DHLSL__
 #define __WIN_D3DHLSL__
 
-#include <vector>
 #include "../frontend/mame/ui/menuitem.h"
 #include "../frontend/mame/ui/slider.h"
 #include "modules/lib/osdlib.h"
+
+#include <wrl/client.h>
+
+#include <map>
+#include <memory>
+#include <vector>
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -133,11 +138,8 @@ public:
 	effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, const char *path);
 	~effect();
 
-	void        begin(UINT *passes, DWORD flags);
-	void        begin_pass(UINT pass);
-
+	void        begin(DWORD flags);
 	void        end();
-	void        end_pass();
 
 	void        set_technique(const char *name);
 
@@ -145,7 +147,6 @@ public:
 	void        set_float(D3DXHANDLE param, float value);
 	void        set_int(D3DXHANDLE param, int value);
 	void        set_bool(D3DXHANDLE param, bool value);
-	void        set_matrix(D3DXHANDLE param, D3DXMATRIX *matrix);
 	void        set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex);
 
 	void        add_uniform(const char *name, uniform::uniform_type type, int id);
@@ -154,16 +155,26 @@ public:
 	D3DXHANDLE  get_parameter(D3DXHANDLE param, const char *name);
 
 	shaders*    get_shaders() { return m_shaders; }
+	uint32_t    num_passes() { return m_num_passes; }
 
 	bool        is_valid() { return m_valid; }
+	bool        is_active() { return m_active; }
 
 private:
 	std::vector<std::unique_ptr<uniform>> m_uniform_list;
 
 	ID3DXEffect *m_effect;
 	shaders     *m_shaders;
+	uint32_t     m_num_passes;
+
+	std::map<D3DXHANDLE, D3DXVECTOR4> m_vecs;
+	std::map<D3DXHANDLE, float> m_floats;
+	std::map<D3DXHANDLE, int> m_ints;
+	std::map<D3DXHANDLE, bool> m_bools;
+	std::map<D3DXHANDLE, void*> m_textures;
 
 	bool        m_valid;
+	bool        m_active;
 };
 
 class d3d_render_target;
@@ -300,10 +311,13 @@ public:
 	shaders();
 	~shaders();
 
-	bool init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer);
+	bool init(IDirect3D9 *d3dobj, running_machine *machine, renderer_d3d9 *renderer);
 
-	bool enabled() { return post_fx_enable && d3dintf->post_fx_available; }
+	bool enabled() { return post_fx_enable && d3d->post_fx_available(); }
 	void toggle() { post_fx_enable = initialized && !post_fx_enable; }
+
+	void begin_frame(render_primitive_list *primlist);
+	void end_frame();
 
 	void begin_draw();
 	void end_draw();
@@ -323,6 +337,7 @@ public:
 	void init_fsfx_quad();
 
 	void set_texture(texture_info *info);
+	void set_filter(bool filter_screens);
 	void remove_render_target(int source_width, int source_height, uint32_t screen_index);
 	void remove_render_target(d3d_render_target *rt);
 
@@ -336,8 +351,12 @@ public:
 	void *get_slider_option(int id, int index = 0);
 
 private:
+	using IDirect3D9Ptr = Microsoft::WRL::ComPtr<IDirect3D9>;
+	using IDirect3DTexture9Ptr = Microsoft::WRL::ComPtr<IDirect3DTexture9>;
+	using IDirect3DSurface9Ptr = Microsoft::WRL::ComPtr<IDirect3DSurface9>;
+
+	void                    set_curr_effect(effect *curr_effect);
 	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, uint32_t prim_index, uint32_t prim_count);
-	void                    enumerate_screens();
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
 	// Time since last call, only updates once per render of all screens
@@ -364,7 +383,7 @@ private:
 	int                     screen_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	void                    ui_pass(poly_info *poly, int vertnum);
 
-	d3d_base *              d3dintf;                    // D3D interface
+	IDirect3D9Ptr           d3dobj;                     // D3D interface
 
 	running_machine *       machine;
 	renderer_d3d9 *         d3d;                        // D3D renderer
@@ -372,7 +391,10 @@ private:
 	bool                    post_fx_enable;             // overall enable flag
 	bool                    oversampling_enable;        // oversampling enable flag
 	int                     num_screens;                // number of emulated physical screens
-	int                     curr_screen;                // current screen for render target operations
+	int                     num_targets;                // number of emulated screen targets (can be different from above; cf. artwork and Laserdisc games)
+	int                     curr_target;                // current target index for render target operations
+	int                     targets_per_screen[256];    // screen target count per screen device/container index; estimated maximum count for array size
+	int                     target_to_screen[256];      // lookup from target index to screen device/container index; estimated maximum count for array size
 	double                  acc_t;                      // accumulated machine time
 	double                  delta_t;                    // data for delta_time
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
@@ -383,49 +405,55 @@ private:
 	texture_info *          ui_lut_texture;
 	hlsl_options *          options;                    // current options
 
-	IDirect3DSurface9 *     black_surface;              // black dummy surface
-	IDirect3DTexture9 *     black_texture;              // black dummy texture
+	IDirect3DSurface9Ptr    black_surface;              // black dummy surface
+	IDirect3DTexture9Ptr    black_texture;              // black dummy texture
 
 	bool                    recording_movie;            // ongoing movie recording
 	std::unique_ptr<movie_recorder> recorder;           // HLSL post-render movie recorder
 
 	bool                    render_snap;                // whether or not to take HLSL post-render snapshot
-	IDirect3DSurface9 *     snap_copy_target;           // snapshot destination surface in system memory
-	IDirect3DTexture9 *     snap_copy_texture;          // snapshot destination surface in system memory
-	IDirect3DSurface9 *     snap_target;                // snapshot upscaled surface
-	IDirect3DTexture9 *     snap_texture;               // snapshot upscaled texture
+	IDirect3DSurface9Ptr    snap_copy_target;           // snapshot destination surface in system memory
+	IDirect3DTexture9Ptr    snap_copy_texture;          // snapshot destination surface in system memory
+	IDirect3DSurface9Ptr    snap_target;                // snapshot upscaled surface
+	IDirect3DTexture9Ptr    snap_texture;               // snapshot upscaled texture
 	int                     snap_width;                 // snapshot width
 	int                     snap_height;                // snapshot height
 
 	bool                    initialized;                // whether or not we're initialized
 
 	// HLSL effects
-	IDirect3DSurface9 *     backbuffer;                 // pointer to our device's backbuffer
+	IDirect3DSurface9Ptr    backbuffer;                 // pointer to our device's backbuffer
 	effect *                curr_effect;                // pointer to the currently active effect object
-	effect *                default_effect;             // pointer to the primary-effect object
-	effect *                prescale_effect;            // pointer to the prescale-effect object
-	effect *                post_effect;                // pointer to the post-effect object
-	effect *                distortion_effect;          // pointer to the distortion-effect object
-	effect *                scanline_effect;
-	effect *                focus_effect;               // pointer to the focus-effect object
-	effect *                phosphor_effect;            // pointer to the phosphor-effect object
-	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
-	effect *                color_effect;               // pointer to the color-effect object
-	effect *                ntsc_effect;                // pointer to the NTSC effect object
-	effect *                bloom_effect;               // pointer to the bloom composite effect
-	effect *                downsample_effect;          // pointer to the bloom downsample effect
-	effect *                vector_effect;              // pointer to the vector-effect object
-	effect *                chroma_effect;
+	std::unique_ptr<effect> default_effect;             // pointer to the primary-effect object
+	std::unique_ptr<effect> ui_effect;                  // pointer to the UI-element effect object
+	std::unique_ptr<effect> ui_wrap_effect;             // pointer to the UI-element effect object with texture wrapping
+	std::unique_ptr<effect> vector_buffer_effect;       // pointer to the vector-buffering effect object
+	std::unique_ptr<effect> prescale_effect;            // pointer to the prescale-effect object
+	std::unique_ptr<effect> prescale_point_effect;      // pointer to the prescale-effect object with point filtering
+	std::unique_ptr<effect> post_effect;                // pointer to the post-effect object
+	std::unique_ptr<effect> distortion_effect;          // pointer to the distortion-effect object
+	std::unique_ptr<effect> scanline_effect;
+	std::unique_ptr<effect> focus_effect;               // pointer to the focus-effect object
+	std::unique_ptr<effect> phosphor_effect;            // pointer to the phosphor-effect object
+	std::unique_ptr<effect> deconverge_effect;          // pointer to the deconvergence-effect object
+	std::unique_ptr<effect> color_effect;               // pointer to the color-effect object
+	std::unique_ptr<effect> ntsc_effect;                // pointer to the NTSC effect object
+	std::unique_ptr<effect> bloom_effect;               // pointer to the bloom composite effect
+	std::unique_ptr<effect> downsample_effect;          // pointer to the bloom downsample effect
+	std::unique_ptr<effect> vector_effect;              // pointer to the vector-effect object
+	std::unique_ptr<effect> chroma_effect;
 
+	texture_info *          diffuse_texture;
+	bool                    filter_screens;
 	texture_info *          curr_texture;
 	d3d_render_target *     curr_render_target;
 	poly_info *             curr_poly;
 
 	std::vector<std::unique_ptr<d3d_render_target>> m_render_target_list;
 
-	std::vector<slider*>    internal_sliders;
+	std::vector<std::unique_ptr<slider> >    internal_sliders;
 	std::vector<ui::menu_item> m_sliders;
-	std::vector<std::unique_ptr<slider_state>> m_core_sliders;
+	std::vector<std::unique_ptr<slider_state> > m_core_sliders;
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options

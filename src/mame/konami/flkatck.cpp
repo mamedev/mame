@@ -49,7 +49,6 @@ public:
 		m_k007121(*this, "k007121"),
 		m_k007232(*this, "k007232"),
 		m_watchdog(*this, "watchdog"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
@@ -82,7 +81,6 @@ private:
 	required_device<k007121_device> m_k007121;
 	required_device<k007232_device> m_k007232;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	void bankswitch_w(uint8_t data);
@@ -99,8 +97,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -161,8 +157,8 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_b)
 
 void flkatck_state::video_start()
 {
-	m_k007121_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_a)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_k007121_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_a)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -246,7 +242,7 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// draw the graphics
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_gfxdecode->palette(), &m_spriteram[sprite_buffer], 0, 40, 0, screen.priority(), (uint32_t)-1, true);
+	m_k007121->sprites_draw(bitmap, cliprect, &m_spriteram[sprite_buffer], 0, 40, 0, screen.priority(), (uint32_t)-1, true);
 	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 	return 0;
 }
@@ -383,19 +379,8 @@ static INPUT_PORTS_START( flkatck )
 	KONAMI8_B12_UNK(2)
 INPUT_PORTS_END
 
-static const gfx_layout gfxlayout =
-{
-	8,8,
-	0x80000/32,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_flkatck )
-	GFXDECODE_ENTRY( "gfx", 0, gfxlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb, 0, 32 )
 GFXDECODE_END
 
 void flkatck_state::volume_callback(uint8_t data)
@@ -447,11 +432,9 @@ void flkatck_state::flkatck(machine_config &config)
 	screen.set_screen_update(FUNC(flkatck_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_flkatck);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121, 0);
-	m_k007121->set_palette_tag("palette");
+	K007121(config, m_k007121, 0, "palette", gfx_flkatck);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -475,12 +458,11 @@ ROM_START( mx5000 )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // 6309 code
 	ROM_LOAD( "669_r01.16c", 0x00000, 0x10000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) )
 
-
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites
-	ROM_LOAD( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
+	ROM_LOAD16_WORD_SWAP( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
 
 	ROM_REGION( 0x40000, "k007232", 0 )
 	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M
@@ -494,7 +476,7 @@ ROM_START( flkatck )
 	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites
-	ROM_LOAD( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
+	ROM_LOAD16_WORD_SWAP( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
 
 	ROM_REGION( 0x40000, "k007232", 0 )
 	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M
@@ -509,14 +491,14 @@ ROM_START( flkatcka )
 	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites, same data as above set, on PWB 450593 sub-board instead.
-	ROM_LOAD16_BYTE( "669_f03a.4b", 0x00001, 0x10000, CRC(f0ed4c1e) SHA1(58efe3cd81054d22de54a7d195aa3b865bde4a01) )
-	ROM_LOAD16_BYTE( "669_f03e.4d", 0x00000, 0x10000, CRC(95a57a26) SHA1(c8aa30c2c734c0740630b1b04ae43c69931cc7c1) )
-	ROM_LOAD16_BYTE( "669_f03b.5b", 0x20001, 0x10000, CRC(e2593f3c) SHA1(aa0f6d04015650eaef17c4a39f228eaccf9a2948) )
-	ROM_LOAD16_BYTE( "669_f03f.5d", 0x20000, 0x10000, CRC(c6c9903e) SHA1(432ad6d03992499cc533273226944a666b40fa58) )
-	ROM_LOAD16_BYTE( "669_f03c.6b", 0x40001, 0x10000, CRC(47be92dd) SHA1(9ccc62d7d42fccbd5ad60e35e3a0478a04405cf1) )
-	ROM_LOAD16_BYTE( "669_f03g.6d", 0x40000, 0x10000, CRC(70d35fbd) SHA1(21384f738684c5da4a7a84a1c9aa173fffddf47a) )
-	ROM_LOAD16_BYTE( "669_f03d.7b", 0x60001, 0x10000, CRC(18d48f9e) SHA1(b95e38aa813e0f3a0dc6bd45fdb4bf71f7e2066c) )
-	ROM_LOAD16_BYTE( "669_f03h.7d", 0x60000, 0x10000, CRC(abfe76e7) SHA1(f8661f189308e83056ec442fa6c936efff67ba0a) )
+	ROM_LOAD16_BYTE( "669_f03a.4b", 0x00000, 0x10000, CRC(f0ed4c1e) SHA1(58efe3cd81054d22de54a7d195aa3b865bde4a01) )
+	ROM_LOAD16_BYTE( "669_f03e.4d", 0x00001, 0x10000, CRC(95a57a26) SHA1(c8aa30c2c734c0740630b1b04ae43c69931cc7c1) )
+	ROM_LOAD16_BYTE( "669_f03b.5b", 0x20000, 0x10000, CRC(e2593f3c) SHA1(aa0f6d04015650eaef17c4a39f228eaccf9a2948) )
+	ROM_LOAD16_BYTE( "669_f03f.5d", 0x20001, 0x10000, CRC(c6c9903e) SHA1(432ad6d03992499cc533273226944a666b40fa58) )
+	ROM_LOAD16_BYTE( "669_f03c.6b", 0x40000, 0x10000, CRC(47be92dd) SHA1(9ccc62d7d42fccbd5ad60e35e3a0478a04405cf1) )
+	ROM_LOAD16_BYTE( "669_f03g.6d", 0x40001, 0x10000, CRC(70d35fbd) SHA1(21384f738684c5da4a7a84a1c9aa173fffddf47a) )
+	ROM_LOAD16_BYTE( "669_f03d.7b", 0x60000, 0x10000, CRC(18d48f9e) SHA1(b95e38aa813e0f3a0dc6bd45fdb4bf71f7e2066c) )
+	ROM_LOAD16_BYTE( "669_f03h.7d", 0x60001, 0x10000, CRC(abfe76e7) SHA1(f8661f189308e83056ec442fa6c936efff67ba0a) )
 
 	ROM_REGION( 0x40000, "k007232", 0 )
 	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M

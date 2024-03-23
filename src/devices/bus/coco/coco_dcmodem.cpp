@@ -49,7 +49,7 @@ namespace
 		virtual void device_add_mconfig(machine_config &config) override;
 
 		// callbacks
-		WRITE_LINE_MEMBER(uart_irq_w)
+		void uart_irq_w(int state)
 		{
 			set_line_value(line::CART, state != 0);
 		}

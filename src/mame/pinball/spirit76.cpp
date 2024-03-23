@@ -358,7 +358,7 @@ void spirit76_state::spirit76(machine_config &config)
 	config.set_default_layout(layout_spirit76);
 
 	//6821pia
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set(FUNC(spirit76_state::porta_w));
 	pia.writepb_handler().set(FUNC(spirit76_state::portb_w));
 	pia.readpa_handler().set(FUNC(spirit76_state::porta_r));

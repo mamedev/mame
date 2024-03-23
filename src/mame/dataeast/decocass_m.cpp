@@ -88,9 +88,12 @@ void decocass_state::decocass_sound_data_w(uint8_t data)
 uint8_t decocass_state::decocass_sound_command_r()
 {
 	uint8_t data = m_soundlatch->read();
-	LOG(4,("CPU %s sound command <- $%02x\n", m_audiocpu->tag(), data));
-	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	m_sound_ack &= ~0x80;
+	if (!machine().side_effects_disabled())
+	{
+		LOG(4,("CPU %s sound command <- $%02x\n", m_audiocpu->tag(), data));
+		m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		m_sound_ack &= ~0x80;
+	}
 	return data;
 }
 
@@ -109,16 +112,22 @@ void decocass_state::decocass_sound_nmi_enable_w(uint8_t data)
 
 uint8_t decocass_state::decocass_sound_nmi_enable_r()
 {
-	m_audio_nmi_enabled = 1;
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_audio_nmi_enabled = 1;
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	}
 	return 0xff;
 }
 
 uint8_t decocass_state::decocass_sound_data_ack_reset_r()
 {
 	uint8_t data = 0xff;
-	LOG(2,("CPU %s sound ack rst <- $%02x\n", m_audiocpu->tag(), data));
-	m_sound_ack &= ~0x40;
+	if (!machine().side_effects_disabled())
+	{
+		LOG(2,("CPU %s sound ack rst <- $%02x\n", m_audiocpu->tag(), data));
+		m_sound_ack &= ~0x40;
+	}
 	return data;
 }
 
@@ -246,7 +255,7 @@ uint8_t decocass_type1_state::decocass_type1_r(offs_t offset)
 	if (!m_type1_map)
 		return 0x00;
 
-	uint8_t data;
+	uint8_t data = 0x00;
 
 	if (1 == (offset & 1))
 	{
@@ -261,11 +270,10 @@ uint8_t decocass_type1_state::decocass_type1_r(offs_t offset)
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
-	else
+	else if (!machine().side_effects_disabled())
 	{
 		offs_t promaddr;
 		uint8_t save;
-		uint8_t *prom = machine().root_device().memregion("dongle")->base();
 
 		if (m_firsttime)
 		{
@@ -274,7 +282,7 @@ uint8_t decocass_type1_state::decocass_type1_r(offs_t offset)
 			{
 				if (promaddr % 8 == 0)
 					LOG(3,("  %02x:", promaddr));
-				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
+				LOG(3,(" %02x%s", m_donglerom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
 			}
 			m_firsttime = 0;
 			m_latch1 = 0;    /* reset latch (??) */
@@ -301,12 +309,12 @@ uint8_t decocass_type1_state::decocass_type1_r(offs_t offset)
 		data = 0;
 		promshift = 0;
 
-		for (int i=0;i<8;i++)
+		for (int i=0; i<8; i++)
 		{
-			if (m_type1_map[i] == T1PROM)     { data |= (((prom[promaddr] >> promshift) & 1)               << T1MAP(i,m_type1_outmap)); promshift++; }
+			if (m_type1_map[i] == T1PROM)     { data |= (((m_donglerom[promaddr] >> promshift) & 1)       << T1MAP(i,m_type1_outmap)); promshift++; }
 			if (m_type1_map[i] == T1LATCHINV) { data |= ((1 - ((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)) << T1MAP(i,m_type1_outmap)); }
-			if (m_type1_map[i] == T1LATCH)    { data |= (((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)    << T1MAP(i,m_type1_outmap)); }
-			if (m_type1_map[i] == T1DIRECT)   { data |= (((save >> T1MAP(i,m_type1_inmap)) & 1)        << T1MAP(i,m_type1_outmap)); }
+			if (m_type1_map[i] == T1LATCH)    { data |= (((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)       << T1MAP(i,m_type1_outmap)); }
+			if (m_type1_map[i] == T1DIRECT)   { data |= (((save >> T1MAP(i,m_type1_inmap)) & 1)           << T1MAP(i,m_type1_outmap)); }
 		}
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_r(%02x): $%02x\n",
@@ -355,6 +363,15 @@ static uint8_t type1_latch_ctisland3[8] = { T1LATCHINV,T1PROM,T1PROM,T1DIRECT,T1
  ***************************************************************************/
 
 static uint8_t type1_pass_136_table[8] ={ T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T1PROM,T1DIRECT,T1PROM };
+
+/***************************************************************************
+ *
+ *  TYPE1 DONGLE
+ *  - Nebula
+ *
+ ***************************************************************************/
+
+static uint8_t type1_nebula_table[8] ={ T1PROM,T1PROM,T1DIRECT,T1DIRECT,   T1PROM,T1DIRECT,T1PROM,T1PROM };
 
 /***************************************************************************
  *
@@ -516,8 +533,7 @@ uint8_t decocass_type2_state::decocass_type2_r(offs_t offset)
 	{
 		if (1 == (offset & 1))
 		{
-			uint8_t *prom = memregion("dongle")->base();
-			data = prom[256 * m_type2_d2_latch + m_type2_promaddr];
+			data = m_donglerom[256 * m_type2_d2_latch + m_type2_promaddr];
 			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, 256 * m_type2_d2_latch + m_type2_promaddr));
 		}
 		else
@@ -556,16 +572,16 @@ void decocass_type2_state::decocass_type2_w(offs_t offset, uint8_t data)
 	{
 		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
 	}
-	if (1 == (offset & 1))
+	if (!machine().side_effects_disabled())
 	{
-		if (0xc0 == (data & 0xf0))
+		if ((1 == (offset & 1)) && (0xc0 == (data & 0xf0)))
 		{
 			m_type2_xx_latch = 1;
 			m_type2_d2_latch = (data & 0x04) ? 1 : 0;
 			LOG(3,("PROM:%s D2:%d", m_type2_xx_latch ? "on" : "off", m_type2_d2_latch));
 		}
+		m_mcu->upi41_master_w(offset & 1, data);
 	}
-	m_mcu->upi41_master_w(offset & 1, data);
 
 #ifdef MAME_DEBUG
 	decocass_fno(offset, data);
@@ -598,11 +614,11 @@ uint8_t decocass_type3_state::decocass_type3_r(offs_t offset)
 	{
 		if (1 == m_type3_pal_19)
 		{
-			uint8_t *prom = memregion("dongle")->base();
-			data = prom[m_type3_ctrs];
+			data = m_donglerom[m_type3_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, m_type3_ctrs));
-			if (++m_type3_ctrs == 4096)
-				m_type3_ctrs = 0;
+			if (!machine().side_effects_disabled())
+				if (++m_type3_ctrs == 4096)
+					m_type3_ctrs = 0;
 		}
 		else
 		{
@@ -764,8 +780,11 @@ uint8_t decocass_type3_state::decocass_type3_r(offs_t offset)
 						(BIT(save, 6) << 6) |
 						(BIT(save, 7) << 7);
 				}
-				m_type3_d0_latch = save & 1;
-				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.'));
+				if (!machine().side_effects_disabled())
+				{
+					m_type3_d0_latch = save & 1;
+					LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.'));
+				}
 			}
 			else
 			{
@@ -779,8 +798,11 @@ uint8_t decocass_type3_state::decocass_type3_r(offs_t offset)
 					(BIT(save, 5) << 5) |
 					(BIT(save, 6) << 7) |
 					(BIT(save, 7) << 6);
-				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.'));
-				m_type3_d0_latch = save & 1;
+				if (!machine().side_effects_disabled())
+				{
+					LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.'));
+					m_type3_d0_latch = save & 1;
+				}
 			}
 		}
 	}
@@ -849,11 +871,12 @@ uint8_t decocass_type4_state::decocass_type4_r(offs_t offset)
 	{
 		if (m_type4_latch)
 		{
-			uint8_t *prom = machine().root_device().memregion("dongle")->base();
-
-			data = prom[m_type4_ctrs];
-			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.', m_type4_ctrs));
-			m_type4_ctrs = (m_type4_ctrs + 1) & 0x7fff;
+			data = m_donglerom[m_type4_ctrs];
+			if (!machine().side_effects_disabled())
+			{
+				LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.', m_type4_ctrs));
+				m_type4_ctrs = (m_type4_ctrs + 1) & 0x7fff;
+			}
 		}
 		else
 		{
@@ -1052,9 +1075,7 @@ uint8_t decocass_widel_state::decocass_widel_r(offs_t offset)
 	{
 		if (m_widel_latch)
 		{
-			uint8_t *prom = machine().root_device().memregion("dongle")->base();
-
-			data = prom[m_widel_ctrs];
+			data = m_donglerom[m_widel_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x '%c' <- PROM[%04x]\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.', m_widel_ctrs));
 
 			if (!machine().side_effects_disabled())
@@ -1109,6 +1130,47 @@ void decocass_widel_state::decocass_widel_w(offs_t offset, uint8_t data)
 	}
 	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	m_mcu->upi41_master_w(offset, data);
+}
+
+/***************************************************************************
+ *
+ *  Darksoft Multigame Aftermarket modification
+ *   - provides access to a large ROM
+ *   - doesn't support games requiring dongle for proper game data, only
+ *     loading, so games like Treausre Island don't work with this kit
+ *
+ ***************************************************************************/
+
+uint8_t decocass_darksoft_state::decocass_darksoft_r(offs_t offset)
+{
+	uint8_t data;
+
+	if (offset == 0)
+	{
+		data = m_donglerom[m_address & 0xfffff];
+		if (!machine().side_effects_disabled())
+			m_address++;
+	}
+	else if (offset == 1)
+	{
+		data = m_donglerom[m_address & 0xfffff];
+		if (!machine().side_effects_disabled())
+			m_address += 0x100;
+	}
+	else
+	{
+		data = 0xff;
+	}
+
+	return data;
+}
+
+void decocass_darksoft_state::decocass_darksoft_w(offs_t offset, uint8_t data)
+{
+	if ((offset & E5XX_MASK) == 0)
+	{
+		m_address = data;
+	}
 }
 
 /***************************************************************************
@@ -1386,6 +1448,14 @@ MACHINE_RESET_MEMBER(decocass_type1_state,ctsttape)
 	m_type1_map = type1_pass_136_table;
 }
 
+MACHINE_RESET_MEMBER(decocass_type1_state,cnebula)
+{
+	machine_reset();
+	LOG(0,("dongle type #1 (DE-0061)\n"));
+	m_type1_map = type1_nebula_table;
+}
+
+
 MACHINE_RESET_MEMBER(decocass_type1_state,chwy)
 {
 	machine_reset();
@@ -1574,7 +1644,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,csdtenis)
 
 MACHINE_RESET_MEMBER(decocass_type3_state,czeroize)
 {
-	uint8_t *mem = memregion("dongle")->base();
 	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_23_56;
@@ -1588,9 +1657,9 @@ MACHINE_RESET_MEMBER(decocass_type3_state,czeroize)
 	 * This hack seems to be sufficient to get around
 	 * the missing dongle ROM contents and play the game.
 	 */
-	memset(mem, 0x00, 0x1000);
-	mem[0x08a0] = 0x18;
-	mem[0x08a1] = 0xf7;
+	memset(m_donglerom, 0x00, 0x1000);
+	m_donglerom[0x08a0] = 0x18;
+	m_donglerom[0x08a1] = 0xf7;
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cppicf)
@@ -1627,6 +1696,22 @@ void decocass_widel_state::machine_reset()
 
 	m_widel_ctrs = 0;
 	m_widel_latch = 0;
+}
+
+
+void decocass_darksoft_state::machine_start()
+{
+	decocass_state::machine_start();
+	save_item(NAME(m_address));
+}
+
+void decocass_darksoft_state::machine_reset()
+{
+	decocass_state::machine_reset();
+	m_dongle_r = read8sm_delegate(*this, FUNC(decocass_darksoft_state::decocass_darksoft_r));
+	m_dongle_w = write8sm_delegate(*this, FUNC(decocass_darksoft_state::decocass_darksoft_w));
+
+	m_address = 0;
 }
 
 

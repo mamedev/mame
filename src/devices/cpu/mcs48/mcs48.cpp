@@ -34,7 +34,7 @@
     8648    64   1k   27  (OTPROM)
     8748    64   1k   27  (EPROM)
     8884    64   1k
-    N7751  128   2k
+    N7751   64   1k       (8048, speech synthesizer in internal ROM)
 
     8039   128    0   27  (external ROM)
     8049   128   2k   27  (ROM)
@@ -159,7 +159,7 @@ DEFINE_DEVICE_TYPE(I8742,   i8742_device,   "i8742",   "Intel 8742")
 DEFINE_DEVICE_TYPE(I8042AH, i8042ah_device, "i8042ah", "Intel 8042AH")
 DEFINE_DEVICE_TYPE(I8742AH, i8742ah_device, "i8742ah", "Intel 8742AH")
 DEFINE_DEVICE_TYPE(MB8884,  mb8884_device,  "mb8884",  "MB8884")
-DEFINE_DEVICE_TYPE(N7751,   n7751_device,   "n7751",   "N7751")
+DEFINE_DEVICE_TYPE(N7751,   n7751_device,   "n7751",   "NEC uPD7751")
 DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "M58715")
 
 
@@ -201,16 +201,21 @@ void mcs48_cpu_device::data_8bit(address_map &map)
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0
-					   , (rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) : (rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) : (rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) : address_map_constructor())
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
-					, (ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) : (ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) : address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0,
+			(rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) :
+			(rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) :
+			(rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) :
+			address_map_constructor())
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, ((ram_size == 64) ? 6 : ((ram_size == 128) ? 7 : 8)), 0,
+			(ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) :
+			(ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) :
+			address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
-	, m_bus_in_cb(*this)
+	, m_bus_in_cb(*this, 0xff)
 	, m_bus_out_cb(*this)
-	, m_test_in_cb(*this)
+	, m_test_in_cb(*this, 0)
 	, m_t0_clk_func(*this)
 	, m_prog_out_cb(*this)
 	, m_psw(0)
@@ -709,11 +714,9 @@ OPHANDLER( in_a_p2 )        { burn_cycles(2); m_a = port_r(2) & m_p2; }
 OPHANDLER( ins_a_bus )      { burn_cycles(2); m_a = bus_r(); }
 OPHANDLER( in_a_dbb )
 {
-	burn_cycles(2);
+	burn_cycles(1);
 
 	// acknowledge the IBF IRQ and clear the bit in STS
-	if ((m_sts & STS_IBF) != 0)
-		standard_irq_callback(UPI41_INPUT_IBF);
 	m_sts &= ~STS_IBF;
 
 	// if P2 flags are enabled, update the state of P2
@@ -850,7 +853,7 @@ OPHANDLER( outl_p1_a )      { burn_cycles(2); port_w(1, m_p1 = m_a); }
 OPHANDLER( outl_p2_a )      { burn_cycles(2); uint8_t mask = p2_mask(); port_w(2, m_p2 = (m_p2 & ~mask) | (m_a & mask)); }
 OPHANDLER( out_dbb_a )
 {
-	burn_cycles(2);
+	burn_cycles(1);
 
 	// copy to the DBBO and update the bit in STS
 	m_dbbo = m_a;
@@ -1130,14 +1133,6 @@ void mcs48_cpu_device::device_start()
 	if(m_feature_mask & EXT_BUS_FEATURE)
 		space(AS_IO).specific(m_io);
 
-	// resolve callbacks
-	m_port_in_cb.resolve_all_safe(0xff);
-	m_port_out_cb.resolve_all_safe();
-	m_bus_in_cb.resolve_safe(0xff);
-	m_bus_out_cb.resolve_safe();
-	m_test_in_cb.resolve_all_safe(0);
-	m_prog_out_cb.resolve_safe();
-
 	// ensure that regptr is valid before get_info gets called
 	update_regptr();
 
@@ -1253,6 +1248,9 @@ void mcs48_cpu_device::check_irqs()
 	// external interrupts take priority
 	else if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
+		// indicate we took the external IRQ
+		standard_irq_callback(0, m_pc);
+
 		burn_cycles(2);
 		m_irq_in_progress = true;
 
@@ -1265,14 +1263,13 @@ void mcs48_cpu_device::check_irqs()
 
 		// transfer to location 0x03
 		execute_call(0x03);
-
-		// indicate we took the external IRQ
-		standard_irq_callback(0);
 	}
 
 	// timer overflow interrupts follow
 	else if (m_timer_overflow && m_tirq_enabled)
 	{
+		standard_irq_callback(1, m_pc);
+
 		burn_cycles(2);
 		m_irq_in_progress = true;
 

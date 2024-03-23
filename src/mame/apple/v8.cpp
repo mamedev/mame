@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-    Apple "V8", "Eagle", and "Spice" system ASICs
+    Apple "V8", "Eagle", "Spice", and "Tinkerbell" system ASICs
     Emulation by R. Belmont
 
     V8 (343S0116 or 343-0155) contains the following:
@@ -22,6 +22,10 @@
     and adds the option for an optional ROM expansion plus support for pushbutton sound volume
     and display intensity controls and power saver mode.
 
+    Tinker Bell (343S1109) is an evolution of Spice with a simpler memory controller that has
+    an 8MB limit (4MB on the motherboard, 1, 2, or 4MB in the SIMM slot) and support for the
+    Macintosh TV's video input feature.
+
     VISA (343S0101) is a predecessor of V8 and Eagle without support for dedicated VRAM banks
     or VGA modes.  It was coupled to a non-customized Bt450 RAMDAC on the Elsie prototype, and
     did not offer video modes with more than 4 bits per pixel.
@@ -34,12 +38,13 @@
 #include "emu.h"
 #include "v8.h"
 
+#include "cpu/m68000/m68030.h"
 #include "formats/ap_dsk35.h"
 #include "layout/generic.h"
 
-#define LOG_RAM (1U << 0)
+#define LOG_RAM (1U << 1)
 
-#define VERBOSE (LOG_RAM)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 static constexpr u32 C7M  = 7833600;
@@ -52,6 +57,7 @@ static constexpr u32 C15M = (C7M * 2);
 DEFINE_DEVICE_TYPE(V8, v8_device, "v8", "Apple V8 system ASIC")
 DEFINE_DEVICE_TYPE(EAGLE, eagle_device, "v8eagle", "Apple Eagle system ASIC")
 DEFINE_DEVICE_TYPE(SPICE, spice_device, "v8spice", "Apple Spice system ASIC")
+DEFINE_DEVICE_TYPE(TINKERBELL, tinkerbell_device, "v8tkbell", "Apple Tinker Bell system ASIC")
 
 static INPUT_PORTS_START( v8 )
 	PORT_START("MONTYPE")
@@ -94,10 +100,8 @@ void v8_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(FUNC(v8_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(v8_device::vbl_w));
+	m_screen->screen_vblank().set(FUNC(v8_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
 	PALETTE(config, m_palette).set_entries(256);
@@ -115,34 +119,35 @@ void v8_device::device_add_mconfig(machine_config &config)
 	ASC(config, m_asc, C15M, asc_device::asc_type::V8);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(v8_device::asc_irq));
 }
 
 //-------------------------------------------------
 //  v8_device - constructor
 //-------------------------------------------------
 
-v8_device::v8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: v8_device(mconfig, V8, tag, owner, clock)
+v8_device::v8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	v8_device(mconfig, V8, tag, owner, clock)
 {
 }
 
-v8_device::v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	  write_pb4(*this),
-	  write_pb5(*this),
-	  write_cb2(*this),
-	  write_hdsel(*this),
-	  write_hmmu_enable(*this),
-	  read_pb3(*this),
-	  m_maincpu(*this, finder_base::DUMMY_TAG),
-	  m_montype(*this, "MONTYPE"),
-	  m_screen(*this, "screen"),
-	  m_palette(*this, "palette"),
-	  m_via1(*this, "via1"),
-	  m_asc(*this, "asc"),
-	  m_rom(*this, finder_base::DUMMY_TAG),
-	  m_overlay(false),
-	  m_baseIs4M(false)
+v8_device::v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette"),
+	m_asc(*this, "asc"),
+	m_overlay(false),
+	write_pb4(*this),
+	write_pb5(*this),
+	write_cb2(*this),
+	write_hdsel(*this),
+	write_hmmu_enable(*this),
+	read_pb3(*this, 0),
+	m_montype(*this, "MONTYPE"),
+	m_via1(*this, "via1"),
+	m_rom(*this, finder_base::DUMMY_TAG),
+	m_baseIs4M(false)
 {
 }
 
@@ -153,13 +158,6 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 void v8_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
-
-	write_pb4.resolve_safe();
-	write_pb5.resolve_safe();
-	write_cb2.resolve_safe();
-	write_hdsel.resolve_safe();
-	write_hmmu_enable.resolve_safe();
-	read_pb3.resolve_safe(0);
 
 	m_6015_timer = timer_alloc(FUNC(v8_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -177,9 +175,6 @@ void v8_device::device_start()
 	save_item(NAME(m_pal_control));
 	save_item(NAME(m_pal_colkey));
 	save_item(NAME(m_overlay));
-
-	m_rom_ptr = &m_rom[0];
-	m_rom_size = m_rom.length() << 2;
 
 	m_pseudovia_ier = m_pseudovia_ifr = 0;
 	m_pal_address = m_pal_idx = m_pal_control = m_pal_colkey = 0;
@@ -211,24 +206,24 @@ void v8_device::device_reset()
 
 	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
+	const u32 memory_size = std::min<u32>(0x3fffff, m_rom.length() << 2);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
 	space.unmap_write(0x00000000, memory_end);
-	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
+	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, &m_rom[0]);
 }
 
 u32 v8_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		ram_size(0xc0); // full SIMM, full 4MB onboard
 		m_overlay = false;
 	}
 
-	return m_rom_ptr[offset & ((m_rom_size - 1) >> 2)];
+	return m_rom[offset & (m_rom.length() - 1)];
 }
 
 void v8_device::set_ram_info(u32 *ram, u32 size)
@@ -253,7 +248,7 @@ u8 v8_device::via_in_b()
 	return read_pb3() << 3;
 }
 
-WRITE_LINE_MEMBER(v8_device::via_out_cb2)
+void v8_device::via_out_cb2(int state)
 {
 	write_cb2(state & 1);
 }
@@ -269,13 +264,13 @@ void v8_device::via_out_b(u8 data)
 	write_pb5(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(v8_device::via1_irq)
+void v8_device::via1_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(v8_device::via2_irq)
+void v8_device::via2_irq(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();
@@ -311,23 +306,45 @@ void v8_device::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(v8_device::scc_irq_w)
+void v8_device::scc_irq_w(int state)
 {
 	m_scc_interrupt = (state == ASSERT_LINE);
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(v8_device::vbl_w)
+template <u8 mask>
+void v8_device::slot_irq_w(int state)
 {
-	if (!state)
+	if (state)
 	{
-		return;
+		m_pseudovia_regs[2] &= ~mask;
+	}
+	else
+	{
+		m_pseudovia_regs[2] |= mask;
 	}
 
-	m_pseudovia_regs[2] &= ~0x40; // set vblank signal
+	pseudovia_recalc_irqs();
+}
 
-	if (m_pseudovia_regs[0x12] & 0x40)
+template void v8_device::slot_irq_w<0x40>(int state);
+template void v8_device::slot_irq_w<0x20>(int state);
+template void v8_device::slot_irq_w<0x10>(int state);
+template void v8_device::slot_irq_w<0x08>(int state);
+template void v8_device::slot_irq_w<0x04>(int state);
+template void v8_device::slot_irq_w<0x02>(int state);
+template void v8_device::slot_irq_w<0x01>(int state);
+
+void v8_device::asc_irq(int state)
+{
+	if (state == ASSERT_LINE)
 	{
+		m_pseudovia_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
+		pseudovia_recalc_irqs();
+	}
+	else
+	{
+		m_pseudovia_regs[3] &= ~0x10;
 		pseudovia_recalc_irqs();
 	}
 }
@@ -591,12 +608,12 @@ void v8_device::ram_size(u8 config)
 	}
 }
 
-WRITE_LINE_MEMBER(v8_device::cb1_w)
+void v8_device::cb1_w(int state)
 {
 	m_via1->write_cb1(state);
 }
 
-WRITE_LINE_MEMBER(v8_device::cb2_w)
+void v8_device::cb2_w(int state)
 {
 	m_via1->write_cb2(state);
 }
@@ -862,6 +879,7 @@ void eagle_device::device_add_mconfig(machine_config &config)
 	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::EAGLE);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(eagle_device::asc_irq));
 }
 
 eagle_device::eagle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -920,6 +938,7 @@ void spice_device::map(address_map &map)
 	v8_device::map(map);
 
 	map(0x516000, 0x517fff).rw(FUNC(spice_device::swim_r), FUNC(spice_device::swim_w));
+	map(0x518000, 0x518001).w(FUNC(spice_device::bright_contrast_w));
 }
 
 static INPUT_PORTS_START(spice)
@@ -941,6 +960,7 @@ void spice_device::device_add_mconfig(machine_config &config)
 	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::SONORA);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(spice_device::asc_irq));
 
 	SWIM2(config, m_fdc, C15M);
 	m_fdc->devsel_cb().set(FUNC(spice_device::devsel_w));
@@ -950,12 +970,17 @@ void spice_device::device_add_mconfig(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 }
 
+spice_device::spice_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: v8_device(mconfig, type, tag, owner, clock),
+	  m_fdc(*this, "fdc"),
+	  m_floppy(*this, "fdc:%d", 0U),
+	  m_cur_floppy(nullptr),
+	  m_hdsel(0)
+{
+}
+
 spice_device::spice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: v8_device(mconfig, SPICE, tag, owner, clock),
-	m_fdc(*this, "fdc"),
-	m_floppy(*this, "fdc:%d", 0U),
-	m_cur_floppy(nullptr),
-	m_hdsel(0)
+	: spice_device(mconfig, SPICE, tag, owner, clock)
 {
 }
 
@@ -1143,3 +1168,188 @@ void spice_device::via_out_a(u8 data)
 	}
 	m_hdsel = hdsel;
 }
+
+void spice_device::bright_contrast_w(offs_t offset, u8 data)
+{
+	// offset 0 = brightness (0-255)
+	// offset 1 = contrast (0-255)
+}
+
+// ================ tinkerbell_device
+
+void tinkerbell_device::device_add_mconfig(machine_config &config)
+{
+	spice_device::device_add_mconfig(config);
+	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+}
+
+tinkerbell_device::tinkerbell_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: spice_device(mconfig, TINKERBELL, tag, owner, clock)
+{
+}
+
+u8 tinkerbell_device::via_in_a()
+{
+	return 0x84;
+}
+
+u8 tinkerbell_device::pseudovia_r(offs_t offset)
+{
+	if (offset < 0x100)
+	{
+		if (offset == 0x10)
+		{
+			return 0x06 << 3;   // ID as an Apple 13" 640x480 monitor
+		}
+	}
+
+	return v8_device::pseudovia_r(offset);
+}
+
+u32 tinkerbell_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int hres, vres;
+	hres = 640;
+	vres = 480;
+
+	const pen_t *pens = m_palette->pens();
+	switch (m_pseudovia_regs[0x10] & 7)
+	{
+	case 0: // 1bpp
+	{
+		auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
+
+		for (int y = 0; y < vres; y++)
+		{
+			u32 *scanline = &bitmap.pix(y);
+			for (int x = 0; x < hres; x += 8)
+			{
+				u8 const pixels = vram8[(y * 1024) + (x / 8)];
+
+				*scanline++ = pens[0x7f | (pixels & 0x80)];
+				*scanline++ = pens[0x7f | ((pixels << 1) & 0x80)];
+				*scanline++ = pens[0x7f | ((pixels << 2) & 0x80)];
+				*scanline++ = pens[0x7f | ((pixels << 3) & 0x80)];
+				*scanline++ = pens[0x7f | ((pixels << 4) & 0x80)];
+				*scanline++ = pens[0x7f | ((pixels << 5) & 0x80)];
+				*scanline++ = pens[0x7f | ((pixels << 6) & 0x80)];
+				*scanline++ = pens[0x7f | ((pixels << 7) & 0x80)];
+			}
+		}
+	}
+	break;
+
+	case 1: // 2bpp
+	{
+		auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
+
+		for (int y = 0; y < vres; y++)
+		{
+			u32 *scanline = &bitmap.pix(y);
+			for (int x = 0; x < hres / 4; x++)
+			{
+				u8 const pixels = vram8[(y * 1024) + x];
+
+				*scanline++ = pens[0x3f | (pixels & 0xc0)];
+				*scanline++ = pens[0x3f | ((pixels << 2) & 0xc0)];
+				*scanline++ = pens[0x3f | ((pixels << 4) & 0xc0)];
+				*scanline++ = pens[0x3f | ((pixels << 6) & 0xc0)];
+			}
+		}
+	}
+	break;
+
+	case 2: // 4bpp
+	{
+		auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
+
+		for (int y = 0; y < vres; y++)
+		{
+			u32 *scanline = &bitmap.pix(y);
+
+			for (int x = 0; x < hres / 2; x++)
+			{
+				u8 const pixels = vram8[(y * 1024) + x];
+
+				*scanline++ = pens[0x0f | (pixels & 0xf0)];
+				*scanline++ = pens[0x0f | ((pixels << 4) & 0xf0)];
+			}
+		}
+	}
+	break;
+
+	case 3: // 8bpp
+	{
+		auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
+
+		for (int y = 0; y < vres; y++)
+		{
+			u32 *scanline = &bitmap.pix(y);
+
+			for (int x = 0; x < hres; x++)
+			{
+				u8 const pixels = vram8[(y * 1024) + x];
+				*scanline++ = pens[pixels];
+			}
+		}
+	}
+	break;
+
+	case 4: // 16bpp
+	{
+		auto const vram16 = util::big_endian_cast<u16 const>(&m_vram[0]);
+
+		for (int y = 0; y < vres; y++)
+		{
+			u32 *scanline = &bitmap.pix(y);
+			for (int x = 0; x < hres; x++)
+			{
+				u16 const pixels = vram16[(y * hres) + x];
+				*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
+			}
+		}
+	}
+	break;
+	}
+
+	return 0;
+}
+
+/*
+    Tinker Bell is different from the V8, but it still needs to kind of act like one.
+    The major difference: the RAM limit is 8MB instead of 10, and no RAM appears
+    above 0x7FFFFFFF.  Also, when the bits are set for what on V8 would be 8MB SIMM
+    and no motherboard RAM except the 0x800000 image, that means 4MB of motherboard
+    and 4MB of SIMM here.
+*/
+void tinkerbell_device::ram_size(u8 config)
+{
+	if (!m_overlay)
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		const void *mb_ram = m_ram_ptr;
+		u32 simm_size = m_ram_size - 0x400000;
+		void *simm_ram = &m_ram_ptr[0x400000 / 4];
+
+		space.unmap_readwrite(0x000000, 0x9fffff);
+
+		// place the motherboard RAM at 0
+		LOGMASKED(LOG_RAM, "Motherboard RAM at 0x00000000 to 0x003fffff\n");
+		space.install_ram(0, 0x3fffff, 0, (void *)mb_ram);
+
+		// is SIMM RAM present?  it always goes at 0x400000
+		if (simm_size > 0)
+		{
+			if ((config & 0xc0) != 0)
+			{
+				LOGMASKED(LOG_RAM, "SIMM RAM at 0x400000 to %x\n", simm_size - 1);
+				space.install_ram(0x400000, (0x400000 + simm_size) - 1, 0, (void *)simm_ram);
+			}
+		}
+		else
+		{
+			LOGMASKED(LOG_RAM, "Base config, no SIMM\n");
+		}
+	}
+}
+

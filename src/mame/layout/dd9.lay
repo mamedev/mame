@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<!-- general grey backdrop -->
+	<element name="greyback">
+		<rect>
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="border">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+	<element name="black">
+		<rect>
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+
+	<element name="white">
+		<rect />
+	</element>
+
+	<!-- text elements -->
+	<element name="volume"><text string="VOLUME" /></element>
+	<element name="minus"><text string="-" /></element>
+	<element name="plus"><text string="+" /></element>
+	<element name="style"><text string="STYLE" /></element>
+	<element name="perc"><text string="PERC." /></element>
+	<element name="set"><text string="SET" /></element>
+	<element name="tempo"><text string="TEMPO" /></element>
+	<element name="demo"><text string="DEMO" /></element>
+	<element name="tap"><text string="TAP" /></element>
+	<element name="tap_start"><text string="START" /></element>
+	<element name="pad_assign"><text string="PAD ASSIGN" /></element>
+	<element name="pointer_l"><text string="&#x25c4;" /></element>
+	<element name="pointer_r"><text string="&#x25ba;" /></element>
+	<element name="se"><text string="SE" /></element>
+	<element name="select"><text string="SELECT" /></element>
+	<element name="start"><text string="START/" /></element>
+	<element name="stop"><text string="STOP" /></element>
+	<element name="auto"><text string="AUTO" /></element>
+	<element name="auto_roll"><text string="ROLL" /></element>
+	<element name="off"><text string="OFF" align="1" /></element>
+	<element name="echo"><text string="ECHO" align="1" /></element>
+	<element name="flam"><text string="FLAM" align="1" /></element>
+	<element name="roll"><text string="ROLL" align="1" /></element>
+	<element name="se_pads"><text string="SOUND EFFECT PADS" /></element>
+
+	<!-- button primitives -->
+	<element name="button-circ" defstate="0">
+		<disk><bounds x="0" y="0" width="40" height="40" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0"><bounds x="2" y="2" width="36" height="36" /><color red="0.5" green="0.5" blue="0.5" /></disk>
+		<disk state="1"><bounds x="2" y="2" width="36" height="36" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+	</element>
+	<element name="button-demo" defstate="0">
+		<disk><bounds x="0" y="0" width="40" height="40" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0"><bounds x="2" y="2" width="36" height="36" /><color red="1.0" green="0.82" blue="0.0" /></disk>
+		<disk state="1"><bounds x="2" y="2" width="36" height="36" /><color red="0.9" green="0.75" blue="0.0" /></disk>
+	</element>
+	<element name="button-start-stop" defstate="0">
+		<disk><bounds x="0" y="0" width="40" height="40" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0"><bounds x="2" y="2" width="36" height="36" /><color red="1.0" green="0.14" blue="0.14" /></disk>
+		<disk state="1"><bounds x="2" y="2" width="36" height="36" /><color red="0.8" green="0.11" blue="0.11" /></disk>
+	</element>
+	<element name="button-rect" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="40" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="36" /><color red="0.5" green="0.5" blue="0.5" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="36" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+	</element>
+	<element name="button-drumpad" defstate="0">
+		<disk><bounds x="0" y="0" width="40" height="40" /><color red="0.2" green="0.2" blue="0.2" /></disk>
+		<disk state="0"><bounds x="2" y="2" width="36" height="36" /><color red="0.02" green="0.02" blue="0.02" /></disk>
+		<disk state="1"><bounds x="2" y="2" width="36" height="36" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+	</element>
+
+	<!-- LED primitive -->
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.1" /></led7seg>
+	</element>
+
+	<view name="Drum Kit">
+		<!-- overall background -->
+		<element ref="greyback"><bounds x="0" y="-40" width="1430" height="790" /></element>
+
+		<element ref="button-drumpad" inputtag="PF" inputmask="0x01"><bounds x="0" y="180" width="330" height="330" /></element>
+		<element ref="button-drumpad" inputtag="PF" inputmask="0x02"><bounds x="350" y="-40" width="330" height="330" /></element>
+		<element ref="button-drumpad" inputtag="PF" inputmask="0x04"><bounds x="750" y="-40" width="330" height="330" /></element>
+		<element ref="button-drumpad" inputtag="PF" inputmask="0x08"><bounds x="1100" y="180" width="330" height="330" /></element>
+
+		<element ref="volume"><bounds xc="375" yc="570" width="100" height="15" /></element>
+		<element ref="button-rect" inputtag="KEY2" inputmask="0x02"><bounds xc="350" yc="600" width="30" height="30" /></element>
+		<element ref="minus"><bounds xc="350" yc="630" width="100" height="20" /></element>
+		<element ref="button-rect" inputtag="KEY2" inputmask="0x01"><bounds xc="400" yc="600" width="30" height="30" /></element>
+		<element ref="plus"><bounds xc="400" yc="630" width="100" height="20" /></element>
+
+		<element ref="style"><bounds xc="640" yc="522" width="100" height="15" /></element>
+		<element ref="button-circ" inputtag="KEY0" inputmask="0x01"><bounds xc="640" yc="560" width="25" height="25" /></element>
+		<element ref="perc"><bounds xc="690" yc="522" width="100" height="15" /></element>
+		<element ref="set"><bounds xc="690" yc="537" width="100" height="15" /></element>
+		<element ref="button-circ" inputtag="KEY0" inputmask="0x02"><bounds xc="690" yc="560" width="25" height="25" /></element>
+		<element ref="tempo"><bounds xc="740" yc="522" width="100" height="15" /></element>
+		<element ref="button-circ" inputtag="KEY0" inputmask="0x04"><bounds xc="740" yc="560" width="25" height="25" /></element>
+		<element ref="demo"><bounds xc="790" yc="522" width="100" height="15" /></element>
+		<element ref="button-demo" inputtag="KEY1" inputmask="0x01"><bounds xc="790" yc="560" width="25" height="25" /></element>
+
+		<element ref="tap"><bounds xc="640" yc="582" width="100" height="15" /></element>
+		<element ref="tap_start"><bounds xc="640" yc="597" width="100" height="15" /></element>
+		<element ref="button-circ" inputtag="KEY1" inputmask="0x02"><bounds xc="640" yc="620" width="25" height="25" /></element>
+		<element ref="pad_assign"><bounds xc="715" yc="582" width="100" height="15" /></element>
+		<element ref="pointer_l"><bounds xc="690" yc="597" width="100" height="15" /></element>
+		<element ref="pointer_r"><bounds xc="740" yc="597" width="100" height="15" /></element>
+		<element ref="button-circ" inputtag="KEY2" inputmask="0x08"><bounds xc="690" yc="620" width="25" height="25" /></element>
+		<element ref="button-circ" inputtag="KEY2" inputmask="0x04"><bounds xc="740" yc="620" width="25" height="25" /></element>
+		<element ref="se"><bounds xc="790" yc="582" width="100" height="15" /></element>
+		<element ref="select"><bounds xc="790" yc="597" width="100" height="15" /></element>
+		<element ref="white"><bounds x="790" yc="620" width="35" height="3" /></element>
+		<element ref="white"><bounds x="825" yc="620" width="3" height="120" /></element>
+		<element ref="white"><bounds x="825" yc="560" width="15" height="3" /></element>
+		<element ref="white"><bounds x="825" yc="680" width="15" height="3" /></element>
+		<element ref="button-circ" inputtag="KEY1" inputmask="0x04"><bounds xc="790" yc="620" width="25" height="25" /></element>
+
+		<element ref="start"><bounds xc="640" yc="642" width="100" height="15" /></element>
+		<element ref="stop"><bounds xc="640" yc="657" width="100" height="15" /></element>
+		<element ref="button-start-stop" inputtag="KEY0" inputmask="0x08"><bounds xc="640" yc="680" width="25" height="25" /></element>
+		<element ref="auto"><bounds xc="690" yc="642" width="100" height="15" /></element>
+		<element ref="auto_roll"><bounds xc="690" yc="657" width="100" height="15" /></element>
+		<element ref="button-circ" inputtag="KEY1" inputmask="0x08"><bounds xc="690" yc="680" width="25" height="25" /></element>
+
+		<element ref="off"><bounds x="725" yc="650" width="200" height="15" /></element>
+		<element ref="echo"><bounds x="725" yc="665" width="200" height="15" /></element>
+		<element ref="flam"><bounds x="725" yc="680" width="200" height="15" /></element>
+		<element ref="roll"><bounds x="725" yc="695" width="200" height="15" /></element>
+		<element ref="white"><bounds x="712" y="650" width="1" height="45" /></element>
+		<element ref="white"><bounds x="712" y="650" width="8" height="1" /></element>
+		<element ref="white"><bounds x="712" y="665" width="8" height="1" /></element>
+		<element ref="white"><bounds x="712" y="680" width="8" height="1" /></element>
+		<element ref="white"><bounds x="712" y="695" width="8" height="1" /></element>
+
+		<element ref="se_pads"><bounds xc="970" yc="502" width="200" height="15" /></element>
+		<element ref="button-circ" inputtag="KEY3" inputmask="0x01"><bounds xc="880" yc="560" width="65" height="65" /></element>
+		<element ref="button-circ" inputtag="KEY3" inputmask="0x02"><bounds xc="940" yc="680" width="65" height="65" /></element>
+		<element ref="button-circ" inputtag="KEY3" inputmask="0x04"><bounds xc="1000" yc="560" width="65" height="65" /></element>
+		<element ref="button-circ" inputtag="KEY3" inputmask="0x08"><bounds xc="1060" yc="680" width="65" height="65" /></element>
+
+		<repeat count="10">
+			<param name="y" start="310" increment="18" />
+			<element ref="border"><bounds xc="715" y="~y~" width="680" height="8" /></element>
+		</repeat>
+		<element ref="greyback"><bounds xc="715" y="364" width="150" height="100" /></element>
+		<element ref="black"><bounds xc="715" y="370" width="120" height="90" /></element>
+
+		<element ref="digit" name="digit0"><bounds x="670" y="390" width="40" height="50" /><orientation rotate="180" /></element>
+		<element ref="digit" name="digit1"><bounds x="720" y="390" width="40" height="50" /><orientation rotate="180" /></element>
+	</view>
+</mamelayout>

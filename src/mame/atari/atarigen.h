@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATARIGEN_H
-#define MAME_MACHINE_ATARIGEN_H
+#ifndef MAME_ATARI_ATARIGEN_H
+#define MAME_ATARI_ATARIGEN_H
 
 #include "screen.h"
 
@@ -94,4 +94,4 @@ protected:
 ***************************************************************************/
 
 
-#endif // MAME_MACHINE_ATARIGEN_H
+#endif // MAME_ATARI_ATARIGEN_H

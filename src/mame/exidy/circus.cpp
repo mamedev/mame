@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
-/***************************************************************************
+/*******************************************************************************
 
 Exidy 'Universal' Game Board V1
 
@@ -14,7 +14,7 @@ Rip Cord         May 1979  6502   RC30-0014 (cpu) 0015 (snd)
                                   9023-9026, 9027-9034, 9035
 Crash           July 1979  6502   CR30-3162 (cpu) 3161 (snd)  9036 (?)
 
-***************************************************************************
+********************************************************************************
 
 driver (initial) by Mike Coates
 
@@ -34,49 +34,102 @@ A000      Control Switches
 C000      Option Switches
 D000      Paddle Position and Interrupt Reset (where applicable)
 
-    NOTES:
-    - Circus: Taito licensed and released the game as "Acrobat TV"
+********************************************************************************
 
-    TODO:
-    - generic video timing (vsync, vblank, # of scanlines)
-    - circus/ripcord collision detection is accurate?
-    - crash: irq timing
-    - improve discrete sound
+NOTES:
+- Circus: Taito licensed and released the game as "Acrobat TV"
 
-***************************************************************************/
+TODO:
+- generic video timing (vsync, vblank, # of scanlines)
+- circus/ripcord collision detection is accurate?
+- crash: irq timing
+- improve discrete sound
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "circus.h"
 
 #include "cpu/m6502/m6502.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "circus.lh"
 #include "crash.lh"
+#include "crasha.lh"
 
 
-uint8_t circus_state::circus_paddle_r()
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
+void circus_state::machine_start()
 {
-	// also clears irq
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	return ioport("PADDLE")->read();
+	save_item(NAME(m_clown_x));
+	save_item(NAME(m_clown_y));
+	save_item(NAME(m_clown_z));
 }
 
-void circus_state::circus_map(address_map &map)
+void circus_state::machine_reset()
+{
+	m_clown_x = 0;
+	m_clown_y = 0;
+	m_clown_z = 0;
+}
+
+
+
+/*******************************************************************************
+    Misc. I/O
+*******************************************************************************/
+
+uint8_t circus_state::paddle_r()
+{
+	// also clears irq
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	return m_paddle->read();
+}
+
+void circus_state::clown_z_w(uint8_t data)
+{
+	// This register triggers the discrete sound circuitry
+	//logerror("Z: %02X\n", data);
+	sound_w(data);
+
+	// also used to enable the amplifier
+	machine().sound().system_mute(data & 0x80);
+
+	// and the clown image currently displayed
+	m_clown_z = data;
+}
+
+
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
+
+void circus_state::main_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x1000, 0x1fff).rom();
-	map(0x2000, 0x2000).w(FUNC(circus_state::circus_clown_x_w));
-	map(0x3000, 0x3000).w(FUNC(circus_state::circus_clown_y_w));
-	map(0x4000, 0x43ff).ram().w(FUNC(circus_state::circus_videoram_w)).share("videoram");
-	map(0x8000, 0x8000).ram().w(FUNC(circus_state::circus_clown_z_w));
+	map(0x2000, 0x2000).w(FUNC(circus_state::clown_x_w));
+	map(0x3000, 0x3000).w(FUNC(circus_state::clown_y_w));
+	map(0x4000, 0x43ff).ram().w(FUNC(circus_state::videoram_w)).share("videoram");
+	map(0x8000, 0x8000).ram().w(FUNC(circus_state::clown_z_w));
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xc000, 0xc000).portr("DSW");
-	map(0xd000, 0xd000).r(FUNC(circus_state::circus_paddle_r));
+	map(0xd000, 0xd000).r(FUNC(circus_state::paddle_r));
 	map(0xf000, 0xffff).rom();
 }
 
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( circus )
 	PORT_START("INPUTS")
@@ -218,6 +271,11 @@ static INPUT_PORTS_START( ripcord )
 INPUT_PORTS_END
 
 
+
+/*******************************************************************************
+    GFX Layouts
+*******************************************************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
@@ -265,45 +323,36 @@ GFXDECODE_END
 
 
 
-/***************************************************************************
-  Machine drivers
-***************************************************************************/
-void circus_state::machine_start()
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
+
+void circus_state::base_mcfg(machine_config &config)
 {
-	save_item(NAME(m_clown_x));
-	save_item(NAME(m_clown_y));
-	save_item(NAME(m_clown_z));
-}
+	// basic machine hardware
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); // 705.562kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::main_map);
 
-void circus_state::machine_reset()
-{
-	m_clown_x = 0;
-	m_clown_y = 0;
-	m_clown_z = 0;
-}
-
-
-void circus_state::circus(machine_config &config)
-{
-	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);  /* needed for proper hardware collisions */
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(circus_state::screen_update_circus));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // needed for proper hardware collisions
+	m_screen->set_refresh_hz(57);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500)); // complete guess
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(circus_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	/* sound hardware */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
+}
+
+void circus_state::circus(machine_config &config)
+{
+	base_mcfg(config);
+
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -315,27 +364,14 @@ void circus_state::circus(machine_config &config)
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void circus_state::robotbwl(machine_config &config)
+void robotbwl_state::robotbwl(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
-	// does not generate irq!
+	base_mcfg(config);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(circus_state::screen_update_robotbwl));
-	screen.set_palette(m_palette);
+	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_robotbwl);
+	m_screen->set_video_attributes(0);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robotbwl);
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -347,35 +383,15 @@ void circus_state::robotbwl(machine_config &config)
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
+void crash_state::crash(machine_config &config)
 {
-	int scanline = param;
+	base_mcfg(config);
 
-	if(scanline == 256 || scanline == 0) // vblank-out / in irq
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-}
+	// vblank-out / in irq
+	m_screen->screen_vblank().set([this](int state) { m_maincpu->set_input_line(0, ASSERT_LINE); });
+	m_screen->set_video_attributes(0);
 
-void circus_state::crash(machine_config &config)
-{
-	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(circus_state::crash_scanline), "screen", 0, 1);
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
-	screen.set_size(40*8, 40*8); // TODO // to do what?
-	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(circus_state::screen_update_crash));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -387,27 +403,11 @@ void circus_state::crash(machine_config &config)
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void circus_state::ripcord(machine_config &config)
+void ripcord_state::ripcord(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
+	base_mcfg(config);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);          /* needed for proper hardware collisions */
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(circus_state::screen_update_ripcord));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -418,6 +418,12 @@ void circus_state::ripcord(machine_config &config)
 	DISCRETE(config, m_discrete, circus_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
+
+
+
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( circus )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
@@ -440,7 +446,7 @@ ROM_START( circus )
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
@@ -466,7 +472,7 @@ ROM_START( circuso ) // older set, there exist several bootlegs identical to thi
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
@@ -492,7 +498,7 @@ ROM_START( springbd )
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "93448.14d",  0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but should match
+	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but should match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
@@ -509,17 +515,17 @@ ROM_START( robotbwl )
 	ROM_LOAD( "4027b.9a", 0xfe00, 0x0200, CRC(07487e27) SHA1(b5528fb3fec474df2b66f36e28df13a7e81f9ce3) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
-	ROM_LOAD( "4010.4c", 0x0000, 0x0200, CRC(a5f7acb9) SHA1(556dd34d0fa50415b128477e208e96bf0c050c2c) ) // these are all N82S141N BPROMs
-	ROM_LOAD( "4011.3c", 0x0200, 0x0200, CRC(d5380c9b) SHA1(b9670e87011a1b3aebd1d386f1fe6a74f8c77be9) )
-	ROM_LOAD( "4012.2c", 0x0400, 0x0200, CRC(47b3e39c) SHA1(393c680fba3bd384e2c773150c3bae4d735a91bf) )
-	ROM_LOAD( "4013.1c", 0x0600, 0x0200, CRC(b2991e7e) SHA1(32b6d42bb9312d6cbe5b4113fcf2262bfeef3777) )
+	ROM_LOAD( "4010.4c",  0x0000, 0x0200, CRC(a5f7acb9) SHA1(556dd34d0fa50415b128477e208e96bf0c050c2c) ) // these are all N82S141N BPROMs
+	ROM_LOAD( "4011.3c",  0x0200, 0x0200, CRC(d5380c9b) SHA1(b9670e87011a1b3aebd1d386f1fe6a74f8c77be9) )
+	ROM_LOAD( "4012.2c",  0x0400, 0x0200, CRC(47b3e39c) SHA1(393c680fba3bd384e2c773150c3bae4d735a91bf) )
+	ROM_LOAD( "4013.1c",  0x0600, 0x0200, CRC(b2991e7e) SHA1(32b6d42bb9312d6cbe5b4113fcf2262bfeef3777) )
 
 	ROM_REGION( 0x0020, "gfx2", ROMREGION_INVERT ) // ball sprite
-	ROM_LOAD( "6000.14d",0x0000, 0x0020, CRC(a402ac06) SHA1(3bd75630786bcc86d9e9fbc826adc909eef9b41f) )
+	ROM_LOAD( "6000.14d", 0x0000, 0x0020, CRC(a402ac06) SHA1(3bd75630786bcc86d9e9fbc826adc909eef9b41f) )
 
-	ROM_REGION( 0x100, "extra_proms", 0 ) // timing? not used by the emulation
-	ROM_LOAD( "5000.4d", 0x000, 0x020, NO_DUMP ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
-	ROM_LOAD( "5001.5d", 0x020, 0x020, NO_DUMP )
+	ROM_REGION( 0x0100, "proms", 0 ) // timing? not used by the emulation
+	ROM_LOAD( "5000.4d",  0x0000, 0x0020, NO_DUMP ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
+	ROM_LOAD( "5001.5d",  0x0020, 0x0020, NO_DUMP )
 ROM_END
 
 ROM_START( crash )
@@ -544,8 +550,6 @@ ROM_START( crash )
 	ROM_LOAD( "crash.d14",  0x0000, 0x0200, CRC(833f81e4) SHA1(78a0ace3510546691ecaf6f6275cb3269495edc9) )
 ROM_END
 
-// colours: the playfield is cyan. The entire centre box (and contents) is pale green
-// see http://forum.arcadecontrols.com/index.php/topic,146323.msg1526542.html
 ROM_START( crasha )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
 	ROM_LOAD( "nsa7.a8",    0x1000, 0x0800, CRC(2e47c5ee) SHA1(4712ec3080ce3797420266d6efb26e7d146a965a) )
@@ -604,29 +608,19 @@ ROM_START( ripcord )
 ROM_END
 
 
-void circus_state::init_circus()
-{
-	m_game_id = 1;
-}
 
-void circus_state::init_robotbwl()
-{
-	m_game_id = 2;
-}
-void circus_state::init_crash()
-{
-	m_game_id = 3;
-}
-void circus_state::init_ripcord()
-{
-	m_game_id = 4;
-}
+/*******************************************************************************
+    Game Drivers
+*******************************************************************************/
 
-GAMEL( 1977, circus,   0,      circus,   circus,   circus_state, init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus )
-GAMEL( 1977, circuso,  circus, circus,   circus,   circus_state, init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus )
-GAMEL( 1977, springbd, circus, circus,   circus,   circus_state, init_circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
-GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, circus_state, init_robotbwl, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAMEL( 1979, crash,    0,      crash,    crash,    circus_state, init_crash,    ROT0, "Exidy", "Crash", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
-GAMEL( 1979, crasha,   crash,  crash,    crash,    circus_state, init_crash,    ROT0, "Exidy", "Crash (alt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
-GAMEL( 1979, smash,    crash,  crash,    crash,    circus_state, init_crash,    ROT0, "bootleg", "Smash (Crash bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
-GAME(  1979, ripcord,  0,      ripcord,  ripcord,  circus_state, init_ripcord,  ROT0, "Exidy", "Rip Cord", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAMEL( 1977, circus,   0,      circus,   circus,   circus_state,   empty_init, ROT0, "Exidy / Taito", "Circus / Acrobat TV", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // named Acrobat TV when Taito published it in Japan
+GAMEL( 1977, circuso,  circus, circus,   circus,   circus_state,   empty_init, ROT0, "Exidy / Taito", "Circus / Acrobat TV (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // "
+GAMEL( 1977, springbd, circus, circus,   circus,   circus_state,   empty_init, ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but it also had a different bezel
+
+GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl_state, empty_init, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+
+GAMEL( 1979, crash,    0,      crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
+GAMEL( 1979, crasha,   crash,  crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crasha )
+GAMEL( 1979, smash,    crash,  crash,    crash,    crash_state,    empty_init, ROT0, "bootleg", "Smash (bootleg of Crash)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
+
+GAME(  1979, ripcord,  0,      ripcord,  ripcord,  ripcord_state,  empty_init, ROT0, "Exidy", "Rip Cord", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

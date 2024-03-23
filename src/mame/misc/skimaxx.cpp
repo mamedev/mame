@@ -37,13 +37,15 @@
 *****************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class skimaxx_state : public driver_device
 {
@@ -95,7 +97,7 @@ private:
 	void unk1_w(u32 data);
 	void sub_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 analog_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	void tms_irq(int state);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
@@ -498,7 +500,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(skimaxx_state::tms_irq)
+void skimaxx_state::tms_irq(int state)
 {
 	// TODO
 }
@@ -613,6 +615,8 @@ ROM_START( skimaxx )
 	ROM_REGION( 0x80000, "oki4", 0 )
 	ROM_LOAD( "main2_0.u4", 0x000000, 0x80000, CRC(c84b3c46) SHA1(b956358518495aa822a5b699cbad1abac212dd09) )   // identical to main2_0.u2
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

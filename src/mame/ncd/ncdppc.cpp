@@ -20,6 +20,9 @@
 #include "cpu/powerpc/ppc.h"
 #include "screen.h"
 
+
+namespace {
+
 class ncd_ppc_state : public driver_device
 {
 public:
@@ -45,29 +48,8 @@ private:
 
 	uint32_t unk_r();
 	void tty_w(uint32_t data);
-
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 };
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-#define ENABLE_VERBOSE_LOG (0)
-
-inline void ATTR_PRINTF(3,4) ncd_ppc_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-#if ENABLE_VERBOSE_LOG
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
-	}
-#endif
-}
 
 void ncd_ppc_state::machine_reset()
 {
@@ -121,6 +103,9 @@ ROM_START( explorapro )
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "explora__v2.7.6_bm.u37", 0x000000, 0x040000, CRC(038fb1dc) SHA1(036836359f59e70d5bebc50d69083bbe020ddf98) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT    CLASS          INIT               COMPANY                 FULLNAME           FLAGS
 COMP( 1995, explorapro, 0,      0,   explorapro, explorapro, ncd_ppc_state,  empty_init,   "Network Computing Devices", "NCD Explora Pro XQ", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

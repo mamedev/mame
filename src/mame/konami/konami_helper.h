@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Konami video helper functions */
-#ifndef MAME_VIDEO_KONAMI_HELPER_H
-#define MAME_VIDEO_KONAMI_HELPER_H
+#ifndef MAME_KONAMI_KONAMI_HELPER_H
+#define MAME_KONAMI_KONAMI_HELPER_H
 
 #pragma once
 
@@ -15,4 +15,4 @@ void konami_sortlayers4(int *layer, int *pri);
 // helper function to sort five tile layers by priority order
 void konami_sortlayers5(int *layer, int *pri);
 
-#endif // MAME_VIDEO_KONAMI_HELPER_H
+#endif // MAME_KONAMI_KONAMI_HELPER_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver, Nicola Salmoria
-#ifndef MAME_AUDIO_REDBARON_H
-#define MAME_AUDIO_REDBARON_H
+#ifndef MAME_ATARI_REDBARON_H
+#define MAME_ATARI_REDBARON_H
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -48,4 +48,4 @@ private:
 
 DECLARE_DEVICE_TYPE(REDBARON, redbaron_sound_device)
 
-#endif // MAME_AUDIO_REDBARON_H
+#endif // MAME_ATARI_REDBARON_H

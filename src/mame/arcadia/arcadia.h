@@ -5,8 +5,8 @@
  * includes/arcadia.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_ARCADIA_H
-#define MAME_INCLUDES_ARCADIA_H
+#ifndef MAME_ARCADIA_ARCADIA_H
+#define MAME_ARCADIA_ARCADIA_H
 
 #pragma once
 
@@ -123,7 +123,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	DECLARE_READ_LINE_MEMBER(vsync_r);
+	int vsync_r();
 	uint8_t video_r(offs_t offset);
 	void video_w(offs_t offset, uint8_t data);
 	void palette_init(palette_device &palette) const;
@@ -137,4 +137,4 @@ private:
 	void draw_sprites();
 };
 
-#endif // MAME_INCLUDES_ARCADIA_H
+#endif // MAME_ARCADIA_ARCADIA_H

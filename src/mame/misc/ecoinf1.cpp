@@ -11,6 +11,8 @@
 #include "cpu/z80/z80.h"
 
 
+namespace {
+
 class ecoinf1_state : public driver_device
 {
 public:
@@ -359,6 +361,9 @@ ROM_START( ec_casbxoa )
 	ROM_LOAD( "bx5c10p.a3", 0x1000, 0x1000, CRC(12640d16) SHA1(fd30abe0551734eea83cefcb5cac15a380a97586) )
 	ROM_LOAD( "bx5c10p.a2", 0x2000, 0x1000, CRC(0bd21303) SHA1(eb60749d3097ce77f0955586fc8ed1d16993286a) )
 ROM_END
+
+} // anonymous namespace
+
 
 // all roms might really be for the same game, just in different cabinet styles
 // these ALL contain "Ver 3 BAR-X V1:84 TYPE T" strings

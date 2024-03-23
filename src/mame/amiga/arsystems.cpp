@@ -59,6 +59,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 // arcadia_state was also defined in mess/includes/arcadia.h
 class arcadia_amiga_state : public amiga_state
 {
@@ -321,6 +323,7 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_amiga_state::arcadia_map);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&arcadia_amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&arcadia_amiga_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
@@ -450,8 +453,8 @@ ROM_START( ar_airh2 )
 	ROM_LOAD16_BYTE( "arcadia4.u10", 0x00000, 0x10000, CRC(baf8d886) SHA1(77efbc27c1cf717dfee2686009a957029eb1b113) )
 	ROM_LOAD16_BYTE( "arcadia4.u6",  0x00001, 0x10000, CRC(ccff38ee) SHA1(ae89dbc9533358c80423b2dc21f101816730be7c) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 
@@ -505,8 +508,8 @@ ROM_START( ar_dart2 )
 	ROM_LOAD16_BYTE( "arcadia3.u20", 0xa0000, 0x10000, CRC(efb0f2e2) SHA1(7ba1d85ac573db9bbd1ef04d0770c7c1277bc10e) )
 	ROM_LOAD16_BYTE( "arcadia3.u16", 0xa0001, 0x10000, CRC(a9c5e939) SHA1(75de7c0fb4654b6738ecd0c170589f3a46012f33) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 
@@ -700,8 +703,8 @@ ROM_START( ar_ninj2 )
 	ROM_LOAD16_BYTE( "arcadia5.u20", 0xa0000, 0x10000, CRC(7359920b) SHA1(72c7438f9f5ef5d6a23f11fc58d32f8e1ff0ae44) )
 	ROM_LOAD16_BYTE( "arcadia5.u16", 0xa0001, 0x10000, CRC(85a639bb) SHA1(22bfadfe6c8fd366e45ec172c070d9811e1ea8a9) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 
@@ -758,8 +761,8 @@ ROM_START( ar_sdwr2 )
 	ROM_LOAD16_BYTE( "arcadia1.u20", 0xa0000, 0x10000, CRC(5791440b) SHA1(fc9297343ddc2e6e1e22b7ed9a986777519061db) )
 	ROM_LOAD16_BYTE( "arcadia1.u16", 0xa0001, 0x10000, CRC(e63e1679) SHA1(0762bff0018e006905a2e58141fdf05910f06e29) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 
@@ -933,15 +936,13 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 	for (i = 0; i < 0x20000/2; i++)
 		rom[i] = bitswap<16>(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 
-	#if 0
+	if (0)
 	{
 		uint8_t *ROM = memregion(tag)->base();
 	//  int size = memregion(tag)->bytes();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "decrypted_" + std::string(machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (i = 0; i < 0x20000; i++)
@@ -950,7 +951,6 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 			fclose(fp);
 		}
 	}
-	#endif
 }
 
 
@@ -1001,6 +1001,8 @@ void arcadia_amiga_state::init_xeon() { init_arcadia(); generic_decode("user3", 
 void arcadia_amiga_state::init_pm()   { init_arcadia(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
 void arcadia_amiga_state::init_dlta() { init_arcadia(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
 void arcadia_amiga_state::init_argh() { init_arcadia(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+
+} // anonymous namespace
 
 
 /*************************************

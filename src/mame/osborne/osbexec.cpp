@@ -27,6 +27,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MAIN_CLOCK  XTAL(23'961'600)
 
 #define MODEM_PORT_TAG "modem"
@@ -123,13 +125,13 @@ private:
 	void osbexec_pia0_a_w(uint8_t data);
 	uint8_t osbexec_pia0_b_r();
 	void osbexec_pia0_b_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_txclk_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_rxclk_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(modem_ri_w);
-	DECLARE_WRITE_LINE_MEMBER(comm_clk_a_w);
+	void osbexec_pia0_ca2_w(int state);
+	void osbexec_pia0_cb2_w(int state);
+	void modem_txclk_w(int state);
+	void modem_rxclk_w(int state);
+	void modem_dsr_w(int state);
+	void modem_ri_w(int state);
+	void comm_clk_a_w(int state);
 	void osbexec_io(address_map &map);
 	void osbexec_mem(address_map &map);
 };
@@ -389,33 +391,33 @@ void osbexec_state::osbexec_pia0_b_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_ca2_w)
+void osbexec_state::osbexec_pia0_ca2_w(int state)
 {
 	logerror("osbexec_pia0_ca2_w: state = %d\n", state);
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_cb2_w)
+void osbexec_state::osbexec_pia0_cb2_w(int state)
 {
 	m_pia0_cb2 = state;
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_txclk_w)
+void osbexec_state::modem_txclk_w(int state)
 {
 	if (BIT(m_pia0_portb, 5))
 		m_sio->txca_w(state);
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_rxclk_w)
+void osbexec_state::modem_rxclk_w(int state)
 {
 	if (BIT(m_pia0_portb, 4))
 		m_sio->rxca_w(state);
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_dsr_w)
+void osbexec_state::modem_dsr_w(int state)
 {
 	if (state)
 		m_pia0_portb |= 0x40;
@@ -424,7 +426,7 @@ WRITE_LINE_MEMBER(osbexec_state::modem_dsr_w)
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::modem_ri_w)
+void osbexec_state::modem_ri_w(int state)
 {
 	if (state)
 		m_pia0_portb |= 0x80;
@@ -433,7 +435,7 @@ WRITE_LINE_MEMBER(osbexec_state::modem_ri_w)
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::comm_clk_a_w)
+void osbexec_state::comm_clk_a_w(int state)
 {
 	if (!BIT(m_pia0_portb, 5))
 		m_sio->txca_w(state);
@@ -548,7 +550,7 @@ void osbexec_state::osbexec(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(osbexec_state::osbexec_pia0_a_r));
 	m_pia[0]->readpb_handler().set(FUNC(osbexec_state::osbexec_pia0_b_r));
 	m_pia[0]->writepa_handler().set(FUNC(osbexec_state::osbexec_pia0_a_w));
@@ -558,7 +560,7 @@ void osbexec_state::osbexec(machine_config &config)
 	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 
@@ -616,6 +618,9 @@ ROM_START( osbexec )
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "execv12.ud18", 0x0000, 0x2000, CRC(70798c2f) SHA1(2145a72da563bed1d6d455c77e48cc011a5f1153) )    /* Checksum C6B2 */
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME     FLAGS
 COMP( 1982, osbexec, 0,      0,      osbexec, osbexec, osbexec_state, init_osbexec, "Osborne", "Executive", MACHINE_NOT_WORKING )

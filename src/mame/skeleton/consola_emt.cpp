@@ -32,6 +32,8 @@
 #include "screen.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -277,7 +279,8 @@ void consoemt_state::consoemt(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(consoemt_state::consoemt_palette), 3);
 
-	KS0066_F05(config, m_lcdc, 0);
+	KS0066(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_default_bios_tag("f05");
 	m_lcdc->set_lcd_size(2, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(consoemt_state::lcd_pixel_update));
 }
@@ -294,6 +297,8 @@ ROM_START( consoemt )
 	ROM_REGION(0x2000, "mcu", 0)
 	ROM_LOAD("v26_7caa_n87c51fa.ic20", 0x0000, 0x2000, CRC(37e6c202) SHA1(7b240ed6474240090c26de11048a40c5870886dd))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

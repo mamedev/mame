@@ -59,6 +59,8 @@ Z1000G
 #include "datum.lh"
 
 
+namespace {
+
 class datum_state : public driver_device
 {
 public:
@@ -203,14 +205,14 @@ void datum_state::datum(machine_config &config)
 	m_display->set_segmask(0x3f0, 0x7f);
 
 	/* Devices */
-	PIA6821(config, m_pia1, 0); // keyboard & display
+	PIA6821(config, m_pia1); // keyboard & display
 	m_pia1->readpa_handler().set(FUNC(datum_state::pa_r));
 	m_pia1->writepa_handler().set(FUNC(datum_state::pa_w));
 	m_pia1->writepb_handler().set(FUNC(datum_state::pb_w));
 	m_pia1->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 	m_pia1->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	PIA6821(config, m_pia2, 0); // expansion
+	PIA6821(config, m_pia2); // expansion
 	m_pia2->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 	m_pia2->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
@@ -228,6 +230,9 @@ ROM_START( datum )
 	ROM_REGION( 0x800, "roms", 0 )
 	ROM_LOAD( "datum.bin", 0x0000, 0x0800, BAD_DUMP CRC(6fb11628) SHA1(8a77a846b62eee0d12848da76e16b4c66ef445d8) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
 COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

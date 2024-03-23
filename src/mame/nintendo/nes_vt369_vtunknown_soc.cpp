@@ -72,7 +72,7 @@ void nes_vt369_soc_device::device_add_mconfig(machine_config& config)
 
 	VT_VT1682_ALU(config, m_alu, 0);
 
-	M6502(config, m_soundcpu, N2A03_NTSC_XTAL);
+	M6502(config, m_soundcpu, RP2A03_NTSC_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nes_vt369_soc_device::vt369_sound_map);
 }
 
@@ -101,12 +101,12 @@ void nes_vt369_soc_device::nes_vt369_map(address_map &map)
 	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
 	map(0x2010, 0x201f).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));  //  extra VT PPU registers
 
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
+	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 
-	map(0x4014, 0x4014).r(FUNC(nes_vt369_soc_device::psg1_4014_r)).w(FUNC(nes_vt369_soc_device::vt_dma_w));
-	map(0x4015, 0x4015).rw(FUNC(nes_vt369_soc_device::psg1_4015_r), FUNC(nes_vt369_soc_device::psg1_4015_w)); // PSG status / first control register
+	map(0x4014, 0x4014).w(FUNC(nes_vt369_soc_device::vt_dma_w));
+	map(0x4015, 0x4015).r(m_apu, FUNC(nes_apu_vt_device::status_r)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(nes_vt369_soc_device::in0_r), FUNC(nes_vt369_soc_device::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt369_soc_device::in1_r)).w(FUNC(nes_vt369_soc_device::psg1_4017_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt369_soc_device::in1_r));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt369_soc_device::vt03_4034_w));  // secondary DMA
 
@@ -322,9 +322,9 @@ void nes_vt369_alt_soc_device::nes_vt_hh_map(address_map &map)
 void nes_vt369_alt_swap_d5_d6_soc_device::encryption_4169_w(uint8_t data)
 {
 	if (data == 0x01)
-		downcast<n2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(false);
+		downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(false);
 	else if (data == 0x00)
-		downcast<n2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(true);
+		downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(true);
 	else
 		logerror("%s: encryption_4169_w %02x\n", machine().describe_context(), data);
 }
@@ -342,7 +342,7 @@ void nes_vt369_alt_swap_d5_d6_soc_device::device_add_mconfig(machine_config& con
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 
-	N2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt369_alt_swap_d5_d6_soc_device::nes_vt_hh_swap_map);
 }
 

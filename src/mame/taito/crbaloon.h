@@ -5,8 +5,8 @@
 Crazy Ballooon
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CRBALOON_H
-#define MAME_INCLUDES_CRBALOON_H
+#ifndef MAME_TAITO_CRBALOON_H
+#define MAME_TAITO_CRBALOON_H
 
 #pragma once
 
@@ -62,7 +62,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void crbaloon_palette(palette_device &palette) const;
 	uint32_t screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vbl_int_w);
+	void vbl_int_w(int state);
 	void crbaloon_audio_set_music_freq(uint8_t data);
 	void crbaloon_audio_set_music_enable(uint8_t data);
 	void crbaloon_audio_set_laugh_enable(uint8_t data);
@@ -80,4 +80,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CRBALOON_H
+#endif // MAME_TAITO_CRBALOON_H

@@ -261,15 +261,15 @@ inline uint8_t mos7360_device::read_rom(offs_t offset)
 //  mos7360_device - constructor
 //-------------------------------------------------
 
-mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOS7360, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_sound_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
-		m_write_irq(*this),
-		m_read_k(*this),
-		m_stream(nullptr)
+mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MOS7360, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	device_sound_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
+	m_write_irq(*this),
+	m_read_k(*this, 0xff),
+	m_stream(nullptr)
 {
 }
 
@@ -280,10 +280,6 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 
 void mos7360_device::device_start()
 {
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_read_k.resolve_safe(0xff);
-
 	// allocate timers
 	m_timer[TIMER_ID_1] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
 	m_timer[TIMER_ID_2] = timer_alloc(FUNC(mos7360_device::timer_expired), this);

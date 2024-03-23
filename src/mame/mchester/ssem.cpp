@@ -15,6 +15,8 @@
 #include <sstream>
 
 
+namespace {
+
 class ssem_state : public driver_device
 {
 public:
@@ -552,18 +554,12 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 	std::string image_line = read_line(image);
 	if (image_line.empty())
-	{
-		image.message("No data in line 1");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid image file: no data in line 1");
 
 	sscanf(image_line.c_str(), "%d", &num_lines);  //num_lines = std::stoul(image_line);
 
 	if (num_lines < 1)
-	{
-		image.message("No data to process");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid image file: no data to process");
 
 	for (u32 i = 0; i < num_lines; i++)
 	{
@@ -573,8 +569,9 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 		if (length < 8)
 		{
-			image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
-			return image_init_result::FAIL;
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Bad data (%s) in line %d", image_line, i + 2));
 		}
 
 		// Isolate and convert 4-digit decimal address
@@ -585,8 +582,9 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 		{
 			if (length < 37)
 			{
-				image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
-				return image_init_result::FAIL;
+				return std::make_pair(
+						image_error::INVALIDIMAGE,
+						util::string_format("Bad data (%s) in line %d", image_line, i + 2));
 			}
 
 			// Parse a line such as: 0000:00000110101001000100000100000100
@@ -613,26 +611,19 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 			if (buffer == "num")
 				word = unsigned_value;
-			else
-			if (buffer == "jmp")
+			else if (buffer == "jmp")
 				word = 0x00000000 | unsigned_value ;
-			else
-			if (buffer == "jrp")
+			else if (buffer == "jrp")
 				word = 0x00040000 | unsigned_value;
-			else
-			if (buffer == "ldn")
+			else if (buffer == "ldn")
 				word = 0x00020000 | unsigned_value;
-			else
-			if (buffer == "sto")
+			else if (buffer == "sto")
 				word = 0x00060000 | unsigned_value;
-			else
-			if (buffer == "sub")
+			else if (buffer == "sub")
 				word = 0x00010000 | unsigned_value;
-			else
-			if (buffer == "cmp")
+			else if (buffer == "cmp")
 				word = 0x00030000 | unsigned_value;
-			else
-			if (buffer == "stp")
+			else if (buffer == "stp")
 				word = 0x00070000 | unsigned_value;
 			else
 				logerror("Unknown opcode (%s) in line %d\n",buffer,i+2);
@@ -644,7 +635,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 		space.write_byte((line << 2) + 3, BIT(word, 0,  8));
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /****************************************************\
@@ -688,6 +679,8 @@ void ssem_state::ssem(machine_config &config)
 ROM_START( ssem )
 	ROM_REGION( 0x80, "maincpu", ROMREGION_ERASE00 )  /* Main Store */
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME

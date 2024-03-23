@@ -166,8 +166,10 @@ SMPC NVRAM contents:
 #include "coreutil.h"
 
 
-#define LOG_SMPC 0
-#define LOG_PAD_CMD 0
+#define LOG_PAD_CMD (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -205,6 +207,7 @@ void smpc_hle_device::smpc_regs(address_map &map)
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this))
 	, m_mini_nvram(*this, "smem")
 	, m_mshres(*this)
@@ -214,8 +217,8 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	, m_sysres(*this)
 	, m_syshalt(*this)
 	, m_dotsel(*this)
-	, m_pdr1_read(*this)
-	, m_pdr2_read(*this)
+	, m_pdr1_read(*this, 0xff)
+	, m_pdr2_read(*this, 0xff)
 	, m_pdr1_write(*this)
 	, m_pdr2_write(*this)
 	, m_irq_line(*this)
@@ -244,26 +247,9 @@ void smpc_hle_device::device_add_mconfig(machine_config &config)
 
 void smpc_hle_device::device_start()
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 //  check if SMEM has valid data via byte 4 in the array, if not then simulate a battery backup fail
 //  (-> call the RTC / Language select menu for Saturn)
 	m_mini_nvram->set_base(&m_smem, 5);
-
-	m_mshres.resolve_safe();
-	m_mshnmi.resolve_safe();
-	m_sshres.resolve_safe();
-	m_sndres.resolve_safe();
-	m_sysres.resolve_safe();
-	m_syshalt.resolve_safe();
-	m_dotsel.resolve_safe();
-	m_irq_line.resolve_safe();
-
-	m_pdr1_read.resolve_safe(0xff);
-	m_pdr2_read.resolve_safe(0xff);
-	m_pdr1_write.resolve_safe();
-	m_pdr2_write.resolve_safe();
 
 	save_item(NAME(m_sf));
 	save_item(NAME(m_sr));
@@ -289,14 +275,6 @@ void smpc_hle_device::device_start()
 	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
 	m_intback_timer = timer_alloc(FUNC(smpc_hle_device::intback_continue_request), this);
 	m_sndres_timer = timer_alloc(FUNC(smpc_hle_device::sound_reset), this);
-
-	m_rtc_data[0] = DectoBCD(systime.local_time.year / 100);
-	m_rtc_data[1] = DectoBCD(systime.local_time.year % 100);
-	m_rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	m_rtc_data[3] = DectoBCD(systime.local_time.mday);
-	m_rtc_data[4] = DectoBCD(systime.local_time.hour);
-	m_rtc_data[5] = DectoBCD(systime.local_time.minute);
-	m_rtc_data[6] = DectoBCD(systime.local_time.second);
 }
 
 
@@ -328,6 +306,22 @@ void smpc_hle_device::device_reset()
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
+
+//-------------------------------------------------
+//  rtc_clock_updated - update clock with real time
+//-------------------------------------------------
+
+void smpc_hle_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_rtc_data[0] = DectoBCD(year / 100);
+	m_rtc_data[1] = DectoBCD(year % 100);
+	m_rtc_data[2] = ((day_of_week - 1) << 4) | month;
+	m_rtc_data[3] = DectoBCD(day);
+	m_rtc_data[4] = DectoBCD(hour);
+	m_rtc_data[5] = DectoBCD(minute);
+	m_rtc_data[6] = DectoBCD(second);
+}
+
 device_memory_interface::space_config_vector smpc_hle_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -353,13 +347,13 @@ void smpc_hle_device::ireg_w(offs_t offset, uint8_t data)
 		{
 			if(data & 0x40)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
+				LOGMASKED(LOG_PAD_CMD, "SMPC: BREAK request\n");
 				sr_ack();
 				m_intback_stage = 0;
 			}
 			else if(data & 0x80)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
+				LOGMASKED(LOG_PAD_CMD, "SMPC: CONTINUE request\n");
 
 				m_intback_timer->adjust(attotime::from_usec(700));  // TODO: is timing correct?
 

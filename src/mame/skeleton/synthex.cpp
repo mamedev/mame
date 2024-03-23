@@ -14,6 +14,9 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 
+
+namespace {
+
 class synthex_state : public driver_device
 {
 public:
@@ -227,5 +230,8 @@ ROM_START(synthex)
 	ROM_LOAD("sx_t41.1h", 0x0000, 0x0800, CRC(520459b9) SHA1(2c2bd1399e99bdc7f81de4e642de19b19547a6f6))
 	// ROM4 decode is not used
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1981, synthex, 0, 0, synthex, synthex, synthex_state, empty_init, "Elka", "Synthex", MACHINE_IS_SKELETON)

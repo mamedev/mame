@@ -70,23 +70,23 @@ public:
 	void write(uint8_t data);
 
 	// Inputs
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
-	DECLARE_WRITE_LINE_MEMBER( extready_in );
-	DECLARE_WRITE_LINE_MEMBER( sndready_in );
+	void clock_in(int state);
+	void dbin_in(int state);
+	void extready_in(int state);
+	void sndready_in(int state);
 	void cru_sstep_write(offs_t offset, uint8_t data);
 	void cru_ctrl_write(offs_t offset, uint8_t data);
 
 	// Outputs
-	DECLARE_READ_LINE_MEMBER( csr_out );
-	DECLARE_READ_LINE_MEMBER( csw_out );
-	DECLARE_READ_LINE_MEMBER( rtcen_out );
-	DECLARE_READ_LINE_MEMBER( romen_out );
-	DECLARE_READ_LINE_MEMBER( ramen_out );
-	DECLARE_READ_LINE_MEMBER( ramenx_out );
-	DECLARE_READ_LINE_MEMBER( snden_out );
-	DECLARE_READ_LINE_MEMBER( dben_out );
-	DECLARE_READ_LINE_MEMBER( gaready_out );
+	int csr_out();
+	int csw_out();
+	int rtcen_out();
+	int romen_out();
+	int ramen_out();
+	int ramenx_out();
+	int snden_out();
+	int dben_out();
+	int gaready_out();
 
 	int get_prefix(int lines);
 	bool accessing_dram();
@@ -99,10 +99,10 @@ public:
 	offs_t get_dram_address();
 
 	// Keyboard support
-	DECLARE_WRITE_LINE_MEMBER( set_keyboard_clock );
-	DECLARE_WRITE_LINE_MEMBER( enable_shift_register );
-	DECLARE_WRITE_LINE_MEMBER( kbdclk );
-	DECLARE_WRITE_LINE_MEMBER( kbddata );
+	void set_keyboard_clock(int state);
+	void enable_shift_register(int state);
+	void kbdclk(int state);
+	void kbddata(int state);
 	auto kbdint_cb() { return m_keyint.bind(); }
 	auto kbdclk_cb() { return m_keyb_clk.bind(); }
 	auto kbddata_cb() { return m_keyb_data.bind(); }
@@ -252,13 +252,13 @@ class geneve_pal_device : public device_t
 public:
 	geneve_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( gaready_in );
-	DECLARE_WRITE_LINE_MEMBER( csw_in );
-	DECLARE_WRITE_LINE_MEMBER( csr_in );
-	DECLARE_WRITE_LINE_MEMBER( memen );
-	DECLARE_WRITE_LINE_MEMBER( vwaiten );   // pin 19
-	DECLARE_WRITE_LINE_MEMBER( sysspeed );  // pin 5
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
+	void gaready_in(int state);
+	void csw_in(int state);
+	void csr_in(int state);
+	void memen(int state);
+	void vwaiten(int state);   // pin 19
+	void sysspeed(int state);  // pin 5
+	void clock_in(int state);
 
 	auto ready_cb() { return m_ready.bind(); }
 
@@ -297,11 +297,11 @@ public:
 	void set_turbo(bool turbo) { m_turbo = turbo; }
 	void set_timode(bool timode) { m_timode = timode; }
 
-	DECLARE_READ_LINE_MEMBER( gaready_out );
-	DECLARE_READ_LINE_MEMBER( dben_out );
-	DECLARE_WRITE_LINE_MEMBER( gaready_in );
-	DECLARE_WRITE_LINE_MEMBER( extready_in );
-	DECLARE_WRITE_LINE_MEMBER( sndready_in );
+	int gaready_out();
+	int dben_out();
+	void gaready_in(int state);
+	void extready_in(int state);
+	void sndready_in(int state);
 
 private:
 	void device_start() override;

@@ -158,18 +158,18 @@ wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, dev
 	, m_out_intrq_cb(*this)
 	, m_out_bdrq_cb(*this)
 	, m_out_bcr_cb(*this)
-	, m_in_bcs_cb(*this)
-	, m_in_brdy_cb(*this)
+	, m_in_bcs_cb(*this, 0)
+	, m_in_brdy_cb(*this, 0)
 	, m_out_bcs_cb(*this)
 	, m_out_dirin_cb(*this)
 	, m_out_step_cb(*this)
 	, m_out_rwc_cb(*this)
 	, m_out_wg_cb(*this)
-	, m_in_drdy_cb(*this)
-	, m_in_index_cb(*this)
-	, m_in_wf_cb(*this)
-	, m_in_tk000_cb(*this)
-	, m_in_sc_cb(*this)
+	, m_in_drdy_cb(*this, 0)
+	, m_in_index_cb(*this, 0)
+	, m_in_wf_cb(*this, 0)
+	, m_in_tk000_cb(*this, 0)
+	, m_in_sc_cb(*this, 0)
 	, m_status(0)
 	, m_error(0)
 {
@@ -182,26 +182,7 @@ wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, dev
 
 void wd2010_device::device_start()
 {
-	// resolve callbacks
-	m_out_intrq_cb.resolve_safe();
-	m_out_bdrq_cb.resolve_safe();
-	m_out_bcr_cb.resolve_safe();
-	m_in_bcs_cb.resolve_safe(0);
-
-	m_in_brdy_cb.resolve_safe(0);
-
-	m_out_bcs_cb.resolve_safe();
-	m_out_dirin_cb.resolve_safe();
-	m_out_step_cb.resolve_safe();
-	m_out_rwc_cb.resolve_safe();
-	m_out_wg_cb.resolve_safe();
-	m_in_drdy_cb.resolve_safe(0);
-	m_in_index_cb.resolve_safe(0);
-	m_in_wf_cb.resolve_safe(0);
-	m_in_tk000_cb.resolve_safe(0);
-	m_in_sc_cb.resolve_safe(0);
-
-	/* allocate a timer for commands */
+	// allocate a timer for commands
 	m_cmd_timer = timer_alloc(FUNC(wd2010_device::command_complete), this);
 	m_complete_write_timer = timer_alloc(FUNC(wd2010_device::complete_write), this);
 	m_deassert_write_timer = timer_alloc(FUNC(wd2010_device::deassert_write), this);

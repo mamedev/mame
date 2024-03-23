@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Radon17, RCgoff, Berger
-/******************************************************************************
+/*******************************************************************************
 
 Электроника ИМ-01 (Elektronika IM-01)
 
@@ -25,7 +25,7 @@ TODO:
 - verify im05 XTAL and IRQ
 - verify im05 button functions
 
-===============================================================================
+================================================================================
 
 Hardware notes:
 
@@ -45,7 +45,7 @@ Hardware notes:
 - К1573ХМ1 (I/O controller)
 - rest is same as ИМ-01
 
-===============================================================================
+================================================================================
 
 ИМ-01 keypad legend (excluding A1-H8 and black/white):
 
@@ -84,7 +84,7 @@ CТА: -                                                   - Enter Move
 ПХ:  -                                                   - Hint
 Р:   -                                                   - Promotion (hold)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -95,13 +95,11 @@ CТА: -                                                   - Enter Move
 #include "speaker.h"
 
 // internal artwork
-#include "im01.lh" // clickable
-#include "im05.lh" // clickable
+#include "im01.lh"
+#include "im05.lh"
 
 
 namespace {
-
-// ИМ-01 / shared
 
 class im01_state : public driver_device
 {
@@ -121,11 +119,15 @@ public:
 protected:
 	virtual void machine_start() override;
 
+private:
 	// devices/pointers
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<6> m_inputs;
+
+	u16 m_inp_mux = 0;
+	u16 m_digit_data = 0;
 
 	void im01_map(address_map &map);
 	void im01t_map(address_map &map);
@@ -143,9 +145,6 @@ protected:
 	u16 input_r(offs_t offset, u16 mem_mask);
 	u16 inputa_r(offs_t offset, u16 mem_mask);
 	void error_w(offs_t offset, u16 data, u16 mem_mask);
-
-	u16 m_inp_mux = 0;
-	u16 m_digit_data = 0;
 };
 
 void im01_state::machine_start()
@@ -157,9 +156,9 @@ void im01_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Interrupts
-******************************************************************************/
+*******************************************************************************/
 
 u8 im01_state::irq_callback(offs_t offset)
 {
@@ -179,9 +178,9 @@ INTERRUPT_GEN_MEMBER(im01_state::interrupt)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // ИМ-01 / shared
 
@@ -249,9 +248,9 @@ u16 im01_state::inputa_r(offs_t offset, u16 mem_mask)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void im01_state::im01_map(address_map &map)
 {
@@ -279,9 +278,9 @@ void im01_state::im05_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( im01 )
 	PORT_START("IN.0")
@@ -327,7 +326,7 @@ static INPUT_PORTS_START( im05 )
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Forward")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME(u8"ПХ (Hint)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"Р (Promotion)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME(u8"Р (Promotion)")
 
 	PORT_MODIFY("IN.2")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Confirm")
@@ -346,9 +345,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void im01_state::im01(machine_config &config)
 {
@@ -391,9 +390,9 @@ void im01_state::im05(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( im01 )
 	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
@@ -418,12 +417,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, im01,  0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, im01t, im01,   0, im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, im01,  0,      0,      im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, im01t, im01,   0,      im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1993, im05,  0,      0, im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, im05,  0,      0,      im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

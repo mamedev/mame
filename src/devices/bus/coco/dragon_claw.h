@@ -45,7 +45,7 @@ protected:
 	virtual address_space &cartridge_space() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 	required_device<via6522_device> m_via;
 	required_device<cococart_slot_device> m_slot;

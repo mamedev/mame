@@ -31,6 +31,9 @@
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 
+
+namespace {
+
 class ts802_state : public driver_device
 {
 public:
@@ -240,6 +243,9 @@ ROM_START( ts802h )
 	ROM_LOAD( "800000-003a.a68",  0x0000, 0x0800, CRC(24eeb74d) SHA1(77900937f1492b4c5a70ba3aac55da322d403fbd) )
 	ROM_LOAD( "800000-002a.a67",  0x0800, 0x0800, CRC(4b6c6e29) SHA1(c236e4625bc16062154cbebc4dbc8d62183ef9ab) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

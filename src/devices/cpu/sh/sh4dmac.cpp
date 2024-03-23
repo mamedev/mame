@@ -16,7 +16,7 @@ TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_dmac_callback )
 {
 	int channel = param;
 
-	LOG(("SH4 '%s': DMA %d complete\n", tag(), channel));
+	LOG("SH4 '%s': DMA %d complete\n", tag(), channel);
 	m_dma_timer_active[channel] = 0;
 	switch (channel)
 	{
@@ -49,12 +49,10 @@ TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_dmac_callback )
 
 int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr, uint32_t *sar, uint32_t *dar, uint32_t *dmatcr)
 {
-	int incs, incd, size;
-	uint32_t src, dst, count;
+	int incd = (chcr & CHCR_DM) >> 14;
+	int incs = (chcr & CHCR_SM) >> 12;
 
-	incd = (chcr & CHCR_DM) >> 14;
-	incs = (chcr & CHCR_SM) >> 12;
-
+	int size;
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
 		size = dmasize[(chcr & CHCR_TS) >> 4];
@@ -64,18 +62,19 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr
 		size = sh3_dmasize[(chcr >> 3) & 3];
 	}
 
-	if(incd == 3 || incs == 3)
+	if (incd == 3 || incs == 3)
 	{
 		logerror("SH4: DMA: bad increment values (%d, %d, %d, %04x)\n", incd, incs, size, chcr);
 		return 0;
 	}
-	src   = *sar;
-	dst   = *dar;
-	count = *dmatcr;
+
+	uint32_t src   = *sar;
+	uint32_t dst   = *dar;
+	uint32_t count = *dmatcr;
 	if (!count)
 		count = 0x1000000;
 
-	LOG(("SH4: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", channel, src, dst, count, chcr, incs, incd, size));
+	LOG("SH4: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", channel, src, dst, count, chcr, incs, incd, size);
 
 	if (timermode == 1) // timer actvated after a time based on the number of words to transfer
 	{
@@ -91,51 +90,51 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr
 	src &= SH34_AM;
 	dst &= SH34_AM;
 
-	switch(size)
+	switch (size)
 	{
 	case 1: // 8 bit
-		for(;count > 0; count --)
+		for (;count > 0; count --)
 		{
-			if(incs == 2)
+			if (incs == 2)
 				src --;
-			if(incd == 2)
+			if (incd == 2)
 				dst --;
 			m_program->write_byte(dst, m_program->read_byte(src));
-			if(incs == 1)
+			if (incs == 1)
 				src ++;
-			if(incd == 1)
+			if (incd == 1)
 				dst ++;
 		}
 		break;
 	case 2: // 16 bit
 		src &= ~1;
 		dst &= ~1;
-		for(;count > 0; count --)
+		for (;count > 0; count --)
 		{
-			if(incs == 2)
+			if (incs == 2)
 				src -= 2;
-			if(incd == 2)
+			if (incd == 2)
 				dst -= 2;
 			m_program->write_word(dst, m_program->read_word(src));
-			if(incs == 1)
+			if (incs == 1)
 				src += 2;
-			if(incd == 1)
+			if (incd == 1)
 				dst += 2;
 		}
 		break;
 	case 8: // 64 bit
 		src &= ~7;
 		dst &= ~7;
-		for(;count > 0; count --)
+		for (;count > 0; count --)
 		{
-			if(incs == 2)
+			if (incs == 2)
 				src -= 8;
-			if(incd == 2)
+			if (incd == 2)
 				dst -= 8;
 			m_program->write_qword(dst, m_program->read_qword(src));
-			if(incs == 1)
+			if (incs == 1)
 				src += 8;
-			if(incd == 1)
+			if (incd == 1)
 				dst += 8;
 
 		}
@@ -143,16 +142,16 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr
 	case 4: // 32 bit
 		src &= ~3;
 		dst &= ~3;
-		for(;count > 0; count --)
+		for (;count > 0; count --)
 		{
-			if(incs == 2)
+			if (incs == 2)
 				src -= 4;
-			if(incd == 2)
+			if (incd == 2)
 				dst -= 4;
 			m_program->write_dword(dst, m_program->read_dword(src));
-			if(incs == 1)
+			if (incs == 1)
 				src += 4;
-			if(incd == 1)
+			if (incd == 1)
 				dst += 4;
 
 		}
@@ -160,19 +159,19 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr
 	case 32:
 		src &= ~31;
 		dst &= ~31;
-		for(;count > 0; count --)
+		for (;count > 0; count --)
 		{
-			if(incs == 2)
+			if (incs == 2)
 				src -= 32;
-			if(incd == 2)
+			if (incd == 2)
 				dst -= 32;
 			m_program->write_qword(dst, m_program->read_qword(src));
-			m_program->write_qword(dst+8, m_program->read_qword(src+8));
-			m_program->write_qword(dst+16, m_program->read_qword(src+16));
-			m_program->write_qword(dst+24, m_program->read_qword(src+24));
-			if(incs == 1)
+			m_program->write_qword(dst + 8, m_program->read_qword(src + 8));
+			m_program->write_qword(dst + 16, m_program->read_qword(src + 16));
+			m_program->write_qword(dst + 24, m_program->read_qword(src + 24));
+			if (incs == 1)
 				src += 32;
-			if(incd == 1)
+			if (incd == 1)
 				dst += 32;
 		}
 		break;
@@ -185,13 +184,10 @@ int sh34_base_device::sh4_dma_transfer(int channel, int timermode, uint32_t chcr
 
 int sh34_base_device::sh4_dma_transfer_device(int channel, uint32_t chcr, uint32_t *sar, uint32_t *dar, uint32_t *dmatcr)
 {
-	int incs, incd, size, mod;
-	uint32_t src, dst, count;
+	int incd = (chcr & CHCR_DM) >> 14;
+	int incs = (chcr & CHCR_SM) >> 12;
 
-	incd = (chcr & CHCR_DM) >> 14;
-	incs = (chcr & CHCR_SM) >> 12;
-
-
+	int size;
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
 		size = dmasize[(chcr & CHCR_TS) >> 4];
@@ -201,19 +197,20 @@ int sh34_base_device::sh4_dma_transfer_device(int channel, uint32_t chcr, uint32
 		size = sh3_dmasize[(chcr >> 3) & 3];
 	}
 
-	mod = ((chcr & CHCR_RS) >> 8);
+	int mod = ((chcr & CHCR_RS) >> 8);
 	if (incd == 3 || incs == 3)
 	{
 		logerror("SH4: DMA: bad increment values (%d, %d, %d, %04x)\n", incd, incs, size, chcr);
 		return 0;
 	}
-	src   = *sar;
-	dst   = *dar;
-	count = *dmatcr;
+
+	uint32_t src   = *sar;
+	uint32_t dst   = *dar;
+	uint32_t count = *dmatcr;
 	if (!count)
 		count = 0x1000000;
 
-	LOG(("SH4: DMA %d start device<->memory %x, %x, %x, %04x, %d, %d, %d\n", channel, src, dst, count, chcr, incs, incd, size));
+	LOG("SH4: DMA %d start device<->memory %x, %x, %x, %04x, %d, %d, %d\n", channel, src, dst, count, chcr, incs, incd, size);
 
 	m_dma_timer_active[channel] = 1;
 
@@ -294,7 +291,6 @@ void sh34_base_device::sh4_dmac_check(int channel)
 // called by drivers to transfer data in a cpu<->device dma. 'device' must be a SH4 cpu
 int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 {
-	uint32_t pos, len, siz;
 	int channel = s->channel;
 	void *data = s->buffer;
 
@@ -304,11 +300,12 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 	if (m_dma_mode[channel] == 2)
 	{
 		// device receives data
-		len = m_dma_count[channel];
+		uint32_t len = m_dma_count[channel];
 		if (s->length < len)
 			len = s->length;
-		siz = m_dma_wordsize[channel];
-		for (pos = 0;pos < len;pos++) {
+		uint32_t siz = m_dma_wordsize[channel];
+		for (uint32_t pos = 0; pos < len; pos++)
+		{
 			switch (siz)
 			{
 			case 8:
@@ -362,11 +359,12 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 	else if (m_dma_mode[channel] == 3)
 	{
 		// device sends data
-		len = m_dma_count[channel];
+		uint32_t len = m_dma_count[channel];
 		if (s->length < len)
 			len = s->length;
-		siz = m_dma_wordsize[channel];
-		for (pos = 0;pos < len;pos++) {
+		uint32_t siz = m_dma_wordsize[channel];
+		for (uint32_t pos = 0; pos < len; pos++)
+		{
 			switch (siz)
 			{
 			case 8:
@@ -425,17 +423,13 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 // called by drivers to transfer data in a DDT dma.
 void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 {
-	uint32_t chcr;
-	uint32_t *p32bits;
-	uint64_t *p32bytes;
-	uint32_t pos,len,siz;
-
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_dma_ddt uses m_m[] with SH3\n");
 
 	if (m_dma_timer_active[s->channel])
 		return;
-	if (s->mode >= 0) {
+	if (s->mode >= 0)
+	{
 		switch (s->channel)
 		{
 		case 0:
@@ -480,6 +474,8 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 				m_SH4_DAR3 = s->destination;
 			break;
 		}
+		uint32_t len;
+		uint32_t chcr;
 		switch (s->channel)
 		{
 		case 0:
@@ -500,13 +496,13 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 			len = m_SH4_DMATCR3;
 			break;
 		}
-		if ((s->direction) == 0) {
+
+		if (s->direction == 0)
 			chcr = (chcr & 0xffff3fff) | ((s->mode & 0x30) << 10);
-		} else {
+		else
 			chcr = (chcr & 0xffffcfff) | ((s->mode & 0x30) << 8);
-		}
 
-
+		uint32_t siz = 0;
 		if (m_cpu_type == CPU_TYPE_SH4)
 		{
 			//siz = dmasize[(chcr & CHCR_TS) >> 4];
@@ -518,43 +514,51 @@ void sh34_base_device::sh4_dma_ddt(struct sh4_ddt_dma *s)
 		}
 
 
-		if (siz && (s->size))
-			if ((len * siz) != (s->length * s->size))
+		if (siz && s->size)
+			if (len * siz != s->length * s->size)
 				return;
 		sh4_dma_transfer(s->channel, 0, chcr, &s->source, &s->destination, &len);
-	} else {
-		if (s->size == 4) {
-			if ((s->direction) == 0) {
-				len = s->length;
-				p32bits = (uint32_t *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
-					*p32bits = m_program->read_dword(s->source);
-					p32bits++;
+	}
+	else
+	{
+		if (s->size == 4)
+		{
+			if ((s->direction) == 0)
+			{
+				uint32_t *p32bits = (uint32_t *)s->buffer;
+				for (uint32_t pos = 0; pos < s->length; pos++)
+				{
+					*p32bits++ = m_program->read_dword(s->source);
 					s->source = s->source + 4;
 				}
-			} else {
-				len = s->length;
-				p32bits = (uint32_t *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
+			}
+			else
+			{
+				uint32_t *p32bits = (uint32_t *)s->buffer;
+				for (uint32_t pos = 0; pos < s->length; pos++)
+				{
 					m_program->write_dword(s->destination, *p32bits);
 					p32bits++;
 					s->destination = s->destination + 4;
 				}
 			}
 		}
-		if (s->size == 32) {
-			if ((s->direction) == 0) {
-				len = s->length * 4;
-				p32bytes = (uint64_t *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
-					*p32bytes = m_program->read_qword(s->source);
-					p32bytes++;
+		if (s->size == 32)
+		{
+			if ((s->direction) == 0)
+			{
+				uint64_t *p32bytes = (uint64_t *)s->buffer;
+				for (uint32_t pos = 0; pos < s->length * 4; pos++)
+				{
+					*p32bytes++ = m_program->read_qword(s->source);
 					s->destination = s->destination + 8;
 				}
-			} else {
-				len = s->length * 4;
-				p32bytes = (uint64_t *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
+			}
+			else
+			{
+				uint64_t *p32bytes = (uint64_t *)s->buffer;
+				for (uint32_t pos = 0; pos < s->length * 4; pos++)
+				{
 					m_program->write_qword(s->destination, *p32bytes);
 					p32bytes++;
 					s->destination = s->destination + 8;

@@ -101,7 +101,7 @@ public:
 	virtual u16 read_io(offs_t offset, u16 mem_mask) { return 0xffff; }
 	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) { }
 
-	void rom_alloc(u32 size, const char *tag);
+	void rom_alloc(u32 size);
 	void nvram_alloc(u32 size);
 	u16* get_rom_base() { return m_rom; }
 	uint8_t* get_nvram_base() { return &m_nvram[0]; }
@@ -145,15 +145,15 @@ public:
 	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~ws_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "wswan_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "ws,wsc,bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
@@ -172,23 +172,16 @@ public:
 	virtual void write_io(offs_t offset, u16 data, u16 mem_mask);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	int m_type;
-	device_ws_cart_interface* m_cart;
+	device_ws_cart_interface *m_cart;
 };
 
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(WS_CART_SLOT, ws_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define WSSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_WSWAN_SLOT_H

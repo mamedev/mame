@@ -26,17 +26,17 @@ public:
 
 	void x_w(uint8_t data);
 	void y_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tsx_w);
-	DECLARE_WRITE_LINE_MEMBER(tsm_w);
-	DECLARE_WRITE_LINE_MEMBER(tsl_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_x_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_y_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_p_w);
-	DECLARE_WRITE_LINE_MEMBER(prel_w);
-	DECLARE_WRITE_LINE_MEMBER(rnd_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(acc_w);
-	DECLARE_WRITE_LINE_MEMBER(sub_w);
+	void tsx_w(int state);
+	void tsm_w(int state);
+	void tsl_w(int state);
+	void clk_x_w(int state);
+	void clk_y_w(int state);
+	void clk_p_w(int state);
+	void prel_w(int state);
+	void rnd_w(int state);
+	void tc_w(int state);
+	void acc_w(int state);
+	void sub_w(int state);
 
 	// Output preloads by group
 	void xtp_w(uint8_t data);

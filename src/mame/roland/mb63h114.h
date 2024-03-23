@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MB63H114_H
-#define MAME_MACHINE_MB63H114_H
+#ifndef MAME_ROLAND_MB63H114_H
+#define MAME_ROLAND_MB63H114_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MB63H114, mb63h114_device)
 
-#endif // MAME_MACHINE_MB63H114_H
+#endif // MAME_ROLAND_MB63H114_H

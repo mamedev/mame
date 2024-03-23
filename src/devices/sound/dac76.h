@@ -37,18 +37,18 @@ public:
 	dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// chord
-	DECLARE_WRITE_LINE_MEMBER(b1_w) { m_chord &= ~(1 << 2); m_chord |= (state << 2); }
-	DECLARE_WRITE_LINE_MEMBER(b2_w) { m_chord &= ~(1 << 1); m_chord |= (state << 1); }
-	DECLARE_WRITE_LINE_MEMBER(b3_w) { m_chord &= ~(1 << 0); m_chord |= (state << 0); }
+	void b1_w(int state) { m_chord &= ~(1 << 2); m_chord |= (state << 2); }
+	void b2_w(int state) { m_chord &= ~(1 << 1); m_chord |= (state << 1); }
+	void b3_w(int state) { m_chord &= ~(1 << 0); m_chord |= (state << 0); }
 
 	// step
-	DECLARE_WRITE_LINE_MEMBER(b4_w) { m_step &= ~(1 << 3); m_step |= (state << 3); }
-	DECLARE_WRITE_LINE_MEMBER(b5_w) { m_step &= ~(1 << 2); m_step |= (state << 2); }
-	DECLARE_WRITE_LINE_MEMBER(b6_w) { m_step &= ~(1 << 1); m_step |= (state << 1); }
-	DECLARE_WRITE_LINE_MEMBER(b7_w) { m_step &= ~(1 << 0); m_step |= (state << 0); }
+	void b4_w(int state) { m_step &= ~(1 << 3); m_step |= (state << 3); }
+	void b5_w(int state) { m_step &= ~(1 << 2); m_step |= (state << 2); }
+	void b6_w(int state) { m_step &= ~(1 << 1); m_step |= (state << 1); }
+	void b7_w(int state) { m_step &= ~(1 << 0); m_step |= (state << 0); }
 
 	// sign bit
-	DECLARE_WRITE_LINE_MEMBER(sb_w) { m_sb = bool(state); }
+	void sb_w(int state) { m_sb = bool(state); }
 
 	void update() { m_stream->update(); }
 
@@ -64,8 +64,8 @@ private:
 
 	sound_stream *m_stream;
 
-	uint8_t m_chord; // 4-bit
-	uint8_t m_step; // 3-bit
+	uint8_t m_chord; // 3-bit
+	uint8_t m_step; // 4-bit
 	bool m_sb;
 };
 

@@ -34,7 +34,7 @@
 #include "emu.h"
 #include "taito_f3.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -128,7 +128,6 @@ void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 		/* Banks are 0x20000 bytes each, divide by two to get data16
 		pointer rather than byte pointer */
 		m_taito_en->set_bank(1, idx);
-
 	}
 	else
 	{
@@ -1133,7 +1132,6 @@ ROM_START( hthero93u )
 	ROM_LOAD ("d29-15.ic29.bin", 0x000000, 0x157, CRC(692eb582) SHA1(db40eb294cecc65d4a0d65e75b6daef75dcc2fb7) )
 	ROM_LOAD ("d29-16.ic7.bin",  0x000000, 0x117, CRC(11875f52) SHA1(2c3a7a15b3184421ca1bc88383eeccf49ee0d22c) )
 	ROM_LOAD ("d29-17.ic16.bin", 0x000000, 0x117, CRC(a0f74b51) SHA1(9d19e9099be965152a3cfbc5593e6abedb7c9d71) )
-
 ROM_END
 
 

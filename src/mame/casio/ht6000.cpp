@@ -11,9 +11,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "cpu/mcs48/mcs48.h"
 
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -336,6 +338,8 @@ ROM_START( ht6000 )
 	ROM_REGION(0x800, "keycpu", 0)
 	ROM_LOAD("187_8734h7.bin", 0x000, 0x800, CRC(47b47af7) SHA1(8f0515f95dcc6e224a8a59e0c2cd7ddb4796e34e))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

@@ -19,7 +19,6 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "bus/centronics/ctronics.h"
-#include "formats/coupedsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -51,16 +50,16 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	void busy_w(int state);
 
 	required_memory_region m_rom;
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 
-	int m_romcs;
+	bool m_romcs;
 	uint8_t m_ram[8 * 1024];
 	bool m_centronics_busy;
 };
@@ -88,7 +87,7 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
 	TIMER_CALLBACK_MEMBER(reset_tick);
 

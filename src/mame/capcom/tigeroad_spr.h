@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_TIGEROAD_SPR_H
-#define MAME_VIDEO_TIGEROAD_SPR_H
+#ifndef MAME_CAPCOM_TIGEROAD_SPR_H
+#define MAME_CAPCOM_TIGEROAD_SPR_H
 
 #pragma once
 
@@ -28,4 +28,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TIGEROAD_SPRITE, tigeroad_spr_device)
 
-#endif // MAME_VIDEO_TIGEROAD_SPR_H
+#endif // MAME_CAPCOM_TIGEROAD_SPR_H

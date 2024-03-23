@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder, Robbbert
 #pragma once
 
-#ifndef MAME_INCLUDES_PHC25_H
-#define MAME_INCLUDES_PHC25_H
+#ifndef MAME_SANYO_PHC25_H
+#define MAME_SANYO_PHC25_H
 
 
 #include "cpu/z80/z80.h"
@@ -41,10 +41,10 @@ public:
 private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	void write_centronics_busy(int state);
 	uint8_t port40_r();
 	void port40_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 	uint8_t video_ram_r(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(ntsc_char_rom_r);
 	MC6847_GET_CHARROM_MEMBER(pal_char_rom_r);
@@ -60,4 +60,4 @@ private:
 	required_device<cassette_image_device> m_cassette;
 };
 
-#endif
+#endif // MAME_SANYO_PHC25_H

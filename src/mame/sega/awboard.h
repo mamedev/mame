@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert,Andreas Naive
-#ifndef MAME_MACHINE_AWBOARD_H
-#define MAME_MACHINE_AWBOARD_H
+#ifndef MAME_SEGA_AWBOARD_H
+#define MAME_SEGA_AWBOARD_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 
 DECLARE_DEVICE_TYPE(AW_ROM_BOARD, aw_rom_board)
 
-#endif // MAME_MACHINE_AWBOARD_H
+#endif // MAME_SEGA_AWBOARD_H

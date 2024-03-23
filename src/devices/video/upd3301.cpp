@@ -10,8 +10,9 @@
 
     TODO:
 
-    - pinpoint how much of pc8001/pc8801 drawing functions should actually be inherited
-      here;
+    - pinpoint and expose actual attribute pin meanings;
+    - verify if pc8001 / pc8801 attribute bit 3 extension is internal or
+      external to the chip;
     - N interrupt (special control character);
     - light pen;
     - reset counters;
@@ -22,9 +23,10 @@
     - DMA underrun (sorcerml in pc8801?). Should throw a status U irq;
     - cleanup: variable namings should be more verbose
         (i.e. not be a single letter like m_y, m_z, m_b ...);
-    - jettermi (pc8801) expects to colorize its underlying 400 b&w mode by masking with the
-        text color attributes here;
-    - xak2 (pc8801) throws text garbage on legacy renderer (verify);
+    - escapepr (pc8801_flop): should draw a semigfx mask over gameplay window but all the attribute
+      areas are 0, with only a single 0x50 0x18 setup at the very end of the VRAM,
+      is it expecting to chain from one frame to another or it's simply failing to setup it properly
+      earlier?
 
 */
 
@@ -39,6 +41,7 @@
 #define LOG_CRTC    (1U << 4) // CRTC parameters
 #define LOG_INT     (1U << 5) // INT, VRTC and DRQ lines
 #define LOG_HRTC    (1U << 6) // HRTC (verbose)
+#define LOG_STRIPS  (1U << 7) // attribute row strips (verbose)
 
 #define VERBOSE (LOG_WARN)
 //#define VERBOSE (LOG_WARN|LOG_CMD)
@@ -52,6 +55,7 @@
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
 #define LOGINT(...)       LOGMASKED(LOG_INT, __VA_ARGS__)
 #define LOGHRTC(...)      LOGMASKED(LOG_HRTC, __VA_ARGS__)
+#define LOGSTRIPS(...)    LOGMASKED(LOG_STRIPS, __VA_ARGS__)
 
 
 //**************************************************************************
@@ -142,12 +146,8 @@ upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, d
 void upd3301_device::device_start()
 {
 	screen().register_screen_bitmap(m_bitmap);
-	// resolve callbacks
-	m_write_drq.resolve_safe();
-	m_write_int.resolve_safe();
-	m_write_hrtc.resolve_safe();
-	m_write_vrtc.resolve_safe();
-	m_write_rvv.resolve();
+
+	// resolve delegates
 	m_display_cb.resolve();
 	m_attr_fetch_cb.resolve();
 
@@ -204,7 +204,7 @@ void upd3301_device::device_reset()
 	m_cm = 0;
 	m_b = 48;
 	m_reverse_display = false;
-	if (!m_write_rvv.isnull())
+	if (!m_write_rvv.isunset())
 		m_write_rvv(m_reverse_display);
 
 	recompute_parameters();
@@ -460,7 +460,7 @@ void upd3301_device::write(offs_t offset, uint8_t data)
 				if (m_reverse_display != new_rvv)
 				{
 					m_reverse_display = new_rvv;
-					if (!m_write_rvv.isnull())
+					if (!m_write_rvv.isunset())
 						m_write_rvv(m_reverse_display);
 					else if (m_reverse_display == true)
 						logerror("%s: RVV reverse display enabled (warning)\n", machine().describe_context());
@@ -538,8 +538,6 @@ void upd3301_device::dack_w(uint8_t data)
 	if ((m_data_fifo_pos == m_h) && (m_attr_fifo_pos == (m_attr << 1)))
 	{
 		const u8 attr_max_size = 80;
-		// first attribute start is always overwritten with a 0
-		m_attr_fifo[m_input_fifo][0] = 0;
 		// last parameter always extends up to the end of the row
 		// (7narabe (pc8001) fills last row value with white when exausting available slots)
 		m_attr_fifo[m_input_fifo][40] = attr_max_size;
@@ -550,7 +548,7 @@ void upd3301_device::dack_w(uint8_t data)
 
 		draw_scanline();
 
-		if (m_y == (m_l * m_r))
+		if (m_y >= (m_l * m_r))
 		{
 			// end DMA transfer
 			set_drq(0);
@@ -601,19 +599,39 @@ UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 	if (m_gfx_mode == 1)
 		return attr_extend_info;
 
-	// TODO: may actually fetch in LIFO order
-	// Some edge cases in pc8801 N88 Basic (status on bottom), jettermi and play6lim backs up this theory.
-	for (int ex = 0; ex < attr_fifo_size; ex+=2)
+	int row_offset = 0;
+
+	// if very first value is not a 0 then use next value as 0-[n] filler
+	// pc8801 examples:
+	// - N88 Basic (status on bottom)
+	// - jettermi
+	// - play6lim
+	// TODO: comsight uses an attr_row of 2 as first param when entering in code edit mode.
+	// Most likely a delay side effect with DMA that *shouldn't* pickup this branch.
+	if (attr_row[0] != 0)
+	{
+		// tdown (pc8801) unintentionally requires to clamp against max size while loading
+		// (fills TVRAM with floppy data)
+		u8 attr_end = std::min(attr_row[0], attr_max_size);
+		u8 attr_value = attr_row[1];
+		for (int i = 0; i < attr_end; i++)
+			attr_extend_info[i] = attr_value;
+		LOGSTRIPS("ex ----| start:  0 | end: %2u [%02x]\n",  attr_end, attr_value);
+
+		row_offset = 2;
+	}
+
+	for (int ex = 0; ex < attr_fifo_size - row_offset; ex+=2)
 	{
 		u8 attr_start = std::min(attr_row[ex], attr_max_size);
-		u8 attr_value = attr_row[ex+1];
-		u8 attr_end = std::min(attr_row[ex+2], attr_max_size);
+		u8 attr_value = attr_row[ex + 1 + row_offset];
+		u8 attr_end = std::min(attr_row[ex + 2], attr_max_size);
 		// if the target is == 0 then just consider max size instead
 		// (starfire (pc8001) wants this otherwise will black screen on gameplay)
 		if (attr_end == 0)
 			attr_end = attr_max_size;
 
-		//printf("%04x %d %d [%02x]\n", ex, attr_start, attr_end, attr_value);
+		LOGSTRIPS("ex %04x| start: %2u | end: %2u [%02x]%s\n", ex, attr_start, attr_end, attr_value, attr_start == attr_end ? " (ignored)" : "");
 
 		for (int i = attr_start; i < attr_end; i++)
 			attr_extend_info[i] = attr_value;
@@ -664,7 +682,10 @@ void upd3301_device::draw_scanline()
 		}
 	}
 
-	m_y += m_r;
+	// sorcer (pc8801) enables the "skip line" then sets up DMA for 12 rows (start address 0xf9e8, do the math).
+	// Other than applying pseudo-interlace effect over the graphic layer this also seems to skip strips,
+	// sorcer wants the very last row (0xff88) to be used as a mask over bottom-most 16 lines.
+	m_y += m_r << m_s;
 }
 
 
@@ -722,6 +743,11 @@ void upd3301_device::set_drq(int state)
 bool upd3301_device::get_display_status()
 {
 	return bool(m_status & STATUS_VE);
+}
+
+bool upd3301_device::is_gfx_color_mode()
+{
+	return get_display_status() && (m_gfx_mode == 2);
 }
 
 

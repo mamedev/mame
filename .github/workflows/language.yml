@@ -3,11 +3,11 @@ name: Compile UI translations
 on:
   push:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - 'language/**'
   pull_request:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - 'language/**'
 
 permissions:

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-#ifndef MAME_AUDIO_T5182_H
-#define MAME_AUDIO_T5182_H
+#ifndef MAME_SEIBU_T5182_H
+#define MAME_SEIBU_T5182_H
 
 #pragma once
 
@@ -30,7 +30,7 @@ public:
 	void sharedram_semaphore_main_release_w(uint8_t data);
 	uint8_t sharedram_r(offs_t offset);
 	void sharedram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_handler);
+	void ym2151_irq_handler(int state);
 
 	void t5182_io(address_map &map);
 	void t5182_map(address_map &map);
@@ -59,4 +59,4 @@ private:
 
 DECLARE_DEVICE_TYPE(T5182, t5182_device)
 
-#endif // MAME_AUDIO_T5182_H
+#endif // MAME_SEIBU_T5182_H

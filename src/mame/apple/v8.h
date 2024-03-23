@@ -18,13 +18,9 @@
 
 class v8_device :  public device_t
 {
-	friend class eagle_device;
-	friend class spice_device;
-
 public:
 	// construction/destruction
 	v8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// interface routines
 	auto pb4_callback() { return write_pb4.bind(); }
@@ -41,44 +37,55 @@ public:
 	void set_ram_info(u32 *ram, u32 size);
 	void set_baseram_is_4M(bool ramSize) { m_baseIs4M = ramSize; }
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void cb1_w(int state);
+	void cb2_w(int state);
+	template <u8 mask> void slot_irq_w(int state);
+	void scc_irq_w(int state);
 
 protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<asc_device> m_asc;
+
+	std::unique_ptr<u32 []> m_vram;
+
+	u8 m_pseudovia_regs[256];
+	u32 *m_ram_ptr;
+	u32 m_ram_size;
+	bool m_overlay;
+
+	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual u8 pseudovia_r(offs_t offset);
+
+	void asc_irq(int state);
+
+	virtual void ram_size(u8 config);
+
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_hdsel, write_hmmu_enable;
 	devcb_read_line read_pb3;
 
-	required_device<cpu_device> m_maincpu;
 	optional_ioport m_montype;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	required_device<via6522_device> m_via1;
-	required_device<asc_device> m_asc;
 	required_region_ptr<u32> m_rom;
 
-	std::unique_ptr<u32[]> m_vram;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	u8 m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;
+	u8 m_pseudovia_ier, m_pseudovia_ifr;
 	u8 m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey;
-	bool m_overlay;
-	u32 *m_ram_ptr, *m_rom_ptr;
-	u32 m_ram_size, m_rom_size;
 
 	bool m_baseIs4M;
-	u32 rom_switch_r(offs_t offset);
-	void ram_size(u8 config);
 
-	virtual u8 pseudovia_r(offs_t offset);
+	u32 rom_switch_r(offs_t offset);
+
 	void pseudovia_w(offs_t offset, u8 data);
 	void pseudovia_recalc_irqs();
 
@@ -91,9 +98,9 @@ private:
 	void via_out_b(u8 data);
 	void via_sync();
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(via1_irq);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq);
+	void via_out_cb2(int state);
+	void via1_irq(int state);
+	void via2_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 
 	u32 vram_r(offs_t offset);
@@ -134,27 +141,52 @@ public:
 	required_device_array<floppy_connector, 2> m_floppy;
 
 protected:
+	spice_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	void phases_w(u8 phases);
+	void devsel_w(u8 devsel);
+
 private:
-	u8 via_in_a() override;
-	virtual void via_out_a(u8 data) override;
-	u8 pseudovia_r(offs_t offset) override;
-	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel;
 
-	void phases_w(u8 phases);
-	void devsel_w(u8 devsel);
+	virtual u8 via_in_a() override;
+	virtual void via_out_a(u8 data) override;
+	virtual u8 pseudovia_r(offs_t offset) override;
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
 	u16 swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
+
+	void bright_contrast_w(offs_t offset, u8 data);
+};
+
+// ======================> tinkerbell_device
+
+class tinkerbell_device : public spice_device
+{
+public:
+	tinkerbell_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual void ram_size(u8 config) override;
+
+private:
+	virtual u8 via_in_a() override;
+	virtual u8 pseudovia_r(offs_t offset) override;
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(V8, v8_device)
 DECLARE_DEVICE_TYPE(EAGLE, eagle_device)
 DECLARE_DEVICE_TYPE(SPICE, spice_device)
+DECLARE_DEVICE_TYPE(TINKERBELL, tinkerbell_device)
 
 #endif // MAME_APPLE_V8_H

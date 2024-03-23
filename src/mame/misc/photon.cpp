@@ -29,6 +29,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class photon_state : public pk8000_base_state
 {
 public:
@@ -284,6 +286,9 @@ ROM_START( phklad )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "klad.bin", 0x0000, 0x4000, BAD_DUMP CRC(49cc7d65) SHA1(d966cfc1d973a533df8044a71fad37f7177da554) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 19??,  phtetris, 0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1989?, phpython,  0,     photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           MACHINE_SUPPORTS_SAVE )

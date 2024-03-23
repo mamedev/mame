@@ -65,7 +65,7 @@ void beep_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		clock = m_frequency;
 
 	/* if we're not enabled, just fill with 0 */
-	if ( !m_enable || clock == 0 )
+	if (!m_enable || clock == 0)
 	{
 		buffer.fill(0);
 		return;
@@ -93,7 +93,7 @@ void beep_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 //  changing state to on from off will restart tone
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(beep_device::set_state)
+void beep_device::set_state(int state)
 {
 	/* only update if new state is not the same as old state */
 	int on = (state) ? 1 : 0;

@@ -104,8 +104,8 @@ private:
 	void alpha3_dig1_w(uint8_t data);
 	void lamp0_w(uint8_t data) { }
 	void lamp1_w(uint8_t data) { }
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
+	void ym2151_irq_w(int state);
+	void msm5205_irq_w(int state);
 	void sound_w(uint8_t data);
 
 	uint8_t sound_latch_r();
@@ -264,12 +264,12 @@ void de_2_state::machine_start()
 	m_sample_bank->set_entry(0);
 }
 
-WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
+void de_2_state::ym2151_irq_w(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
 }
 
-WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
+void de_2_state::msm5205_irq_w(int state)
 {
 	m_msm5205->data_w(m_sample_data >> 4);
 	if(m_more_data)

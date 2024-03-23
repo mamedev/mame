@@ -31,6 +31,9 @@
 #include "machine/timekpr.h"
 #include "screen.h"
 
+
+namespace {
+
 class cromptons_state : public driver_device
 {
 public:
@@ -160,6 +163,8 @@ ROM_START( ffruits )
 	ROM_REGION(0x2000, "timekpr", 0)
 	ROM_LOAD( "frntf_m48t08-100pc1.ic12", 0x0000, 0x2000, CRC(19f1c93a) SHA1(4fb01299c72e50c91af80939f8ffa8a8447f5211) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2000, ffruits,  0,   cromptons, cromptons, cromptons_state, empty_init, ROT0, "Cromptons Leisure Machines", "Frantic Fruits",  MACHINE_IS_SKELETON_MECHANICAL )

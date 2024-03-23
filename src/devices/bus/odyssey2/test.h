@@ -30,7 +30,7 @@ protected:
 	virtual void cart_init() override;
 
 	virtual u8 read_rom04(offs_t offset) override { return m_rom[offset]; }
-	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset]; }
+	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset + 0x400]; }
 	virtual void bus_write(u8 data) override { m_bus_data = data; }
 
 	virtual void write_p1(u8 data) override;

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_FRUITSAMPLES_H
-#define MAME_AUDIO_FRUITSAMPLES_H
+#ifndef MAME_SHARED_FRUITSAMPLES_H
+#define MAME_SHARED_FRUITSAMPLES_H
 
 #pragma once
 
@@ -19,12 +19,29 @@ public:
 	fruit_samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void play(uint8_t index);
+	void stop(uint8_t index);
 
 	enum
 	{
 		SAMPLE_PAYOUT = 0,
 		SAMPLE_METER,
+		SAMPLE_BUZZER,
+		SAMPLE_EM_REEL_1_START,
+		SAMPLE_EM_REEL_2_START,
+		SAMPLE_EM_REEL_3_START,
+		SAMPLE_EM_REEL_4_START,
+		SAMPLE_EM_REEL_1_STOP,
+		SAMPLE_EM_REEL_2_STOP,
+		SAMPLE_EM_REEL_3_STOP,
+		SAMPLE_EM_REEL_4_STOP,
 		SAMPLE_END
+	};
+
+	struct sample_params
+	{
+		uint32_t id;
+		uint8_t channel;
+		bool loop;
 	};
 
 protected:
@@ -37,4 +54,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FRUIT_SAMPLES, fruit_samples_device)
 
-#endif // MAME_AUDIO_FRUITSAMPLES_H
+#endif // MAME_SHARED_FRUITSAMPLES_H

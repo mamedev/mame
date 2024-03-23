@@ -8,15 +8,18 @@
 
 // MAME headers
 #include "emu.h"
+
 #include "drivenum.h"
+#include "emuopts.h"
+#include "fileio.h"
+#include "main.h"
 #include "render.h"
 #include "rendlay.h"
 #include "rendutil.h"
-#include "emuopts.h"
-#include "fileio.h"
+#include "screen.h"
+
 #include "aviio.h"
 #include "png.h"
-#include "screen.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -50,8 +53,6 @@ class movie_recorder
 public:
 	movie_recorder(running_machine& machine, renderer_d3d9 *d3d, int width, int height)
 		: m_initialized(false), m_d3d(d3d), m_width(width), m_height(height)
-		, m_sys_texture(nullptr), m_sys_surface(nullptr)
-		, m_vid_texture(nullptr), m_vid_surface(nullptr)
 	{
 		HRESULT result;
 
@@ -82,17 +83,6 @@ public:
 
 	~movie_recorder()
 	{
-		if (m_sys_texture != nullptr)
-			m_sys_texture->Release();
-
-		if (m_sys_surface != nullptr)
-			m_sys_surface->Release();
-
-		if (m_vid_texture != nullptr)
-			m_vid_texture->Release();
-
-		if (m_vid_surface != nullptr)
-			m_vid_surface->Release();
 	}
 
 	void record(const char *name)
@@ -109,7 +99,7 @@ public:
 			return;
 
 		// copy the frame from video memory, where it is not accessible, to system memory
-		HRESULT result = m_d3d->get_device()->GetRenderTargetData(m_vid_surface, m_sys_surface);
+		HRESULT result = m_d3d->get_device()->GetRenderTargetData(m_vid_surface.Get(), m_sys_surface.Get());
 		if (FAILED(result))
 			return;
 
@@ -144,7 +134,7 @@ public:
 		m_avi_writer->audio_frame(buffer, samples_this_frame);
 	}
 
-	IDirect3DSurface9 * target_surface() { return m_vid_surface; }
+	IDirect3DSurface9 * target_surface() { return m_vid_surface.Get(); }
 
 private:
 	bool                m_initialized;
@@ -156,10 +146,10 @@ private:
 	bitmap_rgb32        m_frame;
 	int                 m_width;
 	int                 m_height;
-	IDirect3DTexture9 * m_sys_texture; // texture in system memory
-	IDirect3DSurface9 * m_sys_surface; // surface in system memory
-	IDirect3DTexture9 * m_vid_texture; // texture in video memory
-	IDirect3DSurface9 * m_vid_surface; // surface in video memory
+	Microsoft::WRL::ComPtr<IDirect3DTexture9> m_sys_texture; // texture in system memory
+	Microsoft::WRL::ComPtr<IDirect3DSurface9> m_sys_surface; // surface in system memory
+	Microsoft::WRL::ComPtr<IDirect3DTexture9> m_vid_texture; // texture in video memory
+	Microsoft::WRL::ComPtr<IDirect3DSurface9> m_vid_surface; // surface in video memory
 };
 
 
@@ -168,51 +158,32 @@ private:
 //============================================================
 
 shaders::shaders() :
-	d3dintf(nullptr),
 	machine(nullptr),
 	d3d(nullptr),
 	post_fx_enable(false),
 	oversampling_enable(false),
 	num_screens(0),
-	curr_screen(0),
+	num_targets(0),
+	curr_target(0),
 	acc_t(0),
 	delta_t(0),
 	shadow_texture(nullptr),
 	lut_texture(nullptr),
 	ui_lut_texture(nullptr),
 	options(nullptr),
-	black_surface(nullptr),
-	black_texture(nullptr),
 	recording_movie(false),
 	render_snap(false),
-	snap_copy_target(nullptr),
-	snap_copy_texture(nullptr),
-	snap_target(nullptr),
-	snap_texture(nullptr),
 	snap_width(0),
 	snap_height(0),
 	initialized(false),
-	backbuffer(nullptr),
 	curr_effect(nullptr),
-	default_effect(nullptr),
-	prescale_effect(nullptr),
-	post_effect(nullptr),
-	distortion_effect(nullptr),
-	scanline_effect(nullptr),
-	focus_effect(nullptr),
-	phosphor_effect(nullptr),
-	deconverge_effect(nullptr),
-	color_effect(nullptr),
-	ntsc_effect(nullptr),
-	bloom_effect(nullptr),
-	downsample_effect(nullptr),
-	vector_effect(nullptr),
-	chroma_effect(nullptr),
+	diffuse_texture(nullptr),
 	curr_texture(nullptr),
 	curr_render_target(nullptr),
 	curr_poly(nullptr),
 	d3dx_create_effect_from_file_ptr(nullptr)
 {
+	std::fill(std::begin(target_to_screen), std::end(target_to_screen), 0);
 }
 
 
@@ -222,12 +193,7 @@ shaders::shaders() :
 
 shaders::~shaders()
 {
-	for (slider* slider : internal_sliders)
-	{
-		delete slider;
-	}
-
-	if (options != nullptr)
+	if (options && (&last_options != options))
 	{
 		delete options;
 		options = nullptr;
@@ -244,11 +210,9 @@ void shaders::save_snapshot()
 	if (!enabled())
 		return;
 
-	auto win = d3d->assert_window();
-
 	int width = snap_width;
 	int height = snap_height;
-	if (win->swap_xy())
+	if (d3d->window().swap_xy())
 	{
 		std::swap(width, height);
 	}
@@ -289,8 +253,7 @@ void shaders::record_movie()
 		return;
 	}
 
-	auto win = d3d->assert_window();
-	osd_dim wdim = win->get_size();
+	osd_dim wdim = d3d->window().get_size();
 
 	recorder = std::make_unique<movie_recorder>(*machine, d3d, wdim.width(), wdim.height());
 	recorder->record(downcast<windows_options &>(machine->options()).d3d_hlsl_write());
@@ -323,11 +286,9 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	if (!enabled())
 		return;
 
-	auto win = d3d->assert_window();
-
 	int width = snap_width;
 	int height = snap_height;
-	if (win->swap_xy())
+	if (d3d->window().swap_xy())
 	{
 		std::swap(width, height);
 	}
@@ -337,7 +298,7 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 		return;
 
 	// copy the texture
-	HRESULT result = d3d->get_device()->GetRenderTargetData(surface, snap_copy_target);
+	HRESULT result = d3d->get_device()->GetRenderTargetData(surface, snap_copy_target.Get());
 	if (FAILED(result))
 		return;
 
@@ -378,29 +339,10 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during texture UnlockRect call\n", result);
 
-	if (snap_texture != nullptr)
-	{
-		snap_texture->Release();
-		snap_texture = nullptr;
-	}
-
-	if (snap_target != nullptr)
-	{
-		snap_target->Release();
-		snap_target = nullptr;
-	}
-
-	if (snap_copy_texture != nullptr)
-	{
-		snap_copy_texture->Release();
-		snap_copy_texture = nullptr;
-	}
-
-	if (snap_copy_target != nullptr)
-	{
-		snap_copy_target->Release();
-		snap_copy_target = nullptr;
-	}
+	snap_texture.Reset();
+	snap_target.Reset();
+	snap_copy_texture.Reset();
+	snap_copy_target.Reset();
 }
 
 
@@ -440,17 +382,25 @@ void shaders::set_texture(texture_info *texture)
 		return;
 	}
 
-	// set initial texture to use
-	texture_info *default_texture = d3d->get_default_texture();
-	default_effect->set_texture("Diffuse", (texture == nullptr) ? default_texture->get_finaltex() : texture->get_finaltex());
-	if (options->yiq_enable)
+	if (texture)
 	{
-		ntsc_effect->set_texture("Diffuse", (texture == nullptr) ? default_texture->get_finaltex() : texture->get_finaltex());
+		diffuse_texture = texture;
 	}
 	else
 	{
-		color_effect->set_texture("Diffuse", (texture == nullptr) ? default_texture->get_finaltex() : texture->get_finaltex());
+		diffuse_texture = d3d->get_default_texture();
 	}
+}
+
+
+//============================================================
+//  shaders::set_filter - indicates if screens should be
+//  filtered on upscaling
+//============================================================
+
+void shaders::set_filter(bool filter_screens)
+{
+	this->filter_screens = filter_screens;
 }
 
 
@@ -458,7 +408,7 @@ void shaders::set_texture(texture_info *texture)
 //  shaders::init
 //============================================================
 
-bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer)
+bool shaders::init(IDirect3D9 *d3dobj, running_machine *machine, renderer_d3d9 *renderer)
 {
 	osd_printf_verbose("Direct3D: Initialize HLSL\n");
 
@@ -490,13 +440,9 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		return false;
 	}
 
-	d3dintf->post_fx_available = true;
-
-	this->d3dintf = d3dintf;
+	this->d3dobj = d3dobj;
 	this->machine = machine;
 	this->d3d = renderer;
-
-	enumerate_screens();
 
 	auto &winoptions = downcast<windows_options &>(machine->options());
 
@@ -505,19 +451,18 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
 
-	this->options = new hlsl_options;
-	this->options->params_init = false;
-
-	// copy last options if initialized
 	if (last_options.params_init)
 	{
+		// copy last options if initialized
 		osd_printf_verbose("Direct3D: First restore options\n");
 		options = &last_options;
 	}
-
-	// read options if not initialized
-	if (!options->params_init)
+	else
 	{
+		// read options if not initialized
+		options = new hlsl_options;
+		options->params_init = false;
+
 		strncpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture(), sizeof(options->shadow_mask_texture));
 		options->shadow_mask_tile_mode = winoptions.screen_shadow_mask_tile_mode();
 		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
@@ -599,6 +544,7 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 
 		osd_printf_verbose("Direct3D: First store options\n");
 		last_options = *options;
+		delete options;
 		options = &last_options;
 	}
 
@@ -613,11 +559,70 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 
 
 //============================================================
+//  shaders::begin_frame
+//
+//  Enumerates the total number of screen textures present.
+//
+//  Additionally, ensures the presence of necessary post-
+//  processing geometry.
+//
+//============================================================
+
+void shaders::begin_frame(render_primitive_list *primlist)
+{
+	init_fsfx_quad();
+
+	std::fill(std::begin(target_to_screen), std::end(target_to_screen), 0);
+	std::fill(std::begin(targets_per_screen), std::end(targets_per_screen), 0);
+	EQUIVALENT_ARRAY(target_to_screen, render_container *) containers;
+
+	// Maximum potential runtime O(max_num_targets^2)
+	num_targets = 0;
+	num_screens = 0;
+	curr_target = 0;
+	for (render_primitive &prim : *primlist)
+	{
+		if (PRIMFLAG_GET_SCREENTEX(prim.flags))
+		{
+			int screen_index = 0;
+			for (; screen_index < num_screens && containers[screen_index] != prim.container; screen_index++);
+			containers[screen_index] = prim.container;
+			target_to_screen[num_targets] = screen_index;
+			targets_per_screen[screen_index]++;
+			if (screen_index >= num_screens)
+				num_screens++;
+			num_targets++;
+		}
+	}
+
+	diffuse_texture = d3d->get_default_texture();
+}
+
+
+//============================================================
+//  shaders::end_frame
+//
+//  Closes out any still-active effects at the end of
+//  rendering.
+//
+//============================================================
+
+void shaders::end_frame()
+{
+	if (curr_effect->is_active())
+	{
+		curr_effect->end();
+	}
+}
+
+
+//============================================================
 //  shaders::init_fsfx_quad
 //
 //  Called always at the start of each frame so that the two
 //  triangles used for the post-processing effects are always
-//  at the beginning of the vertex buffer
+//  at the beginning of the vertex buffer.
+//
 //============================================================
 
 void shaders::init_fsfx_quad()
@@ -714,7 +719,7 @@ int shaders::create_resources()
 		return 1;
 	}
 	black_texture->GetSurfaceLevel(0, &black_surface);
-	result = d3d->get_device()->SetRenderTarget(0, black_surface);
+	result = d3d->get_device()->SetRenderTarget(0, black_surface.Get());
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 
@@ -722,7 +727,7 @@ int shaders::create_resources()
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
 
-	result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+	result = d3d->get_device()->SetRenderTarget(0, backbuffer.Get());
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 
@@ -747,7 +752,7 @@ int shaders::create_resources()
 		texture.seqid = 0;
 
 		// now create it (no prescale, no wrap)
-		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		auto tex = std::make_unique<texture_info>(*d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 		shadow_texture = tex.get();
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
@@ -770,7 +775,7 @@ int shaders::create_resources()
 		texture.seqid = 0;
 
 		// now create it (no prescale, no wrap)
-		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		auto tex = std::make_unique<texture_info>(*d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 		lut_texture = tex.get();
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
@@ -793,74 +798,66 @@ int shaders::create_resources()
 		texture.seqid = 0;
 
 		// now create it (no prescale, no wrap)
-		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		auto tex = std::make_unique<texture_info>(*d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 		ui_lut_texture = tex.get();
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
 
-	default_effect = new effect(this, d3d->get_device(), "primary.fx", fx_dir);
-	post_effect = new effect(this, d3d->get_device(), "post.fx", fx_dir);
-	distortion_effect = new effect(this, d3d->get_device(), "distortion.fx", fx_dir);
-	prescale_effect = new effect(this, d3d->get_device(), "prescale.fx", fx_dir);
-	phosphor_effect = new effect(this, d3d->get_device(), "phosphor.fx", fx_dir);
-	focus_effect = new effect(this, d3d->get_device(), "focus.fx", fx_dir);
-	scanline_effect = new effect(this, d3d->get_device(), "scanline.fx", fx_dir);
-	deconverge_effect = new effect(this, d3d->get_device(), "deconverge.fx", fx_dir);
-	color_effect = new effect(this, d3d->get_device(), "color.fx", fx_dir);
-	ntsc_effect = new effect(this, d3d->get_device(), "ntsc.fx", fx_dir);
-	bloom_effect = new effect(this, d3d->get_device(), "bloom.fx", fx_dir);
-	downsample_effect = new effect(this, d3d->get_device(), "downsample.fx", fx_dir);
-	vector_effect = new effect(this, d3d->get_device(), "vector.fx", fx_dir);
-	chroma_effect = new effect(this, d3d->get_device(), "chroma.fx", fx_dir);
+	default_effect        = std::make_unique<effect>(this, d3d->get_device(), "primary.fx", fx_dir);
+	ui_effect             = std::make_unique<effect>(this, d3d->get_device(), "primary.fx", fx_dir);
+	ui_wrap_effect        = std::make_unique<effect>(this, d3d->get_device(), "primary.fx", fx_dir);
+	vector_buffer_effect  = std::make_unique<effect>(this, d3d->get_device(), "primary.fx", fx_dir);
+	post_effect           = std::make_unique<effect>(this, d3d->get_device(), "post.fx", fx_dir);
+	distortion_effect     = std::make_unique<effect>(this, d3d->get_device(), "distortion.fx", fx_dir);
+	prescale_effect       = std::make_unique<effect>(this, d3d->get_device(), "prescale.fx", fx_dir);
+	prescale_point_effect = std::make_unique<effect>(this, d3d->get_device(), "prescale.fx", fx_dir);
+	phosphor_effect       = std::make_unique<effect>(this, d3d->get_device(), "phosphor.fx", fx_dir);
+	focus_effect          = std::make_unique<effect>(this, d3d->get_device(), "focus.fx", fx_dir);
+	scanline_effect       = std::make_unique<effect>(this, d3d->get_device(), "scanline.fx", fx_dir);
+	deconverge_effect     = std::make_unique<effect>(this, d3d->get_device(), "deconverge.fx", fx_dir);
+	color_effect          = std::make_unique<effect>(this, d3d->get_device(), "color.fx", fx_dir);
+	ntsc_effect           = std::make_unique<effect>(this, d3d->get_device(), "ntsc.fx", fx_dir);
+	bloom_effect          = std::make_unique<effect>(this, d3d->get_device(), "bloom.fx", fx_dir);
+	downsample_effect     = std::make_unique<effect>(this, d3d->get_device(), "downsample.fx", fx_dir);
+	vector_effect         = std::make_unique<effect>(this, d3d->get_device(), "vector.fx", fx_dir);
+	chroma_effect         = std::make_unique<effect>(this, d3d->get_device(), "chroma.fx", fx_dir);
 
-	if (!default_effect->is_valid() ||
-		!post_effect->is_valid() ||
-		!distortion_effect->is_valid() ||
-		!prescale_effect->is_valid() ||
-		!phosphor_effect->is_valid() ||
-		!focus_effect->is_valid() ||
-		!scanline_effect->is_valid() ||
-		!deconverge_effect->is_valid() ||
-		!color_effect->is_valid() ||
-		!ntsc_effect->is_valid() ||
-		!bloom_effect->is_valid() ||
-		!downsample_effect->is_valid() ||
-		!vector_effect->is_valid() ||
-		!chroma_effect->is_valid())
+	std::array<effect*, 18> effects = {
+			default_effect.get(),
+			ui_effect.get(),
+			ui_wrap_effect.get(),
+			vector_buffer_effect.get(),
+			post_effect.get(),
+			distortion_effect.get(),
+			prescale_effect.get(),
+			prescale_point_effect.get(),
+			phosphor_effect.get(),
+			focus_effect.get(),
+			scanline_effect.get(),
+			deconverge_effect.get(),
+			color_effect.get(),
+			ntsc_effect.get(),
+			bloom_effect.get(),
+			downsample_effect.get(),
+			vector_effect.get(),
+			chroma_effect.get() };
+
+	for (effect *eff : effects)
 	{
-		return 1;
+		if (!eff->is_valid())
+			return 1;
 	}
 
-	std::array<effect*, 15> effects = {
-		default_effect,
-		post_effect,
-		distortion_effect,
-		prescale_effect,
-		phosphor_effect,
-		focus_effect,
-		scanline_effect,
-		deconverge_effect,
-		color_effect,
-		ntsc_effect,
-		color_effect,
-		bloom_effect,
-		downsample_effect,
-		vector_effect,
-		chroma_effect
-	};
-
-	for (int i = 0; i < effects.size(); i++)
+	for (effect *eff : effects)
 	{
-		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
-		effects[i]->add_uniform("TargetScale", uniform::UT_FLOAT, uniform::CU_TARGET_SCALE);
-		effects[i]->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-		effects[i]->add_uniform("ScreenCount", uniform::UT_INT, uniform::CU_SCREEN_COUNT);
-		effects[i]->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
-		effects[i]->add_uniform("SwapXY", uniform::UT_BOOL, uniform::CU_SWAP_XY);
-		effects[i]->add_uniform("VectorScreen", uniform::UT_BOOL, uniform::CU_VECTOR_SCREEN);
+		eff->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+		eff->add_uniform("TargetScale", uniform::UT_FLOAT, uniform::CU_TARGET_SCALE);
+		eff->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+		eff->add_uniform("ScreenCount", uniform::UT_INT, uniform::CU_SCREEN_COUNT);
+		eff->add_uniform("SwapXY", uniform::UT_BOOL, uniform::CU_SWAP_XY);
+		eff->add_uniform("VectorScreen", uniform::UT_BOOL, uniform::CU_VECTOR_SCREEN);
 	}
 
 	ntsc_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
@@ -873,6 +870,7 @@ int shaders::create_resources()
 	ntsc_effect->add_uniform("IFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_IFREQ);
 	ntsc_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
 	ntsc_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
+	ntsc_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 
 	color_effect->add_uniform("RedRatios", uniform::UT_VEC3, uniform::CU_COLOR_RED_RATIOS);
 	color_effect->add_uniform("GrnRatios", uniform::UT_VEC3, uniform::CU_COLOR_GRN_RATIOS);
@@ -880,6 +878,8 @@ int shaders::create_resources()
 	color_effect->add_uniform("Offset", uniform::UT_VEC3, uniform::CU_COLOR_OFFSET);
 	color_effect->add_uniform("Scale", uniform::UT_VEC3, uniform::CU_COLOR_SCALE);
 	color_effect->add_uniform("Saturation", uniform::UT_FLOAT, uniform::CU_COLOR_SATURATION);
+	color_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+	color_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
 
 	deconverge_effect->add_uniform("ConvergeX", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_X);
 	deconverge_effect->add_uniform("ConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_Y);
@@ -892,6 +892,8 @@ int shaders::create_resources()
 	scanline_effect->add_uniform("ScanlineVariation", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_VARIATION);
 	scanline_effect->add_uniform("ScanlineBrightScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_SCALE);
 	scanline_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
+	scanline_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
+	scanline_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
 
@@ -904,8 +906,14 @@ int shaders::create_resources()
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 	post_effect->add_uniform("ChomaMode", uniform::UT_INT, uniform::CU_CHROMA_MODE);
 	post_effect->add_uniform("ConversionGain", uniform::UT_VEC3, uniform::CU_CHROMA_CONVERSION_GAIN);
+	post_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
+	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
+
+	bloom_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+
+	downsample_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 
 	chroma_effect->add_uniform("YGain", uniform::UT_VEC3, uniform::CU_CHROMA_Y_GAIN);
 	chroma_effect->add_uniform("ChromaA", uniform::UT_VEC2, uniform::CU_CHROMA_A);
@@ -919,9 +927,19 @@ int shaders::create_resources()
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
+	distortion_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 
-	default_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
-	default_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
+	prescale_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+
+	prescale_point_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+
+	ui_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
+	ui_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
+
+	ui_wrap_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
+	ui_wrap_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
+
+	vector_buffer_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
 
 	return 0;
 }
@@ -933,24 +951,24 @@ int shaders::create_resources()
 
 void shaders::begin_draw()
 {
-	double t;
-
 	if (!enabled())
-	{
 		return;
-	}
 
-	curr_screen = 0;
-	curr_effect = default_effect;
+	curr_target = 0;
+
 	// Update for delta_time
-	t = machine->time().as_double();
+	const double t = machine->time().as_double();
 	delta_t = t - acc_t;
 	acc_t = t;
 
 	default_effect->set_technique("ScreenTechnique");
+	ui_effect->set_technique("UiTechnique");
+	ui_wrap_effect->set_technique("UiWrapTechnique");
+	vector_buffer_effect->set_technique("VectorBufferTechnique");
 	post_effect->set_technique("DefaultTechnique");
 	distortion_effect->set_technique("DefaultTechnique");
 	prescale_effect->set_technique("DefaultTechnique");
+	prescale_point_effect->set_technique("PointTechnique");
 	phosphor_effect->set_technique("DefaultTechnique");
 	focus_effect->set_technique("DefaultTechnique");
 	scanline_effect->set_technique("DefaultTechnique");
@@ -963,11 +981,31 @@ void shaders::begin_draw()
 	vector_effect->set_technique("DefaultTechnique");
 	chroma_effect->set_technique("DefaultTechnique");
 
-	HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+	HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer.Get());
 	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 	}
+
+	set_curr_effect(default_effect.get());
+}
+
+
+//============================================================
+//  shaders::set_curr_effect
+//============================================================
+
+void shaders::set_curr_effect(effect *curr_effect)
+{
+	if (this->curr_effect == curr_effect)
+	{
+		return;
+	}
+	if (this->curr_effect && this->curr_effect->is_active())
+	{
+		this->curr_effect->end();
+	}
+	this->curr_effect = curr_effect;
 }
 
 
@@ -994,7 +1032,7 @@ void shaders::blit(
 
 		if (clear_dst)
 		{
-			result = d3d->get_device()->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
+			result = d3d->get_device()->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0xff,0,0,0), 0, 0);
 			if (FAILED(result))
 			{
 				osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
@@ -1002,24 +1040,17 @@ void shaders::blit(
 		}
 	}
 
-	UINT num_passes = 0;
-	curr_effect->begin(&num_passes, 0);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
+	if (!curr_effect->is_active())
 	{
-		curr_effect->begin_pass(pass);
-
-		// add the primitives
-		result = d3d->get_device()->DrawPrimitive(prim_type, prim_index, prim_count);
-		if (FAILED(result))
-		{
-			osd_printf_verbose("Direct3D: Error %08lX during device DrawPrimitive call\n", result);
-		}
-
-		curr_effect->end_pass();
+		curr_effect->begin(0);
 	}
 
-	curr_effect->end();
+	// add the primitives
+	result = d3d->get_device()->DrawPrimitive(prim_type, prim_index, prim_count);
+	if (FAILED(result))
+	{
+		osd_printf_verbose("Direct3D: Error %08lX during device DrawPrimitive call\n", result);
+	}
 }
 
 //============================================================
@@ -1056,14 +1087,15 @@ int shaders::ntsc_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 
 	// initial "Diffuse"  texture is set in shaders::set_texture()
 
-	curr_effect = ntsc_effect;
+	set_curr_effect(ntsc_effect.get());
+	curr_effect->set_texture("Diffuse", diffuse_texture->get_finaltex());
 	curr_effect->update_uniforms();
 	curr_effect->set_float("SignalOffset", signal_offset);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->source_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->source_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
-	color_effect->set_texture("Diffuse", rt->source_texture[next_index]);
+	color_effect->set_texture("Diffuse", rt->source_texture[next_index].Get());
 
 	return next_index;
 }
@@ -1112,13 +1144,23 @@ int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, pol
 {
 	int next_index = source_index;
 
-	curr_effect = color_effect;
-	curr_effect->update_uniforms();
+	set_curr_effect(color_effect.get());
 
-	// initial "Diffuse" texture is set in shaders::set_texture() or the result of shaders::ntsc_pass()
+	// initial "Diffuse" texture is set in shaders::ntsc_pass() if NTSC processing is enabled
+	if (!options->yiq_enable)
+	{
+		curr_effect->set_texture("Diffuse", diffuse_texture->get_finaltex());
+	}
+
+	curr_effect->update_uniforms();
+	uint32_t tint = (uint32_t)poly->tint();
+	float prim_tint[3] = { ((tint >> 16) & 0xff) / 255.0f, ((tint >> 8) & 0xff) / 255.0f, (tint & 0xff) / 255.0f };
+	curr_effect->set_vector("PrimTint", 3, prim_tint);
+	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_bool("UiLutEnable", false);
 
 	next_index = rt->next_index(next_index);
-	blit(rt->source_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->source_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1127,12 +1169,12 @@ int shaders::prescale_pass(d3d_render_target *rt, int source_index, poly_info *p
 {
 	int next_index = source_index;
 
-	curr_effect = prescale_effect;
+	set_curr_effect(filter_screens ? prescale_effect.get() : prescale_point_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->source_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->source_texture[next_index].Get());
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1150,12 +1192,12 @@ int shaders::deconverge_pass(d3d_render_target *rt, int source_index, poly_info 
 		return next_index;
 	}
 
-	curr_effect = deconverge_effect;
+	set_curr_effect(deconverge_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1165,12 +1207,11 @@ int shaders::scanline_pass(d3d_render_target *rt, int source_index, poly_info *p
 	int next_index = source_index;
 
 	// skip scanline if alpha is 0
-	if (options->scanline_alpha == 0.0f)
-		return next_index;
+	//if (options->scanline_alpha == 0.0f)
+		//return next_index;
 
-	auto win = d3d->assert_window();
 	screen_device_enumerator screen_iterator(machine->root_device());
-	screen_device *screen = screen_iterator.byindex(curr_screen);
+	screen_device *screen = screen_iterator.byindex(target_to_screen[curr_target]);
 	render_container &screen_container = screen->container();
 	float xscale = 1.0f / screen_container.xscale();
 	float yscale = 1.0f / screen_container.yscale();
@@ -1179,16 +1220,16 @@ int shaders::scanline_pass(d3d_render_target *rt, int source_index, poly_info *p
 	float screen_scale[] = { xscale, yscale };
 	float screen_offset[] = { xoffset, yoffset };
 
-	curr_effect = scanline_effect;
+	set_curr_effect(scanline_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
 	curr_effect->set_float("ScanlineOffset",
 		curr_texture->get_cur_frame() == 0 ?
 		0.0f : options->scanline_jitter);
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 	return next_index;
 }
 
@@ -1202,12 +1243,12 @@ int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *po
 		return next_index;
 	}
 
-	curr_effect = focus_effect;
+	set_curr_effect(focus_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1223,23 +1264,23 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 	}
 
 	// Shader needs time between last update
-	curr_effect = phosphor_effect;
+	set_curr_effect(phosphor_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->cache_texture);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
+	curr_effect->set_texture("LastPass", rt->cache_texture.Get());
 	curr_effect->set_bool("Passthrough", false);
 	curr_effect->set_float("DeltaTime", delta_time());
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	// Pass along our phosphor'd screen
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->target_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
+	curr_effect->set_texture("LastPass", rt->target_texture[next_index].Get());
 	curr_effect->set_bool("Passthrough", true);
 
-	blit(rt->cache_surface, false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->cache_surface.Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1248,10 +1289,8 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 {
 	int next_index = source_index;
 
-	auto win = d3d->assert_window();
-
 	screen_device_enumerator screen_iterator(machine->root_device());
-	screen_device *screen = screen_iterator.byindex(curr_screen);
+	screen_device *screen = screen_iterator.byindex(target_to_screen[curr_target]);
 	render_container &screen_container = screen->container();
 
 	float xscale = 1.0f / screen_container.xscale();
@@ -1270,11 +1309,11 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 			float(back_color_rgb.g()) / 255.0f,
 			float(back_color_rgb.b()) / 255.0f };
 
-	curr_effect = post_effect;
+	set_curr_effect(post_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("ShadowTexture", shadow_texture == nullptr ? nullptr : shadow_texture->get_finaltex());
+	curr_effect->set_texture("ShadowTexture", !shadow_texture ? nullptr : shadow_texture->get_finaltex());
 	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
-	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
+	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index].Get());
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
@@ -1283,7 +1322,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 
 	next_index = rt->next_index(next_index);
-	blit(prepare_bloom ? rt->source_surface[next_index] : rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(prepare_bloom ? rt->source_surface[next_index].Get() : rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1292,11 +1331,11 @@ int shaders::chroma_pass(d3d_render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
-	curr_effect = chroma_effect;
+	set_curr_effect(chroma_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 	return next_index;
 }
 
@@ -1310,18 +1349,19 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 		return next_index;
 	}
 
-	curr_effect = downsample_effect;
-	curr_effect->update_uniforms();
+	set_curr_effect(downsample_effect.get());
 
 	for (int bloom_index = 0; bloom_index < rt->bloom_count; bloom_index++)
 	{
+		curr_effect->update_uniforms();
 		curr_effect->set_vector("TargetDims", 2, rt->bloom_dims[bloom_index]);
 		curr_effect->set_texture("DiffuseTexture",
 				bloom_index == 0
-					? rt->source_texture[next_index]
-					: rt->bloom_texture[bloom_index - 1]);
+					? rt->source_texture[next_index].Get()
+					: rt->bloom_texture[bloom_index - 1].Get());
 
-		blit(rt->bloom_surface[bloom_index], false, D3DPT_TRIANGLELIST, 0, 2);
+		blit(rt->bloom_surface[bloom_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
+		downsample_effect->end();
 	}
 
 	return next_index;
@@ -1337,7 +1377,7 @@ int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly
 		return next_index;
 	}
 
-	curr_effect = bloom_effect;
+	set_curr_effect(bloom_effect.get());
 	curr_effect->update_uniforms();
 
 	curr_effect->set_float("Level0Weight", options->bloom_level0_weight);
@@ -1354,22 +1394,22 @@ int shaders::bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly
 	curr_effect->set_float("BloomScale", options->bloom_scale);
 	curr_effect->set_vector("BloomOverdrive", 3, options->bloom_overdrive);
 
-	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
+	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index].Get());
 
 	char name[14] = "BloomTexture*";
 	for (int index = 1; index < rt->bloom_count; index++)
 	{
 		name[12] = 'A' + index - 1;
-		curr_effect->set_texture(name, rt->bloom_texture[index - 1]);
+		curr_effect->set_texture(name, rt->bloom_texture[index - 1].Get());
 	}
 	for (int index = rt->bloom_count; index < MAX_BLOOM_COUNT; index++)
 	{
 		name[12] = 'A' + index - 1;
-		curr_effect->set_texture(name, black_texture);
+		curr_effect->set_texture(name, black_texture.Get());
 	}
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1390,12 +1430,12 @@ int shaders::distortion_pass(d3d_render_target *rt, int source_index, poly_info 
 		return next_index;
 	}
 
-	curr_effect = distortion_effect;
+	set_curr_effect(distortion_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
+	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index].Get());
 
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1404,14 +1444,14 @@ int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
-	curr_effect = vector_effect;
+	set_curr_effect(vector_effect.get());
 	curr_effect->update_uniforms();
 	curr_effect->set_float("LengthRatio", options->vector_length_ratio);
 	curr_effect->set_float("LengthScale", options->vector_length_scale);
 	curr_effect->set_float("BeamSmooth", options->vector_beam_smooth);
 
 	// we need to clear the vector render target here
-	blit(rt->target_surface[next_index], true, poly->type(), vertnum, poly->count());
+	blit(rt->target_surface[next_index].Get(), true, poly->type(), vertnum, poly->count());
 
 	return next_index;
 }
@@ -1420,17 +1460,17 @@ int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_in
 {
 	int next_index = source_index;
 
-	curr_effect = default_effect;
+	set_curr_effect(vector_buffer_effect.get());
+	curr_effect->set_texture("Diffuse", diffuse_texture->get_finaltex());
 	curr_effect->update_uniforms();
-	curr_effect->set_technique("VectorBufferTechnique");
 
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : lut_texture->get_finaltex());
-
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
+	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_bool("UiLutEnable", false);
 
 	// we need to clear the vector render target here
 	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index].Get(), true, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1441,14 +1481,16 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 	d3d->set_blendmode(PRIMFLAG_GET_BLENDMODE(poly->flags()));
 
-	curr_effect = default_effect;
+	set_curr_effect(default_effect.get());
+	curr_effect->set_texture("Diffuse", diffuse_texture->get_finaltex());
 	curr_effect->update_uniforms();
-	curr_effect->set_technique("ScreenTechnique");
 
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
+	curr_effect->set_texture("LutTexture", nullptr);
+	curr_effect->set_bool("LutEnable", false);
+	curr_effect->set_bool("UiLutEnable", false);
 
-	blit(backbuffer, false, poly->type(), vertnum, poly->count());
+	blit(backbuffer.Get(), false, poly->type(), vertnum, poly->count());
 
 	if (recording_movie)
 	{
@@ -1460,9 +1502,9 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	if (render_snap)
 	{
 		// we need to clear the snap render target here
-		blit(snap_target, true, poly->type(), vertnum, poly->count());
+		blit(snap_target.Get(), true, poly->type(), vertnum, poly->count());
 
-		render_snapshot(snap_target);
+		render_snapshot(snap_target.Get());
 
 		render_snap = false;
 	}
@@ -1474,11 +1516,11 @@ void shaders::ui_pass(poly_info *poly, int vertnum)
 {
 	d3d->set_blendmode(PRIMFLAG_GET_BLENDMODE(poly->flags()));
 
-	curr_effect = default_effect;
+	set_curr_effect(PRIMFLAG_GET_TEXWRAP(poly->flags()) ? ui_wrap_effect.get() : ui_effect.get());
+	curr_effect->set_texture("Diffuse", diffuse_texture->get_finaltex());
 	curr_effect->update_uniforms();
-	curr_effect->set_technique("UiTechnique");
 
-	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : ui_lut_texture->get_finaltex());
+	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : ui_lut_texture->get_finaltex());
 
 	blit(nullptr, false, poly->type(), vertnum, poly->count());
 }
@@ -1498,8 +1540,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	curr_texture = poly->texture();
 	curr_poly = poly;
 
-	auto win = d3d->assert_window();
-
 	if (PRIMFLAG_GET_SCREENTEX(poly->flags()))
 	{
 		if (curr_texture == nullptr)
@@ -1508,9 +1548,9 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			return;
 		}
 
-		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+		curr_target = curr_target < num_targets ? curr_target : 0;
 
-		curr_render_target = find_render_target(curr_texture->get_width(), curr_texture->get_height(), curr_screen);
+		curr_render_target = find_render_target(curr_texture->get_width(), curr_texture->get_height(), curr_target);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1530,12 +1570,16 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		//next_index = phosphor_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
-		int old_index = next_index;
-		next_index = post_pass(rt, next_index, poly, vertnum, true);
-		next_index = downsample_pass(rt, next_index, poly, vertnum);
+		bool bloom_enabled = (options->bloom_scale > 0.0f);
+		if (bloom_enabled)
+		{
+			int old_index = next_index;
+			next_index = post_pass(rt, next_index, poly, vertnum, true);
+			next_index = downsample_pass(rt, next_index, poly, vertnum);
+			next_index = old_index;
+		}
 
-		// apply bloom textures
-		next_index = old_index;
+		// apply bloom textures (if enabled) and other post effects
 		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
 		next_index = phosphor_pass(rt, next_index, poly, vertnum);
@@ -1551,19 +1595,19 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
 
-		curr_screen++;
+		curr_target++;
 	}
 	else if (PRIMFLAG_GET_VECTOR(poly->flags()))
 	{
-		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+		curr_target = curr_target < num_targets ? curr_target : 0;
 
 		int source_width = int(poly->prim_width() + 0.5f);
 		int source_height = int(poly->prim_height() + 0.5f);
-		if (win->swap_xy())
+		if (d3d->window().swap_xy())
 		{
 			std::swap(source_width, source_height);
 		}
-		curr_render_target = find_render_target(source_width, source_height, curr_screen);
+		curr_render_target = find_render_target(source_width, source_height, curr_target);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1576,25 +1620,25 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		next_index = vector_pass(rt, next_index, poly, vertnum);
 
-		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer.Get());
 		if (FAILED(result))
 		{
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 
-		curr_screen++;
+		curr_target++;
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->flags()))
 	{
-		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+		curr_target = curr_target < num_targets ? curr_target : 0;
 
 		int source_width = int(poly->prim_width() + 0.5f);
 		int source_height = int(poly->prim_height() + 0.5f);
-		if (win->swap_xy())
+		if (d3d->window().swap_xy())
 		{
 			std::swap(source_width, source_height);
 		}
-		curr_render_target = find_render_target(source_width, source_height, curr_screen);
+		curr_render_target = find_render_target(source_width, source_height, curr_target);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1629,7 +1673,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = screen_pass(rt, next_index, poly, vertnum);
 		d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(curr_texture->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 
-		curr_screen++;
+		curr_target++;
 	}
 	else
 	{
@@ -1655,7 +1699,7 @@ void shaders::end_draw()
 		return;
 	}
 
-	backbuffer->Release();
+	backbuffer->Release(); // TODO: where's the matching AddRef that requires this explicit Release?
 }
 
 
@@ -1670,8 +1714,6 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, int width
 		return nullptr;
 	}
 
-	auto win = d3d->assert_window();
-
 	int source_width = width;
 	int source_height = height;
 	int source_screen = screen;
@@ -1679,7 +1721,7 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, int width
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
-	if (win->swap_xy())
+	if (d3d->window().swap_xy())
 	{
 		std::swap(target_width, target_height);
 	}
@@ -1710,8 +1752,6 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim, int screen
 		return nullptr;
 	}
 
-	auto win = d3d->assert_window();
-
 	int source_width = int(prim->get_quad_width() + 0.5f);
 	int source_height = int(prim->get_quad_height() + 0.5f);
 	int source_screen = screen;
@@ -1719,7 +1759,7 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim, int screen
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
-	if (win->swap_xy())
+	if (d3d->window().swap_xy())
 	{
 		std::swap(source_width, source_height);
 		std::swap(target_width, target_height);
@@ -1751,8 +1791,6 @@ bool shaders::create_vector_target(render_primitive *prim, int screen)
 		return false;
 	}
 
-	auto win = d3d->assert_window();
-
 	int source_width = int(prim->get_quad_width() + 0.5f);
 	int source_height = int(prim->get_quad_height() + 0.5f);
 	int source_screen = screen;
@@ -1760,7 +1798,7 @@ bool shaders::create_vector_target(render_primitive *prim, int screen)
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
-	if (win->swap_xy())
+	if (d3d->window().swap_xy())
 	{
 		std::swap(source_width, source_height);
 		std::swap(target_width, target_height);
@@ -1796,16 +1834,6 @@ bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, int 
 
 
 //============================================================
-//  shaders::enumerate_screens
-//============================================================
-void shaders::enumerate_screens()
-{
-	screen_device_enumerator iter(machine->root_device());
-	num_screens = iter.count();
-}
-
-
-//============================================================
 //  shaders::create_texture_target
 //============================================================
 
@@ -1816,8 +1844,6 @@ bool shaders::create_texture_target(render_primitive *prim, int width, int heigh
 		return false;
 	}
 
-	auto win = d3d->assert_window();
-
 	int source_width = width;
 	int source_height = height;
 	int source_screen = screen;
@@ -1825,7 +1851,7 @@ bool shaders::create_texture_target(render_primitive *prim, int width, int heigh
 	int target_height = int(prim->get_full_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
-	if (win->swap_xy())
+	if (d3d->window().swap_xy())
 	{
 		// source texture is already swapped
 		std::swap(target_width, target_height);
@@ -1863,93 +1889,29 @@ void shaders::delete_resources()
 
 	m_render_target_list.clear();
 
-	if (downsample_effect != nullptr)
-	{
-		delete downsample_effect;
-		downsample_effect = nullptr;
-	}
-	if (bloom_effect != nullptr)
-	{
-		delete bloom_effect;
-		bloom_effect = nullptr;
-	}
-	if (vector_effect != nullptr)
-	{
-		delete vector_effect;
-		vector_effect = nullptr;
-	}
-	if (default_effect != nullptr)
-	{
-		delete default_effect;
-		default_effect = nullptr;
-	}
-	if (post_effect != nullptr)
-	{
-		delete post_effect;
-		post_effect = nullptr;
-	}
-	if (distortion_effect != nullptr)
-	{
-		delete distortion_effect;
-		distortion_effect = nullptr;
-	}
-	if (prescale_effect != nullptr)
-	{
-		delete prescale_effect;
-		prescale_effect = nullptr;
-	}
-	if (phosphor_effect != nullptr)
-	{
-		delete phosphor_effect;
-		phosphor_effect = nullptr;
-	}
-	if (focus_effect != nullptr)
-	{
-		delete focus_effect;
-		focus_effect = nullptr;
-	}
-	if (scanline_effect != nullptr)
-	{
-		delete scanline_effect;
-		scanline_effect = nullptr;
-	}
-	if (deconverge_effect != nullptr)
-	{
-		delete deconverge_effect;
-		deconverge_effect = nullptr;
-	}
-	if (color_effect != nullptr)
-	{
-		delete color_effect;
-		color_effect = nullptr;
-	}
-	if (ntsc_effect != nullptr)
-	{
-		delete ntsc_effect;
-		ntsc_effect = nullptr;
-	}
-	if (chroma_effect != nullptr)
-	{
-		delete chroma_effect;
-		chroma_effect = nullptr;
-	}
+	downsample_effect.reset();
+	bloom_effect.reset();
+	vector_effect.reset();
+	default_effect.reset();
+	ui_effect.reset();
+	ui_wrap_effect.reset();
+	vector_buffer_effect.reset();
+	post_effect.reset();
+	distortion_effect.reset();
+	prescale_effect.reset();
+	prescale_point_effect.reset();
+	phosphor_effect.reset();
+	focus_effect.reset();
+	scanline_effect.reset();
+	deconverge_effect.reset();
+	color_effect.reset();
+	ntsc_effect.reset();
+	chroma_effect.reset();
 
-	if (backbuffer != nullptr)
-	{
-		backbuffer->Release();
-		backbuffer = nullptr;
-	}
+	backbuffer.Reset();
 
-	if (black_surface != nullptr)
-	{
-		black_surface->Release();
-		black_surface = nullptr;
-	}
-	if (black_texture != nullptr)
-	{
-		black_texture->Release();
-		black_texture = nullptr;
-	}
+	black_surface.Reset();
+	black_texture.Reset();
 
 	shadow_bitmap.reset();
 	lut_bitmap.reset();
@@ -2215,13 +2177,13 @@ slider_desc shaders::s_sliders[] =
 	{ "NTSC Frame Jitter Offset",           0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_JITTER,             0.01f,    "%1.2f", {} },
 	{ "NTSC A Value",                    -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_A_VALUE,            0.01f,    "%1.2f", {} },
 	{ "NTSC B Value",                    -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_B_VALUE,            0.01f,    "%1.2f", {} },
-	{ "NTSC Incoming Phase Pixel Clock Scale",-300,   100,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_P_VALUE,            0.01f,    "%1.2f", {} },
-	{ "NTSC Outgoing Phase Offset",      -300,     0,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_O_VALUE,            0.01f,    "%1.2f", {} },
-	{ "NTSC Color Carrier (Hz)",            0, 35795, 60000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_CC_VALUE,           0.001f,   "%1.4f", {} },
-	{ "NTSC Color Notch Filter Width",      0,   100,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_N_VALUE,            0.01f,    "%1.4f", {} },
-	{ "NTSC Y Signal Bandwidth (Hz)",       0,   600,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Y_VALUE,            0.01f,    "%1.4f", {} },
-	{ "NTSC I Signal Bandwidth (Hz)",       0,   120,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_I_VALUE,            0.01f,    "%1.4f", {} },
-	{ "NTSC Q Signal Bandwidth (Hz)",       0,    60,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Q_VALUE,            0.01f,    "%1.4f", {} },
+	{ "NTSC Incoming Phase Pixel Clock Scale",-300,100, 300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_P_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC Outgoing Phase Offset (radians)",-314, 0,   314, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_O_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC Color Carrier (MHz)",           0, 31500,6*8800, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_CC_VALUE,           1/8800.f, "%1.5f", {} },
+	{ "NTSC Color Notch Filter Width (MHz)",0,   100,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_N_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC Y Signal Bandwidth (MHz)",      0,   600,  2100, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Y_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC I Signal Bandwidth (MHz)",      0,   120,  2100, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_I_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC Q Signal Bandwidth (MHz)",      0,    60,  2100, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Q_VALUE,            0.01f,    "%1.2f", {} },
 	{ "NTSC Scanline Duration (uSec)",      0,  5260, 10000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_SCAN_TIME,          0.01f,    "%1.2f", {} },
 	{ "3D LUT (Screen)",                    0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_LUT_ENABLE,              0,        "%s",    { "Off", "On" } },
 	{ nullptr, 0, 0, 0, 0, 0, 0, -1, 0, nullptr, {} }
@@ -2313,10 +2275,6 @@ void shaders::init_slider_list()
 	m_sliders.clear();
 	m_core_sliders.clear();
 
-	for (slider* slider : internal_sliders)
-	{
-		delete slider;
-	}
 	internal_sliders.clear();
 
 	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();
@@ -2349,28 +2307,27 @@ void shaders::init_slider_list()
 
 			for (int j = 0; j < count; j++)
 			{
-				auto* slider_arg = new slider(desc, get_slider_option(desc->id, j), &options->params_dirty);
-				internal_sliders.push_back(slider_arg);
+				slider &slider_arg = *internal_sliders.emplace_back(std::make_unique<slider>(desc, get_slider_option(desc->id, j), &options->params_dirty));
 				std::string name = desc->name;
 				switch (desc->slider_type)
 				{
 					case SLIDER_VEC2:
 					{
-						std::string names[2] = { " X", " Y" };
-						name = name + names[j];
+						char const *const names[2] = { " X", " Y" };
+						name += names[j];
 						break;
 					}
 					case SLIDER_COLOR:
 					{
-						std::string names[3] = { " Red", " Green", " Blue" };
-						name = name + names[j];
+						char const *const names[3] = { " Red", " Green", " Blue" };
+						name += names[j];
 						break;
 					}
 					default:
 						break;
 				}
 
-				std::unique_ptr<slider_state> core_slider = slider_alloc(std::move(name), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
+				std::unique_ptr<slider_state> core_slider = slider_alloc(std::move(name), desc->minval, desc->defval, desc->maxval, desc->step, &slider_arg);
 
 				ui::menu_item item(ui::menu_item_type::SLIDER, core_slider.get());
 				item.set_text(core_slider->description);
@@ -2405,8 +2362,7 @@ void uniform::update()
 	hlsl_options *options = shadersys->options;
 	renderer_d3d9 *d3d = shadersys->d3d;
 
-	auto win = d3d->assert_window();
-	const screen_device *first_screen = screen_device_enumerator(win->machine().root_device()).first();
+	const screen_device *first_screen = screen_device_enumerator(d3d->window().machine().root_device()).first();
 
 	bool vector_screen =
 		first_screen != nullptr &&
@@ -2422,7 +2378,7 @@ void uniform::update()
 		}
 		case CU_SCREEN_COUNT:
 		{
-			int screen_count = win->target()->current_view().visible_screen_count();
+			int screen_count = d3d->window().target()->current_view().visible_screen_count();
 			m_shader->set_int("ScreenCount", screen_count);
 			break;
 		}
@@ -2485,7 +2441,7 @@ void uniform::update()
 
 		case CU_SWAP_XY:
 		{
-			m_shader->set_bool("SwapXY", win->swap_xy());
+			m_shader->set_bool("SwapXY", d3d->window().swap_xy());
 			break;
 		}
 		case CU_VECTOR_SCREEN:
@@ -2609,7 +2565,7 @@ void uniform::update()
 			m_shader->set_float("SmoothBorderAmount", options->smooth_border);
 			break;
 		case CU_POST_SHADOW_ALPHA:
-			m_shader->set_float("ShadowAlpha", shadersys->shadow_texture == nullptr ? 0.0f : options->shadow_mask_alpha);
+			m_shader->set_float("ShadowAlpha", !shadersys->shadow_texture ? 0.0f : options->shadow_mask_alpha);
 			break;
 		case CU_POST_SHADOW_COUNT:
 		{
@@ -2684,11 +2640,13 @@ void uniform::update()
 //============================================================
 
 effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, const char *path)
+	: m_effect(nullptr)
+	, m_shaders(shadersys)
+	, m_num_passes(0)
+	, m_valid(false)
+	, m_active(false)
 {
 	LPD3DXBUFFER buffer_errors = nullptr;
-
-	m_shaders = shadersys;
-	m_valid = false;
 
 	char name_cstr[1024];
 	sprintf(name_cstr, "%s\\%s", path, name);
@@ -2716,6 +2674,12 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 effect::~effect()
 {
 	m_effect->Release();
+
+	m_vecs.clear();
+	m_floats.clear();
+	m_ints.clear();
+	m_bools.clear();
+	m_textures.clear();
 }
 
 void effect::add_uniform(const char *name, uniform::uniform_type type, int id)
@@ -2729,24 +2693,19 @@ void effect::update_uniforms()
 		(*uniform).update();
 }
 
-void effect::begin(UINT *passes, DWORD flags)
+void effect::begin(DWORD flags)
 {
-	m_effect->Begin(passes, flags);
+	m_active = true;
+	m_num_passes = 0;
+	m_effect->Begin(&m_num_passes, flags);
+	m_effect->BeginPass(0);
 }
 
 void effect::end()
 {
-	m_effect->End();
-}
-
-void effect::begin_pass(UINT pass)
-{
-	m_effect->BeginPass(pass);
-}
-
-void effect::end_pass()
-{
+	m_active = false;
 	m_effect->EndPass();
+	m_effect->End();
 }
 
 void effect::set_technique(const char *name)
@@ -2756,48 +2715,97 @@ void effect::set_technique(const char *name)
 
 void effect::set_vector(D3DXHANDLE param, int count, float *vector)
 {
-	static D3DXVECTOR4 out_vector;
-	if (count > 0)
+	count = std::min(count, 4);
+
+	auto iter = m_vecs.find(param);
+	if (iter != m_vecs.end())
 	{
-		out_vector.x = vector[0];
+		D3DXVECTOR4 &data = iter->second;
+		if (!memcmp((float *)data, vector, sizeof(float) * count))
+		{
+			return;
+		}
+		memcpy(data, vector, sizeof(float) * count);
+		m_effect->SetVector(param, &iter->second);
 	}
-	if (count > 1)
+	else
 	{
-		out_vector.y = vector[1];
+		D3DXVECTOR4 vec;
+		memcpy((float *)vec, vector, sizeof(float) * count);
+		m_effect->SetVector(param, &vec);
+		m_vecs[param] = vec;
 	}
-	if (count > 2)
-	{
-		out_vector.z = vector[2];
-	}
-	if (count > 3)
-	{
-		out_vector.w = vector[3];
-	}
-	m_effect->SetVector(param, &out_vector);
 }
 
 void effect::set_float(D3DXHANDLE param, float value)
 {
+	auto iter = m_floats.find(param);
+	if (iter != m_floats.end())
+	{
+		if (iter->second == value)
+		{
+			return;
+		}
+		iter->second = value;
+	}
+	else
+	{
+		m_floats[param] = value;
+	}
 	m_effect->SetFloat(param, value);
 }
 
 void effect::set_int(D3DXHANDLE param, int value)
 {
+	auto iter = m_ints.find(param);
+	if (iter != m_ints.end())
+	{
+		if (iter->second == value)
+		{
+			return;
+		}
+		iter->second = value;
+	}
+	else
+	{
+		m_ints[param] = value;
+	}
 	m_effect->SetInt(param, value);
 }
 
 void effect::set_bool(D3DXHANDLE param, bool value)
 {
+	auto iter = m_bools.find(param);
+	if (iter != m_bools.end())
+	{
+		if (iter->second == value)
+		{
+			return;
+		}
+		iter->second = value;
+	}
+	else
+	{
+		m_bools[param] = value;
+	}
 	m_effect->SetBool(param, value);
-}
-
-void effect::set_matrix(D3DXHANDLE param, D3DXMATRIX *matrix)
-{
-	m_effect->SetMatrix(param, matrix);
 }
 
 void effect::set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex)
 {
+	auto iter = m_textures.find(param);
+	if (iter != m_textures.end())
+	{
+		if (iter->second == (void *)tex)
+		{
+			return;
+		}
+		iter->second = (void *)tex;
+	}
+	else
+	{
+		m_textures[param] = (void *)tex;
+	}
 	m_effect->SetTexture(param, tex);
 }
 

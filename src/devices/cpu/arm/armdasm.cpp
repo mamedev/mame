@@ -14,7 +14,7 @@ uint32_t arm_disassembler::ExtractImmediateOperand(uint32_t opcode) const
 	// rrrrbbbbbbbb
 	uint32_t imm = opcode & 0xff;
 	uint8_t r = ((opcode >> 8) & 0xf) * 2;
-	return (imm >> r) | (r ? (imm << (32 - r)) : 0);
+	return rotr_32(imm, r);
 }
 
 void arm_disassembler::WriteDataProcessingOperand(std::ostream &stream, uint32_t opcode, bool printOp0, bool printOp1, offs_t pc) const
@@ -81,7 +81,7 @@ void arm_disassembler::WriteRegisterOperand1(std::ostream &stream, uint32_t opco
 
 	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 	{
-		util::stream_format(stream, ", %s R%d", pRegOp[shiftop], (opcode >> 7) & 0xf);
+		util::stream_format(stream, ", %s R%d", pRegOp[shiftop], (opcode >> 8) & 0xf);
 	}
 	else /* Shift amount immediate 5 bit unsigned integer */
 	{
@@ -104,12 +104,7 @@ void arm_disassembler::WriteRegisterOperand1(std::ostream &stream, uint32_t opco
 
 void arm_disassembler::WriteBranchAddress(std::ostream &stream, uint32_t pc, uint32_t opcode) const
 {
-	opcode &= 0x00ffffff;
-	if( opcode&0x00800000 )
-	{
-		opcode |= 0xff000000; /* sign-extend */
-	}
-	pc += 8+4*opcode;
+	pc += 8+4*util::sext(opcode, 24);
 	util::stream_format( stream, "&%07X", pc & 0x03ffffff );
 } /* WriteBranchAddress */
 

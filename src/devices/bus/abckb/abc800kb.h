@@ -52,7 +52,7 @@ private:
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
 	void kb_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t1_r();
 
 	required_device<i8048_device> m_maincpu;
 	required_ioport_array<12> m_x;

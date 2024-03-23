@@ -116,7 +116,7 @@ void igs028_device::IGS028_do_dma(uint16_t src, uint16_t dst, uint16_t size, uin
 				if (mode==0) dat2 -= extraxor;
 				else if (mode==1) dat2  = ((dat2 & 0xf0f0) >> 4)|((dat2 & 0x0f0f) << 4);
 				else if (mode==2) dat2 ^= extraxor;
-				else if (mode==5) dat2  = ((dat2 &0x00ff) << 8) | ((dat2 &0xff00) >> 8);
+				else if (mode==5) dat2  = swapendian_int16(dat2);
 				else if (mode==6) dat2 += extraxor;
 				else
 				{
@@ -134,7 +134,7 @@ void igs028_device::IGS028_do_dma(uint16_t src, uint16_t dst, uint16_t size, uin
 					if ((x & 0x300) == 0x300) extraxor2 |= 0x2000; // ' '
 
 
-					printf("mode %d - %04x (%04x %04x %04x - %04x %04x %04x - %04x %04x \n", mode, dat2, (uint16_t)(dat2-extraxor), (uint16_t)(dat2+extraxor), (uint16_t)(dat2^extraxor), (uint16_t)(dat2-extraxor2), (uint16_t)(dat2+extraxor2), (uint16_t)(dat2^extraxor2), ((dat2 & 0xf0f0) >> 4)|((dat2 & 0x0f0f) << 4), ((dat2 &0x00ff) << 8) | ((dat2 &0xff00) >> 8) );
+					printf("mode %d - %04x (%04x %04x %04x - %04x %04x %04x - %04x %04x \n", mode, dat2, (uint16_t)(dat2-extraxor), (uint16_t)(dat2+extraxor), (uint16_t)(dat2^extraxor), (uint16_t)(dat2-extraxor2), (uint16_t)(dat2+extraxor2), (uint16_t)(dat2^extraxor2), ((dat2 & 0xf0f0) >> 4)|((dat2 & 0x0f0f) << 4), swapendian_int16(dat2) );
 					dat2 = 0x4e75; // hack
 				}
 

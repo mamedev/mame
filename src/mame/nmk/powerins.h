@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_POWERINS_H
-#define MAME_INCLUDES_POWERINS_H
+#ifndef MAME_NMK_POWERINS_H
+#define MAME_NMK_POWERINS_H
 
 #include "nmk16.h"
 #include "nmk16spr.h"
@@ -29,8 +29,8 @@ private:
 
 	TILE_GET_INFO_MEMBER(powerins_get_bg_tile_info);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_powerinsa);
+	void screen_vblank(int state);
+	void screen_vblank_powerinsa(int state);
 
 	virtual void video_start() override;
 
@@ -44,4 +44,4 @@ private:
 	void powerinsb_sound_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_POWERINS_H
+#endif // MAME_NMK_POWERINS_H

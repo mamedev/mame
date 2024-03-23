@@ -5,18 +5,17 @@
 
 #pragma once
 
-#include "machine/6532riot.h"
 #include "machine/6821pia.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "sound/tms5220.h"
 
 
-class exidy_sound_device : public device_t,
-									public device_sound_interface
+class exidy_sound_device : public device_t, public device_sound_interface
 {
-	/* 6840 variables */
+	// 6840 variables
 	struct sh6840_timer_channel
 	{
 		uint8_t   cr = 0;
@@ -46,7 +45,7 @@ public:
 protected:
 	exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -57,11 +56,11 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-	virtual s32 generate_music_sample();
+	virtual s32 generate_music_sample() { return 0; }
 
 	static inline void sh6840_apply_clock(sh6840_timer_channel *t, int clocks);
 
-	/* sound streaming variables */
+	// sound streaming variables
 	sound_stream *m_stream;
 	double m_freq_to_step;
 
@@ -86,6 +85,7 @@ private:
 
 DECLARE_DEVICE_TYPE(EXIDY, exidy_sound_device)
 
+
 class exidy_sh8253_sound_device : public exidy_sound_device
 {
 	struct sh8253_timer_channel
@@ -100,35 +100,21 @@ class exidy_sh8253_sound_device : public exidy_sound_device
 protected:
 	exidy_sh8253_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual s32 generate_music_sample() override;
 
-	void r6532_porta_w(uint8_t data);
-	uint8_t r6532_porta_r();
-	void r6532_portb_w(uint8_t data);
-	uint8_t r6532_portb_r();
-
 	void sh8253_w(offs_t offset, uint8_t data);
-
 	void sh8253_register_state_globals();
 
-	/* 8253 variables */
 	sh8253_timer_channel m_sh8253_timer[3];
 
-	/* 6532 variables */
-	required_device<riot6532_device> m_riot;
-
-	/* 5220/CVSD variables */
-	optional_device<mc3417_device> m_cvsd;
-	optional_device<filter_biquad_device> m_cvsd_filter;
-	optional_device<filter_biquad_device> m_cvsd_filter2;
-	optional_device<cpu_device> m_cvsdcpu;
-	optional_device<tms5220_device> m_tms;
+	required_device<mos6532_device> m_riot;
 	required_device<pia6821_device> m_pia;
 };
+
 
 class venture_sound_device : public exidy_sh8253_sound_device
 {
@@ -142,16 +128,15 @@ public:
 	auto cb2_callback() { return m_cb2_callback.bind(); }
 
 	// external access
-	void pa_w(uint8_t data);
-	void pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ca_w);
-	DECLARE_WRITE_LINE_MEMBER(cb_w);
+	void pa_w(uint8_t data) { m_pia->porta_w(data); }
+	void pb_w(uint8_t data) { m_pia->portb_w(data); }
+	void ca_w(int state) { m_pia->ca1_w(state); }
+	void cb_w(int state) { m_pia->cb1_w(state); }
 
 protected:
 	venture_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	void venture_audio_map(address_map &map);
@@ -159,10 +144,10 @@ protected:
 private:
 	void filter_w(uint8_t data);
 
-	void pia_pa_w(uint8_t data);
-	void pia_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	void pia_pa_w(uint8_t data) { m_pa_callback(data); }
+	void pia_pb_w(uint8_t data) { m_pb_callback(data); }
+	void pia_ca2_w(int state) { m_ca2_callback(state); }
+	void pia_cb2_w(int state) { m_cb2_callback(state); }
 
 	void venture_audio(machine_config &config);
 
@@ -174,28 +159,38 @@ private:
 
 DECLARE_DEVICE_TYPE(EXIDY_VENTURE, venture_sound_device)
 
+
 class mtrap_sound_device : public venture_sound_device
 {
 public:
 	mtrap_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<timer_device> m_cvsd_timer;
+	required_device<mc3417_device> m_cvsd;
+	required_device<filter_biquad_device> m_cvsd_filter;
+	required_device<filter_biquad_device> m_cvsd_filter2;
+	required_device<cpu_device> m_cvsdcpu;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(cvsd_timer);
 	void voiceio_w(offs_t offset, uint8_t data);
 	uint8_t voiceio_r(offs_t offset);
-	bool m_cvsd_clk;
+	void cvsd_data_w(uint8_t data);
+
+	uint8_t m_cvsd_data;
+	uint8_t m_cvsd_clk;
 
 	void cvsd_map(address_map &map);
 	void cvsd_iomap(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(EXIDY_MTRAP, mtrap_sound_device)
+
 
 class victory_sound_device : public exidy_sh8253_sound_device
 {
@@ -208,24 +203,26 @@ public:
 	void command_w(uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(main_ack_w);
+	required_device<tms5220_device> m_tms;
+
+	void irq_clear_w(int state);
+	void main_ack_w(int state);
 
 	void victory_audio_map(address_map &map);
 
 	// internal state
-	uint8_t m_victory_sound_response_ack_clk; /* 7474 @ F4 */
+	uint8_t m_sound_response_ack_clk; // 7474 @ F4
 
-	TIMER_CALLBACK_MEMBER( delayed_command_w );
+	TIMER_CALLBACK_MEMBER(delayed_command_w);
 
-	int m_pia_ca1 = 0;
-	int m_pia_cb1 = 0;
+	int m_pia_ca1;
+	int m_pia_cb1;
 };
 
 DECLARE_DEVICE_TYPE(EXIDY_VICTORY, victory_sound_device)

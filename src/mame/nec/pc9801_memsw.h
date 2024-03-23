@@ -6,8 +6,8 @@ Template for skeleton device
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_PC9801_MEMSW_H
-#define MAME_MACHINE_PC9801_MEMSW_H
+#ifndef MAME_NEC_PC9801_MEMSW_H
+#define MAME_NEC_PC9801_MEMSW_H
 
 #pragma once
 
@@ -53,4 +53,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_MEMSW, pc9801_memsw_device)
 
-#endif // MAME_MACHINE_PC9801_MEMSW_H
+#endif // MAME_NEC_PC9801_MEMSW_H

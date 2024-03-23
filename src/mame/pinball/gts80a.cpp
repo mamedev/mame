@@ -48,9 +48,6 @@ Status:
 - All games (except caveman) are playable
 - Lots of issues with the sound
 
-ToDo:
-- rflshdlx: no sound
-
 *****************************************************************************************************************/
 
 #include "emu.h"
@@ -95,6 +92,10 @@ public:
 	void r1v(machine_config &config);  // r1 with votrax
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	u8 port1a_r();
 	u8 port2a_r();
@@ -110,12 +111,11 @@ private:
 	u8 m_swrow = 0U;
 	u8 m_soundex = 0U;
 	u8 m_sol_state[9][2]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+
 	required_device<m6502_device> m_maincpu;
-	required_device<riot6532_device> m_riot1;
-	required_device<riot6532_device> m_riot2;
-	required_device<riot6532_device> m_riot3;
+	required_device<mos6532_device> m_riot1;
+	required_device<mos6532_device> m_riot2;
+	required_device<mos6532_device> m_riot3;
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<9> m_io_keyboard;
 	optional_device<gottlieb_sound_p2_device> m_p2_sound;
@@ -128,11 +128,13 @@ private:
 void gts80a_state::gts80a_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x017f).ram();
+	map(0x0000, 0x007f).m(m_riot1, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).m(m_riot2, FUNC(mos6532_device::ram_map));
+	map(0x0100, 0x017f).m(m_riot3, FUNC(mos6532_device::ram_map));
 	map(0x01cb, 0x01cb).lr8(NAME([] () { return 0xff; }));  // continual read
-	map(0x0200, 0x027f).rw("riot1", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0x0280, 0x02ff).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0x0300, 0x037f).rw("riot3", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0200, 0x021f).mirror(0x0060).m(m_riot1, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0060).m(m_riot2, FUNC(mos6532_device::io_map));
+	map(0x0300, 0x031f).mirror(0x0060).m(m_riot3, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x17ff).rom();
 	map(0x1800, 0x18ff).ram().share("nvram"); // 5101L-1 256x4
 	map(0x2000, 0x2fff).rom();
@@ -330,7 +332,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( gts80a_state::slam_w )
 {
-	m_riot2->porta_in_set(newval ? 0x80 : 0, 0x80);
+	m_riot2->pa_bit_w<7>(newval);
 }
 
 u8 gts80a_state::port1a_r()
@@ -532,21 +534,21 @@ void gts80a_state::p0(machine_config &config)
 	config.set_default_layout(layout_gts80a);
 
 	/* Devices */
-	RIOT6532(config, m_riot1, XTAL(3'579'545)/4);
-	m_riot1->in_pa_callback().set(FUNC(gts80a_state::port1a_r)); // sw_r
-	m_riot1->out_pb_callback().set(FUNC(gts80a_state::port1b_w)); // sw_w
-	m_riot1->irq_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	MOS6532(config, m_riot1, XTAL(3'579'545)/4);
+	m_riot1->pa_rd_callback().set(FUNC(gts80a_state::port1a_r)); // sw_r
+	m_riot1->pb_wr_callback().set(FUNC(gts80a_state::port1b_w)); // sw_w
+	m_riot1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 
-	RIOT6532(config, m_riot2, XTAL(3'579'545)/4);
-	m_riot2->in_pa_callback().set(FUNC(gts80a_state::port2a_r)); // pa7 - slam tilt
-	m_riot2->out_pa_callback().set(FUNC(gts80a_state::port2a_w)); // digit select
-	m_riot2->out_pb_callback().set(FUNC(gts80a_state::port2b_w)); // seg
-	m_riot2->irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	MOS6532(config, m_riot2, XTAL(3'579'545)/4);
+	m_riot2->pa_rd_callback().set(FUNC(gts80a_state::port2a_r)); // pa7 - slam tilt
+	m_riot2->pa_wr_callback().set(FUNC(gts80a_state::port2a_w)); // digit select
+	m_riot2->pb_wr_callback().set(FUNC(gts80a_state::port2b_w)); // seg
+	m_riot2->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
-	RIOT6532(config, m_riot3, XTAL(3'579'545)/4);
-	m_riot3->out_pa_callback().set(FUNC(gts80a_state::port3a_w)); // sol, snd
-	m_riot3->out_pb_callback().set(FUNC(gts80a_state::port3b_w)); // lamps
-	m_riot3->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+	MOS6532(config, m_riot3, XTAL(3'579'545)/4);
+	m_riot3->pa_wr_callback().set(FUNC(gts80a_state::port3a_w)); // sol, snd
+	m_riot3->pb_wr_callback().set(FUNC(gts80a_state::port3b_w)); // lamps
+	m_riot3->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<2>));
 
 	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m6502_device::IRQ_LINE); // wire-or'd
 
@@ -558,25 +560,25 @@ void gts80a_state::p0(machine_config &config)
 void gts80a_state::p2(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::p3(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN3(config, m_p3_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::r1(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::r1v(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_SPEECH_REV1A(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 //******************* CAVEMAN ****************************************************************
@@ -765,8 +767,9 @@ ROM_START(dvlsdre2)
 
 	ROM_REGION(0x1000, "p2sound:audiocpu", 0)
 	ROM_LOAD("670-a-s.snd", 0x0400, 0x0400, CRC(f141d535) SHA1(91e4ab9ce63b5ff3e395b6447a104286327b5533))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
+
+	ROM_REGION( 0x0400, "p2sound:r6530", 0 )
+	ROM_LOAD("6530sy80.bin", 0x0000, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -975,11 +978,11 @@ GAME( 1982, punk,     0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Got
 GAME( 1982, striker,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker (Pinball)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, krullp,   0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, qbquest,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sorbit,   0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rflshdlx, 0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, sorbit,   0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rflshdlx, 0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, goinnuts, 0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Goin' Nuts",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, amazonh,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, amazonha, amazonh, r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, amazonh,  0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, amazonha, amazonh, r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, rackempp, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rack 'em Up! (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, raimfire, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Ready...Aim...Fire!",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, jack2opn, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Jacks to Open",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

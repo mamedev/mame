@@ -48,6 +48,9 @@ Notes:
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(10'000'000)
 
 class _3x3puzzle_state : public driver_device
@@ -507,6 +510,7 @@ ROM_START( casanova )
 	ROM_LOAD32_BYTE( "casanova.u54", 0x000000, 0x80000, CRC(e60bf0db) SHA1(503738b3b83a37ff812beed6c71e915072e5b10f) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1998, 3x3puzzl,  0,        _3x3puzzle, _3x3puzzle, _3x3puzzle_state, empty_init, ROT0, "Ace Enterprise", "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28

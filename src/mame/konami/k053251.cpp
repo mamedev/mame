@@ -128,12 +128,9 @@ actually used, since the priority is taken from the external ports.
 
 DEFINE_DEVICE_TYPE(K053251, k053251_device, "k053251", "K053251 Priority Encoder")
 
-k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053251, tag, owner, clock),
-	//m_dirty_tmap[5],
-	//m_ram[16],
+k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K053251, tag, owner, clock),
 	m_tilemaps_set(0)
-	//m_palette_index[5]
 {
 }
 
@@ -145,7 +142,6 @@ void k053251_device::device_start()
 {
 	save_item(NAME(m_ram));
 	save_item(NAME(m_tilemaps_set));
-	save_item(NAME(m_dirty_tmap));
 }
 
 //-------------------------------------------------
@@ -154,15 +150,10 @@ void k053251_device::device_start()
 
 void k053251_device::device_reset()
 {
-	int i;
-
 	m_tilemaps_set = 0;
 
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 		m_ram[i] = 0;
-
-	for (i = 0; i < 5; i++)
-		m_dirty_tmap[i] = 0;
 
 	reset_indexes();
 }
@@ -182,8 +173,6 @@ void k053251_device::device_post_load()
 
 void k053251_device::write(offs_t offset, u8 data)
 {
-	int i, newind;
-
 	data &= 0x3f;
 
 	if (m_ram[offset] != data)
@@ -192,14 +181,11 @@ void k053251_device::write(offs_t offset, u8 data)
 		if (offset == 9)
 		{
 			/* palette base index */
-			for (i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				newind = 32 * ((data >> 2 * i) & 0x03);
+				int newind = 32 * ((data >> 2 * i) & 0x03);
 				if (m_palette_index[i] != newind)
-				{
 					m_palette_index[i] = newind;
-					m_dirty_tmap[i] = 1;
-				}
 			}
 
 			if (!m_tilemaps_set)
@@ -208,14 +194,11 @@ void k053251_device::write(offs_t offset, u8 data)
 		else if (offset == 10)
 		{
 			/* palette base index */
-			for (i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
-				newind = 16 * ((data >> 3 * i) & 0x07);
+				int newind = 16 * ((data >> 3 * i) & 0x07);
 				if (m_palette_index[3 + i] != newind)
-				{
 					m_palette_index[3 + i] = newind;
-					m_dirty_tmap[3 + i] = 1;
-				}
 			}
 
 			if (!m_tilemaps_set)
@@ -234,18 +217,6 @@ int k053251_device::get_palette_index( int ci )
 	return m_palette_index[ci];
 }
 
-int k053251_device::get_tmap_dirty( int tmap_num )
-{
-	assert(tmap_num < 5);
-	return m_dirty_tmap[tmap_num];
-}
-
-void k053251_device::set_tmap_dirty( int tmap_num, int data )
-{
-	assert(tmap_num < 5);
-	m_dirty_tmap[tmap_num] = data ? 1 : 0;
-}
-
 void k053251_device::reset_indexes()
 {
 	m_palette_index[0] = 32 * ((m_ram[9] >> 0) & 0x03);
@@ -259,5 +230,5 @@ void k053251_device::reset_indexes()
 
 u8 k053251_device::read(offs_t offset)
 {
-	return m_ram[offset];
-}       // PCU1
+	return m_ram[offset]; // PCU1
+}

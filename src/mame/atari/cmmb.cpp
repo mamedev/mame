@@ -56,6 +56,9 @@ OSC @ 72.576MHz
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(72'576'000)
 
 class cmmb_state : public driver_device
@@ -452,6 +455,9 @@ ROM_START( cmmb103 )
 	ROM_COPY( "maincpu",      0x18000, 0x08000, 0x08000 )
 	//ROM_FILL( 0x1c124, 2, 0xea ) // temporary patch to avoid waiting on IRQs
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2001, cmmb103, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command (rev 1.03)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

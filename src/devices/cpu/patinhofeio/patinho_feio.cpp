@@ -61,11 +61,11 @@ patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(patinho_feio_cpu_device::prog_8bit), this))
 	, m_update_panel_cb(*this)
 	, m_icount(0)
-	, m_rc_read_cb(*this)
-	, m_buttons_read_cb(*this)
-	, m_iodev_read_cb(*this)
+	, m_rc_read_cb(*this, 0)
+	, m_buttons_read_cb(*this, 0)
+	, m_iodev_read_cb(*this, 0)
 	, m_iodev_write_cb(*this)
-	, m_iodev_status_cb(*this)
+	, m_iodev_status_cb(*this, 0) // unused?
 {
 }
 
@@ -77,10 +77,7 @@ device_memory_interface::space_config_vector patinho_feio_cpu_device::memory_spa
 }
 
 uint16_t patinho_feio_cpu_device::read_panel_keys_register(){
-	if (!m_rc_read_cb.isnull())
-		m_rc = m_rc_read_cb(0);
-	else
-		m_rc = 0;
+	m_rc = m_rc_read_cb(0);
 
 	return m_rc;
 }
@@ -94,7 +91,7 @@ void patinho_feio_cpu_device::transfer_byte_from_external_device(uint8_t channel
 void patinho_feio_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_update_panel_cb.resolve();
+	m_update_panel_cb.resolve_safe();
 
 //TODO: implement handling of these special purpose registers
 //      which are also mapped to the first few main memory positions:
@@ -128,17 +125,6 @@ void patinho_feio_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).noshow().formatstr("%8s");
 
-	m_rc_read_cb.resolve();
-	if (m_rc_read_cb.isnull()){
-		fatalerror("Panel keys register not found!");
-	}
-
-	m_buttons_read_cb.resolve();
-
-	m_iodev_read_cb.resolve_all();
-	m_iodev_write_cb.resolve_all();
-	m_iodev_status_cb.resolve_all(); // unused?
-
 	set_icountptr(m_icount);
 }
 
@@ -159,8 +145,7 @@ void patinho_feio_cpu_device::device_reset()
 	m_addr = 0;
 	m_opcode = 0;
 	m_mode = ADDRESSING_MODE;
-	if (!m_update_panel_cb.isnull())
-		m_update_panel_cb(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
+	m_update_panel_cb(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
 }
 
 /* execute instructions on this CPU until icount expires */
@@ -169,12 +154,11 @@ void patinho_feio_cpu_device::execute_run() {
 		read_panel_keys_register();
 		m_ext = READ_ACC_EXTENSION_REG();
 		m_idx = READ_INDEX_REG();
-		if (!m_update_panel_cb.isnull())
-			m_update_panel_cb(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
+		m_update_panel_cb(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
 		debugger_instruction_hook(PC);
 
 		if (!m_run){
-			if (!m_buttons_read_cb.isnull()){
+			if (!m_buttons_read_cb.isunset()){
 				uint16_t buttons = m_buttons_read_cb(0);
 				if (buttons & BUTTON_PARTIDA){
 					/* "startup" button */
@@ -338,7 +322,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x90:
 			//ST 0 = "Se T=0, Pula"
 			//       If T is zero, skip the next instruction
-						if ((FLAGS & T) == 0)
+			if ((FLAGS & T) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x91:
@@ -353,7 +337,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x92:
 			//ST 1 = "Se T=1, Pula"
 			//       If T is one, skip the next instruction
-						if ((FLAGS & T) == T)
+			if ((FLAGS & T) == T)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x93:
@@ -368,7 +352,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x94:
 			//SV 0 = "Se V=0, Pula"
 			//       If V is zero, skip the next instruction
-						if ((FLAGS & V) == 0)
+			if ((FLAGS & V) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x95:
@@ -383,7 +367,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x96:
 			//SV 1 = "Se V=1, Pula"
 			//       If V is one, skip the next instruction
-						if ((FLAGS & V) == 1)
+			if ((FLAGS & V) == 1)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x97:
@@ -398,15 +382,15 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x98:
 			//PUL="Pula para /002 a limpa estado de interrupcao"
 			//     Jump to address /002 and disables interrupts
-						PC = 0x002;
+			PC = 0x002;
 			m_interrupts_enabled = false;
 			return;
 		case 0x99:
 			//TRE="Troca conteudos de ACC e EXT"
 			//     Exchange the value of the accumulator with the ACC extension register
-						value = ACC;
-						ACC = READ_ACC_EXTENSION_REG();
-						WRITE_ACC_EXTENSION_REG(value);
+			value = ACC;
+			ACC = READ_ACC_EXTENSION_REG();
+			WRITE_ACC_EXTENSION_REG(value);
 			return;
 		case 0x9A:
 			//INIB="Inibe"
@@ -699,7 +683,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							if (channel==0xE){
 								//TODO: Implement-me!
 							} else {
-								printf("Function 8 of the /FNC instruction can only be used with"\
+								printf("Function 8 of the /FNC instruction can only be used with "
 										"the papertape reader device at channel /E.\n");
 							}
 							break;
@@ -710,7 +694,7 @@ void patinho_feio_cpu_device::execute_instruction()
 				case 0x20:
 					//SAL="Salta"
 					//    Skips a couple bytes if a condition is met
-										skip = false;
+					skip = false;
 					switch(function)
 					{
 						case 1:
@@ -744,7 +728,7 @@ void patinho_feio_cpu_device::execute_instruction()
 					break;
 				case 0x80:
 					/* SAI = "Output data to I/O device" */
-					if (m_iodev_write_cb[channel].isnull()){
+					if (m_iodev_write_cb[channel].isunset()){
 						printf("Warning: There's no device hooked up at I/O address 0x%X", channel);
 					} else {
 						m_iodev_write_cb[channel](ACC);

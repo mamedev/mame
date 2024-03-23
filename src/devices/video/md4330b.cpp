@@ -44,10 +44,6 @@ md4332b_device::md4332b_device(const machine_config &mconfig, const char *tag, d
 
 void md4330b_device::device_start()
 {
-	// resolve callbacks
-	m_write_q.resolve_safe();
-	m_write_do.resolve_safe();
-
 	// zerofill
 	m_shift = 0;
 	m_clk = 0;
@@ -80,7 +76,7 @@ void md4330b_device::update_output()
 	m_write_q(0, out);
 }
 
-WRITE_LINE_MEMBER(md4330b_device::clk_w)
+void md4330b_device::clk_w(int state)
 {
 	state = (state) ? 1 : 0;
 

@@ -214,6 +214,9 @@ public:
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
+	void set_serial_clock(uint32_t serial_clock) { c_serial_clock = serial_clock; }
+	void set_serial_clock(const XTAL &xtal) { set_serial_clock(xtal.value()); }
+
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
 	void ppcdrc_set_options(uint32_t options);
@@ -260,7 +263,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;
@@ -297,6 +300,7 @@ protected:
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
 	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64;
 	uint32_t c_bus_frequency;
+	uint32_t c_serial_clock;
 
 	struct internal_ppc_state
 	{
@@ -499,9 +503,11 @@ protected:
 
 	uint32_t          m_system_clock;
 	uint32_t          m_cpu_clock;
+	uint32_t          m_serial_clock;
 	uint64_t          m_tb_zero_cycles;
 	uint64_t          m_dec_zero_cycles;
 	emu_timer *     m_decrementer_int_timer;
+
 
 	read32sm_delegate  m_dcr_read_func;
 	write32sm_delegate m_dcr_write_func;
@@ -629,7 +635,7 @@ protected:
 	void set_timebase(uint64_t newtb);
 	uint32_t get_decrementer();
 	void set_decrementer(uint32_t newdec);
-	uint32_t ppccom_translate_address_internal(int intention, offs_t &address);
+	uint32_t ppccom_translate_address_internal(int intention, bool debug, offs_t &address);
 	void ppc4xx_set_irq_line(uint32_t bitmask, int state);
 	int ppc4xx_get_irq_line(uint32_t bitmask);
 	void ppc4xx_dma_update_irq_states();
@@ -751,6 +757,17 @@ public:
 	ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class ppc740_device : public ppc_device
+{
+public:
+	ppc740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class ppc750_device : public ppc_device
+{
+public:
+	ppc750_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class ppc4xx_device : public ppc_device
 {
@@ -806,5 +823,7 @@ DECLARE_DEVICE_TYPE(MPC8240,   mpc8240_device)
 DECLARE_DEVICE_TYPE(PPC403GA,  ppc403ga_device)
 DECLARE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device)
 DECLARE_DEVICE_TYPE(PPC405GP,  ppc405gp_device)
+DECLARE_DEVICE_TYPE(PPC740,    ppc740_device)
+DECLARE_DEVICE_TYPE(PPC750,    ppc750_device)
 
 #endif  // MAME_CPU_POWERPC_PPC_H

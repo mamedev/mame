@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m740.c
+    m740.cpp
 
     Mitsubishi M740 series (M507xx/M509xx)
 
@@ -36,19 +36,11 @@ void m740_device::device_start()
 
 void m740_device::device_reset()
 {
-	inst_state_base = 0;
-	inst_state = STATE_RESET;
-	inst_substate = 0;
-	nmi_state = false;
+	m6502_device::device_reset();
+
 	irq_state = false;
 	m_irq_multiplex = 0;
 	m_irq_vector = 0xfffc;
-	apu_irq_state = false;
-	irq_taken = false;
-	nmi_pending = false;
-	v_state = false;
-	sync = false;
-	inhibit_interrupts = false;
 	SP = 0x00ff;
 }
 
@@ -90,37 +82,37 @@ void m740_device::do_sbc_dt(uint8_t val)
 {
 	uint8_t c = P & F_C ? 0 : 1;
 	P &= ~(F_N|F_V|F_Z|F_C);
-	uint16_t diff = TMP2 - val - c;
-	uint8_t al = (TMP2 & 15) - (val & 15) - c;
+	uint16_t diff = TMP - val - c;
+	uint8_t al = (TMP & 15) - (val & 15) - c;
 	if(int8_t(al) < 0)
 		al -= 6;
-	uint8_t ah = (TMP2 >> 4) - (val >> 4) - (int8_t(al) < 0);
+	uint8_t ah = (TMP >> 4) - (val >> 4) - (int8_t(al) < 0);
 	if(!uint8_t(diff))
 		P |= F_Z;
 	else if(diff & 0x80)
 		P |= F_N;
-	if((TMP2^val) & (TMP2^diff) & 0x80)
+	if((TMP^val) & (TMP^diff) & 0x80)
 		P |= F_V;
 	if(!(diff & 0xff00))
 		P |= F_C;
 	if(int8_t(ah) < 0)
 		ah -= 6;
-	TMP2 = (ah << 4) | (al & 15);
+	TMP = (ah << 4) | (al & 15);
 }
 
 void m740_device::do_sbc_ndt(uint8_t val)
 {
-	uint16_t diff = TMP2 - val - (P & F_C ? 0 : 1);
+	uint16_t diff = TMP - val - (P & F_C ? 0 : 1);
 	P &= ~(F_N|F_V|F_Z|F_C);
 	if(!uint8_t(diff))
 		P |= F_Z;
 	else if(int8_t(diff) < 0)
 		P |= F_N;
-	if((TMP2^val) & (TMP2^diff) & 0x80)
+	if((TMP^val) & (TMP^diff) & 0x80)
 		P |= F_V;
 	if(!(diff & 0xff00))
 		P |= F_C;
-	TMP2 = diff;
+	TMP = diff;
 }
 
 void m740_device::do_sbct(uint8_t val)
@@ -135,37 +127,37 @@ void m740_device::do_adc_dt(uint8_t val)
 {
 	uint8_t c = P & F_C ? 1 : 0;
 	P &= ~(F_N|F_V|F_Z|F_C);
-	uint8_t al = (TMP2 & 15) + (val & 15) + c;
+	uint8_t al = (TMP & 15) + (val & 15) + c;
 	if(al > 9)
 		al += 6;
-	uint8_t ah = (TMP2 >> 4) + (val >> 4) + (al > 15);
-	if(!uint8_t(TMP2 + val + c))
+	uint8_t ah = (TMP >> 4) + (val >> 4) + (al > 15);
+	if(!uint8_t(TMP + val + c))
 		P |= F_Z;
 	else if(ah & 8)
 		P |= F_N;
-	if(~(TMP2^val) & (TMP2^(ah << 4)) & 0x80)
+	if(~(TMP^val) & (TMP^(ah << 4)) & 0x80)
 		P |= F_V;
 	if(ah > 9)
 		ah += 6;
 	if(ah > 15)
 		P |= F_C;
-	TMP2 = (ah << 4) | (al & 15);
+	TMP = (ah << 4) | (al & 15);
 }
 
 void m740_device::do_adc_ndt(uint8_t val)
 {
 	uint16_t sum;
-	sum = TMP2 + val + (P & F_C ? 1 : 0);
+	sum = TMP + val + (P & F_C ? 1 : 0);
 	P &= ~(F_N|F_V|F_Z|F_C);
 	if(!uint8_t(sum))
 		P |= F_Z;
 	else if(int8_t(sum) < 0)
 		P |= F_N;
-	if(~(TMP2^val) & (TMP2^sum) & 0x80)
+	if(~(TMP^val) & (TMP^sum) & 0x80)
 		P |= F_V;
 	if(sum & 0xff00)
 		P |= F_C;
-	TMP2 = sum;
+	TMP = sum;
 }
 
 void m740_device::do_adct(uint8_t val)

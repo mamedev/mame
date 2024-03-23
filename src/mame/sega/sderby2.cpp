@@ -41,6 +41,8 @@
 #include "video/resnet.h"
 
 
+namespace {
+
 class sderby2_state : public driver_device
 {
 public:
@@ -65,15 +67,15 @@ private:
 	void sderby2_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void palette_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void palette_w(offs_t offset, uint8_t data);
 	uint8_t host_r();
 	void main_nmi(uint8_t data);
 	void sub_nmi(uint8_t data);
 	uint8_t sub_r();
 	void host_io_40_w(uint8_t data);
 	uint8_t sub_io_0_r();
-	uint8_t sub_unk_r();
-	void sub_unk_w(uint8_t data);
+	[[maybe_unused]] uint8_t sub_unk_r();
+	[[maybe_unused]] void sub_unk_w(uint8_t data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_subcpu;
@@ -410,6 +412,8 @@ void sderby2_state::init_sderby2()
 {
 
 }
+
+} // anonymous namespace
 
 
 /*************************************

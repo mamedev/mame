@@ -22,9 +22,9 @@ public:
 	void write(offs_t offset, uint8_t data) override;
 	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	void romgq_line(int state) override;
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
-	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
+	void gclock_in(int state) override;
 
 	bool is_grom_idle() override;
 

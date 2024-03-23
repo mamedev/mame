@@ -18,8 +18,8 @@ using namespace NWindows;
 using namespace NFile;
 using namespace NDir;
 
-static LPCWSTR kCantFindArchive = L"Can not find archive file";
-static LPCWSTR kCantOpenArchive = L"Can not open the file as archive";
+static LPCSTR const kCantFindArchive = "Cannot find archive file";
+static LPCSTR const kCantOpenArchive = "Cannot open the file as archive";
 
 struct CThreadExtracting
 {
@@ -64,18 +64,14 @@ struct CThreadExtracting
     
     if (!CreateComplexDir(dirPath))
     {
-      ErrorMessage = MyFormatNew(IDS_CANNOT_CREATE_FOLDER,
-        #ifdef LANG
-        0x02000603,
-        #endif
-        fs2us(dirPath));
+      ErrorMessage = MyFormatNew(IDS_CANNOT_CREATE_FOLDER, fs2us(dirPath));
       Result = E_FAIL;
       return;
     }
 
-    ExtractCallbackSpec->Init(ArchiveLink.GetArchive(), dirPath, L"Default", fi.MTime, 0);
+    ExtractCallbackSpec->Init(ArchiveLink.GetArchive(), dirPath, (UString)"Default", fi.MTime, 0);
 
-    Result = ArchiveLink.GetArchive()->Extract(0, (UInt32)(Int32)-1 , BoolToInt(false), ExtractCallback);
+    Result = ArchiveLink.GetArchive()->Extract(NULL, (UInt32)(Int32)-1 , BoolToInt(false), ExtractCallback);
   }
 
   void Process()
@@ -116,7 +112,9 @@ HRESULT ExtractArchive(CCodecs *codecs, const FString &fileName, const FString &
   {
     t.ExtractCallbackSpec->ProgressDialog.IconID = IDI_ICON;
     NWindows::CThread thread;
-    RINOK(thread.Create(CThreadExtracting::MyThreadFunction, &t));
+    const WRes wres = thread.Create(CThreadExtracting::MyThreadFunction, &t);
+    if (wres != 0)
+      return HRESULT_FROM_WIN32(wres);
     
     UString title;
     LangString(IDS_PROGRESS_EXTRACTING, title);

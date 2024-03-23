@@ -5,8 +5,8 @@
  * includes/vtech2.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_VTECH2_H
-#define MAME_INCLUDES_VTECH2_H
+#ifndef MAME_VTECH_VTECH2_H
+#define MAME_VTECH_VTECH2_H
 
 #pragma once
 
@@ -116,4 +116,4 @@ private:
 	memory_region *m_cart_rom = nullptr;
 };
 
-#endif // MAME_INCLUDES_VTECH2_H
+#endif // MAME_VTECH_VTECH2_H

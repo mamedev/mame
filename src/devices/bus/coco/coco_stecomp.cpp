@@ -70,10 +70,10 @@ namespace
 	{
 		SPEAKER(config, "sc_lspeaker").front_left();
 		SPEAKER(config, "sc_rspeaker").front_right();
-		DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "sc_lspeaker", 0.5);
-		DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "sc_rspeaker", 0.5);
+		DAC_8BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, "sc_lspeaker", 0.5);
+		DAC_8BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, "sc_rspeaker", 0.5);
 
-		pia6821_device &pia(PIA6821(config, "sc_pia", 0));
+		pia6821_device &pia(PIA6821(config, "sc_pia"));
 		pia.writepa_handler().set("sc_ldac", FUNC(dac_byte_interface::data_w));
 		pia.writepb_handler().set("sc_rdac", FUNC(dac_byte_interface::data_w));
 	}

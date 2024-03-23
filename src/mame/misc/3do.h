@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_3DO_H
-#define MAME_INCLUDES_3DO_H
+#ifndef MAME_MISC_3DO_H
+#define MAME_MISC_3DO_H
 
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -198,4 +198,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_3DO_H
+#endif // MAME_MISC_3DO_H

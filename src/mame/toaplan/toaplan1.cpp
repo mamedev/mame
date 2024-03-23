@@ -755,7 +755,8 @@ void toaplan1_samesame_state::main_map(address_map &map)
 	map(0x140008, 0x140009).portr("SYSTEM");
 	map(0x14000b, 0x14000b).r(FUNC(toaplan1_samesame_state::port_6_word_r));    /* Territory, and MCU ready */
 	map(0x14000d, 0x14000d).w(FUNC(toaplan1_samesame_state::coin_w));  /* Coin counter/lockout */
-	map(0x14000f, 0x14000f).w(FUNC(toaplan1_samesame_state::mcu_w));   /* Commands sent to HD647180 */
+//  map(0x14000e, 0x14000f).nopr(); // irq ack?
+	map(0x14000f, 0x14000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   /* Commands sent to HD647180 */
 	map(0x180001, 0x180001).w(FUNC(toaplan1_samesame_state::bcu_flipscreen_w));
 	map(0x180002, 0x180003).rw(FUNC(toaplan1_samesame_state::tileram_offs_r), FUNC(toaplan1_samesame_state::tileram_offs_w));
 	map(0x180004, 0x180007).rw(FUNC(toaplan1_samesame_state::tileram_r), FUNC(toaplan1_samesame_state::tileram_w));
@@ -935,9 +936,9 @@ void toaplan1_demonwld_state::dsp_program_map(address_map &map)
 
 void toaplan1_demonwld_state::dsp_io_map(address_map &map)
 {
-	map(0, 0).w(FUNC(toaplan1_demonwld_state::dsp_addrsel_w));
-	map(1, 1).rw(FUNC(toaplan1_demonwld_state::dsp_r), FUNC(toaplan1_demonwld_state::dsp_w));
-	map(3, 3).w(FUNC(toaplan1_demonwld_state::dsp_bio_w));
+	map(0x0, 0x0).w(FUNC(toaplan1_demonwld_state::dsp_addrsel_w));
+	map(0x1, 0x1).rw(FUNC(toaplan1_demonwld_state::dsp_r), FUNC(toaplan1_demonwld_state::dsp_w));
+	map(0x3, 0x3).w(FUNC(toaplan1_demonwld_state::dsp_bio_w));
 }
 
 
@@ -979,44 +980,27 @@ void toaplan1_state::vimana_hd647180_io_map(address_map &map)
 
 u8 toaplan1_state::vimana_dswb_invert_r()
 {
-	return m_dswb_io->read() ^ 0xFF;
+	return m_dswb_io->read() ^ 0xff;
 }
 
 u8 toaplan1_state::vimana_tjump_invert_r()
 {
-	return (m_tjump_io->read() ^ 0xFF)|0xC0; // high 2 bits of port G always read as 1
-}
-
-void toaplan1_samesame_state::mcu_w(u8 data)
-{
-	m_to_mcu = data;
-	m_cmdavailable = 1;
-};
-
-u8 toaplan1_samesame_state::soundlatch_r()
-{
-	return m_to_mcu;
-};
-
-void toaplan1_samesame_state::sound_done_w(u8 data)
-{
-	m_to_mcu = data;
-	m_cmdavailable = 0;
+	return (m_tjump_io->read() ^ 0xff) | 0xc0; // high 2 bits of port G always read as 1
 }
 
 u8 toaplan1_samesame_state::cmdavailable_r()
 {
-	if (m_cmdavailable) return 0xff;
-	else return 0x00;
-};
+	return m_soundlatch->pending_r() ? 1 : 0;
+}
 
 void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 {
+	map.unmap_value_high();
 	map.global_mask(0xff);
 
-	map(0x63, 0x63).nopr();
-	map(0xa0, 0xa0).r(FUNC(toaplan1_samesame_state::soundlatch_r));
-	map(0xb0, 0xb0).w(FUNC(toaplan1_samesame_state::sound_done_w));
+	map(0x63, 0x63).nopr(); // read port D
+	map(0xa0, 0xa0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xb0, 0xb0).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 
 	map(0x80, 0x81).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
@@ -2050,14 +2034,13 @@ void toaplan1_state::zerowing(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::zerowing_main_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan1_state::reset_callback));
 
 	Z80(config, m_audiocpu, XTAL(28'000'000) / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::zerowing_sound_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2117,15 +2100,16 @@ void toaplan1_samesame_state::samesame(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_samesame_state::main_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan1_samesame_state::reset_callback));
 
-	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(10'000'000))); // HD647180XOFS6 CPU
 	// 16k byte ROM and 512 byte RAM are internal
 	audiocpu.set_addrmap(AS_IO, &toaplan1_samesame_state::hd647180_io_map);
 	audiocpu.in_pd_callback().set(FUNC(toaplan1_samesame_state::cmdavailable_r));
 
-	config.set_perfect_quantum(m_maincpu);
+	GENERIC_LATCH_8(config, m_soundlatch).set_separate_acknowledge(true);
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_samesame_state,zerowing)
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2150,14 +2134,13 @@ void toaplan1_state::outzone(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::outzone_main_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan1_state::reset_callback));
 
 	Z80(config, m_audiocpu, XTAL(28'000'000) / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::outzone_sound_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2182,14 +2165,13 @@ void toaplan1_state::outzonecv(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::outzonecv_main_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan1_state::reset_callback));
 
 	Z80(config, m_audiocpu, XTAL(28'000'000) / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::zerowing_sound_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2214,16 +2196,15 @@ void toaplan1_state::vimana(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_main_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan1_state::reset_callback));
 
-	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(10'000'000))); // HD647180XOFS6 CPU
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_hd647180_mem_map);
 	audiocpu.set_addrmap(AS_IO, &toaplan1_state::vimana_hd647180_io_map);
 	audiocpu.in_pa_callback().set(FUNC(toaplan1_state::vimana_dswb_invert_r)); // note these inputs seem to be inverted, unlike the DSWA ones.
 	audiocpu.in_pg_callback().set(FUNC(toaplan1_state::vimana_tjump_invert_r)); // note these inputs seem to be inverted, unlike the DSWA ones.
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2667,6 +2648,35 @@ ROM_START( demonwld4 )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.bin", 0x000000, 0x20000, CRC(6f7468e0) SHA1(87ef7733fd0d00d0d375dbf30332cf0614480dc2) )
 	ROM_LOAD16_BYTE( "o16-09.bin", 0x000001, 0x20000, CRC(a572f5f7) SHA1(3d6a443cecd46734c7e1b761130909482c7a9914) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
+
+	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
+	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
+	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
+	ROM_LOAD16_BYTE( "rom07",  0x00001, 0x20000, CRC(a3a0d993) SHA1(50311b9447eb04271b17b212ca31d083ab5b2414) )
+	ROM_LOAD16_BYTE( "rom06",  0x40000, 0x20000, CRC(4fc5e5f3) SHA1(725d4b009d575ff8ffbe1c00df352ccf235465d7) )
+	ROM_LOAD16_BYTE( "rom08",  0x40001, 0x20000, CRC(eb53ab09) SHA1(d98195cc1b65b76335b5b24adb31deae1b313f3a) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rom01",  0x00000, 0x20000, CRC(1b3724e9) SHA1(3dbb0450ab1e40e6df2b7c7356352419cd3f113d) )
+	ROM_LOAD16_BYTE( "rom02",  0x00001, 0x20000, CRC(7b20a44d) SHA1(4dc1a2fa2058077b112c73492808ee9381060ec7) )
+	ROM_LOAD16_BYTE( "rom03",  0x40000, 0x20000, CRC(2cacdcd0) SHA1(92216d1c6859e05d39363c30e0beb45bc0ae4e1c) )
+	ROM_LOAD16_BYTE( "rom04",  0x40001, 0x20000, CRC(76fd3201) SHA1(7a12737bf90bd9760074132edeb22f3fd3e16b4f) )
+
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
+ROM_END
+
+ROM_START( demonwld5 ) // standard TP-O16 PCB
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
+	ROM_LOAD16_BYTE( "o16-10.bin", 0x000000, 0x20000, CRC(4bcd85f6) SHA1(5349480cc4289ef60dcd523757bd38c19e6f23b0) ) // SLDH
+	ROM_LOAD16_BYTE( "o16-09.bin", 0x000001, 0x20000, CRC(8e5445ba) SHA1(a071e9e60bda27446fce0ddb50df9b5b1720f568) ) // SLDH
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
@@ -3190,42 +3200,44 @@ ROM_START( vimanaj )
 ROM_END
 
 
-GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1_rallybik_state, empty_init, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+//    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS                    INIT        ROT     COMPANY                                       FULLNAME                   FLAGS
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1_rallybik_state, empty_init, ROT270, "Toaplan / Taito Corporation",                "Rally Bike / Dash Yarou", 0 )
 
-GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,          empty_init, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,          empty_init, ROT270, "Toaplan / Taito Corporation",                "Truxton / Tatsujin", 0 )
 
-GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set)",        0 )
-GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set)",        0 )
-GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set, older)", 0 )
-GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set, older)", 0 )
+GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",                    "Hellfire (2P set)",        0 )
+GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",                    "Hellfire (1P set)",        0 )
+GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",                    "Hellfire (2P set, older)", 0 )
+GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state,          empty_init, ROT0,   "Toaplan (Taito license)",                    "Hellfire (1P set, older)", 0 )
 
-GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state,          empty_init, ROT0,   "Toaplan",                     "Zero Wing (2P set)",                   0 )
-GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state,          empty_init, ROT0,   "Toaplan",                     "Zero Wing (1P set)",                   0 )
-GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state,          empty_init, ROT0,   "Toaplan (Williams license)",  "Zero Wing (2P set, Williams license)", 0 )
+GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state,          empty_init, ROT0,   "Toaplan",                                    "Zero Wing (2P set)",                   0 )
+GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state,          empty_init, ROT0,   "Toaplan",                                    "Zero Wing (1P set)",                   0 )
+GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state,          empty_init, ROT0,   "Toaplan (Williams license)",                 "Zero Wing (2P set, Williams license)", 0 )
 
-GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 1)", 0 )
-GAME( 1989, demonwld1,  demonwld, demonwld, demonwld,  toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 2)", 0 )
-GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 3)", 0 )
-GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 4)", 0 )
-GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 5)", 0 )
+GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                                    "Demon's World / Horror Story (set 1)", 0 )
+GAME( 1989, demonwld1,  demonwld, demonwld, demonwld,  toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                                    "Demon's World / Horror Story (set 2)", 0 )
+GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                                    "Demon's World / Horror Story (set 3)", 0 )
+GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                                    "Demon's World / Horror Story (set 4)", 0 )
+GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan",                                    "Demon's World / Horror Story (set 5)", 0 )
+GAME( 1989, demonwld5,  demonwld, demonwld, demonwld1, toaplan1_demonwld_state, empty_init, ROT0,   "Toaplan (APM Electronics license)",          "Demon's World / Horror Story (set 6)", 0 )
 
-GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                     "Fire Shark",                                0 )
-GAME( 1989, fireshrka,  fireshrk, samesame, fireshrka, toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                     "Fire Shark (earlier)",                      0 )
-GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_samesame_state, empty_init, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 1, easier)",         0 )
-GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_samesame_state, empty_init, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 2, harder)",         0 )
-GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                     "Same! Same! Same! (1P set)",                0 )
-GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                     "Same! Same! Same! (2P set)",                0 )
-GAME( 1990, samesamecn, fireshrk, samesame, jiaojiao,  toaplan1_samesame_state, empty_init, ROT270, "Toaplan (Hong Kong Honest Trading license)",   "Jiao! Jiao! Jiao! (China, 2P set)", 0 )
-GAME( 2015, samesamenh, fireshrk, samesame, samesame,  toaplan1_samesame_state, empty_init, ROT270, "hack (trap15)",               "Same! Same! Same! (1P set, NEW VER! hack)", 0 )
+GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                                    "Fire Shark",                                0 )
+GAME( 1989, fireshrka,  fireshrk, samesame, fireshrka, toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                                    "Fire Shark (earlier)",                      0 )
+GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_samesame_state, empty_init, ROT270, "Toaplan (Dooyong license)",                  "Fire Shark (Korea, set 1, easier)",         0 )
+GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_samesame_state, empty_init, ROT270, "Toaplan (Dooyong license)",                  "Fire Shark (Korea, set 2, harder)",         0 )
+GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                                    "Same! Same! Same! (1P set)",                0 )
+GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_samesame_state, empty_init, ROT270, "Toaplan",                                    "Same! Same! Same! (2P set)",                0 )
+GAME( 1990, samesamecn, fireshrk, samesame, jiaojiao,  toaplan1_samesame_state, empty_init, ROT270, "Toaplan (Hong Kong Honest Trading license)", "Jiao! Jiao! Jiao! (China, 2P set)", 0 )
+GAME( 2015, samesamenh, fireshrk, samesame, samesame,  toaplan1_samesame_state, empty_init, ROT270, "hack (trap15)",                              "Same! Same! Same! (1P set, NEW VER! hack)", 0 )
 
-GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Out Zone",                                   0 )
-GAME( 1990, outzoneh,   outzone,  outzone,  outzone,   toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Out Zone (harder)",                          0 )
-GAME( 1990, outzonea,   outzone,  outzone,  outzonea,  toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Out Zone (old set)",                         0 )
-GAME( 1990, outzoneb,   outzone,  outzone,  outzonea,  toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Out Zone (older set)",                       0 )
-GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Out Zone (oldest set)",                      MACHINE_IMPERFECT_SOUND ) // prototype?
-GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Out Zone (Zero Wing TP-015 PCB conversion)", 0 )
+GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Out Zone",                                   0 )
+GAME( 1990, outzoneh,   outzone,  outzone,  outzone,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Out Zone (harder)",                          0 )
+GAME( 1990, outzonea,   outzone,  outzone,  outzonea,  toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Out Zone (old set)",                         0 )
+GAME( 1990, outzoneb,   outzone,  outzone,  outzonea,  toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Out Zone (older set)",                       0 )
+GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Out Zone (oldest set)",                      MACHINE_IMPERFECT_SOUND ) // prototype?
+GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Out Zone (Zero Wing TP-015 PCB conversion)", 0 )
 
 // has various licenses / regions depending on jumpers, including Tecmo
-GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Vimana (World, set 1)", 0 )
-GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Vimana (World, set 2)", 0 )
-GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state,          empty_init, ROT270, "Toaplan",                     "Vimana (Japan)",        0 )
+GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Vimana (World, set 1)", 0 )
+GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Vimana (World, set 2)", 0 )
+GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Vimana (Japan)",        0 )

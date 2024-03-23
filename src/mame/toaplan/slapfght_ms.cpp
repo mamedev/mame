@@ -83,9 +83,9 @@ private:
 	tilemap_t *m_pf1_tilemap = nullptr;
 	tilemap_t *m_fix_tilemap = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void vblank_irq(int state);
+	void irq_enable_w(int state);
+	void sound_reset_w(int state);
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
@@ -101,8 +101,6 @@ private:
 	void sound_prg_map(address_map &map);
 };
 
-
-// video
 
 TILE_GET_INFO_MEMBER(slapfght_ms_state::get_pf1_tile_info)
 {
@@ -204,15 +202,13 @@ void slapfght_ms_state::video_start()
 }
 
 
-// machine
-
-WRITE_LINE_MEMBER(slapfght_ms_state::vblank_irq)
+void slapfght_ms_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_enabled)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_ms_state::irq_enable_w)
+void slapfght_ms_state::irq_enable_w(int state)
 {
 	m_main_irq_enabled = state ? true : false;
 
@@ -220,7 +216,7 @@ WRITE_LINE_MEMBER(slapfght_ms_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_ms_state::sound_reset_w)
+void slapfght_ms_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 
@@ -393,13 +389,13 @@ void slapfght_ms_state::slapfighm(machine_config &config)
 	ym2203_device &ym1(YM2203(config, "ym1", 20_MHz_XTAL / 5)); // divisor unknown
 	ym1.port_a_read_callback().set_ioport("IN0");
 	ym1.port_b_read_callback().set_ioport("IN1");
-	ym1.irq_handler().set_log("ym 1 IRQ");
+	ym1.irq_handler().set([this](int state) { if (state) logerror("ym 1 IRQ\n"); });
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 20_MHz_XTAL / 5)); // divisor unknown
 	ym2.port_a_read_callback().set_ioport("SW1");
 	ym2.port_b_read_callback().set_ioport("SW2");
-	ym2.irq_handler().set_log("ym 2 IRQ");
+	ym2.irq_handler().set([this](int state) { if (state) logerror("ym 2 IRQ\n"); });
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 

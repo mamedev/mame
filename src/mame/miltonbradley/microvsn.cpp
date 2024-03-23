@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, hap
 // thanks-to:Dan Boris, Kevin Horton, Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Milton Bradley Microvision, handheld game console
 
@@ -25,7 +25,7 @@ TODO:
 - dump/add remaining 8021 cartridges, which games have 8021 versions? An online
   FAQ mentions at least Block Buster, Connect Four, Bowling.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -33,7 +33,6 @@ TODO:
 #include "bus/generic/slot.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/hlcd0488.h"
 #include "video/pwm.h"
@@ -59,7 +58,6 @@ public:
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_dac( *this, "dac" ),
 		m_cart(*this, "cartslot"),
-		m_paddle_timer(*this, "paddle_timer"),
 		m_inputs(*this, "COL%u", 0),
 		m_paddle(*this, "PADDLE"),
 		m_conf(*this, "CONF")
@@ -81,20 +79,20 @@ private:
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_byte_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
-	required_device<timer_device> m_paddle_timer;
 	required_ioport_array<3> m_inputs;
 	required_ioport m_paddle;
 	required_ioport m_conf;
 
-	u32 tms1100_decode_micro(offs_t offset);
+	u32 tms1100_micro_pla(offs_t offset);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void apply_settings(void);
 
-	u8 m_pla_auto;
-	u16 m_butmask_auto;
-	u16 m_button_mask;
-	bool m_paddle_auto;
-	bool m_paddle_on;
+	u8 m_pla_auto = 0;
+	u16 m_butmask_auto = 0;
+	u16 m_button_mask = 0;
+	bool m_paddle_auto = false;
+	bool m_paddle_on = false;
+	attotime m_paddle_delay;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void lcd_output_w(offs_t offset, u16 data) { m_lcd_pwm->matrix(offset, data); }
@@ -102,16 +100,16 @@ private:
 	// TMS1100 interface
 	u8 tms1100_k_r();
 	void tms1100_o_w(u16 data);
-	void tms1100_r_w(u16 data);
+	void tms1100_r_w(u32 data);
 
-	u16 m_r = 0;
+	u32 m_r = 0;
 
 	// Intel 8021 interface
 	u8 i8021_p0_r();
 	void i8021_p0_w(u8 data);
 	void i8021_p1_w(u8 data);
 	void i8021_p2_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(i8021_t1_r);
+	int i8021_t1_r();
 
 	u8 m_p0 = 0xff;
 	u8 m_p2 = 0xff;
@@ -120,6 +118,7 @@ private:
 void microvision_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_paddle_delay));
 	save_item(NAME(m_r));
 	save_item(NAME(m_p0));
 	save_item(NAME(m_p2));
@@ -130,11 +129,11 @@ void microvision_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Cartridge Init
-******************************************************************************/
+*******************************************************************************/
 
-static const u16 microvision_output_pla[2][0x20] =
+static const u16 tms1100_output_pla[2][0x20] =
 {
 	// default TMS1100 O output PLA
 	// verified for: blckbstr, pinball
@@ -155,34 +154,40 @@ static const u16 microvision_output_pla[2][0x20] =
 	}
 };
 
-u32 microvision_state::tms1100_decode_micro(offs_t offset)
+u32 microvision_state::tms1100_micro_pla(offs_t offset)
 {
 	// default TMS1100 microinstructions PLA - this should work for all games
 	// verified for: blckbstr, bowling, pinball, vegasslt
-	static const u16 micro[0x80] =
+
+	// TCY, YNEC, TCMIY, AxAAC
+	static const u16 micro1[4] = { 0x0108, 0x9080, 0x8068, 0x0136 };
+
+	// 0x00, 0x20, 0x30
+	static const u16 micro2[0x30] =
 	{
 		0x1402, 0x0c30, 0xd002, 0x2404, 0x8019, 0x8038, 0x0416, 0x0415,
 		0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1100, 0x0000,
-		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+
 		0x000a, 0x0404, 0x0408, 0x8004, 0xa019, 0xa038, 0x2004, 0x2000,
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-		0x1580, 0x1580, 0x1580, 0x1580, 0x0c34, 0x0834, 0x0434, 0x1400,
-		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
-		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
-		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
-		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
-		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
-		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
-		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136,
-		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0134
+		0x1580, 0x1580, 0x1580, 0x1580, 0x0c34, 0x0834, 0x0434, 0x1400
 	};
 
-	if (offset >= 0x80 || micro[offset] == 0)
-		return 0x8fa3;
-	else
-		return micro[offset];
+	static const int micro2h[4] = { 0x00, -1, 0x10, 0x20 };
+
+	u16 data = 0;
+
+	if (offset >= 0x40 && offset < 0x80)
+	{
+		data = micro1[offset >> 4 & 3];
+		if (offset == 0x7f) data ^= 2; // CLA
+	}
+	else if (offset < 0x40 && (offset & 0xf0) != 0x10)
+		data = micro2[micro2h[offset >> 4] | (offset & 0xf)];
+
+	return (data == 0) ? 0x8fa3 : data;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
@@ -190,10 +195,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x400 && size != 0x800)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM file size (must be 1K or 2K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -236,7 +238,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		m_tms1100->set_clock(clock);
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void microvision_state::apply_settings()
@@ -247,16 +249,16 @@ void microvision_state::apply_settings()
 	m_button_mask = (conf & 1) ? m_butmask_auto : 0xfff;
 
 	u8 pla = ((conf & 0x18) == 0x10) ? m_pla_auto : (conf >> 3 & 1);
-	m_tms1100->set_output_pla(microvision_output_pla[pla]);
+	m_tms1100->set_output_pla(tms1100_output_pla[pla]);
 
 	m_paddle_on = ((conf & 6) == 4) ? m_paddle_auto : bool(conf & 2);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Video
-******************************************************************************/
+*******************************************************************************/
 
 uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -278,9 +280,9 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // TMS1100 interface
 
@@ -294,8 +296,8 @@ u8 microvision_state::tms1100_k_r()
 			data |= m_inputs[i]->read() & (m_button_mask >> (i * 4) & 0xf);
 
 	// K8: paddle capacitor
-	if (m_paddle_on)
-		data |= (m_paddle_timer->enabled() ? 0 : BIT(m_r, 2)) << 3;
+	if (m_paddle_on && m_paddle_delay < machine().time())
+		data |= BIT(m_r, 2) << 3;
 
 	return data;
 }
@@ -306,14 +308,14 @@ void microvision_state::tms1100_o_w(u16 data)
 	m_lcd->data_w(data & 0xf);
 }
 
-void microvision_state::tms1100_r_w(u16 data)
+void microvision_state::tms1100_r_w(u32 data)
 {
 	// R2: charge paddle capacitor when high
 	if (~m_r & data & 4 && m_paddle_on)
 	{
 		// note that the games don't use the whole range, so there's a deadzone around the edges
 		const float step = (2000 - 500) / 255.0f; // approximation
-		m_paddle_timer->adjust(attotime::from_usec(500 + m_paddle->read() * step));
+		m_paddle_delay = machine().time() + attotime::from_usec(500 + m_paddle->read() * step);
 	}
 
 	// R0: speaker lead 2
@@ -380,25 +382,26 @@ void microvision_state::i8021_p2_w(u8 data)
 	if (m_p2 & 0xc && (data & 0xc) == 0 && m_paddle_on)
 	{
 		const float step = (1000 - 10) / 255.0f; // approximation
-		m_paddle_timer->adjust(attotime::from_usec(10 + (m_paddle->read() ^ 0xff) * step));
+		m_paddle_delay = machine().time() + attotime::from_usec(10 + (m_paddle->read() ^ 0xff) * step);
 	}
 
 	m_p2 = data;
 }
 
-READ_LINE_MEMBER(microvision_state::i8021_t1_r)
+int microvision_state::i8021_t1_r()
 {
 	// T1: paddle capacitor (active low)
-	int active = (m_p2 & 0xc) ? 1 : 0;
-	active |= m_paddle_timer->enabled() ? 1 : 0;
-	return (m_paddle_on) ? active : 1;
+	if (m_paddle_on)
+		return (m_p2 & 0xc || m_paddle_delay > machine().time()) ? 1 : 0;
+	else
+		return 1;
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( microvision )
 	PORT_START("COL0")
@@ -438,19 +441,19 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void microvision_state::microvision(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_tms1100, 0);
-	m_tms1100->set_output_pla(microvision_output_pla[0]);
-	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_decode_micro));
-	m_tms1100->k().set(FUNC(microvision_state::tms1100_k_r));
-	m_tms1100->o().set(FUNC(microvision_state::tms1100_o_w));
-	m_tms1100->r().set(FUNC(microvision_state::tms1100_r_w));
+	m_tms1100->set_output_pla(tms1100_output_pla[0]);
+	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_micro_pla));
+	m_tms1100->read_k().set(FUNC(microvision_state::tms1100_k_r));
+	m_tms1100->write_o().set(FUNC(microvision_state::tms1100_o_w));
+	m_tms1100->write_r().set(FUNC(microvision_state::tms1100_r_w));
 
 	I8021(config, m_i8021, 0);
 	m_i8021->bus_in_cb().set(FUNC(microvision_state::i8021_p0_r));
@@ -459,9 +462,7 @@ void microvision_state::microvision(machine_config &config)
 	m_i8021->p2_out_cb().set(FUNC(microvision_state::i8021_p2_w));
 	m_i8021->t1_in_cb().set(FUNC(microvision_state::i8021_t1_r));
 
-	TIMER(config, "paddle_timer").configure_generic(nullptr);
-
-	/* video hardware */
+	// video hardware
 	HLCD0488(config, m_lcd);
 	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
 
@@ -476,11 +477,11 @@ void microvision_state::microvision(machine_config &config)
 	screen.set_size(16, 16);
 	screen.set_visarea_full();
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(microvision_state::cart_load));
@@ -490,9 +491,9 @@ void microvision_state::microvision(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( microvsn )
 	// nothing here yet, ROM is on the cartridge
@@ -506,9 +507,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, microvsn, 0,      0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "Microvision", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, microvsn, 0,      0,      microvision, microvision, microvision_state, empty_init, "Milton Bradley", "Microvision", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

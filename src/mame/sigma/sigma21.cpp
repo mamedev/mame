@@ -15,6 +15,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class sigma21_state : public driver_device
 {
 public:
@@ -116,5 +119,8 @@ ROM_START(sigma21)
 	ROM_REGION(0x100, "proms", 0)
 	ROM_LOAD("bprom.bin", 0x000, 0x100, CRC(c0e5e4e0) SHA1(c42636c4723fe8b2b00868af5dd33c0608b3fecc))
 ROM_END
+
+} // anonymous namespace
+
 
 GAME(197?, sigma21, 0, sigma21, sigma21, sigma21_state, empty_init, ROT0, "Sigma Enterprises", "21 (Sigma)", MACHINE_IS_SKELETON)

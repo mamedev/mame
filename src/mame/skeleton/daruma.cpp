@@ -21,6 +21,9 @@
 #include "speaker.h"
 //TODO: #include "ds348.lh"
 
+
+namespace {
+
 class daruma_state : public driver_device
 {
 public:
@@ -34,7 +37,7 @@ public:
 private:
 	uint8_t dev0_r();
 	void dev1_w(uint8_t data);
-	void dev2_w(uint8_t data);
+	[[maybe_unused]] void dev2_w(uint8_t data);
 	uint8_t dev4_r();
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -144,6 +147,9 @@ ROM_START( ds348 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "daruma_ds348_v1_1.rom",   0x0000, 0x10000, CRC(10bf9036) SHA1(d654a13bc582f5384e759ec6fe5309a642bd8e18) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME                                 FLAGS
 COMP( 1998, ds348, 0,      0,      daruma,  daruma, daruma_state, empty_init, "Sigtron Daruma", "Print Plus DS348 - Dot matrix printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

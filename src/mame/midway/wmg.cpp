@@ -78,6 +78,8 @@ of save-state is also needed.
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK        (XTAL(12'000'000))
 #define SOUND_CLOCK         (XTAL(3'579'545))
 
@@ -97,15 +99,13 @@ public:
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
 private:
-	virtual void driver_init() override;
-
 	u8 wmg_nvram_r(offs_t offset);
 	void wmg_nvram_w(offs_t offset, u8 data);
 	u8 wmg_pia_0_r(offs_t offset);
 	void wmg_c400_w(u8 data);
 	void wmg_d000_w(u8 data);
 	void wmg_blitter_w(offs_t, u8);
-	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
+	void wmg_port_select_w(int state);
 	void wmg_sound_reset_w(u8 data);
 	void wmg_vram_select_w(u8 data);
 
@@ -458,7 +458,7 @@ void wmg_state::machine_reset()
  *
  *************************************/
 
-WRITE_LINE_MEMBER( wmg_state::wmg_port_select_w )
+void wmg_state::wmg_port_select_w(int state)
 {
 	m_wmg_port_select = state | (m_wmg_c400 << 1);
 }
@@ -493,17 +493,6 @@ u8 wmg_state::wmg_pia_0_r(offs_t offset)
 	}
 
 	return data;
-}
-
-/*************************************
- *
- *  Driver Initialisation
- *
- *************************************/
-void wmg_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
 }
 
 /*************************************
@@ -550,21 +539,24 @@ void wmg_state::wmg(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
-	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia_0"));
 	pia0.readpa_handler().set_ioport("IN0");
 	pia0.readpb_handler().set_ioport("IN1");
 	pia0.cb2_handler().set(FUNC(wmg_state::wmg_port_select_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia_1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia_1"));
 	pia1.readpa_handler().set_ioport("IN2");
 	pia1.writepb_handler().set(FUNC(wmg_state::snd_cmd_w));
 	pia1.irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	pia1.irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	pia6821_device &pia2(PIA6821(config, "pia_2", 0));
+	pia6821_device &pia2(PIA6821(config, "pia_2"));
 	pia2.writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	pia2.irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	pia2.irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0xc000;
 }
 
 /*************************************
@@ -595,6 +587,8 @@ ROM_START( wmg )
 	ROM_LOAD( "decoder.4",       0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
 	ROM_LOAD( "decoder.6",       0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*******************************************************

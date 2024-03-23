@@ -13,7 +13,7 @@
     Taisen Mahjong Final Romance 4 (Japan)
     (c)1998 Video System Co.,Ltd.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/28 -
+    Driver by Takahiro Nogi 2001/02/28 -
     Special thanks to Uki.
 
 ******************************************************************************/
@@ -68,17 +68,17 @@ uint16_t fromanc2_state::keymatrix_r()
 	return ret;
 }
 
-READ_LINE_MEMBER(fromanc2_state::subcpu_int_r)
+int fromanc2_state::subcpu_int_r()
 {
 	return m_subcpu_int_flag & 0x01;
 }
 
-READ_LINE_MEMBER(fromanc2_state::sndcpu_nmi_r)
+int fromanc2_state::sndcpu_nmi_r()
 {
 	return m_sndcpu_nmi_flag & 0x01;
 }
 
-READ_LINE_MEMBER(fromanc2_state::subcpu_nmi_r)
+int fromanc2_state::subcpu_nmi_r()
 {
 	return m_subcpu_nmi_flag & 0x01;
 }

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
 
-#ifndef MAME_MACHINE_GAELCRPT_H
-#define MAME_MACHINE_GAELCRPT_H
+#ifndef MAME_GAELCO_GAELCRPT_H
+#define MAME_GAELCO_GAELCRPT_H
 
 #pragma once
 
@@ -33,4 +33,4 @@ private:
 	uint16_t m_param2;
 };
 
-#endif // MAME_MACHINE_GAELCRPT_H
+#endif // MAME_GAELCO_GAELCRPT_H

@@ -11,8 +11,8 @@
     - scobra.cpp
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GALAXOLD_H
-#define MAME_INCLUDES_GALAXOLD_H
+#ifndef MAME_GALAXIAN_GALAXOLD_H
+#define MAME_GALAXIAN_GALAXOLD_H
 
 #pragma once
 
@@ -144,11 +144,11 @@ public:
 	void galaxold_gfxbank_w(offs_t offset, uint8_t data);
 	void dambustr_bg_split_line_w(uint8_t data);
 	void dambustr_bg_color_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
-	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
+	void galaxold_7474_9m_2_q_callback(int state);
+	void galaxold_7474_9m_1_callback(int state);
 	uint8_t rescueb_a002_r() { return 0xfc; }
-	template <int Mask> DECLARE_READ_LINE_MEMBER(_4in1_fake_port_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(vpool_lives_r);
+	template <int Mask> int _4in1_fake_port_r();
+	template <int Mask> int vpool_lives_r();
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
 	void init_bullsdrtg();
@@ -227,6 +227,7 @@ public:
 	void scrambold_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void darkplnt_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void dambustr_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+	void rescue_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void galaxold_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void scrambold_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ad2083_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -299,4 +300,4 @@ protected:
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
 
-#endif
+#endif // MAME_GALAXIAN_GALAXOLD_H

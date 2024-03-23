@@ -12,8 +12,8 @@
 #include "emu.h"
 #include "pcf8583.h"
 
-#define LOG_DATA (1 << 1)
-#define LOG_LINE (1 << 2)
+#define LOG_DATA (1U << 1)
+#define LOG_LINE (1U << 2)
 
 
 #define VERBOSE (0)
@@ -69,8 +69,6 @@ void pcf8583_device::device_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_data));
 	save_item(NAME(m_slave_address));
-
-	m_irq_cb.resolve_safe();
 }
 
 TIMER_CALLBACK_MEMBER(pcf8583_device::clock_tick)
@@ -183,8 +181,8 @@ void pcf8583_device::nvram_default()
 
 bool pcf8583_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+	auto const [err, actual] = read(file, m_data, sizeof(m_data));
+	return !err && (actual == sizeof(m_data));
 }
 
 //-------------------------------------------------
@@ -194,8 +192,8 @@ bool pcf8583_device::nvram_read(util::read_stream &file)
 
 bool pcf8583_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+	auto const [err, actual] = write(file, m_data, sizeof(m_data));
+	return !err;
 }
 
 
@@ -203,7 +201,7 @@ bool pcf8583_device::nvram_write(util::write_stream &file)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER(pcf8583_device::a0_w)
+void pcf8583_device::a0_w(int state)
 {
 	state &= 1;
 	if (BIT(m_slave_address, 1) != state)
@@ -213,7 +211,7 @@ WRITE_LINE_MEMBER(pcf8583_device::a0_w)
 	}
 }
 
-WRITE_LINE_MEMBER(pcf8583_device::scl_w)
+void pcf8583_device::scl_w(int state)
 {
 	if (m_scl != state)
 	{
@@ -385,7 +383,7 @@ WRITE_LINE_MEMBER(pcf8583_device::scl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(pcf8583_device::sda_w)
+void pcf8583_device::sda_w(int state)
 {
 	state &= 1;
 	if (m_sdaw != state)
@@ -412,7 +410,7 @@ WRITE_LINE_MEMBER(pcf8583_device::sda_w)
 	}
 }
 
-READ_LINE_MEMBER(pcf8583_device::sda_r)
+int pcf8583_device::sda_r()
 {
 	int res = m_sdar & 1;
 

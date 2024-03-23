@@ -66,7 +66,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;1 + ">
+		<text string="£1 + ">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.40"/>
 		</text>
@@ -1422,7 +1422,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;4 + Repeat">
+		<text string="£4 + Repeat">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1442,7 +1442,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;2 +  Repeat">
+		<text string="£2 +  Repeat">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1462,7 +1462,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;3 +  Repeat">
+		<text string="£3 +  Repeat">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1482,7 +1482,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;5 + Repeat">
+		<text string="£5 + Repeat">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1502,7 +1502,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;8 + Repeat">
+		<text string="£8 + Repeat">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1522,7 +1522,7 @@
 		<disk state="0">
 			<color red="0.25" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;15 ">
+		<text string="£15 ">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.40"/>
 		</text>
@@ -2046,7 +2046,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.13" blue="0.06"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -2202,55 +2202,55 @@
 		</text>
 	</element>
 	<element name="label_187">
-		<text string="&#xA3;15">
+		<text string="£15">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_188">
-		<text string="&#xA3;10">
+		<text string="£10">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_189">
-		<text string="&#xA3;6">
+		<text string="£6">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_190">
-		<text string="&#xA3;5">
+		<text string="£5">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_191">
-		<text string="&#xA3;4">
+		<text string="£4">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_192">
-		<text string="&#xA3;3">
+		<text string="£3">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_193">
-		<text string="&#xA3;2">
+		<text string="£2">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_194">
-		<text string="&#xA3;1.60">
+		<text string="£1.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_195">
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>

@@ -42,6 +42,8 @@
 #include "screen.h"
 
 
+namespace {
+
 #define SCREEN_TAG "screen"
 
 class st17xx_state : public driver_device
@@ -178,6 +180,9 @@ ROM_START( st1714 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_DWORD( "st1714.bin", 0x000000, 0x200000, CRC(08fc0a1b) SHA1(74dfd5595e1ab45fb9aff50a6c365fd9c9b33c33) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

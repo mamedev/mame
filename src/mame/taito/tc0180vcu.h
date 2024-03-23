@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_VIDEO_TC0180VCU_H
-#define MAME_VIDEO_TC0180VCU_H
+#ifndef MAME_TAITO_TC0180VCU_H
+#define MAME_TAITO_TC0180VCU_H
 
 #pragma once
 
@@ -32,8 +32,7 @@ public:
 
 	void tc0180vcu_memrw(address_map &map);
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -79,4 +78,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)
 
-#endif // MAME_VIDEO_TC0180VCU_H
+#endif // MAME_TAITO_TC0180VCU_H

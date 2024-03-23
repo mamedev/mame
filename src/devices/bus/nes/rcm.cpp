@@ -21,14 +21,12 @@
 #include "rcm.h"
 
 
-
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -97,7 +95,7 @@ nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char
 
 void nes_gs2015_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("gs2015 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("gs2015 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(offset);
 	chr8(offset >> 1, m_chr_source);
@@ -105,7 +103,7 @@ void nes_gs2015_device::write_h(offs_t offset, uint8_t data)
 
 uint8_t nes_gs2015_device::read_m(offs_t offset)
 {
-	LOG_MMC(("gs2015 read_m, offset: %04x\n", offset));
+	LOG("gs2015 read_m, offset: %04x\n", offset);
 	return 0;   // Videopoker Bonza needs this (sort of protection? or related to inputs?)
 }
 
@@ -123,13 +121,13 @@ uint8_t nes_gs2015_device::read_m(offs_t offset)
 
 u8 nes_gs2004_device::read_m(offs_t offset)
 {
-	LOG_MMC(("gs2004 read_m, offset: %04x\n", offset));
+	LOG("gs2004 read_m, offset: %04x\n", offset);
 	return m_prg[m_base + offset];    // fixed base differs per device
 }
 
 void nes_gs2004_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("gs2004 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("gs2004 write_h, offset: %04x, data: %02x\n", offset, data);
 	prg32(data);
 }
 
@@ -147,7 +145,7 @@ void nes_gs2004_device::write_h(offs_t offset, u8 data)
 
 void nes_tf9_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("tetrisfam write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("tetrisfam write_h, offset: %04x, data: %02x\n", offset, data);
 
 	u8 bank = (offset & 0x0f) << 1 | BIT(offset, 5);
 	u8 mode = !BIT(offset, 4);

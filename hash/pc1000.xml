@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pc1000" description="VTech PreComputer 1000 cartridges">
 	<software name="biblekno">
@@ -17,7 +17,7 @@ license:CC0
 
 	<software name="explor"> <!-- only working with PreComputer 1000 or MisterX -->
 		<description>Explorations</description>
-		<year>1988</year>
+		<year>1991</year>
 		<publisher>VTech</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
@@ -84,6 +84,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="speller" supported="no">
+		<description>Pre-Computer Speller</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-00867-000.ic1" size="0x20000" crc="71c54de1" sha1="9b0d253d286e6353c5e6113d07f5cfe4fe77d889" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sportstr">
 		<description>Sports Trivia</description>
 		<year>1988</year>
@@ -121,7 +132,7 @@ license:CC0
 
 	<software name="cgen2">     <!-- cart for Ordisavant -->
 		<description>Connaissances Generales II</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>VTech</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
@@ -132,7 +143,7 @@ license:CC0
 
 	<software name="encyclop">  <!-- cart for Ordisavant -->
 		<description>Encyclopedie</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>VTech</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">

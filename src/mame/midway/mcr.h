@@ -49,7 +49,8 @@ public:
 		m_squawk_n_talk(*this, "snt"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_backlight(*this, "backlight")
 	{ }
 
 	void mcr_control_port_w(uint8_t data);
@@ -140,6 +141,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
+	output_finder<> m_backlight;
 	uint32_t m_mcr_cpu_board = 0;
 	uint32_t m_mcr_sprite_board = 0;
 
@@ -197,8 +199,8 @@ public:
 		m_ipu_pio1(*this, "ipu_pio1")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
+	void sio_txda_w(int state);
+	void sio_txdb_w(int state);
 	void ipu_laserdisk_w(offs_t offset, uint8_t data);
 	uint8_t ipu_watchdog_r();
 	void ipu_watchdog_w(uint8_t data);

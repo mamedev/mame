@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_DC_CTRL_H
-#define MAME_MACHINE_DC_CTRL_H
+#ifndef MAME_SEGA_DC_CTRL_H
+#define MAME_SEGA_DC_CTRL_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 DECLARE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device)
 DECLARE_DEVICE_TYPE(DC_KEYBOARD, dc_keyboard_device)
 
-#endif // MAME_MACHINE_DC_CTRL_H
+#endif // MAME_SEGA_DC_CTRL_H

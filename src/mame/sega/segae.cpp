@@ -307,6 +307,8 @@ GND  8A 8B GND
 #include "speaker.h"
 
 
+namespace {
+
 class systeme_state : public driver_device
 {
 public:
@@ -1160,6 +1162,8 @@ ROM_START( megrescu )
 	ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-3.ic3",   0x20000, 0x08000, CRC(56e36f85) SHA1(84aa78bc628bce64b1b990a8c9fcca25e5940bd3) )
 	ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-2.ic2",   0x28000, 0x08000, CRC(5b74c767) SHA1(dbc82a4e046f01130c72bbd7a81190d7f0ca209c) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT    MACHINE            INPUT     STATE          INIT           MONITOR COMPANY         FULLNAME,FLAGS

@@ -20,7 +20,7 @@
 
 // ======================> ptm6840_device
 
-class ptm6840_device :  public device_t
+class ptm6840_device : public device_t
 {
 public:
 	// construction/destruction
@@ -43,14 +43,14 @@ public:
 	uint8_t read(offs_t offset);
 
 	void set_gate(int idx, int state);
-	DECLARE_WRITE_LINE_MEMBER( set_g1 ) { set_gate(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( set_g2 ) { set_gate(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( set_g3 ) { set_gate(2, state); }
+	void set_g1(int state) { set_gate(0, state); }
+	void set_g2(int state) { set_gate(1, state); }
+	void set_g3(int state) { set_gate(2, state); }
 
 	void set_clock(int idx, int state);
-	DECLARE_WRITE_LINE_MEMBER( set_c1 ) { set_clock(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( set_c2 ) { set_clock(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( set_c3 ) { set_clock(2, state); }
+	void set_c1(int state) { set_clock(0, state); }
+	void set_c2(int state) { set_clock(1, state); }
+	void set_c3(int state) { set_clock(2, state); }
 
 	void update_interrupts();
 

@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "machine/pic8259.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_ICW     (1U << 1)
 #define LOG_OCW     (1U << 2)
 
@@ -63,18 +62,15 @@ void pic8259_device::set_irq_line(int irq, int state)
 {
 	uint8_t mask = (1 << irq);
 
-	if (state)
+	if (state && !(m_irq_lines & mask))
 	{
 		/* setting IRQ line */
 		LOG("set_irq_line(): PIC set IR%d line\n", irq);
 
-		if(m_level_trig_mode || (!m_level_trig_mode && !(m_irq_lines & mask)))
-		{
-			m_irr |= mask;
-		}
+		m_irr |= mask;
 		m_irq_lines |= mask;
 	}
-	else
+	else if (!state && (m_irq_lines & mask))
 	{
 		/* clearing IRQ line */
 		LOG("set_irq_line(): PIC cleared IR%d line\n", irq);
@@ -99,7 +95,7 @@ uint8_t pic8259_device::acknowledge()
 			if (!machine().side_effects_disabled())
 			{
 				LOG("pic8259_acknowledge(): PIC acknowledge IR%d\n", m_current_level);
-				if (!m_level_trig_mode)
+				if (!m_level_trig_mode && (!m_master || !(m_slave & mask)))
 					m_irr &= ~mask;
 
 				if (!m_auto_eoi)
@@ -138,7 +134,7 @@ uint8_t pic8259_device::acknowledge()
 					LOG("pic8259_acknowledge(): PIC acknowledge IR%d\n", m_current_level);
 
 					uint8_t mask = 1 << m_current_level;
-					if (!m_level_trig_mode)
+					if (!m_level_trig_mode && (!m_master || !(m_slave & mask)))
 						m_irr &= ~mask;
 					m_isr |= mask;
 				}
@@ -199,7 +195,7 @@ uint8_t pic8259_device::read(offs_t offset)
 				{
 					data = 0x80 | m_current_level;
 
-					if (!m_level_trig_mode)
+					if (!m_level_trig_mode && (!m_master || !BIT(m_slave, m_current_level)))
 						m_irr &= ~(1 << m_current_level);
 
 					if (!m_auto_eoi)
@@ -246,6 +242,7 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 				m_imr                = 0x00;
 				m_isr                = 0x00;
 				m_irr                = 0x00;
+				m_slave              = 0x00;
 				m_level_trig_mode    = (data & 0x08) ? 1 : 0;
 				m_vector_size        = (data & 0x04) ? 1 : 0;
 				m_cascade            = (data & 0x02) ? 0 : 1;
@@ -263,6 +260,7 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 					/* write OCW3 */
 					LOGOCW("pic8259_device::write(): OCW3; data=0x%02X\n", data);
 
+					// TODO: special mask mode
 					m_ocw3 = data;
 				}
 				else if ((data & 0x18) == 0x00)
@@ -381,21 +379,6 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void pic8259_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_int_func.resolve_safe();
-	m_in_sp_func.resolve_safe(1);
-	m_read_slave_ack_func.resolve_safe(0);
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -471,8 +454,8 @@ DEFINE_DEVICE_TYPE(MK98PIC, mk98pic_device, "mk98pic", "Elektronika MK-98 PIC")
 pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_func(*this)
-	, m_in_sp_func(*this)
-	, m_read_slave_ack_func(*this)
+	, m_in_sp_func(*this, 1)
+	, m_read_slave_ack_func(*this, 0)
 	, m_irr(0)
 	, m_irq_lines(0)
 	, m_level_trig_mode(0)

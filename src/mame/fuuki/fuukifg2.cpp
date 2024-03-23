@@ -84,7 +84,7 @@ void fuuki16_state::sound_command_w(u8 data)
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 //      m_maincpu->spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
+	machine().scheduler().perfect_quantum(attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
 template<int Layer>
@@ -337,18 +337,6 @@ INPUT_PORTS_END
 //  graphics layouts
 //-------------------------------------------------
 
-/* 16x16x4 */
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(0,4) },
-	{ STEP16(0,16*4) },
-	16*16*4
-};
-
 /* 16x16x8 */
 static const gfx_layout layout_16x16x8 =
 {
@@ -362,7 +350,7 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_fuuki16 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,         0x400*0, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0x400*0, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,         0x400*1, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,   0x400*3, 0x40 ) // [2] Layer 2
 GFXDECODE_END
@@ -610,10 +598,35 @@ Mitsubishi M60067-0901FP 452100 (208pin PQFP, GA1)
 
 ***************************************************************************/
 
-ROM_START( pbancho )
+ROM_START( pbancho ) // ROMs NO1 & NO2 had an addition block dot on labels
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "no1..rom2", 0x000000, 0x080000, CRC(e607eca6) SHA1(be9156d2a336a04fb9ff147b0d0287d8ff2ccfc5) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "no2..rom1", 0x000001, 0x080000, CRC(ee15b423) SHA1(6da7ba9dd785dfcf919c030e126daf8d6750d072) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "no4.rom23", 0x00000, 0x20000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
+
+	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
+	ROM_LOAD16_WORD_SWAP( "58.rom20", 0x000000, 0x200000, CRC(4dad0a2e) SHA1(a4f70557503110a5457b9096a79a5f249095fa55) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
+	ROM_LOAD16_WORD_SWAP( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 )   /* 16x16x8 Tiles */
+	ROM_LOAD32_WORD_SWAP( "59.rom15", 0x000000, 0x200000, CRC(b83dcb70) SHA1(b0b9df451535d85612fa095b4f694cf2e7930bca) )
+	ROM_LOAD32_WORD_SWAP( "61.rom11", 0x000002, 0x200000, CRC(7f1213b9) SHA1(f8d6432b270c4d0954602e430ddd26841eb05656) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 )   /* 16x16x4 Tiles */
+	ROM_LOAD16_WORD_SWAP( "60.rom3",  0x000000, 0x200000, CRC(a50a3c1b) SHA1(a2b30f9f83f5dc2e069d7559aefbda9929fc640c) )    // ?maybe?
+
+	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "n03.rom25", 0x000000, 0x040000, CRC(a7bfb5ea) SHA1(61937eae4f8855bc09c494aff52d76d41dc3b76a) )
+ROM_END
+
+ROM_START( pbanchoa )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "no1.rom2", 0x000000, 0x080000, CRC(1b4fd178) SHA1(02cf3d2554b29cd253470d68ea959738f3b98dbe) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "no2,rom1", 0x000001, 0x080000, CRC(9cf510a5) SHA1(08e79b5bbd1c011c32f82dd15fba42d7898861be) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "no2.rom1", 0x000001, 0x080000, CRC(9cf510a5) SHA1(08e79b5bbd1c011c32f82dd15fba42d7898861be) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "no4.rom23", 0x00000, 0x20000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
@@ -642,4 +655,5 @@ ROM_END
 
 GAME( 1995, gogomile,  0,        fuuki16, gogomile,  fuuki16_state, empty_init, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, fuuki16_state, empty_init, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, pbancho,   0,        fuuki16, pbancho,   fuuki16_state, empty_init, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pbancho,   0,        fuuki16, pbancho,   fuuki16_state, empty_init, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan, set 1)",        MACHINE_SUPPORTS_SAVE ) // program ROMs had extra black dot on labels
+GAME( 1996, pbanchoa,  pbancho,  fuuki16, pbancho,   fuuki16_state, empty_init, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan, set 2)",        MACHINE_SUPPORTS_SAVE )

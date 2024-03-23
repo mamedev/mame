@@ -6,8 +6,8 @@
  * includes/vc4000.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_VC4000_H
-#define MAME_INCLUDES_VC4000_H
+#ifndef MAME_INTERTON_VC4000_H
+#define MAME_INTERTON_VC4000_H
 
 #pragma once
 
@@ -117,7 +117,7 @@ private:
 	uint8_t vc4000_key_r(offs_t offset);
 	uint8_t vc4000_video_r(offs_t offset);
 	void vc4000_video_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER(vc4000_vsync_r);
+	int vc4000_vsync_r();
 	uint8_t elektor_cass_r();
 	void elektor_cass_w(uint8_t data);
 	vc4000_video_t m_video;
@@ -168,4 +168,4 @@ private:
 	inline void vc4000_draw_grid(uint8_t *collision);
 };
 
-#endif // MAME_INCLUDES_VC4000_H
+#endif // MAME_INTERTON_VC4000_H

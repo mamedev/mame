@@ -47,6 +47,9 @@ to prevent disabling inputs.
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define KOIKOI_CRYSTAL 15468000
 
 static constexpr int input_tab[] = { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0x28, 0x21, 0x41, 0x82, 0x81, 0x42 };
@@ -431,6 +434,9 @@ ROM_START( koikoi )
 	ROM_LOAD( "pal16r8a_brown.ic11",   0x0600, 0x0104, CRC(fff46363) SHA1(97f673c862e9d5b12cac283000a779c465c76828) )
 	ROM_LOAD( "pal16r8a_red.ic10",     0x0800, 0x0104, CRC(027ad661) SHA1(fa5aafe6deb3a9865498152b92dd3776ea10a51d) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

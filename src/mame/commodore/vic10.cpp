@@ -23,6 +23,9 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
+
+namespace {
+
 #define MOS6566_TAG     "u2"
 #define MOS6581_TAG     "u6"
 #define MOS6526_TAG     "u9"
@@ -87,7 +90,7 @@ private:
 	uint8_t cpu_r();
 	void cpu_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
+	void exp_reset_w(int state);
 
 	void vic10_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
@@ -584,7 +587,7 @@ void vic10_state::cpu_w(uint8_t data)
 //  VIC10_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
+void vic10_state::exp_reset_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -711,6 +714,7 @@ ROM_START( vic10 )
 	ROM_LOAD( "6703.u4", 0x000, 0x100, NO_DUMP )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

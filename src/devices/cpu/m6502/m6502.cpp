@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6502.c
+    m6502.cpp
 
     MOS Technology 6502, original NMOS variant
 
@@ -29,30 +29,32 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 	cpu_device(mconfig, type, tag, owner, clock),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
-	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
-	inst_state(0), inst_substate(0), icount(0), nmi_state(false), irq_state(false), apu_irq_state(false), v_state(false), nmi_pending(false), irq_taken(false), sync(false), inhibit_interrupts(false)
+	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16),
+	mintf(nullptr),
+	uses_custom_memory_interface(false)
 {
 }
 
 void m6502_device::device_start()
 {
-	mintf = space(AS_PROGRAM).addr_width() > 14 ? std::make_unique<mi_default>() : std::make_unique<mi_default14>();
+	if(!uses_custom_memory_interface)
+		mintf = space(AS_PROGRAM).addr_width() > 14 ? std::make_unique<mi_default>() : std::make_unique<mi_default14>();
 
 	init();
 }
 
 void m6502_device::init()
 {
-	space(AS_PROGRAM).cache(mintf->cprogram);
-	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
-	if(space(AS_PROGRAM).addr_width() > 14)
-		space(AS_PROGRAM).specific(mintf->program);
-	else
-		space(AS_PROGRAM).specific(mintf->program14);
+	if(mintf) {
+		space(AS_PROGRAM).cache(mintf->cprogram);
+		space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
 
-	sync_w.resolve_safe();
-
-	XPC = 0;
+		// specific group 1-14 or 15-31
+		if(space(AS_PROGRAM).addr_width() > 14)
+			space(AS_PROGRAM).specific(mintf->program);
+		else
+			space(AS_PROGRAM).specific(mintf->program14);
+	}
 
 	state_add(STATE_GENPC,     "GENPC",     XPC).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     XPC).callexport().noshow();
@@ -89,6 +91,8 @@ void m6502_device::init()
 
 	set_icountptr(icount);
 
+	XPC = 0x0000;
+	PPC = 0x0000;
 	PC = 0x0000;
 	NPC = 0x0000;
 	A = 0x00;
@@ -118,10 +122,6 @@ void m6502_device::device_reset()
 	inst_state = STATE_RESET;
 	inst_substate = 0;
 	inst_state_base = 0;
-	irq_state = false;
-	nmi_state = false;
-	apu_irq_state = false;
-	v_state = false;
 	nmi_pending = false;
 	irq_taken = false;
 	sync = false;
@@ -147,7 +147,7 @@ uint32_t m6502_device::execute_input_lines() const noexcept
 
 bool m6502_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
-	return inputnum == NMI_LINE;
+	return inputnum == NMI_LINE || inputnum == V_LINE;
 }
 
 void m6502_device::do_adc_d(uint8_t val)
@@ -412,12 +412,12 @@ void m6502_device::execute_set_input(int inputnum, int state)
 	case IRQ_LINE: irq_state = state == ASSERT_LINE; break;
 	case APU_IRQ_LINE: apu_irq_state = state == ASSERT_LINE; break;
 	case NMI_LINE:
-		if(!nmi_state && state == ASSERT_LINE)
+		if(machine().time() > attotime::zero && !nmi_state && state == ASSERT_LINE)
 			nmi_pending = true;
 		nmi_state = state == ASSERT_LINE;
 		break;
 	case V_LINE:
-		if(!v_state && state == ASSERT_LINE)
+		if(machine().time() > attotime::zero && !v_state && state == ASSERT_LINE)
 			P |= F_V;
 		v_state = state == ASSERT_LINE;
 		break;
@@ -449,7 +449,9 @@ void m6502_device::state_import(const device_state_entry &entry)
 	case M6502_PC:
 		PC = NPC;
 		irq_taken = false;
-		prefetch();
+		prefetch_start();
+		IR = mintf->read_sync(PC);
+		prefetch_end();
 		PPC = NPC;
 		inst_state = IR | inst_state_base;
 		break;
@@ -480,12 +482,15 @@ void m6502_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-void m6502_device::prefetch()
+void m6502_device::prefetch_start()
 {
 	sync = true;
 	sync_w(ASSERT_LINE);
 	NPC = PC;
-	IR = mintf->read_sync(PC);
+}
+
+void m6502_device::prefetch_end()
+{
 	sync = false;
 	sync_w(CLEAR_LINE);
 
@@ -496,12 +501,8 @@ void m6502_device::prefetch()
 		PC++;
 }
 
-void m6502_device::prefetch_noirq()
+void m6502_device::prefetch_end_noirq()
 {
-	sync = true;
-	sync_w(ASSERT_LINE);
-	NPC = PC;
-	IR = mintf->read_sync(PC);
 	sync = false;
 	sync_w(CLEAR_LINE);
 	PC++;
@@ -560,68 +561,6 @@ uint8_t m6502_device::mi_default14::read(uint16_t adr)
 void m6502_device::mi_default14::write(uint16_t adr, uint8_t val)
 {
 	program14.write_byte(adr, val);
-}
-
-m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, type, tag, owner, clock)
-{
-}
-
-
-void m6502_mcu_device::recompute_bcount(uint64_t event_time)
-{
-	if(!event_time || event_time >= total_cycles() + icount) {
-		bcount = 0;
-		return;
-	}
-	bcount = total_cycles() + icount - event_time;
-}
-
-void m6502_mcu_device::execute_run()
-{
-	internal_update(total_cycles());
-
-	icount -= count_before_instruction_step;
-	if(icount < 0) {
-		count_before_instruction_step = -icount;
-		icount = 0;
-	} else
-		count_before_instruction_step = 0;
-
-	while(bcount && icount <= bcount)
-		internal_update(total_cycles() + icount - bcount);
-
-	if(icount > 0 && inst_substate)
-		do_exec_partial();
-
-	while(icount > 0) {
-		while(icount > bcount) {
-			if(inst_state < 0xff00) {
-				PPC = NPC;
-				inst_state = IR | inst_state_base;
-				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(NPC);
-			}
-			do_exec_full();
-		}
-		if(icount > 0)
-			while(bcount && icount <= bcount)
-				internal_update(total_cycles() + icount - bcount);
-		if(icount > 0 && inst_substate)
-			do_exec_partial();
-	}
-	if(icount < 0) {
-		count_before_instruction_step = -icount;
-		icount = 0;
-	}
-}
-
-void m6502_mcu_device::add_event(uint64_t &event_time, uint64_t new_event)
-{
-	if(!new_event)
-		return;
-	if(!event_time || event_time > new_event)
-		event_time = new_event;
 }
 
 

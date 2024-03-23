@@ -130,7 +130,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;
@@ -146,9 +146,9 @@ protected:
 
 	uint32_t m_r[/*NUM_REGS*/37];
 
-	void translate_insn_command(const std::vector<std::string> &params);
-	void translate_data_command(const std::vector<std::string> &params);
-	void translate_command(const std::vector<std::string> &params, int intention);
+	void translate_insn_command(const std::vector<std::string_view> &params);
+	void translate_data_command(const std::vector<std::string_view> &params);
+	void translate_command(const std::vector<std::string_view> &params, int intention);
 
 	void update_insn_prefetch(uint32_t curr_pc);
 	bool insn_fetch_thumb(uint32_t pc, uint32_t &out_insn);

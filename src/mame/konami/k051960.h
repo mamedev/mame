@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
-#ifndef MAME_VIDEO_K051960_H
-#define MAME_VIDEO_K051960_H
+#ifndef MAME_KONAMI_K051960_H
+#define MAME_KONAMI_K051960_H
 
 #pragma once
 
@@ -13,7 +13,7 @@ enum
 };
 
 
-#define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
+#define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, bool *shadow)
 
 
 class k051960_device : public device_t, public device_gfx_interface, public device_video_interface
@@ -26,7 +26,7 @@ class k051960_device : public device_t, public device_gfx_interface, public devi
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
 
 public:
-	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority, int *shadow)>;
+	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority, bool *shadow)>;
 
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -34,12 +34,11 @@ public:
 
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	auto vreg_contrast_handler() { return m_vreg_contrast_handler.bind(); }
-
 
 	// static configuration
 	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb.set(std::forward<T>(args)...); }
 	void set_plane_order(int order);
+	void set_shadow_inv(bool inv);
 
 	/*
 	The callback is passed:
@@ -84,16 +83,17 @@ private:
 	// TODO: is this even used by anything?
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
-	devcb_write_line m_vreg_contrast_handler;
 
-	uint8_t    m_spriterombank[3];
-	int      m_romoffset;
-	int      m_spriteflip, m_readroms;
-	int m_nmi_enabled;
+	uint8_t m_spriterombank[3];
+	uint8_t m_romoffset;
+	bool    m_spriteflip, m_readroms;
+	uint8_t m_shadow_config;
+	bool    m_inv_shadow;
+	bool    m_nmi_enabled;
 
 	int k051960_fetchromdata( int byte );
 };
 
 DECLARE_DEVICE_TYPE(K051960, k051960_device)
 
-#endif // MAME_VIDEO_K051960_H
+#endif // MAME_KONAMI_K051960_H

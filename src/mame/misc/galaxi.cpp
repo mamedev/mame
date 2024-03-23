@@ -44,6 +44,9 @@
 
 #include "galaxi.lh"
 
+
+namespace {
+
 #define CPU_CLOCK       (XTAL(10'000'000))
 #define SND_CLOCK       (XTAL(16'000'000))/16
 
@@ -70,8 +73,8 @@ public:
 	void lastfour(machine_config &config);
 	void magjoker(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ticket_r);
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int ticket_r();
+	int hopper_r();
 
 protected:
 	virtual void machine_start() override;
@@ -297,12 +300,12 @@ void galaxi_state::_500004_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	show_out();
 }
 
-READ_LINE_MEMBER(galaxi_state::ticket_r)
+int galaxi_state::ticket_r()
 {
 	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
-READ_LINE_MEMBER(galaxi_state::hopper_r)
+int galaxi_state::hopper_r()
 {
 	return m_hopper && !(m_screen->frame_number() % 10);
 }
@@ -589,6 +592,8 @@ ROM_START( lastfour )
 	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit ADPCM mono @ 6 kHz.*/
 	ROM_LOAD( "21.u38", 0x00000, 0x20000, CRC(e48523dd) SHA1(47bc2e5c2164b93d685fa134397845e0ed7aaa5f) )
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

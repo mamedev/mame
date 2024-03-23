@@ -1,17 +1,17 @@
 /** @file patest_stop.c
-	@ingroup test_src
-	@brief Test different ways of stopping audio.
+    @ingroup test_src
+    @brief Test different ways of stopping audio.
 
-	Test the three ways of stopping audio:
-		- calling Pa_StopStream(),
-		- calling Pa_AbortStream(),
-		- and returning a 1 from the callback function.
+    Test the three ways of stopping audio:
+        - calling Pa_StopStream(),
+        - calling Pa_AbortStream(),
+        - and returning a 1 from the callback function.
 
-	A long latency is set up so that you can hear the difference.
-	Then a simple 8 note sequence is repeated twice.
-	The program will print what you should hear.
+    A long latency is set up so that you can hear the difference.
+    Then a simple 8 note sequence is repeated twice.
+    The program will print what you should hear.
 
-	@author Phil Burk <philburk@softsynth.com>
+    @author Phil Burk <philburk@softsynth.com>
 */
 /*
  * $Id$
@@ -41,13 +41,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 #include <stdio.h>
@@ -96,7 +96,7 @@ int TestStopMode( paTestData *data );
 float LookupWaveform( paTestData *data, float phase );
 
 /******************************************************
- * Convert phase between 0.0 and 1.0 to waveform value 
+ * Convert phase between 0.0 and 1.0 to waveform value
  * using linear interpolation.
  */
 float LookupWaveform( paTestData *data, float phase )
@@ -132,7 +132,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
 
 
     /* data->outTime = outTime; */
-    
+
     if( !data->done )
     {
         for( i=0; i<framesPerBuffer; i++ )
@@ -184,7 +184,7 @@ int main(void)
     paTestData data;
     int i;
     float simpleTune[] = { NOTE_0, NOTE_1, NOTE_2, NOTE_3, NOTE_4, NOTE_3, NOTE_2, NOTE_1 };
-    
+
     printf("PortAudio Test: play song and test stopping. ask for %f seconds latency\n", LATENCY_SECONDS );
     /* initialise sinusoidal wavetable */
     for( i=0; i<TABLE_SIZE; i++ )
@@ -237,14 +237,14 @@ int TestStopMode( paTestData *data )
     PaStreamParameters outputParameters;
     PaStream *stream;
     PaError err;
-    
+
     data->done = 0;
     data->phase = 0.0;
     data->frameCounter = 0;
     data->noteCounter = 0;
     data->repeatCounter = 0;
     data->phase_increment = data->tune[data->noteCounter];
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
@@ -257,7 +257,7 @@ int TestStopMode( paTestData *data )
     outputParameters.sampleFormat = paFloat32;  /* 32 bit floating point output */
     outputParameters.suggestedLatency = LATENCY_SECONDS;
     outputParameters.hostApiSpecificStreamInfo = NULL;
-    
+
     err = Pa_OpenStream(
               &stream,
               NULL, /* no input */
@@ -317,7 +317,7 @@ int TestStopMode( paTestData *data )
 
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

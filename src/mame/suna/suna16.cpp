@@ -1171,7 +1171,7 @@ ROM_END
 
 /***************************************************************************
 
-                            [ Ultra Ballon ]
+                            [ Ultra Balloon ]
 KRB-0033A
 +------------------------------------+
 | VOL    Z80B    Z80B 14.318MHz 32MHz|
@@ -1200,7 +1200,7 @@ Other: 8 position dipswitch bank x 2
        JP2 & JP3 jumper pads
        VOL volume pot
 
-Roms had no labels and were asigned names by the original dumper.
+ROMs had no labels and were assigned names by the original dumper.
 
 prg1.rom1      27c040
 prg2.rom2      27c040

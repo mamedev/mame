@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Info Taken from here: http://www.samdal.com/SVIDOCS/SVI_Softwares_for_SVI318-328.pdf
                       http://www.samdal.com/svsoftware.htm
@@ -695,7 +695,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="ppatrola" cloneof="ppatrol">
-		<description>Planet Patrol (Alt)</description>
+		<description>Planet Patrol (alt)</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 		<info name="serial" value="SD-669T" />
@@ -840,7 +840,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="ffreddya" cloneof="ffreddy">
-		<description>Frantic Freddy (Alt)</description>
+		<description>Frantic Freddy (alt)</description>
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
 		<info name="serial" value="SD-232C" />
@@ -884,7 +884,7 @@ Ballonies (198x)
 
 
 	<software name="assiduit">
-		<description>Assiduity (Ger)</description>
+		<description>Assiduity (Germany)</description>
 		<year>1984</year>
 		<publisher>Lars Lewejohann</publisher>
 
@@ -920,7 +920,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="deklarat">
-		<description>Deklarations-Program (Swe)</description>
+		<description>Deklarations-Program (Sweden)</description>
 		<year>1985</year>
 		<publisher>Gite Sundberg</publisher>
 
@@ -944,7 +944,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="diamond">
-		<description>Diamond Luis I (Cracked by Morgoth)</description>
+		<description>Diamond Luis I (cracked by Morgoth)</description>
 		<year>1986</year>
 		<publisher>Ikesoft</publisher>
 
@@ -956,7 +956,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="diamoned">
-		<description>Diamond Luis Editor (Fin)</description>
+		<description>Diamond Luis Editor (Finland)</description>
 		<year>1986</year>
 		<publisher>Ikesoft</publisher>
 
@@ -980,7 +980,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="flipman">
-		<description>Flipper Man (Nor)</description>
+		<description>Flipper Man (Norway)</description>
 		<year>1984</year>
 		<publisher>Computerworld - Mikrodata</publisher>
 
@@ -1016,7 +1016,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hollow">
-		<description>Hollow (Ger)</description>
+		<description>Hollow (Germany)</description>
 		<year>1984</year>
 		<publisher>Lars Lewejohann</publisher>
 
@@ -1052,7 +1052,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="labyx">
-		<description>LABYX (Nor)</description>
+		<description>LABYX (Norway)</description>
 		<year>1985</year>
 		<publisher>Hjemmedata Magazine</publisher>
 
@@ -1076,7 +1076,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="megalonea" cloneof="megalone">
-		<description>Megalone (Alt)</description>
+		<description>Megalone (alt)</description>
 		<year>1986</year>
 		<publisher>JD Team</publisher>
 
@@ -1136,7 +1136,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="muscmntra" cloneof="muscmntr">
-		<description>Music Mentor (Cracked by Hacke)</description>
+		<description>Music Mentor (cracked by Hacke)</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 
@@ -1172,7 +1172,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="pogostic">
-		<description>Pogo Stick (Ger)</description>
+		<description>Pogo Stick (Germany)</description>
 		<year>1985</year>
 		<publisher>Choice Software</publisher>
 
@@ -1208,7 +1208,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="struggle">
-		<description>Struggle for Livelihood (Ger)</description>
+		<description>Struggle for Livelihood (Germany)</description>
 		<year>1985</year>
 		<publisher>Choice Software</publisher>
 
@@ -1249,7 +1249,7 @@ Ballonies (198x)
 	<!-- Where these unofficial? Who sold them? -->
 
 	<software name="alien8">
-		<description>Alien 8 (MSX Conversion)</description>
+		<description>Alien 8 (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Ultimate Play the Game</publisher>
 
@@ -1261,7 +1261,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="arkanoid">
-		<description>Arkanoid (MSX Conversion)</description>
+		<description>Arkanoid (MSX conversion)</description>
 		<year>1986</year>
 		<publisher>Taito</publisher>
 
@@ -1273,7 +1273,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="cpk">
-		<description>Cabbage Patch Kids (MSX Conversion)</description>
+		<description>Cabbage Patch Kids (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 716" />
@@ -1286,7 +1286,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="circusc">
-		<description>Circus Charlie (MSX Conversion)</description>
+		<description>Circus Charlie (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 712" />
@@ -1299,7 +1299,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="comicbak">
-		<description>Comic Bakery (MSX Conversion)</description>
+		<description>Comic Bakery (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 714" />
@@ -1312,7 +1312,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="goonies">
-		<description>The Goonies (MSX Conversion)</description>
+		<description>The Goonies (MSX conversion)</description>
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 724" />
@@ -1325,7 +1325,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="gooniesa" cloneof="goonies">
-		<description>The Goonies (MSX Conversion, Alt)</description>
+		<description>The Goonies (MSX conversion, alt)</description>
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 724" />
@@ -1338,7 +1338,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="gunfrght">
-		<description>Gun Fright (MSX Conversion)</description>
+		<description>Gun Fright (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Ultimate Play The Game</publisher>
 
@@ -1350,7 +1350,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hero">
-		<description>H.E.R.O. (MSX Conversion)</description>
+		<description>H.E.R.O. (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 
@@ -1362,7 +1362,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hobbit">
-		<description>The Hobbit (MSX Conversion)</description>
+		<description>The Hobbit (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Melbourne House</publisher>
 
@@ -1374,7 +1374,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hyperol">
-		<description>Hyper Olympic 1 (MSX Conversion)</description>
+		<description>Hyper Olympic 1 (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 710" />
@@ -1387,7 +1387,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hyperol2">
-		<description>Hyper Olympic 2 (MSX Conversion)</description>
+		<description>Hyper Olympic 2 (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 711" />
@@ -1400,7 +1400,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hprrlly">
-		<description>Hyper Rally (MSX Conversion)</description>
+		<description>Hyper Rally (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 718" />
@@ -1413,7 +1413,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hyperspt">
-		<description>Hyper Sports 1 (MSX Conversion)</description>
+		<description>Hyper Sports 1 (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 715" />
@@ -1426,7 +1426,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="hypersp2">
-		<description>Hyper Sports 2 (MSX Conversion)</description>
+		<description>Hyper Sports 2 (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 717" />
@@ -1439,7 +1439,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="ik">
-		<description>International Karate (MSX Conversion)</description>
+		<description>International Karate (MSX conversion)</description>
 		<year>1986</year>
 		<publisher>Endurance Games - Darksloke</publisher>
 
@@ -1451,7 +1451,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="jacknip2">
-		<description>Jack the Nipper II - In Coconut Capers (MSX Conversion, Trained)</description>
+		<description>Jack the Nipper II - In Coconut Capers (MSX conversion, trained)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
 
@@ -1463,7 +1463,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="knightmr">
-		<description>Knightmare (MSX Conversion)</description>
+		<description>Knightmare (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 717" />
@@ -1476,7 +1476,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="baseball">
-		<description>Konami's Baseball (MSX Conversion)</description>
+		<description>Konami's Baseball (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 724" />
@@ -1489,7 +1489,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="boxing">
-		<description>Konami's Boxing (MSX Conversion)</description>
+		<description>Konami's Boxing (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 736" />
@@ -1502,7 +1502,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="pingpong">
-		<description>Konami's Ping Pong (MSX Conversion)</description>
+		<description>Konami's Ping Pong (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 731" />
@@ -1515,7 +1515,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="soccer">
-		<description>Konami's Soccer (MSX Conversion)</description>
+		<description>Konami's Soccer (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 732" />
@@ -1528,7 +1528,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="tennis">
-		<description>Konami's Tennis (MSX Conversion)</description>
+		<description>Konami's Tennis (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 720" />
@@ -1541,7 +1541,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="mgcltree">
-		<description>Magical Tree (MSX Conversion)</description>
+		<description>Magical Tree (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 713" />
@@ -1554,7 +1554,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="mopirngr">
-		<description>Mopi Ranger (MSX Conversion)</description>
+		<description>Mopi Ranger (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 728" />
@@ -1567,7 +1567,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="mrdo">
-		<description>Mr. Do (MSX Conversion)</description>
+		<description>Mr. Do (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Nippon Columbia</publisher>
 
@@ -1579,7 +1579,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="punchy">
-		<description>Punchy (MSX Conversion)</description>
+		<description>Punchy (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Mr. Micro</publisher>
 
@@ -1591,7 +1591,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="rambo3">
-		<description>Rambo III (MSX Conversion)</description>
+		<description>Rambo III (MSX conversion)</description>
 		<year>1988</year>
 		<publisher>Ocean Software - Mr. Haward</publisher>
 
@@ -1603,7 +1603,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="rambo3a" cloneof="rambo3">
-		<description>Rambo III (MSX Conversion, Alt)</description>
+		<description>Rambo III (MSX conversion, alt)</description>
 		<year>1988</year>
 		<publisher>Ocean Software - Mr. Haward</publisher>
 
@@ -1615,7 +1615,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="roadfght">
-		<description>Road Fighter (MSX Conversion)</description>
+		<description>Road Fighter (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 730" />
@@ -1628,7 +1628,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="robocop">
-		<description>Robocop (MSX Conversion)</description>
+		<description>Robocop (MSX conversion)</description>
 		<year>1988</year>
 		<publisher>Ocean Software - Mr. Haward</publisher>
 
@@ -1640,7 +1640,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="skyjag">
-		<description>Sky Jaguar (MSX Conversion)</description>
+		<description>Sky Jaguar (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 721" />
@@ -1653,7 +1653,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="timetrax">
-		<description>Time Trax (MSX Conversion)</description>
+		<description>Time Trax (MSX conversion)</description>
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
 
@@ -1665,7 +1665,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="trackfld">
-		<description>Track and Field 1 (MSX Conversion)</description>
+		<description>Track and Field 1 (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 710" />
@@ -1678,7 +1678,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="yiear1">
-		<description>Yie Ar Kung-Fu (MSX Conversion)</description>
+		<description>Yie Ar Kung-Fu (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 725" />
@@ -1691,7 +1691,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="yiear2">
-		<description>Yie Ar Kung-Fu II - The Emperor Yie-Gah (MSX Conversion)</description>
+		<description>Yie Ar Kung-Fu II - The Emperor Yie-Gah (MSX conversion)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RC 737" />
@@ -1704,7 +1704,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="zaklwood">
-		<description>Zakil Wood (MSX Conversion)</description>
+		<description>Zakil Wood (MSX conversion)</description>
 		<year>1984</year>
 		<publisher>Mr. Micro</publisher>
 
@@ -1720,7 +1720,7 @@ Ballonies (198x)
 	<!-- ColecoVision Conversions -->
 
 	<software name="cavenger">
-		<description>Cosmic Avenger (ColecoVision Conversion)</description>
+		<description>Cosmic Avenger (ColecoVision conversion)</description>
 		<year>1982</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1732,7 +1732,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="cpk_col">
-		<description>Cabbage Patch Kids (ColecoVision Conversion)</description>
+		<description>Cabbage Patch Kids (ColecoVision conversion)</description>
 		<year>1984</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1744,7 +1744,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="decathln">
-		<description>Decathlon (ColecoVision Conversion)</description>
+		<description>Decathlon (ColecoVision conversion)</description>
 		<year>1984</year>
 		<publisher>Activision - Buggy Software</publisher>
 
@@ -1756,7 +1756,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="dkong">
-		<description>Donkey Kong (ColecoVision Conversion)</description>
+		<description>Donkey Kong (ColecoVision conversion)</description>
 		<year>1982</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1768,7 +1768,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="apshai">
-		<description>Gateway to Apshai (ColecoVision Conversion)</description>
+		<description>Gateway to Apshai (ColecoVision conversion)</description>
 		<year>1984</year>
 		<publisher>Epyx - Buggy Software</publisher>
 
@@ -1780,7 +1780,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="looping">
-		<description>Looping (ColecoVision Conversion)</description>
+		<description>Looping (ColecoVision conversion)</description>
 		<year>1983</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1792,7 +1792,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="mtrap">
-		<description>Mouse Trap (ColecoVision Conversion)</description>
+		<description>Mouse Trap (ColecoVision conversion)</description>
 		<year>1983</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1804,7 +1804,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="pepper2">
-		<description>Pepper 2 (ColecoVision Conversion)</description>
+		<description>Pepper 2 (ColecoVision conversion)</description>
 		<year>1983</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1816,7 +1816,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="smurf">
-		<description>Smurf Rescue in Gargamel's Castle (ColecoVision Conversion)</description>
+		<description>Smurf Rescue in Gargamel's Castle (ColecoVision conversion)</description>
 		<year>1983</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1828,7 +1828,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="wargames">
-		<description>War Games (ColecoVision Conversion)</description>
+		<description>War Games (ColecoVision conversion)</description>
 		<year>1984</year>
 		<publisher>Buggy Software</publisher>
 
@@ -1840,7 +1840,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="zaxxon">
-		<description>Zaxxon (ColecoVision Conversion)</description>
+		<description>Zaxxon (ColecoVision conversion)</description>
 		<year>1982</year>
 		<publisher>Buggy Software</publisher>
 
@@ -2574,7 +2574,7 @@ Ballonies (198x)
 	<!-- BASIC Collections -->
 
 	<software name="basicc01">
-		<description>BASIC Collection 01 (Swe)</description>
+		<description>BASIC Collection 01 (Sweden)</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2586,7 +2586,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="basicc02">
-		<description>BASIC Collection 02 (Swe)</description>
+		<description>BASIC Collection 02 (Sweden)</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2598,7 +2598,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="basicc03">
-		<description>BASIC Collection 03 (Swe)</description>
+		<description>BASIC Collection 03 (Sweden)</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2610,7 +2610,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="basicc04">
-		<description>BASIC Collection 04 (Swe)</description>
+		<description>BASIC Collection 04 (Sweden)</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2622,7 +2622,7 @@ Ballonies (198x)
 	</software>
 
 	<software name="basicc05">
-		<description>BASIC Collection 05 (Swe)</description>
+		<description>BASIC Collection 05 (Sweden)</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2634,5 +2634,19 @@ Ballonies (198x)
 	</software>
 
 
+	<!-- Typed in from the Magazine "PC and Office Technology", issue December 1984 -->
+	<!-- See https://archive.org/details/blastar-elon-musk-spectravideo -->
+	<software name="blastar">
+		<description>Blastar</description>
+		<year>1984</year>
+		<publisher>PC and Office Technology</publisher>
+		<info name="author" value="Elon Musk" />
+		<info name="usage" value="Load with CLOAD, enter RUN to start" />
+		<part name="cass1" interface="svi318_cass">
+			<dataarea name="cass" size="1996054">
+				<rom name="blastar.wav" size="1996054" crc="3070219e" sha1="bb649d21c65db02fd5556591575f5c87a615046d" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

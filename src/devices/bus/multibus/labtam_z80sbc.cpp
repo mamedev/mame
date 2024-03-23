@@ -88,11 +88,16 @@ labtam_z80sbc_device::labtam_z80sbc_device(machine_config const &mconfig, char c
 }
 
 ROM_START(labtam_z80sbc)
+	ROM_SYSTEM_BIOS(0, "c85", "Version C85")
+	ROM_SYSTEM_BIOS(1, "a85", "Version A85")
+
 	ROM_REGION(0x2000, "eprom0", 0)
-	ROM_LOAD("z80_boot__a85_0.u59", 0x0000, 0x2000, CRC(4453c938) SHA1(b04987a07ff7e21f7eb354162ad14b59d17096dd))
+	ROMX_LOAD("z80_boot__c85_0.u59", 0x0000, 0x2000, CRC(472b39ad) SHA1(689c194dee29f895fb4f3e901adab3267e0e2823), ROM_BIOS(0))
+	ROMX_LOAD("z80_boot__a85_0.u59", 0x0000, 0x2000, CRC(4453c938) SHA1(b04987a07ff7e21f7eb354162ad14b59d17096dd), ROM_BIOS(1))
 
 	ROM_REGION(0x2000, "eprom1", 0)
-	ROM_LOAD("z80_boot__a85_1.u53", 0x0000, 0x2000, CRC(b7d489ea) SHA1(5bd6f3dd1c1f6f3e07706293bfc46a9bfc43d1f2))
+	ROMX_LOAD("z80_boot__c85_1.u53", 0x0000, 0x2000, CRC(8cb2374d) SHA1(20f6ec9ba9c8fb453f6497ffa0fb1dc3611e7d7f), ROM_BIOS(0))
+	ROMX_LOAD("z80_boot__a85_1.u53", 0x0000, 0x2000, CRC(b7d489ea) SHA1(5bd6f3dd1c1f6f3e07706293bfc46a9bfc43d1f2), ROM_BIOS(1))
 ROM_END
 
 static INPUT_PORTS_START(labtam_z80sbc)
@@ -252,13 +257,13 @@ void labtam_z80sbc_device::device_reset()
 		u32 const ram1_select = m_e15[3]->read();
 
 		m_bus->space(AS_PROGRAM).install_ram(ram0_select, ram0_select | 0xffff, m_ram0.get());
-		m_bus->space(AS_PROGRAM).install_ram(ram1_select, ram1_select | 0xffff, m_ram0.get());
+		m_bus->space(AS_PROGRAM).install_ram(ram1_select, ram1_select | 0xffff, m_ram1.get());
 
 		u16 const pio_select = m_e15[2]->read() | m_e15[1]->read() | m_e15[0]->read();
 
 		m_bus->space(AS_IO).install_write_handler(pio_select | 0, pio_select | 0, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcclr_w)));
 		m_bus->space(AS_IO).install_write_handler(pio_select | 2, pio_select | 2, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::netclr_w)));
-		m_bus->space(AS_IO).install_write_handler(pio_select | 4, pio_select | 4, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcattn_w)));
+		m_bus->space(AS_IO).install_write_handler(pio_select | 4, pio_select | 4, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcatn_w)));
 		m_bus->space(AS_IO).install_read_handler(pio_select | 8, pio_select | 8, read8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcstatus_r)));
 
 		m_installed = true;
@@ -276,6 +281,7 @@ static void z80sbc_floppies(device_slot_interface &device)
 {
 	device.option_add("dssd5", FLOPPY_525_SD);
 	device.option_add("dsdd5", FLOPPY_525_DD);
+	device.option_add("dshd5", FLOPPY_525_HD);
 	device.option_add("dssd8", FLOPPY_8_DSSD);
 	device.option_add("dsdd8", FLOPPY_8_DSDD);
 }
@@ -333,7 +339,7 @@ void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 	m_uic->out_int_callback().set(m_int, FUNC(input_merger_any_high_device::in_w<3>));
 
 	WD2793(config, m_fdc, 2'000'000);
-	m_fdc->intrq_wr_callback().set(FUNC(labtam_z80sbc_device::fdcint_w));
+	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w));
 	m_fdc->drq_wr_callback().set(m_dma[0], FUNC(z80dma_device::rdy_w));
 
 	// WD1002 irq -> Am9519 ireq3
@@ -363,8 +369,8 @@ void labtam_z80sbc_device::cpu_mem(address_map &map)
 
 void labtam_z80sbc_device::cpu_pio(address_map &map)
 {
-	map(0x0000, 0x0000).lw8([this](u8 data) { LOG("fdcset 0x%02x (%s)\n", data, machine().describe_context()); }, "fdcset");
-	//map(0x0008, 0x0008); // TODO: serset: set sio interrupt
+	map(0x0000, 0x0000).mirror(0xff00).lw8([this](u8 data) { LOG("fdcset 0x%02x (%s)\n", data, machine().describe_context()); m_fdcstatus |= 0x01; int_w<3>(0); }, "fdcset");
+	map(0x0008, 0x0008).mirror(0xff00).lw8([this](u8 data) { LOG("serset 0x%02x (%s)\n", data, machine().describe_context()); m_fdcstatus |= 0x02; }, "serset");
 
 	map(0x0010, 0x0010).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_lo[offset >> 8] = data; }, "mapwr0");
 	map(0x0018, 0x0018).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_hi[offset >> 8] = data & 0xf0; }, "mapwr1");
@@ -515,17 +521,6 @@ void labtam_z80sbc_device::mapnum_w(u8 data)
 	m_map_num = data & 0x07;
 }
 
-void labtam_z80sbc_device::fdcint_w(int state)
-{
-	if (state)
-		m_fdcstatus |= 1U << 0;
-	else
-		m_fdcstatus &= ~(1U << 0);
-
-	m_uic->ireq2_w(state);
-	int_w<3>(state);
-}
-
 void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
 {
 	switch (offset)
@@ -569,23 +564,27 @@ void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
 
 void labtam_z80sbc_device::fdcclr_w(u8 data)
 {
-	m_uic->ireq4_w(0);
+	LOG("fdcclr 0x%02x (%s)\n", data, machine().describe_context());
+	m_fdcstatus &= ~0x01;
+	int_w<3>(1);
 }
 
 void labtam_z80sbc_device::netclr_w(u8 data)
 {
-	LOG("netclr_w 0x%02x (%s)\n", data, machine().describe_context());
+	LOG("netclr 0x%02x (%s)\n", data, machine().describe_context());
+	m_fdcstatus &= ~0x02;
 }
 
-void labtam_z80sbc_device::fdcattn_w(u8 data)
+void labtam_z80sbc_device::fdcatn_w(u8 data)
 {
-	LOG("fdcattn_w 0x%02x (%s)\n", data, machine().describe_context());
+	LOG("fdcatn 0x%02x (%s)\n", data, machine().describe_context());
 	m_uic->ireq4_w(1);
+	m_uic->ireq4_w(0);
 }
 
 u8 labtam_z80sbc_device::fdcstatus_r()
 {
-	LOG("fdcstatus_r (%s)\n", machine().describe_context());
+	LOG("fdcstatus (%s)\n", machine().describe_context());
 	return m_fdcstatus;
 }
 

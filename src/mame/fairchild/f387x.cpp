@@ -12,6 +12,8 @@
 #include "machine/f3853.h"
 
 
+namespace {
+
 class f387x_state : public driver_device
 {
 public:
@@ -169,5 +171,8 @@ ROM_START(f387x)
 	ROM_LOAD("pepbug.u16", 0x0000, 0x0800, CRC(de05ac6d) SHA1(220281a7016aae785417bbfe8383c76f72f8fac2))
 	// 2716 sockets at U14 and U15 are not populated
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1979, f387x, 0, 0, f387x, f387x, f387x_state, empty_init, "Fairchild Instrument & Camera Corporation", "F387X PEP System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

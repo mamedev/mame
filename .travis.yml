@@ -12,7 +12,8 @@ addons:
     - libasound2-dev
     - libxinerama-dev
     - libxi-dev
-    - qt5-default
+    - qtbase5-dev
+    - qtbase5-dev-tools
     update: true
 jobs:
   include:

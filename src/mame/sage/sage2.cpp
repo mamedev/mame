@@ -211,7 +211,7 @@ void sage2_state::ppi0_pc_w(uint8_t data)
 //  I8255A INTERFACE( ppi1_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_ack)
+void sage2_state::write_centronics_ack(int state)
 {
 	if (!state)
 	{
@@ -219,22 +219,22 @@ WRITE_LINE_MEMBER(sage2_state::write_centronics_ack)
 	}
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_busy)
+void sage2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_perror)
+void sage2_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_select)
+void sage2_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_fault)
+void sage2_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
@@ -323,13 +323,13 @@ void sage2_state::ppi1_pc_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( sage2_state::br1_w )
+void sage2_state::br1_w(int state)
 {
 	m_usart0->write_txc(state);
 	m_usart0->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( sage2_state::br2_w )
+void sage2_state::br2_w(int state)
 {
 	m_usart1->write_txc(state);
 	m_usart1->write_rxc(state);
@@ -349,7 +349,7 @@ void sage2_state::update_fdc_int()
 	m_maincpu->set_input_line(M68K_IRQ_6, m_fdie && m_fdc_int);
 }
 
-WRITE_LINE_MEMBER( sage2_state::fdc_irq )
+void sage2_state::fdc_irq(int state)
 {
 	m_fdc_int = state;
 	update_fdc_int();

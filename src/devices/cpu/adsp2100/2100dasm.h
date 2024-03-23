@@ -35,8 +35,8 @@ private:
 	static const char *const shift_by_op[];
 	static const char *const constants[];
 
-	void alumac(std::ostream &stream, int dest, int op);
-	void aluconst(std::ostream &stream, int dest, int op);
+	void alumac(std::ostream &stream, int dest, uint32_t op);
+	void aluconst(std::ostream &stream, int dest, uint32_t op);
 
 };
 

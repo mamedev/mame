@@ -212,7 +212,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int prio);
 
 	void brkthru_main_map(address_map &map);
@@ -220,8 +220,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-
-// video
 
 
 /***************************************************************************
@@ -431,8 +429,6 @@ uint32_t brkthru_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -740,7 +736,7 @@ void brkthru_state::machine_reset()
 	m_nmi_mask = 0;
 }
 
-WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
+void brkthru_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

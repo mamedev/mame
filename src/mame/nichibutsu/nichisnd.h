@@ -6,15 +6,11 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_NICHISND_H
-#define MAME_AUDIO_NICHISND_H
+#ifndef MAME_NICHIBUTSU_NICHISND_H
+#define MAME_NICHIBUTSU_NICHISND_H
 
 #pragma once
 
-#include "cpu/z80/tmpz84c011.h"
-#include "sound/dac.h"
-#include "sound/ymopl.h"
-#include "speaker.h"
 #include "machine/gen_latch.h"
 
 
@@ -37,8 +33,7 @@ public:
 	void nichisnd_map(address_map &map);
 
 protected:
-	// device-level overrides
-	//virtual void device_validity_check(validity_checker &valid) const override;
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -52,15 +47,7 @@ private:
 	void soundbank_w(uint8_t data);
 };
 
-
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(NICHISND, nichisnd_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-#endif // MAME_MACHINE_NICHISND_H
+#endif // MAME_NICHIBUTSU_NICHISND_H

@@ -1,7 +1,7 @@
 // UserInputUtils.h
 
-#ifndef __USER_INPUT_UTILS_H
-#define __USER_INPUT_UTILS_H
+#ifndef ZIP7_INC_USER_INPUT_UTILS_H
+#define ZIP7_INC_USER_INPUT_UTILS_H
 
 #include "../../../Common/StdOutStream.h"
 
@@ -14,11 +14,14 @@ enum EEnum
   kYesAll,
   kNoAll,
   kAutoRenameAll,
-  kQuit
+  kQuit,
+  kEof,
+  kError
 };
 }
 
 NUserAnswerMode::EEnum ScanUserYesNoAllQuit(CStdOutStream *outStream);
-UString GetPassword(CStdOutStream *outStream);
+// bool GetPassword(CStdOutStream *outStream, UString &psw);
+HRESULT GetPassword_HRESULT(CStdOutStream *outStream, UString &psw);
 
 #endif

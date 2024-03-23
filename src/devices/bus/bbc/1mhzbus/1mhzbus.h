@@ -112,11 +112,11 @@ public:
 	virtual uint8_t jim_r(offs_t offset);
 	virtual void jim_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
 
 	device_bbc_1mhzbus_interface *m_card;
@@ -140,7 +140,7 @@ public:
 protected:
 	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_1mhzbus_slot_device *m_slot;
+	bbc_1mhzbus_slot_device *const m_slot;
 };
 
 

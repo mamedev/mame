@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_MACHINE_NAMCOIO_H
-#define MAME_MACHINE_NAMCOIO_H
+#ifndef MAME_NAMCO_NAMCOIO_H
+#define MAME_NAMCO_NAMCOIO_H
 
 
 /***************************************************************************
@@ -17,8 +17,8 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	WRITE_LINE_MEMBER( set_reset_line );
-	READ_LINE_MEMBER( read_reset_line );
+	void set_reset_line(int state);
+	int read_reset_line();
 
 	virtual void customio_run() = 0;
 
@@ -89,4 +89,4 @@ DECLARE_DEVICE_TYPE(NAMCO_56XX, namco56xx_device)
 DECLARE_DEVICE_TYPE(NAMCO_58XX, namco58xx_device)
 DECLARE_DEVICE_TYPE(NAMCO_59XX, namco59xx_device)
 
-#endif // MAME_MACHINE_NAMCOIO_H
+#endif // MAME_NAMCO_NAMCOIO_H

@@ -61,6 +61,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "formats/flopimg.h"
+
 
 /* Read/Write Handlers */
 
@@ -339,7 +341,7 @@ void xerox820ii_state::rdpio_pb_w(uint8_t data)
 	// TODO: LS74 Q
 }
 
-WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
+void xerox820ii_state::rdpio_pardy_w(int state)
 {
 	// TODO
 }
@@ -378,10 +380,10 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 
 QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 
 	m_view.select(0);
 
@@ -389,7 +391,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, std::string());
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -398,7 +400,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -409,7 +411,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);   // start program
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -433,14 +435,14 @@ void xerox820_state::update_nmi()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_intrq_w )
+void xerox820_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
+void xerox820_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
@@ -880,7 +882,6 @@ ROM_START( x820ii )
 
 	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(6) )
 	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(6) )
-
 ROM_END
 
 ROM_START( x168 )
@@ -917,6 +918,13 @@ ROM_START( mk83 )
 	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )
 ROM_END
 
+ROM_START( mojmikro )
+	ROM_REGION( 0x2000, Z80_TAG, 0 )
+	ROM_LOAD( "mikro-s.u67", 0x0000, 0x0800, CRC(56a329a8) SHA1(22a5d6bef121d14eddc0c25e85b8a73f6ca6a65f))
+	ROM_REGION( 0x0800, "chargen", ROMREGION_ERASEFF ) // MMSCHAR YU 8.1.1987
+	ROM_LOAD( "mmschar-yu.u73", 0x0000, 0x0800, CRC(ebcc72d3) SHA1(1c3f90b1d2e57586dcd32385d0aaa09e56662e32))
+ROM_END
+
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY                       FULLNAME        FLAGS
@@ -926,3 +934,4 @@ COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   
 COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
 COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
 COMP( 1983, mk83,     bigboard, 0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, mojmikro, bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "<unknown>",                  "Moj mikro Slovenija",  MACHINE_NOT_WORKING )

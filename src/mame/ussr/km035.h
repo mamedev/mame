@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef MAME_MACHINE_KM035_H
-#define MAME_MACHINE_KM035_H
+#ifndef MAME_USSR_KM035_H
+#define MAME_USSR_KM035_H
 
 #pragma once
 
@@ -24,7 +24,7 @@ public:
 	auto tx_handler() { return m_tx_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
+	void write_rxd(int state);
 
 	void km035_map(address_map &map);
 
@@ -58,4 +58,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(KM035, km035_device)
 
-#endif // MAME_MACHINE_KM035_H
+#endif // MAME_USSR_KM035_H

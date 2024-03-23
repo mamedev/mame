@@ -177,7 +177,7 @@ void lynx_sound_device::init()
 void lynx_sound_device::device_start()
 {
 	m_mixer_channel = stream_alloc(0, 1, clock() / 16);
-	m_timer_delegate.resolve();
+	m_timer_delegate.resolve_safe();
 	init();
 	register_save();
 }
@@ -186,7 +186,7 @@ void lynx_sound_device::device_start()
 void lynx2_sound_device::device_start()
 {
 	m_mixer_channel = stream_alloc(0, 2, clock() / 16);
-	m_timer_delegate.resolve();
+	m_timer_delegate.resolve_safe();
 	init();
 	register_save();
 }
@@ -279,8 +279,7 @@ void lynx_sound_device::shift(int chan_nr)
 		case 1: count_down(2); break;
 		case 2: count_down(3); break;
 		case 3:
-			if (!m_timer_delegate.isnull())
-				m_timer_delegate();
+			m_timer_delegate();
 			break;
 	}
 }

@@ -12,8 +12,7 @@
 #include "pc11.h"
 
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_DBG     (1U <<  2)
+#define LOG_DBG     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DBG)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -136,7 +135,7 @@ void pc11_device::z80daisy_irq_reti()
 }
 
 
-image_init_result pc11_device::call_load()
+std::pair<std::error_condition, std::string> pc11_device::call_load()
 {
 	/* reader unit */
 	m_fd = this;
@@ -144,7 +143,7 @@ image_init_result pc11_device::call_load()
 
 	LOG("call_load filename %s is_open %d\n", m_fd->filename(), m_fd->is_open());
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pc11_device::call_unload()

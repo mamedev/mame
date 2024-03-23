@@ -58,7 +58,7 @@ public:
 
 	// read/write
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
 	void as2888_map(address_map &map);
 
@@ -115,7 +115,7 @@ public:
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
 	void as3022_map(address_map &map);
 
@@ -164,8 +164,8 @@ private:
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
 	uint8_t pia_porta_r();
 	void pia_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
+	void pia_cb2_w(int state);
+	void pia_irq_w(int state);
 	uint8_t ay_io_r();
 
 	void update_ay_bus();
@@ -212,7 +212,7 @@ public:
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
 	void cheap_squeak_map(address_map &map);
 
@@ -267,7 +267,7 @@ public:
 	// read/write
 	DECLARE_INPUT_CHANGED_MEMBER(sw1);
 	void sound_select(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_int);
+	void sound_int(int state);
 
 	void squawk_n_talk_map(address_map &map);
 
@@ -302,7 +302,7 @@ private:
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
 	void pia1_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);
+	void pia_irq_w(int state);
 };
 
 
@@ -332,7 +332,7 @@ private:
 
 	void pia2_porta_w(uint8_t data);
 	void pia2_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia2_cb2_w);
+	void pia2_cb2_w(int state);
 	uint8_t ay_io_r();
 
 	void update_ay_bus();

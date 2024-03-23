@@ -29,9 +29,6 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
-#include "formats/dsk_dsk.h"
-#include "formats/td0_dsk.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -50,6 +47,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class alphatro_state : public driver_device
 {
@@ -96,13 +95,13 @@ private:
 	uint8_t port30_r();
 	uint8_t portf0_r();
 	void portf0_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	void alphatro_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(kansas_w);
+	void kansas_r(int state);
+	void kansas_w(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 
 	void alphatro_io(address_map &map);
@@ -694,15 +693,12 @@ void alphatro_state::machine_reset()
 	m_bicom_en = 0;
 }
 
-image_init_result alphatro_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> alphatro_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 
 	if ((size != 0x4000) && (size != 0x2000))
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size, must be 8 or 16 K" );
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid cartridge size (must be 8K or 16K)");
 
 	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 
@@ -715,7 +711,7 @@ image_init_result alphatro_state::load_cart(device_image_interface &image, gener
 		slot->common_load_rom(slot->get_rom_base()+0x2000, size, "rom");
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void alphatro_state::alphatro_palette(palette_device &palette) const
@@ -734,7 +730,7 @@ void alphatro_state::alphatro_palette(palette_device &palette) const
 }
 
 
-WRITE_LINE_MEMBER(alphatro_state::kansas_w)
+void alphatro_state::kansas_w(int state)
 {
 	// incoming @19230Hz
 	u8 twobit = m_cass_data[3] & 3;
@@ -763,7 +759,7 @@ WRITE_LINE_MEMBER(alphatro_state::kansas_w)
 	m_usart->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(alphatro_state::kansas_r)
+void alphatro_state::kansas_r(int state)
 {
 	if (!BIT(m_port_10, 3))
 	{
@@ -785,7 +781,7 @@ WRITE_LINE_MEMBER(alphatro_state::kansas_r)
 	m_usart->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(alphatro_state::hrq_w)
+void alphatro_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);
@@ -946,6 +942,9 @@ ROM_START( alphatrob )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROMX_LOAD( "b40r_ic1067.bin",    0x0000, 0x1000, CRC(543e3ee8) SHA1(3e6c6f8c85d3a5d0735edfec52709c5670ff1646), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, alphatro,  0,        0, alphatro, alphatro, alphatro_pal_state,   empty_init, "Triumph-Adler", "Alphatronic PC (PAL)",            MACHINE_SUPPORTS_SAVE )
 COMP( 1983, alphatron, alphatro, 0, alphatro, alphatro, alphatro_ntsc_state,  empty_init, "Triumph-Adler", "Alphatronic PC (NTSC)",           MACHINE_SUPPORTS_SAVE )

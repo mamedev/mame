@@ -140,7 +140,7 @@ void c64_bn1541_device::update_output()
 //  input_8 - CIA2 PC write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(c64_bn1541_device::input_8)
+void c64_bn1541_device::input_8(int state)
 {
 	if (LOG) logerror("C64 parallel strobe %u\n", state);
 

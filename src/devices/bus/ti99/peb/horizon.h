@@ -44,7 +44,7 @@ protected:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
-	virtual bool nvram_can_write() override;
+	virtual bool nvram_can_write() const override;
 
 private:
 	required_device<ram_device> m_ram;

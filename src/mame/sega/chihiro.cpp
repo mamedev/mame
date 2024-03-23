@@ -61,7 +61,7 @@ GD build date
 |*| 2006     | Sega Network Taisen Mahjong MJ 3 (Rev F)             | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
 | | 2005     | Sega Club Golf 2006: Next Tours                      | Sega                     | GDROM  | GDX-0018   |              |
 |*| 20051107 | Sega Club Golf 2006: Next Tours (Rev A)              | Sega                     | GDROM  | GDX-0018A  | 317-0428-JPN |
-| | 2005     | Firmware Update For MJ 3                             | Sega                     | GDROM  | GDX-0019   |              |
+|*| 20050905 | Firmware Update For MJ 3                             | Sega                     | GDROM  | GDX-0019   | 317-0414-JPN |
 | | 200?     | Sega Club Golf 2006                                  | Sega                     | GDROM  | GDX-0020   |              |
 | | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution           | Sega                     | GDROM  | GDX-0021   | 317-0457-JPN |
 |*| 20070217 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)   | Sega                     | GDROM  | GDX-0021A  | 317-0457-JPN |
@@ -172,7 +172,7 @@ In order from top to bottom they are....
 The 2 boxes join together via the Base Board upper connector and Media Board lower connector.
 
 The Microsoft-manufactured XBox board is the lowest board. It's mostly the same as the V1 XBox retail
-board with the exception that it has 128MB of RAM and a NVidia MCPX X2 chip. The retail XBox board has a
+board with the exception that it has 128MB of RAM and a nVidia MCPX X2 chip. The retail XBox board has a
 MCPX X3 chip. The board was probably released to Sega very early in development and the chip was updated
 in the mass-produced retail version.
 
@@ -430,27 +430,28 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 
+#include "jvs13551.h"
 #include "xbox_pci.h"
 #include "xbox.h"
 
 #include "machine/pci.h"
 #include "machine/idectrl.h"
 
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 #include "cpu/i386/i386.h"
-#include "jvs13551.h"
 #include "machine/jvshost.h"
 #include "naomigd.h"
 
-#include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debugger.h"
 
 #include <functional>
 
-#define LOG_PCI
-//#define LOG_BASEBOARD
-//#define VERBOSE_MSG
+#define LOG_BASEBOARD (1U << 1)
+#define LOG_EXTRA     (1U << 2)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /*
  * Class declaration for jvs_master
@@ -663,9 +664,9 @@ private:
 	void chihiro_map_io(address_map &map);
 
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
-	void jamtable_disasm_command(const std::vector<std::string> &params);
-	void chihiro_help_command(const std::vector<std::string> &params);
-	void debug_commands(const std::vector<std::string> &params);
+	void jamtable_disasm_command(const std::vector<std::string_view> &params);
+	void chihiro_help_command(const std::vector<std::string_view> &params);
+	void debug_commands(const std::vector<std::string_view> &params);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -688,7 +689,8 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 {
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
-	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
+	address_space *tspace;
+	if (!space.device().memory().translate(space.spacenum(), device_memory_interface::TR_READ, addr, tspace))
 	{
 		con.printf("Address is unmapped.\n");
 		return;
@@ -697,30 +699,26 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = space.read_byte(addr);
+		uint32_t opcode = tspace->read_byte(addr);
 		addr++;
-		uint32_t op1 = space.read_dword_unaligned(addr);
+		uint32_t op1 = tspace->read_dword_unaligned(addr);
 		addr += 4;
-		uint32_t op2 = space.read_dword_unaligned(addr);
+		uint32_t op2 = tspace->read_dword_unaligned(addr);
 		addr += 4;
 
-		char sop1[16];
-		char sop2[16];
-		char pcrel[16];
+		std::string sop1;
+		std::string pcrel;
 		if (opcode == 0xe1)
 		{
 			opcode = op2 & 255;
 			op2 = op1;
-			//op1=edi;
-			sprintf(sop2, "%08X", op2);
-			sprintf(sop1, "ACC");
-			sprintf(pcrel, "PC+ACC");
+			sop1 = "ACC";
+			pcrel = "PC+ACC";
 		}
 		else
 		{
-			sprintf(sop2, "%08X", op2);
-			sprintf(sop1, "%08X", op1);
-			sprintf(pcrel, "%08X", base + 9 + op1);
+			sop1 = util::string_format("%08X", op1);
+			pcrel = util::string_format("%08X", base + 9 + op1);
 		}
 		con.printf("%08X ", base);
 		// dl=instr ebx=par1 eax=par2
@@ -737,33 +735,33 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 			// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
 			// +-+----------+------------+---------------+-----------------+-----------------+-+-+
 			// 31 - Enable bit
-			con.printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
+			con.printf("POKEPCI PCICONF[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x02:
-			con.printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
+			con.printf("OUTB    PORT[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x03:
-			con.printf("POKE    MEM[%s]=%s\n", sop2, sop1);
+			con.printf("POKE    MEM[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x04:
-			con.printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
+			con.printf("BNE     IF ACC != %08X THEN PC=%s\n", op2, pcrel);
 			break;
 		case 0x05:
 			// out cf8,op2
 			// in acc,cfc
-			con.printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
+			con.printf("PEEKPCI ACC=PCICONF[%08X]\n", op2);
 			break;
 		case 0x06:
-			con.printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
+			con.printf("AND/OR  ACC=(ACC & %08X) | %s\n", op2, sop1);
 			break;
 		case 0x07:
 			con.printf("BRA     PC=%s\n", pcrel);
 			break;
 		case 0x08:
-			con.printf("INB     ACC=PORT[%s]\n", sop2);
+			con.printf("INB     ACC=PORT[%08X]\n", op2);
 			break;
 		case 0x09:
-			con.printf("PEEK    ACC=MEM[%s]\n", sop2);
+			con.printf("PEEK    ACC=MEM[%08X]\n", op2);
 			break;
 		case 0xee:
 			con.printf("END\n");
@@ -780,21 +778,21 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	}
 }
 
-void chihiro_state::jamtable_disasm_command(const std::vector<std::string> &params)
+void chihiro_state::jamtable_disasm_command(const std::vector<std::string_view> &params)
 {
 	address_space &space = m_maincpu->space();
 	uint64_t  addr, size;
 
 	if (params.size() < 3)
 		return;
-	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+	if (!machine().debugger().console().validate_number_parameter(params[1], addr))
 		return;
-	if (!machine().debugger().commands().validate_number_parameter(params[2], size))
+	if (!machine().debugger().console().validate_number_parameter(params[2], size))
 		return;
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
+void chihiro_state::chihiro_help_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -803,7 +801,7 @@ void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
 	con.printf("  chihiro help -- this list\n");
 }
 
-void chihiro_state::debug_commands(const std::vector<std::string> &params)
+void chihiro_state::debug_commands(const std::vector<std::string_view> &params)
 {
 	if (params.size() < 1)
 		return;
@@ -928,9 +926,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	int sense;
 
-#ifdef VERBOSE_MSG
-	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-#endif
+	LOGMASKED(LOG_EXTRA, "Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	if (endpoint != 0)
 		return -1;
 	// default valuse for data stage
@@ -1038,9 +1034,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data sent by the host contains first a byte with value 0 that is ignored, then a byte specifying the number of packets that follow, then the data for each packet
 		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
 		// broadcast packets must have a destination node address of value 0xff
-#ifdef VERBOSE_MSG
-		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
-#endif
+		LOGMASKED(LOG_EXTRA, " Jvs packets data of %d bytes\n\r", setup->wIndex);
 		endpoints[endpoint].buffer[0] = 0;
 		if (jvs.buffer_out_used == 0)
 		{
@@ -1083,9 +1077,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
-#ifdef VERBOSE_MSG
-	printf("Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
-#endif
+	LOGMASKED(LOG_EXTRA, "Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -1106,19 +1098,15 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 	{
 		if (size > endpoints[4].remain)
 			size = endpoints[4].remain;
-#ifdef VERBOSE_MSG
 		for (int n = 0; n < size; n++)
-			printf(" %02x", buffer[n]);
-#endif
+			LOGMASKED(LOG_EXTRA, " %02x", buffer[n]);
 		if (size > 0) {
 			memcpy(endpoints[4].position, buffer, size);
 			endpoints[4].position = endpoints[4].position + size;
 			endpoints[4].remain = endpoints[4].remain - size;
 			if (endpoints[4].remain == 0)
 			{
-#ifdef VERBOSE_MSG
-				printf("\n\r");
-#endif
+				LOGMASKED(LOG_EXTRA, "\n\r");
 				// extract packets
 				process_jvs_packet();
 			}
@@ -1248,9 +1236,7 @@ void ohci_hlean2131sc_device::initialize()
 
 int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
-#ifdef VERBOSE_MSG
-	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-#endif
+	LOGMASKED(LOG_EXTRA, "Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	if (endpoint != 0)
 		return -1;
 	// default valuse for data stage
@@ -1419,9 +1405,7 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
-#ifdef VERBOSE_MSG
-	printf("Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
-#endif
+	LOGMASKED(LOG_EXTRA, "Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -1479,9 +1463,7 @@ int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 void ohci_hlean2131sc_device::process_packet()
 {
 	uint8_t result = 0;
-#ifdef VERBOSE_MSG
-		printf("%02X %02X %02X %02X\n\r", packet[0], packet[1], packet[2], packet[3]);
-#endif
+	LOGMASKED(LOG_EXTRA, "%02X %02X %02X %02X\n\r", packet[0], packet[1], packet[2], packet[3]);
 	if (packet[0] == 0xff) // 00 00 7f
 		result = 2;
 	else if (packet[0] == 0x81) // 30 7f 4e
@@ -1524,22 +1506,46 @@ void ohci_hlean2131sc_device::device_start()
 
 // ======================> ide_baseboard_device
 
-class ide_baseboard_device : public ata_mass_storage_device
+class ide_baseboard_device : public ata_mass_storage_device_base, public device_ata_interface
 {
 public:
 	// construction/destruction
 	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// device_ata_interface implementation
+	virtual uint16_t read_dma() override { return dma_r(); }
+	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask) override { return command_r(offset); }
+	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask) override { return control_r(offset); }
+
+	virtual void write_dma(uint16_t data) override { dma_w(data); }
+	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask) override { command_w(offset, data); }
+	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask) override { control_w(offset, data); }
+
+	virtual void write_dmack(int state) override { set_dmack_in(state); }
+	virtual void write_csel(int state) override { set_csel_in(state); }
+	virtual void write_dasp(int state) override { set_dasp_in(state); }
+	virtual void write_pdiag(int state) override { set_pdiag_in(state); }
+
+	// ata_mass_storage_device_base implementation
 	virtual int  read_sector(uint32_t lba, void *buffer) override;
 	virtual int  write_sector(uint32_t lba, const void *buffer) override;
+
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 	uint8_t read_buffer[0x20]{};
 	uint8_t write_buffer[0x20]{};
 	chihiro_state *chihirosystem{};
 	static const int size_factor = 2;
+
+private:
+	// ata_hle_device_base implementation
+	virtual void set_irq_out(int state) override { device_ata_interface::set_irq(state); }
+	virtual void set_dmarq_out(int state) override { device_ata_interface::set_dmarq(state); }
+	virtual void set_dasp_out(int state) override { device_ata_interface::set_dasp(state); }
+	virtual void set_pdiag_out(int state) override { device_ata_interface::set_pdiag(state); }
 };
 
 //**************************************************************************
@@ -1554,7 +1560,8 @@ DEFINE_DEVICE_TYPE(IDE_BASEBOARD, ide_baseboard_device, "ide_baseboard", "IDE Ba
 //-------------------------------------------------
 
 ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ata_mass_storage_device(mconfig, IDE_BASEBOARD, tag, owner, clock)
+	: ata_mass_storage_device_base(mconfig, IDE_BASEBOARD, tag, owner, clock)
+	, device_ata_interface(mconfig, *this)
 {
 }
 
@@ -1564,7 +1571,7 @@ ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const 
 
 void ide_baseboard_device::device_start()
 {
-	ata_mass_storage_device::device_start();
+	ata_mass_storage_device_base::device_start();
 	chihirosystem = machine().driver_data<chihiro_state>();
 	// savestates
 	save_item(NAME(read_buffer));
@@ -1586,7 +1593,7 @@ void ide_baseboard_device::device_reset()
 		m_can_identify_device = 1;
 	}
 
-	ata_mass_storage_device::device_reset();
+	ata_mass_storage_device_base::device_reset();
 }
 
 int ide_baseboard_device::read_sector(uint32_t lba, void *buffer)
@@ -1679,12 +1686,12 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 
 	if ((type != 3) || ((write_buffer[0] == 0) && (write_buffer[1] == 0)))
 		return;
-#ifdef LOG_BASEBOARD
-	logerror("Baseboard sector command:\n");
+
+	LOGMASKED(LOG_BASEBOARD, "Baseboard sector command:\n");
 	for (int a = 0; a < 32; a++)
-		logerror(" %02X", write_buffer[a]);
-	logerror("\n");
-#endif
+		LOGMASKED(LOG_BASEBOARD, " %02X", write_buffer[a]);
+	LOGMASKED(LOG_BASEBOARD, "\n");
+
 	// response
 	// second word 8001 (8000+counter), first word=first word of written data (command ?), second dword ?
 	read_buffer[0] = write_buffer[0];
@@ -1772,7 +1779,7 @@ void chihiro_state::chihiro_map_io(address_map &map)
 	map(0x4000, 0x40ff).rw(FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
 }
 
-static INPUT_PORTS_START(chihiro)
+static INPUT_PORTS_START( chihiro )
 	PORT_START("TILT")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT)
 	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1829,7 +1836,7 @@ static INPUT_PORTS_START(chihiro)
 
 	PORT_START("A7")
 	PORT_BIT(0x87ff, IP_ACTIVE_LOW, IPT_UNUSED)
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 void chihiro_state::machine_start()
 {
@@ -1953,7 +1960,7 @@ void chihiro_state::chihirogd(machine_config &config)
 
 #define CHIHIRO_BIOS \
 	ROM_REGION32_LE( 0x80000, "bios", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro BIOS" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr-23887_29lv160te.ic4", 0x000000, 0x200000, CRC(13034372) SHA1(77197fba2781ed1d81402c48bd743adb26d3161a) ) \
@@ -2343,6 +2350,16 @@ ROM_START( mj3 )
 	ROM_LOAD( "317-0414-jpn.pic", 0x000000, 0x004000, CRC(27d1c541) SHA1(c85a8229dd769af02ab43c97f09f995743cdb315) )
 ROM_END
 
+ROM_START( mj3up )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0019", 0, SHA1(39ac33e857a6f66814c8fc5487705dbf43d47888) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0414-jpn.pic", 0x000000, 0x004000, CRC(27d1c541) SHA1(c85a8229dd769af02ab43c97f09f995743cdb315) )
+ROM_END
+
 ROM_START( scg06nt )
 	CHIHIRO_BIOS
 
@@ -2575,7 +2592,7 @@ ROM_START( gundcb83b )
 ROM_END
 
 /* Main board */
-/*Chihiro*/ GAME( 2002, chihiro,  0,        chihiro_base, chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+/*Chihiro*/ GAME( 2002, chihiro,  0,        chihiro_base, chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 
 /* GDX-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2002, hotd3,    chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega / Wow Entertainment", "The House of the Dead III (GDX-0001)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
@@ -2626,7 +2643,7 @@ ROM_END
 /* 0017F */ GAME( 2006, mj3,      chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (Rev F) (GDX-0017F)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0018     GAME( 2005, scg06nto, scg06nt,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Club Golf 2006 Next Tours (GDX-0018)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0018A */ GAME( 2005, scg06nt,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Club Golf 2006 Next Tours (Rev A) (GDX-0018A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0019  Firmware Update For MJ 3
+/* 0019  */ GAME( 2005, mj3up,    chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Firmware Update (GDX-0019)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0020  Sega Golf Club 2006
 // 0021     GAME( 2006, mj3evoo,  mj3evo,    chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (GDX-0021)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0021A */ GAME( 2007, mj3evoa,  mj3evo,    chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) (GDX-0021A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

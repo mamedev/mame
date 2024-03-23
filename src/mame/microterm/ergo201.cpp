@@ -33,6 +33,9 @@
 #include "video/tms9927.h"
 #include "screen.h"
 
+
+namespace {
+
 class ergo201_state : public driver_device
 {
 public:
@@ -179,5 +182,8 @@ ROM_START(ergo201)
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("201.u53", 0x0000, 0x1000, CRC(907dac04) SHA1(5bae6680f1ef3f5335a223bdf403e8f3ef272430)) // MBM2732A-35
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1985, ergo201, 0, 0, ergo201, ergo201, ergo201_state, empty_init, "Micro-Term / Kurzweil Computer Products", "ERGO 201 (Special #9233)", MACHINE_IS_SKELETON)

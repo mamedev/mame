@@ -2,8 +2,14 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Atari Video Computer System digital joystick emulation with
-    boostergrip adapter
+    CBS Electronics Booster-Grip Joystick Adaptor
+
+    This peripheral device, which adds two extra buttons to an
+    ordinary single-button joystick, was packaged with the Atari 2600
+    version of Omega Race. CBS Electronics also advertised it as a
+    pack-in for their unreleased 2600 title Wings (it does not work
+    with the known prototype). The homebrew Thrust games optionally
+    support the Booster-Grip as well.
 
 **********************************************************************/
 
@@ -16,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VCS_JOYSTICK_BOOSTER, vcs_joystick_booster_device, "vcs_joystick_booster", "Atari / CBM Digital joystick with Boostergrip")
+DEFINE_DEVICE_TYPE(VCS_JOYSTICK_BOOSTER, vcs_joystick_booster_device, "vcs_joystick_booster", "CBS Electronics Booster-Grip Joystick Adaptor")
 
 
 static INPUT_PORTS_START( vcs_joystick_booster )
@@ -25,7 +31,7 @@ static INPUT_PORTS_START( vcs_joystick_booster )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY     // Pin 2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY     // Pin 3
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY    // Pin 4
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                     // Pin 6
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_WRITE_LINE_MEMBER(vcs_joystick_booster_device, trigger_w) // Pin 6
 	PORT_BIT( 0xd0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	// Pin 5

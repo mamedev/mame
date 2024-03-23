@@ -23,6 +23,9 @@ A PCB set is available for tracing.
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -121,5 +124,7 @@ ROM_START( crazybal )
 	ROM_LOAD( "3.12l",     0x000, 0x100, CRC(e2ca8670) SHA1(60bc4be4185c50a9afd3a28d1fb9e8f46c93764a) ) // Sn74S287N
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1978, crazybal, 0, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems", "Crazy Balls [TTL]", MACHINE_IS_SKELETON )
+
+GAME( 1978, crazybal, 0, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems", "Crazy Balls", MACHINE_IS_SKELETON )

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_STRING_H_HEADER_GUARD
@@ -38,26 +38,13 @@ namespace bx
 		StringView& operator=(const StringView& _rhs);
 
 		///
-		StringView(char* _ptr);
-
-		///
 		StringView(const char* _ptr);
-
-		///
-		StringView(char* _ptr, int32_t _len);
 
 		///
 		StringView(const char* _ptr, int32_t _len);
 
 		///
 		StringView(const char* _ptr, const char* _term);
-
-		///
-		template<typename Ty>
-		explicit StringView(const Ty& _container);
-
-		///
-		void set(char* _ptr);
 
 		///
 		void set(const char* _ptr);
@@ -70,10 +57,6 @@ namespace bx
 
 		///
 		void set(const StringView& _str, int32_t _start = 0, int32_t _len = INT32_MAX);
-
-		///
-		template<typename Ty>
-		void set(const Ty& _container);
 
 		///
 		void clear();
@@ -91,15 +74,19 @@ namespace bx
 		///
 		const char* getTerm() const;
 
-		///
+		/// Returns `true` if string is empty.
 		bool isEmpty() const;
 
-		///
+		/// Returns string length.
 		int32_t getLength() const;
+
+		/// Returns `true` if string is zero terminated.
+		bool is0Terminated() const;
 
 	protected:
 		const char* m_ptr;
 		int32_t     m_len;
+		bool        m_0terminated;
 	};
 
 	/// ASCII string
@@ -114,13 +101,13 @@ namespace bx
 		StringT(const StringT<AllocatorT>& _rhs);
 
 		///
-		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs);
-
-		///
 		StringT(const StringView& _rhs);
 
 		///
 		~StringT();
+
+		///
+		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs);
 
 		///
 		void set(const StringView& _str);
@@ -137,21 +124,24 @@ namespace bx
 		/// Returns zero-terminated C string pointer.
 		///
 		const char* getCPtr() const;
+
+	protected:
+		int32_t m_capacity;
 	};
 
-	/// Retruns true if character is part of space set.
+	/// Returns true if character is part of space set.
 	bool isSpace(char _ch);
 
 	/// Returns true if string view contains only space characters.
 	bool isSpace(const StringView& _str);
 
-	/// Retruns true if character is uppercase.
+	/// Returns true if character is uppercase.
 	bool isUpper(char _ch);
 
 	/// Returns true if string view contains only uppercase characters.
 	bool isUpper(const StringView& _str);
 
-	/// Retruns true if character is lowercase.
+	/// Returns true if character is lowercase.
 	bool isLower(char _ch);
 
 	/// Returns true if string view contains only lowercase characters.
@@ -160,19 +150,19 @@ namespace bx
 	/// Returns true if character is part of alphabet set.
 	bool isAlpha(char _ch);
 
-	/// Retruns true if string view contains only alphabet characters.
+	/// Returns true if string view contains only alphabet characters.
 	bool isAlpha(const StringView& _str);
 
 	/// Returns true if character is part of numeric set.
 	bool isNumeric(char _ch);
 
-	/// Retruns true if string view contains only numeric characters.
+	/// Returns true if string view contains only numeric characters.
 	bool isNumeric(const StringView& _str);
 
 	/// Returns true if character is part of alpha numeric set.
 	bool isAlphaNum(char _ch);
 
-	/// Returns true if string view contains only alpha-numeric characters.
+	/// Returns true if string view contains only alphanumeric characters.
 	bool isAlphaNum(const StringView& _str);
 
 	/// Returns true if character is part of hexadecimal set.
@@ -187,7 +177,7 @@ namespace bx
 	/// Returns true if string vieww contains only printable characters.
 	bool isPrint(const StringView& _str);
 
-	/// Retruns lower case character representing _ch.
+	/// Returns lower case character representing _ch.
 	char toLower(char _ch);
 
 	/// Lower case string in place assuming length passed is valid.
@@ -224,7 +214,7 @@ namespace bx
 	/// including zero terminator. Copy will be terminated with '\0'.
 	int32_t strCopy(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num = INT32_MAX);
 
-	/// Concatinate string.
+	/// Concatenate string.
 	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num = INT32_MAX);
 
 	/// Test whether the string _str begins with prefix.
@@ -266,10 +256,16 @@ namespace bx
 	/// Returns string view with whitespace characters trimmed from left and right.
 	StringView strTrimSpace(const StringView& _str);
 
+	/// Returns string view with prefix trimmed.
+	StringView strTrimPrefix(const StringView& _str, const StringView& _prefix);
+
+	/// Returns string view with suffix trimmed.
+	StringView strTrimSuffix(const StringView& _str, const StringView& _suffix);
+
 	/// Find new line. Returns pointer after new line terminator.
 	StringView strFindNl(const StringView& _str);
 
-	/// Find end of line. Retuns pointer to new line terminator.
+	/// Find end of line. Returns pointer to new line terminator.
 	StringView strFindEol(const StringView& _str);
 
 	/// Returns StringView of word or empty.
@@ -314,10 +310,6 @@ namespace bx
 	template <typename Ty>
 	void stringPrintf(Ty& _out, const char* _format, ...);
 
-	/// Replace all instances of substring.
-	template <typename Ty>
-	Ty replaceAll(const Ty& _str, const char* _from, const char* _to);
-
 	/// Convert size in bytes to human readable string kibi units.
 	int32_t prettify(char* _out, int32_t _count, uint64_t _value, Units::Enum _units = Units::Kibi);
 
@@ -359,7 +351,7 @@ namespace bx
 	{
 	public:
 		///
-		LineReader(const bx::StringView& _str);
+		LineReader(const StringView& _str);
 
 		///
 		void reset();
@@ -374,8 +366,8 @@ namespace bx
 		uint32_t getLine() const;
 
 	private:
-		const bx::StringView m_str;
-		bx::StringView m_curr;
+		const StringView m_str;
+		StringView m_curr;
 		uint32_t m_line;
 	};
 

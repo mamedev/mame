@@ -104,7 +104,7 @@
 
 
 // configurable logging
-#define LOG_BLITTER     (1U <<  1)
+#define LOG_BLITTER     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BLITTER)
 
@@ -223,8 +223,6 @@ private:
 	void main_map(address_map &map);
 };
 
-
-// video
 
 /*************************************
  *
@@ -366,8 +364,6 @@ uint32_t capbowl_base_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

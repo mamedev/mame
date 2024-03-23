@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="gx4000" description="Amstrad CPC Plus &amp; GX4000 cartridges">
 	<software name="barb2">
@@ -318,7 +318,7 @@ license:CC0
 
 	<!-- These need French keyboard to fully work -->
 	<software name="sysfr" supported="partial">
-		<description>Burnin' Rubber + Locomotive BASIC (Fra)</description>
+		<description>Burnin' Rubber + Locomotive BASIC (France)</description>
 		<year>1990</year>
 		<publisher>Amstrad</publisher>
 		<part name="cart" interface="gx4000_cart">
@@ -330,7 +330,7 @@ license:CC0
 
 	<!-- This was released in France  to address the Plus range incompatibilities with some software designed for the classic CPC range. -->
 	<software name="sysfrv3" cloneof="sysfr" supported="partial">
-		<description>BASIC Cartouche (Fra, with OS v3)</description>
+		<description>BASIC Cartouche (France, with OS v3)</description>
 		<year>1990</year>
 		<publisher>Amstrad</publisher>
 		<part name="cart" interface="gx4000_cart">
@@ -341,7 +341,7 @@ license:CC0
 	</software>
 
 	<software name="sysfrpd" cloneof="sysfr" supported="partial">
-		<description>Locomotive BASIC + ParaDOS (Fra)</description>
+		<description>Locomotive BASIC + ParaDOS (France)</description>
 		<year>1990</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="gx4000_cart">
@@ -353,7 +353,7 @@ license:CC0
 
 	<!-- These need Spanish keyboard to fully work -->
 	<software name="syses" supported="partial">
-		<description>Burnin' Rubber + Locomotive BASIC (Spa)</description>
+		<description>Burnin' Rubber + Locomotive BASIC (Spain)</description>
 		<year>1990</year>
 		<publisher>Amstrad</publisher>
 		<part name="cart" interface="gx4000_cart">
@@ -364,7 +364,7 @@ license:CC0
 	</software>
 
 	<software name="sysespd" cloneof="syses" supported="partial">
-		<description>Locomotive BASIC + ParaDOS (Spa)</description>
+		<description>Locomotive BASIC + ParaDOS (Spain)</description>
 		<year>1990</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="gx4000_cart">

@@ -55,11 +55,7 @@ class z80scc_channel : public device_t,
 public:
 	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// device_serial_interface overrides
+	// device_serial_interface implementation
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_callback() override;
@@ -232,11 +228,12 @@ protected:
 		REG_WR15_EXT_ST_INT_CTRL= 15
 	};
 
-	emu_timer *m_baudtimer;
-	uint16_t m_brg_counter;
-	unsigned int m_brg_rate;
-	unsigned int m_delayed_tx_brg_change;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	unsigned int get_brg_rate();
+	unsigned int get_rtxc_rate();
 	void update_baudtimer();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
@@ -252,6 +249,11 @@ protected:
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
 	void check_dma_request();
+
+	emu_timer *m_baudtimer;
+	uint16_t m_brg_counter;
+	unsigned int m_brg_rate;
+	unsigned int m_delayed_tx_brg_change;
 
 	// receiver state
 	uint8_t m_rx_data_fifo[8];    // receive data FIFO
@@ -296,6 +298,7 @@ protected:
 	// SCC specifics
 	int m_ph;       // Point high command to access regs 08-0f
 	uint8_t m_zc;
+
 private:
 	// helpers
 	void out_txd_cb(int state);
@@ -382,13 +385,12 @@ public:
 protected:
 	z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// device_z80daisy_interface overrides
+	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /* Sega Road Generators */
-#ifndef MAME_VIDEO_SEGAIC16_ROAD_H
-#define MAME_VIDEO_SEGAIC16_ROAD_H
+#ifndef MAME_SEGA_SEGAIC16_ROAD_H
+#define MAME_SEGA_SEGAIC16_ROAD_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGAIC16_ROAD, segaic16_road_device)
 
-#endif // MAME_VIDEO_SEGAIC16_ROAD_H
+#endif // MAME_SEGA_SEGAIC16_ROAD_H

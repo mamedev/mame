@@ -71,7 +71,7 @@ private:
 	void ppi_pb_w(uint8_t data);
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	void busy_w(int state);
 
 	bool pd_pgm1(offs_t offset, int sphi2);
 	bool pd_pgm234(offs_t offset, int sphi2, int bank);

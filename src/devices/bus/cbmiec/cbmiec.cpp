@@ -302,12 +302,6 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 
 void cbm_iec_device::device_start()
 {
-	// resolve callbacks
-	m_write_srq.resolve_safe();
-	m_write_atn.resolve_safe();
-	m_write_clk.resolve_safe();
-	m_write_data.resolve_safe();
-	m_write_reset.resolve_safe();
 }
 
 
@@ -494,6 +488,7 @@ int cbm_iec_device::get_signal(int signal)
 #include "vic1515.h"
 #include "vic1520.h"
 #include "c1526.h"
+#include "mps1200.h"
 
 void cbm_iec_devices(device_slot_interface &device)
 {
@@ -529,4 +524,6 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("fd148", FD148);
 	device.option_add("msdsd1", MSD_SD1);
 	device.option_add("msdsd2", MSD_SD2);
+	device.option_add("mps1200", MPS1200);
+	device.option_add("mps1250", MPS1250);
 }

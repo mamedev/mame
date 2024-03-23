@@ -124,29 +124,29 @@ enum
     The following defines can be set to 0 or 1 to disable or enable certain
     output in the log.
 */
-#define LOG_OP         (1U<<1)   // Current instruction
-#define LOG_EXEC       (1U<<2)   // Address of current instruction
-#define LOG_CYCLES     (1U<<4)   // Cycles
-#define LOG_WARN       (1U<<5)   // Illegal operation or other condition
-#define LOG_MEM        (1U<<6)   // Memory access
-#define LOG_CONTEXT    (1U<<7)   // Context switch
-#define LOG_INT        (1U<<8)   // Interrupts
-#define LOG_READY      (1U<<9)   // READY line input
-#define LOG_CLOCK      (1U<<10)  // Clock pulses
-#define LOG_ADDRESSBUS (1U<<11)  // Address bus operation
-#define LOG_STATUS     (1U<<12)  // Status register
-#define LOG_CRU        (1U<<13)  // CRU operations
-#define LOG_WAIT       (1U<<15)  // Wait states
-#define LOG_HOLD       (1U<<16)  // Hold states
-#define LOG_IDLE       (1U<<17)  // Idle states
-#define LOG_EMU        (1U<<18)  // Emulation details
-#define LOG_MICRO      (1U<<19)  // Microinstruction processing
-#define LOG_INTD       (1U<<20)  // Interrupts (detailed phases)
-#define LOG_LOAD       (1U<<21)  // LOAD interrupt
-#define LOG_DETAIL     (1U<<31)  // Increased detail
+#define LOG_OP         (1U << 1)   // Current instruction
+#define LOG_EXEC       (1U << 2)   // Address of current instruction
+#define LOG_CYCLES     (1U << 4)   // Cycles
+#define LOG_WARN       (1U << 5)   // Illegal operation or other condition
+#define LOG_MEM        (1U << 6)   // Memory access
+#define LOG_CONTEXT    (1U << 7)   // Context switch
+#define LOG_INT        (1U << 8)   // Interrupts
+#define LOG_READY      (1U << 9)   // READY line input
+#define LOG_CLOCK      (1U << 10)  // Clock pulses
+#define LOG_ADDRESSBUS (1U << 11)  // Address bus operation
+#define LOG_STATUS     (1U << 12)  // Status register
+#define LOG_CRU        (1U << 13)  // CRU operations
+#define LOG_WAIT       (1U << 15)  // Wait states
+#define LOG_HOLD       (1U << 16)  // Hold states
+#define LOG_IDLE       (1U << 17)  // Idle states
+#define LOG_EMU        (1U << 18)  // Emulation details
+#define LOG_MICRO      (1U << 19)  // Microinstruction processing
+#define LOG_INTD       (1U << 20)  // Interrupts (detailed phases)
+#define LOG_LOAD       (1U << 21)  // LOAD interrupt
+#define LOG_DETAIL     (1U << 31)  // Increased detail
 
 // Minimum log should be warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -169,7 +169,7 @@ tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, 
 		m_clock_out_line(*this),
 		m_wait_line(*this),
 		m_holda_line(*this),
-		m_get_intlevel(*this),
+		m_get_intlevel(*this, 0),
 		m_external_operation(*this),
 		m_ready_bufd(true),
 		m_program_index(NOPRG),
@@ -202,7 +202,6 @@ enum
 void tms99xx_device::device_start()
 {
 	// TODO: Restore state save feature
-	resolve_lines();
 	m_prgspace = &space(AS_PROGRAM);
 	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
@@ -275,19 +274,6 @@ void tms99xx_device::device_start()
 
 void tms99xx_device::device_stop()
 {
-}
-
-/*
-    External connections
-*/
-void tms99xx_device::resolve_lines()
-{
-	// Resolve our external connections
-	m_external_operation.resolve();
-	m_get_intlevel.resolve();
-	m_clock_out_line.resolve();
-	m_wait_line.resolve();
-	m_holda_line.resolve();
 }
 
 /*
@@ -1218,7 +1204,7 @@ void tms99xx_device::execute_run()
 		{
 			LOGMASKED(LOG_IDLE, "IDLE state\n");
 			pulse_clock(1);
-			if (!m_external_operation.isnull())
+			if (!m_external_operation.isunset())
 			{
 				m_external_operation(IDLE_OP, 0, 0xff);
 				m_external_operation(IDLE_OP, 1, 0xff);
@@ -1322,7 +1308,7 @@ void tms99xx_device::execute_set_input(int irqline, int state)
 */
 int tms99xx_device::get_intlevel(int state)
 {
-	if (!m_get_intlevel.isnull()) return m_get_intlevel(0);
+	if (!m_get_intlevel.isunset()) return m_get_intlevel(0);
 	return 0;
 }
 
@@ -1332,7 +1318,7 @@ void tms99xx_device::service_interrupt()
 
 	m_command = INTR;
 	m_idle_state = false;
-	if (!m_external_operation.isnull()) m_external_operation(IDLE_OP, 0, 0xff);
+	if (!m_external_operation.isunset()) m_external_operation(IDLE_OP, 0, 0xff);
 
 	m_state = 0;
 
@@ -1380,9 +1366,9 @@ void tms99xx_device::pulse_clock(int count)
 {
 	for (int i=0; i < count; i++)
 	{
-		if (!m_clock_out_line.isnull()) m_clock_out_line(ASSERT_LINE);
+		if (!m_clock_out_line.isunset()) m_clock_out_line(ASSERT_LINE);
 		m_ready = m_ready_bufd;              // get the latched READY state
-		if (!m_clock_out_line.isnull()) m_clock_out_line(CLEAR_LINE);
+		if (!m_clock_out_line.isunset()) m_clock_out_line(CLEAR_LINE);
 		m_icount--;                         // This is the only location where we count down the cycles.
 		if (m_check_ready) LOGMASKED(LOG_CLOCK, "pulse_clock, READY=%d\n", m_ready? 1:0);
 		else LOGMASKED(LOG_CLOCK, "pulse_clock\n");
@@ -1398,7 +1384,7 @@ void tms99xx_device::set_hold(int state)
 	if (!m_hold_state)
 	{
 		m_hold_acknowledged = false;
-		if (!m_holda_line.isnull()) m_holda_line(CLEAR_LINE);
+		if (!m_holda_line.isunset()) m_holda_line(CLEAR_LINE);
 	}
 }
 
@@ -1408,7 +1394,7 @@ void tms99xx_device::set_hold(int state)
 inline void tms99xx_device::acknowledge_hold()
 {
 	m_hold_acknowledged = true;
-	if (!m_holda_line.isnull()) m_holda_line(ASSERT_LINE);
+	if (!m_holda_line.isunset()) m_holda_line(ASSERT_LINE);
 }
 
 /*
@@ -1444,7 +1430,7 @@ void tms99xx_device::abort_operation()
 inline void tms99xx_device::set_wait_state(bool state)
 {
 	if (m_wait_state != state)
-		if (!m_wait_line.isnull()) m_wait_line(state? ASSERT_LINE : CLEAR_LINE);
+		if (!m_wait_line.isunset()) m_wait_line(state? ASSERT_LINE : CLEAR_LINE);
 	m_wait_state = state;
 }
 
@@ -2222,7 +2208,7 @@ void tms99xx_device::alu_clr_swpb()
 		sign = 0x8000;
 		break;
 	case SWPB:
-		m_current_value = ((m_current_value << 8) | (m_current_value >> 8)) & 0xffff;
+		m_current_value = swapendian_int16(m_current_value);
 		setstatus = false;
 		break;
 	}
@@ -2670,7 +2656,7 @@ void tms99xx_device::alu_external()
 	if (m_command == IDLE)
 		m_idle_state = true;
 
-	if (!m_external_operation.isnull()) m_external_operation((IR >> 5) & 0x07, 1, 0xff);
+	if (!m_external_operation.isunset()) m_external_operation((IR >> 5) & 0x07, 1, 0xff);
 	pulse_clock(2);
 }
 

@@ -298,38 +298,35 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 	if (gouraud_iinc & 0x800000)
 		gouraud_iinc |= 0xff000000;
 
-	if (LOG_BLITS)
-	{
-	logerror("%s:Blit!\n", machine().describe_context());
-	logerror("  a1_base  = %08X\n", a1_base);
-	logerror("  a1_pitch = %d\n", a1_pitch);
-	logerror("  a1_psize = %d\n", 1 << ((A1FIXED >> 3) & 7));
-	logerror("  a1_width = %d\n", a1_width);
-	logerror("  a1_xadd  = %f (phrase=%d)\n", (double)a1_xadd / 65536.0, a1_phrase_mode);
-	logerror("  a1_yadd  = %f\n", (double)a1_yadd / 65536.0);
-	logerror("  a1_xstep = %f\n", (double)a1_xstep / 65536.0);
-	logerror("  a1_ystep = %f\n", (double)a1_ystep / 65536.0);
-	logerror("  a1_x     = %f\n", (double)a1_x / 65536.0);
-	logerror("  a1_y     = %f\n", (double)a1_y / 65536.0);
+	LOGMASKED(LOG_BLITS, "%s:Blit!\n", machine().describe_context());
+	LOGMASKED(LOG_BLITS, "  a1_base  = %08X\n", a1_base);
+	LOGMASKED(LOG_BLITS, "  a1_pitch = %d\n", a1_pitch);
+	LOGMASKED(LOG_BLITS, "  a1_psize = %d\n", 1 << ((A1FIXED >> 3) & 7));
+	LOGMASKED(LOG_BLITS, "  a1_width = %d\n", a1_width);
+	LOGMASKED(LOG_BLITS, "  a1_xadd  = %f (phrase=%d)\n", (double)a1_xadd / 65536.0, a1_phrase_mode);
+	LOGMASKED(LOG_BLITS, "  a1_yadd  = %f\n", (double)a1_yadd / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a1_xstep = %f\n", (double)a1_xstep / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a1_ystep = %f\n", (double)a1_ystep / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a1_x     = %f\n", (double)a1_x / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a1_y     = %f\n", (double)a1_y / 65536.0);
 
-	logerror("  a2_base  = %08X\n", a2_base);
-	logerror("  a2_pitch = %d\n", a2_pitch);
-	logerror("  a2_psize = %d\n", 1 << ((A2FIXED >> 3) & 7));
-	logerror("  a2_width = %d\n", a2_width);
-	logerror("  a2_xadd  = %f (phrase=%d)\n", (double)a2_xadd / 65536.0, a2_phrase_mode);
-	logerror("  a2_yadd  = %f\n", (double)a2_yadd / 65536.0);
-	logerror("  a2_xstep = %f\n", (double)a2_xstep / 65536.0);
-	logerror("  a2_ystep = %f\n", (double)a2_ystep / 65536.0);
-	logerror("  a2_x     = %f\n", (double)a2_x / 65536.0);
-	logerror("  a2_y     = %f\n", (double)a2_y / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a2_base  = %08X\n", a2_base);
+	LOGMASKED(LOG_BLITS, "  a2_pitch = %d\n", a2_pitch);
+	LOGMASKED(LOG_BLITS, "  a2_psize = %d\n", 1 << ((A2FIXED >> 3) & 7));
+	LOGMASKED(LOG_BLITS, "  a2_width = %d\n", a2_width);
+	LOGMASKED(LOG_BLITS, "  a2_xadd  = %f (phrase=%d)\n", (double)a2_xadd / 65536.0, a2_phrase_mode);
+	LOGMASKED(LOG_BLITS, "  a2_yadd  = %f\n", (double)a2_yadd / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a2_xstep = %f\n", (double)a2_xstep / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a2_ystep = %f\n", (double)a2_ystep / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a2_x     = %f\n", (double)a2_x / 65536.0);
+	LOGMASKED(LOG_BLITS, "  a2_y     = %f\n", (double)a2_y / 65536.0);
 
-	logerror("  count    = %d x %d\n", inner_count, outer_count);
-	logerror("  command  = %08X\n", COMMAND);
-	}
+	LOGMASKED(LOG_BLITS, "  count    = %d x %d\n", inner_count, outer_count);
+	LOGMASKED(LOG_BLITS, "  command  = %08X\n", COMMAND);
 
 	/* check for unhandled command bits */
-	if ((COMMAND & 0x24003000) && LOG_UNHANDLED_BLITS)
-		logerror("Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24003000);
+	if (COMMAND & 0x24003000)
+		LOGMASKED(LOG_UNHANDLED_BLITS, "Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24003000);
 
 	/* top of the outer loop */
 	outer = outer_count;

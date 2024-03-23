@@ -60,23 +60,23 @@ public:
 
 	void set_output_latch(output_latch_device &latch);
 
-	DECLARE_WRITE_LINE_MEMBER( write_strobe );
-	DECLARE_WRITE_LINE_MEMBER( write_data0 );
-	DECLARE_WRITE_LINE_MEMBER( write_data1 );
-	DECLARE_WRITE_LINE_MEMBER( write_data2 );
-	DECLARE_WRITE_LINE_MEMBER( write_data3 );
-	DECLARE_WRITE_LINE_MEMBER( write_data4 );
-	DECLARE_WRITE_LINE_MEMBER( write_data5 );
-	DECLARE_WRITE_LINE_MEMBER( write_data6 );
-	DECLARE_WRITE_LINE_MEMBER( write_data7 );
-	DECLARE_WRITE_LINE_MEMBER( write_ack );
-	DECLARE_WRITE_LINE_MEMBER( write_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_perror );
-	DECLARE_WRITE_LINE_MEMBER( write_select );
-	DECLARE_WRITE_LINE_MEMBER( write_autofd );
-	DECLARE_WRITE_LINE_MEMBER( write_fault );
-	DECLARE_WRITE_LINE_MEMBER( write_init );
-	DECLARE_WRITE_LINE_MEMBER( write_select_in );
+	void write_strobe(int state);
+	void write_data0(int state);
+	void write_data1(int state);
+	void write_data2(int state);
+	void write_data3(int state);
+	void write_data4(int state);
+	void write_data5(int state);
+	void write_data6(int state);
+	void write_data7(int state);
+	void write_ack(int state);
+	void write_busy(int state);
+	void write_perror(int state);
+	void write_select(int state);
+	void write_autofd(int state);
+	void write_fault(int state);
+	void write_init(int state);
+	void write_select_in(int state);
 
 protected:
 	// device-level overrides
@@ -115,44 +115,44 @@ class device_centronics_peripheral_interface : public device_interface
 public:
 	virtual ~device_centronics_peripheral_interface();
 
-	DECLARE_WRITE_LINE_MEMBER( output_strobe ) { m_slot->m_strobe_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data0 ) { m_slot->m_data0_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data1 ) { m_slot->m_data1_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data2 ) { m_slot->m_data2_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data3 ) { m_slot->m_data3_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data4 ) { m_slot->m_data4_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data5 ) { m_slot->m_data5_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data6 ) { m_slot->m_data6_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_data7 ) { m_slot->m_data7_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_ack ) { m_slot->m_ack_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_busy ) { m_slot->m_busy_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_perror ) { m_slot->m_perror_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_select ) { m_slot->m_select_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_autofd ) { m_slot->m_autofd_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_fault ) { m_slot->m_fault_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_init ) { m_slot->m_init_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_select_in ) { m_slot->m_select_in_handler(state); }
+	void output_strobe(int state) { m_slot->m_strobe_handler(state); }
+	void output_data0(int state) { m_slot->m_data0_handler(state); }
+	void output_data1(int state) { m_slot->m_data1_handler(state); }
+	void output_data2(int state) { m_slot->m_data2_handler(state); }
+	void output_data3(int state) { m_slot->m_data3_handler(state); }
+	void output_data4(int state) { m_slot->m_data4_handler(state); }
+	void output_data5(int state) { m_slot->m_data5_handler(state); }
+	void output_data6(int state) { m_slot->m_data6_handler(state); }
+	void output_data7(int state) { m_slot->m_data7_handler(state); }
+	void output_ack(int state) { m_slot->m_ack_handler(state); }
+	void output_busy(int state) { m_slot->m_busy_handler(state); }
+	void output_perror(int state) { m_slot->m_perror_handler(state); }
+	void output_select(int state) { m_slot->m_select_handler(state); }
+	void output_autofd(int state) { m_slot->m_autofd_handler(state); }
+	void output_fault(int state) { m_slot->m_fault_handler(state); }
+	void output_init(int state) { m_slot->m_init_handler(state); }
+	void output_select_in(int state) { m_slot->m_select_in_handler(state); }
 
 protected:
 	device_centronics_peripheral_interface(const machine_config &mconfig, device_t &device);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_ack ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_busy )  { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_perror ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_select ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_autofd ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_fault ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_select_in ) { }
+	virtual void input_strobe(int state) { }
+	virtual void input_data0(int state) { }
+	virtual void input_data1(int state) { }
+	virtual void input_data2(int state) { }
+	virtual void input_data3(int state) { }
+	virtual void input_data4(int state) { }
+	virtual void input_data5(int state) { }
+	virtual void input_data6(int state) { }
+	virtual void input_data7(int state) { }
+	virtual void input_ack(int state) { }
+	virtual void input_busy(int state)  { }
+	virtual void input_perror(int state) { }
+	virtual void input_select(int state) { }
+	virtual void input_autofd(int state) { }
+	virtual void input_fault(int state) { }
+	virtual void input_init(int state) { }
+	virtual void input_select_in(int state) { }
 
 	virtual bool supports_pin35_5v() { return false; }
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Jaen Saul
-#ifndef MAME_MACHINE_POFO_KBD_H
-#define MAME_MACHINE_POFO_KBD_H
+#ifndef MAME_ATARI_POFO_KBD_H
+#define MAME_ATARI_POFO_KBD_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(POFO_KEYBOARD, pofo_keyboard_device);
 
-#endif // MAME_MACHINE_POFO_KBD_H
+#endif // MAME_ATARI_POFO_KBD_H

@@ -265,6 +265,8 @@ IC46->PAL16V8H 74LS393N 74LS368AP 74LS377B1|U||    |   |                        
 #include "sound/ymopn.h"
 
 
+namespace {
+
 class toki_ms_state : public driver_device
 {
 public:
@@ -332,7 +334,7 @@ private:
 	u8 sound_status_r();
 	void sound_command_w(u8 data);
 	void adpcm_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	u8 m_adpcm_data = 0;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
@@ -678,7 +680,7 @@ void toki_ms_state::machine_start()
 	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
-WRITE_LINE_MEMBER(toki_ms_state::adpcm_int)
+void toki_ms_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_adpcm_data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -827,5 +829,8 @@ void toki_ms_state::init_tokims()
 	descramble_16x16tiles(memregion("gfx4")->base(), memregion("gfx4")->bytes());
 	// gfx3 is 8x8 tiles
 }
+
+} // anonymous namespace
+
 
 GAME( 1991, tokims,  toki,  tokims,  tokims,  toki_ms_state, init_tokims, ROT0, "bootleg", "Toki (Modular System)", MACHINE_IMPERFECT_SOUND )

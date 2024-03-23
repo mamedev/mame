@@ -9,8 +9,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ATARIRLE_H
-#define MAME_VIDEO_ATARIRLE_H
+#ifndef MAME_ATARI_ATARIRLE_H
+#define MAME_ATARI_ATARIRLE_H
 
 #include "memarray.h"
 
@@ -177,4 +177,4 @@ private:
 	u16              m_rle_table_data[0x500];
 };
 
-#endif // MAME_VIDEO_ATARIRLE_H
+#endif // MAME_ATARI_ATARIRLE_H

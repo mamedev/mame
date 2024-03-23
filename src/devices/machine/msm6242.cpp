@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "machine/msm6242.h"
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_UNMAPPED    (1U << 1)
 #define LOG_IRQ         (1U << 2)
 #define LOG_IRQ_ENABLE  (1U << 3)
@@ -53,7 +52,6 @@ enum
 	MSM6242_REG_CF
 };
 
-#define TIMER_RTC_CALLBACK      1
 
 
 
@@ -97,11 +95,11 @@ msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, 
 
 void msm6242_device::device_start()
 {
-	m_out_int_handler.resolve();
-
 	// let's call the timer callback every tick
 	m_timer = timer_alloc(FUNC(msm6242_device::rtc_timer_callback), this);
 	m_timer->adjust(attotime::zero);
+	m_timer_irq_clear = timer_alloc(FUNC(msm6242_device::rtc_irq_pulse_timer_callback), this);
+	m_timer_irq_clear->adjust(attotime::zero);
 
 	// set up registers
 	m_tick = 0;
@@ -174,8 +172,16 @@ void msm6242_device::set_irq(bool active)
 	else
 		m_reg[0] &= 0x0b;
 
-	if (!m_out_int_handler.isnull())
+	if (!m_out_int_handler.isunset())
 		m_out_int_handler(active ? ASSERT_LINE : CLEAR_LINE);
+
+	if (active)
+	{
+		if (!BIT(m_reg[1], 1)) // irq is pulsed
+		{
+			m_timer_irq_clear->adjust(attotime::from_nsec(7812500));
+		}
+	}
 }
 
 
@@ -262,7 +268,7 @@ void msm6242_device::update_rtc_registers()
 		return;
 
 	// ticks
-	if ((m_tick % 200) != int((delta + m_tick) % 0x200))
+	if ((m_tick / 0x200) != int((delta + m_tick) / 0x200))
 		irq(IRQ_64THSECOND);
 	delta = bump(RTC_TICKS, delta, 0, 0x8000);
 	if (delta == 0)
@@ -303,7 +309,7 @@ void msm6242_device::update_timer()
 	attotime callback_time = attotime::never;
 
 	// we only need to call back if the IRQ flag is on, and we have a handler
-	if (!m_out_int_handler.isnull() && m_irq_flag == 1)
+	if (!m_out_int_handler.isunset() && m_irq_flag == 1)
 	{
 		switch(m_irq_type)
 		{
@@ -365,6 +371,17 @@ TIMER_CALLBACK_MEMBER(msm6242_device::rtc_timer_callback)
 {
 	update_rtc_registers();
 	update_timer();
+}
+
+
+
+//-------------------------------------------------
+//  rtc_irq_pulse_timer_callback
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(msm6242_device::rtc_irq_pulse_timer_callback)
+{
+	set_irq(false);
 }
 
 
@@ -519,6 +536,7 @@ void msm6242_device::write(offs_t offset, u8 data)
 			{
 				LOGIRQENABLE("%s: MSM6242 acknowledging irq\n", machine().describe_context());
 				set_irq(false);
+				m_timer_irq_clear->adjust(attotime::zero);
 			}
 			m_reg[0] = (data & 0x09) | (m_reg[0] & 0x06);
 			break;
@@ -528,7 +546,7 @@ void msm6242_device::write(offs_t offset, u8 data)
 			//  --x- STD
 			//  ---x MASK
 			m_reg[1] = data & 0x0f;
-			if((data & 3) == 0) // MASK & STD = 0
+			if((data & 1) == 0) // MASK = 0
 			{
 				m_irq_flag = 1;
 				m_irq_type = (data & 0xc) >> 2;

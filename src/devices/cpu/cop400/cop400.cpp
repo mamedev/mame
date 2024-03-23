@@ -88,7 +88,9 @@ DEFINE_DEVICE_TYPE(COP446C, cop446c_cpu_device, "cop446c", "National Semiconduct
     CONSTANTS
 ***************************************************************************/
 
-#define LOG_MICROBUS 0
+#define LOG_MICROBUS (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // step through skipped instructions in debugger
 #define COP_DEBUG_SKIP 0
@@ -174,17 +176,17 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
-	, m_read_l(*this)
-	, m_read_l_tristate(*this)
+	, m_read_l(*this, 0)
+	, m_read_l_tristate(*this, 0)
 	, m_write_l(*this)
-	, m_read_g(*this)
+	, m_read_g(*this, 0)
 	, m_write_g(*this)
 	, m_write_d(*this)
-	, m_read_in(*this)
-	, m_read_si(*this)
+	, m_read_in(*this, 0)
+	, m_read_si(*this, 0)
 	, m_write_so(*this)
 	, m_write_sk(*this)
-	, m_read_cko(*this)
+	, m_read_cko(*this, 0)
 	, m_cki(COP400_CKI_DIVISOR_16)
 	, m_cko(COP400_CKO_OSCILLATOR_OUTPUT)
 	, m_has_microbus(false)
@@ -1063,24 +1065,11 @@ void cop400_cpu_device::inil_tick()
 
 void cop400_cpu_device::device_start()
 {
-	/* find address spaces */
+	// find address spaces
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
 
-	/* find i/o handlers */
-	m_read_l.resolve_safe(0);
-	m_read_l_tristate.resolve_safe(0);
-	m_write_l.resolve_safe();
-	m_read_g.resolve_safe(0);
-	m_write_g.resolve_safe();
-	m_write_d.resolve_safe();
-	m_read_in.resolve_safe(0);
-	m_read_si.resolve_safe(0);
-	m_write_so.resolve_safe();
-	m_write_sk.resolve_safe();
-	m_read_cko.resolve_safe(0);
-
-	/* allocate counter timer */
+	// allocate counter timer
 	m_counter_timer = nullptr;
 	if (m_has_counter)
 	{
@@ -1088,7 +1077,7 @@ void cop400_cpu_device::device_start()
 		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 4, clock()));
 	}
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prevpc));
 	save_item(NAME(m_sa));
@@ -1144,21 +1133,39 @@ void cop400_cpu_device::device_start()
 
 	set_icountptr(m_icount);
 
+	// zerofill
+	m_pc = 0;
+	m_prevpc = 0;
+	m_a = 0;
+	m_b = 0;
+	m_c = 0;
+	m_en = 0;
+	m_g = 0;
 	m_q = 0;
 	m_sa = 0;
 	m_sb = 0;
 	m_sc = 0;
 	m_sio = 0;
+	m_skl = 0;
+
+	m_t = 0;
+	m_skt_latch = 0;
+
 	m_il = 0;
-	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
+	memset(m_in, 0, sizeof(m_in));
 	m_si = 0;
 	m_so_output = 0;
 	m_sk_output = 0;
 	m_l_output = 0;
+
+	m_skip = false;
 	m_skip_lbi = 0;
 	m_last_skip = false;
-	m_skip = false;
+	m_halt = false;
+	m_idle = false;
+
 	m_opcode = 0x44;
+	m_second_byte = false;
 }
 
 
@@ -1382,14 +1389,14 @@ std::unique_ptr<util::disasm_interface> cop400_cpu_device::create_disassembler()
 
 uint8_t cop400_cpu_device::microbus_r()
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS R %02x\n", machine().time().as_string(), machine().describe_context(), Q);
+	LOGMASKED(LOG_MICROBUS, "%s %s MICROBUS R %02x\n", machine().time().as_string(), machine().describe_context(), Q);
 
 	return Q;
 }
 
 void cop400_cpu_device::microbus_w(uint8_t data)
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS W %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	LOGMASKED(LOG_MICROBUS, "%s %s MICROBUS W %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	WRITE_G(G & 0xe);
 

@@ -128,10 +128,10 @@ public:
 	auto porta_w() { return m_port_cb_w[0].bind(); }
 	auto portb_w() { return m_port_cb_w[1].bind(); }
 	auto portc_w() { return m_port_cb_w[2].bind(); }
+	template <std::size_t N> auto portan_r() { return m_portan_cb_r[N].bind(); }
 
-	WRITE_LINE_MEMBER(timer_w) { m_timer.timer_w(state); }
+	void timer_w(int state) { m_timer.timer_w(state); }
 
-protected:
 	// state index constants
 	enum
 	{
@@ -162,6 +162,7 @@ protected:
 		M68705_MOR
 	};
 
+protected:
 	static unsigned const PORT_COUNT = 4;
 
 	m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
@@ -210,6 +211,10 @@ private:
 	u8              m_port_ddr[PORT_COUNT];
 	devcb_read8::array<PORT_COUNT> m_port_cb_r;
 	devcb_write8::array<PORT_COUNT> m_port_cb_w;
+
+	// analog input ports
+	devcb_read8::array<4> m_portan_cb_r;
+	u8 m_acr_mux;
 
 	// miscellaneous register
 	enum mr_mask : u8
@@ -317,9 +322,6 @@ protected:
 
 class m68705r_device : public m68705u_device
 {
-public:
-	// TODO: voltage inputs for ADC (shared with digital port D pins)
-
 protected:
 	virtual void internal_map(address_map &map) override;
 

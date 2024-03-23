@@ -176,6 +176,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class camplynx_state : public driver_device
 {
 public:
@@ -1022,6 +1024,8 @@ ROM_START( lynx128k )
 	ROM_LOAD( "lynx128-3.ic3", 0x4000, 0x2000, CRC(9827b9e9) SHA1(1092367b2af51c72ce9be367179240d692aeb131) )
 	ROM_LOAD( "dosrom.rom",    0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

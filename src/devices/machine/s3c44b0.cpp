@@ -16,6 +16,7 @@
 #include "screen.h"
 
 #include <algorithm>
+#include <cstdarg>
 
 
 #define S3C44B0_INTCON    (0x00 / 4) // Interrupt Control
@@ -226,12 +227,12 @@ s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, S3C44B0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_port_r_cb(*this)
+	, m_port_r_cb(*this, 0)
 	, m_port_w_cb(*this)
 	, m_scl_w_cb(*this)
-	, m_sda_r_cb(*this)
+	, m_sda_r_cb(*this, 0)
 	, m_sda_w_cb(*this)
-	, m_data_r_cb(*this)
+	, m_data_r_cb(*this, 0)
 	, m_data_w_cb(*this)
 {
 	memset(&m_irq, 0, sizeof(s3c44b0_irq_t));
@@ -256,14 +257,6 @@ s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, d
 
 void s3c44b0_device::device_start()
 {
-	m_port_r_cb.resolve();
-	m_port_w_cb.resolve();
-	m_scl_w_cb.resolve();
-	m_sda_r_cb.resolve();
-	m_sda_w_cb.resolve();
-	m_data_r_cb.resolve_safe(0);
-	m_data_w_cb.resolve();
-
 	m_cpu->space(AS_PROGRAM).cache(m_cache);
 
 	for (int i = 0; i < 6; i++) m_pwm.timer[i] = timer_alloc(FUNC(s3c44b0_device::pwm_timer_exp), this);
@@ -914,12 +907,6 @@ void s3c44b0_device::check_pending_irq()
 	temp = (m_irq.regs.intpnd & ~m_irq.regs.intmsk) & m_irq.regs.intmod;
 	if (temp != 0)
 	{
-		uint32_t int_type = 0;
-		while ((temp & 1) == 0)
-		{
-			int_type++;
-			temp = temp >> 1;
-		}
 		if (m_irq.line_fiq != ASSERT_LINE)
 		{
 			m_cpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
@@ -945,17 +932,8 @@ void s3c44b0_device::request_irq(uint32_t int_type)
 
 void s3c44b0_device::check_pending_eint()
 {
-	uint32_t temp = m_gpio.regs.extintpnd;
-	if (temp != 0)
-	{
-		uint32_t int_type = 0;
-		while ((temp & 1) == 0)
-		{
-			int_type++;
-			temp = temp >> 1;
-		}
+	if (m_gpio.regs.extintpnd != 0)
 		request_irq(S3C44B0_INT_EINT4_7);
-	}
 }
 
 void s3c44b0_device::request_eint(uint32_t number)
@@ -1234,22 +1212,17 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::pwm_timer_exp )
 
 inline void s3c44b0_device::iface_i2c_scl_w(int state)
 {
-	if (!m_scl_w_cb.isnull())
-		(m_scl_w_cb)( state);
+	m_scl_w_cb(state);
 }
 
 inline void s3c44b0_device::iface_i2c_sda_w(int state)
 {
-	if (!m_sda_w_cb.isnull())
-		(m_sda_w_cb)( state);
+	m_sda_w_cb(state);
 }
 
 inline int s3c44b0_device::iface_i2c_sda_r()
 {
-	if (!m_sda_r_cb.isnull())
-		return (m_sda_r_cb)();
-	else
-		return 0;
+	return m_sda_r_cb();
 }
 
 void s3c44b0_device::i2c_send_start()
@@ -1456,16 +1429,12 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::iic_timer_exp )
 
 inline uint32_t s3c44b0_device::iface_gpio_port_r(int port)
 {
-	if (!m_port_r_cb.isnull())
-		return (m_port_r_cb)(port);
-	else
-		return 0;
+	return m_port_r_cb(port);
 }
 
 inline void s3c44b0_device::iface_gpio_port_w(int port, uint32_t data)
 {
-	if (!m_port_w_cb.isnull())
-		(m_port_w_cb)(port, data, 0xffff);
+	m_port_w_cb(port, data, 0xffff);
 }
 
 uint32_t s3c44b0_device::gpio_r(offs_t offset, uint32_t mem_mask)
@@ -1894,8 +1863,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::sio_timer_exp )
 
 inline void s3c44b0_device::iface_i2s_data_w(int ch, uint16_t data)
 {
-	if (!m_data_w_cb.isnull())
-		(m_data_w_cb)(ch, data, 0);
+	m_data_w_cb(ch, data, 0);
 }
 
 void s3c44b0_device::iis_start()

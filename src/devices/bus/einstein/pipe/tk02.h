@@ -38,7 +38,7 @@ protected:
 private:
 	void map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(de_w);
+	void de_w(int state);
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Eugene Sandulenko
-#ifndef MAME_AUDIO_TIAMC1_H
-#define MAME_AUDIO_TIAMC1_H
+#ifndef MAME_USSR_TIAMC1_A_H
+#define MAME_USSR_TIAMC1_A_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TIAMC1, tiamc1_sound_device)
 
-#endif // MAME_AUDIO_TIAMC1_H
+#endif // MAME_USSR_TIAMC1_A_H

@@ -32,9 +32,9 @@ awacs_device::awacs_device(const machine_config &mconfig, const char *tag, devic
 	, device_sound_interface(mconfig, *this)
 	, m_irq_out_cb(*this)
 	, m_irq_in_cb(*this)
-	, m_output_cb(*this)
+	, m_output_cb(*this, 0)
 	, m_input_cb(*this)
-	, m_input_port_cb(*this)
+	, m_input_port_cb(*this, 0)
 	, m_output_port_cb(*this)
 	, m_stream(nullptr)
 {
@@ -50,15 +50,6 @@ void awacs_device::device_start()
 	m_stream = stream_alloc(0, 2, clock()/64/divider[0], STREAM_SYNCHRONOUS);
 
 	m_last_sample = attotime::zero;
-
-	m_irq_out_cb.resolve_safe();
-	m_irq_in_cb.resolve_safe();
-
-	m_output_cb.resolve_safe(0);
-	m_input_cb.resolve_safe();
-
-	m_input_port_cb.resolve_safe(0);
-	m_output_port_cb.resolve_safe();
 
 	save_item(NAME(m_extend));
 	save_item(NAME(m_ext_command));

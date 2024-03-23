@@ -25,7 +25,7 @@ dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, co
 	, m_variant(variant)
 	, m_irq_cb(*this)
 	, m_breq_cb(*this)
-	, m_mem_read_cb(*this)
+	, m_mem_read_cb(*this, 0)
 	, m_mem_write_cb(*this)
 	, m_reset(0)
 	, m_rdma_active(0)
@@ -33,10 +33,6 @@ dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, co
 }
 
 void dp8390_device::device_start() {
-	m_irq_cb.resolve_safe();
-	m_breq_cb.resolve_safe();
-	m_mem_read_cb.resolve_safe(0);
-	m_mem_write_cb.resolve_safe();
 }
 
 void dp8390_device::stop() {
@@ -171,7 +167,7 @@ void dp8390_device::recv_cb(uint8_t *buf, int len) {
 	if(!LOOPBACK) recv(buf, len);
 }
 
-WRITE_LINE_MEMBER(dp8390_device::dp8390_reset) {
+void dp8390_device::dp8390_reset(int state) {
 	if(!state) device_reset();
 }
 
@@ -426,7 +422,7 @@ void dp8390_device::cs_write(offs_t offset, uint8_t data) {
 	case 0x45:
 	case 0x46:
 		m_regs.par[(offset & 0x7)-1] = data;
-		set_mac((const char *)m_regs.par);
+		set_mac(m_regs.par);
 		break;
 	case 0x47:
 		m_regs.curr = data;

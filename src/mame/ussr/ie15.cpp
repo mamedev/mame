@@ -19,6 +19,8 @@
 #include "machine/ie15_kbd.h"
 
 
+namespace {
+
 class ie15_state : public driver_device
 {
 public:
@@ -55,6 +57,9 @@ void ie15_state::ie15(machine_config &config)
 
 ROM_START(ie15)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME       FLAGS
 COMP( 1980, ie15, 0,      0,      ie15,    0,     ie15_state, empty_init, "USSR",  "15IE-00-013", 0)

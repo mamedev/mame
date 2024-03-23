@@ -81,6 +81,8 @@ JMON ToDo:
 #include "tec1.lh"
 
 
+namespace {
+
 class tec1_state : public driver_device
 {
 public:
@@ -106,7 +108,7 @@ private:
 	void tec1_digit_w(u8 data);
 	void tecjmon_digit_w(u8 data);
 	void segment_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(da_w);
+	void da_w(int state);
 	bool m_key_pressed = 0;
 	u8 m_seg = 0U;
 	u8 m_digit = 0U;
@@ -204,7 +206,7 @@ u8 tec1_state::kbd_r()
 	return m_kb->read() | m_io_shift->read();
 }
 
-WRITE_LINE_MEMBER( tec1_state::da_w )
+void tec1_state::da_w(int state)
 {
 	m_key_pressed = state;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -404,6 +406,9 @@ ROM_START(tecjmon)
 	ROM_LOAD("jmon.rom",    0x0000, 0x0800, CRC(202c47a2) SHA1(701588ec5640d633d90d94b2ccd6f65422e19a70) )
 	ROM_LOAD("util.rom",    0x0800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                         FULLNAME            FLAGS
 COMP( 1984, tec1,     0,      0,      tec1,    tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1",            MACHINE_SUPPORTS_SAVE )

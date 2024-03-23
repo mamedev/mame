@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-#ifndef MAME_INCLUDES_NAMCOS1_H
-#define MAME_INCLUDES_NAMCOS1_H
+#ifndef MAME_NAMCO_NAMCOS1_H
+#define MAME_NAMCO_NAMCOS1_H
 
 #pragma once
 
@@ -70,7 +70,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void driver_init() override;
+	void driver_init();
 
 private:
 	required_device<mc6809e_device> m_maincpu;
@@ -116,11 +116,11 @@ private:
 	bool m_copy_sprites = false;
 	u8 m_drawmode_table[16]{};
 
-	DECLARE_WRITE_LINE_MEMBER(subres_w);
+	void subres_w(int state);
 	void audiocpu_irq_ack_w(u8 data);
 	void mcu_irq_ack_w(u8 data);
 	u8 dsw_r(offs_t offset);
-	void coin_w(u8 data);
+	void coin_w(offs_t offset, u8 data, u8 mem_mask);
 	void dac_gain_w(u8 data);
 	void sound_bankswitch_w(u8 data);
 	void mcu_bankswitch_w(u8 data);
@@ -147,7 +147,7 @@ private:
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
@@ -156,4 +156,4 @@ private:
 	void virtual_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NAMCOS1_H
+#endif // MAME_NAMCO_NAMCOS1_H

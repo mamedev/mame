@@ -22,7 +22,7 @@
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/timekpr.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 // busses and connectors
 #include "machine/nscsi_bus.h"
@@ -31,8 +31,6 @@
 #include "bus/rs232/rs232.h"
 
 #include "debugger.h"
-
-#define LOG_GENERAL (1U << 0)
 
 #define VERBOSE 0
 #include "logmacro.h"

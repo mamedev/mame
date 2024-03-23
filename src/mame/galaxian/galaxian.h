@@ -5,8 +5,8 @@
     Galaxian hardware family
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GALAXIAN_H
-#define MAME_INCLUDES_GALAXIAN_H
+#ifndef MAME_GALAXIAN_GALAXIAN_H
+#define MAME_GALAXIAN_GALAXIAN_H
 
 #pragma once
 
@@ -18,6 +18,7 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/digitalk.h"
+#include "sound/sn76496.h"
 #include "sound/sp0250.h"
 
 #include "emupal.h"
@@ -106,7 +107,7 @@ public:
 	void scramble_background_green_w(uint8_t data);
 	void scramble_background_blue_w(uint8_t data);
 	void galaxian_gfxbank_w(offs_t offset, uint8_t data);
-	template <int N> DECLARE_READ_LINE_MEMBER(azurian_port_r);
+	template <int N> int azurian_port_r();
 	void irq_enable_w(uint8_t data);
 	void start_lamp_w(offs_t offset, uint8_t data);
 	void coin_lock_w(uint8_t data);
@@ -119,7 +120,7 @@ public:
 	void theend_ppi8255_w(offs_t offset, uint8_t data);
 	void theend_protection_w(uint8_t data);
 	uint8_t theend_protection_r();
-	template <int N> DECLARE_READ_LINE_MEMBER(theend_protection_alt_r);
+	template <int N> int theend_protection_alt_r();
 	void explorer_sound_control_w(uint8_t data);
 	uint8_t frogger_ppi8255_r(offs_t offset);
 	void frogger_ppi8255_w(offs_t offset, uint8_t data);
@@ -196,12 +197,14 @@ public:
 	void init_mimonkey();
 	void init_mimonkeyb();
 	void init_victoryc();
+	void init_bigkonggx();
+	void init_crazym();
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
 	void eagle_palette(palette_device &palette);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
+	void vblank_interrupt_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
@@ -315,9 +318,10 @@ public:
 	void mimonkey(machine_config &config);
 	void mimonscr(machine_config &config);
 	void galartic(machine_config &config);
+	void bigkonggx(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
+	template <int Mask> int ckongs_coinage_r();
 
 protected:
 	// machine configuration helpers
@@ -333,6 +337,7 @@ protected:
 	void anteatergg_map(address_map &map);
 	void anteateruk_map(address_map &map);
 	void astroamb_map(address_map &map);
+	void bigkonggx_map(address_map &map);
 	void bongo_map(address_map &map);
 	void bongo_io_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);
@@ -589,8 +594,8 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(muxbit_r);
-	DECLARE_READ_LINE_MEMBER(noise_r);
+	int muxbit_r();
+	int noise_r();
 
 	void kingball(machine_config &config);
 
@@ -867,6 +872,7 @@ private:
 	uint8_t m_port_select = 0U;
 	uint8_t m_direction[2]{};
 	uint8_t m_counter_74ls161[2]{};
+	uint8_t m_last_dialread[2]{};
 };
 
 
@@ -908,4 +914,25 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_GALAXIAN_H
+class bmxstunts_state : public galaxian_state
+{
+public:
+	bmxstunts_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_snsnd(*this, "snsnd")
+	{
+	}
+
+	void bmxstunts(machine_config &config);
+	void init_bmxstunts();
+	void bmxstunts_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+
+private:
+	required_device<sn76489a_device> m_snsnd;
+
+	void bmxstunts_map(address_map& map);
+	void snsnd_w(uint8_t data) { m_snsnd->write(bitswap<8>(data,0,1,2,3,4,5,6,7)); }
+};
+
+
+#endif // MAME_GALAXIAN_GALAXIAN_H

@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MODEL1IO_H
-#define MAME_MACHINE_MODEL1IO_H
+#ifndef MAME_SEGA_MODEL1IO_H
+#define MAME_SEGA_MODEL1IO_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_MODEL1IO, model1io_device)
 
-#endif // MAME_MACHINE_MODEL1IO_H
+#endif // MAME_SEGA_MODEL1IO_H

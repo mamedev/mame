@@ -1110,6 +1110,37 @@ ROM_START( svolleyu )
 	ROM_LOAD( "sps_15.bin", 0x20000, 0x10000, CRC(f33f415f) SHA1(1dd465d9b3009754a7d53400562a53dacff364fc) )
 ROM_END
 
+ // VS-68K-2 (H2) PCB, same PCB as the svolley set but this has some MASK ROMs.
+ // Shows for use in Japan disclaimer but has English text and makes you play as the USA like svolleyu, but no Data East license.
+ROM_START( svolleyua )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // differs
+	ROM_LOAD16_BYTE( "h0.ic137", 0x00000, 0x10000, CRC(58cfa5d7) SHA1(2e07121b301d4371c0b2bc865276772bf5b923e5) ) // 27512
+	ROM_LOAD16_BYTE( "l0.ic136", 0x00001, 0x10000, CRC(b1f5a54c) SHA1(71b9c9b5cca93c65a87de10030e64005fe3f605c) ) // 27512
+	ROM_LOAD16_BYTE( "h1.ic127", 0x20000, 0x08000, CRC(3c9721ff) SHA1(4a23401667af01b5255d86e2acb66fd47bd40600) ) // 27256
+	ROM_LOAD16_BYTE( "l1.ic126", 0x20001, 0x08000, CRC(55cfabce) SHA1(c35d9cbf54f5103703a169b4764e063f55f5e6ef) ) // 27256
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // same
+	ROM_LOAD( "1.ic112", 0x00000, 0x10000, CRC(48b89688) SHA1(1f39d979a852f5237a7d95231e86a28cdc1f4d65) ) // 27512
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASEFF ) // same but split differently
+	ROM_LOAD16_WORD(      "lh532099.ic46", 0x00000, 0x40000, CRC(9428cc36) SHA1(d915dc6ee16cca695fd8b2ff3049a9cc7f601e34) ) // 2m MASK ROM, 27C020 compatible
+	ROM_LOAD16_WORD_SWAP( "7.ic35",        0x40000, 0x10000, CRC(83b20b91) SHA1(043cb6035d762fca3955221edee284fbcf0f8d1e) ) // 27512, double sized but second half 0x00 filled
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) // same but split differently
+	ROM_LOAD16_WORD(      "lh53200a.ic47", 0x00000, 0x40000, CRC(75930468) SHA1(be5889b969ede70a8e39932e91fd6bd24b9f9df2) ) // 2m MASK ROM, 27C020 compatible
+	ROM_LOAD16_WORD_SWAP( "10.ic36",       0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) ) // 27512
+
+	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF ) // same but split differently
+	ROM_LOAD16_WORD( "lh5320h7.ic51", 0x00000, 0x40000, CRC(152ff5b6) SHA1(8574f59757d198b197284efabb2befe3a7e41d45) ) // 2m MASK ROM, 27C020 compatible
+	ROM_LOAD16_BYTE( "s0.ic18",       0x60000, 0x08000, CRC(4d6c8f0c) SHA1(27f58a53cd6aef071c685eda532e4909ea915c8d) ) // 27256
+	ROM_LOAD16_BYTE( "s1.ic43",       0x60001, 0x08000, CRC(9dd28b42) SHA1(5f49456ee49ed7df59629d02a9da57eac370c388) ) // 27256, S1 was not readable but since S0 matches it's almost certain this does too
+
+	ROM_REGION( 0x40000, "upd", 0 )  // same but split differently
+	ROM_LOAD( "4.ic114", 0x00000, 0x10000, CRC(c4effee6) SHA1(84dece09139f804dcf8a07c2089cec84515eba16) ) // 27512
+	ROM_LOAD( "3.ic123", 0x10000, 0x10000, CRC(5a818eb4) SHA1(a4596a9aedda0b362546e4de7cbbdf1eb1fd7ade) ) // 27512
+	ROM_LOAD( "2.ic133", 0x20000, 0x10000, CRC(f33f415f) SHA1(1dd465d9b3009754a7d53400562a53dacff364fc) ) // 27512
+ROM_END
+
 
 ROM_START( svolleybl )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -1155,12 +1186,13 @@ ROM_END
  *
  *************************************/
 
-//    year  name       parent    machine    input     class          init        rot   company                                      description                 flags
-GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state,  empty_init, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state,  empty_init, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolley,   0,        svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+//    year  name       parent    machine    input     class          init        rot   company                                      description                                 flags
+GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state,  empty_init, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state,  empty_init, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolley,   0,        svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co.",                              "Super Volleyball (Japan)",                 MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co.",                              "Super Volleyball (Korea)",                 MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US, Data East license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyua, svolley,  svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co.",                              "Super Volleyball (US)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact)
 // the sound system seems to be ripped from the later Power Spikes (see aerofgt.cpp)

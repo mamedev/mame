@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_MACHINE_ZORBAKBD_H
-#define MAME_MACHINE_ZORBAKBD_H
+#ifndef MAME_SKELETON_ZORBAKBD_H
+#define MAME_SKELETON_ZORBAKBD_H
 
 #pragma once
 
@@ -17,7 +17,7 @@ public:
 
 	zorba_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
+	void txd_w(int state);
 
 protected:
 	u8 mcu_pa_r();
@@ -40,4 +40,4 @@ protected:
 	u8      m_row_select;
 };
 
-#endif // MAME_MACHINE_ZORBAKBD_H
+#endif // MAME_SKELETON_ZORBAKBD_H

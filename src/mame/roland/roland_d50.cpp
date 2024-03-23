@@ -12,6 +12,9 @@
 #include "mb63h149.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class roland_d50_state : public driver_device
 {
 public:
@@ -164,6 +167,9 @@ ROM_START(d550) // Newer PCB with silkscreen "Roland || D-50, D-550 || MAIN BOAR
 	ROM_LOAD("roland__r15179858_8801ebi__tc534000p-7477.ic30", 0x00000, 0x80000, CRC(e2aed2d9) SHA1(e9f5b38b9b5fce04beb4cf871401e821a42edacb)) // A+B "Roland || R15179858 8801EBI || TC534000P-7477" 512KiB Mask ROM @ ic30
 	// ic29 is empty on boards with tc534000-sized Mask ROMs
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1987, d50,  0,   0, d50,  d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 2.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(1987, d50o, d50, 0, d50,  d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

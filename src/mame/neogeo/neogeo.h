@@ -6,11 +6,17 @@
     Neo-Geo hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_NEOGEO_H
-#define MAME_INCLUDES_NEOGEO_H
+#ifndef MAME_NEOGEO_NEOGEO_H
+#define MAME_NEOGEO_NEOGEO_H
 
 #pragma once
 
+#include "ng_memcard.h"
+#include "neogeo_spr.h"
+
+#include "bus/neogeo/slot.h"
+#include "bus/neogeo/carts.h"
+#include "bus/neogeo_ctrl/ctrl.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopn.h"
@@ -18,16 +24,16 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
-#include "ng_memcard.h"
-#include "neogeo_spr.h"
-
-#include "bus/neogeo/slot.h"
-#include "bus/neogeo/carts.h"
-#include "bus/neogeo_ctrl/ctrl.h"
 
 #include "emupal.h"
 #include "screen.h"
 
+
+#define NEOGEO_MASTER_CLOCK                     (24000000)
+#define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
+#define NEOGEO_AUDIO_CPU_CLOCK                  (NEOGEO_MASTER_CLOCK / 6)
+#define NEOGEO_YM2610_CLOCK                     (NEOGEO_MASTER_CLOCK / 3)
+#define NEOGEO_PIXEL_CLOCK                      (NEOGEO_MASTER_CLOCK / 4)
 
 // On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
 // Two mclks after /VBLANK goes low, the hardware sets a pending IRQ1 flip-flop.
@@ -66,19 +72,17 @@ protected:
 		, m_edge(*this, "edge")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
-		, m_use_cart_vectors(0)
-		, m_use_cart_audio(0)
 		, m_slots(*this, "cslot%u", 1U)
 		, m_audionmi(*this, "audionmi")
 	{ }
 
-	uint16_t memcard_r(offs_t offset);
+	uint16_t memcard_r(offs_t offset, uint16_t mem_mask = ~0);
 	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t audio_cpu_bank_select_r(offs_t offset);
 	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
 	uint16_t unmapped_r(address_space &space);
 	uint16_t paletteram_r(offs_t offset);
-	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paletteram_w(offs_t offset, uint16_t data);
 	uint16_t video_register_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
 	void video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -90,8 +94,8 @@ protected:
 
 	virtual void io_control_w(offs_t offset, uint8_t data);
 	void audio_command_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
-	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
+	void set_use_cart_vectors(int state);
+	void set_use_cart_audio(int state);
 	uint16_t banked_vectors_r(offs_t offset);
 	void write_banksel(uint16_t data);
 	void write_bankprot(uint16_t data);
@@ -101,11 +105,12 @@ protected:
 	void write_bankprot_kof10th(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t read_lorom_kof10th(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(set_screen_shadow);
-	DECLARE_WRITE_LINE_MEMBER(set_palette_bank);
+	void set_screen_shadow(int state);
+	void set_palette_bank(int state);
 
 	void neogeo_base(machine_config &config);
 	void neogeo_stereo(machine_config &config);
+	void neogeo_memcard(machine_config &config);
 
 	void base_main_map(address_map &map);
 	void audio_io_map(address_map &map);
@@ -118,7 +123,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	// MVS-specific devices
 	optional_device<ym2610_device> m_ym;
@@ -157,8 +162,9 @@ protected:
 	uint8_t      m_vblank_level = 0;
 	uint8_t      m_raster_level = 0;
 
-	int m_use_cart_vectors = 0;
-	int m_use_cart_audio = 0;
+	uint8_t      m_use_cart_vectors = 0;
+	uint8_t      m_use_cart_audio = 0;
+	uint8_t      m_card_bank = 0;
 
 	void set_slot_idx(int slot);
 
@@ -231,7 +237,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void io_control_w(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
+	void set_save_ram_unlock(int state);
 	void save_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t in0_edge_r();
 	uint16_t in0_edge_joy_r();
@@ -280,4 +286,4 @@ private:
 INPUT_PORTS_EXTERN(neogeo);
 INPUT_PORTS_EXTERN(aes);
 
-#endif // MAME_INCLUDES_NEOGEO_H
+#endif // MAME_NEOGEO_NEOGEO_H

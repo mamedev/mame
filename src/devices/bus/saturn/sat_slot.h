@@ -31,7 +31,7 @@ public:
 
 	int get_cart_type() const { return m_cart_type; }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void bram_alloc(uint32_t size);
 	void dram0_alloc(uint32_t size);
 	void dram1_alloc(uint32_t size);
@@ -79,15 +79,15 @@ public:
 	sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sat_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "sat_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_cart_type();
@@ -102,7 +102,7 @@ public:
 	virtual void write_ext_bram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -112,12 +112,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(SATURN_CART_SLOT, sat_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define SATSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_SATURN_SAT_SLOT_H

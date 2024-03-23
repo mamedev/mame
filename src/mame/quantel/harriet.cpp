@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/hd63450.h"
 //#include "machine/imsc012.h"
 #include "machine/mc68681.h"
@@ -17,6 +17,9 @@
 #include "machine/nvram.h"
 #include "machine/timekpr.h"
 #include "machine/wd33c9x.h"
+
+
+namespace {
 
 class harriet_state : public driver_device
 {
@@ -129,5 +132,8 @@ ROM_START( harriet )
 	ROM_LOAD16_BYTE("harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1))
 	ROM_LOAD16_BYTE("harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_IS_SKELETON )

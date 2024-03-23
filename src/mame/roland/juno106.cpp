@@ -13,6 +13,9 @@
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 
+
+namespace {
+
 class juno106_state : public driver_device
 {
 public:
@@ -162,6 +165,9 @@ ROM_START(mks7)
 	ROM_REGION(0x2000, "module", 0)
 	ROM_LOAD("mks7-b-module.ic38", 0x0000, 0x2000, CRC(306c6c54) SHA1(725e24199056c2788380b70acbc1a3842780e225))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1984, juno106, 0, 0, juno106, juno106, juno106_state, empty_init, "Roland", "Juno-106 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1985, mks7,    0, 0, mks7,    mks7,    juno106_state, empty_init, "Roland", "MKS-7 Super Quartet",                          MACHINE_IS_SKELETON)

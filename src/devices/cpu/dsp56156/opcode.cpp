@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
-#include <cstdio>
-
 #include "opcode.h"
 
-namespace DSP_56156
-{
+#include <cstdio>
+
+
+namespace DSP_56156 {
+
 Opcode::Opcode(uint16_t w0, uint16_t w1) : m_word0(w0)/*, m_word1(w1)*/
 {
 	m_instruction = Instruction::decodeInstruction(this, w0, w1);
@@ -32,19 +33,10 @@ std::string Opcode::disassemble() const
 		return dcString();
 
 	// Disassemble what you can.
-	std::string opString = "";
-	std::string pmString = "";
-	if (m_instruction) m_instruction->disassemble(opString);
-	if (m_parallelMove) m_parallelMove->disassemble(pmString);
+	auto opString = m_instruction ? m_instruction->disassemble() : "";
+	auto pmString = m_parallelMove ? m_parallelMove->disassemble() : "";
 
 	return opString + " " + pmString;
-}
-
-
-void Opcode::evaluate(dsp56156_core* cpustate) const
-{
-	if (m_instruction) m_instruction->evaluate(cpustate);
-	if (m_parallelMove) m_parallelMove->evaluate();
 }
 
 
@@ -57,15 +49,6 @@ size_t Opcode::size() const
 	return 1;
 }
 
-size_t Opcode::evalSize() const
-{
-	if (m_instruction && m_instruction->valid())
-		return m_instruction->evalSize(); // Probably doesn't matter : + m_instruction->sizeIncrement();
-
-	// Opcode failed to decode, so push it past dc
-	return 1;
-}
-
 
 const reg_id& Opcode::instSource() const { return m_instruction->source(); }
 const reg_id& Opcode::instDestination() const { return m_instruction->destination(); }
@@ -73,9 +56,7 @@ size_t Opcode::instAccumulatorBitsModified() const { return m_instruction->accum
 
 std::string Opcode::dcString() const
 {
-	char tempStr[1024];
-	sprintf(tempStr, "dc $%x", m_word0);
-	return std::string(tempStr);
+	return util::string_format("dc $%x", m_word0);
 }
 
-}
+} // namespace DSP_56156

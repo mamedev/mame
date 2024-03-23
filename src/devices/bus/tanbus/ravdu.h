@@ -46,7 +46,7 @@ protected:
 private:
 	uint8_t videoram_r(offs_t offset);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void vsync_changed(int state);
 
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;

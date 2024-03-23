@@ -74,12 +74,12 @@ public:
 	// computer interface
 	uint8_t in_r();
 	void out_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int ef3_r();
+	int ef4_r();
+	void q_w(int state);
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( inst_w ) { m_write_inst(state); }
+	void inst_w(int state) { m_write_inst(state); }
 
 protected:
 	// device-level overrides

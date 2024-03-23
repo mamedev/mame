@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood, Luca Elia
-#ifndef MAME_INCLUDES_FUUKIFG3_H
-#define MAME_INCLUDES_FUUKIFG3_H
+#ifndef MAME_FUUKI_FUUKIFG3_H
+#define MAME_FUUKI_FUUKIFG3_H
 
 #pragma once
 
@@ -69,7 +69,7 @@ private:
 	void tile_cb(u32 &code);
 	void colpri_cb(u32 &colour, u32 &pri_mask);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
 
 	/* devices */
@@ -105,4 +105,4 @@ private:
 	emu_timer   *m_raster_interrupt_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_FUUKIFG3_H
+#endif // MAME_FUUKI_FUUKIFG3_H

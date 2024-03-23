@@ -4,7 +4,10 @@
 // Management of Oric Jasmin floppy images
 
 #include "fs_oric_jasmin.h"
+#include "fsblk.h"
 #include "oric_dsk.h"
+
+#include "multibyte.h"
 
 #include <stdexcept>
 
@@ -100,12 +103,10 @@ const char *oric_jasmin_image::description() const
 	return "Oric Jasmin";
 }
 
-void oric_jasmin_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void oric_jasmin_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::DSDD))
-		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
-	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::SSDD))
-		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
+	fe.add(FLOPPY_ORIC_JASMIN_FORMAT, floppy_image::FF_3, floppy_image::DSDD, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
+	fe.add(FLOPPY_ORIC_JASMIN_FORMAT, floppy_image::FF_3, floppy_image::SSDD, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
 }
 
 std::unique_ptr<filesystem_t> oric_jasmin_image::mount(fsblk_t &blockdev) const
@@ -293,8 +294,8 @@ std::string oric_jasmin_impl::file_name_read(const u8 *p)
 
 bool oric_jasmin_impl::file_is_system(const u8 *entry)
 {
-	u16 ref = r16b(entry);
-	return ref == 0 && r32b(entry+0xb) == 0x2e535953;
+	u16 ref = get_u16be(entry);
+	return ref == 0 && get_u32be(entry+0xb) == 0x2e535953;
 }
 
 
@@ -305,14 +306,14 @@ meta_data oric_jasmin_impl::file_metadata(const u8 *entry)
 	res.set(meta_name::name, file_name_read(entry + 3));
 	res.set(meta_name::locked, entry[2] == 'L');
 	res.set(meta_name::sequential, entry[0xf] == 'S');
-	res.set(meta_name::size_in_blocks, r16l(entry + 0x10));
+	res.set(meta_name::size_in_blocks, get_u16le(entry + 0x10));
 
 	bool sys = file_is_system(entry);
 	if(sys)
 		res.set(meta_name::length, 0x3e00);
 
 	else {
-		u16 ref = r16b(entry);
+		u16 ref = get_u16be(entry);
 		auto dblk = m_blockdev.get(cs_to_block(ref));
 		res.set(meta_name::loading_address, dblk.r16l(2));
 		res.set(meta_name::length, dblk.r16l(4));
@@ -349,6 +350,7 @@ std::pair<err_t, meta_data> oric_jasmin_impl::metadata(const std::vector<std::st
 		return std::make_pair(ERR_NOT_FOUND, meta_data());
 
 	auto [bdir, off, sys] = file_find(path[0]);
+	std::ignore = sys;
 	if(!off)
 		return std::make_pair(ERR_NOT_FOUND, meta_data());
 
@@ -366,13 +368,13 @@ err_t oric_jasmin_impl::metadata_change(const std::vector<std::string> &path, co
 
 	u8 *entry = bdir.data() + off;
 	if(meta.has(meta_name::locked))
-		w8  (entry+0x02, meta.get_flag(meta_name::locked) ? 'L' : 'U');
+		entry[0x02] = meta.get_flag(meta_name::locked) ? 'L' : 'U';
 	if(meta.has(meta_name::name))
 		wstr(entry+0x03, file_name_prepare(meta.get_string(meta_name::name)));
 	if(meta.has(meta_name::sequential))
-		w8  (entry+0x0f, meta.get_flag(meta_name::sequential) ? 'D' : 'S');
+		entry[0x0f] = meta.get_flag(meta_name::sequential) ? 'D' : 'S';
 	if(!sys && meta.has(meta_name::loading_address))
-		m_blockdev.get(cs_to_block(r16b(entry))).w16l(2, meta.get_number(meta_name::loading_address));
+		m_blockdev.get(cs_to_block(get_u16be(entry))).w16l(2, meta.get_number(meta_name::loading_address));
 
 	return ERR_OK;
 }
@@ -412,6 +414,7 @@ err_t oric_jasmin_impl::rename(const std::vector<std::string> &opath, const std:
 		return ERR_NOT_FOUND;
 
 	auto [bdir, off, sys] = file_find(opath[0]);
+	std::ignore = sys;
 	if(!off)
 		return ERR_NOT_FOUND;
 
@@ -500,7 +503,7 @@ std::pair<err_t, std::vector<u8>> oric_jasmin_impl::file_read(const std::vector<
 
 	} else {
 		const u8 *entry = bdir.rodata() + off;
-		u16 ref = r16b(entry);
+		u16 ref = get_u16be(entry);
 		auto iblk = m_blockdev.get(cs_to_block(ref));
 		u32 length = iblk.r16l(4);
 		while(ref_valid(ref)) {
@@ -545,7 +548,7 @@ err_t oric_jasmin_impl::file_write(const std::vector<std::string> &path, const s
 
 	} else {
 		u8 *entry = bdir.data() + off;
-		u32 cur_ns = r16l(entry + 0x10);
+		u32 cur_ns = get_u16le(entry + 0x10);
 		// Data sectors first
 		u32 need_ns = (data.size() + 255) / 256;
 		if(need_ns == 0)
@@ -559,7 +562,7 @@ err_t oric_jasmin_impl::file_write(const std::vector<std::string> &path, const s
 
 		u16 load_address = 0;
 		std::vector<u16> tofree;
-		u16 iref = r16b(entry);
+		u16 iref = get_u16be(entry);
 		for(u32 i=0; i < cur_ns; i += 125+1) {
 			auto iblk = m_blockdev.get(cs_to_block(iref));
 			if(!i)
@@ -597,8 +600,8 @@ err_t oric_jasmin_impl::file_write(const std::vector<std::string> &path, const s
 				}
 			}
 		}
-		w16l(entry + 0x10, need_ns);
-		w16b(entry + 0x00, blocks[0]);
+		put_u16le(entry + 0x10, need_ns);
+		put_u16be(entry + 0x00, blocks[0]);
 	}
 	return ERR_OK;
 }

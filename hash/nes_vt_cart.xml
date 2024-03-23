@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="nes_vt_cart" description="Cartridges compatible with VRT VT0x based units">
 
@@ -14,6 +14,18 @@ license:CC0
 		<part name="cart" interface="nes_vt_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="s29al016d70tfi02.bin" size="0x200000" crc="f9d4bb5c" sha1="25af611b0ccc48bdab531d7c291a25db787d4212"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Generic looking cartridge paired with a Joystick style controller -->
+	<software name="5bonus">
+		<description>5 Bonus Games</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_vt_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="C9C8_8-20LS.U1" size="0x80000" crc="ea86e3cd" sha1="b641a6bda9f80c9cd9730008eff24df92a6a59cb"/>
 			</dataarea>
 		</part>
 	</software>

@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /*********************************************************************
 
-    formats/hp_ipc_dsk.c
+    formats/hp_ipc_dsk.cpp
 
     HP Integral PC format
 
@@ -14,17 +14,17 @@ hp_ipc_format::hp_ipc_format() : wd177x_format(formats)
 {
 }
 
-const char *hp_ipc_format::name() const
+const char *hp_ipc_format::name() const noexcept
 {
 	return "hp_ipc";
 }
 
-const char *hp_ipc_format::description() const
+const char *hp_ipc_format::description() const noexcept
 {
 	return "HP Integral PC disk image";
 }
 
-const char *hp_ipc_format::extensions() const
+const char *hp_ipc_format::extensions() const noexcept
 {
 	return "img";
 }

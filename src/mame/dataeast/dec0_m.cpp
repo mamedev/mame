@@ -85,33 +85,33 @@ uint16_t dec0_state::midres_controls_r(offs_t offset)
 /******************************************************************************/
 
 
-uint8_t dec0_state::hippodrm_prot_r(offs_t offset)
+uint8_t hippodrm_state::prot_r(offs_t offset)
 {
 //logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
-	if (m_hippodrm_lsb == 0x45) return 0x4e;
-	if (m_hippodrm_lsb == 0x92) return 0x15;
+	if (m_prot_lsb == 0x45) return 0x4e;
+	if (m_prot_lsb == 0x92) return 0x15;
 	return 0;
 }
 
-void dec0_state::hippodrm_prot_w(offs_t offset, uint8_t data)
+void hippodrm_state::prot_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 4: m_hippodrm_msb = data; break;
-		case 5: m_hippodrm_lsb = data; break;
+		case 4: m_prot_msb = data; break;
+		case 5: m_prot_lsb = data; break;
 	}
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
 
-uint16_t dec0_state::hippodrm_68000_share_r(offs_t offset)
+uint16_t hippodrm_state::sharedram_r(offs_t offset)
 {
 	if (offset == 0) m_maincpu->yield(); /* A wee helper */
-	return m_hippodrm_shared_ram[offset] & 0xff;
+	return m_sharedram[offset] & 0xff;
 }
 
-void dec0_state::hippodrm_68000_share_w(offs_t offset, uint16_t data)
+void hippodrm_state::sharedram_w(offs_t offset, uint16_t data)
 {
-	m_hippodrm_shared_ram[offset] = data & 0xff;
+	m_sharedram[offset] = data & 0xff;
 }
 
 /******************************************************************************/
@@ -266,7 +266,7 @@ void dec0_state::h6280_decrypt(const char *cputag)
 		RAM[i] = (RAM[i] & 0x7e) | ((RAM[i] & 0x1) << 7) | ((RAM[i] & 0x80) >> 7);
 }
 
-void dec0_state::init_hippodrm()
+void hippodrm_state::init_hippodrm()
 {
 	uint8_t *RAM = memregion("sub")->base();
 
@@ -278,16 +278,16 @@ void dec0_state::init_hippodrm()
 	RAM[0x1db] = 0x60; /* RTS prot area */
 	RAM[0x21a] = 0x60; /* RTS prot area */
 
-	save_item(NAME(m_hippodrm_msb));
-	save_item(NAME(m_hippodrm_lsb));
+	save_item(NAME(m_prot_msb));
+	save_item(NAME(m_prot_lsb));
 }
 
-void dec0_state::init_slyspy()
+void slyspy_state::init_slyspy()
 {
 	h6280_decrypt("audiocpu");
 
-	save_item(NAME(m_slyspy_state));
-	save_item(NAME(m_slyspy_sound_state));
+	save_item(NAME(m_prot_state));
+	save_item(NAME(m_sound_prot_state));
 }
 
 void dec0_state::init_drgninja()

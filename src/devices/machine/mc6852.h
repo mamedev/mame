@@ -55,14 +55,14 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( rx_data_w ) { device_serial_interface::rx_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_clk_w ) { rx_clock_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx_clk_w ) { tx_clock_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( cts_w ) { m_cts = state; }
-	DECLARE_WRITE_LINE_MEMBER( dcd_w ) { m_dcd = state; }
+	void rx_data_w(int state) { device_serial_interface::rx_w(state); }
+	void rx_clk_w(int state) { rx_clock_w(state); }
+	void tx_clk_w(int state) { tx_clock_w(state); }
+	void cts_w(int state) { m_cts = state; }
+	void dcd_w(int state) { m_dcd = state; }
 
-	DECLARE_READ_LINE_MEMBER( sm_dtr_r ) { return m_sm_dtr; }
-	DECLARE_READ_LINE_MEMBER( tuf_r ) { return m_tuf; }
+	int sm_dtr_r() { return m_sm_dtr; }
+	int tuf_r() { return m_tuf; }
 
 	// These are to allow integration of this driver with code
 	// controlling floppy disks.

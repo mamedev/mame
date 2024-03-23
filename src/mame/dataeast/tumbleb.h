@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Bryan McPhail
-#ifndef MAME_INCLUDES_TUMBLEB_H
-#define MAME_INCLUDES_TUMBLEB_H
+#ifndef MAME_DATAEAST_TUMBLEB_H
+#define MAME_DATAEAST_TUMBLEB_H
 
 #pragma once
 
@@ -69,6 +69,8 @@ public:
 	void init_fncywld();
 	void init_magipur();
 	void init_carket();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(suprtrio_prot_latch_r);
 
 protected:
 	/* memory pointers */
@@ -183,6 +185,8 @@ protected:
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
 	void tumblepopba_main_map(address_map &map);
+
+	u8 m_suprtrio_prot_latch = 0;
 };
 
 class tumbleb_pic_state : public tumbleb_state
@@ -212,4 +216,4 @@ private:
 	uint8_t m_pic_data;
 };
 
-#endif // MAME_INCLUDES_TUMBLEB_H
+#endif // MAME_DATAEAST_TUMBLEB_H

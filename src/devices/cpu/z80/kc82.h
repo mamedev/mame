@@ -38,14 +38,13 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// z80_device overrides
-	virtual u8 rm(u16 addr) override;
-	virtual void wm(u16 addr, u8 value) override;
-	virtual u8 rop() override;
-	virtual u8 arg() override;
-	virtual u16 arg16() override;
+	virtual u8 data_read(u16 addr) override;
+	virtual void data_write(u16 addr, u8 value) override;
+	virtual u8 opcode_read() override;
+	virtual u8 arg_read() override;
 
 	// MMU access
 	u8 mmu_r(offs_t offset);

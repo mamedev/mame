@@ -1,40 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
+
 /*************************************************************************
 
-    audio\orbit.cpp
+    atari\orbit_a.cpp
 
 *************************************************************************/
 #include "emu.h"
-#include "orbit.h"
 
-/*************************************
- *
- *  Write handlers
- *
- *************************************/
-
-void orbit_state::note_w(uint8_t data)
-{
-	m_discrete->write(ORBIT_NOTE_FREQ, (~data) & 0xff);
-}
-
-void orbit_state::note_amp_w(uint8_t data)
-{
-	m_discrete->write(ORBIT_ANOTE1_AMP, data & 0x0f);
-	m_discrete->write(ORBIT_ANOTE2_AMP, data >> 4);
-}
-
-void orbit_state::noise_amp_w(uint8_t data)
-{
-	m_discrete->write(ORBIT_NOISE1_AMP, data & 0x0f);
-	m_discrete->write(ORBIT_NOISE2_AMP, data >> 4);
-}
-
-void orbit_state::noise_rst_w(uint8_t data)
-{
-	m_discrete->write(ORBIT_NOISE_EN, 0);
-}
+#include "orbit_a.h"
 
 
 /************************************************************************/
@@ -66,7 +40,7 @@ static const discrete_lfsr_desc orbit_lfsr =
 
 DISCRETE_SOUND_START(orbit_discrete)
 	/************************************************/
-	/* orbit  Effects Relataive Gain Table          */
+	/* orbit  Effects Relative  Gain Table          */
 	/*                                              */
 	/* Effect  V-ampIn  Gain ratio        Relative  */
 	/* Note     3.8     10/(20.1+.47+.55)   962.1   */

@@ -826,7 +826,7 @@
 		<rect state="0">
 			<color red="0.00" green="0.25" blue="0.06"/>
 		</rect>
-		<text string="LINK COINS UP TO WIN MAXIMUM &#xA3;1">
+		<text string="LINK COINS UP TO WIN MAXIMUM £1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -846,7 +846,7 @@
 		<rect state="0">
 			<color red="0.00" green="0.25" blue="0.06"/>
 		</rect>
-		<text string="LIGHT NEXT ROW MAXIMIM &#xA3;1">
+		<text string="LIGHT NEXT ROW MAXIMIM £1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1214,7 +1214,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>

@@ -5,8 +5,8 @@
     Atari Bad Lands hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BADLANDS_H
-#define MAME_INCLUDES_BADLANDS_H
+#ifndef MAME_ATARI_BADLANDS_H
+#define MAME_ATARI_BADLANDS_H
 
 #pragma once
 
@@ -125,6 +125,6 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_BADLANDS_H
+#endif // MAME_ATARI_BADLANDS_H
 
 

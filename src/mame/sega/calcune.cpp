@@ -51,9 +51,9 @@ private:
 
 	int m_vdp_state = 0;
 
-	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
-	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
-	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
+	void vdp_sndirqline_callback_genesis_z80(int state);
+	void vdp_lv6irqline_callback_genesis_68k(int state);
+	void vdp_lv4irqline_callback_genesis_68k(int state);
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
@@ -222,11 +222,11 @@ IRQ_CALLBACK_MEMBER(calcune_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-WRITE_LINE_MEMBER(calcune_state::vdp_sndirqline_callback_genesis_z80)
+void calcune_state::vdp_sndirqline_callback_genesis_z80(int state)
 {
 }
 
-WRITE_LINE_MEMBER(calcune_state::vdp_lv6irqline_callback_genesis_68k)
+void calcune_state::vdp_lv6irqline_callback_genesis_68k(int state)
 {
 	// this looks odd but is the logic the Genesis code requires
 	if (state == ASSERT_LINE)
@@ -235,7 +235,7 @@ WRITE_LINE_MEMBER(calcune_state::vdp_lv6irqline_callback_genesis_68k)
 		m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(calcune_state::vdp_lv4irqline_callback_genesis_68k)
+void calcune_state::vdp_lv4irqline_callback_genesis_68k(int state)
 {
 	// this looks odd but is the logic the Genesis code requires
 	if (state == ASSERT_LINE)

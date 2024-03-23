@@ -5,25 +5,27 @@
 
 #pragma once
 
-#include "cdrom.h"
+#include "imagedev/cdromimg.h"
 
 
 class cdda_device : public device_t, public device_sound_interface
 {
 public:
-	cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44'100);
+	cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44100);
 
-	void set_cdrom(void *file);
+	template<typename T> void set_cdrom_tag(T &&tag) { m_disc.set_tag(std::forward<T>(tag)); }
 
 	void start_audio(uint32_t startlba, uint32_t numblocks);
 	void stop_audio();
 	void pause_audio(int pause);
-	int16_t get_channel_volume(int channel);
+	int16_t get_channel_sample(int channel);
 
 	uint32_t get_audio_lba();
 	int audio_active();
 	int audio_paused();
 	int audio_ended();
+
+	auto audio_end_cb() { return m_audio_end_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -35,7 +37,7 @@ protected:
 private:
 	void get_audio_data(write_stream_view &bufL, write_stream_view &bufR);
 
-	cdrom_file *        m_disc;
+	required_device<cdrom_image_device> m_disc;
 
 	// internal state
 	sound_stream *      m_stream;
@@ -46,7 +48,11 @@ private:
 	std::unique_ptr<uint8_t[]>   m_audio_cache;
 	uint32_t              m_audio_samples;
 	uint32_t              m_audio_bptr;
-	int16_t               m_audio_volume[2];
+	int16_t               m_audio_data[2];
+
+	uint32_t              m_sequence_counter;
+
+	devcb_write_line m_audio_end_cb;
 };
 
 DECLARE_DEVICE_TYPE(CDDA, cdda_device)

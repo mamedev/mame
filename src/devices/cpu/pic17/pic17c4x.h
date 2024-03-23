@@ -77,12 +77,11 @@ public:
 protected:
 	pic17c4x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size, address_map_constructor data_map);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u32 execute_input_lines() const noexcept override { return 6; } // for now
 	virtual bool execute_input_edge_triggered(int linenum) const noexcept override { return linenum == INT_LINE || linenum == T0CKI_LINE; }
 	virtual void execute_set_input(int linenum, int state) override;

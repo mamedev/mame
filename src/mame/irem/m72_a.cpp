@@ -66,14 +66,6 @@ void m72_audio_device::device_start()
 	save_item(NAME(m_sample_addr));
 }
 
-//-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
-//-------------------------------------------------
-
-void m72_audio_device::rom_bank_updated()
-{
-}
-
 void m72_audio_device::set_sample_start(int start)
 {
 	m_sample_addr = start;

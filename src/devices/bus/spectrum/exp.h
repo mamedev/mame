@@ -87,10 +87,10 @@ public:
 	void mreq_w(offs_t offset, uint8_t data);
 	uint8_t iorq_r(offs_t offset);
 	void iorq_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( romcs );
+	bool romcs();
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
 	uint8_t fb_r() { return m_fb_r_handler(); }
 
 protected:
@@ -120,7 +120,7 @@ public:
 	virtual void mreq_w(offs_t offset, uint8_t data) { }
 	virtual uint8_t iorq_r(offs_t offset) { return offset & 1 ? m_slot->fb_r() : 0xff; }
 	virtual void iorq_w(offs_t offset, uint8_t data) { }
-	virtual DECLARE_READ_LINE_MEMBER(romcs) { return 0; }
+	virtual bool romcs() { return 0; }
 
 protected:
 	// construction/destruction

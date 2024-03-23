@@ -52,7 +52,8 @@ private:
 	uint32_t program_read_cache(offs_t address, uint32_t mask);
 	void program_write_cache(offs_t address, uint32_t data, uint32_t mask);
 
-	u32 debug_read_memory(offs_t offset);
+	u32 debug_read_memory(offs_t offset, u32 mask);
+	void debug_write_memory(offs_t offset, uint32_t value, uint32_t mask);
 
 	address_space_config m_data_config;
 	address_space_config m_opcodes_config;

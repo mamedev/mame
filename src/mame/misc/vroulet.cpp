@@ -47,6 +47,8 @@ Tomasz Slanina 20050225
 #include "tilemap.h"
 
 
+namespace {
+
 class vroulet_state : public driver_device
 {
 public:
@@ -332,6 +334,9 @@ ROM_START( vroulet )
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "roul.gfx", 0x0000, 0x8000, CRC(4e4f46d2) SHA1(efd00e2b564ff4a9013c67ffaaf91124089b310b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Game Driver */
 

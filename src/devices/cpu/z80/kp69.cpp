@@ -64,19 +64,6 @@ kp69_device::kp69_device(const machine_config &mconfig, const char *tag, device_
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void kp69_base_device::device_resolve_objects()
-{
-	// Resolve output callback
-	m_int_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

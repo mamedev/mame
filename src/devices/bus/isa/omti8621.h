@@ -16,8 +16,10 @@
 #pragma once
 
 #include "isa.h"
-#include "machine/upd765.h"
+
 #include "imagedev/floppy.h"
+#include "machine/upd765.h"
+
 
 /***************************************************************************
  FUNCTION PROTOTYPES
@@ -44,7 +46,7 @@ protected:
 			device_t *owner,
 			uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -70,8 +72,8 @@ protected:
 	std::string cpu_context() const;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 	static void floppy_formats(format_registration &fr);
 
 	void fd_moten_w(uint8_t data);

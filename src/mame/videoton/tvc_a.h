@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_TVC_H
-#define MAME_AUDIO_TVC_H
+#ifndef MAME_VIDEOTON_TVC_A_H
+#define MAME_VIDEOTON_TVC_A_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TVC_SOUND, tvc_sound_device)
 
-#endif // MAME_AUDIO_TVC_H
+#endif // MAME_VIDEOTON_TVC_A_H

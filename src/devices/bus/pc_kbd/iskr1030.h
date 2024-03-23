@@ -40,14 +40,14 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override;
+	virtual void clock_write(int state) override;
+	virtual void data_write(int state) override;
 
 private:
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t1_r );
+	int t1_r();
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);

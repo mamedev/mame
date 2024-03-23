@@ -31,6 +31,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class photon2_state : public driver_device
 {
 public:
@@ -68,7 +70,7 @@ private:
 	void photon2_palette(palette_device &palette) const;
 
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
+	void screen_vblank_spectrum(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
 	void spectrum_io(address_map &map);
@@ -99,7 +101,7 @@ private:
 #define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
 #define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
 #define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
+#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
 static constexpr rgb_t spectrum_palette[16] = {
@@ -150,7 +152,7 @@ static inline unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-WRITE_LINE_MEMBER(photon2_state::screen_vblank_spectrum)
+void photon2_state::screen_vblank_spectrum(int state)
 {
 	// rising edge
 	if (state)
@@ -423,6 +425,9 @@ ROM_START( brod )
 	ROM_LOAD( "brod12.bin", 0x8000, 0x2000, CRC(94e53d47) SHA1(698415c5e25528e3b1dcab7471cc98c1dc9cb335) )
 	ROM_LOAD( "brod13.bin", 0xa000, 0x2000, CRC(1177cd17) SHA1(58c5c09a7b857ce6311339c4d0f4d8c1a7e232a3) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, empty_init, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
 GAME( 19??,  black, 0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft

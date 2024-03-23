@@ -141,7 +141,7 @@ ROM_END
 */
 ROM_START(pubtimed2ch)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "challenger_r4b.u7", 0x00000, 0x08000, CRC(6d5c0634) SHA1(45f4ed2e984f2525a1ed680bbc2a11eab93b0bca) ) // 27256
+	ROM_LOAD( "4378-07_u7_r4b_c1992_mii.u7", 0x00000, 0x08000, CRC(6d5c0634) SHA1(45f4ed2e984f2525a1ed680bbc2a11eab93b0bca) ) // 27256
 ROM_END
 
 } // Anonymous namespace

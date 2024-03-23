@@ -49,12 +49,12 @@ public:
 	auto krst_handler() { return m_krst_handler.bind(); }
 
 	// called from keyboard
-	DECLARE_WRITE_LINE_MEMBER(kclk_w) { m_kclk_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(kdat_w) { m_kdat_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(krst_w) { m_krst_handler(state); }
+	void kclk_w(int state) { m_kclk_handler(state); }
+	void kdat_w(int state) { m_kdat_handler(state); }
+	void krst_w(int state) { m_krst_handler(state); }
 
 	// called from host
-	DECLARE_WRITE_LINE_MEMBER(kdat_in_w);
+	void kdat_in_w(int state);
 
 protected:
 	// device-level overrides
@@ -77,7 +77,7 @@ public:
 	// construction/destruction
 	virtual ~device_amiga_keyboard_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) = 0;
+	virtual void kdat_w(int state) = 0;
 
 protected:
 	device_amiga_keyboard_interface(const machine_config &mconfig, device_t &device);

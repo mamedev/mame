@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="einstein_rom" description="Tatung Einstein ROM images">
+
+	<software name="flexidos">
+		<description>FlexiDOS V2.2</description>
+		<year>1986</year>
+		<publisher>SafeData</publisher>
+		<part name="rom" interface="einstein_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="flexidos_2.2.rom" size="8192" crc="e8f62a09" sha1="94aa5df89dc0a2c7cf5d04221635d05dc6f06514"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

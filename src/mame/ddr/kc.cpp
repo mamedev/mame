@@ -13,12 +13,12 @@
 
 ******************************************************************************/
 
-/* Core includes */
 #include "emu.h"
 #include "kc.h"
 
 #include "machine/input_merger.h"
 #include "softlist_dev.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,7 +45,7 @@ void kc85_4_state::kc85_4_mem(address_map &map)
 	map(0xe000, 0xffff).bankr("bank5");
 }
 
-void kc_state::kc85_3_mem(address_map &map)
+void kc_state::kc85_2_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).bankrw("bank1");
@@ -55,7 +55,7 @@ void kc_state::kc85_3_mem(address_map &map)
 	map(0xe000, 0xffff).bankr("bank5");
 }
 
-void kc_state::kc85_3_io(address_map &map)
+void kc_state::kc85_2_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).rw(FUNC(kc_state::expansion_io_read), FUNC(kc_state::expansion_io_write));
@@ -74,6 +74,24 @@ static const z80_daisy_config kc85_daisy_chain[] =
 	{ "z80ctc" },
 	{ "z80pio" },
 	{ nullptr }
+};
+
+static const double kc85_speaker_levels[64] = {
+	-1.0, -0.96875, -0.9375, -0.90625, -0.875, -0.84375, -0.8125, -0.78125,
+	-0.75, -0.71875, -0.6875, -0.65625, -0.625, -0.59375, -0.5625, -0.53125,
+	-0.5, -0.46875, -0.4375, -0.40625, -0.375, -0.34375, -0.3125, -0.28125,
+	-0.25, -0.21875, -0.1875, -0.15625, -0.125, -0.09375, -0.0625, -0.03125,
+	0.0, 0.03125, 0.0625, 0.09375, 0.125, 0.15625, 0.1875, 0.21875,
+	0.25, 0.28125, 0.3125, 0.34375, 0.375, 0.40625, 0.4375, 0.46875,
+	0.5, 0.53125, 0.5625, 0.59375, 0.625, 0.65625, 0.6875, 0.71875,
+	0.75, 0.78125, 0.8125, 0.84375, 0.875, 0.90625, 0.9375, 0.96875
+};
+
+static const double kc85_4_speaker_levels[32] = {
+	-1.0, -0.9375, -0.875, -0.8125, -0.75, -0.6875, -0.625, -0.5625,
+	-0.5, -0.4375, -0.375, -0.3125, -0.25, -0.1875, -0.125, -0.0625,
+	0.0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375,
+	0.5, 0.5625, 0.625, 0.6875, 0.75, 0.8125, 0.875, 0.9375
 };
 
 void kc85_cart(device_slot_interface &device)
@@ -137,36 +155,30 @@ void kc_state::kc85_slots(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
 }
 
-
-void kc_state::kc85_3(machine_config &config)
+void kc_state::kc85_base(machine_config &config, uint32_t clock)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, KC85_3_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_3_mem);
-	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_3_io);
+	Z80(config, m_maincpu, clock);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	Z80PIO(config, m_z80pio, KC85_3_CLOCK);
+	Z80PIO(config, m_z80pio, clock);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
 	m_z80pio->in_pa_callback().set(FUNC(kc_state::pio_porta_r));
 	m_z80pio->out_pa_callback().set(FUNC(kc_state::pio_porta_w));
 	m_z80pio->out_ardy_callback().set(FUNC(kc_state::pio_ardy_cb));
 	m_z80pio->in_pb_callback().set(FUNC(kc_state::pio_portb_r));
-	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
 	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
 
-	Z80CTC(config, m_z80ctc, KC85_3_CLOCK);
+	Z80CTC(config, m_z80ctc, clock);
 	m_z80ctc->intr_callback().set_inputline(m_maincpu, 0);
-	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
 	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));
 	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256);
-	m_screen->set_screen_update(FUNC(kc_state::screen_update));
 	m_screen->set_palette("palette");
 	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);
 
@@ -177,64 +189,70 @@ void kc_state::kc85_3(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER(config, "outl").front_left();
+	SPEAKER(config, "outr").front_right();
+	SPEAKER_SOUND(config, m_dac);
+	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
+	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
 
 	kc85_slots(config);
+}
 
-	/* internal ram */
+void kc_state::kc85_2_3(machine_config &config, uint32_t clock)
+{
+	kc85_base(config, KC85_2_CLOCK);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_2_mem);
+	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_2_io);
+
+	m_screen->set_screen_update(FUNC(kc_state::screen_update));
+
+	m_dac->set_levels(64, kc85_speaker_levels);
+
 	RAM(config, m_ram).set_default_size("16K");
+}
+
+void kc_state::kc85_2(machine_config &config)
+{
+	kc85_2_3(config, KC85_2_CLOCK);
+
+	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
+	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
+}
+
+void kc85_3_state::kc85_3(machine_config &config)
+{
+	kc85_2_3(config, KC85_2_CLOCK);
+
+	m_z80pio->out_pb_callback().set(FUNC(kc85_3_state::pio_portb_w));
+	m_z80ctc->zc_callback<0>().set(FUNC(kc85_3_state::ctc_zc0_callback));
+
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 void kc85_4_state::kc85_4(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, KC85_4_CLOCK);
+	kc85_base(config, KC85_4_CLOCK);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_4_state::kc85_4_mem);
 	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
-	m_maincpu->set_daisy_config(kc85_daisy_chain);
-	config.set_maximum_quantum(attotime::from_hz(60));
 
-	Z80PIO(config, m_z80pio, KC85_4_CLOCK);
-	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
-	m_z80pio->in_pa_callback().set(FUNC(kc_state::pio_porta_r));
-	m_z80pio->out_pa_callback().set(FUNC(kc_state::pio_porta_w));
-	m_z80pio->out_ardy_callback().set(FUNC(kc_state::pio_ardy_cb));
-	m_z80pio->in_pb_callback().set(FUNC(kc_state::pio_portb_r));
-	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
-	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
+	m_z80pio->out_pb_callback().set(FUNC(kc85_4_state::pio_portb_w));
+	m_z80ctc->zc_callback<0>().set(FUNC(kc85_4_state::ctc_zc0_callback));
 
-	Z80CTC(config, m_z80ctc, 0);
-	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
-	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));
-	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(kc85_4_state::screen_update));
-	m_screen->set_palette("palette");
-	TIMER(config, "scantimer").configure_scanline(FUNC(kc85_4_state::kc_scanline), "screen", 0, 1);
 
-	PALETTE(config, "palette", FUNC(kc85_4_state::kc85_palette), KC85_PALETTE_SIZE);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.125);
+	m_dac->set_levels(32, kc85_4_speaker_levels);
 
-	kc_keyboard_device &keyboard(KC_KEYBOARD(config, "keyboard", XTAL(4'000'000)));
-	keyboard.out_wr_callback().set(FUNC(kc_state::keyboard_cb));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	kc85_slots(config);
-
-	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
 }
 
 void kc85_4_state::kc85_5(machine_config &config)
 {
 	kc85_4(config);
-	/* internal ram */
+
 	m_ram->set_default_size("256K");
 }
 
@@ -291,8 +309,8 @@ ROM_START(kc85_5)
 	ROMX_LOAD("caos43e.855", 0x2000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(1))
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1987, kc85_2, 0,      0,      kc85_3,  kc85,  kc_state,     empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
-COMP( 1987, kc85_3, kc85_2, 0,      kc85_3,  kc85,  kc_state,     empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/3",         MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                                               FULLNAME           FLAGS
+COMP( 1987, kc85_2, 0,      0,      kc85_2,  kc85,  kc_state,     empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
+COMP( 1987, kc85_3, kc85_2, 0,      kc85_3,  kc85,  kc85_3_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/3",         MACHINE_NOT_WORKING)
 COMP( 1989, kc85_4, kc85_2, 0,      kc85_4,  kc85,  kc85_4_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/4",         MACHINE_NOT_WORKING)
 COMP( 1989, kc85_5, kc85_2, 0,      kc85_5,  kc85,  kc85_4_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/5",         MACHINE_NOT_WORKING)

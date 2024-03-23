@@ -205,7 +205,12 @@ int32_t opn_registers_base<IsOpnA>::clock_noise_and_lfo()
 	if (!IsOpnA || !lfo_enable())
 	{
 		m_lfo_counter = 0;
-		m_lfo_am = 0;
+
+		// special case: if LFO is disabled on OPNA, it basically just keeps the counter
+		// at 0; since position 0 gives an AM value of 0x3f, it is important to reflect
+		// that here; for example, MegaDrive Venom plays some notes with LFO globally
+		// disabled but enabling LFO on the operators, and it expects this added attenutation
+		m_lfo_am = IsOpnA ? 0x3f : 0x00;
 		return 0;
 	}
 
@@ -427,10 +432,10 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 			ch_output_1(choffs) ? 'R' : '-');
 	if (op_ssg_eg_enable(opoffs))
 		end += sprintf(end, " ssg=%X", op_ssg_eg_mode(opoffs));
-	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
+	bool am = (op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
 	if (am)
 		end += sprintf(end, " am=%u", ch_lfo_am_sens(choffs));
-	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
+	bool pm = (ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
 		end += sprintf(end, " pm=%u", ch_lfo_pm_sens(choffs));
 	if (am || pm)

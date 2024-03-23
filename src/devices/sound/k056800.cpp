@@ -37,8 +37,6 @@ k056800_device::k056800_device(const machine_config &mconfig, const char *tag, d
 
 void k056800_device::device_start()
 {
-	m_int_handler.resolve_safe();
-
 	save_item(NAME(m_int_pending));
 	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_host_to_snd_regs));

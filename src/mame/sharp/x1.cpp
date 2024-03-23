@@ -730,16 +730,26 @@ uint8_t x1_state::x1_fdc_r(offs_t offset)
 		case 0x0ffb:
 			return m_fdc->data_r();
 		case 0x0ffc:
-			logerror("FDC: read FM type\n");
+			if (!machine().side_effects_disabled())
+			{
+				logerror("FDC: read FM type\n");
+				m_fdc->dden_w(1);
+			}
 			return 0xff;
 		case 0x0ffd:
-			logerror("FDC: read MFM type\n");
+			if (!machine().side_effects_disabled())
+			{
+				logerror("FDC: read MFM type\n");
+				m_fdc->dden_w(0);
+			}
 			return 0xff;
 		case 0x0ffe:
-			logerror("FDC: read 1.6M type\n");
+			if (!machine().side_effects_disabled())
+				logerror("FDC: read 1.6M type\n");
 			return 0xff;
 		case 0x0fff:
-			logerror("FDC: switching between 500k/1M\n");
+			if (!machine().side_effects_disabled())
+				logerror("FDC: switching between 500k/1M\n");
 			return 0xff;
 	}
 
@@ -786,12 +796,12 @@ void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
+void x1_state::fdc_drq_w(int state)
 {
 	m_dma->rdy_w(state ^ 1);
 }
 
-WRITE_LINE_MEMBER(x1_state::hdl_w)
+void x1_state::hdl_w(int state)
 {
 	if (state)
 		m_floppy[m_fdc_ctrl & 0x03]->get_device()->mon_w(CLEAR_LINE);
@@ -1837,7 +1847,7 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xc2\xa5")  PORT_CHAR(165) PORT_CHAR('|')// yen
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(u8"¥") PORT_CHAR(U'¥') PORT_CHAR('|')
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_") PORT_CHAR('_')
@@ -2096,6 +2106,8 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 
 	m_ram_bank = 0;
 //  m_old_vpos = -1;
+
+	m_fdc->dden_w(0);
 }
 
 MACHINE_RESET_MEMBER(x1_state,x1turbo)
@@ -2203,7 +2215,7 @@ void x1_state::x1(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
-	MB8877(config, m_fdc, MAIN_CLOCK / 16);
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16); // clocked by SED9421C0B
 	// TODO: guesswork, try to implicitly start the motor
 	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 

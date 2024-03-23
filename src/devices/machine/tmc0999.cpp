@@ -34,6 +34,12 @@ tmc0999_device::tmc0999_device(const machine_config &mconfig, const char *tag, d
 
 void tmc0999_device::device_start()
 {
+	// zerofill
+	m_data = 0;
+	m_wr = 0;
+	m_rd = 0;
+	m_adr_strobe = 0;
+	m_ram_address = 0;
 	memset(m_ram, 0, sizeof(m_ram));
 
 	// register for savestates

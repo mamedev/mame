@@ -47,6 +47,9 @@ the CPU's WAIT pin.
 #include "video/pwm.h"
 #include "vcs80.lh"
 
+
+namespace {
+
 class vcs80_state : public driver_device
 {
 public:
@@ -290,6 +293,9 @@ ROM_START( vcs80 )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "monitor.rom", 0x0000, 0x0200, CRC(44aff4e9) SHA1(3472e5a9357eaba3ed6de65dee2b1c6b29349dd2) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

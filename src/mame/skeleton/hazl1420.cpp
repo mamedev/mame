@@ -18,6 +18,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class hazl1420_state : public driver_device
 {
 public:
@@ -50,8 +53,8 @@ private:
 
 	u8 key_r();
 
-	DECLARE_WRITE_LINE_MEMBER(crtc_lbre_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vblank_w);
+	void crtc_lbre_w(int state);
+	void crtc_vblank_w(int state);
 
 	void prog_map(address_map &map);
 	void io_map(address_map &map);
@@ -141,13 +144,13 @@ void hazl1420_state::machine_start()
 {
 }
 
-WRITE_LINE_MEMBER(hazl1420_state::crtc_lbre_w)
+void hazl1420_state::crtc_lbre_w(int state)
 {
 	if (!state && !m_crtc->vblank_r() && !BIT(m_maincpu->p1_r(), 4))
 		m_mainint->in_w<0>(1);
 }
 
-WRITE_LINE_MEMBER(hazl1420_state::crtc_vblank_w)
+void hazl1420_state::crtc_vblank_w(int state)
 {
 	if (state && !BIT(m_maincpu->p1_r(), 4))
 		m_mainint->in_w<0>(1);
@@ -396,5 +399,8 @@ ROM_START(hazl1420)
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("8316.u23", 0x0000, 0x0800, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1979, hazl1420, 0, 0, hazl1420, hazl1420, hazl1420_state, empty_init, "Hazeltine", "1420 Video Display Terminal", MACHINE_NOT_WORKING)

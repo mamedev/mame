@@ -37,17 +37,29 @@ public:
 		RSC_PUT = 7,
 	};
 
-	virtual bool load(u32 address, u8 &data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
-	virtual bool load(u32 address, u16 &data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
-	virtual bool load(u32 address, u32 &data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
+	virtual bool mem_load(u32 address, u8 &data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
+	virtual bool mem_load(u32 address, u16 &data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
+	virtual bool mem_load(u32 address, u32 &data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
 
-	virtual bool store(u32 address, u8 data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
-	virtual bool store(u32 address, u16 data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
-	virtual bool store(u32 address, u32 data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
+	virtual bool mem_store(u32 address, u8 data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
+	virtual bool mem_store(u32 address, u16 data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
+	virtual bool mem_store(u32 address, u32 data, rsc_mode const mode = RSC_N, bool sp = false) = 0;
 
-	virtual bool modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode = RSC_N) = 0;
-	virtual bool modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode = RSC_N) = 0;
-	virtual bool modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode = RSC_N) = 0;
+	virtual bool mem_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode = RSC_N) = 0;
+	virtual bool mem_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode = RSC_N) = 0;
+	virtual bool mem_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode = RSC_N) = 0;
+
+	virtual bool pio_load(u32 address, u8 &data, rsc_mode const mode = RSC_N) = 0;
+	virtual bool pio_load(u32 address, u16 &data, rsc_mode const mode = RSC_N) = 0;
+	virtual bool pio_load(u32 address, u32 &data, rsc_mode const mode = RSC_N) = 0;
+
+	virtual bool pio_store(u32 address, u8 data, rsc_mode const mode = RSC_N) = 0;
+	virtual bool pio_store(u32 address, u16 data, rsc_mode const mode = RSC_N) = 0;
+	virtual bool pio_store(u32 address, u32 data, rsc_mode const mode = RSC_N) = 0;
+
+	virtual bool pio_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode = RSC_N) = 0;
+	virtual bool pio_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode = RSC_N) = 0;
+	virtual bool pio_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode = RSC_N) = 0;
 
 protected:
 	rsc_bus_interface(machine_config const &mconfig, device_t &device, char const *type)
@@ -69,17 +81,14 @@ public:
 	// cpu interface
 	virtual bool fetch(u32 address, u16 &data, rsc_mode const mode = RSC_N) = 0;
 
-	virtual bool ior(u32 address, u32 &data) = 0;
-	virtual bool iow(u32 address, u32 data) = 0;
-
 	// rsc_bus_interface overrides
-	virtual bool load(u32 address, u8 &data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
-	virtual bool load(u32 address, u16 &data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
-	virtual bool load(u32 address, u32 &data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
+	virtual bool mem_load(u32 address, u8 &data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
+	virtual bool mem_load(u32 address, u16 &data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
+	virtual bool mem_load(u32 address, u32 &data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
 
-	virtual bool store(u32 address, u8 data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
-	virtual bool store(u32 address, u16 data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
-	virtual bool store(u32 address, u32 data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
+	virtual bool mem_store(u32 address, u8 data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
+	virtual bool mem_store(u32 address, u16 data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
+	virtual bool mem_store(u32 address, u32 data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;
 };
 
 #endif // MAME_CPU_ROMP_RSC_H

@@ -19,13 +19,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_tip) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_ring) override;
+	virtual void input_tip(int state) override;
+	virtual void input_ring(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER(tip_a_w);
-	DECLARE_WRITE_LINE_MEMBER(ring_a_w);
-	DECLARE_WRITE_LINE_MEMBER(tip_b_w);
-	DECLARE_WRITE_LINE_MEMBER(ring_b_w);
+	void tip_a_w(int state);
+	void ring_a_w(int state);
+	void tip_b_w(int state);
+	void ring_b_w(int state);
 
 	required_device<ti8x_link_port_device>  m_port_a;
 	required_device<ti8x_link_port_device>  m_port_b;
@@ -54,7 +54,7 @@ tee_connector_device::tee_connector_device(
 }
 
 
-WRITE_LINE_MEMBER(tee_connector_device::tip_a_w)
+void tee_connector_device::tip_a_w(int state)
 {
 	m_tip_a = bool(state);
 	output_tip((m_tip_a && m_tip_b) ? 1 : 0);
@@ -62,7 +62,7 @@ WRITE_LINE_MEMBER(tee_connector_device::tip_a_w)
 }
 
 
-WRITE_LINE_MEMBER(tee_connector_device::ring_a_w)
+void tee_connector_device::ring_a_w(int state)
 {
 	m_ring_a = bool(state);
 	output_ring((m_ring_a && m_ring_b) ? 1 : 0);
@@ -70,7 +70,7 @@ WRITE_LINE_MEMBER(tee_connector_device::ring_a_w)
 }
 
 
-WRITE_LINE_MEMBER(tee_connector_device::tip_b_w)
+void tee_connector_device::tip_b_w(int state)
 {
 	m_tip_b = bool(state);
 	output_tip((m_tip_a && m_tip_b) ? 1 : 0);
@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(tee_connector_device::tip_b_w)
 }
 
 
-WRITE_LINE_MEMBER(tee_connector_device::ring_b_w)
+void tee_connector_device::ring_b_w(int state)
 {
 	m_ring_b = bool(state);
 	output_ring((m_ring_a && m_ring_b) ? 1 : 0);
@@ -112,7 +112,7 @@ void tee_connector_device::device_start()
 }
 
 
-WRITE_LINE_MEMBER(tee_connector_device::input_tip)
+void tee_connector_device::input_tip(int state)
 {
 	m_tip_host = bool(state);
 	m_port_a->tip_w((m_tip_host && m_tip_b) ? 1 : 0);
@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(tee_connector_device::input_tip)
 }
 
 
-WRITE_LINE_MEMBER(tee_connector_device::input_ring)
+void tee_connector_device::input_ring(int state)
 {
 	m_ring_host = bool(state);
 	m_port_a->ring_w((m_ring_host && m_ring_b) ? 1 : 0);

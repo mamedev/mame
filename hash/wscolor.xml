@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 See the wswan software list for the full game list.
 
@@ -1349,7 +1349,7 @@ See the wswan software list for the full game list.
 
 	<software name="mconanyk">
 		<!-- WSC -->
-		<description>Meitantei Conan - Yuugure no Koujo</description>
+		<description>Detective Conan: Yuugure no Koujo</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC0E"/>

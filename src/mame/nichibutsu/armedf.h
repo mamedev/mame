@@ -1,16 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
-#ifndef MAME_INCLUDES_ARMEDF_H
-#define MAME_INCLUDES_ARMEDF_H
+#ifndef MAME_NICHIBUTSU_ARMEDF_H
+#define MAME_NICHIBUTSU_ARMEDF_H
 
 #pragma once
 
 #include "nb1414m4.h"
+
 #include "machine/gen_latch.h"
+#include "sound/flt_biquad.h"
 #include "video/bufsprite.h"
+
 #include "screen.h"
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class armedf_state : public driver_device
 {
@@ -18,6 +22,7 @@ public:
 	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_extra(*this, "extra")
 		, m_nb1414m4(*this, "nb1414m4")
 		, m_screen(*this, "screen")
@@ -25,6 +30,9 @@ public:
 		, m_palette(*this, "palette")
 		, m_spriteram(*this, "spriteram")
 		, m_soundlatch(*this, "soundlatch")
+		, m_dacfilter1(*this, "dacfilter1")
+		, m_dacfilter2(*this, "dacfilter2")
+		, m_ymfilter(*this, "ymfilter")
 		, m_text_videoram(*this, "text_videoram", 0x1000, ENDIANNESS_BIG)
 		, m_spr_pal_clut(*this, "spr_pal_clut")
 		, m_fg_videoram(*this, "fg_videoram")
@@ -40,7 +48,6 @@ public:
 
 	void terraf(machine_config &config);
 	void terrafb(machine_config &config);
-	void legion_common(machine_config &config);
 	void legion(machine_config &config);
 	void legionjb(machine_config &config);
 	void legionjb2(machine_config &config);
@@ -52,11 +59,18 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void legion_common(machine_config &config);
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
+	void sound_config_common(machine_config &config);
 	void sound_config(machine_config &config);
+	void sound_config_3812(machine_config &config);
+	void sound_config_legion(machine_config &config);
+	void sound_config_legion_3812(machine_config &config);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_extra;
 	optional_device<nb1414m4_device> m_nb1414m4;
 	required_device<screen_device> m_screen;
@@ -64,6 +78,9 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<filter_biquad_device> m_dacfilter1;
+	optional_device<filter_biquad_device> m_dacfilter2;
+	optional_device<filter_biquad_device> m_ymfilter;
 
 	// memory pointers
 	memory_share_creator<u8> m_text_videoram;
@@ -178,4 +195,4 @@ private:
 	void bigfghtr_mcu_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ARMEDF_H
+#endif // MAME_NICHIBUTSU_ARMEDF_H

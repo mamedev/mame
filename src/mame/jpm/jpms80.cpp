@@ -47,6 +47,8 @@ System80 is based on the SRU platform, but with more outputs and finally a separ
 #include "j80wsprt2.lh"
 
 
+namespace {
+
 class jpms80_state : public driver_device
 {
 public:
@@ -64,10 +66,10 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(int1_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(int2_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_w);
-	DECLARE_WRITE_LINE_MEMBER(io_enable_w);
+	void int1_enable_w(int state);
+	void int2_enable_w(int state);
+	void watchdog_w(int state);
+	void io_enable_w(int state);
 
 	void jpms80_io_map(address_map &map);
 	void jpms80_map(address_map &map);
@@ -77,19 +79,19 @@ private:
 	required_device<tms9902_device> m_acc;
 };
 
-WRITE_LINE_MEMBER(jpms80_state::int1_enable_w)
+void jpms80_state::int1_enable_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jpms80_state::int2_enable_w)
+void jpms80_state::int2_enable_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jpms80_state::watchdog_w)
+void jpms80_state::watchdog_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jpms80_state::io_enable_w)
+void jpms80_state::io_enable_w(int state)
 {
 }
 
@@ -354,6 +356,7 @@ ROM_START( j80plsnd )
 	ROM_LOAD( "plus_p5.bin", 0x1000, 0x000400, CRC(d111b2c6) SHA1(c0182a4b163e4dbb67f1c98251b93fa878bff2e2) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAMEL( 198?, j80bac,    0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bank A Coin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bac )

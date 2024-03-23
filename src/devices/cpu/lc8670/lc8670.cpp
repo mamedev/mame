@@ -200,9 +200,8 @@ void lc8670_cpu_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// resolve callbacks
-	m_bankswitch_func.resolve();
-	m_lcd_update_func.resolve();
+	// resolve delegates
+	m_lcd_update_func.resolve_safe(0);
 
 	// setup timers
 	m_basetimer = timer_alloc(FUNC(lc8670_cpu_device::base_timer_update), this);
@@ -560,9 +559,7 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 
 uint32_t lc8670_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (!m_lcd_update_func.isnull())
-		return m_lcd_update_func(bitmap, cliprect, m_xram, (REG_MCR & 0x08) && (REG_VCCR & 0x80), REG_STAD);
-	return 0;
+	return m_lcd_update_func(bitmap, cliprect, m_xram, (REG_MCR & 0x08) && (REG_VCCR & 0x80), REG_STAD);
 }
 
 
@@ -640,6 +637,7 @@ void lc8670_cpu_device::check_irqs()
 		if (irq != 0)
 		{
 			LOGMASKED(LOG_IRQ, "%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag(), irq, priority, m_irq_lev);
+			standard_irq_callback(irq, m_pc);
 
 			m_irq_lev |= (1 << priority);
 
@@ -652,8 +650,6 @@ void lc8670_cpu_device::check_irqs()
 
 			// clear the IRQ flag
 			m_irq_flag &= ~(1 << irq);
-
-			standard_irq_callback(irq);
 		}
 	}
 

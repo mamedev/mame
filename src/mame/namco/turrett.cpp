@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "turrett.h"
 
-#include "bus/ata/idehd.h"
+#include "bus/ata/hdd.h"
 
 
 /*************************************
@@ -157,13 +157,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ_LINE_MEMBER( turrett_state::sbrc2_r )
+int turrett_state::sbrc2_r()
 {
 	return m_screen->vblank();
 }
 
 
-READ_LINE_MEMBER( turrett_state::sbrc3_r )
+int turrett_state::sbrc3_r()
 {
 	return m_dma_idle;
 }
@@ -331,7 +331,7 @@ public:
 		if (m_device_head & IDE_DEVICE_HEAD_L)
 			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;
 
-		return ata_mass_storage_device::lba_address();
+		return ide_hdd_device::lba_address();
 	}
 };
 
@@ -396,7 +396,7 @@ ROM_START( turrett )
 	ROM_LOAD32_BYTE( "turret.u8",  0x000002, 0x080000, CRC(ddff4898) SHA1(a8f859a0dcab8ec83fbfe255d58b3e644933b923) )
 	ROM_LOAD32_BYTE( "turret.u7",  0x000003, 0x080000, CRC(fa8b5a5a) SHA1(658e9eeadc9c70185973470565d562c76f4fcdd7) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	/// According to http://personal.inet.fi/cool/lwgt/myoldvdr/V40ProductManual.pdf
 	/// The drive should have CYLS:38869, HEADS:16, SECS:63, Total Units:39,179,952
 	/// We are missing 13482 sectors and we have to adjust the LBA by 63 sectors for

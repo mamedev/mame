@@ -9,8 +9,6 @@ NOTE:  Eventually to be merged into galaxian.cpp
 TODO:
 ----
 
-- Need correct color PROMs for Super Bond
-
 - Dark Planet background graphics
 
 - Explosion sound in Scramble/Super Cobra repeats
@@ -45,6 +43,8 @@ Notes/Tidbits:
 #include "speaker.h"
 
 
+namespace {
+
 class scobra_state : public scramble_state
 {
 public:
@@ -69,7 +69,7 @@ public:
 	void hustlerb(machine_config &config);
 	void rescuefe(machine_config &config);
 
-	template <int Mask> DECLARE_READ_LINE_MEMBER(stratgyx_coinage_r);
+	template <int Mask> int stratgyx_coinage_r();
 
 private:
 	uint8_t scobra_soundram_r(offs_t offset);
@@ -339,11 +339,7 @@ void scobra_state::minefldfe_map(address_map &map)
 	map(0x4C00, 0x4C03).mirror(0x00fc).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4B00, 0x4B03).mirror(0x00fc).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-
-
-
 	map(0x1D98, 0x1D98).r("watchdog", FUNC(watchdog_timer_device::reset_r)); // 0xb000
-
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
 	map(0xf802, 0xf802).w(FUNC(scobra_state::galaxold_coin_counter_w));
@@ -409,7 +405,7 @@ void scobra_state::hustlerb_sound_io_map(address_map &map)
 
 /* stratgyx coinage DIPs are spread across two input ports */
 template <int Mask>
-READ_LINE_MEMBER(scobra_state::stratgyx_coinage_r)
+int scobra_state::stratgyx_coinage_r()
 {
 	return (ioport("IN4")->read() & Mask) ? 1 : 0;
 }
@@ -1794,6 +1790,9 @@ ROM_START( mimonkeyug ) // this bootleg has significant hardware changes: no aud
 	ROM_LOAD( "sn74s288n.6l",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+} // anonymous namespace
+
+
 GAME( 1981, stratgyx,   0,        stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami",                             "Strategy X", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, stratgys,   stratgyx, stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, strongx,    stratgyx, stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "bootleg",                            "Strong X", MACHINE_SUPPORTS_SAVE )
@@ -1814,9 +1813,9 @@ GAME( 1983, minefldfe,  minefld,  minefldfe,  minefldfe,  scobra_state,  empty_i
 
 GAME( 1981, hustler,    0,        hustler,    hustler,    scobra_state,  init_hustler,  ROT90,  "Konami",                             "Video Hustler", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerd,   hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, billiard,   hustler,  hustler,    hustler,    scobra_state,  init_billiard, ROT90,  "bootleg",                            "The Billiards (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, billiard,   hustler,  hustler,    hustler,    scobra_state,  init_billiard, ROT90,  "bootleg",                            "The Billiards (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb,   hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerb2,  hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb2,  hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "bootleg",                            "Fatsy Gambler (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb4,  hustler,  hustlerb4,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb5,  hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb6,  hustler,  hustlerb6,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // stuck on boot, dump verified good

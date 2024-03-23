@@ -1098,7 +1098,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 //  cheat engine
 //-------------------------------------------------
 
-void cheat_manager::set_enable(bool enable)
+void cheat_manager::set_enable(bool enable, bool show)
 {
 	// if the cheat engine is disabled, we're done
 	if (!machine().options().cheat())
@@ -1114,7 +1114,8 @@ void cheat_manager::set_enable(bool enable)
 			if (cheat->state() == SCRIPT_STATE_RUN)
 				cheat->execute_off_script();
 		}
-		machine().popmessage("Cheats Disabled");
+		if (show)
+			machine().popmessage("Cheats Disabled");
 		m_disabled = true;
 	}
 	else if (m_disabled && enable)
@@ -1128,7 +1129,8 @@ void cheat_manager::set_enable(bool enable)
 			if (cheat->state() == SCRIPT_STATE_RUN)
 				cheat->execute_on_script();
 		}
-		machine().popmessage("Cheats Enabled");
+		if (show)
+			machine().popmessage("Cheats Enabled");
 	}
 }
 
@@ -1304,6 +1306,11 @@ std::string cheat_manager::quote_expression(const parsed_expression &expression)
 	strreplace(str, "& ", " band ");
 	strreplace(str, "&", " band ");
 
+	strreplace(str, " << ", " lshift ");
+	strreplace(str, " <<", " lshift ");
+	strreplace(str, "<< ", " lshift ");
+	strreplace(str, "<<", " lshift ");
+
 	strreplace(str, " <= ", " le ");
 	strreplace(str, " <=", " le ");
 	strreplace(str, "<= ", " le ");
@@ -1313,11 +1320,6 @@ std::string cheat_manager::quote_expression(const parsed_expression &expression)
 	strreplace(str, " <", " lt ");
 	strreplace(str, "< ", " lt ");
 	strreplace(str, "<", " lt ");
-
-	strreplace(str, " << ", " lshift ");
-	strreplace(str, " <<", " lshift ");
-	strreplace(str, "<< ", " lshift ");
-	strreplace(str, "<<", " lshift ");
 
 	return str;
 }

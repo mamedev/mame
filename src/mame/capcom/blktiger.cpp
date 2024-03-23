@@ -149,7 +149,7 @@ Notes:
 
 
 // configurable logging
-#define LOG_MCU     (1U <<  1)
+#define LOG_MCU     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MCU)
 
@@ -268,8 +268,6 @@ private:
 	void mcu_main_io_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -494,8 +492,6 @@ uint32_t blktiger_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /**************************************************
 

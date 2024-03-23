@@ -2,8 +2,8 @@
 // copyright-holders:Barry Rodewald
 // Convergent NGEN keyboard
 
-#ifndef MAME_MACHINE_NGEN_KB_H
-#define MAME_MACHINE_NGEN_KB_H
+#ifndef MAME_SKELETON_NGEN_KB_H
+#define MAME_SKELETON_NGEN_KB_H
 
 #pragma once
 
@@ -31,4 +31,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NGEN_KEYBOARD, ngen_keyboard_device)
 
-#endif // MAME_MACHINE_NGEN_KB_H
+#endif // MAME_SKELETON_NGEN_KB_H

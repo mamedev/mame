@@ -6,8 +6,8 @@
     Double Dragon 3 & The Combatribes
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DDRAGON3_H
-#define MAME_INCLUDES_DDRAGON3_H
+#ifndef MAME_TECHNOS_DDRAGON3_H
+#define MAME_TECHNOS_DDRAGON3_H
 
 #pragma once
 
@@ -156,4 +156,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DDRAGON3_H
+#endif // MAME_TECHNOS_DDRAGON3_H

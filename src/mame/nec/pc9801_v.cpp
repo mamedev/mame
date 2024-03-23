@@ -74,6 +74,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 {
+	draw_text(bitmap, addr, y, wd, pitch, lr, cursor_on, cursor_addr, false);
+}
+
+void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, bool lower)
+{
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
@@ -84,6 +89,12 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 
 	uint8_t x_step;
 	uint8_t lastul = 0;
+
+	int scroll_start = 33 - (m_txt_scroll_reg[4] & 0x1f);
+	int scroll_end = scroll_start + m_txt_scroll_reg[5];
+	int scroll = m_txt_scroll_reg[3] % 20;
+	int line = y / lr;
+
 	for(int x=0;x<pitch;x+=x_step)
 	{
 		uint32_t tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
@@ -113,8 +124,6 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 		else
 			x_step = 1;
 
-
-
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{
 			/* Rori Rori Rolling definitely uses different colors for brake stop PCG elements,
@@ -131,10 +140,27 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 
 			for(int yi=0;yi<lr;yi++)
 			{
+				int res_y = y + yi;
+				if((line >= scroll_start) && (line <= scroll_end))
+				{
+					if(!lower)
+					{
+						if(!yi)
+							yi = scroll;
+						else
+							res_y -= scroll;
+					}
+					else if(lower)
+					{
+						if(yi >= scroll)
+							break;
+						res_y += lr - scroll;
+					}
+				}
+
 				for(int xi=0;xi<8;xi++)
 				{
 					int res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
-					int res_y = y+yi - (m_txt_scroll_reg[3] % 20);
 
 					if(!m_screen->visible_area().contains(res_x, res_y))
 						continue;
@@ -172,7 +198,6 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 							tile_data = (m_char_rom[tile*char_size+m_video_ff[FONTSEL_REG]*0x800+yi]);
 					}
 
-					if(reverse) { tile_data^=0xff; }
 					if(yi == lr-1)
 					{
 						if(u_line) tile_data = 0x0f;
@@ -186,6 +211,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 
 					if(blink && m_screen->frame_number() & 0x10)
 						tile_data = 0;
+
+					if(reverse) { tile_data^=0xff; }
 
 					int pen;
 					if(yi >= char_size)
@@ -209,6 +236,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 			lastul = u_line;
 		}
 	}
+	if(scroll && !lower && (line >= scroll_start) && (line <= scroll_end))
+		return draw_text(bitmap, addr += pitch, y, wd, pitch, lr, cursor_on, cursor_addr, true);
 }
 
 /*************************************************

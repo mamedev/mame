@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     Hyperscan RFID cards contain 120 bytes of memory:
     - 0-6      RFID ID (read-only)

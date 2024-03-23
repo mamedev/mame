@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_X1_H
-#define MAME_INCLUDES_X1_H
+#ifndef MAME_SHARP_X1_H
+#define MAME_SHARP_X1_H
 
 #pragma once
 
@@ -144,8 +144,8 @@ public:
 	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hdl_w);
+	void fdc_drq_w(int state);
+	void hdl_w(int state);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
@@ -341,4 +341,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(X1_KEYBOARD, x1_keyboard_device)
 
-#endif // MAME_INCLUDES_X1_H
+#endif // MAME_SHARP_X1_H

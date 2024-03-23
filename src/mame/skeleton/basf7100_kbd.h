@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_BASF7100_KBD_H
-#define MAME_MACHINE_BASF7100_KBD_H
+#ifndef MAME_SKELETON_BASF7100_KBD_H
+#define MAME_SKELETON_BASF7100_KBD_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BASF7100_KBD, basf7100_kbd_device)
 
-#endif // MAME_MACHINE_BASF7100_KBD_H
+#endif // MAME_SKELETON_BASF7100_KBD_H

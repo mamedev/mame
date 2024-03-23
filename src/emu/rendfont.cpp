@@ -13,9 +13,11 @@
 
 #include "emuopts.h"
 #include "fileio.h"
+#include "render.h"
 
 #include "corestr.h"
-#include "coreutil.h"
+#include "multibyte.h"
+#include "path.h"
 
 #include "osdepend.h"
 #include "uismall.fh"
@@ -126,13 +128,12 @@ public:
 
 	bool read(util::read_stream &f)
 	{
-		std::size_t actual(0);
-		return !f.read(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+		auto const [err, actual] = util::read(f, m_data, sizeof(m_data));
+		return !err && (actual == sizeof(m_data));
 	}
 	bool write(util::write_stream &f)
 	{
-		std::size_t actual(0);
-		return !f.write(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+		return !util::write(f, m_data, sizeof(m_data)).first;
 	}
 
 	bool check_magic() const
@@ -149,51 +150,27 @@ public:
 	}
 	u64 get_original_length() const
 	{
-		return
-				(u64(m_data[OFFS_ORIGLENGTH + 0]) << (7 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 1]) << (6 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 2]) << (5 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 3]) << (4 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 4]) << (3 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 5]) << (2 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 6]) << (1 * 8)) |
-				(u64(m_data[OFFS_ORIGLENGTH + 7]) << (0 * 8));
+		return get_u64be(m_data + OFFS_ORIGLENGTH);
 	}
 	u32 get_original_hash() const
 	{
-		return
-				(u32(m_data[OFFS_ORIGHASH + 0]) << (3 * 8)) |
-				(u32(m_data[OFFS_ORIGHASH + 1]) << (2 * 8)) |
-				(u32(m_data[OFFS_ORIGHASH + 2]) << (1 * 8)) |
-				(u32(m_data[OFFS_ORIGHASH + 3]) << (0 * 8));
+		return get_u32be(m_data + OFFS_ORIGHASH);
 	}
 	u32 get_glyph_count() const
 	{
-		return
-				(u32(m_data[OFFS_GLYPHCOUNT + 0]) << (3 * 8)) |
-				(u32(m_data[OFFS_GLYPHCOUNT + 1]) << (2 * 8)) |
-				(u32(m_data[OFFS_GLYPHCOUNT + 2]) << (1 * 8)) |
-				(u32(m_data[OFFS_GLYPHCOUNT + 3]) << (0 * 8));
+		return get_u32be(m_data + OFFS_GLYPHCOUNT);
 	}
 	u16 get_height() const
 	{
-		return
-				(u16(m_data[OFFS_HEIGHT + 0]) << (1 * 8)) |
-				(u16(m_data[OFFS_HEIGHT + 1]) << (0 * 8));
+		return get_u16be(m_data + OFFS_HEIGHT);
 	}
 	s16 get_y_offset() const
 	{
-		return
-				(u16(m_data[OFFS_YOFFSET + 0]) << (1 * 8)) |
-				(u16(m_data[OFFS_YOFFSET + 1]) << (0 * 8));
+		return get_u16be(m_data + OFFS_YOFFSET);
 	}
 	s32 get_default_character() const
 	{
-		return
-				(u32(m_data[OFFS_DEFCHAR + 0]) << (3 * 8)) |
-				(u32(m_data[OFFS_DEFCHAR + 1]) << (2 * 8)) |
-				(u32(m_data[OFFS_DEFCHAR + 2]) << (1 * 8)) |
-				(u32(m_data[OFFS_DEFCHAR + 3]) << (0 * 8));
+		return get_u32be(m_data + OFFS_DEFCHAR);
 	}
 
 	void set_magic()
@@ -207,45 +184,27 @@ public:
 	}
 	void set_original_length(u64 value)
 	{
-		m_data[OFFS_ORIGLENGTH + 0] = u8((value >> (7 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 1] = u8((value >> (6 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 2] = u8((value >> (5 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 3] = u8((value >> (4 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 4] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 5] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 6] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGLENGTH + 7] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u64be(m_data + OFFS_ORIGLENGTH, value);
 	}
 	void set_original_hash(u32 value)
 	{
-		m_data[OFFS_ORIGHASH + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGHASH + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGHASH + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_ORIGHASH + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_data + OFFS_ORIGHASH, value);
 	}
 	void set_glyph_count(u32 value)
 	{
-		m_data[OFFS_GLYPHCOUNT + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_GLYPHCOUNT + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_GLYPHCOUNT + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_GLYPHCOUNT + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_data + OFFS_GLYPHCOUNT, value);
 	}
 	void set_height(u16 value)
 	{
-		m_data[OFFS_HEIGHT + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_HEIGHT + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_data + OFFS_HEIGHT, value);
 	}
 	void set_y_offset(s16 value)
 	{
-		m_data[OFFS_YOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_YOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_data + OFFS_YOFFSET, value);
 	}
 	void set_default_character(s32 value)
 	{
-		m_data[OFFS_DEFCHAR + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_DEFCHAR + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_DEFCHAR + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_DEFCHAR + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_data + OFFS_DEFCHAR, value);
 	}
 
 private:
@@ -285,74 +244,52 @@ public:
 
 	u32 get_encoding() const
 	{
-		return
-				(u32(m_ptr[OFFS_ENCODING + 0]) << (3 * 8)) |
-				(u32(m_ptr[OFFS_ENCODING + 1]) << (2 * 8)) |
-				(u32(m_ptr[OFFS_ENCODING + 2]) << (1 * 8)) |
-				(u32(m_ptr[OFFS_ENCODING + 3]) << (0 * 8));
+		return get_u32be(m_ptr + OFFS_ENCODING);
 	}
 	u16 get_x_advance() const
 	{
-		return
-				(u16(m_ptr[OFFS_XADVANCE + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_XADVANCE + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_XADVANCE);
 	}
 	s16 get_bb_x_offset() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBXOFFSET + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBXOFFSET + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBXOFFSET);
 	}
 	s16 get_bb_y_offset() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBYOFFSET + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBYOFFSET + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBYOFFSET);
 	}
 	u16 get_bb_width() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBWIDTH + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBWIDTH + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBWIDTH);
 	}
 	u16 get_bb_height() const
 	{
-		return
-				(u16(m_ptr[OFFS_BBHEIGHT + 0]) << (1 * 8)) |
-				(u16(m_ptr[OFFS_BBHEIGHT + 1]) << (0 * 8));
+		return get_u16be(m_ptr + OFFS_BBHEIGHT);
 	}
 
 	void set_encoding(u32 value)
 	{
-		m_ptr[OFFS_ENCODING + 0] = u8((value >> (3 * 8)) & 0x00ff);
-		m_ptr[OFFS_ENCODING + 1] = u8((value >> (2 * 8)) & 0x00ff);
-		m_ptr[OFFS_ENCODING + 2] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_ENCODING + 3] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u32be(m_ptr + OFFS_ENCODING, value);
 	}
 	void set_x_advance(u16 value)
 	{
-		m_ptr[OFFS_XADVANCE + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_XADVANCE + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_XADVANCE, value);
 	}
 	void set_bb_x_offset(s16 value)
 	{
-		m_ptr[OFFS_BBXOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBXOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBXOFFSET, value);
 	}
 	void set_bb_y_offset(s16 value)
 	{
-		m_ptr[OFFS_BBYOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBYOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBYOFFSET, value);
 	}
 	void set_bb_width(u16 value)
 	{
-		m_ptr[OFFS_BBWIDTH + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBWIDTH + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBWIDTH, value);
 	}
 	void set_bb_height(u16 value)
 	{
-		m_ptr[OFFS_BBHEIGHT + 0] = u8((value >> (1 * 8)) & 0x00ff);
-		m_ptr[OFFS_BBHEIGHT + 1] = u8((value >> (0 * 8)) & 0x00ff);
+		put_u16be(m_ptr + OFFS_BBHEIGHT, value);
 	}
 
 	bdc_table_entry &operator=(bdc_table_entry const &that) = default;
@@ -672,7 +609,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != nullptr)
-						*dest++ = (accum & (1 << accumbit)) ? fgcol : bgcol;
+						*dest++ = BIT(accum, accumbit) ? fgcol : bgcol;
 					accumbit = (accumbit - 1) & 7;
 				}
 			}
@@ -768,7 +705,7 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != nullptr)
-						*dest++ = (accum & (1 << accumbit)) ? fgcol : bgcol;
+						*dest++ = BIT(accum, accumbit) ? fgcol : bgcol;
 					accumbit = (accumbit - 1) & 7;
 				}
 			}
@@ -821,7 +758,8 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 	bounds.min_y = 0;
 
 	// compute x1,y1 from there based on the bitmap size
-	bounds.set_width(float(gl.bmwidth) * scale * aspect);
+	float width = float(gl.bmwidth) * scale * aspect;
+	bounds.set_width(width < 0.5f ? 0 : std::max(int(width), 1));
 	bounds.set_height(float(m_height) * scale);
 
 	// if the bitmap isn't big enough, bail
@@ -945,7 +883,7 @@ bool render_font::load_cached_bdf(std::string_view filename)
 		m_rawdata.clear();
 		return false;
 	}
-	u32 const hash(core_crc32(0, reinterpret_cast<u8 const *>(&m_rawdata[0]), bytes));
+	u32 const hash(util::crc32_creator::simple(&m_rawdata[0], bytes));
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
 	std::string cachedname(filename, 0, filename.length() - ((4U < filename.length()) && core_filename_ends_with(filename, ".bdf") ? 4 : 0));
@@ -1407,6 +1345,11 @@ bool render_font::load_cached(util::random_read &file, u64 length, u32 hash)
 
 	// now read the rest of the data
 	u64 const remaining(filesize - filepos);
+	if (remaining > std::numeric_limits<std::size_t>::max())
+	{
+		osd_printf_error("render_font::load_cached: BDC file is too large to read into memory\n");
+		return false;
+	}
 	try
 	{
 		m_rawdata.resize(std::size_t(remaining));
@@ -1414,18 +1357,14 @@ bool render_font::load_cached(util::random_read &file, u64 length, u32 hash)
 	catch (...)
 	{
 		osd_printf_error("render_font::load_cached: allocation error\n");
+		return false;
 	}
-	for (u64 bytes_read = 0; remaining > bytes_read; )
+	auto const [err, bytes] = read(file, &m_rawdata[0], remaining);
+	if (err || (bytes != remaining))
 	{
-		u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
-		std::size_t bytes(0);
-		if (file.read(&m_rawdata[bytes_read], chunk, bytes) || bytes != chunk)
-		{
-			osd_printf_error("render_font::load_cached: error reading BDC data\n");
-			m_rawdata.clear();
-			return false;
-		}
-		bytes_read += chunk;
+		osd_printf_error("render_font::load_cached: error reading BDC data\n");
+		m_rawdata.clear();
+		return false;
 	}
 
 	// extract the data from the data
@@ -1507,11 +1446,11 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 			hdr.set_y_offset(m_yoffs);
 			hdr.set_default_character(m_defchar);
 			if (!hdr.write(file))
-				throw emu_fatalerror("Error writing cached file");
+				throw emu_fatalerror("Error writing cached font file");
 		}
 		u64 table_offs;
 		if (file.tell(table_offs))
-			throw emu_fatalerror("Error writing cached file");
+			throw emu_fatalerror("Error writing cached font file");
 
 		// allocate an array to hold the character data
 		std::vector<u8> chartable(std::size_t(numchars) * bdc_table_entry::size(), 0);
@@ -1520,9 +1459,8 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 		std::vector<u8> tempbuffer(65536);
 
 		// write the empty table to the beginning of the file
-		std::size_t bytes_written(0);
-		if (file.write(&chartable[0], chartable.size(), bytes_written) || bytes_written != chartable.size())
-			throw emu_fatalerror("Error writing cached file");
+		if (write(file, &chartable[0], chartable.size()).first)
+			throw emu_fatalerror("Error writing cached font file");
 
 		// loop over all characters
 		bdc_table_entry table_entry(chartable.empty() ? nullptr : &chartable[0]);
@@ -1564,8 +1502,8 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 						*dest++ = accum;
 
 					// write the data
-					if (file.write(&tempbuffer[0], dest - &tempbuffer[0], bytes_written) || bytes_written != dest - &tempbuffer[0])
-						throw emu_fatalerror("Error writing cached file");
+					if (write(file, &tempbuffer[0], dest - &tempbuffer[0]).first)
+						throw emu_fatalerror("Error writing cached font file");
 
 					// free the bitmap and texture
 					m_manager.texture_free(gl.texture);
@@ -1590,15 +1528,8 @@ bool render_font::save_cached(util::random_write &file, u64 length, u32 hash)
 			LOG("render_font::save_cached: writing character table\n");
 			if (file.seek(table_offs, SEEK_SET))
 				return false;
-			u8 const *bytes(&chartable[0]);
-			for (u64 remaining = chartable.size(); remaining; )
-			{
-				u32 const chunk((std::min<u64>)(std::numeric_limits<u32>::max(), remaining));
-				if (file.write(bytes, chunk, bytes_written) || chunk != bytes_written)
-					throw emu_fatalerror("Error writing cached file");
-				bytes += chunk;
-				remaining -= chunk;
-			}
+			if (write(file, &chartable[0], chartable.size()).first)
+				throw emu_fatalerror("Error writing cached font file");
 		}
 
 		// no trouble?
@@ -1649,6 +1580,11 @@ void render_font::render_font_command_glyph()
 
 		// now read the rest of the data
 		u64 const remaining(filesize - filepos);
+		if (remaining > std::numeric_limits<std::size_t>::max())
+		{
+			osd_printf_error("render_font::render_font_command_glyph: BDC file is too large to read into memory\n");
+			return;
+		}
 		try
 		{
 			m_rawdata_cmd.resize(std::size_t(remaining));
@@ -1656,18 +1592,14 @@ void render_font::render_font_command_glyph()
 		catch (...)
 		{
 			osd_printf_error("render_font::render_font_command_glyph: allocation error\n");
+			return;
 		}
-		for (u64 bytes_read = 0; remaining > bytes_read; )
+		auto const [err, bytes] = read(*file, &m_rawdata_cmd[0], remaining);
+		if (err || (bytes != remaining))
 		{
-			u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
-			std::size_t bytes(0);
-			if (file->read(&m_rawdata_cmd[bytes_read], chunk, bytes) || bytes != chunk)
-			{
-				osd_printf_error("render_font::render_font_command_glyph: error reading BDC data\n");
-				m_rawdata_cmd.clear();
-				return;
-			}
-			bytes_read += chunk;
+			osd_printf_error("render_font::render_font_command_glyph: error reading BDC data\n");
+			m_rawdata_cmd.clear();
+			return;
 		}
 
 		// extract the data from the data

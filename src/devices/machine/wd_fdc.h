@@ -61,7 +61,7 @@ public:
 
 	void soft_reset();
 
-	DECLARE_WRITE_LINE_MEMBER(dden_w);
+	void dden_w(int state);
 	void set_floppy(floppy_image_device *floppy);
 	void set_force_ready(bool force_ready);
 	void set_disable_motor_control(bool _disable_motor_control);
@@ -81,15 +81,15 @@ public:
 	void write(offs_t reg, uint8_t val);
 	uint8_t read(offs_t reg);
 
-	DECLARE_READ_LINE_MEMBER(intrq_r);
-	DECLARE_READ_LINE_MEMBER(drq_r);
+	int intrq_r();
+	int drq_r();
 
-	DECLARE_READ_LINE_MEMBER(hld_r);
-	DECLARE_WRITE_LINE_MEMBER(hlt_w);
+	int hld_r();
+	void hlt_w(int state);
 
-	DECLARE_READ_LINE_MEMBER(enp_r);
+	int enp_r();
 
-	DECLARE_WRITE_LINE_MEMBER(mr_w);
+	void mr_w(int state);
 
 	void index_callback(floppy_image_device *floppy, int state);
 protected:
@@ -99,7 +99,7 @@ protected:
 	bool disable_mfm;
 	bool enmf;
 	bool has_enmf;
-	bool inverted_bus;
+	uint8_t bus_invert_value;
 	bool side_control;
 	bool side_compare;
 	bool head_control;
@@ -111,6 +111,7 @@ protected:
 	int delay_register_commit;
 	int delay_command_commit;
 	bool spinup_on_interrupt;
+	bool extended_ddam;
 
 	static constexpr int fd179x_step_times[4] = {  6000, 12000, 20000, 30000 };
 	static constexpr int fd176x_step_times[4] = { 12000, 24000, 40000, 60000 };
@@ -199,6 +200,9 @@ private:
 		SETTLE_WAIT,
 		SETTLE_DONE,
 
+		WRITE_PROTECT_WAIT,
+		WRITE_PROTECT_DONE,
+
 		DATA_LOAD_WAIT,
 		DATA_LOAD_WAIT_DONE,
 
@@ -250,12 +254,14 @@ private:
 
 		attotime tm;
 		int state, next_state;
-		uint16_t shift_reg;
+		uint32_t shift_reg;
 		uint16_t crc;
 		int bit_counter, byte_counter, previous_type;
 		bool data_separator_phase, data_bit_context;
 		uint8_t data_reg;
 		uint8_t idbuf[6];
+		template <unsigned B> uint32_t shift_reg_low() const;
+		uint8_t shift_reg_data() const;
 	};
 
 	enum {
@@ -356,7 +362,7 @@ private:
 	void live_run(attotime limit = attotime::never);
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
-
+	void reset_data_sync();
 	void live_write_raw(uint16_t raw);
 	void live_write_mfm(uint8_t mfm);
 	void live_write_fm(uint8_t fm);
@@ -531,13 +537,13 @@ protected:
 class wd2791_device : public wd_fdc_analog_device_base {
 public:
 	wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
+	void enmf_w(int state) { enmf = state ? false : true; }
 };
 
 class wd2793_device : public wd_fdc_analog_device_base {
 public:
 	wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
+	void enmf_w(int state) { enmf = state ? false : true; }
 };
 
 class wd2795_device : public wd_fdc_analog_device_base {

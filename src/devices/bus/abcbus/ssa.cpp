@@ -161,6 +161,23 @@ void abc_super_smartaid_device::device_reset()
 }
 
 
+void abc_super_smartaid_device::nvram_default()
+{
+}
+
+bool abc_super_smartaid_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram, m_nvram.bytes());
+	return !err && (actual == m_nvram.bytes());
+}
+
+bool abc_super_smartaid_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram, m_nvram.bytes());
+	return !err;
+}
+
+
 
 //**************************************************************************
 //  ABC BUS INTERFACE

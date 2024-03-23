@@ -6,8 +6,8 @@
  *  Created on: 4/10/2013
  */
 
-#ifndef MAME_AUDIO_WPCSND_H
-#define MAME_AUDIO_WPCSND_H
+#ifndef MAME_PINBALL_WPCSND_H
+#define MAME_PINBALL_WPCSND_H
 
 #pragma once
 
@@ -54,7 +54,7 @@ private:
 	// callback
 	devcb_write_line m_reply_cb;
 
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	void ym2151_irq_w(int state);
 
 	void bg_cvsd_clock_set_w(uint8_t data);
 	void bg_cvsd_digit_clock_clear_w(uint8_t data);
@@ -66,4 +66,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WPCSND, wpcsnd_device)
 
-#endif // MAME_AUDIO_WPCSND_H
+#endif // MAME_PINBALL_WPCSND_H

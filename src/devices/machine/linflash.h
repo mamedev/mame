@@ -21,6 +21,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

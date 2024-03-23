@@ -51,14 +51,14 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cinemat_state::vector_control_w)
+void cinemat_state::vector_control_w(int state)
 {
 	/* color is either bright or dim, selected by the value sent to the port */
 	m_vector_color = state ? rgb_t(0x80,0x80,0x80) : rgb_t(0xff,0xff,0xff);
 }
 
 
-WRITE_LINE_MEMBER(cinemat_16level_state::vector_control_w)
+void cinemat_16level_state::vector_control_w(int state)
 {
 	/* on the rising edge of the data value, latch bits 0-3 of the */
 	/* X register as the intensity */
@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(cinemat_16level_state::vector_control_w)
 }
 
 
-WRITE_LINE_MEMBER(cinemat_64level_state::vector_control_w)
+void cinemat_64level_state::vector_control_w(int state)
 {
 	/* on the rising edge of the data value, latch bits 2-7 of the */
 	/* X register as the intensity */
@@ -85,7 +85,7 @@ WRITE_LINE_MEMBER(cinemat_64level_state::vector_control_w)
 }
 
 
-WRITE_LINE_MEMBER(cinemat_color_state::vector_control_w)
+void cinemat_color_state::vector_control_w(int state)
 {
 	/* on the rising edge of the data value, latch the X register */
 	/* as 4-4-4 BGR values */
@@ -103,7 +103,7 @@ WRITE_LINE_MEMBER(cinemat_color_state::vector_control_w)
 }
 
 
-WRITE_LINE_MEMBER(qb3_state::vector_control_w)
+void qb3_state::vector_control_w(int state)
 {
 	/* on the falling edge of the data value, remember the original X,Y values */
 	/* they will be restored on the rising edge; this is to simulate the fact */

@@ -6,14 +6,15 @@
 /* */
 
 
-#ifndef MAME_MACHINE_INDER_VID_H
-#define MAME_MACHINE_INDER_VID_H
+#ifndef MAME_SHARED_INDER_VID_H
+#define MAME_SHARED_INDER_VID_H
 
 #pragma once
 
 
-#include "video/ramdac.h"
 #include "cpu/tms34010/tms34010.h"
+#include "video/ramdac.h"
+
 #include "emupal.h"
 
 DECLARE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device)
@@ -34,6 +35,7 @@ public:
 
 	void megaphx_tms_map(address_map &map);
 	void ramdac_map(address_map &map);
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -53,4 +55,4 @@ private:
 	int m_bpp_mode;
 };
 
-#endif // MAME_MACHINE_INDER_VID_H
+#endif // MAME_SHARED_INDER_VID_H

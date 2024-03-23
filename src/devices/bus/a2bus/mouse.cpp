@@ -115,8 +115,8 @@ protected:
 
 	void pia_out_a(uint8_t data);
 	void pia_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
+	void pia_irqa_w(int state);
+	void pia_irqb_w(int state);
 
 	uint8_t mcu_port_a_r();
 	uint8_t mcu_port_b_r();
@@ -287,11 +287,11 @@ void a2bus_mouse_device::pia_out_b(uint8_t data)
 	m_rom_bank = (data & 0xe) << 7;
 }
 
-WRITE_LINE_MEMBER(a2bus_mouse_device::pia_irqa_w)
+void a2bus_mouse_device::pia_irqa_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(a2bus_mouse_device::pia_irqb_w)
+void a2bus_mouse_device::pia_irqb_w(int state)
 {
 }
 

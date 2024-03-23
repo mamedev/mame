@@ -35,7 +35,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface implementation
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_post_change() override;
 
 	void dsp_io_map(address_map &map);
 
@@ -45,7 +45,7 @@ private:
 	void dsp_pio_w(offs_t offset, u16 data);
 
 	// for synchronised DSP communication
-	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
+	void dsp_ock_w(int state);
 	u16 dsp_pio_r();
 	void set_dsp_ready(s32 param);
 	void set_cmd(s32 param);

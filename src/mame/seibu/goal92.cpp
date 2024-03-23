@@ -95,14 +95,12 @@ private:
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void irqhandler(int state);
+	void adpcm_int(int state);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
 
-
-// video
 
 uint16_t goal92_state::fg_bank_r()
 {
@@ -270,8 +268,6 @@ uint32_t goal92_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 uint16_t goal92_state::inputs_r(offs_t offset, uint16_t mem_mask)
 {
@@ -459,13 +455,13 @@ static INPUT_PORTS_START( goal92 )
 INPUT_PORTS_END
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
-WRITE_LINE_MEMBER(goal92_state::irqhandler)
+void goal92_state::irqhandler(int state)
 {
 	// NMI writes to MSM ports *only*! -AS
 	//m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(goal92_state::adpcm_int)
+void goal92_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;

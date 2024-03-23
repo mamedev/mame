@@ -29,8 +29,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MB87013_H
-#define MAME_MACHINE_MB87013_H
+#ifndef MAME_ROLAND_MB87013_H
+#define MAME_ROLAND_MB87013_H
 
 #pragma once
 
@@ -62,13 +62,12 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// line write handlers
-	DECLARE_WRITE_LINE_MEMBER(dtr_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_w);
+	void dtr_w(int state);
+	void txd_w(int state);
+	void rts_w(int state);
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -87,4 +86,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MB87013, mb87013_device)
 
-#endif // MAME_MACHINE_MB87013_H
+#endif // MAME_ROLAND_MB87013_H

@@ -42,9 +42,9 @@ protected:
 	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void ptm_irq_w(int state);
+	void acia_irq_w(int state);
+	void write_acia_clock(int state);
 
 	required_device<acia6850_device> m_acia;
 	required_device<ptm6840_device> m_ptm;

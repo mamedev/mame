@@ -340,7 +340,7 @@ DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APE(X)C")
 apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, APEXC, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
-	, m_tape_read_cb(*this)
+	, m_tape_read_cb(*this, 0)
 	, m_tape_punch_cb(*this)
 	, m_a(0)
 	, m_r(0)
@@ -763,9 +763,6 @@ special_fetch:
 
 void apexc_cpu_device::device_start()
 {
-	m_tape_read_cb.resolve_safe(0);
-	m_tape_punch_cb.resolve_safe();
-
 	m_program = &space(AS_PROGRAM);
 
 	save_item(NAME(m_a));

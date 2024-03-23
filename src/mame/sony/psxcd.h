@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:smf,R. Belmont,pSXAuthor,Carl
-#ifndef MAME_MACHINE_PSXCD_H
-#define MAME_MACHINE_PSXCD_H
+#ifndef MAME_SONY_PSXCD_H
+#define MAME_SONY_PSXCD_H
 
 #pragma once
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "sound/spu.h"
 
 
@@ -24,7 +24,9 @@ public:
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
-	virtual image_init_result call_load() override;
+
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	void write(offs_t offset, uint8_t data);
@@ -178,4 +180,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PSXCD, psxcd_device)
 
-#endif // MAME_MACHINE_PSXCD_H
+#endif // MAME_SONY_PSXCD_H

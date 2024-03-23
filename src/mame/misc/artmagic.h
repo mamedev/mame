@@ -31,7 +31,7 @@ public:
 	void artmagic(machine_config &config);
 	void shtstar(machine_config &config);
 	void stonebal(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(prot_r);
+	int prot_r();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +69,7 @@ private:
 	void protection_bit_w(offs_t offset, uint16_t data);
 	uint16_t blitter_r();
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
+	void m68k_gen_int(int state);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
@@ -87,6 +87,7 @@ private:
 	void shtstar_guncpu_map(address_map &map);
 	void shtstar_map(address_map &map);
 	void shtstar_subcpu_map(address_map &map);
+	void shtstar_subcpu_vector_map(address_map &map);
 	void stonebal_map(address_map &map);
 	void stonebal_tms_map(address_map &map);
 	void tms_map(address_map &map);

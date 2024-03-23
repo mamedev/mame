@@ -34,7 +34,6 @@ svi_slot_bus_device::svi_slot_bus_device(const machine_config &mconfig, const ch
 
 svi_slot_bus_device::~svi_slot_bus_device()
 {
-	m_dev.detach_all();
 }
 
 //-------------------------------------------------
@@ -43,10 +42,6 @@ svi_slot_bus_device::~svi_slot_bus_device()
 
 void svi_slot_bus_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-	m_romdis_handler.resolve_safe();
-	m_ramdis_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -56,7 +51,7 @@ void svi_slot_bus_device::device_start()
 void svi_slot_bus_device::add_card(device_svi_slot_interface &card)
 {
 	card.set_bus_device(*this);
-	m_dev.append(card);
+	m_dev.emplace_back(card);
 }
 
 //-------------------------------------------------
@@ -65,14 +60,10 @@ void svi_slot_bus_device::add_card(device_svi_slot_interface &card)
 
 uint8_t svi_slot_bus_device::mreq_r(offs_t offset)
 {
-	device_svi_slot_interface *entry = m_dev.first();
 	uint8_t data = 0xff;
 
-	while (entry)
-	{
-		data &= entry->mreq_r(offset);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		data &= entry.mreq_r(offset);
 
 	return data;
 }
@@ -83,13 +74,8 @@ uint8_t svi_slot_bus_device::mreq_r(offs_t offset)
 
 void svi_slot_bus_device::mreq_w(offs_t offset, uint8_t data)
 {
-	device_svi_slot_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->mreq_w(offset, data);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		entry.mreq_w(offset, data);
 }
 
 //-------------------------------------------------
@@ -98,14 +84,10 @@ void svi_slot_bus_device::mreq_w(offs_t offset, uint8_t data)
 
 uint8_t svi_slot_bus_device::iorq_r(offs_t offset)
 {
-	device_svi_slot_interface *entry = m_dev.first();
 	uint8_t data = 0xff;
 
-	while (entry)
-	{
-		data &= entry->iorq_r(offset);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		data &= entry.iorq_r(offset);
 
 	return data;
 }
@@ -116,73 +98,48 @@ uint8_t svi_slot_bus_device::iorq_r(offs_t offset)
 
 void svi_slot_bus_device::iorq_w(offs_t offset, uint8_t data)
 {
-	device_svi_slot_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->iorq_w(offset, data);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		entry.iorq_w(offset, data);
 }
 
 //-------------------------------------------------
 //  bk21_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk21_w )
+void svi_slot_bus_device::bk21_w(int state)
 {
-	device_svi_slot_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->bk21_w(state);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		entry.bk21_w(state);
 }
 
 //-------------------------------------------------
 //  bk22_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk22_w )
+void svi_slot_bus_device::bk22_w(int state)
 {
-	device_svi_slot_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->bk22_w(state);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		entry.bk22_w(state);
 }
 
 //-------------------------------------------------
 //  bk31_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk31_w )
+void svi_slot_bus_device::bk31_w(int state)
 {
-	device_svi_slot_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->bk31_w(state);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		entry.bk31_w(state);
 }
 
 //-------------------------------------------------
 //  bk32_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk32_w )
+void svi_slot_bus_device::bk32_w(int state)
 {
-	device_svi_slot_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->bk32_w(state);
-		entry = entry->next();
-	}
+	for (device_svi_slot_interface &entry : m_dev)
+		entry.bk32_w(state);
 }
 
 
@@ -225,8 +182,7 @@ void svi_slot_device::device_start()
 
 device_svi_slot_interface::device_svi_slot_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "svi3x8slot"),
-	m_bus(nullptr),
-	m_next(nullptr)
+	m_bus(nullptr)
 {
 }
 

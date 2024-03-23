@@ -29,7 +29,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
+	void tx_w(int state) { m_bus->tx_w(state); }
 
 	uint8_t ide_cs0_r(offs_t offset) { return m_ata->cs0_r(offset); }
 	void ide_cs0_w(offs_t offset, uint8_t data) { m_ata->cs0_w(offset, data); }

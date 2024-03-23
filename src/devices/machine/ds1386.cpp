@@ -65,10 +65,6 @@ ds1386_32k_device::ds1386_32k_device(const machine_config &mconfig, const char *
 
 void ds1386_device::device_start()
 {
-	m_inta_cb.resolve_safe();
-	m_intb_cb.resolve_safe();
-	m_sqw_cb.resolve_safe();
-
 	m_tod_alarm = 0;
 	m_watchdog_alarm = 0;
 	m_square = 1;
@@ -365,14 +361,14 @@ void ds1386_device::nvram_default()
 
 bool ds1386_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
+	auto const [err, actual] = read(file, &m_ram[0], m_ram_size);
+	return !err && (actual == m_ram_size);
 }
 
 bool ds1386_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
+	auto const [err, actual] = write(file, &m_ram[0], m_ram_size);
+	return !err;
 }
 
 void ds1386_device::data_w(offs_t offset, uint8_t data)

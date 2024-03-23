@@ -30,12 +30,12 @@ public:
 	void ins8250_w(offs_t offset, u8 data);
 	u8 ins8250_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(dcd_w);
-	DECLARE_WRITE_LINE_MEMBER(dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(ri_w);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
-	DECLARE_READ_LINE_MEMBER(intrpt_r);
+	void dcd_w(int state);
+	void dsr_w(int state);
+	void ri_w(int state);
+	void cts_w(int state);
+	void rx_w(int state);
+	int intrpt_r();
 
 protected:
 	enum class dev_type {

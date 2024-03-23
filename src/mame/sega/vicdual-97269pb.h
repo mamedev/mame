@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#ifndef MAME_VIDEO_VICDUAL_97269PB_H
-#define MAME_VIDEO_VICDUAL_97269PB_H
+#ifndef MAME_SEGA_VICDUAL_97269PB_H
+#define MAME_SEGA_VICDUAL_97269PB_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(S97269PB, s97269pb_device)
 
-#endif // MAME_VIDEO_VICDUAL_97269PB_H
+#endif // MAME_SEGA_VICDUAL_97269PB_H

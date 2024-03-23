@@ -5,8 +5,8 @@
  * includes/poly88.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_POLY88_H
-#define MAME_INCLUDES_POLY88_H
+#ifndef MAME_POLY88_POLY88_H
+#define MAME_POLY88_POLY88_H
 
 #pragma once
 
@@ -52,11 +52,11 @@ private:
 	void intr_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(cassette_clock_w);
+	void cassette_clock_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_tick);
-	DECLARE_WRITE_LINE_MEMBER(vi2_w);
-	DECLARE_WRITE_LINE_MEMBER(vi5_w);
-	DECLARE_WRITE_LINE_MEMBER(usart_ready_w);
+	void vi2_w(int state);
+	void vi5_w(int state);
+	void usart_ready_w(int state);
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
@@ -85,4 +85,4 @@ private:
 	bool m_onboard_disable = false;
 };
 
-#endif // MAME_INCLUDES_POLY88_H
+#endif // MAME_POLY88_POLY88_H

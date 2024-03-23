@@ -18,7 +18,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 
 TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 {
-	if (m_sound0_cnt > 0x3f)
+	if (m_sound0_cnt > 0x1f)
 	{
 		if (m_sound.sg0t > 0)
 		{
@@ -27,16 +27,17 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 				m_sound0_cnt = 0;
 		}
 	}
-	if (m_sound0_cnt < 0x40)
+	if (m_sound0_cnt < 0x20)
 	{
 		m_dac0->write((m_sound.sg0w[m_sound0_cnt >> 1] >> (BIT(m_sound0_cnt, 0) * 4)) & 0xf);
+		m_dac0->set_output_gain(ALL_OUTPUTS, m_sound.sg0l / 31.0F);
 		m_sound0_cnt++;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
 {
-	if (m_sound1_cnt > 0x3f)
+	if (m_sound1_cnt > 0x1f)
 	{
 		if (m_sound.sg1t > 0)
 		{
@@ -45,9 +46,10 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
 				m_sound1_cnt = 0;
 		}
 	}
-	if (m_sound1_cnt < 0x40)
+	if (m_sound1_cnt < 0x20)
 	{
 		m_dac1->write((m_sound.sg1w[m_sound1_cnt >> 1] >> (BIT(m_sound1_cnt, 0) * 4)) & 0xf);
+		m_dac1->set_output_gain(ALL_OUTPUTS, m_sound.sg1l / 31.0F);
 		m_sound1_cnt++;
 	}
 }
@@ -619,16 +621,15 @@ void gamecom_state::init_gamecom()
 	m_p_ram = m_share_maincpu; // required here because pio_w gets called before machine_reset
 }
 
-image_init_result gamecom_state::common_load(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> gamecom_state::common_load(device_image_interface &image, generic_slot_device *slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 	uint32_t load_offset = 0;
 
-	if (size != 0x008000 && size != 0x040000 && size != 0x080000
-			&& size != 0x100000 && size != 0x1c0000 && size != 0x200000)
+	if (size != 0x00'8000 && size != 0x04'0000 && size != 0x08'0000
+			&& size != 0x10'0000 && size != 0x1c'0000 && size != 0x20'0000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size");
 	}
 
 	if (size == 0x1c0000)
@@ -647,7 +648,7 @@ image_init_result gamecom_state::common_load(device_image_interface &image, gene
 	if (size < 0x100000) { memcpy(crt + 0x080000, crt, 0x080000); } /* ->1MB */
 	if (size < 0x1c0000) { memcpy(crt + 0x100000, crt, 0x100000); } /* -> >=1.8MB */
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( gamecom_state::cart1_load )

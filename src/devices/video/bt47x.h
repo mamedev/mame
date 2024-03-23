@@ -15,15 +15,17 @@ public:
 	rgb_t overlay_lookup(u8 index) const { return pen_color(m_palette_colors + index); }
 
 	virtual void map(address_map &map);
+	virtual u8 read(offs_t offset);
+	virtual void write(offs_t offset, u8 data);
 
 protected:
 	bt47x_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits);
 
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return m_palette_colors + m_overlay_colors; }
+	// device_palette_interface implementation
+	virtual u32 palette_entries() const noexcept override { return m_palette_colors + m_overlay_colors; }
 
 	// read/write handlers
 	u8 address_r();
@@ -35,12 +37,12 @@ protected:
 	u8 overlay_r();
 	void overlay_w(u8 data);
 
+	// helpers
+	virtual unsigned address() const { return m_address; };
+	void increment_address(bool const rgb, bool const side_effects = false);
 	virtual unsigned color_bits() const { return m_color_bits; }
 
 private:
-	// helpers
-	void increment_address(bool const side_effects = false);
-
 	// device state
 	u8 m_address;
 	u8 m_address_rgb;
@@ -58,11 +60,13 @@ class bt475_device_base : public bt47x_device_base
 {
 public:
 	virtual void map(address_map &map) override;
+	virtual u8 read(offs_t offset) override;
+	virtual void write(offs_t offset, u8 data) override;
 
 protected:
 	bt475_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits);
 
-	// device_t overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	u8 command_r();
@@ -115,6 +119,30 @@ public:
 	bt478_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
+class bt479_device : public bt47x_device_base
+{
+public:
+	bt479_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	virtual void map(address_map &map) override;
+	virtual u8 read(offs_t offset) override;
+	virtual void write(offs_t offset, u8 data) override;
+
+protected:
+	virtual void device_start() override;
+
+	virtual unsigned address() const override { return BIT(m_command[0], 4, 2) * 0x100 + bt47x_device_base::address(); };
+	virtual unsigned color_bits() const override { return BIT(m_command[1], 1) ? 8 : 6; }
+
+	u8 control_r();
+	void control_w(u8 data);
+
+private:
+	u8 m_window[0x80];
+	u8 m_command[2];
+	u8 m_flood[2];
+};
+
 DECLARE_DEVICE_TYPE(BT471, bt471_device)
 //DECLARE_DEVICE_TYPE(BT473, bt473_device)
 //DECLARE_DEVICE_TYPE(BT474, bt474_device)
@@ -122,6 +150,6 @@ DECLARE_DEVICE_TYPE(BT475, bt475_device)
 DECLARE_DEVICE_TYPE(BT476, bt476_device)
 DECLARE_DEVICE_TYPE(BT477, bt477_device)
 DECLARE_DEVICE_TYPE(BT478, bt478_device)
-//DECLARE_DEVICE_TYPE(BT479, bt479_device)
+DECLARE_DEVICE_TYPE(BT479, bt479_device)
 
 #endif // MAME_VIDEO_BT47X_H

@@ -37,7 +37,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118")
 
-WRITE_LINE_MEMBER(pc9801_118_device::sound_irq)
+void pc9801_118_device::sound_irq(int state)
 {
 	// TODO: sometimes misfired irq causes sound or even host hang
 	m_bus->int_w<5>(state);

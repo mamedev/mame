@@ -17,7 +17,7 @@ static const UInt64 k_UInt64_max = UINT64_CONST(0xFFFFFFFFFFFFFFFF);
       if (c < '0' || c > '9') { if (end) *end = s; return res; } \
       if (res > (k_ ## uintType ## _max) / 10) return 0; \
       res *= 10; \
-      unsigned v = (c - '0'); \
+      unsigned v = (unsigned)(c - '0'); \
       if (res > (k_ ## uintType ## _max) - v) return 0; \
       res += v; }}
 
@@ -25,6 +25,33 @@ CONVERT_STRING_TO_UINT_FUNC(UInt32, char, Byte)
 CONVERT_STRING_TO_UINT_FUNC(UInt32, wchar_t, wchar_t)
 CONVERT_STRING_TO_UINT_FUNC(UInt64, char, Byte)
 CONVERT_STRING_TO_UINT_FUNC(UInt64, wchar_t, wchar_t)
+
+/*
+Int32 ConvertStringToInt32(const char *s, const char **end) throw()
+{
+  if (end)
+    *end = s;
+  const char *s2 = s;
+  if (*s == '-')
+    s2++;
+  if (*s2 == 0)
+    return 0;
+  const char *end2;
+  UInt32 res = ConvertStringToUInt32(s2, &end2);
+  if (*s == '-')
+  {
+    if (res > ((UInt32)1 << (32 - 1)))
+      return 0;
+  }
+  else if ((res & ((UInt32)1 << (32 - 1))) != 0)
+    return 0;
+  if (end)
+    *end = end2;
+  if (*s == '-')
+    return -(Int32)res;
+  return (Int32)res;
+}
+*/
 
 Int32 ConvertStringToInt32(const wchar_t *s, const wchar_t **end) throw()
 {

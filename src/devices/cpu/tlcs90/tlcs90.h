@@ -57,6 +57,12 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// internal registers
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	void p01cr_w(uint8_t data);
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
+	void p2cr_w(uint8_t data);
 	uint8_t p3_r();
 	void p3_w(uint8_t data);
 	uint8_t p4_r();
@@ -121,6 +127,8 @@ private:
 
 	uint8_t m_port_latch[MAX_PORTS];
 
+	uint8_t m_p01cr;
+	uint8_t m_p2cr;
 	uint8_t m_p4cr;
 	uint8_t m_p67cr;
 	uint8_t m_p8cr;
@@ -179,6 +187,7 @@ private:
 	inline int Test( uint8_t cond );
 	inline void Push( uint16_t rr );
 	inline void Pop( uint16_t rr );
+	inline void halt();
 	inline void leave_halt();
 	inline void raise_irq(int irq);
 	inline void clear_irq(int irq);

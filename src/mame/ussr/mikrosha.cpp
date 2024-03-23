@@ -21,6 +21,8 @@
 #include "formats/rk_cas.h"
 
 
+namespace {
+
 class mikrosha_state : public radio86_state
 {
 public:
@@ -32,7 +34,7 @@ public:
 
 private:
 	void mikrosha_8255_font_page_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
+	void mikrosha_pit_out2(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void machine_reset() override;
 	void machine_start() override;
@@ -167,7 +169,7 @@ void mikrosha_state::mikrosha_8255_font_page_w(uint8_t data)
 	m_mikrosha_font_page = (data >> 7) & 1;
 }
 
-WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
+void mikrosha_state::mikrosha_pit_out2(int state)
 {
 }
 
@@ -179,18 +181,21 @@ void mikrosha_state::machine_start()
 
 I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 {
+	using namespace i8275_attributes;
+
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint8_t const *const charmap = &m_chargen[(m_mikrosha_font_page & 1) * 0x400];
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp)
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<6;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
@@ -290,6 +295,9 @@ ROM_START( m86rk )
 	/* here should probably be different rom */
 	ROM_LOAD ("mikrosha.fnt", 0x0000, 0x0800, CRC(b315da1c) SHA1(b5bf9abc0fff75b1aba709a7f08b23d4a89bb04b))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY                                FULLNAME         FLAGS

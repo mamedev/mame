@@ -30,6 +30,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class tk635_state : public driver_device
 {
 public:
@@ -208,5 +211,8 @@ ROM_START( tk635 )
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD("fw_v0_23.bin", 0x00000, 0x40000, CRC(bec6fdae) SHA1(37dc46f6b761d874bd1627a1137bc4082e364698))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 199?, tk635, 0, 0, tk635, tk635, tk635_state, empty_init, "Termtek", "TK-635", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

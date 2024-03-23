@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_WY50KB_H
-#define MAME_MACHINE_WY50KB_H
+#ifndef MAME_WYSE_WY50KB_H
+#define MAME_WYSE_WY50KB_H
 
 #pragma once
 
@@ -10,7 +10,7 @@ class wyse_parallel_keyboard_device : public device_t
 {
 public:
 	void scan_w(u8 address);
-	DECLARE_READ_LINE_MEMBER(sense_r);
+	int sense_r();
 
 protected:
 	wyse_parallel_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner);
@@ -44,4 +44,4 @@ protected:
 DECLARE_DEVICE_TYPE(WY50_KEYBOARD, wy50_keyboard_device)
 DECLARE_DEVICE_TYPE(WY100_KEYBOARD, wy100_keyboard_device)
 
-#endif // MAME_MACHINE_WY50KB_H
+#endif // MAME_WYSE_WY50KB_H

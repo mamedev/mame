@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    konami.h
-
     Portable Konami CPU emulator
 
 **********************************************************************/
@@ -44,6 +42,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual bool hd6309_native_mode() override { return true; }
+
 private:
 	typedef m6809_base_device super;
 
@@ -56,19 +56,19 @@ private:
 	uint8_t read_operand(int ordinal);
 	void write_operand(uint8_t data);
 	void write_operand(int ordinal, uint8_t data);
-	exgtfr_register read_exgtfr_register(uint8_t reg);
-	void write_exgtfr_register(uint8_t reg, exgtfr_register value);
+	uint16_t read_exgtfr_register(uint8_t reg);
+	void write_exgtfr_register(uint8_t reg, uint16_t value);
 
 	// instructions
 	void lmul();
 	void divx();
 
 	// miscellaneous
-	template<class T> T safe_shift_right(T value, uint32_t shift);
-	template<class T> T safe_shift_right_unsigned(T value, uint32_t shift);
-	template<class T> T safe_shift_left(T value, uint32_t shift);
 	void set_lines(uint8_t data);
 	void execute_one();
+
+	uint8_t m_bcount;
+	uint8_t m_temp_im;
 };
 
 #define KONAMI_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */

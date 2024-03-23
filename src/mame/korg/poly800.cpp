@@ -14,6 +14,9 @@
 #include "machine/nvram.h"
 //#include "sound/msm5232.h"
 
+
+namespace {
+
 class poly800_state : public driver_device
 {
 public:
@@ -142,6 +145,9 @@ ROM_START(poly800ii)
 	ROM_REGION(0x4000, "klm779", 0)
 	ROM_LOAD("851005.ic24", 0x0000, 0x4000, CRC(09ae4fc5) SHA1(1e8a418919ef61334fb55aefa8aaebcaefc28ebd)) // 27C128 (last 3/8ths not addressable)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1984, poly800,    0, 0, poly800,    poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1984, poly800mdk, 0, 0, poly800mdk, poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer (MIDI Dump Kit)", MACHINE_IS_SKELETON)

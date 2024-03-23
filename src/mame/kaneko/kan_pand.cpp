@@ -58,10 +58,12 @@ DEFINE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device, "kaneko_pandora", "Kan
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_PANDORA, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_gfx_region(0)
+	, device_gfx_interface(mconfig, *this)
+	, m_clear_bitmap(false)
+	, m_bg_pen(0)
 	, m_xoffset(0)
 	, m_yoffset(0)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_flip_screen(false)
 {
 }
 
@@ -93,7 +95,7 @@ void kaneko_pandora_device::device_reset()
 {
 	memset(m_spriteram.get(), 0x00, 0x1000);
 
-	m_clear_bitmap = 1;
+	m_clear_bitmap = true;
 }
 
 
@@ -101,14 +103,14 @@ void kaneko_pandora_device::device_reset()
     IMPLEMENTATION
 *****************************************************************************/
 
-void kaneko_pandora_device::set_bg_pen( int pen )
+void kaneko_pandora_device::set_bg_pen(uint16_t pen)
 {
 	m_bg_pen = pen;
 }
 
-void kaneko_pandora_device::set_clear_bitmap( int clear )
+void kaneko_pandora_device::set_clear_bitmap(int clear)
 {
-	m_clear_bitmap = clear;
+	m_clear_bitmap = clear != 0;
 }
 
 void kaneko_pandora_device::update( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -198,7 +200,7 @@ void kaneko_pandora_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (sy & 0x100)
 			sy -= 0x200;
 
-		m_gfxdecode->gfx(m_gfx_region)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				tile,
 				(tilecolour & 0xf0) >> 4,
 				flipx, flipy,

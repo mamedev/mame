@@ -42,6 +42,9 @@ This is not a bug (real machine behaves the same).
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define DEBUG_CHAR
 
 #define SPRITE_GLOBAL_X 0
@@ -637,5 +640,8 @@ void srmp5_state::init_srmp5()
 	m_tileduty= make_unique_clear<uint8_t[]>(0x2000);
 #endif
 }
+
+} // anonymous namespace
+
 
 GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, init_srmp5, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

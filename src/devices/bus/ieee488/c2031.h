@@ -49,15 +49,15 @@ protected:
 private:
 	inline int get_device_number();
 
-	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
+	void via0_irq_w(int state);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	void via1_irq_w(int state);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( byte_w );
+	void byte_w(int state);
 
 	void c2031_mem(address_map &map);
 

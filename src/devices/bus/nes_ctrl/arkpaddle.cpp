@@ -12,6 +12,14 @@
  Known differences: NES and Ark2 paddles have screws to adjust range
  of returned values, Ark2 paddle has an extra expansion port.
 
+ The Ark2 paddle's expansion port is NOT a passthru. OUT0 ($4016 bit 0)
+ is passed along when writing. Pins 13 and 7 (normally read as bit 1
+ from $4016 and $4017) are read from the daisy chained device and passed
+ to the Famicom expansion port pins 5 and 4 (i.e. the Famicom sees them
+ as bits 3,4 at $4017). Due to the limited pin connections the Famicom
+ Keyboard cannot be daisy chained, so the Data Recorder cannot be used
+ simultaneously with the paddle when saving and loading user made levels.
+
  All paddles return the ones' complement of a 9-bit value from their
  potentiometers, MSB first. The three commercial releases, Arkanoids
  and Chase HQ, only read 8-bits, ignoring the LSB.
@@ -129,8 +137,8 @@ u8 nes_vausfc_device::read_exp(offs_t offset)
 	{
 		ret = (m_latch & 0x100) >> 7;
 		m_latch <<= 1;
-		ret |= m_daisychain->read_exp(0) << 2;
-		ret |= m_daisychain->read_exp(1) << 3;
+		ret |= (m_daisychain->read_exp(0) & 0x02) << 2;
+		ret |= (m_daisychain->read_exp(1) & 0x02) << 3;
 	}
 	return ret;
 }
@@ -147,6 +155,6 @@ void nes_vaus_device::write(u8 data)
 
 void nes_vausfc_device::write(u8 data)
 {
-	m_daisychain->write(data);
+	m_daisychain->write(data & 1);
 	nes_vaus_device::write(data);
 }

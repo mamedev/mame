@@ -176,7 +176,6 @@ tc0100scn_base_device::tc0100scn_base_device(const machine_config &mconfig, devi
 	, m_flip_text_yoffs(0)
 	, m_multiscrn_xoffs(0)
 	, m_multiscrn_hack(0)
-	, m_col_base(0)
 {
 	std::fill(std::begin(m_bg_colbank), std::end(m_bg_colbank), 0);
 }
@@ -305,9 +304,9 @@ void tc0100scn_base_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	gfx(0)->set_colorbase(m_col_base);
-	set_gfx(1, std::make_unique<gfx_element>(&palette(), charlayout, (u8 *)&m_ram[0x6000 / 2], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));
-	set_gfx(2, std::make_unique<gfx_element>(&palette(), charlayout, (u8 *)&m_ram[0x11000 / 2], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));
+	gfx(0)->set_colorbase(0);
+	set_gfx(1, std::make_unique<gfx_element>(&palette(), charlayout, (u8 *)&m_ram[0x6000 / 2], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
+	set_gfx(2, std::make_unique<gfx_element>(&palette(), charlayout, (u8 *)&m_ram[0x11000 / 2], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
 
 	gfx_element *bg_gfx = gfx(0);
 	gfx_element *txt0 = gfx(1);
@@ -319,8 +318,9 @@ void tc0100scn_base_device::device_start()
 	txt0->set_granularity(bg_gfx->granularity());
 	txt1->set_granularity(bg_gfx->granularity());
 
-	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
-									/* we call this here, so that they can be modified at video_start*/
+	/* standard values, only wgp games change this */
+	/* we call this here, so that they can be modified at video_start */
+	set_colbanks(0, 0, 0);
 
 	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));

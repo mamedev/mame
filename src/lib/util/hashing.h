@@ -34,10 +34,10 @@ namespace util {
 // final digest
 struct sha1_t
 {
-	bool operator==(const sha1_t &rhs) const { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) == 0; }
-	bool operator!=(const sha1_t &rhs) const { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) != 0; }
-	operator uint8_t *() { return m_raw; }
-	bool from_string(std::string_view string);
+	bool operator==(const sha1_t &rhs) const noexcept { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) == 0; }
+	bool operator!=(const sha1_t &rhs) const noexcept { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) != 0; }
+	operator uint8_t *() noexcept { return m_raw; }
+	bool from_string(std::string_view string) noexcept;
 	std::string as_string() const;
 	uint8_t m_raw[20];
 	static const sha1_t null;
@@ -48,19 +48,19 @@ class sha1_creator
 {
 public:
 	// construction/destruction
-	sha1_creator() { reset(); }
+	sha1_creator() noexcept { reset(); }
 
 	// reset
-	void reset();
+	void reset() noexcept;
 
 	// append data
-	void append(const void *data, uint32_t length);
+	void append(const void *data, uint32_t length) noexcept;
 
 	// finalize and compute the final digest
-	sha1_t finish();
+	sha1_t finish() noexcept;
 
 	// static wrapper to just get the digest from a block
-	static sha1_t simple(const void *data, uint32_t length)
+	static sha1_t simple(const void *data, uint32_t length) noexcept
 	{
 		sha1_creator creator;
 		creator.append(data, length);
@@ -80,10 +80,10 @@ protected:
 // final digest
 struct md5_t
 {
-	bool operator==(const md5_t &rhs) const { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) == 0; }
-	bool operator!=(const md5_t &rhs) const { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) != 0; }
-	operator uint8_t *() { return m_raw; }
-	bool from_string(std::string_view string);
+	bool operator==(const md5_t &rhs) const noexcept { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) == 0; }
+	bool operator!=(const md5_t &rhs) const noexcept { return memcmp(m_raw, rhs.m_raw, sizeof(m_raw)) != 0; }
+	operator uint8_t *() noexcept { return m_raw; }
+	bool from_string(std::string_view string) noexcept;
 	std::string as_string() const;
 	uint8_t m_raw[16];
 	static const md5_t null;
@@ -94,16 +94,16 @@ class md5_creator
 {
 public:
 	// construction/destruction
-	md5_creator() { reset(); }
+	md5_creator() noexcept { reset(); }
 
 	// reset
-	void reset() { MD5Init(&m_context); }
+	void reset() noexcept { MD5Init(&m_context); }
 
 	// append data
-	void append(const void *data, uint32_t length) { MD5Update(&m_context, reinterpret_cast<const unsigned char *>(data), length); }
+	void append(const void *data, uint32_t length) noexcept { MD5Update(&m_context, reinterpret_cast<const unsigned char *>(data), length); }
 
 	// finalize and compute the final digest
-	md5_t finish()
+	md5_t finish() noexcept
 	{
 		md5_t result;
 		MD5Final(result.m_raw, &m_context);
@@ -111,7 +111,7 @@ public:
 	}
 
 	// static wrapper to just get the digest from a block
-	static md5_t simple(const void *data, uint32_t length)
+	static md5_t simple(const void *data, uint32_t length) noexcept
 	{
 		md5_creator creator;
 		creator.append(data, length);
@@ -130,19 +130,19 @@ protected:
 // final digest
 struct crc32_t
 {
-	crc32_t() { }
-	constexpr crc32_t(const crc32_t &rhs) = default;
-	constexpr crc32_t(const uint32_t crc) : m_raw(crc) { }
+	crc32_t() noexcept { }
+	constexpr crc32_t(const crc32_t &rhs) noexcept = default;
+	constexpr crc32_t(const uint32_t crc) noexcept : m_raw(crc) { }
 
-	constexpr bool operator==(const crc32_t &rhs) const { return m_raw == rhs.m_raw; }
-	constexpr bool operator!=(const crc32_t &rhs) const { return m_raw != rhs.m_raw; }
+	constexpr bool operator==(const crc32_t &rhs) const noexcept { return m_raw == rhs.m_raw; }
+	constexpr bool operator!=(const crc32_t &rhs) const noexcept { return m_raw != rhs.m_raw; }
 
-	crc32_t &operator=(const crc32_t &rhs) = default;
-	crc32_t &operator=(const uint32_t crc) { m_raw = crc; return *this; }
+	crc32_t &operator=(const crc32_t &rhs) noexcept = default;
+	crc32_t &operator=(const uint32_t crc) noexcept { m_raw = crc; return *this; }
 
-	constexpr operator uint32_t() const { return m_raw; }
+	constexpr operator uint32_t() const noexcept { return m_raw; }
 
-	bool from_string(std::string_view string);
+	bool from_string(std::string_view string) noexcept;
 	std::string as_string() const;
 
 	uint32_t m_raw;
@@ -155,19 +155,19 @@ class crc32_creator
 {
 public:
 	// construction/destruction
-	crc32_creator() { reset(); }
+	crc32_creator() noexcept { reset(); }
 
 	// reset
-	void reset() { m_accum.m_raw = 0; }
+	void reset() noexcept { m_accum.m_raw = 0; }
 
 	// append data
-	void append(const void *data, uint32_t length);
+	void append(const void *data, uint32_t length) noexcept;
 
 	// finalize and compute the final digest
-	crc32_t finish() { return m_accum; }
+	crc32_t finish() noexcept { return m_accum; }
 
 	// static wrapper to just get the digest from a block
-	static crc32_t simple(const void *data, uint32_t length)
+	static crc32_t simple(const void *data, uint32_t length) noexcept
 	{
 		crc32_creator creator;
 		creator.append(data, length);
@@ -186,19 +186,19 @@ protected:
 // final digest
 struct crc16_t
 {
-	crc16_t() { }
-	constexpr crc16_t(const crc16_t &rhs) = default;
-	constexpr crc16_t(const uint16_t crc) : m_raw(crc) { }
+	crc16_t() noexcept { }
+	constexpr crc16_t(const crc16_t &rhs) noexcept = default;
+	constexpr crc16_t(const uint16_t crc) noexcept : m_raw(crc) { }
 
-	constexpr bool operator==(const crc16_t &rhs) const { return m_raw == rhs.m_raw; }
-	constexpr bool operator!=(const crc16_t &rhs) const { return m_raw != rhs.m_raw; }
+	constexpr bool operator==(const crc16_t &rhs) const noexcept { return m_raw == rhs.m_raw; }
+	constexpr bool operator!=(const crc16_t &rhs) const noexcept { return m_raw != rhs.m_raw; }
 
-	crc16_t &operator=(const crc16_t &rhs) = default;
-	crc16_t &operator=(const uint16_t crc) { m_raw = crc; return *this; }
+	crc16_t &operator=(const crc16_t &rhs) noexcept = default;
+	crc16_t &operator=(const uint16_t crc) noexcept { m_raw = crc; return *this; }
 
-	constexpr operator uint16_t() const { return m_raw; }
+	constexpr operator uint16_t() const noexcept { return m_raw; }
 
-	bool from_string(std::string_view string);
+	bool from_string(std::string_view string) noexcept;
 	std::string as_string() const;
 
 	uint16_t m_raw;
@@ -211,19 +211,19 @@ class crc16_creator
 {
 public:
 	// construction/destruction
-	crc16_creator() { reset(); }
+	crc16_creator() noexcept { reset(); }
 
 	// reset
-	void reset() { m_accum.m_raw = 0xffff; }
+	void reset() noexcept { m_accum.m_raw = 0xffff; }
 
 	// append data
-	void append(const void *data, uint32_t length);
+	void append(const void *data, uint32_t length) noexcept;
 
 	// finalize and compute the final digest
-	crc16_t finish() { return m_accum; }
+	crc16_t finish() noexcept { return m_accum; }
 
 	// static wrapper to just get the digest from a block
-	static crc16_t simple(const void *data, uint32_t length)
+	static crc16_t simple(const void *data, uint32_t length) noexcept
 	{
 		crc16_creator creator;
 		creator.append(data, length);
@@ -242,19 +242,19 @@ protected:
 // final digest
 struct sum16_t
 {
-	sum16_t() { }
-	constexpr sum16_t(const sum16_t &rhs) = default;
-	constexpr sum16_t(const uint16_t sum) : m_raw(sum) { }
+	sum16_t() noexcept { }
+	constexpr sum16_t(const sum16_t &rhs) noexcept = default;
+	constexpr sum16_t(const uint16_t sum) noexcept : m_raw(sum) { }
 
-	constexpr bool operator==(const sum16_t &rhs) const { return m_raw == rhs.m_raw; }
-	constexpr bool operator!=(const sum16_t &rhs) const { return m_raw != rhs.m_raw; }
+	constexpr bool operator==(const sum16_t &rhs) const noexcept { return m_raw == rhs.m_raw; }
+	constexpr bool operator!=(const sum16_t &rhs) const noexcept { return m_raw != rhs.m_raw; }
 
-	sum16_t &operator=(const sum16_t &rhs) = default;
-	sum16_t &operator=(const uint16_t sum) { m_raw = sum; return *this; }
+	sum16_t &operator=(const sum16_t &rhs) noexcept = default;
+	sum16_t &operator=(const uint16_t sum) noexcept { m_raw = sum; return *this; }
 
-	constexpr operator uint16_t() const { return m_raw; }
+	constexpr operator uint16_t() const noexcept { return m_raw; }
 
-	bool from_string(std::string_view string);
+	bool from_string(std::string_view string) noexcept;
 	std::string as_string() const;
 
 	uint16_t m_raw;
@@ -267,19 +267,19 @@ class sum16_creator
 {
 public:
 	// construction/destruction
-	sum16_creator() { reset(); }
+	sum16_creator() noexcept { reset(); }
 
 	// reset
-	void reset() { m_accum.m_raw = 0; }
+	void reset() noexcept { m_accum.m_raw = 0; }
 
 	// append data
-	void append(const void *data, uint32_t length);
+	void append(const void *data, uint32_t length) noexcept;
 
 	// finalize and compute the final digest
-	sum16_t finish() { return m_accum; }
+	sum16_t finish() noexcept { return m_accum; }
 
 	// static wrapper to just get the digest from a block
-	static sum16_t simple(const void *data, uint32_t length)
+	static sum16_t simple(const void *data, uint32_t length) noexcept
 	{
 		sum16_creator creator;
 		creator.append(data, length);
@@ -299,14 +299,14 @@ template <> struct hash<::util::crc32_t>
 {
 	typedef ::util::crc32_t argument_type;
 	typedef std::size_t result_type;
-	result_type operator()(argument_type const & s) const { return std::hash<std::uint32_t>()(s); }
+	result_type operator()(argument_type const &s) const noexcept { return std::hash<std::uint32_t>()(s); }
 };
 
 template <> struct hash<::util::crc16_t>
 {
 	typedef ::util::crc16_t argument_type;
 	typedef std::size_t result_type;
-	result_type operator()(argument_type const & s) const { return std::hash<std::uint16_t>()(s); }
+	result_type operator()(argument_type const &s) const noexcept { return std::hash<std::uint16_t>()(s); }
 };
 
 } // namespace std

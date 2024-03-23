@@ -16,6 +16,8 @@
 #include "ui/menu.h"
 
 #include <functional>
+#include <string>
+#include <vector>
 
 
 namespace ui {
@@ -33,8 +35,8 @@ protected:
 	virtual void menu_dismissed() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	void find_languages();
 	void find_sysnames();
@@ -44,6 +46,7 @@ private:
 	std::vector<std::string>    m_sysnames;
 	std::size_t                 m_currlang;
 	std::size_t                 m_currsysnames;
+	u8                          m_currpanels;
 };
 
 //-------------------------------------------------
@@ -56,12 +59,13 @@ public:
 	menu_font_ui(mame_ui_manager &mui, render_container &container, std::function<void (bool)> &&handler);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void menu_dismissed() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	void list();
 
@@ -71,6 +75,7 @@ private:
 	int m_font_size;
 	float const m_info_min, m_info_max;
 	float m_info_size;
+	bool m_face_changed;
 	bool m_changed;
 
 	std::uint16_t m_actual;
@@ -90,6 +95,7 @@ public:
 	menu_colors_ui(mame_ui_manager &mui, render_container &container);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void menu_dismissed() override;
 
@@ -121,8 +127,8 @@ private:
 		const char  *option;
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	s_color_table m_color_table[MUI_RESTORE];
 	void restore_colors();
@@ -138,6 +144,7 @@ public:
 	menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *color, std::string &&title);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -150,16 +157,15 @@ private:
 		PALETTE_CHOOSE
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
-	void inkey_special(const event *menu_event);
+	bool inkey_special(const event *menu_event);
 
 	rgb_t           *m_color;
 	std::string     m_search;
 	bool            m_key_active;
 	int             m_lock_ref;
-	std::string     m_title;
 };
 
 //-------------------------------------------------
@@ -172,8 +178,8 @@ public:
 	menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color);
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	static std::pair<const char *, const char *> const s_palette[];
 	rgb_t &m_original;

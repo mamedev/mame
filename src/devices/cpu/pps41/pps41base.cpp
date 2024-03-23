@@ -63,12 +63,12 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth),
 	m_opla(*this, "opla"),
-	m_read_p(*this),
-	m_read_d(*this),
+	m_read_p(*this, 0xff),
+	m_read_d(*this, 0),
 	m_write_d(*this),
-	m_read_r(*this),
+	m_read_r(*this, 0xff),
 	m_write_r(*this),
-	m_read_sdi(*this),
+	m_read_sdi(*this, 1),
 	m_write_sdo(*this),
 	m_write_ssc(*this),
 	m_write_spk(*this)
@@ -85,17 +85,6 @@ void pps41_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
-
-	// resolve callbacks
-	m_read_p.resolve_safe(0xff);
-	m_read_d.resolve_safe(0);
-	m_write_d.resolve_safe();
-	m_read_r.resolve_safe(0xff);
-	m_write_r.resolve_safe();
-	m_read_sdi.resolve_safe(1);
-	m_write_sdo.resolve_safe();
-	m_write_ssc.resolve_safe();
-	m_write_spk.resolve_safe();
 
 	// init RAM with 0xf
 	for (int i = 0; i <= m_datamask; i++)

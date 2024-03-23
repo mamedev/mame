@@ -96,7 +96,7 @@ private:
 	void sub_rambankselect_w(uint8_t data);
 	void sub_rombankselect_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	void splash_msm5205_int(int state);
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data = 0;
@@ -434,7 +434,7 @@ void splashms_state::splash_adpcm_control_w(uint8_t data)
 	m_msm->reset_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER(splashms_state::splash_msm5205_int)
+void splashms_state::splash_msm5205_int(int state)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;

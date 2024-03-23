@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Miso Kim
 package org.mamedev.mame;
 
 import java.io.*;
@@ -18,11 +20,10 @@ public class MAME extends SDLActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		copyAssetAll("mame.ini");
-		copyAssetAll("ui.ini");
-		copyAssetAll("roms");
+		copyAssetAll("bgfx");
+		copyAssetAll("language");
     }
-	
+
 	public void copyAssetAll(String srcPath) {
 		AssetManager assetMgr = this.getAssets();
 		String assets[] = null;
@@ -39,14 +40,14 @@ public class MAME extends SDLActivity {
 					copyAssetAll(srcPath + File.separator + element);
 				}
 			}
-		} 
+		}
 		catch (IOException e) {
 		   e.printStackTrace();
 		}
 	}
 	public void copyFile(String srcFile, String destFile) {
 		AssetManager assetMgr = this.getAssets();
-	  
+
 		InputStream is = null;
 		OutputStream os = null;
 		try {
@@ -54,7 +55,7 @@ public class MAME extends SDLActivity {
 			if (new File(destFile).exists() == false)
 			{
 				os = new FileOutputStream(destFile);
-		  
+
 				byte[] buffer = new byte[1024];
 				int read;
 				while ((read = is.read(buffer)) != -1) {
@@ -65,12 +66,12 @@ public class MAME extends SDLActivity {
 				os.close();
 				Log.v(TAG, "copy from Asset:" + destFile);
 			}
-		} 
+		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
 

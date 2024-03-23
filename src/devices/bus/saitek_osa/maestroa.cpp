@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/***************************************************************************
+/*******************************************************************************
 
 Saitek OSA Module: Kasparov Maestro A (SciSys, 1986)
 
@@ -17,7 +17,7 @@ Hardware notes:
 The CPU is a 4MHz part, higher speed modules overclock it. The PCB is not
 compatible for upgrading to newer Maestro versions.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "maestroa.h"
@@ -29,7 +29,7 @@ compatible for upgrading to newer Maestro versions.
 #include "softlist_dev.h"
 
 
-DEFINE_DEVICE_TYPE(OSA_MAESTROA, saitekosa_maestroa_device, "osa_maestroa", "Maestro A")
+DEFINE_DEVICE_TYPE(OSA_MAESTROA, saitekosa_maestroa_device, "osa_maestroa", "Saitek OSA Maestro A")
 
 
 //-------------------------------------------------
@@ -50,14 +50,13 @@ void saitekosa_maestroa_device::device_start()
 
 void saitekosa_maestroa_device::device_reset()
 {
-	set_cpu_freq();
 	control_w(0);
 }
 
-void saitekosa_maestroa_device::set_cpu_freq()
+INPUT_CHANGED_MEMBER(saitekosa_maestroa_device::change_cpu_freq)
 {
 	static const XTAL xtal[3] = { 4_MHz_XTAL, 5.67_MHz_XTAL, 6_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 
@@ -89,8 +88,8 @@ const tiny_rom_entry *saitekosa_maestroa_device::device_rom_region() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( maestroa )
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestroa_device, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestroa_device, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz" )
 	PORT_CONFSETTING(    0x01, "5.67MHz" )
 	PORT_CONFSETTING(    0x02, "6MHz" )
@@ -189,5 +188,5 @@ void saitekosa_maestroa_device::nmi_w(int state)
 void saitekosa_maestroa_device::ack_w(int state)
 {
 	if (state != m_expansion->ack_state())
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }

@@ -552,7 +552,7 @@ Notes:
       which simply mixes the left/right audio into one overall output which
       is fed into the Amp PCB.
       CN1 - 5 pin connector, right channel audio input
-      CN2 - 5 pin connectos, mixed audio output to Amp PCB
+      CN2 - 5 pin connector, mixed audio output to Amp PCB
       CN3 - 5 pin connector, left channel audio input
 
 

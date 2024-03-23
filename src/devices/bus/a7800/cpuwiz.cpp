@@ -124,5 +124,5 @@ void a78_rom_p450_vb_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "addon").front_center();
 
-	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+	POKEY(config, m_pokey450, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, "addon", 1.00);
 }

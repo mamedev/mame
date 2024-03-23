@@ -5,8 +5,8 @@
     Taito Z system
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TAITO_Z_H
-#define MAME_INCLUDES_TAITO_Z_H
+#ifndef MAME_TAITO_TAITO_Z_H
+#define MAME_TAITO_TAITO_Z_H
 
 #pragma once
 
@@ -169,7 +169,7 @@ protected:
 private:
 	u8 contcirc_input_bypass_r();
 	void contcirc_out_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(scope_vblank);
+	void scope_vblank(int state);
 
 	void contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	u32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -312,4 +312,4 @@ private:
 	output_finder<2> m_recoil;
 };
 
-#endif // MAME_INCLUDES_TAITO_Z_H
+#endif // MAME_TAITO_TAITO_Z_H

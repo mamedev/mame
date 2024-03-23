@@ -5,8 +5,8 @@
     Bellfruit dotmatrix driver, (under heavy construction !!!)
 
 *************************************************************************************/
-#ifndef MAME_VIDEO_BFM_DM01
-#define MAME_VIDEO_BFM_DM01
+#ifndef MAME_BFM_BFM_DM01
+#define MAME_BFM_BFM_DM01
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BFM_DM01, bfm_dm01_device)
 
-#endif // MAME_VIDEO_BFM_DM01
+#endif // MAME_BFM_BFM_DM01

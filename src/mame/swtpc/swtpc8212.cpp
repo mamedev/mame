@@ -12,6 +12,9 @@ Front end interfacing the terminal device to a MAME RS232 port.
 #include "machine/swtpc8212.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class swtpc8212_state : public driver_device
 {
 public:
@@ -48,6 +51,9 @@ void swtpc8212_state::swtpc8212(machine_config &config)
 
 ROM_START(swtpc8212)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME       FLAGS
 COMP(1980, swtpc8212, 0, 0, swtpc8212, 0, swtpc8212_state, empty_init, "Southwest Technical Products", "SWTPC 8212 Video Terminal", 0 )

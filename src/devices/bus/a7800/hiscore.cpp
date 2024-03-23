@@ -29,7 +29,7 @@ a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char
 
 void a78_hiscore_device::device_add_mconfig(machine_config &config)
 {
-	A78_CART_SLOT(config, "hsc_slot", a7800_cart, nullptr);
+	A78_CART_SLOT(config, m_hscslot, DERIVED_CLOCK(1, 1), a7800_cart, nullptr);
 }
 
 

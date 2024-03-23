@@ -583,7 +583,7 @@ void mcr_state::dotron_op4_w(uint8_t data)
 	*/
 	/* bit 7 = FL1 (J1-3) on flasher control board */
 	/* bit 6 = FL0 (J1-4) on flasher control board */
-	output().set_value("backlight", (data >> 6) & 1);
+	m_backlight = BIT(data, 6);
 
 	/*
 	    Lamp Sequencer:
@@ -2382,6 +2382,31 @@ ROM_START( domino )
 ROM_END
 
 
+ROM_START( dominoa ) // PCB had Satan's Hollow stickers with 'DM' written over them. Also there was a date of 'Nov 10' stamped on the ROM stickers on the CPU PCB.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d2",  0x0000, 0x2000, CRC(c7b6331e) SHA1(9288d1d20818ff0083e0c82f11e02e1abeed587f) )
+	ROM_LOAD( "d3",  0x2000, 0x2000, CRC(81115c86) SHA1(bf6a6233dfb5cfbb7d31cc4fc61d9a9e9c8ed3e3) )
+	ROM_LOAD( "d4",  0x4000, 0x2000, CRC(5cf32c55) SHA1(71dfb1f05f1ab760f2a8130ced925be62d1fb1d8) )
+	ROM_LOAD( "d5",  0x6000, 0x2000, CRC(4f89b68c) SHA1(5546c65315b568cfba7fed387afb0e041d8742a1) )
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_LOAD( "a7",    0x0000, 0x1000, CRC(fa982dcc) SHA1(970340bfa0ac13ad8c2bf5adc21d7ca7aa9e525a) )
+	ROM_LOAD( "a8",    0x1000, 0x1000, CRC(72839019) SHA1(4aa278cfb00fac76cba88600bb300ee88ec3f7ee) )
+	ROM_LOAD( "a9",    0x2000, 0x1000, CRC(ad760da7) SHA1(024fce0f5d46e82b66c4283925556130735b863e) )
+	ROM_LOAD( "a10",   0x3000, 0x1000, CRC(958c7287) SHA1(0dd1ae1b6073f19925d0ec1ba1090d736e0a7cf6) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "g3",  0x0000, 0x2000, CRC(9163007f) SHA1(a7b2e3ed68105ff99841776e8114279f557c90ed) )
+	ROM_LOAD( "g4",  0x2000, 0x2000, CRC(28615c56) SHA1(d4b91c092f594b1216d9a135345ba8955e5e5ec5) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "e1",  0x0000, 0x2000, CRC(0b1f9f9e) SHA1(051d0b126d060300283a5572e1179c7624cedbbf) )
+	ROM_LOAD( "d1",  0x2000, 0x2000, CRC(16aa4b9b) SHA1(700f7dc3ce20dacce38dc40783b28fc9b4c1443a) )
+	ROM_LOAD( "b1",  0x4000, 0x2000, CRC(4a8e76b8) SHA1(563b9db39940060265b771f3b0c4a2055963cf2b) )
+	ROM_LOAD( "a1",  0x6000, 0x2000, CRC(1f39257e) SHA1(645f9b7e8bd2254167d15567c3bd577d3a574f7d) )
+ROM_END
+
+
 ROM_START( wacko )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wackocpu.2d",  0x0000, 0x2000, CRC(c98e29b6) SHA1(38fbb663c238b354925b34b67de246d8ba3356e1) )
@@ -2541,10 +2566,10 @@ ROM_END
 
 ROM_START( tappera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tapper_c.p.u._pg_0_1c_12-9-83.1c",   0x00000, 0x4000, CRC(496a8e04) SHA1(a1e85d20aafb362d73fdfb7761d14c83e4abed19) ) /* labeled TAPPER C.P.U. PG 0 1C 12/9/83 */
-	ROM_LOAD( "tapper_c.p.u._pg_1_2c_12-9-83.2c",   0x04000, 0x4000, CRC(e79c4b0c) SHA1(6d2e7fad732efbe5063e311e92337d9d24375f7f) ) /* labeled TAPPER C.P.U. PG 1 2C 12/9/83 */
-	ROM_LOAD( "tapper_c.p.u._pg_2_3c_12-9-83.3c",   0x08000, 0x4000, CRC(3034ccf0) SHA1(523cfc8f5a52f41ef8de34ed602a5c684d0ff0a4) ) /* labeled TAPPER C.P.U. PG 2 3C 12/9/83 */
-	ROM_LOAD( "tapper_c.p.u._pg_3_4c_12-9-83.4c",   0x0c000, 0x2000, CRC(2dc99e05) SHA1(e9bc159b55939b923e92976ad90058fe3ed712d4) ) /* labeled TAPPER C.P.U. PG 3 4C 12/9/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_0_1c_1-12-84.1c",   0x00000, 0x4000, CRC(127171d1) SHA1(373e9a9d73b71e100c02862662d025f5ead2f94d) ) /* labeled TAPPER C.P.U. PRO 0 1C 1/12/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_1_2c_1-12-84.1c",   0x04000, 0x4000, CRC(9d6a47f7) SHA1(e493e46fc70a765e54bfdd7ba7ca570e6a5c79d6) ) /* labeled TAPPER C.P.U. PRO 1 2C 1/12/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_2_3c_1-12-84.3c",   0x08000, 0x4000, CRC(3a1f8778) SHA1(cb46a2248289ced7282b1463f433dcb970c42c1a) ) /* labeled TAPPER C.P.U. PRO 2 3C 1/12/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_3_4c_1-12-84.4c",   0x0c000, 0x2000, CRC(e8dcdaa4) SHA1(45bf1571a2418c7dc00ccc7061a3e04e65cb6bff) ) /* labeled TAPPER C.P.U. PRO 3 4C 1/12/84 */
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "tapper_sound_snd_0_a7_12-7-83.a7",   0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) ) /* labeled TAPPER SOUND SND 0 A7 12/7/83 */
@@ -2569,10 +2594,10 @@ ROM_END
 
 ROM_START( tapperb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tapper_c.p.u._pg_0_1c.1c",   0x00000, 0x4000, CRC(127171d1) SHA1(373e9a9d73b71e100c02862662d025f5ead2f94d) ) /* labeled TAPPER C.P.U. PRO 0 1C 1/12/84 */
-	ROM_LOAD( "tapper_c.p.u._pg_1_2c.1c",   0x04000, 0x4000, CRC(9d6a47f7) SHA1(e493e46fc70a765e54bfdd7ba7ca570e6a5c79d6) ) /* labeled TAPPER C.P.U. PRO 1 2C 1/12/84 */
-	ROM_LOAD( "tapper_c.p.u._pg_2_3c.3c",   0x08000, 0x4000, CRC(3a1f8778) SHA1(cb46a2248289ced7282b1463f433dcb970c42c1a) ) /* labeled TAPPER C.P.U. PRO 2 3C 1/12/84 */
-	ROM_LOAD( "tapper_c.p.u._pg_3_4c.4c",   0x0c000, 0x2000, CRC(e8dcdaa4) SHA1(45bf1571a2418c7dc00ccc7061a3e04e65cb6bff) ) /* labeled TAPPER C.P.U. PRO 3 4C 1/12/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_0_1c_12-9-83.1c",   0x00000, 0x4000, CRC(496a8e04) SHA1(a1e85d20aafb362d73fdfb7761d14c83e4abed19) ) /* labeled TAPPER C.P.U. PG 0 1C 12/9/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_1_2c_12-9-83.2c",   0x04000, 0x4000, CRC(e79c4b0c) SHA1(6d2e7fad732efbe5063e311e92337d9d24375f7f) ) /* labeled TAPPER C.P.U. PG 1 2C 12/9/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_2_3c_12-9-83.3c",   0x08000, 0x4000, CRC(3034ccf0) SHA1(523cfc8f5a52f41ef8de34ed602a5c684d0ff0a4) ) /* labeled TAPPER C.P.U. PG 2 3C 12/9/83 */
+	ROM_LOAD( "tapper_c.p.u._pg_3_4c_12-9-83.4c",   0x0c000, 0x2000, CRC(2dc99e05) SHA1(e9bc159b55939b923e92976ad90058fe3ed712d4) ) /* labeled TAPPER C.P.U. PG 3 4C 12/9/83 */
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
 	ROM_LOAD( "tapper_sound_snd_0_a7_12-7-83.a7",   0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) ) /* labeled TAPPER SOUND SND 0 A7 12/7/83 */
@@ -3061,7 +3086,8 @@ GAME(  1982, tron3,     tron,     mcr_90010,     tron3,     mcr_state,         i
 GAME(  1982, tron4,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME(  1982, tron5,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (5/12)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME(  1982, tronger,   tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME(  1982, domino,    0,        mcr_90010,     domino,    mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Domino Man", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, domino,    0,        mcr_90010,     domino,    mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Domino Man (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, dominoa,   domino,   mcr_90010,     domino,    mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Domino Man (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME(  1982, wacko,     0,        mcr_90010,     wacko,     mcr_state,         init_wacko,     ROT0,  "Bally Midway", "Wacko", MACHINE_SUPPORTS_SAVE )
 GAME(  1984, twotigerc, twotiger, mcr_90010,     twotigrc,  mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", MACHINE_SUPPORTS_SAVE )
 
@@ -3077,8 +3103,8 @@ GAME(  1983, journey,   0,        mcr_91475,     journey,   mcr_state,         i
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O */
 GAME(  1983, tapper,    0,        mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
 GAME(  1983, tapperg,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84 - Alternate graphics)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
-GAME(  1983, tappera,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
-GAME(  1983, tapperb,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/12/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels */
+GAME(  1983, tappera,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/12/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels */
+GAME(  1983, tapperb,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
 GAME(  1983, sutapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )
 GAME(  1984, rbtapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", MACHINE_SUPPORTS_SAVE )
 GAME(  1984, timber,    0,        mcr_91490,     timber,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Timber", MACHINE_SUPPORTS_SAVE )

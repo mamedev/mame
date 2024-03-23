@@ -58,19 +58,19 @@ public:
 	void clear(u8 data = 0);
 
 	// read handlers (inlined for the sake of optimization)
-	DECLARE_READ_LINE_MEMBER(q0_r) { return BIT(m_q, 0); }
-	DECLARE_READ_LINE_MEMBER(q1_r) { return BIT(m_q, 1); }
-	DECLARE_READ_LINE_MEMBER(q2_r) { return BIT(m_q, 2); }
-	DECLARE_READ_LINE_MEMBER(q3_r) { return BIT(m_q, 3); }
-	DECLARE_READ_LINE_MEMBER(q4_r) { return BIT(m_q, 4); }
-	DECLARE_READ_LINE_MEMBER(q5_r) { return BIT(m_q, 5); }
-	DECLARE_READ_LINE_MEMBER(q6_r) { return BIT(m_q, 6); }
-	DECLARE_READ_LINE_MEMBER(q7_r) { return BIT(m_q, 7); }
+	int q0_r() { return BIT(m_q, 0); }
+	int q1_r() { return BIT(m_q, 1); }
+	int q2_r() { return BIT(m_q, 2); }
+	int q3_r() { return BIT(m_q, 3); }
+	int q4_r() { return BIT(m_q, 4); }
+	int q5_r() { return BIT(m_q, 5); }
+	int q6_r() { return BIT(m_q, 6); }
+	int q7_r() { return BIT(m_q, 7); }
 	u8 output_state() const { return m_q; }
 
 	// control inputs
-	DECLARE_WRITE_LINE_MEMBER(enable_w);
-	DECLARE_WRITE_LINE_MEMBER(clear_w);
+	void enable_w(int state);
+	void clear_w(int state);
 
 protected:
 	// construction/destruction

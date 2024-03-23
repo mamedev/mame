@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, R. Belmont
 /*********************************************************************
 
-    formats/concept_dsk.c
+    formats/concept_dsk.cpp
 
     Formats for Corvus Concept
 
@@ -52,22 +52,22 @@ cc525dsdd_format::cc525dsdd_format()
 {
 }
 
-const char *cc525dsdd_format::name() const
+const char *cc525dsdd_format::name() const noexcept
 {
 	return "concept";
 }
 
-const char *cc525dsdd_format::description() const
+const char *cc525dsdd_format::description() const noexcept
 {
 	return "Corvus Concept 5.25\" DSDD floppy disk image";
 }
 
-const char *cc525dsdd_format::extensions() const
+const char *cc525dsdd_format::extensions() const noexcept
 {
 	return "img";
 }
 
-bool cc525dsdd_format::supports_save() const
+bool cc525dsdd_format::supports_save() const noexcept
 {
 	return true;
 }
@@ -98,7 +98,7 @@ int cc525dsdd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	return 0;
 }
 
-bool cc525dsdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool cc525dsdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -114,18 +114,17 @@ bool cc525dsdd_format::load(util::random_read &io, uint32_t form_factor, const s
 	int track_size = sector_count*512;
 	for (int track=0; track < track_count; track++) {
 		for (int head=0; head < head_count; head++) {
-			size_t actual;
-			io.read_at((track*head_count + head) * track_size, sectdata, track_size, actual);
+			/*auto const [err, acutal] =*/ read_at(io, (track*head_count + head) * track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(cc_9_desc, track, head, sectors, sector_count, 100000, image);
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image.set_variant(floppy_image::DSDD);
 
 	return true;
 }
 
-bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -146,8 +145,7 @@ bool cc525dsdd_format::save(util::random_read_write &io, const std::vector<uint3
 	for (int track=0; track < track_count; track++) {
 		for (int head=0; head < head_count; head++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			size_t actual;
-			io.write_at((track*head_count + head)*track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ write_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors
 		}
 	}
 

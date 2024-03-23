@@ -45,6 +45,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class tecnodar_state : public driver_device
 {
 public:
@@ -352,6 +355,8 @@ ROM_START(tecnodargr)
 	ROM_REGION(0x117, "plds", 0)
 	ROM_LOAD("16as25hb1.bin", 0x000, 0x117, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1991, tecnodar,   0,        tecnodar, tecnodar, tecnodar_state, empty_init, ROT0, "Automatics Pasqual",                    "Tecnodarts",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

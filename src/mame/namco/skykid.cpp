@@ -104,14 +104,12 @@ private:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void mcu_map(address_map &map);
 	void main_map(address_map &map);
 };
 
-
-// video
 
 
 /***************************************************************************
@@ -361,8 +359,6 @@ uint32_t skykid_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-// machine
-
 void skykid_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
@@ -462,14 +458,11 @@ void skykid_state::main_map(address_map &map)
 
 void skykid_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM/
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     // ?
 	map(0x4000, 0x7fff).w(FUNC(skykid_state::irq_2_ctrl_w));
-	map(0x8000, 0xbfff).rom();
+	map(0x8000, 0x9fff).rom().region("mcusub", 0);
 	map(0xc000, 0xc7ff).ram();
-	map(0xf000, 0xffff).rom();
 }
 
 
@@ -690,7 +683,7 @@ static GFXDECODE_START( gfx_skykid )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(skykid_state::vblank_irq)
+void skykid_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -745,9 +738,11 @@ ROM_START( skykid ) // a PCB was found with ROM 4 and 6 labeled sk1, but hashes 
 	ROM_LOAD( "sk1-1c.6b",    0x0c000, 0x4000, CRC(7abe6c6c) SHA1(7d2631cc6149fa3e02b1355cb899de5474ff5d0a) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk2_4.3c",       0x8000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
-	ROM_LOAD( "cus63-63a1.mcu", 0xf000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus63-63a1.mcu", 0x0000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk2_4.3c",     0x0000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -775,9 +770,11 @@ ROM_START( skykido )
 	ROM_LOAD( "sk1_1.6b",     0x0c000, 0x4000, CRC(070a49d4) SHA1(4b994bde3e34b574bd927843804d2fb1a08d1bdf) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk2_4.3c",       0x8000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
-	ROM_LOAD( "cus63-63a1.mcu", 0xf000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus63-63a1.mcu", 0x0000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk2_4.3c",     0x0000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -805,9 +802,11 @@ ROM_START( skykidd )
 	ROM_LOAD( "sk1_1.6b",     0x0c000, 0x4000, CRC(070a49d4) SHA1(4b994bde3e34b574bd927843804d2fb1a08d1bdf) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk1_4.3c",       0x8000, 0x2000, CRC(887137cc) SHA1(dd0f66afb78833c4da73539b692854346f448c0d) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk1_4.3c",     0x0000, 0x2000, CRC(887137cc) SHA1(dd0f66afb78833c4da73539b692854346f448c0d) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -835,9 +834,11 @@ ROM_START( skykids )
 	ROM_LOAD( "sk1a.6b",     0x0c000, 0x4000, CRC(e16abe25) SHA1(78e0d30b15fb62c4399d847784ddc61f6819feba) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk2_4.3c",       0x8000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
-	ROM_LOAD( "cus63-63a1.mcu", 0xf000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus63-63a1.mcu", 0x0000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk2_4.3c",     0x0000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -865,9 +866,11 @@ ROM_START( drgnbstr )
 	ROM_LOAD( "db1_1.6b",     0x0c000, 0x04000, CRC(1c7c1821) SHA1(8b6111afc42e2996bdc2fc276be0c40556cd431e) )
 	ROM_LOAD( "db1_3.6d",     0x10000, 0x04000, CRC(6da169ae) SHA1(235211c26562fef0660e3fde1e87f2e52626d119) )  // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "db1_4.3c",       0x8000, 0x02000, CRC(8a0b1fc1) SHA1(c2861d0da63e2d17f2d1ad46dccf753ecd902ce3) ) // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x01000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "db1_4.3c",     0x0000, 0x2000, CRC(8a0b1fc1) SHA1(c2861d0da63e2d17f2d1ad46dccf753ecd902ce3) ) // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "db1_6.6l",     0x0000, 0x2000, CRC(c080b66c) SHA1(05dcd45274d0bd12ef8ae7fd10c8719e679b3e7b) )

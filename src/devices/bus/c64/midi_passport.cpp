@@ -33,21 +33,21 @@ DEFINE_DEVICE_TYPE(C64_MIDI_PASSPORT, c64_passport_midi_cartridge_device, "c64_m
 //  ptm6840_interface ptm_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::ptm_irq_w )
+void c64_passport_midi_cartridge_device::ptm_irq_w(int state)
 {
 	m_ptm_irq = state;
 
 	m_slot->irq_w(m_ptm_irq || m_acia_irq);
 }
 
-WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::acia_irq_w )
+void c64_passport_midi_cartridge_device::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 
 	m_slot->irq_w(m_ptm_irq || m_acia_irq);
 }
 
-WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::write_acia_clock )
+void c64_passport_midi_cartridge_device::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

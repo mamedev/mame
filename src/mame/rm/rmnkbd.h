@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_RMNKBD_H
-#define MAME_MACHINE_RMNKBD_H
+#ifndef MAME_RM_RMNKBD_H
+#define MAME_RM_RMNKBD_H
 
 #include "bus/rs232/rs232.h"
 #include "machine/keyboard.h"
@@ -23,4 +23,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RMNIMBUS_KEYBOARD, rmnimbus_keyboard_device)
 
-#endif // MAME_MACHINE_RMNKBD_H
+#endif // MAME_RM_RMNKBD_H

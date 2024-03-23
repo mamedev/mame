@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_TV950KB_H
-#define MAME_MACHINE_TV950KB_H
+#ifndef MAME_TELEVIDEO_TV950KB_H
+#define MAME_TELEVIDEO_TV950KB_H
 
 #pragma once
 
@@ -25,11 +25,10 @@ public:
 	// configuration
 	auto tx_cb() { return m_tx_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
+	void rx_w(int state);
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,7 +36,7 @@ protected:
 
 private:
 	u8 keys_r();
-	DECLARE_WRITE_LINE_MEMBER(tx_w);
+	void tx_w(int state);
 
 	void rw_map(address_map &map);
 
@@ -52,4 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TV950_KEYBOARD, tv950kb_device)
 
-#endif // MAME_MACHINE_TV950KB_H
+#endif // MAME_TELEVIDEO_TV950KB_H

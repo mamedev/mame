@@ -4,7 +4,7 @@
 
     Video Hardware for Nichibutsu Mahjong series.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 1999/11/05 -
+    Driver by Takahiro Nogi 1999/11/05 -
     Special thanks to Tatsuyuki Satoh
 
 ******************************************************************************/
@@ -127,6 +127,12 @@ void nbmj9195_state::clut_w(int offset, int data, int vram)
 
 void nbmj9195_state::gfxflag2_w(uint8_t data)
 {
+	// 7654----  gfx flags? (values seen: 0xc0, 0x30)
+	// ----321-  unknown
+	// -------0  coin counter
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
 	m_gfxflag2 = data;
 }
 

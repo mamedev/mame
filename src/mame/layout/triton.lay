@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="red_led" defstate="0">
+		<disk state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="Mainboard LED's">
+		<bounds left="0" right="400" top="0" bottom="320" />
+		<screen index="0">
+			<bounds left="0" right="400" top="0" bottom="300" />
+		</screen>
+
+		<repeat count="8">
+			<param name="i" start="0" increment="1" />
+			<param name="xc" start="80" increment="-10" />
+			<element name="led~i~" ref="red_led">
+				<bounds xc="~xc~" yc="310" width="5" height="5" />
+			</element>
+		</repeat>
+	</view>
+</mamelayout>

@@ -17,7 +17,7 @@ Driver by Tomasz Slanina
 - VDP has also custom label ( "RY 050012    DDU 30600" ) plus TI logo
   Seems to be TMS9928A
   XTAL:10.738MHZ
-- 2xY2404 ( SN76489A comaptible? ) for music and sfx
+- 2xY2404 ( SN76489A compatible? ) for music and sfx
 - MSM5205 - sample player (see below)
 
 - TODO:
@@ -86,6 +86,9 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 #include "video/tms9928a.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
 
@@ -116,7 +119,7 @@ private:
 	uint8_t controls_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	required_device<tms9995_device> m_maincpu;
 	void pachifev_cru(address_map &map);
 	void pachifev_map(address_map &map);
@@ -264,7 +267,7 @@ INPUT_PORTS_END
 #if USE_MSM
 
 
-WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
+void pachifev_state::pf_adpcm_int(int state)
 {
 	if (m_adpcm_pos >= 0x4000 || m_adpcm_idle)
 	{
@@ -309,7 +312,7 @@ void pachifev_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(pachifev_state::vblank_w)
+void pachifev_state::vblank_w(int state)
 {
 	if (state)
 	{
@@ -389,7 +392,9 @@ ROM_START( pachifev )
 
 	ROM_REGION( 0x4000, "adpcm", 0 )
 	ROM_LOAD( "ic66.10",   0x0000, 0x2000, CRC(217c573e) SHA1(6fb90865d1d81f5ea00fa7916d0ccb6756ef5ce5) )
-
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state, empty_init, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

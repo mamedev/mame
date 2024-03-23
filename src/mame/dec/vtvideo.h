@@ -9,8 +9,8 @@ DEC VT Terminal video emulation
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_VTVIDEO_H
-#define MAME_VIDEO_VTVIDEO_H
+#ifndef MAME_DEC_VTVIDEO_H
+#define MAME_DEC_VTVIDEO_H
 
 #pragma once
 
@@ -30,7 +30,7 @@ public:
 
 	template <typename T> void set_chargen(T &&tag) { m_char_rom.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_READ_LINE_MEMBER(lba7_r);
+	int lba7_r();
 	void dc012_w(offs_t offset, uint8_t data);
 	void dc011_w(uint8_t data);
 	void brightness_w(uint8_t data);
@@ -109,4 +109,4 @@ DECLARE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device)
 DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 
 
-#endif // MAME_VIDEO_VTVIDEO_H
+#endif // MAME_DEC_VTVIDEO_H
