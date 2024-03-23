@@ -1497,6 +1497,12 @@ void pgm2_state::init_kof98umh()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
 }
 
+void pgm2_state::init_bubucar()
+{
+	common_encryption_init();
+	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::bubucar_speedup_r))); TODO: once this is fully dumped and decrypted
+}
+
 
 
 
@@ -1547,7 +1553,7 @@ GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, 
 // King of Fighters '98: Ultimate Match Hero
 GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, empty_init,    ROT0, "IGS", "Bu Bu Car (English)", MACHINE_IS_SKELETON ) // Only the program ROM is dumped
+GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, init_bubucar,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_IS_SKELETON ) // Only the program ROM is dumped
 
 // ジグソーワールドアリーナ/Jigsaw World Arena
 
