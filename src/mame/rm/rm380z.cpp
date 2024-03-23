@@ -205,7 +205,7 @@ void rm480z_state::rm480z_io(address_map &map)
 	//map(0x1a, 0x1a).mirror(0xff00); // control port 2
 	//map(0x1b, 0x1b).mirror(0xff00); // control port 3 (DAC) // option
 	//map(0x1d, 0x1d).mirror(0xff00); // control port 5 (USERIO) // option
-	//map(0x20, 0x23).mirror(0xff00); // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50hz int for repeat key
+	//map(0x20, 0x23).mirror(0xff00); // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50Hz int for repeat key
 	//map(0x24, 0x27).mirror(0xff00); // system SIO - 0=chA network data, 1=chB SIO4 data, 2=ChA control, 3=ChB control
 	//map(0x28, 0x29).mirror(0xff02); // am9511/am9512 maths chip // option
 	//map(0x2c, 0x2f).mirror(0xff00); // z80ctc IEEE int, Maths int, RTC, RTC // option
@@ -268,7 +268,7 @@ void rm380z_state::configure(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	FD1771(config, m_fdc, 1_MHz_XTAL);
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 
 	FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
@@ -300,6 +300,9 @@ void rm380z_state_cos34::configure_fds(machine_config &config)
 
 	m_floppy0->set_default_option("fds");
 	m_floppy1->set_default_option("fds");
+
+	// FDS drives require a 2 MHz square wave clock frequency
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / 8);
 }
 
 void rm380z_state_cos40::configure(machine_config &config)
