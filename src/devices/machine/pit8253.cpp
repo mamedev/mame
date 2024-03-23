@@ -292,9 +292,6 @@ void pit_counter_device::load_counter_value()
 {
 	m_value = m_count;
 	m_null_count = 0;
-
-	if (CTRL_MODE(m_control) == 3 && m_output == 0)
-		m_value &= 0xfffe;
 }
 
 
@@ -769,9 +766,8 @@ void pit_counter_device::update()
 }
 
 
-/* We recycle bit 0 of m_value to hold the phase in mode 3 when count is
-   odd. Since read commands in mode 3 always return even numbers, we need to
-   mask this bit off. */
+/* Since read commands in mode 3 always return even numbers,
+   we need to mask bit 0 off. */
 uint16_t pit_counter_device::masked_value() const
 {
 	if ((CTRL_MODE(m_control) == 3) && (downcast<pit8253_device *>(owner())->m_type != pit_type::FE2010))
