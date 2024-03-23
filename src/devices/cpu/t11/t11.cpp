@@ -163,6 +163,8 @@ int t11_device::POP()
 #define GET_V (PSW & VFLAG)
 #define GET_Z (PSW & ZFLAG)
 #define GET_N (PSW & NFLAG)
+#define GET_T (PSW & (1 << 4))
+#define GET_I (PSW & (1 << 7))
 
 /* clears flags */
 #define CLR_C (PSW &= ~CFLAG)
@@ -209,6 +211,122 @@ static const struct irq_table_entry irq_table[] =
 	{ 7<<5, 0144 },
 	{ 7<<5, 0140 }
 };
+
+// PSW7 masks external interrupts (except IRQ1) -- IRQ2, IRQ3, VIRQ
+// PSW11 also masks IRQ1.  PSW10 also masks ACLO.
+void k1801vm1_device::t11_check_irqs()
+{
+	// 2. bus error on vector fetch; nm, vec 160012
+	// 3. double bus error; nm, vec 160006
+	// 4. bus error; PSW11, PSW10
+	if (m_bus_error)
+	{
+		m_bus_error = false;
+		m_mcir = MCIR_IRQ;
+		m_vsel = T11_TIMEOUT;
+	}
+	// 5. illegal insn; nm
+	else if (m_mcir == MCIR_ILL)
+	{
+		WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+		PUSH(PSW);
+		PUSH(PC);
+		PC = RWORD(m_vsel);
+		PSW = RWORD(m_vsel + 2);
+	}
+	// 6. trace trap; WCPU
+	else if (m_trace_trap && m_mcir == MCIR_NONE) // allow trap_to() to execute first
+	{
+		if (GET_T)
+		{
+			m_mcir = MCIR_IRQ;
+			m_vsel = T11_BPT;
+		}
+		else
+			m_trace_trap = false;
+	}
+	else if (GET_T)
+	{
+		m_trace_trap = true;
+	}
+	// 7. power fail (ACLO pin); PSW10
+	else if (m_power_fail)
+	{
+		m_mcir = MCIR_IRQ;
+		m_vsel = T11_PWRFAIL;
+	}
+	// 8. external HALT (nIRQ1 pin); PSW11, PSW10
+	else if (m_hlt_active)
+	{
+		m_mcir = MCIR_HALT;
+		m_vsel = VM1_HALT;
+	}
+	// 9. internal timer, vector 0270; PSW7, PSW10
+	// 10. line clock (nIRQ2 pin); PSW7, PSW10
+	else if (BIT(m_cp_state, 2) && !GET_I)
+	{
+		m_mcir = MCIR_IRQ;
+		m_vsel = VM1_EVNT;
+	}
+	// 11. nIRQ3 pin; PSW7, PSW10
+	else if (BIT(m_cp_state, 3) && !GET_I)
+	{
+		m_mcir = MCIR_IRQ;
+		m_vsel = VM1_IRQ3;
+	}
+	// 12. nVIRQ pin; PSW7, PSW10
+	else if (m_vec_active && !GET_I)
+	{
+		int vec = m_in_iack_func(0);
+		if (vec == -1 || vec == 0)
+		{
+			m_vec_active = 0;
+			return;
+		}
+		m_mcir = MCIR_IRQ;
+		m_vsel = vec;
+	}
+
+	switch (m_mcir)
+	{
+	case MCIR_SET:
+		if (m_vsel >= 0160000) // FIXME
+			WWORD(VM1_SEL1, RWORD(VM1_SEL1) | SEL1_HALT);
+		else
+			WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+		PUSH(PSW);
+		PUSH(PC);
+		PC = RWORD(m_vsel);
+		PSW = RWORD(m_vsel + 2);
+		break;
+
+	case MCIR_IRQ:
+		take_interrupt(m_vsel);
+		break;
+
+	case MCIR_HALT:
+		take_interrupt_halt(m_vsel);
+		break;
+	}
+
+	m_mcir = MCIR_NONE;
+}
+
+void k1801vm1_device::take_interrupt_halt(uint16_t vector)
+{
+	// enter HALT mode
+	WWORD(VM1_SEL1, RWORD(VM1_SEL1) | SEL1_HALT);
+
+	// push the old state, set the new one
+	WWORD(VM1_STACK, PC);
+	WWORD(VM1_STACK + 2, PSW);
+	PCD = RWORD(vector);
+	PSW = RWORD(vector + 2);
+
+	// count cycles and clear the WAIT flag
+	m_icount -= 114;
+	m_wait_state = 0;
+}
 
 void t11_device::t11_check_irqs()
 {
@@ -337,6 +455,10 @@ void t11_device::device_start()
 	save_item(NAME(m_hlt_active));
 	save_item(NAME(m_power_fail));
 	save_item(NAME(m_ext_halt));
+	save_item(NAME(m_trace_trap));
+	save_item(NAME(m_check_irqs));
+	save_item(NAME(m_mcir));
+	save_item(NAME(m_vsel));
 
 	// Register debugger state
 	state_add( T11_PC,  "PC",  m_reg[7].w.l).formatstr("%06O");
@@ -436,6 +558,8 @@ void t11_device::device_reset()
 	m_power_fail = false;
 	m_bus_error = false;
 	m_ext_halt = false;
+	m_trace_trap = false;
+	m_check_irqs = false;
 }
 
 void k1801vm1_device::device_reset()
@@ -444,6 +568,9 @@ void k1801vm1_device::device_reset()
 
 	PC = RWORD(VM1_SEL1) & 0177400;
 	WWORD(VM1_SEL1, RWORD(VM1_SEL1) | SEL1_HALT);
+
+	m_mcir = MCIR_NONE;
+	m_vsel = 0;
 }
 
 void k1801vm2_device::device_reset()
@@ -528,6 +655,12 @@ void t11_device::execute_run()
 
 		op = ROPCODE();
 		(this->*s_opcode_table[op >> 3])(op);
+
+		if (m_check_irqs || m_trace_trap || GET_T)
+		{
+			m_check_irqs = false;
+			t11_check_irqs();
+		}
 	}
 }
 
