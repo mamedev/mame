@@ -2917,6 +2917,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.h",
 		MAME_DIR .. "src/devices/machine/mediagx_cs5530_ide.cpp",
 		MAME_DIR .. "src/devices/machine/mediagx_cs5530_ide.h",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_video.cpp",
+		MAME_DIR .. "src/devices/machine/mediagx_cs5530_video.h",
 		MAME_DIR .. "src/devices/machine/mediagx_host.cpp",
 		MAME_DIR .. "src/devices/machine/mediagx_host.h",
 		MAME_DIR .. "src/devices/machine/zfmicro_usb.cpp",

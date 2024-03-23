@@ -24,8 +24,13 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
+
+	bool m_mac_saturating;
 
 #define O(o) void o ## _full(); void o ## _partial()
 	O(clrmac);

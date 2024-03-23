@@ -7,48 +7,49 @@
     Hardware:
     - SCN8050 (8039)
     - 2716 labeled "121"
-    - XTAL labeled "300-107 KSS3M", measured at 4.6 MHz
+    - XTAL labeled "300-107 KSS3M", measured at 4.6 MHz (4.608 MHz XTAL)
+    - Exar 22-908-03A
     - UA555TC
     - Speaker
 
     TOOD:
     - "Funct" key
-    - Speaker
+    - Speaker frequency
 
     Notes:
     - Also used by the Freedom 200?
     - Data transfer with 1200 baud, 8n1
+    - Key Tronic A65-02730-051 PCB-251 C
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "freedom220_kbd.h"
+
 #include "speaker.h"
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(FREEDOM220_KBD, freedom220_kbd_device, "freedom220_kbd", "Liberty Freedom 220 keyboard")
 
-//-------------------------------------------------
-//  address maps
-//-------------------------------------------------
-
-void freedom220_kbd_device::mem_map(address_map &map)
+freedom220_kbd_device::freedom220_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, FREEDOM220_KBD, tag, owner, clock),
+	m_mcu(*this, "mcu"),
+	m_buzzer(*this, "buzzer"),
+	m_keys(*this, "keys_%x", 0U),
+	m_txd_cb(*this),
+	m_cts_cb(*this),
+	m_key_row(0x0f)
 {
-	map(0x000, 0x7ff).rom().region("mcu", 0);
 }
 
-void freedom220_kbd_device::io_map(address_map &map)
-{
-	map(0x00, 0xff).rw(FUNC(freedom220_kbd_device::select_r), FUNC(freedom220_kbd_device::speaker_w));
-}
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 ROM_START( firmware )
 	ROM_REGION(0x800, "mcu", 0)
@@ -57,16 +58,32 @@ ROM_END
 
 const tiny_rom_entry *freedom220_kbd_device::device_rom_region() const
 {
-	return ROM_NAME(firmware);
+	return ROM_NAME( firmware );
 }
 
-//-------------------------------------------------
-// device_add_mconfig - add device configuration
-//-------------------------------------------------
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+void freedom220_kbd_device::mem_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("mcu", 0);
+}
+
+void freedom220_kbd_device::io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(freedom220_kbd_device::key_row_r), FUNC(freedom220_kbd_device::speaker_w));
+}
+
+
+//**************************************************************************
+//  MACHINE DEFINITIONS
+//**************************************************************************
 
 void freedom220_kbd_device::device_add_mconfig(machine_config &config)
 {
-	I8039(config, m_mcu, 4600000);
+	I8039(config, m_mcu, 4.608_MHz_XTAL);
 	m_mcu->set_addrmap(AS_PROGRAM, &freedom220_kbd_device::mem_map);
 	m_mcu->set_addrmap(AS_IO, &freedom220_kbd_device::io_map);
 	m_mcu->p1_in_cb().set(FUNC(freedom220_kbd_device::p1_r));
@@ -74,13 +91,14 @@ void freedom220_kbd_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_buzzer, 786); // unknown frequency
+	m_buzzer->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
+
+//**************************************************************************
+//  INPUT PORT DEFINITIONS
+//**************************************************************************
 
 static INPUT_PORTS_START( keyboard )
 	PORT_START("keys_0")
@@ -91,7 +109,7 @@ static INPUT_PORTS_START( keyboard )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)     PORT_CHAR(UCHAR_MAMEKEY(F9))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PAUSE)  PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_NAME("Ins Here")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Prog")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                            PORT_NAME("Prog")
 
 	PORT_START("keys_1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)  PORT_CHAR(UCHAR_MAMEKEY(F4))
@@ -100,18 +118,18 @@ static INPUT_PORTS_START( keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // "Funct" key?
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)  PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                        PORT_NAME("Find")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11) PORT_NAME("Set Up")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                      PORT_NAME("Find")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)                               PORT_NAME("Set Up")
 
 	PORT_START("keys_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // 00 code
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // 00
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)    PORT_CHAR(' ')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)     PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // 00 code
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)     PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190") // ←
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // 00
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)                                    PORT_NAME("Comp Char")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME(u8"\u2193")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // 00 code
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME(u8"\u2193") // ↓
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // 00
 
 	PORT_START("keys_3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
@@ -159,8 +177,8 @@ static INPUT_PORTS_START( keyboard )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)     PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)     PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_NAME(".  .")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_NAME(",  ,")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)     PORT_CHAR('9') PORT_CHAR('(')
 
 	PORT_START("keys_8")
@@ -170,7 +188,7 @@ static INPUT_PORTS_START( keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)    PORT_NAME("Right Shift")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)                                   PORT_NAME("Right Shift")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)         PORT_CHAR('0') PORT_CHAR(')')
 
 	PORT_START("keys_9")
@@ -179,31 +197,31 @@ static INPUT_PORTS_START( keyboard )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(UCHAR_MAMEKEY(ENTER))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u2190 Pan")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                               PORT_NAME(u8"\u2190 Pan") // ←
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                               PORT_NAME("Line Feed")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
-	PORT_START("keys_10")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Slct")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Scrl \u2193")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u2191 Scrl")
+	PORT_START("keys_a")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                              PORT_NAME("Slct")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                              PORT_NAME(u8"Scrl \u2193") // ↓
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                              PORT_NAME(u8"\u2191 Scrl") // ↑
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u2192 Pan")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Remov")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Auto Pan")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                              PORT_NAME(u8"\u2192 Pan") // →
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                              PORT_NAME("Remov")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                              PORT_NAME("Auto Pan")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
 
-	PORT_START("keys_11")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // 00 code
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // 00 code
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // 00 code
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)    PORT_CHAR(UCHAR_MAMEKEY(END))    PORT_NAME("Break")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)  PORT_CHAR(UCHAR_MAMEKEY(RIGHT))  PORT_NAME(u8"\u2192")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)     PORT_CHAR(UCHAR_MAMEKEY(UP))     PORT_NAME(u8"\u2191")
+	PORT_START("keys_b")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // 00
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // 00
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // 00
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CANCEL) PORT_CHAR(UCHAR_MAMEKEY(CANCEL)) PORT_NAME("Break")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)  PORT_CHAR(UCHAR_MAMEKEY(RIGHT))  PORT_NAME(u8"\u2192") // →
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)     PORT_CHAR(UCHAR_MAMEKEY(UP))     PORT_NAME(u8"\u2191") // ↑
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP)   PORT_CHAR(UCHAR_MAMEKEY(PGUP))   PORT_NAME("Prev Scrn")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN)   PORT_CHAR(UCHAR_MAMEKEY(PGDN))   PORT_NAME("Next Scrn")
 
-	PORT_START("keys_12")
+	PORT_START("keys_c")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)  PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)  PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)  PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -213,20 +231,20 @@ static INPUT_PORTS_START( keyboard )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)  PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)  PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
 
-	PORT_START("keys_13")
+	PORT_START("keys_d")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PRTSCR)    PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))    PORT_NAME("Print")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)     PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                                                  PORT_NAME("Keypad .")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)     PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
 
-	PORT_START("keys_14")
+	PORT_START("keys_e")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("keys_15")
+	PORT_START("keys_f")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -237,58 +255,44 @@ ioport_constructor freedom220_kbd_device::device_input_ports() const
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  MACHINE EMULATION
 //**************************************************************************
-
-freedom220_kbd_device::freedom220_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, FREEDOM220_KBD, tag, owner, clock),
-	m_mcu(*this, "mcu"),
-	m_speaker(*this, "speaker"),
-	m_keys(*this, "keys_%u", 0U),
-	m_tx_handler(*this)
-{
-}
 
 void freedom220_kbd_device::device_start()
 {
 	// register for save states
-	save_item(NAME(m_select));
+	save_item(NAME(m_key_row));
 }
 
 void freedom220_kbd_device::device_reset()
 {
+	// signal we are connected to the host
+	m_cts_cb(0);
 }
 
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-void freedom220_kbd_device::rx_w(int state)
+void freedom220_kbd_device::rxd_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-uint8_t freedom220_kbd_device::select_r(offs_t offset)
+uint8_t freedom220_kbd_device::key_row_r(offs_t offset)
 {
-	m_select = offset & 0x0f;
+	m_key_row = offset & 0x0f;
 	return 0;
 }
 
 void freedom220_kbd_device::speaker_w(offs_t offset, uint8_t data)
 {
-	// TODO
+	m_buzzer->set_state(BIT(data, 0));
 }
 
 uint8_t freedom220_kbd_device::p1_r()
 {
-	return m_keys[m_select]->read();
+	return m_keys[m_key_row]->read();
 }
 
 void freedom220_kbd_device::p2_w(uint8_t data)
 {
-	if (0)
-		logerror("p2_w: %d %d %d %d\n", BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 4));
-
-	m_tx_handler(BIT(data, 7));
+	// TODO: bit 4 does something too
+	m_txd_cb(BIT(data, 7));
 }

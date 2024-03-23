@@ -36,6 +36,12 @@ public:
 	void ipr_w(offs_t offset, u16 data, u16 mem_mask);
 
 protected:
+	static const u8 pribit[256];
+
+	std::array<u16, 8> m_ipr;
+
+	u16 m_isr, m_icr;
+
 	required_device<sh7042_device> m_cpu;
 
 	virtual void device_start() override;

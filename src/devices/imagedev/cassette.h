@@ -131,6 +131,7 @@ private:
 	const char *                    m_interface;
 
 	std::error_condition internal_load(bool is_create);
+	bool has_any_extension(std::string_view candidate_extensions) const;
 	bool            m_stereo;
 	std::vector<s16> m_samples;
 };

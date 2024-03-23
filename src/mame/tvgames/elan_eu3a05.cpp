@@ -956,6 +956,13 @@ ROM_START( carlecfg )
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
 
+ROM_START( pvmil8 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "millionare_8bit.bin", 0x000000, 0x200000, CRC(8934a8d6) SHA1(24681e06d02f1567a57b84ec1c6f0a23a5f308ac) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
+
 ROM_START( pvmilfin )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "fwwtbam.bin", 0x000000, 0x200000, CRC(2cfef9ab) SHA1(b64f55e36b59790a310ae33154774ac613b5d49f) )
@@ -1027,8 +1034,11 @@ CONS( 2005, sudoku2p, 0,        0, elan_sudoku_pal,  sudoku2p, elan_eu3a05_state
 
 CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
+// this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
+// however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit
+CONS( 2005, pvmil8,   0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmilfin, pvmil8,   0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
 
 CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 

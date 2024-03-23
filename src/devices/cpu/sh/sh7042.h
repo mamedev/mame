@@ -44,6 +44,8 @@ public:
 
 	u64 current_cycles() { return machine().time().as_ticks(clock()); }
 
+	void set_internal_interrupt(int level, u32 vector);
+
 protected:
 	const char *m_port16_names;
 	const char *m_port32_names;

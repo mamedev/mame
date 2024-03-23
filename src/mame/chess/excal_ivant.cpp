@@ -16,7 +16,7 @@ Hardware notes:
 
 The MCU used here is a HD6433256A33P from Excalibur Mirage, the internal ROM
 is disabled. There's also a newer version on a H8/3216. The first version was
-manufactured by CXG.
+produced in a CXG factory.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
@@ -238,7 +238,6 @@ u8 ivant_state::p6_r()
 void ivant_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0007).mirror(0xfff8).w(FUNC(ivant_state::latch_w));
-	map(0x0000, 0xffff).w(FUNC(ivant_state::latch_w));
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr(m_rombank);
 }

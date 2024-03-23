@@ -266,10 +266,10 @@ protected:
 	u8 m_bus_status;
 };
 
-class tdragon_prot_214_state : public tdragon_prot_state
+class macross_prot_state : public tdragon_prot_state
 {
 public:
-	tdragon_prot_214_state(const machine_config &mconfig, device_type type, const char *tag) :
+	macross_prot_state(const machine_config &mconfig, device_type type, const char *tag) :
 		tdragon_prot_state(mconfig, type, tag),
 		m_nmk214(*this, "nmk214_%u", 0U),
 		m_init_data_nmk214(0),
@@ -279,13 +279,17 @@ public:
 	{
 	}
 
-	void saboten_prot(machine_config &config);
+	void bjtwin_prot(machine_config &config);
+	void gunnail_prot(machine_config &config);
+	void macross_prot(machine_config &config);
 
 protected:
 	virtual void device_post_load() override;
 	virtual void machine_start() override;
 
 private:
+	void base_nmk214_215(machine_config &config);
+
 	void decode_nmk214();
 
 	void mcu_port3_to_214_w(u8 data);

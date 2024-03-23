@@ -32,11 +32,11 @@ authors:Sandro Ronco, hap
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
+		<disk state="0"><color red="1.0" green="0.1" blue="0.15" alpha="0.17" /></disk>
 	</element>
 	<element name="ledr" defstate="0">
 		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
-		<rect state="0"><color red="0.17" green="0.015" blue="0.02" /></rect>
+		<rect state="0"><color red="1.0" green="0.1" blue="0.15" alpha="0.17" /></rect>
 	</element>
 	<element name="hlb" defstate="0">
 		<rect state="0">

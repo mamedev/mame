@@ -18,9 +18,12 @@
 
 #include "emu.h"
 
-#include "cpu/h8/swx00.h"
-#include "video/hd44780.h"
 #include "bus/midi/midi.h"
+#include "cpu/h8/swx00.h"
+#include "machine/nvram.h"
+#include "video/hd44780.h"
+
+#include "mks3.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -35,6 +38,9 @@ public:
 	psr340_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_nvram(*this, "ram"),
+		m_mks3(*this, "mks3"),
 		m_lcdc(*this, "ks0066"),
 		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
 		m_key(*this, "S%c", 'A')
@@ -48,6 +54,9 @@ protected:
 
 private:
 	required_device<swx00_device> m_maincpu;
+	required_shared_ptr<u16> m_ram;
+	required_device<nvram_device> m_nvram;
+	required_device<mks3_device> m_mks3;
 	required_device<hd44780_device> m_lcdc;
 	output_finder<80, 8, 5> m_outputs;
 	required_ioport_array<8> m_key;
@@ -55,16 +64,16 @@ private:
 	void c_map(address_map &map);
 	void s_map(address_map &map);
 
-	void lcd_ctrl_w(u8 data);
-	void lcd_data_w(u8 data);
+	void pdt_w(u16 data);
+	u8 pad_r();
+	void txd_w(u8 data);
 
 	void render_w(int state);
 
 	u8 m_matrixsel = 0U;
-	u8 matrix_r();
 };
 
-u8 psr340_state::matrix_r()
+u8 psr340_state::pad_r()
 {
 	u8 data = 0;
 
@@ -79,44 +88,38 @@ u8 psr340_state::matrix_r()
 	return data;
 }
 
-void psr340_state::lcd_ctrl_w(u8 data)
+void psr340_state::pdt_w(u16 data)
 {
-	// bit 3 = E, bit 4 = RS, R/W is connected to GND so write-only
+	// bit 14 = mks3 ic, bit 11 = E, bit 12 = RS, R/W is connected to GND so write-only
 	// all bits are also matrix select for reading the controls
-	m_lcdc->rs_w(BIT(data, 4));
-	m_lcdc->e_w(BIT(data, 3));
-}
-
-void psr340_state::lcd_data_w(u8 data)
-{
+	m_mks3->ic_w(BIT(data, 14));
+	m_lcdc->rs_w(BIT(data, 12));
+	m_lcdc->e_w(BIT(data, 11));
 	m_lcdc->db_w(data);
 	m_matrixsel = data;
 }
 
+void psr340_state::txd_w(u8 data)
+{
+	m_mks3->req_w(BIT(data, 1));
+}
+
 void psr340_state::c_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
-	map(0x400000, 0x43ffff).ram();  // Work RAM?  Or SWP / MEG?
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0); // cs0
+	map(0x400000, 0x43ffff).ram().share(m_ram); // cs2
 
-	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status
-
-//  map(0xffe000, 0xffe7ff).ram();
-
-	map(0xffe027, 0xffe027).r(FUNC(psr340_state::matrix_r));
-
-	map(0xffe02a, 0xffe02a).w(FUNC(psr340_state::lcd_ctrl_w));
-	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
-
-	map(0xffe02f, 0xffe02f).lr8(NAME([]() -> uint8_t { return 0xff; }));
+	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status, cs3, cs4 w/ dack
 }
 
 void psr340_state::s_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("wave", 0);
+	map(0x000000, 0x0fffff).rom().region("wave", 0);
 }
 
 void psr340_state::machine_start()
 {
+	save_item(NAME(m_matrixsel));
 	m_outputs.resolve();
 }
 
@@ -130,70 +133,6 @@ void psr340_state::render_w(int state)
 		return;
 
 	const u8 *render = m_lcdc->render();
-
-	if(0) {
-		logerror("XX -\n");
-		for(int i=2; i != 3; i++) {
-			for(int y=0; y != 8; y++) {
-				std::string r = "XX";
-				for(int x=0; x != 10; x++) {
-					int idx = x+20*i;
-					uint8_t v = render[16*(x+20*i) + y];
-					r += ' ';
-					for(int b=4; b >= 0; b--) {
-						bool known = (idx == 43 && b <= 3) || (idx == 44) || (idx == 45) || (idx == 46 && b >= 3);
-						known = known || (idx == 46 && b == 2 && y >= 5);
-						known = known || (idx == 46 && b == 1 && y >= 4);
-						known = known || (idx == 46 && b == 0 && y >= 5);
-						known = known || (idx == 47 && b == 4 && y >= 4);
-						known = known || (idx == 47 && b == 3 && y >= 5);
-						known = known || (idx == 47 && b == 2 && y >= 4);
-						known = known || (idx == 43 && b == 4 && y >= 4);
-						known = known || (idx == 42 && b == 0 && y >= 4 && y <= 6);
-						known = known || (idx == 42 && b == 1 && y >= 4);
-						known = known || (idx == 42 && b == 2 && y >= 4 && y <= 6);
-						known = known || (idx == 42 && b == 3 && y >= 4);
-						known = known || (idx == 42 && b == 4 && y >= 4 && y <= 6);
-						known = known || (idx == 41 && b == 1 && y >= 4);
-						known = known || (idx == 41 && b == 2 && y >= 4 && y <= 6);
-						known = known || (idx == 41 && b == 3 && y >= 4);
-						known = known || (idx == 41 && b == 4 && y >= 4 && y <= 6);
-						known = known || (idx == 40 && b == 0 && y >= 4);
-						known = known || (idx == 40 && b == 1 && y >= 4 && y <= 6);
-
-						known = known || (idx == 40 && b == 4 && y >= 1 && y <= 6);
-
-						known = known || (idx == 46 && y == 3 && b == 2);
-						known = known || (idx == 46 && y == 2 && b == 1);
-						known = known || (idx == 46 && y == 3 && b == 1);
-						known = known || (idx == 46 && y == 2 && b == 0);
-						known = known || (idx == 46 && y == 3 && b == 0);
-						known = known || (idx == 47 && y == 3 && b == 4);
-						known = known || (idx == 47 && y == 4 && b == 3);
-
-						known = known || (idx == 40 && y == 7 && b == 2);
-						known = known || (idx == 40 && y == 7 && b == 1);
-						known = known || (idx == 41 && y == 7 && b == 4);
-						known = known || (idx == 41 && y == 7 && b == 2);
-						known = known || (idx == 42 && y == 7 && b == 4);
-						known = known || (idx == 42 && y == 7 && b == 2);
-						known = known || (idx == 42 && y == 7 && b == 0);
-						known = known || (idx == 47 && y == 3 && b == 3);
-						known = known || (idx == 47 && y == 3 && b == 2);
-						known = known || (idx == 47 && y == 1 && b == 1);
-						known = known || (idx == 47 && y == 1 && b == 0);
-						known = known || (idx == 47 && y == 2 && b == 4);
-						known = known || (idx == 41 && y == 4 && b == 0);
-						bool is = v & (0x01 << b);
-						r += known ? '_' : is ? '#' : '.';
-					}
-				}
-				logerror("%s\n", r);
-			}
-			logerror("XX\n");
-		}
-	}
-
 	for(int yy=0; yy != 8; yy++)
 		for(int x=0; x != 80; x++) {
 			uint8_t v = render[16*x + yy];
@@ -272,15 +211,32 @@ INPUT_PORTS_END
 void psr340_state::psr340(machine_config &config)
 {
 	/* basic machine hardware */
-	SWX00(config, m_maincpu, 8.4672_MHz_XTAL*2, 1);
-	m_maincpu->set_addrmap(m_maincpu->c_bus_id(), &psr340_state::c_map);
-	m_maincpu->set_addrmap(m_maincpu->s_bus_id(), &psr340_state::s_map);
+	SWX00(config, m_maincpu, 8.4672_MHz_XTAL*2, swx00_device::MODE_DUAL);
+	m_maincpu->set_addrmap(swx00_device::AS_C, &psr340_state::c_map);
+	m_maincpu->set_addrmap(swx00_device::AS_S, &psr340_state::s_map);
 	m_maincpu->read_adc<0>().set_constant(0x3ff); // Battery level
+	m_maincpu->read_adc<1>().set_constant(0x000); // GND
+	m_maincpu->read_adc<2>().set_constant(0x000); // GND
+	m_maincpu->read_adc<3>().set_constant(0x000); // GND
 
-	// SCI0 is externally clocked at the 31250 Hz MIDI rate by the mks3
-	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(31250 * 16));
+	m_maincpu->write_pdt().set(FUNC(psr340_state::pdt_w));
+	m_maincpu->read_pad().set(FUNC(psr340_state::pad_r));
+	m_maincpu->write_txd().set(FUNC(psr340_state::txd_w));
 
-	KS0066(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
+
+	// mks3 is connected to sclki, sync comms on sci1
+	// something generates 500K for sci0, probably internal to the swx00
+	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
+	MKS3(config, m_mks3);
+	m_mks3->write_da().set(m_maincpu, FUNC(swx00_device::sci_rx_w<1>));
+	m_mks3->write_clk().set(m_maincpu, FUNC(swx00_device::sci_clk_w<1>));
+
+	KS0066(config, m_lcdc, 270000); // 91K resistor
 	m_lcdc->set_default_bios_tag("f05");
 	m_lcdc->set_lcd_size(2, 40);
 
@@ -307,8 +263,8 @@ ROM_START( psr340 )
 	ROM_REGION16_BE(0x200000, "wave", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))
 
-	ROM_REGION(0x5704b, "screen", 0)
-	ROM_LOAD("psr340-lcd.svg", 0, 0x5704b, CRC(d93af0a9) SHA1(76156443025e0b4089259417bb266888c547b2d7))
+	ROM_REGION(399369, "screen", 0)
+	ROM_LOAD("psr340-lcd.svg", 0, 399369, CRC(f9d11ca6) SHA1(da036d713c73d6b452a3e2d2b2234d473422d5fb))
 ROM_END
 
 } // anonymous namespace

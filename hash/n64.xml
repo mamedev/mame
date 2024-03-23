@@ -5867,12 +5867,13 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak2k" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 2000 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 2000 (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPAJ-JPN (RZ034-J1)"/>
 		<info name="release" value="20000429"/>
 		<info name="alt_title" value="実況パワフルプロ野球2000"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 2000"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="jikkyou powerful pro yakyuu 2000 (japan) (rev a).bin" size="0x1000000" crc="4e6faa43" sha1="6f32972fe2fdce0ac051787b8253950aa36487d1" />
@@ -5881,12 +5882,13 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak2ka" cloneof="powyak2k" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 2000 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 2000 (Japan)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPAJ-JPN (RZ034-J1)"/>
 		<info name="release" value="20000429"/>
 		<info name="alt_title" value="実況パワフルプロ野球2000"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 2000"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-02A-01" />
 			<feature name="u1" value="U1 [NUS-NP4J-0 02]" />
@@ -5903,12 +5905,13 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak4" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 4 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 4 (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP4J-JPN (RZ001-J1)"/>
 		<info name="release" value="19970314"/>
 		<info name="alt_title" value="実況パワフルプロ野球4"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 4"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="U1 [NUS-NP4J-1]" /> <!-- MX23L9602-35 -->
@@ -5921,12 +5924,13 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak4a" cloneof="powyak4" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 4 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 4 (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP4J-JPN (RZ001-J1)"/>
 		<info name="release" value="19970314"/>
 		<info name="alt_title" value="実況パワフルプロ野球4"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 4"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="jikkyou powerful pro yakyuu 4 (japan).bin" size="0xc00000" crc="8d2540f1" sha1="73016b7c15bae869b0d868e62b433400503ef540" />
@@ -5935,7 +5939,7 @@ Black screen after Rare logo
 	</software>
 
 	<software name="powyak5" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan, rev 2)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 5 (Japan, rev 2)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
@@ -5944,6 +5948,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 		<info name="serial" value="NUS-NJ5J-JPN (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 5"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="jikkyou powerful pro yakyuu 5 (japan) (rev b).bin" size="0x1000000" crc="5b39c8b2" sha1="6105e653e99e56b6e0edf80db35031bf0f0b1881" />
@@ -5952,7 +5957,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak5a" cloneof="powyak5" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 5 (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
@@ -5961,6 +5966,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 		<info name="serial" value="NUS-NJ5J-JPN (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 5"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="U1 [NUS-NJ5J-1]" />
@@ -5977,7 +5983,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak5b" cloneof="powyak5" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 5 (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
@@ -5986,6 +5992,7 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 		<info name="serial" value="NUS-NJ5J-JPN (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 5"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="U1 [NUS-NJ5J-0]" />
@@ -6000,12 +6007,13 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak6" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 6 (Japan, rev 2)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 6 (Japan, rev 2)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J-JPN (RZ026-J1)"/>
 		<info name="release" value="19990325"/>
 		<info name="alt_title" value="実況パワフルプロ野球6"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 6"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="jikkyou powerful pro yakyuu 6 (japan) (rev b).bin" size="0x1000000" crc="e8d4a365" sha1="be9811a86db41f5b1f4844bc004aa34d1d4bc406" />
@@ -6014,12 +6022,13 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak6a" cloneof="powyak6" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 6 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 6 (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J-JPN (RZ026-J1)"/>
 		<info name="release" value="19990325"/>
 		<info name="alt_title" value="実況パワフルプロ野球6"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 6"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="jikkyou powerful pro yakyuu 6 (japan) (rev a).bin" size="0x1000000" crc="5b6351f1" sha1="713b5c8bf72d78b97df416923aad589ec3c8ec64" />
@@ -6028,12 +6037,13 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyak6b" cloneof="powyak6" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu 6 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū 6 (Japan)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J-JPN (RZ026-J1)"/>
 		<info name="release" value="19990325"/>
 		<info name="alt_title" value="実況パワフルプロ野球6"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu 6"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="U1 [NUS-NP6J-0]" />
@@ -6050,12 +6060,13 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyk2k1" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu Basic Ban 2001 (Japan, rev 1)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū Basic-ban 2001 (Japan, rev 1)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPEJ-JPN (RZ038-J1)"/>
 		<info name="release" value="20010329"/>
 		<info name="alt_title" value="実況パワフルプロ野球 Basic版2001"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu Basic-ban 2001"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="jikkyou powerful pro yakyuu basic ban 2001 (japan) (rev a).bin" size="0x1000000" crc="68d57df2" sha1="897d785332af3f7f055b23e7d848e60874003bd5" />
@@ -6064,12 +6075,13 @@ Stuck vertical lines during intro (i.e. when stadiums are displayed)
 	</software>
 
 	<software name="powyk2k1a" cloneof="powyk2k1" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu Basic Ban 2001 (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū Basic-ban 2001 (Japan)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPEJ-JPN (RZ038-J1)"/>
 		<info name="release" value="20010329"/>
 		<info name="alt_title" value="実況パワフルプロ野球 Basic版2001"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu Basic-ban 2001"/> <!-- often used unofficially -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="jikkyou powerful pro yakyuu basic ban 2001 (japan).bin" size="0x1000000" crc="4e102917" sha1="0f34cc6c6448cf4956dccdabeac0fbbd1f36dca1" />

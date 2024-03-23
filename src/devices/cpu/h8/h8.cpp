@@ -48,7 +48,6 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_mode_a20 = false;
 	m_has_exr = false;
 	m_has_mac = false;
-	m_mac_saturating = false;
 	m_has_trace = false;
 	m_has_hc = true;
 	nvram_enable_backup(false); // disable nvram by default
@@ -163,10 +162,6 @@ void h8_device::device_start()
 	save_item(NAME(m_TMP1));
 	save_item(NAME(m_TMP2));
 	save_item(NAME(m_TMPR));
-
-	save_item(NAME(m_mode_advanced));
-	save_item(NAME(m_mode_a20));
-	save_item(NAME(m_mac_saturating));
 
 	save_item(NAME(m_inst_state));
 	save_item(NAME(m_inst_substate));

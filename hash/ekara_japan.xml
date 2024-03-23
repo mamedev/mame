@@ -75,7 +75,7 @@ license:CC0-1.0
 	The EC number is printed on the left side of the cart label, as well as in the serial code
 	Carts EC0001-0010 don't have a number printed on the box, only the title - the number was added starting with EC0011
 
-	Only known undumped carts in main series are 58, 64, 81, 83, 84, 85 (assuming highest number is 85)
+	No known undumped carts in main series (assuming highest number is 85)
 
 	..  *EC0001-JPM  J-Pop Mix Volume 1
 	..  *EC0002-JPM  J-Pop Mix Volume 2
@@ -165,11 +165,11 @@ license:CC0-1.0
 	79  *EC0079-ETZ  Enka Taizen Volume 2 (custom presentation etc.)
 
 	80  *EC0080-JPM  J-Pop Mix Volume 41
-	81   EC0081-JPM  J-Pop Mix Volume 42
+	81  *EC0081-JPM  J-Pop Mix Volume 42
 	82  *EC0082-MBH  Matthew's Best Hit Selection
-	83   EC0083-JPM  J-Pop Mix Volume 43
+	83  *EC0083-JPM  J-Pop Mix Volume 43
 	84  *EC0084-KSB  Kids' Song Best 40
-	85   EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.)
+	85  *EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.)
 
 	(more? what's the highest regular number?)
 
@@ -1125,7 +1125,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- EC0081-JPM  J-Pop Mix Volume 42 -->
+	<software name="ec0081">
+		<description>J-Pop Mix Vol.42 (Japan) (EC0081-JPM)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0081-jpm.u1" size="0x100000" crc="6266252d" sha1="1533f2f76725e45122b719b8482899ab71e25d38"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ec0082"> <!-- custom presentation -->
 		<description>Matthew's Best Hit Selection (Japan) (EC0082-MBH)</description>
@@ -1138,7 +1147,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- EC0083-JPM  J-Pop Mix Volume 43 -->
+	<software name="ec0083">
+		<description>J-Pop Mix Vol.43 (Japan) (EC0083-JPM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0083-jpm.u1" size="0x100000" crc="b8eb7a8f" sha1="e6d169860938b92947dc54718dbfd4225a930248"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ec0084"> <!-- custom presentation -->
 		<description>Kids' Song Best 40 (Japan) (EC0084-KSB)</description>
@@ -1152,6 +1170,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- EC0085-ETZ  Enka Taizen Volume 3 -->
+	<!-- box art says 大ヒット演歌 五十曲入り -->
+	<software name="ec0085"> <!-- custom presentation -->
+		<description>Enka Taizen Dai San-hen (Japan) (EC0085-ETZ)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全 第三篇" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ec0085-etz.u1" size="0x200000" crc="6c81fd34" sha1="a8d6a8edea4c7ea6f6d265c87f210170c6bef54f"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

@@ -15004,6 +15004,7 @@ mjmaglmp                        // (c) 2000 BMC
 shendeng                        // (c) 1998 BMC
 
 @source:bmc/koftball.cpp
+jxzh                            // (c) 1996 BMC
 koftball                        // (c) 1995 BMC
 
 @source:bmc/popobear.cpp
@@ -15967,7 +15968,8 @@ toramich                        // 11/1987 (c) 1987 (Japan
 tvcapcom                        //
 
 @source:capcom/vulgus.cpp
-mach9                           // bootleg (ITISA)
+1942iti                         // bootleg (Itisa)
+mach9                           // bootleg (Itisa)
 vulgus                          // 5/1984 (c) 1984
 vulgusa                         // 5/1984 (c) 1984
 vulgusj                         // 5/1984 (c) 1984
@@ -16150,12 +16152,6 @@ tascr30a
 tascr30b
 tascr30g
 
-@source:chess/yeno_301xl.cpp
-y301xl
-
-@source:chess/yeno_532xl.cpp
-y532xl
-
 @source:chromatics/cgc7900.cpp
 cgc7900                         //
 
@@ -16316,6 +16312,9 @@ bg_ddb                          //
 bg_max                          //
 bg_maxa                         //
 ccorsario                       // (c) 2002 Cirsa / Unidesa
+ccorsarioa                      // (c) 2002 Cirsa / Unidesa
+charles                         // (c) 2002? Cirsa / Unidesa / Europea
+gladiador                       // (c) 2008 Cirsa / Unidesa
 mltpoints                       // (c) 2006 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
 perlacrb                        // (c) 2008 Cirsa / Unidesa
@@ -20098,6 +20097,7 @@ mgcs                            // (c) 1998
 mgdh                            // (c) 1997
 mgdha                           // (c) 1997
 sdmg2                           // (c) 1997
+sdmg2p                          // (c) 2000
 slqz2                           // (c) 1998
 spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
@@ -20331,6 +20331,7 @@ thegladpcb                      //
 thegladpcba                     //
 
 @source:igs/pgm2.cpp
+bubucar                         // (c) 2009
 ddpdojt                         // (c) 2010
 kov2nl                          // (c) 2008
 kov2nl_301                      //
@@ -29141,6 +29142,7 @@ xfiles                          // (c) 1999 dgPIX Entertainment Inc
 xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored for the Korean market)
 
 @source:misc/diamondking.cpp
+caribe                          // (c) 2001 SegaSA / Sonic
 diamondking                     // (c) 1997 SegaSA / Sonic
 diamondkinp                     // (c) 1997 SegaSA / Sonic
 goldenchip                      // (c) 19?? SegaSA / Sonic
@@ -30166,6 +30168,8 @@ magslot                         // (c) 2003 GMS
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
 sc2in1                          // (c) 2001 GMS
+ssanguoj                        // (c) 1998 GMS
+sscs                            // (c) 1999 GMS
 super555                        // (c) 1999 GMS
 
 @source:misc/goldngam.cpp
@@ -32282,8 +32286,9 @@ uchroma68                       // 1980 Motorola evaluation board for the MC6847
 @source:mr/dribling.cpp
 dribling                        // (c) 1983 Model Racing
 driblinga                       // (c) 1983 Model Racing
-driblingbr                      // bootleg
+driblingam                      // bootleg (Automave)
 driblingo                       // (c) 1983 Olympia
+driblingvm                      // bootleg (Videomac)
 
 @source:mr/sshot.cpp
 gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
@@ -34919,6 +34924,7 @@ nmicro2
 @source:novag/primo.cpp
 nprimo
 nsnova
+nsnovaa
 supremo
 
 @source:novag/robotadv.cpp
@@ -35210,6 +35216,7 @@ mspacmanbg                      // bootleg
 mspacmanbg2                     // bootleg
 mspacmanbgc                     // bootleg
 mspacmanbgd                     // bootleg
+mspacmanbgf                     // bootleg
 mspacmanbhe                     // bootleg
 mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
@@ -35224,6 +35231,7 @@ mspacmnf                        // hack
 mspacpls                        // hack
 mspackpls                       // hack
 mspactwin                       // (c) 1992 SUSILU
+mspactwina                      // (c) 1992 SUSILU
 newpuc2                         // hack
 newpuc2b                        // hack
 newpuckx                        // hack
@@ -42023,6 +42031,9 @@ pt68k4                          //
 @source:skeleton/ptcsol.cpp
 sol20                           //
 
+@source:skeleton/pullttrigger.cpp
+pullttrig                       // (c) 2003 Digital Silkroad / Covielsa
+
 @source:skeleton/pv9234.cpp
 pv9234                          //
 
@@ -42102,6 +42113,9 @@ sols5e                          // Solbourne Series 5E computer workstation
 @source:skeleton/squale.cpp
 squale                          //
 
+@source:skeleton/sterz80.cpp
+tongzi
+
 @source:skeleton/swyft.cpp
 swyft                           //
 
@@ -42164,6 +42178,9 @@ a1010                           //
 
 @source:skeleton/ti630.cpp
 ti630                           //
+
+@source:skeleton/ticz80.cpp
+baoqingt
 
 @source:skeleton/tk635.cpp
 tk635                           // (c) 199? Termtek
@@ -44852,6 +44869,7 @@ tvbg6b
 airblsjs
 buzztime
 carlecfg
+pvmil8
 pvmilfin
 pvwwcas
 rad_sinv
@@ -44861,6 +44879,7 @@ sudelan3
 sudoku2p
 
 @source:tvgames/elan_eu3a14.cpp
+batvgc
 rad_gtg
 rad_rsg
 rad_rsgp
@@ -44871,6 +44890,8 @@ rad_hnt3
 rad_hnt3p
 rad_bask
 rad_baskp
+spidtt
+tsbuzz
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
@@ -44899,13 +44920,14 @@ mgtfit
 beambox
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
-smartfp                         // Smart Fit Park
-smartfps
-gormiti
-tkmag220                        //
-myac220
-imgame
 beijuehh
+gormiti
+imgame
+myac220
+smartfp                         // Smart Fit Park
+smartfpf
+smartfps
+tkmag220                        //
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
 paccon
@@ -45005,6 +45027,7 @@ doraglobf
 doraglobg
 doraphon                        // (c) 2006 VTech
 doraphonf
+doyousud
 dreamlss
 fordrace
 gssytts
@@ -45236,6 +45259,7 @@ epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
 epo_guru                        //
+epo_tenn                        //
 epo_tfp2                        //
 evio                            //
 gcslottv                        //
@@ -46244,6 +46268,15 @@ vl1
 
 @source:yamaha/ymvl70.cpp
 vl70                            // 1996 VL70-m
+
+@source:yeno/301xl.cpp
+y301xl
+
+@source:yeno/416xl.cpp
+y416xl
+
+@source:yeno/532xl.cpp
+y532xl
 
 @source:yunsung/nmg5.cpp
 7ordi                           // (c) 2002 Yun Sung

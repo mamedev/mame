@@ -35,7 +35,6 @@ and 2 leds to mimic eyes, and the housing color theme is green instead of beige.
 
 TODO:
 - sensorboard undo buffer goes out of control, probably not worth solving this issue
-- cphantom artwork should be green instead of beige
 
 BTANB:
 - cphantom: As the manual suggests, the computer's move should be displayed on the

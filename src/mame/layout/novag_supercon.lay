@@ -16,11 +16,11 @@ authors:hap
 
 	<element name="ledr" defstate="0">
 		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
-		<rect state="0"><color red="0.17" green="0.015" blue="0.02" /></rect>
+		<rect state="0"><color red="1.0" green="0.1" blue="0.15" alpha="0.17" /></rect>
 	</element>
 	<element name="ledg" defstate="0">
-		<rect state="1"><color red="0.1" green="0.95" blue="0.05" /></rect>
-		<rect state="0"><color red="0.015" green="0.16" blue="0.01" /></rect>
+		<rect state="1"><color red="0.15" green="1.0" blue="0.1" /></rect>
+		<rect state="0"><color red="0.15" green="1.0" blue="0.1" alpha="0.13" /></rect>
 	</element>
 
 	<element name="hlb" defstate="0">

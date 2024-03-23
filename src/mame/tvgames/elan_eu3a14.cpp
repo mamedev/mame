@@ -251,6 +251,18 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map& map)
 }
 
 
+static INPUT_PORTS_START( eu3a14 )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( rad_gtg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -829,54 +841,134 @@ void elan_eu3a14_state::radica_eu3a14p_altrambase_bb3(machine_config& config)
 
 
 ROM_START( rad_gtg )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "goldentee.bin", 0x000000, 0x400000, CRC(2d6cdb85) SHA1(ce6ed39d692ff16ea407f39c37b6e731f952b9d5) )
 ROM_END
 
 ROM_START( rad_rsg )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "realswinggolf.bin", 0x000000, 0x400000, CRC(89e5b6a6) SHA1(0b14aa84d7e7ae7190cd64e3eb125de2104342bc) )
 ROM_END
 
 ROM_START( rad_rsgp )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "realswinggolf.bin", 0x000000, 0x400000, CRC(89e5b6a6) SHA1(0b14aa84d7e7ae7190cd64e3eb125de2104342bc) )
 ROM_END
 
 
 ROM_START( rad_foot )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "connectvfootball.bin", 0x000000, 0x400000, CRC(00ac4fc0) SHA1(2b60ae5c6bc7e9ef7cdbd3f6a0a0657ed3ab5afe) )
 ROM_END
 
 ROM_START( rad_bb3 )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "baseball3.bin", 0x000000, 0x400000, CRC(af86aab0) SHA1(5fed48a295f045ca839f87b0f9b78ecc51104cdc) )
 ROM_END
 
 ROM_START( rad_bb3p )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "baseball3.bin", 0x000000, 0x400000, CRC(af86aab0) SHA1(5fed48a295f045ca839f87b0f9b78ecc51104cdc) )
 ROM_END
 
 ROM_START( rad_hnt3 )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "huntin3.bin", 0x000000, 0x400000, CRC(c8e3e40b) SHA1(81eb16ac5ab6d93525fcfadbc6703b2811d7de7f) )
 ROM_END
 
 ROM_START( rad_hnt3p )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "huntin3.bin", 0x000000, 0x400000, CRC(c8e3e40b) SHA1(81eb16ac5ab6d93525fcfadbc6703b2811d7de7f) )
 ROM_END
 
 ROM_START( rad_bask )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
 ROM_END
 
 ROM_START( rad_baskp )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
+ROM_END
+
+/*
+
+  The Interactive M.A.G. Motion Activated Gear titles use globtops with an unusual square pinout
+  for the main ROM
+
+  10   01
+  +------\
+11|      |48
+  |      |
+  |      |
+24+------+35
+  25    34
+
+
+01 | A10
+02 | A09
+03 | A08
+04 | A19
+05 | A21
+06 | A20
+07 | A18
+08 | A17
+09 | A07
+10 | A06
+11 | A05
+12 | A04
+13 | A00
+14 | A01
+15 | A02
+16 | A03
+17 | /CE
+18 | N/C
+19 | D08
+20 | D00
+21 | N/C
+22 | N/C
+23 | D01
+24 | D09
+25 | D02
+26 | D10
+27 | D03
+28 | D11
+29 | N/C
+30 | VCC
+31 | VCC
+32 | D04
+33 | D12
+34 | D05
+35 | D13
+36 | D06
+37 | D15
+38 | GND
+39 | D07
+40 | D14
+41 | GND
+42 | VCC
+43 | A13
+44 | A14
+45 | A16
+46 | A15
+47 | A12
+48 | A11
+
+*/
+
+ROM_START( tsbuzz )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "toystory_buzz.bin", 0x000000, 0x800000, CRC(8d727ed4) SHA1(228e1d788cdbaf251e15dba01b6c71e82197ea28) )
+ROM_END
+
+ROM_START( batvgc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "batvgc.bin", 0x000000, 0x800000, CRC(513a5625) SHA1(d8db60818a4452e665c312b8b93642d8b2b33c8f) )
+ROM_END
+
+ROM_START( spidtt )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_spidtt", 0x000000, 0x800000, CRC(05de01de) SHA1(f2891d6e743abdd7bb50d0bb84701b18225a0a7a) )
 ROM_END
 
 } // anonymous namespace
@@ -899,3 +991,12 @@ CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3,   
 
 CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
 CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
+
+CONS( 200?, tsbuzz,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Toy Story and Beyond! Buzz Lightyear Galactic Adventure", MACHINE_NOT_WORKING )
+CONS( 200?, batvgc,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: The Batman - Villains of Gotham City", MACHINE_NOT_WORKING )
+CONS( 200?, spidtt,   0,        0, radica_eu3a14,                eu3a14,        elan_eu3a14_state, empty_init,  "Thinkway Toys",                                                     "Interactive M.A.G. Motion Activated Gear: Spider-Man - Triple Threat", MACHINE_NOT_WORKING )
+
+// the following Thinkway Toys 'MAG' products likely also fit here
+// MAG: Teen Titans Arena Showdown
+// MAG: Superman Fight for Metropolis
+// MAG: Disney Pixar Cars I Am Speed

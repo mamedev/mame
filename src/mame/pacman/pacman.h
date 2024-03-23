@@ -192,6 +192,7 @@ protected:
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
 	DECLARE_VIDEO_START(pacman);
 	void pacman_palette(palette_device &palette) const;
+	void pacman_rbg_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(birdiy);
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);
@@ -224,6 +225,7 @@ public:
 	void vanvan(machine_config &config);
 	void s2650games(machine_config &config);
 	void woodpek(machine_config &config);
+	void woodpek_rbg(machine_config &config);
 	void crushs(machine_config &config);
 	void superabc(machine_config &config);
 	void numcrash(machine_config &config);

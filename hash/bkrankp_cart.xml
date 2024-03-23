@@ -16,9 +16,9 @@ Known carts:
 |  NO  |2316095|J-Pop - Green            |
 |  NO  |2316096|J-Pop - Pink             |
 |  NO  |2316097|J-Pop - Lemmon Yellow    |
-|  NO  |2323098|Yo-Kai Watch Selection   |
-|  NO  |2333250|J-Pop - Purple           |
-|  NO  |2333251|J-Pop - White            |
+| YES  |2323098|Yo-Kai Watch Selection   |
+| YES  |2333250|J-Pop - Purple           |
+| YES  |2333251|J-Pop - White            |
 | YES  |2333252|J-Pop - Rose             |
 |  NO  |2333253|J-Pop - Red              |
 | YES  |2333254|Vocaloid                 |
@@ -28,14 +28,54 @@ Known carts:
 |  NO  |2350534|J-Pop - Mint             |
 |  NO  |2350535|Best Hit Song            |
 +======+=======+=========================+
+(some of these are J-Pop Kids, check which)
 
 -->
 
 <softwarelist name="bkrankp_cart" description="Bandai Karaoke Ranking Party cartridges">
 
-	<software name="jpoprose" supported="no">
+	<software name="yokai" supported="no">
+		<description>Yo-Kai Watch</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="妖怪ウォッチ" />
+		<info name="serial" value="2323098" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="yokaiwatch_mx25l6406e_c22017.BIN" size="0x800000" crc="d7a59a34" sha1="11ab60a7ba74fb17398fad21a3724480ebb09fc8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="purple" supported="no">
+		<description>J-Pop Purple</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップパープル" />
+		<info name="serial" value="2333250" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpoppurple_mx25l3206e_c22016.BIN" size="0x400000" crc="1442a419" sha1="b10e3def9a80e10e9e4cab3fbec2d215dc978b23" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="white" supported="no">
+		<description>J-Pop White</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップホワイト" />
+		<info name="serial" value="2333251" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpopwhite_mx25l3206e_c22016.bin" size="0x400000" crc="34761a6a" sha1="65ca5551e9f7e7ae8ce02fc16ff6a62f47b25e68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rose" supported="no">
 		<description>J-Pop Rose</description>
-		<year>20??</year>
+		<year>2015</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="2333252" />
 		<part name="cart" interface="bkrankp_cart">
@@ -47,7 +87,7 @@ Known carts:
 
 	<software name="vocaloid" supported="no">
 		<description>Vocaloid</description>
-		<year>20??</year>
+		<year>2015</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="2333254" />
 		<part name="cart" interface="bkrankp_cart">

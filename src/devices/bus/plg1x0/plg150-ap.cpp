@@ -53,13 +53,16 @@ void plg150_ap_device::midi_rx(int state)
 void plg150_ap_device::map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("cpu", 0);
+	map(0x200000, 0x207fff).ram();
 }
 
 void plg150_ap_device::device_add_mconfig(machine_config &config)
 {
-	SWX00(config, m_cpu, 8.4672_MHz_XTAL, 1);
+	SWX00(config, m_cpu, 8.4672_MHz_XTAL*2, 1);
 	m_cpu->set_addrmap(AS_PROGRAM, &plg150_ap_device::map);
 	m_cpu->write_sci_tx<1>().set([this] (int state) { m_connector->do_midi_tx(state); });
+	m_cpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
+	m_cpu->sci_set_external_clock_period(1, attotime::from_hz(500000));
 }
 
 ROM_START( plg150_ap )

@@ -42,7 +42,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_parallel(*this, "parallel"),
-		m_psxcd(*this, "psxcd")
+		m_psxcd(*this, "psxcd"),
+		m_cd_softlist(*this, "cd_list")
 	{
 	}
 
@@ -71,6 +72,7 @@ private:
 
 	required_device<psx_parallel_slot_device> m_parallel;
 	required_device<psxcd_device> m_psxcd;
+	required_device<software_list_device> m_cd_softlist;
 };
 
 
@@ -531,7 +533,7 @@ void psx1_state::psx_base(machine_config &config)
 	subdevice<psxdma_device>("maincpu:dma")->install_read_handler(3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this));
 	subdevice<psxdma_device>("maincpu:dma")->install_write_handler(3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this));
 
-	SOFTWARE_LIST(config, "cd_list").set_original("psx");
+	SOFTWARE_LIST(config, m_cd_softlist).set_original("psx");
 }
 
 void psx1_state::psj(machine_config &config)
@@ -542,12 +544,17 @@ void psx1_state::psj(machine_config &config)
 	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
 	psx_base(config);
+
+	m_cd_softlist->set_filter("NTSC-J");
 }
 
 void psx1_state::psu(machine_config &config)
 {
 	psj(config);
+
 	HD63705Z0(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // FIXME: actually MC68HC05G6
+
+	m_cd_softlist->set_filter("NTSC-U");
 }
 
 void psx1_state::pse(machine_config &config)
@@ -558,6 +565,8 @@ void psx1_state::pse(machine_config &config)
 	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
 	psx_base(config);
+
+	m_cd_softlist->set_filter("PAL-E");
 }
 
 ROM_START( psj )

@@ -228,6 +228,7 @@ const double XTAL::known_xtals[] = {
 	 13'495'200, /* 13.4952_MHz_XTAL       Used on Shadow Force pcb and maybe other Technos pcbs? */
 	 13'500'000, /* 13.5_MHz_XTAL          Microbee */
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
+	 13'560'000, /* 13.560_MHz_XTAL        Tong Zi Maque */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
 	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
 	 13'977'600, /* 13.9776_MHz_XTAL       Kaypro II dot clock */

@@ -37,9 +37,15 @@
 #include "h8_timer16.h"
 #include "h8_sci.h"
 #include "h8_watchdog.h"
+#include "sound/swx00.h"
 
-class swx00_device : public h8s2000_device {
+class swx00_device : public h8s2000_device, public device_mixer_interface {
 public:
+	enum {
+		AS_C = AS_PROGRAM,
+		AS_S = AS_DATA
+	};
+
 	enum {
 		MODE_DUAL = 1,
 		MODE_SEPARATE = 2
@@ -47,34 +53,12 @@ public:
 
 	swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 mode = 0);
 
-	int s_bus_id() const { return m_mode & MODE_DUAL ? AS_DATA : AS_PROGRAM; }
-	int c_bus_id() const { return m_mode & MODE_DUAL ? AS_PROGRAM : AS_DATA; }
-
-	auto read_port1()  { return m_read_port [PORT_1].bind(); }
-	auto write_port1() { return m_write_port[PORT_1].bind(); }
-	auto read_port2()  { return m_read_port [PORT_2].bind(); }
-	auto write_port2() { return m_write_port[PORT_2].bind(); }
-	auto read_port3()  { return m_read_port [PORT_3].bind(); }
-	auto write_port3() { return m_write_port[PORT_3].bind(); }
-	auto read_port4()  { return m_read_port [PORT_4].bind(); }
-	auto read_port5()  { return m_read_port [PORT_5].bind(); }
-	auto write_port5() { return m_write_port[PORT_5].bind(); }
-	auto read_port6()  { return m_read_port [PORT_6].bind(); }
-	auto write_port6() { return m_write_port[PORT_6].bind(); }
-	auto read_porta()  { return m_read_port [PORT_A].bind(); }
-	auto write_porta() { return m_write_port[PORT_A].bind(); }
-	auto read_portb()  { return m_read_port [PORT_B].bind(); }
-	auto write_portb() { return m_write_port[PORT_B].bind(); }
-	auto read_portc()  { return m_read_port [PORT_C].bind(); }
-	auto write_portc() { return m_write_port[PORT_C].bind(); }
-	auto read_portd()  { return m_read_port [PORT_D].bind(); }
-	auto write_portd() { return m_write_port[PORT_D].bind(); }
-	auto read_porte()  { return m_read_port [PORT_E].bind(); }
-	auto write_porte() { return m_write_port[PORT_E].bind(); }
-	auto read_portf()  { return m_read_port [PORT_F].bind(); }
-	auto write_portf() { return m_write_port[PORT_F].bind(); }
-	auto read_portg()  { return m_read_port [PORT_G].bind(); }
-	auto write_portg() { return m_write_port[PORT_G].bind(); }
+	auto read_pdt()    { return m_read_pdt.bind(); }
+	auto write_pdt()   { return m_write_pdt.bind(); }
+	auto read_pad()    { return m_read_pad.bind(); }
+	auto write_pad()   { return m_write_pad.bind(); }
+	auto write_cmah()  { return m_write_cmah.bind(); }
+	auto write_txd()  { return m_write_txd.bind(); }
 
 	u8 syscr_r();
 	void syscr_w(u8 data);
@@ -109,7 +93,21 @@ protected:
 	required_device<h8s_timer16_channel_device> m_timer16_5;
 	required_device<h8_watchdog_device> m_watchdog;
 
-	address_space_config m_data_config;
+	required_device<swx00_sound_device> m_swx00;
+
+	devcb_read16 m_read_pdt;
+	devcb_write16 m_write_pdt;
+	devcb_read8 m_read_pad;
+	devcb_write8 m_write_pad;
+	devcb_write8 m_write_cmah;
+	devcb_write8 m_write_txd;
+
+	address_space_config m_s_config;
+
+	memory_access<24, 1, -1, ENDIANNESS_BIG>::specific m_s;
+
+	u16 m_pdt, m_pdt_ddr;
+	u8 m_pad;
 
 	u8 m_mode;
 	u8 m_syscr;
@@ -124,6 +122,23 @@ protected:
 	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual space_config_vector memory_space_config() const override;
+
+	u16 s_r(offs_t offset);
+
+	void pdt_ddr_w(offs_t, u16 data, u16 mem_mask);
+	u16 pdt_r();
+	void pdt_w(offs_t, u16 data, u16 mem_mask);
+	u8 pad_r();
+	void pad_w(u8 data);
+	void cmah_w(u8 data);
+	void txd_w(u8 data);
+
+	u16 pdt_default_r();
+	void pdt_default_w(u16 data);
+	u8 pad_default_r();
+	void pad_default_w(u8 data);
+	void cmah_default_w(u8 data);
+	void txd_default_w(u8 data);
 
 	void map(address_map &map);
 

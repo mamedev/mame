@@ -34,6 +34,21 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
+class ss1b550base_state : public driver_device
+{
+public:
+	ss1b550base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{
+	}
+
+	void ss1b550base(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
+};
+
 class diamondking_state : public ss1b202base_state
 {
 public:
@@ -52,6 +67,28 @@ private:
 	required_device<m68340_cpu_device> m_iocpu;
 	required_device<okim6376_device> m_okim6376;
 };
+
+static INPUT_PORTS_START(caribe)
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START(diamondking)
 	// On main board, near the AY-3-8910
@@ -123,6 +160,16 @@ void ss1b202base_state::ss1b202base(machine_config &config)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
 }
 
+void ss1b550base_state::ss1b550base(machine_config &config)
+{
+	M68340(config, m_maincpu, 3.68640_MHz_XTAL);
+
+	SPEAKER(config, "mono").front_center();
+
+	msm6585_device &msm6585(MSM6585(config, "msm6585", 640'000)); // 0.640 MHz resonator
+	msm6585.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
+}
+
 void diamondking_state::diamondking(machine_config &config)
 {
 	ss1b202base(config);
@@ -135,6 +182,17 @@ void diamondking_state::diamondking(machine_config &config)
 	// OkiM6376
 	OKIM6376(config, m_okim6376, XTAL(4'194'304)/4).add_route(ALL_OUTPUTS, "mono", 1.0); // Frequency divisor is a guess
 }
+
+
+/* Sega S.A. "Caribe" electromechanical slot machine.
+   Found just one PCB, named "1B-2004-550", which is essentially the same as the "INTEGRATED IO-3 BOARD" found on Diamond King, with minor differences.
+   May need more PCBs.
+*/
+ROM_START(caribe)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("na.03_segasa_c-2089_1_caribe_01d-0399_b-h240190.u1", 0x00000, 0x80000, CRC(146a565e) SHA1(dcf147b3673c669af9974369d91f7ec9149b897e))
+	ROM_LOAD("na.03_segasa_c-2089_2_caribe_01d-0399_b-h240190.u2", 0x80000, 0x80000, CRC(1d1b25eb) SHA1(965132d32ed573d0123ac64d5f16ca31ca2a24ff))
+ROM_END
 
 /* Four PCBs found for Diamond King (there may be more):
 
@@ -353,6 +411,7 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME         PARENT       MACHINE      INPUT        CLASS              INIT        ROT   COMPANY           FULLNAME                               FLAGS
+GAME(2001, caribe,      0,           ss1b550base, caribe,      ss1b550base_state, empty_init, ROT0, "SegaSA / Sonic", "Caribe",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, diamondking, 0,           diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (with Euro support)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, diamondkinp, diamondking, diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (without Euro support)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??, goldenchip,  0,           ss1b202base, goldenchip,  ss1b202base_state, empty_init, ROT0, "SegaSA / Sonic", "Golden Chip",                         MACHINE_IS_SKELETON_MECHANICAL)

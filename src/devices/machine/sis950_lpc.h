@@ -15,7 +15,8 @@
 
 #include "cpu/i386/i386.h"
 
-#include "machine/8042kbdc.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "machine/at_keybc.h"
 #include "machine/am9517a.h"
 #include "machine/ds128x.h"
 #include "machine/intelfsh.h"
@@ -88,10 +89,12 @@ private:
 	required_device<am9517a_device> m_dmac_master;
 	required_device<am9517a_device> m_dmac_slave;
 	required_device<pit8254_device> m_pit;
-	required_device<kbdc8042_device> m_keybc;
+	required_device<ps2_keyboard_controller_device> m_keybc;
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885ext_device> m_rtc;
+	required_device<pc_kbdc_device> m_ps2_con;
+	required_device<pc_kbdc_device> m_aux_con;
 	required_device<lpc_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
 
@@ -176,10 +179,6 @@ private:
 	void at_page8_w(offs_t offset, uint8_t data);
 	u8 nmi_status_r();
 	void nmi_control_w(uint8_t data);
-	u8 at_keybc_r(offs_t offset);
-	void at_keybc_w(offs_t offset, u8 data);
-	u8 keybc_status_r(offs_t offset);
-	void keybc_command_w(offs_t offset, u8 data);
 	void at_speaker_set_spkrdata(uint8_t data);
 	void iochck_w(int state);
 };

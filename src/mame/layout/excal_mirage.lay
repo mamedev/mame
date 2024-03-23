@@ -8,7 +8,7 @@ authors:hap
 <!-- define elements -->
 
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="red"><rect><color red="0.4" green="0.0" blue="0.15" /></rect></element>
+	<element name="red"><rect><color red="0.3" green="0.0" blue="0.05" /></rect></element>
 	<element name="lcdm"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
 
 	<element name="text_1"><text string="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -53,7 +53,8 @@ authors:hap
 
 	<element name="cblack"><rect><color red="0.41" green="0.4" blue="0.39" /></rect></element>
 	<element name="cwhite"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-	<element name="whitem"><rect><color red="0.4" green="0.4" blue="0.4" /></rect></element>
+	<element name="dgray"><rect><color red="0.21" green="0.2" blue="0.19" /></rect></element>
+	<element name="whitem"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
 
 	<element name="text_black"><text string="BLACK"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_white"><text string="WHITE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -101,9 +102,9 @@ authors:hap
 		<bounds x="-20" y="-2.5" width="120" height="85.0" />
 		<element ref="blackb"><bounds x="-20" y="-2.5" width="120" height="85.0" /></element>
 		<element ref="red"><bounds x="-19.7" y="-2.5" width="119.4" height="85.0" /></element>
-		<element ref="cblack"><bounds x="-19.4" y="-2.2" width="118.8" height="84.4" /></element>
+		<element ref="dgray"><bounds x="-19.4" y="-2.2" width="118.8" height="84.4" /></element>
 		<element ref="red"><bounds x="-0.6" y="-0.6" width="81.2" height="81.2" /></element>
-		<element ref="cblack"><bounds x="-0.3" y="-0.3" width="80.6" height="80.6" /></element>
+		<element ref="dgray"><bounds x="-0.3" y="-0.3" width="80.6" height="80.6" /></element>
 
 		<!-- squares (avoid seams) -->
 		<element ref="cwhite"><bounds x="0"  y="0" width="11" height="11" /></element>
@@ -227,15 +228,15 @@ authors:hap
 
 		<element ref="whitem" blend="multiply"><bounds xc="-10" yc="40" width="17" height="80" /></element>
 		<element ref="whitem" blend="multiply"><bounds xc="90" yc="40" width="17" height="80" /></element>
-		<element ref="cblack" blend="add"><bounds xc="-10" yc="40" width="17" height="80" /></element>
-		<element ref="cblack" blend="add"><bounds xc="90" yc="40" width="17" height="80" /></element>
+		<element ref="dgray" blend="add"><bounds xc="-10" yc="40" width="17" height="80" /></element>
+		<element ref="dgray" blend="add"><bounds xc="90" yc="40" width="17" height="80" /></element>
 
 		<element ref="cwhite"><bounds xc="-10" yc="-0.4" width="10" height="2.8" /></element>
-		<element ref="cblack"><bounds xc="-10" yc="-0.4" width="9.4" height="2.2" /></element>
+		<element ref="dgray"><bounds xc="-10" yc="-0.4" width="9.4" height="2.2" /></element>
 		<element ref="text_black"><bounds xc="-10" yc="-0.5" width="10" height="2.3" /></element>
 
 		<element ref="cwhite"><bounds xc="90" yc="-0.4" width="10" height="2.8" /></element>
-		<element ref="cblack"><bounds xc="90" yc="-0.4" width="9.4" height="2.2" /></element>
+		<element ref="dgray"><bounds xc="90" yc="-0.4" width="9.4" height="2.2" /></element>
 		<element ref="text_white"><bounds xc="90" yc="-0.5" width="10" height="2.3" /></element>
 
 		<!-- sensors, pieces -->

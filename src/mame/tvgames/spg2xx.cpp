@@ -759,6 +759,22 @@ static INPUT_PORTS_START( totspies )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( doyousud )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Menu")
+	// is the on/off button visible at 0020?
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Higher / Up")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pencil")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Lower / Down")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ok")
+
+INPUT_PORTS_END
 
 
 CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
@@ -2193,6 +2209,14 @@ ROM_START( hotwhl2p )
 	ROM_LOAD16_WORD_SWAP( "hotwheels.bin", 0x000000, 0x400000, CRC(f3520b74) SHA1(02a53558d68cf3640a9ab09514cd6cebff8b30af) )
 ROM_END
 
+ROM_START( doyousud )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doyousudoku.bin", 0x000000, 0x100000, CRC(83cafebb) SHA1(a84c7191bc6b0d321415af0b7d2dd69e52c134a1) )
+
+	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 ) // probably just used for saving puzzle progress
+	ROM_LOAD( "at24c16a.u3", 0x000, 0x800, CRC(414ea94d) SHA1(8565a66fd0228104c64a169cdb20715e7b23cfaf) )
+ROM_END
+
 
 void spg2xx_game_state::init_crc()
 {
@@ -2359,4 +2383,7 @@ CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_
 CONS( 200?, lexiart,    0,        0, lexiart,   lexiart,   spg2xx_game_lexiart_state,  empty_init,    "Lexibook",                                               "Lexibook Junior My 1st Drawing Studio",                                 MACHINE_NOT_WORKING )
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
-CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                 MACHINE_NOT_WORKING )
+CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                               MACHINE_NOT_WORKING )
+
+CONS( 2005, doyousud,   0,        0, spg2xx,    doyousud,  spg2xx_game_state,          empty_init,    "SDW Games",                                              "Sudoku: Do You Sudoku?",                                                MACHINE_NOT_WORKING )
+

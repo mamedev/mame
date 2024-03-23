@@ -34,6 +34,7 @@
     - I/O write to 0xc0
 
     Notes:
+    - Use Set-Up for status line setup, Shift+Set-Up for fullscreen setup
     - On first boot you will get an "error 8" - this is because
       RAM is uninitialized.
 
@@ -242,6 +243,13 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom200_state::draw_character )
 	rgb_t fg = BIT(attrcode, 4) ? pen[1] : pen[2];
 	rgb_t bg = pen[0];
 
+	// reverse video?
+	if (BIT(m_video_ctrl, 1))
+	{
+		using std::swap;
+		swap(fg, bg);
+	}
+
 	// draw 8 pixels of the character
 	if (dw)
 	{
@@ -298,10 +306,6 @@ void freedom200_state::machine_start()
 void freedom200_state::machine_reset()
 {
 	m_dw_active = false;
-
-	// allow data to be send to keyboard
-	m_usart[2]->write_dsr(1);
-	m_usart[2]->write_cts(0);
 }
 
 
@@ -362,7 +366,7 @@ void freedom200_state::freedom200(machine_config &config)
 
 	I8251(config, m_usart[2], 0); // unknown clock
 	m_usart[2]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<4>));
-	m_usart[2]->txd_handler().set("kbd", FUNC(freedom220_kbd_device::rx_w));
+	m_usart[2]->txd_handler().set("kbd", FUNC(freedom220_kbd_device::rxd_w));
 
 	rs232_port_device &mainport(RS232_PORT(config, "mainport", default_rs232_devices, nullptr));
 	mainport.rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
@@ -373,7 +377,8 @@ void freedom200_state::freedom200(machine_config &config)
 	auxport.cts_handler().set(m_usart[1], FUNC(i8251_device::write_cts));
 
 	freedom220_kbd_device &kbd(FREEDOM220_KBD(config, "kbd"));
-	kbd.tx_handler().set(m_usart[2], FUNC(i8251_device::write_rxd));
+	kbd.txd_cb().set(m_usart[2], FUNC(i8251_device::write_rxd));
+	kbd.cts_cb().set(m_usart[2], FUNC(i8251_device::write_cts));
 }
 
 
@@ -416,5 +421,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY                FULLNAME       FLAGS
-COMP( 1983, free200, 0,      0,      freedom200, 0,     freedom200_state, empty_init, "Liberty Electronics", "Freedom 200", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, free220, 0,      0,      freedom200, 0,     freedom200_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, free200, 0,      0,      freedom200, 0,     freedom200_state, empty_init, "Liberty Electronics", "Freedom 200", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, free220, 0,      0,      freedom200, 0,     freedom200_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

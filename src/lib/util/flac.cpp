@@ -85,6 +85,8 @@ bool flac_encoder::reset()
 	FLAC__stream_encoder_set_blocksize(m_encoder, m_block_size);
 
 	// re-start processing
+	if (m_file)
+		return (FLAC__stream_encoder_init_stream(m_encoder, write_callback_static, seek_callback_static, tell_callback_static, nullptr, this) == FLAC__STREAM_ENCODER_INIT_STATUS_OK);
 	return (FLAC__stream_encoder_init_stream(m_encoder, write_callback_static, nullptr, nullptr, nullptr, this) == FLAC__STREAM_ENCODER_INIT_STATUS_OK);
 }
 
@@ -279,6 +281,38 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 		}
 	}
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
+}
+
+FLAC__StreamEncoderSeekStatus flac_encoder::seek_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data)
+{
+	return reinterpret_cast<flac_encoder *>(client_data)->seek_callback(absolute_byte_offset);
+}
+
+FLAC__StreamEncoderSeekStatus flac_encoder::seek_callback(FLAC__uint64 absolute_byte_offset)
+{
+	if (m_file)
+	{
+		if (!m_file->seek(absolute_byte_offset, SEEK_SET))
+			return FLAC__STREAM_ENCODER_SEEK_STATUS_OK;
+		return FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR;
+	}
+	return FLAC__STREAM_ENCODER_SEEK_STATUS_UNSUPPORTED;
+}
+
+FLAC__StreamEncoderTellStatus flac_encoder::tell_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data)
+{
+	return reinterpret_cast<flac_encoder *>(client_data)->tell_callback(absolute_byte_offset);
+}
+
+FLAC__StreamEncoderTellStatus flac_encoder::tell_callback(FLAC__uint64 *absolute_byte_offset)
+{
+	if (m_file)
+	{
+		if (!m_file->tell(*absolute_byte_offset))
+			return FLAC__STREAM_ENCODER_TELL_STATUS_OK;
+		return FLAC__STREAM_ENCODER_TELL_STATUS_ERROR;
+	}
+	return FLAC__STREAM_ENCODER_TELL_STATUS_UNSUPPORTED;
 }
 
 

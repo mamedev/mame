@@ -316,8 +316,8 @@ public:
 #endif
 
 private:
-	static const uint32_t HASH_SIZE = ((1 << 10) + 1);
-	static const uint32_t OVERFLOW_SIZE = (1 << 10);
+	static const uint32_t HASH_SIZE = ((1 << 18) + 1);
+	static const uint32_t OVERFLOW_SIZE = (1 << 12);
 
 	void destroy_all_textures();
 

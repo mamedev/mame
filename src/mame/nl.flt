@@ -11,6 +11,7 @@ irem/m62.cpp
 jpm/jpmsru.cpp
 midway/sspeedr.cpp
 misc/cocoloco.cpp
+mr/dribling.cpp
 nintendo/mario.cpp
 nintendo/popeye.cpp
 ramtek/starcrus.cpp

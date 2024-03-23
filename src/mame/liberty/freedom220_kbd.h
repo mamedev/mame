@@ -2,7 +2,7 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    Liberty Freedom 220 keyboard
+    Liberty Freedom 220 Keyboard
 
 ***************************************************************************/
 
@@ -12,14 +12,12 @@
 #pragma once
 
 #include "cpu/mcs48/mcs48.h"
-#include "sound/spkrdev.h"
+#include "sound/beep.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> freedom220_kbd_device
 
 class freedom220_kbd_device :  public device_t
 {
@@ -28,9 +26,11 @@ public:
 	freedom220_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
-	auto tx_handler() { return m_tx_handler.bind(); }
+	auto txd_cb() { return m_txd_cb.bind(); }
+	auto cts_cb() { return m_cts_cb.bind(); }
 
-	void rx_w(int state);
+	// from host
+	void rxd_w(int state);
 
 protected:
 	// device_t overrides
@@ -41,24 +41,25 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	required_device<i8039_device> m_mcu;
+	required_device<beep_device> m_buzzer;
+	required_ioport_array<16> m_keys;
+
+	devcb_write_line m_txd_cb;
+	devcb_write_line m_cts_cb;
+
+	uint8_t m_key_row;
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	uint8_t select_r(offs_t offset);
+	uint8_t key_row_r(offs_t offset);
 	void speaker_w(offs_t offset, uint8_t data);
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
-
-	required_device<i8039_device> m_mcu;
-	required_device<speaker_sound_device> m_speaker;
-	required_ioport_array<16> m_keys;
-
-	devcb_write_line m_tx_handler;
-
-	uint8_t m_select;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(FREEDOM220_KBD, freedom220_kbd_device)
 
 #endif // MAME_LIBERTY_FREEDOM220_KBD_H

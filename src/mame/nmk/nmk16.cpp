@@ -4,7 +4,7 @@
 /********************************************************************
 
 Task Force Harrier         1989 UPL        68000 Z80           YM2203 2xOKIM6295
-Many Block                 1991 Bee-Oh     68000 Z80           YM2203 2xOKIM6295
+Many Block                 1991 Bee-Oh     68000 Z80           YM2203 2xOKIM6295 (hack of "Jewels" by UPL)
 Mustang                    1990 UPL        68000 NMK004        YM2203 2xOKIM6295
 Bio-ship Paladin           1990 UPL        68000 NMK004        YM2203 2xOKIM6295
 Vandyke                    1990 UPL        68000 NMK004        YM2203 2xOKIM6295
@@ -23,6 +23,7 @@ Arcadia / Rapid Hero       1994 NMK        68000 tmp90c841     YM2203 2xOKIM6295
 S.S. Mission               1992 Comad      68000 Z80           OKIM6295 (hack of Thunder Dragon)
 Air Attack                 1996 Comad      68000 Z80           OKIM6295 (hack of Thunder Dragon)
 
+Acrobat Mission (bootleg)                  68000 Z80           YM3812 OKIM6295
 Mustang (bootleg)                          68000 Z80           YM3812 OKIM6295
 Thunder Dragon (bootleg)                   68000 Z80           YM3812 OKIM6295
 
@@ -151,6 +152,8 @@ Questions / Notes
 
 'manybloc' :
 
+  - This is a bootleg / hack of Jewels by UPL
+  - The MCU code was patched to use standard IO, it may be running code that is no longer used.
   - There are writes to 0x080010.w and 0x080012.w (MCU ?) in code between
     0x005000 to 0x005690, but I see no call to "main" routine at 0x005504 !
   - There are writes to 0x08001c.w and 0x08001e.w but I can't tell what
@@ -164,7 +167,7 @@ Questions / Notes
 
 Sound notes for games with a Z80:
 
-mustangb, strahljb and tdragonb use the Seibu Raiden sound hardware and a modified
+acrobatmbl, mustangb, strahljb and tdragonb use the Seibu Raiden sound hardware and a modified
 Z80 program (but the music is intact and recognizable).  See audio/seibu.cpp
 for more info on this.
 
@@ -3929,7 +3932,7 @@ void nmk16_state::tharrier(machine_config &config)
 void nmk16_state::mustang(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL(8'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustang_map);
 	set_hacky_interrupt_timing(config);
 
@@ -3967,7 +3970,7 @@ void nmk16_state::mustang(machine_config &config)
 void nmk16_state::mustangb(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL(8'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4004,7 +4007,7 @@ void nmk16_state::mustangb(machine_config &config)
 void nmk16_state::mustangb3(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL(8'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4371,7 +4374,7 @@ void tdragon_prot_state::machine_reset()
 	m_bus_status = 0x04;
 }
 
-void tdragon_prot_214_state::device_post_load()
+void macross_prot_state::device_post_load()
 {
 	tdragon_prot_state::device_post_load();
 
@@ -4387,7 +4390,7 @@ void tdragon_prot_214_state::device_post_load()
 	}
 }
 
-void tdragon_prot_214_state::machine_start()
+void macross_prot_state::machine_start()
 {
 	tdragon_prot_state::machine_start();
 
@@ -4615,7 +4618,7 @@ void tdragon_prot_state::hachamf_prot(machine_config &config)
 void nmk16_state::macross(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL(10'000'000)); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4631,21 +4634,21 @@ void nmk16_state::macross(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL(16'000'000)/2); // verified on PCB
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4930,7 +4933,7 @@ void nmk16_state::bjtwin(machine_config &config)
 }
 
 // The 215 writes minimal data here to select an unscrambling configuration hardwired inside the NMK214 chip.
-void tdragon_prot_214_state::mcu_port3_to_214_w(u8 data)
+void macross_prot_state::mcu_port3_to_214_w(u8 data)
 {
 	LOG("%s: mcu_port3_to_214_w (data %02x)\n", machine().describe_context(), data);
 
@@ -4962,7 +4965,7 @@ void tdragon_prot_214_state::mcu_port3_to_214_w(u8 data)
 	m_init_clock_nmk214 = BIT(data, 2);
 }
 
-void tdragon_prot_214_state::mcu_port7_to_214_w(u8 data)
+void macross_prot_state::mcu_port7_to_214_w(u8 data)
 {
 	LOG("%s: mcu_port7_to_214_w (data %02x)\n", machine().describe_context(), data);
 
@@ -4976,19 +4979,17 @@ void tdragon_prot_214_state::mcu_port7_to_214_w(u8 data)
 static const std::array<u8, 13> nmk214_sprites_address_bitswap = {0, 1, 2, 3, 10, 12, 13, 14, 15, 16, 17, 18, 19};
 static const std::array<u8, 13> nmk214_bg_address_bitswap      = {0, 1, 2, 3, 11, 13, 14, 15, 16, 17, 18, 19, 20};
 
-void tdragon_prot_214_state::saboten_prot(machine_config &config)
+void macross_prot_state::base_nmk214_215(machine_config &config)
 {
-	bjtwin(config);
-
-	TMP90840(config, m_protcpu, 4000000); // Toshiba TMP90840 marked as NMK-215, with 8Kbyte internal ROM, 256bytes internal RAM
-	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_214_state::tdragon_prot_map);
-	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_214_state::mcu_port6_w));
-	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_214_state::mcu_port5_r));
-	m_protcpu->port_read<6>().set(FUNC(tdragon_prot_214_state::mcu_port6_r));
+	TMP90840(config, m_protcpu, XTAL(16'000'000)/4); // Toshiba TMP90840 marked as NMK-215, with 8Kbyte internal ROM, 256bytes internal RAM
+	m_protcpu->set_addrmap(AS_PROGRAM, &macross_prot_state::tdragon_prot_map);
+	m_protcpu->port_write<6>().set(FUNC(macross_prot_state::mcu_port6_w));
+	m_protcpu->port_read<5>().set(FUNC(macross_prot_state::mcu_port5_r));
+	m_protcpu->port_read<6>().set(FUNC(macross_prot_state::mcu_port6_r));
 
 	// the 215 has these hooked up, going to the 214
-	m_protcpu->port_write<3>().set(FUNC(tdragon_prot_214_state::mcu_port3_to_214_w));
-	m_protcpu->port_write<7>().set(FUNC(tdragon_prot_214_state::mcu_port7_to_214_w));
+	m_protcpu->port_write<3>().set(FUNC(macross_prot_state::mcu_port3_to_214_w));
+	m_protcpu->port_write<7>().set(FUNC(macross_prot_state::mcu_port7_to_214_w));
 
 	NMK214(config, m_nmk214[0], 0); // Descrambling device for sprite GFX data
 	m_nmk214[0]->set_mode(0);
@@ -4997,6 +4998,31 @@ void tdragon_prot_214_state::saboten_prot(machine_config &config)
 	NMK214(config, m_nmk214[1], 0); // Descrambling device for BG GFX data
 	m_nmk214[1]->set_mode(1);
 	m_nmk214[1]->set_input_address_bitswap(nmk214_bg_address_bitswap);
+}
+
+void macross_prot_state::macross_prot(machine_config &config)
+{
+	macross(config);
+
+	base_nmk214_215(config);
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
+}
+
+void macross_prot_state::gunnail_prot(machine_config &config)
+{
+	gunnail(config);
+
+	base_nmk214_215(config);
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
+}
+
+void macross_prot_state::bjtwin_prot(machine_config &config)
+{
+	bjtwin(config);
+
+	base_nmk214_215(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 }
@@ -5190,7 +5216,7 @@ void nmk16_state::decode_gfx()
 	}
 }
 
-void tdragon_prot_214_state::decode_nmk214()
+void macross_prot_state::decode_nmk214()
 {
 	u8 *rom;
 	int len;
@@ -7015,6 +7041,10 @@ ROM_START( macross )
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "921a01",      0x000000, 0x020000, CRC(bbd8242d) SHA1(7cf4897be1278e1190f499f00bc78384817a5160) ) // 8x8 tiles
 
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
+
 	ROM_REGION( 0x200000, "bgtile", 0 )
 	ROM_LOAD( "921a04",      0x000000, 0x200000, CRC(4002e4bb) SHA1(281433d798ac85c84d4f1f3751a3032e8a3b5cd4) ) // 16x16 tiles
 
@@ -7112,6 +7142,10 @@ ROM_START( gunnail )
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "1.u21",    0x000000, 0x020000, CRC(3d00a9f4) SHA1(91a82e3e74c8774d7f8b2adceb228b97010facfd) )    // 8x8 tiles
 
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
+
 	ROM_REGION( 0x100000, "bgtile", 0 )
 	ROM_LOAD( "92077-4.u19", 0x000000, 0x100000, CRC(a9ea2804) SHA1(14dbdb3c7986db5e44dc7c5be6fcf39f3d1e50b0) ) // 16x16 tiles
 
@@ -7139,6 +7173,10 @@ ROM_START( gunnailp )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "1.u21",    0x000000, 0x020000, CRC(bdf427e4) SHA1(e9cd178d1d9e2ed72f0fb013385d935f334b8fe3) )    // 8x8 tiles
+
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
 	ROM_LOAD( "92077-4.u19", 0x000000, 0x100000, CRC(a9ea2804) SHA1(14dbdb3c7986db5e44dc7c5be6fcf39f3d1e50b0) ) // 16x16 tiles
@@ -7574,7 +7612,7 @@ ROM_START( sabotenb )
 	ROM_LOAD( "ic35.sb3",       0x000000, 0x010000, CRC(eb7bc99d) SHA1(b3063afd58025a441d4750c22483e9129da402e7) )  // 8x8 tiles
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
@@ -7600,7 +7638,7 @@ ROM_START( sabotenba )
 	ROM_LOAD16_BYTE( "sb2.75",  0x00001, 0x40000, CRC(0d2c1ab8) SHA1(abb43a8c5398195c0ad48d8d772ef47635bf25c2) )
 
 	ROM_REGION( 0x02000, "protcpu", 0 )
-	// has 'SABOTEN' for the game name string, uploads data to '214' for sprite decryption
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
 	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
@@ -7654,6 +7692,10 @@ ROM_START( bjtwin )
 	ROM_REGION( 0x010000, "fgtile", 0 )
 	ROM_LOAD( "93087-3.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) // 8x8 tiles
 
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
+
 	ROM_REGION( 0x100000, "bgtile", 0 )
 	ROM_LOAD( "93087-4.bin",  0x000000, 0x100000, CRC(8a4f26d0) SHA1(be057a2b6d28c623ac1f16cf02ddbe12ca430b4a) ) // 8x8 tiles
 
@@ -7678,6 +7720,10 @@ ROM_START( bjtwina )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
 	ROM_LOAD( "93087-3.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) // 8x8 tiles
+
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
 	ROM_LOAD( "93087-4.bin",  0x000000, 0x100000, CRC(8a4f26d0) SHA1(be057a2b6d28c623ac1f16cf02ddbe12ca430b4a) ) // 8x8 tiles
@@ -7732,6 +7778,10 @@ ROM_START( bjtwinpa )
 	ROM_REGION( 0x010000, "fgtile", 0 )
 	ROM_LOAD( "ic35.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) // 8x8 tiles
 
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
+
 	ROM_REGION( 0x200000, "bgtile", 0 )
 	ROM_LOAD( "ic32_1.bin", 0x000000, 0x080000, CRC(e2d2b331) SHA1(d8fdbff497303a00fc866f0ef07ba74b369c0636) )
 	ROM_LOAD( "ic32_2.bin", 0x080000, 0x080000, CRC(28a3a845) SHA1(4daf71dce5e598ee7ee7e09bb08ec1b2f06f2b01) )
@@ -7757,6 +7807,10 @@ ROM_START( nouryoku )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
 	ROM_LOAD( "ic35.3",     0x000000, 0x010000, CRC(03d0c3b1) SHA1(4d5427c324e2141d0a953cc5133d10b327827e0b) )  // 8x8 tiles
+
+	ROM_REGION( 0x02000, "protcpu", 0 )
+	// has 'SABOTEN' for the game name string, sends commands to '214' to configure graphics unscrambling
+	ROM_LOAD( "nmk-215.bin", 0x00000, 0x02000, CRC(d355a06f) SHA1(ebb7b1ff35a97599550f6f3524124246f2d718c5) )
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
 	ROM_LOAD( "ic32.4",     0x000000, 0x200000, CRC(88d454fd) SHA1(c79c48d9b3602266499a5dd0b15fd2fb032809be) )  // 8x8 tiles
@@ -9027,69 +9081,69 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1989, tharrier,   0,        tharrier,     tharrier,     nmk16_state, init_tharrier,        ROT270, "UPL",                          "Task Force Harrier", 0 )
-GAME( 1989, tharrieru,  tharrier, tharrier,     tharrier,     nmk16_state, init_tharrier,        ROT270, "UPL (American Sammy license)", "Task Force Harrier (US)", 0 ) // US version but no regional notice
+GAME( 1989, tharrier,   0,        tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL",                          "Task Force Harrier", 0 )
+GAME( 1989, tharrieru,  tharrier, tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL (American Sammy license)", "Task Force Harrier (US)", 0 ) // US version but no regional notice
 
-GAME( 1990, mustang,    0,        mustang,      mustang,      nmk16_state, empty_init,           ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", 0 )
-GAME( 1990, mustangs,   mustang,  mustang,      mustang,      nmk16_state, empty_init,           ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
+GAME( 1990, mustang,    0,        mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", 0 )
+GAME( 1990, mustangs,   mustang,  mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
 
-GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state, empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 ) // US version but no regional notice
-GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state, empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", 0 )
+GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 ) // US version but no regional notice
+GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", 0 )
 
-GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state, empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", 0 )
-GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state, empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", 0 )
-GAME( 1990, vandykejal2,vandyke,  vandyke,      vandyke,      nmk16_state, empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)", 0 )
-GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state, init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  MACHINE_NO_SOUND )
+GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", 0 )
+GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", 0 )
+GAME( 1990, vandykejal2,vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)", 0 )
+GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state,        init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  MACHINE_NO_SOUND )
 
-GAME( 1991, blkheart,   0,        blkheart,     blkheart,     nmk16_state, empty_init,           ROT0,   "UPL",                          "Black Heart", 0 )
-GAME( 1991, blkheartj,  blkheart, blkheart,     blkheart,     nmk16_state, empty_init,           ROT0,   "UPL",                          "Black Heart (Japan)", 0 )
+GAME( 1991, blkheart,   0,        blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart", 0 )
+GAME( 1991, blkheartj,  blkheart, blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart (Japan)", 0 )
 
-GAME( 1991, acrobatm,   0,        acrobatm,     acrobatm,     nmk16_state, empty_init,           ROT270, "UPL (Taito license)",          "Acrobat Mission", 0 )
+GAME( 1991, acrobatm,   0,        acrobatm,     acrobatm,     nmk16_state,        empty_init,           ROT270, "UPL (Taito license)",          "Acrobat Mission", 0 )
 
-GAME( 1992, strahl,     0,        strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (World)", 0 )
-GAME( 1992, strahlj,    strahl,   strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", 0 )
-GAME( 1992, strahlja,   strahl,   strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", 0 )
+GAME( 1992, strahl,     0,        strahl,       strahl,       nmk16_state,        empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (World)", 0 )
+GAME( 1992, strahlj,    strahl,   strahl,       strahl,       nmk16_state,        empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", 0 )
+GAME( 1992, strahlja,   strahl,   strahl,       strahl,       nmk16_state,        empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", 0 )
 
-GAME( 1991, tdragon,    0,        tdragon,      tdragon,      nmk16_state, empty_init,           ROT270, "NMK (Tecmo license)",          "Thunder Dragon (8th Jan. 1992, unprotected)", 0 )
-GAME( 1991, tdragon1,   tdragon,  tdragon_prot, tdragon_prot, tdragon_prot_state, empty_init,    ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991, protected)", 0 )
+GAME( 1991, tdragon,    0,        tdragon,      tdragon,      nmk16_state,        empty_init,           ROT270, "NMK (Tecmo license)",          "Thunder Dragon (8th Jan. 1992, unprotected)", 0 )
+GAME( 1991, tdragon1,   tdragon,  tdragon_prot, tdragon_prot, tdragon_prot_state, empty_init,           ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991, protected)", 0 )
 
-GAME( 1991, hachamf,    0,        hachamf_prot, hachamf_prot, tdragon_prot_state, empty_init,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 1)", 0 )
-GAME( 1991, hachamfa,   hachamf,  hachamf_prot, hachamf_prot, tdragon_prot_state, empty_init,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 2)", 0 )
-GAME( 1991, hachamfb,   hachamf,  hachamf,      hachamfb,     nmk16_state, empty_init,           ROT0,   "bootleg",                      "Hacha Mecha Fighter (19th Sep. 1991, unprotected, bootleg Thunder Dragon conversion)", 0 ) // appears to be a Thunder Dragon conversion, could be bootleg?
-GAME( 1991, hachamfp,   hachamf,  hachamf,      hachamfp,     nmk16_state, empty_init,           ROT0,   "NMK",                          "Hacha Mecha Fighter (Location Test Prototype, 19th Sep. 1991)", 0 ) // Prototype with hand-written labels showing dates of 9/9, 9/13, 9/24, 9/25. The ROM contains the same 19th Sep. 1991 build string as all the prior releases, so that string was likely never updated in later builds.
+GAME( 1991, hachamf,    0,        hachamf_prot, hachamf_prot, tdragon_prot_state, empty_init,           ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 1)", 0 )
+GAME( 1991, hachamfa,   hachamf,  hachamf_prot, hachamf_prot, tdragon_prot_state, empty_init,           ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 2)", 0 )
+GAME( 1991, hachamfb,   hachamf,  hachamf,      hachamfb,     nmk16_state,        empty_init,           ROT0,   "bootleg",                      "Hacha Mecha Fighter (19th Sep. 1991, unprotected, bootleg Thunder Dragon conversion)", 0 ) // appears to be a Thunder Dragon conversion, could be bootleg?
+GAME( 1991, hachamfp,   hachamf,  hachamf,      hachamfp,     nmk16_state,        empty_init,           ROT0,   "NMK",                          "Hacha Mecha Fighter (Location Test Prototype, 19th Sep. 1991)", 0 ) // Prototype with hand-written labels showing dates of 9/9, 9/13, 9/24, 9/25. The ROM contains the same 19th Sep. 1991 build string as all the prior releases, so that string was likely never updated in later builds.
 
-GAME( 1992, macross,    0,        macross,      macross,      nmk16_state, init_nmk,             ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", 0 )
+GAME( 1992, macross,    0,        macross_prot, macross,      macross_prot_state, empty_init,           ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", 0 )
 
-GAME( 1993, gunnail,    0,        gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", 0 ) // Tecmo is displayed only when set to Japan
-GAME( 1992, gunnailp,   gunnail,  gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK",                          "GunNail (location test)", 0 ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
+GAME( 1993, gunnail,    0,        gunnail_prot, gunnail,      macross_prot_state, empty_init,           ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", 0 ) // Tecmo is displayed only when set to Japan
+GAME( 1992, gunnailp,   gunnail,  gunnail_prot, gunnail,      macross_prot_state, empty_init,           ROT270, "NMK",                          "GunNail (location test)", 0 ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
-GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
-GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (Gamest review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game
-GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Macross II (Korea)", MACHINE_NO_COCKTAIL ) // Title screen only shows Macross II
+GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
+GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (Gamest review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game
+GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Macross II (Korea)", MACHINE_NO_COCKTAIL ) // Title screen only shows Macross II
 
-GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bigbanga,   tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
+GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
+GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bigbanga,   tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
 
-GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
-GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^
-GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
+GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^
+GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 // both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate
-GAME( 1992, sabotenb,   0,        saboten_prot, sabotenb,     tdragon_prot_214_state, empty_init,ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1992, sabotenba,  sabotenb, saboten_prot, sabotenb,     tdragon_prot_214_state, empty_init,ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1992, cactus,     sabotenb, bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
+GAME( 1992, sabotenb,   0,        bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1992, sabotenba,  sabotenb, bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1992, cactus,     sabotenb, bjtwin,      sabotenb,      nmk16_state,        init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
 
-GAME( 1993, bjtwin,     0,        bjtwin,       bjtwin,       nmk16_state, init_bjtwin,          ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwina,    bjtwin,   bjtwin,       bjtwin,       nmk16_state, init_bjtwin,          ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwinp,    bjtwin,   bjtwin,       bjtwin,       nmk16_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
-GAME( 1993, bjtwinpa,   bjtwin,   bjtwin,       bjtwin,       nmk16_state, init_bjtwin,          ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
+GAME( 1993, bjtwin,     0,        bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bjtwina,    bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bjtwinp,    bjtwin,   bjtwin,      bjtwin,        nmk16_state,        empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
+GAME( 1993, bjtwinpa,   bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
 
-GAME( 1995, nouryoku,   0,        bjtwin,       nouryoku,     nmk16_state, init_nmk,             ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )
-GAME( 1995, nouryokup,  nouryoku, bjtwin,       nouryoku,     nmk16_state, empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", MACHINE_NO_COCKTAIL ) // GFX aren't encrypted
+GAME( 1995, nouryoku,   0,        bjtwin_prot, nouryoku,      macross_prot_state, empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )
+GAME( 1995, nouryokup,  nouryoku, bjtwin,      nouryoku,      nmk16_state,        empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", MACHINE_NO_COCKTAIL ) // GFX aren't encrypted
 
 // Non NMK boards
 

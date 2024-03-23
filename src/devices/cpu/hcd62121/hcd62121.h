@@ -48,6 +48,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
@@ -55,10 +56,13 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	TIMER_CALLBACK_MEMBER(timer_tick);
 	u8 read_op();
 	u8 datasize(u8 op);
 	void read_reg(int size, u8 op1);
 	void write_reg(int size, u8 op1);
+	void read_ireg(int size, u8 op1);
+	void write_ireg(int size, u8 op1);
 	void read_regreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
 	void write_regreg(int size, u8 op1, u8 op2);
 	void read_iregreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
@@ -92,6 +96,11 @@ private:
 	u8 m_sseg;
 	u8 m_f;
 	u8 m_time;
+	u8 m_time_op;
+	s32 m_cycles_until_timeout;
+	bool m_is_timer_started;
+	bool m_is_infinite_timeout;
+	emu_timer *m_timer;
 	u16 m_lar;
 	u8 m_reg[0x80];
 
@@ -104,6 +113,8 @@ private:
 	u8 m_temp1[0x10];
 	u8 m_temp2[0x10];
 	u32 m_rtemp;
+
+	u32 m_debugger_temp;
 
 	address_space *m_program;
 

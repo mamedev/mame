@@ -62,6 +62,10 @@ private:
 	void init_common();
 	static FLAC__StreamEncoderWriteStatus write_callback_static(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data);
 	FLAC__StreamEncoderWriteStatus write_callback(const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame);
+	static FLAC__StreamEncoderSeekStatus seek_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data);
+	FLAC__StreamEncoderSeekStatus seek_callback(FLAC__uint64 absolute_byte_offset);
+	static FLAC__StreamEncoderTellStatus tell_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
+	FLAC__StreamEncoderTellStatus tell_callback(FLAC__uint64 *absolute_byte_offset);
 
 	// internal state
 	FLAC__StreamEncoder *   m_encoder;              // actual encoder
