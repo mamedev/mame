@@ -4923,12 +4923,29 @@ ROM_END
   in the mainboard, at normal positions.
 
 
+
+  ********** Second PCB *********
+
+  A second PCB was found!
+  The hardware base is totally different from the first set.
+
+  It's a two PCB system with the original SUSILU Ms PacMan Twin daughterboard replacing the Z80 at location 6B,
+  plus two daughterboards replacing the original Namco customs NVC284 at location 5S (VRAM addresser),
+  and NVC285 at location 6D (Z80 sync bus controller).
+
+  Program ROM is way different and need to be anlyzed deeply to find behaviour differences in the game.
+  Besides, the graphics ROM 3 (@ location 5h) has extra bitmapped strings "Push Start" and "Insert Coins"
+  that are not present in the parent set.
+
+
+  
   Docs by Roberto Fresca.
 
+  
 *****************************************************************************/
 
 ROM_START( mspactwin )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for encrypted code */
+	ROM_REGION( 0x10000, "maincpu", 0 )  // 64k for encrypted code
 	ROM_LOAD( "m27256.bin",  0x0000, 0x4000, CRC(77a99184) SHA1(9dcb1a1b78994aa401d653bec571cb3e6f9d900b) )
 	ROM_CONTINUE(0x8000,0x4000)
 
@@ -4937,6 +4954,32 @@ ROM_START( mspactwin )
 	ROM_LOAD( "2__2716.5g",  0x0800, 0x0800, CRC(c08d73a2) SHA1(072e57641ac5ae3c47b4f8d9c55e3da5b35489ea) )
 	ROM_LOAD( "3__2516.5f",  0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
 	ROM_LOAD( "1__2516.5j",  0x1800, 0x0800, CRC(0a8c46a0) SHA1(e38e9e3258ab26fcbc6fdf258844e364f4b165ab) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "mb7051.8h",  0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )
+	ROM_LOAD( "82s129.4a",  0x0020, 0x0100, CRC(a8202d0d) SHA1(2a615211c33f3ef75af14e4bbedd2a700100be29) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
+	ROM_LOAD( "mb7052.1k",  0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s129.3k",  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+ROM_END
+
+/*  Second set...
+
+    m27256.bin   [2/4]      6_db.u4      [2/4]      87.792969%
+    m27256.bin   [4/4]      6_db.u4      [4/4]      87.500000%
+    m27256.bin   [3/4]      6_db.u4      [3/4]      67.150879%
+    m27256.bin   [1/4]      6_db.u4      [1/4]      16.503906%
+*/
+ROM_START( mspactwina )
+	ROM_LOAD( "6_db.u4",  0x0000, 0x4000, CRC(a0fb55ba) SHA1(ad591aa6511600f4687b7c4e70882d87386c9fb9) )
+	ROM_CONTINUE(0x8000,0x4000)
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "1.5e",  0x0000, 0x0800, CRC(483c1d1c) SHA1(d3b967c6a71cf02b825d800f56d5268f2e0e60eb) )
+	ROM_LOAD( "3.5h",  0x0800, 0x0800, CRC(703912f5) SHA1(03f5d7b30bacabf388fdcfa13fe6a5b0e3027fe7) )  // this ROM has additional tiles
+	ROM_LOAD( "2.5f",  0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
+	ROM_LOAD( "4.5j",  0x1800, 0x0800, CRC(0a8c46a0) SHA1(e38e9e3258ab26fcbc6fdf258844e364f4b165ab) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "mb7051.8h",  0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )
@@ -8348,10 +8391,11 @@ GAME( 1993, mspacmanbi,   mspacman, woodpek, mspacman, pacman_state,  empty_init
 GAME( 1992, mspacmanbgc,  mspacman, woodpek, mspacman, pacman_state,  empty_init,   ROT90,  "bootleg (Enavi)",         "Ms. Pac-Man ('Made in Greece' Enavi bootleg)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 198?, pacmansp,     puckman,  pacman,  pacmansp, pacman_state,  empty_init,   ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)",                       MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
-GAME( 1992, mspactwin,    0,        mspactwin, mspactwin, mspactwin_state, init_mspactwin, ROT90,  "hack (Susilu)",   "Ms Pac Man Twin (Argentina)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mspactwin,   0,         mspactwin, mspactwin, mspactwin_state, init_mspactwin, ROT90,  "hack (Susilu)",   "Ms Pac Man Twin (Argentina, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mspactwina,  mspactwin, mspactwin, mspactwin, mspactwin_state, init_mspactwin, ROT90,  "hack (Susilu)",   "Ms Pac Man Twin (Argentina, set 2)",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, clubpacm,     0,        clubpacm,  clubpacm,  clubpacm_state,  empty_init,     ROT90,  "hack (Miky SRL)", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, clubpacma,    clubpacm, clubpacm,  clubpacma, clubpacm_state,  init_clubpacma, ROT90,  "hack (Miky SRL)", "Pacman Club (Argentina)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, clubpacm,    0,         clubpacm,  clubpacm,  clubpacm_state,  empty_init,     ROT90,  "hack (Miky SRL)", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, clubpacma,   clubpacm,  clubpacm,  clubpacma, clubpacm_state,  init_clubpacma, ROT90,  "hack (Miky SRL)", "Pacman Club (Argentina)",                MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", MACHINE_SUPPORTS_SAVE )
