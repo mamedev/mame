@@ -114,6 +114,59 @@ void pacman_state::pacman_palette(palette_device &palette) const
 	}
 }
 
+void pacman_state::pacman_rbg_palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances[3] = { 1000, 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], gweights, 0, 0,
+			2, &resistances[1], bweights, 0, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 32; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
+
+		palette.set_indirect_color(i, rgb_t(r, b, g));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 32;
+
+	// allocate the colortable
+	for (int i = 0; i < 64*4; i++)
+	{
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
+
+		// first palette bank
+		palette.set_pen_indirect(i, ctabentry);
+
+		// second palette bank
+		palette.set_pen_indirect(i + 64*4, 0x10 | ctabentry);
+	}
+}
+
 TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
 {
 	int offs;
