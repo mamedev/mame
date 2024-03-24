@@ -233,6 +233,11 @@ public:
 	emu_fatalerror(util::format_argument_pack<char> const &args);
 	emu_fatalerror(int _exitcode, util::format_argument_pack<char> const &args);
 
+	emu_fatalerror(emu_fatalerror &src)
+		: emu_fatalerror(static_cast<const emu_fatalerror &>(src))
+	{
+	}
+
 	template <typename Format, typename... Params>
 	emu_fatalerror(Format &&fmt, Params &&... args)
 		: emu_fatalerror(static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...)))
