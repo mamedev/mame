@@ -35713,6 +35713,9 @@ compc1                          // 1984 Commodore PC-1
 @source:pc/ct486.cpp
 ct486                           // 1993? 486 with CS4031
 
+@source:pc/dawg.cpp
+dawg
+
 @source:pc/ec184x.cpp
 ec1840                          //
 ec1841                          //
