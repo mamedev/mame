@@ -141,7 +141,6 @@ private:
 	uint8_t   m_scroll_y[2]{};
 
 	// misc
-	uint8_t   m_soundstate = 0U;
 	uint8_t   m_adpcm = 0U;
 	uint8_t   m_nmi_mask = 0U;
 	int       m_sprbank = 0;
@@ -1170,7 +1169,6 @@ void lwings_state::machine_start()
 	save_item(NAME(m_bg2_image));
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
-	save_item(NAME(m_soundstate));
 	save_item(NAME(m_adpcm));
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_sprbank));
@@ -1229,7 +1227,6 @@ void lwings_state::machine_reset()
 	m_scroll_x[1] = 0;
 	m_scroll_y[0] = 0;
 	m_scroll_y[1] = 0;
-	m_soundstate = 0;
 	m_adpcm = 0;
 }
 
