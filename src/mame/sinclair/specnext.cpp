@@ -523,6 +523,7 @@ private:
 
 	u8 m_ay_select; // u2
 
+	emu_timer *m_irq_line_timer;
 	emu_timer *m_spi_clock;
 	int m_spi_clock_cycles;
 	bool m_spi_clock_state;
@@ -1056,7 +1057,7 @@ u32 specnext_state::cooper_until_pos_r(offs_t pos)
 {
 	const u16 vcount = BIT(pos, 0, 9);
 	const u16 hcount = ((BIT(pos, 9, 6) << 3) + (BIT(pos, 15) ? 12 : 0)) << 1;
-	return m_screen->time_until_pos(SCR_256x192.top() + vcount, SCR_256x192.left() + hcount).as_ticks(m_copper->clock());
+	return m_screen->time_until_pos(get_screen_area().top() + vcount + m_nr_64_copper_offset, get_screen_area().left() + hcount).as_ticks(m_copper->clock());
 }
 
 
@@ -2214,6 +2215,12 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1)
 	m_sprites->update_sprites_cache(); // (1)
+
+	if (m_nr_22_line_interrupt_en) {
+		m_irq_line_timer->adjust(m_screen->time_until_pos(
+			get_screen_area().top() - 1 + m_nr_64_copper_offset + m_nr_23_line_interrupt,
+			get_screen_area().right() + 2));
+	}
 	if (!port_ff_interrupt_disable())
 	{
 		m_irq_on_timer->adjust(m_screen->time_until_pos(get_screen_area().top(), get_screen_area().left())
@@ -2627,6 +2634,7 @@ void specnext_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 
+	m_irq_line_timer = timer_alloc(FUNC(specnext_state::irq_on), this);
 	m_spi_clock = timer_alloc(FUNC(specnext_state::spi_clock), this);
 
 	m_regs_map->space(AS_PROGRAM).specific(m_next_regs);
@@ -2762,6 +2770,8 @@ void specnext_state::machine_reset()
 {
 	// TODO prevent from soft reset in config mode?
 	spectrum_128_state::machine_reset();
+
+	m_irq_line_timer->reset();
 
 	if (m_nr_02_hard_reset)
 		reset_hard();
