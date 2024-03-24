@@ -301,8 +301,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, sstar28k,  0,        0,      sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, sstar28k,  0,        0,      sstar28k, sstar28k, star_state, empty_init, "SciSys / Heuristic Software", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1985, tstar432,  0,        0,      tstar432, tstar432, star_state, empty_init, "SciSys", "Turbostar 432 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, tstar432a, tstar432, 0,      tstar432, tstar432, star_state, empty_init, "SciSys", "Turbostar 432 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, tstar432b, tstar432, 0,      tstar432, tstar432, star_state, empty_init, "SciSys", "Turbostar 432 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, tstar432,  0,        0,      tstar432, tstar432, star_state, empty_init, "SciSys / Heuristic Software", "Turbostar 432 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, tstar432a, tstar432, 0,      tstar432, tstar432, star_state, empty_init, "SciSys / Heuristic Software", "Turbostar 432 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, tstar432b, tstar432, 0,      tstar432, tstar432, star_state, empty_init, "SciSys / Heuristic Software", "Turbostar 432 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

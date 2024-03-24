@@ -317,6 +317,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, corona,   0,       0,      corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
-SYST( 1988, coronaa,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, coronab,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, corona,   0,       0,      corona,  corona, corona_state, empty_init, "Saitek / Heuristic Software", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
+SYST( 1988, coronaa,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek / Heuristic Software", "Kasparov Corona (ver. C, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, coronab,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek / Heuristic Software", "Kasparov Corona (ver. C, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

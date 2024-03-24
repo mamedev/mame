@@ -349,4 +349,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, turbos24k, 0,      0,      turbos24k, turbos24k, turbos24k_state, empty_init, "SciSys", "Kasparov Turbo S-24K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, turbos24k, 0,      0,      turbos24k, turbos24k, turbos24k_state, empty_init, "SciSys / Heuristic Software", "Kasparov Turbo S-24K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
