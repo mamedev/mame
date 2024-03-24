@@ -47,9 +47,54 @@
 #include "emu.h"
 #include "nabupc_kbd.h"
 
+#include "cpu/m6800/m6801.h"
+#include "machine/adc0808.h"
 
 
 namespace  {
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class nabupc_keyboard_device: public device_t, public device_rs232_port_interface
+{
+public:
+	// construction/destruction
+	nabupc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
+	void nabu_kb_mem(address_map &map);
+
+	uint8_t port1_r();
+	void port1_w(uint8_t data);
+
+	void irq_w(uint8_t data);
+
+	uint8_t gameport_r(offs_t offset);
+	void adc_latch_w(offs_t offset, uint8_t data);
+	void adc_start_w(offs_t offset, uint8_t data);
+	void cpu_ack_irq_w(offs_t offset, uint8_t data);
+
+	required_device<m6803_cpu_device> m_mcu;
+	required_device<adc0809_device> m_adc;
+
+	required_ioport m_modifiers;
+	required_ioport_array<8> m_keyboard;
+	required_ioport_array<4> m_gameport;
+
+	uint8_t m_port1;
+	uint8_t m_eoc;
+};
+
 
 //**************************************************************************
 //  KEYBOARD ROM
@@ -57,7 +102,12 @@ namespace  {
 
 ROM_START(nabu_keyboard_rom)
 	ROM_REGION( 0x800, "mcu", 0 )
-	ROM_LOAD( "nabukeyboard-90020070-revb-2716.bin", 0x000, 0x800, CRC(7d6ebc61) SHA1(5b0cb3da5b4afcae321c2a557e328c416b107dd7) )
+	ROM_DEFAULT_BIOS("reva")
+	ROM_SYSTEM_BIOS( 0, "reva", "Rev A" )
+	ROMX_LOAD( "nabukeyboard-90020070-reva-2716.bin", 0x000, 0x800, CRC(eead3abc) SHA1(2f6ff63ca2f2ac90f3e03ef4f2b79883205e8a4e), ROM_BIOS(0) )
+	// Rev B keyboard ROM contains a fix for a bug preventing the second paddle on a controller port from working correctly.
+	ROM_SYSTEM_BIOS( 1, "revb", "Rev B (Paddle Fix)" )
+	ROMX_LOAD( "nabukeyboard-90020070-revb-2716.bin", 0x000, 0x800, CRC(7d6ebc61) SHA1(5b0cb3da5b4afcae321c2a557e328c416b107dd7), ROM_BIOS(1) )
 ROM_END
 
 //**************************************************************************
@@ -206,16 +256,6 @@ INPUT_PORTS_START( keyboard_ports )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(8) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) // pin 5
 INPUT_PORTS_END
 
-} // anonymous namespace
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(NABUPC_KEYBOARD, nabupc_keyboard_device, "nabupc_keyboard", "NABU PC keyboard")
-
-
 //**************************************************************************
 //  KEYBOARD DEVICE
 //**************************************************************************
@@ -226,9 +266,9 @@ DEFINE_DEVICE_TYPE(NABUPC_KEYBOARD, nabupc_keyboard_device, "nabupc_keyboard", "
 
 nabupc_keyboard_device::nabupc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NABUPC_KEYBOARD, tag, owner, clock)
+	, device_rs232_port_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
 	, m_adc(*this, "adc")
-	, m_rxd_cb(*this)
 	, m_modifiers(*this, "MODIFIERS")
 	, m_keyboard(*this, "ROW%u", 0U)
 	, m_gameport(*this, "JOYSTICK%u", 1U)
@@ -246,7 +286,7 @@ void nabupc_keyboard_device::device_start()
 void nabupc_keyboard_device::device_reset()
 {
 	m_port1 &= 0x7f;
-	m_rxd_cb(1);
+	output_rxd(1);
 }
 
 void nabupc_keyboard_device::device_add_mconfig(machine_config &config)
@@ -255,7 +295,7 @@ void nabupc_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &nabupc_keyboard_device::nabu_kb_mem);
 	m_mcu->in_p1_cb().set(FUNC(nabupc_keyboard_device::port1_r));
 	m_mcu->out_p1_cb().set(FUNC(nabupc_keyboard_device::port1_w));
-	m_mcu->out_ser_tx_cb().set(FUNC(nabupc_keyboard_device::ser_tx_w));
+	m_mcu->out_ser_tx_cb().set(FUNC(nabupc_keyboard_device::output_rxd));
 
 	ADC0809(config, m_adc, 3.579545_MHz_XTAL / 4);
 	m_adc->eoc_callback().set(FUNC(nabupc_keyboard_device::irq_w));
@@ -344,7 +384,10 @@ void nabupc_keyboard_device::cpu_ack_irq_w(offs_t offset, uint8_t data)
 	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
-void nabupc_keyboard_device::ser_tx_w(uint8_t data)
-{
-	m_rxd_cb(data & 1);
-}
+} // anonymous namespace
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(NABUPC_KEYBOARD, device_rs232_port_interface, nabupc_keyboard_device, "nabupc_keyboard", "NABU PC keyboard")
