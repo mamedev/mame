@@ -1234,10 +1234,10 @@ void avr8_base_device::op_adiw(uint16_t op)
 	if (BIT(pd, 15))
 	{
 		m_r[SREG] |= SREG_MASK_N;
-		if (!BIT(rr, 7))
-			m_r[SREG] |= SREG_MASK_V;
-		else
+		if (BIT(rr, 7))
 			m_r[SREG] |= SREG_MASK_S;
+		else
+			m_r[SREG] |= SREG_MASK_V;
 	}
 	else
 	{
@@ -1258,14 +1258,17 @@ void avr8_base_device::op_sbiw(uint16_t op)
 	m_r[SREG] &= ~(SREG_MASK_V | SREG_MASK_N | SREG_MASK_S | SREG_MASK_Z | SREG_MASK_C);
 	if (BIT(pd, 15))
 	{
-		m_r[SREG] |= SREG_MASK_N;
+		m_r[SREG] |= SREG_MASK_N | SREG_MASK_S;
 		if (!BIT(rr, 7))
-			m_r[SREG] |= SREG_MASK_V | SREG_MASK_C;
-		else
-			m_r[SREG] |= SREG_MASK_S;
+			m_r[SREG] |= SREG_MASK_C;
 	}
-	else if (pd == 0)
-		m_r[SREG] |= SREG_MASK_Z;
+	else
+	{
+		if (pd == 0)
+			m_r[SREG] |= SREG_MASK_Z;
+		if (BIT(rr, 7))
+			m_r[SREG] |= SREG_MASK_V | SREG_MASK_S;
+	}
 	m_r[24 + (DCONST(op) << 1)] = pd & 0x00ff;
 	m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
 }
