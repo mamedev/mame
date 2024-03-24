@@ -103,4 +103,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR2000", MACHINE_IS_SKELETON )
+SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR-2000", MACHINE_IS_SKELETON )

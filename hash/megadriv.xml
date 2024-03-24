@@ -6324,9 +6324,9 @@ Unsupported [Menacer] peripheral
 	</software>
 
 	<software name="pga2hb" cloneof="pga2" supported="no">
-		<description>HeartBeat PGA Tour Golf II</description>
+		<description>PGA Tour Golf II for use with the Personal Trainer</description>
 		<year>1995</year>
-		<publisher>Polar Technology</publisher> <!-- box art shows Polar Technology branding, but cartridge label says "HEARTBEAT CORP." -->
+		<publisher>HeartBeat Corp</publisher>
 		<info name="usage" value="Requires HeartBeat Personal Trainer activity tracker"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom"/>
