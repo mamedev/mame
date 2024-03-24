@@ -173,7 +173,6 @@ Notes on possible shutms11 BIOS bugs:
 #include "machine/sis900_eth.h"
 #include "machine/sis950_lpc.h"
 #include "machine/sis950_smbus.h"
-//#include "machine/fdc37c93x.h"
 
 
 namespace {
