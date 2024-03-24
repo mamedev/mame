@@ -92,7 +92,6 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg1videoram(*this, "bg1videoram"),
-		m_soundlatch2(*this, "soundlatch_2"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_samplebank(*this, "samplebank")
@@ -127,7 +126,6 @@ private:
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bg1videoram;
-	optional_shared_ptr<uint8_t> m_soundlatch2;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 	optional_memory_bank m_samplebank;
@@ -156,7 +154,7 @@ private:
 	uint8_t avengers_adpcm_r();
 	void lwings_bankswitch_w(uint8_t data);
 	uint8_t avengers_m1_r(offs_t offset);
-	uint8_t avengers_soundlatch2_r();
+	uint8_t avengers_soundlatch_ack_r();
 	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
 	void lwings_bg1videoram_w(offs_t offset, uint8_t data);
 	void lwings_bg1_scrollx_w(offs_t offset, uint8_t data);
@@ -293,7 +291,6 @@ void lwings_state::mcu_control_w(uint8_t data)
 		//logerror("%s: MCU writes %02X back to main CPU\n", machine().time().to_string(), m_mcu_data[0]);
 		m_mculatch[2]->write(m_mcu_data[0]);
 		m_soundlatch->write(m_mcu_data[1]);
-		m_soundstate = 0x80;
 		machine().scheduler().perfect_quantum(attotime::from_usec(60));
 	}
 
@@ -311,11 +308,13 @@ uint8_t lwings_state::avengers_m1_r(offs_t offset)
 	return m_maincpu_program.read_byte(offset);
 }
 
-uint8_t lwings_state::avengers_soundlatch2_r()
+uint8_t lwings_state::avengers_soundlatch_ack_r()
 {
-	uint8_t data = *m_soundlatch2 | m_soundstate;
-	m_soundstate = 0;
-	return(data);
+	uint8_t data = m_soundlatch->read() | (m_soundlatch->pending_r() ? 0x80 : 0);
+	if (!machine().side_effects_disabled())
+		m_soundlatch->acknowledge_w();
+
+	return data;
 }
 
 void lwings_state::msm5205_w(uint8_t data)
@@ -403,7 +402,7 @@ void lwings_state::trojan_map(address_map &map)
 	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
 	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
-	map(0xf808, 0xf808).portr("SERVICE").nopw(); //watchdog
+	map(0xf808, 0xf808).portr("SERVICE").nopw(); // watchdog
 	map(0xf809, 0xf809).portr("P1");
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
@@ -419,8 +418,7 @@ void lwings_state::lwings_sound_map(address_map &map)
 	map(0xc800, 0xc800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe001).w("2203a", FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w("2203b", FUNC(ym2203_device::write));
-	map(0xe006, 0xe006).r(FUNC(lwings_state::avengers_soundlatch2_r)); //AT: (avengers061gre)
-	map(0xe006, 0xe006).writeonly().share("soundlatch_2");
+	map(0xe006, 0xe006).r(FUNC(lwings_state::avengers_soundlatch_ack_r)).nopw();
 }
 
 
@@ -1323,6 +1321,7 @@ void lwings_state::fball(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL/12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1374,6 +1373,8 @@ void lwings_state::avengers(machine_config &config)
 	m_mcu->port_in_cb<2>().set(FUNC(lwings_state::mcu_p2_r));
 	m_mcu->port_out_cb<2>().set(FUNC(lwings_state::mcu_p2_w));
 	m_mcu->port_out_cb<3>().set(FUNC(lwings_state::mcu_control_w));
+
+	config.set_maximum_quantum(attotime::from_hz(10000));
 
 	GENERIC_LATCH_8(config, m_mculatch[0]);
 	m_mculatch[0]->data_pending_callback().set_inputline(m_mcu, MCS51_INT0_LINE);
