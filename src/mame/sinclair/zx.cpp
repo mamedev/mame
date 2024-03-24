@@ -39,7 +39,7 @@
     - h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
     - lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
     - Many games don't work.
-    - sets zx80, lambda. pc8300, pow3000 all fail to show text.
+    - sets lambda. pc8300, pow3000 all fail to show text.
 
 ****************************************************************************/
 
@@ -485,7 +485,7 @@ ROM_END
 /* Game Drivers */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT    COMPANY                    FULLNAME               FLAGS
-COMP( 1980, zx80,     0,      0,      zx80,    zx80,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-80",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1980, zx80,     0,      0,      zx80,    zx80,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-80",               MACHINE_NO_SOUND_HW )
 COMP( 1981, zx81,     0,      0,      zx81,    zx81,    zx_state, init_zx, "Sinclair Research Ltd",  "ZX-81",               MACHINE_NO_SOUND_HW )
 COMP( 1982, ts1000,   zx81,   0,      ts1000,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1000", MACHINE_NO_SOUND_HW )
 COMP( 1983, ts1500,   zx81,   0,      ts1500,  zx81,    zx_state, init_zx, "Timex Sinclair",         "Timex Sinclair 1500", MACHINE_NO_SOUND_HW )
