@@ -128,7 +128,7 @@ void uzebox_state::port_a_w(uint8_t data)
 
 uint8_t uzebox_state::port_a_r()
 {
-	return  m_port_a | 0xf0;
+	return m_port_a | 0xf0;
 }
 
 void uzebox_state::port_b_w(uint8_t data)
