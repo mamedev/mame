@@ -19,7 +19,7 @@ The address-based XOR can be thought as 16 one-bit XORs against key bits
 controlled by certain combinations of up to three address bits. The game key is
 comprised of 256 8-bits values provided by the internal ARM; every 8-bit value
 in the key is used on those words whose address match the index modulus 256;
-in a given key byte, every bit affects two positions of the correponding 16-bits
+in a given key byte, every bit affects two positions of the corresponding 16-bits
 encrypted words.
 This use of the key is similar to the one found in previous instantiations of
 IGS circuits.
