@@ -108,11 +108,11 @@ public:
 
 	void mpeg_dreq_w(int state);
 
-	uint16_t p6_r();
-	void p6_w(uint16_t data);
-	uint16_t pb_r();
-	void pb_w(uint16_t data);
-	void pa_w(uint16_t data);
+	uint8_t p6_r();
+	void p6_w(uint8_t data);
+	uint8_t pb_r();
+	void pb_w(uint8_t data);
+	void pa_w(uint8_t data);
 
 	uint8_t cs0_r(offs_t offset);
 	void cs0_w(offs_t offset, uint8_t data);
@@ -141,12 +141,12 @@ void hrdvd_state::mpeg_dreq_w(int state)
 	m_subcpu->set_input_line(H8_INPUT_LINE_DREQ0, m_mpeg_dreq && !(m_p6 & 0x04));
 }
 
-uint16_t hrdvd_state::p6_r()
+uint8_t hrdvd_state::p6_r()
 {
 	return m_p6;
 }
 
-void hrdvd_state::p6_w(uint16_t data)
+void hrdvd_state::p6_w(uint8_t data)
 {
 	u8 delta = data ^ m_p6;
 	m_p6 = data;
@@ -158,12 +158,12 @@ void hrdvd_state::p6_w(uint16_t data)
 	logerror("p6 %02x\n", m_p6);
 }
 
-uint16_t hrdvd_state::pb_r()
+uint8_t hrdvd_state::pb_r()
 {
 	return m_pb;
 }
 
-void hrdvd_state::pb_w(uint16_t data)
+void hrdvd_state::pb_w(uint8_t data)
 {
 	u8 delta = data ^ m_pb;
 	m_pb = (m_pb & 0xc0) | (data & 0x3f);
@@ -174,7 +174,7 @@ void hrdvd_state::pb_w(uint16_t data)
 		logerror("pb %02x\n", data);
 }
 
-void hrdvd_state::pa_w(uint16_t data)
+void hrdvd_state::pa_w(uint8_t data)
 {
 	u8 delta = data ^ m_pa;
 	m_pa = data;

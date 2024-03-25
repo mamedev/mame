@@ -114,8 +114,6 @@ private:
 	void prg_map(address_map &map);
 };
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -299,8 +297,6 @@ uint32_t crzrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void base_state::coin_counter_w(int state)
 {

@@ -106,8 +106,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -346,8 +344,6 @@ uint32_t toobin_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

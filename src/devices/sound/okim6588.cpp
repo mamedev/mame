@@ -136,7 +136,9 @@ s16 okim6588_device::get_adpcm_sample(u8 data)
 
 void okim6588_device::reset_adpcm()
 {
-	m_stream->update();
+	if (machine().time() > attotime::zero)
+		m_stream->update();
+
 	m_adpcm_data = 0;
 	m_adpcm.reset();
 }

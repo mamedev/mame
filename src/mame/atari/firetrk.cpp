@@ -191,8 +191,6 @@ private:
 };
 
 
-// video
-
 void firetrk_state::palette(palette_device &palette)
 {
 	static constexpr uint8_t colortable_source[] =
@@ -606,8 +604,6 @@ uint32_t montecar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// audio
-
 void firetrk_state::skid_reset_w(uint8_t data)
 {
 	m_skid[0] = 0;
@@ -660,8 +656,6 @@ void firetrk_state::xtndply_w(uint8_t data)
 	m_discrete->write(FIRETRUCK_XTNDPLY_EN, data);
 }
 
-
-// machine
 
 void firetrk_state::set_service_mode(int enable)
 {

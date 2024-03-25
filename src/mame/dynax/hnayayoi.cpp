@@ -140,8 +140,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
 First version of the Dynax blitter.
@@ -383,8 +381,6 @@ MC6845_UPDATE_ROW(hnayayoi_state::untoucha_update_row)
 	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 1, 0, col0, true);
 }
 
-
-// machine
 
 template <uint8_t Which>
 uint8_t hnayayoi_state::keyboard_r()
@@ -1116,5 +1112,5 @@ void hnayayoi_state::init_hnfubuki()
 
 
 GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, empty_init,    ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, init_hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, init_hnfubuki, ROT0, "Dynax",            "Hana Fubuki (Japan)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, empty_init,    ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

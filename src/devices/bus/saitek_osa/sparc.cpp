@@ -36,7 +36,7 @@ TODO:
 #include "sparc.h"
 
 
-DEFINE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device, "osa_sparc", "Sparc")
+DEFINE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device, "osa_sparc", "Saitek OSA Sparc")
 
 
 //-------------------------------------------------

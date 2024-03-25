@@ -11,6 +11,7 @@ a power on/reset (F3).
 
 It's the 'sequel' to Simultano, and the first chess computer with a H8 CPU. Even
 though H8 is much faster than 6502, it plays weaker, probably due to less RAM.
+And/or it could also be due to the programmer(s) being unfamiliar with H8.
 
 Hardware notes:
 - PCB label: ST9A-PE-001
@@ -80,8 +81,6 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_select = 0;
 	u8 m_led_direct = 0;
-
-	void main_map(address_map &map);
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -256,17 +255,6 @@ u8 prisma_state::p7_r()
 
 
 /*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void prisma_state::main_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-}
-
-
-
-/*******************************************************************************
     Input Ports
 *******************************************************************************/
 
@@ -321,7 +309,6 @@ void prisma_state::prisma(machine_config &config)
 {
 	// basic machine hardware
 	H8325(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &prisma_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->nvram_set_default_value(~0);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
@@ -368,7 +355,7 @@ void prisma_state::prisma(machine_config &config)
 *******************************************************************************/
 
 ROM_START( prisma )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
 	ROM_LOAD("90_saitek_86051150st9_3258l02p.u1", 0x0000, 0x8000, CRC(b6f8384f) SHA1(a4e8a4a45009c15bda1778512a87dea756aae6d8) )
 
 	ROM_REGION( 795951, "screen", 0 )
@@ -384,4 +371,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek / Heuristic Software", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

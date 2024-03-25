@@ -8,11 +8,11 @@ TODO:
 - identify proper motherboard/BIOS;
 - hookup vibra16 ISA card in place of sblaster_16;
 - Printer error B0 keeps popping in attract/game select (disable in service mode as workaround);
-- Trackball in place of PS/2 mouse (may run thru a COM? autoexec.bat logs hint that the driver is
-loaded at CD time);
+- Trackball in place of PS/2 mouse (doesn't seem to use serial);
 - CD-ROM reading test is too fast (739% of what is reported as 8X);
 - Tri-Scraper / Super Solitaire / Super 11's: timer doesn't count down (goes only up),
   it does with mouse click, likely bug for wrong input device?
+- Outputs, writes to $301-$305 aren't (comms with a CPU?)
 
 ===================================================================================================
 
@@ -109,7 +109,7 @@ void isa16_przone_jamma_if::remap(int space_id, offs_t start, offs_t end)
 
 	if (space_id == AS_IO)
 	{
-		m_isa->install_device(0x0300, 0x0307, *this, &isa16_przone_jamma_if::io_map);
+		m_isa->install_device(0x0300, 0x030f, *this, &isa16_przone_jamma_if::io_map);
 	}
 }
 

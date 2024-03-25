@@ -32,6 +32,25 @@ offs_t pps41_common_disassembler::increment_pc(offs_t pc)
 
 // common lookup tables
 
+enum pps41_common_disassembler::e_mnemonics : unsigned
+{
+	// MM76/shared
+	mILL /* 0! */,
+	mXAB, mLBA, mLB, mEOB2,
+	mSB, mRB, mSKBF,
+	mXAS, mLSA,
+	mL, mX, mXDSK, mXNSK,
+	mA, mAC, mACSK, mASK, mCOM, mRC, mSC, mSKNC, mLAI, mAISK,
+	mRT, mRTSK, mT, mNOP, mTL, mTM, mTML, mTR,
+	mSKMEA, mSKBEI, mSKAEI,
+	mSOS, mROS, mSKISL, mIBM, mOB, mIAM, mOA, mIOS, mI1, mI2C, mINT1H, mDIN1, mINT0L, mDIN0, mSEG1, mSEG2,
+
+	// MM78 differences
+	mINT0H, mINT1L, mSAG, mEOB3, mTAB,
+	mI1SK, mIX, mOX, mLXA, mXAX, mIOA,
+	mTLB, mTMLB
+};
+
 const char *const pps41_common_disassembler::s_name[] =
 {
 	// MM76

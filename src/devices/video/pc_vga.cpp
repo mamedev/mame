@@ -83,11 +83,9 @@
 #define GRAPHIC_MODE (vga.gc.alpha_dis) /* else text mode */
 
 #define EGA_COLUMNS (vga.crtc.horz_disp_end+1)
-#define EGA_START_ADDRESS (vga.crtc.start_addr)
 #define EGA_LINE_LENGTH (vga.crtc.offset<<1)
 
 #define VGA_COLUMNS (vga.crtc.horz_disp_end+1)
-#define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 #define VGA_CH_WIDTH ((vga.sequencer.data[1]&1)?8:9)
@@ -101,7 +99,6 @@
 // Special values for SVGA Trident - Mode Vesa 110h
 #define TLINES (LINES)
 #define TGA_COLUMNS (EGA_COLUMNS)
-#define TGA_START_ADDRESS (vga.crtc.start_addr<<2)
 #define TGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 
@@ -1356,7 +1353,7 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int pel_shift = (vga.attribute.pel_shift & 7);
 
-	for (int addr=EGA_START_ADDRESS, line=0; line<LINES; line += height, addr += offset())
+	for (int addr = vga.crtc.start_addr, line = 0; line < LINES; line += height, addr += offset())
 	{
 		for (int yi=0;yi<height;yi++)
 		{
@@ -1839,7 +1836,7 @@ void vga_device::mem_linear_w(offs_t offset, uint8_t data)
 /* VBLANK callback, start address definitely updates AT vblank, not before. */
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
-	vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	vga.crtc.start_addr = latch_start_addr();
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
@@ -1896,7 +1893,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  }
 
 	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
-	for (int addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr << start_shift, line=0; line<LINES; line+=height, addr += offset(), curr_addr+=offset())
 	{
 		for (int yi = 0;yi < height; yi++)
 		{
@@ -1932,7 +1929,7 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  uint16_t mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
 	int yi=0;
-	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr << 2, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -1967,7 +1964,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  uint16_t mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
 	int yi=0;
-	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr << 2, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2002,7 +1999,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  uint16_t mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
 	int yi=0;
-	for (int addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr << 3, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2036,7 +2033,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  mask_comp = 0xff | (TLINES & 0x300);
 	int curr_addr = 0;
 	int yi=0;
-	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
+	for (int addr = vga.crtc.start_addr << 2, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;

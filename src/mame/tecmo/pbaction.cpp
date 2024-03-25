@@ -236,8 +236,6 @@ private:
 };
 
 
-// video
-
 template <uint8_t Which>
 void pbaction_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -346,8 +344,6 @@ uint32_t pbaction_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void pbaction_state::sh_command_w(uint8_t data)
 {

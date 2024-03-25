@@ -13,7 +13,6 @@ NVRAM won't save properly.
 
 TODO:
 - dump/add other MCU revisions, SX8 for tmate/conquist is known to exist
-- verify if QFP SX5A has the same ROM contents as DIP SX5A
 - what is t1850's official title? "1850 Deluxe Table Chess" is from the back of
   the computer. The manual can't make up its mind and says "1850 Chess Computer",
   "1850 Chess: 16 Level Program", or "1850 Sensory Chess Game". The box disagrees
@@ -46,6 +45,8 @@ SX5(A) program is used in:
 - SciSys Turbo 16K (12MHz, ST5-PE-023 PCB)
 - Tandy (Radio Shack) 1850 60-2201A (8MHz, ST5A-PE-002 PCB)
 - Mephisto Monaco (H+G brand Express 16K)
+
+SX5A 6301Y0A97F (QFP) has the same ROM contents as 6301Y0A96P.
 
 SX8(A) program is used in:
 - Saitek Team-Mate aka Team-Mate Advanced Trainer (8MHz, ST8B-PE-017 PCB)
@@ -148,6 +149,7 @@ INPUT_CHANGED_MEMBER(turbo16k_state::change_cpu_freq)
 	static const u32 freq[4] = { 4'000'000, 8'000'000, 12'000'000, 16'000'000 };
 	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,4,0)]);
 }
+
 
 // Conquistador
 
@@ -503,10 +505,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys", "Turbo 16K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys", "Companion III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys / Heuristic Software", "Turbo 16K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys / Heuristic Software", "Companion III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1988, conquist, 0,        0,      conquist, conquist, conquist_state, empty_init, "Saitek", "Kasparov Conquistador", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, tmate,    conquist, 0,      tmate,    tmate,    conquist_state, empty_init, "Saitek", "Kasparov Team-Mate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, conquist, 0,        0,      conquist, conquist, conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Conquistador", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, tmate,    conquist, 0,      tmate,    tmate,    conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Team-Mate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1986, t1850,    0,        0,      t1850,    t1850,    turbo16k_state, empty_init, "Tandy Corporation / SciSys", "1850 Deluxe Table Chess (model 60-2199)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, t1850,    0,        0,      t1850,    t1850,    turbo16k_state, empty_init, "Tandy Corporation / SciSys / Heuristic Software", "1850 Deluxe Table Chess (model 60-2199)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

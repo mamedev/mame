@@ -297,8 +297,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -501,8 +499,6 @@ uint32_t stinger_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 
@@ -1556,7 +1552,7 @@ GAME( 1983, finger,   stinger, stinger, stinger2, stinger_state, init_stinger, R
 GAME( 1984, scion,    0,       scion,   scion,    stinger_state, empty_init,   ROT0,   "Seibu Denshi",                         "Scion",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, scionc,   scion,   scion,   scion,    stinger_state, empty_init,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state,     empty_init,   ROT0,   "Seibu Kaihatsu",                       "Kung-Fu Taikun (set 1)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1984, kungfuta, kungfut, kungfuta,kungfut,  wiz_state,     empty_init,   ROT0,   "Seibu Kaihatsu",                       "Kung-Fu Taikun (set 2)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
+GAME( 1984, kungfuta, kungfut, kungfuta,kungfut,  wiz_state,     empty_init,   ROT0,   "Seibu Kaihatsu",                       "Kung-Fu Taikun (set 2)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) // board was a bootleg but set might still be original
 GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state,     empty_init,   ROT270, "Seibu Kaihatsu",                       "Wiz",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state,     empty_init,   ROT270, "Seibu Kaihatsu (Taito license)",       "Wiz (Taito, set 1)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state,     empty_init,   ROT270, "Seibu Kaihatsu (Taito license)",       "Wiz (Taito, set 2)",          MACHINE_SUPPORTS_SAVE )

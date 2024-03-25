@@ -897,6 +897,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_mediagx.h,VIDEOS["PC_VGA_MEDIAGX"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_MEDIAGX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_mediagx.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_mediagx.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_nvidia.h,VIDEOS["PC_VGA_NVIDIA"] = true
 --------------------------------------------------
 

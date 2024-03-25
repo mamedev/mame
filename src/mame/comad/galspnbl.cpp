@@ -122,8 +122,6 @@ private:
 };
 
 
-// video
-
 
 void galspnbl_state::palette(palette_device &palette) const
 {
@@ -215,8 +213,6 @@ uint32_t galspnbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void galspnbl_state::soundcommand_w(offs_t offset, uint8_t data)
 {

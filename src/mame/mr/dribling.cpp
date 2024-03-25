@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Aaron Giles
-
+// copyright-holders: Aaron Giles, Enzo Lombardi
 /***************************************************************************
 
     Model Racing Dribbling hardware
@@ -12,7 +11,6 @@
         * Dribbling
 
     TODO:
-    * Audio (discrete components, schematics available)
     * Implement the 2 banks of 8 dips which determine coinage for the 2 players
     * Actual game duration doesn't match the time reported in the manual
 
@@ -36,12 +34,16 @@
 
 #include "emu.h"
 
+#include "nl_dribling.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/netlist.h"
 #include "machine/watchdog.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 // configurable logging
@@ -72,7 +74,18 @@ public:
 		m_colorram(*this, "colorram"),
 		m_mux(*this, "MUX%u", 0),
 		m_proms(*this, "proms"),
-		m_gfxroms(*this, "gfx")
+		m_gfxroms(*this, "gfx"),
+		m_i_pb(*this, "snd_nl:pb%u", 0U),
+		m_i_folla_b(*this, "snd_nl:folla_b"),
+		m_i_folla_m(*this, "snd_nl:folla_m"),
+		m_i_folla_a(*this, "snd_nl:folla_a"),
+		m_i_calcio_b(*this, "snd_nl:calcio_b"),
+		m_i_fischio(*this, "snd_nl:fischio"),
+		m_i_calcio_a(*this, "snd_nl:calcio_a"),
+		m_i_contrasto(*this, "snd_nl:contrasto"),
+		m_i_stop_palla(*this, "snd_nl:stop_palla"),
+		m_i_parata(*this, "snd_nl:parata"),
+		m_i_enable(*this, "snd_nl:enable")
 	{ }
 
 	void dribling(machine_config &config);
@@ -93,6 +106,19 @@ private:
 	required_ioport_array<3> m_mux;
 	required_region_ptr<uint8_t> m_proms;
 	required_region_ptr<uint8_t> m_gfxroms;
+
+	// sound
+	required_device_array<netlist_mame_logic_input_device, 8>    m_i_pb;
+	required_device<netlist_mame_logic_input_device>    m_i_folla_b;
+	required_device<netlist_mame_logic_input_device>    m_i_folla_m;
+	required_device<netlist_mame_logic_input_device>    m_i_folla_a;
+	required_device<netlist_mame_logic_input_device>    m_i_calcio_b;
+	required_device<netlist_mame_logic_input_device>    m_i_fischio;
+	required_device<netlist_mame_logic_input_device>    m_i_calcio_a;
+	required_device<netlist_mame_logic_input_device>    m_i_contrasto;
+	required_device<netlist_mame_logic_input_device>    m_i_stop_palla;
+	required_device<netlist_mame_logic_input_device>    m_i_parata;
+	required_device<netlist_mame_logic_input_device>    m_i_enable;
 
 	// misc
 	uint8_t m_abca = 0U;
@@ -118,8 +144,6 @@ private:
 	void io_map(address_map &map);
 };
 
-
-// video
 
 /*************************************
  *
@@ -193,7 +217,6 @@ uint32_t dribling_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
 
 /*************************************
  *
@@ -244,45 +267,68 @@ uint8_t dribling_state::input_mux0_r()
 
 void dribling_state::misc_w(uint8_t data)
 {
+	LOGMISC("%s:misc_w(%02X)\n", machine().describe_context(), data);
+
 	// bit 7 = di
-	m_di = (data >> 7) & 1;
+	m_di = BIT(data, 7);
 	if (!m_di)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	// bit 6 = parata (save by goalkeeper)
+	m_i_parata->write_line(BIT(data, 6));
 
 	// bit 5 = ab. campo (field enable)
-	m_abca = (data >> 5) & 1;
+	m_abca = BIT(data, 5);
 
 	// bit 4 = ab. a.b.f.
-	// bit 3 = n/c
+	m_i_enable->write_line(BIT(data, 4));
 
+	// bit 3 = n/c
 	// bit 2 = (9) = PC2
 	// bit 1 = (10) = PC1
 	// bit 0 = (32) = PC0
 	m_input_mux = data & 7;
-	LOGMISC("%s:misc_w(%02X)\n", machine().describe_context(), data);
 }
 
 
 void dribling_state::sound_w(uint8_t data)
 {
-	// bit 7 = stop palla (ball stop)
-	// bit 6 = contrasto (tackle)
-	// bit 5 = calcio a (kick a)
-	// bit 4 = fischio (whistle)
-	// bit 3 = calcio b (kick b)
-	// bit 2 = folla a (crowd a)
-	// bit 1 = folla m (crowd m)
-	// bit 0 = folla b (crowd b)
 	LOGSOUND("%s:sound_w(%02X)\n", machine().describe_context(), data);
+
+	// bit 7 = stop palla (ball stop)
+	m_i_stop_palla->write_line(BIT(data, 7));
+
+	// bit 6 = contrasto (tackle)
+	m_i_contrasto->write_line(BIT(data, 6));
+
+	// bit 5 = calcio a (kick a)
+	m_i_calcio_a->write_line(BIT(data, 5));
+
+	// bit 4 = fischio (whistle)
+	m_i_fischio->write_line(BIT(data, 4));
+
+	// bit 3 = calcio b (kick b)
+	m_i_calcio_b->write_line(BIT(data, 3));
+
+	// bit 2 = folla a (crowd a)
+	m_i_folla_a->write_line(BIT(data, 2));
+
+	// bit 1 = folla m (crowd m)
+	m_i_folla_m->write_line(BIT(data, 1));
+
+	// bit 0 = folla b (crowd b)
+	m_i_folla_b->write_line(BIT(data, 0));
 }
 
 
 void dribling_state::pb_w(uint8_t data)
 {
-	// write PB0-7
 	LOGPB("%s:pb_w(%02X)\n", machine().describe_context(), data);
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_i_pb[i]->write_line(BIT(data, i));
+	}
 }
 
 
@@ -457,8 +503,32 @@ void dribling_state::dribling(machine_config &config)
 	PALETTE(config, "palette", FUNC(dribling_state::palette), 256);
 
 	// sound hardware
-}
+	SPEAKER(config, "mono").front_center();
 
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(NETLIST_NAME(dribling))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, m_i_pb[0],      "I_PB0.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb[1],      "I_PB1.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb[2],      "I_PB2.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb[3],      "I_PB3.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb[4],      "I_PB4.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb[5],      "I_PB5.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb[6],      "I_PB6.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_pb[7],      "I_PB7.IN",        0);
+	NETLIST_LOGIC_INPUT(config, m_i_folla_b,    "I_FOLLA_B.IN",    0);
+	NETLIST_LOGIC_INPUT(config, m_i_folla_m,    "I_FOLLA_M.IN",    0);
+	NETLIST_LOGIC_INPUT(config, m_i_folla_a,    "I_FOLLA_A.IN",    0);
+	NETLIST_LOGIC_INPUT(config, m_i_calcio_a,   "I_CALCIO_A.IN",   0);
+	NETLIST_LOGIC_INPUT(config, m_i_fischio,    "I_FISCHIO.IN",    0);
+	NETLIST_LOGIC_INPUT(config, m_i_calcio_b,   "I_CALCIO_B.IN",   0);
+	NETLIST_LOGIC_INPUT(config, m_i_contrasto,  "I_CONTRASTO.IN",  0);
+	NETLIST_LOGIC_INPUT(config, m_i_stop_palla, "I_STOP_PALLA.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_i_parata,     "I_PARATA.IN",     0);
+	NETLIST_LOGIC_INPUT(config, m_i_enable,     "ENABLE_SOUND.IN", 0);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0);
+}
 
 
 /*************************************
@@ -528,7 +598,26 @@ ROM_START( driblingo )
 	ROM_LOAD( "tbp24s10.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
 ROM_END
 
-ROM_START( driblingbr )
+// Original Model Racing PCB (EF00284)
+ROM_START( driblingam )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2532.5p",   0x0000, 0x1000, CRC(35d97f4f) SHA1(c82b1d2a91e25cf3e3f049e0127d300572f0f54c) )
+	ROM_LOAD( "2532.5n",   0x1000, 0x1000, CRC(bd0f223a) SHA1(f9fbc5670a8723c091d61012e545774d315eb18f) )
+	ROM_LOAD( "2532.5l",   0x4000, 0x1000, CRC(1fccfc85) SHA1(c0365ad54144414218f52209173b858b927c9626) )
+	ROM_LOAD( "2532.5k",   0x5000, 0x1000, CRC(737628c4) SHA1(301fda413388c26da5b5150aec2cefc971801749) )
+	ROM_LOAD( "2532.5h",   0x6000, 0x1000, CRC(f1d6925e) SHA1(858fd13aad2c684a73b7458f18a759923b1defae) )
+
+	ROM_REGION( 0x2000, "gfx", 0 )
+	ROM_LOAD( "2532.3p",   0x0000, 0x1000, CRC(208971b8) SHA1(f91f3ea04d75beb58a61c844472b4dba53d84c0f) )
+	ROM_LOAD( "2532.3n",   0x1000, 0x1000, CRC(356c9803) SHA1(8e2ce52f32b33886f4747dadf3aeb78148538173) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "74s476.3c", 0x0000, 0x0400, CRC(b045d005) SHA1(7e3ac10a99aa37f6348b3a57a747116b7025103e) )
+	ROM_LOAD( "93427.3e",  0x0400, 0x0100, CRC(8f1a9908) SHA1(12c513c589757f1282e9979d3589f9b49d30ec0f) )
+	ROM_LOAD( "93427.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
+ROM_END
+
+ROM_START( driblingvm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",  0x0000, 0x1000, CRC(35d97f4f) SHA1(c82b1d2a91e25cf3e3f049e0127d300572f0f54c) )
 	ROM_LOAD( "2",  0x1000, 0x1000, CRC(bd0f223a) SHA1(f9fbc5670a8723c091d61012e545774d315eb18f) )
@@ -555,7 +644,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                   "Dribbling (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblinga,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                   "Dribbling (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblingbr, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "bootleg (Videomac)",             "Dribbling (bootleg, Brazil)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblinga,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 2)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Olympia license)",  "Dribbling (Olympia)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblingam, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Automave license)", "Dribbling (Automave)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingvm, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "bootleg (Videomac)",              "Dribbling (Videomac bootleg, Brazil)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

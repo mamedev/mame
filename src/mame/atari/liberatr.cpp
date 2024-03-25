@@ -272,8 +272,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
    Liberator's screen is 256 pixels by 256 pixels.  The
@@ -541,8 +539,6 @@ uint32_t liberatr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-// machine
 
 void liberatr_state::machine_start()
 {

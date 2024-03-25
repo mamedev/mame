@@ -145,7 +145,7 @@ void mpu401_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(mpu401_device::serial_tick)
 {
-	m_ourcpu->m6801_clock_serial();
+	m_ourcpu->clock_serial();
 }
 
 uint8_t mpu401_device::port1_r()

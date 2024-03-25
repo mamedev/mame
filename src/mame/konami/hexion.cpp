@@ -183,8 +183,6 @@ private:
 };
 
 
-// video
-
 
 /***************************************************************************
 
@@ -350,8 +348,6 @@ uint32_t hexion_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
-
-// machine
 
 
 void hexion_state::coincntr_w(uint8_t data)

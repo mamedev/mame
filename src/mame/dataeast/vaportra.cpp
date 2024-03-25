@@ -95,8 +95,6 @@ private:
 };
 
 
-// video
-
 /****************************************************************************
 
     2 Data East 55 chips for playfields (same as Dark Seal, etc)
@@ -192,8 +190,6 @@ uint32_t vaportra_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /******************************************************************************/
 

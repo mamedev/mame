@@ -271,19 +271,18 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 				m_tcnt = (tt - 0x10000) % m_counter_cycle;
 			else
 				m_tcnt = tt;
-		}
-		else
+		} else
 			m_tcnt = tt % m_counter_cycle;
 
 		for(int i = 0; i < m_tgr_count; i++) {
-			bool match = m_tcnt == m_tgr[i] || (tt == m_tgr[i] && tt == m_counter_cycle);
+			u16 cmp = m_tgr[i] + 1;
+			bool match = m_tcnt == cmp || (tt == cmp && tt == m_counter_cycle);
 			if(!match) {
-				// Need to do additional checks here for software that polls the flags with interrupts disabled,
-				// since recalc_event only schedules IRQ events.
+				// Need to do additional checks here for software that polls the flags with interrupts disabled, since recalc_event only schedules IRQ events.
 				if(prev >= m_counter_cycle)
-					match = (m_tgr[i] > prev && tt >= m_tgr[i]) || (m_tgr[i] <= m_counter_cycle && m_tcnt < m_counter_cycle && (delta - (0x10000 - prev)) >= m_tgr[i]);
-				else if(m_tgr[i] <= m_counter_cycle)
-					match = delta >= m_counter_cycle || (prev < m_tgr[i] && tt >= m_tgr[i]) || (m_tcnt <= prev && m_tcnt >= m_tgr[i]);
+					match = (cmp > prev && tt >= cmp) || (cmp <= m_counter_cycle && m_tcnt < m_counter_cycle && (delta - (0x10000 - prev)) >= cmp);
+				else if(cmp <= m_counter_cycle)
+					match = delta >= m_counter_cycle || (prev < cmp && tt >= cmp) || (m_tcnt <= prev && m_tcnt >= cmp);
 
 				if(match && BIT(m_ier, i) && m_interrupt[i] != -1)
 					logerror("update_counter unexpected TGR %d IRQ\n, i");
@@ -329,8 +328,8 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 
 	if(m_counter_incrementing) {
 		u32 event_delay = 0xffffffff;
-		if(m_tgr_clearing >= 0 && m_tgr[m_tgr_clearing])
-			m_counter_cycle = m_tgr[m_tgr_clearing];
+		if(m_tgr_clearing >= 0)
+			m_counter_cycle = m_tgr[m_tgr_clearing] + 1;
 		else
 			m_counter_cycle = 0x10000;
 		if((m_ier & IRQ_V && m_interrupt[4] != -1) && (m_counter_cycle == 0x10000 || m_tcnt >= m_counter_cycle))
@@ -339,14 +338,15 @@ void h8_timer16_channel_device::recalc_event(u64 cur_time)
 		for(int i = 0; i < m_tgr_count; i++)
 			if(BIT(m_ier, i) && m_interrupt[i] != -1) {
 				u32 new_delay = 0xffffffff;
-				if(m_tgr[i] > m_tcnt) {
-					if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
-						new_delay = m_tgr[i] - m_tcnt;
-				} else if(m_tgr[i] <= m_counter_cycle) {
+				u16 cmp = m_tgr[i] + 1;
+				if(cmp > m_tcnt) {
+					if(m_tcnt >= m_counter_cycle || cmp <= m_counter_cycle)
+						new_delay = cmp - m_tcnt;
+				} else if(cmp <= m_counter_cycle) {
 					if(m_tcnt < m_counter_cycle)
-						new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
+						new_delay = (m_counter_cycle - m_tcnt) + cmp;
 					else
-						new_delay = (0x10000 - m_tcnt) + m_tgr[i];
+						new_delay = (0x10000 - m_tcnt) + cmp;
 				}
 
 				if(event_delay > new_delay)

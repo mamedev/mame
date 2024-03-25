@@ -9,6 +9,8 @@
     TODO:
     - use logmacro and be quiet by default, same for H8 peripherals that
       currently have "static constexpr int V"
+    - Verify H8H opcode map, some opcodes currently for H8H are H8S-only.
+      Base H8/300 (eg. H8/325) opcode map is correct.
     - NVRAM won't work properly when it goes into SSBY (software standby
       mode) and the power button triggers an IRQ to wake up instead of RES.
       Obviously, MAME always starts at reset-phase at power-on, so it's more
@@ -38,7 +40,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_standby_cb(*this),
 	m_PPC(0), m_NPC(0), m_PC(0), m_PIR(0), m_EXR(0), m_CCR(0), m_MAC(0), m_MACF(0),
 	m_TMP1(0), m_TMP2(0), m_TMPR(0), m_inst_state(0), m_inst_substate(0), m_icount(0), m_bcount(0),
-	m_irq_vector(0), m_taken_irq_vector(0), m_irq_level(0), m_taken_irq_level(0), m_irq_required(false), m_irq_nmi(false),
+	m_irq_vector(0), m_taken_irq_vector(0), m_irq_level(0), m_taken_irq_level(0), m_irq_nmi(false),
 	m_standby_pending(false), m_standby_time(0), m_nvram_defval(0), m_nvram_battery(true)
 {
 	m_supports_advanced = false;
@@ -46,7 +48,6 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_mode_a20 = false;
 	m_has_exr = false;
 	m_has_mac = false;
-	m_mac_saturating = false;
 	m_has_trace = false;
 	m_has_hc = true;
 	nvram_enable_backup(false); // disable nvram by default
@@ -145,7 +146,9 @@ void h8_device::device_start()
 		state_add(H8_R7,           "ER7",       m_TMPR).callimport().callexport().formatstr("%9s");
 	}
 
+	save_item(NAME(m_current_dma));
 	save_item(NAME(m_cycles_base));
+
 	save_item(NAME(m_PPC));
 	save_item(NAME(m_NPC));
 	save_item(NAME(m_PC));
@@ -154,16 +157,22 @@ void h8_device::device_start()
 	save_item(NAME(m_R));
 	save_item(NAME(m_EXR));
 	save_item(NAME(m_CCR));
+	save_item(NAME(m_MAC));
+	save_item(NAME(m_MACF));
 	save_item(NAME(m_TMP1));
 	save_item(NAME(m_TMP2));
+	save_item(NAME(m_TMPR));
+
 	save_item(NAME(m_inst_state));
 	save_item(NAME(m_inst_substate));
+	save_item(NAME(m_requested_state));
+	save_item(NAME(m_bcount));
+	save_item(NAME(m_count_before_instruction_step));
 	save_item(NAME(m_irq_vector));
 	save_item(NAME(m_taken_irq_vector));
 	save_item(NAME(m_irq_level));
 	save_item(NAME(m_taken_irq_level));
 	save_item(NAME(m_irq_nmi));
-	save_item(NAME(m_current_dma));
 	save_item(NAME(m_standby_pending));
 	save_item(NAME(m_standby_time));
 	save_item(NAME(m_nvram_battery));

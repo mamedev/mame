@@ -264,4 +264,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, cexpert, 0,      0,      cexpert, cexpert, cexpert_state, empty_init, "Novag", "Constellation Expert", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, cexpert, 0,      0,      cexpert, cexpert, cexpert_state, empty_init, "Novag Industries", "Constellation Expert", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

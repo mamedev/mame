@@ -10254,6 +10254,26 @@ ROM_START( galaxbsf2 )
 	ROM_LOAD( "6l.bpr",            0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( galaxiamv )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "1-2708.bin",     0x0000, 0x0400, CRC(7fa16c70) SHA1(4dcfe25deb822a4de5014e2c1e013405efde4612) )
+	ROM_LOAD( "2-2708.bin",     0x0400, 0x0400, CRC(afec8adb) SHA1(ca97a6919452958c8f33181e0be3f9c6f1bdf7ab) )
+	ROM_LOAD( "3-2708.bin",     0x0800, 0x0400, CRC(770988b5) SHA1(c347d5725d9eb089464022a4528a3fef86a1284f) )
+	ROM_LOAD( "4-2708.bin",     0x0c00, 0x0400, CRC(de7e7770) SHA1(b06043a1d898eb323ddabffd3d2a3b1f63df0e5e) )
+	ROM_LOAD( "5-2708.bin",     0x1000, 0x0400, CRC(a916c919) SHA1(b3e264ff92687022a0f2f551d5df36db848b48eb) )
+	ROM_LOAD( "6-2708.bin",     0x1400, 0x0400, CRC(9175882b) SHA1(d9943efcb9245af7f01aecc533a699bdefc7d283) )
+	ROM_LOAD( "7-2708.bin",     0x1800, 0x0400, CRC(6a57f9e8) SHA1(7970d059679384833083a99ea7f59d14417eccc3) )
+	ROM_LOAD( "8-2708.bin",     0x1c00, 0x0400, CRC(8eeb4c6f) SHA1(77140ea63677356624d12c399ea89f552a27bff1) )
+	ROM_LOAD( "9-2708.bin",     0x2000, 0x0400, CRC(de598114) SHA1(b74d1ce826274296ecb7cb8a327ea51f560521b9) )
+	ROM_LOAD( "10-2708.bin",    0x2400, 0x0400, CRC(9ec63321) SHA1(ee7c398529ad31ccf4b215ef923b8ff083ea47bf) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "11-tms2516.bin", 0x0000, 0x0800, CRC(977e37cf) SHA1(88ff1e4edadf5cfc83413a1fe999aecf4ba72232) )
+	ROM_LOAD( "12-tms2516.bin", 0x0800, 0x0800, CRC(d0ba22c9) SHA1(678b22d10e1ae7dcea068da838bf6bd648e9ee28) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.bin",    0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+ROM_END
 
 ROM_START( galaxianbl ) // looks to be a fairly plain set with modified bonus lives etc.
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -12825,7 +12845,7 @@ ROM_START( ckongis )
 	ROM_REGION( 0x0020, "proms", 0 ) // wasn't in the dump
 	ROM_LOAD( "6l.bin",     0x0000, 0x0020, CRC(fd81e715) SHA1(eadafe88f26405e6540d4b248b940974e8c31145) )
 
-	ROM_REGION( 0x0020, "proms2", 0 ) // NOT the colour prom?
+	ROM_REGION( 0x0020, "proms2", 0 ) // NOT the colour PROM?
 	ROM_LOAD( "dkp.bin",     0x0000, 0x0020, CRC(97c473cc) SHA1(1bbb7f17b8d6a3a621e8c22d473eb26d4c1a750b) )
 ROM_END
 
@@ -12847,7 +12867,7 @@ ROM_START( bagmanmc )
 	ROM_COPY("gfx1",0x3800,0x2800,0x0800)
 	ROM_COPY("gfx1",0x1800,0x0800,0x0800)
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard moon cresta prom works
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard Moon Cresta PROM works
 	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
@@ -12865,6 +12885,33 @@ ROM_START( bagmanm2 )
 	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+// Found on a Moon Cresta PCB made by CIRSA
+ROM_START( bagmanm3 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "1-2-tms2564.bin",       0x0000, 0x2000, CRC(90e5ae76) SHA1(d572eee43476c689d0d958ac23e2277a2ce077cb) )
+	ROM_LOAD( "3-4-tms2564.bin",       0x2000, 0x2000, CRC(f68fc60d) SHA1(c10aef39cf33c87974fefd347185ea7342470022) )
+	ROM_LOAD( "5a.bin",                0x4000, 0x0800, CRC(99992ffb) SHA1(33e34143bc515e645030fd3cf6e926225c1e6e00) )
+	ROM_LOAD( "5b.bin",                0x4800, 0x0800, CRC(838c1462) SHA1(e430b185c51b7b50fcf8ec1f56d46db21d4b1eb5) )
+	ROM_LOAD( "5c.bin",                0x5000, 0x0800, CRC(df4139fe) SHA1(840d3f15a667679ed7ba031fc8d0b0efee5bc382) )
+	ROM_LOAD( "5d.bin",                0x5800, 0x0800, CRC(d07a1fcb) SHA1(1cd4150eda53d164dacc0c6e9eb7bd30f646bd00) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "bottom-tms2532.bin",    0x0000, 0x0800, CRC(c26409b5) SHA1(7d6a309f26ad6cd8790f6a4b383a00c2a06bbe05) )
+	ROM_IGNORE( 0x800 ) // Second half unused
+	ROM_LOAD( "top-tms2532.bin",       0x1000, 0x1000, CRC(a2790089) SHA1(7eb8634f26f6af52fb79bf90ec90b4e258c7c79f) )
+	ROM_LOAD( "c3-bottom-tms2532.bin", 0x2000, 0x0800, CRC(4fdd460f) SHA1(b3d69676be9cd60b201a1c0573eaa3d7121a68b9) )
+	ROM_IGNORE( 0x800 ) // Second half unused
+	ROM_LOAD( "c3-top-tms2532.bin",    0x3000, 0x1000, CRC(b63cfae4) SHA1(3e0cb3dbeec8ad790bc482176ca599721bac31ee) )
+
+	ROM_COPY( "gfx1", 0x3800, 0x2800, 0x0800 )
+	ROM_COPY( "gfx1", 0x1800, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin",            0x0000, 0x0020, CRC(9fe412ff) SHA1(eea54dbf60f3661f24da732c4a479d552734a592) )
+
+	ROM_REGION( 0x0020, "proms2", 0 ) // Extra PROM attached to a 74157
+	ROM_LOAD( "82s123-74157.bin",      0x0000, 0x0020, CRC(66bb08a3) SHA1(f02700b651c3f840ad00844bb716d334f1f36637) )
+ROM_END
 
 ROM_START( mooncmw )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -16253,6 +16300,7 @@ GAME( 1979, starfght,    galaxian, galaxian,   swarm,      galaxian_state, init_
 GAME( 1979, galaxbsf,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 1)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl,  galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 2)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf2,   galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 3)",                                                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiamv,   galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Multivideo)",                       "Diviertate Galaxia (Multivideo, Spanish bootleg of Galaxian)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl2, galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 4)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl3, galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (Spanish bootleg)",                                                                   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // unique color PROM that gives strange colors. Unfortunately PCB doesn't work so it cannot be verified
 GAME( 1980, galaxianem,  galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Electromar)",                       "Galaxian (Electromar Spanish bootleg)",                                                        MACHINE_SUPPORTS_SAVE )
@@ -16441,10 +16489,12 @@ GAME( 1982, ckongis,     ckong,    ckongg,     ckonggx,    galaxian_state, init_
 GAME( 1981, bigkonggx,   ckong,    bigkonggx,  ckongg,     galaxian_state, init_bigkonggx,  ROT90,  "bootleg",       "Big Kong (bootleg of Crazy Kong on Galaxian hardware)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg",       "Bagman (bootleg on Moon Cresta hardware, set 1)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bagmanm2,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmanm3,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg",       "Bagman (bootleg on Moon Cresta hardware, set 3)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
 
 // Other games on basic mooncrst hardware
 GAME( 1982, porter,      dockman,  porter,     porter,     pisces_state,   init_pisces,     ROT90,  "bootleg",                  "Port Man (bootleg on Moon Cresta hardware)",                      MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1982, portera,     dockman,  porter,     portera,    pisces_state,   init_pisces,     ROT90,  "bootleg",                  "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1982, portera,     dockman,  porter,     portera,    pisces_state,   init_pisces,     ROT90,  "bootleg",                  "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL ) // May be Portuguese, not Spanish
 GAME( 1982, skybase,     0,        skybase,    skybase,    pisces_state,   init_pisces,     ROT90,  "Omori Electric Co., Ltd.", "Sky Base",                                                        MACHINE_SUPPORTS_SAVE )
 GAME( 198?, kong,        0,        kong,       kong,       galaxian_state, init_kong,       ROT90,  "Taito do Brasil",          "Kong (Donkey Kong conversion on Galaxian hardware)",              MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 

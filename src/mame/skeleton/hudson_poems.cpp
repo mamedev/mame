@@ -946,7 +946,7 @@ CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_po
 // waits for 2c008f00 to become 0 (missing irq?) happens before it gets to the DMA transfers
 CONS( 2004, poemgolf,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Soukai Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 // waits for 2c005d00 to become 0 (missing irq?) happens before it gets to the DMA transfers
-CONS( 2004, poembase,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Nekketsu Powerpro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2004, poembase,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Nekketsu Pawapuro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 2004, poemzet,      0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan - Mini Game de Taiketsu ja!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 

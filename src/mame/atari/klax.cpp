@@ -116,8 +116,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -221,8 +219,6 @@ u32 klax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

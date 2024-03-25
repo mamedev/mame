@@ -98,8 +98,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K052109
@@ -172,8 +170,6 @@ uint32_t bottom9_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 uint8_t bottom9_state::k052109_051960_r(offs_t offset)
 {

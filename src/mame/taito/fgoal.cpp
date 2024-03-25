@@ -109,8 +109,6 @@ private:
 };
 
 
-// video
-
 void fgoal_state::color_w(uint8_t data)
 {
 	m_current_color = data & 3;
@@ -220,8 +218,6 @@ uint32_t fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 int fgoal_state::intensity(int bits)
 {

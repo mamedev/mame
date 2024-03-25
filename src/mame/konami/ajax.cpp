@@ -120,8 +120,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K052109
@@ -207,8 +205,6 @@ uint32_t ajax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 /*  main_bankswitch_w:
     Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at H11:

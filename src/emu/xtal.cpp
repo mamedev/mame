@@ -228,6 +228,7 @@ const double XTAL::known_xtals[] = {
 	 13'495'200, /* 13.4952_MHz_XTAL       Used on Shadow Force pcb and maybe other Technos pcbs? */
 	 13'500'000, /* 13.5_MHz_XTAL          Microbee */
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
+	 13'560'000, /* 13.560_MHz_XTAL        Tong Zi Maque */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
 	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
 	 13'977'600, /* 13.9776_MHz_XTAL       Kaypro II dot clock */
@@ -280,6 +281,7 @@ const double XTAL::known_xtals[] = {
 	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
 	 16'588'800, /* 16.5888_MHz_XTAL       SM 7238 */
 	 16'666'600, /* 16.6666_MHz_XTAL       Firebeat GCU */
+	 16'667'000, /* 16.667_MHz_XTAL        Visual XDS-19P */
 	 16'669'800, /* 16.6698_MHz_XTAL       Qume QVT-102 */
 	 16'670'000, /* 16.67_MHz_XTAL         - */
 	 16'777'216, /* 16.777216_MHz_XTAL     Nintendo Game Boy Advance */
@@ -287,6 +289,7 @@ const double XTAL::known_xtals[] = {
 	 17'010'000, /* 17.01_MHz_XTAL         Epic 14E */
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
 	 17'074'800, /* 17.0748_MHz_XTAL       SWTPC 8212 */
+	 17'320'000, /* 17.320_MHz_XTAL        Visual 50 */
 	 17'350'000, /* 17.35_MHz_XTAL         ITT Courier 1700 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
 	 17'430'000, /* 17.43_MHz_XTAL         Videx Videoterm */

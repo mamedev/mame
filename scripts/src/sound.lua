@@ -1561,6 +1561,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/sound/swx00.h,SOUNDS["SWX00"] = true
+---------------------------------------------------
+
+if (SOUNDS["SWX00"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/swx00.cpp",
+		MAME_DIR .. "src/devices/sound/swx00.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/sound/meg.h,SOUNDS["MEG"] = true
 ---------------------------------------------------
 
@@ -1700,5 +1712,17 @@ if (SOUNDS["AP2010"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ap2010pcm.cpp",
 		MAME_DIR .. "src/devices/sound/ap2010pcm.h",
+	}
+end
+
+---------------------------------------------------
+-- Texas Instruments CF61909
+--@src/devices/sound/cf61909.h,SOUNDS["CF61909"] = true
+---------------------------------------------------
+
+if (SOUNDS["CF61909"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/cf61909.cpp",
+		MAME_DIR .. "src/devices/sound/cf61909.h",
 	}
 end

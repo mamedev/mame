@@ -124,8 +124,6 @@ private:
 };
 
 
-// video
-
 void crospang_state::tilebank_select_w(u16 data)
 {
 	LOGTILEBANK("tilebank_select_w %04x\n", data);
@@ -251,8 +249,6 @@ u32 crospang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 // main COU
 

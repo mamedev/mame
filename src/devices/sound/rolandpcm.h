@@ -46,6 +46,7 @@ private:
 		uint32_t start = 0;     // start address (18.14 fixed point)
 		uint16_t end = 0;       // end offset (high word)
 		uint16_t loop = 0;      // loop offset (high word)
+
 		// work variables
 		bool enable = false;
 		int8_t play_dir = 0;    // playing direction, -1 [backwards] / 0 [stopped] / +1 [forwards]

@@ -64,7 +64,7 @@ private:
 	required_device<hd6301x0_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	emu_timer *m_standbytimer;
@@ -232,4 +232,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, accord, 0,      0,      accord,  accord, accord_state, empty_init, "Novag", "Accord", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, accord, 0,      0,      accord,  accord, accord_state, empty_init, "Novag Industries", "Accord", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

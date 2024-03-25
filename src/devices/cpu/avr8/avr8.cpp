@@ -566,6 +566,9 @@ void avr8_device<NumTimers>::base_internal_map(address_map &map)
 	map(0x003f, 0x003f).w(FUNC(avr8_device::eecr_w));
 	map(0x0043, 0x0043).w(FUNC(avr8_device::gtccr_w));
 	map(0x0044, 0x0044).w(FUNC(avr8_device::tccr0a_w));
+	map(0x0045, 0x0045).w(FUNC(avr8_device::tccr0b_w));
+	map(0x0047, 0x0047).w(FUNC(avr8_device::ocr0a_w));
+	map(0x0048, 0x0048).w(FUNC(avr8_device::ocr0b_w));
 	map(0x004a, 0x004a).w(FUNC(avr8_device::gpior1_w));
 	map(0x004b, 0x004b).w(FUNC(avr8_device::gpior2_w));
 	map(0x004c, 0x004c).w(FUNC(avr8_device::spcr_w));

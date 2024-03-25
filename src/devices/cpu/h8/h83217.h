@@ -61,7 +61,7 @@ public:
 	u8 mdcr_r();
 
 protected:
-	h83217_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
+	h83217_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size);
 
 	required_device<h8_intc_device> m_intc;
 	required_device_array<h8_port_device, 7> m_port;
@@ -72,7 +72,8 @@ protected:
 
 	memory_view m_ram_view;
 
-	u32 m_ram_start;
+	u32 m_rom_size;
+	u32 m_ram_size;
 	u8 m_md;
 	u8 m_stcr;
 	u8 m_syscr;

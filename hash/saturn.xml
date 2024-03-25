@@ -547,8 +547,8 @@ license:CC0-1.0
 	  Jantei: Battle Cos-Player (Japan) [T-34601G]                                          | (jantbcp)
 	  Japan Super Bass Classic '96 (Japan) [T-18707G]                                       | (jsbc96)
 	  Jikkyou Oshaberi Parodius: Forever with Me (Japan) [T-9513G]                          | (jikkparo)
-	  Jikkyou Powerful Pro Yakyuu '95 Kaimakuban (Japan) [T-9502G]                          | (powyak95)
-	  Jikkyou Powerful Pro Yakyuu S (Japan) [T-9523G]                                       | (powyaks)
+	  Jikkyou Pawafuru Puro Yakyū '95 Kaimaku-ban (Japan) [T-9502G]                         | (powyak95)
+	  Jikkyou Pawafuru Puro Yakyū S (Japan) [T-9523G]                                       | (powyaks)
 	  Jikuu Tantei DD: Dracula Detective: Maboroshi no Lorelei (Japan) [T-2103G]            | (jikudrac)
 	  Jinzou Ningen Hakaider: Last Judgement (Japan) [GS-9088]                              | (lastjudg)
 	  Jissen Mahjong (Japan) [T-15002G]                                                     | (jissenmj)
@@ -18401,12 +18401,13 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Jikkyou Pawerful Puroyakyu '95 (J) (T-9502G)... -->
 	<software name="powyak95" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu '95 - Kaimaku-ban (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū '95 Kaimaku-ban (Japan)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9502G (VS001-J1)"/>
 		<info name="release" value="19950728"/>
 		<info name="alt_title" value="実況パワフルプロ野球'95 開幕版"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu '95 Kaimaku-ban"/> <!-- often used unofficially -->
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -27111,12 +27112,13 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Jikkyou Powerful Pro Yakyuu S T-9523G... -->
 	<software name="powyaks" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu S (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū S (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9523G (VS050-J1)"/>
 		<info name="release" value="19971204"/>
 		<info name="alt_title" value="実況パワフルプロ野球S"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu S"/> <!-- often used unofficially -->
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">

@@ -334,7 +334,7 @@ void yamaha_dx100_state::palette_init(palette_device &palette)
 void yamaha_dx100_state::p22_w(int state)
 {
 	if (state)
-		m_maincpu->m6801_clock_serial();
+		m_maincpu->clock_serial();
 }
 
 void yamaha_dx100_state::mem_map(address_map &map)

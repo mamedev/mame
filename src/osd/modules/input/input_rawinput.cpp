@@ -608,7 +608,7 @@ private:
 
 
 //============================================================
-//  rawinput_module - base class for rawinput modules
+//  rawinput_module - base class for RawInput modules
 //============================================================
 
 class rawinput_module : public wininput_module<rawinput_device>
@@ -726,9 +726,9 @@ protected:
 			{
 				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
 
-				BYTE small_buffer[4096];
+				union { RAWINPUT r; BYTE b[4096]; } small_buffer;
 				std::unique_ptr<BYTE []> larger_buffer;
-				LPBYTE data = small_buffer;
+				LPVOID data = &small_buffer;
 				UINT size;
 
 				// determine the size of data buffer we need
@@ -738,7 +738,7 @@ protected:
 				// if necessary, allocate a temporary buffer and fetch the data
 				if (size > sizeof(small_buffer))
 				{
-					larger_buffer.reset(new (std::nothrow) BYTE [size]);
+					larger_buffer.reset(new (std::align_val_t(alignof(RAWINPUT)), std::nothrow) BYTE [size]);
 					data = larger_buffer.get();
 					if (!data)
 						return false;
@@ -843,7 +843,7 @@ protected:
 
 
 //============================================================
-//  keyboard_input_rawinput - rawinput keyboard module
+//  keyboard_input_rawinput - RawInput keyboard module
 //============================================================
 
 class keyboard_input_rawinput : public rawinput_module
@@ -870,7 +870,7 @@ protected:
 
 
 //============================================================
-//  mouse_input_rawinput - rawinput mouse module
+//  mouse_input_rawinput - RawInput mouse module
 //============================================================
 
 class mouse_input_rawinput : public rawinput_module
@@ -897,7 +897,7 @@ protected:
 
 
 //============================================================
-//  lightgun_input_rawinput - rawinput lightgun module
+//  lightgun_input_rawinput - RawInput lightgun module
 //============================================================
 
 class lightgun_input_rawinput : public rawinput_module

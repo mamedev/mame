@@ -3989,7 +3989,7 @@ Core Misc Options
 
     Specifies the type of UI to use, either ``simple`` or ``cabinet``.
 
-    The default is Cabinet (**-ui cabinet**).
+    The default is cabinet (**-ui cabinet**).
 
     Example:
         .. code-block:: bash
@@ -4025,9 +4025,9 @@ Core Misc Options
 
 **\-[no]ui_mouse**
 
-    Displays a mouse cursor when using the built-in UI for MAME.
+    Displays a mouse cursor when using the built-in MAME user interface.
 
-    The default is (**-noui_mouse**).
+    The default is ON (**-ui_mouse**).
 
 .. _mame-commandline-language:
 

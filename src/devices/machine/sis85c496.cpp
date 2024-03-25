@@ -45,7 +45,7 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 	pci_host_device::io_configuration_access_map(map);
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0021).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-//	map(0x0022, 0x0023) 85C497 super I/O
+//  map(0x0022, 0x0023) 85C497 super I/O
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0063).rw(FUNC(sis85c496_host_device::at_keybc_r), FUNC(sis85c496_host_device::at_keybc_w));
 	map(0x0064, 0x0067).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));

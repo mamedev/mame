@@ -39,8 +39,8 @@ TODO:
 #include "softlist_dev.h"
 
 
-DEFINE_DEVICE_TYPE(OSA_MAESTRO, saitekosa_maestro_device, "osa_maestro", "Maestro B-D")
-DEFINE_DEVICE_TYPE(OSA_ANALYST, saitekosa_analyst_device, "osa_analyst", "Analyst")
+DEFINE_DEVICE_TYPE(OSA_MAESTRO, saitekosa_maestro_device, "osa_maestro", "Saitek OSA Maestro B-D")
+DEFINE_DEVICE_TYPE(OSA_ANALYST, saitekosa_analyst_device, "osa_analyst", "Saitek OSA Analyst")
 
 
 //-------------------------------------------------

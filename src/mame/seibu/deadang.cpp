@@ -164,9 +164,7 @@ private:
 };
 
 
-// video
-
-/******************************************************************************/
+// Video Hardware
 
 void deadang_state::foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -471,18 +469,18 @@ uint32_t popnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-// machine
-
 // Read/Write Handlers
 
 uint16_t deadang_state::ghunter_trackball_low_r()
 {
 	return (m_track[0]->read() & 0xff) | ((m_track[1]->read() & 0xff) << 8);
 }
+
 uint16_t deadang_state::ghunter_trackball_high_r()
 {
 	return ((m_track[0]->read() & 0x0f00) >> 4) | (m_track[1]->read() & 0x0f00);
 }
+
 
 // Memory Maps
 
@@ -686,6 +684,7 @@ static INPUT_PORTS_START( ghunter )
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+
 // Graphics Layouts
 
 static const gfx_layout charlayout =
@@ -735,7 +734,8 @@ static const gfx_layout popnrun_spritelayout =
 };
 #endif
 
-/* Graphics Decode Information */
+
+// Graphics Decode Information
 
 static GFXDECODE_START( gfx_deadang )
 	GFXDECODE_ENTRY( "chars",   0x000000, charlayout,    512, 16 )
@@ -753,6 +753,7 @@ static GFXDECODE_START( gfx_popnrun )
 	GFXDECODE_ENTRY( "tiles2",  0x000000, spritelayout,  256, 16 )
 	GFXDECODE_ENTRY( "tiles3",  0x000000, spritelayout,    0, 16 )
 GFXDECODE_END
+
 
 // Interrupt Generators
 
@@ -777,6 +778,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 	if (scanline == 0) // vblank-in irq
 		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
 }
+
 
 // Machine Drivers
 
@@ -887,6 +889,7 @@ void popnrun_state::popnrun(machine_config &config)
 
 
 // ROMs
+
 ROM_START( popnrun )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "popnrun-27512-1-6e.bin", 0xe0001, 0x010000, CRC(cf800494) SHA1(eaed51212c91ebb16e326f8133b60a0ecf0055e5) )
@@ -1159,6 +1162,7 @@ ROM_START( ghunters )
 	ROM_LOAD( "16.11a", 0x000000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
 ROM_END
 
+
 // Driver Initialization
 
 void deadang_state::init_adpcm()
@@ -1170,7 +1174,8 @@ void deadang_state::init_adpcm()
 } // anonymous namespace
 
 
-/* Game Drivers */
+// Game Drivers
+
 GAME( 1987, popnrun,  0,       popnrun, deadang, popnrun_state, empty_init, ROT0, "Seibu Kaihatsu / Yukai Tsukai",           "Pop'n Run - The Videogame (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, popnruna, popnrun, popnrun, deadang, popnrun_state, empty_init, ROT0, "Seibu Kaihatsu / Yukai Tsukai",           "Pop'n Run - The Videogame (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

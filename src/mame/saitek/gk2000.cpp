@@ -10,7 +10,7 @@ same hardware.
 
 Hardware notes:
 - Hitachi H8/323 MCU, 20MHz XTAL
-- LCD with custom segments
+- LCD with 5 7segs and custom segments
 - piezo, 16 LEDs, button sensors chessboard
 
 A13 MCU is used in:
@@ -23,7 +23,7 @@ A13 MCU is used in:
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
-  has some kind of auxillary autosave state feature at power-off
+  adds some kind of auxillary autosave state feature at power-off
 
 *******************************************************************************/
 
@@ -71,15 +71,13 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
 	output_finder<2, 24> m_out_lcd;
 
 	u16 m_inp_mux = 0;
 	u32 m_lcd_segs = 0;
 	u8 m_lcd_com = 0;
-
-	void main_map(address_map &map);
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -91,7 +89,7 @@ private:
 
 	void p2_w(u8 data);
 	u8 p4_r();
-	void p5_w(offs_t offset, u8 data, u8 mem_mask);
+	void p5_w(u8 data);
 };
 
 void gk2000_state::machine_start()
@@ -200,10 +198,8 @@ u8 gk2000_state::p4_r()
 	return ~data;
 }
 
-void gk2000_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
+void gk2000_state::p5_w(u8 data)
 {
-	data |= ~mem_mask;
-
 	// P50: speaker out
 	m_dac->write(data & 1);
 
@@ -212,17 +208,6 @@ void gk2000_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
 
 	// P53-P55: input mux (buttons)
 	m_inp_mux = (m_inp_mux & 0xff) | (~data << 5 & 0x700);
-}
-
-
-
-/*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void gk2000_state::main_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
 }
 
 
@@ -272,7 +257,6 @@ void gk2000_state::gk2000(machine_config &config)
 {
 	// basic machine hardware
 	H8323(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gk2000_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
 	m_maincpu->standby_cb().append(FUNC(gk2000_state::standby));

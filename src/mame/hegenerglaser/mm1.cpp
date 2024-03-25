@@ -82,7 +82,7 @@ private:
 	// devices/pointers
 	required_device<cdp1806_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 
 	bool m_reset = false;

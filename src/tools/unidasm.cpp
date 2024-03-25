@@ -210,6 +210,7 @@ using util::BIT;
 #include "cpu/xtensa/xtensad.h"
 #include "cpu/z180/z180dasm.h"
 #include "cpu/z8/z8dasm.h"
+#include "cpu/z80/r800dasm.h"
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
 
@@ -263,7 +264,6 @@ struct g65816_unidasm_t : g65816_disassembler::config
 	bool x_flag;
 
 	g65816_unidasm_t() { m_flag = false; x_flag = false; }
-	virtual ~g65816_unidasm_t() override = default;
 	virtual bool get_m_flag() const override { return m_flag; }
 	virtual bool get_x_flag() const override { return x_flag; }
 } g65816_unidasm;
@@ -585,6 +585,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
+	{ "r800",            le,  0, []() -> util::disasm_interface * { return new r800_disassembler; } },
 	{ "romp",            be,  0, []() -> util::disasm_interface * { return new romp_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "rupi44",          le,  0, []() -> util::disasm_interface * { return new rupi44_disassembler; } },

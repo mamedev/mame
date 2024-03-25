@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(H8323, h8323_device, "h8323", "Hitachi H8/323")
 DEFINE_DEVICE_TYPE(H8322, h8322_device, "h8322", "Hitachi H8/322")
 
 
-h8325_device::h8325_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
+h8325_device::h8325_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size) :
 	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8325_device::map), this)),
 	m_intc(*this, "intc"),
 	m_port(*this, "port%u", 1),
@@ -33,45 +33,49 @@ h8325_device::h8325_device(const machine_config &mconfig, device_type type, cons
 	m_timer16(*this, "timer16"),
 	m_timer16_0(*this, "timer16:0"),
 	m_ram_view(*this, "ram_view"),
-	m_ram_start(start),
+	m_rom_size(rom_size),
+	m_ram_size(ram_size),
 	m_md(3)
 {
 }
 
 h83257_device::h83257_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8325_device(mconfig, H83257, tag, owner, clock, 0xf780)
+	h8325_device(mconfig, H83257, tag, owner, clock, 0xf000, 0x800)
 {
 }
 
 h83256_device::h83256_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8325_device(mconfig, H83256, tag, owner, clock, 0xf780)
+	h8325_device(mconfig, H83256, tag, owner, clock, 0xc000, 0x800)
 {
 }
 
 h8325_device::h8325_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8325_device(mconfig, H8325, tag, owner, clock, 0xfb80)
+	h8325_device(mconfig, H8325, tag, owner, clock, 0x8000, 0x400)
 {
 }
 
 h8324_device::h8324_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8325_device(mconfig, H8324, tag, owner, clock, 0xfb80)
+	h8325_device(mconfig, H8324, tag, owner, clock, 0x6000, 0x400)
 {
 }
 
 h8323_device::h8323_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8325_device(mconfig, H8323, tag, owner, clock, 0xfd80)
+	h8325_device(mconfig, H8323, tag, owner, clock, 0x4000, 0x200)
 {
 }
 
 h8322_device::h8322_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	h8325_device(mconfig, H8322, tag, owner, clock, 0xfe80)
+	h8325_device(mconfig, H8322, tag, owner, clock, 0x2000, 0x100)
 {
 }
 
 void h8325_device::map(address_map &map)
 {
-	map(m_ram_start, 0xff7f).view(m_ram_view);
-	m_ram_view[0](m_ram_start, 0xff7f).ram().share(m_internal_ram);
+	if(m_md >= 2)
+		map(0x0000, m_rom_size - 1).rom();
+
+	map(0xff80 - m_ram_size, 0xff7f).view(m_ram_view);
+	m_ram_view[0](0xff80 - m_ram_size, 0xff7f).ram().share(m_internal_ram);
 
 	map(0xff90, 0xff90).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tcr_r), FUNC(h8325_timer16_channel_device::tcr_w));
 	map(0xff91, 0xff91).rw(m_timer16_0, FUNC(h8325_timer16_channel_device::tsr_r), FUNC(h8325_timer16_channel_device::tsr_w));
@@ -221,7 +225,7 @@ void h8325_device::syscr_w(u8 data)
 	logerror("syscr = %02x\n", data);
 
 	// RAME
-	if (data & 1)
+	if(data & 1)
 		m_ram_view.select(0);
 	else
 		m_ram_view.disable();

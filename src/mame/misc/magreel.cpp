@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Scott Stone
+
 /***************************************************************************
 
 Magic Reels - Casino Slots
@@ -24,8 +25,10 @@ UNDUMPED:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c62x/pic16c62x.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -197,7 +200,7 @@ void magreel_state::init_magreel()
 
 	// descramble address. TODO: gives M68000-looking code structure, but probably isn't correct
 	for (int i = 0; i < 0x100000; i++)
-		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 16, 17, 18, 1, 3, 2, 4, 7, 5, 6, 8, 9, 10, 11, 14, 12, 13, 15, 0)];
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 16, 17, 18, 1, 3, 2, 4, 6, 5, 7, 8, 9, 10, 11, 14, 12, 13, 15, 0)];
 
 	uint16_t *rom16 = (uint16_t *)memregion("maincpu")->base();
 
@@ -206,6 +209,6 @@ void magreel_state::init_magreel()
 		rom16[i] = bitswap<16>(rom16[i] ^ 0x0000, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 GAME( 199?, magreel, 0, magreel, magreel, magreel_state, init_magreel, ROT0, "Play System", "Magic Reels", MACHINE_IS_SKELETON )

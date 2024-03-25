@@ -99,8 +99,6 @@ private:
 };
 
 
-// video
-
 TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
 {
 	return num_rows * ((col + 16) % 48) + row;
@@ -184,8 +182,6 @@ void videopin_state::video_ram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-
-// machine
 
 void videopin_state::update_plunger()
 {

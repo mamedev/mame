@@ -118,8 +118,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -188,8 +186,6 @@ uint32_t mosaic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void mosaic_state::protection_w(uint8_t data) // TODO: hook up PIC dump and remove this simulation (PIC dump contains the exact values in this jumptable)
 {

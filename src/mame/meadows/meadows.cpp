@@ -227,8 +227,6 @@ private:
 };
 
 
-// audio
-
 static constexpr uint32_t BASE_CTR1 = (5'000'000 / 256);
 static constexpr uint32_t BASE_CTR2 = (5'000'000 / 32);
 
@@ -306,8 +304,6 @@ void meadows_state::sh_update()
 	m_latched_0c03 = m_0c03;
 }
 
-
-// video
 
 // some constants to make life easier
 static constexpr int8_t SPR_ADJUST_X = -18;
@@ -408,8 +404,6 @@ uint32_t meadows_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 void meadows_state::machine_start()
 {

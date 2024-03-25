@@ -128,8 +128,6 @@ private:
 };
 
 
-// video
-
 void bwing_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -345,8 +343,6 @@ uint32_t bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 //****************************************************************************
 // Interrupt Handlers

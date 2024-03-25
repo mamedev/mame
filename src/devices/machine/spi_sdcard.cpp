@@ -291,7 +291,7 @@ void spi_sdcard_device::do_command()
 			/*
 			else // SD_TYPE_HC: CSD Version 2.0
 			{
-				m_data[3]  = 0x40;
+			    m_data[3]  = 0x40;
 			}
 			*/
 

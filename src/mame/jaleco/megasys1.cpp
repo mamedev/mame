@@ -2923,8 +2923,8 @@ ROM_START( chimerab )
 	ROM_LOAD16_BYTE( "prg8.bin", 0x000000, 0x010000, CRC(a682b1ca) SHA1(66f5d5a73f5e8cba87eac09c55eee59117d94f7b) )
 	ROM_LOAD16_BYTE( "prg7.bin", 0x000001, 0x010000, CRC(83b9982d) SHA1(68e7d344ebfffe19822c4cf9f7b13cb51f23537a) )
 
-	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "chimerab.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code - using Cybattler program, label not confirmed */
+	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, BAD_DUMP CRC(a72e04a7) SHA1(0bd96272e37b0e23793ca47b98a966540e2e2df9) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "s1.bin",   0x000000, 0x080000, CRC(e4c2ac77) SHA1(db4bff3c02f22cc59a67b103fd176f4d88531f93) )
@@ -3046,7 +3046,7 @@ ROM_START( cybattlr )
 	ROM_LOAD16_BYTE( "cb_07.rom", 0x000001, 0x010000, CRC(85d219d7) SHA1(a9628efc5eddefad739363ff0b2f37a2d095df86) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, CRC(a72e04a7) SHA1(0bd96272e37b0e23793ca47b98a966540e2e2df9) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "cb_m01.rom", 0x000000, 0x080000, CRC(1109337f) SHA1(ab294d87c9b4eb54401da5ad6ea171e4c0a700b5) )
@@ -5179,11 +5179,6 @@ void megasys1_bc_iosim_state::init_chimeraba() // Type C
 	m_ip_select_values = chimeraba_seq;
 }
 
-void megasys1_bc_iosim_state::init_cybattlr() // Type C
-{
-	m_ip_select_values = cybattler_seq;
-}
-
 // Type D
 void megasys1_typed_state::init_peekaboo()
 {
@@ -5276,9 +5271,9 @@ GAME( 1991, 64street,   0,        system_C_iomcu,          64street, megasys1_bc
 GAME( 1991, 64streetj,  64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetja, 64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bigstrik,   0,        system_C_iomcu,          bigstrik, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_cybattlr, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab,   0,        system_C_iomcu,          chimerab, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybattlr,   0,        system_C_iomcu,          cybattlr, megasys1_bc_iomcu_state, empty_init,    ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
 GAME( 1993, peekaboo,   0,        system_D,                peekaboo, megasys1_typed_state,    init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
