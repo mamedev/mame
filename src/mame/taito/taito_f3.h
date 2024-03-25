@@ -204,7 +204,34 @@ protected:
 		}
 	};
 
+	struct draw_source {
+		draw_source() {};
+		draw_source(bitmap_ind16* bitmap) {
+			src = bitmap;
+			flags = nullptr;
+		}
+		draw_source(tilemap_t *tilemap) {
+			if (!tilemap) {
+				return;
+			}
+			src = &tilemap->pixmap();
+			flags = &tilemap->flagsmap();
+		};
+		bitmap_ind16* src{nullptr};
+		bitmap_ind8*  flags{nullptr};
+	};
+
+	struct mix_pix { // per-pixel information for the blending circuit
+		u16 src_pal{0};
+		u16 dst_pal{0};
+		u8  src_blend{0};
+		u8  dst_blend{0};
+	};
+
+	struct f3_line_inf;
+
 	struct mixable {// layer compositing information
+		draw_source bitmap;
 		bool x_sample_enable{false};
 		u16 mix_value{0};
 		u8 prio() const { return mix_value & 0x000f; };
@@ -218,26 +245,29 @@ protected:
 
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
+
+		virtual int y_index(const f3_line_inf &line);
+		virtual int x_index(int x);
+		virtual bool blend_select(const u8 *line_flags, int x) { return false; };
+
+		u8 debug_index{0};
+		virtual const char* debug_name() { return "MX"; };
 	};
 
 	struct sprite_inf : mixable {
 		// alpha mode in 6000
+		// mosaic enable in 6400
 		// line enable, clip settings in 7400
 		// priority in 7600
-
-		// mosaic enable in 6400
-		bool blend_select{false}; // 7400 0xf000
-		bitmap_ind16* srcbitmap;
+		bool blend_select_v{false}; // 7400 0xf000
+		bool blend_select(const u8 *line_flags, int x) override { return blend_select_v; };
+		const char* debug_name() override { return "SP"; };
 	};
 
 	struct pivot_inf : mixable {
-		bitmap_ind16* srcbitmap_pixel;
-		bitmap_ind8*  flagsbitmap_pixel;
-		bitmap_ind16* srcbitmap_vram;
-		bitmap_ind8*  flagsbitmap_vram;
-
 		u8 pivot_control{0};     // 6000
-		bool blend_select{false};
+		bool blend_select_v{false};
+		bool blend_select(const u8 *line_flags, int x) override { return blend_select_v; };
 		// mosaic enable in 6400
 		u16 pivot_enable{0};     // 7000
 		// mix info from 7200
@@ -245,12 +275,12 @@ protected:
 
 		u16 reg_sx{0};
 		u16 reg_sy{0};
+		int y_index(const f3_line_inf &line) override;
+		int x_index(int x) override;
+		const char* debug_name() override { return "PV"; };
 	};
 
 	struct playfield_inf : mixable {
-		bitmap_ind16* srcbitmap;
-		bitmap_ind8*  flagsbitmap;
-
 		u16 colscroll{0};            // 4000
 		bool alt_tilemap{false};     // 4000
 		// mosaic enable in 6400
@@ -262,16 +292,31 @@ protected:
 		fixed8 reg_sx{0};
 		fixed8 reg_sy{0};
 		fixed8 reg_fx_y{0};
+
+		u16 width_mask{0};
+
+		int y_index(const f3_line_inf &line) override;
+		int x_index(int x) override;
+		bool blend_select(const u8 *line_flags, int x) override { return BIT(line_flags[x], 0); };
+		const char* debug_name() override { return "PF"; };
 	};
 	
-	struct pri_alpha { u8 pri; u8 active_alpha; u8 alpha; };
+	struct pri_mode {
+		u8 src_prio{0};
+		u8 dst_prio{0};
+		u8 src_blendmode{0xff};
+		u8 dst_blendmode{0xff};
+	};
 
 	struct f3_line_inf {
 		int y{0};
-		pri_alpha pri_alp[432]{};
+		int screen_y{0};
+		pri_mode pri_alp[432]{};
 		// 5000/4000
 		clip_plane_inf clip[NUM_CLIPPLANES];
 		// 6000 - pivot_control, sprite alpha
+		u16 maybe_sync_reg{0};
+		bool no_opaque_dest{false};
 		// 6200
 		u8 blend[4]{0}; // less 0 - 8 more
 		// 6400
@@ -287,14 +332,17 @@ protected:
 		playfield_inf pf[NUM_PLAYFIELDS];
 	};
 
-	void blend_s(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
-	void blend_o(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
-	void blend_d(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
-	void blend_dispatch(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	bool mix_line(mixable *gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
+	void render_line(pen_t *dst, const mix_pix (&z)[432]);
+
+	// void blend_s(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	// void blend_o(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	// void blend_d(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
+	// void blend_dispatch(u8 blend_mode, bool sel, u8 prio, const u8 *blendvals, pri_alpha &pri_alp, u32 &dst, u32 src);
 	
-	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sprite_inf* sp);
-	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, playfield_inf* pf);
-	virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pivot_inf* pv);
+	// virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, sprite_inf* sp);
+	// virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, playfield_inf* pf);
+	// virtual void draw_line(pen_t* dst, f3_line_inf &line, int xs, int xe, pivot_inf* pv);
 
 	int m_game = 0;
 	tilemap_t *m_tilemap[8] = {nullptr};

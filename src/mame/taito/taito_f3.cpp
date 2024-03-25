@@ -9,18 +9,9 @@
     Major thanks to Aaron Giles for sound info, figuring out the 68K/ES5505
     rom interface and ES5505 emulator!
     Thanks to Acho A. Tang for Kirameki Star Road sound banking info!
-    Thank you to Shiriru for the scanline rendering (including alpha blending),
-    sprite sync fixes, sprite zoom fixes and others!
 
     Other Issues:
-    - Various hacks in video core that needs squashing;
-    - When playing space invaders dx in original mode, t.t. with overlay, the
-      alpha blending effect is wrong (see Taito B version of game)
-    - Bubble Symphony has an alpha transition effect that doesn't appear in Mame
-    - Various other missing blending effects (see Mametesters)
     - Find how this HW drives the CRTC, and convert video timings to use screen raw params;
-
-    Feel free to report any other issues to me.
 
     Taito custom chips on motherboard:
 
