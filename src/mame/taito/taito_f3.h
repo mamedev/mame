@@ -246,6 +246,7 @@ protected:
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
 
+		virtual u16 palette_adjust(u16 pal) { return pal; };
 		virtual int y_index(const f3_line_inf &line);
 		virtual int x_index(int x);
 		virtual bool blend_select(const u8 *line_flags, int x) { return false; };
@@ -295,6 +296,7 @@ protected:
 
 		u16 width_mask{0};
 
+		u16 palette_adjust(u16 pal) override;
 		int y_index(const f3_line_inf &line) override;
 		int x_index(int x) override;
 		bool blend_select(const u8 *line_flags, int x) override { return BIT(line_flags[x], 0); };

@@ -1077,6 +1077,9 @@ int taito_f3_state::mixable::y_index(const f3_line_inf &line) {
 	// sprites and pivot and pre-flipped
 	return line.y;
 }
+u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) {
+	return pal + pal_add;
+}
 int taito_f3_state::playfield_inf::x_index(int dest_x) {
 	// what the heck is with this calculation...
 	fixed8 fx_x = reg_sx + rowscroll;
@@ -1121,7 +1124,7 @@ bool taito_f3_state::mix_line(mixable* gfx, mix_pix *z, pri_mode *pri, const f3_
 		//auto mixd = &z[x];
 		if (gfx->prio() >= pri[x].src_prio && gfx->blend_mask() != pri[x].src_blendmode) {
 			// submit src pix
-			if (const u16 pal = src[x_index]) {
+			if (const u16 pal = gfx->palette_adjust(src[x_index])) {
 				bool sel = gfx->blend_select(flags, x_index);
 
 				// caution: is destination contribution REALLY determined at this time ?
@@ -1157,12 +1160,12 @@ bool taito_f3_state::mix_line(mixable* gfx, mix_pix *z, pri_mode *pri, const f3_
 					pri[x].src_prio = gfx->prio();
 				}
 			}
-		} else if (/*prio wins*/ gfx->prio() > pri[x].dst_prio
-				   && /*mode masks same mode*/ gfx->blend_mask() != pri[x].src_blendmode) {
+		} else if (gfx->prio() > pri[x].dst_prio
+				   && gfx->blend_mask() != pri[x].src_blendmode) {
 			// ??? TESTME: don't blend against opaque when out of range ?
 			if (!(gfx->blend_a() ^ gfx->blend_b()) && (z[x].src_blend + z[x].dst_blend) > 256)
 				continue;
-			if (const u16 pal = src[x_index]) {
+			if (const u16 pal = gfx->palette_adjust(src[x_index])) {
 				z[x].dst_pal = pal;
 				pri[x].dst_prio = gfx->prio();
 				//pri[x].dst_blendmode = gfx->blend_mask();
