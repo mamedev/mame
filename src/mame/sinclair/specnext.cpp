@@ -96,7 +96,8 @@ public:
 
 	void tbblue(machine_config &config);
 
-	INPUT_CHANGED_MEMBER(on_nmi);
+	INPUT_CHANGED_MEMBER(on_mf_nmi);
+	INPUT_CHANGED_MEMBER(on_divmmc_nmi);
 
 protected:
 	virtual void machine_start() override;
@@ -662,7 +663,7 @@ void specnext_state::bank_update(u8 bank)
 	m_divmmc->automap_reset_w(!port_divmmc_io_en() || !m_nr_0a_divmmc_automap_en);
 	m_divmmc->automap_active_w(sram_divmmc_automap_en);
 	m_divmmc->retn_seen_w(0);
-	// m_divmmc->divmmc_button_w();
+	m_divmmc->divmmc_button_w(m_nr_02_generate_divmmc_nmi);
 
 	for (s8 cpu_rd_n = 1; cpu_rd_n >= 0; --cpu_rd_n) // check W then R
 	{
@@ -2141,32 +2142,10 @@ void specnext_state::nr_02_w(u8 nr_wr_dat)
 	if (BIT(~nr_wr_dat, 4))
 		m_nr_da_iotrap_cause = 0;
 
-	if (BIT(nr_wr_dat, 3))
-	{
-		if (m_nr_06_button_m1_nmi_en)
-		{
-			m_nr_02_generate_mf_nmi = 1;
-			do_nmi();
-			//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_ticks(32, m_maincpu->unscaled_clock()));
-		}
-	}
-	else
-	{
+	if (BIT(~nr_wr_dat, 3))
 		m_nr_02_generate_mf_nmi = 0;
-	}
-
-	if (BIT(nr_wr_dat, 2))
-	{
-		if (m_nr_06_button_drive_nmi_en)
-		{
-			m_nr_02_generate_divmmc_nmi = 1;
-			m_maincpu->nmi();
-			//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_ticks(32, m_maincpu->unscaled_clock()));
-		}
-	}
-	else
+	if (BIT(~nr_wr_dat, 2))
 		m_nr_02_generate_divmmc_nmi = 0;
-
 
 	if (BIT(nr_wr_dat, 1)) // hard reset
 	{
@@ -2228,19 +2207,30 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 	}
 }
 
-INPUT_CHANGED_MEMBER(specnext_state::on_nmi)
+INPUT_CHANGED_MEMBER(specnext_state::on_mf_nmi)
 {
-	if (m_nr_06_button_m1_nmi_en && newval)
-		do_nmi();
+	m_nr_02_generate_mf_nmi = newval & 1;
+	do_nmi();
+	m_nr_02_generate_mf_nmi = 0;
 }
+
+INPUT_CHANGED_MEMBER(specnext_state::on_divmmc_nmi)
+{
+	m_nr_02_generate_divmmc_nmi = newval & 1;
+	if (m_nr_06_button_drive_nmi_en && m_nr_02_generate_divmmc_nmi)
+		m_maincpu->nmi();
+}
+
 
 void specnext_state::do_nmi()
 {
-	m_maincpu->nmi();
-	m_mf->button_w(1);
-	m_mf->clock_w(1);
-
-	m_mf->button_w(0);
+	if (m_nr_06_button_m1_nmi_en)
+	{
+		m_mf->button_w(m_nr_02_generate_mf_nmi);
+		m_mf->clock_w(1);
+		if (m_nr_02_generate_mf_nmi)
+			m_maincpu->nmi();
+	}
 }
 
 void specnext_state::leave_nmi(int status)
@@ -2627,7 +2617,8 @@ INPUT_PORTS_START(specnext)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
 	PORT_MODIFY("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F9) PORT_CHANGED_MEMBER(DEVICE_SELF, specnext_state, on_nmi, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI MF") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, specnext_state, on_mf_nmi, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI DivMMC") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, specnext_state, on_divmmc_nmi, 0)
 INPUT_PORTS_END
 
 void specnext_state::machine_start()
