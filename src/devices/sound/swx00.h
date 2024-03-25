@@ -25,20 +25,38 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	sound_stream *m_stream;
+
+	static const std::array<s32, 0x80> attack_linear_step;
+	static const std::array<s32, 0x20> decay_linear_step;
+	static const std::array<s32, 16> panmap;
+	std::array<s32,  0x80> m_global_step;
+	std::array<s16, 0x100> m_dpcm;
+
 	std::array<u16,  0x20> m_sample_start;
 	std::array<u16,  0x20> m_sample_end;
 	std::array<u32,  0x20> m_sample_address;
 	std::array<u16,  0x20> m_sample_pitch;
 
 	std::array<u16,  0x20> m_attack;
-	std::array<u16,  0x20> m_release;
+	std::array<u16,  0x20> m_decay;
 
 	std::array<u16,  0x20> m_glo_pan;
 	std::array<u16,  0x20> m_rev_dry;
 	std::array<u16,  0x20> m_cho_var;
 
-	std::array<u32, 0x40> m_dsp_offsets;
+	std::array<u32,  0x40> m_dsp_offsets;
 	std::array<u16, 0x120> m_dsp_values;
+
+	std::array<s32,  0x20> m_sample_pos;
+	std::array<s32,  0x20> m_envelope_level;
+	std::array<s32,  0x20> m_glo_level_cur;
+	std::array<s32,  0x20> m_pan_l;
+	std::array<s32,  0x20> m_pan_r;
+	std::array<bool, 0x20> m_active, m_decay_on, m_decay_done;
+	std::array<s16, 0x20>  m_dpcm_current;
+	std::array<s16, 0x20>  m_dpcm_next;
+	std::array<u32, 0x20>  m_dpcm_address;
 
 	u32 m_keyon;
 	u32 m_rom_address;
@@ -74,8 +92,8 @@ private:
 
 	u16 attack_r(offs_t chan);
 	void attack_w(offs_t chan, u16 data, u16 mem_mask);
-	u16 release_r(offs_t chan);
-	void release_w(offs_t chan, u16 data, u16 mem_mask);
+	u16 decay_r(offs_t chan);
+	void decay_w(offs_t chan, u16 data, u16 mem_mask);
 
 	void keyon_w(offs_t offset, u8 data);
 	void keyon_commit_w(u8);
@@ -93,6 +111,12 @@ private:
 
 	void state_sel_w(u8 data);
 	u8 state_r();
+
+	static bool istep(s32 &value, s32 limit, s32 step);
+	static bool fpstep(s32 &value, s32 limit, s32 step);
+	static s32 fpadd(s32 value, s32 step);
+	static s32 fpsub(s32 value, s32 step);
+	static s32 fpapply(s32 value, s32 sample);
 };
 
 DECLARE_DEVICE_TYPE(SWX00_SOUND, swx00_sound_device)
