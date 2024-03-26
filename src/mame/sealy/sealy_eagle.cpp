@@ -74,7 +74,7 @@ Note:
 
 #include "emu.h"
 
-#include "cpu/se3208/se3208.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/ds1302.h"
 
 #include "emupal.h"
@@ -140,7 +140,7 @@ INPUT_PORTS_END
 
 void sealy_eagle_state::qczl(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14.318181_MHz_XTAL); // placeholder for unemulated SoC
+	ARM9(config, m_maincpu, 14.318181_MHz_XTAL); // placeholder for unemulated SoC
 	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_eagle_state::program_map);
 
 	DS1302(config, "rtc", 32.768_kHz_XTAL);
