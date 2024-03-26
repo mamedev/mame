@@ -17462,7 +17462,8 @@ mjelctrb                        // ??  (c) 1993 bootleg Mahjong Electron Base pa
 mjelctrn                        // ??  Mahjong Electron Base parts 2 & 4
 mjembase                        // "38" Mahjong Electromagnetic Base 1989 Dynax
 mjfriday                        // "26" (c) 1989 Dynax
-mjreach                         // (c) 1994 bootleg
+mjreach                         // (c) 1994 Dynax
+mjreachbl                       // (c) 1994 bootleg
 neruton                         // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 nerutona                        // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 ougonhai                        // "62" (c) 1991 Dynax
@@ -31542,12 +31543,6 @@ savquest                        //
 @source:misc/scm_500.cpp
 scm_500                         //
 
-@source:misc/sealy.cpp
-crzyddz                         // (c) 2004? Sealy
-
-@source:misc/sealy_fr.cpp
-snowbwar                         // (c) 201? Sealy
-
 @source:misc/sfbonus.cpp
 abnudge                         // (c) 2003 Amcoe - Animal Bonus Nudge
 abnudgeb                        // (c) 2003 Amcoe
@@ -38769,6 +38764,15 @@ st1706                          //
 st1707                          //
 st1708                          //
 st1714                          //
+
+@source:sealy/sealy.cpp
+crzyddz                         // (c) 2004? Sealy
+
+@source:sealy/sealy_eagle.cpp
+qczl                            // (c) 2011 Sealy
+
+@source:sealy/sealy_fr.cpp
+snowbwar                        // (c) 201? Sealy
 
 @source:sega/angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?

@@ -48,7 +48,7 @@ Notes:
                being highly likely that the program is encrypted.
       29F002 - AMD AM29F002 PLCC32 (surface-mounted) EEPROM. This is connected to the OKI chip and holds the audio samples.
 DS12B887.U12 - Dallas DS12B887 Real Time Clock Module. This looks suspiciously like it's used for protection data? The PCB contains a battery
-               (for game settings or high scores?) and a 93C46 EEPROM (for game settings or high scores?). No other data needs to be sotred
+               (for game settings or high scores?) and a 93C46 EEPROM (for game settings or high scores?). No other data needs to be sorted
                anywhere. The DS12B887 is connected to the EPM7192 chip. It's possible it might just be for time/bookkeeping. The chip
                (dated 9614) is dumped but I'd be surprised if the battery inside was still alive and the data is good, although the data isn't
                just garbage and reads the same each time so by some miracle it might be ok.
