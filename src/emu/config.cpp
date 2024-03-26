@@ -102,11 +102,12 @@ bool configuration_manager::load_settings()
 
 void configuration_manager::apply_command_line_configs()
 {
-	if (machine().options().conf() != nullptr)
+	if (machine().options().config() != nullptr)
 	{
 		const char config_separator = ',';
 		const char setting_separator = '=';
-		const std::string passed_configs = machine().options().conf();
+		const std::string port_mask_hex_prefix = ":0x";
+		const std::string passed_configs = machine().options().config();
 		std::istringstream configs_stream(passed_configs);
 		for (std::string config_setting; std::getline(configs_stream, config_setting, config_separator);)
 		{
@@ -137,6 +138,7 @@ void configuration_manager::apply_command_line_configs()
 			bool found = false;
 			for (auto &port : machine().ioport().ports())
 			{
+				// Apply the provided value to all fields in the port
 				if (port.first == key)
 				{
 					found = true;
@@ -151,9 +153,42 @@ void configuration_manager::apply_command_line_configs()
 						field.set_user_settings(settings);
 					}
 				}
+				// Apply the provided value only to fields with matching mask
+				else if (key.find(port.first, 0) == 0)
+				{
+					uint32_t supplied_mask = 0;
+					if (key.substr(port.first.length()).rfind(port_mask_hex_prefix, 0) == 0)
+					{
+						const std::string port_mask = key.substr(port.first.length() + port_mask_hex_prefix.length());
+						if (port_mask.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
+							throw emu_fatalerror("Invalid port mask value: 0x%s", port_mask);
+
+						supplied_mask = std::stoul(port_mask, 0, 16);
+					}
+					else
+					{
+						throw emu_fatalerror("Port mask value should start with %s", port_mask_hex_prefix);
+					}
+
+					for (ioport_field &field : port.second->fields())
+					{
+						if (field.type() != IPT_DIPSWITCH && field.type() != IPT_CONFIG)
+							continue;
+
+						if (field.mask() == supplied_mask)
+						{
+							found = true;
+							ioport_field::user_settings settings;
+							field.get_user_settings(settings);
+							settings.value = val & field.mask();
+							field.set_user_settings(settings);
+						}
+					}
+
+				}
 			}
 			if (!found)
-				throw emu_fatalerror("Configuration key not found: %s", config_setting.c_str());
+				throw emu_fatalerror("Configuration key not found: %s", key.c_str());
 		}
 	}
 }

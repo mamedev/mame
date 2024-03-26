@@ -972,7 +972,7 @@ void cli_frontend::listconfigs(const std::vector<std::string> &args)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// print header
-	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "CONF NAME", "CONF OPTIONS", "CONF DESCRIPTION");
+	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "CONFIG NAME", "CONFIG VALUE", "CONFIG DESCRIPTION");
 	printf("%s %s %s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(28,'-').c_str());
 
 	// iterate over drivers
@@ -994,8 +994,17 @@ void cli_frontend::listconfigs(const std::vector<std::string> &args)
 			// iterate over ports
 			for (auto &port : portlist)
 			{
+				// Determine max mask length of settings in the port: 2, 4, or 8
+				int max_mask_length = 2;
+				for (ioport_field const &field : port.second->fields())
+				{
+					if (field.mask() & 0xffff0000)
+						max_mask_length = 8;
+					else if (field.mask() & 0xff00 && max_mask_length < 4)
+						max_mask_length = 4;
+				}
+
 				// iterate through the fields on this port
-				bool first_config = true;
 				for (ioport_field const &field : port.second->fields())
 				{
 					if (field.type() != IPT_DIPSWITCH && field.type() != IPT_CONFIG)
@@ -1006,14 +1015,25 @@ void cli_frontend::listconfigs(const std::vector<std::string> &args)
 					{
 						if (first_value)
 						{
-							printf("%-16s %-16s %-16s %s\n", first_port ? drivlist.driver().name : "", first_config ? port.first.c_str() : "", "", field.specific_name());
+							// system
+							printf("%-16s ", first_port ? drivlist.driver().name : "");
+							// config name + mask
+							if (max_mask_length == 8)
+								printf("%s:0x%08x", port.first.c_str(), field.mask());
+							else if (max_mask_length == 4)
+								printf("%s:0x%04x", port.first.c_str(), field.mask());
+							else
+								printf("%s:0x%02x", port.first.c_str(), field.mask());
+							for (int i = port.first.length() + 3 + max_mask_length; i <= 32; i++)
+								putchar(' ');
+							// config description
+							printf(" %s\n", field.specific_name());
 							first_port = false;
-							first_config = false;
 							first_value = false;
 						}
-						if (field.mask() >= 0x10000)
+						if (max_mask_length == 8)
 							printf("%-16s %-16s 0x%08x%-6s ", "", "", setting.value(), "");
-						else if (field.mask() >= 0x100)
+						else if (max_mask_length == 4)
 							printf("%-16s %-16s 0x%04x%-10s ", "", "", setting.value(), "");
 						else
 							printf("%-16s %-16s 0x%02x%-12s ", "", "", setting.value(), "");
