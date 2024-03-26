@@ -419,7 +419,7 @@ void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
 			   line_ram[0x7180/2] & 0xffff, line_ram[0x7380/2] & 0xffff, line_ram[0x7580/2] & 0xffff, line_ram[0x7780/2] & 0xffff,
 			   line_ram[0x8180/2] & 0xffff, line_ram[0x8380/2] & 0xffff, line_ram[0x8580/2] & 0xffff, line_ram[0x8780/2] & 0xffff,
 			   line_ram[0xa180/2] & 0xffff, line_ram[0xa380/2] & 0xffff, line_ram[0xa580/2] & 0xffff, line_ram[0xa780/2] & 0xffff,
-			   line_ram[0xb180/2] & 0xffff, line_ram[0xb380/2] & 0xffff, line_ram[0xb580/2] & 0xffff, line_ram[0xb780/2] & 0xffff)
+			   line_ram[0xb180/2] & 0xffff, line_ram[0xb380/2] & 0xffff, line_ram[0xb580/2] & 0xffff, line_ram[0xb780/2] & 0xffff);
 #endif
 }
 
@@ -1345,10 +1345,12 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			if (BIT(scroll, 1))
 				global = new_pos;
 			// add scroll offsets
-			if (!BIT(scroll, 2))
-				new_pos += subglobal;
-			if (!BIT(scroll, 3))
+			if (!BIT(scroll, 3)) {
 				new_pos += global;
+				if (!BIT(scroll, 2))
+					new_pos += subglobal;
+			}
+
 
 			switch (block_ctrl) {
 			case 0b00:
