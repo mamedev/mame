@@ -707,6 +707,25 @@ ROM_START( mgfx )
 ROM_END
 
 
+ROM_START( mgzz ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "mgzz_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-100cn.u10", 0x000000, 0x80000, CRC(278964f7) SHA1(75e48e3124d038f16f93fe3c1f63dd1568f0c018) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u9", 0x000000, 0x80000, CRC(10792638) SHA1(ae5d93659140252da332a3dd03cb188ddf79ad5a) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg.u17", 0x000000, 0x400000, CRC(1643fa78) SHA1(4c08b62d3dd7171a9ad3182634f66befa82cb581) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sp.u14", 0x00000, 0x80000, CRC(f037952e) SHA1(0fa83e164937c9e8245861da7fd11f225525918d) )
+ROM_END
+
+
 /*
 
 
@@ -993,6 +1012,25 @@ ROM_START( qlgs )
 	ROM_LOAD( "sp_u5.u5", 0x00000, 0x200000, CRC(6049b892) SHA1(f87285a288bd3fd169080045f70ff15181661582) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
+// PCB-0489-15-FM-1 (IGS027A, M6295, IGS031, 8255, Battery) - same PCB as qlgs
+ROM_START( mgcs3 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "mgcs3_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "m2401_v101cn.u17", 0x000000, 0x200000, CRC(d0d78fb6) SHA1(10a16f1ce0a89b5281822be26a2cdcc86702b188) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u26", 0x000000, 0x200000, CRC(14881df6) SHA1(261e813498981a30a938a9f6205c8c8f79a57029) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg1.u28", 0x000000, 0x400000, CRC(59522cf8) SHA1(b33448d72769e78b097edd2e8055c9144491120d) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u5", 0x00000, 0x200000, CRC(eb27b166) SHA1(eb9641516245d9094861d6ba6e902eac62019968) )
+ROM_END
+
 ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal rom of IGS027A ARM based MCU
@@ -1178,3 +1216,5 @@ GAME( 2002, chessc2,   0,        igs_mahjong, sdwx,     igs_m027_state, init_che
 GAME( 200?, haunthig,  0,        igs_mahjong, sdwx,     igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
 GAME( 200?, extradrw,  0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Extra Draw",   MACHINE_IS_SKELETON )
 GAME( 200?, crzybugs,  0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // 2006 according to some sources
+GAME( 2003, mgzz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)",   MACHINE_IS_SKELETON )
+GAME( 200?, mgcs3,     0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Man Guan Caishen 3 (V101CN)",   MACHINE_IS_SKELETON )

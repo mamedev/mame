@@ -11,7 +11,7 @@
         * Dribbling
 
     TODO:
-    * Implement the 2 banks of 8 dips which determine coinage for the 2 players
+    * Implement the 2 banks of 8 DIP switches which determine coinage for the 2 players
     * Actual game duration doesn't match the time reported in the manual
 
 ****************************************************************************
@@ -49,15 +49,13 @@
 // configurable logging
 #define LOG_MISC     (1U << 1)
 #define LOG_SOUND    (1U << 2)
-#define LOG_PB       (1U << 3)
 
-//#define VERBOSE (LOG_GENERAL | LOG_MISC | LOG_SOUND | LOG_PB)
+//#define VERBOSE (LOG_GENERAL | LOG_MISC | LOG_SOUND)
 
 #include "logmacro.h"
 
 #define LOGMISC(...)     LOGMASKED(LOG_MISC,     __VA_ARGS__)
 #define LOGSOUND(...)    LOGMASKED(LOG_SOUND,    __VA_ARGS__)
-#define LOGPB(...)       LOGMASKED(LOG_PB,       __VA_ARGS__)
 
 
 namespace {
@@ -72,7 +70,7 @@ public:
 		m_ppi8255(*this, "ppi8255%d", 0),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_mux(*this, "MUX%u", 0),
+		m_matrix(*this, "MUX%u", 0),
 		m_proms(*this, "proms"),
 		m_gfxroms(*this, "gfx"),
 		m_i_pb(*this, "snd_nl:pb%u", 0U),
@@ -103,7 +101,7 @@ private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_ioport_array<3> m_mux;
+	required_ioport_array<3> m_matrix;
 	required_region_ptr<uint8_t> m_proms;
 	required_region_ptr<uint8_t> m_gfxroms;
 
@@ -125,14 +123,14 @@ private:
 	uint8_t m_dr = 0U;
 	uint8_t m_ds = 0U;
 	uint8_t m_sh = 0U;
-	uint8_t m_input_mux = 0U;
+	uint8_t m_input_sel = 0U;
 	uint8_t m_di = 0U;
 
 	uint8_t ioread(offs_t offset);
 	void iowrite(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	uint8_t dsr_r();
-	uint8_t input_mux0_r();
+	uint8_t input_matrix_read();
 	void misc_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void pb_w(uint8_t data);
@@ -202,11 +200,11 @@ uint32_t dribling_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// loop over columns
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int const b7 = m_proms[(x >> 3) | ((y >> 3) << 5)] & 1;
+			int const b7 = BIT(m_proms[(x >> 3) | ((y >> 3) << 5)], 0);
 			int const b6 = m_abca;
-			int const b5 = (x >> 3) & 1;
-			int const b4 = (m_gfxroms[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
-			int const b3 = (m_videoram[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
+			int const b5 = BIT(x, 3);
+			int const b4 = BIT(m_gfxroms[(x >> 3) | (y << 5)], x & 7);
+			int const b3 = BIT(m_videoram[(x >> 3) | (y << 5)], x & 7);
 			int const b2_0 = m_colorram[(x >> 3) | ((y >> 2) << 7)] & 7;
 
 			// assemble the various bits into a palette PROM index
@@ -245,16 +243,17 @@ uint8_t dribling_state::dsr_r()
 }
 
 
-uint8_t dribling_state::input_mux0_r()
+uint8_t dribling_state::input_matrix_read()
 {
 	// low value in the given bit selects
-	if (!(m_input_mux & 0x01))
-		return m_mux[0]->read();
-	else if (!(m_input_mux & 0x02))
-		return m_mux[1]->read();
-	else if (!(m_input_mux & 0x04))
-		return m_mux[2]->read();
-	return 0xff;
+	u8 result = 0xff;
+	if (!BIT(m_input_sel, 0))
+		result &= m_matrix[0]->read();
+	if (!BIT(m_input_sel, 1))
+		result &= m_matrix[1]->read();
+	if (!BIT(m_input_sel, 2))
+		result &= m_matrix[2]->read();
+	return result;
 }
 
 
@@ -287,7 +286,7 @@ void dribling_state::misc_w(uint8_t data)
 	// bit 2 = (9) = PC2
 	// bit 1 = (10) = PC1
 	// bit 0 = (32) = PC0
-	m_input_mux = data & 7;
+	m_input_sel = data & 7;
 }
 
 
@@ -295,35 +294,20 @@ void dribling_state::sound_w(uint8_t data)
 {
 	LOGSOUND("%s:sound_w(%02X)\n", machine().describe_context(), data);
 
-	// bit 7 = stop palla (ball stop)
-	m_i_stop_palla->write_line(BIT(data, 7));
-
-	// bit 6 = contrasto (tackle)
-	m_i_contrasto->write_line(BIT(data, 6));
-
-	// bit 5 = calcio a (kick a)
-	m_i_calcio_a->write_line(BIT(data, 5));
-
-	// bit 4 = fischio (whistle)
-	m_i_fischio->write_line(BIT(data, 4));
-
-	// bit 3 = calcio b (kick b)
-	m_i_calcio_b->write_line(BIT(data, 3));
-
-	// bit 2 = folla a (crowd a)
-	m_i_folla_a->write_line(BIT(data, 2));
-
-	// bit 1 = folla m (crowd m)
-	m_i_folla_m->write_line(BIT(data, 1));
-
-	// bit 0 = folla b (crowd b)
-	m_i_folla_b->write_line(BIT(data, 0));
+	m_i_stop_palla->write_line(BIT(data, 7)); // stop palla (ball stop)
+	m_i_contrasto->write_line(BIT(data, 6));  // contrasto (tackle)
+	m_i_calcio_a->write_line(BIT(data, 5));   // calcio a (kick a)
+	m_i_fischio->write_line(BIT(data, 4));    // fischio (whistle)
+	m_i_calcio_b->write_line(BIT(data, 3));   // calcio b (kick b)
+	m_i_folla_a->write_line(BIT(data, 2));    // folla a (crowd a)
+	m_i_folla_m->write_line(BIT(data, 1));    // folla m (crowd m)
+	m_i_folla_b->write_line(BIT(data, 0));    // folla b (crowd b)
 }
 
 
 void dribling_state::pb_w(uint8_t data)
 {
-	LOGPB("%s:pb_w(%02X)\n", machine().describe_context(), data);
+	LOGSOUND("%s:pb_w(%02X)\n", machine().describe_context(), data);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -458,7 +442,7 @@ void dribling_state::machine_start()
 	save_item(NAME(m_dr));
 	save_item(NAME(m_ds));
 	save_item(NAME(m_sh));
-	save_item(NAME(m_input_mux));
+	save_item(NAME(m_input_sel));
 }
 
 void dribling_state::machine_reset()
@@ -468,7 +452,7 @@ void dribling_state::machine_reset()
 	m_dr = 0;
 	m_ds = 0;
 	m_sh = 0;
-	m_input_mux = 0;
+	m_input_sel = 0;
 }
 
 
@@ -482,7 +466,7 @@ void dribling_state::dribling(machine_config &config)
 
 	I8255A(config, m_ppi8255[0]);
 	m_ppi8255[0]->in_pa_callback().set(FUNC(dribling_state::dsr_r));
-	m_ppi8255[0]->in_pb_callback().set(FUNC(dribling_state::input_mux0_r));
+	m_ppi8255[0]->in_pb_callback().set(FUNC(dribling_state::input_matrix_read));
 	m_ppi8255[0]->out_pc_callback().set(FUNC(dribling_state::misc_w));
 
 	I8255A(config, m_ppi8255[1]);

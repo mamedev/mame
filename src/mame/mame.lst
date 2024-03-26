@@ -20122,7 +20122,9 @@ haunthig                        // (c) 200?
 klxyj                           // (c) 200?
 lhzb3                           // (c) 200?
 lhzb4                           // (c) 200?
+mgcs3                           // (c) 200?
 mgfx                            // (c) 200?
+mgzz                            // (c) 2003
 qlgs                            // (c) 1999
 sddz                            // (c) 200?
 sdwx                            // (c) 2002
@@ -35712,6 +35714,9 @@ compc1                          // 1984 Commodore PC-1
 
 @source:pc/ct486.cpp
 ct486                           // 1993? 486 with CS4031
+
+@source:pc/dawg.cpp
+dawg
 
 @source:pc/ec184x.cpp
 ec1840                          //
