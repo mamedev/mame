@@ -7660,20 +7660,6 @@ Unsupported [Menacer] peripheral
 		</part>
 	</software>
 
-	<software name="sonic1jp2" cloneof="sonic">
-		<description>Sonic The Hedgehog (World, JP2, ripped from Sonic Mega Collection)</description>
-		<year>2002</year>
-		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Official modification of rev. A which changes the spike damage behavior to be like that of later titles.
-]]></notes>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="sonic the hedgehog (world) (sonic mega collection).md" size="524288" crc="6382b2c5" sha1="95b6aac7e11bb2d908aafa06973ffeb45817a992"/>
-			</dataarea>
-		</part>
-	</software>
-
 <!-- Euro and Jpn are confirmed -->
 	<software name="sonic2">
 		<description>Sonic The Hedgehog 2 (World, rev. A)</description>
@@ -27703,6 +27689,20 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic spinball (usa) (alt).bin" size="1048576" crc="e9960371" sha1="8f372e3552e309d3462adeb700242b251f59def1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic1jp2" cloneof="sonic">
+		<description>Sonic The Hedgehog (JP2, ripped from Sonic Mega Collection)</description>
+		<year>2002</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Official modification of rev. A which changes the spike damage behavior to be like that of later titles.
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="sonic the hedgehog (world) (sonic mega collection).bin" size="524288" crc="6382b2c5" sha1="95b6aac7e11bb2d908aafa06973ffeb45817a992"/>
 			</dataarea>
 		</part>
 	</software>
