@@ -30,8 +30,9 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <optional>
 #include <new>
+#include <optional>
+#include <regex>
 #include <string_view>
 #include <tuple>
 #include <unordered_map>
@@ -96,6 +97,7 @@ constexpr int MODE_GDI = 2;
 #define OPTION_INPUT "input"
 #define OPTION_OUTPUT "output"
 #define OPTION_OUTPUT_BIN "outputbin"
+#define OPTION_OUTPUT_SPLIT "outputsplit"
 #define OPTION_OUTPUT_FORCE "force"
 #define OPTION_INPUT_START_BYTE "inputstartbyte"
 #define OPTION_INPUT_START_HUNK "inputstarthunk"
@@ -628,6 +630,7 @@ static const option_description s_options[] =
 	{ OPTION_INPUT_PARENT,          "ip",   true, " <filename>: parent file name for input CHD" },
 	{ OPTION_OUTPUT,                "o",    true, " <filename>: output file name" },
 	{ OPTION_OUTPUT_BIN,            "ob",   true, " <filename>: output file name for binary data" },
+	{ OPTION_OUTPUT_SPLIT,          "os",   false, ": output one binary file per track" },
 	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting an existing file" },
 	{ OPTION_OUTPUT_PARENT,         "op",   true, " <filename>: parent file name for output CHD" },
 	{ OPTION_INPUT_START_BYTE,      "isb",  true, " <offset>: starting byte offset within the input" },
@@ -782,6 +785,7 @@ static const command_description s_commands[] =
 		{
 			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_BIN,
+			OPTION_OUTPUT_SPLIT,
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
@@ -1462,62 +1466,19 @@ static void compress_common(chd_file_compressor &chd)
 //  to a CUE file
 //-------------------------------------------------
 
-void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_file::track_info &info, const std::string &filename, uint32_t frameoffs, uint64_t discoffs)
+void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_file::track_info &info, const std::string &filename, uint32_t frameoffs, uint64_t outputoffs)
 {
 	if (mode == MODE_GDI)
 	{
-		int mode = 0, size = 2048;
-
-		switch (info.trktype)
-		{
-			case cdrom_file::CD_TRACK_MODE1:
-				mode = 4;
-				size = 2048;
-				break;
-
-			case cdrom_file::CD_TRACK_MODE1_RAW:
-				mode = 4;
-				size = 2352;
-				break;
-
-			case cdrom_file::CD_TRACK_MODE2:
-				mode = 4;
-				size = 2336;
-				break;
-
-			case cdrom_file::CD_TRACK_MODE2_FORM1:
-				mode = 4;
-				size = 2048;
-				break;
-
-			case cdrom_file::CD_TRACK_MODE2_FORM2:
-				mode = 4;
-				size = 2324;
-				break;
-
-			case cdrom_file::CD_TRACK_MODE2_FORM_MIX:
-				mode = 4;
-				size = 2336;
-				break;
-
-			case cdrom_file::CD_TRACK_MODE2_RAW:
-				mode = 4;
-				size = 2352;
-				break;
-
-			case cdrom_file::CD_TRACK_AUDIO:
-				mode = 0;
-				size = 2352;
-				break;
-		}
+		const int tracktype = info.trktype == cdrom_file::CD_TRACK_AUDIO ? 0 : 4;
 		const bool needquote = filename.find(' ') != std::string::npos;
 		const char *const quotestr = needquote ? "\"" : "";
-		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, quotestr, filename, quotestr, discoffs);
+		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, tracktype, info.datasize, quotestr, filename, quotestr, outputoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
-		// first track specifies the file
-		if (tracknum == 0)
+		// specify a new file when writing to the beginning of a file
+		if (outputoffs == 0)
 			file.printf("FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
@@ -1592,11 +1553,10 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		if (info.pregap > 0)
 			file.printf("ZERO %s %s\n", modesubmode, msf_string_from_frames(info.pregap));
 
-		// all tracks but the first one have a file offset
-		if (tracknum > 0)
-			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, uint32_t(discoffs), msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
-		else
+		if (outputoffs == 0)
 			file.printf("DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
+		else
+			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, uint32_t(outputoffs), msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
 
 		// tracks with pregaps get a START marker too
 		if (info.pregap > 0)
@@ -2591,43 +2551,67 @@ static void do_extract_cd(parameters_map &params)
 	if (output_file_str != params.end())
 		check_existing_output_file(params, *output_file_str->second);
 
-	// verify output BIN file doesn't exist
+	// determine output type based on the specified file extension
+	int mode = MODE_NORMAL;
+	if (core_filename_ends_with(*output_file_str->second, ".cue"))
+		mode = MODE_CUEBIN;
+	else if (core_filename_ends_with(*output_file_str->second, ".gdi"))
+		mode = MODE_GDI;
+
+	// determine the output bin filename based on provided input parameters
 	auto output_bin_file_fnd = params.find(OPTION_OUTPUT_BIN);
 	std::string default_name(*output_file_str->second);
+
+	// split path and extension
 	int chop = default_name.find_last_of('.');
 	if (chop != -1)
 		default_name.erase(chop, default_name.size());
-	std::string basename = default_name;
-	default_name.append(".bin");
+
+	// GDIs will always output as split bin
+	bool is_splitbin = mode == MODE_GDI || params.find(OPTION_OUTPUT_SPLIT) != params.end();
+	if (is_splitbin)
+	{
+		if (mode == MODE_GDI)
+		{
+			default_name += "%02t";
+		}
+		else
+		{
+			const std::string format = toc.numtrks >= 10 ? "%02t" : "%t";
+			default_name += " (Track " + format + ")";
+		}
+	}
+
+	std::string output_bin_file_ext = ".bin";
 	std::string *output_bin_file_str;
 	if (output_bin_file_fnd == params.end())
+	{
 		output_bin_file_str = &default_name;
+	}
 	else
+	{
 		output_bin_file_str = output_bin_file_fnd->second;
 
-	check_existing_output_file(params, *output_bin_file_str);
+		chop = (*output_bin_file_str).find_last_of('.');
+		if (chop != -1)
+		{
+			output_bin_file_ext = (*output_bin_file_str).substr(chop, (*output_bin_file_str).size() - chop);
+			(*output_bin_file_str).erase(chop, (*output_bin_file_str).size());
+		}
+	}
 
 	// print some info
-	util::stream_format(std::cout, "Output TOC:   %s\n", *output_file_str->second);
-	util::stream_format(std::cout, "Output Data:  %s\n", *output_bin_file_str);
 	util::stream_format(std::cout, "Input CHD:    %s\n", *params.find(OPTION_INPUT)->second);
+	util::stream_format(std::cout, "Output TOC:   %s\n", *output_file_str->second);
 
 	// catch errors so we can close & delete the output file
+	std::vector<std::string> track_filenames;
 	util::core_file::ptr output_bin_file;
 	util::core_file::ptr output_toc_file;
+	std::vector<std::string> output_bin_filenames;
+	std::string trackbin_name;
 	try
 	{
-		int mode = MODE_NORMAL;
-
-		if (output_file_str->second->find(".cue") != -1)
-		{
-			mode = MODE_CUEBIN;
-		}
-		else if (output_file_str->second->find(".gdi") != -1)
-		{
-			mode = MODE_GDI;
-		}
-
 		if (cdrom->is_gdrom() && (mode == MODE_CUEBIN))
 		{
 			util::stream_format(std::cout, "Warning: extracting GD-ROM CHDs as bin/cue is not fully supported and will result in an unusable CD-ROM cue file.\n");
@@ -2638,18 +2622,77 @@ static void do_extract_cd(parameters_map &params)
 		if (filerr)
 			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
 
-		// process output BIN file
-		if (mode != MODE_GDI)
-		{
-			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
-			if (filerr)
-				report_error(1, "Unable to open file (%s): %s", *output_bin_file_str, filerr.message());
-		}
-
-		// determine total frames
 		uint64_t total_bytes = 0;
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
+		{
+			// determine total frames
 			total_bytes += toc.tracks[tracknum].frames * (toc.tracks[tracknum].datasize + toc.tracks[tracknum].subsize);
+
+			// generate output filename for each track
+			std::string new_trackbin_name = *output_bin_file_str;
+
+			if (mode == MODE_GDI && toc.tracks[tracknum].trktype == cdrom_file::CD_TRACK_AUDIO)
+				new_trackbin_name += ".raw";
+			else
+				new_trackbin_name += output_bin_file_ext;
+
+			// variable replacement in output filename
+			const std::regex variables_regex("(%*)(%([+-]?\\d+)?([a-zA-Z]))");
+			std::string::const_iterator new_trackbin_name_itr = new_trackbin_name.begin();
+			std::string::const_iterator new_trackbin_name_end = new_trackbin_name.end();
+			std::string filename_formatted = new_trackbin_name;
+			std::smatch variable_matches;
+
+			while (std::regex_search(new_trackbin_name_itr, new_trackbin_name_end, variable_matches, variables_regex))
+			{
+				// full_match will always have one leading %, so if leading_escape has an even number of %s then
+				// we can know that we're working on an unescaped %
+				const std::string leading_escape = variable_matches[1].str();
+				const std::string full_match = variable_matches[2].str();
+				const std::string format_part = variable_matches[3].str();
+				const std::string format_type = variable_matches[4].str();
+
+				if ((leading_escape.size() % 2) == 0)
+				{
+					std::string replacement;
+
+					if (format_type == "t")
+					{
+						// track number
+						replacement = util::string_format("%" + format_part + "d", tracknum+1);
+
+						if (!is_splitbin)
+						{
+							util::stream_format(std::cout, "Warning: --%s not specified but track format string detected, enabling automatically\n", OPTION_OUTPUT_SPLIT);
+							is_splitbin = true;
+						}
+					}
+					else
+					{
+						util::stream_format(std::cout, "Warning: encountered unknown format value '%s', ignoring\n", format_type);
+					}
+
+					if (!replacement.empty())
+					{
+						// replace all instances of encountered full format token
+						size_t index = std::string::npos;
+						while ((index = filename_formatted.find(full_match)) != std::string::npos)
+							filename_formatted.replace(index, full_match.size(), replacement);
+					}
+				}
+
+				new_trackbin_name_itr = variable_matches.suffix().first; // move past match for next loop
+			}
+
+			// verify output BIN file doesn't exist
+			check_existing_output_file(params, filename_formatted);
+
+			// display all new filenames to the user
+			if (track_filenames.empty() || filename_formatted != track_filenames.back())
+				util::stream_format(std::cout, "Output Data:  %s\n", filename_formatted);
+
+			track_filenames.push_back(filename_formatted);
+		}
 
 		// GDI must start with the # of tracks
 		if (mode == MODE_GDI)
@@ -2694,40 +2737,38 @@ static void do_extract_cd(parameters_map &params)
 		}
 
 		// iterate over tracks and copy all data
+		uint64_t totaloutputoffs = 0;
 		uint64_t outputoffs = 0;
 		uint32_t discoffs = 0;
 		std::vector<uint8_t> buffer;
+
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
-			std::string trackbin_name = basename;
-
-			if (mode == MODE_GDI)
+			if (is_splitbin)
 			{
-				trackbin_name += util::string_format("%02d", tracknum+1);
-				if (toc.tracks[tracknum].trktype == cdrom_file::CD_TRACK_AUDIO)
-					trackbin_name += ".raw";
-				else
-					trackbin_name += ".bin";
+				totaloutputoffs += outputoffs;
+				outputoffs = 0;
 
+				if (mode != MODE_GDI)
+					discoffs = 0;
+			}
+
+			if (track_filenames[tracknum] != trackbin_name)
+			{
 				output_bin_file.reset();
+
+				trackbin_name = track_filenames[tracknum];
 
 				filerr = util::core_file::open(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
 				if (filerr)
 					report_error(1, "Unable to open file (%s): %s", trackbin_name, filerr.message());
 
-				outputoffs = 0;
+				output_bin_filenames.push_back(trackbin_name);
 			}
 
 			// output the metadata about the track to the TOC file
 			const cdrom_file::track_info &trackinfo = toc.tracks[tracknum];
-			if (mode == MODE_GDI)
-			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
-			}
-			else
-			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(*output_bin_file_str)), discoffs, outputoffs);
-			}
+			output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
 			// the subdata size in the buffer calculation.
@@ -2747,7 +2788,7 @@ static void do_extract_cd(parameters_map &params)
 			uint32_t actualframes = trackinfo.frames - trackinfo.padframes;
 			for (uint32_t frame = 0; frame < actualframes; frame++)
 			{
-				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(outputoffs) / double(total_bytes));
+				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(totaloutputoffs + outputoffs) / double(total_bytes));
 
 				// read the data
 				cdrom->read_data(cdrom->get_track_start_phys(tracknum) + frame, &buffer[bufferoffs], trackinfo.trktype, true);
@@ -2818,7 +2859,8 @@ static void do_extract_cd(parameters_map &params)
 		// delete the output files
 		output_bin_file.reset();
 		output_toc_file.reset();
-		osd_file::remove(*output_bin_file_str);
+		for (auto output_bin_filename : output_bin_filenames)
+			osd_file::remove(output_bin_filename);
 		osd_file::remove(*output_file_str->second);
 		throw;
 	}
