@@ -63,6 +63,8 @@ public:
 	void init_amazonia();
 	void init_amazoni2();
 	void init_qlgs();
+	void init_mgzz();
+	void init_mgcs3();
 
 protected:
 	virtual void video_start() override;
@@ -1188,6 +1190,19 @@ void igs_m027_state::init_qlgs()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_mgzz()
+{
+	mgzz_decrypt(machine());
+	//qlgs_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
+void igs_m027_state::init_mgcs3()
+{
+	mgcs3_decrypt(machine());
+	//qlgs_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
 
 } // anonymous namespace
 
@@ -1216,5 +1231,5 @@ GAME( 2002, chessc2,   0,        igs_mahjong, sdwx,     igs_m027_state, init_che
 GAME( 200?, haunthig,  0,        igs_mahjong, sdwx,     igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
 GAME( 200?, extradrw,  0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Extra Draw",   MACHINE_IS_SKELETON )
 GAME( 200?, crzybugs,  0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // 2006 according to some sources
-GAME( 2003, mgzz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)",   MACHINE_IS_SKELETON )
-GAME( 200?, mgcs3,     0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Man Guan Caishen 3 (V101CN)",   MACHINE_IS_SKELETON )
+GAME( 2003, mgzz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)",   MACHINE_IS_SKELETON )
+GAME( 2007, mgcs3,     0,        igs_mahjong, sdwx,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)",   MACHINE_IS_SKELETON )

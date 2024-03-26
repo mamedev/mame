@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ElSemi
-/* IGS 027 Encryptions */
+// copyright-holders: David Haywood, ElSemi
+// IGS 027 Encryptions
 
 void pgm_kov_decrypt(running_machine &machine);
 void pgm_kovsh_decrypt(running_machine &machine);
@@ -39,3 +39,5 @@ void slqz3_decrypt(running_machine &machine);
 void fruitpar_decrypt(running_machine &machine);
 void amazonia_decrypt(running_machine &machine);
 void amazoni2_decrypt(running_machine &machine);
+void mgzz_decrypt(running_machine &machine);
+void mgcs3_decrypt(running_machine &machine);
