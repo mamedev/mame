@@ -54,7 +54,7 @@ public:
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
 	uint16_t src_stride()
 	{
-		return (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 0) & 0xfff8;
+		return (s3virge.s3d.dest_src_stride >> 0) & 0xfff8;
 	}
 	uint16_t dest_stride()
 	{
@@ -66,7 +66,7 @@ public:
 //              + ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8);
 //      }
 //      else
-			return (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8;
+			return (s3virge.s3d.dest_src_stride >> 16) & 0xfff8;
 	}
 
 	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existent 8514/A device\n"); return nullptr; }
@@ -128,6 +128,26 @@ protected:
 		S3D_REG_RDEST_XY = 0x10c/4
 	};
 
+	struct bitblt_struct {
+		u32 src_base = 0;
+		u32 dest_base = 0;
+		u32 clip_l_r = 0;
+		u32 clip_t_b = 0;
+		u32 dest_src_str = 0;
+		u64 mono_pat = 0;
+		u32 pat_bg_clr = 0;
+		u32 pat_fg_clr = 0;
+		u32 src_bg_clr = 0;
+		u32 src_fg_clr = 0;
+		u32 cmd_set = 0;
+		u32 rwidth_height = 0;
+		u32 rsrc_xy = 0;
+		u32 rdest_xy = 0;
+	};
+
+	util::fifo<bitblt_struct, 16> m_bitblt_fifo;
+	bitblt_struct m_bitblt_latch; 
+
 	struct
 	{
 		uint32_t linear_address;
@@ -140,18 +160,8 @@ protected:
 		{
 			int state;
 			bool busy;
-			struct
-			{
-				uint32_t reg[0x200/4];
-				int op_type;
-				uint32_t command;
-			} cmd_fifo[16];
-			int cmd_fifo_next_ptr;  // command added here in FIFO
-			int cmd_fifo_current_ptr;  // command currently being processed in FIFO
-			int cmd_fifo_slots_free;
 
 			uint8_t pattern[0xc0];
-			uint32_t reg[5][0x200/4];
 
 			// BitBLT command state
 			uint16_t bitblt_x_src;
@@ -176,11 +186,19 @@ protected:
 			uint16_t clip_t;
 			uint16_t clip_b;
 			uint32_t command;
+			uint32_t src_base;
+			uint32_t dest_base;
+			uint32_t pat_bg_clr;
+			uint32_t pat_fg_clr;
+			uint32_t src_bg_clr;
+			uint32_t src_fg_clr;
+			uint32_t dest_src_stride;
 		} s3d;
 		uint8_t cr66;
 	} s3virge;
 
 	TIMER_CALLBACK_MEMBER(draw_step_tick);
+	TIMER_CALLBACK_MEMBER(command_timer_cb);
 
 	inline void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
 	inline void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
@@ -201,6 +219,7 @@ protected:
 	// has no 8514/A device
 private:
 	emu_timer* m_draw_timer;
+	emu_timer* m_cmd_timer;
 	void bitblt_step();
 	void bitblt_colour_step();
 	void bitblt_monosrc_step();
@@ -209,7 +228,6 @@ private:
 	void line3d_step();
 	void poly3d_step();
 	void add_command(u8 cmd_type);
-	void command_start();
 	void command_finish();
 
 	void s3d_reset();
