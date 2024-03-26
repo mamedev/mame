@@ -7660,6 +7660,7 @@ Unsupported [Menacer] peripheral
 		</part>
 	</software>
 
+
 <!-- Euro and Jpn are confirmed -->
 	<software name="sonic2">
 		<description>Sonic The Hedgehog 2 (World, rev. A)</description>
