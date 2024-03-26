@@ -65,6 +65,7 @@ void virge_pci_device::mmio_map(address_map& map)
 
 void virge_pci_device::lfb_map(address_map& map)
 {
+	// NOTE: upper mirror is i/f for BE hosts.
 	map(0x0, 0x00ffffff).mirror(0x02000000).rw(m_vga, FUNC(s3virge_vga_device::fb_r), FUNC(s3virge_vga_device::fb_w));
 }
 

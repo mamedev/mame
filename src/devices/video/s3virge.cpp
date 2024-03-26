@@ -496,6 +496,7 @@ void s3virge_vga_device::add_command(u8 cmd_type)
 
 	LOGCMD("Added command type %i %08x\n", cmd_type, m_bitblt_latch.cmd_set);
 
+	// TODO: trigger on idle state only
 	m_cmd_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
 
 //	s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type = cmd_type;
@@ -555,14 +556,13 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 			s3virge.s3d.clip_l = (command_struct.clip_l_r & 0x07ff0000) >> 16;
 			s3virge.s3d.clip_b = command_struct.clip_t_b & 0x000007ff;
 			s3virge.s3d.clip_t = (command_struct.clip_t_b & 0x07ff0000) >> 16;
-			s3virge.s3d.busy = true;
-			//if(!(BIT(command_struct.cmd_set, 7)))
+			if(!(BIT(command_struct.cmd_set, 7)))
 			{
+				s3virge.s3d.busy = true;
 				m_draw_timer->adjust(attotime::from_nsec(250),0,attotime::from_nsec(250));
 			}
 			s3virge.s3d.bitblt_step_count = 0;
-			//s3virge.s3d.bitblt_mono_pattern =
-			//      s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_0] | (uint64_t)(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_1]) << 32;
+			s3virge.s3d.bitblt_mono_pattern = command_struct.mono_pat;
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
 			s3virge.s3d.command = command_struct.cmd_set;
