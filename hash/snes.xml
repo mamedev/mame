@@ -22740,7 +22740,7 @@ more investigation needed...
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="rockman's soccer (prototype).sfc" size="1572864"  crc="B999B148" sha1="28E030ACD8A41DE9CA8F6AED5144D3DD85DE6D11" offset="0x000000" />
+				<rom name="rockman's soccer (prototype).sfc" size="1572864" offset="0x000000" crc="b999b148" sha1="28e030acd8a41de9ca8f6aed5144d3dd85de6d11" />
 			</dataarea>
 		</part>
 	</software>
