@@ -89,6 +89,7 @@ void h83217_device::map(address_map &map)
 	map(0xff9b, 0xff9b).rw(m_timer8[2], FUNC(h8_timer8_channel_device::tcsr_r), FUNC(h8_timer8_channel_device::tcsr_w));
 	map(0xff9c, 0xff9d).rw(m_timer8[2], FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
 	map(0xff9e, 0xff9e).rw(m_timer8[2], FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
+	map(0xff9f, 0xff9f).lw8(NAME([this](u8 data) { logerror("tconr = %02x\n", data); }));
 
 	map(0xffaa, 0xffab).rw(m_watchdog, FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
 
@@ -110,6 +111,7 @@ void h83217_device::map(address_map &map)
 	map(0xffbc, 0xffbc).w(m_port[6], FUNC(h8_port_device::ddr_w));
 	map(0xffbe, 0xffbe).rw(m_port[6], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 
+	map(0xffc2, 0xffc2).lw8(NAME([this](u8 data) { logerror("wscr = %02x\n", data); }));
 	map(0xffc3, 0xffc3).rw(FUNC(h83217_device::stcr_r), FUNC(h83217_device::stcr_w));
 	map(0xffc4, 0xffc4).rw(FUNC(h83217_device::syscr_r), FUNC(h83217_device::syscr_w));
 	map(0xffc5, 0xffc5).r(FUNC(h83217_device::mdcr_r));

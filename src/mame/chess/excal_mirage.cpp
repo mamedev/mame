@@ -486,7 +486,7 @@ u8 mirage_state::p7_r()
 void mirage_state::p7_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	// P70,P71: LCD common
-	m_lcd_com = mem_mask << 2 | (data & 3);
+	m_lcd_com = (mem_mask << 2 & 0xc) | (data & 3);
 	update_lcd();
 
 	// P74: motor X direction
