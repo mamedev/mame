@@ -149,10 +149,10 @@ private:
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
-	u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
+	virtual u16 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
 	u32 get_vpage_offset();
-	rectangle get_screen_area() override;
-	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual rectangle get_screen_area() override;
+	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);

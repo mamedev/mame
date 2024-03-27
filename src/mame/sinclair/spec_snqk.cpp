@@ -1072,7 +1072,7 @@ void spectrum_state::setup_plusd(uint8_t *snapdata, uint32_t snapsize)
 						m_port_7ffd_data += i;
 						update_paging();
 						break;
-			};
+			}
 			logerror("Loading bank %d from offset:%05X\n", i, PLUSD128_HDR + i*SPECTRUM_BANK);
 			for (j = 0; j < SPECTRUM_BANK; j++)
 				space.write_byte(j + addr, snapdata[j + PLUSD128_HDR + i*SPECTRUM_BANK]);
@@ -2010,7 +2010,7 @@ void spectrum_state::setup_frz(uint8_t *snapdata, uint32_t snapsize)
 					m_port_7ffd_data += banks[i];
 					update_paging();
 					break;
-		};
+		}
 		logerror("Loading bank %d from offset:%05X\n", banks[i], FRZ_HDR + i*SPECTRUM_BANK);
 		for (j = 0; j < SPECTRUM_BANK; j++)
 			space.write_byte(j + addr, snapdata[j + FRZ_HDR + i*SPECTRUM_BANK]);

@@ -61,31 +61,42 @@ public:
 	auto out_iorq_callback() { return m_out_iorq_cb.bind(); }
 
 	uint8_t read();
-	void write(uint8_t data);
+	virtual void write(uint8_t data);
 
 	void iei_w(int state) { m_iei = state; interrupt_check(); }
 	void rdy_w(int state);
 	void wait_w(int state);
 	void bai_w(int state);
 
-private:
+protected:
+	z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// internal helpers
+	uint8_t is_dma_enabled() { return m_dma_enabled; }
+	virtual int is_ready();
+	void interrupt_check();
+	void trigger_interrupt(int level);
+	void do_read();
+	virtual void do_write();
+	void do_transfer_write();
+	void do_search();
+
+	uint16_t  m_regs[(6<<3)+1+1];
+	uint8_t   m_num_follow;
+
+	uint16_t m_addressA;
+	uint16_t m_addressB;
+	uint16_t m_count;
+	uint16_t m_byte_counter;
+
+private:
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
-
-	// internal helpers
-	int is_ready();
-	void interrupt_check();
-	void trigger_interrupt(int level);
-	void do_read();
-	void do_write();
-	void do_transfer_write();
-	void do_search();
 
 	TIMER_CALLBACK_MEMBER(timerproc);
 
@@ -105,8 +116,6 @@ private:
 
 	emu_timer *m_timer;
 
-	uint16_t  m_regs[(6<<3)+1+1];
-	uint8_t   m_num_follow;
 	uint8_t   m_cur_follow;
 	uint8_t   m_regs_follow[5];
 	uint8_t   m_read_num_follow;
@@ -114,11 +123,6 @@ private:
 	uint8_t   m_read_regs_follow[7];
 	uint8_t   m_status;
 	uint8_t   m_dma_enabled;
-
-	uint16_t m_addressA;
-	uint16_t m_addressB;
-	uint16_t m_count;
-	uint16_t m_byte_counter;
 
 	int m_rdy;
 	int m_force_ready;
@@ -133,7 +137,7 @@ private:
 	int m_iei;                  // interrupt enable input
 	int m_ip;                   // interrupt pending
 	int m_ius;                  // interrupt under service
-	uint8_t m_vector;             // interrupt vector
+	uint8_t m_vector;           // interrupt vector
 };
 
 

@@ -174,7 +174,7 @@ rectangle atm_state::get_screen_area()
 	}
 }
 
-u8 atm_state::get_border_color(u16 hpos, u16 vpos)
+u16 atm_state::get_border_color(u16 hpos, u16 vpos)
 {
 	return m_br3 | (m_port_fe_data & 0x07);
 }

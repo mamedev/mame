@@ -183,7 +183,7 @@ protected:
 	optional_ioport m_io_joy1;
 	optional_ioport m_io_joy2;
 
-	virtual u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0);
+	virtual u16 get_border_color(u16 hpos = ~0, u16 vpos = ~0);
 	// Defines position of main screen excluding border
 	virtual rectangle get_screen_area();
 	virtual void spectrum_update_border(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

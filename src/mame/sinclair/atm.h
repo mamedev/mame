@@ -63,7 +63,7 @@ protected:
 	u16 &pen_page(u8 bank) { return m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
 	void atm_update_memory();
 	virtual u8 merge_ram_with_7ffd(u8 ram_page) { return (ram_page & ~0x07) | (m_port_7ffd_data & 0x07); }
-	virtual bool is_port_7ffd_locked() { return BIT(m_port_7ffd_data, 5); };
+	virtual bool is_port_7ffd_locked() { return BIT(m_port_7ffd_data, 5); }
 	bool is_dos_active() { return !m_cpm_n || m_beta->is_active(); }
 
 	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -72,7 +72,7 @@ protected:
 	void atm_update_screen_hi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual u16 atm_update_memory_get_page(u8 bank);
-	virtual u8 get_border_color(u16 hpos, u16 vpos) override;
+	virtual u16 get_border_color(u16 hpos, u16 vpos) override;
 	virtual rectangle get_screen_area() override;
 	INTERRUPT_GEN_MEMBER(atm_interrupt);
 
