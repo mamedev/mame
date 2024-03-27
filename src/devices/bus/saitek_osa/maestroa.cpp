@@ -28,13 +28,46 @@ compatible for upgrading to newer Maestro versions.
 
 #include "softlist_dev.h"
 
-
-DEFINE_DEVICE_TYPE(OSA_MAESTROA, saitekosa_maestroa_device, "osa_maestroa", "Saitek OSA Maestro A")
-
+namespace {
 
 //-------------------------------------------------
 //  initialization
 //-------------------------------------------------
+
+class saitekosa_maestroa_device : public device_t, public device_saitekosa_expansion_interface
+{
+public:
+	// construction/destruction
+	saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
+
+	// from host
+	virtual u8 data_r() override;
+	virtual void nmi_w(int state) override;
+	virtual void ack_w(int state) override;
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	u8 m_latch = 0xff;
+	bool m_latch_enable = false;
+
+	void main_map(address_map &map);
+
+	u8 rts_r();
+	u8 xdata_r();
+	void xdata_w(u8 data);
+	u8 ack_r();
+	void control_w(u8 data);
+};
 
 saitekosa_maestroa_device::saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, OSA_MAESTROA, tag, owner, clock),
@@ -61,59 +94,23 @@ INPUT_CHANGED_MEMBER(saitekosa_maestroa_device::change_cpu_freq)
 
 
 //-------------------------------------------------
-//  rom_region - device-specific ROM region
+//  host i/o
 //-------------------------------------------------
 
-ROM_START( maestroa )
-	ROM_REGION(0x10000, "maincpu", 0)
-
-	ROM_DEFAULT_BIOS("a1")
-
-	// A
-	ROM_SYSTEM_BIOS(0, "a1", "Maestro A (set 1)")
-	ROMX_LOAD("m6a_a29b.u6", 0x8000, 0x8000, CRC(6ee0197a) SHA1(61f201ca64576aca582bc9f2a427638bd79e1fee), ROM_BIOS(0))
-
-	ROM_SYSTEM_BIOS(1, "a2", "Maestro A (set 2)")
-	ROMX_LOAD("m6a_v14b.u6", 0x8000, 0x8000, CRC(d566a476) SHA1(ef81b9a0dcfbd8427025cfe9bf738d42a7a1139a), ROM_BIOS(1))
-ROM_END
-
-const tiny_rom_entry *saitekosa_maestroa_device::device_rom_region() const
+u8 saitekosa_maestroa_device::data_r()
 {
-	return ROM_NAME(maestroa);
+	return m_latch_enable ? m_latch : 0xff;
 }
 
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-static INPUT_PORTS_START( maestroa )
-	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestroa_device, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "4MHz" )
-	PORT_CONFSETTING(    0x01, "5.67MHz" )
-	PORT_CONFSETTING(    0x02, "6MHz" )
-INPUT_PORTS_END
-
-ioport_constructor saitekosa_maestroa_device::device_input_ports() const
+void saitekosa_maestroa_device::nmi_w(int state)
 {
-	return INPUT_PORTS_NAME(maestroa);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, !state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void saitekosa_maestroa_device::device_add_mconfig(machine_config &config)
+void saitekosa_maestroa_device::ack_w(int state)
 {
-	// basic machine hardware
-	R65C02(config, m_maincpu, 6_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &saitekosa_maestroa_device::main_map);
-
-	// extension rom
-	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_kso");
-	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
+	if (state != m_expansion->ack_state())
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -172,21 +169,62 @@ void saitekosa_maestroa_device::main_map(address_map &map)
 
 
 //-------------------------------------------------
-//  host i/o
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
-u8 saitekosa_maestroa_device::data_r()
+static INPUT_PORTS_START( maestroa )
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestroa_device, change_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "4MHz" )
+	PORT_CONFSETTING(    0x01, "5.67MHz" )
+	PORT_CONFSETTING(    0x02, "6MHz" )
+INPUT_PORTS_END
+
+ioport_constructor saitekosa_maestroa_device::device_input_ports() const
 {
-	return m_latch_enable ? m_latch : 0xff;
+	return INPUT_PORTS_NAME(maestroa);
 }
 
-void saitekosa_maestroa_device::nmi_w(int state)
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void saitekosa_maestroa_device::device_add_mconfig(machine_config &config)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, !state ? ASSERT_LINE : CLEAR_LINE);
+	// basic machine hardware
+	R65C02(config, m_maincpu, 6_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &saitekosa_maestroa_device::main_map);
+
+	// extension rom
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_kso");
+	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
 }
 
-void saitekosa_maestroa_device::ack_w(int state)
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+ROM_START( maestroa )
+	ROM_REGION(0x10000, "maincpu", 0)
+
+	ROM_DEFAULT_BIOS("a1")
+
+	// A
+	ROM_SYSTEM_BIOS(0, "a1", "Maestro A (set 1)")
+	ROMX_LOAD("m6a_a29b.u6", 0x8000, 0x8000, CRC(6ee0197a) SHA1(61f201ca64576aca582bc9f2a427638bd79e1fee), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "a2", "Maestro A (set 2)")
+	ROMX_LOAD("m6a_v14b.u6", 0x8000, 0x8000, CRC(d566a476) SHA1(ef81b9a0dcfbd8427025cfe9bf738d42a7a1139a), ROM_BIOS(1))
+ROM_END
+
+const tiny_rom_entry *saitekosa_maestroa_device::device_rom_region() const
 {
-	if (state != m_expansion->ack_state())
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	return ROM_NAME(maestroa);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(OSA_MAESTROA, device_saitekosa_expansion_interface, saitekosa_maestroa_device, "osa_maestroa", "Saitek OSA Maestro A")
