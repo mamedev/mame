@@ -109,25 +109,6 @@ protected:
 		S3D_STATE_3DPOLY
 	};
 
-	enum
-	{
-		S3D_REG_SRC_BASE = 0xd4/4,
-		S3D_REG_DEST_BASE = 0xd8/4,
-		S3D_REG_CLIP_L_R = 0xdc/4,
-		S3D_REG_CLIP_T_B = 0xe0/4,
-		S3D_REG_DEST_SRC_STR = 0xe4/4,
-		S3D_REG_MONO_PAT_0 = 0xe8/4,
-		S3D_REG_MONO_PAT_1 = 0xec/4,
-		S3D_REG_PAT_BG_CLR = 0xf0/4,
-		S3D_REG_PAT_FG_CLR = 0xf4/4,
-		S3D_REG_SRC_BG_CLR = 0xf8/4,
-		S3D_REG_SRC_FG_CLR = 0xfc/4,
-		//S3D_REG_COMMAND = 0x100/4,
-		S3D_REG_RWIDTH_HEIGHT = 0x104/4,
-		S3D_REG_RSRC_XY = 0x108/4,
-		S3D_REG_RDEST_XY = 0x10c/4
-	};
-
 	struct bitblt_struct {
 		u32 src_base = 0;
 		u32 dest_base = 0;

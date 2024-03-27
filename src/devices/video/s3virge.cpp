@@ -37,8 +37,9 @@
 #define LOG_CMD   (1U << 2)
 #define LOG_MMIO  (1U << 3)
 #define LOG_PIXEL (1U << 4) // log pixel writes (verbose)
+#define LOG_FIFO  (1U << 5)
 
-#define VERBOSE (LOG_REG | LOG_CMD | LOG_MMIO)
+#define VERBOSE (LOG_REG | LOG_CMD | LOG_MMIO | LOG_FIFO)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -46,7 +47,8 @@
 #define LOGREG(...)    LOGMASKED(LOG_REG, __VA_ARGS__)
 #define LOGCMD(...)    LOGMASKED(LOG_CMD, __VA_ARGS__)
 #define LOGMMIO(...)   LOGMASKED(LOG_MMIO, __VA_ARGS__)
-#define LOGPIXEL(...) LOGMASKED(LOG_PIXEL, __VA_ARGS__)
+#define LOGPIXEL(...)  LOGMASKED(LOG_PIXEL, __VA_ARGS__)
+#define LOGFIFO(...)   LOGMASKED(LOG_FIFO, __VA_ARGS__)
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output & 1) ? 0x3d0 : 0x3b0)
 
@@ -158,10 +160,10 @@ void s3virgedx_rev1_vga_device::device_start()
 
 void s3virge_vga_device::s3d_reset()
 {
+	LOGFIFO("S3D Reset\n");
 	m_bitblt_fifo.clear();
 	m_cmd_timer->adjust(attotime::never);
 	m_draw_timer->adjust(attotime::never);
-
 	s3virge.s3d.state = S3D_STATE_IDLE;
 	s3virge.s3d.busy = false;
 	// beos 4.x (and presumably Win 3.1) never sets this when using BitBlt,
@@ -490,14 +492,16 @@ void s3virge_vga_device::fb_w(offs_t offset, uint8_t data)
 void s3virge_vga_device::add_command(u8 cmd_type)
 {
 	// TODO: handle full FIFO (should discard operation?)
-	if(m_bitblt_fifo.full())
+	if (m_bitblt_fifo.full())
 		throw emu_fatalerror("s3virge: FIFO full");
+
 	m_bitblt_fifo.enqueue(m_bitblt_latch);
 
-	LOGCMD("Added command type %i %08x\n", cmd_type, m_bitblt_latch.cmd_set);
+	LOGFIFO("Enqueue command type %i %08x (%d free)\n", cmd_type, m_bitblt_latch.cmd_set, 16 - m_bitblt_fifo.queue_length());
 
 	// TODO: trigger on idle state only
 	m_cmd_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
+
 
 //	s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type = cmd_type;
 //	s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].command = s3virge.s3d.command;
@@ -511,10 +515,16 @@ void s3virge_vga_device::add_command(u8 cmd_type)
 
 TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 {
-	if (m_bitblt_fifo.empty() || s3virge.s3d.busy)
+	// TODO: shouldn't be here
+	if (m_bitblt_fifo.empty())
 		return;
 
-	bitblt_struct command_struct = m_bitblt_fifo.dequeue();
+	if (s3virge.s3d.busy)
+		return;
+
+	const bitblt_struct command_struct = m_bitblt_fifo.dequeue();
+
+	LOGFIFO("Dequeue command %08x (%d free)\n", command_struct.cmd_set, 16 - m_bitblt_fifo.queue_length());
 
 	// start next command in FIFO
 	const u8 cmd_type = 0; //s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].op_type & 0xf;
@@ -584,18 +594,27 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 void s3virge_vga_device::command_finish()
 {
 	s3virge.s3d.state = S3D_STATE_IDLE;
-	s3virge.s3d.busy = false;
 	m_draw_timer->adjust(attotime::never);
+
+	LOGFIFO("Command finished (%u free) ", 16 - m_bitblt_fifo.queue_length());
+	s3virge.s3d.busy = false;
+
 	if (m_bitblt_fifo.empty())
+	{
 		m_cmd_timer->adjust(attotime::never);
+		LOGFIFO("- timer stop\n");
+	}
+	else
+	{
+		//m_cmd_timer->adjust(attotime::from_msec(1));
+		LOGFIFO("- timer continue\n");
+	}
 
 	// check if there is another command in the FIFO
 	//if(s3virge.s3d.cmd_fifo_slots_free < 16)
 	//	command_start();
 	//else
 	//	s3virge.s3d.busy = false;
-
-	LOGMMIO("Command finished (%u slots free)\n", m_bitblt_fifo.queue_length());
 }
 
 void s3virge_vga_device::line2d_step()
@@ -769,13 +788,18 @@ void s3virge_vga_device::bitblt_colour_step()
 	const uint8_t rop = (current_command & 0x01fe0000) >> 17;
 	const int align = (current_command & 0x000000c00) >> 10;
 	//const bool tp = bool(BIT(current_command, 9));
+	const bool mp = bool(BIT(current_command, 8));
 	const bool ids = bool(BIT(current_command, 7));
 	const bool de = bool(BIT(current_command, 5));
 	const u8 command_type = current_command >> 27;
 
 	// NOP disables autoexecute (is it supposed to not execute rest of command?)
 	if (command_type == 0xf)
-		s3virge.s3d.command &= ~1;
+	{
+		m_bitblt_latch.cmd_set &= ~1;
+		//command_finish();
+		//return;
+	}
 
 	uint32_t src = 0;
 	uint32_t dst = 0;
@@ -795,11 +819,11 @@ void s3virge_vga_device::bitblt_colour_step()
 				}
 				else
 					src = read_pixel8(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
-				if(current_command & 0x100)
+				if(mp)
 				{
-					pat = (BIT(s3virge.s3d.bitblt_mono_pattern, (s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
-						? s3virge.s3d.pat_fg_clr
-						: s3virge.s3d.pat_bg_clr;
+					//pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x))) ? s3virge.s3d.pat_fg_clr : s3virge.s3d.pat_bg_clr);
+
+					pat = BIT(s3virge.s3d.bitblt_mono_pattern, (s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)) ? s3virge.s3d.pat_fg_clr : s3virge.s3d.pat_bg_clr;
 				}
 				else
 				{
@@ -841,7 +865,7 @@ void s3virge_vga_device::bitblt_colour_step()
 			else
 				src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
 			dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
-			if(current_command & 0x100)
+			if(mp)
 			{
 				pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x))))
 					? s3virge.s3d.pat_fg_clr
@@ -865,7 +889,7 @@ void s3virge_vga_device::bitblt_colour_step()
 			else
 				src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
 			dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
-			if(current_command & 0x100)
+			if(mp)
 			{
 				pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
 					? s3virge.s3d.pat_fg_clr
@@ -890,7 +914,7 @@ void s3virge_vga_device::bitblt_colour_step()
 					{
 						s3virge.s3d.bitblt_pixel_pos = 0;
 						dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
-						if(current_command & 0x100)
+						if(mp)
 						{
 							pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
 								? s3virge.s3d.pat_fg_clr : s3virge.s3d.pat_bg_clr);
@@ -924,7 +948,7 @@ void s3virge_vga_device::bitblt_colour_step()
 			{
 				src = read_pixel24(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
 				dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
-				if(current_command & 0x100)
+				if(mp)
 				{
 					pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x))))
 						? s3virge.s3d.pat_fg_clr : s3virge.s3d.pat_bg_clr;
@@ -953,6 +977,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 	const uint8_t pixel_size = (current_command & 0x0000001c) >> 2;
 	const uint8_t rop = (current_command & 0x01fe0000) >> 17;
 	const bool tp = bool(BIT(current_command, 9));
+	//const bool mp = bool(BIT(current_command, 8));
 	const bool ids = bool(BIT(current_command, 7));
 	const bool de = bool(BIT(current_command, 5));
 	const int align = (current_command & 0x000000c00) >> 10;
@@ -960,7 +985,11 @@ void s3virge_vga_device::bitblt_monosrc_step()
 
 	// NOP disables autoexecute (is it supposed to not execute rest of command?)
 	if (command_type == 0xf)
+	{
 		m_bitblt_latch.cmd_set &= ~1;
+		//command_finish();
+		//return;
+	}
 
 	uint32_t src = 0;
 	uint32_t dst = 0;
@@ -1112,7 +1141,7 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::draw_step_tick)
 	switch(s3virge.s3d.state)
 	{
 		case S3D_STATE_IDLE:
-			command_finish();
+			m_draw_timer->adjust(attotime::never);
 			break;
 		case S3D_STATE_2DLINE:
 			line2d_step();
@@ -1222,7 +1251,7 @@ inline uint8_t s3virge_vga_device::read_pixel8(uint32_t base, uint16_t x, uint16
 // bits 27-30 - 2D Command - 0000 = BitBLT, 0010 = Rectangle Fill, 0011 = Line Draw, 0101 = Polygon Fill, 1111 = NOP (Turns off autoexecute without executing a command)
 // bit 31 - 2D / 3D Select
 
-
+// MM8504
 uint32_t s3virge_vga_device::s3d_sub_status_r()
 {
 	uint32_t res = 0x00000000;
@@ -1234,7 +1263,7 @@ uint32_t s3virge_vga_device::s3d_sub_status_r()
 	// NOTE: can actually be 24 FIFO depth with specific Scenic Mode (verify if different FIFO altogether)
 	// & 0x1f00
 	//res |= std::min(m_bitblt_fifo.queue_length(), 16) << 8;
-	res |= (15 - m_bitblt_fifo.queue_length()) << 8;
+	res |= (16 - m_bitblt_fifo.queue_length()) << 8;
 
 	return res;
 }
@@ -1293,7 +1322,7 @@ uint32_t s3virge_vga_device::s3d_func_ctrl_r()
 {
 	uint32_t ret = 0;
 
-//	ret |= (m_bitblt_fifo.queue_length << 6);
+//	ret |= (s3d_fifo_size << 6);
 	ret |= 0xf << 6;
 	return ret;
 }
@@ -1436,7 +1465,7 @@ void s3virge_vga_device::s3d_register_map(address_map &map)
 			return m_bitblt_latch.rdest_xy;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA50C (rdest_xy) = %08x\n", data);
+			LOGMMIO("MMA50C (rdest_xy) = %08x & mem_mask\n", data, mem_mask);
 			COMBINE_DATA(&m_bitblt_latch.rdest_xy);
 			// autoexecute enabled
 			if(BIT(m_bitblt_latch.cmd_set, 0))
