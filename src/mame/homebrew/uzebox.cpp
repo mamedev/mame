@@ -14,12 +14,11 @@
 
 #include "emu.h"
 
-#include "cpu/avr8/avr8.h"
-#include "sound/spkrdev.h"
-
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/snes_ctrl/ctrl.h"
+#include "cpu/avr8/avr8.h"
+#include "sound/spkrdev.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -31,7 +30,7 @@ namespace {
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180
 
-#define INTERLACED      0
+#define INTERLACED   0
 
 class uzebox_state : public driver_device
 {
@@ -44,9 +43,14 @@ public:
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
 		, m_speaker(*this, "speaker")
+		, m_conf(*this, "CONF")
 	{ }
 
 	void uzebox(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<atmega644_device> m_maincpu;
@@ -55,6 +59,16 @@ private:
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	required_device<speaker_sound_device> m_speaker;
+	required_ioport m_conf;
+
+	uint32_t m_vpos = 0;
+	uint64_t m_line_start_cycles = 0;
+	uint32_t m_line_pos_cycles = 0;
+	uint8_t m_port_a = 0;
+	uint8_t m_port_b = 0;
+	uint8_t m_port_c = 0;
+	uint8_t m_port_d = 0;
+	bitmap_rgb32 m_bitmap;
 
 	uint8_t port_a_r();
 	void port_a_w(uint8_t data);
@@ -65,31 +79,31 @@ private:
 	uint8_t port_d_r();
 	void port_d_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void line_update();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void data_map(address_map &map);
 	void prg_map(address_map &map);
-
-	int               m_vpos = 0;
-	uint64_t          m_line_start_cycles = 0;
-	uint32_t          m_line_pos_cycles = 0;
-	uint8_t           m_port_a = 0;
-	uint8_t           m_port_b = 0;
-	uint8_t           m_port_c = 0;
-	uint8_t           m_port_d = 0;
-	bitmap_rgb32      m_bitmap;
 };
+
+
+/****************************************************\
+* Initialization                                     *
+\****************************************************/
 
 void uzebox_state::machine_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8sm_delegate(m_cart, FUNC(generic_slot_device::read_rom)));
+	// register for savestates
+	save_item(NAME(m_vpos));
+	save_item(NAME(m_line_start_cycles));
+	save_item(NAME(m_line_pos_cycles));
+	save_item(NAME(m_port_a));
+	save_item(NAME(m_port_b));
+	save_item(NAME(m_port_c));
+	save_item(NAME(m_port_d));
 }
 
 void uzebox_state::machine_reset()
@@ -103,6 +117,32 @@ void uzebox_state::machine_reset()
 	m_port_d = 0;
 }
 
+DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+
+	if (!image.loaded_through_softlist())
+	{
+		std::vector<uint8_t> data(size);
+		image.fread(&data[0], size);
+
+		if (image.is_filetype("uze"))
+			memcpy(m_cart->get_rom_base(), &data[0x200], size - 0x200);
+		else
+			memcpy(m_cart->get_rom_base(), &data[0], size);
+	}
+	else
+		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+/****************************************************\
+* I/O                                                *
+\****************************************************/
 
 void uzebox_state::port_a_w(uint8_t data)
 {
@@ -140,7 +180,7 @@ void uzebox_state::port_b_w(uint8_t data)
 	//  ---- ---x   AD725 HSYNC
 
 	// AD725 CE is hard-wired to VCC in early revisions (C1, D1 and E1)
-	if ((m_port_b & 0x10) || ioport("AD725_CE")->read() == 0)
+	if ((m_port_b & 0x10) || ~m_conf->read() & 1)
 		if ((m_port_b ^ data) & m_port_b & 0x01)
 		{
 			line_update();
@@ -186,6 +226,7 @@ void uzebox_state::port_d_w(uint8_t data)
 	//  --x- x---   NC
 	//  ---- -x--   power
 	//  ---- --xx   UART MIDI
+
 	if ((m_port_d ^ data) & 0x80)
 	{
 		m_speaker->level_w((data & 0x80) ? 1 : 0);
@@ -205,24 +246,26 @@ uint8_t uzebox_state::port_d_r()
 
 void uzebox_state::prg_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom(); // 64 KB internal eprom  ATmega644
+	map(0x0000, 0xffff).r(m_cart, FUNC(generic_slot_device::read_rom));
 }
 
 void uzebox_state::data_map(address_map &map)
 {
-	map(0x0100, 0x10ff).ram(); //  4KB RAM
+	map(0x0100, 0x10ff).ram(); // 4KB RAM
 }
+
 
 /****************************************************\
 * Input ports                                        *
 \****************************************************/
 
 static INPUT_PORTS_START( uzebox )
-	PORT_START("AD725_CE")
+	PORT_START("CONF")
 	PORT_CONFNAME( 0x01, 0x00, "AD725 CE" )
-	PORT_CONFSETTING( 0x00, "VCC" )
-	PORT_CONFSETTING( 0x01, "PB4" )
+	PORT_CONFSETTING(    0x00, "VCC" )
+	PORT_CONFSETTING(    0x01, "PB4" )
 INPUT_PORTS_END
+
 
 /****************************************************\
 * Video hardware                                     *
@@ -251,28 +294,6 @@ uint32_t uzebox_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
-{
-	uint32_t size = m_cart->common_get_size("rom");
-
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-
-	if (!image.loaded_through_softlist())
-	{
-		std::vector<uint8_t> data(size);
-		image.fread(&data[0], size);
-
-		if (image.is_filetype("uze"))
-			memcpy(m_cart->get_rom_base(), &data[0x200], size - 0x200);
-		else
-			memcpy(m_cart->get_rom_base(), &data[0], size);
-	}
-	else
-		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
 
 /****************************************************\
 * Machine definition                                 *
@@ -280,7 +301,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
 
 void uzebox_state::uzebox(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	ATMEGA644(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::data_map);
@@ -293,7 +314,8 @@ void uzebox_state::uzebox(machine_config &config)
 	m_maincpu->gpio_out<atmega644_device::GPIOB>().set(FUNC(uzebox_state::port_b_w));
 	m_maincpu->gpio_out<atmega644_device::GPIOC>().set(FUNC(uzebox_state::port_c_w));
 	m_maincpu->gpio_out<atmega644_device::GPIOD>().set(FUNC(uzebox_state::port_d_w));
-	/* video hardware */
+
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.99);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1395));
@@ -301,10 +323,11 @@ void uzebox_state::uzebox(machine_config &config)
 	m_screen->set_visarea(150, 870-1, 40, 488-1);
 	m_screen->set_screen_update(FUNC(uzebox_state::screen_update));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
 
+	// slot devices
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "uzebox", "bin,uze");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(uzebox_state::cart_load));
@@ -316,13 +339,13 @@ void uzebox_state::uzebox(machine_config &config)
 }
 
 ROM_START( uzebox )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )  /* Main program store */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) // Main program store
 
-	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
+	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 ) // on-die eeprom
 ROM_END
 
 } // anonymous namespace
 
 
-/*   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME */
-CONS(2010, uzebox, 0,      0,      uzebox,  uzebox, uzebox_state, empty_init, "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
+//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME
+CONS(2010, uzebox, 0,      0,      uzebox,  uzebox, uzebox_state, empty_init, "Belogic", "Uzebox", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
