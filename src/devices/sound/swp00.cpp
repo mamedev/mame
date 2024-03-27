@@ -343,7 +343,7 @@ void swp00_device::device_start()
 	save_item(NAME(m_dpcm_next));
 	save_item(NAME(m_dpcm_address));
 
-	for(int i=0; i != 128; i++) {
+	for(int i=0; i<128; i++) {
 		u32 v = 0;
 		switch(i >> 3) {
 		default:  v = ((i & 7) + 8) << (1 + (i >> 3)); break;
@@ -1393,7 +1393,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			}
 
 			if(m_lpf_speed[chan] & 0x80)
-				m_lpf_done[chan] = istep(m_lpf_timer[chan], 0, m_global_step[m_lpf_speed[chan]] >> 1);
+				m_lpf_done[chan] = istep(m_lpf_timer[chan], 0, m_global_step[m_lpf_speed[chan] & 0x7f] >> 1);
 			else
 				m_lpf_done[chan] = istep(m_lpf_value[chan], m_lpf_target_value[chan], m_global_step[m_lpf_speed[chan]] >> 1);
 
