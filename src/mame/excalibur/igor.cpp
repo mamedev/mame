@@ -12,14 +12,13 @@ Hardware notes:
 - 8-bit DAC (Yageo 10L503G resistor array), KA8602 amplifier
 - no LEDs, button sensors chessboard
 
-There's also a newer version from 2000 (model 711E-2) on weaker hardware, it has
-a Samsung KS57C2308 MCU instead.
+There's also a newer version from 2000 (model 711E-2) on much weaker hardware,
+it has a Samsung KS57C2308 MCU instead.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
-- internal artwork
-- add SVG for LCD
+- add SVG for LCD (not same as mirage/ivan)
 - where is the low battery signal?
 
 *******************************************************************************/
@@ -35,7 +34,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "excal_igor.lh"
+#include "excal_igor.lh"
 
 
 namespace {
@@ -277,12 +276,12 @@ static INPUT_PORTS_START( igor )
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Mode")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Set Up / King")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Multi-Move / Bishop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Multi-Move / Bishop")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F2) PORT_NAME("Off / Save")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_C) PORT_NAME("On / Clear")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Move / Pawn")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Level / Rook")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Hint / Knight")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Level / Rook")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Hint / Knight")
 INPUT_PORTS_END
 
 
@@ -322,7 +321,7 @@ void igor_state::igor(machine_config &config)
 	screen.set_size(1920/5, 1080/5);
 	screen.set_visarea_full();
 
-	//config.set_default_layout(layout_excal_igor);
+	config.set_default_layout(layout_excal_igor);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
