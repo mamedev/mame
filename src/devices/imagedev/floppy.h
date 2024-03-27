@@ -90,6 +90,8 @@ public:
 	const floppy_image_format_t *get_load_format() const;
 	std::pair<std::error_condition, const floppy_image_format_t *> identify(std::string_view filename);
 	void set_rpm(float rpm);
+	void set_sectoring_type(uint32_t sectoring_type);
+	uint32_t get_sectoring_type();
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
@@ -125,9 +127,10 @@ public:
 	virtual void tfsel_w(int state) { }    // 35SEL line for Apple Sony drives
 
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
+
 	int dskchg_r() { return m_dskchg; }
 	bool trk00_r() { return (m_has_trk00_sensor ? (m_cyl != 0) : 1); }
-	int idx_r() { return m_idx; }
+	int idx_r() { return m_idx | m_sector_hole; }
 	int mon_r() { return m_mon; }
 	bool ss_r() { return m_ss; }
 	bool twosid_r();
@@ -149,6 +152,7 @@ public:
 	int get_sides() { return m_sides; }
 	uint32_t get_form_factor() const;
 	uint32_t get_variant() const;
+	uint32_t get_disk_sectoring() const;
 
 	static void default_fm_floppy_formats(format_registration &fr);
 	static void default_mfm_floppy_formats(format_registration &fr);
@@ -172,6 +176,7 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 	TIMER_CALLBACK_MEMBER(index_resync);
+	TIMER_CALLBACK_MEMBER(sector_hole_resync);
 
 	virtual void track_changed();
 	virtual void setup_characteristics() = 0;
@@ -188,11 +193,14 @@ protected:
 	std::vector<fs_info>  m_fs;
 	std::vector<const fs::manager_t *> m_fs_managers;
 	emu_timer             *m_index_timer;
+	emu_timer             *m_sector_hole_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
 	int m_tracks; /* addressable tracks */
 	int m_sides;  /* number of heads */
+	int m_phys_sectors;
 	uint32_t m_form_factor; /* 3"5, 5"25, etc */
+	uint32_t m_sectoring_type; /* SOFT, Hard 10/16/32 */
 	bool m_motor_always_on;
 	bool m_dskchg_writable;
 	bool m_has_trk00_sensor;
@@ -211,6 +219,7 @@ protected:
 
 	/* state of output lines */
 	int m_idx;  /* index pulse */
+	int m_sector_hole; /* hard-sector hole pulse */
 	int m_wpt;  /* write protect */
 	int m_rdy;  /* ready */
 	int m_dskchg;     /* disk changed */
@@ -223,6 +232,7 @@ protected:
 
 	attotime m_revolution_start_time, m_rev_time;
 	uint32_t m_revolution_count;
+	uint32_t m_index_start;
 	int m_cyl, m_subcyl;
 	/* Current floppy zone cache */
 	attotime m_cache_start_time, m_cache_end_time, m_cache_weak_start;
@@ -253,6 +263,8 @@ protected:
 	static void wspan_write(const std::vector<wspan> &wspans, std::vector<uint32_t> &track);
 
 	void register_formats();
+
+	void add_variant(uint32_t variant);
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
@@ -296,6 +308,9 @@ protected:
 	static constexpr int flux_screen_sy = 1002;
 	static constexpr int flux_min_r     = 100;
 	static constexpr int flux_max_r     = 245;
+
+	static constexpr int32_t ROTATION_POS_MAX = 200'000'000;
+	static constexpr int32_t HOLE_LENGTH      =   2'000'000;
 
 	void flux_image_prepare();
 	void flux_image_compute_for_track(int track, int head);
@@ -488,6 +503,7 @@ public:
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
 	void enable_sound(bool doit) { m_enable_sound = doit; }
+	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
 
 	floppy_image_device *get_device();
 
@@ -498,6 +514,7 @@ protected:
 private:
 	std::function<void (format_registration &fr)> formats;
 	bool m_enable_sound;
+	uint32_t m_sectoring_type;
 };
 
 
