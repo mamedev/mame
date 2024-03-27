@@ -1035,8 +1035,8 @@ end
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
-			if version < 60000 then
-				print("Clang version 6.0 or later needed")
+			if version < 70000 then
+				print("Clang version 7.0 or later needed")
 				os.exit(-1)
 			end
 			buildoptions {
@@ -1052,12 +1052,6 @@ end
 				"-Wno-unused-value",
 				"-Wno-unused-const-variable",
 			}
-			if (version < 70000) or ((version < 100001) and (_OPTIONS["targetos"] == 'macosx')) then
-				buildoptions { -- clang 6.0 complains that [[maybe_unused]] is ignored for static data members
-					"-Wno-error=ignored-attributes",
-					"-Wno-error=unused-const-variable",
-				}
-			end
 			if ((version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx')) or (version >= 120000) then
 				buildoptions {
 					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
@@ -1069,8 +1063,8 @@ end
 				}
 			end
 		else
-			if version < 70000 then
-				print("GCC version 7.0 or later needed")
+			if version < 100300 then
+				print("GCC version 10.3 or later needed")
 				os.exit(-1)
 			end
 			buildoptions_cpp {
@@ -1082,23 +1076,14 @@ end
 			buildoptions {
 				"-Wno-error=unused-result", -- needed for fgets,fread on linux
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-				"-Wno-array-bounds",
+				"-Wno-error=array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
+				"-Wno-error=stringop-truncation", -- ImGui again
+				"-Wno-error=stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
 			}
-			if version < 100300 then
-				buildoptions_cpp {
-					"-flifetime-dse=1", -- GCC 10.2 and earlier take issue with Sol's get<std::optional<T> >() otherwise - possibly an issue with libstdc++ itself
-				}
-			end
-			if version >= 80000 then
-				buildoptions {
-					"-Wno-stringop-truncation", -- ImGui again
-					"-Wno-stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
-				}
-				buildoptions_cpp {
-					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
-				}
-			end
+			buildoptions_cpp {
+				"-Wno-error=class-memaccess", -- many instances in ImGui and BGFX
+			}
 			if version >= 110000 then
 				buildoptions {
 					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
