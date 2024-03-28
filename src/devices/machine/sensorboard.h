@@ -34,7 +34,7 @@ public:
 	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 7 : 0; return *this; } // enable UI inputs
 	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= ~1; return *this; } // enable modifier keys
 
-	auto clear_cb() { return m_clear_cb.bind(); } // 0 = internal clear, 1 = user presses clear
+	auto clear_cb() { return m_clear_cb.bind(); } // d0: 0 = internal clear, 1 = user presses clear, d1: rotate
 	auto init_cb() { return m_init_cb.bind(); } // for setting pieces starting position
 	auto remove_cb() { return m_remove_cb.bind(); } // user removes piece from hand
 	auto sensor_cb() { return m_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf

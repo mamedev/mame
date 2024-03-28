@@ -162,7 +162,7 @@ void robotadv_state::init_board(u8 data)
 void robotadv_state::clear_board(u8 data)
 {
 	m_piece_hand = 0;
-	m_board->clear_board();
+	m_board->clear_board(data);
 }
 
 

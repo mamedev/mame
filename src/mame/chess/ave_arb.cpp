@@ -159,7 +159,7 @@ void arb_state::init_board(u8 data)
 		}
 	}
 	else
-		m_board->preset_chess();
+		m_board->preset_chess(data);
 }
 
 
