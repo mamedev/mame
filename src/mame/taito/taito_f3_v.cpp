@@ -278,6 +278,7 @@ Playfield tile info:
      1) blend enable bit ("blend mode A" historically)
      2) reverse blend enable bit ("blend mode B" historically)
         always grouped together, usually with other mixing-related bits
+        - these select between the B/A and a/b blend value pairs
 
      3) blend value select bit ("blend select")
         per-line for pivot and sprite groups, per-tile for playfields
@@ -287,35 +288,12 @@ Playfield tile info:
      Bits: [BBBB AAAA bbbb aaaa]
      opacity is (15-N)/8, clamped to (0, 1.0)
 
-     the highest priority non-blank pixel:
-       decides the source ?and destination? blend contributions as
-         src: (a) or (b) per blend select, dst: (A) or (B), idem
-       
-       if opaque (for nonsprites, blend=0 & rblend=0, OR for sprites, blend=1 & rblend=1)
-         computes its own contribution as src*RGB + dst*RGB
-         this is saturating addition, allowing an opaque pixel to "brighten"
-
-       if blend=1 & rblend=0
-?        computes its own contribution as src*RGB, dst is submitted to the
-?        blending circuit as the contribution for the destination color
-       if blend=0 & rblend=1
-?        swaps src and dst, i.e. own contribution is dst*RGB, src is submitted
-?        to the blending circuit as the contribution for the destination
-
-     a lower priority non-blank pixel:
-       if opaque ?and sum of contributions < 1.0?:
-         is combined by saturating addition in the blending circuit using the
-         previously submitted destination contribution.
-       if non-opaque:
-         is ignored (?)
-         e.g. in bubble memories title screen, the sky 'cuts through'
-         the paper bg to the logo (which masks the bub&bob sprites)
+     a lower priority non-blank pixel with *different* blend mode from source:
+       is combined by saturating addition in the blending circuit using
+       a contribution amound according to the opposite of the source blend mode
+       and its own blend select bit
 
      -  should only be (up to) 2 contributing layers to each final pixel (?)
-          here this is currently implemented as having layers "use up" the
-          opacity.  in hw the FDP probably only submits two to the FDA
-     -  if a blend value meant to be used as a contribution is out of range,
-          that pixel is also treated as opaque (?)
      -  there's a HW "feature" (bug) when layers have a prio conflict.
           in this case, for a given pixel, the color can come from
           one layer while the blend mode comes from the other.
@@ -331,8 +309,7 @@ Playfield tile info:
 #include <algorithm>
 #include <variant>
 
-#define VERBOSE 0
-#define TAITOF3_VIDEO_DEBUG 0
+constexpr int TAITOF3_VIDEO_DEBUG = 1;
 
 // Game specific data - some of this can be removed when the software values are figured out
 struct taito_f3_state::F3config
@@ -496,44 +473,19 @@ void taito_f3_state::set_extend(bool state) {
 		m_tilemap[6] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<6>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 		m_tilemap[7] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<7>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	}
-	if (m_extend) {
-		m_pf_data[0] = m_pf_ram + (0x0000 / 2);
-		m_pf_data[1] = m_pf_ram + (0x2000 / 2);
-		m_pf_data[2] = m_pf_ram + (0x4000 / 2);
-		m_pf_data[3] = m_pf_ram + (0x6000 / 2);
-	} else {
-		m_pf_data[0] = m_pf_ram + (0x0000 / 2);
-		m_pf_data[1] = m_pf_ram + (0x1000 / 2);
-		m_pf_data[2] = m_pf_ram + (0x2000 / 2);
-		m_pf_data[3] = m_pf_ram + (0x3000 / 2);
-		m_pf_data[4] = m_pf_ram + (0x4000 / 2);
-		m_pf_data[5] = m_pf_ram + (0x5000 / 2);
-		m_pf_data[6] = m_pf_ram + (0x6000 / 2);
-		m_pf_data[7] = m_pf_ram + (0x7000 / 2);
+	for (int i=0; i<8; i++) {
+		if (m_tilemap[i])
+			m_tilemap[i]->set_transparent_pen(0);
 	}
+
 	if (m_extend) {
-		m_width_mask = 0x3ff;
-		m_twidth_mask = 0x7f;
-		m_twidth_mask_bit = 7;
+		m_width_mask = 0x3ff; // 11 bits
+		for (int i=0; i<4; i++)
+			m_pf_data[i] = &m_pf_ram[(0x2000 * i) / 2];
 	} else {
-		m_width_mask = 0x1ff;
-		m_twidth_mask = 0x3f;
-		m_twidth_mask_bit = 6;
-	}
-	if (m_extend) {
-		m_tilemap[0]->set_transparent_pen(0);
-		m_tilemap[1]->set_transparent_pen(0);
-		m_tilemap[2]->set_transparent_pen(0);
-		m_tilemap[3]->set_transparent_pen(0);
-	} else {
-		m_tilemap[0]->set_transparent_pen(0);
-		m_tilemap[1]->set_transparent_pen(0);
-		m_tilemap[2]->set_transparent_pen(0);
-		m_tilemap[3]->set_transparent_pen(0);
-		m_tilemap[4]->set_transparent_pen(0);
-		m_tilemap[5]->set_transparent_pen(0);
-		m_tilemap[6]->set_transparent_pen(0);
-		m_tilemap[7]->set_transparent_pen(0);
+		m_width_mask = 0x1ff; // 9 bits
+		for (int i=0; i<8; i++)
+			m_pf_data[i] = &m_pf_ram[(0x1000 * i) / 2];
 	}
 }
 
@@ -684,15 +636,6 @@ u16 taito_f3_state::spriteram_r(offs_t offset)
 
 void taito_f3_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset % 8 == 3) {
-		//logerror("sprite write: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
-	}
-	if (offset % 8 == 5) {
-		if (BIT(m_spriteram[(offset & ~0b111) + 3], 15)) {
-			//logerror("!sprite command: %04x at: %04x vpos: %d\n", data, offset*2, m_screen->vpos());
-		}
-	}
-
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
@@ -753,30 +696,20 @@ void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u8 r, g, b;
-
 	COMBINE_DATA(&m_paletteram32[offset]);
+	u32 color = m_paletteram32[offset];
+	rgb_t rgb;
 
-	// .... .... .... .... rrrr gggg bbbb ....
-	// .... .... rrrr rrrr gggg gggg bbbb bbbb
-	
-	/* 12 bit palette games - there has to be a palette select bit somewhere */
-	if (m_game == SPCINVDX || m_game == RIDINGF || m_game == ARABIANM || m_game == RINGRAGE)
-	{
-		b = 15 * ((m_paletteram32[offset] >> 4) & 0xf);
-		g = 15 * ((m_paletteram32[offset] >> 8) & 0xf);
-		r = 15 * ((m_paletteram32[offset] >> 12) & 0xf);
+	/* TODO: 12 bit palette games - seems to be selected on a line basis by 6400? */
+	if (m_game == SPCINVDX || m_game == RIDINGF || m_game == ARABIANM || m_game == RINGRAGE) {
+		// .... .... .... .... RRRR GGGG BBBB ....
+		// .... .... RRRR rrrr GGGG gggg BBBB bbbb
+		rgb = rgb_t(BIT(color, 12, 4) * 16, BIT(color, 8, 4) * 16, BIT(color, 4, 4) * 16);
+	} else {
+		rgb = rgb_t(color).set_a(255);
 	}
-
-	/* All other games - standard 24 bit palette */
-	else
-	{
-		r = (m_paletteram32[offset] >> 16) & 0xff;
-		g = (m_paletteram32[offset] >> 8) & 0xff;
-		b = (m_paletteram32[offset] >> 0) & 0xff;
-	}
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+ 
+	m_palette->set_pen_color(offset, rgb);
 }
 
 /******************************************************************************/
@@ -824,10 +757,10 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		
 		line.pivot.blend_select_v = BIT(line_6000, 9);
 		line.pivot.pivot_control = BIT(line_6000, 8, 8);
-#if TAITOF3_VIDEO_DEBUG==1
-		if (line.pivot.pivot_control & 0b01011101) // check if unknown pivot control bits set
-			logerror("unknown 6000 pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
-#endif
+		if (TAITOF3_VIDEO_DEBUG==1) {
+			if (line.pivot.pivot_control & 0b01011101) // check if unknown pivot control bits set
+				logerror("unknown 6000 pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
+		}
 		
 		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
 			line.sp[sp_group].mix_value &= 0x3fff;
@@ -856,23 +789,27 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		line.pivot.x_sample_enable = BIT(x_mosaic, 9);
 
 		line.fx_6400 = (x_mosaic & 0xfc00) >> 8;
-#if TAITOF3_VIDEO_DEBUG==1
-		if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
-			logerror("unknown 6400 fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
-#endif
+		if (TAITOF3_VIDEO_DEBUG==1) {
+			if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
+				logerror("unknown 6400 fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
+		}
 	}
 	if (offs_t where = latched_addr(2, 3)) {
 		line.bg_palette = m_line_ram[where];
+		if (TAITOF3_VIDEO_DEBUG==1) {
+			if (line.bg_palette) // check if unknown effect bits set
+				logerror("unknown 6600 bg palette: %04x at %04x\n", line.bg_palette, 0x6600 + y*2);
+		}		
 	}
 
 	// 7000 **********************************
 	if (offs_t where = latched_addr(3, 0)) {
 		u16 line_7000 = m_line_ram[where];
 		line.pivot.pivot_enable = line_7000;
-#if TAITOF3_VIDEO_DEBUG==1
-		if (line_7000) // check if confusing pivot enable bits are set
-			logerror("unknown 7000 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
-#endif
+		if (TAITOF3_VIDEO_DEBUG==1) {
+			if (line_7000) // check if confusing pivot enable bits are set
+				logerror("unknown 7000 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
+		}
 	}
 	if (offs_t where = latched_addr(3, 1)) {
 		line.pivot.mix_value = m_line_ram[where];
@@ -880,11 +817,11 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (offs_t where = latched_addr(3, 2)) {
 		u16 sprite_mix = m_line_ram[where];
 		
-#if TAITOF3_VIDEO_DEBUG==1
-		u16 unknown = BIT(sprite_mix, 10, 2);
-		if (unknown)
-			logerror("unknown sprite mix bits: _%01x__ at %04x\n", unknown << 2, 0x7400 + y*2);
-#endif
+		if (TAITOF3_VIDEO_DEBUG==1) {
+			u16 unknown = BIT(sprite_mix, 10, 2);
+			if (unknown)
+				logerror("unknown sprite mix bits: _%01x__ at %04x\n", unknown << 2, 0x7400 + y*2);
+		}
 		
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
 			line.sp[group].mix_value = (line.sp[group].mix_value & 0xc00f)
@@ -1039,14 +976,13 @@ int taito_f3_state::mixable::x_index(int x) {
 	return x;
 }
 int taito_f3_state::mixable::y_index(const f3_line_inf &line) {
-	// sprites and pivot and pre-flipped
 	return line.y;
 }
 u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) {
 	return pal + pal_add;
 }
 int taito_f3_state::playfield_inf::x_index(int dest_x) {
-	// what the heck is with this calculation...
+	// what is with this calculation...
 	fixed8 fx_x = reg_sx + rowscroll;
 	fx_x += 10*((x_scale)-(1<<8));
 
@@ -1064,19 +1000,9 @@ int taito_f3_state::pivot_inf::y_index(const f3_line_inf &line) {
 
 bool taito_f3_state::mix_line(mixable* gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range)
 {
-	// don't need clut yet
 	const int y = gfx->y_index(line);
 	const u16 *src = &gfx->bitmap.src->pix(y);
 	const u8 *flags = gfx->bitmap.flags ? &gfx->bitmap.flags->pix(y) : nullptr;
-#if TAITOF3_VIDEO_DEBUG==1
-	const int DEBUG_X = 100 + 46;
-	const int DEBUG_Y = 181 + 32;
-	if (line.y == DEBUG_Y) logerror("[%X] %s%d: %d,%d (%d)\n",
-							   gfx->prio(), gfx->debug_name(), gfx->debug_index,
-							   gfx->blend_b(), gfx->blend_a(), gfx->blend_select(flags, 82));
-#endif
-
-	bool mixbuf_complete = false;
 
 	for (int x = range.l; x < range.r; x++) {
 		int real_x = gfx->x_sample_enable ? mosaic(x, line.x_sample) : x;
@@ -1086,78 +1012,71 @@ bool taito_f3_state::mix_line(mixable* gfx, mix_pix *z, pri_mode *pri, const f3_
 			continue;
 		}
 
-		//auto mixd = &z[x];
 		if (gfx->prio() >= pri[x].src_prio && gfx->blend_mask() != pri[x].src_blendmode) {
 			// submit src pix
 			if (const u16 pal = gfx->palette_adjust(src[x_index])) {
 				bool sel = gfx->blend_select(flags, x_index);
-
-				// caution: is destination contribution REALLY determined at this time ?
 				switch (gfx->blend_mask()) {
-				case 0b10:
+				case 0b10: // reverse blend
 					if (line.blend[sel] == 0)
 						continue; // this could be early return for pivot and sprite
 					z[x].src_blend = std::min(255, line.blend[sel] * 32);
-					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
-					pri[x].src_blendmode = gfx->blend_mask();
 					z[x].dst_pal = 0;
 					break;
-				case 0b01:
+				case 0b01: // normal blend
 					if (line.blend[2 + sel] == 0)
 						continue; // this could be early return for pivot and sprite
 					z[x].src_blend = std::min(255, line.blend[2 + sel] * 32);
-					z[x].dst_blend = std::min(255, line.blend[sel] * 32);
-					pri[x].src_blendmode = gfx->blend_mask();
 					z[x].dst_pal = 0;
 					break;
-				case 0b00: case 0b11: default:
+				case 0b00: case 0b11: default: // opaque layer
 					if (line.blend[sel] + line.blend[2 + sel] == 0)
 						continue; // this could be early return for pivot and sprite
 					z[x].src_blend = std::min(255, line.blend[sel] * 32);
 					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
-					pri[x].src_blendmode = gfx->blend_mask();
 					pri[x].dst_prio = gfx->prio();
 					z[x].dst_pal = pal;
 					break;
 				}
+				pri[x].src_blendmode = gfx->blend_mask();
+
+				// only check prio here to emulate priority conflict (dariusg and bubblem)
 				if (gfx->prio() > pri[x].src_prio) {
 					z[x].src_pal = pal;
 					pri[x].src_prio = gfx->prio();
 				}
 			}
-		} else if (gfx->prio() > pri[x].dst_prio
-				   && gfx->blend_mask() != pri[x].src_blendmode) {
-			// ??? TESTME: don't blend against opaque when out of range ?
-			// if (!(gfx->blend_a() ^ gfx->blend_b()) && (z[x].src_blend + z[x].dst_blend) > 256)
-			// 	continue;
+		} else if (gfx->prio() > pri[x].dst_prio && gfx->blend_mask() != pri[x].src_blendmode) {
+			// submit dest pix
+			// note that layers cannot blend against the same blend mode
 			if (const u16 pal = gfx->palette_adjust(src[x_index])) {
 				z[x].dst_pal = pal;
 				pri[x].dst_prio = gfx->prio();
-				//pri[x].dst_blendmode = gfx->blend_mask();
-			}
-			bool sel = gfx->blend_select(flags, x_index);
-			switch (pri[x].src_blendmode) {
-				case 0b10:
-					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
-					break;
+				bool sel = gfx->blend_select(flags, x_index);
+				switch (pri[x].src_blendmode) {
 				case 0b01:
 					z[x].dst_blend = std::min(255, line.blend[sel] * 32);
 					break;
-				case 0b00: case 0b11: default:
+				case 0b10: case 0b00: case 0b11: default:
 					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
 					break;
 				}
+			}
 		}
 	}
-#if TAITOF3_VIDEO_DEBUG==1
-	if (line.y == DEBUG_Y)
-		logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
+	
+	constexpr int DEBUG_X = 288 + 46;
+	constexpr int DEBUG_Y = 190 + 24;
+	if (TAITOF3_VIDEO_DEBUG && line.y == DEBUG_Y) {
+		logerror("[%X] %s%d: %d,%d (%d)\n   {pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
+				 gfx->prio(), gfx->debug_name(), gfx->debug_index,
+				 gfx->blend_b(), gfx->blend_a(), gfx->blend_select(flags, 82),
 				 z[DEBUG_X].src_pal, z[DEBUG_X].dst_pal,
 				 z[DEBUG_X].src_blend, z[DEBUG_X].dst_blend,
 				 pri[DEBUG_X].src_prio, pri[DEBUG_X].dst_prio);
-#endif
+	}
 
-	return mixbuf_complete;
+	return false; // TODO: determine when we can stop drawing?
 }
 
 void taito_f3_state::render_line(pen_t *dst, const mix_pix (&z)[432])
@@ -1173,6 +1092,8 @@ void taito_f3_state::render_line(pen_t *dst, const mix_pix (&z)[432])
 
 void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	auto prio = [](const auto& obj) -> u8 { return obj->prio(); };
+
 	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
 	for (int i=0; i<NUM_SPRITEGROUPS; i++) {
@@ -1187,20 +1108,19 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 		line_data.pf[pf].debug_index = pf;
 	}
 	if (m_flipscreen) {
-		line_data.pivot.reg_sx = (m_control_1[4]) - 12;
-		line_data.pivot.reg_sy = (m_control_1[5] & 0x1ff);
+		line_data.pivot.reg_sx = m_control_1[4] - 12;
+		line_data.pivot.reg_sy = m_control_1[5];
 	} else {
-		line_data.pivot.reg_sx = -(m_control_1[4]) - 5;
-		line_data.pivot.reg_sy = -(m_control_1[5] & 0x1ff);
+		line_data.pivot.reg_sx = -m_control_1[4] - 5;
+		line_data.pivot.reg_sy = -m_control_1[5];
 	}
-
-	auto prio = [](const auto& obj) -> u8 { return obj->prio(); };
 
 	for (int screen_y = 0; screen_y != 256; screen_y += 1) {
 		int y = m_flipscreen ? 255 - screen_y : screen_y;
 		read_line_ram(line_data, y);
 		line_data.y = screen_y;
 
+		// some tilemap source selection depends on current line data
 		for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
 			int tmap_number = pf;
 			if (!m_extend && line_data.pf[pf].alt_tilemap)
@@ -1218,7 +1138,7 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
-				   NUM_SPRITEGROUPS + NUM_TILEMAPS> layers = {
+				   NUM_SPRITEGROUPS + NUM_PLAYFIELDS + 1> layers = {
 			&line_data.pivot,
 			&line_data.sp[0], &line_data.pf[0],
 			&line_data.sp[1], &line_data.pf[1],
@@ -1241,16 +1161,16 @@ void taito_f3_state::scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cl
 				}
 			}, gfx);
 		}
-#if TAITOF3_VIDEO_DEBUG==1
-		if (y == 100) {
-			logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
-					 line_buf[180].src_pal, line_buf[180].dst_pal,
-					 line_buf[180].src_blend, line_buf[180].dst_blend,
-					 line_pri[180].src_prio, line_pri[180].dst_prio);
-			logerror("-' [%d,%d,%d,%d] '------------------------- 100\n", line_data.blend[0],
-					 line_data.blend[1], line_data.blend[2], line_data.blend[3]);
+		if (TAITOF3_VIDEO_DEBUG==1) {
+			if (y == 100) {
+				logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
+						 line_buf[180].src_pal, line_buf[180].dst_pal,
+						 line_buf[180].src_blend, line_buf[180].dst_blend,
+						 line_pri[180].src_prio, line_pri[180].dst_prio);
+				logerror("-' [%d,%d,%d,%d] '------------------------- 100\n", line_data.blend[0],
+						 line_data.blend[1], line_data.blend[2], line_data.blend[3]);
+			}
 		}
-#endif
 
 		render_line(&bitmap.pix(screen_y), line_buf);
 
@@ -1272,13 +1192,15 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
-	//logerror("sprite draw at %f %f size %f %f\n", sprite.x/16.0, sprite.y/16.0, sprite.zoomx/16.0, sprite.zoomy/16.0);
 	const u8 flipx = sprite.flip_x ? 0xF : 0;
 	const u8 flipy = sprite.flip_y ? 0xF : 0;
 
 	fixed8 dy8 = (sprite.y);
 	if (!m_flipscreen)
-		dy8 += 255; // round up in non-flipscreen mode?    mayybe flipscreen coordinate adjustments should be done after all this math, during final rendering?. anyway:  testcases for vertical scaling: elvactr mission # text (non-flipscreen), kaiserknj attract mode first text line (flipscreen)
+		dy8 += 255; // round up in non-flipscreen mode?
+	// maybe flipscreen coordinate adjustments should be done after all this math, during final rendering?
+	// y scaling testcases: elvactr mission # text (!flip), kaiserknj attract text (flip)
+
 	for (u8 y = 0; y < 16; y++) {
 		const int dy = dy8 >> 8;
 		dy8 += sprite.scale_y;
@@ -1459,25 +1381,20 @@ void taito_f3_state::draw_sprites(const rectangle &cliprect)
 		}
 	}
 
-	rectangle myclip = cliprect;
-	myclip &= m_pri_alp_bitmap.cliprect();
-
 	for (auto* spr = m_sprite_end; spr-- != &m_spritelist[0]; ) {
-		f3_drawgfx(*spr, myclip);
+		f3_drawgfx(*spr, cliprect);
 	}
 }
 
 /******************************************************************************/
 u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-#if TAITOF3_VIDEO_DEBUG==1
-	logerror("vpos screen update now: %d\n", m_screen->vpos());
-#endif
 
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(0, cliprect);
 
+	// TODO: presumably "sprite lag" is timing of sprite ram/framebuffer access.
 	if (m_sprite_lag == 0) {
 		get_sprite_info();
 		draw_sprites(cliprect);
