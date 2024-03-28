@@ -628,8 +628,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, driblinga,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 2)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Olympia license)",  "Dribbling (Olympia)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1983, driblingam, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Automave license)", "Dribbling (Automave)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblingvm, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "bootleg (Videomac)",              "Dribbling (Videomac bootleg, Brazil)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 1)",                    MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblinga,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing",                    "Dribbling (set 2)",                    MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Olympia license)",  "Dribbling (Olympia)",                  MACHINE_SUPPORTS_SAVE)
+GAME( 1983, driblingam, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "Model Racing (Automave license)", "Dribbling (Automave)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingvm, dribling, dribling, dribling, dribling_state, empty_init, ROT0, "bootleg (Videomac)",              "Dribbling (Videomac bootleg, Brazil)", MACHINE_SUPPORTS_SAVE)

@@ -21,6 +21,8 @@
 // The schematic incorrectly labels two JFETS in the PARATA circuit as 2N3812.  They're actually 2N3819.
 // JFET transistors not supported, but this should do the trick; but not for this game.
 #define Q_2N3819(name) MOSFET(name, "NMOS(VTO=-3 KP=0.001 CAPMOD=0)")
+// Setting KP slows down the simulation. Not required for this JFET.
+#define Q_2N3819B(name) MOSFET(name, "NMOS(VTO=-3)")
 
 #ifdef USE_SIMPLIFIED_LM339
 // Simplified LM339 model - uses high-level simulation of differential input stage.
@@ -186,51 +188,24 @@ static NETLIST_START(stop_palla)
 
 // The actual PARATA schematics requires JFETs (2N3819) and using 'MOSFET(Q21, "NMOS(VTO=-1.0)")' as proposed in the FAQ
 // doesn't work. So using the same circuit STOP_PALLA with different values to emulate the sound which has a higher pitch.
-#ifdef USE_FAKE_PARATA
-static NETLIST_START(parata)
-{
-	ANALOG_INPUT(I_V5, 5)
-	QBJT_EB(Q1, "BC309")
-	RES(R5, RES_K(1))
-	RES(R6, RES_K(160))
-	RES(R7, RES_K(75))
-	RES(R8, RES_K(3.75))
-	RES(R9, RES_K(2.2))
-	CAP(C5, CAP_U(1))
-	CAP(C6, CAP_U(1))
-	DIODE(D1, "1N914")
-	SUBMODEL(LM339, IC_B9)
-	ALIAS(GND, IC_B9.4)
-	ALIAS(INPUT, R5.1)
-	NET_C(R5.2, Q1.B)
-	NET_C(Q1.E, I_V5)
-	NET_C(Q1.C, C5.2, R7.2, R6.1)
-	NET_C(C5.1, GND)
-	NET_C(R7.1, GND)
-	NET_C(R6.2, IC_B9.1, D1.A)
-	NET_C(D1.K, R9.1, IC_B9.5, R8.2)
-	NET_C(IC_B9.2, C6.2, R8.1)
-	NET_C(C6.1, GND)
-	NET_C(R9.2, I_V5)
-	NET_C(IC_B9.3, I_V5)
 
-	ALIAS(OUTPUT, IC_B9.5)
-}
-#else // USE_FAKE_PARATA
 static NETLIST_START(parata)
 {
 	ANALOG_INPUT(I_V5, 5)
+
 	QBJT_EB(Q1, "BC309")
 	Q_2N3819(Q2)
-	Q_2N3819(Q3)
+	Q_2N3819B(Q3)
 	RES(R5, RES_K(1))
 	RES(R6, RES_K(150))
 	RES(R7, RES_K(220))
-	RES(R8, RES_K(1))
 	RES(R9, RES_K(2.2))
 	CAP(C5, CAP_U(2.2))
 	CAP(C6, CAP_U(1))
 	DIODE(D1, "1N914")
+	DIODE(D2, "1N914")
+	DIODE(D3, "1N914")
+
 	SUBMODEL(LM339, IC_B9)
 	ALIAS(GND, IC_B9.4)
 	ALIAS(INPUT, R5.1)
@@ -241,15 +216,20 @@ static NETLIST_START(parata)
 	NET_C(R7.1, GND)
 	NET_C(R6.2, IC_B9.1, D1.A)
 	NET_C(D1.K, R9.1, IC_B9.5, Q2.G, Q2.S)
-	NET_C(IC_B9.2, C6.2, Q2.D, Q3.G)
+	NET_C(IC_B9.2, C6.2, Q2.D)
 	NET_C(C6.1, GND)
-	NET_C(R9.2, Q3.D, I_V5)
+	NET_C(R9.2, I_V5)
 	NET_C(IC_B9.3, I_V5)
-	NET_C(Q3.D, R8.2)
-	NET_C(R8.1, GND)
+	NET_C(D2.A, Q2.G)
+	NET_C(D2.K, Q2.S)
+
+	NET_C(Q2.D, Q3.G)
+	NET_C(Q3.D, I_V5)
+	NET_C(D3.A, Q3.G)
+	NET_C(D3.K, Q3.S)	
 	ALIAS(OUTPUT, Q3.S)
+	OPTIMIZE_FRONTIER(Q3.S, RES_K(100), 1)
 }
-#endif // USE_FAKE_PARATA
 
 // Sallen-Key approximation of a third-order Butterworth filter with 15KHz cutoff frequency.
 // Values computed using http://sim.okawa-denshi.jp/en/Sallen3tool.php .
@@ -285,7 +265,10 @@ NETLIST_START(dribling)
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-5)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.GS_LOOPS, 10)
+	PARAM(Solver.PARALLEL, 2) // More does not help
 
 	CLOCK(clk, 40000) // 40KHz
 	ANALOG_INPUT(I_V5, 5)
