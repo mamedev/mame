@@ -22,6 +22,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 89 Mj Friday               D2607198L1                Z80                 YM2413             PROM
 89 Mj Gekisha              D2809218L-1  D2809218L-2  TLCS                YM2413             PROM  Battery
 89 Sports Match            D31?                      Z80          YM2203                    PROM
+90 Mj Gekisha Part 2       D2809218L-1  D2809218L-2  TLCS                YM2413             PROM  Battery
 90 Jong Tou Ki             D1505178-A   D2711078L-B  Z80*2 AY8912 YM2203        M5205       PROM  2 x Blitter
 90 Mj Campus Hunting       D3312108L1-1 D23SUB1      Z80   AY8912        YM2413 M5205       RAM
 90 Hana Jingi              no number    D3312108L1-2 Z80   AY8912        YM2413 M5205       RAM
@@ -7332,6 +7333,22 @@ ROM_START( gekisha )
 	ROM_LOAD( "pr1.ic26", 0x200, 0x200, CRC(af5edf32) SHA1(7202e0aa1ee3f22e3c5fb69a88db455a241929c5) )
 ROM_END
 
+ROM_START( gekishap2 ) // same PCB set as gekisha
+	ROM_REGION( 0x50000, "maincpu", 0 ) // TLCS90 Code
+	ROM_LOAD( "dynax_2816.ic6",  0x00000, 0x10000, CRC(78be48da) SHA1(72455cd60fd39690b6c8ac737e1e5c8b3aa01d2b) ) // only ROM on the sub board
+	ROM_LOAD( "dynax_2805.ic19", 0x10000, 0x10000, CRC(03e2ed1a) SHA1(644153a186a787efdb12a108d49700e1c94e8af2) ) // same as gekisha
+
+	ROM_REGION( 0x80000, "blitter", 0 )    // blitter data
+	ROM_LOAD( "dynax_2801.ic40", 0x00000, 0x20000, CRC(cf75f9a4) SHA1(d078d009c347f927d8efd325921f4f75f6485c79) )
+	ROM_LOAD( "dynax_2802.ic32", 0x20000, 0x20000, CRC(c505c64a) SHA1(3920a085e7afacc1fa2fbc862d0e92fc2955d636) )
+	ROM_LOAD( "dynax_2803.ic31", 0x40000, 0x20000, CRC(bfc8ffca) SHA1(adceebcde8f0b649219503257bb968202697b96a) )
+	ROM_LOAD( "dynax_2814.ic22", 0x60000, 0x10000, CRC(b8c6760d) SHA1(bfb6d6e3c34f71a83d95d567060c6e362d7f879e) ) // only blitter ROM differing from gekisha
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs (same as mjfriday)
+	ROM_LOAD( "pr2.ic27", 0x000, 0x200, CRC(d6db5c60) SHA1(89ee10d092011c2c4eaab2c097aa88f5bb98bb97) )  // FIXED BITS (0xxxxxxx)
+	ROM_LOAD( "pr1.ic26", 0x200, 0x200, CRC(af5edf32) SHA1(7202e0aa1ee3f22e3c5fb69a88db455a241929c5) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -7341,24 +7358,25 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, janyuki,    0,        janyuki,    janyuki,  jantouki_state,    empty_init,    ROT0,   "Dynax",                     "Jong Yu Ki (Japan)",                                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamai,    0,        hanamai,    hanamai,  dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana no Mai (Japan)",                                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hnkochou,   hanamai,  hanamai,    hnkochou, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Kochou (Japan)",                                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hjingi,     0,        hjingi,     hjingi,   dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Jingi (Japan set 1)",                                             MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1990, hjingia,    hjingi,   hjingi,     hjingi,   dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Jingi (Japan set 2)",                                             MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1989, hnoridur,   hjingi,   hnoridur,   hnoridur, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Oriduru (Japan)",                                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1989, drgpunch,   0,        sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Dragon Punch (Japan)",                                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sprtmtch,   drgpunch, sprtmtch,   sprtmtch, dynax_state,       empty_init,    ROT0,   "Dynax (Fabtek license)",    "Sports Match",                                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, janyuki,    0,        janyuki,    janyuki,  jantouki_state,    empty_init,    ROT0,   "Dynax",                     "Jong Yu Ki (Japan)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamai,    0,        hanamai,    hanamai,  dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana no Mai (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hnkochou,   hanamai,  hanamai,    hnkochou, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Kochou (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hjingi,     0,        hjingi,     hjingi,   dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Jingi (Japan set 1)",                                      MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1990, hjingia,    hjingi,   hjingi,     hjingi,   dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Jingi (Japan set 2)",                                      MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1989, hnoridur,   hjingi,   hnoridur,   hnoridur, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, drgpunch,   0,        sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sprtmtch,   drgpunch, sprtmtch,   sprtmtch, dynax_state,       empty_init,    ROT0,   "Dynax (Fabtek license)",    "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
 // these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match
-GAME( 1994, maya,       0,        sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "Promat",                    "Maya (set 1)",                                                         MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayaa,      maya,     sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "Promat",                    "Maya (set 2)",                                                         MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayab,      maya,     sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "Promat",                    "Maya (set 3)",                                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayac,      maya,     sprtmtch,   drgpunch, blktouch_state,    init_mayac,    ROT0,   "Promat",                    "Maya (set 4, clean)",                                                  MACHINE_SUPPORTS_SAVE )
-GAME( 199?, inca,       0,        sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "<unknown>",                 "Inca",                                                                 MACHINE_SUPPORTS_SAVE ) // PCB by "Barko", game too?
-GAME( 199?, blktouch,   0,        sprtmtch,   drgpunch, blktouch_state,    init_blktouch, ROT0,   "Yang Gi Co Ltd.",           "Black Touch (Korea)",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, maya,       0,        sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "Promat",                    "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayaa,      maya,     sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "Promat",                    "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayab,      maya,     sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "Promat",                    "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayac,      maya,     sprtmtch,   drgpunch, blktouch_state,    init_mayac,    ROT0,   "Promat",                    "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 199?, inca,       0,        sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "<unknown>",                 "Inca",                                                          MACHINE_SUPPORTS_SAVE ) // PCB by "Barko", game too?
+GAME( 199?, blktouch,   0,        sprtmtch,   drgpunch, blktouch_state,    init_blktouch, ROT0,   "Yang Gi Co Ltd.",           "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mjfriday,   0,        mjfriday,   mjfriday, dynax_state,       empty_init,    ROT180, "Dynax",                     "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gekisha,    0,        gekisha,    gekisha,  dynax_state,       empty_init,    ROT180, "Dynax",                     "Mahjong Gekisha (Japan)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gekishap2,  gekisha,  gekisha,    gekisha,  dynax_state,       empty_init,    ROT180, "Dynax",                     "Mahjong Gekisha Part II (Japan)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mcnpshnt,   0,        mcnpshnt,   mcnpshnt, dynax_adpcm_state, empty_init,    ROT0,   "Dynax",                     "Mahjong Campus Hunting (Japan)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 7jigen,     0,        nanajign,   nanajign, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, jantouki,   0,        jantouki,   jantouki, jantouki_state,    empty_init,    ROT0,   "Dynax",                     "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
