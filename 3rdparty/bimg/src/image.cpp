@@ -3348,6 +3348,7 @@ namespace bimg
 #define DDS_BC4U BX_MAKEFOURCC('B', 'C', '4', 'U')
 #define DDS_ATI2 BX_MAKEFOURCC('A', 'T', 'I', '2')
 #define DDS_BC5U BX_MAKEFOURCC('B', 'C', '5', 'U')
+#define DDS_RXGB BX_MAKEFOURCC('R', 'X', 'G', 'B')
 #define DDS_DX10 BX_MAKEFOURCC('D', 'X', '1', '0')
 
 #define DDS_ETC1      BX_MAKEFOURCC('E', 'T', 'C', '1')
@@ -3423,6 +3424,7 @@ namespace bimg
 #define DDS_FORMAT_B5G5R5A1_UNORM         86
 #define DDS_FORMAT_B8G8R8A8_UNORM         87
 #define DDS_FORMAT_B8G8R8A8_UNORM_SRGB    91
+#define DDS_FORMAT_BC6H_UF16              95
 #define DDS_FORMAT_BC6H_SF16              96
 #define DDS_FORMAT_BC7_UNORM              98
 #define DDS_FORMAT_BC7_UNORM_SRGB         99
@@ -3519,6 +3521,7 @@ namespace bimg
 		{ DDS_BC4U,                  TextureFormat::BC4,       false },
 		{ DDS_ATI2,                  TextureFormat::BC5,       false },
 		{ DDS_BC5U,                  TextureFormat::BC5,       false },
+		{ DDS_RXGB,                  TextureFormat::BC5,       false },
 
 		{ DDS_ETC1,                  TextureFormat::ETC1,      false },
 		{ DDS_ETC2,                  TextureFormat::ETC2,      false },
@@ -3580,6 +3583,7 @@ namespace bimg
 		{ DDS_FORMAT_BC3_UNORM_SRGB,        TextureFormat::BC3,       true  },
 		{ DDS_FORMAT_BC4_UNORM,             TextureFormat::BC4,       false },
 		{ DDS_FORMAT_BC5_UNORM,             TextureFormat::BC5,       false },
+		{ DDS_FORMAT_BC6H_UF16,             TextureFormat::BC6H,      false },
 		{ DDS_FORMAT_BC6H_SF16,             TextureFormat::BC6H,      false },
 		{ DDS_FORMAT_BC7_UNORM,             TextureFormat::BC7,       false },
 		{ DDS_FORMAT_BC7_UNORM_SRGB,        TextureFormat::BC7,       true  },
@@ -3659,8 +3663,8 @@ namespace bimg
 		{ 16, DDPF_RGB|DDPF_ALPHAPIXELS, { 0x00000f00, 0x000000f0, 0x0000000f, 0x0000f000 }, TextureFormat::BGRA4   },
 		{ 16, DDPF_RGB,                  { 0x0000001f, 0x000007e0, 0x0000f800, 0x00000000 }, TextureFormat::R5G6B5  },
 		{ 16, DDPF_RGB,                  { 0x0000f800, 0x000007e0, 0x0000001f, 0x00000000 }, TextureFormat::B5G6R5  },
-		{ 16, DDPF_RGB,                  { 0x0000001f, 0x000003e0, 0x00007c00, 0x00008000 }, TextureFormat::BGR5A1  },
-		{ 16, DDPF_RGB,                  { 0x00007c00, 0x000003e0, 0x0000001f, 0x00008000 }, TextureFormat::RGB5A1  },
+		{ 16, DDPF_RGB|DDPF_ALPHAPIXELS, { 0x0000001f, 0x000003e0, 0x00007c00, 0x00008000 }, TextureFormat::BGR5A1  },
+		{ 16, DDPF_RGB|DDPF_ALPHAPIXELS, { 0x00007c00, 0x000003e0, 0x0000001f, 0x00008000 }, TextureFormat::RGB5A1  },
 		{ 24, DDPF_RGB,                  { 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000 }, TextureFormat::RGB8    },
 		{ 24, DDPF_RGB,                  { 0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000 }, TextureFormat::RGB8    },
 		{ 32, DDPF_RGB,                  { 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000 }, TextureFormat::BGRA8   },
