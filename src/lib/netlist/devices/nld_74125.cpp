@@ -38,7 +38,7 @@ namespace netlist::devices {
 
 		NETLIB_HANDLERI(A)
 		{
-			m_Y.push(m_A(), m_A() ? D::sig_off_on::value() : D::sig_on_off::value());
+			m_Y.push(m_A() ^ D::invert_y::value, m_A() ? D::sig_off_on::value() : D::sig_on_off::value());
 		}
 
 		NETLIB_HANDLERI(G)
@@ -57,6 +57,7 @@ namespace netlist::devices {
 	struct desc_74125 : public desc_base
 	{
 		using invert_g = desc_const<0>;
+		using invert_y = desc_const<0>;
 		using ts_off_on = time_ns<11>;
 		using ts_on_off = time_ns<13>;
 		using sig_off_on = time_ns<8>;
@@ -68,10 +69,17 @@ namespace netlist::devices {
 		using invert_g = desc_const<1>;
 	};
 
+	struct desc_74368 : public desc_74125
+	{
+		using invert_y = desc_const<1>;
+	};
+
 	using NETLIB_NAME(74125) = NETLIB_NAME(74125_base)<desc_74125>;
 	using NETLIB_NAME(74126) = NETLIB_NAME(74125_base)<desc_74126>;
+	using NETLIB_NAME(74368) = NETLIB_NAME(74125_base)<desc_74368>;
 
 	NETLIB_DEVICE_IMPL(74125,     "TTL_74125_GATE",     "")
 	NETLIB_DEVICE_IMPL(74126,     "TTL_74126_GATE",     "")
+	NETLIB_DEVICE_IMPL(74368,     "TTL_74368_GATE",     "")
 
 } // namespace netlist::devices
