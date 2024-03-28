@@ -697,7 +697,8 @@ void whtscsi_pld_device::update_line_states(int address, bool drq, bool irq)
 
 void whtscsi_pld_device::device_config_complete()
 {
-	m_board = static_cast<whtech_scsi_card_device*>(owner());
+	m_board = dynamic_cast<whtech_scsi_card_device*>(owner());
+	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 } // end namespace bus::ti99::peb

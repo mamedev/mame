@@ -452,7 +452,8 @@ bool ti99_cartridge_device::is_grom_idle()
 
 void ti99_cartridge_device::device_config_complete()
 {
-	m_connector = static_cast<cartridge_connector_device*>(owner());
+	m_connector = dynamic_cast<cartridge_connector_device*>(owner());
+	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 /*

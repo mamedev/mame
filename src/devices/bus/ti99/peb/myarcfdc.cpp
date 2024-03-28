@@ -514,7 +514,8 @@ bool ddcc1_pal_device::cs259()
 
 void ddcc1_pal_device::device_config_complete()
 {
-	m_board = static_cast<myarc_fdc_device*>(owner());
+	m_board = dynamic_cast<myarc_fdc_device*>(owner());
+	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 } // end namespace bus::ti99::peb

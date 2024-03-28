@@ -244,7 +244,12 @@ bool gromport_device::is_grom_idle()
 
 void gromport_device::device_config_complete()
 {
-	m_connector = downcast<cartridge_connector_device*>(subdevices().first());
+	if (subdevices().first() != nullptr)
+	{
+		m_connector = dynamic_cast<cartridge_connector_device*>(subdevices().first());
+		if (m_connector == nullptr)
+			throw emu_fatalerror("gromport_device: cartridge connector not found");
+	}
 }
 
 INPUT_PORTS_START(gromport)
@@ -283,7 +288,8 @@ void  cartridge_connector_device::ready_line(int state)
 
 void cartridge_connector_device::device_config_complete()
 {
-	m_gromport = static_cast<gromport_device*>(owner());
+	m_gromport = dynamic_cast<gromport_device*>(owner());
+	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 } // end namespace bus::ti99::gromport

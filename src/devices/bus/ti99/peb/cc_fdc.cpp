@@ -567,9 +567,10 @@ ROM_END
 
 void corcomp_dcc_device::device_config_complete()
 {
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(subdevice(CCDCC_PALU2_TAG));
-	m_ctrlpal = static_cast<ccfdc_sel_pal_device*>(subdevice(CCDCC_PALU1_TAG));
-	connect_drives();
+	m_decpal = dynamic_cast<ccfdc_dec_pal_device*>(subdevice(CCDCC_PALU2_TAG));
+	m_ctrlpal = dynamic_cast<ccfdc_sel_pal_device*>(subdevice(CCDCC_PALU1_TAG));
+	if (m_decpal != nullptr) 
+		connect_drives();
 }
 
 ioport_constructor corcomp_fdc_device::device_input_ports() const
@@ -605,7 +606,8 @@ ccfdc_sel_pal_device::ccfdc_sel_pal_device(const machine_config &mconfig, device
 
 void ccfdc_dec_pal_device::device_config_complete()
 {
-	m_board = static_cast<corcomp_fdc_device*>(owner());
+	m_board = dynamic_cast<corcomp_fdc_device*>(owner());
+	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 /*
@@ -707,8 +709,9 @@ int ccdcc_palu1_device::ready_out()
 
 void ccdcc_palu1_device::device_config_complete()
 {
-	m_board = static_cast<corcomp_fdc_device*>(owner());
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCDCC_PALU2_TAG));
+	m_board = dynamic_cast<corcomp_fdc_device*>(owner());
+	m_decpal = dynamic_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCDCC_PALU2_TAG));
+	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 // ============================================================================
@@ -825,8 +828,8 @@ int ccfdc_palu6_device::ready_out()
 
 void ccfdc_palu6_device::device_config_complete()
 {
-	m_board = static_cast<corcomp_fdca_device*>(owner());
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCFDC_PALU12_TAG));
+	m_board = dynamic_cast<corcomp_fdca_device*>(owner());
+	m_decpal = dynamic_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCFDC_PALU12_TAG));
 }
 
 } // end namespace bus::ti99::peb
