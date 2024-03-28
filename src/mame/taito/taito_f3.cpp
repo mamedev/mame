@@ -9,18 +9,9 @@
     Major thanks to Aaron Giles for sound info, figuring out the 68K/ES5505
     rom interface and ES5505 emulator!
     Thanks to Acho A. Tang for Kirameki Star Road sound banking info!
-    Thank you to Shiriru for the scanline rendering (including alpha blending),
-    sprite sync fixes, sprite zoom fixes and others!
 
     Other Issues:
-    - Various hacks in video core that needs squashing;
-    - When playing space invaders dx in original mode, t.t. with overlay, the
-      alpha blending effect is wrong (see Taito B version of game)
-    - Bubble Symphony has an alpha transition effect that doesn't appear in Mame
-    - Various other missing blending effects (see Mametesters)
     - Find how this HW drives the CRTC, and convert video timings to use screen raw params;
-
-    Feel free to report any other issues to me.
 
     Taito custom chips on motherboard:
 
@@ -461,10 +452,19 @@ void taito_f3_state::f3(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(58.97);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
-	m_screen->set_size(40*8+48*2, 32*8);
-	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
+	// from taito z system and crystal on board  not sure if correct?
+	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/?
+	m_screen->set_raw(
+		XTAL(26'686'000)/4,
+		432, 46, 320+46,
+		262, 24, 256
+	);
+	// refresh rate = 26686000/4/432/262 = 58.94..
+	
+	//m_screen->set_refresh_hz(58.97);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
+	//m_screen->set_size(40*8+48*2, 32*8);
+	//m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));
 
