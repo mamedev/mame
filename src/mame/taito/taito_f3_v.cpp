@@ -227,8 +227,8 @@ Line ram memory map:
 
     word 4: [bbbb mlyx cccc cccc]
      b: block position controls
-     m: "multi" ? has something to do with sprite blocks but i don't use it
-     l: "lock" (set to 0 on the first sprite in a block, 1 on all others)
+     m: "multi" - set to 0 on the sprite before a new sprite block
+     l: "lock" - reuse palette from previous sprite
      y: y flip
      x: x flip
      c: color palette
@@ -1315,7 +1315,7 @@ void taito_f3_state::get_sprite_info()
 		fixed8 block_scale = 1 << 8;
 		fixed8 pos = 0, block_pos = 0;
 		s16 global = 0, subglobal = 0;
-		void update(u8 scroll, u16 posw, bool lock, u8 block_ctrl, u8 new_zoom)
+		void update(u8 scroll, u16 posw, bool multi, u8 block_ctrl, u8 new_zoom)
 		{
 			s16 new_pos = util::sext(posw, 12);
 			// set scroll offsets
@@ -1333,7 +1333,7 @@ void taito_f3_state::get_sprite_info()
 
 			switch (block_ctrl) {
 			case 0b00:
-				if (!lock) {
+				if (!multi) {
 					block_pos = new_pos << 8;
 					block_scale = (0x100 - new_zoom);
 				}
@@ -1349,7 +1349,7 @@ void taito_f3_state::get_sprite_info()
 	};
 	sprite_axis x, y;
 	u8 color = 0;
-	//bool multi = false;
+	bool multi = false;
 
 	const rectangle &visarea = m_screen->visible_area();
 
@@ -1419,8 +1419,9 @@ void taito_f3_state::get_sprite_info()
 			color = spr[4] & 0xFF;
 		const u8 scroll_mode = BIT(spr[2], 12, 4);
 		const u16 zooms = spr[1];
-		x.update(scroll_mode, spr[2] & 0xFFF, lock, BIT(spritecont, 4+2, 2), zooms & 0xFF);
-		y.update(scroll_mode, spr[3] & 0xFFF, lock, BIT(spritecont, 4+0, 2), zooms >> 8);
+		x.update(scroll_mode, spr[2] & 0xFFF, multi, BIT(spritecont, 4+2, 2), zooms & 0xFF);
+		y.update(scroll_mode, spr[3] & 0xFFF, multi, BIT(spritecont, 4+0, 2), zooms >> 8);
+		multi = BIT(spritecont, 3);
 
 		int tile = spr[0] | (BIT(spr[5], 0) << 16);
 		if (!tile) continue; // todo: is this the correct way to tell if a sprite exists?
@@ -1433,7 +1434,6 @@ void taito_f3_state::get_sprite_info()
 
 		const bool flip_x = BIT(spritecont, 0);
 		const bool flip_y = BIT(spritecont, 1);
-		//multi = BIT(spritecont, 3);
 
 		sprite_ptr->x = tx;
 		sprite_ptr->y = ty;
