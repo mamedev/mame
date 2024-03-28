@@ -26,6 +26,21 @@ How to use cassette:
     1873      press GO to load tape
 NOTE: save end address is next address from program end
 
+How to use the console:
+Toggle the console enable by hitting 'T' (or use Input Settings/Toggle
+Inputs/TTY) and then RS (reset).
+Connect to the console at 2400 bps 8N2 (speeds from 110 to 9600 bps should work).
+Hit <Delete> or <Return> on the console and it should display "KIM"
+and accept monitor commands:
+
+<hex address> <space>    Show data at <address>
+<hex data> .             Write to current address
+<Return>                 Advance to next address
+<Line Feed>              Move to previous address
+<Delete>                 Terminate memory edit
+L                        Load program from paper tape
+Q                        Save memory to paper tape (saves from current address to $17F7, $17F8)
+G                        Go from current address
 
 Keyboard and Display logic
 ==========================
@@ -58,8 +73,9 @@ Paste test:
 
 
 TODO:
+- Get console working on screen (works with pty)
 - LEDs should be dark at startup (RS key to activate)
-- add TTY support
+- Make console toggle a DIP switch?
 
 ******************************************************************************/
 
@@ -67,6 +83,7 @@ TODO:
 
 #include "bus/kim1/cards.h"
 #include "bus/kim1/kim1bus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "machine/mos6530.h"
@@ -79,7 +96,6 @@ TODO:
 #include "formats/kim1_cas.h"
 
 #include "kim1.lh"
-
 
 namespace {
 
@@ -98,6 +114,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_row(*this, "ROW%u", 0U)
 		, m_special(*this, "SPECIAL")
+		, m_rs232(*this, "rs232")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
@@ -113,11 +130,13 @@ private:
 	required_device_array<mos6530_device, 2> m_miot;
 	required_device<pwm_display_device> m_digit_pwm;
 	required_device<cassette_image_device> m_cass;
-	required_ioport_array<3> m_row;
+	required_ioport_array<4> m_row;
 	required_ioport m_special;
+	required_device<rs232_port_device> m_rs232;
 
 	int m_sync_state = 0;
 	bool m_k7 = false;
+	uint8_t m_u2_port_a = 0;
 	uint8_t m_u2_port_b = 0;
 	uint8_t m_311_output = 0;
 	uint32_t m_cassette_high_count = 0;
@@ -134,6 +153,7 @@ private:
 	void u2_write_b(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
+	void tty_callback(uint8_t data);
 };
 
 void kim1_state::machine_start()
@@ -141,6 +161,7 @@ void kim1_state::machine_start()
 	// Register for save states
 	save_item(NAME(m_sync_state));
 	save_item(NAME(m_k7));
+	save_item(NAME(m_u2_port_a));
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));
@@ -152,6 +173,13 @@ void kim1_state::machine_reset()
 	m_cassette_high_count = 0;
 }
 
+static DEVICE_INPUT_DEFAULTS_START(terminal)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_2400)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_2400)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
+DEVICE_INPUT_DEFAULTS_END
 
 //**************************************************************************
 //  I/O
@@ -195,14 +223,19 @@ uint8_t kim1_state::u2_read_a()
 
 	// Read from keyboard
 	offs_t const sel = (m_u2_port_b >> 1) & 0x0f;
-	if (3U > sel)
+	if (4U > sel)
 		data = m_row[sel]->read() & 0x7f;
 
-	return data | 0x80;
+	// Read from serial console
+	data = data | (m_rs232->rxd_r() << 7);
+
+	return data;
 }
 
 void kim1_state::u2_write_a(uint8_t data)
 {
+	m_u2_port_a = data;
+
 	// Write to 7-segment LEDs
 	m_digit_pwm->write_mx(data & 0x7f);
 }
@@ -226,6 +259,9 @@ void kim1_state::u2_write_b(uint8_t data)
 	// Cassette write/speaker update
 	if (data & 0x20)
 		m_cass->output((data & 0x80) ? -1.0 : 1.0);
+
+	// Write bit 0 to serial console
+	m_rs232->write_txd(data & 0x01);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
@@ -266,6 +302,13 @@ void kim1_state::sync_map(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(kim1_state::sync_r));
 }
 
+// Called when serial data comes in from console.
+void kim1_state::tty_callback(uint8_t data)
+{
+	// Send data back to terminal to simulate the KIM-1 hardware
+	// echo.
+	m_rs232->write_txd(data);
+}
 
 //**************************************************************************
 //  INPUT PORTS
@@ -298,6 +341,9 @@ static INPUT_PORTS_START( kim1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_NAME("AD")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+
+	PORT_START("ROW3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_NAME("TTY")
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("ST") PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
@@ -337,6 +383,11 @@ void kim1_state::kim1(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface("kim1_cass");
+
+	// serial console/tty
+	rs232_port_device &m_rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	m_rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	m_rs232.rxd_handler().set(FUNC(kim1_state::tty_callback));
 
 	SPEAKER(config, "mono").front_center();
 
