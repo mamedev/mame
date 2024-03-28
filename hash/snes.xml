@@ -22732,6 +22732,19 @@ more investigation needed...
 		</part>
 	</software>
 
+	<software name="rockmansp" cloneof="megamans">
+		<description>Rockman's Soccer (Japan, sample)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="ロックマンズサッカー" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1572864">
+				<rom name="rockman's soccer (prototype).sfc" size="1572864" offset="0x000000" crc="b999b148" sha1="28e030acd8a41de9ca8f6aed5144d3dd85de6d11" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rocko">
 		<description>Rocko's Modern Life - Spunky's Dangerous Day (USA)</description>
 		<year>1994</year>
