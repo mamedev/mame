@@ -1128,13 +1128,25 @@ bool taito_f3_state::mix_line(mixable* gfx, mix_pix *z, pri_mode *pri, const f3_
 		} else if (gfx->prio() > pri[x].dst_prio
 				   && gfx->blend_mask() != pri[x].src_blendmode) {
 			// ??? TESTME: don't blend against opaque when out of range ?
-			if (!(gfx->blend_a() ^ gfx->blend_b()) && (z[x].src_blend + z[x].dst_blend) > 256)
-				continue;
+			// if (!(gfx->blend_a() ^ gfx->blend_b()) && (z[x].src_blend + z[x].dst_blend) > 256)
+			// 	continue;
 			if (const u16 pal = gfx->palette_adjust(src[x_index])) {
 				z[x].dst_pal = pal;
 				pri[x].dst_prio = gfx->prio();
 				//pri[x].dst_blendmode = gfx->blend_mask();
 			}
+			bool sel = gfx->blend_select(flags, x_index);
+			switch (pri[x].src_blendmode) {
+				case 0b10:
+					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
+					break;
+				case 0b01:
+					z[x].dst_blend = std::min(255, line.blend[sel] * 32);
+					break;
+				case 0b00: case 0b11: default:
+					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
+					break;
+				}
 		}
 	}
 #if TAITOF3_VIDEO_DEBUG==1
