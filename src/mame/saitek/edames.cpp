@@ -79,7 +79,7 @@ private:
 	u16 m_led_data[2] = { };
 	bool m_enable_reset = false;
 
-	void init_board(int state);
+	void init_board(u8 data);
 
 	// I/O handlers
 	void update_display();
@@ -107,7 +107,7 @@ void edames_state::machine_start()
 	save_item(NAME(m_enable_reset));
 }
 
-void edames_state::init_board(int state)
+void edames_state::init_board(u8 data)
 {
 	for (int i = 0; i < 20; i++)
 	{

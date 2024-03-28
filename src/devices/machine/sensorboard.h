@@ -41,7 +41,7 @@ public:
 	auto spawn_cb() { return m_spawn_cb.bind(); } // spawnpoint/piece = offset, retval = new piece id
 	auto output_cb() { return m_output_cb.bind(); } // pos = offset(A8 for ui/board, A9 for count), id = data
 
-	void preset_chess(int state = 0); // init_cb() preset for chessboards
+	void preset_chess(u8 data = 0); // init_cb() preset for chessboards
 
 	// read sensors
 	u8 read_sensor(u8 x, u8 y);
@@ -53,7 +53,7 @@ public:
 	// handle board state
 	u8 read_piece(u8 x, u8 y) { return m_curstate[y * m_width + x]; }
 	void write_piece(u8 x, u8 y, u8 id) { m_curstate[y * m_width + x] = id; }
-	void clear_board(int state = 0) { memset(m_curstate, 0, sizeof(m_curstate)); } // default clear_cb()
+	void clear_board(u8 data = 0) { memset(m_curstate, 0, sizeof(m_curstate)); } // default clear_cb()
 
 	void refresh();
 	void cancel_sensor();
@@ -104,8 +104,8 @@ private:
 	required_ioport m_inp_ui;
 	required_ioport m_inp_conf;
 
-	devcb_write_line m_clear_cb;
-	devcb_write_line m_init_cb;
+	devcb_write8 m_clear_cb;
+	devcb_write8 m_init_cb;
 	devcb_read8 m_remove_cb;
 	devcb_read8 m_sensor_cb;
 	devcb_read8 m_spawn_cb;

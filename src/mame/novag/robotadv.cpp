@@ -104,7 +104,8 @@ private:
 	u8 counters_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_timer) { refresh(); }
-	void clear_board(int state);
+	void init_board(u8 data);
+	void clear_board(u8 data);
 	void refresh();
 	void update_counters();
 	void update_limits();
@@ -142,7 +143,23 @@ void robotadv_state::machine_reset()
 	refresh();
 }
 
-void robotadv_state::clear_board(int state)
+void robotadv_state::init_board(u8 data)
+{
+	m_board->preset_chess(data);
+
+	// reposition pieces if board will be rotated
+	if (data & 2)
+	{
+		for (int y = 0; y < 8; y++)
+			for (int x = 7; x >= 0; x--)
+			{
+				m_board->write_piece(x + 4, y, m_board->read_piece(x, y));
+				m_board->write_piece(x, y, 0);
+			}
+	}
+}
+
+void robotadv_state::clear_board(u8 data)
 {
 	m_piece_hand = 0;
 	m_board->clear_board();
@@ -514,7 +531,7 @@ void robotadv_state::robotadv(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->set_size(8+4, 8);
 	m_board->clear_cb().set(FUNC(robotadv_state::clear_board));
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->init_cb().set(FUNC(robotadv_state::init_board));
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 

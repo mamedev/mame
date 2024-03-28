@@ -107,7 +107,8 @@ private:
 	attotime m_motor_remain[2];
 	emu_timer *m_motor_timer[2];
 
-	void clear_board(int state);
+	void init_board(u8 data);
+	void clear_board(u8 data);
 	void init_motors();
 
 	void get_scaled_pos(double *x, double *y);
@@ -168,7 +169,23 @@ void mirage_state::machine_reset()
 	output_magnet_pos();
 }
 
-void mirage_state::clear_board(int state)
+void mirage_state::init_board(u8 data)
+{
+	m_board->preset_chess(data);
+
+	// reposition pieces if board will be rotated
+	if (data & 2)
+	{
+		for (int y = 0; y < 8; y++)
+			for (int x = 7; x >= 0; x--)
+			{
+				m_board->write_piece(x + 4, y, m_board->read_piece(x, y));
+				m_board->write_piece(x, y, 0);
+			}
+	}
+}
+
+void mirage_state::clear_board(u8 data)
 {
 	memset(m_pieces_map, 0, sizeof(m_pieces_map));
 	m_piece_hand = 0;
@@ -563,7 +580,7 @@ void mirage_state::mirage(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_size(8+4, 8);
 	m_board->clear_cb().set(FUNC(mirage_state::clear_board));
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->init_cb().set(FUNC(mirage_state::init_board));
 	m_board->set_delay(attotime::from_msec(150));
 	//m_board->set_nvram_enable(true);
 
