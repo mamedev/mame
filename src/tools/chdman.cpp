@@ -2569,6 +2569,13 @@ static void do_extract_cd(parameters_map &params)
 
 	// GDIs will always output as split bin
 	bool is_splitbin = mode == MODE_GDI || params.find(OPTION_OUTPUT_SPLIT) != params.end();
+	if (!is_splitbin && cdrom->is_gdrom() && mode == MODE_CUEBIN)
+	{
+		// GD-ROM cue/bin is in Redump format which should always be split by tracks
+		util::stream_format(std::cout, "Warning: --%s is required for this specific combination of input disc type and output format, enabling automatically\n", OPTION_OUTPUT_SPLIT);
+		is_splitbin = true;
+	}
+
 	if (is_splitbin)
 	{
 		if (mode == MODE_GDI)
@@ -2612,11 +2619,6 @@ static void do_extract_cd(parameters_map &params)
 	std::string trackbin_name;
 	try
 	{
-		if (cdrom->is_gdrom() && (mode == MODE_CUEBIN))
-		{
-			util::stream_format(std::cout, "Warning: extracting GD-ROM CHDs as bin/cue is not fully supported and will result in an unusable CD-ROM cue file.\n");
-		}
-
 		// process output file
 		std::error_condition filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
 		if (filerr)
@@ -2736,6 +2738,55 @@ static void do_extract_cd(parameters_map &params)
 				output_toc_file->printf("CD_ROM\n\n\n");
 		}
 
+		if (cdrom->is_gdrom() && mode == MODE_CUEBIN)
+		{
+			// modify TOC to match Redump cue/bin format as best as possible
+			cdrom_file::toc *trackinfo = (cdrom_file::toc*)&toc;
+
+			// TOSEC GDI-based CHDs have the padframes field set to non-0 where the pregaps for the next track would be
+			const bool has_physical_pregap = trackinfo->tracks[0].padframes == 0;
+
+			for (int tracknum = 1; tracknum < toc.numtrks; tracknum++)
+			{
+				// pgdatasize should never be set in GD-ROMs currently, so if it is set then assume the TOC has proper pregap values
+				if (trackinfo->tracks[tracknum].pgdatasize != 0)
+					break;
+
+				// don't adjust the first track of the single-density and high-density areas
+				if (toc.tracks[tracknum].physframeofs == 45000)
+					continue;
+
+				if (!has_physical_pregap)
+				{
+					// NOTE: This will generate a cue with PREGAP commands instead of INDEX 00 because the pregap data isn't baked into the bins
+					trackinfo->tracks[tracknum].pregap += trackinfo->tracks[tracknum-1].padframes;
+
+					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum].trktype != cdrom_file::CD_TRACK_AUDIO)
+					{
+						// TODO: These 75 frames are actually included at the end of the previous track so should be written
+						// It's currently not possible to format it as expected without hacky code because the 150 pregap for the last track
+						// is sandwiched between these 75 frames and the actual track data.
+						// The 75 frames seems to normally be 0s so this should be ok for now until a use case is found.
+						trackinfo->tracks[tracknum-1].frames -= 75;
+						trackinfo->tracks[tracknum].pregap += 75;
+					}
+				}
+				else
+				{
+					int curextra = 150; // 00:02:00
+					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum+1].trktype != cdrom_file::CD_TRACK_AUDIO)
+						curextra += 75; // 00:01:00, special case when last track is data
+
+					trackinfo->tracks[tracknum-1].padframes = curextra;
+
+					trackinfo->tracks[tracknum].pregap += curextra;
+					trackinfo->tracks[tracknum].splitframes = curextra;
+					trackinfo->tracks[tracknum].pgdatasize = trackinfo->tracks[tracknum].datasize;
+					trackinfo->tracks[tracknum].pgtype = trackinfo->tracks[tracknum].trktype;
+				}
+			}
+		}
+
 		// iterate over tracks and copy all data
 		uint64_t totaloutputoffs = 0;
 		uint64_t outputoffs = 0;
@@ -2766,6 +2817,14 @@ static void do_extract_cd(parameters_map &params)
 				output_bin_filenames.push_back(trackbin_name);
 			}
 
+			if (cdrom->is_gdrom() && mode == MODE_CUEBIN)
+			{
+				if (tracknum == 0)
+					output_toc_file->printf("REM SINGLE-DENSITY AREA\n");
+				else if (toc.tracks[tracknum].physframeofs == 45000)
+					output_toc_file->printf("REM HIGH-DENSITY AREA\n");
+			}
+
 			// output the metadata about the track to the TOC file
 			const cdrom_file::track_info &trackinfo = toc.tracks[tracknum];
 			output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
@@ -2785,31 +2844,44 @@ static void do_extract_cd(parameters_map &params)
 
 			// now read and output the actual data
 			uint32_t bufferoffs = 0;
-			uint32_t actualframes = trackinfo.frames - trackinfo.padframes;
+			uint32_t actualframes = trackinfo.frames - trackinfo.padframes + trackinfo.splitframes;
 			for (uint32_t frame = 0; frame < actualframes; frame++)
 			{
 				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(totaloutputoffs + outputoffs) / double(total_bytes));
 
+				int trk, frameofs;
+				if (tracknum > 0 && frame < trackinfo.splitframes)
+				{
+					// pull data from previous track, the reverse of how splitframes is used when making the GD-ROM CHDs
+					trk = tracknum - 1;
+					frameofs = toc.tracks[trk].frames - trackinfo.splitframes + frame;
+				}
+				else
+				{
+					trk = tracknum;
+					frameofs = frame - trackinfo.splitframes;
+				}
+
 				// read the data
-				cdrom->read_data(cdrom->get_track_start_phys(tracknum) + frame, &buffer[bufferoffs], trackinfo.trktype, true);
+				cdrom->read_data(cdrom->get_track_start_phys(trk) + frameofs, &buffer[bufferoffs], toc.tracks[trk].trktype, true);
 
 				// for CDRWin and GDI audio tracks must be reversed
 				// in the case of GDI and CHD version < 5 we assuming source CHD image is GDROM so audio tracks is already reversed
-				if (((mode == MODE_GDI && input_chd.version() > 4) || (mode == MODE_CUEBIN)) && (trackinfo.trktype == cdrom_file::CD_TRACK_AUDIO))
-					for (int swapindex = 0; swapindex < trackinfo.datasize; swapindex += 2)
+				if (((mode == MODE_GDI && input_chd.version() > 4) || (mode == MODE_CUEBIN)) && (toc.tracks[trk].trktype == cdrom_file::CD_TRACK_AUDIO))
+					for (int swapindex = 0; swapindex < toc.tracks[trk].datasize; swapindex += 2)
 					{
 						uint8_t swaptemp = buffer[bufferoffs + swapindex];
 						buffer[bufferoffs + swapindex] = buffer[bufferoffs + swapindex + 1];
 						buffer[bufferoffs + swapindex + 1] = swaptemp;
 					}
-				bufferoffs += trackinfo.datasize;
+				bufferoffs += toc.tracks[trk].datasize;
 				discoffs++;
 
 				// read the subcode data
-				if (trackinfo.subtype != cdrom_file::CD_SUB_NONE && (mode == MODE_NORMAL))
+				if (toc.tracks[trk].subtype != cdrom_file::CD_SUB_NONE && (mode == MODE_NORMAL))
 				{
-					cdrom->read_subcode(cdrom->get_track_start_phys(tracknum) + frame, &buffer[bufferoffs], true);
-					bufferoffs += trackinfo.subsize;
+					cdrom->read_subcode(cdrom->get_track_start_phys(trk) + frameofs, &buffer[bufferoffs], true);
+					bufferoffs += toc.tracks[trk].subsize;
 				}
 
 				// write it out if we need to
@@ -2822,28 +2894,6 @@ static void do_extract_cd(parameters_map &params)
 					outputoffs += bufferoffs;
 					bufferoffs = 0;
 				}
-			}
-
-			if (cdrom->is_gdrom() && mode == MODE_CUEBIN && trackinfo.padframes > 0)
-			{
-				uint32_t padframes = trackinfo.padframes;
-
-				// don't write the pad frames between the end of the single density area and start of the high density area
-				if (tracknum+1 < toc.numtrks && toc.tracks[tracknum+1].physframeofs == 45000)
-					padframes = 0;
-
-				bufferoffs = 0;
-				std::fill(buffer.begin(), buffer.end(), 0);
-
-				while (bufferoffs < padframes)
-				{
-					auto const [writerr, byteswritten] = write(*output_bin_file, &buffer[0], output_frame_size);
-					if (writerr)
-						report_error(1, "Error writing pad data to file (%s): %s\n", *output_file_str->second, "Write error");
-					bufferoffs++;
-				}
-
-				outputoffs += output_frame_size * padframes;
 			}
 
 			discoffs += trackinfo.padframes;
