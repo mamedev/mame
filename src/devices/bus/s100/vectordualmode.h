@@ -7,6 +7,7 @@
 
 #include "bus/s100/s100.h"
 #include "imagedev/floppy.h"
+#include "imagedev/mfmhd.h"
 #include "machine/fdc_pll.h"
 
 class s100_vector_dualmode_device :
@@ -32,11 +33,15 @@ private:
 	bool get_next_bit(attotime &tm, const attotime &limit);
 
 	required_device_array<floppy_connector, 4> m_floppy;
+	required_device<mfm_harddisk_connector> m_hdd;
 	uint8_t m_ram[512];
 	uint16_t m_cmar;
 	uint8_t m_drive;
+	bool m_reduced_wc;
 	uint8_t m_sector;
 	bool m_read;
+	bool m_ecc;
+	bool m_wpcom;
 	emu_timer *m_motor_on_timer;
 
 	enum sector_timer_state {
