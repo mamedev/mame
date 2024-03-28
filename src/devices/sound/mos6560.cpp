@@ -325,6 +325,8 @@ void mos6560_device::drawlines( int first, int last )
 
 void mos6560_device::write(offs_t offset, uint8_t data)
 {
+	offset &= 0xf;
+
 	DBG_LOG(1, "mos6560_port_w", ("%.4x:%.2x\n", offset, data));
 
 	switch (offset)
@@ -403,6 +405,8 @@ void mos6560_device::write(offs_t offset, uint8_t data)
 
 uint8_t mos6560_device::read(offs_t offset)
 {
+	offset &= 0xf;
+
 	int val;
 
 	switch (offset)

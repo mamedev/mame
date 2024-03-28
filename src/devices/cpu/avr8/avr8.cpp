@@ -1484,7 +1484,7 @@ void avr8_device<NumTimers>::timer0_tick_ctc_toggle()
 		m_timer_top[0] = 0;
 		LOGMASKED(LOG_TIMER0, "%s: timer0: Toggle OC0B on match\n", machine().describe_context());
 		m_r[PORTG] ^= (1 << 5);
-		m_gpio_out_cb[PORTG](m_r[PORTG]);
+		m_gpio_out_cb[GPIOG](m_r[PORTG]);
 	}
 	m_r[TCNT0]++;
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
@@ -1498,7 +1498,7 @@ void avr8_device<NumTimers>::timer0_tick_ctc_clear()
 		m_timer_top[0] = 0;
 		LOGMASKED(LOG_TIMER0, "[0] timer0: Clear OC0B on match\n", machine().describe_context());
 		m_r[PORTG] &= ~(1 << 5);
-		m_gpio_out_cb[PORTG](m_r[PORTG]);
+		m_gpio_out_cb[GPIOG](m_r[PORTG]);
 	}
 	m_r[TCNT0]++;
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
@@ -1512,7 +1512,7 @@ void avr8_device<NumTimers>::timer0_tick_ctc_set()
 		m_timer_top[0] = 0;
 		LOGMASKED(LOG_TIMER0, "%s: timer0: Set OC0B on match\n", machine().describe_context());
 		m_r[PORTG] |= (1 << 5);
-		m_gpio_out_cb[PORTG](m_r[PORTG]);
+		m_gpio_out_cb[GPIOG](m_r[PORTG]);
 	}
 	m_r[TCNT0]++;
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
@@ -2254,7 +2254,7 @@ void avr8_device<NumTimers>::timer5_tick()
 				m_timer_top[5] = 0;
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Toggle OC5B on compare match\n", machine().describe_context());
 				m_r[PORTL] ^= 1 << 4;
-				m_gpio_out_cb[PORTL](m_r[PORTL]);
+				m_gpio_out_cb[GPIOL](m_r[PORTL]);
 			}
 			break;
 		case 2: /* Clear OC5B on compare match */
@@ -2264,7 +2264,7 @@ void avr8_device<NumTimers>::timer5_tick()
 				// Clear OC5B
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Clear OC5B on compare match\n", machine().describe_context());
 				m_r[PORTL] &= ~(1 << 4);
-				m_gpio_out_cb[PORTL](m_r[PORTL]);
+				m_gpio_out_cb[GPIOL](m_r[PORTL]);
 			}
 			break;
 		case 3: /* Set OC5B on compare match */
@@ -2273,7 +2273,7 @@ void avr8_device<NumTimers>::timer5_tick()
 				m_timer_top[5] = 0;
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Set OC5B on compare match\n", machine().describe_context());
 				m_r[PORTL] |= 1 << 4;
-				m_gpio_out_cb[PORTL](m_r[PORTL]);
+				m_gpio_out_cb[GPIOL](m_r[PORTL]);
 			}
 			break;
 		}

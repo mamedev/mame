@@ -2067,7 +2067,6 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 	}
 
 	m_dac1bit_disable = true;
-	m_egc = { };
 }
 
 MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
