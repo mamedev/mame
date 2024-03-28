@@ -39601,6 +39601,11 @@ sderby2                         // (c) 1985
 beena                           //
 tvochken                        //
 
+@source:sega/sega_ferie.cpp
+ferieki                         //
+feriepu                         //
+feriewt                         //
+
 @source:sega/sega_sawatte.cpp
 sawatte                         //
 
