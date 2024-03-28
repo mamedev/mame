@@ -195,7 +195,16 @@ void sterz80_state::init_tongzi()
 	// by bits 0, 1, 4, 5, 6 and 7 of the address, the data bitswaps by bits 0 and 1 of the address.
 
 	// decrypt M6295 ROM
-	// TODO
+	uint8_t *okirom = memregion("oki")->base();
+	std::vector<uint8_t> buffer(0x40000);
+
+	memcpy(&buffer[0], okirom, 0x40000);
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		okirom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 4, 3, 1, 2, 5, 0, 10, 13, 8, 6, 15, 17, 7, 9, 12, 14, 11, 16)];
+		okirom[i] = bitswap<8>(okirom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+	}
 }
 
 } // anonymous namespace
