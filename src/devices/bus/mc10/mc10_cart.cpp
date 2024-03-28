@@ -108,6 +108,18 @@ std::pair<std::error_condition, std::string> mc10cart_slot_device::call_load()
 				image_error::INVALIDLENGTH,
 				util::string_format("Unsupported cartridge size (must be no more than %u bytes)", m_cart->max_rom_length()));
 	}
+	else if (len < m_cart->min_rom_length())
+	{
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Unsupported cartridge size (must be at least %u bytes)", m_cart->min_rom_length()));
+	}
+	else if (len % m_cart->block_rom_length() != 0)
+	{
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Unsupported cartridge size (must be a multiple of %u bytes)", m_cart->block_rom_length()));
+	}
 
 	if (!loaded_through_softlist())
 	{
@@ -176,10 +188,20 @@ void device_mc10cart_interface::interface_pre_start()
 }
 
 /*-------------------------------------------------
-    max_rom_length
+    rom size constraints
 -------------------------------------------------*/
 
 int device_mc10cart_interface::max_rom_length() const
+{
+	return 0;
+}
+
+int device_mc10cart_interface::min_rom_length() const
+{
+	return 0;
+}
+
+int device_mc10cart_interface::block_rom_length() const
 {
 	return 0;
 }

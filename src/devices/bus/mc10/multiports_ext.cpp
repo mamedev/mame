@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:S. Glaize
+
 /***************************************************************************
 
     multiports_ext.cpp
@@ -24,7 +27,6 @@
 #include "emu.h"
 #include "multiports_ext.h"
 
-
 namespace {
 
 //**************************************************************************
@@ -37,6 +39,9 @@ public:
 	mc10_multiports_ext_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual int max_rom_length() const override;
+	virtual int min_rom_length() const override;
+	virtual int block_rom_length() const override;
+
 	virtual std::pair<std::error_condition, std::string> load() override;
 
 protected:
@@ -49,11 +54,9 @@ protected:
 	void control_register_write(offs_t offset, u8 data);
 
 	void multiports_mem(address_map &map);
-	void update_bank();
 
 private:
 	memory_bank_creator m_bank;
-	uint8_t rom_bank_index;
 	memory_share_creator<u8> m_extention_ram;
 };
 
@@ -70,7 +73,6 @@ mc10_multiports_ext_device::mc10_multiports_ext_device(const machine_config &mco
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mc10cart_interface(mconfig, *this)
 	, m_bank(*this, "cart_bank")
-	, rom_bank_index(0)
 	, m_extention_ram(*this, "ext_ram", 1024 * 16, ENDIANNESS_BIG)
 {
 }
@@ -78,6 +80,16 @@ mc10_multiports_ext_device::mc10_multiports_ext_device(const machine_config &mco
 int mc10_multiports_ext_device::max_rom_length() const
 {
 	return 1024 * 64;
+}
+
+int mc10_multiports_ext_device::min_rom_length() const
+{
+	return 1024 * 8;
+}
+
+int mc10_multiports_ext_device::block_rom_length() const
+{
+	return 1024 * 8;
 }
 
 void mc10_multiports_ext_device::multiports_mem(address_map &map)
@@ -103,14 +115,15 @@ void mc10_multiports_ext_device::device_reset()
 void mc10_multiports_ext_device::control_register_write(offs_t offset, u8 data)
 {
 	if (offset < 0x1000)
+	{
 		m_bank->set_entry(data & 0x07);
+	}
 }
 
 std::pair<std::error_condition, std::string> mc10_multiports_ext_device::load()
 {
 	memory_region *const romregion(memregion("^rom"));
-	if (romregion->bytes() < (0x2000 * 8))
-		return std::make_pair(image_error::INVALIDLENGTH, "Cartridge ROM must be at least 64KB");
+	assert(romregion != nullptr);
 
 	m_bank->configure_entries(0, 8, romregion->base(), 0x2000);
 
