@@ -97,7 +97,7 @@ constexpr int MODE_GDI = 2;
 #define OPTION_INPUT "input"
 #define OPTION_OUTPUT "output"
 #define OPTION_OUTPUT_BIN "outputbin"
-#define OPTION_OUTPUT_SPLIT "outputsplit"
+#define OPTION_OUTPUT_SPLIT "split"
 #define OPTION_OUTPUT_FORCE "force"
 #define OPTION_INPUT_START_BYTE "inputstartbyte"
 #define OPTION_INPUT_START_HUNK "inputstarthunk"
@@ -630,7 +630,7 @@ static const option_description s_options[] =
 	{ OPTION_INPUT_PARENT,          "ip",   true, " <filename>: parent file name for input CHD" },
 	{ OPTION_OUTPUT,                "o",    true, " <filename>: output file name" },
 	{ OPTION_OUTPUT_BIN,            "ob",   true, " <filename>: output file name for binary data" },
-	{ OPTION_OUTPUT_SPLIT,          "os",   false, ": output one binary file per track" },
+	{ OPTION_OUTPUT_SPLIT,          "sb",   false, ": output one binary file per track" },
 	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting an existing file" },
 	{ OPTION_OUTPUT_PARENT,         "op",   true, " <filename>: parent file name for output CHD" },
 	{ OPTION_INPUT_START_BYTE,      "isb",  true, " <offset>: starting byte offset within the input" },
