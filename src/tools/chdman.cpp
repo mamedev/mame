@@ -2661,13 +2661,8 @@ static void do_extract_cd(parameters_map &params)
 					if (format_type == "t")
 					{
 						// track number
-						replacement = util::string_format("%" + format_part + "d", tracknum+1);
-
-						if (!is_splitbin)
-						{
-							util::stream_format(std::cout, "Warning: --%s not specified but track format string detected, enabling automatically\n", OPTION_OUTPUT_SPLIT);
-							is_splitbin = true;
-						}
+						if (is_splitbin)
+							replacement = util::string_format("%" + format_part + "d", tracknum+1);
 					}
 					else
 					{
