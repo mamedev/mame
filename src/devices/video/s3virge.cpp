@@ -517,10 +517,6 @@ void s3virge_vga_device::add_command(u8 cmd_type)
 
 TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 {
-	// TODO: shouldn't be here
-	if (m_bitblt_fifo.empty())
-		return;
-
 	if (s3virge.s3d.xfer_mode)
 	{
 		if (!m_xfer_fifo.empty())
@@ -531,6 +527,9 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 		}
 		return;
 	}
+
+	if (m_bitblt_fifo.empty())
+		return;
 
 	if (s3virge.s3d.busy)
 		return;
@@ -1189,7 +1188,7 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::draw_step_tick)
 			break;
 		case S3D_STATE_BITBLT:
 			bitblt_step();
-			if (param == 1)
+			if (param == 1 && m_xfer_fifo.empty())
 				s3virge.s3d.busy = false;
 			break;
 	}
@@ -1290,14 +1289,14 @@ uint32_t s3virge_vga_device::s3d_sub_status_r()
 {
 	uint32_t res = 0x00000000;
 
-	// HACK: this is entirely wrong, TBD log the status interactions
-	if(s3virge.s3d.busy == true || m_bitblt_fifo.empty() || m_xfer_fifo.empty())
+	if(s3virge.s3d.busy == false && m_bitblt_fifo.empty())
 		res |= 0x00002000;  // S3d engine is idle
 
 	//res |= (s3virge.s3d.cmd_fifo_slots_free << 8);
 	// NOTE: can actually be 24 FIFO depth with specific Scenic Mode (verify if different FIFO altogether)
 	// & 0x1f00
 	//res |= std::min(m_bitblt_fifo.queue_length(), 16) << 8;
+	// TODO: this likely listens for xfer FIFO, not command
 	res |= (16 - (m_bitblt_fifo.queue_length() / 15)) << 8;
 
 	return res;
