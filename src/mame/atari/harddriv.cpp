@@ -1312,8 +1312,8 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - voice mic */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - brake */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_NAME("Brake")
 
 	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - volume */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
@@ -1324,8 +1324,8 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 - canopy */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_NAME("Brake") PORT_REVERSE
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - ADC input for voice mic? Not verified */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
