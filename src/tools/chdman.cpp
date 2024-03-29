@@ -97,7 +97,7 @@ constexpr int MODE_GDI = 2;
 #define OPTION_INPUT "input"
 #define OPTION_OUTPUT "output"
 #define OPTION_OUTPUT_BIN "outputbin"
-#define OPTION_OUTPUT_SPLIT "split"
+#define OPTION_OUTPUT_SPLITBIN "splitbin"
 #define OPTION_OUTPUT_FORCE "force"
 #define OPTION_INPUT_START_BYTE "inputstartbyte"
 #define OPTION_INPUT_START_HUNK "inputstarthunk"
@@ -630,7 +630,7 @@ static const option_description s_options[] =
 	{ OPTION_INPUT_PARENT,          "ip",   true, " <filename>: parent file name for input CHD" },
 	{ OPTION_OUTPUT,                "o",    true, " <filename>: output file name" },
 	{ OPTION_OUTPUT_BIN,            "ob",   true, " <filename>: output file name for binary data" },
-	{ OPTION_OUTPUT_SPLIT,          "sb",   false, ": output one binary file per track" },
+	{ OPTION_OUTPUT_SPLITBIN,       "sb",   false, ": output one binary file per track" },
 	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting an existing file" },
 	{ OPTION_OUTPUT_PARENT,         "op",   true, " <filename>: parent file name for output CHD" },
 	{ OPTION_INPUT_START_BYTE,      "isb",  true, " <offset>: starting byte offset within the input" },
@@ -785,7 +785,7 @@ static const command_description s_commands[] =
 		{
 			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_BIN,
-			OPTION_OUTPUT_SPLIT,
+			OPTION_OUTPUT_SPLITBIN,
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
@@ -2568,11 +2568,11 @@ static void do_extract_cd(parameters_map &params)
 		default_name.erase(chop, default_name.size());
 
 	// GDIs will always output as split bin
-	bool is_splitbin = mode == MODE_GDI || params.find(OPTION_OUTPUT_SPLIT) != params.end();
+	bool is_splitbin = mode == MODE_GDI || params.find(OPTION_OUTPUT_SPLITBIN) != params.end();
 	if (!is_splitbin && cdrom->is_gdrom() && mode == MODE_CUEBIN)
 	{
 		// GD-ROM cue/bin is in Redump format which should always be split by tracks
-		util::stream_format(std::cout, "Warning: --%s is required for this specific combination of input disc type and output format, enabling automatically\n", OPTION_OUTPUT_SPLIT);
+		util::stream_format(std::cout, "Warning: --%s is required for this specific combination of input disc type and output format, enabling automatically\n", OPTION_OUTPUT_SPLITBIN);
 		is_splitbin = true;
 	}
 
@@ -2599,15 +2599,15 @@ static void do_extract_cd(parameters_map &params)
 	{
 		output_bin_file_str = output_bin_file_fnd->second;
 
-		chop = (*output_bin_file_str).find_last_of('.');
+		chop = output_bin_file_str->find_last_of('.');
 		if (chop != std::string::npos)
 		{
-			output_bin_file_ext = (*output_bin_file_str).substr(chop, (*output_bin_file_str).size() - chop);
-			(*output_bin_file_str).erase(chop, (*output_bin_file_str).size());
+			output_bin_file_ext = output_bin_file_str->substr(chop, output_bin_file_str->size() - chop);
+			output_bin_file_str->erase(chop, output_bin_file_str->size());
 		}
 	}
 
-	if ((*output_bin_file_str).find('"') != std::string::npos || output_bin_file_ext.find('"') != std::string::npos)
+	if (output_bin_file_str->find('"') != std::string::npos || output_bin_file_ext.find('"') != std::string::npos)
 		report_error(1, "Output bin filename (%s%s) must not contain quotation marks", *output_bin_file_str, output_bin_file_ext);
 
 	// print some info
@@ -2690,7 +2690,7 @@ static void do_extract_cd(parameters_map &params)
 
 			if (is_splitbin && !found_track_variable)
 			{
-				report_error(1, "A track number variable (%%t) must be specified in the output bin filename when --%s is enabled\n", OPTION_OUTPUT_SPLIT);
+				report_error(1, "A track number variable (%%t) must be specified in the output bin filename when --%s is enabled\n", OPTION_OUTPUT_SPLITBIN);
 			}
 
 			// verify output BIN file doesn't exist
@@ -2913,7 +2913,7 @@ static void do_extract_cd(parameters_map &params)
 		// delete the output files
 		output_bin_file.reset();
 		output_toc_file.reset();
-		for (auto output_bin_filename : output_bin_filenames)
+		for (auto const &output_bin_filename : output_bin_filenames)
 			osd_file::remove(output_bin_filename);
 		osd_file::remove(*output_file_str->second);
 		throw;
