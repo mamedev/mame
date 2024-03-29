@@ -8,9 +8,9 @@
 
 #include <alloca.h> // alloca
 #include <stdarg.h> // va_list
+#include <stddef.h> // ptrdiff_t
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
-#include <stddef.h> // ptrdiff_t
 
 #include "platform.h"
 #include "config.h"
@@ -214,9 +214,14 @@ namespace bx
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
 
-	/// Returns a value of type To by reinterpreting the object representation of From.
+	/// Returns a value of type `Ty` by reinterpreting the object representation of `FromT`.
 	template <typename Ty, typename FromT>
-	constexpr Ty bit_cast(const FromT& _from);
+	constexpr Ty bitCast(const FromT& _from);
+
+	/// Performs `static_cast` of value `_from`, and in debug build runtime verifies/asserts
+	/// that the value didn't change.
+	template<typename Ty, typename FromT>
+	constexpr Ty narrowCast(const FromT& _from, Location _location = Location::current() );
 
 	/// Copy memory block.
 	///
