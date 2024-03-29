@@ -2644,6 +2644,7 @@ static void do_extract_cd(parameters_map &params)
 			std::string::const_iterator new_trackbin_name_end = new_trackbin_name.end();
 			std::string filename_formatted = new_trackbin_name;
 			std::smatch variable_matches;
+			bool found_track_variable = false;
 
 			while (std::regex_search(new_trackbin_name_itr, new_trackbin_name_end, variable_matches, variables_regex))
 			{
@@ -2662,7 +2663,10 @@ static void do_extract_cd(parameters_map &params)
 					{
 						// track number
 						if (is_splitbin)
+						{
 							replacement = util::string_format("%" + format_part + "d", tracknum+1);
+							found_track_variable = true;
+						}
 					}
 					else
 					{
@@ -2679,6 +2683,11 @@ static void do_extract_cd(parameters_map &params)
 				}
 
 				new_trackbin_name_itr = variable_matches.suffix().first; // move past match for next loop
+			}
+
+			if (is_splitbin && !found_track_variable)
+			{
+				report_error(1, "A track number variable (%%t) must be specified in the output bin filename when --%s is enabled\n", OPTION_OUTPUT_SPLIT);
 			}
 
 			// verify output BIN file doesn't exist
