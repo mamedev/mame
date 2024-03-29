@@ -27897,7 +27897,7 @@ Official modification of rev. A which changes the spike damage behavior to be li
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Earlier than the "Beta 4" prototype. No equivalent build has been found in the Sega QA Archive.
-Original scene release which was altered to include a cracktro and bypass the copy protection. Dump originally in smd format, converted to raw binary due to this softlist not supporting smd files.
+Original scene release which was altered to include a cracktro and bypass the copy protection. Dump originally in smd format, converted to raw binary.
 ]]></notes>
 		<info name="release" value="19921109"/>
 		<part name="cart" interface="megadriv_cart">
