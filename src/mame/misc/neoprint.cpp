@@ -832,6 +832,23 @@ ROM_START( npcramen ) // ? string
 	ROM_LOAD32_BYTE( "l009-c2 pstm-romc.c2", 0x000001, 0x080000, CRC(d63dea34) SHA1(cf2dbf982ed955fe5a4c737d1752cdb66ab5f84a) )
 ROM_END
 
+ROM_START( npft ) // NP 1.30 19970430 string
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "ft_ep1.ep1", 0x000000, 0x080000, CRC(870d6e77) SHA1(651958d5254763f308e53ab46c4c70694e57acd7) ) // hand-written label
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_LOAD( "p004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
+
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_LOAD( "p004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 ) // hand-written labels
+	ROM_LOAD32_BYTE( "ft_c1.c1", 0x000000, 0x080000, CRC(2977a558) SHA1(fc4777899c2dcb01aa31a974d3b7c83cdb38e650) )
+	ROM_LOAD32_BYTE( "ft_c2.c2", 0x000001, 0x080000, CRC(15468148) SHA1(9a96e75894cc2bb51c3c3dc83b31f13e68c2bd85) )
+	ROM_LOAD32_BYTE( "ft_c3.c3", 0x200001, 0x080000, CRC(dcc527cf) SHA1(e49ade0f422439e99a7dbe97d1f9df833037301d) )
+	ROM_LOAD32_BYTE( "ft_c4.c4", 0x200001, 0x080000, CRC(c91dea9d) SHA1(a99e18c4f737e3e5964371cf5e05fecbc6e7a6fe) )
+ROM_END
+
 ROM_START( nppopeye ) // NP 1.30 19970430 string
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p027-ep1", 0x000000, 0x080000, CRC(f928ad2e) SHA1(a958b2d357af6daf2bde6d5b8874963c9c4130c3))
@@ -962,5 +979,6 @@ GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, init_9
 GAME( 1998, npsprg98,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Spring '98 (T4i 3.07)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fuyu Pri Iitoko-dori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npft,        0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fairy Tales (World) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
