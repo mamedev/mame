@@ -1324,8 +1324,7 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 - canopy */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
-	/* Placeholder ADC port for voice mic, NOT tested or verified! */
-	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - voice mic */
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - ADC input for voice mic? Not verified */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - seat adjust */
