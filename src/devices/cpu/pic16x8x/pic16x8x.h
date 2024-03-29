@@ -62,7 +62,7 @@ public:
 
 protected:
 	// construction/destruction
-	pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, uint16_t eeprom_size, int pic_model);
+	pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -103,7 +103,7 @@ protected:
 
 	u8 m_eeprom_data[0x40];
 	u16 m_buff[0x40];
-	
+
 	optional_memory_region m_region;
 
 private:
@@ -151,7 +151,7 @@ private:
 	u8      m_portb_chdetect_temp;
 	bool    m_irq_in_progress;
 
-	const u8 m_internal_eeprom_size;
+	const u8 m_internal_eeprom_size = 0x40;
 
 	// i/o handlers
 	devcb_read8::array<2> m_read_port;
@@ -167,7 +167,7 @@ private:
 		u8 cycles;
 		pic16x8x_ophandler function;
 	};
-	
+
 	static const pic16x8x_opcode s_opcode_main[128];
 	static const pic16x8x_opcode s_opcode_00x[128];
 
@@ -300,3 +300,4 @@ public:
 };
 
 #endif  // MAME_CPU_PIC16X8X_PIC16X8X_H
+
