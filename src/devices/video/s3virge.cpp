@@ -168,7 +168,8 @@ void s3virge_vga_device::s3d_reset()
 	s3virge.s3d.busy = false;
 	// beos 4.x (and presumably Win 3.1) never sets this when using BitBlt,
 	// expecting 0xf0 ROPs to be 1-filled rather than 0
-	m_bitblt_latch.mono_pat = (u64)0xffff'ffff'ffff'ffff;
+	m_bitblt_latch[5] = 0xffff'ffff;
+	m_bitblt_latch[6] = 0xffff'ffff;
 	// TODO: the rest of the pipeline, particularly more state reset on dual boot transitions.
 }
 
@@ -495,12 +496,13 @@ void s3virge_vga_device::add_command(u8 cmd_type)
 	if (m_bitblt_fifo.full())
 		throw emu_fatalerror("s3virge: FIFO full");
 
-	m_bitblt_fifo.enqueue(m_bitblt_latch);
+	if (m_bitblt_fifo.empty())
+		m_cmd_timer->adjust(attotime::from_nsec(250), 0, attotime::from_nsec(250));
 
-	LOGFIFO("Enqueue command type %i %08x (%d free)\n", cmd_type, m_bitblt_latch.cmd_set, 16 - m_bitblt_fifo.queue_length());
+	for (int i = 0; i < 15; i++)
+		m_bitblt_fifo.enqueue(m_bitblt_latch[i]);
 
-	// TODO: trigger on idle state only
-	m_cmd_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
+	LOGFIFO("Enqueue command type %i %08x (%d free)\n", cmd_type, m_bitblt_latch[11], 16 - m_bitblt_fifo.queue_length() / 15);
 
 
 //	s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type = cmd_type;
@@ -519,12 +521,19 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 	if (m_bitblt_fifo.empty())
 		return;
 
+	if (s3virge.s3d.xfer_mode)
+	{
+		if (!m_xfer_fifo.empty())
+		{
+			s3virge.s3d.busy = true;
+			s3virge.s3d.image_xfer = m_xfer_fifo.dequeue();
+			m_draw_timer->adjust(attotime::from_nsec(250), 1);
+		}
+		return;
+	}
+
 	if (s3virge.s3d.busy)
 		return;
-
-	const bitblt_struct command_struct = m_bitblt_fifo.dequeue();
-
-	LOGFIFO("Dequeue command %08x (%d free)\n", command_struct.cmd_set, 16 - m_bitblt_fifo.queue_length());
 
 	// start next command in FIFO
 	const u8 cmd_type = 0; //s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].op_type & 0xf;
@@ -548,13 +557,38 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 			LOGCMD("3D Tri command (unsupported)\n");
 			break;
 		case OP_BITBLT:
+		{
+			u32 tmp;
 			s3virge.s3d.state = S3D_STATE_BITBLT;
-			s3virge.s3d.bitblt_x_src = (command_struct.rsrc_xy & 0x07ff0000) >> 16;
-			s3virge.s3d.bitblt_y_src = (command_struct.rsrc_xy & 0x000007ff);
-			s3virge.s3d.bitblt_x_dst = (command_struct.rdest_xy & 0x07ff0000) >> 16;
-			s3virge.s3d.bitblt_y_dst = (command_struct.rdest_xy & 0x000007ff);
-			s3virge.s3d.bitblt_width = (command_struct.rwidth_height & 0xffff0000) >> 16;
-			s3virge.s3d.bitblt_height = (command_struct.rwidth_height & 0x0000ffff);
+			//const bitblt_struct command_struct = m_bitblt_fifo.dequeue();
+			s3virge.s3d.src_base = m_bitblt_fifo.dequeue();
+			s3virge.s3d.dest_base = m_bitblt_fifo.dequeue();
+			tmp = m_bitblt_fifo.dequeue();
+			s3virge.s3d.clip_r = tmp & 0x000007ff;
+			s3virge.s3d.clip_l = (tmp & 0x07ff0000) >> 16;
+			tmp = m_bitblt_fifo.dequeue();
+			s3virge.s3d.clip_b = tmp & 0x000007ff;
+			s3virge.s3d.clip_t = (tmp & 0x07ff0000) >> 16;
+			tmp = m_bitblt_fifo.dequeue();
+			s3virge.s3d.src_stride = (tmp >> 0) & 0xfff8;
+			s3virge.s3d.dest_stride = (tmp >> 16) & 0xfff8;
+			tmp = m_bitblt_fifo.dequeue();
+			s3virge.s3d.bitblt_mono_pattern = ((u64)m_bitblt_fifo.dequeue() << 32) | tmp;
+			s3virge.s3d.pat_bg_clr = m_bitblt_fifo.dequeue();
+			s3virge.s3d.pat_fg_clr = m_bitblt_fifo.dequeue();
+			s3virge.s3d.src_bg_clr = m_bitblt_fifo.dequeue();
+			s3virge.s3d.src_fg_clr = m_bitblt_fifo.dequeue();
+			s3virge.s3d.command = m_bitblt_fifo.dequeue();
+			tmp = m_bitblt_fifo.dequeue();
+			s3virge.s3d.bitblt_width = (tmp & 0xffff0000) >> 16;
+			s3virge.s3d.bitblt_height = (tmp & 0x0000ffff);
+			tmp = m_bitblt_fifo.dequeue();
+			s3virge.s3d.bitblt_x_src = (tmp & 0x07ff0000) >> 16;
+			s3virge.s3d.bitblt_y_src = (tmp & 0x000007ff);
+			tmp = m_bitblt_fifo.dequeue();
+			s3virge.s3d.bitblt_x_dst = (tmp & 0x07ff0000) >> 16;
+			s3virge.s3d.bitblt_y_dst = (tmp & 0x000007ff);
+
 			// TODO: these four goes negative at second transfer of beos 4 (two's complement?)
 			s3virge.s3d.bitblt_x_current = s3virge.s3d.bitblt_x_dst;
 			s3virge.s3d.bitblt_x_src_current = s3virge.s3d.bitblt_x_src;
@@ -562,29 +596,24 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 			s3virge.s3d.bitblt_y_src_current = s3virge.s3d.bitblt_y_src;
 			s3virge.s3d.bitblt_pat_x = s3virge.s3d.bitblt_x_current % 8;
 			s3virge.s3d.bitblt_pat_y = s3virge.s3d.bitblt_y_current % 8;
-			s3virge.s3d.clip_r = command_struct.clip_l_r & 0x000007ff;
-			s3virge.s3d.clip_l = (command_struct.clip_l_r & 0x07ff0000) >> 16;
-			s3virge.s3d.clip_b = command_struct.clip_t_b & 0x000007ff;
-			s3virge.s3d.clip_t = (command_struct.clip_t_b & 0x07ff0000) >> 16;
-			if(!(BIT(command_struct.cmd_set, 7)))
-			{
-				s3virge.s3d.busy = true;
-				m_draw_timer->adjust(attotime::from_nsec(250),0,attotime::from_nsec(250));
-			}
 			s3virge.s3d.bitblt_step_count = 0;
-			s3virge.s3d.bitblt_mono_pattern = command_struct.mono_pat;
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
-			s3virge.s3d.command = command_struct.cmd_set;
-			s3virge.s3d.src_base = command_struct.src_base;
-			s3virge.s3d.dest_base = command_struct.dest_base;
-			s3virge.s3d.pat_fg_clr = command_struct.pat_fg_clr;
-			s3virge.s3d.pat_bg_clr = command_struct.pat_bg_clr;
-			s3virge.s3d.src_fg_clr = command_struct.src_fg_clr;
-			s3virge.s3d.src_bg_clr = command_struct.src_bg_clr;
-			s3virge.s3d.dest_src_stride = command_struct.dest_src_str;
+
+			if(!(BIT(s3virge.s3d.command, 7)))
+			{
+				s3virge.s3d.busy = true;
+				s3virge.s3d.xfer_mode = false;
+				m_draw_timer->adjust(attotime::from_nsec(250), 0, attotime::from_nsec(250));
+			}
+			else
+				s3virge.s3d.xfer_mode = true;
+
+			LOGFIFO("Dequeue command %08x (%d free)\n", s3virge.s3d.command, 16 - (m_bitblt_fifo.queue_length() / 15));
+
 			LOGCMD("Started BitBLT command [%08x]\n", s3virge.s3d.command);
 			break;
+		}
 		default:
 			LOGCMD("<reserved %02x> command detected [%08x]\n", cmd_type, s3virge.s3d.command);
 			break;
@@ -593,19 +622,22 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 
 void s3virge_vga_device::command_finish()
 {
-	s3virge.s3d.state = S3D_STATE_IDLE;
 	m_draw_timer->adjust(attotime::never);
 
-	LOGFIFO("Command finished (%u free) ", 16 - m_bitblt_fifo.queue_length());
+	LOGFIFO("Command finished (%u free) ", 16 - (m_bitblt_fifo.queue_length() / 15));
 	s3virge.s3d.busy = false;
+	s3virge.s3d.xfer_mode = false;
 
 	if (m_bitblt_fifo.empty())
 	{
+		s3virge.s3d.state = S3D_STATE_IDLE;
+		m_draw_timer->adjust(attotime::never);
 		m_cmd_timer->adjust(attotime::never);
 		LOGFIFO("- timer stop\n");
 	}
 	else
 	{
+		s3virge.s3d.state = S3D_STATE_BITBLT;
 		//m_cmd_timer->adjust(attotime::from_msec(1));
 		LOGFIFO("- timer continue\n");
 	}
@@ -796,9 +828,9 @@ void s3virge_vga_device::bitblt_colour_step()
 	// NOP disables autoexecute (is it supposed to not execute rest of command?)
 	if (command_type == 0xf)
 	{
-		m_bitblt_latch.cmd_set &= ~1;
-		//command_finish();
-		//return;
+		m_bitblt_latch[11] &= ~1;
+		command_finish();
+		return;
 	}
 
 	uint32_t src = 0;
@@ -986,9 +1018,9 @@ void s3virge_vga_device::bitblt_monosrc_step()
 	// NOP disables autoexecute (is it supposed to not execute rest of command?)
 	if (command_type == 0xf)
 	{
-		m_bitblt_latch.cmd_set &= ~1;
-		//command_finish();
-		//return;
+		m_bitblt_latch[11] &= ~1;
+		command_finish();
+		return;
 	}
 
 	uint32_t src = 0;
@@ -1157,6 +1189,8 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::draw_step_tick)
 			break;
 		case S3D_STATE_BITBLT:
 			bitblt_step();
+			if (param == 1)
+				s3virge.s3d.busy = false;
 			break;
 	}
 }
@@ -1256,14 +1290,15 @@ uint32_t s3virge_vga_device::s3d_sub_status_r()
 {
 	uint32_t res = 0x00000000;
 
-	if(s3virge.s3d.busy == false && m_bitblt_fifo.empty())
+	// HACK: this is entirely wrong, TBD log the status interactions
+	if(s3virge.s3d.busy == true || m_bitblt_fifo.empty() || m_xfer_fifo.empty())
 		res |= 0x00002000;  // S3d engine is idle
 
 	//res |= (s3virge.s3d.cmd_fifo_slots_free << 8);
 	// NOTE: can actually be 24 FIFO depth with specific Scenic Mode (verify if different FIFO altogether)
 	// & 0x1f00
 	//res |= std::min(m_bitblt_fifo.queue_length(), 16) << 8;
-	res |= (16 - m_bitblt_fifo.queue_length()) << 8;
+	res |= (16 - (m_bitblt_fifo.queue_length() / 15)) << 8;
 
 	return res;
 }
@@ -1338,137 +1373,17 @@ void s3virge_vga_device::s3d_register_map(address_map &map)
 			s3virge.s3d.pattern[offset] = data;
 		})
 	);
-	map(0x04d4, 0x04d7).lrw32(
+	map(0x04d4, 0x050f).lrw32(
 		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.src_base;
+			return m_bitblt_latch[offset];
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4D4 (src_base) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.src_base);
-		})
-	);
-	map(0x04d8, 0x04db).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.dest_base;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4D8 (dest_base) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.dest_base);
-		})
-	);
-	map(0x04dc, 0x04df).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.clip_l_r;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4DC (clip_l_r) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.clip_l_r);
-		})
-	);
-	map(0x04e0, 0x04e3).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.clip_t_b;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4E0 (clip_t_b) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.clip_t_b);
-		})
-	);
-	map(0x04e4, 0x04e7).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.dest_src_str;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4E4 (dest_src_str) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.dest_src_str);
-		})
-	);
-	map(0x04e8, 0x04ef).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.mono_pat >> (offset * 32);
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MM%04X (mono_pat_%d) = %08x & %08x\n", (offset*4)+0xa4e8, offset, data, mem_mask);
-			if (offset)
-				m_bitblt_latch.mono_pat = ((u64)data << 32) | (m_bitblt_latch.mono_pat & 0xffff'ffff);
-			else
-				m_bitblt_latch.mono_pat = (data & 0xffff'ffff) | (u64)(m_bitblt_latch.mono_pat & 0xffff'ffff'0000'0000);
-		})
-	);
-	map(0x04f0, 0x04f3).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.pat_bg_clr;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4F0 (pat_bg_clr) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.pat_bg_clr);
-		})
-	);
-	map(0x04f4, 0x04f7).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.pat_fg_clr;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4F4 (pat_fg_clr) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.pat_fg_clr);
-		})
-	);
-	map(0x04f8, 0x04fb).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.src_bg_clr;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4F8 (src_bg_clr) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.src_bg_clr);
-		})
-	);
-	map(0x04fc, 0x04ff).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.src_fg_clr;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA4FC (src_fg_clr) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.src_fg_clr);
-		})
-	);
-	map(0x0500, 0x0503).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.cmd_set;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA500 (cmd_set) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.cmd_set);
-			if(!(BIT(data, 0)))
+			const u32 native_offset = (offset * 4) + 0xa4d4;
+			LOGMMIO("MM%04X = %08x & %08x\n", native_offset, data, mem_mask);
+			COMBINE_DATA(&m_bitblt_latch[offset]);
+			if (native_offset == 0xa500 && !(BIT(data, 0)))
 				add_command(0);
-		})
-	);
-	map(0x0504, 0x0507).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.rwidth_height;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA504 (rwidth_height) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.rwidth_height);
-		})
-	);
-	map(0x0508, 0x050b).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.rsrc_xy;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA508 (rsrc_xy) = %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.rsrc_xy);
-		})
-	);
-	map(0x050c, 0x050f).lrw32(
-		NAME([this] (offs_t offset) {
-			return m_bitblt_latch.rdest_xy;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGMMIO("MMA50C (rdest_xy) = %08x & mem_mask\n", data, mem_mask);
-			COMBINE_DATA(&m_bitblt_latch.rdest_xy);
-			// autoexecute enabled
-			if(BIT(m_bitblt_latch.cmd_set, 0))
+			if (native_offset == 0xa50c && BIT(m_bitblt_latch[11], 0))
 				add_command(0);
 		})
 	);

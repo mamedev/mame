@@ -36,14 +36,10 @@ public:
 
 	void s3d_register_map(address_map &map);
 
-	void image_xfer(uint32_t data)
+	void image_xfer(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
-//      if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000080)
-		{
-//      logerror("IMG Xfer:(%u):%08x  X:%u(%u) Y:%u(%u)\n",s3virge.s3d.bitblt_step_count,data,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_width,s3virge.s3d.bitblt_y_current,s3virge.s3d.bitblt_height);
-		s3virge.s3d.image_xfer = data;
-		bitblt_step();
-		}
+		m_xfer_fifo.enqueue(data);
+		machine().scheduler().synchronize();
 	}
 
 	uint32_t get_linear_address() { return s3virge.linear_address; }
@@ -54,7 +50,7 @@ public:
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
 	uint16_t src_stride()
 	{
-		return (s3virge.s3d.dest_src_stride >> 0) & 0xfff8;
+		return s3virge.s3d.src_stride;
 	}
 	uint16_t dest_stride()
 	{
@@ -66,7 +62,7 @@ public:
 //              + ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8);
 //      }
 //      else
-			return (s3virge.s3d.dest_src_stride >> 16) & 0xfff8;
+			return s3virge.s3d.dest_stride;
 	}
 
 	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existent 8514/A device\n"); return nullptr; }
@@ -126,8 +122,10 @@ protected:
 		u32 rdest_xy = 0;
 	};
 
-	util::fifo<bitblt_struct, 16> m_bitblt_fifo;
-	bitblt_struct m_bitblt_latch; 
+//	util::fifo<u32, 16 * 15> m_bitblt_fifo;
+	util::fifo<u32, 0x8000> m_bitblt_fifo;
+	util::fifo<u32, 0x8000> m_xfer_fifo;
+	u32 m_bitblt_latch[15]{};
 
 	struct
 	{
@@ -140,7 +138,8 @@ protected:
 		struct
 		{
 			int state;
-			bool busy;
+			bool busy = false;
+			bool xfer_mode = false;
 
 			uint8_t pattern[0xc0];
 
@@ -173,7 +172,8 @@ protected:
 			uint32_t pat_fg_clr;
 			uint32_t src_bg_clr;
 			uint32_t src_fg_clr;
-			uint32_t dest_src_stride;
+			uint16_t dest_stride;
+			uint16_t src_stride;
 		} s3d;
 		uint8_t cr66;
 	} s3virge;
