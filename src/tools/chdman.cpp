@@ -2795,17 +2795,14 @@ static void do_extract_cd(parameters_map &params)
 
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
-			if (is_splitbin)
+			if (track_filenames[tracknum] != trackbin_name)
 			{
 				totaloutputoffs += outputoffs;
 				outputoffs = 0;
 
 				if (mode != MODE_GDI)
 					discoffs = 0;
-			}
 
-			if (track_filenames[tracknum] != trackbin_name)
-			{
 				output_bin_file.reset();
 
 				trackbin_name = track_filenames[tracknum];
