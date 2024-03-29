@@ -2564,7 +2564,7 @@ static void do_extract_cd(parameters_map &params)
 
 	// split path and extension
 	int chop = default_name.find_last_of('.');
-	if (chop != -1)
+	if (chop != std::string::npos)
 		default_name.erase(chop, default_name.size());
 
 	// GDIs will always output as split bin
@@ -2600,12 +2600,15 @@ static void do_extract_cd(parameters_map &params)
 		output_bin_file_str = output_bin_file_fnd->second;
 
 		chop = (*output_bin_file_str).find_last_of('.');
-		if (chop != -1)
+		if (chop != std::string::npos)
 		{
 			output_bin_file_ext = (*output_bin_file_str).substr(chop, (*output_bin_file_str).size() - chop);
 			(*output_bin_file_str).erase(chop, (*output_bin_file_str).size());
 		}
 	}
+
+	if ((*output_bin_file_str).find('"') != std::string::npos || output_bin_file_ext.find('"') != std::string::npos)
+		report_error(1, "Output bin filename (%s%s) must not contain quotation marks", *output_bin_file_str, output_bin_file_ext);
 
 	// print some info
 	util::stream_format(std::cout, "Input CHD:    %s\n", *params.find(OPTION_INPUT)->second);
