@@ -2997,6 +2997,16 @@ ROM_START(ss_12)
 	ROM_LOAD16_BYTE("sssnd_11.s4", 0x400000, 0x100000, CRC(258b0a27) SHA1(83763b98907cf38e6f7b9fe4f26ce93a54ba3568))
 ROM_END
 
+ROM_START(ss_11)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("stiffg11.1_1", 0x00000, 0x80000, CRC(210615f4) SHA1(8f376c68d072f9b276d45452133107cdd0a3ea68))
+	ROM_RELOAD(0x80000, 0x80000)
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("sssnd_10.s2", 0x000000, 0x100000, CRC(964974f1) SHA1(9b86d4c192eadbad85cf7676c74feed08b680581))
+	ROM_LOAD16_BYTE("sssnd_10.s3", 0x200000, 0x100000, CRC(c4f2e08a) SHA1(e20ff622a3f475db11f1f44d36a6669e160437a3))
+	ROM_LOAD16_BYTE("sssnd_10.s4", 0x400000, 0x100000, CRC(258b0a27) SHA1(83763b98907cf38e6f7b9fe4f26ce93a54ba3568))
+ROM_END
+
 ROM_START(ss_03)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD("ss_g11.0_3", 0x00000, 0x80000, CRC(5b9755d6) SHA1(207d9ea858c76c4991747b401dc83183c1ddf7e4))
@@ -3182,6 +3192,7 @@ GAME(1996,  sc_091,     sc_18,      wpc_95, sc,     wpc_95_state,   init_sc,    
 GAME(1996,  ss_15,      0,          wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.5)",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1996,  ss_14,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.4)",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1996,  ss_12,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.2)",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1996,  ss_11,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (1.1)",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1996,  ss_03,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (0.3)",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1996,  ss_01,      ss_15,      wpc_95, ss,     wpc_95_state,   init_ss,     ROT0, "Bally",                "Scared Stiff (D0.1R with sound rev.25)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1996,  totan_14,   0,          wpc_95, totan,  wpc_95_state,   init_totan,  ROT0, "Williams",             "Tales Of The Arabian Nights (1.4)",      MACHINE_IS_SKELETON_MECHANICAL )
