@@ -106,46 +106,45 @@ void pic16x8x_device::ram_7(address_map &map)
 	map(0x0c, 0x4f).ram().mirror(0x80);
 }
 
-pic16x8x_device::pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, uint16_t eeprom_size, int pic_model)
+
+pic16x8x_device::pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_region(*this, DEVICE_SELF)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1,
-			((program_width == 9) ? address_map_constructor(FUNC(pic16x8x_device::rom_9), this) :  address_map_constructor(FUNC(pic16x8x_device::rom_10),this)))
+		((program_width == 9) ? address_map_constructor(FUNC(pic16x8x_device::rom_9), this) :  address_map_constructor(FUNC(pic16x8x_device::rom_10),this)))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0,
-			((pic_model == 0x83) ? address_map_constructor(FUNC(pic16x8x_device::ram_6), this) :
-			address_map_constructor(FUNC(pic16x8x_device::ram_7), this)))
+		((program_width == 9) ? address_map_constructor(FUNC(pic16x8x_device::ram_6), this) :  address_map_constructor(FUNC(pic16x8x_device::ram_7), this)))
 	, m_CONFIG(0x3fff)
 	, m_program_width(program_width)
-	, m_internal_eeprom_size(eeprom_size)
 	, m_read_port(*this, 0)
 	, m_write_port(*this)
-
 {
-}
+}	
+
 
 pic16cr83_device::pic16cr83_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16CR83, tag, owner, clock, 9, 0x40, 0x83)
+	: pic16x8x_device(mconfig, PIC16CR83, tag, owner, clock, 9)
 {
 }
 
 pic16cr84_device::pic16cr84_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16CR84, tag, owner, clock, 10, 0x40, 0x84)
+	: pic16x8x_device(mconfig, PIC16CR84, tag, owner, clock, 10)
 {
 }
 
 pic16f83_device::pic16f83_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16F83, tag, owner, clock, 9, 0x40, 0x83)
+	: pic16x8x_device(mconfig, PIC16F83, tag, owner, clock, 9)
 {
 }
 
 pic16f84_device::pic16f84_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16F84, tag, owner, clock, 10, 0x40, 0x84)
+	: pic16x8x_device(mconfig, PIC16F84, tag, owner, clock, 10)
 {
 }
 
 pic16f84a_device::pic16f84a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16F84A, tag, owner, clock, 10, 0x40, 0x84)
+	: pic16x8x_device(mconfig, PIC16F84A, tag, owner, clock, 10)
 {
 }
 
@@ -237,18 +236,18 @@ void pic16x8x_device::m_eewrite(offs_t offs, u8 data)
 // | IRP | RP1 | RP0 | T0| PD| Z | DC | C |
 
 // IRP Register Bank Select - Unimplemented on this device
-#define RP1_FLAG    0x40    // Register Bank Select Bit 1
-#define RP0_FLAG    0x20    // Register Bank Select Bit 0
-							// 00 = Bank 0 (00h-7fh)
-							// 01 = Bank 1 (80h-ffh)
-							// 10 = Bank 2 (100h-17fh)
-							// 11 = Bank 3 (180h-1ffh)
-							// Each bank is 128 bytes. Only bit RP0 is used by the PIC16F8X. RP1 should be mantained clear.
-#define TO_FLAG     0x10    // TO   Time Out flag (WatchDog)
-#define PD_FLAG     0x08    // PD   Power Down flag
-#define Z_FLAG      0x04    // Z    Zero Flag
-#define DC_FLAG     0x02    // DC   Digit Carry/Borrow flag (Nibble)
-#define C_FLAG      0x01    // C    Carry/Borrow Flag (Byte)
+constexpr u8 RP1_FLAG = 0x40;  // Register Bank Select Bit 1
+constexpr u8 RP0_FLAG = 0x20;  // Register Bank Select Bit 0
+							  // 00 = Bank 0 (00h-7fh)
+							  // 01 = Bank 1 (80h-ffh)
+							  // 10 = Bank 2 (100h-17fh)
+							  // 11 = Bank 3 (180h-1ffh)
+							  // Each bank is 128 bytes. Only bit RP0 is used by the PIC16F8X. RP1 should be mantained clear.
+constexpr u8 TO_FLAG  = 0x10;  // TO   Time Out flag (WatchDog)
+constexpr u8 PD_FLAG  = 0x08;  // PD   Power Down flag
+constexpr u8 Z_FLAG   = 0x04;  // Z    Zero Flag
+constexpr u8 DC_FLAG  = 0x02;  // DC   Digit Carry/Borrow flag (Nibble)
+constexpr u8 C_FLAG   = 0x01;  // C    Carry/Borrow Flag (Byte)
 
 #define RP0     (m_STATUS & RP0_FLAG)
 #define TO      (m_STATUS & TO_FLAG)
@@ -261,20 +260,20 @@ void pic16x8x_device::m_eewrite(offs_t offs, u8 data)
 // ******** The following is the OPTION flag register definition. ********
 // |   7  |    6   |   5  |   4  |  3  |   2 |   1 |   0 |
 // | RBPU | INTEDG | T0CS | T0SE | PSA | PS2 | PS1 | PS0 |
-#define RBPU_FLAG    0x80   // RBPU PORTB Pull-up Enable bit
-#define INTEDG_FLAG  0x40   // INTEDG  Interrupt Edge Select bit
-							// 1 = Interrupt on rising edge of RB0/INT pin
-							// 0 = Interrupt on falling edge of RB0/INT pin
-#define T0CS_FLAG    0x20   // T0CS Timer 0 clock source select
-							// 1 = Transition on RA4/T0CKI pin
-							// 0 = Internal instruction cycle clock (CLKOUT)
-#define T0SE_FLAG    0x10   // T0SE Timer 0 clock source edge select
-							// 1 = Increment on high-to-low transition on RA4/T0CKI pin
-							// 0 = Increment on low-to-high transition on RA4/T0CKI pin
-#define PSA_FLAG     0x08   // PSA Prescaler Assignment bit
-							// 1 = Prescaler is assigned to the WDT
-							// 0 = Prescaler is assigned to the Timer0 module
-#define PS_REG       0x07   // PS Prescaler Rate select
+constexpr u8 RBPU_FLAG   = 0x80;  // RBPU PORTB Pull-up Enable bit
+constexpr u8 INTEDG_FLAG = 0x40;  // INTEDG  Interrupt Edge Select bit
+								 // 1 = Interrupt on rising edge of RB0/INT pin
+								 // 0 = Interrupt on falling edge of RB0/INT pin
+constexpr u8 T0CS_FLAG   = 0x20;  // T0CS Timer 0 clock source select
+								 // 1 = Transition on RA4/T0CKI pin
+								 // 0 = Internal instruction cycle clock (CLKOUT)
+constexpr u8 T0SE_FLAG   = 0x10;  // T0SE Timer 0 clock source edge select
+								 // 1 = Increment on high-to-low transition on RA4/T0CKI pin
+								 // 0 = Increment on low-to-high transition on RA4/T0CKI pin
+constexpr u8 PSA_FLAG    = 0x08;  // PSA Prescaler Assignment bit
+								 // 1 = Prescaler is assigned to the WDT
+								 // 0 = Prescaler is assigned to the Timer0 module
+constexpr u8 PS_REG      = 0x07;  // PS Prescaler Rate select
 
 #define RBPU    (m_OPTION & RBPU_FLAG)
 #define INTEDG  (m_OPTION & INTEDG_FLAG)
@@ -288,8 +287,8 @@ void pic16x8x_device::m_eewrite(offs_t offs, u8 data)
 // | 11 | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 |   2  | 1 | 0 |
 // |              CP                     | WDTE |  FOSC |
 							// CP       Code Protect (ROM read protect)
-#define WDTE_FLAG   0x04    // WDTE     WatchDog Timer enable
-#define FOSC_FLAG   0x03    // FOSC     Oscillator source select
+constexpr u8 WDTE_FLAG  = 0x04;  // WDTE     WatchDog Timer enable
+constexpr u8 FOSC_FLAG  = 0x03;  // FOSC     Oscillator source select
 
 #define WDTE    (m_CONFIG & WDTE_FLAG)
 #define FOSC    (m_CONFIG & FOSC_FLAG)
@@ -299,14 +298,14 @@ void pic16x8x_device::m_eewrite(offs_t offs, u8 data)
 // |   7 |   6  |   5  |   4  |   3  |   2  |   1  |   0  |
 // | GIE | EEIE | T0IE | INTE | RBIE | T0IF | INTF | RBIF |
 
-#define GIE_FLAG   0x80
-#define EEIE_FLAG  0x40
-#define T0IE_FLAG  0x20
-#define INTE_FLAG  0x10
-#define RBIE_FLAG  0x08
-#define T0IF_FLAG  0x04
-#define INTF_FLAG  0x02
-#define RBIF_FLAG  0x01
+constexpr u8 GIE_FLAG  = 0x80;
+constexpr u8 EEIE_FLAG = 0x40;
+constexpr u8 T0IE_FLAG = 0x20;
+constexpr u8 INTE_FLAG = 0x10;
+constexpr u8 RBIE_FLAG = 0x08;
+constexpr u8 T0IF_FLAG = 0x04;
+constexpr u8 INTF_FLAG = 0x02;
+constexpr u8 RBIF_FLAG = 0x01;
 
 #define GIE   (m_INTCON & GIE_FLAG)
 #define EEIE  (m_INTCON & EEIE_FLAG)
@@ -321,11 +320,11 @@ void pic16x8x_device::m_eewrite(offs_t offs, u8 data)
 // | 7 | 6 | 5 |   4  |   3   |   2  |  1 |  0 |
 // |   |   |   | EEIF | WRERR | WREN | WR | RD |
 
-#define EEIF_FLAG  0x10
-#define WRERR_FLAG 0x08
-#define WREN_FLAG  0x04
-#define EEWR_FLAG  0x02
-#define EERD_FLAG  0x01
+constexpr u8 EEIF_FLAG  = 0x10;
+constexpr u8 WRERR_FLAG = 0x08;
+constexpr u8 WREN_FLAG  = 0x04;
+constexpr u8 EEWR_FLAG  = 0x02;
+constexpr u8 EERD_FLAG  = 0x01;
 
 #define EEIF  (m_EECON1 & EEIF_FLAG)
 #define WRERR (m_EECON1 & WRERR_FLAG)
@@ -337,8 +336,8 @@ void pic16x8x_device::m_eewrite(offs_t offs, u8 data)
  *  Fixed Vectors
  ************************************************************************/
 
-#define RESET_VECTOR 0x00
-#define INT_VECTOR 0x04
+constexpr u8 RESET_VECTOR = 0x00;
+constexpr u8 INT_VECTOR   = 0x04;
 
 /************************************************************************
  *  Shortcuts
@@ -397,16 +396,22 @@ void pic16x8x_device::calc_sub_flags(u8 minuend)
 		SET(m_STATUS, DC_FLAG);
 }
 
-
-
 void pic16x8x_device::set_pc(u16 addr)
 {
 	m_PCL = addr & m_program_mask;
 }
 
+/*
+Notes about Stack (from datasheet)
+After the stack has been PUSHed eight times, the ninth
+push overwrites the value that was stored from the first
+push. The tenth push overwrites the second push (and
+so on)
+*/
+
 u16 pic16x8x_device::pop_stack()
 {
-	m_stack_pointer--;
+	m_stack_pointer = (m_stack_pointer - 1) & 0x0f;
 	u16 data = m_STACK[m_stack_pointer];
 	return data & m_program_mask;
 }
@@ -414,7 +419,7 @@ u16 pic16x8x_device::pop_stack()
 void pic16x8x_device::push_stack(u16 data)
 {
 	m_STACK[m_stack_pointer] = data & m_program_mask;
-	m_stack_pointer++;
+	m_stack_pointer = (m_stack_pointer + 1) & 0x0f;
 }
 
 void pic16x8x_device::store_result(u8 addr, u8 data)
@@ -686,8 +691,6 @@ void pic16x8x_device::andwf()
 	m_ALU = get_regfile(ADDR) & m_W;
 	store_result(ADDR, m_ALU);
 	calc_zero_flag();
-	if(ADDR == 0x0b)
-		logerror("ANDWF -> INTCON - data:%x\n", m_ALU);
 }
 
 void pic16x8x_device::bcf()
@@ -695,8 +698,6 @@ void pic16x8x_device::bcf()
 	m_ALU = get_regfile(ADDR);
 	m_ALU &= ~(1 << BITPOS);
 	store_regfile(ADDR, m_ALU);
-	if(ADDR == 0x0b)
-		logerror("BCF:INTCON - Flag:%x\n", BITPOS);
 }
 
 void pic16x8x_device::bsf()
@@ -704,8 +705,6 @@ void pic16x8x_device::bsf()
 	m_ALU = get_regfile(ADDR);
 	m_ALU |= 1 << BITPOS;
 	store_regfile(ADDR, m_ALU);
-	if(ADDR == 0x0b)
-		logerror("BSF:INTCON - Flag:%x\n", BITPOS);
 }
 
 void pic16x8x_device::btfss()
@@ -737,8 +736,6 @@ void pic16x8x_device::clrw()
 {
 	m_W = 0;
 	SET(m_STATUS, Z_FLAG);
-	if(ADDR == 0x0b)
-		logerror("CLRW -> INTCON - data:%x\n", m_W);
 }
 
 void pic16x8x_device::clrf()
@@ -808,8 +805,6 @@ void pic16x8x_device::iorlw()
 	m_ALU = m_opcode.b.l | m_W;
 	m_W = m_ALU;
 	calc_zero_flag();
-	if(ADDR == 0x0b)
-		logerror("IORLW -> INTCON - data:%x\n", m_ALU);
 }
 
 void pic16x8x_device::iorwf()
@@ -834,8 +829,6 @@ void pic16x8x_device::movlw()
 void pic16x8x_device::movwf()
 {
 	store_regfile(ADDR, m_W);
-	if(ADDR == 0x0b)
-		logerror("MOVWF -> INTCON - data:%x\n", m_W);
 }
 
 void pic16x8x_device::nop()
@@ -1117,29 +1110,6 @@ void pic16x8x_device::state_export(const device_state_entry &entry)
 	{
 	}
 }
-
-
-#define RP1_FLAG    0x40    // Register Bank Select Bit 1
-#define RP0_FLAG    0x20    // Register Bank Select Bit 0
-							// 00 = Bank 0 (00h-7fh)
-							// 01 = Bank 1 (80h-ffh)
-							// 10 = Bank 2 (100h-17fh)
-							// 11 = Bank 3 (180h-1ffh)
-							// Each bank is 128 bytes. Only bit RP0 is used by the PIC16F8X. RP1 should be mantained clear.
-#define TO_FLAG     0x10    // TO   Time Out flag (WatchDog)
-#define PD_FLAG     0x08    // PD   Power Down flag
-#define Z_FLAG      0x04    // Z    Zero Flag
-#define DC_FLAG     0x02    // DC   Digit Carry/Borrow flag (Nibble)
-#define C_FLAG      0x01    // C    Carry/Borrow Flag (Byte)
-
-#define RP0     (m_STATUS & RP0_FLAG)
-#define TO      (m_STATUS & TO_FLAG)
-#define PD      (m_STATUS & PD_FLAG)
-#define ZERO    (m_STATUS & Z_FLAG)
-#define DC      (m_STATUS & DC_FLAG)
-#define CARRY   (m_STATUS & C_FLAG)
-
-
 
 void pic16x8x_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
