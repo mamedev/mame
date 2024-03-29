@@ -45,7 +45,7 @@
 
 #define LOG_WARN            (1U << 1)
 #define LOG_CHANGE          (1U << 2)
-#define VERBOSE (LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -252,7 +252,7 @@ void ti99_multi_cart_conn_device::crureadz(offs_t offset, uint8_t *value)
 
 void ti99_multi_cart_conn_device::cruwrite(offs_t offset, uint8_t data)
 {
-	int slot = get_active_slot(true, offset);
+	int slot = get_active_slot(false, offset);
 
 	/* Sanity check. Higher slots are always empty. */
 	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS)

@@ -127,7 +127,7 @@ namespace bus::ti99::gromport {
 
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_GROMPORT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
+		device_single_card_slot_interface<cartridge_connector_device>(mconfig, *this),
 		m_connector(nullptr),
 		m_reset_on_insert(true),
 		m_console_ready(*this),
@@ -244,12 +244,7 @@ bool gromport_device::is_grom_idle()
 
 void gromport_device::device_config_complete()
 {
-	if (subdevices().first() != nullptr)
-	{
-		m_connector = dynamic_cast<cartridge_connector_device*>(subdevices().first());
-		if (m_connector == nullptr)
-			throw emu_fatalerror("gromport_device: cartridge connector not found");
-	}
+	m_connector = get_card_device();
 }
 
 INPUT_PORTS_START(gromport)

@@ -53,7 +53,7 @@ private:
     I/O port
 ********************************************************************/
 
-class ioport_device : public device_t, public device_slot_interface
+class ioport_device : public device_t, public device_single_card_slot_interface<ioport_attached_device>
 {
 	friend class ioport_attached_device;
 

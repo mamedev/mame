@@ -25,7 +25,7 @@ struct pcb_type
 class ti99_cartridge_device;
 class cartridge_connector_device;
 
-class gromport_device : public device_t, public device_slot_interface
+class gromport_device : public device_t, public device_single_card_slot_interface<cartridge_connector_device>
 {
 public:
 	template <typename U>
