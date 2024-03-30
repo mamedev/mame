@@ -5202,7 +5202,7 @@ ROM_END
   
   The SUSILU PCB soldered below the Z80 socket, is exactly
   the same documented above, containing a Z80 CPU, a M27256 EPROM,
-  a 74LS254 and an unknown DIL40 IC.  .
+  a 74LS254 and an unknown DIL40 IC.
 
 
   Docs by Roberto Fresca.
