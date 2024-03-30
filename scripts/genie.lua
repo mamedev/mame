@@ -1079,7 +1079,7 @@ end
 				"-Wno-error=array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
 				"-Wno-error=stringop-truncation", -- ImGui again
-				"-Wno-error=stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
+				"-Wno-stringop-overflow", -- generates false positives when assigning an int rvalue to a u8 variable without an explicit cast
 			}
 			buildoptions_cpp {
 				"-Wno-error=class-memaccess", -- many instances in ImGui and BGFX
