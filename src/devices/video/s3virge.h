@@ -39,7 +39,7 @@ public:
 	void image_xfer(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		m_xfer_fifo.enqueue(data);
-		machine().scheduler().synchronize();
+		//machine().scheduler().synchronize();
 	}
 
 	uint32_t get_linear_address() { return s3virge.linear_address; }
@@ -95,9 +95,10 @@ protected:
 		OP_3DTRI
 	};
 
-	enum
+	enum s3d_state_t
 	{
 		S3D_STATE_IDLE = 0,
+		S3D_STATE_COMMAND_RX,
 		S3D_STATE_BITBLT,
 		S3D_STATE_2DLINE,
 		S3D_STATE_2DPOLY,
@@ -105,27 +106,12 @@ protected:
 		S3D_STATE_3DPOLY
 	};
 
-	struct bitblt_struct {
-		u32 src_base = 0;
-		u32 dest_base = 0;
-		u32 clip_l_r = 0;
-		u32 clip_t_b = 0;
-		u32 dest_src_str = 0;
-		u64 mono_pat = 0;
-		u32 pat_bg_clr = 0;
-		u32 pat_fg_clr = 0;
-		u32 src_bg_clr = 0;
-		u32 src_fg_clr = 0;
-		u32 cmd_set = 0;
-		u32 rwidth_height = 0;
-		u32 rsrc_xy = 0;
-		u32 rdest_xy = 0;
-	};
-
-//	util::fifo<u32, 16 * 15> m_bitblt_fifo;
+//  util::fifo<u32, 16 * 15> m_bitblt_fifo;
+	// TODO: sketchy, command pipeline size is unclear
 	util::fifo<u32, 0x8000> m_bitblt_fifo;
 	util::fifo<u32, 0x8000> m_xfer_fifo;
 	u32 m_bitblt_latch[15]{};
+	s3d_state_t m_s3d_state = S3D_STATE_IDLE;
 
 	struct
 	{
@@ -137,8 +123,6 @@ protected:
 
 		struct
 		{
-			int state;
-			bool busy = false;
 			bool xfer_mode = false;
 
 			uint8_t pattern[0xc0];
@@ -178,8 +162,7 @@ protected:
 		uint8_t cr66;
 	} s3virge;
 
-	TIMER_CALLBACK_MEMBER(draw_step_tick);
-	TIMER_CALLBACK_MEMBER(command_timer_cb);
+	TIMER_CALLBACK_MEMBER(op_timer_cb);
 
 	inline void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
 	inline void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
@@ -199,8 +182,7 @@ protected:
 
 	// has no 8514/A device
 private:
-	emu_timer* m_draw_timer;
-	emu_timer* m_cmd_timer;
+	emu_timer *m_op_timer;
 	void bitblt_step();
 	void bitblt_colour_step();
 	void bitblt_monosrc_step();
@@ -209,6 +191,8 @@ private:
 	void line3d_step();
 	void poly3d_step();
 	void add_command(u8 cmd_type);
+	void command_enqueue(u8 op_type);
+	void command_dequeue(u8 op_type);
 	void command_finish();
 
 	void s3d_reset();

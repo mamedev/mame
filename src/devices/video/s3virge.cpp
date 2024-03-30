@@ -108,8 +108,7 @@ void s3virge_vga_device::device_start()
 	save_item(vga.attribute.data,"Attribute Registers");
 
 	m_vblank_timer = timer_alloc(FUNC(s3virge_vga_device::vblank_timer_cb), this);
-	m_draw_timer = timer_alloc(FUNC(s3virge_vga_device::draw_step_tick), this);
-	m_cmd_timer = timer_alloc(FUNC(s3virge_vga_device::command_timer_cb), this);
+	m_op_timer = timer_alloc(FUNC(s3virge_vga_device::op_timer_cb), this);
 
 	memset(&s3, 0, sizeof(s3));
 	memset(&s3virge, 0, sizeof(s3virge));
@@ -117,11 +116,11 @@ void s3virge_vga_device::device_start()
 	s3virge.linear_address_size_full = 0x10000;
 
 	save_item(s3virge.s3d.pattern,"S3D Pattern Data");
-//	save_item(s3virge.s3d.reg[0],"S3D Registers: BitBLT");
-//	save_item(s3virge.s3d.reg[1],"S3D Registers: 2D Line");
-//	save_item(s3virge.s3d.reg[2],"S3D Registers: 2D Polygon");
-//	save_item(s3virge.s3d.reg[3],"S3D Registers: 3D Line");
-//	save_item(s3virge.s3d.reg[4],"S3D Registers: 3D Triangle");
+//  save_item(s3virge.s3d.reg[0],"S3D Registers: BitBLT");
+//  save_item(s3virge.s3d.reg[1],"S3D Registers: 2D Line");
+//  save_item(s3virge.s3d.reg[2],"S3D Registers: 2D Polygon");
+//  save_item(s3virge.s3d.reg[3],"S3D Registers: 3D Line");
+//  save_item(s3virge.s3d.reg[4],"S3D Registers: 3D Triangle");
 
 	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
 	for (int x = 0; x < 4; x++)
@@ -162,10 +161,9 @@ void s3virge_vga_device::s3d_reset()
 {
 	LOGFIFO("S3D Reset\n");
 	m_bitblt_fifo.clear();
-	m_cmd_timer->adjust(attotime::never);
-	m_draw_timer->adjust(attotime::never);
-	s3virge.s3d.state = S3D_STATE_IDLE;
-	s3virge.s3d.busy = false;
+	m_op_timer->adjust(attotime::never);
+
+	m_s3d_state = S3D_STATE_IDLE;
 	// beos 4.x (and presumably Win 3.1) never sets this when using BitBlt,
 	// expecting 0xf0 ROPs to be 1-filled rather than 0
 	m_bitblt_latch[5] = 0xffff'ffff;
@@ -496,48 +494,57 @@ void s3virge_vga_device::add_command(u8 cmd_type)
 	if (m_bitblt_fifo.full())
 		throw emu_fatalerror("s3virge: FIFO full");
 
-	if (m_bitblt_fifo.empty())
-		m_cmd_timer->adjust(attotime::from_nsec(250), 0, attotime::from_nsec(250));
-
 	for (int i = 0; i < 15; i++)
 		m_bitblt_fifo.enqueue(m_bitblt_latch[i]);
 
-	LOGFIFO("Enqueue command type %i %08x (%d free)\n", cmd_type, m_bitblt_latch[11], 16 - m_bitblt_fifo.queue_length() / 15);
-
-
-//	s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type = cmd_type;
-//	s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].command = s3virge.s3d.command;
-//	LOGCMD("Added command type %i cmd %08x ptr %u\n",s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_next_ptr].op_type, s3virge.s3d.command, s3virge.s3d.cmd_fifo_next_ptr);
-//	s3virge.s3d.cmd_fifo_next_ptr++;
-//	if(s3virge.s3d.cmd_fifo_next_ptr >= 16)
-//		s3virge.s3d.cmd_fifo_next_ptr = 0;
-//	if(s3virge.s3d.cmd_fifo_slots_free == 16)  // if all slots are free, start command now
-//	s3virge.s3d.cmd_fifo_slots_free--;
-}
-
-TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
-{
-	if (s3virge.s3d.xfer_mode)
+	if (m_s3d_state == S3D_STATE_IDLE)
 	{
-		if (!m_xfer_fifo.empty())
-		{
-			s3virge.s3d.busy = true;
-			s3virge.s3d.image_xfer = m_xfer_fifo.dequeue();
-			m_draw_timer->adjust(attotime::from_nsec(250), 1);
-		}
-		return;
+		m_op_timer->adjust(attotime::from_nsec(250), 0, attotime::from_nsec(250));
+		m_s3d_state = S3D_STATE_COMMAND_RX;
 	}
 
-	if (m_bitblt_fifo.empty())
-		return;
+	LOGFIFO("Enqueue command type %i %08x (%d free)\n", cmd_type, m_bitblt_latch[11], 16 - m_bitblt_fifo.queue_length() / 15);
+}
 
-	if (s3virge.s3d.busy)
-		return;
+TIMER_CALLBACK_MEMBER(s3virge_vga_device::op_timer_cb)
+{
+	switch (m_s3d_state)
+	{
+		case S3D_STATE_IDLE:
+			return;
+		case S3D_STATE_COMMAND_RX:
+			// start next command in FIFO
+			//const u8 cmd_type = 0; //s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].op_type & 0xf;
+			assert(!m_bitblt_fifo.empty());
+			command_dequeue(OP_BITBLT);
+			break;
+		case S3D_STATE_BITBLT:
+			if (s3virge.s3d.xfer_mode == true)
+			{
+				if (m_xfer_fifo.empty())
+					return;
+				s3virge.s3d.image_xfer = m_xfer_fifo.dequeue();
+			}
+			bitblt_step();
+			break;
+		case S3D_STATE_2DLINE:
+			line2d_step();
+			break;
+		case S3D_STATE_2DPOLY:
+			poly2d_step();
+			break;
+		case S3D_STATE_3DLINE:
+			line3d_step();
+			break;
+		case S3D_STATE_3DPOLY:
+			poly3d_step();
+			break;
+	}
+}
 
-	// start next command in FIFO
-	const u8 cmd_type = 0; //s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].op_type & 0xf;
-
-	switch(cmd_type)
+void s3virge_vga_device::command_dequeue(u8 op_type)
+{
+	switch(op_type)
 	{
 		case OP_2DLINE:
 			//LOGCMD("2D Line command (unsupported) [%u]\n", s3virge.s3d.cmd_fifo_current_ptr);
@@ -558,7 +565,6 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 		case OP_BITBLT:
 		{
 			u32 tmp;
-			s3virge.s3d.state = S3D_STATE_BITBLT;
 			//const bitblt_struct command_struct = m_bitblt_fifo.dequeue();
 			s3virge.s3d.src_base = m_bitblt_fifo.dequeue();
 			s3virge.s3d.dest_base = m_bitblt_fifo.dequeue();
@@ -599,53 +605,41 @@ TIMER_CALLBACK_MEMBER(s3virge_vga_device::command_timer_cb)
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
 
-			if(!(BIT(s3virge.s3d.command, 7)))
-			{
-				s3virge.s3d.busy = true;
-				s3virge.s3d.xfer_mode = false;
-				m_draw_timer->adjust(attotime::from_nsec(250), 0, attotime::from_nsec(250));
-			}
-			else
-				s3virge.s3d.xfer_mode = true;
+			s3virge.s3d.xfer_mode = bool(BIT(s3virge.s3d.command, 7));
+			m_s3d_state = S3D_STATE_BITBLT;
 
-			LOGFIFO("Dequeue command %08x (%d free)\n", s3virge.s3d.command, 16 - (m_bitblt_fifo.queue_length() / 15));
+			LOGFIFO("Dequeued command %08x (%d free)\n", s3virge.s3d.command, 16 - (m_bitblt_fifo.queue_length() / 15));
 
 			LOGCMD("Started BitBLT command [%08x]\n", s3virge.s3d.command);
 			break;
 		}
 		default:
-			LOGCMD("<reserved %02x> command detected [%08x]\n", cmd_type, s3virge.s3d.command);
+			LOGCMD("<reserved %02x> command detected [%08x]\n", op_type, s3virge.s3d.command);
 			break;
 	}
 }
 
 void s3virge_vga_device::command_finish()
 {
-	m_draw_timer->adjust(attotime::never);
-
 	LOGFIFO("Command finished (%u free) ", 16 - (m_bitblt_fifo.queue_length() / 15));
-	s3virge.s3d.busy = false;
-	s3virge.s3d.xfer_mode = false;
 
 	if (m_bitblt_fifo.empty())
 	{
-		s3virge.s3d.state = S3D_STATE_IDLE;
-		m_draw_timer->adjust(attotime::never);
-		m_cmd_timer->adjust(attotime::never);
-		LOGFIFO("- timer stop\n");
+		m_s3d_state = S3D_STATE_IDLE;
+		m_op_timer->adjust(attotime::never);
+		LOGFIFO("- state idle\n");
 	}
 	else
 	{
-		s3virge.s3d.state = S3D_STATE_BITBLT;
-		//m_cmd_timer->adjust(attotime::from_msec(1));
-		LOGFIFO("- timer continue\n");
+		m_s3d_state = S3D_STATE_COMMAND_RX;
+		const auto xfer_fifo = m_xfer_fifo.queue_length();
+		// NOTE: without flushing xfer FIFO GFXs will go awry in win98se
+		// i.e. when calling shutdown menu
+		if (xfer_fifo)
+			LOGFIFO("Warning: non-empty xfer FIFO at command end (%lld)\n", xfer_fifo);
+		LOGFIFO("- state new command\n");
+		m_xfer_fifo.clear();
 	}
-
-	// check if there is another command in the FIFO
-	//if(s3virge.s3d.cmd_fifo_slots_free < 16)
-	//	command_start();
-	//else
-	//	s3virge.s3d.busy = false;
 }
 
 void s3virge_vga_device::line2d_step()
@@ -799,6 +793,24 @@ bool s3virge_vga_device::advance_pixel()
 	}
 	return false;
 }
+
+// 2D command register format - A500 (BitBLT), A900 (2D line), AD00 (2D Polygon)
+// bit 0 - Autoexecute, if set command is executed when the highest relevant register is written to (A50C / A97C / AD7C)
+// bit 1 - Enable hardware clipping
+// bits 2-4 - Destination colour format - (0 = 8bpp palettised, 1 = 16bpp RGB1555 or RGB565, 2 = 24bpp RGB888
+// bit 5 - Draw enable - if reset, doesn't draw anything, but is still executed
+// bit 6 - Image source Mono transfer, if set source is mono, otherwise source is the same pixel depth as the destination
+// bit 7 - Image data source - 0 = source is in video memory, 1 = source is from the image transfer port (CPU / system memory)
+// bit 8 - Mono pattern - if set, pattern data is mono, otherwise pattern data is the same pixel depth as the destination
+//         Cleared to 0 if using an ROP with a colour source  Must be set to 1 if doing a rectangle fill operation
+// bit 9 - Transparency - if set, does not update if a background colour is selected.  Effectively only if bit 7 is set,  Typically used for text display.
+// bits 10-11 - Image transfer alignment - Data for an image transfer is byte (0), word (1), or doubleword (2) aligned.  All image transfers are doubleword in size.
+// bits 12-13 - First doubleword offset - (Image transfers) - start with the given byte (+1) in a doubleword for an image transfer
+// bits 17-24 - MS Windows Raster Operation
+// bit 25 - X Positive - if set, BitBLT is performed from left to right, otherwise, from right to left
+// bit 26 - Y Positive - if set, BitBLT is performed from top to bottom, otherwise from bottom to top
+// bits 27-30 - 2D Command - 0000 = BitBLT, 0010 = Rectangle Fill, 0011 = Line Draw, 0101 = Polygon Fill, 1111 = NOP (Turns off autoexecute without executing a command)
+// bit 31 - 2D / 3D Select
 
 void s3virge_vga_device::bitblt_step()
 {
@@ -1166,34 +1178,6 @@ void s3virge_vga_device::bitblt_monosrc_step()
 	s3virge.s3d.bitblt_step_count++;
 }
 
-TIMER_CALLBACK_MEMBER(s3virge_vga_device::draw_step_tick)
-{
-	// TODO: S3D state timing
-	switch(s3virge.s3d.state)
-	{
-		case S3D_STATE_IDLE:
-			m_draw_timer->adjust(attotime::never);
-			break;
-		case S3D_STATE_2DLINE:
-			line2d_step();
-			break;
-		case S3D_STATE_2DPOLY:
-			poly2d_step();
-			break;
-		case S3D_STATE_3DLINE:
-			line3d_step();
-			break;
-		case S3D_STATE_3DPOLY:
-			poly3d_step();
-			break;
-		case S3D_STATE_BITBLT:
-			bitblt_step();
-			if (param == 1 && m_xfer_fifo.empty())
-				s3virge.s3d.busy = false;
-			break;
-	}
-}
-
 inline void s3virge_vga_device::write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
 {
 	if(BIT(s3virge.s3d.command, 1))
@@ -1266,34 +1250,16 @@ inline uint8_t s3virge_vga_device::read_pixel8(uint32_t base, uint16_t x, uint16
 	return vga.memory[(base + x + (y * stride_select)) % vga.svga_intf.vram_size];
 }
 
-// 2D command register format - A500 (BitBLT), A900 (2D line), AD00 (2D Polygon)
-// bit 0 - Autoexecute, if set command is executed when the highest relevant register is written to (A50C / A97C / AD7C)
-// bit 1 - Enable hardware clipping
-// bits 2-4 - Destination colour format - (0 = 8bpp palettised, 1 = 16bpp RGB1555 or RGB565, 2 = 24bpp RGB888
-// bit 5 - Draw enable - if reset, doesn't draw anything, but is still executed
-// bit 6 - Image source Mono transfer, if set source is mono, otherwise source is the same pixel depth as the destination
-// bit 7 - Image data source - 0 = source is in video memory, 1 = source is from the image transfer port (CPU / system memory)
-// bit 8 - Mono pattern - if set, pattern data is mono, otherwise pattern data is the same pixel depth as the destination
-//         Cleared to 0 if using an ROP with a colour source  Must be set to 1 if doing a rectangle fill operation
-// bit 9 - Transparency - if set, does not update if a background colour is selected.  Effectively only if bit 7 is set,  Typically used for text display.
-// bits 10-11 - Image transfer alignment - Data for an image transfer is byte (0), word (1), or doubleword (2) aligned.  All image transfers are doubleword in size.
-// bits 12-13 - First doubleword offset - (Image transfers) - start with the given byte (+1) in a doubleword for an image transfer
-// bits 17-24 - MS Windows Raster Operation
-// bit 25 - X Positive - if set, BitBLT is performed from left to right, otherwise, from right to left
-// bit 26 - Y Positive - if set, BitBLT is performed from top to bottom, otherwise from bottom to top
-// bits 27-30 - 2D Command - 0000 = BitBLT, 0010 = Rectangle Fill, 0011 = Line Draw, 0101 = Polygon Fill, 1111 = NOP (Turns off autoexecute without executing a command)
-// bit 31 - 2D / 3D Select
-
 // MM8504
 uint32_t s3virge_vga_device::s3d_sub_status_r()
 {
 	uint32_t res = 0x00000000;
 
-	if(s3virge.s3d.busy == false && m_bitblt_fifo.empty())
-		res |= 0x00002000;  // S3d engine is idle
+	res |= (m_s3d_state == S3D_STATE_IDLE) << 13;
 
 	//res |= (s3virge.s3d.cmd_fifo_slots_free << 8);
-	// NOTE: can actually be 24 FIFO depth with specific Scenic Mode (verify if different FIFO altogether)
+	// NOTE: can actually be 24 FIFO depth with specific Scenic Mode
+	// (looks different FIFO altogether)
 	// & 0x1f00
 	//res |= std::min(m_bitblt_fifo.queue_length(), 16) << 8;
 	// TODO: this likely listens for xfer FIFO, not command
@@ -1356,7 +1322,7 @@ uint32_t s3virge_vga_device::s3d_func_ctrl_r()
 {
 	uint32_t ret = 0;
 
-//	ret |= (s3d_fifo_size << 6);
+//  ret |= (s3d_fifo_size << 6);
 	ret |= 0xf << 6;
 	return ret;
 }
