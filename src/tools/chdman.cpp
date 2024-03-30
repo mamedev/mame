@@ -2768,20 +2768,37 @@ static void do_extract_cd(parameters_map &params)
 					// NOTE: This will generate a cue with PREGAP commands instead of INDEX 00 because the pregap data isn't baked into the bins
 					trackinfo->tracks[tracknum].pregap += trackinfo->tracks[tracknum-1].padframes;
 
+					// "type 1" (only one data track in high-density area) and "type 2" (1 data and then the rest of the tracks being audio tracks in high-density area) don't require any adjustments
 					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum].trktype != cdrom_file::CD_TRACK_AUDIO)
 					{
-						// TODO: These 75 frames are actually included at the end of the previous track so should be written
-						// It's currently not possible to format it as expected without hacky code because the 150 pregap for the last track
-						// is sandwiched between these 75 frames and the actual track data.
-						// The 75 frames seems to normally be 0s so this should be ok for now until a use case is found.
-						trackinfo->tracks[tracknum-1].frames -= 75;
-						trackinfo->tracks[tracknum].pregap += 75;
+						if (toc.tracks[tracknum-1].trktype != cdrom_file::CD_TRACK_AUDIO)
+						{
+							// "type 3" where the high-density area is just two data tracks
+							// there shouldn't be any pregap in the padframes from the previous track in this case, and the full 3s pregap is baked into the previous track
+							// Only known to be used by Shenmue II JP's discs 2, 3, 4 and Virtua Fighter History & VF4
+							trackinfo->tracks[tracknum-1].padframes += 225;
+
+							trackinfo->tracks[tracknum].pregap += 225;
+							trackinfo->tracks[tracknum].splitframes = 225;
+							trackinfo->tracks[tracknum].pgdatasize = trackinfo->tracks[tracknum].datasize;
+							trackinfo->tracks[tracknum].pgtype = trackinfo->tracks[tracknum].trktype;
+						}
+						else
+						{
+							// "type 3 split" where the first track and last of the high-density area are data tracks and in between is audio tracks
+							// TODO: These 75 frames are actually included at the end of the previous track so should be written
+							// It's currently not possible to format it as expected without hacky code because the 150 pregap for the last track
+							// is sandwiched between these 75 frames and the actual track data.
+							// The 75 frames seems to normally be 0s so this should be ok for now until a use case is found.
+							trackinfo->tracks[tracknum-1].frames -= 75;
+							trackinfo->tracks[tracknum].pregap += 75;
+						}
 					}
 				}
 				else
 				{
 					int curextra = 150; // 00:02:00
-					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum+1].trktype != cdrom_file::CD_TRACK_AUDIO)
+					if (tracknum + 1 >= toc.numtrks && toc.tracks[tracknum].trktype != cdrom_file::CD_TRACK_AUDIO)
 						curextra += 75; // 00:01:00, special case when last track is data
 
 					trackinfo->tracks[tracknum-1].padframes = curextra;
