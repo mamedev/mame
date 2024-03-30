@@ -3138,7 +3138,7 @@ license:CC0-1.0
 		<publisher>Cyttorak</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="gemitas.sms" size="65536" crc="d0f12c3e" sha1="43d3f47a23fbe407da03b52c8f49d0bf65960f31" />
+				<rom name="gemitas.sms" size="65536" offset="000000" crc="d0f12c3e" sha1="43d3f47a23fbe407da03b52c8f49d0bf65960f31" />
 			</dataarea>
 		</part>
 	</software>
@@ -7343,7 +7343,7 @@ license:CC0-1.0
 		<publisher>CollectorVision</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="Sydney Hunter - The Sacred Tribe (World).sms" size="131072" crc="e3060500" sha1="e10253c75026b686435a2bd44ceba5b1eef1e6a2" offset="000000" />
+				<rom name="Sydney Hunter - The Sacred Tribe (World).sms" size="131072" offset="000000" crc="e3060500" sha1="e10253c75026b686435a2bd44ceba5b1eef1e6a2" />
 			</dataarea>
 		</part>
 	</software>
