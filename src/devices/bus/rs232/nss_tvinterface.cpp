@@ -5,6 +5,8 @@
 
 Novag Super System Peripheral: TV Interface
 
+It's a box that connects to a CRT TV, for showing an in-progress chess game.
+
 It's meant to be connected either like: PC -> Distributor -> TV Interface, or
 like: chesscomputer -> Distributor -> TV Interface. But the distributor is only
 for converting to/from RS-232/TTL voltage, so MAME can ignore it.
@@ -242,5 +244,6 @@ const tiny_rom_entry *nss_tvinterface_device::device_rom_region() const
 }
 
 } // anonymous namespace
+
 
 DEFINE_DEVICE_TYPE_PRIVATE(NSS_TVINTERFACE, device_rs232_port_interface, nss_tvinterface_device, "nss_tvinterface", "Novag Super System TV Interface")
