@@ -257,6 +257,7 @@ protected:
 private:
 	int get_index_from_tagname();
 	device_ti99_peribox_card_interface *m_card;
+	peribox_device *m_peb;
 	int m_slotnumber;
 	const char* card_name() { return m_card->device().tag(); }
 };

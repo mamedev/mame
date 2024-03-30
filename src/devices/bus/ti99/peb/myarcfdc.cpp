@@ -64,6 +64,10 @@ myarc_fdc_device::myarc_fdc_device(const machine_config &mconfig, const char *ta
 	  m_buffer_ram(*this, BUFFER_TAG),
 	  m_pal(*this, PAL_TAG),
 	  m_dsrrom(nullptr),
+	  m_flopcon0(*this, "0"),
+	  m_flopcon1(*this, "1"),
+	  m_flopcon2(*this, "2"),	
+	  m_flopcon3(*this, "3"),
 	  m_banksel(false),
 	  m_cardsel(false),
 	  m_selected_drive(0),
@@ -356,23 +360,27 @@ void myarc_fdc_device::device_start()
 
 void myarc_fdc_device::device_reset()
 {
+	m_floppy[0] = m_flopcon0->get_device();
+	m_floppy[1] = m_flopcon1->get_device();
+	m_floppy[2] = m_flopcon2->get_device();
+	m_floppy[3] = m_flopcon3->get_device();
+
+	for (int i=0; i < 4; i++)
+	{
+		if (m_floppy[i] != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", i, m_floppy[i]->name());
+		else
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", i);
+	}
+	
 	if (ioport("CONTROLLER")->read()==0)
 		m_wdc = m_wd1770;
 	else
 		m_wdc = m_wd1772;
 
 	m_dec_high = (ioport("AMADECODE")->read()!=0);
-}
-
-void myarc_fdc_device::device_config_complete()
-{
-	for (auto & elem : m_floppy)
-		elem = nullptr;
-
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
-	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
+	
+	m_pal->set_board(this);
 }
 
 void myarc_fdc_device::floppy_formats(format_registration &fr)
@@ -510,12 +518,6 @@ bool ddcc1_pal_device::cs251()
 bool ddcc1_pal_device::cs259()
 {
 	return ((m_board->get_address() & 0xff00)==0x1100);
-}
-
-void ddcc1_pal_device::device_config_complete()
-{
-	m_board = dynamic_cast<myarc_fdc_device*>(owner());
-	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 } // end namespace bus::ti99::peb

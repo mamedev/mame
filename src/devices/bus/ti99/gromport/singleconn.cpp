@@ -15,7 +15,7 @@ namespace bus::ti99::gromport {
 
 ti99_single_cart_conn_device::ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cartridge_connector_device(mconfig, TI99_GROMPORT_SINGLE, tag, owner, clock),
-	m_cartridge(nullptr)
+	m_cartridge(*this, "cartridge")
 {
 }
 
@@ -73,19 +73,10 @@ bool ti99_single_cart_conn_device::is_grom_idle()
 	return m_cartridge->is_grom_idle();
 }
 
-void ti99_single_cart_conn_device::device_start()
-{
-	m_cartridge = static_cast<ti99_cartridge_device*>(subdevices().first());
-}
-
-void ti99_single_cart_conn_device::device_reset()
-{
-	m_cartridge->set_slot(0);
-}
-
 void ti99_single_cart_conn_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, "cartridge", 0);
+	TI99_CART(config, m_cartridge, 0);
+	m_cartridge->set_connector(this);
 }
 
 } // end namespace bus::ti99::gromport

@@ -72,12 +72,16 @@ namespace bus::ti99::peb {
 
 // ----------------------------------
 
-corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *dpname, const char *cpname):
 	  device_t(mconfig, type, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_wdc(*this, WDC_TAG),
-	  m_decpal(nullptr),
-	  m_ctrlpal(nullptr),
+	  m_decpal(*this, dpname),
+	  m_ctrlpal(*this, cpname),
+	  m_flopcon0(*this, "0"),
+	  m_flopcon1(*this, "1"),
+	  m_flopcon2(*this, "2"),
+	  m_flopcon3(*this, "3"),
 	  m_motormf(*this, MOTORMF_TAG),
 	  m_tms9901(*this, TMS9901_TAG),
 	  m_buffer_ram(*this, BUFFER),
@@ -426,6 +430,11 @@ void corcomp_fdc_device::device_start()
 
 void corcomp_fdc_device::device_reset()
 {
+	m_floppy[0] = m_flopcon0->get_device();
+	m_floppy[1] = m_flopcon1->get_device();
+	m_floppy[2] = m_flopcon2->get_device();
+	m_floppy[3] = m_flopcon3->get_device();
+
 	for (int i=0; i < 4; i++)
 	{
 		if (m_floppy[i] != nullptr)
@@ -433,17 +442,10 @@ void corcomp_fdc_device::device_reset()
 		else
 			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", i);
 	}
-}
 
-void corcomp_fdc_device::connect_drives()
-{
-	for (auto & elem : m_floppy)
-		elem = nullptr;
-
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
-	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
+	m_decpal->set_board(this);
+	m_ctrlpal->set_board(this);
+	m_ctrlpal->set_decoder(m_decpal);
 }
 
 INPUT_PORTS_START( cc_fdc )
@@ -542,7 +544,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 // ============================================================================
 
 corcomp_dcc_device::corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	  corcomp_fdc_device(mconfig, TI99_CCDCC, tag, owner, clock)
+	  corcomp_fdc_device(mconfig, TI99_CCDCC, tag, owner, clock, CCDCC_PALU2_TAG, CCDCC_PALU1_TAG)
 {
 }
 
@@ -564,14 +566,6 @@ ROM_START( cc_dcc )
 	ROM_LOAD("ccdcc_v89.u3", 0x0000, 0x2000, CRC(de3f9476) SHA1(b88aea1141769dad4e4bea5f93ac4f63a627cc82)) /* 8K single ROM bank 1*/
 	ROM_LOAD("ccdcc_v89.u4", 0x2000, 0x2000, CRC(9c4e5c08) SHA1(26f8096ae60f3839902b4e8764c5fde283ad4ba2)) /* 8K single ROM bank 2*/
 ROM_END
-
-void corcomp_dcc_device::device_config_complete()
-{
-	m_decpal = dynamic_cast<ccfdc_dec_pal_device*>(subdevice(CCDCC_PALU2_TAG));
-	m_ctrlpal = dynamic_cast<ccfdc_sel_pal_device*>(subdevice(CCDCC_PALU1_TAG));
-	if (m_decpal != nullptr) 
-		connect_drives();
-}
 
 ioport_constructor corcomp_fdc_device::device_input_ports() const
 {
@@ -602,12 +596,6 @@ ccfdc_sel_pal_device::ccfdc_sel_pal_device(const machine_config &mconfig, device
 	   m_tms9901(*owner, TMS9901_TAG),
 	   m_wdc(*owner, WDC_TAG)
 {
-}
-
-void ccfdc_dec_pal_device::device_config_complete()
-{
-	m_board = dynamic_cast<corcomp_fdc_device*>(owner());
-	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 /*
@@ -707,19 +695,12 @@ int ccdcc_palu1_device::ready_out()
 	return ready;
 }
 
-void ccdcc_palu1_device::device_config_complete()
-{
-	m_board = dynamic_cast<corcomp_fdc_device*>(owner());
-	m_decpal = dynamic_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCDCC_PALU2_TAG));
-	// owner is the empty_state during -listxml, so this will be nullptr
-}
-
 // ============================================================================
 // Revised CorComp floppy disk controller card REV A
 // ============================================================================
 
 corcomp_fdca_device::corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	  corcomp_fdc_device(mconfig, TI99_CCFDC, tag, owner, clock)
+	  corcomp_fdc_device(mconfig, TI99_CCFDC, tag, owner, clock, CCFDC_PALU12_TAG, CCFDC_PALU6_TAG)
 {
 }
 
@@ -748,13 +729,6 @@ ROM_START( cc_fdcmg )
 	ROM_LOAD("ccfdc_v89mg.u1", 0x0000, 0x2000, CRC(f010e273) SHA1(bd30103d80c43d4b35e0669145cef7b5c6b9813b)) /* 16K single ROM */
 	ROM_LOAD("ccfdc_v89mg.u2", 0x2000, 0x2000, CRC(0cad8f5b) SHA1(7744f777b51eedf614f766576bbc3f8c2c2e0042)) /* 16K single ROM */
 ROM_END
-
-void corcomp_fdca_device::device_config_complete()
-{
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(subdevice(CCFDC_PALU12_TAG));
-	m_ctrlpal = static_cast<ccfdc_sel_pal_device*>(subdevice(CCFDC_PALU6_TAG));
-	connect_drives();
-}
 
 const tiny_rom_entry *corcomp_fdca_device::device_rom_region() const
 {
@@ -816,7 +790,12 @@ int ccfdc_palu6_device::ready_out()
 {
 	bool wdc = m_decpal->addresswdc();                   // Addressing the WDC
 	bool even = (m_board->get_address()&1)==0;          // A15 = 0
-	bool trap = static_cast<corcomp_fdca_device*>(m_board)->ready_trap_active();   // READY trap active
+	bool trap = false;
+
+	// The PAL u6 is only used on the Rev A board
+	corcomp_fdca_device* boarda = static_cast<corcomp_fdca_device*>(m_board);
+	trap = boarda->ready_trap_active();   // READY trap active
+
 	bool waitbyte = m_wdc->drq_r()==CLEAR_LINE;          // We are waiting for a byte
 	bool noterm = m_wdc->intrq_r()==CLEAR_LINE;          // There is no interrupt yet
 
@@ -824,12 +803,6 @@ int ccfdc_palu6_device::ready_out()
 
 	LOGMASKED(LOG_READY, "READY = %d (%d,%d,%d,%d,%d)\n", ready, wdc, even, trap, waitbyte, noterm);
 	return ready;
-}
-
-void ccfdc_palu6_device::device_config_complete()
-{
-	m_board = dynamic_cast<corcomp_fdca_device*>(owner());
-	m_decpal = dynamic_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCFDC_PALU12_TAG));
 }
 
 } // end namespace bus::ti99::peb

@@ -30,8 +30,6 @@ public:
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 	void gclock_in(int state) override;
 
-	void insert(int index, ti99_cartridge_device* cart) override;
-	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
 	bool is_grom_idle() override;
@@ -49,6 +47,12 @@ private:
 	int     m_active_slot;
 	int     m_fixed_slot;
 	int     m_next_free_slot;
+
+	required_device<ti99_cartridge_device> m_cart1;
+	required_device<ti99_cartridge_device> m_cart2;
+	required_device<ti99_cartridge_device> m_cart3;
+	required_device<ti99_cartridge_device> m_cart4;
+
 	ti99_cartridge_device*  m_cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
 
 	void    set_slot(int slotnumber);
