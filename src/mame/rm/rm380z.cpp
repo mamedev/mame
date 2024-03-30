@@ -420,7 +420,7 @@ ROM_END
 //   YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT      CLASS                   INIT                       COMPANY              FULLNAME                        FLAGS
 COMP(1978, rm380z,     0,       0,      configure,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M",          0)
 COMP(1978, rm380zhrg,  rm380z,  0,      configure,     rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M with HRG", 0)
-COMP(1978, rm380zf,    rm380z,  0,      configure_fds, rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F",          0)
+COMP(1978, rm380zf,    0,       0,      configure_fds, rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F",          0)
 COMP(1978, rm380zfhrg, rm380zf, 0,      configure_fds, rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F with HRG", 0)
 COMP(1978, rm380z34d,  rm380z,  0,      configure_fds, rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D/F",          MACHINE_NO_SOUND_HW)
 COMP(1978, rm380z34e,  rm380z,  0,      configure,     rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E/M",          MACHINE_NO_SOUND_HW)
