@@ -36,9 +36,6 @@ Research Machines RM 380Z
 // abstract base class
 class rm380z_state : public driver_device
 {
-public:
-	void configure_fds(machine_config &config);
-
 protected:
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
@@ -55,7 +52,7 @@ protected:
 	static inline constexpr int RM380Z_SCREENROWS = 24;
 	static inline constexpr int RM380Z_SCREENCOLS = 40;
 
-	virtual void configure(machine_config &config);
+	void configure(machine_config &config, bool bFDS);
 
 	void machine_reset() override;
 
@@ -113,7 +110,8 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void rm380z34e(machine_config &config, bool bFDS = false);
+	void rm380z34d(machine_config &config) { rm380z34e(config, true); }
 
 protected:
 	void machine_reset() override;
@@ -157,7 +155,8 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void rm380z(machine_config &config, bool bFDS = false);
+	void rm380zf(machine_config &config) { rm380z(config, true); }
 
 protected:
 	template <int ROWS, int COLS>
@@ -221,7 +220,8 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void rm380zhrg(machine_config &config, bool bFDS = false);
+	void rm380zfhrg(machine_config &config) { rm380zhrg(config, true); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
@@ -272,7 +272,8 @@ public:
 	{
 	}
 
-	void configure(machine_config &config) override;
+	void rm480z(machine_config &config);
+	void rm480za(machine_config &config) { rm480z(config); }
 
 protected:
 	void machine_reset() override;

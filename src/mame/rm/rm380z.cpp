@@ -249,7 +249,7 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void rm380z_state::configure(machine_config &config)
+void rm380z_state::configure(machine_config &config, bool bFDS)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
@@ -268,30 +268,28 @@ void rm380z_state::configure(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
-
-	FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+	if (bFDS)
+	{
+		// FDS drives require a 2 MHz square wave clock frequency
+		FD1771(config, m_fdc, 16_MHz_XTAL / 8);
+		FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "fds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+		FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "fds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+	}
+	else
+	{
+		FD1771(config, m_fdc, 16_MHz_XTAL / 16);
+		FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+		FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+	}
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 
-void rm380z_state::configure_fds(machine_config &config)
+void rm380z_state_cos34::rm380z34e(machine_config &config, bool bFDS)
 {
-	configure(config);
-
-	m_floppy0->set_default_option("fds");
-	m_floppy1->set_default_option("fds");
-
-	// FDS drives require a 2 MHz square wave clock frequency
-	m_fdc->set_unscaled_clock(16_MHz_XTAL / 8);
-}
-
-void rm380z_state_cos34::configure(machine_config &config)
-{
-	rm380z_state::configure(config);
+	configure(config, bFDS);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -305,23 +303,23 @@ void rm380z_state_cos34::configure(machine_config &config)
 	m_rocg->set_palette(m_palette);
 }
 
-void rm380z_state_cos40::configure(machine_config &config)
+void rm380z_state_cos40::rm380z(machine_config &config, bool bFDS)
 {
-	rm380z_state::configure(config);
+	configure(config, bFDS);
 
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 }
 
-void rm380z_state_cos40_hrg::configure(machine_config &config)
+void rm380z_state_cos40_hrg::rm380zhrg(machine_config &config, bool bFDS)
 {
-	rm380z_state_cos40::configure(config);
+	rm380z(config, bFDS);
 
 	m_palette->set_init(FUNC(rm380z_state_cos40_hrg::palette_init)).set_entries(19);
 }
 
-void rm480z_state::configure(machine_config &config)
+void rm480z_state::rm480z(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
@@ -417,12 +415,12 @@ ROM_END
 
 
 /* Driver */
-//   YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT      CLASS                   INIT                       COMPANY              FULLNAME                        FLAGS
-COMP(1978, rm380z,     0,       0,      configure,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M",          0)
-COMP(1978, rm380zhrg,  rm380z,  0,      configure,     rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M with HRG", 0)
-COMP(1978, rm380zf,    0,       0,      configure_fds, rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F",          0)
-COMP(1978, rm380zfhrg, rm380zf, 0,      configure_fds, rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F with HRG", 0)
-COMP(1978, rm380z34d,  rm380z,  0,      configure_fds, rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D/F",          MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34e,  rm380z,  0,      configure,     rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E/M",          MACHINE_NO_SOUND_HW)
-COMP(1981, rm480z,     rm380z,  0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",         MACHINE_IS_SKELETON)
-COMP(1981, rm480za,    rm380z,  0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)",         MACHINE_IS_SKELETON)
+//   YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT      CLASS                   INIT                       COMPANY              FULLNAME                        FLAGS
+COMP(1978, rm380z,     0,       0,      rm380z,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M",          0)
+COMP(1978, rm380zhrg,  rm380z,  0,      rm380zhrg,  rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M with HRG", 0)
+COMP(1978, rm380zf,    0,       0,      rm380zf,    rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F",          0)
+COMP(1978, rm380zfhrg, rm380zf, 0,      rm380zfhrg, rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F with HRG", 0)
+COMP(1978, rm380z34d,  rm380z,  0,      rm380z34d,  rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D/F",          MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34e,  rm380z,  0,      rm380z34e,  rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E/M",          MACHINE_NO_SOUND_HW)
+COMP(1981, rm480z,     rm380z,  0,      rm480z,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",         MACHINE_IS_SKELETON)
+COMP(1981, rm480za,    rm380z,  0,      rm480za,    rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)",         MACHINE_IS_SKELETON)
