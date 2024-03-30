@@ -395,7 +395,7 @@ protected:
 	void get_sprite_info();
 	void read_line_ram(f3_line_inf &line, int y);
 	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const mixable *line);
-	void scanline_draw_TWO(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy);
 
 
