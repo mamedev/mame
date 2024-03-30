@@ -278,6 +278,17 @@ void rm380z_state::configure(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 
+void rm380z_state::configure_fds(machine_config &config)
+{
+	configure(config);
+
+	m_floppy0->set_default_option("fds");
+	m_floppy1->set_default_option("fds");
+
+	// FDS drives require a 2 MHz square wave clock frequency
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / 8);
+}
+
 void rm380z_state_cos34::configure(machine_config &config)
 {
 	rm380z_state::configure(config);
@@ -292,17 +303,6 @@ void rm380z_state_cos34::configure(machine_config &config)
 
 	SN74S262(config, m_rocg, 0);
 	m_rocg->set_palette(m_palette);
-}
-
-void rm380z_state_cos34::configure_fds(machine_config &config)
-{
-	rm380z_state_cos34::configure(config);
-
-	m_floppy0->set_default_option("fds");
-	m_floppy1->set_default_option("fds");
-
-	// FDS drives require a 2 MHz square wave clock frequency
-	m_fdc->set_unscaled_clock(16_MHz_XTAL / 8);
 }
 
 void rm380z_state_cos40::configure(machine_config &config)
@@ -359,20 +359,36 @@ ROM_END
 
 ROM_START( rm380z ) // COS 4.0B/M
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
-	// I'm not sure of how those ROMs have been dumped. I don't know if those are good dumps or not.
-	ROM_LOAD( "cos40b-m.bin",           0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f) )
-	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x0400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a) )
-	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x0200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
+	ROM_LOAD( "cos40b-m.bin",           0x0000, 0x1000, CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f) )
+	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x0400, CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a) )
+	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x0200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "c-gen-22.bin",           0x0000, 0x0800, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa) )
 ROM_END
 
 ROM_START( rm380zhrg ) // COS 4.0B/M
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
-	// I'm not sure of how those ROMs have been dumped. I don't know if those are good dumps or not.
-	ROM_LOAD( "cos40b-m.bin",           0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f) )
-	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x0400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a) )
-	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x0200, BAD_DUMP CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
+	ROM_LOAD( "cos40b-m.bin",           0x0000, 0x1000, CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f) )
+	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x0400, CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a) )
+	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x0200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "c-gen-22.bin",           0x0000, 0x0800, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa) )
+ROM_END
+
+ROM_START( rm380zf ) // COS 4.0B/F
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_LOAD( "cos40b-f.bin",           0x0000, 0x1000, CRC(c4110957) SHA1(08d924c7a152ca102585520a987051bcad3fca3f) )
+	ROM_LOAD( "cos40b-f_f600-f9ff.bin", 0x1000, 0x0400, CRC(3b983326) SHA1(4a5273ca196cb98f9bb262f3e8f13bf22c9ca11c) )
+	ROM_LOAD( "cos40b-f_1c00-1dff.bin", 0x1400, 0x0200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "c-gen-22.bin",           0x0000, 0x0800, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa) )
+ROM_END
+
+ROM_START( rm380zfhrg ) // COS 4.0B/F
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_LOAD( "cos40b-f.bin",           0x0000, 0x1000, CRC(c4110957) SHA1(08d924c7a152ca102585520a987051bcad3fca3f) )
+	ROM_LOAD( "cos40b-f_f600-f9ff.bin", 0x1000, 0x0400, CRC(3b983326) SHA1(4a5273ca196cb98f9bb262f3e8f13bf22c9ca11c) )
+	ROM_LOAD( "cos40b-f_1c00-1dff.bin", 0x1400, 0x0200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff) )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "c-gen-22.bin",           0x0000, 0x0800, CRC(1b67127f) SHA1(289a919871d30c5e832d22244bcac1dcfd544baa) )
 ROM_END
@@ -401,10 +417,12 @@ ROM_END
 
 
 /* Driver */
-//   YEAR  NAME       PARENT  COMPAT  MACHINE        INPUT      CLASS                   INIT                       COMPANY              FULLNAME                      FLAGS
-COMP(1978, rm380z,    0,      0,      configure,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B",          0)
-COMP(1978, rm380zhrg, rm380z, 0,      configure,     rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B with HRG", 0)
-COMP(1978, rm380z34d, rm380z, 0,      configure_fds, rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D",          MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34e, rm380z, 0,      configure,     rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E",          MACHINE_NO_SOUND_HW)
-COMP(1981, rm480z,    rm380z, 0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1981, rm480za,   rm380z, 0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT      CLASS                   INIT                       COMPANY              FULLNAME                        FLAGS
+COMP(1978, rm380z,     0,       0,      configure,     rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M",          0)
+COMP(1978, rm380zhrg,  rm380z,  0,      configure,     rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/M with HRG", 0)
+COMP(1978, rm380zf,    rm380z,  0,      configure_fds, rm380z,    rm380z_state_cos40,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F",          0)
+COMP(1978, rm380zfhrg, rm380zf, 0,      configure_fds, rm380zhrg, rm380z_state_cos40_hrg, driver_device::empty_init, "Research Machines", "RM-380Z, COS 4.0B/F with HRG", 0)
+COMP(1978, rm380z34d,  rm380z,  0,      configure_fds, rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4D/F",          MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34e,  rm380z,  0,      configure,     rm380z,    rm380z_state_cos34,     driver_device::empty_init, "Research Machines", "RM-380Z, COS 3.4E/M",          MACHINE_NO_SOUND_HW)
+COMP(1981, rm480z,     rm380z,  0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",         MACHINE_IS_SKELETON)
+COMP(1981, rm480za,    rm380z,  0,      configure,     rm380z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)",         MACHINE_IS_SKELETON)
