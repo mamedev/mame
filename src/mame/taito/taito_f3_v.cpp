@@ -145,10 +145,6 @@ Line ram memory map:
 
     0x7000: ? [unemulated]
         "Pivot/vram layer enable" ?
-        0x0001 - ? (pbobble4)
-        0x00ff - ? (quizhuhu)
-        0x4000 - ? (recalh)
-        0xc000 - ? (commandw, ridingf, trstar)
     0x7200: VRAM layer mixing info (incl. priority)
         Bits: BAEI cccc iiii pppp  (see 0xb000)
     0x7400: Sprite mixing info (without priority, like playfield priority clip bits but shifted)
@@ -176,8 +172,8 @@ Line ram memory map:
 
     0x9000: Palette add (can affect blend output)
       9200: Playfield 2 palette add
-      9400: Playfield 2 palette add
-      9600: Playfield 2 palette add
+      9400: Playfield 3 palette add
+      9600: Playfield 4 palette add
 
     0xa000: Playfield 1 rowscroll (1 word per line, 256 lines)
       a200: Playfield 2 rowscroll
@@ -198,9 +194,6 @@ Line ram memory map:
           B = Alpha mode B - alpha with reversed source/destination contribution
 
     0xc000 - 0xffff: Unused.
-
-    "When sprite priority==playfield priority sprite takes precedence (Bubble Symph title)"
-    -- Y: does it?  it seems like there's a strange blend line conflict in these cases
 
 ****************************************************************************
 
@@ -274,24 +267,26 @@ Playfield tile info:
 
 ***************************************************************************
     blending seems to work something like:
+    Blend values:
+     Bits: [BBBB AAAA bbbb aaaa]
+     opacity is (15-N)/8, clamped to (0, 1.0)
+
     each layer (each playfield, each sprite priority group, and pivot):
      1) blend enable bit ("blend mode A" historically)
      2) reverse blend enable bit ("blend mode B" historically)
         always grouped together, usually with other mixing-related bits
-        - these select between the B/A and a/b blend value pairs
+        - these select between the a/b and A/B blend value pairs
+        - when both 0 or both 1 (sprites), the layer is opaque.
+          opaque layers use two contribution values. (e.g. A*x + a*x)
 
      3) blend value select bit ("blend select")
         per-line for pivot and sprite groups, per-tile for playfields
         this selects between the two sets of blend contribution values.
 
-     Blend values:
-     Bits: [BBBB AAAA bbbb aaaa]
-     opacity is (15-N)/8, clamped to (0, 1.0)
-
      a lower priority non-blank pixel with *different* blend mode from source:
        is combined by saturating addition in the blending circuit using
-       a contribution amound according to the opposite of the source blend mode
-       and its own blend select bit
+       a contribution amount according to the opposite of the source blend mode,
+       and according to its own blend select bit
 
      -  should only be (up to) 2 contributing layers to each final pixel (?)
      -  there's a HW "feature" (bug) when layers have a prio conflict.
@@ -423,17 +418,17 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 	//  text: [?yyyyyxxxxxx]
 	int y = BIT(tile_index, 0, 5);
 	int x = BIT(tile_index, 5, 6);
-	// TODO
+	// HACK: [legacy implementation of scroll offset check for pixel palette mirroring]
 	// the pixel layer is 256px high, but uses the palette from the text layer which is twice as long
 	// so normally it only uses the first half of textram, BUT if you scroll down, you get
 	//   an alternate version of the pixel layer which gets its palette data from the second half of textram.
 	// we simulate this using a hack, checking scroll offset to determine which version of the pixel layer is visible.
 	// this means we SHOULD dirty parts of the pixel layer, if the scroll or flipscreen changes.. but we don't.
 	// (really we should just apply the palette during rendering instead of this ?)
-	int y_offs = m_control_1[5];
+	int y_offs = y * 8 + m_control_1[5];
 	if (m_flipscreen)
 		y_offs += 0x100; // this could just as easily be ^= 0x100 or -= 0x100
-	if (((y * 8 + y_offs) & 0x1ff) >= 256)
+	if ((y_offs & 0x1ff) >= 256)
 		y += 32;
 
 	const u16 vram_tile = m_textram[y << 6 | x];
@@ -499,8 +494,6 @@ void taito_f3_state::video_start()
 	const F3config *pCFG = &f3_config_table[0];
 
 	m_spritelist = nullptr;
-	//m_spriteram16_buffered = nullptr;
-	//m_line_inf = nullptr;
 	m_tile_opaque_sp = nullptr;
 
 	/* Setup individual game */
@@ -516,12 +509,11 @@ void taito_f3_state::video_start()
 	
 	set_extend(m_game_config->extend);
 	
-	//m_spriteram16_buffered = std::make_unique<u16[]>(0x10000 / 2);
 	m_spritelist = std::make_unique<tempsprite[]>(0x400);
 	m_sprite_end = &m_spritelist[0];
 	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
-	//m_line_inf = std::make_unique<f3_line_inf[]>(256);
+
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
 	for (auto &sp_bitmap : m_sprite_framebuffers) {
 		m_screen->register_screen_bitmap(sp_bitmap);
@@ -540,7 +532,6 @@ void taito_f3_state::video_start()
 	m_flipscreen = false;
 	m_sprite_bank = 0;
 	m_sprite_trails = false;
-	//memset(m_spriteram16_buffered.get(), 0, 0x10000);
 	memset(&m_spriteram[0], 0, 0x10000);
 
 	save_item(NAME(m_control_0));
@@ -726,7 +717,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	const auto latched_addr = [=] (u8 section, u8 subsection) -> offs_t
 	{
 		const u16 latches = m_line_ram[(section * 0x200)/2 + y];
-		// this may actually be computed from the upper byte? i.e.:
+		// NOTE: this may actually be computed from the upper byte? i.e.:
 		//offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
 		const offs_t base = 0x4000 + 0x1000 * section + 0x200 * subsection;
 		if (BIT(latches, subsection + 4))
@@ -747,7 +738,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 
 	// 5000 **********************************
-	// renderer needs to adjust by -48
+	// renderer needs to adjust clip by -48
 	for (int i : {0, 1, 2, 3}) {
 		if (offs_t where = latched_addr(1, i)) {
 			u16 clip_lows = m_line_ram[where];
@@ -756,13 +747,14 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 
 	// 6000 **********************************
-	if (offs_t where = latched_addr(2, 0)) {
+	if (offs_t where = latched_addr(2, 0)) { // sprite blend modes, pivot blend select, ?
 		// old code called first value "sync register", is special handling necessary?
 		u16 line_6000 = m_line_ram[where];
 		
 		line.pivot.blend_select_v = BIT(line_6000, 9);
 		line.pivot.pivot_control = BIT(line_6000, 8, 8);
 		if (TAITOF3_VIDEO_DEBUG==1) {
+			// arabianm: 0a, scfinals: a2, busymph: a2, recalh: 0c, bubblem: 03/f0
 			if (line.pivot.pivot_control & 0b01011101) // check if unknown pivot control bits set
 				logerror("unknown 6000 pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
 		}
@@ -772,14 +764,14 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 			line.sp[sp_group].mix_value |= BIT(line_6000, sp_group * 2, 2) << 14;
 		}
 	}
-	if (offs_t where = latched_addr(2, 1)) {
+	if (offs_t where = latched_addr(2, 1)) { // blend values
 		u16 blend_vals = m_line_ram[where];
 		for (int idx = 0; idx < 4; idx++) {
 			u8 a = BIT(blend_vals, 4 * idx, 4);
 			line.blend[idx] = 0xf - a;
 		}
 	}
-	if (offs_t where = latched_addr(2, 2)) {
+	if (offs_t where = latched_addr(2, 2)) { // mosaic, palette depth effects
 		u16 x_mosaic = m_line_ram[where];
 
 		line.x_sample = 16 - BIT(x_mosaic, 4, 4);
@@ -793,36 +785,41 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		}
 		line.pivot.x_sample_enable = BIT(x_mosaic, 9);
 
-		line.fx_6400 = (x_mosaic & 0xfc00) >> 8;
+		line.fx_6400 = (x_mosaic & 0xfc00) >> 8; // palette interpretation [unimplemented]
 		if (TAITOF3_VIDEO_DEBUG==1) {
+			// gseeker(intro):40, ringrage/arabianm:30/33, ridingf:30/31, spcinvdj:30, gunlock:78
 			if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
 				logerror("unknown 6400 fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
 		}
 	}
-	if (offs_t where = latched_addr(2, 3)) {
+	if (offs_t where = latched_addr(2, 3)) { // bg palette? [unimplemented]
 		line.bg_palette = m_line_ram[where];
 		if (TAITOF3_VIDEO_DEBUG==1) {
+			// gunlock: 0000
 			if (line.bg_palette) // check if unknown effect bits set
 				logerror("unknown 6600 bg palette: %04x at %04x\n", line.bg_palette, 0x6600 + y*2);
 		}		
 	}
 
 	// 7000 **********************************
-	if (offs_t where = latched_addr(3, 0)) {
+	if (offs_t where = latched_addr(3, 0)) { // ? [unimplemented]
 		u16 line_7000 = m_line_ram[where];
 		line.pivot.pivot_enable = line_7000;
 		if (TAITOF3_VIDEO_DEBUG==1) {
+			// ridingf/commandw/trstar: c000, gunlock: 0000, recalh: 4000, quizhuhu: 00ff
+			// puchicar/ktiger2/gekiridn: 0001, dariusg: 0001 on zone H boss pool effect lines
 			if (line_7000) // check if confusing pivot enable bits are set
 				logerror("unknown 7000 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
 		}
 	}
-	if (offs_t where = latched_addr(3, 1)) {
+	if (offs_t where = latched_addr(3, 1)) { // pivot layer mix info word
 		line.pivot.mix_value = m_line_ram[where];
 	}
-	if (offs_t where = latched_addr(3, 2)) {
+	if (offs_t where = latched_addr(3, 2)) { // sprite clip info, blend select
 		u16 sprite_mix = m_line_ram[where];
 		
 		if (TAITOF3_VIDEO_DEBUG==1) {
+			// many: _8__, exceptions: pbobble3/puchicar/pbobble4/gunlock
 			u16 unknown = BIT(sprite_mix, 10, 2);
 			if (unknown)
 				logerror("unknown sprite mix bits: _%01x__ at %04x\n", unknown << 2, 0x7400 + y*2);
@@ -834,7 +831,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 			line.sp[group].blend_select_v = BIT(sprite_mix, 12 + group, 1);
 		}
 	}
-	if (offs_t where = latched_addr(3, 3)) {
+	if (offs_t where = latched_addr(3, 3)) { // sprite priority
 		u16 sprite_prio = m_line_ram[where];
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
 			line.sp[group].mix_value = (line.sp[group].mix_value & 0xfff0)
@@ -843,7 +840,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 
 	// 8000 **********************************
-	for (int i : { 0, 1, 2, 3 }) {
+	for (int i : { 0, 1, 2, 3 }) { // playfield zoom
 		if (offs_t where = latched_addr(4, i)) {
 			u16 pf_scale = m_line_ram[where];
 			// y zooms are interleaved
@@ -854,7 +851,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 
 	// 9000 **********************************
-	for (int i : { 0, 1, 2, 3 }) {
+	for (int i : { 0, 1, 2, 3 }) { // playfield palette addition
 		if (offs_t where = latched_addr(5, i)) {
 			u16 pf_pal_add = m_line_ram[where];
 			line.pf[i].pal_add = pf_pal_add * 16;
@@ -863,8 +860,9 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 	// A000 **********************************
 	// iiii iiii iiff ffff
-	// fractional part is negative (allegedly). i wonder if it's supposed to be inverted instead? and then we just subtract (1<<8) to get almost the same value..
-	for (int i : { 0, 1, 2, 3 }) {
+	// fractional part is negative (allegedly). i wonder if it's supposed to be inverted instead?
+	// and then we just subtract (1<<8) to get almost the same value..
+	for (int i : { 0, 1, 2, 3 }) { // playfield rowscroll
 		if (offs_t where = latched_addr(6, i)) {
 			fixed8 rowscroll = m_line_ram[where] << (8-6);
 			line.pf[i].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
@@ -873,7 +871,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 
 	// B000 **********************************
-	for (int i : { 0, 1, 2, 3 }) {
+	for (int i : { 0, 1, 2, 3 }) { // playfield mix info
 		if (offs_t where = latched_addr(7, i)) {
 			line.pf[i].mix_value = m_line_ram[where];
 		}

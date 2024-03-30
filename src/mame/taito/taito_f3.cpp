@@ -416,7 +416,9 @@ GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(taito_f3_state::trigger_int3)
 {
-	m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
+	// some signal from video hardware?
+	// vblank handler will wait until approximately end of vblank for it
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taito_f3_state::interrupt2)
@@ -445,6 +447,9 @@ void taito_f3_state::f3(machine_config &config)
 	M68EC020(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::f3_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::interrupt2));
+	// there might be a way for games to enable hblank interrupts?
+	// most just have no-op or scanline counter handlers, but pbobble4 (e.g.)
+	// DOES generate them, while spcinvdj will crash if you send it hblank.
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -452,8 +457,8 @@ void taito_f3_state::f3(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// from taito z system and crystal on board  not sure if correct?
-	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/?
+	// from taito z system and crystal on board
+	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/
 	m_screen->set_raw(
 		XTAL(26'686'000)/4,
 		432, 46, 320+46,
@@ -461,10 +466,6 @@ void taito_f3_state::f3(machine_config &config)
 	);
 	// refresh rate = 26686000/4/432/262 = 58.94..
 	
-	//m_screen->set_refresh_hz(58.97);
-	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
-	//m_screen->set_size(40*8+48*2, 32*8);
-	//m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+232-1);
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));
 
