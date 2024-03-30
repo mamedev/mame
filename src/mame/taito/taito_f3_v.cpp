@@ -417,29 +417,34 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 {
-	int y_offs = BIT(m_control_1[5], 0, 9);
+	/* attributes are shared with VRAM layer */
+	// convert the index:
+	// pixel: [0xxxxxxyyyyy]
+	//  text: [?yyyyyxxxxxx]
+	int y = BIT(tile_index, 0, 5);
+	int x = BIT(tile_index, 5, 6);
+	// TODO
+	// the pixel layer is 256px high, but uses the palette from the text layer which is twice as long
+	// so normally it only uses the first half of textram, BUT if you scroll down, you get
+	//   an alternate version of the pixel layer which gets its palette data from the second half of textram.
+	// we simulate this using a hack, checking scroll offset to determine which version of the pixel layer is visible.
+	// this means we SHOULD dirty parts of the pixel layer, if the scroll or flipscreen changes.. but we don't.
+	// (really we should just apply the palette during rendering instead of this ?)
+	int y_offs = m_control_1[5];
 	if (m_flipscreen)
-		y_offs += 0x100;
+		y_offs += 0x100; // this could just as easily be ^= 0x100 or -= 0x100
+	if (((y * 8 + y_offs) & 0x1ff) >= 256)
+		y += 32;
 
-	/* Colour is shared with VRAM layer */
-	// lllllllhhhhh ??
-	//+ hhhhh
-	//+     lllllll
-	int col_off = (BIT(tile_index, 0, 5) << 6) + BIT(tile_index, 5, 7);
-	if (((BIT(tile_index, 0, 5) * 8 + y_offs) & 0x1ff) > 0xff)
-		col_off += 0x800;
-	// edits here are untested
-	
-	const u16 vram_tile = m_textram[col_off];
+	const u16 vram_tile = m_textram[y << 6 | x];
 
+	const int tile = tile_index;
+	const u8 palette = BIT(vram_tile, 9, 6);
 	u8 flags = 0;
-	if (BIT(vram_tile,  8)) flags |= TILE_FLIPX;
+	if (BIT(vram_tile, 8)) flags |= TILE_FLIPX;
 	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
-	tileinfo.set(1,
-			tile_index,
-			BIT(vram_tile, 9, 6),
-			flags);
+	tileinfo.set(1, tile, palette, flags);
 }
 
 /******************************************************************************/
@@ -479,7 +484,7 @@ void taito_f3_state::set_extend(bool state) {
 	}
 
 	if (m_extend) {
-		m_width_mask = 0x3ff; // 11 bits
+		m_width_mask = 0x3ff; // 10 bits
 		for (int i=0; i<4; i++)
 			m_pf_data[i] = &m_pf_ram[(0x2000 * i) / 2];
 	} else {
@@ -649,16 +654,16 @@ void taito_f3_state::textram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_textram[offset]);
 
 	m_vram_layer->mark_tile_dirty(offset);
-	//m_vram_layer->mark_tile_dirty(offset + 1);
 
-	// is this supposed to be mirroring?
-	if (offset > 0x7ff) offset -= 0x800;
-
-	const int tile = offset;
-	const int col_off = ((tile & 0x3f) << 5) + ((tile & 0xfc0) >> 6);
-
+	// dirty the pixel layer too, since it uses palette etc. from text layer
+	// convert the position (x and y are swapped, and the upper bit of y is ignored)
+	//  text: [Yyyyyyxxxxxx]
+	// pixel: [0xxxxxxyyyyy]
+	const int y = BIT(offset, 6, 5);
+	const int x = BIT(offset, 0, 6);
+	int col_off = x << 5 | y;
+	
 	m_pixel_layer->mark_tile_dirty(col_off);
-	//m_pixel_layer->mark_tile_dirty(col_off+32);
 }
 
 
