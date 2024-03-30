@@ -27892,12 +27892,12 @@ Official modification of rev. A which changes the spike damage behavior to be li
 	</software>
 
 	<software name="sonic2p12" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (prototype 199209xx, pirate)</description>
+		<description>Sonic The Hedgehog 2 (prototype 199209xx, pirate, hacked)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Earlier than the "Beta 4" prototype. No equivalent build has been found in the Sega QA Archive.
-Original scene release which was altered to include a cracktro and bypass the copy protection. Dump originally in smd format, converted to raw binary.
+Original scene release which was altered to include a cracktro and bypass the copy protection. Dump originally in smd format and converted to raw binary for it to work without a Super Magic Drive or compatible device.
 ]]></notes>
 		<info name="release" value="19921109"/>
 		<part name="cart" interface="megadriv_cart">
