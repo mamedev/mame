@@ -1703,7 +1703,7 @@ ROM_END
 
 ROM_START(re800v1a)  // same version, but with some registers changed.
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("genatron.bin", 0x0000, 0x4000, CRC(622b57dd) SHA1(90ac6b845e97ace34d26c250c4e4533b601156d3) )
+	ROM_LOAD("76b1.bin", 0x0000, 0x4000, CRC(622b57dd) SHA1(90ac6b845e97ace34d26c250c4e4533b601156d3) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD("re800snd.16", 0x0000, 0x0800, CRC(54d312fa) SHA1(6ed31f091362f7baa59afef91410fe946894e2ee) )
