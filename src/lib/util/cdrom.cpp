@@ -871,66 +871,51 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 	/* start with no tracks */
 	for (toc.numtrks = 0; toc.numtrks < MAX_TRACKS; toc.numtrks++)
 	{
-		int tracknum = -1, frames = 0, pregap, postgap, padframes;
+		int tracknum, frames, pregap, postgap, padframes;
 		char type[16], subtype[16], pgtype[16], pgsub[16];
 		track_info *track;
 
-		pregap = postgap = padframes = 0;
+		tracknum = -1;
+		frames = pregap = postgap = padframes = 0;
+		std::fill(std::begin(type), std::end(type), 0);
+		std::fill(std::begin(subtype), std::end(subtype), 0);
+		std::fill(std::begin(pgtype), std::end(pgtype), 0);
+		std::fill(std::begin(pgsub), std::end(pgsub), 0);
 
 		/* fetch the metadata for this track */
-		err = chd->read_metadata(CDROM_TRACK_METADATA_TAG, toc.numtrks, metadata);
-		if (!err)
+		if (!chd->read_metadata(CDROM_TRACK_METADATA_TAG, toc.numtrks, metadata))
 		{
-			/* parse the metadata */
-			type[0] = subtype[0] = 0;
-			pgtype[0] = pgsub[0] = 0;
 			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
 				return chd_file::error::INVALID_DATA;
-			if (tracknum == 0 || tracknum > MAX_TRACKS)
+		}
+		else if (!chd->read_metadata(CDROM_TRACK_METADATA2_TAG, toc.numtrks, metadata))
+		{
+			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
 				return chd_file::error::INVALID_DATA;
-			track = &toc.tracks[tracknum - 1];
 		}
 		else
 		{
-			err = chd->read_metadata(CDROM_TRACK_METADATA2_TAG, toc.numtrks, metadata);
+			/* fall through to GD-ROM detection */
+			err = chd->read_metadata(GDROM_OLD_METADATA_TAG, toc.numtrks, metadata);
 			if (!err)
-			{
-				/* parse the metadata */
-				type[0] = subtype[0] = 0;
-				pregap = postgap = 0;
-				if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
-					return chd_file::error::INVALID_DATA;
-				if (tracknum == 0 || tracknum > MAX_TRACKS)
-					return chd_file::error::INVALID_DATA;
-				track = &toc.tracks[tracknum - 1];
-			}
+				/* legacy GDROM track was detected */
+				toc.flags |= CD_FLAG_GDROMLE;
 			else
-			{
-				err = chd->read_metadata(GDROM_OLD_METADATA_TAG, toc.numtrks, metadata);
-				if (!err)
-					/* legacy GDROM track was detected */
-					toc.flags |= CD_FLAG_GDROMLE;
-				else
-					err = chd->read_metadata(GDROM_TRACK_METADATA_TAG, toc.numtrks, metadata);
+				err = chd->read_metadata(GDROM_TRACK_METADATA_TAG, toc.numtrks, metadata);
 
-				if (!err)
-				{
-					/* parse the metadata */
-					type[0] = subtype[0] = 0;
-					pregap = postgap = 0;
-					if (sscanf(metadata.c_str(), GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
-						return chd_file::error::INVALID_DATA;
-					if (tracknum == 0 || tracknum > MAX_TRACKS)
-						return chd_file::error::INVALID_DATA;
-					track = &toc.tracks[tracknum - 1];
-					toc.flags |= CD_FLAG_GDROM;
-				}
-				else
-				{
-					break;
-				}
-			}
+			if (err)
+				break;
+
+			if (sscanf(metadata.c_str(), GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
+				return chd_file::error::INVALID_DATA;
+
+			toc.flags |= CD_FLAG_GDROM;
 		}
+
+		if (tracknum == 0 || tracknum > MAX_TRACKS)
+			return chd_file::error::INVALID_DATA;
+
+		track = &toc.tracks[tracknum - 1];
 
 		/* extract the track type and determine the data size */
 		track->trktype = CD_TRACK_MODE1;
@@ -1045,7 +1030,16 @@ std::error_condition cdrom_file::write_metadata(chd_file *chd, const toc &toc)
 	for (int i = 0; i < toc.numtrks; i++)
 	{
 		std::string metadata;
-		if (!(toc.flags & CD_FLAG_GDROM))
+		if (toc.flags & CD_FLAG_GDROM)
+		{
+			metadata = util::string_format(GDROM_TRACK_METADATA_FORMAT, i + 1, get_type_string(toc.tracks[i].trktype),
+					get_subtype_string(toc.tracks[i].subtype), toc.tracks[i].frames, toc.tracks[i].padframes,
+					toc.tracks[i].pregap, get_type_string(toc.tracks[i].pgtype),
+					get_subtype_string(toc.tracks[i].pgsub), toc.tracks[i].postgap);
+
+			err = chd->write_metadata(GDROM_TRACK_METADATA_TAG, i, metadata);
+		}
+		else
 		{
 			char submode[32];
 
@@ -1064,15 +1058,6 @@ std::error_condition cdrom_file::write_metadata(chd_file *chd, const toc &toc)
 					submode, get_subtype_string(toc.tracks[i].pgsub),
 					toc.tracks[i].postgap);
 			err = chd->write_metadata(CDROM_TRACK_METADATA2_TAG, i, metadata);
-		}
-		else
-		{
-			metadata = util::string_format(GDROM_TRACK_METADATA_FORMAT, i + 1, get_type_string(toc.tracks[i].trktype),
-					get_subtype_string(toc.tracks[i].subtype), toc.tracks[i].frames, toc.tracks[i].padframes,
-					toc.tracks[i].pregap, get_type_string(toc.tracks[i].pgtype),
-					get_subtype_string(toc.tracks[i].pgsub), toc.tracks[i].postgap);
-
-			err = chd->write_metadata(GDROM_TRACK_METADATA_TAG, i, metadata);
 		}
 		if (err)
 			return err;
@@ -2341,7 +2326,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 					wavoffs = wavlen = 0;
 				}
 
-				outinfo.track[trknum].fname.assign(lastfname); // default filename to the last one
+				outinfo.track[trknum].fname.assign(lastfname); /* default filename to the last one */
 
 				if (EXTRA_VERBOSE)
 				{
@@ -2368,7 +2353,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 				convert_subtype_string_to_track_info(token, &outtoc.tracks[trknum]);
 			}
-			else if (!strcmp(token, "INDEX"))   /* only in bin/cue files */
+			else if (!strcmp(token, "INDEX"))
 			{
 				int idx, frames;
 
@@ -2433,78 +2418,58 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	{
 		uint64_t tlen = 0;
 
-		// this is true for cue/bin and cue/iso, and we need it for cue/wav since .WAV is little-endian
+		/* this is true for cue/bin and cue/iso, and we need it for cue/wav since .WAV is little-endian */
 		if (outtoc.tracks[trknum].trktype == CD_TRACK_AUDIO)
 		{
 			outinfo.track[trknum].swap = true;
 		}
 
-		// don't do this for .WAV tracks, we already have their length and offset filled out
-		if (outinfo.track[trknum].offset == 0)
+		/* don't do this for .WAV tracks, we already have their length and offset filled out */
+		if (outinfo.track[trknum].offset != 0)
+			continue;
+
+		if (trknum+1 >= outtoc.numtrks && trknum > 0 && (outinfo.track[trknum].fname.compare(outinfo.track[trknum-1].fname)==0))
 		{
-			// is this the last track?
-			if (trknum == (outtoc.numtrks-1))
+			/* if the last track's filename is the same as the previous track */
+			tlen = get_file_size(outinfo.track[trknum].fname);
+			if (tlen == 0)
 			{
-				/* if we have the same filename as the last track, do it that way */
-				if (trknum != 0 && (outinfo.track[trknum].fname.compare(outinfo.track[trknum-1].fname)==0))
-				{
-					tlen = get_file_size(outinfo.track[trknum].fname);
-					if (tlen == 0)
-					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
-						return std::errc::no_such_file_or_directory;
-					}
-					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
-					outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
-				}
-				else    /* data files are different */
-				{
-					tlen = get_file_size(outinfo.track[trknum].fname);
-					if (tlen == 0)
-					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
-						return std::errc::no_such_file_or_directory;
-					}
-					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
-					outtoc.tracks[trknum].frames = tlen;
-					outinfo.track[trknum].offset = 0;
-				}
+				printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
+				return std::errc::no_such_file_or_directory;
 			}
-			else
+
+			outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+			outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+		}
+		else if (trknum+1 < outtoc.numtrks && outinfo.track[trknum].fname.compare(outinfo.track[trknum+1].fname)==0)
+		{
+			/* if the current filename is the same as the next track */
+			outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx0offs - outinfo.track[trknum].idx0offs;
+
+			if (outtoc.tracks[trknum].frames == 0)
 			{
-				/* if we have the same filename as the next track, do it that way */
-				if (outinfo.track[trknum].fname.compare(outinfo.track[trknum+1].fname)==0)
-				{
-					outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx0offs - outinfo.track[trknum].idx0offs;
-
-					if (trknum == 0)    // track 0 offset is 0
-					{
-						outinfo.track[trknum].offset = 0;
-					}
-					else
-					{
-						outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
-					}
-
-					if (!outtoc.tracks[trknum].frames)
-					{
-						printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
-						return chd_file::error::INVALID_DATA;
-					}
-				}
-				else    /* data files are different */
-				{
-					tlen = get_file_size(outinfo.track[trknum].fname);
-					if (tlen == 0)
-					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.c_str());
-						return std::errc::no_such_file_or_directory;
-					}
-					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
-					outtoc.tracks[trknum].frames = tlen;
-					outinfo.track[trknum].offset = 0;
-				}
+				printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
+				return chd_file::error::INVALID_DATA;
 			}
+
+			if (trknum > 0)
+			{
+				const uint32_t previous_track_raw_size = outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+				outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + previous_track_raw_size;
+			}
+		}
+		else if (outtoc.tracks[trknum].frames == 0)
+		{
+			/* if the filenames between tracks are different */
+			tlen = get_file_size(outinfo.track[trknum].fname);
+			if (tlen == 0)
+			{
+				printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
+				return std::errc::no_such_file_or_directory;
+			}
+
+			outtoc.tracks[trknum].frames = tlen / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+			outinfo.track[trknum].offset = 0;
 		}
 	}
 
