@@ -1340,7 +1340,7 @@ The following floppies came with the machines.
 		<description>Score Editor (Japan)</description>
 		<year>1987</year>
 		<publisher>Toshiba-EMI Ltd.</publisher>
-		<info name="alt_title" value="ズスコアエディタ"/>
+		<info name="alt_title" value="ズスコア・エディタ"/>
 		<info name="serial" value="PS-3009S"/>
 		<info name="barcode" value="4988006014817"/>
 		<part name="flop1" interface="floppy_3_5">
