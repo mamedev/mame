@@ -5,26 +5,25 @@
 
 #include "multibyte.h"
 
-static int to_msf_raw(int frame)
+static int32_t to_msf_raw(int32_t frame)
 {
-	int m = frame / (75 * 60);
-	int s = (frame / 75) % 60;
-	int f = frame % 75;
-
+	const int m = (frame / (75 * 60)) % 100;
+	const int s = (frame / 75) % 60;
+	const int f = frame % 75;
 	return (m << 16) | (s << 8) | f;
 }
 
-static int to_msf(int frame)
+static int32_t to_msf(int32_t frame)
 {
-	int adjusted_frame = frame + 150;
-	if (frame <= -151)
+	int32_t adjusted_frame = frame + 150;
+	if (adjusted_frame < 0)
 		adjusted_frame += 450000;
 	return to_msf_raw(adjusted_frame);
 }
 
-static int to_lba(int msf)
+static int32_t to_lba(int32_t msf)
 {
-	int lba = cdrom_file::msf_to_lba(msf) - 150;
+	int32_t lba = cdrom_file::msf_to_lba(msf) - 150;
 	if (BIT(msf, 16, 8) >= 90) // 90:00:00 and later
 		lba -= 450000;
 	return lba;
@@ -288,6 +287,12 @@ void t10mmc::ExecCommand()
 		m_lba = get_u32be(&command[2]);
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
+		if (m_lba == 0xffffffff)
+		{
+			m_device->logerror("T10MMC: play audio from current not fully implemented!\n");
+			m_lba = m_cdda->get_audio_lba();
+		}
+
 		if (m_lba == 0)
 		{
 			// A request for LBA 0 will return something different depending on the type of media being played.
@@ -297,10 +302,6 @@ void t10mmc::ExecCommand()
 				m_lba = m_image->get_track_start(0);
 			else
 				m_lba = 150;
-		}
-		else if (m_lba == 0xffffffff)
-		{
-			m_device->logerror("T10MMC: play audio from current not implemented!\n");
 		}
 
 		//m_device->logerror("T10MMC: PLAY AUDIO(10) at LBA %x for %x blocks\n", m_lba, m_blocks);
@@ -334,23 +335,19 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
-		const uint32_t msf_start = get_u24be(&command[3]);
+		uint32_t msf_start = get_u24be(&command[3]);
 		const uint32_t msf_end = get_u24be(&command[6]);
 
-		int32_t lba_start = to_lba(msf_start);
-		int32_t lba_end = to_lba(msf_end);
-
-		// LBA valid range is technically -45150 to 404849 but negatives are not handled anywhere
-		if (lba_start < 0 || lba_end < 0)
+		if (msf_start == 0xffffff)
 		{
-			m_device->logerror("T10MMC: tried playing audio from lba %d to %d\n", lba_start, lba_end);
-			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
-			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE);
-			break;
+			// when start MSF is set to all FFs, the starting address becomes the current optical head location
+			m_lba = m_cdda->get_audio_lba();
+			msf_start = to_msf(m_lba);
 		}
 
-		m_lba = lba_start;
-		m_blocks = lba_end - lba_start;
+		// note: BeOS's CD player sends the start MSF + a large end MSF (99:59:71) when a scan is ended and it wants to resume playback
+		m_lba = to_lba(msf_start);
+		m_blocks = cdrom_file::msf_to_lba(msf_end - msf_start);
 
 		if (m_lba == 0)
 		{
@@ -371,13 +368,6 @@ void t10mmc::ExecCommand()
 			m_device->logerror("T10MMC: track is not played\n");
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_audio_sense = SCSI_SENSE_ASC_ASCQ_NO_SENSE;
-		}
-		else if (msf_start == 0xffffff)
-		{
-			// when start MSF is set to all FFs, the starting address becomes the current optical head location
-			m_device->logerror("T10MMC: play audio from current not implemented!\n");
-			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
-			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR);
 		}
 		else if (msf_start > msf_end)
 		{
@@ -479,6 +469,8 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_STOP_PLAY_SCAN:
+		m_last_lba = m_cdda->get_audio_lba();
+
 		abort_audio();
 
 		//m_device->logerror("T10MMC: STOP_PLAY_SCAN\n");
@@ -512,16 +504,18 @@ void t10mmc::ExecCommand()
 		m_lba = get_u32be(&command[2]);
 		m_blocks = get_u32be(&command[6]);
 
+		if (m_lba == 0xffffffff)
+		{
+			m_device->logerror("T10MMC: play audio from current not fully implemented!\n");
+			m_lba = m_cdda->get_audio_lba();
+		}
+
 		if (m_lba == 0)
 		{
 			if (m_image->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
 				m_lba = m_image->get_track_start(0);
 			else
 				m_lba = 150;
-		}
-		else if (m_lba == 0xffffffff)
-		{
-			m_device->logerror("T10MMC: play audio from current not implemented!\n");
 		}
 
 		//m_device->logerror("T10MMC: PLAY AUDIO(12) at LBA %x for %x blocks\n", m_lba, m_blocks);
@@ -1134,13 +1128,11 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					return;
 				}
 
-				m_device->logerror("T10MMC: READ SUB-CHANNEL Time = %x, SUBQ = %x\n", command[1], command[2]);
-
 				bool msf = (command[1] & 0x2) != 0;
 
 				data[0]= 0x00;
 
-				int audio_active = m_cdda->audio_active();
+				const int audio_active = m_cdda->audio_active();
 				if (audio_active)
 				{
 					// if audio is playing, get the latest LBA from the CDROM layer
@@ -1167,6 +1159,8 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						data[1] = 0x15; // No current audio status to return
 					}
 				}
+
+				m_device->logerror("T10MMC: READ SUB-CHANNEL Time = %x, SUBQ = %x, LBA = %d)\n", msf, command[2], m_last_lba);
 
 				if (command[2] & 0x40)
 				{
