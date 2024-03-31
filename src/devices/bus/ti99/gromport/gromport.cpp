@@ -205,8 +205,9 @@ void gromport_device::set_gromlines(line_state mline, line_state moline, line_st
 
 void gromport_device::device_start()
 {
-
 	save_item(NAME(m_romgq));
+	if (m_connector != nullptr)
+		m_connector->set_port(this);
 }
 
 void gromport_device::device_reset()
@@ -279,12 +280,6 @@ cartridge_connector_device::cartridge_connector_device(const machine_config &mco
 void  cartridge_connector_device::ready_line(int state)
 {
 	m_gromport->ready_line(state);
-}
-
-void cartridge_connector_device::device_config_complete()
-{
-	m_gromport = dynamic_cast<gromport_device*>(owner());
-	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 } // end namespace bus::ti99::gromport

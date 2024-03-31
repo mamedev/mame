@@ -101,6 +101,8 @@ private:
 	void update_readyff_input();
 
 	// Link to the attached floppy drives
+	required_device<floppy_connector> m_flopcon0;
+	required_device<floppy_connector> m_flopcon1;
 	floppy_image_device*    m_floppy[2];
 	floppy_image_device*    m_current_floppy;
 	int m_floppy_select, m_floppy_select_last;

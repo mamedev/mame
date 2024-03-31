@@ -94,6 +94,10 @@ snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag,
 	  m_address(0),
 	  m_dsrrom(nullptr),
 	  m_buffer_ram(*this, BUFFER),
+	  m_flopcon0(*this, "0"),
+	  m_flopcon1(*this, "1"),
+	  m_flopcon2(*this, "2"),	
+	  m_flopcon3(*this, "3"),	
 	  m_sel_floppy(0),
 	  m_wd1773(*this, FDC_TAG),
 	  m_clock(*this, CLOCK_TAG),
@@ -541,6 +545,11 @@ void snug_bwg_device::device_reset()
 	m_address = 0;
 	m_WDsel = false;
 	m_WDsel0 = false;
+	
+	m_floppy[0] = m_flopcon0->get_device();
+	m_floppy[1] = m_flopcon1->get_device();
+	m_floppy[2] = m_flopcon2->get_device();
+	m_floppy[3] = m_flopcon3->get_device();
 
 	for (int i=0; i < 4; i++)
 	{
@@ -555,18 +564,6 @@ void snug_bwg_device::device_reset()
 	m_dip1 = ioport("BWGDIP1")->read();
 	m_dip2 = ioport("BWGDIP2")->read();
 	m_dip34 = ioport("BWGDIP34")->read();
-}
-
-void snug_bwg_device::device_config_complete()
-{
-	for (auto & elem : m_floppy)
-		elem = nullptr;
-
-	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
-	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
 }
 
 INPUT_PORTS_START( bwg_fdc )
@@ -615,10 +612,10 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 
 	MM58274C(config, CLOCK_TAG, 32.768_kHz_XTAL).set_mode_and_day(1, 0); // 24h, sunday
 
-	FLOPPY_CONNECTOR(config, "0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon0, bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon1, bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon2, bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon3, bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
 
 	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
 

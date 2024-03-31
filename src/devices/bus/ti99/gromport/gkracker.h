@@ -26,25 +26,23 @@ public:
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 	void gclock_in(int state) override;
 
-	void insert(int index, ti99_cartridge_device* cart) override;
-	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
 	// We may have a cartridge plugged into the GK
 	bool is_grom_idle() override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void device_start() override;
+	void device_reset() override;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry* device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	void device_add_mconfig(machine_config &config) override;
+	const tiny_rom_entry* device_rom_region() const override;
+	ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface
-	virtual void nvram_default() override;
-	virtual bool nvram_read(util::read_stream &file) override;
-	virtual bool nvram_write(util::write_stream &file) override;
+	void nvram_default() override;
+	bool nvram_read(util::read_stream &file) override;
+	bool nvram_write(util::write_stream &file) override;
 
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.
@@ -57,7 +55,7 @@ private:
 
 	bool    m_waddr_LSB;
 
-	ti99_cartridge_device *m_cartridge;     // guest cartridge
+	required_device<ti99_cartridge_device> m_cartridge;
 
 	// Just for proper initialization
 	void gk_install_menu(const char* menutext, int len, int ptr, int next, int start);

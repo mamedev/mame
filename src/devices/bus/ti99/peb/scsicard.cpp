@@ -375,7 +375,8 @@ void whtech_scsi_card_device::device_add_mconfig(machine_config &config)
 	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
 
 	// PLD circuit
-	WHTSCSI_PLD(config, PLD_TAG, 0);
+	WHTSCSI_PLD(config, m_pld, 0);
+	m_pld->set_board(this);
 
 	// SCSI bus
 	NSCSI_BUS(config, m_scsibus);
@@ -693,12 +694,6 @@ bool whtscsi_pld_device::card_selected()
 void whtscsi_pld_device::update_line_states(int address, bool drq, bool irq)
 {
 	m_readyout = (irq || !m_dma_lock)? true : drq;
-}
-
-void whtscsi_pld_device::device_config_complete()
-{
-	m_board = dynamic_cast<whtech_scsi_card_device*>(owner());
-	// owner is the empty_state during -listxml, so this will be nullptr
 }
 
 } // end namespace bus::ti99::peb

@@ -57,11 +57,10 @@ public:
 	void select_bank(int state);
 
 protected:
-	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *dpname, const char *cpname);
 
 	void device_start() override;
 	void device_reset() override;
-	void connect_drives();
 
 	virtual void device_add_mconfig(machine_config &config) override =0;
 	ioport_constructor device_input_ports() const override;
@@ -74,8 +73,8 @@ protected:
 	required_device<wd_fdc_device_base>   m_wdc;
 
 	// PALs
-	ccfdc_dec_pal_device* m_decpal;
-	ccfdc_sel_pal_device* m_ctrlpal;
+	required_device<ccfdc_dec_pal_device> m_decpal;
+	required_device<ccfdc_sel_pal_device> m_ctrlpal;
 
 	// Lines that are polled by the PAL chips
 	bool card_selected();
@@ -90,6 +89,10 @@ protected:
 	void operate_ready_line();
 
 	// Link to the attached floppy drives
+	required_device<floppy_connector> m_flopcon0;
+	required_device<floppy_connector> m_flopcon1;
+	required_device<floppy_connector> m_flopcon2;
+	required_device<floppy_connector> m_flopcon3;	
 	floppy_image_device*    m_floppy[4];
 
 	// Motor monoflop
@@ -133,13 +136,13 @@ public:
 	corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 private:
 	void device_add_mconfig(machine_config &config) override;
-	void device_config_complete() override;
 	const tiny_rom_entry *device_rom_region() const override;
 };
 
 // =========== Decoder PAL circuit ================
 class ccfdc_dec_pal_device : public device_t
 {
+	friend class corcomp_fdc_device;
 public:
 	int addresswdc();
 	int address4();
@@ -150,16 +153,18 @@ protected:
 	ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void device_start() override { }
-	void device_config_complete() override;
 
 	corcomp_fdc_device* m_board;
 	required_device<tms9901_device> m_tms9901;
+	
+	void set_board(corcomp_fdc_device* board) { m_board = board; }
 };
 
 // =========== Selector PAL circuit ================
 
 class ccfdc_sel_pal_device : public device_t
 {
+	friend class corcomp_fdc_device;
 public:
 	int selectram();
 	virtual int selectwdc();
@@ -170,13 +175,15 @@ protected:
 	ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void device_start() override { }
-	virtual void device_config_complete() override =0;
 
 	corcomp_fdc_device* m_board;
 	ccfdc_dec_pal_device* m_decpal;
 	required_device<ttl74123_device> m_motormf;
 	required_device<tms9901_device> m_tms9901;
 	required_device<wd_fdc_device_base> m_wdc;
+
+	void set_board(corcomp_fdc_device* board) { m_board = board; }
+	void set_decoder(ccfdc_dec_pal_device* decpal) { m_decpal = decpal; }
 };
 
 // =========== Specific decoder PAL circuit of the CCDCC ================
@@ -194,9 +201,6 @@ class ccdcc_palu1_device : public ccfdc_sel_pal_device
 public:
 	ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	int ready_out() override;
-
-private:
-	void device_config_complete() override;
 };
 
 // ============================================================================
@@ -211,7 +215,6 @@ public:
 	corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 private:
 	void device_add_mconfig(machine_config &config) override;
-	void device_config_complete() override;
 	const tiny_rom_entry *device_rom_region() const override;
 	bool ready_trap_active();
 };
@@ -235,9 +238,6 @@ public:
 	int selectdsr() override;
 
 	int ready_out() override;
-
-private:
-	void device_config_complete() override;
 };
 
 } // end namespace bus::ti99::peb

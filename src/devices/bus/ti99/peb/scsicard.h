@@ -93,6 +93,8 @@ private:
 
 class whtscsi_pld_device : public device_t
 {
+	friend class whtech_scsi_card_device;
+	
 public:
 	whtscsi_pld_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -116,10 +118,10 @@ public:
 private:
 	void device_start() override;
 	void device_reset() override;
-	void device_config_complete() override;
 
 	whtech_scsi_card_device* m_board;
 
+	void set_board(whtech_scsi_card_device* board) { m_board = board; }
 	bool busen();
 
 	// Flags

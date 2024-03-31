@@ -159,6 +159,7 @@ private:
 */
 class ti_pio_attached_device : public device_t, public device_image_interface
 {
+	friend class ti_rs232_pio_device;
 public:
 	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -176,6 +177,10 @@ protected:
 	void    device_start() override { }
 	std::pair<std::error_condition, std::string>    call_load() override;
 	void    call_unload() override;
+
+private:
+	ti_rs232_pio_device* m_card;
+	void set_card(ti_rs232_pio_device* card) { m_card = card; }
 };
 
 } // end namespace bus::ti99::peb

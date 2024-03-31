@@ -75,6 +75,8 @@ private:
 
 class cartridge_connector_device : public device_t
 {
+	friend class gromport_device;
+
 public:
 	virtual void readz(offs_t offset, uint8_t *value) = 0;
 	virtual void write(offs_t offset, uint8_t data) = 0;
@@ -90,16 +92,17 @@ public:
 
 	void ready_line(int state);
 
-	virtual void insert(int index, bus::ti99::gromport::ti99_cartridge_device* cart) { m_gromport->cartridge_inserted(); }
-	virtual void remove(int index) { }
+	virtual void insert() { m_gromport->cartridge_inserted(); }
+	virtual void remove() { }
 	virtual bool is_grom_idle() = 0;
 
 protected:
 	cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
 	bool     m_grom_selected;
+
+	void set_port(gromport_device* gromport) { m_gromport = gromport; }
 };
 
 } // end namespace bus::ti99::gromport

@@ -59,7 +59,11 @@ ti99_multi_cart_conn_device::ti99_multi_cart_conn_device(const machine_config &m
 	: cartridge_connector_device(mconfig, TI99_GROMPORT_MULTI, tag, owner, clock),
 	m_active_slot(0),
 	m_fixed_slot(0),
-	m_next_free_slot(0)
+	m_next_free_slot(0),
+	m_cart1(*this, "1"),
+	m_cart2(*this, "2"),
+	m_cart3(*this, "3"),
+	m_cart4(*this, "4")
 {
 }
 
@@ -124,31 +128,13 @@ int ti99_multi_cart_conn_device::get_active_slot(bool changebase, offs_t offset)
 	return slot;
 }
 
-void ti99_multi_cart_conn_device::insert(int index, ti99_cartridge_device* cart)
-{
-	LOGMASKED(LOG_CHANGE, "Insert slot %d\n", index);
-	m_cartridge[index] = cart;
-	m_gromport->cartridge_inserted();
-}
-
-void ti99_multi_cart_conn_device::remove(int index)
-{
-	LOGMASKED(LOG_CHANGE, "Remove slot %d\n", index);
-	m_cartridge[index] = nullptr;
-}
-
 void ti99_multi_cart_conn_device::romgq_line(int state)
 {
 	m_readrom = state;
 
 	// Propagate to all slots
 	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
-	{
-		if (m_cartridge[i] != nullptr)
-		{
-			m_cartridge[i]->romgq_line(state);
-		}
-	}
+		m_cartridge[i]->romgq_line(state);
 }
 
 /*
@@ -159,26 +145,14 @@ void ti99_multi_cart_conn_device::set_gromlines(line_state mline, line_state mol
 	// GROM selected?
 	m_grom_selected = (gsq == ASSERT_LINE);
 
-	// Propagate to all slots
 	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
-	{
-		if (m_cartridge[i] != nullptr)
-		{
-			m_cartridge[i]->set_gromlines(mline, moline, gsq);
-		}
-	}
+		m_cartridge[i]->set_gromlines(mline, moline, gsq);
 }
 
 void ti99_multi_cart_conn_device::gclock_in(int state)
 {
-	// Propagate to all slots
 	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
-	{
-		if (m_cartridge[i] != nullptr)
-		{
-			m_cartridge[i]->gclock_in(state);
-		}
-	}
+		m_cartridge[i]->gclock_in(state);
 }
 
 void ti99_multi_cart_conn_device::readz(offs_t offset, uint8_t *value)
@@ -192,23 +166,16 @@ void ti99_multi_cart_conn_device::readz(offs_t offset, uint8_t *value)
 	{
 		for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
 		{
-			if (m_cartridge[i] != nullptr)
-			{
-				uint8_t newval = *value;
-				m_cartridge[i]->readz(offset, &newval);
-				if (i==slot)
-				{
-					*value = newval;
-				}
-			}
+			uint8_t newval = *value;
+			m_cartridge[i]->readz(offset, &newval);
+			if (i==slot)
+				*value = newval;
 		}
 	}
 	else
 	{
-		if (slot < NUMBER_OF_CARTRIDGE_SLOTS && m_cartridge[slot] != nullptr)
-		{
+		if (slot < NUMBER_OF_CARTRIDGE_SLOTS)
 			m_cartridge[slot]->readz(offset, value);
-		}
 	}
 }
 
@@ -218,50 +185,32 @@ void ti99_multi_cart_conn_device::write(offs_t offset, uint8_t data)
 	// We don't have GRAM cartridges, anyway, so it's just used for setting the address.
 	if (m_grom_selected)
 	{
-		for (auto & elem : m_cartridge)
-		{
-			if (elem != nullptr)
-			{
-				elem->write(offset, data);
-			}
-		}
+		for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
+			m_cartridge[i]->write(offset, data);
 	}
 	else
 	{
 		int slot = get_active_slot(true, offset);
-		if (slot < NUMBER_OF_CARTRIDGE_SLOTS && m_cartridge[slot] != nullptr)
-		{
+		if (slot < NUMBER_OF_CARTRIDGE_SLOTS)
 			// logerror("writing %04x (slot %d) <- %02x\n", offset, slot, data);
 			m_cartridge[slot]->write(offset, data);
-		}
 	}
 }
 
 void ti99_multi_cart_conn_device::crureadz(offs_t offset, uint8_t *value)
 {
 	int slot = get_active_slot(false, offset);
-	/* Sanity check. Higher slots are always empty. */
-	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS)
-		return;
-
-	if (m_cartridge[slot] != nullptr)
-	{
+	// Sanity check. Higher slots are always empty.
+	if (slot < NUMBER_OF_CARTRIDGE_SLOTS)
 		m_cartridge[slot]->crureadz(offset, value);
-	}
 }
 
 void ti99_multi_cart_conn_device::cruwrite(offs_t offset, uint8_t data)
 {
 	int slot = get_active_slot(false, offset);
 
-	/* Sanity check. Higher slots are always empty. */
-	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS)
-		return;
-
-	if (m_cartridge[slot] != nullptr)
-	{
+	if (slot < NUMBER_OF_CARTRIDGE_SLOTS)
 		m_cartridge[slot]->cruwrite(offset, data);
-	}
 }
 
 /*
@@ -270,11 +219,8 @@ void ti99_multi_cart_conn_device::cruwrite(offs_t offset, uint8_t data)
 */
 bool ti99_multi_cart_conn_device::is_grom_idle()
 {
-	/* Sanity check. Higher slots are always empty. */
-	if (m_active_slot >= NUMBER_OF_CARTRIDGE_SLOTS)
-		return false;
-
-	if (m_cartridge[m_active_slot] != nullptr)
+	// Sanity check. Higher slots are always empty.
+	if (m_active_slot < NUMBER_OF_CARTRIDGE_SLOTS)
 		return m_cartridge[m_active_slot]->is_grom_idle();
 
 	return false;
@@ -284,14 +230,19 @@ void ti99_multi_cart_conn_device::device_start()
 {
 	m_next_free_slot = 0;
 	m_active_slot = 0;
-	for (auto & elem : m_cartridge)
-	{
-		elem = nullptr;
-	}
+
 	save_item(NAME(m_readrom));
 	save_item(NAME(m_active_slot));
 	save_item(NAME(m_fixed_slot));
 	save_item(NAME(m_next_free_slot));
+
+	m_cartridge[0] = m_cart1;
+	m_cartridge[1] = m_cart2;
+	m_cartridge[2] = m_cart3;
+	m_cartridge[3] = m_cart4;
+
+	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
+		m_cartridge[i]->set_connector(this);
 }
 
 void ti99_multi_cart_conn_device::device_reset(void)
@@ -303,10 +254,10 @@ void ti99_multi_cart_conn_device::device_reset(void)
 
 void ti99_multi_cart_conn_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, "cartridge1", 0);
-	TI99_CART(config, "cartridge2", 0);
-	TI99_CART(config, "cartridge3", 0);
-	TI99_CART(config, "cartridge4", 0);
+	TI99_CART(config, m_cart1, 0);
+	TI99_CART(config, m_cart2, 0);
+	TI99_CART(config, m_cart3, 0);
+	TI99_CART(config, m_cart4, 0);
 }
 
 INPUT_CHANGED_MEMBER( ti99_multi_cart_conn_device::switch_changed )
