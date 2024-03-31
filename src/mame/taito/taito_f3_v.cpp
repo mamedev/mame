@@ -261,7 +261,7 @@ Playfield tile info:
     0xc000 0000 - X/Y Flip
     0x3000 ffff - Tile index
     0x0c00 0000 - Extra planes enable (00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp)
-    0x0200 0000 - Alpha blend mode
+    0x0200 0000 - Blend value select
     0x01ff 0000 - Colour
 
 
@@ -304,7 +304,7 @@ Playfield tile info:
 #include <algorithm>
 #include <variant>
 
-constexpr int TAITOF3_VIDEO_DEBUG = 1;
+constexpr int TAITOF3_VIDEO_DEBUG = 0;
 
 // Game specific data - some of this can be removed when the software values are figured out
 struct taito_f3_state::F3config
@@ -371,7 +371,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 	// yx: x/y flip
 	// ?: upper bits of tile number?
 	// d: bpp
-	// a: alpha blend mode
+	// a: blend select
 	// c: color
 
 	const u16 palette_code = BIT(tilep[0],  0, 9);
@@ -605,8 +605,9 @@ void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (m_game_config->extend)
 	{
-		if (offset < 0x4000)
+		if (offset < 0x4000) {
 			m_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
+		}
 	}
 	else
 	{
@@ -813,7 +814,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		}
 	}
 	if (const offs_t where = latched_addr(3, 1)) { // pivot layer mix info word
-		line.pivot.mix_value = m_line_ram[where];
+		line.pivot.set_mix(m_line_ram[where]);
 	}
 	if (const offs_t where = latched_addr(3, 2)) { // sprite clip info, blend select
 		const u16 sprite_mix = m_line_ram[where];
@@ -834,8 +835,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (const offs_t where = latched_addr(3, 3)) { // sprite priority
 		const u16 sprite_prio = m_line_ram[where];
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
-			line.sp[group].mix_value = (line.sp[group].mix_value & 0xfff0)
-				| BIT(sprite_prio, group * 4, 4);
+			line.sp[group].set_prio(BIT(sprite_prio, group * 4, 4));
 		}
 	}
 
@@ -873,7 +873,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	// B000 **********************************
 	for (const int i : { 0, 1, 2, 3 }) { // playfield mix info
 		if (const offs_t where = latched_addr(7, i)) {
-			line.pf[i].mix_value = m_line_ram[where];
+			line.pf[i].set_mix(m_line_ram[where]);
 		}
 	}
 }
@@ -970,41 +970,38 @@ taito_f3_state::calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES],
 	return ranges;
 }
 
-static int mosaic(int x, int sample) {
+static int mosaic(int x, u8 sample) {
 	int x_count = (x - 46 + 114);
 	x_count = x_count >= 432 ? x_count - 432 : x_count;
 	return x - (x_count % sample);
 }
 
-int taito_f3_state::mixable::x_index(int x) {
+inline int taito_f3_state::mixable::x_index(int x) const {
 	return x;
 }
-int taito_f3_state::mixable::y_index(const f3_line_inf &line) {
-	return line.y;
+inline int taito_f3_state::mixable::y_index(int y) const {
+	return y;
 }
-u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) {
+inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const {
 	return pal + pal_add;
 }
-int taito_f3_state::playfield_inf::x_index(int dest_x) {
-	// what is with this calculation...
-	fixed8 fx_x = reg_sx + rowscroll;
-	fx_x += 10*((x_scale)-(1<<8));
-
-	return (((fx_x + (dest_x - 46) * x_scale)>>8) + 46) & width_mask;
+inline int taito_f3_state::playfield_inf::x_index(int dest_x) const {
+	return (((reg_fx_x + (dest_x - 46) * x_scale)>>8) + 46) & width_mask;
 }
-int taito_f3_state::playfield_inf::y_index(const f3_line_inf &line) {
+inline int taito_f3_state::playfield_inf::y_index(int y) const {
 	return ((reg_fx_y >> 8) + colscroll) & 0x1ff;
 }
-int taito_f3_state::pivot_inf::x_index(int x) {
+inline int taito_f3_state::pivot_inf::x_index(int x) const {
 	return (x + reg_sx) & 0x1FF;
 }
-int taito_f3_state::pivot_inf::y_index(const f3_line_inf &line) {
-	return (reg_sy + line.y) & (use_pix() ? 0xff : 0x1ff);
+inline int taito_f3_state::pivot_inf::y_index(int y) const {
+	return (reg_sy + y) & (use_pix() ? 0xff : 0x1ff);
 }
 
-bool taito_f3_state::mix_line(mixable* gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range)
+template<typename Mix>
+bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range)
 {
-	const int y = gfx->y_index(line);
+	const int y = gfx->y_index(line.y);
 	const u16 *src = &gfx->bitmap.src->pix(y);
 	const u8 *flags = gfx->bitmap.flags ? &gfx->bitmap.flags->pix(y) : nullptr;
 
@@ -1023,19 +1020,19 @@ bool taito_f3_state::mix_line(mixable* gfx, mix_pix *z, pri_mode *pri, const f3_
 				switch (gfx->blend_mask()) {
 				case 0b10: // reverse blend
 					if (line.blend[sel] == 0)
-						continue; // this could be early return for pivot and sprite
+						continue; // could be early return for pivot and sprite
 					z[x].src_blend = std::min(255, line.blend[sel] * 32);
 					z[x].dst_pal = 0;
 					break;
 				case 0b01: // normal blend
 					if (line.blend[2 + sel] == 0)
-						continue; // this could be early return for pivot and sprite
+						continue; // could be early return for pivot and sprite
 					z[x].src_blend = std::min(255, line.blend[2 + sel] * 32);
 					z[x].dst_pal = 0;
 					break;
 				case 0b00: case 0b11: default: // opaque layer
 					if (line.blend[sel] + line.blend[2 + sel] == 0)
-						continue; // this could be early return for pivot and sprite
+						continue; // could be early return for pivot and sprite
 					z[x].src_blend = std::min(255, line.blend[sel] * 32);
 					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
 					pri[x].dst_prio = gfx->prio();
@@ -1102,6 +1099,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 	f3_line_inf line_data{};
 	for (int i=0; i<NUM_SPRITEGROUPS; i++) {
 		new (&line_data.sp[i].bitmap) draw_source(&m_sprite_framebuffers[i]);
+		line_data.sp[i].sprite_pri_usage = &m_sprite_pri_row_usage;
 		line_data.sp[i].debug_index = i;
 	}
 	for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
@@ -1125,11 +1123,16 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		line_data.y = screen_y;
 
 		// some tilemap source selection depends on current line data
-		for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
-			int tmap_number = pf;
-			if (!m_extend && line_data.pf[pf].alt_tilemap)
+		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; ++pf_num) {
+			auto &pf = line_data.pf[pf_num];
+			int tmap_number = pf_num;
+			if (!m_extend && pf.alt_tilemap)
 				tmap_number += 2;
-			new(&line_data.pf[pf].bitmap) draw_source(m_tilemap[tmap_number]);
+			new(&pf.bitmap) draw_source(m_tilemap[tmap_number]);
+			// what is with this calculation...
+			pf.reg_fx_x = pf.reg_sx + pf.rowscroll;
+			pf.reg_fx_x += 10*((pf.x_scale)-(1<<8));
+
 		}
 		if (line_data.pivot.use_pix()) {
 			new(&line_data.pivot.bitmap) draw_source(m_pixel_layer);
@@ -1155,15 +1158,17 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 						 });
 
 		// draw layers to framebuffer (currently top to bottom)
-		for (auto gfx : layers) {
-			std::visit([&](auto&& arg) {
-				if (arg->layer_enable()) {
-					const std::vector<clip_plane_inf> clip_ranges = calc_clip(line_data.clip, arg);
-					for (const auto &clip : clip_ranges) {
-						mix_line(arg, &line_buf[0], &line_pri[0], line_data, clip);
+		if (screen_y >= cliprect.min_y && screen_y <= cliprect.max_y) {
+			for (auto gfx : layers) {
+				std::visit([&](auto&& arg) {
+					if (arg->layer_enable() && arg->used(line_data.y)) {
+						const auto clip_ranges = calc_clip(line_data.clip, arg);
+						for (const auto &clip : clip_ranges) {
+							mix_line(arg, &line_buf[0], &line_pri[0], line_data, clip);
+						}
 					}
-				}
-			}, gfx);
+				}, gfx);
+			}
 		}
 		if (TAITOF3_VIDEO_DEBUG==1) {
 			if (y == 100) {
@@ -1211,7 +1216,8 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 		if (dy < cliprect.min_y || dy > cliprect.max_y)
 			continue;
 		u8 *pri = &m_pri_alp_bitmap.pix(dy);
-		u16* dest = &dest_bmp.pix(dy);
+		u16 *dest = &dest_bmp.pix(dy);
+		auto &usage = m_sprite_pri_row_usage[dy];
 		const auto *src = &code_base[(y ^ flipy) * 16];
 
 		fixed8 dx8 = (sprite.x) + 128; // 128 is ½ in fixed.8
@@ -1227,6 +1233,7 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 			if (c && !pri[dx]) {
 				dest[dx] = gfx->colorbase() + (sprite.color<<4 | c);
 				pri[dx] = 1;
+				usage |= 1<<sprite.pri;
 			}
 		}
 	}
@@ -1380,6 +1387,7 @@ void taito_f3_state::draw_sprites(const rectangle &cliprect)
 {
 	if (!m_sprite_trails) {
 		m_pri_alp_bitmap.fill(0);
+		std::fill_n(m_sprite_pri_row_usage, 256, 0);
 		for (auto &sp_bitmap : m_sprite_framebuffers) {
 			sp_bitmap.fill(0);
 		}

@@ -236,23 +236,27 @@ protected:
 		draw_source bitmap;
 		bool x_sample_enable{false};
 		u16 mix_value{0};
-		u8 prio() const { return mix_value & 0x000f; };
-		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); };
-		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); };
-		bool clip_inv_mode() const { return mix_value & 0x1000; };
-		bool layer_enable() const { return mix_value & 0x2000; };
-		u8 blend_mask() const { return BIT(mix_value, 14, 2); };
-		bool blend_a() const { return mix_value & 0x4000; };
-		bool blend_b() const { return mix_value & 0x8000; };
+		u8 _prio{0};
+		inline void set_mix(u16 v) { mix_value = v; _prio = v & 0xf; };
+		inline void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; _prio = p; };
+		inline u8 prio() const { return _prio; };
+		inline auto clip_inv() const { return std::bitset<4>(mix_value >> 4); };
+		inline auto clip_enable() const { return std::bitset<4>(mix_value >> 8); };
+		inline bool clip_inv_mode() const { return mix_value & 0x1000; };
+		inline bool layer_enable() const { return mix_value & 0x2000; };
+		inline u8 blend_mask() const { return BIT(mix_value, 14, 2); };
+		inline bool blend_a() const { return mix_value & 0x4000; };
+		inline bool blend_b() const { return mix_value & 0x8000; };
 
 		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
 		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
 
-		virtual u16 palette_adjust(u16 pal) { return pal; };
-		virtual int y_index(const f3_line_inf &line);
-		virtual int x_index(int x);
-		virtual bool blend_select(const u8 *line_flags, int x) { return false; };
+		virtual inline u16 palette_adjust(u16 pal) const { return pal; };
+		virtual inline int y_index(int y) const;
+		virtual inline int x_index(int x) const;
+		virtual bool blend_select(const u8 *line_flags, int x) const { return false; };
 
+		virtual bool used(int y) const { return true; };
 		u8 debug_index{0};
 		virtual const char* debug_name() { return "MX"; };
 	};
@@ -263,14 +267,17 @@ protected:
 		// line enable, clip settings in 7400
 		// priority in 7600
 		bool blend_select_v{false}; // 7400 0xf000
-		bool blend_select(const u8 *line_flags, int x) override { return blend_select_v; };
+		bool blend_select(const u8 *line_flags, int x) const override { return blend_select_v; };
+
+		u8 (*sprite_pri_usage)[256]{nullptr};
+		bool used(int y) const override { return (*sprite_pri_usage)[y] & (1<<debug_index); }
 		const char* debug_name() override { return "SP"; };
 	};
 
 	struct pivot_inf : mixable {
 		u8 pivot_control{0};     // 6000
 		bool blend_select_v{false};
-		bool blend_select(const u8 *line_flags, int x) override { return blend_select_v; };
+		bool blend_select(const u8 *line_flags, int x) const override { return blend_select_v; };
 		// mosaic enable in 6400
 		u16 pivot_enable{0}; // 7000 - what is in this word ?
 		// mix info from 7200
@@ -278,8 +285,8 @@ protected:
 
 		u16 reg_sx{0};
 		u16 reg_sy{0};
-		int y_index(const f3_line_inf &line) override;
-		int x_index(int x) override;
+		inline int y_index(int y) const override;
+		inline int x_index(int x) const override;
 		const char* debug_name() override { return "PV"; };
 	};
 
@@ -295,16 +302,17 @@ protected:
 		fixed8 reg_sx{0};
 		fixed8 reg_sy{0};
 		fixed8 reg_fx_y{0};
+		fixed8 reg_fx_x{0};
 
 		u16 width_mask{0};
 
-		u16 palette_adjust(u16 pal) override;
-		int y_index(const f3_line_inf &line) override;
-		int x_index(int x) override;
-		bool blend_select(const u8 *line_flags, int x) override { return BIT(line_flags[x], 0); };
+		inline u16 palette_adjust(u16 pal) const override;
+		inline int y_index(int y) const override;
+		inline int x_index(int x) const override;
+		bool blend_select(const u8 *line_flags, int x) const override { return BIT(line_flags[x], 0); };
 		const char* debug_name() override { return "PF"; };
 	};
-	
+
 	struct pri_mode {
 		u8 src_prio{0};
 		u8 dst_prio{0};
@@ -334,7 +342,9 @@ protected:
 		playfield_inf pf[NUM_PLAYFIELDS];
 	};
 
-	bool mix_line(mixable *gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
+	template<typename Mix>
+	bool mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
+
 	void render_line(pen_t *dst, const mix_pix (&z)[432]);
 
 	int m_game = 0;
@@ -348,7 +358,7 @@ protected:
 	bool m_sprite_trails = false;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
-	//u8 m_sprite_pri_usage = 0;
+	u8 m_sprite_pri_row_usage[256]{0};
 	bitmap_ind8 m_pri_alp_bitmap;
 	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
 	u16 m_width_mask = 0;
