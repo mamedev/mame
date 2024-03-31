@@ -583,6 +583,27 @@ uint32_t cdrom_file::get_track(uint32_t frame) const
 	return track;
 }
 
+uint32_t cdrom_file::get_track_index(uint32_t frame) const
+{
+	const uint32_t track = get_track(frame);
+	const uint32_t track_start = get_track_start(track);
+	const uint32_t index_offset = frame - track_start;
+	int index = 0;
+
+	for (int i = 0; i < std::size(cdtrack_info.track[track].idx); i++)
+	{
+		if (index_offset >= cdtrack_info.track[track].idx[i])
+			index = i;
+		else
+			break;
+	}
+
+	if (cdtrack_info.track[track].idx[index] == -1)
+		index = 1; // valid index not found, default to index 1
+
+	return index;
+}
+
 
 /***************************************************************************
     EXTRA UTILITIES
@@ -1880,8 +1901,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 //              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx track_end %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, track_end, (uint32_t)(index1-index0)/size, (uint32_t)(track_end-index1)/size);
 				outinfo.track[track-1].fname.assign(tocfname);
 				outinfo.track[track-1].offset = offset + (uint32_t)(index1-index0);
-				outinfo.track[track-1].idx0offs = 0;
-				outinfo.track[track-1].idx1offs = 0;
+				outinfo.track[track-1].idx[0] = outinfo.track[track-1].idx[1] = 0;
 
 				switch (mode)
 				{
@@ -2004,8 +2024,7 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 
 	outinfo.track[0].fname = tocfname;
 	outinfo.track[0].offset = 0;
-	outinfo.track[0].idx0offs = 0;
-	outinfo.track[0].idx1offs = 0;
+	outinfo.track[0].idx[0] = outinfo.track[0].idx[1] = 0;
 
 	if ((size % 2048)==0 ) {
 		outtoc.tracks[0].trktype = CD_TRACK_MODE1;
@@ -2315,9 +2334,8 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				outtoc.tracks[trknum].padframes = 0;
 				outtoc.tracks[trknum].datasize = 0;
 				outtoc.tracks[trknum].multicuearea = is_gdrom ? current_area : 0;
-				outinfo.track[trknum].idx0offs = -1;
-				outinfo.track[trknum].idx1offs = 0;
 				outinfo.track[trknum].offset = 0;
+				std::fill(std::begin(outinfo.track[trknum].idx), std::end(outinfo.track[trknum].idx), -1);
 
 				if (wavlen != 0)
 				{
@@ -2365,22 +2383,25 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				TOKENIZE
 				frames = msf_to_frames( token );
 
-				if (idx == 0)
+				if (idx < 0 || idx > MAX_INDEX)
 				{
-					outinfo.track[trknum].idx0offs = frames;
+					printf("ERROR: encountered invalid index %d\n", idx);
+					return chd_file::error::INVALID_DATA;
 				}
-				else if (idx == 1)
+
+				outinfo.track[trknum].idx[idx] = frames;
+
+				if (idx == 1)
 				{
-					outinfo.track[trknum].idx1offs = frames;
-					if ((outtoc.tracks[trknum].pregap == 0) && (outinfo.track[trknum].idx0offs != -1))
+					if (outtoc.tracks[trknum].pregap == 0 && outinfo.track[trknum].idx[0] != -1)
 					{
-						outtoc.tracks[trknum].pregap = frames - outinfo.track[trknum].idx0offs;
+						outtoc.tracks[trknum].pregap = frames - outinfo.track[trknum].idx[0];
 						outtoc.tracks[trknum].pgtype = outtoc.tracks[trknum].trktype;
 						outtoc.tracks[trknum].pgdatasize = outtoc.tracks[trknum].datasize;
 					}
-					else    // pregap sectors not in file, but we're always using idx0ofs for track length calc now
+					else if (outinfo.track[trknum].idx[0] == -1) /* pregap sectors not in file, but we're always using idx 0 for track length calc now */
 					{
-						outinfo.track[trknum].idx0offs = frames;
+						outinfo.track[trknum].idx[0] = frames;
 					}
 				}
 			}
@@ -2418,6 +2439,13 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	{
 		uint64_t tlen = 0;
 
+		if (outinfo.track[trknum].idx[1] == -1)
+		{
+			/* index 1 should always be set */
+			printf("ERROR: track %d is missing INDEX 01 marker\n", trknum+1);
+			return chd_file::error::INVALID_DATA;
+		}
+
 		/* this is true for cue/bin and cue/iso, and we need it for cue/wav since .WAV is little-endian */
 		if (outtoc.tracks[trknum].trktype == CD_TRACK_AUDIO)
 		{
@@ -2444,7 +2472,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 		else if (trknum+1 < outtoc.numtrks && outinfo.track[trknum].fname.compare(outinfo.track[trknum+1].fname)==0)
 		{
 			/* if the current filename is the same as the next track */
-			outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx0offs - outinfo.track[trknum].idx0offs;
+			outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx[0] - outinfo.track[trknum].idx[0];
 
 			if (outtoc.tracks[trknum].frames == 0)
 			{
@@ -2488,7 +2516,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 			outinfo.track[trknum].offset += this_offset;
 			outtoc.tracks[trknum].frames -= this_pregap;
-			outinfo.track[trknum].idx1offs -= this_pregap;
+			outinfo.track[trknum].idx[1] -= this_pregap;
 
 			outtoc.tracks[trknum].pregap = 0;
 			outtoc.tracks[trknum].pgtype = 0;
@@ -2527,8 +2555,8 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				outtoc.tracks[trknum].pregap,
 				outtoc.tracks[trknum].pgtype,
 				outtoc.tracks[trknum].pgdatasize,
-				outinfo.track[trknum].idx0offs,
-				outinfo.track[trknum].idx1offs,
+				outinfo.track[trknum].idx[0],
+				outinfo.track[trknum].idx[1],
 				outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
 		}
 

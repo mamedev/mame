@@ -24,6 +24,7 @@ public:
 	static constexpr uint32_t MAX_TRACKS       = 99;        /* AFAIK the theoretical limit */
 	static constexpr uint32_t MAX_SECTOR_DATA  = 2352;
 	static constexpr uint32_t MAX_SUBCODE_DATA = 96;
+	static constexpr uint32_t MAX_INDEX        = 99;
 
 	static constexpr uint32_t FRAME_SIZE       = MAX_SECTOR_DATA + MAX_SUBCODE_DATA;
 	static constexpr uint32_t FRAMES_PER_HUNK  = 8;
@@ -98,13 +99,12 @@ public:
 	struct track_input_entry
 	{
 		track_input_entry() { reset(); }
-		void reset() { fname.clear(); offset = idx0offs = idx1offs = 0; swap = false; }
+		void reset() { fname.clear(); offset = 0; swap = false; std::fill(std::begin(idx), std::end(idx), -1); }
 
 		std::string fname;      // filename for each track
 		uint32_t offset;      // offset in the data file for each track
 		bool swap;          // data needs to be byte swapped
-		uint32_t idx0offs;
-		uint32_t idx1offs;
+		int32_t idx[MAX_INDEX + 1];
 	};
 
 	struct track_input_info
@@ -128,6 +128,7 @@ public:
 	uint32_t get_track(uint32_t frame) const;
 	uint32_t get_track_start(uint32_t track) const {return cdtoc.tracks[track == 0xaa ? cdtoc.numtrks : track].logframeofs; }
 	uint32_t get_track_start_phys(uint32_t track) const { return cdtoc.tracks[track == 0xaa ? cdtoc.numtrks : track].physframeofs; }
+	uint32_t get_track_index(uint32_t frame) const;
 
 	/* TOC utilities */
 	static std::error_condition parse_nero(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
