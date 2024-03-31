@@ -55,14 +55,15 @@ public:
 	void set_config(u16 data);
 
 	void core_regs(address_map &map, u8 mirror = 0);
-	void rom_9(address_map &map);
-	void rom_10(address_map &map);
+
 	void ram_6(address_map &map);
-	void ram_7(address_map &map);
+	void rom_9(address_map &map);
+	void ram_7(address_map &map);		
+	void rom_10(address_map &map);
 
 protected:
 	// construction/destruction
-	pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width);
+	pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor program_map, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -105,12 +106,14 @@ protected:
 	u16 m_buff[0x40];
 
 	optional_memory_region m_region;
-
-private:
-
+	
 	// address spaces
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	
+	int m_program_width;
+
+private:
 
 	memory_access<13, 1, -1, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 8, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
@@ -137,7 +140,6 @@ private:
 	u16     m_STACK[8];
 	u16     m_prescaler;  // Note: this is really an 8-bit register
 	PAIR16  m_opcode;
-	int     m_program_width;
 	int     m_icount;
 	int     m_delay_timer;
 	int     m_rtcc;
@@ -260,7 +262,22 @@ private:
 	void xorwf();
 };
 
-class pic16cr83_device : public pic16x8x_device
+
+class pic16x83_device : public pic16x8x_device
+{
+public:
+	// construction/destruction
+	pic16x83_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock); //, int program_width);
+};
+
+class pic16x84_device : public pic16x8x_device
+{
+public:
+	// construction/destruction
+	pic16x84_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock); //, int program_width);
+};
+
+class pic16cr83_device : public pic16x83_device
 {
 public:
 	// construction/destruction
@@ -268,7 +285,7 @@ public:
 };
 
 
-class pic16cr84_device : public pic16x8x_device
+class pic16cr84_device : public pic16x84_device
 {
 public:
 	// construction/destruction
@@ -276,7 +293,7 @@ public:
 };
 
 
-class  pic16f83_device : public pic16x8x_device
+class  pic16f83_device : public pic16x83_device
 {
 public:
 	// construction/destruction
@@ -284,7 +301,7 @@ public:
 };
 
 
-class pic16f84_device : public pic16x8x_device
+class pic16f84_device : public pic16x84_device
 {
 public:
 	// construction/destruction
@@ -292,7 +309,7 @@ public:
 };
 
 
-class pic16f84a_device : public pic16x8x_device
+class pic16f84a_device : public pic16x84_device
 {
 public:
 	// construction/destruction
@@ -300,4 +317,3 @@ public:
 };
 
 #endif  // MAME_CPU_PIC16X8X_PIC16X8X_H
-
