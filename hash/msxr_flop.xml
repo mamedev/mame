@@ -7,6 +7,8 @@ license:CC0-1.0
 <softwarelist name="msxr_flop" description="MSX Turbo-R disk images">
 
 <!--
+The MSX Turbo-R system is not supported yet, so all items are marked accordingly.
+
 
 Disks to sort:
     Win2000 installer by Italo Valerio
@@ -33,7 +35,6 @@ Known undumped:
 		<description>FS-A1GT (Japan)</description>
 		<year>1990</year>
 		<publisher>Panasonic</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk 1 - システムディスク1"/>
 			<dataarea name="flop" size="737280">
@@ -58,7 +59,6 @@ Known undumped:
 		<description>FS-A1ST (Japan)</description>
 		<year>1990</year>
 		<publisher>Panasonic</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk 1 - システムディスク1"/>
 			<dataarea name="flop" size="737280">
@@ -80,7 +80,6 @@ Known undumped:
 		<description>2021 Snooky! (Japan)</description>
 		<year>1991</year>
 		<publisher>Studio Hawk</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="2021 snooky (1991)(studio hawk)(jp).dsk" size="737280" crc="3d3e50b0" sha1="96d493fabe69aa8322e68e0b0c5344c464325cf9"/>
@@ -104,7 +103,6 @@ Known undumped:
 		<description>Dewoman Zenpen (Japan)</description>
 		<year>1993</year>
 		<publisher>Blue Eyes</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="デューマン前編"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -135,7 +133,6 @@ Known undumped:
 		<description>Dewoman Chuuhen (Japan)</description>
 		<year>1993</year>
 		<publisher>Blue Eyes</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="デューマン中編"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -184,7 +181,6 @@ Known undumped:
 		<description>Die Frage II' (Japan)</description>
 		<year>199?</year>
 		<publisher>Studio Sequence</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="diefrage.dsk" size="737280" crc="3249258a" sha1="4f0ddc72531c55857325ed3651219b7a6081de39"/>
@@ -196,7 +192,6 @@ Known undumped:
 		<description>Die Frage II' (Japan, bad dump?)</description>
 		<year>199?</year>
 		<publisher>Studio Sequence</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="frage ii, die (199x)(studio sequence)(jp)[b].dsk" size="737280" crc="6d749b83" sha1="3da39ec846c109fbd74476efa3f9a349a85081b0" status="baddump"/>
@@ -208,7 +203,6 @@ Known undumped:
 		<description>Fantasy Attraction (Japan)</description>
 		<year>1996</year>
 		<publisher>Rem Company</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="fantasy attraction - rem company.dsk" size="737280" crc="b977ace3" sha1="0a3b65b266d0e1709d168e60a41786a2c7459735"/>
@@ -220,7 +214,6 @@ Known undumped:
 		<description>Fray - In Magical Adventure (Japan)</description>
 		<year>1990</year>
 		<publisher>Micro Cabin</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="フレイサーク外伝"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk 0"/>
@@ -258,7 +251,6 @@ Known undumped:
 		<description>Fray - In Magical Adventure (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>Micro Cabin</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="フレイサーク外伝"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk 0"/>
@@ -296,7 +288,6 @@ Known undumped:
 		<description>Fray - In Magical Adventure (Japan, alt 2)</description>
 		<year>1990</year>
 		<publisher>Micro Cabin</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="フレイサーク外伝"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk 0"/>
@@ -334,7 +325,6 @@ Known undumped:
 		<description>Illusion City - Genei Toshi (Japan)</description>
 		<year>1991</year>
 		<publisher>Micro Cabin</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="げんえいとし" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1"/>
@@ -390,7 +380,6 @@ Known undumped:
 		<description>innocent wish ~destiny2~ (Japan)</description>
 		<year>1995</year>
 		<publisher>Sign House</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="innocent wish - destiny2 - sign house.dsk" size="737280" crc="ee349375" sha1="4abff41ef488885802c2d0056bbdc4a9d7d3e1c7"/>
@@ -402,7 +391,6 @@ Known undumped:
 		<description>Mahouno Kunino Hoippuru (Japan)</description>
 		<year>1996</year>
 		<publisher>Pastel Hope</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="魔法の国のほいっぷる"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -415,7 +403,6 @@ Known undumped:
 		<description>Mechanical Brain (Japan)</description>
 		<year>1996</year>
 		<publisher>Studio Sequence</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="mechanical brain - studio sequence.dsk" size="737280" crc="61050e08" sha1="4f69e1ccb9e4622c0f0870c10fda4df00e01e97f"/>
@@ -427,7 +414,6 @@ Known undumped:
 		<description>Me-yuu Isago - Mejuusa (Japan)</description>
 		<year>1994</year>
 		<publisher>Blue Eyes</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="眼獣・沙 ~メジューサ~"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -450,7 +436,6 @@ Known undumped:
 		<description>MSX ViewCALC (Japan)</description>
 		<year>1991</year>
 		<publisher>ASCII Corporation</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="barcode" value="4988606207572"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk - システムディスク"/>
@@ -470,7 +455,6 @@ Known undumped:
 		<description>μ.Note (Japan)</description>
 		<year>1992</year>
 		<publisher>Bit²</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -489,7 +473,6 @@ Known undumped:
 		<description>μ.Sios (Japan)</description>
 		<year>1991</year>
 		<publisher>Bit²</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
@@ -514,7 +497,6 @@ Known undumped:
 		<description>R2 Chaser's (Japan)</description>
 		<year>1996</year>
 		<publisher>Studio Sequence</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="r2 chasers - studio sequence.dsk" size="737280" crc="ac80184a" sha1="f59dde8b8c2782cf5efd013f30d5f3787aa43eb4"/>
@@ -526,7 +508,6 @@ Known undumped:
 		<description>Ranma ½ - Hiryuu Densetsu (Japan)</description>
 		<year>1992</year>
 		<publisher>Bothtec</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="らんま1/2飛龍伝説"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -582,7 +563,6 @@ Known undumped:
 		<description>Ranma ½ - Hiryuu Densetsu (Japan, alt)</description>
 		<year>1992</year>
 		<publisher>Bothtec</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="らんま1/2飛龍伝説"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -638,7 +618,6 @@ Known undumped:
 		<description>Ranma ½ - Hiryuu Densetsu (Japan, alt 2)</description>
 		<year>1992</year>
 		<publisher>Bothtec</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="らんま1/2飛龍伝説"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -694,7 +673,6 @@ Known undumped:
 		<description>Ranma ½ - Hiryuu Densetsu (Japan, alt disk 1)</description>
 		<year>1992</year>
 		<publisher>Bothtec</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="らんま1/2飛龍伝説"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -750,7 +728,6 @@ Known undumped:
 		<description>Seed of Dragon (Japan)</description>
 		<year>1990</year>
 		<publisher>Riverhill Soft</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="シードオブドラゴン"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1"/>
@@ -776,7 +753,6 @@ Known undumped:
 		<description>Seed of Dragon (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>Riverhill Soft</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="シードオブドラゴン" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1"/>
@@ -802,7 +778,6 @@ Known undumped:
 		<description>Seed of Dragon (Japan, alt disk 1)</description>
 		<year>1990</year>
 		<publisher>Riverhill Soft</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="シードオブドラゴン" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1"/>
@@ -828,7 +803,6 @@ Known undumped:
 		<description>South Town's Hero II (Japan)</description>
 		<year>1995</year>
 		<publisher>FM-Guamuom</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="south towns hero ii - fm-guamuom (disk a).dsk" size="737280" crc="c86c7236" sha1="295097cac2d9e9af0befc16ddff6be47e98056fd"/>
@@ -845,7 +819,6 @@ Known undumped:
 		<description>South Town's Hero Turbo (Japan)</description>
 		<year>1995</year>
 		<publisher>FM-Guamuom</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="south towns hero turbo - fm-guamuom.dsk" size="737280" crc="dd4eaf2b" sha1="8514c9ea020d13b6b6cb4d58eab0e194eb0550e7"/>
@@ -857,7 +830,6 @@ Known undumped:
 		<description>Speedline (demo)</description>
 		<year>2001</year>
 		<publisher>Traposoft</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="speedline - traposoft.dsk" size="737280" crc="48acbd73" sha1="5c779c0134cfaeb6910d24aa5298e47229d83ad4"/>
@@ -869,7 +841,6 @@ Known undumped:
 		<description>Superiority Fighters (Japan)</description>
 		<year>1994</year>
 		<publisher>Mushroom</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="superiority fighters - mushroom.dsk" size="737280" crc="601c9bf1" sha1="03db284a1c879694fd3693db1876f4b5646c7873"/>
@@ -881,7 +852,6 @@ Known undumped:
 		<description>Turbo Blaster (Japan)</description>
 		<year>1994</year>
 		<publisher>M.O.V</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="turbo blaster - m.o.v.dsk" size="737280" crc="fcc14198" sha1="e0acf2bff6792ed5927ee5a55e87c16fdafdc3fb"/>
@@ -893,7 +863,6 @@ Known undumped:
 		<description>Turbo Booster (Japan)</description>
 		<year>1990</year>
 		<publisher>Kyoto Media</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="turbo booster (1990)(team toy boys)(jp)[b].dsk" size="737280" crc="f7233416" sha1="78763684ef466ef84773f9f3c3102deaf2cc61cb"/>
@@ -905,7 +874,6 @@ Known undumped:
 		<description>Welkis the Legend (Japan)</description>
 		<year>1996</year>
 		<publisher>Uechan Dayo</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="ウェルキス・ザ・レジェンド"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -929,7 +897,6 @@ Known undumped:
 		<description>Dream Drops - Secret Design of the Hearts (Japan)</description>
 		<year>2011</year>
 		<publisher>Rabbit Soft Worker's</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dd_rehearsal.dsk" size="737280" crc="58ffca39" sha1="fc19a452557a75fbe4c55ee313302dfd6b362610"/>
@@ -941,7 +908,6 @@ Known undumped:
 		<description>Dream Fighters (Japan)</description>
 		<year>1996</year>
 		<publisher>Monoki</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="dreamfighters.dsk" size="737280" crc="0d25daef" sha1="fa0d62775202f9e7e9a7cb617a7ab40323c2b6f2"/>
@@ -954,7 +920,6 @@ Known undumped:
 		<description>Earth Attack (Japan)</description>
 		<year>19??</year>
 		<publisher>GW's Workshop</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="earth attack (19xx)(gw's workshop)[b].dsk" size="737280" crc="b6cd052d" sha1="3ad636e6726be67f395b80d170566065c5d80868"/>
@@ -966,7 +931,6 @@ Known undumped:
 		<description>F-Nano 2 - 3D Car Action (Japan)</description>
 		<year>1994</year>
 		<publisher>XRay</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="f-nano 2 - 3d car action (demo) (1994)(xray)(jp).dsk" size="737280" crc="65f9baa0" sha1="2ffd8e05317a1f5f296635da654b51739d392b6a"/>
@@ -978,7 +942,6 @@ Known undumped:
 		<description>F-Nano 2' - 3D Car Action (Japan)</description>
 		<year>1997</year>
 		<publisher>XRay</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="f-nano 2' (xray, 1997).dsk" size="737280" crc="3b65605e" sha1="031f9dcc4ae1832dd3e0252c2988a7c7a13b90a7"/>
@@ -990,7 +953,6 @@ Known undumped:
 		<description>Gekikara Roudousha (Japan)</description>
 		<year>1995</year>
 		<publisher>Delta Trial</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="激辛労働者"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -1003,7 +965,6 @@ Known undumped:
 		<description>Gun Shot vs Festa Again (Japan)</description>
 		<year>2001</year>
 		<publisher>Rabbit Soft Worker's</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="gun shot vs festa again (2001)(rabbit soft worker's)(jp).dsk" size="737280" crc="6375481b" sha1="56ac03a3fc5dcdb2cf07f1110284d87f7be061cb"/>
@@ -1015,7 +976,6 @@ Known undumped:
 		<description>Hyper Role Playing Story LOSTWORD Episode 0 (Japan)</description>
 		<year>2019</year>
 		<publisher>Rabbit Soft Worker's</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="lostword episode 0 - rabbit soft workers.dsk" size="737280" crc="88e544ab" sha1="9b6367656e0959d3907f9d36156c58b85710b8af"/>
@@ -1027,7 +987,6 @@ Known undumped:
 		<description>In the 6th Sense - Product of the Hearts (Japan)</description>
 		<year>2007</year>
 		<publisher>Rabbit Soft Worker's</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="hearts_r.dsk" size="737280" crc="619614b4" sha1="669ac574bc9abbaebca602d6d998353f3352714d"/>
@@ -1039,7 +998,6 @@ Known undumped:
 		<description>Mistral Blue</description>
 		<year>2002</year>
 		<publisher>Popcorn</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="misttria.dsk" size="737280" crc="5367f0da" sha1="6f352de01235c9f4ac763f8f3714aad3672956a8"/>
@@ -1051,7 +1009,6 @@ Known undumped:
 		<description>Mobius Debugger 2 - Eternal Striker</description>
 		<year>1995</year>
 		<publisher>Studio Sequence</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="eternaldemo.dsk" size="737280" crc="19a45f75" sha1="20cbe1beaa164f2fc80a49caeadf320848881a74"/>
@@ -1063,7 +1020,6 @@ Known undumped:
 		<description>Moon Light Saga - Horus no Shou (Japan)</description>
 		<year>1996</year>
 		<publisher>MapleYard</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="Moon light Saga～ホルスの章～"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk"/>
@@ -1089,7 +1045,6 @@ Known undumped:
 		<description>Moon Light Saga (Japan, bad dump?)</description>
 		<year>1996</year>
 		<publisher>MapleYard</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="moonlight saga (1997)(-)[b].dsk" size="737280" crc="e4d13543" sha1="835363a41c6145a92eb9f8d7c8a0404145af2f97" status="baddump"/>
@@ -1101,7 +1056,6 @@ Known undumped:
 		<description>Moon Light Saga (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>MapleYard</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="moonlight saga (1996)(maple yard)(jp).dsk" size="737280" crc="5adff71b" sha1="c6e339c992562800ded94b29cd910cfe7d656cea"/>
@@ -1113,7 +1067,6 @@ Known undumped:
 		<description>Multi-Plex (Japan)</description>
 		<year>1993</year>
 		<publisher>MIWA</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="multi-plex (1993)(miwa)(jp).dsk" size="737280" crc="126399dc" sha1="a6f75f120c89c22dce27a63f73209d96ccacb92a"/>
@@ -1125,7 +1078,6 @@ Known undumped:
 		<description>Multi-Plex (Japan, alt)</description>
 		<year>1993</year>
 		<publisher>MIWA</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1, Alt"/>
 			<dataarea name="flop" size="737280">
@@ -1138,7 +1090,6 @@ Known undumped:
 		<description>PaRaDream - Parallel Dream (Japan)</description>
 		<year>1992</year>
 		<publisher>RAC House</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="paradream (1992)(rac house)(jp).dsk" size="737280" crc="81f23eae" sha1="1dd663e5b38ce0206f09a8c6a226f9e6562e341a"/>
@@ -1150,7 +1101,6 @@ Known undumped:
 		<description>PaRaDream - Parallel Dream (Japan, alt)</description>
 		<year>1992</year>
 		<publisher>RAC House</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="paradream (1992)(rac house)(jp)[a].dsk" size="737280" crc="cb11589a" sha1="eea7efb3a3f3df9a8985a24bc9838d3ef90b78e7"/>
@@ -1162,7 +1112,6 @@ Known undumped:
 		<description>PaRaDream - Parallel Dream (Japan, alt 2)</description>
 		<year>1992</year>
 		<publisher>RAC House</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="paradream (1992)(rac house)(jp)[a2].dsk" size="737280" crc="7cafcc2c" sha1="7182f010517a9d7f54f2ade133c8f3b7f77b8f3e"/>
@@ -1174,7 +1123,6 @@ Known undumped:
 		<description>Phi</description>
 		<year>2004</year>
 		<publisher>Mariko-ban GCC</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="phi.dsk" size="737280" crc="c71e6887" sha1="e5034a491c115e19678deb0d983128538a20bd43"/>
@@ -1186,7 +1134,6 @@ Known undumped:
 		<description>Qui Veut Gagner Des Millions</description>
 		<year>2004</year>
 		<publisher>Walter</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="qui veut gagner des millions - walter.dsk" size="737280" crc="0a6974b2" sha1="c78087a64ac2cc73eb08bf1fd6452a4ea0dccade"/>
@@ -1198,7 +1145,6 @@ Known undumped:
 		<description>Quien Quiere Ser Milionario</description>
 		<year>2009</year>
 		<publisher>Walter</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="quien quiere ser milionario - walter.dsk" size="737280" crc="d45aac6d" sha1="db490319cd6e68ee25d1669b00a46a54a19db924"/>
@@ -1210,7 +1156,6 @@ Known undumped:
 		<description>S.T.G. (Japan)</description>
 		<year>1996</year>
 		<publisher>Y. Tomohara</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="s.t.g. (1996)(y. tomohara).dsk" size="368640" crc="1bf3a50c" sha1="1bfbac72446c059d4838a0b117c5cd5db0a85e21"/>
@@ -1222,7 +1167,6 @@ Known undumped:
 		<description>S.T.G. Special - Do Don Taku (Japan)</description>
 		<year>1998</year>
 		<publisher>Y. Tomohara</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="s.t.g. special - do don taku (1998)(y. tomohara).dsk" size="737280" crc="82309e65" sha1="a885df863a6f04441881ac907510ab80d139c357"/>
@@ -1234,7 +1178,6 @@ Known undumped:
 		<description>Saishuu Bouei-sen - Save Your Mother Planet: The Earth (Japan)</description>
 		<year>1996</year>
 		<publisher>GW's Workshop</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="最終防衛線"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -1247,7 +1190,6 @@ Known undumped:
 		<description>Shoot That Flying Windows! (Finland)</description>
 		<year>1997</year>
 		<publisher>Nyyrikki</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="shoot that flying windows (1997)(nyyrikki)[mouse].dsk" size="737280" crc="1c8f1d96" sha1="d69c803efb9558314489ab04a25ec84a2901f49f"/>
@@ -1259,7 +1201,6 @@ Known undumped:
 		<description>Shoot That Flying Windows! (Finland, alt)</description>
 		<year>1997</year>
 		<publisher>Nyyrikki</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="shoot that flying windows (1997)(nyyrikki)[a][mouse].dsk" size="737280" crc="07a4a7ef" sha1="14e93cedcdd35e42c46d8d2c7b0b153012507bdb"/>
@@ -1271,7 +1212,6 @@ Known undumped:
 		<description>Shoulder Blade (Japan, bad dump?)</description>
 		<year>1997</year>
 		<publisher>GW's Workshop</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="usage" value="Requires MSX-DOS2"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -1284,7 +1224,6 @@ Known undumped:
 		<description>Space Panic! (Japan)</description>
 		<year>1998</year>
 		<publisher>Mikasen</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="space panic - mikasen.dsk" size="368640" crc="ac36568e" sha1="d7a024eca395907a66672d8e2e7b2d814dfedd85"/>
@@ -1296,7 +1235,6 @@ Known undumped:
 		<description>Stage 11 (Japan)</description>
 		<year>1996</year>
 		<publisher>Mikasen</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="stage 11 - mikasen.dsk" size="737280" crc="9e14fce8" sha1="89466408f3e61a03558e939f4bcb0949ea758a79"/>
@@ -1308,7 +1246,6 @@ Known undumped:
 		<description>Stage 11 Kai (Japan)</description>
 		<year>1998</year>
 		<publisher>Mikasen</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="ＳＴＡＧＥ１１改"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -1322,7 +1259,6 @@ Known undumped:
 		<description>Sweet (Japan)</description>
 		<year>1994</year>
 		<publisher>Kazuyuki Suzuki</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="sweet (1994)(kazuyuki suzuki)(jp)[old t800].dsk" size="737280" crc="3cf9612c" sha1="8d46a336944128a9f925498647a3d163f7796acd"/>
@@ -1334,7 +1270,6 @@ Known undumped:
 		<description>Telebasic Edición No. 1 (Spain)</description>
 		<year>1993</year>
 		<publisher>Traposoft</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="telebasic edicion no 1 - traposoft.dsk" size="737280" crc="9c11fde1" sha1="d0691a07805dea89eb3be54bbcf37303df49e192"/>
@@ -1346,7 +1281,6 @@ Known undumped:
 		<description>Telebasic Edición No. 2 (Spain)</description>
 		<year>1994</year>
 		<publisher>Traposoft</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="telebasic edicion no 2 - traposoft.dsk" size="737280" crc="c3cc936d" sha1="cec2cc9915d3f72a26ae409f6e156b9d2822ed4c"/>
@@ -1358,7 +1292,6 @@ Known undumped:
 		<description>Telebasic Edición No. 3 (Spain)</description>
 		<year>1995</year>
 		<publisher>Traposoft</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="telebasic edicion no 3 - traposoft.dsk" size="737280" crc="a60abbc8" sha1="7d6e1844a4603fdfdb3282a8dfae8cd75e057ce2"/>
@@ -1370,7 +1303,6 @@ Known undumped:
 		<description>Treasure of Babylon (France)</description>
 		<year>2013</year>
 		<publisher>Eric Boez</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="treasureofbabylon1-0.dsk" size="737280" crc="9cdc78e2" sha1="4f4a7a6de36d9b5f88f21ba31d5d07435c7887f7"/>
@@ -1382,7 +1314,6 @@ Known undumped:
 		<description>Zone Terra (Netherlands)</description>
 		<year>1994</year>
 		<publisher>Quadrivium</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="zone terra (1994)(quadrivium)(nl).dsk" size="737280" crc="5d7c7d25" sha1="cd631425a0fb7e7cf043c8f69281fd8255ce2c4f"/>
@@ -1394,7 +1325,6 @@ Known undumped:
 		<description>Zone Terra (Netherlands, demo)</description>
 		<year>1994</year>
 		<publisher>Quadrivium</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="zone terra (demo) (1994)(quadrivium)(nl).dsk" size="737280" crc="ed4ac074" sha1="a36dec1e71df540c4e87ee7f38660900f3a05efd"/>
@@ -1406,7 +1336,6 @@ Known undumped:
 		<description>Zekkou no Tsuri Biyori ya!! (Japan)</description>
 		<year>1996</year>
 		<publisher>GW's Workshop</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="絶好の釣り日和や！！"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -1419,7 +1348,6 @@ Known undumped:
 		<description>Zekkou no Tsuri Biyori ya!! (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>GW's Workshop</publisher>
-		<notes>MSX Turbo-R is not supported.</notes>
 		<info name="alt_title" value="絶好の釣り日和や！！"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
