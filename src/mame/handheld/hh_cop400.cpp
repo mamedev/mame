@@ -1109,8 +1109,7 @@ class mbaskb2_state : public hh_cop400_state
 public:
 	mbaskb2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cop400_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu"),
-		m_on_timer(*this, "on_timer")
+		m_subcpu(*this, "subcpu")
 	{ }
 
 	void mbaskb2(machine_config &config);
@@ -1119,11 +1118,13 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
 	required_device<cop400_cpu_device> m_subcpu;
-	required_device<timer_device> m_on_timer;
+
+	attotime m_on_time;
 
 	void update_display();
 	void shared_write_l(u8 data);
@@ -1133,10 +1134,16 @@ private:
 	u8 sub_read_in();
 };
 
+void mbaskb2_state::machine_start()
+{
+	hh_cop400_state::machine_start();
+	save_item(NAME(m_on_time));
+}
+
 void mbaskb2_state::machine_reset()
 {
 	hh_cop400_state::machine_reset();
-	m_on_timer->adjust(attotime::from_msec(5));
+	m_on_time = machine().time() + attotime::from_msec(5);
 }
 
 // handlers
@@ -1185,7 +1192,7 @@ CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
 {
 	// The power switch is off-1-2, and the game relies on power-on starting at 1,
 	// otherwise msoccer2 boots up to what looks like a factory test mode.
-	return (m_inputs[3]->read() & 1) | (m_on_timer->enabled() ? 1 : 0);
+	return (machine().time() < m_on_time && ~m_inputs[4]->read() & 1) ? 1 : (m_inputs[3]->read() & 1);
 }
 
 static INPUT_PORTS_START( mbaskb2 )
@@ -1210,6 +1217,9 @@ static INPUT_PORTS_START( mbaskb2 )
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msoccer2 )
@@ -1219,6 +1229,11 @@ static INPUT_PORTS_START( msoccer2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Low/High Kick")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Score")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Teammate")
+
+	PORT_MODIFY("IN.4")
+	PORT_CONFNAME( 0x01, 0x00, "Factory Test" ) PORT_CONDITION("IN.3", 0x01, EQUALS, 0x00)
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 // config
@@ -1246,8 +1261,6 @@ void mbaskb2_state::mbaskb2(machine_config &config)
 	m_subcpu->read_cko().set(m_maincpu, FUNC(cop400_cpu_device::sk_r));
 
 	config.set_perfect_quantum(m_maincpu);
-
-	TIMER(config, "on_timer").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
