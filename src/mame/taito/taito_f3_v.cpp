@@ -769,7 +769,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		const u16 blend_vals = m_line_ram[where];
 		for (int idx = 0; idx < 4; idx++) {
 			const u8 alpha = BIT(blend_vals, 4 * idx, 4);
-			line.blend[idx] = 0xf - alpha;
+			line.blend[idx] = std::min(255, (0xf - alpha) * 32);
 		}
 	}
 	if (const offs_t where = latched_addr(2, 2)) { // mosaic, palette depth effects
@@ -985,8 +985,8 @@ inline int taito_f3_state::mixable::y_index(int y) const {
 inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const {
 	return pal + pal_add;
 }
-inline int taito_f3_state::playfield_inf::x_index(int dest_x) const {
-	return (((reg_fx_x + (dest_x - 46) * x_scale)>>8) + 46) & width_mask;
+inline int taito_f3_state::playfield_inf::x_index(int x) const {
+	return (((reg_fx_x + (x - 46) * x_scale)>>8) + 46) & width_mask;
 }
 inline int taito_f3_state::playfield_inf::y_index(int y) const {
 	return ((reg_fx_y >> 8) + colscroll) & 0x1ff;
@@ -1006,35 +1006,34 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 	const u8 *flags = gfx->bitmap.flags ? &gfx->bitmap.flags->pix(y) : nullptr;
 
 	for (int x = range.l; x < range.r; x++) {
-		const int real_x = gfx->x_sample_enable ? mosaic(x, line.x_sample) : x;
-		const int x_index = gfx->x_index(real_x);
-		// tilemap transparent flag
-		if (flags && !(flags[x_index] & 0xf0)) {
-			continue;
-		}
+		if (gfx->blend_mask() == pri[x].src_blendmode)
+			continue; // note that layers cannot blend against the same blend mode
 
-		if (gfx->prio() >= pri[x].src_prio && gfx->blend_mask() != pri[x].src_blendmode) {
+		const int real_x = gfx->x_sample_enable ? mosaic(x, line.x_sample) : x;
+		const int gfx_x = gfx->x_index(real_x);
+		// tilemap transparent flag
+		if (flags && !(flags[gfx_x] & 0xf0))
+			continue;
+
+		if (gfx->prio() >= pri[x].src_prio) {
 			// submit src pix
-			if (const u16 pal = gfx->palette_adjust(src[x_index])) {
-				const bool sel = gfx->blend_select(flags, x_index);
+			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
+				u8 sel = gfx->blend_select(flags, gfx_x);
 				switch (gfx->blend_mask()) {
+				case 0b01: // normal blend
+					sel = 2 + sel;
+					[[fallthrough]];
 				case 0b10: // reverse blend
 					if (line.blend[sel] == 0)
 						continue; // could be early return for pivot and sprite
-					z[x].src_blend = std::min(255, line.blend[sel] * 32);
-					z[x].dst_pal = 0;
-					break;
-				case 0b01: // normal blend
-					if (line.blend[2 + sel] == 0)
-						continue; // could be early return for pivot and sprite
-					z[x].src_blend = std::min(255, line.blend[2 + sel] * 32);
+					z[x].src_blend = line.blend[sel];
 					z[x].dst_pal = 0;
 					break;
 				case 0b00: case 0b11: default: // opaque layer
 					if (line.blend[sel] + line.blend[2 + sel] == 0)
 						continue; // could be early return for pivot and sprite
-					z[x].src_blend = std::min(255, line.blend[sel] * 32);
-					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
+					z[x].src_blend = line.blend[sel];
+					z[x].dst_blend = line.blend[2 + sel];
 					pri[x].dst_prio = gfx->prio();
 					z[x].dst_pal = pal;
 					break;
@@ -1047,19 +1046,18 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 					pri[x].src_prio = gfx->prio();
 				}
 			}
-		} else if (gfx->prio() > pri[x].dst_prio && gfx->blend_mask() != pri[x].src_blendmode) {
+		} else if (gfx->prio() > pri[x].dst_prio) {
 			// submit dest pix
-			// note that layers cannot blend against the same blend mode
-			if (const u16 pal = gfx->palette_adjust(src[x_index])) {
+			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
 				z[x].dst_pal = pal;
 				pri[x].dst_prio = gfx->prio();
-				const bool sel = gfx->blend_select(flags, x_index);
+				const bool sel = gfx->blend_select(flags, gfx_x);
 				switch (pri[x].src_blendmode) {
 				case 0b01:
-					z[x].dst_blend = std::min(255, line.blend[sel] * 32);
+					z[x].dst_blend = line.blend[sel];
 					break;
 				case 0b10: case 0b00: case 0b11: default:
-					z[x].dst_blend = std::min(255, line.blend[2 + sel] * 32);
+					z[x].dst_blend = line.blend[2 + sel];
 					break;
 				}
 			}
@@ -1083,7 +1081,7 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 void taito_f3_state::render_line(pen_t *dst, const mix_pix (&z)[432])
 {
 	const pen_t *clut = &m_palette->pen(0);
-	for (int x = 0; x < 432; x++) {
+	for (int x = 46; x < 46 + 320; x++) {
 		const mix_pix mix = z[x];
 		rgb_t s_rgb = clut[mix.src_pal];
 		rgb_t d_rgb = clut[mix.dst_pal];
@@ -1169,19 +1167,19 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 					}
 				}, gfx);
 			}
-		}
-		if (TAITOF3_VIDEO_DEBUG==1) {
-			if (y == 100) {
-				logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
-						 line_buf[180].src_pal, line_buf[180].dst_pal,
-						 line_buf[180].src_blend, line_buf[180].dst_blend,
-						 line_pri[180].src_prio, line_pri[180].dst_prio);
-				logerror("-' [%d,%d,%d,%d] '------------------------- 100\n", line_data.blend[0],
-						 line_data.blend[1], line_data.blend[2], line_data.blend[3]);
+			if (TAITOF3_VIDEO_DEBUG==1) {
+				if (y == 100) {
+					logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
+							 line_buf[180].src_pal, line_buf[180].dst_pal,
+							 line_buf[180].src_blend, line_buf[180].dst_blend,
+							 line_pri[180].src_prio, line_pri[180].dst_prio);
+					logerror("-' [%d,%d,%d,%d] '------------------------- 100\n", line_data.blend[0],
+							 line_data.blend[1], line_data.blend[2], line_data.blend[3]);
+				}
 			}
-		}
 
-		render_line(&bitmap.pix(screen_y), line_buf);
+			render_line(&bitmap.pix(screen_y), line_buf);
+		}
 
 		if (screen_y != 0) {
 			// update registers
