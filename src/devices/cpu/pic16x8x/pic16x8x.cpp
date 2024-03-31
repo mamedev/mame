@@ -107,44 +107,51 @@ void pic16x8x_device::ram_7(address_map &map)
 }
 
 
-pic16x8x_device::pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width)
+pic16x8x_device::pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor program_map, address_map_constructor data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_region(*this, DEVICE_SELF)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1,
-		((program_width == 9) ? address_map_constructor(FUNC(pic16x8x_device::rom_9), this) :  address_map_constructor(FUNC(pic16x8x_device::rom_10),this)))
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0,
-		((program_width == 9) ? address_map_constructor(FUNC(pic16x8x_device::ram_6), this) :  address_map_constructor(FUNC(pic16x8x_device::ram_7), this)))
-	, m_CONFIG(0x3fff)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1, program_map)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0, data_map)
 	, m_program_width(program_width)
+	, m_CONFIG(0x3fff)
 	, m_read_port(*this, 0)
 	, m_write_port(*this)
 {
-}	
+}
 
+pic16x83_device::pic16x83_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: pic16x8x_device(mconfig, type, tag, owner, clock, 9, address_map_constructor(FUNC(pic16x8x_device::rom_9), this), address_map_constructor(FUNC(pic16x8x_device::ram_6), this))
+{
+}
+
+pic16x84_device::pic16x84_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: pic16x8x_device(mconfig, type, tag, owner, clock, 10, address_map_constructor(FUNC(pic16x8x_device::rom_10), this), address_map_constructor(FUNC(pic16x8x_device::ram_7), this))
+{
+}
 
 pic16cr83_device::pic16cr83_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16CR83, tag, owner, clock, 9)
+	: pic16x83_device(mconfig, PIC16CR83, tag, owner, clock)
 {
 }
 
 pic16cr84_device::pic16cr84_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16CR84, tag, owner, clock, 10)
+	: pic16x84_device(mconfig, PIC16CR84, tag, owner, clock)
 {
 }
 
 pic16f83_device::pic16f83_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16F83, tag, owner, clock, 9)
+	: pic16x83_device(mconfig, PIC16F83, tag, owner, clock)
 {
 }
 
 pic16f84_device::pic16f84_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16F84, tag, owner, clock, 10)
+	: pic16x84_device(mconfig, PIC16F84, tag, owner, clock)
 {
 }
 
 pic16f84a_device::pic16f84a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16x8x_device(mconfig, PIC16F84A, tag, owner, clock, 10)
+	: pic16x84_device(mconfig, PIC16F84A, tag, owner, clock)
 {
 }
 
@@ -345,8 +352,6 @@ constexpr u8 INT_VECTOR   = 0x04;
 
 #define RISING_EDGE_RB0   (( (int)(RB0_in - m_old_RB0) > 0) ? 1 : 0)
 #define FALLING_EDGE_RB0  (( (int)(RB0_in - m_old_RB0) < 0) ? 1 : 0)
-
-//#define S_RB0_IN          (m_read_port[PORTB](PORTB, 0x01))
 
 #define M_RDEEPROM(A)     m_eeread(A)
 #define M_WREEPROM(A,V)   m_eewrite(A, V)
