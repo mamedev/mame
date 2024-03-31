@@ -289,11 +289,9 @@ Playfield tile info:
        and according to its own blend select bit
 
      -  should only be (up to) 2 contributing layers to each final pixel (?)
-     -  there's a HW "feature" (bug) when layers have a prio conflict.
-          in this case, for a given pixel, the color can come from
-          one layer while the blend mode comes from the other.
-          (dariusg V': pf clouds submit color, sprite fb submits blend mode)
-
+     -  there's a HW "feature" (bug?) when layers have a prio conflict.
+          in this case, for a given pixel, it seems like the second layer
+          can reset part of the state... (dariusg stage V' clouds)
 
 ***************************************************************************/
 
@@ -1020,29 +1018,29 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 			// submit src pix
 			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
 				u8 sel = gfx->blend_select(flags, gfx_x);
-				switch (gfx->blend_mask()) {
-				case 0b01: // normal blend
-					sel = 2 + sel;
-					[[fallthrough]];
-				case 0b10: // reverse blend
-					if (line.blend[sel] == 0)
-						continue; // could be early return for pivot and sprite
-					z[x].src_blend = line.blend[sel];
-					z[x].dst_pal = 0;
-					break;
-				case 0b00: case 0b11: default: // opaque layer
-					if (line.blend[sel] + line.blend[2 + sel] == 0)
-						continue; // could be early return for pivot and sprite
-					z[x].src_blend = line.blend[sel];
-					z[x].dst_blend = line.blend[2 + sel];
-					pri[x].dst_prio = gfx->prio();
-					z[x].dst_pal = pal;
-					break;
-				}
-				pri[x].src_blendmode = gfx->blend_mask();
-
+				z[x].dst_pal = 0;
 				// only check prio here, to emulate priority conflict (dariusg and bubblem)
 				if (gfx->prio() > pri[x].src_prio) {
+					switch (gfx->blend_mask()) {
+					case 0b01: // normal blend
+						sel = 2 + sel;
+						[[fallthrough]];
+					case 0b10: // reverse blend
+						if (line.blend[sel] == 0)
+							continue; // could be early return for pivot and sprite
+						z[x].src_blend = line.blend[sel];
+						break;
+					case 0b00: case 0b11: default: // opaque layer
+						if (line.blend[sel] + line.blend[2 + sel] == 0)
+							continue; // could be early return for pivot and sprite
+						z[x].src_blend = line.blend[2 + sel];
+						z[x].dst_blend = line.blend[sel];
+						pri[x].dst_prio = gfx->prio();
+						z[x].dst_pal = pal;
+						break;
+					}
+					pri[x].src_blendmode = gfx->blend_mask();
+
 					z[x].src_pal = pal;
 					pri[x].src_prio = gfx->prio();
 				}
@@ -1065,8 +1063,8 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 		}
 	}
 
-	constexpr int DEBUG_X = 288 + 46;
-	constexpr int DEBUG_Y = 190 + 24;
+	constexpr int DEBUG_X = 50 + 46;
+	constexpr int DEBUG_Y = 180 + 24;
 	if (TAITOF3_VIDEO_DEBUG && line.y == DEBUG_Y) {
 		logerror("[%X] %s%d: %d,%d (%d)\n   {pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
 				 gfx->prio(), gfx->debug_name(), gfx->debug_index,
@@ -1145,11 +1143,11 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
 				   NUM_SPRITEGROUPS + NUM_PLAYFIELDS + 1> layers = {
-			&line_data.pivot,
+			&line_data.pivot, // this order seems ok for dariusg/gseeker/bubblem conflicts?
 			&line_data.sp[0], &line_data.pf[0],
-			&line_data.sp[1], &line_data.pf[1],
+			&line_data.sp[3], &line_data.pf[3],
 			&line_data.sp[2], &line_data.pf[2],
-			&line_data.sp[3], &line_data.pf[3]
+			&line_data.sp[1], &line_data.pf[1]
 		};
 		std::stable_sort(layers.begin(), layers.end(),
 						 [prio](auto a, auto b) {
@@ -1174,7 +1172,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 							 line_buf[180].src_pal, line_buf[180].dst_pal,
 							 line_buf[180].src_blend, line_buf[180].dst_blend,
 							 line_pri[180].src_prio, line_pri[180].dst_prio);
-					logerror("-' [%d,%d,%d,%d] '------------------------- 100\n", line_data.blend[0],
+					logerror("-' [%hhu,%hhu,%hhu,%hhu] '------------------------- 100\n", line_data.blend[0],
 							 line_data.blend[1], line_data.blend[2], line_data.blend[3]);
 				}
 			}
