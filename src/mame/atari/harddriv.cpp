@@ -1267,15 +1267,6 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("mainpcb:SW1")       /* 60c002 */
-	
-	 // Virtual DIP switches here
-	
-	PORT_DIPNAME( 0x100, 0x100, "Controller Type" )
-    PORT_DIPSETTING(    0x100, "Wheel" )
-    PORT_DIPSETTING(    0x000, "Joystick" )
-
-	// Hardware DIP switches continue here
-	
 	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1308,11 +1299,11 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 )  /* ??? */
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_TOGGLE  /* reverse */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )  /* ??? */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 )  /* ??? */
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )  /* wings */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )  /* wings */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 )  /* center edge on steering wheel */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
@@ -1339,11 +1330,8 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC.0")
-	PORT_BIT(0x3ff, 0x800, IPT_PADDLE) PORT_CONDITION("mainpcb:SW1", 0x100, EQUALS, 0x100) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(400) 	PORT_KEYDELTA(5) PORT_NAME("Steering Wheel *Toggle Analogue Joystick input in dip switch menu*")
-
-    PORT_BIT(0x3fe, 0x1FF, IPT_PADDLE) PORT_CONDITION("mainpcb:SW1", 0x100, EQUALS, 0x000) PORT_MINMAX(0x000, 0x3fe) PORT_SENSITIVITY(1) 	PORT_KEYDELTA(0) PORT_NAME("Analogue Joystick *Toggle Steering Wheel input in dip switch menu*")
-
+	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
+	PORT_BIT(0xfff, 0x280, IPT_PADDLE) PORT_MINMAX(0x000, 0x500) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")       /* FAKE */
@@ -1369,15 +1357,6 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("mainpcb:SW1")       /* 60c002 */
-	
-	 // Virtual DIP switches here
-	
-	PORT_DIPNAME( 0x100, 0x100, "Controller Type" )
-    PORT_DIPSETTING(    0x100, "Wheel" )
-    PORT_DIPSETTING(    0x000, "Joystick" )
-
-	// Hardware DIP switches continue here
-	
 	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1441,10 +1420,8 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
-	PORT_START("mainpcb:12BADC.0")
-	PORT_BIT(0x3ff, 0x800, IPT_PADDLE) PORT_CONDITION("mainpcb:SW1", 0x100, EQUALS, 0x100) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(400) 	PORT_KEYDELTA(5) PORT_NAME("Steering Wheel *Toggle Analogue Joystick input in dip switch menu*")
-
-    PORT_BIT(0x3fe, 0x1FF, IPT_PADDLE) PORT_CONDITION("mainpcb:SW1", 0x100, EQUALS, 0x000) PORT_MINMAX(0x000, 0x3fe) PORT_SENSITIVITY(1) 	PORT_KEYDELTA(0) PORT_NAME("Analogue Joystick *Toggle Steering Wheel input in dip switch menu*")
+	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
+	PORT_BIT(0xfff, 0x280, IPT_PADDLE) PORT_MINMAX(0x000, 0x500) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")
