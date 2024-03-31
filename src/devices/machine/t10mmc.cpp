@@ -576,6 +576,13 @@ void t10mmc::ExecCommand()
 		m_transfer_length = 0;
 		break;
 
+	case T10MMC_CMD_MECHANISM_STATUS:
+		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = get_u16be(&command[8]);
+		m_device->logerror("T10MMC: MECHANISM STATUS requested %d bytes\n", m_transfer_length);
+		break;
+
 	case T10MMC_CMD_READ_CD:
 	{
 		if (!m_image->exists())
@@ -885,6 +892,32 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 			}
 		}
 		break;
+
+	case T10MMC_CMD_MECHANISM_STATUS:
+	{
+		uint8_t status_header[8];
+		size_t transfer_len = get_u16be(&command[8]);
+
+		if (transfer_len == 0)
+			break;
+
+		std::fill_n(&data[0], transfer_len, 0);
+		std::fill(std::begin(status_header), std::end(status_header), 0);
+
+		put_u24be(&status_header[2], m_last_lba);
+
+		if (m_cdda->audio_active())
+		{
+			// cdrdao checks this flag after starting an audio track to play for 1 block to
+			// determine when it can read the sub q channel data when finding tracks and indexes
+			m_last_lba = m_cdda->get_audio_lba();
+			status_header[1] |= 1 << 5; // playing (audio or data) flag
+		}
+
+		std::copy_n(std::begin(status_header), std::min(std::size(status_header), transfer_len), &data[0]);
+
+		break;
+	}
 
 	case T10MMC_CMD_READ_CD:
 		//m_device->logerror("T10MMC: read CD %x dataLength lba=%x\n", dataLength, m_lba);
