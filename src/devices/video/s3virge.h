@@ -38,6 +38,9 @@ public:
 
 	void image_xfer(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
+		if (mem_mask != 0xffff'ffff)
+			logerror("Warning: image_xfer access with non-32 parallelism %08x & %08x\n", data, mem_mask);
+
 		m_xfer_fifo.enqueue(data);
 		//machine().scheduler().synchronize();
 	}

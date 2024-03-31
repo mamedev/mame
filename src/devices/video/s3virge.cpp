@@ -161,6 +161,8 @@ void s3virge_vga_device::s3d_reset()
 {
 	LOGFIFO("S3D Reset\n");
 	m_bitblt_fifo.clear();
+	m_xfer_fifo.clear();
+	s3virge.s3d.xfer_mode = false;
 	m_op_timer->adjust(attotime::never);
 
 	m_s3d_state = S3D_STATE_IDLE;
@@ -605,12 +607,34 @@ void s3virge_vga_device::command_dequeue(u8 op_type)
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
 
-			s3virge.s3d.xfer_mode = bool(BIT(s3virge.s3d.command, 7));
-			m_s3d_state = S3D_STATE_BITBLT;
-
 			LOGFIFO("Dequeued command %08x (%d free)\n", s3virge.s3d.command, 16 - (m_bitblt_fifo.queue_length() / 15));
 
-			LOGCMD("Started BitBLT command [%08x]\n", s3virge.s3d.command);
+			const u32 current_command = s3virge.s3d.command;
+
+			s3virge.s3d.xfer_mode = bool(BIT(current_command, 7));
+			m_s3d_state = S3D_STATE_BITBLT;
+
+			const u8 command_type = BIT(current_command, 27, 4);
+
+			// NOP disables autoexecute without executing a command
+			// win2k relies on this at explorer startup
+			if (command_type == 0xf)
+			{
+				LOGCMD("BitBLT NOP encountered\n");
+				m_bitblt_latch[11] &= ~1;
+				s3virge.s3d.xfer_mode = false;
+				command_finish();
+				return;
+			}
+			else
+			{
+				LOGCMD("Started BitBLT command [%08x type=%02x xfer_mode=%d]\n"
+					, s3virge.s3d.command
+					, command_type
+					, s3virge.s3d.xfer_mode
+				);
+			}
+
 			break;
 		}
 		default:
@@ -633,8 +657,9 @@ void s3virge_vga_device::command_finish()
 	{
 		m_s3d_state = S3D_STATE_COMMAND_RX;
 		const auto xfer_fifo = m_xfer_fifo.queue_length();
-		// NOTE: without flushing xfer FIFO GFXs will go awry in win98se
-		// i.e. when calling shutdown menu
+		// FIXME: without flushing xfer FIFO GFXs will go awry in win98se (i.e. when calling shutdown menu)
+		// root cause of this is also causing hangs in win2k when bringing up explorer window,
+		// possibly a command is misbehaving in size.
 		if (xfer_fifo)
 			LOGFIFO("Warning: non-empty xfer FIFO at command end (%lld)\n", xfer_fifo);
 		LOGFIFO("- state new command\n");
@@ -834,15 +859,6 @@ void s3virge_vga_device::bitblt_colour_step()
 	const bool mp = bool(BIT(current_command, 8));
 	const bool ids = bool(BIT(current_command, 7));
 	const bool de = bool(BIT(current_command, 5));
-	const u8 command_type = current_command >> 27;
-
-	// NOP disables autoexecute (is it supposed to not execute rest of command?)
-	if (command_type == 0xf)
-	{
-		m_bitblt_latch[11] &= ~1;
-		command_finish();
-		return;
-	}
 
 	uint32_t src = 0;
 	uint32_t dst = 0;
@@ -1024,15 +1040,6 @@ void s3virge_vga_device::bitblt_monosrc_step()
 	const bool ids = bool(BIT(current_command, 7));
 	const bool de = bool(BIT(current_command, 5));
 	const int align = (current_command & 0x000000c00) >> 10;
-	const u8 command_type = current_command >> 27;
-
-	// NOP disables autoexecute (is it supposed to not execute rest of command?)
-	if (command_type == 0xf)
-	{
-		m_bitblt_latch[11] &= ~1;
-		command_finish();
-		return;
-	}
 
 	uint32_t src = 0;
 	uint32_t dst = 0;
@@ -1255,7 +1262,10 @@ uint32_t s3virge_vga_device::s3d_sub_status_r()
 {
 	uint32_t res = 0x00000000;
 
+	// check for idle
 	res |= (m_s3d_state == S3D_STATE_IDLE) << 13;
+	//if (m_s3d_state == S3D_STATE_BITBLT && s3virge.s3d.xfer_mode == true && m_xfer_fifo.empty())
+	//	res |= 1 << 13;
 
 	//res |= (s3virge.s3d.cmd_fifo_slots_free << 8);
 	// NOTE: can actually be 24 FIFO depth with specific Scenic Mode
