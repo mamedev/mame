@@ -21,6 +21,7 @@
 #include "corestr.h"
 #include "multibyte.h"
 #include "osdfile.h"
+#include "path.h"
 #include "strformat.h"
 
 #include <cassert>
@@ -180,6 +181,9 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 			track.logframeofs = track.pregap;
 		}
 
+		if ((cdtoc.flags & CD_FLAG_MULTISESSION) && cdtrack_info.track[i].leadin != -1)
+			logofs += cdtrack_info.track[i].leadin;
+
 		track.physframeofs = physofs;
 		track.chdframeofs = 0;
 		track.logframeofs += logofs;
@@ -191,8 +195,13 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 		physofs += track.frames;
 		logofs  += track.frames;
 
+		if ((cdtoc.flags & CD_FLAG_MULTISESSION) && cdtrack_info.track[i].leadout != -1)
+			logofs += cdtrack_info.track[i].leadout;
+
 		if (EXTRA_VERBOSE)
-			printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n", i+1,
+			printf("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
+				track.session+1,
+				i+1,
 				track.trktype,
 				track.subtype,
 				track.datasize,
@@ -290,7 +299,9 @@ cdrom_file::cdrom_file(chd_file *_chd)
 		logofs  += track.frames;
 
 		if (EXTRA_VERBOSE)
-			printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n", i+1,
+			printf("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
+				track.session+1,
+				i+1,
 				track.trktype,
 				track.subtype,
 				track.datasize,
@@ -889,6 +900,8 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 	/* clear structures */
 	memset(&toc, 0, sizeof(toc));
 
+	toc.numsessions = 1;
+
 	/* start with no tracks */
 	for (toc.numtrks = 0; toc.numtrks < MAX_TRACKS; toc.numtrks++)
 	{
@@ -992,8 +1005,11 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 	auto *mrp = reinterpret_cast<uint32_t *>(&oldmetadata[0]);
 	toc.numtrks = *mrp++;
 
+	toc.numsessions = 1;
+
 	for (int i = 0; i < MAX_TRACKS; i++)
 	{
+		toc.tracks[i].session = 0;
 		toc.tracks[i].trktype = *mrp++;
 		toc.tracks[i].subtype = *mrp++;
 		toc.tracks[i].datasize = *mrp++;
@@ -1839,6 +1855,8 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 	memset(&outtoc, 0, sizeof(outtoc));
 	outinfo.reset();
 
+	outtoc.numsessions = 1;
+
 	// seek to 12 bytes before the end
 	fseek(infile, -12, SEEK_END);
 	fread(buffer, 12, 1, infile);
@@ -2021,6 +2039,7 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 
 
 	outtoc.numtrks = 1;
+	outtoc.numsessions = 1;
 
 	outinfo.track[0].fname = tocfname;
 	outinfo.track[0].offset = 0;
@@ -2193,6 +2212,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 
 	/* store the number of tracks found */
 	outtoc.numtrks = numtracks;
+	outtoc.numsessions = 1;
 
 	return std::error_condition();
 }
@@ -2219,13 +2239,15 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 
 std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo)
 {
-	int i, trknum;
+	int i, trknum, sessionnum, session_pregap;
 	char token[512];
 	std::string lastfname;
 	uint32_t wavlen, wavoffs;
 	std::string path = std::string(tocfname);
 	const bool is_gdrom = is_gdicue(tocfname);
 	enum gdi_area current_area = SINGLE_DENSITY;
+	bool is_multibin = false;
+	int leadin = -1;
 
 	FILE *infile = fopen(path.c_str(), "rt");
 	if (!infile)
@@ -2241,6 +2263,8 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 	trknum = -1;
 	wavoffs = wavlen = 0;
+	sessionnum = 0;
+	session_pregap = 0;
 
 	if (is_gdrom)
 	{
@@ -2265,13 +2289,65 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 			if (!strcmp(token, "REM"))
 			{
-				/* TODO: sessions are notated using REM commands: "REM SESSION 01" */
-
 				/* skip to actual data of REM command */
 				while (i < std::size(linebuffer) && isspace((uint8_t)linebuffer[i]))
 					i++;
 
-				if (is_gdrom && !strncmp(linebuffer+i, "SINGLE-DENSITY AREA", 19))
+				if (!strncmp(linebuffer+i, "SESSION", 7))
+				{
+					/* IsoBuster extension */
+					TOKENIZE
+
+					/* get the session number */
+					TOKENIZE
+
+					sessionnum = strtoul(token, nullptr, 10) - 1;
+
+					if (sessionnum >= 1) /* don't consider it a multisession CD unless there's actually more than 1 session */
+						outtoc.flags |= CD_FLAG_MULTISESSION;
+				}
+				else if ((outtoc.flags & CD_FLAG_MULTISESSION) && !strncmp(linebuffer+i, "PREGAP", 6))
+				{
+					/*
+					Redump extension? PREGAP associated with the session instead of the track
+
+					DiscImageCreator - Older versions would write a bogus value here (and maybe session lead-in and lead-out).
+					These should be considered bad dumps and will not be supported.
+					*/
+					TOKENIZE
+
+					/* get pregap time */
+					TOKENIZE
+					session_pregap = msf_to_frames( token );
+				}
+				else if (!strncmp(linebuffer+i, "LEAD-OUT", 8))
+				{
+					/*
+					IsoBuster and ImgBurn (single bin file) - Lead-out time is the start of the lead-out
+					lead-out time - MSF of last track of session = size of last track
+
+					Redump and DiscImageCreator (multiple bins) - Lead-out time is the duration of just the lead-out
+					*/
+					TOKENIZE
+
+					/* get lead-out time */
+					TOKENIZE
+					int leadout_offset = msf_to_frames( token );
+					outinfo.track[trknum].leadout = leadout_offset;
+				}
+				else if (!strncmp(linebuffer+i, "LEAD-IN", 7))
+				{
+					/*
+					IsoBuster and ImgBurn (single bin file) - Not used?
+					Redump and DiscImageCreator (multiple bins) - Lead-in time is the duration of just the lead-in
+					*/
+					TOKENIZE
+
+					/* get lead-in time */
+					TOKENIZE
+					leadin = msf_to_frames( token );
+				}
+				else if (is_gdrom && !strncmp(linebuffer+i, "SINGLE-DENSITY AREA", 19))
 				{
 					/* single-density area starts LBA = 0 */
 					current_area = SINGLE_DENSITY;
@@ -2288,7 +2364,10 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				TOKENIZE
 
 				/* keep the filename */
+				std::string prevfname = lastfname;
 				lastfname.assign(path).append(token);
+				if (prevfname.length() > 0 && lastfname.compare(prevfname) != 0)
+					is_multibin = true;
 
 				/* get the file type */
 				TOKENIZE
@@ -2327,6 +2406,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				/* next token on the line is the track type */
 				TOKENIZE
 
+				outtoc.tracks[trknum].session = sessionnum;
 				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc.tracks[trknum].subsize = 0;
 				outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
@@ -2336,6 +2416,24 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				outtoc.tracks[trknum].multicuearea = is_gdrom ? current_area : 0;
 				outinfo.track[trknum].offset = 0;
 				std::fill(std::begin(outinfo.track[trknum].idx), std::end(outinfo.track[trknum].idx), -1);
+
+				outinfo.track[trknum].leadout = -1;
+				outinfo.track[trknum].leadin = leadin; /* use previously saved lead-in value */
+				leadin = -1;
+
+				if (session_pregap != 0)
+				{
+					/*
+					associated the pregap from the session transition with the lead-in to simplify things for now.
+					setting it as the proper pregap for the track causes logframeofs of the last dummy entry in the TOC
+					to become 2s later than it should. this might be an issue with how pgdatasize = 0 pregaps are handled.
+					*/
+					if (outinfo.track[trknum].leadin == -1)
+						outinfo.track[trknum].leadin = session_pregap;
+					else
+						outinfo.track[trknum].leadin += session_pregap;
+					session_pregap = 0;
+				}
 
 				if (wavlen != 0)
 				{
@@ -2455,6 +2553,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 	/* store the number of tracks found */
 	outtoc.numtrks = trknum + 1;
+	outtoc.numsessions = sessionnum + 1;
 
 	/* now go over the files again and set the lengths */
 	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
@@ -2521,6 +2620,62 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			outtoc.tracks[trknum].frames = tlen / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 			outinfo.track[trknum].offset = 0;
 		}
+
+		if (outtoc.flags & CD_FLAG_MULTISESSION)
+		{
+			if (is_multibin)
+			{
+				if (outinfo.track[trknum].leadout == -1 && trknum + 1 < outtoc.numtrks && outtoc.tracks[trknum].session != outtoc.tracks[trknum+1].session)
+				{
+					/* add a standard lead-out to the last track before changing sessions */
+					outinfo.track[trknum].leadout = outtoc.tracks[trknum].session == 0 ? 6750 : 2250; /* first session lead-out (1m30s0f) is longer than the rest (0m30s0f) */
+				}
+
+				if (outinfo.track[trknum].leadin == -1 && trknum > 0 && outtoc.tracks[trknum].session != outtoc.tracks[trknum-1].session)
+				{
+					/* add a standard lead-in to the first track of a new session */
+					outinfo.track[trknum].leadin = 4500; /* lead-in (1m0s0f) */
+				}
+			}
+			else
+			{
+				if (outinfo.track[trknum].leadout != -1)
+				{
+					/*
+					if a lead-out time is specified in a multisession CD then the size of the previous track needs to be trimmed
+					to use the lead-out time instead of the idx 0 of the next track
+					*/
+					const int endframes = outinfo.track[trknum].leadout - outinfo.track[trknum].idx[0];
+					if (outtoc.tracks[trknum].frames >= endframes)
+					{
+						outtoc.tracks[trknum].frames = endframes; /* trim track length */
+
+						if (trknum + 1 < outtoc.numtrks)
+						{
+							/* lead-out value becomes just the duration between the lead-out to the pre-gap of the next track */
+							outinfo.track[trknum].leadout = outinfo.track[trknum+1].idx[0] - outinfo.track[trknum].leadout;
+						}
+					}
+				}
+
+				if (trknum > 0 && outinfo.track[trknum-1].leadout != -1)
+				{
+					/*
+					ImgBurn bin/cue have dummy data to pad between the lead-out and the start of the next track.
+					DiscImageCreator img/cue does not have any data between the lead-out and the start of the next track.
+
+					Detecting by extension is an awful way to handle this but there's no other way to determine what format
+					the data will be in since we don't know the exact length of the last track just from the cue.
+					*/
+					if (!core_filename_ends_with(outinfo.track[trknum-1].fname, ".img"))
+					{
+						outtoc.tracks[trknum-1].padframes += outinfo.track[trknum-1].leadout;
+						outtoc.tracks[trknum].frames -= outinfo.track[trknum-1].leadout;
+						outinfo.track[trknum].offset += outinfo.track[trknum-1].leadout * (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+					}
+				}
+			}
+		}
 	}
 
 	if (is_gdrom)
@@ -2566,7 +2721,8 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	if (EXTRA_VERBOSE)
 		for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 		{
-			printf("trk %d: %d frames @ offset %d, pad=%d, split=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, pgdatasize=%d, idx0=%d, idx1=%d, dataframes=%d\n",
+			printf("session %d trk %d: %d frames @ offset %d, pad=%d, split=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, pgdatasize=%d, idx0=%d, idx1=%d, dataframes=%d\n",
+				outtoc.tracks[trknum].session+1,
 				trknum+1,
 				outtoc.tracks[trknum].frames,
 				outinfo.track[trknum].offset,
@@ -2847,6 +3003,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 
 	/* store the number of tracks found */
 	outtoc.numtrks = trknum + 1;
+	outtoc.numsessions = 1;
 
 	return std::error_condition();
 }

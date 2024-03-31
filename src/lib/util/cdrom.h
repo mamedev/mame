@@ -54,8 +54,9 @@ public:
 
 	enum
 	{
-		CD_FLAG_GDROM   = 0x00000001,  // disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
-		CD_FLAG_GDROMLE = 0x00000002  // legacy GD-ROM, with little-endian CDDA data
+		CD_FLAG_GDROM        = 0x00000001,  // disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
+		CD_FLAG_GDROMLE      = 0x00000002,  // legacy GD-ROM, with little-endian CDDA data
+		CD_FLAG_MULTISESSION = 0x00000004,  // multisession CD-ROM
 	};
 
 	enum
@@ -89,6 +90,7 @@ public:
 		uint32_t pgdatasize;    /* size of data in each sector of the pregap */
 		uint32_t pgsubsize;     /* size of subchannel data in each sector of the pregap */
 		uint32_t control_flags; /* metadata flags associated with each track */
+		uint32_t session;       /* session number */
 
 		/* fields used in CHDMAN only */
 		uint32_t padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
@@ -108,6 +110,7 @@ public:
 	struct toc
 	{
 		uint32_t numtrks;     /* number of tracks */
+		uint32_t numsessions; /* number of sessions */
 		uint32_t flags;       /* see FLAG_ above */
 		track_info tracks[MAX_TRACKS + 1];
 	};
@@ -115,12 +118,13 @@ public:
 	struct track_input_entry
 	{
 		track_input_entry() { reset(); }
-		void reset() { fname.clear(); offset = 0; swap = false; std::fill(std::begin(idx), std::end(idx), -1); }
+		void reset() { fname.clear(); offset = 0; leadin = leadout = -1; swap = false; std::fill(std::begin(idx), std::end(idx), -1); }
 
 		std::string fname;      // filename for each track
 		uint32_t offset;      // offset in the data file for each track
 		bool swap;          // data needs to be byte swapped
 		int32_t idx[MAX_INDEX + 1];
+		int32_t leadin, leadout; // TODO: these should probably be their own tracks entirely
 	};
 
 	struct track_input_info
@@ -153,6 +157,7 @@ public:
 	static std::error_condition parse_cue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	static bool is_gdicue(std::string_view tocfname);
 	static std::error_condition parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	int get_last_session() const { return cdtoc.numsessions ? cdtoc.numsessions : 1; }
 	int get_last_track() const { return cdtoc.numtrks; }
 	int get_adr_control(int track) const {
 		if (track == 0xaa)
