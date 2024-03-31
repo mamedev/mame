@@ -112,11 +112,7 @@ private:
 	required_device<ram_device> m_buffer_ram;
 
 	// Link to the attached floppy drives
-	required_device<floppy_connector> m_flopcon0;
-	required_device<floppy_connector> m_flopcon1;
-	required_device<floppy_connector> m_flopcon2;
-	required_device<floppy_connector> m_flopcon3;
-	floppy_image_device*    m_floppy[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Currently selected floppy drive (1-4, 0=none)
 	int m_sel_floppy;

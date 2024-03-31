@@ -89,11 +89,7 @@ protected:
 	void operate_ready_line();
 
 	// Link to the attached floppy drives
-	required_device<floppy_connector> m_flopcon0;
-	required_device<floppy_connector> m_flopcon1;
-	required_device<floppy_connector> m_flopcon2;
-	required_device<floppy_connector> m_flopcon3;	
-	floppy_image_device*    m_floppy[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Motor monoflop
 	required_device<ttl74123_device> m_motormf;

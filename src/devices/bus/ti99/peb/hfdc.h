@@ -99,17 +99,10 @@ private:
 	required_device<mm58274c_device> m_clock;
 
 	// Link to the attached floppy drives
-	required_device<floppy_connector> m_flopcon0;
-	required_device<floppy_connector> m_flopcon1;
-	required_device<floppy_connector> m_flopcon2;
-	required_device<floppy_connector> m_flopcon3;
-	floppy_image_device*    m_floppy_unit[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Link to the attached hard disks
-	required_device<mfm_harddisk_connector> m_hardcon0;
-	required_device<mfm_harddisk_connector> m_hardcon1;
-	required_device<mfm_harddisk_connector> m_hardcon2;
-	mfm_harddisk_device*    m_harddisk_unit[3];
+	required_device_array<mfm_harddisk_connector, 3> m_harddisk;
 
 	// Currently selected floppy drive
 	floppy_image_device*    m_current_floppy;

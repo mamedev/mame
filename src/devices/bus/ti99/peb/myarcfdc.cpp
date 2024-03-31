@@ -64,10 +64,7 @@ myarc_fdc_device::myarc_fdc_device(const machine_config &mconfig, const char *ta
 	  m_buffer_ram(*this, BUFFER_TAG),
 	  m_pal(*this, PAL_TAG),
 	  m_dsrrom(nullptr),
-	  m_flopcon0(*this, "0"),
-	  m_flopcon1(*this, "1"),
-	  m_flopcon2(*this, "2"),	
-	  m_flopcon3(*this, "3"),
+	  m_floppy(*this, "%u", 0),
 	  m_banksel(false),
 	  m_cardsel(false),
 	  m_selected_drive(0),
@@ -278,8 +275,8 @@ void myarc_fdc_device::fdc_mon_w(int state)
 	// Do not start the motors when no drive is selected. However, motors
 	// can always be stopped.
 	if (m_selected_drive != 0 || state==1)
-		for (int i = 0; i < 4; i++)
-			if (m_floppy[i] != nullptr) m_floppy[i]->mon_w(state);
+		for (auto &flop : m_floppy)
+			if (flop->get_device() != nullptr) flop->get_device()->mon_w(state);
 }
 
 /*
@@ -303,7 +300,7 @@ void myarc_fdc_device::sidsel_w(int state)
 	if (m_selected_drive != 0)
 	{
 		LOGMASKED(LOG_DRIVE, "Set side = %d on DSK%d\n", state, m_selected_drive);
-		m_floppy[m_selected_drive-1]->ss_w(state);
+		m_floppy[m_selected_drive-1]->get_device()->ss_w(state);
 	}
 }
 
@@ -339,12 +336,12 @@ void myarc_fdc_device::drivesel_w(int state)
 	}
 	else
 	{
-		if (m_floppy[driveno-1] != nullptr)
+		if (m_floppy[driveno-1]->get_device() != nullptr)
 		{
 			m_selected_drive = driveno;
 			LOGMASKED(LOG_DRIVE, "Select drive DSK%d\n", driveno);
-			m_wdc->set_floppy(m_floppy[driveno-1]);
-			m_floppy[driveno-1]->ss_w(m_drivelatch->q2_r());
+			m_wdc->set_floppy(m_floppy[driveno-1]->get_device());
+			m_floppy[driveno-1]->get_device()->ss_w(m_drivelatch->q2_r());
 		}
 	}
 }
@@ -360,17 +357,12 @@ void myarc_fdc_device::device_start()
 
 void myarc_fdc_device::device_reset()
 {
-	m_floppy[0] = m_flopcon0->get_device();
-	m_floppy[1] = m_flopcon1->get_device();
-	m_floppy[2] = m_flopcon2->get_device();
-	m_floppy[3] = m_flopcon3->get_device();
-
-	for (int i=0; i < 4; i++)
+	for (auto &flop : m_floppy)
 	{
-		if (m_floppy[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", i, m_floppy[i]->name());
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", flop->basetag(), flop->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", i);
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
 	
 	if (ioport("CONTROLLER")->read()==0)
@@ -467,10 +459,10 @@ void myarc_fdc_device::device_add_mconfig(machine_config& config)
 	DDCC1_PAL(config, PAL_TAG, 0);
 
 	// Floppy drives
-	FLOPPY_CONNECTOR(config, "0", myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "3", myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
 }
 
 ioport_constructor myarc_fdc_device::device_input_ports() const
