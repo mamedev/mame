@@ -1337,15 +1337,15 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="msxaudse">
-		<description>MSX Audio Series Score Editor (Japan)</description>
+		<description>Score Editor (Japan)</description>
 		<year>1987</year>
 		<publisher>Toshiba-EMI Ltd.</publisher>
-		<info name="alt_title" value="ＭＳＸ－Ａｕｄｉｏシリーズスコアエディタ"/>
+		<info name="alt_title" value="ズスコアエディタ"/>
 		<info name="serial" value="PS-3009S"/>
 		<info name="barcode" value="4988006014817"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
-				<rom name="msx audio series score editor - toshiba-emi.dsk" size="368640" crc="db18b408" sha1="25f1650f78e0842599d2adf730864dbec5281107"/>
+				<rom name="score editor - toshiba-emi.dsk" size="368640" crc="db18b408" sha1="25f1650f78e0842599d2adf730864dbec5281107"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1475,7 +1475,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="kanjukut">
-		<description>Nihongo Waupuro Kan Juku Tomato (Japan)</description>
+		<description>Nihongo Waupuro Kan-juku Tomato (Japan)</description>
 		<year>1985</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="日本語ワープロ漢熟トマト"/>
@@ -1485,13 +1485,13 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Program Disk - ブログラムディスク"/>
 			<dataarea name="flop" size="737280">
 				<!-- According to generation-msx this was released on a single sided floppy -->
-				<rom name="nihongo waupuro kan juku tomato - sony (program disk).dsk" size="737280" crc="69099c1f" sha1="fe7aa0f89e7892820634d9d4deceee483d79747c" status="baddump"/>
+				<rom name="nihongo waupuro kan-juku tomato - sony (program disk).dsk" size="737280" crc="69099c1f" sha1="fe7aa0f89e7892820634d9d4deceee483d79747c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Bunreishuu - 文例集"/>
 			<dataarea name="flop" size="368640">
-				<rom name="nihongo waupuro kan juku tomato - sony (bunreishuu).dsk" size="368640" crc="9a36f990" sha1="aa8512a2c8759588c2caa5862aec9164028d60ea"/>
+				<rom name="nihongo waupuro kan-juku tomato - sony (bunreishuu).dsk" size="368640" crc="9a36f990" sha1="aa8512a2c8759588c2caa5862aec9164028d60ea"/>
 			</dataarea>
 		</part>
 	</software>
