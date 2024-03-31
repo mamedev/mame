@@ -11550,7 +11550,8 @@ ROM_END
     "Radio Shack-12", but there's no title prefix on the box.
   - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU,
     see hh_cop400.cpp driver
-  - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2495, 28-pin Motorola
+    LSC417570DW, 6805 family or custom?
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 

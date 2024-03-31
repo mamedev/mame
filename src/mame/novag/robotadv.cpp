@@ -40,7 +40,6 @@ TODO:
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/sn76496.h"
 #include "video/pwm.h"
 
@@ -92,6 +91,7 @@ private:
 	s32 m_counter[4] = { };
 	attotime m_pwm_accum[4];
 	attotime m_pwm_last;
+	emu_timer *m_refresh_timer;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -103,10 +103,9 @@ private:
 	u8 input_r();
 	u8 counters_r();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(refresh_timer) { refresh(); }
 	void init_board(u8 data);
 	void clear_board(u8 data);
-	void refresh();
+	void refresh(s32 param = 0);
 	void update_counters();
 	void update_limits();
 	void update_clawpos(double *x, double *y);
@@ -121,6 +120,8 @@ private:
 
 void robotadv_state::machine_start()
 {
+	m_refresh_timer = timer_alloc(FUNC(robotadv_state::refresh), this);
+
 	// resolve outputs
 	m_piece_hand.resolve();
 	m_out_motor.resolve();
@@ -321,7 +322,7 @@ void robotadv_state::update_piece(double x, double y)
 	}
 }
 
-void robotadv_state::refresh()
+void robotadv_state::refresh(s32 param)
 {
 	if (machine().side_effects_disabled())
 		return;
@@ -342,6 +343,8 @@ void robotadv_state::refresh()
 	const int open = (m_limits & 1) ? 0x800 : 0; // put open state on x bit 11
 	m_out_pos[0] = int((x + 15.0) * 50.0 + 0.5) | open;
 	m_out_pos[1] = int((y + 15.0) * 50.0 + 0.5);
+
+	m_refresh_timer->adjust(attotime::from_hz(60));
 }
 
 
@@ -523,8 +526,6 @@ void robotadv_state::robotadv(machine_config &config)
 	auto &irq_clock(CLOCK(config, "irq_clock", 1200)); // approximation, from 555 timer with VR
 	irq_clock.set_pulse_width(attotime::from_usec(10)); // guessed
 	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	TIMER(config, "refresh_timer").configure_periodic(FUNC(robotadv_state::refresh_timer), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
