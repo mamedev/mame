@@ -6,7 +6,7 @@ Excalibur Mirage
 
 It's Excalibur's first chess computer, and also Ron Nelson's official return to
 chess programming. The x/y motorized magnet is similar to the one used in
-Fidelity Phantom (and Milton Bradley Phantom before that).
+Fidelity Phantom (and Milton Bradley Grand·Master before that).
 
 Before moving a piece, wait until the computer is done with its own move. After
 capturing a piece, select the captured piece from the MAME sensorboard spawn
@@ -256,7 +256,7 @@ void mirage_state::realign_magnet_pos()
 			m_motor_pos[i] += inc * 4;
 			m_motor_drift[i] -= inc;
 
-			logerror("motor %C drift error (%d total)\n", 'X' + i, m_motor_drift[i]);
+			logerror("motor %c drift error (%d total)\n", 'X' + i, m_motor_drift[i]);
 		}
 	}
 }
