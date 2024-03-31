@@ -388,7 +388,7 @@ Known undumped:
 	</software>
 
 	<software name="hoippuru" supported="no">
-		<description>Mahouno Kunino Hoippuru (Japan)</description>
+		<description>Mahou no Kuni no Hoippuru (Japan)</description>
 		<year>1996</year>
 		<publisher>Pastel Hope</publisher>
 		<info name="alt_title" value="魔法の国のほいっぷる"/>
@@ -411,7 +411,7 @@ Known undumped:
 	</software>
 
 	<software name="mejuusa" supported="no">
-		<description>Me-yuu Isago - Mejuusa (Japan)</description>
+		<description>Mejuu Isago - Medusa (Japan)</description>
 		<year>1994</year>
 		<publisher>Blue Eyes</publisher>
 		<info name="alt_title" value="眼獣・沙 ~メジューサ~"/>
