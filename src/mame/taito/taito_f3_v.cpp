@@ -972,6 +972,7 @@ taito_f3_state::calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES],
 
 static int mosaic(int x, u8 sample) {
 	int x_count = (x - 46 + 114);
+	// hw quirk: the counter resets 2 px from the right edge...
 	x_count = x_count >= 432 ? x_count - 432 : x_count;
 	return x - (x_count % sample);
 }
