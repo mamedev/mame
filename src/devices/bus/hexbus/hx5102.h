@@ -38,7 +38,7 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -48,8 +48,8 @@ protected:
 	void board_reset(int state);
 	static void floppy_formats(format_registration &fr);
 
-	void device_start() override;
-	void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void hexbus_value_changed(uint8_t data) override;
 
 private:

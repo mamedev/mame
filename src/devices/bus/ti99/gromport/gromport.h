@@ -59,10 +59,10 @@ public:
 	gromport_device& extend() { m_mask = 0x3fff; return *this; }
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_config_complete() override;
-	ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	cartridge_connector_device*    m_connector;
