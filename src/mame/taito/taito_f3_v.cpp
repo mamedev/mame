@@ -1014,41 +1014,41 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 		if (flags && !(flags[gfx_x] & 0xf0))
 			continue;
 
-		if (gfx->prio() >= pri[x].src_prio) {
+		if (gfx->prio() > pri[x].src_prio) {
 			// submit src pix
 			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
 				u8 sel = gfx->blend_select(flags, gfx_x);
-				z[x].dst_pal = 0;
-				// only check prio here, to emulate priority conflict (dariusg and bubblem)
-				if (gfx->prio() > pri[x].src_prio) {
-					switch (gfx->blend_mask()) {
-					case 0b01: // normal blend
-						sel = 2 + sel;
-						[[fallthrough]];
-					case 0b10: // reverse blend
-						if (line.blend[sel] == 0)
-							continue; // could be early return for pivot and sprite
-						z[x].src_blend = line.blend[sel];
-						break;
-					case 0b00: case 0b11: default: // opaque layer
-						if (line.blend[sel] + line.blend[2 + sel] == 0)
-							continue; // could be early return for pivot and sprite
-						z[x].src_blend = line.blend[2 + sel];
-						z[x].dst_blend = line.blend[sel];
-						pri[x].dst_prio = gfx->prio();
-						z[x].dst_pal = pal;
-						break;
-					}
-					pri[x].src_blendmode = gfx->blend_mask();
 
-					z[x].src_pal = pal;
-					pri[x].src_prio = gfx->prio();
+				switch (gfx->blend_mask()) {
+				case 0b01: // normal blend
+					sel = 2 + sel;
+					[[fallthrough]];
+				case 0b10: // reverse blend
+					if (line.blend[sel] == 0)
+						continue; // could be early return for pivot and sprite
+					z[x].src_blend = line.blend[sel];
+					break;
+				case 0b00: case 0b11: default: // opaque layer
+					if (line.blend[sel] + line.blend[2 + sel] == 0)
+						continue; // could be early return for pivot and sprite
+					z[x].src_blend = line.blend[2 + sel];
+					z[x].dst_blend = line.blend[sel];
+					pri[x].dst_prio = gfx->prio();
+					z[x].dst_pal = pal;
+					break;
 				}
+				pri[x].src_blendmode = gfx->blend_mask();
+
+				z[x].src_pal = pal;
+				pri[x].src_prio = gfx->prio();
 			}
-		} else if (gfx->prio() > pri[x].dst_prio) {
+		} else if (gfx->prio() >= pri[x].dst_prio) {
 			// submit dest pix
 			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
-				z[x].dst_pal = pal;
+				if (gfx->prio() != pri[x].dst_prio)
+					z[x].dst_pal = pal;
+				else // prio conflict = color line conflict? (dariusg, bubblem)
+					z[x].dst_pal = 0;
 				pri[x].dst_prio = gfx->prio();
 				const bool sel = gfx->blend_select(flags, gfx_x);
 				switch (pri[x].src_blendmode) {
