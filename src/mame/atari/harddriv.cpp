@@ -322,6 +322,13 @@ Notes:
       68010 clock input - 8.000MHz [32/4]
       34010 clock input - 48.000MHz
 
+      strtdriv brake calibration doesn't work properly.  You need to have
+      the brake fully depressed when it says to "TAKE YOUR HANDS AND FEET
+      OFF ALL CONTROLS" and "TAKE YOUR FOOT OFF THE BRAKE".  When it says
+      "NOW STEP ON THE BRAKE FIRMLY AND RELEASE" you need to release the
+      brake and then press it again.  If you abort the calibration, the
+      defaults will work anyway.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -1313,7 +1320,7 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - brake */
-	PORT_BIT( 0xff, 0x20, IPT_PEDAL2 ) PORT_MINMAX(0x20, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_NAME("Brake") PORT_REVERSE
+	PORT_BIT( 0xff, 0x20, IPT_PEDAL2 ) PORT_MINMAX(0x20, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_NAME("Brake")
 
 	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - volume */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
@@ -1421,7 +1428,7 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT(0xfff, 0x200, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT(0xfff, 0x200, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")

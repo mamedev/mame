@@ -411,23 +411,23 @@ Known undumped:
 	</software>
 
 	<software name="mejuusa" supported="no">
-		<description>Mejuu Isago - Medusa (Japan)</description>
+		<description>Mejuu Sa - Medusa (Japan)</description>
 		<year>1994</year>
 		<publisher>Blue Eyes</publisher>
 		<info name="alt_title" value="眼獣・沙 ~メジューサ~"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="me-yuu isago - mejuusa - blue eyes (disk 1).dsk" size="737280" crc="ac934e71" sha1="2b05d80ce3b23cdda12104a589f463fa69bfad20"/>
+				<rom name="mejuu sa - medusa - blue eyes (disk 1).dsk" size="737280" crc="ac934e71" sha1="2b05d80ce3b23cdda12104a589f463fa69bfad20"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="me-yuu isago - mejuusa - blue eyes (disk 2).dsk" size="737280" crc="eb55bb2b" sha1="f771ae808d733a5faeeed60337cea8a6855203ae"/>
+				<rom name="mejuu sa - medusa - blue eyes (disk 2).dsk" size="737280" crc="eb55bb2b" sha1="f771ae808d733a5faeeed60337cea8a6855203ae"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="me-yuu isago - mejuusa - blue eyes (disk 3).dsk" size="737280" crc="098dc8bb" sha1="a943977a9e9ad27d1f72fd2a1a0f43ecd6838bf1"/>
+				<rom name="mejuu sa - medusa - blue eyes (disk 3).dsk" size="737280" crc="098dc8bb" sha1="a943977a9e9ad27d1f72fd2a1a0f43ecd6838bf1"/>
 			</dataarea>
 		</part>
 	</software>
