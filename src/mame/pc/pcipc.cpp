@@ -40,6 +40,8 @@
 #include "machine/pci-ide.h"
 #include "machine/w83977tf.h"
 
+#include "softlist_dev.h"
+
 // enable ISA verbose messaging at I/O $80
 // NOTE: xubuntu 6.10 will ping the port a lot once it gets to GNOME.
 #define VERBOSE_ISA_DEBUG 0
@@ -65,6 +67,9 @@ public:
 	void pciagp(machine_config &config);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
+
+protected:
+	void x86_softlists(machine_config &config);
 
 private:
 	void pcipc_map(address_map &map);
@@ -556,6 +561,16 @@ void pcipc_state::pcipc_map_io(address_map &map)
 	map.unmap_value_high();
 }
 
+void pcipc_state::x86_softlists(machine_config &config)
+{
+	/* software lists */
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+}
+
 void pcipc_state::pcipc(machine_config &config)
 {
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 90000000));
@@ -602,6 +617,8 @@ void pcipc_state::pcipc(machine_config &config)
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
 
 	//  SW1000XG(config, "pci:11.0");
+
+	x86_softlists(config);
 }
 
 void pcipc_state::pcipcs7(machine_config &config)
@@ -630,6 +647,8 @@ void pcipc_state::pcipctx(machine_config &config)
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w");
+
+	x86_softlists(config);
 }
 
 void pcipc_state::pciagp(machine_config &config)
@@ -686,6 +705,8 @@ void pcipc_state::pciagp(machine_config &config)
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, nullptr);
+
+	x86_softlists(config);
 }
 
 ROM_START(pcipc)
