@@ -78,10 +78,7 @@ corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_typ
 	  m_wdc(*this, WDC_TAG),
 	  m_decpal(*this, dpname),
 	  m_ctrlpal(*this, cpname),
-	  m_flopcon0(*this, "0"),
-	  m_flopcon1(*this, "1"),
-	  m_flopcon2(*this, "2"),
-	  m_flopcon3(*this, "3"),
+	  m_floppy(*this, "%u", 0),
 	  m_motormf(*this, MOTORMF_TAG),
 	  m_tms9901(*this, TMS9901_TAG),
 	  m_buffer_ram(*this, BUFFER),
@@ -367,10 +364,10 @@ void corcomp_fdc_device::select_dsk(int state)
 		}
 		LOGMASKED(LOG_DRIVE, "Select drive DSK%d\n", m_selected_drive);
 
-		if (m_floppy[m_selected_drive-1] != nullptr)
+		if (m_floppy[m_selected_drive-1]->get_device() != nullptr)
 		{
-			m_wdc->set_floppy(m_floppy[m_selected_drive-1]);
-			m_floppy[m_selected_drive-1]->ss_w(m_tms9901->read_bit(tms9901_device::INT15_P7));
+			m_wdc->set_floppy(m_floppy[m_selected_drive-1]->get_device());
+			m_floppy[m_selected_drive-1]->get_device()->ss_w(m_tms9901->read_bit(tms9901_device::INT15_P7));
 		}
 	}
 }
@@ -381,7 +378,7 @@ void corcomp_fdc_device::side_select(int state)
 	if (m_selected_drive != 0)
 	{
 		LOGMASKED(LOG_DRIVE, "Set side (bit 7) = %d on DSK%d\n", state, m_selected_drive);
-		m_floppy[m_selected_drive-1]->ss_w(state);
+		m_floppy[m_selected_drive-1]->get_device()->ss_w(state);
 	}
 }
 
@@ -394,8 +391,10 @@ void corcomp_fdc_device::motor_w(int state)
 	m_wdc->set_force_ready(state==ASSERT_LINE);
 
 	// Set all motors
-	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
+	for (auto &elem : m_floppy)
+		if (elem->get_device() != nullptr)
+			elem->get_device()->mon_w((state==ASSERT_LINE)? 0 : 1);
+
 	operate_ready_line();
 }
 
@@ -430,17 +429,12 @@ void corcomp_fdc_device::device_start()
 
 void corcomp_fdc_device::device_reset()
 {
-	m_floppy[0] = m_flopcon0->get_device();
-	m_floppy[1] = m_flopcon1->get_device();
-	m_floppy[2] = m_flopcon2->get_device();
-	m_floppy[3] = m_flopcon3->get_device();
-
-	for (int i=0; i < 4; i++)
+	for (auto &flop : m_floppy)
 	{
-		if (m_floppy[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", i, m_floppy[i]->name());
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", flop->basetag(), flop->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", i);
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
 
 	m_decpal->set_board(this);
@@ -530,10 +524,10 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_motormf->set_clear_pin_value(1);
 	m_motormf->out_cb().set(FUNC(corcomp_fdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, "0", ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "3", ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
 
 	// SRAM 2114 1Kx4
 	RAM(config, BUFFER).set_default_size("1k").set_default_value(0);

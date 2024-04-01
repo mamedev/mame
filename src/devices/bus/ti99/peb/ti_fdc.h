@@ -104,10 +104,7 @@ private:
 	uint8_t*  m_dsrrom;
 
 	// Link to the attached floppy drives
-	required_device<floppy_connector> m_flopcon0;
-	required_device<floppy_connector> m_flopcon1;
-	required_device<floppy_connector> m_flopcon2;
-	floppy_image_device*    m_floppy[3];
+	required_device_array<floppy_connector, 3> m_floppy;
 	
 	// Currently selected floppy drive
 	int  m_sel_floppy;

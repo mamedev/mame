@@ -85,11 +85,7 @@ private:
 	uint8_t* m_dsrrom;
 
 	// Link to the attached floppy drives
-	required_device<floppy_connector> m_flopcon0;
-	required_device<floppy_connector> m_flopcon1;
-	required_device<floppy_connector> m_flopcon2;
-	required_device<floppy_connector> m_flopcon3;
-	floppy_image_device*    m_floppy[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Debugger accessors
 	void debug_read(offs_t offset, uint8_t* value);

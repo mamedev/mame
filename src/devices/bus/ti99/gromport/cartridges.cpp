@@ -386,6 +386,19 @@ void ti99_cartridge_device::call_unload()
 		}
 	}
 
+	// If we don't clear this, swapping cartridges may make old contents reappear
+	if (memregion("grom"))
+		machine().memory().region_free(memregion("grom")->name());
+
+	if (memregion("rom"))
+		machine().memory().region_free(memregion("rom")->name());
+
+	if (memregion("nvram"))
+		machine().memory().region_free(memregion("nvram")->name());
+
+	if (memregion("ram"))
+		machine().memory().region_free(memregion("ram")->name());
+
 	m_pcb = nullptr;
 	m_connector->remove();
 }
