@@ -311,7 +311,7 @@ inline void z80_device::leave_halt()
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-inline u8 z80_device::in(u16 port)
+u8 z80_device::in(u16 port)
 {
 	u8 res = m_io.read_byte(port);
 	T(m_iorq_cycles);
@@ -321,7 +321,7 @@ inline u8 z80_device::in(u16 port)
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-inline void z80_device::out(u16 port, u8 value)
+void z80_device::out(u16 port, u8 value)
 {
 	m_io.write_byte(port, value);
 	T(m_iorq_cycles);
@@ -368,7 +368,7 @@ inline void z80_device::data_write(u16 addr, u8 value)
 	m_data.write_byte(translate_memory_address((u32)addr), value);
 }
 
-inline void z80_device::wm(u16 addr, u8 value)
+void z80_device::wm(u16 addr, u8 value)
 {
 	data_write(addr, value);
 	T(m_memrq_cycles);
@@ -475,7 +475,7 @@ inline void z80_device::pop(PAIR &r)
 /***************************************************************
  * PUSH
  ***************************************************************/
-inline void z80_device::push(PAIR &r)
+void z80_device::push(PAIR &r)
 {
 	nomreq_ir(1);
 	wm16_sp(r);
@@ -577,7 +577,7 @@ inline void z80_device::ret_cond(bool cond, u8 opcode)
 /***************************************************************
  * RETN
  ***************************************************************/
-inline void z80_device::retn()
+void z80_device::retn()
 {
 	LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2);
 	pop(m_pc);
@@ -650,7 +650,7 @@ inline void z80_device::rst(u16 addr)
 /***************************************************************
  * INC  r8
  ***************************************************************/
-inline u8 z80_device::inc(u8 value)
+u8 z80_device::inc(u8 value)
 {
 	u8 res = value + 1;
 	set_f((F & CF) | SZHV_inc[res]);
@@ -816,7 +816,7 @@ inline void z80_device::daa()
 /***************************************************************
  * AND  n
  ***************************************************************/
-inline void z80_device::and_a(u8 value)
+void z80_device::and_a(u8 value)
 {
 	A &= value;
 	set_f(SZP[A] | HF);
@@ -3568,7 +3568,7 @@ void z80_device::execute_run()
 {
 	do
 	{
-		if (m_wait_state)
+		if (m_wait_state || m_busrq_state)
 		{
 			// stalled
 			m_icount = 0;

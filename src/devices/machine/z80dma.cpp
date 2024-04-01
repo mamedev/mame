@@ -141,8 +141,7 @@ z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, co
 	, m_out_mreq_cb(*this)
 	, m_in_iorq_cb(*this, 0)
 	, m_out_iorq_cb(*this)
-{
-}
+{}
 
 
 //-------------------------------------------------

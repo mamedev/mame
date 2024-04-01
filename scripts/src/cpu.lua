@@ -2906,13 +2906,14 @@ end
 --------------------------------------------------
 -- Zilog Z80
 --@src/devices/cpu/z80/z80.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/z80n.h,CPUS["Z80N"] = true
 --@src/devices/cpu/z80/kc82.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a12.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a16.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/ky80.h,CPUS["KC80"] = true
 --------------------------------------------------
 
-if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
+if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
@@ -2930,6 +2931,13 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.h",
+	}
+end
+
+if CPUS["Z80N"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/z80/z80n.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/z80n.h",
 	}
 end
 
@@ -2960,6 +2968,12 @@ if want_disasm_z80 or want_disasm_kc80 then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/r800dasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.h")
+end
+
+if opt_tool(CPUS, "Z80N") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.h")
 end
 
 --------------------------------------------------

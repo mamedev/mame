@@ -143,7 +143,7 @@ protected:
 	PROTOTYPES(op)
 	PROTOTYPES(cb)
 	PROTOTYPES(dd)
-	PROTOTYPES(ed)
+	PROTOTYPES(virtual ed)
 	PROTOTYPES(fd)
 	PROTOTYPES(xycb)
 
@@ -174,7 +174,7 @@ protected:
 	void call();
 	void call_cond(bool cond, u8 opcode);
 	void ret_cond(bool cond, u8 opcode);
-	void retn();
+	virtual void retn();
 	void reti();
 	void ld_r_a();
 	void ld_a_r();
@@ -240,7 +240,7 @@ protected:
 	void execute_cycles(u8 icount);
 	virtual void check_interrupts();
 	void take_interrupt();
-	void take_nmi();
+	virtual void take_nmi();
 	void nomreq_ir(s8 cycles);
 	void nomreq_addr(u16 addr, s8 cycles);
 
