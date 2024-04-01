@@ -17756,6 +17756,9 @@ e9161                           //
 @source:ericsson/eispc.cpp
 epc                             // 1984 Ericsson PC
 
+@source:esprit/executive10.cpp
+exe10102                        // 1983 Esprit Systems
+
 @source:excalibur/igor.cpp
 igor
 
@@ -19797,6 +19800,9 @@ husky                           // DVW Husky
 
 @source:ibm/ibm3153.cpp
 ibm3153                         //
+
+@source:ibm/ibm5100.cpp
+ibm5100
 
 @source:ibm/ibm5550.cpp
 ibm5550                         //

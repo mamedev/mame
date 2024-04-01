@@ -20,6 +20,9 @@ public:
 	static unsigned constexpr AS_IOC = AS_IO;
 	static unsigned constexpr AS_IOD = 4;
 
+	auto getb_bus() { return m_getb_bus.bind(); }
+	auto select_ros() { return m_select_ros.bind(); }
+
 	palm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
@@ -43,6 +46,8 @@ protected:
 	bool condition(unsigned const modifier, u16 const data, u8 const mask) const;
 	s16 modifier(unsigned const modifier) const;
 
+	void control(u8 data);
+
 private:
 	// address spaces
 	address_space_config const m_ros_config;
@@ -55,13 +60,16 @@ private:
 	memory_access<4, 0, 0, ENDIANNESS_BIG>::specific m_ioc;
 	memory_access<4, 0, 0, ENDIANNESS_BIG>::specific m_iod;
 
+	devcb_write8 m_getb_bus;
+	devcb_write_line m_select_ros;
+
 	// mame state
 	int m_icount;
+	u16 m_pc;
 
 	u16 m_r[4][16];  // registers
 	u8 m_il;         // interrupt level
-	u8 m_il_pending; // pending interrupt level
-	u8 m_irpt_req;   // interrupt line state
+	u8 m_ff;         // controller flip-flops
 };
 
 DECLARE_DEVICE_TYPE(PALM, palm_device)
