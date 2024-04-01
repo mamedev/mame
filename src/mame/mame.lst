@@ -17756,6 +17756,9 @@ e9161                           //
 @source:ericsson/eispc.cpp
 epc                             // 1984 Ericsson PC
 
+@source:esprit/executive10.cpp
+exe10102                        // 1983 Esprit Systems
+
 @source:excalibur/igor.cpp
 igor
 
