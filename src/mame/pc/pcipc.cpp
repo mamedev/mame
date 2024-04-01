@@ -59,9 +59,9 @@ public:
 	static const boot_state_info boot_state_infos_award[];
 
 	void pcipc(machine_config &config);
+	void pcipcs7(machine_config &config);
 	void pcipctx(machine_config &config);
 	void pcinv3(machine_config &config);
-	void pcimga(machine_config &config);
 	void pciagp(machine_config &config);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
@@ -604,6 +604,16 @@ void pcipc_state::pcipc(machine_config &config)
 	//  SW1000XG(config, "pci:11.0");
 }
 
+void pcipc_state::pcipcs7(machine_config &config)
+{
+	pcipc_state::pcipc(config);
+	pentium_mmx_device &maincpu(PENTIUM_MMX(config.replace(), "maincpu", 266'000'000)); // socket 7 CPU
+	maincpu.set_addrmap(AS_PROGRAM, &pcipc_state::pcipc_map);
+	maincpu.set_addrmap(AS_IO, &pcipc_state::pcipc_map_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
+}
+
 void pcipc_state::pcipctx(machine_config &config)
 {
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 60000000));
@@ -709,6 +719,8 @@ ROM_START(pciagp)
 	ROMX_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317), ROM_BIOS(0) )
 ROM_END
 
+#define rom_pcipcs7    rom_pcipc
+
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
 
@@ -716,5 +728,6 @@ INPUT_PORTS_END
 
 
 COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
+COMP(1998, pcipcs7,  pcipc, 0, pcipcs7, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX, Socket 7 CPU)", MACHINE_NO_SOUND ) // alternative of above, for running already installed OSes at their nominal speed + fiddling with MMX
 COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
 COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state $05 (keyboard, blame 8042kbdc.cpp) bp e140c,1,{eax&=~1;g}) does stuff if bypassed but eventually PnP breaks OS booting
