@@ -327,17 +327,18 @@ void spi_sdcard_device::do_command()
 
 		case 12: // CMD12 - STOP_TRANSMISSION
 			m_data[0] = 0;
-			send_data(1, m_state == SD_STATE_RCV ? SD_STATE_PRG : SD_STATE_TRAN);
+			send_data(1, (m_state == SD_STATE_RCV) ? SD_STATE_PRG : SD_STATE_TRAN);
 			break;
 
 		case 13: // CMD13 - SEND_STATUS
 			m_data[0] = 0; // TODO
-			send_data(1, SD_STATE_STBY);
+			m_data[1] = 0;
+			send_data(2, SD_STATE_STBY);
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN
 			m_blksize = get_u16be(&m_cmd[3]);
-			if (m_image->set_block_size(m_blksize))
+			if (m_image->exists() && m_image->set_block_size(m_blksize))
 			{
 				m_data[0] = 0;
 			}
