@@ -24,10 +24,14 @@
 
 #define LOG_PINS (1 << 1)
 #define LOG_STATE (1 << 2)
+#define LOG_TODO (1 << 3)
 
-// #define VERBOSE (LOG_GENERAL | LOG_PINS | LOG_STATE)
+// #define VERBOSE (LOG_GENERAL | LOG_PINS | LOG_STATE | LOG_TODO)
+#define VERBOSE (LOG_TODO)
 
 #include "logmacro.h"
+
+#define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
 
 
 DEFINE_DEVICE_TYPE(ICD2061A, icd2061a_device, "icd2061a", "IC Designs 2061A Dual Programmable Graphics Clock Generator")
@@ -168,6 +172,8 @@ TIMER_CALLBACK_MEMBER( icd2061a_device::update_clock_callback )
 		const int m = BIT(m_regs[MREG], 7, 3); // post-vco divisor
 		const int q = BIT(m_regs[MREG], 0, 7) + 2; // q counter value
 		m_reg_clocks[MREG] = (clock() * m_prescale[a] * (p / double(q))) / (1 << m);
+	} else {
+		LOGTODO("unimplemented mclkout selected %d\n", m_mclkout_select);
 	}
 
 	if (m_reg_clocks[MREG] != m_mclkout_clock) {
@@ -198,6 +204,8 @@ TIMER_CALLBACK_MEMBER( icd2061a_device::update_clock_callback )
 		const int m = BIT(m_regs[m_vclkout_select], 7, 3); // post-vco divisor
 		const int q = BIT(m_regs[m_vclkout_select], 0, 7) + 2; // q counter value
 		vclkout_clock = m_reg_clocks[m_vclkout_select] = (clock() * m_prescale[a] * (p / double(q))) / (1 << m);
+	} else {
+		LOGTODO("unimplemented vclkout selected %d\n", m_vclkout_select);
 	}
 
 	if (vclkout_clock != m_vclkout_clock) {
