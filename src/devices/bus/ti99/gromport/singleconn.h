@@ -29,8 +29,8 @@ public:
 	bool is_grom_idle() override;
 
 protected:
-	void device_start() override { };
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override { };
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<ti99_cartridge_device> m_cartridge;

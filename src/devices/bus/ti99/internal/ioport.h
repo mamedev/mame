@@ -86,8 +86,8 @@ public:
 	auto ready_cb() { return m_console_ready.bind(); }
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// Methods called back from the external device
 	devcb_write_line m_console_extint;   // EXTINT line

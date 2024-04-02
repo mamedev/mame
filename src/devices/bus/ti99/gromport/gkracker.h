@@ -32,17 +32,17 @@ public:
 	bool is_grom_idle() override;
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	void device_add_mconfig(machine_config &config) override;
-	const tiny_rom_entry* device_rom_region() const override;
-	ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry* device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface
-	void nvram_default() override;
-	bool nvram_read(util::read_stream &file) override;
-	bool nvram_write(util::write_stream &file) override;
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.

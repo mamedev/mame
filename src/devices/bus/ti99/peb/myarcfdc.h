@@ -38,14 +38,15 @@ public:
 	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
-	void device_start() override;
-	void device_reset() override;
-
-	const tiny_rom_entry *device_rom_region() const override;
-	void device_add_mconfig(machine_config &config) override;
-	ioport_constructor device_input_ports() const override;
-
 	static void floppy_formats(format_registration &fr);
 
 	// Callback methods
@@ -111,7 +112,7 @@ private:
 class ddcc1_pal_device : public device_t
 {
 	friend class myarc_fdc_device;
-	
+
 public:
 	ddcc1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -123,7 +124,7 @@ public:
 	bool cs259();
 
 private:
-	void device_start() override { }	
+	void device_start() override { }
 	myarc_fdc_device* m_board;
 	void set_board(myarc_fdc_device* board) { m_board = board; }
 };
