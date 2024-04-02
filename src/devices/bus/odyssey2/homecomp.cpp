@@ -24,14 +24,56 @@ TODO:
 
 #include "emu.h"
 #include "homecomp.h"
+
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "machine/gen_latch.h"
+
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_HOMECOMP, o2_homecomp_device, "o2_homecomp", "Videopac+ C7420 Cartridge")
-
+namespace {
 
 //-------------------------------------------------
-//  o2_homecomp_device - constructor
+//  initialization
 //-------------------------------------------------
+
+class o2_homecomp_device : public device_t, public device_o2_cart_interface
+{
+public:
+	o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual void cart_init() override;
+
+	virtual u8 read_rom04(offs_t offset) override { return m_rom[offset]; }
+	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset + 0x400]; }
+
+	virtual void write_p1(u8 data) override;
+	virtual void io_write(offs_t offset, u8 data) override;
+	virtual u8 io_read(offs_t offset) override;
+	virtual int t0_read() override { return m_latch[0]->pending_r(); }
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device_array<generic_latch_8_device, 2> m_latch;
+	required_device<cassette_image_device> m_cass;
+
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_control = 0;
+	bool m_installed = false;
+
+	void internal_io_w(offs_t offset, u8 data);
+	u8 internal_io_r(offs_t offset);
+	u8 internal_rom_r(offs_t offset) { return m_exrom[offset]; }
+
+	void homecomp_io(address_map &map);
+	void homecomp_mem(address_map &map);
+};
 
 o2_homecomp_device::o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_HOMECOMP, tag, owner, clock),
@@ -71,19 +113,33 @@ void o2_homecomp_device::cart_init()
 
 
 //-------------------------------------------------
-//  input_ports - device-specific input ports
+//  mapper specific handlers
 //-------------------------------------------------
 
-static INPUT_PORTS_START( homecomp )
-	PORT_START("RAM")
-	PORT_CONFNAME( 0x01, 0x00, "RAM Size" )
-	PORT_CONFSETTING( 0x00, "16KB" )
-	PORT_CONFSETTING( 0x01, "32KB" ) // unofficial
-INPUT_PORTS_END
-
-ioport_constructor o2_homecomp_device::device_input_ports() const
+void o2_homecomp_device::write_p1(u8 data)
 {
-	return INPUT_PORTS_NAME(homecomp);
+	// P10: Z80 INT pin
+	// P10+P11: Z80 RESET pin
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 3) ? CLEAR_LINE : ASSERT_LINE);
+
+	// P11: must be low to access latch 0
+	// P14: must be low to access latch 1
+	m_control = data;
+}
+
+u8 o2_homecomp_device::io_read(offs_t offset)
+{
+	if ((offset & 0xa0) == 0xa0 && ~m_control & 2)
+		return m_latch[0]->read();
+	else
+		return 0xff;
+}
+
+void o2_homecomp_device::io_write(offs_t offset, u8 data)
+{
+	if (offset & 0x80 && ~m_control & 0x10)
+		m_latch[1]->write(data);
 }
 
 
@@ -154,6 +210,23 @@ void o2_homecomp_device::homecomp_io(address_map &map)
 
 
 //-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+static INPUT_PORTS_START( homecomp )
+	PORT_START("RAM")
+	PORT_CONFNAME( 0x01, 0x00, "RAM Size" )
+	PORT_CONFSETTING( 0x00, "16KB" )
+	PORT_CONFSETTING( 0x01, "32KB" ) // unofficial
+INPUT_PORTS_END
+
+ioport_constructor o2_homecomp_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(homecomp);
+}
+
+
+//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
@@ -174,33 +247,7 @@ void o2_homecomp_device::device_add_mconfig(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "cass_output", 0.05);
 }
 
+} // anonymous namespace
 
-//-------------------------------------------------
-//  mapper specific handlers
-//-------------------------------------------------
 
-void o2_homecomp_device::write_p1(u8 data)
-{
-	// P10: Z80 INT pin
-	// P10+P11: Z80 RESET pin
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 3) ? CLEAR_LINE : ASSERT_LINE);
-
-	// P11: must be low to access latch 0
-	// P14: must be low to access latch 1
-	m_control = data;
-}
-
-u8 o2_homecomp_device::io_read(offs_t offset)
-{
-	if ((offset & 0xa0) == 0xa0 && ~m_control & 2)
-		return m_latch[0]->read();
-	else
-		return 0xff;
-}
-
-void o2_homecomp_device::io_write(offs_t offset, u8 data)
-{
-	if (offset & 0x80 && ~m_control & 0x10)
-		m_latch[1]->write(data);
-}
+DEFINE_DEVICE_TYPE_PRIVATE(O2_ROM_HOMECOMP, device_o2_cart_interface, o2_homecomp_device, "o2_homecomp", "Videopac+ C7420 Cartridge")

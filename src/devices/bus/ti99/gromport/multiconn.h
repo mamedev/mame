@@ -30,26 +30,24 @@ public:
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 	void gclock_in(int state) override;
 
-	void insert(int index, ti99_cartridge_device* cart) override;
-	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
 	bool is_grom_idle() override;
 
 protected:
-	static constexpr unsigned NUMBER_OF_CARTRIDGE_SLOTS = 4;
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	static constexpr unsigned NUMBER_OF_CARTRIDGE_SLOTS = 4;
 	bool m_readrom;
 	int     m_active_slot;
 	int     m_fixed_slot;
 	int     m_next_free_slot;
-	ti99_cartridge_device*  m_cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
+
+	required_device_array<ti99_cartridge_device,NUMBER_OF_CARTRIDGE_SLOTS> m_cart;
 
 	void    set_slot(int slotnumber);
 	int     get_active_slot(bool changebase, offs_t offset);

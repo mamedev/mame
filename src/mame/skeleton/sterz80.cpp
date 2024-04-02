@@ -48,7 +48,7 @@ Notes:
                being highly likely that the program is encrypted.
       29F002 - AMD AM29F002 PLCC32 (surface-mounted) EEPROM. This is connected to the OKI chip and holds the audio samples.
 DS12B887.U12 - Dallas DS12B887 Real Time Clock Module. This looks suspiciously like it's used for protection data? The PCB contains a battery
-               (for game settings or high scores?) and a 93C46 EEPROM (for game settings or high scores?). No other data needs to be sotred
+               (for game settings or high scores?) and a 93C46 EEPROM (for game settings or high scores?). No other data needs to be stored
                anywhere. The DS12B887 is connected to the EPM7192 chip. It's possible it might just be for time/bookkeeping. The chip
                (dated 9614) is dumped but I'd be surprised if the battery inside was still alive and the data is good, although the data isn't
                just garbage and reads the same each time so by some miracle it might be ok.
@@ -195,7 +195,16 @@ void sterz80_state::init_tongzi()
 	// by bits 0, 1, 4, 5, 6 and 7 of the address, the data bitswaps by bits 0 and 1 of the address.
 
 	// decrypt M6295 ROM
-	// TODO
+	uint8_t *okirom = memregion("oki")->base();
+	std::vector<uint8_t> buffer(0x40000);
+
+	memcpy(&buffer[0], okirom, 0x40000);
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		okirom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 4, 3, 1, 2, 5, 0, 10, 13, 8, 6, 15, 17, 7, 9, 12, 14, 11, 16)];
+		okirom[i] = bitswap<8>(okirom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+	}
 }
 
 } // anonymous namespace

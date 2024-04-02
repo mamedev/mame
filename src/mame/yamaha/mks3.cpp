@@ -160,7 +160,6 @@ void mks3_device::req_w(int state)
 
 TIMER_CALLBACK_MEMBER(mks3_device::transmit_tick)
 {
-	logerror("tr %d\n", m_step);
 	if(m_step == 15) {
 		transmit_next();
 		return;
@@ -189,7 +188,6 @@ void mks3_device::transmit_next()
 	if(m_byte_count)
 		memmove(m_bytes.data(), m_bytes.data() + 1, m_byte_count);
 
-	logerror("start %02x\n", m_byte);
 	m_write_clk(0);
 	m_write_da(BIT(m_byte, 7));
 	m_step = 0;

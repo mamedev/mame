@@ -1440,6 +1440,7 @@ void swp30_device::execute_run()
 						break;
 					}
 					}
+					logerror("XX %04x %04x\n", val0, val1);
 					break;
 				}
 

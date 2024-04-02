@@ -788,39 +788,31 @@ macro jsr32 %opc %spreg
 		// Conditions:
 		//    p = q*d + r
 		//    abs(r) < abs(d)
-		//    d and r are same sign or r=0
+		//    p and r are same sign or r=0
 		// p = +20, d = +3 -> q =  6, r =  2
-		// p = +20, d = -3 -> q = -6, r = -2
-		// p = -20, d = +3 -> q = -7, r =  1
+		// p = +20, d = -3 -> q = -7, r =  1
+		// p = -20, d = +3 -> q = -6, r = -2
 		// p = -20, d = -3 -> q =  7, r = -1
 		int q, r;
 		if(m_TMP2 & 0x80000000) {
 			if(m_TMP1 & 0x80000000) { // - -
 				q = (-m_TMP1) / (-m_TMP2);
-				r = (-m_TMP1) % (-m_TMP2);
-				if(r) {
-					r = r + m_TMP2;
-					q++;
-				}
+				r = -((-m_TMP1) % (-m_TMP2));
 			} else {       // + -
-				m_CCR |= F_N;
 				q = -(m_TMP1 / (-m_TMP2));
-				r = -(m_TMP1 % (-m_TMP2));
+				r = m_TMP1 % (-m_TMP2);
 			}
 		} else {
 			if(m_TMP1 & 0x80000000) { // - +
-				m_CCR |= F_N;
 				q = -((-m_TMP1) / m_TMP2);
-				r = (-m_TMP1) % m_TMP2;
-				if(r) {
-					r = m_TMP2 - r;
-					q--;
-				}
+				r = -((-m_TMP1) % m_TMP2);
 			} else {       // + +
 				q = m_TMP1 / m_TMP2;
 				r = m_TMP1 % m_TMP2;
 			}
 		}
+		if(q < 0)
+			m_CCR |= F_N;
 		r16_w(m_IR[1], (q & 0xff) | ((r & 0xff) << 8));
 	}
 	prefetch_done();
@@ -837,39 +829,31 @@ macro jsr32 %opc %spreg
 		// Conditions:
 		//    p = q*d + r
 		//    abs(r) < abs(d)
-		//    d and r are same sign or r=0
+		//    p and r are same sign or r=0
 		// p = +20, d = +3 -> q =  6, r =  2
-		// p = +20, d = -3 -> q = -6, r = -2
-		// p = -20, d = +3 -> q = -7, r =  1
+		// p = +20, d = -3 -> q = -7, r =  1
+		// p = -20, d = +3 -> q = -6, r = -2
 		// p = -20, d = -3 -> q =  7, r = -1
 		int q, r;
 		if(m_TMP2 & 0x80000000) {
 			if(m_TMP1 & 0x80000000) { // - -
 				q = (-m_TMP1) / (-m_TMP2);
-				r = (-m_TMP1) % (-m_TMP2);
-				if(r) {
-					r = r + m_TMP2;
-					q++;
-				}
+				r = -((-m_TMP1) % (-m_TMP2));
 			} else {       // + -
-				m_CCR |= F_N;
 				q = -(m_TMP1 / (-m_TMP2));
-				r = -(m_TMP1 % (-m_TMP2));
+				r = m_TMP1 % (-m_TMP2);
 			}
 		} else {
 			if(m_TMP1 & 0x80000000) { // - +
-				m_CCR |= F_N;
 				q = -((-m_TMP1) / m_TMP2);
-				r = (-m_TMP1) % m_TMP2;
-				if(r) {
-					r = m_TMP2 - r;
-					q--;
-				}
+				r = -((-m_TMP1) % m_TMP2);
 			} else {       // + +
 				q = m_TMP1 / m_TMP2;
 				r = m_TMP1 % m_TMP2;
 			}
 		}
+		if(q < 0)
+			m_CCR |= F_N;
 		r32_w(m_IR[1], (q & 0xffff) | ((r & 0xffff) << 16));
 	}
 	prefetch_done();

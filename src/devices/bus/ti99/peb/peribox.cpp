@@ -683,6 +683,7 @@ peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const ch
 	device_t(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_ti99_peribox_card_interface>(mconfig, *this),
 	m_card(nullptr),
+	m_peb(nullptr),
 	m_slotnumber(0)
 {
 }
@@ -739,9 +740,9 @@ void peribox_slot_device::device_start()
 void peribox_slot_device::device_config_complete()
 {
 	m_card = get_card_device();
-	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
-	if (peb)
-		peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
+	m_peb = dynamic_cast<peribox_device*>(owner());
+	if (m_peb)
+		m_peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
 }
 
 /*
@@ -750,26 +751,26 @@ void peribox_slot_device::device_config_complete()
 */
 void peribox_slot_device::set_inta(int state)
 {
-	peribox_device *peb = static_cast<peribox_device*>(owner());
-	peb->inta_join(m_slotnumber, state);
+	if (m_peb)
+		m_peb->inta_join(m_slotnumber, state);
 }
 
 void peribox_slot_device::set_intb(int state)
 {
-	peribox_device *peb = static_cast<peribox_device*>(owner());
-	peb->intb_join(m_slotnumber, state);
+	if (m_peb)
+		m_peb->intb_join(m_slotnumber, state);
 }
 
 void peribox_slot_device::lcp_line(int state)
 {
-	peribox_device *peb = static_cast<peribox_device*>(owner());
-	peb->lcp_join(m_slotnumber, state);
+	if (m_peb)
+		m_peb->lcp_join(m_slotnumber, state);
 }
 
 void peribox_slot_device::set_ready(int state)
 {
-	peribox_device *peb = static_cast<peribox_device*>(owner());
-	peb->ready_join(m_slotnumber, state);
+	if (m_peb)
+		m_peb->ready_join(m_slotnumber, state);
 }
 
 /***************************************************************************/

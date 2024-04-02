@@ -86,7 +86,7 @@ private:
 	void init_backgammon();
 	void init_jacquet();
 	void init_plakoto();
-	void board_init_cb(int state);
+	void board_init_cb(u8 data);
 	u8 board_spawn_cb(offs_t offset);
 	u8 board_remove_cb();
 	u8 board_sensor_cb(offs_t offset);
@@ -197,9 +197,9 @@ INPUT_CHANGED_MEMBER(ecbackg_state::init_board)
 	m_board->refresh();
 }
 
-void ecbackg_state::board_init_cb(int state)
+void ecbackg_state::board_init_cb(u8 data)
 {
-	if (!state)
+	if (~data & 1)
 		init_backgammon();
 }
 

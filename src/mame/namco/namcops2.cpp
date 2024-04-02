@@ -27,9 +27,10 @@ Games on System 246/256/S256 include.....
 Name from title screen                           System   Media ID            (HDD/CD/DVD)  Cart ID   Revision               Company/Year                  Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB
-Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *?                      Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A otherwise no boot-up
-Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | Dongle selects region using same HDD's
-Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  HDD: Maxtor Fireball 3 30GB 2F030L0
+Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900068A(?)           Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A otherwise no boot-up; dongle selects region using same HDDs
+Battle Gear 3 (US).............................. ------X *?                    HDD (20GB)   NM00010? *?                      Taito 2002                     | 2004 Betson release; contrary to flyer, does *not* remove Honda cars (contrast sidebs2u/batlgear)
+Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | HDD: Maxtor Fireball 3 30GB 2F030L0
+Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
 Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires RAYS I/O PCB and IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
@@ -52,7 +53,7 @@ Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 123456X  SED1 DVD0            D
 M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 123456X  GSD1 DVD0            DVD          NM00034   GSD1 Ver.A             Banpresto 2006                % #
 Mobile Suit Z Gundam A.E.U.G. vs Titans......... 123456X  ZGA1 DVD0            DVD          NM00013   ZGA1 Ver.A             Capcom/Banpresto 2003         %
 Mobile Suit Z Gundam DX A.E.U.G. vs Titans...... 12X456X  ZDX1 DVD0            DVD          NM00017   ZDX1 Ver.A             Capcom/Banpresto 2003         %
-Moto GP......................................... XXXX56X  MGP1004-NA-HDD0-A    HDD (80GB)   NM00039   MGP1004-NA-B           Namco 2007                    HDD: Western Digital WD800BB (note only about 2.5GB is used and the remainder of the drive is 00-filled)
+MotoGP.......................................... XXXX56X  MGP1004-NA-HDD0-A    HDD (80GB)   NM00039   MGP1004-NA-B           Namco 2007                    HDD: Western Digital WD800BB (note only about 2.5GB is used and the remainder of the drive is 00-filled)
 Netchuu Pro Yakyuu 2002.        ................ X23XXXX  NPY1 CD0B            CD           NM00009   NPY Ver.B              Namco 2002
 Netchuu Pro Yakyuu 2002.        ................ X23XXXX  NPY1 CD0C            CD           NM00009   NPY Ver.C              Namco 2002
 Pride GP 2003................................... 123456X  PR21 DVD0            DVD          NM00011   PR21 Ver.A             Capcom 2003                   %
@@ -1744,7 +1745,7 @@ GAME(2006, taiko9,     sys256, system256, system246, namcops2_state, empty_init,
 GAME(2006, yuyuhaku,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", MACHINE_IS_SKELETON)
 GAME(2006, zoidiexp,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", MACHINE_IS_SKELETON)
 GAME(2007, kinniku2,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2007, motogp,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Moto GP (MGP1004-NA-B)", MACHINE_IS_SKELETON)
+GAME(2007, motogp,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "MotoGP (MGP1004-NA-B)", MACHINE_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
 GAME(2008, taiko11,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 11 (T111001-NA-A)", MACHINE_IS_SKELETON)
 GAME(2008, gdvsgd,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", MACHINE_IS_SKELETON)

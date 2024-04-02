@@ -14,6 +14,100 @@ Known undumped:
 
 -->
 
+<!-- System software -->
+
+	<software name="fsa1fx">
+		<description>FS-A1FX (Japan)</description>
+		<year>1988</year>
+		<publisher>Panasonic</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fs-a1fx - panasonic.dsk" size="737280" crc="2627f23c" sha1="33203ca8602ee1f00fe7dccb98623fc31564c16c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fsa1wsx">
+		<description>FS-A1WSX (Japan)</description>
+		<year>1989</year>
+		<publisher>Panasonic</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk 1 - システムディスク1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fs-a1wsx - system disk 1 - panasonic.dsk" size="737280" crc="024d98e5" sha1="3de4f0413b18272d72212144c652834bacfb29dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk 2 - システムディスク2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fs-a1wsx - system disk 2 - panasonic.dsk" size="737280" crc="94fc9057" sha1="824779ece25664514bdfa6c15675f36477094144"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fsa1wx">
+		<description>FS-A1WX (Japan)</description>
+		<year>1988</year>
+		<publisher>Panasonic</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk 1 - システムディスク1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fs-a1wx - system disk 1 - panasonic.dsk" size="737280" crc="18b8f52b" sha1="d5ad5bb12f686fdde03b681287269bbf6e505304"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk 2 - システムディスク2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fs-a1wx - system disk 2 - panasonic.dsk" size="737280" crc="f29af67b" sha1="40246914726e35a20469b5d1116abeaccc53c16c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbf1xv">
+		<description>HB-F1XV (Japan)</description>
+		<year>1989</year>
+		<publisher>Sony</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Creative Tools I - クリエイティブツールI"/>
+			<dataarea name="flop" size="737280">
+				<!-- cracked -->
+				<rom name="creative tools i - sony.dsk" size="737280" crc="575528c9" sha1="4b47e7afab3643d1a79a7a3a5f346233c01b8314" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Creative Tools II - クリエイティブツールII"/>
+			<dataarea name="flop" size="737280">
+				<rom name="creative tools ii - sony.dsk" size="737280" crc="8bd2e824" sha1="8dde94fc487fd74552c2e29c8aff209990def254"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Creative Tools III - クリエイティブツールIII"/>
+			<dataarea name="flop" size="737280">
+				<rom name="creative tool iii - sony.dsk" size="737280" crc="3b0bd75f" sha1="8eff160d9cd80a9a306fedb68bada93fdf2cdbb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phc70">
+		<description>PHC-70FD/FD2 (Japan)</description>
+		<year>1988</year>
+		<publisher>Sanyo</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="MSX-DOS"/>
+			<dataarea name="flop" size="737280">
+				<!-- contains files added after 1988 -->
+				<rom name="phc-70 - sanyo (msx-dos).dsk" size="737280" crc="a61f2353" sha1="139ffdb5e864cdfefae95de5425cff8e2875e830" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Demo Soft"/>
+			<dataarea name="flop" size="737280">
+				<rom name="phc-70 - sanyo (demo soft).dsk" size="737280" crc="73c930d6" sha1="2f45dfe9fdd03b33ddd8ce362389dedbf6c43afd"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 
 	<software name="beppin">
 		<description>Beppin Disk (Japan)</description>
@@ -104,6 +198,18 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="family stadium pro baseball - homerun contest (1989)(namcot)(jp)[a].dsk" size="737280" crc="bd3d819d" sha1="53d1c26f5d87c53f8fa26154c2c568c657d314f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamept">
+		<description>Game Programming Tool HB-F1XDJ Sen'you (Japan)</description>
+		<year>1988</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="ゲームプログラミングツールHB-F1XDJ専用"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="game programming tool hb-f1xdj senyou - sony.dsk" size="737280" crc="51d7a21f" sha1="bf6f593defcff08b51ab8e38988859c5cfa3b071"/>
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +513,7 @@ Known undumped:
 		</part>
 	</software>
 
-	<software name="hbf1xv">
+	<software name="hbf1xvsd">
 		<description>Sony HB-F1XV Story Disk (Japan)</description>
 		<year>1990</year>
 		<publisher>Sony</publisher>

@@ -34,18 +34,62 @@ TODO:
 #include "maestro.h"
 
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/r65c02.h"
+#include "video/hd44780.h"
 
 #include "softlist_dev.h"
 
-
-DEFINE_DEVICE_TYPE(OSA_MAESTRO, saitekosa_maestro_device, "osa_maestro", "Saitek OSA Maestro B-D")
-DEFINE_DEVICE_TYPE(OSA_ANALYST, saitekosa_analyst_device, "osa_analyst", "Saitek OSA Analyst")
-
+namespace {
 
 //-------------------------------------------------
 //  initialization
 //-------------------------------------------------
+
+// Maestro / shared
+
+class saitekosa_maestro_device : public device_t, public device_saitekosa_expansion_interface
+{
+public:
+	// construction/destruction
+	saitekosa_maestro_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
+
+	// from host
+	virtual u8 data_r() override;
+	virtual void nmi_w(int state) override;
+	virtual void ack_w(int state) override;
+
+protected:
+	saitekosa_maestro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	memory_share_creator<u8> m_banked_ram;
+	required_memory_bank m_rambank;
+	required_memory_bank m_rombank;
+	required_device<generic_slot_device> m_extrom;
+
+	u8 m_latch = 0xff;
+	bool m_latch_enable = false;
+	u8 m_extrom_bank = 0;
+
+	virtual void main_map(address_map &map);
+
+	u8 extrom_r(offs_t offset);
+	template <int N> void stall_w(u8 data = 0);
+	u8 rts_r();
+	u8 xdata_r();
+	void xdata_w(u8 data);
+	u8 ack_r();
+	void control_w(u8 data);
+};
 
 saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -61,10 +105,33 @@ saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig
 	saitekosa_maestro_device(mconfig, OSA_MAESTRO, tag, owner, clock)
 { }
 
+
+// Analyst
+
+class saitekosa_analyst_device : public saitekosa_maestro_device
+{
+public:
+	saitekosa_analyst_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+	static auto parent_rom_device_type() { return &OSA_MAESTRO; }
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<hd44780_device> m_lcd;
+
+	virtual void main_map(address_map &map) override;
+};
+
 saitekosa_analyst_device::saitekosa_analyst_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	saitekosa_maestro_device(mconfig, OSA_ANALYST, tag, owner, clock),
 	m_lcd(*this, "lcd")
 { }
+
 
 void saitekosa_maestro_device::device_start()
 {
@@ -87,6 +154,170 @@ INPUT_CHANGED_MEMBER(saitekosa_maestro_device::change_cpu_freq)
 {
 	static const XTAL xtal[6] = { 4_MHz_XTAL, 5.67_MHz_XTAL, 6_MHz_XTAL, 7.2_MHz_XTAL, 8_MHz_XTAL, 10_MHz_XTAL };
 	m_maincpu->set_unscaled_clock(xtal[newval % 6]);
+}
+
+
+//-------------------------------------------------
+//  host i/o
+//-------------------------------------------------
+
+u8 saitekosa_maestro_device::data_r()
+{
+	return m_latch_enable ? m_latch : 0xff;
+}
+
+void saitekosa_maestro_device::nmi_w(int state)
+{
+	m_maincpu->set_input_line(0, !state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void saitekosa_maestro_device::ack_w(int state)
+{
+	if (state != m_expansion->ack_state())
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+}
+
+u32 saitekosa_analyst_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0xffffff, cliprect);
+	const u8 *render = m_lcd->render();
+
+	// draw lcd characters
+	for (int i = 0; i < 16; i++)
+	{
+		const u8 *src = render + 16 * ((i & 7) + BIT(i, 3) * 40);
+		for (int y = 0; y < 8; y++)
+			for (int x = 0; x < 5; x++)
+				bitmap.pix(y + 4, i * 6 + x + 2) = (BIT(src[y], 4 - x) && m_expansion->pw_state()) ? 0x282828 : 0xe8e8e8;
+	}
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  internal i/o
+//-------------------------------------------------
+
+u8 saitekosa_maestro_device::extrom_r(offs_t offset)
+{
+	u16 bank = m_extrom_bank * 0x4000;
+	return (m_extrom->exists()) ? m_extrom->read_rom(offset | bank) : 0xff;
+}
+
+template <int N> void saitekosa_maestro_device::stall_w(u8 data)
+{
+	// cpu clock divider
+}
+
+u8 saitekosa_maestro_device::rts_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		// strobe RTS-P
+		m_expansion->rts_w(1);
+		m_expansion->rts_w(0);
+	}
+
+	return 0xff;
+}
+
+void saitekosa_maestro_device::xdata_w(u8 data)
+{
+	// clock latch
+	m_latch = data;
+}
+
+u8 saitekosa_maestro_device::xdata_r()
+{
+	return m_expansion->data_state();
+}
+
+void saitekosa_maestro_device::control_w(u8 data)
+{
+	// d0: main rom bank
+	m_rombank->set_entry(data & 1);
+
+	// d1: ext rom bank
+	// d1: ram bank
+	m_extrom_bank = BIT(data, 1);
+	m_rambank->set_entry(m_extrom_bank);
+
+	// d3: enable latch output
+	m_latch_enable = bool(data & 8);
+
+	// d2: STB-P
+	m_expansion->stb_w(BIT(data, 2));
+}
+
+u8 saitekosa_maestro_device::ack_r()
+{
+	// d6: _Vcc
+	// d7: ACK-P
+	return m_expansion->ack_state() ? 0x80 : 0x00;
+}
+
+void saitekosa_maestro_device::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2000).mirror(0x01ff).w(FUNC(saitekosa_maestro_device::stall_w<0>));
+	map(0x2200, 0x2200).mirror(0x01ff).rw(FUNC(saitekosa_maestro_device::rts_r), FUNC(saitekosa_maestro_device::stall_w<1>));
+	map(0x2400, 0x2400).mirror(0x01ff).rw(FUNC(saitekosa_maestro_device::xdata_r), FUNC(saitekosa_maestro_device::xdata_w));
+	map(0x2600, 0x2600).mirror(0x01ff).rw(FUNC(saitekosa_maestro_device::ack_r), FUNC(saitekosa_maestro_device::control_w));
+	map(0x2800, 0x37ff).bankrw("rambank");
+	map(0x4000, 0x7fff).r(FUNC(saitekosa_maestro_device::extrom_r));
+	map(0x8000, 0xffff).bankr("rombank");
+}
+
+void saitekosa_analyst_device::main_map(address_map &map)
+{
+	saitekosa_maestro_device::main_map(map);
+	map(0x3800, 0x3801).mirror(0x07fe).rw(m_lcd, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+}
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+static INPUT_PORTS_START( maestro )
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x07, 0x04, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestro_device, change_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "4MHz" )
+	PORT_CONFSETTING(    0x01, "5.67MHz" )
+	PORT_CONFSETTING(    0x02, "6MHz" )
+	PORT_CONFSETTING(    0x03, "7.2MHz" )
+	PORT_CONFSETTING(    0x04, "8MHz" )
+	PORT_CONFSETTING(    0x05, "10MHz" )
+INPUT_PORTS_END
+
+ioport_constructor saitekosa_maestro_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(maestro);
+}
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void saitekosa_maestro_device::device_add_mconfig(machine_config &config)
+{
+	// basic machine hardware
+	R65C02(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &saitekosa_maestro_device::main_map);
+
+	// extension rom
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
+	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
+}
+
+void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
+{
+	saitekosa_maestro_device::device_add_mconfig(config);
+
+	// video hardware
+	HD44780(config, m_lcd, 270'000); // OSC = 91K resistor
 }
 
 
@@ -194,166 +425,8 @@ const tiny_rom_entry *saitekosa_analyst_device::device_rom_region() const
 	return ROM_NAME(analyst);
 }
 
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-static INPUT_PORTS_START( maestro )
-	PORT_START("CPU")
-	PORT_CONFNAME( 0x07, 0x04, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitekosa_maestro_device, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "4MHz" )
-	PORT_CONFSETTING(    0x01, "5.67MHz" )
-	PORT_CONFSETTING(    0x02, "6MHz" )
-	PORT_CONFSETTING(    0x03, "7.2MHz" )
-	PORT_CONFSETTING(    0x04, "8MHz" )
-	PORT_CONFSETTING(    0x05, "10MHz" )
-INPUT_PORTS_END
-
-ioport_constructor saitekosa_maestro_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(maestro);
-}
+} // anonymous namespace
 
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void saitekosa_maestro_device::device_add_mconfig(machine_config &config)
-{
-	// basic machine hardware
-	R65C02(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &saitekosa_maestro_device::main_map);
-
-	// extension rom
-	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
-	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
-}
-
-void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
-{
-	saitekosa_maestro_device::device_add_mconfig(config);
-
-	// video hardware
-	HD44780(config, m_lcd, 270'000); // OSC = 91K resistor
-}
-
-
-//-------------------------------------------------
-//  internal i/o
-//-------------------------------------------------
-
-u8 saitekosa_maestro_device::extrom_r(offs_t offset)
-{
-	u16 bank = m_extrom_bank * 0x4000;
-	return (m_extrom->exists()) ? m_extrom->read_rom(offset | bank) : 0xff;
-}
-
-template <int N> void saitekosa_maestro_device::stall_w(u8 data)
-{
-	// cpu clock divider
-}
-
-u8 saitekosa_maestro_device::rts_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		// strobe RTS-P
-		m_expansion->rts_w(1);
-		m_expansion->rts_w(0);
-	}
-
-	return 0xff;
-}
-
-void saitekosa_maestro_device::xdata_w(u8 data)
-{
-	// clock latch
-	m_latch = data;
-}
-
-u8 saitekosa_maestro_device::xdata_r()
-{
-	return m_expansion->data_state();
-}
-
-void saitekosa_maestro_device::control_w(u8 data)
-{
-	// d0: main rom bank
-	m_rombank->set_entry(data & 1);
-
-	// d1: ext rom bank
-	// d1: ram bank
-	m_extrom_bank = BIT(data, 1);
-	m_rambank->set_entry(m_extrom_bank);
-
-	// d3: enable latch output
-	m_latch_enable = bool(data & 8);
-
-	// d2: STB-P
-	m_expansion->stb_w(BIT(data, 2));
-}
-
-u8 saitekosa_maestro_device::ack_r()
-{
-	// d6: _Vcc
-	// d7: ACK-P
-	return m_expansion->ack_state() ? 0x80 : 0x00;
-}
-
-void saitekosa_maestro_device::main_map(address_map &map)
-{
-	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).mirror(0x01ff).w(FUNC(saitekosa_maestro_device::stall_w<0>));
-	map(0x2200, 0x2200).mirror(0x01ff).rw(FUNC(saitekosa_maestro_device::rts_r), FUNC(saitekosa_maestro_device::stall_w<1>));
-	map(0x2400, 0x2400).mirror(0x01ff).rw(FUNC(saitekosa_maestro_device::xdata_r), FUNC(saitekosa_maestro_device::xdata_w));
-	map(0x2600, 0x2600).mirror(0x01ff).rw(FUNC(saitekosa_maestro_device::ack_r), FUNC(saitekosa_maestro_device::control_w));
-	map(0x2800, 0x37ff).bankrw("rambank");
-	map(0x4000, 0x7fff).r(FUNC(saitekosa_maestro_device::extrom_r));
-	map(0x8000, 0xffff).bankr("rombank");
-}
-
-void saitekosa_analyst_device::main_map(address_map &map)
-{
-	saitekosa_maestro_device::main_map(map);
-	map(0x3800, 0x3801).mirror(0x07fe).rw(m_lcd, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
-}
-
-
-//-------------------------------------------------
-//  host i/o
-//-------------------------------------------------
-
-u8 saitekosa_maestro_device::data_r()
-{
-	return m_latch_enable ? m_latch : 0xff;
-}
-
-void saitekosa_maestro_device::nmi_w(int state)
-{
-	m_maincpu->set_input_line(0, !state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void saitekosa_maestro_device::ack_w(int state)
-{
-	if (state != m_expansion->ack_state())
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
-}
-
-u32 saitekosa_analyst_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0xffffff, cliprect);
-	const u8 *render = m_lcd->render();
-
-	// draw lcd characters
-	for (int i = 0; i < 16; i++)
-	{
-		const u8 *src = render + 16 * ((i & 7) + BIT(i, 3) * 40);
-		for (int y = 0; y < 8; y++)
-			for (int x = 0; x < 5; x++)
-				bitmap.pix(y + 4, i * 6 + x + 2) = (BIT(src[y], 4 - x) && m_expansion->pw_state()) ? 0x282828 : 0xe8e8e8;
-	}
-
-	return 0;
-}
+DEFINE_DEVICE_TYPE_PRIVATE(OSA_MAESTRO, device_saitekosa_expansion_interface, saitekosa_maestro_device, "osa_maestro", "Saitek OSA Maestro B-D")
+DEFINE_DEVICE_TYPE_PRIVATE(OSA_ANALYST, device_saitekosa_expansion_interface, saitekosa_analyst_device, "osa_analyst", "Saitek OSA Analyst")

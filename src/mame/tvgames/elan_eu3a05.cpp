@@ -1032,7 +1032,7 @@ CONS( 2005, sudelan, 0,         0, elan_sudoku_pal,  sudoku,   elan_eu3a05_state
 
 CONS( 2005, sudoku2p, 0,        0, elan_sudoku_pal,  sudoku2p, elan_eu3a05_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
 
-CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
 // however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit

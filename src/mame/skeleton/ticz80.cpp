@@ -53,8 +53,8 @@ Notes:
    TIC03-06 - 27C4001 OTP EPROM (gfx)
 
 
-TODO: This is almost surely bootlegged hardware. Move to appropriate
-      driver when identified.
+TODO: This is almost surely bootlegged from hardware in dynax/dynax.cpp
+      mjelctrn I/O map is very similar.
 *******************************************************************/
 
 

@@ -54,6 +54,11 @@ if _OPTIONS["USE_WAYLAND"]=="1" then
 	defines {
 		"SDLMAME_USE_WAYLAND",
 	}
+	if _OPTIONS["targetos"]=="linux" then
+		buildoptions {
+			backtick(pkgconfigcmd() .. " --cflags wayland-egl"),
+		}
+	end
 end
 
 if _OPTIONS["NO_USE_XINPUT"]=="1" then

@@ -71,6 +71,9 @@ public:
 	void ack_w(int state);
 	void lpstb_w(int state);
 
+	// cursor location
+	bool cursor_active(unsigned x, unsigned y);
+
 protected:
 	// device_t implementation
 	virtual void device_start() override;

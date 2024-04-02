@@ -1484,7 +1484,7 @@ void avr8_device<NumTimers>::timer0_tick_ctc_toggle()
 		m_timer_top[0] = 0;
 		LOGMASKED(LOG_TIMER0, "%s: timer0: Toggle OC0B on match\n", machine().describe_context());
 		m_r[PORTG] ^= (1 << 5);
-		m_gpio_out_cb[PORTG](m_r[PORTG]);
+		m_gpio_out_cb[GPIOG](m_r[PORTG]);
 	}
 	m_r[TCNT0]++;
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
@@ -1498,7 +1498,7 @@ void avr8_device<NumTimers>::timer0_tick_ctc_clear()
 		m_timer_top[0] = 0;
 		LOGMASKED(LOG_TIMER0, "[0] timer0: Clear OC0B on match\n", machine().describe_context());
 		m_r[PORTG] &= ~(1 << 5);
-		m_gpio_out_cb[PORTG](m_r[PORTG]);
+		m_gpio_out_cb[GPIOG](m_r[PORTG]);
 	}
 	m_r[TCNT0]++;
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
@@ -1512,7 +1512,7 @@ void avr8_device<NumTimers>::timer0_tick_ctc_set()
 		m_timer_top[0] = 0;
 		LOGMASKED(LOG_TIMER0, "%s: timer0: Set OC0B on match\n", machine().describe_context());
 		m_r[PORTG] |= (1 << 5);
-		m_gpio_out_cb[PORTG](m_r[PORTG]);
+		m_gpio_out_cb[GPIOG](m_r[PORTG]);
 	}
 	m_r[TCNT0]++;
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
@@ -1961,7 +1961,7 @@ void avr8_device<NumTimers>::update_timer_waveform_gen_mode(uint8_t t, uint8_t m
 	if (m_timer_top[t] == -1)
 	{
 		m_timer_top[t] = 0;
-		LOGMASKED((LOG_TIMER0 + t), "%s: update_timer_waveform_gen_mode: Timer %d - Unsupported waveform generation type: %d\n", machine().describe_context(), t, mode);
+		LOGMASKED((LOG_TIMER0 << t), "%s: update_timer_waveform_gen_mode: Timer %d - Unsupported waveform generation type: %d\n", machine().describe_context(), t, mode);
 	}
 }
 
@@ -2028,7 +2028,7 @@ void avr8_device<NumTimers>::timer2_tick_fast_pwm()
 			if (m_ocr2_not_reached_yet)
 			{
 				// Turn off
-				m_r[PORTD] |= 1 << 7;
+				m_r[PORTD] &= ~(1 << 7);
 				m_gpio_out_cb[GPIOD](m_r[PORTD]);
 				m_ocr2_not_reached_yet = false;
 			}
@@ -2191,11 +2191,11 @@ void avr8_device<NumTimers>::update_timer_clock_source(uint8_t clock_select, con
 	const uint16_t old_prescale = s_prescale_values[(Timer == 2) ? 1 : 0][old_clock_select];
 	m_timer_prescale[Timer] = (uint16_t)prescale_divisor;
 
-	LOGMASKED(LOG_TIMER0 + Timer, "%s: update_timer_clock_source: t = %d, cs = %d\n", machine().describe_context(), Timer, clock_select);
+	LOGMASKED(LOG_TIMER0 << Timer, "%s: update_timer_clock_source: t = %d, cs = %d\n", machine().describe_context(), Timer, clock_select);
 
 	if (prescale_divisor == -1)
 	{
-		LOGMASKED(LOG_TIMER0 + Timer, "%s: timer%d: update_timer_clock_source: External trigger mode not implemented yet\n", machine().describe_context(), Timer);
+		LOGMASKED(LOG_TIMER0 << Timer, "%s: timer%d: update_timer_clock_source: External trigger mode not implemented yet\n", machine().describe_context(), Timer);
 		m_timer_prescale[Timer] = 0xffff;
 	}
 
@@ -2254,7 +2254,7 @@ void avr8_device<NumTimers>::timer5_tick()
 				m_timer_top[5] = 0;
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Toggle OC5B on compare match\n", machine().describe_context());
 				m_r[PORTL] ^= 1 << 4;
-				m_gpio_out_cb[PORTL](m_r[PORTL]);
+				m_gpio_out_cb[GPIOL](m_r[PORTL]);
 			}
 			break;
 		case 2: /* Clear OC5B on compare match */
@@ -2264,7 +2264,7 @@ void avr8_device<NumTimers>::timer5_tick()
 				// Clear OC5B
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Clear OC5B on compare match\n", machine().describe_context());
 				m_r[PORTL] &= ~(1 << 4);
-				m_gpio_out_cb[PORTL](m_r[PORTL]);
+				m_gpio_out_cb[GPIOL](m_r[PORTL]);
 			}
 			break;
 		case 3: /* Set OC5B on compare match */
@@ -2273,7 +2273,7 @@ void avr8_device<NumTimers>::timer5_tick()
 				m_timer_top[5] = 0;
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Set OC5B on compare match\n", machine().describe_context());
 				m_r[PORTL] |= 1 << 4;
-				m_gpio_out_cb[PORTL](m_r[PORTL]);
+				m_gpio_out_cb[GPIOL](m_r[PORTL]);
 			}
 			break;
 		}

@@ -52,7 +52,7 @@ AUDIO:
 - IRQ - ?
 - NMI - triggered by main cpu, sound latch read
 - AY-3-8910
-- PPI (8253) - used to sync the audio
+- PIT (8253) - used to sync the audio
 - game works without the sound cpu
 
 +-----------------------------------------------------------------------------------------------------------------------------------+

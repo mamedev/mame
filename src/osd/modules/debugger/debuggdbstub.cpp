@@ -21,6 +21,7 @@
 #include "fileio.h"
 
 #include <cinttypes>
+#include <string_view>
 
 
 namespace osd {
@@ -587,7 +588,7 @@ public:
 
 	int readchar();
 
-	void send_reply(const char *str);
+	void send_reply(std::string_view str);
 	void send_stop_packet();
 
 private:
@@ -676,15 +677,12 @@ int debug_gdbstub::readchar()
 }
 
 //-------------------------------------------------------------------------
-static std::string escape_packet(const std::string src)
+static std::string escape_packet(std::string_view src)
 {
 	std::string result;
 	result.reserve(src.length());
-	for ( char ch: src )
+	for ( char ch : src )
 	{
-		if ( ch == '\n' ) // don't let socket convert line endings and messing up the checksum
-			continue;
-
 		if ( ch == '#' || ch == '$' || ch == '}' )
 		{
 			result += '}';
@@ -704,10 +702,10 @@ void debug_gdbstub::generate_target_xml()
 	target_xml += "<?xml version=\"1.0\"?>\n";
 	target_xml += "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">\n";
 	target_xml += "<target version=\"1.0\">\n";
-	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch.c_str());
-	target_xml += string_format("  <feature name=\"%s\">\n", m_gdb_feature.c_str());
+	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch);
+	target_xml += string_format("  <feature name=\"%s\">\n", m_gdb_feature);
 	for ( const auto &reg: m_gdb_registers )
-		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name.c_str(), reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
+		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
 	target_xml += "  </feature>\n";
 	target_xml += "</target>\n";
 	m_target_xml = escape_packet(target_xml);
@@ -840,26 +838,24 @@ void debug_gdbstub::debugger_update()
 //-------------------------------------------------------------------------
 void debug_gdbstub::send_nack()
 {
-	m_socket.puts("-");
+	m_socket.write("-", 1);
 }
 
 //-------------------------------------------------------------------------
 void debug_gdbstub::send_ack()
 {
-	m_socket.puts("+");
+	m_socket.write("+", 1);
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_reply(const char *str)
+void debug_gdbstub::send_reply(std::string_view str)
 {
-	size_t length = strlen(str);
-
 	uint8_t checksum = 0;
-	for ( size_t i = 0; i < length; i++ )
-		checksum += str[i];
+	for ( char ch : str )
+		checksum += ch;
 
 	std::string reply = string_format("$%s#%02x", str, checksum);
-	m_socket.puts(reply);
+	m_socket.write(reply.c_str(), reply.length());
 }
 
 
@@ -917,7 +913,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_g(const char *buf)
 	std::string reply;
 	for ( const auto &reg: m_gdb_registers )
 		reply += get_register_string(reg.gdb_regnum);
-	send_reply(reply.c_str());
+	send_reply(reply);
 	return REPLY_NONE;
 }
 
@@ -986,7 +982,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 		uint8_t value = tspace->read_byte(offset + i);
 		reply += string_format("%02x", value);
 	}
-	send_reply(reply.c_str());
+	send_reply(reply);
 
 	return REPLY_NONE;
 }
@@ -1042,7 +1038,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_p(const char *buf)
 	if ( sscanf(buf, "%x", &gdb_regnum) != 1 || gdb_regnum >= m_gdb_registers.size() )
 		return REPLY_ENN;
 	std::string reply = get_register_string(gdb_regnum);
-	send_reply(reply.c_str());
+	send_reply(reply);
 	return REPLY_NONE;
 }
 
@@ -1109,7 +1105,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 				reply += string_format("%02x", *line++);
 			reply += "0A";
 		}
-		send_reply(reply.c_str());
+		send_reply(reply);
 		return REPLY_NONE;
 	}
 
@@ -1126,7 +1122,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	{
 		std::string reply = string_format("PacketSize=%x", MAX_PACKET_SIZE);
 		reply += ";qXfer:features:read+";
-		send_reply(reply.c_str());
+		send_reply(reply);
 		return REPLY_NONE;
 	}
 	else if ( name == "Xfer" )
@@ -1147,7 +1143,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 				else
 					reply += 'l';
 				reply += m_target_xml.substr(offset, length);
-				send_reply(reply.c_str());
+				send_reply(reply);
 				m_target_xml_sent = true;
 				return REPLY_NONE;
 			}
@@ -1334,7 +1330,7 @@ void debug_gdbstub::send_stop_packet()
 	if ( m_target_xml_sent )
 		for ( const auto &gdb_regnum: m_stop_reply_registers )
 			reply += string_format("%02x:%s;", gdb_regnum, get_register_string(gdb_regnum));
-	send_reply(reply.c_str());
+	send_reply(reply);
 }
 
 //-------------------------------------------------------------------------

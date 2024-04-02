@@ -4751,6 +4751,71 @@ ROM_START( clubpacma )
 ROM_END
 
 
+/*
+  Super Ms Pac-Man (turbo hack)
+  -----------------------------
+
+  This Ms. Pac-Man turbo game has all the info in a 27256 EPROM.
+  It runs on a hardware with NVC284 and NVC285 Namco customs
+
+  Also the PCB has a lot of hacks involving high addressing lines
+  with different TTL components.
+
+
+   EPROM 27256   CPU addressing
+  -------------+----------------
+    0000-0fff  |  0000-0fff
+    1000-1fff  |  8000-8fff
+    2000-2fff  |  1000-1fff
+    3000-37ff  |  9000-97ff
+    3800-3fff  |  9800-9fff (empty)
+               |
+    6000-6fff  |  2000-2fff
+    7000-7fff  |  3000-3fff
+
+
+  There is a complete graphics set at 4000-5fff of the 27256 EPROM.
+  Still don't know if the game is using this set, or the one stored in the original 2732 EPROMs.
+  Both GFX sets are identical.
+
+   EPROM 27256   Graphics
+  -------------+----------------
+    4000-47ff  |  0000-07ff (GFX ROM @5e)
+    4800-4fff  |  0800-0fff (GFX ROM @5h)
+    5000-57ff  |  1000-17ff (GFX ROM @5f)
+    5800-5fff  |  1800-1fff (GFX ROM @5j)
+
+*/
+ROM_START( mspacmanhnc )
+	ROM_REGION( 0x8000, "bigeprom", 0 )
+	ROM_LOAD( "6f.bin",  0x0000, 0x8000, CRC(db164116) SHA1(e5b16b37e765ee46681b1d565c67d3eda94cd0f1) )
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_COPY( "bigeprom",  0x0000, 0x0000, 0x1000 )   // copy segment to 0000-0fff
+	ROM_COPY( "bigeprom",  0x2000, 0x1000, 0x1000 )   // copy segment to 1000-1fff
+	ROM_COPY( "bigeprom",  0x6000, 0x2000, 0x1000 )   // copy segment to 2000-2fff
+	ROM_COPY( "bigeprom",  0x7000, 0x3000, 0x1000 )   // copy segment to 3000-3fff
+	ROM_COPY( "bigeprom",  0x1000, 0x8000, 0x1000 )   // copy segment to 8000-8fff
+	ROM_COPY( "bigeprom",  0x3000, 0x9000, 0x0800 )   // copy segment to 9000-97ff
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+//	ROM_COPY( "bigeprom",  0x4000, 0x0000, 0x2000 )   // copy segments to 0000-1fff, same GFX set of the GFX EPROMs
+	ROM_LOAD( "5e.bin",   0x0000, 0x0800, CRC(93933d1d) SHA1(fa38d2cb87e872bb9a3158a4df98f38360dc85ec) )
+	ROM_LOAD( "5h.bin",   0x0800, 0x0800, CRC(7409fbec) SHA1(f440f08ba026ae6172666e1bdc0894ce33bba420) )
+	ROM_LOAD( "5f.bin",   0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
+	ROM_LOAD( "5j.bin",   0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
+
+	// from parent set...
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123-cpu.7f",    0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s129-vid.4a",    0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
+	ROM_LOAD( "82s129-vid.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s129-vid.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
+ROM_END
+
+
 /*****************************************************************************
 
   Ms Pac Man Twin (SUSILU)
@@ -4970,6 +5035,174 @@ ROM_END
   Besides, the graphics ROM 3 (@ location 5h) has extra bitmapped strings "Push Start" and "Insert Coins"
   that are not present in the parent set.
 
+
+  PCB Layout...
+
+   G-HB
+  .---------------------------------------------------------------------------------.
+  |         1             2              3              4                 5         |
+  |                  .----------.   .----------.                  .--------------.  |
+  | S                | 74LS161  |   | 74LS161  |                  |   PKN00004   |  |
+  |                  '----------'   '----------'                  |    socket    |  |
+  |                  .----------.   .----------.   .----------.   '--------------'  |
+  | R                | 74LS161  |   | 74LS161  |   |  2114-2  |                     |
+  |                  '----------'   '----------'   '----------'                     |
+  |                  .----------.   .----------.   .----------.                     |
+  | P   RESNET 1     |  74LS02  |   |  74LS10  |   |  2114-2  |                     |
+  |                  '----------'   '----------'   '----------'                     |
+  |   .----------.                  .----------.   .----------.      .----------.   |
+  | N |  CD4066  |     RESNET 2     |  74LS74  |   |  2114-2  |      |  74LS08  |   |
+  |   '----------'                  '----------'   '----------'      '----------'   |
+  |   .----------.   .----------.   .----------.   .----------.      .----------.   |
+  | M |  IM5623  |   | 74LS273  |   |  IM5623  |   |  2114-2  |      |  74LS74  |   |
+  |   '----------'   '----------'   '----------'   '----------'      '----------'   |
+  |   .----------.   .----------.   .----------.   .----------.      .----------.   |
+  | L | 74LS174  |   |  74S89   |   | 74LS157  |   |  2114-2  |      | 74LS139  |   |-----.
+  |   '----------'   '----------'   '----------'   '----------'      '----------'   |-----| R
+  |   .----------.   .----------.   .----------.   .----------.                     |-----| I
+  | K | 74LS283  |   |  74S89   |   | 74LS158  |   |  2114-2  |                     |-----| B
+  |   '----------'   '----------'   '----------'   '----------'   .--------------.  |-----| B
+  |                                                               |    MB5816    |  |-----| O
+  |                                                               |              |  |-----| N
+  | J                                                             '--------------'  |-----|
+  |                                                               .--------------.  |-----| C
+  |                                                               |    MB5816    |  |-----| A
+  |   .----------.   .----------.   .----------.   .----------.   |              |  |-----| B
+  | H | 74LS174  |   | 74LS86   |   |  74S89   |   | 74LS245  |   '--------------'  |-----| L
+  |   '----------'   '----------'   '----------'   '----------'   .--------------.  |-----| E
+  |   .----------.   .----------.   .----------.   .----------.   |    MB5816    |  |-----|
+  | F | 74LS283  |   | 74LS283  |   |  74S89   |   |  74LS86  |   |              |  |-----'
+  |   '----------'   '----------'   '----------'   '----------'   '--------------'  |
+  |                                                               .--------------.  |
+  |   .----------.   .----------.   .----------.   .----------.   |    MB5816    |  |
+  | E | 74LS161  |   | 74LS161  |   |  74LS20  |   | 74LS157  |   |              |  |
+  |   '----------'   '----------'   '----------'   '----------'   '--------------'  |
+  |                  .----------.                  .----------.                     |
+  | D                |  2115A   |                  | 74LS273  |                     |
+  |                  '----------'                  '----------'                     |
+  |                  .----------.   .----------.   .----------.      .----------.   |
+  | C                |  2115A   |   | 74LS375  |   |  74LS00  |      | 74LS194  |   |
+  |                  '----------'   '----------'   '----------'      '----------'   |
+  |                  .----------.   .----------.   .----------.      .----------.   |
+  | B                |  2115A   |   | 74LS157  |   | 74LS377  |      | 74LS194  |   |
+  |                  '----------'   '----------'   '----------'      '----------'   |
+  |                  .----------.   .----------.   .----------.      .----------.   |
+  | A                |  2115A   |   | 74LS158  |   | 74LS287  |      | 74LS157  |   |
+  |                  '----------'   '----------'   '----------'      '----------'   |
+  |                                                                                 |
+  '---------------------------------------------------------------------------------'
+
+
+           G-HA
+          .----------------------------------------------------------------------------------.
+          |           6               7              8              9                        |
+          |       .----------.                                                               |
+          | S     | 74LS367  |                                                               |
+          |       '----------'                                                               |
+          |       .----------.                                                               |
+          | R     | 74LS367  |                                                               |
+          |       '----------'                                                               |
+          |   .--------------.                                                               |
+          |   |              |                                                               |
+          | P |    socket    |                                                               |
+          |   '--------------'                                                               |
+          |   .--------------.   .----------.                                                |
+          | N |              |   |  74LS42  |                                                |
+          |   |    socket    |   '----------'                                                |
+          |   '--------------'                                                               |
+          |   .--------------.   .----------.                                                |
+          | M |              |   | 74LS139  |                                             .--'
+          |   |    socket    |   '----------'                                             |
+          |   '--------------'   .----------.                                          01 '--.
+    .-----| L .--------------.   |  74LS02  |                                             ---|
+  R |-----|   |              |   '----------'                                             ---|
+  I |-----|   |    socket    |                                                            ---|
+  B |-----|   '--------------'                  .----------.                              ---|
+  B |-----| K .--------------.                  | 74LS259  |                              ---|
+  O |-----|   |              |                  '----------'                        2x22  ---|
+  N |-----|   |    socket    |   .----------.                                       edge  ---|
+    |-----| J '--------------'   | 741LS38  |                                       conn  ---|
+  C |-----|   .--------------.   '----------'                                             ---|
+  A |-----|   |              |   .----------.   .----------.                              ---|
+  B |-----| H |    socket    |   |  74LS08  |   | 74LS367  |                              ---|
+  L |-----|   '--------------'   '----------'   '----------'                              ---|
+  E |-----|   .--------------.                                                            ---|
+    |-----|   |              |   .----------.   .----------.                              ---|
+    '-----| F |    socket    |   |   7603   |   | 74LS367  |                              ---|
+          |   '--------------'   '----------'   '----------'                           22 .--'
+          |   .--------------.   .----------.   .----------.                              |
+          | E |              |   |          |   | 74LS367  |                              '--.
+          |   |    socket    |   '----------'   '----------'                                 |
+          |   '--------------'                                                               |
+          |       .--------------.              .----------.   .--------------.              |
+          | D     |   PKN00003   |              | 74LS367  |   | DIP switches |              |
+          |       |    socket    |              '----------'   '--------------'              |
+          |       '--------------'              .----------.   .----------.                  |
+          | C                                   |  74LS74  |   | 74LS161  |                  |
+          |     .-------------------. .------.  '----------'   '----------'                  |
+          |     |      SUSILU       | |18.432|  .----------.                                 |
+          | B   |      socket       | |  MHZ |  |  74258   |                                 |
+          |     '-------------------' '------'  '----------'                  .----------.   |
+          |                             Xtal    .----------.                  |          |   |
+          | A                                   |  74107   |                  |  MB3712  |   |
+          |                                     '----------'                  '----------'   |
+          |   .--.                        .--.                                               |
+          |   |  ||||||||||||||||||||||||||  |                                               |
+          '---'  '------------------------'  '-----------------------------------------------'
+                    2x25 edge connector
+
+
+  Custom NVC284 replacement PCB (at location 5S):
+  .----------------------------------------------.
+  |                 .----------.       PKN00004  |
+  |                 | 74LS367  |                 |
+  |                 '----------'                 |
+  |  .----------.   . . . . . . . . . . . . . .  |
+  |  |  74LS32  |                                |
+  |  '----------'       C O N N E C T O R        |
+  |  .----------.                                |
+  |  | 74LS138  |   . . . . . . . . . . . . . .  |
+  |  '----------'                                |
+  |  .----------.   .----------.   .----------.  |
+  |  |  74LS86  |   | 74LS257  |   | 74LS257  |  |
+  |  '----------'   '----------'   '----------'  |
+  |  .----------.   .----------.   .----------.  |
+  |  |  74LS86  |   | 74LS257  |   | 74LS257  |  |
+  |  '----------'   '----------'   '----------'  |
+  |  .----------.   .----------.   .----------.  |
+  |  |  74LS86  |   | 74LS257  |   | 74LS257  |  |
+  |  '----------'   '----------'   '----------'  |
+  |  .----------.   .----------.   .----------.  |
+  |  |  74LS08  |   |  74LS04  |   | 74LS148  |  |
+  |  '----------'   '----------'   '----------'  |
+  '----------------------------------------------'
+
+
+  Custom NVC285 replacement PCB (at location 6D):
+  .-----------------------------------------------.
+  |                   .  C   .          PKN00003  |
+  |  .----------.     .  O   .                    |
+  |  | 74LS139  |     .  N   .                    |
+  |  '----------'     .  N   .                    |
+  |  .----------.     .  E   .     .-----------.  |
+  |  | 74LS139  |     .  C   .     |  74LS373  |  |
+  |  '----------'     .  T   .     '-----------'  |
+  |  .----------.     .  O   .     .-----------.  |
+  |  |  74LS08  |     .  R   .     |  74LS373  |  |
+  |  '----------'                  '-----------'  |
+  |  .----------.   .----------.   .-----------.  |
+  |  |  74LS32  |   |  74LS04  |   |  74LS373  |  |
+  |  '----------'   '----------'   '-----------'  |
+  |  .----------.   .----------.   .-----------.  |
+  |  |  74LS14  |   | 74LS109  |   |  74LS109  |  |
+  |  '----------'   '----------'   '-----------'  |
+  |                                               |
+  '-----------------------------------------------'
+
+  
+  The SUSILU PCB soldered below the Z80 socket, is exactly
+  the same documented above, containing a Z80 CPU, a M27256 EPROM,
+  a 74LS254 and an unknown DIL40 IC.
 
 
   Docs by Roberto Fresca.
@@ -8390,26 +8623,27 @@ GAME( 1980, pacmanug, puckman,  pacman,   pacman,   pacman_state,  empty_init,  
 
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacman_state,  init_pacplus,  ROT90,  "Namco (Midway license)", "Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mspacman,   0,        mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmnf,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack",                                  "Ms. Pac-Man (speedup hack)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmat,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack",                                  "Ms. Pac Attack",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, msheartb,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack (Two-Bit Score)",                  "Ms. Pac-Man Heart Burn",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacgal2,    mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "bootleg",                               "Pac-Gal (set 2)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmancr, mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg on Crush Roller Hardware)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 1)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab2,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 2)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab4,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 4)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmbe,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacmbe,  ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, encrypted)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mspacmbmc,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg (Marti Colls)",                 "Ms. Pac-Man (Marti Colls bootleg)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmbn,   mspacman, woodpek,  mspacman, pacman_state,  init_pengomc1,  ROT90,  "bootleg (Novatronic)",                  "Ms. Pac-Man (Novatronic bootleg)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mspacmanlai,mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg (Leisure and Allied)",          "Ms. Pac-Man (Leisure and Allied bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii,    mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,   ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii2,   mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,   ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacgal,     mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "hack",                                  "Pac-Gal (set 1)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacpls,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "hack",                                  "Ms. Pac-Man Plus",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mschamp,    mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,   ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Zola-Puc Gal",       MACHINE_SUPPORTS_SAVE ) // Rayglo version
-GAME( 1995, mschamps,   mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,   ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Super Zola-Puc Gal", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspackpls,  mspacman, woodpek,  mspacman, pacman_state,  init_mspackpls, ROT90,  "hack",                                  "Miss Packman Plus",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacman,    0,        mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmnf,    mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack",                                  "Ms. Pac-Man (speedup hack)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmat,    mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack",                                  "Ms. Pac Attack",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, msheartb,    mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack (Two-Bit Score)",                  "Ms. Pac-Man Heart Burn",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacgal2,     mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "bootleg",                               "Pac-Gal (set 2)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmancr,  mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg on Crush Roller Hardware)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab,    mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab2,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab4,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 4)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmbe,    mspacman, woodpek,  mspacman, pacman_state,  init_mspacmbe,  ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, encrypted)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mspacmbmc,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg (Marti Colls)",                 "Ms. Pac-Man (Marti Colls bootleg)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmbn,    mspacman, woodpek,  mspacman, pacman_state,  init_pengomc1,  ROT90,  "bootleg (Novatronic)",                  "Ms. Pac-Man (Novatronic bootleg)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mspacmanlai, mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg (Leisure and Allied)",          "Ms. Pac-Man (Leisure and Allied bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii,     mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,   ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii2,    mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,   ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacgal,      mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "hack",                                  "Pac-Gal (set 1)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacpls,    mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "hack",                                  "Ms. Pac-Man Plus",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mschamp,     mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,   ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Zola-Puc Gal",       MACHINE_SUPPORTS_SAVE ) // Rayglo version
+GAME( 1995, mschamps,    mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,   ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Super Zola-Puc Gal", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspackpls,   mspacman, woodpek,  mspacman, pacman_state,  init_mspackpls, ROT90,  "hack",                                  "Miss Packman Plus",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mspacmanhnc, mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "hack",                                  "Super Ms. Pac-Man (turbo hack, NVC284/NVC285 hardware)", MACHINE_SUPPORTS_SAVE )
 
 // These bootlegs have MADE IN GREECE clearly visible and etched into the PCBs. They were very common in Spain with several operators having their own versions.
 // Based on the PCBs and copyright dates shown they  were produced late 80s / early 90s. Usually they run a version of Ms. Pacman, but were sometimes converted back to regular Pac-Man

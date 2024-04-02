@@ -16137,12 +16137,6 @@ cncchess2
 @source:chess/conic_cchess3.cpp
 cncchess3
 
-@source:chess/excal_ivant.cpp
-ivant
-
-@source:chess/excal_mirage.cpp
-emirage
-
 @source:chess/regence.cpp
 regence
 
@@ -17437,6 +17431,7 @@ blktouch                        // (c) Yang Gi Co Ltd.
 cdracula                        // (c) 1994 Y.S.E.
 drgpunch                        // "24" (c) 1989 Dynax
 gekisha                         // "28" (c) 1989 Dynax
+gekishap2                       // ??   (c) 1990 Dynax
 hanamai                         // "16" (c) 1988 Dynax
 hanayara                        // "55" (c) 1991 Dynax
 hjingi                          // ?? (c) 1990 Dynax
@@ -17462,7 +17457,8 @@ mjelctrb                        // ??  (c) 1993 bootleg Mahjong Electron Base pa
 mjelctrn                        // ??  Mahjong Electron Base parts 2 & 4
 mjembase                        // "38" Mahjong Electromagnetic Base 1989 Dynax
 mjfriday                        // "26" (c) 1989 Dynax
-mjreach                         // (c) 1994 bootleg
+mjreach                         // (c) 1994 Dynax
+mjreachbl                       // (c) 1994 bootleg
 neruton                         // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 nerutona                        // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 ougonhai                        // "62" (c) 1991 Dynax
@@ -17759,6 +17755,18 @@ e9161                           //
 
 @source:ericsson/eispc.cpp
 epc                             // 1984 Ericsson PC
+
+@source:esprit/executive10.cpp
+exe10102                        // 1983 Esprit Systems
+
+@source:excalibur/igor.cpp
+igor
+
+@source:excalibur/ivant.cpp
+ivant
+
+@source:excalibur/mirage.cpp
+emirage
 
 @source:excellent/aquarium.cpp
 aquarium                        // (c) 1996 Excellent System
@@ -19793,6 +19801,9 @@ husky                           // DVW Husky
 @source:ibm/ibm3153.cpp
 ibm3153                         //
 
+@source:ibm/ibm5100.cpp
+ibm5100
+
 @source:ibm/ibm5550.cpp
 ibm5550                         //
 
@@ -20122,7 +20133,9 @@ haunthig                        // (c) 200?
 klxyj                           // (c) 200?
 lhzb3                           // (c) 200?
 lhzb4                           // (c) 200?
+mgcs3                           // (c) 200?
 mgfx                            // (c) 200?
+mgzz                            // (c) 2003
 qlgs                            // (c) 1999
 sddz                            // (c) 200?
 sdwx                            // (c) 2002
@@ -29048,6 +29061,7 @@ luckyrlt                        // (c) 1990 unknown
 rcirulet                        // (c) 199? Entretenimientos GEMINIS
 re800ea                         // (c) 1991 Entretenimientos GEMINIS
 re800v1                         // (c) 1991 Entretenimientos GEMINIS
+re800v1a                        // (c) 1991 Entretenimientos GEMINIS
 re800v3                         // (c) 1992 Entretenimientos GEMINIS
 winner81                        // (c) 1981 Corona Co, Ltd.
 winner81b                       // (c) 1981 Corona Co, Ltd.
@@ -31165,6 +31179,7 @@ npcartv1                        //
 npcramen                        //
 npeurver                        //
 npfpit                          //
+npft                            //
 npmillen                        //
 npotogib                        //
 nppopeye                        //
@@ -31539,12 +31554,6 @@ savquest                        //
 
 @source:misc/scm_500.cpp
 scm_500                         //
-
-@source:misc/sealy.cpp
-crzyddz                         // (c) 2004? Sealy
-
-@source:misc/sealy_fr.cpp
-snowbwar                         // (c) 201? Sealy
 
 @source:misc/sfbonus.cpp
 abnudge                         // (c) 2003 Amcoe - Animal Bonus Nudge
@@ -35222,6 +35231,7 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmanhnc                     // hack
 mspacmanlai                     // bootleg
 mspacmat                        // hack
 mspacmbe                        // bootleg
@@ -35852,6 +35862,7 @@ streetgr3                       // (c) 1993
 @source:pc/pcipc.cpp
 pciagp                          //
 pcipc                           //
+pcipcs7                         //
 pcipctx                         //
 
 @source:pc/pcipc_sis.cpp
@@ -37880,6 +37891,7 @@ sc_18n                          //
 sc_18s2                         //
 ss_01                           //
 ss_03                           //
+ss_11                           //
 ss_12                           //
 ss_14                           //
 ss_15                           //
@@ -38767,6 +38779,15 @@ st1706                          //
 st1707                          //
 st1708                          //
 st1714                          //
+
+@source:sealy/sealy.cpp
+crzyddz                         // (c) 2004? Sealy
+
+@source:sealy/sealy_eagle.cpp
+qczl                            // (c) 2011 Sealy
+
+@source:sealy/sealy_fr.cpp
+snowbwar                        // (c) 201? Sealy
 
 @source:sega/angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
@@ -42981,6 +43002,7 @@ earthjkra                       //
 earthjkrb                       //
 earthjkrp                       //
 eto                             // (c) 1994 Visco (Japan)
+etoa                            // (c) 1994 Visco (Japan)
 galmedes                        // (c) 1992 Visco (Japan)
 jigkmgri                        // B41 (c) 1988 Taito Corporation (Japan)
 mofflott                        // C17 (c) 1989 Taito Corporation (Japan)

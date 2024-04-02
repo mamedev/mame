@@ -341,7 +341,7 @@ protected:
 		uint8_t prev_dx = 0, prev_dy = 0;
 		uint8_t freq_reg = 0;
 		uint8_t freq_index = 0;
-	}m_mouse;
+	} m_mouse;
 
 private:
 	u8 ppi_mouse_porta_r();
@@ -467,7 +467,7 @@ protected:
 	struct {
 		uint8_t pal_entry = 0;
 		uint8_t r[16]{}, g[16]{}, b[16]{};
-	}m_analog16;
+	} m_analog16;
 
 private:
 	// EGC, PC9801VX onward

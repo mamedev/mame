@@ -68,7 +68,7 @@ private:
 
 	void main_map(address_map &map);
 
-	void init_board(int state);
+	void init_board(u8 data);
 	u8 read_board_row(u8 row);
 
 	// I/O handlers
@@ -91,7 +91,7 @@ void dsc_state::machine_start()
     Sensorboard
 *******************************************************************************/
 
-void dsc_state::init_board(int state)
+void dsc_state::init_board(u8 data)
 {
 	for (int i = 0; i < 20; i++)
 	{

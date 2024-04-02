@@ -241,6 +241,7 @@ const double XTAL::known_xtals[] = {
 	 14'314'000, /* 14.314_MHz_XTAL        Taito TTL Board  */
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	 14'349'600, /* 14.3496_MHz_XTAL       Roland S-50 VDP */
+	 14'469'000, /* 14.469_MHz_XTAL        Esprit Systems Executive 10/102 */
 	 14'580'000, /* 14.58_MHz_XTAL         Fortune 32:16 Video Controller */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'728'000, /* 14.728_MHz_XTAL        ADM 36 */
@@ -286,6 +287,7 @@ const double XTAL::known_xtals[] = {
 	 16'670'000, /* 16.67_MHz_XTAL         - */
 	 16'777'216, /* 16.777216_MHz_XTAL     Nintendo Game Boy Advance */
 	 16'934'400, /* 16.9344_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
+	 16'960'000, /* 16.960_MHz_XTAL        Esprit Systems Executive 10/102 */
 	 17'010'000, /* 17.01_MHz_XTAL         Epic 14E */
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
 	 17'074'800, /* 17.0748_MHz_XTAL       SWTPC 8212 */

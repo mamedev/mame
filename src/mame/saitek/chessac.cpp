@@ -83,9 +83,9 @@ private:
 	u8 m_led_data = 0;
 	u32 m_adpdm_address = 0;
 
-	u8 m_port3 = 0;
-	u8 m_port5 = 0;
-	u8 m_port7 = 0;
+	u8 m_port3 = 0xff;
+	u8 m_port5 = 0xff;
+	u8 m_port7 = 0xff;
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
