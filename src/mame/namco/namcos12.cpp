@@ -97,10 +97,6 @@ It was shown only at an amusement show. Possibly a prototype still exists. Possi
 Tekno Werk                              (C) Namco,        1999
 Some kind of music game similar to Konami's Keyboard Mania series
 
-Um Jammer Lammy                         (C) Namco,        1999
-http://www.wailee.com/sys/lpic/UM_Jammer_Lammy.jpg
-https://www.youtube.com/watch?v=Jrwj4lUzKgU
-
 The Namco System 12 system comprises 3 mandatory PCB's....
 MOTHER PCB  - This is the main PCB. It holds all sound circuitry, sound ROMs, program ROMs, shared RAM, bank-switching
               logic, controller/input logic (including sound CPU) and some video output circuitry.
