@@ -430,14 +430,8 @@ void spi_sdcard_device::do_command()
 
 		case 58: // CMD58 - READ_OCR
 			m_data[0] = 0;
-			if (m_type == SD_TYPE_HC)
-			{
-				m_data[1] = 0x40; // indicate SDHC support
-			}
-			else
-			{
-				m_data[1] = 0;
-			}
+			m_data[1] = 0x80; // Busy Status: 1b - Initialization Complete
+			m_data[1] |= (m_type == SD_TYPE_V2) ? 0 : 0x40; // Card Capacity Status: 0b - SDCS, 1b SDHC, SDXC
 			m_data[2] = 0;
 			m_data[3] = 0;
 			m_data[4] = 0;
