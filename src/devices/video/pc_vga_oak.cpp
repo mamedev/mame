@@ -357,12 +357,9 @@ void oak_oti111_vga_device::ramdac_mmio_map(address_map &map)
 
 uint16_t oak_oti111_vga_device::offset()
 {
-	uint16_t off = svga_device::offset();
-
 	if (m_oak_gfx_mode)
 		return vga.crtc.offset << 4;
-	else
-		return off;
+	return svga_device::offset();
 }
 
 u8 oak_oti111_vga_device::mem_r(offs_t offset)

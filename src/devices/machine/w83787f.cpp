@@ -148,7 +148,7 @@ void w83787f_device::write(offs_t offset, u8 data)
 // none of these regs have a real naming, they are all CR*
 void w83787f_device::config_map(address_map &map)
 {
-//	map(0x00, 0x00) IDE & FDC
+//  map(0x00, 0x00) IDE & FDC
 	map(0x01, 0x01).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_cr1;
@@ -158,24 +158,24 @@ void w83787f_device::config_map(address_map &map)
 			remap(AS_IO, 0, 0x400);
 		})
 	);
-//	map(0x02, 0x02) extension adapter mode
-//	map(0x03, 0x03) game port, UART clocks
-//	map(0x04, 0x04) game port, UARTA/B power-down tristate
-//	map(0x05, 0x05) ECP FIFO threshold
-//	map(0x06, 0x06) 2x / x4 FDD select, FDC power-down tristate, IDE power-down tristate
-//	map(0x07, 0x07) FDDs type
-//	map(0x08, 0x08) automatic power-down, FDD write protect
-//	map(0x09, 0x09) CHIP ID, lock alias, operating mode
-//	map(0x0a, 0x0a) LPT pins
-//	map(0x0c, 0x0c) UARTA/B clock source, lock select
-//	map(0x0d, 0x0d) IrDA select
-//	map(0x0e, 0x0f) <reserved for test>
-//	map(0x10, 0x10) GIO0 address select 7-0
-//	map(0x11, 0x11) GIO0 address select 10-8, GI0 address MODE0-1
-//	map(0x12, 0x12) GIO1 address select 7-0
-//	map(0x13, 0x13) GIO1 address select 10-8, GI0 address MODE0-1
-//	map(0x14, 0x14) GIO0 ddr/mode
-//	map(0x15, 0x15) GIO1 ddr/mode
+//  map(0x02, 0x02) extension adapter mode
+//  map(0x03, 0x03) game port, UART clocks
+//  map(0x04, 0x04) game port, UARTA/B power-down tristate
+//  map(0x05, 0x05) ECP FIFO threshold
+//  map(0x06, 0x06) 2x / x4 FDD select, FDC power-down tristate, IDE power-down tristate
+//  map(0x07, 0x07) FDDs type
+//  map(0x08, 0x08) automatic power-down, FDD write protect
+//  map(0x09, 0x09) CHIP ID, lock alias, operating mode
+//  map(0x0a, 0x0a) LPT pins
+//  map(0x0c, 0x0c) UARTA/B clock source, lock select
+//  map(0x0d, 0x0d) IrDA select
+//  map(0x0e, 0x0f) <reserved for test>
+//  map(0x10, 0x10) GIO0 address select 7-0
+//  map(0x11, 0x11) GIO0 address select 10-8, GI0 address MODE0-1
+//  map(0x12, 0x12) GIO1 address select 7-0
+//  map(0x13, 0x13) GIO1 address select 10-8, GI0 address MODE0-1
+//  map(0x14, 0x14) GIO0 ddr/mode
+//  map(0x15, 0x15) GIO1 ddr/mode
 }
 
 /*

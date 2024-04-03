@@ -158,6 +158,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "keyboard.h"
 #include "loopback.h"
 #include "mboardd.h"
+#include "nss_tvinterface.h"
 #include "null_modem.h"
 #include "patchbox.h"
 #include "printer.h"
@@ -178,6 +179,7 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("keyboard",      SERIAL_KEYBOARD);
 	device.option_add("loopback",      RS232_LOOPBACK);
 	device.option_add("mockingboard",  SERIAL_MOCKINGBOARD_D);
+	device.option_add("nss_tvi",       NSS_TVINTERFACE);
 	device.option_add("null_modem",    NULL_MODEM);
 	device.option_add("patch",         RS232_PATCH_BOX);
 	device.option_add("printer",       SERIAL_PRINTER);

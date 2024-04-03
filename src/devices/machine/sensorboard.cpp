@@ -154,7 +154,7 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_sensordelay));
 }
 
-void sensorboard_device::preset_chess(int state)
+void sensorboard_device::preset_chess(u8 data)
 {
 	// set chessboard start position
 
@@ -606,17 +606,18 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 	if (!newval)
 		return;
 
-	u8 init = (u8)param;
+	u8 init = param ? 1 : 0;
 	cancel_sensor();
 	cancel_hand();
 
-	m_clear_cb(init ? 0 : 1);
+	u8 rotate = m_inp_ui->read() & 2;
+	m_clear_cb((init ^ 1) | rotate);
 
 	if (init)
-		m_init_cb(1);
+		m_init_cb(init | rotate);
 
 	// rotate pieces
-	if (m_inp_ui->read() & 2)
+	if (rotate)
 	{
 		u8 tempstate[0x100];
 		for (int y = 0; y < m_height; y++)

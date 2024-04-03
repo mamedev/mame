@@ -5,6 +5,9 @@ King Of Football (c)1995 BMC
 
 preliminary driver by Tomasz Slanina
 
+TODO: jxzh has bad GFX and needs correct protection handling. For testing, one well-placed soft reset
+      will make it boot
+
 --
 
 MC68000P10
@@ -29,11 +32,13 @@ ft5_v6_c4.u58 /
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -57,6 +62,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void jxzh(machine_config &config);
 	void koftball(machine_config &config);
 
 	void init_koftball();
@@ -80,6 +86,7 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void jxzh_mem(address_map &map);
 	void koftball_mem(address_map &map);
 	void ramdac_map(address_map &map);
 };
@@ -168,6 +175,36 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x320000, 0x320001).nopw();
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
+}
+
+void koftball_state::jxzh_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x20ffff).ram().share(m_main_ram);
+
+	map(0x260000, 0x260fff).ram().w(FUNC(koftball_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x261000, 0x261fff).ram().w(FUNC(koftball_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x262000, 0x26ffff).ram();
+
+	map(0x280000, 0x28ffff).ram(); // unused ?
+	map(0x2a0000, 0x2a001f).nopw();
+	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
+	map(0x2b0000, 0x2b0003).r(FUNC(koftball_state::random_number_r));
+	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
+	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
+
+	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x2db003, 0x2db003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x2db005, 0x2db005).w("ramdac", FUNC(ramdac_device::mask_w));
+
+	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x2f0000, 0x2f0003).portr("INPUTS");
+	map(0x300000, 0x300001).nopw();
+	map(0x320000, 0x320001).nopw();
+	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
+	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
+	map(0x380000, 0x380001).w(FUNC(koftball_state::prot_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(koftball_state::prot_w));
 }
 
 void koftball_state::ramdac_map(address_map &map)
@@ -259,6 +296,13 @@ void koftball_state::koftball(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }
 
+void koftball_state::jxzh(machine_config &config)
+{
+	koftball(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &koftball_state::jxzh_mem);
+}
+
 ROM_START( koftball )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "ft5_v16_c5.u14", 0x000001, 0x10000, CRC(45c856e3) SHA1(0a25cfc2b09f1bf996f9149ee2a7d0a7e51794b7) )
@@ -270,10 +314,72 @@ ROM_START( koftball )
 	ROM_LOAD16_BYTE( "ft5_v6_c1.u59", 0x40000, 0x20000, CRC(b33a008f) SHA1(c4fd40883fa1c1cbc58f7b342fed753c52f0cf59) )
 	ROM_LOAD16_BYTE( "ft5_v6_c2.u60", 0x40001, 0x20000, CRC(3dc22223) SHA1(dc74800c51de3b6a7fbf7214a1da1d2f3d2aea84) )
 
-
 	ROM_REGION( 0x040000, "oki", 0 ) // Samples
 	ROM_LOAD( "ft5_v6_c9.u21", 0x00000, 0x10000,  CRC(f6216740) SHA1(3d1c795da2f8093e937107e3848cb96338536faf) )
+ROM_END
 
+/*******************************************************************
+錦繡中華 (Jǐnxiù Zhōnghuá), BMC 1996
+Hardware Info by Guru
+---------------------
+
+BMC-A-41210
+|-------------------------------------------------|
+|21.47727MHz  9  AR17961              uPC1242H   1|
+|                        4   3   2   1           0|
+|T518A      6264                           7805  W|
+|  555                 |-----|              VOL  A|
+|           6264       |40817|     HM86171       Y|
+|                      |-----|                  |-|
+|           62256                               |
+|                      |-----|             LM324|-|
+|           62256      |PLCC |   3567             |
+|                      |68   |                   M|
+| |-|             GAL1 |-----|    3.579545MHz    A|
+| |6|   5   6116  GAL2                           H|
+| |8|                                            J|
+| |0|           SCAP                  DIP1       O|
+| |0|                                            N|
+| |0|   6   6116                                 G|
+| |-|                                 DIP2        |
+|-------------------------------------------------|
+Notes:
+      68000 - Clock 10.738635MHz [21.47727/2]
+    AR17961 - Equivalent to OKI M6295 4-Channel ADPCM Voice Synthesis LSI. Clock input 0.976239545MHz [21.47727/22]. Pin 7 HIGH
+       3567 - Equivalent to Yamaha YM2413 OPLL FM Synthesis Sound Chip. Clock input 3.579545MHz
+      61256 - 32kB x8-bit SRAM
+       6264 - 8kB x8-bit SRAM
+       6116 - 2kB x8-bit SRAM (both backed-up by 5.5V Supercap)
+     DIP1/2 - 8-position DIP Switch
+     GAL1/2 - LATTICE GAL16V8B PLD
+   uPC1242H - NEC uPC1242H Audio Power Amp
+      LM324 - LM324 Quad Operational Amplifier
+        555 - 555 Timer (provides master reset)
+       7805 - LM7805 5V Linear Regulator
+    HM86171 - HMC HM86171-80 Color Palette RAMDAC
+      40817 - BMC QFP100 Custom Chip marked 'BMC VDB40817'
+     PLCC68 - Unknown PLCC68 IC. Surface scratched but likely to be BMC B816140 (CPLD)
+      T518A - Mitsumi PST518A Master Reset IC (TO92)
+       SCAP - 5.5V 0.1F Supercap
+        5/6 - 27C1001 EPROM (main program)
+    1/2/3/4 - 23C4000 mask ROM (gfx)
+          9 - 23C2000 mask ROM (OKI samples)
+
+*******************************************************************/
+
+ROM_START( jxzh )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "bmc_m5k.u14", 0x000001, 0x20000, CRC(43b67d0a) SHA1(f421c71165d79881c208d332416f1c82057f5680) )
+	ROM_LOAD16_BYTE( "bmc_m6k.u15", 0x000000, 0x20000, CRC(410ee342) SHA1(2b83e0fc2c5f9a2d745755572eba751bfac107f5) )
+
+	ROM_REGION( 0x200000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "bmc_mj9601-3.u61", 0x000000, 0x80000, CRC(b0c66e6f) SHA1(7539178d3bd4c012f0dd2f642e5a02303779109d) )
+	ROM_LOAD16_BYTE( "bmc_mj9601-4.u58", 0x000001, 0x80000, CRC(04a307f1) SHA1(8a45de790305c3cc4285a91d19b95d696d31bd11) )
+	ROM_LOAD16_BYTE( "bmc_mj9601-1.u59", 0x100000, 0x80000, CRC(184b8ba8) SHA1(0b84b9540ff72a57982a8f9e107a6d8d9314fdd1) )
+	ROM_LOAD16_BYTE( "bmc_mj9601-2.u60", 0x100001, 0x80000, CRC(f82e0f34) SHA1(4051c7b24f865cf7fb77eb89dde79cb30bdba7a0) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) // Samples
+	ROM_LOAD( "bmc_mj9601-9.u21", 0x00000, 0x40000,  CRC(0ffcae13) SHA1(f8501c7c8a8bebf5da95aa3b275dd514f1014971) )
 ROM_END
 
 #if NVRAM_HACK
@@ -318,7 +424,8 @@ void koftball_state::init_koftball()
 #endif
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
-GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jxzh,     0, jxzh,     koftball, koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

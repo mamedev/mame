@@ -13,19 +13,14 @@
 ****************************************************************************/
 
 #include "emu.h"
-
 #include "h17_fdc.h"
 
-// Register setup
-#define LOG_REG   (1U << 1)
-// Control lines
-#define LOG_LINES (1U << 2)
-// Drive select
-#define LOG_DRIVE (1U << 3)
-// Function calls
-#define LOG_FUNC  (1U << 4)
+#define LOG_REG   (1U << 1) // Register setup
+#define LOG_LINES (1U << 2) // Control lines
+#define LOG_DRIVE (1U << 3) // Drive select
+#define LOG_FUNC  (1U << 4) // Function calls
 
-//#define VERBOSE (0xff)
+//#define VERBOSE (LOG_GENERAL | LOG_REG | LOG_LINES | LOG_DRIVE | LOG_FUNC)
 
 #include "logmacro.h"
 

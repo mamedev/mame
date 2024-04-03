@@ -135,6 +135,7 @@ using util::BIT;
 #include "cpu/ns32000/ns32000d.h"
 #include "cpu/nuon/nuondasm.h"
 #include "cpu/pace/pacedasm.h"
+#include "cpu/palm/palmd.h"
 #include "cpu/patinhofeio/patinho_feio_dasm.h"
 #include "cpu/pdp1/pdp1dasm.h"
 #include "cpu/pdp8/pdp8dasm.h"
@@ -210,6 +211,7 @@ using util::BIT;
 #include "cpu/xtensa/xtensad.h"
 #include "cpu/z180/z180dasm.h"
 #include "cpu/z8/z8dasm.h"
+#include "cpu/z80/r800dasm.h"
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
 
@@ -565,6 +567,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "p8xc552",         le,  0, []() -> util::disasm_interface * { return new p8xc552_disassembler; } },
 	{ "p8xc562",         le,  0, []() -> util::disasm_interface * { return new p8xc562_disassembler; } },
 	{ "pace",            le, -1, []() -> util::disasm_interface * { return new pace_disassembler; } },
+	{ "palm",            be,  0, []() -> util::disasm_interface * { return new palm_disassembler; } },
 	{ "patinho_feio",    le,  0, []() -> util::disasm_interface * { return new patinho_feio_disassembler; } },
 	{ "pdp1",            be, -2, []() -> util::disasm_interface * { return new pdp1_disassembler; } },
 	{ "pdp8",            be, -1, []() -> util::disasm_interface * { return new pdp8_disassembler; } },
@@ -584,6 +587,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
+	{ "r800",            le,  0, []() -> util::disasm_interface * { return new r800_disassembler; } },
 	{ "romp",            be,  0, []() -> util::disasm_interface * { return new romp_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "rupi44",          le,  0, []() -> util::disasm_interface * { return new rupi44_disassembler; } },

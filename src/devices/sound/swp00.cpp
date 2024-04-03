@@ -343,7 +343,7 @@ void swp00_device::device_start()
 	save_item(NAME(m_dpcm_next));
 	save_item(NAME(m_dpcm_address));
 
-	for(int i=0; i != 128; i++) {
+	for(int i=0; i<128; i++) {
 		u32 v = 0;
 		switch(i >> 3) {
 		default:  v = ((i & 7) + 8) << (1 + (i >> 3)); break;
@@ -904,6 +904,8 @@ void swp00_device::keyon(int chan)
 	m_lfo_phase[chan] = 0;
 	m_sample_pos[chan] = -m_sample_start[chan] << 15;
 
+	m_sample_pos[chan] = 0;
+
 	m_active[chan] = true;
 	m_decay[chan] = false;
 	m_decay_done[chan] = false;
@@ -1324,6 +1326,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			case 2:   // 8-bits linear
 				val0 = (read_byte(base_address + spos)     << 8);
 				val1 = (read_byte(base_address + spos + 1) << 8);
+				logerror("XX %04x %04x\n", val0, val1);
 				break;
 
 			case 3: { // 8-bits delta-pcm
@@ -1373,7 +1376,10 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			m_lfo_phase[chan] = (m_lfo_phase[chan] + m_global_step[0x20 + (m_lfo_step[chan] & 0x3f)]) & 0x7ffffff;
 
 			u32 sample_increment = ((m_pitch[chan] & 0xfff) << (8 + (s16(m_pitch[chan]) >> 12))) >> 4;
-			m_sample_pos[chan] += (sample_increment * (0x800 + ((lfo_p_phase * m_lfo_pmod_depth[chan]) >> (m_lfo_step[chan] & 0x40 ? 18 : 19)))) >> 11;
+			m_sample_pos[chan] += 0x8000;//(sample_increment * (0x800 + ((lfo_p_phase * m_lfo_pmod_depth[chan]) >> (m_lfo_step[chan] & 0x40 ? 18 : 19)))) >> 11;
+			(void)lfo_p_phase;
+			(void)sample_increment;
+
 			if((m_sample_pos[chan] >> 15) >= m_sample_end[chan]) {
 				if(!m_sample_end[chan])
 					m_active[chan] = false;
@@ -1387,7 +1393,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			}
 
 			if(m_lpf_speed[chan] & 0x80)
-				m_lpf_done[chan] = istep(m_lpf_timer[chan], 0, m_global_step[m_lpf_speed[chan]] >> 1);
+				m_lpf_done[chan] = istep(m_lpf_timer[chan], 0, m_global_step[m_lpf_speed[chan] & 0x7f] >> 1);
 			else
 				m_lpf_done[chan] = istep(m_lpf_value[chan], m_lpf_target_value[chan], m_global_step[m_lpf_speed[chan]] >> 1);
 

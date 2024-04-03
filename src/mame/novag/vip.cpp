@@ -14,7 +14,7 @@ of this portable design (Ruby, Sapphire, ..) are on H8.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- add Super System peripherals, each has their own MCU
+- add more Super System peripherals, each has their own MCU
 - unmapped reads from 0x3* range, same as snova driver
 
 BTANB:
@@ -33,7 +33,7 @@ Hardware notes:
 - PCB label: 100078
 - Hitachi HD6301Y0F (mode 2) @ 8MHz
 - 2KB RAM (NEC D449G-15)
-- LCD with 4 digits and custom segments, no LCD chip
+- LCD with 4 7segs and custom segments, no LCD chip
 - 24 buttons, piezo
 
 The LCD is the same as the one in Primo / Supremo / Super Nova.
@@ -55,7 +55,8 @@ Hardware notes:
 
 Super VIP is Novag's first chess computer with a proper serial interface. It
 connects to the Novag Super System Distributor, which can then connect to an
-external chessboard, TV interface, computer, etc.
+external chessboard, TV interface, computer, etc. They are basically RS-232
+devices, just with a different plug.
 
 Serial transmission format for Novag Super System is 1 start bit, 8 data bits,
 1 stop bit, no parity. On Super VIP, the baud rate is selectable 1200 or 9600,

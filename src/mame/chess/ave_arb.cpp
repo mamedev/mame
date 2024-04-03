@@ -95,7 +95,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<via6522_device> m_via;
 	memory_share_creator<u8> m_extram;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
@@ -110,7 +110,7 @@ private:
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
-	void init_board(int state);
+	void init_board(u8 data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
@@ -147,7 +147,7 @@ void arb_state::update_reset()
 
 // sensorboard
 
-void arb_state::init_board(int state)
+void arb_state::init_board(u8 data)
 {
 	// different board setup for checkers
 	if (m_altboard)
@@ -159,7 +159,7 @@ void arb_state::init_board(int state)
 		}
 	}
 	else
-		m_board->preset_chess();
+		m_board->preset_chess(data);
 }
 
 

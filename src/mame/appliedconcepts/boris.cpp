@@ -148,7 +148,7 @@ void boris_state::main_map(address_map &map)
 {
 	map.global_mask(0x0fff);
 	map(0x0000, 0x0bff).rom();
-	map(0x0c00, 0x0fff).ram();
+	map(0x0c00, 0x0cff).mirror(0x300).ram();
 }
 
 void boris_state::main_io(address_map &map)

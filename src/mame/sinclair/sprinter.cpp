@@ -122,7 +122,7 @@ protected:
 	void update_memory();
 	void update_cpu();
 
-	TIMER_CALLBACK_MEMBER(irq_on) override;
+	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -135,7 +135,7 @@ private:
 
 	void midi_r(int state) { m_rx_data = state; }
 
-	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midiclock_w(int state) { if (state) m_maincpu->clock_serial(); }
 
 	/**
 	 * @brief Handle a write to the synth's IO Port 1.

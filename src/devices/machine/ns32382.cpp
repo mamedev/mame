@@ -406,7 +406,7 @@ ns32382_device::translate_result ns32382_device::translate(address_space &space,
 		if (m_state == RDVAL || m_state == WRVAL)
 		{
 			m_state = STATUS;
-			if (pte1 & PTE_V)
+			if (pte2 & PTE_V)
 				m_status |= SLAVE_F;
 
 			return CANCEL;

@@ -110,8 +110,8 @@ void h8_adc_device::device_start()
 	save_item(NAME(m_channel));
 	save_item(NAME(m_count));
 	save_item(NAME(m_analog_powered));
-	save_item(NAME(m_next_event));
 	save_item(NAME(m_adtrg));
+	save_item(NAME(m_next_event));
 }
 
 void h8_adc_device::device_reset()

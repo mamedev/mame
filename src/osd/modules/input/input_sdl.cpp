@@ -63,7 +63,7 @@ char const *const CONTROLLER_AXIS_XBOX[]{
 		"LT",
 		"RT" };
 
-[[maybe_unused]] char const *const CONTROLLER_AXIS_PS[]{
+char const *const CONTROLLER_AXIS_PS[]{
 		"LSX",
 		"LSY",
 		"RSX",
@@ -71,7 +71,7 @@ char const *const CONTROLLER_AXIS_XBOX[]{
 		"L2",
 		"R2" };
 
-[[maybe_unused]] char const *const CONTROLLER_AXIS_SWITCH[]{
+char const *const CONTROLLER_AXIS_SWITCH[]{
 		"LSX",
 		"LSY",
 		"RSX",
@@ -102,7 +102,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_XBOXONE[]{
+char const *const CONTROLLER_BUTTON_XBOXONE[]{
 		"A",
 		"B",
 		"X",
@@ -125,7 +125,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_PS3[]{
+char const *const CONTROLLER_BUTTON_PS3[]{
 		"Cross",
 		"Circle",
 		"Square",
@@ -148,7 +148,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_PS4[]{
+char const *const CONTROLLER_BUTTON_PS4[]{
 		"Cross",
 		"Circle",
 		"Square",
@@ -171,7 +171,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_PS5[]{
+char const *const CONTROLLER_BUTTON_PS5[]{
 		"Cross",
 		"Circle",
 		"Square",
@@ -194,7 +194,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_SWITCH[]{
+char const *const CONTROLLER_BUTTON_SWITCH[]{
 		"A",
 		"B",
 		"X",
@@ -1288,10 +1288,7 @@ public:
 		char const *const *axisnames = CONTROLLER_AXIS_XBOX;
 		char const *const *buttonnames = CONTROLLER_BUTTON_XBOX360;
 		bool digitaltriggers = false;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		bool avoidpaddles = false;
-#endif
-#if SDL_VERSION_ATLEAST(2, 0, 12)
 		auto const ctrltype = SDL_GameControllerGetType(m_ctrldevice);
 		switch (ctrltype)
 		{
@@ -1324,14 +1321,12 @@ public:
 			buttonnames = CONTROLLER_BUTTON_SWITCH;
 			digitaltriggers = true;
 			break;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		//case SDL_CONTROLLER_TYPE_VIRTUAL:
 		case SDL_CONTROLLER_TYPE_PS5:
 			osd_printf_verbose("Game Controller:   ...  PlayStation 5 type\n");
 			axisnames = CONTROLLER_AXIS_PS;
 			buttonnames = CONTROLLER_BUTTON_PS5;
 			break;
-#endif
 #if SDL_VERSION_ATLEAST(2, 0, 16)
 		//case SDL_CONTROLLER_TYPE_AMAZON_LUNA:
 		case SDL_CONTROLLER_TYPE_GOOGLE_STADIA:
@@ -1360,7 +1355,6 @@ public:
 			osd_printf_verbose("Game Controller:   ...  unrecognized type (%d)\n", int(ctrltype));
 			break;
 		}
-#endif
 
 		// keep track of item numbers as we add controls
 		std::pair<input_item_id, input_item_id> axisitems[SDL_CONTROLLER_AXIS_MAX];
@@ -1390,9 +1384,7 @@ public:
 		for (auto [axis, item, buttontest] : axes)
 		{
 			bool avail = !buttontest || !digitaltriggers;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 			avail = avail && SDL_GameControllerHasAxis(m_ctrldevice, axis);
-#endif
 			if (avail)
 			{
 				auto const binding = SDL_GameControllerGetBindForAxis(m_ctrldevice, axis);
@@ -1432,17 +1424,13 @@ public:
 				{ SDL_CONTROLLER_BUTTON_INVALID,       SDL_CONTROLLER_AXIS_TRIGGERRIGHT, true },
 				{ SDL_CONTROLLER_BUTTON_LEFTSTICK,     SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_RIGHTSTICK,    SDL_CONTROLLER_AXIS_INVALID,      true },
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				{ SDL_CONTROLLER_BUTTON_PADDLE1,       SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_PADDLE2,       SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_PADDLE3,       SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_PADDLE4,       SDL_CONTROLLER_AXIS_INVALID,      true },
-#endif
 				{ SDL_CONTROLLER_BUTTON_GUIDE,         SDL_CONTROLLER_AXIS_INVALID,      false },
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				{ SDL_CONTROLLER_BUTTON_MISC1,         SDL_CONTROLLER_AXIS_INVALID,      false },
 				{ SDL_CONTROLLER_BUTTON_TOUCHPAD,      SDL_CONTROLLER_AXIS_INVALID,      false },
-#endif
 				};
 		input_item_id button_item = ITEM_ID_BUTTON1;
 		unsigned buttoncount = 0;
@@ -1452,9 +1440,7 @@ public:
 			input_item_id actual = ITEM_ID_INVALID;
 			if (SDL_CONTROLLER_BUTTON_INVALID != button)
 			{
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				avail = SDL_GameControllerHasButton(m_ctrldevice, button);
-#endif
 				if (avail)
 				{
 					auto const binding = SDL_GameControllerGetBindForButton(m_ctrldevice, button);
@@ -1481,9 +1467,7 @@ public:
 			}
 			else
 			{
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				avail = SDL_GameControllerHasAxis(m_ctrldevice, axis);
-#endif
 				if (avail)
 				{
 					auto const binding = SDL_GameControllerGetBindForAxis(m_ctrldevice, axis);
@@ -1533,9 +1517,7 @@ public:
 		for (auto [button, item] : fixedbuttons)
 		{
 			bool avail = true;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 			avail = SDL_GameControllerHasButton(m_ctrldevice, button);
-#endif
 			if (avail)
 			{
 				auto const binding = SDL_GameControllerGetBindForButton(m_ctrldevice, button);
@@ -1606,7 +1588,6 @@ public:
 			{
 				// took trigger buttons
 			}
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 			else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
 			{
 				// took P1/P2
@@ -1615,7 +1596,6 @@ public:
 			{
 				// took P3/P4
 			}
-#endif
 		}
 
 		// prefer trigger axes for pedals, otherwise take half axes and buttons
@@ -1701,22 +1681,18 @@ public:
 		{
 			// took digital triggers
 		}
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		else if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
 		{
 			// took upper paddles
 		}
-#endif
 		else if (consume_trigger_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
 		{
 			// took analog triggers
 		}
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		else if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE3], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE4]))
 		{
 			// took lower paddles
 		}
-#endif
 		else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, diraxis[1][1]))
 		{
 			// took secondary Y
@@ -1727,7 +1703,6 @@ public:
 		}
 
 		// try to get a matching pair of buttons for page up/down
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
 		{
 			// took upper paddles
@@ -1737,7 +1712,6 @@ public:
 			// took lower paddles
 		}
 		else
-#endif
 		if (consume_trigger_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
 		{
 			// took analog triggers
@@ -2197,10 +2171,7 @@ protected:
 		char guid_str[256];
 		guid_str[0] = '\0';
 		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
-		char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-		serial = SDL_JoystickGetSerial(joy);
-#endif
+		char const *const serial = SDL_JoystickGetSerial(joy);
 		std::string id(guid_str);
 		if (serial)
 			id.append(1, '-').append(serial);
@@ -2337,10 +2308,7 @@ public:
 			else
 			{
 				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-				char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-				serial = SDL_JoystickGetSerial(joy);
-#endif
+				char const *const serial = SDL_JoystickGetSerial(joy);
 				auto *const target_device = find_reconnect_match(guid, serial);
 				if (target_device)
 				{
@@ -2490,10 +2458,7 @@ public:
 				}
 
 				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-				char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-				serial = SDL_JoystickGetSerial(joy);
-#endif
+				char const *const serial = SDL_JoystickGetSerial(joy);
 				auto *const target_device = find_reconnect_match(guid, serial);
 				if (target_device)
 				{
@@ -2523,10 +2488,7 @@ public:
 				}
 
 				SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(event.cdevice.which);
-				char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-				serial = SDL_GameControllerGetSerial(ctrl);
-#endif
+				char const *const serial = SDL_GameControllerGetSerial(ctrl);
 				auto *const target_device = find_reconnect_match(guid, serial);
 				if (target_device)
 				{
@@ -2558,10 +2520,7 @@ private:
 		char guid_str[256];
 		guid_str[0] = '\0';
 		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
-		char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-		serial = SDL_GameControllerGetSerial(ctrl);
-#endif
+		char const *const serial = SDL_GameControllerGetSerial(ctrl);
 		std::string id(guid_str);
 		if (serial)
 			id.append(1, '-').append(serial);

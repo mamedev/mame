@@ -387,13 +387,13 @@ void gambl186_state::gambl186_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share("nvram");
 	map(0x40000, 0x7ffff).bankr(m_data_bank);
-	map(0xa0000, 0xbffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0xa0000, 0xbffff).rw("vga", FUNC(cirrus_gd5428_vga_device::mem_r), FUNC(cirrus_gd5428_vga_device::mem_w));
 	map(0xc0000, 0xfffff).rom().region("ipl", 0);
 }
 
 void gambl186_state::gambl186_io(address_map &map)
 {
-	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5428_device::io_map));
+	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5428_vga_device::io_map));
 	map(0x0400, 0x0401).w(FUNC(gambl186_state::upd_w));      // upd7759 sample index/input
 	map(0x0500, 0x0501).portr("IN0");
 	map(0x0502, 0x0503).portr("IN1");
@@ -509,9 +509,9 @@ void gambl186_state::gambl186(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_vga_device::screen_update));
 
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
+	cirrus_gd5428_vga_device &vga(CIRRUS_GD5428_VGA(config, "vga", 0));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 

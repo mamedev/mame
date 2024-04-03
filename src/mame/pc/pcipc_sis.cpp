@@ -98,8 +98,8 @@ void sis496_state::winbond_superio_config(device_t *device)
 {
 	w83787f_device &fdc = *downcast<w83787f_device *>(device);
 //  fdc.set_sysopt_pin(1);
-//	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-//	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+//  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq1_w));
 	fdc.irq8().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -112,7 +112,6 @@ void sis496_state::winbond_superio_config(device_t *device)
 
 void sis496_state::sis496(machine_config &config)
 {
-	// Basic machine hardware
 	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sis496_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sis496_state::main_io);
@@ -126,7 +125,7 @@ void sis496_state::sis496(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:w83787f", FUNC(w83787f_device::rxd1_w));
 	serport0.dcd_handler().set("board4:w83787f", FUNC(w83787f_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:w83787f", FUNC(w83787f_device::ndsr1_w));

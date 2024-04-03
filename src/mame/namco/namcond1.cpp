@@ -242,11 +242,11 @@ private:
 	required_shared_ptr<uint16_t> m_shared_ram;
 
 	uint8_t m_h8_irq5_enabled = 0;
-	uint16_t m_p8 = 0;
+	uint8_t m_p8 = 0;
 
-	uint16_t mcu_p7_read();
-	uint16_t mcu_pa_read();
-	void mcu_pa_write(uint16_t data);
+	uint8_t mcu_p7_read();
+	uint8_t mcu_pa_read();
+	void mcu_pa_write(uint8_t data);
 	uint16_t cuskey_r(offs_t offset);
 	void cuskey_w(offs_t offset, uint16_t data);
 	uint16_t printer_r();
@@ -441,17 +441,17 @@ static INPUT_PORTS_START( abcheck )
 INPUT_PORTS_END
 
 
-uint16_t namcond1_state::mcu_p7_read()
+uint8_t namcond1_state::mcu_p7_read()
 {
 	return 0xff;
 }
 
-uint16_t namcond1_state::mcu_pa_read()
+uint8_t namcond1_state::mcu_pa_read()
 {
 	return 0xff;
 }
 
-void namcond1_state::mcu_pa_write(uint16_t data)
+void namcond1_state::mcu_pa_write(uint8_t data)
 {
 	m_p8 = data;
 }
@@ -503,7 +503,6 @@ void namcond1_state::namcond1(machine_config &config)
 	m_mcu->read_port7().set(FUNC(namcond1_state::mcu_p7_read));
 	m_mcu->read_porta().set(FUNC(namcond1_state::mcu_pa_read));
 	m_mcu->write_porta().set(FUNC(namcond1_state::mcu_pa_write));
-
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 

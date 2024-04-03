@@ -4,11 +4,6 @@
 
     NCR 5385 SCSI Controller emulation
 
-    TODO:
-    - Everything. Currently, just enough is implemented to make the
-      Philips VP415 CPU / Datagrabber board satisfied that the
-      controller has passed its internal diagnostics.
-
 ************************************************************************
                             _____   _____
                     D2   1 |*    \_/     | 48  VCC
@@ -43,91 +38,89 @@
 
 #pragma once
 
+#include "machine/nscsi_bus.h"
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> ncr5385_device
-
-class ncr5385_device : public device_t
+class ncr5385_device
+	: public nscsi_device
+	, public nscsi_slot_card_interface
 {
 public:
-	// construction/destruction
-	ncr5385_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	auto irq() { return m_int.bind(); }
+	auto dreq() { return m_dreq.bind(); }
 
-	void write(offs_t offset, uint8_t data);
-	uint8_t read(offs_t offset);
+	void set_own_id(unsigned id) { m_own_id = id; }
+
+	ncr5385_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	void map(address_map &map);
+
+	u8 dma_r();
+	void dma_w(u8 data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// ncsci_device implementation
+	virtual void scsi_ctrl_changed() override;
+
+	// read handlers
+	u8 dat_r();
+	u8 cmd_r();
+	u8 ctl_r();
+	u8 dst_id_r();
+	u8 aux_status_r();
+	u8 own_id_r();
+	u8 int_status_r();
+	u8 src_id_r();
+	u8 dia_status_r();
+	template <unsigned N> u8 cnt_r();
+	u8 tst_r();
+
+	// write handlers
+	void dat_w(u8 data);
+	void cmd_w(u8 data);
+	void ctl_w(u8 data);
+	void dst_id_w(u8 data);
+	template <unsigned N> void cnt_w(u8 data);
+	void tst_w(u8 data);
+
+	// state machine, interrupts and dma
+	void state_timer(s32 param);
+	int state_step();
+	bool remaining(u32 const count = 0) const;
+	void update_int();
+	void set_dreq(bool dreq);
+
 private:
-	enum
-	{
-		STATE_IDLE,
-		STATE_DIAGNOSTIC_GOOD_PARITY,
-		STATE_DIAGNOSTIC_BAD_PARITY,
-	};
-
-	enum
-	{
-		DIAG_TURN_MISCOMPARE_INITIAL = 0x08,
-		DIAG_TURN_MISCOMPARE_FINAL   = 0x10,
-		DIAG_TURN_GOOD_PARITY        = 0x18,
-		DIAG_TURN_BAD_PARITY         = 0x20,
-		DIAG_COMPLETE = 0x80,
-
-		DIAG_COMPLETE_BIT = 7,
-	};
-
-	enum
-	{
-		INT_FUNC_COMPLETE = 0x01,
-		INT_INVALID_CMD   = 0x40,
-
-		INT_FUNC_COMPLETE_BIT = 0,
-		INT_INVALID_CMD_BIT   = 6,
-	};
-
-	enum
-	{
-		AUX_STATUS_TC_ZERO    = 0x02,
-		AUX_STATUS_PAUSED     = 0x04,
-		AUX_STATUS_PARITY_ERR = 0x40,
-		AUX_STATUS_DATA_FULL  = 0x80,
-
-		AUX_STATUS_TC_ZERO_BIT    = 1,
-		AUX_STATUS_PAUSED_BIT     = 2,
-		AUX_STATUS_PARITY_ERR_BIT = 6,
-		AUX_STATUS_DATA_FULL_BIT  = 7,
-	};
-
-	enum
-	{
-		CTRL_SELECT   = 0x01,
-		CTRL_RESELECT = 0x02,
-		CTRL_PARITY   = 0x04,
-
-		CTRL_SELECT_BIT   = 0,
-		CTRL_RESELECT_BIT = 1,
-		CTRL_PARITY_BIT   = 2,
-	};
-
 	devcb_write_line m_int;
+	devcb_write_line m_dreq;
 
-	uint32_t m_state;
-	uint8_t m_ctrl_reg;
-	uint8_t m_int_reg;
-	uint8_t m_aux_status_reg;
-	uint8_t m_diag_status_reg;
+	emu_timer *m_state_timer;
+
+	// registers
+	u8 m_dat;
+	u8 m_cmd;
+	u8 m_ctl;
+	u8 m_dst_id;
+	u8 m_aux_status;
+	u8 m_own_id;
+	u8 m_int_status;
+	u8 m_src_id;
+	u8 m_dia_status;
+	u32 m_cnt;
+
+	// other state
+	u32 m_state;
+	u8 m_phase;
+	u8 m_mode;
+	bool m_sbx;
+
+	bool m_int_state;
+	bool m_dreq_state;
 };
 
-// device type definition
 DECLARE_DEVICE_TYPE(NCR5385, ncr5385_device)
 
 #endif // MAME_MACHINE_NCR5385_H

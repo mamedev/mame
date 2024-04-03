@@ -43,19 +43,16 @@ void s3vision864_vga_device::device_add_mconfig(machine_config &config)
 	IBM8514A(config, "8514a", 0).set_vga_owner();
 }
 
-TIMER_CALLBACK_MEMBER(s3vision864_vga_device::vblank_timer_cb)
+uint32_t s3vision864_vga_device::latch_start_addr()
 {
 	if(s3.memory_config & 0x08)
 	{
 		// - SDD scrolling test expects a << 2 for 8bpp and no shift for anything else
 		// - Slackware 3.x XF86_S3 expect a << 2 shift (to be confirmed)
 		// - przonegd expect no shift (RGB16)
-		vga.crtc.start_addr = vga.crtc.start_addr_latch << (svga.rgb8_en ? 2 : 0);
+		return vga.crtc.start_addr_latch << (svga.rgb8_en ? 2 : 0);
 	}
-	else
-		vga.crtc.start_addr = vga.crtc.start_addr_latch;
-	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
-	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+	return vga.crtc.start_addr_latch;
 }
 
 void s3vision864_vga_device::device_start()
@@ -94,7 +91,6 @@ u16 s3vision864_vga_device::line_compare_mask()
 
 uint16_t s3vision864_vga_device::offset()
 {
-	//popmessage("Offset: %04x  %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(s3.memory_config & 0x08)?"31":"--");
 	if(s3.memory_config & 0x08)
 		return vga.crtc.offset << 3;
 	return vga_device::offset();

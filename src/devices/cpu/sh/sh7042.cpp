@@ -174,7 +174,7 @@ void sh7042_device::do_sci_w(int sci, int state)
 
 void sh7042_device::internal_update()
 {
-	internal_update(current_cycles());	
+	internal_update(current_cycles());
 }
 
 void sh7042_device::add_event(u64 &event_time, u64 new_event)
@@ -296,4 +296,11 @@ void sh7042_device::pcf_if_w(offs_t, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pcf_if);
 	logerror("pcf if = %04x\n", m_pcf_if);
+}
+
+void sh7042_device::set_internal_interrupt(int level, u32 vector)
+{
+	m_sh2_state->internal_irq_level = level;
+	m_internal_irq_vector = vector;
+	m_test_irq = 1;
 }

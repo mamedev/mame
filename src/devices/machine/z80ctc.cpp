@@ -77,12 +77,17 @@ DEFINE_DEVICE_TYPE(Z80CTC_CHANNEL, z80ctc_channel_device, "z80ctc_channel", "Z80
 //-------------------------------------------------
 
 z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, Z80CTC, tag, owner, clock)
+	: z80ctc_device(mconfig, Z80CTC, tag, owner, clock)
+{
+}
+
+z80ctc_device::z80ctc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
+	, m_channel(*this, "ch%u", 0U)
 	, m_intr_cb(*this)
 	, m_zc_cb(*this)
 	, m_vector(0)
-	, m_channel(*this, "ch%u", 0U)
 {
 }
 

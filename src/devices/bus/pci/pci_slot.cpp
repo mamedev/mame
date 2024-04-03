@@ -8,6 +8,7 @@
 
 #include "aha2940au.h"
 #include "audiowerk2.h"
+#include "clgd5446.h"
 #include "clgd546x_laguna.h"
 #include "ds2416.h"
 #include "ess_maestro.h"
@@ -21,6 +22,7 @@
 #include "rivatnt.h"
 #include "rtl8029as_pci.h"
 #include "rtl8139_pci.h"
+#include "sis6326.h"
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "virge_pci.h"
@@ -107,7 +109,7 @@ void pci_card_device::irq_pin_w(offs_t line, int state)
 void pci_cards(device_slot_interface &device)
 {
 	// 0x00 - backward compatible pre-class code
-//	device.option_add("voodoo1",        VOODOO_1_PCI);
+//  device.option_add("voodoo1",        VOODOO_1_PCI);
 	device.option_add("vision864",      VISION864_PCI);
 	device.option_add("vision964",      VISION964_PCI);
 
@@ -125,6 +127,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
+	device.option_add("gd5446",         GD5446_PCI);
 	device.option_add("oti64111",       OTI64111_PCI);
 	device.option_add("wd9710",         WD9710_PCI);
 
@@ -169,5 +172,6 @@ void agp_cards(device_slot_interface &device)
 	device.option_add("geforce256",     GEFORCE256);
 	device.option_add("geforce256_ddr", GEFORCE256_DDR);
 	device.option_add("quadro",         QUADRO);
-	device.option_add("laguna3d",       CIRRUS_GD5465_LAGUNA3D);
+	device.option_add("laguna3d",       GD5465_LAGUNA3D);
+	device.option_add("sis6326_agp",    SIS6326_AGP);
 }

@@ -71,7 +71,7 @@ private:
 	required_device_array<z80pio_device, 2> m_pio;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 
 	u16 m_matrix = 0;

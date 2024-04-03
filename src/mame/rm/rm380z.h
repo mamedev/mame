@@ -18,6 +18,8 @@ Research Machines RM 380Z
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "video/sn74s262.h"
 
 #include "emupal.h"
 
@@ -37,9 +39,9 @@ class rm380z_state : public driver_device
 protected:
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_chargen(*this, "chargen"),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771"),
 		m_floppy0(*this, "wd1771:0"),
@@ -88,9 +90,9 @@ protected:
 	uint8_t m_port1 = 0;
 	uint8_t m_fbfe = 0;
 
-	required_region_ptr<u8> m_chargen;
 	required_device<cpu_device> m_maincpu;
 	optional_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 	optional_device<ram_device> m_messram;
 	optional_device<fd1771_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
@@ -103,11 +105,13 @@ class rm380z_state_cos34 : public rm380z_state
 public:
 	rm380z_state_cos34(const machine_config &mconfig, device_type type, const char *tag) :
 		rm380z_state(mconfig, type, tag),
+		m_rocg(*this, "sn74s262"),
 		m_cassette(*this, "cassette")
 	{
 	}
 
 	void configure(machine_config &config);
+	void configure_fds(machine_config &config);
 
 protected:
 	void machine_reset() override;
@@ -132,15 +136,11 @@ private:
 		uint8_t m_chars[ROWS][COLS];
 	};
 
-	static inline constexpr int RM380Z_CHDIMX = 5;
-	static inline constexpr int RM380Z_CHDIMY = 9;
-	static inline constexpr int RM380Z_NCX = 8;
-	static inline constexpr int RM380Z_NCY = 16;
-
 	void putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
 
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
+	required_device<sn74s262_device> m_rocg;
 	required_device<cassette_image_device> m_cassette;
 };
 
@@ -149,7 +149,9 @@ class rm380z_state_cos40 : public rm380z_state
 {
 public:
 	rm380z_state_cos40(const machine_config &mconfig, device_type type, const char *tag) :
-		rm380z_state(mconfig, type, tag)
+		rm380z_state(mconfig, type, tag),
+		m_chargen(*this, "chargen"),
+		m_speaker(*this, "speaker")
 	{
 	}
 
@@ -191,6 +193,11 @@ protected:
 	int m_videomode = RM380Z_VIDEOMODE_80COL;
 	rm380z_vram<RM380Z_SCREENROWS, RM380Z_SCREENCOLS> m_vram;
 
+	uint8_t m_fbfd = 0;
+
+	required_region_ptr<u8> m_chargen;
+	optional_device<speaker_sound_device> m_speaker;
+
 private:
 	void config_videomode();
 	void putChar_vdu80(int charnum, int attribs, int x, int y, bitmap_ind16 &bitmap) const;
@@ -208,7 +215,6 @@ class rm380z_state_cos40_hrg : public rm380z_state_cos40
 public:
 	rm380z_state_cos40_hrg(const machine_config &mconfig, device_type type, const char *tag) :
 		rm380z_state_cos40(mconfig, type, tag),
-		m_palette(*this, "palette"),
 		m_io_display_type(*this, "display_type")
 	{
 	}
@@ -252,7 +258,6 @@ private:
 	uint8_t m_hrg_port1 = 0;
 	hrg_display_mode m_hrg_display_mode = hrg_display_mode::none;
 
-	required_device<palette_device> m_palette;
 	required_ioport m_io_display_type;
 };
 

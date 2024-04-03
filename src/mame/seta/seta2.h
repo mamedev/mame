@@ -187,11 +187,11 @@ private:
 	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data; }
 
 	uint32_t debug_r();
-	uint16_t coins_r();
-	void leds_w(uint16_t data);
-	uint16_t outputs_r();
-	void outputs_w(uint16_t data);
-	uint16_t battery_r();
+	uint8_t coins_r();
+	void leds_w(uint8_t data);
+	uint8_t outputs_r();
+	void outputs_w(uint8_t data);
+	uint8_t battery_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
@@ -201,7 +201,7 @@ private:
 
 	void funcube_debug_outputs();
 
-	uint16_t m_outputs, m_funcube_leds;
+	uint8_t m_outputs, m_funcube_leds;
 	uint64_t m_coin_start_cycles = 0;
 	uint8_t m_hopper_motor = 0;
 };

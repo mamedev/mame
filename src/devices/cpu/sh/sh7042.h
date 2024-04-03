@@ -44,6 +44,8 @@ public:
 
 	u64 current_cycles() { return machine().time().as_ticks(clock()); }
 
+	void set_internal_interrupt(int level, u32 vector);
+
 protected:
 	const char *m_port16_names;
 	const char *m_port32_names;
@@ -111,7 +113,7 @@ private:
 	void recompute_timer(u64 event_time);
 	TIMER_CALLBACK_MEMBER(event_timer_tick);
 	void internal_update(u64 current_time);
-	
+
 	void do_sci_w(int sci, int state);
 
 	u16 pcf_ah_r();

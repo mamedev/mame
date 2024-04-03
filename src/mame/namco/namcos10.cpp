@@ -1359,7 +1359,7 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 	HOPPER(config, m_mgexio_hopper[2], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	mgexio.port4_read_callback().set([this] (offs_t offset) {
-		uint16_t r = 0;
+		uint8_t r = 0;
 		r |= (m_mgexio_outputs[6] & 1); // divider sol (l) sensor
 		r |= (m_mgexio_outputs[7] & 1) << 1; //divider sol (r) sensor
 		return r;
@@ -1370,7 +1370,7 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 	});
 
 	mgexio.porta_read_callback().set([this] (offs_t offset) {
-		uint16_t r = 0b1111;
+		uint8_t r = 0b1111;
 
 		// update coin states
 		auto curtime = machine().time();
@@ -1395,11 +1395,11 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 		return r;
 	});
 
-	mgexio.port4_write_callback().set([this] (uint16_t data) {
+	mgexio.port4_write_callback().set([this] (uint8_t data) {
 		m_mgexio_outputs[8] = BIT(data, 6); // win lamp
 	});
 
-	mgexio.portb_write_callback().set([this] (uint16_t data) {
+	mgexio.portb_write_callback().set([this] (uint8_t data) {
 		m_mgexio_hopper[0]->motor_w(BIT(data, 0));
 		m_mgexio_hopper[1]->motor_w(BIT(data, 1));
 		m_mgexio_hopper[2]->motor_w(BIT(data, 4));
@@ -3260,18 +3260,18 @@ static INPUT_PORTS_START( mgexio_medal )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("MGEXIO_SENSOR")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Check Sensor(2)")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Check Sensor(1)")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Check Sensor(4)")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Check Sensor(3)")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Check Sensor(6)")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Check Sensor(5)")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Check Sensor(7)")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Check Sensor(2)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Check Sensor(1)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Check Sensor(4)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Check Sensor(3)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Check Sensor(6)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Check Sensor(5)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Check Sensor(7)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("MGEXIO_COIN")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 0)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 1)
 
 INPUT_PORTS_END
 

@@ -29,7 +29,7 @@ uint32_t wide_fm(uint16_t val)
 {
 	uint32_t res = 0;
 	for (int i = 15; i >= 0; i--) {
-		res |= (util::BIT(val, i) << (i*2 + 1));
+		res |= (util::BIT(val, i) << (i * 2 + 1));
 	}
 	return res;
 }
@@ -38,7 +38,7 @@ uint32_t data_to_wide_fm(uint8_t val)
 {
 	uint16_t res = 0xaaaa;  // clock
 	for (int i = 7; i >= 0; i--) {
-		res |= (util::BIT(val, i) << i*2);      // data
+		res |= (util::BIT(val, i) << i * 2);      // data
 	}
 	return wide_fm(res);
 }
@@ -76,14 +76,17 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	if (io.length(size))
 		return 0;
 
+	std::error_condition err;
+	size_t actual;
+
 	uint8_t header[HEADER_SIZE];
-	auto const [err, actual] = read_at(io, 0, header, HEADER_SIZE);
+	std::tie(err, actual) = read_at(io, 0, header, HEADER_SIZE);
 	if (err || (HEADER_SIZE != actual))
 		return 0;
 
-	int tracks = header[1];
-	int track_size = get_u16le(&header[2]);
-	int heads = (header[4] & 0x10) ? 1 : 2;
+	const int tracks_from_header = header[1];
+	const int track_size = get_u16le(&header[2]);
+	const int heads = util::BIT(header[4], 4) ? 1 : 2;
 
 	// The first header byte must be 00 or FF
 	if (header[0] != 0x00 && header[0] != 0xff)
@@ -91,24 +94,46 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 	}
 
-	// Bytes C-F must be zero
-	if (header[0x0c] != 0 || header[0xd] != 0 || header[0xe] != 0 || header[0xf] != 0)
+	// Verify reserved/unsupported header bytes
+	for (int i = 4; i < 0x10; i++)
 	{
-		return 0;
+		if (header[i] != 0x00)
+			return 0;
 	}
 
 	// Check track size within limits
-	if (track_size < 0x80 || track_size > 0x3FFF )
-	{
+	if (track_size < 0x80 || track_size > 0x3fff)
 		return 0;
-	}
 
-	if (size == HEADER_SIZE + heads * tracks * track_size)
+	const int tracks_in_file = (size - HEADER_SIZE) / (heads * track_size);
+	for (int track = 0; track < tracks_in_file; track++)
 	{
-		return FIFID_STRUCT|FIFID_SIZE;
-	}
+		for (int head = 0; head < heads; head++)
+		{
+			// Read track
+			std::vector<uint8_t> track_data(track_size);
+			std::tie(err, actual) = read_at(io, HEADER_SIZE + (heads * track + head) * track_size, &track_data[0], track_size);
+			if (err || track_size != actual)
+				return 0;
 
-	return 0;
+			// Verify idam entries
+			for (int idam_index = 0; idam_index < 64; idam_index++)
+			{
+				const uint16_t idam_entry = get_u16le(&track_data[2 * idam_index]);
+				if (idam_entry == 0x0000)
+					continue;
+				const uint16_t idam_offset = idam_entry & 0x3fff;
+				if (idam_offset >= track_size)
+					return 0;
+				if (track_data[idam_offset] != 0xfe)
+					return 0;
+			}
+		}
+	}
+	if (size == HEADER_SIZE + heads * tracks_from_header * track_size)
+		return FIFID_HINT|FIFID_SIZE;
+	else
+		return FIFID_HINT;
 }
 
 
@@ -117,42 +142,25 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	std::error_condition err;
 	size_t actual;
 
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
 	uint8_t header[HEADER_SIZE];
 	std::tie(err, actual) = read_at(io, 0, header, HEADER_SIZE);
 	if (err || (HEADER_SIZE != actual))
 		return false;
 
-	const int tracks = header[1];
 	const int track_size = get_u16le(&header[2]);
-	const int heads = (header[4] & 0x10) ? 1 : 2;
-	const bool is_sd = (header[4] & 0x40) ? true : false;
+	const int heads = util::BIT(header[4], 4) ? 1 : 2;
+	const bool is_sd = util::BIT(header[4], 6);
+	const int tracks = (size - HEADER_SIZE) / (heads * track_size);
 
-	auto variant = floppy_image::SSDD;
-	if (is_sd)
-	{
-		if (heads == 2)
-		{
-			variant = floppy_image::DSSD;
-		}
-		else
-		{
-			variant = floppy_image::SSSD;
-		}
-	}
-	else
-	{
-		if (heads == 2)
-		{
-			variant = floppy_image::DSDD;
-		}
-		else
-		{
-			variant = floppy_image::SSDD;
-		}
-	}
+	const auto variant = is_sd ? (heads == 2 ? floppy_image::DSSD : floppy_image::SSSD)
+		: (heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
 	image.set_variant(variant);
 
-	int fm_stride = is_sd ? 1 : 2;
+	const int fm_stride = is_sd ? 1 : 2;
 
 	for (int track = 0; track < tracks; track++)
 	{
@@ -161,15 +169,17 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int fm_loss = 0;
 			std::vector<uint8_t> track_data(track_size);
 			std::vector<uint32_t> raw_track_data;
-			int mark_location[64*2+1];
-			uint8_t mark_value[64*2+1];
-			bool mark_is_mfm[64*2+1];
+			int mark_location[64 * 2 + 1];
+			uint8_t mark_value[64 * 2 + 1];
+			bool mark_is_mfm[64 * 2 + 1];
 			int iam_location = -1;
 
 			// Read track
-			std::tie(err, actual) = read_at(io, HEADER_SIZE + (heads * track + head) * track_size, &track_data[0], track_size); // FIXME: check for errors and premature EOF
+			std::tie(err, actual) = read_at(io, HEADER_SIZE + (heads * track + head) * track_size, &track_data[0], track_size);
+			if (err || track_size != actual)
+				return false;
 
-			for (int i = 0; i < 64*2+1; i++)
+			for (int i = 0; i < 64 * 2 + 1; i++)
 			{
 				mark_location[i] = -1;
 				mark_value[i] = 0xfe;
@@ -180,10 +190,10 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			// Find IDAM/DAM locations
 			uint16_t track_header_offset = 0;
 			uint16_t track_offset = get_u16le(&track_data[track_header_offset]) & 0x3fff;
-			bool idam_is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
+			bool idam_is_mfm = util::BIT(track_data[track_header_offset + 1], 7);
 			track_header_offset += 2;
 
-			while ( track_offset != 0 && track_offset >= 0x83 && track_offset < track_size && track_header_offset < 0x80 )
+			while (track_offset != 0 && track_offset >= 0x83 && track_offset < track_size && track_header_offset < 0x80)
 			{
 				// Assume 3 bytes before IDAM pointers are the start of IDAM indicators
 				int mark_offset = idam_is_mfm ? 3 : 0;
@@ -194,11 +204,11 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 				int stride = idam_is_mfm ? 1 : fm_stride;
 				// Scan for DAM location
-				for (int i = track_offset + 10*stride; i < track_offset + 53*stride; i++)
+				for (int i = track_offset + 10 * stride; i < track_offset + 53 * stride; i++)
 				{
 					if ((track_data[i] >= 0xf8 && track_data[i] <= 0xfb))
 					{
-						if (!idam_is_mfm || (track_data[i-1] == 0xa1 && track_data[i-2] == 0xa1))
+						if (!idam_is_mfm || get_u16le(&track_data[i - 2]) == 0xa1a1)
 						{
 							mark_location[mark_count] = i - mark_offset;
 							mark_value[mark_count] = track_data[i];
@@ -210,7 +220,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					}
 				}
 
-				idam_is_mfm = (track_data[track_header_offset + 1] & 0x80) ? true : false;
+				idam_is_mfm = util::BIT(track_data[track_header_offset + 1], 7);
 				track_offset = get_u16le(&track_data[track_header_offset]) & 0x3fff;
 				track_header_offset += 2;
 			}
@@ -222,10 +232,10 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			}
 
 			// Find IAM location
-			for(int i = mark_location[0] - 1; i >= 3; i--)
+			for (int i = mark_location[0] - 1; i >= 3; i--)
 			{
 				// It's usually 3 bytes but several dumped tracks seem to contain only 2 bytes
-				if (track_data[i] == 0xfc && (is_sd || (track_data[i-1] == 0xc2 && track_data[i-2] == 0xc2)))
+				if (track_data[i] == 0xfc && (is_sd || get_u16le(&track_data[i - 2]) == 0xc2c2))
 				{
 					iam_location = i - (is_sd ? 0 : 3);
 					break;

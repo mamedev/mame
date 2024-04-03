@@ -85,7 +85,7 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	bool m_kp_select = false;
@@ -237,4 +237,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag Industries", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag Industries / Heuristic Software", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

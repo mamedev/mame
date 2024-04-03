@@ -484,8 +484,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, leonardo,  0,        0,      leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, leonardoa, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, leonardob, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, leonardo,  0,        0,      leonardo,  leonardo,  leo_state, empty_init, "SciSys / Heuristic Software", "Kasparov Leonardo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, leonardoa, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys / Heuristic Software", "Kasparov Leonardo (v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, leonardob, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys / Heuristic Software", "Kasparov Leonardo (v1.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-SYST( 1988, galileo,   leonardo, 0,      galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, galileo,   leonardo, 0,      galileo,   galileo,   leo_state, empty_init, "Saitek / Heuristic Software", "Kasparov Galileo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

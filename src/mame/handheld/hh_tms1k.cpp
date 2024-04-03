@@ -11550,7 +11550,8 @@ ROM_END
     "Radio Shack-12", but there's no title prefix on the box.
   - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU,
     see hh_cop400.cpp driver
-  - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2495, 28-pin Motorola
+    LSC417570DW, 6805 family or custom?
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
@@ -14016,9 +14017,9 @@ void ti1000_state::write_r(u32 data)
 
 void ti1000_state::write_o(u16 data)
 {
-	// O0-O3,O5(?): input mux
+	// O0-O2,O4,O5: input mux
 	// O0-O7: digit segments
-	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
+	m_inp_mux = (data & 7) | (data >> 1 & 0x18);
 	m_o = bitswap<8>(data,7,4,3,2,1,0,6,5);
 }
 
@@ -14050,7 +14051,7 @@ static INPUT_PORTS_START( ti1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
-	PORT_START("IN.3") // O3 or O4?
+	PORT_START("IN.3") // O4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
@@ -14280,10 +14281,11 @@ ROM_END
 /*******************************************************************************
 
   Texas Instruments WIZ-A-TRON
-  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
+  * TMS0970 MCU label TMC0907NL ZA0379 BSP, DP0907BS (die label: 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
-  The hardware is nearly identical to Little Professor (1976 version).
+  The hardware is nearly identical to Little Professor (1976 version). The same
+  ZA0379 BSP MCU (should be same ROM) was also used in TI Math Magic.
 
 *******************************************************************************/
 
@@ -14306,7 +14308,7 @@ INPUT_PORTS_END
 
 ROM_START( wizatron )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc0907nl_za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
+	ROM_LOAD( "tmc0907nl_za0379_bsp", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
@@ -14366,10 +14368,10 @@ void lilprof_state::write_r(u32 data)
 
 void lilprof_state::write_o(u16 data)
 {
-	// O0-O3,O5(?): input mux
+	// O0-O2,O4,O5: input mux
 	// O0-O6: digit segments A-G
 	// O7: 6th digit
-	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
+	m_inp_mux = (data & 7) | (data >> 1 & 0x18);
 	m_o = data;
 }
 
@@ -14401,7 +14403,7 @@ static INPUT_PORTS_START( lilprof )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
-	PORT_START("IN.3") // O3 or O4?
+	PORT_START("IN.3") // O4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set")
@@ -17410,12 +17412,11 @@ SYST( 1976, ti30,       0,         0,      ti30,      ti30,      ti30_state,    
 SYST( 1976, tibusan,    0,         0,      ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, tiprog,     0,         0,      ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, ti1000,     0,         0,      ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1977, wizatron,   0,         0,      lilprofo,  wizatron,  lilprofo_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1978, lilprof,    0,         0,      lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofoa,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofob,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofo,   lilprof,   0,      lilprofoc, lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-
+SYST( 1977, wizatron,   0,         0,      lilprofo,  wizatron,  lilprofo_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, ti1680,     0,         0,      ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, dataman,    0,         0,      dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1980, mathmarv,   0,         0,      mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )

@@ -2137,7 +2137,7 @@ ROM_START( eto )
 	ROM_LOAD16_BYTE( "eto-1.ic23",  0x00000, 0x20000, CRC(44286597) SHA1(ac37e5edbf9d187f60232adc5e9ebed45b3d2fe2) )
 	ROM_LOAD16_BYTE( "eto-0.ic8",   0x00001, 0x20000, CRC(57b79370) SHA1(25f83eada982ef654260fe92016d42a90005a05c) )
 	// 0x40000 - 0x7ffff is intentionally empty
-	ROM_LOAD16_WORD( "eto-2.ic30",    0x80000, 0x80000, CRC(12f46fb5) SHA1(04db8b6ccd0051668bd2930275efa0265c0cfd2b) )    // Fix ROM
+	ROM_LOAD16_WORD( "eto-2.ic30",  0x80000, 0x80000, CRC(12f46fb5) SHA1(04db8b6ccd0051668bd2930275efa0265c0cfd2b) )    // Fix ROM
 
 	ROM_REGION( 0x80000, "tc0100scn", 0 )
 	ROM_LOAD16_WORD_SWAP( "eto-4.ic3", 0x00000, 0x80000, CRC(a8768939) SHA1(a2cbbd3e10ed48ba32a680b2e40ea03900cf33fa) )   // Sprites (16 x 16)
@@ -2147,6 +2147,26 @@ ROM_START( eto )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "eto-5.ic27", 0x00000, 0x10000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) ) // banked
+ROM_END
+
+// Possible prototype or test version
+// Smaller program (ends at 0x01eee4, while eto ends at 0x020952)
+// Smaller data (ends at 0x0a74aa, while eto ends at 0x0fdd94)
+ROM_START( etoa )
+	ROM_REGION( 0x100000, "maincpu", 0 )     // 1024k for 68000 code
+	ROM_LOAD16_BYTE( "pe.ic23",  0x00000, 0x20000, CRC(36a6a742) SHA1(32d49842cb46c8acfc44fbbf8da54e25541c2a13) )
+	ROM_LOAD16_BYTE( "po.ic8",   0x00001, 0x20000, CRC(bc86f328) SHA1(ff746e7f17e62c09af2e1011583ee1aedce782d4) )
+	// 0x40000 - 0x7ffff is intentionally empty
+	ROM_LOAD16_WORD( "pd.ic30",  0x80000, 0x80000, CRC(39e6a0f3) SHA1(f75d4313db5f292c5fd8f86f4e6871ee244d30d3) )    // Fix ROM
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "sc.ic3", 0x00000, 0x80000, CRC(a8768939) SHA1(a2cbbd3e10ed48ba32a680b2e40ea03900cf33fa) )   // Sprites (16 x 16)
+
+	ROM_REGION( 0x80000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "ob.ic6", 0x00000, 0x80000, CRC(dd247397) SHA1(53a7bf877fd7e5f3daf295a698f4012447b6f113) )   // SCR tiles (8 x 8)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sd.ic27", 0x00000, 0x10000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) ) // banked
 ROM_END
 
 
@@ -2195,3 +2215,4 @@ GAME( 1993, earthjkrb, earthjkr, asuka,    earthjkr,  msm_state,      empty_init
 GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkrp, msm_state,      empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, eto,       0,        eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, etoa,      eto,      eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )

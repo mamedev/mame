@@ -73,7 +73,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<6> m_inputs;
 	output_finder<2, 24> m_out_lcd;
 
@@ -86,7 +86,7 @@ private:
 	void init_backgammon();
 	void init_jacquet();
 	void init_plakoto();
-	void board_init_cb(int state);
+	void board_init_cb(u8 data);
 	u8 board_spawn_cb(offs_t offset);
 	u8 board_remove_cb();
 	u8 board_sensor_cb(offs_t offset);
@@ -197,9 +197,9 @@ INPUT_CHANGED_MEMBER(ecbackg_state::init_board)
 	m_board->refresh();
 }
 
-void ecbackg_state::board_init_cb(int state)
+void ecbackg_state::board_init_cb(u8 data)
 {
-	if (!state)
+	if (~data & 1)
 		init_backgammon();
 }
 

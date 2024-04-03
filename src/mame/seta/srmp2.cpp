@@ -1741,7 +1741,7 @@ ROM_END
 GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state, empty_init, ROT0, "Seta (Alba license)", "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state, empty_init, ROT0, "Seta (Alba license)", "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )

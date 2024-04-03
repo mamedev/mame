@@ -11,6 +11,7 @@ a power on/reset (F3).
 
 It's the 'sequel' to Simultano, and the first chess computer with a H8 CPU. Even
 though H8 is much faster than 6502, it plays weaker, probably due to less RAM.
+And/or it could also be due to the programmer(s) being unfamiliar with H8.
 
 Hardware notes:
 - PCB label: ST9A-PE-001
@@ -354,7 +355,7 @@ void prisma_state::prisma(machine_config &config)
 *******************************************************************************/
 
 ROM_START( prisma )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
 	ROM_LOAD("90_saitek_86051150st9_3258l02p.u1", 0x0000, 0x8000, CRC(b6f8384f) SHA1(a4e8a4a45009c15bda1778512a87dea756aae6d8) )
 
 	ROM_REGION( 795951, "screen", 0 )
@@ -370,4 +371,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek / Heuristic Software", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

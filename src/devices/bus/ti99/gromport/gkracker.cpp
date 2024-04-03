@@ -101,7 +101,7 @@
 #define LOG_CHANGE       (1U << 2)   // Cartridge change
 #define LOG_GKRACKER     (1U << 3)   // Gram Kracker operation
 
-#define VERBOSE (LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_GROMPORT_GK, bus::ti99::gromport::ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
@@ -141,16 +141,15 @@ ti99_gkracker_device::ti99_gkracker_device(const machine_config &mconfig, const 
 		m_ram_ptr(nullptr),
 		m_grom_ptr(nullptr),
 		m_waddr_LSB(false),
-		m_cartridge(nullptr)
+		m_cartridge(*this, "cartridge")
 {
 }
 
 void ti99_gkracker_device::romgq_line(int state)
 {
 	m_romspace_selected = (state==ASSERT_LINE);
-	// Propagate to the guest
-	if (m_cartridge != nullptr)
-		m_cartridge->romgq_line(state);
+	// Propagate to the guest (if available)
+	m_cartridge->romgq_line(state);
 }
 
 /*
@@ -159,14 +158,12 @@ void ti99_gkracker_device::romgq_line(int state)
 void ti99_gkracker_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
 	m_grom_selected = (gsq==ASSERT_LINE);
-	if (m_cartridge != nullptr)
-		m_cartridge->set_gromlines(mline, moline, gsq);
+	m_cartridge->set_gromlines(mline, moline, gsq);
 }
 
 void ti99_gkracker_device::gclock_in(int state)
 {
-	if (m_cartridge != nullptr)
-		m_cartridge->gclock_in(state);
+	m_cartridge->gclock_in(state);
 }
 
 /*
@@ -174,7 +171,7 @@ void ti99_gkracker_device::gclock_in(int state)
 */
 bool ti99_gkracker_device::is_grom_idle()
 {
-	return (m_cartridge != nullptr) ? m_cartridge->is_grom_idle() : false;
+	return m_cartridge->is_grom_idle();
 }
 
 void ti99_gkracker_device::readz(offs_t offset, uint8_t *value)
@@ -224,25 +221,19 @@ void ti99_gkracker_device::readz(offs_t offset, uint8_t *value)
 	}
 
 	// If the guest has GROMs or ROMs they will override the GK contents
-	if (m_cartridge != nullptr)
-	{
-		// For debugging
-		uint8_t val1 = *value;
+	// For debugging
+	uint8_t val1 = *value;
 
-		// Read from the guest cartridge.
-		m_cartridge->readz(offset, value);
-		if (val1 != *value)
-			LOGMASKED(LOG_GKRACKER, "Read (from guest) %04x -> %02x\n", offset, *value);
-	}
+	// Read from the guest cartridge.
+	m_cartridge->readz(offset, value);
+	if (val1 != *value)
+		LOGMASKED(LOG_GKRACKER, "Read (from guest) %04x -> %02x\n", offset, *value);
 }
 
 void ti99_gkracker_device::write(offs_t offset, uint8_t data)
 {
 	// write to the guest cartridge if present
-	if (m_cartridge != nullptr)
-	{
-		m_cartridge->write(offset, data);
-	}
+	m_cartridge->write(offset, data);
 
 	if (m_grom_selected)
 	{
@@ -310,35 +301,18 @@ void ti99_gkracker_device::write(offs_t offset, uint8_t data)
 
 void ti99_gkracker_device::crureadz(offs_t offset, uint8_t *value)
 {
-	if (m_cartridge != nullptr)
-		m_cartridge->crureadz(offset, value);
+	m_cartridge->crureadz(offset, value);
 }
 
 void ti99_gkracker_device::cruwrite(offs_t offset, uint8_t data)
 {
-	if (m_cartridge != nullptr)
-		m_cartridge->cruwrite(offset, data);
+	m_cartridge->cruwrite(offset, data);
 }
 
 INPUT_CHANGED_MEMBER( ti99_gkracker_device::gk_changed )
 {
 	LOGMASKED(LOG_GKRACKER, "Input changed %d - %d\n", int(param & 0x07), newval);
 	m_gk_switch[param & 0x07] = newval;
-}
-
-void ti99_gkracker_device::insert(int index, ti99_cartridge_device* cart)
-{
-	LOGMASKED(LOG_CHANGE, "Insert cartridge\n");
-	m_cartridge = cart;
-	// Switch 1 has a third location for resetting. We do the reset by default
-	// here. It can be turned off in the configuration.
-	m_gromport->cartridge_inserted();
-}
-
-void ti99_gkracker_device::remove(int index)
-{
-	LOGMASKED(LOG_CHANGE, "Remove cartridge\n");
-	m_cartridge = nullptr;
 }
 
 void ti99_gkracker_device::gk_install_menu(const char* menutext, int len, int ptr, int next, int start)
@@ -406,7 +380,8 @@ void ti99_gkracker_device::device_start()
 {
 	m_ram_ptr = memregion(GKRACKER_NVRAM_TAG)->base();
 	m_grom_ptr = memregion(GKRACKER_ROM_TAG)->base();
-	m_cartridge = nullptr;
+	m_cartridge->set_connector(this);
+
 	for (int i=1; i < 6; i++) m_gk_switch[i] = 0;
 	save_pointer(NAME(m_gk_switch),6);
 	save_item(NAME(m_romspace_selected));
@@ -444,7 +419,7 @@ const tiny_rom_entry *ti99_gkracker_device::device_rom_region() const
 
 void ti99_gkracker_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, "cartridge", 0);
+	TI99_CART(config, m_cartridge, 0);
 }
 
 INPUT_PORTS_START(gkracker)
