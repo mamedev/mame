@@ -16,13 +16,14 @@ driver by Yochizo and Takahiro Nogi
 
 Supported games :
 ==================
- Super Real Mahjong Part1     (C) 1987 Seta
- Super Real Mahjong Part2     (C) 1987 Seta
- Super Real Mahjong Part3     (C) 1988 Seta
- Mahjong Yuugi (set 1)        (C) 1990 Visco
- Mahjong Yuugi (set 2)        (C) 1990 Visco
- Mahjong Pon Chin Kan (set 1) (C) 1991 Visco
- Mahjong Pon Chin Kan (set 2) (C) 1991 Visco
+ Super Real Mahjong Part1     (C) 1987 Seta    P0-023
+ Super Real Mahjong Part2     (C) 1987 Seta    P0-023
+ Super Real Mahjong Part3     (C) 1988 Seta    P0-037A
+ Real Mahjong Gold Yumehai    (C) 1988 Seta    P0-064A
+ Mahjong Yuugi (set 1)        (C) 1990 Visco   P0-049A
+ Mahjong Yuugi (set 2)        (C) 1990 Visco   P0-049A
+ Mahjong Pon Chin Kan (set 1) (C) 1991 Visco   P0-049A
+ Mahjong Pon Chin Kan (set 2) (C) 1991 Visco   P0-049A
 
 
 System specs :
@@ -1491,7 +1492,7 @@ ROM_START( srmp1 )
 	ROM_LOAD( "ub2.13", 0x400, 0x200, CRC(7e7d25f7) SHA1(e5bf5071567f95c3bb70347f0b86a9703f9f2e6c) )
 ROM_END
 
-ROM_START( srmp2 )
+ROM_START( srmp2 ) // PCB: P0-023
 	ROM_REGION( 0x040000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "uco-2.17", 0x000000, 0x020000, CRC(0d6c131f) SHA1(be85f2578b0ae2a072565605b7dbeb970e5e3851) )
 	ROM_LOAD16_BYTE( "uco-3.18", 0x000001, 0x020000, CRC(e9fdf5f8) SHA1(aa1f8cc3f1d0ed942403c0473605775bc1537cbf) )
@@ -1520,7 +1521,7 @@ ROM_START( srmp2 )
 	ROM_LOAD( "uc-2o.13", 0x000400, 0x000400, CRC(50a33b96) SHA1(cfb6d3cb6b73d1bf484014fb340c28bc1774137d) )
 ROM_END
 
-ROM_START( srmp3 )
+ROM_START( srmp3 ) // PCB: P0-037A
 	ROM_REGION( 0x020000, "maincpu", 0 )                    /* Z80 Code */
 	ROM_LOAD( "za0-10.bin", 0x000000, 0x020000, CRC(939d126f) SHA1(7a5c7f7fbee8de11a08194d3c8f10a20f8dc2f0a) )
 
@@ -1630,7 +1631,7 @@ ROM_START( rmgoldyh )
 	ROM_LOAD( "zf0-13.u59", 0x000200, 0x000200, CRC(4ea3d2fe) SHA1(c7d18b9c1331e08faadf33e52033c658bf2b16fc) )
 ROM_END
 
-ROM_START( mjyuugi )
+ROM_START( mjyuugi ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "um001.001", 0x000000, 0x020000, CRC(28d5340f) SHA1(683d89987b8b794695fdb6104d8e6ff5204afafb) )
 	ROM_LOAD16_BYTE( "um001.003", 0x000001, 0x020000, CRC(275197de) SHA1(2f8efa112f23f172eaef9bb732b2a253307dd896) )
@@ -1658,7 +1659,7 @@ ROM_START( mjyuugi )
 	ROM_LOAD( "maj-001.02", 0x080000, 0x080000, CRC(eb28e641) SHA1(67e1d89c9b40e4a83a3783d4343d7a8121668091) )
 ROM_END
 
-ROM_START( mjyuugia )
+ROM_START( mjyuugia ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "um_001.001", 0x000000, 0x020000, CRC(76dc0594) SHA1(4bd81616769cdc59eaf6f7921e404e166500f67f) )
 	ROM_LOAD16_BYTE( "um001.003",  0x000001, 0x020000, CRC(275197de) SHA1(2f8efa112f23f172eaef9bb732b2a253307dd896) )
@@ -1686,7 +1687,7 @@ ROM_START( mjyuugia )
 	ROM_LOAD( "maj-001.02", 0x080000, 0x080000, CRC(eb28e641) SHA1(67e1d89c9b40e4a83a3783d4343d7a8121668091) )
 ROM_END
 
-ROM_START( ponchin )
+ROM_START( ponchin ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "um2_1_1.u22", 0x000000, 0x020000, CRC(cf88efbb) SHA1(7bd2304d365524fc5bcf3fb30752f5efec73a9f5) )
 	ROM_LOAD16_BYTE( "um2_1_3.u42", 0x000001, 0x020000, CRC(e053458f) SHA1(db4a34589a08d0252d700144a6260a0f6c4e8e30) )
@@ -1711,7 +1712,7 @@ ROM_START( ponchin )
 	ROM_LOAD( "um2_1_10.u63", 0x080000, 0x080000, CRC(53e643e9) SHA1(3b221217e8f846ae96a9a47149037cea19d97549) )
 ROM_END
 
-ROM_START( ponchina )
+ROM_START( ponchina ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "u22.bin",     0x000000, 0x020000, CRC(9181de20) SHA1(03fdb289d862ff2d87249d35991bd60784e172d9) )
 	ROM_LOAD16_BYTE( "um2_1_3.u42", 0x000001, 0x020000, CRC(e053458f) SHA1(db4a34589a08d0252d700144a6260a0f6c4e8e30) )
