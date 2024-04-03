@@ -214,7 +214,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 			set_audio_squelch(true, true);
 			m_mark_frame = ~uint32_t(0);
 			advance_slider(1);
-			queue_reply(0x0a, 0.4);
+			queue_reply(0x0a, 1.4);
 			break;
 		}
 		case CMD_STEP_STILL_REVERSE:
@@ -223,7 +223,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 			set_audio_squelch(true, true);
 			m_mark_frame = ~uint32_t(0);
 			advance_slider(-1);
-			queue_reply(0x0a, 0.4);
+			queue_reply(0x0a, 1.4);
 			break;
 		}
 		case CMD_STOP:
@@ -315,7 +315,8 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 		}
 		case CMD_STEP_REVERSE:
 		{
-			m_mode = MODE_STILL;
+			m_speed = m_base_speed / 7;
+			m_mode = MODE_MS_REVERSE;
 			set_audio_squelch(true, true);
 			m_mark_frame = 0;
 			advance_slider(-1);
@@ -685,6 +686,12 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 			m_curr_frame = bcd_to_literal(line & 0x7ffff);
 
 		LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
+			get_field_code(LASERDISC_CODE_LINE16, false),
+			get_field_code(LASERDISC_CODE_LINE17, false),
+			get_field_code(LASERDISC_CODE_LINE18, false),
+			line);
+
+		popmessage("Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
 			get_field_code(LASERDISC_CODE_LINE16, false),
 			get_field_code(LASERDISC_CODE_LINE17, false),
 			get_field_code(LASERDISC_CODE_LINE18, false),
