@@ -2594,6 +2594,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<description>Alien Trilogy (Japan)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113G"/>
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="エイリアントリロジー"/>
@@ -9675,6 +9676,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113G"/>
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="エイリアントリロジー"/>
@@ -14946,6 +14948,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Japan, alt 2)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113G"/>
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="エイリアントリロジー"/>
@@ -30198,6 +30201,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="language" value="English/French/Italian/Spanish" />
 		<info name="serial" value="T-8113H-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -30212,6 +30216,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Germany)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="language" value="German" />
 		<info name="serial" value="T-8113H-18"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -34286,7 +34291,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying CRIMEWAVE_demo... -->
 	<software name="crimewavd" cloneof="crimewav" supported="no">
-		<description>CrimeWave Playable Demonstration Disk (Europe)</description>
+		<description>CrimeWave Playable Demonstration Disk - Not For Resale (Europe)</description>
 		<year>1997</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="610-6455"/>
@@ -34716,6 +34721,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113H"/>
 		<info name="release" value="199607xx"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -37208,7 +37214,7 @@ Sega logo animation draws offset [VDP2]
 	</software>
 
 	<!-- Identifying dw-sat-0856-Rayman-usa... -->
-	<software name="raymanu" supported="no">
+	<software name="raymanu" cloneof="rayman" supported="no">
 		<description>Rayman (USA)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
@@ -39099,7 +39105,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- input / output cue/bin verified identical as of CHDMAN change made around 28th Dec 2015, except for
 	   the 'ISRC 904002100272' metadata line after 'TRACK 24 AUDIO' being ommitted from the cuesheet, we don't
 	   store that information -->
-	<software name="raymanp" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
+	<software name="raymanp" cloneof="rayman" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
 		<description>Rayman (prototype 19950720)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
