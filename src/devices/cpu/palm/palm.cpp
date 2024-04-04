@@ -42,6 +42,7 @@ palm_device::palm_device(machine_config const &mconfig, char const *tag, device_
 	, m_iod_config("iod", ENDIANNESS_BIG, 8, 4)
 	, m_getb_bus(*this)
 	, m_select_ros(*this)
+	, m_program_level(*this)
 	, m_icount(0)
 	, m_r{}
 {
@@ -89,6 +90,7 @@ void palm_device::device_reset()
 	// select instruction source
 	m_ff = FF_IPL | FF_MSS;
 	m_select_ros((m_ff & FF_MSS) && !(m_ff & FF_IPL));
+	m_program_level(0);
 
 	// read initial PC from ROS
 	m_il = 0;
@@ -110,6 +112,7 @@ void palm_device::execute_run()
 		if ((m_ff & FF_IE) && m_il != il)
 		{
 			m_il = il;
+			m_program_level(m_il > 0);
 
 			// notify the debugger
 			if (m_il && (machine().debug_flags & DEBUG_FLAG_ENABLED))
@@ -209,8 +212,6 @@ void palm_device::execute_run()
 			}
 			else
 			{
-				m_getb_bus(DA, Ry);
-
 				if (MOD < 0xc)
 				{
 					// get byte
@@ -218,8 +219,12 @@ void palm_device::execute_run()
 					Ry += modifier(MOD);
 				}
 				else
+				{
+					m_getb_bus(DA, Ry);
+
 					// get register byte
 					Ry = (Ry & 0xff00U) | m_ioc.read_byte(DA);
+				}
 			}
 			break;
 		case 0xf: Rx -= IMM + 1; break; // subtract immediate
@@ -305,7 +310,7 @@ void palm_device::control(u8 data)
 {
 	LOG("control 0x%02x (%s)\n", data, machine().describe_context());
 
-	// 0 reset controller errors
+	// 0: reset controller errors
 
 	// 1: 0=disable interrupts
 	// 2: 0=enable interrupts
@@ -314,10 +319,7 @@ void palm_device::control(u8 data)
 	else if (!IBIT(data, 2))
 		m_ff |= FF_IE;
 
-	// TODO: 3 not used?
-	// 4 not used (0:display & select frame on)
-
-	// 5 state transition
+	// 5: state transition
 	if (!IBIT(data, 5))
 	{
 		m_ff &= ~FF_IPL;
@@ -325,6 +327,4 @@ void palm_device::control(u8 data)
 
 		m_select_ros((m_ff & FF_MSS) && !(m_ff & FF_IPL));
 	}
-
-	// TODO: 6..7 not used (frame bit #1,2?)
 }

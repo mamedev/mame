@@ -22,6 +22,7 @@ public:
 
 	auto getb_bus() { return m_getb_bus.bind(); }
 	auto select_ros() { return m_select_ros.bind(); }
+	auto program_level() { return m_program_level.bind(); }
 
 	palm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
@@ -62,6 +63,7 @@ private:
 
 	devcb_write8 m_getb_bus;
 	devcb_write_line m_select_ros;
+	devcb_write_line m_program_level;
 
 	// mame state
 	int m_icount;
