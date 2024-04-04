@@ -41,6 +41,8 @@ private:
 	required_shared_ptr<u8> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+
 	uint8_t m_kgs_datao, m_kgs_datai, m_kgs_ctrl;
 	bool m_nmi_enable;
 

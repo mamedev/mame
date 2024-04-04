@@ -61,6 +61,7 @@ void robotron_k7071_device::device_start()
 	save_item(NAME(m_kgs_ctrl));
 	save_item(NAME(m_nmi_enable));
 
+	m_cpu->space(AS_PROGRAM).specific(m_program);
 	m_bus->space(AS_IO).install_readwrite_handler(0x200, 0x203, read16s_delegate(*this, FUNC(robotron_k7071_device::io_r)), write16s_delegate(*this, FUNC(robotron_k7071_device::io_w)));
 }
 
@@ -78,8 +79,8 @@ void robotron_k7071_device::device_add_mconfig(machine_config &config)
 
 	I8257(config, m_dma, XTAL(16'000'000) / 6);
 	m_dma->out_hrq_cb().set(FUNC(robotron_k7071_device::hrq_w));
-	m_dma->in_memr_cb().set([this] (offs_t offset) { return m_cpu->space(AS_PROGRAM).read_byte(offset); });
-	m_dma->out_iow_cb<0>().set([this] (u8 data) { m_crtc->dack_w(data); });
+	m_dma->in_memr_cb().set([this] (offs_t offset) { return m_program.read_byte(offset); });
+	m_dma->out_iow_cb<0>().set(m_crtc, FUNC(i8275_device::dack_w));
 
 	I8275(config, m_crtc, XTAL(16'000'000) / 8);
 	m_crtc->set_screen(m_screen);
