@@ -25827,7 +25827,6 @@ Red screen
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="RIDDLE WIRED クイズ独占企業の崩壊 8月 VOL. 1"/>
-		<info name="alt_title" value="クイズ リドル･ワイアード ８月 VOL.1 (Sega Game Toshokan menu)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="riddle wired (jpn) (sn).bin" size="262144" crc="fae3d720" sha1="662ffc946978030125dc1274aeec5196bc9a721b"/>
