@@ -97,9 +97,6 @@ It was shown only at an amusement show. Possibly a prototype still exists. Possi
 Tekno Werk                              (C) Namco,        1999
 A music game with two 17-key Yamaha keyboards side by side for 2 players
 Video: https://www.youtube.com/watch?v=uGlt0HM67l8
-Another video from 2022 mentions that the machine was at
-'the AM Jam Jam Tsukuba', which now appears permanently closed,
-but contacting someone affiliated might lead to the machine. 
 
 The Namco System 12 system comprises 3 mandatory PCB's....
 MOTHER PCB  - This is the main PCB. It holds all sound circuitry, sound ROMs, program ROMs, shared RAM, bank-switching
