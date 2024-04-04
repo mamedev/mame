@@ -2810,6 +2810,13 @@ static void do_extract_cd(parameters_map &params)
 				}
 			}
 		}
+		else
+		{
+			cdrom_file::toc* trackinfo = (cdrom_file::toc*)&toc;
+						
+			for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
+				trackinfo->tracks[tracknum].splitframes = 0;
+		}
 
 		// iterate over tracks and copy all data
 		uint64_t totaloutputoffs = 0;
