@@ -7866,10 +7866,10 @@ The following floppies came with the machines.
 
 	<!-- The software release contained 2 floppies. -->
 	<software name="graphsar10" cloneof="graphsar">
-		<description>Graph Saurus v1.0 (Japan)</description>
+		<description>Graph Saurus Ver1.0 (Japan)</description>
 		<year>1989</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="グラフサウルス"/>
+		<info name="alt_title" value="グラフ サウルス"/>
 		<info name="serial" value="BM-021"/>
 		<info name="gtin" value="04988655132108"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -7880,10 +7880,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="graphsar">
-		<description>Graph Saurus v2.0 (Japan)</description>
+		<description>Graph Saurus Ver2.0 (Japan)</description>
 		<year>1991</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="グラフサウルスＶｅｒ．２．０"/>
+		<info name="alt_title" value="グラフ サウルス version 2.0"/>
 		<info name="serial" value="BM-124"/>
 		<info name="gtin" value="04988655632219"/>
 		<info name="usage" value="Requires a Japanese system."/>
@@ -10845,7 +10845,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Bit²</publisher>
 		<notes>Before starting the software the system will be rebooted automatically.</notes>
-		<info name="alt_title" value="MIDIサウルス"/>
+		<info name="alt_title" value="MIDI サウルス"/>
 		<info name="barcode" value="4988655211100"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
@@ -15891,7 +15891,7 @@ The following floppies came with the machines.
 		<description>Synth Saurus Ver2.0 (Japan, v2.03)</description>
 		<year>1989</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルスVer2.0"/>
+		<info name="alt_title" value="シンセサウルス version 2.0"/>
 		<info name="serial" value="BM-912"/>
 		<info name="gtin" value="04988655231191"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -15906,7 +15906,7 @@ The following floppies came with the machines.
 		<description>Synth Saurus Ver2.0 (Japan)</description>
 		<year>1989</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルスVer2.0"/>
+		<info name="alt_title" value="シンセサウルス version 2.0"/>
 		<info name="serial" value="BM-912"/>
 		<info name="gtin" value="04988655231191"/>
 		<part name="flop1" interface="floppy_3_5">
