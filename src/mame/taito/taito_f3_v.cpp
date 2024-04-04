@@ -657,8 +657,9 @@ void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 // y should be called 0->255 for non-flipscreen, 255->0 for flipscreen
 void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 {
-	const auto latched_addr = [=] (u8 section, u8 subsection) -> offs_t {
-		const u16 latches = m_line_ram[(section * 0x200)/2 + y];
+	const auto &line_ram = m_line_ram;
+	const auto latched_addr = [line_ram, y] (u8 section, u8 subsection) -> offs_t {
+		const u16 latches = line_ram[(section * 0x200)/2 + y];
 		// NOTE: this may actually be computed from the upper byte? i.e.:
 		//offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
 		const offs_t base = 0x4000 + 0x1000 * section + 0x200 * subsection;
