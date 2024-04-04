@@ -857,9 +857,10 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 	reg_sy = sy;
 }
 
+template<typename Mix>
 std::vector<taito_f3_state::clip_plane_inf>
 taito_f3_state::calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES],
-						  const mixable *line)
+						  const Mix line)
 {
 	using clip_range = clip_plane_inf;
 	const s16 INF_L = 46;
@@ -964,7 +965,7 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 		if (flags && !(flags[gfx_x] & 0xf0))
 			continue;
 
-		if (gfx->prio() > pri[x].src_prio) {
+		if (gfx->prio > pri[x].src_prio) {
 			// submit src pix
 			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
 				u8 sel = gfx->blend_select(flags, gfx_x);
@@ -983,23 +984,23 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 						continue; // could be early return for pivot and sprite
 					z[x].src_blend = line.blend[2 + sel];
 					z[x].dst_blend = line.blend[sel];
-					pri[x].dst_prio = gfx->prio();
+					pri[x].dst_prio = gfx->prio;
 					z[x].dst_pal = pal;
 					break;
 				}
 				pri[x].src_blendmode = gfx->blend_mask();
 
 				z[x].src_pal = pal;
-				pri[x].src_prio = gfx->prio();
+				pri[x].src_prio = gfx->prio;
 			}
-		} else if (gfx->prio() >= pri[x].dst_prio) {
+		} else if (gfx->prio >= pri[x].dst_prio) {
 			// submit dest pix
 			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
-				if (gfx->prio() != pri[x].dst_prio)
+				if (gfx->prio != pri[x].dst_prio)
 					z[x].dst_pal = pal;
 				else // prio conflict = color line conflict? (dariusg, bubblem)
 					z[x].dst_pal = 0;
-				pri[x].dst_prio = gfx->prio();
+				pri[x].dst_prio = gfx->prio;
 				const bool sel = gfx->blend_select(flags, gfx_x);
 				switch (pri[x].src_blendmode) {
 				case 0b01:
@@ -1017,7 +1018,7 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 	constexpr int DEBUG_Y = 180 + 24;
 	if (TAITOF3_VIDEO_DEBUG && line.y == DEBUG_Y) {
 		logerror("[%X] %s%d: %d,%d (%d)\n   {pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
-				 gfx->prio(), gfx->debug_name(), gfx->debug_index,
+				 gfx->prio, gfx->debug_name(), gfx->debug_index,
 				 gfx->blend_b(), gfx->blend_a(), gfx->blend_select(flags, 82),
 				 z[DEBUG_X].src_pal, z[DEBUG_X].dst_pal,
 				 z[DEBUG_X].src_blend, z[DEBUG_X].dst_blend,
@@ -1040,7 +1041,7 @@ void taito_f3_state::render_line(pen_t *dst, const mix_pix (&z)[432])
 
 void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto prio = [](const auto &obj) -> u8 { return obj->prio(); };
+	auto prio = [](const auto &obj) -> u8 { return obj->prio; };
 
 	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
