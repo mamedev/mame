@@ -4723,7 +4723,7 @@ GAME( 1995, spcinv95,   0,        f3_224a, f3, taito_f3_state, init_spcinv95, RO
 GAME( 1995, spcinv95u,  spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito America Corporation", "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)", 0 )
 GAME( 1995, akkanvdr,   spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito Corporation",         "Akkanbeder (Ver 2.5J 1995/06/14)", 0 )
 GAME( 1995, twinqix,    0,        f3_224a, f3, taito_f3_state, init_twinqix,  ROT0,   "Taito America Corporation", "Twin Qix (Ver 1.0A 1995/01/17, prototype)", 0 )
-GAME( 1995, quizhuhu,   0,        f3,      f3, taito_f3_state, init_quizhuhu, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // quiz text positioning, heavy sprite window usage
+GAME( 1995, quizhuhu,   0,        f3,      f3, taito_f3_state, init_quizhuhu, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", 0 )
 GAME( 1995, pbobble2,   0,        f3,      f3, taito_f3_state, init_pbobbl2p, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.3O 1995/07/31)", 0 )
 GAME( 1995, pbobble2o,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.2O 1995/07/20)", 0 )
 GAME( 1995, pbobble2j,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 )
