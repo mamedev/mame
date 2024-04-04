@@ -10845,7 +10845,7 @@ The following floppies came with the machines.
 		<year>1990</year>
 		<publisher>Bit²</publisher>
 		<notes>Before starting the software the system will be rebooted automatically.</notes>
-		<info name="alt_title" value="ＭＩＤＩサウルス"/>
+		<info name="alt_title" value="MIDIサウルス"/>
 		<info name="barcode" value="4988655211100"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
@@ -11324,9 +11324,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="msxtechg">
-		<description>MSX Technical Guide Daiyonhan (Japan)</description>
+		<description>MSX Technical Guidebook - The Fourth Edition (Japan)</description>
 		<year>1991</year>
 		<publisher>ASCAT</publisher>
+		<info name="alt_title" value="MSXテクニカルガイドフック第四版"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
@@ -11415,7 +11416,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="onchikun">
-		<description>Music Editor Onchi Kun (Japan)</description>
+		<description>Music Editor Onchi-kun (Japan)</description>
 		<year>1988</year>
 		<publisher>Winky Soft</publisher>
 		<info name="alt_title" value="ミュージックエディター音知くん"/>
@@ -11516,7 +11517,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="niwabusa">
-		<description>Nihongo Waupuro Bunsyo Sakuzaemon (Japan)</description>
+		<description>Nihongo Waupuro Bunsho Sakuzaemon (Japan)</description>
 		<year>1988</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="日本語ワープロ・文書作左衛門"/>
@@ -11526,13 +11527,13 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program disk - プログラムディスク"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nihongo waupuro bunsyo sakuzaemon - sony (program disk).dsk" size="737280" crc="c640b85f" sha1="c49b36cb844598e32226815977fbbb6d4b1a1de9"/>
+				<rom name="nihongo waupuro bunsho sakuzaemon - sony (program disk).dsk" size="737280" crc="c640b85f" sha1="c49b36cb844598e32226815977fbbb6d4b1a1de9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Illustration disk - イラストディスク"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nihongo waupuro bunsyo sakuzaemon - sony (illustration disk).dsk" size="737280" crc="eb276dfa" sha1="ad69a084457073c472cc7b87c8da121c7695ee01"/>
+				<rom name="nihongo waupuro bunsho sakuzaemon - sony (illustration disk).dsk" size="737280" crc="eb276dfa" sha1="ad69a084457073c472cc7b87c8da121c7695ee01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15887,10 +15888,10 @@ The following floppies came with the machines.
 
 	<!-- v2.03 is only referenced once. The other verion references are still 2.00. -->
 	<software name="synthsa203">
-		<description>Synth Saurus v2.0 (Japan, v2.03)</description>
+		<description>Synth Saurus Ver2.0 (Japan, v2.03)</description>
 		<year>1989</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルスＶｅｒ．２．０"/>
+		<info name="alt_title" value="シンセサウルスVer2.0"/>
 		<info name="serial" value="BM-912"/>
 		<info name="gtin" value="04988655231191"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -15902,10 +15903,10 @@ The following floppies came with the machines.
 
 	<!-- The data only has references to 2.00, assuming this is v2.00. -->
 	<software name="synthsa2" cloneof="synthsa203">
-		<description>Synth Saurus v2.0 (Japan)</description>
+		<description>Synth Saurus Ver2.0 (Japan)</description>
 		<year>1989</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルスＶｅｒ．２．０"/>
+		<info name="alt_title" value="シンセサウルスVer2.0"/>
 		<info name="serial" value="BM-912"/>
 		<info name="gtin" value="04988655231191"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -19050,6 +19051,7 @@ HOMEBREW
 		<description>Animecha (Japan, v2.00)</description>
 		<year>1995</year>
 		<publisher>Tempest</publisher>
+		<info name="alt_title" value="アニメカ"/>
 		<info name="usage" value="Type AM to start the software."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
