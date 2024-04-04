@@ -975,11 +975,17 @@ static int mosaic(int x, u8 sample) {
 	return x - (x_count % sample);
 }
 
+inline bool taito_f3_state::mixable::layer_enable() const {
+	return (mix_value & 0x2000) && blend_mask() != 0b11;
+}
 inline int taito_f3_state::mixable::x_index(int x) const {
 	return x;
 }
 inline int taito_f3_state::mixable::y_index(int y) const {
 	return y;
+}
+inline bool taito_f3_state::sprite_inf::layer_enable() const {
+	return (mix_value & 0x2000) && blend_mask() != 0b00;
 }
 inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const {
 	return pal + pal_add;

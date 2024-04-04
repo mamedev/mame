@@ -243,7 +243,7 @@ protected:
 		inline auto clip_inv() const { return std::bitset<4>(mix_value >> 4); };
 		inline auto clip_enable() const { return std::bitset<4>(mix_value >> 8); };
 		inline bool clip_inv_mode() const { return mix_value & 0x1000; };
-		inline bool layer_enable() const { return mix_value & 0x2000; };
+		virtual inline bool layer_enable() const;
 		inline u8 blend_mask() const { return BIT(mix_value, 14, 2); };
 		inline bool blend_a() const { return mix_value & 0x4000; };
 		inline bool blend_b() const { return mix_value & 0x8000; };
@@ -268,6 +268,7 @@ protected:
 		// priority in 7600
 		bool blend_select_v{false}; // 7400 0xf000
 		bool blend_select(const u8 *line_flags, int x) const override { return blend_select_v; };
+		inline bool layer_enable() const override;
 
 		u8 (*sprite_pri_usage)[256]{nullptr};
 		bool used(int y) const override { return (*sprite_pri_usage)[y] & (1<<debug_index); }
