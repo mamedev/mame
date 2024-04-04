@@ -36,18 +36,21 @@ Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            D
 Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires RAYS I/O PCB and IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
 Dragon Chronicles (satellite)................... ------X *DCO31-TS CD0        *CD           NM00020   DC001 Ver.A            Namco 2002                    \
 Dragon Chronicles Legend of the Master Ark (sat) ------X *DGC11 CD0           *CD          *NM00014  *DGC11 Ver.A1           Namco 200?                    | server is a custom PC
-Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    |
+Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    | Uses the V290 or V300 I/O Boards.
    "                                      ...... XXXX56X  DOL150-1-ST-DVD0-G   DVD          NM00028  *?                      Namco 2004                    |
    "                                      ...... XXXX56X  DOL140-1-ST-DVD0-F   DVD          NM00028  *?                      Namco 2004                    |
    "                                      ...... XXXX56X  DOL120-1-ST-DVD0-D   DVD          NM00028  *?                      Namco 2004                    |
    "                                      ...... XXXX56X  DOL110-1-ST-DVD0-C   DVD          NM00028  *?                      Namco 2004                    /
 Fate / Unlimited Codes.......................... X23456X  FUD-HDD0-A           HDD (80GB)   NM00048   FUD1 Ver.A             Capcom/Type-Moon/Cavia/8ing 2008 HDD: Western Digital WD800BB
 Gundam vs Gundam Next........................... XXXX56X  GNX100-1-NA-HDD0-A   HDD (80GB)   NM00052   GNX1001-NA-A           Bandai/Capcom 2009            HDD: Western Digital WD800BB
-Idol Master..................................... ------X *IDM1-HA             *HDD         *NM00022  *IDMS1 Ver.A            Namco 2004
+THE IDOLM@STER (Station)........................ XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMS1 Ver.D            Namco 2004                    Uses the V290 or V300 I/O Boards.
+THE IDOLM@STER (Tower).......................... XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMT1 Ver.D            Namco 2004                    Uses the V290 or V300 I/O Boards. Can be a Local server for Station units.
 Kinnikuman Muscle Grand Prix.................... XXXX56X  KN1-B                DVD          NM00029   KN1 Ver.A              Banpresto 2006                #
 Kinnikuman Muscle Grand Prix 2.................. XXXX56X  KN2                  DVD          NM00040   KN2 Ver.A              Banpresto 2007                #
-Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0    *DVD          NM00036   ZNT100-1-ST-A          Namco 2006
-Minna de Kitaeru Zenno Training.(Ver. 1.50)..... ------X  ZNT100-1-NA-DVD0-B   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
+Minna de Kitaeru Zenno Training................. ----56X  ZNT100-1-NA-DVD0-A   DVD          NM00036   ZNT100-1-ST-A          Namco 2006
+Minna de Kitaeru Zenno Training.(Ver. 1.50)..... ----56X  ZNT150-1-NA-DVD0-A   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
+Minna de Kitaeru Zenno Training.(Ver. 1.50)..... ----56X  ZNT150-1-NA-DVD0-B   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
+Minna de Kitaeru Zenno Training.(Ver. 1.60)..... ----56X  ZNT150-1-NA-DVD0-A   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
 Mobile Suit Gundam - Gundam vs Gundam........... XXXX56X  GVS1 DVD0B           DVD          NM00043   GVS1 Ver.A             Bandai/Capcom 2008
 Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 123456X  SED1 DVD0            DVD          NM00024   SED1 Ver.A             Banpresto 2005                % #
 M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 123456X  GSD1 DVD0            DVD          NM00034   GSD1 Ver.A             Banpresto 2006                % #
@@ -615,11 +618,17 @@ Notes:
 
 V290 FCB PCB is almost identical to FCA PCB. The main differences are changed internal MCU code & PIC code,
 some extra/different connectors, less D1017 driver transistors and an added RS-232 IC.
-The V290 FCB PCB is used with touchscreen games such as Dragon Chronicles, Druaga Online, Idol Master etc.
+The V290 FCB PCB is used with touchscreen games such as Dragon Chronicles, Druaga Online, THE IDOLM@STER etc.
 It supports a serial touchscreen interface, card readers and buttons.
 The additional devices are supported via J108 which connects to another PCB 'XOU020-A' which contains a
 Texas Instruments TMS32VC540x DSP, TSOP32 flash ROM and other components.
 
+V300 FCB PCB
+2606960100 (2582960101)
+
+Notes: V300 FCB PCB is almost identical to the V290 FCB PCB. The main differences are changed internal MCU
+code & PIC code, more output transistors and an traded the RS-232 for a RS-232C IC.
+[to-do]
 
 System246 JAMMA(B) PCB
 8908962701 (8908972701)

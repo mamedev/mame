@@ -27,6 +27,8 @@
  * This scheme disallows modifier combinations, with shift taking priority over
  * command. Bits 5 and 6 of the scan code are swapped when output.
  *
+ * IBM 5110 keyboard scan codes are bitwise inverted and reversed.
+ *
  * Regular alpha, numeric and keypad keys are easily mapped 1:1 with a standard
  * modern keyboard. Additional keys are mapped by default as follows:
  *
@@ -57,6 +59,7 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(IBM5100_KEYBOARD, ibm5100_keyboard_device, "ibm5100_keyboard", "IBM 5100 Keyboard")
+DEFINE_DEVICE_TYPE(IBM5110_KEYBOARD, ibm5110_keyboard_device, "ibm5110_keyboard", "IBM 5110 Keyboard")
 
 INPUT_PORTS_START(ibm5100_keyboard)
 	PORT_START("modifiers")
@@ -184,8 +187,8 @@ static const std::pair<u8, u8>typamatic_keys[] =
 	std::make_pair(17, 1), // cursor left
 };
 
-ibm5100_keyboard_device::ibm5100_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, IBM5100_KEYBOARD, tag, owner, clock)
+ibm5100_keyboard_device::ibm5100_keyboard_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this
 		, "col.0", "col.1", "col.2", "col.3", "col.4", "col.5", "col.6", "col.7"
 		, "col.8", "col.9", "col.a", "col.b", "col.c", "col.d", "col.e", "col.f"
@@ -193,6 +196,16 @@ ibm5100_keyboard_device::ibm5100_keyboard_device(machine_config const &mconfig, 
 	, m_strobe(*this)
 	, m_modifiers(*this, "modifiers")
 	, m_lock(false)
+{
+}
+
+ibm5100_keyboard_device::ibm5100_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: ibm5100_keyboard_device(mconfig, IBM5100_KEYBOARD, tag, owner, clock)
+{
+}
+
+ibm5110_keyboard_device::ibm5110_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: ibm5100_keyboard_device(mconfig, IBM5110_KEYBOARD, tag, owner, clock)
 {
 }
 
@@ -219,7 +232,7 @@ void ibm5100_keyboard_device::key_make(u8 row, u8 column)
 	if (m_lock)
 		return;
 
-	m_scan = translate(row, column);
+	m_scan = translate(row, column, m_modifiers->read());
 
 	LOG("key_make row %d column %d scan 0x%02x\n", row, column, m_scan);
 
@@ -243,20 +256,33 @@ void ibm5100_keyboard_device::key_repeat(u8 row, u8 column)
 {
 	if (m_typamatic)
 	{
-		m_scan = translate(row, column);
+		m_scan = translate(row, column, m_modifiers->read());
 
 		m_strobe(0);
 		m_strobe(1);
 	}
 }
 
-// column and row are swapped with respect device_matrix_keyboard_interface arguments
-u8 ibm5100_keyboard_device::translate(u8 column, u8 row)
+void ibm5100_keyboard_device::typamatic_w(int state)
 {
-	// compute basic scan code with bits 5 and 6 swapped
-	u8 data = bitswap<8>(row << 5 | column, 7, 5, 6, 4, 3, 2, 1, 0);
+	m_typamatic = state;
+}
 
-	u8 const modifiers = m_modifiers->read();
+void ibm5100_keyboard_device::lock_w(int state)
+{
+	// FIXME: not connected?
+	//m_lock = !state;
+}
+
+ioport_constructor ibm5100_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ibm5100_keyboard);
+}
+
+// column and row are swapped with respect device_matrix_keyboard_interface arguments
+u8 ibm5100_keyboard_device::translate(u8 column, u8 row, u8 modifiers) const
+{
+	u8 data = bitswap<8>(row << 5 | column, 4, 5, 6, 4, 3, 2, 1, 0);
 
 	// modifiers are applied differently for columns > 15
 	if (column < 16)
@@ -270,7 +296,7 @@ u8 ibm5100_keyboard_device::translate(u8 column, u8 row)
 	}
 	else
 	{
-		data |= 0x82;
+		data |= 0x02; // S is active low
 
 		if (BIT(modifiers, 0))
 			// shift
@@ -283,17 +309,8 @@ u8 ibm5100_keyboard_device::translate(u8 column, u8 row)
 	return data;
 }
 
-void ibm5100_keyboard_device::typamatic_w(int state)
+u8 ibm5110_keyboard_device::translate(u8 column, u8 row, u8 modifiers) const
 {
-	m_typamatic = state;
-}
-
-void ibm5100_keyboard_device::lock_w(int state)
-{
-	m_lock = !state;
-}
-
-ioport_constructor ibm5100_keyboard_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(ibm5100_keyboard);
+	// 5110 scan codes are bitwise inverted and reversed
+	return bitswap<8>(~ibm5100_keyboard_device::translate(column, row, modifiers), 0, 1, 2, 3, 4, 5, 6, 7);
 }
