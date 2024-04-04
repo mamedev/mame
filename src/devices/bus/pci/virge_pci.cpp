@@ -32,7 +32,7 @@ void virge_pci_device::mmio_map(address_map& map)
 	map(0x0000,0x7fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
 	//map(0x8000,0x8043) PCI Configuration Space regs
-	//map(0x8180,0x81ff) primary/secondary stream control
+	map(0x8180,0x81ff).m(m_vga, FUNC(s3virge_vga_device::streams_control_map));
 
 	//map(0x8200,0x821f) memory port controller
 	//map(0x8220,0x8227) DMA control

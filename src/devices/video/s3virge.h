@@ -36,6 +36,8 @@ public:
 
 	void s3d_register_map(address_map &map);
 
+	void streams_control_map(address_map &map);
+
 	void image_xfer(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		if (mem_mask != 0xffff'ffff)
@@ -108,6 +110,12 @@ protected:
 		S3D_STATE_3DLINE,
 		S3D_STATE_3DPOLY
 	};
+
+	struct {
+		u8 psidf = 0;
+		u8 pshfc = 0;
+		u16 primary_stride = 0;
+	} m_streams;
 
 //  util::fifo<u32, 16 * 15> m_bitblt_fifo;
 	// TODO: sketchy, command pipeline size is unclear

@@ -33,22 +33,24 @@
 
 //#include <iostream>
 
-#define LOG_REG   (1U << 1)
-#define LOG_CMD   (1U << 2)
-#define LOG_MMIO  (1U << 3)
-#define LOG_PIXEL (1U << 4) // log pixel writes (verbose)
-#define LOG_FIFO  (1U << 5)
+#define LOG_REG     (1U << 1)
+#define LOG_CMD     (1U << 2)
+#define LOG_MMIO    (1U << 3)
+#define LOG_PIXEL   (1U << 4) // log pixel writes (verbose)
+#define LOG_FIFO    (1U << 5)
+#define LOG_STREAMS (1U << 6)
 
-#define VERBOSE (LOG_REG | LOG_CMD | LOG_MMIO | LOG_FIFO)
+#define VERBOSE (LOG_REG | LOG_CMD | LOG_MMIO | LOG_FIFO | LOG_STREAMS)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
-#define LOGREG(...)    LOGMASKED(LOG_REG, __VA_ARGS__)
-#define LOGCMD(...)    LOGMASKED(LOG_CMD, __VA_ARGS__)
-#define LOGMMIO(...)   LOGMASKED(LOG_MMIO, __VA_ARGS__)
-#define LOGPIXEL(...)  LOGMASKED(LOG_PIXEL, __VA_ARGS__)
-#define LOGFIFO(...)   LOGMASKED(LOG_FIFO, __VA_ARGS__)
+#define LOGREG(...)       LOGMASKED(LOG_REG, __VA_ARGS__)
+#define LOGCMD(...)       LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGMMIO(...)      LOGMASKED(LOG_MMIO, __VA_ARGS__)
+#define LOGPIXEL(...)     LOGMASKED(LOG_PIXEL, __VA_ARGS__)
+#define LOGFIFO(...)      LOGMASKED(LOG_FIFO, __VA_ARGS__)
+#define LOGSTREAMS(...)   LOGMASKED(LOG_STREAMS, __VA_ARGS__)
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output & 1) ? 0x3d0 : 0x3b0)
 
@@ -160,6 +162,8 @@ void s3virgedx_rev1_vga_device::device_start()
 void s3virge_vga_device::s3d_reset()
 {
 	LOGFIFO("S3D Reset\n");
+	m_streams.psidf = 0;
+	m_streams.pshfc = 0;
 	m_bitblt_fifo.clear();
 	m_xfer_fifo.clear();
 	s3virge.s3d.xfer_mode = false;
@@ -200,12 +204,46 @@ void s3virgedx_rev1_vga_device::device_reset()
 	s3.strapping = 0x0aff0912;
 }
 
+// base 0x8180
+void s3virge_vga_device::streams_control_map(address_map &map)
+{
+	map(0x0000, 0x0003).lrw32(
+		NAME([this] (offs_t offset) {
+			return (m_streams.psidf << 24) | (m_streams.pshfc << 28);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_24_31)
+			{
+				m_streams.psidf = (data >> 24) & 7;
+				m_streams.pshfc = (data >> 28) & 7;
+			}
+			LOGSTREAMS("MM8180 (Primary Stream Control) %08x & %08x\n", data, mem_mask);
+		})
+	);
+//	map(0x0004, 0x0007) Color/Chroma Key Control (MM8184)
+//	map(0x0010, 0x0013) Secondary Stream Control (MM8190)
+//	map(0x0014, 0x0017) Chroma Key Upper Bound (MM8194)
+//	map(0x0018, 0x001b) Secondary Stream Stretch/Filter Constants (MM8198)
+//	map(0x0020, 0x0023) Blend Control (MM81A0)
+//	map(0x0040, 0x0043) Primary Stream Frame Buffer Address 0 (MM81C0)
+//	map(0x0044, 0x0047) Primary Stream Frame Buffer Address 1 (MM81C4)
+	map(0x0048, 0x004b).lrw32(
+		NAME([this] (offs_t offset) {
+			return (m_streams.primary_stride);
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_streams.primary_stride);
+			m_streams.primary_stride &= 0xfff;
+			LOGSTREAMS("MM81C8 (Primary Stream Stride) %08x & %08x\n", data, mem_mask);
+		})
+	);
+}
+
 uint16_t s3virge_vga_device::offset()
 {
-	// win98se expects 24bpp packed mode with x6 boundaries
-	// this breaks SDD, which detects these VESA modes as 32bpp.
-	if(svga.rgb24_en)
-		return vga.crtc.offset * 6;
+	if (s3.ext_misc_ctrl_2 & 0xc)
+		return m_streams.primary_stride;
+	// TODO: SDD expects offset x8 with streams disabled
 	return s3trio64_vga_device::offset();
 }
 
@@ -391,7 +429,7 @@ void s3virge_vga_device::s3_define_video_mode()
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
 			case 0x0d: svga.rgb24_en = 1; divisor = 1; break;
-			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4));
+			default: popmessage("video/s3virge.cpp: video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4));
 		}
 	}
 	else
@@ -573,6 +611,7 @@ void s3virge_vga_device::command_dequeue(u8 op_type)
 			tmp = m_bitblt_fifo.dequeue();
 			s3virge.s3d.clip_r = tmp & 0x000007ff;
 			s3virge.s3d.clip_l = (tmp & 0x07ff0000) >> 16;
+			// $a4e0
 			tmp = m_bitblt_fifo.dequeue();
 			s3virge.s3d.clip_b = tmp & 0x000007ff;
 			s3virge.s3d.clip_t = (tmp & 0x07ff0000) >> 16;
@@ -581,13 +620,15 @@ void s3virge_vga_device::command_dequeue(u8 op_type)
 			s3virge.s3d.dest_stride = (tmp >> 16) & 0xfff8;
 			tmp = m_bitblt_fifo.dequeue();
 			s3virge.s3d.bitblt_mono_pattern = ((u64)m_bitblt_fifo.dequeue() << 32) | tmp;
+			// $a4f0
 			s3virge.s3d.pat_bg_clr = m_bitblt_fifo.dequeue();
 			s3virge.s3d.pat_fg_clr = m_bitblt_fifo.dequeue();
 			s3virge.s3d.src_bg_clr = m_bitblt_fifo.dequeue();
 			s3virge.s3d.src_fg_clr = m_bitblt_fifo.dequeue();
+			// $a500
 			s3virge.s3d.command = m_bitblt_fifo.dequeue();
 			tmp = m_bitblt_fifo.dequeue();
-			s3virge.s3d.bitblt_width = (tmp & 0xffff0000) >> 16;
+			s3virge.s3d.bitblt_width = ((tmp & 0xffff0000) >> 16) + 1;
 			s3virge.s3d.bitblt_height = (tmp & 0x0000ffff);
 			tmp = m_bitblt_fifo.dequeue();
 			s3virge.s3d.bitblt_x_src = (tmp & 0x07ff0000) >> 16;
@@ -763,14 +804,15 @@ bool s3virge_vga_device::advance_pixel()
 	if(xpos)
 	{
 		left = s3virge.s3d.bitblt_x_dst;
-		right = s3virge.s3d.bitblt_x_dst + s3virge.s3d.bitblt_width + 1;
+		right = s3virge.s3d.bitblt_x_dst + s3virge.s3d.bitblt_width;
 		s3virge.s3d.bitblt_x_current++;
 		s3virge.s3d.bitblt_x_src_current++;
 		s3virge.s3d.bitblt_pat_x++;
 	}
 	else
 	{
-		left = s3virge.s3d.bitblt_x_dst - s3virge.s3d.bitblt_width - 1;
+		// FIXME: beos 4 dominos demo
+		left = s3virge.s3d.bitblt_x_dst - s3virge.s3d.bitblt_width;
 		right = s3virge.s3d.bitblt_x_dst;
 		s3virge.s3d.bitblt_x_current--;
 		s3virge.s3d.bitblt_x_src_current--;
