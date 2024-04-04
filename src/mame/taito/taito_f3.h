@@ -365,8 +365,6 @@ protected:
 	u16 m_width_mask = 0;
 	u8 m_twidth_mask = 0;
 	u8 m_twidth_mask_bit = 0;
-	std::unique_ptr<u8[]> m_tile_opaque_sp;
-	std::unique_ptr<u8[]> m_tile_opaque_pf[8];
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
 	bool m_sprite_bank = 0;

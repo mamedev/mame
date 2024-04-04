@@ -449,7 +449,8 @@ void taito_f3_state::screen_vblank(int state)
 	}
 }
 
-void taito_f3_state::set_extend(bool state) {
+void taito_f3_state::set_extend(bool state)
+{
 	m_extend = state;
 	// TODO: we need to free these if this is called multiple times
 	// for (int i=0; i<8; i++) {
@@ -492,12 +493,10 @@ void taito_f3_state::video_start()
 	const F3config *pCFG = &f3_config_table[0];
 
 	m_spritelist = nullptr;
-	m_tile_opaque_sp = nullptr;
 
 	/* Setup individual game */
 	do {
-		if (pCFG->name == m_game)
-		{
+		if (pCFG->name == m_game) {
 			break;
 		}
 		pCFG++;
@@ -516,9 +515,6 @@ void taito_f3_state::video_start()
 	for (auto &sp_bitmap : m_sprite_framebuffers) {
 		m_screen->register_screen_bitmap(sp_bitmap);
 	}
-	m_tile_opaque_sp = std::make_unique<u8[]>(m_gfxdecode->gfx(2)->elements());
-	for (auto &tile_opaque : m_tile_opaque_pf)
-		tile_opaque = std::make_unique<u8[]>(m_gfxdecode->gfx(3)->elements());
 
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
@@ -539,55 +535,6 @@ void taito_f3_state::video_start()
 	m_gfxdecode->gfx(1)->set_source((u8 *)m_pivot_ram.target());
 
 	m_sprite_lag = m_game_config->sprite_lag;
-
-	{
-		gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
-
-		for (int c = 0; c < sprite_gfx->elements(); c++)
-		{
-			int chk_trans_or_opa = 0;
-			const u8 *dp = sprite_gfx->get_data(c);
-			for (int y = 0; y < sprite_gfx->height(); y++)
-			{
-				for (int x = 0; x < sprite_gfx->width(); x++)
-				{
-					if (!dp[x]) chk_trans_or_opa |= 2;
-					else        chk_trans_or_opa |= 1;
-				}
-				dp += sprite_gfx->rowbytes();
-			}
-			if (chk_trans_or_opa == 1) m_tile_opaque_sp[c] = 1;
-			else                       m_tile_opaque_sp[c] = 0;
-		}
-	}
-
-	{
-		gfx_element *pf_gfx = m_gfxdecode->gfx(3);
-
-		for (int c = 0; c < pf_gfx->elements(); c++)
-		{
-			for (int extra_planes = 0; extra_planes < 4; extra_planes++)
-			{
-				int chk_trans_or_opa = 0;
-				/* 0 = 4bpp, 1=5bpp, 2=?, 3=6bpp */
-				const u8 extra_mask = ((extra_planes << 4) | 0x0f);
-				const u8 *dp = pf_gfx->get_data(c);
-
-				for (int y = 0; y < pf_gfx->height(); y++)
-				{
-					for (int x = 0; x < pf_gfx->width(); x++)
-					{
-						if (!(dp[x] & extra_mask))
-							chk_trans_or_opa |= 2;
-						else
-							chk_trans_or_opa |= 1;
-					}
-					dp += pf_gfx->rowbytes();
-				}
-				m_tile_opaque_pf[extra_planes][c] = chk_trans_or_opa;
-			}
-		}
-	}
 }
 
 /******************************************************************************/
@@ -601,14 +548,11 @@ void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pf_ram[offset]);
 
-	if (m_game_config->extend)
-	{
+	if (m_game_config->extend) {
 		if (offset < 0x4000) {
 			m_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
 		}
-	}
-	else
-	{
+	} else {
 		if (offset < 0x4000)
 			m_tilemap[offset >> 11]->mark_tile_dirty((offset & 0x7ff) >> 1);
 	}
@@ -713,8 +657,7 @@ void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 // y should be called 0->255 for non-flipscreen, 255->0 for flipscreen
 void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 {
-	const auto latched_addr = [=] (u8 section, u8 subsection) -> offs_t
-	{
+	const auto latched_addr = [=] (u8 section, u8 subsection) -> offs_t {
 		const u16 latches = m_line_ram[(section * 0x200)/2 + y];
 		// NOTE: this may actually be computed from the upper byte? i.e.:
 		//offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
@@ -1246,8 +1189,7 @@ void taito_f3_state::get_sprite_info()
 {
 	const u16 *spriteram16_ptr = m_spriteram.target();
 
-	struct sprite_axis
-	{
+	struct sprite_axis {
 		fixed8 block_scale = 1 << 8;
 		fixed8 pos = 0, block_pos = 0;
 		s16 global = 0, subglobal = 0;
@@ -1292,8 +1234,7 @@ void taito_f3_state::get_sprite_info()
 	tempsprite *sprite_ptr = &m_spritelist[0];
 	int total_sprites = 0;
 
-	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++)
-	{
+	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++) {
 		total_sprites++; // prevent infinite loops
 		const int bank = m_sprite_bank ? 0x4000 : 0;
 		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
@@ -1404,7 +1345,6 @@ void taito_f3_state::draw_sprites(const rectangle &cliprect)
 /******************************************************************************/
 u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(0, cliprect);
