@@ -15897,6 +15897,7 @@ pangbp                          // bootleg
 pkladies                        // (c) 1989 Mitchell
 pkladiesbl                      // bootleg
 pkladiesbl2                     // bootleg
+pkladiesblu                     // bootleg
 pkladiesl                       // (c) 1989 Leprechaun
 pkladiesla                      // (c) 1989 Leprechaun
 pompingw                        // (c) 1989 Mitchell (Japan)
@@ -19804,6 +19805,7 @@ ibm3153                         //
 
 @source:ibm/ibm5100.cpp
 ibm5100
+ibm5110
 
 @source:ibm/ibm5550.cpp
 ibm5550                         //
