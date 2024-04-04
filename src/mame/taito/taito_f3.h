@@ -208,7 +208,7 @@ protected:
 
 	struct draw_source {
 		draw_source() {};
-		draw_source(bitmap_ind16* bitmap) {
+		draw_source(bitmap_ind16 *bitmap) {
 			src = bitmap;
 			flags = nullptr;
 		}
@@ -219,8 +219,8 @@ protected:
 			src = &tilemap->pixmap();
 			flags = &tilemap->flagsmap();
 		};
-		bitmap_ind16* src{nullptr};
-		bitmap_ind8*  flags{nullptr};
+		bitmap_ind16 *src{nullptr};
+		bitmap_ind8  *flags{nullptr};
 	};
 
 	struct mix_pix { // per-pixel information for the blending circuit
@@ -248,8 +248,8 @@ protected:
 		inline bool blend_a() const { return mix_value & 0x4000; };
 		inline bool blend_b() const { return mix_value & 0x8000; };
 
-		inline bool operator<(const mixable& rhs) const noexcept { return this->prio() < rhs.prio(); };
-		inline bool operator>(const mixable& rhs) const noexcept { return this->prio() > rhs.prio(); };
+		inline bool operator<(const mixable &rhs) const noexcept { return this->prio() < rhs.prio(); };
+		inline bool operator>(const mixable &rhs) const noexcept { return this->prio() > rhs.prio(); };
 
 		virtual inline u16 palette_adjust(u16 pal) const { return pal; };
 		virtual inline int y_index(int y) const;
@@ -258,7 +258,7 @@ protected:
 
 		virtual bool used(int y) const { return true; };
 		u8 debug_index{0};
-		virtual const char* debug_name() { return "MX"; };
+		virtual const char *debug_name() { return "MX"; };
 	};
 
 	struct sprite_inf : mixable {
@@ -272,7 +272,7 @@ protected:
 
 		u8 (*sprite_pri_usage)[256]{nullptr};
 		bool used(int y) const override { return (*sprite_pri_usage)[y] & (1<<debug_index); }
-		const char* debug_name() override { return "SP"; };
+		const char *debug_name() override { return "SP"; };
 	};
 
 	struct pivot_inf : mixable {
@@ -288,7 +288,7 @@ protected:
 		u16 reg_sy{0};
 		inline int y_index(int y) const override;
 		inline int x_index(int x) const override;
-		const char* debug_name() override { return "PV"; };
+		const char *debug_name() override { return "PV"; };
 	};
 
 	struct playfield_inf : mixable {
@@ -311,7 +311,7 @@ protected:
 		inline int y_index(int y) const override;
 		inline int x_index(int x) const override;
 		bool blend_select(const u8 *line_flags, int x) const override { return BIT(line_flags[x], 0); };
-		const char* debug_name() override { return "PF"; };
+		const char *debug_name() override { return "PF"; };
 	};
 
 	struct pri_mode {

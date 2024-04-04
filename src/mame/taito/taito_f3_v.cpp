@@ -363,7 +363,7 @@ void taito_f3_state::device_post_load()
 template<unsigned Layer>
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 {
-	u16* tilep = &m_pf_data[Layer][tile_index * 2];
+	u16 *tilep = &m_pf_data[Layer][tile_index * 2];
 	// tile info:
 	// [yx?? ddac cccc cccc]
 	// yx: x/y flip
@@ -1039,7 +1039,7 @@ void taito_f3_state::render_line(pen_t *dst, const mix_pix (&z)[432])
 
 void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto prio = [](const auto& obj) -> u8 { return obj->prio(); };
+	auto prio = [](const auto &obj) -> u8 { return obj->prio(); };
 
 	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
