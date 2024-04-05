@@ -41028,6 +41028,9 @@ macsbios                        //
 yujan                           // (C) 1999 Yubis
 yuka                            // (c) 1999 Yubis
 
+@source:seta/namcoeva.cpp
+hammerch                        //
+
 @source:seta/seta.cpp
 atehate                         // (C) 1993 Athena
 blandia                         // (c) 1992 Allumer
@@ -41119,11 +41122,11 @@ gundamex                        // (c) 1994 Banpresto
 mj4simai                        // (c) 1996 Maboroshi Ware
 myangel                         // (c) 1996 Namco
 myangel2                        // (c) 1997 Namco
-staraudi                        // (c) 1997 Namco
 namcostr                        // (c) 2000 Namco
 penbros                         // (c) 2000 Subsino
 pzlbowl                         // (c) 1999 Nihon System / Moss
 reelquak                        // (c) 1997 <unknown>
+staraudi                        // (c) 1997 Namco
 telpacfl                        // (c) 1996 Sunsoft
 trophyh                         // (c) 2002 Sammy USA Corporation
 trophyht                        // (c) 2002 Sammy USA Corporation
