@@ -1258,9 +1258,9 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 
 	if (which == 2)
 	{
-		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == TIMER_DRQ)
+		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
 			drq_callback(0);
-		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == TIMER_DRQ)
+		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
 			drq_callback(1);
 		if ((m_timer[0].control & 0x800c) == 0x8008)
 			inc_timer(0);
