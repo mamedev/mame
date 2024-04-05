@@ -51,6 +51,7 @@ public:
 	{
 	}
 
+	void common(machine_config &config);
 	void ibm5100(machine_config &config);
 
 protected:
@@ -263,7 +264,7 @@ void ibm5100_state::cpu_iod_map(address_map &map)
 	map(0xf, 0xf).noprw();
 }
 
-void ibm5100_state::ibm5100(machine_config &config)
+void ibm5100_state::common(machine_config &config)
 {
 	PALM(config, m_cpu, 15'091'200);
 	m_cpu->set_addrmap(palm_device::AS_ROS, &ibm5100_state::cpu_ros_map);
@@ -281,6 +282,11 @@ void ibm5100_state::ibm5100(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(15'091'200, 64*10+15, 0, 64*10, 16*12*2, 0, 16*12*2);
 	m_screen->set_screen_update(FUNC(ibm5100_state::screen_update));
+}
+
+void ibm5100_state::ibm5100(machine_config &config)
+{
+	ibm5100_state::common(config);
 
 	IBM5100_KEYBOARD(config, m_kbd);
 	m_kbd->strobe().set(
@@ -293,7 +299,7 @@ void ibm5100_state::ibm5100(machine_config &config)
 
 void ibm5110_state::ibm5110(machine_config &config)
 {
-	ibm5100_state::ibm5100(config);
+	ibm5100_state::common(config);
 
 	m_cpu->program_level().set(
 		[this](int state)
@@ -304,7 +310,7 @@ void ibm5110_state::ibm5110(machine_config &config)
 				m_exr.select(BIT(m_lang->read(), 6));
 		});
 
-	IBM5110_KEYBOARD(config.replace(), m_kbd);
+	IBM5110_KEYBOARD(config, m_kbd);
 	m_kbd->strobe().set(
 		[this](int state)
 		{
