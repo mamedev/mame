@@ -55,6 +55,7 @@ TODO:
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
 - Background color is not verified
+- Device-fy video chip and split according to hardware (i.e. NamcoEVA2 and 3).
 
 gundamex:
 - slowdowns, music tempo is incorrect

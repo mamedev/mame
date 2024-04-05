@@ -36,7 +36,6 @@ public:
 
 		m_x1_bank(*this, "x1_bank_%u", 1U),
 		m_spriteram(*this, "spriteram", 0x40000, ENDIANNESS_BIG),
-		m_tileram(*this, "tileram"),
 		m_vregs(*this, "vregs", 0x40, ENDIANNESS_BIG),
 		m_leds(*this, "led%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
@@ -127,7 +126,6 @@ protected:
 
 	optional_memory_bank_array<8> m_x1_bank;
 	memory_share_creator<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_tileram;
 	memory_share_creator<uint16_t> m_vregs;
 	output_finder<7> m_leds;
 	output_finder<11> m_lamps;
