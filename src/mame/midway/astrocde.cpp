@@ -1657,7 +1657,7 @@ ROM_START( gorfpgm1g )
 ROM_END
 
 /* PCB engraved as "MIDWAY MFC  A IRECSA".
-   ROM test fails on test mode, it seems that Irecsa didn't bothered to change the checksums. */
+   ROM test fails in test mode, it seems Irecsa didn't bother to change the checksums. */
 ROM_START( gorfirec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.bin", 0x0000, 0x1000, CRC(97cb4a6a) SHA1(efdae9a437c665fb861665a38c6cb13fd848ad91) )
@@ -1885,7 +1885,7 @@ GAMEL( 1981, gorf,      0,    gorf,     gorf,      astrocde_state, init_gorf,   
 GAMEL( 1981, gorfpgm1,  gorf, gorf,     gorf,      astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 GAMEL( 1981, gorfpgm1f, gorf, gorf,     gorfpgm1f, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with French language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 GAMEL( 1981, gorfpgm1g, gorf, gorf,     gorfpgm1g, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with German language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
-GAMEL( 1981, gorfirec,  gorf, gorf,     gorfirec,  astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway (Irecsa license)", "Gorf (Irecsa license, Spanish)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL( 1981, gorfirec,  gorf, gorf,     gorfirec,  astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway (Irecsa license)", "Gorf (Spain, Irecsa license)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 
 
 // 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board
