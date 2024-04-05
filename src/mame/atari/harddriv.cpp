@@ -1310,7 +1310,7 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )  /* ??? */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )  /* ??? */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /*??? */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
@@ -1400,7 +1400,7 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) 	PORT_NAME("Wings 1")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Wings 1")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel, if you add a PORT_NAME to this then asign a button to it you can reset the steering center point but only in the test menu........ */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
