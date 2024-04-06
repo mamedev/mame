@@ -5649,8 +5649,8 @@ ROM_START( comg272b )  // Cal Omega v27.2 (Keno (gaming))
 	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
-/*
 
+/*
   CEI Video Poker
   Jacks or Better
   V 51.08
@@ -5659,7 +5659,6 @@ ROM_END
   PROMS 2764
 
 */
-
 ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. checked in offset $8034
@@ -5694,6 +5693,43 @@ ROM_START( comg5107 )  // Cal Omega v51.07 (Poker)
 	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
+/*
+  CEI 906III POKER
+  V60.04  1989  906III board
+    
+  Jumper 8,9
+  EPR 1-5 2764
+  CG's    2764
+  Labeled UCMC
+
+  EPR1   075B   E3185D4F3848ECE90BFBE6B0AAC95E62C8B39FAF
+  EPR2   442A   474B6B2CC592518836C1D3804FE77CAE505FCC97
+  EPR3   E8E9   AE259FCFA34B20F0C9C71CA48275426F2E9CFFBE
+  EPR4   65A3   B8A16A8B8BA245901D4F347250E0DCB7E6D36E0A
+  EPR5   3D40   53D33F3B251D27F6EC40E3E3B059EA7BA8A2EFE0
+
+  CG2A   961D   68472E7271F835656197109620BB3988FC52308A
+  CG2B   B319   B2BCE60E24DD61977F7BF6EE4705CA7D104AB388
+  CG2C   DF06   3AF5F568DE3F2AF1A6BBB00D673BDBFF16C87A40
+  Color  076A   CBFF2CB60137462DC0B7C7719A64574218D96C62
+
+*/
+ROM_START( comg6004 )  // Cal Omega v60.04 (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "60.00_epr1.bin",   0x6000, 0x2000, CRC(6eccf229) SHA1(e3185d4f3848ece90bfbe6b0aac95e62c8b39faf) )  // schedule eprom
+	ROM_LOAD( "60.01_epr2.bin",   0x8000, 0x2000, CRC(9f5af552) SHA1(474b6b2cc592518836c1d3804fe77cae505fcc97) )
+	ROM_LOAD( "60.02_epr3.bin",   0xa000, 0x2000, CRC(98799fa0) SHA1(ae259fcfa34b20f0c9c71ca48275426f2e9cffbe) )
+	ROM_LOAD( "60.03_epr4.bin",   0xc000, 0x2000, CRC(eff6fbb3) SHA1(b8a16a8b8ba245901d4f347250e0dcb7e6d36e0a) )
+	ROM_LOAD( "60.04_epr5.bin",   0xe000, 0x2000, CRC(fc4b7c2f) SHA1(53d33f3b251d27f6ec40e3e3b059ea7ba8a2efe0) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.bin",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.bin",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.bin",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.bin",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
 
 
 /*********************** Diagnostic PROMs ***********************/
@@ -6185,6 +6221,7 @@ GAME( 198?, comg905d,  0,        sys905,   stand905, calomega_state, empty_init,
 //************* 906-III games **************
 GAME( 1988, comg5107,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, comg5108,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, comg6004,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 60.04 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 903/904/905 3rd party games *******
 GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Tuni Electro Service",                  "El Grande - 5 Card Draw (New)",                    MACHINE_SUPPORTS_SAVE )
