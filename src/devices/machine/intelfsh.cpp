@@ -82,54 +82,56 @@ enum
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(INTEL_28F016S5,        intel_28f016s5_device,        "intel_28f016s5",        "Intel 28F016S5 Flash")
-DEFINE_DEVICE_TYPE(SHARP_LH28F016S,       sharp_lh28f016s_device,       "sharp_lh28f016s",       "Sharp LH28F016S Flash")
-DEFINE_DEVICE_TYPE(SHARP_LH28F016S_16BIT, sharp_lh28f016s_16bit_device, "sharp_lh28f016s_16bit", "Sharp LH28F016S Flash (16-bit)")
-DEFINE_DEVICE_TYPE(ATMEL_29C010,          atmel_29c010_device,          "atmel_29c010",          "Atmel 29C010 Flash")
-DEFINE_DEVICE_TYPE(AMD_29F010,            amd_29f010_device,            "amd_29f010",            "AMD 29F010 Flash")
-DEFINE_DEVICE_TYPE(AMD_29F040,            amd_29f040_device,            "amd_29f040",            "AMD 29F040 Flash")
-DEFINE_DEVICE_TYPE(AMD_29F080,            amd_29f080_device,            "amd_29f080",            "AMD 29F080 Flash")
-DEFINE_DEVICE_TYPE(AMD_29F400T,           amd_29f400t_device,           "amd_29f400t",           "AMD 29F400T Flash")
-DEFINE_DEVICE_TYPE(AMD_29F800T,           amd_29f800t_device,           "amd_29f800t",           "AMD 29F800T Flash")
-DEFINE_DEVICE_TYPE(AMD_29F800B_16BIT,     amd_29f800b_16bit_device,     "amd_29f800b_16bit",     "AMD 29F800B Flash (16-bit)")
-DEFINE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device,          "amd_29lv200t",          "AMD 29LV200T Flash")
-DEFINE_DEVICE_TYPE(FUJITSU_29F160TE,      fujitsu_29f160te_device,      "mbm29f160te",           "Fujitsu MBM29F160TE Flash")
-DEFINE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,fujitsu_29f160te_16bit_device,"mbm29f160te_16bit",     "Fujitsu MBM29F160TE Flash (16-bit)")
-DEFINE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device,       "mbm29f016a",            "Fujitsu MBM29F016A Flash")
-DEFINE_DEVICE_TYPE(FUJITSU_29DL164BD,     fujitsu_29dl164bd_device,     "mbm29dl164bd",          "Fujitsu MBM29DL164BD Flash")
-DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device,     "mbm29lv002tc",          "Fujitsu MBM29LV002TC Flash")
-DEFINE_DEVICE_TYPE(FUJITSU_29LV800B,      fujitsu_29lv800b_device,      "mbm29lv800b",           "Fujitsu MBM29LV800B Flash")
-DEFINE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device,        "intel_e28f400b",        "Intel E28F400B Flash")
-DEFINE_DEVICE_TYPE(MACRONIX_29F008TC,     macronix_29f008tc_device,     "macronix_29f008tc",     "Macronix 29F008TC Flash")
-DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device,     "macronix_29l001mc",     "Macronix 29L001MC Flash")
-DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device,   "macronix_29lv160tmc",   "Macronix 29LV160TMC Flash")
-DEFINE_DEVICE_TYPE(TMS_29F040,            tms_29f040_device,            "tms_29f040",            "Texas Instruments 29F040 Flash")
+DEFINE_DEVICE_TYPE(INTEL_28F016S5,           intel_28f016s5_device,           "intel_28f016s5",           "Intel 28F016S5 Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F016S,          sharp_lh28f016s_device,          "sharp_lh28f016s",          "Sharp LH28F016S Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F016S_16BIT,    sharp_lh28f016s_16bit_device,    "sharp_lh28f016s_16bit",    "Sharp LH28F016S Flash (16-bit)")
+DEFINE_DEVICE_TYPE(ATMEL_29C010,             atmel_29c010_device,             "atmel_29c010",             "Atmel 29C010 Flash")
+DEFINE_DEVICE_TYPE(AMD_29F010,               amd_29f010_device,               "amd_29f010",               "AMD 29F010 Flash")
+DEFINE_DEVICE_TYPE(AMD_29F040,               amd_29f040_device,               "amd_29f040",               "AMD 29F040 Flash")
+DEFINE_DEVICE_TYPE(AMD_29F080,               amd_29f080_device,               "amd_29f080",               "AMD 29F080 Flash")
+DEFINE_DEVICE_TYPE(AMD_29F400T,              amd_29f400t_device,              "amd_29f400t",              "AMD 29F400T Flash")
+DEFINE_DEVICE_TYPE(AMD_29F800T,              amd_29f800t_device,              "amd_29f800t",              "AMD 29F800T Flash")
+DEFINE_DEVICE_TYPE(AMD_29F800B_16BIT,        amd_29f800b_16bit_device,        "amd_29f800b_16bit",        "AMD 29F800B Flash (16-bit)")
+DEFINE_DEVICE_TYPE(AMD_29LV200T,             amd_29lv200t_device,             "amd_29lv200t",             "AMD 29LV200T Flash")
+DEFINE_DEVICE_TYPE(FUJITSU_29F160TE,         fujitsu_29f160te_device,         "mbm29f160te",              "Fujitsu MBM29F160TE Flash")
+DEFINE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,   fujitsu_29f160te_16bit_device,   "mbm29f160te_16bit",        "Fujitsu MBM29F160TE Flash (16-bit)")
+DEFINE_DEVICE_TYPE(FUJITSU_29F016A,          fujitsu_29f016a_device,          "mbm29f016a",               "Fujitsu MBM29F016A Flash")
+DEFINE_DEVICE_TYPE(FUJITSU_29DL164BD,        fujitsu_29dl164bd_device,        "mbm29dl164bd",             "Fujitsu MBM29DL164BD Flash")
+DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,        fujitsu_29lv002tc_device,        "mbm29lv002tc",             "Fujitsu MBM29LV002TC Flash")
+DEFINE_DEVICE_TYPE(FUJITSU_29LV800B,         fujitsu_29lv800b_device,         "mbm29lv800b",              "Fujitsu MBM29LV800B Flash")
+DEFINE_DEVICE_TYPE(INTEL_E28F400B,           intel_e28f400b_device,           "intel_e28f400b",           "Intel E28F400B Flash")
+DEFINE_DEVICE_TYPE(MACRONIX_29F008TC,        macronix_29f008tc_device,        "macronix_29f008tc",        "Macronix 29F008TC Flash")
+DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC,       macronix_29f1610mc_device,       "macronix_29f1610mc",       "Macronix 29F1610MC Flash")
+DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC_16BIT, macronix_29f1610mc_16bit_device, "macronix_29f1610mc_16bit", "Macronix 29F1610MC Flash (16-bit)")
+DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,        macronix_29l001mc_device,        "macronix_29l001mc",        "Macronix 29L001MC Flash")
+DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,      macronix_29lv160tmc_device,      "macronix_29lv160tmc",      "Macronix 29LV160TMC Flash")
+DEFINE_DEVICE_TYPE(TMS_29F040,               tms_29f040_device,               "tms_29f040",               "Texas Instruments 29F040 Flash")
 
-DEFINE_DEVICE_TYPE(PANASONIC_MN63F805MNP, panasonic_mn63f805mnp_device, "panasonic_mn63f805mnp", "Panasonic MN63F805MNP Flash")
-DEFINE_DEVICE_TYPE(SANYO_LE26FV10N1TS,    sanyo_le26fv10n1ts_device,    "sanyo_le26fv10n1ts",    "Sanyo LE26FV10N1TS Flash")
-DEFINE_DEVICE_TYPE(SST_28SF040,           sst_28sf040_device,           "sst_28sf040",           "SST 28SF040 Flash")
-DEFINE_DEVICE_TYPE(SST_39SF040,           sst_39sf040_device,           "sst_39sf040",           "SST 39SF040 Flash")
-DEFINE_DEVICE_TYPE(SST_39VF020,           sst_39vf020_device,           "sst_39vf020",           "SST 39VF020 Flash")
-DEFINE_DEVICE_TYPE(SST_49LF020,           sst_49lf020_device,           "sst_49lf020",           "SST 49LF020 Flash")
+DEFINE_DEVICE_TYPE(PANASONIC_MN63F805MNP,    panasonic_mn63f805mnp_device,    "panasonic_mn63f805mnp",    "Panasonic MN63F805MNP Flash")
+DEFINE_DEVICE_TYPE(SANYO_LE26FV10N1TS,       sanyo_le26fv10n1ts_device,       "sanyo_le26fv10n1ts",       "Sanyo LE26FV10N1TS Flash")
+DEFINE_DEVICE_TYPE(SST_28SF040,              sst_28sf040_device,              "sst_28sf040",              "SST 28SF040 Flash")
+DEFINE_DEVICE_TYPE(SST_39SF040,              sst_39sf040_device,              "sst_39sf040",              "SST 39SF040 Flash")
+DEFINE_DEVICE_TYPE(SST_39VF020,              sst_39vf020_device,              "sst_39vf020",              "SST 39VF020 Flash")
+DEFINE_DEVICE_TYPE(SST_49LF020,              sst_49lf020_device,              "sst_49lf020",              "SST 49LF020 Flash")
 
-DEFINE_DEVICE_TYPE(SHARP_LH28F400,        sharp_lh28f400_device,        "sharp_lh28f400",        "Sharp LH28F400 Flash")
-DEFINE_DEVICE_TYPE(INTEL_E28F008SA,       intel_e28f008sa_device,       "intel_e28f008sa",       "Intel E28F008SA Flash")
-DEFINE_DEVICE_TYPE(INTEL_TE28F160,        intel_te28f160_device,        "intel_te28f160",        "Intel TE28F160 Flash")
-DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device,      "sharp_lh28f160s3",      "Sharp LH28F160S3 Flash")
-DEFINE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device,        "intel_te28f320",        "Intel TE28F320 Flash")
-DEFINE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device,      "sharp_lh28f320bf",      "Sharp LH28F320BFHE-PBTL Flash")
-DEFINE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device,       "intel_28f320j3d",       "Intel 28F320J3D Flash")
-DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device,    "spansion_s29gl064s",    "Spansion / Cypress S29GL064S Flash")
-DEFINE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device,        "intel_28f320j5",        "Intel 28F320J5 Flash")
-DEFINE_DEVICE_TYPE(INTEL_28F640J5,        intel_28f640j5_device,        "intel_28f640j5",        "Intel 28F640J5 Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F400,           sharp_lh28f400_device,           "sharp_lh28f400",           "Sharp LH28F400 Flash")
+DEFINE_DEVICE_TYPE(INTEL_E28F008SA,          intel_e28f008sa_device,          "intel_e28f008sa",          "Intel E28F008SA Flash")
+DEFINE_DEVICE_TYPE(INTEL_TE28F160,           intel_te28f160_device,           "intel_te28f160",           "Intel TE28F160 Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,         sharp_lh28f160s3_device,         "sharp_lh28f160s3",         "Sharp LH28F160S3 Flash")
+DEFINE_DEVICE_TYPE(INTEL_TE28F320,           intel_te28f320_device,           "intel_te28f320",           "Intel TE28F320 Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F320BF,         sharp_lh28f320bf_device,         "sharp_lh28f320bf",         "Sharp LH28F320BFHE-PBTL Flash")
+DEFINE_DEVICE_TYPE(INTEL_28F320J3D,          intel_28f320j3d_device,          "intel_28f320j3d",          "Intel 28F320J3D Flash")
+DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,       spansion_s29gl064s_device,       "spansion_s29gl064s",       "Spansion / Cypress S29GL064S Flash")
+DEFINE_DEVICE_TYPE(INTEL_28F320J5,           intel_28f320j5_device,           "intel_28f320j5",           "Intel 28F320J5 Flash")
+DEFINE_DEVICE_TYPE(INTEL_28F640J5,           intel_28f640j5_device,           "intel_28f640j5",           "Intel 28F640J5 Flash")
 
-DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39vf400a",          "SST 39VF400A Flash")
+DEFINE_DEVICE_TYPE(SST_39VF400A,             sst_39vf400a_device,             "sst_39vf400a",             "SST 39VF400A Flash")
 
-DEFINE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device,         "atmel_49f4096",         "Atmel AT49F4096 Flash")
+DEFINE_DEVICE_TYPE(ATMEL_49F4096,            atmel_49f4096_device,            "atmel_49f4096",            "Atmel AT49F4096 Flash")
 
-DEFINE_DEVICE_TYPE(CAT28F020,             cat28f020_device,             "cat28f020",             "CSI CAT28F020 Flash")
+DEFINE_DEVICE_TYPE(CAT28F020,                cat28f020_device,                "cat28f020",                "CSI CAT28F020 Flash")
 
-DEFINE_DEVICE_TYPE(TC58FVT800,            tc58fvt800_device,            "tc58fvt800",            "Toshiba TC58FVT800 Flash")
+DEFINE_DEVICE_TYPE(TC58FVT800,               tc58fvt800_device,               "tc58fvt800",               "Toshiba TC58FVT800 Flash")
 
 
 
@@ -235,6 +237,12 @@ intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, co
 
 macronix_29f008tc_device::macronix_29f008tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, MACRONIX_29F008TC, tag, owner, clock, 0x100000, MFG_MACRONIX, 0x81) { m_sector_is_4k = true; }
+
+macronix_29f1610mc_device::macronix_29f1610mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, MACRONIX_29F1610MC, tag, owner, clock, 0x200000, MFG_MACRONIX, 0xfa) { }
+
+macronix_29f1610mc_16bit_device::macronix_29f1610mc_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, MACRONIX_29F1610MC_16BIT, tag, owner, clock, 0x100000, MFG_MACRONIX, 0xfa) { }
 
 macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, MACRONIX_29L001MC, tag, owner, clock, 0x20000, MFG_MACRONIX, 0x51) { }
