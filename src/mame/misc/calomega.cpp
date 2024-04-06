@@ -261,6 +261,7 @@
         |                          |         |         |          |         |          |         |               |      |      |
    51.07| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
    51.08| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
+   60.04| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
         |                          |         |         |          |         |          |         |               |      |      |
  * 903d | System 903 Diag.PROM     |   903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
  * 905d | System 905 Diag.PROM     |   905   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
