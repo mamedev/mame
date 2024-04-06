@@ -5662,36 +5662,70 @@ ROM_END
 */
 ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. checked in offset $8034
-	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
-	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
-	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
-	ROM_LOAD( "epr5.u32",   0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
+	ROM_LOAD( "epr1_s05f.u28",  0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. checked in offset $8034
+	ROM_LOAD( "epr2_5008.u29",  0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
+	ROM_LOAD( "epr3_5008.u30",  0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
+	ROM_LOAD( "epr4_5008.u31",  0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
+	ROM_LOAD( "epr5_5008.u32",  0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "cg2c.u4",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
-	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
-	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
 	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
-	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
+
+ROM_START( comg5108a )  // Cal Omega v51.08a (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr1_s09f.u28",  0x6000, 0x2000, CRC(6eccf229) SHA1(e3185d4f3848ece90bfbe6b0aac95e62c8b39faf) )  // schedule eprom 09F. checked in offset $8034
+	ROM_LOAD( "epr2_5008.u29",  0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
+	ROM_LOAD( "epr3_5008.u30",  0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
+	ROM_LOAD( "epr4_5008.u31",  0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
+	ROM_LOAD( "epr5_5008.u32",  0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
+
+ROM_START( comg5108b )  // Cal Omega v51.08b (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr1_s21f.u28",  0x6000, 0x2000, CRC(33b1bb5b) SHA1(86f439ef96f7dafe320c394878ff4fda3f94c631) )  // schedule eprom 21F. checked in offset $8034
+	ROM_LOAD( "epr2_5008.u29",  0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
+	ROM_LOAD( "epr3_5008.u30",  0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
+	ROM_LOAD( "epr4_5008.u31",  0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
+	ROM_LOAD( "epr5_5008.u32",  0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.u16",     0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
 ROM_START( comg5107 )  // Cal Omega v51.07 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. same as the 51.08 set
-	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(1cefe40d) SHA1(9169c466903485d6e78c53bd104dc61722437509) )
-	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(0bc9be3e) SHA1(bce88a6a37ded6396954ec8c11e19af66f658e4d) )
-	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(34e7d16f) SHA1(c4901e00a5dbaeb6277dbe9bdcad93827c5aa947) )
-	ROM_LOAD( "epr5.u32",   0xe000, 0x2000, CRC(e5a252b5) SHA1(7a226c771ba16944b4e50c22db0cd5d7fc530e11) )
+	ROM_LOAD( "epr1_s05f.u28",  0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F
+	ROM_LOAD( "epr2_5007.u29",  0x8000, 0x2000, CRC(1cefe40d) SHA1(9169c466903485d6e78c53bd104dc61722437509) )
+	ROM_LOAD( "epr3_5007.u30",  0xa000, 0x2000, CRC(0bc9be3e) SHA1(bce88a6a37ded6396954ec8c11e19af66f658e4d) )
+	ROM_LOAD( "epr4_5007.u31",  0xc000, 0x2000, CRC(34e7d16f) SHA1(c4901e00a5dbaeb6277dbe9bdcad93827c5aa947) )
+	ROM_LOAD( "epr5_5007.u32",  0xe000, 0x2000, CRC(e5a252b5) SHA1(7a226c771ba16944b4e50c22db0cd5d7fc530e11) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "cg2c.u4",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
-	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
-	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
 	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
-	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
 /*
@@ -5717,19 +5751,19 @@ ROM_END
 */
 ROM_START( comg6004 )  // Cal Omega v60.04 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "60.00_epr1.bin",   0x6000, 0x2000, CRC(6eccf229) SHA1(e3185d4f3848ece90bfbe6b0aac95e62c8b39faf) )  // schedule eprom
-	ROM_LOAD( "60.01_epr2.bin",   0x8000, 0x2000, CRC(9f5af552) SHA1(474b6b2cc592518836c1d3804fe77cae505fcc97) )
-	ROM_LOAD( "60.02_epr3.bin",   0xa000, 0x2000, CRC(98799fa0) SHA1(ae259fcfa34b20f0c9c71ca48275426f2e9cffbe) )
-	ROM_LOAD( "60.03_epr4.bin",   0xc000, 0x2000, CRC(eff6fbb3) SHA1(b8a16a8b8ba245901d4f347250e0dcb7e6d36e0a) )
-	ROM_LOAD( "60.04_epr5.bin",   0xe000, 0x2000, CRC(fc4b7c2f) SHA1(53d33f3b251d27f6ec40e3e3b059ea7ba8a2efe0) )
+	ROM_LOAD( "epr1_s09f.u28",  0x6000, 0x2000, CRC(6eccf229) SHA1(e3185d4f3848ece90bfbe6b0aac95e62c8b39faf) )  // schedule eprom 09F
+	ROM_LOAD( "epr2_6004.u29",  0x8000, 0x2000, CRC(9f5af552) SHA1(474b6b2cc592518836c1d3804fe77cae505fcc97) )
+	ROM_LOAD( "epr3_6004.u30",  0xa000, 0x2000, CRC(98799fa0) SHA1(ae259fcfa34b20f0c9c71ca48275426f2e9cffbe) )
+	ROM_LOAD( "epr4_6004.u31",  0xc000, 0x2000, CRC(eff6fbb3) SHA1(b8a16a8b8ba245901d4f347250e0dcb7e6d36e0a) )
+	ROM_LOAD( "epr5_6004.u32",  0xe000, 0x2000, CRC(fc4b7c2f) SHA1(53d33f3b251d27f6ec40e3e3b059ea7ba8a2efe0) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "cg2c.bin",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
-	ROM_LOAD( "cg2b.bin",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
-	ROM_LOAD( "cg2a.bin",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
 	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
-	ROM_LOAD( "bprom.bin",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
 
@@ -6220,9 +6254,11 @@ GAME( 198?, comg903d,  0,        sys903,   stand903, calomega_state, empty_init,
 GAME( 198?, comg905d,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
 
 //************* 906-III games **************
-GAME( 1988, comg5107,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, comg5108,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, comg6004,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 60.04 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5107,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker, Schedule 05F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker, Schedule 05F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108a, comg5108, sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker, Schedule 09F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108b, comg5108, sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker, Schedule 21F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, comg6004,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 60.04 (CEI 906-III Poker, Schedule 09F)",      MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 903/904/905 3rd party games *******
 GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Tuni Electro Service",                  "El Grande - 5 Card Draw (New)",                    MACHINE_SUPPORTS_SAVE )
