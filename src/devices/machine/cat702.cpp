@@ -88,9 +88,15 @@
 #include "cat702.h"
 
 DEFINE_DEVICE_TYPE(CAT702, cat702_device, "cat702", "CAT702")
+DEFINE_DEVICE_TYPE(CAT702_PIU, cat702_piu_device, "cat702_piu", "CAT702_PIU")
 
 cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CAT702, tag, owner, clock),
+	cat702_device(mconfig, CAT702, tag, owner, clock)
+{
+}
+
+cat702_device::cat702_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_region(*this, DEVICE_SELF),
 	m_select(1),
 	m_clock(1),
@@ -230,4 +236,64 @@ void cat702_device::write_clock(int state)
 void cat702_device::write_datain(int state)
 {
 	m_datain = state;
+}
+
+void cat702_piu_device::write_select(int state)
+{
+	if (m_select != state)
+	{
+		if (!state)
+		{
+			m_state = 0xfc;
+			m_bit = 0;
+
+			apply_sbox(initial_sbox);
+		}
+		else
+		{
+			m_dataout_handler(1);
+		}
+
+		m_select = state;
+	}
+}
+
+void cat702_piu_device::write_clock(int state)
+{
+	/*
+	Pump It Up uses a CAT702 but accesses it directly and in a way that
+	seems conflicting with how the ZN uses it through the PS1's SIO.
+
+	This is the sequence performed with clock and data lines write and read data:
+	write unkbit 0
+	write unkbit 1
+	write select 0
+	loop for all bits that need to be transferred:
+	    write clk = 0, data = x
+	    write clk = x, data = 0/1
+	    write clk = 1, data = x
+	    read data
+	write select 1
+
+	Modifying the old code to work with PIU breaks ZN games.
+	*/
+	if (state && !m_clock && !m_select)
+	{
+		// Compute the output and change the state
+		if (!m_datain)
+			apply_bit_sbox(m_bit);
+
+		m_bit++;
+		m_bit&=7;
+
+		if (m_bit==0)
+		{
+			// Apply the initial sbox
+			apply_sbox(initial_sbox);
+		}
+
+		m_dataout_handler(((m_state >> m_bit) & 1) != 0);
+	}
+
+	m_clock = state;
 }
