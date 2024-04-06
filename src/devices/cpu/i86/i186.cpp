@@ -1308,7 +1308,7 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 void i80186_cpu_device::restart_timer(int which)
 {
 	timer_state *t = &m_timer[which];
-	// Only run timer 0,1 when not incremented via timer 2 pre-scaler
+	/* Only run timer 0,1 when not incremented via timer 2 pre-scaler */
 	if (which != 2 && (t->control & 0x800c) == 0x8008)
 		return;
 
