@@ -12,9 +12,11 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/flt_rc.h"
-#include "sound/honmeg.h"
 #include "sound/hohnerpcm.h"
 #include "video/hd61830.h"
+
+#include "sound/honmeg.h"
+//#include "meg.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -71,7 +73,7 @@ protected:
     void lcd_map(address_map& map);
     void meg_memory_map(address_map& map);
     void pcm_memory_map(address_map& map);
-    
+
     required_device<i80186_cpu_device> m_maincpu;
     required_device<honmeg_device> m_meg;
     required_device_array<filter_rc_device, 8> m_meg_filter;
@@ -102,7 +104,11 @@ private:
     bool serial_read_panel = false;
     s8 serial_read_count = 127;
 
-    
+    void lcd_palette(palette_device &palette) const {
+        palette.set_pen_color(0, rgb_t(0x49, 0x9f, 0xd8));
+        palette.set_pen_color(1, rgb_t(0x41, 0x42, 0x3c));
+    }
+
     void acia_irq_w(int state)
     {
         m_maincpu->drq1_w(state);
@@ -534,8 +540,6 @@ INPUT_PORTS_END
 
 void ustudio_state::ustudio_common(machine_config& config)
 {
-    // NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
     // Midi interface
     ACIA6850(config, m_acia);
     clock_device& midiclock(CLOCK(config, "midiclock", 8_MHz_XTAL / 16));
@@ -565,13 +569,12 @@ void ustudio_state::ustudio_common(machine_config& config)
     // it show the intended screen area:
     screen.set_visarea(0, 260 - 1, 0, 64 - 1);
     screen.set_palette("palette");
-    PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+    PALETTE(config, "palette", FUNC(ustudio_state::lcd_palette), 2);
 
     config.set_default_layout(layout_ustudio);
 
     // Sound hardware
     SPEAKER(config, "mono").front_center();
-
 
     HONMEG(config, m_meg, 1_MHz_XTAL);
     m_meg->set_addrmap(0, &ustudio_state::meg_memory_map);
@@ -586,11 +589,10 @@ void ustudio_state::ustudio_common(machine_config& config)
         m_meg->add_route(i, m_meg_filter[i], 1.00);
     }
 
-    // m_meg->add_route(0, "meg_filter", 1.00);
-	HOHNERPCM(config, m_rhythm_pcm, 4_MHz_XTAL);
+    HOHNERPCM(config, m_rhythm_pcm, 4_MHz_XTAL);
     m_rhythm_pcm->set_addrmap(0, &ustudio_state::pcm_memory_map);
-	m_rhythm_pcm->add_route(0, "mono", 1.0);
-	m_rhythm_pcm->add_route(1, "mono", 1.0);
+    m_rhythm_pcm->add_route(0, "mono", 1.0);
+    m_rhythm_pcm->add_route(1, "mono", 1.0);
 
 }
 
