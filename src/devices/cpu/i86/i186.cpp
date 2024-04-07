@@ -1258,9 +1258,9 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 
 	if (which == 2)
 	{
-		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == TIMER_DRQ)
+		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
 			drq_callback(0);
-		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == TIMER_DRQ)
+		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
 			drq_callback(1);
 		if ((m_timer[0].control & 0x800c) == 0x8008)
 			inc_timer(0);
@@ -1308,6 +1308,10 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 void i80186_cpu_device::restart_timer(int which)
 {
 	timer_state *t = &m_timer[which];
+	/* Only run timer 0,1 when not incremented via timer 2 pre-scaler */
+	if (which != 2 && (t->control & 0x800c) == 0x8008)
+		return;
+
 	int count = (t->control & 0x1000) ? t->maxB : t->maxA;
 	if (!(t->control & 4))
 		t->int_timer->adjust((attotime::from_hz(clock() / 8) * (count ? count : 0x10000)), which);
