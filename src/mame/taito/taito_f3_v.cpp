@@ -446,9 +446,9 @@ void taito_f3_state::screen_vblank(int state)
 	}
 }
 
-void taito_f3_state::set_extend(bool state)
+void taito_f3_state::create_tilemaps(bool extend)
 {
-	m_extend = state;
+	m_extend = extend;
 	// TODO: we need to free these if this is called multiple times
 	if (m_extend) {
 		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -498,7 +498,7 @@ void taito_f3_state::video_start()
 
 	m_game_config = pCFG;
 
-	set_extend(m_game_config->extend);
+	create_tilemaps(m_game_config->extend);
 
 	m_spritelist = std::make_unique<tempsprite[]>(0x400);
 	m_sprite_end = &m_spritelist[0];

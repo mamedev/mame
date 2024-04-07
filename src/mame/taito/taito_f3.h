@@ -405,7 +405,7 @@ protected:
 
 	void tile_decode();
 
-	void set_extend(bool state);
+	void create_tilemaps(bool extend);
 
 	inline void f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect);
 	void get_sprite_info();
