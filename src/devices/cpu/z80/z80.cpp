@@ -3212,6 +3212,7 @@ void z80_device::take_interrupt()
 	m_r++;
 
 	// fetch the IRQ vector
+	m_irqfetch_cb(true);
 	device_z80daisy_interface *intf = daisy_get_irq_device();
 	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
 	LOGINT("single INT irq_vector $%02x\n", irq_vector);
@@ -3761,6 +3762,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_irqack_cb(*this),
+	m_irqfetch_cb(*this),
 	m_reti_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
