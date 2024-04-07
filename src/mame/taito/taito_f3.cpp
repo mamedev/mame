@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+// thanks-to: Shiriru
 /***************************************************************************
 
     Taito F3 Package System (aka F3 Cybercore System)
