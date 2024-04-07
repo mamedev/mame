@@ -14,8 +14,6 @@
 #include "tilemap.h"
 #include <bitset>
 
-using fixed8 = int;
-
 class taito_f3_state : public driver_device
 {
 public:
@@ -93,6 +91,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 
 protected:
+	using fixed8 = s32;
+
 	struct F3config;
 
 	/* This it the best way to allow game specific kludges until the system is fully understood */

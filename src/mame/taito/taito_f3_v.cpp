@@ -297,7 +297,6 @@ Playfield tile info:
 
 #include "emu.h"
 #include "taito_f3.h"
-#include "render.h"
 
 #include <algorithm>
 #include <variant>
