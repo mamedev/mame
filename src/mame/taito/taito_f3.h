@@ -240,8 +240,8 @@ protected:
 	struct mix_pix { // per-pixel information for the blending circuit
 		u16 src_pal{0};
 		u16 dst_pal{0};
-		u8  src_blend{0};
-		u8  dst_blend{0};
+		u8  src_blend{0x00};
+		u8  dst_blend{0xff};
 	};
 
 	struct f3_line_inf;

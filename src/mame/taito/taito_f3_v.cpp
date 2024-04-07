@@ -1092,6 +1092,8 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		mix_pix line_buf[H_TOTAL]{};
 		pri_mode line_pri[H_TOTAL]{};
+		// background palette -- what contributions should this default to?
+		std::fill_n(line_buf, H_TOTAL, mix_pix{0, line_data.bg_palette, 0x0, 0xff});
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
