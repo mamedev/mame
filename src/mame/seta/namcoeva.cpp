@@ -17,23 +17,24 @@ with
 - MACH111 PLD (KC026)
 - 2x banks of 8 DIP switches
 - 50 MHz XTAL
-- 26.670 MHz XTAL
+- 26.670 MHz XTAL (possibly for the video chips)
 
 I/O board:
 NAMCO M136 I/O PCB - hi-pric P41 B - 1423961101 (1423971101)
 with
-Motorola MC68HC11K1
-Fuji MB8422 DPRAM
-8 MHz XTAL
+- Motorola MC68HC11K1
+- Fuji MB8422 DPRAM
+- 8 MHz XTAL
 
-The game runs without IO board to test mode but will not go in game (error 07)
+On real hardware, the game runs without IO board to test mode but will not go in game (error 07)
 
 
 TODO:
 - currently starts with 9 credits inserted. After entering and exiting test mode, the game shows 0
   coins and can be coined up normally;
 - implement proper controls. The game has a peculiar input setup (see video link above);
-- complete sound hook up (missing IRQ?). Puts same string as namco/namcod1.cpp in H8 RAM ("Quattro Ver.1.2.H8");
+- sound system is the same as namco/namcond1.cpp (puts "Quattro Ver.1.2.H8" in H8 RAM). Ir interacts
+  with the keycus. Handling is copied over from said driver, but could probably be improved;
 - after coining up there's a GFX bug that maybe points to some unimplemented feature in seta2_v.cpp;
 - once the video emulation in seta/seta2_v.cpp has been devicified, remove derivation from
   seta/seta2.h and possibly move to namco/ folder.
@@ -58,7 +59,7 @@ TODO:
 #define LOG_IOCPU     (1U << 2)
 #define LOG_SUBCPU    (1U << 3)
 
-#define VERBOSE (2)
+//#define VERBOSE (LOG_GENERAL | LOG_MAINCPU | LOG_IOCPU | LOG_SUBCPU)
 
 #include "logmacro.h"
 
@@ -80,6 +81,10 @@ public:
 
 	void hammerch(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<h83002_device> m_subcpu;
 	required_device<mc68hc11k1_device> m_iocpu;
@@ -87,7 +92,69 @@ private:
 	void maincpu_map(address_map &map) ATTR_COLD;
 	void subcpu_map(address_map &map) ATTR_COLD;
 	void iocpu_map(address_map &map) ATTR_COLD;
+
+	uint8_t m_h8_irq5_enabled = 0;
+
+	uint16_t keycus_r(offs_t offset);
+	void keycus_w(offs_t offset, uint16_t data);
+	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 };
+
+
+void namcoeva_state::machine_start()
+{
+	save_item(NAME(m_h8_irq5_enabled));
+}
+
+void namcoeva_state::machine_reset()
+{
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_h8_irq5_enabled = 0;
+}
+
+
+uint16_t namcoeva_state::keycus_r(offs_t offset)
+{
+	switch (offset)
+	{
+		// this address returns a jump vector inside ISR2
+		// - if zero then the ISR returns without jumping
+		case (0x2e >> 1):
+			return 0x0000;
+		case (0x30 >> 1):
+			return 0x0000;
+
+		default:
+			return 0;
+	}
+}
+
+void namcoeva_state::keycus_w(offs_t offset, uint16_t data)
+{
+	switch (offset)
+	{
+		case (0x0a >> 1):
+			// this is a kludge
+			if ((m_h8_irq5_enabled == 0) && (data != 0x0000))
+			{
+				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
+			m_h8_irq5_enabled = (data != 0x0000);
+			break;
+
+		default:
+			break;
+	}
+}
+
+INTERRUPT_GEN_MEMBER(namcoeva_state::mcu_interrupt)
+{
+	if (m_h8_irq5_enabled)
+	{
+		device.execute().pulse_input_line(5, device.execute().minimum_quantum_time());
+	}
+}
 
 
 void namcoeva_state::maincpu_map(address_map &map)
@@ -96,8 +163,8 @@ void namcoeva_state::maincpu_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x210000, 0x21002f).ram(); // ??
 	map(0x300000, 0x3001ff).ram(); // ??
-	//map(0x400000, 0x40ffff).ram().share("sharedram"); // writes here, but if mapped code loops (probably some missing IRQ). Sound test shows these are audio-related comms.
-	map(0x600000, 0x600001).portr("IN0"); // TODO: inputs aren't tested yet
+	map(0x400000, 0x40ffff).ram().share("sharedram");
+	map(0x600000, 0x600001).portr("IN0");
 	map(0x600002, 0x600003).portr("IN1");
 	map(0x600004, 0x600005).portr("IN2");
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
@@ -105,10 +172,10 @@ void namcoeva_state::maincpu_map(address_map &map)
 	map(0x600300, 0x600301).portr("DSW1");
 	map(0x600302, 0x600303).portr("DSW2");
 	map(0x800000, 0x800fff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff); // EXT IO CHECK: NG if unmapped
-	map(0xa00000, 0xa3ffff).ram().share("spriteram");
+	map(0xa00000, 0xa3ffff).ram().share(m_spriteram);
 	map(0xa40000, 0xa4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xa60000, 0xa6003f).ram().w(FUNC(namcoeva_state::vregs_w)).share("vregs");
-	map(0xc3ff00, 0xc3ffff).ram(); // keycus?
+	map(0xa60000, 0xa6003f).ram().w(FUNC(namcoeva_state::vregs_w)).share(m_vregs);
+	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcoeva_state::keycus_r), FUNC(namcoeva_state::keycus_w));
 }
 
 void namcoeva_state::subcpu_map(address_map &map)
@@ -259,13 +326,13 @@ static const gfx_layout tile_layout =
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
 static GFXDECODE_START( gfx_dx_10x )
-	GFXDECODE_ENTRY( "sprites", 0, tile_layout, 0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
+	GFXDECODE_ENTRY( "sprites", 0, tile_layout, 0, 0x8000 / 16 )   // 8bpp, but 4bpp color granularity
 GFXDECODE_END
 
 
 void namcoeva_state::hammerch(machine_config &config)
 {
-	tmp68301_device &maincpu(TMP68301(config, m_maincpu, 50_MHz_XTAL / 4)); // TODO: divider not verified
+	tmp68301_device &maincpu(TMP68301(config, m_maincpu, 50_MHz_XTAL / 4)); // TODO: clock and divider not verified
 	maincpu.set_addrmap(AS_PROGRAM, &namcoeva_state::maincpu_map);
 	maincpu.parallel_r_cb().set([this] () { LOGMAINCPU("%s: P4 read\n", machine().describe_context()); return uint16_t(0); });
 	maincpu.parallel_w_cb().set([this] (uint8_t data) { LOGMAINCPU("%s: P4 write %04x\n", machine().describe_context(), data); });
@@ -275,8 +342,9 @@ void namcoeva_state::hammerch(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	H83002(config, m_subcpu, 26.670_MHz_XTAL / 2); // TODO: divider not verified
+	H83002(config, m_subcpu, 50_MHz_XTAL / 3); // TODO: clock and divider not verified
 	m_subcpu->set_addrmap(AS_PROGRAM, &namcoeva_state::subcpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(namcoeva_state::mcu_interrupt));
 	// seems to only use P4 read at start up
 	m_subcpu->read_port4().set([this] () { LOGSUBCPU("%s: P4 read\n", machine().describe_context()); return u8(0); });
 	m_subcpu->write_port4().set([this] (u8 data) { LOGSUBCPU("%s: P4 write %02x\n", machine().describe_context(), data); });
@@ -344,7 +412,7 @@ void namcoeva_state::hammerch(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	c352_device &c352(C352(config, "c352", 50_MHz_XTAL / 3, 288)); // TODO: divider not verified
+	c352_device &c352(C352(config, "c352", 50_MHz_XTAL / 2, 288)); // TODO: clock and divider not verified
 	c352.add_route(0, "lspeaker", 1.00);
 	c352.add_route(1, "rspeaker", 1.00);
 	c352.add_route(2, "lspeaker", 1.00);
@@ -356,7 +424,7 @@ ROM_START( hammerch )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // TMP68301
 	ROM_LOAD16_WORD( "hc1_main0.u02", 0x00000, 0x80000, CRC(150164bb) SHA1(c99f03718fd1002386bfbf8695b7010ec5dad168) )
 
-	ROM_REGION( 0x80000, "subcpu", 0 )     // H8/3007
+	ROM_REGION( 0x80000, "subcpu", 0 ) // H8/3002
 	ROM_LOAD( "hc1_sub0.u47", 0x00000, 0x80000, CRC(4762451a) SHA1(b46bf1eaeac317264eb80c2e3f50d2821791569f) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x10000, "iocpu", 0 ) // MC68HC11K1
@@ -375,4 +443,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, hammerch, 0, hammerch, hammerch, namcoeva_state, empty_init, ROT0, "Namco", "Hammer Champ (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, hammerch, 0, hammerch, hammerch, namcoeva_state, empty_init, ROT0, "Namco", "Hammer Champ (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
