@@ -14,10 +14,9 @@ Brief overview:
     2 sprite banks (for double buffering of sprites)
     Sprites can be 4, 5 or 6 bpp
     Sprite scaling.
-    Rowscroll on all playfields
-    Line by line zoom on all playfields
-    Column scroll on all playfields
-    Line by line sprite and playfield priority mixing
+    Line by line effects on all playfields
+    Line by line control of priority/mixing on sprites and text/pixel layer
+    2 of the 4 playfields have (line by line) access to alternate tilemaps
 
 Notes:
     All special effects are controlled by an area in 'line ram'.  Typically
@@ -27,8 +26,8 @@ Notes:
     is the scale control for that line in the destination bitmap (screen).
     Therefore each line can have a different zoom value for special effects.
 
-    This also applies to playfield priority, rowscroll, column scroll, sprite
-    priority and VRAM/pivot layers.
+    This also applies to playfield priority, rowscroll, column scroll, clipping,
+    palette interpretation, sprite priority, VRAM/pivot layers, and so on...
 
     However - at the start of line ram there are also sets of 256 values
     with bits controlling each effect subsection, which cause the last allowed
@@ -130,18 +129,17 @@ Line ram memory map:
                p = enable effect for pivot layer
             (spcinvdj title screen, riding fight, command war)
 
+          x4xx = ??? seems to display garbage pixels on the pivot layer
+          x8xx = ??? seems to affect the palette of a single layer(??)
+
        0xf000: palette ram format? [unemulated]
-        3xxx = ? (arabianm, ridingf)
-        4xxx = ? (gseeker intro) -- unsetting this in pbobble4 roughly equivalent to 12 bit palette hack
-        7xxx = ? (bubsymph, commandw)
-        (old comment:)
-          1xxx = interpret palette ram for this playfield line as 15 bit and bilinear filter framebuffer(??)
-          3xxx = interpret palette ram for this playfield line as 15 bit
-          7xxx = interpret palette ram for this playfield line as 24 bit palette
-          8xxx = interpret palette ram for this playfield line as 21 bit palette
+         Bits: ?wBu
+           ? = ? possibly "interpret palette ram for this as 21-bit palette"
+           w = 1 = interpret palette entries as 12-bit RGB
+           B = 0 = enable horizontal forward blur (1 = don't blur)
+           u = ??? (normally 1)
 
     0x6600: Background - background palette entry (under all tilemaps) (takes part in alpha blending)
-        [unemulated]
 
     0x7000: ? [unemulated]
         "Pivot/vram layer enable" ?

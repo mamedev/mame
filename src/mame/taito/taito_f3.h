@@ -430,7 +430,7 @@ private:
 	void bubsympb_oki_w(u8 data);
 	u32 f3_control_r(offs_t offset);
 	void f3_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void f3_unk_w(offs_t offset, u16 data);
+	void f3_timer_control_w(offs_t offset, u16 data);
 	void sound_reset_0_w(u32 data);
 	void sound_reset_1_w(u32 data);
 	void sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask = ~0);

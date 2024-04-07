@@ -15,10 +15,10 @@
 
     Taito custom chips on motherboard:
 
-        TC0630FDP - Playfield generator?  (Nearest tile roms)
-        TC0640FIO - I/O & watchdog?
-        TC0650FDA - Priority mixer?  (Near paletteram & video output)
-        TC0660FCM - Sprites? (Nearest sprite roms)
+        TC0630FDP "Display Processor" - Graphics (sprites, playfields, prio, lineram...)
+        TC0640FIO "I/O"               - I/O ports (buttons, eeprom, and watchdog)
+        TC0650FDA "Digital to Analog" - Blending and RGB output
+        TC0660FCM "Control Module?"   - Misc. control/comm.?
 
 ***************************************************************************/
 
@@ -119,7 +119,7 @@ void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
-void taito_f3_state::f3_unk_w(offs_t offset, u16 data)
+void taito_f3_state::f3_timer_control_w(offs_t offset, u16 data)
 {
 	/*
 	TODO: Several games configure timer-based pseudo-hblank int5 here at POST
@@ -172,7 +172,7 @@ void taito_f3_state::f3_map(address_map &map)
 	map(0x400000, 0x41ffff).mirror(0x20000).ram();
 	map(0x440000, 0x447fff).ram().w(FUNC(taito_f3_state::palette_24bit_w)).share("paletteram");
 	map(0x4a0000, 0x4a001f).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
-	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_timer_control_w));
 	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::spriteram_r), FUNC(taito_f3_state::spriteram_w));
 	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::pf_ram_r), FUNC(taito_f3_state::pf_ram_w));
 	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::textram_r), FUNC(taito_f3_state::textram_w));
@@ -207,7 +207,7 @@ void taito_f3_state::bubsympb_map(address_map &map)
 	map(0x4a0000, 0x4a001b).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
 	map(0x4a001d, 0x4a001d).w(FUNC(taito_f3_state::bubsympb_oki_w));
 	map(0x4a001f, 0x4a001f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_unk_w));
+	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_timer_control_w));
 	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::spriteram_r), FUNC(taito_f3_state::spriteram_w));
 	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::pf_ram_r), FUNC(taito_f3_state::pf_ram_w));
 	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::textram_r), FUNC(taito_f3_state::textram_w));
