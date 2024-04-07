@@ -190,16 +190,19 @@ protected:
 		s16 r;
 
 		clip_plane_inf() { l = 0; r = 0; }
-		clip_plane_inf(s16 left, s16 right) {
+		clip_plane_inf(s16 left, s16 right)
+		{
 			l = left;
 			r = right;
 		}
-		auto set_upper(s8 left, s8 right) {
+		auto set_upper(s8 left, s8 right)
+		{
 			l = (l & 0xff) | left<<8;
 			r = (r & 0xff) | right<<8;
 			return this;
 		}
-		auto set_lower(u8 left, u8 right) {
+		auto set_lower(u8 left, u8 right)
+		{
 			l = (l & 0x100) | left;
 			r = (r & 0x100) | right;
 			return this;
@@ -207,15 +210,16 @@ protected:
 	};
 
 	struct draw_source {
-		draw_source() {};
-		draw_source(bitmap_ind16 *bitmap) {
+		draw_source() { };
+		draw_source(bitmap_ind16 *bitmap)
+		{
 			src = bitmap;
 			flags = nullptr;
 		}
-		draw_source(tilemap_t *tilemap) {
-			if (!tilemap) {
+		draw_source(tilemap_t *tilemap)
+		{
+			if (!tilemap)
 				return;
-			}
 			src = &tilemap->pixmap();
 			flags = &tilemap->flagsmap();
 		};
@@ -330,7 +334,7 @@ protected:
 		u16 maybe_sync_reg{0};
 		bool no_opaque_dest{false};
 		// 6200
-		u8 blend[4]{0}; // less 0 - 8 more
+		u8 blend[4]{}; // less 0 - 8 more
 		// 6400
 		u8 x_sample{16 - 0}; // mosaic effect
 		u8 fx_6400{0}; // unemulated other effects
@@ -353,7 +357,7 @@ protected:
 	bool m_sprite_trails = false;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
-	u8 m_sprite_pri_row_usage[256]{0};
+	u8 m_sprite_pri_row_usage[256]{};
 	bitmap_ind8 m_pri_alp_bitmap;
 	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
 	u16 m_width_mask = 0;

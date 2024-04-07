@@ -57,40 +57,36 @@ u32 taito_f3_state::f3_control_r(offs_t offset)
 
 void taito_f3_state::f3_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	switch (offset)
-	{
-		case 0x00: /* Watchdog */
-			m_watchdog->watchdog_reset();
-			return;
+	switch (offset) {
+	case 0x00: /* Watchdog */
+		m_watchdog->watchdog_reset();
+		return;
 
-		case 0x01: /* Coin counters & lockouts */
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
-				m_coin_word[0]=(data>>16)&0xffff;
-			}
-			return;
+	case 0x01: /* Coin counters & lockouts */
+		if (ACCESSING_BITS_24_31) {
+			machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
+			machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
+			m_coin_word[0]=(data>>16)&0xffff;
+		}
+		return;
 
-		case 0x04: /* Eeprom */
-			if (ACCESSING_BITS_0_7)
-			{
-				m_eepromout->write(data, 0xff);
-			}
-			return;
+	case 0x04: /* Eeprom */
+		if (ACCESSING_BITS_0_7) {
+			m_eepromout->write(data, 0xff);
+		}
+		return;
 
-		case 0x05:  /* Player 3 & 4 coin counters */
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(2,~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(3,~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(2, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(3, data & 0x08000000);
-				m_coin_word[1]=(data>>16)&0xffff;
-			}
-			return;
+	case 0x05:  /* Player 3 & 4 coin counters */
+		if (ACCESSING_BITS_24_31) {
+			machine().bookkeeping().coin_lockout_w(2,~data & 0x01000000);
+			machine().bookkeeping().coin_lockout_w(3,~data & 0x02000000);
+			machine().bookkeeping().coin_counter_w(2, data & 0x04000000);
+			machine().bookkeeping().coin_counter_w(3, data & 0x08000000);
+			m_coin_word[1]=(data>>16)&0xffff;
+		}
+		return;
 	}
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",m_maincpu->pc(),offset,data);
 }
@@ -107,8 +103,7 @@ void taito_f3_state::sound_reset_1_w(u32 data)
 
 void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (m_game == KIRAMEKI)
-	{
+	if (m_game == KIRAMEKI) {
 		int idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
 			idx += 1;
@@ -117,11 +112,9 @@ void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 			idx -= 8;
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
-		pointer rather than byte pointer */
+		   pointer rather than byte pointer */
 		m_taito_en->set_bank(1, idx);
-	}
-	else
-	{
+	} else {
 		logerror("Sound bankswitch in unsupported game\n");
 	}
 }
@@ -197,12 +190,9 @@ void taito_f3_state::bubsympb_oki_w(u8 data) // TODO: this is wrong. PCB referen
 {
 	//printf("write %08x %08x\n",data,mem_mask);
 	const u8 bank = data & 0xf;
-	if (data < 5)
-	{
+	if (data < 5) {
 		m_okibank->set_entry(bank);
-	}
-	else
-	{
+	} else {
 		logerror("unknown oki bank write %02x at %08x\n", bank, m_maincpu->pc());
 	}
 	//printf("oki bank w %08x\n",data);
@@ -359,8 +349,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout charlayout =
-{
+static const gfx_layout charlayout = {
 	8,8,
 	256,
 	4,
@@ -370,8 +359,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static const gfx_layout pivotlayout =
-{
+static const gfx_layout pivotlayout = {
 	8,8,
 	2048,
 	4,
@@ -381,8 +369,7 @@ static const gfx_layout pivotlayout =
 	32*8
 };
 
-static const gfx_layout layout_6bpp_sprite_hi =
-{
+static const gfx_layout layout_6bpp_sprite_hi = {
 	16,16,
 	RGN_FRAC(1,1),
 	6,
@@ -392,8 +379,7 @@ static const gfx_layout layout_6bpp_sprite_hi =
 	16*16*2
 };
 
-static const gfx_layout layout_6bpp_tile_hi =
-{
+static const gfx_layout layout_6bpp_tile_hi = {
 	16,16,
 	RGN_FRAC(1,1),
 	6,
@@ -465,7 +451,7 @@ void taito_f3_state::f3(machine_config &config)
 		262, 24, 256
 	);
 	// refresh rate = 26686000/4/432/262 = 58.94..
-	
+
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));
 
@@ -504,8 +490,7 @@ void taito_f3_state::f3_224c(machine_config &config)
 	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
 }
 
-static const gfx_layout bubsympb_sprite_layout =
-{
+static const gfx_layout bubsympb_sprite_layout = {
 	16,16,
 	RGN_FRAC(1,6),
 	6,
@@ -515,8 +500,7 @@ static const gfx_layout bubsympb_sprite_layout =
 	16*16
 };
 
-static const gfx_layout bubsympb_layout_5bpp_tile_hi =
-{
+static const gfx_layout bubsympb_layout_5bpp_tile_hi = {
 	16,16,
 	RGN_FRAC(1,1),
 	5,
@@ -4336,8 +4320,7 @@ void taito_f3_state::tile_decode()
 
 	u8 *dest;
 	// all but bubsymphb (bootleg board with different sprite gfx layout), 2mindril (no sprite gfx roms)
-	if (m_gfxdecode->gfx(5) != nullptr)
-	{
+	if (m_gfxdecode->gfx(5) != nullptr) {
 		gfx_element *spr_gfx = m_gfxdecode->gfx(2);
 		gfx_element *spr_gfx_hi = m_gfxdecode->gfx(5);
 
@@ -4346,14 +4329,12 @@ void taito_f3_state::tile_decode()
 
 		// loop over elements
 		dest = m_decoded_gfx5.get();
-		for (int c = 0; c < spr_gfx->elements(); c++)
-		{
+		for (int c = 0; c < spr_gfx->elements(); c++) {
 			const u8 *c1base = spr_gfx->get_data(c);
 			const u8 *c3base = spr_gfx_hi->get_data(c);
 
 			// loop over height
-			for (int y = 0; y < spr_gfx->height(); y++)
-			{
+			for (int y = 0; y < spr_gfx->height(); y++) {
 				const u8 *c1 = c1base;
 				const u8 *c3 = c3base;
 
@@ -4370,8 +4351,7 @@ void taito_f3_state::tile_decode()
 		m_gfxdecode->set_gfx(5, nullptr);
 	}
 
-	if (m_gfxdecode->gfx(4) != nullptr)
-	{
+	if (m_gfxdecode->gfx(4) != nullptr) {
 		gfx_element *pf_gfx = m_gfxdecode->gfx(3);
 		gfx_element *pf_gfx_hi = m_gfxdecode->gfx(4);
 
@@ -4380,14 +4360,12 @@ void taito_f3_state::tile_decode()
 
 		// loop over elements
 		dest = m_decoded_gfx4.get();
-		for (int c = 0; c < pf_gfx->elements(); c++)
-		{
+		for (int c = 0; c < pf_gfx->elements(); c++) {
 			const u8 *c0base = pf_gfx->get_data(c);
 			const u8 *c2base = pf_gfx_hi->get_data(c);
 
 			// loop over height
-			for (int y = 0; y < pf_gfx->height(); y++)
-			{
+			for (int y = 0; y < pf_gfx->height(); y++) {
 				const u8 *c0 = c0base;
 				const u8 *c2 = c2base;
 

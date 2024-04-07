@@ -305,15 +305,13 @@ Playfield tile info:
 constexpr int TAITOF3_VIDEO_DEBUG = 0;
 
 // Game specific data - some of this can be removed when the software values are figured out
-struct taito_f3_state::F3config
-{
+struct taito_f3_state::F3config {
 	int name;
 	int extend;     // playfield control 0x1F bit 7
 	int sprite_lag;
 };
 
-const taito_f3_state::F3config taito_f3_state::f3_config_table[] =
-{
+const taito_f3_state::F3config taito_f3_state::f3_config_table[] = {
 	/* Name    Extend  Lag */
 	{ RINGRAGE,  0,     2 },
 	{ ARABIANM,  0,     2 },
@@ -434,7 +432,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 	const int tile = tile_index;
 	const u8 palette = BIT(vram_tile, 9, 6);
 	u8 flags = 0;
-	if (BIT(vram_tile, 8)) flags |= TILE_FLIPX;
+	if (BIT(vram_tile, 8))  flags |= TILE_FLIPX;
 	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
 	tileinfo.set(1, tile, palette, flags);
@@ -453,9 +451,6 @@ void taito_f3_state::set_extend(bool state)
 {
 	m_extend = state;
 	// TODO: we need to free these if this is called multiple times
-	// for (int i=0; i<8; i++) {
-	// 	delete m_tilemap[i];
-	// }
 	if (m_extend) {
 		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -472,18 +467,18 @@ void taito_f3_state::set_extend(bool state)
 		m_tilemap[6] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<6>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 		m_tilemap[7] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<7>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	}
-	for (int i=0; i<8; i++) {
+	for (int i = 0; i < 8; i++) {
 		if (m_tilemap[i])
 			m_tilemap[i]->set_transparent_pen(0);
 	}
 
 	if (m_extend) {
 		m_width_mask = 0x3ff; // 10 bits
-		for (int i=0; i<4; i++)
+		for (int i = 0; i < 4; i++)
 			m_pf_data[i] = &m_pf_ram[(0x2000 * i) / 2];
 	} else {
 		m_width_mask = 0x1ff; // 9 bits
-		for (int i=0; i<8; i++)
+		for (int i = 0; i < 8; i++)
 			m_pf_data[i] = &m_pf_ram[(0x1000 * i) / 2];
 	}
 }
@@ -502,7 +497,7 @@ void taito_f3_state::video_start()
 		pCFG++;
 	} while (pCFG->name);
 
-	m_game_config=pCFG;
+	m_game_config = pCFG;
 
 	set_extend(m_game_config->extend);
 
@@ -600,7 +595,6 @@ void taito_f3_state::textram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_pixel_layer->mark_tile_dirty(col_off);
 }
 
-
 u16 taito_f3_state::charram_r(offs_t offset)
 {
 	return m_charram[offset];
@@ -670,7 +664,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		return 0;
 	};
 	// 4000 **********************************
-	for (const int i : {2, 3}) {
+	for (const int i : { 2, 3 }) {
 		if (const offs_t where = latched_addr(0, i)) {
 			const u16 colscroll = m_line_ram[where];
 			line.pf[i].colscroll   = colscroll & 0x1ff;
@@ -682,7 +676,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 	// 5000 **********************************
 	// renderer needs to adjust clip by -48
-	for (const int i : {0, 1, 2, 3}) {
+	for (const int i : { 0, 1, 2, 3 }) {
 		if (const offs_t where = latched_addr(1, i)) {
 			const u16 clip_lows = m_line_ram[where];
 			line.clip[i].set_lower(BIT(clip_lows, 0, 8), BIT(clip_lows, 8, 8));
@@ -696,7 +690,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 		line.pivot.blend_select_v = BIT(line_6000, 9);
 		line.pivot.pivot_control = BIT(line_6000, 8, 8);
-		if (TAITOF3_VIDEO_DEBUG==1) {
+		if (TAITOF3_VIDEO_DEBUG == 1) {
 			// arabianm: 0a, scfinals: a2, busymph: a2, recalh: 0c, bubblem: 03/f0
 			if (line.pivot.pivot_control & 0b01011101) // check if unknown pivot control bits set
 				logerror("unknown 6000 pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
@@ -729,7 +723,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		line.pivot.x_sample_enable = BIT(x_mosaic, 9);
 
 		line.fx_6400 = (x_mosaic & 0xfc00) >> 8; // palette interpretation [unimplemented]
-		if (TAITOF3_VIDEO_DEBUG==1) {
+		if (TAITOF3_VIDEO_DEBUG == 1) {
 			// gseeker(intro):40, ringrage/arabianm:30/33, ridingf:30/31, spcinvdj:30, gunlock:78
 			if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
 				logerror("unknown 6400 fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
@@ -737,7 +731,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	}
 	if (const offs_t where = latched_addr(2, 3)) { // bg palette? [unimplemented]
 		line.bg_palette = m_line_ram[where];
-		if (TAITOF3_VIDEO_DEBUG==1) {
+		if (TAITOF3_VIDEO_DEBUG == 1) {
 			// gunlock: 0000
 			if (line.bg_palette) // check if unknown effect bits set
 				logerror("unknown 6600 bg palette: %04x at %04x\n", line.bg_palette, 0x6600 + y*2);
@@ -748,7 +742,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (const offs_t where = latched_addr(3, 0)) { // ? [unimplemented]
 		const u16 line_7000 = m_line_ram[where];
 		line.pivot.pivot_enable = line_7000;
-		if (TAITOF3_VIDEO_DEBUG==1) {
+		if (TAITOF3_VIDEO_DEBUG == 1) {
 			// ridingf/commandw/trstar: c000, gunlock: 0000, recalh: 4000, quizhuhu: 00ff
 			// puchicar/ktiger2/gekiridn: 0001, dariusg: 0001 on zone H boss pool effect lines
 			if (line_7000) // check if confusing pivot enable bits are set
@@ -761,7 +755,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 	if (const offs_t where = latched_addr(3, 2)) { // sprite clip info, blend select
 		const u16 sprite_mix = m_line_ram[where];
 
-		if (TAITOF3_VIDEO_DEBUG==1) {
+		if (TAITOF3_VIDEO_DEBUG == 1) {
 			// many: _8__, exceptions: pbobble3/puchicar/pbobble4/gunlock
 			const u16 unknown = BIT(sprite_mix, 10, 2);
 			if (unknown)
@@ -770,7 +764,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
 			line.sp[group].mix_value = (line.sp[group].mix_value & 0xc00f)
-				| BIT(sprite_mix, 0, 10) << 4;
+					| BIT(sprite_mix, 0, 10) << 4;
 			line.sp[group].blend_select_v = BIT(sprite_mix, 12 + group, 1);
 		}
 	}
@@ -836,12 +830,12 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 
 	if (m_flipscreen) {
 		sx_raw += 320 << 6; // 10.6
-		sx_raw += (512+192) << 6; // 10.6
+		sx_raw += (512 + 192) << 6; // 10.6
 
 		sy_raw = -sy_raw;
 	}
 
-	sx_raw += ((40 - 4*pf_num) << 6); // 10.6
+	sx_raw += (40 - 4*pf_num) << 6; // 10.6
 
 	fixed8 sx = sx_raw << (8-6); // 10.6 to 24.8
 	fixed8 sy = sy_raw << (8-7); // 9.7 to 24.8
@@ -913,38 +907,48 @@ taito_f3_state::calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES],
 	return ranges;
 }
 
-static int mosaic(int x, u8 sample) {
+static int mosaic(int x, u8 sample)
+{
 	int x_count = (x - 46 + 114);
 	// hw quirk: the counter resets 2 px from the right edge...
 	x_count = x_count >= 432 ? x_count - 432 : x_count;
 	return x - (x_count % sample);
 }
 
-inline bool taito_f3_state::mixable::layer_enable() const {
+inline bool taito_f3_state::mixable::layer_enable() const
+{
 	return (mix_value & 0x2000) && blend_mask() != 0b11;
 }
-inline int taito_f3_state::mixable::x_index(int x) const {
+inline int taito_f3_state::mixable::x_index(int x) const
+{
 	return x;
 }
-inline int taito_f3_state::mixable::y_index(int y) const {
+inline int taito_f3_state::mixable::y_index(int y) const
+{
 	return y;
 }
-inline bool taito_f3_state::sprite_inf::layer_enable() const {
+inline bool taito_f3_state::sprite_inf::layer_enable() const
+{
 	return (mix_value & 0x2000) && blend_mask() != 0b00;
 }
-inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const {
+inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const
+{
 	return pal + pal_add;
 }
-inline int taito_f3_state::playfield_inf::x_index(int x) const {
+inline int taito_f3_state::playfield_inf::x_index(int x) const
+{
 	return (((reg_fx_x + (x - 46) * x_scale)>>8) + 46) & width_mask;
 }
-inline int taito_f3_state::playfield_inf::y_index(int y) const {
+inline int taito_f3_state::playfield_inf::y_index(int y) const
+{
 	return ((reg_fx_y >> 8) + colscroll) & 0x1ff;
 }
-inline int taito_f3_state::pivot_inf::x_index(int x) const {
+inline int taito_f3_state::pivot_inf::x_index(int x) const
+{
 	return (x + reg_sx) & 0x1FF;
 }
-inline int taito_f3_state::pivot_inf::y_index(int y) const {
+inline int taito_f3_state::pivot_inf::y_index(int y) const
+{
 	return (reg_sy + y) & (use_pix() ? 0xff : 0x1ff);
 }
 
@@ -1045,7 +1049,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
-	for (int i=0; i<NUM_SPRITEGROUPS; i++) {
+	for (int i=0; i < NUM_SPRITEGROUPS; i++) {
 		new (&line_data.sp[i].bitmap) draw_source(&m_sprite_framebuffers[i]);
 		line_data.sp[i].sprite_pri_usage = &m_sprite_pri_row_usage;
 		line_data.sp[i].debug_index = i;
@@ -1076,16 +1080,15 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			int tmap_number = pf_num;
 			if (!m_extend && pf.alt_tilemap)
 				tmap_number += 2;
-			new(&pf.bitmap) draw_source(m_tilemap[tmap_number]);
+			new (&pf.bitmap) draw_source(m_tilemap[tmap_number]);
 			// what is with this calculation...
 			pf.reg_fx_x = pf.reg_sx + pf.rowscroll;
-			pf.reg_fx_x += 10*((pf.x_scale)-(1<<8));
-
+			pf.reg_fx_x += 10 * ((pf.x_scale) - (1<<8));
 		}
 		if (line_data.pivot.use_pix()) {
-			new(&line_data.pivot.bitmap) draw_source(m_pixel_layer);
+			new (&line_data.pivot.bitmap) draw_source(m_pixel_layer);
 		} else {
-			new(&line_data.pivot.bitmap) draw_source(m_vram_layer);
+			new (&line_data.pivot.bitmap) draw_source(m_vram_layer);
 		}
 
 		mix_pix line_buf[432]{};
@@ -1093,7 +1096,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
-				   NUM_SPRITEGROUPS + NUM_PLAYFIELDS + 1> layers = {
+				NUM_SPRITEGROUPS + NUM_PLAYFIELDS + 1> layers = {
 			&line_data.pivot, // this order seems ok for dariusg/gseeker/bubblem conflicts?
 			&line_data.sp[0], &line_data.pf[0],
 			&line_data.sp[3], &line_data.pf[3],
@@ -1101,14 +1104,14 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			&line_data.sp[1], &line_data.pf[1]
 		};
 		std::stable_sort(layers.begin(), layers.end(),
-						 [prio](auto a, auto b) {
-							 return std::visit(prio, a) > std::visit(prio, b); // was <
-						 });
+				[prio](auto a, auto b) -> bool {
+					return std::visit(prio, a) > std::visit(prio, b);
+				});
 
 		// draw layers to framebuffer (currently top to bottom)
 		if (screen_y >= cliprect.min_y && screen_y <= cliprect.max_y) {
 			for (auto gfx : layers) {
-				std::visit([&](auto&& arg) {
+				std::visit([this, &line_data, &line_buf, &line_pri](auto &&arg) {
 					if (arg->layer_enable() && arg->used(line_data.y)) {
 						const auto clip_ranges = calc_clip(line_data.clip, arg);
 						for (const auto &clip : clip_ranges) {
@@ -1117,7 +1120,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 					}
 				}, gfx);
 			}
-			if (TAITOF3_VIDEO_DEBUG==1) {
+			if (TAITOF3_VIDEO_DEBUG == 1) {
 				if (y == 100) {
 					logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
 							 line_buf[180].src_pal, line_buf[180].dst_pal,
@@ -1134,7 +1137,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		if (screen_y != 0) {
 			// update registers
 			for (auto &pf : line_data.pf) {
-					pf.reg_fx_y += pf.y_scale;
+				pf.reg_fx_y += pf.y_scale;
 			}
 		}
 	}
@@ -1265,7 +1268,7 @@ void taito_f3_state::get_sprite_info()
 			// Sprite bank select
 			m_sprite_bank = BIT(cntrl, 0);
 		} else {
-			if (spr[5]>>1) {
+			if (spr[5] >> 1) {
 				logerror("unknown word 5 bits: %4x\n", spr[5]);
 			}
 		}
@@ -1298,12 +1301,13 @@ void taito_f3_state::get_sprite_info()
 			color = spr[4] & 0xFF;
 		const u8 scroll_mode = BIT(spr[2], 12, 4);
 		const u16 zooms = spr[1];
-		x.update(scroll_mode, spr[2] & 0xFFF, multi, BIT(spritecont, 4+2, 2), zooms & 0xFF);
-		y.update(scroll_mode, spr[3] & 0xFFF, multi, BIT(spritecont, 4+0, 2), zooms >> 8);
+		x.update(scroll_mode, spr[2] & 0xFFF, multi, BIT(spritecont, 4 + 2, 2), zooms & 0xFF);
+		y.update(scroll_mode, spr[3] & 0xFFF, multi, BIT(spritecont, 4 + 0, 2), zooms >> 8);
 		multi = BIT(spritecont, 3);
 
 		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
-		if (!tile) continue; // todo: is this the correct way to tell if a sprite exists?
+		if (!tile)
+			continue; // todo: is this the correct way to tell if a sprite exists?
 
 		const fixed8 tx = m_flipscreen ? (512<<8) - x.block_scale*16 - x.pos : x.pos;
 		const fixed8 ty = m_flipscreen ? (256<<8) - y.block_scale*16 - y.pos : y.pos;
