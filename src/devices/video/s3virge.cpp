@@ -220,13 +220,13 @@ void s3virge_vga_device::streams_control_map(address_map &map)
 			LOGSTREAMS("MM8180 (Primary Stream Control) %08x & %08x\n", data, mem_mask);
 		})
 	);
-//	map(0x0004, 0x0007) Color/Chroma Key Control (MM8184)
-//	map(0x0010, 0x0013) Secondary Stream Control (MM8190)
-//	map(0x0014, 0x0017) Chroma Key Upper Bound (MM8194)
-//	map(0x0018, 0x001b) Secondary Stream Stretch/Filter Constants (MM8198)
-//	map(0x0020, 0x0023) Blend Control (MM81A0)
-//	map(0x0040, 0x0043) Primary Stream Frame Buffer Address 0 (MM81C0)
-//	map(0x0044, 0x0047) Primary Stream Frame Buffer Address 1 (MM81C4)
+//  map(0x0004, 0x0007) Color/Chroma Key Control (MM8184)
+//  map(0x0010, 0x0013) Secondary Stream Control (MM8190)
+//  map(0x0014, 0x0017) Chroma Key Upper Bound (MM8194)
+//  map(0x0018, 0x001b) Secondary Stream Stretch/Filter Constants (MM8198)
+//  map(0x0020, 0x0023) Blend Control (MM81A0)
+//  map(0x0040, 0x0043) Primary Stream Frame Buffer Address 0 (MM81C0)
+//  map(0x0044, 0x0047) Primary Stream Frame Buffer Address 1 (MM81C4)
 	map(0x0048, 0x004b).lrw32(
 		NAME([this] (offs_t offset) {
 			return (m_streams.primary_stride);
@@ -243,8 +243,11 @@ uint16_t s3virge_vga_device::offset()
 {
 	if (s3.ext_misc_ctrl_2 & 0xc)
 		return m_streams.primary_stride;
-	// TODO: SDD expects offset x8 with streams disabled
-	return s3trio64_vga_device::offset();
+
+	// NOTE: same as Vision968
+	if (s3.memory_config & 0x08)
+		return vga.crtc.offset << 3;
+	return vga_device::offset();
 }
 
 void s3virge_vga_device::crtc_map(address_map &map)
@@ -423,12 +426,24 @@ void s3virge_vga_device::s3_define_video_mode()
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
 		svga.rgb24_en = 0;
+		svga.rgb32_en = 0;
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
 			case 0x01: svga.rgb8_en = 1; break;
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
-			case 0x0d: svga.rgb24_en = 1; divisor = 1; break;
+			case 0x0d:
+			{
+				// if streams disabled run RAMDAC in unpacked mode
+				// NOTE: it matches original Vision968 behaviour
+				// - SDD and Tiny Core Linux relies on this
+				if (s3.ext_misc_ctrl_2 & 0xc)
+					svga.rgb24_en = 1;
+				else
+					svga.rgb32_en = 1;
+				divisor = 1;
+				break;
+			}
 			default: popmessage("video/s3virge.cpp: video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4));
 		}
 	}
@@ -438,6 +453,7 @@ void s3virge_vga_device::s3_define_video_mode()
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
 		svga.rgb24_en = 0;
+		svga.rgb32_en = 0;
 	}
 	if(s3.cr43 & 0x80)  // Horizontal clock doubling (technically, doubles horizontal CRT parameters)
 		divisor *= 2;
@@ -1307,7 +1323,7 @@ uint32_t s3virge_vga_device::s3d_sub_status_r()
 	// check for idle
 	res |= (m_s3d_state == S3D_STATE_IDLE) << 13;
 	//if (m_s3d_state == S3D_STATE_BITBLT && s3virge.s3d.xfer_mode == true && m_xfer_fifo.empty())
-	//	res |= 1 << 13;
+	//  res |= 1 << 13;
 
 	//res |= (s3virge.s3d.cmd_fifo_slots_free << 8);
 	// NOTE: can actually be 24 FIFO depth with specific Scenic Mode
