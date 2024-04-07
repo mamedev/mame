@@ -840,10 +840,10 @@ void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 	fixed8 sy = sy_raw << (8-7); // 9.7 to 24.8
 	sx ^= 0b1111'1100;
 	if (m_flipscreen) {
-		sx = sx - (46 << 8);
+		sx = sx - (H_START << 8);
 		sy = -sy;
 	} else {
-		sx = sx - (46 << 8);
+		sx = sx - (H_START << 8);
 	}
 
 	reg_sx = sx;
@@ -856,8 +856,8 @@ taito_f3_state::calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES],
 						  const Mix line)
 {
 	using clip_range = clip_plane_inf;
-	const s16 INF_L = 46;
-	const s16 INF_R = 320 + 46;
+	constexpr s16 INF_L = H_START;
+	constexpr s16 INF_R = H_START + H_VIS;
 
 	std::bitset<4> normal_planes = line->clip_enable() & ~line->clip_inv();
 	std::bitset<4> invert_planes = line->clip_enable() & line->clip_inv();
@@ -936,7 +936,7 @@ inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const
 }
 inline int taito_f3_state::playfield_inf::x_index(int x) const
 {
-	return (((reg_fx_x + (x - 46) * x_scale)>>8) + 46) & width_mask;
+	return (((reg_fx_x + (x - H_START) * x_scale)>>8) + H_START) & width_mask;
 }
 inline int taito_f3_state::playfield_inf::y_index(int y) const
 {
@@ -1017,8 +1017,8 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 		}
 	}
 
-	constexpr int DEBUG_X = 50 + 46;
-	constexpr int DEBUG_Y = 180 + 24;
+	constexpr int DEBUG_X = 50 + H_START;
+	constexpr int DEBUG_Y = 180 + V_START;
 	if (TAITOF3_VIDEO_DEBUG && line.y == DEBUG_Y) {
 		logerror("[%X] %s%d: %d,%d (%d)\n   {pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
 				 gfx->prio, gfx->debug_name(), gfx->debug_index,
@@ -1031,10 +1031,10 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 	return false; // TODO: determine when we can stop drawing?
 }
 
-void taito_f3_state::render_line(pen_t *dst, const mix_pix (&z)[432])
+void taito_f3_state::render_line(pen_t *dst, const mix_pix (&z)[H_TOTAL])
 {
 	const pen_t *clut = &m_palette->pen(0);
-	for (int x = 46; x < 46 + 320; x++) {
+	for (int x = H_START; x < H_START + H_VIS; x++) {
 		const mix_pix mix = z[x];
 		rgb_t s_rgb = clut[mix.src_pal];
 		rgb_t d_rgb = clut[mix.dst_pal];
@@ -1090,8 +1090,8 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			new (&line_data.pivot.bitmap) draw_source(m_vram_layer);
 		}
 
-		mix_pix line_buf[432]{};
-		pri_mode line_pri[432]{};
+		mix_pix line_buf[H_TOTAL]{};
+		pri_mode line_pri[H_TOTAL]{};
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,

@@ -122,7 +122,7 @@ void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 void taito_f3_state::f3_unk_w(offs_t offset, u16 data)
 {
 	/*
-	Several games writes a value here at POST, dunno what kind of config this is ...
+	TODO: Several games configure timer-based pseudo-hblank int5 here at POST
 	ringrage:  0x0000
 	arabianm:  0x0000
 	ridingf: (no init)
@@ -430,12 +430,9 @@ void taito_f3_state::machine_reset()
 void taito_f3_state::f3(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	M68EC020(config, m_maincpu, F3_MAIN_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::f3_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::interrupt2));
-	// there might be a way for games to enable hblank interrupts?
-	// most just have no-op or scanline counter handlers, but pbobble4 (e.g.)
-	// DOES generate them, while spcinvdj will crash if you send it hblank.
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -446,9 +443,9 @@ void taito_f3_state::f3(machine_config &config)
 	// from taito z system and crystal on board
 	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/
 	m_screen->set_raw(
-		XTAL(26'686'000)/4,
-		432, 46, 320+46,
-		262, 24, 256
+		26.686_MHz_XTAL / 4,
+		432, 46, 320 + 46,
+		262, 24, 232 + 24
 	);
 	// refresh rate = 26686000/4/432/262 = 58.94..
 
@@ -523,7 +520,7 @@ GFXDECODE_END
 void taito_f3_state::bubsympb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, XTAL(16'000'000));
+	M68EC020(config, m_maincpu, F3_MAIN_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_f3_state::bubsympb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taito_f3_state::interrupt2));
 

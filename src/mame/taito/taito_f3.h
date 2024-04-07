@@ -93,8 +93,22 @@ public:
 protected:
 	using fixed8 = s32;
 
-	struct F3config;
+	// should be 30.47618_MHz_XTAL / 2
+	static inline constexpr XTAL F3_MAIN_CLK = 16_MHz_XTAL;
 
+	static inline constexpr int H_TOTAL = 432;
+	static inline constexpr int H_VIS   = 320;
+	static inline constexpr int H_START = 46;
+	static inline constexpr int V_TOTAL = 262;
+	static inline constexpr int V_VIS   = 232;
+	static inline constexpr int V_START = 24;
+
+	static inline constexpr int NUM_PLAYFIELDS = 4;
+	static inline constexpr int NUM_TILEMAPS = 5;
+	static inline constexpr int NUM_SPRITEGROUPS = 4; // high 2 bits of color
+	static inline constexpr int NUM_CLIPPLANES = 4;
+
+	struct F3config;
 	/* This it the best way to allow game specific kludges until the system is fully understood */
 	enum {
 		/* Early F3 class games, these are not cartridge games and system features may be different */
@@ -181,10 +195,6 @@ protected:
 		u8 pri;
 	};
 
-	static const int NUM_PLAYFIELDS = 4;
-	static const int NUM_TILEMAPS = 5;
-	static const int NUM_SPRITEGROUPS = 4; // high 2 bits of color
-	static const int NUM_CLIPPLANES = 4;
 	struct clip_plane_inf {
 		s16 l;
 		s16 r;
