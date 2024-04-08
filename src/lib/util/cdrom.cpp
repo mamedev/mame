@@ -867,7 +867,7 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 
 	/* clear structures */
 	memset(&toc, 0, sizeof(toc));
-	
+
 	/* start with no tracks */
 	for (toc.numtrks = 0; toc.numtrks < MAX_TRACKS; toc.numtrks++)
 	{
