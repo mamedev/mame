@@ -2810,7 +2810,7 @@ static void do_extract_cd(parameters_map &params)
 				}
 			}
 		}
-		
+
 		// iterate over tracks and copy all data
 		uint64_t totaloutputoffs = 0;
 		uint64_t outputoffs = 0;
