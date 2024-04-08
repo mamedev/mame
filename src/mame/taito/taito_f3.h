@@ -205,17 +205,17 @@ protected:
 			l = left;
 			r = right;
 		}
-		auto set_upper(s8 left, s8 right)
+		clip_plane_inf& set_upper(s8 left, s8 right)
 		{
 			l = (l & 0xff) | left<<8;
 			r = (r & 0xff) | right<<8;
-			return this;
+			return *this;
 		}
-		auto set_lower(u8 left, u8 right)
+		clip_plane_inf& set_lower(u8 left, u8 right)
 		{
 			l = (l & 0x100) | left;
 			r = (r & 0x100) | right;
-			return this;
+			return *this;
 		}
 	};
 

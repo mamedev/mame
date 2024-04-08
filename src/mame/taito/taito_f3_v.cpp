@@ -122,7 +122,7 @@ Line ram memory map:
             a = contribution (alpha) value A for DEST when alpha mode is not reversed
             b = contribution (alpha) value B for DEST when alpha mode is not reversed
 
-    0x6400: forward repeat
+    0x6400: forward repeat and palette
         0x03ff: x repeat / mosaic - each tile collapses to 16 single colour lines
           Bits: ??ps mmmm 4321
             4321 = enable effect for respective playfield
@@ -413,8 +413,8 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 	// convert the index:
 	// pixel: [0xxxxxxyyyyy]
 	//  text: [?yyyyyxxxxxx]
+	const int x = BIT(tile_index, 5, 6);
 	int y = BIT(tile_index, 0, 5);
-	int x = BIT(tile_index, 5, 6);
 	// HACK: [legacy implementation of scroll offset check for pixel palette mirroring]
 	// the pixel layer is 256px high, but uses the palette from the text layer which is twice as long
 	// so normally it only uses the first half of textram, BUT if you scroll down, you get
@@ -520,15 +520,15 @@ void taito_f3_state::video_start()
 	m_gfxdecode->gfx(3)->set_granularity(16);
 
 	m_flipscreen = false;
-	m_sprite_bank = 0;
+	m_sprite_bank = false;
 	m_sprite_trails = false;
 	memset(&m_spriteram[0], 0, 0x10000);
 
 	save_item(NAME(m_control_0));
 	save_item(NAME(m_control_1));
 
-	m_gfxdecode->gfx(0)->set_source((u8 *)m_charram.target());
-	m_gfxdecode->gfx(1)->set_source((u8 *)m_pivot_ram.target());
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_charram.target()));
+	m_gfxdecode->gfx(1)->set_source(reinterpret_cast<u8 *>(m_pivot_ram.target()));
 
 	m_sprite_lag = m_game_config->sprite_lag;
 }
