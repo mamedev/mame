@@ -21,35 +21,42 @@ pngcmp
 
 This tool is used in regression testing to compare PNG screenshot results with the runtest.cmd script found in the source archive. This script works only on Microsoft Windows.
 
+
 nltool
 ------
 
 Discrete component conversion tool.
+
 
 nlwav
 -----
 
 Discrete component conversion and testing tool.
 
+
 jedutil
 -------
 
 PAL/PLA/PLD/GAL dump handling tool. It can convert between the industry-standard JED format and MAME's proprietary packed binary format and it can show logic equations for the types of devices it knows the internal logic of.
+
 
 ldresample
 ----------
 
 This tool recompresses video data for laserdisc and VHS dumps.
 
+
 ldverify
 --------
 
 This tool is used for comparing laserdisc or VHS CHD images with the source AVI.
 
+
 romcmp
 ------
 
 This tool is used to perform basic data comparisons and integrity checks on binary dumps. With the -h switch, it can also be used to calculate hash functions.
+
 
 unidasm
 -------
