@@ -2392,13 +2392,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 						outtoc.tracks[trknum].pregap = frames - outinfo.track[trknum].idx0offs;
 						outtoc.tracks[trknum].pgtype = outtoc.tracks[trknum].trktype;
 						outtoc.tracks[trknum].pgdatasize = outtoc.tracks[trknum].datasize;
-					}
-					else if ((outtoc.tracks[trknum].pregap > 0) && (outinfo.track[trknum].idx0offs == -1))
-					{
-						outinfo.track[trknum].idx0offs = frames;
-						outtoc.tracks[trknum].pgtype = outtoc.tracks[trknum].trktype;
-						outtoc.tracks[trknum].pgdatasize = outtoc.tracks[trknum].datasize;
-					}
+					}					
 					else    // pregap sectors not in file, but we're always using idx0ofs for track length calc now
 					{
 						outinfo.track[trknum].idx0offs = frames;
