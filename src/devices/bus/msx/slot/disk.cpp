@@ -640,8 +640,7 @@ u8 msx_slot_disk4_tc8566_device::media_change_r()
 {
 	return (m_floppy[0] && m_floppy[0]->get_device()->dskchg_r() ? 0x10 : 0x00) |
 		(m_floppy[1] && m_floppy[1]->get_device()->dskchg_r() ? 0x20 : 0x00) |
-		0x03
-	;
+		0x03;
 }
 
 u8 msx_slot_disk4_tc8566_device::unk_7ffc_r()
