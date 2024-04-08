@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan Mcphail, ywy, 12Me21
+// copyright-holders:Bryan McPhail, ywy, 12Me21
 /***************************************************************************
 
    Taito F3 Video emulation
@@ -1172,7 +1172,7 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 		u8 *pri = &m_pri_alp_bitmap.pix(dy);
 		u16 *dest = &dest_bmp.pix(dy);
 		auto &usage = m_sprite_pri_row_usage[dy];
-		const auto *src = &code_base[(y ^ flipy) * 16];
+		const u8 *src = &code_base[(y ^ flipy) * 16];
 
 		fixed8 dx8 = (sprite.x) + 128; // 128 is ½ in fixed.8
 		for (u8 x = 0; x < 16; x++) {
@@ -1183,7 +1183,7 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 				continue;
 			if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
 				continue;
-			const auto c = src[(x ^ flipx)] & m_sprite_pen_mask;
+			const u8 c = src[(x ^ flipx)] & m_sprite_pen_mask;
 			if (c && !pri[dx]) {
 				dest[dx] = gfx->colorbase() + (sprite.color<<4 | c);
 				pri[dx] = 1;
