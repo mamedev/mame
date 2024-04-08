@@ -44,6 +44,7 @@ public:
 		, m_kbd(*this, "kbd")
 		, m_nxr(*this, { "common", "basic", "apl" })
 		, m_cgr(*this, "cgr")
+		, m_pgm(*this, "pgm")
 		, m_ros(*this, "ros")
 		, m_conf(*this, "CONF")
 		, m_disp(*this, "DISP")
@@ -59,7 +60,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void cpu_ros_map(address_map &map);
+	virtual void cpu_pgm_map(address_map &map);
 	virtual void cpu_rws_map(address_map &map);
 	virtual void cpu_ioc_map(address_map &map);
 	virtual void cpu_iod_map(address_map &map);
@@ -87,6 +88,7 @@ protected:
 	required_region_ptr_array<u16, 3> m_nxr;
 	required_region_ptr<u8> m_cgr; // character generator ROS
 
+	memory_view m_pgm;
 	memory_view m_ros;
 
 	required_ioport m_conf;
@@ -108,7 +110,6 @@ public:
 	ibm5110_state(machine_config const &mconfig, device_type type, char const *tag)
 		: ibm5100_state(mconfig, type, tag)
 		, m_alarm(*this, "alarm")
-		, m_exr(*this, "exr")
 		, m_jmp(*this, { "L2_1", "L2_2", "K4" })
 	{
 	}
@@ -119,7 +120,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void cpu_ros_map(address_map &map) override;
+	virtual void cpu_pgm_map(address_map &map) override;
 	virtual void cpu_ioc_map(address_map &map) override;
 
 	virtual void da0_ctl_w(u8 data) override;
@@ -134,8 +135,6 @@ protected:
 
 private:
 	required_device<beep_device> m_alarm;
-
-	memory_view m_exr;
 
 	required_ioport_array<3> m_jmp;
 
@@ -203,23 +202,35 @@ void ibm5110_state::machine_reset()
 {
 	ibm5100_state::machine_reset();
 
-	m_exr.disable();
 	m_exr_ff = 0;
 }
 
-void ibm5100_state::cpu_ros_map(address_map &map)
+void ibm5100_state::cpu_pgm_map(address_map &map)
 {
-	map(0x0000, 0xffff).view(m_ros);
+	map(0x0000, 0xffff).view(m_pgm);
+
+	// normal mode program memory
+	m_pgm[0](0x0000, 0xffff).view(m_ros);
 	m_ros[0](0x0000, 0xffff).rom().region("ros", 0);
+	// m_ros[1] RWS (configurable size)
+
+	// interrupt mode program memory
+	m_pgm[1](0x0000, 0xffff).rom().region("ros", 0);
 }
 
-void ibm5110_state::cpu_ros_map(address_map &map)
+void ibm5110_state::cpu_pgm_map(address_map &map)
 {
-	map(0x0000, 0xffff).view(m_ros);
-	m_ros[0](0x0000, 0x7fff).rom().region("l2_1", 0);
-	m_ros[0](0x0000, 0x7fff).view(m_exr);
-	m_exr[0](0x0000, 0x7fff).rom().region("l2_2a", 0);
-	m_exr[1](0x0000, 0x7fff).rom().region("l2_2b", 0);
+	map(0x0000, 0xffff).view(m_pgm);
+
+	// normal mode program memory
+	m_pgm[0](0x0000, 0xffff).view(m_ros);
+	m_ros[0](0x0000, 0x7fff).rom().region("ros1", 0);
+	// m_ros[1] RWS (configurable size)
+	m_ros[2](0x0000, 0x7fff).rom().region("ros2a", 0);
+	m_ros[3](0x0000, 0x7fff).rom().region("ros2b", 0);
+
+	// interrupt mode program memory
+	m_pgm[1](0x0000, 0x7fff).rom().region("ros1", 0);
 }
 
 void ibm5100_state::cpu_rws_map(address_map &map)
@@ -267,12 +278,12 @@ void ibm5100_state::cpu_iod_map(address_map &map)
 void ibm5100_state::common(machine_config &config)
 {
 	PALM(config, m_cpu, 15'091'200);
-	m_cpu->set_addrmap(palm_device::AS_ROS, &ibm5100_state::cpu_ros_map);
+	m_cpu->set_addrmap(palm_device::AS_PGM, &ibm5100_state::cpu_pgm_map);
 	m_cpu->set_addrmap(palm_device::AS_RWS, &ibm5100_state::cpu_rws_map);
 	m_cpu->set_addrmap(palm_device::AS_IOC, &ibm5100_state::cpu_ioc_map);
 	m_cpu->set_addrmap(palm_device::AS_IOD, &ibm5100_state::cpu_iod_map);
 	m_cpu->getb_bus().set([this](offs_t offset, u8 data) { m_getb_bus = data; });
-	m_cpu->select_ros().set([this](int state) { m_ros.select(state); });
+	m_cpu->program_level().set([this](int state) { m_pgm.select(state); });
 
 	/*
 	 * Display output is 16 rows of 64 characters. Each character cell is 10x12
@@ -288,6 +299,8 @@ void ibm5100_state::ibm5100(machine_config &config)
 {
 	ibm5100_state::common(config);
 
+	m_cpu->select_ros().set([this](int state) { m_ros.select(state); });
+
 	IBM5100_KEYBOARD(config, m_kbd);
 	m_kbd->strobe().set(
 		[this](int state)
@@ -301,13 +314,13 @@ void ibm5110_state::ibm5110(machine_config &config)
 {
 	ibm5100_state::common(config);
 
-	m_cpu->program_level().set(
+	m_cpu->select_ros().set(
 		[this](int state)
 		{
-			if (state || !(m_exr_ff & EXR_ROS2))
-				m_exr.disable();
+			if (!state && (m_exr_ff & EXR_ROS2))
+				m_ros.select(BIT(m_lang->read(), 6) + 2);
 			else
-				m_exr.select(BIT(m_lang->read(), 6));
+				m_ros.select(state);
 		});
 
 	IBM5110_KEYBOARD(config, m_kbd);
@@ -354,7 +367,7 @@ u32 ibm5100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, re
 
 	bool const reverse = BIT(disp, 0);
 	bool const n64 = !BIT(disp, 2);
-	bool const r32 = BIT(disp, 3);
+	unsigned const r32 = BIT(disp, 3) ? 32 : 0;
 
 	// start with a blank screen
 	bitmap.fill(c[reverse]);
@@ -370,16 +383,18 @@ u32 ibm5100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, re
 		int const y = screen.visible_area().min_y + char_y * 12 * 2;
 
 		// compute offset into rws for each row
-		offs_t offset = 0x200 + char_y * 64 + (r32 ? 32 : 0);
+		offs_t offset = 0x200 + char_y * 64 + r32;
 
 		for (unsigned char_x = 0; char_x < 64; char_x++)
 		{
+			// skip alternate columns in l32/r32 mode
+			if (!n64 && (char_x & 1))
+				continue;
+
 			int const x = screen.visible_area().min_x + char_x * 10;
 
-			// read next character if normal mode or even column
-			u8 char_data = 0;
-			if (n64 || !(char_x & 1))
-				char_data = rws[offset++];
+			// read next character
+			u8 const char_data = rws[offset++];
 
 			// draw 8x12 character cell
 			for (unsigned cell_y = 0; cell_y < 12; cell_y++)
@@ -461,13 +476,17 @@ void ibm5110_state::exr_ctl_w(u8 data)
 
 	if (BIT(data, 7))
 	{
-		m_exr.select(BIT(m_lang->read(), 6));
 		m_exr_ff |= EXR_ROS2;
+
+		if (m_ros.entry() != 1)
+			m_ros.select(BIT(m_lang->read(), 6) + 2);
 	}
 	else if (BIT(data, 6))
 	{
-		m_exr.disable();
 		m_exr_ff &= ~EXR_ROS2;
+
+		if (m_ros.entry() != 1)
+			m_ros.select(0);
 	}
 }
 
@@ -701,16 +720,16 @@ ROM_END
 
 ROM_START(ibm5110)
 	// Executable ROS
-	ROM_REGION16_BE(0x8000, "l2_1", 0)
+	ROM_REGION16_BE(0x8000, "ros1", 0)
 	ROM_LOAD("l2_1.ros", 0x0000, 0x8000, CRC(0355894f) SHA1(c76a91cbbec226feb942ccde93ecb1637c88a01b))
 
 	// APL Executable ROS
-	ROM_REGION16_BE(0x8000, "l2_2a", 0)
+	ROM_REGION16_BE(0x8000, "ros2a", 0)
 	ROM_LOAD("l2_2a.ros", 0x0000, 0x5000, CRC(46918be9) SHA1(bf45a44f77104c55f2ccfa462af06944e6bffe1a))
 	ROM_FILL(0x5000, 0x3000, 0xff)
 
 	// BASIC Executable ROS
-	ROM_REGION16_BE(0x8000, "l2_2b", 0)
+	ROM_REGION16_BE(0x8000, "ros2b", 0)
 	ROM_LOAD("l2_2b.ros", 0x0000, 0x4000, CRC(a69dd0c1) SHA1(ecdc1363e25b72b695c517af145c50a069b6e8dc))
 	ROM_FILL(0x4000, 0x3000, 0xff)
 
@@ -732,10 +751,10 @@ ROM_START(ibm5110)
 	/*
 	 * This data was hand-made based on the character map in the documentation.
 	 * It was assumed that the first 12 bytes of each character store the 8x12
-	 * cell, followed by 8x4 empty bytes.
+	 * cell, followed by 4 empty bytes.
 	 */
 	ROM_REGION(0x1000, "cgr", 0)
-	ROM_LOAD("g2.ros", 0x000, 0x1000, CRC(1f55161c) SHA1(eb22f3177060bd7cb4ba8facaa293147ffeceabc) BAD_DUMP)
+	ROM_LOAD("g2.ros", 0x000, 0x1000, CRC(86e6a99c) SHA1(7168ba05fbac3f66bd98b8ef9fc135d0d08eb44b) BAD_DUMP)
 ROM_END
 
 static INPUT_PORTS_START(ibm5100)
