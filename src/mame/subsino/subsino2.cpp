@@ -29,6 +29,10 @@ Year  Game                CPU         Sound            Custom                   
 ----------------------------------------------------------------------------------------------------------------
 *SS9600   **SS9689
 
+Graphics for the H8-based games are stored in either four socketed DIP28 8-bit EPROMs, two socketed DIP40 16-bit EPROMs or one
+surface-mounted SSOP70 32-bit ROM. Later H8-based PCBs have a custom QFP device labeled "SG 003" instead of the off-the-shelf
+RAMDAC.
+
 To do:
 
 - Add sound to SS9804/SS9904 games.
@@ -43,10 +47,9 @@ Protection seems to work the same way on every game in this driver, using a bitb
 command is issued, and only the first 8 bits returned are examined to determine whether they match the expected device code (0x14).
 If this test passes, the EEPROM contents are recalled and the first 64 bits are read out. These 64 bits are then unscrambled using
 a permutation table common to all games. The second and final protection check compares byte 6 in the unscrambled data buffer
-against a game-specific ID code. This byte is composed of EEPROM bits 22 (MSB), 27, 52, 50, 42, 9, 38 and 35 (LSB).
-
-It is unknown where this protection EEPROM exists on any Subsino PCB (if it isn't an external dongle), though the IC package is
-known to be quite small. (The iButton version, DS1971, is another possibility.)
+against a game-specific ID code. This byte is composed of EEPROM bits 22 (MSB), 27, 52, 50, 42, 9, 38 and 35 (LSB). This EEPROM
+comes in a small TO-92 package which is very difficult to spot on PCB photos, though it appears to be typically positioned near
+one of the edge connectors.
 
 Timings in the Z180-based and H8-based games consistently fail to meet 1-Wire specifications. In the case of the H8-based games,
 this likely has to do with CPU clocks and emulated cycle timings being both too fast. There may also be wait states programmed
@@ -122,6 +125,7 @@ public:
 	{ }
 
 	void bishjan(machine_config &config);
+	void xiaoao(machine_config &config);
 	void saklove(machine_config &config);
 	void mtrain(machine_config &config);
 	void tbonusal(machine_config &config);
@@ -133,6 +137,7 @@ public:
 	void ptrain(machine_config &config);
 
 	void init_bishjan();
+	void init_xiaoao();
 	void init_new2001();
 	void init_queenbee();
 	void init_queenbeeb();
@@ -187,6 +192,7 @@ private:
 	uint8_t bishjan_sound_r();
 	void bishjan_sound_w(uint8_t data);
 	uint8_t bishjan_serial_r();
+	uint8_t xiaoao_serial_r();
 	uint8_t bishjan_unknown_r();
 	void bishjan_input_w(uint8_t data);
 	uint8_t bishjan_input_r();
@@ -949,6 +955,14 @@ uint8_t subsino2_state::bishjan_serial_r()
 		(m_eeprom->data_r() ? 0x80 : 0) |             // bit 7 - serial communication
 		(machine().rand() & 0x18) |
 		((m_bishjan_sound == 0x12) ? 0x40:0x00);     // bit 6 - sound communication
+}
+
+uint8_t subsino2_state::xiaoao_serial_r()
+{
+	return
+		(m_eeprom->data_r() ? 0x80 : 0) |             // bit 7 - serial communication
+		(machine().rand() & 0x18) |
+		((m_bishjan_sound == 0x11) ? 0x40:0x00);     // bit 6 - sound communication
 }
 
 uint8_t subsino2_state::bishjan_unknown_r()
@@ -2798,6 +2812,14 @@ void subsino2_state::bishjan(machine_config &config)
 	// SS9904
 }
 
+void subsino2_state::xiaoao(machine_config &config)
+{
+	bishjan(config);
+
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.in_port_callback<6>().set(FUNC(subsino2_state::xiaoao_serial_r));
+}
+
 void subsino2_state::new2001(machine_config &config)
 {
 	bishjan(config);
@@ -3102,7 +3124,7 @@ ROM_START( bishjan )
 	ROM_LOAD( "2-v201.u9", 0x000000, 0x100000, CRC(ea42764d) SHA1(13fe1cd30e474f4b092949c440068e9ddca79976) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(e248ebfa) SHA1(b75e5be0a0a6b32e6cc372fc3da01009f3cca7e2) BAD_DUMP ) // handcrafted to pass protection check
+	ROM_LOAD( "bishoujan-ds2430a.q3", 0x00, 0x28, CRC(7366d9d5) SHA1(1b276015f70bdc8cc7ba8380be19a821e728b617) )
 ROM_END
 
 void subsino2_state::init_bishjan()
@@ -3112,6 +3134,34 @@ void subsino2_state::init_bishjan()
 	// rts -> rte
 	rom[0x33386/2] = 0x5670; // IRQ 0
 	rom[0x0CC5C/2] = 0x5670; // IRQ 8
+}
+
+// Uses newer PCB type, same as Humlan's Lyckohjul
+ROM_START( xiaoao )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "1-v100.u21", 0x00000, 0x80000, CRC(728b4597) SHA1(97f92b9a6c455d2d906d55482166fd9704253615) )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD( "graphics.bin", 0x000000, 0x400000, NO_DUMP ) // SSOP70 ROM not dumped yet; using ROMs from bishjan for now
+	ROM_LOAD32_BYTE( "3-v201.u25", 0x000000, 0x100000, CRC(e013e647) SHA1(a5b0f82f3454393c1ea5e635b0d37735a25e2ea5) BAD_DUMP )
+	ROM_LOAD32_BYTE( "4-v201.u26", 0x000002, 0x100000, CRC(e0d40ef1) SHA1(95f80889103a7b93080b46387274cb1ffe0c8768) BAD_DUMP )
+	ROM_LOAD32_BYTE( "5-v201.u27", 0x000001, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) BAD_DUMP )
+	ROM_LOAD32_BYTE( "6-v201.u28", 0x000003, 0x100000, CRC(430bd9d7) SHA1(dadf5a7eb90cf2dc20f97dbf20a4b6c8e7734fb1) BAD_DUMP )
+
+	ROM_REGION( 0x100000, "samples", 0 )
+	ROM_LOAD( "mj-v1.u10", 0x000000, 0x100000, CRC(4d797394) SHA1(fa40a410f903cd81f15c3a86a60ad405b5db8168) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "xiaoaojianghu-ds2430a.q3", 0x00, 0x28, CRC(518e4ba3) SHA1(704fb6f8ff9966d1b90af849b2b7c6df06d3e4a0) )
+ROM_END
+
+void subsino2_state::init_xiaoao()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// rts -> rte
+	rom[0x35238/2] = 0x5670; // IRQ 0
+	rom[0x0D550/2] = 0x5670; // IRQ 8
 }
 
 /***************************************************************************
@@ -4002,6 +4052,7 @@ GAME( 1997, treacity,    0,       saklove, treacity, subsino2_state, empty_init,
 GAME( 1997, treacity202, treacity,saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
+GAME( 200?, xiaoao,   bishjan,  xiaoao,   bishjan,  subsino2_state, init_xiaoao,   ROT0, "Subsino",                          "Xiao Ao Jiang Hu",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, init_new2001,  ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
 

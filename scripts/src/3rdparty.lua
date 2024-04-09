@@ -1558,6 +1558,9 @@ end
 			defines {
 				"WL_EGL_PLATFORM=1",
 			}
+			buildoptions {
+				backtick(pkgconfigcmd() .. " --cflags wayland-egl-backend"),
+			}
 		end
 	end
 

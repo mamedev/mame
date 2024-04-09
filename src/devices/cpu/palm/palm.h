@@ -15,14 +15,14 @@ public:
 	static unsigned constexpr IRPT_REQ3 = INPUT_LINE_IRQ2;
 
 	// four address spaces
-	static unsigned constexpr AS_ROS = AS_PROGRAM;
+	static unsigned constexpr AS_PGM = AS_PROGRAM;
 	static unsigned constexpr AS_RWS = AS_DATA;
 	static unsigned constexpr AS_IOC = AS_IO;
 	static unsigned constexpr AS_IOD = 4;
 
 	auto getb_bus() { return m_getb_bus.bind(); }
-	auto select_ros() { return m_select_ros.bind(); }
 	auto program_level() { return m_program_level.bind(); }
+	auto select_ros() { return m_select_ros.bind(); }
 
 	palm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
@@ -51,19 +51,19 @@ protected:
 
 private:
 	// address spaces
-	address_space_config const m_ros_config;
+	address_space_config const m_pgm_config;
 	address_space_config const m_rws_config;
 	address_space_config const m_ioc_config;
 	address_space_config const m_iod_config;
 
-	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_ros;
+	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_pgm;
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_rws;
 	memory_access<4, 0, 0, ENDIANNESS_BIG>::specific m_ioc;
 	memory_access<4, 0, 0, ENDIANNESS_BIG>::specific m_iod;
 
 	devcb_write8 m_getb_bus;
-	devcb_write_line m_select_ros;
 	devcb_write_line m_program_level;
+	devcb_write_line m_select_ros;
 
 	// mame state
 	int m_icount;

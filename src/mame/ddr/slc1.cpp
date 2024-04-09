@@ -25,7 +25,7 @@ This computer is both a Z80 trainer, and a chess computer. The keyboard
 
 Hardware:
     4 Kbytes ROM in the address range 0000-0FFF
-    1 Kbyte RAM in the address range 5000-53ff (user area starts at 5100)
+    1 Kbyte RAM in the address range 5000-53FF (user area starts at 5100)
     6-digit 7-segment display
     Busy LED
     Keyboard with 12 keys
