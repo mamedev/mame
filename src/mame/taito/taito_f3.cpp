@@ -12,7 +12,7 @@
     Thanks to Acho A. Tang for Kirameki Star Road sound banking info!
 
     Other Issues:
-    - Find how this HW drives the CRTC, and convert video timings to use screen raw params;
+    - Find how this HW drives the CRTC and verify timing of interrupts
 
     Taito custom chips on motherboard:
 

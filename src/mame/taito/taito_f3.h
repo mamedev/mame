@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, ywy, 12Me21
 #ifndef MAME_TAITO_TAITO_F3_H
 #define MAME_TAITO_TAITO_F3_H
 
@@ -347,9 +347,9 @@ protected:
 		u8 blend[4]{}; // less 0 - 8 more
 		// 6400
 		u8 x_sample{16 - 0}; // mosaic effect
-		u8 fx_6400{0}; // unemulated other effects
+		u8 fx_6400{0}; // unemulated other effects (palette interpretation + unused bits)
 		// 6600
-		u16 bg_palette{0}; // unemulated, needs investigation, bad name?
+		u16 bg_palette{0}; // always palette 0 in existing games
 		// 7200
 		pivot_inf pivot;
 		sprite_inf sp[NUM_SPRITEGROUPS];

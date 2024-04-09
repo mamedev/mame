@@ -133,8 +133,8 @@ Line ram memory map:
                p = enable effect for pivot layer
             (spcinvdj title screen, riding fight, command war)
 
-          x4xx = ??? seems to display garbage pixels on the pivot layer
-          x8xx = ??? seems to affect the palette of a single layer(??)
+          x4xx = ??? seems to display garbage pixels on the pivot layer (unused?)
+          x8xx = ??? seems to affect the palette of a single layer(??) (gunlock)
 
        0xf000: palette ram format? [unemulated]
          Bits: ?wBu
@@ -973,6 +973,7 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 		if (gfx->prio > pri[x].src_prio) {
 			// submit src pix
 			if (const u16 pal = gfx->palette_adjust(src[gfx_x])) {
+				// could be pulled out of loop for pivot and sprite
 				u8 sel = gfx->blend_select(flags, gfx_x);
 
 				switch (gfx->blend_mask()) {
@@ -993,9 +994,10 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 					z[x].dst_pal = pal;
 					break;
 				}
-				pri[x].src_blendmode = gfx->blend_mask();
 
+				// lock in source color for blending and update the prio test buffer
 				z[x].src_pal = pal;
+				pri[x].src_blendmode = gfx->blend_mask();
 				pri[x].src_prio = gfx->prio;
 			}
 		} else if (gfx->prio >= pri[x].dst_prio) {
@@ -1006,6 +1008,7 @@ bool taito_f3_state::mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line
 				else // prio conflict = color line conflict? (dariusg, bubblem)
 					z[x].dst_pal = 0;
 				pri[x].dst_prio = gfx->prio;
+
 				const bool sel = gfx->blend_select(flags, gfx_x);
 				switch (pri[x].src_blendmode) {
 				case 0b01:
