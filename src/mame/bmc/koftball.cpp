@@ -1,18 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders: Tomasz Slanina
+
 /*
 King Of Football (c)1995 BMC
 
 preliminary driver by Tomasz Slanina
 
-TODO: jxzh has bad GFX and needs correct protection handling. For testing, one well-placed soft reset
-      will make it boot
+TODO:
+- boards have 2 DIP banks which aren't hooked up in emulation, jxzh DSW 2:8 enables test mode on real hw;
+- lots of unknown writes / reads;
+- one of the customs could contain a VIA6522-like core. bmc/bmcbowl.cpp uses the VIA6522 and the
+  accesses are similar.
 
 --
 
 MC68000P10
-M28 (OKI 6295, next to rom C9)
-BMC ADB40817(80 Pin PQFP - google hits, but no datasheet or description)
+M28 (OKI 6295, next to ROM C9)
+BMC ADB40817(80 Pin PQFP - Google hits, but no datasheet or description)
 RAMDAC TRC1710-80PCA (Monolithic 256-word by 18bit Look-up Table & Triple Video DAC with 6-bit DACs)
 File 89C67 (MCU?? Next to 3.57954MHz OSC)
 OSC: 21.47727MHz & 3.57954MHz
@@ -45,6 +49,16 @@ ft5_v6_c4.u58 /
 #include "tilemap.h"
 
 
+// configurable logging
+#define LOG_GFX   (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_GFX)
+
+#include "logmacro.h"
+
+#define LOGGFX(...)   LOGMASKED(LOG_GFX,   __VA_ARGS__)
+
+
 namespace {
 
 
@@ -68,17 +82,21 @@ public:
 	void init_koftball();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_main_ram;
-	required_shared_ptr_array<uint16_t, 2> m_videoram;
+	required_shared_ptr_array<uint16_t, 4> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	tilemap_t *m_tilemap[2]{};
+	tilemap_t *m_tilemap[4]{};
 	uint16_t m_prot_data = 0;
+	uint8_t m_irq_enable = 0;
+	uint8_t m_gfx_ctrl = 0;
 
+	void irq_ack_w(uint8_t data);
 	uint16_t random_number_r();
 	uint16_t prot_r();
 	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -92,28 +110,72 @@ private:
 };
 
 
+void koftball_state::machine_start()
+{
+	m_prot_data = 0;
+
+	save_item(NAME(m_prot_data));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_gfx_ctrl));
+}
+
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(koftball_state::get_tile_info)
 {
-	int data = m_videoram[Which][tile_index];
-	tileinfo.set(0,
-			data,
-			0,
-			0);
+	int const data = m_videoram[Which][tile_index];
+	tileinfo.set(0, data, 0, 0);
 }
 
 void koftball_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8,64,32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8,64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 }
 
 uint32_t koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	/*
+	TODO:
+	there are a lot of unused bits written to both 0x320000 and 0x2a000f during screen changes.
+	Bit 1 and 5 of 0x320000 are the only ones that give correct layer results (see table below).
+	What is the meaning of the others? More games running on this hw would help.
+
+	The following table describes the attract mode sequence for jxzh. koftball is relatively simpler as it almost
+	only uses the first 2 layers.
+
+	                            layer0      layer 1     layer 2     layer 3     0x2a000f    0x320000
+	title screen                over        under       off         off         0x13        0x98
+	girl with scrolling tiles   prev screen prev screen over        under       0x1b        0xba
+	                                                                            0x00        0x00
+	demon                       over        under       prev screen prev screen 0x1f        0x98
+	                                                                            0x00        0x00
+	slot with road signs        prev screen prev screen over        under       0x17        0xba
+	Chinese lanterns            prev screen prev screen over        under       0x17        0xba
+	slot with numbers           prev screen prev screen over        under       0x17        0xba
+	                                                                            0x00        0x00
+	pirates                     over        under       prev screen prev screen 0x17        0x98
+	                                                                            0x00        0x00
+	tile race                   over        under       prev screen prev screen 0x17        0x98
+	                                                                            0x00        0x00
+	girl select after coin up   prev screen prev screen over        under       0x13        0x3a
+	*/
+
+	if (BIT(m_gfx_ctrl, 5)) // TODO: or bit 1?
+	{
+		m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
+		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	}
+	else
+	{
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
 	return 0;
 }
 
@@ -125,7 +187,7 @@ uint16_t koftball_state::random_number_r()
 
 uint16_t koftball_state::prot_r()
 {
-	switch(m_prot_data)
+	switch (m_prot_data)
 	{
 		case 0x0000: return 0x0d00;
 		case 0xff00: return 0x8d00;
@@ -133,7 +195,7 @@ uint16_t koftball_state::prot_r()
 		case 0x8000: return 0x0f0f;
 	}
 
-	logerror("unk prot r %x %x\n",m_prot_data,  m_maincpu->pcbase());
+	logerror("unk prot r %x %x\n", m_prot_data, m_maincpu->pcbase());
 	return machine().rand();
 }
 
@@ -149,30 +211,43 @@ void koftball_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
+void koftball_state::irq_ack_w(uint8_t data)
+{
+	for (int i = 1; i < 8; i++)
+		if (BIT(data, i))
+			m_maincpu->set_input_line(i, CLEAR_LINE);
+}
+
 void koftball_state::koftball_mem(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x220000, 0x22ffff).ram().share(m_main_ram);
 
-	map(0x260000, 0x260fff).w(FUNC(koftball_state::videoram_w<0>)).share(m_videoram[0]);
-	map(0x261000, 0x261fff).w(FUNC(koftball_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x262000, 0x26ffff).ram();
+	map(0x260000, 0x260fff).ram().w(FUNC(koftball_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x261000, 0x261fff).ram().w(FUNC(koftball_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x262000, 0x262fff).ram().w(FUNC(koftball_state::videoram_w<2>)).share(m_videoram[2]);
+	map(0x263000, 0x263fff).ram().w(FUNC(koftball_state::videoram_w<3>)).share(m_videoram[3]);
+	map(0x268000, 0x26ffff).ram();
 
 	map(0x280000, 0x28ffff).ram(); // unused ?
-	map(0x2a0000, 0x2a001f).nopw();
+	map(0x2a0007, 0x2a0007).w(FUNC(koftball_state::irq_ack_w));
+	map(0x2a0009, 0x2a0009).lw8(NAME([this] (uint8_t data) { m_irq_enable = data; }));
+	map(0x2a000f, 0x2a000f).lw8(NAME([this] (uint8_t data) { LOGGFX("GFX ctrk 2a000f %02x\n", data); }));
+	map(0x2a001a, 0x2a001b).nopw();
 	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
 	map(0x2b0000, 0x2b0003).r(FUNC(koftball_state::random_number_r));
 	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
 	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 
 	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x2db002, 0x2db003).nopr(); // reads here during some scene changes
 	map(0x2db003, 0x2db003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x2db005, 0x2db005).w("ramdac", FUNC(ramdac_device::mask_w));
 
 	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2f0000, 0x2f0003).portr("INPUTS");
 	map(0x300000, 0x300001).nopw();
-	map(0x320000, 0x320001).nopw();
+	map(0x320000, 0x320000).lw8(NAME([this] (uint8_t data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl 320000 %02x\n", data); }));
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 }
@@ -184,23 +259,29 @@ void koftball_state::jxzh_mem(address_map &map)
 
 	map(0x260000, 0x260fff).ram().w(FUNC(koftball_state::videoram_w<0>)).share(m_videoram[0]);
 	map(0x261000, 0x261fff).ram().w(FUNC(koftball_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x262000, 0x26ffff).ram();
+	map(0x262000, 0x262fff).ram().w(FUNC(koftball_state::videoram_w<2>)).share(m_videoram[2]);
+	map(0x263000, 0x263fff).ram().w(FUNC(koftball_state::videoram_w<3>)).share(m_videoram[3]);
+	map(0x264b00, 0x264dff).ram(); // TODO: writes here at least at girl selection after coin up. Some kind of effect?
+	map(0x268000, 0x26ffff).ram();
 
 	map(0x280000, 0x28ffff).ram(); // unused ?
-	map(0x2a0000, 0x2a001f).nopw();
+	map(0x2a0007, 0x2a0007).w(FUNC(koftball_state::irq_ack_w));
+	map(0x2a0009, 0x2a0009).lw8(NAME([this] (uint8_t data) { m_irq_enable = data; }));
+	map(0x2a000f, 0x2a000f).lw8(NAME([this] (uint8_t data) { LOGGFX("GFX ctrk 2a000f %02x\n", data); }));
+	map(0x2a001a, 0x2a001d).nopw();
 	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
-	map(0x2b0000, 0x2b0003).r(FUNC(koftball_state::random_number_r));
-	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
+	map(0x2b0000, 0x2b0001).portr("INPUTS2");
 	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 
 	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x2db002, 0x2db003).nopr(); // reads here during some scene changes
 	map(0x2db003, 0x2db003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x2db005, 0x2db005).w("ramdac", FUNC(ramdac_device::mask_w));
 
 	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x2f0000, 0x2f0003).portr("INPUTS");
+	map(0x2f0000, 0x2f0001).portr("INPUTS");
 	map(0x300000, 0x300001).nopw();
-	map(0x320000, 0x320001).nopw();
+	map(0x320000, 0x320000).lw8(NAME([this] (uint8_t data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl 320000 %02x\n", data); }));
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 	map(0x380000, 0x380001).w(FUNC(koftball_state::prot_w));
@@ -214,10 +295,10 @@ void koftball_state::ramdac_map(address_map &map)
 
 static INPUT_PORTS_START( koftball )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("info") PORT_CODE(KEYCODE_Z)//info page
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("info") PORT_CODE(KEYCODE_Z) //info page
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("dec") PORT_CODE(KEYCODE_C)//dec sound test
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("inc") PORT_CODE(KEYCODE_V)//inc sound test
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("dec") PORT_CODE(KEYCODE_C) //dec sound test
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("inc") PORT_CODE(KEYCODE_V) //inc sound test
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test6") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test7") PORT_CODE(KEYCODE_M)
@@ -227,25 +308,169 @@ static INPUT_PORTS_START( koftball )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test12") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test13") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test14") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("sound test") PORT_CODE(KEYCODE_H) //test mdoe enter
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("sound test") PORT_CODE(KEYCODE_H) //test mode enter
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test16") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("Select") PORT_CODE(KEYCODE_K)//test mode select
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("Select") PORT_CODE(KEYCODE_K) //test mode select
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )    PORT_NAME("test18") PORT_CODE(KEYCODE_L)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME(        0x0001, 0x0001, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(             0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(             0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0004, 0x0004, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(             0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0008, 0x0008, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(             0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(             0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0020, 0x0020, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(             0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0040, 0x0040, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(             0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0080, 0x0080, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(             0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME(        0x0001, 0x0001, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(             0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(             0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0004, 0x0004, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(             0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0008, 0x0008, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(             0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(             0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0020, 0x0020, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(             0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0040, 0x0040, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(             0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0080, 0x0080, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(             0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jxzh )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Freeze")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP) PORT_NAME("Change Tile / Double Up")
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME(        0x0001, 0x0001, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(             0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(             0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0004, 0x0004, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(             0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0008, 0x0008, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(             0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(             0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0020, 0x0020, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(             0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0040, 0x0040, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(             0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0080, 0x0080, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(             0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME(        0x0001, 0x0001, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(             0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(             0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0004, 0x0004, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(             0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0008, 0x0008, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(             0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(             0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0020, 0x0020, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(             0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(        0x0040, 0x0040, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(             0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(             0x0000, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC(         0x0080, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(koftball_state::interrupt)
 {
-	int scanline = param;
+	int const scanline = param;
 
-	if(scanline == 240)
-		m_maincpu->set_input_line(2, HOLD_LINE);
+	if (scanline == 240)
+		if (BIT(m_irq_enable, 2))
+			m_maincpu->set_input_line(2, ASSERT_LINE);
 
-	if(scanline == 128)
-		m_maincpu->set_input_line(3, HOLD_LINE);
+	if (scanline == 128)
+		if (BIT(m_irq_enable, 3))
+			m_maincpu->set_input_line(3, ASSERT_LINE);
 
-	if(scanline == 64)
-		m_maincpu->set_input_line(6, HOLD_LINE);
+	if (scanline == 64)
+		if (BIT(m_irq_enable, 6))
+			m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
 static const gfx_layout tilelayout =
@@ -266,7 +491,7 @@ GFXDECODE_END
 
 void koftball_state::koftball(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
+	M68000(config, m_maincpu, 21.477272_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &koftball_state::koftball_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(koftball_state::interrupt), "screen", 0, 1);
 
@@ -287,11 +512,11 @@ void koftball_state::koftball(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));  // guessed chip type, clock not verified
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 21.477272_MHz_XTAL / 22, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 verified for jxzh
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }
@@ -368,7 +593,7 @@ Notes:
 *******************************************************************/
 
 ROM_START( jxzh )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "bmc_m5k.u14", 0x000001, 0x20000, CRC(43b67d0a) SHA1(f421c71165d79881c208d332416f1c82057f5680) )
 	ROM_LOAD16_BYTE( "bmc_m6k.u15", 0x000000, 0x20000, CRC(410ee342) SHA1(2b83e0fc2c5f9a2d745755572eba751bfac107f5) )
 
@@ -408,16 +633,12 @@ static const uint16_t nvram[]=
 #endif
 void koftball_state::init_koftball()
 {
-	m_prot_data = 0;
-
-	save_item(NAME(m_prot_data));
-
 #if NVRAM_HACK
 	{
 		int offset = 0;
-		while(nvram[offset] != 0xffff)
+		while (nvram[offset] != 0xffff)
 		{
-			m_main_ram[offset]=nvram[offset];
+			m_main_ram[offset] = nvram[offset];
 			++offset;
 		}
 	}
@@ -428,4 +649,4 @@ void koftball_state::init_koftball()
 
 
 GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, jxzh,     0, jxzh,     koftball, koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jxzh,     0, jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
