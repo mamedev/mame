@@ -1490,11 +1490,6 @@ void i80186_cpu_device::update_dma_control(int which, int new_control)
 		new_control = (new_control & ~ST_STOP) | (d->control & ST_STOP);
 	new_control &= ~CHG_NOCHG;
 
-	/* check for control bits we don't handle */
-	int diff = new_control ^ d->control;
-	if (diff & 0x6811)
-		LOGMASKED(LOG_DMA, "%05X:ERROR! - unsupported DMA mode %04X\n", m_pc, new_control);
-
 	LOGMASKED(LOG_DMA, "Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 	/* set the new control register */

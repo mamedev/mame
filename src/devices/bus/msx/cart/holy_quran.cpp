@@ -68,14 +68,10 @@ std::error_condition msx_cart_holy_quran_device::initialize_cartridge(std::strin
 
 	m_decrypted.resize(size);
 
-	u8 lookup_prot[256];
 	// protection uses a simple rotation on databus, some lines inverted
-	for (int i = 0; i < 0x100; i++)
-		lookup_prot[i] = bitswap<8>(i,6,2,4,0,1,5,7,3) ^ 0x4d;
-
 	u8 *rom = cart_rom_region()->base();
 	for (u32 i = 0; i < size; i++)
-		m_decrypted[i] = lookup_prot[rom[i]];
+		m_decrypted[i] = bitswap<8>(rom[i],6,2,4,0,1,5,7,3) ^ 0x4d;
 
 	for (int i = 0; i < 4; i++)
 		m_rombank[i]->configure_entries(0, banks, m_decrypted.data(), BANK_SIZE);

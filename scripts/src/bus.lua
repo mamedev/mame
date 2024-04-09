@@ -1898,6 +1898,8 @@ if (BUSES["MSX_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/libbler.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/libbler.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/magickey.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/magickey.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/sgadapt.cpp",
@@ -5263,6 +5265,8 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/labtam_z80sbc.h",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.h",
+		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.h",
 	}
 end
 

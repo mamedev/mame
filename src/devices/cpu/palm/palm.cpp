@@ -36,13 +36,13 @@ DEFINE_DEVICE_TYPE(PALM, palm_device, "palm", "IBM PALM")
 
 palm_device::palm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, PALM, tag, owner, clock)
-	, m_ros_config("ros", ENDIANNESS_BIG, 16, 16)
+	, m_pgm_config("pgm", ENDIANNESS_BIG, 16, 16)
 	, m_rws_config("rws", ENDIANNESS_BIG, 16, 16)
 	, m_ioc_config("ioc", ENDIANNESS_BIG, 8, 4)
 	, m_iod_config("iod", ENDIANNESS_BIG, 8, 4)
 	, m_getb_bus(*this)
-	, m_select_ros(*this)
 	, m_program_level(*this)
+	, m_select_ros(*this)
 	, m_icount(0)
 	, m_r{}
 {
@@ -77,7 +77,7 @@ void palm_device::device_start()
 	save_item(NAME(m_il));
 	save_item(NAME(m_ff));
 
-	space(AS_ROS).specific(m_ros);
+	space(AS_PGM).specific(m_pgm);
 	space(AS_RWS).specific(m_rws);
 	space(AS_IOC).specific(m_ioc);
 	space(AS_IOD).specific(m_iod);
@@ -90,11 +90,11 @@ void palm_device::device_reset()
 	// select instruction source
 	m_ff = FF_IPL | FF_MSS;
 	m_select_ros((m_ff & FF_MSS) && !(m_ff & FF_IPL));
-	m_program_level(0);
 
-	// read initial PC from ROS
+	// read initial PC from program memory
 	m_il = 0;
-	m_pc = m_r[m_il][0] = m_ros.read_word(0);
+	m_program_level(0);
+	m_pc = m_r[m_il][0] = m_pgm.read_word(0);
 }
 
 #define Rx  r[IBIT(op, 4, 4)]
@@ -126,7 +126,7 @@ void palm_device::execute_run()
 		debugger_instruction_hook(r[0] & ~1);
 
 		// fetch instruction
-		u16 const op = m_ros.read_word(r[0] & ~1);
+		u16 const op = m_pgm.read_word(r[0] & ~1);
 
 		// increment instruction address register
 		r[0] += 2;
@@ -258,7 +258,7 @@ device_memory_interface::space_config_vector palm_device::memory_space_config() 
 {
 	return space_config_vector
 	{
-		std::make_pair(AS_ROS, &m_ros_config),
+		std::make_pair(AS_PGM, &m_pgm_config),
 		std::make_pair(AS_RWS, &m_rws_config),
 		std::make_pair(AS_IOC, &m_ioc_config),
 		std::make_pair(AS_IOD, &m_iod_config),

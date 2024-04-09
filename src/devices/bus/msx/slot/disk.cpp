@@ -598,13 +598,27 @@ void msx_slot_disk4_tc8566_device::device_start()
 	m_rombank->set_entry(0);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank);
+	page(1)->install_read_handler(0x7ff0, 0x7ff0, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::bank_r)));
 	page(1)->install_write_handler(0x7ff0, 0x7ff0, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::bank_w)));
-	// 0x7ff1 media change register
+	page(1)->install_read_handler(0x7ff1, 0x7ff1, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::media_change_r)));
 	page(1)->install_write_handler(0x7ff2, 0x7ff2, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::dor_w)));
 	page(1)->install_write_handler(0x7ff3, 0x7ff3, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
 	page(1)->install_read_handler(0x7ff4, 0x7ff4, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
 	page(1)->install_read_handler(0x7ff5, 0x7ff5, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
 	page(1)->install_write_handler(0x7ff5, 0x7ff5, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::unk_7ffc_r)));
+	page(1)->install_read_handler(0x7ffd, 0x7ffd, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::unk_7ffd_r)));
+	page(1)->install_read_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::unk_7fff_r)));
+	// TODO: Investigate on real unit
+	// Some or all register reads are mirrored? Register writes also?
+	// At least msr_r must be mirrored otherwise Microcabin software will not boot (on FS-A1ST).
+	page(2)->install_read_handler(0xbff0, 0xbff0, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::bank_r)));
+	page(2)->install_read_handler(0xbff1, 0xbff1, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::media_change_r)));
+	page(2)->install_read_handler(0xbff4, 0xbff4, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(2)->install_read_handler(0xbff5, 0xbff5, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(2)->install_read_handler(0xbffc, 0xbffc, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::unk_7ffc_r)));
+	page(2)->install_read_handler(0xbffd, 0xbffd, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::unk_7ffd_r)));
+	page(2)->install_read_handler(0xbfff, 0xbfff, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::unk_7fff_r)));
 }
 
 void msx_slot_disk4_tc8566_device::device_add_mconfig(machine_config &config)
@@ -612,11 +626,40 @@ void msx_slot_disk4_tc8566_device::device_add_mconfig(machine_config &config)
 	add_mconfig(config);
 }
 
+u8 msx_slot_disk4_tc8566_device::bank_r()
+{
+	return m_rombank->entry();
+}
+
 void msx_slot_disk4_tc8566_device::bank_w(u8 data)
 {
 	m_rombank->set_entry(data & 0x03);
 }
 
+u8 msx_slot_disk4_tc8566_device::media_change_r()
+{
+	return (m_floppy[0] && m_floppy[0]->get_device()->dskchg_r() ? 0x10 : 0x00) |
+		(m_floppy[1] && m_floppy[1]->get_device()->dskchg_r() ? 0x20 : 0x00) |
+		0x03;
+}
+
+u8 msx_slot_disk4_tc8566_device::unk_7ffc_r()
+{
+	// Unknown
+	return 0xfc;
+}
+
+u8 msx_slot_disk4_tc8566_device::unk_7ffd_r()
+{
+	// Unknown
+	return 0xfc;
+}
+
+u8 msx_slot_disk4_tc8566_device::unk_7fff_r()
+{
+	// Unknown
+	return 0x3f;
+}
 
 
 
