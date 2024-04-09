@@ -30,9 +30,19 @@ int main(int argc, char* argv[]) {
     unsigned((ASMJIT_LIBRARY_VERSION      ) & 0xFF));
 
   printf("Usage:\n");
-  printf("  --help        Show usage only\n");
-  printf("  --quick       Decrease the number of iterations to make tests quicker\n");
-  printf("  --arch=<ARCH> Select architecture to run ('all' by default)\n");
+  printf("  --help         Show usage only\n");
+  printf("  --quick        Decrease the number of iterations to make tests quicker\n");
+  printf("  --arch=<ARCH>  Select architecture(s) to run ('all' by default)\n");
+  printf("\n");
+
+  printf("Architectures:\n");
+#if !defined(ASMJIT_NO_X86)
+  printf("  --arch=x86     32-bit X86 architecture (X86)\n");
+  printf("  --arch=x64     64-bit X86 architecture (X86_64)\n");
+#endif
+#if !defined(ASMJIT_NO_AARCH64)
+  printf("  --arch=aarch64 64-bit ARM architecture (AArch64)\n");
+#endif
   printf("\n");
 
   if (cmdLine.hasArg("--help"))

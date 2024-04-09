@@ -1,37 +1,29 @@
-// [AsmJit]
-// Machine Code Generation for C++.
+// This file is part of AsmJit project <https://asmjit.com>
 //
-// [License]
-// ZLIB - See LICENSE.md file in the package.
-
-// ============================================================================
-// tablegen-arm.js
-// ============================================================================
+// See asmjit.h or LICENSE.md for license and copyright information
+// SPDX-License-Identifier: Zlib
 
 "use strict";
 
-const { executionAsyncResource } = require("async_hooks");
 const core = require("./tablegen.js");
+const commons = require("./generator-commons.js");
 const hasOwn = Object.prototype.hasOwnProperty;
 
 const asmdb = core.asmdb;
-const kIndent = core.kIndent;
-const IndexedArray = core.IndexedArray;
-const StringUtils = core.StringUtils;
+const kIndent = commons.kIndent;
+const IndexedArray = commons.IndexedArray;
+const StringUtils = commons.StringUtils;
 
-const FAIL = core.FAIL;
+const FATAL = commons.FATAL;
 
 // ============================================================================
 // [ArmDB]
 // ============================================================================
 
-// Create ARM ISA.
-const isa = new asmdb.arm.ISA();
+// Create AArch64 ISA.
+const isa = new asmdb.aarch64.ISA();
 
-// ============================================================================
-// [tablegen.arm.GenUtils]
-// ============================================================================
-
+/*
 class GenUtils {
   // Get a list of instructions based on `name` and optional `mode`.
   static query(name, mode) {
@@ -76,6 +68,7 @@ class GenUtils {
     return arr;
   }
 }
+*/
 
 // ============================================================================
 // [tablegen.arm.ArmTableGen]
@@ -133,11 +126,8 @@ class ArmTableGen extends core.TableGen {
 
         // [06] OpcodeDataIndex.
         "([^\\)]+)" +
-        "\\s*,\\s*" +
-
-        // [07] NameDataIndex.
-        "([^\\)]+)" +
         "\\s*\\)"
+
       , "g");
 
     var m;
@@ -168,14 +158,12 @@ class ArmTableGen extends core.TableGen {
         opcodeData        : opcodeData,      // Opcode data.
         opcodeDataIndex   : -1,              // Opcode data index.
         rwInfo            : rwInfo,          // RW info.
-        flags             : instFlags,       // Instruction flags.
-
-        nameIndex         : -1               // Index to InstDB::_nameData.
+        flags             : instFlags        // Instruction flags.
       });
     }
 
     if (this.insts.length === 0 || this.insts.length !== StringUtils.countOf(stringData, "INST("))
-      FAIL("ARMTableGen.parse(): Invalid parsing regexp (no data parsed)");
+      FATAL("ARMTableGen.parse(): Invalid parsing regexp (no data parsed)");
 
     console.log("Number of Instructions: " + this.insts.length);
   }
@@ -188,8 +176,7 @@ class ArmTableGen extends core.TableGen {
         String(inst.opcodeData      ).padEnd(86) + ", " +
         String(inst.rwInfo          ).padEnd(10) + ", " +
         String(inst.flags           ).padEnd(26) + ", " +
-        String(inst.opcodeDataIndex ).padEnd( 3) + ", " +
-        String(inst.nameIndex       ).padEnd( 4) + ")";
+        String(inst.opcodeDataIndex ).padEnd( 3) + ")" ;
     }) + "\n";
     return this.inject("InstInfo", s, this.insts.length * 4);
   }
