@@ -327,6 +327,7 @@ public:
 	void tmoshs_init();
 	void tmoshsp_init();
 
+	void heartbeat_pulse_w(int state);
 	uint16_t tokimeki_serial_r();
 	void tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -736,7 +737,7 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(tokimeki_state::heartbeat_timer_tick)
 {
-	const auto heartrate = m_heartbeat->read();
+	const auto heartrate = m_heartbeat->read() & 0xff;
 
 	if (heartrate > 0)
 	{
@@ -748,6 +749,12 @@ TIMER_CALLBACK_MEMBER(tokimeki_state::heartbeat_timer_tick)
 		// hand not on sensor, wait 100 ms for the heartbeat value to change again
 		m_heartbeat_timer->adjust(attotime::from_msec(100));
 	}
+}
+
+void tokimeki_state::heartbeat_pulse_w(int state)
+{
+	if (state)
+		m_heartbeat_signal = 0;
 }
 
 uint16_t tokimeki_state::tokimeki_serial_r()
@@ -871,21 +878,27 @@ static INPUT_PORTS_START( tmosh )
 	// Setting the value here to 0 will act as if the player's hand is off the sensor, and anything after that acts as 50-100
 	// Default heartbeat is configured for 80 beats per minute
 	PORT_START("HEARTBEAT")
-	PORT_BIT( 0xff, 31, IPT_PADDLE_V ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0, 101) PORT_NAME("Heartbeat Sensor")
+	PORT_BIT( 0x0ff, 31,             IPT_PADDLE_V ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0, 101) PORT_NAME("Heart Rate") PORT_CONDITION("CONTROLS", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0ff,  0,             IPT_CUSTOM ) PORT_CONDITION("CONTROLS", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_WRITE_LINE_MEMBER(tokimeki_state, heartbeat_pulse_w) PORT_NAME("Heartbeat Pulse") PORT_CONDITION("CONTROLS", 0x01, EQUALS, 0x00)
 
 	// value read during calibration is treated as zero
 	// scale in operator menu goes from 0x00-0xff but only 0x00-0x80 is actually usable in-game
 	PORT_START("GSR")
-	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_MINMAX(0x00, 0x80) PORT_NAME("GSR Sensor")
+	PORT_BIT( 0x0ff, 0x00, IPT_POSITIONAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_MINMAX(0x00, 0x80) PORT_NAME("GSR Sensor")
 
 	PORT_START("PRINTER_META")
 	PORT_CONFNAME( 0x01, 0x01, "Printer Paper Empty" )
-	PORT_CONFSETTING( 0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_CONFNAME( 0x02, 0x02, "Printer Malfunction" )
-	PORT_CONFSETTING( 0x02, DEF_STR( Off ) )
-	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
+	PORT_START("CONTROLS")
+	PORT_CONFNAME( 0x01, 0x01, "Heartbeat Input" )
+	PORT_CONFSETTING(    0x00, "Direct" )
+	PORT_CONFSETTING(    0x01, "Simulated" )
 INPUT_PORTS_END
 
 /*
