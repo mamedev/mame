@@ -340,8 +340,8 @@ ROM_START( igor )
 	ROM_REGION( 0x20000, "cobrom", 0 )
 	ROM_LOAD("sound.ic2", 0x00000, 0x20000, CRC(bc540da3) SHA1(68647ce1c7e87eba90d9d1912921213af03e3c5d) ) // no label
 
-	ROM_REGION( 165302, "screen", 0 )
-	ROM_LOAD("igor.svg", 0, 165302, CRC(25655697) SHA1(5faee5dc0c58e8e86e5f86eb2fc73d9921cb220e) )
+	ROM_REGION( 89047, "screen", 0 )
+	ROM_LOAD("igor.svg", 0, 89047, CRC(fe514f65) SHA1(da5a56882bd241d01a6c49cb1cb066b88473c445) )
 ROM_END
 
 } // anonymous namespace
