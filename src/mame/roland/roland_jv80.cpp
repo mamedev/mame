@@ -50,13 +50,15 @@ void roland_jv80_state::jv880(machine_config &config)
 }
 
 ROM_START(jv880)
+	ROM_DEFAULT_BIOS("v1.0.1")
+	ROM_SYSTEM_BIOS(0, "v1.0.0", "ROM Version 1.0.0")
+	ROM_SYSTEM_BIOS(1, "v1.0.1", "ROM Version 1.0.1")
+
 	ROM_REGION(0x8000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD("roland_r15199810_6435328b86f.ic16", 0x0000, 0x8000, CRC(b3d611b1) SHA1(6c1b59905b361ac3c4803d39589406bc3e1d0647))
 
 	ROM_REGION(0x40000, "progrom", 0)
-	ROM_SYSTEM_BIOS(0, "v1.0.0", "ROM Version 1.0.0")
 	ROMX_LOAD("roland_jv-880_v1.00.ic17", 0x00000, 0x40000, CRC(b266efe9) SHA1(282116e8e8471053cf159d22675931592b7f7c8f), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v1.0.1", "ROM Version 1.0.1")
 	ROMX_LOAD("roland_jv-880_v1.01.ic17", 0x00000, 0x40000, CRC(5f19c95f) SHA1(38ec496f16dfa02d35f934cf32d8302aaf5f236e), ROM_BIOS(1))
 
 	ROM_REGION(0x400000, "waverom", 0)
