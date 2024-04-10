@@ -180,10 +180,10 @@ Notes: (all main parts shown)
        This PCB is plugged into the Tokimeki Memorial Oshiete Your Heart main board into CN4
        It provides additional functionality for the printer and sensor(s) and possibly other things.
 
-       CN10 & CN11 - TCS7927-54 4-pin mini DIN connectors
+       CN10 & CN11 - TCS7927-54 4-pin mini DIN connectors, S-Video in and out for printer
                CN9 - 6 pin connector
                CN8 - 5 pin connector
-               CN7 - 7 pin connector
+               CN7 - 7 pin connector, printer communication
                CN6 - 3 pin connector
                CN5 - 2 pin connector
                CN3 - 4 pin power connector. Joins to CN6 on mainboard via a Y-splitter cable. The other end of the
@@ -213,6 +213,13 @@ Notes:
       uPC817 - Sharp PC817 Optocoupler
          CN1 - 4 pin power connector joining to GQ673 PCB CN3 and CN6 on mainboard via a Y-splitter cable.
      CN1/CN2 - 2 pin connector
+
+
+Notes:
+The Tokimeki Memorial Oshiete Your Heart printer appears to be a model based on the Sony UP-1200 which is
+a color video printer that takes S-Video as input.
+https://www.ykuns-mechanical-club.com/tokimemo.html
+https://www2.biglobe.ne.jp/~tell/keihin/tokimeki/tyheart/tyheart.html
 
 ***************************************************************************/
 
@@ -245,6 +252,7 @@ class konamigv_state : public driver_device
 public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_screen(*this, "screen")
 		, m_ncr53cf96(*this, "scsi:7:ncr53cf96")
 		, m_btc_trackball(*this, "upd%u", 1)
 		, m_maincpu(*this, "maincpu")
@@ -271,6 +279,8 @@ protected:
 	void kdeadeye_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(scsi_dma_transfer);
+
+	required_device<screen_device> m_screen;
 
 	required_device<ncr53cf96_device> m_ncr53cf96;
 	optional_device_array<upd4701_device, 2> m_btc_trackball;
@@ -319,6 +329,7 @@ public:
 		, m_gsr(*this, "GSR")
 		, m_printer_meta(*this, "PRINTER_META")
 		, m_device_val_start_state(0)
+		, m_printer_is_manual_layout(false)
 	{
 	}
 
@@ -335,12 +346,22 @@ public:
 	void tokimeki_device_check_w(int state);
 
 private:
+	enum
+	{
+		// This should actually be A6 sized paper (105mm x 148mm)
+		PRINTER_PAGE_WIDTH = 800,
+		PRINTER_PAGE_HEIGHT = 600,
+	};
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	uint32_t printer_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void tmosh_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(heartbeat_timer_tick);
+	TIMER_CALLBACK_MEMBER(printing_status_timeout);
 
 	required_ioport m_heartbeat;
 	required_ioport m_gsr;
@@ -355,7 +376,19 @@ private:
 	uint16_t m_serial_sensor_data;
 	uint8_t m_heartbeat_signal;
 
+	uint8_t m_printer_bit;
+	uint8_t m_printer_data[6];
+	uint8_t m_printer_curbit;
+	uint8_t m_printer_curbyte;
+	attotime m_printer_pulse_starttime;
+	uint8_t m_printer_is_printing;
+	uint32_t m_printer_current_image;
+	bool m_printer_is_manual_layout;
+
+	bitmap_rgb32 m_page_bitmap;
+
 	emu_timer *m_heartbeat_timer;
+	emu_timer *m_printer_printing_status_timeout;
 };
 
 void konamigv_state::konamigv_map(address_map &map)
@@ -486,8 +519,19 @@ void tokimeki_state::machine_start()
 	save_item(NAME(m_serial_sensor_data));
 	save_item(NAME(m_heartbeat_signal));
 
+	save_item(NAME(m_printer_bit));
+	save_item(NAME(m_printer_curbit));
+	save_item(NAME(m_printer_curbyte));
+	save_item(NAME(m_printer_is_printing));
+	save_item(NAME(m_printer_current_image));
+	save_item(NAME(m_printer_data));
+	save_item(NAME(m_page_bitmap));
+
 	m_heartbeat_timer = timer_alloc(FUNC(tokimeki_state::heartbeat_timer_tick), this);
 	m_heartbeat_timer->adjust(attotime::zero);
+
+	m_printer_printing_status_timeout = timer_alloc(FUNC(tokimeki_state::printing_status_timeout), this);
+	m_printer_printing_status_timeout->adjust(attotime::never);
 }
 
 void tokimeki_state::machine_reset()
@@ -500,6 +544,17 @@ void tokimeki_state::machine_reset()
 	m_serial_sensor_id = 0;
 	m_serial_sensor_data = 0;
 	m_heartbeat_signal = 1;
+
+	m_printer_bit = 0;
+	m_printer_curbit = 0;
+	m_printer_curbyte = 0;
+	m_printer_is_printing = 0;
+	m_printer_current_image = 0;
+
+	std::fill(std::begin(m_printer_data), std::end(m_printer_data), 0);
+
+	m_page_bitmap.allocate(PRINTER_PAGE_WIDTH, PRINTER_PAGE_HEIGHT);
+	m_page_bitmap.fill(0xffffffff);
 }
 
 void konamigv_state::konamigv(machine_config &config)
@@ -532,7 +587,7 @@ void konamigv_state::konamigv(machine_config &config)
 	// video hardware
 	CXD8514Q(config, "gpu", XTAL(53'693'175), 0x100000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -751,6 +806,11 @@ TIMER_CALLBACK_MEMBER(tokimeki_state::heartbeat_timer_tick)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(tokimeki_state::printing_status_timeout)
+{
+	m_printer_is_printing = 0;
+}
+
 void tokimeki_state::heartbeat_pulse_w(int state)
 {
 	if (state)
@@ -772,7 +832,7 @@ uint16_t tokimeki_state::tokimeki_serial_r()
 	if (!BIT(printer_meta, 1))
 		r |= 0x80; // printer is malfunctioning
 
-	r |= 0x40; // required to be set to avoid error when printer tries to print something
+	r |= m_printer_is_printing << 6;
 
 	return r;
 }
@@ -780,20 +840,185 @@ uint16_t tokimeki_state::tokimeki_serial_r()
 void tokimeki_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
-	    serial EEPROM-like device here: when mem_mask == 0x000000ff only,
-
-	    0x40 = chip enable
-	    0x20 = clock
-	    0x10 = data
-
+	    0x20 = serial clock
+	    0x10 = serial data
 	    0x02 = sensors dest
 
-	    0x80 = printer config?
-	    0x40 = printer config?
-	    0x01 = printer data?
+	    0x80 = printer s-video in display flag? only shown during printer config menus
+	    0x01 = printer data. the duration of the value being held 1 is used to determine the command or value
 	*/
-	int clk = BIT(data, 5);
 
+	const int printer_bit = BIT(data, 0);
+	if (printer_bit && !m_printer_bit)
+	{
+		m_printer_pulse_starttime = machine().time();
+	}
+	else if (!printer_bit && m_printer_bit)
+	{
+		/*
+		duration of the transition from 1->0->1 is used to figure out what is being sent/
+		the durations are clocked against the PS1's clock via GetRCnt(0xf2000002)
+		internally the values compared are 2400, 4800, and 9600 cycles
+		9600 = start of new data transfer
+		4800 = data bit 1
+		2400 = data bit 0
+		*/
+		const auto curtime = machine().time();
+		const auto ticks = (curtime - m_printer_pulse_starttime).as_ticks(m_maincpu->clock() / 16);
+
+		if (ticks >= 9000)
+		{
+			// start of data transfer
+			m_printer_curbit = 0;
+		}
+		else
+		{
+			// data bit transfer
+			const int bit = ticks >= 4000 && ticks <= 5600;
+
+			if (m_printer_curbit == 0)
+				m_printer_data[m_printer_curbyte] = 0;
+
+			m_printer_data[m_printer_curbyte] |= bit << m_printer_curbit;
+			m_printer_curbit++;
+
+			// game is programmed to always sends two bytes. first byte is 7 bits, second byte is hardcoded to be 0xf9
+			if ((m_printer_curbyte & 1) == 0 && m_printer_curbit == 7)
+			{
+				m_printer_curbyte++;
+				m_printer_curbit = 0;
+			}
+			else if ((m_printer_curbyte & 1) == 1 && m_printer_curbit == 8)
+			{
+				if (m_printer_data[m_printer_curbyte] != 0xf9)
+					logerror("tokimeki printer 2nd byte was expected to be f9, found %02x", m_printer_data[m_printer_curbyte]);
+
+				m_printer_curbyte++;
+				m_printer_curbit = 0;
+			}
+		}
+
+		if (m_printer_curbyte >= 6)
+		{
+			/*
+			All of the commands seem to correspond to physical buttons available on the machine.
+			The manual configuration option in the printer test menu appears to let you control
+			the printer's OSD via the cabinet controls and you can see it sending 64/65/66/67
+			depending on which direction you press on the joystick.
+
+			0x0b = sent before 0x63 -> 0x62 sequence when holding button to exit manual configuration menu. stop?
+			0x10 = memory in
+			0x11 = print
+			0x17 = source/memory?
+			0x62 = menu
+			0x63 = exec
+			0x64 = up
+			0x65 = down
+			0x66 = left
+			0x67 = right
+			*/
+
+			// The same sequence of 2 bytes will be sent 3 times every time it is sent, so only accept the value if it was repeated 3 times
+			if (m_printer_data[0] != m_printer_data[2] || m_printer_data[0] != m_printer_data[4] || m_printer_data[1] != m_printer_data[3] || m_printer_data[1] != m_printer_data[5])
+			{
+				logerror("printer command not accepted, found different bytes [%02x %02x %02x] [%02x %02x %02x]", m_printer_data[0], m_printer_data[2], m_printer_data[4], m_printer_data[1], m_printer_data[3], m_printer_data[5]);
+			}
+			else if (m_printer_data[1] != 0xf9)
+			{
+				logerror("printer command not accepted, found second byte that wasn't 0xf9 [%02x %02x %02x] [%02x %02x %02x]", m_printer_data[0], m_printer_data[2], m_printer_data[4], m_printer_data[1], m_printer_data[3], m_printer_data[5]);
+			}
+			else if (m_printer_data[0] == 0x10)
+			{
+				// memory in
+				if (m_printer_is_manual_layout)
+				{
+					// 4x4 image layout
+					// The game tells the printer to take a video still of each individual
+					// image that'll be printed on the sticker sheet instead of one only
+					// one picture for the entire sheet like the non-plus version.
+
+					// HACK: crop out some unwanted padding and garbage from the input image.
+					// The left side of image gets cropped off due to PSX gpu rendering issues.
+					// The actual image itself uses 4x4 pixels except for a few pixels
+					// around the edge of the image, so those few pixels are also cropped
+					// to allow for clean scaling without chunky pixels.
+					const int32_t crop_left = 1;
+					const int32_t crop_top = 40;
+					const int32_t crop_right = 19;
+					const int32_t crop_bottom = 16;
+
+					bitmap_rgb32 cropped(
+						m_screen->curbitmap().as_rgb32(),
+						{
+							crop_left,
+							m_screen->cliprect().max_x - crop_right,
+							crop_top,
+							m_screen->cliprect().max_y - crop_bottom,
+						}
+					);
+
+					// scale the individual screenshot down to roughly the right size
+					const int32_t inner_pad_x = 6, inner_pad_y = 5;
+					const int32_t width_margin = 163, height_margin = 161; // full size of padding on both sides
+					const int32_t dest_w = (PRINTER_PAGE_WIDTH - width_margin - (inner_pad_x * 3)) / 4;
+					const int32_t dest_h = (PRINTER_PAGE_HEIGHT - height_margin - (inner_pad_y * 3)) / 4;
+					const int32_t scale_w = (cropped.width() << 16) / dest_w;
+					const int32_t scale_h = (cropped.height() << 16) / dest_h;
+
+					bitmap_rgb32 scaled(dest_w, dest_h);
+
+					copyrozbitmap(
+						scaled,
+						scaled.cliprect(),
+						cropped,
+						0, 0,
+						scale_w, 0, 0, scale_h,
+						false
+					);
+
+					// render the cropped and scaled image to the printer page
+					const int x = (m_printer_current_image % 4) * (scaled.width() + inner_pad_x);
+					const int y = (m_printer_current_image / 4) * (scaled.height() + inner_pad_y);
+					copybitmap(m_page_bitmap, scaled, 0, 0, width_margin / 2 + x, height_margin / 2 + y, m_page_bitmap.cliprect());
+
+					m_printer_current_image++;
+				}
+				else
+				{
+					// center entire screen onto printer page
+					m_page_bitmap.fill(0xffffffff);
+
+					const int x = (PRINTER_PAGE_WIDTH - m_screen->width()) / 2;
+					const int y = (PRINTER_PAGE_HEIGHT - m_screen->height()) / 2;
+					copybitmap(m_page_bitmap, m_screen->curbitmap().as_rgb32(), 0, 0, x, y, m_page_bitmap.cliprect());
+				}
+			}
+			else if (m_printer_data[0] == 0x11)
+			{
+				// print
+				// tmoshs expects the busy status bit to be set for a little bit after this command or it errors out
+				m_printer_is_printing = 1;
+				m_printer_printing_status_timeout->adjust(attotime::from_msec(1000));
+			}
+			else if (m_printer_data[0] == 0x17)
+			{
+				// source/memory?
+				m_page_bitmap.fill(0xffffffff);
+				m_printer_current_image = 0;
+			}
+			else
+			{
+				logerror("tokimeki printer found unknown command %02x\n", m_printer_data[0]);
+			}
+
+			m_printer_curbyte = 0;
+			m_printer_curbit = 0;
+		}
+	}
+
+	m_printer_bit = printer_bit;
+
+	const int serial_clk = BIT(data, 5);
 	if (BIT(data, 1))
 	{
 		m_serial_sensor_data = 0;
@@ -801,7 +1026,7 @@ void tokimeki_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t me
 		m_serial_val = 0;
 		m_serial_len = 0;
 	}
-	else if (!m_serial_clk && clk)
+	else if (!m_serial_clk && serial_clk)
 	{
 		if (m_serial_len < 5)
 		{
@@ -834,13 +1059,28 @@ void tokimeki_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t me
 		m_serial_len++;
 	}
 
-	m_serial_clk = clk;
+	m_serial_clk = serial_clk;
 }
 
 void tokimeki_state::tmosh(machine_config &config)
 {
 	konamigv(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tokimeki_state::tmosh_map);
+
+	auto &screen(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	screen.set_size(PRINTER_PAGE_WIDTH, PRINTER_PAGE_HEIGHT);
+	screen.set_visarea_full();
+	screen.set_refresh_hz(10); // infrequently updated, only displays printed page
+	screen.set_screen_update(FUNC(tokimeki_state::printer_screen_update));
+}
+
+uint32_t tokimeki_state::printer_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (!m_printer_is_printing)
+		return 0;
+
+	copybitmap(bitmap, m_page_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
 }
 
 void tokimeki_state::tmoshs_init()
@@ -851,6 +1091,7 @@ void tokimeki_state::tmoshs_init()
 void tokimeki_state::tmoshsp_init()
 {
 	m_device_val_start_state = 0xf0ba;
+	m_printer_is_manual_layout = true;
 }
 
 CUSTOM_INPUT_MEMBER(tokimeki_state::tokimeki_device_check_r)
@@ -1174,10 +1415,10 @@ GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, empty_init, 
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, empty_init,   ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, empty_init,   ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, weddingr, konamigv, konamigv, weddingr, konamigv_state, empty_init,   ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1997, tmosh,    konamigv, tmosh,    tmosh,    tokimeki_state, empty_init,   ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
-GAME( 1997, tmoshs,   konamigv, tmosh,    tmosh,    tokimeki_state, tmoshs_init,  ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
-GAME( 1997, tmoshsp,  konamigv, tmosh,    tmosh,    tokimeki_state, tmoshsp_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
-GAME( 1997, tmoshspa, tmoshsp,  tmosh,    tmosh,    tokimeki_state, tmoshsp_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
+GAME( 1997, tmosh,    konamigv, tmosh,    tmosh,    tokimeki_state, empty_init,   ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // graphics: picture to be printed is cut off on the left
+GAME( 1997, tmoshs,   konamigv, tmosh,    tmosh,    tokimeki_state, tmoshs_init,  ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, tmoshsp,  konamigv, tmosh,    tmosh,    tokimeki_state, tmoshsp_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, tmoshspa, tmoshsp,  tmosh,    tmosh,    tokimeki_state, tmoshsp_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND)
 GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND)
 GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init,   ROT0, "Konami", "The Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND)
