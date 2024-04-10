@@ -251,7 +251,6 @@ public:
 	{
 	}
 
-	void tmosh(machine_config &config);
 	void kdeadeye(machine_config &config);
 	void btchamp(machine_config &config);
 	void konamigv(machine_config &config);
@@ -263,15 +262,13 @@ protected:
 	virtual void machine_reset() override;
 
 	void btc_trackball_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t tokimeki_serial_r();
-	void tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	void scsi_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void scsi_drq(int state);
 
 	void btchamp_map(address_map &map);
 	void kdeadeye_map(address_map &map);
-	void tmosh_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(scsi_dma_transfer);
 
@@ -311,6 +308,53 @@ private:
 	required_device_array<fujitsu_29f016a_device, 4> m_flash8;
 
 	uint32_t m_flash_address = 0;
+};
+
+class tokimeki_state : public konamigv_state
+{
+public:
+	tokimeki_state(const machine_config &mconfig, device_type type, const char *tag)
+		: konamigv_state(mconfig, type, tag)
+		, m_heartbeat(*this, "HEARTBEAT")
+		, m_gsr(*this, "GSR")
+		, m_printer_meta(*this, "PRINTER_META")
+		, m_device_val_start_state(0)
+	{
+	}
+
+	void tmosh(machine_config &config);
+
+	void tmoshs_init();
+	void tmoshsp_init();
+
+	uint16_t tokimeki_serial_r();
+	void tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(tokimeki_device_check_r);
+	void tokimeki_device_check_w(int state);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void tmosh_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(heartbeat_timer_tick);
+
+	required_ioport m_heartbeat;
+	required_ioport m_gsr;
+	required_ioport m_printer_meta;
+
+	uint16_t m_device_val_start_state;
+	uint16_t m_device_val;
+	uint8_t m_serial_val;
+	uint8_t m_serial_len;
+	uint8_t m_serial_clk;
+	uint8_t m_serial_sensor_id;
+	uint16_t m_serial_sensor_data;
+	uint8_t m_heartbeat_signal;
+
+	emu_timer *m_heartbeat_timer;
 };
 
 void konamigv_state::konamigv_map(address_map &map)
@@ -357,12 +401,12 @@ void konamigv_state::kdeadeye_map(address_map &map)
 	map(0x1f6800e0, 0x1f6800e3).nopw();
 }
 
-void konamigv_state::tmosh_map(address_map &map)
+void tokimeki_state::tmosh_map(address_map &map)
 {
 	konamigv_map(map);
 
-	map(0x1f680080, 0x1f680081).r(FUNC(konamigv_state::tokimeki_serial_r));
-	map(0x1f680090, 0x1f680091).w(FUNC(konamigv_state::tokimeki_serial_w));
+	map(0x1f680080, 0x1f680081).r(FUNC(tokimeki_state::tokimeki_serial_r));
+	map(0x1f680090, 0x1f680091).w(FUNC(tokimeki_state::tokimeki_serial_w));
 }
 
 // SCSI
@@ -430,6 +474,33 @@ void simpbowl_state::machine_start()
 	save_item(NAME(m_flash_address));
 }
 
+void tokimeki_state::machine_start()
+{
+	konamigv_state::machine_start();
+	save_item(NAME(m_device_val));
+	save_item(NAME(m_serial_val));
+	save_item(NAME(m_serial_len));
+	save_item(NAME(m_serial_clk));
+	save_item(NAME(m_serial_sensor_id));
+	save_item(NAME(m_serial_sensor_data));
+	save_item(NAME(m_heartbeat_signal));
+
+	m_heartbeat_timer = timer_alloc(FUNC(tokimeki_state::heartbeat_timer_tick), this);
+	m_heartbeat_timer->adjust(attotime::zero);
+}
+
+void tokimeki_state::machine_reset()
+{
+	konamigv_state::machine_reset();
+	m_device_val = m_device_val_start_state;
+	m_serial_val = 0;
+	m_serial_len = 0;
+	m_serial_clk = 0;
+	m_serial_sensor_id = 0;
+	m_serial_sensor_data = 0;
+	m_heartbeat_signal = 1;
+}
+
 void konamigv_state::konamigv(machine_config &config)
 {
 	// basic machine hardware
@@ -467,8 +538,8 @@ void konamigv_state::konamigv(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "lspeaker", 0.75);
-	spu.add_route(1, "rspeaker", 0.75);
+	spu.add_route(1, "lspeaker", 0.75); // to verify the channels, btchamp's "game sound test" in the sound test menu speaks the words left, right, center
+	spu.add_route(0, "rspeaker", 0.75);
 }
 
 
@@ -661,17 +732,45 @@ static INPUT_PORTS_START( btchamp )
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-// Tokimeki Memorial games - have a mouse and printer and who knows what else
+// Tokimeki Memorial games - has a heart rate sensor, GSR (galvanic skin response) sensor, and printer
 
-uint16_t konamigv_state::tokimeki_serial_r()
+TIMER_CALLBACK_MEMBER(tokimeki_state::heartbeat_timer_tick)
 {
-	// bits checked: 0x80 and 0x20 for periodic status (800b6968 and 800b69e0 in tmoshs)
-	// 0x08 for reading the serial device (8005e624)
+	const auto heartrate = m_heartbeat->read();
 
-	return 0xffff;
+	if (heartrate > 0)
+	{
+		m_heartbeat_timer->adjust(attotime::from_msec(60'000 / (heartrate + 49)));
+		m_heartbeat_signal = 0;
+	}
+	else
+	{
+		// hand not on sensor, wait 100 ms for the heartbeat value to change again
+		m_heartbeat_timer->adjust(attotime::from_msec(100));
+	}
 }
 
-void konamigv_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint16_t tokimeki_state::tokimeki_serial_r()
+{
+	uint16_t r = m_heartbeat_signal << 2;
+	m_heartbeat_signal = 1;
+
+	if (m_serial_sensor_id != 0)
+		r |= BIT(m_serial_sensor_data, 8) << 3;
+
+	const auto printer_meta = m_printer_meta->read();
+	if (!BIT(printer_meta, 0))
+		r |= 0x20; // no paper loaded
+
+	if (!BIT(printer_meta, 1))
+		r |= 0x80; // printer is malfunctioning
+
+	r |= 0x40; // required to be set to avoid error when printer tries to print something
+
+	return r;
+}
+
+void tokimeki_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    serial EEPROM-like device here: when mem_mask == 0x000000ff only,
@@ -680,18 +779,114 @@ void konamigv_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t me
 	    0x20 = clock
 	    0x10 = data
 
-	    tmoshs sends 6 bits: 110100 then reads 8 bits.
-	    readback is bit 3 (0x08) of serial_r
-	    This happens starting around 8005e580.
-	*/
+	    0x02 = sensors dest
 
+	    0x80 = printer config?
+	    0x40 = printer config?
+	    0x01 = printer data?
+	*/
+	int clk = BIT(data, 5);
+
+	if (BIT(data, 1))
+	{
+		m_serial_sensor_data = 0;
+		m_serial_sensor_id = 0;
+		m_serial_val = 0;
+		m_serial_len = 0;
+	}
+	else if (!m_serial_clk && clk)
+	{
+		if (m_serial_len < 5)
+		{
+			// Sends 5 bits of data for the sensor ID
+			m_serial_val |= BIT(data, 4) << (4 - m_serial_len);
+
+			if (m_serial_len == 4)
+			{
+				m_serial_sensor_id = m_serial_val;
+
+				switch (m_serial_sensor_id)
+				{
+					case 0x1a: // GSR sensor value
+						m_serial_sensor_data = m_gsr->read();
+						break;
+					case 0x18:
+					case 0x19:
+					default:
+						m_serial_sensor_data = 0;
+						break;
+				}
+			}
+		}
+		else if (m_serial_len >= 6)
+		{
+			// Shifts data between reads of tokimeki_serial_r
+			m_serial_sensor_data <<= 1;
+		}
+
+		m_serial_len++;
+	}
+
+	m_serial_clk = clk;
 }
 
-void konamigv_state::tmosh(machine_config &config)
+void tokimeki_state::tmosh(machine_config &config)
 {
 	konamigv(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::tmosh_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tokimeki_state::tmosh_map);
 }
+
+void tokimeki_state::tmoshs_init()
+{
+	m_device_val_start_state = 0xf073;
+}
+
+void tokimeki_state::tmoshsp_init()
+{
+	m_device_val_start_state = 0xf0ba;
+}
+
+CUSTOM_INPUT_MEMBER(tokimeki_state::tokimeki_device_check_r)
+{
+	return BIT(m_device_val, 15);
+}
+
+void tokimeki_state::tokimeki_device_check_w(int state)
+{
+	// The check is accepted when it reads whatever is specified in m_device_val_start_state
+	if (state)
+		m_device_val = (m_device_val << 1) | BIT(m_device_val, 15);
+}
+
+static INPUT_PORTS_START( tmosh )
+	PORT_INCLUDE( konamigv )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tokimeki_state, tokimeki_device_check_r)
+
+	PORT_MODIFY("EEPROMOUT")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(tokimeki_state, tokimeki_device_check_w)
+
+	// valid range for heart rate is 50-150, anything outside of that range makes the game show ? in the heart rate meter area
+	// Setting the value here to 0 will act as if the player's hand is off the sensor, and anything after that acts as 50-100
+	// Default heartbeat is configured for 80 beats per minute
+	PORT_START("HEARTBEAT")
+	PORT_BIT( 0xff, 31, IPT_PADDLE_V ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0, 101) PORT_NAME("Heartbeat Sensor")
+
+	// value read during calibration is treated as zero
+	// scale in operator menu goes from 0x00-0xff but only 0x00-0x80 is actually usable in-game
+	PORT_START("GSR")
+	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_MINMAX(0x00, 0x80) PORT_NAME("GSR Sensor")
+
+	PORT_START("PRINTER_META")
+	PORT_CONFNAME( 0x01, 0x01, "Printer Paper Empty" )
+	PORT_CONFSETTING( 0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x02, "Printer Malfunction" )
+	PORT_CONFSETTING( 0x02, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
 
 /*
 Dead Eye
@@ -916,7 +1111,7 @@ ROM_START( tmosh )
 	GV_BIOS
 
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
-	ROM_LOAD( "tmosh.25c", 0x000000, 0x000080, NO_DUMP )
+	ROM_LOAD( "tmosh.25c", 0x000000, 0x000080, BAD_DUMP CRC(2f6a27fc) SHA1(4ead9313f07e9bf7aa0272dba59db6b21510e00b) ) // hand crafted
 
 	DISK_REGION( "scsi:4:cdrom" )
 	DISK_IMAGE_READONLY( "673jaa01", 0, SHA1(eaa76073749f9db48c1bee3dff9bea955683c8a8) )
@@ -958,17 +1153,17 @@ ROM_END
 // BIOS placeholder
 GAME( 1995, konamigv, 0,        konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Baby Phoenix/GV System", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", MACHINE_IMPERFECT_SOUND )
-GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", MACHINE_IMPERFECT_SOUND )
-GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", MACHINE_IMPERFECT_SOUND )
-GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND )
-GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, empty_init, ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, empty_init, ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, weddingr, konamigv, konamigv, weddingr, konamigv_state, empty_init, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1997, tmosh,    konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshs,   konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshspa, tmoshsp,  tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND)
-GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND)
-GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init, ROT0, "Konami", "The Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND)
+GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, empty_init,   ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, empty_init,   ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, weddingr, konamigv, konamigv, weddingr, konamigv_state, empty_init,   ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, tmosh,    konamigv, tmosh,    tmosh,    tokimeki_state, empty_init,   ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
+GAME( 1997, tmoshs,   konamigv, tmosh,    tmosh,    tokimeki_state, tmoshs_init,  ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
+GAME( 1997, tmoshsp,  konamigv, tmosh,    tmosh,    tokimeki_state, tmoshsp_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
+GAME( 1997, tmoshspa, tmoshsp,  tmosh,    tmosh,    tokimeki_state, tmoshsp_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
+GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND)
+GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, empty_init,   ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND)
+GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init,   ROT0, "Konami", "The Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND)
