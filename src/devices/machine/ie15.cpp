@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/ie15.h"
+#include "ie15.h"
 
 #include "emupal.h"
 

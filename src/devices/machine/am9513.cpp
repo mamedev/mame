@@ -27,7 +27,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/am9513.h"
+#include "am9513.h"
 
 #define LOG_MODE  (1U << 1)
 #define LOG_INPUT (1U << 2)

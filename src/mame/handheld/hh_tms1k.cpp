@@ -232,7 +232,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "cpu/tms1000/tms0970.h"
 #include "cpu/tms1000/tms0980.h"
 #include "machine/clock.h"
-#include "machine/ds8874.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -245,6 +244,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
 #include "sound/tms5110.h"
+#include "video/ds8874.h"
 #include "video/hlcd0515.h"
 #include "video/pwm.h"
 

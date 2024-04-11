@@ -95,7 +95,7 @@ History:
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/ins8250.h"
+#include "ins8250.h"
 
 #include <algorithm>
 

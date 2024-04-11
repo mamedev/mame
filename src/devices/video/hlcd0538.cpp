@@ -16,7 +16,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/hlcd0538.h"
+#include "hlcd0538.h"
 
 
 DEFINE_DEVICE_TYPE(HLCD0538, hlcd0538_device, "hlcd0538", "Hughes HLCD 0538 LCD Driver")

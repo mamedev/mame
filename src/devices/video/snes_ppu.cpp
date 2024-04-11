@@ -73,7 +73,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/snes_ppu.h"
+#include "snes_ppu.h"
 
 #define SNES_MAINSCREEN    0
 #define SNES_SUBSCREEN     1

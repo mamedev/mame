@@ -2,8 +2,7 @@
 // copyright-holders:Angelo Salese
 
 #include "emu.h"
-#include "machine/m6m80011ap.h"
-
+#include "m6m80011ap.h"
 
 
 //**************************************************************************

@@ -1339,18 +1339,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ds8874.h,MACHINES["DS8874"] = true
----------------------------------------------------
-
-if (MACHINES["DS8874"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/ds8874.cpp",
-		MAME_DIR .. "src/devices/machine/ds8874.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/e0516.h,MACHINES["E0516"] = true
 ---------------------------------------------------
 

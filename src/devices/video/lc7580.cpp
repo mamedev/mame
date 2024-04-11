@@ -14,7 +14,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/lc7580.h"
+#include "lc7580.h"
 
 #include <tuple>
 

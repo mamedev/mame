@@ -2,14 +2,14 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ticket.c
+    ticket.cpp
 
     Generic ticket dispensing device.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ticket.h"
+#include "ticket.h"
 
 
 //**************************************************************************

@@ -199,6 +199,18 @@ if (VIDEOS["DP8350"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/video/ds8874.h,VIDEOS["DS8874"] = true
+---------------------------------------------------
+
+if (VIDEOS["DS8874"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ds8874.cpp",
+		MAME_DIR .. "src/devices/video/ds8874.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/video/ef9340_1.h,VIDEOS["EF9340_1"] = true
