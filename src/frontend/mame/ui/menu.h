@@ -19,14 +19,27 @@
 #include "language.h"
 #include "render.h"
 
+#include "interface/uievents.h"
+
+#include <algorithm>
+#include <chrono>
+#include <cmath>
 #include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
+
+
+/***************************************************************************
+    FORWARD DECLARATIONS
+***************************************************************************/
+
+struct ui_event;
 
 
 namespace ui {
@@ -132,11 +145,10 @@ protected:
 	// menu-related events
 	struct event
 	{
-		void                *itemref;   // reference for the selected item or nullptr
-		menu_item           *item;      // selected item or nullptr
-		int                 iptkey;     // one of the IPT_* values from inptport.h
-		char32_t            unichar;    // unicode character if iptkey == IPT_SPECIAL
-		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
+		void        *itemref;   // reference for the selected item or nullptr
+		menu_item   *item;      // selected item or nullptr
+		int         iptkey;     // one of the IPT_* values from inpttype.h
+		char32_t    unichar;    // unicode character if iptkey == IPT_SPECIAL
 	};
 
 	menu(mame_ui_manager &mui, render_container &container);
@@ -181,10 +193,6 @@ protected:
 	void select_first_item();
 	void select_last_item();
 
-	int hover() const { return m_hover; }
-	void set_hover(int index) { m_hover = index; }
-	void clear_hover() { m_hover = m_items.size() + 1; }
-
 	// scroll position control
 	void set_top_line(int index) { top_line = (0 < index) ? (index - 1) : index; }
 	void centre_selection() { top_line = m_selected - (m_visible_lines / 2); }
@@ -196,6 +204,8 @@ protected:
 	float get_customtop() const { return m_customtop; }
 	float get_custombottom() const { return m_custombottom; }
 
+	std::pair<uint32_t, uint32_t> target_size() const { return m_last_size; }
+	float x_aspect() const { return m_last_aspect; }
 	float line_height() const { return m_line_height; }
 	float gutter_width() const { return m_gutter_width; }
 	float tb_border() const { return m_tb_border; }
@@ -281,7 +291,7 @@ protected:
 			std::string_view const &line(*it);
 			if (!line.empty())
 			{
-				text_layout layout(*ui().get_font(), text_size * m_last_aspect, text_size, 1.0, justify, wrap);
+				text_layout layout(*ui().get_font(), text_size * x_aspect(), text_size, 1.0, justify, wrap);
 				layout.add_text(line, rgb_t::white(), rgb_t::black());
 				maxwidth = (std::max)(layout.actual_width(), maxwidth);
 			}
@@ -328,36 +338,32 @@ protected:
 
 	// draw additional menu content
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect);
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
-	// map mouse to menu coordinates
-	void map_mouse();
+	// access to pointer state
+	bool have_pointer() const noexcept { return m_global_state.have_pointer(); }
+	bool pointer_idle() const noexcept { return (track_pointer::IDLE == m_pointer_state) && have_pointer(); }
+	bool pointer_in_rect(float x0, float y0, float x1, float y1) const noexcept { return m_global_state.pointer_in_rect(x0, y0, x1, y1); }
+	std::pair<float, float> pointer_location() const noexcept { return m_global_state.pointer_location(); }
+	osd::ui_event_handler::pointer pointer_type() const noexcept { return m_global_state.pointer_type(); }
 
-	// clear the mouse position
-	void ignore_mouse();
-
-	bool is_mouse_hit() const { return m_mouse_hit; }   // is mouse pointer inside menu's render container?
-	float get_mouse_x() const { return m_mouse_x; }     // mouse x location in menu coordinates
-	float get_mouse_y() const { return m_mouse_y; }     // mouse y location in menu coordinates
-
-	// mouse hit test - checks whether mouse_x is in [x0, x1) and mouse_y is in [y0, y1)
-	bool mouse_in_rect(float x0, float y0, float x1, float y1) const
-	{
-		return m_mouse_hit && (m_mouse_x >= x0) && (m_mouse_x < x1) && (m_mouse_y >= y0) && (m_mouse_y < y1);
-	}
+	// derived classes that override handle_events need to call these for pointer events
+	std::pair<int, bool> handle_pointer_update(uint32_t flags, ui_event const &uievt);
+	std::pair<int, bool> handle_pointer_leave(uint32_t flags, ui_event const &uievt);
+	std::pair<int, bool> handle_pointer_abort(uint32_t flags, ui_event const &uievt);
 
 	// overridable event handling
 	void set_process_flags(uint32_t flags) { m_process_flags = flags; }
-	virtual void handle_events(uint32_t flags, event &ev);
-	virtual void handle_keys(uint32_t flags, int &iptkey);
-	virtual bool custom_ui_back() { return false; }
-	virtual bool custom_mouse_down() { return false; }
-	virtual bool custom_mouse_scroll(int lines) { return false; }
+	virtual bool handle_events(uint32_t flags, event &ev);
+	virtual bool handle_keys(uint32_t flags, int &iptkey);
+	virtual bool custom_ui_back();
+	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt);
+	virtual bool custom_mouse_scroll(int lines);
 
 	// event notifications
-	virtual void menu_activated() { }
-	virtual void menu_deactivated() { }
-	virtual void menu_dismissed() { }
+	virtual void menu_activated();
+	virtual void menu_deactivated();
+	virtual void menu_dismissed();
 
 	static bool is_selectable(menu_item const &item)
 	{
@@ -371,7 +377,47 @@ protected:
 		return ((actual > min) ? FLAG_LEFT_ARROW : 0) | ((actual < max) ? FLAG_RIGHT_ARROW : 0);
 	}
 
+	static bool reentered_rect(float x0, float y0, float x1, float y1, float l, float t, float r, float b)
+	{
+		return
+				((x0 < l) || (x0 >= r) || (y0 < t) || (y0 >= b)) &&
+				((x1 >= l) && (x1 < r) && (y1 >= t) && (y1 < b));
+	}
+
+	std::pair<bool, bool> check_drag_conversion(float x, float y, float x_base, float y_base, float threshold) const
+	{
+		float const dx(std::abs((x - x_base) / x_aspect()));
+		float const dy(std::abs(y - y_base));
+		if ((dx > dy) && (dx >= threshold))
+			return std::make_pair(true, false);
+		else if ((dy >= dx) && (dy > threshold))
+			return std::make_pair(false, true);
+		else
+			return std::make_pair(false, false);
+	}
+
+	template <typename T>
+	static T drag_scroll(float location, float base, float &last, float unit, T start, T min, T max)
+	{
+		// set thresholds depending on the direction for hysteresis and clamp to valid range
+		T const target((location - (std::abs(unit) * ((location > last) ? 0.3F : -0.3F)) - base) / unit);
+		last = base + (float(target) * unit);
+		return std::clamp(start + target, min, max);
+	}
+
 private:
+	// pointer tracking state
+	enum class track_pointer
+	{
+		IDLE,
+		IGNORED,
+		COMPLETED,
+		CUSTOM,
+		TRACK_LINE,
+		SCROLL,
+		ADJUST
+	};
+
 	class global_state : public widgets_manager
 	{
 	public:
@@ -396,17 +442,43 @@ private:
 
 		uint32_t ui_handler(render_container &container);
 
+		bool have_pointer() const noexcept
+		{
+			return 0 <= m_current_pointer;
+		}
+		bool pointer_in_rect(float x0, float y0, float x1, float y1) const noexcept
+		{
+			return (m_pointer_x >= x0) && (m_pointer_x < x1) && (m_pointer_y >= y0) && (m_pointer_y < y1);
+		}
+		std::pair<float, float> pointer_location() const noexcept
+		{
+			return std::make_pair(m_pointer_x, m_pointer_y);
+		}
+		osd::ui_event_handler::pointer pointer_type() const noexcept
+		{
+			return m_pointer_type;
+		}
+
+		std::pair<bool, bool> use_pointer(render_target &target, render_container &container, ui_event const &event);
+
 	protected:
-		mame_ui_manager         &m_ui;
+		mame_ui_manager                 &m_ui;
 
 	private:
-		bitmap_ptr              m_bgrnd_bitmap;
-		texture_ptr             m_bgrnd_texture;
+		bitmap_ptr                      m_bgrnd_bitmap;
+		texture_ptr                     m_bgrnd_texture;
 
-		std::unique_ptr<menu>   m_stack;
-		std::unique_ptr<menu>   m_free;
+		std::unique_ptr<menu>           m_stack;
+		std::unique_ptr<menu>           m_free;
 
-		bool                    m_hide;
+		bool                            m_hide;
+
+		s32                             m_current_pointer;      // current active pointer ID or -1 if none
+		osd::ui_event_handler::pointer  m_pointer_type;         // current pointer type
+		u32                             m_pointer_buttons;      // depressed buttons for current pointer
+		float                           m_pointer_x;
+		float                           m_pointer_y;
+		bool                            m_pointer_hit;
 	};
 
 	// this is to satisfy the std::any requirement that objects be copyable
@@ -417,8 +489,15 @@ private:
 		global_state_wrapper(global_state_wrapper const &that) : global_state(that.m_ui) { }
 	};
 
-	// process a menu, drawing it and returning any interesting events
-	std::pair<const event *, bool> process();
+	// process a menu, returning any interesting events
+	std::pair<int, bool> handle_primary_down(uint32_t flags, ui_event const &uievt);
+	std::pair<int, bool> update_line_click(ui_event const &uievt);
+	bool update_drag_scroll(ui_event const &uievt);
+	std::pair<int, bool> update_drag_adjust(ui_event const &uievt);
+	std::pair<int, bool> check_touch_drag(ui_event const &uievt);
+
+	// drawing the menu
+	void do_draw_menu();
 	virtual void draw(uint32_t flags);
 
 	// request the specific handling of the game selection main menu
@@ -432,8 +511,11 @@ private:
 
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction);
 
+	bool check_metrics();
+	bool do_rebuild();
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= m_items.size(); }
+	void force_visible_selection();
 
 	// push a new menu onto the stack
 	static void stack_push(std::unique_ptr<menu> &&menu) { menu->m_global_state.stack_push(std::move(menu)); }
@@ -464,26 +546,35 @@ private:
 	float                   m_lr_arrow_width;
 	float                   m_ud_arrow_width;
 
+	float                   m_items_left;           // left of the area where the items are drawn
+	float                   m_items_right;          // right of the area where the items are drawn
+	float                   m_items_top;            // top of the area where the items are drawn
+	float                   m_adjust_top;           // top of the "increase"/"decrease" arrows
+	float                   m_adjust_bottom;        // bottom of the "increase"/"decrease" arrows
+	float                   m_decrease_left;        // left of the "decrease" arrow
+	float                   m_increase_left;        // left of the "increase" arrow
+	bool                    m_show_up_arrow;        // are we showing the "scroll up" arrow?
+	bool                    m_show_down_arrow;      // are we showing the "scroll down" arrow?
+	bool                    m_items_drawn;          // have we drawn the items at least once?
+
+	track_pointer           m_pointer_state;        // tracking state for currently active pointer
+	std::pair<float, float> m_pointer_down;         // start location of tracked pointer action
+	std::pair<float, float> m_pointer_updated;      // location where pointer tracking was updated
+	int                     m_pointer_line;         // the line we're tracking pointer motion in
+	std::chrono::steady_clock::time_point m_pointer_repeat;
+
 	uint32_t                m_process_flags;        // event processing options
 	int                     m_selected;             // which item is selected
-	int                     m_hover;                // which item is being hovered over
 	bool                    m_special_main_menu;    // true if no real emulation running under the menu
 	bool                    m_one_shot;             // true for menus outside the normal stack
 	bool                    m_needs_prev_menu_item; // true to automatically create item to dismiss menu
 	bool                    m_active;               // whether the menu is currently visible and topmost
-
-	event                   m_event;                // the UI event that occurred
 
 	float                   m_customtop;            // amount of extra height to add at the top
 	float                   m_custombottom;         // amount of extra height to add at the bottom
 
 	int                     m_resetpos;             // item index to select after repopulating
 	void                    *m_resetref;            // item reference value to select after repopulating
-
-	bool                    m_mouse_hit;
-	bool                    m_mouse_button;
-	float                   m_mouse_x;
-	float                   m_mouse_y;
 };
 
 

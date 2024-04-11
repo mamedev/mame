@@ -57,6 +57,7 @@
 #include "util/xmlfile.h"
 
 #include <algorithm>
+#include <limits>
 
 
 
@@ -97,6 +98,40 @@ struct render_target::object_transform
 	int                 orientation;        // orientation transform
 	bool                no_center;          // center the container?
 };
+
+
+struct render_target::pointer_info
+{
+	pointer_info() noexcept
+		: type(osd::ui_event_handler::pointer::UNKNOWN)
+		, oldpos(std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
+		, newpos(std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
+		, oldbuttons(0U)
+		, newbuttons(0U)
+		, edges(0U, 0U)
+	{
+	}
+
+	osd::ui_event_handler::pointer type;
+	std::pair<float, float> oldpos;
+	std::pair<float, float> newpos;
+	u32 oldbuttons, newbuttons;
+	std::pair<size_t, size_t> edges;
+};
+
+
+struct render_target::hit_test
+{
+	hit_test() noexcept
+		: inbounds(0U, 0U)
+		, hit(0U)
+	{
+	}
+
+	std::pair<u64, u64> inbounds;
+	u64 hit;
+};
+
 
 
 
@@ -883,19 +918,21 @@ render_container::user_settings::user_settings()
 //  render_target - constructor
 //-------------------------------------------------
 
-render_target::render_target(render_manager &manager, const internal_layout *layoutfile, u32 flags)
-	: render_target(manager, layoutfile, flags, CONSTRUCTOR_IMPL)
+render_target::render_target(render_manager &manager, render_container *ui, const internal_layout *layoutfile, u32 flags)
+	: render_target(manager, ui, layoutfile, flags, CONSTRUCTOR_IMPL)
 {
 }
 
-render_target::render_target(render_manager &manager, util::xml::data_node const &layout, u32 flags)
-	: render_target(manager, layout, flags, CONSTRUCTOR_IMPL)
+render_target::render_target(render_manager &manager, render_container *ui, util::xml::data_node const &layout, u32 flags)
+	: render_target(manager, ui, layout, flags, CONSTRUCTOR_IMPL)
 {
 }
 
-template <typename T> render_target::render_target(render_manager &manager, T &&layout, u32 flags, constructor_impl_t)
+template <typename T>
+render_target::render_target(render_manager &manager, render_container *ui, T &&layout, u32 flags, constructor_impl_t)
 	: m_next(nullptr)
 	, m_manager(manager)
+	, m_ui_container(ui)
 	, m_curview(0U)
 	, m_flags(flags)
 	, m_listindex(0)
@@ -1030,9 +1067,12 @@ void render_target::set_view(unsigned viewindex)
 {
 	if (m_views.size() > viewindex)
 	{
+		forget_pointers();
 		m_curview = viewindex;
 		current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
 		current_view().preload();
+		m_clickable_items.clear();
+		m_clickable_items.resize(current_view().interactive_items().size());
 	}
 }
 
@@ -1050,6 +1090,229 @@ void render_target::set_max_texture_size(int maxwidth, int maxheight)
 
 
 //-------------------------------------------------
+//  pointer_updated - pointer activity within
+//  target
+//-------------------------------------------------
+
+void render_target::pointer_updated(
+		osd::ui_event_handler::pointer type,
+		u16 ptrid,
+		u16 device,
+		s32 x,
+		s32 y,
+		u32 buttons,
+		u32 pressed,
+		u32 released,
+		s16 clicks)
+{
+	auto const target_f(map_point_layout(x, y));
+	current_view().pointer_updated(type, ptrid, device, target_f.first, target_f.second, buttons, pressed, released, clicks);
+
+	// 64 pointers ought to be enough for anyone
+	if (64 <= ptrid)
+		return;
+
+	// just store the updated pointer state
+	if (m_pointers.size() <= ptrid)
+		m_pointers.resize(ptrid + 1);
+	m_pointers[ptrid].type = type;
+	m_pointers[ptrid].newpos = target_f;
+	m_pointers[ptrid].newbuttons = buttons;
+}
+
+
+//-------------------------------------------------
+//  pointer_left - pointer left target normally
+//-------------------------------------------------
+
+void render_target::pointer_left(
+		osd::ui_event_handler::pointer type,
+		u16 ptrid,
+		u16 device,
+		s32 x,
+		s32 y,
+		u32 released,
+		s16 clicks)
+{
+	auto const target_f(map_point_layout(x, y));
+	current_view().pointer_left(type, ptrid, device, target_f.first, target_f.second, released, clicks);
+
+	// store the updated state if relevant
+	if (m_pointers.size() > ptrid)
+	{
+		m_pointers[ptrid].newpos = std::make_pair(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
+		m_pointers[ptrid].newbuttons = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  pointer_aborted - pointer left target
+//  abnormally
+//-------------------------------------------------
+
+void render_target::pointer_aborted(
+		osd::ui_event_handler::pointer type,
+		u16 ptrid,
+		u16 device,
+		s32 x,
+		s32 y,
+		u32 released,
+		s16 clicks)
+{
+	// let layout scripts handle pointer input
+	auto const target_f(map_point_layout(x, y));
+	current_view().pointer_aborted(type, ptrid, device, target_f.first, target_f.second, released, clicks);
+
+	// store the updated state if relevant
+	if (m_pointers.size() > ptrid)
+	{
+		m_pointers[ptrid].newpos = std::make_pair(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
+		m_pointers[ptrid].newbuttons = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  forget_pointers - stop processing pointer
+//  input
+//-------------------------------------------------
+
+void render_target::forget_pointers()
+{
+	current_view().forget_pointers();
+	m_pointers.clear();
+	for (size_t i = 0; m_clickable_items.size() > i; ++i)
+	{
+		if (m_clickable_items[i].hit)
+		{
+			layout_view_item const &item(current_view().interactive_items()[i]);
+			auto const [port, mask] = item.input_tag_and_mask();
+			ioport_field *const field(port ? port->field(mask) : nullptr);
+			if (field)
+				field->set_value(0);
+		}
+		m_clickable_items[i] = hit_test();
+	}
+}
+
+
+//-------------------------------------------------
+//  update_pointer_fields - update inputs for new
+//  pointer state
+//-------------------------------------------------
+
+void render_target::update_pointer_fields()
+{
+	auto const &x_edges(current_view().interactive_edges_x());
+	auto const &y_edges(current_view().interactive_edges_y());
+
+	// update items bounds intersection checks for pointers
+	for (size_t ptr = 0; m_pointers.size() > ptr; ++ptr)
+	{
+		auto const [x, y] = m_pointers[ptr].newpos;
+		auto edges = m_pointers[ptr].edges;
+
+		// check for moving across horizontal edges
+		if (x < m_pointers[ptr].oldpos.first)
+		{
+			while (edges.first && (x < x_edges[edges.first - 1].position()))
+			{
+				--edges.first;
+				auto const &edge(x_edges[edges.first]);
+				if (edge.trailing())
+					m_clickable_items[edge.index()].inbounds.first |= u64(1) << ptr;
+				else
+					m_clickable_items[edge.index()].inbounds.first &= ~(u64(1) << ptr);
+			}
+		}
+		else if (x > m_pointers[ptr].oldpos.first)
+		{
+			while ((x_edges.size() > edges.first) && (x >= x_edges[edges.first].position()))
+			{
+				auto const &edge(x_edges[edges.first]);
+				if (edge.trailing())
+					m_clickable_items[edge.index()].inbounds.first &= ~(u64(1) << ptr);
+				else
+					m_clickable_items[edge.index()].inbounds.first |= u64(1) << ptr;
+				++edges.first;
+			}
+		}
+
+		// check for moving across vertical edges
+		if (y < m_pointers[ptr].oldpos.second)
+		{
+			while (edges.second && (y < y_edges[edges.second - 1].position()))
+			{
+				--edges.second;
+				auto const &edge(y_edges[edges.second]);
+				if (edge.trailing())
+					m_clickable_items[edge.index()].inbounds.second |= u64(1) << ptr;
+				else
+					m_clickable_items[edge.index()].inbounds.second &= ~(u64(1) << ptr);
+			}
+		}
+		else if (y > m_pointers[ptr].oldpos.second)
+		{
+			while ((y_edges.size() > edges.second) && (y >= y_edges[edges.second].position()))
+			{
+				auto const &edge(y_edges[edges.second]);
+				if (edge.trailing())
+					m_clickable_items[edge.index()].inbounds.second &= ~(u64(1) << ptr);
+				else
+					m_clickable_items[edge.index()].inbounds.second |= u64(1) << ptr;
+				++edges.second;
+			}
+		}
+
+		// update the pointer's state
+		m_pointers[ptr].oldpos = m_pointers[ptr].newpos;
+		m_pointers[ptr].oldbuttons = m_pointers[ptr].newbuttons;
+		m_pointers[ptr].edges = edges;
+	}
+
+	// update item hit states
+	u64 obscured(0U);
+	for (size_t i = 0; m_clickable_items.size() > i; ++i)
+	{
+		layout_view_item const &item(current_view().interactive_items()[i]);
+		u64 const inbounds(m_clickable_items[i].inbounds.first & m_clickable_items[i].inbounds.second);
+		u64 hit(m_clickable_items[i].hit);
+		for (unsigned ptr = 0; m_pointers.size() > ptr; ++ptr)
+		{
+			pointer_info const &pointer(m_pointers[ptr]);
+			bool const prefilter(BIT(~obscured & inbounds, ptr));
+			if (!prefilter || !BIT(pointer.newbuttons, 0) || !item.bounds().includes(pointer.newpos.first, pointer.newpos.second))
+			{
+				hit &= ~(u64(1) << ptr);
+			}
+			else
+			{
+				hit |= u64(1) << ptr;
+				if (!item.clickthrough())
+					obscured |= u64(1) << ptr;
+			}
+		}
+
+		// update field state
+		if (bool(hit) != bool(m_clickable_items[i].hit))
+		{
+			auto const [port, mask] = item.input_tag_and_mask();
+			ioport_field *const field(port ? port->field(mask) : nullptr);
+			if (field)
+			{
+				if (hit)
+					field->set_value(1);
+				else
+					field->clear_value();
+			}
+		}
+		m_clickable_items[i].hit = hit;
+	}
+}
+
+
+//-------------------------------------------------
 //  set_visibility_toggle - show or hide selected
 //  parts of a view
 //-------------------------------------------------
@@ -1061,7 +1324,7 @@ void render_target::set_visibility_toggle(unsigned index, bool enable)
 		m_views[m_curview].second |= u32(1) << index;
 	else
 		m_views[m_curview].second &= ~(u32(1) << index);
-	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+	update_layer_config();
 	current_view().preload();
 }
 
@@ -1454,8 +1717,8 @@ render_primitive_list &render_target::get_primitives()
 		}
 	}
 
-	// process the UI if we are the UI target
-	if (is_ui_target())
+	// process UI elements if applicable
+	if (m_ui_container)
 	{
 		// compute the transform for the UI
 		object_transform ui_xform;
@@ -1468,7 +1731,7 @@ render_primitive_list &render_target::get_primitives()
 		ui_xform.no_center = false;
 
 		// add UI elements
-		add_container_primitives(list, root_xform, ui_xform, m_manager.ui_container(), BLENDMODE_ALPHA);
+		add_container_primitives(list, root_xform, ui_xform, *m_ui_container, BLENDMODE_ALPHA);
 	}
 
 	// optimize the list before handing it off
@@ -1489,7 +1752,7 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
 
 	// explicitly check for the UI container
-	if (&container == &m_manager.ui_container())
+	if (&container == m_ui_container)
 	{
 		// this hit test went against the UI container
 		if ((target_f.first >= 0.0f) && (target_f.first < 1.0f) && (target_f.second >= 0.0f) && (target_f.second < 1.0f))
@@ -1536,74 +1799,6 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 
 
 //-------------------------------------------------
-//  map_point_input - attempts to map a point on
-//  the specified render_target to an input port
-//  field, if possible
-//-------------------------------------------------
-
-bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
-{
-	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
-	if (m_orientation & ORIENTATION_FLIP_X)
-		target_f.first = 1.0f - target_f.first;
-	if (m_orientation & ORIENTATION_FLIP_Y)
-		target_f.second = 1.0f - target_f.second;
-	if (m_orientation & ORIENTATION_SWAP_XY)
-		std::swap(target_f.first, target_f.second);
-
-	auto const &items(current_view().interactive_items());
-	m_hit_test.resize(items.size() * 2);
-	std::fill(m_hit_test.begin(), m_hit_test.end(), false);
-
-	for (auto const &edge : current_view().interactive_edges_x())
-	{
-		if ((edge.position() > target_f.first) || ((edge.position() == target_f.first) && edge.trailing()))
-			break;
-		else
-			m_hit_test[edge.index()] = !edge.trailing();
-	}
-
-	for (auto const &edge : current_view().interactive_edges_y())
-	{
-		if ((edge.position() > target_f.second) || ((edge.position() == target_f.second) && edge.trailing()))
-			break;
-		else
-			m_hit_test[items.size() + edge.index()] = !edge.trailing();
-	}
-
-	for (unsigned i = 0; items.size() > i; ++i)
-	{
-		if (m_hit_test[i] && m_hit_test[items.size() + i])
-		{
-			layout_view_item &item(items[i]);
-			render_bounds const bounds(item.bounds());
-			if (bounds.includes(target_f.first, target_f.second))
-			{
-				if (item.has_input())
-				{
-					// point successfully mapped
-					std::tie(input_port, input_mask) = item.input_tag_and_mask();
-					input_x = (target_f.first - bounds.x0) / bounds.width();
-					input_y = (target_f.second - bounds.y0) / bounds.height();
-					return true;
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-	}
-
-	// default to point not mapped
-	input_port = nullptr;
-	input_mask = 0;
-	input_x = input_y = -1.0f;
-	return false;
-}
-
-
-//-------------------------------------------------
 //  invalidate_all - if any of our primitive lists
 //  contain a reference to the given pointer,
 //  clear them
@@ -1632,7 +1827,7 @@ void render_target::resolve_tags()
 	for (layout_file &file : m_filelist)
 		file.resolve_tags();
 
-	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+	update_layer_config();
 	current_view().preload();
 }
 
@@ -1644,7 +1839,10 @@ void render_target::resolve_tags()
 
 void render_target::update_layer_config()
 {
+	forget_pointers();
 	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+	m_clickable_items.clear();
+	m_clickable_items.resize(current_view().interactive_items().size());
 }
 
 
@@ -2620,6 +2818,25 @@ std::pair<float, float> render_target::map_point_internal(s32 target_x, s32 targ
 
 
 //-------------------------------------------------
+//  map_point_layout - map point from screen
+//  coordinates to layout coordinates
+//-------------------------------------------------
+
+std::pair<float, float> render_target::map_point_layout(s32 target_x, s32 target_y)
+{
+	using std::swap;
+	std::pair<float, float> result(map_point_internal(target_x, target_y));
+	if (m_orientation & ORIENTATION_FLIP_X)
+		result.first = 1.0f - result.first;
+	if (m_orientation & ORIENTATION_FLIP_Y)
+		result.second = 1.0f - result.second;
+	if (m_orientation & ORIENTATION_SWAP_XY)
+		swap(result.first, result.second);
+	return result;
+}
+
+
+//-------------------------------------------------
 //  view_name - return the name of the indexed
 //  view, or nullptr if it doesn't exist
 //-------------------------------------------------
@@ -2698,12 +2915,11 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 		set_orientation(orientation_add(rotate, orientation()));
 
 		// apply the opposite orientation to the UI
-		if (is_ui_target())
+		if (m_ui_container)
 		{
-			render_container &ui_container = m_manager.ui_container();
-			render_container::user_settings settings = ui_container.get_user_settings();
+			render_container::user_settings settings = m_ui_container->get_user_settings();
 			settings.m_orientation = orientation_add(orientation_reverse(rotate), settings.m_orientation);
-			ui_container.set_user_settings(settings);
+			m_ui_container->set_user_settings(settings);
 		}
 	}
 
@@ -2743,6 +2959,8 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 		{
 			current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
 			current_view().preload();
+			m_clickable_items.clear();
+			m_clickable_items.resize(current_view().interactive_items().size());
 		}
 	}
 }
@@ -3104,7 +3322,6 @@ render_manager::render_manager(running_machine &machine)
 	, m_ui_target(nullptr)
 	, m_live_textures(0)
 	, m_texture_id(0)
-	, m_ui_container(std::make_unique<render_container>(*this))
 {
 	// register callbacks
 	machine.configuration().config_register(
@@ -3125,7 +3342,7 @@ render_manager::render_manager(running_machine &machine)
 render_manager::~render_manager()
 {
 	// free all the containers since they may own textures
-	m_ui_container.reset();
+	m_ui_containers.clear();
 	m_screen_container_list.clear();
 
 	// better not be any outstanding textures when we die
@@ -3181,12 +3398,14 @@ float render_manager::max_update_rate() const
 
 render_target *render_manager::target_alloc(const internal_layout *layoutfile, u32 flags)
 {
-	return &m_targetlist.append(*new render_target(*this, layoutfile, flags));
+	render_container *const ui = (flags & RENDER_CREATE_HIDDEN) ? nullptr : &m_ui_containers.emplace_back(*this);
+	return &m_targetlist.append(*new render_target(*this, ui, layoutfile, flags));
 }
 
 render_target *render_manager::target_alloc(util::xml::data_node const &layout, u32 flags)
 {
-	return &m_targetlist.append(*new render_target(*this, layout, flags));
+	render_container *const ui = (flags & RENDER_CREATE_HIDDEN) ? nullptr : &m_ui_containers.emplace_back(*this);
+	return &m_targetlist.append(*new render_target(*this, ui, layout, flags));
 }
 
 
@@ -3223,35 +3442,56 @@ render_target *render_manager::target_by_index(int index) const
 
 float render_manager::ui_aspect(render_container *rc)
 {
-	int orient;
+	// work out if this is a UI container
+	render_target *target = nullptr;
+	if (!rc)
+	{
+		target = &ui_target();
+		rc = target->ui_container();
+		assert(rc);
+	}
+	else
+	{
+		for (render_target &t : m_targetlist)
+		{
+			if (t.ui_container() == rc)
+			{
+				target = &t;
+				break;
+			}
+		}
+	}
+
 	float aspect;
 
-	if (rc == m_ui_container.get() || rc == nullptr) {
-		// ui container, aggregated multi-screen target
+	if (target)
+	{
+		// UI container, aggregated multi-screen target
 
-		orient = orientation_add(m_ui_target->orientation(), m_ui_container->orientation());
 		// based on the orientation of the target, compute height/width or width/height
+		int const orient = orientation_add(target->orientation(), rc->orientation());
 		if (!(orient & ORIENTATION_SWAP_XY))
-				aspect = (float)m_ui_target->height() / (float)m_ui_target->width();
+			aspect = float(target->height()) / float(target->width());
 		else
-				aspect = (float)m_ui_target->width() / (float)m_ui_target->height();
+			aspect = float(target->width()) / float(target->height());
 
 		// if we have a valid pixel aspect, apply that and return
-		if (m_ui_target->pixel_aspect() != 0.0f)
+		if (target->pixel_aspect() != 0.0f)
 		{
-			float pixel_aspect = m_ui_target->pixel_aspect();
+			float pixel_aspect = target->pixel_aspect();
 
 			if (orient & ORIENTATION_SWAP_XY)
 				pixel_aspect = 1.0f / pixel_aspect;
 
 			return aspect /= pixel_aspect;
 		}
-
-	} else {
+	}
+	else
+	{
 		// single screen container
 
-		orient = rc->orientation();
 		// based on the orientation of the target, compute height/width or width/height
+		int const orient = rc->orientation();
 		if (!(orient & ORIENTATION_SWAP_XY))
 			aspect = (float)rc->screen()->visible_area().height() / (float)rc->screen()->visible_area().width();
 		else

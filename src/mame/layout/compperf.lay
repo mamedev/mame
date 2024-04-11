@@ -158,9 +158,9 @@ authors:hap
 		<element ref="whited" inputtag="IN.1" inputmask="0x0c" inputraw="yes"><bounds xc="116" yc="111" width="3.5" height="3.5" /></element>
 
 		<!-- block clickable input -->
-		<element ref="nothing" inputtag="IN.1" inputmask="0x00" inputraw="yes"><bounds xc="89.5" yc="114.5" width="20" height="3" /></element>
-		<element ref="nothing" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds xc="106" yc="125.5" width="20" height="3" /></element>
-		<element ref="nothing" inputtag="IN.1" inputmask="0x00" inputraw="yes"><bounds xc="122" yc="114.5" width="20" height="3" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="89.5" yc="114.5" width="20" height="3" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="106" yc="125.5" width="20" height="3" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="122" yc="114.5" width="20" height="3" /></element>
 
 		<element ref="switch1" inputtag="IN.1" inputmask="0x03" inputraw="yes"><bounds xc="89.5" yc="114.5" width="20" height="3" /></element>
 		<element ref="switch2" inputtag="IN.0" inputmask="0x07" inputraw="yes"><bounds xc="106" yc="125.5" width="20" height="3" /></element>

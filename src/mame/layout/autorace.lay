@@ -61,7 +61,7 @@ authors:hap
 		<!-- bezel -->
 		<element ref="lane"><bounds x="18.69" y="9.7" width="2.62" height="24" /></element>
 
-		<element ref="white" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
+		<element ref="white" clickthrough="no"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
 		<collection name="Gear Position">
 			<element ref="gear" inputtag="IN.0" inputmask="0x0c" inputraw="yes"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
 		</collection>

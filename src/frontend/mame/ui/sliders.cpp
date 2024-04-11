@@ -255,11 +255,10 @@ void menu_sliders::recompute_metrics(uint32_t width, uint32_t height, float aspe
 
 
 //-------------------------------------------------
-//  menu_sliders_custom_render - perform our special
-//  rendering
+//  custom_render - perform our special rendering
 //-------------------------------------------------
 
-void menu_sliders::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_sliders::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	const slider_state *curslider = (const slider_state *)selectedref;
 	if (curslider != nullptr)

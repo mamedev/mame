@@ -30,7 +30,8 @@ enum input_event
 	INPUT_EVENT_RAWINPUT,
 	INPUT_EVENT_ARRIVAL,
 	INPUT_EVENT_REMOVAL,
-	INPUT_EVENT_MOUSE_BUTTON
+	INPUT_EVENT_MOUSE_BUTTON,
+	INPUT_EVENT_MOUSE_WHEEL
 };
 
 struct KeyPressEventArgs
@@ -40,10 +41,12 @@ struct KeyPressEventArgs
 	uint8_t scancode;
 };
 
-struct MouseButtonEventArgs
+struct MouseUpdateEventArgs
 {
-	int button;
-	int keydown;
+	unsigned pressed;
+	unsigned released;
+	int vdelta;
+	int hdelta;
 	int xpos;
 	int ypos;
 };

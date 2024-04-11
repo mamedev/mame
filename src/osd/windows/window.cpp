@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
 //  window.cpp - Win32 window handling
@@ -64,6 +64,29 @@
 #define WM_USER_SET_MINSIZE             (WM_USER + 5)
 
 
+namespace {
+
+constexpr unsigned get_pointer_buttons(WPARAM wparam)
+{
+	return
+			(IS_POINTER_FIRSTBUTTON_WPARAM(wparam) ? 0x01 : 0x00) |
+			(IS_POINTER_SECONDBUTTON_WPARAM(wparam) ? 0x02 : 0x00) |
+			(IS_POINTER_THIRDBUTTON_WPARAM(wparam) ? 0x04 : 0x00) |
+			(IS_POINTER_FOURTHBUTTON_WPARAM(wparam) ? 0x08 : 0x00) |
+			(IS_POINTER_FIFTHBUTTON_WPARAM(wparam) ? 0x10 : 0x00);
+}
+
+constexpr osd::ui_event_handler::pointer convert_pointer_type(POINTER_INPUT_TYPE type)
+{
+	// PT_POINTER isn't a real type, and we'll leave PT_TOUCHPAD as unknown for now
+	return
+			(PT_TOUCH == type) ? osd::ui_event_handler::pointer::TOUCH :
+			(PT_PEN == type) ? osd::ui_event_handler::pointer::PEN :
+			(PT_MOUSE == type) ? osd::ui_event_handler::pointer::MOUSE :
+			osd::ui_event_handler::pointer::UNKNOWN;
+}
+
+} // anonymous namespace
 
 //============================================================
 //  GLOBAL VARIABLES
@@ -190,6 +213,14 @@ void windows_osd_interface::window_exit()
 }
 
 
+inline win_window_info::win_pointer_info::win_pointer_info(WORD p, POINTER_INPUT_TYPE t, unsigned i, unsigned d)
+	: pointer_info(i, d)
+	, ptrid(p)
+	, type(t)
+{
+}
+
+
 win_window_info::win_window_info(
 		running_machine &machine,
 		render_module &renderprovider,
@@ -216,6 +247,10 @@ win_window_info::win_window_info(
 	, m_resize_state(RESIZE_STATE_NORMAL)
 	, m_main(nullptr)
 	, m_attached_mode(false)
+	, m_pointer_mask(0)
+	, m_next_pointer(0)
+	, m_next_ptrdev(0)
+	, m_tracking_mouse(false)
 {
 	m_non_fullscreen_bounds.left = 0;
 	m_non_fullscreen_bounds.top = 0;
@@ -224,6 +259,10 @@ win_window_info::win_window_info(
 
 	m_fullscreen = !video_config.windowed;
 	m_prescale = video_config.prescale;
+
+	m_ptrdev_map.reserve(8);
+	m_ptrdev_info.reserve(1);
+	m_active_pointers.reserve(16);
 }
 
 POINT win_window_info::s_saved_cursor_pos = { -1, -1 };
@@ -314,15 +353,35 @@ static bool is_mame_window(HWND hwnd)
 
 inline static BOOL handle_mouse_button(windows_osd_interface *osd, int button, int down, int x, int y)
 {
-	MouseButtonEventArgs args;
-	args.button = button;
-	args.keydown = down;
+	MouseUpdateEventArgs args;
+	args.pressed = (down ? 1 : 0) << button;
+	args.released = (down ? 0 : 1) << button;
+	args.vdelta = 0;
+	args.hdelta = 0;
 	args.xpos = x;
 	args.ypos = y;
 
 	bool handled = osd->handle_input_event(INPUT_EVENT_MOUSE_BUTTON, &args);
 
 	// When in lightgun mode or mouse mode, the mouse click may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd->options().lightgun() && !osd->options().mouse();
+}
+
+inline static BOOL handle_mouse_wheel(windows_osd_interface *osd, int v, int h, int x, int y)
+{
+	MouseUpdateEventArgs args;
+	args.pressed = 0;
+	args.released = 0;
+	args.vdelta = v;
+	args.hdelta = h;
+	args.xpos = x;
+	args.ypos = y;
+
+	bool handled = osd->handle_input_event(INPUT_EVENT_MOUSE_WHEEL, &args);
+
+	// When in lightgun mode or mouse mode, the mouse wheel may be routed to the input system
 	// because the mouse interactions in the UI are routed from the video_window_proc below
 	// we need to make sure they aren't suppressed in these cases.
 	return handled && !osd->options().lightgun() && !osd->options().mouse();
@@ -406,6 +465,15 @@ void windows_osd_interface::process_events(bool ingame, bool nodispatch)
 
 					case WM_XBUTTONUP:
 						dispatch = !handle_mouse_button(this, 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					// forward mouse wheel movement to the input system
+					case WM_MOUSEWHEEL:
+						dispatch = !handle_mouse_wheel(this, GET_WHEEL_DELTA_WPARAM(message.wParam), 0, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_MOUSEHWHEEL:
+						dispatch = !handle_mouse_wheel(this, 0, GET_WHEEL_DELTA_WPARAM(message.wParam), GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_KEYDOWN:
@@ -1066,49 +1134,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	case WM_SYSKEYDOWN:
 		break;
 
-	// input events
-	case WM_MOUSEMOVE:
-		window->machine().ui_input().push_mouse_move_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-		break;
-
-	case WM_MOUSELEAVE:
-		window->machine().ui_input().push_mouse_leave_event(window->target());
-		break;
-
-	case WM_LBUTTONDOWN:
-		{
-			auto const ticks = std::chrono::steady_clock::now();
-			window->machine().ui_input().push_mouse_down_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-
-			// check for a double-click - avoid overflow by adding times rather than subtracting
-			if (ticks < (window->m_lastclicktime + std::chrono::milliseconds(GetDoubleClickTime())) &&
-				GET_X_LPARAM(lparam) >= window->m_lastclickx - 4 && GET_X_LPARAM(lparam) <= window->m_lastclickx + 4 &&
-				GET_Y_LPARAM(lparam) >= window->m_lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->m_lastclicky + 4)
-			{
-				window->m_lastclicktime = std::chrono::steady_clock::time_point::min();
-				window->machine().ui_input().push_mouse_double_click_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-			}
-			else
-			{
-				window->m_lastclicktime = ticks;
-				window->m_lastclickx = GET_X_LPARAM(lparam);
-				window->m_lastclicky = GET_Y_LPARAM(lparam);
-			}
-		}
-		break;
-
-	case WM_LBUTTONUP:
-		window->machine().ui_input().push_mouse_up_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-		break;
-
-	case WM_RBUTTONDOWN:
-		window->machine().ui_input().push_mouse_rdown_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-		break;
-
-	case WM_RBUTTONUP:
-		window->machine().ui_input().push_mouse_rup_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-		break;
-
+	// text input events
 	case WM_CHAR:
 		{
 			char16_t const ch = char16_t(wparam);
@@ -1140,12 +1166,59 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			window->machine().ui_input().push_char_event(window->target(), char32_t(wparam));
 		break;
 
+	// legacy mouse events
+	case WM_MOUSEMOVE:
+		window->mouse_updated(wparam, lparam);
+		break;
+
+	case WM_MOUSELEAVE:
+		window->mouse_left(wparam, lparam);
+		break;
+
+	case WM_LBUTTONDOWN:
+		window->mouse_updated(wparam, lparam);
+		break;
+
+	case WM_LBUTTONUP:
+		window->mouse_updated(wparam, lparam);
+		break;
+
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+		window->mouse_updated(wparam, lparam);
+		break;
+
+	case WM_XBUTTONDOWN:
+	case WM_XBUTTONUP:
+		window->mouse_updated(wparam, lparam);
+		return TRUE;
+
 	case WM_MOUSEWHEEL:
 		{
+			POINT where{ GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam) };
+			ScreenToClient(wnd, &where);
 			UINT ucNumLines = 3; // default
 			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
-			window->machine().ui_input().push_mouse_wheel_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
+			window->machine().ui_input().push_mouse_wheel_event(window->target(), where.x, where.y, GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
 		}
+		break;
+
+	// new-style pointer handling (mouse/pen/touch)
+	case WM_POINTERENTER:
+		window->pointer_entered(wparam, lparam);
+		break;
+	case WM_POINTERLEAVE:
+		window->pointer_left(wparam, lparam);
+		break;
+	case WM_POINTERDOWN:
+	case WM_POINTERUP:
+	case WM_POINTERUPDATE:
+		window->pointer_updated(wparam, lparam);
+		break;
+	case WM_POINTERCAPTURECHANGED:
+		window->pointer_capture_changed(wparam, lparam);
 		break;
 
 	// pause the system when we start a menu or resize
@@ -1834,11 +1907,405 @@ win_window_focus win_window_info::focus() const
 }
 
 
+void win_window_info::pointer_entered(WPARAM wparam, LPARAM lparam)
+{
+	assert(!IS_POINTER_CANCELED_WPARAM(wparam));
+	auto const info(map_pointer(wparam));
+	if (m_active_pointers.end() != info)
+	{
+		POINT where{ GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam) };
+		ScreenToClient(platform_window(), &where);
+		info->x = where.x;
+		info->y = where.y;
+		machine().ui_input().push_pointer_update(
+				target(),
+				convert_pointer_type(info->type),
+				info->index,
+				info->device,
+				where.x, where.y,
+				0U, 0U, 0U, 0U);
+	}
+}
+
+void win_window_info::pointer_left(WPARAM wparam, LPARAM lparam)
+{
+	auto const info(find_pointer(wparam));
+	if (m_active_pointers.end() != info)
+	{
+		bool const canceled(IS_POINTER_CANCELED_WPARAM(wparam));
+		POINT where{ GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam) };
+		ScreenToClient(platform_window(), &where);
+		expire_pointer(info, where, canceled);
+	}
+}
+
+void win_window_info::pointer_updated(WPARAM wparam, LPARAM lparam)
+{
+	bool const canceled(IS_POINTER_CANCELED_WPARAM(wparam));
+	auto const info(canceled ? find_pointer(wparam) : map_pointer(wparam));
+	if (m_active_pointers.end() != info)
+	{
+		POINT where{ GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam) };
+		ScreenToClient(platform_window(), &where);
+		unsigned const buttons(canceled ? 0 : get_pointer_buttons(wparam));
+		update_pointer(*info, where, buttons, canceled);
+	}
+}
+
+void win_window_info::pointer_capture_changed(WPARAM wparam, LPARAM lparam)
+{
+	auto const info(find_pointer(wparam));
+	if (m_active_pointers.end() != info)
+	{
+		// treat this as the pointer being stolen - fail any gestures
+		if (BIT(info->buttons, 0))
+		{
+			assert(0 <= info->clickcnt);
+			info->clickcnt = -info->clickcnt;
+		}
+
+		// push to UI manager and dump pointer data
+		machine().ui_input().push_pointer_abort(
+				target(),
+				convert_pointer_type(info->type),
+				info->index,
+				info->device,
+				info->x, info->y,
+				info->buttons, info->clickcnt);
+		m_pointer_mask &= ~(decltype(m_pointer_mask)(1) << info->index);
+		if (info->index < m_next_pointer)
+			m_next_pointer = info->index;
+		m_active_pointers.erase(info);
+	}
+}
+
+void win_window_info::mouse_left(WPARAM wparam, LPARAM lparam)
+{
+	m_tracking_mouse = false;
+	auto const info(find_mouse_pointer());
+	if (m_active_pointers.end() != info)
+	{
+		POINT where{ GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam) };
+		expire_pointer(info, where, false);
+	}
+}
+
+void win_window_info::mouse_updated(WPARAM wparam, LPARAM lparam)
+{
+	auto const info(map_mouse_pointer());
+	if (m_active_pointers.end() == info)
+		return;
+
+	POINT const where{ GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam) };
+	unsigned const buttons(
+			((MK_LBUTTON  & wparam) ? 0x01 : 0x00) |
+			((MK_RBUTTON  & wparam) ? 0x02 : 0x00) |
+			((MK_MBUTTON  & wparam) ? 0x04 : 0x00) |
+			((MK_XBUTTON1 & wparam) ? 0x08 : 0x00) |
+			((MK_XBUTTON2 & wparam) ? 0x10 : 0x00));
+
+	// continue to track the mouse outside the window if buttons are down
+	if (buttons && !info->buttons)
+	{
+		SetCapture(platform_window());
+
+		TRACKMOUSEEVENT tm;
+		std::memset(&tm, 0, sizeof(tm));
+		tm.cbSize = sizeof(tm);
+		tm.dwFlags = TME_CANCEL | TME_LEAVE;
+		tm.hwndTrack = platform_window();
+		TrackMouseEvent(&tm);
+		m_tracking_mouse = false;
+	}
+	else
+	{
+		if (!buttons && info->buttons)
+		{
+			if (GetCapture() == platform_window())
+				ReleaseCapture();
+		}
+
+		if (!m_tracking_mouse)
+		{
+			TRACKMOUSEEVENT tm;
+			std::memset(&tm, 0, sizeof(tm));
+			tm.cbSize = sizeof(tm);
+			tm.dwFlags = TME_LEAVE;
+			tm.hwndTrack = platform_window();
+			TrackMouseEvent(&tm);
+			m_tracking_mouse = true;
+		}
+	}
+
+	update_pointer(*info, where, buttons, false);
+}
+
+void win_window_info::expire_pointer(std::vector<win_pointer_info>::iterator info, POINT const &where, bool canceled)
+{
+	// leaving implicitly releases buttons, so check hold/drag if necessary
+	if (BIT(info->buttons, 0))
+	{
+		assert(0 <= info->clickcnt);
+		if (!canceled)
+		{
+			auto const now(std::chrono::steady_clock::now());
+			auto const exp(std::chrono::milliseconds(GetDoubleClickTime()) + info->pressed);
+			int const dx(where.x - info->pressedx);
+			int const dy(where.y - info->pressedy);
+			int const distance((dx * dx) + (dy * dy));
+			int const tolerance((PT_TOUCH == info->type) ? TAP_DISTANCE : CLICK_DISTANCE);
+			if ((exp < now) || (tolerance < distance))
+				info->clickcnt = -info->clickcnt;
+		}
+		else
+		{
+			info->clickcnt = -info->clickcnt;
+		}
+	}
+
+	// need to remember touches to recognise multi-tap gestures
+	if (!canceled && (PT_TOUCH == info->type) && (0 < info->clickcnt))
+	{
+		auto const now(std::chrono::steady_clock::now());
+		auto const time = std::chrono::milliseconds(GetDoubleClickTime());
+		if ((time + info->pressed) >= now)
+		{
+			try
+			{
+				unsigned i(0);
+				if (m_ptrdev_info.size() > info->device)
+					i = m_ptrdev_info[info->device].clear_expired_touches(now, time);
+				else
+					m_ptrdev_info.resize(info->device + 1);
+
+				if (std::size(m_ptrdev_info[info->device].touches) > i)
+				{
+					m_ptrdev_info[info->device].touches[i].when = info->pressed;
+					m_ptrdev_info[info->device].touches[i].x = info->pressedx;
+					m_ptrdev_info[info->device].touches[i].y = info->pressedy;
+					m_ptrdev_info[info->device].touches[i].cnt = info->clickcnt;
+				}
+			}
+			catch (std::bad_alloc const &)
+			{
+				osd_printf_error("win_window_info: error allocating pointer data\n");
+			}
+		}
+	}
+
+	// push to UI manager and dump pointer data
+	if (!canceled)
+	{
+		machine().ui_input().push_pointer_leave(
+				target(),
+				convert_pointer_type(info->type),
+				info->index,
+				info->device,
+				where.x, where.y,
+				info->buttons, info->clickcnt);
+	}
+	else
+	{
+		machine().ui_input().push_pointer_abort(
+				target(),
+				convert_pointer_type(info->type),
+				info->index,
+				info->device,
+				where.x, where.y,
+				info->buttons, info->clickcnt);
+	}
+	m_pointer_mask &= ~(decltype(m_pointer_mask)(1) << info->index);
+	if (info->index < m_next_pointer)
+		m_next_pointer = info->index;
+	m_active_pointers.erase(info);
+}
+
+void win_window_info::update_pointer(win_pointer_info &info, POINT const &where, unsigned buttons, bool canceled)
+{
+	if (!canceled && (where.x == info.x) && (where.y == info.y) && (buttons == info.buttons))
+		return;
+
+	// detect multi-click actions
+	unsigned const pressed(canceled ? 0 : (buttons & ~info.buttons));
+	unsigned const released(canceled ? ~info.buttons : (~buttons & info.buttons));
+	if (BIT(pressed, 0))
+	{
+		info.primary_down(
+				where.x, where.y,
+				std::chrono::milliseconds(GetDoubleClickTime()),
+				(PT_TOUCH == info.type) ? TAP_DISTANCE : CLICK_DISTANCE,
+				PT_TOUCH == info.type,
+				m_ptrdev_info);
+	}
+	else if (BIT(info.buttons, 0))
+	{
+		info.check_primary_hold_drag(
+				where.x, where.y,
+				std::chrono::milliseconds(GetDoubleClickTime()),
+				(PT_TOUCH == info.type) ? TAP_DISTANCE : CLICK_DISTANCE);
+	}
+
+	// update info and push to UI manager
+	info.x = where.x;
+	info.y = where.y;
+	info.buttons = buttons;
+	if (!canceled)
+	{
+		machine().ui_input().push_pointer_update(
+				target(),
+				convert_pointer_type(info.type),
+				info.index,
+				info.device,
+				where.x, where.y,
+				buttons, pressed, released, info.clickcnt);
+	}
+	else
+	{
+		machine().ui_input().push_pointer_abort(
+				target(),
+				convert_pointer_type(info.type),
+				info.index,
+				info.device,
+				where.x, where.y,
+				released, info.clickcnt);
+	}
+}
+
+std::vector<win_window_info::win_pointer_info>::iterator win_window_info::map_pointer(WPARAM wparam)
+{
+	WORD const ptrid(GET_POINTERID_WPARAM(wparam));
+	auto found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), ptrid, &win_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->ptrid == ptrid))
+		return found;
+
+	if ((sizeof(m_next_pointer) * 8) <= m_next_pointer)
+	{
+		assert(~decltype(m_pointer_mask)(0) == m_pointer_mask);
+		osd_printf_warning("win_window_info: exceeded maximum number of active pointers\n");
+		return m_active_pointers.end();
+	}
+	assert(!BIT(m_pointer_mask, m_next_pointer));
+
+	POINTER_INFO info = { 0 };
+	if (!OSD_DYNAMIC_CALL(GetPointerInfo, ptrid, &info))
+	{
+		osd_printf_error("win_window_info: failed to get info for pointer ID %u\n", ptrid);
+		return m_active_pointers.end();
+	}
+
+	auto devpos(std::lower_bound(
+			m_ptrdev_map.begin(),
+			m_ptrdev_map.end(),
+			info.sourceDevice,
+			[] (std::pair<HANDLE, unsigned> const &mapping, HANDLE device)
+			{
+				return mapping.first < device;
+			}));
+
+	try
+	{
+		if ((m_ptrdev_map.end() == devpos) || (devpos->first != info.sourceDevice))
+		{
+			devpos = m_ptrdev_map.emplace(devpos, info.sourceDevice, m_next_ptrdev);
+			++m_next_ptrdev;
+		}
+
+		found = m_active_pointers.emplace(
+				found,
+				win_pointer_info(ptrid, info.pointerType, m_next_pointer, devpos->second));
+		m_pointer_mask |= decltype(m_pointer_mask)(1) << m_next_pointer;
+		do
+		{
+			++m_next_pointer;
+		}
+		while (((sizeof(m_next_pointer) * 8) > m_next_pointer) && BIT(m_pointer_mask, m_next_pointer));
+
+		return found;
+	}
+	catch (std::bad_alloc const &)
+	{
+		osd_printf_error("win_window_info: error allocating pointer data\n");
+		return m_active_pointers.end();
+	}
+}
+
+std::vector<win_window_info::win_pointer_info>::iterator win_window_info::find_pointer(WPARAM wparam)
+{
+	WORD const ptrid(GET_POINTERID_WPARAM(wparam));
+	auto const found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), ptrid, &win_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->ptrid == ptrid))
+		return found;
+	else
+		return m_active_pointers.end();
+}
+
+std::vector<win_window_info::win_pointer_info>::iterator win_window_info::map_mouse_pointer()
+{
+	WORD const ptrid(~WORD(0));
+	auto found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), ptrid, &win_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->ptrid == ptrid))
+		return found;
+
+	if ((sizeof(m_next_pointer) * 8) <= m_next_pointer)
+	{
+		assert(~decltype(m_pointer_mask)(0) == m_pointer_mask);
+		osd_printf_warning("win_window_info: exceeded maximum number of active pointers\n");
+		return m_active_pointers.end();
+	}
+	assert(!BIT(m_pointer_mask, m_next_pointer));
+
+	auto devpos(std::lower_bound(
+			m_ptrdev_map.begin(),
+			m_ptrdev_map.end(),
+			INVALID_HANDLE_VALUE,
+			[] (std::pair<HANDLE, unsigned> const &mapping, HANDLE device)
+			{
+				return mapping.first < device;
+			}));
+
+	try
+	{
+		if ((m_ptrdev_map.end() == devpos) || (devpos->first != INVALID_HANDLE_VALUE))
+		{
+			devpos = m_ptrdev_map.emplace(devpos, INVALID_HANDLE_VALUE, m_next_ptrdev);
+			++m_next_ptrdev;
+		}
+
+		found = m_active_pointers.emplace(
+				found,
+				win_pointer_info(ptrid, PT_MOUSE, m_next_pointer, devpos->second));
+		m_pointer_mask |= decltype(m_pointer_mask)(1) << m_next_pointer;
+		do
+		{
+			++m_next_pointer;
+		}
+		while (((sizeof(m_next_pointer) * 8) > m_next_pointer) && BIT(m_pointer_mask, m_next_pointer));
+
+		return found;
+	}
+	catch (std::bad_alloc const &)
+	{
+		osd_printf_error("win_window_info: error allocating pointer data\n");
+		return m_active_pointers.end();
+	}
+}
+
+std::vector<win_window_info::win_pointer_info>::iterator win_window_info::find_mouse_pointer()
+{
+	WORD const ptrid(~WORD(0));
+	auto const found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), ptrid, &win_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->ptrid == ptrid))
+		return found;
+	else
+		return m_active_pointers.end();
+}
+
+
+#if (USE_QTDEBUG)
 //============================================================
 //  winwindow_qt_filter
 //============================================================
 
-#if (USE_QTDEBUG)
 bool winwindow_qt_filter(void *message)
 {
 	MSG *msg = (MSG *)message;

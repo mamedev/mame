@@ -1057,6 +1057,66 @@ view:set_recomputed_callback(cb)
     View coordinates are recomputed in various events, including the window
     being resized, entering or leaving full-screen mode, and changing the zoom
     to screen area setting.
+view:set_pointer_updated_callback(cb)
+    Set a function to receive notifications when a pointer enters, moves or
+    changes button states over the view.  The function must accept nine
+    arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the currently pressed buttons.
+    * A bit mask representing the buttons that were pressed in this update.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_pointer_left_callback(cb)
+    Set a function to receive notifications when a pointer leaves the view
+    normally.  The function must accept seven arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).  The ID may be reused for a new pointer after
+      receiving this notification.
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_pointer_aborted_callback(cb)
+    Set a function to receive notifications when a pointer leaves the view
+    abnormally.  The function must accept seven arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).  The ID may be reused for a new pointer after
+      receiving this notification.
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_forget_pointers_callback(cb)
+    Set a function to receive notifications when the view should stop processing
+    pointer input.  The function must accept no arguments.  Call with ``nil`` to
+    remove the callback.
+
+    This can happen in a number of situations, including the view configuration
+    changing or a menu taking over input handling.
 
 Properties
 ~~~~~~~~~~

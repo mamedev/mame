@@ -736,12 +736,13 @@ public:
 			break;
 
 		case SDL_MOUSEWHEEL:
+			// adjust SDL 1-per-click to match Win32 120-per-click
 #if SDL_VERSION_ATLEAST(2, 0, 18)
-			m_v += event.wheel.preciseY * input_device::RELATIVE_PER_PIXEL;
-			m_h += event.wheel.preciseX * input_device::RELATIVE_PER_PIXEL;
+			m_v += std::lround(event.wheel.preciseY * 120 * input_device::RELATIVE_PER_PIXEL);
+			m_h += std::lround(event.wheel.preciseX * 120 * input_device::RELATIVE_PER_PIXEL);
 #else
-			m_v += event.wheel.y * input_device::RELATIVE_PER_PIXEL;
-			m_h += event.wheel.x * input_device::RELATIVE_PER_PIXEL;
+			m_v += event.wheel.y * 120 * input_device::RELATIVE_PER_PIXEL;
+			m_h += event.wheel.x * 120 * input_device::RELATIVE_PER_PIXEL;
 #endif
 			break;
 		}
