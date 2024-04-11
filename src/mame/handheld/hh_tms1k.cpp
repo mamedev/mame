@@ -9528,7 +9528,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("CPU") // fake
+	PORT_START("IN.6") // fake
 	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssimon_state, speed_switch, 0)
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
