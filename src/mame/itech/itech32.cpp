@@ -404,20 +404,18 @@ Notes:
 #include "speaker.h"
 
 
-#define LOG_DRIVEDGE_UNINIT_RAM     0
-
 #define LOG_SCREEN  (1U << 1)
 #define LOG_PIA     (1U << 2)
-#define LOG_DSP     (1U << 3)
+#define LOG_RAM     (1U << 3)
 
-#define LOG_ALL     (LOG_SCREEN | LOG_PIA | LOG_DSP)
+#define LOG_ALL     (LOG_SCREEN | LOG_PIA | LOG_RAM)
 
 #define VERBOSE (0)
 #include "logmacro.h"
 
 #define LOGSCREEN(...)  LOGMASKED(LOG_SCREEN, __VA_ARGS__)
 #define LOGPIA(...)     LOGMASKED(LOG_PIA, __VA_ARGS__)
-#define LOGDSP(...)     LOGMASKED(LOG_DSP, __VA_ARGS__)
+#define LOGRAM(...)     LOGMASKED(LOG_RAM, __VA_ARGS__)
 
 
 #define START_TMS_SPINNING(n)           do { space.device().execute().spin_until_trigger(7351 + n); m_tms_spinning[n] = 1; } while (0)
@@ -506,7 +504,9 @@ void drivedge_state::machine_start()
 	m_leds.resolve();
 
 	save_item(NAME(m_tms_spinning));
+#if LOG_DRIVEDGE_UNINIT_RAM
 	save_item(NAME(m_written));
+#endif
 }
 
 void drivedge_state::machine_reset()
@@ -916,10 +916,13 @@ void itech32_state::bloodstm_map(address_map &map)
 
 u32 drivedge_state::test1_r(offs_t offset, u32 mem_mask)
 {
-	if (ACCESSING_BITS_24_31 && !m_written[0x100 + offset*4+0]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+3);
+	if (!machine().side_effects_disabled())
+	{
+		if (ACCESSING_BITS_24_31 && !m_written[0x100 + offset*4+0]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+0);
+		if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+1);
+		if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+2);
+		if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+3);
+	}
 	return ((u32 *)m_nvram)[0x100/4 + offset];
 }
 
@@ -934,10 +937,13 @@ void drivedge_state::test1_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 drivedge_state::test2_r(offs_t offset, u32 mem_mask)
 {
-	if (ACCESSING_BITS_24_31 && !m_written[0xc00 + offset*4+0]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) LOGDSP("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+3);
+	if (!machine().side_effects_disabled())
+	{
+		if (ACCESSING_BITS_24_31 && !m_written[0xc00 + offset*4+0]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+0);
+		if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+1);
+		if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+2);
+		if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) LOGRAM("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+3);
+	}
 	return ((u32 *)m_nvram)[0xc00/4 + offset];
 }
 
@@ -1759,8 +1765,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static constexpr XTAL CPU_CLOCK     = XTAL(12'000'000);          // clock for 68000-based systems
-static constexpr XTAL SOUND_CLOCK   = XTAL(16'000'000);          // clock for sound board
+static constexpr XTAL CPU_CLOCK   = XTAL(12'000'000); // clock for 68000-based systems
+static constexpr XTAL SOUND_CLOCK = XTAL(16'000'000); // clock for sound board
 
 void itech32_state::base_devices(machine_config &config)
 {
@@ -1834,7 +1840,7 @@ void itech32_state::bloodstm(machine_config &config)
 
 void drivedge_state::drivedge(machine_config &config)
 {
-	static constexpr XTAL TMS_CLOCK     = XTAL(40'000'000);          // TMS320C31 clocks on drivedge
+	constexpr XTAL TMS_CLOCK = XTAL(40'000'000); // TMS320C31 clocks on drivedge
 
 	// basic machine hardware
 	M68EC020(config, m_maincpu, CPU020_CLOCK);

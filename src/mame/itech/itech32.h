@@ -79,7 +79,7 @@ public:
 	int special_port_r();
 
 protected:
-	static constexpr XTAL VIDEO_CLOCK   = XTAL(8'000'000);           // video (pixel) clock
+	static constexpr XTAL VIDEO_CLOCK = XTAL(8'000'000); // video (pixel) clock
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -231,6 +231,13 @@ private:
 	u16 steering_r();
 	u16 gas_r();
 
+#if LOG_DRIVEDGE_UNINIT_RAM
+	u32 test1_r(offs_t offset, u32 mem_mask);
+	u32 test2_r(offs_t offset, u32 mem_mask);
+	void test1_w(offs_t offset, u32 data, u32 mem_mask);
+	void test2_w(offs_t offset, u32 data, u32 mem_mask);
+#endif
+
 	u32 tms1_speedup_r(address_space &space);
 	u32 tms2_speedup_r(address_space &space);
 	void tms_reset_assert_w(u32 data);
@@ -266,7 +273,9 @@ private:
 	required_ioport m_gas;
 
 	u8 m_tms_spinning[2];
+#if LOG_DRIVEDGE_UNINIT_RAM
 	u8 m_written[0x8000]{};
+#endif
 };
 
 class shoottv_state : public itech32_state
