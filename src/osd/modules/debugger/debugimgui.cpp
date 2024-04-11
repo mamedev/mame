@@ -1591,27 +1591,31 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	}
 	if(firststop)
 	{
-//      debug_show_all();
-		device.machine().ui_input().reset();
+		//debug_show_all();
 		m_running = false;
 	}
 	if(!m_take_ui)
 	{
-		m_take_ui = m_machine->ui().set_ui_event_handler([this] () { return m_take_ui; });
-		if(m_take_ui)
-			m_machine->ui_input().reset();
+		if (!m_machine->ui().set_ui_event_handler([this] () { return m_take_ui; }))
+		{
+			// can't break if we can't take over UI input
+			m_machine->debugger().console().get_visible_cpu()->debug()->go();
+			m_running = true;
+			return;
+		}
+		m_take_ui = true;
+
 	}
 	m_hide = false;
-	m_machine->osd().input_update(true);
+	m_machine->osd().input_update(false);
 	handle_events();
 	handle_console(m_machine);
 	update_cpu_view(&device);
-	imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height,m_key_char);
+	imguiBeginFrame(m_mouse_x, m_mouse_y, m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height,m_key_char);
 	handle_mouse_views();
 	handle_keys_views();
 	update();
 	imguiEndFrame();
-	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
 	osd_sleep(osd_ticks_per_second() / 1000 * 50);
 }
