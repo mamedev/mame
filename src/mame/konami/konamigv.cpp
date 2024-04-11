@@ -1096,8 +1096,9 @@ ROM_START( kdeadeye )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
+	// constructed from six reads of the same disc using two drives, 80 sectors have Q subcode CRC errors
 	DISK_REGION( "scsi:4:cdrom" )
-	DISK_IMAGE_READONLY( "054uaa01", 0, SHA1(84ff29b6ca0282b8d3ffac8c8a1a1c58085fd469) )
+	DISK_IMAGE_READONLY( "054uaa01", 0, SHA1(a05079e4e5024ca66b7f6b81de74695d86c62dd8) )
 ROM_END
 
 ROM_START( nagano98 )
