@@ -3142,11 +3142,7 @@ ROM_START( xiaoao )
 	ROM_LOAD( "1-v100.u21", 0x00000, 0x80000, CRC(728b4597) SHA1(97f92b9a6c455d2d906d55482166fd9704253615) )
 
 	ROM_REGION( 0x400000, "tilemap", 0 )
-	ROM_LOAD( "graphics.bin", 0x000000, 0x400000, NO_DUMP ) // SSOP70 ROM not dumped yet; using ROMs from bishjan for now
-	ROM_LOAD32_BYTE( "3-v201.u25", 0x000000, 0x100000, CRC(e013e647) SHA1(a5b0f82f3454393c1ea5e635b0d37735a25e2ea5) BAD_DUMP )
-	ROM_LOAD32_BYTE( "4-v201.u26", 0x000002, 0x100000, CRC(e0d40ef1) SHA1(95f80889103a7b93080b46387274cb1ffe0c8768) BAD_DUMP )
-	ROM_LOAD32_BYTE( "5-v201.u27", 0x000001, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) BAD_DUMP )
-	ROM_LOAD32_BYTE( "6-v201.u28", 0x000003, 0x100000, CRC(430bd9d7) SHA1(dadf5a7eb90cf2dc20f97dbf20a4b6c8e7734fb1) BAD_DUMP )
+	ROM_LOAD( "mj-gc1.u24", 0x000000, 0x400000, CRC(ed3eaaea) SHA1(941ef99dfb2ba0e26112dcd992f7690a1dba8d9c) )
 
 	ROM_REGION( 0x100000, "samples", 0 )
 	ROM_LOAD( "mj-v1.u10", 0x000000, 0x100000, CRC(4d797394) SHA1(fa40a410f903cd81f15c3a86a60ad405b5db8168) )
@@ -4052,7 +4048,7 @@ GAME( 1997, treacity,    0,       saklove, treacity, subsino2_state, empty_init,
 GAME( 1997, treacity202, treacity,saklove, treacity, subsino2_state, empty_init,   ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
-GAME( 200?, xiaoao,   bishjan,  xiaoao,   bishjan,  subsino2_state, init_xiaoao,   ROT0, "Subsino",                          "Xiao Ao Jiang Hu",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, xiaoao,   bishjan,  xiaoao,   bishjan,  subsino2_state, init_xiaoao,   ROT0, "Subsino",                          "Xiao Ao Jiang Hu (China, Ver. 1.00)",   MACHINE_NO_SOUND )
 
 GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, init_new2001,  ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
 

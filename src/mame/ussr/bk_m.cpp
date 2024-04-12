@@ -102,6 +102,13 @@ uint16_t bk_state::key_press_r()
 	return 0x8080 | m_key_pressed | cas;
 }
 
+uint16_t bk_state::trap_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
+	return ~0;
+}
+
 void bk_state::key_state_w(uint16_t data)
 {
 	m_kbd_state = (m_kbd_state & ~0x40) | (data & 0x40);
@@ -114,7 +121,14 @@ void bk_state::vid_scroll_w(uint16_t data)
 
 void bk_state::key_press_w(uint16_t data)
 {
+	m_dac->write(BIT(data, 6));
 	m_cassette->output(BIT(data, 6) ? 1.0 : -1.0);
+	m_cassette->change_state((BIT(data, 7)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+}
+
+void bk_state::trap_w(uint16_t data)
+{
+	m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
 }
 
 uint16_t bk_state::floppy_cmd_r()
@@ -151,13 +165,14 @@ void bk_state::floppy_data_w(uint16_t data)
 
 u32 bk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u16 const nOfs = (m_scroll - 728) % 256;
+	u16 const mini = !BIT(m_scroll, 9);
+	u16 const nOfs = (m_scroll & 255) + (mini ? 40 : -216);
 
 	for (u16 y = 0; y < 256; y++)
 	{
 		for (u16 x = 0; x < 32; x++)
 		{
-			u16 const code = m_vram[((y+nOfs) %256)*32 + x];
+			u16 const code = (y > 63 && mini) ? 0 : m_vram[((y+nOfs) %256)*32 + x];
 			for (u8 b = 0; b < 16; b++)
 				bitmap.pix(y, x*16 + b) =  BIT(code, b);
 		}

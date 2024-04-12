@@ -10,6 +10,7 @@ Hardware notes:
 - Hitachi H8/3214 MCU, 12MHz XTAL
 - small daughterboard (27C080 pinout) with a 128KB ROM under epoxy
 - 8-bit DAC (Yageo 10L503G resistor array), KA8602 amplifier
+- LCD with 5 7segs and custom segments (BAT segment unused)
 - no LEDs, button sensors chessboard
 
 There's also a newer version from 2000 (model 711E-2) on much weaker hardware,
@@ -18,7 +19,6 @@ it has a Samsung KS57C2308 MCU instead.
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
-- where is the low battery signal?
 
 *******************************************************************************/
 

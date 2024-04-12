@@ -10,8 +10,10 @@
 
 #pragma once
 
+#include "bus/qbus/qbus.h"
 #include "cpu/t11/t11.h"
 #include "imagedev/cassette.h"
+#include "sound/dac.h"
 
 class bk_state : public driver_device
 {
@@ -21,6 +23,8 @@ public:
 		, m_vram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, "cassette")
+		, m_dac(*this, "dac")
+		, m_qbus(*this, "qbus")
 		, m_io_keyboard(*this, "LINE%u", 0U)
 	{ }
 
@@ -39,9 +43,11 @@ private:
 	uint16_t key_code_r();
 	uint16_t vid_scroll_r();
 	uint16_t key_press_r();
+	uint16_t trap_r();
 	void key_state_w(uint16_t data);
 	void vid_scroll_w(uint16_t data);
 	void key_press_w(uint16_t data);
+	void trap_w(uint16_t data);
 	uint16_t floppy_cmd_r();
 	void floppy_cmd_w(uint16_t data);
 	uint16_t floppy_data_r();
@@ -54,6 +60,8 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<t11_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<dac_bit_interface> m_dac;
+	required_device<qbus_device> m_qbus;
 	required_ioport_array<12> m_io_keyboard;
 	void bk0010_mem(address_map &map);
 	void bk0010fd_mem(address_map &map);
