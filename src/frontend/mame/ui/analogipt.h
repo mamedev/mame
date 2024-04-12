@@ -14,7 +14,10 @@
 
 #include "ui/menu.h"
 
+#include <chrono>
 #include <functional>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 
@@ -28,10 +31,20 @@ public:
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt) override;
 	virtual void menu_activated() override;
 
 private:
+	enum class pointer_action
+	{
+		NONE,
+		SCROLL_UP,
+		SCROLL_DOWN,
+		SCROLL_DRAG,
+		CHECK_TOGGLE_MENU
+	};
+
 	enum
 	{
 		ANALOG_ITEM_KEYSPEED = 0,
@@ -71,15 +84,30 @@ private:
 	virtual bool handle(event const *ev) override;
 
 	void find_fields();
+	bool scroll_if_expired(std::chrono::steady_clock::time_point now);
+	bool update_scroll_drag(ui_event const &uievt);
 
 	static std::string item_text(int type, int value);
 
 	item_data_vector m_item_data;
 	field_data_vector m_field_data;
 	std::string m_prompt;
-	unsigned m_visible_fields;
+	unsigned m_bottom_fields;
+	int m_visible_fields;
 	int m_top_field;
 	bool m_hide_menu;
+
+	float m_box_left;
+	float m_box_top;
+	float m_box_right;
+	float m_box_bottom;
+
+	pointer_action m_pointer_action;
+	std::chrono::steady_clock::time_point m_scroll_repeat;
+	std::pair<float, float> m_base_pointer;
+	std::pair<float, float> m_last_pointer;
+	int m_scroll_base;
+	bool m_arrow_clicked_first;
 };
 
 } // namespace ui

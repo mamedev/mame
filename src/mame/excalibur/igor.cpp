@@ -18,7 +18,6 @@ it has a Samsung KS57C2308 MCU instead.
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
-- add SVG for LCD (not same as mirage/ivan)
 - where is the low battery signal?
 
 *******************************************************************************/
@@ -318,7 +317,7 @@ void igor_state::igor(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/5, 1080/5);
+	screen.set_size(1920/6, 723/6);
 	screen.set_visarea_full();
 
 	config.set_default_layout(layout_excal_igor);
@@ -341,8 +340,8 @@ ROM_START( igor )
 	ROM_REGION( 0x20000, "cobrom", 0 )
 	ROM_LOAD("sound.ic2", 0x00000, 0x20000, CRC(bc540da3) SHA1(68647ce1c7e87eba90d9d1912921213af03e3c5d) ) // no label
 
-	ROM_REGION( 200000, "screen", 0 )
-	ROM_LOAD("igor.svg", 0, 200000, NO_DUMP )
+	ROM_REGION( 89047, "screen", 0 )
+	ROM_LOAD("igor.svg", 0, 89047, CRC(fe514f65) SHA1(da5a56882bd241d01a6c49cb1cb066b88473c445) )
 ROM_END
 
 } // anonymous namespace
@@ -354,4 +353,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY, FULLNAME, FLAGS
-SYST( 1997, igor, 0,      0,      igor,    igor,  igor_state, init_igor, "Excalibur Electronics", "Igor (Excalibur)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1997, igor, 0,      0,      igor,    igor,  igor_state, init_igor, "Excalibur Electronics", "Igor (Excalibur)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

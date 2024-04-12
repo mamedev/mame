@@ -232,7 +232,7 @@ public:
 	virtual void configure(input_device &device) override;
 
 private:
-	mouse_state m_mouse;
+	DIMOUSESTATE2 m_mouse;
 };
 
 dinput_mouse_device::dinput_mouse_device(

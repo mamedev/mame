@@ -5,27 +5,6 @@ authors:Sandro Ronco, hap
 -->
 <mamelayout version="2">
 
-<!-- mephisto_polgar.lay and mephisto_risc.lay are identical -->
-
-<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
-
-	<script><![CDATA[
-		local layout = {}
-		local prev_state = 0
-
-		function layout.frame()
-			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
-			if cur_state ~= prev_state then
-				machine.ioport.ports[":KEY"]:field(0x40):set_value(cur_state)
-				machine.ioport.ports[":KEY"]:field(0x80):set_value(cur_state)
-			end
-			prev_state = cur_state
-		end
-
-		return layout
-	]]></script>
-
-
 <!-- define elements -->
 
 	<element name="led" defstate="0">
@@ -426,7 +405,8 @@ authors:Sandro Ronco, hap
 		<element ref="hlb" inputtag="KEY" inputmask="0x80"> <bounds x="54.5" y="10" width="3.5" height="2.5" /> </element>
 
 		<!-- hidden input above ENT/CL buttons to press both -->
-		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
+		<element ref="nothing" inputtag="KEY" inputmask="0x40" clickthrough="yes"><bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
+		<element ref="nothing" inputtag="KEY" inputmask="0x80" clickthrough="no"> <bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
 	</group>
 
 

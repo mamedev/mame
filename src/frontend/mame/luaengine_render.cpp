@@ -18,6 +18,7 @@
 #include "rendlay.h"
 #include "rendutil.h"
 
+#include "interface/uievents.h"
 #include "ioprocs.h"
 
 #include <algorithm>
@@ -447,6 +448,33 @@ public:
 };
 
 } // namespace sol
+
+
+//-------------------------------------------------
+//  sol_lua_push - automatically convert
+//  osd::ui_event_handler::pointer to a string
+//-------------------------------------------------
+
+int sol_lua_push(sol::types<osd::ui_event_handler::pointer>, lua_State *L, osd::ui_event_handler::pointer &&value)
+{
+	const char *typestr = "invalid";
+	switch (value)
+	{
+	case osd::ui_event_handler::pointer::UNKNOWN:
+		typestr = "unknown";
+		break;
+	case osd::ui_event_handler::pointer::MOUSE:
+		typestr = "mouse";
+		break;
+	case osd::ui_event_handler::pointer::PEN:
+		typestr = "pen";
+		break;
+	case osd::ui_event_handler::pointer::TOUCH:
+		typestr = "touch";
+		break;
+	}
+	return sol::stack::push(L, typestr);
+}
 
 
 template <typename T>
@@ -931,6 +959,34 @@ void lua_engine::initialize_render(sol::table &emu)
 					nullptr,
 					"set_recomputed_callback",
 					"recomputed"));
+	layout_view_type.set_function(
+			"set_pointer_updated_callback",
+			make_simple_callback_setter(
+					&layout_view::set_pointer_updated_callback,
+					nullptr,
+					"set_pointer_updated_callback",
+					"pointer updated"));
+	layout_view_type.set_function(
+			"set_pointer_left_callback",
+			make_simple_callback_setter(
+					&layout_view::set_pointer_left_callback,
+					nullptr,
+					"set_pointer_left_callback",
+					"pointer left"));
+	layout_view_type.set_function(
+			"set_pointer_aborted_callback",
+			make_simple_callback_setter(
+					&layout_view::set_pointer_aborted_callback,
+					nullptr,
+					"set_pointer_aborted_callback",
+					"pointer aborted"));
+	layout_view_type.set_function(
+			"set_forget_pointers_callback",
+			make_simple_callback_setter(
+					&layout_view::set_forget_pointers_callback,
+					nullptr,
+					"set_forget_pointers_callback",
+					"forget pointers"));
 	layout_view_type["items"] = sol::property([] (layout_view &v) { return layout_view_items(v); });
 	layout_view_type["name"] = sol::property(&layout_view::name);
 	layout_view_type["unqualified_name"] = sol::property(&layout_view::unqualified_name);

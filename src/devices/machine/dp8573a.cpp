@@ -15,7 +15,7 @@
  */
 
 #include "emu.h"
-#include "machine/dp8573a.h"
+#include "dp8573a.h"
 
 #include "machine/timehelp.h"
 

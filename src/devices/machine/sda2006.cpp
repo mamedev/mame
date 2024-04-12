@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina
 
 #include "emu.h"
-#include "machine/sda2006.h"
+#include "sda2006.h"
 
 //-------------------------------------------------
 //

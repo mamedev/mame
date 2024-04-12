@@ -232,7 +232,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "cpu/tms1000/tms0970.h"
 #include "cpu/tms1000/tms0980.h"
 #include "machine/clock.h"
-#include "machine/ds8874.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -245,6 +244,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
 #include "sound/tms5110.h"
+#include "video/ds8874.h"
 #include "video/hlcd0515.h"
 #include "video/pwm.h"
 
@@ -9528,7 +9528,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("CPU") // fake
+	PORT_START("IN.6") // fake
 	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssimon_state, speed_switch, 0)
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )

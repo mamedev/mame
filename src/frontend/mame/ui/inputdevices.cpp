@@ -44,7 +44,7 @@ protected:
 		set_custom_space(0.0F, (line_height() * (m_have_analog ? 2.0F : 1.0F)) + (tb_border() * 3.0F));
 	}
 
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override
 	{
 		if (selectedref)
 		{

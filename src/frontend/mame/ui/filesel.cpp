@@ -19,6 +19,8 @@
 
 #include "imagedev/floppy.h"
 
+#include "uiinput.h"
+
 #include "util/corestr.h"
 #include "util/zippath.h"
 
@@ -48,15 +50,26 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, menu_file_selector::result &result)
+menu_file_selector::menu_file_selector(
+		mame_ui_manager &mui,
+		render_container &container,
+		device_image_interface *image,
+		std::string_view directory,
+		std::string_view file,
+		bool has_empty,
+		bool has_softlist,
+		bool has_create,
+		handler_function &&handler)
 	: menu(mui, container)
+	, m_handler(std::move(handler))
 	, m_image(image)
-	, m_current_directory(current_directory)
-	, m_current_file(current_file)
+	, m_current_directory(directory)
+	, m_current_file(file)
+	, m_result(result::INVALID)
 	, m_has_empty(has_empty)
 	, m_has_softlist(has_softlist)
 	, m_has_create(has_create)
-	, m_result(result)
+	, m_clicked_directory(std::string::npos, std::string::npos)
 {
 	(void)m_image;
 	set_process_flags(PROCESS_IGNOREPAUSE);
@@ -69,6 +82,8 @@ menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &c
 
 menu_file_selector::~menu_file_selector()
 {
+	if (m_handler)
+		m_handler(m_result, std::move(m_current_directory), std::move(m_current_file));
 }
 
 
@@ -80,7 +95,9 @@ void menu_file_selector::recompute_metrics(uint32_t width, uint32_t height, floa
 {
 	menu::recompute_metrics(width, height, aspect);
 
-	// set up custom render proc
+	m_path_layout.reset();
+	m_clicked_directory = std::make_pair(std::string::npos, std::string::npos);
+
 	set_custom_space(line_height() + 3.0F * tb_border(), 0.0F);
 }
 
@@ -89,63 +106,131 @@ void menu_file_selector::recompute_metrics(uint32_t width, uint32_t height, floa
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
-void menu_file_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_file_selector::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// lay out extra text
-	auto layout = create_layout();
-	layout.add_text(m_current_directory);
-
-	// position this extra text
-	float x1, y1, x2, y2;
-	extra_text_position(origx1, origx2, origy1, top, layout, -1, x1, y1, x2, y2);
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
-
-	// take off the borders
-	x1 += lr_border();
-	y1 += tb_border();
-
-	size_t hit_start = 0, hit_span = 0;
-	if (is_mouse_hit()
-		&& layout.hit_test(get_mouse_x() - x1, get_mouse_y() - y1, hit_start, hit_span)
-		&& m_current_directory.substr(hit_start, hit_span) != PATH_SEPARATOR)
+	if (!m_path_layout)
 	{
-		// we're hovering over a directory!  highlight it
-		auto target_dir_start = m_current_directory.rfind(PATH_SEPARATOR, hit_start) + 1;
-		auto target_dir_end = m_current_directory.find(PATH_SEPARATOR, hit_start + hit_span);
-		m_hover_directory = m_current_directory.substr(0, target_dir_end + strlen(PATH_SEPARATOR));
-
-		// highlight the text in question
-		rgb_t fgcolor = ui().colors().mouseover_color();
-		rgb_t bgcolor = ui().colors().mouseover_bg_color();
-		layout.restyle(target_dir_start, target_dir_end - target_dir_start, &fgcolor, &bgcolor);
+		m_path_layout.emplace(create_layout());
+		m_path_layout->add_text(m_current_directory);
 	}
 	else
 	{
-		// we are not hovering over anything
-		m_hover_directory.clear();
+		rgb_t const fgcolor = ui().colors().text_color();
+		rgb_t const bgcolor = rgb_t::transparent();
+		m_path_layout->restyle(0, m_current_directory.length(), &fgcolor, &bgcolor);
+	}
+
+	// position this extra text
+	float x2, y2;
+	extra_text_position(origx1, origx2, origy1, top, *m_path_layout, -1, m_path_position.first, m_path_position.second, x2, y2);
+
+	// draw a box
+	ui().draw_outlined_box(container(), m_path_position.first, m_path_position.second, x2, y2, ui().colors().background_color());
+
+	// take off the borders
+	m_path_position.first += lr_border();
+	m_path_position.second += tb_border();
+
+	if (m_clicked_directory.second > m_clicked_directory.first)
+	{
+		// see if it's still over the clicked path component
+		auto const [x, y] = pointer_location();
+		size_t start = 0, span = 0;
+		if (m_path_layout->hit_test(x - m_path_position.first, y - m_path_position.second, start, span))
+		{
+			if ((start >= m_clicked_directory.first) && ((start + span) <= m_clicked_directory.second))
+			{
+				rgb_t const fgcolor = ui().colors().selected_color();
+				rgb_t const bgcolor = ui().colors().selected_bg_color();
+				m_path_layout->restyle(m_clicked_directory.first, m_clicked_directory.second - m_clicked_directory.first, &fgcolor, &bgcolor);
+			}
+		}
+	}
+	else if (pointer_idle())
+	{
+		// see if it's hovering over a path component
+		auto const [x, y] = pointer_location();
+		auto const [target_dir_start, target_dir_end] = get_directory_range(x, y);
+		if (target_dir_end > target_dir_start)
+		{
+			rgb_t const fgcolor = ui().colors().mouseover_color();
+			rgb_t const bgcolor = ui().colors().mouseover_bg_color();
+			m_path_layout->restyle(target_dir_start, target_dir_end - target_dir_start, &fgcolor, &bgcolor);
+		}
 	}
 
 	// draw the text within it
-	layout.emit(container(), x1, y1);
+	m_path_layout->emit(container(), m_path_position.first, m_path_position.second);
 }
 
 
 //-------------------------------------------------
-//  custom_mouse_down - perform our special mouse down
+//  custom_pointer_updated - perform our special
+//  pointer handling
 //-------------------------------------------------
 
-bool menu_file_selector::custom_mouse_down()
+std::tuple<int, bool, bool> menu_file_selector::custom_pointer_updated(bool changed, ui_event const &uievt)
 {
-	if (m_hover_directory.length() > 0)
+	// track pointer after clicking a path component
+	if (m_clicked_directory.second > m_clicked_directory.first)
 	{
-		m_current_directory = m_hover_directory;
-		reset(reset_options::SELECT_FIRST);
-		return true;
+		if (ui_event::type::POINTER_ABORT == uievt.event_type)
+		{
+			// abort always cancels
+			m_clicked_directory = std::make_pair(std::string::npos, std::string::npos);
+			return std::make_tuple(IPT_INVALID, false, true);
+		}
+		else if (uievt.pointer_released & 0x01)
+		{
+			// releasing the primary button - check for dragging out
+			auto const [x, y] = pointer_location();
+			size_t start = 0, span = 0;
+			if (m_path_layout->hit_test(x - m_path_position.first, y - m_path_position.second, start, span))
+			{
+				// abuse IPT_CUSTOM to change to the clicked directory
+				if ((start >= m_clicked_directory.first) && ((start + span) <= m_clicked_directory.second))
+					return std::make_tuple(IPT_CUSTOM, false, true);
+			}
+			m_clicked_directory = std::make_pair(std::string::npos, std::string::npos);
+			return std::make_tuple(IPT_INVALID, false, true);
+		}
+		else if (uievt.pointer_buttons & ~u32(1))
+		{
+			// pressing more buttons cancels
+			m_clicked_directory = std::make_pair(std::string::npos, std::string::npos);
+			return std::make_tuple(IPT_INVALID, false, true);
+		}
+		else
+		{
+			// keep tracking the pointer
+			return std::make_tuple(IPT_INVALID, true, false);
+		}
 	}
 
-	return false;
+	// check for clicks if we have up-to-date content on-screen
+	if (m_path_layout && pointer_idle() && (uievt.pointer_buttons & 0x01) && !(uievt.pointer_buttons & ~u32(0x01)))
+	{
+		auto const [x, y] = pointer_location();
+		auto const [target_dir_start, target_dir_end] = get_directory_range(x, y);
+		if (target_dir_end > target_dir_start)
+		{
+			m_clicked_directory = std::make_pair(target_dir_start, target_dir_end);
+			return std::make_tuple(IPT_INVALID, true, true);
+		}
+	}
+
+	return std::make_tuple(IPT_INVALID, false, false);
+}
+
+
+//-------------------------------------------------
+//  menu_activated - menu has gained focus
+//-------------------------------------------------
+
+void menu_file_selector::menu_activated()
+{
+	m_clicked_directory = std::make_pair(std::string::npos, std::string::npos);
 }
 
 
@@ -299,7 +384,9 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 				break;
 			}
 		}
-		m_current_directory.assign(entry.fullpath);
+		m_current_directory = entry.fullpath;
+		m_path_layout.reset();
+		m_clicked_directory = std::make_pair(std::string::npos, std::string::npos);
 		reset(reset_options::SELECT_FIRST);
 		break;
 
@@ -314,7 +401,7 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 
 
 //-------------------------------------------------
-//  type_search_char
+//  update_search
 //-------------------------------------------------
 
 void menu_file_selector::update_search()
@@ -353,6 +440,35 @@ void menu_file_selector::update_search()
 			centre_selection();
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  get_directory_range
+//-------------------------------------------------
+
+std::pair<size_t, size_t> menu_file_selector::get_directory_range(float x, float y)
+{
+	size_t start = 0, span = 0;
+	if (m_path_layout->hit_test(x - m_path_position.first, y - m_path_position.second, start, span))
+	{
+		if (std::string_view(m_current_directory).substr(start, span) != PATH_SEPARATOR)
+		{
+			auto target_start = m_current_directory.rfind(PATH_SEPARATOR, start);
+			if (std::string::npos == target_start)
+				target_start = 0;
+			else
+				target_start += 1;
+
+			auto target_end = m_current_directory.find(PATH_SEPARATOR, start + span);
+			if (std::string::npos == target_end)
+				target_end = m_current_directory.length();
+
+			return std::make_pair(target_start, target_end);
+		}
+	}
+
+	return std::make_pair(std::string::npos, std::string::npos);
 }
 
 
@@ -479,6 +595,18 @@ bool menu_file_selector::handle(event const *ev)
 			return true;
 		}
 	}
+	else if (ev->iptkey == IPT_CUSTOM)
+	{
+		// clicked a path component
+		if (m_clicked_directory.second > m_clicked_directory.first)
+		{
+			m_current_directory.resize(m_clicked_directory.second + strlen(PATH_SEPARATOR));
+			m_path_layout.reset();
+			m_clicked_directory = std::make_pair(std::string::npos, std::string::npos);
+			reset(reset_options::SELECT_FIRST);
+			return true;
+		}
+	}
 	else if (ev->itemref && (ev->iptkey == IPT_UI_SELECT))
 	{
 		// handle selections
@@ -502,11 +630,15 @@ bool menu_file_selector::handle(event const *ev)
 //  ctor
 //-------------------------------------------------
 
-menu_select_rw::menu_select_rw(mame_ui_manager &mui, render_container &container,
-										bool can_in_place, result &result)
-	: menu(mui, container),
-		m_can_in_place(can_in_place),
-		m_result(result)
+menu_select_rw::menu_select_rw(
+		mame_ui_manager &mui,
+		render_container &container,
+		bool can_in_place,
+		handler_function &&handler)
+	: menu(mui, container)
+	, m_handler(std::move(handler))
+	, m_can_in_place(can_in_place)
+	, m_result(result::INVALID)
 {
 }
 
@@ -517,6 +649,8 @@ menu_select_rw::menu_select_rw(mame_ui_manager &mui, render_container &container
 
 menu_select_rw::~menu_select_rw()
 {
+	if (m_handler)
+		m_handler(m_result);
 }
 
 
@@ -526,7 +660,8 @@ menu_select_rw::~menu_select_rw()
 
 void menu_select_rw::populate()
 {
-	item_append(_("Select access mode"), FLAG_DISABLE, nullptr);
+	set_heading(_("Select access mode"));
+
 	item_append(_("Read-only"), 0, itemref_from_result(result::READONLY));
 	if (m_can_in_place)
 		item_append(_("Read-write"), 0, itemref_from_result(result::READWRITE));

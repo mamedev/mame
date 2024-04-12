@@ -8,7 +8,7 @@
 // TODO: everything
 
 #include "emu.h"
-#include "sound/nes_apu_vt.h"
+#include "nes_apu_vt.h"
 
 DEFINE_DEVICE_TYPE(NES_APU_VT, nes_apu_vt_device, "nes_apu_vt", "XOP APU")
 

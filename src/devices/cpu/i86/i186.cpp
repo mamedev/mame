@@ -1314,7 +1314,7 @@ void i80186_cpu_device::restart_timer(int which)
 
 	int count = (t->control & 0x1000) ? t->maxB : t->maxA;
 	if (!(t->control & 4))
-		t->int_timer->adjust((attotime::from_hz(clock() / 8) * (count ? count : 0x10000)), which);
+		t->int_timer->adjust(cycles_to_attotime(4 * (count ? count : 0x10000)), which);
 }
 
 void i80186_cpu_device::internal_timer_sync(int which)
@@ -1323,7 +1323,7 @@ void i80186_cpu_device::internal_timer_sync(int which)
 
 	/* if we have a timing timer running, adjust the count */
 	if ((t->control & 0x8000) && !(t->control & 0x0c) && t->int_timer->enabled())
-		t->count = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->int_timer->remaining().as_ticks(clock() / 8);
+		t->count = ((t->control & 0x1000) ? t->maxB : t->maxA) - attotime_to_cycles(t->int_timer->remaining()) / 4;
 }
 
 void i80186_cpu_device::inc_timer(int which)
@@ -1447,7 +1447,7 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 			int diff = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->count;
 			if (diff <= 0)
 				diff += 0x10000;
-			t->int_timer->adjust(attotime::from_hz(clock()/8) * diff, which);
+			t->int_timer->adjust(cycles_to_attotime(4 * diff), which);
 			LOGMASKED(LOG_TIMER, "Set interrupt timer for %d\n", which);
 		}
 		else

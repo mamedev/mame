@@ -13,24 +13,27 @@
 #include "emuopts.h"
 #include "render.h"
 #include "screen.h"
+#include "uiinput.h"
 #include "ui/uimain.h"
 
 // OSD headers
-#include "window.h"
-#include "osdsdl.h"
 #include "modules/monitor/monitor_common.h"
+#include "osdsdl.h"
+#include "window.h"
 
 // standard SDL headers
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 
 // standard C headers
+#include <algorithm>
+#include <cassert>
 #include <cmath>
+#include <list>
+#include <memory>
+
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
-#include <list>
-#include <memory>
 
 #ifdef SDLMAME_WIN32
 #include <windows.h>
@@ -61,11 +64,6 @@
 
 #define SDL_VERSION_EQUALS(v1, vnum2) (SDL_VERSIONNUM(v1.major, v1.minor, v1.patch) == vnum2)
 
-class SDL_DM_Wrapper
-{
-public:
-	SDL_DisplayMode mode;
-};
 
 
 //============================================================
@@ -248,9 +246,9 @@ void sdl_window_info::toggle_full_screen()
 #endif
 	if (fullscreen() && (video_config.switchres || is_osx))
 	{
-		SDL_SetWindowFullscreen(platform_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode->mode);    // Try to set mode
-		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+		SDL_SetWindowFullscreen(platform_window(), 0);
+		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode);
+		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);
 	}
 	SDL_DestroyWindow(platform_window());
 	set_platform_window(nullptr);
@@ -334,6 +332,293 @@ int sdl_window_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 	return renderer().xy_to_render_target(x, y, xt, yt);
 }
 
+void sdl_window_info::mouse_entered(unsigned device)
+{
+	m_mouse_inside = true;
+}
+
+void sdl_window_info::mouse_left(unsigned device)
+{
+	m_mouse_inside = false;
+
+	auto info(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), SDL_FingerID(-1), &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() == info) || (info->finger != SDL_FingerID(-1)))
+		return;
+
+	// leaving implicitly releases buttons, so check hold/drag if necessary
+	if (BIT(info->buttons, 0))
+	{
+		assert(0 <= info->clickcnt);
+
+		auto const now(std::chrono::steady_clock::now());
+		auto const exp(std::chrono::milliseconds(250) + info->pressed);
+		int const dx(info->x - info->pressedx);
+		int const dy(info->y - info->pressedy);
+		int const distance((dx * dx) + (dy * dy));
+		if ((exp < now) || (CLICK_DISTANCE < distance))
+			info->clickcnt = -info->clickcnt;
+	}
+
+	// push to UI manager
+	machine().ui_input().push_pointer_leave(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			info->x, info->y,
+			info->buttons, info->clickcnt);
+
+	// dump pointer data
+	m_pointer_mask &= ~(decltype(m_pointer_mask)(1) << info->index);
+	if (info->index < m_next_pointer)
+		m_next_pointer = info->index;
+	m_active_pointers.erase(info);
+}
+
+void sdl_window_info::mouse_down(unsigned device, int x, int y, unsigned button)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	if ((x == info->x) && (y == info->y) && BIT(info->buttons, button))
+		return;
+
+	// detect multi-click actions
+	if (0 == button)
+	{
+		info->primary_down(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				CLICK_DISTANCE,
+				false,
+				m_ptrdev_info);
+	}
+
+	// update info and push to UI manager
+	auto const pressed(decltype(info->buttons)(1) << button);
+	info->x = x;
+	info->y = y;
+	info->buttons |= pressed;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			x, y,
+			info->buttons, pressed, 0, info->clickcnt);
+}
+
+void sdl_window_info::mouse_up(unsigned device, int x, int y, unsigned button)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	if ((x == info->x) && (y == info->y) && !BIT(info->buttons, button))
+		return;
+
+	// detect multi-click actions
+	if (0 == button)
+	{
+		info->check_primary_hold_drag(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				CLICK_DISTANCE);
+	}
+
+	// update info and push to UI manager
+	auto const released(decltype(info->buttons)(1) << button);
+	info->x = x;
+	info->y = y;
+	info->buttons &= ~released;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			x, y,
+			info->buttons, 0, released, info->clickcnt);
+}
+
+void sdl_window_info::mouse_moved(unsigned device, int x, int y)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	// detect multi-click actions
+	if (BIT(info->buttons, 0))
+	{
+		info->check_primary_hold_drag(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				CLICK_DISTANCE);
+	}
+
+	// update info and push to UI manager
+	info->x = x;
+	info->y = y;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::MOUSE,
+			info->index,
+			device,
+			x, y,
+			info->buttons, 0, 0, info->clickcnt);
+}
+
+void sdl_window_info::mouse_wheel(unsigned device, int y)
+{
+	if (!m_mouse_inside)
+		return;
+
+	auto const info(map_pointer(SDL_FingerID(-1), device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	// push to UI manager
+	machine().ui_input().push_mouse_wheel_event(target(), info->x, info->y, y, 3);
+}
+
+void sdl_window_info::finger_down(SDL_FingerID finger, unsigned device, int x, int y)
+{
+	auto const info(map_pointer(finger, device));
+	if (m_active_pointers.end() == info)
+		return;
+
+	assert(!info->buttons);
+
+	// detect multi-click actions
+	info->primary_down(
+			x,
+			y,
+			std::chrono::milliseconds(250),
+			TAP_DISTANCE,
+			true,
+			m_ptrdev_info);
+
+	// update info and push to UI manager
+	info->x = x;
+	info->y = y;
+	info->buttons = 1;
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::TOUCH,
+			info->index,
+			device,
+			x, y,
+			1, 1, 0, info->clickcnt);
+}
+
+void sdl_window_info::finger_up(SDL_FingerID finger, unsigned device, int x, int y)
+{
+	auto info(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), finger, &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() == info) || (info->finger != finger))
+		return;
+
+	assert(1 == info->buttons);
+
+	// check for conversion to a (multi-)click-and-hold/drag
+	info->check_primary_hold_drag(
+			x,
+			y,
+			std::chrono::milliseconds(250),
+			TAP_DISTANCE);
+
+	// need to remember touches to recognise multi-tap gestures
+	if (0 < info->clickcnt)
+	{
+		auto const now(std::chrono::steady_clock::now());
+		auto const time = std::chrono::milliseconds(250);
+		if ((time + info->pressed) >= now)
+		{
+			try
+			{
+				unsigned i(0);
+				if (m_ptrdev_info.size() > device)
+					i = m_ptrdev_info[device].clear_expired_touches(now, time);
+				else
+					m_ptrdev_info.resize(device + 1);
+
+				if (std::size(m_ptrdev_info[device].touches) > i)
+				{
+					m_ptrdev_info[device].touches[i].when = info->pressed;
+					m_ptrdev_info[device].touches[i].x = info->pressedx;
+					m_ptrdev_info[device].touches[i].y = info->pressedy;
+					m_ptrdev_info[device].touches[i].cnt = info->clickcnt;
+				}
+			}
+			catch (std::bad_alloc const &)
+			{
+				osd_printf_error("win_window_info: error allocating pointer data\n");
+			}
+		}
+	}
+
+	// push to UI manager
+	machine().ui_input().push_pointer_update(
+			target(),
+			osd::ui_event_handler::pointer::TOUCH,
+			info->index,
+			device,
+			x, y,
+			0, 0, 1, info->clickcnt);
+	machine().ui_input().push_pointer_leave(
+			target(),
+			osd::ui_event_handler::pointer::TOUCH,
+			info->index,
+			device,
+			x, y,
+			0, info->clickcnt);
+
+	// dump pointer data
+	m_pointer_mask &= ~(decltype(m_pointer_mask)(1) << info->index);
+	if (info->index < m_next_pointer)
+		m_next_pointer = info->index;
+	m_active_pointers.erase(info);
+}
+
+void sdl_window_info::finger_moved(SDL_FingerID finger, unsigned device, int x, int y)
+{
+	auto info(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), finger, &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() == info) || (info->finger != finger))
+
+	assert(1 == info->buttons);
+
+	if ((x != info->x) || (y != info->y))
+	{
+		info->check_primary_hold_drag(
+				x,
+				y,
+				std::chrono::milliseconds(250),
+				TAP_DISTANCE);
+
+		// update info and push to UI manager
+		info->x = x;
+		info->y = y;
+		machine().ui_input().push_pointer_update(
+				target(),
+				osd::ui_event_handler::pointer::TOUCH,
+				info->index,
+				device,
+				x, y,
+				1, 0, 0, info->clickcnt);
+	}
+}
+
 //============================================================
 //  sdlwindow_video_window_create
 //  (main thread)
@@ -373,9 +658,9 @@ void sdl_window_info::complete_destroy()
 
 	if (fullscreen() && video_config.switchres)
 	{
-		SDL_SetWindowFullscreen(platform_window(), 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode->mode);    // Try to set mode
-		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+		SDL_SetWindowFullscreen(platform_window(), 0);
+		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode);
+		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);
 	}
 
 	renderer_reset();
@@ -684,7 +969,7 @@ int sdl_window_info::complete_create()
 		SDL_DisplayMode mode;
 		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
 		SDL_GetWindowDisplayMode(platform_window(), &mode);
-		m_original_mode->mode = mode;
+		m_original_mode = mode;
 		mode.w = temp.width();
 		mode.h = temp.height();
 		if (m_win_config.refresh)
@@ -1021,6 +1306,52 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 	return maximum.dim();
 }
 
+
+std::vector<sdl_window_info::sdl_pointer_info>::iterator sdl_window_info::map_pointer(SDL_FingerID finger, unsigned device)
+{
+	auto found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), finger, &sdl_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->finger == finger))
+		return found;
+
+	if ((sizeof(m_next_pointer) * 8) <= m_next_pointer)
+	{
+		assert(~decltype(m_pointer_mask)(0) == m_pointer_mask);
+		osd_printf_warning("sdl_window_info: exceeded maximum number of active pointers\n");
+		return m_active_pointers.end();
+	}
+	assert(!BIT(m_pointer_mask, m_next_pointer));
+
+	try
+	{
+		found = m_active_pointers.emplace(
+				found,
+				sdl_pointer_info(finger, m_next_pointer, device));
+		m_pointer_mask |= decltype(m_pointer_mask)(1) << m_next_pointer;
+		do
+		{
+			++m_next_pointer;
+		}
+		while (((sizeof(m_next_pointer) * 8) > m_next_pointer) && BIT(m_pointer_mask, m_next_pointer));
+
+		return found;
+	}
+	catch (std::bad_alloc const &)
+	{
+		osd_printf_error("sdl_window_info: error allocating pointer data\n");
+		return m_active_pointers.end();
+	}
+}
+
+
+inline sdl_window_info::sdl_pointer_info::sdl_pointer_info(SDL_FingerID f, unsigned i, unsigned d)
+	: pointer_info(i, d)
+	, finger(f)
+{
+}
+
+
+
+
 //============================================================
 //  construction and destruction
 //============================================================
@@ -1040,13 +1371,18 @@ sdl_window_info::sdl_window_info(
 	, m_extra_flags(0)
 	, m_mouse_captured(false)
 	, m_mouse_hidden(false)
+	, m_pointer_mask(0)
+	, m_next_pointer(0)
+	, m_mouse_inside(false)
 {
 	//FIXME: these should be per_window in config-> or even better a bit set
 	m_fullscreen = !video_config.windowed;
 	m_prescale = video_config.prescale;
 
 	m_windowed_dim = osd_dim(config->width, config->height);
-	m_original_mode = std::make_unique<SDL_DM_Wrapper>();
+
+	m_ptrdev_info.reserve(1);
+	m_active_pointers.reserve(16);
 }
 
 sdl_window_info::~sdl_window_info()

@@ -136,9 +136,9 @@ pointing device:
 * Click menu items to highlight them.
 * Double-click menu items to select them.
 * Click the left- or right-pointing triangle to adjust settings.
-* For menus with too many items to fit on the screen, click the upward- or
-  downward-pointing triangle at the top or bottom to scroll up or down by one
-  screen at a time.
+* For menus or text boxes with too many items or lines to fit on the screen,
+  press on the upward- or downward-pointing triangle at the top or bottom to
+  scroll up or down.
 * Use vertical scrolling gestures to scroll menus or text boxes with too many
   items or lines to fit on the screen.
 * Click toolbar items to select them, or hover over them to see a description.
@@ -146,6 +146,28 @@ pointing device:
 If you have enough additional mouse buttons, you may want to assign button
 combinations to the **Show/Hide Menu**, **Pause**, **UI Back** and/or
 **UI Cancel** inputs to make it possible to use MAME without a keyboard.
+
+
+.. _ui-menus-touch:
+
+Using a touch screen
+~~~~~~~~~~~~~~~~~~~~
+
+MAME has basic support for navigating menus using a touch screen:
+
+* Tap menu items to highlight them.
+* Double-tap menu items to select them.
+* Swipe left or right (horizontally) on the highlighted menu item to adjust the
+  setting if applicable.
+* Swipe up or down (vertically) to scroll menus or text boxes with too many
+  items to fit on the screen.
+* For menus or text boxes with too many items or lines to fit on the screen,
+  press on the upward- or downward-pointing triangle at the top or bottom to
+  scroll up or down.
+
+Note that for SDL-based MAME, the
+:ref:`enable_touch <mame-scommandline-enabletouch>` option must be switched on
+to use touch screen support.
 
 
 .. _ui-inptcfg:
@@ -492,6 +514,8 @@ When focus is on any area besides the info/image tabs, you can change the image
 or info source with left/right.  When focus is on the info/image tabs,
 left/right switch between tabs.  When focus is on the image/info tabs or source,
 you can scroll the info using up, down, page up, page down, home and end.
+
+You can move focus to an area by clicking on it with the middle mouse button.
 
 
 .. _ui-simpleselmenu:

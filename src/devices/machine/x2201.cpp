@@ -23,7 +23,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/x2201.h"
+#include "x2201.h"
 
 #include <algorithm>
 

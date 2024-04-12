@@ -134,7 +134,7 @@ authors:hap
 		<element ref="nothing" inputtag="IN.5" inputmask="0x07" inputraw="yes"><bounds xc="100" yc="97" width="3.5" height="3.5" /></element>
 		<element ref="nothing" inputtag="IN.6" inputmask="0x06" inputraw="yes"><bounds xc="106.5" yc="97" width="3.5" height="3.5" /></element>
 
-		<element ref="nothing" inputtag="IN.3" inputmask="0x00" inputraw="yes"><bounds xc="100" y="85" width="25" height="18" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="100" y="85" width="25" height="18" /></element>
 
 		<element ref="redd"><bounds xc="100" yc="100" width="20" height="20" /></element>
 		<element ref="text_set" blend="multiply"><bounds xc="100" yc="106" width="20" height="5" /></element>

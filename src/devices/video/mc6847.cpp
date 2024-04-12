@@ -91,7 +91,7 @@
 
 
 #include "emu.h"
-#include "video/mc6847.h"
+#include "mc6847.h"
 
 #define LOG_SCANLINE (1U << 1)
 #define LOG_HSYNC    (1U << 2)

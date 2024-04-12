@@ -14,7 +14,8 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/pc_fdc.h"
+#include "pc_fdc.h"
+
 #include "imagedev/floppy.h"
 
 //#define VERBOSE (LOG_GENERAL)

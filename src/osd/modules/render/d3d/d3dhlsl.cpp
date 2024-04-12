@@ -2022,7 +2022,7 @@ int32_t slider::update(std::string *str, int32_t newval)
 	return 0;
 }
 
-char shaders::last_system_name[16];
+char shaders::last_system_name[MAX_DRIVER_NAME_CHARS + 1];
 
 hlsl_options shaders::last_options = { false };
 

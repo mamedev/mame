@@ -1188,7 +1188,7 @@ Clickable items
 If a view item (``element`` or ``screen`` element) has ``inputtag`` and
 ``inputmask`` attribute values that correspond to a digital switch field in the
 emulated system, clicking the element will activate the switch.  The switch
-will remain active as long as the mouse button is held down and the pointer is
+will remain active as long as the primary button is held down and the pointer is
 within the item’s current bounds.  (Note that the bounds may change depending on
 the item’s animation state, see :ref:`layfile-interact-itemanim`).
 
@@ -1196,6 +1196,12 @@ The ``inputtag`` attribute specifies the tag path of an I/O port relative to the
 device that caused the layout file to be loaded.  The ``inputmask`` attribute
 must be an integer specifying the bits of the I/O port field that the item
 should activate.  This sample shows instantiation of clickable buttons:
+
+The ``clickthrough`` attribute controls whether clicks can pass through the view
+item to other view items drawn above it.  The ``clickthrough`` attribute must be
+``yes`` or ``no`` if present.  The default is ``no`` (clicks do not pass
+through) for view items with ``inputtag`` and ``inputmask`` attributes, and
+``yes`` (clicks pass through) for other view items.
 
 .. code-block:: XML
 
@@ -1209,9 +1215,8 @@ should activate.  This sample shows instantiation of clickable buttons:
         <bounds x="1.775" y="5.375" width="1.0" height="1.0" />
     </element>
 
-When handling mouse input, MAME treats all layout elements as being rectangular,
-and only activates the first clickable item whose area includes the location of
-the mouse pointer.
+When handling pointer input, MAME treats all layout elements as being
+rectangular.
 
 
 .. _layfile-interact-elemstate:

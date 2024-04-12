@@ -36,7 +36,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/pwm.h"
+#include "pwm.h"
 
 #include <algorithm>
 

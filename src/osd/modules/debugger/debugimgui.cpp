@@ -18,6 +18,7 @@
 #include "debug/debugcpu.h"
 #include "debugger.h"
 #include "render.h"
+#include "ui/uimain.h"
 #include "uiinput.h"
 
 #include "formats/flopimg.h"
@@ -36,16 +37,16 @@ class debug_area
 	DISABLE_COPYING(debug_area);
 
 public:
-	debug_area(running_machine &machine, debug_view_type type)
-		: next(nullptr),
-			type(0),
-			ofs_x(0),
-			ofs_y(0),
-			is_collapsed(false),
-			exec_cmd(false),
-			scroll_end(false),
-			scroll_follow(false)
-		{
+	debug_area(running_machine &machine, debug_view_type type) :
+		next(nullptr),
+		type(0),
+		ofs_x(0),
+		ofs_y(0),
+		is_collapsed(false),
+		exec_cmd(false),
+		scroll_end(false),
+		scroll_follow(false)
+	{
 		this->view = machine.debug_view().alloc_view(type, nullptr, this);
 		this->type = type;
 		this->m_machine = &machine;
@@ -63,7 +64,7 @@ public:
 		default:
 			break;
 		}
-		}
+	}
 	~debug_area()
 	{
 		//this->target->debug_free(*this->container);
@@ -72,7 +73,7 @@ public:
 
 	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
-	debug_area *             next;
+	debug_area *        next;
 
 	int                 type;
 	debug_view *        view;
@@ -99,9 +100,11 @@ public:
 class debug_imgui : public osd_module, public debug_module
 {
 public:
-	debug_imgui()
-	: osd_module(OSD_DEBUG_PROVIDER, "imgui"), debug_module(),
+	debug_imgui() :
+		osd_module(OSD_DEBUG_PROVIDER, "imgui"), debug_module(),
 		m_machine(nullptr),
+		m_take_ui(false),
+		m_current_pointer(-1),
 		m_mouse_x(0),
 		m_mouse_y(0),
 		m_mouse_button(false),
@@ -155,9 +158,8 @@ private:
 		std::string longname;
 	};
 
-	void handle_mouse();
+	void handle_events();
 	void handle_mouse_views();
-	void handle_keys();
 	void handle_keys_views();
 	void handle_console(running_machine* machine);
 	void update();
@@ -184,15 +186,17 @@ private:
 	static int history_set(ImGuiInputTextCallbackData* data);
 
 	running_machine* m_machine;
-	int32_t            m_mouse_x;
-	int32_t            m_mouse_y;
+	bool             m_take_ui;
+	int32_t          m_current_pointer;
+	int32_t          m_mouse_x;
+	int32_t          m_mouse_y;
 	bool             m_mouse_button;
 	bool             m_prev_mouse_button;
 	bool             m_running;
 	const char*      font_name;
 	float            font_size;
 	ImVec2           m_text_size;  // size of character (assumes monospaced font is in use)
-	uint8_t            m_key_char;
+	uint8_t          m_key_char;
 	bool             m_hide;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
 	bool             m_has_images; // true if current system has any image devices
@@ -271,72 +275,18 @@ bool debug_imgui::get_view_source(void* data, int idx, const char** out_text)
 	return true;
 }
 
-void debug_imgui::handle_mouse()
-{
-	m_prev_mouse_button = m_mouse_button;
-	m_machine->ui_input().find_mouse(&m_mouse_x, &m_mouse_y, &m_mouse_button);
-	ImGuiIO& io = ImGui::GetIO();
-	io.MousePos = ImVec2(m_mouse_x,m_mouse_y);
-	io.MouseDown[0] = m_mouse_button;
-}
-
-void debug_imgui::handle_mouse_views()
-{
-	rectangle rect;
-	bool clicked = false;
-	if(m_mouse_button == true && m_prev_mouse_button == false)
-		clicked = true;
-
-	// check all views, and pass mouse clicks to them
-	if(!m_mouse_button)
-		return;
-	rect.min_x = view_main_disasm->ofs_x;
-	rect.min_y = view_main_disasm->ofs_y;
-	rect.max_x = view_main_disasm->ofs_x + view_main_disasm->view_width;
-	rect.max_y = view_main_disasm->ofs_y + view_main_disasm->view_height;
-	if(rect.contains(m_mouse_x,m_mouse_y) && clicked && view_main_disasm->has_focus)
-	{
-		debug_view_xy topleft = view_main_disasm->view->visible_position();
-		debug_view_xy newpos;
-		newpos.x = topleft.x + (m_mouse_x-view_main_disasm->ofs_x) / m_text_size.x;
-		newpos.y = topleft.y + (m_mouse_y-view_main_disasm->ofs_y) / m_text_size.y;
-		view_main_disasm->view->set_cursor_position(newpos);
-		view_main_disasm->view->set_cursor_visible(true);
-	}
-	for(auto it = view_list.begin();it != view_list.end();++it)
-	{
-		rect.min_x = (*it)->ofs_x;
-		rect.min_y = (*it)->ofs_y;
-		rect.max_x = (*it)->ofs_x + (*it)->view_width;
-		rect.max_y = (*it)->ofs_y + (*it)->view_height;
-		if(rect.contains(m_mouse_x,m_mouse_y) && clicked && (*it)->has_focus)
-		{
-			if((*it)->view->cursor_supported())
-			{
-				debug_view_xy topleft = (*it)->view->visible_position();
-				debug_view_xy newpos;
-				newpos.x = topleft.x + (m_mouse_x-(*it)->ofs_x) / m_text_size.x;
-				newpos.y = topleft.y + (m_mouse_y-(*it)->ofs_y) / m_text_size.y;
-				(*it)->view->set_cursor_position(newpos);
-				(*it)->view->set_cursor_visible(true);
-			}
-		}
-	}
-}
-
-void debug_imgui::handle_keys()
+void debug_imgui::handle_events()
 {
 	ImGuiIO& io = ImGui::GetIO();
-	ui_event event;
-	debug_area* focus_view = nullptr;
 
 	// find view that has focus (should only be one at a time)
-	for(auto view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+	debug_area* focus_view = nullptr;
+	for(auto view_ptr = view_list.begin();view_ptr != view_list.end(); ++view_ptr)
 		if((*view_ptr)->has_focus)
 			focus_view = *view_ptr;
 
 	// check views in main views also (only the disassembler view accepts inputs)
-	if(view_main_disasm != nullptr)
+	if(view_main_disasm)
 		if(view_main_disasm->has_focus)
 			focus_view = view_main_disasm;
 
@@ -355,21 +305,65 @@ void debug_imgui::handle_keys()
 
 	for(input_item_id id = ITEM_ID_A; id <= ITEM_ID_CANCEL; ++id)
 	{
-		if(m_machine->input().code_pressed(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id))) {
-			if (m_mapping.count(id)) io.AddKeyEvent(m_mapping[id], true);
-		} else {
-			if (m_mapping.count(id)) io.AddKeyEvent(m_mapping[id], false);
+		if(m_machine->input().code_pressed(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+		{
+			if(m_mapping.count(id))
+				io.AddKeyEvent(m_mapping[id], true);
+		}
+		else
+		{
+			if(m_mapping.count(id))
+				io.AddKeyEvent(m_mapping[id], false);
 		}
 	}
 
+	m_prev_mouse_button = m_mouse_button;
 	m_key_char = 0;
-	while (m_machine->ui_input().pop_event(&event))
+	ui_event event;
+	while(m_machine->ui_input().pop_event(&event))
 	{
 		switch (event.event_type)
 		{
+		case ui_event::type::POINTER_UPDATE:
+			if(&m_machine->render().ui_target() != event.target)
+				break;
+			if(event.pointer_id != m_current_pointer)
+			{
+				if((0 > m_current_pointer) || ((event.pointer_pressed & 1) && !m_mouse_button))
+					m_current_pointer = event.pointer_id;
+			}
+			if(event.pointer_id == m_current_pointer)
+			{
+				bool changed = (m_mouse_x != event.pointer_x) || (m_mouse_y != event.pointer_y) || (m_mouse_button != bool(event.pointer_buttons & 1));
+				m_mouse_x = event.pointer_x;
+				m_mouse_y = event.pointer_y;
+				m_mouse_button = bool(event.pointer_buttons & 1);
+				if(changed)
+				{
+					io.MousePos = ImVec2(m_mouse_x,m_mouse_y);
+					io.MouseDown[0] = m_mouse_button;
+				}
+			}
+			break;
+		case ui_event::type::POINTER_LEAVE:
+		case ui_event::type::POINTER_ABORT:
+			if((&m_machine->render().ui_target() == event.target) && (event.pointer_id == m_current_pointer))
+			{
+				m_current_pointer = -1;
+				bool changed = (m_mouse_x != event.pointer_x) || (m_mouse_y != event.pointer_y) || m_mouse_button;
+				m_mouse_x = event.pointer_x;
+				m_mouse_y = event.pointer_y;
+				m_mouse_button = false;
+				if(changed)
+				{
+					io.MousePos = ImVec2(m_mouse_x,m_mouse_y);
+					io.MouseDown[0] = m_mouse_button;
+				}
+			}
+			break;
 		case ui_event::type::IME_CHAR:
-			m_key_char = event.ch;
-			if(focus_view != nullptr)
+			m_key_char = event.ch; // FIXME: assigning 4-byte UCS4 character to 8-bit variable
+			if(focus_view)
 				focus_view->view->process_char(m_key_char);
 			return;
 		default:
@@ -429,6 +423,50 @@ void debug_imgui::handle_keys()
 	if(ImGui::IsKeyPressed(ImGuiKey_L,false) && io.KeyCtrl)
 		add_log(++m_win_count);
 
+}
+
+void debug_imgui::handle_mouse_views()
+{
+	rectangle rect;
+	bool clicked = false;
+	if(m_mouse_button == true && m_prev_mouse_button == false)
+		clicked = true;
+
+	// check all views, and pass mouse clicks to them
+	if(!m_mouse_button)
+		return;
+	rect.min_x = view_main_disasm->ofs_x;
+	rect.min_y = view_main_disasm->ofs_y;
+	rect.max_x = view_main_disasm->ofs_x + view_main_disasm->view_width;
+	rect.max_y = view_main_disasm->ofs_y + view_main_disasm->view_height;
+	if(rect.contains(m_mouse_x,m_mouse_y) && clicked && view_main_disasm->has_focus)
+	{
+		debug_view_xy topleft = view_main_disasm->view->visible_position();
+		debug_view_xy newpos;
+		newpos.x = topleft.x + (m_mouse_x-view_main_disasm->ofs_x) / m_text_size.x;
+		newpos.y = topleft.y + (m_mouse_y-view_main_disasm->ofs_y) / m_text_size.y;
+		view_main_disasm->view->set_cursor_position(newpos);
+		view_main_disasm->view->set_cursor_visible(true);
+	}
+	for(auto it = view_list.begin();it != view_list.end();++it)
+	{
+		rect.min_x = (*it)->ofs_x;
+		rect.min_y = (*it)->ofs_y;
+		rect.max_x = (*it)->ofs_x + (*it)->view_width;
+		rect.max_y = (*it)->ofs_y + (*it)->view_height;
+		if(rect.contains(m_mouse_x,m_mouse_y) && clicked && (*it)->has_focus)
+		{
+			if((*it)->view->cursor_supported())
+			{
+				debug_view_xy topleft = (*it)->view->visible_position();
+				debug_view_xy newpos;
+				newpos.x = topleft.x + (m_mouse_x-(*it)->ofs_x) / m_text_size.x;
+				newpos.y = topleft.y + (m_mouse_y-(*it)->ofs_y) / m_text_size.y;
+				(*it)->view->set_cursor_position(newpos);
+				(*it)->view->set_cursor_visible(true);
+			}
+		}
+	}
 }
 
 void debug_imgui::handle_keys_views()
@@ -1553,22 +1591,31 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	}
 	if(firststop)
 	{
-//      debug_show_all();
-		device.machine().ui_input().reset();
+		//debug_show_all();
 		m_running = false;
 	}
+	if(!m_take_ui)
+	{
+		if (!m_machine->ui().set_ui_event_handler([this] () { return m_take_ui; }))
+		{
+			// can't break if we can't take over UI input
+			m_machine->debugger().console().get_visible_cpu()->debug()->go();
+			m_running = true;
+			return;
+		}
+		m_take_ui = true;
+
+	}
 	m_hide = false;
-	m_machine->osd().input_update(true);
-	handle_mouse();
-	handle_keys();
+	m_machine->osd().input_update(false);
+	handle_events();
 	handle_console(m_machine);
 	update_cpu_view(&device);
-	imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height,m_key_char);
+	imguiBeginFrame(m_mouse_x, m_mouse_y, m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height,m_key_char);
 	handle_mouse_views();
 	handle_keys_views();
 	update();
 	imguiEndFrame();
-	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
 	osd_sleep(osd_ticks_per_second() / 1000 * 50);
 }
@@ -1576,19 +1623,31 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 
 void debug_imgui::debugger_update()
 {
-	if(view_main_disasm == nullptr || view_main_regs == nullptr || view_main_console == nullptr)
+	if(!view_main_disasm || !view_main_regs || !view_main_console || !m_machine || (m_machine->phase() != machine_phase::RUNNING))
 		return;
 
-	if (m_machine && (m_machine->phase() == machine_phase::RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
+	if(!m_machine->debugger().cpu().is_stopped())
 	{
-		uint32_t width = m_machine->render().ui_target().width();
-		uint32_t height = m_machine->render().ui_target().height();
-		m_machine->osd().input_update(true);
-		handle_mouse();
-		handle_keys();
-		imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height, m_key_char);
-		update();
-		imguiEndFrame();
+		if(m_take_ui)
+		{
+			m_take_ui = false;
+			m_current_pointer = -1;
+			m_prev_mouse_button = m_mouse_button;
+			if(m_mouse_button)
+			{
+				m_mouse_button = false;
+				ImGuiIO& io = ImGui::GetIO();
+				io.MouseDown[0] = false;
+			}
+		}
+		if(!m_hide)
+		{
+			uint32_t width = m_machine->render().ui_target().width();
+			uint32_t height = m_machine->render().ui_target().height();
+			imguiBeginFrame(m_mouse_x, m_mouse_y, 0, 0, width, height, m_key_char);
+			update();
+			imguiEndFrame();
+		}
 	}
 }
 

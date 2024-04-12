@@ -5,25 +5,6 @@ authors:Sandro Ronco, hap
 -->
 <mamelayout version="2">
 
-<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
-
-	<script><![CDATA[
-		local layout = {}
-		local prev_state = 0
-
-		function layout.frame()
-			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
-			if cur_state ~= prev_state then
-				machine.ioport.ports[":IN.1"]:field(0x01):set_value(cur_state)
-				machine.ioport.ports[":IN.1"]:field(0x02):set_value(cur_state)
-			end
-			prev_state = cur_state
-		end
-
-		return layout
-	]]></script>
-
-
 <!-- define elements -->
 
 	<element name="black_rect">
@@ -428,7 +409,8 @@ authors:Sandro Ronco, hap
 		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="119" y="78" width="5" height="5" /></element>
 
 		<!-- hidden input at the left of MONITOR/VIEW buttons to press both -->
-		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="110.8" y="24" width="5" height="2" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x01" clickthrough="yes"><bounds x="110.8" y="24" width="5" height="2" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x02" clickthrough="no"> <bounds x="110.8" y="24" width="5" height="2" /></element>
 
 		<!-- panel 16seg leds -->
 		<element name="display_background" ref="black_rect"> <bounds x="101" y="4" width="26" height="9.2" /></element>
