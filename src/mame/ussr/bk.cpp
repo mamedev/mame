@@ -41,19 +41,20 @@ TODO:
 /* Address maps */
 void bk_state::bk0010_mem(address_map &map)
 {
-	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(bk_state::trap_r), FUNC(bk_state::trap_w));
 	map(0x0000, 0x3fff).ram();
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0xfeff).rom().region("maincpu",0);
 	map(0xffb0, 0xffb1).rw(FUNC(bk_state::key_state_r), FUNC(bk_state::key_state_w));
 	map(0xffb2, 0xffb3).r(FUNC(bk_state::key_code_r));
 	map(0xffb4, 0xffb5).rw(FUNC(bk_state::vid_scroll_r), FUNC(bk_state::vid_scroll_w));
+	map(0xffcc, 0xffcd).noprw();
 	map(0xffce, 0xffcf).rw(FUNC(bk_state::key_press_r), FUNC(bk_state::key_press_w));
 }
 
 void bk_state::bk0010fd_mem(address_map &map)
 {
-	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(bk_state::trap_r), FUNC(bk_state::trap_w));
 	map(0x0000, 0x3fff).ram();
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0x9fff).rom().region("maincpu",0);
@@ -64,6 +65,7 @@ void bk_state::bk0010fd_mem(address_map &map)
 	map(0xffb0, 0xffb1).rw(FUNC(bk_state::key_state_r), FUNC(bk_state::key_state_w));
 	map(0xffb2, 0xffb3).r(FUNC(bk_state::key_code_r));
 	map(0xffb4, 0xffb5).rw(FUNC(bk_state::vid_scroll_r), FUNC(bk_state::vid_scroll_w));
+	map(0xffcc, 0xffcd).noprw();
 	map(0xffce, 0xffcf).rw(FUNC(bk_state::key_press_r), FUNC(bk_state::key_press_w));
 }
 
@@ -186,6 +188,11 @@ void bk_state::bk0010(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bk_state::bk0010_mem);
 	m_maincpu->in_iack().set(FUNC(bk_state::irq_callback));
 
+	QBUS(config, m_qbus, 0);
+	m_qbus->set_space(m_maincpu, AS_PROGRAM);
+	m_qbus->birq4().set_inputline(m_maincpu, t11_device::VEC_LINE);
+	QBUS_SLOT(config, "qbus" ":1", qbus_cards, nullptr);
+
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
@@ -198,9 +205,10 @@ void bk_state::bk0010(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("bk0010_cass");
 

@@ -7,7 +7,7 @@ King Of Football (c)1995 BMC
 preliminary driver by Tomasz Slanina
 
 TODO:
-- uses same 'pixmap' as bmc/bmcpokr.cpp. Noted uses are for jxzh's test mode and bookkeeping.
+- uses a 'pixmap' like bmc/bmcpokr.cpp. Noted uses are for jxzh's test mode and bookkeeping.
   For now implementation is just copied over, but it needs to be adapted;
 - lots of unknown writes / reads;
 - one of the customs could contain a VIA6522-like core. bmc/bmcbowl.cpp uses the VIA6522 and the

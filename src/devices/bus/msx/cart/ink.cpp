@@ -35,6 +35,7 @@ protected:
 private:
 	required_device<amd_29f040_device> m_flash;
 
+	template <int Page> u8 read_page(offs_t offset);
 	template <int Page> void write_page(offs_t offset, u8 data);
 };
 
@@ -65,16 +66,18 @@ std::error_condition msx_cart_ink_device::initialize_cartridge(std::string &mess
 	u8 *flash = memregion("flash")->base();
 	memcpy(flash, cart_rom_region()->base(), size);
 
-	page(0)->install_rom(0x0000, 0x3fff, flash);
-	page(1)->install_rom(0x4000, 0x7fff, flash + 0x4000);
-	page(2)->install_rom(0x8000, 0xbfff, flash + 0x8000);
-	page(3)->install_rom(0xc000, 0xffff, flash + 0xc000);
-	page(0)->install_write_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
-	page(1)->install_write_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
-	page(2)->install_write_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
-	page(3)->install_write_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
+	page(0)->install_readwrite_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<0>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
+	page(1)->install_readwrite_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<1>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
+	page(2)->install_readwrite_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<2>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
+	page(3)->install_readwrite_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<3>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
 
 	return std::error_condition();
+}
+
+template <int Page>
+u8 msx_cart_ink_device::read_page(offs_t offset)
+{
+	return m_flash->read(offset | (Page * 0x4000));
 }
 
 template <int Page>
