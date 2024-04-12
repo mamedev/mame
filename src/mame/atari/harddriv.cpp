@@ -1470,7 +1470,7 @@ void harddriv_state::driver_nomsp(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	ADC0809(config, m_adc8, 1000000); // unknown clock
+	ADC0809(config, m_adc8, 640000); // Chip operated at 2 frequencies, 640khz (Conversion time 100μs) and 500Khz (Conversion time 100μs)
 	m_adc8->in_callback<0>().set_ioport("8BADC.0");
 	m_adc8->in_callback<1>().set_ioport("8BADC.1");
 	m_adc8->in_callback<2>().set_ioport("8BADC.2");
