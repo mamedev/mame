@@ -41,7 +41,7 @@ authors:hap
 		<element name="0.8" ref="led"><bounds x="-2" y="0" width="1.5" height="1.5" /></element>
 		<element ref="text_pm"><bounds x="-4" y="2" width="5.5" height="1.5" /></element>
 
-		<element ref="nothing" inputtag="IN.6" inputmask="0x00" inputraw="yes"><bounds x="-2" y="9" width="1.5" height="1.5" /></element> <!-- block clickable input -->
+		<element ref="nothing" clickthrough="no"><bounds x="-2" y="9" width="1.5" height="1.5" /></element> <!-- block clickable input -->
 		<element ref="led" inputtag="IN.6" inputmask="0x02"><bounds x="-2" y="9" width="1.5" height="1.5" /></element>
 		<element ref="text_b1"><bounds x="-3" y="11" width="7.5" height="1.5" /></element>
 		<element ref="text_b2"><bounds x="-3" y="12.5" width="7.5" height="1.5" /></element>

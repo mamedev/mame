@@ -204,23 +204,16 @@ public:
 
 	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Base &)> &&handler) override
 	{
-		if (m_choices.empty())
-		{
-			handler(*this);
-		}
-		else
-		{
-			menu::stack_push<menu_selector>(
-					mui, container,
-					_("Filter"), // TODO: get localised name of filter in here somehow
-					std::vector<std::string>(m_choices), // ouch, a vector copy!
-					m_selection,
-					[this, cb = std::move(handler)] (int selection)
-					{
-						m_selection = selection;
-						cb(*this);
-					});
-		}
+		menu::stack_push<menu_selector>(
+				mui, container,
+				_("Filter"), // TODO: get localised name of filter in here somehow
+				std::vector<std::string>(m_choices), // ouch, a vector copy!
+				m_selection,
+				[this, cb = std::move(handler)] (int selection)
+				{
+					m_selection = selection;
+					cb(*this);
+				});
 	}
 
 	virtual bool wants_adjuster() const override { return have_choices(); }

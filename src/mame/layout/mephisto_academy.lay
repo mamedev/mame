@@ -5,25 +5,6 @@ authors:Sandro Ronco, hap
 -->
 <mamelayout version="2">
 
-<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
-
-	<script><![CDATA[
-		local layout = {}
-		local prev_state = 0
-
-		function layout.frame()
-			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
-			if cur_state ~= prev_state then
-				machine.ioport.ports[":KEY"]:field(0x40):set_value(cur_state)
-				machine.ioport.ports[":KEY"]:field(0x80):set_value(cur_state)
-			end
-			prev_state = cur_state
-		end
-
-		return layout
-	]]></script>
-
-
 <!-- define elements -->
 
 	<element name="ledo">
@@ -456,7 +437,8 @@ authors:Sandro Ronco, hap
 		<element ref="hlbr" inputtag="KEY" inputmask="0x80"> <bounds x="75" y="3.75" width="1.5" height="2.5" /> </element>
 
 		<!-- hidden input below ENT/CL buttons to press both -->
-		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="69" y="6.85" width="7.5" height="1.3" /></element>
+		<element ref="nothing" inputtag="KEY" inputmask="0x40" clickthrough="yes"><bounds x="69" y="6.85" width="7.5" height="1.3" /></element>
+		<element ref="nothing" inputtag="KEY" inputmask="0x80" clickthrough="no"> <bounds x="69" y="6.85" width="7.5" height="1.3" /></element>
 
 		<element ref="ledo"><bounds x="31.1" y="0.1" width="1.3" height="1.3" /></element>
 		<element ref="ledo"><bounds x="37.1" y="0.1" width="1.3" height="1.3" /></element>

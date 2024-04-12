@@ -311,7 +311,7 @@ bool menu_bookkeeping::handle(event const *ev)
 	}
 	else
 	{
-		return ev && handle_key(ev->iptkey);
+		return menu_textbox::handle(ev);
 	}
 }
 

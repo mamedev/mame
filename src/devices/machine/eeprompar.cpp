@@ -47,7 +47,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eeprompar.h"
+#include "eeprompar.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

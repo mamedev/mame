@@ -16,6 +16,8 @@
 #include "rendertypes.h"
 #include "screen.h"
 
+#include "interface/uievents.h"
+
 #include <array>
 #include <functional>
 #include <map>
@@ -436,6 +438,9 @@ public:
 	using prepare_items_delegate = delegate<void ()>;
 	using preload_delegate = delegate<void ()>;
 	using recomputed_delegate = delegate<void ()>;
+	using pointer_updated_delegate = delegate<void (osd::ui_event_handler::pointer, u16, u16, float, float, u32, u32, u32, s16)>;
+	using pointer_left_delegate = delegate<void (osd::ui_event_handler::pointer, u16, u16, float, float, u32, s16)>;
+	using forget_pointers_delegate = delegate<void ()>;
 
 	using item = layout_view_item;
 	using item_list = std::list<item>;
@@ -524,9 +529,13 @@ public:
 	bool has_art() const { return m_has_art; }
 
 	// set handlers
-	void set_prepare_items_callback(prepare_items_delegate &&handler);
-	void set_preload_callback(preload_delegate &&handler);
-	void set_recomputed_callback(recomputed_delegate &&handler);
+	void set_prepare_items_callback(prepare_items_delegate &&handler) ATTR_COLD;
+	void set_preload_callback(preload_delegate &&handler) ATTR_COLD;
+	void set_recomputed_callback(recomputed_delegate &&handler) ATTR_COLD;
+	void set_pointer_updated_callback(pointer_updated_delegate &&handler) ATTR_COLD;
+	void set_pointer_left_callback(pointer_left_delegate &&handler) ATTR_COLD;
+	void set_pointer_aborted_callback(pointer_left_delegate &&handler) ATTR_COLD;
+	void set_forget_pointers_callback(forget_pointers_delegate &&handler) ATTR_COLD;
 
 	// operations
 	void prepare_items();
@@ -535,6 +544,28 @@ public:
 
 	// resolve tags, if any
 	void resolve_tags();
+
+	// pointer input
+	void pointer_updated(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 buttons, u32 pressed, u32 released, s16 clicks)
+	{
+		if (!m_pointer_updated.isnull())
+			m_pointer_updated(type, ptrid, device, x, y, buttons, pressed, released, clicks);
+	}
+	void pointer_left(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 released, s16 clicks)
+	{
+		if (!m_pointer_left.isnull())
+			m_pointer_left(type, ptrid, device, x, y, released, clicks);
+	}
+	void pointer_aborted(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 released, s16 clicks)
+	{
+		if (!m_pointer_aborted.isnull())
+			m_pointer_aborted(type, ptrid, device, x, y, released, clicks);
+	}
+	void forget_pointers()
+	{
+		if (!m_forget_pointers.isnull())
+			m_forget_pointers();
+	}
 
 private:
 	struct layer_lists;
@@ -576,6 +607,10 @@ private:
 	prepare_items_delegate      m_prepare_items;    // prepare items for adding to render container
 	preload_delegate            m_preload;          // additional actions when visible items change
 	recomputed_delegate         m_recomputed;       // additional actions on resizing/visibility change
+	pointer_updated_delegate    m_pointer_updated;  // pointer state updated
+	pointer_left_delegate       m_pointer_left;     // pointer left normally
+	pointer_left_delegate       m_pointer_aborted;  // pointer left abnormally
+	forget_pointers_delegate    m_forget_pointers;  // stop processing pointer input
 
 	// cold items
 	std::string                 m_name;             // display name for the view

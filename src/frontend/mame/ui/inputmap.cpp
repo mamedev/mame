@@ -322,7 +322,7 @@ void menu_input::recompute_metrics(uint32_t width, uint32_t height, float aspect
 }
 
 
-void menu_input::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_input::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	if (pollingitem)
 	{

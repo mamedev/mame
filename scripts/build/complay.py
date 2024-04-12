@@ -174,6 +174,17 @@ class LayoutChecker(Minifyer):
             self.handle_error('Element %s attribute %s "%s" is not a number' % (name, key, val))
             return None
 
+    def check_bool_attribute(self, name, attrs, key, default):
+        if key not in attrs:
+            return default
+        val = attrs[key]
+        if self.VARPATTERN.match(val):
+            return None
+        elif val in self.YESNO:
+            return 'yes' == val
+        self.handle_error('Element %s attribute %s "%s" is not "yes" or "no"' % (name, key, val))
+        return None
+
     def check_parameter(self, attrs):
         if 'name' not in attrs:
             self.handle_error('Element param missing attribute name')
@@ -253,8 +264,7 @@ class LayoutChecker(Minifyer):
         if self.check_int_attribute('orientation', attrs, 'rotate', 0) not in self.ORIENTATIONS:
             self.handle_error('Element orientation attribute rotate "%s" is unsupported' % (attrs['rotate'], ))
         for name in ('swapxy', 'flipx', 'flipy'):
-            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs[name])):
-                self.handle_error('Element orientation attribute %s "%s" is not "yes" or "no"' % (name, attrs[name]))
+            self.check_bool_attribute('orientation', attrs, name, None)
 
     def check_color(self, attrs):
         self.check_color_channel(attrs, 'red')
@@ -324,8 +334,8 @@ class LayoutChecker(Minifyer):
                 self.handle_error('Element %s has inputraw attribute without inputtag attribute' % (name, ))
         inputmask = self.check_int_attribute(name, attrs, 'inputmask', None)
         if (inputmask is not None) and (not inputmask):
-            if (inputraw is None) or (not inputraw):
-                self.handle_error('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
+            self.handle_error('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
+        self.check_bool_attribute(name, attrs, 'clickthrough', None)
 
     def startViewItem(self, name):
         self.handlers.append((self.viewItemStartHandler, self.viewItemEndHandler))
@@ -676,8 +686,7 @@ class LayoutChecker(Minifyer):
             else:
                 have_scroll[-1] = self.format_location()
                 self.check_float_attribute(name, attrs, 'size', 1.0)
-                if (attrs.get('wrap', 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['wrap'])):
-                    self.handle_error('Element %s attribute wrap "%s" is not "yes" or "no"' % (name, attrs['wrap']))
+                self.check_bool_attribute(name, attrs, 'wrap', False)
                 if 'inputtag' in attrs:
                     if 'name' in attrs:
                         self.handle_error('Element %s has both attribute inputtag and attribute name' % (name, ))

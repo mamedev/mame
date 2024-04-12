@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
 //  window.h - Win32 window handling
@@ -128,6 +128,21 @@ public:
 	int                 m_resize_state;
 
 private:
+	struct win_pointer_info : public pointer_info
+	{
+		static constexpr bool compare(win_pointer_info const &info, WORD ptrid) { return info.ptrid < ptrid; }
+
+		win_pointer_info(win_pointer_info const &) = default;
+		win_pointer_info(win_pointer_info &&) = default;
+		win_pointer_info &operator=(win_pointer_info const &) = default;
+		win_pointer_info &operator=(win_pointer_info &&) = default;
+
+		win_pointer_info(WORD p, POINTER_INPUT_TYPE t, unsigned i, unsigned d);
+
+		WORD ptrid;
+		POINTER_INPUT_TYPE type;
+	};
+
 	void draw_video_contents(HDC dc, bool update);
 	int complete_create();
 	int wnd_extra_width();
@@ -141,8 +156,37 @@ private:
 	void adjust_window_position_after_major_change();
 	void set_fullscreen(int fullscreen);
 
+	// pointer handling helpers
+	void pointer_entered(WPARAM wparam, LPARAM lparam);
+	void pointer_left(WPARAM wparam, LPARAM lparam);
+	void pointer_updated(WPARAM wparam, LPARAM lparam);
+	void pointer_capture_changed(WPARAM wparam, LPARAM lparam);
+	void mouse_left(WPARAM wparam, LPARAM lparam);
+	void mouse_updated(WPARAM wparam, LPARAM lparam);
+	void expire_pointer(std::vector<win_pointer_info>::iterator info, POINT const &where, bool canceled);
+	void update_pointer(win_pointer_info &info, POINT const &where, unsigned buttons, bool canceled);
+	std::vector<win_pointer_info>::iterator map_pointer(WPARAM wparam);
+	std::vector<win_pointer_info>::iterator find_pointer(WPARAM wparam);
+	std::vector<win_pointer_info>::iterator map_mouse_pointer();
+	std::vector<win_pointer_info>::iterator find_mouse_pointer();
+
 	win_window_info *   m_main;
 	bool                m_attached_mode;
+
+	// these functions first appear in Windows 8/Server 2012
+	OSD_DYNAMIC_API(user32, "User32.dll", "User32.dll");
+	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerType, UINT32, POINTER_INPUT_TYPE *);
+	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerInfo, UINT32, POINTER_INFO *);
+	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerPenInfo, UINT32, POINTER_PEN_INFO *);
+	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerTouchInfo, UINT32, POINTER_TOUCH_INFO *);
+
+	// info on currently active pointers - 64 pointers ought to be enough for anyone
+	uint64_t m_pointer_mask;
+	unsigned m_next_pointer, m_next_ptrdev;
+	bool m_tracking_mouse;
+	std::vector<std::pair<HANDLE, unsigned> > m_ptrdev_map;
+	std::vector<pointer_dev_info> m_ptrdev_info;
+	std::vector<win_pointer_info> m_active_pointers;
 
 	static POINT        s_saved_cursor_pos;
 };

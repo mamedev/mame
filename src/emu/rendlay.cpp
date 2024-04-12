@@ -4251,6 +4251,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// sort edges of interactive items
 	LOGMASKED(LOG_INTERACTIVE_ITEMS, "Recalculated view '%s' with %u interactive items\n",
 			name(), m_interactive_items.size());
+	//std::reverse(m_interactive_items.begin(), m_interactive_items.end()); TODO: flip hit test order to match visual order
 	m_interactive_edges_x.reserve(m_interactive_items.size() * 2);
 	m_interactive_edges_y.reserve(m_interactive_items.size() * 2);
 	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
@@ -4311,6 +4312,50 @@ void layout_view::set_preload_callback(preload_delegate &&handler)
 void layout_view::set_recomputed_callback(recomputed_delegate &&handler)
 {
 	m_recomputed = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_pointer_updated_callback - set handler
+//  called for pointer input
+//-------------------------------------------------
+
+void layout_view::set_pointer_updated_callback(pointer_updated_delegate &&handler)
+{
+	m_pointer_updated = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_pointer_left_callback - set handler for
+//  pointer leaving normally
+//-------------------------------------------------
+
+void layout_view::set_pointer_left_callback(pointer_left_delegate &&handler)
+{
+	m_pointer_left = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_pointer_aborted_callback - set handler for
+//  pointer leaving abnormally
+//-------------------------------------------------
+
+void layout_view::set_pointer_aborted_callback(pointer_left_delegate &&handler)
+{
+	m_pointer_aborted = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_forget_pointers_callback - set handler for
+//  abandoning pointer input
+//-------------------------------------------------
+
+void layout_view::set_forget_pointers_callback(forget_pointers_delegate &&handler)
+{
+	m_forget_pointers = std::move(handler);
 }
 
 

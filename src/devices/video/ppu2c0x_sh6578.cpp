@@ -5,7 +5,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "video/ppu2c0x_sh6578.h"
+#include "ppu2c0x_sh6578.h"
 
 #define LOG_PPU_EXTRA       (1U << 1)
 

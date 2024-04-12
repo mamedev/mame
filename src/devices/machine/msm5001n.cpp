@@ -17,7 +17,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "machine/msm5001n.h"
+#include "msm5001n.h"
 
 
 DEFINE_DEVICE_TYPE(MSM5001N, msm5001n_device, "msm5001n", "OKI MSM5001N LCD Watch")

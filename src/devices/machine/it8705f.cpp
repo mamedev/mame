@@ -11,7 +11,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "machine/it8705f.h"
+#include "it8705f.h"
 
 #include "formats/naslite_dsk.h"
 

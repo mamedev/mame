@@ -36,19 +36,11 @@ enum
 ui_input_manager::ui_input_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_presses_enabled(true)
-	, m_current_mouse_target(nullptr)
-	, m_current_mouse_x(-1)
-	, m_current_mouse_y(-1)
-	, m_current_mouse_down(false)
-	, m_current_mouse_field(nullptr)
 	, m_events_start(0)
 	, m_events_end(0)
 {
 	std::fill(std::begin(m_next_repeat), std::end(m_next_repeat), 0);
 	std::fill(std::begin(m_seqpressed), std::end(m_seqpressed), 0);
-
-	// add a frame callback to poll inputs
-	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ui_input_manager::frame_update, this));
 }
 
 
@@ -58,12 +50,12 @@ ui_input_manager::ui_input_manager(running_machine &machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    frame_update - looks through pressed
-    input as per events pushed our way and posts
+    check_ui_inputs - looks through pressed input
+    as per events pushed our way and posts
     corresponding IPT_UI_* events
 -------------------------------------------------*/
 
-void ui_input_manager::frame_update()
+void ui_input_manager::check_ui_inputs()
 {
 	// update the state of all the UI keys
 	for (ioport_type code = ioport_type(IPT_UI_FIRST + 1); code < IPT_UI_LAST; ++code)
@@ -80,22 +72,6 @@ void ui_input_manager::frame_update()
 			m_seqpressed[code] = false;
 		}
 	}
-
-	// perform mouse hit testing
-	ioport_field *mouse_field = m_current_mouse_down ? find_mouse_field() : nullptr;
-	if (m_current_mouse_field != mouse_field)
-	{
-		// clear the old field if there was one
-		if (m_current_mouse_field != nullptr)
-			m_current_mouse_field->set_value(0);
-
-		// set the new field if it exists and isn't already being pressed
-		if (mouse_field != nullptr && !mouse_field->digital_value())
-			mouse_field->set_value(1);
-
-		// update internal state
-		m_current_mouse_field = mouse_field;
-	}
 }
 
 
@@ -106,37 +82,6 @@ void ui_input_manager::frame_update()
 
 bool ui_input_manager::push_event(ui_event evt)
 {
-	// some pre-processing (this is an icky place to do this stuff!)
-	switch (evt.event_type)
-	{
-		case ui_event::type::MOUSE_MOVE:
-			m_current_mouse_target = evt.target;
-			m_current_mouse_x = evt.mouse_x;
-			m_current_mouse_y = evt.mouse_y;
-			break;
-
-		case ui_event::type::MOUSE_LEAVE:
-			if (m_current_mouse_target == evt.target)
-			{
-				m_current_mouse_target = nullptr;
-				m_current_mouse_x = -1;
-				m_current_mouse_y = -1;
-			}
-			break;
-
-		case ui_event::type::MOUSE_DOWN:
-			m_current_mouse_down = true;
-			break;
-
-		case ui_event::type::MOUSE_UP:
-			m_current_mouse_down = false;
-			break;
-
-		default:
-			/* do nothing */
-			break;
-	}
-
 	// is the queue filled up?
 	if ((m_events_end + 1) % std::size(m_events) == m_events_start)
 		return false;
@@ -186,62 +131,10 @@ void ui_input_manager::reset()
 }
 
 
-/*-------------------------------------------------
-    find_mouse - retrieves the current
-    location of the mouse
--------------------------------------------------*/
-
-render_target *ui_input_manager::find_mouse(s32 *x, s32 *y, bool *button) const
-{
-	if (x != nullptr)
-		*x = m_current_mouse_x;
-	if (y != nullptr)
-		*y = m_current_mouse_y;
-	if (button != nullptr)
-		*button = m_current_mouse_down;
-	return m_current_mouse_target;
-}
-
-
-/*-------------------------------------------------
-    find_mouse_field - retrieves the input field
-    the mouse is currently pointing at
--------------------------------------------------*/
-
-ioport_field *ui_input_manager::find_mouse_field() const
-{
-	// map the point and determine what was hit
-	if (m_current_mouse_target != nullptr)
-	{
-		ioport_port *port = nullptr;
-		ioport_value mask;
-		float x, y;
-		if (m_current_mouse_target->map_point_input(m_current_mouse_x, m_current_mouse_y, port, mask, x, y))
-		{
-			if (port != nullptr)
-				return port->field(mask);
-		}
-	}
-	return nullptr;
-}
-
-
 
 /***************************************************************************
     USER INTERFACE SEQUENCE READING
 ***************************************************************************/
-
-/*-------------------------------------------------
-    pressed - return true if a key down
-    for the given user interface sequence is
-    detected
--------------------------------------------------*/
-
-bool ui_input_manager::pressed(int code)
-{
-	return pressed_repeat(code, 0);
-}
-
 
 /*-------------------------------------------------
     pressed_repeat - return true if a key
@@ -272,7 +165,7 @@ bool ui_input_manager::pressed_repeat(int code, int speed)
 		/* if this is an autorepeat case, set a 1x delay and leave pressed = 1 */
 		else if (speed > 0 && (osd_ticks() + tps - m_next_repeat[code]) >= tps)
 		{
-			// In the autorepeatcase, we need to double check the key is still pressed
+			// In the autorepeat case, we need to double-check the key is still pressed
 			// as there can be a delay between the key polling and our processing of the event
 			m_seqpressed[code] = machine().ioport().type_pressed(ioport_type(code));
 			pressed = (m_seqpressed[code] == SEQ_PRESSED_TRUE);
@@ -319,105 +212,84 @@ void ui_input_manager::push_window_defocus_event(render_target *target)
 }
 
 /*-------------------------------------------------
-    push_mouse_move_event - pushes a mouse
-    move event to the specified render_target
+    push_pointer_update - pushes a pointer update
+    event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_move_event(render_target *target, s32 x, s32 y)
+void ui_input_manager::push_pointer_update(
+		render_target *target,
+		pointer type,
+		u16 ptrid,
+		u16 device,
+		s32 x,
+		s32 y,
+		u32 buttons,
+		u32 pressed,
+		u32 released,
+		s16 clicks)
 {
 	ui_event event = { ui_event::type::NONE };
-	event.event_type = ui_event::type::MOUSE_MOVE;
+	event.event_type = ui_event::type::POINTER_UPDATE;
 	event.target = target;
-	event.mouse_x = x;
-	event.mouse_y = y;
+	event.pointer_type = type;
+	event.pointer_id = ptrid;
+	event.pointer_device = device;
+	event.pointer_x = x;
+	event.pointer_y = y;
+	event.pointer_buttons = buttons;
+	event.pointer_pressed = pressed;
+	event.pointer_released = released;
+	event.pointer_clicks = clicks;
 	push_event(event);
 }
 
-/*-------------------------------------------------
-    push_mouse_leave_event - pushes a
-    mouse leave event to the specified render_target
--------------------------------------------------*/
-
-void ui_input_manager::push_mouse_leave_event(render_target *target)
+void ui_input_manager::push_pointer_leave(
+		render_target *target,
+		pointer type,
+		u16 ptrid,
+		u16 device,
+		s32 x,
+		s32 y,
+		u32 released,
+		s16 clicks)
 {
 	ui_event event = { ui_event::type::NONE };
-	event.event_type = ui_event::type::MOUSE_LEAVE;
+	event.event_type = ui_event::type::POINTER_LEAVE;
 	event.target = target;
+	event.pointer_type = type;
+	event.pointer_id = ptrid;
+	event.pointer_device = device;
+	event.pointer_x = x;
+	event.pointer_y = y;
+	event.pointer_buttons = 0U;
+	event.pointer_pressed = 0U;
+	event.pointer_released = released;
+	event.pointer_clicks = clicks;
 	push_event(event);
 }
 
-/*-------------------------------------------------
-    push_mouse_down_event - pushes a mouse
-    down event to the specified render_target
--------------------------------------------------*/
-
-void ui_input_manager::push_mouse_down_event(render_target *target, s32 x, s32 y)
+void ui_input_manager::push_pointer_abort(
+		render_target *target,
+		pointer type,
+		u16 ptrid,
+		u16 device,
+		s32 x,
+		s32 y,
+		u32 released,
+		s16 clicks)
 {
 	ui_event event = { ui_event::type::NONE };
-	event.event_type = ui_event::type::MOUSE_DOWN;
+	event.event_type = ui_event::type::POINTER_ABORT;
 	event.target = target;
-	event.mouse_x = x;
-	event.mouse_y = y;
-	push_event(event);
-}
-
-/*-------------------------------------------------
-    push_mouse_down_event - pushes a mouse
-    down event to the specified render_target
--------------------------------------------------*/
-
-void ui_input_manager::push_mouse_up_event(render_target *target, s32 x, s32 y)
-{
-	ui_event event = { ui_event::type::NONE };
-	event.event_type = ui_event::type::MOUSE_UP;
-	event.target = target;
-	event.mouse_x = x;
-	event.mouse_y = y;
-	push_event(event);
-}
-
-/*-------------------------------------------------
-push_mouse_down_event - pushes a mouse
-down event to the specified render_target
--------------------------------------------------*/
-
-void ui_input_manager::push_mouse_rdown_event(render_target *target, s32 x, s32 y)
-{
-	ui_event event = { ui_event::type::NONE };
-	event.event_type = ui_event::type::MOUSE_RDOWN;
-	event.target = target;
-	event.mouse_x = x;
-	event.mouse_y = y;
-	push_event(event);
-}
-
-/*-------------------------------------------------
-push_mouse_down_event - pushes a mouse
-down event to the specified render_target
--------------------------------------------------*/
-
-void ui_input_manager::push_mouse_rup_event(render_target *target, s32 x, s32 y)
-{
-	ui_event event = { ui_event::type::NONE };
-	event.event_type = ui_event::type::MOUSE_RUP;
-	event.target = target;
-	event.mouse_x = x;
-	event.mouse_y = y;
-	push_event(event);
-}
-
-/*-------------------------------------------------
-    push_mouse_double_click_event - pushes
-    a mouse double-click event to the specified
-    render_target
--------------------------------------------------*/
-void ui_input_manager::push_mouse_double_click_event(render_target *target, s32 x, s32 y)
-{
-	ui_event event = { ui_event::type::NONE };
-	event.event_type = ui_event::type::MOUSE_DOUBLE_CLICK;
-	event.target = target;
-	event.mouse_x = x;
-	event.mouse_y = y;
+	event.pointer_type = type;
+	event.pointer_id = ptrid;
+	event.pointer_device = device;
+	event.pointer_x = x;
+	event.pointer_y = y;
+	event.pointer_buttons = 0U;
+	event.pointer_pressed = 0U;
+	event.pointer_released = released;
+	event.pointer_clicks = clicks;
 	push_event(event);
 }
 
@@ -439,7 +311,7 @@ void ui_input_manager::push_char_event(render_target *target, char32_t ch)
     wheel event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_wheel_event(render_target *target, s32 x, s32 y, short delta, int ucNumLines)
+void ui_input_manager::push_mouse_wheel_event(render_target *target, s32 x, s32 y, short delta, int lines)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_WHEEL;
@@ -447,7 +319,7 @@ void ui_input_manager::push_mouse_wheel_event(render_target *target, s32 x, s32 
 	event.mouse_x = x;
 	event.mouse_y = y;
 	event.zdelta = delta;
-	event.num_lines = ucNumLines;
+	event.num_lines = lines;
 	push_event(event);
 }
 

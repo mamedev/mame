@@ -14,7 +14,7 @@
  */
 
 #include "emu.h"
-#include "machine/x76f041.h"
+#include "x76f041.h"
 
 #include <cstdarg>
 #include <tuple>

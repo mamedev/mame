@@ -112,7 +112,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eepromser.h"
+#include "eepromser.h"
 
 
 

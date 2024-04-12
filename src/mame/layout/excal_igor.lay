@@ -461,7 +461,7 @@ authors:hap
 
 		<group ref="buttons"><bounds x="76.75" y="25.25" width="30" height="50" /></group>
 
-		<screen index="0"><bounds xc="91.5" yc="20.25" width="16" height="6" /></screen>
+		<screen index="0"><bounds xc="91.5" yc="20.25" width="16" height="6.03" /></screen>
 		<element ref="lcdm" blend="multiply"><bounds xc="91.5" yc="20.25" width="17" height="7" /></element>
 
 	</view>

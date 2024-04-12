@@ -27,6 +27,7 @@
 #include "uiinput.h"
 
 #include <cctype>
+#include <string_view>
 
 
 namespace ui {
@@ -142,16 +143,6 @@ bool simple_menu_select_game::handle(event const *ev)
 	case IPT_SPECIAL:
 		inkey_special(*ev);
 		break;
-	}
-
-	// if we're in an error state, overlay an error message
-	if (m_error)
-	{
-		ui().draw_text_box(
-				container(),
-				_("The selected game is missing one or more required ROM or CHD images. "
-				"Please select a different game.\n\nPress any key to continue."),
-				text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	}
 	return changed;
 }
@@ -300,7 +291,7 @@ void simple_menu_select_game::recompute_metrics(uint32_t width, uint32_t height,
 	menu::recompute_metrics(width, height, aspect);
 
 	// configure the custom rendering
-	set_custom_space(line_height() + 3.0f * tb_border(), 4.0f * line_height() + 3.0f * tb_border());
+	set_custom_space(line_height() + 3.0f * tb_border(), 5.0f * line_height() + 3.0f * tb_border());
 }
 
 
@@ -308,11 +299,11 @@ void simple_menu_select_game::recompute_metrics(uint32_t width, uint32_t height,
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
-void simple_menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	// if no matches, display the error message
 	if (m_nomatch)
 	{
+		// if no matches, display the error message
 		ui().draw_text_box(
 				container(),
 				string_format(
@@ -326,104 +317,133 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 				UI_RED_COLOR);
 		return;
 	}
-
-	const game_driver *driver;
-	std::string tempbuf[5];
-
-	// display the current typeahead
-	if (!m_search.empty())
-		tempbuf[0] = string_format(_("Type name or select: %1$s_"), m_search);
-	else
-		tempbuf[0] = _("Type name or select: (random)");
-
-	// draw the top box
-	draw_text_box(
-			tempbuf, tempbuf + 1,
-			origx1, origx2, origy1 - top, origy1 - tb_border(),
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), ui().colors().background_color());
-
-	// determine the text to render below
-	driver = ((uintptr_t)selectedref > 1) ? (const game_driver *)selectedref : nullptr;
-	if (driver)
-	{
-		// first line is game name
-		tempbuf[0] = string_format(_("%1$-.100s"), driver->type.fullname());
-
-		// next line is year, manufacturer
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
-
-		// next line source path
-		tempbuf[2] = string_format(_("Source file: %1$s"), info_xml_creator::format_sourcefile(driver->type.source()));
-
-		// update cached values if selection changed
-		if (driver != m_cached_driver)
-		{
-			emu_options clean_options;
-			machine_static_info const info(ui().options(), machine_config(*driver, clean_options));
-			m_cached_driver = driver;
-			m_cached_flags = info.machine_flags();
-			m_cached_unemulated = info.unemulated_features();
-			m_cached_imperfect = info.imperfect_features();
-			m_cached_color = info.status_color();
-		}
-
-		// next line is overall driver status
-		if (m_cached_flags & machine_flags::NOT_WORKING)
-			tempbuf[3] = _("Overall: NOT WORKING");
-		else if ((m_cached_unemulated | m_cached_imperfect) & device_t::feature::PROTECTION)
-			tempbuf[3] = _("Overall: Unemulated Protection");
-		else
-			tempbuf[3] = _("Overall: Working");
-
-		// next line is graphics, sound status
-		if (m_cached_unemulated & device_t::feature::GRAPHICS)
-			tempbuf[4] = _("Graphics: Unimplemented, ");
-		else if ((m_cached_unemulated | m_cached_imperfect) & (device_t::feature::GRAPHICS | device_t::feature::PALETTE))
-			tempbuf[4] = _("Graphics: Imperfect, ");
-		else
-			tempbuf[4] = _("Graphics: OK, ");
-
-		if (m_cached_flags & machine_flags::NO_SOUND_HW)
-			tempbuf[4].append(_("Sound: None"));
-		else if (m_cached_unemulated & device_t::feature::SOUND)
-			tempbuf[4].append(_("Sound: Unimplemented"));
-		else if (m_cached_imperfect & device_t::feature::SOUND)
-			tempbuf[4].append(_("Sound: Imperfect"));
-		else
-			tempbuf[4].append(_("Sound: OK"));
-	}
 	else
 	{
-		const char *s = emulator_info::get_copyright();
-		unsigned line = 0;
+		std::string tempbuf[5];
 
-		// first line is version string
-		tempbuf[line++] = string_format("%s %s", emulator_info::get_appname(), build_version);
+		// display the current typeahead
+		if (!m_search.empty())
+			tempbuf[0] = string_format(_("Type name or select: %1$s_"), m_search);
+		else
+			tempbuf[0] = _("Type name or select: (random)");
 
-		// output message
-		while (line < std::size(tempbuf))
+		// draw the top box
+		draw_text_box(
+				tempbuf, tempbuf + 1,
+				origx1, origx2, origy1 - top, origy1 - tb_border(),
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
+				ui().colors().text_color(), ui().colors().background_color());
+
+		// determine the text to render below
+		game_driver const *const driver = (uintptr_t(selectedref) > 1) ? (const game_driver *)selectedref : nullptr;
+		if (driver)
 		{
-			if (!(*s == 0 || *s == '\n'))
-				tempbuf[line].push_back(*s);
+			// first line is game name
+			tempbuf[0] = string_format(_("%1$-.100s"), driver->type.fullname());
 
-			if (*s == '\n')
+			// next line is year, manufacturer
+			tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
+
+			// next line source path
+			tempbuf[2] = string_format(_("Source file: %1$s"), info_xml_creator::format_sourcefile(driver->type.source()));
+
+			// update cached values if selection changed
+			if (driver != m_cached_driver)
 			{
-				line++;
-				s++;
-			} else if (*s != 0)
-				s++;
+				emu_options clean_options;
+				machine_static_info const info(ui().options(), machine_config(*driver, clean_options));
+				m_cached_driver = driver;
+				m_cached_flags = info.machine_flags();
+				m_cached_unemulated = info.unemulated_features();
+				m_cached_imperfect = info.imperfect_features();
+				m_cached_color = info.status_color();
+			}
+
+			// next line is overall driver status
+			if (m_cached_flags & machine_flags::NOT_WORKING)
+				tempbuf[3] = _("Overall: NOT WORKING");
+			else if ((m_cached_unemulated | m_cached_imperfect) & device_t::feature::PROTECTION)
+				tempbuf[3] = _("Overall: Unemulated Protection");
 			else
-				line++;
+				tempbuf[3] = _("Overall: Working");
+
+			// next line is graphics, sound status
+			if (m_cached_unemulated & device_t::feature::GRAPHICS)
+				tempbuf[4] = _("Graphics: Unimplemented, ");
+			else if ((m_cached_unemulated | m_cached_imperfect) & (device_t::feature::GRAPHICS | device_t::feature::PALETTE))
+				tempbuf[4] = _("Graphics: Imperfect, ");
+			else
+				tempbuf[4] = _("Graphics: OK, ");
+
+			if (m_cached_flags & machine_flags::NO_SOUND_HW)
+				tempbuf[4].append(_("Sound: None"));
+			else if (m_cached_unemulated & device_t::feature::SOUND)
+				tempbuf[4].append(_("Sound: Unimplemented"));
+			else if (m_cached_imperfect & device_t::feature::SOUND)
+				tempbuf[4].append(_("Sound: Imperfect"));
+			else
+				tempbuf[4].append(_("Sound: OK"));
 		}
+		else
+		{
+			std::string_view s = emulator_info::get_copyright();
+			unsigned line = 0;
+
+			// first line is version string
+			tempbuf[line++] = string_format("%s %s", emulator_info::get_appname(), build_version);
+
+			// output message
+			while (line < std::size(tempbuf))
+			{
+				auto const found = s.find('\n');
+				if (std::string::npos != found)
+				{
+					tempbuf[line++] = s.substr(0, found);
+					s.remove_prefix(found + 1);
+				}
+				else
+				{
+					tempbuf[line++] = s;
+					s = std::string_view();
+				}
+			}
+		}
+
+		// draw the bottom box
+		draw_text_box(
+				std::begin(tempbuf), std::end(tempbuf),
+				origx1, origx2, origy2 + tb_border(), origy2 + bottom,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, true,
+				ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color());
 	}
 
-	// draw the bottom box
-	draw_text_box(
-			tempbuf, tempbuf + 4,
-			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, true,
-			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color());
+	// if we're in an error state, overlay an error message
+	if (m_error)
+	{
+		ui().draw_text_box(
+				container(),
+				_("The selected system is missing one or more required ROMs/disk images. "
+				"Please select a different system.\n\nPress any key to continue."),
+				text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	}
+}
+
+
+//-------------------------------------------------
+//  custom_pointer_updated - override pointer
+//  handling
+//-------------------------------------------------
+
+std::tuple<int, bool, bool> simple_menu_select_game::custom_pointer_updated(bool changed, ui_event const &uievt)
+{
+	// only override mouse handling when error message is visible
+	if (!m_error || !uievt.pointer_buttons)
+		return std::make_tuple(IPT_INVALID, false, false);
+
+	// primary click dismisses the message
+	if ((uievt.pointer_pressed & 0x01) && !(uievt.pointer_buttons & ~u32(0x01)))
+		m_error = false;
+	return std::make_tuple(IPT_INVALID, true, !m_error);
 }
 
 

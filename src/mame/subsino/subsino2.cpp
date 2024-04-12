@@ -3757,7 +3757,7 @@ ROM_START( saklove )
 	ROM_LOAD( "2.u10", 0x00000, 0x80000, CRC(4f70125c) SHA1(edd5e6bd47b9a4fa3c4057cb4a85544241fe483d) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(0ed01bd7) SHA1(62546003443845552e6adc4ca26375f93824d662) BAD_DUMP ) // handcrafted to pass protection check
+	ROM_LOAD( "ds2430a.q3", 0x00, 0x28, CRC(225136fb) SHA1(86095f7c98b579282605730de820d17ac2c8a141) )
 ROM_END
 
 /***************************************************************************

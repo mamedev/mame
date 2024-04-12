@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <functional>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -34,6 +36,8 @@ public:
 	virtual void popup_time_string(int seconds, std::string message) { }
 
 	virtual void menu_reset() { }
+
+	virtual bool set_ui_event_handler(std::function<bool ()> &&handler) { return false; }
 
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
 
