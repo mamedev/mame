@@ -32,8 +32,6 @@ protected:
 	void apply_bit_sbox(int sel);
 	void apply_sbox(const uint8_t *sbox);
 
-	static constexpr uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
-
 	optional_memory_region m_region;
 	uint8_t m_transform[8];
 
@@ -49,8 +47,7 @@ protected:
 class cat702_piu_device : public cat702_device
 {
 public:
-	cat702_piu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: cat702_device(mconfig, CAT702_PIU, tag, owner, clock) {}
+	cat702_piu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write_select(int state);
 	void write_clock(int state);

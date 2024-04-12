@@ -87,6 +87,8 @@
 #include "emu.h"
 #include "cat702.h"
 
+static constexpr uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
+
 DEFINE_DEVICE_TYPE(CAT702, cat702_device, "cat702", "CAT702")
 DEFINE_DEVICE_TYPE(CAT702_PIU, cat702_piu_device, "cat702_piu", "CAT702_PIU")
 
@@ -207,8 +209,6 @@ void cat702_device::write_select(int state)
 
 void cat702_device::write_clock(int state)
 {
-	static const uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
-
 	if (!state && m_clock && !m_select)
 	{
 		if (m_bit==0)
@@ -236,6 +236,14 @@ void cat702_device::write_clock(int state)
 void cat702_device::write_datain(int state)
 {
 	m_datain = state;
+}
+
+///////////////
+
+
+cat702_piu_device::cat702_piu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cat702_device(mconfig, CAT702_PIU, tag, owner, clock)
+{
 }
 
 void cat702_piu_device::write_select(int state)

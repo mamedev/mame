@@ -120,6 +120,9 @@ HS3PIN  Unpopulated header near A40MX04
 
 
 #include "emu.h"
+
+#include "xtom3d_piu10.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -143,8 +146,6 @@ HS3PIN  Unpopulated header near A40MX04
 #include "sound/cdda.h"
 #include "sound/ymz280b.h"
 #include "video/voodoo_pci.h"
-
-#include "xtom3d_piu10.h"
 
 #include "speaker.h"
 

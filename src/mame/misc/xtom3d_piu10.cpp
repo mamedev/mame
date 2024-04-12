@@ -119,14 +119,15 @@ uint16_t isa16_piu10::read(offs_t offset)
 			else if (m_dest == 0)
 			{
 				const uint32_t offs = m_addr;
-				if (m_flash_unlock)
+				if (!machine().side_effects_disabled() && m_flash_unlock)
 					m_addr++;
 				return m_flash->read(offs);
 			}
 			break;
 	}
 
-	logerror("%s: unknown read %d %03x %06x %02x\n", machine().describe_context(), m_flash_unlock, m_dest, m_addr, offset);
+	if (!machine().side_effects_disabled())
+		logerror("%s: unknown read %d %03x %06x %02x\n", machine().describe_context(), m_flash_unlock, m_dest, m_addr, offset);
 
 	return 0;
 }
