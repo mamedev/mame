@@ -531,7 +531,8 @@ void tokimeki_state::machine_start()
 	m_heartbeat_timer->adjust(attotime::zero);
 
 	m_printer_printing_status_timeout = timer_alloc(FUNC(tokimeki_state::printing_status_timeout), this);
-	m_printer_printing_status_timeout->adjust(attotime::never);
+
+	m_page_bitmap.allocate(PRINTER_PAGE_WIDTH, PRINTER_PAGE_HEIGHT);
 }
 
 void tokimeki_state::machine_reset()
@@ -553,7 +554,6 @@ void tokimeki_state::machine_reset()
 
 	std::fill(std::begin(m_printer_data), std::end(m_printer_data), 0);
 
-	m_page_bitmap.allocate(PRINTER_PAGE_WIDTH, PRINTER_PAGE_HEIGHT);
 	m_page_bitmap.fill(0xffffffff);
 }
 
