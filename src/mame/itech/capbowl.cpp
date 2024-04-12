@@ -309,7 +309,8 @@ uint8_t bowlrama_state::blitter_r(offs_t offset)
 		// Read data and increment address
 		case 4:
 			result = data;
-			m_blitter_addr = (m_blitter_addr + 1) & 0x3ffff;
+			if (!machine().side_effects_disabled())
+				m_blitter_addr = (m_blitter_addr + 1) & 0x3ffff;
 			break;
 
 		default:
