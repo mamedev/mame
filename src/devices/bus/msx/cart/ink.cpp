@@ -66,14 +66,10 @@ std::error_condition msx_cart_ink_device::initialize_cartridge(std::string &mess
 	u8 *flash = memregion("flash")->base();
 	memcpy(flash, cart_rom_region()->base(), size);
 
-	page(0)->install_read_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<0>)));
-	page(1)->install_read_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<1>)));
-	page(2)->install_read_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<2>)));
-	page(3)->install_read_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<3>)));
-	page(0)->install_write_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
-	page(1)->install_write_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
-	page(2)->install_write_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
-	page(3)->install_write_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
+	page(0)->install_readwrite_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<0>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
+	page(1)->install_readwrite_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<1>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
+	page(2)->install_readwrite_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<2>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
+	page(3)->install_readwrite_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::read_page<3>)), emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
 
 	return std::error_condition();
 }
