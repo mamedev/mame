@@ -19,12 +19,17 @@ public:
 	msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	void set_ym2413_tag(const char *tag) { m_ym2413_tag = tag; }
+	template <class ObjectClass, bool Required>
+	void set_ym2413(const device_finder<ObjectClass, Required> &finder) {
+		m_ym2413_base = &finder.finder_target().first;
+		m_ym2413_tag = finder.finder_target().second;
+	}
 
 protected:
 	virtual void device_start() override;
 
 private:
+	device_t *m_ym2413_base;
 	ym2413_device *m_ym2413;
 	const char *m_ym2413_tag;
 };

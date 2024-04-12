@@ -9,6 +9,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_MUSIC, msx_slot_music_device, "msx_slot_music", "MSX
 
 msx_slot_music_device::msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rom_device(mconfig, MSX_SLOT_MUSIC, tag, owner, clock)
+	, m_ym2413_base(nullptr)
 	, m_ym2413(nullptr)
 	, m_ym2413_tag(nullptr)
 {
@@ -23,7 +24,7 @@ void msx_slot_music_device::device_start()
 		fatalerror("msx_slot_music_device: no YM2413 tag specified\n");
 	}
 
-	m_ym2413 = owner()->subdevice<ym2413_device>(m_ym2413_tag);
+	m_ym2413 = m_ym2413_base->subdevice<ym2413_device>(m_ym2413_tag);
 
 	if (m_ym2413 == nullptr)
 	{

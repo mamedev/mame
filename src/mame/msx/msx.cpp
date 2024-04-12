@@ -279,6 +279,8 @@ void msx_state::msx_base_io_map(address_map &map)
 //  map(0xb8, 0xbb).noprw();
 	map(0xd8, 0xd9).w(FUNC(msx_state::kanji_w));
 	map(0xd9, 0xd9).r(FUNC(msx_state::kanji_r));
+	map(0xda, 0xdb).w(FUNC(msx_state::kanji2_w));
+	map(0xdb, 0xdb).r(FUNC(msx_state::kanji2_r));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
@@ -453,6 +455,35 @@ void msx_state::kanji_w(offs_t offset, u8 data)
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
+u8 msx_state::kanji2_r(offs_t offset)
+{
+	u8 result = 0xff;
+
+	if (m_region_kanji && m_region_kanji->bytes() > 0x20000)
+	{
+		// TODO: Are there one or two latches in a system?
+		u32 latch = m_kanji_fsa1fx ? bitswap<17>(m_kanji_latch, 4, 3, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 2, 1, 0) : m_kanji_latch;
+		result = m_region_kanji->as_u8(0x20000 | latch);
+
+		if (!machine().side_effects_disabled())
+		{
+			m_kanji_latch = (m_kanji_latch & ~0x1f) | ((m_kanji_latch + 1) & 0x1f);
+		}
+	}
+	return result;
+}
+
+void msx_state::kanji2_w(offs_t offset, u8 data)
+{
+	if (m_region_kanji && m_region_kanji->bytes() > 0x20000)
+	{
+		if (offset)
+			m_kanji_latch = (m_kanji_latch & 0x007e0) | ((data & 0x3f) << 11);
+		else
+			m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
+	}
+}
+
 void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
 	// basic machine hardware
@@ -480,10 +511,10 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, const 
 	if (ay8910_type == SND_YM2149)
 		YM2149(config, m_ay8910, m_main_xtal / m_cpu_xtal_divider / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
-	m_ay8910->port_a_read_callback().set(FUNC(msx2_base_state::psg_port_a_r));
-	m_ay8910->port_b_read_callback().set(FUNC(msx2_base_state::psg_port_b_r));
-	m_ay8910->port_a_write_callback().set(FUNC(msx2_base_state::psg_port_a_w));
-	m_ay8910->port_b_write_callback().set(FUNC(msx2_base_state::psg_port_b_w));
+	m_ay8910->port_a_read_callback().set(FUNC(msx_state::psg_port_a_r));
+	m_ay8910->port_b_read_callback().set(FUNC(msx_state::psg_port_b_r));
+	m_ay8910->port_a_write_callback().set(FUNC(msx_state::psg_port_a_w));
+	m_ay8910->port_b_write_callback().set(FUNC(msx_state::psg_port_b_w));
 	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port1, msx_general_purpose_port_devices, "joystick");
@@ -556,6 +587,25 @@ void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config 
 	msx1_add_softlists(config);
 }
 
+void msx_state::setup_slot_spaces(msx_internal_slot_interface &device)
+{
+	device.set_memory_space(m_maincpu, AS_PROGRAM);
+	device.set_io_space(m_maincpu, AS_IO);
+	device.set_maincpu(m_maincpu);
+}
+
+
+
+msx2_base_state::msx2_base_state(const machine_config &mconfig, device_type type, const char *tag, XTAL main_xtal, int cpu_xtal_divider)
+	: msx_state(mconfig, type, tag, main_xtal, cpu_xtal_divider)
+	, m_v9938(*this, "v9938")
+	, m_v9958(*this, "v9958")
+	, m_ym2413(*this, "ym2413")
+	, m_rtc(*this, "rtc")
+	, m_rtc_latch(0)
+{
+}
+
 void msx2_base_state::msx2_base_io_map(address_map &map)
 {
 	msx_base_io_map(map);
@@ -571,7 +621,7 @@ void msx2_base_state::msx2_io_map(address_map &map)
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
 
-void msx2_base_state::msx2plus_io_map(address_map &map)
+void msx2_base_state::msx2_v9958_io_map(address_map &map)
 {
 	msx2_base_io_map(map);
 	// TODO: S-1985 mirrors 9c-9f
@@ -627,17 +677,9 @@ void msx2_base_state::switched_w(offs_t offset, u8 data)
 	}
 }
 
-// Some MSX2+ can switch the z80 clock between 3.5 and 5.3 MHz
-void msx2_base_state::turbo_w(int state)
-{
-	// 0 - 5.369317 MHz
-	// 1 - 3.579545 MHz
-	m_maincpu->set_unscaled_clock(m_main_xtal / (state ? 6 : 4));
-}
-
 void msx2_base_state::msx_ym2413(machine_config &config)
 {
-	YM2413(config, "ym2413", m_main_xtal / m_cpu_xtal_divider).add_route(ALL_OUTPUTS, m_speaker, 0.8);
+	YM2413(config, m_ym2413, m_main_xtal / m_cpu_xtal_divider).add_route(ALL_OUTPUTS, m_speaker, 0.8);
 }
 
 void msx2_base_state::msx2_64kb_vram(machine_config &config)
@@ -662,51 +704,6 @@ void msx2_base_state::msx2_add_softlists(machine_config &config)
 	if (m_hw_def.has_fdc())
 	{
 		SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
-	}
-}
-
-void msx2_base_state::msx2plus_add_softlists(machine_config &config)
-{
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cass_list").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_cart_list").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
-		SOFTWARE_LIST(config, "msx2_flop_list").set_compatible("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
-	}
-}
-
-void msx2_base_state::turbor_add_softlists(machine_config &config)
-{
-	if (m_hw_def.has_cassette())
-	{
-		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
-		SOFTWARE_LIST(config, "msx1_cass_list").set_compatible("msx1_cass");
-	}
-
-	if (m_hw_def.has_cartslot())
-	{
-		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-		SOFTWARE_LIST(config, "msx1_cart_list").set_compatible("msx1_cart");
-	}
-
-	if (m_hw_def.has_fdc())
-	{
-		SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
-		SOFTWARE_LIST(config, "msx2p_flop_list").set_compatible("msx2p_flop");
-		SOFTWARE_LIST(config, "msx2_flop_list").set_compatible("msx2_flop");
 		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
 	}
 }
@@ -741,11 +738,11 @@ void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, 
 	m_v9938->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
+void msx2_base_state::msx2_v9958_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
 	msx2_base(ay8910_type, config, layout);
 
-	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2plus_io_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2_v9958_io_map);
 
 	// video hardware
 	V9958(config, m_v9958, m_main_xtal);
@@ -754,7 +751,44 @@ void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &con
 	m_v9958->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 }
 
-void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
+
+
+msx2p_base_state::msx2p_base_state(const machine_config &mconfig, device_type type, const char *tag, XTAL main_xtal, int cpu_xtal_divider)
+	: msx2_base_state(mconfig, type, tag, main_xtal, cpu_xtal_divider)
+	, m_cold_boot_flags(0)
+	, m_boot_flags(0)
+{
+}
+
+void msx2p_base_state::machine_start()
+{
+	msx2_base_state::machine_start();
+
+	m_boot_flags = m_cold_boot_flags;
+	save_item(NAME(m_boot_flags));
+}
+
+void msx2p_base_state::msx2plus_io_map(address_map &map)
+{
+	msx2_v9958_io_map(map);
+	// f3 - vdp display mode?
+	map(0xf4, 0xf4).lrw8(NAME([this]() { return m_boot_flags;}), NAME([this](u8 data) { m_boot_flags = data; }));
+}
+
+void msx2p_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
+{
+	msx2_v9958_base(ay8910_type, config, layout);
+
+	m_maincpu->set_addrmap(AS_IO, &msx2p_base_state::msx2plus_io_map);
+}
+
+void msx2p_base_state::msx2plus_pal_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
+{
+	msx2plus_base(ay8910_type, config, layout);
+	m_v9958->set_screen_pal(m_screen);
+}
+
+void msx2p_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
 	msx2plus_base(ay8910_type, config, layout);
 
@@ -762,20 +796,63 @@ void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, 
 	msx2plus_add_softlists(config);
 }
 
-void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
+void msx2p_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
 	msx2plus(ay8910_type, config, layout);
 	m_v9958->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
+void msx2p_base_state::msx2plus_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
+		SOFTWARE_LIST(config, "msx1_cass_list").set_compatible("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2p_cart");
+		SOFTWARE_LIST(config, "msx2_cart_list").set_compatible("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_cart_list").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
+		SOFTWARE_LIST(config, "msx2_flop_list").set_compatible("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+	}
+}
+
+void msx2p_base_state::turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
 	msx2plus_base(ay8910_type, config, layout);
 
 	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_base_state::memory_map);
-	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2plus_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2p_base_state::memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2p_base_state::msx2plus_io_map);
 
 	// Software lists
 	turbor_add_softlists(config);
 }
+
+void msx2p_base_state::turbor_add_softlists(machine_config &config)
+{
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msxr_cart");
+		SOFTWARE_LIST(config, "msx2p_cart_list").set_compatible("msx2p_cart");
+		SOFTWARE_LIST(config, "msx2_cart_list").set_compatible("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_cart_list").set_compatible("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
+		SOFTWARE_LIST(config, "msx2p_flop_list").set_compatible("msx2p_flop");
+		SOFTWARE_LIST(config, "msx2_flop_list").set_compatible("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flop_list").set_compatible("msx1_flop");
+	}
+}
+
