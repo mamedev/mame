@@ -192,7 +192,7 @@ protected:
 	required_device<speaker_device> m_speaker;
 	required_device<input_merger_any_high_device> m_mainirq;
 	required_device<screen_device> m_screen;
-	optional_memory_region m_region_kanji;
+	optional_region_ptr<u8> m_region_kanji;
 	required_device<msx_general_purpose_port_device> m_gen_port1;
 	required_device<msx_general_purpose_port_device> m_gen_port2;
 	required_ioport_array<11> m_io_key;
@@ -249,6 +249,7 @@ protected:
 	const int m_cpu_xtal_divider;
 
 	virtual void setup_slot_spaces(msx_internal_slot_interface &device);
+	virtual address_space& get_io_space();
 
 private:
 	// configuration helpers

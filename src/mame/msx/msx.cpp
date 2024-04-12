@@ -277,10 +277,7 @@ void msx_state::msx_base_io_map(address_map &map)
 	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  // Sanyo optical pen interface (not emulated)
 //  map(0xb8, 0xbb).noprw();
-	map(0xd8, 0xd9).w(FUNC(msx_state::kanji_w));
-	map(0xd9, 0xd9).r(FUNC(msx_state::kanji_r));
-	map(0xda, 0xdb).w(FUNC(msx_state::kanji2_w));
-	map(0xdb, 0xdb).r(FUNC(msx_state::kanji2_r));
+	// 0xd8 - 0xdb : Kanji rom interface. I/O handlers will be installed in a kanji rom is present.
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
@@ -314,6 +311,17 @@ void msx_state::machine_start()
 	m_caps_led.resolve();
 	m_code_led.resolve();
 	m_port_c_old = 0xff;
+
+	if (m_region_kanji.found() && m_region_kanji.length() >= 0x20000)
+	{
+		get_io_space().install_write_handler(0xd8, 0xd9, emu::rw_delegate(*this, FUNC(msx_state::kanji_w)));
+		get_io_space().install_read_handler(0xd9, 0xd9, emu::rw_delegate(*this, FUNC(msx_state::kanji_r)));
+		if (m_region_kanji.length() >= 0x40000)
+		{
+			get_io_space().install_write_handler(0xda, 0xdb, emu::rw_delegate(*this, FUNC(msx_state::kanji2_w)));
+			get_io_space().install_read_handler(0xd9, 0xd9, emu::rw_delegate(*this, FUNC(msx_state::kanji2_r)));
+		}
+	}
 }
 
 void msx_state::driver_start()
@@ -432,17 +440,12 @@ u8 msx_state::expanded_slot_r()
 
 u8 msx_state::kanji_r(offs_t offset)
 {
-	u8 result = 0xff;
+	const u32 latch = m_kanji_fsa1fx ? bitswap<17>(m_kanji_latch, 4, 3, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 2, 1, 0) : m_kanji_latch;
+	const u8 result = m_region_kanji[latch];
 
-	if (m_region_kanji)
+	if (!machine().side_effects_disabled())
 	{
-		u32 latch = m_kanji_fsa1fx ? bitswap<17>(m_kanji_latch, 4, 3, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 2, 1, 0) : m_kanji_latch;
-		result = m_region_kanji->as_u8(latch);
-
-		if (!machine().side_effects_disabled())
-		{
-			m_kanji_latch = (m_kanji_latch & ~0x1f) | ((m_kanji_latch + 1) & 0x1f);
-		}
+		m_kanji_latch = (m_kanji_latch & ~0x1f) | ((m_kanji_latch + 1) & 0x1f);
 	}
 	return result;
 }
@@ -457,31 +460,23 @@ void msx_state::kanji_w(offs_t offset, u8 data)
 
 u8 msx_state::kanji2_r(offs_t offset)
 {
-	u8 result = 0xff;
+	// TODO: Are there one or two latches in a system?
+	const u32 latch = m_kanji_fsa1fx ? bitswap<17>(m_kanji_latch, 4, 3, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 2, 1, 0) : m_kanji_latch;
+	const u8 result = m_region_kanji[0x20000 | latch];
 
-	if (m_region_kanji && m_region_kanji->bytes() > 0x20000)
+	if (!machine().side_effects_disabled())
 	{
-		// TODO: Are there one or two latches in a system?
-		u32 latch = m_kanji_fsa1fx ? bitswap<17>(m_kanji_latch, 4, 3, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 2, 1, 0) : m_kanji_latch;
-		result = m_region_kanji->as_u8(0x20000 | latch);
-
-		if (!machine().side_effects_disabled())
-		{
-			m_kanji_latch = (m_kanji_latch & ~0x1f) | ((m_kanji_latch + 1) & 0x1f);
-		}
+		m_kanji_latch = (m_kanji_latch & ~0x1f) | ((m_kanji_latch + 1) & 0x1f);
 	}
 	return result;
 }
 
 void msx_state::kanji2_w(offs_t offset, u8 data)
 {
-	if (m_region_kanji && m_region_kanji->bytes() > 0x20000)
-	{
-		if (offset)
-			m_kanji_latch = (m_kanji_latch & 0x007e0) | ((data & 0x3f) << 11);
-		else
-			m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
-	}
+	if (offset)
+		m_kanji_latch = (m_kanji_latch & 0x007e0) | ((data & 0x3f) << 11);
+	else
+		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
 void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
@@ -585,6 +580,11 @@ void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config 
 
 	// Software lists
 	msx1_add_softlists(config);
+}
+
+address_space& msx_state::get_io_space()
+{
+	return m_maincpu->space(AS_IO);
 }
 
 void msx_state::setup_slot_spaces(msx_internal_slot_interface &device)
