@@ -474,7 +474,7 @@ void msx2_state::cpg120(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "saubrom", 0, 3, 0, 2, "subrom");
 	add_cartridge_slot<1>(config, 1);
-	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 2, 1, 1, "music").set_ym2413(m_ym2413);
+	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 2, 1, 1, "music");
 	add_cartridge_slot<2>(config, 3);
 
 	MSX_S1985(config, "s1985", 0);

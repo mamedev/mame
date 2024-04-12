@@ -18,20 +18,11 @@ class msx_slot_music_device : public msx_slot_rom_device
 public:
 	msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// configuration helpers
-	template <class ObjectClass, bool Required>
-	void set_ym2413(const device_finder<ObjectClass, Required> &finder) {
-		m_ym2413_base = &finder.finder_target().first;
-		m_ym2413_tag = finder.finder_target().second;
-	}
-
 protected:
 	virtual void device_start() override;
 
 private:
-	device_t *m_ym2413_base;
-	ym2413_device *m_ym2413;
-	const char *m_ym2413_tag;
+	required_device<ym2413_device> m_ym2413;
 };
 
 
