@@ -95,7 +95,7 @@ int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	}
 
 	// Verify reserved/unsupported header bytes
-	for (int i = 4; i < 0x10; i++)
+	for (int i = 5; i < 0x10; i++)
 	{
 		if (header[i] != 0x00)
 			return 0;

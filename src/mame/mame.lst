@@ -27581,6 +27581,9 @@ wargods                         // (c) 1996 Midway (HD 10/09/1996 - Dual Resolut
 wargodsa                        // (c) 1996 Midway (HD 08/15/1996)
 wargodsb                        // (c) 1996 Midway (HD 12/11/1995)
 
+@source:midway/midwayttl.cpp
+wheelsii                        //
+
 @source:midway/midwunit.cpp
 mk3                             // (c) 1994 Midway
 mk3p40                          // (c) 1994 Midway
@@ -31499,6 +31502,7 @@ bazookabr                       // (c) 1977 Taito do Brasil
 dpatrol                         // (c) 1977 PSE
 dpatrola                        // (c) 1977 PSE / Telegames
 gametree                        // (c) 1978 PSE
+knightar                        // (c) 1976 PSE
 
 @source:misc/quizo.cpp
 quizo                           // (c) 1985 Seoul Coin Corp.
@@ -42723,25 +42727,25 @@ expcard                         // (c) 1998 American Alpha
 humlan                          // (c) 2001 Subsino & Truemax
 mtrain                          // (c) 1997 Subsino
 mtraina                         // (c) 1996 Subsino
-strain
-tbonusal                        // (c) 1996 American Alpha
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
 ptraina                         // (c) 1999 Subsino
+qbeebing
 queenbee                        // (c) 2001 American Alpha
 queenbeeb                       // (c) 2001 Subsino
 queenbeei                       // (c) 2001 Subsino
 queenbeesa                      // (c) 2001 Subsino
 saklove                         // (c) 1998 Subsino
 squeenb                         // (c) 2002 Subsino
-wtrnymph                        // (c) 1996 Subsino
-xplan                           // (c) 2006 Subsino
-xtrain                          // (c) 1999 Subsino
-qbeebing
-treamary
+strain
+tbonusal                        // (c) 1996 American Alpha
 treacity
 treacity202
+treamary
+wtrnymph                        // (c) 1996 Subsino
 xiaoao
+xplan                           // (c) 2006 Subsino
+xtrain                          // (c) 1999 Subsino
 
 @source:sun/sun1.cpp
 sun1                            //
