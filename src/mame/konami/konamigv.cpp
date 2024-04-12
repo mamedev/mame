@@ -384,6 +384,7 @@ private:
 	uint8_t m_printer_is_printing;
 	uint32_t m_printer_current_image;
 	bool m_printer_is_manual_layout;
+	bool m_printer_page_is_dirty;
 
 	bitmap_rgb32 m_page_bitmap;
 
@@ -526,6 +527,7 @@ void tokimeki_state::machine_start()
 	save_item(NAME(m_printer_current_image));
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_page_bitmap));
+	save_item(NAME(m_printer_page_is_dirty));
 
 	m_heartbeat_timer = timer_alloc(FUNC(tokimeki_state::heartbeat_timer_tick), this);
 	m_heartbeat_timer->adjust(attotime::zero);
@@ -555,6 +557,7 @@ void tokimeki_state::machine_reset()
 	std::fill(std::begin(m_printer_data), std::end(m_printer_data), 0);
 
 	m_page_bitmap.fill(0xffffffff);
+	m_printer_page_is_dirty = true;
 }
 
 void konamigv_state::konamigv(machine_config &config)
@@ -998,6 +1001,7 @@ void tokimeki_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t me
 				// print
 				// tmoshs expects the busy status bit to be set for a little bit after this command or it errors out
 				m_printer_is_printing = 1;
+				m_printer_page_is_dirty = true;
 				m_printer_printing_status_timeout->adjust(attotime::from_msec(1000));
 			}
 			else if (m_printer_data[0] == 0x17)
@@ -1076,10 +1080,12 @@ void tokimeki_state::tmosh(machine_config &config)
 
 uint32_t tokimeki_state::printer_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!m_printer_is_printing)
-		return 0;
+	if (!m_printer_page_is_dirty)
+		return UPDATE_HAS_NOT_CHANGED;
 
 	copybitmap(bitmap, m_page_bitmap, 0, 0, 0, 0, cliprect);
+	m_printer_page_is_dirty = false;
+
 	return 0;
 }
 
