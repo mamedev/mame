@@ -42727,25 +42727,25 @@ expcard                         // (c) 1998 American Alpha
 humlan                          // (c) 2001 Subsino & Truemax
 mtrain                          // (c) 1997 Subsino
 mtraina                         // (c) 1996 Subsino
-strain
-tbonusal                        // (c) 1996 American Alpha
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
 ptraina                         // (c) 1999 Subsino
+qbeebing
 queenbee                        // (c) 2001 American Alpha
 queenbeeb                       // (c) 2001 Subsino
 queenbeei                       // (c) 2001 Subsino
 queenbeesa                      // (c) 2001 Subsino
 saklove                         // (c) 1998 Subsino
 squeenb                         // (c) 2002 Subsino
-wtrnymph                        // (c) 1996 Subsino
-xplan                           // (c) 2006 Subsino
-xtrain                          // (c) 1999 Subsino
-qbeebing
-treamary
+strain
+tbonusal                        // (c) 1996 American Alpha
 treacity
 treacity202
+treamary
+wtrnymph                        // (c) 1996 Subsino
 xiaoao
+xplan                           // (c) 2006 Subsino
+xtrain                          // (c) 1999 Subsino
 
 @source:sun/sun1.cpp
 sun1                            //
