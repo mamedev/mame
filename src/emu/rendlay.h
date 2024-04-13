@@ -527,6 +527,12 @@ public:
 	const visibility_toggle_vector &visibility_toggles() const { return m_vistoggles; }
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }
+	bool show_pointers() const { return m_show_ptr; }
+	bool hide_inactive_pointers() const { return m_ptr_time_out; }
+
+	// setters
+	void set_show_pointers(bool value) noexcept;
+	void set_hide_inactive_pointers(bool value) noexcept ATTR_COLD;
 
 	// set handlers
 	void set_prepare_items_callback(prepare_items_delegate &&handler) ATTR_COLD;
@@ -621,6 +627,9 @@ private:
 	render_bounds               m_expbounds;        // explicit bounds of the view
 	u32                         m_defvismask;       // default visibility mask
 	bool                        m_has_art;          // true if the layout contains non-screen elements
+	bool                        m_show_ptr;         // whether pointers should be displayed
+	bool                        m_ptr_time_out;     // whether pointers should be hidden after inactivity
+	s8                          m_exp_show_ptr;     // explicitly configured pointer visibility
 };
 
 

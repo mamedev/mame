@@ -690,6 +690,11 @@ element.  This means a view can reference elements and groups that appear after
 it in the file, and parameters from the enclosing scope will have their final
 values from the end of the ``mamelayout`` element.
 
+A ``view`` element may have a ``showpointers`` attribute to set whether mouse
+and pen pointers should be shown for the view.  If present, the value must be
+either ``yes`` or ``no``.  If the ``showpointers`` attribute is not present, pen
+and mouse pointers are shown for views that contain items bound to I/O ports.
+
 The following child elements are allowed inside a ``view`` element:
 
 bounds

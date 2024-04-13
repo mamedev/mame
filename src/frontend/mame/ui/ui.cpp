@@ -38,6 +38,7 @@
 #include "render.h"
 #include "cheat.h"
 #include "rendfont.h"
+#include "rendlay.h"
 #include "romload.h"
 #include "screen.h"
 #include "speaker.h"
@@ -165,7 +166,13 @@ enum class mame_ui_manager::ui_callback_type : int
 
 struct mame_ui_manager::active_pointer
 {
-	active_pointer(ui_event const &event) : target(event.target), type(event.pointer_type), ptrid(event.pointer_id), x(-1.0F), y(-1.0F)
+	active_pointer(ui_event const &event)
+		: target(event.target)
+		, updated(std::chrono::steady_clock::time_point::min())
+		, type(event.pointer_type)
+		, ptrid(event.pointer_id)
+		, x(-1.0F)
+		, y(-1.0F)
 	{
 	}
 
@@ -175,6 +182,7 @@ struct mame_ui_manager::active_pointer
 	}
 
 	render_target *target;
+	std::chrono::steady_clock::time_point updated;
 	osd::ui_event_handler::pointer type;
 	u16 ptrid;
 	float x, y;
@@ -198,8 +206,6 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_popup_text_end(0)
 	, m_mouse_bitmap(32, 32)
 	, m_mouse_arrow_texture(nullptr)
-	, m_mouse_show(false)
-	, m_update_pointers(false)
 	, m_pointers_changed(false)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
@@ -240,7 +246,6 @@ void mame_ui_manager::init()
 					return 0;
 				}));
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((std::size(non_char_keys) + 7) / 8);
-	m_mouse_show = machine().system().flags & machine_flags::CLICKABLE_ARTWORK ? true : false;
 
 	// request notification callbacks
 	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&mame_ui_manager::frame_update, this));
@@ -733,7 +738,7 @@ bool mame_ui_manager::update_and_render(render_container &container)
 	// display the internal pointers
 	bool const pointer_update = m_pointers_changed;
 	m_pointers_changed = false;
-	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
+	if (!is_menu_active() || machine().options().ui_mouse())
 	{
 		const float cursor_size = 0.6 * get_line_height();
 		for (auto const &pointer : m_display_pointers)
@@ -1128,12 +1133,12 @@ void mame_ui_manager::process_ui_events()
 			{
 				if (osd::ui_event_handler::pointer::TOUCH != event.pointer_type)
 				{
-					m_update_pointers = true;
 					auto pos(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), std::make_pair(event.target, event.pointer_id)));
 					if ((m_active_pointers.end() == pos) || (pos->target != event.target) || (pos->ptrid != event.pointer_id))
 						pos = m_active_pointers.emplace(pos, event);
 					else
 						assert(pos->type == event.pointer_type);
+					pos->updated = std::chrono::steady_clock::now();
 					event.target->map_point_container(event.pointer_x, event.pointer_y, *event.target->ui_container(), pos->x, pos->y);
 				}
 
@@ -1150,10 +1155,7 @@ void mame_ui_manager::process_ui_events()
 			{
 				auto const pos(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), std::make_pair(event.target, event.pointer_id)));
 				if (m_active_pointers.end() != pos)
-				{
-					m_update_pointers = true;
 					m_active_pointers.erase(pos);
-				}
 
 				event.target->pointer_left(
 						event.pointer_type, event.pointer_id, event.pointer_device,
@@ -1168,10 +1170,7 @@ void mame_ui_manager::process_ui_events()
 			{
 				auto const pos(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), std::make_pair(event.target, event.pointer_id)));
 				if (m_active_pointers.end() != pos)
-				{
-					m_update_pointers = true;
 					m_active_pointers.erase(pos);
-				}
 
 				event.target->pointer_aborted(
 						event.pointer_type, event.pointer_id, event.pointer_device,
@@ -1379,15 +1378,20 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// process UI events and update pointers if necessary
 	process_ui_events();
-	if (m_update_pointers)
+	display_pointer_vector pointers;
+	pointers.reserve(m_active_pointers.size());
+	auto const now(std::chrono::steady_clock::now());
+	for (auto const &pointer : m_active_pointers)
 	{
-		display_pointer_vector pointers;
-		pointers.reserve(m_active_pointers.size());
-		for (auto const &pointer : m_active_pointers)
-			pointers.emplace_back(display_pointer{ *pointer.target, pointer.type, pointer.x, pointer.y });
-		set_pointers(pointers.begin(), pointers.end());
-		m_update_pointers = false;
+		layout_view const &view(pointer.target->current_view());
+		if (view.show_pointers())
+		{
+			// TODO: make timeout configurable
+			if (!view.hide_inactive_pointers() || (osd::ui_event_handler::pointer::PEN == pointer.type) || ((now - pointer.updated) <= std::chrono::seconds(3)))
+				pointers.emplace_back(display_pointer{ *pointer.target, pointer.type, pointer.x, pointer.y });
+		}
 	}
+	set_pointers(pointers.begin(), pointers.end());
 
 	if (!ui_disabled)
 	{
@@ -2399,6 +2403,12 @@ bool mame_ui_manager::set_ui_event_handler(std::function<bool ()> &&handler)
 	// only allow takeover if there's nothing else happening
 	if (ui_callback_type::GENERAL != m_handler_callback_type)
 		return false;
+
+	for (auto *target = machine().render().first_target(); target; target = target->next())
+	{
+		if (!target->hidden())
+			target->forget_pointers();
+	}
 
 	set_handler(
 			ui_callback_type::CUSTOM,
