@@ -219,4 +219,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, y416xl, 0,      0,      y416xl,  y416xl, y416xl_state, empty_init, "Yeno", "416 XL (Yeno)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, y416xl, 0,      0,      y416xl,  y416xl, y416xl_state, empty_init, "Yeno", "416 XL (Yeno)", MACHINE_SUPPORTS_SAVE )

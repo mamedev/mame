@@ -202,9 +202,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1992, berl16a,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, berl16l,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, berl16a,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.02)", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, berl16l,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, berlinpl, berlinp, 0,      berlinp, berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, berlinpl, berlinp, 0,      berlinp, berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE )

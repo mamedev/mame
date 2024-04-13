@@ -622,24 +622,24 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 0.12 or 0.121?
-SYST( 1988, alm16,   alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.13)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, alm16a,  alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.121)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE ) // 0.12 or 0.121?
+SYST( 1988, alm16,   alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.13)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, alm16a,  alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.121)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, port32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, port32a, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, port32b, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, port16,  port32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, port32a, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, port32b, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, port16,  port32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, lyon32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, lyon16,  lyon32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, lyon32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, lyon16,  lyon32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1991, van32,   0,      0,      van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, van16,   van32,  0,      van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, van32,   0,      0,      van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, van16,   van32,  0,      van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1993, gen32,   0,      0,      gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1993, gen32a,  gen32,  0,      gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, gen32l,  gen32,  0,      gen32,  gen32,  mmodular_state, empty_init, "Richard Lang", "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, gen32,   0,      0,      gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+SYST( 1993, gen32a,  gen32,  0,      gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+SYST( 1996, gen32l,  gen32,  0,      gen32,  gen32,  mmodular_state, empty_init, "Richard Lang", "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-SYST( 1996, lond32,  0,      0,      van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
-SYST( 1996, lond16,  lond32, 0,      van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16
+SYST( 1996, lond32,  0,      0,      van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE ) // for alm32/port32/lyon32/van32
+SYST( 1996, lond16,  lond32, 0,      van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE ) // for alm16/port16/lyon16/van16

@@ -223,6 +223,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, modena,   0,      0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1992, modenaa,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1992, modenab,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, modena,   0,      0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, modenaa,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, modenab,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 3)", MACHINE_SUPPORTS_SAVE )

@@ -291,4 +291,4 @@ ROM_END
 ******************************************************************************/
 
 /*     YEAR  NAME    PARENT  MACHINE       INPUT   CLASS               INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
-GAMEL( 1997, 30test, 0,      namco_30test, 30test, namco_30test_state, empty_init, ROT0,    "Namco", "30 Test (remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )
+GAMEL( 1997, 30test, 0,      namco_30test, 30test, namco_30test_state, empty_init, ROT0,    "Namco", "30 Test (remake)", MACHINE_SUPPORTS_SAVE, layout_30test )

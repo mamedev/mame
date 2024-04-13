@@ -479,9 +479,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, "Novag Industries", "Primo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, "Novag Industries", "Primo (Novag)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag Industries", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag Industries", "Supremo", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, nsnova,  0,      0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, v1.05 set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, nsnovaa, nsnova, 0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, v1.05 set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, nsnova,  0,      0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, v1.05 set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, nsnovaa, nsnova, 0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, v1.05 set 2)", MACHINE_SUPPORTS_SAVE )

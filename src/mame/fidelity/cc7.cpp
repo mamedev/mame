@@ -277,7 +277,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, cc7,      0,      0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, cc7a,     cc7,    0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, cc7,      0,      0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, cc7a,     cc7,    0,      bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, backgamc, 0,      0,      bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 1979, backgamc, 0,      0,      bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

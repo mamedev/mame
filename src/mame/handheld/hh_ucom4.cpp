@@ -3341,8 +3341,8 @@ SYST( 1980, bgunf,    0,        0,      bgunf,    bgunf,    bgunf_state,    empt
 SYST( 1981, bgalaxn,  0,        0,      bgalaxn,  bgalaxn,  bgalaxn_state,  empty_init, "Bandai", "Galaxian (Bandai)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, bcclimbr, 0,        0,      bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, tactix,   0,        0,      tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1980, tactix,   0,        0,      tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE ) // ***
 
 SYST( 1980, einspace, 0,        0,      einspace, einspace, einspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, efball,   0,        0,      efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
@@ -3355,7 +3355,7 @@ SYST( 1979, mcompgin, 0,        0,      mcompgin, mcompgin, mcompgin_state, empt
 
 SYST( 1979, mvbfree,  0,        0,      mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
+SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE ) // some of the games: ***
 
 SYST( 1980, tccombat, 0,        0,      tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, tmtennis, 0,        0,      tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )

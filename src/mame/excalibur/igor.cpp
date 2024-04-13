@@ -353,4 +353,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY, FULLNAME, FLAGS
-SYST( 1997, igor, 0,      0,      igor,    igor,  igor_state, init_igor, "Excalibur Electronics", "Igor (Excalibur)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1997, igor, 0,      0,      igor,    igor,  igor_state, init_igor, "Excalibur Electronics", "Igor (Excalibur)", MACHINE_SUPPORTS_SAVE )

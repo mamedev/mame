@@ -351,4 +351,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                                     FULLNAME                FLAGS
-SYST( 1987, chessmstdm, 0,      0,      chessmstdm, chessmstdm, chessmstdm_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, chessmstdm, 0,      0,      chessmstdm, chessmstdm, chessmstdm_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE )
