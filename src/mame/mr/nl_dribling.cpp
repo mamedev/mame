@@ -3,10 +3,6 @@
 
 // Netlist for Model Racing Dribbling: derived from the schematics in the Dribbling manual, located here:
 // https://archive.org/details/ArcadeGameManualDribbling
-// Known issues:
-// In the PARATA netlist the JFET emulation based on MOSFET doesn't work well. The whole netlist has been
-// replaced with a quite similar one, at least to my ears. The real netlist is commented behind the FAKE_PARATA
-// define.
 
 #include "netlist/devices/net_lib.h"
 
