@@ -69,7 +69,7 @@ void coleco_sgm_device::device_start()
 	save_pointer(NAME(m_ram_upper), 0x6000);
 
 	// install device into memory map
-	m_expansion->io_space().install_device(0x00, 0x7f, *this, coleco_sgm_device::io_map);
+	m_expansion->io_space().install_device(0x00, 0x7f, *this, &coleco_sgm_device::io_map);
 
 	m_expansion->mem_space().install_view(0x0000, 0x1fff, m_view_lower);
 	m_view_lower[0].install_ram(0x0000, 0x1fff, &m_ram_lower[0]);
