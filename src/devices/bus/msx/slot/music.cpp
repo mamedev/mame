@@ -9,7 +9,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_MUSIC, msx_slot_music_device, "msx_slot_music", "MSX
 
 msx_slot_music_device::msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msx_slot_rom_device(mconfig, MSX_SLOT_MUSIC, tag, owner, clock)
-	, m_ym2413(*this, "^ym2413")
+	, m_ym2413(*this, finder_base::DUMMY_TAG)
 {
 }
 

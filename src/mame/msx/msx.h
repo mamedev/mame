@@ -249,7 +249,7 @@ protected:
 	const int m_cpu_xtal_divider;
 
 	virtual void setup_slot_spaces(msx_internal_slot_interface &device);
-	virtual address_space& get_io_space();
+	virtual address_space &get_io_space();
 
 private:
 	// configuration helpers
