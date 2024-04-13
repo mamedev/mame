@@ -1157,7 +1157,7 @@ view.has_art (read-only)
     items that are not visible because the user has hidden the item collection
     that they belong to.
 view.show_pointers (read/write)
-    A Boolean that sets whether mouse and pon pointers should be displayed for
+    A Boolean that sets whether mouse and pen pointers should be displayed for
     the view.
 view.hide_inactive_pointers (read/write)
     A Boolean that sets whether mouse pointers for the view should be hidden

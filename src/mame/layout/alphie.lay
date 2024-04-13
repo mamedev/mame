@@ -46,7 +46,7 @@ authors:hap
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
+	<view name="Internal Layout" showpointers="no">
 		<bounds left="-1.5" right="17.5" top="-0.5" bottom="14.5" />
 
 		<element name="0.0" ref="led"><bounds x="2" y="0" width="2" height="2" /></element>
