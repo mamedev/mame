@@ -16,7 +16,8 @@
 #define TTL_74LS164_DIP TTL_74164_DIP
 #define ATTENUATE_FOLLA 200
 #define USE_SIMPLIFIED_LM339
-#define USE_FAKE_PARATA
+// The TOS SUBMODEL generates a ticking sound more pronounced than using the netlist without it.
+// #define USE_TOS_SUBMODEL
 
 // The schematic incorrectly labels two JFETS in the PARATA circuit as 2N3812.  They're actually 2N3819.
 // JFET transistors not supported, but this should do the trick; but not for this game.
@@ -105,10 +106,11 @@ static NETLIST_START(LM339)
 // CALCIO_A and CALCIO_B differ only for the parameters of 3 capacitors.
 static NETLIST_START(calcio)
 {
-	DEFPARAM(CAP1, 33)
-	DEFPARAM(CAP2, 68)
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(GND, 0)
+	DEFPARAM(CAP1, 33)
+	DEFPARAM(CAP2, 68)
+
 	QBJT_EB(Q8, "BC239C")
 	QBJT_EB(Q9, "BC239C")
 	ALIAS(INPUT, R45.2)
@@ -152,7 +154,7 @@ static NETLIST_START(calcio)
 	NET_C(R57.1, GND)
 	NET_C(C32.1, R58.2)
 	NET_C(R58.1, GND)
-	RES(R0, RES_K(1))
+	RES(R0, 1)
 	NET_C(R0.1, Q9.C)
 	ALIAS(OUTPUT, R0.2)
 
@@ -163,6 +165,7 @@ static NETLIST_START(stop_palla)
 {
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(GND, 0)
+
 	QBJT_EB(Q1, "BC309")
 	RES(R5, RES_K(1))
 	RES(R6, RES_K(160))
@@ -186,7 +189,7 @@ static NETLIST_START(stop_palla)
 	NET_C(C6.1, GND)
 	NET_C(R9.2, I_V5)
 	NET_C(IC_B9.3, I_V5)
-	RES(R0, RES_K(1))
+	RES(R0, 1)
 	NET_C(R0.1, IC_B9.5)
 	ALIAS(OUTPUT, R0.2)
 
@@ -200,6 +203,7 @@ static NETLIST_START(parata)
 {
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(GND, 0)
+
 	QBJT_EB(Q1, "BC309")
 	Q_2N3819(Q2)
 	Q_2N3819B(Q3)
@@ -244,6 +248,10 @@ static NETLIST_START(parata)
 // This is because the tone generator outputs a 40KHz square wave at idle, and this is to avoid aliasing when outputing at 48KHz.
 static NETLIST_START(output_filter)
 {
+	ANALOG_INPUT(VPLUS, 12)
+	ANALOG_INPUT(VMINUS, -12)
+	ANALOG_INPUT(GND, 0)
+
 	OPAMP(AMP, "OPAMP(TYPE=1 FPF=5 RI=1M RO=50 UGF=1M SLEW=1M VLH=0.5 VLL=0.03 DAB=0.0015)")
 	RES(R1, RES_K(11))
 	RES(R2, RES_K(110))
@@ -251,9 +259,7 @@ static NETLIST_START(output_filter)
 	CAP(C1, CAP_U(0.001))
 	CAP(C2, CAP_P(470))
 	CAP(C3, CAP_P(68))
-	ANALOG_INPUT(VPLUS, 12)
-	ANALOG_INPUT(VMINUS, -12)
-	ANALOG_INPUT(GND, 0)
+
 	NET_C(VPLUS, AMP.VCC)
 	NET_C(VMINUS, AMP.GND)
 	ALIAS(INPUT, R1.1)
@@ -269,10 +275,11 @@ static NETLIST_START(output_filter)
 
 static NETLIST_START(inverter)
 {
-	NC_PIN(NC)
-	TTL_7414_DIP(IC_L9)
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(GND, 0)
+
+	TTL_7414_DIP(IC_L9)
+
 	NET_C(GND, IC_L9.7)
 	NET_C(IC_L9.14, I_V5)
 	ALIAS(INPUT,IC_L9.1)
@@ -286,11 +293,13 @@ static NETLIST_START(inverter)
 
 static NETLIST_START(fischio)
 {
+	ANALOG_INPUT(I_V5, 5)
+	ANALOG_INPUT(GND, 0)
+
 	LOCAL_SOURCE(inverter)
 	SUBMODEL(NE556_DIP, IC_N9)
 	SUBMODEL(inverter, INV)
-	ANALOG_INPUT(I_V5, 5)
-	ANALOG_INPUT(GND, 0)
+
 	TTL_74393_DIP(IC_M9)
 
 	NET_C(IC_M9.7, GND)
@@ -327,19 +336,22 @@ static NETLIST_START(fischio)
 	HINT(IC_M9.11, NC)
 	// ALIAS(OUTPUT, IC_N9.9)
 
-	RES(R0, RES_K(1))
+	RES(R0, 1)
 	NET_C(R0.1, IC_N9.9)
 	ALIAS(OUTPUT, R0.2)
 
 	OPTIMIZE_FRONTIER(R0.1, RES_M(100), 1)
 }
 
+#ifdef USE_TOS_SUBMODEL
 static NETLIST_START(tos)
 {
-	LOCAL_SOURCE(inverter)
-	CLOCK(clk, 40000) // 40KHz
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(GND, 0)
+
+	LOCAL_SOURCE(inverter)
+	CLOCK(clk, 40000) // 40KHz
+
 	NET_C(clk.VCC, I_V5)
 	NET_C(clk.GND, GND)
 
@@ -376,12 +388,13 @@ static NETLIST_START(tos)
 	NET_C(IC_C7.8, IC_E7.15) // FLIP-FLOP
 	NET_C(IC_C7.11, IC_E7.15)
 
-	RES(R0, RES_K(1))
+	RES(R0, 1)
 	NET_C(R0.1, IC_C7.5)
 	ALIAS(OUTPUT, R0.2)
 
 	OPTIMIZE_FRONTIER(R0.1, RES_M(100), 1)
 }
+#endif // USE_TOS_SUBMODEL
 
 static NETLIST_START(folla)
 {
@@ -459,7 +472,7 @@ static NETLIST_START(folla)
 	ALIAS(CONT_OUT, C23.2)
 	NET_C(C23.2, R36.2)
 
-	RES(R0, RES_K(1))
+	RES(R0, 1)
 	NET_C(R0.1,  IC_C8.14)
 	ALIAS(OUTPUT, R0.2)
 
@@ -478,12 +491,10 @@ NETLIST_START(dribling)
 	PARAM(Solver.GS_LOOPS, 10)
 	PARAM(Solver.PARALLEL, 2) // More does not help
 
-
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V6, 6)
 	ANALOG_INPUT(I_V12, 12)
 
-	NC_PIN(NC)
 
 	LOCAL_SOURCE(LM339)
 	LOCAL_SOURCE(calcio)
@@ -491,7 +502,6 @@ NETLIST_START(dribling)
 	LOCAL_SOURCE(parata)
 	LOCAL_SOURCE(output_filter)
 	LOCAL_SOURCE(fischio)
-	LOCAL_SOURCE(tos)
 	LOCAL_SOURCE(folla)
 
 	// TOS Section
@@ -505,6 +515,9 @@ NETLIST_START(dribling)
 	TTL_INPUT(I_PB7, 0)
 	NET_C(GND, I_PB0.GND, I_PB1.GND, I_PB2.GND, I_PB3.GND, I_PB4.GND, I_PB5.GND, I_PB6.GND, I_PB7.GND)
 	NET_C(I_V5, I_PB0.VCC, I_PB1.VCC, I_PB2.VCC, I_PB3.VCC, I_PB4.VCC, I_PB5.VCC, I_PB6.VCC, I_PB7.VCC)
+
+#ifdef USE_TOS_SUBMODEL
+	LOCAL_SOURCE(tos)
 	SUBMODEL(tos, TOS)
 	NET_C(TOS.IN0, I_PB0)
 	NET_C(TOS.IN1, I_PB1)
@@ -514,6 +527,48 @@ NETLIST_START(dribling)
 	NET_C(TOS.IN5, I_PB5)
 	NET_C(TOS.IN6, I_PB6)
 	NET_C(TOS.IN7, I_PB7)
+	ALIAS(TOS_OUTPUT, TOS.OUTPUT)
+#else  // USE_TOS_SUBMODEL
+	LOCAL_SOURCE(inverter)
+	CLOCK(clk, 40000) // 40KHz
+
+	NET_C(clk.VCC, I_V5)
+	NET_C(clk.GND, GND)
+
+	SUBMODEL(inverter, INV1)
+	SUBMODEL(inverter, INV2)
+	SUBMODEL(inverter, INV3)
+
+	CAP(C7_1, CAP_P(330))
+	CAP(C7_2, CAP_P(330))
+	TTL_74161_DIP(IC_D7)  // 4 bit counter
+	TTL_74161_DIP(IC_E7)  // same
+	TTL_74LS107_DIP(IC_C7)  // dual JK flip flop
+	NET_C(GND, IC_C7.7, IC_D7.8, IC_E7.8, C7_1.2)
+	NET_C(I_V5, IC_C7.14, IC_D7.16, IC_E7.16)
+	NET_C(I_PB0, IC_D7.3)
+	NET_C(I_PB1, IC_D7.4)
+	NET_C(I_PB2, IC_D7.5)
+	NET_C(I_PB3, IC_D7.6)
+	NET_C(I_PB4, IC_E7.3)
+	NET_C(I_PB5, IC_E7.4)
+	NET_C(I_PB6, IC_E7.5)
+	NET_C(I_PB7, IC_E7.6)
+	NET_C(IC_E7.1, IC_D7.1, I_V5)  // CLEAR FLAG
+	NET_C(IC_D7.7, IC_D7.10, I_V5)
+	NET_C(IC_E7.9, IC_D7.9, C7_1.1, INV1.OUTPUT)
+	NET_C(IC_D7.15, IC_E7.7, IC_E7.10)
+	NET_C(IC_E7.15, INV1.INPUT)
+	NET_C(INV2.OUTPUT, IC_E7.2, IC_D7.2)
+	NET_C(INV2.INPUT, C7_2.1, IC_C7.9, INV3.OUTPUT)
+	NET_C(GND, C7_2.2)
+	NET_C(INV3.INPUT, clk)
+	NET_C(IC_C7.10, I_V5)
+	NET_C(IC_C7.1, IC_C7.13, IC_C7.4, IC_C7.12, GND.Q)
+	NET_C(IC_C7.8, IC_E7.15) // FLIP-FLOP
+	NET_C(IC_C7.11, IC_E7.15)
+	ALIAS(TOS_OUTPUT, IC_C7.5)
+#endif // USE_TOS_SUBMODEL
 
 	// FISCHIO
 	TTL_INPUT(I_FISCHIO, 0)
@@ -569,7 +624,7 @@ NETLIST_START(dribling)
 	// TOS
 	CAP(C_TOS, CAP_N(100))
 	RES(R_TOS, RES_K(220))
-	NET_C(TOS.OUTPUT, C_TOS.1)
+	NET_C(TOS_OUTPUT, C_TOS.1)
 	NET_C(R_TOS.1, C_TOS.2)
 
 	// FISCHIO
