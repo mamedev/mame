@@ -47,28 +47,12 @@ public:
 		//machine().scheduler().synchronize();
 	}
 
-	uint32_t get_linear_address() { return s3virge.linear_address; }
-	void set_linear_address(uint32_t addr) { s3virge.linear_address = addr; }
-	uint8_t get_linear_address_size() { return s3virge.linear_address_size; }
-	uint32_t get_linear_address_size_full() { return s3virge.linear_address_size_full; }
-	bool is_linear_address_active() { return s3virge.linear_address_enable; }
+	uint32_t get_linear_address() { return m_linear_address; }
+	void set_linear_address(uint32_t addr) { m_linear_address = addr; }
+	uint8_t get_linear_address_size() { return m_linear_address_size; }
+	uint32_t get_linear_address_size_full() { return m_linear_address_size_full; }
+	bool is_linear_address_active() { return m_linear_address_enable; }
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
-	uint16_t src_stride()
-	{
-		return s3virge.s3d.src_stride;
-	}
-	uint16_t dest_stride()
-	{
-//      if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x0000001c) == 0x08)
-//      {
-//          popmessage("Stride=%08x",(((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8) / 3)
-//              + ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8));
-//          return (((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8) / 3)
-//              + ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8);
-//      }
-//      else
-			return s3virge.s3d.dest_stride;
-	}
 
 	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existent 8514/A device\n"); return nullptr; }
 
@@ -117,69 +101,69 @@ protected:
 		u16 primary_stride = 0;
 	} m_streams;
 
+	u32 m_interrupt_enable = 0;
+
+	bool m_linear_address_enable = false;
+	u32 m_linear_address = 0;
+	u8 m_linear_address_size = 0;
+	u32 m_linear_address_size_full = 0;
+
+	u8 m_cr66 = 0;
+
 //  util::fifo<u32, 16 * 15> m_bitblt_fifo;
 	// TODO: sketchy, command pipeline size is unclear
 	util::fifo<u32, 0x8000> m_bitblt_fifo;
 	util::fifo<u32, 0x8000> m_xfer_fifo;
+	// TODO: sketchy type, verify implications of using a struct class with util::fifo
+	// (may be required if we want to glue in a "execute command" insert flag)
 	u32 m_bitblt_latch[15]{};
 	s3d_state_t m_s3d_state = S3D_STATE_IDLE;
 
 	struct
 	{
-		uint32_t linear_address;
-		uint8_t linear_address_size;
-		uint32_t linear_address_size_full;
-		bool linear_address_enable;
-		uint32_t interrupt_enable;
+		bool xfer_mode = false;
 
-		struct
-		{
-			bool xfer_mode = false;
+		u8 pattern[0xc0]{};
 
-			uint8_t pattern[0xc0];
-
-			// BitBLT command state
-			uint16_t bitblt_x_src;
-			uint16_t bitblt_y_src;
-			uint16_t bitblt_x_dst;
-			uint16_t bitblt_y_dst;
-			int16_t bitblt_x_current;
-			int16_t bitblt_y_current;
-			int16_t bitblt_x_src_current;
-			int16_t bitblt_y_src_current;
-			int8_t bitblt_pat_x;
-			int8_t bitblt_pat_y;
-			uint16_t bitblt_height;
-			uint16_t bitblt_width;
-			uint32_t bitblt_step_count;
-			uint64_t bitblt_mono_pattern;
-			uint32_t bitblt_current_pixel;
-			uint32_t bitblt_pixel_pos;  // current position in a pixel (for packed 24bpp colour image transfers)
-			uint32_t image_xfer;  // source data via image transfer ports
-			uint16_t clip_l;
-			uint16_t clip_r;
-			uint16_t clip_t;
-			uint16_t clip_b;
-			uint32_t command;
-			uint32_t src_base;
-			uint32_t dest_base;
-			uint32_t pat_bg_clr;
-			uint32_t pat_fg_clr;
-			uint32_t src_bg_clr;
-			uint32_t src_fg_clr;
-			uint16_t dest_stride;
-			uint16_t src_stride;
-		} s3d;
-		uint8_t cr66;
-	} s3virge;
+		u16 x_src = 0;
+		u16 y_src = 0;
+		u16 x_dst = 0;
+		u16 y_dst = 0;
+		s16 x_current = 0;
+		s16 y_current = 0;
+		s16 x_src_current = 0;
+		s16 y_src_current = 0;
+		s8 pat_x = 0;
+		s8 pat_y = 0;
+		u16 height = 0;
+		u16 width = 0;
+		u32 step_count = 0;
+		u64 mono_pattern = 0;
+		u32 current_pixel = 0;
+		// current position in a pixel (for packed 24bpp colour image transfers)
+		u32 pixel_pos = 0;
+		// source data via image transfer ports
+		u32 image_xfer = 0;
+		u16 clip_l = 0;
+		u16 clip_r = 0;
+		u16 clip_t = 0;
+		u16 clip_b = 0;
+		u32 command = 0;
+		u32 src_base = 0;
+		u32 dest_base = 0;
+		u32 pat_bg_clr = 0;
+		u32 pat_fg_clr = 0;
+		u32 src_bg_clr = 0;
+		u32 src_fg_clr = 0;
+		u16 dest_stride = 0;
+		u16 src_stride = 0;
+	} m_bitblt;
 
 	TIMER_CALLBACK_MEMBER(op_timer_cb);
 
-	inline void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
 	inline void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
 	inline void write_pixel16(uint32_t base, uint16_t x, uint16_t y, uint16_t val);
 	inline void write_pixel8(uint32_t base, uint16_t x, uint16_t y, uint8_t val);
-	inline uint32_t read_pixel32(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
 	inline uint32_t read_pixel24(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
 	inline uint16_t read_pixel16(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
 	inline uint8_t read_pixel8(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
