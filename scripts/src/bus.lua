@@ -1192,6 +1192,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/coleco/expansion/expansion.h,BUSES["COLECO_EXPANSION"] = true
+---------------------------------------------------
+
+if (BUSES["COLECO_EXPANSION"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/crvision/slot.h,BUSES["CRVISION"] = true
 ---------------------------------------------------
 
