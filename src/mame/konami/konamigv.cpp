@@ -362,6 +362,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(heartbeat_timer_tick);
 	TIMER_CALLBACK_MEMBER(printing_status_timeout);
+	TIMER_CALLBACK_MEMBER(printer_scan_video_frame);
 
 	required_ioport m_heartbeat;
 	required_ioport m_gsr;
@@ -385,11 +386,13 @@ private:
 	uint32_t m_printer_current_image;
 	bool m_printer_is_manual_layout;
 	bool m_printer_page_is_dirty;
+	int m_printer_video_last_vblank_state;
 
 	bitmap_rgb32 m_page_bitmap;
 
 	emu_timer *m_heartbeat_timer;
 	emu_timer *m_printer_printing_status_timeout;
+	emu_timer *m_printer_video_frame_timer;
 };
 
 void konamigv_state::konamigv_map(address_map &map)
@@ -526,13 +529,15 @@ void tokimeki_state::machine_start()
 	save_item(NAME(m_printer_is_printing));
 	save_item(NAME(m_printer_current_image));
 	save_item(NAME(m_printer_data));
-	save_item(NAME(m_page_bitmap));
 	save_item(NAME(m_printer_page_is_dirty));
+	save_item(NAME(m_printer_video_last_vblank_state));
+	save_item(NAME(m_page_bitmap));
 
 	m_heartbeat_timer = timer_alloc(FUNC(tokimeki_state::heartbeat_timer_tick), this);
 	m_heartbeat_timer->adjust(attotime::zero);
 
 	m_printer_printing_status_timeout = timer_alloc(FUNC(tokimeki_state::printing_status_timeout), this);
+	m_printer_video_frame_timer = timer_alloc(FUNC(tokimeki_state::printer_scan_video_frame), this);
 
 	m_page_bitmap.allocate(PRINTER_PAGE_WIDTH, PRINTER_PAGE_HEIGHT);
 }
@@ -553,6 +558,7 @@ void tokimeki_state::machine_reset()
 	m_printer_curbyte = 0;
 	m_printer_is_printing = 0;
 	m_printer_current_image = 0;
+	m_printer_video_last_vblank_state = 0;
 
 	std::fill(std::begin(m_printer_data), std::end(m_printer_data), 0);
 
@@ -814,6 +820,84 @@ TIMER_CALLBACK_MEMBER(tokimeki_state::printing_status_timeout)
 	m_printer_is_printing = 0;
 }
 
+TIMER_CALLBACK_MEMBER(tokimeki_state::printer_scan_video_frame)
+{
+	// only accept video frame when it's the start of the next vblank area
+	const int vblank = m_screen->vblank();
+	const bool is_next_vblank = vblank != m_printer_video_last_vblank_state && vblank != 0;
+
+	m_printer_video_last_vblank_state = vblank;
+
+	if (!is_next_vblank)
+	{
+		m_printer_video_frame_timer->adjust(attotime::from_nsec(500));
+		return;
+	}
+
+	if (m_printer_is_manual_layout)
+	{
+		// 4x4 image layout
+		// The game tells the printer to take a video still of each individual
+		// image that'll be printed on the sticker sheet instead of one only
+		// one picture for the entire sheet like the non-plus version.
+
+		// HACK: crop out some unwanted padding and garbage from the input image.
+		// The left side of image gets cropped off due to PSX gpu rendering issues.
+		// The actual image itself uses 4x4 pixels except for a few pixels
+		// around the edge of the image, so those few pixels are also cropped
+		// to allow for clean scaling without chunky pixels.
+		const int32_t crop_left = 1;
+		const int32_t crop_top = 40;
+		const int32_t crop_right = 19;
+		const int32_t crop_bottom = 16;
+
+		bitmap_rgb32 cropped(
+			m_screen->curbitmap().as_rgb32(),
+			{
+				crop_left,
+				m_screen->cliprect().max_x - crop_right,
+				crop_top,
+				m_screen->cliprect().max_y - crop_bottom,
+			}
+		);
+
+		// scale the individual screenshot down to roughly the right size
+		const int32_t inner_pad_x = 6, inner_pad_y = 5;
+		const int32_t width_margin = 163, height_margin = 161; // full size of padding on both sides
+		const int32_t dest_w = (PRINTER_PAGE_WIDTH - width_margin - (inner_pad_x * 3)) / 4;
+		const int32_t dest_h = (PRINTER_PAGE_HEIGHT - height_margin - (inner_pad_y * 3)) / 4;
+		const int32_t scale_w = (cropped.width() << 16) / dest_w;
+		const int32_t scale_h = (cropped.height() << 16) / dest_h;
+
+		bitmap_rgb32 scaled(dest_w, dest_h);
+
+		copyrozbitmap(
+			scaled,
+			scaled.cliprect(),
+			cropped,
+			0, 0,
+			scale_w, 0, 0, scale_h,
+			false
+		);
+
+		// render the cropped and scaled image to the printer page
+		const int x = (m_printer_current_image % 4) * (scaled.width() + inner_pad_x);
+		const int y = (m_printer_current_image / 4) * (scaled.height() + inner_pad_y);
+		copybitmap(m_page_bitmap, scaled, 0, 0, width_margin / 2 + x, height_margin / 2 + y, m_page_bitmap.cliprect());
+
+		m_printer_current_image++;
+	}
+	else
+	{
+		// center entire screen onto printer page
+		m_page_bitmap.fill(0xffffffff);
+
+		const int x = (PRINTER_PAGE_WIDTH - m_screen->width()) / 2;
+		const int y = (PRINTER_PAGE_HEIGHT - m_screen->height()) / 2;
+		copybitmap(m_page_bitmap, m_screen->curbitmap().as_rgb32(), 0, 0, x, y, m_page_bitmap.cliprect());
+	}
+}
+
 void tokimeki_state::heartbeat_pulse_w(int state)
 {
 	if (state)
@@ -933,68 +1017,8 @@ void tokimeki_state::tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t me
 			else if (m_printer_data[0] == 0x10)
 			{
 				// memory in
-				if (m_printer_is_manual_layout)
-				{
-					// 4x4 image layout
-					// The game tells the printer to take a video still of each individual
-					// image that'll be printed on the sticker sheet instead of one only
-					// one picture for the entire sheet like the non-plus version.
-
-					// HACK: crop out some unwanted padding and garbage from the input image.
-					// The left side of image gets cropped off due to PSX gpu rendering issues.
-					// The actual image itself uses 4x4 pixels except for a few pixels
-					// around the edge of the image, so those few pixels are also cropped
-					// to allow for clean scaling without chunky pixels.
-					const int32_t crop_left = 1;
-					const int32_t crop_top = 40;
-					const int32_t crop_right = 19;
-					const int32_t crop_bottom = 16;
-
-					bitmap_rgb32 cropped(
-						m_screen->curbitmap().as_rgb32(),
-						{
-							crop_left,
-							m_screen->cliprect().max_x - crop_right,
-							crop_top,
-							m_screen->cliprect().max_y - crop_bottom,
-						}
-					);
-
-					// scale the individual screenshot down to roughly the right size
-					const int32_t inner_pad_x = 6, inner_pad_y = 5;
-					const int32_t width_margin = 163, height_margin = 161; // full size of padding on both sides
-					const int32_t dest_w = (PRINTER_PAGE_WIDTH - width_margin - (inner_pad_x * 3)) / 4;
-					const int32_t dest_h = (PRINTER_PAGE_HEIGHT - height_margin - (inner_pad_y * 3)) / 4;
-					const int32_t scale_w = (cropped.width() << 16) / dest_w;
-					const int32_t scale_h = (cropped.height() << 16) / dest_h;
-
-					bitmap_rgb32 scaled(dest_w, dest_h);
-
-					copyrozbitmap(
-						scaled,
-						scaled.cliprect(),
-						cropped,
-						0, 0,
-						scale_w, 0, 0, scale_h,
-						false
-					);
-
-					// render the cropped and scaled image to the printer page
-					const int x = (m_printer_current_image % 4) * (scaled.width() + inner_pad_x);
-					const int y = (m_printer_current_image / 4) * (scaled.height() + inner_pad_y);
-					copybitmap(m_page_bitmap, scaled, 0, 0, width_margin / 2 + x, height_margin / 2 + y, m_page_bitmap.cliprect());
-
-					m_printer_current_image++;
-				}
-				else
-				{
-					// center entire screen onto printer page
-					m_page_bitmap.fill(0xffffffff);
-
-					const int x = (PRINTER_PAGE_WIDTH - m_screen->width()) / 2;
-					const int y = (PRINTER_PAGE_HEIGHT - m_screen->height()) / 2;
-					copybitmap(m_page_bitmap, m_screen->curbitmap().as_rgb32(), 0, 0, x, y, m_page_bitmap.cliprect());
-				}
+				m_printer_video_last_vblank_state = m_screen->vblank();
+				m_printer_video_frame_timer->adjust(m_screen->time_until_vblank_start());
 			}
 			else if (m_printer_data[0] == 0x11)
 			{
