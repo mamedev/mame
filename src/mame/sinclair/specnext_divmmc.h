@@ -81,7 +81,6 @@ private:
 	bool automap_nmi_instant_on() const noexcept;
 	bool automap_nmi_delayed_on() const noexcept;
 	bool automap() const noexcept;
-
 };
 
 DECLARE_DEVICE_TYPE(SPECNEXT_DIVMMC, specnext_divmmc_device)

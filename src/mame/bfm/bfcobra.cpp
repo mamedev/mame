@@ -155,14 +155,14 @@ union ADDR_REG
 };
 
 /* Blitter register flag bits */
-#define CMD_RUN         0x01
-#define CMD_COLST       0x02
-#define CMD_PARRD       0x04        /* Never used? */
-#define CMD_SRCUP       0x08
-#define CMD_DSTUP       0x10
-#define CMD_LT0         0x20
-#define CMD_LT1         0x40
-#define CMD_LINEDRAW    0x80
+static constexpr uint8_t CMD_RUN         = 0x01;
+static constexpr uint8_t CMD_COLST       = 0x02;
+static constexpr uint8_t CMD_PARRD       = 0x04;        /* Never used? */
+static constexpr uint8_t CMD_SRCUP       = 0x08;
+static constexpr uint8_t CMD_DSTUP       = 0x10;
+static constexpr uint8_t CMD_LT0         = 0x20;
+static constexpr uint8_t CMD_LT1         = 0x40;
+static constexpr uint8_t CMD_LINEDRAW    = 0x80;
 
 
 /* All unconfirmed */
@@ -172,20 +172,20 @@ union ADDR_REG
 #define SRCDST_A_1      0x80        /* This might be correct for line drawing? */
 
 /* These appear to be correct */
-#define MODE_SSIGN      0x80
-#define MODE_DSIGN      0x40
-#define MODE_YFRAC      0x20
-#define MODE_BITTOBYTE  0x04
-#define MODE_PALREMAP   0x10
+static constexpr uint8_t MODE_SSIGN      = 0x80;
+static constexpr uint8_t MODE_DSIGN      = 0x40;
+static constexpr uint8_t MODE_YFRAC      = 0x20;
+static constexpr uint8_t MODE_BITTOBYTE  = 0x04;
+static constexpr uint8_t MODE_PALREMAP   = 0x10;
 
-#define CMPFUNC_LT      0x01
-#define CMPFUNC_EQ      0x02
-#define CMPFUNC_GT      0x04
-#define CMPFUNC_BEQ     0x08
-#define CMPFUNC_LOG0    0x10
-#define CMPFUNC_LOG1    0x20
-#define CMPFUNC_LOG2    0x40
-#define CMPFUNC_LOG3    0x80
+static constexpr uint8_t CMPFUNC_LT      = 0x01;
+static constexpr uint8_t CMPFUNC_EQ      = 0x02;
+static constexpr uint8_t CMPFUNC_GT      = 0x04;
+static constexpr uint8_t CMPFUNC_BEQ     = 0x08;
+static constexpr uint8_t CMPFUNC_LOG0    = 0x10;
+static constexpr uint8_t CMPFUNC_LOG1    = 0x20;
+static constexpr uint8_t CMPFUNC_LOG2    = 0x40;
+static constexpr uint8_t CMPFUNC_LOG3    = 0x80;
 
 /*
     Blitter state
@@ -194,26 +194,26 @@ struct bf_blitter_t
 {
 	ADDR_REG    program;
 
-	uint8_t       control = 0;
-	uint8_t       status = 0;
+	uint8_t     control = 0;
+	uint8_t     status = 0;
 
-	uint8_t       command = 0;
+	uint8_t     command = 0;
 	ADDR_REG    source;
 	ADDR_REG    dest;
-	uint8_t       modectl = 0;
-	uint8_t       compfunc = 0;
-	uint8_t       outercnt = 0;
+	uint8_t     modectl = 0;
+	uint8_t     compfunc = 0;
+	uint8_t     outercnt = 0;
 
-	uint8_t       innercnt = 0;
-	uint8_t       step = 0;
-	uint8_t       pattern = 0;
+	uint8_t     innercnt = 0;
+	uint8_t     step = 0;
+	uint8_t     pattern = 0;
 };
 
 #define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
 
 struct fdc_t
 {
-	uint8_t   MSR = 0;
+	uint8_t MSR = 0;
 
 	int     side = 0;
 	int     track = 0;
@@ -231,8 +231,8 @@ struct fdc_t
 	int     cmd_cnt = 0;
 	int     res_len = 0;
 	int     res_cnt = 0;
-	uint8_t   cmd[10]{};
-	uint8_t   results[8]{};
+	uint8_t cmd[10]{};
+	uint8_t results[8]{};
 };
 
 
@@ -304,7 +304,7 @@ protected:
 	void reset_fdc();
 	void exec_w_phase(uint8_t data);
 	void init_ram();
-	void command_phase(struct fdc_t &fdc, uint8_t data);
+	void command_phase(fdc_t &fdc, uint8_t data);
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z80_bank(int num, int data);
 
@@ -339,7 +339,7 @@ private:
 	uint8_t m_col7bit[256]{};
 	uint8_t m_col6bit[256]{};
 	struct bf_blitter_t m_blitter;
-	struct fdc_t m_fdc;
+	fdc_t m_fdc;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -1058,7 +1058,7 @@ enum command
 
 void bfcobra_state::reset_fdc()
 {
-	memset(&m_fdc, 0, sizeof(m_fdc));
+	m_fdc = fdc_t();
 
 	m_fdc.MSR = 0x80;
 	m_fdc.phase = COMMAND;
@@ -1075,71 +1075,70 @@ uint8_t bfcobra_state::fdctrl_r()
 
 uint8_t bfcobra_state::fddata_r()
 {
-	struct fdc_t &fdc = m_fdc;
-	#define BPS     1024
-	#define SPT     10
-	#define BPT     1024*10
+	constexpr int BPS = 1024;
+	constexpr int SPT = 10;
+	constexpr int BPT = BPS * SPT;
 
 	uint8_t val = 0;
 
-	if (fdc.phase == EXECUTION_R)
+	if (m_fdc.phase == EXECUTION_R)
 	{
-		switch (fdc.cmd[0] & 0x1f)
+		switch (m_fdc.cmd[0] & 0x1f)
 		{
 			/* Specify */
 			case READ_DATA:
 			{
-				if (fdc.setup_read)
+				if (m_fdc.setup_read)
 				{
-					fdc.track = fdc.cmd[2];
-					fdc.side = fdc.cmd[3];
-					fdc.sector = fdc.cmd[4];
-					fdc.number = fdc.cmd[5];
-					fdc.stop_track = fdc.cmd[6];
-					//int GPL = fdc.cmd[7];
-					//int DTL = fdc.cmd[8];
+					m_fdc.track = m_fdc.cmd[2];
+					m_fdc.side = m_fdc.cmd[3];
+					m_fdc.sector = m_fdc.cmd[4];
+					m_fdc.number = m_fdc.cmd[5];
+					m_fdc.stop_track = m_fdc.cmd[6];
+					//int GPL = m_fdc.cmd[7];
+					//int DTL = m_fdc.cmd[8];
 
-					fdc.setup_read = 0;
-					fdc.byte_pos = 0;
+					m_fdc.setup_read = 0;
+					m_fdc.byte_pos = 0;
 				}
 
-				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memregion("user2")->base() + fdc.offset);
+				m_fdc.offset = (BPT * m_fdc.track*2) + (m_fdc.side ? BPT : 0) + (BPS * (m_fdc.sector-1)) + m_fdc.byte_pos++;
+				val = *(memregion("user2")->base() + m_fdc.offset);
 
 				/* Move on to next sector? */
-				if (fdc.byte_pos == 1024)
+				if (m_fdc.byte_pos == 1024)
 				{
-					fdc.byte_pos = 0;
+					m_fdc.byte_pos = 0;
 
-					if (fdc.sector == fdc.stop_track || ++fdc.sector == 11)
+					if (m_fdc.sector == m_fdc.stop_track || ++m_fdc.sector == 11)
 					{
 						/* End of read operation */
-						fdc.MSR = 0xd0;
-						fdc.phase = RESULTS;
+						m_fdc.MSR = 0xd0;
+						m_fdc.phase = RESULTS;
 
-						fdc.results[0] = 0;
-						fdc.results[1] = 0;
-						fdc.results[2] = 0;
+						m_fdc.results[0] = 0;
+						m_fdc.results[1] = 0;
+						m_fdc.results[2] = 0;
 
-						fdc.results[3] = 0;
-						fdc.results[4] = 0;
-						fdc.results[5] = 0;
-						fdc.results[6] = 0;
+						m_fdc.results[3] = 0;
+						m_fdc.results[4] = 0;
+						m_fdc.results[5] = 0;
+						m_fdc.results[6] = 0;
 					}
 				}
 				break;
 			}
 		}
 	}
-	else if (fdc.phase == RESULTS)
+	else if (m_fdc.phase == RESULTS)
 	{
-		val = fdc.results[fdc.res_cnt++];
+		val = m_fdc.results[m_fdc.res_cnt++];
 
-		if (fdc.res_cnt == fdc.res_len)
+		if (m_fdc.res_cnt == m_fdc.res_len)
 		{
-			fdc.phase = COMMAND;
-			fdc.res_cnt = 0;
-			fdc.MSR &= ~0x40;
+			m_fdc.phase = COMMAND;
+			m_fdc.res_cnt = 0;
+			m_fdc.MSR &= ~0x40;
 		}
 	}
 
@@ -1148,12 +1147,11 @@ uint8_t bfcobra_state::fddata_r()
 
 void bfcobra_state::fdctrl_w(uint8_t data)
 {
-	struct fdc_t &fdc = m_fdc;
-	switch (fdc.phase)
+	switch (m_fdc.phase)
 	{
 		case COMMAND:
 		{
-			command_phase(fdc, data);
+			command_phase(m_fdc, data);
 			break;
 		}
 		case EXECUTION_W:
@@ -1168,7 +1166,7 @@ void bfcobra_state::fdctrl_w(uint8_t data)
 	}
 }
 
-void bfcobra_state::command_phase(struct fdc_t &fdc, uint8_t data)
+void bfcobra_state::command_phase(fdc_t &fdc, uint8_t data)
 {
 	if (fdc.cmd_cnt == 0)
 	{

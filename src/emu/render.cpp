@@ -336,7 +336,8 @@ render_texture::render_texture()
 		m_curseq(0)
 {
 	m_sbounds.set(0, -1, 0, -1);
-	memset(m_scaled, 0, sizeof(m_scaled));
+	for (auto &elem : m_scaled)
+		elem.seqid = 0;
 }
 
 
