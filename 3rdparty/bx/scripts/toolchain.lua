@@ -132,7 +132,7 @@ function toolchain(_buildDir, _libDir)
 	newoption {
 		trigger     = "with-macos",
 		value       = "#",
-		description = "Set macOS target version (default 10.11).",
+		description = "Set macOS target version (default 10.15).",
 	}
 
 	newoption {
@@ -419,7 +419,7 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "osx" == _OPTIONS["xcode"] then
-			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "10.11")
+			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "10.15")
 			premake.xcode.toolset = "macosx"
 			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
 
@@ -920,7 +920,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-arch x86_64",
 			"-msse4.2",
-			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
+			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.15"),
 		}
 
 	configuration { "osx-arm64" }
