@@ -731,6 +731,13 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_rgb32 &bitma
 
 		n_left = ( ( (int32_t)n_horiz_disstart - n_overscanleft ) * (int32_t)n_screenwidth ) / 2560;
 		n_columns = ( ( ( (int32_t)n_horiz_disend - n_horiz_disstart ) * (int32_t)n_screenwidth ) / 2560 );
+
+		/* adjustment to prevent the screen is cut off */
+		if( n_left > n_screenwidth - n_columns )
+		{
+			n_left = n_screenwidth - n_columns;
+		}
+
 		if( n_left < 0 )
 		{
 			n_x = -n_left;
