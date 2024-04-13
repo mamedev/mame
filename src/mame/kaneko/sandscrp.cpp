@@ -498,7 +498,7 @@ ROM_START( sandscrp ) /* Z03VA-003 PCB */
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "8.ic51", 0x00000, 0x20000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
 	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
 
@@ -518,7 +518,7 @@ ROM_START( sandscrpa ) /* Z03VA-003 PCB, earlier program version */
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "8.ic51", 0x00000, 0x20000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
 	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
 
@@ -540,7 +540,7 @@ ROM_START( sandscrpb ) /* Different rev PCB */
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "8.ic51", 0x00000, 0x20000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "ss502.ic16", 0x000000, 0x100000, CRC(d8012ebb) SHA1(975bbb3b57a09e41d2257d4fa3a64097144de554) )
 
 	ROM_REGION( 0x100000, "view2", 0 )   /* Layers */
