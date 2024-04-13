@@ -326,7 +326,7 @@ void slikshot_state::inters_to_words(u16 inter1, u16 inter2, u16 inter3, u8 &bea
 		}
 		else
 			LOGSENSOR("inters_to_words: unable to convert %04x %04x %04x %02x\n",
-					(u32)inter1, (u32)inter2, (u32)inter3, (u32)beams);
+					inter1, inter2, inter3, beams);
 	}
 
 	// handle the case where low bit of beams is 0
@@ -346,7 +346,7 @@ void slikshot_state::inters_to_words(u16 inter1, u16 inter2, u16 inter3, u8 &bea
 		}
 		else
 			LOGSENSOR("inters_to_words: unable to convert %04x %04x %04x %02x\n",
-					(u32)inter1, (u32)inter2, (u32)inter3, (u32)beams);
+					inter1, inter2, inter3, beams);
 	}
 }
 
@@ -584,9 +584,7 @@ u32 slikshot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_ybuffer_next++;
 
 	// determine where to draw the starting point
-	m_curxpos += m_xbuffer[(m_ybuffer_next + 1) % YBUFFER_COUNT];
-	if (m_curxpos < -0x80) m_curxpos = -0x80;
-	if (m_curxpos >  0x80) m_curxpos =  0x80;
+	m_curxpos = std::clamp<s32>(m_curxpos + m_xbuffer[(m_ybuffer_next + 1) % YBUFFER_COUNT], -0x80, 0x80);
 
 	// compute the total X/Y movement
 	s32 totaldx = 0, totaldy = 0;
@@ -599,22 +597,9 @@ u32 slikshot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	// if the shoot button is pressed, fire away
 	if (totaldy < m_last_ytotal && m_last_ytotal > 50 && m_crosshair_vis)
 	{
-		int temp;
-		// compute the updated values
-		temp = totaldx;
-		if (temp <= -0x80) temp = -0x7f;
-		if (temp >=  0x80) temp =  0x7f;
-		m_curvx = temp;
-
-		temp = m_last_ytotal - 50;
-		if (temp <=  0x10) temp =  0x10;
-		if (temp >=  0x7f) temp =  0x7f;
-		m_curvy = temp;
-
-		temp = 0x60 + (m_curxpos * 0x30 / 0x80);
-		if (temp <=  0x30) temp =  0x30;
-		if (temp >=  0x90) temp =  0x90;
-		m_curx = temp;
+		m_curvx = std::clamp<int>(totaldx, -0x7f, 0x7f);
+		m_curvy = std::clamp<int>(m_last_ytotal - 50, 0x10, 0x7f);
+		m_curx = std::clamp<int>(0x60 + ((m_curxpos * 3) >> 3), 0x30, 0x90);
 
 		compute_sensors();
 //      popmessage("V=%02x,%02x  X=%02x", m_curvx, m_curvy, m_curx);

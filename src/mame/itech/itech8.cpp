@@ -1851,7 +1851,7 @@ void grmatch_state::grmatch(machine_config &config)
 	m_screen->set_visarea(0, 399, 0, 239);
 	m_screen->set_screen_update(FUNC(grmatch_state::screen_update));
 
-	config.device_remove("tlc34076"); // replaced to TMS34070s
+	config.device_remove("tlc34076"); // replaced with TMS34070s
 
 	for (auto &elem : m_palette)
 		PALETTE(config, elem).set_entries(16);
