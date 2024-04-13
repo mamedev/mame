@@ -88,7 +88,7 @@ void msx2p_state::expert3i(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "music", 1, 1, 1, 1, "music");
+	add_internal_slot(config, MSX_SLOT_MUSIC, "music", 1, 1, 1, 1, "music").set_ym2413_tag(m_ym2413);
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793, "disk", 1, 2, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "ide", 1, 3, 0, 4, "ide");         /* IDE hardware needs to be emulated */
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 4).set_total_size(0x40000);       // 256KB?? Mapper RAM
@@ -143,7 +143,7 @@ void msx2p_state::expert3t(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1, 0);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "music", 1, 1, 1, 1, "music");
+	add_internal_slot(config, MSX_SLOT_MUSIC, "music", 1, 1, 1, 1, "music").set_ym2413_tag(m_ym2413);
 	add_internal_slot(config, MSX_SLOT_ROM, "turbo", 1, 2, 1, 1, "turbo");          /* Turbo hardware needs to be emulated */
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793, "disk", 1, 3, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 4).set_total_size(0x40000);       // 256KB Mapper RAM
@@ -310,7 +310,7 @@ void msx2p_state::fsa1wsx(machine_config &config)
 	// pause button
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 0, 2, 1, 1, "msxmusic");
+	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 0, 2, 1, 1, "msxmusic").set_ym2413_tag(m_ym2413);
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_unused_bits(0x80);   // 64KB Mapper RAM
@@ -371,7 +371,7 @@ void msx2p_state::fsa1wx(machine_config &config)
 	// pause button
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 0, 2, 1, 1, "msxmusic");
+	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 0, 2, 1, 1, "msxmusic").set_ym2413_tag(m_ym2413);
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_unused_bits(0x80);   // 64KB Mapper RAM
@@ -490,7 +490,7 @@ void msx2p_state::phc70fd(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x18000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x8000);
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK3_TC8566, "disk", 3, 2, 1, 2, "mainrom", 0x1c000);
-	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x00000);
+	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x00000).set_ym2413_tag(m_ym2413);
 	add_internal_slot(config, MSX_SLOT_ROM, "basickun", 3, 3, 2, 1, "mainrom", 0x04000);
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
@@ -541,7 +541,7 @@ void msx2p_state::phc70fd2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK3_TC8566_2_DRIVES, "disk", 3, 2, 1, 2, "diskrom");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "msxmusic");
+	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "msxmusic").set_ym2413_tag(m_ym2413);
 	add_internal_slot(config, MSX_SLOT_ROM, "basickun", 3, 3, 2, 1, "basickun");
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
@@ -584,7 +584,7 @@ void msx2p_state::hbf1xdj(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x10000);
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N, "disk", 3, 2, 1, 2, "mainrom", 0xc000);
-	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x18000);
+	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x18000).set_ym2413_tag(m_ym2413);
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
@@ -627,7 +627,7 @@ void msx2p_state::hbf1xv(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x10000);
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N, "disk", 3, 2, 1, 2, "mainrom", 0xc000);
-	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x18000);
+	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x18000).set_ym2413_tag(m_ym2413);
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
@@ -667,7 +667,7 @@ void msx2p_state::fsa1gt(machine_config &config)
 	// ren-sha turbo slider
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 0, 2, 1, 1, "maincpu", 0x24000);
+	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 0, 2, 1, 1, "maincpu", 0x24000).set_ym2413_tag(m_ym2413);
 	add_internal_slot(config, MSX_SLOT_ROM, "opt", 0, 3, 1, 1, "maincpu", 0x28000);
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
@@ -710,7 +710,7 @@ void msx2p_state::fsa1st(machine_config &config)
 	// ren-sha turbo slider
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu");
-	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 0, 2, 1, 1, "maincpu", 0x24000);
+	add_internal_slot(config, MSX_SLOT_MUSIC, "mus", 0, 2, 1, 1, "maincpu", 0x24000).set_ym2413_tag(m_ym2413);
 	add_internal_slot(config, MSX_SLOT_ROM, "opt", 0, 3, 1, 1, "maincpu", 0x28000);
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
