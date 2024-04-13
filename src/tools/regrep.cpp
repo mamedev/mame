@@ -14,6 +14,7 @@
 
 #include "osdcomm.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdio>
@@ -67,8 +68,8 @@ struct summary_file
 	summary_file *  next;
 	char            name[20];
 	char            source[100];
-	uint8_t           status[MAX_COMPARES];
-	uint8_t           matchbitmap[MAX_COMPARES];
+	uint8_t         status[MAX_COMPARES];
+	uint8_t         matchbitmap[MAX_COMPARES];
 	std::string     text[MAX_COMPARES];
 };
 
@@ -290,7 +291,7 @@ int main(int argc, char *argv[])
 
 static summary_file *get_file(const char *filename)
 {
-	summary_file *file;
+	summary_file *file = nullptr;
 
 	/* use the first two characters as a lookup */
 	for (file = filehash[filename[0] & 0x7f][filename[1] & 0x7f]; file != nullptr; file = file->next)
@@ -298,10 +299,14 @@ static summary_file *get_file(const char *filename)
 			return file;
 
 	/* didn't find one -- allocate */
-	file = (summary_file *)malloc(sizeof(*file));
+	file = new (std::nothrow) summary_file;
 	if (file == nullptr)
 		return nullptr;
-	memset(file, 0, sizeof(*file));
+	file->next = nullptr;
+	std::fill(std::begin(file->name), std::end(file->name), '\0');
+	std::fill(std::begin(file->source), std::end(file->source), '\0');
+	std::fill(std::begin(file->status), std::end(file->status), 0);
+	std::fill(std::begin(file->matchbitmap), std::end(file->matchbitmap), 0);
 
 	/* set the name so we find it in the future */
 	strcpy(file->name, filename);
@@ -510,7 +515,7 @@ static int CLIB_DECL compare_file(const void *file0ptr, const void *file1ptr)
     into a single, sorted list
 -------------------------------------------------*/
 
-static summary_file *sort_file_list(void)
+static summary_file *sort_file_list()
 {
 	summary_file *listhead, **tailptr, *curfile, **filearray;
 	int numfiles, filenum;
