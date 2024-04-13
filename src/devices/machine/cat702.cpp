@@ -92,24 +92,19 @@ static constexpr uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0,
 DEFINE_DEVICE_TYPE(CAT702, cat702_device, "cat702", "CAT702")
 DEFINE_DEVICE_TYPE(CAT702_PIU, cat702_piu_device, "cat702_piu", "CAT702_PIU")
 
-cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cat702_device(mconfig, CAT702, tag, owner, clock)
-{
-}
-
-cat702_device::cat702_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+base_cat702_device::base_cat702_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_region(*this, DEVICE_SELF),
 	m_select(1),
 	m_clock(1),
 	m_datain(1),
 	m_state(0),
 	m_bit(0),
-	m_dataout_handler(*this)
+	m_dataout_handler(*this),
+	m_region(*this, DEVICE_SELF)
 {
 }
 
-void cat702_device::device_start()
+void base_cat702_device::device_start()
 {
 	memset(m_transform, 0xff, sizeof(m_transform));
 
@@ -152,7 +147,7 @@ static int c_linear(uint8_t x, uint8_t a)
 #endif
 
 // Derive the sbox xor mask for a given input and select bit
-uint8_t cat702_device::compute_sbox_coef(int sel, int bit)
+uint8_t base_cat702_device::compute_sbox_coef(int sel, int bit)
 {
 	if(!sel)
 		return m_transform[bit];
@@ -166,7 +161,7 @@ uint8_t cat702_device::compute_sbox_coef(int sel, int bit)
 }
 
 // Apply the sbox for a input 0 bit
-void cat702_device::apply_bit_sbox(int sel)
+void base_cat702_device::apply_bit_sbox(int sel)
 {
 	int i;
 	uint8_t r = 0;
@@ -178,7 +173,7 @@ void cat702_device::apply_bit_sbox(int sel)
 }
 
 // Apply a sbox
-void cat702_device::apply_sbox(const uint8_t *sbox)
+void base_cat702_device::apply_sbox(const uint8_t *sbox)
 {
 	int i;
 	uint8_t r = 0;
@@ -188,6 +183,20 @@ void cat702_device::apply_sbox(const uint8_t *sbox)
 
 	m_state = r;
 }
+
+void base_cat702_device::write_datain(int state)
+{
+	m_datain = state;
+}
+
+///////////////
+
+
+cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: base_cat702_device(mconfig, CAT702, tag, owner, clock)
+{
+}
+
 
 void cat702_device::write_select(int state)
 {
@@ -233,16 +242,11 @@ void cat702_device::write_clock(int state)
 	m_clock = state;
 }
 
-void cat702_device::write_datain(int state)
-{
-	m_datain = state;
-}
-
 ///////////////
 
 
 cat702_piu_device::cat702_piu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cat702_device(mconfig, CAT702_PIU, tag, owner, clock)
+	: base_cat702_device(mconfig, CAT702_PIU, tag, owner, clock)
 {
 }
 
