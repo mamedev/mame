@@ -386,7 +386,7 @@ private:
 	uint32_t m_printer_current_image;
 	bool m_printer_is_manual_layout;
 	bool m_printer_page_is_dirty;
-	int m_printer_video_last_vblank_state;
+	uint8_t m_printer_video_last_vblank_state;
 
 	bitmap_rgb32 m_page_bitmap;
 
