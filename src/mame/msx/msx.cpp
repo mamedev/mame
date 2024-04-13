@@ -130,26 +130,13 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_gen_port1(*this, "gen1")
 	, m_gen_port2(*this, "gen2")
 	, m_io_key(*this, "KEY%u", 0U)
-	, m_view_page0(*this, "view0")
-	, m_view_page1(*this, "view1")
-	, m_view_page2(*this, "view2")
-	, m_view_page3(*this, "view3")
-	, m_view_slot0_page0(*this, "view0_0")
-	, m_view_slot0_page1(*this, "view0_1")
-	, m_view_slot0_page2(*this, "view0_2")
-	, m_view_slot0_page3(*this, "view0_3")
-	, m_view_slot1_page0(*this, "view1_0")
-	, m_view_slot1_page1(*this, "view1_1")
-	, m_view_slot1_page2(*this, "view1_2")
-	, m_view_slot1_page3(*this, "view1_3")
-	, m_view_slot2_page0(*this, "view2_0")
-	, m_view_slot2_page1(*this, "view2_1")
-	, m_view_slot2_page2(*this, "view2_2")
-	, m_view_slot2_page3(*this, "view2_3")
-	, m_view_slot3_page0(*this, "view3_0")
-	, m_view_slot3_page1(*this, "view3_1")
-	, m_view_slot3_page2(*this, "view3_2")
-	, m_view_slot3_page3(*this, "view3_3")
+	, m_view{ {*this, "view0"}, {*this, "view1"}, {*this, "view2"}, {*this, "view3"} }
+	, m_exp_view{
+		{ {*this, "view0_0"}, {*this, "view0_1"}, {*this, "view0_2"}, {*this, "view0_3"} },
+		{ {*this, "view1_0"}, {*this, "view1_1"}, {*this, "view1_2"}, {*this, "view1_3"} },
+		{ {*this, "view2_0"}, {*this, "view2_1"}, {*this, "view2_2"}, {*this, "view2_3"} },
+		{ {*this, "view3_0"}, {*this, "view3_1"}, {*this, "view3_2"}, {*this, "view3_3"} },
+	 }
 	, m_psg_b(0)
 	, m_kanji_latch(0)
 	, m_slot_expanded{false, false, false, false}
@@ -162,26 +149,6 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_main_xtal(main_xtal)
 	, m_cpu_xtal_divider(cpu_xtal_divider)
 {
-	m_view[0] = &m_view_page0;
-	m_view[1] = &m_view_page1;
-	m_view[2] = &m_view_page2;
-	m_view[3] = &m_view_page3;
-	m_exp_view[0][0] = &m_view_slot0_page0;
-	m_exp_view[0][1] = &m_view_slot0_page1;
-	m_exp_view[0][2] = &m_view_slot0_page2;
-	m_exp_view[0][3] = &m_view_slot0_page3;
-	m_exp_view[1][0] = &m_view_slot1_page0;
-	m_exp_view[1][1] = &m_view_slot1_page1;
-	m_exp_view[1][2] = &m_view_slot1_page2;
-	m_exp_view[1][3] = &m_view_slot1_page3;
-	m_exp_view[2][0] = &m_view_slot2_page0;
-	m_exp_view[2][1] = &m_view_slot2_page1;
-	m_exp_view[2][2] = &m_view_slot2_page2;
-	m_exp_view[2][3] = &m_view_slot2_page3;
-	m_exp_view[3][0] = &m_view_slot3_page0;
-	m_exp_view[3][1] = &m_view_slot3_page1;
-	m_exp_view[3][2] = &m_view_slot3_page2;
-	m_exp_view[3][3] = &m_view_slot3_page3;
 }
 
 void msx_state::memory_expand_slot(int slot)
@@ -193,18 +160,16 @@ void msx_state::memory_expand_slot(int slot)
 	if (m_slot_expanded[slot])
 		return;
 
-	m_view_page0[slot](0x0000, 0x3fff).view(*m_exp_view[slot][0]);
-	m_view_page1[slot](0x4000, 0x7fff).view(*m_exp_view[slot][1]);
-	m_view_page2[slot](0x8000, 0xbfff).view(*m_exp_view[slot][2]);
-	m_view_page3[slot](0xc000, 0xffff).view(*m_exp_view[slot][3]);
-	m_view_page3[slot](0xffff, 0xffff).rw(FUNC(msx_state::expanded_slot_r), FUNC(msx_state::expanded_slot_w));
-	for (int i = 0; i < 4; i++)
+	m_view[0][slot](0x0000, 0x3fff).view(m_exp_view[slot][0]);
+	m_view[1][slot](0x4000, 0x7fff).view(m_exp_view[slot][1]);
+	m_view[2][slot](0x8000, 0xbfff).view(m_exp_view[slot][2]);
+	m_view[3][slot](0xc000, 0xffff).view(m_exp_view[slot][3]);
+	m_view[3][slot](0xffff, 0xffff).rw(FUNC(msx_state::expanded_slot_r), FUNC(msx_state::expanded_slot_w));
+	for (int subslot = 0; subslot < 4; subslot++)
 	{
 		// Ensure that the views will exist
-		(*m_exp_view[slot][0])[i];
-		(*m_exp_view[slot][1])[i];
-		(*m_exp_view[slot][2])[i];
-		(*m_exp_view[slot][3])[i];
+		for (int page = 0; page < 4; page++)
+			(m_exp_view[slot][page])[subslot];
 	}
 	m_slot_expanded[slot] = true;
 }
@@ -213,19 +178,15 @@ void msx_state::memory_map(address_map &map)
 {
 	map.unmap_value_high();
 
-	map(0x0000, 0x3fff).view(m_view_page0);
-	map(0x4000, 0x7fff).view(m_view_page1);
-	map(0x8000, 0xbfff).view(m_view_page2);
-	map(0xc000, 0xffff).view(m_view_page3);
+	map(0x0000, 0x3fff).view(m_view[0]);
+	map(0x4000, 0x7fff).view(m_view[1]);
+	map(0x8000, 0xbfff).view(m_view[2]);
+	map(0xc000, 0xffff).view(m_view[3]);
 
 	// setup defaults
-	for (int i = 0; i < 4; i++)
-	{
-		m_view_page0[i];
-		m_view_page1[i];
-		m_view_page2[i];
-		m_view_page3[i];
-	}
+	for (int slot = 0; slot < 4; slot++)
+		for (int page = 0; page < 4; page++)
+			m_view[page][slot];
 
 	// Look for expanded slots
 	for (const auto& entry : m_internal_slots)
@@ -238,27 +199,15 @@ void msx_state::memory_map(address_map &map)
 	{
 		memory_view::memory_view_entry *view[4] = {nullptr, nullptr, nullptr, nullptr};
 		for (int i = 0; i < entry.numpages; i++)
-		{
 			view[entry.page + i] = get_view(entry.page + i, entry.prim, entry.sec);
-		}
+
 		entry.internal_slot->install(view[0], view[1], view[2], view[3]);
 	}
 }
 
 memory_view::memory_view_entry *msx_state::get_view(int page, int prim, int sec)
 {
-	switch (page)
-	{
-	case 0:
-		return m_slot_expanded[prim] ? &(*m_exp_view[prim][0])[sec] : &m_view_page0[prim];
-	case 1:
-		return m_slot_expanded[prim] ? &(*m_exp_view[prim][1])[sec] : &m_view_page1[prim];
-	case 2:
-		return m_slot_expanded[prim] ? &(*m_exp_view[prim][2])[sec] : &m_view_page2[prim];
-	case 3:
-		return m_slot_expanded[prim] ? &(*m_exp_view[prim][3])[sec] : &m_view_page3[prim];
-	}
-	return nullptr;
+	return m_slot_expanded[prim] ? &(m_exp_view[prim][page])[sec] : &m_view[page][prim];
 }
 
 void msx_state::msx_base_io_map(address_map &map)
@@ -291,17 +240,14 @@ void msx_state::machine_reset()
 {
 	m_primary_slot = 0;
 	m_secondary_slot[0] = 0;
-	m_view_page0.select(0);
-	m_view_page1.select(0);
-	m_view_page2.select(0);
-	m_view_page3.select(0);
+
+	for (int page = 0; page < 4; page++)
+		m_view[page].select(0);
+
 	if (m_slot_expanded[0])
-	{
-		m_view_slot0_page0.select(0);
-		m_view_slot0_page1.select(0);
-		m_view_slot0_page2.select(0);
-		m_view_slot0_page3.select(0);
-	}
+		for (int page = 0; page < 4; page++)
+			m_exp_view[0][page].select(0);
+
 	m_caps_led = 0;
 	m_code_led = 0;
 }
@@ -382,10 +328,8 @@ void msx_state::ppi_port_a_w(u8 data)
 	m_primary_slot = data;
 
 	LOG("write to primary slot select: %02x\n", m_primary_slot);
-	m_view_page0.select((data >> 0) & 0x03);
-	m_view_page1.select((data >> 2) & 0x03);
-	m_view_page2.select((data >> 4) & 0x03);
-	m_view_page3.select((data >> 6) & 0x03);
+	for (int page = 0; page < 4; page++)
+		m_view[page].select((data >> (page * 2)) & 0x03);
 }
 
 void msx_state::ppi_port_c_w(u8 data)
@@ -426,10 +370,8 @@ void msx_state::expanded_slot_w(u8 data)
 	const int slot = (m_primary_slot >> 6) & 0x03;
 	m_secondary_slot[slot] = data;
 	LOG("write to expanded slot select: %02x\n", data);
-	m_exp_view[slot][0]->select((data >> 0) & 0x03);
-	m_exp_view[slot][1]->select((data >> 2) & 0x03);
-	m_exp_view[slot][2]->select((data >> 4) & 0x03);
-	m_exp_view[slot][3]->select((data >> 6) & 0x03);
+	for (int page = 0; page < 4; page++)
+		m_exp_view[slot][page].select((data >> (page * 2)) & 0x03);
 }
 
 u8 msx_state::expanded_slot_r()

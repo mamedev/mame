@@ -199,29 +199,8 @@ protected:
 	msx_hw_def m_hw_def;
 	// This is here until more direct rom dumps from kanji font roms become available.
 	bool m_kanji_fsa1fx = false;
-	memory_view m_view_page0;
-	memory_view m_view_page1;
-	memory_view m_view_page2;
-	memory_view m_view_page3;
-	memory_view *m_view[4];
-	// There must be a better way to do this
-	memory_view m_view_slot0_page0;
-	memory_view m_view_slot0_page1;
-	memory_view m_view_slot0_page2;
-	memory_view m_view_slot0_page3;
-	memory_view m_view_slot1_page0;
-	memory_view m_view_slot1_page1;
-	memory_view m_view_slot1_page2;
-	memory_view m_view_slot1_page3;
-	memory_view m_view_slot2_page0;
-	memory_view m_view_slot2_page1;
-	memory_view m_view_slot2_page2;
-	memory_view m_view_slot2_page3;
-	memory_view m_view_slot3_page0;
-	memory_view m_view_slot3_page1;
-	memory_view m_view_slot3_page2;
-	memory_view m_view_slot3_page3;
-	memory_view *m_exp_view[4][4];
+	memory_view m_view[4];
+	memory_view m_exp_view[4][4];
 	struct internal_slot
 	{
 		int prim;
