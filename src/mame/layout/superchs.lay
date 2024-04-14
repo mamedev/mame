@@ -4,9 +4,7 @@ license:CC0-1.0
 -->
 <mamelayout version="2">
 
-	<element name="nothing" defstate="0">
-		<rect><color alpha="0" /></rect>
-	</element>
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
 
 	<element name="shifter" defstate="0">
 		<rect>
@@ -69,6 +67,11 @@ license:CC0-1.0
 				<bounds x="606" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 	<view name="Upright (4:3) + Shifter-R Off-Screen" showpointers="no">
@@ -83,6 +86,11 @@ license:CC0-1.0
 				<bounds x="648" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="648" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 	<view name="Upright (4:3) + Shifter-L Overlay" showpointers="no">
@@ -97,6 +105,11 @@ license:CC0-1.0
 				<bounds x="2" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 	<view name="Upright (4:3) + Shifter-L Off-Screen" showpointers="no">
@@ -111,6 +124,11 @@ license:CC0-1.0
 				<bounds x="-40" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -129,6 +147,11 @@ license:CC0-1.0
 				<bounds x="819.333" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="819.333" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 	<view name="Deluxe (16:9) + Shifter-R Off-Screen" showpointers="no">
@@ -143,6 +166,11 @@ license:CC0-1.0
 				<bounds x="861.333" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="861.333" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 	<view name="Deluxe (16:9) + Shifter-L Overlay" showpointers="no">
@@ -157,6 +185,11 @@ license:CC0-1.0
 				<bounds x="2" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 	<view name="Deluxe (16:9) + Shifter-L Off-Screen" showpointers="no">
@@ -171,6 +204,11 @@ license:CC0-1.0
 				<bounds x="-40" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 

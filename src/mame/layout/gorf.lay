@@ -57,7 +57,7 @@ authors:hap
 	</element>
 
 
-<!-- build screen -->
+<!-- side panel -->
 
 	<group name="lamps">
 		<element ref="white"><bounds x="0" y="-5" width="100" height="205" /></element>
@@ -123,8 +123,11 @@ authors:hap
 		<element name="lamp5" ref="lamp" blend="multiply"><bounds xc="75" yc="167" width="44" height="60" /></element>
 	</group>
 
+
+<!-- build screen -->
+
 	<view name="Lamps">
-		<collection name="Centre Display">
+		<collection name="Centre Display" visible="no">
 			<element ref="nothing"><bounds x="-96" y="0" width="492" height="400" /></element>
 		</collection>
 		<screen index="0"><bounds x="0" y="0" width="300" height="400" /></screen>

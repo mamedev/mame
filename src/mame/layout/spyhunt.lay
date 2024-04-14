@@ -7,9 +7,7 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="nothing" defstate="0">
-		<rect><color alpha="0" /></rect>
-	</element>
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
 
 	<element name="lamp_miss" defstate="0">
 		<text string="MISSILES" state="0">
@@ -267,6 +265,11 @@ authors:hap
 				<bounds x="446" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="446" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -289,6 +292,11 @@ authors:hap
 				<bounds x="488" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="488" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -311,6 +319,11 @@ authors:hap
 				<bounds x="2" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="2" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -333,6 +346,11 @@ authors:hap
 				<bounds x="-40" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="-40" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -355,6 +373,11 @@ authors:hap
 				<bounds x="488" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="488" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -377,6 +400,11 @@ authors:hap
 				<bounds x="-40" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+					<bounds x="-40" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 

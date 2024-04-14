@@ -6,9 +6,7 @@ license:CC0-1.0
 
 <!-- define elements -->
 
-	<element name="nothing" defstate="0">
-		<rect><color alpha="0" /></rect>
-	</element>
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
 
 	<element name="shifter" defstate="0">
 		<rect>
@@ -202,6 +200,11 @@ license:CC0-1.0
 				<bounds x="256" y="326" width="24" height="48" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="256" y="326" width="24" height="48" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -230,6 +233,11 @@ license:CC0-1.0
 				<bounds x="288" y="326" width="24" height="48" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="288" y="326" width="24" height="48" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -258,6 +266,11 @@ license:CC0-1.0
 				<bounds x="2" y="326" width="24" height="48" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="2" y="326" width="24" height="48" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -286,6 +299,11 @@ license:CC0-1.0
 				<bounds x="-30" y="326" width="24" height="48" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x04">
+					<bounds x="-30" y="326" width="24" height="48" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 

@@ -7,9 +7,7 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="nothing" defstate="0">
-		<rect><color alpha="0" /></rect>
-	</element>
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
 
 	<element name="shutter" defstate="0">
 		<rect state="1"><color red="0" green="0" blue="0" /></rect>
@@ -77,6 +75,11 @@ authors:hap
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="606" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 	<view name="Shifter-R Off-Screen" showpointers="no">
 		<screen index="0">
@@ -89,6 +92,11 @@ authors:hap
 			<bounds x="648" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="648" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 	<view name="Shifter-L Overlay" showpointers="no">
 		<screen index="0">
@@ -101,6 +109,11 @@ authors:hap
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="2" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 	<view name="Shifter-L Off-Screen" showpointers="no">
 		<screen index="0">
@@ -113,6 +126,11 @@ authors:hap
 			<bounds x="-40" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="-40" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 
 	<!-- for the 3D Scope views, enable stereoscopic 3D DIP switch first -->

@@ -30,9 +30,7 @@ authors:hap
 	<element name="text_rpm"><text string="RPM" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="text_speed"><text string="SPEED" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<element name="nothing" defstate="0">
-		<rect><color alpha="0" /></rect>
-	</element>
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
 
 	<element name="digit" defstate="0">
 		<led7seg>
@@ -372,6 +370,9 @@ authors:hap
 	<view name="Side Panel + Shifter-R Overlay" showpointers="no">
 		<collection name="Side Panel">
 			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing"><bounds x="480" y="0" width="168" height="640" /></element>
+			</collection>
 		</collection>
 
 		<screen index="0">
@@ -385,12 +386,20 @@ authors:hap
 				<bounds x="446" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x04">
+					<bounds x="446" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
 	<view name="Side Panel + Shifter-R Off-Screen" showpointers="no">
 		<collection name="Side Panel">
 			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing"><bounds x="480" y="0" width="168" height="640" /></element>
+			</collection>
 		</collection>
 
 		<screen index="0">
@@ -404,12 +413,20 @@ authors:hap
 				<bounds x="488" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x04">
+					<bounds x="488" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
 	<view name="Side Panel + Shifter-L Overlay" showpointers="no">
 		<collection name="Side Panel">
 			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing"><bounds x="480" y="0" width="168" height="640" /></element>
+			</collection>
 		</collection>
 
 		<screen index="0">
@@ -423,12 +440,20 @@ authors:hap
 				<bounds x="2" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x04">
+					<bounds x="2" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
 	<view name="Side Panel + Shifter-L Off-Screen" showpointers="no">
 		<collection name="Side Panel">
 			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+			<collection name="Centre Display" visible="no">
+				<element ref="nothing"><bounds x="480" y="0" width="168" height="640" /></element>
+			</collection>
 		</collection>
 
 		<screen index="0">
@@ -442,6 +467,11 @@ authors:hap
 				<bounds x="-40" y="574" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x04">
+					<bounds x="-40" y="574" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
