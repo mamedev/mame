@@ -159,6 +159,7 @@ void spi_sdcard_device::latch_in()
 
 		case SD_STATE_WRITE_DATA:
 			m_data[m_write_ptr++] = m_in_latch;
+			m_cmd[5] = 0xff; // avoid writing to cmd buffer
 			if (m_write_ptr == (m_blksize + 2))
 			{
 				LOG("writing LBA %x, data %02x %02x %02x %02x\n", m_blknext, m_data[0], m_data[1], m_data[2], m_data[3]);
@@ -445,7 +446,7 @@ void spi_sdcard_device::do_command()
 			break;
 
 		default:
-			LOGMASKED(LOG_COMMAND, "SDCARD: Unsupported %02x\n", m_cmd[0] & 0x3f);
+			LOGMASKED(LOG_COMMAND, "SDCARD: Unsupported CMD%02d\n", m_cmd[0] & 0x3f);
 			clean_cmd = false;
 			break;
 		}
