@@ -66,7 +66,6 @@ public:
 	void palette_init(palette_device &palette) const;
 
 protected:
-	virtual void machine_start() override { }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
