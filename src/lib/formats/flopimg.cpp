@@ -103,42 +103,31 @@ bool floppy_image::track_is_formatted(int track, int head, int subtrack) const n
 
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant, uint32_t sectoring) noexcept
 {
-	if (sectoring == SOFT) {
-		switch(variant) {
-		case SSSD: return "Single side, single density";
-		case SSDD: return "Single side, double density";
-		case SSQD: return "Single side, quad density";
-		case DSSD: return "Doubld side, single density";
-		case DSDD: return "Double side, double density";
-		case DSQD: return "Double side, quad density";
-		case DSHD: return "Double side, high density";
-		case DSED: return "Double side, extended density";
-		}
-	} else if (sectoring == H10) {
-		switch(variant) {
-		case SSSD: return "Single side, single density, 10-sector";
-		case SSDD: return "Single side, double density, 10-sector";
-		case SSQD: return "Single side, quad density, 10-sector";
-		case DSSD: return "Doubld side, single density, 10-sector";
-		case DSDD: return "Double side, double density, 10-sector";
-		case DSQD: return "Double side, quad density, 10-sector";
-		}
-	} else if (sectoring == H16) {
-		switch(variant) {
-		case SSSD: return "Single side, single density, 16-sector";
-		case SSDD: return "Single side, double density, 16-sector";
-		case SSQD: return "Single side, quad density, 16-sector";
-		case DSSD: return "Doubld side, single density, 16-sector";
-		case DSDD: return "Double side, double density, 16-sector";
-		case DSQD: return "Double side, quad density, 16-sector";
-		}
-	} else if (sectoring == H32) {
-		switch(variant) {
-		case SSSD: return "Single side, single density, 32-sector";
-		case SSDD: return "Single side, double density, 32-sector";
-		case DSSD: return "Doubld side, single density, 32-sector";
-		case DSDD: return "Double side, double density, 32-sector";
-		}
+	switch(variant) {
+	case SSSD: return "Single side, single density";
+	case SSDD: return "Single side, double density";
+	case SSQD: return "Single side, quad density";
+	case DSSD: return "Doubld side, single density";
+	case DSDD: return "Double side, double density";
+	case DSQD: return "Double side, quad density";
+	case DSHD: return "Double side, high density";
+	case DSED: return "Double side, extended density";
+	case SS10: return "Single side, single density, 10-sector";
+	case SD10: return "Single side, double density, 10-sector";
+	case SQ10: return "Single side, quad density, 10-sector";
+	case DS10: return "Doubld side, single density, 10-sector";
+	case DD10: return "Double side, double density, 10-sector";
+	case DQ10: return "Double side, quad density, 10-sector";
+	case SS16: return "Single side, single density, 16-sector";
+	case SD16: return "Single side, double density, 16-sector";
+	case SQ16: return "Single side, quad density, 16-sector";
+	case DS16: return "Doubld side, single density, 16-sector";
+	case DD16: return "Double side, double density, 16-sector";
+	case DQ16: return "Double side, quad density, 16-sector";
+	case SS32: return "Single side, single density, 32-sector";
+	case SD32: return "Single side, double density, 32-sector";
+	case DS32: return "Doubld side, single density, 32-sector";
+	case DD32: return "Double side, double density, 32-sector";
 	}
 
 	return "Unknown";
