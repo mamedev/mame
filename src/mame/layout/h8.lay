@@ -286,4 +286,17 @@ license:CC0-1.0
 			</group>
 		</collection>
 	</view>
+
+	<view name="LEDs, Keypad, and Terminal">
+		<bounds x="0" y="0" width="1000" height="400" />
+		<collection name="LEDs and Keypad">
+			<group ref="leds">
+				<bounds x="5" y="15" width="1000" height="150" />
+			</group>
+			<group ref="keypad">
+				<bounds x="720" y="15" width="220" height="220" />
+			</group>
+		</collection>
+		<screen index="0"><bounds x="120" y="160" width="400" height="300" /></screen>
+	</view>
 </mamelayout>
