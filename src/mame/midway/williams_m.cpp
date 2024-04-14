@@ -86,6 +86,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::endscreen_callback)
 
 void williams2_state::machine_start()
 {
+	williams_state::machine_start();
+
 	/* configure memory banks */
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
@@ -93,6 +95,8 @@ void williams2_state::machine_start()
 
 void williams2_state::machine_reset()
 {
+	williams_state::machine_reset();
+
 	/* make sure our banking is reset */
 	bank_select_w(0);
 }
@@ -309,6 +313,8 @@ void williams2_state::segments_w(u8 data)
 
 void defender_state::machine_reset()
 {
+	williams_state::machine_reset();
+
 	bank_select_w(0);
 }
 
@@ -386,13 +392,16 @@ void sinistar_state::cockpit_snd_cmd_w(u8 data)
 
 void blaster_state::machine_start()
 {
+	williams_state::machine_start();
+
 	/* banking is different for blaster */
 	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 void blaster_state::machine_reset()
 {
-	m_rom_view.disable();
+	williams_state::machine_reset();
+
 	m_mainbank->set_entry(0);
 }
 
@@ -458,6 +467,7 @@ void williams2_state::video_control_w(u8 data)
 void tshoot_state::machine_start()
 {
 	williams2_state::machine_start();
+
 	m_grenade_lamp.resolve();
 	m_gun_lamp.resolve();
 	m_p1_gun_recoil.resolve();
@@ -495,6 +505,7 @@ void tshoot_state::lamp_w(u8 data)
 void joust2_state::machine_start()
 {
 	williams2_state::machine_start();
+
 	save_item(NAME(m_current_sound_data));
 }
 
