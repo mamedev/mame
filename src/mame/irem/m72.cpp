@@ -3724,7 +3724,7 @@ ROM_START( xmultipl )
 	ROM_LOAD( "t51.31.ic13", 0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
-	ROM_LOAD( "t53.a0,ic50", 0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )  // tiles #1
+	ROM_LOAD( "t53.a0.ic50", 0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )  // tiles #1
 	ROM_LOAD( "t54.a1.ic49", 0x20000, 0x20000, CRC(076c16c5) SHA1(4be858806b916953d59aceee550e721eaf3996a6) )
 	ROM_LOAD( "t55.a2.ic51", 0x40000, 0x20000, CRC(25d877a5) SHA1(48c948bf714c432f534c098123c8f50d5561756f) )
 	ROM_LOAD( "t56.a3.ic52", 0x60000, 0x20000, CRC(5b1213f5) SHA1(87782aa0bd04d4378c4ba78b63028ae2709da2f1) )
@@ -4418,7 +4418,7 @@ ROM_START( cosmccop )
 	ROM_LOAD( "cc_d-g30-.ic64", 0x60000, 0x20000, CRC(f64a3166) SHA1(1661db2a37c76e6b4552e48c04966dbbccab8926) )   // == cc-b-a3.ic23 + cc-b-b3.ic24
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
-	ROM_LOAD( "cc_d-vo-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
+	ROM_LOAD( "cc_d-v0-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
 
 	ROM_REGION( 0x0200, "proms", 0 ) // located on M84-B-B top board
 	ROM_LOAD( "ken_b-4n-.ic23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10N
@@ -4455,7 +4455,7 @@ ROM_START( gallop )
 	ROM_LOAD( "cc_d-g30-.ic64", 0x60000, 0x20000, CRC(f64a3166) SHA1(1661db2a37c76e6b4552e48c04966dbbccab8926) )   // == cc-b-a3.ic23 + cc-b-b3.ic24
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
-	ROM_LOAD( "cc_d-vo-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
+	ROM_LOAD( "cc_d-v0-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
 
 	ROM_REGION( 0x0200, "proms", 0 ) // located on M84-B-B top board
 	ROM_LOAD( "ken_b-4n-.ic23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10N

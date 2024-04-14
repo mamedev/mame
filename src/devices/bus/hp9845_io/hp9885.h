@@ -55,7 +55,10 @@ private:
 		FSM_RD_ID,
 		FSM_WAIT_DATA_AM,
 		FSM_RD_DATA,
-		FSM_WR_DATA
+		FSM_WR_DATA,
+		FSM_WAIT_INDEX,
+		FSM_FORMATTING,
+		FSM_FORMAT_END
 	};
 
 	// Head states
@@ -71,7 +74,8 @@ private:
 		OP_READ,
 		OP_WRITE,
 		OP_STEP_IN,
-		OP_GET_STATUS
+		OP_GET_STATUS,
+		OP_FORMAT
 	};
 
 	required_device<floppy_connector> m_drive_connector;
@@ -94,6 +98,7 @@ private:
 	unsigned m_sector_cnt;
 	unsigned m_word_cnt;
 	unsigned m_rev_cnt;
+	unsigned m_format_track;
 	uint32_t m_am_detector;
 	uint16_t m_crc; // x^15 is stored in LSB
 
@@ -125,6 +130,7 @@ private:
 	void start_rd();
 	void stop_rdwr();
 	uint16_t rd_word();
+	void wr_byte(uint8_t data, uint8_t clock);
 	void wr_word(uint16_t word);
 	void preset_crc();
 	void update_crc(bool bit);

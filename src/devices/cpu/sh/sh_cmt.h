@@ -63,7 +63,7 @@ protected:
 
 	void csr_w(int reg, u16 data, u16 mem_mask);
 	void cnt_w(int reg, u16 data, u16 mem_mask);
-	void cor_w(int reg, u16 data, u16 mem_mask);	
+	void cor_w(int reg, u16 data, u16 mem_mask);
 
 	void clock_start(int clk);
 	void compute_next_event(int clk);

@@ -146,7 +146,7 @@ authors:hap
 	<group name="lcd1">
 		<bounds x="-1" y="3" width="18" height="8" />
 		<screen index="0" blend="alpha"><bounds x="0" y="4" width="15.8" height="6" /></screen>
-		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="yes"><bounds x="-1" y="3" width="18" height="8" /></element>
+		<element ref="nothing" blend="add" clickthrough="no"><bounds x="-1" y="3" width="18" height="8" /></element>
 		<element ref="lcd_bg" blend="multiply" inputtag="IN.4" inputmask="0x02" inputraw="yes"><bounds x="-1" y="3" width="18" height="8" /></element>
 	</group>
 
@@ -206,7 +206,7 @@ authors:hap
 		<screen index="1" blend="alpha"><bounds x="9.8" y="10" width="106" height="108" /></screen>
 		<element ref="lcd_cb" blend="multiply"><bounds x="1.5" y="2.9" width="122.6" height="122.1" /></element>
 
-		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="yes"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+		<element ref="nothing" blend="add" clickthrough="no"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
 		<element ref="lcd2m" blend="multiply" inputtag="IN.4" inputmask="0x04" inputraw="yes"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
 	</group>
 

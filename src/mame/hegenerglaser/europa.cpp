@@ -224,4 +224,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, europa, 0,      0,      europa,  europa, europa_state, empty_init, "Hegener + Glaser", "Mephisto Europa", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, europa, 0,      0,      europa,  europa, europa_state, empty_init, "Hegener + Glaser", "Mephisto Europa", MACHINE_SUPPORTS_SAVE )

@@ -224,8 +224,8 @@
 #define MOVB_X(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
 #define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DBT_##d(result)
 /* MTPS: flags = src */
-#define MTPS_R(d)   int dreg, dest;     GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
-#define MTPS_M(d)   int dreg, dest, ea; GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
+#define MTPS_R(d)   int dreg, dest;     GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); m_check_irqs = true
+#define MTPS_M(d)   int dreg, dest, ea; GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); m_check_irqs = true
 /* NEG: dst = -dst */
 #define NEG_R(d)    int dreg, dest, result;     GET_DW_##d; CLR_NZVC; result = -dest; SETW_NZ; if (dest == 0x8000) SET_V; if (result) SET_C; PUT_DW_DREG(result)
 #define NEG_M(d)    int dreg, dest, result, ea; GET_DW_##d; CLR_NZVC; result = -dest; SETW_NZ; if (dest == 0x8000) SET_V; if (result) SET_C; PUT_DW_EA(result)
@@ -273,11 +273,22 @@
 
 void t11_device::trap_to(uint16_t vector)
 {
-	PUSH(PSW);
-	PUSH(PC);
-	PC = RWORD(vector);
-	PSW = RWORD(vector + 2);
-	t11_check_irqs();
+	if (c_insn_set & IS_VM1)
+	{
+		m_vsel = vector;
+		if (vector == T11_ILLINST || vector == T11_TIMEOUT)
+			m_mcir = MCIR_ILL;
+		else
+			m_mcir = MCIR_SET;
+	}
+	else
+	{
+		PUSH(PSW);
+		PUSH(PC);
+		PC = RWORD(vector);
+		PSW = RWORD(vector + 2);
+	}
+	m_check_irqs = true;
 }
 
 void t11_device::op_0000(uint16_t op)
@@ -286,11 +297,11 @@ void t11_device::op_0000(uint16_t op)
 	{
 		case 0x00:  /* HALT  */ halt(op); break;
 		case 0x01:  /* WAIT  */ m_icount = 0; m_wait_state = 1; break;
-		case 0x02:  /* RTI   */ m_icount -= 24; PC = POP(); PSW = POP(); t11_check_irqs(); break;
-		case 0x03:  /* BPT   */ m_icount -= 48; trap_to(0x0c); break;
-		case 0x04:  /* IOT   */ m_icount -= 48; trap_to(0x10); break;
+		case 0x02:  /* RTI   */ m_icount -= 24; PC = POP(); PSW = POP(); if (GET_T) m_trace_trap = true; m_check_irqs = true; break;
+		case 0x03:  /* BPT   */ m_icount -= 48; trap_to(T11_BPT); break;
+		case 0x04:  /* IOT   */ m_icount -= 48; trap_to(T11_IOT); break;
 		case 0x05:  /* RESET */ m_out_reset_func(ASSERT_LINE); m_out_reset_func(CLEAR_LINE); m_icount -= 110; break;
-		case 0x06:  /* RTT   */ if (c_insn_set & IS_LEIS) { m_icount -= 33; PC = POP(); PSW = POP(); t11_check_irqs(); } else illegal(op); break;
+		case 0x06:  /* RTT   */ if (c_insn_set & IS_LEIS) { m_icount -= 33; PC = POP(); PSW = POP(); m_check_irqs = true; } else illegal(op); break;
 		case 0x07:  /* MFPT  */ if (c_insn_set & IS_MFPT) REGB(0) = 4; else illegal(op); break;
 
 		default:    illegal(op); break;
@@ -324,11 +335,18 @@ void t11_device::op_0001(uint16_t op)
 void t11_device::halt(uint16_t op)
 {
 	m_icount -= 48;
-	PUSH(PSW);
-	PUSH(PC);
-	PC = m_initial_pc + 4;
-	PSW = 0340;
-	t11_check_irqs();
+	if (c_insn_set & IS_VM1)
+	{
+		trap_to(VM1_HALT);
+	}
+	else
+	{
+		PUSH(PSW);
+		PUSH(PC);
+		PC = m_initial_pc + 4;
+		PSW = 0340;
+	}
+	m_check_irqs = true;
 }
 
 void t11_device::illegal(uint16_t op)

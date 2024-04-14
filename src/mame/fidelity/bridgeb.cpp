@@ -293,4 +293,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, bridgeb, 0,      0,      bridgeb, bridgeb, bridgeb_state, empty_init, "Fidelity Electronics", "Bridge Bidder", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, bridgeb, 0,      0,      bridgeb, bridgeb, bridgeb_state, empty_init, "Fidelity Electronics", "Bridge Bidder", MACHINE_SUPPORTS_SAVE )

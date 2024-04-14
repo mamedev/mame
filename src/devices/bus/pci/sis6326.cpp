@@ -52,8 +52,8 @@ ROM_START( sis6326agp )
 	ROMX_LOAD( "sis6326agp.bin", 0x000000, 0x010000, CRC(a671255c) SHA1(332ab9499142e8f7a235afe046e8e8d21a28580d), ROM_BIOS(3) )
 
 	// basically identical to siso
-//	ROM_SYSTEM_BIOS( 3, "sisvbi", "SiS6326 4MB PCI 1.21d" )
-//	ROMX_LOAD( "4mb_pci.vbi",  0x000000, 0x00c000, CRC(8fca47be) SHA1(7ce995ec0d8b9ac4f0f40ccd0a61d7fc209d313f), ROM_BIOS(3) )
+//  ROM_SYSTEM_BIOS( 3, "sisvbi", "SiS6326 4MB PCI 1.21d" )
+//  ROMX_LOAD( "4mb_pci.vbi",  0x000000, 0x00c000, CRC(8fca47be) SHA1(7ce995ec0d8b9ac4f0f40ccd0a61d7fc209d313f), ROM_BIOS(3) )
 ROM_END
 
 const tiny_rom_entry *sis6326_agp_device::device_rom_region() const

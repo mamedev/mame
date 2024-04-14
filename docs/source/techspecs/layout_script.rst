@@ -563,6 +563,96 @@ Dimensions recomputed
 
     The callback function has no return value and takes no parameters.  Call
     with ``nil`` as the argument to remove the event handler.
+Pointer updated
+    ``view:set_pointer_updated_callback(cb)``
+
+    Called when a pointer enters, moves or changes button state over the view.
+
+    The callback function is passed nine arguments:
+
+    * The pointer type as a string.  This will be ``mouse``, ``pen``, ``touch``
+      or ``unknown``, and will not change for the lifetime of a pointer.
+    * The pointer ID.  This will be a non-negative integer that will not change
+      for the lifetime of a pointer.  Pointer ID values are recycled
+      aggressively.
+    * The device ID.  This will be a non-negative integer that can be used to
+      group pointers for recognising multi-touch gestures.
+    * The horizontal position of the pointer in layout coordinates.
+    * The vertical position of the pointer in layout coordinates.
+    * A bit mask representing the currently pressed buttons.  The primary button
+      is the least significant bit.
+    * A bit mask representing the buttons that were pressed in this update.  The
+      primary button is the least significant bit.
+    * A bit mask representing the buttons that were released in this update.
+      The primary button is the least significant bit.
+    * The click count.  This is positive for multi-click actions, or negative if
+      a click is turned into a hold or drag.  This only applies to the primary
+      button.
+
+    The callback function has no return value.  Call with ``nil`` as the
+    argument to remove the event handler.
+Pointer left
+    ``view:set_pointer_left_callback(cb)``
+
+    Called when a pointer leaves the view normally.  After receiving this event,
+    the pointer ID may be reused for a new pointer.
+
+    The callback function is passed seven arguments:
+
+    * The pointer type as a string.  This will be ``mouse``, ``pen``, ``touch``
+      or ``unknown``, and will not change for the lifetime of a pointer.
+    * The pointer ID.  This will be a non-negative integer that will not change
+      for the lifetime of a pointer.  Pointer ID values are recycled
+      aggressively.
+    * The device ID.  This will be a non-negative integer that can be used to
+      group pointers for recognising multi-touch gestures.
+    * The horizontal position of the pointer in layout coordinates.
+    * The vertical position of the pointer in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+      The primary button is the least significant bit.
+    * The click count.  This is positive for multi-click actions, or negative if
+      a click is turned into a hold or drag.  This only applies to the primary
+      button.
+
+    The callback function has no return value.  Call with ``nil`` as the
+    argument to remove the event handler.
+Pointer aborted
+    ``view:set_pointer_aborted_callback(cb)``
+
+    Called when a pointer leaves the view abnormally.  After receiving this
+    event, the pointer ID may be reused for a new pointer.
+
+    The callback function is passed seven arguments:
+
+    * The pointer type as a string.  This will be ``mouse``, ``pen``, ``touch``
+      or ``unknown``, and will not change for the lifetime of a pointer.
+    * The pointer ID.  This will be a non-negative integer that will not change
+      for the lifetime of a pointer.  Pointer ID values are recycled
+      aggressively.
+    * The device ID.  This will be a non-negative integer that can be used to
+      group pointers for recognising multi-touch gestures.
+    * The horizontal position of the pointer in layout coordinates.
+    * The vertical position of the pointer in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+      The primary button is the least significant bit.
+    * The click count.  This is positive for multi-click actions, or negative if
+      a click is turned into a hold or drag.  This only applies to the primary
+      button.
+
+    The callback function has no return value.  Call with ``nil`` as the
+    argument to remove the event handler.
+Forget pointers
+    ``view:set_forget_pointers_callback(cb)``
+
+    Called when the view should stop processing pointer input.  This can happen
+    in a number of situations, including:
+
+    * The user activated a menu.
+    * The view configuration will change.
+    * The view will be deactivated.
+
+    The callback function has no return value and takes no parameters.  Call
+    with ``nil`` as the argument to remove the event handler.
 
 .. _layscript-events-item:
 
@@ -692,4 +782,5 @@ Draw
 
     The callback is passed two arguments: the element state (an integer) and the
     32-bit ARGB bitmap at the required size.  The callback must not attempt to
-    resize the bitmap.
+    resize the bitmap.  Call with ``nil`` as the argument to remove the event
+    handler.

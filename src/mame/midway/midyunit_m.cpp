@@ -11,18 +11,31 @@
 #include "cpu/m6809/m6809.h"
 #include "midyunit.h"
 
+#define LOG_CMOS     (1U << 1)
+#define LOG_PROT     (1U << 1)
 
-/* constant definitions */
-#define SOUND_NARC                  1
-#define SOUND_CVSD_SMALL            2
-#define SOUND_CVSD                  3
-#define SOUND_ADPCM                 4
-#define SOUND_YAWDIM                5
-#define SOUND_YAWDIM2               6
+#define LOG_ALL      (LOG_CMOS | LOG_PROT)
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
-void midyunit_state::machine_start()
+#define LOGCMOS(...) LOGMASKED(LOG_CMOS, __VA_ARGS__)
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
+
+// constant definitions
+enum
 {
+	SOUND_NARC = 1,
+	SOUND_CVSD_SMALL,
+	SOUND_CVSD,
+	SOUND_ADPCM,
+	SOUND_YAWDIM
+};
+
+void term2_state::machine_start()
+{
+	midyunit_state::machine_start();
+
 	m_left_flash.resolve();
 	m_right_flash.resolve();
 	m_left_gun_recoil.resolve();
@@ -41,7 +54,7 @@ void midyunit_state::machine_start()
 
 void midyunit_state::midyunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("%08x:CMOS Write @ %05X\n", m_maincpu->pc(), offset);
+	LOGCMOS("%08x:CMOS Write @ %05X\n", m_maincpu->pc(), offset);
 	COMBINE_DATA(&m_cmos_ram[offset + m_cmos_page]);
 }
 
@@ -63,46 +76,46 @@ void midyunit_state::midyunit_cmos_enable_w(address_space &space, uint16_t data)
 {
 	m_cmos_w_enable = (~data >> 9) & 1;
 
-	logerror("%08x:Protection write = %04X\n", m_maincpu->pc(), data);
+	LOGPROT("%08x:Protection write = %04X\n", m_maincpu->pc(), data);
 
-	/* only go down this path if we have a data structure */
+	// only go down this path if we have a data structure
 	if (m_prot_data)
 	{
-		/* mask off the data */
+		// mask off the data
 		data &= 0x0f00;
 
-		/* update the FIFO */
+		// update the FIFO
 		m_prot_sequence[0] = m_prot_sequence[1];
 		m_prot_sequence[1] = m_prot_sequence[2];
 		m_prot_sequence[2] = data;
 
-		/* special case: sequence entry 1234 means Strike Force, which is different */
+		// special case: sequence entry 1234 means Strike Force, which is different
 		if (m_prot_data->reset_sequence[0] == 0x1234)
 		{
 			if (data == 0x500)
 			{
 				m_prot_result = space.read_word(0x10a4390) << 4;
-				logerror("  desired result = %04X\n", m_prot_result);
+				LOGPROT("  desired result = %04X\n", m_prot_result);
 			}
 		}
 
-		/* all other games use the same pattern */
+		// all other games use the same pattern
 		else
 		{
-			/* look for a reset */
+			// look for a reset
 			if (m_prot_sequence[0] == m_prot_data->reset_sequence[0] &&
 				m_prot_sequence[1] == m_prot_data->reset_sequence[1] &&
 				m_prot_sequence[2] == m_prot_data->reset_sequence[2])
 			{
-				logerror("Protection reset\n");
+				LOGPROT("Protection reset\n");
 				m_prot_index = 0;
 			}
 
-			/* look for a clock */
+			// look for a clock
 			if ((m_prot_sequence[1] & 0x0800) != 0 && (m_prot_sequence[2] & 0x0800) == 0)
 			{
 				m_prot_result = m_prot_data->data_sequence[m_prot_index++];
-				logerror("Protection clock (new data = %04X)\n", m_prot_result);
+				LOGPROT("Protection clock (new data = %04X)\n", m_prot_result);
 			}
 		}
 	}
@@ -111,8 +124,9 @@ void midyunit_state::midyunit_cmos_enable_w(address_space &space, uint16_t data)
 
 uint16_t midyunit_state::midyunit_protection_r()
 {
-	/* return the most recently clocked value */
-	logerror("%08X:Protection read = %04X\n", m_maincpu->pc(), m_prot_result);
+	// return the most recently clocked value
+	if (!machine().side_effects_disabled())
+		LOGPROT("%08X:Protection read = %04X\n", m_maincpu->pc(), m_prot_result);
 	return m_prot_result;
 }
 
@@ -137,17 +151,17 @@ uint16_t midyunit_state::midyunit_input_r(offs_t offset)
  *
  *************************************/
 
-uint16_t midyunit_state::term2_input_r(offs_t offset)
+uint16_t term2_state::term2_input_r(offs_t offset)
 {
 	if (offset != 2)
 		return m_ports[offset]->read();
 
-	return m_term2_adc->read() | 0xff00;
+	return m_adc->read() | 0xff00;
 }
 
-void midyunit_state::term2_sound_w(offs_t offset, uint16_t data)
+void term2_state::term2_sound_w(offs_t offset, uint16_t data)
 {
-	/* Flash Lamp Output Data */
+	// Flash Lamp Output Data
 	if  ( ((data & 0x800) != 0x800) && ((data & 0x400) == 0x400 ) )
 	{
 		for (int i = 0; i < 4; i++)
@@ -156,7 +170,7 @@ void midyunit_state::term2_sound_w(offs_t offset, uint16_t data)
 			m_right_flash[i] = BIT(data, i + 4);
 	}
 
-	/* Gun Output Data */
+	// Gun Output Data
 	if  ( ((data & 0x800) == 0x800) && ((data & 0x400) != 0x400 ) )
 	{
 		m_left_gun_recoil = BIT(data, 0);
@@ -168,7 +182,7 @@ void midyunit_state::term2_sound_w(offs_t offset, uint16_t data)
 	}
 
 	if (offset == 0)
-		m_term2_adc->write(((data >> 12) & 3) | 4);
+		m_adc->write(((data >> 12) & 3) | 4);
 
 	m_adpcm_sound->reset_write((~data & 0x100) >> 1);
 	m_adpcm_sound->write(data);
@@ -182,7 +196,7 @@ void midyunit_state::term2_sound_w(offs_t offset, uint16_t data)
  *
  *************************************/
 
-void midyunit_state::term2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void term2_state::term2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 1 && m_maincpu->pc() == 0xffce6520)
 	{
@@ -192,7 +206,7 @@ void midyunit_state::term2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-void midyunit_state::term2la3_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void term2_state::term2la3_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && m_maincpu->pc() == 0xffce5230)
 	{
@@ -202,7 +216,7 @@ void midyunit_state::term2la3_hack_w(offs_t offset, uint16_t data, uint16_t mem_
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-void midyunit_state::term2la2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void term2_state::term2la2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && m_maincpu->pc() == 0xffce4b80)
 	{
@@ -212,7 +226,7 @@ void midyunit_state::term2la2_hack_w(offs_t offset, uint16_t data, uint16_t mem_
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-void midyunit_state::term2la1_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void term2_state::term2la1_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && m_maincpu->pc() == 0xffce33f0)
 	{
@@ -232,10 +246,10 @@ void midyunit_state::term2la1_hack_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void midyunit_state::cvsd_protection_w(offs_t offset, uint8_t data)
 {
-	/* because the entire CVSD ROM is banked, we have to make sure that writes */
-	/* go to the proper location (i.e., bank 0); currently bank 0 always lives */
-	/* in the 0x10000-0x17fff space, so we just need to add 0x8000 to get the  */
-	/* proper offset */
+	// because the entire CVSD ROM is banked, we have to make sure that writes
+	// go to the proper location (i.e., bank 0); currently bank 0 always lives
+	// in the 0x10000-0x17fff space, so we just need to add 0x8000 to get the 
+	// proper offset
 	m_cvsd_protection_base[offset] = data;
 }
 
@@ -249,16 +263,15 @@ void midyunit_state::install_hidden_ram(mc6809e_device &cpu, int prot_start, int
 
 void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_end)
 {
-	offs_t gfx_chunk = m_gfx_rom.bytes() / 4;
+	offs_t const gfx_chunk = m_gfx_rom.bytes() / 4;
 	uint8_t d1, d2, d3, d4, d5, d6;
-	int i;
 
-	/* load graphics ROMs */
-	uint8_t *base = memregion("gfx1")->base();
+	// load graphics ROMs
+	uint8_t const *const base = memregion("gfx")->base();
 	switch (bpp)
 	{
 		case 4:
-			for (i = 0; i < m_gfx_rom.bytes(); i += 2)
+			for (int i = 0; i < m_gfx_rom.bytes(); i += 2)
 			{
 				d1 = ((base[0 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
 				d2 = ((base[1 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
@@ -271,7 +284,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case 6:
-			for (i = 0; i < m_gfx_rom.bytes(); i += 2)
+			for (int i = 0; i < m_gfx_rom.bytes(); i += 2)
 			{
 				d1 = ((base[0 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
 				d2 = ((base[1 * gfx_chunk + (i + 0) / 4]) >> (2 * ((i + 0) % 4))) & 3;
@@ -286,7 +299,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case 8:
-			for (i = 0; i < m_gfx_rom.bytes(); i += 4)
+			for (int i = 0; i < m_gfx_rom.bytes(); i += 4)
 			{
 				m_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
 				m_gfx_rom[i + 1] = base[1 * gfx_chunk + i / 4];
@@ -296,7 +309,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 	}
 
-	/* load sound ROMs and set up sound handlers */
+	// load sound ROMs and set up sound handlers
 	m_chip_type = sound;
 	switch (sound)
 	{
@@ -318,7 +331,6 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case SOUND_YAWDIM:
-		case SOUND_YAWDIM2:
 			break;
 	}
 }
@@ -336,7 +348,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 
 void midyunit_state::init_narc()
 {
-	/* common init */
+	// common init
 	init_generic(8, SOUND_NARC, 0xcdff, 0xce29);
 }
 
@@ -355,7 +367,7 @@ void midyunit_state::init_narc()
 
 void midyunit_state::init_trog()
 {
-	/* protection */
+	// protection
 	static const struct protection_data trog_protection_data =
 	{
 		{ 0x0f00, 0x0f00, 0x0f00 },
@@ -366,7 +378,7 @@ void midyunit_state::init_trog()
 	};
 	m_prot_data = &trog_protection_data;
 
-	/* common init */
+	// common init
 	init_generic(4, SOUND_CVSD_SMALL, 0x9eaf, 0x9ed9);
 }
 
@@ -375,7 +387,7 @@ void midyunit_state::init_trog()
 
 void midyunit_state::init_smashtv()
 {
-	/* common init */
+	// common init
 	init_generic(6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
 
 	m_prot_data = nullptr;
@@ -386,7 +398,7 @@ void midyunit_state::init_smashtv()
 
 void midyunit_state::init_hiimpact()
 {
-	/* protection */
+	// protection
 	static const struct protection_data hiimpact_protection_data =
 	{
 		{ 0x0b00, 0x0b00, 0x0b00 },
@@ -395,7 +407,7 @@ void midyunit_state::init_hiimpact()
 	};
 	m_prot_data = &hiimpact_protection_data;
 
-	/* common init */
+	// common init
 	init_generic(6, SOUND_CVSD, 0x9b79, 0x9ba3);
 }
 
@@ -404,7 +416,7 @@ void midyunit_state::init_hiimpact()
 
 void midyunit_state::init_shimpact()
 {
-	/* protection */
+	// protection
 	static const struct protection_data shimpact_protection_data =
 	{
 		{ 0x0f00, 0x0e00, 0x0d00 },
@@ -413,7 +425,7 @@ void midyunit_state::init_shimpact()
 	};
 	m_prot_data = &shimpact_protection_data;
 
-	/* common init */
+	// common init
 	init_generic(6, SOUND_CVSD, 0x9c06, 0x9c15);
 }
 
@@ -422,14 +434,14 @@ void midyunit_state::init_shimpact()
 
 void midyunit_state::init_strkforc()
 {
-	/* protection */
+	// protection
 	static const struct protection_data strkforc_protection_data =
 	{
 		{ 0x1234 }
 	};
 	m_prot_data = &strkforc_protection_data;
 
-	/* common init */
+	// common init
 	init_generic(4, SOUND_CVSD_SMALL, 0x9f7d, 0x9fa7);
 }
 
@@ -448,7 +460,7 @@ void midyunit_state::init_strkforc()
 
 void midyunit_state::init_mkyunit()
 {
-	/* protection */
+	// protection
 	static const struct protection_data mk_protection_data =
 	{
 		{ 0x0d00, 0x0c00, 0x0900 },
@@ -458,21 +470,14 @@ void midyunit_state::init_mkyunit()
 	};
 	m_prot_data = &mk_protection_data;
 
-	/* common init */
+	// common init
 	init_generic(6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
 }
 
-void midyunit_state::init_mkyawdim()
+void mkyawdim_state::init_mkyawdim()
 {
-	/* common init */
+	// common init
 	init_generic(6, SOUND_YAWDIM, 0, 0);
-}
-
-void midyunit_state::init_mkyawdim2()
-{
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(midyunit_state::yawdim2_oki_bank_w)));
-	m_audiocpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xa7ff, read8smo_delegate(*this, FUNC(midyunit_state::yawdim2_soundlatch_r)));
-	init_mkyawdim();
 }
 
 
@@ -491,7 +496,7 @@ uint16_t midyunit_state::mkturbo_prot_r()
 
 void midyunit_state::init_mkyturbo()
 {
-	/* protection */
+	// protection
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16smo_delegate(*this, FUNC(midyunit_state::mkturbo_prot_r)));
 
 	init_mkyunit();
@@ -500,7 +505,7 @@ void midyunit_state::init_mkyturbo()
 void midyunit_state::init_mkla3bl()
 {
 	// rearrange GFX so the driver can deal with them
-	uint8_t *gfxrom = memregion("gfx1")->base();
+	uint8_t *gfxrom = memregion("gfx")->base();
 	std::vector<uint8_t> buffer(0x400000);
 	memcpy(&buffer[0], gfxrom, 0x400000);
 
@@ -523,7 +528,7 @@ void midyunit_state::init_mkla3bl()
 
 /********************** Terminator 2 **********************/
 
-void midyunit_state::term2_init_common(write16s_delegate hack_w)
+void term2_state::term2_init_common(write16s_delegate hack_w)
 {
 	// protection
 	static constexpr struct protection_data term2_protection_data =
@@ -536,9 +541,9 @@ void midyunit_state::term2_init_common(write16s_delegate hack_w)
 	// common init
 	init_generic(6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
-	// special inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16sm_delegate(*this, FUNC(midyunit_state::term2_input_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16sm_delegate(*this, FUNC(midyunit_state::term2_sound_w)));
+	// special inputs
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16sm_delegate(*this, FUNC(term2_state::term2_input_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16sm_delegate(*this, FUNC(term2_state::term2_sound_w)));
 
 	// HACK: this prevents the freeze on the movies
 	// until we figure what's causing it, this is better than nothing
@@ -546,10 +551,10 @@ void midyunit_state::term2_init_common(write16s_delegate hack_w)
 	m_t2_hack_mem = m_mainram + (0xaa0e0>>4);
 }
 
-void midyunit_state::init_term2()    { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2_hack_w))); }
-void midyunit_state::init_term2la3() { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2la3_hack_w))); }
-void midyunit_state::init_term2la2() { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2la2_hack_w))); }
-void midyunit_state::init_term2la1() { term2_init_common(write16s_delegate(*this, FUNC(midyunit_state::term2la1_hack_w))); }
+void term2_state::init_term2()    { term2_init_common(write16s_delegate(*this, FUNC(term2_state::term2_hack_w))); }
+void term2_state::init_term2la3() { term2_init_common(write16s_delegate(*this, FUNC(term2_state::term2la3_hack_w))); }
+void term2_state::init_term2la2() { term2_init_common(write16s_delegate(*this, FUNC(term2_state::term2la2_hack_w))); }
+void term2_state::init_term2la1() { term2_init_common(write16s_delegate(*this, FUNC(term2_state::term2la1_hack_w))); }
 
 
 
@@ -557,7 +562,7 @@ void midyunit_state::init_term2la1() { term2_init_common(write16s_delegate(*this
 
 void midyunit_state::init_totcarn()
 {
-	/* protection */
+	// protection
 	static const struct protection_data totcarn_protection_data =
 	{
 		{ 0x0f00, 0x0f00, 0x0f00 },
@@ -566,7 +571,7 @@ void midyunit_state::init_totcarn()
 	};
 	m_prot_data = &totcarn_protection_data;
 
-	/* common init */
+	// common init
 	init_generic(6, SOUND_ADPCM, 0xfc04, 0xfc2e);
 }
 
@@ -580,7 +585,7 @@ void midyunit_state::init_totcarn()
 
 MACHINE_RESET_MEMBER(midyunit_state,midyunit)
 {
-	/* reset sound */
+	// reset sound
 	switch (m_chip_type)
 	{
 		case SOUND_NARC:
@@ -600,7 +605,6 @@ MACHINE_RESET_MEMBER(midyunit_state,midyunit)
 			break;
 
 		case SOUND_YAWDIM:
-		case SOUND_YAWDIM2:
 			break;
 	}
 }
@@ -615,14 +619,14 @@ MACHINE_RESET_MEMBER(midyunit_state,midyunit)
 
 void midyunit_state::midyunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* check for out-of-bounds accesses */
+	// check for out-of-bounds accesses
 	if (offset)
 	{
 		logerror("%08X:Unexpected write to sound (hi) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 
-	/* call through based on the sound type */
+	// call through based on the sound type
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 		switch (m_chip_type)
 		{
@@ -640,15 +644,24 @@ void midyunit_state::midyunit_sound_w(offs_t offset, uint16_t data, uint16_t mem
 				m_adpcm_sound->reset_write((~data & 0x100) >> 8);
 				m_adpcm_sound->write(data);
 				break;
-
-			case SOUND_YAWDIM:
-				m_soundlatch->write(data);
-				m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-				break;
-
-			case SOUND_YAWDIM2:
-				m_soundlatch->write(data);
-				m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-				break;
 		}
+}
+
+void mkyawdim_state::yawdim_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// call through based on the sound type
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		m_soundlatch->write(data);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+}
+
+void mkyawdim_state::yawdim2_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// call through based on the sound type
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		m_soundlatch->write(data);
+	}
 }

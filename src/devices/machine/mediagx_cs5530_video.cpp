@@ -28,7 +28,7 @@ mediagx_cs5530_video_device::mediagx_cs5530_video_device(const machine_config &m
 void mediagx_cs5530_video_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-//	map(0x14, 0xff).unmaprw(); // <reserved>
+//  map(0x14, 0xff).unmaprw(); // <reserved>
 }
 
 void mediagx_cs5530_video_device::io_map(address_map &map)

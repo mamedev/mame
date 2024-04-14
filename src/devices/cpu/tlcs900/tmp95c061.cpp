@@ -308,7 +308,7 @@ int tmp95c061_device::tlcs900_process_hdma( int channel )
 	uint8_t vector = ( m_dma_vector[channel] & 0x1f ) << 2;
 
 	/* Check if any HDMA actions should be performed */
-	if ( vector >= 0x28 && vector != 0x3C && vector < 0x74 )
+	if ( vector >= 0x28 && vector != 0x3c && vector < 0x74 )
 	{
 		int irq = 0;
 

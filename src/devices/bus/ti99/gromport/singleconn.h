@@ -29,12 +29,11 @@ public:
 	bool is_grom_idle() override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override { };
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	ti99_cartridge_device *m_cartridge;
+	required_device<ti99_cartridge_device> m_cartridge;
 };
 
 } // end namespace bus::ti99::gromport

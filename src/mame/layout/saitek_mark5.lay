@@ -219,7 +219,7 @@ authors:hap
 		<element ref="hlc" blend="add" inputtag="IN.8" inputmask="0x80"><bounds x="18.333" y="12.333" width="4.666" height="4.666" /></element>
 
 		<element ref="black"><bounds x="9" y="22.5" width="14" height="45" /></element>
-		<element ref="nothing" blend="add" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds x="-1" y="-1" width="34" height="69" /></element>
+		<element ref="nothing" blend="add" clickthrough="no"><bounds x="-1" y="-1" width="34" height="69" /></element>
 
 		<!-- button labels (upper) -->
 		<element ref="text_b01e" blend="add" inputtag="IN.6" inputmask="0x04" inputraw="yes"><bounds x="0" y="1" width="6" height="1.4" /></element>
@@ -405,7 +405,7 @@ authors:hap
 
 	<group name="display">
 		<screen index="0" blend="alpha"><bounds x="0" y="0" width="100" height="114.65" /></screen>
-		<element ref="nothing" blend="add" inputtag="IN.7" inputmask="0x00" inputraw="yes"><bounds x="0" y="0" width="100" height="114.65" /></element>
+		<element ref="nothing" blend="add" clickthrough="no"><bounds x="0" y="0" width="100" height="114.65" /></element>
 		<element ref="lcd_bg" blend="multiply" inputtag="IN.7" inputmask="0x02" inputraw="yes"><bounds x="0" y="0" width="100" height="114.65" /></element>
 		<element ref="lcd_cb" blend="multiply"><bounds x="0" y="0" width="100" height="95.9" /></element>
 	</group>

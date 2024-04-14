@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/er2055.h"
+#include "er2055.h"
 
 #include "logmacro.h"
 

@@ -223,38 +223,6 @@ bool menu_select_game::handle(event const *ev)
 		}
 		else switch (ev->iptkey)
 		{
-		case IPT_UI_UP:
-			if ((get_focus() == focused_menu::LEFT) && (machine_filter::FIRST < m_filter_highlight))
-			{
-				--m_filter_highlight;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_DOWN:
-			if ((get_focus() == focused_menu::LEFT) && (machine_filter::LAST > m_filter_highlight))
-			{
-				m_filter_highlight++;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_HOME:
-			if (get_focus() == focused_menu::LEFT)
-			{
-				m_filter_highlight = machine_filter::FIRST;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_END:
-			if (get_focus() == focused_menu::LEFT)
-			{
-				m_filter_highlight = machine_filter::LAST;
-				changed = true;
-			}
-			break;
-
 		case IPT_UI_EXPORT:
 			inkey_export();
 			break;
@@ -276,46 +244,6 @@ bool menu_select_game::handle(event const *ev)
 						else
 							changed = inkey_select(ev);
 					}
-					break;
-
-				case IPT_CUSTOM:
-					// handle IPT_CUSTOM (mouse right click)
-					if (!m_populated_favorites)
-					{
-						menu::stack_push<menu_machine_configure>(
-								ui(),
-								container(),
-								*reinterpret_cast<ui_system_info const *>(m_prev_selected),
-								nullptr);
-					}
-					else
-					{
-						ui_software_info *sw = reinterpret_cast<ui_software_info *>(m_prev_selected);
-						ui_system_info const &sys = m_persistent_data.systems()[driver_list::find(sw->driver->name)];
-						menu::stack_push<menu_machine_configure>(
-								ui(),
-								container(),
-								sys,
-								[this, empty = sw->startempty] (bool fav, bool changed)
-								{
-									if (changed)
-										reset(empty ? reset_options::SELECT_FIRST : reset_options::REMEMBER_REF);
-								});
-					}
-					break;
-
-				case IPT_UI_LEFT:
-					if (right_panel() == RP_IMAGES)
-						changed = previous_image_view(); // Images
-					else if (right_panel() == RP_INFOS)
-						changed = change_info_pane(-1); // Infos
-					break;
-
-				case IPT_UI_RIGHT:
-					if (right_panel() == RP_IMAGES)
-						changed = next_image_view(); // Images
-					else if (right_panel() == RP_INFOS)
-						changed = change_info_pane(1); // Infos
 					break;
 
 				case IPT_UI_FAVORITES:
@@ -356,8 +284,6 @@ bool menu_select_game::handle(event const *ev)
 		}
 	}
 
-	// if we're in an error state, overlay an error message
-	draw_error_text();
 	return changed;
 }
 
@@ -801,53 +727,6 @@ bool menu_select_game::isfavorite() const
 
 
 //-------------------------------------------------
-//  change what's displayed in the info box
-//-------------------------------------------------
-
-bool menu_select_game::change_info_pane(int delta)
-{
-	auto const cap_delta =
-			[this, &delta] (uint8_t &current, uint8_t &total) -> bool
-			{
-				if ((0 > delta) && (-delta > current))
-					delta = -int(unsigned(current));
-				else if ((0 < delta) && ((current + unsigned(delta)) >= total))
-					delta = int(unsigned(total - current - 1));
-				if (delta)
-				{
-					current += delta;
-					m_topline_datsview = 0;
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			};
-	ui_system_info const *sys;
-	ui_software_info const *soft;
-	get_selection(soft, sys);
-	if (!m_populated_favorites)
-	{
-		if (uintptr_t(sys) > m_skip_main_items)
-			return cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
-		else
-			return false;
-	}
-	else if (uintptr_t(soft) > m_skip_main_items)
-	{
-		if (soft->startempty)
-			return cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
-		else
-			return cap_delta(ui_globals::cur_sw_dats_view, ui_globals::cur_sw_dats_total);
-	}
-	else
-	{
-		return false;
-	}
-}
-
-//-------------------------------------------------
 //  populate search list
 //-------------------------------------------------
 
@@ -1083,10 +962,10 @@ void menu_select_game::load_custom_filters()
 //  draw left box
 //-------------------------------------------------
 
-float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
+void menu_select_game::draw_left_panel(u32 flags)
 {
 	machine_filter_data &filter_data(m_persistent_data.filter_data());
-	return menu_select_launch::draw_left_panel<machine_filter>(filter_data.get_current_filter_type(), filter_data.get_filters(), x1, y1, x2, y2);
+	menu_select_launch::draw_left_panel<machine_filter>(flags, filter_data.get_current_filter_type(), filter_data.get_filters());
 }
 
 
@@ -1105,6 +984,32 @@ void menu_select_game::get_selection(ui_software_info const *&software, ui_syste
 	{
 		software = nullptr;
 		system = reinterpret_cast<ui_system_info const *>(get_selection_ptr());
+	}
+}
+
+void menu_select_game::show_config_menu(int index)
+{
+	if (!m_populated_favorites)
+	{
+		menu::stack_push<menu_machine_configure>(
+				ui(),
+				container(),
+				*reinterpret_cast<ui_system_info const *>(item(index).ref()),
+				nullptr);
+	}
+	else
+	{
+		ui_software_info *sw = reinterpret_cast<ui_software_info *>(item(index).ref());
+		ui_system_info const &sys = m_persistent_data.systems()[driver_list::find(sw->driver->name)];
+		menu::stack_push<menu_machine_configure>(
+				ui(),
+				container(),
+				sys,
+				[this, empty = sw->startempty] (bool fav, bool changed)
+				{
+					if (changed)
+						reset(empty ? reset_options::SELECT_FIRST : reset_options::REMEMBER_REF);
+				});
 	}
 }
 
@@ -1142,30 +1047,29 @@ std::string menu_select_game::make_software_description(ui_software_info const &
 }
 
 
-void menu_select_game::filter_selected()
+void menu_select_game::filter_selected(int index)
 {
-	if ((machine_filter::FIRST <= m_filter_highlight) && (machine_filter::LAST >= m_filter_highlight))
-	{
-		m_persistent_data.filter_data().get_filter(machine_filter::type(m_filter_highlight)).show_ui(
-				ui(),
-				container(),
-				[this] (machine_filter &filter)
+	assert((machine_filter::FIRST <= index) && (machine_filter::LAST >= index));
+
+	m_persistent_data.filter_data().get_filter(machine_filter::type(index)).show_ui(
+			ui(),
+			container(),
+			[this] (machine_filter &filter)
+			{
+				set_switch_image();
+				machine_filter::type const new_type(filter.get_type());
+				if (machine_filter::CUSTOM == new_type)
 				{
-					set_switch_image();
-					machine_filter::type const new_type(filter.get_type());
-					if (machine_filter::CUSTOM == new_type)
+					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					if (!file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())))
 					{
-						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (!file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())))
-						{
-							filter.save_ini(file, 0);
-							file.close();
-						}
+						filter.save_ini(file, 0);
+						file.close();
 					}
-					m_persistent_data.filter_data().set_current_filter_type(new_type);
-					reset(reset_options::REMEMBER_REF);
-				});
-	}
+				}
+				m_persistent_data.filter_data().set_current_filter_type(new_type);
+				reset(reset_options::REMEMBER_REF);
+			});
 }
 
 } // namespace ui

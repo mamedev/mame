@@ -327,7 +327,8 @@ ASMJIT_FAVOR_SIZE Error initFuncDetail(FuncDetail& func, const FuncSignature& si
   }
 
   switch (cc.strategy()) {
-    case CallConvStrategy::kDefault: {
+    case CallConvStrategy::kDefault:
+    default: {
       uint32_t gpzPos = 0;
       uint32_t vecPos = 0;
 

@@ -13,18 +13,23 @@
 
 #pragma once
 
-#include "render.h"
-#include "moptions.h"
 #include "language.h"
 #include "ui/uimain.h"
 #include "ui/menuitem.h"
+#include "ui/moptions.h"
 #include "ui/slider.h"
 #include "ui/text.h"
+
+#include "render.h"
+
+#include "interface/uievents.h"
 
 #include <any>
 #include <cassert>
 #include <ctime>
+#include <functional>
 #include <set>
+#include <string>
 #include <string_view>
 #include <typeindex>
 #include <typeinfo>
@@ -62,14 +67,6 @@ class laserdisc_device;
 ***************************************************************************/
 
 class mame_ui_manager;
-
-enum class ui_callback_type
-{
-	GENERAL,
-	MODAL,
-	MENU,
-	VIEWER
-};
 
 // ======================> ui_colors
 
@@ -132,6 +129,18 @@ public:
 		OPAQUE_
 	};
 
+	struct display_pointer
+	{
+		std::reference_wrapper<render_target> target;
+		osd::ui_event_handler::pointer type;
+		float x, y;
+
+		bool operator!=(display_pointer const &that) const noexcept
+		{
+			return (&target.get() != &that.target.get()) || (type != that.type) || (x != that.x) || (y != that.y);
+		}
+	};
+
 	// construction/destruction
 	mame_ui_manager(running_machine &machine);
 	~mame_ui_manager();
@@ -184,7 +193,6 @@ public:
 	void set_show_profiler(bool show);
 	bool show_profiler() const;
 	void show_menu();
-	void show_mouse(bool status);
 	virtual bool is_menu_active() override;
 	bool can_paste();
 	bool found_machine_warnings() const { return m_has_warnings; }
@@ -195,8 +203,39 @@ public:
 	void draw_fps_counter(render_container &container);
 	void draw_profiler(render_container &container);
 
+	// pointer display
+	template <typename T>
+	void set_pointers(T first, T last)
+	{
+		auto dest = m_display_pointers.begin();
+		while ((m_display_pointers.end() != dest) && (first != last))
+		{
+			if (*first != *dest)
+			{
+				*dest = *first;
+				m_pointers_changed = true;
+			}
+			++dest;
+			++first;
+		}
+		if (m_display_pointers.end() != dest)
+		{
+			m_display_pointers.erase(dest, m_display_pointers.end());
+			m_pointers_changed = true;
+		}
+		else
+		{
+			while (first != last)
+			{
+				m_display_pointers.emplace_back(*first);
+				m_pointers_changed = true;
+				++first;
+			}
+		}
+	}
+
 	// slider controls
-	std::vector<ui::menu_item>&  get_slider_list();
+	std::vector<ui::menu_item> &get_slider_list();
 
 	// metrics
 	float target_font_height() const { return m_target_font_height; }
@@ -205,7 +244,7 @@ public:
 	void update_target_font_height();
 
 	// other
-	void process_natural_keyboard();
+	void process_ui_events();
 	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::word_wrapping::WORD);
 	void set_image_display_enabled(bool image_display_enabled) { m_image_display_enabled = image_display_enabled; }
 	bool image_display_enabled() const { return m_image_display_enabled; }
@@ -215,6 +254,7 @@ public:
 	virtual void popup_time_string(int seconds, std::string message) override;
 
 	virtual void menu_reset() override;
+	virtual bool set_ui_event_handler(std::function<bool ()> &&handler) override;
 
 	template <typename Owner, typename Data, typename... Param>
 	Data &get_session_data(Param &&... args)
@@ -232,9 +272,15 @@ public:
 	std::string get_general_input_setting(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
 
 private:
+	enum class ui_callback_type : int;
+
+	struct active_pointer;
+
 	using handler_callback_func = delegate<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;
 	using session_data_map = std::unordered_map<std::type_index, std::any>;
+	using active_pointer_vector = std::vector<active_pointer>;
+	using display_pointer_vector = std::vector<display_pointer>;
 
 	// instance variables
 	std::unique_ptr<render_font> m_font;
@@ -248,11 +294,11 @@ private:
 	osd_ticks_t             m_popup_text_end;
 	std::unique_ptr<uint8_t []> m_non_char_keys_down;
 
+	active_pointer_vector   m_active_pointers;
+	display_pointer_vector  m_display_pointers;
 	bitmap_argb32           m_mouse_bitmap;
 	render_texture *        m_mouse_arrow_texture;
-	bool                    m_mouse_show;
-	int                     m_mouse_target;
-	std::pair<float, float> m_mouse_position;
+	bool                    m_pointers_changed;
 
 	ui_options              m_ui_options;
 	ui_colors               m_ui_colors;
@@ -280,6 +326,7 @@ private:
 
 	// private methods
 	void set_handler(ui_callback_type callback_type, handler_callback_func &&callback);
+	void frame_update();
 	void exit();
 	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);

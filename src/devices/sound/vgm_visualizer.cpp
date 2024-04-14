@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/vgm_visualizer.h"
+#include "vgm_visualizer.h"
 
 #include "wdlfft/fft.h"
 

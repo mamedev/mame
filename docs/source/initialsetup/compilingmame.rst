@@ -9,11 +9,11 @@ All Platforms
 -------------
 
 * To compile MAME, you need a C++17 compiler and runtime library.  We
-  support building with GCC version 7.2 or later and clang version 6 or
-  later.  MAME should run with GNU libstdc++ version 7.2 or later or
-  libc++ version 7 or later.  The initial release of any major version
+  support building with GCC version 10.3 or later and clang version 11
+  or later.  MAME should run with GNU libstdc++ version 10.3 or later or
+  libc++ version 11 or later.  The initial release of any major version
   of GCC should be avoided.  For example, if you want to compile MAME
-  with GCC 10, you should use version 10.3 or later.
+  with GCC 12, you should use version 12.1 or later.
 
 * Whenever you are changing build parameters, (for example changing
   optimisation settings, or adding tools to the compile list), or system
@@ -98,7 +98,7 @@ building MAME on a 64-bit system.  Instructions may need to be adjusted for
   use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
   add **OSD=sdl** to the make options.  The main emulator binary will have an
   ``sdl`` prefix prepended (e.g. ``sdlmame.exe``).  You
-  will need to install the MSYS2 packages for SDL 2 version 2.0.6 or later.
+  will need to install the MSYS2 packages for SDL 2 version 2.0.14 or later.
 * By default, MAME will include the native Windows debugger.  To also include
   the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
   will need to install the MSYS2 packages for Qt 5.
@@ -251,9 +251,14 @@ Fedora Linux
 ------------
 
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
-SDL2 2.0.6 or later as earlier versions lack required functionality::
+SDL 2 version 2.0.14 or later as earlier versions lack required functionality::
 
     sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel pulseaudio-libs-devel
+
+If you want to use the more efficient LLVM tools for archiving static libraries
+and linking, you’ll need to install the corresponding packages::
+
+    sudo dnf install lld llvm
 
 Compilation is exactly as described above in All Platforms.
 
@@ -273,7 +278,7 @@ Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 -------------------------------------------------------------
 
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
-SDL2 2.0.6 or later as earlier versions lack required functionality::
+SDL 2 version 2.0.14 or later as earlier versions lack required functionality::
 
     sudo apt-get install git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake
 
@@ -299,9 +304,8 @@ Compilation is exactly as described above in All Platforms.
 Apple macOS
 -----------
 
-You’ll need a few prerequisites to get started. Make sure you’re on OS X 10.14
-Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will
-need SDL2 2.0.6 or later for Intel or SDL2 2.0.14 on Apple Silicon.  You’ll also
+You’ll need a few prerequisites to get started.  Make sure you’re on macOS 11.0
+Big Sur or later.  You will need SDL 2 version 2.0.14 or later.  You’ll also
 need to install Python 3 – it’s currently included with the Xcode command line
 tools, but you can also install a stand-alone version or get it via the Homebrew
 package manager.
@@ -317,7 +321,7 @@ package manager.
 * Type **xcode-select --install** to install additional tools necessary for MAME
   (also available as a package on ADC).
 
-Next you’ll need to get SDL2 installed.
+Next you’ll need to get SDL 2 installed.
 
 * Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the
   *macOS* .dmg file
@@ -677,11 +681,6 @@ USE_SYSTEM_LIB_PORTMIDI
 USE_SYSTEM_LIB_PORTAUDIO
     Set to **1** to prefer the system installation of the PortAudio library over
     the version provided with the MAME source.
-USE_BUNDLED_LIB_SDL2
-    Set to **1** to prefer the version of SDL provided with the MAME source over
-    the system installation.  (This is enabled by default for Visual Studio and
-    Android builds.  For other configurations, the system installation of SDL is
-    preferred.)
 USE_SYSTEM_LIB_UTF8PROC
     Set to **1** to prefer the system installation of the Julia utf8proc library
     over the version provided with the MAME source.

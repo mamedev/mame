@@ -206,17 +206,15 @@ void ti_rs232_attached_device::call_unload()
 */
 std::pair<std::error_condition, std::string> ti_pio_attached_device::call_load()
 {
-	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
-
 	// tell whether the image is readable
-	card->m_pio_readable = true;
+	m_card->m_pio_readable = true;
 	// tell whether the image is writable
-	card->m_pio_writable = !is_readonly();
+	m_card->m_pio_writable = !is_readonly();
 
-	if (card->m_pio_write && card->m_pio_writable)
-		card->m_pio_handshakein = false;    // receiver ready
+	if (m_card->m_pio_write && m_card->m_pio_writable)
+		m_card->m_pio_handshakein = false;    // receiver ready
 	else
-		card->m_pio_handshakein = true;
+		m_card->m_pio_handshakein = true;
 
 	return std::make_pair(std::error_condition(), std::string());  // OK
 }
@@ -226,11 +224,9 @@ std::pair<std::error_condition, std::string> ti_pio_attached_device::call_load()
 */
 void ti_pio_attached_device::call_unload()
 {
-	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
-
-	card->m_pio_writable = false;
-	card->m_pio_handshakein = true; /* receiver not ready */
-	card->m_pio_sparein = false;
+	m_card->m_pio_writable = false;
+	m_card->m_pio_handshakein = true; /* receiver not ready */
+	m_card->m_pio_sparein = false;
 }
 
 /****************************************************************************/
@@ -1108,6 +1104,7 @@ void ti_rs232_pio_device::device_add_mconfig(machine_config &config)
 	m_serdev1->connect(m_uart1);
 
 	TI99_PIO_DEV(config, m_piodev, 0);
+	m_piodev->set_card(this);
 
 	LS259(config, m_crulatch); // U12
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_rs232_pio_device::selected_w));

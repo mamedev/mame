@@ -80,25 +80,40 @@ of save-state is also needed.
 
 namespace {
 
-#define MASTER_CLOCK        (XTAL(12'000'000))
-#define SOUND_CLOCK         (XTAL(3'579'545))
 
-class wmg_state : public defender_state
+class wmg_state : public williams_state
 {
 public:
 	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: defender_state(mconfig, type, tag)
-		, m_p_ram(*this, "nvram")
+		: williams_state(mconfig, type, tag)
+		, m_p_ram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
 		, m_keyboard(*this, "X%d", 0U)
+		, m_mainbank(*this, "mainbank")
 		, m_codebank(*this, "codebank")
 		, m_soundbank(*this, "soundbank")
+		, m_io_view(*this, "io_view")
 	{ }
 
 	void wmg(machine_config &config);
 
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
+	memory_share_creator<uint8_t> m_p_ram;
+	required_ioport_array<17> m_keyboard;
+	required_memory_bank m_mainbank;
+	required_memory_bank m_codebank;
+	required_memory_bank m_soundbank;
+	memory_view m_io_view;
+
+	uint8_t m_wmg_c400 = 0U;
+	uint8_t m_wmg_d000 = 0U;
+	uint8_t m_port_select = 0U;
+
 	u8 wmg_nvram_r(offs_t offset);
 	void wmg_nvram_w(offs_t offset, u8 data);
 	u8 wmg_pia_0_r(offs_t offset);
@@ -112,18 +127,6 @@ private:
 	void wmg_cpu1(address_map &map);
 	void wmg_cpu2(address_map &map);
 	void wmg_banked_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	uint8_t m_wmg_c400 = 0U;
-	uint8_t m_wmg_d000 = 0U;
-	uint8_t m_wmg_port_select = 0U;
-	uint8_t m_wmg_vram_bank = 0U;
-	required_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<17> m_keyboard;
-	required_memory_bank m_codebank;
-	required_memory_bank m_soundbank;
 };
 
 
@@ -135,10 +138,26 @@ private:
  *************************************/
 void wmg_state::wmg_cpu1(address_map &map)
 {
-	map(0x0000, 0xbfff).ram().share("videoram");
-	map(0x0000, 0x8fff).bankr("mainbank");
-	map(0xc000, 0xcfff).m(m_bankc000, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xffff).bankr("codebank");
+	map(0x0000, 0xbfff).ram().share(m_videoram);
+	map(0x0000, 0x8fff).view(m_rom_view);
+	m_rom_view[0](0x0000, 0x8fff).bankr(m_mainbank);
+	map(0xc000, 0xcfff).view(m_io_view);
+	m_io_view[0](0xc000, 0xc00f).mirror(0x03e0).writeonly().share(m_paletteram);
+	m_io_view[0](0xc010, 0xc01f).mirror(0x03e0).lw8(NAME([this] (u8 data) { m_cocktail = BIT(data, 0); })); // TODO: should this really be here?  m_cocktail is set in wmg_vram_select_w
+	m_io_view[0](0xc400, 0xc400).w(FUNC(wmg_state::wmg_c400_w));
+	m_io_view[0](0xc401, 0xc401).w(FUNC(wmg_state::wmg_sound_reset_w));
+	m_io_view[0](0xc804, 0xc807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
+	m_io_view[0](0xc80c, 0xc80f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	m_io_view[0](0xc900, 0xc9ff).nopr().w(FUNC(wmg_state::wmg_vram_select_w));
+	m_io_view[0](0xca00, 0xca07).w(FUNC(wmg_state::wmg_blitter_w));
+	m_io_view[0](0xcb00, 0xcbff).r(FUNC(wmg_state::video_counter_r));
+	m_io_view[0](0xcbff, 0xcbff).w(FUNC(wmg_state::watchdog_reset_w));
+	m_io_view[0](0xcc00, 0xcfff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
+	m_io_view[1](0xc000, 0xcfff).rom().region("maincpu", 0x58000); // Defender ROMs
+	m_io_view[2](0xc000, 0xcfff).rom().region("maincpu", 0x59000);
+	m_io_view[3](0xc000, 0xcfff).rom().region("maincpu", 0x5a000);
+	m_io_view[4](0xc000, 0xcfff).rom().region("maincpu", 0x5b000);
+	map(0xd000, 0xffff).bankr(m_codebank);
 	map(0xd000, 0xd000).w(FUNC(wmg_state::wmg_d000_w));
 }
 
@@ -147,25 +166,7 @@ void wmg_state::wmg_cpu2(address_map &map)
 	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x00ff).ram();     /* MC6810 RAM */
 	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xf000, 0xffff).bankr("soundbank");
-}
-
-void wmg_state::wmg_banked_map(address_map &map)
-{
-	map(0x0000, 0x000f).mirror(0x03e0).writeonly().share("paletteram");
-	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(wmg_state::video_control_w));
-	map(0x0400, 0x0400).w(FUNC(wmg_state::wmg_c400_w));
-	map(0x0401, 0x0401).w(FUNC(wmg_state::wmg_sound_reset_w));
-	map(0x0804, 0x0807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
-	map(0x080c, 0x080f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0900, 0x09ff).nopr().w(FUNC(wmg_state::wmg_vram_select_w));
-	map(0x0a00, 0x0a07).w(FUNC(wmg_state::wmg_blitter_w));
-	map(0x0b00, 0x0bff).r(FUNC(wmg_state::video_counter_r));
-	map(0x0bff, 0x0bff).w(FUNC(wmg_state::watchdog_reset_w));
-	map(0x0c00, 0x0fff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
-	map(0x1000, 0x4fff).rom().region("maincpu", 0x58000); // Defender roms
-	// This one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead.
-	map(0xd000, 0xefff).ram().share("nvram");
+	map(0xf000, 0xffff).bankr(m_soundbank);
 }
 
 /***************************************************************
@@ -363,7 +364,7 @@ void wmg_state::wmg_c400_w(u8 data)
 	{
 		m_wmg_c400 = data;
 		wmg_d000_w(0); // select i/o
-		m_mainbank->set_entry(m_wmg_vram_bank ? (1+m_wmg_c400) : 0);      // Gfx etc
+		m_mainbank->set_entry(data);      // Gfx etc
 		m_codebank->set_entry(data);      // Code
 		m_soundbank->set_entry(data);      // Sound
 		m_soundcpu->reset();
@@ -379,8 +380,10 @@ void wmg_state::wmg_sound_reset_w(u8 data)
 void wmg_state::wmg_vram_select_w(u8 data)
 {
 	/* VRAM/ROM banking from bit 0 */
-	m_wmg_vram_bank = BIT(data, 0);
-	m_mainbank->set_entry(m_wmg_vram_bank ? (1+m_wmg_c400) : 0);
+	if (BIT(data, 0))
+		m_rom_view.select(0);
+	else
+		m_rom_view.disable();
 
 	/* cocktail flip from bit 1 */
 	m_cocktail = BIT(data, 1);
@@ -404,23 +407,21 @@ void wmg_state::wmg_d000_w(u8 data)
 			case 1:
 			case 2:
 			case 3:
-				m_bankc000->set_bank(data);
+				m_io_view.select(data);
 				break;
 
 			case 7:
-				m_bankc000->set_bank(4);
+				m_io_view.select(4);
 				break;
 
 			default:
-				printf("Unknown bank %X selected\n",data);
+				logerror("Unknown bank %X selected\n",data);
 		}
 	}
-	else
-	// everything else - choose i/o space
-	if (data == 0)
+	else if (data == 0)
 	{
-		/* install the i/o devices into c000-cfff */
-		m_bankc000->set_bank(0);
+		// everything else - choose i/o space
+		m_io_view.select(0);
 	}
 
 	m_wmg_d000 = data;
@@ -429,25 +430,26 @@ void wmg_state::wmg_d000_w(u8 data)
 
 void wmg_state::machine_start()
 {
+	williams_state::machine_start();
+
 	uint8_t *cpu = memregion("maincpu")->base();
 	uint8_t *snd = memregion("soundcpu")->base();
-	m_mainbank->configure_entry(0, m_videoram);
-	m_mainbank->configure_entries(1, 8, &cpu[0x00000], 0x10000);  // Gfx etc
+	m_mainbank->configure_entries(0, 8, &cpu[0x00000], 0x10000);  // Gfx etc
 	m_codebank->configure_entries(0, 8, &cpu[0x0d000], 0x10000);  // Code
 	m_soundbank->configure_entries(0, 8, &snd[0x00000], 0x1000);  // Sound
 
 	save_item(NAME(m_wmg_c400));
 	save_item(NAME(m_wmg_d000));
-	save_item(NAME(m_wmg_port_select));
-	save_item(NAME(m_wmg_vram_bank));
+	save_item(NAME(m_port_select));
 }
 
 void wmg_state::machine_reset()
 {
-	m_wmg_c400=0xff;
-	m_wmg_d000=0xff;
-	m_wmg_port_select=0;
-	m_wmg_vram_bank=0;
+	williams_state::machine_reset();
+
+	m_wmg_c400 = 0xff;
+	m_wmg_d000 = 0xff;
+	m_port_select = 0;
 	wmg_c400_w(0);
 	m_maincpu->reset();
 }
@@ -460,7 +462,7 @@ void wmg_state::machine_reset()
 
 void wmg_state::wmg_port_select_w(int state)
 {
-	m_wmg_port_select = state | (m_wmg_c400 << 1);
+	m_port_select = state | (m_wmg_c400 << 1);
 }
 
 template <int N>
@@ -468,13 +470,13 @@ CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
 {
 	if (N == 0)
 	{
-		uint8_t ports[17] = { 0,0,2,2,5,4,7,7,9,9,11,11,14,13,9,9 };
-		return m_keyboard[ports[m_wmg_port_select]]->read();
+		uint8_t const ports[17] = { 0,0,2,2,5,4,7,7,9,9,11,11,14,13,9,9 };
+		return m_keyboard[ports[m_port_select]]->read();
 	}
 	else
 	{
-		uint8_t ports[17] = { 1,1,3,3,6,6,8,8,10,10,12,12,16,15,10,10 };
-		return m_keyboard[ports[m_wmg_port_select]]->read();
+		uint8_t const ports[17] = { 1,1,3,3,6,6,8,8,10,10,12,12,16,15,10,10 };
+		return m_keyboard[ports[m_port_select]]->read();
 	}
 }
 
@@ -484,12 +486,15 @@ u8 wmg_state::wmg_pia_0_r(offs_t offset)
     Since there is no code in rom to handle this, it must be a hardware feature
     which probably just resets the cpu. */
 
-	uint8_t data = m_pia[0]->read(offset);
+	uint8_t const data = m_pia[0]->read(offset);
 
-	if ((m_wmg_c400) && (offset == 0) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
+	if (!machine().side_effects_disabled())
 	{
-		wmg_c400_w(0);
-		m_maincpu->reset();
+		if ((m_wmg_c400) && (offset == 0) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
+		{
+			wmg_c400_w(0);
+			m_maincpu->reset();
+		}
 	}
 
 	return data;
@@ -500,8 +505,12 @@ u8 wmg_state::wmg_pia_0_r(offs_t offset)
  *  Machine Driver
  *
  *************************************/
+
 void wmg_state::wmg(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
+	constexpr XTAL SOUND_CLOCK = 3.579545_MHz_XTAL;
+
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_CLOCK/3/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu1);
@@ -510,8 +519,6 @@ void wmg_state::wmg(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	ADDRESS_MAP_BANK(config, "bankc000").set_map(&wmg_state::wmg_banked_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
 	TIMER(config, "scan_timer").configure_scanline(FUNC(wmg_state::va11_callback), "screen", 0, 32);

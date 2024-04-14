@@ -530,4 +530,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1991, d70, 0, 0, d70, d70, roland_d70_state, init_d70, "Roland", "D-70 Super LA Synthetizer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+SYST(1991, d70, 0, 0, d70, d70, roland_d70_state, init_d70, "Roland", "D-70 Super LA Synthesizer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

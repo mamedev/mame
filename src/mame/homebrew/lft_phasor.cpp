@@ -86,8 +86,8 @@ void lft_phasor_state::data_map(address_map &map)
 
 void lft_phasor_state::port_b_w(uint8_t data)
 {
-	m_gpio_b = data;
 	video_update();
+	m_gpio_b = data;
 }
 
 //**************************************************************************

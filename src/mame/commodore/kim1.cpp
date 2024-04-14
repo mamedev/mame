@@ -27,8 +27,7 @@ How to use cassette:
 NOTE: save end address is next address from program end
 
 How to use the console:
-Toggle the console enable by hitting 'T' (or use Input Settings/Toggle
-Inputs/TTY) and then RS (reset).
+Enable using Input Settings/Toggle Inputs TTY On.
 Connect to the console at 2400 bps 8N2 (speeds from 110 to 9600 bps should work).
 Hit <Delete> or <Return> on the console and it should display "KIM"
 and accept monitor commands:
@@ -73,9 +72,7 @@ Paste test:
 
 
 TODO:
-- Get console working on screen (works with pty)
 - LEDs should be dark at startup (RS key to activate)
-- Make console toggle a DIP switch?
 
 ******************************************************************************/
 
@@ -97,6 +94,7 @@ TODO:
 
 #include "kim1.lh"
 
+
 namespace {
 
 //**************************************************************************
@@ -112,9 +110,9 @@ public:
 		, m_miot(*this, "miot%u", 0)
 		, m_digit_pwm(*this, "digit_pwm")
 		, m_cass(*this, "cassette")
+		, m_rs232(*this, "rs232")
 		, m_row(*this, "ROW%u", 0U)
 		, m_special(*this, "SPECIAL")
-		, m_rs232(*this, "rs232")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
@@ -130,13 +128,13 @@ private:
 	required_device_array<mos6530_device, 2> m_miot;
 	required_device<pwm_display_device> m_digit_pwm;
 	required_device<cassette_image_device> m_cass;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<4> m_row;
 	required_ioport m_special;
-	required_device<rs232_port_device> m_rs232;
 
 	int m_sync_state = 0;
 	bool m_k7 = false;
-	uint8_t m_u2_port_a = 0;
+	bool tty_in = 0;
 	uint8_t m_u2_port_b = 0;
 	uint8_t m_311_output = 0;
 	uint32_t m_cassette_high_count = 0;
@@ -153,7 +151,7 @@ private:
 	void u2_write_b(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
-	void tty_callback(uint8_t data);
+	void tty_callback(int data);
 };
 
 void kim1_state::machine_start()
@@ -161,7 +159,6 @@ void kim1_state::machine_start()
 	// Register for save states
 	save_item(NAME(m_sync_state));
 	save_item(NAME(m_k7));
-	save_item(NAME(m_u2_port_a));
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));
@@ -173,6 +170,7 @@ void kim1_state::machine_reset()
 	m_cassette_high_count = 0;
 }
 
+
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_2400)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_2400)
@@ -180,6 +178,7 @@ static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
 DEVICE_INPUT_DEFAULTS_END
+
 
 //**************************************************************************
 //  I/O
@@ -234,8 +233,6 @@ uint8_t kim1_state::u2_read_a()
 
 void kim1_state::u2_write_a(uint8_t data)
 {
-	m_u2_port_a = data;
-
 	// Write to 7-segment LEDs
 	m_digit_pwm->write_mx(data & 0x7f);
 }
@@ -260,8 +257,8 @@ void kim1_state::u2_write_b(uint8_t data)
 	if (data & 0x20)
 		m_cass->output((data & 0x80) ? -1.0 : 1.0);
 
-	// Write bit 0 to serial console
-	m_rs232->write_txd(data & 0x01);
+	// Write bit 0 to serial console. The hardware ANDs it with TTY in.
+	m_rs232->write_txd((data & 0x01) & tty_in);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
@@ -303,12 +300,16 @@ void kim1_state::sync_map(address_map &map)
 }
 
 // Called when serial data comes in from console.
-void kim1_state::tty_callback(uint8_t data)
+void kim1_state::tty_callback(int data)
 {
+	// Save state as it is needed by u2_write_b()
+	tty_in = data;
+
 	// Send data back to terminal to simulate the KIM-1 hardware
-	// echo.
-	m_rs232->write_txd(data);
+	// echo. The hardware ANDs this with U2 port B port 0.
+	m_rs232->write_txd(data & (m_u2_port_b & 0x01));
 }
+
 
 //**************************************************************************
 //  INPUT PORTS

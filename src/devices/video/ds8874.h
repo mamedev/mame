@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_MACHINE_DS8874_H
-#define MAME_MACHINE_DS8874_H
+#ifndef MAME_VIDEO_DS8874_H
+#define MAME_VIDEO_DS8874_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DS8874, ds8874_device)
 
-#endif // MAME_MACHINE_DS8874_H
+#endif // MAME_VIDEO_DS8874_H

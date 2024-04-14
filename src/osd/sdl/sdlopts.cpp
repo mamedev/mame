@@ -66,7 +66,8 @@ const options_entry f_sdl_option_entries[] =
 	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat",   core_options::option_type::PATH,       "keymap filename" },
 
 	// joystick mapping
-	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL JOYSTICK MAPPING" },
+	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL INPUT OPTIONS" },
+	{ SDLOPTION_ENABLE_TOUCH,                "0",            core_options::option_type::BOOLEAN,    "enable touch input support" },
 	{ SDLOPTION_SIXAXIS,                     "0",            core_options::option_type::BOOLEAN,    "use special handling for PS3 Sixaxis controllers" },
 
 #if (USE_XINPUT)

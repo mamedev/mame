@@ -19,12 +19,32 @@ Used in:
 #include "emu.h"
 #include "rally.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Videopac+ 60 Cartridge")
-
+namespace {
 
 //-------------------------------------------------
-//  o2_rally_device - constructor
+//  initialization
 //-------------------------------------------------
+
+class o2_rally_device : public device_t, public device_o2_cart_interface
+{
+public:
+	o2_rally_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void cart_init() override;
+
+	virtual u8 read_rom04(offs_t offset) override;
+	virtual u8 read_rom0c(offs_t offset) override { return read_rom04(offset + 0x400); }
+
+	virtual void write_p1(u8 data) override { m_control = data; }
+	virtual void io_write(offs_t offset, u8 data) override;
+
+private:
+	u8 m_control = 0;
+	u8 m_bank = 0;
+};
 
 o2_rally_device::o2_rally_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_RALLY, tag, owner, clock),
@@ -60,3 +80,8 @@ void o2_rally_device::io_write(offs_t offset, u8 data)
 	if (offset & 0x80 && ~m_control & 0x10)
 		m_bank = data;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(O2_ROM_RALLY, device_o2_cart_interface, o2_rally_device, "o2_rally", "Videopac+ 60 Cartridge")

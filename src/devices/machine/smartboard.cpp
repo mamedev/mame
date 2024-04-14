@@ -140,7 +140,7 @@ void tasc_sb30_device::device_add_mconfig(machine_config &config)
 //  sensorboard_device interface
 //-------------------------------------------------
 
-void tasc_sb30_device::init_cb(int state)
+void tasc_sb30_device::init_cb(u8 data)
 {
 	m_board->clear_board();
 	m_board->write_piece(0, 0, SB30_WHITE_ROOK1);

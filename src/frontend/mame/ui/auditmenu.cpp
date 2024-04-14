@@ -83,7 +83,7 @@ void menu_audit::recompute_metrics(uint32_t width, uint32_t height, float aspect
 }
 
 
-void menu_audit::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 	switch (m_phase)
 	{

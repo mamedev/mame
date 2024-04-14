@@ -40,11 +40,11 @@ ROM_START( gd5446 )
 	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "quadtel", "Quadtel CL-GD5446 1.31" )
 	ROMX_LOAD( "cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c), ROM_BIOS(0) )
-	// Chip:CL-GD5446-HC-A - ROM: CL-GD5436/46 PCI VGA BIOS Version 1.25 - RAM: 1MB, 2MB, 4MB - 
+	// Chip:CL-GD5446-HC-A - ROM: CL-GD5436/46 PCI VGA BIOS Version 1.25 - RAM: 1MB, 2MB, 4MB -
 	// OSC: 14.31818MHz - Connector: DB15 - VESA feature connector
 	ROM_SYSTEM_BIOS( 1, "quadtelo", "Quadtel CL-GD5446 1.25" )
 	ROMX_LOAD("cl-gd5446_pci_vga_bios_version_1.25.u2",  0x0000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a), ROM_BIOS(1) )
-//	ROMX_LOAD("5446bv.vbi", 0x00000, 0x10000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
+//  ROMX_LOAD("5446bv.vbi", 0x00000, 0x10000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
 ROM_END
 
 const tiny_rom_entry *cirrus_gd5446_pci_device::device_rom_region() const

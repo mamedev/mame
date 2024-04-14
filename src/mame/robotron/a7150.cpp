@@ -34,6 +34,7 @@ To do:
 
 #include "bus/multibus/multibus.h"
 #include "bus/multibus/robotron_k7070.h"
+#include "bus/multibus/robotron_k7071.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/i8087.h"
@@ -140,6 +141,7 @@ void a7150_state::machine_start()
 static void a7150_cards(device_slot_interface &device)
 {
 	device.option_add("kgs", ROBOTRON_K7070);
+	device.option_add("abs", ROBOTRON_K7071);
 }
 
 /*

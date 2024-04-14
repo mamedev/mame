@@ -115,7 +115,7 @@ authors:hap
 		<element ref="nothing" inputtag="IN.3" inputmask="0x08" inputraw="yes"><bounds x="9.805" y="9.55" width="0.39" height="0.39" /></element>
 		<element ref="nothing" inputtag="IN.3" inputmask="0x07" inputraw="yes"><bounds x="9.805" y="9.95" width="0.39" height="0.39" /></element>
 
-		<element ref="nothing" inputtag="FAKE" inputmask="0x00" inputraw="yes"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></element>
 		<element ref="switch_music" inputtag="FAKE" inputmask="0x02" inputraw="yes"><bounds x="10.25" y="8.8" width="1" height="0.29" /></element>
 		<element ref="switch_speed" inputtag="IN.4" inputmask="0x01" inputraw="yes"><bounds x="10.25" y="9.2" width="1" height="0.29" /></element>
 		<element ref="switch_skill" inputtag="IN.3" inputmask="0x08" inputraw="yes"><bounds x="10.25" y="9.6" width="1" height="0.29" /></element>

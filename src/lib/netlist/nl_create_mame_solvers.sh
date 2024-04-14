@@ -16,7 +16,7 @@ mkdir ${OUTDIR}
 
 #--dir src/lib/netlist/generated/static --static-include
 
-if ${NLTOOL} --cmd static --output=${GENERATED}.tmp --include=src/mame/audio ${FILES} ; then
+if ${NLTOOL} --cmd static --output=${GENERATED}.tmp --include=src/mame/shared ${FILES} ; then
 	mv -f ${GENERATED}.tmp ${GENERATED}
 	echo Created ${GENERATED} file
 else

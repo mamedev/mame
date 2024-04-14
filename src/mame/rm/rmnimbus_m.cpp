@@ -696,7 +696,7 @@ void rmnimbus_state::pc8031_reset()
 {
 	logerror("peripheral controller reset\n");
 
-	memset(&m_ipc_interface,0,sizeof(m_ipc_interface));
+	m_ipc_interface = decltype(m_ipc_interface)();
 }
 
 

@@ -18,7 +18,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams_state::va11_callback)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	// must not fire at line 256
 	if (scanline == 256)
@@ -31,7 +31,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::va11_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams_state::count240_callback)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	// the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13
 	m_pia[1]->ca1_w(scanline >= 240 ? 1 : 0);
@@ -44,11 +44,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::count240_callback)
  *
  *************************************/
 
-void williams_state::machine_start()
+void williams_state::machine_reset()
 {
-	/* configure the memory bank */
-	m_mainbank->configure_entry(1, memregion("maincpu")->base() + 0x10000);
-	m_mainbank->configure_entry(0, m_videoram);
+	m_rom_view.disable();
 }
 
 
@@ -60,7 +58,7 @@ void williams_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::va11_callback)
 {
-	int scanline = param;
+	int const scanline = param;
 	if (scanline == 256)
 		return;
 
@@ -72,7 +70,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::va11_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::endscreen_callback)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	// the /ENDSCREEN signal comes into CA1
 	m_pia[0]->ca1_w(scanline >= 254 ? 0 : 1);
@@ -88,15 +86,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::endscreen_callback)
 
 void williams2_state::machine_start()
 {
+	williams_state::machine_start();
+
 	/* configure memory banks */
-	m_mainbank->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
-	m_mainbank->configure_entry(0, m_videoram);
-	membank("vram8000")->set_base(&m_videoram[0x8000]);
+	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
 
 void williams2_state::machine_reset()
 {
+	williams_state::machine_reset();
+
 	/* make sure our banking is reset */
 	bank_select_w(0);
 }
@@ -112,10 +112,13 @@ void williams2_state::machine_reset()
 void williams_state::vram_select_w(u8 data)
 {
 	/* VRAM/ROM banking from bit 0 */
-	m_mainbank->set_entry(data & 0x01);
+	if (BIT(data, 0))
+		m_rom_view.select(0);
+	else
+		m_rom_view.disable();
 
 	/* cocktail flip from bit 1 */
-	m_cocktail = data & 0x02;
+	m_cocktail = BIT(data, 1);
 }
 
 
@@ -126,21 +129,23 @@ void williams2_state::bank_select_w(u8 data)
 	{
 		/* page 0 is video ram */
 		case 0:
-			m_mainbank->set_entry(0);
-			m_bank8000->set_bank(0);
+			m_rom_view.disable();
+			m_palette_view.disable();
 			break;
 
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			m_mainbank->set_entry(1 + ((data & 6) >> 1));
-			m_bank8000->set_bank(0);
+			m_mainbank->set_entry((data & 6) >> 1);
+			m_rom_view.select(0);
+			m_palette_view.disable();
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			m_mainbank->set_entry(1 + ((data & 4) >> 1));
-			m_bank8000->set_bank(1);
+			m_mainbank->set_entry((data & 4) >> 1);
+			m_rom_view.select(0);
+			m_palette_view.select(0);
 			break;
 	}
 }
@@ -210,7 +215,7 @@ void williams2_state::snd_cmd_w(u8 data)
 u8 williams_state::port_0_49way_r()
 {
 	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
+	return (translate49[m_49way_x->read() >> 4] << 4) | translate49[m_49way_y->read() >> 4];
 }
 
 
@@ -308,19 +313,24 @@ void williams2_state::segments_w(u8 data)
 
 void defender_state::machine_reset()
 {
+	williams_state::machine_reset();
+
 	bank_select_w(0);
 }
 
 
 void defender_state::video_control_w(u8 data)
 {
-	m_cocktail = data & 0x01;
+	m_cocktail = BIT(data, 0);
 }
 
 
 void defender_state::bank_select_w(u8 data)
 {
-	m_bankc000->set_bank(data & 0x0f);
+	if ((data & 0x0f) < 10)
+		m_rom_view.select(data & 0x0f);
+	else
+		m_rom_view.disable();
 }
 
 
@@ -355,7 +365,7 @@ void sinistar_state::vram_select_w(u8 data)
 	williams_state::vram_select_w(data);
 
 	/* window enable from bit 2 (clips to 0x7400) */
-	m_blitter_window_enable = data & 0x04;
+	m_blitter_window_enable = BIT(data, 2);
 }
 
 
@@ -385,54 +395,46 @@ void sinistar_state::cockpit_snd_cmd_w(u8 data)
 
 void blaster_state::machine_start()
 {
+	williams_state::machine_start();
+
 	/* banking is different for blaster */
-	m_mainbank->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
-	m_mainbank->configure_entry(0, m_videoram);
-
-	m_bankb->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
-	m_bankb->configure_entry(0, &m_videoram[0x4000]);
-
-	/* register for save states */
-	save_item(NAME(m_vram_bank));
-	save_item(NAME(m_rom_bank));
-
-	m_vram_bank = 0;
-	m_rom_bank = 0;
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-
-inline void blaster_state::update_blaster_banking()
+void blaster_state::machine_reset()
 {
-	m_mainbank->set_entry(m_vram_bank * (m_rom_bank + 1));
-	m_bankb->set_entry(m_vram_bank * (m_rom_bank + 1));
+	williams_state::machine_reset();
+
+	m_mainbank->set_entry(0);
 }
 
 
 void blaster_state::vram_select_w(u8 data)
 {
 	/* VRAM/ROM banking from bit 0 */
-	m_vram_bank = data & 0x01;
-	update_blaster_banking();
+	if (BIT(data, 0))
+		m_rom_view.select(0);
+	else
+		m_rom_view.disable();
 
 	/* cocktail flip from bit 1 */
-	m_cocktail = data & 0x02;
+	m_cocktail = BIT(data, 1);
 
 	/* window enable from bit 2 (clips to 0x9700) */
-	m_blitter_window_enable = data & 0x04;
+	m_blitter_window_enable = BIT(data, 2);
 }
 
 
 void blaster_state::bank_select_w(u8 data)
 {
-	m_rom_bank = data & 0x0f;
-	update_blaster_banking();
+	m_mainbank->set_entry(data & 0x0f);
 }
 
 
 TIMER_CALLBACK_MEMBER(blaster_state::deferred_snd_cmd_w)
 {
-	uint8_t l_data = param | 0x80;
-	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
+	uint8_t const l_data = param | 0x80;
+	uint8_t const r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
 	m_pia[2]->portb_w(l_data); m_pia[2]->cb1_w((l_data == 0xff) ? 0 : 1);
 	m_pia[3]->portb_w(r_data); m_pia[3]->cb1_w((r_data == 0xff) ? 0 : 1);
@@ -454,7 +456,7 @@ void blaster_state::blaster_snd_cmd_w(u8 data)
 
 void williams2_state::video_control_w(u8 data)
 {
-	m_cocktail = data & 0x01;
+	m_cocktail = BIT(data, 0);
 }
 
 
@@ -468,6 +470,7 @@ void williams2_state::video_control_w(u8 data)
 void tshoot_state::machine_start()
 {
 	williams2_state::machine_start();
+
 	m_grenade_lamp.resolve();
 	m_gun_lamp.resolve();
 	m_p1_gun_recoil.resolve();
@@ -505,6 +508,7 @@ void tshoot_state::lamp_w(u8 data)
 void joust2_state::machine_start()
 {
 	williams2_state::machine_start();
+
 	save_item(NAME(m_current_sound_data));
 }
 

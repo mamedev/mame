@@ -285,9 +285,9 @@ void m68000_device::device_start()
 	m_post_run = 0;
 	m_post_run_cycles = 0;
 
-	state_add(STATE_GENPCBASE, "PC",  m_ipc).callimport();
-	state_add(STATE_GENPC,     "rPC", m_pc);
-	state_add(M68K_IR,         "IR",  m_ir);
+	state_add(STATE_GENPCBASE, "CURPC", m_ipc).callimport();
+	state_add(STATE_GENPC,     "PC",    m_pc).callimport();
+	state_add(M68K_IR,         "IR",    m_ir);
 	state_add(STATE_GENFLAGS,  "GENFLAGS", m_sr).noshow().callexport().formatstr("%16s");
 	state_add(M68K_SR,         "SR",  m_sr).callimport();
 	for(int r = 0; r != 8; r++)
@@ -303,11 +303,15 @@ void m68000_device::device_start()
 void m68000_device::state_import(const device_state_entry &entry)
 {
 	switch(entry.index()) {
+	case STATE_GENPC:
+		m_ipc = m_pc;
+		[[fallthrough]];
+
 	case STATE_GENPCBASE: {
 		m_pc = m_ipc+2;
 		m_au = m_ipc+4;
 		auto dis = machine().disable_side_effects();
-		m_ir = m_ird = m_opcodes.read_word(m_ipc);
+		m_ir = m_ird = m_irdi = m_opcodes.read_word(m_ipc);
 		m_irc = m_dbin = m_opcodes.read_word(m_pc);
 		set_ftu_const();
 		m_inst_state = m_decode_table[m_ird];

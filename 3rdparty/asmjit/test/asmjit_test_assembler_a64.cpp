@@ -17,7 +17,7 @@
 using namespace asmjit;
 
 #define TEST_INSTRUCTION(OPCODE, ...) \
-  tester.testInstruction(OPCODE, #__VA_ARGS__, tester.assembler.__VA_ARGS__)
+  tester.testValidInstruction(#__VA_ARGS__, OPCODE, tester.assembler.__VA_ARGS__)
 
 static void ASMJIT_NOINLINE testA64AssemblerBase(AssemblerTester<a64::Assembler>& tester) noexcept {
   using namespace a64;
@@ -485,16 +485,24 @@ static void ASMJIT_NOINLINE testA64AssemblerBase(AssemblerTester<a64::Assembler>
   TEST_INSTRUCTION("41104078", ldrh(w1, ptr(x2, 1)));   // LDURH
   TEST_INSTRUCTION("41D05F78", ldrh(w1, ptr(x2, -3)));  // LDURH
   TEST_INSTRUCTION("41705F78", ldrh(w1, ptr(x2, -9)));  // LDURH
+  TEST_INSTRUCTION("4168E338", ldrsb(w1, ptr(x2, x3)));
   TEST_INSTRUCTION("4104C039", ldrsb(w1, ptr(x2, 1)));
+  TEST_INSTRUCTION("4120C039", ldrsb(w1, ptr(x2, 8)));
   TEST_INSTRUCTION("41D0DF38", ldrsb(w1, ptr(x2, -3))); // LDURSB
   TEST_INSTRUCTION("4170DF38", ldrsb(w1, ptr(x2, -9))); // LDURSB
+  TEST_INSTRUCTION("4168A338", ldrsb(x1, ptr(x2, x3)));
   TEST_INSTRUCTION("41048039", ldrsb(x1, ptr(x2, 1)));
+  TEST_INSTRUCTION("41208039", ldrsb(x1, ptr(x2, 8)));
   TEST_INSTRUCTION("41D09F38", ldrsb(x1, ptr(x2, -3))); // LDURSB
   TEST_INSTRUCTION("41709F38", ldrsb(x1, ptr(x2, -9))); // LDURSB
+  TEST_INSTRUCTION("4168E378", ldrsh(w1, ptr(x2, x3)));
   TEST_INSTRUCTION("4110C078", ldrsh(w1, ptr(x2, 1)));  // LDURSH
+  TEST_INSTRUCTION("4110C079", ldrsh(w1, ptr(x2, 8)));
   TEST_INSTRUCTION("41D0DF78", ldrsh(w1, ptr(x2, -3))); // LDURSH
   TEST_INSTRUCTION("4170DF78", ldrsh(w1, ptr(x2, -9))); // LDURSH
+  TEST_INSTRUCTION("4168A378", ldrsh(x1, ptr(x2, x3)));
   TEST_INSTRUCTION("41108078", ldrsh(x1, ptr(x2, 1)));  // LDURSH
+  TEST_INSTRUCTION("41108079", ldrsh(x1, ptr(x2, 8)));
   TEST_INSTRUCTION("41D09F78", ldrsh(x1, ptr(x2, -3))); // LDURSH
   TEST_INSTRUCTION("41709F78", ldrsh(x1, ptr(x2, -9))); // LDURSH
   TEST_INSTRUCTION("410080B9", ldrsw(x1, ptr(x2)));
@@ -738,6 +746,10 @@ static void ASMJIT_NOINLINE testA64AssemblerBase(AssemblerTester<a64::Assembler>
   TEST_INSTRUCTION("411088B8", ldursw(x1, ptr(x2, 129)));
   TEST_INSTRUCTION("E10380B8", ldursw(x1, ptr(sp)));
   TEST_INSTRUCTION("E11388B8", ldursw(x1, ptr(sp, 129)));
+  TEST_INSTRUCTION("420080B8", ldursw(x2, ptr(x2)));
+  TEST_INSTRUCTION("421088B8", ldursw(x2, ptr(x2, 129)));
+  TEST_INSTRUCTION("E20380B8", ldursw(x2, ptr(sp)));
+  TEST_INSTRUCTION("E21388B8", ldursw(x2, ptr(sp, 129)));
   TEST_INSTRUCTION("61087F88", ldxp(w1, w2, ptr(x3)));
   TEST_INSTRUCTION("E10B7F88", ldxp(w1, w2, ptr(sp)));
   TEST_INSTRUCTION("61087FC8", ldxp(x1, x2, ptr(x3)));
@@ -850,6 +862,13 @@ static void ASMJIT_NOINLINE testA64AssemblerBase(AssemblerTester<a64::Assembler>
   TEST_INSTRUCTION("F42FC1DA", pacdzb(x20));
   TEST_INSTRUCTION("4130C39A", pacga(x1, x2, x3));
   TEST_INSTRUCTION("4130DF9A", pacga(x1, x2, sp));
+  TEST_INSTRUCTION("204080F9", prfm(Predicate::PRFOp::kPLDL1KEEP, ptr(x1, 128)));
+  TEST_INSTRUCTION("401098F8", prfm(Predicate::PRFOp::kPLDL1KEEP, ptr(x2, -127)));
+  TEST_INSTRUCTION("601088F8", prfm(Predicate::PRFOp::kPLDL1KEEP, ptr(x3, 129)));
+  TEST_INSTRUCTION("6068A4F8", prfm(Predicate::PRFOp::kPLDL1KEEP, ptr(x3, x4)));
+  TEST_INSTRUCTION("6078A4F8", prfm(Predicate::PRFOp::kPLDL1KEEP, ptr(x3, x4, lsl(3))));
+  TEST_INSTRUCTION("60C8A4F8", prfm(Predicate::PRFOp::kPLDL1KEEP, ptr(x3, x4, sxtw(0))));
+  TEST_INSTRUCTION("73D8A4F8", prfm(Predicate::PRFOp::kPSTL2STRM, ptr(x3, x4, sxtw(3))));
   TEST_INSTRUCTION("9F3403D5", pssbb());
   TEST_INSTRUCTION("4100C05A", rbit(w1, w2));
   TEST_INSTRUCTION("4100C0DA", rbit(x1, x2));

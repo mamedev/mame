@@ -12,7 +12,7 @@ properly.
 
 Hardware notes:
 - PCB label: CHESS3 YENO 416XL
-- Hitachi HD63B01Y0P @ ~8MHz (LC oscillator)
+- Hitachi HD6301Y0P @ ~8MHz (LC oscillator)
 - 8*8 chessboard buttons, 16+7 LEDs, piezo
 
 TODO:
@@ -219,4 +219,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, y416xl, 0,      0,      y416xl,  y416xl, y416xl_state, empty_init, "Yeno", "416 XL (Yeno)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, y416xl, 0,      0,      y416xl,  y416xl, y416xl_state, empty_init, "Yeno", "416 XL (Yeno)", MACHINE_SUPPORTS_SAVE )

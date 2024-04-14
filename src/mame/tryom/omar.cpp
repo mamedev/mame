@@ -378,5 +378,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, omar1, 0,      0,      omar1,   omar,  omar_state,  empty_init, "Tryom", "Omar I", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, omar2, 0,      0,      omar2,   omar,  omar2_state, empty_init, "Tryom", "Omar II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, omar1, 0,      0,      omar1,   omar,  omar_state,  empty_init, "Tryom", "Omar I", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, omar2, 0,      0,      omar2,   omar,  omar2_state, empty_init, "Tryom", "Omar II", MACHINE_SUPPORTS_SAVE )

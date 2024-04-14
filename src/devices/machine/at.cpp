@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/at.h"
+#include "at.h"
+
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 

@@ -12,7 +12,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "machine/mc146818.h"
+#include "mc146818.h"
 
 #include "coreutil.h"
 

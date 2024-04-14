@@ -335,7 +335,8 @@ void esq1_filters::recalc_filter(filter &f)
 void esq1_filters::device_start()
 {
 	stream = stream_alloc(8, 2, 44100);
-	memset(filters, 0, sizeof(filters));
+	for(auto & elem : filters)
+		elem = filter();
 	for(auto & elem : filters)
 		recalc_filter(elem);
 }
@@ -389,8 +390,8 @@ namespace {
 class esq1_state : public driver_device
 {
 public:
-	esq1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	esq1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_filters(*this, "filters"),

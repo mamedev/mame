@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/vic4567.h"
+#include "vic4567.h"
 
 #include "screen.h"
 

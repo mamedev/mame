@@ -20,13 +20,49 @@ TODO:
 
 #include "emu.h"
 #include "voice.h"
+
+#include "sound/sp0256.h"
+
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Cartridge")
+namespace {
 
 //-------------------------------------------------
-//  o2_voice_device - constructor
+//  initialization
 //-------------------------------------------------
+
+class o2_voice_device : public device_t, public device_o2_cart_interface
+{
+public:
+	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void cart_init() override;
+
+	virtual u8 read_rom04(offs_t offset) override { return (m_subslot->exists()) ? m_subslot->read_rom04(offset) : 0xff; }
+	virtual u8 read_rom0c(offs_t offset) override { return (m_subslot->exists()) ? m_subslot->read_rom0c(offset) : 0xff; }
+
+	virtual void write_p1(u8 data) override { m_control = data; if (m_subslot->exists()) m_subslot->write_p1(data & 3); }
+	virtual void write_p2(u8 data) override { if (m_subslot->exists()) m_subslot->write_p2(data & ~4); }
+	virtual void bus_write(u8 data) override { if (m_subslot->exists()) m_subslot->bus_write(data); }
+	virtual u8 bus_read() override { return (m_subslot->exists()) ? m_subslot->bus_read() : 0xff; }
+
+	virtual void io_write(offs_t offset, u8 data) override;
+	virtual int t0_read() override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	required_device<sp0256_device> m_speech;
+	required_device<o2_cart_slot_device> m_subslot;
+
+	u8 m_control = 0;
+	bool m_reset = false;
+};
 
 o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_VOICE, tag, owner, clock),
@@ -64,31 +100,6 @@ void o2_voice_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void o2_voice_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	SP0256(config, m_speech, 3.12_MHz_XTAL);
-	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
-	m_speech->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	O2_CART_SLOT(config, m_subslot, o2_cart, nullptr);
-}
-
-ROM_START( o2voice )
-	ROM_REGION( 0x10000, "speech", ROMREGION_ERASE00 )
-ROM_END
-
-const tiny_rom_entry *o2_voice_device::device_rom_region() const
-{
-	return ROM_NAME( o2voice );
-}
-
-
-//-------------------------------------------------
 //  mapper specific handlers
 //-------------------------------------------------
 
@@ -114,3 +125,33 @@ void o2_voice_device::io_write(offs_t offset, u8 data)
 		m_reset = reset;
 	}
 }
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void o2_voice_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SP0256(config, m_speech, 3.12_MHz_XTAL);
+	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
+	m_speech->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	O2_CART_SLOT(config, m_subslot, o2_cart, nullptr);
+}
+
+ROM_START( o2voice )
+	ROM_REGION( 0x10000, "speech", ROMREGION_ERASE00 )
+ROM_END
+
+const tiny_rom_entry *o2_voice_device::device_rom_region() const
+{
+	return ROM_NAME( o2voice );
+}
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(O2_ROM_VOICE, device_o2_cart_interface, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Cartridge")

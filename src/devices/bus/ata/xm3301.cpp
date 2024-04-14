@@ -30,8 +30,8 @@ void toshiba_xm3301_device::device_start()
 	// [3605] as Rev number
 	// Both TAISATAP.SYS and CD_BALLY.SYS tests against one of these strings:
 	// "TOSHIBA CD-ROM"
-    // "TOSHIBA CD-ROM XM-3301"
-    // "TOSHIBA CD-ROM DRIVE:XM"
+	// "TOSHIBA CD-ROM XM-3301"
+	// "TOSHIBA CD-ROM DRIVE:XM"
 	// "TOSHIBA DVD" (CD_BALLY.SYS only)
 	t10mmc::set_model("TOSHIBA CD-ROM XM-5401TA3605");
 

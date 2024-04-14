@@ -451,7 +451,7 @@ void mg1_state::mg1(machine_config &config)
 	 * selects a 256 divisor, giving a 9600Hz clock which after the 8x divider in the IOP gives a 1200 baud data rate.
 	 */
 	clock_device &kbd_clk(CLOCK(config, "kbd_clock", 2.4576_MHz_XTAL / 256));
-	kbd_clk.signal_handler().set([this](int state) { if (state) m_iop->m6801_clock_serial(); });
+	kbd_clk.signal_handler().set([this](int state) { if (state) m_iop->clock_serial(); });
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_buzzer);

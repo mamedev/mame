@@ -112,4 +112,4 @@ TIMER_CALLBACK_MEMBER(msx_vaus_device::copy_counter)
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(MSX_VAUS, device_msx_general_purpose_port_interface, msx_vaus_device, "msx_vaus", "MSX Arkanoid Vaus")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_VAUS, device_msx_general_purpose_port_interface, msx_vaus_device, "msx_vaus", "Taito Arkanoid Vaus Controller (MSX)")

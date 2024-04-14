@@ -4,16 +4,12 @@
     Yamaha PSR-340 PortaSound keyboard
     Preliminary driver by R. Belmont
 
-    CPU and Sound: SWX00B, which is an H8S/2000 series CPU and Yamaha SWP00? (or SWP30?) on one chip.
+    CPU and Sound: SWX00B, which is an H8S/2000 series CPU and Yamaha
+      AWM2 with capabilities somewhat intermediate between SWP00 and
+      SWP30.
     LCD controller: KS0066U (apparently equivalent to Samsung S6A0069)
     FDC: HD63266F (uPD765 derivative)
     RAM: 256KiB, 2x uPD431000 or equivalent
-
-    TODO:
-    - Customized CPU.  Interrupt controller is H8S/2655 style, but there are customizations too.
-    - LCD (it's similar to the MU-5's)
-    - Front panel / keyboard scanner (6305 with internal ROM manages this on hardware)
-    - Sound generation
 */
 
 #include "emu.h"

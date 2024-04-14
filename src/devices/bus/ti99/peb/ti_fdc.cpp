@@ -29,7 +29,7 @@
 #define LOG_MOTOR       (1U << 10)
 #define LOG_ADDRESS     (1U << 11)
 
-#define VERBOSE (LOG_CONFIG | LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_FDC, bus::ti99::peb::ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
@@ -56,6 +56,7 @@ ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, dev
 	m_crulatch(*this, "crulatch"),
 	m_motormf(*this, "motormf"),
 	m_dsrrom(nullptr),
+	m_floppy(*this, "%u", 0),
 	m_sel_floppy(0)
 {
 }
@@ -255,7 +256,8 @@ void ti_fdc_device::dvena_w(int state)
 
 	// Set all motors
 	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
+		if (elem->get_device() != nullptr) 
+			elem->get_device()->mon_w((state==ASSERT_LINE)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -281,7 +283,8 @@ void ti_fdc_device::sidsel_w(int state)
 {
 	// Select side of disk (bit 7)
 	LOGMASKED(LOG_CRU, "Set side (bit 7) = %d\n", state);
-	if (m_sel_floppy != 0) m_floppy[m_sel_floppy-1]->ss_w(state);
+	if (m_sel_floppy > 0)
+		m_floppy[m_sel_floppy-1]->get_device()->ss_w(state);
 }
 
 /*
@@ -323,12 +326,12 @@ void ti_fdc_device::select_drive(int n, int state)
 		{
 			LOGMASKED(LOG_WARN, "Warning: DSK%d selected while DSK%d not yet unselected\n", n, m_sel_floppy);
 		}
-
-		if (m_floppy[n-1] != nullptr)
+	
+		if (m_floppy[n-1]->get_device() != nullptr)
 		{
 			m_sel_floppy = n;
-			m_fd1771->set_floppy(m_floppy[n-1]);
-			m_floppy[n-1]->ss_w(m_crulatch->q7_r());
+			m_fd1771->set_floppy(m_floppy[n-1]->get_device());
+			m_floppy[n-1]->get_device()->ss_w(m_crulatch->q7_r());
 		}
 	}
 }
@@ -357,26 +360,16 @@ void ti_fdc_device::device_reset()
 	m_selected = false;
 	m_inDsrArea = false;
 	m_WDsel = false;
-
-	for (int i=0; i < 3; i++)
+	
+	for (auto &flop : m_floppy)
 	{
-		if (m_floppy[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", i, m_floppy[i]->name());
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", flop->basetag(), flop->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "No floppy attached to connector %d\n", i);
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
-
+	
 	m_sel_floppy = 0;
-}
-
-void ti_fdc_device::device_config_complete()
-{
-	// Seems to be null when doing a "-listslots"
-	for (auto &elem : m_floppy)
-		elem = nullptr;
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
 }
 
 void ti_fdc_device::floppy_formats(format_registration &fr)
@@ -404,9 +397,9 @@ void ti_fdc_device::device_add_mconfig(machine_config& config)
 	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
 	m_fd1771->hld_wr_callback().set(FUNC(ti_fdc_device::fdc_hld_w));
 
-	FLOPPY_CONNECTOR(config, "0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", tifdc_floppies, nullptr, ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], tifdc_floppies, nullptr, ti_fdc_device::floppy_formats).enable_sound(true);
 
 	LS259(config, m_crulatch); // U23
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_fdc_device::dskpgena_w));

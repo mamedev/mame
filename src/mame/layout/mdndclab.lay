@@ -5,101 +5,76 @@ authors:hap, Carl
 -->
 <mamelayout version="2">
 
-<!-- luascript (-plugin layout) -->
-<!-- this adds support for placing wall pieces by clicking between buttons -->
-
 	<script><![CDATA[
-		local layout = {}
-		local walls = { { 7.5, {0, 10, 20, 30, 40, 50, 60, 70}},
-						{17.5, {0, 10, 20, 30, 40, 50, 60, 70}},
-						{27.5, {0, 10, 20, 30, 40, 50, 60, 70}},
-						{37.5, {0, 10, 20, 30, 40, 50, 60, 70}},
-						{47.5, {0, 10, 20, 30, 40, 50, 60, 70}},
-						{57.5, {0, 10, 20, 30, 40, 50, 60, 70}},
-						{67.5, {0, 10, 20, 30, 40, 50, 60, 70}} }
+		-- add support for placing wall pieces by clicking between buttons
+		file:set_resolve_tags_callback(
+				function ()
+					local walls = { {  7.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 17.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 27.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 37.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 47.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 57.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 67.5, { 0, 10, 20, 30, 40, 50, 60, 70 } } }
 
-		local last_state = false
-
-		local function get_mouse()
-			local x, y, button, target = machine.uiinput:find_mouse()
-			if not button then
-				last_state = false
-				return nil
-			end
-			if last_state then
-				return nil
-			end
-			last_state = true
-			local h = target.height
-			local w = target.width
-			local vb = target.current_view.bounds
-			local vw = (vb.x1 - vb.x0)
-			local vh = (vb.y1 - vb.y0)
-			if machine.options.entries.keepaspect:value() then
-				if (vh / h) < (vw / w) then
-					local oh = h
-					h = w * (vh / vw)
-					y = y - ((oh - h) / 2)
-				else
-					local ow = w
-					w = h * (vw / vh)
-					x = x - ((ow - w) / 2)
-				end
-			end
-
-			x = ((x / w) * vw) + vb.x0
-			y = ((y / h) * vh) + vb.y0
-			return x, y
-		end
-
-		function layout.reset()
-			for num, col in pairs(walls) do
-				for num2, wall in pairs(col[2]) do
-					machine.output:set_indexed_value("colwall", (num * 10) + num2, 0)
-				end
-			end
-			for num, row in pairs(walls) do
-				for num2, wall in pairs(row[2]) do
-					machine.output:set_indexed_value("rowwall", (num * 10) + num2, 0)
-				end
-			end
-		end
-
-		function layout.frame()
-			local x, y = get_mouse()
-			if not x or x < 0 or y < 0 then
-				return
-			end
-			for num, col in pairs(walls) do
-				if col[1] < x and (col[1] + 2.5) > x then
-					for num2, wall in pairs(col[2]) do
-						if wall < y and (wall + 7.5) > y then
-							local state = machine.output:get_indexed_value("colwall", (num * 10) + num2)
-							machine.output:set_indexed_value("colwall", (num * 10) + num2, (~state) & 1)
-							return
+					for num, col in pairs(walls) do
+						for num2, wall in pairs(col[2]) do
+							machine.output:set_indexed_value("colwall", (num * 10) + num2, 0)
 						end
 					end
-				end
-			end
-			for num, row in pairs(walls) do
-				if row[1] < y and (row[1] + 2.5) > y then
-					for num2, wall in pairs(row[2]) do
-						if wall < x and (wall + 7.5) > x then
-							local state = machine.output:get_indexed_value("rowwall", (num * 10) + num2)
-							machine.output:set_indexed_value("rowwall", (num * 10) + num2, (~state) & 1)
-							return
+					for num, row in pairs(walls) do
+						for num2, wall in pairs(row[2]) do
+							machine.output:set_indexed_value("rowwall", (num * 10) + num2, 0)
 						end
 					end
-				end
-			end
-		end
 
-		return layout
+					local view = file.views["Internal Layout"]
+					local boundsref = view.items["boundsref"]
+					local transform
+
+					view:set_recomputed_callback(
+							function ()
+								transform = boundsref.bounds
+							end)
+
+					view:set_pointer_updated_callback(
+							function (pointertype, id, device, x, y, buttons, pressed, released, clicks)
+								if ((pressed & 0x1) ~= 0) and (1 == buttons) then
+									-- convert to layout units
+									x = (x - transform.x0) / transform.width
+									y = (y - transform.y0) / transform.height
+
+									for num, col in pairs(walls) do
+										if col[1] < x and (col[1] + 2.5) > x then
+											for num2, wall in pairs(col[2]) do
+												if wall < y and (wall + 7.5) > y then
+													local state = machine.output:get_indexed_value("colwall", (num * 10) + num2)
+													machine.output:set_indexed_value("colwall", (num * 10) + num2, (~state) & 1)
+													return
+												end
+											end
+										end
+									end
+									for num, row in pairs(walls) do
+										if row[1] < y and (row[1] + 2.5) > y then
+											for num2, wall in pairs(row[2]) do
+												if wall < x and (wall + 7.5) > x then
+													local state = machine.output:get_indexed_value("rowwall", (num * 10) + num2)
+													machine.output:set_indexed_value("rowwall", (num * 10) + num2, (~state) & 1)
+													return
+												end
+											end
+										end
+									end
+								end
+							end)
+				end)
 	]]></script>
 
 
 <!-- define elements -->
 
+	<element name="empty" />
 	<element name="static_black"><rect><color red="0.07" green="0.07" blue="0.06" /></rect></element>
 	<element name="static_red"><rect><color red="0.55" green="0.1" blue="0.05" /></rect></element>
 	<element name="static_white"><rect><color red="0.8" green="0.75" blue="0.7" /></rect></element>
@@ -155,6 +130,10 @@ authors:hap, Carl
 
 	<view name="Internal Layout">
 		<bounds left="-15" right="80" top="-2.5" bottom="80" />
+
+		<!-- for script coordinate calculation -->
+		<element id="boundsref" ref="empty"><bounds x="0" y="0" width="1" height="1" /></element>
+
 		<element ref="static_black">
 			<bounds left="-16" right="81" top="-3" bottom="81" />
 		</element>

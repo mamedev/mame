@@ -13,14 +13,19 @@
 #pragma once
 
 #include "ui/menu.h"
+#include "ui/utils.h"
 
 #include "audit.h"
 
 #include "lrucache.h"
 
+#include <chrono>
 #include <map>
 #include <memory>
 #include <optional>
+#include <string_view>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 
@@ -29,6 +34,14 @@ struct ui_software_info;
 
 
 namespace ui {
+
+enum
+{
+	RP_FIRST = 0,
+	RP_IMAGES = RP_FIRST,
+	RP_INFOS,
+	RP_LAST = RP_INFOS
+};
 
 class machine_static_info;
 
@@ -113,9 +126,6 @@ protected:
 	menu_select_launch(mame_ui_manager &mui, render_container &container, bool is_swlist);
 
 	focused_menu get_focus() const { return m_focus; }
-	void set_focus(focused_menu focus) { m_focus = focus; }
-	bool next_image_view();
-	bool previous_image_view();
 
 	bool dismiss_error();
 	void set_error(reset_options ropt, std::string &&message);
@@ -127,7 +137,7 @@ protected:
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo, std::string const &part) { launch_system(ui(), driver, &swinfo, &part, nullptr); }
 
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(u32 flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void menu_activated() override;
 	virtual void menu_deactivated() override;
 
@@ -137,15 +147,10 @@ protected:
 
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
-	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float ud_arrow_width);
-
-	bool draw_error_text();
+	void draw_info_arrow(u32 flags, int line);
 
 	template <typename Filter>
-	float draw_left_panel(
-			typename Filter::type current,
-			std::map<typename Filter::type, typename Filter::ptr> const &filters,
-			float x1, float y1, float x2, float y2);
+	void draw_left_panel(u32 flags, typename Filter::type current, std::map<typename Filter::type, typename Filter::ptr> const &filters);
 
 	// icon helpers
 	void check_for_icons(char const *listname);
@@ -164,8 +169,11 @@ protected:
 		return (uintptr_t(selected_ref) > m_skip_main_items) ? selected_ref : m_prev_selected;
 	}
 
+	bool show_left_panel() const { return !(m_panels_status & HIDE_LEFT_PANEL); }
+	bool show_right_panel() const { return !(m_panels_status & HIDE_RIGHT_PANEL); }
 	u8 right_panel() const { return m_right_panel; }
 	u8 right_image() const { return m_image_view; }
+
 	char const *right_panel_config_string() const;
 	char const *right_image_config_string() const;
 	void set_right_panel(u8 index);
@@ -189,11 +197,28 @@ protected:
 	std::string m_search;
 
 private:
+	enum class pointer_action
+	{
+		NONE,
+		MAIN_TRACK_LINE,
+		MAIN_TRACK_RBUTTON,
+		MAIN_DRAG,
+		LEFT_TRACK_LINE,
+		LEFT_DRAG,
+		RIGHT_TRACK_TAB,
+		RIGHT_TRACK_ARROW,
+		RIGHT_TRACK_LINE,
+		RIGHT_SWITCH,
+		RIGHT_DRAG,
+		TOOLBAR_TRACK,
+		DIVIDER_TRACK
+	};
+
 	using bitmap_vector = std::vector<bitmap_argb32>;
 	using texture_ptr_vector = std::vector<texture_ptr>;
 
 	using s_parts = std::unordered_map<std::string, std::string>;
-	using s_bios = std::vector<std::pair<std::string, int>>;
+	using s_bios = std::vector<std::pair<std::string, int> >;
 
 	class software_parts;
 	class bios_selection;
@@ -242,22 +267,48 @@ private:
 
 	using flags_cache = util::lru_cache_map<game_driver const *, system_flags>;
 
-	void reset_pressed() { m_pressed = false; m_repeat = 0; }
-	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
-	void set_pressed();
+	// various helpers for common calculations
+	bool main_at_top() const noexcept { return !top_line; }
+	bool main_at_bottom() const noexcept { return (top_line + m_primary_lines) >= m_available_items; }
+	bool is_main_up_arrow(int index) const noexcept { return !index && !main_at_top(); }
+	bool is_main_down_arrow(int index) const noexcept { return ((m_primary_lines - 1) == index) && !main_at_bottom(); }
+	bool left_at_top() const noexcept { return !m_left_visible_top; }
+	bool left_at_bottom() const noexcept { return (m_left_visible_top + m_left_visible_lines) >= m_left_item_count; }
+	bool is_left_up_arrow(int index) const noexcept { return !index && !left_at_top(); }
+	bool is_left_down_arrow(int index) const noexcept { return ((m_left_visible_lines - 1) == index) && !left_at_bottom(); }
+	bool info_at_top() const noexcept { return !m_topline_datsview; }
+	bool info_at_bottom() const noexcept { return (m_topline_datsview + m_right_visible_lines) >= m_total_lines; }
+
+	// getting precalculated geometry
+	float left_panel_left() const noexcept { return lr_border(); }
+	float left_panel_right() const noexcept { return lr_border() + m_left_panel_width; }
+	float right_panel_left() const noexcept { return 1.0F - lr_border() - m_right_panel_width; }
+	float right_panel_right() const noexcept { return 1.0F - lr_border(); }
+	float right_tab_width() const noexcept { return m_right_panel_width / float(RP_LAST - RP_FIRST + 1); }
+	float right_arrows_top() const noexcept { return m_right_heading_top + (0.1F * line_height()); }
+	float right_arrows_bottom() const noexcept { return m_right_heading_top + (0.9F * line_height()); }
+	float left_divider_left() const noexcept { return lr_border() + m_left_panel_width; }
+	float left_divider_right() const noexcept { return lr_border() + m_left_panel_width + m_divider_width; }
+	float right_divider_left() const noexcept { return 1.0F - lr_border() - m_right_panel_width - m_divider_width; }
+	float right_divider_right() const noexcept { return 1.0F - lr_border() - m_right_panel_width; }
 
 	bool snapx_valid() const { return m_cache.snapx_bitmap().valid(); }
 
+	void draw_divider(u32 flags, float x1, bool right);
+
 	// draw left panel
-	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
-	float draw_collapsed_left_panel(float x1, float y1, float x2, float y2);
+	virtual void draw_left_panel(u32 flags) = 0;
 
 	// draw infos
-	void infos_render(float x1, float y1, float x2, float y2);
+	void infos_render(u32 flags);
 	void general_info(ui_system_info const *system, game_driver const &driver, std::string &buffer);
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const = 0;
+
+	// show configuration menu
+	virtual void show_config_menu(int index) = 0;
+
 	virtual bool accept_search() const { return true; }
 	void select_prev()
 	{
@@ -277,38 +328,65 @@ private:
 			}
 		}
 	}
+	void set_focus(focused_menu focus) { m_focus = focus; }
 	void rotate_focus(int dir);
+	std::pair<bool, bool> next_right_panel_view();
+	std::pair<bool, bool> previous_right_panel_view();
+	std::pair<bool, bool> next_image_view();
+	std::pair<bool, bool> previous_image_view();
+	std::pair<bool, bool> next_info_view();
+	std::pair<bool, bool> previous_info_view();
 
-	void draw_toolbar(float x1, float y1, float x2, float y2);
+	void draw_toolbar(u32 flags, float x1, float y1, float x2, float y2);
 	void draw_star(float x0, float y0);
 	void draw_icon(int linenum, void *selectedref, float x1, float y1);
 	virtual render_texture *get_icon_texture(int linenum, void *selectedref) = 0;
 
-	void get_title_search(std::string &title, std::string &search);
+	std::string get_arts_searchpath();
 
 	// event handling
-	virtual void handle_keys(u32 flags, int &iptkey) override;
-	virtual void handle_events(u32 flags, event &ev) override;
+	virtual bool handle_events(u32 flags, event &ev) override;
+	virtual bool handle_keys(u32 flags, int &iptkey) override;
+	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt) override;
+
+	// pointer handling helpers
+	std::tuple<int, bool, bool> handle_primary_down(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> handle_right_down(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> handle_middle_down(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_main_track_line(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_main_track_rbutton(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_main_drag(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_left_track_line(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_left_drag(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_right_track_tab(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_right_track_arrow(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_right_track_line(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_right_switch(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_right_drag(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_toolbar_track(bool changed, ui_event const &uievt);
+	std::tuple<int, bool, bool> update_divider_track(bool changed, ui_event const &uievt);
+
+	bool main_force_visible_selection();
 
 	// draw game list
 	virtual void draw(u32 flags) override;
 
 	// draw right panel
-	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);
-	float draw_right_box_title(float x1, float y1, float x2, float y2);
+	void draw_right_panel(u32 flags);
+	void draw_right_box_tabs(u32 flags);
+	void draw_right_box_heading(u32 flags, bool larrow, bool rarrow, std::string_view text);
 
 	// images render
-	void arts_render(float origx1, float origy1, float origx2, float origy2);
-	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
-	void arts_render_images(bitmap_argb32 &&bitmap, float origx1, float origy1, float origx2, float origy2);
-	void draw_snapx(float origx1, float origy1, float origx2, float origy2);
+	void arts_render(u32 flags);
+	void arts_render_images(bitmap_argb32 &&bitmap);
+	void draw_snapx();
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
 	virtual std::string make_software_description(ui_software_info const &software, ui_system_info const *system) const = 0;
 
 	// filter navigation
-	virtual void filter_selected() = 0;
+	virtual void filter_selected(int index) = 0;
 
 	static void make_audit_fail_text(std::ostream &str, media_auditor const &auditor, media_auditor::summary summary);
 	static void launch_system(mame_ui_manager &mui, game_driver const &driver, ui_software_info const *swinfo, std::string const *part, int const *bios);
@@ -316,8 +394,20 @@ private:
 	static bool has_multiple_bios(ui_software_info const &swinfo, s_bios &biosname);
 	static bool has_multiple_bios(game_driver const &driver, s_bios &biosname);
 
-	bool show_left_panel() const;
-	bool show_right_panel() const;
+	bool check_scroll_repeat(float top, std::pair<float, float> hbounds, float height)
+	{
+		float const linetop(top + (float(m_clicked_line) * height));
+		float const linebottom(top + (float(m_clicked_line + 1) * height));
+		if (pointer_in_rect(hbounds.first, linetop, hbounds.second, linebottom))
+		{
+			if (std::chrono::steady_clock::now() >= m_scroll_repeat)
+			{
+				m_scroll_repeat += std::chrono::milliseconds(100);
+				return true;
+			}
+		}
+		return false;
+	}
 
 	bool        m_ui_error;
 	std::string m_error_text;
@@ -339,10 +429,39 @@ private:
 	cache                       &m_cache;
 	bool                        m_is_swlist;
 	focused_menu                m_focus;
-	bool                        m_pressed;              // mouse button held down
-	osd_ticks_t                 m_repeat;
 
+	pointer_action              m_pointer_action;
+	std::chrono::steady_clock::time_point m_scroll_repeat;
+	std::pair<float, float>     m_base_pointer;
+	std::pair<float, float>     m_last_pointer;
+	int                         m_clicked_line;
+	focused_menu                m_wheel_target;
+	int                         m_wheel_movement;
+
+	std::pair<float, float>     m_primary_vbounds;
+	float                       m_primary_items_top;
+	std::pair<float, float>     m_primary_items_hbounds;
+	int                         m_primary_lines;
+
+	float                       m_left_panel_width;
+	std::pair<float, float>     m_left_items_hbounds;
+	float                       m_left_items_top;
+	int                         m_left_item_count;
+	int                         m_left_visible_lines;
+	int                         m_left_visible_top;
+
+	float                       m_right_panel_width;
+	float                       m_right_tabs_bottom;
+	float                       m_right_heading_top;
+	std::pair<float, float>     m_right_content_vbounds;
+	std::pair<float, float>     m_right_content_hbounds;
 	int                         m_right_visible_lines;  // right box lines
+
+	std::pair<float, float>     m_toolbar_button_vbounds;
+	float                       m_toolbar_button_width;
+	float                       m_toolbar_button_spacing;
+	float                       m_toolbar_backtrack_left;
+	float                       m_toolbar_main_left;
 
 	u8                          m_panels_status;
 	u8                          m_right_panel;
