@@ -435,6 +435,8 @@ private:
 	std::pair<float, float>     m_base_pointer;
 	std::pair<float, float>     m_last_pointer;
 	int                         m_clicked_line;
+	focused_menu                m_wheel_target;
+	int                         m_wheel_movement;
 
 	std::pair<float, float>     m_primary_vbounds;
 	float                       m_primary_items_top;
