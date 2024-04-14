@@ -12,7 +12,7 @@ authors:hap
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="0.1" green="1.0" blue="0.15" /></disk>
-		<disk state="0"><color red="0.015" green="0.17" blue="0.02" /></disk>
+		<disk state="0"><color red="0.1" green="1.0" blue="0.15" alpha="0.13" /></disk>
 	</element>
 
 	<element name="text_1"><text string="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>

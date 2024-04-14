@@ -12,7 +12,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/hlcd0488.h"
+#include "hlcd0488.h"
 
 
 DEFINE_DEVICE_TYPE(HLCD0488, hlcd0488_device, "hlcd0488", "Hughes HLCD 0488 LCD Driver")

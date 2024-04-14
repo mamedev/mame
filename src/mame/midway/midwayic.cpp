@@ -640,14 +640,14 @@ void midway_serial_pic2_device::nvram_default()
 
 bool midway_serial_pic2_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_nvram, sizeof(m_nvram), actual) && actual == sizeof(m_nvram);
+	auto const [err, actual] = util::read(file, m_nvram, sizeof(m_nvram));
+	return !err && (actual == sizeof(m_nvram));
 }
 
 bool midway_serial_pic2_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_nvram, sizeof(m_nvram), actual) && actual == sizeof(m_nvram);
+	auto const [err, actual] = util::write(file, m_nvram, sizeof(m_nvram));
+	return !err;
 }
 
 

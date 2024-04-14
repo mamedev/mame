@@ -225,7 +225,7 @@ private:
 	required_device<i8243_device> m_i8243;
 	required_device<pwm_display_device> m_display;
 	optional_device<s14001a_device> m_speech;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<dac_1bit_device> m_dac;
 	required_ioport_array<8> m_inputs;
 
 	u32 m_barcode = 0;
@@ -715,11 +715,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, bridgec,  0,        0,      brc,     brc,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1979, bridgec,  0,        0,      brc,     brc,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1979, bridgeca, 0,        0,      brc,     brc,   card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-SYST( 1979, bridgecv, bridgeca, 0,      vbrc,    brc,   card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1979, bridgeca, 0,        0,      brc,     brc,   card_state, empty_init, "Fidelity Electronics", "Advanced Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1979, bridgecv, bridgeca, 0,      vbrc,    brc,   card_state, empty_init, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1982, bridgec3, 0,        0,      bv3,     bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1982, bridgec3, 0,        0,      bv3,     bv3,   card_state, empty_init, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1982, gincribc, 0,        0,      gin,     gin,   card_state, empty_init, "Fidelity Electronics", "Gin & Cribbage Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1982, gincribc, 0,        0,      gin,     gin,   card_state, empty_init, "Fidelity Electronics", "Gin & Cribbage Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )

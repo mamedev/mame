@@ -71,7 +71,7 @@ private:
 	required_device_array<z80pio_device, 2> m_pio;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 
 	u16 m_matrix = 0;
@@ -206,9 +206,6 @@ static INPUT_PORTS_START( chessmst )
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Halt")  PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, halt_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, reset_button, 0)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -300,5 +297,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY                                     FULLNAME                FLAGS
-SYST( 1984, chessmst,   0,        0,      chessmst,  chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, chessmsta,  chessmst, 0,      chessmsta, chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, chessmst,   0,        0,      chessmst,  chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, chessmsta,  chessmst, 0,      chessmsta, chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

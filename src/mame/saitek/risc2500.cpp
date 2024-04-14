@@ -65,20 +65,20 @@ namespace {
 class risc2500_state : public driver_device
 {
 public:
-	risc2500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_rom(*this, "maincpu")
-		, m_ram(*this, "ram")
-		, m_nvram(*this, "nvram")
-		, m_disable_bootrom(*this, "disable_bootrom")
-		, m_speaker(*this, "speaker")
-		, m_lcdc(*this, "lcdc")
-		, m_board(*this, "board")
-		, m_inputs(*this, "IN.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_syms(*this, "sym%u", 0U)
-		, m_leds(*this, "led%u", 0U)
+	risc2500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_rom(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_nvram(*this, "nvram"),
+		m_disable_bootrom(*this, "disable_bootrom"),
+		m_speaker(*this, "speaker"),
+		m_lcdc(*this, "lcdc"),
+		m_board(*this, "board"),
+		m_inputs(*this, "IN.%u", 0),
+		m_digits(*this, "digit%u", 0U),
+		m_syms(*this, "sym%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
@@ -386,10 +386,10 @@ static INPUT_PORTS_START( risc2500 )
 
 	PORT_START("IN.5")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King")     PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Play")     PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Play")     PORT_CODE(KEYCODE_P)
 
 	PORT_START("IN.6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RIGHT")    PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right")    PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game") PORT_CODE(KEYCODE_N)
 
 	PORT_START("IN.7")
@@ -498,7 +498,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+SYST( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-SYST( 1995, montreux,  0,        0,      montreux, montreux, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // after Saitek bought Hegener + Glaser
+SYST( 1995, montreux,  0,        0,      montreux, montreux, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // after Saitek bought Hegener + Glaser

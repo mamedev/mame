@@ -13,9 +13,6 @@ NVRAM won't save properly.
 
 TODO:
 - dump/add other MCU revisions, SX8 for tmate/conquist is known to exist
-- verify if QFP SX5A has the same ROM contents as DIP SX5A
-- SX4A and SX5A read from port 2 bits 3 and 7 while DDR is 0xff, why does it work?
-  I added a simple workaround for it in p2_w
 - what is t1850's official title? "1850 Deluxe Table Chess" is from the back of
   the computer. The manual can't make up its mind and says "1850 Chess Computer",
   "1850 Chess: 16 Level Program", or "1850 Sensory Chess Game". The box disagrees
@@ -48,6 +45,8 @@ SX5(A) program is used in:
 - SciSys Turbo 16K (12MHz, ST5-PE-023 PCB)
 - Tandy (Radio Shack) 1850 60-2201A (8MHz, ST5A-PE-002 PCB)
 - Mephisto Monaco (H+G brand Express 16K)
+
+SX5A 6301Y0A97F (QFP) has the same ROM contents as 6301Y0A96P.
 
 SX8(A) program is used in:
 - Saitek Team-Mate aka Team-Mate Advanced Trainer (8MHz, ST8B-PE-017 PCB)
@@ -125,7 +124,6 @@ protected:
 
 	template <int N> void leds1_w(u8 data);
 	template <int N> void leds2_w(u8 data);
-	void p2_w(u8 data);
 	void p2l_w(u8 data);
 	virtual void p3_w(u8 data);
 	virtual u8 p5_r();
@@ -151,6 +149,7 @@ INPUT_CHANGED_MEMBER(turbo16k_state::change_cpu_freq)
 	static const u32 freq[4] = { 4'000'000, 8'000'000, 12'000'000, 16'000'000 };
 	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,4,0)]);
 }
+
 
 // Conquistador
 
@@ -203,15 +202,6 @@ void turbo16k_state::leds2_w(u8 data)
 {
 	// P2x, P6x, P7x: status leds (direct)
 	m_display->write_row(N + 3, ~data);
-}
-
-void turbo16k_state::p2_w(u8 data)
-{
-	// P24,P25: status leds
-	leds2_w<0>(data);
-
-	// HACK: force DDR2 to be 0x77
-	m_maincpu->space(AS_PROGRAM).write_byte(0x01, 0x77);
 }
 
 void turbo16k_state::p3_w(u8 data)
@@ -283,7 +273,8 @@ void turbo16k_state::lcd_enable(u8 enable)
 
 void turbo16k_state::p2l_w(u8 data)
 {
-	p2_w(data);
+	// P24,P25: status leds
+	leds2_w<0>(data);
 
 	// P20,P21: LCD clocks enabled
 	lcd_enable(~data & 3);
@@ -339,7 +330,7 @@ static INPUT_PORTS_START( turbo16k )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Set Up")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Play")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Multi Move")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
@@ -377,7 +368,7 @@ static INPUT_PORTS_START( conquist )
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Non Auto")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Play")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
@@ -425,7 +416,8 @@ void turbo16k_state::compan3(machine_config &config)
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	m_maincpu->out_p1_cb().set(FUNC(turbo16k_state::leds1_w<0>));
 	m_maincpu->in_p2_cb().set_ioport("FREQ");
-	m_maincpu->out_p2_cb().set(FUNC(turbo16k_state::p2_w));
+	m_maincpu->in_p2_override_mask(0x88); // SX4A and SX5A rely on this
+	m_maincpu->out_p2_cb().set(FUNC(turbo16k_state::leds2_w<0>));
 	m_maincpu->out_p3_cb().set(FUNC(turbo16k_state::p3_w));
 	m_maincpu->out_p4_cb().set(FUNC(turbo16k_state::leds1_w<1>));
 	m_maincpu->in_p5_cb().set(FUNC(turbo16k_state::p5_r));
@@ -513,10 +505,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys", "Turbo 16K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys", "Companion III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys / Heuristic Software", "Turbo 16K", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys / Heuristic Software", "Companion III", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, conquist, 0,        0,      conquist, conquist, conquist_state, empty_init, "Saitek", "Kasparov Conquistador", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, tmate,    conquist, 0,      tmate,    tmate,    conquist_state, empty_init, "Saitek", "Kasparov Team-Mate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, conquist, 0,        0,      conquist, conquist, conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Conquistador", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, tmate,    conquist, 0,      tmate,    tmate,    conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Team-Mate", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, t1850,    0,        0,      t1850,    t1850,    turbo16k_state, empty_init, "Tandy Corporation / SciSys", "1850 Deluxe Table Chess (model 60-2199)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, t1850,    0,        0,      t1850,    t1850,    turbo16k_state, empty_init, "Tandy Corporation / SciSys / Heuristic Software", "1850 Deluxe Table Chess (model 60-2199)", MACHINE_SUPPORTS_SAVE )

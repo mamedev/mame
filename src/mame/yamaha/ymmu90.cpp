@@ -83,9 +83,9 @@ private:
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 
-	void pa_w(u16 data);
-	void pb_w(u16 data);
-	u16 pb_r();
+	void pa_w(u8 data);
+	void pb_w(u8 data);
+	u8 pb_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -140,12 +140,12 @@ u16 mu90_state::adc_battery_r()
 	return 0x200;
 }
 
-void mu90_state::pb_w(u16 data)
+void mu90_state::pb_w(u8 data)
 {
 	cur_pb = data;
 }
 
-u16 mu90_state::pb_r()
+u8 mu90_state::pb_r()
 {
 	u8 res = 0xff;
 	if((cur_pa & 0x20)) {
@@ -167,7 +167,7 @@ u16 mu90_state::pb_r()
 	return res;
 }
 
-void mu90_state::pa_w(u16 data)
+void mu90_state::pa_w(u8 data)
 {
 	if(!(cur_pa & 0x01) && (data & 0x01)) {
 		m_lcd->set_contrast(cur_pb & 7);
@@ -175,7 +175,7 @@ void mu90_state::pa_w(u16 data)
 		logerror("ad2 input level %s\n", cur_pb & 0x40 ? "line" : "mic");
 	}
 
-	if(!(cur_pa & 0x20) && (data & 0x20)) {
+	if((cur_pa & 0x20) && !(data & 0x20)) {
 		if(!(cur_pa & 0x40)) {
 			if(cur_pa & 0x02)
 				m_lcd->data_write(cur_pb);

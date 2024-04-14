@@ -68,7 +68,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 
 	bool m_power = false;
@@ -248,4 +248,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R / Intelligent Software", u8"La Régence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R / Intelligent Software", u8"La Régence", MACHINE_SUPPORTS_SAVE )

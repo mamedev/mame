@@ -73,8 +73,7 @@ void h8s2245_device::map(address_map &map)
 	map(0xfffebd, 0xfffebd).w(m_porte, FUNC(h8_port_device::ddr_w));
 	map(0xfffebe, 0xfffebe).w(m_portf, FUNC(h8_port_device::ddr_w));
 	map(0xfffebf, 0xfffebf).w(m_portg, FUNC(h8_port_device::ddr_w));
-	map(0xfffec0, 0xfffec1).rw(m_intc, FUNC(h8s_intc_device::icr_r), FUNC(h8s_intc_device::icr_w));
-	map(0xfffec2, 0xfffec2).rw(m_intc, FUNC(h8s_intc_device::icrc_r), FUNC(h8s_intc_device::icrc_w));
+	map(0xfffec0, 0xfffec2).rw(m_intc, FUNC(h8s_intc_device::icr_r), FUNC(h8s_intc_device::icr_w));
 	map(0xffff2c, 0xffff2c).rw(m_intc, FUNC(h8s_intc_device::iscrh_r), FUNC(h8s_intc_device::iscrh_w));
 	map(0xffff2d, 0xffff2d).rw(m_intc, FUNC(h8s_intc_device::iscrl_r), FUNC(h8s_intc_device::iscrl_w));
 	map(0xffff2e, 0xffff2e).rw(m_intc, FUNC(h8s_intc_device::ier_r), FUNC(h8s_intc_device::ier_w));
@@ -190,36 +189,36 @@ void h8s2245_device::device_add_mconfig(machine_config &config)
 	H8_PORT(config, m_porte, *this, h8_device::PORT_E, 0x00, 0x00);
 	H8_PORT(config, m_portf, *this, h8_device::PORT_F, 0x00, 0x00);
 	H8_PORT(config, m_portg, *this, h8_device::PORT_G, 0xe0, 0x00);
-	H8H_TIMER8_CHANNEL(config, m_timer8_0, *this, m_intc, 64, 65, 66, m_timer8_1, h8_timer8_channel_device::CHAIN_OVERFLOW, true,  false);
-	H8H_TIMER8_CHANNEL(config, m_timer8_1, *this, m_intc, 68, 69, 70, m_timer8_0, h8_timer8_channel_device::CHAIN_A,        false, false);
+	H8H_TIMER8_CHANNEL(config, m_timer8_0, *this, m_intc, 64, 65, 66, m_timer8_1, h8_timer8_channel_device::CHAIN_OVERFLOW, true, false);
+	H8H_TIMER8_CHANNEL(config, m_timer8_1, *this, m_intc, 68, 69, 70, m_timer8_0, h8_timer8_channel_device::CHAIN_A, false, false);
 	H8_TIMER16(config, m_timer16, *this, 3, 0x00);
 	H8S_TIMER16_CHANNEL(config, m_timer16_0, *this, 4, 0x60, m_intc, 32,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::INPUT_D);
+			h8_timer16_channel_device::DIV_1,
+			h8_timer16_channel_device::DIV_4,
+			h8_timer16_channel_device::DIV_16,
+			h8_timer16_channel_device::DIV_64,
+			h8_timer16_channel_device::INPUT_A,
+			h8_timer16_channel_device::INPUT_B,
+			h8_timer16_channel_device::INPUT_C,
+			h8_timer16_channel_device::INPUT_D);
 	H8S_TIMER16_CHANNEL(config, m_timer16_1, *this, 2, 0x4c, m_intc, 40,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::DIV_256,
-									h8_timer16_channel_device::CHAIN).set_chain(m_timer16_2);
+			h8_timer16_channel_device::DIV_1,
+			h8_timer16_channel_device::DIV_4,
+			h8_timer16_channel_device::DIV_16,
+			h8_timer16_channel_device::DIV_64,
+			h8_timer16_channel_device::INPUT_A,
+			h8_timer16_channel_device::INPUT_B,
+			h8_timer16_channel_device::DIV_256,
+			h8_timer16_channel_device::CHAIN).set_chain(m_timer16_2);
 	H8S_TIMER16_CHANNEL(config, m_timer16_2, *this, 2, 0x4c, m_intc, 44,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::DIV_1024);
+			h8_timer16_channel_device::DIV_1,
+			h8_timer16_channel_device::DIV_4,
+			h8_timer16_channel_device::DIV_16,
+			h8_timer16_channel_device::DIV_64,
+			h8_timer16_channel_device::INPUT_A,
+			h8_timer16_channel_device::INPUT_B,
+			h8_timer16_channel_device::INPUT_C,
+			h8_timer16_channel_device::DIV_1024);
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 80, 81, 82, 83);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 84, 85, 86, 87);
 	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);
@@ -300,10 +299,27 @@ void h8s2245_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void h8s2245_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_sci[2]->notify_standby(state);
+	m_timer8_0->notify_standby(state);
+	m_timer8_1->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_timer16_1->notify_standby(state);
+	m_timer16_2->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h8s2245_device::device_start()
 {
 	h8s2000_device::device_start();
 	m_dtc_device = m_dtc;
+
+	save_item(NAME(m_syscr));
+	save_item(NAME(m_mstpcr));
 }
 
 void h8s2245_device::device_reset()

@@ -282,7 +282,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
-	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
+	m_pia->cb2_handler().set("dac", FUNC(dac_1bit_device::write));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -324,4 +324,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sphinx 40", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sphinx 40", MACHINE_SUPPORTS_SAVE )

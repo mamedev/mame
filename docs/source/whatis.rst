@@ -19,7 +19,7 @@ that were its initial focus.
 
 |
 | **MAME®**
-| **Copyright © 1997-2023 MAMEdev and contributors**
+| **Copyright © 1997-2024 MAMEdev and contributors**
 | **MAME is a registered trademark of Gregory Ember**
 |
 

@@ -142,7 +142,7 @@ void vl1_state::main_w(u16 data)
 				 BIT(data, 7),
 				 BIT(data, 8, 2),
 				 BIT(data, 15));
-	
+
 	m_main_ctrl = data;
 	m_subcpu1->set_input_line(INPUT_LINE_HALT, !BIT(data, 8));
 	m_subcpu2->set_input_line(INPUT_LINE_HALT, !BIT(data, 9));
@@ -159,7 +159,7 @@ void vl1_state::sub1_w(u16 data)
 		logerror("sub1_w dsp = %d %d\n",
 				 BIT(data, 0),
 				 BIT(data, 1));
-	
+
 	m_sub1_ctrl = data;
 	m_dspv2->set_input_line(INPUT_LINE_RESET, !BIT(data, 0));
 	m_dspv3->set_input_line(INPUT_LINE_RESET, !BIT(data, 1));
@@ -175,7 +175,7 @@ void vl1_state::sub2_w(u16 data)
 	if(1)
 		logerror("sub2_w dsp = %d\n",
 				 BIT(data, 0));
-	
+
 	m_sub2_ctrl = data;
 	m_dspv1->set_input_line(INPUT_LINE_RESET, !BIT(data, 0));
 }

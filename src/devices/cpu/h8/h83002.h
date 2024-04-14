@@ -76,16 +76,17 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_4;
 	required_device<h8_watchdog_device> m_watchdog;
 
+	devcb_write_line::array<2> m_tend_cb;
+
 	u8 m_syscr;
 	u8 m_rtmcsr;
-
-	devcb_write_line::array<2> m_tend_cb;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(u64 current_time) override;
+	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
 

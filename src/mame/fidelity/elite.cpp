@@ -130,7 +130,7 @@ protected:
 	optional_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
@@ -174,6 +174,7 @@ INPUT_CHANGED_MEMBER(elite_state::change_cpu_freq)
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
 	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
+
 
 // EAG
 
@@ -370,7 +371,7 @@ void eag_state::eag_map(address_map &map)
 void eag_state::eag2100_map(address_map &map)
 {
 	eag_map(map);
-	map(0xa000, 0xbfff).bankr("rombank");
+	map(0xa000, 0xbfff).bankr(m_rombank);
 }
 
 
@@ -1088,22 +1089,22 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fpresa,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fpresb,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fpresc,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fpresd,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fprese,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresa,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresb,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresc,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 4)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresd,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 5)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fprese,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, feag,      0,      0,      eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, feag,      0,      0,      eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE )

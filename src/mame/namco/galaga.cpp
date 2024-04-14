@@ -2397,6 +2397,17 @@ Notes:
                     0400 (DIP28): Motion Object and Scratch RAM to CPU Bus Interface IC
                     0702 (DIP28): Sync Generator/Clock Divider IC
 
+There's also a Sidam version of Galaga (Sidam PCB 11200, official license for the Italian market),
+but, unlike Sidam's Dig Dug, this one does not use any unique ROM, but a mix between the two Namco sets:
+     bottom-10_2532.4d  = gg1_11.4d  galaga   Galaga (Namco rev. B)
+     bottom-8_2532.4h   = gg1_9.4l   galaga   Galaga (Namco rev. B)
+     bottom-9_2532.4f   = gg1_10.4f  galaga   Galaga (Namco rev. B)
+     top-0_2532.3n      = gg1-1.3p   galagao  Galaga (Namco)
+     top-1_2532.3m      = gg1-2.3m   galagao  Galaga (Namco)
+     top-2_2532.3l      = gg1_3.2m   galaga   Galaga (Namco rev. B)
+     top-3_2532.3k      = gg1-4.2l   galagao  Galaga (Namco)
+     top-4_2532.3j      = gg1_5b.3f  galaga   Galaga (Namco rev. B)
+     top-6_2532.3e      = gg1_7b.2c  galaga   Galaga (Namco rev. B)
 */
 
 ROM_START( galaga )

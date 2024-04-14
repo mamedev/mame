@@ -319,6 +319,7 @@ Common options supported:
 Additional options:
 
 * ``--outputbin <file>`` / ``-ob <file>``
+* ``--splitbin`` / ``-sb``
 
 extractdvd
 ~~~~~~~~~~

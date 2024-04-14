@@ -56,9 +56,9 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_off);
-
 	void constjr(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 protected:
 	virtual void machine_start() override;
@@ -69,7 +69,7 @@ private:
 	required_device<hd6301v1_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	emu_timer *m_standbytimer;
@@ -237,4 +237,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, constjr, 0,      0,      constjr, constjr, constjr_state, empty_init, "Novag", "Constellation Junior", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, constjr, 0,      0,      constjr, constjr, constjr_state, empty_init, "Novag Industries", "Constellation Junior", MACHINE_SUPPORTS_SAVE )

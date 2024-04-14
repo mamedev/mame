@@ -11,12 +11,13 @@ a power on/reset (F3).
 
 It's the 'sequel' to Simultano, and the first chess computer with a H8 CPU. Even
 though H8 is much faster than 6502, it plays weaker, probably due to less RAM.
+And/or it could also be due to the programmer(s) being unfamiliar with H8.
 
 Hardware notes:
 - PCB label: ST9A-PE-001
 - Hitachi H8/325 MCU, 20MHz XTAL
 - Epson SED1502F, LCD screen (same as simultano)
-- piezo, 16+3 leds, button sensors chessboard
+- piezo, 16+3 LEDs, button sensors chessboard
 
 In 1992, it was also sold by Tandy as Chess Champion 2150L, still manufactured
 by Saitek. Overall, the hardware is the same, but with a slower CPU (16MHz XTAL).
@@ -76,12 +77,10 @@ private:
 
 	u8 m_lcd_data = 0;
 	u8 m_lcd_address = 0;
-	u8 m_lcd_write = 0;
+	u8 m_lcd_control = 0;
 	u8 m_inp_mux = 0;
 	u8 m_led_select = 0;
 	u8 m_led_direct = 0;
-
-	void main_map(address_map &map);
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -92,6 +91,7 @@ private:
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
+	u8 p3_r();
 	void p3_w(u8 data);
 	void p4_w(u8 data);
 	u8 p5_r();
@@ -107,7 +107,7 @@ void prisma_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_address));
-	save_item(NAME(m_lcd_write));
+	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_direct));
@@ -117,7 +117,7 @@ INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
 {
 	// 12MHz and 24MHz versions don't exist, but the software supports it
 	static const XTAL freq[4] = { 16_MHz_XTAL, 20_MHz_XTAL, 24_MHz_XTAL, 12_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,7,0)] / 2);
+	m_maincpu->set_unscaled_clock(freq[bitswap<2>(newval,7,0)]);
 }
 
 
@@ -179,8 +179,7 @@ void prisma_state::p1_w(u8 data)
 	// P14: speaker out
 	m_dac->level_w(BIT(data, 4));
 
-	// P16: ext power
-	// (no need to emulate it)
+	// P16: ext power (no need to emulate it)
 }
 
 void prisma_state::p2_w(u8 data)
@@ -188,6 +187,13 @@ void prisma_state::p2_w(u8 data)
 	// P20-P27: input mux, led data
 	m_inp_mux = bitswap<8>(~data,7,6,5,4,0,3,1,2);
 	update_leds();
+}
+
+u8 prisma_state::p3_r()
+{
+	// P30-P37: LCD data (never reads here)
+	logerror("read from LCD\n");
+	return 0xff;
 }
 
 void prisma_state::p3_w(u8 data)
@@ -201,16 +207,16 @@ void prisma_state::p4_w(u8 data)
 	// P40: LCD CS
 	// P41: LCD RD
 	// P42: LCD WR
-	if (~data & m_lcd_write && ~data & 1)
+	if (~data & m_lcd_control & 4 && ~data & 1)
 		m_lcd->write(m_lcd_address, m_lcd_data);
-	m_lcd_write = data & 4;
+	m_lcd_control = data;
 }
 
 u8 prisma_state::p5_r()
 {
 	u8 data = 0;
 
-	// P50,P52: read buttons
+	// P50-P52: read buttons
 	for (int i = 0; i < 3; i++)
 		if (m_inp_mux & m_inputs[i]->read())
 			data |= 1 << i;
@@ -244,17 +250,6 @@ u8 prisma_state::p7_r()
 			data |= m_board->read_file(i);
 
 	return bitswap<8>(~data,6,5,3,2,0,1,7,4);
-}
-
-
-
-/*******************************************************************************
-    Address Maps
-*******************************************************************************/
-
-void prisma_state::main_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
 }
 
 
@@ -314,14 +309,15 @@ void prisma_state::prisma(machine_config &config)
 {
 	// basic machine hardware
 	H8325(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &prisma_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->nvram_set_default_value(~0);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
 	m_maincpu->standby_cb().append(FUNC(prisma_state::standby));
 	m_maincpu->write_port1().set(FUNC(prisma_state::p1_w));
 	m_maincpu->write_port2().set(FUNC(prisma_state::p2_w));
+	m_maincpu->read_port3().set(FUNC(prisma_state::p3_r));
 	m_maincpu->write_port3().set(FUNC(prisma_state::p3_w));
+	m_maincpu->read_port4().set_constant(0xff);
 	m_maincpu->write_port4().set(FUNC(prisma_state::p4_w));
 	m_maincpu->read_port5().set(FUNC(prisma_state::p5_r));
 	m_maincpu->write_port5().set(FUNC(prisma_state::p5_w));
@@ -359,7 +355,7 @@ void prisma_state::prisma(machine_config &config)
 *******************************************************************************/
 
 ROM_START( prisma )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
 	ROM_LOAD("90_saitek_86051150st9_3258l02p.u1", 0x0000, 0x8000, CRC(b6f8384f) SHA1(a4e8a4a45009c15bda1778512a87dea756aae6d8) )
 
 	ROM_REGION( 795951, "screen", 0 )
@@ -375,4 +371,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek / Heuristic Software", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE )

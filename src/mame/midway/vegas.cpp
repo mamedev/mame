@@ -884,7 +884,7 @@ void vegas_state::cpu_io_w(offs_t offset, uint8_t data)
 		case 0xfe: digit = '-'; break;
 		case 0xff: digit = 'Z'; break;
 		}
-		//popmessage("System LED: %C", digit);
+		//popmessage("System LED: %c", digit);
 		LOGMASKED(LOG_SIO, "%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
 		break;
 	}

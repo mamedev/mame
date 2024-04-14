@@ -750,7 +750,7 @@ GFXDECODE_END
 
 void pgm2_state::pgm2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
 
@@ -758,7 +758,7 @@ void pgm2_state::pgm2(machine_config &config)
 
 	ARM_AIC(config, m_arm_aic, 0).irq_callback().set(FUNC(pgm2_state::irq));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(59.08)); // 59.08Hz, 264 total lines @ 15.59KHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -1193,6 +1193,35 @@ ROM_START( kof98umh )
 	KOF98UMH_VIDEO_SOUND_ROMS
 ROM_END
 
+// Single board game (PCB-0779-00-JG)
+ROM_START( bubucar )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "bu_bu_car-en_b5_internal_rom.u12", 0x00000000, 0x0004000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "bubu-car-s1c0en_ev29lv160ab.u23",  0x00000000, 0x0200000, CRC(4c5009ef) SHA1(5b0c96d7bd1243523eb3670b7545cc7455b2d668) )
+
+	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASE00 )
+	ROM_LOAD( "jg_text.u31",                      0x00000000, 0x0200000, NO_DUMP ) // EN29LV160AB-70TCP
+
+	ROM_REGION( 0x2000000, "bgtile", ROMREGION_ERASE00 )
+	// BGL/BGH unpopulated (no background tilemap)
+
+	ROM_REGION( 0x08000000, "sprites_mask", 0 )
+	ROM_LOAD32_WORD( "jg_map_bml.u38",            0x00000000, 0x4000000, NO_DUMP ) // K8Q2815UQB
+	ROM_LOAD32_WORD( "jg_map_bmh.u37",            0x00000002, 0x4000000, NO_DUMP ) // K8Q2815UQB
+
+	ROM_REGION( 0x20000000, "sprites_colour", 0 )
+	ROM_LOAD32_WORD( "jg_cg_cgl.u19",             0x00000000, 0x4000000, NO_DUMP ) // K8Q2815UQB
+	ROM_LOAD32_WORD( "jg_cg_cgh.u20",             0x00000002, 0x4000000, NO_DUMP ) // K8Q2815UQB
+
+	ROM_REGION( 0x08000000, "ymz774", ROMREGION_ERASEFF ) // YMZ774
+	ROM_LOAD16_WORD_SWAP( "jg_wave.u18",          0x00000000, 0x4000000, NO_DUMP ) // K8Q2815UQB
+
+	ROM_REGION( 0x10000, "sram", 0 )
+	ROM_LOAD( "bubucar_en_sram",                  0x00000000, 0x0010000, NO_DUMP )
+ROM_END
+
 static void iga_u16_decode(u16 *rom, int len, int ixor)
 {
 	int i;
@@ -1249,10 +1278,10 @@ static void sprite_colour_decode(u16* rom, int len)
 
 	for (i = 0; i < len / 2; i++)
 	{
-		rom[i] = bitswap<16>(rom[i], 15, 14, /* unused - 6bpp */
+		rom[i] = bitswap<16>(rom[i], 15, 14, // unused - 6bpp
 								   13, 12, 11,
 								   5, 4, 3,
-								   7, 6, /* unused - 6bpp */
+								   7, 6, // unused - 6bpp
 								   10, 9, 8,
 								   2, 1, 0  );
 	}
@@ -1468,25 +1497,31 @@ void pgm2_state::init_kof98umh()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
 }
 
+void pgm2_state::init_bubucar()
+{
+	common_encryption_init();
+	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::bubucar_speedup_r))); TODO: once this is fully dumped and decrypted
+}
 
 
 
 
-/* PGM2 */
+
+// PGM2
 
 //华通电子/Huatong Electronics (distributor of orleg2, kov2nl in china) = 华通科技/Huatong Technology (distributor of kov3 in china),
 //Same company but they changed name.
 
 // Oriental Legend 2 - should be a V102 and V100 too
-//西游释厄传2/Xīyóu shì è chuán 2 (China; Simplified Chinese)
+//西游释厄传2/Xīyóu shì è zhuàn 2 (China; Simplified Chinese)
 //西遊釋厄傳2/Saiyū Shakuyakuden 2 (Japan; Traditional Chinese - Taiwan(undumped) too?)
-GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
+GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) // Overseas sets of OL2 do not use the card reader
 GAME( 2007, orleg2_103,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_101,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2007, orleg2_104jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_103jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
@@ -1517,6 +1552,8 @@ GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, 
 
 // King of Fighters '98: Ultimate Match Hero
 GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, init_bubucar,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_IS_SKELETON ) // Only the program ROM is dumped
 
 // ジグソーワールドアリーナ/Jigsaw World Arena
 

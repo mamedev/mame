@@ -135,8 +135,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-// video
-
 TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
 {
 	int const code = m_tileram[tile_index * 2 + 1] | (m_tileram[tile_index * 2] << 8);
@@ -226,8 +224,6 @@ uint32_t speedspn_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 uint8_t speedspn_state::irq_ack_r()
 {

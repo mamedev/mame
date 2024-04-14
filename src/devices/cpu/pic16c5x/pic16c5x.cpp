@@ -398,7 +398,7 @@ void pic16c5x_device::push_stack(u16 data)
 u8 pic16c5x_device::get_regfile(u8 addr) // Read from internal memory
 {
 	if (addr == 0) { // Indirect addressing
-		addr = m_FSR & m_data_mask;
+		addr = m_FSR;
 	} else if (m_data_width != 5) {
 		addr |= (m_FSR & 0x60); // FSR bits 6-5 are used for banking in direct mode
 	}
@@ -409,7 +409,7 @@ u8 pic16c5x_device::get_regfile(u8 addr) // Read from internal memory
 void pic16c5x_device::store_regfile(u8 addr, u8 data) // Write to internal memory
 {
 	if (addr == 0) { // Indirect addressing
-		addr = m_FSR & m_data_mask;
+		addr = m_FSR;
 	} else if (m_data_width != 5) {
 		addr |= (m_FSR & 0x60); // FSR bits 6-5 are used for banking in direct mode
 	}
@@ -468,13 +468,13 @@ void pic16c5x_device::status_w(u8 data)
 
 u8 pic16c5x_device::fsr_r()
 {
-	return m_FSR;
+	// high bits are 1
+	return m_FSR | u8(~m_data_mask);
 }
 
 void pic16c5x_device::fsr_w(u8 data)
 {
-	// high bits are 1
-	m_FSR = data | u8(~m_data_mask);
+	m_FSR = data & m_data_mask;
 }
 
 u8 pic16c5x_device::porta_r()
@@ -1048,7 +1048,7 @@ void pic16c5x_device::device_start()
 		if (m_picmodel != 0x16C54 && m_picmodel != 0x16C56 && m_picmodel != 0x16C58)
 			state_add( PIC16C5x_TRSC, "TRSC", m_port_tris[PORTC]).formatstr("%02X");
 	}
-	state_add( PIC16C5x_FSR,  "FSR",  m_debugger_temp).mask(0xff).callimport().callexport().formatstr("%02X");
+	state_add( PIC16C5x_FSR,  "FSR",  m_debugger_temp).mask(m_data_mask).formatstr("%02X");
 	state_add( PIC16C5x_PSCL, "PSCL", m_debugger_temp).callimport().formatstr("%3s");
 
 	state_add( STATE_GENPC, "GENPC", m_PC).noshow();
@@ -1081,9 +1081,6 @@ void pic16c5x_device::state_import(const device_state_entry &entry)
 		case PIC16C5x_PRTD:
 			m_port_data[PORTD] = m_debugger_temp;
 			break;
-		case PIC16C5x_FSR:
-			m_FSR = m_debugger_temp | u8(~m_data_mask);
-			break;
 		case PIC16C5x_PSCL:
 			m_prescaler = m_debugger_temp;
 			break;
@@ -1112,9 +1109,6 @@ void pic16c5x_device::state_export(const device_state_entry &entry)
 		case PIC16C5x_PRTD:
 			m_debugger_temp = m_port_data[PORTD];
 			break;
-		case PIC16C5x_FSR:
-			m_debugger_temp = m_FSR | u8(~m_data_mask);
-			break;
 	}
 }
 
@@ -1129,15 +1123,15 @@ void pic16c5x_device::state_string_export(const device_state_entry &entry, std::
 		case STATE_GENFLAGS:
 			str = string_format("%01x%c%c%c%c%c %c%c%c%03x",
 				(m_STATUS & 0xe0) >> 5,
-				m_STATUS & 0x10 ? '.':'O',      // WDT Overflow
-				m_STATUS & 0x08 ? 'P':'D',      // Power/Down
-				m_STATUS & 0x04 ? 'Z':'.',      // Zero
-				m_STATUS & 0x02 ? 'c':'b',      // Nibble Carry/Borrow
-				m_STATUS & 0x01 ? 'C':'B',      // Carry/Borrow
+				m_STATUS & 0x10 ? '.':'O', // WDT Overflow
+				m_STATUS & 0x08 ? 'P':'D', // Power/Down
+				m_STATUS & 0x04 ? 'Z':'.', // Zero
+				m_STATUS & 0x02 ? 'c':'b', // Nibble Carry/Borrow
+				m_STATUS & 0x01 ? 'C':'B', // Carry/Borrow
 
-				m_OPTION & 0x20 ? 'C':'T',    // Counter/Timer
-				m_OPTION & 0x10 ? 'N':'P',    // Negative/Positive
-				m_OPTION & 0x08 ? 'W':'T',    // WatchDog/Timer
+				m_OPTION & 0x20 ? 'C':'T', // Counter/Timer
+				m_OPTION & 0x10 ? 'N':'P', // Negative/Positive
+				m_OPTION & 0x08 ? 'W':'T', // WatchDog/Timer
 				m_OPTION & 0x08 ? (1<<(m_OPTION&7)) : (2<<(m_OPTION&7)));
 			break;
 	}
@@ -1182,8 +1176,6 @@ void pic16c5x_device::device_reset()
 	reset_regs();
 	CLR(m_STATUS, PA_REG);
 	SET(m_STATUS, TO_FLAG | PD_FLAG);
-	store_regfile(3, m_STATUS);
-	store_regfile(4, m_FSR);
 }
 
 

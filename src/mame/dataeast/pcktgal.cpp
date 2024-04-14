@@ -93,8 +93,6 @@ private:
 };
 
 
-// video
-
 
 void pcktgal_state::palette(palette_device &palette) const
 {
@@ -168,8 +166,6 @@ uint32_t pcktgal_state::screen_update_bootleg(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************/
 

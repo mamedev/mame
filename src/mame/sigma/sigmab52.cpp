@@ -125,7 +125,7 @@
   0x6030 - 0x6030    ; Audio CPU IRQ ack
   0x6050 - 0x6050    ; Sound latch
 
-  0x6060 - 0x6061    ; YM3812 
+  0x6060 - 0x6061    ; YM3812
 
   0x8000 - 0xFFFF    ; ROM space.
 

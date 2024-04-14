@@ -174,7 +174,7 @@ authors:hap
 		<element ref="text_s3"><bounds x="-3.9" y="32.15" width="3.5" height="0.9" /></element>
 
 		<element ref="static_black2"><bounds x="-6.5" y="29.125" width="0.5" height="4.5" /></element>
-		<element ref="nothing" inputtag="IN.6" inputmask="0x00" inputraw="yes"><bounds x="-7.25" y="29.125" width="2" height="4.5" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="-7.25" y="29.125" width="2" height="4.5" /></element>
 		<element ref="switch0" inputtag="IN.6" inputmask="0x03" inputraw="yes"><bounds x="-7" y="29.625" width="1.5" height="1" /></element>
 		<element ref="switch1" inputtag="IN.6" inputmask="0x03" inputraw="yes"><bounds x="-7" y="30.875" width="1.5" height="1" /></element>
 		<element ref="switch2" inputtag="IN.6" inputmask="0x03" inputraw="yes"><bounds x="-7" y="32.125" width="1.5" height="1" /></element>
@@ -207,7 +207,7 @@ authors:hap
 		<element ref="text_4"><bounds x="50.25" y="34.65" width="1" height="0.9" /></element>
 
 		<element ref="static_black2"><bounds x="53" y="16.875" width="0.5" height="7" /></element>
-		<element ref="nothing" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds x="52.25" y="16.875" width="2" height="7" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="52.25" y="16.875" width="2" height="7" /></element>
 		<element ref="switch0" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="17.375" width="1.5" height="1" /></element>
 		<element ref="switch8" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="18.625" width="1.5" height="1" /></element>
 		<element ref="switch4" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="19.875" width="1.5" height="1" /></element>
@@ -215,7 +215,7 @@ authors:hap
 		<element ref="switch1" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="22.375" width="1.5" height="1" /></element>
 
 		<element ref="static_black2"><bounds x="53" y="29.125" width="0.5" height="7" /></element>
-		<element ref="nothing" inputtag="IN.4" inputmask="0x00" inputraw="yes"><bounds x="52.25" y="29.125" width="2" height="7" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="52.25" y="29.125" width="2" height="7" /></element>
 		<element ref="switch0" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="29.625" width="1.5" height="1" /></element>
 		<element ref="switch2" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="30.875" width="1.5" height="1" /></element>
 		<element ref="switch4" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="32.125" width="1.5" height="1" /></element>

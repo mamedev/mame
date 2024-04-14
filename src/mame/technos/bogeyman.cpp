@@ -88,8 +88,6 @@ private:
 };
 
 
-// video
-
 void bogeyman_state::palette(palette_device &palette) const
 {
 	uint8_t const *color_prom = memregion("proms")->base();
@@ -215,8 +213,6 @@ uint32_t bogeyman_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 // Read/Write Handlers
 

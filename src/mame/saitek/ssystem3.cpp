@@ -123,7 +123,7 @@ private:
 	required_device<md4332b_device> m_lcd1;
 	optional_device_array<hlcd0438_device, 2> m_lcd2;
 	optional_device_array<pwm_display_device, 2> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_shared_ptr<u8> m_nvram;
 	optional_ioport_array<4+3> m_inputs;
 	output_finder<8, 48> m_out_lcd2;
@@ -568,5 +568,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
-SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag Industries", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE )

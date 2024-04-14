@@ -262,4 +262,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY, FULLNAME, FLAGS
-SYST( 1983, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King / Intelligent Software", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King / Intelligent Software", "Master (Chess King)", MACHINE_SUPPORTS_SAVE )

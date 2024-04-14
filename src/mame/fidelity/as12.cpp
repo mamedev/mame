@@ -77,7 +77,7 @@ private:
 	// devices/pointers
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	u16 m_inp_mux = 0;
@@ -312,8 +312,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, feleg,   0,      0,      feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, felega,  feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, felega1, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, felega2, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, felega3, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, feleg,   0,      0,      feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega,  feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega1, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega2, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega3, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE )

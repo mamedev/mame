@@ -245,8 +245,6 @@ private:
 };
 
 
-// video
-
 // General
 
 void base_state::bg_videoram_w(offs_t offset, uint8_t data)
@@ -464,8 +462,6 @@ uint32_t trckydoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void base_state::machine_start()
 {

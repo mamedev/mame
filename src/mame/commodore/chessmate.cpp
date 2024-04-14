@@ -85,7 +85,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6530_device> m_miot;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_ioport_array<5> m_inputs;
 
 	u8 m_inp_mux = 0;
@@ -318,7 +318,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1978, chmate, 0,      0,      chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, chmate, 0,      0,      chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
-SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag Industries", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE ) // 1st version (jukebox model), aka version B
+SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag Industries", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE )

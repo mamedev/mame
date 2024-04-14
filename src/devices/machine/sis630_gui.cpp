@@ -63,7 +63,7 @@ DEFINE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device, "sis630_gui", "SiS 630 GUI")
 
 sis630_gui_device::sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SIS630_GUI, tag, owner, clock)
-	, m_svga(*this, "svga")
+	, m_vga(*this, "svga")
 	, m_gui_rom(*this, "gui_rom")
 {
 	set_ids(0x10396300, 0x00, 0x030000, 0x00);
@@ -93,13 +93,13 @@ void sis630_gui_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_svga, FUNC(sis630_svga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(sis630_vga_device::screen_update));
 
-	SIS630_SVGA(config, m_svga, 0);
-	m_svga->set_screen("screen");
+	SIS630_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
 	// 64MB according to POST
 	// documentation claims 128MB, assume being wrong
-	m_svga->set_vram_size(64*1024*1024);
+	m_vga->set_vram_size(64*1024*1024);
 }
 
 void sis630_gui_device::config_map(address_map &map)
@@ -129,7 +129,7 @@ u32 sis630_gui_device::agp_id_r()
 {
 	LOGAGP("Read AGP ID [$50]\n");
 	// bits 23-16 AGP v1.0
-	// bits 15-8 0x5c NEXT_PTR (which goes to NULL terminator, heh)
+	// bits 15-8 0x5c NEXT_PTR (which goes to NULL terminator)
 	// bits 7-0 CAP_ID (0x02 for AGP)
 	return 0x00105c02;
 }
@@ -196,7 +196,7 @@ void sis630_gui_device::subvendor_w(offs_t offset, u32 data, u32 mem_mask)
 
 void sis630_gui_device::memory_map(address_map &map)
 {
-	map(0x0000000, 0x3ffffff).rw(m_svga, FUNC(sis630_svga_device::mem_linear_r), FUNC(sis630_svga_device::mem_linear_w)).umask32(0xffffffff);
+	map(0x0000000, 0x3ffffff).rw(m_vga, FUNC(sis630_vga_device::mem_linear_r), FUNC(sis630_vga_device::mem_linear_w));
 }
 
 void sis630_gui_device::io_map(address_map &map)
@@ -216,7 +216,7 @@ void sis630_gui_device::space_io_map(address_map &map)
 	// RIO + 0x16: 301 RAMDAC
 	// RIO + 0x30/+0x40/+0x50: omitted, legacy '300/'630 VGA regs?
 	// (gamecstl definitely tries to access 0x44 index 5 for readback extension ID)
-	map(0x30, 0x5f).m(m_svga, FUNC(sis630_svga_device::io_map));
+	map(0x30, 0x5f).m(m_vga, FUNC(sis630_vga_device::io_map));
 }
 
 void sis630_gui_device::legacy_memory_map(address_map &map)
@@ -226,7 +226,7 @@ void sis630_gui_device::legacy_memory_map(address_map &map)
 
 void sis630_gui_device::legacy_io_map(address_map &map)
 {
-	map(0x03b0, 0x03df).m(m_svga, FUNC(sis630_svga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(sis630_vga_device::io_map));
 }
 
 void sis630_gui_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -264,12 +264,12 @@ void sis630_gui_device::device_reset()
 // TODO: remove these trampolines
 uint8_t sis630_gui_device::vram_r(offs_t offset)
 {
-	return downcast<sis630_svga_device *>(m_svga.target())->mem_r(offset);
+	return downcast<sis630_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void sis630_gui_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<sis630_svga_device *>(m_svga.target())->mem_w(offset, data);
+	downcast<sis630_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 /*****************************

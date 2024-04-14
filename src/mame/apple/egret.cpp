@@ -79,21 +79,21 @@ ROM_START( egret )
 	ROMX_LOAD("341s0851.bin", 0x0000, 0x1100, CRC(ea9ea6e4) SHA1(8b0dae3ec66cdddbf71567365d2c462688aeb571), ROM_BIOS(2))
 ROM_END
 
-	//-------------------------------------------------
-	//  ADDRESS_MAP
-	//-------------------------------------------------
+//-------------------------------------------------
+//  ADDRESS_MAP
+//-------------------------------------------------
 
-	void egret_device::egret_map(address_map &map)
-	{
-		map(0x0000, 0x0002).rw(FUNC(egret_device::ports_r), FUNC(egret_device::ports_w));
-		map(0x0004, 0x0006).rw(FUNC(egret_device::ddr_r), FUNC(egret_device::ddr_w));
-		map(0x0007, 0x0007).rw(FUNC(egret_device::pll_r), FUNC(egret_device::pll_w));
-		map(0x0008, 0x0008).rw(FUNC(egret_device::timer_ctrl_r), FUNC(egret_device::timer_ctrl_w));
-		map(0x0009, 0x0009).rw(FUNC(egret_device::timer_counter_r), FUNC(egret_device::timer_counter_w));
-		map(0x0012, 0x0012).rw(FUNC(egret_device::onesec_r), FUNC(egret_device::onesec_w));
-		map(0x0090, 0x00ff).ram().share(m_internal_ram); // work RAM and stack
-		map(0x0100, 0x01ff).rw(FUNC(egret_device::pram_r), FUNC(egret_device::pram_w));
-		map(0x0f00, 0x1fff).rom().region("roms", 0);
+void egret_device::egret_map(address_map &map)
+{
+	map(0x0000, 0x0002).rw(FUNC(egret_device::ports_r), FUNC(egret_device::ports_w));
+	map(0x0004, 0x0006).rw(FUNC(egret_device::ddr_r), FUNC(egret_device::ddr_w));
+	map(0x0007, 0x0007).rw(FUNC(egret_device::pll_r), FUNC(egret_device::pll_w));
+	map(0x0008, 0x0008).rw(FUNC(egret_device::timer_ctrl_r), FUNC(egret_device::timer_ctrl_w));
+	map(0x0009, 0x0009).rw(FUNC(egret_device::timer_counter_r), FUNC(egret_device::timer_counter_w));
+	map(0x0012, 0x0012).rw(FUNC(egret_device::onesec_r), FUNC(egret_device::onesec_w));
+	map(0x0090, 0x00ff).ram().share(m_internal_ram); // work RAM and stack
+	map(0x0100, 0x01ff).rw(FUNC(egret_device::pram_r), FUNC(egret_device::pram_w));
+	map(0x0f00, 0x1fff).rom().region("roms", 0);
 }
 
 
@@ -549,8 +549,8 @@ void egret_device::nvram_default()
 
 bool egret_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (!file.read(m_disk_pram, 0x100, actual) && actual == 0x100)
+	auto const [err, actual] = read(file, m_disk_pram, 0x100);
+	if (!err && (actual == 0x100))
 	{
 		LOGMASKED(LOG_PRAM, "PRAM read from disk OK");
 		m_pram_loaded = false;
@@ -561,6 +561,6 @@ bool egret_device::nvram_read(util::read_stream &file)
 
 bool egret_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_pram, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = write(file, m_pram, 0x100);
+	return !err;
 }

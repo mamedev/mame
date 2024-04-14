@@ -313,6 +313,16 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+
+private:
+	u8 bank_r();
+	void bank_w(u8 bank);
+	u8 media_change_r();
+	u8 unk_7ffc_r();
+	u8 unk_7ffd_r();
+	u8 unk_7fff_r();
+
+	memory_bank_creator m_rombank;
 };
 
 

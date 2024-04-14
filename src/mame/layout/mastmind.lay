@@ -9,22 +9,20 @@ authors:hap
 
 	<element name="mul"><rect><color red="0.5" green="0.4" blue="0.05" /></rect></element>
 
-	<element name="text_1"><text string="1"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_2"><text string="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_3"><text string="3"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_4"><text string="4"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_5"><text string="5"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_x"><text string="X"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_1"><text string="1"></text></element>
+	<element name="text_2"><text string="2"></text></element>
+	<element name="text_3"><text string="3"></text></element>
+	<element name="text_4"><text string="4"></text></element>
+	<element name="text_5"><text string="5"></text></element>
+	<element name="text_x"><text string="X"></text></element>
 
-	<element name="text_v">
-		<text string="V">
-			<bounds x="0" y="0" width="1" height="1" />
-			<color red="1" green="1" blue="1" />
-		</text>
-		<disk>
-			<bounds x="0" y="0" width="0.5" height="0.5" />
-			<color red="0" green="0" blue="0" />
-		</disk>
+	<!-- flat checkmark icon, (C) Icons8, MIT license -->
+	<element name="checkmark">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="48" height="48" viewBox="0 0 48 48">
+				<polygon fill="#ffffff" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"/>
+			</svg>
+		]]></data></image>
 	</element>
 
 	<element name="digit" defstate="0">
@@ -43,7 +41,7 @@ authors:hap
 			<element ref="text_3"><bounds x="40" y="0" width="10" height="10" /></element>
 			<element ref="text_4"><bounds x="50" y="0" width="10" height="10" /></element>
 			<element ref="text_5"><bounds x="60" y="0" width="10" height="10" /></element>
-			<element ref="text_v"><bounds x="80" y="0" width="10" height="10" /></element>
+			<element ref="checkmark"><bounds xc="85" y="0.0" width="8.5" height="9.6" /></element>
 			<element ref="text_x"><bounds x="90" y="0" width="10" height="10" /></element>
 
 			<element ref="mul" blend="multiply"><bounds x="8" y="0" width="94" height="28" /></element>

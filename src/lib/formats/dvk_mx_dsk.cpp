@@ -103,8 +103,7 @@ int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const s
 	if (track_count)
 	{
 		uint8_t sectdata[512];
-		size_t actual;
-		io.read_at(512, sectdata, 512, actual);
+		/*auto const [err, actual] =*/ read_at(io, 512, sectdata, 512); // FIXME: check for errors and premature EOF
 		// check value in RT-11 home block.  see src/tools/imgtool/modules/rt11.cpp
 		if (get_u16le(&sectdata[0724]) == 6)
 			return FIFID_SIGN|FIFID_SIZE;
@@ -137,8 +136,7 @@ bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std:
 	{
 		for (int head = 0; head < head_count; head++)
 		{
-			size_t actual;
-			io.read_at((track * head_count + head) * track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track * head_count + head) * track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(dvk_mx_new_desc, track, head, sectors, sector_count, 45824, image);
 		}
 	}
@@ -177,10 +175,10 @@ bool dvk_mx_format::save(util::random_read_write &io, const std::vector<uint32_t
 			uint8_t sector_data[MX_SECTORS * MX_SECTOR_SIZE];
 			if (get_next_sector(bitstream, sector_data))
 			{
-				unsigned offset_in_image = (cyl * heads + head) * MX_SECTOR_SIZE * MX_SECTORS;
-				size_t actual;
+				unsigned const offset_in_image = (cyl * heads + head) * MX_SECTOR_SIZE * MX_SECTORS;
 				res = true;
-				io.write_at(offset_in_image, sector_data, MX_SECTOR_SIZE * MX_SECTORS, actual);
+				// FIXME: check for errors
+				/*auto const [err, actual] =*/ write_at(io, offset_in_image, sector_data, MX_SECTOR_SIZE * MX_SECTORS);
 			}
 		}
 	}

@@ -5388,8 +5388,8 @@ SYST( 1984, pairmtch,  0,        0,      pairmtch,  pairmtch,  pairmtch_state,  
 SYST( 1981, alnattck,  0,        0,      alnattck,  alnattck,  alnattck_state,  empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, cdkong,    0,        0,      cdkong,    cdkong,    cdkong_state,    empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, cgalaxn,   0,        0,      cgalaxn,   cgalaxn,   cgalaxn_state,   empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-SYST( 1981, cpacman,   0,        0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, cpacmanr1, cpacman,  0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, cpacman,   0,        0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, rev. 29)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, cpacmanr1, cpacman,  0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, rev. 28)", MACHINE_SUPPORTS_SAVE )
 SYST( 1983, cmspacmn,  0,        0,      cmspacmn,  cmspacmn,  cmspacmn_state,  empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1981, egalaxn2,  0,        0,      egalaxn2,  egalaxn2,  egalaxn2_state,  empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )

@@ -1790,10 +1790,10 @@ private:
 			{
 				u8 const *const src(reinterpret_cast<u8 const *>(dst));
 				rgb_t const d(
-						u8((float(src[3]) * c.a) + 0.5),
-						u8((float(src[0]) * c.r) + 0.5),
-						u8((float(src[1]) * c.g) + 0.5),
-						u8((float(src[2]) * c.b) + 0.5));
+						u8((float(src[3]) * c.a) + 0.5F),
+						u8((float(src[0]) * c.r) + 0.5F),
+						u8((float(src[1]) * c.g) + 0.5F),
+						u8((float(src[2]) * c.b) + 0.5F));
 				*dst = d;
 				havealpha = havealpha || (d.a() < 255U);
 			}
@@ -2069,17 +2069,12 @@ private:
 			return;
 		}
 		svgbuf[len] = '\0';
-		for (char *ptr = svgbuf.get(); len; )
+		size_t actual;
+		std::tie(filerr, actual) = read(file, svgbuf.get(), len);
+		if (filerr || (actual < len))
 		{
-			size_t read;
-			filerr = file.read(ptr, size_t(len), read);
-			if (filerr || !read)
-			{
-				osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
-				return;
-			}
-			ptr += read;
-			len -= read;
+			osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
+			return;
 		}
 		parse_svg(svgbuf.get());
 	}
@@ -2303,17 +2298,13 @@ public:
 					if ((x >= minfill) && (x <= maxfill))
 					{
 						if (255 <= a)
-						{
 							dst = std::fill_n(dst, maxfill - x + 1, f);
-							x = maxfill;
-						}
 						else
-						{
 							while (x++ <= maxfill)
 								alpha_blend(*dst++, a, r, g, b, inva);
-							--x;
-						}
+
 						--dst;
+						x = maxfill;
 					}
 					else
 					{
@@ -2415,17 +2406,13 @@ public:
 					if ((x >= minfill) && (x <= maxfill))
 					{
 						if (255 <= a)
-						{
 							dst = std::fill_n(dst, maxfill - x + 1, f);
-							x = maxfill;
-						}
 						else
-						{
 							while (x++ <= maxfill)
 								alpha_blend(*dst++, a, r, g, b, inva);
-							--x;
-						}
+
 						--dst;
+						x = maxfill;
 					}
 					else
 					{
@@ -4013,7 +4000,17 @@ layout_view::layout_view(
 	, m_elemmap(elemmap)
 	, m_defvismask(0U)
 	, m_has_art(false)
+	, m_show_ptr(false)
+	, m_ptr_time_out(true) // FIXME: add attribute for this
+	, m_exp_show_ptr(-1)
 {
+	// check for explicit pointer display setting
+	if (viewnode.get_attribute_string_ptr("showpointers"))
+	{
+		m_show_ptr = env.get_attribute_bool(viewnode, "showpointers", false);
+		m_exp_show_ptr = m_show_ptr ? 1 : 0;
+	}
+
 	// parse the layout
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	view_environment local(env, m_name.c_str());
@@ -4191,6 +4188,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// loop over items and filter by visibility mask
 	bool first = true;
 	bool scrfirst = true;
+	bool haveinput = false;
 	for (item &curitem : m_items)
 	{
 		if ((visibility_mask & curitem.visibility_mask()) == curitem.visibility_mask())
@@ -4222,8 +4220,14 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 			// accumulate interactive elements
 			if (!curitem.clickthrough() || curitem.has_input())
 				m_interactive_items.emplace_back(curitem);
+			if (curitem.has_input())
+				haveinput = true;
 		}
 	}
+
+	// if show pointers isn't explicitly, update it based on visible items
+	if (0 > m_exp_show_ptr)
+		m_show_ptr = haveinput;
 
 	// if we have an explicit bounds, override it
 	if (m_expbounds.x1 > m_expbounds.x0)
@@ -4264,6 +4268,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// sort edges of interactive items
 	LOGMASKED(LOG_INTERACTIVE_ITEMS, "Recalculated view '%s' with %u interactive items\n",
 			name(), m_interactive_items.size());
+	//std::reverse(m_interactive_items.begin(), m_interactive_items.end()); TODO: flip hit test order to match visual order
 	m_interactive_edges_x.reserve(m_interactive_items.size() * 2);
 	m_interactive_edges_y.reserve(m_interactive_items.size() * 2);
 	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
@@ -4291,6 +4296,29 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// additional actions typically supplied by script
 	if (!m_recomputed.isnull())
 		m_recomputed();
+}
+
+
+//-------------------------------------------------
+//  set_show_pointers - set whether pointers
+//  should be displayed
+//-------------------------------------------------
+
+void layout_view::set_show_pointers(bool value) noexcept
+{
+	m_show_ptr = value;
+	m_exp_show_ptr = value ? 1 : 0;
+}
+
+
+//-------------------------------------------------
+//  set_pointers_time_out - set whether pointers
+//  should be hidden after inactivity
+//-------------------------------------------------
+
+void layout_view::set_hide_inactive_pointers(bool value) noexcept
+{
+	m_ptr_time_out = value;
 }
 
 
@@ -4324,6 +4352,50 @@ void layout_view::set_preload_callback(preload_delegate &&handler)
 void layout_view::set_recomputed_callback(recomputed_delegate &&handler)
 {
 	m_recomputed = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_pointer_updated_callback - set handler
+//  called for pointer input
+//-------------------------------------------------
+
+void layout_view::set_pointer_updated_callback(pointer_updated_delegate &&handler)
+{
+	m_pointer_updated = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_pointer_left_callback - set handler for
+//  pointer leaving normally
+//-------------------------------------------------
+
+void layout_view::set_pointer_left_callback(pointer_left_delegate &&handler)
+{
+	m_pointer_left = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_pointer_aborted_callback - set handler for
+//  pointer leaving abnormally
+//-------------------------------------------------
+
+void layout_view::set_pointer_aborted_callback(pointer_left_delegate &&handler)
+{
+	m_pointer_aborted = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_forget_pointers_callback - set handler for
+//  abandoning pointer input
+//-------------------------------------------------
+
+void layout_view::set_forget_pointers_callback(forget_pointers_delegate &&handler)
+{
+	m_forget_pointers = std::move(handler);
 }
 
 

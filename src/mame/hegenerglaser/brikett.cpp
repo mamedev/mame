@@ -131,7 +131,7 @@ private:
 	optional_device<sensorboard_device> m_board;
 	required_device<mephisto_display1_device> m_display;
 	optional_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
 
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INFO")
 
 	PORT_MODIFY("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("POS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("POS")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left / Black / 9")
 
 	PORT_MODIFY("IN.3")
@@ -597,17 +597,17 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       STATE          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, mephisto,   0,         0,      mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, mephisto,   0,         0,      mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, mephisto1x, 0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, mephistoj,  0,         0,      mephistoj,  mephistoj,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // there's also a "Mephisto Junior" from 1990
+SYST( 1981, mephisto1x, 0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, mephistoj,  0,         0,      mephistoj,  mephistoj,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE ) // there's also a "Mephisto Junior" from 1990
 
-SYST( 1981, mephisto2,  0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1981, mephisto2a, mephisto2, 0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, mephisto2,  0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephisto2a, mephisto2, 0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, mephisto2e, 0,         0,      mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, mephisto2e, 0,         0,      mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1983, mephisto3,  0,         0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, mephisto3a, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, mephisto3b, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, mephisto3c, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, mephisto3,  0,         0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3a, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3b, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3c, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE )

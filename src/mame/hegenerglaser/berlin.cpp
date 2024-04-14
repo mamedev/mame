@@ -33,13 +33,13 @@ namespace {
 class berlin_state : public driver_device
 {
 public:
-	berlin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_keys(*this, "KEY")
+	berlin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_keys(*this, "KEY")
 	{ }
 
 	void berlin(machine_config &config);
@@ -121,9 +121,6 @@ static INPUT_PORTS_START( berlin )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Right")           PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("New Game (1/2)")  PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("New Game (2/2)")  PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_F1) // "
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -205,9 +202,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1992, berl16a,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, berl16l,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, berl16a,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.02)", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, berl16l,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, berlinpl, berlinp, 0,      berlinp, berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, berlinpl, berlinp, 0,      berlinp, berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE )

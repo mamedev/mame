@@ -30,19 +30,15 @@ Unpopulated spaces marked for: DS5002FP, PIC16C54, 93C56 EEPROM, a couple more u
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
-#include "bus/pci/rivatnt.h"
 #include "cpu/i386/i386.h"
 #include "machine/8042kbdc.h"
 #include "machine/mc146818.h"
 #include "machine/mediagx_cs5530_bridge.h"
 #include "machine/mediagx_cs5530_ide.h"
+#include "machine/mediagx_cs5530_video.h"
 #include "machine/mediagx_host.h"
 #include "machine/pci.h"
 #include "machine/zfmicro_usb.h"
-
-#include "screen.h"
-
-#define ENABLE_VGA 0
 
 namespace {
 
@@ -79,7 +75,6 @@ INPUT_PORTS_END
 
 void matrix_state::matrix(machine_config &config)
 {
-	// basic machine hardware
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
 	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -108,10 +103,6 @@ void matrix_state::matrix(machine_config &config)
 	// Tries to initialize MediaGX F4 -> ISA -> PCI
 	// May actually be a ZFMicro PCI Bridge (0x10780400)?
 	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
-#if ENABLE_VGA
-	// NOTE: most MediaGX boards don't even provide an AGP port, at best you get PCI slots.
-	PCI_SLOT(config, "pci:01.0:1", pci_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
-#endif
 
 	// "pci:12.0" or "pci:10.0" depending on pin H26 (readable in bridge thru PCI index $44)
 	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:12.0", 0, "maincpu", "pci:12.2"));
@@ -129,7 +120,7 @@ void matrix_state::matrix(machine_config &config)
 	ide.irq_sec().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq15_w));
 
 	// "pci:12.3" XpressAUDIO
-	// "pci:12.4" XpressVIDEO
+	MEDIAGX_CS5530_VIDEO(config, "pci:12.4", 0);
 
 	ZFMICRO_USB(config, "pci:13.0", 0);
 

@@ -302,7 +302,7 @@ static INPUT_PORTS_START( vcc )
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G)
 
@@ -445,7 +445,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, vcc,  0,      0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, vcca, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, vcc,  0,      0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, vcca, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, uvc,  vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, uvc,  vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE )

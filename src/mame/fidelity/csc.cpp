@@ -227,8 +227,6 @@ clicking on the game board.
 
 namespace {
 
-// CSC / shared
-
 class csc_state : public driver_device
 {
 public:
@@ -263,7 +261,7 @@ protected:
 	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
 	optional_region_ptr<u8> m_language;
@@ -849,10 +847,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, csc,      0,      0,      csc,     csc,   csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1981, csce,     0,      0,      csce,    csc,   csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1981, cscet,    csce,   0,      cscet,   csc,   csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (WMCCC 1981 Travemünde TM)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, csc,      0,      0,      csc,     csc,   csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, csce,     0,      0,      csce,    csc,   csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, cscet,    csce,   0,      cscet,   csc,   csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (WMCCC 1981 Travemünde TM)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1983, super9cc, 0,      0,      su9,     su9,   csc_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, super9cc, 0,      0,      su9,     su9,   csc_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, reversic, 0,      0,      rsc,     rsc,   csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, reversic, 0,      0,      rsc,     rsc,   csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE )

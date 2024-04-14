@@ -123,7 +123,7 @@ private:
 	// devices/pointers
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<6> m_inputs;
 
 	u16 m_inp_mux = 0;
@@ -326,7 +326,7 @@ static INPUT_PORTS_START( im05 )
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Forward")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME(u8"ПХ (Hint)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"Р (Promotion)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME(u8"Р (Promotion)")
 
 	PORT_MODIFY("IN.2")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Confirm")
@@ -422,7 +422,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, im01,  0,      0,      im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, im01t, im01,   0,      im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, im01,  0,      0,      im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, im01t, im01,   0,      im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1993, im05,  0,      0,      im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, im05,  0,      0,      im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE )

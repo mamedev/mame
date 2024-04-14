@@ -33,16 +33,19 @@ class williams_state : public driver_device
 public:
 	williams_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_nvram(*this, "nvram"),
-		m_videoram(*this, "videoram"),
-		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "paletteram"),
-		m_pia(*this, "pia_%u", 0U)
+		m_pia(*this, "pia_%u", 0U),
+		m_nvram(*this, "nvram"),
+		m_videoram(*this, "videoram"),
+		m_mainbank(*this, "mainbank"),
+		m_rom_view(*this, "rom_view"),
+		m_49way_x(*this, "49WAYX"),
+		m_49way_y(*this, "49WAYY")
 	{ }
 
 	void williams_base(machine_config &config);
@@ -63,7 +66,7 @@ public:
 	void palette_init(palette_device &palette) const;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	// blitter type
@@ -87,9 +90,23 @@ protected:
 		WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256 = 0x01
 	};
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+	optional_shared_ptr<uint8_t> m_paletteram;
+	optional_device_array<pia6821_device, 4> m_pia;
+
 	required_shared_ptr<uint8_t> m_nvram;
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_memory_bank m_mainbank;
+
+	memory_view m_rom_view;
+
+	optional_ioport m_49way_x;
+	optional_ioport m_49way_y;
+
 	uint8_t m_blitter_config;
 	uint16_t m_blitter_clip_address;
 	uint8_t m_blitter_window_enable;
@@ -100,6 +117,7 @@ protected:
 	uint8_t m_blitter_remap_index;
 	const uint8_t *m_blitter_remap;
 	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
+
 	virtual void vram_select_w(u8 data);
 	virtual void cmos_w(offs_t offset, u8 data);
 	void blitter_w(address_space &space, offs_t offset, u8 data);
@@ -111,14 +129,6 @@ protected:
 	void blitter_init(int blitter_config, const uint8_t *remap_prom);
 	inline void blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte);
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_paletteram;
-	optional_device_array<pia6821_device, 4> m_pia;
 
 	virtual void main_map(address_map &map);
 	virtual void sound_map(address_map &map);
@@ -274,7 +284,6 @@ class blaster_state : public williams_state
 public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
-		m_bankb(*this, "blaster_bankb"),
 		m_muxa(*this, "mux_a"),
 		m_muxb(*this, "mux_b")
 	{ }
@@ -282,18 +291,17 @@ public:
 	void blastkit(machine_config &config);
 	void blaster(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	optional_memory_bank m_bankb;
+private:
 	required_device<ls157_x2_device> m_muxa;
 	optional_device<ls157_device> m_muxb;
 
 	rgb_t m_color0;
 	uint8_t m_video_control;
-	uint8_t m_vram_bank;
-	uint8_t m_rom_bank;
 
 	virtual void vram_select_w(u8 data) override;
 	void bank_select_w(u8 data);
@@ -304,8 +312,6 @@ private:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	inline void update_blaster_banking();
-
 	virtual void main_map(address_map &map) override;
 };
 
@@ -315,9 +321,9 @@ class williams2_state : public williams_state
 public:
 	williams2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
-		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_tileram(*this, "williams2_tile"),
+		m_tileram(*this, "tileram"),
+		m_palette_view(*this, "palette_view"),
 		m_gain(  { 0.25f, 0.25f, 0.25f }),
 		m_offset({ 0.00f, 0.00f, 0.00f })
 	{ }
@@ -338,9 +344,10 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	required_device<address_map_bank_device> m_bank8000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_tileram;
+
+	memory_view m_palette_view;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint16_t m_tilemap_xscroll = 0;
@@ -371,7 +378,6 @@ protected:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	void bank8000_map(address_map &map);
 	void common_map(address_map &map);
 	virtual void sound_map(address_map &map) override;
 

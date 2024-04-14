@@ -60,7 +60,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 
 	u8 m_inp_mux = 0;
@@ -68,7 +68,7 @@ private:
 
 	void main_map(address_map &map);
 
-	void init_board(int state);
+	void init_board(u8 data);
 	u8 read_board_row(u8 row);
 
 	// I/O handlers
@@ -91,7 +91,7 @@ void dsc_state::machine_start()
     Sensorboard
 *******************************************************************************/
 
-void dsc_state::init_board(int state)
+void dsc_state::init_board(u8 data)
 {
 	for (int i = 0; i < 20; i++)
 	{
@@ -263,4 +263,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, damesc, 0,      0,      dsc,     dsc,   dsc_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, damesc, 0,      0,      dsc,     dsc,   dsc_state, empty_init, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE )

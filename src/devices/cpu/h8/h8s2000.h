@@ -33,7 +33,22 @@ protected:
 	virtual void do_exec_partial() override;
 
 #define O(o) void o ## _full(); void o ## _partial()
+
 	O(andc_imm8_exr);
+	O(band_imm3_abs16); O(band_imm3_abs32);
+	O(bclr_imm3_abs16); O(bclr_r8h_abs16); O(bclr_imm3_abs32); O(bclr_r8h_abs32);
+	O(biand_imm3_abs16); O(biand_imm3_abs32);
+	O(bild_imm3_abs16); O(bild_imm3_abs32);
+	O(bior_imm3_abs16); O(bior_imm3_abs32);
+	O(bist_imm3_abs16); O(bist_imm3_abs32);
+	O(bixor_imm3_abs16); O(bixor_imm3_abs32);
+	O(bld_imm3_abs16); O(bld_imm3_abs32);
+	O(bnot_imm3_abs16); O(bnot_r8h_abs16); O(bnot_imm3_abs32); O(bnot_r8h_abs32);
+	O(bor_imm3_abs16); O(bor_imm3_abs32);
+	O(bset_imm3_abs16); O(bset_r8h_abs16); O(bset_imm3_abs32); O(bset_r8h_abs32);
+	O(bst_imm3_abs16); O(bst_imm3_abs32);
+	O(btst_imm3_abs16); O(btst_r8h_abs16); O(btst_imm3_abs32); O(btst_r8h_abs32);
+	O(bxor_imm3_abs16); O(bxor_imm3_abs32);
 	O(ldc_imm8_exr); O(ldc_r8l_exr); O(ldc_w_abs16_exr); O(ldc_w_abs32_exr); O(ldc_w_r32d16h_exr); O(ldc_w_r32d32hh_exr); O(ldc_w_r32ih_exr); O(ldc_w_r32ph_exr);
 	O(ldm_l_spp_r32n2l); O(ldm_l_spp_r32n3l); O(ldm_l_spp_r32n4l);
 	O(orc_imm8_exr);

@@ -73,7 +73,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<6> m_inputs;
 	output_finder<2, 24> m_out_lcd;
 
@@ -86,7 +86,7 @@ private:
 	void init_backgammon();
 	void init_jacquet();
 	void init_plakoto();
-	void board_init_cb(int state);
+	void board_init_cb(u8 data);
 	u8 board_spawn_cb(offs_t offset);
 	u8 board_remove_cb();
 	u8 board_sensor_cb(offs_t offset);
@@ -197,9 +197,9 @@ INPUT_CHANGED_MEMBER(ecbackg_state::init_board)
 	m_board->refresh();
 }
 
-void ecbackg_state::board_init_cb(int state)
+void ecbackg_state::board_init_cb(u8 data)
 {
-	if (!state)
+	if (~data & 1)
 		init_backgammon();
 }
 
@@ -446,7 +446,7 @@ static INPUT_PORTS_START( ecbackg )
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_A) PORT_NAME("Double / Accept")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Reject")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Play")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Play")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Game Option")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
@@ -551,4 +551,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, ecbackg, 0,      0,      ecbackg, ecbackg, ecbackg_state, empty_init, "Saitek", "Electronic Champion Backgammon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, ecbackg, 0,      0,      ecbackg, ecbackg, ecbackg_state, empty_init, "Saitek", "Electronic Champion Backgammon", MACHINE_SUPPORTS_SAVE )

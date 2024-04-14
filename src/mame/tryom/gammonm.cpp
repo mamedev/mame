@@ -198,4 +198,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1978, gammonm2, 0,      0,      gammonm2, gammonm2, gammonm_state, empty_init, "Tryom", "Gammonmaster II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, gammonm2, 0,      0,      gammonm2, gammonm2, gammonm_state, empty_init, "Tryom", "Gammonmaster II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

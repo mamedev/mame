@@ -1740,7 +1740,7 @@ void parsed_expression::infix_to_postfix()
 		else if (token->is_operator())
 		{
 			// normalize the operator based on neighbors
-			normalize_operator(*token, prev, next != m_tokenlist.end() ? &*next : nullptr, stack, was_rparen);
+			normalize_operator(*token, prev, next != origlist.end() ? &*next : nullptr, stack, was_rparen);
 			was_rparen = false;
 
 			// if the token is an opening parenthesis, push it onto the stack.

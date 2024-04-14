@@ -78,7 +78,7 @@ private:
 	required_device<hlcd0539_device> m_lcd2;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_inputs;
 
@@ -436,5 +436,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag Industries", "Savant", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag Industries", "Savant II", MACHINE_SUPPORTS_SAVE )

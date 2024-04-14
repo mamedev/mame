@@ -268,4 +268,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, exechess, 0,      0,      exechess, exechess, exechess_state, empty_init, "SciSys", "Executive Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, exechess, 0,      0,      exechess, exechess, exechess_state, empty_init, "SciSys", "Executive Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

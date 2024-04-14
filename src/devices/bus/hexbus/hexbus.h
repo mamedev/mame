@@ -161,7 +161,7 @@ public:
 	void write(int dir, uint8_t data);
 
 protected:
-	void device_start() override;
+	virtual void device_start() override;
 	device_hexbus_interface *m_next_dev;
 
 private:

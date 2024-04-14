@@ -94,8 +94,6 @@ private:
 };
 
 
-// video
-
 template <uint8_t Pen>
 void subs_state::invert_w(int state)
 {
@@ -196,8 +194,6 @@ void subs_state::palette(palette_device &palette) const
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
 }
 
-
-// machine
 
 /***************************************************************************
 machine initialization

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ie15_kbd.h"
+#include "ie15_kbd.h"
 
 #include "machine/keyboard.ipp"
 

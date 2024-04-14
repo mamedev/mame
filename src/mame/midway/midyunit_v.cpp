@@ -58,7 +58,7 @@ VIDEO_START_MEMBER(midyunit_state,common)
 
 	/* reset DMA state */
 	memset(m_dma_register, 0, sizeof(m_dma_register));
-	memset(&m_dma_state, 0, sizeof(m_dma_state));
+	m_dma_state = dma_state_t();
 
 	/* register for state saving */
 	save_item(NAME(m_autoerase_enable));
@@ -272,14 +272,13 @@ void midyunit_state::midyunit_paletteram_w(offs_t offset, uint16_t data, uint16_
 
 void midyunit_state::dma_draw(uint16_t command)
 {
-	struct dma_state_t &dma_state = m_dma_state;
 	int dx = (command & 0x10) ? -1 : 1;
-	int height = dma_state.height;
-	int width = dma_state.width;
+	int height = m_dma_state.height;
+	int width = m_dma_state.width;
 	uint8_t *base = m_gfx_rom;
-	uint32_t offset = dma_state.offset >> 3;
-	uint16_t pal = dma_state.palette;
-	uint16_t color = pal | dma_state.color;
+	uint32_t offset = m_dma_state.offset >> 3;
+	uint16_t pal = m_dma_state.palette;
+	uint16_t color = pal | m_dma_state.color;
 	int x, y;
 
 	/* we only need the low 4 bits of the command */
@@ -288,14 +287,14 @@ void midyunit_state::dma_draw(uint16_t command)
 	/* loop over the height */
 	for (y = 0; y < height; y++)
 	{
-		int tx = dma_state.xpos;
-		int ty = dma_state.ypos;
+		int tx = m_dma_state.xpos;
+		int ty = m_dma_state.ypos;
 		uint32_t o = offset;
 		uint16_t *dest;
 
 		/* determine Y position */
 		ty = (ty + y) & 0x1ff;
-		offset += dma_state.rowbytes;
+		offset += m_dma_state.rowbytes;
 
 		/* determine destination pointer */
 		dest = &m_local_videoram[ty * 512];

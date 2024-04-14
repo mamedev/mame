@@ -81,8 +81,6 @@ private:
 };
 
 
-// video
-
 // bit 3 and 7 of the char color PROMs are used for something -- not currently emulated - thus GAME_IMPERFECT_GRAPHICS
 
 void cheekyms_state::palette(palette_device &palette) const
@@ -267,8 +265,6 @@ uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 {

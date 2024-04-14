@@ -191,8 +191,6 @@ private:
 };
 
 
-// video
-
 /**************************************************************************/
 
 int homerun_state::sprite0_r()
@@ -339,8 +337,6 @@ u32 homerun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 

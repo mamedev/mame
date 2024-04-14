@@ -465,7 +465,7 @@ void submenu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
 //  perform our special rendering
 //-------------------------------------------------
 
-void submenu::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void submenu::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	if (selectedref)
 	{

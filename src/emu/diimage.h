@@ -148,15 +148,13 @@ public:
 	u32 fread(void *buffer, u32 length)
 	{
 		check_for_file();
-		size_t actual;
-		m_file->read(buffer, length, actual);
+		auto const [err, actual] = read(*m_file, buffer, length);
 		return actual;
 	}
 	u32 fwrite(const void *buffer, u32 length)
 	{
 		check_for_file();
-		size_t actual;
-		m_file->write(buffer, length, actual);
+		auto const [err, actual] = write(*m_file, buffer, length);
 		return actual;
 	}
 	std::error_condition fseek(s64 offset, int whence)
@@ -171,10 +169,6 @@ public:
 		m_file->tell(result);
 		return result;
 	}
-
-	// allocate and read into buffers
-	u32 fread(std::unique_ptr<u8 []> &ptr, u32 length) { ptr = std::make_unique<u8 []>(length); return fread(ptr.get(), length); }
-	u32 fread(std::unique_ptr<u8 []> &ptr, u32 length, offs_t offset) { ptr = std::make_unique<u8 []>(length); return fread(ptr.get() + offset, length - offset); }
 
 	// access to software list item information
 	const software_info *software_entry() const noexcept;

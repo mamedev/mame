@@ -75,7 +75,6 @@ public:
 	virtual void submap(address_map &map) override;
 	void sh4_map(address_map &map);
 	void sh4_io_map(address_map &map);
-	void pic_map(address_map &map);
 	void pci_map(address_map &map);
 	void pci_config_map(address_map &map);
 
@@ -125,8 +124,8 @@ public:
 	void shared_sh4_sdram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint64_t i2cmem_dimm_r();
 	void i2cmem_dimm_w(uint64_t data);
-	uint8_t pic_dimm_r(offs_t offset);
-	void pic_dimm_w(offs_t offset, uint8_t data);
+	uint8_t pic_dimm_r();
+	void pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
 	virtual void device_start() override;

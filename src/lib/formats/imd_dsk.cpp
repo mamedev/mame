@@ -425,9 +425,10 @@ void imd_format::fixnum(char *start, char *end) const
 int imd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[4];
+	auto const [err, actual] = read_at(io, 0, h, 4);
+	if(err || (4 != actual))
+		return 0;
 
-	size_t actual;
-	io.read_at(0, h, 4, actual);
 	if(!memcmp(h, "IMD ", 4))
 		return FIFID_SIGN;
 
@@ -451,9 +452,9 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t size;
 	if(io.length(size))
 		return false;
-	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [err, img, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return false;
 
 	uint64_t pos, savepos;
 	for(pos=0; pos < size && img[pos] != 0x1a; pos++) { }

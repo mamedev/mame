@@ -3,57 +3,61 @@
 // thanks-to: Diego Nappino
 /**************************************************************************************************
 
-    SiS 630 chipset based PC
+SiS 630 chipset based PC
 
-    TODO (main):
-    - PS/2 loses IRQs, mouse is unusable, "ibm" BIOS doesn't work at all;
-    - Super I/O handling of ITE 8705F (I/O $2e / $2f)
-    \- We currently (wrongly) handle most stuff in PCI LPC instead;
-    \- Another Super I/O is the HW motherboard monitor,
-       cfr. I/O $294 reads in shutms11 BIOS fan tests;
-    - '900 Ethernet (missing ROM dump);
-    - USB controllers (OpenHCI complaint);
-    - Floppy drive, unsupported SMC37C673 default;
-    - ACPI is not fully lpc-acpi complaint;
-    - EISA slots;
-    - PnP from LPC;
-    - SMBus;
+TODO (main):
+- Finalize Super I/O handling of ITE 8705F (I/O $2e / $2f)
+\- fan monitor, cfr. I/O $294 reads in shutms11 BIOS fan tests;
+\- FDC doesn't work, moans on first boot;
+- '900 Ethernet PXE (missing ROM dump);
+- USB controllers (OpenHCI complaint);
+- ACPI is not fully lpc-acpi complaint;
+- EISA slots;
+- SMBus;
+- PS/2 mouse is unstable, worked around by disabling and using a serial mouse instead.
 
-    TODO (usability, to be moved in a SW list):
-    - windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
-      ACPI STOP #a5 error with param $11
-    \- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.
-       And by F7 I really mean it :shrug:
+TODO (usability, to be moved in a SW list):
+- windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
+  ACPI STOP #a5 error with param $11
+\- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.
+   And by F7 I really mean it :shrug:
 
-    - windows xp sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
+- windows xp sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
 
-    - windows neptune: BSoD during ethernet check (after time clock setup)
-      with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
+- windows neptune: BSoD during ethernet check (after time clock setup)
+  with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
 
-    - gamecstl Kontron BIOS:
-    \- hangs at PC=0xf3cf2, again wanting a SMI# from devtrap_en_w;
-    \- No PS/2 inputs;
+- gamecstl Kontron BIOS:
+\- hangs at PC=0xf3cf2, again wanting a SMI# from devtrap_en_w;
+\- No PS/2 inputs;
 
-    - gamecstl dump (tested from shutms11, also see notes below):
-    \- Currently black screens before booting normal Windows, reading $5004 from the LPC ACPI
-       (flip EAX to non-zero to bypass).
-       NB: it also writes to $5048 once (devtrap_en_w), which should generate a SMI# event;
-    \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
-       hangs there;
-    \- GUI is never recognized no matter what, punts with DirectX not installed;
+- gamecstl dump (tested from shutms11, also see notes below):
+\- Currently black screens before booting normal Windows, reading $5004 from the LPC ACPI
+   (flip EAX to non-zero to bypass).
+   NB: it also writes to $5048 once (devtrap_en_w), which should generate a SMI# event;
+\- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
+   hangs there;
+\- GUI is never recognized no matter what, punts with DirectX not installed;
 
-    - xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
-      (get configuration/read disc information),
-      eventually punts to prompt with a "can't access tty: job control turned off" (on live CD) or
-      hangs at "Configuring network interfaces" (on actual install);
+- xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
+  (get configuration/read disc information),
+  eventually punts to prompt with a "can't access tty: job control turned off" (on live CD) or
+  hangs at "Configuring network interfaces" (on actual install);
 
-    - xubuntu 10.10: stalls after '900 ethernet check;
+- xubuntu 10.10: stalls after '900 ethernet check;
 
-    - Haiku 0.1: hangs throwing an "unhandled READ TOC format 2",
-      serial COM1 prints a "vm_mark_page_range_inuse: page 0x9f in non-free state 7!"
+- Haiku 0.1: hangs throwing an "unhandled READ TOC format 2",
+  serial COM1 prints a "vm_mark_page_range_inuse: page 0x9f in non-free state 7!"
 
-    - Red Hat 6.2: Triple Faults on x87 exception check
-    \- prints the type of mounted floating point exception if bypassed.
+- Red Hat 6.2: Triple Faults on x87 exception check
+\- prints the type of mounted floating point exception if bypassed.
+
+Notes on possible shutms11 BIOS bugs:
+- BeOS 5 hardwires serial mouse checks at $2e8, ignoring BIOS PnP.
+- FreeDOS 1.3 ctmouse often fails serial detection (will work if you load it at prompt)
+- BIOS in general often throws serial conflicts when changing port setups,
+  even on perfectly valid combinations (i.e. COM1 assigned while COM2 is *disabled*)
+- PCI device listing often forgets to list print ACPI irq.
 
 ===================================================================================================
 
@@ -153,7 +157,13 @@
 #include "cpu/i386/i386.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "machine/intelfsh.h"
+#include "machine/it8705f.h"
 #include "machine/pci.h"
 #include "machine/sis5513_ide.h"
 #include "machine/sis630_host.h"
@@ -163,7 +173,6 @@
 #include "machine/sis900_eth.h"
 #include "machine/sis950_lpc.h"
 #include "machine/sis950_smbus.h"
-//#include "machine/fdc37c93x.h"
 
 
 namespace {
@@ -193,11 +202,43 @@ private:
 
 //  void main_io(address_map &map);
 //  void main_map(address_map &map);
+	static void ite_superio_config(device_t *device);
 };
 
 
 static INPUT_PORTS_START(sis630)
 INPUT_PORTS_END
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("it8705f", IT8705F);
+}
+
+void sis630_state::ite_superio_config(device_t *device)
+{
+	it8705f_device &fdc = *downcast<it8705f_device *>(device);
+//  fdc.set_sysopt_pin(1);
+	fdc.irq1().set(":pci:01.0", FUNC(sis950_lpc_device::pc_irq1_w));
+	fdc.irq8().set(":pci:01.0", FUNC(sis950_lpc_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
 
 void sis630_state::sis630(machine_config &config)
 {
@@ -256,6 +297,24 @@ void sis630_state::sis630(machine_config &config)
 
 	// TODO: 1 parallel + 2 serial ports
 	// TODO: 1 game port ('7018?)
+
+	// TODO: move in MB implementations
+	// (some unsupported variants uses W83697HF, namely Gigabyte GA-6SMZ7)
+	ISA16_SLOT(config, "superio", 0, "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
+
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
+	serport0.rxd_handler().set("superio:it8705f", FUNC(it8705f_device::rxd1_w));
+	serport0.dcd_handler().set("superio:it8705f", FUNC(it8705f_device::ndcd1_w));
+	serport0.dsr_handler().set("superio:it8705f", FUNC(it8705f_device::ndsr1_w));
+	serport0.ri_handler().set("superio:it8705f", FUNC(it8705f_device::nri1_w));
+	serport0.cts_handler().set("superio:it8705f", FUNC(it8705f_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("superio:it8705f", FUNC(it8705f_device::rxd2_w));
+	serport1.dcd_handler().set("superio:it8705f", FUNC(it8705f_device::ndcd2_w));
+	serport1.dsr_handler().set("superio:it8705f", FUNC(it8705f_device::ndsr2_w));
+	serport1.ri_handler().set("superio:it8705f", FUNC(it8705f_device::nri2_w));
+	serport1.cts_handler().set("superio:it8705f", FUNC(it8705f_device::ncts2_w));
 
 	// TODO: AMR (Audio/modem riser) + UPT (Panel Link-TV out), assume [E]ISA complaint, needs specific slot options
 //  ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);

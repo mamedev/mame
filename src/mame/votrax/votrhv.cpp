@@ -737,5 +737,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT  CLASS         INIT        COMPANY                 FULLNAME             FLAGS
-COMP( 1978, hc110,   0,      0,      hc110,  hc110, votrhv_state, empty_init, "Votrax/Phonic Mirror", "HandiVoice HC-110", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1978, hc110,   0,      0,      hc110,  hc110, votrhv_state, empty_init, "Votrax/Phonic Mirror", "HandiVoice HC-110", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 COMP( 1978, hc120,   hc110,  0,      votrhv, hc120, hc120_state,  empty_init, "Votrax/Phonic Mirror", "HandiVoice HC-120", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

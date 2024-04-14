@@ -31,7 +31,7 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "video/huc6272.h"
+#include "huc6272.h"
 
 #define VERBOSE (LOG_GENERAL)
 

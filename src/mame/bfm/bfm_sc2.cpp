@@ -8595,7 +8595,7 @@ ROM_END
 
 /* Video Based (Adder 2) */
 
-#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
+#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL
 
 GAMEL( 1993, quintoon,    0,        scorpion2_vidm, quintoon, bfm_sc2_vid_state,  init_quintoon,    0, "BFM",      "Quintoon (UK, Game Card 95-750-206)",          MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
 GAMEL( 1993, quintond,    quintoon, scorpion2_vidm, quintoon, bfm_sc2_vid_state,  init_quintoon,    0, "BFM",      "Quintoon (UK, Game Card 95-751-206, Datapak)", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING,layout_quintoon ) //Current samples need verification

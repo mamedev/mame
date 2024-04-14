@@ -52,7 +52,7 @@ void bebox_state::main_mem(address_map &map)
 	map(0x800002F8, 0x800002FF).rw("ns16550_1", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000380, 0x80000387).rw("ns16550_2", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000388, 0x8000038F).rw("ns16550_3", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x800003B0, 0x800003DF).m(m_vga, FUNC(cirrus_gd5428_device::io_map));
+	map(0x800003B0, 0x800003DF).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
 	map(0x800003F0, 0x800003F7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 	map(0x800003F0, 0x800003F7).m(m_smc37c78, FUNC(smc37c78_device::map));
 	map(0x800003F8, 0x800003FF).rw("ns16550_0", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
@@ -61,8 +61,8 @@ void bebox_state::main_mem(address_map &map)
 	//map(0x800042E8, 0x800042EF).w("cirrus", FUNC(cirrus_device::cirrus_42E8_w));
 
 	map(0xBFFFFFF0, 0xBFFFFFFF).r(FUNC(bebox_state::bebox_interrupt_ack_r));
-	map(0xC00A0000, 0xC00BFFFF).rw(m_vga, FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
-	map(0xC1000000, 0xC11FFFFF).rw(m_vga, FUNC(cirrus_gd5428_device::mem_linear_r), FUNC(cirrus_gd5428_device::mem_linear_w));
+	map(0xC00A0000, 0xC00BFFFF).rw(m_vga, FUNC(cirrus_gd5446_vga_device::mem_r), FUNC(cirrus_gd5446_vga_device::mem_w));
+	map(0xC1000000, 0xC11FFFFF).rw(m_vga, FUNC(cirrus_gd5446_vga_device::mem_linear_r), FUNC(cirrus_gd5446_vga_device::mem_linear_w));
 	map(0xFFF00000, 0xFFF03FFF).bankr("bank2");
 	map(0xFFF04000, 0xFFFFFFFF).rw(FUNC(bebox_state::bebox_flash_r), FUNC(bebox_state::bebox_flash_w));
 }
@@ -187,9 +187,10 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(cirrus_gd5428_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(cirrus_gd5446_vga_device::screen_update));
 
-	CIRRUS_GD5428(config, m_vga, 0);
+	// was GD5428, assume mistake (GD5446 is PCI)
+	CIRRUS_GD5446_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 

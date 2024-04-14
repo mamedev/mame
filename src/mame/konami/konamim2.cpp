@@ -1106,7 +1106,7 @@ void konamim2_state::konamim2(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update("bda:vdu", FUNC(m2_vdu_device::screen_update));
 
-	/* Sound hardware */
+	// Sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -1222,7 +1222,7 @@ ROM_START( polystar )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
 	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(fab5a203) SHA1(153e22aa8cfce80b77ba200957685f796fc99b1c) )
 
 	DISK_REGION( "ata:0:cr589" ) // Has 1s of silence near the start of the first audio track
@@ -1236,7 +1236,7 @@ ROM_START( btltryst )
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(cc2c5640) SHA1(694cf2b3700f52ed80252b013052c90020e58ce6) )
 
-	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
 	ROM_LOAD( "m48t58", 0x000000, 0x002000, CRC(71ee073b) SHA1(cc8002d7ee8d1695aebbbb2a3a1e97a7e16948c1) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1248,7 +1248,7 @@ ROM_START( btltrysta )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
 	ROM_LOAD( "m48t58y", 0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1257,30 +1257,33 @@ ROM_END
 #endif
 
 ROM_START( heatof11 )
-	ROM_REGION64_BE( 0x200000, "boot", 0 )  /* boot rom */
+	ROM_REGION64_BE( 0x200000, "boot", 0 )  // boot ROM
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
 	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(e7029938) SHA1(ae41340dbcb600debe246629dc36fb371d1a5b05) )
 
-	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
 	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(5b74eafd) SHA1(afbf5f1f5a27407fd6f17c764bbb7fae4ab779f5) )
 
 	DISK_REGION( "ata:0:cr589" )
-	DISK_IMAGE_READONLY( "heatof11", 0, BAD_DUMP SHA1(5a0a2782cd8676d3f6dfad4e0f805b309e230d8b) )
+	/* Ring codes found on the disc:
+          703EAA02 PN.0000046809  1 + + + + +  IFPI L251
+          IFPI 42MO */
+	DISK_IMAGE_READONLY( "703eaa02", 0, SHA1(f8a87eacfdbbd22659f39c7a72e3895f0a7697b7) )
 ROM_END
 
 ROM_START( evilngt )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
 	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(60ae825e) SHA1(fd61db9667c53dd12700a0fe202fcd1e3d35d206) )
 
-	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
 	ROM_LOAD( "m48t58y.9n", 0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) )
 
-	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B sound ROM on sub board
 	ROM_LOAD( "810a03.16h", 0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1291,13 +1294,13 @@ ROM_START( hellngt )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
 	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(53b41f68) SHA1(f75f59808a5b04b1e49f2cca0592a2466b82f019) )
 
 	ROM_REGION( 0x2000, "m48t58", 0 )
 	ROM_LOAD( "m48t58y.9n",  0x000000, 0x002000, CRC(ff8e78a1) SHA1(02e56f55264dd0bf3a08808726a6366e9cb6031e) )
 
-	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B sound ROM on sub board
 	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1311,7 +1314,7 @@ ROM_START( totlvice )
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(25aa0bd1) SHA1(cc461e0629ff71c3a868882f1f67af0e19135c1a) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_REGION( 0x100000, "ymz", 0 ) // YMZ280B sound rom on sub board
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1324,7 +1327,7 @@ ROM_START( totlvicd )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_REGION( 0x100000, "ymz", 0 ) // YMZ280B sound rom on sub board
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1336,7 +1339,7 @@ ROM_START( totlvicu )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_REGION( 0x100000, "ymz", 0 ) // YMZ280B sound rom on sub board
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1347,7 +1350,7 @@ ROM_START( totlvica )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_REGION( 0x100000, "ymz", 0 ) // YMZ280B sound rom on sub board
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
 	DISK_REGION( "ata:0:cr589" )
@@ -1358,7 +1361,7 @@ ROM_START( totlvicj )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_REGION( 0x100000, "ymz", 0 ) // YMZ280B sound rom on sub board
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
 	DISK_REGION( "ata:0:cr589" ) // Need a re-image
@@ -1455,21 +1458,21 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 
 	struct ItemNode
 	{
-		m2ptr pn_Next;    /* pointer to next in list              */ // 0
-		m2ptr pn_Prev;    /* pointer to previous in list          */ // 4
+		m2ptr pn_Next;                /* pointer to next in list              */ // 0
+		m2ptr pn_Prev;                /* pointer to previous in list          */ // 4
 		uint8_t     n_SubsysType;     /* what component manages this node     */ // 8
 		uint8_t     n_Type;           /* what type of node for the component  */ // 9
 		uint8_t     n_Priority;       /* queueing priority                    */ // A
 		uint8_t     n_Flags;          /* misc flags, see below                */ // B
 		int32_t     n_Size;           /* total size of node including hdr     */ // C
-		m2ptr    pn_Name;           /* name of item, or NULL                */ // 10
+		m2ptr    pn_Name;             /* name of item, or NULL                */ // 10
 		uint8_t     n_Version;        /* version of of this Item              */ // 14
 		uint8_t     n_Revision;       /* revision of this Item                */ // 15
 		uint8_t     n_Reserved0;      /* reserved for future use              */ // 16
 		uint8_t     n_ItemFlags;      /* additional system item flags         */ // 17
-		Item      n_Item;           /* Item number representing this struct */ //18
-		Item      n_Owner;          /* creator, present owner, disposer     */ // 1C
-		m2ptr     pn_Reserved1;      /* reserved for future use              */ // 20
+		Item      n_Item;             /* Item number representing this struct */ //18
+		Item      n_Owner;            /* creator, present owner, disposer     */ // 1C
+		m2ptr     pn_Reserved1;       /* reserved for future use              */ // 20
 	};
 
 	struct Task
@@ -1479,7 +1482,7 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 		uint32_t     t_WaitBits;        /* signals being waited for     */
 		uint32_t     t_SigBits;         /* signals received             */
 		uint32_t     t_AllocatedSigs;   /* signals allocated            */
-		m2ptr        pt_StackBase;       /* base of stack                */
+		m2ptr        pt_StackBase;      /* base of stack                */
 		int32_t      t_StackSize;       /* size of stack                */
 		uint32_t     t_MaxUSecs;        /* quantum length in usecs      */
 		TimerTicks   t_ElapsedTime;     /* time spent running this task */
@@ -1487,7 +1490,7 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 		uint32_t     t_Flags;           /* task flags                   */
 		Item         t_Module;          /* the module we live within    */
 		Item         t_DefaultMsgPort;  /* default task msgport         */
-		m2ptr         pt_UserData;        /* user-private data            */
+		m2ptr         pt_UserData;      /* user-private data            */
 	};
 
 	debugger_console &con = machine().debugger().console();
@@ -1556,7 +1559,7 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 //  uint32_t     t_WaitBits;        /* signals being waited for     */
 //  uint32_t     t_SigBits;         /* signals received             */
 //  uint32_t     t_AllocatedSigs;   /* signals allocated            */
-//  m2ptr        pt_StackBase;       /* base of stack                */
+//  m2ptr        pt_StackBase;      /* base of stack                */
 //  int32_t      t_StackSize;       /* size of stack                */
 //  uint32_t     t_MaxUSecs;        /* quantum length in usecs      */
 //  TimerTicks   t_ElapsedTime;     /* time spent running this task */
@@ -1564,7 +1567,7 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 //  uint32_t     t_Flags;           /* task flags                   */
 //  Item         t_Module;          /* the module we live within    */
 //  Item         t_DefaultMsgPort;  /* default task msgport         */
-//  m2ptr         pt_UserData;        /* user-private data            */
+//  m2ptr         pt_UserData;      /* user-private data            */
 
 	con.printf("**** Task Info @ %08X ****\n", address);
 	con.printf("Next:        %08X\n", task.t.pn_Next);

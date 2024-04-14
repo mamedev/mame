@@ -26,7 +26,7 @@ h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, d
 
 void h8_port_device::ddr_w(u8 data)
 {
-	//  logerror("ddr_w %02x\n", data);
+	//logerror("ddr_w %02x\n", data);
 	m_ddr = data;
 	update_output();
 }
@@ -38,14 +38,14 @@ u8 h8_port_device::ddr_r()
 
 void h8_port_device::dr_w(u8 data)
 {
-	//  logerror("dr_w %02x\n", data);
+	//logerror("dr_w %02x\n", data);
 	m_dr = data;
 	update_output();
 }
 
 u8 h8_port_device::dr_r()
 {
-	//  logerror("dr_r %02x\n", (dr | mask) & 0xff);
+	//logerror("dr_r %02x\n", (dr | mask) & 0xff);
 	return m_dr | m_mask;
 }
 
@@ -55,7 +55,7 @@ u8 h8_port_device::port_r()
 	if((m_ddr & ~m_mask) != u8(~m_mask))
 		res |= m_cpu->do_read_port(m_address) & ~m_ddr;
 
-	//  logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, u8(~mask));
+	//logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, u8(~mask));
 	return res;
 }
 
@@ -85,7 +85,7 @@ u8 h8_port_device::odr_r()
 
 void h8_port_device::update_output()
 {
-	u8 data = m_dr & m_ddr & ~m_mask;
+	u8 data = (m_dr | ~m_ddr) & ~m_mask;
 	u8 ddr = m_ddr & ~m_mask; // 0-bits = hi-z
 	u16 res = ddr << 8 | data;
 
@@ -98,9 +98,9 @@ void h8_port_device::update_output()
 void h8_port_device::device_start()
 {
 	save_item(NAME(m_ddr));
-	save_item(NAME(m_dr));
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_odr));
+	save_item(NAME(m_dr));
 	save_item(NAME(m_last_output));
 
 	m_last_output = -1;
@@ -117,26 +117,18 @@ void h8_port_device::device_reset()
 
 bool h8_port_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	u8 buf[4];
+	u8 const buf[4]{ m_ddr, m_dr, m_pcr, m_odr };
 
-	buf[0] = m_ddr;
-	buf[1] = m_dr;
-	buf[2] = m_pcr;
-	buf[3] = m_odr;
-
-	if(file.write(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
-		return false;
-
-	return true;
+	auto const [err, actual] = write(file, buf, sizeof(buf));
+	return !err;
 }
 
 bool h8_port_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
 	u8 buf[4];
 
-	if(file.read(&buf, sizeof(buf), actual) || (sizeof(buf) != actual))
+	auto const [err, actual] = read(file, buf, sizeof(buf));
+	if(err || (sizeof(buf) != actual))
 		return false;
 
 	m_ddr = buf[0];

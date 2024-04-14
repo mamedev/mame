@@ -4,7 +4,7 @@
 
     TIM-011 AY Card
 
-	Card created by Zoran Urosevic.
+    Card created by Zoran Urosevic.
 
 **********************************************************************/
 
@@ -25,7 +25,7 @@ static INPUT_PORTS_START(joystick)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2)
-INPUT_PORTS_END       
+INPUT_PORTS_END
 
 class tim011_aycard_device :
 	public device_t,

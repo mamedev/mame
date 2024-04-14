@@ -183,8 +183,6 @@ private:
 };
 
 
-// video
-
 /* Sprites probably need to be delayed
    Some scroll layers may need to be offset slightly?
    Check sprite colours
@@ -292,8 +290,6 @@ uint32_t silkroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void silkroad_state::okibank_w(uint8_t data)
 {

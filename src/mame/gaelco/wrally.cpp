@@ -212,8 +212,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     Callbacks for the TileMap code
@@ -305,8 +303,6 @@ uint32_t wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void wrally_state::machine_start()
 {

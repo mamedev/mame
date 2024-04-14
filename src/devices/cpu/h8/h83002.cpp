@@ -26,9 +26,9 @@ h83002_device::h83002_device(const machine_config &mconfig, const char *tag, dev
 	m_timer16_3(*this, "timer16:3"),
 	m_timer16_4(*this, "timer16:4"),
 	m_watchdog(*this, "watchdog"),
-	m_tend_cb(*this)
+	m_tend_cb(*this),
+	m_syscr(0)
 {
-	m_syscr = 0;
 }
 
 void h83002_device::map(address_map &map)
@@ -233,16 +233,33 @@ void h83002_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
+void h83002_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_timer16_1->notify_standby(state);
+	m_timer16_2->notify_standby(state);
+	m_timer16_3->notify_standby(state);
+	m_timer16_4->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h83002_device::device_start()
 {
 	h8h_device::device_start();
 	m_dma_device = m_dma;
+
+	save_item(NAME(m_syscr));
+	save_item(NAME(m_rtmcsr));
 }
 
 void h83002_device::device_reset()
 {
 	h8h_device::device_reset();
 	m_syscr = 0x09;
+	m_rtmcsr = 0x00;
 }
 
 u8 h83002_device::syscr_r()

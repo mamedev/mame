@@ -95,7 +95,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<via6522_device> m_via;
 	memory_share_creator<u8> m_extram;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
@@ -110,7 +110,7 @@ private:
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
-	void init_board(int state);
+	void init_board(u8 data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void update_display();
@@ -147,7 +147,7 @@ void arb_state::update_reset()
 
 // sensorboard
 
-void arb_state::init_board(int state)
+void arb_state::init_board(u8 data)
 {
 	// different board setup for checkers
 	if (m_altboard)
@@ -159,7 +159,7 @@ void arb_state::init_board(int state)
 		}
 	}
 	else
-		m_board->preset_chess();
+		m_board->preset_chess(data);
 }
 
 
@@ -270,9 +270,6 @@ static INPUT_PORTS_START( arb )
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, 0)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -356,5 +353,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, arb,   0,      0,      arb,     arb,   arb_state, empty_init, "AVE Micro Systems", "Auto Response Board", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 2012, arbv2, arb,    0,      v2,      arb,   arb_state, empty_init, "hack (Steve Braid)", "ARB V2 Sargon 4.0", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, arb,   0,      0,      arb,     arb,   arb_state, empty_init, "AVE Micro Systems", "Auto Response Board", MACHINE_SUPPORTS_SAVE )
+SYST( 2012, arbv2, arb,    0,      v2,      arb,   arb_state, empty_init, "hack (Steve Braid)", "ARB V2 Sargon 4.0", MACHINE_SUPPORTS_SAVE )

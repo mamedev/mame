@@ -62,6 +62,7 @@ protected:
 	uint8_t m_IR_pointer;
 	uint16_t m_screen1_address;
 	uint16_t m_screen2_address;
+	uint16_t m_screen2_address_start;
 	uint16_t m_cursor_address;
 	uint8_t m_irq_register;
 	uint8_t m_status_register;

@@ -128,12 +128,12 @@ void virge_pci_device::linear_config_changed_w(int state)
 
 uint8_t virge_pci_device::vram_r(offs_t offset)
 {
-	return downcast<s3_vga_device *>(m_vga.target())->mem_r(offset);
+	return downcast<s3virge_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void virge_pci_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<s3_vga_device *>(m_vga.target())->mem_w(offset, data);
+	downcast<s3virge_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void virge_pci_device::postload()
@@ -217,18 +217,23 @@ ROM_START( virge_pci )
 	ROM_REGION(0x8000,"bios", 0)
 	ROM_DEFAULT_BIOS("virge")
 
-	ROM_SYSTEM_BIOS( 0, "virge", "PCI S3 ViRGE v1.00-10" )
+	ROM_SYSTEM_BIOS( 0, "virge", "S3 ViRGE v1.00-10" )
 	ROMX_LOAD("pci_m-v_virge-4s3.bin", 0x00000, 0x8000, CRC(d0a0f1de) SHA1(b7b41081974762a199610219bdeab149b7c7143d), ROM_BIOS(0) )
 
-	ROM_SYSTEM_BIOS( 1, "virgeo", "PCI S3 ViRGE v1.00-05" )
+	ROM_SYSTEM_BIOS( 1, "virgeo", "S3 ViRGE v1.00-05" )
 	ROMX_LOAD("s3virge.bin", 0x00000, 0x8000, CRC(a7983a85) SHA1(e885371816d3237f7badd57ccd602cd863c9c9f8), ROM_BIOS(1) )
 	ROM_IGNORE( 0x8000 )
 ROM_END
 
 ROM_START( virgedx_pci )
 	ROM_REGION(0x8000,"bios", 0)
-	ROM_LOAD("s3virgedx.bin", 0x00000, 0x8000, CRC(0da83bd3) SHA1(228a2d644e1732cb5a2eb1291608c7050cf39229) )
-	//ROMX_LOAD("virgedxdiamond.bin", 0x00000, 0x8000, CRC(58b0dcda) SHA1(b13ae6b04db6fc05a76d924ddf2efe150b823029), ROM_BIOS(2) )
+	ROM_DEFAULT_BIOS("virgedx")
+
+	ROM_SYSTEM_BIOS( 0, "virgedx", "S3 ViRGE/DX v2.01.13" )
+	ROMX_LOAD("s3virgedx.bin", 0x00000, 0x8000, CRC(0da83bd3) SHA1(228a2d644e1732cb5a2eb1291608c7050cf39229), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS( 1, "dms3d2kp", "Diamond Stealth 3D 2000 Pro v3.04" )
+	ROMX_LOAD("virgedxdiamond.bin", 0x00000, 0x8000, CRC(58b0dcda) SHA1(b13ae6b04db6fc05a76d924ddf2efe150b823029), ROM_BIOS(1) )
 ROM_END
 
 const tiny_rom_entry *virge_pci_device::device_rom_region() const
@@ -243,3 +248,4 @@ const tiny_rom_entry *virgedx_pci_device::device_rom_region() const
 
 DEFINE_DEVICE_TYPE(VIRGE_PCI, virge_pci_device, "virge_pci", "S3 86C325 ViRGE")
 DEFINE_DEVICE_TYPE(VIRGEDX_PCI, virgedx_pci_device, "virgedx_pci", "S3 86C375 ViRGE/DX")
+//VIRGEGX_PCI, /DX with SGRAM/SDRAM support

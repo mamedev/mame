@@ -55,6 +55,7 @@ TODO:
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
 - Background color is not verified
+- Device-fy video chip and split according to hardware (i.e. NamcoEVA2 and 3).
 
 gundamex:
 - slowdowns, music tempo is incorrect
@@ -112,9 +113,9 @@ funcube series:
 
 void seta2_state::machine_start()
 {
-	if (memregion( "x1snd" ) != nullptr)
+	if (memregion("x1snd") != nullptr)
 	{
-		uint32_t const max = memregion( "x1snd" )->bytes() / 0x20000;
+		uint32_t const max = memregion("x1snd")->bytes() / 0x20000;
 		for (int i = 0; i < 8; i++)
 		{
 			if (m_x1_bank[i] != nullptr)
@@ -122,7 +123,7 @@ void seta2_state::machine_start()
 				uint32_t ind = 0;
 				while (ind < 256)
 				{
-					m_x1_bank[i]->configure_entries(ind, max, memregion( "x1snd" )->base(), 0x20000); // TODO : Mirrored?
+					m_x1_bank[i]->configure_entries(ind, max, memregion("x1snd")->base(), 0x20000); // TODO : Mirrored?
 					ind += max;
 				}
 			}
@@ -160,7 +161,7 @@ void seta2_state::grdians_lockout_w(uint8_t data)
 	// initially 0, then either $25 (coin 1) or $2a (coin 2)
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);   // or 0x08
-//  popmessage("%04X", data & 0xff);
+	//popmessage("%04X", data & 0xff);
 }
 
 void seta2_state::grdians_map(address_map &map)
@@ -429,7 +430,7 @@ void seta2_state::reelquak_leds_w(offs_t offset, uint16_t data, uint16_t mem_mas
 		m_dispenser->motor_w(BIT(data, 8)); // ticket dispenser
 	}
 
-//  popmessage("LED %04X", data);
+	//popmessage("LED %04X", data);
 }
 
 void seta2_state::reelquak_coin_w(uint8_t data)
@@ -438,9 +439,9 @@ void seta2_state::reelquak_coin_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
 	machine().bookkeeping().coin_counter_w(2, data & 0x04);  // pay out
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  // key in
-	//                                data & 0x10); // Sound IRQ Ack.? 1->0
-	//                                data & 0x20); // Vblank IRQ.? 1
-//  popmessage("COIN %04X", data & 0xff);
+	// data & 0x10); // Sound IRQ Ack.? 1->0
+	// data & 0x20); // Vblank IRQ.? 1
+	//popmessage("COIN %04X", data & 0xff);
 }
 
 void seta2_state::reelquak_map(address_map &map)
@@ -485,10 +486,11 @@ void seta2_state::samshoot_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+
 	// Are these connected? They are set in I/O test
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x40);
 	machine().bookkeeping().coin_lockout_w(1,~data & 0x80);
-//  popmessage("%04x",data);
+	//popmessage("%04x",data);
 }
 
 void seta2_state::samshoot_map(address_map &map)
@@ -527,35 +529,35 @@ void seta2_state::samshoot_map(address_map &map)
 
 void staraudi_state::staraudi_debug_outputs()
 {
-//  popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
+	//popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
 }
 
 void staraudi_state::lamps1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps1);
-	m_leds[0] = BIT(data, 0);  // Lamp 1 |
-	m_leds[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
-	m_leds[2] = BIT(data, 2);  // Lamp 3 |
-	//                        data & 0x08 );  // Degauss
+	m_leds[0] = BIT(data, 0); // Lamp 1 |
+	m_leds[1] = BIT(data, 1); // Lamp 2 |- Camera Lamps
+	m_leds[2] = BIT(data, 2); // Lamp 3 |
+	// data & 0x08 );  // Degauss
 	staraudi_debug_outputs();
 }
 
 void staraudi_state::lamps2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps2);
-	//                        data & 0x20 );  // ? Always On
-	m_leds[3] = BIT(data, 6);  // 2P Switch Lamp
-	m_leds[4] = BIT(data, 7);  // 1P Switch Lamp
+	// data & 0x20 ); // ? Always On
+	m_leds[3] = BIT(data, 6); // 2P Switch Lamp
+	m_leds[4] = BIT(data, 7); // 1P Switch Lamp
 	staraudi_debug_outputs();
 }
 
 void staraudi_state::camera_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_cam);
-	//                        data & 0x01 );  // ? Always On
-	//                        data & 0x02 );  // ? Print Test
-	//                        data & 0x08 );  // Camera On (Test Mode)
-	//                        data & 0x20 );  // ?
+	// data & 0x01 ); // ? Always On
+	// data & 0x02 ); // ? Print Test
+	// data & 0x08 ); // Camera On (Test Mode)
+	// data & 0x20 ); // ?
 	staraudi_debug_outputs();
 }
 
@@ -621,7 +623,7 @@ void seta2_state::telpacfl_lamp1_w(uint8_t data)
 	for (int i = 0; i <= 7; i++)
 		m_lamps[i] = BIT(data, i);
 
-//  popmessage("LAMP1 %04X", data);
+	//popmessage("LAMP1 %04X", data);
 }
 
 void seta2_state::telpacfl_lamp2_w(uint8_t data)
@@ -629,11 +631,11 @@ void seta2_state::telpacfl_lamp2_w(uint8_t data)
 	m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
 	m_lamps[9] = BIT(data, 1); // bet lamp
 	m_lamps[10] = BIT(data, 2); // payout lamp
-	m_dispenser->motor_w(       data & 0x08 ); // coin out motor
-	machine().bookkeeping().coin_counter_w(0,  data & 0x10); // coin out counter
-	//                          data & 0x20 ); // on credit increase
+	m_dispenser->motor_w(data & 0x08); // coin out motor
+	machine().bookkeeping().coin_counter_w(0, data & 0x10); // coin out counter
+	// data & 0x20 ); // on credit increase
 
-//  popmessage("LAMP2 %04X", data);
+	//popmessage("LAMP2 %04X", data);
 }
 
 void seta2_state::telpacfl_lockout_w(uint8_t data)
@@ -643,7 +645,7 @@ void seta2_state::telpacfl_lockout_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x08); // 100yen blocker
 	// bits 0x30 ?
 
-//  popmessage("LOCK %04X", data);
+	//popmessage("LOCK %04X", data);
 }
 
 void seta2_state::telpacfl_map(address_map &map)
@@ -756,7 +758,8 @@ void funcube_touchscreen_device::device_reset()
 TIMER_CALLBACK_MEMBER(funcube_touchscreen_device::read_buttons)
 {
 	uint8_t button_state = m_btn->read();
-	if(m_button_state != button_state) {
+	if (m_button_state != button_state)
+	{
 		m_button_state = button_state;
 		m_serial[0] = button_state ? 0xfe : 0xfd;
 		m_serial[1] = m_x->read();
@@ -769,7 +772,7 @@ TIMER_CALLBACK_MEMBER(funcube_touchscreen_device::read_buttons)
 
 void funcube_touchscreen_device::tra_complete()
 {
-	if(m_serial_pos != 4)
+	if (m_serial_pos != 4)
 		transmit_register_setup(m_serial[m_serial_pos++]);
 }
 
@@ -779,29 +782,7 @@ void funcube_touchscreen_device::tra_callback()
 }
 
 
-// Bus conversion functions:
-
-// RAM shared with the sub CPU
-uint32_t funcube_state::nvram_r(offs_t offset)
-{
-	uint16_t val = m_nvram[offset];
-	return ((val & 0xff00) << 8) | (val & 0x00ff);
-}
-
-void funcube_state::nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_nvram[offset] = (m_nvram[offset] & 0xff00) | (data & 0x000000ff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		m_nvram[offset] = (m_nvram[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
-	}
-}
-
 // Main CPU
-
 
 uint32_t funcube_state::debug_r()
 {
@@ -829,7 +810,7 @@ void funcube_state::funcube_map(address_map &map)
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
 	map(0x00860000, 0x0086003f).rw(FUNC(funcube_state::vregs_r), FUNC(funcube_state::vregs_w));
 
-	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
 
 	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
@@ -850,7 +831,7 @@ void funcube_state::funcube2_map(address_map &map)
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x00860000, 0x0086003f).rw(FUNC(funcube_state::vregs_r), FUNC(funcube_state::vregs_w));
 
-	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
 
 	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
@@ -861,7 +842,7 @@ void funcube_state::funcube2_map(address_map &map)
 void funcube_state::funcube_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x200000, 0x20017f).ram().share("nvram");
+	map(0x200000, 0x20017f).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask16(0xffff);
 }
 
 
@@ -871,23 +852,23 @@ void funcube_state::funcube_sub_map(address_map &map)
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
-uint16_t funcube_state::coins_r()
+uint8_t funcube_state::coins_r()
 {
 	uint8_t ret = ioport("SWITCH")->read();
-	uint8_t coin_bit0 = 1;    // active low
+	uint8_t coin_bit0 = 1; // active low
 	uint8_t coin_bit1 = 1;
 
-	uint8_t hopper_bit = (m_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
+	uint8_t hopper_bit = (m_hopper_motor && !(m_screen->frame_number() % 20)) ? 1 : 0;
 
 	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/10);
 
-	if ( m_coin_start_cycles )
+	if (m_coin_start_cycles)
 	{
 		uint64_t elapsed = m_sub->total_cycles() - m_coin_start_cycles;
 
-		if ( elapsed < coin_total_cycles/2 )
+		if (elapsed < coin_total_cycles/2)
 			coin_bit0 = 0;
-		else if ( elapsed < coin_total_cycles )
+		else if (elapsed < coin_total_cycles)
 			coin_bit1 = 0;
 		else
 			m_coin_start_cycles = 0;
@@ -903,12 +884,10 @@ uint16_t funcube_state::coins_r()
 
 void funcube_state::funcube_debug_outputs()
 {
-#ifdef MAME_DEBUG
-//  popmessage("LED: %02x OUT: %02x", m_funcube_leds, m_outputs);
-#endif
+	//popmessage("LED: %02x OUT: %02x", m_funcube_leds, m_outputs);
 }
 
-void funcube_state::leds_w(uint16_t data)
+void funcube_state::leds_w(uint8_t data)
 {
 	m_funcube_leds = data;
 
@@ -924,13 +903,13 @@ void funcube_state::leds_w(uint16_t data)
 	funcube_debug_outputs();
 }
 
-uint16_t funcube_state::outputs_r()
+uint8_t funcube_state::outputs_r()
 {
 	// Bits 1,2,3 read
 	return m_outputs;
 }
 
-void funcube_state::outputs_w(uint16_t data)
+void funcube_state::outputs_w(uint8_t data)
 {
 	m_outputs = data;
 
@@ -947,7 +926,7 @@ void funcube_state::outputs_w(uint16_t data)
 	funcube_debug_outputs();
 }
 
-uint16_t funcube_state::battery_r()
+uint8_t funcube_state::battery_r()
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
@@ -4421,7 +4400,7 @@ GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,
 
 GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P-FG01-1 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, grdiansa,  grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, grdiansbl, grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "bootleg (Intac Japan)",         "Guardians / Denjin Makai II (bootleg)",       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, grdiansbl, grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "bootleg (Intac Japan)",         "Guardians / Denjin Makai II (bootleg)",       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)",        MACHINE_NO_COCKTAIL )
 

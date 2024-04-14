@@ -392,10 +392,7 @@ int microvision_state::i8021_t1_r()
 {
 	// T1: paddle capacitor (active low)
 	if (m_paddle_on)
-	{
-		bool active = (m_p2 & 0xc) || m_paddle_delay > machine().time();
-		return active ? 1 : 0;
-	}
+		return (m_p2 & 0xc || m_paddle_delay > machine().time()) ? 1 : 0;
 	else
 		return 1;
 }

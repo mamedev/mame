@@ -85,7 +85,7 @@ protected:
 	optional_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	u8 m_select = 0;
@@ -112,6 +112,7 @@ void desdis_state::machine_start()
 	save_item(NAME(m_select));
 	save_item(NAME(m_lcd_data));
 }
+
 
 // Designer Master
 
@@ -231,7 +232,7 @@ void desdis_state::fdes2100d_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(desdis_state::input_r), FUNC(desdis_state::control_w));
-	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x6000, 0x6007).mirror(0x1ff8).w(FUNC(desdis_state::lcd_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -401,10 +402,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE    INPUT   CLASS         INIT            COMPANY, FULLNAME, FLAGS
-SYST( 1988, fdes2100d,  0,         0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fdes2100da, fdes2100d, 0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fdes2000d,  fdes2100d, 0,      fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fdes2100d,  0,         0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2100da, fdes2100d, 0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2000d,  fdes2100d, 0,      fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, fdes2265,   0,         0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, fdes2265a,  fdes2265,  0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, fdes2325,   fdes2265,  0,      fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, fdes2265,   0,         0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, fdes2265a,  fdes2265,  0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, fdes2325,   fdes2265,  0,      fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE )

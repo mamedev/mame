@@ -42,15 +42,15 @@ namespace {
 class montec_state : public driver_device
 {
 public:
-	montec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_lcd_latch(*this, "lcd_latch")
-		, m_led_pwm(*this, "led_pwm")
-		, m_lcd(*this, "lcd%u", 0)
-		, m_keys(*this, "KEY.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+	montec_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_lcd_latch(*this, "lcd_latch"),
+		m_led_pwm(*this, "led_pwm"),
+		m_lcd(*this, "lcd%u", 0),
+		m_keys(*this, "KEY.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void montec(machine_config &config);
@@ -151,7 +151,7 @@ void montec_state::montec_mem(address_map &map)
 static INPUT_PORTS_START( montec )
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("BOOK / 9")   PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / 0")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / 0")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM")        PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO")       PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
@@ -267,8 +267,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, montec,     0,        0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, montec,     0,        0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV: Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV: Limited Edition", MACHINE_SUPPORTS_SAVE )

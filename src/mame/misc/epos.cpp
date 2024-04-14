@@ -183,8 +183,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   These games has one 32 byte palette PROM, connected to the RGB output this way:
@@ -276,8 +274,6 @@ uint32_t epos_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-
-// machine
 
 void tristar9000_state::decrypt_rom(offs_t offset, uint8_t data)
 {

@@ -152,8 +152,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
 {
 	int const tileno = m_videoram[tile_index];
@@ -200,8 +198,6 @@ void sbugger_state::palette(palette_device &palette) const
 	}
 }
 
-
-// machine
 
 void sbugger_state::prg_map(address_map &map)
 {

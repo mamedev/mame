@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ldp1450.h"
+#include "ldp1450.h"
 
 #define DUMP_BCD 1
 #define FIFO_MAX 0x10

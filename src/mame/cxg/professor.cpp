@@ -14,7 +14,7 @@ For some reason, they've put the row leds on the right instead of on the left.
 Hardware notes:
 - PCB label: 243 600 001
 - Hitachi HD63B01Y0P, 8MHz XTAL
-- Sanyo LC7580, LCD with custom segments
+- Sanyo LC7580, LCD with 5 7segs and custom segments
 - 8*8 chessboard buttons, 16 LEDs, piezo
 
 *******************************************************************************/
@@ -63,14 +63,14 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<lc7580_device> m_lcd;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<3> m_inputs;
 	output_finder<2, 52> m_out_lcd;
 
 	u16 m_inp_mux = 0;
 
 	// I/O handlers
-	void lcd_s_w(offs_t offset, u64 data);
+	void lcd_output_w(offs_t offset, u64 data);
 	template <int N> void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
@@ -98,7 +98,7 @@ INPUT_CHANGED_MEMBER(professor_state::on_button)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-void professor_state::lcd_s_w(offs_t offset, u64 data)
+void professor_state::lcd_output_w(offs_t offset, u64 data)
 {
 	for (int i = 0; i < 52; i++)
 		m_out_lcd[offset][i] = BIT(data, i);
@@ -119,9 +119,9 @@ void professor_state::control_w(u8 data)
 	// P23: speaker out
 	m_dac->write(BIT(data, 3));
 
-	// P26: LC7580 CE
-	// P25: LC7580 CLK
 	// P24: LC7580 DATA
+	// P25: LC7580 CLK
+	// P26: LC7580 CE
 	m_lcd->data_w(BIT(data, 4));
 	m_lcd->clk_w(BIT(data, 5));
 	m_lcd->ce_w(BIT(data, 6));
@@ -170,7 +170,7 @@ static INPUT_PORTS_START( professor )
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("Reset")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Position")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Position")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Color")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Test")
@@ -198,8 +198,8 @@ void professor_state::professor(machine_config &config)
 	HD6301Y0(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y_cpu_device::nvram_set_battery));
-	m_maincpu->standby_cb().append(m_lcd, FUNC(lc7580_device::inh_w));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
+	m_maincpu->standby_cb().append(m_lcd, FUNC(lc7580_device::inh_w));
 	m_maincpu->out_p1_cb().set(FUNC(professor_state::leds_w<0>));
 	m_maincpu->out_p4_cb().set(FUNC(professor_state::leds_w<1>));
 	m_maincpu->out_p2_cb().set(FUNC(professor_state::control_w));
@@ -213,7 +213,7 @@ void professor_state::professor(machine_config &config)
 
 	// video hardware
 	LC7580(config, m_lcd, 0);
-	m_lcd->write_segs().set(FUNC(professor_state::lcd_s_w));
+	m_lcd->write_segs().set(FUNC(professor_state::lcd_output_w));
 	m_lcd->nvram_enable_backup(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -239,8 +239,8 @@ ROM_START( scprof )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("1988_107_newcrest_hd6301y0j76p", 0x0000, 0x4000, CRC(681456c7) SHA1(99f8ab7369dbc2c93335affc38838295a8a2c5f3) )
 
-	ROM_REGION( 61763, "screen", 0 )
-	ROM_LOAD("scprof.svg", 0, 61763, CRC(2c26e603) SHA1(028b6406ff2aa89af75dc4133d3cb9a1bbcb846d) )
+	ROM_REGION( 61580, "screen", 0 )
+	ROM_LOAD("scprof.svg", 0, 61580, CRC(6ebdf57c) SHA1(b0c01f1f251a569a2503a1053d7e676b1e6d9b0a) )
 ROM_END
 
 } // anonymous namespace
@@ -252,4 +252,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Chess Professor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Chess Professor", MACHINE_SUPPORTS_SAVE )

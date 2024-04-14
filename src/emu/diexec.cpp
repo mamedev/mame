@@ -70,8 +70,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_attoseconds_per_cycle(0)
 	, m_spin_end_timer(nullptr)
 {
-	memset(&m_localtime, 0, sizeof(m_localtime));
-
 	// configure the fast accessor
 	assert(!device.interfaces().m_execute);
 	device.interfaces().m_execute = this;

@@ -196,8 +196,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     Convert the color PROMs.
@@ -517,8 +515,6 @@ void baraduke_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 void baraduke_state::inputport_select_w(uint8_t data)
 {

@@ -243,7 +243,7 @@ static INPUT_PORTS_START( cc10c )
 	PORT_INCLUDE( cc3 )
 
 	PORT_MODIFY("IN.1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / PB") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / PB") PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_P)
 INPUT_PORTS_END
 
 
@@ -319,6 +319,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1977, cc1,   0,      0,      cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-SYST( 1977, cc3,   0,      0,      cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
-SYST( 1979, cc10c, 0,      0,      cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C
+SYST( 1977, cc1,   0,      0,      cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, cc3,   0,      0,      cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
+SYST( 1979, cc10c, 0,      0,      cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C

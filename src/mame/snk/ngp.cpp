@@ -805,8 +805,8 @@ void ngp_state::nvram_default()
 
 bool ngp_state::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (!file.read(m_mainram, 0x3000, actual) && actual == 0x3000)
+	auto const [err, actual] = read(file, m_mainram, 0x3000);
+	if (!err && (actual == 0x3000))
 	{
 		m_nvram_loaded = true;
 		return true;
@@ -817,8 +817,8 @@ bool ngp_state::nvram_read(util::read_stream &file)
 
 bool ngp_state::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_mainram, 0x3000, actual) && actual == 0x3000;
+	auto const [err, actual] = write(file, m_mainram, 0x3000);
+	return !err;
 }
 
 

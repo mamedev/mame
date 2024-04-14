@@ -62,7 +62,7 @@ private:
 	required_device<z80pio_device> m_z80pio;
 	required_device_array<dl1414_device, 3> m_dl1414;
 	required_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<8> m_inputs;
 	output_finder<12> m_digits;
 
@@ -293,4 +293,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, bridgeb, 0,      0,      bridgeb, bridgeb, bridgeb_state, empty_init, "Fidelity Electronics", "Bridge Bidder", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, bridgeb, 0,      0,      bridgeb, bridgeb, bridgeb_state, empty_init, "Fidelity Electronics", "Bridge Bidder", MACHINE_SUPPORTS_SAVE )

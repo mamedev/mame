@@ -175,8 +175,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Video Hardware for Championship V'ball by Paul Hampson
@@ -320,8 +318,6 @@ uint32_t vball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 // Based on ddragon driver
 inline int vball_state::scanline_to_vcount(int scanline)

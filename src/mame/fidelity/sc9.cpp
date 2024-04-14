@@ -64,8 +64,6 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 
 namespace {
 
-// SC9 / shared
-
 class sc9_state : public driver_device
 {
 public:
@@ -93,7 +91,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	u8 m_inp_mux = 0;
@@ -323,7 +321,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
-SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9c,  sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state, empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 9 is not between quotation marks here
+SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE ) // aka version "B"
+SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9c,  sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state, empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE ) // 9 is not between quotation marks here

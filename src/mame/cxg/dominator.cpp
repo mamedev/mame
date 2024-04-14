@@ -69,7 +69,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<lc7582_device> m_lcd;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 	output_finder<8> m_out_digit;
 	output_finder<2, 52> m_out_lcd;
@@ -79,7 +79,7 @@ private:
 	void galaxy_map(address_map &map);
 
 	// I/O handlers
-	void lcd_s_w(offs_t offset, u64 data);
+	void lcd_output_w(offs_t offset, u64 data);
 	void control_w(u8 data);
 	void leds_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
@@ -99,14 +99,14 @@ void dominator_state::machine_start()
 
 // LC7582 LCD
 
-void dominator_state::lcd_s_w(offs_t offset, u64 data)
+void dominator_state::lcd_output_w(offs_t offset, u64 data)
 {
 	// output individual segments
 	for (int i = 0; i < 52; i++)
 		m_out_lcd[offset][i] = BIT(data, i);
 
 	// unscramble digit 7segs
-	static u8 seg2digit[4*7] =
+	static const u8 seg2digit[4*7] =
 	{
 		0x03, 0x04, 0x00, 0x40, 0x41, 0x02, 0x42,
 		0x05, 0x06, 0x07, 0x48, 0x44, 0x45, 0x46,
@@ -131,9 +131,9 @@ void dominator_state::lcd_s_w(offs_t offset, u64 data)
 
 void dominator_state::control_w(u8 data)
 {
-	// d2: LC7582 CE
-	// d1: LC7582 CLK
 	// d0: LC7582 DATA
+	// d1: LC7582 CLK
+	// d2: LC7582 CE
 	m_lcd->data_w(BIT(data, 0));
 	m_lcd->clk_w(BIT(data, 1));
 	m_lcd->ce_w(BIT(data, 2));
@@ -267,7 +267,7 @@ void dominator_state::dominator(machine_config &config)
 
 	// video hardware
 	LC7582(config, m_lcd, 0);
-	m_lcd->write_segs().set(FUNC(dominator_state::lcd_s_w));
+	m_lcd->write_segs().set(FUNC(dominator_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8+1, 8);
 	config.set_default_layout(layout_cxg_dominator);
@@ -341,10 +341,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, sdtor,    0,       0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, sdtor,    0,       0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, sgalaxy,  0,       0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, sgalaxya, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, sgalaxyb, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, sgalaxy,  0,       0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sgalaxya, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.00)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sgalaxyb, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v1.03)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, scmder,   0,       0,      commander, commander, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Commander (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, scmder,   0,       0,      commander, commander, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Commander (v2.00)", MACHINE_SUPPORTS_SAVE )

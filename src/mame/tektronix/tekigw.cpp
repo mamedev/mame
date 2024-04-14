@@ -9,15 +9,44 @@
  *   - https://archive.org/details/tektronix_Tektronix_1985
  *
  * TODO:
- *   - am9516 dma controller
  *   - slots and cards
  *   - gpib devices
  *   - graphics and keyboard
  */
 /*
- * WIP
+ * tek4132
  *  - novram chip select not asserted when trying to read ethernet mac address?
  *  - aborts to firmware monitor on second serial port after failing to boot
+ *  - hangs during UTek boot
+ *
+booting /vmunix
+<UTek>  RSA - RS-232 ports
+<UTek>  RSADMA - RS-232 DMA
+<UTek>  SCSI - SCSI interface
+<UTek>  lna0: Ethernet= 8:0:11:0:0:f7 Ip=[42.128.0.1]
+<UTek>  LNA - Local Area Network
+<UTek>  CEPWR - Soft Power switch
+<UTek> end configure
+<UTek> Tektronix - UTek STRATOSIIW2.3 #1.25 Thu Oct 23 16:56:50 PDT 1986
+<UTek>
+<UTek> real mem = 1024k
+<UTek> firstaddr = 0x3fda8
+<UTek> firstaddr = 0x78600
+<UTek> avail mem = 531456
+<UTek> using 51 buffers containing 104448 bytes of memory
+<UTek> inittodr: clock has gone backward, file system time used
+<UTek>    file system time = 2eab0645
+<UTek>    clock = 5bb2d3
+ */
+/*
+ * tek6130
+ * "Invalid menu file.  Dropping into shell.\n" - string at d789
+ * accessed by printf at 7b82
+ * message set at a6b0
+ *
+Booting from disk
+Invalid menu file.  Dropping into shell.
+diags>
  */
 
 #include "emu.h"
@@ -27,12 +56,12 @@
 #include "machine/ram.h"
 
 // various hardware
-//#include "machine/am9516a.h"
+#include "machine/am9516.h"
 #include "machine/am9517a.h"
 #include "machine/eepromser.h"
 #include "machine/i82586.h"
 #include "machine/mm58167.h"
-//#include "machine/ncr5385.h"
+#include "machine/ncr5385.h"
 #include "machine/ns32081.h"
 #include "machine/ns32082.h"
 #include "machine/ns32202.h"
@@ -75,7 +104,7 @@ protected:
 		, m_serial(*this, "port%u", 0U)
 		, m_rtc(*this, "rtc")
 		, m_nov(*this, "nov%u", 0U)
-		//, m_dma(*this, "dma")
+		, m_dma(*this, "dma")
 		, m_lan(*this, "lan")
 		, m_led(*this, "led")
 	{
@@ -90,6 +119,7 @@ protected:
 
 	// address maps
 	template <unsigned ST> void cpu_map(address_map &map);
+	void dma_map(address_map &map);
 
 	// computer board control registers
 	u8 nov_r() { return m_nmr; }
@@ -114,7 +144,7 @@ protected:
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<mm58167_device> m_rtc;
 	optional_device_array<eeprom_serial_x24c44_16bit_device, 2> m_nov;
-	//required_device<am9516a_device> m_dma;
+	required_device<am9516_device> m_dma;
 	required_device<i82586_device> m_lan;
 
 	output_finder<> m_led;
@@ -173,7 +203,7 @@ private:
 	template <typename T> T buf_r();
 	template <typename T> void buf_w(T data);
 
-	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, rectangle const& cliprect) { return 0; }
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) { return 0; }
 
 	required_device<tms9914_device> m_gpib;
 	required_device<wd1770_device> m_fdc;
@@ -198,7 +228,7 @@ public:
 	tek4132_state(machine_config const &mconfig, device_type type, char const *tag)
 		: tekigw_state_base(mconfig, type, tag)
 		, m_scsibus(*this, "scsi")
-		//, m_scsi(*this, "scsi:7:ncr5385")
+		, m_scsi(*this, "scsi:7:ncr5385")
 		, m_sdma(*this, "sdma")
 		, m_sirq(*this, "sirq")
 	{
@@ -218,7 +248,7 @@ protected:
 
 private:
 	required_device<nscsi_bus_device> m_scsibus;
-	//required_device<ncr5385_device> m_scsi;
+	required_device<ncr5385_device> m_scsi;
 	required_device<am9517a_device> m_sdma;
 
 	required_device<input_merger_all_high_device> m_sirq;
@@ -243,6 +273,10 @@ void tekigw_state_base::machine_reset()
 {
 	nov_w(0);
 	scr_w(0);
+
+	m_icu->g_w<0>(1); // mmu present
+	m_icu->g_w<7>(1); // fpu present
+	m_icu->ir_w<12>(0);
 }
 
 void tek6100_state::machine_start()
@@ -263,16 +297,6 @@ void tek6100_state::machine_reset()
 
 	hcr_w(0);
 	fcr_w(0);
-
-	m_icu->ir_w<0>(1); // mmu present
-	m_icu->ir_w<3>(1);
-	m_icu->ir_w<4>(1);
-	m_icu->ir_w<5>(1);
-	m_icu->ir_w<6>(1);
-	m_icu->ir_w<7>(1);
-	m_icu->ir_w<8>(1);
-	m_icu->ir_w<9>(1);
-	m_icu->ir_w<14>(1); // fpu present
 }
 
 void tekigw_state_base::common_init()
@@ -342,6 +366,8 @@ enum per_mask : u16
 
 void tekigw_state_base::scr_w(u8 data)
 {
+	LOG("scr_w 0x%02x (%s)\n", data, machine().describe_context());
+
 	if (!(m_scr & SCR_RAME) && (data & SCR_RAME))
 		m_cpu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
 
@@ -556,6 +582,7 @@ template <unsigned ST> void tekigw_state_base::cpu_map(address_map &map)
 	map(0xfff00a, 0xfff00b).lr16([this]() { return m_per; }, "per_r");
 	map(0xfff00c, 0xfff00c).rw(FUNC(tekigw_state_base::scr_r), FUNC(tekigw_state_base::scr_w));
 	map(0xfff00e, 0xfff00e).r(FUNC(tekigw_state_base::ssr_r));
+	map(0xfff00f, 0xfff00f).lr8([]() { return 7; }, "mem_size"); // code at 804703 uses this to size memory
 
 	map(0xfff800, 0xfff83f).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0xff);
 	map(0xfffa00, 0xfffa07).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff);
@@ -580,7 +607,7 @@ template <unsigned ST> void tek6100_state::cpu_map(address_map &map)
 			// 7 for CPU, but diagnostic expects F; maybe 4132 is different?
 			m_buserror->adjust(attotime::from_ticks(10, m_cpu->clock()), 0x7);
 
-			return 0; // space.unmap();
+			return space.unmap();
 		}, "buserror"); // expansion I/O
 
 	map(0xff0000, 0xff7fff).rw(FUNC(tek6100_state::buf_r<u16>), FUNC(tek6100_state::buf_w<u16>));
@@ -641,13 +668,16 @@ enum csr_mask : u8
 template <unsigned ST> void tek4132_state::cpu_map(address_map &map)
 {
 	map(0x000000, 0xffffff).lr8(
-		[this](address_space &space)
+		[this](address_space &space, offs_t offset)
 		{
-			// FIXME: Should be 20μs according to 6100 documentation; CPU is still
-			// too fast, and timing may differ on 4132. Also DMACH field should be
-			// 7 for CPU, but diagnostic expects F; maybe 4132 is different?
-			m_buserror->adjust(attotime::from_ticks(50, m_cpu->clock()), 0xf);
-
+			if (!machine().side_effects_disabled())
+			{
+				// FIXME: Should be 20μs according to 6100 documentation; CPU is still
+				// too fast, and timing may differ on 4132. Also DMACH field should be
+				// 7 for CPU, but diagnostic expects F; maybe 4132 is different?
+				m_buserror->adjust(attotime::from_ticks(20, m_cpu->clock()), 0xf);
+				logerror("buserror 0x%06x (%s)\n", offset, machine().describe_context());
+			}
 			return space.unmap();
 		}, "buserror");
 
@@ -658,23 +688,25 @@ template <unsigned ST> void tek4132_state::cpu_map(address_map &map)
 
 	//map(0xfff000, 0xfff000).w(FUNC(tek6100_state::fcr_w)); // rsaa_dmaaos serial dma address offset register
 	//map(0xfff002, 0xfff002).w(FUNC(tek6100_state::gcr_w)); // rsaa_auxlatch serial auxiliary control register
+	//map(0xfff008, 0xfff008).w(); // rsaa_irqreset
+	//map(0xfff00f, 0xfff00f).lr8([]() { return 0x7; }, "memsize"); // code at 804703 uses this to size memory
 
 	map(0xfff900, 0xfff91f).rw(m_sdma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff);
 	//map(0xfffa08, 0xfffa08); // rsaa_status
 
 	//map(0xfffc00, 0xfffc1f); // signature
 	map(0xfffc20, 0xfffc3f).lw8(
-		[this](u8 data)
+		[this](offs_t offset, u8 data)
 		{
-			LOG("csr_w 0x%02x (%s)\n", data, machine().describe_context());
+			LOG("csr_w 0x%02x offset 0x%x (%s)\n", data, offset, machine().describe_context());
 
-			//m_scsi->set_own_id(~data & CSR_IDENT);
-			//m_sirq->in_w<1>(bool(data & CSR_IENBL));
+			m_scsi->set_own_id(~data & CSR_IDENT);
+			m_sirq->in_w<0>(bool(data & CSR_IENBL));
 		}, "csr_w");
-	//map(0xfffc40, 0xfffc5f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff);
-	map(0xfffc60, 0xfffc61).ram(); // 9516 data
-	map(0xfffc62, 0xfffc63).ram(); // 9516 pointer
-	map(0xfffd00, 0xfffdff).ram(); // stub out 9516
+	map(0xfffc40, 0xfffc5f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff);
+	map(0xfffc60, 0xfffc61).rw(m_dma, FUNC(am9516_device::data_r), FUNC(am9516_device::data_w));
+	map(0xfffc62, 0xfffc63).rw(m_dma, FUNC(am9516_device::addr_r), FUNC(am9516_device::addr_w));
+	//map(0xfffd00, 0xfffdff).ram(); // stub out 9516
 
 	map(0xffff00, 0xffffff).rom().region("kernel", 0xff00);
 }
@@ -684,6 +716,24 @@ void tek4132_state::lan_map(address_map &map)
 	map.global_mask(0x3fffff);
 
 	map(0x3fff00, 0x3fffff).rom().region("kernel", 0xff00); // 0xf00000-0xffffff
+}
+
+void tekigw_state_base::dma_map(address_map &map)
+{
+	map(0x000000, 0xffffff).lrw16(
+		[this](offs_t offset, u16 mem_mask)
+		{
+			return (mem_mask == 0xffff)
+				? m_cpu->space(0).read_word(offset << 1)
+				: swapendian_int16(m_cpu->space(0).read_word(offset << 1, swapendian_int16(mem_mask)));
+		}, "dma_r",
+		[this](offs_t offset, u16 data, u16 mem_mask)
+		{
+			if (mem_mask == 0xffff)
+				m_cpu->space(0).write_word(offset << 1, data, mem_mask);
+			else
+				m_cpu->space(0).write_word(offset << 1, swapendian_int16(data), swapendian_int16(mem_mask));
+		}, "dma_w");
 }
 
 void tekigw_state_base::common_config(machine_config &config)
@@ -722,13 +772,27 @@ void tekigw_state_base::common_config(machine_config &config)
 	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
+	/*
+	 * non-volatile memory: xx yy mm mm mm mm mm mm ii ii ii ii
+	 *
+	 * where (bit order reversed):
+	 *   xx yy - checksum?
+	 *   mm    - mac address
+	 *   ii    - IP address
+	 */
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
 
 	EEPROM_X24C44_16BIT(config, m_nov[0]); // X2443P
 	m_nov[0]->do_callback().set(FUNC(tekigw_state_base::nov_do));
 
+	AM9516(config, m_dma, 16_MHz_XTAL / 4); // TODO: 4132 has Am9516A-8
+	m_dma->set_addrmap(am9516_device::SYSTEM_MEM, &tekigw_state_base::dma_map);
+	m_dma->set_addrmap(am9516_device::NORMAL_MEM, &tekigw_state_base::dma_map);
+
+	// TODO: channel B fdc
+
 	I82586(config, m_lan, 16_MHz_XTAL / 2);
-	m_lan->out_irq_cb().set(m_icu, FUNC(ns32202_device::ir_w<11>)).invert();
+	m_lan->out_irq_cb().set(m_icu, FUNC(ns32202_device::ir_w<11>));
 }
 
 void tek6100_state::tek6130(machine_config &config)
@@ -736,7 +800,7 @@ void tek6100_state::tek6130(machine_config &config)
 	tekigw_state_base::common_config(config);
 
 	m_cpu->set_addrmap(0, &tek6100_state::cpu_map<0>);
-	m_cpu->set_addrmap(6, &tek6100_state::cpu_map<6>);
+	m_cpu->set_addrmap(ns32000::ST_EIM, &tek6100_state::cpu_map<ns32000::ST_EIM>);
 
 	m_lan->set_addrmap(0, &tek6100_state::lan_map);
 
@@ -762,7 +826,7 @@ void tek6100_state::tek6130(machine_config &config)
 
 	WD1770(config, m_fdc, 8_MHz_XTAL); // clock?
 	m_fdc->intrq_wr_callback().set(m_icu, FUNC(ns32202_device::ir_w<13>));
-	//m_fdc->drq_wr_callback().set(m_dma, FUNC(::));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9516_device::dreq_w<1>));
 	FLOPPY_CONNECTOR(config, "fdc:0", "525dd", FLOPPY_525_DD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	WD1010(config, m_hdc, 20_MHz_XTAL / 4);
@@ -848,7 +912,8 @@ void tek4132_state::tek4132(machine_config &config)
 	tekigw_state_base::common_config(config);
 
 	m_cpu->set_addrmap(0, &tek4132_state::cpu_map<0>);
-	m_cpu->set_addrmap(6, &tek4132_state::cpu_map<6>);
+	m_cpu->set_addrmap(ns32000::ST_EIM, &tek4132_state::cpu_map<ns32000::ST_EIM>);
+	//m_cpu->set_addrmap(ns32000::ST_ODT, &tek4132_state::cpu_map<ns32000::ST_ODT>);
 
 	m_lan->set_addrmap(0, &tek4132_state::lan_map);
 
@@ -874,12 +939,12 @@ void tek4132_state::tek4132(machine_config &config)
 	 * 15 software clock
 	 */
 
-	m_rtc->irq().set(m_icu, FUNC(ns32202_device::ir_w<13>));
+	m_rtc->irq().set(m_icu, FUNC(ns32202_device::ir_w<13>)).invert(); // device emulation has inverted polarity
 
 	EEPROM_X24C44_16BIT(config, m_nov[1]); // X2443P
 	m_nov[1]->do_callback().set(FUNC(tek4132_state::nov_do));
 
-	AM9517A(config, m_sdma, 4'000'000); // clock?
+	AM9517A(config, m_sdma, 4'000'000); // D8237A-5 (clock?)
 	m_sdma->dreq_active_low();
 
 	INPUT_MERGER_ALL_HIGH(config, m_sirq);
@@ -893,22 +958,19 @@ void tek4132_state::tek4132(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-#if 1
-	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr);
-#else
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5385", NCR5385).clock(10'000'000).machine_config(
 		[this](device_t *device)
 		{
 			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
 
-			//adapter.irq().set(m_sirq, FUNC(input_merger_all_high_device::in_w<0>));
+			//adapter.irq().set(m_sirq, FUNC(input_merger_all_high_device::in_w<1>));
 			adapter.irq().set(m_icu, FUNC(ns32202_device::ir_w<4>));
-			//adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
+			adapter.dreq().set(m_dma, FUNC(am9516_device::dreq_w<0>)).invert();
 
-			//subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
-			//subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_w));
 		});
-#endif
+
+	m_dma->flyby_byte_r<0>().set(":scsi:7:ncr5385", FUNC(ncr5385_device::dma_r));
+	m_dma->flyby_byte_w<0>().set(":scsi:7:ncr5385", FUNC(ncr5385_device::dma_w));
 }
 
 static INPUT_PORTS_START(tekigw)

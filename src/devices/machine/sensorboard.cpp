@@ -57,7 +57,7 @@ sensor state instead.
 */
 
 #include "emu.h"
-#include "machine/sensorboard.h"
+#include "sensorboard.h"
 
 
 DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard")
@@ -154,7 +154,7 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_sensordelay));
 }
 
-void sensorboard_device::preset_chess(int state)
+void sensorboard_device::preset_chess(u8 data)
 {
 	// set chessboard start position
 
@@ -214,15 +214,15 @@ void sensorboard_device::nvram_default()
 
 bool sensorboard_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
+	auto const [err, actual] = read(file, m_curstate, sizeof(m_curstate));
+	return !err && (sizeof(m_curstate) == actual);
 }
 
 bool sensorboard_device::nvram_write(util::write_stream &file)
 {
 	// save last board position
-	size_t actual;
-	return !file.write(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
+	auto const [err, actual] = write(file, m_curstate, sizeof(m_curstate));
+	return !err;
 }
 
 bool sensorboard_device::nvram_can_write() const
@@ -606,17 +606,18 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 	if (!newval)
 		return;
 
-	u8 init = (u8)param;
+	u8 init = param ? 1 : 0;
 	cancel_sensor();
 	cancel_hand();
 
-	m_clear_cb(init ? 0 : 1);
+	u8 rotate = m_inp_ui->read() & 2;
+	m_clear_cb((init ^ 1) | rotate);
 
 	if (init)
-		m_init_cb(1);
+		m_init_cb(init | rotate);
 
 	// rotate pieces
-	if (m_inp_ui->read() & 2)
+	if (rotate)
 	{
 		u8 tempstate[0x100];
 		for (int y = 0; y < m_height; y++)

@@ -4154,33 +4154,33 @@ static INPUT_PORTS_START( op5cards )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)
 
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Royal Flush" )		PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x04, 0x00, "Royal Flush" )       PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x04, "Lose" )
 	PORT_DIPSETTING(    0x00, "OK" )
-	PORT_DIPNAME( 0x08, 0x00, "Credit Max" )		PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPNAME( 0x08, 0x00, "Credit Max" )        PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x00, "Disable" )
 	PORT_DIPSETTING(    0x08, "Enable" )
-	PORT_DIPNAME( 0x10, 0x00, "Credit Max Amount" )	PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPNAME( 0x10, 0x00, "Credit Max Amount" ) PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x10, "200" )
 	PORT_DIPSETTING(    0x00, "500" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Double Up" )			PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPNAME( 0x40, 0x40, "Double Up" )         PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x00, "80%" )
 	PORT_DIPSETTING(    0x40, "90%" )
-	PORT_DIPNAME( 0x80, 0x80, "Port Check" )		PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPNAME( 0x80, 0x80, "Port Check" )        PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("SW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW2:!6,!7,!8")  // coin2 = (coin1 x5); note = (coin1 x10)
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:!6,!7,!8")  // coin2 = (coin1 x5); note = (coin1 x10)
 	PORT_DIPSETTING(    0x00, "Coin1 = 5C-1C;   Coin2 = 1C-1C;   Note = 1C-2C" )
 	PORT_DIPSETTING(    0x01, "Coin1 = 2C-1C;   Coin2 = 1C-3C;   Note = 1C-6C" )
 	PORT_DIPSETTING(    0x02, "Coin1 = 1C-1C;   Coin2 = 1C-5C;   Note = 1C-10C" )
@@ -4189,16 +4189,16 @@ static INPUT_PORTS_START( op5cards )
 	PORT_DIPSETTING(    0x05, "Coin1 = 1C-4C;   Coin2 = 1C-20C;  Note = 1C-40C" )
 	PORT_DIPSETTING(    0x06, "Coin1 = 1C-5C;   Coin2 = 1C-25C;  Note = 1C-50C" )
 	PORT_DIPSETTING(    0x07, "Coin1 = 1C-10C;  Coin2 = 1C-50C;  Note = 1C-100C" )
-	PORT_DIPNAME( 0x08, 0x00, "Bet Max" )			PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPNAME( 0x08, 0x00, "Bet Max" )           PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x08, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Game Duty" )			PORT_DIPLOCATION("SW2:!3")
+	PORT_DIPNAME( 0x20, 0x20, "Game Duty" )         PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(    0x20, "Weak" )
 	PORT_DIPSETTING(    0x00, "Strong" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Pay Rate" )			PORT_DIPLOCATION("SW2:!2,!1")
+	PORT_DIPNAME( 0xc0, 0xc0, "Pay Rate" )          PORT_DIPLOCATION("SW2:!2,!1")
 	PORT_DIPSETTING(    0x00, "60%" )
 	PORT_DIPSETTING(    0x40, "70%" )
 	PORT_DIPSETTING(    0x80, "80%" )
@@ -12065,7 +12065,7 @@ ROM_END
 */
  ROM_START( op5cards )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-//	ROM_LOAD( "noname.ic4", 0x8000, 0x8000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )  // mapping the unrelated program, to check...
+//  ROM_LOAD( "noname.ic4", 0x8000, 0x8000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )  // mapping the unrelated program, to check...
 	ROM_LOAD( "noname.ic4", 0xc000, 0x4000, CRC(af0ea127) SHA1(466de9a3e2ebe81eac30bbd9139edd71738d33d4) )
 	ROM_IGNORE(                     0x4000)         // discarding 2nd half (the unrelated program).
 
@@ -12094,7 +12094,7 @@ ROM_END
 	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size
 	ROM_COPY( "gfxpool", 0x4800, 0x0000, 0x0800 ) // src-dest-size
 
-	ROM_REGION( 0x1800, "gfx3", 0 )  // nag, held, cards back 
+	ROM_REGION( 0x1800, "gfx3", 0 )  // nag, held, cards back
 	ROM_COPY( "gfxpool", 0x1000, 0x1000, 0x0800 ) // src-dest-size
 	ROM_COPY( "gfxpool", 0x3000, 0x0800, 0x0800 ) // src-dest-size
 	ROM_COPY( "gfxpool", 0x5000, 0x0000, 0x0800 ) // src-dest-size
@@ -12591,7 +12591,7 @@ void goldnpkr_state::init_lespenduj()
 
 void goldnpkr_state::init_op5cards()
 {
-	/* Seems to do a sort of blend 
+	/* Seems to do a sort of blend
 	   between a tile bytes from 1468-146f (top left backcard edge)
 	   with 7468-746f range. In this game seems to be only for this tile.
 	*/

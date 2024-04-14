@@ -270,7 +270,7 @@ protected:
 	optional_device<i8251_device> m_usart;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_ioport_array<3> m_inputs;
 
 	u8 m_select = 0;
@@ -305,6 +305,7 @@ void eag_state::machine_reset()
 	update_dsr();
 }
 
+
 // EAG V5
 
 class eagv5_state : public eag_state
@@ -335,6 +336,7 @@ private:
 	u8 main_ack_r();
 	u8 sub_ack_r();
 };
+
 
 // Elite Premiere
 
@@ -383,6 +385,7 @@ void premiere_state::machine_reset()
 	m_rombank->set_entry(bank);
 	m_nvrambank->set_entry(bank);
 }
+
 
 // Excel 68000
 
@@ -986,24 +989,24 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, fex68k,    0,       0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, fex68ka,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, fex68kb,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km2,  fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km2a, fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km3,  fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km3a, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, fex68km3b, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, fex68k,    0,       0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fex68ka,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fex68kb,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fex68km2,  fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fex68km2a, fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fex68km3,  fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fex68km3a, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fex68km3b, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master 2265 (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv7a,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, feagv7b,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv9,    feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, feagv10,   feagv4,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 2001, feagv11,   feagv4,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde 2325 (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde 2265 (model 6114-5)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv7a,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv7b,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-6/7, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, feagv9,    feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-9)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, feagv10,   feagv4,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde 2325 (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+SYST( 2001, feagv11,   feagv4,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde 2325 (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-SYST( 1992, premiere,  0,       0,      premiere, premiere, premiere_state, empty_init, "Fidelity Electronics", "Elite Premiere", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, premiere,  0,       0,      premiere, premiere, premiere_state, empty_init, "Fidelity Electronics", "Elite Premiere", MACHINE_SUPPORTS_SAVE )

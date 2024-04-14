@@ -44,12 +44,12 @@ TODO:
 #define LOGLOCKED(...)     LOGMASKED(LOG_LOCKED,  __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(PVGA1A,   pvga1a_vga_device,    "pvga1a_vga",   "Paradise Systems PVGA1A")
-DEFINE_DEVICE_TYPE(WD90C00,  wd90c00_vga_device,   "wd90c00_vga",  "Western Digital WD90C00 \"PVGA1B\" VGA Controller")
-DEFINE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device,  "wd90c11a_vga", "Western Digital WD90C11A \"PVGA1C\" VGA Controller")
-DEFINE_DEVICE_TYPE(WD90C30,  wd90c30_vga_device,   "wd90c30_vga",  "Western Digital WD90C30 \"PVGA1D\" VGA Controller")
-DEFINE_DEVICE_TYPE(WD90C31,  wd90c31_vga_device,   "wd90c31_vga",  "Western Digital WD90C31 VGA Controller")
-DEFINE_DEVICE_TYPE(WD90C33,  wd90c33_vga_device,   "wd90c33_vga",  "Western Digital WD90C33 VGA Controller")
+DEFINE_DEVICE_TYPE(PVGA1A,   pvga1a_vga_device,    "pvga1a_vga",   "Paradise Systems PVGA1A i/f")
+DEFINE_DEVICE_TYPE(WD90C00,  wd90c00_vga_device,   "wd90c00_vga",  "Western Digital WD90C00 \"PVGA1B\" VGA i/f")
+DEFINE_DEVICE_TYPE(WD90C11A, wd90c11a_vga_device,  "wd90c11a_vga", "Western Digital WD90C11A \"PVGA1C\" VGA i/f")
+DEFINE_DEVICE_TYPE(WD90C30,  wd90c30_vga_device,   "wd90c30_vga",  "Western Digital WD90C30 \"PVGA1D\" VGA i/f")
+DEFINE_DEVICE_TYPE(WD90C31,  wd90c31_vga_device,   "wd90c31_vga",  "Western Digital WD90C31 VGA i/f")
+DEFINE_DEVICE_TYPE(WD90C33,  wd90c33_vga_device,   "wd90c33_vga",  "Western Digital WD90C33 VGA i/f")
 
 
 pvga1a_vga_device::pvga1a_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

@@ -58,7 +58,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display1_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_keys;
 	required_ioport m_reset;
 
@@ -147,7 +147,7 @@ void amsterdam_state::dallas32_mem(address_map &map)
 static INPUT_PORTS_START( amsterdam )
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("INFO") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEV") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("MEM") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
@@ -168,9 +168,6 @@ static INPUT_PORTS_START( amsterdam )
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, amsterdam_state, reset_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, amsterdam_state, reset_button, 0)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -258,11 +255,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, dallas32a, dallas32, 0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas32a, dallas32, 0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000", MACHINE_SUPPORTS_SAVE )

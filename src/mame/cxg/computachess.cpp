@@ -98,7 +98,7 @@ private:
 	required_device<hmcs40_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	u8 m_inp_mux = 0;
@@ -243,5 +243,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, scptchess,  0,         0,      scptchess,  scptchess,  computachess_state, empty_init, "CXG Systems / White & Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, scptchessa, scptchess, 0,      scptchessa, scptchessa, computachess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, scptchess,  0,         0,      scptchess,  scptchess,  computachess_state, empty_init, "CXG Systems / White & Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, scptchessa, scptchess, 0,      scptchessa, scptchessa, computachess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE )

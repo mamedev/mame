@@ -64,7 +64,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
 
 	u16 m_inp_mux = 0;
@@ -258,4 +258,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, cp2000, 0,      0,      cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, cp2000, 0,      0,      cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag Industries", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE )

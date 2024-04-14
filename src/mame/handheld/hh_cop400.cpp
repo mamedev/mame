@@ -1109,8 +1109,7 @@ class mbaskb2_state : public hh_cop400_state
 public:
 	mbaskb2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cop400_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu"),
-		m_on_timer(*this, "on_timer")
+		m_subcpu(*this, "subcpu")
 	{ }
 
 	void mbaskb2(machine_config &config);
@@ -1119,11 +1118,13 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
 	required_device<cop400_cpu_device> m_subcpu;
-	required_device<timer_device> m_on_timer;
+
+	attotime m_on_time;
 
 	void update_display();
 	void shared_write_l(u8 data);
@@ -1133,10 +1134,16 @@ private:
 	u8 sub_read_in();
 };
 
+void mbaskb2_state::machine_start()
+{
+	hh_cop400_state::machine_start();
+	save_item(NAME(m_on_time));
+}
+
 void mbaskb2_state::machine_reset()
 {
 	hh_cop400_state::machine_reset();
-	m_on_timer->adjust(attotime::from_msec(5));
+	m_on_time = machine().time() + attotime::from_msec(5);
 }
 
 // handlers
@@ -1185,7 +1192,7 @@ CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
 {
 	// The power switch is off-1-2, and the game relies on power-on starting at 1,
 	// otherwise msoccer2 boots up to what looks like a factory test mode.
-	return (m_inputs[3]->read() & 1) | (m_on_timer->enabled() ? 1 : 0);
+	return (machine().time() < m_on_time && ~m_inputs[4]->read() & 1) ? 1 : (m_inputs[3]->read() & 1);
 }
 
 static INPUT_PORTS_START( mbaskb2 )
@@ -1210,6 +1217,9 @@ static INPUT_PORTS_START( mbaskb2 )
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msoccer2 )
@@ -1219,6 +1229,11 @@ static INPUT_PORTS_START( msoccer2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Low/High Kick")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Score")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Teammate")
+
+	PORT_MODIFY("IN.4")
+	PORT_CONFNAME( 0x01, 0x00, "Factory Test" ) PORT_CONDITION("IN.3", 0x01, EQUALS, 0x00)
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 // config
@@ -1246,8 +1261,6 @@ void mbaskb2_state::mbaskb2(machine_config &config)
 	m_subcpu->read_cko().set(m_maincpu, FUNC(cop400_cpu_device::sk_r));
 
 	config.set_perfect_quantum(m_maincpu);
-
-	TIMER(config, "on_timer").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
@@ -2805,7 +2818,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, ctstein,    0,         0,      ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ctstein,    0,         0,      ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, h2hbaskbc,  h2hbaskb,  0,      h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, h2hhockeyc, h2hhockey, 0,      h2hhockeyc, h2hhockeyc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
@@ -2813,11 +2826,11 @@ SYST( 1980, h2hsoccerc, 0,         0,      h2hsoccerc, h2hsoccerc, h2hbaskbc_sta
 
 SYST( 1981, einvaderc,  einvader,  0,      einvaderc,  einvaderc,  einvaderc_state, empty_init, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN Toys", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN Toys", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 
-SYST( 1979, funjacks,   0,         0,      funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, funrlgl,    0,         0,      funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, funtag,     0,         0,      funtag,     funtag,     funtag_state,    empty_init, "Mattel Electronics", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, funjacks,   0,         0,      funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, funrlgl,    0,         0,      funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, funtag,     0,         0,      funtag,     funtag,     funtag_state,    empty_init, "Mattel Electronics", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, mbaskb2,    0,         0,      mbaskb2,    mbaskb2,    mbaskb2_state,   empty_init, "Mattel Electronics", "Basketball 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, msoccer2,   0,         0,      msoccer2,   msoccer2,   mbaskb2_state,   empty_init, "Mattel Electronics", "Soccer 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, lafootb,    0,         0,      lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel Electronics", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
@@ -2826,8 +2839,8 @@ SYST( 1981, mdallas,    0,         0,      mdallas,    mdallas,    mdallas_state
 SYST( 1980, minspace,   0,         0,      minspace,   minspace,   minspace_state,  empty_init, "Mego", "Invasion From Space (patent)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, plus1,      0,         0,      plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
-SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, bshipg,     bship,     0,      bshipg,     bshipg,     bshipg_state,    empty_init, "Milton Bradley", "Electronic Battleship (COP420 version, Rev. G)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bshipg,     bship,     0,      bshipg,     bshipg,     bshipg_state,    empty_init, "Milton Bradley", "Electronic Battleship (COP420 version, rev. G)", MACHINE_SUPPORTS_SAVE ) // ***
 
 SYST( 1979, qkracera,   qkracer,   0,      qkracera,   qkracera,   qkracera_state,  empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1982, copspa,     0,         0,      mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "COPS Pocket Assistant", MACHINE_SUPPORTS_SAVE )
@@ -2836,7 +2849,7 @@ SYST( 1984, solution,   0,         0,      scat,       solution,   scat_state,  
 
 SYST( 1987, vidchal,    0,         0,      vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-SYST( 1981, comparca,   comparc,   0,      comparca,   comparca,   comparca_state,  empty_init, "Tandy Corporation", "Computerized Arcade (COP421 version, model 60-2159A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
+SYST( 1981, comparca,   comparc,   0,      comparca,   comparca,   comparca_state,  empty_init, "Tandy Corporation", "Computerized Arcade (COP421 version, model 60-2159A)", MACHINE_SUPPORTS_SAVE ) // some of the games: ***
 
 SYST( 1989, lilcomp,    0,         0,      lilcomp,    lilcomp,    lilcomp_state,   empty_init, "Texas Instruments", "My Little Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

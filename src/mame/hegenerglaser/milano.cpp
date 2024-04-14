@@ -34,13 +34,13 @@ namespace {
 class milano_state : public driver_device
 {
 public:
-	milano_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_led_pwm(*this, "led_pwm")
-		, m_keys(*this, "KEY")
+	milano_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_led_pwm(*this, "led_pwm"),
+		m_keys(*this, "KEY")
 	{ }
 
 	void milano(machine_config &config);
@@ -147,14 +147,11 @@ static INPUT_PORTS_START( milano )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Training / Pawn")   PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Info / Knight")     PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Memory / Bishop")   PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Position / Rook")   PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Position / Rook")   PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Level / Queen")     PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Function / King")   PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Enter / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Clear / New Game")  PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -223,7 +220,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS          INIT       COMPANY, FULLNAME, FLAGS
-SYST( 1991, milano,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, milanoa,   milano,  0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, milano,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.02)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, milanoa,   milano,  0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.01)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1993, nshort,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Nigel Short", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, nshort,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Nigel Short", MACHINE_SUPPORTS_SAVE )

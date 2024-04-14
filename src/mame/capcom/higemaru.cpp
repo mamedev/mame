@@ -81,8 +81,6 @@ private:
 };
 
 
-// video
-
 void higemaru_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -219,8 +217,6 @@ uint32_t higemaru_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::scanline)
 {
