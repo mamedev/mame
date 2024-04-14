@@ -1139,8 +1139,15 @@ void tokimeki_state::tokimeki_device_check_w(int state)
 static INPUT_PORTS_START( tmosh )
 	PORT_INCLUDE( konamigv )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xffffc3e0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("P2")
+	PORT_BIT( 0xfffffbff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tokimeki_state, tokimeki_device_check_r)
+
+	PORT_MODIFY("P3_P4")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("EEPROMOUT")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(tokimeki_state, tokimeki_device_check_w)
