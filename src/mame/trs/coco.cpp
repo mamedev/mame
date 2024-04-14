@@ -863,7 +863,7 @@ void coco_state::diecom_lightgun_clock()
 	/* while in full state 15, prepare to check next video frame for a hit */
 	if (m_dclg_state == 15)
 	{
-		int dclg_vpos = m_diecom_lightgun.input(sel2() ? 1 : 0, 1) - 12;
+		int dclg_vpos = m_diecom_lightgun.input(sel2() ? 1 : 0, 1) + 12;
 		m_dclg_timer = m_diecom_lightgun.input(sel2() ? 1 : 0, 0);
 		int horizontal_pixel = ((m_dclg_timer - 105.) / (420. - 110.0)) * (639.0 - 0.0) + 0.0;
 		attotime dclg_time = m_screen->time_until_pos(dclg_vpos, horizontal_pixel);
