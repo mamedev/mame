@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -171,7 +172,7 @@ license:CC0-1.0
 
 		<collection name="Shifter">
 			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
-				<bounds x="496" y="574" width="32" height="64" />
+				<bounds x="488" y="574" width="32" height="64" />
 			</element>
 		</collection>
 	</view>
@@ -189,7 +190,7 @@ license:CC0-1.0
 
 		<collection name="Shifter">
 			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
-				<bounds x="-48" y="574" width="32" height="64" />
+				<bounds x="-40" y="574" width="32" height="64" />
 			</element>
 		</collection>
 	</view>
@@ -219,7 +220,7 @@ license:CC0-1.0
 
 		<collection name="Shifter">
 			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
-				<bounds x="496" y="574" width="32" height="64" />
+				<bounds x="488" y="574" width="32" height="64" />
 			</element>
 		</collection>
 	</view>
@@ -249,36 +250,8 @@ license:CC0-1.0
 
 		<collection name="Shifter">
 			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
-				<bounds x="-48" y="574" width="32" height="64" />
+				<bounds x="-40" y="574" width="32" height="64" />
 			</element>
 		</collection>
-	</view>
-
-	<view name="Vertical Widescreen Lamps + Shifter-R">
-		<screen index="0">
-			<bounds x="0" y="0" width="480" height="640" />
-		</screen>
-
-		<group ref="lamps">
-			<bounds x="0" y="641" width="480" height="25" />
-		</group>
-
-		<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="446" y="667" width="32" height="64" />
-		</element>
-	</view>
-
-	<view name="Vertical Widescreen Lamps + Shifter-L">
-		<screen index="0">
-			<bounds x="0" y="0" width="480" height="640" />
-		</screen>
-
-		<group ref="lamps">
-			<bounds x="0" y="641" width="480" height="25" />
-		</group>
-
-		<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="2" y="667" width="32" height="64" />
-		</element>
 	</view>
 </mamelayout>
