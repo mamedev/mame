@@ -504,11 +504,12 @@ u8 wmg_state::wmg_pia_0_r(offs_t offset)
  *  Machine Driver
  *
  *************************************/
-static constexpr XTAL MASTER_CLOCK = (XTAL(12'000'000));
-static constexpr XTAL SOUND_CLOCK = (XTAL(3'579'545));
 
 void wmg_state::wmg(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
+	constexpr XTAL SOUND_CLOCK = 3.579545_MHz_XTAL;
+
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_CLOCK/3/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu1);
