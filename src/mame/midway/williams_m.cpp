@@ -327,7 +327,10 @@ void defender_state::video_control_w(u8 data)
 
 void defender_state::bank_select_w(u8 data)
 {
-	m_bankc000->set_bank(data & 0x0f);
+	if ((data & 0x0f) < 10)
+		m_rom_view.select(data & 0x0f);
+	else
+		m_rom_view.disable();
 }
 
 

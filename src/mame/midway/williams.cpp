@@ -511,22 +511,25 @@ Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 void defender_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share(m_videoram);
-	map(0xc000, 0xcfff).m(m_bankc000, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xcfff).view(m_rom_view);
+	m_rom_view[0](0xc000, 0xc00f).mirror(0x03e0).writeonly().share(m_paletteram);
+	m_rom_view[0](0xc3ff, 0xc3ff).w(FUNC(defender_state::watchdog_reset_w));
+	m_rom_view[0](0xc010, 0xc01f).mirror(0x03e0).w(FUNC(defender_state::video_control_w));
+	m_rom_view[0](0xc400, 0xc4ff).mirror(0x0300).ram().w(FUNC(defender_state::cmos_w)).share("nvram");
+	m_rom_view[0](0xc800, 0xcbff).r(FUNC(defender_state::video_counter_r));
+	m_rom_view[0](0xcc00, 0xcc03).mirror(0x03e0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	m_rom_view[0](0xcc04, 0xcc07).mirror(0x03e0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	m_rom_view[1](0xc000, 0xcfff).rom().region("maincpu", 0x10000);
+	m_rom_view[2](0xc000, 0xcfff).rom().region("maincpu", 0x11000);
+	m_rom_view[3](0xc000, 0xcfff).rom().region("maincpu", 0x12000);
+	m_rom_view[4](0xc000, 0xcfff).rom().region("maincpu", 0x13000);
+	m_rom_view[5](0xc000, 0xcfff).rom().region("maincpu", 0x14000);
+	m_rom_view[6](0xc000, 0xcfff).rom().region("maincpu", 0x15000);
+	m_rom_view[7](0xc000, 0xcfff).rom().region("maincpu", 0x16000);
+	m_rom_view[8](0xc000, 0xcfff).rom().region("maincpu", 0x17000);
+	m_rom_view[9](0xc000, 0xcfff).rom().region("maincpu", 0x18000);
 	map(0xd000, 0xdfff).w(FUNC(defender_state::bank_select_w));
 	map(0xd000, 0xffff).rom();
-}
-
-void defender_state::bankc000_map(address_map &map)
-{
-	map(0x0000, 0x000f).mirror(0x03e0).writeonly().share(m_paletteram);
-	map(0x03ff, 0x03ff).w(FUNC(defender_state::watchdog_reset_w));
-	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(defender_state::video_control_w));
-	map(0x0400, 0x04ff).mirror(0x0300).ram().w(FUNC(defender_state::cmos_w)).share("nvram");
-	map(0x0800, 0x0bff).r(FUNC(defender_state::video_counter_r));
-	map(0x0c00, 0x0c03).mirror(0x03e0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0c04, 0x0c07).mirror(0x03e0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x9fff).rom().region("maincpu", 0x10000);
-	map(0xa000, 0xffff).noprw();
 }
 
 /*************************************
@@ -661,7 +664,7 @@ void williams2_state::common_map(address_map &map)
 }
 
 // mysticm and inferno: D000-DFFF is RAM
-void williams_d000_ram_state::d000_map(address_map &map)
+void williams2_state::d000_ram_map(address_map &map)
 {
 	common_map(map);
 	map(0xd000, 0xdfff).ram();
@@ -669,7 +672,7 @@ void williams_d000_ram_state::d000_map(address_map &map)
 }
 
 // tshoot and joust2: D000-DFFF is ROM
-void williams_d000_rom_state::d000_map(address_map &map)
+void williams2_state::d000_rom_map(address_map &map)
 {
 	common_map(map);
 	map(0xd000, 0xffff).rom();
@@ -1619,7 +1622,6 @@ void defender_state::defender(machine_config &config)
 {
 	williams_b0(config);
 
-	ADDRESS_MAP_BANK(config, m_bankc000).set_map(&defender_state::bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 	m_screen->set_visarea(12, 304-1, 7, 247-1);
 }
 
@@ -1870,7 +1872,7 @@ void williams2_state::williams2_base(machine_config &config)
 void inferno_state::inferno(machine_config &config)
 {
 	williams2_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &inferno_state::d000_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inferno_state::d000_ram_map);
 
 	// pia
 	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
@@ -1886,7 +1888,7 @@ void inferno_state::inferno(machine_config &config)
 void mysticm_state::mysticm(machine_config &config)
 {
 	williams2_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mysticm_state::d000_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mysticm_state::d000_ram_map);
 
 	m_screen->set_raw(MASTER_CLOCK*2/3, 512, 8, 284, 256, 8, 248);
 	m_screen->set_screen_update(FUNC(mysticm_state::screen_update));
@@ -1904,7 +1906,7 @@ void tshoot_state::tshoot(machine_config &config)
 	williams2_base(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &tshoot_state::d000_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tshoot_state::d000_rom_map);
 
 	// pia
 	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
@@ -1928,7 +1930,7 @@ void joust2_state::joust2(machine_config &config)
 	williams2_base(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &joust2_state::d000_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &joust2_state::d000_rom_map);
 
 	S11_OBG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 2.0); // D-11298-3035 'pinbot style' older BG sound board
 	// Jumpers for the board: W1=? W2=open W3=present W4=open W5=open W6=open W7=present

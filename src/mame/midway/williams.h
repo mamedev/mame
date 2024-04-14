@@ -17,7 +17,6 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/74157.h"
-#include "machine/bankdev.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -42,7 +41,6 @@ public:
 		m_pia(*this, "pia_%u", 0U),
 		m_nvram(*this, "nvram"),
 		m_videoram(*this, "videoram"),
-		m_mainbank(*this, "mainbank"),
 		m_rom_view(*this, "rom_view"),
 		m_49way_x(*this, "49WAYX"),
 		m_49way_y(*this, "49WAYY")
@@ -100,7 +98,6 @@ protected:
 
 	required_shared_ptr<uint8_t> m_nvram;
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_memory_bank m_mainbank;
 
 	memory_view m_rom_view;
 
@@ -140,8 +137,7 @@ class defender_state : public williams_state
 {
 public:
 	defender_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag),
-		m_bankc000(*this, "bankc000")
+		williams_state(mconfig, type, tag)
 	{ }
 
 	void defender(machine_config &config);
@@ -155,13 +151,9 @@ protected:
 
 	void video_control_w(u8 data);
 
-	required_device<address_map_bank_device> m_bankc000;
-
 private:
-	virtual void machine_start() override { }
 	virtual void machine_reset() override;
 
-	void bankc000_map(address_map &map);
 	virtual void sound_map(address_map &map) override;
 	virtual void sound_map_6802(address_map &map);
 
@@ -285,7 +277,8 @@ public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
 		m_muxa(*this, "mux_a"),
-		m_muxb(*this, "mux_b")
+		m_muxb(*this, "mux_b"),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void blastkit(machine_config &config);
@@ -299,6 +292,7 @@ protected:
 private:
 	required_device<ls157_x2_device> m_muxa;
 	optional_device<ls157_device> m_muxb;
+	required_memory_bank m_mainbank;
 
 	rgb_t m_color0;
 	uint8_t m_video_control;
@@ -319,17 +313,6 @@ private:
 class williams2_state : public williams_state
 {
 public:
-	williams2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_tileram(*this, "tileram"),
-		m_palette_view(*this, "palette_view"),
-		m_gain(  { 0.25f, 0.25f, 0.25f }),
-		m_offset({ 0.00f, 0.00f, 0.00f })
-	{ }
-
-	void williams2_base(machine_config &config);
-
 	INPUT_CHANGED_MEMBER(rgb_gain)
 	{
 		if (param < 3)
@@ -340,12 +323,25 @@ public:
 	}
 
 protected:
+	williams2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_tileram(*this, "tileram"),
+		m_mainbank(*this, "mainbank"),
+		m_palette_view(*this, "palette_view"),
+		m_gain(  { 0.25f, 0.25f, 0.25f }),
+		m_offset({ 0.00f, 0.00f, 0.00f })
+	{ }
+
+	void williams2_base(machine_config &config);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_tileram;
+	required_memory_bank m_mainbank;
 
 	memory_view m_palette_view;
 
@@ -379,39 +375,19 @@ protected:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	void common_map(address_map &map);
+	void d000_rom_map(address_map &map);
+	void d000_ram_map(address_map &map);
 	virtual void sound_map(address_map &map) override;
 
 	void video_control_w(u8 data);
 };
 
-class williams_d000_rom_state : public williams2_state
-{
-public:
-	williams_d000_rom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams2_state(mconfig, type, tag)
-	{ }
-
-protected:
-	void d000_map(address_map &map);
-};
-
-class williams_d000_ram_state : public williams2_state
-{
-public:
-	williams_d000_ram_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams2_state(mconfig, type, tag)
-	{ }
-
-protected:
-	void d000_map(address_map &map);
-};
-
 // Inferno
-class inferno_state : public williams_d000_ram_state
+class inferno_state : public williams2_state
 {
 public:
 	inferno_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_d000_ram_state(mconfig, type, tag),
+		williams2_state(mconfig, type, tag),
 		m_mux(*this, "mux")
 	{ }
 
@@ -422,11 +398,11 @@ private:
 };
 
 // Mystic Marathon
-class mysticm_state : public williams_d000_ram_state
+class mysticm_state : public williams2_state
 {
 public:
 	mysticm_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_d000_ram_state(mconfig, type, tag)
+		williams2_state(mconfig, type, tag)
 	{
 		// overwrite defaults for mysticm
 		m_gain =   {   0.8f, 0.73f,  0.81f };
@@ -448,11 +424,11 @@ private:
 };
 
 // Turkey Shoot
-class tshoot_state : public williams_d000_rom_state
+class tshoot_state : public williams2_state
 {
 public:
 	tshoot_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_d000_rom_state(mconfig, type, tag),
+		williams2_state(mconfig, type, tag),
 		m_mux(*this, "mux"),
 		m_gun(*this, {"GUNX", "GUNY"}),
 		m_grenade_lamp(*this, "Grenade_lamp"),
@@ -480,11 +456,11 @@ private:
 };
 
 // Joust 2
-class joust2_state : public williams_d000_rom_state
+class joust2_state : public williams2_state
 {
 public:
 	joust2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_d000_rom_state(mconfig, type, tag),
+		williams2_state(mconfig, type, tag),
 		m_mux(*this, "mux"),
 		m_bg(*this, "bg")
 	{ }
