@@ -230,6 +230,7 @@ private:
 };
 
 
+
 /*************************************
  *
  *  Tilemap callback
@@ -465,6 +466,7 @@ void atetris_bartop_state::atetrisbp_map(address_map &map)
 }
 
 
+
 /*************************************
  *
  *  Bootleg MCU handlers
@@ -486,11 +488,13 @@ uint8_t atetris_mcu_state::mcu_bus_r()
 	}
 }
 
+
 void atetris_mcu_state::mcu_p2_w(uint8_t data)
 {
 	if ((data & 0xc0) == 0x80)
 		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r());
 }
+
 
 void atetris_mcu_state::mcu_reg_w(offs_t offset, uint8_t data)
 {
@@ -498,6 +502,7 @@ void atetris_mcu_state::mcu_reg_w(offs_t offset, uint8_t data)
 	m_soundlatch[0]->write(offset | 0x20);
 	m_soundlatch[1]->write(data);
 }
+
 
 
 /*************************************
@@ -559,6 +564,7 @@ static GFXDECODE_START( gfx_atetris )
 GFXDECODE_END
 
 
+
 /*************************************
  *
  *  Machine driver
@@ -592,6 +598,7 @@ void atetris_state::atetris_base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
+
 void atetris_state::atetris_pokey(machine_config &config)
 {
 	atetris_base(config);
@@ -607,6 +614,7 @@ void atetris_state::atetris_pokey(machine_config &config)
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+
 void atetris_state::atetris(machine_config &config)
 {
 	atetris_pokey(config);
@@ -615,6 +623,7 @@ void atetris_state::atetris(machine_config &config)
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x6000, 0x7fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
+
 
 void atetris_state::atetrisb2(machine_config &config)
 {
@@ -660,10 +669,9 @@ void atetris_mcu_state::atetrisb3(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	for (int i = 0; i < 4; i++)
-	{
 		SN76489A(config, m_sn[i], 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.50);
-	}
 }
+
 
 void atetris_m5205_state::atetb5205(machine_config &config)
 {
@@ -672,7 +680,7 @@ void atetris_m5205_state::atetb5205(machine_config &config)
 	m_mcu->set_clock(11_MHz_XTAL);
 
 	// TODO: Properly hook up OKI M5205
-	MSM5205(config, m_msm, XTAL(400'000));
+	MSM5205(config, m_msm, 400_kHz_XTAL);
 }
 
 
@@ -682,6 +690,7 @@ void atetris_bartop_state::atetrisbp(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_bartop_state::atetrisbp_map);
 }
+
 
 
 /*************************************
@@ -893,14 +902,15 @@ ROM_START( atetb3482 )
 	ROM_LOAD( "pal16l8.4f" , 0x618, 0x104, NO_DUMP )
 ROM_END
 
+
 /*
 atetb5205: Korean Tetris bootleg with additional OKI 5205 (with its ROMs).
 Same main PCB layout as 'atetrisb3'.
 
-The OKI 5205 is on a separate subboard connected on the "ROM B" socket of the main PCB:
+The OKI M5205 is on a separate subboard connected on the "ROM B" socket of the main PCB:
    _______________________________________________
   | ________________   __________    _______      |
-  || 27C512        |  |MC14013BCP    |·····| <- 5 pins connector
+  || 27C512        |  |MC14013BCP    |·····| <- 5 pin connector
   ||               |                __________    |
   ||_______________|   __________  |MC14017BCP    |
   | ________________  |MC14013BCP   ____________  |
@@ -912,7 +922,7 @@ The OKI 5205 is on a separate subboard connected on the "ROM B" socket of the ma
   ||               |     ____         _______     |
   ||_______________|    400 Osc      |MC1741CP1   |       
   | ________________   __________                 |
-  || 27C512        |  |OKI M2505|                 |
+  || 27C512        |  |OKI M5205|                 |
   ||               |                              |
   ||_______________|   ____________               |
   |                   |PAL16L8ACN |               |
