@@ -1044,14 +1044,17 @@ void taito_f3_state::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 	for (int x = H_START; x < H_START + H_VIS; x++) {
 		rgb_t s_rgb = clut[z.src_pal[x]];
 		rgb_t d_rgb = clut[z.dst_pal[x]];
+
+		// source_color * src_blend + dest_color * dst_blend
+		// by the way, any time i touch this code i lose 10-20% speed. - ywy
 		u16 r1 = s_rgb.r();
 		u16 g1 = s_rgb.g();
 		u16 b1 = s_rgb.b();
 		u16 r2 = d_rgb.r();
 		u16 g2 = d_rgb.g();
 		u16 b2 = d_rgb.b();
-		r1 *= z.src_blend[x];
-		g1 *= z.src_blend[x];
+		r1 *= z.src_blend[x]; // these blend contributions have fixed3 precision
+		g1 *= z.src_blend[x]; // i.e. 0 (b0'000) to 8 (b1'000) represents 0.0 to 1.0
 		b1 *= z.src_blend[x];
 		r2 *= z.dst_blend[x];
 		g2 *= z.dst_blend[x];
@@ -1059,12 +1062,13 @@ void taito_f3_state::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 		r1 += r2;
 		g1 += g2;
 		b1 += b2;
+
 		r1 >>= 3;
 		g1 >>= 3;
 		b1 >>= 3;
-		r1 = std::min(r1, (u16)255);
-		g1 = std::min(g1, (u16)255);
-		b1 = std::min(b1, (u16)255);
+		r1 = std::min(r1, static_cast<u16>(255));
+		g1 = std::min(g1, static_cast<u16>(255));
+		b1 = std::min(b1, static_cast<u16>(255));
 
 		dst[x] = rgb_t(r1, g1, b1);
 	}
