@@ -119,7 +119,7 @@
 *************************************************************/
 
 #include "emu.h"
-#include "machine/s2636.h"
+#include "s2636.h"
 
 #include "screen.h"
 

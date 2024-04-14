@@ -32,7 +32,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "machine/chessmachine.h"
+#include "chessmachine.h"
 
 
 DEFINE_DEVICE_TYPE(CHESSMACHINE, chessmachine_device, "chessmachine", "Tasc ChessMachine")

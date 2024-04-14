@@ -946,5 +946,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME            FLAGS
-SYST( 1986, cz1,    0,      0,      cz1,     cz1,    cz1_state,    empty_init, "Casio", "CZ-1",             MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-SYST( 1986, mz1,    cz1,    0,      mz1,     mz1,    cz1_state,    empty_init, "Casio", "MZ-1 (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1986, cz1,    0,      0,      cz1,     cz1,    cz1_state,    empty_init, "Casio", "CZ-1",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1986, mz1,    cz1,    0,      mz1,     mz1,    cz1_state,    empty_init, "Casio", "MZ-1 (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

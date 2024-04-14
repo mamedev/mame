@@ -135,7 +135,7 @@ private:
 
 	void midi_r(int state) { m_rx_data = state; }
 
-	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midiclock_w(int state) { if (state) m_maincpu->clock_serial(); }
 
 	/**
 	 * @brief Handle a write to the synth's IO Port 1.
@@ -416,4 +416,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON | MACHINE_CLICKABLE_ARTWORK)
+SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)

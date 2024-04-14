@@ -947,7 +947,7 @@ static INPUT_PORTS_START( fengyunh )
 	PORT_DIPSETTING(    0x18, "200 / 10" )
 	PORT_DIPSETTING(    0x08, "300 / 15" )
 	PORT_DIPSETTING(    0x00, "500 / 25" )
-	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-Out" )       PORT_DIPLOCATION("DIP2:6,7")   // 洗分洗分
+	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-Out" )       PORT_DIPLOCATION("DIP2:6,7")   // 洗分單位
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x20, "20" )
 	PORT_DIPSETTING(    0x60, "30" )

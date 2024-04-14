@@ -53,7 +53,7 @@ private:
     I/O port
 ********************************************************************/
 
-class ioport_device : public device_t, public device_slot_interface
+class ioport_device : public device_t, public device_single_card_slot_interface<ioport_attached_device>
 {
 	friend class ioport_attached_device;
 
@@ -86,8 +86,8 @@ public:
 	auto ready_cb() { return m_console_ready.bind(); }
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// Methods called back from the external device
 	devcb_write_line m_console_extint;   // EXTINT line

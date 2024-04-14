@@ -2024,7 +2024,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 	uint8_t op_mode;
 	uint8_t *ROM;
 	uint8_t *PRG = memregion("fdc_data")->base();
-	int i;
 
 	// TODO: this loading shouldn't happen dynamically but actually be tied to specific floppy configs
 	// pc9801 has no floppy as default
@@ -2035,13 +2034,13 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 	ROM = memregion("fdc_bios_2dd")->base();
 	op_mode = (ioport("ROM_LOAD")->read() & 2) >> 1;
 
-	for(i=0;i<0x1000;i++)
+	for(int i=0;i<0x1000;i++)
 		ROM[i] = PRG[i+op_mode*0x8000];
 
 	ROM = memregion("fdc_bios_2hd")->base();
 	op_mode = ioport("ROM_LOAD")->read() & 1;
 
-	for(i=0;i<0x1000;i++)
+	for(int i=0;i<0x1000;i++)
 		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
 
 	m_beeper->set_state(0);
@@ -2068,8 +2067,6 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 	}
 
 	m_dac1bit_disable = true;
-
-	memset(&m_egc, 0, sizeof(m_egc));
 }
 
 MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)

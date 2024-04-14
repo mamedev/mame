@@ -66,7 +66,7 @@ public:
 	auto standby_cb() { return m_standby_func.bind(); } // notifier (not an output pin)
 	int standby() { return suspended(SUSPEND_REASON_CLOCK) ? 1 : 0; }
 
-	void m6801_clock_serial();
+	void clock_serial();
 
 protected:
 	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const m6800_cpu_device::op_func *insn, const u8 *cycles, address_map_constructor internal, int nvram_bytes);
@@ -163,7 +163,7 @@ protected:
 	bool m_port2_written;
 
 	u8 m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tshr;
-	int m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
+	int m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_sci_clocks;
 	bool m_use_ext_serclock;
 
 	u8 m_latch09;
@@ -194,10 +194,12 @@ protected:
 	virtual void check_timer_event();
 	virtual void set_rmcr(u8 data);
 	virtual void write_port2();
-	int m6800_rx();
+	int m6801_rx();
 	void serial_transmit();
 	void serial_receive();
 	TIMER_CALLBACK_MEMBER(sci_tick);
+	void sci_clock_internal(u8 divider);
+	void reset_sci_timer();
 	void set_os3(int state);
 };
 

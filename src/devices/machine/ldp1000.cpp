@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ldp1000.h"
+#include "ldp1000.h"
 
 #define DUMP_BCD 1
 #define FIFO_MAX 0x10

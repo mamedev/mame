@@ -27,6 +27,10 @@ class ti99_cartridge_pcb;
 
 class ti99_cartridge_device : public device_t, public device_cartrom_image_interface
 {
+	friend class ti99_single_cart_conn_device;
+	friend class ti99_multi_cart_conn_device;
+	friend class ti99_gkracker_device;
+
 public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -43,12 +47,10 @@ public:
 	void gclock_in(int state);
 
 	bool    is_available() { return m_pcb != nullptr; }
-	void    set_slot(int i);
 	bool    is_grom_idle();
 
 protected:
 	virtual void device_start() override { }
-	virtual void device_config_complete() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry* device_rom_region() const override;
 
@@ -62,6 +64,8 @@ protected:
 	bool is_reset_on_load() const noexcept override       { return false; }
 	const char *image_interface() const noexcept override { return "ti99_cart"; }
 	const char *file_extensions() const noexcept override { return "rpk"; }
+
+	void set_connector(cartridge_connector_device* conn) { m_connector = conn; }
 
 private:
 
@@ -116,7 +120,6 @@ private:
 
 	bool    m_readrom;
 	int     m_pcbtype;
-	int     m_slot;
 	int     get_index_from_tagname();
 
 	std::unique_ptr<ti99_cartridge_pcb> m_pcb;          // inbound

@@ -13,15 +13,15 @@ video merged with video/seta.cpp
 
 
 Supported games:
-----------------------------------------------------
- Name                    Company               Year
-  Superman                Taito Corp.           1988
-  Twin Hawk (World)       Taito Corp. Japan     1988
-  Twin Hawk (US)          Taito America Corp.   1988
-  Daisenpu (Japan)        Taito Corp.           1988
-  Gigandes                East Technology Corp. 1989
-  Last Striker            East Technology Corp. 1989
-  Balloon Brothers        East Technology Corp. 199?
+-------------------------------------------------------------------------
+ Name                    Company               Year    PCB ref.
+  Superman                Taito Corp.           1988    P0-039A
+  Twin Hawk (World)       Taito Corp. Japan     1988    P0-051A
+  Twin Hawk (US)          Taito America Corp.   1988    P0-051A
+  Daisenpu (Japan)        Taito Corp.           1988    P0-051A
+  Gigandes                East Technology Corp. 1989    P0-057A
+  Last Striker            East Technology Corp. 1989    P0-057A + P1-046A
+  Balloon Brothers        East Technology Corp. 199?    P0-057A + P1-046A
 
 
 This file contains routines to interface with the Taito Controller Chip
@@ -209,7 +209,7 @@ P0-057A
 
 Notes:
         All M-8-x ROMs are held on a plug-in sub-board.
-        The sub-board has printed on it "East Technology" and has PCB Number P0-046A
+        The sub-board has printed on it "East Technology" and has PCB Number P1-046A
 
          68000 clock: 8.000MHz
            Z80 clock: 4.000MHz

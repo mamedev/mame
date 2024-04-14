@@ -35,6 +35,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 /***************************************************************************
     T6834 IMPLEMENTATION
@@ -1447,10 +1449,12 @@ void x07_state::machine_reset()
 	memset(m_regs_r, 0, sizeof(m_regs_r));
 	memset(m_regs_w, 0, sizeof(m_regs_w));
 	memset(m_alarm, 0, sizeof(m_alarm));
-	memset(&m_in, 0, sizeof(m_in));
-	memset(&m_out, 0, sizeof(m_out));
-	memset(&m_locate, 0, sizeof(m_locate));
-	memset(&m_cursor, 0, sizeof(m_cursor));
+	std::fill(std::begin(m_in.data), std::end(m_in.data), 0);
+	m_in.read = m_in.write = 0;
+	std::fill(std::begin(m_out.data), std::end(m_out.data), 0);
+	m_out.read = m_out.write = 0;
+	m_locate = lcd_position();
+	m_cursor = lcd_position();
 	memset(m_prn_buffer, 0, sizeof(m_prn_buffer));
 	memset(m_lcd_map, 0, sizeof(m_lcd_map));
 

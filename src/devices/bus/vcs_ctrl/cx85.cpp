@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(ATARI_CX85, atari_cx85_device, "atari_cx85", "Atari CX85 Nume
 
 
 //**************************************************************************
-//  INPUT PORTS 
+//  INPUT PORTS
 //**************************************************************************
 
 static INPUT_PORTS_START(atari_cx85)

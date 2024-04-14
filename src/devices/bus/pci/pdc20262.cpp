@@ -160,7 +160,7 @@ void pdc20262_device::bus_master_ide_control_map(address_map &map)
 void pdc20262_device::extra_map(address_map &map)
 {
 	// TODO: should be memory mapped versions of above, *nix driver seems to use this
-//	map(0x00, 0x07).m(*this, FUNC(pdc20262_device::ide1_command_map)));
+//  map(0x00, 0x07).m(*this, FUNC(pdc20262_device::ide1_command_map)));
 // ...
 }
 

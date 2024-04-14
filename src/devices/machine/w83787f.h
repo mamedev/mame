@@ -20,8 +20,8 @@ public:
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-//	auto gp20_reset() { return m_gp20_reset_callback.bind(); }
-//	auto gp25_gatea20() { return m_gp25_gatea20_callback.bind(); }
+//  auto gp20_reset() { return m_gp20_reset_callback.bind(); }
+//  auto gp25_gatea20() { return m_gp25_gatea20_callback.bind(); }
 	auto irq1() { return m_irq1_callback.bind(); }
 	auto irq8() { return m_irq8_callback.bind(); }
 	auto irq9() { return m_irq9_callback.bind(); }

@@ -413,7 +413,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys", "Chess Companion II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys", "Explorer Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys", "Chess Companion II", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys", "Explorer Chess", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE )

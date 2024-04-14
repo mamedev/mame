@@ -77,7 +77,7 @@ public:
 	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-//		, m_eeprom(*this, "eeprom")
+//      , m_eeprom(*this, "eeprom")
 	{
 	}
 
@@ -86,11 +86,11 @@ public:
 
 private:
 	required_device<i486dx4_device> m_maincpu;
-//	required_device<eeprom_serial_93cxx_device> m_eeprom;
+//  required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-//	uint8_t bios_r(offs_t offset);
-//	void bios_w(offs_t offset, uint8_t data);
-//	void eeprom_w(uint8_t data);
+//  uint8_t bios_r(offs_t offset);
+//  void bios_w(offs_t offset, uint8_t data);
+//  void eeprom_w(uint8_t data);
 
 	static void winbond_superio_config(device_t *device);
 
@@ -149,13 +149,13 @@ void photoply_state::eeprom_w(uint8_t data)
 void photoply_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x000c0000, 0x000fffff).rw(FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
+//  map(0x000c0000, 0x000fffff).rw(FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
 }
 
 void photoply_state::main_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x0202, 0x0202).w(FUNC(photoply_state::eeprom_w));
+//  map(0x0202, 0x0202).w(FUNC(photoply_state::eeprom_w));
 }
 
 static INPUT_PORTS_START( photoply )
@@ -182,8 +182,8 @@ void photoply_state::winbond_superio_config(device_t *device)
 {
 	w83787f_device &fdc = *downcast<w83787f_device *>(device);
 //  fdc.set_sysopt_pin(1);
-//	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-//	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+//  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq1_w));
 	fdc.irq8().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -228,9 +228,9 @@ void photoply_state::photoply(machine_config &config)
 	PCI_SLOT(config, "pci:2", pci_cards, 11, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 12, 2, 3, 0, 1, nullptr);
 
-//	EEPROM_93C46_16BIT(config, "eeprom")
-//		.write_time(attotime::from_usec(1))
-//		.erase_all_time(attotime::from_usec(10));
+//  EEPROM_93C46_16BIT(config, "eeprom")
+//      .write_time(attotime::from_usec(1))
+//      .erase_all_time(attotime::from_usec(10));
 }
 
 // We asume that every Photo Play from 1999 onwards use a DX4 100MHz instead of a 75MHz one (both were compatible, the latter were recommended)

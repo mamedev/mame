@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/x2212.h"
+#include "x2212.h"
 
 #include <algorithm>
 

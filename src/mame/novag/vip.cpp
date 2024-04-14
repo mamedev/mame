@@ -14,7 +14,7 @@ of this portable design (Ruby, Sapphire, ..) are on H8.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- add Super System peripherals, each has their own MCU
+- add more Super System peripherals, each has their own MCU
 - unmapped reads from 0x3* range, same as snova driver
 
 BTANB:
@@ -55,7 +55,8 @@ Hardware notes:
 
 Super VIP is Novag's first chess computer with a proper serial interface. It
 connects to the Novag Super System Distributor, which can then connect to an
-external chessboard, TV interface, computer, etc.
+external chessboard, TV interface, computer, etc. They are basically RS-232
+devices, just with a different plug.
 
 Serial transmission format for Novag Super System is 1 start bit, 8 data bits,
 1 stop bit, no parity. On Super VIP, the baud rate is selectable 1200 or 9600,
@@ -420,9 +421,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, nvip,   0,      0,      vip,     vip,   vip_state, empty_init, "Novag Industries", "VIP (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, nvip,   0,      0,      vip,     vip,   vip_state, empty_init, "Novag Industries", "VIP (Novag)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, nsvip,  0,      0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v3.7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, nsvipa, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, nsvipb, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, nsvipc, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, nsvip,  0,      0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v3.7)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nsvipa, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v3.6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nsvipb, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v1.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nsvipc, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v1.01)", MACHINE_SUPPORTS_SAVE )

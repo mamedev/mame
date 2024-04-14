@@ -278,4 +278,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, y532xl, 0,      0,      y532xl,  y532xl, y532xl_state, empty_init, "Yeno", "532 XL (Yeno)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, y532xl, 0,      0,      y532xl,  y532xl, y532xl_state, empty_init, "Yeno", "532 XL (Yeno)", MACHINE_SUPPORTS_SAVE )

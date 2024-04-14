@@ -373,7 +373,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, fscc6,   0,      0,      sc6,     sc6,    sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"6\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, miniscc, 0,      0,      msc,     msc,    sc6_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka "Mini Sensory II"
+SYST( 1982, fscc6,   0,      0,      sc6,     sc6,    sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"6\"", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, miniscc, 0,      0,      msc,     msc,    sc6_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1982 version)", MACHINE_SUPPORTS_SAVE ) // aka "Mini Sensory II"
 
-SYST( 1989, gambit,  0,      0,      gambit,  gambit, sc6_state, empty_init, "Fidelity Electronics", "The Gambit (1989 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, gambit,  0,      0,      gambit,  gambit, sc6_state, empty_init, "Fidelity Electronics", "The Gambit (1989 version)", MACHINE_SUPPORTS_SAVE )

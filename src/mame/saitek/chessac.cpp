@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Sean Riddle
+// thanks-to:Sean Riddle, Berger
 /*******************************************************************************
 
 Saitek Kasparov Chess Academy / Mephisto Schachakademie (both were later rebranded
@@ -16,10 +16,11 @@ Hardware notes:
 - OKI MSM6588 ADPCM Recorder @ 4MHz, small daughterboard with 4MB ROM under epoxy
 - 8*8 LEDs, button sensors chessboard
 
+The German version has 2 epoxy blobs (4MB and 2MB) on the daughterboard.
+
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
-- dump/add German speech ROM (Mephisto Schachakademie, MCU is same)
 - does a French speech version exist?
 
 *******************************************************************************/
@@ -35,6 +36,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
+#include "mephisto_schachak.lh"
 #include "saitek_chessac.lh"
 
 
@@ -56,6 +58,7 @@ public:
 	{ }
 
 	void chessac(machine_config &config);
+	void schachak(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
@@ -78,11 +81,11 @@ private:
 	u8 m_lcd_com = 0;
 	u8 m_led_select = 0;
 	u8 m_led_data = 0;
-	u32 m_adpdm_address = 0;
+	u32 m_adpcm_address = 0;
 
-	u8 m_port3 = 0;
-	u8 m_port5 = 0;
-	u8 m_port7 = 0;
+	u8 m_port3 = 0xff;
+	u8 m_port5 = 0xff;
+	u8 m_port7 = 0xff;
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -112,7 +115,7 @@ void chessac_state::machine_start()
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
-	save_item(NAME(m_adpdm_address));
+	save_item(NAME(m_adpcm_address));
 	save_item(NAME(m_port3));
 	save_item(NAME(m_port5));
 	save_item(NAME(m_port7));
@@ -194,7 +197,7 @@ void chessac_state::update_adpcm_address()
 		if (BIT(m_port3, i))
 		{
 			const u8 shift = 8 * i;
-			m_adpdm_address = (m_adpdm_address & ~(0xff << shift)) | (m_port7 << shift);
+			m_adpcm_address = (m_adpcm_address & ~(0xff << shift)) | (m_port7 << shift);
 		}
 }
 
@@ -211,7 +214,7 @@ void chessac_state::p3_w(u8 data)
 		m_okim6588->data_w(m_port7);
 
 	// P33: ADPCM ROM CE
-	// P30-P33: enable ADPCM ROM address latches
+	// P30-P32: enable ADPCM ROM address latches
 	m_port3 = data;
 	update_adpcm_address();
 }
@@ -263,7 +266,7 @@ u8 chessac_state::p7_r()
 
 	// P70-P77: read ADPCM ROM
 	if (~m_port3 & 8)
-		data &= m_adpcm_rom[m_adpdm_address & (m_adpcm_rom.bytes() - 1)];
+		data &= m_adpcm_rom[m_adpcm_address & (m_adpcm_rom.bytes() - 1)];
 
 	// P70-P73: read MSM6588 status
 	if ((m_port3 & 0xf0) == 0xa0)
@@ -313,9 +316,6 @@ static INPUT_PORTS_START( chessac )
 	PORT_START("IN.2")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, chessac_state, go_button, 0) PORT_NAME("Go / Stop")
 	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -366,6 +366,12 @@ void chessac_state::chessac(machine_config &config)
 	m_okim6588->set_mcum_pin(1);
 }
 
+void chessac_state::schachak(machine_config &config)
+{
+	chessac(config);
+	config.set_default_layout(layout_mephisto_schachak);
+}
+
 
 
 /*******************************************************************************
@@ -383,6 +389,19 @@ ROM_START( chessac )
 	ROM_LOAD("gk2000.svg", 0, 68501, CRC(80554c49) SHA1(88f06ec8f403eaaf7cbce4cc84807b5742ce7108) )
 ROM_END
 
+ROM_START( schachak )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
+	ROM_LOAD("97_saitek_86165400831_hd6433214a08f.u1", 0x0000, 0x8000, CRC(29d06d6a) SHA1(08b6f4093b240b0a34d9da67c9acffc576ba1d2d) )
+
+	ROM_REGION( 0x800000, "adpcm", 0 )
+	ROM_LOAD("adpcm.u2", 0x000000, 0x400000, CRC(21608a97) SHA1(42f16cab961f1c53a649a7d630bb96304208e850) ) // no label
+	ROM_LOAD("adpcm.u1", 0x400000, 0x200000, CRC(03ed8eaf) SHA1(44c6de8414b943044dcb8c20e43b40701d1ebc85) ) // "
+	ROM_RELOAD(          0x600000, 0x200000 )
+
+	ROM_REGION( 68501, "screen", 0 )
+	ROM_LOAD("gk2000.svg", 0, 68501, CRC(80554c49) SHA1(88f06ec8f403eaaf7cbce4cc84807b5742ce7108) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -391,5 +410,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, chessac, 0,      0,      chessac, chessac, chessac_state, empty_init, "Saitek", "Kasparov Chess Academy", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1997, chessac,  0,       0,      chessac,  chessac, chessac_state, empty_init, "Saitek", "Kasparov Chess Academy", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, schachak, chessac, 0,      schachak, chessac, chessac_state, empty_init, "Saitek", "Mephisto Schachakademie", MACHINE_SUPPORTS_SAVE )

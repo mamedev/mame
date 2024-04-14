@@ -10,11 +10,14 @@
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
+#include <SDL2/SDL.h>
+
 #include <cassert>
 #include <chrono>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
+#include <utility>
 #include <string>
 #include <vector>
 
@@ -128,8 +131,6 @@ public:
 };
 
 
-union SDL_Event;
-
 using sdl_event_manager = event_subscription_manager<SDL_Event, uint32_t>;
 
 
@@ -194,6 +195,8 @@ private:
 	bool mouse_over_window() const { return m_mouse_over_window > 0; }
 	template <typename T> sdl_window_info *focus_window(T const &event) const;
 
+	unsigned map_pointer_device(SDL_TouchID device);
+
 	sdl_options &m_options;
 	sdl_window_info *m_focus_window;
 	int m_mouse_over_window;
@@ -202,6 +205,10 @@ private:
 	std::chrono::steady_clock::time_point m_last_click_time;
 	int m_last_click_x;
 	int m_last_click_y;
+
+	bool m_enable_touch;
+	unsigned m_next_ptrdev;
+	std::vector<std::pair<SDL_TouchID, unsigned> > m_ptrdev_map;
 };
 
 //============================================================

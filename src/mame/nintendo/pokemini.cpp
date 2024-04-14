@@ -46,17 +46,17 @@ protected:
 private:
 	struct PRC
 	{
-		uint8_t       colors_inverted = 0;
-		uint8_t       background_enabled = 0;
-		uint8_t       sprites_enabled = 0;
-		uint8_t       copy_enabled = 0;
-		uint8_t       map_size = 0;
-		uint8_t       map_size_x = 0;
-		uint8_t       frame_count = 0;
-		uint8_t       max_frame_count = 0;
-		uint32_t      bg_tiles = 0;
-		uint32_t      spr_tiles = 0;
-		uint8_t       count = 0;
+		uint8_t     colors_inverted = 0;
+		uint8_t     background_enabled = 0;
+		uint8_t     sprites_enabled = 0;
+		uint8_t     copy_enabled = 0;
+		uint8_t     map_size = 0;
+		uint8_t     map_size_x = 0;
+		uint8_t     frame_count = 0;
+		uint8_t     max_frame_count = 0;
+		uint32_t    bg_tiles = 0;
+		uint32_t    spr_tiles = 0;
+		uint8_t     count = 0;
 		emu_timer   *count_timer = nullptr;
 	};
 
@@ -1651,8 +1651,8 @@ TIMER_CALLBACK_MEMBER(pokemini_state::prc_counter_callback)
 void pokemini_state::machine_start()
 {
 	/* Clear internal structures */
-	memset( &m_prc, 0, sizeof(m_prc) );
-	memset( &m_timers, 0, sizeof(m_timers) );
+	m_prc = PRC();
+	m_timers = TIMERS();
 	memset( m_pm_reg, 0, sizeof(m_pm_reg) );
 
 	/* Set up timers */

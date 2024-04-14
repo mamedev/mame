@@ -291,7 +291,7 @@ void spi_sdcard_device::do_command()
 			/*
 			else // SD_TYPE_HC: CSD Version 2.0
 			{
-				m_data[3]  = 0x40;
+			    m_data[3]  = 0x40;
 			}
 			*/
 
@@ -327,17 +327,18 @@ void spi_sdcard_device::do_command()
 
 		case 12: // CMD12 - STOP_TRANSMISSION
 			m_data[0] = 0;
-			send_data(1, m_state == SD_STATE_RCV ? SD_STATE_PRG : SD_STATE_TRAN);
+			send_data(1, (m_state == SD_STATE_RCV) ? SD_STATE_PRG : SD_STATE_TRAN);
 			break;
 
 		case 13: // CMD13 - SEND_STATUS
 			m_data[0] = 0; // TODO
-			send_data(1, SD_STATE_STBY);
+			m_data[1] = 0;
+			send_data(2, SD_STATE_STBY);
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN
 			m_blksize = get_u16be(&m_cmd[3]);
-			if (m_image->set_block_size(m_blksize))
+			if (m_image->exists() && m_image->set_block_size(m_blksize))
 			{
 				m_data[0] = 0;
 			}
@@ -429,14 +430,8 @@ void spi_sdcard_device::do_command()
 
 		case 58: // CMD58 - READ_OCR
 			m_data[0] = 0;
-			if (m_type == SD_TYPE_HC)
-			{
-				m_data[1] = 0x40; // indicate SDHC support
-			}
-			else
-			{
-				m_data[1] = 0;
-			}
+			m_data[1] = 0x80; // Busy Status: 1b - Initialization Complete
+			m_data[1] |= (m_type == SD_TYPE_V2) ? 0 : 0x40; // Card Capacity Status: 0b - SDCS, 1b SDHC, SDXC
 			m_data[2] = 0;
 			m_data[3] = 0;
 			m_data[4] = 0;

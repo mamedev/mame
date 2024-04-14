@@ -9,7 +9,7 @@
 */
 
 #include "emu.h"
-#include "video/gf4500.h"
+#include "gf4500.h"
 
 #define VERBOSE (0)
 #include "logmacro.h"

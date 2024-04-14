@@ -1,5 +1,4 @@
 // license:GPL-2.0+
-
 // copyright-holders:Spiro Trikaliotis, Rhett Aultman
 
 /*************************************************************************
@@ -13,7 +12,7 @@
  **************************************************************************/
 
 #include "emu.h"
-#include "machine/cs8900a.h"
+#include "cs8900a.h"
 
 #include <cstring>
 

@@ -4,11 +4,10 @@
 
     machine/genpc.cpp
 
-
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/genpc.h"
+#include "genpc.h"
 
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"

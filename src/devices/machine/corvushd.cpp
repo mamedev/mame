@@ -65,7 +65,7 @@
 //
 
 #include "emu.h"
-#include "machine/corvushd.h"
+#include "corvushd.h"
 
 #define LOG_RESPONSES (1U << 1)
 

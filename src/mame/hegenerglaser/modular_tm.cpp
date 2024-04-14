@@ -292,14 +292,14 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, port32t,   port32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port32t,   port32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 68030", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, lyon32t,   lyon32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, lyon32t8,  lyon32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Lyon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, lyon32t,   lyon32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 68030", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, lyon32t8,  lyon32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Lyon", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1991, van32t,    van32,  0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, van32t8,   van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Vancouver", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, berl32t8p, van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Berlin (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, van32t,    van32,  0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 68030", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, van32t8,   van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Vancouver", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, berl32t8p, van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Berlin (prototype)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1996, lond32t,   lond32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Saitek", "Mephisto London 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // after Saitek took over H+G
-SYST( 1996, lond32t8,  lond32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Saitek", "Mephisto TM London", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+SYST( 1996, lond32t,   lond32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Saitek", "Mephisto London 68030", MACHINE_SUPPORTS_SAVE ) // after Saitek took over H+G
+SYST( 1996, lond32t8,  lond32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Saitek", "Mephisto TM London", MACHINE_SUPPORTS_SAVE ) // "

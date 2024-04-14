@@ -915,8 +915,8 @@ ROM_START( gkkey )
 	ROM_LOAD( "cvs00080,1-4002.bin", 0x00000, 0x80000, CRC(f58a3040) SHA1(906ed54aeafdf2cf58ee8425405498a8c64b52e1) )
 	ROM_LOAD( "ivc00097,1-4002.bin", 0x00000, 0x80000, CRC(f0a59fd1) SHA1(8e980e9eb80e6899fe3bbcd21ccbd39f9fdccaca) ) /* Vision Ram/E-Square Clear (Replaces IVC00070) */
 
-//	ROM_REGION( 0x80000, "miscbad", 0 )
-//	these are also bad dumps, again they never contains the byte value 0x0d (uploaded in ASCII mode with carriage return stripped out?)
+//  ROM_REGION( 0x80000, "miscbad", 0 )
+//  these are also bad dumps, again they never contains the byte value 0x0d (uploaded in ASCII mode with carriage return stripped out?)
 
 	ROM_REGION32_LE( 0x200000, "game", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100000, "cg", ROMREGION_ERASEFF )

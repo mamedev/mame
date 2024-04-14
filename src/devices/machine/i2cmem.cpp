@@ -23,7 +23,7 @@ there are two standard values.
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/i2cmem.h"
+#include "i2cmem.h"
 
 #include <cstdarg>
 

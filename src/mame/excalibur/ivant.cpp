@@ -5,7 +5,8 @@
 
 Excalibur Ivan The Terrible
 
-The chess engine is by Ron Nelson, similar to the one in Excalibur Mirage.
+The chess engine is by Ron Nelson, similar to the one in Excalibur Mirage. It
+has speech, and also sound effects that are reminiscent of Battle Chess.
 
 Hardware notes:
 - PCB label: EXCALIBUR ELECTRONICS, INC. 6/28/96, IVANT
@@ -148,7 +149,7 @@ void ivant_state::update_lcd()
 void ivant_state::lcd_com_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	// P70,P71: LCD common
-	m_lcd_com = mem_mask << 2 | (data & 3);
+	m_lcd_com = (mem_mask << 2 & 0xc) | (data & 3);
 	update_lcd();
 }
 
@@ -203,7 +204,7 @@ u8 ivant_state::read_inputs()
 
 u8 ivant_state::p4_r()
 {
-	// P47: multiplexed inputs part
+	// P47: multiplexed inputs high bit
 	return (read_inputs() & 0x80) | 0x7f;
 }
 
@@ -345,4 +346,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1996, ivant, 0,      0,      ivant,   ivant, ivant_state, empty_init, "Excalibur Electronics", "Ivan The Terrible", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1996, ivant, 0,      0,      ivant,   ivant, ivant_state, empty_init, "Excalibur Electronics", "Ivan The Terrible", MACHINE_SUPPORTS_SAVE )

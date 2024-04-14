@@ -20,12 +20,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define VIDEO_CLOCK     XTAL(8'000'000)           // video (pixel) clock
-#define CPU_CLOCK       XTAL(12'000'000)          // clock for 68000-based systems
-#define CPU020_CLOCK    XTAL(25'000'000)          // clock for 68EC020-based systems
-#define SOUND_CLOCK     XTAL(16'000'000)          // clock for sound board
-#define TMS_CLOCK       XTAL(40'000'000)          // TMS320C31 clocks on drivedge
-
+#define LOG_DRIVEDGE_UNINIT_RAM     0
 
 class itech32_state : public driver_device
 {
@@ -34,7 +29,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_via(*this, "via6522_0"),
+		m_via(*this, "via6522"),
 		m_ensoniq(*this, "ensoniq"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -46,10 +41,12 @@ public:
 		m_nvram32(*this, "nvram32"),
 		m_main_ram32(*this, "main_ram"),
 		m_video(*this, "video", 0x200, ENDIANNESS_BIG),
-		m_main_rom16(*this, "user1"),
-		m_main_rom32(*this, "user1"),
-		m_grom(*this, "gfx1"),
-		m_soundbank(*this, "soundbank")
+		m_main_rom16(*this, "maindata"),
+		m_main_rom32(*this, "maindata"),
+		m_grom(*this, "grom"),
+		m_soundbank(*this, "soundbank"),
+		m_trackball_x(*this, "TRACKX%u", 1U),
+		m_trackball_y(*this, "TRACKY%u", 1U)
 	{ }
 
 	void base_devices(machine_config &config);
@@ -82,6 +79,8 @@ public:
 	int special_port_r();
 
 protected:
+	static constexpr XTAL VIDEO_CLOCK = XTAL(8'000'000); // video (pixel) clock
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<via6522_device> m_via; // sftm, wcbowl and gt games don't have the via
@@ -103,6 +102,9 @@ protected:
 	required_region_ptr<u8> m_grom;
 	required_memory_bank m_soundbank;
 
+	optional_ioport_array<2> m_trackball_x;
+	optional_ioport_array<2> m_trackball_y;
+
 	virtual void nvram_init(nvram_device &nvram, void *base, size_t length);
 
 	std::unique_ptr<u16[]> m_videoram;
@@ -112,16 +114,11 @@ protected:
 	u8 m_irq_base = 0;
 	u8 m_sound_return = 0;
 	offs_t m_itech020_prot_address = 0;
-	int m_special_result = 0;
-	int m_p1_effx = 0;
-	int m_p1_effy = 0;
-	int m_p1_lastresult = 0;
-	attotime m_p1_lasttime{};
-	int m_p2_effx = 0;
-	int m_p2_effy = 0;
-	int m_p2_lastresult = 0;
-	attotime m_p2_lasttime{};
-	u8 m_written[0x8000]{};
+	u8 m_special_result = 0;
+	s32 m_effx[2]{};
+	s32 m_effy[2]{};
+	u8 m_lastresult[2]{};
+	attotime m_lasttime[2]{};
 	u16 m_xfer_xcount = 0;
 	u16 m_xfer_ycount = 0;
 	u16 m_xfer_xcur = 0;
@@ -144,11 +141,9 @@ protected:
 	u32 m_grom_bank_mask = 0;
 
 	void int1_ack_w(u16 data);
-	u8 trackball_r();
-	u8 trackball_p2_r();
+	template<unsigned Which> u8 trackball_r();
 	u16 trackball_8bit_r();
-	u32 trackball32_4bit_p1_r();
-	u32 trackball32_4bit_p2_r();
+	template<unsigned Which> u32 trackball32_4bit_r();
 	u32 trackball32_4bit_combined_r();
 	u16 wcbowl_prot_result_r();
 	u8 itech020_prot_result_r();
@@ -190,7 +185,7 @@ protected:
 	inline void disable_clipping();
 	inline void enable_clipping();
 	virtual void logblit(const char *tag);
-	void update_interrupts(int fast);
+	void update_interrupts();
 	void draw_raw(u16 *base, u16 color);
 	void draw_raw_widthpix(u16 *base, u16 color);
 	virtual void command_blit_raw();
@@ -232,8 +227,16 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	u16 steering_r();
 	u16 gas_r();
+
+#if LOG_DRIVEDGE_UNINIT_RAM
+	u32 test1_r(offs_t offset, u32 mem_mask);
+	u32 test2_r(offs_t offset, u32 mem_mask);
+	void test1_w(offs_t offset, u32 data, u32 mem_mask);
+	void test2_w(offs_t offset, u32 data, u32 mem_mask);
+#endif
 
 	u32 tms1_speedup_r(address_space &space);
 	u32 tms2_speedup_r(address_space &space);
@@ -270,6 +273,9 @@ protected:
 	required_ioport m_gas;
 
 	u8 m_tms_spinning[2];
+#if LOG_DRIVEDGE_UNINIT_RAM
+	u8 m_written[0x8000]{};
+#endif
 };
 
 class shoottv_state : public itech32_state

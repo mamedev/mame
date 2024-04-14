@@ -48,7 +48,7 @@ void rm380z_state_cos40_hrg::palette_init(palette_device &palette)
 	palette.set_pen_color(2, rgb_t::white());
 
 	// HRG palette (initialise to all black)
-	for (int c=3; c < 19; c++)
+	for (int c = 3; c < 19; c++)
 	{
 		palette.set_pen_color(c, rgb_t::black());
 	}
@@ -115,7 +115,7 @@ void rm380z_state_cos40::config_videomode()
 {
 	int old_mode = m_videomode;
 
-	if (m_port0 & 0x20)
+	if (BIT(m_port0, 5))
 	{
 		// 80 cols
 		m_videomode = RM380Z_VIDEOMODE_80COL;
@@ -171,6 +171,8 @@ void rm380z_state_cos40::videoram_write(offs_t offset, uint8_t data)
 		else
 		{
 			m_vram.set_char(row, col, data);
+			// when a character is written, the corresponding attributes are cleared
+			m_vram.set_attrib(row, col, 0);
 		}
 	}
 	// else out of bounds write had no effect (see VTOUT description in firmware guide)
@@ -178,7 +180,7 @@ void rm380z_state_cos40::videoram_write(offs_t offset, uint8_t data)
 
 void rm380z_state_cos40_hrg::videoram_write(offs_t offset, uint8_t data)
 {
-	if (m_hrg_port0 & 0x04)
+	if (BIT(m_hrg_port0, 2))
 	{
 		// write to HRG memory
 		m_hrg_ram[calculate_hrg_vram_index(offset)] = data;
@@ -199,7 +201,7 @@ uint8_t rm380z_state_cos34::videoram_read(offs_t offset)
 		data = m_vram.get_char(row, col);
 	}
 
-	return data; 
+	return data;
 }
 
 uint8_t rm380z_state_cos40::videoram_read(offs_t offset)
@@ -219,14 +221,14 @@ uint8_t rm380z_state_cos40::videoram_read(offs_t offset)
 		}
 	}
 
-	return data; 
+	return data;
 }
 
 uint8_t rm380z_state_cos40_hrg::videoram_read(offs_t offset)
 {
 	uint8_t data;
 
-	if (m_hrg_port0 & 0x04)
+	if (BIT(m_hrg_port0, 2))
 	{
 		// read from HRG memory
 		data = m_hrg_ram[calculate_hrg_vram_index(offset)];
@@ -247,7 +249,7 @@ void rm380z_state_cos40::putChar_vdu80(int charnum, int attribs, int x, int y, b
 
 	int data_pos = (charnum % 128) * 16;
 
-	for (int r=0; r < 10; r++, data_pos++)
+	for (int r = 0; r < 10; r++, data_pos++)
 	{
 		uint8_t data;
 
@@ -266,9 +268,9 @@ void rm380z_state_cos40::putChar_vdu80(int charnum, int attribs, int x, int y, b
 			data = m_user_defined_chars[data_pos];
 		}
 
-		for (int c=0; c < 8; c++, data <<= 1)
+		for (int c = 0; c < 8; c++, data <<= 1)
 		{
-			uint8_t pixel_value = (data & 0x80) ? 2 : 0;
+			uint8_t pixel_value = BIT(data, 7) ? 2 : 0;
 			if (attrRev)
 			{
 				pixel_value = !pixel_value;
@@ -291,13 +293,13 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 	{
 		// 5x9 characters are drawn in 8x10 grid
 		// with 1 pixel gap to the left, 2 pixel gap to the right, and 1 pixel gap at the bottom
-		for (int r=0; r < 9; r++)
+		for (int r = 0; r < 9; r++)
 		{
 			uint8_t data = m_rocg->read(charnum, r);
 
-			for (int c=1; c < 6; c++, data <<= 1)
+			for (int c = 1; c < 6; c++, data <<= 1)
 			{
-				if (data & 0x40)
+				if (BIT(data, 6))
 				{
 					bitmap.pix(y * 10 + r, x * 8 + c) = 2;
 				}
@@ -311,27 +313,27 @@ void rm380z_state_cos34::putChar_vdu40(int charnum, int x, int y, bitmap_ind16 &
 
 		// discrete logic gates were used to produce a full 8x10 grid of pixels
 		// the top block is 4 pixels high, and the two lower two blocks are 3 pixels high
-		if (charnum & 0x01)
+		if (BIT(charnum, 0))
 		{
 			bitmap.plot_box(x * 8, y * 10, 4, 4, colour);
 		}
-		if (charnum & 0x02)
+		if (BIT(charnum, 1))
 		{
 			bitmap.plot_box(x * 8 + 4, y * 10, 4, 4, colour);
 		}
-		if (charnum & 0x04)
+		if (BIT(charnum, 2))
 		{
 			bitmap.plot_box(x * 8, y * 10 + 4, 4, 3, colour);
 		}
-		if (charnum & 0x08)
+		if (BIT(charnum, 3))
 		{
 			bitmap.plot_box(x * 8 + 4, y * 10 + 4, 4, 3, colour);
 		}
-		if (charnum & 0x10)
+		if (BIT(charnum, 4))
 		{
 			bitmap.plot_box(x * 8, y * 10 + 7, 4, 3, colour);
 		}
-		if (charnum & 0x20)
+		if (BIT(charnum, 5))
 		{
 			bitmap.plot_box(x * 8 + 4, y * 10 + 7, 4, 3, colour);
 		}
@@ -351,9 +353,9 @@ void rm380z_state_cos40_hrg::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 		{
 			int index = ((y / 16) * 1280) + ((x / 4) << 4) + (y % 16);
 			uint8_t data = m_hrg_ram[index];
-			for (int c=0; c < 4; c++, data >>= 2)
+			for (int c = 0; c < 4; c++, data >>= 2)
 			{
-				bitmap.plot_box((x+c)*pw, y*ph, pw, ph, (data & 0x03) + 3);
+				bitmap.plot_box((x + c)*pw, y*ph, pw, ph, (data & 0x03) + 3);
 			}
 		}
 	}
@@ -390,7 +392,11 @@ void rm380z_state_cos40_hrg::update_screen(bitmap_ind16 &bitmap) const
 		draw_medium_res_graphics(bitmap);
 	}
 
-	rm380z_state_cos40::update_screen(bitmap);
+	if (!BIT(m_fbfd, 7))
+	{
+		// display text on top of graphics unless prevented by bit 7 of fbfd (VID INHIB)
+		rm380z_state_cos40::update_screen(bitmap);
+	}
 }
 
 void rm380z_state_cos40::update_screen(bitmap_ind16 &bitmap) const

@@ -252,4 +252,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Chess Professor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Chess Professor", MACHINE_SUPPORTS_SAVE )

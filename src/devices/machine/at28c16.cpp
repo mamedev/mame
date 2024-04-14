@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/at28c16.h"
+#include "at28c16.h"
 
 #define AT28C16_DATA_BYTES ( 0x800 )
 #define AT28C16_ID_BYTES ( 0x20 )

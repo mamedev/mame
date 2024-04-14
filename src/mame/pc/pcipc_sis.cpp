@@ -98,8 +98,8 @@ void sis496_state::winbond_superio_config(device_t *device)
 {
 	w83787f_device &fdc = *downcast<w83787f_device *>(device);
 //  fdc.set_sysopt_pin(1);
-//	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-//	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+//  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq1_w));
 	fdc.irq8().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));

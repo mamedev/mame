@@ -304,4 +304,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts", "Destiny Prodigy", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts", "Destiny Prodigy", MACHINE_SUPPORTS_SAVE )

@@ -913,7 +913,7 @@ std::error_condition zip_file_impl::decompress(void *buffer, std::size_t length)
 	}
 
 	// get the compressed data offset
-	std::uint64_t offset;
+	std::uint64_t offset = 0;
 	auto const ziperr = get_compressed_data_offset(offset);
 	if (ziperr)
 		return ziperr;
