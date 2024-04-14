@@ -34,6 +34,8 @@ enum
 
 void term2_state::machine_start()
 {
+	midyunit_state::machine_start();
+
 	m_left_flash.resolve();
 	m_right_flash.resolve();
 	m_left_gun_recoil.resolve();
