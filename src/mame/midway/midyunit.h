@@ -63,8 +63,6 @@ public:
 	int adpcm_irq_state_r();
 
 protected:
-	virtual void machine_start() override { }
-
 	// protection data types
 	struct protection_data
 	{
