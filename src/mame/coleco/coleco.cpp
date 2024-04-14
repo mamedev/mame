@@ -603,6 +603,7 @@ void coleco_state::coleco(machine_config &config)
 	exp.set_io_space(m_maincpu, AS_IO);
 	exp.int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // TODO: Merge with other IRQs?
 	exp.nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	exp.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void coleco_state::colecop(machine_config &config)

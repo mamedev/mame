@@ -55,7 +55,10 @@ class device_coleco_expansion_interface;
 //  BUS DEVICE
 //**************************************************************************
 
-class coleco_expansion_device : public device_t, public device_single_card_slot_interface<device_coleco_expansion_interface>
+class coleco_expansion_device :
+	public device_t,
+	public device_single_card_slot_interface<device_coleco_expansion_interface>,
+	public device_mixer_interface
 {
 public:
 	// construction/destruction

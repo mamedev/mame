@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "sgm.h"
 #include "sound/ay8910.h"
-#include "speaker.h"
 
 
 //**************************************************************************
@@ -47,10 +46,8 @@ void coleco_sgm_device::io_map(address_map &map)
 
 void coleco_sgm_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "mono").front_center();
-
 	ay8910_device &ay(AY8910(config, "ay", 7.15909_MHz_XTAL / 4));
-	ay.add_route(ALL_OUTPUTS, "mono", 1.00);
+	ay.add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0);
 }
 
 

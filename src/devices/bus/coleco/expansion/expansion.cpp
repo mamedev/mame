@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(COLECO_EXPANSION, coleco_expansion_device, "coleco_expansion"
 coleco_expansion_device::coleco_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COLECO_EXPANSION, tag, owner, clock),
 	device_single_card_slot_interface<device_coleco_expansion_interface>(mconfig, *this),
+	device_mixer_interface(mconfig, *this),
 	m_program(*this, finder_base::DUMMY_TAG, -1),
 	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_int_handler(*this),
