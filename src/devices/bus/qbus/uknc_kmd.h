@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include "machine/1801vp128.h"
-
 #include "qbus.h"
+
+#include "machine/1801vp128.h"
 
 
 /***************************************************************************
@@ -34,13 +34,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<k1801vp128_device> m_fdc;
-
-private:
-	static void floppy_formats(format_registration &fr);
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(UKNC_KMD, uknc_kmd_device)
 
-#endif
+#endif // MAME_BUS_QBUS_UKNC_KMD_H

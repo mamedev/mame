@@ -7,11 +7,27 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "uknc_kmd.h"
 
 #include "machine/pdp11.h"
+
 #include "formats/bk0010_dsk.h"
 
-#include "uknc_kmd.h"
+
+namespace {
+
+void uknc_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
+
+void uknc_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BK0010_FORMAT);
+}
+
+} // anonymous namespace
 
 
 //**************************************************************************
@@ -36,34 +52,25 @@ uknc_kmd_device::uknc_kmd_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void uknc_kmd_device::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_BK0010_FORMAT);
-}
-
-static void uknc_floppies(device_slot_interface &device)
-{
-	device.option_add("525qd", FLOPPY_525_QD);
-}
-
 void uknc_kmd_device::device_add_mconfig(machine_config &config)
 {
 	K1801VP128(config, m_fdc, XTAL(4'000'000));
-	m_fdc->ds_in_callback().set([this] (uint16_t data) {
-		switch (data & 02003)
-		{
-			case 02000: return 3;
-			case 02001: return 2;
-			case 02002: return 1;
-			case 02003: return 0;
-			default: return -1;
-		}
-	});
-	FLOPPY_CONNECTOR(config, "fdc:0", uknc_floppies, "525qd", uknc_kmd_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", uknc_floppies, "525qd", uknc_kmd_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", uknc_floppies, "525qd", uknc_kmd_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", uknc_floppies, "525qd", uknc_kmd_device::floppy_formats);
+	m_fdc->ds_in_callback().set(
+			[this] (uint16_t data)
+			{
+				switch (data & 02003)
+				{
+					case 02000: return 3;
+					case 02001: return 2;
+					case 02002: return 1;
+					case 02003: return 0;
+					default: return -1;
+				}
+			});
+	FLOPPY_CONNECTOR(config, "fdc:0", uknc_floppies, "525qd", uknc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", uknc_floppies, "525qd", uknc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", uknc_floppies, "525qd", uknc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", uknc_floppies, "525qd", uknc_floppy_formats);
 }
 
 
@@ -74,8 +81,7 @@ void uknc_kmd_device::device_add_mconfig(machine_config &config)
 void uknc_kmd_device::device_start()
 {
 	m_bus->install_device(0177130, 0177133,
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write))
-	);
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write)));
 }
 
