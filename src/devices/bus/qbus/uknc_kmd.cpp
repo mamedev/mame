@@ -56,7 +56,7 @@ void uknc_kmd_device::device_add_mconfig(machine_config &config)
 {
 	K1801VP128(config, m_fdc, XTAL(4'000'000));
 	m_fdc->ds_in_callback().set(
-			[this] (uint16_t data)
+			[] (uint16_t data) -> uint16_t
 			{
 				switch (data & 02003)
 				{
