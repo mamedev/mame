@@ -2124,9 +2124,16 @@ void seattle_state::flagstaff(machine_config &config)
 void seattle_state::wg3dh(machine_config &config)
 {
 	phoenix(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
@@ -2138,9 +2145,16 @@ void seattle_state::wg3dh(machine_config &config)
 void seattle_state::mace(machine_config &config)
 {
 	seattle150(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
@@ -2213,9 +2227,16 @@ void seattle_state::sfrushrkw(machine_config &config)
 void seattle_state::calspeed(machine_config &config)
 {
 	seattle150_widget(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c0);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
@@ -2228,9 +2249,16 @@ void seattle_state::calspeed(machine_config &config)
 void seattle_state::vaportrx(machine_config &config)
 {
 	seattle200_widget(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
@@ -2242,9 +2270,16 @@ void seattle_state::vaportrx(machine_config &config)
 void seattle_state::biofreak(machine_config &config)
 {
 	seattle150(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3835);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
@@ -2256,9 +2291,16 @@ void seattle_state::biofreak(machine_config &config)
 void seattle_state::blitz(machine_config &config)
 {
 	seattle150(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
@@ -2271,9 +2313,16 @@ void seattle_state::blitz(machine_config &config)
 void seattle_state::blitz99(machine_config &config)
 {
 	seattle150(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0afb);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
@@ -2286,9 +2335,16 @@ void seattle_state::blitz99(machine_config &config)
 void seattle_state::blitz2k(machine_config &config)
 {
 	seattle150(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0b5d);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
@@ -2303,9 +2359,15 @@ void seattle_state::carnevil(machine_config &config)
 	seattle150(config);
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::carnevil_cs3_map, "carnevil_cs3_map", this), this);
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
@@ -2317,9 +2379,16 @@ void seattle_state::carnevil(machine_config &config)
 void seattle_state::hyprdriv(machine_config &config)
 {
 	seattle200_widget(config);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
