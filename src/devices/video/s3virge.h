@@ -54,6 +54,8 @@ public:
 	bool is_linear_address_active() { return m_linear_address_enable; }
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
 
+	// has no 8514/A device
+	// FIXME: should map this dependency in machine_config
 	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existent 8514/A device\n"); return nullptr; }
 
 protected:
@@ -175,7 +177,6 @@ protected:
 
 	virtual void s3_define_video_mode(void) override;
 
-	// has no 8514/A device
 private:
 	emu_timer *m_op_timer;
 	void bitblt_step();
