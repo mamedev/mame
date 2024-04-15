@@ -29,6 +29,7 @@
             1x M27C512 (4.10).
 
     PLDs:   1x PALCE22V10H (read protected)
+            2x MACH210-15JC-18JI EEPLDs
 
     Clock:  1x 16MHz Crystal.
 
@@ -43,9 +44,14 @@
     GENERAL NOTES:
 
     - The game is based on Funworld/Tab/CMC games, but the hardware is completely different.
-      It has more complex improvements (encryption, MCU, banks, etc...)
+       It has more complex improvements (encryption, MCU, banks, etc...)
+
     - The program ROM is encrypted.
+
     - The color palettes are stored in a normal ROM.
+
+	- The code initializes a couple of inexistent PIAs 6821 that handle the I/O, so surely 
+	   these are emulated/simulated. However, set Rugby has both physical PIAs in the PCB.
 
 
 ***********************************************************************************
@@ -54,7 +60,23 @@
     Memory Map
     ----------
 
-    $0000 - $7FFF   Still unknown...
+    $0000 - $07FF   NVRAM
+
+    $0800 - $0803   PIA 6821 #0 (rugby, simulated in 4roses)
+    $0A00 - $0A03   PIA 6821 #1 (rugby, simulated in 4roses)
+
+    $0C00 - $0C00   AY-8910 data R
+    $0C01 - $0C01   AY-8910 data & address W
+
+    $0E00 - $0E00   CRTC 6845 address
+    $0E01 - $0E01   CRTC 6845 register
+
+    $4000 - $4FFF   Video RAM (4roses).
+    $5000 - $5FFF   Color/attr RAM (4roses).
+
+    $6000 - $6FFF   Video RAM (rugby).
+    $7000 - $7FFF   Color/attr RAM (rugby).
+
     $8000 - $FFFF   ROM Space.
 
 
@@ -160,13 +182,11 @@
 
     *** TO DO ***
 
-    - Decrypt the program ROMs.
-    - Fix memory map.
     - Fix GFX decode.
     - Fix color decode routines.
     - Proper inputs.
     - MCU simulation.
-    - Dump/decap the MCU.
+    - Decap/dump the MCUs.
 
 
 ***********************************************************************************/
@@ -176,6 +196,7 @@
 #include "funworld.h"
 
 #include "cpu/m6502/m65c02.h"
+#include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -228,6 +249,7 @@ private:
 	void rugby_opcodes_map(address_map &map);
 };
 
+
 /**********************
 * Read/Write Handlers *
 **********************/
@@ -241,6 +263,8 @@ private:
 void _4roses_state::_4roses_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram(); // .share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // non existent in the hardware, but initialized and operated.
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // non existent in the hardware, but initialized and operated.
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
@@ -290,9 +314,12 @@ void _4roses_state::_4roses_opcodes_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
+
 void rugby_state::rugby_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram(); // .share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
@@ -394,32 +421,6 @@ static INPUT_PORTS_START( 4roses )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SW2")   /* this bank is x4 DIP switches */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -429,14 +430,14 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-/* WRONG... Must be changed */
+// WRONG... Must be changed
 	4,
 	8,
-//  0x1000,
-	RGN_FRAC(1,2),
+  0x1000,
+//	RGN_FRAC(1,2),
 	4,
-//  { 0, 4, 0x8000*8, 0x8000*8+4 },
-	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },
+  { 0, 4, 0x8000*8, 0x8000*8+4 },
+//	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },
 	{ 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2
@@ -458,36 +459,44 @@ GFXDECODE_END
 
 void _4roses_state::_4roses(machine_config &config)
 {
-	/* basic machine hardware */
-	M65C02(config, m_maincpu, MASTER_CLOCK/8); /* 2MHz, guess */
+	// basic machine hardware
+	M65C02(config, m_maincpu, MASTER_CLOCK/8);  // 2MHz, guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &_4roses_state::_4roses_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &_4roses_state::_4roses_opcodes_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	pia6821_device &pia0(PIA6821(config, "pia0"));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
+
+	pia6821_device &pia1(PIA6821(config, "pia1"));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.readpb_handler().set_ioport("SW1");
+
+	// video hardware
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((124+1)*4, (30+1)*8);               /* guess. taken from funworld games */
-	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* guess. taken from funworld games */
+	screen.set_size((124+1)*4, (30+1)*8);          // guess. taken from funworld games
+	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  // guess. taken from funworld games
 	screen.set_screen_update(FUNC(_4roses_state::screen_update_funworld));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_4roses);
 
 	PALETTE(config, "palette", FUNC(_4roses_state::funworld_palette), 0x1000);
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8)); /* 2MHz, guess */
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8));  // 2MHz, guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);
 	//crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay8910", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.5);    /* 2MHz, guess */
+	AY8910(config, "ay8910", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.5);  // 2MHz, guess
 }
 
 void rugby_state::rugby(machine_config &config)
@@ -504,10 +513,10 @@ void rugby_state::rugby(machine_config &config)
 *************************/
 
 ROM_START( 4roses )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x10000, "maincpu", 0 )  // encrypted program ROM...
 	ROM_LOAD( "4.10.u32", 0x00000, 0x10000, CRC(e94440e9) SHA1(b2f81ba79f1f40ed35e45fd80c17eb8529ccdb4c) )
 
-	ROM_REGION( 0x0400,  "mcu", 0 ) /* protected... no dump available */
+	ROM_REGION( 0x0400,  "mcu", 0 )  // protected... no dump available
 	ROM_LOAD( "ep87c750ebpn_no_dump.u41", 0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -522,10 +531,10 @@ ROM_START( 4roses )
 ROM_END
 
 ROM_START( 4rosesa )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x10000, "maincpu", 0 )  // encrypted program ROM...
 	ROM_LOAD( "4.u15", 0x00000, 0x10000, CRC(66bb5b67) SHA1(438371c3918f0a285cb19caa650739df9fb24800) )
 
-	ROM_REGION( 0x0400,  "mcu", 0 ) /* protected... no dump available */
+	ROM_REGION( 0x0400,  "mcu", 0 )  // protected... no dump available
 	ROM_LOAD( "ep87c750ebpn_no_dump.u41", 0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -549,10 +558,10 @@ no cpu... cpu seem a 44 plcc chip with name scratched off...
 pcb is almost the same as "Four Roses"
 */
 ROM_START( rugby )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x10000, "maincpu", 0 )  // encrypted program ROM...
 	ROM_LOAD( "rugby1.u15", 0x00000, 0x10000, CRC(6ac45fa7) SHA1(dba936d236d57172e56143a9858e5052009e4346) )
 
-	ROM_REGION( 0x0400,  "mcu", 0 ) /* protected... no dump available */
+	ROM_REGION( 0x0400,  "mcu", 0 )  // protected... no dump available
 	ROM_LOAD( "ep87c750ebpn_no_dump.u41", 0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
