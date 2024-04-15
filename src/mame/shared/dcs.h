@@ -20,6 +20,8 @@
 class dcs_audio_device : public device_t
 {
 public:
+	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
+
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	void set_dram_in_mb(int dram_in_mb) { m_dram_in_mb = dram_in_mb; }
 	void set_polling_offset(offs_t polling_offset) { m_polling_offset = polling_offset; }
@@ -125,8 +127,6 @@ public:
 
 	uint8_t get_rev() { return m_rev; } // TODO(RH): This can be done better, and shouldn't be necessary.
 	cpu_device *get_cpu() { return m_cpu; } // TODO(RH): Same.
-
-	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
 
 protected:
 	// construction/destruction
