@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/h8500/h8532.h"
-//#include "machine/nvram.h"
+#include "machine/nvram.h"
 
 
 namespace {
@@ -33,7 +33,11 @@ private:
 
 void roland_jv80_state::mem_map(address_map &map)
 {
-	map(0x08000, 0x3ffff).rom().region("progrom", 0x8000);
+	map(0x08000, 0x09fff).ram();
+	map(0x10000, 0x3ffff).rom().region("progrom", 0x10000);
+	map(0x40000, 0x4ffff).rom().region("progrom", 0);
+	map(0xa0000, 0xa7fff).ram();
+	map(0xe0000, 0xe7fff).ram().share("nvram");
 }
 
 static INPUT_PORTS_START(jv880)
@@ -44,7 +48,7 @@ void roland_jv80_state::jv880(machine_config &config)
 	HD6435328(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_jv80_state::mem_map);
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // LC36256AML-10 (IC18) + CR2032 battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // LC36256AML-10 (IC18) + CR2032 battery
 
 	//TC6116(config, "pcm", 23.2_MHz_XTAL);
 }
