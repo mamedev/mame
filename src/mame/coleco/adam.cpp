@@ -1079,6 +1079,7 @@ void adam_state::adam(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "colec_cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "colec_hb_list").set_original("coleco_homebrew");
 	SOFTWARE_LIST(config, "adam_cart_list").set_original("adam_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("adam_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("adam_flop");

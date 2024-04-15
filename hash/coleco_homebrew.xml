@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+license: CC0-1.0
+
+Unoffical software releases for the Coleco Colecovision
+
+-->
+
+<softwarelist name="coleco_homebrew" description="Coleco ColecoVision homebrew cartridges">
+
+	<software name="31in1">
+		<description>31 Games in 1 Cartridge v1.1</description>
+		<year>2013</year>
+		<publisher>Buzz &amp; ZX-81</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="xin1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="31in1-eprom-15012013-rev2.rom" size="1048576" crc="3f4ebe58" sha1="bf7fc70b25b9654c86f644474ef9e6906df82a46" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="63in1">
+		<description>63 Games in 1 Cartridge v1.0</description>
+		<year>2013</year>
+		<publisher>Buzz &amp; ZX-81</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="xin1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="eprom-flash-63in1-part1.rom" size="1048576" offset="0x000000" crc="3b21137f" sha1="a22b1a4ea96507c87269db50c0d21052e987e83f" />
+				<rom name="eprom-flash-63in1-part2.rom" size="1048576" offset="0x100000" crc="f4d18722" sha1="e5a6d0071a0b1d813f03713133b48ba3a073c2cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antienvi">
+		<description>A.E. - Anti-Environment Encounter</description>
+		<year>2011</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="17408">
+				<rom name="anti-environment-encounter-a-e-2012.rom" size="17408" crc="db845695" sha1="9e331ac982a848988264f705b6de4c0a8f5f1264" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arnodash">
+		<description>Arno Dash</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="arno-dash-2021.rom" size="32768" crc="ead5e824" sha1="647259250d7079ca171ea1f2d47636e810768ade" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bankpanc">
+		<description>Bank Panic</description>
+		<year>2011</year>
+		<publisher>Team Pixelboy</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bank-panic-2011.rom" size="32768" crc="223e7ddc" sha1="0a24de36acf6d9f8261a31f5dea93eb1414b6e90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Needs 'Activison PCB' emulation with EEPROM -->
+	<software name="blackonx" supported="no">
+		<description>The Black Onyx</description>
+		<year>2013</year>
+		<publisher>Team Pixelboy</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="black-onyx-the-2013.rom" size="65536" crc="dddd1396" sha1="9bc148c38bd94ba52efa335a08f5c2660b5dbf32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boomboy">
+		<description>Booming Boy</description>
+		<year>2019</year>
+		<publisher>Team Pixelboy</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="booming-boy-2019.rom" size="32768" crc="924a7d57" sha1="290223ece23287fc0d1816fd172999cfe4d76ef0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Needs 'Activison PCB' emulation with EEPROM -->
+	<software name="boxxle" supported="no">
+		<description>Boxxle</description>
+		<year>2015</year>
+		<publisher>Team Pixelboy</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="boxxle-2015.rom" size="65536" crc="62dacf07" sha1="98dc774cb4e954a026a298d2cb91d662f0f484cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckroge">
+		<description>Buck Rogers Super Game</description>
+		<year>2013</year>
+		<publisher>Team Pixelboy</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="megacart" />
+			<dataarea name="rom" size="262144">
+				<rom name="buck-rogers-super-game-2013.rom" size="262144" crc="c4f1a85a" sha1="199e8aa54d21cc30a999fdbee9e1987a96186e1d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burnrubb">
+		<description>Burn Rubber</description>
+		<year>2012</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="burn-rubber-2012.rom" size="32768" crc="b278ebde" sha1="0c323ec9a9d1058e849de39256d1914cec778bdc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cso">
+		<description>C-So!</description>
+		<year>2018</year>
+		<publisher>Team Pixelboy</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32369">
+				<rom name="c-so-2018.rom" size="32369" crc="b248cd72" sha1="f16177e445997ff534cfde25c8c02d3affa81f61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caosbegn">
+		<description>Caos Begins</description>
+		<year>2016</year>
+		<publisher>Team Pixelboy</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="caos-begins-2016.rom" size="32768" crc="53672097" sha1="57edfe7db9edbfcd5fbbac6cea017e536bac417f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catersos">
+		<description>Caterpillar S.O.S.</description>
+		<year>2011</year>
+		<publisher>CollectorVision Games</publisher>
+		<info name="alt_title" value="The Cat S.O.S. Game" /> <!-- box cover -->
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="caterpillar-s-o-s-2011.rom" size="32768" crc="10e6e6de" sha1="6e10e01bc2c9c192ce1366eccd4fb2258b488d36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavtitan">
+		<description>Caverns of Titan</description>
+		<year>2017</year>
+		<publisher>Team Pixelboy</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="caverns-of-titan-2017.rom" size="32768" crc="4928b5f5" sha1="fb191968b0a8d106d378826ebc700905cc6eb9e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diadash2">
+		<description>Diamond Dash II</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="diamond-dash-2-2021.rom" size="32768" crc="5576dec3" sha1="518f352bd73974edf86ee8f958774844c17b7487" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flapbird">
+		<description>Flapee Byrd</description>
+		<year>2014</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32756">
+				<rom name="flapee-byrd-2014.rom" size="32756" crc="5ac80811" sha1="7c45c6c7517a78168a80504e0e7b65fdbca232ef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klondike">
+		<description>Klondike Solitaire v1.0</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="klondike-solitaire-2021.rom" size="32768" crc="278c5021" sha1="f753ea5a69551b1854d81e75f068707328ee1a7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kobashi">
+		<description>Kobashi</description>
+		<year>2010</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="kobashi-2010.rom" size="16384" crc="4d9e301e" sha1="4ce63f21e6d62220431f486ba75bef1ba127b1b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfum">
+		<description>Kung-Fu Master</description>
+		<year>2016</year>
+		<publisher>CollectorVision Games</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="megacart" />
+			<dataarea name="rom" size="131072">
+				<rom name="kung-fu-master-2016.rom" size="131072" crc="a078f273" sha1="7daa9c2002cb1f1b144c301a9a6e9320b35a6035" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjongs">
+		<description>Mahjong Solitaire v1.0</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mahjong-solitaire-2021.rom" size="32768" crc="6ed6a2e1" sha1="d1dc508d78e3d213dec7199ea305090a05339a3f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariobrs">
+		<description>Mario Bros.</description>
+		<year>2009</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="megacart" />
+			<dataarea name="rom" size="65536">
+				<rom name="mario-brothers-2009.rom" size="65536" crc="11777b27" sha1="cf36ea335ad730049a099a90d4e1876f417dc120" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mineswpr">
+		<description>Minesweeper v1.0</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="13604">
+				<rom name="minesweeper-2021.rom" size="13604" crc="5cd9d34a" sha1="f8eb14dd0916042028907477997ab9ee44655208" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrchin">
+		<description>Mr Chin</description>
+		<year>2008</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mr-chin-2008.rom" size="32768" crc="9ab11795" sha1="3255ff03ea67b38a288414c14522cffd08379d34" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pegged">
+		<description>Pegged v1.0</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pegged-2021.rom" size="32768" crc="b47377fd" sha1="03c43981d3ad74e0e351c6aa0a932dbc4d9bbf85" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pillars">
+		<description>Pillars</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pillars-2021.rom" size="32768" crc="5a49b249" sha1="fd8b0d8afa7efb7f70406ac6a9f78f6cfe336a3f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitman">
+		<description>Pitman</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pitman-2021.rom" size="32768" crc="50998610" sha1="18cf173617d53fa96f0112042dfade21f0f45a6a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooyan">
+		<description>Pooyan</description>
+		<year>2009</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pooyan-2009.rom" size="32768" crc="0e25ebd7" sha1="5bd0aeb08f37b605c7edbf0de7e65712acfc73a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prowrest">
+		<description>Champion Pro Wrestling</description>
+		<year>2020</year>
+		<publisher>Team Pixelboy</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion-pro-wrestling-2020.rom" size="32768" crc="045c54d6" sha1="a1cfb2ae24b13e20e1f59481359b0792a53ffe2c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pyrbatt2">
+		<description>Pyramid Warp + Battle Ship Clapton II</description>
+		<year>2009</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pyramid-warp-battleship-clapton-2-2009.rom" size="32768" crc="f7052b06" sha1="7b69630be10fed424f5068536d745a724c499790" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snake">
+		<description>Snake</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="14114">
+				<rom name="snake-2021.rom" size="14114" crc="edd4c690" sha1="3945f18530d530741ef9576cca948acc20b1d36d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spunkysc">
+		<description>Spunky's Super Car!</description>
+		<year>2014</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32697">
+				<rom name="spunky-s-super-car-2014.rom" size="32697" crc="deed811e" sha1="4483a9989ed3e097350e9f6b34121f6a4fab8e4e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vexed">
+		<description>Vexed</description>
+		<year>2021</year>
+		<publisher>Under4Mhz</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="vexed-2021.rom" size="32768" crc="530c586f" sha1="d7584b912c5ee72e8f1b725d17e80664c8055635" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winktrap">
+		<description>Winky Trap</description>
+		<year>2007</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="winky-trap-2007.rom" size="16384" crc="eaa5f606" sha1="6da8e9f0adbe6d1f9787bc5364615de36b65133f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zippyrac">
+		<description>Zippy Race</description>
+		<year>2009</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zippy-race-2009.rom" size="32768" crc="44e6948c" sha1="8e5602f0c3b54254819120b0c32652ad7ef5f0b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombcala">
+		<description>Zombie Calavera Prologue</description>
+		<year>2021</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zombie-calavera-prologue-2021.rom" size="32768" crc="91645814" sha1="66189081b7f87e2e1c061c9a7994639978b3775b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombnear">
+		<description>Zombie Near</description>
+		<year>2012</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="megacart" />
+			<dataarea name="rom" size="131072">
+				<rom name="zombie-near-2012.rom" size="131072" crc="c89d281d" sha1="703cfa1f94298a1a95537363f730404745e9385a" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -595,6 +595,7 @@ void coleco_state::coleco(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "homebrew_list").set_original("coleco_homebrew");
 
 	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_state::paddle_update_callback), attotime::from_msec(20));
 
@@ -643,6 +644,7 @@ void bit90_state::bit90(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "homebrew_list").set_original("coleco_homebrew");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K,16K");
