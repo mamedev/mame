@@ -113,16 +113,16 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="cannonbl" supported="partial">
+	<software name="cannonbl">
 		<description>Cannon Ball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
 		<notes><![CDATA[
-Controls during gameplay do not work correctly; pressing A to move left also fires a shot. Gamepad input works fine.
+Keyboard controls do not work correctly because of conflicts with Joystick 2's default keys. Unmapping them fixes the issue.
 ]]></notes>
 		<info name="serial" value="0201028"/>
 		<info name="alt_title" value="キャノンボール"/>
-		<info name="usage" value="Press A for single player or D for two players. A or D to move, S to Shoot" /> <!-- Keyboard controls are glitchy and don't respond correctly, gamepad works fine. -->
+		<info name="usage" value="Press A for single player or D for two players. In game, press A or D to move, and Spacebar to Shoot; the same controls are used by both players." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="rx78cannonball.bin" size="8192" crc="49601d95" sha1="0ad4ae7a1f9e667b3aa9f8cbefa0d1cdb7cd8de3" />
