@@ -63,6 +63,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/interface/midiport.h",
 		MAME_DIR .. "src/osd/interface/nethandler.cpp",
 		MAME_DIR .. "src/osd/interface/nethandler.h",
+		MAME_DIR .. "src/osd/interface/uievents.h",
 		MAME_DIR .. "src/osd/modules/debugger/debug_module.h",
 		MAME_DIR .. "src/osd/modules/debugger/debuggdbstub.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugimgui.cpp",

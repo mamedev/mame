@@ -186,4 +186,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, triomphe, 0,      0,      triomphe, triomphe, triomphe_state, empty_init, "Chess King / Intelligent Software", "Triomphe", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, triomphe, 0,      0,      triomphe, triomphe, triomphe_state, empty_init, "Chess King / Intelligent Software", "Triomphe", MACHINE_SUPPORTS_SAVE )

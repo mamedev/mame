@@ -36,7 +36,7 @@ UNIMPLEMENTED FEATURES :
  **********************************************************************/
 
 #include "emu.h"
-#include "machine/wd2010.h"
+#include "wd2010.h"
 
 #define VERBOSE 1
 #include "logmacro.h"

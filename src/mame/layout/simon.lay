@@ -130,7 +130,7 @@ authors:hap
 
 		<!-- switches -->
 		<element ref="text_game"><bounds x="68" y="93" width="20" height="4" /></element>
-		<element ref="nothing" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds x="73.9" y="97.9" width="3.2" height="4.2" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="73.9" y="97.9" width="3.2" height="4.2" /></element>
 		<element ref="switch_game" inputtag="IN.0" inputmask="0x07" inputraw="yes"><bounds x="74" y="98" width="3" height="4" /></element>
 		<element ref="text_lg"><bounds x="66.5" y="97" width="6" height="6" /></element>
 		<element ref="nothing" inputtag="SWITCH" inputmask="0x01"><bounds x="65.5" y="96" width="8" height="8" /></element>
@@ -138,7 +138,7 @@ authors:hap
 		<element ref="nothing" inputtag="SWITCH" inputmask="0x02"><bounds x="77" y="96" width="8" height="8" /></element>
 
 		<element ref="text_skill"><bounds x="112" y="93" width="30" height="4" /></element>
-		<element ref="nothing" inputtag="IN.3" inputmask="0x00" inputraw="yes"><bounds x="122.9" y="97.9" width="3.2" height="4.2" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="122.9" y="97.9" width="3.2" height="4.2" /></element>
 		<element ref="switch_skill" inputtag="IN.3" inputmask="0x0f" inputraw="yes"><bounds x="123" y="98" width="3" height="4" /></element>
 		<element ref="text_lb"><bounds x="115.5" y="97" width="6" height="6" /></element>
 		<element ref="nothing" inputtag="SWITCH" inputmask="0x04"><bounds x="114.5" y="96" width="8" height="8" /></element>

@@ -26,6 +26,7 @@
 #define SDLOPTION_KEYMAP                "keymap"
 #define SDLOPTION_KEYMAP_FILE           "keymap_file"
 
+#define SDLOPTION_ENABLE_TOUCH          "enable_touch"
 #define SDLOPTION_SIXAXIS               "sixaxis"
 #if defined(USE_XINPUT) && USE_XINPUT
 #define SDLOPTION_LIGHTGUNINDEX         "lightgun_index"
@@ -82,7 +83,8 @@ public:
 	bool keymap() const { return bool_value(SDLOPTION_KEYMAP); }
 	const char *keymap_file() const { return value(SDLOPTION_KEYMAP_FILE); }
 
-	// joystick mapping
+	// input options
+	bool enable_touch() const { return bool_value(SDLOPTION_ENABLE_TOUCH); }
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }
 
 	const char *video_driver() const { return value(SDLOPTION_VIDEODRIVER); }

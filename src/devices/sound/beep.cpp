@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/beep.h"
+#include "beep.h"
 
 #define BEEP_RATE (384000)
 

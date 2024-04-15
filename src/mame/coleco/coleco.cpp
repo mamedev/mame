@@ -69,7 +69,11 @@
 */
 
 #include "emu.h"
+
 #include "coleco.h"
+
+#include "bus/coleco/expansion/expansion.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -591,8 +595,16 @@ void coleco_state::coleco(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "homebrew_list").set_original("coleco_homebrew");
 
 	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_state::paddle_update_callback), attotime::from_msec(20));
+
+	coleco_expansion_device &exp(COLECO_EXPANSION(config, "exp", nullptr));
+	exp.set_program_space(m_maincpu, AS_PROGRAM);
+	exp.set_io_space(m_maincpu, AS_IO);
+	exp.int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // TODO: Merge with other IRQs?
+	exp.nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	exp.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void coleco_state::colecop(machine_config &config)
@@ -632,6 +644,7 @@ void bit90_state::bit90(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "homebrew_list").set_original("coleco_homebrew");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K,16K");
@@ -642,6 +655,8 @@ void bit90_state::bit90(machine_config &config)
 void coleco_state::czz50(machine_config &config)
 {
 	coleco(config);
+
+	config.device_remove("exp"); // this system has a different expansion port
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::czz50_map); // note: cpu speed unverified, assume it's the same as ColecoVision

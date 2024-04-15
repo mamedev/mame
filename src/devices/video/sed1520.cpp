@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/sed1520.h"
+#include "sed1520.h"
 
 #include "screen.h"
 

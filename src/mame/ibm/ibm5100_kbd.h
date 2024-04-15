@@ -22,6 +22,8 @@ public:
 	void lock_w(int state);
 
 protected:
+	ibm5100_keyboard_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -32,7 +34,7 @@ protected:
 	virtual void key_break(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
 
-	u8 translate(u8 column, u8 row);
+	virtual u8 translate(u8 column, u8 row, u8 modifiers) const;
 
 private:
 	devcb_write_line m_strobe;
@@ -44,6 +46,17 @@ private:
 	bool m_lock;
 };
 
+class ibm5110_keyboard_device
+	: public ibm5100_keyboard_device
+{
+public:
+	ibm5110_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual u8 translate(u8 column, u8 row, u8 modifiers) const override;
+};
+
 DECLARE_DEVICE_TYPE(IBM5100_KEYBOARD, ibm5100_keyboard_device)
+DECLARE_DEVICE_TYPE(IBM5110_KEYBOARD, ibm5110_keyboard_device)
 
 #endif // MAME_IBM_IBM5100_KBD_H

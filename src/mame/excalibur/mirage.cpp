@@ -623,4 +623,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1996, emirage, 0,      0,      mirage,  mirage, mirage_state, empty_init, "Excalibur Electronics", "Mirage (Excalibur)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1996, emirage, 0,      0,      mirage,  mirage, mirage_state, empty_init, "Excalibur Electronics", "Mirage (Excalibur)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

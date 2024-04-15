@@ -39,7 +39,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/mpu401.h"
+#include "mpu401.h"
+
 #include "bus/midi/midi.h"
 
 #define M6801_TAG   "mpu6801"

@@ -237,4 +237,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag Industries / Heuristic Software", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag Industries / Heuristic Software", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE )

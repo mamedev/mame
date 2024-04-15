@@ -15,7 +15,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/timekpr.h"
+#include "timekpr.h"
+
 #include "machine/timehelp.h"
 
 #define LOG_TICKS   (1U << 1)

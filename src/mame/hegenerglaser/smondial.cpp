@@ -401,11 +401,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, smondial,   0,        0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. A)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, smondialab, smondial, 0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, smondialb,  smondial, 0,      smondialb, smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, smondial,   0,        0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. A)",  MACHINE_SUPPORTS_SAVE )
+SYST( 1986, smondialab, smondial, 0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, smondialb,  smondial, 0,      smondialb, smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)",  MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, mega4,      0,        0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, mega4a,     mega4,    0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, mega4,      0,        0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE )
+SYST( 1988, mega4a,     mega4,    0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE )

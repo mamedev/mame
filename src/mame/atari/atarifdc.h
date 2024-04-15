@@ -37,17 +37,17 @@ private:
 
 	struct atari_drive
 	{
-		std::unique_ptr<uint8_t[]> image;       /* alloc'd image */
-		int type;           /* type of image (XFD, ATR, DSK) */
-		int mode;           /* 0 read only, != 0 read/write */
-		int density;        /* 0 SD, 1 MD, 2 DD */
-		int header_skip;    /* number of bytes in format header */
-		int tracks;         /* number of tracks (35,40,77,80) */
-		int heads;          /* number of heads (1,2) */
-		int spt;            /* sectors per track (18,26) */
-		int seclen;         /* sector length (128,256) */
-		int bseclen;        /* boot sector length (sectors 1..3) */
-		int sectors;        /* total sectors, ie. tracks x heads x spt */
+		std::unique_ptr<uint8_t[]> image;   // alloc'd image
+		int type = 0;                       // type of image (XFD, ATR, DSK)
+		int mode = 0;                       // 0 read only, != 0 read/write
+		int density = 0;                    // 0 SD, 1 MD, 2 DD
+		int header_skip = 0;                // number of bytes in format header
+		int tracks = 0;                     // number of tracks (35,40,77,80)
+		int heads = 0;                      // number of heads (1,2)
+		int spt = 0;                        // sectors per track (18,26)
+		int seclen = 0;                     // sector length (128,256)
+		int bseclen = 0;                    // boot sector length (sectors 1..3)
+		int sectors = 0;                    // total sectors, ie. tracks x heads x spt
 	};
 
 	required_device_array<legacy_floppy_image_device, 4> m_floppy;

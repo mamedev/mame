@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/tc009xlvc.h"
+#include "tc009xlvc.h"
 
 #include "emupal.h"
 #include "screen.h"

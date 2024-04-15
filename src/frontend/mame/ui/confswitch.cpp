@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "ui/confswitch.h"
 
+#include "uiinput.h"
+
 #include <algorithm>
 #include <cstring>
 
@@ -176,6 +178,13 @@ bool menu_confswitch::handle(event const *ev)
 	if (!ev || !ev->itemref)
 		return false;
 
+	if (IPT_CUSTOM == ev->iptkey)
+	{
+		// clicked a switch
+		reset(reset_options::REMEMBER_REF);
+		return true;
+	}
+
 	if (uintptr_t(ev->itemref) == 1U)
 	{
 		// reset
@@ -339,16 +348,15 @@ void menu_settings_dip_switches::recompute_metrics(uint32_t width, uint32_t heig
 }
 
 
-void menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	// catch if no DIP locations have to be drawn
 	if (!m_visible_switch_groups)
 		return;
 
 	// calculate optimal width
-	float const aspect(machine().render().ui_aspect(&container()));
 	float const maxwidth(1.0f - (lr_border() * 2.0f));
-	m_single_width = (line_height() * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * aspect);
+	m_single_width = (line_height() * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * x_aspect());
 	float width(0.0f);
 	unsigned maxswitches(0U);
 	for (switch_group_descriptor const &group : switch_groups())
@@ -358,7 +366,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 			maxswitches = (std::max)(group.switch_count(), maxswitches);
 			float const namewidth(get_string_width(group.name));
 			float const switchwidth(m_single_width * maxswitches);
-			width = (std::min)((std::max)(namewidth + switchwidth + (line_height() * aspect), width), maxwidth);
+			width = (std::min)((std::max)(namewidth + switchwidth + (line_height() * x_aspect()), width), maxwidth);
 		}
 	}
 
@@ -370,12 +378,12 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 	// calculate centred layout
 	float const nameleft((1.0f - width) * 0.5f);
 	float const switchleft(nameleft + width - (m_single_width * maxswitches));
-	float const namewidth(width - (m_single_width * maxswitches) - (line_height() * aspect));
+	float const namewidth(width - (m_single_width * maxswitches) - (line_height() * x_aspect()));
 
 	// iterate over switch groups
 	ioport_field *const field((uintptr_t(selectedref) != 1U) ? reinterpret_cast<ioport_field *>(selectedref) : nullptr);
 	float const nubheight(line_height() * SINGLE_TOGGLE_SWITCH_HEIGHT);
-	m_nub_width = line_height() * SINGLE_TOGGLE_SWITCH_WIDTH * aspect;
+	m_nub_width = line_height() * SINGLE_TOGGLE_SWITCH_WIDTH * x_aspect();
 	float const ygap(line_height() * ((DIP_SWITCH_HEIGHT * 0.5f) - SINGLE_TOGGLE_SWITCH_HEIGHT) * 0.5f);
 	float const xgap((m_single_width + (UI_LINE_WIDTH * 0.5f) - m_nub_width) * 0.5f);
 	m_first_nub = switchleft + xgap;
@@ -449,13 +457,16 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 }
 
 
-bool menu_settings_dip_switches::custom_mouse_down()
+std::tuple<int, bool, bool> menu_settings_dip_switches::custom_pointer_updated(bool changed, ui_event const &uievt)
 {
-	if (!m_visible_switch_groups || (get_mouse_x() < m_first_nub))
-		return false;
+	if (!m_visible_switch_groups || !(uievt.pointer_pressed & 0x01) || (uievt.pointer_buttons & ~u32(0x01)))
+		return std::make_tuple(IPT_INVALID, false, false);
 
-	float const x(get_mouse_x() - m_first_nub);
-	float const y(get_mouse_y());
+	auto const [cx, y] = pointer_location();
+	if (cx < m_first_nub)
+		return std::make_tuple(IPT_INVALID, false, false);
+
+	float const x(cx - m_first_nub);
 	for (unsigned n = 0U, line = 0U; (switch_groups().size() > n) && (m_visible_switch_groups > line); ++n)
 	{
 		switch_group_descriptor const &group(switch_groups()[n]);
@@ -476,8 +487,7 @@ bool menu_settings_dip_switches::custom_mouse_down()
 							group.toggles[i].field->get_user_settings(settings);
 							settings.value ^= group.toggles[i].mask;
 							group.toggles[i].field->set_user_settings(settings);
-							reset(reset_options::REMEMBER_REF);
-							return true;
+							return std::make_tuple(IPT_CUSTOM, true, true);
 						}
 					}
 				}
@@ -485,7 +495,7 @@ bool menu_settings_dip_switches::custom_mouse_down()
 		}
 	}
 
-	return false;
+	return std::make_tuple(IPT_INVALID, false, false);
 }
 
 

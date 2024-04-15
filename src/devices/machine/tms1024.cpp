@@ -11,13 +11,14 @@
 */
 
 #include "emu.h"
-#include "machine/tms1024.h"
+#include "tms1024.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TMS1024, tms1024_device, "tms1024", "TMS1024 I/O Expander")
 DEFINE_DEVICE_TYPE(TMS1025, tms1025_device, "tms1025", "TMS1025 I/O Expander")
+
 
 //-------------------------------------------------
 //  constructor
@@ -42,7 +43,6 @@ tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -55,7 +55,6 @@ void tms1024_device::device_start()
 	save_item(NAME(m_std));
 	save_item(NAME(m_ms));
 }
-
 
 
 //-------------------------------------------------

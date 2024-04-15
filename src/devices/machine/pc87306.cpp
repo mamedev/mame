@@ -11,9 +11,9 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/isa/isa.h"
+#include "pc87306.h"
+
 //#include "machine/ds128x.h"
-#include "machine/pc87306.h"
 #include "machine/pckeybrd.h"
 
 #define LOG_WARN        (1U << 1) // Show warnings

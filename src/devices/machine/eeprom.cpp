@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eeprom.h"
+#include "eeprom.h"
 
 #include "multibyte.h"
 

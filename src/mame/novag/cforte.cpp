@@ -293,5 +293,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, cfortea, 0,       0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, cforteb, cfortea, 0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, cfortea, 0,       0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, cforteb, cfortea, 0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE )

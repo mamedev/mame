@@ -156,7 +156,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/gb_lcd.h"
+#include "gb_lcd.h"
 
 #include "screen.h"
 

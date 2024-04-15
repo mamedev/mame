@@ -55,6 +55,7 @@ TODO:
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
 - Background color is not verified
+- Device-fy video chip and split according to hardware (i.e. NamcoEVA2 and 3).
 
 gundamex:
 - slowdowns, music tempo is incorrect
@@ -4399,7 +4400,7 @@ GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,
 
 GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P-FG01-1 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, grdiansa,  grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, grdiansbl, grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "bootleg (Intac Japan)",         "Guardians / Denjin Makai II (bootleg)",       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, grdiansbl, grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "bootleg (Intac Japan)",         "Guardians / Denjin Makai II (bootleg)",       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)",        MACHINE_NO_COCKTAIL )
 

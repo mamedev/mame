@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/wd11c00_17.h"
+#include "wd11c00_17.h"
 
 #define VERBOSE 1
 #include "logmacro.h"

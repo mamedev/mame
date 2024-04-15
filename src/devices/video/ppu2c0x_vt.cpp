@@ -10,7 +10,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "video/ppu2c0x_vt.h"
+#include "ppu2c0x_vt.h"
 
 
 /* constant definitions */

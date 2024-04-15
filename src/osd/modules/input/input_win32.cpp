@@ -129,13 +129,15 @@ public:
 //  win32_mouse_device
 //============================================================
 
-class win32_mouse_device : public event_based_device<MouseButtonEventArgs>
+class win32_mouse_device : public event_based_device<MouseUpdateEventArgs>
 {
 public:
 	win32_mouse_device(std::string &&name, std::string &&id, input_module &module) :
 		event_based_device(std::move(name), std::move(id), module),
 		m_mouse({0}),
-		m_win32_mouse({{0}})
+		m_win32_mouse({{0}}),
+		m_vscroll(0),
+		m_hscroll(0)
 	{
 	}
 
@@ -146,7 +148,7 @@ public:
 		if (!relative_reset)
 			return;
 
-		CURSORINFO cursor_info = {0};
+		CURSORINFO cursor_info = { 0 };
 		cursor_info.cbSize = sizeof(CURSORINFO);
 		GetCursorInfo(&cursor_info);
 
@@ -169,23 +171,42 @@ public:
 
 			SetCursorPos(m_win32_mouse.last_point.x, m_win32_mouse.last_point.y);
 		}
+
+		// update scroll axes
+		m_mouse.lV = std::exchange(m_vscroll, 0) * input_device::RELATIVE_PER_PIXEL;
+		m_mouse.lH = std::exchange(m_hscroll, 0) * input_device::RELATIVE_PER_PIXEL;
 	}
 
 	virtual void configure(input_device &device) override
 	{
 		// populate the axes
-		for (int axisnum = 0; axisnum < 2; axisnum++)
-		{
-			device.add_item(
-					default_axis_name[axisnum],
-					std::string_view(),
-					input_item_id(ITEM_ID_XAXIS + axisnum),
-					generic_axis_get_state<LONG>,
-					&m_mouse.lX + axisnum);
-		}
+		device.add_item(
+				"X",
+				std::string_view(),
+				ITEM_ID_XAXIS,
+				generic_axis_get_state<LONG>,
+				&m_mouse.lX);
+		device.add_item(
+				"Y",
+				std::string_view(),
+				ITEM_ID_YAXIS,
+				generic_axis_get_state<LONG>,
+				&m_mouse.lY);
+		device.add_item(
+				"Scroll V",
+				std::string_view(),
+				ITEM_ID_ZAXIS,
+				generic_axis_get_state<LONG>,
+				&m_mouse.lV);
+		device.add_item(
+				"Scroll H",
+				std::string_view(),
+				ITEM_ID_RZAXIS,
+				generic_axis_get_state<LONG>,
+				&m_mouse.lH);
 
 		// populate the buttons
-		for (int butnum = 0; butnum < 2; butnum++)
+		for (int butnum = 0; butnum < 5; butnum++)
 		{
 			device.add_item(
 					default_button_name(butnum),
@@ -200,13 +221,25 @@ public:
 	{
 		memset(&m_mouse, 0, sizeof(m_mouse));
 		memset(&m_win32_mouse, 0, sizeof(m_win32_mouse));
+		m_vscroll = m_hscroll = 0;
 	}
 
 protected:
-	virtual void process_event(MouseButtonEventArgs const &args) override
+	virtual void process_event(MouseUpdateEventArgs const &args) override
 	{
 		// set the button state
-		m_mouse.rgbButtons[args.button] = args.keydown ? 0x80 : 0x00;
+		assert(!(args.pressed & args.released));
+		for (unsigned i = 0; 5 > i; ++i)
+		{
+			if (BIT(args.pressed, i))
+				m_mouse.rgbButtons[i] = 0x80;
+			else if (BIT(args.released, i))
+				m_mouse.rgbButtons[i] = 0x00;
+		}
+
+		// accumulate scroll delta
+		m_vscroll += args.vdelta;
+		m_hscroll += args.hdelta;
 	}
 
 private:
@@ -217,6 +250,7 @@ private:
 
 	mouse_state         m_mouse;
 	win32_mouse_state   m_win32_mouse;
+	long                m_vscroll, m_hscroll;
 };
 
 
@@ -244,14 +278,18 @@ public:
 
 	virtual bool handle_input_event(input_event eventid, void *eventdata) override
 	{
-		if (!manager().class_enabled(DEVICE_CLASS_MOUSE) || eventid != INPUT_EVENT_MOUSE_BUTTON)
-			return false;
+		if (manager().class_enabled(DEVICE_CLASS_MOUSE))
+		{
+			if ((eventid == INPUT_EVENT_MOUSE_BUTTON) || (eventid == INPUT_EVENT_MOUSE_WHEEL))
+			{
+				auto const *const args = reinterpret_cast<MouseUpdateEventArgs *>(eventdata);
+				devicelist().for_each_device(
+						[args] (auto &device) { device.queue_events(args, 1); });
+				return true;
+			}
+		}
 
-		auto const *const args = static_cast<MouseButtonEventArgs *>(eventdata);
-		devicelist().for_each_device(
-				[args] (auto &device) { device.queue_events(args, 1); });
-
-		return true;
+		return false;
 	}
 };
 
@@ -260,7 +298,7 @@ public:
 //  win32_lightgun_device_base
 //============================================================
 
-class win32_lightgun_device_base : public event_based_device<MouseButtonEventArgs>
+class win32_lightgun_device_base : public event_based_device<MouseUpdateEventArgs>
 {
 public:
 	virtual void reset() override
@@ -268,7 +306,17 @@ public:
 		memset(&m_mouse, 0, sizeof(m_mouse));
 	}
 
-	virtual void configure(input_device &device) override
+protected:
+	win32_lightgun_device_base(
+			std::string &&name,
+			std::string &&id,
+			input_module &module) :
+		event_based_device(std::move(name), std::move(id), module),
+		m_mouse({ 0 })
+	{
+	}
+
+	void do_configure(input_device &device, unsigned buttons)
 	{
 		// populate the axes
 		for (int axisnum = 0; axisnum < 2; axisnum++)
@@ -282,7 +330,7 @@ public:
 		}
 
 		// populate the buttons
-		for (int butnum = 0; butnum < 2; butnum++)
+		for (int butnum = 0; butnum < buttons; butnum++)
 		{
 			device.add_item(
 					default_button_name(butnum),
@@ -291,16 +339,6 @@ public:
 					generic_button_get_state<BYTE>,
 					&m_mouse.rgbButtons[butnum]);
 		}
-	}
-
-protected:
-	win32_lightgun_device_base(
-			std::string &&name,
-			std::string &&id,
-			input_module &module) :
-		event_based_device(std::move(name), std::move(id), module),
-		m_mouse({ 0 })
-	{
 	}
 
 	mouse_state m_mouse;
@@ -319,7 +357,9 @@ public:
 			std::string &&name,
 			std::string &&id,
 			input_module &module) :
-		win32_lightgun_device_base(std::move(name), std::move(id), module)
+		win32_lightgun_device_base(std::move(name), std::move(id), module),
+		m_vscroll(0),
+		m_hscroll(0)
 	{
 	}
 
@@ -348,14 +388,60 @@ public:
 		// update the X/Y positions
 		m_mouse.lX = xpos;
 		m_mouse.lY = ypos;
+
+		// update the scroll axes if appropriate
+		if (relative_reset)
+		{
+			m_mouse.lV = std::exchange(m_vscroll, 0) * input_device::RELATIVE_PER_PIXEL;
+			m_mouse.lH = std::exchange(m_hscroll, 0) * input_device::RELATIVE_PER_PIXEL;
+		}
+	}
+
+	virtual void configure(input_device &device) override
+	{
+		do_configure(device, 5);
+
+		// add scroll axes
+		device.add_item(
+				"Scroll V",
+				std::string_view(),
+				ITEM_ID_ADD_RELATIVE1,
+				generic_axis_get_state<LONG>,
+				&m_mouse.lV);
+		device.add_item(
+				"Scroll H",
+				std::string_view(),
+				ITEM_ID_ADD_RELATIVE2,
+				generic_axis_get_state<LONG>,
+				&m_mouse.lH);
+	}
+
+	virtual void reset() override
+	{
+		win32_lightgun_device_base::reset();
+		m_vscroll = m_hscroll = 0;
 	}
 
 protected:
-	virtual void process_event(MouseButtonEventArgs const &args) override
+	virtual void process_event(MouseUpdateEventArgs const &args) override
 	{
 		// In non-shared axis mode, just update the button state
-		m_mouse.rgbButtons[args.button] = args.keydown ? 0x80 : 0x00;
+		assert(!(args.pressed & args.released));
+		for (unsigned i = 0; 5 > i; ++i)
+		{
+			if (BIT(args.pressed, i))
+				m_mouse.rgbButtons[i] = 0x80;
+			else if (BIT(args.released, i))
+				m_mouse.rgbButtons[i] = 0x00;
+		}
+
+		// accumulate scroll delta
+		m_vscroll += args.vdelta;
+		m_hscroll += args.hdelta;
 	}
+
+private:
+	long                m_vscroll, m_hscroll;
 };
 
 
@@ -376,38 +462,42 @@ public:
 	{
 	}
 
-protected:
-	virtual void process_event(MouseButtonEventArgs const &args) override
+	virtual void configure(input_device &device) override
 	{
-		int const button = args.button;
+		do_configure(device, 2);
+	}
 
-		if (button > 3)
-			return; // We only handle the first four buttons in shared axis mode
-		else if (button >= 2 && m_gun_index == 0)
-			return; // First gun doesn't handle buttons 2 and 3
-		else if (button < 2 && m_gun_index == 1)
-			return; // Second gun doesn't handle buttons 0 and 1
-
-		// Adjust the button if we're the second lightgun
-		int const logical_button = (m_gun_index == 1) ? (button - 2) : button;
-
-		// set the button state
-		m_mouse.rgbButtons[logical_button] = args.keydown ? 0x80 : 0x00;
-		if (args.keydown)
+protected:
+	virtual void process_event(MouseUpdateEventArgs const &args) override
+	{
+		// We only handle the first four buttons in shared axis mode
+		assert(!(args.pressed & args.released));
+		for (unsigned i = 0; 2 > i; ++i)
 		{
-			// get the position relative to the window
-			HWND const hwnd = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
-			RECT client_rect;
-			GetClientRect(hwnd, &client_rect);
+			// Adjust the button if we're the second lightgun
+			unsigned const bit = i + ((1 == m_gun_index) ? 2 : 0);
+			if (BIT(args.pressed, bit))
+			{
+				m_mouse.rgbButtons[i] = 0x80;
 
-			POINT mousepos;
-			mousepos.x = args.xpos;
-			mousepos.y = args.ypos;
-			ScreenToClient(hwnd, &mousepos);
+				// get the position relative to the window
+				HWND const hwnd = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
+				RECT client_rect;
+				GetClientRect(hwnd, &client_rect);
 
-			// convert to absolute coordinates
-			m_mouse.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
-			m_mouse.lY = normalize_absolute_axis(mousepos.y, client_rect.top, client_rect.bottom);
+				POINT mousepos;
+				mousepos.x = args.xpos;
+				mousepos.y = args.ypos;
+				ScreenToClient(hwnd, &mousepos);
+
+				// convert to absolute coordinates
+				m_mouse.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
+				m_mouse.lY = normalize_absolute_axis(mousepos.y, client_rect.top, client_rect.bottom);
+			}
+			else if (BIT(args.released, bit))
+			{
+				m_mouse.rgbButtons[i] = 0x00;
+			}
 		}
 	}
 
@@ -449,14 +539,18 @@ public:
 
 	virtual bool handle_input_event(input_event eventid, void *eventdata) override
 	{
-		if (!manager().class_enabled(DEVICE_CLASS_LIGHTGUN) || eventid != INPUT_EVENT_MOUSE_BUTTON)
-			return false;
+		if (manager().class_enabled(DEVICE_CLASS_LIGHTGUN))
+		{
+			if ((eventid == INPUT_EVENT_MOUSE_BUTTON) || (eventid == INPUT_EVENT_MOUSE_WHEEL))
+			{
+				auto const *const args = reinterpret_cast<MouseUpdateEventArgs *>(eventdata);
+				devicelist().for_each_device(
+						[args] (auto &device) { device.queue_events(args, 1); });
+				return true;
+			}
+		}
 
-		auto const *const args = static_cast<MouseButtonEventArgs *>(eventdata);
-		devicelist().for_each_device(
-				[args] (auto &device) { device.queue_events(args, 1); });
-
-		return true;
+		return false;
 	}
 };
 

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "ui/videoopt.h"
 
+#include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
 
@@ -121,7 +122,7 @@ void menu_video_options::populate()
 	if (!m_snapshot || !machine().video().snap_native())
 	{
 		for (char const *name = m_target.view_name(ref = 0); name; name = m_target.view_name(++ref))
-			item_append(name, 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
+			item_append(name, convert_command_glyph(ref == m_target.view() ? "_>" : "_<"), 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
 		item_append(menu_item_type::SEPARATOR);
 	}
 

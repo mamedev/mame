@@ -15,7 +15,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "machine/ds8874.h"
+#include "ds8874.h"
 
 
 DEFINE_DEVICE_TYPE(DS8874, ds8874_device, "ds8874", "DS8874 LED Driver")

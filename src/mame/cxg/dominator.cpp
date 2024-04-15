@@ -341,10 +341,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, sdtor,    0,       0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, sdtor,    0,       0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, sgalaxy,  0,       0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, sgalaxya, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, sgalaxyb, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, sgalaxy,  0,       0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sgalaxya, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.00)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sgalaxyb, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v1.03)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, scmder,   0,       0,      commander, commander, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Commander (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, scmder,   0,       0,      commander, commander, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Commander (v2.00)", MACHINE_SUPPORTS_SAVE )
