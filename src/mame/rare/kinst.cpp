@@ -195,6 +195,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+
 namespace {
 
 class kinst_state : public driver_device

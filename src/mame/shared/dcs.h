@@ -12,9 +12,9 @@
 #pragma once
 
 #include "cpu/adsp2100/adsp2100.h"
-#include "sound/dmadac.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
+#include "sound/dmadac.h"
 
 
 class dcs_audio_device : public device_t, public device_mixer_interface
@@ -22,7 +22,7 @@ class dcs_audio_device : public device_t, public device_mixer_interface
 public:
 	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
 
-	template <typename T> void set_maincpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag));; }
+	template <typename T> void set_maincpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	void set_dram_in_mb(int dram_in_mb) { m_dram_in_mb = dram_in_mb; }
 	void set_polling_offset(offs_t polling_offset) { m_polling_offset = polling_offset; }
@@ -57,13 +57,11 @@ protected:
 	// construction/destruction
 	dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev, int outputs);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	void add_mconfig_dcs(machine_config &config);
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	static constexpr const char *const denver_regname[4] =
-	{ "SDRC_ROM", "SDRC_IO", "RAM_PAGE", "VER/FIFO_RESET" };
+	void add_mconfig_dcs(machine_config &config) ATTR_COLD;
 
 	struct sdrc_state
 	{
@@ -103,6 +101,10 @@ protected:
 
 	optional_device<address_map_bank_device> m_ram_map;
 
+	optional_region_ptr<uint16_t> m_bootrom;
+	optional_shared_ptr<uint32_t> m_internal_program_ram;
+	optional_shared_ptr<uint32_t> m_external_program_ram;
+	optional_shared_ptr<uint32_t> m_internal_data_ram;
 	optional_shared_ptr<uint16_t> m_iram;
 
 	optional_memory_bank    m_data_bank;
@@ -115,7 +117,7 @@ protected:
 	uint8_t       m_rev;
 	offs_t        m_polling_offset;
 	uint32_t      m_polling_count;
-	/* sound output */
+	// sound output
 	uint8_t       m_channels;
 	uint16_t      m_size;
 	uint16_t      m_incs;
@@ -124,16 +126,14 @@ protected:
 	uint16_t      m_ireg_base;
 	uint16_t      m_control_regs[32];
 
-	/* memory access/booting */
-	uint16_t *    m_bootrom;
-	uint32_t      m_bootrom_words;
+	// memory access
 	uint16_t *    m_sounddata;
 	std::unique_ptr<uint16_t[]> m_sounddata_ptr;
 	uint32_t      m_sounddata_words;
 	uint32_t      m_sounddata_banks;
 	uint16_t      m_sounddata_bank;
 
-	/* I/O with the host */
+	// I/O with the host
 	uint8_t       m_auto_ack;
 	uint16_t      m_latch_control;
 	uint16_t      m_input_data;
@@ -167,9 +167,6 @@ protected:
 	std::unique_ptr<uint16_t[]> m_sram;
 	uint16_t m_polling_value;
 	uint32_t m_polling32_value;
-	uint32_t *m_internal_program_ram;
-	uint32_t *m_external_program_ram;
-	uint32_t *m_internal_data_ram;
 
 	int32_t m_dmovlay_val;
 
@@ -236,24 +233,24 @@ protected:
 	int preprocess_stage_2(uint16_t data);
 	int preprocess_write(uint16_t data);
 
-	void dcs2_2104_data_map(address_map &map);
-	void dcs2_2104_program_map(address_map &map);
-	void dcs2_2115_data_map(address_map &map);
-	void dcs2_2115_program_map(address_map &map);
-	void dcs_2k_data_map(address_map &map);
-	void dcs_2k_program_map(address_map &map);
-	void dcs_2k_uart_data_map(address_map &map);
-	void dcs_8k_data_map(address_map &map);
-	void dcs_8k_program_map(address_map &map);
-	void dcs_wpc_program_map(address_map &map);
-	void denver_data_map(address_map &map);
-	void denver_io_map(address_map &map);
-	void denver_program_map(address_map &map);
-	void denver_rambank_map(address_map &map);
-	void dsio_data_map(address_map &map);
-	void dsio_io_map(address_map &map);
-	void dsio_program_map(address_map &map);
-	void dsio_rambank_map(address_map &map);
+	void dcs2_2104_data_map(address_map &map) ATTR_COLD;
+	void dcs2_2104_program_map(address_map &map) ATTR_COLD;
+	void dcs2_2115_data_map(address_map &map) ATTR_COLD;
+	void dcs2_2115_program_map(address_map &map) ATTR_COLD;
+	void dcs_2k_data_map(address_map &map) ATTR_COLD;
+	void dcs_2k_program_map(address_map &map) ATTR_COLD;
+	void dcs_2k_uart_data_map(address_map &map) ATTR_COLD;
+	void dcs_8k_data_map(address_map &map) ATTR_COLD;
+	void dcs_8k_program_map(address_map &map) ATTR_COLD;
+	void dcs_wpc_program_map(address_map &map) ATTR_COLD;
+	void denver_data_map(address_map &map) ATTR_COLD;
+	void denver_io_map(address_map &map) ATTR_COLD;
+	void denver_program_map(address_map &map) ATTR_COLD;
+	void denver_rambank_map(address_map &map) ATTR_COLD;
+	void dsio_data_map(address_map &map) ATTR_COLD;
+	void dsio_io_map(address_map &map) ATTR_COLD;
+	void dsio_program_map(address_map &map) ATTR_COLD;
+	void dsio_rambank_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -266,13 +263,10 @@ public:
 	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS_AUDIO_2K, dcs_audio_2k_device)
 
 // dcs_audio_2k_uart_device
 
@@ -283,12 +277,10 @@ public:
 	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS_AUDIO_2K_UART, dcs_audio_2k_uart_device)
 
 // dcs_audio_8k_device
 
@@ -299,12 +291,10 @@ public:
 	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS_AUDIO_8K, dcs_audio_8k_device)
 
 // dcs_audio_wpc_device
 
@@ -314,14 +304,12 @@ public:
 	// construction/destruction
 	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void dcs_wpc_data_map(address_map &map);
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-};
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS_AUDIO_WPC, dcs_audio_wpc_device)
+	void dcs_wpc_data_map(address_map &map) ATTR_COLD;
+};
 
 
 // dcs2_audio_device
@@ -332,10 +320,12 @@ protected:
 	// construction/destruction
 	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int outputs);
 
-	// device-level overrides
-	virtual void device_start() override;
-	void add_mconfig_dcs2(machine_config &config);
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
+	void add_mconfig_dcs2(machine_config &config) ATTR_COLD;
 };
+
 
 // dcs2_audio_2115_device
 
@@ -346,12 +336,10 @@ public:
 	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS2_AUDIO_2115, dcs2_audio_2115_device)
 
 // dcs2_audio_2104_device
 
@@ -362,12 +350,10 @@ public:
 	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS2_AUDIO_2104, dcs2_audio_2104_device)
 
 // dcs2_audio_dsio_device
 
@@ -378,22 +364,21 @@ public:
 	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device)
 
 // dcs2_audio_denver_device types
+
 class dcs2_audio_denver_device : public dcs2_audio_device
 {
-public:
+protected:
 	// construction/destruction
 	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int outputs);
-protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class dcs2_audio_denver_5ch_device : public dcs2_audio_denver_device
@@ -401,9 +386,10 @@ class dcs2_audio_denver_5ch_device : public dcs2_audio_denver_device
 public:
 	// construction/destruction
 	dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class dcs2_audio_denver_2ch_device : public dcs2_audio_denver_device
@@ -411,14 +397,22 @@ class dcs2_audio_denver_2ch_device : public dcs2_audio_denver_device
 public:
 	// construction/destruction
 	dcs2_audio_denver_2ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device)
 
+// device type declarations
+DECLARE_DEVICE_TYPE(DCS_AUDIO_2K, dcs_audio_2k_device)
+DECLARE_DEVICE_TYPE(DCS_AUDIO_2K_UART, dcs_audio_2k_uart_device)
+DECLARE_DEVICE_TYPE(DCS_AUDIO_8K, dcs_audio_8k_device)
+DECLARE_DEVICE_TYPE(DCS_AUDIO_WPC, dcs_audio_wpc_device)
+DECLARE_DEVICE_TYPE(DCS2_AUDIO_2115, dcs2_audio_2115_device)
+DECLARE_DEVICE_TYPE(DCS2_AUDIO_2104, dcs2_audio_2104_device)
+DECLARE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device)
+DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device)
 DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_2CH, dcs2_audio_denver_2ch_device)
 
 #endif // MAME_SHARED_DCS_H

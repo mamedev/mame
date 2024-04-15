@@ -174,6 +174,8 @@
 static constexpr uint16_t LCTRL_OUTPUT_EMPTY = 0x400;
 static constexpr uint16_t LCTRL_INPUT_EMPTY  = 0x800;
 
+static constexpr const char *const denver_regname[4] = { "SDRC_ROM", "SDRC_IO", "RAM_PAGE", "VER/FIFO_RESET" };
+
 #define IS_OUTPUT_EMPTY()           (m_latch_control & LCTRL_OUTPUT_EMPTY)
 #define IS_OUTPUT_FULL()            (!(m_latch_control & LCTRL_OUTPUT_EMPTY))
 #define SET_OUTPUT_EMPTY()          (m_latch_control |= LCTRL_OUTPUT_EMPTY)
@@ -270,10 +272,10 @@ static constexpr int DENV_NUM_BANK = 0x800;
 // DCS 2k memory map
 void dcs_audio_device::dcs_2k_program_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("dcsint");
-	map(0x0800, 0x0fff).ram().share("dcsext");
-	map(0x1000, 0x17ff).ram().share("dcsext");
-	map(0x1800, 0x1fff).ram().share("dcsext");
+	map(0x0000, 0x03ff).ram().share(m_internal_program_ram);
+	map(0x0800, 0x0fff).ram().share(m_external_program_ram);
+	map(0x1000, 0x17ff).ram().share(m_external_program_ram);
+	map(0x1800, 0x1fff).ram().share(m_external_program_ram);
 }
 
 void dcs_audio_device::dcs_2k_data_map(address_map &map)
@@ -304,8 +306,8 @@ void dcs_audio_device::dcs_2k_uart_data_map(address_map &map)
 // DCS 8k memory map
 void dcs_audio_device::dcs_8k_program_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("dcsint");
-	map(0x0800, 0x1fff).ram().share("dcsext");
+	map(0x0000, 0x03ff).ram().share(m_internal_program_ram);
+	map(0x0800, 0x1fff).ram().share(m_external_program_ram);
 	map(0x3000, 0x3003).rw(FUNC(dcs_audio_device::input_latch32_r), FUNC(dcs_audio_device::output_latch32_w)); // why?
 }
 
@@ -323,8 +325,8 @@ void dcs_audio_device::dcs_8k_data_map(address_map &map)
 // Williams WPC DCS/Security Pinball
 void dcs_audio_device::dcs_wpc_program_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("dcsint");
-	map(0x1000, 0x3fff).ram().share("dcsext");
+	map(0x0000, 0x03ff).ram().share(m_internal_program_ram);
+	map(0x1000, 0x3fff).ram().share(m_external_program_ram);
 }
 
 void dcs_audio_wpc_device::dcs_wpc_data_map(address_map &map)
@@ -347,13 +349,13 @@ void dcs_audio_wpc_device::dcs_wpc_data_map(address_map &map)
 void dcs_audio_device::dcs2_2115_program_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x03ff).ram().share("dcsint");
+	map(0x0000, 0x03ff).ram().share(m_internal_program_ram);
 }
 
 void dcs_audio_device::dcs2_2104_program_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x01ff).ram().share("dcsint");
+	map(0x0000, 0x01ff).ram().share(m_internal_program_ram);
 }
 
 
@@ -394,7 +396,7 @@ void dcs_audio_device::dcs2_2104_data_map(address_map &map)
 void dcs_audio_device::dsio_program_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).ram().share("dcsint");
+	map(0x0000, 0x3fff).ram().share(m_internal_program_ram);
 }
 
 
@@ -402,7 +404,7 @@ void dcs_audio_device::dsio_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).m(m_ram_map, FUNC(address_map_bank_device::amap16));
-	map(0x2000, 0x3fdf).ram().share("dcsint_data");
+	map(0x2000, 0x3fdf).ram().share(m_internal_data_ram);
 	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
@@ -434,7 +436,7 @@ void dcs_audio_device::dsio_io_map(address_map &map)
 void dcs_audio_device::denver_program_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).ram().share("dcsint");
+	map(0x0000, 0x3fff).ram().share(m_internal_program_ram);
 }
 
 
@@ -480,8 +482,8 @@ void dcs_audio_device::dcs_boot()
 		case REV_DCS1P5:
 		{
 			// determine the base
-			// max_banks = m_bootrom_words / 0x1000;
-			uint16_t const *const base = m_bootrom + ((m_sounddata_bank * 0x1000) % m_bootrom_words);
+			// max_banks = m_bootrom.length() / 0x1000;
+			uint16_t const *const base = &m_bootrom[(m_sounddata_bank * 0x1000) % m_bootrom.length()];
 
 			// convert from 16-bit data to 8-bit data and boot
 			uint8_t buffer[0x1000];
@@ -489,8 +491,8 @@ void dcs_audio_device::dcs_boot()
 			{
 				buffer[i] = base[i];
 			}
-			assert(m_internal_program_ram != nullptr);
-			m_cpu->load_boot_data(buffer, m_internal_program_ram);
+			assert(m_internal_program_ram);
+			m_cpu->load_boot_data(buffer, &m_internal_program_ram[0]);
 			break;
 		}
 
@@ -499,15 +501,15 @@ void dcs_audio_device::dcs_boot()
 		{
 			// determine the base
 			uint16_t* base;
-			if (m_bootrom == m_sounddata)
+			if (m_bootrom.target() == m_sounddata)
 			{
 				// EPROM case: page is selected from the page register
-				base = m_bootrom + ((SDRC_EPM_PG * 0x1000) % m_bootrom_words);
+				base = &m_bootrom[(SDRC_EPM_PG * 0x1000) % m_bootrom.length()];
 			}
 			else
 			{
 				// DRAM case: page is selected from the ROM page register
-				base = m_bootrom + ((SDRC_ROM_PG * 0x1000) % m_bootrom_words);
+				base = &m_bootrom[(SDRC_ROM_PG * 0x1000) % m_bootrom.length()];
 			}
 
 			// convert from 16-bit data to 8-bit data and boot
@@ -516,8 +518,8 @@ void dcs_audio_device::dcs_boot()
 			{
 				buffer[i] = base[i];
 			}
-			assert(m_internal_program_ram != nullptr);
-			m_cpu->load_boot_data(buffer, m_internal_program_ram);
+			assert(m_internal_program_ram);
+			m_cpu->load_boot_data(buffer, &m_internal_program_ram[0]);
 			break;
 		}
 
@@ -688,6 +690,10 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_sport0_timer(*this, "dcs_sport0_timer"),
 	m_internal_timer(*this, "dcs_int_timer"),
 	m_ram_map(*this, "data_map_bank"),
+	m_bootrom(*this, DEVICE_SELF),
+	m_internal_program_ram(*this, "dcsint"),
+	m_external_program_ram(*this, "dcsext"),
+	m_internal_data_ram(*this, "dcsint_data"),
 	m_iram(*this, "iram"),
 	m_data_bank(*this, "databank"),
 	m_rom_page(*this, "rompage"),
@@ -703,8 +709,6 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_incs(0),
 	m_ireg(0),
 	m_ireg_base(0),
-	m_bootrom(nullptr),
-	m_bootrom_words(0),
 	m_sounddata(nullptr),
 	m_sounddata_words(0),
 	m_sounddata_banks(0),
@@ -731,9 +735,6 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_timer_period(0),
 	m_timers_fired(0),
 	m_sram(nullptr),
-	m_internal_program_ram(nullptr),
-	m_external_program_ram(nullptr),
-	m_internal_data_ram(nullptr),
 	m_dram_in_mb(0)
 {
 	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = nullptr;
@@ -756,17 +757,6 @@ void dcs_audio_device::device_start()
 {
 	m_sram = nullptr;
 
-	memory_share *internal_ram = memshare("dcsint");
-	if (internal_ram != nullptr)
-	{
-		m_internal_program_ram = (uint32_t *)internal_ram->ptr();
-	}
-	memory_share *external_ram = memshare("dcsext");
-	if (external_ram != nullptr)
-	{
-		m_external_program_ram = (uint32_t *)external_ram->ptr();
-	}
-
 	// find the DCS CPU and the sound ROMs
 	m_cpu = subdevice<adsp21xx_device>("dcs");
 	if (m_cpu != nullptr && !m_cpu->started())
@@ -778,10 +768,8 @@ void dcs_audio_device::device_start()
 	m_dmadac[0] = subdevice<dmadac_sound_device>("dac");
 
 	// configure boot and sound ROMs
-	m_bootrom = (uint16_t *)machine().root_device().memregion("dcs")->base();
-	m_bootrom_words = machine().root_device().memregion("dcs")->bytes() / 2;
-	m_sounddata = m_bootrom;
-	m_sounddata_words = m_bootrom_words;
+	m_sounddata = m_bootrom.target();
+	m_sounddata_words = m_bootrom.length();
 	if (m_rev == REV_DCS1)
 	{
 		m_sounddata_banks = m_sounddata_words / 0x1000;
@@ -811,22 +799,6 @@ void dcs2_audio_device::device_start()
 {
 	int soundbank_words;
 
-	memory_share *internal_ram = memshare("dcsint");
-	if (internal_ram != nullptr)
-	{
-		m_internal_program_ram = (uint32_t *)internal_ram->ptr();
-	}
-	memory_share *external_ram = memshare("dcsext");
-	if (external_ram != nullptr)
-	{
-		m_external_program_ram = (uint32_t *)external_ram->ptr();
-	}
-	memory_share *internal_data_ram = memshare("dcsint_data");
-	if (internal_data_ram != nullptr)
-	{
-		m_internal_data_ram = (uint32_t *)internal_ram->ptr();
-	}
-
 	// find the DCS CPU and the sound ROMs
 	m_cpu = subdevice<adsp21xx_device>("dcs2");
 	m_rev = REV_DCS2;
@@ -852,14 +824,6 @@ void dcs2_audio_device::device_start()
 	m_dmadac[0] = subdevice<dmadac_sound_device>("dac1");
 	m_dmadac[1] = subdevice<dmadac_sound_device>("dac2");
 
-	// always boot from the base of "dcs"
-	memory_region *bootrom_region = machine().root_device().memregion("dcs");
-	if (bootrom_region != nullptr)
-	{
-		m_bootrom = (uint16_t *)bootrom_region->base();
-		m_bootrom_words = bootrom_region->bytes() / 2;
-	}
-
 	// supports both RAM and ROM variants
 	if (m_dram_in_mb != 0)
 	{
@@ -870,8 +834,8 @@ void dcs2_audio_device::device_start()
 	}
 	else
 	{
-		m_sounddata = m_bootrom;
-		m_sounddata_words = m_bootrom_words;
+		m_sounddata = m_bootrom.target();
+		m_sounddata_words = m_bootrom.length();
 	}
 	m_sounddata_banks = m_sounddata_words / soundbank_words;
 	if (m_rev != REV_DCS2)
@@ -996,7 +960,7 @@ void dcs_audio_device::sdrc_update_bank_pointers()
 		int const pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
 
 		// update the bank pointer based on whether we are ROM-based or RAM-based
-		if (m_bootrom == m_sounddata)
+		if (m_bootrom.target() == m_sounddata)
 		{
 			// ROM-based; use the memory page to select from ROM
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
@@ -1009,7 +973,7 @@ void dcs_audio_device::sdrc_update_bank_pointers()
 			// RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
 			{
-				m_rom_page->set_base(&m_bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % m_bootrom_words]);
+				m_rom_page->set_base(&m_bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % m_bootrom.length()]);
 			}
 			if (SDRC_DM_ST != 0)
 			{
@@ -2594,9 +2558,9 @@ void dcs2_audio_device::add_mconfig_dcs2(machine_config &config)
 	dcs2.set_addrmap(AS_PROGRAM, &dcs2_audio_device::dcs2_2115_program_map);
 	dcs2.set_addrmap(AS_DATA, &dcs2_audio_device::dcs2_2115_data_map);
 
-	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs2_audio_device::dcs_irq));
-	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs2_audio_device::sport0_irq));
-	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs2_audio_device::internal_timer_callback));
+	TIMER(config, m_reg_timer).configure_generic(FUNC(dcs2_audio_device::dcs_irq));
+	TIMER(config, m_sport0_timer).configure_generic(FUNC(dcs2_audio_device::sport0_irq));
+	TIMER(config, m_internal_timer).configure_generic(FUNC(dcs2_audio_device::internal_timer_callback));
 	TIMER(config, "dcs_hle_timer").configure_generic(FUNC(dcs2_audio_device::transfer_watchdog_callback));
 
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
@@ -2713,8 +2677,7 @@ void dcs2_audio_denver_5ch_device::device_add_mconfig(machine_config &config)
 	DMADAC(config, "dac3").add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 2);
 	DMADAC(config, "dac4").add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 3);
 	DMADAC(config, "dac5").add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 4);
-	DMADAC(config, "dac6");
-	// Does not produce sound
+	DMADAC(config, "dac6"); // Does not produce sound
 }
 
 DEFINE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device, "dcs2_audio_denver_5ch", "DCS2 Audio Denver 5 Channel")

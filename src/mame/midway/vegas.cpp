@@ -2041,7 +2041,7 @@ void vegas_state::gauntleg(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2064,7 +2064,7 @@ void vegas_state::gauntdl(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2086,7 +2086,7 @@ void vegas_state::warfa(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2108,7 +2108,7 @@ void vegas_state::tenthdeg(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0afb);
@@ -2130,7 +2130,7 @@ void vegas_state::roadburn(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_dsio_device &dcs(DCS2_AUDIO_DSIO(config, "dcs", 0));
+	dcs2_audio_dsio_device &dcs(DCS2_AUDIO_DSIO(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0ddd);
@@ -2152,7 +2152,7 @@ void vegas_state::nbashowt(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2176,7 +2176,7 @@ void vegas_state::nbanfl(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2204,7 +2204,7 @@ void vegas_state::nbagold(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2230,7 +2230,7 @@ void vegas_state::sf2049(machine_config &config)
 	SPEAKER(config, "rrspeaker").headrest_right();
 	SPEAKER(config, "subwoofer").backrest();
 
-	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
@@ -2259,7 +2259,7 @@ void vegas_state::sf2049se(machine_config &config)
 	SPEAKER(config, "rrspeaker").headrest_right();
 	SPEAKER(config, "subwoofer").backrest();
 
-	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
@@ -2288,7 +2288,7 @@ void vegas_state::sf2049te(machine_config &config)
 	SPEAKER(config, "rrspeaker").headrest_right();
 	SPEAKER(config, "subwoofer").backrest();
 
-	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
@@ -2313,7 +2313,7 @@ void vegas_state::cartfury(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
