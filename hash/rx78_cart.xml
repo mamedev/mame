@@ -113,10 +113,13 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="cannonbl">
+	<software name="cannonbl" supported="partial">
 		<description>Cannon Ball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Controls during gameplay do not work correctly; pressing A to move left also fires a shot. Gamepad input works fine.
+]]></notes>
 		<info name="serial" value="0201028"/>
 		<info name="alt_title" value="キャノンボール"/>
 		<info name="usage" value="Press A for single player or D for two players. A or D to move, S to Shoot" /> <!-- Keyboard controls are glitchy and don't respond correctly, gamepad works fine. -->
