@@ -118,7 +118,7 @@ The monitor will expect you to load a program from cassette.
 		<year>1983</year>
 		<publisher>Bandai</publisher>
 		<notes><![CDATA[
-Keyboard controls do not work correctly because of conflicts with Joystick 2's default keys. Unmapping them fixes the issue.
+Keyboard controls do not work correctly until you unmap Joystick 2's default keys. (btanb)
 ]]></notes>
 		<info name="serial" value="0201028"/>
 		<info name="alt_title" value="キャノンボール"/>
