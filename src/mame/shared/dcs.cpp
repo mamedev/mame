@@ -986,31 +986,30 @@ void dcs_audio_device::sdrc_update_bank_pointers()
 
 void dcs_audio_device::sdrc_remap_memory()
 {
-	// if SRAM disabled, clean it out
 	if (SDRC_SM_EN == 0)
 	{
+		// if SRAM disabled, clean it out
 		m_program->unmap_readwrite(0x0800, 0x3fff);
 		m_data->unmap_readwrite(0x0800, 0x37ff);
 	}
-
-	// otherwise, map the SRAM
 	else
 	{
+		// otherwise, map the SRAM
+
 		// first start with a clean program map
 		m_program->install_ram(0x0800, 0x3fff, &m_sram[0x4800]);
 
 		// set up the data map based on the SRAM banking
-		// map 0: ram from 0800-37ff
 		if (SDRC_SM_BK == 0)
 		{
+			// map 0: ram from 0800-37ff
 			m_data->install_ram(0x0800, 0x17ff, &m_sram[0x0000]);
 			m_data->install_ram(0x1800, 0x27ff, &m_sram[0x1000]);
 			m_data->install_ram(0x2800, 0x37ff, &m_sram[0x2000]);
 		}
-
-		// map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff
 		else
 		{
+			// map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff
 			m_data->unmap_readwrite(0x0800, 0x17ff);
 			m_data->install_ram(0x1800, 0x27ff, &m_sram[0x3000]);
 			m_data->install_ram(0x2800, 0x37ff, &m_sram[0x2000]);
@@ -1703,15 +1702,16 @@ void dcs_audio_device::update_timer_count()
 	uint64_t elapsed_cycles = m_cpu->total_cycles() - m_timer_start_cycles;
 	uint64_t elapsed_clocks = elapsed_cycles / m_timer_scale;
 
-	// if we haven't counted past the initial count yet, just do that
-	if (elapsed_clocks < m_timer_start_count + 1) {
+	if (elapsed_clocks < m_timer_start_count + 1)
+	{
+		// if we haven't counted past the initial count yet, just do that
 		m_timer_start_count -= elapsed_clocks;
 		m_control_regs[TIMER_COUNT_REG] = m_timer_start_count;
 
-	// otherwise, count how many periods
 	}
 	else
 	{
+		// otherwise, count how many periods
 		elapsed_clocks -= m_timer_start_count + 1;
 		uint64_t periods_since_start = elapsed_clocks / (m_timer_period + 1);
 		elapsed_clocks -= periods_since_start * (m_timer_period + 1);
@@ -1762,17 +1762,18 @@ void dcs_audio_device::reset_timer()
 			m_program->read_dword(0x18) == 0x0c0030 &&      // ENA SEC_REG
 			m_program->read_dword(0x19) == 0x804828 &&      // SI = DM($0482)
 			m_program->read_dword(0x1a) == 0x904828 &&      // DM($0482) = SI
-			m_program->read_dword(0x1b) == 0x0C0020 &&      // DIS SEC_REG
-			m_program->read_dword(0x1c) == 0x0A001F)            // RTI
+			m_program->read_dword(0x1b) == 0x0c0020 &&      // DIS SEC_REG
+			m_program->read_dword(0x1c) == 0x0a001f)        // RTI
 		{
 			LOGMASKED(LOG_DCS_IO, "reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
 			m_timer_ignore = true;
-		} else if (m_rev == REV_DSIO &&
+		}
+		else if (m_rev == REV_DSIO &&
 			m_program->read_dword(0x30) == 0x0c0030 &&      // ENA SEC_REG
 			m_program->read_dword(0x31) == 0x014828 &&      // SI = IO($0482)
 			m_program->read_dword(0x32) == 0x01c828 &&      // IO($0482) = SI
-			m_program->read_dword(0x33) == 0x0C0020 &&      // DIS SEC_REG
-			m_program->read_dword(0x34) == 0x0A001F)            // RTI
+			m_program->read_dword(0x33) == 0x0c0020 &&      // DIS SEC_REG
+			m_program->read_dword(0x34) == 0x0A001f)        // RTI
 		{
 			LOGMASKED(LOG_DCS_IO, "reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
 			m_timer_ignore = true;
@@ -2206,25 +2207,23 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 	switch (transfer.state)
 	{
 		case 0:
-			// look for command 0x001a to transfer chunks of data
 			if (data == 0x001a)
 			{
+				// look for command 0x001a to transfer chunks of data
 				LOGMASKED(LOG_DCS_TRANSFERS, "%s:DCS Transfer command %04X\n", machine().describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
 			}
-
-			// look for command 0x002a to start booting the uploaded program
 			else if (data == 0x002a)
 			{
+				// look for command 0x002a to start booting the uploaded program
 				LOGMASKED(LOG_DCS_TRANSFERS, "%s:DCS State change %04X\n", machine().describe_context(), data);
 				transfer.dcs_state = 1;
 			}
-
-			// anything else is ignored
 			else
 			{
+				// anything else is ignored
 				LOGMASKED(LOG_DCS_TRANSFERS, "Command: %04X\n", data);
 			}
 			break;
@@ -2337,18 +2336,17 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 	switch (transfer.state)
 	{
 		case 0:
-			// look for command 0x55d0 or 0x55d1 to transfer chunks of data
 			if (data == 0x55d0 || data == 0x55d1)
 			{
+				// look for command 0x55d0 or 0x55d1 to transfer chunks of data
 				LOGMASKED(LOG_DCS_TRANSFERS, "%s:DCS Transfer command %04X\n", machine().describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
 			}
-
-			// anything else is ignored
 			else
 			{
+				// anything else is ignored
 				LOGMASKED(LOG_DCS_TRANSFERS, "%s:Command: %04X\n", machine().describe_context(), data);
 			}
 			break;
