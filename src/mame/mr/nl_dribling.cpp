@@ -14,6 +14,7 @@
 #define USE_SIMPLIFIED_LM339
 // By using FRONTIER, the second JFET is not necessary, but we need to drop the voltage by ~1.5V
 // using two diodes. Performance increase is 60% with an undistinguishable difference in the output.
+// Two JFETs is accurate to the hardware, while one JFET plut two diodes still generates correct sound and runs faster.
 #define REPLACE_PARATA_JFET_WITH_DIODES
 
 // The schematic incorrectly labels two JFETS in the PARATA circuit as 2N3812.  They're actually 2N3819.
