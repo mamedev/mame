@@ -20,6 +20,8 @@
 class dcs_audio_device : public device_t, public device_mixer_interface
 {
 public:
+	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
+
 	template <typename T> void set_maincpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag));; }
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	void set_dram_in_mb(int dram_in_mb) { m_dram_in_mb = dram_in_mb; }
@@ -176,8 +178,6 @@ protected:
 	hle_transfer_state m_transfer;
 
 	int m_dram_in_mb;
-
-	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
 
 	// non public
 	void dcs_boot();
