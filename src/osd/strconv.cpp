@@ -5,16 +5,19 @@
 //  strconv.cpp - Win32 string conversion
 //
 //============================================================
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
-#include <windows.h>
-#endif
-#include <algorithm>
-#include <cassert>
-// MAMEOS headers
+
 #include "strconv.h"
+
 #include "unicode.h"
 
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#include <algorithm>
+#include <cassert>
+
+
+#if defined(_WIN32)
+
+#include <windows.h>
+
 
 namespace osd::text {
 
@@ -255,18 +258,22 @@ std::string from_wstring(const WCHAR *s)
 
 int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
+	// handle UTF-8 internally
 	if (GetACP() == CP_UTF8)
 		return uchar_from_utf8(uchar, osdchar, count);
 
-	WCHAR wch;
+	// FIXME: This makes multiple bad assumptions:
+	// * Assumes any character can be converted to a single wchar_t.
+	// * Assumes characters are either one byte or maximum number of bytes.
+	// * Doesn't handle nominal single-byte encodings with combining characters.
 	CPINFO cp;
-
 	if (!GetCPInfo(CP_ACP, &cp))
 		goto error;
 
 	// The multibyte char can't be bigger than the max character size
 	count = std::min(count, size_t(IsDBCSLeadByte(*osdchar) ? cp.MaxCharSize : 1));
 
+	WCHAR wch;
 	if (MultiByteToWideChar(CP_ACP, 0, osdchar, static_cast<DWORD>(count), &wch, 1) == 0)
 		goto error;
 
@@ -279,23 +286,27 @@ error:
 }
 
 
-#else
-#include "unicode.h"
+#else // _WIN32
+
 //============================================================
 //  osd_uchar_from_osdchar
 //============================================================
 
 int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
+	// FIXME: mbstowcs depends on global state
 	wchar_t wch;
-
 	count = mbstowcs(&wch, (char *)osdchar, 1);
-	if (count != -1)
+	if (count != size_t(-1))
+	{
 		*uchar = wch;
+		return int(count);
+	}
 	else
+	{
 		*uchar = 0;
-
-	return count;
+		return -1;
+	}
 }
 
-#endif
+#endif // _WIN32
