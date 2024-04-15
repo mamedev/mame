@@ -134,7 +134,7 @@ private:
 
 	int m_sync_state = 0;
 	bool m_k7 = false;
-	bool tty_in = 0;
+	bool m_tty_in = false;
 	uint8_t m_u2_port_b = 0;
 	uint8_t m_311_output = 0;
 	uint32_t m_cassette_high_count = 0;
@@ -159,6 +159,7 @@ void kim1_state::machine_start()
 	// Register for save states
 	save_item(NAME(m_sync_state));
 	save_item(NAME(m_k7));
+	save_item(NAME(m_tty_in));
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));
@@ -258,7 +259,7 @@ void kim1_state::u2_write_b(uint8_t data)
 		m_cass->output((data & 0x80) ? -1.0 : 1.0);
 
 	// Write bit 0 to serial console. The hardware ANDs it with TTY in.
-	m_rs232->write_txd((data & 0x01) & tty_in);
+	m_rs232->write_txd(BIT(data, 0) & (m_tty_in ? 1 : 0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::cassette_input)
@@ -303,11 +304,11 @@ void kim1_state::sync_map(address_map &map)
 void kim1_state::tty_callback(int data)
 {
 	// Save state as it is needed by u2_write_b()
-	tty_in = data;
+	m_tty_in = data;
 
 	// Send data back to terminal to simulate the KIM-1 hardware
 	// echo. The hardware ANDs this with U2 port B port 0.
-	m_rs232->write_txd(data & (m_u2_port_b & 0x01));
+	m_rs232->write_txd(data & BIT(m_u2_port_b, 0));
 }
 
 
