@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: David Haywood
+
 /* IGS Gambling games using IGS036 CPU
    pgm2.cpp also uses this CPU
 
@@ -58,11 +59,17 @@ check more info and photo from cjdh2.zip!!!
 */
 
 #include "emu.h"
+
+#include "igs036crypt.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "igs036crypt.h"
+#include "sound/okim6295.h"
+#include "sound/tt5665.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -193,7 +200,7 @@ ROM_START( cjddzsp )
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjddzsp_s122cn.u18",  0x000000, 0x200000, CRC(4a42aad6) SHA1(96805e5bfbd50686177fe50020229ea8787ade17) )
 
-	ROM_REGION( 0x800100, "oki", 0 ) // TT5665 samples
+	ROM_REGION( 0x800100, "tt5665", 0 ) // samples
 	ROM_LOAD( "cjddzsp_s122cn.u27", 0x000000, 0x800100, CRC(797e5ba3) SHA1(784fae513ac8cfd1143f0d0ce0936f74e2e64e48))
 
 	ROM_REGION( 0x800100*2, "gfx", 0 )
@@ -201,6 +208,75 @@ ROM_START( cjddzsp )
 	ROM_LOAD( "cjddzsp_s122cn.u30",  0x800100, 0x800100, CRC(e0e02a57) SHA1(96074a5226dd24d0bc150adff7324b5349cb5dc2) )
 ROM_END
 
+
+/*******************************************************************
+Long Hu Zheng Ba Te Bie Ban, IGS, 2009
+Que Huang Zheng Ba, IGS, 2007
+(Year not shown on title screens but date shown on error screen when program ROM removed)
+Hardware Info by Guru
+---------------------
+
+PCB-0701-01-IU   (Que Huang Zheng Ba)
+PCB-0799-02-IU-1 (Long Hu Zheng Ba Te Bie Ban)
+|----|  |-------------------------------|  |------|
+|    |--|             JAMMA             |--|      |
+|                              ULN2004    TDA1519 |
+|-| 7407                       ULN2004        VOL |
+  |     LV245 LV245                  4.952MHz     |
+|-|      LV245 LV245  EPM3032   |------|    UPC844|
+|       20MHz                   |TT5665|       U43|
+|1        |------|              |------| QS3257   |
+|8        |IGS036|                       QS3257   |
+|W        |      |                                |
+|A        |------|                 U27        CON3|
+|Y  7404     32.768kHz                            |
+|   7404                           U28            |
+|-| HC132     U18                                 |
+  | SW4    16LV1024                U29            |
+  |                     LV245                  JP8|
+|-| BATT                           U30            |
+|           1117-18       SW1                     |
+|10   TYN408G             SW2      U31            |
+|WAY        1084-33       SW3                     |
+|                                              JP7|
+|-------------------------------------------------|
+Notes:
+      IGS036 - Custom SOC in BGA package with internal ROM. SOC is possibly ARM-based. Clock input 20.000MHz
+      TT5665 - Tontek Design Technology TT5665 8-Channel (or 4-Channel L/R Stereo) ADPCM Voice Synthesis LSI
+               Clock input 4.952MHz, pin 25 (SS) high, S0 and S1 low. Game sound is very low quality.
+     EPM3032 - Altera EPM3032 CPLD in PLCC44 package
+               Sticker on Que Huang Zheng Ba: "IU U23"
+               Sticker on Long Hu Zheng Ba Te Bie Ban: "IU-1 U23"
+     TDA1519 - NXP TDA1519 6W Stereo Power Amplifier IC
+      UPC844 - NEC uPC844 Quad Operational Amplifier
+      QS3257 - IDT QS3257 Mux/Demux (=74LS257)
+     ULN2004 - Texas Instruments ULN2004 Darlington Array
+       LV245 - 74LV245A Octal Bus Transceiver
+        7407 - 7407D Hex Buffer
+        7404 - 7404D Hex Inverter
+       HC132 - 74HC132D Quadruple 2-Input Positive-NAND Schmitt Trigger
+    16LV1024 - Chiplus CS16LV10243GCR70 64kBx16-bit SRAM
+         U43 - PS/2 Port (not populated on PCB-0799)
+        CON3 - DB9 Port (not populated on PCB-0799)
+         JP7 - 4-pin power connector
+         JP8 - 10-pin connector (not populated, might be for JTAG programming)
+        BATT - 3V Coin Battery
+       SW1-3 - 8-position DIP Switch
+         SW4 - SPDT Switch (clears high scores/NVRAM)
+     1117-18 - 1.8V 800mA LDO Regulator
+     1084-33 - 3.3V 5A LDO Regulator
+     TYN408G - ST TYN408G SCR
+         U18 - EV29LV160AB 2Mx8-bit/1Mx16-bit DIP42 3.3V Flash ROM. ROM data is 16-bit.
+               The ROM is not pin compatible with 27C160 and must be dumped using a custom adapter.
+               This ROM is the game-specific program code. There is common code inside the IGS036 SOC because
+               if the program ROM is removed and booted the screen shows 'PROGRAM ROM ERROR'
+                - Que Huang Zheng Ba: V100CN_U18.U18
+                - Long Hu Zheng Ba Te Bie Ban: S101CN_U18.U18
+     U27-U31 - EV29LV640MT 8Mx8-bit/4Mx16-bit DIP48 Flash ROM (U29 & U31 not populated). ROM data is 16-bit.
+               U27 - Audio Samples for TT5665
+               Other ROMs - Graphics
+
+*******************************************************************/
 
 ROM_START( lhtb ) // PCB-0799-02-IU-1, every ROM label starts with 龍虎特別版
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -210,13 +286,31 @@ ROM_START( lhtb ) // PCB-0799-02-IU-1, every ROM label starts with 龍虎特別�
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s-101cn.u18",  0x000000, 0x200000, CRC(1020f4b5) SHA1(953bb776a804738c624a1dca336e42beb10238f7) )
 
-	ROM_REGION( 0x800100, "oki", 0 ) // TT5665 samples
-	ROM_LOAD( "s101cn_u27.u27", 0x000000, 0x800100, CRC(1b114177) SHA1(acd9969806a49fd6696782fd629b24bbc22f43af) ) // 1xxxxxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "s101cn_u27.u27", 0x000000, 0x800000, CRC(8db377ae) SHA1(769c146104d8577b337d5aa8b388b9c8b726dd21) )
 
-	ROM_REGION( 0x800100*2, "gfx", 0 )
-	ROM_LOAD( "s101cn_u28.u28",  0x000000, 0x800100, CRC(d823ccba) SHA1(b1c69536baab36331dc5ed9ea12dad4f53b7422e) ) // 1xxxxxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION( 0x800000*2, "gfx", 0 )
+	ROM_LOAD( "s101cn_u28.u28",  0x000000, 0x800000, CRC(75029040) SHA1(d1d0fd696a6c2819034b089e5d2e97b6d5ccc5f9) )
 	// u29 not populated
-	ROM_LOAD( "s101cn_u30.u30",  0x800100, 0x800100, CRC(3077bca5) SHA1(3850cd108f8704be549de82af20b385ccc7f999e) ) // 1xxxxxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "s101cn_u30.u30",  0x800000, 0x800000, CRC(4024bd96) SHA1(c3f1c616c9783560a5ea0f8727e39c20c64d46f2) )
+	// u31 not populated, etched CG1-L on PCB
+ROM_END
+
+ROM_START( qhzb ) // PCB-0701-01-IU
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "qhzb_igs036", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v100cn_u18.u18", 0x000000, 0x200000, CRC(8c2733b7) SHA1(226768eead8d7754b2468384e5e691812d0ac96d) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "sp_u27.u27", 0x000000, 0x800000, CRC(1b114177) SHA1(acd9969806a49fd6696782fd629b24bbc22f43af) ) // 1xxxxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x800000*2, "gfx", 0 )
+	ROM_LOAD( "cg_u28.u28",  0x000000, 0x800000, CRC(04105f6f) SHA1(e917825c2304bba3362aecbfab73d2e2b340478e) ) // FIXED BITS (xxxxxxxx0000xxxx)
+	// u29 not populated
+	ROM_LOAD( "cg_u30.u30",  0x800000, 0x800000, CRC(37c7d442) SHA1(81682aa1ba6912919c85ee8f68c2e9821f4a3171) )
 	// u31 not populated, etched CG1-L on PCB
 ROM_END
 
@@ -229,13 +323,13 @@ ROM_START( lhzb3in1 )
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb3in1_v100cn.u17",  0x000000, 0x200000, CRC(03caaba4) SHA1(701b97d791e9329bad2ddc4d365748e65c430758) )
 
-	ROM_REGION( 0x1000000, "oki", 0 ) // TT5665 samples
+	ROM_REGION( 0x1000000, "tt5665", 0 ) // samples
 	ROM_LOAD( "lhzb3in1_v100cn.u29", 0x000000, 0x800000, CRC(d8c160a9) SHA1(4b567571764db679a265ae075136128db495acdd) )
-	ROM_LOAD( "lhzb3in1_v100cn.u28", 0x800000, 0x800000, CRC(68624630) SHA1(56e638d59c4533136f69db22f562b39120b516c1) )
+	ROM_LOAD( "lhzb3in1_v100cn.u28", 0x800000, 0x800000, CRC(68624630) SHA1(56e638d59c4533136f69db22f562b39120b516c1) ) // 11xxxxxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x2000000, "gfx", 0 )
 	ROM_LOAD( "lhzb3in1_v100cn.u30",  0x0000000, 0x800000, CRC(fb4124d7) SHA1(324fe2ade17b0ee9833decf2cab9dd4654a04cec) )
-	ROM_LOAD( "lhzb3in1_v100cn.u31",  0x0800000, 0x800000, CRC(4572ff90) SHA1(5d4a40ddec1505edc8a1e35130abd7f2c97b1094) )
+	ROM_LOAD( "lhzb3in1_v100cn.u31",  0x0800000, 0x800000, CRC(4572ff90) SHA1(5d4a40ddec1505edc8a1e35130abd7f2c97b1094) ) // FIXED BITS (xxxxxxxx0000xxxx)
 	ROM_LOAD( "lhzb3in1_v100cn.u32",  0x1000000, 0x800000, CRC(04fe8ca2) SHA1(039009dd535e1388236bd0fd699eeaf593ae5323) )
 	ROM_LOAD( "lhzb3in1_v100cn.u33",  0x1800000, 0x800000, CRC(9afa55d1) SHA1(0a19e1c54b271b21fb9931e7c81a9e7d9e77295a) )
 ROM_END
@@ -249,10 +343,11 @@ ROM_START( igsm312 )
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "m312cn.rom", 0x000000, 0x200000, CRC(5069c310) SHA1(d53a2e8acddfbb7afc27c68c0b3167419a3ec3e6) )
 
-	ROM_REGION( 0x800100, "oki", ROMREGION_ERASE00 ) // TT5665 samples
-	/* missing */
+	ROM_REGION( 0x800100, "tt5665", ROMREGION_ERASE00 ) // samples
+	// missing
+
 	ROM_REGION( 0x800100*2, "gfx", ROMREGION_ERASE00 )
-	/* missing */
+	// missing
 ROM_END
 
 
@@ -265,7 +360,7 @@ ROM_START( mghammer )
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v_100jp.u26", 0x000000, 0x200000, CRC(d78a4dbb) SHA1(149e68c1294b31f4b039d2cd36d36f17873c247e) )
 
-	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 ) // TT5665 samples
+	ROM_REGION( 0x1000000, "tt5665", ROMREGION_ERASE00 ) // samples
 	ROM_LOAD( "sp_u17.u17", 0x000000, 0x800000, CRC(dd9b43b6) SHA1(5fa3191a2ebb0ea7fb737e44b1f651987c6c1bbb) )
 	ROM_LOAD( "sp_u18.u18", 0x800000, 0x800000, CRC(0998e0c6) SHA1(bfa2b42248dc52f83682bbdec7bb7aaa53b4ac29) )
 
@@ -321,7 +416,7 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 void igs_m036_state::igs_m036(machine_config &config)
 {
-	IGS036(config, m_maincpu, 20'000'000);
+	IGS036(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -333,13 +428,15 @@ void igs_m036_state::igs_m036(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x200);
-	// sound hardware (OKI)
+
+	SPEAKER(config, "speaker").front_center();
+	OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "speaker", 1.0); // clock and pin 7 not verified
 }
 
 
 void igs_m036_state::igs_m036_tt(machine_config &config)
 {
-	IGS036(config, m_maincpu, 20'000'000);
+	IGS036(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -351,7 +448,9 @@ void igs_m036_state::igs_m036_tt(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x200);
-	// sound hardware (TT5665)
+
+	SPEAKER(config, "speaker").front_center();
+	TT5665(config, "tt5665", 4.952_MHz_XTAL, tt5665_device::ss_state::SS_HIGH, 0).add_route(1, "speaker", 1.0);
 }
 
 
@@ -401,7 +500,9 @@ GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2, 
 
 GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_IS_SKELETON )
 
-GAME( 200?, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Tebie Ban (V101CN)", MACHINE_IS_SKELETON ) // 龍虎特別版 - Lónghǔ tèbié bǎn
+GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Que Huang Zheng Ba (V100CN)", MACHINE_IS_SKELETON )
+
+GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Tebie Ban (V101CN)", MACHINE_IS_SKELETON ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
 GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_IS_SKELETON ) // 龙虎争霸三合一
 
