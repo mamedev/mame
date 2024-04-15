@@ -117,9 +117,6 @@ The monitor will expect you to load a program from cassette.
 		<description>Cannon Ball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<notes><![CDATA[
-Keyboard controls do not work correctly until you unmap Joystick 2's default keys. (btanb)
-]]></notes>
 		<info name="serial" value="0201028"/>
 		<info name="alt_title" value="キャノンボール"/>
 		<info name="usage" value="Press A for single player or D for two players. In game, press A or D to move, and Spacebar to Shoot; the same controls are used by both players." />
