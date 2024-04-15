@@ -17,9 +17,10 @@
 #include "machine/timer.h"
 
 
-class dcs_audio_device : public device_t
+class dcs_audio_device : public device_t, public device_mixer_interface
 {
 public:
+	template <typename T> void set_maincpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag));; }
 	// for dcs2 (int dram_in_mb, offs_t polling_offset)
 	void set_dram_in_mb(int dram_in_mb) { m_dram_in_mb = dram_in_mb; }
 	void set_polling_offset(offs_t polling_offset) { m_polling_offset = polling_offset; }
@@ -46,6 +47,137 @@ public:
 	void dmovlay_callback(uint32_t data);
 	void denver_postload();
 	void install_speedup();
+
+	uint8_t get_rev() { return m_rev; } // TODO(RH): This can be done better, and shouldn't be necessary.
+	cpu_device *get_cpu() { return m_cpu; } // TODO(RH): Same.
+
+protected:
+	// construction/destruction
+	dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev, int outputs);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	void add_mconfig_dcs(machine_config &config);
+
+	static constexpr const char *const denver_regname[4] =
+	{ "SDRC_ROM", "SDRC_IO", "RAM_PAGE", "VER/FIFO_RESET" };
+
+	struct sdrc_state
+	{
+		uint16_t      reg[4];
+		uint8_t       seed;
+	};
+
+
+	struct dsio_state
+	{
+		uint16_t      reg[4];
+		uint8_t       start_on_next_write;
+		uint16_t      channelbits;
+	};
+
+
+	struct hle_transfer_state
+	{
+		uint8_t       hle_enabled;
+		int32_t       dcs_state;
+		int32_t       state;
+		int32_t       start;
+		int32_t       stop;
+		int32_t       type;
+		int32_t       temp;
+		int32_t       writes_left;
+		uint16_t      sum;
+		int32_t       fifo_entries;
+		timer_device *watchdog;
+	};
+
+	optional_device<device_execute_interface> m_maincpu;
+
+	required_device<timer_device> m_reg_timer;
+	optional_device<timer_device> m_sport0_timer;
+	required_device<timer_device> m_internal_timer;
+
+	optional_device<address_map_bank_device> m_ram_map;
+
+	optional_shared_ptr<uint16_t> m_iram;
+
+	optional_memory_bank    m_data_bank;
+	memory_bank_creator     m_rom_page;
+	memory_bank_creator     m_dram_page;
+
+	adsp21xx_device *m_cpu;
+	address_space *m_program;
+	address_space *m_data;
+	uint8_t       m_rev;
+	offs_t        m_polling_offset;
+	uint32_t      m_polling_count;
+	/* sound output */
+	uint8_t       m_channels;
+	uint16_t      m_size;
+	uint16_t      m_incs;
+	dmadac_sound_device *m_dmadac[6];
+	int32_t       m_ireg;
+	uint16_t      m_ireg_base;
+	uint16_t      m_control_regs[32];
+
+	/* memory access/booting */
+	uint16_t *    m_bootrom;
+	uint32_t      m_bootrom_words;
+	uint16_t *    m_sounddata;
+	std::unique_ptr<uint16_t[]> m_sounddata_ptr;
+	uint32_t      m_sounddata_words;
+	uint32_t      m_sounddata_banks;
+	uint16_t      m_sounddata_bank;
+
+	/* I/O with the host */
+	uint8_t       m_auto_ack;
+	uint16_t      m_latch_control;
+	uint16_t      m_input_data;
+	uint16_t      m_output_data;
+	uint16_t      m_pre_output_data;
+	uint16_t      m_output_control;
+	uint64_t      m_output_control_cycles;
+	uint8_t       m_last_output_full;
+	uint8_t       m_last_input_empty;
+	uint16_t      m_progflags;
+	emu_timer *   m_s1_ack_timer;
+	emu_timer *   m_s1_ack2_timer;
+	emu_timer *   m_s2_ack_timer;
+
+	write_line_delegate m_output_full_cb;
+	write_line_delegate m_input_empty_cb;
+
+	read16smo_delegate  m_fifo_data_r;
+	read16mo_delegate   m_fifo_status_r;
+	write_line_delegate m_fifo_reset_w;
+
+	/* timers */
+	uint8_t       m_timer_enable;
+	bool          m_timer_ignore;
+	uint64_t      m_timer_start_cycles;
+	uint32_t      m_timer_start_count;
+	uint32_t      m_timer_scale;
+	uint32_t      m_timer_period;
+	uint32_t      m_timers_fired;
+
+	std::unique_ptr<uint16_t[]> m_sram;
+	uint16_t m_polling_value;
+	uint32_t m_polling32_value;
+	uint32_t *m_internal_program_ram;
+	uint32_t *m_external_program_ram;
+	uint32_t *m_internal_data_ram;
+
+	int32_t m_dmovlay_val;
+
+	sdrc_state m_sdrc;
+	dsio_state m_dsio;
+	hle_transfer_state m_transfer;
+
+	int m_dram_in_mb;
+
+	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
 
 	// non public
 	void dcs_boot();
@@ -122,134 +254,6 @@ public:
 	void dsio_io_map(address_map &map);
 	void dsio_program_map(address_map &map);
 	void dsio_rambank_map(address_map &map);
-
-	uint8_t get_rev() { return m_rev; } // TODO(RH): This can be done better, and shouldn't be necessary.
-	cpu_device *get_cpu() { return m_cpu; } // TODO(RH): Same.
-
-	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
-
-protected:
-	// construction/destruction
-	dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	void add_mconfig_dcs(machine_config &config);
-
-	static constexpr const char *const denver_regname[4] =
-	{ "SDRC_ROM", "SDRC_IO", "RAM_PAGE", "VER/FIFO_RESET" };
-
-	struct sdrc_state
-	{
-		uint16_t      reg[4];
-		uint8_t       seed;
-	};
-
-
-	struct dsio_state
-	{
-		uint16_t      reg[4];
-		uint8_t       start_on_next_write;
-		uint16_t      channelbits;
-	};
-
-
-	struct hle_transfer_state
-	{
-		uint8_t       hle_enabled;
-		int32_t       dcs_state;
-		int32_t       state;
-		int32_t       start;
-		int32_t       stop;
-		int32_t       type;
-		int32_t       temp;
-		int32_t       writes_left;
-		uint16_t      sum;
-		int32_t       fifo_entries;
-		timer_device *watchdog;
-	};
-
-	adsp21xx_device *m_cpu;
-	address_space *m_program;
-	address_space *m_data;
-	uint8_t       m_rev;
-	offs_t        m_polling_offset;
-	uint32_t      m_polling_count;
-	/* sound output */
-	uint8_t       m_channels;
-	uint16_t      m_size;
-	uint16_t      m_incs;
-	dmadac_sound_device *m_dmadac[6];
-	required_device<timer_device> m_reg_timer;
-	optional_device<timer_device> m_sport0_timer;
-	required_device<timer_device> m_internal_timer;
-	int32_t       m_ireg;
-	uint16_t      m_ireg_base;
-	uint16_t      m_control_regs[32];
-
-	/* memory access/booting */
-	uint16_t *    m_bootrom;
-	uint32_t      m_bootrom_words;
-	uint16_t *    m_sounddata;
-	std::unique_ptr<uint16_t[]> m_sounddata_ptr;
-	uint32_t      m_sounddata_words;
-	uint32_t      m_sounddata_banks;
-	uint16_t      m_sounddata_bank;
-
-	optional_device<address_map_bank_device> m_ram_map;
-	optional_memory_bank    m_data_bank;
-	memory_bank_creator     m_rom_page;
-	memory_bank_creator     m_dram_page;
-
-	/* I/O with the host */
-	uint8_t       m_auto_ack;
-	uint16_t      m_latch_control;
-	uint16_t      m_input_data;
-	uint16_t      m_output_data;
-	uint16_t      m_pre_output_data;
-	uint16_t      m_output_control;
-	uint64_t      m_output_control_cycles;
-	uint8_t       m_last_output_full;
-	uint8_t       m_last_input_empty;
-	uint16_t      m_progflags;
-	emu_timer *   m_s1_ack_timer;
-	emu_timer *   m_s1_ack2_timer;
-	emu_timer *   m_s2_ack_timer;
-
-	write_line_delegate m_output_full_cb;
-	write_line_delegate m_input_empty_cb;
-
-	read16smo_delegate  m_fifo_data_r;
-	read16mo_delegate   m_fifo_status_r;
-	write_line_delegate m_fifo_reset_w;
-
-	/* timers */
-	uint8_t       m_timer_enable;
-	bool          m_timer_ignore;
-	uint64_t      m_timer_start_cycles;
-	uint32_t      m_timer_start_count;
-	uint32_t      m_timer_scale;
-	uint32_t      m_timer_period;
-	uint32_t      m_timers_fired;
-
-	std::unique_ptr<uint16_t[]> m_sram;
-	uint16_t m_polling_value;
-	uint32_t m_polling32_value;
-	uint32_t *m_internal_program_ram;
-	uint32_t *m_external_program_ram;
-	uint32_t *m_internal_data_ram;
-
-	int m_dmovlay_val;
-
-	sdrc_state m_sdrc;
-	dsio_state m_dsio;
-	hle_transfer_state m_transfer;
-
-	int m_dram_in_mb;
-
-	optional_shared_ptr<uint16_t> m_iram;
-	optional_device<device_execute_interface> m_maincpu;
 };
 
 
@@ -326,7 +330,7 @@ class dcs2_audio_device : public dcs_audio_device
 {
 protected:
 	// construction/destruction
-	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int outputs);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -386,7 +390,7 @@ class dcs2_audio_denver_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int outputs);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

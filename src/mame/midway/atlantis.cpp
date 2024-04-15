@@ -57,6 +57,7 @@
 #include "video/zeus2.h"
 
 #include "emupal.h"
+#include "speaker.h"
 
 #define LOG_RTC         (1U << 1)
 #define LOG_PORT        (1U << 2)
@@ -839,9 +840,15 @@ void atlantis_state::mwskins(machine_config &config)
 	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	DCS2_AUDIO_DENVER_2CH(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0xe33);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);

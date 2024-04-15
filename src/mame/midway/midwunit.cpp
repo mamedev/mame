@@ -102,7 +102,7 @@ Notes:
 #include "machine/nvram.h"
 
 #include "screen.h"
-
+#include "speaker.h"
 
 #define PIXEL_CLOCK     (8000000)
 
@@ -649,7 +649,11 @@ void midwunit_state::wunit(machine_config &config)
 	screen.set_palette(m_palette);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
 	DCS_AUDIO_8K(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 void midwunit_state::wunit_picsim(machine_config &config)
