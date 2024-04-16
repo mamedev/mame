@@ -979,7 +979,7 @@ ROM_END
    Recording from the real hardware: https://youtu.be/ibd8_nsklTY */
 ROM_START( animalhjb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "27c512.u44",     0x00000, 0x10000, BAD_DUMP CRC(b21fa168) SHA1(ca5419dc02abe752dc4c8caa794c77e6b96bdb97) ) // Bitrotten
+	ROM_LOAD( "27c512.u44",     0x00000, 0x10000, CRC(d11d191f) SHA1(113e22d69a2b8ceb213d72ec8cee021b1a5507e5) )
 
 	ROM_REGION( 0x8000, "data", 0 )
 	ROM_LOAD( "tms27c256.u43",  0x00000, 0x08000, CRC(af67f687) SHA1(8f43a693358612880389b238ec7040f78b0164bb) )
@@ -987,8 +987,7 @@ ROM_START( animalhjb )
 	ROM_REGION( 0x30000, "reels", 0 )
 	ROM_LOAD( "am27c512.u17",   0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
 	ROM_LOAD( "am27c512.u16",   0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
-	ROM_LOAD( "am27c512.u15",   0x20000, 0x10000, BAD_DUMP CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) ) // Bitrotten, taken from 'jingbell', as it's probably the same
-
+	ROM_LOAD( "am27c512.u15",   0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
 	ROM_REGION( 0xc0000, "tiles", 0 )
 	ROM_LOAD( "at27c020.u25",   0x00000, 0x40000, CRC(5f8abeaf) SHA1(99c4a795cb9b4d94867c12ca99cba04f9c05e129) )
 	ROM_LOAD( "at27c020.u24",   0x40000, 0x40000, CRC(58efe5a8) SHA1(fb4cba3965052e5cdd24a7e93966c597855caa68) )
@@ -1146,6 +1145,6 @@ GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbe
 GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, animalhjb, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Bad program ROM
+GAME( 1995?, animalhjb, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1998,  gp98a,     gp98,     gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)",         MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM
