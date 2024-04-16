@@ -11,6 +11,7 @@ https://web.archive.org/web/20060221032551/http://www.datawind.com/specs.html
 https://uk.pcmag.com/first-looks/7579/datawind-pocketsurfer
 
 CPU Sharp LH79524-NOF (package BGA-208).
+SIM300 v7.03 GSM/GPRS modem.
 
 Tear down of a production unit: https://www.youtube.com/watch?v=lQi8veu3ugU
 
@@ -19,13 +20,13 @@ PCB:
   _______________________________|   |__  _______________
  _|               _____________  |USB|  |_|              \_____________________
 _|    ________    |            |                                _______        |
-|     |DW-    |   |            |                                |STB5610       |
-|     |SBTM1  |   |            |                                |      |       |
-|     |Bluetooth  |   SIM      |                                |______|       |
-|     |_______|   |  SOCKET    | ___         _____________            _______  |
-|   ___________   |   AND      ||___|  ___   | IS42S16400B|           |      | |
-|   |U4 Flash  |  |  COMMS     |       |  |  | DRAM       | ________  |IS42S16400B
-|   |          |  |            | LVX457->_|  |____________| |SHARP  | |DRAM  | |
+|     |DW-    |   |   SIM      |                                |STB5610       |
+|     |SBTM1  |   |  SOCKET    |                                |      |       |
+|     |Bluetooth  |   AMD      |                                |______|       |
+|     |_______|   |  COMMS     | ___         _____________            _______  |
+|   ___________   |            ||___|  ___   | IS42S16400B|           |      | |
+|   |U4 Flash  |  |SIM300 v7.03|       |  |  | DRAM       | ________  |IS42S16400B
+|   |          |  |  GSM/GPRS  | LVX457->_|  |____________| |SHARP  | |DRAM  | |
 |   |__________|  |____________|       ___                  |LH79524| |      | |
 |                           ___        |  |                 |NOF    | |      | |
 |                    LCX125->__|       |_<-LCX125           |_______| |______| |
