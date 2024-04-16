@@ -1147,6 +1147,11 @@ void midvunit_state::midvplus(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
 	MIDWAY_IOASIC(config, m_midway_ioasic, 0);
+	m_midway_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_midway_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_midway_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_midway_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_midway_ioasic->set_dcs_tag(m_dcs);
 	m_midway_ioasic->set_shuffle(0);
 	m_midway_ioasic->set_upper(452); /* no alternates */
 	m_midway_ioasic->set_yearoffs(94);

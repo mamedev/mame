@@ -161,6 +161,9 @@ public:
 	// construction/destruction
 	midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template<unsigned Port> auto in_port_cb() { return m_input_cb[Port].bind(); }
+	template <typename T> void set_cage_tag(T &&tag) { m_cage.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_dcs_tag(T &&tag) { m_dcs.set_tag(std::forward<T>(tag)); }
 	void set_shuffle(uint8_t shuffle) { m_shuffle_type = shuffle; }
 	void set_shuffle_default(uint8_t shuffle) { m_shuffle_default = shuffle; }
 	void set_auto_ack(uint8_t auto_ack) { m_auto_ack = auto_ack; }
@@ -199,10 +202,12 @@ private:
 	void update_ioasic_irq();
 	uint16_t get_fifo_status();
 
-	required_ioport m_io_dips;
-	required_ioport m_io_system;
-	required_ioport m_io_in1;
-	required_ioport m_io_in2;
+	optional_device<atari_cage_device> m_cage;
+	optional_device<dcs_audio_device> m_dcs;
+
+	devcb_write8 m_irq_callback;
+
+	devcb_read32::array<4> m_input_cb;
 
 	devcb_write8    m_serial_tx_cb;
 	devcb_write32   m_aux_output_cb;
@@ -215,7 +220,6 @@ private:
 	uint8_t   m_shuffle_default = 0;
 	uint8_t   m_shuffle_active = 0;
 	const uint8_t *   m_shuffle_map = nullptr;
-	devcb_write8 m_irq_callback;
 	uint8_t   m_irq_state = 0;
 	uint16_t  m_sound_irq_state = 0;
 	uint8_t   m_auto_ack = 0;
@@ -227,8 +231,6 @@ private:
 	uint16_t  m_fifo_bytes = 0;
 	offs_t  m_fifo_force_buffer_empty_pc = 0;
 
-	optional_device<atari_cage_device> m_cage;
-	optional_device<dcs_audio_device> m_dcs;
 };
 
 
