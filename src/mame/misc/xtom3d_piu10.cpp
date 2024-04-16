@@ -78,9 +78,7 @@ void isa16_piu10::device_add_mconfig(machine_config &config)
 	MACRONIX_29F1610MC_16BIT(config, m_flash);
 
 	CAT702_PIU(config, m_cat702, 0);
-	m_cat702->dataout_handler().set([this] (u16 data) {
-		m_cat702_data = data & 1;
-	});
+	m_cat702->dataout_handler().set([this] (u16 data) { m_cat702_data = data & 1; });
 
 	DAC3350A(config, m_dac3350a);
 
@@ -103,27 +101,27 @@ uint16_t isa16_piu10::read(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0x5: // 2da
-			if (m_dest == 0x008)
-			{
-				uint16_t r = 0;
+	case 0x5: // 2da
+		if (m_dest == 0x008)
+		{
+			uint16_t r = 0;
 
-				r |= (m_cat702_data & 1) << 5;
+			r |= (m_cat702_data & 1) << 5;
 
-				r |= m_mp3_mpeg_frame_sync << 2; // every 256th transition the game will set the internal playback position timestamp to counter*6.2687998 to sync with the MP3 decoder chip (counter*6.2687998/240 = (1152*counter)/44100)
-				r |= 1 << 1; // the MP3 data send function loops until this is 1 before sending MP3 data byte
-				r |= m_mp3_demand << 0; // if not set then MP3 data send function early returns
+			r |= m_mp3_mpeg_frame_sync << 2; // every 256th transition the game will set the internal playback position timestamp to counter*6.2687998 to sync with the MP3 decoder chip (counter*6.2687998/240 = (1152*counter)/44100)
+			r |= 1 << 1; // the MP3 data send function loops until this is 1 before sending MP3 data byte
+			r |= m_mp3_demand << 0; // if not set then MP3 data send function early returns
 
-				return r;
-			}
-			else if (m_dest == 0)
-			{
-				const uint32_t offs = m_addr;
-				if (!machine().side_effects_disabled() && m_flash_unlock)
-					m_addr++;
-				return m_flash->read(offs);
-			}
-			break;
+			return r;
+		}
+		else if (m_dest == 0)
+		{
+			const uint32_t offs = m_addr;
+			if (!machine().side_effects_disabled() && m_flash_unlock)
+				m_addr++;
+			return m_flash->read(offs);
+		}
+		break;
 	}
 
 	if (!machine().side_effects_disabled())
@@ -134,65 +132,63 @@ uint16_t isa16_piu10::read(offs_t offset)
 
 void isa16_piu10::write(offs_t offset, uint16_t data)
 {
-	switch(offset)
+	switch (offset)
 	{
-		// address port, bottom 16-bits are location and top 16-bits are target device
-		case 0x0: // 2d0
-			m_addr &= 0xfff00;
-			m_addr |= data & 0xff;
-			break;
-		case 0x1: // 2d2
-			m_addr &= 0xf00ff;
-			m_addr |= (data & 0xff) << 8;
-			break;
+	// address port, bottom 16-bits are location and top 16-bits are target device
+	case 0x0: // 2d0
+		m_addr &= 0xfff00;
+		m_addr |= data & 0xff;
+		break;
+	case 0x1: // 2d2
+		m_addr &= 0xf00ff;
+		m_addr |= (data & 0xff) << 8;
+		break;
 
-		case 0x2: // 2d4
-			m_addr &= 0x0ffff;
-			m_addr |= (data & 0xf) << 16;
+	case 0x2: // 2d4
+		m_addr &= 0x0ffff;
+		m_addr |= (data & 0xf) << 16;
 
-			m_dest &= 0xff0;
-			m_dest |= (data >> 4) & 0xf;
-			break;
-		case 0x3: // 2d6
-			m_dest &= 0x00f;
-			m_dest |= (data & 0xff) << 4;
-			break;
+		m_dest &= 0xff0;
+		m_dest |= (data >> 4) & 0xf;
+		break;
+	case 0x3: // 2d6
+		m_dest &= 0x00f;
+		m_dest |= (data & 0xff) << 4;
+		break;
 
-		// data port
-		case 0x5: // 2da
+	// data port
+	case 0x5: // 2da
+		if (m_dest == 0x010)
 		{
-			if (m_dest == 0x010)
-			{
-				m_cat702->write_datain(BIT(data, 5));
-				m_cat702->write_clock(BIT(data, 4));
-				m_cat702->write_select(BIT(data, 3));
+			m_cat702->write_datain(BIT(data, 5));
+			m_cat702->write_clock(BIT(data, 4));
+			m_cat702->write_select(BIT(data, 3));
 
-				m_dac3350a->i2c_sda_w(BIT(data, 1));
-				m_dac3350a->i2c_scl_w(BIT(data, 0));
-			}
-			else if (m_dest == 0x008)
-			{
-				m_mas3507d->sid_w(data);
-			}
-			else if (m_dest == 0 && m_flash_unlock)
-			{
-				m_flash->write(m_addr, data);
-			}
-			else
-			{
-				logerror("%s: unknown write %d %03x %06x %02x %02x\n", machine().describe_context(), m_flash_unlock, m_dest, m_addr, offset, data);
-			}
-			break;
+			m_dac3350a->i2c_sda_w(BIT(data, 1));
+			m_dac3350a->i2c_scl_w(BIT(data, 0));
 		}
-
-		// chip enable, 0 -> 1 transitions
-		case 0x6: // 2dc
-			m_flash_unlock = BIT(data, 3);
-			break;
-
-		default:
+		else if (m_dest == 0x008)
+		{
+			m_mas3507d->sid_w(data);
+		}
+		else if (m_dest == 0 && m_flash_unlock)
+		{
+			m_flash->write(m_addr, data);
+		}
+		else
+		{
 			logerror("%s: unknown write %d %03x %06x %02x %02x\n", machine().describe_context(), m_flash_unlock, m_dest, m_addr, offset, data);
-			break;
+		}
+		break;
+
+	// chip enable, 0 -> 1 transitions
+	case 0x6: // 2dc
+		m_flash_unlock = BIT(data, 3);
+		break;
+
+	default:
+		logerror("%s: unknown write %d %03x %06x %02x %02x\n", machine().describe_context(), m_flash_unlock, m_dest, m_addr, offset, data);
+		break;
 	}
 }
 

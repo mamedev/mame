@@ -118,6 +118,7 @@ dac3350a_device::dac3350a_device(const machine_config &mconfig, const char *tag,
 
 void dac3350a_device::device_start()
 {
+	// TODO: use configured clock for sample rate and respond to device_clock_changed
 	m_stream = stream_alloc(2, 2, 44100);
 
 	save_item(NAME(m_i2c_bus_state));

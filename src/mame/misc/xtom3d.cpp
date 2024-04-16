@@ -745,8 +745,8 @@ void xtom3d_state::pumpitup(machine_config &config)
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
 
-	ISA16_SLOT(config.replace(), "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "pumpitup_piu10", true).set_option_machine_config("pumpitup_piu10", piu10_config);
-	ISA16_SLOT(config.replace(), "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "pumpitup_io_sound", true);
+	subdevice<isa16_slot_device>("board1")->set_default_option("pumpitup_piu10").set_option_machine_config("pumpitup_piu10", piu10_config);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("pumpitup_io_sound");
 }
 
 ROM_START( xtom3d )

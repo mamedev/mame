@@ -6,11 +6,11 @@
 #pragma once
 
 #include "bus/isa/isa.h"
-#include "bus/isa/isa_cards.h"
 #include "machine/cat702.h"
 #include "machine/intelfsh.h"
 #include "sound/dac3350a.h"
 #include "sound/mas3507d.h"
+
 
 class isa16_piu10 : public device_t, public device_isa16_card_interface
 {
@@ -50,4 +50,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ISA16_PIU10, isa16_piu10)
 
-#endif
+#endif // MAME_MISC_XTOM3D_PIU10_H
