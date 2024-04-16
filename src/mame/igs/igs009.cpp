@@ -63,6 +63,7 @@ public:
 
 	void init_jingbell();
 	void init_jingbelli();
+	void init_animalhjb();
 
 	int hopper_r();
 
@@ -1037,6 +1038,15 @@ void igs009_state::init_jingbelli()
 	rom[0x01f19] = 0x18;
 }
 
+void igs009_state::init_animalhjb()
+{
+	decrypt_jingbell();
+
+	// protection patch
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
+	rom[0x01f21] = 0x18;
+}
+
 void igs009_state::init_jingbell()
 {
 	decrypt_jingbell();
@@ -1145,6 +1155,6 @@ GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbe
 GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, animalhjb, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995?, animalhjb, jingbell, jingbell, jingbell, igs009_state,  init_animalhjb, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1998,  gp98a,     gp98,     gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)",         MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM
