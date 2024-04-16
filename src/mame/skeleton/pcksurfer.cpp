@@ -41,7 +41,6 @@ Chip labeled "31314 3A05U 511AD" inside the DW-SBTM1 module.
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 namespace
 {
