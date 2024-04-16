@@ -400,6 +400,7 @@ protected:
 	virtual void check_irq2() override;
 	virtual void set_timer_event() override;
 	virtual void modified_counters() override;
+	virtual void eat_cycles() override;
 	virtual void increment_counter(int amount) override;
 	virtual void check_timer_event() override;
 	virtual void cleanup_counters() override;
