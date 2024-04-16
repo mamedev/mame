@@ -252,19 +252,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="calcraft">
-		<description>Calendar Crafter (version 1.2) (cleanly cracked)</description>
+		<description>Calendar Crafter (A-194 version 1.2) (trex crack)</description>
 		<year>1987</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A194" />
+		<info name="partno" value="A-194" />
 		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Diane Portner, Steven D. Splinter, and Paul R. Wenker" />
-		<info name="version" value="1.2" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
-		<!--"Calendar Crafter" is a 1987 productivity program developed by Gene Breault, Charolyn Kapplinger, Diane Portner, Steven D. Splinter, and Paul R. Wenker, and distributed by MECC. -->
-		<!-- Protection: Bad block check for block $8 -->
-
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 2021-08-13-->
+		<!--productivity program-->
+		<!--Protection: Bad block check for block $8-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="calendar crafter v1.2 iigs(trex crack).2mg" size="819264" crc="65717231" sha1="2f2415385a699fc78a68a3a73ff8470a5fc8df6f"/>
@@ -475,19 +473,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnprnt">
-		<description>Designer Prints (version 1.0) (cleanly cracked)</description>
+		<description>Designer Prints (A-252 version 1.0) (trex crack)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A252" />
+		<info name="partno" value="A-252" />
 		<info name="programmer" value="Diane Portner, Michael Stein, Brian Walker, and Paul Wenker" />
-		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
-		<!--"Designer Prints" is a 1989 desktop publishing program developed by Diane Portner, Michael Stein, Brian Walker, and Paul Wenker, and distributed by MECC. -->
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 2021-08-13-->
+		<!--desktop publishing program-->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -503,19 +499,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnpuzl">
-		<description>Designer Puzzles (version 1.0) (cleanly cracked)</description>
+		<description>Designer Puzzles (A-223 version 1.0) (trex crack)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A223" />
+		<info name="partno" value="A-223" />
 		<info name="programmer" value="Susan Gabrys, John J. Krenz, Diane Portner, and Steve Splinter" />
-		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
-		<!--"Designer Puzzles" is a 1990 desktop publishing program developed by Susan Gabrys, John J. Krenz, Diane Portner, and Steve Splinter, and distributed by MECC. -->
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 2021-08-13-->
+		<!--desktop publishing program-->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
