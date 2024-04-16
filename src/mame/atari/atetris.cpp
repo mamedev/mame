@@ -943,7 +943,7 @@ ROM_START( atetb5205 )
 
 	ROM_REGION( 0x40000, "oki", 0)
 	ROM_LOAD( "1_am27c512.bin",    0x00000, 0x10000, CRC(3aecab3f) SHA1(f072ca51298a2c88ff1feb24933f2ffdb7f8eb63) )
-	ROM_LOAD( "2_tms27c512.bin",   0x10000, 0x10000, BAD_DUMP CRC(53683560) SHA1(a2d7884f00c65a340bb3a6a93b8fa99704bda804) ) // Bitrotten, several bad addresses
+	ROM_LOAD( "2_tms27c512.bin",   0x10000, 0x10000, CRC(953d0ec4) SHA1(af2586332411d9b552241300e61c73463b0ffc5f) )
 	ROM_LOAD( "3_m5l27512.bin",    0x20000, 0x10000, BAD_DUMP CRC(20c1e632) SHA1(b33d276775e1f81a0c4799f2779c4d378436f7be) ) // Bitrotten, 0x1136 address bad
 	ROM_LOAD( "4_am27c512.bin",    0x30000, 0x10000, CRC(a3a7fe78) SHA1(babbbe332a2b15efb67476e3563aeabaede2b55a) )
 
