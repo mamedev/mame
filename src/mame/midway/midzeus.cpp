@@ -1295,7 +1295,7 @@ void midzeus_state::midzeus(machine_config &config)
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
 	m_ioasic->in_port_cb<3>().set_ioport("IN2");
 	m_ioasic->set_dcs_tag("dcs");
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(94);
 }
 
@@ -1348,7 +1348,7 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
 	m_ioasic->in_port_cb<3>().set_ioport("IN2");
 	m_ioasic->set_dcs_tag("dcs");
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
 

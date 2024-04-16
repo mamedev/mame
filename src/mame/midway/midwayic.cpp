@@ -247,8 +247,12 @@ DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC_EMU, midway_serial_pic_emu_device, "midway_
 //-------------------------------------------------
 
 midway_serial_pic_emu_device::midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, tag, owner, clock)
-	, m_pic(*this, "pic")
+	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, tag, owner, clock),
+	m_pic(*this, "pic"),
+	m_command(0),
+	m_data_out(0),
+	m_clk(0),
+	m_status(0)
 {
 }
 
@@ -357,9 +361,9 @@ midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconf
 	m_time_write_timer(nullptr)
 {
 	memset(m_buffer,0,sizeof(m_buffer));
-	memset(m_time_buf,0,sizeof(m_time_buf));
 	memset(m_nvram,0,sizeof(m_nvram));
 	memset(m_default_nvram,0,sizeof(m_default_nvram));
+	memset(m_time_buf,0,sizeof(m_time_buf));
 }
 
 
@@ -498,9 +502,9 @@ void midway_serial_pic2_device::write(u8 data)
 				m_index = 0;
 				m_total = 0;
 
-				// if we haven't written a new time recently, use the real live time
 				if (!m_time_just_written)
 				{
+					// if we haven't written a new time recently, use the real live time
 					system_time systime;
 					machine().base_datetime(systime);
 
@@ -512,10 +516,9 @@ void midway_serial_pic2_device::write(u8 data)
 					m_buffer[m_total++] = make_bcd(systime.local_time.month + 1);
 					m_buffer[m_total++] = make_bcd(systime.local_time.year - 1900 - m_yearoffs);
 				}
-
-				// otherwise, just parrot back what was written to pass self tests
 				else
 				{
+					// otherwise, just parrot back what was written to pass self tests
 					m_buffer[m_total++] = m_time_buf[0];
 					m_buffer[m_total++] = m_time_buf[1];
 					m_buffer[m_total++] = m_time_buf[2];
@@ -530,30 +533,29 @@ void midway_serial_pic2_device::write(u8 data)
 			// write the clock
 			case 4:
 
-				// if coming from state 0, go to state 1 (this is just the command byte)
 				if (m_state == 0)
 				{
+					// if coming from state 0, go to state 1 (this is just the command byte)
 					m_state = 0x14;
 					m_time_index = 0;
 				}
-
-				// if in states 1-2 put data in the buffer until it's full
 				else if (m_state == 0x14)
 				{
+					// if in states 1-2 put data in the buffer until it's full
 					m_time_buf[m_time_index] = m_latch & 0x0f;
 					m_state = 0x24;
 				}
 				else if (m_state == 0x24)
 				{
 					m_time_buf[m_time_index++] |= m_latch << 4;
-
-					// if less than 7 bytes accumulated, go back to state 1
 					if (m_time_index < 7)
+					{
+						// if less than 7 bytes accumulated, go back to state 1
 						m_state = 0x14;
-
-					// otherwise, flag the time as having just been written for 1/2 second
+					}
 					else
 					{
+						// otherwise, flag the time as having just been written for 1/2 second
 						m_time_write_timer->adjust(attotime::from_msec(500));
 						m_time_just_written = 1;
 						m_state = 0;
@@ -563,35 +565,32 @@ void midway_serial_pic2_device::write(u8 data)
 
 			// write to NVRAM
 			case 5:
-
-				// if coming from state 0, go to state 1 (this is just the command byte)
 				if (m_state == 0)
+				{
+					// if coming from state 0, go to state 1 (this is just the command byte)
 					m_state = 0x15;
-
-				// coming from state 1, go to state 2 and latch the low 4 address bits
+				}
 				else if (m_state == 0x15)
 				{
+					// coming from state 1, go to state 2 and latch the low 4 address bits
 					m_nvram_addr = m_latch & 0x0f;
 					m_state = 0x25;
 				}
-
-				// coming from state 2, go to state 3 and latch the high 4 address bits
 				else if (m_state == 0x25)
 				{
+					// coming from state 2, go to state 3 and latch the high 4 address bits
 					m_state = 0x35;
 					m_nvram_addr |= m_latch << 4;
 				}
-
-				// coming from state 3, go to state 4 and write the low 4 bits
 				else if (m_state == 0x35)
 				{
+					// coming from state 3, go to state 4 and write the low 4 bits
 					m_state = 0x45;
 					m_nvram[m_nvram_addr] = m_latch & 0x0f;
 				}
-
-				// coming from state 4, reset the states and write the upper 4 bits
 				else if (m_state == 0x45)
 				{
+					// coming from state 4, reset the states and write the upper 4 bits
 					m_state = 0;
 					m_nvram[m_nvram_addr] |= m_latch << 4;
 					LOGNVRAM("Write byte %02X = %02X\n", m_nvram_addr, m_nvram[m_nvram_addr]);
@@ -600,21 +599,20 @@ void midway_serial_pic2_device::write(u8 data)
 
 			// read from NVRAM
 			case 6:
-
-				// if coming from state 0, go to state 1 (this is just the command byte)
 				if (m_state == 0)
+				{
+					// if coming from state 0, go to state 1 (this is just the command byte)
 					m_state = 0x16;
-
-				// coming from state 1, go to state 2 and latch the low 4 address bits
+				}
 				else if (m_state == 0x16)
 				{
+					// coming from state 1, go to state 2 and latch the low 4 address bits
 					m_nvram_addr = m_latch & 0x0f;
 					m_state = 0x26;
 				}
-
-				// coming from state 2, reset the states and make the data available
 				else if (m_state == 0x26)
 				{
+					// coming from state 2, reset the states and make the data available
 					m_state = 0;
 					m_nvram_addr |= m_latch << 4;
 
@@ -709,8 +707,6 @@ midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const 
 	m_input_cb(*this, 0),
 	m_serial_tx_cb(*this),
 	m_aux_output_cb(*this),
-	m_has_dcs(0),
-	m_has_cage(0),
 	m_dcs_cpu(nullptr),
 	m_shuffle_type(0),
 	m_shuffle_default(0),
@@ -753,10 +749,7 @@ void midway_ioasic_device::device_start()
 	ioasic_register_state();
 
 	// do we have a DCS2 sound chip connected?
-	m_has_dcs = (m_dcs != nullptr);
-	m_has_cage = (m_cage != nullptr);
-
-	if (m_has_dcs)
+	if (m_dcs)
 	{
 		m_dcs_cpu = m_dcs->get_cpu();
 	}
@@ -773,7 +766,7 @@ void midway_ioasic_device::device_start()
 
 
 	// configure the fifo
-	if (m_has_dcs)
+	if (m_dcs)
 	{
 		m_dcs->set_fifo_callbacks(
 				read16smo_delegate(*this, FUNC(midway_ioasic_device::fifo_r)),
@@ -798,7 +791,7 @@ void midway_ioasic_device::ioasic_reset()
 	m_shuffle_active = m_shuffle_default;
 	m_sound_irq_state = 0x0080;
 	m_reg[IOASIC_INTCTL] = 0;
-	if (m_has_dcs)
+	if (m_dcs)
 		fifo_reset_w(1);
 	update_ioasic_irq();
 	midway_serial_pic_device::reset_w(1);
@@ -894,7 +887,7 @@ uint16_t midway_ioasic_device::fifo_r()
 			// because of the way the streaming code works, we need to make sure that the
 			// next status read indicates an empty buffer, even if we've timesliced and the
 			// main CPU is handling the I/O ASIC interrupt
-			if (m_fifo_bytes == 0 && m_has_dcs)
+			if (m_fifo_bytes == 0 && m_dcs)
 			{
 				m_fifo_force_buffer_empty_pc = m_dcs_cpu->pc();
 				LOGFIFO("fifo_r(%04X): FIFO empty, PC = %04X\n", result, m_fifo_force_buffer_empty_pc);
@@ -1060,13 +1053,13 @@ uint32_t midway_ioasic_device::read(address_space &space, offs_t offset)
 		case IOASIC_SOUNDSTAT:
 			// status from sound CPU
 			result = 0;
-			if (m_has_dcs)
+			if (m_dcs)
 			{
 				result |= ((m_dcs->control_r() >> 4) ^ 0x40) & 0x00c0;
 				result |= fifo_status_r(space) & 0x0038;
 				result |= m_dcs->data2_r() & 0xff00;
 			}
-			else if (m_has_cage)
+			else if (m_cage)
 			{
 				result |= (m_cage->control_r() << 6) ^ 0x80;
 			}
@@ -1076,7 +1069,7 @@ uint32_t midway_ioasic_device::read(address_space &space, offs_t offset)
 
 		case IOASIC_SOUNDIN:
 			result = 0;
-			if (m_has_dcs)
+			if (m_dcs)
 			{
 				result = m_dcs->data_r();
 				if (!machine().side_effects_disabled())
@@ -1085,7 +1078,7 @@ uint32_t midway_ioasic_device::read(address_space &space, offs_t offset)
 						m_dcs->ack_w();
 				}
 			}
-			else if (m_has_cage)
+			else if (m_cage)
 				result = m_cage->main_r();
 			else
 			{
@@ -1136,15 +1129,13 @@ void midway_ioasic_device::serial_rx_w(u8 data)
 
 void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t oldreg, newreg;
-
 	offset = m_shuffle_active ? m_shuffle_map[offset & 15] : offset;
-	oldreg = m_reg[offset];
+	uint32_t const oldreg = m_reg[offset];
 	// Block register updates until ioasic is unlocked
 	// mwskins and thegrid use this as test to see if the ioasic is unlocked
 	if (m_shuffle_active)
 		COMBINE_DATA(&m_reg[offset]);
-	newreg = m_reg[offset];
+	uint32_t const newreg = m_reg[offset];
 
 	if (offset != IOASIC_SOUNDOUT)
 		LOGIOASIC("%s ioasic_w(%d) = %08X\n", machine().describe_context(), offset, data);
@@ -1196,11 +1187,11 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 		case IOASIC_SOUNDCTL:
 			LOGIOASIC("%s: write IOASIC_SOUNDCTL=%04x\n", machine().describe_context(), data);
 			// sound reset?
-			if (m_has_dcs)
+			if (m_dcs)
 			{
 				m_dcs->reset_w(newreg & 1);
 			}
-			else if (m_has_cage)
+			else if (m_cage)
 			{
 				if ((oldreg ^ newreg) & 1)
 				{
@@ -1215,9 +1206,9 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 			break;
 
 		case IOASIC_SOUNDOUT:
-			if (m_has_dcs)
+			if (m_dcs)
 				m_dcs->data_w(newreg);
-			else if (m_has_cage)
+			else if (m_cage)
 				m_cage->main_w(newreg);
 			break;
 
@@ -1227,9 +1218,9 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 			break;
 
 		case IOASIC_PICOUT:
-			if (m_shuffle_type == MIDWAY_IOASIC_VAPORTRX)
+			if (m_shuffle_type == SHUFFLE_VAPORTRX)
 				midway_serial_pic2_device::write(newreg ^ 0x0a);
-			else if (m_shuffle_type == MIDWAY_IOASIC_SFRUSHRK)
+			else if (m_shuffle_type == SHUFFLE_SFRUSHRK)
 				midway_serial_pic2_device::write(newreg ^ 0x05);
 			else
 				midway_serial_pic2_device::write(newreg);
