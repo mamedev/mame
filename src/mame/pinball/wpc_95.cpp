@@ -49,6 +49,8 @@ ToDo:
 #include "machine/nvram.h"
 #include "machine/timer.h"
 
+#include "speaker.h"
+
 namespace {
 
 class wpc_95_state : public driver_device
@@ -2312,7 +2314,12 @@ void wpc_95_state::wpc_95(machine_config &config)
 	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_95_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	SPEAKER(config, "mono").front_center();
+
 	DCS_AUDIO_WPC(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 /*-------------------------

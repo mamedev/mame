@@ -277,6 +277,7 @@ public:
 	void sharkpy(machine_config &config);
 	void victor5(machine_config &config);
 	void newhunterb(machine_config &config);
+	void newhunterd(machine_config &config);
 
 	void init_stbsub();
 	void init_stisub();
@@ -351,6 +352,7 @@ private:
 	void dinofmly_map(address_map &map);
 	void mtrainnv_map(address_map &map);
 	void newhunterb_map(address_map &map);
+	void newhunterd_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void sharkpy_map(address_map &map);
 	void srider_map(address_map &map);
@@ -1025,6 +1027,30 @@ void subsino_state::newhunterb_map(address_map &map)
 	map(0x0f00e, 0x0f00e).portr("INC");
 	map(0x0f00f, 0x0f00f).w(FUNC(subsino_state::tiles_offset_w));
 	map(0x14000, 0x15fff).rom().region("program", 0x4000);
+}
+
+void subsino_state::newhunterd_map(address_map &map)
+{
+	map(0x00000, 0x06fff).rom().region("maincpu", 0x0000); // 0x7000 - 0x9fff are 0xff filled
+	map(0x07000, 0x07fff).ram();
+	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
+	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
+	map(0x09008, 0x09008).rw(FUNC(subsino_state::out_c_r), FUNC(subsino_state::out_c_w));
+	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
+	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0900e, 0x0900e).portr("INC");
+	map(0x0900f, 0x0900f).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x09800, 0x09fff).ram();
+	map(0x0a000, 0x0dfff).rom().region("maincpu", 0xa000);
+	map(0x0f0c0, 0x0f0ff).ram().share("reel_scroll.2");
+	map(0x0f140, 0x0f17f).ram().share("reel_scroll.1");
+	map(0x0f180, 0x0f1bf).ram().share("reel_scroll.0");
+	map(0x0f800, 0x0f9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0x0fa00, 0x0fbff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x0fc00, 0x0fdff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -2957,6 +2983,13 @@ void subsino_state::newhunterb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::newhunterb_map);
 }
 
+void subsino_state::newhunterd(machine_config &config)
+{
+	tisub(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::newhunterd_map);
+}
+
 void subsino_state::stbsub(machine_config &config)
 {
 	// basic machine hardware
@@ -3416,14 +3449,10 @@ ROM_END
     - Sound: SM64 + SM65.
     - 12.000 MHz xtal (only one xtal on the PCB).
     - Five positions for banks of eight DIP switches, but four of them unpopulated (only one present on the PCB).
-    - MCU with its surface scratched out.
+    - MCU with its surface scratched out. Appears to run in external ROM mode.
    Direct recording from PCB for reference: https://youtu.be/0cFNFCqEEQo */
 ROM_START( newhunterd )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "hd647180.bin",   0x00000, 0x04000, NO_DUMP )
-	HD647180X_FAKE_INTERNAL_ROM
-
-	ROM_REGION( 0x10000, "program", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_am27c512.u44", 0x00000, 0x10000, CRC(456bdb88) SHA1(7135584576f7761b4a0b4c66318cd0cb649eeb93) )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
@@ -3442,10 +3471,10 @@ ROM_START( newhunterd )
 	ROM_LOAD( "3_m27512.u43",   0x04000, 0x04000, CRC(44933beb) SHA1(a19ed785cc3b38c2a2a6a08e9d639361ee118343) )
 	ROM_IGNORE(0xc000)
 
-	ROM_REGION( 0x00300, "proms", 0 )
-	ROM_LOAD( "n82s129an.u67",  0x00000, 0x00100, BAD_DUMP CRC(69af17fc) SHA1(38546f5665cf731195ac384aca182c56884333f0) ) // Not dumped on this set
-	ROM_LOAD( "n82s129an.u68",  0x00100, 0x00100, BAD_DUMP CRC(4b5f288a) SHA1(b6b9f9067afe93bd13ea17311484e2a2af01a0ed) ) // Not dumped on this set
-	ROM_LOAD( "n82s129an.u69",  0x00200, 0x00100, BAD_DUMP CRC(a1c0d069) SHA1(794df68451525901ebd5895feb26fcda2c517c3f) ) // Not dumped on this set
+	ROM_REGION( 0x00300, "proms", 0 ) // Not dumped for this set, the ones from newhunterb seem to fit
+	ROM_LOAD( "n82s129an.u67",  0x00000, 0x00100, BAD_DUMP CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "n82s129an.u68",  0x00100, 0x00100, BAD_DUMP CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "n82s129an.u69",  0x00200, 0x00100, BAD_DUMP CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
 
 	ROM_REGION( 0x00045c, "plds", 0 )
 	ROM_LOAD( "palce16v8h.u61", 0x00000, 0x00117, NO_DUMP )
@@ -4396,8 +4425,8 @@ GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tis
 GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   )
 
 GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
-GAMEL( 1993, newhunterd,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   )
-GAMEL( 1998, ndongmul,    0,       newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "Hyoja Game",      "New DongmulDongmul",                          MACHINE_NOT_WORKING, layout_tisubb   )
+GAMEL( 1993, newhunterd,  tisub,   newhunterd, tisub,    subsino_state, empty_init,       ROT0, "bootleg",         "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // reel GFX don't appear, inputs
+GAMEL( 1998, ndongmul,    0,       newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "Hyoja Game",      "New DongmulDongmul",                          MACHINE_NOT_WORKING, layout_tisubb   ) // hangs after a while, bad reels GFX loading / decode
 
 
 GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",         "Poker Carnival",                              0,                   layout_crsbingo )
