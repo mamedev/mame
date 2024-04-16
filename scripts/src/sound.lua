@@ -551,6 +551,20 @@ end
 
 
 ---------------------------------------------------
+-- Micronas DAC 3550A Stereo Audio DAC
+--@src/devices/sound/dac3350a.h,SOUNDS["DAC3350A"] = true
+---------------------------------------------------
+
+if (SOUNDS["DAC3350A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dac3350a.cpp",
+		MAME_DIR .. "src/devices/sound/dac3350a.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- MEA8000 Voice Synthesizer
 --@src/devices/sound/mea8000.h,SOUNDS["MEA8000"] = true
 ---------------------------------------------------
