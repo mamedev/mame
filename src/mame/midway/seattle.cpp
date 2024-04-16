@@ -2128,7 +2128,7 @@ void seattle_state::wg3dh(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
@@ -2136,7 +2136,12 @@ void seattle_state::wg3dh(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_upper(310); // no alternates
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2149,7 +2154,7 @@ void seattle_state::mace(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
@@ -2157,7 +2162,12 @@ void seattle_state::mace(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_MACE);
 	m_ioasic->set_upper(319); // or 314
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2173,17 +2183,22 @@ void seattle_state::sfrush(machine_config &config)
 	SPEAKER(config, "rrspeaker").headrest_right();
 	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
 
-	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
-	cage.set_speedup(0x5236);
-	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
+	ATARI_CAGE_SEATTLE(config, m_cage, 0);
+	m_cage->set_speedup(0x5236);
+	m_cage->irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
-	cage.add_route(0, "frspeaker", 1.0); // Foward Right
-	cage.add_route(1, "rlspeaker", 1.0); // Back Left
-	cage.add_route(2, "flspeaker", 1.0); // Foward Left
-	cage.add_route(3, "rrspeaker", 1.0); // Back Right
+	m_cage->add_route(0, "frspeaker", 1.0); // Foward Right
+	m_cage->add_route(1, "rlspeaker", 1.0); // Back Left
+	m_cage->add_route(2, "flspeaker", 1.0); // Foward Left
+	m_cage->add_route(3, "rrspeaker", 1.0); // Back Right
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_cage_tag(m_cage);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_upper(315); // no alternates
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2200,18 +2215,22 @@ void seattle_state::sfrushrk(machine_config &config)
 	SPEAKER(config, "rrspeaker").headrest_right();
 	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
 
-	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
-	cage.set_speedup(0x5329);
-	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
+	ATARI_CAGE_SEATTLE(config, m_cage, 0);
+	m_cage->set_speedup(0x5329);
+	m_cage->irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
-	cage.add_route(0, "frspeaker", 1.0); // Foward Right
-	cage.add_route(1, "rlspeaker", 1.0); // Back Left
-	cage.add_route(2, "flspeaker", 1.0); // Foward Left
-	cage.add_route(3, "rrspeaker", 1.0); // Back Right
-
+	m_cage->add_route(0, "frspeaker", 1.0); // Foward Right
+	m_cage->add_route(1, "rlspeaker", 1.0); // Back Left
+	m_cage->add_route(2, "flspeaker", 1.0); // Foward Left
+	m_cage->add_route(3, "rrspeaker", 1.0); // Back Right
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_cage_tag(m_cage);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_SFRUSHRK);
 	m_ioasic->set_upper(331); // no alternates
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2221,7 +2240,7 @@ void seattle_state::sfrushrk(machine_config &config)
 void seattle_state::sfrushrkw(machine_config &config)
 {
 	sfrushrk(config);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 }
 
 void seattle_state::calspeed(machine_config &config)
@@ -2231,7 +2250,7 @@ void seattle_state::calspeed(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c0);
@@ -2239,7 +2258,12 @@ void seattle_state::calspeed(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_CALSPEED);
 	m_ioasic->set_upper(328); // 328 = 27"; may or may not have a 31" ID
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2253,7 +2277,7 @@ void seattle_state::vaportrx(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
@@ -2261,7 +2285,12 @@ void seattle_state::vaportrx(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_VAPORTRX);
 	m_ioasic->set_upper(324); // or 334
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2274,7 +2303,7 @@ void seattle_state::biofreak(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3835);
@@ -2282,7 +2311,12 @@ void seattle_state::biofreak(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_upper(231); // no alternates
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2295,7 +2329,7 @@ void seattle_state::blitz(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
@@ -2303,7 +2337,12 @@ void seattle_state::blitz(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_BLITZ99);
 	m_ioasic->set_upper(444); // or 528
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2317,7 +2356,7 @@ void seattle_state::blitz99(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0afb);
@@ -2325,7 +2364,12 @@ void seattle_state::blitz99(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_BLITZ99);
 	m_ioasic->set_upper(481); // or 484 or 520
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2339,7 +2383,7 @@ void seattle_state::blitz2k(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0b5d);
@@ -2347,7 +2391,12 @@ void seattle_state::blitz2k(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_BLITZ99);
 	m_ioasic->set_upper(494); // or 498
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2362,7 +2411,7 @@ void seattle_state::carnevil(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
@@ -2370,7 +2419,12 @@ void seattle_state::carnevil(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_CARNEVIL);
 	m_ioasic->set_upper(469); // 469 = 25"; 486 = 39";
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
@@ -2383,7 +2437,7 @@ void seattle_state::hyprdriv(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
@@ -2391,7 +2445,12 @@ void seattle_state::hyprdriv(machine_config &config)
 	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_HYPRDRIV);
 	m_ioasic->set_upper(471); // 471 = 25"; 479 = 31"
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
