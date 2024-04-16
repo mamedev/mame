@@ -42030,6 +42030,9 @@ p8000_16                        //
 @source:skeleton/palestra.cpp
 palestra
 
+@source:skeleton/pcksurfer.cpp
+pcksurfer                       // (c) 2006 Datawind
+
 @source:skeleton/pdt3100.cpp
 pdt3100                         //
 
