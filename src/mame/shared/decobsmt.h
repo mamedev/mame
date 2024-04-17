@@ -8,14 +8,12 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/bsmt2000.h"
 
-#define DECOBSMT_TAG "decobsmt"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class decobsmt_device : public device_t
+class decobsmt_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
