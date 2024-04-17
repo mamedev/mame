@@ -456,6 +456,21 @@ void williams2_state::video_control_w(u8 data)
 
 /*************************************
  *
+ *  Mystic Marathon-specific routines
+ *
+ *************************************/
+
+void mysticm_state::machine_start()
+{
+	williams2_state::machine_start();
+
+	save_item(NAME(m_bg_color));
+}
+
+
+
+/*************************************
+ *
  *  Turkey Shoot-specific routines
  *
  *************************************/

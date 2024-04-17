@@ -26,6 +26,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
+
 // base Williams hardware
 class williams_state : public driver_device
 {
@@ -46,14 +47,16 @@ public:
 		m_49way_y(*this, "49WAYY")
 	{ }
 
-	void williams_base(machine_config &config);
 	void williams_b0(machine_config &config);
 	void williams_b1(machine_config &config);
 	void williams_b2(machine_config &config);
 
+	void joust(machine_config &config);
 	void bubbles(machine_config &config);
+	void splat(machine_config &config);
 	void playball(machine_config &config);
 	void spdball(machine_config &config);
+	void alienar(machine_config &config);
 	void lottofun(machine_config &config);
 
 	u8 port_0_49way_r();
@@ -131,9 +134,13 @@ protected:
 	inline void blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte);
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
 
+	void williams_base(machine_config &config);
+	void williams_muxed(machine_config &config);
+
 	virtual void main_map(address_map &map);
 	void bubbles_main_map(address_map &map);
 	void spdball_main_map(address_map &map);
+	void alienar_main_map(address_map &map);
 	virtual void sound_map(address_map &map);
 	void sound2_map(address_map &map); // for Blaster and Sinistar cockpit
 };
@@ -212,28 +219,6 @@ public:
 
 private:
 	required_ioport m_dial;
-};
-
-// Joust, Splat: muxed inputs
-class wms_muxed_state : public williams_state
-{
-public:
-	wms_muxed_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag),
-		m_mux0(*this, "mux_0"),
-		m_mux1(*this, "mux_1")
-	{ }
-
-	void joust(machine_config &config);
-	void splat(machine_config &config);
-
-	void init_alienar();
-
-private:
-	void williams_muxed(machine_config &config);
-
-	required_device<ls157_device> m_mux0;
-	required_device<ls157_device> m_mux1;
 };
 
 // Blaster: extra sound hardware
@@ -365,6 +350,8 @@ public:
 	void mysticm(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 private:

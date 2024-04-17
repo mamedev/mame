@@ -569,13 +569,6 @@ void williams_state::main_map(address_map &map)
 }
 
 
-
-/*************************************
- *
- *  Sinistar memory handlers
- *
- *************************************/
-
 void sinistar_state::main_map(address_map &map)
 {
 	williams_state::main_map(map);
@@ -585,13 +578,6 @@ void sinistar_state::main_map(address_map &map)
 }
 
 
-
-/*************************************
- *
- *  Bubbles memory handlers
- *
- *************************************/
-
 void williams_state::bubbles_main_map(address_map &map)
 {
 	main_map(map);
@@ -600,13 +586,6 @@ void williams_state::bubbles_main_map(address_map &map)
 	map(0xcc00, 0xcfff).ram().share("nvram");
 }
 
-
-
-/*************************************
- *
- *  Speed Ball memory handlers
- *
- *************************************/
 
 void williams_state::spdball_main_map(address_map &map)
 {
@@ -620,6 +599,14 @@ void williams_state::spdball_main_map(address_map &map)
 
 	// add a third PIA
 	map(0xc808, 0xc80b).mirror(0x00f0).rw(m_pia[3], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
+
+
+void williams_state::alienar_main_map(address_map &map)
+{
+	main_map(map);
+
+	map(0xcbff, 0xcbff).nopw();
 }
 
 
@@ -1661,7 +1648,7 @@ void defender_state::jin(machine_config &config)
 }
 
 
-void wms_muxed_state::williams_muxed(machine_config &config)
+void williams_state::williams_muxed(machine_config &config)
 {
 	// pia
 	m_pia[0]->readpa_handler().set_ioport("IN0").mask(0x30);
@@ -1672,25 +1659,32 @@ void wms_muxed_state::williams_muxed(machine_config &config)
 	m_pia[0]->cb2_handler().set("mux_0", FUNC(ls157_device::select_w));
 	m_pia[0]->cb2_handler().append("mux_1", FUNC(ls157_device::select_w));
 
-	LS157(config, m_mux0, 0); // IC3 on interface board (actually LS257 with OC tied low)
-	m_mux0->a_in_callback().set_ioport("INP2");
-	m_mux0->b_in_callback().set_ioport("INP1");
+	ls157_device &mux0(LS157(config, "mux_0", 0)); // IC3 on interface board (actually LS257 with OC tied low)
+	mux0.a_in_callback().set_ioport("INP2");
+	mux0.b_in_callback().set_ioport("INP1");
 
-	LS157(config, m_mux1, 0); // IC4 on interface board (actually LS257 with OC tied low)
-	m_mux1->a_in_callback().set_ioport("INP2A");
-	m_mux1->b_in_callback().set_ioport("INP1A");
+	ls157_device &mux1(LS157(config, "mux_1", 0)); // IC4 on interface board (actually LS257 with OC tied low)
+	mux1.a_in_callback().set_ioport("INP2A");
+	mux1.b_in_callback().set_ioport("INP1A");
 }
 
-void wms_muxed_state::joust(machine_config &config)
+void williams_state::joust(machine_config &config)
 {
 	williams_b1(config);
 	williams_muxed(config);
 }
 
-void wms_muxed_state::splat(machine_config &config)
+void williams_state::splat(machine_config &config)
 {
 	williams_b2(config);
 	williams_muxed(config);
+}
+
+void williams_state::alienar(machine_config &config)
+{
+	joust(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::alienar_main_map);
 }
 
 
@@ -3858,12 +3852,6 @@ void defender_state::init_defndjeu()
 }
 
 
-void wms_muxed_state::init_alienar()
-{
-	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
-}
-
-
 
 /*************************************
  *
@@ -3917,15 +3905,15 @@ GAME( 1987, robotron87, robotron, williams_b1,      robotron, williams_state,  e
 GAME( 2012, robotron12, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
 GAME( 2015, robotrontd, robotron, williams_b1,      robotron, williams_state,  empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
-GAME( 1982, joust,      0,        joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustr,     joust,    joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jousty,     joust,    joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joust,      0,        joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joustr,     joust,    joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jousty,     joust,    joust,            joust,    williams_state,  empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, bubbles,    0,        bubbles,          bubbles,  williams_state,  empty_init,    ROT0,   "Williams", "Bubbles",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bubblesr,   bubbles,  bubbles,          bubbles,  williams_state,  empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bubblesp,   bubbles,  bubbles,          bubbles,  williams_state,  empty_init,    ROT0,   "Williams", "Bubbles (prototype)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, splat,      0,        splat,            splat,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, splat,      0,        splat,            splat,    williams_state,  empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, sinistar,   0,        upright,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, upright)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sinistarc,  sinistar, cockpit,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 3, cockpit)", MACHINE_SUPPORTS_SAVE )
@@ -3941,8 +3929,8 @@ GAME( 1983, blasterkit, blaster,  blastkit,         blastkit, blaster_state,   e
 
 GAME( 1985, spdball,    0,        spdball,          spdball,  williams_state,  empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, alienar,    0,        joust,            alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  joust,            alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienar,    0,        alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, lottofun,   0,        lottofun,         lottofun, williams_state,  empty_init,    ROT0,   "HAR Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
