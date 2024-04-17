@@ -898,8 +898,20 @@ void hd6301x_cpu_device::increment_counter(int amount)
 
 void m6801_cpu_device::eat_cycles()
 {
-	while (m_icount > 0)
-		increment_counter(1);
+	int cycles_to_eat = std::min(int(m_timer_next - CTD), m_icount);
+	if (cycles_to_eat > 0)
+		increment_counter(cycles_to_eat);
+}
+
+void hd6301x_cpu_device::eat_cycles()
+{
+	if (BIT(m_tcsr3, 4))
+	{
+		while (m_icount > 0 && m_wai_state & (M6800_WAI | M6800_SLP))
+			increment_counter(1);
+	}
+	else
+		m6801_cpu_device::eat_cycles();
 }
 
 /* cleanup high-word of counters */

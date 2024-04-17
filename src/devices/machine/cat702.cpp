@@ -87,21 +87,24 @@
 #include "emu.h"
 #include "cat702.h"
 
-DEFINE_DEVICE_TYPE(CAT702, cat702_device, "cat702", "CAT702")
+static constexpr uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
 
-cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CAT702, tag, owner, clock),
-	m_region(*this, DEVICE_SELF),
+DEFINE_DEVICE_TYPE(CAT702, cat702_device, "cat702", "CAT702")
+DEFINE_DEVICE_TYPE(CAT702_PIU, cat702_piu_device, "cat702_piu", "CAT702_PIU")
+
+cat702_device_base::cat702_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_select(1),
 	m_clock(1),
 	m_datain(1),
 	m_state(0),
 	m_bit(0),
-	m_dataout_handler(*this)
+	m_dataout_handler(*this),
+	m_region(*this, DEVICE_SELF)
 {
 }
 
-void cat702_device::device_start()
+void cat702_device_base::device_start()
 {
 	memset(m_transform, 0xff, sizeof(m_transform));
 
@@ -132,54 +135,69 @@ void cat702_device::device_start()
 #if 0
 static int c_linear(uint8_t x, uint8_t a)
 {
-	int i;
-	uint8_t r;
 	x &= a;
-	r = 0;
-	for(i=0; i<8; i++)
-		if(x & (1<<i))
+	uint8_t r = 0;
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(x, i))
 			r = !r;
+	}
 	return r;
 }
 #endif
 
 // Derive the sbox xor mask for a given input and select bit
-uint8_t cat702_device::compute_sbox_coef(int sel, int bit)
+uint8_t cat702_device_base::compute_sbox_coef(int sel, int bit)
 {
-	if(!sel)
+	if (!sel)
 		return m_transform[bit];
 
-	uint8_t r = compute_sbox_coef((sel-1) & 7, (bit-1) & 7);
-	r = (r << 1)|(((r >> 7)^(r >> 6)) & 1);
-	if(bit != 7)
+	uint8_t r = compute_sbox_coef((sel - 1) & 7, (bit - 1) & 7);
+	r = (r << 1) | (BIT(r, 7) ^ BIT(r, 6));
+	if (bit != 7)
 		return r;
 
 	return r ^ compute_sbox_coef(sel, 0);
 }
 
 // Apply the sbox for a input 0 bit
-void cat702_device::apply_bit_sbox(int sel)
+void cat702_device_base::apply_bit_sbox(int sel)
 {
-	int i;
 	uint8_t r = 0;
-	for(i=0; i<8; i++)
-		if(m_state & (1<<i))
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_state, i))
 			r ^= compute_sbox_coef(sel, i);
-
+	}
 	m_state = r;
 }
 
 // Apply a sbox
-void cat702_device::apply_sbox(const uint8_t *sbox)
+void cat702_device_base::apply_sbox(const uint8_t *sbox)
 {
-	int i;
 	uint8_t r = 0;
-	for(i=0; i<8; i++)
-		if(m_state & (1<<i))
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_state, i))
 			r ^= sbox[i];
-
+	}
 	m_state = r;
 }
+
+void cat702_device_base::write_datain(int state)
+{
+	m_datain = state;
+}
+
+
+///////////////
+
+
+cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cat702_device_base(mconfig, CAT702, tag, owner, clock)
+{
+}
+
 
 void cat702_device::write_select(int state)
 {
@@ -201,8 +219,6 @@ void cat702_device::write_select(int state)
 
 void cat702_device::write_clock(int state)
 {
-	static const uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
-
 	if (!state && m_clock && !m_select)
 	{
 		if (m_bit==0)
@@ -212,7 +228,7 @@ void cat702_device::write_clock(int state)
 		}
 
 		// Compute the output and change the state
-		m_dataout_handler(((m_state >> m_bit) & 1) != 0);
+		m_dataout_handler(BIT(m_state, m_bit));
 	}
 
 	if (state && !m_clock && !m_select)
@@ -220,14 +236,75 @@ void cat702_device::write_clock(int state)
 		if (!m_datain)
 			apply_bit_sbox(m_bit);
 
-		m_bit++;
-		m_bit&=7;
+		m_bit = (m_bit + 1) & 7;
 	}
 
 	m_clock = state;
 }
 
-void cat702_device::write_datain(int state)
+
+///////////////
+
+cat702_piu_device::cat702_piu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cat702_device_base(mconfig, CAT702_PIU, tag, owner, clock)
 {
-	m_datain = state;
+}
+
+void cat702_piu_device::write_select(int state)
+{
+	if (m_select != state)
+	{
+		if (!state)
+		{
+			m_state = 0xfc;
+			m_bit = 0;
+
+			apply_sbox(initial_sbox);
+		}
+		else
+		{
+			m_dataout_handler(1);
+		}
+
+		m_select = state;
+	}
+}
+
+void cat702_piu_device::write_clock(int state)
+{
+	/*
+	Pump It Up uses a CAT702 but accesses it directly and in a way that
+	seems conflicting with how the ZN uses it through the PS1's SIO.
+
+	This is the sequence performed with clock and data lines write and read data:
+	write unkbit 0
+	write unkbit 1
+	write select 0
+	loop for all bits that need to be transferred:
+	    write clk = 0, data = x
+	    write clk = x, data = 0/1
+	    write clk = 1, data = x
+	    read data
+	write select 1
+
+	Modifying the old code to work with PIU breaks ZN games.
+	*/
+	if (state && !m_clock && !m_select)
+	{
+		// Compute the output and change the state
+		if (!m_datain)
+			apply_bit_sbox(m_bit);
+
+		m_bit = (m_bit + 1) & 7;
+
+		if (m_bit == 0)
+		{
+			// Apply the initial sbox
+			apply_sbox(initial_sbox);
+		}
+
+		m_dataout_handler(BIT(m_state, m_bit));
+	}
+
+	m_clock = state;
 }

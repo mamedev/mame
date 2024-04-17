@@ -249,7 +249,7 @@ static INPUT_PORTS_START( sicv_base )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )   // sicv has a DIP switch connected here
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED )    // tied high via 1k resistor on schematic
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNUSED )    // tied high via 1k resistor on schematic
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )    // tied high via 1k resistor on schematic (shard with IN1 bit 3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )    // tied high via 1k resistor on schematic (shared with IN1 bit 3)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )    // tied high via 1k resistor on schematic
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNUSED )    // not connected (floating) on schematic)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )    // tied high via 1k resistor on schematic
@@ -1555,6 +1555,7 @@ static INPUT_PORTS_START( rollingc )
 	PORT_INCLUDE( sicv_base )
 
 	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rollingc_state, game_select_r)
 
 	PORT_MODIFY("IN1")
@@ -4111,7 +4112,7 @@ void cane_state::cane(machine_config &config)
 	CANE_AUDIO(config, "soundboard");
 }
 
-void cane_state::cane_unknown_port0_w(u8 data)
+void cane_state::cane_unknown_port0_w(uint8_t data)
 {
 	logerror("Unmapped io memory write to 00 = 00 %u\n", data);
 }
@@ -4140,13 +4141,13 @@ void cane_state::cane_unknown_port0_w(u8 data)
 
 ***********************************************************************************************************************************/
 
-u8 orbite_state::orbite_scattered_colorram_r(address_space &space, offs_t offset, u8 mem_mask)
+uint8_t orbite_state::orbite_scattered_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
 }
 
 
-void orbite_state::orbite_scattered_colorram_w(address_space &space, offs_t offset, u8 data, u8 mem_mask)
+void orbite_state::orbite_scattered_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
 }

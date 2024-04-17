@@ -4637,21 +4637,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dueldigt">
-		<description>Dueling Digits</description>
-		<year>1982</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 48K Apple II or II+. Due to compatibility problems created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
-		<!-- Dump released: 2019-05-01 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="352021">
-				<rom name="dueling digits.woz" size="352021" crc="f1a7b5dc" sha1="cebd874ea25606d8ddbd566813beecfaa4973b67" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="elite">
 		<description>Elite</description>
 		<year>1985</year>
@@ -12792,21 +12777,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="conqfrpm">
-		<description>Conquering Fractions (+, -) (version 1.0)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241048">
-				<rom name="conquering fractions (addition, subtraction).woz" size="241048" crc="282f2022" sha1="61ee416fbc5a965d9c7912bd514db601c1b1d198" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bgtrck21">
 		<description>Bag of Tricks (version 2.1)</description>
 		<year>1987</year>
@@ -12953,21 +12923,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="aartrcks">
-		<description>Amazing Arithmetricks (version 1.0)</description>
-		<year>1993</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-08 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234873">
-				<rom name="amazing arithmetricks.woz" size="234873" crc="1cc7086a" sha1="616e7ea3898b3a9dccc1cd37820f533fbf416bc5" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wndlpzls">
 		<description>Wonderland Puzzles (version 1.0)</description>
 		<year>1992</year>
@@ -12979,21 +12934,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234836">
 				<rom name="wonderland puzzles.woz" size="234836" crc="da667e28" sha1="a4e487b3500f1c1880efa815b83482ca9997ae32" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="conqfrmd">
-		<description>Conquering Fractions (×, ÷) (version 1.0)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241036">
-				<rom name="conquering fractions (multiplication, division).woz" size="241036" crc="dddd9a92" sha1="81399db18fc7fb13c683c8f579bd605de82303f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -13088,88 +13028,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cryptqst">
-		<description>CryptoQuest (version 1.0)</description>
-		<year>1993</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-08 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234849">
-				<rom name="cryptoquest.woz" size="234849" crc="3cdc455e" sha1="a798f153f829687f7d1e48a3eb5278c1b6aa27d9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="elecadvt">
-		<description>Electrifying Adventures (version 1.0)</description>
-		<year>1993</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-08 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234855">
-				<rom name="electrifying adventures.woz" size="234855" crc="bbe4f440" sha1="0680fed43bdb9945b25809e9408664ba0ac4c1f3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="eerilibr">
-		<description>Eerieville Library (version 1.0)</description>
-		<year>1993</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-08 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234846">
-				<rom name="eerieville library.woz" size="234846" crc="a39fd0fd" sha1="b872f82ed763c17b9236236d5777c795707ec932" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="drlivstn">
-		<description>Dr. Livingstone, I Presume? (version 1.0)</description>
-		<year>1992</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-09 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234848">
-				<rom name="dr. livingstone, i presume side a.woz" size="234848" crc="83287d89" sha1="aeefd8ee425e6cd9496b936393842139f1ab5993" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234848">
-				<rom name="dr. livingstone, i presume side b.woz" size="234848" crc="20b8e890" sha1="8e4dbd8059bc680f2880f2af1a1d67670297a6d5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="decconc">
-		<description>Decimal Concepts (version 1.0)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234698">
-				<rom name="decimal concepts.woz" size="234698" crc="06e3856c" sha1="56ec59ea0330161f889fa44c0310ddbf6ec9d0d4" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="picastory">
 		<description>Picture a Story (version 1.0)</description>
 		<year>1992</year>
@@ -13226,21 +13084,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234872">
 				<rom name="exploring sequences and series.woz" size="234872" crc="56aa52cd" sha1="53f75c0913cb8a3a30bf29af04c1f142a8e6322f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cavbustr">
-		<description>Cavity Busters (version 1.0)</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-09 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241539">
-				<rom name="cavity busters.woz" size="241539" crc="6cd640b3" sha1="fb7432c0dd5a894c7daef8811acdb8ba74be0b42" />
 			</dataarea>
 		</part>
 	</software>
@@ -13320,21 +13163,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="conqdcmd">
-		<description>Conquering Decimals (×, ÷) (version 1.0)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234803">
-				<rom name="conquering decimals (multiplication, division).woz" size="234803" crc="ff020002" sha1="b8cd573141127a215b7fcbf0341cec86804d3a3b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="grmrtysh">
 		<description>Grammar Toy Shop (version 1.0)</description>
 		<year>1990</year>
@@ -13346,21 +13174,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234868">
 				<rom name="grammar toy shop.woz" size="234868" crc="4534fe62" sha1="9188f8776850a2d5faeb188453ae0e1616e47f92" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clnwtdet">
-		<description>Cleanwater Detectives (version 1.0)</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-10 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234852">
-				<rom name="cleanwater detectives.woz" size="234852" crc="9c78798e" sha1="28cd9843860f74cad155cca29a2a26e37fb0dd38" />
 			</dataarea>
 		</part>
 	</software>
@@ -13485,21 +13298,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="conqscpm">
-		<description>Conquering Decimals (+, -) (version 1.0)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234870">
-				<rom name="conquering decimals (addition, subtraction).woz" size="234870" crc="6b6384cb" sha1="1076355dcd45bb725c861811221ad07ba4f3cd4d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="exgaslws">
 		<description>Exploring Gas Laws (version 1.0)</description>
 		<year>1989</year>
@@ -13526,36 +13324,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241528">
 				<rom name="invisible bugs.woz" size="241528" crc="8232ec2d" sha1="c5e07824a0d8e378d7210fc50b8c459c84e4581f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bckydbrd">
-		<description>Backyard Birds (version 1.0)</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-11 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234872">
-				<rom name="backyard birds.woz" size="234872" crc="e4045b4e" sha1="8dcd3c0b1a7dfd93bc456284e316ba6c73f53873" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bgbluff">
-		<description>Bluegrass Bluff (version 1.0)</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-11 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234869">
-				<rom name="bluegrass bluff.woz" size="234869" crc="ccef05ca" sha1="4cf9cbf571e3de33af0cb70101f099f3aa55aa4b" />
 			</dataarea>
 		</part>
 	</software>
@@ -13638,36 +13406,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234786">
 				<rom name="those amazing reading machines iii.woz" size="234786" crc="9f803984" sha1="a36039d301953112003dea3a44c813ddd4a3a152" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="commky11">
-		<description>CommuniKeys (version 1.1)</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-12 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234877">
-				<rom name="communikeys v1.1.woz" size="234877" crc="2f9a3ab2" sha1="0f3e5e1b3ee5ffd1ef8c0d48e2916af80aa8064d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="frcpru11">
-		<description>Fraction Practice Unlimited (version 1.1)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234777">
-				<rom name="fraction practice unlimited v1.1.woz" size="234777" crc="f3d55989" sha1="9c429f40ec75e07fec9b95c0972e94261809f9a7" />
 			</dataarea>
 		</part>
 	</software>
@@ -16579,102 +16317,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mcaricr35v1">
-		<description>Arithmetic Critters (version 1.0) (800K 3.5")</description>
-		<year>1986</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-08-06 redumped: 2021-12-14 to fix incorrect header information -->
-		<!--"Arithmetic Critters" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345310">
-				<rom name="arithmetic critters 800k.woz" size="1345310" crc="74b14b19" sha1="7b7eeb909cbdc1de88a346d2657429c82fda17c8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clckwrks">
-		<description>Clock Works (version 1.0) (800K 3.5")</description>
-		<year>1986</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-08-09 redumped: 2021-12-14 to fix incorrect header information -->
-		<!--"Clock Works" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345302">
-				<rom name="clock works 800k.woz" size="1345302" crc="10213777" sha1="9d854320f839c567d42448d8925b648ece7b0e31" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bckydbrd35">
-		<description>Backyard Birds (version 1.0) (800K 3.5")</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-08-09 redumped: 2021-12-14 to fix incorrect header information -->
-		<!--"Backyard Birds" is a 1989 educational program developed by Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345386">
-				<rom name="backyard birds 800k.woz" size="1345386" crc="1929bb55" sha1="12a3cee293e0d96e7bf4d2928ef1dd14e60a8514" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mcchembe35">
-		<description>Chemistry: Balancing Equations (version 1.0) (800K 3.5")</description>
-		<year>1990</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-08-09 -->
-		<!--"Chemistry: Balancing Equations" is a 1990 educational program developed by Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296232">
-				<rom name="chemistry- balancing equations 800k.woz" size="1296232" crc="741bcaa4" sha1="93f7dc5c6b6b9737628bcbd540918aee4ec7e746" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clnwtdet35">
-		<description>Cleanwater Detectives (800K 3.5")</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-08-09 -->
-		<!--"Cleanwater Detectives" is a 1991 educational program developed by Vincent J. Erickson, John Ojanen, and Diane Portner, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345366">
-				<rom name="cleanwater detectives 800k.woz" size="1345366" crc="051bbdd2" sha1="64306906c5ea53e08c80f86d56eb1840e15f0277" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cirmth35">
-		<description>Circus Math (version 1.0) (800K 3.5")</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-08-10 -->
-		<!--"Circus Math" is a 1984 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345309">
-				<rom name="circus math 800k.woz" size="1345309" crc="e676033e" sha1="f12e92bd54cbfb5bfb37181b8106031fb1a43feb" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vcrc1135">
 		<description>VCR Companion (version 1.1) (800K 3.5")</description>
 		<year>1988</year>
@@ -19102,22 +18744,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mccryptoq35">
-		<description>Cryptoquest (version 1.0) (800K 3.5")</description>
-		<year>1993</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-25 -->
-		<!--"Cryptoquest" is a 1993 educational program developed by Mark Durkin, Rod Haenke, Ruth Kivisto, and Mike Tschimperle, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. Note: this image has been modified to remove identifying site license information.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296218">
-				<rom name="cryptoquest 800k.woz" size="1296218" crc="08cf7ada" sha1="310fc8b1db2e827fb5678e08de4271699fffd7fe" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcscigiant35">
 		<description>Science Giants (version 1.0) (800K 3.5")</description>
 		<year>1994</year>
@@ -19278,38 +18904,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mccttimb35">
-		<description>Caravans to Timbuktu! (version 1.0) (800K 3.5")</description>
-		<year>1994</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-26 -->
-		<!--"Caravans to Timbuktu!" is a 1994 educational program developed by Rich Bergeron, Beth Daniels, Dee Dee Daus, Debbie Effertz, Marty Euerle, Lon Koenig, Dan Megears, Sue Minor, Lawrence Peterson, Ju-Chang Wang, LaDonna Williams, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. Note: this image has been modified to remove identifying site license information.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296325">
-				<rom name="caravans to timbuktu 800k.woz" size="1296325" crc="07d2d2ab" sha1="7babe6d2b0d5434d099a32fb04cdb1bd95836a70" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mcamzatk35">
-		<description>Amazing Arithmetricks (version 1.0) (800K 3.5")</description>
-		<year>1993</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-26 -->
-		<!--"Amazing Arithmetricks" is a 1993 educational program developed by Diane Portner, Korey Schulz, Ju-Chang Wang, John P. Wlazlo, and Shari Zehm, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. Note: this image has been modified to remove identifying site license information.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296242">
-				<rom name="amazing arithmetricks 800k.woz" size="1296242" crc="62cf2ca1" sha1="20afc8993c762ff0bba90e6f7397bd91d91c3150" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcpicstory35">
 		<description>Picture a Story (version 1.0) (800K 3.5")</description>
 		<year>1992</year>
@@ -19390,22 +18984,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mcdueldig35">
-		<description>Dueling Digits (version 1.0) (800K 3.5")</description>
-		<year>1993</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-26 -->
-		<!--"Dueling Digits" is a 1993 educational program developed by Dave Denninger, Rod Haenke, Ju-Chang Wang, and John P. Wlazlo, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. Note: this image has been modified to remove identifying site license information.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296223">
-				<rom name="dueling digits 800k.woz" size="1296223" crc="38478627" sha1="e93e01bee99ab7beb1fc5651968c30f7840d012c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mchistmakr35">
 		<description>History Makers (version 1.0) (800K 3.5")</description>
 		<year>1992</year>
@@ -19418,38 +18996,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296277">
 				<rom name="history makers 800k.woz" size="1296277" crc="7d02216a" sha1="83057b57e637c05410ba4aebbb9de651ad9bfe92" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mcdrlivi35">
-		<description>Dr. Livingstone, I Presume? (version 1.0) (800K 3.5")</description>
-		<year>1992</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-26 -->
-		<!--"Dr. Livingstone, I Presume?" is a 1992 educational program developed by R. Philip Bouchard, David L. Wood, Shari Zehm, and John A. Persoon, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. Note: this image has been modified to remove identifying site license information.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296241">
-				<rom name="dr. livingstone, i presume 800k.woz" size="1296241" crc="37d8ad84" sha1="95b59f5fe39dc1fc3a5b3f52bed0e3587eaf953d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mceerievl35">
-		<description>Eerieville Library (version 1.0) (800K 3.5")</description>
-		<year>1992</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-26 -->
-		<!--"Eerieville Library" is a 1992 educational program developed by Sheila Dols, Kevin Neff, Mike Palmquist, Mike Tschimperle, and John Wlazlo, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. Note: this image has been modified to remove identifying site license information.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296239">
-				<rom name="eerieville library 800k.woz" size="1296239" crc="1a2a0820" sha1="3052df43d75f156f83ef50b78bf209b1098f36e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -19886,22 +19432,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mcfrccon1235">
-		<description>Fraction Concepts, Inc. (version 1.2) (800K 3.5")</description>
-		<year>1987</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Fraction Concepts, Inc." is a 1987 educational program developed and distributed by MECC. This is version 1.2. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1344295">
-				<rom name="fraction concepts, inc. 800k.woz" size="1344295" crc="e0d544af" sha1="2833bd6be6e3160ad2fad3e7775e654cd0886013" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="stystsci35">
 		<description>Story Starters: Science (800K 3.5")</description>
 		<year>1990</year>
@@ -19966,22 +19496,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mccmk1135">
-		<description>CommuniKeys (version 1.1) (800K 3.5")</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"CommuniKeys" is a 1989 educational program developed by Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser, and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345423">
-				<rom name="communikeys 800k.woz" size="1345423" crc="16374785" sha1="207c41b559050d4f96f833077574cae8be669362" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcfrmn1035">
 		<description>Fraction Munchers (version 1.0) (800K 3.5")</description>
 		<year>1987</year>
@@ -19994,70 +19508,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345313">
 				<rom name="fraction munchers 800k.woz" size="1345313" crc="8bce93a6" sha1="bc25b9b3e88ad5483e8de6aaa1dd1d391148e18b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mccdas1135">
-		<description>Conquering Decimals (+, -) (version 1.1) (800K 3.5")</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Conquering Decimals (+, -)" is a 1988 educational program developed by Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345420">
-				<rom name="conquering decimals (addition, subtraction) 800k.woz" size="1345420" crc="6cb089b2" sha1="379d5e51449a193e30a20461b9d5d85928b29ed7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mccfas1135">
-		<description>Conquering Fractions (+, -) (version 1.1) (800K 3.5")</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Conquering Fractions (+, -)" is a 1988 educational program developed by Sheila Dols, Vincent Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345452">
-				<rom name="conquering fractions (addition, subtraction) 800k.woz" size="1345452" crc="96506a24" sha1="95a05d33c89f05c8360b2fd8dbb6699ede45233c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mccdmd1135">
-		<description>Conquering Decimals (x, /) (version 1.1) (800K 3.5")</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Conquering Decimals (x, /)" is a 1988 educational program developed by Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345420">
-				<rom name="conquering decimals (multiplication, division) 800k.woz" size="1345420" crc="2acc2070" sha1="0fab5a373b829bf6b6b40f96d7c27cb6226ee984" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mccfmd1135">
-		<description>Conquering Fractions (x, /) (version 1.1) (800K 3.5")</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Conquering Fractions (x, /)" is a 1988 educational program developed by Sheila Dols, Vincent Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345452">
-				<rom name="conquering fractions (multiplication, division) 800k.woz" size="1345452" crc="eefdb033" sha1="5d857b4d076db607ae2271fa6388536494119685" />
 			</dataarea>
 		</part>
 	</software>
@@ -20519,22 +19969,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mccwhnum1135">
-		<description>Conquering Whole Numbers (version 1.1) (800K 3.5")</description>
-		<year>1987</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-02 -->
-		<!--"Conquering Whole Numbers" is a 1987 educational program developed and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345322">
-				<rom name="conquering whole numbers 800k.woz" size="1345322" crc="a86a0c22" sha1="39d1b854624a062f03545888982bcb3f4954f5ca" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="galquest">
 		<description>Galactic Quest</description>
 		<year>1980</year>
@@ -20579,22 +20013,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345314">
 				<rom name="jenny's journeys 800k.woz" size="1345314" crc="f077ef2a" sha1="f6c6279c28c45ec9137cb960ff5505df6d916914" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mcmmwgen1135">
-		<description>Mastering Math Worksheet Generator (version 1.1) (800K 3.5")</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-02 -->
-		<!--"Mastering Math Worksheet Generator" is a 1985 educational program developed and distributed by MECC. This is version 1.1. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345332">
-				<rom name="mastering math worksheet generator 800k.woz" size="1345332" crc="9cf3e194" sha1="12bd756088f5b5ea6b5a118ddd1d173ba9d000af" />
 			</dataarea>
 		</part>
 	</software>
@@ -23281,10 +22699,10 @@ license:CC0-1.0
 		<description>The Factory (800K 3.5")</description>
 		<year>1990</year>
 		<publisher>WINGS for learning</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card " />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card " />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-09-10 -->
-		<!--"The Factory: Strategies in Problem Solving" is an educational program developed by Marge Cappo and Mike Fish. This re-release on 3.5-inch disk is dated 1990 and is distributed by WINGS for learning. It requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card.-->
+		<!--"The Factory: Strategies in Problem Solving" is an educational program developed by Marge Cappo and Mike Fish. This re-release on 3.5-inch disk is dated 1990 and is distributed by WINGS for learning. It requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1329991">
@@ -24345,51 +23763,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="addlogic10">
-		<description>Addition Logician (version 1.0) (800K 3.5")</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-03-27 -->
-		<!--"Addition Logician" is a 1984 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk.-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345307">
-				<rom name="addition logician 800k.woz" size="1345307" crc="bcdb5108" sha1="6c732b0b5067fd9305d76a37a98071e2c62fd40e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="comath11">
-		<description>Coordinate Math (version 1.1) (800K 3.5")</description>
-		<year>1987</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-03-27 -->
-		<!--"Coordinate Math" is a 1987 educational program developed and distributed by MECC. This is version 1.1. It is distributed on a single 3.5-inch (800K) disk.-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345305">
-				<rom name="coordinate math v1.1 800k.woz" size="1345305" crc="cadd691a" sha1="47c72fe236d3b177e6ac8140f9dee43643256d4a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="funaz10">
-		<description>Fun from A to Z (version 1.0) (800K 3.5")</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-03-27 -->
-		<!--"Fun from A to Z" is a 1985 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk.-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296153">
-				<rom name="fun from a to z 800k.woz" size="1296153" crc="cf7bac85" sha1="386aed582de7aad50607a367ef862b18f1d6cbb8" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pptblends10">
 		<description>Phonics Prime Time: Blends and Digraphs (version 1.0) (800K 3.5")</description>
 		<year>1987</year>
@@ -24416,21 +23789,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296223">
 				<rom name="problem-solving with nim 800k.woz" size="1296223" crc="f7c23313" sha1="7636208003087cf447f90f6381936957990e49a7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fracprau12">
-		<description>Fraction Practice Unlimited (version 1.2) (800K 3.5")</description>
-		<year>1987</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-03-27 -->
-		<!--"Fraction Practice Unlimited" is a 1987 educational program developed and distributed by MECC. This is version 1.2. It is distributed on a single 3.5-inch (800K) disk.-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345301">
-				<rom name="fraction practice unlimited v1.2 800k.woz" size="1345301" crc="cfd76748" sha1="855b04291203922a329b4298f1b7b32933f593c4" />
 			</dataarea>
 		</part>
 	</software>
@@ -25849,36 +25207,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="compinsp10">
-		<description>Computer Inspector (version 1.0)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Computer Inspector" is a 1988 program developed by Diane Portner, Craig Solomonson, Michael Stein, and James Thompson, and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234859">
-				<rom name="computer inspector v1.0.woz" size="234859" crc="5755f31d" sha1="bb86a8916a6a713fd3a2d06f26dffe456a975a55" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="addlog10">
-		<description>Addition Logician (version 1.0)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Addition Logician" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234776">
-				<rom name="addition logician v1.0.woz" size="234776" crc="8c18aea7" sha1="ec0c272033dbb3b6c0235b5fff7bcfa194c4bea1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lurkhorr203m">
 		<description>The Lurking Horror (Release 203 / 870506-M)</description>
 		<year>1987</year>
@@ -25890,126 +25218,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234818">
 				<rom name="the lurking horror r203-870506-m.woz" size="234818" crc="b1215804" sha1="4d52b2ce4919ec5db7b5513997791442a325420c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="advfrac10">
-		<description>Adventures with Fractions (version 1.0)</description>
-		<year>1983</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Adventures with Fractions" is a 1983 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234800">
-				<rom name="adventures with fractions v1.0.woz" size="234800" crc="b9cee37c" sha1="f93862c552c9954d6c695518dfb4d56e84dd9c32" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="autotech110">
-		<description>Automotive Technician Mathematics Volume 1: Whole Numbers and Fractions (version 1.0)</description>
-		<year>1983</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Automotive Technician Mathematics Volume 1: Whole Numbers and Fractions" is a 1983 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234854">
-				<rom name="automotive technician mathematics volume i v1.0.woz" size="234854" crc="ffae07f2" sha1="e08a373d9023f78b6594bc1f0bc8ca2be9cd77e1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="autotech210">
-		<description>Automotive Technician Mathematics Volume 2: Decimals and Percents (version 1.0)</description>
-		<year>1983</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Automotive Technician Mathematics Volume 2: Decimals and Percents" is a 1983 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234848">
-				<rom name="automotive technician mathematics volume ii v1.0.woz" size="234848" crc="cc38eda5" sha1="ca470fdc25ac9ddea31287d7e5c890ebdc987d8a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="circmath10">
-		<description>Circus Math (version 1.0)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Circus Math" is a 1984 educational program developed and distributed by MECC. This is version 1.0. -->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234801">
-				<rom name="circus math v1.0.woz" size="234801" crc="441d4b88" sha1="485b232fedc0c90f8c7c8e11ea68e9cc31d430d8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cgmm1ps11">
-		<description>Computer Generated Mathematics Materials Volume 1: Problem Solving (version 1.1)</description>
-		<year>1982</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Computer Generated Mathematics Materials Volume 1: Problem Solving" is a 1982 educational program developed and distributed by MECC. This is version 1.1.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234849">
-				<rom name="computer generated mathematics materials volume 1- problem solving v1.1.woz" size="234849" crc="7de3f3b1" sha1="b8ad3d3f653d91a2baff5c774c5fe5388a5b803e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cgmm1ps13">
-		<description>Computer Generated Mathematics Materials Volume 1: Problem Solving (version 1.3)</description>
-		<year>1982</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Computer Generated Mathematics Materials Volume 1: Problem Solving" is a 1982 educational program developed and distributed by MECC. This is version 1.3.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234849">
-				<rom name="computer generated mathematics materials volume 1- problem solving v1.3.woz" size="234849" crc="1288fe4f" sha1="fecefc67af12a51480feed322473aba622dae0a0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crtbase10">
-		<description>Create-A-Base (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Create-A-Base" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234788">
-				<rom name="create-a-base v1.0.woz" size="234788" crc="a708a5f2" sha1="a511c4dcefa007ed923d62b5c8a9149745a0ed4a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="earlyadd13">
-		<description>Early Addition (version 1.3)</description>
-		<year>1983</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-15 -->
-		<!--"Early Addition" is a 1983 educational program developed and distributed by MECC. This is version 1.3.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234789">
-				<rom name="early addition v1.3.woz" size="234789" crc="cf5f5e0e" sha1="a6eeb4620fb6770ed5a37f05a5d24c68df269635" />
 			</dataarea>
 		</part>
 	</software>
@@ -26239,21 +25447,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="loggates10">
-		<description>Logic Gates (version 1.0)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-16 -->
-		<!--"Logic Gates" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234786">
-				<rom name="logic gates v1.0.woz" size="234786" crc="41e6d237" sha1="421d401d53dc1155280c6133b5b0430f17b0d468" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mastspell13">
 		<description>Master Spell (version 1.3)</description>
 		<year>1984</year>
@@ -26389,21 +25582,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sptstat10">
-		<description>Sports Stats (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-20 -->
-		<!--"Sports Stats" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234787">
-				<rom name="sports stats v1.0.woz" size="234787" crc="cb25650f" sha1="14f5c15660cb1964d8f0038a2b4e4ca649aa29a2" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="3rmicro11">
 		<description>The Three Rs of Microcomputing (version 1.1)</description>
 		<year>1983</year>
@@ -26415,66 +25593,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234805">
 				<rom name="the three rs of microcomputing v1.1.woz" size="234805" crc="f0d6f661" sha1="cc919a1cd7bb44873c9655bd51f9dbbcf0947451" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arithcrit10">
-		<description>Arithmetic Critters (version 1.0)</description>
-		<year>1986</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Arithmetic Critters" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234809">
-				<rom name="arithmetic critters v1.0.woz" size="234809" crc="ad004a17" sha1="2dbf87feabeccfc6807069171a8b0e29e4196ef6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clockwrks10">
-		<description>Clock Works (version 1.0)</description>
-		<year>1986</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Clock Works" is a 1986 educational program developed and distributed by MECC.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234801">
-				<rom name="clock works v1.0.woz" size="234801" crc="64e041b5" sha1="309e2bdd0b16b203391c454fdd4fe545ba26a1cd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="countcrit10">
-		<description>Counting Critters (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Counting Critters" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234776">
-				<rom name="counting critters v1.0.woz" size="234776" crc="83110c9b" sha1="8a9d33e555c289c261a5020fa3e2d747d2151651" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="funatoz10">
-		<description>Fun from A to Z (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Fun from A to Z" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234774">
-				<rom name="fun from a to z v1.0.woz" size="234774" crc="d57016f2" sha1="a67f38e5902073441677389a85411b15d13171e6" />
 			</dataarea>
 		</part>
 	</software>
@@ -26524,21 +25642,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="multpuzz10">
-		<description>Multiplication Puzzles (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Multiplication Puzzles" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234812">
-				<rom name="multiplication puzzles v1.0.woz" size="234812" crc="a3e348ab" sha1="21e2538ba892f887e414733e88709afafb0ea9b0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="odelllk10">
 		<description>Odell Lake (version 1.0)</description>
 		<year>1986</year>
@@ -26569,36 +25672,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="quotqst10">
-		<description>Quotient Quest (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Quotient Quest" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234773">
-				<rom name="quotient quest v1.0.woz" size="234773" crc="fbae3f5c" sha1="3f20307128fcfd1362ada613557920de54af6281" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spcsub10">
-		<description>Space Subtraction (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Space Subtraction" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234776">
-				<rom name="space subtraction v1.0.woz" size="234776" crc="7d14fcef" sha1="31a2ddfca98b5e36219ea40d194e747c26461227" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="studygui15">
 		<description>Study Guide (version 1.5)</description>
 		<year>1984</year>
@@ -26617,21 +25690,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Data master disk" />
 			<dataarea name="flop" size="241442">
 				<rom name="study guide v1.5 disk 2 - data master.woz" size="241442" crc="12ede32a" sha1="78f1f86b7c9d4c2d20047cb3017f05e5f76b35bf" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="subpuzz10">
-		<description>Subtraction Puzzles (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Subtraction Puzzles" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234778">
-				<rom name="subtraction puzzles v1.0.woz" size="234778" crc="1d963eea" sha1="c7f6824c3b021851332b50b16f3d8baa44540642" />
 			</dataarea>
 		</part>
 	</software>
@@ -26695,126 +25753,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="chembaleq10">
-		<description>Chemistry: Balancing Equations (version 1.0)</description>
-		<year>1990</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Chemistry: Balancing Equations" is a 1990 educational program developed by Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234852">
-				<rom name="chemistry- balancing equations v1.0.woz" size="234852" crc="435e15cb" sha1="013df30277d6d734d6c5e25ef0c58569fb60fcef" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chempertab10">
-		<description>Chemistry: The Periodic Table (version 1.0)</description>
-		<year>1988</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Chemistry: The Periodic Table" is a 1988 educational program developed by Gene Breault, Charolyn Kapplinger, Kevin W. Neff, John Persoon, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234890">
-				<rom name="chemistry- the periodic table v1.0.woz" size="234890" crc="232c6255" sha1="e52f576c864fe325dcb705513b53ebafb628a430" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="commkeys10">
-		<description>CommuniKeys (version 1.0)</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-23-->
-		<!--"CommuniKeys" is a 1989 educational program developed by Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser, and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234900">
-				<rom name="communikeys v1.0.woz" size="234900" crc="ba6bf6fa" sha1="11b60fa9f5d4e142dc5cdb5f8d3275d154e2088f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="conqmwg10">
-		<description>Conquering Math Worksheet Generator (version 1.0)</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Conquering Math Worksheet Generator" is a 1989 educational program developed by Sue Gabrys, Shari Glenn, Scott Jensen, and Kevin Neff, and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234865">
-				<rom name="conquering math worksheet generator v1.0.woz" size="234865" crc="94c8465b" sha1="85a29fdf171ffabd8c0c08d80851da17260a7554" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="conqper10">
-		<description>Conquering Percents (version 1.0)</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Conquering Percents" is a 1989 educational program developed by Sheila Dols, Susan Gabrys, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Pat Korn, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234930">
-				<rom name="conquering percents v1.0.woz" size="234930" crc="74e99302" sha1="a45fe02e8ac0d8a0587202ddc21bd546fb25b46a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="conqratpr11">
-		<description>Conquering Ratios and Proportions (version 1.1)</description>
-		<year>1989</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Conquering Ratios and Proportions" is a 1989 educational program developed by Sheila Dols, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Diana Lin, Jane Peterson, and Craig Solomonson, and distributed by MECC. This is version 1.1.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234914">
-				<rom name="conquering ratios and proportions v1.1.woz" size="234914" crc="fb6f1075" sha1="c4740f1acc2acd6146aad597ef3a37e7f1459555" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="coordmath10">
-		<description>Coordinate Math (version 1.0)</description>
-		<year>1987</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Coordinate Math" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234788">
-				<rom name="coordinate math v1.0.woz" size="234788" crc="63fbfbc8" sha1="cc7a29b9765f212f32b99117da00fa0bf99e880d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dqsamp10">
-		<description>Dataquest: Sampler (version 1.0)</description>
-		<year>1986</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Dataquest: Sampler" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234791">
-				<rom name="dataquest- sampler v1.0.woz" size="234791" crc="4614b4ca" sha1="0990bc15bdec596603cb4d6f632f29547df9d795" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="equatmath10">
 		<description>Equation Math (version 1.0)</description>
 		<year>1987</year>
@@ -26841,36 +25779,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234903">
 				<rom name="estimation- quick solve ii v1.0.woz" size="234903" crc="5378dd49" sha1="05ed9d2968c1ad7b237bd8b7caba3a457634e58a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fractcon12">
-		<description>Fraction Concepts, Inc. (version 1.2)</description>
-		<year>1987</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Fraction Concepts, Inc." is a 1987 educational program developed and distributed by MECC. This is version 1.2.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234796">
-				<rom name="fraction concepts, inc. v1.2.woz" size="234796" crc="4afaa0fa" sha1="1b47dbd1863b26d72afe0261b916357a24edcabe" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fractpru10">
-		<description>Fraction Practice Unlimited (version 1.0)</description>
-		<year>1987</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-23-->
-		<!--"Fraction Practice Unlimited" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234800">
-				<rom name="fraction practice unlimited v1.0.woz" size="234800" crc="7ca86529" sha1="f715773fcf8ad4e84a30b0b4ee4776f05ad99979" />
 			</dataarea>
 		</part>
 	</software>
@@ -26908,21 +25816,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Sampler disk" />
 			<dataarea name="flop" size="234930">
 				<rom name="instant survey v1.0 disk 2 - sampler.woz" size="234930" crc="0e0350d7" sha1="b0d2c559bbc70b1a40276c79984d926f5371c623" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybdmas10">
-		<description>Keyboarding Master (version 1.0)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Keyboarding Master" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234775">
-				<rom name="keyboarding master v1.0.woz" size="234775" crc="cb33bd28" sha1="3a1899634a7ba0820058bfb04fa764583a9058c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -28008,6 +26901,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="advfrac10">
+		<description>Adventures with Fractions (A-774 version 1.0)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-774" />
+		<info name="programmer" value="H. Bill Way and Mike Boucher"/>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="adventures with fractions v1.0.woz" size="234800" crc="b9cee37c" sha1="f93862c552c9954d6c695518dfb4d56e84dd9c32" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="afbiglit">
 		<description>Alphabet Fun: Big and Little Letters</description>
 		<year>1991</year>
@@ -28036,6 +26947,42 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241486">
 				<rom name="alphabet fun- learning the alphabet.woz" size="241486" crc="4ea03524" sha1="a9ac293a69862d1bbcab965216ff8f25ad1fe0c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazarit_525" cloneof="amazarit">
+		<description>Amazing Arithmetricks (A-336 version 1.0)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-336" />
+		<info name="programmer" value="Diane Portner, Korey Schulz, Ju-Chang Wang, John P. Wlazlo, and Shari Zehm"/>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-08-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234873">
+				<rom name="amazing arithmetricks.woz" size="234873" crc="1cc7086a" sha1="616e7ea3898b3a9dccc1cd37820f533fbf416bc5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazarit">
+		<description>Amazing Arithmetricks (A-336 version 1.0) (800K 3.5")</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-336" />
+		<info name="programmer" value="Diane Portner, Korey Schulz, Ju-Chang Wang, John P. Wlazlo, and Shari Zehm"/>
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-26-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296242">
+				<rom name="amazing arithmetricks 800k.woz" size="1296242" crc="62cf2ca1" sha1="20afc8993c762ff0bba90e6f7397bd91d91c3150" />
 			</dataarea>
 		</part>
 	</software>
@@ -28103,6 +27050,7 @@ license:CC0-1.0
 		<info name="partno" value="A-335" />
 		<info name="programmer" value="Rich Bergeron, Greg S. Johnson, Sheila Kelly, Lon Koenig, John Persoon, and Elizabeth Wendland" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-02-25 -->
 		<!--educational program-->
@@ -28161,6 +27109,78 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="autotech1">
+		<description>Automotive Technician Mathematics Volume 1: Whole Numbers and Fractions (A-762 version 1.0)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-762" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234854">
+				<rom name="automotive technician mathematics volume i v1.0.woz" size="234854" crc="ffae07f2" sha1="e08a373d9023f78b6594bc1f0bc8ca2be9cd77e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autotech2">
+		<description>Automotive Technician Mathematics Volume 2: Decimals and Percents (A-763 version 1.0)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-763" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234848">
+				<rom name="automotive technician mathematics volume ii v1.0.woz" size="234848" crc="cc38eda5" sha1="ca470fdc25ac9ddea31287d7e5c890ebdc987d8a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bckydbrd_525" cloneof="bckydbrd">
+		<description>Backyard Birds (A-216 version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-216" />
+		<info name="programmer" value="Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-11-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234872">
+				<rom name="backyard birds.woz" size="234872" crc="e4045b4e" sha1="8dcd3c0b1a7dfd93bc456284e316ba6c73f53873" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bckydbrd">
+		<description>Backyard Birds (A-216 version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-216" />
+		<info name="programmer" value="Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-08-09 Redumped: 2021-12-14-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345386">
+				<rom name="backyard birds 800k.woz" size="1345386" crc="1929bb55" sha1="12a3cee293e0d96e7bf4d2928ef1dd14e60a8514" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beachlnd">
 		<description>Beach Landing</description>
 		<year>1984</year>
@@ -28194,18 +27214,55 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bgbluff">
+		<description>Bluegrass Bluff (A-256 version 1.0)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-256" />
+		<info name="programmer" value="Rich Bergeron, Gene Breault, Charolyn Kapplinger, Kevin Neff, and Dick Sisco" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-11-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234869">
+				<rom name="bluegrass bluff.woz" size="234869" crc="ccef05ca" sha1="4cf9cbf571e3de33af0cb70101f099f3aa55aa4b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carbuild">
 		<description>Car Builder (800K 3.5")</description>
 		<year>1985</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and David Cunningham" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2021-08-10-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1297213">
 				<rom name="car builder 800k.woz" size="1297213" crc="8d78c9a0" sha1="05a0f9e0e3d0d7be1c0a978e1314cc604b3d52cc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caratimb">
+		<description>Caravans to Timbuktu! (A-345 version 1.0) (800K 3.5")</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-345" />
+		<info name="programmer" value="Rich Bergeron, Beth Daniels, Dee Dee Daus, Debbie Effertz, Marty Euerle, Lon Koenig, Dan Megears, Sue Minor, Lawrence Peterson, Ju-Chang Wang, and LaDonna Williams" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-26-->
+		<!--educational program-->
+		<!--Modified to remove identifying site license information.-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296325">
+				<rom name="caravans to timbuktu 800k.woz" size="1296325" crc="07d2d2ab" sha1="7babe6d2b0d5434d099a32fb04cdb1bd95836a70" />
 			</dataarea>
 		</part>
 	</software>
@@ -28226,10 +27283,263 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cavbustr">
+		<description>Cavity Busters (A-284 version 1.0)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-284" />
+		<info name="programmer" value="R. Philip Bouchard, Gene Breault, Kevin Neff, Eileen Nannen, Larry Phenow, and Diane Portner" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241539">
+				<rom name="cavity busters.woz" size="241539" crc="6cd640b3" sha1="fb7432c0dd5a894c7daef8811acdb8ba74be0b42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chembaleq_525" cloneof="chembaleq">
+		<description>Chemistry: Balancing Equations (A-280 version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-280" />
+		<info name="programmer" value="Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234852">
+				<rom name="chemistry- balancing equations v1.0.woz" size="234852" crc="435e15cb" sha1="013df30277d6d734d6c5e25ef0c58569fb60fcef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chembaleq">
+		<description>Chemistry: Balancing Equations (A-280 version 1.0) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-280" />
+		<info name="programmer" value="Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-08-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296232">
+				<rom name="chemistry- balancing equations 800k.woz" size="1296232" crc="741bcaa4" sha1="93f7dc5c6b6b9737628bcbd540918aee4ec7e746" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chempertab10">
+		<description>Chemistry: The Periodic Table (A-251 version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-251" />
+		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Kevin W. Neff, John Persoon, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234890">
+				<rom name="chemistry- the periodic table v1.0.woz" size="234890" crc="232c6255" sha1="e52f576c864fe325dcb705513b53ebafb628a430" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clnwtdet_525" cloneof="clnwtdet">
+		<description>Cleanwater Detectives (A-282 version 1.0)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-282" />
+		<info name="programmer" value="Vincent J. Erickson, John Ojanen, and Diane Portner" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234852">
+				<rom name="cleanwater detectives.woz" size="234852" crc="9c78798e" sha1="28cd9843860f74cad155cca29a2a26e37fb0dd38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clnwtdet">
+		<description>Cleanwater Detectives (A-282 version 1.0) (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-282" />
+		<info name="programmer" value="Vincent J. Erickson, John Ojanen, and Diane Portner" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-08-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345366">
+				<rom name="cleanwater detectives 800k.woz" size="1345366" crc="051bbdd2" sha1="64306906c5ea53e08c80f86d56eb1840e15f0277" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockwrks_525" cloneof="clockwrks">
+		<description>Clock Works (A-168 version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-168" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="clock works v1.0.woz" size="234801" crc="64e041b5" sha1="309e2bdd0b16b203391c454fdd4fe545ba26a1cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockwrks">
+		<description>Clock Works (A-168 version 1.0) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-168" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-08-09 Redumped: 2021-12-14-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345302">
+				<rom name="clock works 800k.woz" size="1345302" crc="10213777" sha1="9d854320f839c567d42448d8925b648ece7b0e31" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commkeys10" cloneof="commkeys">
+		<description>CommuniKeys (A-248 version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-248" />
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234900">
+				<rom name="communikeys v1.0.woz" size="234900" crc="ba6bf6fa" sha1="11b60fa9f5d4e142dc5cdb5f8d3275d154e2088f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commkeys11_525" cloneof="commkeys">
+		<description>CommuniKeys (A-248 version 1.1)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-248" />
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-12-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234877">
+				<rom name="communikeys v1.1.woz" size="234877" crc="2f9a3ab2" sha1="0f3e5e1b3ee5ffd1ef8c0d48e2916af80aa8064d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commkeys">
+		<description>CommuniKeys (A-248 version 1.1) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-248" />
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345423">
+				<rom name="communikeys 800k.woz" size="1345423" crc="16374785" sha1="207c41b559050d4f96f833077574cae8be669362" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgmm1ps11" cloneof="cgmm1ps">
+		<description>Computer Generated Mathematics Materials Volume 1: Problem Solving (A-757 version 1.1)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-757" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234849">
+				<rom name="computer generated mathematics materials volume 1- problem solving v1.1.woz" size="234849" crc="7de3f3b1" sha1="b8ad3d3f653d91a2baff5c774c5fe5388a5b803e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgmm1ps">
+		<description>Computer Generated Mathematics Materials Volume 1: Problem Solving (A-757 version 1.3)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-757" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234849">
+				<rom name="computer generated mathematics materials volume 1- problem solving v1.3.woz" size="234849" crc="1288fe4f" sha1="fecefc67af12a51480feed322473aba622dae0a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compinsp">
+		<description>Computer Inspector (A-240 version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-240" />
+		<info name="programmer" value="Diane Portner, Craig Solomonson, Michael Stein, and James Thompson" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234859">
+				<rom name="computer inspector v1.0.woz" size="234859" crc="5755f31d" sha1="bb86a8916a6a713fd3a2d06f26dffe456a975a55" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="compgov">
 		<description>Computers in Government (A-122 version 1.0)</description>
 		<year>1984</year>
 		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
 		<info name="partno" value="A-122" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.0" />
@@ -28239,6 +27549,366 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234798">
 				<rom name="computers in government v1.0.woz" size="234798" crc="3964a55e" sha1="740519fb6fc36eb3310f503f772058aa638040bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscdecpm10" cloneof="cmscdecpm">
+		<description>Conquering Math Series: Conquering Decimals (+, -) (A-207 version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-207" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-19-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234870">
+				<rom name="conquering decimals (addition, subtraction).woz" size="234870" crc="6b6384cb" sha1="1076355dcd45bb725c861811221ad07ba4f3cd4d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscdecpm">
+		<description>Conquering Math Series: Conquering Decimals (+, -) (A-207 version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-207" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345420">
+				<rom name="conquering decimals (addition, subtraction) 800k.woz" size="1345420" crc="6cb089b2" sha1="379d5e51449a193e30a20461b9d5d85928b29ed7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscdecmd10" cloneof="cmscdecmd">
+		<description>Conquering Math Series: Conquering Decimals (×, ÷) (A-208 version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-208" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-19-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234803">
+				<rom name="conquering decimals (multiplication, division).woz" size="234803" crc="ff020002" sha1="b8cd573141127a215b7fcbf0341cec86804d3a3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscdecmd">
+		<description>Conquering Math Series: Conquering Decimals (×, ÷) (A-208 version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-208" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345420">
+				<rom name="conquering decimals (multiplication, division) 800k.woz" size="1345420" crc="2acc2070" sha1="0fab5a373b829bf6b6b40f96d7c27cb6226ee984" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscfrapm10" cloneof="cmscfrapm">
+		<description>Conquering Math Series: Conquering Fractions (+, -) (A-204 version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-204" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-19-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241048">
+				<rom name="conquering fractions (addition, subtraction).woz" size="241048" crc="282f2022" sha1="61ee416fbc5a965d9c7912bd514db601c1b1d198" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscfrapm">
+		<description>Conquering Math Series: Conquering Fractions (+, -) (A-204 version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-204" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345452">
+				<rom name="conquering fractions (addition, subtraction) 800k.woz" size="1345452" crc="96506a24" sha1="95a05d33c89f05c8360b2fd8dbb6699ede45233c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscframd10" cloneof="cmscframd">
+		<description>Conquering Math Series: Conquering Fractions (×, ÷) (A-205 version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-205" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-19-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241036">
+				<rom name="conquering fractions (multiplication, division).woz" size="241036" crc="dddd9a92" sha1="81399db18fc7fb13c683c8f579bd605de82303f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscframd">
+		<description>Conquering Math Series: Conquering Fractions (×, ÷) (A-205 version 1.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-205" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345452">
+				<rom name="conquering fractions (multiplication, division) 800k.woz" size="1345452" crc="eefdb033" sha1="5d857b4d076db607ae2271fa6388536494119685" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscmwg">
+		<description>Conquering Math Series: Conquering Math Worksheet Generator (A-260 version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-260" />
+		<info name="programmer" value="Sue Gabrys, Shari Glenn, Scott Jensen, and Kevin Neff" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234865">
+				<rom name="conquering math worksheet generator v1.0.woz" size="234865" crc="94c8465b" sha1="85a29fdf171ffabd8c0c08d80851da17260a7554" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscperc10">
+		<description>Conquering Math Series: Conquering Percents (A-210 version 1.0)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-210" />
+		<info name="programmer" value="Sheila Dols, Susan Gabrys, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Pat Korn, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234930">
+				<rom name="conquering percents v1.0.woz" size="234930" crc="74e99302" sha1="a45fe02e8ac0d8a0587202ddc21bd546fb25b46a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscratpr">
+		<description>Conquering Math Series: Conquering Ratios and Proportions (A-209 version 1.1)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-209" />
+		<info name="programmer" value="Sheila Dols, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Sherry Leudloff, Diane Lin, Jane Peterson, and Craig Solomonson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234914">
+				<rom name="conquering ratios and proportions v1.1.woz" size="234914" crc="fb6f1075" sha1="c4740f1acc2acd6146aad597ef3a37e7f1459555" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmscwholn">
+		<description>Conquering Math Series: Conquering Whole Numbers (A-201 version 1.1) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-201" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-02-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345322">
+				<rom name="conquering whole numbers 800k.woz" size="1345322" crc="a86a0c22" sha1="39d1b854624a062f03545888982bcb3f4954f5ca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmsdecconc">
+		<description>Conquering Math Series: Decimal Concepts (A-206 version 1.0)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-206" />
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-19-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234698">
+				<rom name="decimal concepts.woz" size="234698" crc="06e3856c" sha1="56ec59ea0330161f889fa44c0310ddbf6ec9d0d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmsfrconci12_525" cloneof="cmsfrconci">
+		<description>Conquering Math Series: Fraction Concepts, Inc. (A-202 version 1.2)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-202" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="fraction concepts, inc. v1.2.woz" size="234796" crc="4afaa0fa" sha1="1b47dbd1863b26d72afe0261b916357a24edcabe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmsfrconci">
+		<description>Conquering Math Series: Fraction Concepts, Inc. (A-202 version 1.2) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-202" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1344295">
+				<rom name="fraction concepts, inc. 800k.woz" size="1344295" crc="e0d544af" sha1="2833bd6be6e3160ad2fad3e7775e654cd0886013" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmsfrpracun10" cloneof="cmsfrpracun">
+		<description>Conquering Math Series: Fraction Practice Unlimited (A-203 version 1.0)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-203" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="fraction practice unlimited v1.0.woz" size="234800" crc="7ca86529" sha1="f715773fcf8ad4e84a30b0b4ee4776f05ad99979" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmsfrpracun11" cloneof="cmsfrpracun">
+		<description>Conquering Math Series: Fraction Practice Unlimited (A-203 version 1.1)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-203" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-19-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="fraction practice unlimited v1.1.woz" size="234777" crc="f3d55989" sha1="9c429f40ec75e07fec9b95c0972e94261809f9a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmsfrpracun">
+		<description>Conquering Math Series: Fraction Practice Unlimited (A-203 version 1.2) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-203" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-03-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345301">
+				<rom name="fraction practice unlimited v1.2 800k.woz" size="1345301" crc="cfd76748" sha1="855b04291203922a329b4298f1b7b32933f593c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coordmath10" cloneof="coordmath">
+		<description>Coordinate Math (A-192 version 1.0)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-192" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="coordinate math v1.0.woz" size="234788" crc="63fbfbc8" sha1="cc7a29b9765f212f32b99117da00fa0bf99e880d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coordmath">
+		<description>Coordinate Math (A-192 version 1.1) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-203" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-03-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345305">
+				<rom name="coordinate math v1.1 800k.woz" size="1345305" crc="cadd691a" sha1="47c72fe236d3b177e6ac8140f9dee43643256d4a" />
 			</dataarea>
 		</part>
 	</software>
@@ -28724,7 +28394,7 @@ license:CC0-1.0
 		<description>Copy II Plus (version 8.1) (800K 3.5")</description>
 		<year>1987</year>
 		<publisher>Central Point Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 64K //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, a 64K //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="8.1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2022-03-29-->
@@ -28756,7 +28426,7 @@ license:CC0-1.0
 		<description>Copy II Plus (version 8.2) (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Central Point Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 64K //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, a 64K //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="8.2" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2022-03-29-->
@@ -28788,7 +28458,7 @@ license:CC0-1.0
 		<description>Copy II Plus (version 8.3) (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Central Point Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 64K //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, a 64K //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="8.3" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2022-03-29-->
@@ -28820,7 +28490,7 @@ license:CC0-1.0
 		<description>Copy II Plus (version 8.4) (800K 3.5")</description>
 		<year>1989</year>
 		<publisher>Central Point Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 64K //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, a 64K //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="8.4" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2022-03-29-->
@@ -28950,6 +28620,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="crtabase">
+		<description>Create-A-Base (A-406 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="TIES" />
+		<info name="partno" value="A-406" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="create-a-base v1.0.woz" size="234788" crc="a708a5f2" sha1="a511c4dcefa007ed923d62b5c8a9149745a0ed4a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cribsol">
 		<description>Cribbage/Solitaire</description>
 		<year>1982</year>
@@ -29014,6 +28702,43 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cryptqst_525" cloneof="cryptqst">
+		<description>CryptoQuest (A-340 version 1.0)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-340" />
+		<info name="programmer" value="Mark Durkin, Rod Haenke, Ruth Kivisto, and Mike Tschimperle" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-08-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234849">
+				<rom name="cryptoquest.woz" size="234849" crc="3cdc455e" sha1="a798f153f829687f7d1e48a3eb5278c1b6aa27d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cryptqst">
+		<description>CryptoQuest (A-340 version 1.0) (800K 3.5")</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-340" />
+		<info name="programmer" value="Mark Durkin, Rod Haenke, Ruth Kivisto, and Mike Tschimperle" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<!--Modified to remove identifying site license information.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-25-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296218">
+				<rom name="cryptoquest 800k.woz" size="1296218" crc="08cf7ada" sha1="310fc8b1db2e827fb5678e08de4271699fffd7fe" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cryscavr">
 		<description>Crystal Caverns</description>
 		<year>1982</year>
@@ -29048,50 +28773,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mdqpres11" cloneof="mdqpres">
-		<description>Dataquest: The Presidents (A-140 version 1.1)</description>
-		<year>1985</year>
+	<software name="dqsample">
+		<description>Dataquest: Sampler (A-173 version 1.0)</description>
+		<year>1986</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A-140" />
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-173" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-06-22-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234805">
-				<rom name="mecc dataquest- the presidents v1.1 side a.woz" size="234805" crc="474553d5" sha1="9a6e9b4d2f1a2abc56f2344afb5eeed17194bc26" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234805">
-				<rom name="mecc dataquest- the presidents v1.1 side b.woz" size="234805" crc="0918cfff" sha1="0648dea58422b86c7a8472e8d8614177825c3a7f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdqpres">
-		<description>Dataquest: The Presidents (A-140 version 1.2)</description>
-		<year>1985</year>
-		<publisher>MECC</publisher>
-		<info name="partno" value="A-140" />
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--educational program-->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234805">
-				<rom name="mecc dataquest- the presidents v1.2 side a.woz" size="234805" crc="6e3d2c1b" sha1="46e45f560d98fcd300224659608c65c6b463dcaa" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234805">
-				<rom name="mecc dataquest- the presidents v1.2 side b.woz" size="234805" crc="23bcdad9" sha1="9c4c5bafeb5f3401a278fca30b919b548d15a6e5" />
+			<dataarea name="flop" size="234791">
+				<rom name="dataquest- sampler v1.0.woz" size="234791" crc="4614b4ca" sha1="0990bc15bdec596603cb4d6f632f29547df9d795" />
 			</dataarea>
 		</part>
 	</software>
@@ -29112,7 +28807,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dogsleda10" cloneof="dogsleda">
+	<software name="dogsleda10_525" cloneof="dogsleda">
 		<description>Dog Sled Ambassadors (A-339 version 1.0)</description>
 		<year>1993</year>
 		<publisher>MECC</publisher>
@@ -29155,12 +28850,149 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="drlivstn10_525" cloneof="drlivstn">
+		<description>Dr. Livingstone, I Presume? (A-314 version 1.0)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-314" />
+		<info name="programmer" value="R. Philip Bouchard, David L. Wood, Shari Zehm, and John A. Persoon" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234848">
+				<rom name="dr. livingstone, i presume side a.woz" size="234848" crc="83287d89" sha1="aeefd8ee425e6cd9496b936393842139f1ab5993" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234848">
+				<rom name="dr. livingstone, i presume side b.woz" size="234848" crc="20b8e890" sha1="8e4dbd8059bc680f2880f2af1a1d67670297a6d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drlivstn">
+		<description>Dr. Livingstone, I Presume? (A-314 version 1.0) (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-314" />
+		<info name="programmer" value="R. Philip Bouchard, David L. Wood, Shari Zehm, and John A. Persoon" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<!--Image has been modified to remove identifying site license information.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-26-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296241">
+				<rom name="dr. livingstone, i presume 800k.woz" size="1296241" crc="37d8ad84" sha1="95b59f5fe39dc1fc3a5b3f52bed0e3587eaf953d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dueldigt">
+		<description>Dueling Digits</description>
+		<year>1982</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Doug Carlston and Brian Crouch" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+." />
+		<!--Due to compatibility problems created by the copy protection, it will not run on later models.-->
+		<sharedfeat name="compatibility" value="A2,A2P" />
+		<!--Dump released: 2019-05-01-->
+		<!--educational game-->
+		<!--This is a different program than Dueling Digits by MECC.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="352021">
+				<rom name="dueling digits.woz" size="352021" crc="f1a7b5dc" sha1="cebd874ea25606d8ddbd566813beecfaa4973b67" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdueldig">
+		<description>Dueling Digits (A-338 version 1.0) (800K 3.5")</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-338" />
+		<info name="programmer" value="Dave Denninger, Rod Haenke, Ju-Chang Wang, and John P. Wlazlo" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<!--Image has been modified to remove identifying site license information.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-26-->
+		<!--educational program-->
+		<!--This is a different program than Dueling Digits by Brøderbund Software.-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296223">
+				<rom name="dueling digits 800k.woz" size="1296223" crc="38478627" sha1="e93e01bee99ab7beb1fc5651968c30f7840d012c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eerievlib_525" cloneof="eerievlib">
+		<description>Eerieville Library (A-304 version 1.0)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-304" />
+		<info name="programmer" value="Sheila Dols, Kevin Neff, Mike Palmquist, Mike Tschimperle, and John Wlazlo" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-08-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234846">
+				<rom name="eerieville library.woz" size="234846" crc="a39fd0fd" sha1="b872f82ed763c17b9236236d5777c795707ec932" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eerievlib">
+		<description>Eerieville Library (A-304 version 1.0) (800K 3.5")</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-304" />
+		<info name="programmer" value="Sheila Dols, Kevin Neff, Mike Palmquist, Mike Tschimperle, and John Wlazlo" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<!--Image has been modified to remove identifying site license information.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-26-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296239">
+				<rom name="eerieville library 800k.woz" size="1296239" crc="1a2a0820" sha1="3052df43d75f156f83ef50b78bf209b1098f36e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elecadvt">
+		<description>Electrifying Adventures (A-334 version 1.0)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-334" />
+		<info name="programmer" value="Beth Bell, Rush Kivisto, Patricia Korn, and Dave Wood" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-08-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234855">
+				<rom name="electrifying adventures.woz" size="234855" crc="bbe4f440" sha1="0680fed43bdb9945b25809e9408664ba0ac4c1f3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="faywrd35">
 		<description>Fay: The Word Hunter (800K 3.5")</description>
 		<year>1991</year>
 		<publisher>Didatech Software</publisher>
 		<info name="programmer" value="Dave Vincent and Allan Forsberg" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2022-09-10-->
 		<!--educational program-->
@@ -29209,7 +29041,7 @@ license:CC0-1.0
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-817" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value="revision 1.0" />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-06-16-->
 		<!--education program-->
@@ -29292,7 +29124,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1990" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2022-09-11-->
@@ -29316,6 +29148,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234768">
 				<rom name="lancaster.woz" size="234768" crc="f5245b69" sha1="660d9aff97a01563d5180c72d71a383454bb0e39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loggates">
+		<description>Logic Gates (A-403 version 1.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="TIES" />
+		<info name="partno" value="A-403" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="logic gates v1.0.woz" size="234786" crc="41e6d237" sha1="421d401d53dc1155280c6133b5b0430f17b0d468" />
 			</dataarea>
 		</part>
 	</software>
@@ -29356,6 +29206,186 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mmerlyad">
+		<description>Mastering Math Series 1: Early Addition (A-788 version 1.3)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-788" />
+		<info name="programmer" value="Frederick Steinmann and Peter Fuglstad" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="early addition v1.3.woz" size="234789" crc="cf5f5e0e" sha1="a6eeb4620fb6770ed5a37f05a5d24c68df269635" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcirmth_525" cloneof="mmcirmth">
+		<description>Mastering Math Series 2: Circus Math (A-109 version 1.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-109" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="circus math v1.0.woz" size="234801" crc="441d4b88" sha1="485b232fedc0c90f8c7c8e11ea68e9cc31d430d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcirmth">
+		<description>Mastering Math Series 2: Circus Math (A-109 version 1.0) (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-109" />
+		<info name="developer" value="MECC" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-08-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345309">
+				<rom name="circus math 800k.woz" size="1345309" crc="e676033e" sha1="f12e92bd54cbfb5bfb37181b8106031fb1a43feb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmaddlog_525" cloneof="mmaddlog">
+		<description>Mastering Math Series 3: Addition Logician (A-125 version 1.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-125" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-15-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="addition logician v1.0.woz" size="234776" crc="8c18aea7" sha1="ec0c272033dbb3b6c0235b5fff7bcfa194c4bea1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmaddlog">
+		<description>Mastering Math Series 3: Addition Logician (A-125 version 1.0) (800K 3.5")</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-125" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-03-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345307">
+				<rom name="addition logician 800k.woz" size="1345307" crc="bcdb5108" sha1="6c732b0b5067fd9305d76a37a98071e2c62fd40e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmspcsub">
+		<description>Mastering Math Series 4: Space Subtraction (A-145 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-145" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="space subtraction v1.0.woz" size="234776" crc="7d14fcef" sha1="31a2ddfca98b5e36219ea40d194e747c26461227" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmsubpuz">
+		<description>Mastering Math Series 5: Subtraction Puzzles (A-146 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC"/>
+		<info name="partno" value="A-146" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="subtraction puzzles v1.0.woz" size="234778" crc="1d963eea" sha1="c7f6824c3b021851332b50b16f3d8baa44540642" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmmulpuz">
+		<description>Mastering Math Series 6: Multiplication Puzzles (A-147 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC"/>
+		<info name="partno" value="A-147" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234812">
+				<rom name="multiplication puzzles v1.0.woz" size="234812" crc="a3e348ab" sha1="21e2538ba892f887e414733e88709afafb0ea9b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmquotqst">
+		<description>Mastering Math Series 7: Quotient Quest (A-148 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-148" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="quotient quest v1.0.woz" size="234773" crc="fbae3f5c" sha1="3f20307128fcfd1362ada613557920de54af6281" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmwrkshtgen">
+		<description>Mastering Math Series: Worksheet Generator (A-151 version 1.1) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-151" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-02-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345332">
+				<rom name="mastering math worksheet generator 800k.woz" size="1345332" crc="9cf3e194" sha1="12bd756088f5b5ea6b5a118ddd1d173ba9d000af" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mstrtype">
 		<description>MasterType (version 2.1)</description>
 		<year>1984</year>
@@ -29379,7 +29409,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 1: Careers (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
 		<!--educational program-->
@@ -29394,7 +29424,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 2: Money (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
 		<!--educational program-->
@@ -29409,7 +29439,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 3: Sports (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
 		<!--educational program-->
@@ -29424,7 +29454,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 4: Travel (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
 		<!--educational program-->
@@ -29440,13 +29470,169 @@ license:CC0-1.0
 		<!--Title screen says "The Stickybear Math Word Problems-->
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296179">
 				<rom name="math word problems volume 6- our nation's capital washington dc 800k.woz" size="1296179" crc="1fde4272" sha1="702d7569430d96e8535303c300f245646961bc41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqpres11" cloneof="mdqpres">
+		<description>MECC Dataquest: The Presidents (A-140 version 1.1)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-140" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.1 side a.woz" size="234805" crc="474553d5" sha1="9a6e9b4d2f1a2abc56f2344afb5eeed17194bc26" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.1 side b.woz" size="234805" crc="0918cfff" sha1="0648dea58422b86c7a8472e8d8614177825c3a7f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqpres">
+		<description>MECC Dataquest: The Presidents (A-140 version 1.2)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-140" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.2 side a.woz" size="234805" crc="6e3d2c1b" sha1="46e45f560d98fcd300224659608c65c6b463dcaa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234805">
+				<rom name="mecc dataquest- the presidents v1.2 side b.woz" size="234805" crc="23bcdad9" sha1="9c4c5bafeb5f3401a278fca30b919b548d15a6e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melarcrit_525" cloneof="melarcrit">
+		<description>MECC Early Learning Series: Arithmetic Critters (A-166 version 1.0)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-166" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="arithmetic critters v1.0.woz" size="234809" crc="ad004a17" sha1="2dbf87feabeccfc6807069171a8b0e29e4196ef6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melarcrit">
+		<description>MECC Early Learning Series: Arithmetic Critters (A-166 version 1.0) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-166" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-08-06 Redumped: 2021-12-14-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345310">
+				<rom name="arithmetic critters 800k.woz" size="1345310" crc="74b14b19" sha1="7b7eeb909cbdc1de88a346d2657429c82fda17c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melctcrit">
+		<description>MECC Early Learning Series: Counting Critters (A-165 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-165" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="counting critters v1.0.woz" size="234776" crc="83110c9b" sha1="8a9d33e555c289c261a5020fa3e2d747d2151651" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melfunaz_525" cloneof="melfunaz">
+		<description>MECC Early Learning Series: Fun from A to Z (A-164 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-164" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="fun from a to z v1.0.woz" size="234774" crc="d57016f2" sha1="a67f38e5902073441677389a85411b15d13171e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melfunaz">
+		<description>MECC Early Learning Series: Fun from A to Z (A-164 version 1.0) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-164" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-03-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296153">
+				<rom name="fun from a to z 800k.woz" size="1296153" crc="cf7bac85" sha1="386aed582de7aad50607a367ef862b18f1d6cbb8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mkeybdmas10">
+		<description>MECC Keyboarding Master: Games and Drills (Student Program) (A-131 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="TIES" />
+		<info name="partno" value="A-131" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="keyboarding master v1.0.woz" size="234775" crc="cb33bd28" sha1="3a1899634a7ba0820058bfb04fa764583a9058c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -29489,7 +29675,7 @@ license:CC0-1.0
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-823" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value="revision 1.0" />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-06-20-->
 		<!--education program-->
@@ -29536,12 +29722,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="pollspol">
-		<description>Polls and Politics (A-820 version 1.0)</description>
+		<description>Polls and Politics Volume 1 (A-820 version 1.0)</description>
 		<year>1984</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-820" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value="revision 1.0" />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-06-20-->
 		<!--education program-->
@@ -29559,7 +29745,7 @@ license:CC0-1.0
 		<info name="partno" value="A-784" />
 		<info name="programmer" value="Lois Edwards and Russ Erickson" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value="revision 1.0" />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-06-20-->
 		<!--education program-->
@@ -29574,7 +29760,7 @@ license:CC0-1.0
 		<description>Reading Comprehension Volume 2: Sports (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-28-->
 		<!--educational program-->
@@ -29589,7 +29775,7 @@ license:CC0-1.0
 		<description>Reading Comprehension Volume 3: Geography (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-28-->
 		<!--educational program-->
@@ -29604,7 +29790,7 @@ license:CC0-1.0
 		<description>Reading Comprehension Volume 4: History in the Making (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-28-->
 		<!--educational program-->
@@ -29620,7 +29806,7 @@ license:CC0-1.0
 		<!--Title screen says "The Stickybear Reading Comprehension Series-->
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-28-->
 		<!--educational program-->
@@ -29636,7 +29822,7 @@ license:CC0-1.0
 		<!--Title screen says "The Stickybear Reading Comprehension Series-->
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-28-->
 		<!--educational program-->
@@ -29652,7 +29838,7 @@ license:CC0-1.0
 		<!--Title screen says "The Stickybear Reading Comprehension Series-->
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-28-->
 		<!--educational program-->
@@ -29735,7 +29921,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and Steve Worthington" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1989" />
 		<!--1989 re-release-->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -29801,7 +29987,7 @@ license:CC0-1.0
 		<description>Spelling Rules (version 1989) (800K 3.5")</description>
 		<year>1989</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1987" />
 		<!--1989 re-release-->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -29810,6 +29996,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1297155">
 				<rom name="spelling rules 800k.woz" size="1297155" crc="824e437b" sha1="0cf88bf109922357ed217533d772ce3af30ffff2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sportstat">
+		<description>Sports Stats (A-405 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="TIES" />
+		<info name="partno" value="A-405" />
+		<info name="programmer" value="Jim Sydow, Ron Geiser, Reed Christiansen, Dave Laden, Curt Traaseth, and Jean Brown"/>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234787">
+				<rom name="sports stats v1.0.woz" size="234787" crc="cb25650f" sha1="14f5c15660cb1964d8f0038a2b4e4ca649aa29a2" />
 			</dataarea>
 		</part>
 	</software>
@@ -29918,7 +30123,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and Susan Dubicki" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1988" />
 		<!--1988 re-release-->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -29953,7 +30158,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and Susan Dubicki" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1988" />
 		<!--1988 re-release-->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -30045,7 +30250,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter, Janie and Steve Worthington" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1989" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2021-07-15-->
@@ -30178,7 +30383,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter, Janie Worthington" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1989" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -30212,7 +30417,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and Steve Worthington" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1988" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -30246,7 +30451,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and Dave Lusby" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1988" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2021-07-15-->
@@ -30280,7 +30485,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and Susan Dubicki" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="1988" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2021-07-15-->
@@ -30314,7 +30519,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter and V.R. Swami" />
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<info name="version" value="800K" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -30432,7 +30637,7 @@ license:CC0-1.0
 		<description>Vocabulary Development (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a //e or 64K ][+ with a compatible drive controller card." />
+		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
 		<!--educational program-->

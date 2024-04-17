@@ -63,6 +63,7 @@ public:
 
 	void init_jingbell();
 	void init_jingbelli();
+	void init_animalhjb();
 
 	int hopper_r();
 
@@ -975,6 +976,34 @@ ROM_START( jingbelli )
 	ROM_LOAD( "palce22v10h-ch-jin-u27.u27", 0x000, 0x2dd, NO_DUMP )
 ROM_END
 
+/* Animal House.
+   Recording from the real hardware: https://youtu.be/ibd8_nsklTY */
+ROM_START( animalhjb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.u44",     0x00000, 0x10000, CRC(d11d191f) SHA1(113e22d69a2b8ceb213d72ec8cee021b1a5507e5) )
+
+	ROM_REGION( 0x8000, "data", 0 )
+	ROM_LOAD( "tms27c256.u43",  0x00000, 0x08000, CRC(af67f687) SHA1(8f43a693358612880389b238ec7040f78b0164bb) )
+
+	ROM_REGION( 0x30000, "reels", 0 )
+	ROM_LOAD( "am27c512.u17",   0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
+	ROM_LOAD( "am27c512.u16",   0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
+	ROM_LOAD( "am27c512.u15",   0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
+	ROM_REGION( 0xc0000, "tiles", 0 )
+	ROM_LOAD( "at27c020.u25",   0x00000, 0x40000, CRC(5f8abeaf) SHA1(99c4a795cb9b4d94867c12ca99cba04f9c05e129) )
+	ROM_LOAD( "at27c020.u24",   0x40000, 0x40000, CRC(58efe5a8) SHA1(fb4cba3965052e5cdd24a7e93966c597855caa68) )
+	ROM_LOAD( "at27c020.u23",   0x80000, 0x40000, CRC(e6249be1) SHA1(f49383c587061a8a5531381dc80c8ebd7c94d61d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "tms27c010a.u38", 0x00000, 0x20000, CRC(a42d73b1) SHA1(93157e9630d5c8bb34c71186415d0aa8c5d51951) )
+
+	ROM_REGION( 0x2dd, "plds", 0 )
+	ROM_LOAD( "gal16v8d.u12",   0x00000, 0x00117, CRC(b59340ed) SHA1(8678f2efedf7d17aec18b6ffeb0d4ef6b943df3c) )
+	ROM_LOAD( "gal16v8d.u33",   0x00000, 0x00117, CRC(83547e35) SHA1(a8d3622905cbd54af39c01070048f07be1b0257a) )
+	ROM_LOAD( "pal22v10.u26",   0x00000, 0x002dd, CRC(808381b5) SHA1(15802edd7d28ca4a73fb4d7757c80040393daf8d) )
+	ROM_LOAD( "pal22v10.u27",   0x00000, 0x002dd, CRC(848a42fc) SHA1(2cfeecbf934b81e9fbf3018efc00cc431a14b266) )
+ROM_END
+
 void igs009_state::decrypt_jingbell()
 {
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
@@ -1007,6 +1036,15 @@ void igs009_state::init_jingbelli()
 	// protection patch
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x01f19] = 0x18;
+}
+
+void igs009_state::init_animalhjb()
+{
+	decrypt_jingbell();
+
+	// protection patch
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
+	rom[0x01f21] = 0x18;
 }
 
 void igs009_state::init_jingbell()
@@ -1111,11 +1149,12 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                         FLAGS
-GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",      MACHINE_SUPPORTS_SAVE ) // Shows V154UE in test mode!
-GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98a,     gp98,     gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)", MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM
+//    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                                 FLAGS
+GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",              MACHINE_SUPPORTS_SAVE ) // Shows V154UE in test mode!
+GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, animalhjb, jingbell, jingbell, jingbell, igs009_state,  init_animalhjb, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98a,     gp98,     gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)",         MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM
