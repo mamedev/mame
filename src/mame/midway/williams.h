@@ -51,6 +51,9 @@ public:
 	void williams_b1(machine_config &config);
 	void williams_b2(machine_config &config);
 
+	void bubbles(machine_config &config);
+	void playball(machine_config &config);
+	void spdball(machine_config &config);
 	void lottofun(machine_config &config);
 
 	u8 port_0_49way_r();
@@ -64,9 +67,6 @@ public:
 	void palette_init(palette_device &palette) const;
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	// blitter type
 	enum
 	{
@@ -115,12 +115,16 @@ protected:
 	const uint8_t *m_blitter_remap;
 	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
 
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	virtual void vram_select_w(u8 data);
-	virtual void cmos_w(offs_t offset, u8 data);
+	void cmos_4bit_w(offs_t offset, u8 data);
 	void blitter_w(address_space &space, offs_t offset, u8 data);
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 	virtual void snd_cmd_w(u8 data);
+	void playball_snd_cmd_w(u8 data);
 
 	void state_save_register();
 	void blitter_init(int blitter_config, const uint8_t *remap_prom);
@@ -128,6 +132,8 @@ protected:
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
 
 	virtual void main_map(address_map &map);
+	void bubbles_main_map(address_map &map);
+	void spdball_main_map(address_map &map);
 	virtual void sound_map(address_map &map);
 	void sound2_map(address_map &map); // for Blaster and Sinistar cockpit
 };
@@ -147,15 +153,15 @@ public:
 	void init_defndjeu();
 
 protected:
+	virtual void machine_reset() override;
+
 	virtual void main_map(address_map &map) override;
 
 	void video_control_w(u8 data);
 
 private:
-	virtual void machine_reset() override;
-
 	virtual void sound_map(address_map &map) override;
-	virtual void sound_map_6802(address_map &map);
+	void sound_map_6802(address_map &map);
 
 	void bank_select_w(u8 data);
 };
@@ -190,32 +196,6 @@ private:
 
 	TIMER_CALLBACK_MEMBER(cockpit_deferred_snd_cmd_w);
 	void cockpit_snd_cmd_w(u8 data);
-};
-
-// Playball: more soundlatch bits
-class playball_state : public williams_state
-{
-public:
-	playball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag)
-	{ }
-
-	void playball(machine_config &config);
-
-private:
-	virtual void snd_cmd_w(u8 data) override;
-};
-
-// Bubbles: 8-bit nvram
-class bubbles_state : public williams_state
-{
-public:
-	bubbles_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void cmos_w(offs_t offset, u8 data) override;
 };
 
 // Conquest: flywheel controller
@@ -254,20 +234,6 @@ private:
 
 	required_device<ls157_device> m_mux0;
 	required_device<ls157_device> m_mux1;
-};
-
-// Speed Ball: more input ports
-class spdball_state : public williams_state
-{
-public:
-	spdball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag)
-	{ }
-
-	void spdball(machine_config &config);
-
-private:
-	virtual void main_map(address_map &map) override;
 };
 
 // Blaster: extra sound hardware
@@ -313,16 +279,6 @@ private:
 class williams2_state : public williams_state
 {
 public:
-	INPUT_CHANGED_MEMBER(rgb_gain)
-	{
-		if (param < 3)
-			m_gain[param] = float(newval) / 100.0f;
-		else
-			m_offset[param - 3] = (float(newval) / 100.0f) - 1.0f;
-		rebuild_palette();
-	}
-
-protected:
 	williams2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -333,12 +289,18 @@ protected:
 		m_offset({ 0.00f, 0.00f, 0.00f })
 	{ }
 
-	void williams2_base(machine_config &config);
+	void inferno(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	INPUT_CHANGED_MEMBER(rgb_gain)
+	{
+		if (param < 3)
+			m_gain[param] = float(newval) / 100.0f;
+		else
+			m_offset[param - 3] = (float(newval) / 100.0f) - 1.0f;
+		rebuild_palette();
+	}
 
+protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_tileram;
 	required_memory_bank m_mainbank;
@@ -350,6 +312,12 @@ protected:
 	uint8_t m_fg_color = 0;
 	std::array<float, 3> m_gain;
 	std::array<float, 3> m_offset;
+
+	void williams2_base(machine_config &config);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	virtual u8 video_counter_r() override;
 
@@ -380,21 +348,6 @@ protected:
 	virtual void sound_map(address_map &map) override;
 
 	void video_control_w(u8 data);
-};
-
-// Inferno
-class inferno_state : public williams2_state
-{
-public:
-	inferno_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams2_state(mconfig, type, tag),
-		m_mux(*this, "mux")
-	{ }
-
-	void inferno(machine_config &config);
-
-private:
-	required_device<ls157_device> m_mux;
 };
 
 // Mystic Marathon

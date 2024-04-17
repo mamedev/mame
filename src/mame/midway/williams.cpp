@@ -515,7 +515,7 @@ void defender_state::main_map(address_map &map)
 	m_rom_view[0](0xc000, 0xc00f).mirror(0x03e0).writeonly().share(m_paletteram);
 	m_rom_view[0](0xc3ff, 0xc3ff).w(FUNC(defender_state::watchdog_reset_w));
 	m_rom_view[0](0xc010, 0xc01f).mirror(0x03e0).w(FUNC(defender_state::video_control_w));
-	m_rom_view[0](0xc400, 0xc4ff).mirror(0x0300).ram().w(FUNC(defender_state::cmos_w)).share("nvram");
+	m_rom_view[0](0xc400, 0xc4ff).mirror(0x0300).ram().w(FUNC(defender_state::cmos_4bit_w)).share("nvram");
 	m_rom_view[0](0xc800, 0xcbff).r(FUNC(defender_state::video_counter_r));
 	m_rom_view[0](0xcc00, 0xcc03).mirror(0x03e0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	m_rom_view[0](0xcc04, 0xcc07).mirror(0x03e0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -564,7 +564,7 @@ void williams_state::main_map(address_map &map)
 	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::blitter_w));
 	map(0xcb00, 0xcbff).r(FUNC(williams_state::video_counter_r));
 	map(0xcbff, 0xcbff).w(FUNC(williams_state::watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::cmos_w)).share("nvram");
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::cmos_4bit_w)).share("nvram");
 	map(0xd000, 0xffff).rom();
 }
 
@@ -579,8 +579,25 @@ void williams_state::main_map(address_map &map)
 void sinistar_state::main_map(address_map &map)
 {
 	williams_state::main_map(map);
+
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
+}
+
+
+
+/*************************************
+ *
+ *  Bubbles memory handlers
+ *
+ *************************************/
+
+void williams_state::bubbles_main_map(address_map &map)
+{
+	main_map(map);
+
+	// bubbles has additional CMOS for a full 8 bits
+	map(0xcc00, 0xcfff).ram().share("nvram");
 }
 
 
@@ -591,14 +608,16 @@ void sinistar_state::main_map(address_map &map)
  *
  *************************************/
 
-void spdball_state::main_map(address_map &map)
+void williams_state::spdball_main_map(address_map &map)
 {
-	williams_state::main_map(map);
+	main_map(map);
+
 	// install extra input handlers
 	map(0xc800, 0xc800).portr("AN0");
 	map(0xc801, 0xc801).portr("AN1");
 	map(0xc802, 0xc802).portr("AN2");
 	map(0xc803, 0xc803).portr("AN3");
+
 	// add a third PIA
 	map(0xc808, 0xc80b).mirror(0x00f0).rw(m_pia[3], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
@@ -627,7 +646,7 @@ void blaster_state::main_map(address_map &map)
 	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(blaster_state::blitter_w));
 	map(0xcb00, 0xcbff).r(FUNC(blaster_state::video_counter_r));
 	map(0xcbff, 0xcbff).w(FUNC(blaster_state::watchdog_reset_w));
-	map(0xcc00, 0xcfff).ram().w(FUNC(blaster_state::cmos_w)).share("nvram");
+	map(0xcc00, 0xcfff).ram().w(FUNC(blaster_state::cmos_4bit_w)).share("nvram");
 	map(0xd000, 0xffff).rom();
 }
 
@@ -660,7 +679,7 @@ void williams2_state::common_map(address_map &map)
 	map(0xcb80, 0xcb9f).w(FUNC(williams2_state::video_control_w));
 	map(0xcba0, 0xcbbf).w(FUNC(williams2_state::blit_window_enable_w));
 	map(0xcbe0, 0xcbef).r(FUNC(williams2_state::video_counter_r));
-	map(0xcc00, 0xcfff).ram().w(FUNC(williams2_state::cmos_w)).share("nvram");
+	map(0xcc00, 0xcfff).ram().w(FUNC(williams2_state::cmos_4bit_w)).share("nvram");
 }
 
 // mysticm and inferno: D000-DFFF is RAM
@@ -1675,9 +1694,37 @@ void wms_muxed_state::splat(machine_config &config)
 }
 
 
-void spdball_state::spdball(machine_config &config)
+void williams_state::bubbles(machine_config &config)
 {
 	williams_b1(config);
+
+	// Bubbles: 8-bit nvram
+	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::bubbles_main_map);
+}
+
+void williams_state::playball(machine_config &config)
+{
+	williams_b1(config);
+
+	// video hardware
+	m_screen->set_visarea(6, 298-1, 8, 240-1);
+
+	// sound hardware
+	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+
+	// pia
+	m_pia[1]->writepb_handler().set(FUNC(williams_state::playball_snd_cmd_w));
+
+	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
+	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
+}
+
+void williams_state::spdball(machine_config &config)
+{
+	williams_b1(config);
+
+	// Speed Ball: more input ports
+	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::spdball_main_map);
 
 	// pia
 	PIA6821(config, m_pia[3]);
@@ -1732,21 +1779,6 @@ void sinistar_state::cockpit(machine_config &config)
 	m_pia[3]->writepa_handler().set("rdac", FUNC(dac_byte_interface::data_w));
 	m_pia[3]->irqa_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
-}
-
-void playball_state::playball(machine_config &config)
-{
-	williams_b1(config);
-
-	// video hardware
-	m_screen->set_visarea(6, 298-1, 8, 240-1);
-
-	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
-
-	// pia
-	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
-	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
 }
 
 
@@ -1869,10 +1901,11 @@ void williams2_state::williams2_base(machine_config &config)
 }
 
 
-void inferno_state::inferno(machine_config &config)
+void williams2_state::inferno(machine_config &config)
 {
 	williams2_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &inferno_state::d000_ram_map);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &williams2_state::d000_ram_map);
 
 	// pia
 	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
@@ -1880,9 +1913,9 @@ void inferno_state::inferno(machine_config &config)
 
 	m_pia[2]->set_port_a_input_overrides_output_mask(0xff);
 
-	LS157_X2(config, m_mux, 0); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
-	m_mux->a_in_callback().set_ioport("INP1");
-	m_mux->b_in_callback().set_ioport("INP2");
+	ls157_x2_device &mux(LS157_X2(config, "mux", 0)); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
+	mux.a_in_callback().set_ioport("INP1");
+	mux.b_in_callback().set_ioport("INP2");
 }
 
 void mysticm_state::mysticm(machine_config &config)
@@ -3888,9 +3921,9 @@ GAME( 1982, joust,      0,        joust,            joust,    wms_muxed_state, e
 GAME( 1982, joustr,     joust,    joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, jousty,     joust,    joust,            joust,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, bubbles,    0,        williams_b1,      bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesr,   bubbles,  williams_b1,      bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bubblesp,   bubbles,  williams_b1,      bubbles,  bubbles_state,   empty_init,    ROT0,   "Williams", "Bubbles (prototype)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubbles,    0,        bubbles,          bubbles,  williams_state,  empty_init,    ROT0,   "Williams", "Bubbles",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesr,   bubbles,  bubbles,          bubbles,  williams_state,  empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bubblesp,   bubbles,  bubbles,          bubbles,  williams_state,  empty_init,    ROT0,   "Williams", "Bubbles (prototype)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, splat,      0,        splat,            splat,    wms_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
@@ -3900,13 +3933,13 @@ GAME( 1982, sinistar2,  sinistar, upright,          sinistar, sinistar_state,  e
 GAME( 1982, sinistarc2, sinistar, cockpit,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (revision 2, cockpit)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sinistarp,  sinistar, upright,          sinistar, sinistar_state,  empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, playball,   0,        playball,         playball, playball_state,  empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, playball,   0,        playball,         playball, williams_state,  empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, blaster,    0,        blaster,          blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster",                  MACHINE_SUPPORTS_SAVE ) // 20 levels - stereo sound
 GAME( 1983, blastero,   blaster,  blaster,          blaster,  blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (location test)",  MACHINE_SUPPORTS_SAVE ) // 30 levels - stereo sound
 GAME( 1983, blasterkit, blaster,  blastkit,         blastkit, blaster_state,   empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // 20 levels - mono sound
 
-GAME( 1985, spdball,    0,        spdball,          spdball,  spdball_state,   empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdball,    0,        spdball,          spdball,  williams_state,  empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, alienar,    0,        joust,            alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1985, alienaru,   alienar,  joust,            alienar,  wms_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
@@ -3920,7 +3953,7 @@ GAME( 1983, mysticmp,   mysticm,  mysticm,          mysticm, mysticm_state,    e
 
 GAME( 1984, tshoot,     0,        tshoot,           tshoot,  tshoot_state,     empty_init,    ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, inferno,    0,        inferno,          inferno, inferno_state,    empty_init,    ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, inferno,    0,        inferno,          inferno, williams2_state,  empty_init,    ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, joust2,     0,        joust2,           joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, joust2r1,   joust2,   joust2,           joust2,  joust2_state,     empty_init,    ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )

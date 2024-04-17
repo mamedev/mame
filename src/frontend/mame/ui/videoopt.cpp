@@ -362,13 +362,14 @@ bool menu_video_options::handle(event const *ev)
 				}
 				else
 				{
-					auto const timeout = ui().pointer_activity_timeout(m_target.index());
-					if (std::chrono::milliseconds(100) < timeout)
+					bool const ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
+					std::chrono::milliseconds const increment(ctrl_pressed ? 1'000 : 100);
+					auto timeout = ui().pointer_activity_timeout(m_target.index());
+					auto const remainder = timeout % increment;
+					timeout -= remainder.count() ? remainder : increment;
+					if (std::chrono::milliseconds(100) <= timeout)
 					{
-						auto const remainder = timeout % std::chrono::milliseconds(100);
-						ui().set_pointer_activity_timeout(
-								m_target.index(),
-								timeout - (remainder.count() ? remainder : std::chrono::milliseconds(100)));
+						ui().set_pointer_activity_timeout(m_target.index(), timeout);
 						changed = true;
 					}
 				}
@@ -384,9 +385,11 @@ bool menu_video_options::handle(event const *ev)
 					}
 					else
 					{
+						bool const ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
+						int const increment(ctrl_pressed ? 1'000 : 100);
 						ui().set_pointer_activity_timeout(
 								m_target.index(),
-								std::chrono::milliseconds((1 + (timeout / std::chrono::milliseconds(100))) * 100));
+								std::chrono::milliseconds((1 + (timeout / std::chrono::milliseconds(increment))) * increment));
 					}
 					changed = true;
 				}
