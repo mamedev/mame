@@ -41670,6 +41670,9 @@ clxvme186                       //
 @source:skeleton/codata.cpp
 codata                          //
 
+@source:skeleton/conliner.cpp
+onlinertp                       // (c) 200? Comatel / Atata Systems
+
 @source:skeleton/consola_emt.cpp
 consoemt                        //
 
