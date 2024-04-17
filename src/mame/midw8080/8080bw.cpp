@@ -356,7 +356,7 @@ static INPUT_PORTS_START( alieninv )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPNAME( 0x02, 0x02, "Pence Coinage" )     PORT_DIPLOCATION("SW1:2")
@@ -1555,6 +1555,9 @@ static INPUT_PORTS_START( rollingc )
 	PORT_INCLUDE( sicv_base )
 
 	PORT_MODIFY("IN0")
+	// bit 0: Looks like simple protection for moonbase, see routine at $0EB1, gets called at $0DD2.
+	// It checks for score overflow, and the game ends with message "YOU ARE TOO STRONG" when score
+	// overflows from 99990 to 0. If bit 0 value = 1, the game ends prematurely when score hits 1000.
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rollingc_state, game_select_r)
 
