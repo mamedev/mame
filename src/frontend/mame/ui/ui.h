@@ -26,6 +26,7 @@
 
 #include <any>
 #include <cassert>
+#include <chrono>
 #include <ctime>
 #include <functional>
 #include <set>
@@ -164,13 +165,21 @@ public:
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
 	bool update_and_render(render_container &container);
+
+	// getting display font and metrics
 	render_font *get_font();
 	float get_line_height(float scale = 1.0F);
+	float target_font_height() const { return m_target_font_height; }
 	float get_char_width(char32_t ch);
 	float get_string_width(std::string_view s);
 	float get_string_width(std::string_view s, float text_size);
+	float box_lr_border() const { return target_font_height() * 0.25f; }
+	float box_tb_border() const { return target_font_height() * 0.25f; }
+
+	// drawing boxes and text
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
+	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, uint32_t flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	void draw_text(render_container &container, std::string_view buf, float x, float y);
 	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr);
 	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size);
@@ -197,13 +206,17 @@ public:
 	bool can_paste();
 	bool found_machine_warnings() const { return m_has_warnings; }
 	void image_handler_ingame();
-	void increase_frameskip();
-	void decrease_frameskip();
 	void request_quit();
+	void set_pointer_activity_timeout(int target, std::chrono::steady_clock::duration timeout) noexcept;
+	void set_hide_inactive_pointers(int target, bool hide) noexcept;
+	std::chrono::steady_clock::duration pointer_activity_timeout(int target) const noexcept;
+	bool hide_inactive_pointers(int target) const noexcept;
+
+	// drawing informational overlays
 	void draw_fps_counter(render_container &container);
 	void draw_profiler(render_container &container);
 
-	// pointer display
+	// pointer display for UI handlers
 	template <typename T>
 	void set_pointers(T first, T last)
 	{
@@ -238,9 +251,6 @@ public:
 	std::vector<ui::menu_item> &get_slider_list();
 
 	// metrics
-	float target_font_height() const { return m_target_font_height; }
-	float box_lr_border() const { return target_font_height() * 0.25f; }
-	float box_tb_border() const { return target_font_height() * 0.25f; }
 	void update_target_font_height();
 
 	// other
@@ -248,9 +258,6 @@ public:
 	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::word_wrapping::WORD);
 	void set_image_display_enabled(bool image_display_enabled) { m_image_display_enabled = image_display_enabled; }
 	bool image_display_enabled() const { return m_image_display_enabled; }
-
-	// draw an outlined box with given line color and filled with a texture
-	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, uint32_t flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	virtual void popup_time_string(int seconds, std::string message) override;
 
 	virtual void menu_reset() override;
@@ -275,11 +282,13 @@ private:
 	enum class ui_callback_type : int;
 
 	struct active_pointer;
+	struct pointer_options;
 
 	using handler_callback_func = delegate<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;
 	using session_data_map = std::unordered_map<std::type_index, std::any>;
 	using active_pointer_vector = std::vector<active_pointer>;
+	using pointer_options_vector = std::vector<pointer_options>;
 	using display_pointer_vector = std::vector<display_pointer>;
 
 	// instance variables
@@ -294,6 +303,7 @@ private:
 	osd_ticks_t             m_popup_text_end;
 	std::unique_ptr<uint8_t []> m_non_char_keys_down;
 
+	pointer_options_vector  m_pointer_options;
 	active_pointer_vector   m_active_pointers;
 	display_pointer_vector  m_display_pointers;
 	bitmap_argb32           m_mouse_bitmap;
@@ -328,8 +338,12 @@ private:
 	void set_handler(ui_callback_type callback_type, handler_callback_func &&callback);
 	void frame_update();
 	void exit();
-	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
-	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
+	void increase_frameskip();
+	void decrease_frameskip();
+	void config_load_warnings(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
+	void config_save_warnings(config_type cfg_type, util::xml::data_node *parentnode);
+	void config_load_pointers(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
+	void config_save_pointers(config_type cfg_type, util::xml::data_node *parentnode);
 	template <typename... Params> void slider_alloc(Params &&...args) { m_sliders.push_back(std::make_unique<slider_state>(std::forward<Params>(args)...)); }
 
 	// slider controls

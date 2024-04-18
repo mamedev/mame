@@ -90,6 +90,7 @@ public:
 		, m_keyboard(*this, "X%d", 0U)
 		, m_mainbank(*this, "mainbank")
 		, m_codebank(*this, "codebank")
+		, m_nvrambank(*this, "nvrambank")
 		, m_soundbank(*this, "soundbank")
 		, m_io_view(*this, "io_view")
 	{ }
@@ -107,6 +108,7 @@ private:
 	required_ioport_array<17> m_keyboard;
 	required_memory_bank m_mainbank;
 	required_memory_bank m_codebank;
+	required_memory_bank m_nvrambank;
 	required_memory_bank m_soundbank;
 	memory_view m_io_view;
 
@@ -114,12 +116,9 @@ private:
 	uint8_t m_wmg_d000 = 0U;
 	uint8_t m_port_select = 0U;
 
-	u8 wmg_nvram_r(offs_t offset);
-	void wmg_nvram_w(offs_t offset, u8 data);
 	u8 wmg_pia_0_r(offs_t offset);
 	void wmg_c400_w(u8 data);
 	void wmg_d000_w(u8 data);
-	void wmg_blitter_w(offs_t, u8);
 	void wmg_port_select_w(int state);
 	void wmg_sound_reset_w(u8 data);
 	void wmg_vram_select_w(u8 data);
@@ -149,10 +148,10 @@ void wmg_state::wmg_cpu1(address_map &map)
 	m_io_view[0](0xc804, 0xc807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
 	m_io_view[0](0xc80c, 0xc80f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	m_io_view[0](0xc900, 0xc9ff).nopr().w(FUNC(wmg_state::wmg_vram_select_w));
-	m_io_view[0](0xca00, 0xca07).w(FUNC(wmg_state::wmg_blitter_w));
+	m_io_view[0](0xca00, 0xca07).w(FUNC(wmg_state::blitter_w));
 	m_io_view[0](0xcb00, 0xcbff).r(FUNC(wmg_state::video_counter_r));
 	m_io_view[0](0xcbff, 0xcbff).w(FUNC(wmg_state::watchdog_reset_w));
-	m_io_view[0](0xcc00, 0xcfff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
+	m_io_view[0](0xcc00, 0xcfff).bankrw(m_nvrambank);
 	m_io_view[1](0xc000, 0xcfff).rom().region("maincpu", 0x58000); // Defender ROMs
 	m_io_view[2](0xc000, 0xcfff).rom().region("maincpu", 0x59000);
 	m_io_view[3](0xc000, 0xcfff).rom().region("maincpu", 0x5a000);
@@ -322,31 +321,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  NVRAM (8k x 8), banked
- *
- *************************************/
-u8 wmg_state::wmg_nvram_r(offs_t offset)
-{
-	return m_p_ram[offset+(m_wmg_c400<<10)];
-}
-
-void wmg_state::wmg_nvram_w(offs_t offset, u8 data)
-{
-	m_p_ram[offset+(m_wmg_c400<<10)] = data;
-}
-
-/*************************************
- *
- *  Blitter
- *
- *************************************/
-void wmg_state::wmg_blitter_w(offs_t offset, u8 data)
-{
-	blitter_w(m_maincpu->space(AS_PROGRAM), offset, data);
-}
-
-/*************************************
- *
  *  Bankswitching
  *
  *************************************/
@@ -360,13 +334,14 @@ void wmg_state::wmg_c400_w(u8 data)
 	if (m_wmg_c400 == data)
 		return;
 
-	if ((data == 0) || (m_wmg_c400 == 0))   // we must be going to/from the menu
+	if ((data == 0) || (m_wmg_c400 == 0)) // we must be going to/from the menu
 	{
 		m_wmg_c400 = data;
-		wmg_d000_w(0); // select i/o
-		m_mainbank->set_entry(data);      // Gfx etc
+		wmg_d000_w(0);                    // select I/O
+		m_mainbank->set_entry(data);      // Graphics, etc.
 		m_codebank->set_entry(data);      // Code
-		m_soundbank->set_entry(data);      // Sound
+		m_nvrambank->set_entry(data);     // NVRAM
+		m_soundbank->set_entry(data);     // Sound
 		m_soundcpu->reset();
 	}
 }
@@ -432,11 +407,12 @@ void wmg_state::machine_start()
 {
 	williams_state::machine_start();
 
-	uint8_t *cpu = memregion("maincpu")->base();
-	uint8_t *snd = memregion("soundcpu")->base();
-	m_mainbank->configure_entries(0, 8, &cpu[0x00000], 0x10000);  // Gfx etc
-	m_codebank->configure_entries(0, 8, &cpu[0x0d000], 0x10000);  // Code
-	m_soundbank->configure_entries(0, 8, &snd[0x00000], 0x1000);  // Sound
+	uint8_t *const cpu = memregion("maincpu")->base();
+	uint8_t *const snd = memregion("soundcpu")->base();
+	m_mainbank->configure_entries(0, 8, &cpu[0x00000], 0x10000);    // Graphics, etc.
+	m_codebank->configure_entries(0, 8, &cpu[0x0d000], 0x10000);    // Code
+	m_nvrambank->configure_entries(0, 8, &m_nvram[0], 0x400);       // NVRAM
+	m_soundbank->configure_entries(0, 8, &snd[0x00000], 0x1000);    // Sound
 
 	save_item(NAME(m_wmg_c400));
 	save_item(NAME(m_wmg_d000));
@@ -518,6 +494,7 @@ void wmg_state::wmg(machine_config &config)
 	M6808(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu2);
 
+	// 8k x 8, banked
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen

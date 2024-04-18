@@ -170,9 +170,9 @@ void williams_state::snd_cmd_w(u8 data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::deferred_snd_cmd_w),this), data | 0xc0);
 }
 
-void playball_state::snd_cmd_w(u8 data)
+void williams_state::playball_snd_cmd_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(playball_state::deferred_snd_cmd_w),this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::deferred_snd_cmd_w),this), data);
 }
 
 TIMER_CALLBACK_MEMBER(williams2_state::deferred_snd_cmd_w)
@@ -226,17 +226,10 @@ u8 williams_state::port_0_49way_r()
  *
  *************************************/
 
-void williams_state::cmos_w(offs_t offset, u8 data)
+void williams_state::cmos_4bit_w(offs_t offset, u8 data)
 {
-	/* only 4 bits are valid */
+	// only 4 bits are valid
 	m_nvram[offset] = data | 0xf0;
-}
-
-
-void bubbles_state::cmos_w(offs_t offset, u8 data)
-{
-	/* bubbles has additional CMOS for a full 8 bits */
-	m_nvram[offset] = data;
 }
 
 
@@ -457,6 +450,21 @@ void blaster_state::blaster_snd_cmd_w(u8 data)
 void williams2_state::video_control_w(u8 data)
 {
 	m_cocktail = BIT(data, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Mystic Marathon-specific routines
+ *
+ *************************************/
+
+void mysticm_state::machine_start()
+{
+	williams2_state::machine_start();
+
+	save_item(NAME(m_bg_color));
 }
 
 
