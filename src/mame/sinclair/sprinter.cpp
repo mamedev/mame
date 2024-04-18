@@ -283,6 +283,7 @@ private:
 	u8 m_cbl_wa;
 	bool m_cbl_wae;
 	emu_timer *m_cbl_timer = nullptr;
+	bool m_hold_irq;
 };
 
 void sprinter_state::update_memory()
@@ -1332,6 +1333,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_cbl_cnt));
 	save_item(NAME(m_cbl_wa));
 	save_item(NAME(m_cbl_wae));
+	save_item(NAME(m_hold_irq));
 
 	m_beta->enable();
 
@@ -1387,6 +1389,7 @@ void sprinter_state::machine_reset()
 
 	m_cbl_xx = 0;
 	m_cbl_wa = 0;
+	m_hold_irq = 0;
 
 	m_ata_selected = 0;
 
@@ -1518,7 +1521,7 @@ void sprinter_state::do_cpu_wait(bool is_io)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	if (m_maincpu->input_state(INPUT_LINE_IRQ0) != HOLD_LINE)
+	if (!m_hold_irq)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
@@ -1528,6 +1531,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
+	m_hold_irq = 0;
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
@@ -1545,7 +1549,8 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 
 	if (cbl_int_ena() && !(m_cbl_cnt & 0x7f))
 	{
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+		m_hold_irq = 1;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_irq_off_timer->adjust(attotime::never);
 	}
 }
@@ -1716,7 +1721,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_io_map(&sprinter_state::map_io);
 	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->irqack_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->irqack_cb().set(FUNC(sprinter_state::irq_off));
 
 	ISA8(config, m_isa[0], 0);
 	m_isa[0]->set_custom_spaces();
