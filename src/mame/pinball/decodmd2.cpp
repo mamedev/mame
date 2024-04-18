@@ -10,7 +10,11 @@
 
 #include "emu.h"
 #include "decodmd2.h"
+
 #include "screen.h"
+
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(DECODMD2, decodmd_type2_device, "decodmd2", "Data East Pinball Dot Matrix Display Type 2")
 
@@ -41,7 +45,7 @@ uint8_t decodmd_type2_device::latch_r()
 	if (!machine().side_effects_disabled())
 	{
 		// clear IRQ?
-		m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
+		m_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 		m_busy = false;
 	}
 	return m_command;
@@ -68,13 +72,13 @@ uint8_t decodmd_type2_device::busy_r()
 
 void decodmd_type2_device::ctrl_w(uint8_t data)
 {
-	if(!(m_ctrl & 0x01) && (data & 0x01))
+	if (!(m_ctrl & 0x01) && (data & 0x01))
 	{
 		m_cpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
 		m_busy = true;
 		m_command = m_latch;
 	}
-	if((m_ctrl & 0x02) && !(data & 0x02))
+	if ((m_ctrl & 0x02) && !(data & 0x02))
 	{
 		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_rombank->set_entry(0);
@@ -168,6 +172,7 @@ decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const 
 	, m_busy(0)
 	, m_command(0)
 {
+	std::fill(std::begin(m_crtc_reg), std::end(m_crtc_reg), 0);
 }
 
 void decodmd_type2_device::device_start()
@@ -181,7 +186,6 @@ void decodmd_type2_device::device_start()
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_command));
-
 }
 
 void decodmd_type2_device::device_reset()
