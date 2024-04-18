@@ -9,7 +9,7 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/fdc37c665gt.h"
+#include "fdc37c665gt.h"
 
 #define LOG_CONFIG (1U << 1) // Show global configuration changes
 

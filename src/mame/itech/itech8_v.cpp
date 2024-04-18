@@ -133,11 +133,11 @@
 #define BLITTER_XSTOP           m_blitter_data[10]
 #define BLITTER_YSKIP           m_blitter_data[11]
 
-#define BLITFLAG_SHIFT          0x01
-#define BLITFLAG_XFLIP          0x02
-#define BLITFLAG_YFLIP          0x04
-#define BLITFLAG_RLE            0x08
-#define BLITFLAG_TRANSPARENT    0x10
+static constexpr u8 BLITFLAG_SHIFT        = 0x01;
+static constexpr u8 BLITFLAG_XFLIP        = 0x02;
+static constexpr u8 BLITFLAG_YFLIP        = 0x04;
+static constexpr u8 BLITFLAG_RLE          = 0x08;
+static constexpr u8 BLITFLAG_TRANSPARENT  = 0x10;
 
 
 
@@ -149,10 +149,10 @@
 
 void itech8_state::video_start()
 {
-	/* get the TMS34061 display state */
+	// get the TMS34061 display state
 	m_tms34061->get_display_state();
 
-	/* reset statics */
+	// reset statics
 	m_page_select = 0xc0;
 	m_blit_in_progress = 0;
 
@@ -238,8 +238,6 @@ inline void itech8_state::consume_rle(int count)
 {
 	while (count)
 	{
-		int num_to_consume;
-
 		if (m_fetch_rle_count == 0)
 		{
 			m_fetch_rle_count = m_grom[m_fetch_offset++ % m_grom.length()];
@@ -250,7 +248,7 @@ inline void itech8_state::consume_rle(int count)
 				m_fetch_rle_value = m_grom[m_fetch_offset++ % m_grom.length()];
 		}
 
-		num_to_consume = (count < m_fetch_rle_count) ? count : m_fetch_rle_count;
+		int const num_to_consume = (count < m_fetch_rle_count) ? count : m_fetch_rle_count;
 		count -= num_to_consume;
 
 		m_fetch_rle_count -= num_to_consume;
@@ -270,48 +268,48 @@ inline void itech8_state::consume_rle(int count)
 void itech8_state::perform_blit()
 {
 	offs_t addr = m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8);
-	u8 shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
-	int transparent = (BLITTER_FLAGS & BLITFLAG_TRANSPARENT);
-	int ydir = (BLITTER_FLAGS & BLITFLAG_YFLIP) ? -1 : 1;
+	u8 const shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
+	int const transparent = (BLITTER_FLAGS & BLITFLAG_TRANSPARENT);
+	int const ydir = (BLITTER_FLAGS & BLITFLAG_YFLIP) ? -1 : 1;
 	int xdir = (BLITTER_FLAGS & BLITFLAG_XFLIP) ? -1 : 1;
-	int xflip = (BLITTER_FLAGS & BLITFLAG_XFLIP);
-	int rle = (BLITTER_FLAGS & BLITFLAG_RLE);
-	int color = m_tms34061->latch_r();
+	int const xflip = (BLITTER_FLAGS & BLITFLAG_XFLIP);
+	int const rle = (BLITTER_FLAGS & BLITFLAG_RLE);
+	int const color = m_tms34061->latch_r();
 	int width = BLITTER_WIDTH;
 	int height = BLITTER_HEIGHT;
 	u8 transmaskhi, transmasklo;
-	u8 mask = BLITTER_MASK;
+	u8 const mask = BLITTER_MASK;
 	u8 skip[3];
 	int x, y;
 
-	/* debugging */
+	// debugging
 	LOGBLITTER("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
 				m_screen->vpos(),
 				(m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
 
-	/* initialize the fetcher */
+	// initialize the fetcher
 	m_fetch_offset = (m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO;
 	m_fetch_rle_count = 0;
 
-	/* RLE starts with a couple of extra 0's */
+	// RLE starts with a couple of extra 0's
 	if (rle)
 		m_fetch_offset += 2;
 
-	/* select 4-bit versus 8-bit transparency */
+	// select 4-bit versus 8-bit transparency
 	if (BLITTER_OUTPUT & 0x40)
 		transmaskhi = 0xf0, transmasklo = 0x0f;
 	else
 		transmaskhi = transmasklo = 0xff;
 
-	/* compute horiz skip counts */
+	// compute horiz skip counts
 	skip[0] = BLITTER_XSTART;
 	skip[1] = (width <= BLITTER_XSTOP) ? 0 : width - 1 - BLITTER_XSTOP;
 	if (xdir == -1) { int temp = skip[0]; skip[0] = skip[1]; skip[1] = temp; }
 	width -= skip[0] + skip[1];
 
-	/* compute vertical skip counts */
+	// compute vertical skip counts
 	if (ydir == 1)
 	{
 		skip[2] = (height <= BLITTER_YCOUNT) ? 0 : height - BLITTER_YCOUNT;
@@ -323,71 +321,71 @@ void itech8_state::perform_blit()
 		if (BLITTER_YCOUNT > 1) height -= BLITTER_YCOUNT - 1;
 	}
 
-	/* skip top */
+	// skip top
 	for (y = 0; y < skip[2]; y++)
 	{
-		/* skip src and dest */
+		// skip src and dest
 		addr += xdir * (width + skip[0] + skip[1]);
 		if (rle)
 			consume_rle(width + skip[0] + skip[1]);
 		else
 			consume_raw(width + skip[0] + skip[1]);
 
-		/* back up one and reverse directions */
+		// back up one and reverse directions
 		addr -= xdir;
 		addr += ydir * 256;
 		addr &= VRAM_MASK;
 		xdir = -xdir;
 	}
 
-	/* loop over height */
+	// loop over height
 	for (y = skip[2]; y < height; y++)
 	{
-		/* skip left */
+		// skip left
 		addr += xdir * skip[y & 1];
 		if (rle)
 			consume_rle(skip[y & 1]);
 		else
 			consume_raw(skip[y & 1]);
 
-		/* loop over width */
+		// loop over width
 		for (x = 0; x < width; x++)
 		{
 			u8 pix = rle ? fetch_next_rle() : fetch_next_raw();
 
-			/* swap pixels for X flip in 4bpp mode */
+			// swap pixels for X flip in 4bpp mode
 			if (xflip && transmaskhi != 0xff)
 				pix = (pix >> 4) | (pix << 4);
 			pix &= mask;
 
-			/* draw upper pixel */
+			// draw upper pixel
 			if (!transparent || (pix & transmaskhi))
 			{
 				m_tms34061->m_display.vram[addr] = (m_tms34061->m_display.vram[addr] & (0x0f << shift)) | ((pix & 0xf0) >> shift);
 				m_tms34061->m_display.latchram[addr] = (m_tms34061->m_display.latchram[addr] & (0x0f << shift)) | ((color & 0xf0) >> shift);
 			}
 
-			/* draw lower pixel */
+			// draw lower pixel
 			if (!transparent || (pix & transmasklo))
 			{
-				offs_t addr1 = addr + shift/4;
+				offs_t const addr1 = addr + shift/4;
 				m_tms34061->m_display.vram[addr1] = (m_tms34061->m_display.vram[addr1] & (0xf0 >> shift)) | ((pix & 0x0f) << shift);
 				m_tms34061->m_display.latchram[addr1] = (m_tms34061->m_display.latchram[addr1] & (0xf0 >> shift)) | ((color & 0x0f) << shift);
 			}
 
-			/* advance to the next byte */
+			// advance to the next byte
 			addr += xdir;
 			addr &= VRAM_MASK;
 		}
 
-		/* skip right */
+		// skip right
 		addr += xdir * skip[~y & 1];
 		if (rle)
 			consume_rle(skip[~y & 1]);
 		else
 			consume_raw(skip[~y & 1]);
 
-		/* back up one and reverse directions */
+		// back up one and reverse directions
 		addr -= xdir;
 		addr += ydir * 256;
 		addr &= VRAM_MASK;
@@ -405,7 +403,7 @@ void itech8_state::perform_blit()
 
 TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 {
-	/* turn off blitting and generate an interrupt */
+	// turn off blitting and generate an interrupt
 	m_blit_in_progress = 0;
 	update_interrupts(-1, -1, 1);
 
@@ -424,23 +422,24 @@ u8 itech8_state::blitter_r(offs_t offset)
 {
 	int result = m_blitter_data[offset / 2];
 
-	/* debugging */
+	// debugging
 	LOGBLITTER("%s:blitter_r(%02x)\n", machine().describe_context(), offset / 2);
 
-	/* low bit seems to be ignored */
+	// low bit seems to be ignored
 	offset /= 2;
 
-	/* a read from offset 3 clears the interrupt and returns the status */
+	// a read from offset 3 clears the interrupt and returns the status
 	if (offset == 3)
 	{
-		update_interrupts(-1, -1, 0);
+		if (!machine().side_effects_disabled())
+			update_interrupts(-1, -1, 0);
 		if (m_blit_in_progress)
 			result |= 0x80;
 		else
 			result &= 0x7f;
 	}
 
-	/* a read from offsets 12-15 return input port values */
+	// a read from offsets 12-15 return input port values
 	if (offset >= 12 && offset <= 15)
 		result = m_an[offset - 12].read_safe(0);
 
@@ -450,14 +449,14 @@ u8 itech8_state::blitter_r(offs_t offset)
 
 void itech8_state::blitter_w(offs_t offset, u8 data)
 {
-	/* low bit seems to be ignored */
+	// low bit seems to be ignored
 	offset /= 2;
 	m_blitter_data[offset] = data;
 
-	/* a write to offset 3 starts things going */
+	// a write to offset 3 starts things going
 	if (offset == 3)
 	{
-		/* log to the blitter file */
+		// log to the blitter file
 		LOGBLITTER("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
 						(m_tms34061->xyoffset() >> 8) & 0x0f, m_tms34061->xyaddress(),
 						m_grom_bank, m_blitter_data[0], m_blitter_data[1],
@@ -473,15 +472,15 @@ void itech8_state::blitter_w(offs_t offset, u8 data)
 						m_blitter_data[12], m_blitter_data[13],
 						m_blitter_data[14], m_blitter_data[15]);
 
-		/* perform the blit */
+		// perform the blit
 		perform_blit();
 		m_blit_in_progress = 1;
 
-		/* set a timer to go off when we're done */
+		// set a timer to go off when we're done
 		m_blitter_done_timer->adjust(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12));
 	}
 
-	/* debugging */
+	// debugging
 	LOGBLITTER("%s:blitter_w(%02x)=%02x\n", machine().describe_context(), offset, data);
 }
 
@@ -495,7 +494,7 @@ void itech8_state::blitter_w(offs_t offset, u8 data)
 
 void itech8_state::tms34061_w(offs_t offset, u8 data)
 {
-	int func = (offset >> 9) & 7;
+	int const func = (offset >> 9) & 7;
 	int col = offset & 0xff;
 
 	/* Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted
@@ -503,14 +502,14 @@ void itech8_state::tms34061_w(offs_t offset, u8 data)
 	if (func == 0 || func == 2)
 		col ^= 2;
 
-	/* Row address (RA0-RA8) is not dependent on the offset */
+	// Row address (RA0-RA8) is not dependent on the offset
 	m_tms34061->write(col, 0xff, func, data);
 }
 
 
 u8 itech8_state::tms34061_r(offs_t offset)
 {
-	int func = (offset >> 9) & 7;
+	int const func = (offset >> 9) & 7;
 	int col = offset & 0xff;
 
 	/* Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted
@@ -518,7 +517,7 @@ u8 itech8_state::tms34061_r(offs_t offset)
 	if (func == 0 || func == 2)
 		col ^= 2;
 
-	/* Row address (RA0-RA8) is not dependent on the offset */
+	// Row address (RA0-RA8) is not dependent on the offset
 	return m_tms34061->read(col, 0xff, func);
 }
 
@@ -532,14 +531,14 @@ u8 itech8_state::tms34061_r(offs_t offset)
 
 void grmatch_state::palette_w(u8 data)
 {
-	/* set the palette control; examined in the scanline callback */
+	// set the palette control; examined in the scanline callback
 	m_palcontrol = data;
 }
 
 
 void grmatch_state::xscroll_w(u8 data)
 {
-	/* update the X scroll value */
+	// update the X scroll value
 	//m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_xscroll = data;
@@ -548,21 +547,21 @@ void grmatch_state::xscroll_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(grmatch_state::palette_update)
 {
-	/* if the high bit is set, we are supposed to latch the palette values */
+	// if the high bit is set, we are supposed to latch the palette values
 	if (m_palcontrol & 0x80)
 	{
-		/* the TMS34070s latch at the start of the frame, based on the first few bytes */
-		u32 page_offset = (m_tms34061->m_display.dispstart & 0x0ffff) | m_xscroll;
+		// the TMS34070s latch at the start of the frame, based on the first few bytes
+		u32 const page_offset = (m_tms34061->m_display.dispstart & 0x0ffff) | m_xscroll;
 
-		/* iterate over both pages */
+		// iterate over both pages
 		for (int page = 0; page < 2; page++)
 		{
 			const u8 *base = &m_tms34061->m_display.vram[(page * 0x20000 + page_offset) & VRAM_MASK];
 			for (int x = 0; x < 16; x++)
 			{
-				u8 data0 = base[x * 2 + 0];
-				u8 data1 = base[x * 2 + 1];
-				m_palette[page][x] = rgb_t(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0));
+				u8 const data0 = base[x * 2 + 0];
+				u8 const data1 = base[x * 2 + 1];
+				m_palette[page]->set_pen_color(x, rgb_t(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0)));
 			}
 		}
 	}
@@ -582,10 +581,10 @@ u32 itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitm
 {
 	pen_t const *const pens = m_tlc34076->pens();
 
-	/* first get the current display state */
+	// first get the current display state
 	m_tms34061->get_display_state();
 
-	/* if we're blanked, just fill with black */
+	// if we're blanked, just fill with black
 	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
@@ -604,7 +603,7 @@ u32 itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitm
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int const pix0 = base0[x] & 0x0f;
+			u8 const pix0 = base0[x] & 0x0f;
 			dest[x] = pens[pix0 ? pix0 : base2[x]];
 		}
 	}
@@ -614,10 +613,12 @@ u32 itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitm
 
 u32 grmatch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* first get the current display state */
+	pen_t const *const pens[2] = { m_palette[0]->pens(), m_palette[1]->pens() };
+
+	// first get the current display state
 	m_tms34061->get_display_state();
 
-	/* if we're blanked, just fill with black */
+	// if we're blanked, just fill with black
 	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
@@ -642,14 +643,14 @@ u32 grmatch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			u8 const pix2 = base2[x / 2];
 
 			if ((pix0 & 0xf0) != 0)
-				dest[x] = m_palette[0][pix0 >> 4];
+				dest[x] = pens[0][pix0 >> 4];
 			else
-				dest[x] = m_palette[1][pix2 >> 4];
+				dest[x] = pens[1][pix2 >> 4];
 
 			if ((pix0 & 0x0f) != 0)
-				dest[x + 1] = m_palette[0][pix0 & 0x0f];
+				dest[x + 1] = pens[0][pix0 & 0x0f];
 			else
-				dest[x + 1] = m_palette[1][pix2 & 0x0f];
+				dest[x + 1] = pens[1][pix2 & 0x0f];
 		}
 	}
 	return 0;
@@ -660,10 +661,10 @@ u32 itech8_state::screen_update_2page(screen_device &screen, bitmap_rgb32 &bitma
 {
 	pen_t const *const pens = m_tlc34076->pens();
 
-	/* first get the current display state */
+	// first get the current display state
 	m_tms34061->get_display_state();
 
-	/* if we're blanked, just fill with black */
+	// if we're blanked, just fill with black
 	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
@@ -689,10 +690,10 @@ u32 itech8_state::screen_update_2page_large(screen_device &screen, bitmap_rgb32 
 {
 	pen_t const *const pens = m_tlc34076->pens();
 
-	/* first get the current display state */
+	// first get the current display state
 	m_tms34061->get_display_state();
 
-	/* if we're blanked, just fill with black */
+	// if we're blanked, just fill with black
 	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);

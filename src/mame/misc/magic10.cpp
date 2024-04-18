@@ -17,6 +17,7 @@
   Magic's 10 (ver. 16.45)        1995  A.W.P. Games          post lex  direct    yes       ?          no      NVRAM     ?
   Magic's 10 (ver. 16.54)        1995  A.W.P. Games          post lex  direct    yes       ?          no      ?         ?
   Magic's 10 (ver. 16.55)        1995  A.W.P. Games          post lex  direct    yes       DIP H      no      NVRAM     040
+  Soccer 10 (ver. 16.44)         1996  Unknown               post lex  direct    yes       DIP H      no      NVRAM     none
   Hot Slot (ver. 05.01)          1996  ABM Games             post lex  direct    yes       LCC        no      battery   ?
   Super Gran Safari (ver. 3.11)  1996  New Impeuropex Corp.  post lex  [1]       yes       DIP V      no      NVRAM     COMP01
   Magic's 10 2 (ver. 1.1)        1997  ABM Games             post lex  [2]       no        ?          yes     battery   9605 Rev.02
@@ -152,6 +153,7 @@ Both setups show different variants for components layout, memory size, NVRAM, e
     blue scrolling diagonally. The blocks are out of alignment which is caused by
     update_screen doing m_tilemap[1]->set_scrollx(0, (m_vregs[2 / 2] - m_vregs[6 / 2]) + 4)
     Removing the +4 fixes the problem but does it cause other issues ?
+  - soccer10 needs correct GFX decode
 
 
 ****************************************************************************/
@@ -223,9 +225,11 @@ public:
 	void magic10(machine_config &config);
 	void magic10a(machine_config &config);
 	void sgsafari(machine_config &config);
+	void soccer10(machine_config &config);
 
 	void init_magic10();
 	void init_sgsafari();
+	void init_soccer10();
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
@@ -962,6 +966,12 @@ void magic10_state::magic10a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::magic10a_map);
 }
 
+void magic10_state::soccer10(machine_config &config)
+{
+	magic10a(config);
+
+	m_maincpu->set_vblank_int("screen", FUNC(magic10_base_state::irq4_line_hold));
+}
 
 void magic102_state::magic102(machine_config &config)
 {
@@ -1255,6 +1265,25 @@ ROM_START( magic102a )
 	ROM_REGION( 0x0400, "plds", 0 ) // PLDs
 	ROM_LOAD( "gal22cv10.u22", 0x0000, 0x02dd, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
+ROM_END
+
+ROM_START( soccer10 ) // PCB marked I.G.T. International Games Trade s.r.l. (Italian, as s.r.l. is an acronym for 'Società a Responsabilità Limitata')
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "12.u16", 0x000000, 0x20000, CRC(5b1d8de2) SHA1(c20f4ca235dc78acb20277407833db8906027d4f) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "13.u15", 0x000001, 0x20000, CRC(92ed3808) SHA1(eb1a062190cbcc389561504a0d0685c91952dbd9) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "tiles", 0 )
+	ROM_LOAD( "4.u24", 0x00000, 0x40000, CRC(06db9866) SHA1(97c18c50c5eb0bd3bc927d3ac22c3176498017fd) )
+	ROM_LOAD( "5.u28", 0x40000, 0x40000, CRC(f41c196d) SHA1(046b7d4bb30740a43ea9ccfb7e5a4d1405456ef8) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
+	ROM_LOAD( "1.u44", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) ) // same as magic10 and clones
+
+	ROM_REGION( 0x0800, "ds1220", 0 ) // TODO: is this needed or is it just user data? Verify once working
+	ROM_LOAD( "ds1220.u20", 0x0000, 0x0800, CRC(afc7cbc3) SHA1(74f51217a4f280c20742657ef80a9b4d5a891a7e) )
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "gal20v8a.u4", 0x0000, 0x0157, NO_DUMP )
 ROM_END
 
 /*
@@ -1886,6 +1915,17 @@ void magic10_state::init_sgsafari()
 	m_layer2_offset[1] = 20;
 }
 
+void magic10_state::init_soccer10()
+{
+	//m_layer2_offset[0] = 16;
+	//m_layer2_offset[1] = 20;
+
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000 / 2; i++)
+		rom[i] = bitswap<16>(rom[i], 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0, 1);
+}
+
 void spetrix_state::init_spetrix()
 {
 	m_layer2_offset[0] = 16;
@@ -1904,7 +1944,7 @@ void magic102_state::init_altaten()
 	rom[0x7669] = 0x4e;
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /******************************
@@ -1916,6 +1956,7 @@ GAMEL( 1995, magic10,   0,        magic10,  magic10,  magic10_state,  init_magic
 GAMEL( 1995, magic10a,  magic10,  magic10,  magic10,  magic10_state,  init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
 GAMEL( 1995, magic10b,  magic10,  magic10a, magic10,  magic10_state,  init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
 GAMEL( 1995, magic10c,  magic10,  magic10a, magic10,  magic10_state,  init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        MACHINE_SUPPORTS_SAVE,                        layout_sgsafari )
+GAMEL( 1996, soccer10,  0,        soccer10, magic10,  magic10_state,  init_soccer10, ROT0, "<unknown>",            "Soccer 10 (ver. 16.44)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_sgsafari ) // needs correct GFX decode. Manufacturer to be verified once done
 GAME(  1997, magic102,  0,        magic102, magic102, magic102_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. 1.1)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  1997, magic102a, magic102, magic102, magic102, magic102_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. BETA3)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, suprpool,  0,        magic102, magic102, magic102_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

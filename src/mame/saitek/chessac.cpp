@@ -81,7 +81,7 @@ private:
 	u8 m_lcd_com = 0;
 	u8 m_led_select = 0;
 	u8 m_led_data = 0;
-	u32 m_adpdm_address = 0;
+	u32 m_adpcm_address = 0;
 
 	u8 m_port3 = 0xff;
 	u8 m_port5 = 0xff;
@@ -115,7 +115,7 @@ void chessac_state::machine_start()
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
-	save_item(NAME(m_adpdm_address));
+	save_item(NAME(m_adpcm_address));
 	save_item(NAME(m_port3));
 	save_item(NAME(m_port5));
 	save_item(NAME(m_port7));
@@ -197,7 +197,7 @@ void chessac_state::update_adpcm_address()
 		if (BIT(m_port3, i))
 		{
 			const u8 shift = 8 * i;
-			m_adpdm_address = (m_adpdm_address & ~(0xff << shift)) | (m_port7 << shift);
+			m_adpcm_address = (m_adpcm_address & ~(0xff << shift)) | (m_port7 << shift);
 		}
 }
 
@@ -214,7 +214,7 @@ void chessac_state::p3_w(u8 data)
 		m_okim6588->data_w(m_port7);
 
 	// P33: ADPCM ROM CE
-	// P30-P33: enable ADPCM ROM address latches
+	// P30-P32: enable ADPCM ROM address latches
 	m_port3 = data;
 	update_adpcm_address();
 }
@@ -266,7 +266,7 @@ u8 chessac_state::p7_r()
 
 	// P70-P77: read ADPCM ROM
 	if (~m_port3 & 8)
-		data &= m_adpcm_rom[m_adpdm_address & (m_adpcm_rom.bytes() - 1)];
+		data &= m_adpcm_rom[m_adpcm_address & (m_adpcm_rom.bytes() - 1)];
 
 	// P70-P73: read MSM6588 status
 	if ((m_port3 & 0xf0) == 0xa0)
@@ -316,9 +316,6 @@ static INPUT_PORTS_START( chessac )
 	PORT_START("IN.2")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, chessac_state, go_button, 0) PORT_NAME("Go / Stop")
 	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -414,5 +411,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, chessac,  0,       0,      chessac,  chessac, chessac_state, empty_init, "Saitek", "Kasparov Chess Academy", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1997, schachak, chessac, 0,      schachak, chessac, chessac_state, empty_init, "Saitek", "Mephisto Schachakademie", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1997, chessac,  0,       0,      chessac,  chessac, chessac_state, empty_init, "Saitek", "Kasparov Chess Academy", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, schachak, chessac, 0,      schachak, chessac, chessac_state, empty_init, "Saitek", "Mephisto Schachakademie", MACHINE_SUPPORTS_SAVE )

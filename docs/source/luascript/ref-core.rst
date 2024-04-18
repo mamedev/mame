@@ -587,9 +587,6 @@ driver.is_bios_root (read-only)
 driver.requires_artwork (read-only)
     A Boolean indicating whether the system requires external artwork to be
     usable.
-driver.clickable_artwork (read-only)
-    A Boolean indicating whether the system requires clickable artwork features
-    to be usable.
 driver.unofficial (read-only)
     A Boolean indicating whether this is an unofficial but common user
     modification to a system.

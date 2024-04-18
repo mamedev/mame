@@ -10,8 +10,7 @@ Looks similar in design to National PC87306 (including similar reg names)
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/isa/isa.h"
-#include "machine/w83787f.h"
+#include "w83787f.h"
 
 #define LOG_WARN        (1U << 1)
 

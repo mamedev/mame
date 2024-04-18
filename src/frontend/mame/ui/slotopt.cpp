@@ -222,7 +222,7 @@ void menu_slot_devices::recompute_metrics(uint32_t width, uint32_t height, float
 //  custom_render - draw extra menu content
 //-------------------------------------------------
 
-void menu_slot_devices::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_slot_devices::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	if (selectedref && (ITEMREF_RESET != selectedref))
 	{

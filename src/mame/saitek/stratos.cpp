@@ -574,9 +574,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, stratos,  0,       0,      stratos, stratos, stratos_state, empty_init, "SciSys / Heuristic Software", "Kasparov Stratos (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, stratosa, stratos, 0,      stratos, stratos, stratos_state, empty_init, "SciSys / Heuristic Software", "Kasparov Stratos (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, stratos,  0,       0,      stratos, stratos, stratos_state, empty_init, "SciSys / Heuristic Software", "Kasparov Stratos (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, stratosa, stratos, 0,      stratos, stratos, stratos_state, empty_init, "SciSys / Heuristic Software", "Kasparov Stratos (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, tking,    stratos, 0,      tking2,  tking2,  stratos_state, empty_init, "Saitek / Heuristic Software", "Kasparov Turbo King (ver. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
-SYST( 1988, tkinga,   stratos, 0,      tking,   tking,   stratos_state, empty_init, "Saitek / Heuristic Software", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, tkingb,   stratos, 0,      tking,   tking,   stratos_state, empty_init, "Saitek / Heuristic Software", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, tking,    stratos, 0,      tking2,  tking2,  stratos_state, empty_init, "Saitek / Heuristic Software", "Kasparov Turbo King (ver. D)", MACHINE_SUPPORTS_SAVE ) // aka Turbo King II
+SYST( 1988, tkinga,   stratos, 0,      tking,   tking,   stratos_state, empty_init, "Saitek / Heuristic Software", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, tkingb,   stratos, 0,      tking,   tking,   stratos_state, empty_init, "Saitek / Heuristic Software", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE )

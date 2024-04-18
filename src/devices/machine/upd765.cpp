@@ -483,7 +483,7 @@ void upd765_family_device::tdr_w(uint8_t data)
 
 uint8_t upd765_family_device::msr_r()
 {
-	uint32_t msr = 0;
+	uint8_t msr = 0;
 	switch(main_phase) {
 	case PHASE_CMD:
 		msr |= MSR_RQM;
@@ -540,7 +540,7 @@ uint8_t upd765_family_device::fifo_r()
 	switch(main_phase) {
 	case PHASE_CMD:
 		if(machine().side_effects_disabled())
-			return 0x00;
+			return 0xff;
 		if(command_pos)
 			fifo_w(0xff);
 		LOGFIFO("fifo_r in command phase\n");

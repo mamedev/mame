@@ -29,7 +29,7 @@ protected:
 	virtual void menu_activated() override;
 
 private:
-	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_INIT, SELECT_RW };
+	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_INIT };
 
 	floppy_image_device &fd;
 	const floppy_image_format_t *input_format, *output_format;

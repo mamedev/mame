@@ -210,4 +210,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS                  INIT        COMPANY         FULLNAME                  FLAGS
-COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, empty_init, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, empty_init, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

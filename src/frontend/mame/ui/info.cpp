@@ -576,11 +576,6 @@ void menu_game_info::populate()
 {
 }
 
-bool menu_game_info::handle(event const *ev)
-{
-	return ev && handle_key(ev->iptkey);
-}
-
 
 /*-------------------------------------------------
   menu_warn_info - handle the emulation warnings menu
@@ -638,11 +633,6 @@ void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &wi
 
 void menu_warn_info::populate()
 {
-}
-
-bool menu_warn_info::handle(event const *ev)
-{
-	return ev && handle_key(ev->iptkey);
 }
 
 

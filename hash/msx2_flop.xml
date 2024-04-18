@@ -22,6 +22,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="mlg30">
+		<description>Mitsubishi ML-G30</description>
+		<year>1985</year>
+		<publisher>Mitsubishi</publisher>
+		<info name="usage" value="Requires a mouse. Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="mitsubishi ml-g30.dsk" size="737280" crc="95e46993" sha1="4a732bededded8ee863694ef186aa920a7f90b43"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fs4600">
 		<description>National FS-4600</description>
 		<year>1986</year>
@@ -50,7 +62,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="fs5000">
-		<description>iNational FS-5000</description>
+		<description>National FS-5000</description>
 		<year>1986</year>
 		<publisher>National</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -333,6 +345,39 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="easytlp2" supported="no">
+		<description>Easy Telopper II (Japan)</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<notes>When running on a HB-F900, a 192KB ramdisk is supposed to be created on boot. Cartridge not fully dumped?</notes>
+		<info name="serial" value="HBS-H022D"/>
+		<info name="barcode" value="4901780069446"/>
+		<info name="usage" value="Requires a HB-F900 system. Requires a mouse."/>
+		<part name="cart" interface="msx_cart">
+			<!-- PCB contains: 3x MB834000 (512KB ROM), 1x OKI M27512ZB (64KB EPROM), a large 64pin OKI M71H003 ic, and 2x AKM6264ALP-12. -->
+			<feature name="slot" value="halnote"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="easy telopper ii - sony.rom" size="0x100000" crc="3f21be88" sha1="7bba3687cade37aa71b9bbf6d9ce5541d3d6d3d1" status="baddump"/>
+			</dataarea>
+			<!-- 2x AKM6264ALP-12 -->
+			<dataarea name="sram" size="16384"/>
+			<dataarea name="kanji" size="0x20000">
+				<rom name="lh5321l7.ic4" size="0x20000" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk - プログラムディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="easy telopper ii - sony (program disk).dsk" size="737280" crc="8bf0816c" sha1="8e731f3d8d83efb728d74341c67204547e8a4ce7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Backup System Disk - パックアッッジムライスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="easy telopper ii - sony (backup system disk).dsk" size="737280" crc="1adbeaf7" sha1="9deb251abd670aca7334b7cf43c1269170c2d257"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="halnote">
 		<description>HalNote (Japan)</description>
@@ -363,6 +408,61 @@ The following floppies came with the machines.
 			</dataarea>
 			<dataarea name="kanji" size="0x20000">
 				<rom name="lh5321l7.ic4" size="0x20000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nms1170" supported="no">
+		<description>NMS 1170 (Netherlands)</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<notes>Included with NMS 1170 Barcode reader. NMS 1170 is not supported.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="nms 1170 - philips.dsk" size="368640" crc="76afa59b" sha1="3f61b31a8c2daa9969bd9a0468299a8c568f11df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nms1255" supported="no">
+		<description>MSX Data Communications (Netherlands, v1.7)</description>
+		<year>1987</year>
+		<publisher>Philips</publisher>
+		<notes>Included with NMS 1255 Modem package. NMS 1255 is not supported.</notes>
+		<info name="serial" value="NMS 8961/23"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="msx data communications - philips (v1.7).dsk" size="368640" crc="8ed5d1ea" sha1="4d5f4bc28171d0dde555a03a482d8164e81098ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fsifa1" supported="no">
+		<description>Panasonic FS-IFA1 (Japan)</description>
+		<year>1988</year>
+		<publisher>Panasonic</publisher>
+		<notes>The interface cartridge, and supported printers are not emulated.</notes>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<!-- DFJN106ZA, contains a utility for the FW-PU1B handy printer. -->
+			<feature name="part_id" value="システムディスク1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fs-ifa1 - panasonic (disk 1).dsk" size="737280" crc="ddfc7f0f" sha1="7da9488cecd1c18a98b78e886f459138f044a48e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<!-- DFJN111ZA, contains a utility for the FW-RSU1H/W image scanner. -->
+			<feature name="part_id" value="システムディスク2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fs-ifa1 - panasonic (disk 2).dsk" size="737280" crc="d47d9df0" sha1="a35700a81bb4f1a664583f8ecf23e564d7916ea7"/>
+			</dataarea>
+		</part>
+		<part name="cart" interface="msx_cart">
+			<feature name="part_id" value="Interface Cartridge"/>
+			<!-- unknown if it contains rom and/or ram. -->
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="rom" size="0x4000" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -963,6 +1063,34 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="amimoto" supported="no">
+		<description>Amimoto-san (Japan)</description>
+		<year>1988</year>
+		<publisher>MSX Magazine</publisher>
+		<notes>Modems are not supported yet.</notes>
+		<info name="alt_title" value="網元さん"/>
+		<info name="usage" value="Requires a Japanese system. Type HOST to start the BBS host software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="amimoto-san - msx magazine.dsk" size="737280" crc="d890c857" sha1="9279bdd277d86d41c1fe3566374fd48cc3d1bf99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amimoto2" supported="no">
+		<description>Amimoto-san 2 (Japan)</description>
+		<year>1989</year>
+		<publisher>MSX Magazine</publisher>
+		<notes>Modems are not supported yet.</notes>
+		<info name="alt_title" value="網元さん2"/>
+		<info name="usage" value="Requires a Japanese system. Type HOST to start the BBS host software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="amimoto-san 2 - msx magazine.dsk" size="368640" crc="13ef5870" sha1="7c0ecd30351c4eac15983b02693208f015941b23"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="angelus">
 		<description>Angelus (Japan)</description>
 		<year>1988</year>
@@ -1321,6 +1449,17 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="atlasenc">
+		<description>Atlas / Encyclopedie (Belgium)</description>
+		<year>1987</year> <!-- Not sure about this release date. -->
+		<publisher>DAInamic</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="atlas - encyclopedia - dainamic.dsk" size="368640" crc="24d595a8" sha1="e8c9b5bdad15e991d3279d2bb460b3b72bd06c72"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dunbine">
 		<description>Aura Battler Dunbine (Japan)</description>
 		<year>1991</year>
@@ -1638,6 +1777,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="ebd89">
+		<description>Belasting Diskette 1989 (Netherlands)</description>
+		<year>1989</year>
+		<publisher>Elsevier</publisher>
+		<info name="usage" value="Type RUN&quot;EBD&quot;."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="belasting diskette 1989 - elsevier.dsk" size="368640" crc="7f45a2f3" sha1="12ed32b93dfdbfeff07ca67b5bde9f01a3196eac"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="birdywld">
 		<description>Birdy World (Japan)</description>
 		<year>1992</year>
@@ -1729,6 +1880,17 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="block terminator (1988)(dot plan)(jp).dsk" size="737280" crc="6521fdb4" sha1="b234c31453e9e004c5d1753ea7e6048a96fae92c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brnstorm">
+		<description>Brainstorm (Netherlands)</description>
+		<year>1993</year>
+		<publisher>MSX Club Gouda</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1049616">
+				<rom name="brainstorm - msx club gouda.dmk" size="1049616" crc="b56f4464" sha1="36199fc142979d221d45b6c90bdafcc1e7165014"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2210,6 +2372,17 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="cheatmaster">
+		<description>Cheat Master (Netherlands)</description>
+		<year>1992</year>
+		<publisher>MSX Engiine</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cheat master - msx engine.dsk" size="737280" crc="28e3568e" sha1="7cdafe650a00d25fda9b8258530fdfbb1a27c03a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Generation-msx lists this as a single sided release. -->
 	<!-- Software visibly boots through MSX-DOS. -->
 	<software name="chessgm2">
@@ -2413,6 +2586,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="compassf">
+		<description>Compass - Finally Free Edition (v1.2.09)</description>
+		<year>2021</year>
+		<publisher>Compjoetania</publisher>
+		<info name="usage" value="Type COMPASS to start the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="compass - finally free edition - compjoetania.dsk" size="737280" crc="a87f502a" sha1="0dacbbc6800e4e8478c0ff4b0132a8929612efab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="consmaze">
 		<description>Construction Tool Meizu-kun (Japan)</description>
 		<year>1989</year>
@@ -2455,6 +2640,73 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="737280">
 				<rom name="continental - technopolis soft (disk d).dsk" size="737280" crc="2243f1dc" sha1="1c2c142de73fe57da240671cd7d824833f210414"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copyaid">
+		<description>Copy Aid Tenka Muteki (Japan, v2.32+)</description>
+		<year>1993</year>
+		<publisher>SOFTPAL</publisher>
+		<info name="alt_title" value="COPY AID 天下無敵"/>
+		<info name="release" value="19930220"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="copy aid tenka muteki - softpal (v2.32p).dsk" size="737280" crc="635e7b38" sha1="97b5ee865b16071c8ce58137b49913eb6378db4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copyaid232" cloneof="copyaid">
+		<description>Copy Aid Tenka Muteki (Japan, v2.32)</description>
+		<year>1993</year>
+		<publisher>SOFTPAL</publisher>
+		<info name="alt_title" value="COPY AID 天下無敵"/>
+		<info name="release" value="199302??"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="copy aid tenka muteki - softpal (v2.32).dsk" size="737280" crc="1501a6d8" sha1="75ccb3179e4868a17cbe326a541443190d5592c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copyaid230" cloneof="copyaid">
+		<description>Copy Aid Tenka Muteki (Japan, v2.30)</description>
+		<year>1991</year>
+		<publisher>SOFTPAL</publisher>
+		<info name="alt_title" value="COPY AID 天下無敵"/>
+		<info name="release" value="19910622"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="copy aid tenka muteki - softpal (v2.30).dsk" size="737280" crc="4523a583" sha1="b790c38aa05e5940eb78ccbba35107821b4cfcca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copyaid220" cloneof="copyaid">
+		<description>Copy Aid Tenka Muteki (Japan, v2.20)</description>
+		<year>1989</year>
+		<publisher>SOFTPAL</publisher>
+		<info name="alt_title" value="COPY AID 天下無敵"/>
+		<info name="release" value="19890409"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="copy aid tenka muteki - softpal (v2.20).dsk" size="737280" crc="64dc588d" sha1="ff43c148ee2f02fbfbcf05652414944561f8d217"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copyaid212" cloneof="copyaid">
+		<description>Copy Aid Tenka Muteki (Japan, v2.12)</description>
+		<year>1989</year>
+		<publisher>SOFTPAL</publisher>
+		<info name="alt_title" value="COPY AID 天下無敵"/>
+		<info name="release" value="19891118"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="copy aid tenka muteki - softpal (v2.12).dsk" size="737280" crc="6744a170" sha1="69281a4026c00027ea5eef62a6416252e8153451"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3214,6 +3466,18 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="deep forest (1987)(xain)(jp)[a3].dsk" size="737280" crc="5a8a693b" sha1="4cd8323d915875a63f7e44be55ab96073380900d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demokitdx">
+		<description>DemoKit Deluxe (Netherlands)</description>
+		<year>1990</year>
+		<publisher>NewVision</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1032442">
+				<rom name="demokit deluxe - newvision.dmk" size="1032442" crc="481d4290" sha1="0ebee22ba0674f73f1351db63757f527375cd5e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4648,6 +4912,19 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="diskal42">
+		<description>Disk Album 42 - MSX-C Nyuumon Jougekan (Japan)</description>
+		<year>1991</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="Disk Album 42 MSX-C入門　上下巻"/>
+		<info name="usage" value="Requires MSX-DOS."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk album 42 - ascii.dsk" size="737280" crc="0a8d2275" sha1="854115d05adcda8811ed4130c00ee9b590e523a4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="manilove">
 		<description>Disk Mystery #4 - The Man I Love (Japan)</description>
 		<year>1988</year>
@@ -5601,6 +5878,17 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="dupedisk">
+		<description>DupeDisk (Netherlands, v1.02)</description>
+		<year>1992</year>
+		<publisher>U.M.F.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dupedisk - u.m.f. (v1.02).dsk" size="737280" crc="77200358" sha1="d09156eb64a6834a1e19b27240ba33347d1222a1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dynampbl">
 		<description>Dynamic Publisher (Spain)</description>
 		<year>1988</year>
@@ -6183,6 +6471,70 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="f1td">
+		<description>F1 Tool Disk (Japan)</description>
+		<year>1988</year>
+		<publisher>Sony</publisher>
+		<notes>This software came with Sony HB-F1XD, HBD-F1, and HBD-20W machines in early 1988.</notes>
+		<info name="alt_title" value="Ｆ１ツールディスク"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="f1 tool disk - sony.dsk" size="737280" crc="8a70c1eb" sha1="eaa5a4461643379aadd28b4fe8e673de8e4c8e51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1td2">
+		<description>F1 Tool Disk II (Japan)</description>
+		<year>1989</year>
+		<publisher>Sony</publisher>
+		<notes>This software came with Sony HB-F1XDJ computer or HBP-F1C printer in early 1989.</notes>
+		<info name="alt_title" value="F1ツールディスクII"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="f1 tool disk ii - sony.dsk" size="737280" crc="cbbbb332" sha1="b0a317fc46a3f0f4b14e04dc4e85900d1e1b0144"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="facst2">
+		<description>FAC Soundtracker (Netherlands, v2.0)</description>
+		<year>1991</year>
+		<publisher>MSX-Club West-Friesland</publisher>
+		<!-- The MSX-Club West-Friesland release contains just FAC Soundtracker 2.0. The MK Public Domain release includes FAC Music Disk #3. -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1033616">
+				<rom name="fac soundtracker - msx-club west-friesland (v2.0).dmk" size="1033616" crc="89a71f11" sha1="37ca4b29fbe809cf79c9f70cf9d3d3f2394eaec7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="facstp103">
+		<description>FAC Soundtracker Pro (Netherlands, v1.03)</description>
+		<year>1994</year>
+		<publisher>MSX-Club West-Friesland</publisher>
+		<!-- According to generation-msx the release contained 4 floppies. -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1019056">
+				<rom name="fac soundtracker pro - msx-club west-friesland (v1.03).dmk" size="1019056" crc="530cf16c" sha1="ef594a8eb6fba5262da393549a67da43c4127131"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="facstp92" cloneof="facstp103">
+		<description>FAC Soundtracker Pro (Netherlands, 1992)</description>
+		<year>1992</year>
+		<publisher>MK Public Domain</publisher>
+		<!-- According to generation-msx the release contained 4 floppies. -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fac soundtracker pro - mk public domain.dsk" size="737280" crc="92e457d9" sha1="56ccc6cb4310a2670bc87a3fe49b108c69a89239"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fahrn451">
 		<description>Fahrenheit 451 (Spain, cracked)</description>
 		<year>1986</year>
@@ -6554,6 +6906,19 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="fistan - stark-texel (v2.05).dsk" size="368640" crc="09e56e37" sha1="7f97254df972090e51f68cfe4b74ce8f575c0ea9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="focus">
+		<description>MSX2 Disk Backup Tool - Focus (Japan, v2.0)</description>
+		<year>1988</year>
+		<publisher>I.C.C.</publisher>
+		<info name="alt_title" value="MSX2ディスクバックアップツール・フォーカス"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="msx2 disk backup tool - focus - i.c.c..dsk" size="737280" crc="5f7e5dcd" sha1="0a1c882316c09618ee8f56e92934a4d741fc6a4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7067,6 +7432,43 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="gfx9ktb" supported="no">
+		<description>GFX9000 Toolbox</description>
+		<year>2003</year>
+		<publisher>Sunrise for MSX</publisher>
+		<notes>GFX9000 is not emulated.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="G-BASIC - PowerBASIC"/>
+			<dataarea name="flop" size="737280">
+				<rom name="gfx9000 toolbox - sunrise for msx (gbasic).dsk" size="737280" crc="efb52d03" sha1="1d30f29099229e5088f58fcb1ff6f9bf01c8b2e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Paint9000 - GFXAGE"/>
+			<dataarea name="flop" size="737280">
+				<rom name="gfx9000 toolbox - sunrise for msx (paint9000).dsk" size="737280" crc="97669e0a" sha1="ca47d5895103762e37986c6edb521bb2cb8c1a29"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="PicView"/>
+			<dataarea name="flop" size="737280">
+				<rom name="gfx9000 toolbox - sunrise for msx (picview).dsk" size="737280" crc="a2b184ca" sha1="7c075bdc84feaf06e2868495a160a4a5ba6fde53"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="FLI Player"/>
+			<dataarea name="flop" size="737280">
+				<rom name="gfx9000 toolbox - sunrise for msx (fli player).dsk" size="737280" crc="b4f02616" sha1="3ca1bd9e4590cdc00689e3d77f0cac803f6cd513"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="DEMOS - PowerBASIC"/>
+			<dataarea name="flop" size="737280">
+				<rom name="gfx9000 toolbox - sunrise for msx (demos).dsk" size="737280" crc="d4179b09" sha1="e321a20f92398c9eed2fb0d8186185dc21536a40"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="giddyrun">
 		<description>Giddy Runner (Japan)</description>
 		<year>1990</year>
@@ -7464,10 +7866,10 @@ The following floppies came with the machines.
 
 	<!-- The software release contained 2 floppies. -->
 	<software name="graphsar10" cloneof="graphsar">
-		<description>Graph Saurus v1.0 (Japan)</description>
+		<description>Graph Saurus Ver1.0 (Japan)</description>
 		<year>1989</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="グラフサウルス"/>
+		<info name="alt_title" value="グラフ サウルス"/>
 		<info name="serial" value="BM-021"/>
 		<info name="gtin" value="04988655132108"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -7478,10 +7880,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="graphsar">
-		<description>Graph Saurus v2.0 (Japan)</description>
+		<description>Graph Saurus Ver2.0 (Japan)</description>
 		<year>1991</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="グラフサウルスＶｅｒ．２．０"/>
+		<info name="alt_title" value="グラフ サウルス version 2.0"/>
 		<info name="serial" value="BM-124"/>
 		<info name="gtin" value="04988655632219"/>
 		<info name="usage" value="Requires a Japanese system."/>
@@ -7563,6 +7965,23 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Utility disk"/>
 			<dataarea name="flop" size="737280">
 				<rom name="graph saurus v2.0 (1991)(bit2)(jp)(disk 2 of 2).dsk" size="737280" crc="1b2a1703" sha1="42b5aa813627d464dafbcadddf394b0e6ab1e9dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphs21" supported="no">
+		<description>Graph Saurus Ver.2.1 Interlace Mode Plus (Japan)</description>
+		<year>1993</year>
+		<publisher>Bit²</publisher>
+		<info name="alt_title" value="グラフサウルスVer.2.1インターレスモードプラス"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="graph saurus v2.1 - bit2 (disk 1).dsk" size="737280" crc="cb3270ed" sha1="1f02daabbd053fdfa82b6e2b2c8b80255056c087"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="graph saurus v2.1 - bit2 (disk 2).dsk" size="737280" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8120,6 +8539,28 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="homeoffi">
+		<description>Home Office - MSX Designer (Italy)</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="home office - msx designer - philips (italy).dsk" size="368640" crc="7c0d69b6" sha1="3956fd13d30ba0d7224756fab8d60383c973b67a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homeof2i">
+		<description>Home Office 2 (Italy)</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="home office 2 - philips (italy).dsk" size="368640" crc="8b6bda4a" sha1="97e0bb1c6d8c993116e93ac70d008e27b54bf39a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hotmilk">
 		<description>Hot Milk (Japan)</description>
 		<year>1989</year>
@@ -8320,6 +8761,17 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
 				<rom name="illumina - cocktail soft (disk c).dsk" size="737280" crc="d150621f" sha1="1bbb590b2b83daea0f937c40087970e2566f4b7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imgmaker">
+		<description>Image Maker &amp; Poster 8 (Netherlands)</description>
+		<year>1990</year>
+		<publisher>MSX Gids</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="image maker &amp; poster 8 - msx gids.dsk" size="368640" crc="1c9c5e2b" sha1="802f111a614a00a72f9b7dd20258a52357ac77c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10196,6 +10648,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="melbnote">
+		<!-- Software is in English -->
+		<description>Melbrains Note (Japan?)</description>
+		<year>1986</year>
+		<publisher>Mel Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="melbrains note - mel software.dsk" size="737280" crc="fd54d0d0" sha1="c528a7254478c4bca48787111f3f8441d24d1050"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="membgolf">
 		<description>Membership Golf (Japan)</description>
 		<year>1989</year>
@@ -10376,6 +10840,31 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="midisaurus">
+		<description>MIDI Saurus (Japan)</description>
+		<year>1990</year>
+		<publisher>Bit²</publisher>
+		<notes>Before starting the software the system will be rebooted automatically.</notes>
+		<info name="alt_title" value="MIDI サウルス"/>
+		<info name="barcode" value="4988655211100"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1018896">
+				<rom name="midi saurus - bit2 (disk 1).dmk" size="1018896" crc="41cee38f" sha1="1b73e61446c2fc6e27cdcd118774de5b1b977e4c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<!-- Identical disks? The disks seem to have the same labels. -->
+			<dataarea name="flop" size="1018896">
+				<rom name="midi saurus - bit2 (disk 2).dmk" size="1018896" crc="41cee38f" sha1="1b73e61446c2fc6e27cdcd118774de5b1b977e4c"/>
+			</dataarea>
+		</part>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="bm_012"/>
+			<dataarea name="dummy" size="1"/>
+		</part>
+	</software>
+
 	<software name="mightmg2">
 		<description>Might and Magic II - Gates to Another World (Japan)</description>
 		<year>1989</year>
@@ -10549,6 +11038,56 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="mobile suit field gundam (1988)(family soft)(jp).dsk" size="737280" crc="0609e85d" sha1="89392c0acf277f271d9f53231685004c9565ba47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonblst14">
+		<description>MoonBlaster (Netherlands, v1.4)</description>
+		<year>1992</year>
+		<publisher>Stichting Sunrise</publisher>
+		<info name="serial" value="SR002"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program"/>
+			<dataarea name="flop" size="368640">
+				<rom name="moonblaster - stichting sunrise (program).dsk" size="368640" crc="65b627c1" sha1="78698f5a7558f7f3af5e709e43f03138fd7640ad"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Samples"/>
+			<dataarea name="flop" size="368640">
+				<rom name="moonblaster - stichting sunrise (samples).dsk" size="368640" crc="7064307f" sha1="621138309b2b18f6ce3d662fdb7af04f648685b9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Music"/>
+			<dataarea name="flop" size="368640">
+				<rom name="moonblaster - stichting sunrise (music).dsk" size="368640" crc="2d2613d6" sha1="6bf94800426abee4260fcfaa3a542dea964c4abf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonbms2">
+		<description>MoonBlaster Music #2 (Netherlands)</description>
+		<year>1993</year>
+		<publisher>Stichting Sunrise</publisher>
+		<info name="serial" value="SR006"/>
+		<info name="usage" value="Requires the screen to be 80 characters wide before starting the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Music #2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="moonblaster music 2 - stichting sunrise.dsk" size="737280" crc="02644601" sha1="44ba8ac04dbeda320a978f54e87b95bea56e99ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxbaskn">
+		<description>MSX BASIC Kun (Netherlands)</description>
+		<year>1988</year>
+		<publisher>Sparrowsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="msx basic kun - sparrowsoft.dsk" size="368640" crc="3d4a0a3c" sha1="8559d7d61c91711bd817ba57142fac5a6ef89256"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10784,6 +11323,19 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="msxtechg">
+		<description>MSX Technical Guidebook - The Fourth Edition (Japan)</description>
+		<year>1991</year>
+		<publisher>ASCAT</publisher>
+		<info name="alt_title" value="MSXテクニカルガイドフック第四版"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="msx technical guide daiyonhan - ascat.dsk" size="368640" crc="a35e6625" sha1="2f15e47e423c428c761d132fceb80d66b6f8c178"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msxtrain">
 		<description>MSX Train (Japan)</description>
 		<year>1993</year>
@@ -10835,6 +11387,42 @@ The following floppies came with the machines.
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="msx train 2 - family soft (disk 4).dsk" size="737280" crc="5b4f4605" sha1="1ef3f533a95c0a0975081ac11896b2e91189ffbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multbarc" supported="no">
+		<description>Multi-Barcode (Netherlands)</description>
+		<year>1991</year>
+		<publisher>Club van Zes</publisher>
+		<notes>Barcode reader/pen is not supported.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="multi-barcode - club van zes.dsk" size="368640" crc="8626c7bb" sha1="5f7771492522c8772a5006d0afcddd8bb4658361"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barad" cloneof="multbarc" supported="no">
+		<description>Barad (Netherlands)</description>
+		<year>1991</year>
+		<publisher>Club van Zes</publisher>
+		<notes>Barcode reader/pen is not supported.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="barad - club van zes.dsk" size="368640" crc="c4f5a1d0" sha1="8dcf572668da10cc6f478794a7fadaadf2388db0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="onchikun">
+		<description>Music Editor Onchi-kun (Japan)</description>
+		<year>1988</year>
+		<publisher>Winky Soft</publisher>
+		<info name="alt_title" value="ミュージックエディター音知くん"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="music editor onchi kun - winky soft.dsk" size="737280" crc="80c7dff7" sha1="69a59e0b5218e515507aeeb76b48e109f6a62edd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10924,6 +11512,28 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="nichiyoubi uchuujin. alien sunday (1986)(software studio wing)(jp)(disk 2 of 2).dsk" size="737280" crc="e8f006ab" sha1="c661269c58525f46cdc4b3a83a5e363caeb29e80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="niwabusa">
+		<description>Nihongo Waupuro Bunsho Sakuzaemon (Japan)</description>
+		<year>1988</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="日本語ワープロ・文書作左衛門"/>
+		<info name="serial" value="HBS-B012D"/>
+		<info name="barcode" value="4901780087181"/>
+		<info name="usage" value="Requires MSX-JE."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program disk - プログラムディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nihongo waupuro bunsho sakuzaemon - sony (program disk).dsk" size="737280" crc="c640b85f" sha1="c49b36cb844598e32226815977fbbb6d4b1a1de9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Illustration disk - イラストディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="nihongo waupuro bunsho sakuzaemon - sony (illustration disk).dsk" size="737280" crc="eb276dfa" sha1="ad69a084457073c472cc7b87c8da121c7695ee01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11417,6 +12027,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="palet2">
+		<description>Palet 2 (Netherlands)</description>
+		<year>1987</year>
+		<publisher>Sparrowsoft</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="palet 2 - sparrowsoft.dsk" size="368640" crc="bfaadffc" sha1="e16485315f0f881df4cae95715fb0076c4a3e1bd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pacdisc" supported="no">
 		<description>Pana Amusement Collection Disc (Japan)</description>
 		<year>1988</year>
@@ -11818,6 +12440,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="phdigdsk" supported="no">
+		<description>Philips NMS 8280 Digitiser Disk (Netherlands)</description>
+		<year>1995</year>
+		<publisher>MSX-Club West-Friesland</publisher>
+		<notes>Digitising is not supported.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="philips nms 8280 digitiser disk - msx-club west-friesland.dsk" size="737280" crc="b33e1b3e" sha1="9c644ec87dad61896e5945238efafe0e8a20d92b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pias">
 		<description>PIAS - Hikisakareta Seishun (Japan)</description>
 		<year>1991</year>
@@ -11833,6 +12467,18 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
 				<rom name="pias - hikisakareta seishun - birdy software (disk b).dsk" size="737280" crc="627db361" sha1="997b63c03e3765217c2d6de2c512e36d9e32e883"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pictkitd">
+		<description>PictureKit Deluxe (Netherlands)</description>
+		<year>1990</year>
+		<publisher>NewVision</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1019536">
+				<rom name="picturekit deluxe - newvision.dmk" size="1019536" crc="dac04ed9" sha1="cfd688222e95aff24c67eedc9d2af352a9727785"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12456,7 +13102,7 @@ The following floppies came with the machines.
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk NO.7"/>
+			<feature name="part_id" value="Disk NO.6"/>
 			<dataarea name="flop" size="737280">
 				<rom name="princess maker v2 (1992)(micro cabin)(jp)(disk 6 of 7).dsk" size="737280" crc="42001e1f" sha1="f9847d3ee2d8eb7786901dec6e2d0bf5de2e0c8b"/>
 			</dataarea>
@@ -12490,6 +13136,51 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="printshop2" supported="no">
+		<description>Print Shop II (Japan)</description>
+		<year>1989</year>
+		<publisher>Sony</publisher>
+		<notes>Seems to be protected. Title screen loads over and over.</notes>
+		<info name="alt_title" value="プリントショップII"/>
+		<info name="serial" value="HBS-B014D"/>
+		<info name="barcode" value="4901780100828"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk - システムディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="print shop ii - sony (system disk).dsk" size="737280" crc="473ecd82" sha1="848cd3655bcd897a7facb4d99ad3b1ac9ccca6b1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Shotai Disk - 書体ディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="print shop ii - sony (typeface disk).dsk" size="737280" crc="a90c5336" sha1="26e8e403efd9f0bc3394a76f2c45bbe9480c1b6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printshop2c" cloneof="printshop2">
+		<description>Print Shop II (Japan, cracked)</description>
+		<year>1989</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="プリントショップII"/>
+		<info name="serial" value="HBS-B014D"/>
+		<info name="barcode" value="4901780100828"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk - システムディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="print shop ii - sony (system disk, cracked).dsk" size="737280" crc="19a322cc" sha1="936c683d1f9a6e344189615779196fd632e9e5ab"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Shotai Disk - 書体ディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="print shop ii - sony (typeface disk).dsk" size="737280" crc="a90c5336" sha1="26e8e403efd9f0bc3394a76f2c45bbe9480c1b6e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="proyakfn">
 		<description>Pro Yakyu Fan (Japan)</description>
 		<year>1988</year>
@@ -12498,6 +13189,17 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pro baseball fan (1988)(telenet japan)(jp).dsk" size="737280" crc="27ddb9a3" sha1="f096a3bc95cfcd45c4bfec6abdd17d718ff84be4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psgtracker">
+		<description>PSG Tracker (Netherlands)</description>
+		<year>1992</year>
+		<publisher>Flying Bytes</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="psg tracker - flying bytes.dsk" size="368640" crc="fc1843a0" sha1="20245ad973bccd2f5a2098f1d163c19bfae8292d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15138,6 +15840,18 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="supersd">
+		<description>Superscreendumper (Netherlands)</description>
+		<year>1988</year>
+		<publisher>Sparrowsoft</publisher>
+		<info name="usage" value="Type RUN&quot;SDUMP.BAS&quot; to start the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="superscreendumper - sparrowsoft.dsk" size="368640" crc="0c434e44" sha1="66f1f182fa0b20f8b5621eceeb218147ca8e9414"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suzumebg">
 		<description>Jong Borg Suzume (Japan)</description>
 		<year>1990</year>
@@ -15172,11 +15886,27 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="synthsa2">
-		<description>Synth Saurus v2.0 (Japan)</description>
+	<!-- v2.03 is only referenced once. The other verion references are still 2.00. -->
+	<software name="synthsa203">
+		<description>Synth Saurus Ver2.0 (Japan, v2.03)</description>
 		<year>1989</year>
 		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルスＶｅｒ．２．０"/>
+		<info name="alt_title" value="シンセサウルス version 2.0"/>
+		<info name="serial" value="BM-912"/>
+		<info name="gtin" value="04988655231191"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="synth saurus v2.0 - bit2 (v2.03).dsk" size="737280" crc="2f056983" sha1="fcbff56b458c48e8df5573c749ce1c5684581a50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The data only has references to 2.00, assuming this is v2.00. -->
+	<software name="synthsa2" cloneof="synthsa203">
+		<description>Synth Saurus Ver2.0 (Japan)</description>
+		<year>1989</year>
+		<publisher>Bit²</publisher>
+		<info name="alt_title" value="シンセサウルス version 2.0"/>
 		<info name="serial" value="BM-912"/>
 		<info name="gtin" value="04988655231191"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -15194,6 +15924,38 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="t.d.f. (1988)(data west)(jp).dsk" size="737280" crc="dce72c5f" sha1="d4349a19fc63c2a5ef7fb39238b02a104b5442a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmaker4">
+		<description>T/Maker IV</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<info name="serial" value="HBS-B007D"/>
+		<info name="usage" value="Type TMAKER to start the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1046008">
+				<rom name="t-maker - sony (disk a).dmk" size="1046008" crc="ff1df085" sha1="18de9820ea649f9145d0e46b07a136e82772a37a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1046008">
+				<rom name="t-maker - sony (disk b).dmk" size="1046008" crc="2119caa3" sha1="4a86ceca16c81b16f377b85f7bd6f5f446e0ca79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvkrant">
+		<description>De T.V. Krant (Netherlands)</description>
+		<year>1987</year>
+		<publisher>Oasis</publisher>
+		<info name="usage" value="Requires disk to not be write protected."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="de t.v. krant - oasis.dsk" size="737280" crc="3aeecd87" sha1="38d3974a4dd6de5dc4aab5587125542e18a0c92e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15876,6 +16638,17 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="trbltwn">
+		<description>Troubles in Town (Netherlands)</description>
+		<year>1991</year>
+		<publisher>MK Public Domain</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1030822">
+				<rom name="troubles in town - mk public domain.dmk" size="1030822" crc="7847d03e" sha1="ba944bc1f775335c09d47ab228a5c386c5666b47"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toshinto">
 		<description>Toushin Toshi (Japan)</description>
 		<year>1990</year>
@@ -16101,6 +16874,17 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="turbowipe">
+		<description>Turbowipe (Netherlands)</description>
+		<year>1991</year>
+		<publisher>NewVision</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="turbowipe - newvision.dsk" size="737280" crc="afbbc30f" sha1="3ada8ae299c762dc44c808a05be0b07283346746"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="twinkle">
 		<description>Twinkle Star - Hoshi no Mahou Tsukai (Japan)</description>
 		<year>1990</year>
@@ -16181,6 +16965,18 @@ The following floppies came with the machines.
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
 				<rom name="ultima iv - quest of the avatar (1987)(pony canyon)(jp)(disk 2 of 2).dsk" size="737280" crc="6e7a1784" sha1="1ce762b191bb3cf31272fc8ecbf48df38cb5f9cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrabasic">
+		<description>Ultra BASIC (Netherlands)</description>
+		<year>1988</year>
+		<publisher>MSX Gids</publisher>
+		<info name="usage" value="RUN&quot;ULTRA.BAS&quot;. To run the demo: RUN&quot;ULT-DEMO.BAS&quot;."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="ultra basic - msx gids.dsk" size="368640" crc="1be7b833" sha1="b5d8b32f8c1e804598aef189712b07140e1fd84b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16802,6 +17598,17 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wonderful adventures of a little princess (1987)(champion soft)(jp).dsk" size="737280" crc="5e6e50e7" sha1="24ac626ef06d85be0bb502b2280c2335d377df43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="workmate">
+		<description>Workmate (Europe)</description>
+		<year>1989</year>
+		<publisher>Checkmark</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1018096">
+				<rom name="workmate - checkmark.dmk" size="1018096" crc="6f0af281" sha1="b539042dc3655f6e0e15118a8b7233dbf7d1ceb1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18005,14 +18812,13 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<!-- According to generation-msx this was released on single sided floppy. -->
 	<software name="zoo">
 		<description>Zoo (Europe)</description>
 		<year>1989</year>
 		<publisher>Radarsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="zoo - radarsoft.dsk" size="737280" crc="370ba756" sha1="d963fbf94b1a3f478f924bbb0223f21f597cecd3" status="baddump"/>
+			<dataarea name="flop" size="1022896">
+				<rom name="zoo - radarsoft.dmk" size="1022896" crc="12254093" sha1="35337065f47a46e505ea2bf12411a6af469a7e15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18237,6 +19043,19 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="alien slime (1990)(ax-alex - raketto)[a2].dsk" size="368640" crc="404a3a0f" sha1="48eaaeff9ed3c7fe06db760797ec1831cc6662e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animecha2">
+		<description>Animecha (Japan, v2.00)</description>
+		<year>1995</year>
+		<publisher>Tempest</publisher>
+		<info name="alt_title" value="アニメカ"/>
+		<info name="usage" value="Type AM to start the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="animecha - tempest (v2.00).dsk" size="737280" crc="f180882a" sha1="e2d52094582068a7c6b28949d1fd1803ef7d3873"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18967,6 +19786,18 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="copycat200">
+		<description>Copy CAT (Japan, v2.00)</description>
+		<year>1991</year>
+		<publisher>TAC</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="copy cat - tac (v2.00).dsk" size="737280" crc="606dacf3" sha1="7d4106bacfe3b6ba65d0812402d4468cd470a70d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="coral2">
 		<description>Coral 2 (Netherlands, demo)</description>
 		<year>2004</year>
@@ -19159,6 +19990,18 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="develop2">
+		<description>Developer II (Netherlands)</description>
+		<year>1989</year>
+		<publisher>MSX Gids</publisher>
+		<info name="usage" value="Requires a mouse."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="developer ii - msx gids.dsk" size="368640" crc="b7e86daf" sha1="b73528cccbf91cc18d8b557db39451036fc601e1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dimies">
 		<description>Dimies</description>
 		<year>1991</year>
@@ -19238,6 +20081,17 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="dizzy (1992)(msx engine).dsk" size="368640" crc="6599b9e7" sha1="6cdd2a0807030603edb940e108c908188f0f92a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmkc63">
+		<description>DMK Creator (v6.3)</description>
+		<year>2017</year>
+		<publisher>Pirates do Caribe</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dmk creator - pirates do caribe (v6.3).dsk" size="737280" crc="1ca5abc8" sha1="f485dd8a00ed2a7ac42f923d95bf0ea1f97ec98d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19346,6 +20200,54 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="dskpro116" supported="partial">
+		<description>DSKPRO (v11.6)</description>
+		<year>2017</year>
+		<publisher>Pirates do Caribe</publisher>
+		<notes>Does not start on all systems.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dskpro - pirates do caribe (v11.6).dsk" size="737280" crc="03f2fd8f" sha1="2eaa5c57f3b14d3de2b372d246edb8154997f8f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskpro901" cloneof="dskpro116">
+		<description>DSKPRO (v9.01)</description>
+		<year>2015</year>
+		<publisher>Pirates do Caribe</publisher>
+		<info name="usage" value="Type DSKPRO to start the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dskpro - pirates do caribe (v9.01).dsk" size="737280" crc="14e784f4" sha1="4bfdd4b3ffd94ffb7ffaf326ba54997cd11e0334"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskpro651" cloneof="dskpro116">
+		<description>DSKPRO (v6.51)</description>
+		<year>2014</year>
+		<publisher>Pirates do Caribe</publisher>
+		<info name="usage" value="Type DSKPRO to start the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dskpro - pirates do caribe (v6.51).dsk" size="737280" crc="615110d3" sha1="1fd811fae03ce5ffc611759bef46ca18b23d678a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskproli">
+		<description>DSKPRO Light (v1.4)</description>
+		<year>2021</year>
+		<publisher>Pirates do Caribe</publisher>
+		<info name="usage" value="Type DSKPROLI to start the software."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dskpro light - pirates do caribe (v1.4).dsk" size="737280" crc="69fa499b" sha1="4b151ed328ea54a33b5e07fe3867b3659869de29"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ducktales">
 		<description>DuckTales (English)</description>
 		<year>1994</year>
@@ -19434,6 +20336,17 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="eggbert (demo) (1993)(fony)(nl).dsk" size="737280" crc="66b950e0" sha1="fbd96d3b597da23ddf19af621204416404e1b185"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eprom">
+		<description>EPROM - Extra Products ROM (Netherlands)</description>
+		<year>1996</year>
+		<publisher>UMF Noord-Holland</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="eprom - extra products rom - umf noord-holland.dsk" size="737280" crc="528c48b6" sha1="214d75561104e0565d242bec9f9bb7049a6c57e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20642,6 +21555,17 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="magedit">
+		<description>The Magical Editor (German)</description>
+		<year>1992</year>
+		<publisher>Sven Paschukat, Daniel Simon, Wolfgang Friedrich</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the magical editor - paschukat-simon-friedrich.dsk" size="737280" crc="a9f2f6cb" sha1="d0d131566d79df7173eabb7db8f2aa416c1fd651"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="maglabrxdl">
 		<description>Magical Labyrinth Remix (Japan, download)</description>
 		<year>2020</year>
@@ -21099,6 +22023,17 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="msx wars v - syntax.dsk" size="737280" crc="dd88e2f2" sha1="50cb33f65c3ec9bca387467425fad82dbc7dc645"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxutild">
+		<description>MSX Utility Disk (Netherlands)</description>
+		<year>1989</year>
+		<publisher>MSX Gids</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="msx utility disk - msx gids.dsk" size="368640" crc="8c1b3c71" sha1="1d18240e15fe48d1cba180ea8b59a3ce5b65a590"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21733,6 +22668,17 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="protracker">
+		<description>Pro-tracker (Netherlands)</description>
+		<year>1991</year>
+		<publisher>Tyfoon Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1030984">
+				<rom name="pro-tracker - tyfoon software.dmk" size="1030984" crc="f646d462" sha1="0146d3522793e177164505424303aee0f69b7a1d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="psychobl">
 		<description>Psycho Ball (Netherlands)</description>
 		<year>1993</year>
@@ -22243,6 +23189,42 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="sampbox2">
+		<description>Sampbox 2 Deluxe (Netherlands)</description>
+		<year>199?</year>
+		<publisher>Z800</publisher>
+		<info name="usage" value="Requires MSX-AUDIO."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sampboxc 2 deluxe - z800.dsk" size="737280" crc="deded64d" sha1="bfa65f7bf4351eb88dbc6311d2fdbce57a5af4e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sampbox3">
+		<description>Sampbox 3 Deluxe (Netherlands)</description>
+		<year>199?</year>
+		<publisher>Z800</publisher>
+		<info name="usage" value="Requires MSX-AUDIO."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sampboxc 3 deluxe - z800.dsk" size="737280" crc="93da1dea" sha1="af8a09139911d38a5ae6a02359e1dc05a2cc5327"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sampbox4">
+		<description>Sampbox 4 Macro (Netherlands)</description>
+		<year>1994</year>
+		<publisher>N.O.P.</publisher>
+		<info name="usage" value="Requires MSX-AUDIO."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sampboxc 4 macro - n.o.p.dsk" size="737280" crc="b51bf3f7" sha1="3a00b4adf8c1756a4973b57174169d9e003151d3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sanriku0">
 		<description>Sanriku Ouja #0 (Japan)</description>
 		<year>1997</year>
@@ -22701,6 +23683,17 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="studiofm">
+		<description>Studio FM (Netherlands)</description>
+		<year>1991</year>
+		<publisher>MSX-Engine</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1032280">
+				<rom name="studio fm - msx-engine.dmk" size="1032280" crc="65950dbc" sha1="0f2b4b1633fd2239bc71b1de7bdc40fccda67c60"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="summishm">
 		<description>Sum the Missile Human (Japan)</description>
 		<year>1989</year>
@@ -22721,6 +23714,29 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="super_dynamite_fighters_street.dsk" size="737280" crc="8c30cc16" sha1="a99c26cfdac12db8c000bdd8b0dc333803199988"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superx12">
+		<description>Super-X (Japan, v1.2)</description>
+		<year>1994</year>
+		<publisher>Romi</publisher>
+		<info name="usage" value="To enter the software type _@. Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="super-x - romi (v1.2).dsk" size="737280" crc="61ce60ca" sha1="06d16a5168b0bd0a686137c0d74cb55ff7a0f12c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synchroc">
+		<description>Synchro Copy</description>
+		<year>1993</year>
+		<publisher>E.I Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="synchro copy - e.i soft.dsk" size="737280" crc="8f7f196f" sha1="8ee37683174060e24753d0eaebaf8a9c36d21a98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22911,6 +23927,33 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="traxplayer" supported="no">
+		<description>TraxPlayer</description>
+		<year>1994</year>
+		<publisher>N.O.P.</publisher>
+		<notes>Loading from example disks results in errors.</notes>
+		<info name="usage" value="Requires MSX-AUDIO. Requires 256KB RAM."/>
+		<part name="flop1" interface="floppy_3_5">
+			<!-- No photographic evidence for this part id -->
+			<feature name="part_id" value="Editor"/>
+			<dataarea name="flop" size="737280">
+				<rom name="traxplayer - n.o.p. (disk 1).dsk" size="737280" crc="b6c2dfdc" sha1="d9911bf4437244c1db4f921bdf36bbcdf012d40c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Example disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="traxplayer - n.o.p. (disk 2).dsk" size="737280" crc="b1693a0a" sha1="c043124bcb337d065df268d288b44f7690fe119e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Example disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="traxplayer - n.o.p. (disk 3).dsk" size="737280" crc="74bdb5e7" sha1="8ed224ae616ce8ce7efda0fed45452d09ce360fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="trojka">
 		<description>Trojka (Netherlands)</description>
 		<year>1992</year>
@@ -23016,6 +24059,18 @@ HOMEBREW
 		</part>
 	</software>
 
+	<software name="twincopy">
+		<description>TwinCopy (Japan)</description>
+		<year>1991</year>
+		<publisher>P.T.O.</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="twincopy - p.t.o..dsk" size="737280" crc="d143c16f" sha1="5af95f3799e7aa3038babcd0e248bd8f5d494bc2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="uhfpaint">
 		<description>The UHF Painter (Italy)</description>
 		<year>1992</year>
@@ -23033,8 +24088,8 @@ HOMEBREW
 		<publisher>MSX Club West Friesland</publisher>
 		<notes>Requires two MSX computers to be connected through joystick ports using a joynet cable.</notes>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="368640">
-				<rom name="veldslag - mcwf.dsk" size="368640" crc="808e0403" sha1="816ea85708c36e5162b6340e34de5a3f2f0fe67c"/>
+			<dataarea name="flop" size="1046008">
+				<rom name="veldslag - mcwf.dmk" size="1046008" crc="d50105b8" sha1="3279368358380c412f0de92963f41bc83f0429f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23232,8 +24287,8 @@ HOMEBREW
 		<publisher>MSX Club West Friesland</publisher>
 		<notes>Requires two MSX computers to be connected through joystick ports using a joynet cable.</notes>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="368640">
-				<rom name="zeeslag - mcwf.dsk" size="368640" crc="bb4ff65b" sha1="4357c1e0f7ae559ab8ceb8169a689fb4cd0d8f1f"/>
+			<dataarea name="flop" size="1046008">
+				<rom name="zeeslag - mcwf.dmk" size="1046008" crc="95a88052" sha1="709661c0c421c40a6eb733d5bdae8034610c9425"/>
 			</dataarea>
 		</part>
 	</software>

@@ -44,33 +44,35 @@ public:
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual bool custom_mouse_down() override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt) override;
 
 	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:
 	struct list_items
 	{
-		list_items(std::string &&l, int i, std::string &&rev) : label(std::move(l)), option(i), revision(std::move(rev)) { }
+		list_items(std::string &&l, int i, std::string &&rev) : label(std::move(l)), revision(std::move(rev)), option(i), bounds(1.0F, 0.0F) { }
 
 		std::string label;
-		int option;
 		std::string revision;
+		int option;
+
+		std::pair<float, float> bounds;
 	};
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	void get_data(std::string &buffer);
-	void get_data_sw(std::string &buffer);
-
 	ui_system_info const *const m_system;
 	ui_software_info const *const m_swinfo;
 	bool const m_issoft;
-	int m_actual;
+	int m_current_tab;
 	std::string m_list, m_short, m_long, m_parent;
 	std::vector<list_items> m_items_list;
+
+	std::pair<float, float> m_tab_line;
+	int m_clicked_tab;
 };
 
 } // namespace ui

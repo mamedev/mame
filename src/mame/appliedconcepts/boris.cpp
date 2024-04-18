@@ -244,5 +244,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1978, boris,  0,      0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 01)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris awaits your move"
-SYST( 1978, borisa, boris,  0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 00)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris plays black"
+SYST( 1978, boris,  0,      0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 01)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // "Boris awaits your move"
+SYST( 1978, borisa, boris,  0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 00)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // "Boris plays black"

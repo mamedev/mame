@@ -160,7 +160,7 @@ SMPC NVRAM contents:
 */
 
 #include "emu.h"
-#include "machine/smpc.h"
+#include "smpc.h"
 
 #include "screen.h"
 #include "coreutil.h"

@@ -5,25 +5,6 @@ authors:hap
 -->
 <mamelayout version="2">
 
-<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
-
-	<script><![CDATA[
-		local layout = {}
-		local prev_state = 0
-
-		function layout.frame()
-			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
-			if cur_state ~= prev_state then
-				machine.ioport.ports[":IN.1"]:field(0x01):set_value(cur_state)
-				machine.ioport.ports[":IN.1"]:field(0x02):set_value(cur_state)
-			end
-			prev_state = cur_state
-		end
-
-		return layout
-	]]></script>
-
-
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
@@ -502,7 +483,7 @@ authors:hap
 		<element name="9.9" ref="led2"><bounds x="91" y="60.25" width="1.5" height="1.5" /></element>
 		<element name="9.8" ref="led2"><bounds x="91" y="63.25" width="1.5" height="1.5" /></element>
 
-		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="95" y="13" width="2" height="2" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x02" clickthrough="yes"><bounds x="95" y="13" width="2" height="2" /></element>
 		<element ref="bt" inputtag="IN.1" inputmask="0x01"><bounds x="95" y="13" width="2" height="2" /></element>
 		<element ref="bt" inputtag="IN.1" inputmask="0x02"><bounds x="95" y="17" width="2" height="2" /></element>
 

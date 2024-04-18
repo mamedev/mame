@@ -117,6 +117,7 @@ ________________________________________________________________
 #include "machine/adc0844.h"
 
 #include "screen.h"
+#include "speaker.h"
 
 
 #define PIXEL_CLOCK     (8000000)
@@ -308,7 +309,11 @@ void midxunit_state::midxunit(machine_config &config)
 	adc.ch6_callback().set_ioport("AN5");
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
 	DCS_AUDIO_2K_UART(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 

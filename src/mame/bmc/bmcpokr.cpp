@@ -50,6 +50,7 @@ public:
 		m_pixram(*this, "pixram"),
 		m_priority(*this, "priority"),
 		m_layerctrl(*this, "layerctrl"),
+		m_backpen(*this, "backpen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_dsw(*this, "DSW%u", 1U),
@@ -78,6 +79,7 @@ private:
 	required_shared_ptr<uint16_t> m_pixram;
 	required_shared_ptr<uint16_t> m_priority;
 	required_shared_ptr<uint16_t> m_layerctrl;
+	required_shared_ptr<uint16_t> m_backpen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -283,7 +285,7 @@ uint32_t bmcpokr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	}
 #endif
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(*m_backpen, cliprect);
 
 	if (layers_ctrl & 2)    draw_layer(screen, bitmap, cliprect, 2);
 /*
@@ -424,7 +426,7 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 	map(0x340009, 0x340009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x34000e, 0x34000f).ram().share(m_priority);    // 34000f.b, w (priority?)
 	map(0x340017, 0x340017).w(FUNC(bmcpokr_state::pixpal_w));
-	map(0x340018, 0x340019).ram(); // 340019.b, w
+	map(0x340018, 0x340019).ram().share(m_backpen); // 340019.b, w
 	map(0x34001a, 0x34001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x34001c, 0x34001d).ram(); // 34001d.b, w(0)
 
@@ -508,7 +510,7 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 	map(0x3ca009, 0x3ca009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x3ca00e, 0x3ca00f).ram().share(m_priority);    // 3ca00f.b, w (priority?)
 	map(0x3ca017, 0x3ca017).w(FUNC(bmcpokr_state::pixpal_w));
-	map(0x3ca018, 0x3ca019).ram(); // 3ca019.b, w
+	map(0x3ca018, 0x3ca019).ram().share(m_backpen); // 3ca019.b, w
 	map(0x3ca01a, 0x3ca01b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x3ca01c, 0x3ca01d).ram(); // 3ca01d.b, w(0)
 }
@@ -540,7 +542,7 @@ void bmcpokr_state::shendeng_map(address_map &map)
 	map(0x370009, 0x370009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x37000e, 0x37000f).ram().share(m_priority);    // 37000f.b, w (priority?)
 	map(0x370017, 0x370017).w(FUNC(bmcpokr_state::pixpal_w));
-	map(0x370018, 0x370019).ram(); // 370019.b, w
+	map(0x370018, 0x370019).ram().share(m_backpen); // 370019.b, w
 	map(0x37001a, 0x37001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x37001c, 0x37001d).ram(); // 3ca01d.b, w(0)
 	map(0x380001, 0x380001).w("ramdac", FUNC(ramdac_device::index_w));

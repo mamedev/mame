@@ -57,7 +57,7 @@ sensor state instead.
 */
 
 #include "emu.h"
-#include "machine/sensorboard.h"
+#include "sensorboard.h"
 
 
 DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard")

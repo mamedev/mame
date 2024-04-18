@@ -40,6 +40,8 @@ The Grid         v1.2   10/18/2000
 #include "machine/tsb12lv01a.h"
 #include "video/zeus2.h"
 
+#include "speaker.h"
+
 #include "crusnexo.lh"
 
 #define LOG_FIREWIRE    (1U << 1)
@@ -1279,10 +1281,21 @@ void midzeus_state::midzeus(machine_config &config)
 	m_screen->set_palette("palette");
 
 	/* sound hardware */
-	DCS2_AUDIO_2104(config, "dcs", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag("dcs");
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(94);
 }
 
@@ -1318,13 +1331,24 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_zeus->irq_callback().set(FUNC(midzeus2_state::zeus_irq));
 
 	/* sound hardware */
-	DCS2_AUDIO_2104(config, "dcs", 0);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	M48T35(config, m_m48t35, 0);
 
 	/* I/O hardware */
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag("dcs");
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
 

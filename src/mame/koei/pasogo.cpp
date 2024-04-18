@@ -219,7 +219,7 @@ void pasogo_state::machine_start()
 {
 	system_time systime;
 
-	memset(&m_vg230, 0, sizeof(m_vg230));
+	m_vg230 = decltype(m_vg230)();
 	m_vg230.pmu.write_protected = true;
 	machine().base_datetime(systime);
 

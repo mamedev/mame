@@ -505,10 +505,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys / Heuristic Software", "Turbo 16K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys / Heuristic Software", "Companion III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, turbo16k, 0,        0,      turbo16k, turbo16k, turbo16k_state, empty_init, "SciSys / Heuristic Software", "Turbo 16K", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, compan3,  turbo16k, 0,      compan3,  compan3,  turbo16k_state, empty_init, "SciSys / Heuristic Software", "Companion III", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, conquist, 0,        0,      conquist, conquist, conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Conquistador", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, tmate,    conquist, 0,      tmate,    tmate,    conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Team-Mate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, conquist, 0,        0,      conquist, conquist, conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Conquistador", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, tmate,    conquist, 0,      tmate,    tmate,    conquist_state, empty_init, "Saitek / Heuristic Software", "Kasparov Team-Mate", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, t1850,    0,        0,      t1850,    t1850,    turbo16k_state, empty_init, "Tandy Corporation / SciSys / Heuristic Software", "1850 Deluxe Table Chess (model 60-2199)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, t1850,    0,        0,      t1850,    t1850,    turbo16k_state, empty_init, "Tandy Corporation / SciSys / Heuristic Software", "1850 Deluxe Table Chess (model 60-2199)", MACHINE_SUPPORTS_SAVE )

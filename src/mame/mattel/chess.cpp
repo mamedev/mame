@@ -245,4 +245,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, mchess, 0,      0,      mchess,  mchess, mchess_state, empty_init, "Mattel Electronics / Teletape Productions", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, mchess, 0,      0,      mchess,  mchess, mchess_state, empty_init, "Mattel Electronics / Teletape Productions", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

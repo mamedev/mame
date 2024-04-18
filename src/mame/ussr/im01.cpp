@@ -422,7 +422,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, im01,  0,      0,      im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, im01t, im01,   0,      im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, im01,  0,      0,      im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, im01t, im01,   0,      im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1993, im05,  0,      0,      im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, im05,  0,      0,      im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE )

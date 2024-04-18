@@ -1241,7 +1241,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This was found in multiple carts with Coleco-style shell, both from USA, Euro and Canada -->
+	<!-- This was found in multiple carts with Coleco-style shell, both from USA, Euro and Canada -->
 	<software name="pitstop">
 		<!-- Pitstop (1983)(Epyx)[a].bin -->
 		<description>Pitstop (Euro, USA, Canada)</description>
@@ -1257,7 +1257,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This was found in multiple carts with Imagic-style shell, USA only -->
+	<!-- This was found in multiple carts with Imagic-style shell, USA only -->
 	<software name="pitstopa" cloneof="pitstop">
 		<!-- Pitstop (1983)(Epyx).bin -->
 		<!-- 0x26a7 : 0x20 ('pitstop') - 0x10 ('pitstopa') -->
@@ -1303,7 +1303,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This has been verified with a real cart -->
+	<!-- This has been verified with a real cart -->
 	<software name="qbertqub">
 		<description>Q*bert Qubes</description>
 		<year>1984</year>
@@ -3389,33 +3389,6 @@ license:CC0-1.0
 				<rom name="ttennis.2" size="8192" crc="b72f9ff8" sha1="d960b0f6207a64d6330a5dee458f1a18f6ec6a87" offset="0x2000" />
 				<rom name="ttennis.3" size="8192" crc="b4293435" sha1="5e2b96c19c4f5c63a5afa2de504d29fe64a4c908" offset="0x4000" /> <!-- All FF bytes -->
 				<rom name="ttennis.4" size="8192" crc="b4293435" sha1="5e2b96c19c4f5c63a5afa2de504d29fe64a4c908" offset="0x6000" /> <!-- All FF bytes -->
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Unofficial multicarts -->
-
-	<software name="31in1">
-		<description>31-in-1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="coleco_cart">
-			<feature name="slot" value="xin1" />
-			<dataarea name="rom" size="1048576">
-				<rom name="31in1-eprom-15012013-rev2.rom" size="1048576" crc="3f4ebe58" sha1="bf7fc70b25b9654c86f644474ef9e6906df82a46" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="63in1">
-		<description>63-in-1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="coleco_cart">
-			<feature name="slot" value="xin1" />
-			<dataarea name="rom" size="2097152">
-				<rom name="eprom-flash-63in1-part1.rom" size="1048576" crc="3b21137f" sha1="a22b1a4ea96507c87269db50c0d21052e987e83f" offset="0x000000" />
-				<rom name="eprom-flash-63in1-part2.rom" size="1048576" crc="f4d18722" sha1="e5a6d0071a0b1d813f03713133b48ba3a073c2cd" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>

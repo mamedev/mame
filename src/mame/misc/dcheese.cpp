@@ -777,8 +777,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, dcheese,   0,       dcheese, dcheese, dcheese_state, empty_init, ROT90, "HAR",                "Double Cheese",                                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1993, lottof2,   0,       dcheese, lottof2, dcheese_state, empty_init, ROT0,  "HAR",                "Lotto Fun 2",                                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dcheese,   0,       dcheese, dcheese, dcheese_state, empty_init, ROT90, "HAR Management",     "Double Cheese",                                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1993, lottof2,   0,       dcheese, lottof2, dcheese_state, empty_init, ROT0,  "HAR Management",     "Lotto Fun 2",                                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cecmatch,  0,       fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, fredmem,   0,       fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (World?, Ticket version, 3/17/95)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1994, fredmemus, fredmem, fredmem, fredmem, dcheese_state, empty_init, ROT0,  "Coastal Amusements", "Fred Flintstone's Memory Match (US, High Score version, 3/10/95)",    MACHINE_SUPPORTS_SAVE )

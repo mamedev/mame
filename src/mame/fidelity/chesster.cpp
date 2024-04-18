@@ -258,7 +258,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, chesster,  0,        0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, chesstera, chesster, 0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, kishon,    chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, kishona,   chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, chesster,  0,        0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, chesstera, chesster, 0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, kishon,    chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, kishona,   chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE )

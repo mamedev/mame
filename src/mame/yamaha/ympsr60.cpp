@@ -738,5 +738,5 @@ ROM_END
 
 } // namespace
 
-CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
-CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
+CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND)
+CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND)

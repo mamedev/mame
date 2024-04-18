@@ -1192,6 +1192,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/coleco/expansion/expansion.h,BUSES["COLECO_EXPANSION"] = true
+---------------------------------------------------
+
+if (BUSES["COLECO_EXPANSION"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/crvision/slot.h,BUSES["CRVISION"] = true
 ---------------------------------------------------
 
@@ -1898,6 +1915,8 @@ if (BUSES["MSX_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/ctrl/joystick.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/libbler.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/libbler.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/magickey.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/magickey.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/mouse.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/sgadapt.cpp",
@@ -4625,8 +4644,12 @@ if (BUSES["QBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/qbus/pc11.h",
 		MAME_DIR .. "src/devices/bus/qbus/qbus.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/qbus.h",
+		MAME_DIR .. "src/devices/bus/qbus/qg640.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/qg640.h",
 		MAME_DIR .. "src/devices/bus/qbus/qtx.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/qtx.h",
+		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.h",
 	}
 end
 
@@ -5261,6 +5284,8 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/labtam_z80sbc.h",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.h",
+		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.h",
 	}
 end
 

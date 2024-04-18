@@ -4,7 +4,7 @@
 // ARM PrimeCell PL190/PL192 VIC emulation
 
 #include "emu.h"
-#include "machine/vic_pl192.h"
+#include "vic_pl192.h"
 
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"

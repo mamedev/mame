@@ -315,4 +315,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, gk2000, 0,      0,      gk2000,  gk2000, gk2000_state, empty_init, "Saitek", "Kasparov GK 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, gk2000, 0,      0,      gk2000,  gk2000, gk2000_state, empty_init, "Saitek", "Kasparov GK 2000", MACHINE_SUPPORTS_SAVE )

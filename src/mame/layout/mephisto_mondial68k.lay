@@ -5,25 +5,6 @@ authors:Sandro Ronco, hap
 -->
 <mamelayout version="2">
 
-<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
-
-	<script><![CDATA[
-		local layout = {}
-		local prev_state = 0
-
-		function layout.frame()
-			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
-			if cur_state ~= prev_state then
-				machine.ioport.ports[":IN.2"]:field(0x08):set_value(cur_state)
-				machine.ioport.ports[":IN.3"]:field(0x08):set_value(cur_state)
-			end
-			prev_state = cur_state
-		end
-
-		return layout
-	]]></script>
-
-
 <!-- define elements -->
 
 	<element name="digit" defstate="0">
@@ -423,7 +404,8 @@ authors:Sandro Ronco, hap
 		<element ref="hlb" inputtag="IN.3" inputmask="0x08"> <bounds x="72.5" y="6.5" width="6" height="4" /> <color alpha="0.3"/></element>
 
 		<!-- hidden input between CL/ENT buttons to press both -->
-		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="70" y="6.5" width="2.5" height="4" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x08" clickthrough="yes"><bounds x="70" y="6.5" width="2.5" height="4" /></element>
+		<element ref="nothing" inputtag="IN.3" inputmask="0x08" clickthrough="no"> <bounds x="70" y="6.5" width="2.5" height="4" /></element>
 	</group>
 
 

@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "dcs.h"
-
 #include "cpu/m6809/m6809.h"
 #include "wpcsnd.h"
 #include "wpc.h"

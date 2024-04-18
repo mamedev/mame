@@ -50,6 +50,7 @@ void sv603_device::device_add_mconfig(machine_config &config)
 	// cartridge slot
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "homebrew_list").set_original("coleco_homebrew");
 }
 
 

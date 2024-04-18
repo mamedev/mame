@@ -41,10 +41,10 @@ private:
 	};
 
 	// internal state
-	struct c_state      m_c24_state;
-	struct c_state      m_c25_state;
-	struct n_state      m_noise_state;
-	uint8_t               m_sound_latch_a = 0;
+	c_state             m_c24_state;
+	c_state             m_c25_state;
+	n_state             m_noise_state;
+	uint8_t             m_sound_latch_a = 0;
 	sound_stream *      m_channel = nullptr;
 	std::unique_ptr<uint32_t[]> m_poly18;
 	required_device<discrete_device> m_discrete;
