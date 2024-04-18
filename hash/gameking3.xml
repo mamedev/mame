@@ -50,9 +50,9 @@ see gameking.xml for information about cartridge types
 		<part name="cart" interface="gameking_cart">
 			<feature name="pcb" value="2007D / APR 23 05 / REV:1.0"/>
 			<dataarea name="rom" size="524288">
-			<rom name="panzer.gk3" size="524288" crc="52d24c9e" sha1="c6d0aed0b6bf3ff5f8f31973a8e347fe7ceeb52f"/>
-			<!-- in the ROM below address 0xc0a8 has been flipped from 0xff to 0xbf, this is in an unused fill area and likely just bitrot -->
-			<!-- <rom name="panzer.gk3" size="524288" crc="54c7389e" sha1="1fe26d743ad02b466d045aa53706b13c8be2fe2e"/> -->
+				<rom name="panzer.gk3" size="524288" crc="52d24c9e" sha1="c6d0aed0b6bf3ff5f8f31973a8e347fe7ceeb52f"/>
+				<!-- in the ROM below address 0xc0a8 has been flipped from 0xff to 0xbf, this is in an unused fill area and likely just bitrot -->
+				<!-- <rom name="panzer.gk3" size="524288" crc="54c7389e" sha1="1fe26d743ad02b466d045aa53706b13c8be2fe2e"/> -->
 			</dataarea>
 		</part>
 	</software>
