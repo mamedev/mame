@@ -240,7 +240,7 @@ void whitestar_state::whitestar_base_map(address_map &map)
 	map(0x3300, 0x3300).w(FUNC(whitestar_state::switch_w));
 	map(0x3400, 0x3400).r(FUNC(whitestar_state::switch_r));
 	map(0x3600, 0x3600).w(FUNC(whitestar_state::dmddata_w));
-	map(0x3601, 0x3601).rw(m_decodmd, FUNC(decodmd_type2_device::ctrl_r), FUNC(decodmd_type2_device::ctrl_w));
+	map(0x3601, 0x3601).rw(m_decodmd, FUNC(decodmd_type2_device::ctrl_r), FUNC(decodmd_type2_device::ctrl_w)); // TODO: should this be status_r?
 	map(0x3700, 0x3700).r(m_decodmd, FUNC(decodmd_type2_device::busy_r));
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
