@@ -12504,7 +12504,7 @@ ROM_START( bongo )
 	ROM_LOAD( "b-clr.bin",  0x0000, 0x0020, CRC(c4761ada) SHA1(067d12b2d3635ffa6337ed234ba42717447bea00) )
 ROM_END
 
-ROM_START( bongo2 )
+ROM_START( bongoa )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "1-2532.bin", 0x0000, 0x1000, CRC(ebcc50bb) SHA1(6d9deb561c3eb3e21abeda3180a29d21a2848e07) )
 	ROM_LOAD( "2-2532.bin", 0x1000, 0x1000, CRC(a19da662) SHA1(a2674392d489c5e5eeb9abc51572a37cc6045220) )
@@ -16495,7 +16495,7 @@ GAME( 1980, galactica2,  moonal2,  mooncrst,   moonal2,    galaxian_state, init_
 // Larger romspace, interrupt enable moved
 GAME( 198?, thepitm,     thepit,   thepitm,    thepitm,    galaxian_state, init_mooncrsu,   ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ PCB, even if the memory map appears closer to Moon Cresta
 GAME( 1983, bongo,       0,        bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 1)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bongo2,      bongo,    bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 2)",                             MACHINE_SUPPORTS_SAVE ) // on an original Namco PCB
+GAME( 1983, bongoa,      bongo,    bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 2)",                             MACHINE_SUPPORTS_SAVE ) // on an original Namco PCB
 
 
 // Crazy Kong & Bagman bootlegs on galaxian/mooncrst hardware
