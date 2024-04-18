@@ -18,13 +18,6 @@
 class decodmd_type1_device : public device_t
 {
 public:
-	template <typename T>
-	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gfxregion_tag)
-		: decodmd_type1_device(mconfig, tag, owner, clock)
-	{
-		set_gfxregion(std::forward<T>(gfxregion_tag));
-	}
-
 	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t latch_r();
@@ -42,8 +35,6 @@ public:
 	void rowclock_w(int state);
 	void test_w(int state);
 
-	template <typename T> void set_gfxregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
-
 	void decodmd1_io_map(address_map &map);
 	void decodmd1_map(address_map &map);
 protected:
@@ -55,6 +46,12 @@ private:
 	static constexpr unsigned B_CLR = 0x01;
 	static constexpr unsigned B_SET = 0x02;
 	static constexpr unsigned B_CLK = 0x04;
+
+	required_device<cpu_device> m_cpu;
+	required_memory_bank m_rombank;
+	required_shared_ptr<uint8_t> m_ram;
+	required_device<hc259_device> m_bitlatch;
+	required_region_ptr<uint8_t> m_rom;
 
 	uint8_t m_latch;
 	uint8_t m_status;
@@ -70,16 +67,9 @@ private:
 	uint32_t m_pxdata1_latched;
 	uint32_t m_pxdata2_latched;
 	bool m_frameswap;
-	uint32_t m_pixels[0x200];
+	uint32_t m_pixels[0x200]{};
 	uint8_t m_busy_lines;
 	uint32_t m_prevrow;
-
-	required_device<cpu_device> m_cpu;
-	required_memory_bank m_rombank1;
-	required_memory_bank m_rombank2;
-	required_shared_ptr<uint8_t> m_ram;
-	required_device<hc259_device> m_bitlatch;
-	required_region_ptr<uint8_t> m_rom;
 
 	void output_data();
 	void set_busy(uint8_t input, uint8_t val);

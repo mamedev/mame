@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(DECODMD2, decodmd_type2_device, "decodmd2", "Data East Pinbal
 
 void decodmd_type2_device::bank_w(uint8_t data)
 {
-	m_rombank1->set_entry(data & 0x1f);
+	m_rombank->set_entry(data & 0x1f);
 }
 
 void decodmd_type2_device::crtc_address_w(uint8_t data)
@@ -38,9 +38,12 @@ void decodmd_type2_device::crtc_register_w(uint8_t data)
 
 uint8_t decodmd_type2_device::latch_r()
 {
-	// clear IRQ?
-	m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
-	m_busy = false;
+	if (!machine().side_effects_disabled())
+	{
+		// clear IRQ?
+		m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
+		m_busy = false;
+	}
 	return m_command;
 }
 
@@ -74,7 +77,7 @@ void decodmd_type2_device::ctrl_w(uint8_t data)
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
 		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_rombank1->set_entry(0);
+		m_rombank->set_entry(0);
 		logerror("DMD2: Reset\n");
 	}
 	m_ctrl = data;
@@ -108,7 +111,7 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 	{
 		for (int dot = 0; dot < 8; dot++)
 		{
-			uint8_t intensity = ((m_ram[addr] >> (7-dot) & 0x01) << 1) | (m_ram[addr + 0x200] >> (7-dot) & 0x01);
+			uint8_t const intensity = ((m_ram[addr] >> (7-dot) & 0x01) << 1) | (m_ram[addr + 0x200] >> (7-dot) & 0x01);
 			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		addr++;
@@ -117,13 +120,13 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 
 void decodmd_type2_device::decodmd2_map(address_map &map)
 {
-	map(0x0000, 0x2fff).ram().share("dmdram");
+	map(0x0000, 0x2fff).ram().share(m_ram);
 	map(0x3000, 0x3000).rw(FUNC(decodmd_type2_device::crtc_status_r), FUNC(decodmd_type2_device::crtc_address_w));
 	map(0x3001, 0x3001).w(FUNC(decodmd_type2_device::crtc_register_w));
 	map(0x3002, 0x3002).w(FUNC(decodmd_type2_device::bank_w));
 	map(0x3003, 0x3003).r(FUNC(decodmd_type2_device::latch_r));
-	map(0x4000, 0x7fff).bankr("dmdbank1").w(FUNC(decodmd_type2_device::status_w));
-	map(0x8000, 0xffff).bankr("dmdbank2"); // last 32k of ROM
+	map(0x4000, 0x7fff).bankr(m_rombank).w(FUNC(decodmd_type2_device::status_w));
+	map(0x8000, 0xffff).rom().region(DEVICE_SELF, 0x78000); // last 32k of ROM
 }
 
 void decodmd_type2_device::device_add_mconfig(machine_config &config)
@@ -146,7 +149,7 @@ void decodmd_type2_device::device_add_mconfig(machine_config &config)
 	screen.set_native_aspect();
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 128-1, 0, 32-1);
-	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
+	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
 	screen.set_refresh_hz(60);
 }
 
@@ -155,22 +158,34 @@ decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const 
 	: device_t(mconfig, DECODMD2, tag, owner, clock)
 	, m_cpu(*this, "dmdcpu")
 	, m_mc6845(*this, "dmd6845")
-	, m_rombank1(*this, "dmdbank1")
-	, m_rombank2(*this, "dmdbank2")
+	, m_rombank(*this, "dmdbank")
 	, m_ram(*this, "dmdram")
-	, m_rom(*this, finder_base::DUMMY_TAG)
+	, m_rom(*this, DEVICE_SELF)
+	, m_crtc_index(0)
+	, m_latch(0)
+	, m_status(0)
+	, m_ctrl(0)
+	, m_busy(0)
+	, m_command(0)
 {
 }
 
 void decodmd_type2_device::device_start()
 {
+	m_rombank->configure_entries(0, 32, &m_rom[0x0000], 0x4000);
+
+	save_item(NAME(m_crtc_index));
+	save_item(NAME(m_crtc_reg));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_status));
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_command));
+
 }
 
 void decodmd_type2_device::device_reset()
 {
-	m_rombank1->configure_entries(0, 32, &m_rom[0x0000], 0x4000);
-	m_rombank2->configure_entry(0, &m_rom[0x78000]);
-	m_rombank1->set_entry(0);
-	m_rombank2->set_entry(0);
+	m_rombank->set_entry(0);
 	m_busy = false;
 }

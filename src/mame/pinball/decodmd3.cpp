@@ -59,9 +59,12 @@ void decodmd_type3_device::status_w(uint16_t data)
 
 uint16_t decodmd_type3_device::latch_r()
 {
-	// clear IRQ?
-	m_cpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
-	m_busy = false;
+	if (!machine().side_effects_disabled())
+	{
+		// clear IRQ?
+		m_cpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_busy = false;
+	}
 	return m_command;
 }
 
@@ -107,12 +110,12 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 	{
 		for (int dot = 0; dot < 8; dot++)
 		{
-			uint8_t intensity = (BIT(m_ram[addr], 15-dot) << 1) | BIT(m_ram[addr + 0x400], 15-dot);
+			uint8_t const intensity = (BIT(m_ram[addr], 15-dot) << 1) | BIT(m_ram[addr + 0x400], 15-dot);
 			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		for (int dot = 8; dot < 16; dot++)
 		{
-			uint8_t intensity = (BIT(m_ram[addr], 15-dot) << 1) | BIT(m_ram[addr + 0x400], 15-dot);
+			uint8_t const intensity = (BIT(m_ram[addr], 15-dot) << 1) | BIT(m_ram[addr + 0x400], 15-dot);
 			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 	}
@@ -120,11 +123,11 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 
 void decodmd_type3_device::decodmd3_map(address_map &map)
 {
-	map(0x00000000, 0x000fffff).bankr("dmdrom");
-	map(0x00800000, 0x0080ffff).ram().share("dmdram");
-	map(0x00c00010, 0x00c00011).rw(FUNC(decodmd_type3_device::crtc_status_r), FUNC(decodmd_type3_device::crtc_address_w));
-	map(0x00c00012, 0x00c00013).w(FUNC(decodmd_type3_device::crtc_register_w));
-	map(0x00c00020, 0x00c00021).rw(FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
+	map(0x000000, 0x0fffff).rom().region(DEVICE_SELF, 0);
+	map(0x800000, 0x80ffff).ram().share(m_ram);
+	map(0xc00010, 0xc00011).rw(FUNC(decodmd_type3_device::crtc_status_r), FUNC(decodmd_type3_device::crtc_address_w));
+	map(0xc00012, 0xc00013).w(FUNC(decodmd_type3_device::crtc_register_w));
+	map(0xc00020, 0xc00021).rw(FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
 }
 
 void decodmd_type3_device::device_add_mconfig(machine_config &config)
@@ -147,7 +150,7 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 	screen.set_native_aspect();
 	screen.set_size(192, 64);
 	screen.set_visarea(0, 192-1, 0, 64-1);
-	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
+	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
 	screen.set_refresh_hz(60);
 }
 
@@ -156,18 +159,27 @@ decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const 
 	: device_t(mconfig, DECODMD3, tag, owner, clock)
 	, m_cpu(*this,"dmdcpu")
 	, m_mc6845(*this,"dmd6845")
-	, m_rombank(*this,"dmdrom")
 	, m_ram(*this, "dmdram")
-	, m_rom(*this, finder_base::DUMMY_TAG)
+	, m_status(0)
+	, m_crtc_index(0)
+	, m_latch(0)
+	, m_ctrl(0)
+	, m_busy(0)
+	, m_command(0)
 {
 }
 
 void decodmd_type3_device::device_start()
 {
+	save_item(NAME(m_status));
+	save_item(NAME(m_crtc_index));
+	save_item(NAME(m_crtc_reg));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_command));
 }
 
 void decodmd_type3_device::device_reset()
 {
-	m_rombank->configure_entry(0, &m_rom[0]);
-	m_rombank->set_entry(0);
 }
