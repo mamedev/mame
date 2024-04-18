@@ -9,7 +9,11 @@
 
 #include "emu.h"
 #include "decodmd1.h"
+
 #include "screen.h"
+
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(DECODMD1, decodmd_type1_device, "decodmd1", "Data East Pinball Dot Matrix Display Type 1")
 
@@ -65,7 +69,7 @@ uint8_t decodmd_type1_device::dmd_port_r(offs_t offset)
 {
 	if((offset & 0x84) == 0x80)
 	{
-		if (!machine().side_effects_disabled())
+		if(!machine().side_effects_disabled())
 		{
 			// IDAT (read only)
 			//m_ctrl &= ~0x01;
@@ -248,8 +252,9 @@ decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const 
 	, m_frameswap(false)
 	, m_busy_lines(0)
 	, m_prevrow(0)
-
-{}
+{
+	std::fill(std::begin(m_pixels), std::end(m_pixels), 0);
+}
 
 void decodmd_type1_device::device_start()
 {
@@ -269,7 +274,7 @@ void decodmd_type1_device::device_start()
 	save_item(NAME(m_pxdata1_latched));
 	save_item(NAME(m_pxdata2_latched));
 	save_item(NAME(m_frameswap));
-	save_item(m_pixels,"DMD Video data");
+	save_item(NAME(m_pixels));
 	save_item(NAME(m_busy_lines));
 	save_item(NAME(m_prevrow));
 }
