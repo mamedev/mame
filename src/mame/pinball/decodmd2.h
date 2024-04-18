@@ -22,6 +22,7 @@ public:
 	void data_w(uint8_t data);
 	uint8_t busy_r();
 	void ctrl_w(uint8_t data);
+	uint8_t ctrl_r(); // pinball/whitestar.cpp uses this
 	uint8_t status_r();
 
 protected:
@@ -51,7 +52,6 @@ private:
 	void crtc_register_w(uint8_t data);
 	uint8_t crtc_status_r();
 	uint8_t latch_r();
-	uint8_t ctrl_r();
 	void status_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_firq);
