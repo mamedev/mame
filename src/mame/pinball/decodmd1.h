@@ -11,7 +11,6 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 
 
@@ -20,23 +19,11 @@ class decodmd_type1_device : public device_t
 public:
 	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t latch_r();
 	void data_w(uint8_t data);
 	uint8_t busy_r();
 	void ctrl_w(uint8_t data);
-	uint8_t ctrl_r();
 	uint8_t status_r();
-	uint8_t dmd_port_r(offs_t offset);
-	void dmd_port_w(offs_t offset, uint8_t data);
 
-	void blank_w(int state);
-	void status_w(int state);
-	void rowdata_w(int state);
-	void rowclock_w(int state);
-	void test_w(int state);
-
-	void decodmd1_io_map(address_map &map);
-	void decodmd1_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -67,17 +54,30 @@ private:
 	uint32_t m_pxdata1_latched;
 	uint32_t m_pxdata2_latched;
 	bool m_frameswap;
-	uint32_t m_pixels[0x200]{};
+	uint32_t m_pixels[0x200];
 	uint8_t m_busy_lines;
 	uint32_t m_prevrow;
+
+	uint8_t latch_r();
+	uint8_t ctrl_r();
+	uint8_t dmd_port_r(offs_t offset);
+	void dmd_port_w(offs_t offset, uint8_t data);
+
+	void blank_w(int state);
+	void status_w(int state);
+	void rowdata_w(int state);
+	void rowclock_w(int state);
+	void test_w(int state);
 
 	void output_data();
 	void set_busy(uint8_t input, uint8_t val);
 	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_nmi);
+
+	void decodmd1_map(address_map &map);
+	void decodmd1_io_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(DECODMD1, decodmd_type1_device)
-
 
 #endif // MAME_PINBALL_DECODMD1_H
