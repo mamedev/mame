@@ -10,7 +10,11 @@
 
 #include "emu.h"
 #include "decodmd3.h"
+
 #include "screen.h"
+
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(DECODMD3, decodmd_type3_device, "decodmd3", "Data East Pinball Dot Matrix Display Type 3")
 
@@ -25,7 +29,7 @@ uint8_t decodmd_type3_device::busy_r()
 
 	ret = (m_status & 0x0f) << 3;
 
-	if(m_busy)
+	if (m_busy)
 		return 0x80 | ret;
 	else
 		return 0x00 | ret;
@@ -33,13 +37,13 @@ uint8_t decodmd_type3_device::busy_r()
 
 void decodmd_type3_device::ctrl_w(uint8_t data)
 {
-	if(!(m_ctrl & 0x01) && (data & 0x01))
+	if (!(m_ctrl & 0x01) && (data & 0x01))
 	{
 		m_cpu->set_input_line(M68K_IRQ_1,ASSERT_LINE);
 		m_busy = true;
 		m_command = m_latch;
 	}
-	if((m_ctrl & 0x02) && !(data & 0x02))
+	if ((m_ctrl & 0x02) && !(data & 0x02))
 	{
 		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		logerror("DMD3: Reset\n");
@@ -75,7 +79,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type3_device::dmd_irq)
 
 void decodmd_type3_device::crtc_address_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if(ACCESSING_BITS_8_15)
+	if (ACCESSING_BITS_8_15)
 	{
 		m_mc6845->address_w(data >> 8);
 		m_crtc_index = data >> 8;
@@ -84,7 +88,7 @@ void decodmd_type3_device::crtc_address_w(offs_t offset, uint16_t data, uint16_t
 
 uint16_t decodmd_type3_device::crtc_status_r(offs_t offset, uint16_t mem_mask)
 {
-	if(ACCESSING_BITS_8_15)
+	if (ACCESSING_BITS_8_15)
 		return m_mc6845->register_r();
 	else
 		return 0xff;
@@ -92,9 +96,9 @@ uint16_t decodmd_type3_device::crtc_status_r(offs_t offset, uint16_t mem_mask)
 
 void decodmd_type3_device::crtc_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if(ACCESSING_BITS_8_15)
+	if (ACCESSING_BITS_8_15)
 	{
-		if(m_crtc_index == 9)  // hack!!
+		if (m_crtc_index == 9)  // hack!!
 			data -= 0x100;
 		m_mc6845->register_w(data >> 8);
 		m_crtc_reg[m_crtc_index] = data >> 8;
@@ -167,6 +171,7 @@ decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const 
 	, m_busy(0)
 	, m_command(0)
 {
+	std::fill(std::begin(m_crtc_reg), std::end(m_crtc_reg), 0);
 }
 
 void decodmd_type3_device::device_start()
