@@ -16947,38 +16947,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="nibaw2c3">
-		<description>Nibbles Away ][ (version C3)</description>
-		<year>1983</year>
-		<publisher>COMPUTER:applications</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-11-04 -->
-		<!--"Nibbles Away ][" is a 1983 disk utility developed and distributed by COMPUTER:applications. This is version C3. It runs on any Apple ][ with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="146764">
-				<rom name="nibbles away ][.woz" size="146764" crc="db6d9e93" sha1="8729a7c7e69d74bb474a96e14a36a8b2fe0c085f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="eddupl44">
-		<description>Essential Data Duplicator (version 4.4)</description>
-		<year>1986</year>
-		<publisher>Utilico Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-11-04 -->
-		<!--"Essential Data Duplicator" is a 1986 disk utility developed by Donald A. Schnapp and distributed by Utilico Microware. This is version 4.4. It runs on any Apple ][ with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="106863">
-				<rom name="essential data duplicator v4.4.woz" size="106863" crc="a50ae8ed" sha1="c3f6a000171af417c81af7d47c81dc7f1d2026f7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bbatlm35">
 		<description>Beauty and the Beast and The Little Mermaid (800K 3.5")</description>
 		<year>1992</year>
@@ -17685,29 +17653,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234804">
 				<rom name="competition karate.woz" size="234804" crc="5ad403a7" sha1="97830c60250ad1f487f1508e44e8f6afb07b6bf9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nibaw3v125b">
-		<description>Nibbles Away III (version 1.25B)</description>
-		<year>1985</year>
-		<publisher>COMPUTER:applications</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-09 -->
-		<!--"Nibbles Away III" is a 1985 disk utility developed and distributed by COMPUTER:applications, Inc. This is version 1.25B. It runs on any Apple II with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program" />
-			<dataarea name="flop" size="234776">
-				<rom name="nibbles away iii v1.25b disk 1 - program.woz" size="234776" crc="3eb9f3b7" sha1="a7236341f1ba481a780ee25103cd70cb300b2e38" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Library" />
-			<dataarea name="flop" size="234776">
-				<rom name="nibbles away iii v1.25b disk 2 - library disk.woz" size="234776" crc="1bd02293" sha1="2a2fb311fec6c4846e8d88befb2eee792ccea106" />
 			</dataarea>
 		</part>
 	</software>
@@ -20187,54 +20132,6 @@ license:CC0-1.0
 			<!-- This disk upgrades 6.0A to 6.0B -->
 			<dataarea name="flop" size="234799">
 				<rom name="locksmith v6.0b parameter disk 1d.woz" size="234799" crc="e31292d4" sha1="bab8cc7a5f34a2a44954648b17f85997cacd443a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="edd30840206">
-		<description>Essential Data Duplicator (version 3.0-1984-02-06)</description>
-		<year>1984</year>
-		<publisher>Utilico Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-27 -->
-		<!--"Essential Data Duplicator" is a 1984 disk utility developed by Donald Anthony Schnapp and distributed by Utilico Microware. This is version 3.0-1984-02-06. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in &lt;a href="https://archive.org/details/OpenEmulatorSnapshots" rel="nofollow"&gt;OpenEmulator v1.1&lt;/a&gt;.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="248150">
-				<rom name="essential data duplicator iii v3.0-1984-02-06.woz" size="248150" crc="0a30990a" sha1="16dd4115b4dbba341504ee066500b5e6901b7cf5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="edd30840525">
-		<description>Essential Data Duplicator (version 3.0-1984-05-25)</description>
-		<year>1984</year>
-		<publisher>Utilico Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-27 -->
-		<!--"Essential Data Duplicator" is a 1984 disk utility developed by Donald Anthony Schnapp and distributed by Utilico Microware. This is version 3.0-1984-05-25. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in OpenEmulator v1.1.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="247145">
-				<rom name="essential data duplicator iii v3.0-1984-05-25.woz" size="247145" crc="7b1493eb" sha1="1de36a7c74a19786cf4516b4d1f16e4c7164837e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="backitup36">
-		<description>Back It Up (version 3.6)</description>
-		<year>1983</year>
-		<publisher>Sensible Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-27 -->
-		<!--"Back It Up" is a 1983 disk utility developed by Henry A. Roberts and distributed by Sensible Software. This is version 3.6. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in OpenEmulator v1.1.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="121660">
-				<rom name="back it up iii v3.6.woz" size="121660" crc="9161150d" sha1="07398e4da71fcba119534eb56ec3feba26958170" />
 			</dataarea>
 		</part>
 	</software>
@@ -27002,6 +26899,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="anchorman">
+		<description>Anchorman</description>
+		<year>1988</year>
+		<publisher>Virginia Real Software</publisher>
+		<info name="programmer" value="Hal Kiefer" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-02-02-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="anchorman.woz" size="234779" crc="b63194b8" sha1="a90958e1fe57c97c563a99370be1d0944ecec834" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="anmstoriv">
 		<description>Animal Stories IV</description>
 		<year>1990</year>
@@ -27145,6 +27058,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="backitup3v34" cloneof="backitup3">
+		<description>Back It Up III (version 3.4)</description>
+		<year>1983</year>
+		<publisher>Sensible Software</publisher>
+		<info name="programmer" value="Henry A. Roberts, Jr." />
+		<info name="usage" value="Requires an Apple ][, Apple ][+, Apple //e, and enhanced Apple //e with 48K." />
+		<info name="version" value="3.4" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE" />
+		<!--Due to aggressive copy protection, it does not boot on later models (//c or IIgs).-->
+		<!--Dump released: 2024-03-17-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="301268">
+				<rom name="back it up iii v3.4.woz" size="301268" crc="859eceae" sha1="5f5250a50115f8e069d8c79d6f568d3e2d8ba5b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backitup3">
+		<description>Back It Up III (version 3.6)</description>
+		<year>1983</year>
+		<publisher>Sensible Software</publisher>
+		<info name="programmer" value="Henry A. Roberts, Jr." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.6" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-27-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121660">
+				<rom name="back it up iii v3.6.woz" size="121660" crc="9161150d" sha1="07398e4da71fcba119534eb56ec3feba26958170" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bckydbrd_525" cloneof="bckydbrd">
 		<description>Backyard Birds (A-216 version 1.0)</description>
 		<year>1989</year>
@@ -27228,6 +27176,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234869">
 				<rom name="bluegrass bluff.woz" size="234869" crc="ccef05ca" sha1="4cf9cbf571e3de33af0cb70101f099f3aa55aa4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="candyland">
+		<description>Candy Land</description>
+		<year>1988</year>
+		<publisher>GameTek</publisher>
+		<info name="programmer" value="Michael Robert Hausman" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234773">
+				<rom name="candy land side a.woz" size="234773" crc="038a986e" sha1="aeb758ad95d92ab80a44792e10fce2e804a1e674" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234773">
+				<rom name="candy land side b (boot).woz" size="234773" crc="11f0df3c" sha1="406d12484536fde25a8643c37b80db71d7fea184" />
 			</dataarea>
 		</part>
 	</software>
@@ -27351,6 +27322,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234890">
 				<rom name="chemistry- the periodic table v1.0.woz" size="234890" crc="232c6255" sha1="e52f576c864fe325dcb705513b53ebafb628a430" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyeagaft">
+		<description>Chuck Yeager's Advanced Flight Trainer</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Gene Kusmiak" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-16-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234833">
+				<rom name="chuck yeager's advanced flight trainer side a.woz" size="234833" crc="7991d3cc" sha1="a84b2fbc0ad9b16e8aefb2ffbfeb823f12b61f4b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234833">
+				<rom name="chuck yeager's advanced flight trainer side b.woz" size="234833" crc="9f55431e" sha1="e6f2c741b84fd077bdb175f91516a2c567023eba" />
 			</dataarea>
 		</part>
 	</software>
@@ -28002,6 +27996,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="15186">
 				<rom name="copy ii plus v3.1.woz" size="15186" crc="45de29aa" sha1="0eef8313f859807c27983503fb2d119135aed54e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv33" cloneof="copy2p">
+		<description>Copy II Plus (version 3.3)</description>
+		<year>1982</year>
+		<publisher>Central Point Software</publisher>
+		<info name="programmer" value="Michael A. Brown" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.3" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-12-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="28483">
+				<rom name="copy ii plus v3.3.woz" size="28483" crc="1912cb81" sha1="3c6bda79887a8a917b483675aa60cc05389ce4d3" />
 			</dataarea>
 		</part>
 	</software>
@@ -28987,6 +28998,74 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="eddup30840206" cloneof="eddup3">
+		<description>Essential Data Duplicator III (version 3.0-1984-02-06)</description>
+		<year>1984</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.0-1984-02-06" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-27-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248150">
+				<rom name="essential data duplicator iii v3.0-1984-02-06.woz" size="248150" crc="0a30990a" sha1="16dd4115b4dbba341504ee066500b5e6901b7cf5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddup3">
+		<description>Essential Data Duplicator III (version 3.0-1984-05-25)</description>
+		<year>1984</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.0-1984-05-25" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-27-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="247145">
+				<rom name="essential data duplicator iii v3.0-1984-05-25.woz" size="247145" crc="7b1493eb" sha1="1de36a7c74a19786cf4516b4d1f16e4c7164837e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddup4">
+		<description>Essential Data Duplicator 4 (version 4.4)</description>
+		<year>1986</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="4.4" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-11-04-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="106863">
+				<rom name="essential data duplicator v4.4.woz" size="106863" crc="a50ae8ed" sha1="c3f6a000171af417c81af7d47c81dc7f1d2026f7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddup4p">
+		<description>Essential Data Duplicator 4 Plus (version 4.1)</description>
+		<year>1986</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="4.1" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-17-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="95026">
+				<rom name="essential data duplicator 4 plus v4.1.woz" size="95026" crc="1e3718ff" sha1="46e7db7d52a25133db8665a4a98bdbef1a56a759" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="faywrd35">
 		<description>Fay: The Word Hunter (800K 3.5")</description>
 		<year>1991</year>
@@ -29721,6 +29800,82 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="nibaw">
+		<description>Nibbles Away (version B2)</description>
+		<year>1981</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="B2" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-07-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="129797">
+				<rom name="nibbles away vb2.woz" size="129797" crc="9d73e8fa" sha1="80391d17d7094e5c0a381cd8bf5da4c64d561f86" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw2a1" cloneof="nibaw2">
+		<description>Nibbles Away ][ (version A1)</description>
+		<year>1981</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires an Apple ][ or Apple ][+ with 48K" />
+		<info name="version" value="A1" />
+		<sharedfeat name="compatibility" value="A2,A2P" />
+		<!--Due to aggressive copy protection, it does not boot on later models.-->
+		<!--Dump released: 2024-03-17-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="nibbles away ii va1.woz" size="234779" crc="a247f034" sha1="c0f74dc31daa6d1ed4de765a4cf368e2ef242143" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw2">
+		<description>Nibbles Away ][ (version C3)</description>
+		<year>1983</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="C3" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-11-04-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="146764">
+				<rom name="nibbles away ][.woz" size="146764" crc="db6d9e93" sha1="8729a7c7e69d74bb474a96e14a36a8b2fe0c085f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw3">
+		<description>Nibbles Away III (version 1.25B)</description>
+		<year>1985</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="1.25B" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-09-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program" />
+			<dataarea name="flop" size="234776">
+				<rom name="nibbles away iii v1.25b disk 1 - program.woz" size="234776" crc="3eb9f3b7" sha1="a7236341f1ba481a780ee25103cd70cb300b2e38" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Library" />
+			<dataarea name="flop" size="234776">
+				<rom name="nibbles away iii v1.25b disk 2 - library disk.woz" size="234776" crc="1bd02293" sha1="2a2fb311fec6c4846e8d88befb2eee792ccea106" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pollspol">
 		<description>Polls and Politics Volume 1 (A-820 version 1.0)</description>
 		<year>1984</year>
@@ -29752,6 +29907,53 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234801">
 				<rom name="problem-solving strategies v1.0.woz" size="234801" crc="8e33f814" sha1="6674eb2c9dd393195bd949937cd9e1ce7722971b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qm1prihel">
+		<description>Questmaster I: The Prism of Heheutotol</description>
+		<year>1989</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Sean B. Barger, Allan J. Lamb, Sean B. Barger, Greg Hopkins, Dave Kuchta, and Rick Incrocci" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-05-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 1.woz" size="234967" crc="18af8da0" sha1="7b7940d544f2887c8de0159f1eac6d6ba81f3742" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 2.woz" size="234967" crc="e81feeac" sha1="5a4e1554bd9375410c6898b10c04837abcad2d6c" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 3.woz" size="234967" crc="a053a1f9" sha1="a2b4e2dc65ca0e43fa36c16b7b55c003ab91ac6a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 4.woz" size="234967" crc="9ff3706c" sha1="692b07fb4a9d28097bd014293adea9d901270a3e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 5.woz" size="234967" crc="434a7d0c" sha1="47e542d2edb107167c962c1688b61d9e81ba08c7" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side 6" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 6.woz" size="234967" crc="52038971" sha1="c334883cbbd31bb88239f558bcd1fdef73b77078" />
 			</dataarea>
 		</part>
 	</software>
@@ -30660,6 +30862,86 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234892">
 				<rom name="wings out of shadow.woz" size="234892" crc="3dd30c72" sha1="22ac1989ce534d437c29e35f061b89b5a7f8266a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizcovlad">
+		<description>Wizimore: Catacombs of Vlad</description>
+		<year>1987</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234891">
+				<rom name="wizimore - catacombs of vlad.woz" size="234891" crc="5d4499d2" sha1="cdb4d341f51912df5c5fc7bf0d1428b2af9548dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiznihon">
+		<description>Wizimore: Nihonbashi</description>
+		<year>1987</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234884">
+				<rom name="wizimore - nihonbashi.woz" size="234884" crc="9899bbcd" sha1="31da8032f80faad7bc057b1cc66faf8a638dcc03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizomine">
+		<description>Wizimore: O'Connor's Mine</description>
+		<year>1985</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234889">
+				<rom name="wizimore - o'connor's mine.woz" size="234889" crc="decf27bd" sha1="6463c751f1378dfbb33c8e9a5bb5f42af739931a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizempsl">
+		<description>Wizimore: The Emperor's Seal</description>
+		<year>1987</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234892">
+				<rom name="wizimore - the emperor's seal.woz" size="234892" crc="fcee2feb" sha1="b4bc61c77949c2dc59830afbf7c3d6e31ffdd20e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizsbhh">
+		<description>Wizimore: The Scarlet Brotherhood of Hsi Ho</description>
+		<year>1985</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-19-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234907">
+				<rom name="wizimore - the scarlet brotherhood of hsi ho.woz" size="234907" crc="c52237ac" sha1="aec32fb58baebb34cb1e0578189781fe958ed9bf" />
 			</dataarea>
 		</part>
 	</software>
