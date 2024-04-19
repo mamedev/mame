@@ -169,12 +169,18 @@ void tsconf_state::tsconf_update_screen(screen_device &screen, bitmap_rgb32 &bit
 	{
 		screen.priority().fill(0, cliprect);
 		if (BIT(m_regs[TS_CONFIG], 5))
-			m_ts_tilemap[TM_TILES0]->draw(screen, bitmap, cliprect,
-										  BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1);
+		{
+			m_ts_tilemap[TM_TILES0]->draw(
+					screen, bitmap, cliprect,
+					BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1);
+		}
 
 		if (BIT(m_regs[TS_CONFIG], 6))
-			m_ts_tilemap[TM_TILES1]->draw(screen, bitmap, cliprect,
-										  BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2);
+		{
+			m_ts_tilemap[TM_TILES1]->draw(
+					screen, bitmap, cliprect,
+					BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2);
+		}
 
 		if (BIT(m_regs[TS_CONFIG], 7))
 		{
@@ -337,12 +343,21 @@ void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_rgb32 &bitmap, c
 				for (auto ix = x; ix <= x + width8 * 8; ix = ix + 8)
 				{
 					if (layer == 2)
-						m_gfxdecode->gfx(TM_SPRITES)->transpen(bitmap, cliprect, tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64))
-							, pal, flipx, flipy, ix, iy, 0);
+					{
+						m_gfxdecode->gfx(TM_SPRITES)->transpen(
+								bitmap, cliprect,
+								tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64)),
+								pal, flipx, flipy, ix, iy,
+								0);
+					}
 					else
-						m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(bitmap, cliprect, tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64))
-							, pal, flipx, flipy, ix, iy
-							, screen_d.priority(), GFX_PMASK_2 | (layer ? GFX_PMASK_1 : 0), 0);
+					{
+						m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(
+								bitmap, cliprect,
+								tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64)),
+								pal, flipx, flipy, ix, iy,
+								screen_d.priority(), GFX_PMASK_2 | (layer ? GFX_PMASK_1 : 0), 0);
+					}
 					tile_col += flipx ? -1 : 1;
 				}
 				tile_row += flipy ? -1 : 1;
@@ -443,8 +458,8 @@ void tsconf_state::sfile_write16(offs_t offset, u16 data)
 
 u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
 	return m_beta->started() && m_beta->is_active()
-		? m_beta->status_r()
-		: 0x00; // TODO kempston read
+			? m_beta->status_r()
+			: 0x00; // TODO kempston read
 }
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
@@ -668,8 +683,8 @@ u8 tsconf_state::tsconf_port_f7_r(offs_t offset)
 {
 	// BFF7
 	return  (m_port_f7_ext == PS2KEYBOARDS_LOG && m_glukrs->address_r() == 0xf0)
-		? m_keyboard->read()
-		: m_glukrs->data_r();
+			? m_keyboard->read()
+			: m_glukrs->data_r();
 }
 
 void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
@@ -880,8 +895,8 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 		case G_Y_OFFS_L:
 		case G_Y_OFFS_H:
 			m_gfx_y_frame_offset = screen_vpos < get_screen_area().top()
-				? -get_screen_area().top()
-				: -screen_vpos;
+					? -get_screen_area().top()
+					: -screen_vpos;
 			break;
 
 		case T0_G_PAGE:
