@@ -611,7 +611,7 @@ void williams_state::alienar_main_map(address_map &map)
  *
  *************************************/
 
-void blaster_state::main_map(address_map &map)
+void blaster_state::blaster_main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share(m_videoram);
 	map(0x0000, 0x8fff).view(m_rom_view);
@@ -620,7 +620,7 @@ void blaster_state::main_map(address_map &map)
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share(m_paletteram);
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xc900, 0xc93f).w(FUNC(blaster_state::vram_select_w));
+	map(0xc900, 0xc93f).w(FUNC(blaster_state::blaster_vram_select_w));
 	map(0xc940, 0xc97f).w(FUNC(blaster_state::remap_select_w));
 	map(0xc980, 0xc9bf).w(FUNC(blaster_state::bank_select_w));
 	map(0xc9c0, 0xc9ff).w(FUNC(blaster_state::video_control_w));
@@ -1789,12 +1789,14 @@ void blaster_state::blastkit(machine_config &config)
 	williams_b2(config);
 	m_blitter_clip_address = 0x9700;
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &blaster_state::blaster_main_map);
+
 	// video hardware
 	m_screen->set_screen_update(FUNC(blaster_state::screen_update));
 
 	// pia
-	m_pia[0]->readpa_handler().set("mux_a", FUNC(ls157_x2_device::output_r));
-	m_pia[0]->cb2_handler().set("mux_a", FUNC(ls157_x2_device::select_w));
+	m_pia[0]->readpa_handler().set(m_muxa, FUNC(ls157_x2_device::output_r));
+	m_pia[0]->cb2_handler().set(m_muxa, FUNC(ls157_x2_device::select_w));
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
 	LS157_X2(config, m_muxa, 0);
@@ -1813,16 +1815,15 @@ void blaster_state::blaster(machine_config &config)
 	// pia
 	m_pia[0]->readpb_handler().set("mux_b", FUNC(ls157_device::output_r)).mask(0x0f);
 	m_pia[0]->readpb_handler().append_ioport("IN1").mask(0xf0);
-	m_pia[0]->cb2_handler().set("mux_a", FUNC(ls157_x2_device::select_w));
 	m_pia[0]->cb2_handler().append("mux_b", FUNC(ls157_device::select_w));
 
 	// IC7 (for PA0-PA3) + IC5 (for PA4-PA7)
 	m_muxa->a_in_callback().set(FUNC(blaster_state::port_0_49way_r));
 	m_muxa->b_in_callback().set_ioport("IN3");
 
-	LS157(config, m_muxb, 0); // IC3
-	m_muxb->a_in_callback().set_ioport("INP1");
-	m_muxb->b_in_callback().set_ioport("INP2");
+	ls157_device &muxb(LS157(config, "mux_b", 0)); // IC3
+	muxb.a_in_callback().set_ioport("INP1");
+	muxb.b_in_callback().set_ioport("INP2");
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
 
@@ -1944,9 +1945,9 @@ void tshoot_state::tshoot(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tshoot_state::d000_rom_map);
 
 	// pia
-	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
+	m_pia[0]->readpa_handler().set(m_mux, FUNC(ls157_x2_device::output_r));
 	m_pia[0]->writepb_handler().set(FUNC(tshoot_state::lamp_w));
-	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_x2_device::select_w));
+	m_pia[0]->ca2_handler().set(m_mux, FUNC(ls157_x2_device::select_w));
 	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
@@ -1972,8 +1973,8 @@ void joust2_state::joust2(machine_config &config)
 
 	// pia
 	m_pia[0]->readpa_handler().set_ioport("IN0").mask(0xf0);
-	m_pia[0]->readpa_handler().append("mux", FUNC(ls157_device::output_r)).mask(0x0f);
-	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_device::select_w));
+	m_pia[0]->readpa_handler().append(m_mux, FUNC(ls157_device::output_r)).mask(0x0f);
+	m_pia[0]->ca2_handler().set(m_mux, FUNC(ls157_device::select_w));
 
 	m_pia[1]->readpa_handler().set_ioport("IN2");
 	m_pia[1]->writepb_handler().set(FUNC(joust2_state::snd_cmd_w)); // this goes both to the sound cpu AND to the s11 bg cpu

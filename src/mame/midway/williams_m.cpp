@@ -397,7 +397,7 @@ void blaster_state::machine_start()
 {
 	williams_state::machine_start();
 
-	/* banking is different for blaster */
+	// banking is different for blaster
 	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
@@ -409,18 +409,18 @@ void blaster_state::machine_reset()
 }
 
 
-void blaster_state::vram_select_w(u8 data)
+void blaster_state::blaster_vram_select_w(u8 data)
 {
-	/* VRAM/ROM banking from bit 0 */
+	// VRAM/ROM banking from bit 0
 	if (BIT(data, 0))
 		m_rom_view.select(0);
 	else
 		m_rom_view.disable();
 
-	/* cocktail flip from bit 1 */
+	// cocktail flip from bit 1
 	m_cocktail = BIT(data, 1);
 
-	/* window enable from bit 2 (clips to 0x9700) */
+	// window enable from bit 2 (clips to 0x9700)
 	m_blitter_window_enable = BIT(data, 2);
 }
 
