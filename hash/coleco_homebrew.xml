@@ -136,12 +136,12 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
-	<!-- Needs 'Activison PCB' emulation with EEPROM -->
-	<software name="blackonx" supported="no">
+	<software name="blackonx">
 		<description>The Black Onyx</description>
 		<year>2013</year>
 		<publisher>Team Pixelboy</publisher>
 		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="activision_256b" />
 			<dataarea name="rom" size="65536">
 				<rom name="black-onyx-the-2013.rom" size="65536" crc="dddd1396" sha1="9bc148c38bd94ba52efa335a08f5c2660b5dbf32" />
 			</dataarea>
@@ -171,12 +171,12 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
-	<!-- Needs 'Activison PCB' emulation with EEPROM -->
-	<software name="boxxle" supported="no">
+	<software name="boxxle">
 		<description>Boxxle</description>
 		<year>2015</year>
 		<publisher>Team Pixelboy</publisher>
 		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="activision_32k" />
 			<dataarea name="rom" size="65536">
 				<rom name="boxxle-2015.rom" size="65536" crc="62dacf07" sha1="98dc774cb4e954a026a298d2cb91d662f0f484cd" />
 			</dataarea>
@@ -1362,13 +1362,13 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
-	<software name="spacesha" supported="no">
+	<software name="spacesha">
 		<description>Space Shuttle: A Journey Into Space (64k)</description>
 		<year>2022</year>
 		<publisher>Team Pixelboy</publisher>
 		<info name="usage" value="req. Super Game Module" />
 		<part name="cart" interface="coleco_cart">
-			<feature name="slot" value="megacart" />
+			<feature name="slot" value="activision" />
 			<dataarea name="rom" size="65536">
 				<rom name="space-shuttle-a-journey-into-space-2022.rom" size="65536" crc="bb0f6678" sha1="6365c5f36052202954161007932d328db2d4bb8b" />
 			</dataarea>
