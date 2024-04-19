@@ -1531,6 +1531,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
+	m_irq_off_timer->adjust(attotime::never); // in case it's called from INT Ack, not by timer itself
 	m_hold_irq = 0;
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
