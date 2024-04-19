@@ -53,13 +53,14 @@ public:
 
 	void joust(machine_config &config);
 	void bubbles(machine_config &config);
+	void sinistar_upright(machine_config &config);
+	void sinistar_cockpit(machine_config &config);
 	void splat(machine_config &config);
 	void playball(machine_config &config);
 	void spdball(machine_config &config);
 	void alienar(machine_config &config);
 	void lottofun(machine_config &config);
 
-	u8 port_0_49way_r();
 	virtual u8 video_counter_r();
 	virtual void watchdog_reset_w(u8 data);
 
@@ -121,13 +122,17 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	u8 port_0_49way_r();
 	virtual void vram_select_w(u8 data);
+	void sinistar_vram_select_w(u8 data);
 	void cmos_4bit_w(offs_t offset, u8 data);
 	void blitter_w(address_space &space, offs_t offset, u8 data);
 
+	template <unsigned A, unsigned... B>
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 	virtual void snd_cmd_w(u8 data);
 	void playball_snd_cmd_w(u8 data);
+	void cockpit_snd_cmd_w(u8 data);
 
 	void state_save_register();
 	void blitter_init(int blitter_config, const uint8_t *remap_prom);
@@ -139,6 +144,7 @@ protected:
 
 	virtual void main_map(address_map &map);
 	void bubbles_main_map(address_map &map);
+	void sinistar_main_map(address_map &map);
 	void spdball_main_map(address_map &map);
 	void alienar_main_map(address_map &map);
 	virtual void sound_map(address_map &map);
@@ -160,16 +166,15 @@ public:
 	void init_defndjeu();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void main_map(address_map &map) override;
-
-	void video_control_w(u8 data);
+	void defender_main_map(address_map &map);
+	void defender_sound_map(address_map &map);
+	void defender_sound_map_6802(address_map &map);
 
 private:
-	virtual void sound_map(address_map &map) override;
-	void sound_map_6802(address_map &map);
-
+	void video_control_w(u8 data);
 	void bank_select_w(u8 data);
 };
 
@@ -181,28 +186,12 @@ public:
 		defender_state(mconfig, type, tag)
 	{ }
 
+	void mayday(machine_config &config);
+
 private:
+	void mayday_main_map(address_map &map);
+
 	u8 protection_r(offs_t offset);
-	virtual void main_map(address_map &map) override;
-};
-
-// Sinistar: blitter window clip
-class sinistar_state : public williams_state
-{
-public:
-	sinistar_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag)
-	{ }
-
-	void upright(machine_config &config);
-	void cockpit(machine_config &config);
-
-private:
-	virtual void vram_select_w(u8 data) override;
-	virtual void main_map(address_map &map) override;
-
-	TIMER_CALLBACK_MEMBER(cockpit_deferred_snd_cmd_w);
-	void cockpit_snd_cmd_w(u8 data);
 };
 
 // Conquest: flywheel controller

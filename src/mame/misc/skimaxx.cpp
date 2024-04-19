@@ -59,7 +59,8 @@ public:
 		m_fpga_ctrl(*this, "fpga_ctrl"),
 		m_fg_buffer(*this, "fg_buffer"),
 		m_blitter_gfx(*this, "blitter"),
-		m_bgrambank(*this, "bgrambank")
+		m_bgrambank(*this, "bgrambank"),
+		m_an_io(*this, {"X", "Y"})
 	{ }
 
 	void skimaxx(machine_config &config);
@@ -80,6 +81,7 @@ private:
 	required_region_ptr<u16> m_blitter_gfx;
 
 	required_memory_bank m_bgrambank;
+	required_ioport_array<2> m_an_io;
 
 	std::unique_ptr<u32[]> m_bg_buffer;
 	u32 *m_bg_buffer_front;
@@ -118,7 +120,7 @@ private:
 // Set up blit parameters
 void skimaxx_state::blitter_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 newdata = COMBINE_DATA( &m_blitter_regs[offset] );
+	u32 const newdata = COMBINE_DATA( &m_blitter_regs[offset] );
 
 	switch (offset)
 	{
@@ -149,22 +151,25 @@ void skimaxx_state::blitter_w(offs_t offset, u32 data, u32 mem_mask)
 // A read by the 68030 from this area blits one pixel to the back buffer (at the same offset)
 u32 skimaxx_state::blitter_r(offs_t offset, u32 mem_mask)
 {
-	u32 const penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
-	const u16 *src = m_blitter_gfx + (penaddr % m_blitter_gfx.length());
-	u32 *dst = m_bg_buffer_back + offset;
-
-	u16 const pen = (*src) & 0x7fff;
-
-	if (pen)
+	if (!machine().side_effects_disabled())
 	{
-		if (ACCESSING_BITS_16_31)
-			*dst = (*dst & 0x0000ffff) | (pen << 16);
-		else
-			*dst = (*dst & 0xffff0000) | pen;
-	}
+		u32 const penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
+		const u16 *src = m_blitter_gfx + (penaddr % m_blitter_gfx.length());
+		u32 *dst = m_bg_buffer_back + offset;
 
-	m_blitter_src_x = (m_blitter_src_x & 0x10000) | ((m_blitter_src_x + m_blitter_src_dx) & 0xffff);
-	m_blitter_src_y = (m_blitter_src_y & 0xffff0000) | ((m_blitter_src_y + m_blitter_src_dy) & 0xffff);
+		u16 const pen = (*src) & 0x7fff;
+
+		if (pen)
+		{
+			if (ACCESSING_BITS_16_31)
+				*dst = (*dst & 0x0000ffff) | (pen << 16);
+			else
+				*dst = (*dst & 0xffff0000) | pen;
+		}
+
+		m_blitter_src_x = (m_blitter_src_x & 0x10000) | ((m_blitter_src_x + m_blitter_src_dx) & 0xffff);
+		m_blitter_src_y = (m_blitter_src_y & 0xffff0000) | ((m_blitter_src_y + m_blitter_src_dy) & 0xffff);
+	}
 
 	return 0;
 }
@@ -272,7 +277,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
 
 void skimaxx_state::fpga_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 newdata = COMBINE_DATA( m_fpga_ctrl );
+	u32 const newdata = COMBINE_DATA( m_fpga_ctrl );
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -323,7 +328,7 @@ void skimaxx_state::sub_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 */
 u32 skimaxx_state::analog_r(offs_t offset)
 {
-	return bitswap<8>(ioport(offset ? "Y" : "X")->read(), 0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_an_io[offset]->read(), 0,1,2,3,4,5,6,7);
 }
 
 /*************************************
@@ -371,11 +376,11 @@ void skimaxx_state::m68030_2_map(address_map &map)
 	map(0x00000000, 0x003fffff).rom();
 
 	map(0x20000000, 0x2007ffff).r(FUNC(skimaxx_state::blitter_r));    // do blit
-	map(0x30000000, 0x3000000f).w(FUNC(skimaxx_state::blitter_w)).share("blitter_regs");
+	map(0x30000000, 0x3000000f).w(FUNC(skimaxx_state::blitter_w)).share(m_blitter_regs);
 
-	map(0x40000000, 0x40000003).w(FUNC(skimaxx_state::fpga_ctrl_w)).share("fpga_ctrl");
+	map(0x40000000, 0x40000003).w(FUNC(skimaxx_state::fpga_ctrl_w)).share(m_fpga_ctrl);
 
-	map(0x50000000, 0x5007ffff).bankrw("bgrambank");    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
+	map(0x50000000, 0x5007ffff).bankrw(m_bgrambank);    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  map(0xfffc0000, 0xfffc7fff).ram().share("share1");
 	map(0xfffc0000, 0xfffcffff).ram().share("share1");
 //  map(0xfffe0000, 0xffffffff).ram(); // I think this is banked with the shared RAM? (see CPU sync routines)
@@ -395,7 +400,7 @@ void skimaxx_state::tms_program_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).ram();
 	map(0x00050000, 0x0005ffff).ram();
-	map(0x00220000, 0x003fffff).ram().share("fg_buffer");
+	map(0x00220000, 0x003fffff).ram().share(m_fg_buffer);
 	map(0x02000000, 0x0200000f).ram();
 	map(0x02100000, 0x0210000f).ram();
 	map(0x04000000, 0x047fffff).rom().region("tmsgfx", 0);
@@ -530,7 +535,7 @@ void skimaxx_state::skimaxx(machine_config &config)
 	M68EC030(config, m_subcpu, XTAL(40'000'000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &skimaxx_state::m68030_2_map);
 
-	/* video hardware */
+	// video hardware
 	TMS34010(config, m_tms, XTAL(50'000'000));
 	m_tms->set_addrmap(AS_PROGRAM, &skimaxx_state::tms_program_map);
 	m_tms->set_halt_on_reset(false);
@@ -554,7 +559,7 @@ void skimaxx_state::skimaxx(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
