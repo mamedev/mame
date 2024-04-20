@@ -378,7 +378,7 @@ protected:
 	int m_sprite_lag = 0;
 	u8 m_sprite_pri_row_usage[256]{};
 	bitmap_ind8 m_pri_alp_bitmap;
-	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
+	bitmap_ind16 m_sprite_framebuffer{};
 	u16 m_width_mask = 0;
 	u8 m_twidth_mask = 0;
 	u8 m_twidth_mask_bit = 0;

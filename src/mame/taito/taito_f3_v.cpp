@@ -506,10 +506,7 @@ void taito_f3_state::video_start()
 	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
-	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
-	for (auto &sp_bitmap : m_sprite_framebuffers) {
-		m_screen->register_screen_bitmap(sp_bitmap);
-	}
+	m_screen->register_screen_bitmap(m_sprite_framebuffer);
 
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
@@ -970,6 +967,12 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 
 		const int real_x = gfx.x_sample_enable ? mosaic(x, line.x_sample) : x;
 		const int gfx_x = gfx.x_index(real_x);
+
+		if constexpr (std::is_same_v<Mix, sprite_inf*>) {
+			if (BIT(src[gfx_x], 10, 2) != gfx.debug_index)
+				continue;
+		}
+
 		// tilemap transparent flag
 		if (flags && !(flags[gfx_x] & 0xf0))
 			continue;
@@ -1081,7 +1084,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
 	for (int i=0; i < NUM_SPRITEGROUPS; i++) {
-		line_data.sp[i].bitmap = draw_source(&m_sprite_framebuffers[i]);
+		line_data.sp[i].bitmap = draw_source(&m_sprite_framebuffer);
 		line_data.sp[i].sprite_pri_usage = &m_sprite_pri_row_usage;
 		line_data.sp[i].debug_index = i;
 	}
@@ -1187,7 +1190,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect)
 {
-	bitmap_ind16 &dest_bmp = m_sprite_framebuffers[sprite.pri];
+	bitmap_ind16 &dest_bmp = m_sprite_framebuffer;
 
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
@@ -1206,7 +1209,6 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 		dy8 += sprite.scale_y;
 		if (dy < cliprect.min_y || dy > cliprect.max_y)
 			continue;
-		u8 *pri = &m_pri_alp_bitmap.pix(dy);
 		u16 *dest = &dest_bmp.pix(dy);
 		auto &usage = m_sprite_pri_row_usage[dy];
 		const u8 *src = &code_base[(y ^ flipy) * 16];
@@ -1221,9 +1223,8 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 			if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
 				continue;
 			const u8 c = src[(x ^ flipx)] & m_sprite_pen_mask;
-			if (c && !pri[dx]) {
+			if (c && !dest[dx]) {
 				dest[dx] = gfx->colorbase() + (sprite.color<<4 | c);
-				pri[dx] = 1;
 				usage |= 1<<sprite.pri;
 			}
 		}
@@ -1376,11 +1377,8 @@ void taito_f3_state::get_sprite_info()
 void taito_f3_state::draw_sprites(const rectangle &cliprect)
 {
 	if (!m_sprite_trails) {
-		m_pri_alp_bitmap.fill(0);
 		std::fill_n(m_sprite_pri_row_usage, 256, 0);
-		for (auto &sp_bitmap : m_sprite_framebuffers) {
-			sp_bitmap.fill(0);
-		}
+		m_sprite_framebuffer.fill(0);
 	}
 
 	for (const auto *spr = m_sprite_end; spr-- != &m_spritelist[0]; ) {
