@@ -21164,6 +21164,9 @@ vc4000                          // Interton vc4000
 vc6000                          //
 vmdtbase                        //
 
+@source:irem/blackjack92.cpp
+bj92
+
 @source:irem/m10.cpp
 andromed                        // (c) 1979
 greenber                        // Irem
