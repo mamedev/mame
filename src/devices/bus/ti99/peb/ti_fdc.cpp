@@ -256,7 +256,7 @@ void ti_fdc_device::dvena_w(int state)
 
 	// Set all motors
 	for (auto & elem : m_floppy)
-		if (elem->get_device() != nullptr) 
+		if (elem->get_device() != nullptr)
 			elem->get_device()->mon_w((state==ASSERT_LINE)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
@@ -326,7 +326,7 @@ void ti_fdc_device::select_drive(int n, int state)
 		{
 			LOGMASKED(LOG_WARN, "Warning: DSK%d selected while DSK%d not yet unselected\n", n, m_sel_floppy);
 		}
-	
+
 		if (m_floppy[n-1]->get_device() != nullptr)
 		{
 			m_sel_floppy = n;
@@ -360,7 +360,7 @@ void ti_fdc_device::device_reset()
 	m_selected = false;
 	m_inDsrArea = false;
 	m_WDsel = false;
-	
+
 	for (auto &flop : m_floppy)
 	{
 		if (flop->get_device() != nullptr)
@@ -368,7 +368,7 @@ void ti_fdc_device::device_reset()
 		else
 			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
-	
+
 	m_sel_floppy = 0;
 }
 

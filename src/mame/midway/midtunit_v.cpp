@@ -781,10 +781,10 @@ void midtunit_video_device::dma_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	}
 
 	// there seems to be two types of behavior for the DMA chip
-	// for MK1 and MK2, the upper byte of the LRSKIP is the    
-	// starting skip value, and the lower byte is the ending   
+	// for MK1 and MK2, the upper byte of the LRSKIP is the
+	// starting skip value, and the lower byte is the ending
 	// skip value; for the NBA Jam, Hangtime, and Open Ice, the
-	// full word seems to be the starting skip value.          
+	// full word seems to be the starting skip value.
 	if (command & 0x40)
 	{
 		m_dma_state.startskip = m_dma_register[DMA_LRSKIP] & 0xff;

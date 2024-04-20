@@ -3223,7 +3223,7 @@ ROM_END
 
 // There is known to exist a PCB with hand written labels shown as V1.23
 
-ROM_START( sftmj114 )   // Version 1.14N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board 
+ROM_START( sftmj114 )   // Version 1.14N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board
 	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
 	ROM_LOAD32_BYTE( "sfmn_prom0_v1.14.prom0", 0x00000, 0x40000, CRC(2a0c0bb7) SHA1(5722a399ed5dff55d47e096fb04a5d5b16de2f9a) )
 	ROM_LOAD32_BYTE( "sfmn_prom1_v1.14.prom1", 0x00001, 0x40000, CRC(088aa12c) SHA1(3c488068edea7ee726b7b837fedeeb0374a7b1ac) )
@@ -3258,7 +3258,7 @@ ROM_START( sftmj114 )   // Version 1.14N (Japan), P/N 1064 REV 1 Mainboard, P/N 
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
 ROM_END
 
-ROM_START( sftmj112 )   // Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board 
+ROM_START( sftmj112 )   // Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board
 	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
 	ROM_LOAD32_BYTE( "sfmn_prom0_v1.12.prom0", 0x00000, 0x40000, CRC(640a04a8) SHA1(adc7f5880962cbcc5f9f28e72a84070da6e2ec36) ) // CAPCOM labels
 	ROM_LOAD32_BYTE( "sfmn_prom1_v1.12.prom1", 0x00001, 0x40000, CRC(2a27b690) SHA1(f63c3665ec030ecc2d7a10ead182941ade1c79d0) )
@@ -3293,7 +3293,7 @@ ROM_START( sftmj112 )   // Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
 ROM_END
 
-ROM_START( sftmk112 )   // Version 1.12K (Korea), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board 
+ROM_START( sftmk112 )   // Version 1.12K (Korea), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board
 	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
 	ROM_LOAD32_BYTE( "sfmk_prom0_v1.12.prom0", 0x00000, 0x40000, CRC(1864ca77) SHA1(44702d69a5ee6a11328281943e04bd64b12b02a1) ) // CAPCOM labels
 	ROM_LOAD32_BYTE( "sfmk_prom1_v1.12.prom1", 0x00001, 0x40000, CRC(a93c52aa) SHA1(51539e79cfe8a2826f77b09ec8beeb94c2bb0767) )
@@ -3465,7 +3465,7 @@ ROM_START( shufshot137 )   // Version 1.37 (PCB P/N 1083 Rev 2)
 	ROM_LOAD16_BYTE( "shf_srom1.srom1", 0x200000, 0x80000, CRC(8c89948a) SHA1(1054eca5de352c17f34f31ef16297ba6177a37ba) )
 ROM_END
 
-ROM_START( shufshot135 )   // Version 1.35 (PCB P/N 1083 Rev 2) - Not offically released? - found on dev CD 
+ROM_START( shufshot135 )   // Version 1.35 (PCB P/N 1083 Rev 2) - Not offically released? - found on dev CD
 	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.35.prom0", 0x00000, 0x20000, CRC(1a1d510c) SHA1(b1919beee499fb4e213a987ad796742dbfbd540b) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.35.prom1", 0x00001, 0x20000, CRC(5d7d5017) SHA1(8330339bd45c30066650a2a6cc7e12f365c91608) )
@@ -4035,7 +4035,7 @@ ROM_START( gt97s121 ) // Version 1.21S for the 3 tier type PCB with short ROM bo
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "gtg3_srom1_nr++.srom1", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) ) // actually labeled "GTG3 SROM1 NR**"
-	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*" 
+	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*"
 ROM_END
 
 ROM_START( gt97v120 ) // Version 1.20
@@ -4246,7 +4246,7 @@ ROM_START( gt98s100 ) // Version 1.00S for the 3 tier type PCB with short ROM bo
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "gtg3_srom1_nr++.srom1", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) ) // actually labeled "GTG3 SROM1 NR**"
-	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*" 
+	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*"
 ROM_END
 
 ROM_START( gt98t303 )   // Version 3.03 Tournament Edition (PCB P/N 1083 Rev 2)
@@ -4406,7 +4406,7 @@ ROM_START( gt99s100 )   // Version 1.00S for the 3 tier type PCB with short ROM 
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "gtg3_srom1_nr++.srom1", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) ) // actually labeled "GTG3 SROM1 NR**"
-	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*" 
+	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*"
 ROM_END
 
 ROM_START( gt99t400 )   // Version 4.00 Tournament Edition (PCB P/N 1083 Rev 2)
@@ -4572,7 +4572,7 @@ ROM_START( gt2ks100 )   // Version 1.00S for the 3 tier type PCB with short ROM 
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "gtg3_srom1_nr++.srom1", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) ) // actually labeled "GTG3 SROM1 NR**"
-	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*" 
+	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*"
 ROM_END
 
 ROM_START( gt2kt500 ) // Version 5.00 Tournament Edition (PCB P/N 1083 Rev 2)
@@ -4630,7 +4630,7 @@ ROM_START( gtsupreme ) // Version 5.10T ELC S (Tournament Edition, PCB P/N 1083 
 	ROM_LOAD32_BYTE( "gt2k_grom1_3.grm1_3", 0x200003, 0x80000, CRC(59f48688) SHA1(37b2c84e487f4f3a9145bef34c573a3716b4a6a7) )
 
 	// GT99, GT2K & GT Classic all share the above listed 8 graphics ROMs and may be labeled GT99, GT2K or GTClassic
-	// The Euro version has different GROM2_x compared to the standard US versions.  GT Supreme PCBs have been seen 
+	// The Euro version has different GROM2_x compared to the standard US versions.  GT Supreme PCBs have been seen
 	// with GT 2K mask ROMs as well as all GROMs labeled "GT SUPREME"
 
 	ROM_LOAD32_BYTE( "gt_supreme_grom2_0.grm2_0", 0x400000, 0x80000, CRC(33998a3e) SHA1(53832e37c42155eb9c774eb33b8b36fe387fa162) )
@@ -4740,7 +4740,7 @@ ROM_START( gtclasscs )  // Version 1.00S for the 3 tier type PCB with short ROM 
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "gtg3_srom1_nr++.srom1", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) ) // actually labeled "GTG3 SROM1 NR**"
-	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*" 
+	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) // actually labeled "GTG3 SROM2 NR*"
 ROM_END
 
 /***************************************************************************
@@ -5266,7 +5266,7 @@ GAME( 2002, gtsupreme, gt2k,     tourny, gt98s, itech32_state, init_aamat,     R
 
 GAME( 2001, gtclassc,  0,        sftm,   aama,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGFCL
 GAME( 2001, gtclasscp, gtclassc, sftm,   aama,  itech32_state, init_gtclasscp, ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00) (alt protection)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGFCL
-GAME( 2001, gtclasscs, gtclassc, sftm,   s_ver, itech32_state, init_s_ver,     ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00S)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGFCL-M 
+GAME( 2001, gtclasscs, gtclassc, sftm,   s_ver, itech32_state, init_s_ver,     ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00S)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGFCL-M
 
 GAME( 199?, shoottv,  0,         shoottv, shoottv, shoottv_state, empty_init,  ROT0, "Incredible Technologies", "Must Shoot TV (prototype)" , MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pubball,  0,         pubball, pubball, itech32_state, init_pubball,ROT0, "Midway / Incredible Technologies", "Power Up Baseball (prototype)" , MACHINE_SUPPORTS_SAVE )

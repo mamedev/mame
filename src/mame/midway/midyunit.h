@@ -177,7 +177,7 @@ protected:
 
 private:
 	required_device<adc0844_device> m_adc;
-	
+
 	output_finder<4> m_left_flash;
 	output_finder<4> m_right_flash;
 	output_finder<> m_left_gun_recoil;

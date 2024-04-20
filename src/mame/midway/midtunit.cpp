@@ -64,16 +64,16 @@ void midtunit_base_state::main_map(address_map &map)
 
 void midtunit_adpcm_state::main_adpcm_map(address_map &map)
 {
-	midtunit_base_state::main_map(map);
-	map.unmap_value_high();
+	main_map(map);
+
 	map(0x01d00000, 0x01d0001f).r(FUNC(midtunit_adpcm_state::sound_state_r));
 	map(0x01d01020, 0x01d0103f).rw(FUNC(midtunit_adpcm_state::sound_r), FUNC(midtunit_adpcm_state::sound_w));
 }
 
 void mk2_state::mk2_map(address_map &map)
 {
-	midtunit_base_state::main_map(map);
-	map.unmap_value_high();
+	main_map(map);
+
 	map(0x01d00000, 0x01d0001f).r(FUNC(mk2_state::dcs_state_r));
 	map(0x01d01020, 0x01d0103f).rw(FUNC(mk2_state::dcs_r), FUNC(mk2_state::dcs_w));
 }
@@ -610,7 +610,6 @@ void midtunit_base_state::tunit_core(machine_config &config)
 
 	// basic machine hardware
 	TMS34010(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &midtunit_base_state::main_map);
 	m_maincpu->set_halt_on_reset(false);     // halt on reset
 	m_maincpu->set_pixel_clock(PIXEL_CLOCK); // pixel clock
 	m_maincpu->set_pixels_per_clock(2);      // pixels per clock
