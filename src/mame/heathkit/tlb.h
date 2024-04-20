@@ -33,17 +33,17 @@ public:
 	virtual void serial_in_w(int state) = 0;
 
 	// optional operations
-	virtual void rlsd_in_w(int state)           {}
-	virtual void dsr_in_w(int state)            {}
-	virtual void cts_in_w(int state)            {}
+	virtual void rlsd_in_w(int state) {}
+	virtual void dsr_in_w(int state) {}
+	virtual void cts_in_w(int state) {}
 
 	// optional SigmaSet operations
-	virtual void sigma_ctrl_w(u8 data)          {}
-	virtual u8   sigma_ctrl_r()                 { return 0x00; }
-	virtual u8   sigma_video_mem_r()            { return 0x00; }
-	virtual void sigma_video_mem_w(u8 val)      {}
-	virtual void sigma_io_lo_addr_w(u8 val)     {}
-	virtual void sigma_io_hi_addr_w(u8 val)     {}
+	virtual void sigma_ctrl_w(u8 data) {}
+	virtual u8   sigma_ctrl_r() { return 0x00; }
+	virtual u8   sigma_video_mem_r() { return 0x00; }
+	virtual void sigma_video_mem_w(u8 val) {}
+	virtual void sigma_io_lo_addr_w(u8 val) {}
+	virtual void sigma_io_hi_addr_w(u8 val) {}
 	virtual void sigma_window_lo_addr_w(u8 val) {}
 	virtual void sigma_window_hi_addr_w(u8 val) {}
 
@@ -68,13 +68,13 @@ public:
 	virtual void rlsd_in_w(int state) override;
 	virtual void dsr_in_w(int state) override;
 	virtual void cts_in_w(int state) override;
-	void         serial_irq_w(int state);
+	void serial_irq_w(int state);
 
 	// Keyboard
-	void         reset_key_w(int state);
-	void         right_shift_w(int state);
-	void         repeat_key_w(int state);
-	void         break_key_w(int state);
+	void reset_key_w(int state);
+	void right_shift_w(int state);
+	void repeat_key_w(int state);
+	void break_key_w(int state);
 
 protected:
 	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
@@ -85,41 +85,41 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void         mem_map(address_map &map);
-	void         io_map(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 
 	// interrupt related
 	virtual void set_irq_line();
 
 	// reset
-	void         check_for_reset();
+	void check_for_reset();
 
 	// sound/speaker
-	void         check_beep_state();
-	void         key_click_w(u8 data);
-	void         bell_w(u8 data);
+	void check_beep_state();
+	void key_click_w(u8 data);
+	void bell_w(u8 data);
 	TIMER_CALLBACK_MEMBER(key_click_off);
 	TIMER_CALLBACK_MEMBER(bell_off);
 
 	// keyboard
-	u8           kbd_key_r();
-	u8           kbd_flags_r();
-	u16          translate_mm5740_b(u16 b);
-	int          mm5740_shift_r();
-	int          mm5740_control_r();
-	void         mm5740_data_ready_w(int state);
+	u8 kbd_key_r();
+	u8 kbd_flags_r();
+	u16 translate_mm5740_b(u16 b);
+	int mm5740_shift_r();
+	int mm5740_control_r();
+	void mm5740_data_ready_w(int state);
 
 	// serial port
-	void         serial_out_b(int data);
-	void         dtr_out(int data);
-	void         rts_out(int data);
+	void serial_out_b(int data);
+	void dtr_out(int data);
+	void rts_out(int data);
 
 	// crtc
-	void         crtc_addr_w(offs_t reg, u8 val);
-	virtual u8   crtc_reg_r(offs_t reg);
+	void crtc_addr_w(offs_t reg, u8 val);
+	virtual u8 crtc_reg_r(offs_t reg);
 	virtual void crtc_reg_w(offs_t reg, u8 val);
-	void         crtc_vsync_w(int val);
+	void crtc_vsync_w(int val);
 	virtual MC6845_UPDATE_ROW(crtc_update_row);
 
 	required_device<cpu_device>     m_maincpu;
@@ -180,16 +180,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void         mem_map(address_map &map);
-	void         io_map(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
-	void         dtr_internal(int data);
-	void         out1_internal(int data);
-	void         out2_internal(int data);
+	void dtr_internal(int data);
+	void out1_internal(int data);
+	void out2_internal(int data);
 
-	virtual u8   crtc_reg_r(offs_t reg) override;
+	virtual u8 crtc_reg_r(offs_t reg) override;
 	virtual void crtc_reg_w(offs_t reg, u8 val) override;
 
 	u8   m_selected_char_set;
@@ -222,7 +222,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void         mem_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
 /**
@@ -242,10 +242,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void         mem_map(address_map &map);
-	void         io_map(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
-	void         latch_u5_w(u8 data);
+	void latch_u5_w(u8 data);
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
@@ -270,23 +270,23 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void         mem_map(address_map &map);
-	void         io_map(address_map &map);
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
-	void         crtc_hsync_w(int val);
+	void crtc_hsync_w(int val);
 
 	IRQ_CALLBACK_MEMBER(irq_ack_cb);
 
-	void         tap_6000h();
-	void         tap_8000h();
+	void tap_6000h();
+	void tap_8000h();
 
-	void         allow_tlb_intr();
-	void         allow_hsync_intr();
+	void allow_tlb_intr();
+	void allow_hsync_intr();
 
-	void         display_enable_w(offs_t reg, u8 val);
-	void         config_irq_w(offs_t reg, u8 val);
-	void         nop_w(offs_t reg, u8 val);
+	void display_enable_w(offs_t reg, u8 val);
+	void config_irq_w(offs_t reg, u8 val);
+	void nop_w(offs_t reg, u8 val);
 	virtual void set_irq_line() override;
 
 	required_memory_bank            m_mem_bank;
@@ -313,9 +313,9 @@ public:
 	heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void sigma_ctrl_w(u8 data) override;
-	virtual u8   sigma_ctrl_r() override;
+	virtual u8 sigma_ctrl_r() override;
 
-	virtual u8   sigma_video_mem_r() override;
+	virtual u8 sigma_video_mem_r() override;
 	virtual void sigma_video_mem_w(u8 val) override;
 
 	virtual void sigma_io_lo_addr_w(u8 val) override;
@@ -360,7 +360,7 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor    device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 /**
@@ -373,10 +373,10 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor    device_input_ports() const override;
-	virtual void                  device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	void                          mem_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
 /**
@@ -389,7 +389,7 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor    device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 // Options for the standard H89 class of systems
@@ -429,35 +429,35 @@ public:
 	virtual ~heath_tlb_connector();
 
 	// computer interface
-	auto serial_data_callback()              { return m_write_sd.bind(); }
-	auto dtr_callback()                      { return m_dtr_cb.bind(); }
-	auto rts_callback()                      { return m_rts_cb.bind(); }
-	auto reset_cb()                          { return m_reset.bind(); }
+	auto serial_data_callback() { return m_write_sd.bind(); }
+	auto dtr_callback() { return m_dtr_cb.bind(); }
+	auto rts_callback() { return m_rts_cb.bind(); }
+	auto reset_cb() { return m_reset.bind(); }
 
 	// card interface
-	void serial_in_w(int state)              { if (m_tlb) m_tlb->serial_in_w(state); }
-	void rlsd_in_w(int state)                { if (m_tlb) m_tlb->rlsd_in_w(state); }
-	void dsr_in_w(int state)                 { if (m_tlb) m_tlb->dsr_in_w(state); }
-	void cts_in_w(int state)                 { if (m_tlb) m_tlb->cts_in_w(state); }
+	void serial_in_w(int state) { if (m_tlb) m_tlb->serial_in_w(state); }
+	void rlsd_in_w(int state) { if (m_tlb) m_tlb->rlsd_in_w(state); }
+	void dsr_in_w(int state) { if (m_tlb) m_tlb->dsr_in_w(state); }
+	void cts_in_w(int state) { if (m_tlb) m_tlb->cts_in_w(state); }
 
 	// signals out from the tlb
-	void serial_out_b(int data)              { m_write_sd(data); }
-	void dtr_out(int data)                   { m_dtr_cb(data); }
-	void rts_out(int data)                   { m_rts_cb(data); }
-	void reset_out(int data)                 { m_reset(data); }
+	void serial_out_b(int data) { m_write_sd(data); }
+	void dtr_out(int data) { m_dtr_cb(data); }
+	void rts_out(int data) { m_rts_cb(data); }
+	void reset_out(int data) { m_reset(data); }
 
 	// optional SigmaSet IGC operations
-	void sigma_ctrl_w(u8 data)               { if (m_tlb) m_tlb->sigma_ctrl_w(data); }
-	u8   sigma_ctrl_r()                      { return (m_tlb) ? m_tlb->sigma_ctrl_r() : 0x00; }
+	u8 sigma_ctrl_r() { return (m_tlb) ? m_tlb->sigma_ctrl_r() : 0x00; }
+	void sigma_ctrl_w(u8 data) { if (m_tlb) m_tlb->sigma_ctrl_w(data); }
 
-	u8   sigma_video_mem_r()                 { return (m_tlb) ? m_tlb->sigma_video_mem_r() : 0x00; }
-	void sigma_video_mem_w(u8 val)           { if (m_tlb) m_tlb->sigma_video_mem_w(val); }
+	u8 sigma_video_mem_r() { return (m_tlb) ? m_tlb->sigma_video_mem_r() : 0x00; }
+	void sigma_video_mem_w(u8 val) { if (m_tlb) m_tlb->sigma_video_mem_w(val); }
 
-	void sigma_io_lo_addr_w(u8 val)          { if (m_tlb) m_tlb->sigma_io_lo_addr_w(val); }
-	void sigma_io_hi_addr_w(u8 val)          { if (m_tlb) m_tlb->sigma_io_hi_addr_w(val); }
+	void sigma_io_lo_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_io_lo_addr_w(val); }
+	void sigma_io_hi_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_io_hi_addr_w(val); }
 
-	void sigma_window_lo_addr_w(u8 val)      { if (m_tlb) m_tlb->sigma_window_lo_addr_w(val); }
-	void sigma_window_hi_addr_w(u8 val)      { if (m_tlb) m_tlb->sigma_window_hi_addr_w(val); }
+	void sigma_window_lo_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_window_lo_addr_w(val); }
+	void sigma_window_hi_addr_w(u8 val) { if (m_tlb) m_tlb->sigma_window_hi_addr_w(val); }
 
 protected:
 	virtual void device_start() override;
