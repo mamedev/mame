@@ -164,7 +164,7 @@ void coleco_state::coleco_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x63ff).ram().mirror(0x1c00);
-	map(0x8000, 0xffff).rom();
+	map(0x8000, 0xffff).rw(FUNC(coleco_state::cart_r), FUNC(coleco_state::cart_w));
 }
 
 void bit90_state::bit90_map(address_map &map)
@@ -173,7 +173,7 @@ void bit90_state::bit90_map(address_map &map)
 	map(0x2000, 0x3fff).rom();
 	map(0x4000, 0x5fff).rom();  // Decoded through pin 5 of the Bit90 expansion port
 	map(0x6000, 0x67ff).ram().mirror(0x1800);
-	map(0x8000, 0xffff).ram();
+	map(0x8000, 0xffff).rw(FUNC(coleco_state::cart_r), FUNC(coleco_state::cart_w));
 }
 
 void coleco_state::coleco_io_map(address_map &map)
@@ -416,7 +416,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 
 uint8_t coleco_state::cart_r(offs_t offset)
 {
-	return m_cart->bd_r(offset & 0x7fff, 0, 0, 0, 0, 0);
+	return m_cart->read(offset, 0, 0, 0, 0);
+}
+
+void coleco_state::cart_w(offs_t offset, uint8_t data)
+{
+	m_cart->write(offset, data, 0, 0, 0, 0);
 }
 
 uint8_t coleco_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1)
@@ -523,9 +528,6 @@ void coleco_state::machine_start()
 		m_joy_d7_state[port] = 0;
 		m_joy_analog_state[port] = 0;
 	}
-
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*this, FUNC(coleco_state::cart_r)));
 
 	save_item(NAME(m_joy_mode));
 	save_item(NAME(m_last_nmi_state));

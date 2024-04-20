@@ -47189,6 +47189,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="fbegcont">
+		<description>From The Beginning... Contraception (4am crack)</description>
+		<year>1985</year>
+		<publisher>Orange Juice Software Systems</publisher>
+		<info name="programmer" value="Rita Houser and Larry Olbrantz" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="143360">
+				<rom name="from the beginning... contraception (4am crack) disk 1.dsk" size="143360" crc="b90955ad" sha1="98611b0d1b9de00c2bf4c951ce421c3fef1f3f43" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="143360">
+				<rom name="from the beginning... contraception (4am crack) disk 2.dsk" size="143360" crc="f42d2eb5" sha1="ca29581db2abbe6159c6f2f9c2243d3c67f816a3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fundirec84" cloneof="fundirec">
 		<description>Fun with Directions (version 1984) (4am crack)</description>
 		<year>1984</year>

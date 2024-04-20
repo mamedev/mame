@@ -123,7 +123,7 @@ protected:
 	virtual void video_start() override;
 
 	u8 port_0_49way_r();
-	virtual void vram_select_w(u8 data);
+	void vram_select_w(u8 data);
 	void sinistar_vram_select_w(u8 data);
 	void cmos_4bit_w(offs_t offset, u8 data);
 	void blitter_w(address_space &space, offs_t offset, u8 data);
@@ -142,7 +142,7 @@ protected:
 	void williams_base(machine_config &config);
 	void williams_muxed(machine_config &config);
 
-	virtual void main_map(address_map &map);
+	void main_map(address_map &map);
 	void bubbles_main_map(address_map &map);
 	void sinistar_main_map(address_map &map);
 	void spdball_main_map(address_map &map);
@@ -217,7 +217,6 @@ public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
 		m_muxa(*this, "mux_a"),
-		m_muxb(*this, "mux_b"),
 		m_mainbank(*this, "mainbank")
 	{ }
 
@@ -231,13 +230,12 @@ protected:
 
 private:
 	required_device<ls157_x2_device> m_muxa;
-	optional_device<ls157_device> m_muxb;
 	required_memory_bank m_mainbank;
 
 	rgb_t m_color0;
 	uint8_t m_video_control;
 
-	virtual void vram_select_w(u8 data) override;
+	void blaster_vram_select_w(u8 data);
 	void bank_select_w(u8 data);
 	void remap_select_w(u8 data);
 	void video_control_w(u8 data);
@@ -246,7 +244,7 @@ private:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	virtual void main_map(address_map &map) override;
+	void blaster_main_map(address_map &map);
 };
 
 // base Williams 2nd gen hardware

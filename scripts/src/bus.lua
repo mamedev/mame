@@ -1180,6 +1180,8 @@ if (BUSES["COLECO_CART"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/exp.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/exp.h",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/activision.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/activision.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.cpp",

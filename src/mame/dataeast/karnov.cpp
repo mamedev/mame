@@ -842,8 +842,8 @@ void karnov_state::chelnovjbl(machine_config &config)
  *
  *************************************/
 
-ROM_START( karnov ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+ROM_START( karnov ) // DE-0248-3 main board, DE-259-0 sub/rom board
+	ROM_REGION( 0x60000, "maincpu", 0 ) // 6*64k for 68000 code
 	ROM_LOAD16_BYTE( "dn08-6.j15", 0x00000, 0x10000, CRC(4c60837f) SHA1(6886e6ee1d1563c3011b8fea79e7435f983a3ee0) )
 	ROM_LOAD16_BYTE( "dn11-6.j20", 0x00001, 0x10000, CRC(cd4abb99) SHA1(b4482175f5d90941ad3aec6c2269a50f57a465ed) )
 	ROM_LOAD16_BYTE( "dn07-.j14",  0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
@@ -851,7 +851,7 @@ ROM_START( karnov ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_LOAD16_BYTE( "dn06-5.j13", 0x40000, 0x10000, CRC(29d64e42) SHA1(c07ff5f29b7ccd5fc97b5086bcae57ab6eb29330) )
 	ROM_LOAD16_BYTE( "dn09-5.j17", 0x40001, 0x10000, CRC(072d7c49) SHA1(92195b89274d066a9c1f87dd810683ea66edaff4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 6502 Sound CPU
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 MCU (Note: Dump taken from a Rev 5 board)
@@ -877,14 +877,14 @@ ROM_START( karnov ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_LOAD( "dn19-5.f18", 0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
-	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) /* MB7122E BPROM */
+	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) // MB7132E BPROM
+	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) // MB7122E BPROM
 ROM_END
 
-ROM_START( karnova ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "dn08-5.j15", 0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) ) /* also known to be labeled DN08-5E */
-	ROM_LOAD16_BYTE( "dn11-5.j20", 0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) ) /* also known to be labeled DN11-5E */
+ROM_START( karnova ) // DE-0248-3 main board, DE-259-0 sub/rom board
+	ROM_REGION( 0x60000, "maincpu", 0 ) // 6*64k for 68000 code
+	ROM_LOAD16_BYTE( "dn08-5.j15", 0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) ) // also known to be labeled DN08-5E
+	ROM_LOAD16_BYTE( "dn11-5.j20", 0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) ) // also known to be labeled DN11-5E
 	ROM_LOAD16_BYTE( "dn07-.j14",  0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
 	ROM_LOAD16_BYTE( "dn10-.j18",  0x20001, 0x10000, CRC(a4a34e37) SHA1(f40b680cc7312c844f81d01997f9a47c48d36e88) )
 	ROM_LOAD16_BYTE( "dn06-5.j13", 0x40000, 0x10000, CRC(29d64e42) SHA1(c07ff5f29b7ccd5fc97b5086bcae57ab6eb29330) )
@@ -916,24 +916,24 @@ ROM_START( karnova ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_LOAD( "dn19-5.f18", 0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
-	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) /* MB7122E BPROM */
+	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) // MB7132E BPROM
+	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) // MB7122E BPROM
 ROM_END
 
-ROM_START( karnovj ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
-	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "kar8.j15",  0x00000, 0x10000, CRC(3e17e268) SHA1(3a63928bb0148175519540f9d891b03590094dfb) )
-	ROM_LOAD16_BYTE( "kar11.j20", 0x00001, 0x10000, CRC(417c936d) SHA1(d31f9291f18c3d5e3c4430768396e1ac10fd9ea3) )
+ROM_START( karnovj ) // DE-0248-3 main board, DE-259-0 sub/rom board
+	ROM_REGION( 0x60000, "maincpu", 0 ) // 6*64k for 68000 code
+	ROM_LOAD16_BYTE( "dn08-.j15",  0x00000, 0x10000, CRC(3e17e268) SHA1(3a63928bb0148175519540f9d891b03590094dfb) )
+	ROM_LOAD16_BYTE( "dn11-.j20", 0x00001, 0x10000, CRC(417c936d) SHA1(d31f9291f18c3d5e3c4430768396e1ac10fd9ea3) )
 	ROM_LOAD16_BYTE( "dn07-.j14", 0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
 	ROM_LOAD16_BYTE( "dn10-.j18", 0x20001, 0x10000, CRC(a4a34e37) SHA1(f40b680cc7312c844f81d01997f9a47c48d36e88) )
-	ROM_LOAD16_BYTE( "kar6.j13",  0x40000, 0x10000, CRC(c641e195) SHA1(fa7a2eba70e730f72a8d868160af9c41f9b2e5b0) )
-	ROM_LOAD16_BYTE( "kar9.j17",  0x40001, 0x10000, CRC(d420658d) SHA1(4c7e67a80e419b8b94eb015f7f0af0a01f00c28e) )
+	ROM_LOAD16_BYTE( "dn06-.j13",  0x40000, 0x10000, CRC(c641e195) SHA1(fa7a2eba70e730f72a8d868160af9c41f9b2e5b0) )
+	ROM_LOAD16_BYTE( "dn09-.j17",  0x40001, 0x10000, CRC(d420658d) SHA1(4c7e67a80e419b8b94eb015f7f0af0a01f00c28e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
-	ROM_LOAD( "kar5.f3", 0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 6502 Sound CPU
+	ROM_LOAD( "dn05-.f3", 0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 MCU (BAD_DUMP because it was created from the US version)
-	ROM_LOAD( "karnovj_i8751.k14", 0x0000, 0x1000, BAD_DUMP CRC(5a8c4d28) SHA1(58cc912d91e569503d5a20fa3180fbdca595e39f) )
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 MCU - seen with DN-3 label on Japanese PCB, "3" is handwritten
+	ROM_LOAD( "dn-3.k14", 0x0000, 0x1000, BAD_DUMP CRC(5a8c4d28) SHA1(58cc912d91e569503d5a20fa3180fbdca595e39f) ) // hand-crafted based on US version
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "dn00-.c5",        0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )

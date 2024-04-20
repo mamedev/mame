@@ -17461,6 +17461,7 @@ mjembase                        // "38" Mahjong Electromagnetic Base 1989 Dynax
 mjfriday                        // "26" (c) 1989 Dynax
 mjreach                         // (c) 1994 Dynax
 mjreachbl                       // (c) 1994 bootleg
+mjreachp2                       // (c) 1994 Dynax
 neruton                         // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 nerutona                        // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 ougonhai                        // "62" (c) 1991 Dynax
@@ -21162,6 +21163,9 @@ tvc4000                         //
 vc4000                          // Interton vc4000
 vc6000                          //
 vmdtbase                        //
+
+@source:irem/blackjack92.cpp
+bj92
 
 @source:irem/m10.cpp
 andromed                        // (c) 1979
