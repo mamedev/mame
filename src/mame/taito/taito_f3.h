@@ -346,7 +346,7 @@ protected:
 	struct f3_line_inf {
 		int y{0};
 		int screen_y{0};
-		pri_mode pri_alp[432]{};
+		pri_mode pri_alp{};
 		// 5000/4000
 		clip_plane_inf clip[NUM_CLIPPLANES];
 		// 6000 - pivot_control, sprite alpha
@@ -385,7 +385,7 @@ protected:
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
 	bool m_sprite_bank = 0;
-	//f3_line_inf m_line_inf;
+	//f3_line_inf m_line_data{};
 	const F3config *m_game_config = nullptr;
 
 	u16 spriteram_r(offs_t offset);
