@@ -8,9 +8,11 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/m6809/m6809.h"
 #include "midtunit.h"
+
+#include "cpu/m6809/m6809.h"
+#include "cpu/tms34010/tms34010.h"
+
 
 #define LOG_PROT    (1U << 1)
 #define LOG_CMOS    (1U << 2)
@@ -498,6 +500,8 @@ void mk2_state::init_mk2()
 
 void midtunit_adpcm_state::machine_reset()
 {
+	midtunit_base_state::machine_reset();
+
 	// reset sound
 	m_adpcm_sound->reset_write(1);
 	m_adpcm_sound->reset_write(0);
@@ -505,6 +509,8 @@ void midtunit_adpcm_state::machine_reset()
 
 void mk2_state::machine_reset()
 {
+	midtunit_base_state::machine_reset();
+
 	// reset sound
 	m_dcs->reset_w(0);
 	m_dcs->reset_w(1);
@@ -522,13 +528,11 @@ uint16_t midtunit_adpcm_state::sound_state_r()
 {
 //  LOGSOUND("%s:Sound status read\n", machine().describe_context());
 
-	if (!machine().side_effects_disabled())
+	if (m_fake_sound_state)
 	{
-		if (m_fake_sound_state)
-		{
+		if (!machine().side_effects_disabled())
 			m_fake_sound_state--;
-			return 0;
-		}
+		return 0;
 	}
 	return ~0;
 }
