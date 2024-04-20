@@ -846,7 +846,6 @@ void dcs2_audio_device::device_start()
 		LOG("device_start: audio ram banks: %x size: %x\n", m_sounddata_banks, soundbank_words);
 	}
 
-
 	// allocate memory for the SRAM
 	m_sram = std::make_unique<uint16_t[]>(0x8000*4/2);
 
@@ -1460,7 +1459,7 @@ void dcs_audio_device::reset_w(int state)
 	// going low halts the CPU
 	if (!state)
 	{
-		//      LOG("%s: DCS reset = %d\n", machine().describe_context(), state);
+		//LOG("%s: DCS reset = %d\n", machine().describe_context(), state);
 
 		// just run through the init code again
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_reset),this));

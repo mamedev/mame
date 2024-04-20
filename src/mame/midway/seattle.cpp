@@ -2128,12 +2128,12 @@ void seattle_state::wg3dh(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x3839);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x3839);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2154,12 +2154,12 @@ void seattle_state::mace(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x3839);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x3839);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2176,6 +2176,7 @@ void seattle_state::mace(machine_config &config)
 void seattle_state::sfrush(machine_config &config)
 {
 	flagstaff(config);
+
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "flspeaker").front_left();
 	SPEAKER(config, "frspeaker").front_right();
@@ -2208,6 +2209,7 @@ void seattle_state::sfrush(machine_config &config)
 void seattle_state::sfrushrk(machine_config &config)
 {
 	flagstaff(config);
+
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "flspeaker").front_left();
 	SPEAKER(config, "frspeaker").front_right();
@@ -2250,12 +2252,12 @@ void seattle_state::calspeed(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x39c0);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x39c0);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2277,12 +2279,12 @@ void seattle_state::vaportrx(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x39c2);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x39c2);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2303,12 +2305,12 @@ void seattle_state::biofreak(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x3835);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x3835);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2329,12 +2331,12 @@ void seattle_state::blitz(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x39c2);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x39c2);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2356,12 +2358,12 @@ void seattle_state::blitz99(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x0afb);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x0afb);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2383,12 +2385,12 @@ void seattle_state::blitz2k(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x0b5d);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x0b5d);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2411,12 +2413,12 @@ void seattle_state::carnevil(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x0af7);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x0af7);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2437,12 +2439,12 @@ void seattle_state::hyprdriv(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, m_dcs, 0));
-	dcs.set_maincpu_tag(m_maincpu);
-	dcs.set_dram_in_mb(2);
-	dcs.set_polling_offset(0x0af7);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x0af7);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
