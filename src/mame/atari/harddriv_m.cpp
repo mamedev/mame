@@ -271,12 +271,12 @@ uint16_t harddriv_state::hdc68k_wheel_r()
 	/* grab the new wheel value */
 	uint16_t new_wheel = m_12badc[0].read_safe(0xffff);
 
-	/* hack to display the wheel position, last wheel position and wheel edge for debugging. */
+	/* hack to display the wheel position */
 	if (machine().input().code_pressed(KEYCODE_LSHIFT))
-		popmessage("New: %04X Last: %04X Debug: P Edge: %d", new_wheel, m_hdc68k_last_wheel, m_hdc68k_wheel_edge);
+		popmessage("%04X", new_wheel);
 
 	/* if we crossed the center line, latch the edge bit */
-	if ((m_hdc68k_last_wheel / 0x200) != (new_wheel / 0x200)) 
+	if ((m_hdc68k_last_wheel / 0xf00) != (new_wheel / 0xf00))
 		m_hdc68k_wheel_edge = 1;
 
 	/* remember the last value and return the low 8 bits */
