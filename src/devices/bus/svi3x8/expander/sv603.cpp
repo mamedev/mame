@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "sv603.h"
 #include "softlist_dev.h"
-#include "speaker.h"
 
 
 //**************************************************************************
@@ -38,8 +37,8 @@ const tiny_rom_entry *sv603_device::device_rom_region() const
 
 void sv603_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "mono").front_center();
-	SN76489A(config, m_snd, XTAL(10'738'635) / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489A(config, m_snd, XTAL(10'738'635) / 3);
+	m_snd->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0);
 
 	// controller ports
 	COLECOVISION_CONTROL_PORT(config, m_joy[0], colecovision_control_port_devices, "hand");
