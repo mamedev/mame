@@ -565,7 +565,7 @@ void swx00_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 				val1 = read_word(adr+1);
 				break;
 			}
-			
+
 			case 1: { // 12-bits linear
 				offs_t adr = base_address + (spos >> 2)*3;
 				switch(spos & 3) {
@@ -601,7 +601,7 @@ void swx00_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 				}
 				break;
 			}
-				
+
 			case 2: { // 8-bits linear
 				offs_t adr = base_address + (spos >> 1);
 				if(spos & 1) {

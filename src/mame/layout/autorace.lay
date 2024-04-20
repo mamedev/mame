@@ -55,7 +55,7 @@ authors:hap
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
+	<view name="Internal Layout" showpointers="no">
 		<bounds left="16" right="24" top="5.8" bottom="34.5" />
 
 		<!-- bezel -->

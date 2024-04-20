@@ -511,6 +511,7 @@ private:
 
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction);
 
+	void activate_menu();
 	bool check_metrics();
 	bool do_rebuild();
 	bool first_item_visible() const { return top_line <= 0; }
@@ -562,6 +563,7 @@ private:
 	std::pair<float, float> m_pointer_updated;      // location where pointer tracking was updated
 	int                     m_pointer_line;         // the line we're tracking pointer motion in
 	std::chrono::steady_clock::time_point m_pointer_repeat;
+	int                     m_accumulated_wheel;    // accumulated scroll wheel/gesture movement
 
 	uint32_t                m_process_flags;        // event processing options
 	int                     m_selected;             // which item is selected

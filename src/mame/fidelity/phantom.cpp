@@ -686,6 +686,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

@@ -237,5 +237,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, roma2,     0,      0,      roma2,    roma2,    roma2_state, empty_init, "Hegener + Glaser", "Mephisto Roma II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1993, montreal,  0,      0,      montreal, montreal, roma2_state, empty_init, "Hegener + Glaser", "Mephisto Montreal 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, roma2,     0,      0,      roma2,    roma2,    roma2_state, empty_init, "Hegener + Glaser", "Mephisto Roma II", MACHINE_SUPPORTS_SAVE )
+SYST( 1993, montreal,  0,      0,      montreal, montreal, roma2_state, empty_init, "Hegener + Glaser", "Mephisto Montreal 68000", MACHINE_SUPPORTS_SAVE )

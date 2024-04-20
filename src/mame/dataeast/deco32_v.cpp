@@ -509,7 +509,7 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 
 // different alpha blending behavior, priority? TODO : verify behavior from real hardware
 // reference : https://www.youtube.com/watch?v=ax-_P3meUiA (review)
-void nslasher_state::mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
+void tattass_state::mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
 {
 	const pen_t *pens = m_deco_ace->pens();
 	const pen_t *pal0 = &pens[gfx0->colorbase()];
@@ -649,7 +649,7 @@ void nslasher_state::mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, co
 	}
 }
 
-u32 nslasher_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 tattass_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool alphaTilemap = false;
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());

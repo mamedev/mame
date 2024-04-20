@@ -176,7 +176,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, polgar,    0,       0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, polgara,   polgar,  0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, polgar101, polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, polgar10,  polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, polgar,    0,       0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, polgara,   polgar,  0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, polgar101, polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, polgar10,  polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE )

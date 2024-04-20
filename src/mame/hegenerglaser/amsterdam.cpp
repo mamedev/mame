@@ -255,11 +255,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, dallas32a, dallas32, 0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas32a, dallas32, 0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000", MACHINE_SUPPORTS_SAVE )

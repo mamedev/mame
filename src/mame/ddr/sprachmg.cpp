@@ -428,4 +428,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1985, sprachmg, 0,      0,      sprachmg, sprachmg, sprachmg_state, empty_init, "Institut für Kosmosforschung", "Gerät 32620 (Sprach/Morsegenerator)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1985, sprachmg, 0,      0,      sprachmg, sprachmg, sprachmg_state, empty_init, "Institut für Kosmosforschung", "Gerät 32620 (Sprach/Morsegenerator)", MACHINE_SUPPORTS_SAVE )

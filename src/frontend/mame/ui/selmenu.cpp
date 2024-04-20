@@ -533,6 +533,8 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_base_pointer(0.0F, 0.0F)
 	, m_last_pointer(0.0F, 0.0F)
 	, m_clicked_line(0)
+	, m_wheel_target(focused_menu::MAIN)
+	, m_wheel_movement(0)
 	, m_primary_vbounds(0.0F, -1.0F)
 	, m_primary_items_top(-1.0F)
 	, m_primary_items_hbounds(0.0F, -1.0F)
@@ -938,6 +940,8 @@ void menu_select_launch::custom_render(u32 flags, void *selectedref, float top, 
 void menu_select_launch::menu_activated()
 {
 	m_panels_status = ui().options().hide_panels();
+	m_wheel_target = focused_menu::MAIN;
+	m_wheel_movement = 0;
 }
 
 
@@ -1645,22 +1649,57 @@ bool menu_select_launch::handle_events(u32 flags, event &ev)
 		case ui_event::type::MOUSE_WHEEL:
 			if ((&machine().render().ui_target() == local_menu_event.target) && pointer_idle() && !m_ui_error)
 			{
+				// check whether it's over something scrollable
 				float x, y;
 				bool const hit(local_menu_event.target->map_point_container(local_menu_event.mouse_x, local_menu_event.mouse_y, container(), x, y));
 				if (!hit)
+				{
+					m_wheel_movement = 0;
 					break;
-
+				}
+				focused_menu hover;
 				if ((x >= m_primary_items_hbounds.first) && (x < m_primary_items_hbounds.second) && (y >= m_primary_items_top) && (y < (m_primary_items_top + (float(m_primary_lines) * line_height()))))
 				{
-					if (local_menu_event.zdelta > 0)
+					hover = focused_menu::MAIN;
+				}
+				else if (show_left_panel() && (x >= m_left_items_hbounds.first) && (x < m_left_items_hbounds.second) && (y >= m_left_items_top) && (y < (m_left_items_top + (float(m_left_visible_lines) * m_info_line_height))))
+				{
+					hover = focused_menu::LEFT;
+				}
+				else if (show_right_panel() && (x >= m_right_content_hbounds.first) && (x < m_right_content_hbounds.second) && (y >= m_right_content_vbounds.first) && (y < m_right_content_vbounds.second))
+				{
+					hover = focused_menu::RIGHTBOTTOM;
+				}
+				else
+				{
+					m_wheel_movement = 0;
+					break;
+				}
+
+				// clear out leftovers if it isn't the last thing to be scrolled
+				if (hover != m_wheel_target)
+					m_wheel_movement = 0;
+				m_wheel_target = hover;
+
+				// the value is scaled to 120 units per "click"
+				m_wheel_movement += local_menu_event.zdelta * local_menu_event.num_lines;
+				int const lines((m_wheel_movement + ((0 < local_menu_event.zdelta) ? 36 : -36)) / 120);
+				if (!lines)
+					break;
+				m_wheel_movement -= lines * 120;
+
+				switch (hover)
+				{
+				case focused_menu::MAIN:
+					if (lines > 0)
 					{
 						if ((selected_index() >= m_available_items) || is_first_selected())
 							break;
 						stop = true;
 						ev.iptkey = IPT_CUSTOM; // stop processing events so info can be rebuilt
-						set_selected_index(selected_index() - local_menu_event.num_lines);
+						set_selected_index(selected_index() - lines);
 						if (selected_index() < top_line + (top_line != 0))
-							top_line -= local_menu_event.num_lines;
+							top_line -= lines;
 					}
 					else
 					{
@@ -1668,20 +1707,26 @@ bool menu_select_launch::handle_events(u32 flags, event &ev)
 							break;
 						stop = true;
 						ev.iptkey = IPT_CUSTOM; // stop processing events so info can be rebuilt
-						set_selected_index(std::min(selected_index() + local_menu_event.num_lines, m_available_items - 1));
+						set_selected_index(std::min(selected_index() - lines, m_available_items - 1));
 						if (selected_index() >= top_line + m_visible_items + (top_line != 0))
-							top_line += local_menu_event.num_lines;
+							top_line -= lines;
 					}
-				}
-				else if ((x >= m_right_content_hbounds.first) && (x < m_right_content_hbounds.second) && (y >= m_right_content_vbounds.first) && (y < m_right_content_vbounds.second))
-				{
-					if (show_right_panel() && (RP_INFOS == m_right_panel))
+					break;
+				case focused_menu::LEFT:
 					{
-						if (local_menu_event.zdelta > 0)
-							m_topline_datsview -= local_menu_event.num_lines;
-						else
-							m_topline_datsview += local_menu_event.num_lines;
+						m_left_visible_top = std::clamp(m_left_visible_top - lines, 0, m_left_item_count - m_left_visible_lines);
+						int const first(left_at_top() ? 0 : (m_left_visible_top + 1));
+						int const last(m_left_visible_top + m_left_visible_lines - (left_at_bottom() ? 1 : 2));
+						m_filter_highlight = std::clamp(m_filter_highlight, first, last);
+						m_filter_highlight = std::clamp(m_filter_highlight - lines, 0, m_left_item_count - 1);
 					}
+					break;
+				case focused_menu::RIGHTBOTTOM:
+					if (RP_INFOS == m_right_panel)
+						m_topline_datsview -= lines;
+					break;
+				case focused_menu::RIGHTTOP:
+					break; // never gets here
 				}
 			}
 			break;
@@ -4202,7 +4247,6 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 
 	str << ((flags.machine_flags() & machine_flags::MECHANICAL)        ? _("Mechanical System\tYes\n")          : _("Mechanical System\tNo\n"));
 	str << ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK)  ? _("Requires Artwork\tYes\n")           : _("Requires Artwork\tNo\n"));
-	str << ((flags.machine_flags() & machine_flags::CLICKABLE_ARTWORK) ? _("Requires Clickable Artwork\tYes\n") : _("Requires Clickable Artwork\tNo\n"));
 	if (flags.machine_flags() & machine_flags::NO_COCKTAIL)
 		str << _("Support Cocktail\tNo\n");
 	str << ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT)      ? _("System is BIOS\tYes\n")             : _("System is BIOS\tNo\n"));

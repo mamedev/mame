@@ -319,6 +319,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1977, cc1,   0,      0,      cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-SYST( 1977, cc3,   0,      0,      cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
-SYST( 1979, cc10c, 0,      0,      cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C
+SYST( 1977, cc1,   0,      0,      cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, cc3,   0,      0,      cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
+SYST( 1979, cc10c, 0,      0,      cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C

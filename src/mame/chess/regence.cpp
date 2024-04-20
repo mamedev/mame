@@ -248,4 +248,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R / Intelligent Software", u8"La Régence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R / Intelligent Software", u8"La Régence", MACHINE_SUPPORTS_SAVE )

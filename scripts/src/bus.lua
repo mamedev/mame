@@ -1180,12 +1180,31 @@ if (BUSES["COLECO_CART"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/exp.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/exp.h",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/activision.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/activision.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/xin1.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/xin1.cpp",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/coleco/expansion/expansion.h,BUSES["COLECO_EXPANSION"] = true
+---------------------------------------------------
+
+if (BUSES["COLECO_EXPANSION"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.h",
 	}
 end
 
@@ -4631,6 +4650,8 @@ if (BUSES["QBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/qbus/qg640.h",
 		MAME_DIR .. "src/devices/bus/qbus/qtx.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/qtx.h",
+		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.h",
 	}
 end
 

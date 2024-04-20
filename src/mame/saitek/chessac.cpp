@@ -411,5 +411,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, chessac,  0,       0,      chessac,  chessac, chessac_state, empty_init, "Saitek", "Kasparov Chess Academy", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1997, schachak, chessac, 0,      schachak, chessac, chessac_state, empty_init, "Saitek", "Mephisto Schachakademie", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1997, chessac,  0,       0,      chessac,  chessac, chessac_state, empty_init, "Saitek", "Kasparov Chess Academy", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, schachak, chessac, 0,      schachak, chessac, chessac_state, empty_init, "Saitek", "Mephisto Schachakademie", MACHINE_SUPPORTS_SAVE )

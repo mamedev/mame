@@ -4000,7 +4000,17 @@ layout_view::layout_view(
 	, m_elemmap(elemmap)
 	, m_defvismask(0U)
 	, m_has_art(false)
+	, m_show_ptr(false)
+	, m_ptr_time_out(true) // FIXME: add attribute for this
+	, m_exp_show_ptr(-1)
 {
+	// check for explicit pointer display setting
+	if (viewnode.get_attribute_string_ptr("showpointers"))
+	{
+		m_show_ptr = env.get_attribute_bool(viewnode, "showpointers", false);
+		m_exp_show_ptr = m_show_ptr ? 1 : 0;
+	}
+
 	// parse the layout
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	view_environment local(env, m_name.c_str());
@@ -4178,6 +4188,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// loop over items and filter by visibility mask
 	bool first = true;
 	bool scrfirst = true;
+	bool haveinput = false;
 	for (item &curitem : m_items)
 	{
 		if ((visibility_mask & curitem.visibility_mask()) == curitem.visibility_mask())
@@ -4209,8 +4220,14 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 			// accumulate interactive elements
 			if (!curitem.clickthrough() || curitem.has_input())
 				m_interactive_items.emplace_back(curitem);
+			if (curitem.has_input())
+				haveinput = true;
 		}
 	}
+
+	// if show pointers isn't explicitly, update it based on visible items
+	if (0 > m_exp_show_ptr)
+		m_show_ptr = haveinput;
 
 	// if we have an explicit bounds, override it
 	if (m_expbounds.x1 > m_expbounds.x0)
@@ -4279,6 +4296,29 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// additional actions typically supplied by script
 	if (!m_recomputed.isnull())
 		m_recomputed();
+}
+
+
+//-------------------------------------------------
+//  set_show_pointers - set whether pointers
+//  should be displayed
+//-------------------------------------------------
+
+void layout_view::set_show_pointers(bool value) noexcept
+{
+	m_show_ptr = value;
+	m_exp_show_ptr = value ? 1 : 0;
+}
+
+
+//-------------------------------------------------
+//  set_pointers_time_out - set whether pointers
+//  should be hidden after inactivity
+//-------------------------------------------------
+
+void layout_view::set_hide_inactive_pointers(bool value) noexcept
+{
+	m_ptr_time_out = value;
 }
 
 

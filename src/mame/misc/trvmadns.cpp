@@ -439,5 +439,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY             FULLNAME                                  FLAGS
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

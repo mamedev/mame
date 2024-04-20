@@ -475,5 +475,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, renaissa,  0,        0,      ren,     ren,   ren_state, empty_init, "Saitek / Heuristic Software", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, renaissaa, renaissa, 0,      ren,     ren,   ren_state, empty_init, "Saitek / Heuristic Software", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, renaissa,  0,        0,      ren,     ren,   ren_state, empty_init, "Saitek / Heuristic Software", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, renaissaa, renaissa, 0,      ren,     ren,   ren_state, empty_init, "Saitek / Heuristic Software", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE )

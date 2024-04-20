@@ -9,7 +9,11 @@
 
 #include "emu.h"
 #include "decodmd1.h"
+
 #include "screen.h"
+
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(DECODMD1, decodmd_type1_device, "decodmd1", "Data East Pinball Dot Matrix Display Type 1")
 
@@ -38,7 +42,7 @@ void decodmd_type1_device::ctrl_w(uint8_t data)
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
-		m_rombank1->set_entry(0);
+		m_rombank->set_entry(0);
 		set_busy(B_SET,0);
 		m_rowselect = 0;
 		m_blank = 0;
@@ -65,10 +69,13 @@ uint8_t decodmd_type1_device::dmd_port_r(offs_t offset)
 {
 	if((offset & 0x84) == 0x80)
 	{
-		// IDAT (read only)
-		//m_ctrl &= ~0x01;
-		set_busy(B_CLR,0);
-		set_busy(B_CLR,1);
+		if(!machine().side_effects_disabled())
+		{
+			// IDAT (read only)
+			//m_ctrl &= ~0x01;
+			set_busy(B_CLR,0);
+			set_busy(B_CLR,1);
+		}
 		return m_command;
 	}
 	return 0xff;
@@ -160,7 +167,7 @@ void decodmd_type1_device::output_data()
 
 void decodmd_type1_device::set_busy(uint8_t input, uint8_t val)
 {
-	uint8_t newval = (m_busy_lines & ~input) | (val ? input : 0);
+	uint8_t const newval = (m_busy_lines & ~input) | (val ? input : 0);
 
 	if(~newval & m_busy_lines & B_CLR)
 		m_busy = 0;
@@ -184,9 +191,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
 
 void decodmd_type1_device::decodmd1_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("dmdbank2"); // last 16k of ROM
-	map(0x4000, 0x7fff).bankr("dmdbank1");
-	map(0x8000, 0x9fff).ram().share("dmdram");
+	map(0x0000, 0x3fff).rom().region(DEVICE_SELF, 0x1c000); // last 16k of ROM
+	map(0x4000, 0x7fff).bankr(m_rombank);
+	map(0x8000, 0x9fff).ram().share(m_ram);
 }
 
 void decodmd_type1_device::decodmd1_io_map(address_map &map)
@@ -213,7 +220,7 @@ void decodmd_type1_device::device_add_mconfig(machine_config &config)
 	dmd.set_refresh_hz(50);
 
 	HC259(config, m_bitlatch); // U4
-	m_bitlatch->parallel_out_cb().set_membank(m_rombank1).mask(0x07).invert();
+	m_bitlatch->parallel_out_cb().set_membank(m_rombank).mask(0x07).invert();
 	m_bitlatch->q_out_cb<3>().set(FUNC(decodmd_type1_device::blank_w));
 	m_bitlatch->q_out_cb<4>().set(FUNC(decodmd_type1_device::status_w));
 	m_bitlatch->q_out_cb<5>().set(FUNC(decodmd_type1_device::rowdata_w));
@@ -225,16 +232,51 @@ void decodmd_type1_device::device_add_mconfig(machine_config &config)
 decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECODMD1, tag, owner, clock)
 	, m_cpu(*this, "dmdcpu")
-	, m_rombank1(*this, "dmdbank1")
-	, m_rombank2(*this, "dmdbank2")
+	, m_rombank(*this, "dmdbank")
 	, m_ram(*this, "dmdram")
 	, m_bitlatch(*this, "bitlatch")
-	, m_rom(*this, finder_base::DUMMY_TAG)
-{}
+	, m_rom(*this, DEVICE_SELF)
+	, m_latch(0)
+	, m_status(0)
+	, m_ctrl(0)
+	, m_busy(0)
+	, m_command(0)
+	, m_rowclock(0)
+	, m_rowdata(0)
+	, m_rowselect(0)
+	, m_blank(0)
+	, m_pxdata1(0)
+	, m_pxdata2(0)
+	, m_pxdata1_latched(0)
+	, m_pxdata2_latched(0)
+	, m_frameswap(false)
+	, m_busy_lines(0)
+	, m_prevrow(0)
+{
+	std::fill(std::begin(m_pixels), std::end(m_pixels), 0);
+}
 
 void decodmd_type1_device::device_start()
 {
-	save_pointer(m_pixels,"DMD Video data",0x100);
+	m_rombank->configure_entries(0, 8, &m_rom[0x0000], 0x4000);
+
+	save_item(NAME(m_latch));
+	save_item(NAME(m_status));
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_command));
+	save_item(NAME(m_rowclock));
+	save_item(NAME(m_rowdata));
+	save_item(NAME(m_rowselect));
+	save_item(NAME(m_blank));
+	save_item(NAME(m_pxdata1));
+	save_item(NAME(m_pxdata2));
+	save_item(NAME(m_pxdata1_latched));
+	save_item(NAME(m_pxdata2_latched));
+	save_item(NAME(m_frameswap));
+	save_item(NAME(m_pixels));
+	save_item(NAME(m_busy_lines));
+	save_item(NAME(m_prevrow));
 }
 
 void decodmd_type1_device::device_reset()
@@ -242,10 +284,7 @@ void decodmd_type1_device::device_reset()
 	memset(m_ram,0,0x2000);
 	memset(m_pixels,0,0x200*sizeof(uint32_t));
 
-	m_rombank1->configure_entries(0, 8, &m_rom[0x0000], 0x4000);
-	m_rombank2->configure_entry(0, &m_rom[0x1c000]);
-	m_rombank1->set_entry(0);
-	m_rombank2->set_entry(0);
+	m_rombank->set_entry(0);
 	m_status = 0;
 	m_busy = 0;
 	set_busy(B_CLR|B_SET,0);

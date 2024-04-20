@@ -283,4 +283,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, tchess, 0,      0,      tchess,  tchess, chess_state, empty_init, "Tryom", "Electronic Chess (Tryom)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, tchess, 0,      0,      tchess,  tchess, chess_state, empty_init, "Tryom", "Electronic Chess (Tryom)", MACHINE_SUPPORTS_SAVE )

@@ -994,6 +994,8 @@ void lua_engine::initialize_render(sol::table &emu)
 	layout_view_type["effective_aspect"] = sol::property(&layout_view::effective_aspect);
 	layout_view_type["bounds"] = sol::property(&layout_view::bounds);
 	layout_view_type["has_art"] = sol::property(&layout_view::has_art);
+	layout_view_type["show_pointers"] = sol::property(&layout_view::show_pointers, &layout_view::set_show_pointers);
+	layout_view_type["hide_inactive_pointers"] = sol::property(&layout_view::hide_inactive_pointers, &layout_view::set_hide_inactive_pointers);
 
 
 	auto layout_view_item_type = sol().registry().new_usertype<layout_view_item>("layout_item", sol::no_constructor);
@@ -1100,6 +1102,7 @@ void lua_engine::initialize_render(sol::table &emu)
 
 
 	auto target_type = sol().registry().new_usertype<render_target>("target", sol::no_constructor);
+	target_type["ui_container"] = sol::property(&render_target::ui_container);
 	target_type["index"] = sol::property([] (render_target const &t) { return t.index() + 1; });
 	target_type["width"] = sol::property(&render_target::width);
 	target_type["height"] = sol::property(&render_target::height);
