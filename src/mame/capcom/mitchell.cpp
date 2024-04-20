@@ -2222,7 +2222,7 @@ ROM_START( pkladiesblu )  // uncensored encrypted bootleg. ROMs 1, 2, 3, 16 & 17
 	ROM_LOAD("pklbu17.bin", 0x000000, 0x20000, CRC(5a6efdcc) SHA1(04120dd4da0ff8df514f98a44d7eee7100e4c033) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD("pklbu13.bin", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
+	ROM_LOAD("pklbu3.bin", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
 ROM_END
 
 ROM_START( pkladiesbl2 ) // same as the above but without the z80 block, only 1.ic112 differs

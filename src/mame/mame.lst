@@ -17461,6 +17461,7 @@ mjembase                        // "38" Mahjong Electromagnetic Base 1989 Dynax
 mjfriday                        // "26" (c) 1989 Dynax
 mjreach                         // (c) 1994 Dynax
 mjreachbl                       // (c) 1994 bootleg
+mjreachp2                       // (c) 1994 Dynax
 neruton                         // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 nerutona                        // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 ougonhai                        // "62" (c) 1991 Dynax
@@ -18486,6 +18487,7 @@ blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
 bmxstunts                       // (c) 1985 Jetsoft
 bomber                          //
 bongo                           // (c) 1983 Jetsoft
+bongoa                          // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago
 catacomb                        // 1982 MTM Games
 checkman                        // (c) 1982 Zilec-Zenitone
@@ -20067,6 +20069,7 @@ wcat3a                          //
 wcherry                         // bootleg
 
 @source:igs/igs009.cpp
+animalhjb                       // bootleg
 gp98                            // (c) 1998
 gp98a                           // (c) 1998
 jingbell                        // (c) 1997
@@ -20152,9 +20155,10 @@ cjdh2a                          // (c) 200?
 cjdh2b                          // (c) 200?
 cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
-lhtb                            // (c) 200?
+lhtb                            // (c) 2009
 lhzb3in1                        // (c) 200?
 mghammer                        // (c) 2015
+qhzb                            // (c) 2007
 
 @source:igs/igspoker.cpp
 chleague                        // (c) 199? IGS
@@ -21159,6 +21163,9 @@ tvc4000                         //
 vc4000                          // Interton vc4000
 vc6000                          //
 vmdtbase                        //
+
+@source:irem/blackjack92.cpp
+bj92
 
 @source:irem/m10.cpp
 andromed                        // (c) 1979
@@ -32494,10 +32501,6 @@ cpg120                          //
 cx7128                          // 1986 MSX2
 cx7m128                         // 1986 MSX2
 expert20                        // 1986 MSX2 Korea
-expert3i                        //
-expert3t                        //
-expertac                        //
-expertdx                        //
 fpc900                          //
 fs4500                          // 1986 MSX2 Japan
 fs4600f                         // 1986 MSX2 Japan
@@ -32509,19 +32512,11 @@ fsa1                            // 1986 MSX2 Japan
 fsa1a                           // 1986 MSX2 Japan
 fsa1f                           // 1987 MSX2 Japan
 fsa1fm                          // 1988 MSX2 Japan
-fsa1fx                          // 1988 MSX2+ Japan
-fsa1gt                          //
 fsa1mk2                         // 1987 MSX2 Japan
-fsa1st                          //
-fsa1wsx                         // 1989 MSX2+ Japan
-fsa1wx                          // 1988 MSX2+ Japan
-fsa1wxa                         // 1988 MSX2+ Japan
 fstm1                           //
 hbf1                            // 1986 MSX2 Japan
 hbf1ii                          // 1987 MSX2 Japan
 hbf1xd                          // 1987 MSX2 Japan
-hbf1xdj                         // 1988 MSX2+ Japan
-hbf1xv                          // 1989 MSX2+ Japan
 hbf5                            //
 hbf500                          // 1986 MSX2 Japan
 hbf500_2                        //
@@ -32570,10 +32565,7 @@ nms8280f                        //
 nms8280g                        // 1986 MSX2
 phc23                           // 1986 MSX2 Japan
 phc23jb                         // 1987 MSX2 Japan
-phc35j                          // 1989 MSX2+ Japan
 phc55fd2                        //
-phc70fd                         // 1988 MSX2+ Japan
-phc70fd2                        // 1988 MSX2+ Japan
 phc77                           //
 tpc310                          // 1986 MSX2
 tpp311                          //
@@ -32595,6 +32587,23 @@ y805128r2                       //
 y805128r2e                      //
 y805256                         //
 yis604                          //
+
+@source:msx/msx2p.cpp
+expert3i                        //
+expert3t                        //
+expertac                        //
+expertdx                        //
+fsa1fx                          // 1988 MSX2+ Japan
+fsa1gt                          //
+fsa1st                          //
+fsa1wsx                         // 1989 MSX2+ Japan
+fsa1wx                          // 1988 MSX2+ Japan
+fsa1wxa                         // 1988 MSX2+ Japan
+hbf1xdj                         // 1988 MSX2+ Japan
+hbf1xv                          // 1989 MSX2+ Japan
+phc35j                          // 1989 MSX2+ Japan
+phc70fd                         // 1988 MSX2+ Japan
+phc70fd2                        // 1988 MSX2+ Japan
 
 @source:msx/pengadvb.cpp
 pengadvb                        // (c) 1988 Screen
@@ -34139,6 +34148,7 @@ tubepb                          // (c) 1984 + bootleg
 
 @source:nichibutsu/wiping.cpp
 rugrats                         // (c) 1983
+shettle                         // (c) 1984
 wiping                          // (c) 1982
 
 @source:nintendo/aleck64.cpp

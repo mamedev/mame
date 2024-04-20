@@ -245,4 +245,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT CLASS     INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1978, checkc2, 0,      0,      cr,      cr,   cr_state, empty_init, "Fidelity Electronics", "Checker Challenger (model CR, 2 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 1978, checkc2, 0,      0,      cr,      cr,   cr_state, empty_init, "Fidelity Electronics", "Checker Challenger (model CR, 2 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

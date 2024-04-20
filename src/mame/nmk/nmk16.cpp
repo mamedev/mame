@@ -4,7 +4,7 @@
 /********************************************************************
 
 Task Force Harrier         1989 UPL        68000 Z80           YM2203 2xOKIM6295
-Many Block                 1991 Bee-Oh     68000 Z80           YM2203 2xOKIM6295 (hack of "Jewels" by UPL)
+Many Block                 1991 Bee-Oh     68000 Z80           YM2203 2xOKIM6295 (hack of "Slot Gal" by UPL)
 Mustang                    1990 UPL        68000 NMK004        YM2203 2xOKIM6295
 Bio-ship Paladin           1990 UPL        68000 NMK004        YM2203 2xOKIM6295
 Vandyke                    1990 UPL        68000 NMK004        YM2203 2xOKIM6295
@@ -152,7 +152,7 @@ Questions / Notes
 
 'manybloc' :
 
-  - This is a bootleg / hack of Jewels by UPL
+  - This is a bootleg / hack of Slot Gal by UPL
   - The MCU code was patched to use standard IO, it may be running code that is no longer used.
   - There are writes to 0x080010.w and 0x080012.w (MCU ?) in code between
     0x005000 to 0x005690, but I see no call to "main" routine at 0x005504 !

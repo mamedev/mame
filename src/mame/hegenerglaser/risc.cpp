@@ -197,5 +197,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1994, mrisc2,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE )
+SYST( 1994, mrisc2,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE )

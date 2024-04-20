@@ -31,6 +31,7 @@ void h8532_device::internal_map(address_map &map)
 {
 	if (mode_control() == 2 || mode_control() == 4 || mode_control() == 7)
 		map(0x0000, 0x7fff).rom().region(DEVICE_SELF, 0);
+	map(0xfb80, 0xff7f).ram(); // TODO: may be disabled by writing 0 to RAME bit in RAMCR
 #if 0
 	map(0xff80, 0xff80).w(FUNC(h8532_device::p1ddr_w));
 	map(0xff81, 0xff81).w(FUNC(h8532_device::p2ddr_w));

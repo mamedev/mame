@@ -754,6 +754,10 @@ manager.machine.video.snapshot_target
 Properties
 ~~~~~~~~~~
 
+target.ui_container (read-only)
+    The :ref:`render container <luascript-ref-rendercontainer>` for drawing user
+    interface elements over this render target, or ``nil`` for hidden render
+    targets (targets that are not shown to the user directly).
 target.index (read-only)
     The 1-based index of the render target.  This has O(n) complexity.
 target.width (read-only)
@@ -810,6 +814,9 @@ Instantiation
 manager.machine.render.ui_container
     Gets the render container used to draw the user interface, including menus,
     sliders and pop-up messages.
+manager.machine.render.targets[index].ui_container
+    Gets the render container used to draw user interface elements over a
+    particular render target.
 manager.machine.screens[tag].container
     Gets the render container used to draw a given screen.
 
@@ -1145,10 +1152,16 @@ view.bounds (read-only)
     effective bounds of the view in its current configuration.  The coordinates
     are in view units, which are arbitrary but assumed to have square aspect
     ratio.
-view.has_art
+view.has_art (read-only)
     A Boolean indicating whether the view has any non-screen items, including
     items that are not visible because the user has hidden the item collection
     that they belong to.
+view.show_pointers (read/write)
+    A Boolean that sets whether mouse and pen pointers should be displayed for
+    the view.
+view.hide_inactive_pointers (read/write)
+    A Boolean that sets whether mouse pointers for the view should be hidden
+    after a period of inactivity.
 
 
 .. _luascript-ref-renderlayitem:

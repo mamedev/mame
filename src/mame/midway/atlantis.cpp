@@ -57,6 +57,7 @@
 #include "video/zeus2.h"
 
 #include "emupal.h"
+#include "speaker.h"
 
 #define LOG_RTC         (1U << 1)
 #define LOG_PORT        (1U << 2)
@@ -839,12 +840,23 @@ void atlantis_state::mwskins(machine_config &config)
 	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	DCS2_AUDIO_DENVER_2CH(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0xe33);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->set_upper(342); // 325
 	m_ioasic->irq_handler().set(FUNC(atlantis_state::ioasic_irq));

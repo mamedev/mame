@@ -371,4 +371,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek / Heuristic Software", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, prisma, 0,      0,      prisma,  prisma, prisma_state, empty_init, "Saitek / Heuristic Software", "Kasparov Prisma", MACHINE_SUPPORTS_SAVE )

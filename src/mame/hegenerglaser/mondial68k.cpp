@@ -240,4 +240,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, mondl68k,  0,        0,      mondial68k,  mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, mondl68k,  0,        0,      mondial68k,  mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL", MACHINE_SUPPORTS_SAVE )

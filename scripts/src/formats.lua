@@ -438,6 +438,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/bk0010_dsk.h,FORMATS["BK0010_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "BK0010_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/bk0010_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/bk0010_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/bw12_dsk.h,FORMATS["BW12_DSK"] = true
 --------------------------------------------------
 

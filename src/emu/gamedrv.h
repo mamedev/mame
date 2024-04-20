@@ -45,11 +45,10 @@ struct machine_flags
 		NO_COCKTAIL         = 0x0000'0100,  // screen flip support is missing
 		IS_BIOS_ROOT        = 0x0000'0200,  // this driver entry is a BIOS root
 		REQUIRES_ARTWORK    = 0x0000'0400,  // requires external artwork for key game elements
-		CLICKABLE_ARTWORK   = 0x0000'0800,  // artwork is clickable and requires mouse cursor
-		UNOFFICIAL          = 0x0000'1000,  // unofficial hardware modification
-		NO_SOUND_HW         = 0x0000'2000,  // system has no sound output
-		MECHANICAL          = 0x0000'4000,  // contains mechanical parts (pinball, redemption games, ...)
-		IS_INCOMPLETE       = 0x0000'8000   // official system with blatantly incomplete hardware/software
+		UNOFFICIAL          = 0x0000'0800,  // unofficial hardware modification
+		NO_SOUND_HW         = 0x0000'1000,  // system has no sound output
+		MECHANICAL          = 0x0000'2000,  // contains mechanical parts (pinball, redemption games, ...)
+		IS_INCOMPLETE       = 0x0000'4000   // official system with blatantly incomplete hardware/software
 	};
 };
 
@@ -71,7 +70,6 @@ constexpr u64 MACHINE_SUPPORTS_SAVE             = machine_flags::SUPPORTS_SAVE; 
 constexpr u64 MACHINE_NO_COCKTAIL               = machine_flags::NO_COCKTAIL;               ///< The system supports screen flipping for use in a cocktail cabinet, but this feature is not properly emulated
 constexpr u64 MACHINE_IS_BIOS_ROOT              = machine_flags::IS_BIOS_ROOT;              ///< The system represents an empty system board of some kind - clones are treated as separate systems rather than variants
 constexpr u64 MACHINE_REQUIRES_ARTWORK          = machine_flags::REQUIRES_ARTWORK;          ///< The system requires external artwork for key functionality
-constexpr u64 MACHINE_CLICKABLE_ARTWORK         = machine_flags::CLICKABLE_ARTWORK;         ///< Enables pointer display for the system to facilitate using clickable artwork
 constexpr u64 MACHINE_UNOFFICIAL                = machine_flags::UNOFFICIAL;                ///< The system represents an after-market or end-user modification to a system
 constexpr u64 MACHINE_NO_SOUND_HW               = machine_flags::NO_SOUND_HW;               ///< The system has no sound output capability
 constexpr u64 MACHINE_MECHANICAL                = machine_flags::MECHANICAL;                ///< The system depends on mechanical features for key functionality

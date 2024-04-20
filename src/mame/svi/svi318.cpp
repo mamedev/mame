@@ -560,6 +560,7 @@ void svi3x8_state::svi318(machine_config &config)
 	m_expander->ctrl1_handler().set(FUNC(svi3x8_state::ctrl1_w));
 	m_expander->excsr_handler().set(m_vdp, FUNC(tms9928a_device::read));
 	m_expander->excsw_handler().set(m_vdp, FUNC(tms9928a_device::write));
+	m_expander->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void svi3x8_state::svi318p(machine_config &config)

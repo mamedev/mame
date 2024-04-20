@@ -467,7 +467,7 @@ ROM_START( gladiador )
 	ROM_LOAD( "24c16.u10", 0x000, 0x800, CRC(a38693a9) SHA1(bad306f3e50dbb60cbf59a09f1e4720576bb3983) )
 
 	ROM_REGION( 0x800, "counters", 0 )
-	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "225c_b-h240891_cs4_24c16w.bin", 0x000, 0x800, CRC(fd418bd7) SHA1(c257b11288aa70ae986fcf8cbdfcbc4bc83dbd45) ) // Dump for machine with serial 09-01000 (the SEEPROM is probably tied to the serial number)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected

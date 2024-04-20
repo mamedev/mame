@@ -237,4 +237,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, constjr, 0,      0,      constjr, constjr, constjr_state, empty_init, "Novag Industries", "Constellation Junior", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, constjr, 0,      0,      constjr, constjr, constjr_state, empty_init, "Novag Industries", "Constellation Junior", MACHINE_SUPPORTS_SAVE )

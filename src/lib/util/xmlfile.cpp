@@ -76,10 +76,12 @@ void write_escaped(core_file &file, std::string const &str)
 
 struct parse_info
 {
+	parse_info() { memset(&parser, 0, sizeof(parser)); }
+
 	XML_Parser      parser;
 	file::ptr       rootnode;
-	data_node *     curnode;
-	uint32_t        flags;
+	data_node *     curnode = nullptr;
+	uint32_t        flags = 0;
 };
 
 
@@ -813,7 +815,7 @@ std::string normalize_string(std::string_view string)
 static bool expat_setup_parser(parse_info &info, parse_options const *opts)
 {
 	// setup info structure
-	memset(&info, 0, sizeof(info));
+	info = parse_info();
 	if (opts != nullptr)
 	{
 		info.flags = opts->flags;

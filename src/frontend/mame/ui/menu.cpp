@@ -227,10 +227,7 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 		// ensure topmost menu is active - need a loop because it could push another menu
 		while (m_stack && !m_stack->is_active())
 		{
-			m_stack->m_items_drawn = false;
-			m_stack->m_pointer_state = track_pointer::IDLE;
-			m_stack->m_active = true;
-			m_stack->menu_activated();
+			m_stack->activate_menu();
 			if (m_stack && m_stack->is_active())
 			{
 				// menu activated - draw it to ensure it's on-screen before it can process input
@@ -414,6 +411,7 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_pointer_updated(0.0F, 0.0F)
 	, m_pointer_line(0)
 	, m_pointer_repeat(std::chrono::steady_clock::time_point::min())
+	, m_accumulated_wheel(0)
 	, m_process_flags(0)
 	, m_selected(0)
 	, m_special_main_menu(false)
@@ -1044,9 +1042,16 @@ bool menu::handle_events(uint32_t flags, event &ev)
 		case ui_event::type::MOUSE_WHEEL:
 			if ((track_pointer::IDLE == m_pointer_state) || (track_pointer::IGNORED == m_pointer_state))
 			{
-				if (!custom_mouse_scroll((0 < local_menu_event.zdelta) ? -local_menu_event.num_lines : local_menu_event.num_lines) && !(flags & (PROCESS_ONLYCHAR | PROCESS_CUSTOM_NAV)))
+				// the value is scaled to 120 units per "click"
+				m_accumulated_wheel += local_menu_event.zdelta * local_menu_event.num_lines;
+				int const lines((m_accumulated_wheel + ((0 < local_menu_event.zdelta) ? 36 : -36)) / 120);
+				if (!lines)
+					break;
+				m_accumulated_wheel -= lines * 120;
+
+				if (!custom_mouse_scroll(-lines) && !(flags & (PROCESS_ONLYCHAR | PROCESS_CUSTOM_NAV)))
 				{
-					if (local_menu_event.zdelta > 0)
+					if (lines > 0)
 					{
 						if (is_first_selected())
 						{
@@ -1054,12 +1059,12 @@ bool menu::handle_events(uint32_t flags, event &ev)
 						}
 						else
 						{
-							m_selected -= local_menu_event.num_lines;
+							m_selected -= lines;
 							validate_selection(-1);
 						}
 						top_line -= (m_selected <= top_line && top_line != 0);
 						if (m_selected <= top_line && m_visible_items != m_visible_lines)
-							top_line -= local_menu_event.num_lines;
+							top_line -= lines;
 					}
 					else
 					{
@@ -1069,12 +1074,12 @@ bool menu::handle_events(uint32_t flags, event &ev)
 						}
 						else
 						{
-							m_selected += local_menu_event.num_lines;
+							m_selected -= lines;
 							validate_selection(1);
 						}
 						top_line += (m_selected >= top_line + m_visible_items + (top_line != 0));
 						if (m_selected >= (top_line + m_visible_items + (top_line != 0)))
-							top_line += local_menu_event.num_lines;
+							top_line -= lines;
 					}
 				}
 			}
@@ -1896,6 +1901,21 @@ void menu::validate_selection(int scandir)
 	// skip past unselectable items
 	while (!is_selectable(m_items[m_selected]))
 		m_selected = (m_selected + m_items.size() + scandir) % m_items.size();
+}
+
+
+//-------------------------------------------------
+//  activate_menu - handle becoming top of the
+//  menu stack
+//-------------------------------------------------
+
+void menu::activate_menu()
+{
+	m_items_drawn = false;
+	m_pointer_state = track_pointer::IDLE;
+	m_accumulated_wheel = 0;
+	m_active = true;
+	menu_activated();
 }
 
 

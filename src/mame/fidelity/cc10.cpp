@@ -355,7 +355,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1978, cc10,    0,      0,      ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1978, cc10a,   cc10,   0,      ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version A
+SYST( 1978, cc10,    0,      0,      ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, cc10a,   cc10,   0,      ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX)", MACHINE_SUPPORTS_SAVE ) // aka version A
 
-SYST( 1978, checkc4, 0,      0,      acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger (model ACR, 4 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 1978, checkc4, 0,      0,      acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger (model ACR, 4 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

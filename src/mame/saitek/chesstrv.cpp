@@ -313,5 +313,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, chesstrv,  0,      0,      chesstrv,  chesstrv,  chesstrv_state, empty_init, "SciSys / Novag Industries", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, chesstrvi, 0,      0,      chesstrvi, chesstrvi, chesstrv_state, empty_init, "SciSys", "Chess Intercontinental Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, chesstrv,  0,      0,      chesstrv,  chesstrv,  chesstrv_state, empty_init, "SciSys / Novag Industries", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+SYST( 1982, chesstrvi, 0,      0,      chesstrvi, chesstrvi, chesstrv_state, empty_init, "SciSys", "Chess Intercontinental Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

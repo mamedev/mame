@@ -30,7 +30,7 @@ Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  H
 Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900068A(?)           Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A otherwise no boot-up; dongle selects region using same HDDs
 Battle Gear 3 (US).............................. ------X *?                    HDD (20GB)   NM00010? *?                      Taito 2002                     | 2004 Betson release; contrary to flyer, does *not* remove Honda cars (contrast sidebs2u/batlgear)
 Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | HDD: Maxtor Fireball 3 30GB 2F030L0
-Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  
+Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
 Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires RAYS I/O PCB and IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0

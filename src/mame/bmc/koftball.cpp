@@ -7,15 +7,12 @@ King Of Football (c)1995 BMC
 preliminary driver by Tomasz Slanina
 
 TODO:
-- uses a 'pixmap' like bmc/bmcpokr.cpp. Noted uses are for jxzh's test mode and bookkeeping.
-  For now implementation is just copied over, but it needs to be adapted;
 - lots of unknown writes / reads;
 - one of the customs could contain a VIA6522-like core. bmc/bmcbowl.cpp uses the VIA6522 and the
   accesses are similar;
 - probably jxzh also supports the mahjong keyboard. Check if one of the dips enable it and where it
   is read;
 - better understanding of the koftball protection;
-- hardware has a lot in common with that in bmc/bmcpokr.cpp. Merge?
 
 --
 
@@ -91,33 +88,35 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_post_load() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint16_t> m_main_ram;
-	required_shared_ptr_array<uint16_t, 4> m_videoram;
-	required_shared_ptr<uint16_t> m_pixram;
+	optional_shared_ptr<u16> m_main_ram;
+	required_shared_ptr_array<u16, 4> m_videoram;
+	required_shared_ptr<u16> m_pixram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	tilemap_t *m_tilemap[4]{};
-	uint16_t m_prot_data = 0;
-	uint8_t m_irq_enable = 0;
-	uint8_t m_gfx_ctrl = 0;
-	uint8_t m_priority = 0;
+	u16 m_prot_data = 0;
+	u8 m_irq_enable = 0;
+	u8 m_gfx_ctrl = 0;
+	u8 m_priority = 0;
+	u8 m_backpen = 0;
 	std::unique_ptr<bitmap_ind16> m_pixbitmap;
-	uint8_t m_pixpal = 0;
+	u8 m_pixpal = 0;
 
-	void irq_ack_w(uint8_t data);
-	uint16_t random_number_r();
-	uint16_t prot_r();
-	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void pixbitmap_redraw();
-	void pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void irq_ack_w(u8 data);
+	u16 random_number_r();
+	u16 prot_r();
+	void prot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void pixpal_w(offs_t offset, u8 data, u8 mem_mask = ~0);
+	template <u8 Which> void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+
+	template <u8 Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	void draw_pixlayer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void jxzh_mem(address_map &map);
 	void koftball_mem(address_map &map);
@@ -133,68 +132,20 @@ void koftball_state::machine_start()
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_gfx_ctrl));
 	save_item(NAME(m_priority));
+	save_item(NAME(m_backpen));
 	save_item(NAME(m_pixpal));
 }
 
-template <uint8_t Which>
+template <u8 Which>
 TILE_GET_INFO_MEMBER(koftball_state::get_tile_info)
 {
 	int const data = m_videoram[Which][tile_index];
 	tileinfo.set(0, data, 0, 0);
 }
 
-// TODO: the following 'pixpal' methods were copied from bmc/bmcpokr.cpp. They need adapting.
-
-void koftball_state::pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void koftball_state::pixpal_w(offs_t offset, u8 data, u8 mem_mask)
 {
-	COMBINE_DATA(&m_pixram[offset]);
-
-	int const x = (offset & 0xff) << 2;
-	int const y = (offset >> 8);
-
-	uint16_t const pixpal = (m_pixpal & 0xf) << 4;
-
-	uint16_t pen;
-	if (ACCESSING_BITS_8_15)
-	{
-		pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
-		pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
-		pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
-	}
-}
-
-void koftball_state::pixbitmap_redraw()
-{
-	uint16_t const pixpal = (m_pixpal & 0xf) << 4;
-	int offset = 0;
-	for (int y = 0; y < 512; y++)
-	{
-		for (int x = 0; x < 1024; x += 4)
-		{
-			uint16_t const data = m_pixram[offset++];
-			uint16_t pen;
-			pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
-			pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
-			pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
-			pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
-		}
-	}
-}
-
-void koftball_state::pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask)
-{
-	uint8_t const old = m_pixpal;
-	if (old != COMBINE_DATA(&m_pixpal))
-		pixbitmap_redraw();
-}
-
-void koftball_state::device_post_load()
-{
-	pixbitmap_redraw();
+	COMBINE_DATA(&m_pixpal);
 }
 
 void koftball_state::video_start()
@@ -207,10 +158,34 @@ void koftball_state::video_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_pixbitmap = std::make_unique<bitmap_ind16>(0x400, 0x200);
+	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[3]->set_transparent_pen(0);
+
+	m_pixbitmap = std::make_unique<bitmap_ind16>(512, 256);
 }
 
-uint32_t koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// linear 512x256x4bpp
+void koftball_state::draw_pixlayer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u8 pix_bank = (m_pixpal & 0xf) << 4;
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u16 pitch = y * 0x80;
+		for (int x = cliprect.min_x; x <= cliprect.max_x >> 2; x++)
+		{
+			const u16 tile_data = m_pixram[(pitch + x) & 0xffff];
+			for (int xi = 0; xi < 4; xi++)
+			{
+				const u8 nibble = (tile_data >> ((3 - xi) * 4)) & 0xf;
+				if (nibble)
+					bitmap.pix(y, (x << 2) + xi) = pix_bank | nibble;
+			}
+		}
+	}
+}
+
+u32 koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/*
 	TODO:
@@ -238,10 +213,16 @@ uint32_t koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	girl select after coin up   prev screen prev screen over        under       0x13        0x3a
 	*/
 
+	m_pixbitmap->fill(0, cliprect);
+	draw_pixlayer(*m_pixbitmap, cliprect);
+
+	bitmap.fill(m_backpen, cliprect);
+
 	if (BIT(m_priority, 3))
 		copyscrollbitmap_trans(bitmap, *m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
 
-	if (BIT(m_gfx_ctrl, 5)) // TODO: or bit 1?
+	// TODO: or bit 1?
+	if (BIT(m_gfx_ctrl, 5))
 	{
 		m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
 		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
@@ -258,13 +239,13 @@ uint32_t koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-uint16_t koftball_state::random_number_r()
+u16 koftball_state::random_number_r()
 {
 	return machine().rand();
 }
 
 
-uint16_t koftball_state::prot_r()
+u16 koftball_state::prot_r()
 {
 	switch (m_prot_data)
 	{
@@ -278,25 +259,26 @@ uint16_t koftball_state::prot_r()
 	return machine().rand();
 }
 
-void koftball_state::prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void koftball_state::prot_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_prot_data);
 }
 
-template <uint8_t Which>
-void koftball_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template <u8 Which>
+void koftball_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_videoram[Which][offset]);
 	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void koftball_state::irq_ack_w(uint8_t data)
+void koftball_state::irq_ack_w(u8 data)
 {
 	for (int i = 1; i < 8; i++)
 		if (BIT(data, i))
 			m_maincpu->set_input_line(i, CLEAR_LINE);
 }
 
+// FIXME: merge video maps
 void koftball_state::koftball_mem(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
@@ -308,11 +290,12 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x263000, 0x263fff).ram().w(FUNC(koftball_state::videoram_w<3>)).share(m_videoram[3]);
 	map(0x268000, 0x26ffff).ram();
 
-	map(0x280000, 0x29ffff).ram().w(FUNC(koftball_state::pixram_w)).share(m_pixram);
+	map(0x280000, 0x29ffff).ram().share(m_pixram);
 	map(0x2a0007, 0x2a0007).w(FUNC(koftball_state::irq_ack_w));
-	map(0x2a0009, 0x2a0009).lw8(NAME([this] (uint8_t data) { m_irq_enable = data; }));
-	map(0x2a000f, 0x2a000f).lw8(NAME([this] (uint8_t data) { m_priority = data; LOGGFX("GFX ctrl 2a000f %02x\n", data); }));
+	map(0x2a0009, 0x2a0009).lw8(NAME([this] (u8 data) { m_irq_enable = data; }));
+	map(0x2a000f, 0x2a000f).lw8(NAME([this] (u8 data) { m_priority = data; LOGGFX("GFX ctrl $2a000f (priority) %02x\n", data); }));
 	map(0x2a0017, 0x2a0017).w(FUNC(koftball_state::pixpal_w));
+	map(0x2a0019, 0x2a0019).lw8(NAME([this] (u8 data) { m_backpen = data; LOGGFX("GFX ctrl $2a0019 (backpen) %02x\n", data); }));
 	map(0x2a001a, 0x2a001b).nopw();
 	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
 	map(0x2b0000, 0x2b0001).portr("DSW");
@@ -327,7 +310,7 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2f0000, 0x2f0003).portr("INPUTS");
 	map(0x300000, 0x300001).nopw();
-	map(0x320000, 0x320000).lw8(NAME([this] (uint8_t data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl 320000 %02x\n", data); }));
+	map(0x320000, 0x320000).lw8(NAME([this] (u8 data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl $320000 (layer enable) %02x\n", data); }));
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 }
@@ -344,11 +327,12 @@ void koftball_state::jxzh_mem(address_map &map)
 	map(0x264b00, 0x264dff).ram(); // TODO: writes here at least at girl selection after coin up. Some kind of effect?
 	map(0x268000, 0x26ffff).ram();
 
-	map(0x280000, 0x29ffff).ram().w(FUNC(koftball_state::pixram_w)).share(m_pixram);
+	map(0x280000, 0x29ffff).ram().share(m_pixram);
 	map(0x2a0007, 0x2a0007).w(FUNC(koftball_state::irq_ack_w));
-	map(0x2a0009, 0x2a0009).lw8(NAME([this] (uint8_t data) { m_irq_enable = data; }));
-	map(0x2a000f, 0x2a000f).lw8(NAME([this] (uint8_t data) { m_priority = data; LOGGFX("GFX ctrl 2a000f %02x\n", data); }));
+	map(0x2a0009, 0x2a0009).lw8(NAME([this] (u8 data) { m_irq_enable = data; }));
+	map(0x2a000f, 0x2a000f).lw8(NAME([this] (u8 data) { m_priority = data; LOGGFX("GFX ctrl $2a000f (priority) %02x\n", data); }));
 	map(0x2a0017, 0x2a0017).w(FUNC(koftball_state::pixpal_w));
+	map(0x2a0019, 0x2a0019).lw8(NAME([this] (u8 data) { m_backpen = data; LOGGFX("GFX ctrl $2a0019 (backpen) %02x\n", data); }));
 	map(0x2a001a, 0x2a001d).nopw();
 	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
 	map(0x2b0000, 0x2b0001).portr("DSW");
@@ -362,7 +346,7 @@ void koftball_state::jxzh_mem(address_map &map)
 	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2f0000, 0x2f0001).portr("INPUTS");
 	map(0x300000, 0x300001).nopw();
-	map(0x320000, 0x320000).lw8(NAME([this] (uint8_t data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl 320000 %02x\n", data); }));
+	map(0x320000, 0x320000).lw8(NAME([this] (u8 data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl $320000 (layer enable) %02x\n", data); }));
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 	map(0x380000, 0x380001).w(FUNC(koftball_state::prot_w));
@@ -672,7 +656,7 @@ ROM_END
 
 #if NVRAM_HACK
 
-static const uint16_t nvram[]=
+static const u16 nvram[]=
 {
 	0x0000,0x5555,0x0000,0x5555,0x0000,0x5555,0x0000,0x5555,
 	0x0000,0x5555,0x0000,0x0000,0x0000,0x0000,0x5555,0x5555,

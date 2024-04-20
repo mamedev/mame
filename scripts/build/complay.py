@@ -409,6 +409,7 @@ class LayoutChecker(Minifyer):
                     self.views[attrs['name']] = self.format_location()
                 elif not self.VARPATTERN.match(attrs['name']):
                     self.handle_error('Element view has duplicate name "%s" (previous %s)' % (attrs['name'], self.views[attrs['name']]))
+            self.check_bool_attribute(name, attrs, 'showpointers', None)
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
             self.item_ids = { }

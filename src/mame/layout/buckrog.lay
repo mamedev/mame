@@ -27,6 +27,8 @@ authors:hap
 		<text string="YOUR SCORE"><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
 
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
 	<element name="digit" defstate="0">
 		<led7seg>
 			<color red="1.0" green="0.1" blue="0.15" />
@@ -117,10 +119,13 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Score Panel">
-		<bounds left="-168" top="0" right="640" bottom="480" />
-
+		<element ref="nothing"><bounds x="-168" y="0" width="8" height="480" /></element>
 		<group ref="panel1"><bounds x="-160" y="45" width="152" height="238" /></group>
 		<group ref="panel2"><bounds x="-160" y="330" width="152" height="96.5" /></group>
+
+		<collection name="Centre Display" visible="no">
+			<element ref="nothing"><bounds x="640" y="0" width="168" height="480" /></element>
+		</collection>
 
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />

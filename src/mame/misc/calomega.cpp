@@ -5733,7 +5733,7 @@ ROM_END
 /*
   CEI 906III POKER
   V60.04  1989  906III board
-    
+
   Jumper 8,9
   EPR 1-5 2764
   CG's    2764

@@ -364,14 +364,14 @@ void myarc_fdc_device::device_reset()
 		else
 			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
-	
+
 	if (ioport("CONTROLLER")->read()==0)
 		m_wdc = m_wd1770;
 	else
 		m_wdc = m_wd1772;
 
 	m_dec_high = (ioport("AMADECODE")->read()!=0);
-	
+
 	m_pal->set_board(this);
 }
 

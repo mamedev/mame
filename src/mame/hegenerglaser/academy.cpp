@@ -201,10 +201,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, academygb, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 27-08-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, academyd,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (Dutch, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English, 04-10-88)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, academygb, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 27-08-88)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, academyd,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (Dutch, 04-10-88)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, academytt, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy T+T (Dutch, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, academytt, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy T+T (Dutch, prototype)", MACHINE_SUPPORTS_SAVE )

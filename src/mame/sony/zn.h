@@ -21,7 +21,7 @@
 #include "machine/7200fifo.h"
 #include "machine/at28c16.h"
 #include "machine/bankdev.h"
-#include "cat702.h"
+#include "machine/cat702.h"
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "machine/nvram.h"

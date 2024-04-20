@@ -4799,7 +4799,7 @@ ROM_START( mspacmanhnc )
 	ROM_COPY( "bigeprom",  0x3000, 0x9000, 0x0800 )   // copy segment to 9000-97ff
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-//	ROM_COPY( "bigeprom",  0x4000, 0x0000, 0x2000 )   // copy segments to 0000-1fff, same GFX set of the GFX EPROMs
+//  ROM_COPY( "bigeprom",  0x4000, 0x0000, 0x2000 )   // copy segments to 0000-1fff, same GFX set of the GFX EPROMs
 	ROM_LOAD( "5e.bin",   0x0000, 0x0800, CRC(93933d1d) SHA1(fa38d2cb87e872bb9a3158a4df98f38360dc85ec) )
 	ROM_LOAD( "5h.bin",   0x0800, 0x0800, CRC(7409fbec) SHA1(f440f08ba026ae6172666e1bdc0894ce33bba420) )
 	ROM_LOAD( "5f.bin",   0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
@@ -5199,7 +5199,7 @@ ROM_END
   |                                               |
   '-----------------------------------------------'
 
-  
+
   The SUSILU PCB soldered below the Z80 socket, is exactly
   the same documented above, containing a Z80 CPU, a M27256 EPROM,
   a 74LS254 and an unknown DIL40 IC.

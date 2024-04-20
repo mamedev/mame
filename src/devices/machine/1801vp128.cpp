@@ -45,7 +45,39 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(K1801VP128, k1801vp128_device, "1801vp1-128", "1801VP1-128")
+DEFINE_DEVICE_TYPE(K1801VP128, k1801vp128_device, "1801vp1_128", "1801VP1-128 FDC")
+
+
+
+inline k1801vp128_device::floppy_info::floppy_info()
+	: tm(nullptr)
+	, dev(nullptr)
+	, id(0)
+	, main_state(0)
+	, sub_state(0)
+	, dir(0)
+	, counter(0)
+	, live(false)
+	, index(false)
+{
+}
+
+
+inline k1801vp128_device::live_info::live_info()
+	: tm(attotime::never)
+	, state(IDLE)
+	, next_state(-1)
+	, fi(nullptr)
+	, shift_reg(0)
+	, crc(0)
+	, bit_counter(0)
+	, data_separator_phase(false)
+	, data_bit_context(false)
+	, crc_init(false)
+	, data_reg(0)
+	, pll()
+{
+}
 
 
 
@@ -62,10 +94,6 @@ k1801vp128_device::k1801vp128_device(const machine_config &mconfig, const char *
 	, m_connectors(*this, "%u", 0U)
 	, m_read_ds(*this, -1)
 {
-	memset(&cur_live, 0x00, sizeof(cur_live));
-	cur_live.tm = attotime::never;
-	cur_live.state = IDLE;
-	cur_live.next_state = -1;
 }
 
 

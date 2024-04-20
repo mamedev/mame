@@ -34,7 +34,7 @@ authors:hap
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
+	<view name="Internal Layout" showpointers="no">
 		<bounds left="0" right="18" top="0" bottom="18" />
 
 		<element ref="lcdw"><bounds x="0" y="0" width="18" height="18" /></element>

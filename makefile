@@ -1638,11 +1638,11 @@ ifeq (posix,$(SHELLTYPE))
 		-name \*.mm -o \
 		-name \*.lay -o \
 		-name \*.lst \
-		\) -exec ./srcclean {} \; >&2
-	$(SILENT) find hash    \( -name \*.hsi -o -name \*.xml  \) -exec ./srcclean {} \; >&2
-	$(SILENT) find bgfx    \( -name \*.json                 \) -exec ./srcclean {} \; >&2
-	$(SILENT) find plugins \( -name \*.lua -o -name \*.json \) -exec ./srcclean {} \; >&2
-	$(SILENT) find scripts \( -name \*.lua                  \) -exec ./srcclean {} \; >&2
+		\) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT) find hash    \( -name \*.hsi -o -name \*.xml  \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT) find bgfx    \( -name \*.json                 \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT) find plugins \( -name \*.lua -o -name \*.json \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT) find scripts \( -name \*.lua                  \) -print0 | xargs -0 -n 20 ./srcclean >&2
 else
 	$(shell for /r src     %%i in (*.c, *.cpp, *.h, *.hpp, *.hxx, *.ipp, *.mm, *.lay, *.lst) do srcclean %%i >&2 )
 	$(shell for /r hash    %%i in (*.hsi, *.xml)  do srcclean %%i >&2 )

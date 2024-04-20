@@ -27,7 +27,7 @@ authors:hap
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
+	<view name="Internal Layout" showpointers="no">
 		<bounds left="-3.5" right="56" top="-3" bottom="18" />
 
 		<element name="digit0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>

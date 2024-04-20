@@ -2193,22 +2193,22 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, touchme,   0,       0,      touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, touchme,   0,       0,      touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, rev. 2)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, pabball,   0,       0,      pabball,   pabball,   pabball_state,   empty_init, "Calfax / Caprice Electronics", "Pro-Action Electronic-Computerized Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 SYST( 1981, sfxphasor, 0,       0,      sfxphasor, sfxphasor, sfxphasor_state, empty_init, "Electroplay", "Sound FX Phasor", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-SYST( 1980, melodym,   0,       0,      melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, melodym,   0,       0,      melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, maniac,    0,       0,      maniac,    maniac,    maniac_state,    empty_init, "Ideal Toy Corporation", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, flash,     0,       0,      flash,     flash,     flash_state,     empty_init, "Ideal Toy Corporation", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, maniac,    0,       0,      maniac,    maniac,    maniac_state,    empty_init, "Ideal Toy Corporation", "Maniac", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, flash,     0,       0,      flash,     flash,     flash_state,     empty_init, "Ideal Toy Corporation", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, matchme,   0,       0,      matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, matchme,   0,       0,      matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, drdunk,    0,       0,      drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart Corporation", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, leboom,    0,       0,      leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, leboom,    0,       0,      leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, rockpin,   0,       0,      rockpin,   rockpin,   rockpin_state,   empty_init, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, hccbaskb,  0,       0,      hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )

@@ -726,8 +726,8 @@ void sentx6p_state::init_sentx6pd()
 } // anonymous namespace
 
 
-CONS( 2004, sentx6p,    0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6p,   "Senario",               "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (US)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a US version, values in USD
-CONS( 2004, sentx6puk,  sentx6p,     0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6puk, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+CONS( 2004, sentx6p,    0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6p,   "Senario",               "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a US version, values in USD
+CONS( 2004, sentx6puk,  sentx6p,     0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6puk, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
 
-CONS( 2004, sentx6pd,   0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6pd,  "Senario",               "Deluxe TV Poker - Texas Hold'em, Blackjack & Video Poker (US)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, sentx6pd,   0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6pd,  "Senario",               "Deluxe TV Poker - Texas Hold'em, Blackjack & Video Poker (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // Deluxe version wasn't released outside of US?

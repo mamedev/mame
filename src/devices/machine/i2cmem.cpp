@@ -75,6 +75,8 @@ DEFINE_DEVICE_TYPE(I2C_X2404P,  i2c_x2404p_device,  "x2404p",  "X2404P I2C Memor
 DEFINE_DEVICE_TYPE(I2C_24C08,   i2c_24c08_device,   "24c08",   "24C08 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C16,   i2c_24c16_device,   "24c16",   "24C16 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C64,   i2c_24c64_device,   "24c64",   "24C64 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C128,  i2c_24c128_device,  "24c128",  "24C128 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C256,  i2c_24c256_device,  "24c256",  "24C256 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C512,  i2c_24c512_device,  "24c512",  "24C512 I2C Memory")
 
 //**************************************************************************
@@ -180,6 +182,16 @@ i2c_24c16_device::i2c_24c16_device(const machine_config &mconfig, const char *ta
 
 i2c_24c64_device::i2c_24c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i2cmem_device(mconfig, I2C_24C64, tag, owner, clock, 0, 32, 0x2000)
+{
+}
+
+i2c_24c128_device::i2c_24c128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C128, tag, owner, clock, 0, 64, 0x4000)
+{
+}
+
+i2c_24c256_device::i2c_24c256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C256, tag, owner, clock, 0, 64, 0x8000)
 {
 }
 

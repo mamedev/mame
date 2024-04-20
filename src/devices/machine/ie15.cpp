@@ -494,7 +494,7 @@ void ie15_device::device_reset()
 {
 	update_serial(0);
 
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
 	m_kbd_sdv = false;
