@@ -38,7 +38,8 @@ private:
 static void tlb_options(device_slot_interface &device)
 {
 	device.option_add("heath", HEATH_TLB);
-	device.option_add("gp19", HEATH_GP19);
+	// temporary disable GP19 due not initializing properly after commit 1af40e3a1c828e8394d51b8f3b611d39a2b4bb5e 
+	// device.option_add("gp19", HEATH_GP19);
 	device.option_add("imaginator", HEATH_IMAGINATOR);
 	device.option_add("super19", HEATH_SUPER19);
 	device.option_add("superset", HEATH_SUPERSET);
