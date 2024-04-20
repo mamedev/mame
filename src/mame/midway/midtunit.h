@@ -36,20 +36,20 @@ protected:
 
 	void machine_start() override;
 
+	void cmos_enable_w(uint16_t data);
+	void cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cmos_r(offs_t offset);
+
+	void main_map(address_map &map);
+
 	required_device<tms340x0_device> m_maincpu;
 	required_device<midtunit_video_device> m_video;
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint16_t> m_nvram;
 
-	void cmos_enable_w(uint16_t data);
-	void cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t cmos_r(offs_t offset);
-
 	// CMOS-related variables
 	uint8_t    m_cmos_write_enable = 0;
-
-	void main_map(address_map &map);
 };
 
 class midtunit_adpcm_state : public midtunit_base_state
@@ -73,8 +73,6 @@ protected:
 	void machine_reset() override;
 
 private:
-	required_device<williams_adpcm_sound_device> m_adpcm_sound;
-
 	uint16_t sound_state_r();
 	uint16_t sound_r();
 	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -88,6 +86,10 @@ private:
 	uint16_t jdredd_prot_r(offs_t offset);
 
 	void init_nbajam_common(int te_protection);
+
+	void main_adpcm_map(address_map &map);
+
+	required_device<williams_adpcm_sound_device> m_adpcm_sound;
 
 	// sound-related variables
 	uint8_t    m_fake_sound_state = 0;
@@ -103,8 +105,6 @@ private:
 	const uint8_t *m_jdredd_prot_table = nullptr;
 	uint8_t    m_jdredd_prot_index = 0;
 	uint8_t    m_jdredd_prot_max = 0;
-
-	void main_adpcm_map(address_map &map);
 };
 
 class mk2_state : public midtunit_base_state
@@ -124,8 +124,6 @@ protected:
 	void machine_reset() override;
 
 private:
-	required_device<dcs_audio_device> m_dcs;
-
 	uint16_t dcs_state_r();
 	uint16_t dcs_r();
 	void dcs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -135,10 +133,12 @@ private:
 	uint16_t mk2_prot_shift_r();
 	void mk2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	void mk2_map(address_map &map);
+
+	required_device<dcs_audio_device> m_dcs;
+
 	// protection
 	uint16_t   m_mk2_prot_data = 0;
-
-	void mk2_map(address_map &map);
 };
 
 #endif // MAME_MIDWAY_MIDTUNIT_H
