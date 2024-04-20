@@ -326,7 +326,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- no sound, huge GFX issues (mostly related with pitch) -->
 	<software name="cybermor" supported="no">
-		<description>Cybermorph (Rev. B)</description>
+		<description>Cybermorph (rev. B)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="J9000E 700700-3"/>
@@ -339,7 +339,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- no sound, huge GFX issues (mostly related with pitch) -->
 	<software name="cybermor1" cloneof="cybermor" supported="no">
-		<description>Cybermorph (Rev. A)</description>
+		<description>Cybermorph (rev. A)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="J9000E 700700-2"/>
@@ -684,7 +684,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- boot OK, ranking screen cuts off text on 9th and 10th places -->
 	<software name="raiden" supported="partial">
-		<description>Raiden (Rev. A)</description>
+		<description>Raiden (rev. A)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="J9005E 700705-2"/>
@@ -911,7 +911,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- boot OK, no sprites, main menu with incorrect width, no sound (btanb) -->
 	<software name="ttoonadv" supported="no">
-		<description>Tiny Toon Adventures (Ver. 1)</description>
+		<description>Tiny Toon Adventures (ver. 1)</description>
 		<year>2010</year>
 		<publisher>Team Jaguar</publisher>
 		<info name="serial" value="J6004E 110403-110"/>
@@ -953,7 +953,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- boot OK, no sound, GFXs missing on gameplay and title screen -->
 	<software name="trevmcfr" supported="no">
-		<description>Trevor McFur in the Crescent Galaxy (Rev. A)</description>
+		<description>Trevor McFur in the Crescent Galaxy (rev. A)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="J9001E 700701-2"/>
@@ -1236,7 +1236,7 @@ These have been converted to j64 format with the universal header -->
 
 	<!-- black screen -->
 	<software name="gorf2k" supported="no">
-		<description>Gorf 2000 (Demo)</description>
+		<description>Gorf 2000 (demo)</description>
 		<year>2008</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="jaguar_cart">
