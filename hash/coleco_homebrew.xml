@@ -1362,7 +1362,7 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
-	<software name="spacesha">
+	<software name="spacesha" cloneof="spacesh">
 		<description>Space Shuttle: A Journey Into Space (64k)</description>
 		<year>2022</year>
 		<publisher>Team Pixelboy</publisher>
@@ -1433,7 +1433,7 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
-	<!-- Hangs -->
+	<!-- Timing sensitive, hangs (often on real hardware too) -->
 	<software name="starforc" supported="no">
 		<description>Star Force</description>
 		<year>2011</year>
@@ -1441,6 +1441,18 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="star-force-2011.rom" size="32768" crc="cbc58796" sha1="fc80400f413545efa6d276efd8c09048a043b901" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Fixed version -->
+	<software name="starforcf" cloneof="starforc">
+		<description>Star Force (fixed)</description>
+		<year>2011</year>
+		<publisher>Team Pixelboy</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="starforcepatchedtursi2.rom" size="32768" crc="ce3ff5c7" sha1="817f6dd26bddad207c9817fe0cc9c81f9dfec38b" />
 			</dataarea>
 		</part>
 	</software>
