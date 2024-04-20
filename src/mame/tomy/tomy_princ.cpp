@@ -81,15 +81,17 @@ private:
 	required_device<mb90611_device> m_maincpu;
 	required_device<timer_device> m_scantimer;
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scan_interrupt);
 
+	DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void princ_map(address_map &map);
 
 	u8 read_gpu_status();
 
-	uint32_t screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	bool bFirstPort8Read = false;
 };
@@ -104,6 +106,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(tomy_princ_state::scan_interrupt)
 
 	m_maincpu->tin1_w(ASSERT_LINE);
 	m_maincpu->tin1_w(CLEAR_LINE);
+}
+
+void tomy_princ_state::machine_start()
+{
+	if (m_cart->exists())
+	{
+		memory_region *const cart_rom = m_cart->memregion("rom");
+		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x87ffff, cart_rom->base());
+	}
 }
 
 void tomy_princ_state::machine_reset()
@@ -122,9 +133,60 @@ u8 tomy_princ_state::read_gpu_status()
 	return 0x00;
 }
 
-uint32_t tomy_princ_state::screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 tomy_princ_state::screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(tomy_princ_state::cart_load)
+{
+	u64 length;
+	memory_region *cart_rom = nullptr;
+	if (m_cart->loaded_through_softlist())
+	{
+		cart_rom = m_cart->memregion("rom");
+		if (!cart_rom)
+		{
+			return std::make_pair(image_error::BADSOFTWARE, "Software list item has no 'rom' data area");
+		}
+		length = cart_rom->bytes();
+	}
+	else
+	{
+		length = m_cart->length();
+	}
+
+	if (!length)
+	{
+		return std::make_pair(image_error::INVALIDLENGTH, "Cartridges must not be empty");
+	}
+	if (length & 1)
+	{
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be a multiple of 2 bytes)");
+	}
+
+	if (!m_cart->loaded_through_softlist())
+	{
+		cart_rom = machine().memory().region_alloc(m_cart->subtag("rom"), length, 2, ENDIANNESS_LITTLE);
+		if (!cart_rom)
+		{
+			return std::make_pair(std::errc::not_enough_memory, std::string());
+		}
+
+		u16 *const base = reinterpret_cast<u16 *>(cart_rom->base());
+		if (m_cart->fread(base, length) != length)
+		{
+			return std::make_pair(std::errc::io_error, "Error reading cartridge file");
+		}
+
+		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
+		{
+			for (u64 i = 0; (length / 2) > i; ++i)
+				base[i] = swapendian_int16(base[i]);
+		}
+	}
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 // fe2d25
@@ -158,6 +220,11 @@ void tomy_princ_state::tomy_princ(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(tomy_princ_state::scan_interrupt), "screen", 0, 1);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "princ_cart");
+	m_cart->set_endian(ENDIANNESS_LITTLE);
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(tomy_princ_state::cart_load));
+	m_cart->set_must_be_loaded(false);
+
 	SOFTWARE_LIST(config, "cart_list").set_original("princ");
 }
 

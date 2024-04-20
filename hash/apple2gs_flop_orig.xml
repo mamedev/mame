@@ -3096,16 +3096,16 @@ license:CC0-1.0
 	</software>
 
 	<software name="calcraft">
-		<description>Calendar Crafter (version 1.2)</description>
+		<description>Calendar Crafter (A-194 version 1.2)</description>
 		<year>1987</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A194" />
+		<info name="partno" value="A-194" />
 		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Diane Portner, Steven D. Splinter, and Paul R. Wenker" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-06-25 -->
-		<!-- productivity program -->
+		<!--Dump released: 2021-06-25-->
+		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345411">
 				<rom name="calendar crafter iigs.woz" size="1345411" crc="6308e6ba" sha1="b127dfaaa517b49636854de03540602d7c698e1b" />
@@ -3114,10 +3114,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnprnt">
-		<description>Designer Prints (version 1.0)</description>
+		<description>Designer Prints (A-252 version 1.0)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A252" />
+		<info name="partno" value="A-252" />
 		<info name="programmer" value="Diane Portner, Michael Stein, Brian Walker, and Paul Wenker" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
@@ -3139,7 +3139,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnpuzl">
-		<description>Designer Puzzles (version 1.0)</description>
+		<description>Designer Puzzles (A-223 version 1.0)</description>
 		<year>1990</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A223" />

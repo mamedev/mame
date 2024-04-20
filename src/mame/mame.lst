@@ -17461,6 +17461,7 @@ mjembase                        // "38" Mahjong Electromagnetic Base 1989 Dynax
 mjfriday                        // "26" (c) 1989 Dynax
 mjreach                         // (c) 1994 Dynax
 mjreachbl                       // (c) 1994 bootleg
+mjreachp2                       // (c) 1994 Dynax
 neruton                         // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 nerutona                        // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 ougonhai                        // "62" (c) 1991 Dynax
@@ -18486,6 +18487,7 @@ blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
 bmxstunts                       // (c) 1985 Jetsoft
 bomber                          //
 bongo                           // (c) 1983 Jetsoft
+bongoa                          // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago
 catacomb                        // 1982 MTM Games
 checkman                        // (c) 1982 Zilec-Zenitone
@@ -20067,6 +20069,7 @@ wcat3a                          //
 wcherry                         // bootleg
 
 @source:igs/igs009.cpp
+animalhjb                       // bootleg
 gp98                            // (c) 1998
 gp98a                           // (c) 1998
 jingbell                        // (c) 1997
@@ -20152,9 +20155,10 @@ cjdh2a                          // (c) 200?
 cjdh2b                          // (c) 200?
 cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
-lhtb                            // (c) 200?
+lhtb                            // (c) 2009
 lhzb3in1                        // (c) 200?
 mghammer                        // (c) 2015
+qhzb                            // (c) 2007
 
 @source:igs/igspoker.cpp
 chleague                        // (c) 199? IGS
@@ -34141,6 +34145,7 @@ tubepb                          // (c) 1984 + bootleg
 
 @source:nichibutsu/wiping.cpp
 rugrats                         // (c) 1983
+shettle                         // (c) 1984
 wiping                          // (c) 1982
 
 @source:nintendo/aleck64.cpp

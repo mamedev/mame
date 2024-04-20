@@ -105,17 +105,17 @@ uint8_t sv603_device::mreq_r(offs_t offset)
 	uint8_t data = 0xff;
 
 	// ls138 (active low)
-	int ccs1 = ((offset >> 13) == 0) ? 0 : 1;
-	int ccs2 = ((offset >> 13) == 1) ? 0 : 1;
-	int ccs3 = ((offset >> 13) == 2) ? 0 : 1;
-	int ccs4 = ((offset >> 13) == 3) ? 0 : 1;
-	int bios = ((offset >> 13) == 4) ? 0 : 1;
+	const int ccs1 = ((offset >> 13) == 0) ? 0 : 1;
+	const int ccs2 = ((offset >> 13) == 1) ? 0 : 1;
+	const int ccs3 = ((offset >> 13) == 2) ? 0 : 1;
+	const int ccs4 = ((offset >> 13) == 3) ? 0 : 1;
+	const int bios = ((offset >> 13) == 4) ? 0 : 1;
 	// 5, 6, 7: not connected
 
 	m_expander->romdis_w(0);
 	m_expander->ramdis_w(bios);
 
-	data &= m_cart->bd_r(offset, data, ccs1, ccs2, ccs3, ccs4);
+	data &= m_cart->read(offset, ccs1, ccs2, ccs3, ccs4);
 
 	if (bios == 0)
 		data &= m_bios->as_u8(offset & 0x1fff);
@@ -125,7 +125,16 @@ uint8_t sv603_device::mreq_r(offs_t offset)
 
 void sv603_device::mreq_w(offs_t offset, uint8_t data)
 {
+	const int ccs1 = ((offset >> 13) == 0) ? 0 : 1;
+	const int ccs2 = ((offset >> 13) == 1) ? 0 : 1;
+	const int ccs3 = ((offset >> 13) == 2) ? 0 : 1;
+	const int ccs4 = ((offset >> 13) == 3) ? 0 : 1;
+	const int bios = ((offset >> 13) == 4) ? 0 : 1;
+
 	m_expander->romdis_w(0);
+	m_expander->ramdis_w(bios);
+
+	m_cart->write(offset, data, ccs1, ccs2, ccs3, ccs4);
 }
 
 uint8_t sv603_device::iorq_r(offs_t offset)

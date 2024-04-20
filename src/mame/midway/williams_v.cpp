@@ -210,24 +210,23 @@ void williams2_state::video_start()
 
 uint32_t williams_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// precompute the palette
 	rgb_t pens[16];
-
-	/* precompute the palette */
 	for (int x = 0; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
-	/* loop over rows */
+	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint8_t const *const source = &m_videoram[y];
 		uint32_t *const dest = &bitmap.pix(y);
 
-		/* loop over columns */
+		// loop over columns
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			uint8_t const pix = source[(x/2) * 256];
-			dest[x+0] = pens[pix >> 4];
-			dest[x+1] = pens[pix & 0x0f];
+			uint8_t const pix = source[(x / 2) * 256];
+			dest[x + 0] = pens[pix >> 4];
+			dest[x + 1] = pens[pix & 0x0f];
 		}
 	}
 	return 0;

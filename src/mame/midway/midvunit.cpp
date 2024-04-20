@@ -30,6 +30,8 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/nvram.h"
 
+#include "speaker.h"
+
 #include "crusnusa.lh"
 
 
@@ -1105,7 +1107,11 @@ void midvunit_state::midvunit(machine_config &config)
 	m_adc->ch3_callback().set_ioport("BRAKE");
 
 	/* sound hardware */
-	DCS_AUDIO_2K(config, "dcs", 0);
+	SPEAKER(config, "mono").front_center();
+
+	DCS_AUDIO_2K(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 
@@ -1141,14 +1147,25 @@ void midvunit_state::midvplus(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
 	MIDWAY_IOASIC(config, m_midway_ioasic, 0);
+	m_midway_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_midway_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_midway_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_midway_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_midway_ioasic->set_dcs_tag(m_dcs);
 	m_midway_ioasic->set_shuffle(0);
 	m_midway_ioasic->set_upper(452); /* no alternates */
 	m_midway_ioasic->set_yearoffs(94);
 
 	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 }
 
 

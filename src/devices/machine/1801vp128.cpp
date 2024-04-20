@@ -45,7 +45,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(K1801VP128, k1801vp128_device, "1801vp1-128", "1801VP1-128")
+DEFINE_DEVICE_TYPE(K1801VP128, k1801vp128_device, "1801vp1_128", "1801VP1-128 FDC")
 
 
 

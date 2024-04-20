@@ -158,21 +158,25 @@ void williams2_state::bank_select_w(u8 data)
  *
  *************************************/
 
+template <unsigned A, unsigned... B>
 TIMER_CALLBACK_MEMBER(williams_state::deferred_snd_cmd_w)
 {
-	m_pia[2]->portb_w(param);
-	m_pia[2]->cb1_w((param == 0xff) ? 0 : 1);
+	m_pia[A]->portb_w(param);
+	m_pia[A]->cb1_w((param == 0xff) ? 0 : 1);
+
+	if constexpr (sizeof...(B) > 0)
+		deferred_snd_cmd_w<B...>(param);
 }
 
 void williams_state::snd_cmd_w(u8 data)
 {
-	/* the high two bits are set externally, and should be 1 */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::deferred_snd_cmd_w),this), data | 0xc0);
+	// the high two bits are set externally, and should be 1
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::deferred_snd_cmd_w<2>), this), data | 0xc0);
 }
 
-void playball_state::snd_cmd_w(u8 data)
+void williams_state::playball_snd_cmd_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(playball_state::deferred_snd_cmd_w),this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::deferred_snd_cmd_w<2>), this), data);
 }
 
 TIMER_CALLBACK_MEMBER(williams2_state::deferred_snd_cmd_w)
@@ -214,7 +218,7 @@ void williams2_state::snd_cmd_w(u8 data)
 
 u8 williams_state::port_0_49way_r()
 {
-	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
+	static const u8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[m_49way_x->read() >> 4] << 4) | translate49[m_49way_y->read() >> 4];
 }
 
@@ -226,17 +230,10 @@ u8 williams_state::port_0_49way_r()
  *
  *************************************/
 
-void williams_state::cmos_w(offs_t offset, u8 data)
+void williams_state::cmos_4bit_w(offs_t offset, u8 data)
 {
-	/* only 4 bits are valid */
+	// only 4 bits are valid
 	m_nvram[offset] = data | 0xf0;
-}
-
-
-void bubbles_state::cmos_w(offs_t offset, u8 data)
-{
-	/* bubbles has additional CMOS for a full 8 bits */
-	m_nvram[offset] = data;
 }
 
 
@@ -311,6 +308,22 @@ void williams2_state::segments_w(u8 data)
  *
  *************************************/
 
+void defender_state::machine_start()
+{
+	williams_state::machine_start();
+
+	memory_region *const banked_rom = memregion("banked");
+	unsigned const banks = banked_rom->bytes() / 0x1000;
+	for (unsigned i = 0; 15 > i; ++i)
+	{
+		if ((i < 9) && (i < banks))
+			m_rom_view[i + 1].install_rom(0xc000, 0xcfff, banked_rom->base() + (i * 0x1000));
+		else
+			m_rom_view[i + 1];
+	}
+}
+
+
 void defender_state::machine_reset()
 {
 	williams_state::machine_reset();
@@ -327,10 +340,7 @@ void defender_state::video_control_w(u8 data)
 
 void defender_state::bank_select_w(u8 data)
 {
-	if ((data & 0x0f) < 10)
-		m_rom_view.select(data & 0x0f);
-	else
-		m_rom_view.disable();
+	m_rom_view.select(data & 0x0f);
 }
 
 
@@ -359,30 +369,20 @@ u8 mayday_state::protection_r(offs_t offset)
  *
  *************************************/
 
-void sinistar_state::vram_select_w(u8 data)
+void williams_state::sinistar_vram_select_w(u8 data)
 {
-	/* low two bits are standard */
-	williams_state::vram_select_w(data);
+	// low two bits are standard
+	vram_select_w(data);
 
-	/* window enable from bit 2 (clips to 0x7400) */
+	// window enable from bit 2 (clips to 0x7400)
 	m_blitter_window_enable = BIT(data, 2);
 }
 
 
-TIMER_CALLBACK_MEMBER(sinistar_state::cockpit_deferred_snd_cmd_w)
+void williams_state::cockpit_snd_cmd_w(u8 data)
 {
-	m_pia[2]->portb_w(param);
-	m_pia[2]->cb1_w((param == 0xff) ? 0 : 1);
-
-	m_pia[3]->portb_w(param);
-	m_pia[3]->cb1_w((param == 0xff) ? 0 : 1);
-}
-
-
-void sinistar_state::cockpit_snd_cmd_w(u8 data)
-{
-	/* the high two bits are set externally, and should be 1 */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sinistar_state::cockpit_deferred_snd_cmd_w), this), data | 0xc0);
+	// the high two bits are set externally, and should be 1
+	machine().scheduler().synchronize(timer_expired_delegate(NAME((&williams_state::deferred_snd_cmd_w<2, 3>)), this), data | 0xc0);
 }
 
 
@@ -397,7 +397,7 @@ void blaster_state::machine_start()
 {
 	williams_state::machine_start();
 
-	/* banking is different for blaster */
+	// banking is different for blaster
 	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
@@ -409,18 +409,18 @@ void blaster_state::machine_reset()
 }
 
 
-void blaster_state::vram_select_w(u8 data)
+void blaster_state::blaster_vram_select_w(u8 data)
 {
-	/* VRAM/ROM banking from bit 0 */
+	// VRAM/ROM banking from bit 0
 	if (BIT(data, 0))
 		m_rom_view.select(0);
 	else
 		m_rom_view.disable();
 
-	/* cocktail flip from bit 1 */
+	// cocktail flip from bit 1
 	m_cocktail = BIT(data, 1);
 
-	/* window enable from bit 2 (clips to 0x9700) */
+	// window enable from bit 2 (clips to 0x9700)
 	m_blitter_window_enable = BIT(data, 2);
 }
 
@@ -433,8 +433,8 @@ void blaster_state::bank_select_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(blaster_state::deferred_snd_cmd_w)
 {
-	uint8_t const l_data = param | 0x80;
-	uint8_t const r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
+	u8 const l_data = param | 0x80;
+	u8 const r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
 	m_pia[2]->portb_w(l_data); m_pia[2]->cb1_w((l_data == 0xff) ? 0 : 1);
 	m_pia[3]->portb_w(r_data); m_pia[3]->cb1_w((r_data == 0xff) ? 0 : 1);
@@ -457,6 +457,21 @@ void blaster_state::blaster_snd_cmd_w(u8 data)
 void williams2_state::video_control_w(u8 data)
 {
 	m_cocktail = BIT(data, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Mystic Marathon-specific routines
+ *
+ *************************************/
+
+void mysticm_state::machine_start()
+{
+	williams2_state::machine_start();
+
+	save_item(NAME(m_bg_color));
 }
 
 

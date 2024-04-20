@@ -118,6 +118,7 @@ const double XTAL::known_xtals[] = {
 	  4'433'619, /* 4.433619_MHz_XTAL      PAL color subcarrier (technically 4.43361875mhz)*/
 	  4'608'000, /* 4.608_MHz_XTAL         Luxor ABC-77 keyboard (Keytronic custom part #48-300-107 is equivalent) */
 	  4'915'200, /* 4.9152_MHz_XTAL        - */
+	  4'952'000, /* 4.952_MHz_XTAL         IGS M036 based mahjong games, for TT5665 sound chip */
 	  5'000'000, /* 5_MHz_XTAL             Mutant Night */
 	  5'068'800, /* 5.0688_MHz_XTAL        Usually used as MC2661 or COM8116 baud rate clock */
 	  5'185'000, /* 5.185_MHz_XTAL         Intel INTELLEC® 4 */
@@ -209,7 +210,6 @@ const double XTAL::known_xtals[] = {
 	 12'292'000, /* 12.292_MHz_XTAL        Northwest Digitial Systems GP-19 */
 	 12'324'000, /* 12.324_MHz_XTAL        Otrona Attache */
 	 12'335'600, /* 12.3356_MHz_XTAL       RasterOps ColorBoard 264 (~784x NTSC line rate) */
-	 12'432'000, /* 12.432_MHz_XTAL        Kaneko Fly Boy/Fast Freddie Hardware */
 	 12'472'500, /* 12.4725_MHz_XTAL       Bonanza's Mini Boy 7 */
 	 12'480'000, /* 12.48_MHz_XTAL         TRS-80 Model II */
 	 12'500'000, /* 12.5_MHz_XTAL          Red Alert audio board */

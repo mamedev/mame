@@ -50,7 +50,9 @@ see gameking.xml for information about cartridge types
 		<part name="cart" interface="gameking_cart">
 			<feature name="pcb" value="2007D / APR 23 05 / REV:1.0"/>
 			<dataarea name="rom" size="524288">
-				<rom name="panzer.gk3" size="524288" crc="54c7389e" sha1="1fe26d743ad02b466d045aa53706b13c8be2fe2e"/>
+				<rom name="panzer.gk3" size="524288" crc="52d24c9e" sha1="c6d0aed0b6bf3ff5f8f31973a8e347fe7ceeb52f"/>
+				<!-- in the ROM below address 0xc0a8 has been flipped from 0xff to 0xbf, this is in an unused fill area and likely just bitrot -->
+				<!-- <rom name="panzer.gk3" size="524288" crc="54c7389e" sha1="1fe26d743ad02b466d045aa53706b13c8be2fe2e"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -84,6 +86,28 @@ see gameking.xml for information about cartridge types
 		<part name="cart" interface="gameking_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="vagrant.gk3" size="524288" crc="db50e1c9" sha1="80f27ec7973d336e12ee506f090440db35ecf183"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diamond" supported="partial">
+		<description>Diamond</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="diamond.gk3" size="524288" crc="9b968d49" sha1="ce3de488ebb65ba9802670ea1558761d5aadb7f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hemic" supported="partial">
+		<description>Hemic Battle</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="hemicbattle.gk3" size="524288" crc="87465984" sha1="60032e52e3ef56be739ce0f6180891a44b68380d"/>
 			</dataarea>
 		</part>
 	</software>

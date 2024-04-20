@@ -44,6 +44,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 94 Castle Of Dracula                                 Z80   M6295                            PROM  Blitter is an FPGA
 94 Mj Reach                CS166P002                 TLCS  YM2149F       YM2413       M6242 PROM  Battery
 94 Mj Reach (bootleg)      bootleg                   TLCS  AY8910        YM2413       M6242 PROM  Battery
+94 Mj Reach Part II        D8810138L1                TLCS  YM2149F       YM2413       M6242 PROM  Battery
 94 Maya                                              Z80          YM2203                    PROM  Blitter is an FPGA
 9? Inca                                              Z80          YM2203                    PROM
 ---------------------------------------------------------------------------------------------------------------------
@@ -1257,6 +1258,13 @@ void dynax_state::tenkai_banked_map(address_map &map)
 	map(0x00000, 0x3ffff).rom().region("maincpu", 0x10000);
 	map(0x80000, 0x8000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x90000, 0x97fff).rw(FUNC(dynax_state::tenkai_palette_r), FUNC(dynax_state::tenkai_palette_w));
+}
+
+void dynax_state::mjreachp2_map(address_map &map)
+{
+	tenkai_map(map);
+
+	map(0x10058, 0x10058).w(FUNC(dynax_state::dynax_blit_romregion_w));
 }
 
 void dynax_state::ougonhai_map(address_map &map) // TODO: verify once the protection is beaten
@@ -5048,6 +5056,26 @@ void dynax_state::gekisha(machine_config &config)
 	YM2413(config, "ym2413", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0); // ?
 }
 
+/***************************************************************************
+                           Mahjong Reach Part II
+***************************************************************************/
+
+void dynax_state::mjreachp2_p8_w(uint8_t data)
+{
+	m_rombank = (data & 0x08) ? (m_rombank & 0x0f) : (m_rombank & 0x0f) | 0x10;
+	tenkai_update_rombank();
+}
+
+
+void dynax_state::mjreachp2(machine_config &config)
+{
+	mjreach(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::mjreachp2_map);
+
+	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
+	tmp.port_write<8>().set(FUNC(dynax_state::mjreachp2_p8_w));
+}
 
 /***************************************************************************
 
@@ -6716,6 +6744,20 @@ ROM_START( mjreachbl )
 	ROM_RELOAD(          0x180000, 0x80000 )
 ROM_END
 
+ROM_START( mjreachp2 ) // BTANB: typo on title screen shows 'Mahjong Reach Rart II' (verified with reference pics)
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "880q.wc",         0x00000, 0x40000, CRC(a92954bc) SHA1(473778eabd0ecc7b66c7e66ab7eb3d8b40554434) )
+	ROM_RELOAD(                  0x10000, 0x40000 )
+	ROM_LOAD( "mjreach2-mcu.5b", 0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // MCU has pins 9 to 12 & 15 to 16 stripped out
+
+	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
+	ROM_LOAD( "8802.13b", 0x000000, 0x80000, CRC(90f6036f) SHA1(f92aafd0316dc235e58d615825f3110806bc2cf9) )
+	ROM_LOAD( "8803.15b", 0x080000, 0x40000, CRC(ce1fb102) SHA1(ad7da2054b860277fac23da72d261f880224541e) )
+	ROM_RELOAD(           0x0c0000, 0x40000 )
+	ROM_LOAD( "8802.13b", 0x100000, 0x80000, CRC(90f6036f) SHA1(f92aafd0316dc235e58d615825f3110806bc2cf9) )
+	ROM_RELOAD(           0x180000, 0x80000 )
+ROM_END
+
 /***************************************************************************
 
 Mahjong Tenkaigen
@@ -7405,8 +7447,9 @@ GAME( 1991, ougonhai,   0,        ougonhai,   tenkai,   dynax_state,       empty
 GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach",                                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver 1.00, bootleg)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreachp2,  mjreach,  mjreachp2,  mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach Part II (Ver. D88)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, cdracula,   0,        cdracula,   cdracula, cdracula_state,    empty_init,    ROT0,   "Yun Sung (Escape license)", "Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a Dynax board
 GAME( 1995, shpeng,     0,        sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "WSAC Systems?",             "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a Dynax board. PROMs?
 GAME( 1995, intrgirl,   0,        sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "Barko",                     "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a Dynax board.

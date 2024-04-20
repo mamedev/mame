@@ -71,8 +71,10 @@ with a ``version`` attribute specifying the configuration format version
 (currently ``10`` – MAME will not load a file using a different version).  The
 ``mameconfig`` element contains one or more ``system`` elements, each of which
 has a ``name`` attribute specifying the system(s) it applies to.  Each
-``system`` element contains an ``input`` element which holds the actual
+``system`` element may contain an ``input`` element which holds the actual
 ``remap`` and ``port`` configuration elements, which will be described later.
+Each ``system`` element may also contain a ``pointer_input`` element to set
+pointer input options for systems with interactive artwork.
 
 When launching an emulated system, MAME will apply configuration from ``system``
 elements where the value of the ``name`` attribute meets one of the following
@@ -261,3 +263,45 @@ MAME applies ``mapdevice`` elements found inside the first applicable ``system``
 element only.  To avoid confusion, it’s simplest to place the ``system`` element
 applying to all systems (``name`` attribute set to ``default``) first in the
 file, and use it to assign input device numbers.
+
+
+.. _ctrlrcfg-pointers:
+
+Setting pointer input options
+-----------------------------
+
+A ``pointer_input`` element may contain ``target`` elements to set pointer input
+options for each output screen or window.  Each ``target`` element must have an
+``index`` attribute containing the zero-based index of the screen to which it
+applies.
+
+Each ``target`` element may have an ``activity_timeout`` attribute to set the
+time after which a mouse pointer that has not moved and has no buttons pressed
+will be considered inactive.  The value is specified in seconds, and must be in
+the range of 0.1 seconds to 10 seconds, inclusive.
+
+Each ``target`` element may have a ``hide_inactive`` element to set whether
+inactive pointers may be hidden.  If the value is ``0`` (zero), inactive
+pointers will not be hidden.  If the value is ``1``, inactive pointers may be
+hidden, but layout views can still specify that inactive pointers should not be
+hidden.
+
+Here’s an example demonstrating the use of this feature:
+
+.. code-block:: XML
+
+    <system name="default">
+        <pointer_input>
+            <target index="0" activity_timeout="1.5" />
+        </pointer_input>
+    </system>
+    <system name="intellec4.cpp">
+        <pointer_input>
+            <target index="0" hide_inactive="0" />
+        </pointer_input>
+    </system>
+
+For all systems, pointers over the first output screen or window will be
+considered inactive after not moving for 1.5 seconds with no buttons pressed.
+For systems defined in ``intellec4.cpp``, inactive pointers over the first
+window will not be hidden.
