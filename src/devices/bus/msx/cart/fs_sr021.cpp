@@ -21,12 +21,7 @@ public:
 		: device_t(mconfig, MSX_CART_FS_SR021, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
 		, m_bank(*this, "bank%u", 0U)
-		, m_view_0000(*this, "view0000")
-		, m_view_2000(*this, "view2000")
-		, m_view_4000(*this, "view4000")
-		, m_view_6000(*this, "view6000")
-		, m_view_8000(*this, "view8000")
-		, m_view_a000(*this, "viewa000")
+		, m_view{ {*this, "view0000"}, {*this, "view2000"}, {*this, "view4000"}, {*this, "view6000"}, {*this, "view8000"}, {*this, "viewa000"} }
 	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
@@ -47,12 +42,7 @@ private:
 	void kanji_w(offs_t offset, u8 data);
 
 	memory_bank_array_creator<6> m_bank;
-	memory_view m_view_0000;
-	memory_view m_view_2000;
-	memory_view m_view_4000;
-	memory_view m_view_6000;
-	memory_view m_view_8000;
-	memory_view m_view_a000;
+	memory_view m_view[6];
 	u8 m_selected_bank[6];
 	u8 m_control;
 	u32 m_kanji_latch;
@@ -68,12 +58,8 @@ void msx_cart_fs_sr021_device::device_start()
 void msx_cart_fs_sr021_device::device_reset()
 {
 	m_control = 0;
-	m_view_0000.select(0);
-	m_view_2000.select(0);
-	m_view_4000.select(0);
-	m_view_6000.select(0);
-	m_view_8000.select(0);
-	m_view_a000.select(0);
+	for (int i = 0; i < 6; i++)
+		m_view[i].select(0);
 	m_bank[2]->set_entry(0);
 }
 
@@ -113,30 +99,22 @@ std::error_condition msx_cart_fs_sr021_device::initialize_cartridge(std::string 
 		m_bank[i]->configure_entry(0x81, cart_sram_region()->base() + BANK_SIZE);
 	}
 
-	page(0)->install_view(0x0000, 0x1fff, m_view_0000);
-	m_view_0000[0].install_read_bank(0x0000, 0x1fff, m_bank[0]);
-	m_view_0000[1].install_readwrite_bank(0x0000, 0x1fff, m_bank[0]);
-	page(0)->install_view(0x2000, 0x3fff, m_view_2000);
-	m_view_2000[0].install_read_bank(0x2000, 0x3fff, m_bank[1]);
-	m_view_2000[1].install_readwrite_bank(0x2000, 0x3fff, m_bank[1]);
+	for (int pg = 0; pg < 3; pg++)
+	{
+		const offs_t start = pg * 0x4000;
+		const int index = pg * 2;
+		page(pg)->install_view(start, start + 0x1fff, m_view[index]);
+		m_view[index][0].install_read_bank(start, start + 0x1fff, m_bank[index]);
+		m_view[index][1].install_readwrite_bank(start, start + 0x1fff, m_bank[index]);
+		page(pg)->install_view(start + 0x2000, start + 0x3fff, m_view[index + 1]);
+		m_view[index + 1][0].install_read_bank(start + 0x2000, start + 0x3fff, m_bank[index + 1]);
+		m_view[index + 1][1].install_readwrite_bank(start + 0x2000, start + 0x3fff, m_bank[index + 1]);
+	}
 
-	page(1)->install_view(0x4000, 0x5fff, m_view_4000);
-	m_view_4000[0].install_read_bank(0x4000, 0x5fff, m_bank[2]);
-	m_view_4000[1].install_readwrite_bank(0x4000, 0x5fff, m_bank[2]);
-	page(1)->install_view(0x6000, 0x7fff, m_view_6000);
-	m_view_6000[0].install_read_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view_6000[1].install_readwrite_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view_6000[2].install_read_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view_6000[2].install_read_handler(0x7ff0, 0x7ff5, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::bank_r)));
-	m_view_6000[3].install_readwrite_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view_6000[3].install_read_handler(0x7ff0, 0x7ff5, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::bank_r)));
-
-	page(2)->install_view(0x8000, 0x9fff, m_view_8000);
-	m_view_8000[0].install_read_bank(0x8000, 0x9fff, m_bank[4]);
-	m_view_8000[1].install_readwrite_bank(0x8000, 0x9fff, m_bank[4]);
-	page(2)->install_view(0xa000, 0xbfff, m_view_a000);
-	m_view_a000[0].install_read_bank(0xa000, 0xbfff, m_bank[5]);
-	m_view_a000[1].install_readwrite_bank(0xa000, 0xbfff, m_bank[5]);
+	m_view[3][2].install_read_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view[3][2].install_read_handler(0x7ff0, 0x7ff5, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::bank_r)));
+	m_view[3][3].install_readwrite_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view[3][3].install_read_handler(0x7ff0, 0x7ff5, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::bank_r)));
 
 	page(1)->install_write_handler(0x6000, 0x6000, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::bank_w<0>))); // 0000-1fff
 	page(1)->install_write_handler(0x6400, 0x6400, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::bank_w<1>))); // 2000-3fff
@@ -157,18 +135,10 @@ template <int Bank>
 void msx_cart_fs_sr021_device::set_view()
 {
 	bool ram_active = (m_selected_bank[Bank] >= 0x80 && m_selected_bank[Bank] < 0x82);
-	if (Bank == 0)
-		m_view_0000.select(ram_active ? 1 : 0);
-	if (Bank == 1)
-		m_view_2000.select(ram_active ? 1 : 0);
-	if (Bank == 2)
-		m_view_4000.select(ram_active ? 1 : 0);
 	if (Bank == 3)
-		m_view_6000.select((BIT(m_control, 2) ? 2 : 0) | (ram_active ? 1 : 0));
-	if (Bank == 4)
-		m_view_8000.select(ram_active ? 1 : 0);
-	if (Bank == 5)
-		m_view_a000.select(ram_active ? 1 : 0);
+		m_view[Bank].select((BIT(m_control, 2) ? 2 : 0) | (ram_active ? 1 : 0));
+	else
+		m_view[Bank].select(ram_active ? 1 : 0);
 }
 
 template <int Bank>

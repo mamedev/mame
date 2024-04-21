@@ -104,9 +104,7 @@ public:
 		, msx_cart_interface(mconfig, *this)
 		, m_mb89352a(*this, "scsi:7:mb89352a")
 		, m_srambank(*this, "srambank%u", 0U)
-		, m_view0(*this, "view0")
-		, m_view2(*this, "view2")
-		, m_view3(*this, "view3")
+		, m_view{ {*this, "view0"}, {*this, "view1"}, {*this, "view2"}, {*this, "view3"} }
 		, m_bank_mask(0)
 	{ }
 
@@ -124,9 +122,7 @@ private:
 
 	required_device<mb89352_device> m_mb89352a;
 	memory_bank_array_creator<4> m_srambank;
-	memory_view m_view0;
-	memory_view m_view2;
-	memory_view m_view3;
+	memory_view m_view[4];
 	u8 m_bank_mask;
 
 	template <int Bank> void bank_w(u8 data);
@@ -150,10 +146,11 @@ void msx_cart_mega_scsi_device::device_add_mconfig(machine_config &config)
 void msx_cart_mega_scsi_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
+	{
+		if (i != 1)
+			m_view[i].select(0);
 		m_srambank[i]->set_entry(0);
-	m_view0.select(0);
-	m_view2.select(0);
-	m_view3.select(0);
+	}
 }
 
 std::error_condition msx_cart_mega_scsi_device::initialize_cartridge(std::string &message)
@@ -178,31 +175,31 @@ std::error_condition msx_cart_mega_scsi_device::initialize_cartridge(std::string
 	for (int i = 0; i < 4; i++)
 		m_srambank[i]->configure_entries(0, sram_banks, cart_sram_region()->base(), BANK_SIZE);
 
-	page(1)->install_view(0x4000, 0x5fff, m_view0);
-	m_view0[0].install_read_bank(0x4000, 0x5fff, m_srambank[0]);
-	m_view0[1].install_readwrite_bank(0x4000, 0x5fff, m_srambank[0]);
-	m_view0[2].install_read_handler(0x4000, 0x4fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_r)));
-	m_view0[2].install_write_handler(0x4000, 0x4fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_w)));
+	page(1)->install_view(0x4000, 0x5fff, m_view[0]);
+	m_view[0][0].install_read_bank(0x4000, 0x5fff, m_srambank[0]);
+	m_view[0][1].install_readwrite_bank(0x4000, 0x5fff, m_srambank[0]);
+	m_view[0][2].install_read_handler(0x4000, 0x4fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_r)));
+	m_view[0][2].install_write_handler(0x4000, 0x4fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_w)));
 	// mb89352 is mirrored at 5000 - 5fff
-	for (int i = 0; i < 0x1000; i += 0x10)
-		m_view0[2].install_device(0x5000 + i, 0x500f + i, *m_mb89352a, &mb89352_device::map);
+	for (int addr = 0x5000; addr < 0x6000; addr += 0x10)
+		m_view[0][2].install_device(addr, addr + 0x0f, *m_mb89352a, &mb89352_device::map);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_srambank[1]);
-	page(2)->install_view(0x8000, 0x9fff, m_view2);
-	m_view2[0].install_read_bank(0x8000, 0x9fff, m_srambank[2]);
-	m_view2[1].install_readwrite_bank(0x8000, 0x9fff, m_srambank[2]);
-	m_view2[2].install_read_handler(0x8000, 0x8fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_r)));
-	m_view2[2].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_w)));
+	page(2)->install_view(0x8000, 0x9fff, m_view[2]);
+	m_view[2][0].install_read_bank(0x8000, 0x9fff, m_srambank[2]);
+	m_view[2][1].install_readwrite_bank(0x8000, 0x9fff, m_srambank[2]);
+	m_view[2][2].install_read_handler(0x8000, 0x8fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_r)));
+	m_view[2][2].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_w)));
 	// mb89352 is mirrored at 9000 - 9fff
-	for (int i = 0; i < 0x1000; i += 0x10)
-		m_view2[2].install_device(0x9000 + i, 0x900f + i, *m_mb89352a, &mb89352_device::map);
-	page(2)->install_view(0xa000, 0xbfff, m_view3);
-	m_view3[0].install_read_bank(0xa000, 0xbfff, m_srambank[3]);
-	m_view3[1].install_readwrite_bank(0xa000, 0xbfff, m_srambank[3]);
-	m_view3[2].install_read_handler(0xa000, 0xafff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_r)));
-	m_view3[2].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_w)));
+	for (int addr = 0x9000; addr < 0xa000; addr += 0x10)
+		m_view[2][2].install_device(addr, addr + 0x0f, *m_mb89352a, &mb89352_device::map);
+	page(2)->install_view(0xa000, 0xbfff, m_view[3]);
+	m_view[3][0].install_read_bank(0xa000, 0xbfff, m_srambank[3]);
+	m_view[3][1].install_readwrite_bank(0xa000, 0xbfff, m_srambank[3]);
+	m_view[3][2].install_read_handler(0xa000, 0xafff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_r)));
+	m_view[3][2].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*m_mb89352a, FUNC(mb89352_device::dma_w)));
 	// mb89352 is mirrored at b000 - bfff
-	for (int i = 0; i < 0x1000; i += 0x10)
-		m_view3[2].install_device(0xb000 + i, 0xb00f + i, *m_mb89352a, &mb89352_device::map);
+	for (int addr = 0xb000; addr < 0xc000; addr += 0x10)
+		m_view[3][2].install_device(addr, addr + 0x0f, *m_mb89352a, &mb89352_device::map);
 
 	page(1)->install_write_handler(0x6000, 0x67ff, emu::rw_delegate(*this, FUNC(msx_cart_mega_scsi_device::bank_w<0>)));
 	page(1)->install_write_handler(0x6800, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_mega_scsi_device::bank_w<1>)));
@@ -221,12 +218,7 @@ void msx_cart_mega_scsi_device::bank_w(u8 data)
 	{
 		int view_to_select = BIT(data, 7) ? 1 : (BIT(data, 6) ? 2 : 0);
 
-		if (Bank == 0)
-			m_view0.select(view_to_select);
-		if (Bank == 2)
-			m_view2.select(view_to_select);
-		if (Bank == 3)
-			m_view3.select(view_to_select);
+		m_view[Bank].select(view_to_select);
 	}
 }
 

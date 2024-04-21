@@ -21,8 +21,7 @@ public:
 		: device_t(mconfig, MSX_CART_HOLY_QURAN, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
 		, m_rombank(*this, "rombank%u", 0U)
-		, m_view1(*this, "view1")
-		, m_view2(*this, "view2")
+		, m_view{ {*this, "view1"}, {*this, "view2"} }
 	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
@@ -40,8 +39,7 @@ private:
 	template <int Bank> void bank_w(u8 data);
 
 	memory_bank_array_creator<4> m_rombank;
-	memory_view m_view1;
-	memory_view m_view2;
+	memory_view m_view[2];
 
 	std::vector<u8> m_decrypted;
 	u8 m_bank_mask;
@@ -76,27 +74,27 @@ std::error_condition msx_cart_holy_quran_device::initialize_cartridge(std::strin
 	for (int i = 0; i < 4; i++)
 		m_rombank[i]->configure_entries(0, banks, m_decrypted.data(), BANK_SIZE);
 
-	page(1)->install_view(0x4000, 0x7fff, m_view1);
-	m_view1[0].install_read_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::read)));
-	m_view1[1].install_read_bank(0x4000, 0x5fff, m_rombank[0]);
-	m_view1[1].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	m_view1[1].install_write_handler(0x5000, 0x5000, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<0>)));
-	m_view1[1].install_write_handler(0x5400, 0x5400, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<1>)));
-	m_view1[1].install_write_handler(0x5800, 0x5800, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<2>)));
-	m_view1[1].install_write_handler(0x5c00, 0x5c00, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<3>)));
+	page(1)->install_view(0x4000, 0x7fff, m_view[0]);
+	m_view[0][0].install_read_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::read)));
+	m_view[0][1].install_read_bank(0x4000, 0x5fff, m_rombank[0]);
+	m_view[0][1].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
+	m_view[0][1].install_write_handler(0x5000, 0x5000, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<0>)));
+	m_view[0][1].install_write_handler(0x5400, 0x5400, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<1>)));
+	m_view[0][1].install_write_handler(0x5800, 0x5800, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<2>)));
+	m_view[0][1].install_write_handler(0x5c00, 0x5c00, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<3>)));
 
-	page(2)->install_view(0x8000, 0xbfff, m_view2);
-	m_view2[0].install_read_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::read2)));
-	m_view2[1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	m_view2[1].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
+	page(2)->install_view(0x8000, 0xbfff, m_view[1]);
+	m_view[1][0].install_read_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::read2)));
+	m_view[1][1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	m_view[1][1].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 
 	return std::error_condition();
 }
 
 void msx_cart_holy_quran_device::device_reset()
 {
-	m_view1.select(0);
-	m_view2.select(0);
+	m_view[0].select(0);
+	m_view[1].select(0);
 	for (int i = 0; i < 4; i++)
 		m_rombank[i]->set_entry(0);
 }
@@ -108,8 +106,8 @@ u8 msx_cart_holy_quran_device::read(offs_t offset)
 	if (offset + 0x4000 == ((cart_rom_region()->base()[3] << 8) | cart_rom_region()->base()[2]) && !machine().side_effects_disabled())
 	{
 		// Switch to decrypted contents
-		m_view1.select(1);
-		m_view2.select(1);
+		m_view[0].select(1);
+		m_view[1].select(1);
 	}
 	return data;
 }
@@ -121,8 +119,8 @@ u8 msx_cart_holy_quran_device::read2(offs_t offset)
 	if (offset + 0x8000 == ((cart_rom_region()->base()[3] << 8) | cart_rom_region()->base()[2]) && !machine().side_effects_disabled())
 	{
 		// Switch to decrypted contents
-		m_view1.select(1);
-		m_view2.select(1);
+		m_view[0].select(1);
+		m_view[1].select(1);
 	}
 	return data;
 }
