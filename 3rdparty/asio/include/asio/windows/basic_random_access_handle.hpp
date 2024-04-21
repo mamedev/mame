@@ -2,7 +2,7 @@
 // windows/basic_random_access_handle.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -39,6 +39,10 @@ template <typename Executor = any_io_executor>
 class basic_random_access_handle
   : public basic_overlapped_handle<Executor>
 {
+private:
+  class initiate_async_write_some_at;
+  class initiate_async_read_some_at;
+
 public:
   /// The type of the executor associated with the object.
   typedef Executor executor_type;
@@ -75,8 +79,8 @@ public:
   /// Construct a random-access handle without opening it.
   /**
    * This constructor creates a random-access handle without opening it. The
-   * handle needs to be opened or assigned before data can be sent or received
-   * on it.
+   * handle needs to be opened or assigned before data can be written to or read
+   * from it.
    *
    * @param context An execution context which provides the I/O executor that
    * the random-access handle will use, by default, to dispatch handlers for any
@@ -84,10 +88,10 @@ public:
    */
   template <typename ExecutionContext>
   explicit basic_random_access_handle(ExecutionContext& context,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value,
         defaulted_constraint
-      >::type = defaulted_constraint())
+      > = defaulted_constraint())
     : basic_overlapped_handle<Executor>(context)
   {
   }
@@ -127,14 +131,13 @@ public:
   template <typename ExecutionContext>
   basic_random_access_handle(ExecutionContext& context,
       const native_handle_type& handle,
-      typename constraint<
+      constraint_t<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type = 0)
+      > = 0)
     : basic_overlapped_handle<Executor>(context, handle)
   {
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-construct a random-access handle from another.
   /**
    * This constructor moves a random-access handle from one object to another.
@@ -168,7 +171,51 @@ public:
     basic_overlapped_handle<Executor>::operator=(std::move(other));
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+
+  /// Move-construct a random-access handle from a handle of another executor
+  /// type.
+  /**
+   * This constructor moves a random-access handle from one object to another.
+   *
+   * @param other The other random-access handle object from which the
+   * move will occur.
+   *
+   * @note Following the move, the moved-from object is in the same state as if
+   * constructed using the @c basic_random_access_handle(const executor_type&)
+   * constructor.
+   */
+  template<typename Executor1>
+  basic_random_access_handle(basic_random_access_handle<Executor1>&& other,
+      constraint_t<
+        is_convertible<Executor1, Executor>::value,
+        defaulted_constraint
+      > = defaulted_constraint())
+    : basic_overlapped_handle<Executor>(std::move(other))
+  {
+  }
+
+  /// Move-assign a random-access handle from a handle of another executor
+  /// type.
+  /**
+   * This assignment operator moves a random-access handle from one object to
+   * another.
+   *
+   * @param other The other random-access handle object from which the
+   * move will occur.
+   *
+   * @note Following the move, the moved-from object is in the same state as if
+   * constructed using the @c basic_random_access_handle(const executor_type&)
+   * constructor.
+   */
+  template<typename Executor1>
+  constraint_t<
+    is_convertible<Executor1, Executor>::value,
+    basic_random_access_handle&
+  > operator=(basic_random_access_handle<Executor1>&& other)
+  {
+    basic_overlapped_handle<Executor>::operator=(std::move(other));
+    return *this;
+  }
 
   /// Write some data to the handle at the specified offset.
   /**
@@ -239,26 +286,32 @@ public:
   /// Start an asynchronous write at the specified offset.
   /**
    * This function is used to asynchronously write data to the random-access
-   * handle. The function call always returns immediately.
+   * handle. It is an initiating function for an @ref asynchronous_operation,
+   * and always returns immediately.
    *
    * @param offset The offset at which the data will be written.
    *
    * @param buffers One or more data buffers to be written to the handle.
    * Although the buffers object may be copied as necessary, ownership of the
    * underlying memory blocks is retained by the caller, which must guarantee
-   * that they remain valid until the handler is called.
+   * that they remain valid until the completion handler is called.
    *
-   * @param handler The handler to be called when the write operation completes.
-   * Copies will be made of the handler as required. The function signature of
-   * the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the write completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const asio::error_code& error, // Result of operation.
-   *   std::size_t bytes_transferred           // Number of bytes written.
+   *   std::size_t bytes_transferred // Number of bytes written.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
-   * not, the handler will not be invoked from within this function. On
-   * immediate completion, invocation of the handler will be performed in a
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
    * manner equivalent to using asio::post().
+   *
+   * @par Completion Signature
+   * @code void(asio::error_code, std::size_t) @endcode
    *
    * @note The write operation may not transmit all of the data to the peer.
    * Consider using the @ref async_write_at function if you need to ensure that
@@ -285,18 +338,17 @@ public:
    */
   template <typename ConstBufferSequence,
       ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) WriteHandler
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (asio::error_code, std::size_t))
-  async_write_some_at(uint64_t offset,
-      const ConstBufferSequence& buffers,
-      ASIO_MOVE_ARG(WriteHandler) handler
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
+        std::size_t)) WriteToken = default_completion_token_t<executor_type>>
+  auto async_write_some_at(uint64_t offset, const ConstBufferSequence& buffers,
+      WriteToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
+      async_initiate<WriteToken,
+        void (asio::error_code, std::size_t)>(
+          declval<initiate_async_write_some_at>(), token, offset, buffers))
   {
-    return async_initiate<WriteHandler,
+    return async_initiate<WriteToken,
       void (asio::error_code, std::size_t)>(
-        initiate_async_write_some_at(this), handler, offset, buffers);
+        initiate_async_write_some_at(this), token, offset, buffers);
   }
 
   /// Read some data from the handle at the specified offset.
@@ -370,26 +422,32 @@ public:
   /// Start an asynchronous read at the specified offset.
   /**
    * This function is used to asynchronously read data from the random-access
-   * handle. The function call always returns immediately.
+   * handle. It is an initiating function for an @ref asynchronous_operation,
+   * and always returns immediately.
    *
    * @param offset The offset at which the data will be read.
    *
    * @param buffers One or more buffers into which the data will be read.
    * Although the buffers object may be copied as necessary, ownership of the
    * underlying memory blocks is retained by the caller, which must guarantee
-   * that they remain valid until the handler is called.
+   * that they remain valid until the completion handler is called.
    *
-   * @param handler The handler to be called when the read operation completes.
-   * Copies will be made of the handler as required. The function signature of
-   * the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the read completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const asio::error_code& error, // Result of operation.
-   *   std::size_t bytes_transferred           // Number of bytes read.
+   *   std::size_t bytes_transferred // Number of bytes read.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
-   * not, the handler will not be invoked from within this function. On
-   * immediate completion, invocation of the handler will be performed in a
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
    * manner equivalent to using asio::post().
+   *
+   * @par Completion Signature
+   * @code void(asio::error_code, std::size_t) @endcode
    *
    * @note The read operation may not read all of the requested number of bytes.
    * Consider using the @ref async_read_at function if you need to ensure that
@@ -417,18 +475,17 @@ public:
    */
   template <typename MutableBufferSequence,
       ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) ReadHandler
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (asio::error_code, std::size_t))
-  async_read_some_at(uint64_t offset,
-      const MutableBufferSequence& buffers,
-      ASIO_MOVE_ARG(ReadHandler) handler
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
+        std::size_t)) ReadToken = default_completion_token_t<executor_type>>
+  auto async_read_some_at(uint64_t offset, const MutableBufferSequence& buffers,
+      ReadToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
+      async_initiate<ReadToken,
+        void (asio::error_code, std::size_t)>(
+          declval<initiate_async_read_some_at>(), token, offset, buffers))
   {
-    return async_initiate<ReadHandler,
+    return async_initiate<ReadToken,
       void (asio::error_code, std::size_t)>(
-        initiate_async_read_some_at(this), handler, offset, buffers);
+        initiate_async_read_some_at(this), token, offset, buffers);
   }
 
 private:
@@ -442,13 +499,13 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    const executor_type& get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename WriteHandler, typename ConstBufferSequence>
-    void operator()(ASIO_MOVE_ARG(WriteHandler) handler,
+    void operator()(WriteHandler&& handler,
         uint64_t offset, const ConstBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your handler
@@ -475,13 +532,13 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    const executor_type& get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename ReadHandler, typename MutableBufferSequence>
-    void operator()(ASIO_MOVE_ARG(ReadHandler) handler,
+    void operator()(ReadHandler&& handler,
         uint64_t offset, const MutableBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your handler

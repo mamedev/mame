@@ -2,7 +2,7 @@
 // stream.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -75,17 +75,13 @@ void test()
     ip::tcp::socket socket1(ioc, ip::tcp::v4());
     ssl::stream<ip::tcp::socket&> stream2(socket1, context);
 
-#if defined(ASIO_HAS_MOVE)
     ssl::stream<ip::tcp::socket> stream3
       = ssl::stream<ip::tcp::socket>(ioc, context);
     ssl::stream<ip::tcp::socket> stream4(std::move(stream3));
-#endif // defined(ASIO_HAS_MOVE)
 
     // ssl::stream assignment.
 
-#if defined(ASIO_HAS_MOVE)
     stream3 = std::move(stream4);
-#endif // defined(ASIO_HAS_MOVE)
 
     // basic_io_object functions.
 
@@ -199,5 +195,5 @@ void test()
 ASIO_TEST_SUITE
 (
   "ssl/stream",
-  ASIO_TEST_CASE(ssl_stream_compile::test)
+  ASIO_COMPILE_TEST_CASE(ssl_stream_compile::test)
 )

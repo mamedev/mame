@@ -2,7 +2,7 @@
 // redirect_error.hpp
 // ~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,7 +23,7 @@
 
 namespace asio {
 
-/// Completion token type used to specify that an error produced by an
+/// A @ref completion_token adapter used to specify that an error produced by an
 /// asynchronous operation is captured to an error_code variable.
 /**
  * The redirect_error_t class is used to indicate that any error_code produced
@@ -35,9 +35,8 @@ class redirect_error_t
 public:
   /// Constructor. 
   template <typename T>
-  redirect_error_t(ASIO_MOVE_ARG(T) completion_token,
-      asio::error_code& ec)
-    : token_(ASIO_MOVE_CAST(T)(completion_token)),
+  redirect_error_t(T&& completion_token, asio::error_code& ec)
+    : token_(static_cast<T&&>(completion_token)),
       ec_(ec)
   {
   }
@@ -47,14 +46,13 @@ public:
   asio::error_code& ec_;
 };
 
-/// Create a completion token to capture error_code values to a variable.
+/// Adapt a @ref completion_token to capture error_code values to a variable.
 template <typename CompletionToken>
-inline redirect_error_t<typename decay<CompletionToken>::type> redirect_error(
-    ASIO_MOVE_ARG(CompletionToken) completion_token,
-    asio::error_code& ec)
+inline redirect_error_t<decay_t<CompletionToken>> redirect_error(
+    CompletionToken&& completion_token, asio::error_code& ec)
 {
-  return redirect_error_t<typename decay<CompletionToken>::type>(
-      ASIO_MOVE_CAST(CompletionToken)(completion_token), ec);
+  return redirect_error_t<decay_t<CompletionToken>>(
+      static_cast<CompletionToken&&>(completion_token), ec);
 }
 
 } // namespace asio
