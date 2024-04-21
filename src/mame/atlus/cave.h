@@ -71,6 +71,7 @@ public:
 	void paccarn(machine_config &config);
 	void paceight(machine_config &config);
 	void pacslot(machine_config &config);
+	void jumbogod(machine_config &config);
 	void tekkenbs(machine_config &config);
 	void tekkencw(machine_config &config);
 	void tjumpman(machine_config &config);
@@ -199,6 +200,7 @@ protected:
 	template<int Chip> void videoregs_w(offs_t offset, u16 data, u16 mem_mask);
 	void korokoro_leds_w(offs_t offset, u16 data, u16 mem_mask);
 	void tjumpman_leds_w(u8 data);
+	void jumbogod_leds_w(u8 data);
 	void pacslot_leds_w(u8 data);
 	void eeprom_w(u8 data);
 	void guwange_eeprom_w(u8 data);
@@ -247,6 +249,7 @@ protected:
 	void paccarn_map(address_map &map);
 	void paceight_map(address_map &map);
 	void pacslot_map(address_map &map);
+	void jumbogod_map(address_map &map);
 	void tekkenbs_map(address_map &map);
 	void tekkencw_map(address_map &map);
 	void tjumpman_map(address_map &map);
