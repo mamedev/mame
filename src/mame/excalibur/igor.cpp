@@ -45,7 +45,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
-		m_cobrom(*this, "cobrom"),
+		m_soundrom(*this, "soundrom"),
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0),
@@ -63,7 +63,7 @@ private:
 	// devices/pointers
 	required_device<h83214_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
-	required_region_ptr<u8> m_cobrom;
+	required_region_ptr<u8> m_soundrom;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_8bit_r2r_device> m_dac;
 	required_ioport_array<2> m_inputs;
@@ -103,8 +103,8 @@ private:
 
 void igor_state::init_igor()
 {
-	u8 *rom = memregion("cobrom")->base();
-	const u32 len = memregion("cobrom")->bytes();
+	u8 *rom = memregion("soundrom")->base();
+	const u32 len = memregion("soundrom")->bytes();
 
 	// descramble data lines
 	for (int i = 0; i < len; i++)
@@ -189,13 +189,13 @@ u8 igor_state::read_inputs()
 
 void igor_state::p1_w(u8 data)
 {
-	// P10-P17: COB ROM address + LCD segs
+	// P10-P17: sound ROM address + LCD segs
 	m_port1 = data;
 }
 
 void igor_state::p2_w(u8 data)
 {
-	// P20-P27: COB ROM address + LCD segs
+	// P20-P27: sound ROM address + LCD segs
 	// P26: input mux low bit
 	m_port2 = data;
 	read_inputs();
@@ -203,9 +203,9 @@ void igor_state::p2_w(u8 data)
 
 u8 igor_state::p3_r()
 {
-	// P30-P37: read COB ROM
+	// P30-P37: read sound ROM
 	u32 address = bitswap<4>(m_port7,4,7,6,5) << 16 | m_port2 << 8 | m_port1;
-	return (m_port5 & 4) ? 0xff : m_cobrom[address & (m_cobrom.bytes() - 1)];
+	return (m_port5 & 4) ? 0xff : m_soundrom[address & (m_soundrom.bytes() - 1)];
 }
 
 void igor_state::p4_w(u8 data)
@@ -226,7 +226,7 @@ void igor_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
 	// P51: DAC bit 6
 	m_dac_data = (m_dac_data & 0xbf) | BIT(data, 1) << 6;
 
-	// P52: COB ROM CS, KA8602 mute
+	// P52: sound ROM CS, KA8602 mute
 	// P55: input mux high bit
 	m_port5 = data;
 	update_dac();
@@ -250,7 +250,7 @@ u8 igor_state::p6_r()
 void igor_state::p7_w(u8 data)
 {
 	// P70-P77: input mux part + LCD segs
-	// P74-P77: COB ROM address
+	// P74-P77: sound ROM address
 	m_port7 = data;
 	read_inputs();
 }
@@ -337,7 +337,7 @@ ROM_START( igor )
 	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
 	ROM_LOAD("1997_rcn_1002a_excal_hd6433214l02p.ic1", 0x0000, 0x8000, CRC(adbc7e07) SHA1(0d297ad2fd0d18312966195cfad4658da4bc4442) )
 
-	ROM_REGION( 0x20000, "cobrom", 0 )
+	ROM_REGION( 0x20000, "soundrom", 0 )
 	ROM_LOAD("sound.ic2", 0x00000, 0x20000, CRC(bc540da3) SHA1(68647ce1c7e87eba90d9d1912921213af03e3c5d) ) // no label
 
 	ROM_REGION( 89047, "screen", 0 )
