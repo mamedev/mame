@@ -203,4 +203,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, feldo, 0,      0,      eldorado, eldorado, eldorado_state, empty_init, "Fidelity Electronics / CXG Systems", "Eldorado Chess Challenger", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, feldo, 0,      0,      eldorado, eldorado, eldorado_state, empty_init, "Fidelity Electronics International / CXG Systems", "Eldorado Chess Challenger", MACHINE_SUPPORTS_SAVE )

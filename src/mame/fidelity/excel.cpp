@@ -552,15 +552,15 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, fexcel,    0,       0,      fexcelb,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, fexcelv,   fexcel,  0,      fexcelv,  fexcelv, excel_state, empty_init, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, fexceld,   fexcel,  0,      fexceld,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, fexcel12,  fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE ) // 1st version of The Excellence
-SYST( 1985, fexcel124, fexcel,  0,      fexcel4,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, fexcela,   fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fexcel,    0,       0,      fexcelb,  fexcelb, excel_state, empty_init, "Fidelity International", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fexcelv,   fexcel,  0,      fexcelv,  fexcelv, excel_state, empty_init, "Fidelity International", "Voice Excellence", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fexceld,   fexcel,  0,      fexceld,  fexcelb, excel_state, empty_init, "Fidelity International", "Excel Display", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, fexcel12,  fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity International", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE ) // 1st version of The Excellence
+SYST( 1985, fexcel124, fexcel,  0,      fexcel4,  fexcel,  excel_state, empty_init, "Fidelity International", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, fexcela,   fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity International", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, fexcelp,   0,       0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, fexcelpb,  fexcelp, 0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, fexcelp,   0,       0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity International", "The Par Excellence", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, fexcelpb,  fexcelp, 0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity International", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE )
 SYST( 1986, granits,   fexcelp, 0,      granits,  fexcel,  excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, fdes2000,  fexcelp, 0,      fdes2000, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, fdes2100,  fexcelp, 0,      fdes2100, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2000,  fexcelp, 0,      fdes2000, fdes,    excel_state, empty_init, "Fidelity International", "Designer 2000", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2100,  fexcelp, 0,      fdes2100, fdes,    excel_state, empty_init, "Fidelity International", "Designer 2100", MACHINE_SUPPORTS_SAVE )

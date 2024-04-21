@@ -47,6 +47,9 @@ If control Q4 is set, printer data can be read from I0.
 Similar to EAS, the new game command for SC12 is: RE -> A6 (or A8) -> CL.
 The newer model 6086 does not have this issue.
 
+Fidelity Electronics, Ltd. went bankrupt in early 1984. They were briefly Fidelity
+Computer Products, Inc. (FCP) afterwards, and then Fidelity International, Inc.
+
 TODO:
 - is SE12 program the same as SC12? just a faster CPU, and probably /4 divider?
 
@@ -291,5 +294,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, fscc12,  0,      0,      sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, fscc12a, fscc12, 0,      sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, fscc12,  0,      0,      sc12b,   sc12b, sc12_state, empty_init, "Fidelity International", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, fscc12a, fscc12, 0,      sc12,    sc12,  sc12_state, empty_init, "Fidelity Computer Products", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE )
