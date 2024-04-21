@@ -33,10 +33,13 @@ public:
 	// Q-Bus interface
 	virtual void biaki_w(int state) { }
 	virtual void bdmgi_w(int state) { }
+	virtual void init_w() { device_reset(); }
 
 protected:
 	// construction/destruction
 	device_qbus_card_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void device_reset() { }
 
 	virtual int z80daisy_irq_state() { return 0; }
 	virtual int z80daisy_irq_ack() { return -1; }
@@ -78,6 +81,8 @@ public:
 
 	void add_card(device_qbus_card_interface &card);
 	void install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask=0xffffffff);
+
+	void init_w();
 
 	void birq4_w(int state) { m_out_birq4_cb(state); }
 	void birq5_w(int state) { m_out_birq5_cb(state); }
@@ -138,7 +143,6 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
 	devcb_write_line m_write_birq4;
 	devcb_write_line m_write_birq5;
