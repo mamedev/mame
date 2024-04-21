@@ -19,8 +19,7 @@ msx_slot_msx_write_device::msx_slot_msx_write_device(const machine_config &mconf
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_switch_port(*this, "SWITCH")
 	, m_rombank(*this, "rombank%u", 0U)
-	, m_view1(*this, "view1")
-	, m_view2(*this, "view2")
+	, m_view{ {*this, "view1"}, {*this, "view2"} }
 	, m_region_offset(0)
 	, m_enabled(true)
 {
@@ -49,26 +48,26 @@ void msx_slot_msx_write_device::device_start()
 	m_rombank[0]->configure_entries(0, 0x20, m_rom_region->base() + m_region_offset, 0x4000);
 	m_rombank[1]->configure_entries(0, 0x20, m_rom_region->base() + m_region_offset, 0x4000);
 
-	page(1)->install_view(0x4000, 0x7fff, m_view1);
-	m_view1[0].install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	m_view1[0].install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<0>)));
-	m_view1[0].install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<1>)));
-	m_view1[1];
+	page(1)->install_view(0x4000, 0x7fff, m_view[0]);
+	m_view[0][0].install_read_bank(0x4000, 0x7fff, m_rombank[0]);
+	m_view[0][0].install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<0>)));
+	m_view[0][0].install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<1>)));
+	m_view[0][1];
 
-	page(2)->install_view(0x8000, 0xbfff, m_view2);
-	m_view2[0].install_read_bank(0x8000, 0xbfff, m_rombank[1]);
-	m_view2[1];
+	page(2)->install_view(0x8000, 0xbfff, m_view[1]);
+	m_view[1][0].install_read_bank(0x8000, 0xbfff, m_rombank[1]);
+	m_view[1][1];
 }
 
 void msx_slot_msx_write_device::device_reset()
 {
 	m_enabled = BIT(m_switch_port->read(), 0);
 
-	m_rombank[0]->set_entry(0);
-	m_rombank[1]->set_entry(1);
-
-	m_view1.select(m_enabled ? 0 : 1);
-	m_view2.select(m_enabled ? 0 : 1);
+	for (int i = 0; i < 2; i++)
+	{
+		m_rombank[i]->set_entry(i);
+		m_view[i].select(m_enabled ? 0 : 1);
+	}
 }
 
 template <int Bank>
