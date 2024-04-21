@@ -520,6 +520,11 @@ void taito_f3_state::video_start()
 	m_sprite_trails = false;
 	memset(&m_spriteram[0], 0, 0x10000);
 
+	std::fill_n(m_tilemap_row_usage[0], 32, 0);
+	std::fill_n(m_tilemap_row_usage[1], 32, 0);
+	std::fill_n(m_tilemap_row_usage[2], 32, 0);
+	std::fill_n(m_tilemap_row_usage[3], 32, 0);
+
 	save_item(NAME(m_control_0));
 	save_item(NAME(m_control_1));
 
@@ -538,6 +543,20 @@ u16 taito_f3_state::pf_ram_r(offs_t offset)
 
 void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	// [.ttt yyyy yxxx xxa|h] non-extend
+	// [.tty yyyy xxxx xxa|h] extend
+	if (offset & 1 && offset < 0x4000) {
+		const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
+		const u16 prev_tile = m_pf_ram[offset];
+		int tmap = m_extend ? offset >> 12 : offset >> 11;
+		if (tmap >= 4) tmap -= 2;
+
+		if (prev_tile == 0 && data != 0)
+			m_tilemap_row_usage[tmap][row] += 1;
+		else if (prev_tile != 0 && data == 0)
+			m_tilemap_row_usage[tmap][row] -= 1;
+	}
+
 	COMBINE_DATA(&m_pf_ram[offset]);
 
 	if (m_game_config->extend) {
@@ -695,8 +714,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		}
 
 		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
-			line.sp[sp_group].mix_value &= 0x3fff;
-			line.sp[sp_group].mix_value |= BIT(line_6000, sp_group * 2, 2) << 14;
+			line.sp[sp_group].set_blend(BIT(line_6000, sp_group * 2, 2));
 		}
 	}
 	if (const offs_t where = latched_addr(2, 1)) { // blend values
@@ -761,8 +779,8 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		}
 
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
-			line.sp[group].mix_value = (line.sp[group].mix_value & 0xc00f)
-					| BIT(sprite_mix, 0, 10) << 4;
+			line.sp[group].set_mix((line.sp[group].mix_value & 0xc00f)
+								   | BIT(sprite_mix, 0, 10) << 4);
 			line.sp[group].blend_select_v = BIT(sprite_mix, 12 + group, 1);
 		}
 	}
@@ -919,7 +937,7 @@ static int mosaic(int x, u8 sample)
 
 inline bool taito_f3_state::mixable::layer_enable() const
 {
-	return (mix_value & 0x2000) && blend_mask() != 0b11;
+	return (mix_value & 0x2000) && blend_mode != 0b11;
 }
 inline int taito_f3_state::mixable::x_index(int x) const
 {
@@ -931,7 +949,7 @@ inline int taito_f3_state::mixable::y_index(int y) const
 }
 inline bool taito_f3_state::sprite_inf::layer_enable() const
 {
-	return (mix_value & 0x2000) && blend_mask() != 0b00;
+	return (mix_value & 0x2000) && blend_mode != 0b00;
 }
 inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const
 {
@@ -944,6 +962,10 @@ inline int taito_f3_state::playfield_inf::x_index(int x) const
 inline int taito_f3_state::playfield_inf::y_index(int y) const
 {
 	return ((reg_fx_y >> 8) + colscroll) & 0x1ff;
+}
+inline bool taito_f3_state::playfield_inf::used(int y) const
+{
+	return (*pf_row_usage)[y_index(y) / 16] > 0;
 }
 inline int taito_f3_state::pivot_inf::x_index(int x) const
 {
@@ -962,7 +984,7 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 	const u8 *flags = gfx.bitmap.flags ? &gfx.bitmap.flags->pix(y) : nullptr;
 
 	for (int x = range.l; x < range.r; x++) {
-		if (gfx.blend_mask() == pri.src_blendmode[x])
+		if (gfx.blend_mode == pri.src_blendmode[x])
 			continue; // note that layers cannot blend against the same blend mode
 
 		const int real_x = gfx.x_sample_enable ? mosaic(x, line.x_sample) : x;
@@ -983,7 +1005,7 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 				// could be pulled out of loop for pivot and sprite
 				u8 sel = gfx.blend_select(flags, gfx_x);
 
-				switch (gfx.blend_mask()) {
+				switch (gfx.blend_mode) {
 				case 0b01: // normal blend
 					sel = 2 + sel;
 					[[fallthrough]];
@@ -1003,7 +1025,7 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 				}
 				// lock in source color for blending and update the prio test buffer
 				z.src_pal[x] = pal;
-				pri.src_blendmode[x] = gfx.blend_mask();
+				pri.src_blendmode[x] = gfx.blend_mode;
 				pri.src_prio[x] = gfx.prio;
 			}
 		} else if (gfx.prio >= pri.dst_prio[x]) {
@@ -1093,6 +1115,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 		line_data.pf[pf].width_mask = m_width_mask;
+		line_data.pf[pf].pf_row_usage = &m_tilemap_row_usage[pf];
 		line_data.pf[pf].debug_index = pf;
 	}
 	if (m_flipscreen) {

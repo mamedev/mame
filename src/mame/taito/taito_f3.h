@@ -255,16 +255,17 @@ protected:
 		bool x_sample_enable{false};
 		u16 mix_value{0};
 		u8 prio{0};
+		u8 blend_mode;
 
 		u8 debug_index{0};
 
-		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; }
-		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; }
+		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; blend_mode = BIT(mix_value, 14, 2); };
+		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; };
+		void set_blend(u8 b) { mix_value = (mix_value & 0x3fff) | (b << 14); blend_mode = b; };
 		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); }
 		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); }
 		bool clip_inv_mode() const { return mix_value & 0x1000; }
 		bool layer_enable() const;
-		u8 blend_mask() const { return BIT(mix_value, 14, 2); }
 		bool blend_a() const { return mix_value & 0x4000; }
 		bool blend_b() const { return mix_value & 0x8000; }
 
@@ -328,11 +329,13 @@ protected:
 		fixed8 reg_fx_x{0};
 
 		u16 width_mask{0};
+		u8 (*pf_row_usage)[32]{nullptr};
 
 		u16 palette_adjust(u16 pal) const;
 		int y_index(int y) const;
 		int x_index(int x) const;
 		bool blend_select(const u8 *line_flags, int x) const { return BIT(line_flags[x], 0); }
+		inline bool used(int y) const;
 		static const char *debug_name() { return "PF"; }
 	};
 
@@ -377,6 +380,7 @@ protected:
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
 	u8 m_sprite_pri_row_usage[256]{};
+	u8 m_tilemap_row_usage[4][32]{};
 	bitmap_ind8 m_pri_alp_bitmap;
 	bitmap_ind16 m_sprite_framebuffer{};
 	u16 m_width_mask = 0;
