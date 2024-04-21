@@ -226,7 +226,7 @@ TIMER_CALLBACK_MEMBER(ksm_state::clock_brg)
 
 void ksm_state::machine_reset()
 {
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	brga = 0;
 	brgb = 0;
 	brgc = 0;

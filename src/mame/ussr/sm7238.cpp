@@ -154,7 +154,7 @@ void sm7238_state::sm7238_io(address_map &map)
 
 void sm7238_state::machine_reset()
 {
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	m_videobank->set_bank(0);
 }
 
