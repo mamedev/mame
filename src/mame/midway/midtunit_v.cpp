@@ -23,22 +23,40 @@
 #include <rapidjson/prettywriter.h> // Used by JSON logging
 #include <rapidjson/stringbuffer.h> // Used by JSON logging
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")
 DEFINE_DEVICE_TYPE(MIDXUNIT_VIDEO, midxunit_video_device, "xunitvid", "Midway X-Unit Video")
 
-/* compile-time options */
-#define LOG_DMA             0       /* DMAs are logged if the 'L' key is pressed */
+// compile-time options
+#define LOG_DMA             0       // DMAs are logged if the 'L' key is pressed
+
+#define LOG_CTRL    (1U << 1)
+#define LOG_DMACTRL (1U << 2)
+
+#define LOG_ALL     (LOG_CTRL | LOG_DMACTRL)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGCTRL(...)     LOGMASKED(LOG_CTRL,     __VA_ARGS__)
+#define LOGDMACTRL(...)  LOGMASKED(LOG_DMACTRL,  __VA_ARGS__)
 
 midtunit_video_device::midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, finder_base::DUMMY_TAG)
-	, m_gfxrom(*this, finder_base::DUMMY_TAG)
+	, m_gfxrom(*this, DEVICE_SELF)
+	, m_midtunit_control(0)
+	, m_gfx_rom_large(false)
+	, m_gfxbank_offset{0x000000, 0x400000}
+	, m_videobank_select(0)
 #if DEBUG_MIDTUNIT_BLITTER
 	, m_debug_palette(*this, "debugpalette")
 #endif
+	, m_dma_irq_cb(*this)
 {
+	std::fill(std::begin(m_dma_register), std::end(m_dma_register), 0);
 }
 
 midtunit_video_device::midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -49,10 +67,11 @@ midtunit_video_device::midtunit_video_device(const machine_config &mconfig, cons
 midwunit_video_device::midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: midtunit_video_device(mconfig, type, tag, owner, clock)
 {
+	m_gfx_rom_large = true;
 }
 
 midwunit_video_device::midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: midtunit_video_device(mconfig, MIDWUNIT_VIDEO, tag, owner, clock)
+	: midwunit_video_device(mconfig, MIDWUNIT_VIDEO, tag, owner, clock)
 {
 }
 
@@ -171,7 +190,7 @@ void midtunit_video_device::device_start()
 {
 	debug_init();
 
-	/* allocate memory */
+	// allocate memory
 	m_local_videoram = std::make_unique<uint16_t[]>(0x100000/2);
 
 #if DEBUG_MIDTUNIT_BLITTER
@@ -183,15 +202,11 @@ void midtunit_video_device::device_start()
 
 	m_dma_timer = timer_alloc(FUNC(midtunit_video_device::dma_done), this);
 
-	/* reset all the globals */
-	m_gfxbank_offset[0] = 0x000000;
-	m_gfxbank_offset[1] = 0x400000;
-
-	memset(m_dma_register, 0, sizeof(m_dma_register));
+	// reset all the globals
 	memset(&m_dma_state, 0, sizeof(dma_state));
-	m_dma_state.gfxrom = m_gfxrom->base();
+	m_dma_state.gfxrom = &m_gfxrom[0];
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_midtunit_control));
 	save_item(NAME(m_gfxbank_offset));
 	save_pointer(NAME(m_local_videoram), 0x100000/sizeof(m_local_videoram[0]));
@@ -202,20 +217,11 @@ void midtunit_video_device::device_start()
 	INIT_TEMPLATED_DMA_DRAW_GROUP(m_dma_draw_noskip_scale,   false, true);
 	INIT_TEMPLATED_DMA_DRAW_GROUP(m_dma_draw_skip_noscale,   true,  false);
 	INIT_TEMPLATED_DMA_DRAW_GROUP(m_dma_draw_noskip_noscale, false, false);
-
-	m_gfx_rom_large = false;
-}
-
-void midwunit_video_device::device_start()
-{
-	midtunit_video_device::device_start();
-	m_gfx_rom_large = true;
 }
 
 void midxunit_video_device::device_start()
 {
-	midtunit_video_device::device_start();
-	m_gfx_rom_large = true;
+	midwunit_video_device::device_start();
 	m_videobank_select = 1;
 }
 
@@ -229,7 +235,7 @@ void midxunit_video_device::device_start()
 
 uint16_t midtunit_video_device::midtunit_gfxrom_r(offs_t offset)
 {
-	uint8_t *base = m_gfxrom->base() + m_gfxbank_offset[(offset >> 21) & 1];
+	uint8_t const *const base = &m_gfxrom[m_gfxbank_offset[(offset >> 21) & 1]];
 	offset = (offset & 0x01fffff) * 2;
 	return base[offset] | (base[offset + 1] << 8);
 }
@@ -237,7 +243,7 @@ uint16_t midtunit_video_device::midtunit_gfxrom_r(offs_t offset)
 
 uint16_t midwunit_video_device::midwunit_gfxrom_r(offs_t offset)
 {
-	uint8_t *base = m_gfxrom->base() + m_gfxbank_offset[0];
+	uint8_t const *const base = &m_gfxrom[m_gfxbank_offset[0]];
 	offset *= 2;
 	return base[offset] | (base[offset + 1] << 8);
 }
@@ -346,17 +352,17 @@ void midtunit_video_device::midtunit_control_w(offs_t offset, uint16_t data, uin
 	    other important bits:
 	        bit 2 (0x0004) is toggled periodically
 	*/
-	logerror("T-unit control = %04X\n", data);
+	LOGCTRL("T-unit control = %04X\n", data);
 
 	COMBINE_DATA(&m_midtunit_control);
 
-	/* gfx bank select is bit 7 */
+	// gfx bank select is bit 7
 	if (!(m_midtunit_control & 0x0080) || !m_gfx_rom_large)
 		m_gfxbank_offset[0] = 0x000000;
 	else
 		m_gfxbank_offset[0] = 0x800000;
 
-	/* video bank select is bit 5 */
+	// video bank select is bit 5
 	m_videobank_select = (m_midtunit_control >> 5) & 1;
 }
 
@@ -367,14 +373,14 @@ void midwunit_video_device::midwunit_control_w(offs_t offset, uint16_t data, uin
 	    other important bits:
 	        bit 2 (0x0004) is toggled periodically
 	*/
-	logerror("Wolf-unit control = %04X\n", data);
+	LOGCTRL("Wolf-unit control = %04X\n", data);
 
 	COMBINE_DATA(&m_midtunit_control);
 
-	/* gfx bank select is bits 8-9 */
+	// gfx bank select is bits 8-9
 	m_gfxbank_offset[0] = 0x800000 * ((m_midtunit_control >> 8) & 3);
 
-	/* video bank select is unknown */
+	// video bank select is unknown
 	m_videobank_select = (m_midtunit_control >> 11) & 1;
 }
 
@@ -425,21 +431,21 @@ uint16_t midxunit_video_device::midxunit_paletteram_r(offs_t offset)
 template <int BitsPerPixel, bool XFlip, bool Skip, bool Scale, midtunit_video_device::op_type_t Zero, midtunit_video_device::op_type_t NonZero>
 void midtunit_video_device::dma_draw()
 {
-	int height = m_dma_state.height << 8;
-	uint8_t *base = m_dma_state.gfxrom;
+	int const height = m_dma_state.height << 8;
+	uint8_t const *const base = m_dma_state.gfxrom;
 	uint32_t offset = m_dma_state.offset;
 	uint16_t pal = m_dma_state.palette;
 	uint16_t color = pal | m_dma_state.color;
 	int sy = m_dma_state.ypos;
 	int iy = 0;
 	int ty;
-	int mask = (1 << BitsPerPixel) - 1;
-	int xstep = Scale ? m_dma_state.xstep : 0x100;
+	int const mask = (1 << BitsPerPixel) - 1;
+	int const xstep = Scale ? m_dma_state.xstep : 0x100;
 
-	/* loop over the height */
+	// loop over the height
 	while (iy < height)
 	{
-		int startskip = m_dma_state.startskip << 8;
+		int const startskip = m_dma_state.startskip << 8;
 		[[maybe_unused]] int endskip = m_dma_state.endskip << 8;
 		int width = m_dma_state.width << 8;
 		int sx = m_dma_state.xpos;
@@ -449,13 +455,13 @@ void midtunit_video_device::dma_draw()
 		int pre, post;
 		uint16_t *d;
 
-		/* handle skipping */
+		// handle skipping
 		if (Skip)
 		{
-			uint8_t value = EXTRACTGEN(0xff);
+			uint8_t const value = EXTRACTGEN(0xff);
 			o += 8;
 
-			/* adjust for preskip */
+			// adjust for preskip
 			pre = (value & 0x0f) << (m_dma_state.preskip + 8);
 			tx = pre / xstep;
 			if (XFlip)
@@ -464,17 +470,17 @@ void midtunit_video_device::dma_draw()
 				sx = (sx + tx) & XPOSMASK;
 			ix += tx * xstep;
 
-			/* adjust for postskip */
+			// adjust for postskip
 			post = ((value >> 4) & 0x0f) << (m_dma_state.postskip + 8);
 			width -= post;
 			endskip -= post;
 		}
 
-		/* handle Y clipping */
+		// handle Y clipping
 		if (sy < m_dma_state.topclip || sy > m_dma_state.botclip)
 			goto clipy;
 
-		/* handle start skip */
+		// handle start skip
 		if (ix < startskip)
 		{
 			tx = ((startskip - ix) / xstep) * xstep;
@@ -482,24 +488,24 @@ void midtunit_video_device::dma_draw()
 			o += (tx >> 8) * BitsPerPixel;
 		}
 
-		/* handle end skip */
+		// handle end skip
 		if ((width >> 8) > m_dma_state.width - m_dma_state.endskip)
 			width = (m_dma_state.width - m_dma_state.endskip) << 8;
 
-		/* determine destination pointer */
+		// determine destination pointer
 #if DEBUG_MIDTUNIT_BLITTER
 		d = m_doing_debug_dma ? &m_debug_videoram[sy * 512] : &m_local_videoram[sy * 512];
 #else
 		d = &m_local_videoram[sy * 512];
 #endif
 
-		/* loop until we draw the entire width */
+		// loop until we draw the entire width
 		while (ix < width)
 		{
-			/* only process if not clipped */
+			// only process if not clipped
 			if (sx >= m_dma_state.leftclip && sx <= m_dma_state.rightclip)
 			{
-				/* special case similar handling of zero/non-zero */
+				// special case similar handling of zero/non-zero
 				if (Zero == NonZero)
 				{
 					if (Zero == PIXEL_COLOR)
@@ -508,12 +514,12 @@ void midtunit_video_device::dma_draw()
 						d[sx] = (EXTRACTGEN(mask)) | pal;
 				}
 
-				/* otherwise, read the pixel and look */
+				// otherwise, read the pixel and look
 				else
 				{
 					int pixel = (EXTRACTGEN(mask));
 
-					/* non-zero pixel case */
+					// non-zero pixel case
 					if (pixel)
 					{
 						if (NonZero == PIXEL_COLOR)
@@ -522,7 +528,7 @@ void midtunit_video_device::dma_draw()
 							d[sx] = pixel | pal;
 					}
 
-					/* zero pixel case */
+					// zero pixel case
 					else
 					{
 						if (Zero == PIXEL_COLOR)
@@ -533,13 +539,13 @@ void midtunit_video_device::dma_draw()
 				}
 			}
 
-			/* update pointers */
+			// update pointers
 			if (XFlip)
 				sx = (sx - 1) & XPOSMASK;
 			else
 				sx = (sx + 1) & XPOSMASK;
 
-			/* advance to the next pixel */
+			// advance to the next pixel
 			if (!Scale)
 			{
 				ix += 0x100;
@@ -555,7 +561,7 @@ void midtunit_video_device::dma_draw()
 		}
 
 	clipy:
-		/* advance to the next row */
+		// advance to the next row
 		if (m_dma_state.yflip)
 			sy = (sy - 1) & YPOSMASK;
 		else
@@ -591,7 +597,7 @@ void midtunit_video_device::dma_draw()
 				if (width > 0) o += width * BitsPerPixel;
 				while (ty--)
 				{
-					uint8_t value = EXTRACTGEN(0xff);
+					uint8_t const value = EXTRACTGEN(0xff);
 					o += 8;
 					pre = (value & 0x0f) << m_dma_state.preskip;
 					post = ((value >> 4) & 0x0f) << m_dma_state.postskip;
@@ -618,8 +624,8 @@ DEFINE_TEMPLATED_DMA_DRAW_GROUP(false, false);
 
 TIMER_CALLBACK_MEMBER(midtunit_video_device::dma_done)
 {
-	m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_dma_register[DMA_COMMAND] &= ~0x8000; // tell the cpu we're done
+	m_dma_irq_cb(ASSERT_LINE);
 }
 
 
@@ -630,11 +636,11 @@ TIMER_CALLBACK_MEMBER(midtunit_video_device::dma_done)
  *
  *************************************/
 
-uint16_t midtunit_video_device::midtunit_dma_r(offs_t offset)
+uint16_t midtunit_video_device::dma_r(offs_t offset)
 {
-	/* rmpgwt sometimes reads register 0, expecting it to return the */
-	/* current DMA status; thus we map register 0 to register 1 */
-	/* openice does it as well */
+	// rmpgwt sometimes reads register 0, expecting it to return the
+	// current DMA status; thus we map register 0 to register 1
+	// openice does it as well
 	if (offset == 0)
 		offset = 1;
 	return m_dma_register[offset];
@@ -687,36 +693,36 @@ uint16_t midtunit_video_device::midtunit_dma_r(offs_t offset)
  *           | ----------2----- | select top/bottom or left/right for reg 12/13
  */
 
-void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midtunit_video_device::dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const uint8_t register_map[2][16] =
 	{
 		{ 0,1,2,3,4,5,6,7,8,9,10,11,16,17,14,15 },
 		{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 }
 	};
-	int regbank = (m_dma_register[DMA_CONFIG] >> 5) & 1;
+	int const regbank = (m_dma_register[DMA_CONFIG] >> 5) & 1;
 	int pixels = 0;
 
-	/* blend with the current register contents */
+	// blend with the current register contents
 	int regnum = register_map[regbank][offset];
 	COMBINE_DATA(&m_dma_register[regnum]);
 
-	/* only writes to DMA_COMMAND actually cause actions */
+	// only writes to DMA_COMMAND actually cause actions
 	if (regnum != DMA_COMMAND)
 		return;
 
-	/* high bit triggers action */
-	int command = m_dma_register[DMA_COMMAND];
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	// high bit triggers action
+	int const command = m_dma_register[DMA_COMMAND];
+	m_dma_irq_cb(CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 
 	auto profile = g_profiler.start(PROFILER_USER1);
 
-	/* determine bpp */
-	int bpp = (command >> 12) & 7;
+	// determine bpp
+	int const bpp = (command >> 12) & 7;
 
-	/* fill in the basic data */
+	// fill in the basic data
 	m_dma_state.xpos = m_dma_register[DMA_XSTART] & XPOSMASK;
 	m_dma_state.ypos = m_dma_register[DMA_YSTART] & YPOSMASK;
 	m_dma_state.width = m_dma_register[DMA_WIDTH] & 0x3ff;
@@ -724,27 +730,27 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	m_dma_state.palette = m_dma_register[DMA_PALETTE] & 0x7f00;
 	m_dma_state.color = m_dma_register[DMA_COLOR] & 0xff;
 
-	/* fill in the rev 2 data */
+	// fill in the rev 2 data
 	m_dma_state.yflip = (command & 0x20) >> 5;
 	m_dma_state.preskip = (command >> 8) & 3;
 	m_dma_state.postskip = (command >> 10) & 3;
 	m_dma_state.xstep = m_dma_register[DMA_SCALE_X] ? m_dma_register[DMA_SCALE_X] : 0x100;
 	m_dma_state.ystep = m_dma_register[DMA_SCALE_Y] ? m_dma_register[DMA_SCALE_Y] : 0x100;
 
-	/* clip the clippers */
+	// clip the clippers
 	m_dma_state.topclip = m_dma_register[DMA_TOPCLIP] & 0x1ff;
 	m_dma_state.botclip = m_dma_register[DMA_BOTCLIP] & 0x1ff;
 	m_dma_state.leftclip = m_dma_register[DMA_LEFTCLIP] & 0x3ff;
 	m_dma_state.rightclip = m_dma_register[DMA_RIGHTCLIP] & 0x3ff;
 
-	/* determine the offset */
+	// determine the offset
 	uint32_t gfxoffset = m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16);
 
-	/* special case: drawing mode C doesn't need to know about any pixel data */
+	// special case: drawing mode C doesn't need to know about any pixel data
 	if ((command & 0x0f) == 0x0c)
 		gfxoffset = 0;
 
-	/* determine the location */
+	// determine the location
 	if (!m_gfx_rom_large && gfxoffset >= 0x2000000)
 		gfxoffset -= 0x2000000;
 	if (gfxoffset >= 0xf8000000)
@@ -753,7 +759,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 		m_dma_state.offset = gfxoffset;
 	else
 	{
-		logerror("DMA source out of range: %08X\n", gfxoffset);
+		LOGDMACTRL("DMA source out of range: %08X\n", gfxoffset);
 		goto skipdma;
 	}
 
@@ -774,11 +780,11 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 		}
 	}
 
-	/* there seems to be two types of behavior for the DMA chip */
-	/* for MK1 and MK2, the upper byte of the LRSKIP is the     */
-	/* starting skip value, and the lower byte is the ending    */
-	/* skip value; for the NBA Jam, Hangtime, and Open Ice, the */
-	/* full word seems to be the starting skip value.           */
+	// there seems to be two types of behavior for the DMA chip
+	// for MK1 and MK2, the upper byte of the LRSKIP is the
+	// starting skip value, and the lower byte is the ending
+	// skip value; for the NBA Jam, Hangtime, and Open Ice, the
+	// full word seems to be the starting skip value.
 	if (command & 0x40)
 	{
 		m_dma_state.startskip = m_dma_register[DMA_LRSKIP] & 0xff;
@@ -802,7 +808,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 		}
 	}
 
-	/* then draw */
+	// then draw
 	if (m_dma_state.xstep == 0x100 && m_dma_state.ystep == 0x100)
 	{
 		if (command & 0x80)
@@ -825,7 +831,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 			pixels = 0;
 	}
 
-	/* signal we're done */
+	// signal we're done
 skipdma:
 	m_dma_timer->adjust(attotime::from_nsec(41 * pixels));
 }
@@ -844,7 +850,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midtunit_video_device::scanline_update)
 	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr << 1;
 
-	/* copy the non-blanked portions of this scanline */
+	// copy the non-blanked portions of this scanline
 	for (int x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = src[coladdr++ & 0x1ff] & 0x7fff;
 }
@@ -855,14 +861,14 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midxunit_video_device::scanline_update)
 	uint16_t const *const src = &m_local_videoram[fulladdr & 0x3fe00];
 	uint16_t *const dest = &bitmap.pix(scanline);
 
-	/* copy the non-blanked portions of this scanline */
+	// copy the non-blanked portions of this scanline
 	for (int x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = src[fulladdr++ & 0x1ff] & 0x7fff;
 }
 
 void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 {
-	const uint32_t raw_offset = m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16);
+	uint32_t const raw_offset = m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16);
 	if (m_logged_rom[raw_offset >> 6] & (1ULL << (raw_offset & 0x3f)))
 		return;
 
@@ -903,16 +909,16 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	m_log_bitmap.allocate(m_dma_state.width, m_dma_state.height);
 	m_log_bitmap.fill(0);
 
-	uint8_t *base = m_dma_state.gfxrom;
+	uint8_t const *const base = m_dma_state.gfxrom;
 	uint32_t offset = m_dma_state.offset;
-	uint16_t pal = m_dma_state.palette;
-	uint16_t color = pal | m_dma_state.color;
-	int mask = (1 << bpp) - 1;
+	uint16_t const pal = m_dma_state.palette;
+	uint16_t const color = pal | m_dma_state.color;
+	int const mask = (1 << bpp) - 1;
 
-	/* loop over the height */
+	// loop over the height
 	for (int y = 0; y < m_dma_state.height; y++)
 	{
-		int startskip = m_dma_state.startskip;
+		int const startskip = m_dma_state.startskip;
 		[[maybe_unused]] int endskip = m_dma_state.endskip;
 		int width = m_dma_state.width;
 		int ix = 0;
@@ -920,24 +926,24 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		uint32_t o = offset;
 		int pre = 0, post = 0;
 
-		/* handle skipping */
+		// handle skipping
 		if (Skip)
 		{
-			uint8_t value = EXTRACTGEN(0xff);
+			uint8_t const value = EXTRACTGEN(0xff);
 			o += 8;
 
-			/* adjust for preskip */
+			// adjust for preskip
 			pre = (value & 0x0f) << m_dma_state.preskip;
 			tx = pre;
 			ix += tx;
 
-			/* adjust for postskip */
+			// adjust for postskip
 			post = ((value >> 4) & 0x0f) << m_dma_state.postskip;
 			width -= post;
 			endskip -= post;
 		}
 
-		/* handle start skip */
+		// handle start skip
 		if (ix < startskip)
 		{
 			tx = (startskip - ix);
@@ -945,18 +951,18 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 			o += tx * bpp;
 		}
 
-		/* handle end skip */
+		// handle end skip
 		if (width > m_dma_state.width - m_dma_state.endskip)
 			width = m_dma_state.width - m_dma_state.endskip;
 
 		bitmap_rgb32::pixel_t *d = &m_log_bitmap.pix(y, ix);
 
-		/* determine destination pointer */
+		// determine destination pointer
 
-		/* loop until we draw the entire width */
+		// loop until we draw the entire width
 		while (ix < width)
 		{
-			/* special case similar handling of zero/non-zero */
+			// special case similar handling of zero/non-zero
 			if (Zero == NonZero)
 			{
 				if (Zero == PIXEL_COLOR)
@@ -965,12 +971,12 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 					*d = m_palette->palette()->entry_list_raw()[(EXTRACTGEN(mask)) | pal];
 			}
 
-			/* otherwise, read the pixel and look */
+			// otherwise, read the pixel and look
 			else
 			{
-				int pixel = (EXTRACTGEN(mask));
+				int const pixel = (EXTRACTGEN(mask));
 
-				/* non-zero pixel case */
+				// non-zero pixel case
 				if (pixel)
 				{
 					if (NonZero == PIXEL_COLOR)
@@ -979,7 +985,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 						*d = m_palette->palette()->entry_list_raw()[pixel | pal];
 				}
 
-				/* zero pixel case */
+				// zero pixel case
 				else
 				{
 					if (Zero == PIXEL_COLOR)
@@ -989,13 +995,13 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 				}
 			}
 
-			/* advance to the next pixel */
+			// advance to the next pixel
 			ix++;
 			d++;
 			o += bpp;
 		}
 
-		/* advance to the next row */
+		// advance to the next row
 		width = m_dma_state.width;
 		if (Skip)
 		{

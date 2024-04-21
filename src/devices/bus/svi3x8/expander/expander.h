@@ -39,16 +39,18 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
+// forward declaration
 class device_svi_expander_interface;
 
-// ======================> svi_expander_device
 
-class svi_expander_device : public device_t, public device_single_card_slot_interface<device_svi_expander_interface>
+//**************************************************************************
+//  BUS DEVICE
+//**************************************************************************
+
+class svi_expander_device :
+	public device_t,
+	public device_single_card_slot_interface<device_svi_expander_interface>,
+	public device_mixer_interface
 {
 public:
 	// construction/destruction
@@ -110,9 +112,14 @@ private:
 
 	devcb_read8 m_excsr_handler;
 	devcb_write8 m_excsw_handler;
+
+	uint8_t m_dummy; // needed for save-state support
 };
 
-// ======================> device_svi_expander_interface
+
+//**************************************************************************
+//  CARD INTERFACE
+//**************************************************************************
 
 class device_svi_expander_interface : public device_interface
 {
@@ -136,7 +143,7 @@ protected:
 	svi_expander_device *m_expander;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(SVI_EXPANDER, svi_expander_device)
 
 // include here so drivers don't need to

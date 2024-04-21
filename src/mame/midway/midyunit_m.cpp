@@ -248,7 +248,7 @@ void midyunit_state::cvsd_protection_w(offs_t offset, uint8_t data)
 {
 	// because the entire CVSD ROM is banked, we have to make sure that writes
 	// go to the proper location (i.e., bank 0); currently bank 0 always lives
-	// in the 0x10000-0x17fff space, so we just need to add 0x8000 to get the 
+	// in the 0x10000-0x17fff space, so we just need to add 0x8000 to get the
 	// proper offset
 	m_cvsd_protection_base[offset] = data;
 }

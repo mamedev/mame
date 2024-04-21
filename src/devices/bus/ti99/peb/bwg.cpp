@@ -503,7 +503,7 @@ void snug_bwg_device::motorona_w(int state)
 
 	// Set all motors
 	for (auto & elem : m_floppy)
-		if (elem->get_device() != nullptr) 
+		if (elem->get_device() != nullptr)
 			elem->get_device()->mon_w((state==ASSERT_LINE)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
@@ -543,7 +543,7 @@ void snug_bwg_device::device_reset()
 	m_address = 0;
 	m_WDsel = false;
 	m_WDsel0 = false;
-	
+
 	for (auto &flop : m_floppy)
 	{
 		if (flop->get_device() != nullptr)
