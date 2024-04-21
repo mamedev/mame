@@ -151,9 +151,9 @@ msx_slot_fsa1fm_device::msx_slot_fsa1fm_device(const machine_config &mconfig, co
 
 static INPUT_PORTS_START(fsa1fm)
 	PORT_START("SWITCH")
-	PORT_CONFNAME(0x04, 0x00, "Firmware")
-	PORT_CONFSETTING(0x04, "disabled")
-	PORT_CONFSETTING(0x00, "enabled")
+	PORT_CONFNAME(0x04, 0x00, "Enable Firmware")
+	PORT_CONFSETTING(0x04, DEF_STR(No))
+	PORT_CONFSETTING(0x00, DEF_STR(Yes))
 INPUT_PORTS_END
 
 ioport_constructor msx_slot_fsa1fm_device::device_input_ports() const

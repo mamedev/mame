@@ -91,7 +91,7 @@ public:
 		uint8_t                     numpages = 0;                       // number of allocated pages
 		uint8_t                     flip = 0;                           // screen flip?
 		uint8_t                     rowscroll = 0, colscroll = 0;       // are rowscroll/colscroll enabled (if external enables are used)
-		uint8_t                     bank[8];                            // indexes of the tile banks
+		uint8_t                     bank[8] = {0,0,0,0,0,0,0,0};        // indexes of the tile banks
 		uint16_t                    banksize = 0;                       // number of tiles per bank
 		uint16_t                    latched_xscroll[4] = {0,0,0,0};     // latched X scroll values
 		uint16_t                    latched_yscroll[4] = {0,0,0,0};     // latched Y scroll values
