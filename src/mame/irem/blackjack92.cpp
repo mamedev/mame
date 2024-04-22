@@ -142,11 +142,11 @@ void blackjack_state::main_io_map(address_map &map)
 	map(0x5000, 0x5000).portr("IN0"); // ??
 	map(0x8000, 0x8fff).ram().w(FUNC(blackjack_state::tileram_w)).share(m_tileram);
 	map(0x9000, 0x9fff).ram().w(FUNC(blackjack_state::colorram_w)).share(m_colorram);
-	map(0xa000, 0xafff).ram(); // again writes at the same locations of the former two
+	map(0xa000, 0xafff).ram(); // again writes at the same offsets of the former two
 	map(0xb000, 0xbfff).ram();
 	map(0xc000, 0xcfff).ram(); // writes here
 	map(0xd000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram(); // writes at the same locations of 0xc000-0xcfff
+	map(0xe000, 0xefff).ram(); // writes at the same offsets of 0xc000-0xcfff
 	map(0xf000, 0xffff).ram();
 }
 
