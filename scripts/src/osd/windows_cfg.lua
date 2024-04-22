@@ -4,7 +4,7 @@
 defines {
 	"OSD_WINDOWS",
 	"UNICODE",
-	"_UNICODE"
+	"_UNICODE",
 	"WIN32_LEAN_AND_MEAN",
 	"NOMINMAX",
 }
