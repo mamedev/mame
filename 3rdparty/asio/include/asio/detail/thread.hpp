@@ -2,7 +2,7 @@
 // detail/thread.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,10 +29,8 @@
 # else
 #  include "asio/detail/win_thread.hpp"
 # endif
-#elif defined(ASIO_HAS_STD_THREAD)
-# include "asio/detail/std_thread.hpp"
 #else
-# error Only Windows, POSIX and std::thread are supported!
+# include "asio/detail/std_thread.hpp"
 #endif
 
 namespace asio {
@@ -50,7 +48,7 @@ typedef winapp_thread thread;
 # else
 typedef win_thread thread;
 # endif
-#elif defined(ASIO_HAS_STD_THREAD)
+#else
 typedef std_thread thread;
 #endif
 

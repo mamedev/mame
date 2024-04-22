@@ -59,6 +59,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
 		m_pg(*this, "pg%u", 0U),
+		m_toms(*this, "tom%u", 1U),
+		m_bd(*this, "bd"),
 		m_cassette(*this, "cassette"),
 		m_linein(*this, "linein"),
 		m_keys(*this, "kc%u", 0U),
@@ -82,6 +84,8 @@ private:
 	required_device<upd7811_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
 	required_device_array<upd934g_device, 2> m_pg;
+	required_device_array<speaker_device, 3> m_toms;
+	required_device<speaker_device> m_bd;
 	required_device<cassette_image_device> m_cassette;
 	required_device<cassette_image_device> m_linein;
 	required_ioport_array<8> m_keys;
@@ -342,6 +346,11 @@ void rz1_state::port_b_w(uint8_t data)
 		logerror("port_b_w: %02x\n", data);
 
 	m_port_b = data;
+
+	m_toms[0]->set_input_gain(0, BIT(data, 0) ? 1.0 : 0.0);
+	m_toms[1]->set_input_gain(0, BIT(data, 0) ? 0.0 : 1.0);
+	m_toms[2]->set_input_gain(0, BIT(data, 1) ? 1.0 : 0.0);
+	m_bd->set_input_gain(0, BIT(data, 1) ? 0.0 : 1.0);
 }
 
 uint8_t rz1_state::port_c_r()
@@ -437,13 +446,37 @@ void rz1_state::rz1(machine_config &config)
 	config.set_default_layout(layout_rz1);
 
 	// audio hardware
+
+	// individual drum outputs
+	SPEAKER(config, "tom1").front_center();
+	SPEAKER(config, "tom2").front_center();
+	SPEAKER(config, "tom3").front_center();
+	SPEAKER(config, "bd").front_center();
+	SPEAKER(config, "rim_and_sd").front_center();
+	SPEAKER(config, "hihat").front_center();
+	SPEAKER(config, "claps_and_ride").front_center();
+	SPEAKER(config, "cowbell_and_crash").front_center();
+	SPEAKER(config, "sample_1_and_2").front_center();
+	SPEAKER(config, "sample_3_and_4").front_center();
+	// for tape / line in
 	SPEAKER(config, "speaker").front_center();
+
 	UPD934G(config, m_pg[0], 1333000);
 	m_pg[0]->set_addrmap(0, &rz1_state::pg0_map);
-	m_pg[0]->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_pg[0]->add_route(0, "claps_and_ride", 1.0);
+	m_pg[0]->add_route(1, "cowbell_and_crash", 1.0);
+	m_pg[0]->add_route(2, "sample_1_and_2", 1.0);
+	m_pg[0]->add_route(3, "sample_3_and_4", 1.0);
+
 	UPD934G(config, m_pg[1], 1280000);
 	m_pg[1]->set_addrmap(0, &rz1_state::pg1_map);
-	m_pg[1]->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// tom1/tom2 and tom3/bd are multiplexed together (see port_b_w)
+	m_pg[1]->add_route(0, "tom1", 1.0);
+	m_pg[1]->add_route(0, "tom2", 1.0);
+	m_pg[1]->add_route(1, "tom3", 1.0);
+	m_pg[1]->add_route(1, "bd", 1.0);
+	m_pg[1]->add_route(2, "rim_and_sd", 1.0);
+	m_pg[1]->add_route(3, "hihat", 1.0);
 
 	// midi
 	midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));

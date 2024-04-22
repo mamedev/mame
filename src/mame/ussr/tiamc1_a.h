@@ -49,7 +49,6 @@ private:
 	};
 
 
-	void timer8253_reset(struct timer8253struct *t);
 	void timer8253_tick(struct timer8253struct *t,int chn);
 	void timer8253_wr(struct timer8253struct *t, int reg, uint8_t val);
 	char timer8253_get_output(struct timer8253struct *t, int chn);

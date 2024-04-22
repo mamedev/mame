@@ -19,12 +19,7 @@ msx_slot_fsa1fm2_device::msx_slot_fsa1fm2_device(const machine_config &mconfig, 
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_bank(*this, "bank%u", 0U)
-	, m_view0(*this, "view0")
-	, m_view1(*this, "view1")
-	, m_view2(*this, "view2")
-	, m_view3(*this, "view3")
-	, m_view4(*this, "view4")
-	, m_view5(*this, "view5")
+	, m_view{ {*this, "view0"}, {*this, "view1"}, {*this, "view2"}, {*this, "view3"}, {*this, "view4"}, {*this, "view5"} }
 	, m_region_offset(0)
 {
 }
@@ -60,25 +55,25 @@ void msx_slot_fsa1fm2_device::device_start()
 		}
 	}
 
-	page(0)->install_view(0x0000, 0x1fff, m_view0);
-	m_view0[0].install_read_bank(0x0000, 0x1fff, m_bank[0]);
-	m_view0[1].install_readwrite_bank(0x0000, 0x1fff, m_bank[0]);
+	page(0)->install_view(0x0000, 0x1fff, m_view[0]);
+	m_view[0][0].install_read_bank(0x0000, 0x1fff, m_bank[0]);
+	m_view[0][1].install_readwrite_bank(0x0000, 0x1fff, m_bank[0]);
 
-	page(0)->install_view(0x2000, 0x3fff, m_view1);
-	m_view1[0].install_read_bank(0x2000, 0x3fff, m_bank[1]);
-	m_view1[1].install_readwrite_bank(0x2000, 0x3fff, m_bank[1]);
+	page(0)->install_view(0x2000, 0x3fff, m_view[1]);
+	m_view[1][0].install_read_bank(0x2000, 0x3fff, m_bank[1]);
+	m_view[1][1].install_readwrite_bank(0x2000, 0x3fff, m_bank[1]);
 
-	page(1)->install_view(0x4000, 0x5fff, m_view2);
-	m_view2[0].install_read_bank(0x4000, 0x5fff, m_bank[2]);
-	m_view2[1].install_readwrite_bank(0x4000, 0x5fff, m_bank[2]);
+	page(1)->install_view(0x4000, 0x5fff, m_view[2]);
+	m_view[2][0].install_read_bank(0x4000, 0x5fff, m_bank[2]);
+	m_view[2][1].install_readwrite_bank(0x4000, 0x5fff, m_bank[2]);
 
-	page(1)->install_view(0x6000, 0x7fff, m_view3);
-	m_view3[0].install_read_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view3[1].install_readwrite_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view3[2].install_read_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view3[2].install_read_handler(0x7ff0, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_r)));
-	m_view3[3].install_readwrite_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view3[3].install_read_handler(0x7ff0, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_r)));
+	page(1)->install_view(0x6000, 0x7fff, m_view[3]);
+	m_view[3][0].install_read_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view[3][1].install_readwrite_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view[3][2].install_read_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view[3][2].install_read_handler(0x7ff0, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_r)));
+	m_view[3][3].install_readwrite_bank(0x6000, 0x7fff, m_bank[3]);
+	m_view[3][3].install_read_handler(0x7ff0, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_r)));
 	page(1)->install_write_handler(0x6000, 0x6000, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<2>)));
 	page(1)->install_write_handler(0x6400, 0x6400, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<0>)));
 	page(1)->install_write_handler(0x6800, 0x6800, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<3>)));
@@ -87,27 +82,22 @@ void msx_slot_fsa1fm2_device::device_start()
 	page(1)->install_write_handler(0x7800, 0x7800, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::bank_w<5>)));
 	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*this, FUNC(msx_slot_fsa1fm2_device::control_w)));
 
-	page(2)->install_view(0x8000, 0x9fff, m_view4);
-	m_view4[0].install_read_bank(0x8000, 0x9fff, m_bank[4]);
-	m_view4[1].install_readwrite_bank(0x8000, 0x9fff, m_bank[4]);
+	page(2)->install_view(0x8000, 0x9fff, m_view[4]);
+	m_view[4][0].install_read_bank(0x8000, 0x9fff, m_bank[4]);
+	m_view[4][1].install_readwrite_bank(0x8000, 0x9fff, m_bank[4]);
 
-	page(2)->install_view(0xa000, 0xbfff, m_view5);
-	m_view5[0].install_read_bank(0xa000, 0xbfff, m_bank[5]);
-	m_view5[1].install_readwrite_bank(0xa000, 0xbfff, m_bank[5]);
+	page(2)->install_view(0xa000, 0xbfff, m_view[5]);
+	m_view[5][0].install_read_bank(0xa000, 0xbfff, m_bank[5]);
+	m_view[5][1].install_readwrite_bank(0xa000, 0xbfff, m_bank[5]);
 }
 
 void msx_slot_fsa1fm2_device::device_reset()
 {
-	m_view0.select(0);
-	m_view1.select(0);
-	m_view2.select(0);
-	m_view3.select(0);
-	m_view4.select(0);
-	m_view5.select(0);
 	m_control = 0;
 
 	for (int i = 0; i < 6 ; i++)
 	{
+		m_view[i].select(0);
 		m_selected_bank[i] = 0xa8;
 		m_bank[i]->set_entry(0x28);
 	}
@@ -117,18 +107,10 @@ template <int Bank>
 void msx_slot_fsa1fm2_device::set_view()
 {
 	bool ram_active = (m_selected_bank[Bank] & 0xf4) == 0x84;
-	if (Bank == 0)
-		m_view0.select(ram_active ? 1 : 0);
-	if (Bank == 1)
-		m_view1.select(ram_active ? 1 : 0);
-	if (Bank == 2)
-		m_view2.select(ram_active ? 1 : 0);
 	if (Bank == 3)
-		m_view3.select((ram_active ? 1 : 0) | (BIT(m_control, 2) ? 2 : 0));
-	if (Bank == 4)
-		m_view4.select(ram_active ? 1 : 0);
-	if (Bank == 5)
-		m_view5.select(ram_active ? 1 : 0);
+		m_view[3].select((ram_active ? 1 : 0) | (BIT(m_control, 2) ? 2 : 0));
+	else if (Bank != 2)
+		m_view[Bank].select(ram_active ? 1 : 0);
 }
 
 template <int Bank>
@@ -169,9 +151,9 @@ msx_slot_fsa1fm_device::msx_slot_fsa1fm_device(const machine_config &mconfig, co
 
 static INPUT_PORTS_START(fsa1fm)
 	PORT_START("SWITCH")
-	PORT_CONFNAME(0x04, 0x00, "Firmware is")
-	PORT_CONFSETTING(0x04, "disabled")
-	PORT_CONFSETTING(0x00, "enabled")
+	PORT_CONFNAME(0x04, 0x00, "Enable Firmware")
+	PORT_CONFSETTING(0x04, DEF_STR(No))
+	PORT_CONFSETTING(0x00, DEF_STR(Yes))
 INPUT_PORTS_END
 
 ioport_constructor msx_slot_fsa1fm_device::device_input_ports() const

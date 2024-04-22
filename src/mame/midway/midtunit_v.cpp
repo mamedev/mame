@@ -505,18 +505,17 @@ void midtunit_video_device::dma_draw()
 			// only process if not clipped
 			if (sx >= m_dma_state.leftclip && sx <= m_dma_state.rightclip)
 			{
-				// special case similar handling of zero/non-zero
 				if (Zero == NonZero)
 				{
+					// special case similar handling of zero/non-zero
 					if (Zero == PIXEL_COLOR)
 						d[sx] = color;
 					else if (Zero == PIXEL_COPY)
 						d[sx] = (EXTRACTGEN(mask)) | pal;
 				}
-
-				// otherwise, read the pixel and look
 				else
 				{
+					// otherwise, read the pixel and look
 					int pixel = (EXTRACTGEN(mask));
 
 					// non-zero pixel case
@@ -962,18 +961,17 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		// loop until we draw the entire width
 		while (ix < width)
 		{
-			// special case similar handling of zero/non-zero
 			if (Zero == NonZero)
 			{
+				// special case similar handling of zero/non-zero
 				if (Zero == PIXEL_COLOR)
 					*d = m_palette->palette()->entry_list_raw()[color];
 				else if (Zero == PIXEL_COPY)
 					*d = m_palette->palette()->entry_list_raw()[(EXTRACTGEN(mask)) | pal];
 			}
-
-			// otherwise, read the pixel and look
 			else
 			{
+				// otherwise, read the pixel and look
 				int const pixel = (EXTRACTGEN(mask));
 
 				// non-zero pixel case

@@ -312,8 +312,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, feleg,   0,      0,      feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega,  feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega1, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega2, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega3, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feleg,   0,      0,      feleg,   feleg,   as12_state, empty_init, "Fidelity International", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega,  feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega1, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega2, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega3, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE )

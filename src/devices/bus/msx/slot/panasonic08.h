@@ -37,11 +37,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_memory_region m_rom_region;
 	memory_bank_array_creator<6> m_bank;
-	memory_view m_view0;
-	memory_view m_view1;
-	memory_view m_view3;
-	memory_view m_view4;
-	memory_view m_view5;
+	memory_view m_view[6];
 	u32 m_region_offset;
 	u8 m_selected_bank[6];
 	u8 m_control;

@@ -537,8 +537,6 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	, m_pagelatch_cb(*this, DEVICE_SELF, FUNC(segaic16_video_device::tilemap_16b_fill_latch))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
-	memset(m_rotate, 0, sizeof(m_rotate));
-	memset(m_bg_tilemap, 0, sizeof(m_bg_tilemap));
 }
 
 void segaic16_video_device::device_start()
@@ -1205,7 +1203,7 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	tilemap_get_info_delegate get_tile_info(*this);
 
 	/* reset the tilemap info */
-	memset(info, 0, sizeof(*info));
+	*info = tilemap_info();
 	info->index = which;
 	info->type = type;
 	for (int i = 0; i < numbanks; i++)
@@ -1477,7 +1475,7 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 	struct rotate_info *info = &m_rotate[which];
 
 	/* reset the tilemap info */
-	memset(info, 0, sizeof(*info));
+	*info = rotate_info();
 	info->index = which;
 	info->type = type;
 	info->colorbase = colorbase;

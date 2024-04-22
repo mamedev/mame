@@ -71,16 +71,16 @@ protected:
 private:
 	struct math_t
 	{
-		uint16_t  cpulatch;
-		uint16_t  promaddr;
-		uint16_t  inslatch;
-		uint32_t  mux;
-		uint16_t  ppshift;
-		uint32_t  i0ff;
-		uint16_t  retval;
-		uint16_t  muxlatch;   // TX-1
-		int     dbgaddr;
-		int     dbgpc = 0;
+		uint16_t    cpulatch = 0;
+		uint16_t    promaddr = 0;
+		uint16_t    inslatch = 0;
+		uint32_t    mux = 0;
+		uint16_t    ppshift = 0;
+		uint32_t    i0ff = 0;
+		uint16_t    retval = 0;
+		uint16_t    muxlatch = 0;   // TX-1
+		int         dbgaddr = 0;
+		int         dbgpc = 0;
 
 		uint16_t get_datarom_addr() const;
 		uint16_t get_bb_datarom_addr() const;
