@@ -113,7 +113,7 @@ Unreleased (possibly no prototypes exist):
 		<year>1997</year>
 		<publisher>ICD</publisher>
 		<notes><![CDATA[
-Boot OK, gameplay graphics are in shades of blue, pause message gets cut off
+Gameplay graphics are in shades of blue, pause message gets cut off
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -134,7 +134,7 @@ Boot OK, gameplay graphics are in shades of blue, pause message gets cut off
 		<year>1994</year>
 		<publisher>Midnite Entertainment Group</publisher>
 		<notes><![CDATA[
-Boot OK, gameplay graphics are in shades of blue, pause message gets cut off
+Gameplay graphics are in shades of blue, pause message gets cut off
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -150,7 +150,7 @@ Boot OK, gameplay graphics are in shades of blue, pause message gets cut off
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, several HUD elements have wrong pitch, HUD automap is incorrectly drawn as a big quadrilateral, HUD blending looks ugly
+Several HUD elements have wrong pitch, HUD automap is incorrectly drawn as a big quadrilateral, HUD blending looks ugly
 ]]></notes>
 
 		<info name="serial" value="J9008E 800108-022"/>
@@ -184,7 +184,7 @@ Boot OK, several HUD elements have wrong pitch, HUD automap is incorrectly drawn
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, gameplay graphics have clipping/alignment issues, eventually throws an exception, no sound
+Gameplay graphics have clipping/alignment issues, eventually throws an exception, no sound
 ]]></notes>
 
 		<info name="serial" value="J9091E 705091-002"/>
@@ -200,7 +200,7 @@ Boot OK, gameplay graphics have clipping/alignment issues, eventually throws an 
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, title screen foreground layer not drawn properly, no sound
+Title screen foreground layer not drawn properly, no sound
 ]]></notes>
 
 		<info name="serial" value="J9072E 705072-002"/>
@@ -308,7 +308,6 @@ Rightmost column of gameplay has odd "overscan" area
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="bubsy">
 		<description>Bubsy in Fractured Furry Tales</description>
 		<year>1994</year>
@@ -321,7 +320,6 @@ Rightmost column of gameplay has odd "overscan" area
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="cfodder">
 		<description>Cannon Fodder</description>
 		<year>1995</year>
@@ -403,7 +401,7 @@ No sound, huge GFX issues (mostly related with pitch)
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, Defender 2000 and Defender Plus both crashes after some few seconds in gameplay.
+Defender 2000 and Defender Plus both crashes after some few seconds in gameplay.
 Defender 2000 have misplaced GFX portions.
 "paused" GFX upper part incorrectly placed in Defender Classic
 ]]></notes>
@@ -421,7 +419,7 @@ Defender 2000 have misplaced GFX portions.
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, sound farts, GFX status bar is stretched in horizontal direction (screen mode changes mid-frame)
+Sound farts, GFX status bar is stretched in horizontal direction (screen mode changes mid-frame)
 Automap becomes blue a few frames after being called
 ]]></notes>
 
@@ -438,7 +436,7 @@ Automap becomes blue a few frames after being called
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
 		<notes><![CDATA[
-Boot OK, no BGMs
+No BGMs
 ]]></notes>
 
 		<info name="serial" value="21941"/>
@@ -454,7 +452,7 @@ Boot OK, no BGMs
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
 		<notes><![CDATA[
-Boot OK, gameplay backgrounds are missing or garbled
+Gameplay backgrounds are missing or garbled
 ]]></notes>
 
 		<info name="serial" value="J9036E 700128-002"/>
@@ -470,7 +468,7 @@ Boot OK, gameplay backgrounds are missing or garbled
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, gameplay area is cut off to the right, status bar even moreso (screen mode changes mid-frame)
+Gameplay area is cut off to the right, status bar even moreso (screen mode changes mid-frame)
 ]]></notes>
 
 		<info name="serial" value="J9006 700706-001"/>
@@ -534,7 +532,7 @@ RSoD on Jaguar logo
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-Boot OK, gameplay area is cut off to the right (especially noticeable when pausing game), no color fill for cutscenes
+Gameplay area is cut off to the right (especially noticeable when pausing game), no color fill for cutscenes
 ]]></notes>
 
 		<info name="serial" value="43175-79126"/>
@@ -585,7 +583,7 @@ Huge GFX issues (mostly related with pitch)
 		<year>2000</year>
 		<publisher>Songboard Productions</publisher>
 		<notes><![CDATA[
-Boot OK, reload after saving doesn't work
+Reload after saving doesn't work
 ]]></notes>
 
 		<info name="serial" value="CF3003"/>
@@ -601,7 +599,7 @@ Boot OK, reload after saving doesn't work
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, has heavy pitch GFX issues
+Has heavy pitch GFX issues
 ]]></notes>
 
 		<info name="serial" value="J9043E 705043-002"/>
@@ -681,7 +679,7 @@ Technically a Jaguar CD cartridge draws an incorrect pitch GFX, doesn't do much 
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, text GFXs are solid filled, no BGMs
+Text GFXs are solid filled, no BGMs
 ]]></notes>
 
 		<info name="serial" value="J9097 705097-001"/>
@@ -714,7 +712,7 @@ Minor glitch on team box when selecting one (blitter not filling properly)
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Boot OK, "Enter Combat" has ground textures with black, "Enter Network" causes a black screen after loading, no BGMs
+"Enter Combat" has ground textures with black, "Enter Network" causes a black screen after loading, no BGMs
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -729,7 +727,7 @@ Boot OK, "Enter Combat" has ground textures with black, "Enter Network" causes a
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-Boot OK, no sound
+No sound
 ]]></notes>
 
 		<info name="serial" value="J0144E 700709-002"/>
@@ -745,7 +743,7 @@ Boot OK, no sound
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, hangs after few seconds of gameplay
+Hangs after few seconds of gameplay
 ]]></notes>
 
 		<info name="serial" value="J9101 700701-001"/>
@@ -761,7 +759,7 @@ Boot OK, hangs after few seconds of gameplay
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
-Boot OK, no BGMs, water background in stage 1 is in Black and white, eventually crashes if bumping into road edges
+No BGMs, water background in stage 1 is in Black and white, eventually crashes if bumping into road edges
 ]]></notes>
 
 		<info name="serial" value="31763-11153"/>
@@ -809,7 +807,7 @@ Black screen
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, ranking screen cuts off text on 9th and 10th places
+Ranking screen cuts off text on 9th and 10th places
 ]]></notes>
 
 		<info name="serial" value="J9005E 700705-2"/>
@@ -825,7 +823,7 @@ Boot OK, ranking screen cuts off text on 9th and 10th places
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, ranking screen cuts off text on 9th and 10th places
+Ranking screen cuts off text on 9th and 10th places
 ]]></notes>
 
 		<info name="serial" value="J9005 700705-1"/>
@@ -841,7 +839,7 @@ Boot OK, ranking screen cuts off text on 9th and 10th places
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
-Boot OK, saves reports error, no sound
+Saves reports error, no sound
 ]]></notes>
 
 		<info name="serial" value="C3669T"/>
@@ -873,7 +871,7 @@ Black screen
 		<year>1995</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Boot OK, no BGMs
+No BGMs
 ]]></notes>
 
 		<info name="alt_title" value="International Sensible Soccer (box, cart); Soccer (manual)"/>
@@ -890,7 +888,7 @@ Boot OK, no BGMs
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Boot OK, hangs after loading a stage
+Hangs after loading a stage
 ]]></notes>
 
 		<info name="serial" value="CF3001"/>
@@ -934,7 +932,6 @@ RSoD on Jaguar logo
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="soccerkd1h" cloneof="soccerkd">
 		<!-- uses universal header, only way to boot this at moment -->
 		<description>Soccer Kid (re-release, hacked)</description>
@@ -1033,7 +1030,7 @@ Gets to title screen (with wrong GFX width) then hangs
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Boot OK, OSD full of pitch imperfections (name entry chars)
+OSD full of pitch imperfections (name entry chars)
 ]]></notes>
 
 		<info name="serial" value="L8002-SYNJAG"/>
@@ -1044,7 +1041,6 @@ Boot OK, OSD full of pitch imperfections (name entry chars)
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="tempst2k" supported="no">
 		<description>Tempest 2000</description>
 		<year>1994</year>
@@ -1062,7 +1058,7 @@ Boot OK, OSD full of pitch imperfections (name entry chars)
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Boot OK, background has pitch glitch
+Background has pitch glitch
 ]]></notes>
 
 		<info name="serial" value="L8001-TPKJAG"/>
@@ -1078,7 +1074,7 @@ Boot OK, background has pitch glitch
 		<year>2010</year>
 		<publisher>Team Jaguar</publisher>
 		<notes><![CDATA[
-Boot OK, no sprites, main menu with incorrect width, no sound (btanb)
+No sprites, main menu with incorrect width, no sound (btanb)
 ]]></notes>
 
 		<info name="serial" value="J6004E 110403-110"/>
@@ -1110,7 +1106,7 @@ Heavy GFX issues, black screen if left on title screen
 		<year>1996</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Boot OK, gameplay screen flickers
+Gameplay screen flickers
 ]]></notes>
 
 		<info name="serial" value="JA256"/>
@@ -1129,7 +1125,7 @@ Boot OK, gameplay screen flickers
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, no sound, GFXs missing on gameplay and title screen
+No sound, GFXs missing on gameplay and title screen
 ]]></notes>
 
 		<info name="serial" value="J9001E 700701-2"/>
@@ -1145,7 +1141,7 @@ Boot OK, no sound, GFXs missing on gameplay and title screen
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, no sound, GFXs missing on gameplay and title screen
+No sound, GFXs missing on gameplay and title screen
 ]]></notes>
 
 		<info name="serial" value="J9001E 700701"/>
@@ -1161,7 +1157,7 @@ Boot OK, no sound, GFXs missing on gameplay and title screen
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
 		<notes><![CDATA[
-Boot OK, no BGMs, has minor GFX pitch issue when action summary message pops up after a play
+No BGMs, has minor GFX pitch issue when action summary message pops up after a play
 ]]></notes>
 
 		<info name="serial" value="21942"/>
@@ -1209,7 +1205,7 @@ RSoD on Jaguar logo
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, sound farts, missing/wrong GFXs on menus and gameplay
+Sound farts, missing/wrong GFXs on menus and gameplay
 ]]></notes>
 
 		<info name="serial" value="J9060E 700760-002"/>
@@ -1225,7 +1221,7 @@ Boot OK, sound farts, missing/wrong GFXs on menus and gameplay
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, black screen after title screen, no sound
+Black screen after title screen, no sound
 ]]></notes>
 
 		<info name="serial" value="J9070E 700770-002"/>
@@ -1241,7 +1237,7 @@ Boot OK, black screen after title screen, no sound
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, sound buzz when selecting new game, can eventually black screen or throw an exception
+Sound buzz when selecting new game, can eventually black screen or throw an exception
 ]]></notes>
 
 		<info name="serial" value="J9028 700128-001"/>
@@ -1257,7 +1253,7 @@ Boot OK, sound buzz when selecting new game, can eventually black screen or thro
 		<year>1998</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Boot OK, pen corruption on background during gameplay, layers are slightly cut off
+Pen corruption on background during gameplay, layers are slightly cut off
 ]]></notes>
 
 		<info name="serial" value="JA103"/>
@@ -1273,7 +1269,7 @@ Boot OK, pen corruption on background during gameplay, layers are slightly cut o
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Boot OK, minor GFX pitch issues, no sound
+Minor GFX pitch issues, no sound
 ]]></notes>
 
 		<info name="serial" value="J4011"/>
@@ -1289,7 +1285,7 @@ Boot OK, minor GFX pitch issues, no sound
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, sound metrics menu has glitchy bars (pause menu then press 'B')
+Sound metrics menu has glitchy bars (pause menu then press 'B')
 ]]></notes>
 
 		<info name="serial" value="J9042E 700742-002"/>
@@ -1481,7 +1477,7 @@ Black screen
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Boot OK, text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay
+Text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
