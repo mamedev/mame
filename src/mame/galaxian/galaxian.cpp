@@ -10154,7 +10154,7 @@ ROM_START( zerotimemc )
 ROM_END
 
 // Unknown manufacturer / bootleger
-ROM_START( zerotimeu )
+ROM_START( zerotimea )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "1.bin", 0x0000, 0x0800, CRC(ac64aabe) SHA1(1cd834bf8b387428639dffd5e4b0ee72fa8aafdf) )
 	ROM_LOAD( "2.bin", 0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
@@ -10168,6 +10168,23 @@ ROM_START( zerotimeu )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+// Unknown manufacturer / bootleger
+ROM_START( zerotimeb )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "p01-6b52-2716.bin",  0x0000, 0x0800, CRC(90a2bc61) SHA1(9d23dfcf5310cf1d4aa1b473ec84279585e1a876) )
+	ROM_LOAD( "p02-f499-2716.bin",  0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
+	ROM_LOAD( "p03a-eh61-2716.bin", 0x1000, 0x0800, CRC(aaf038d4) SHA1(2d070fe7c4e9b26092f0f12a9db3392f7d8a65f1) )
+	ROM_LOAD( "p04-17c7-2716.bin",  0x1800, 0x0800, CRC(786d690a) SHA1(50c5c07941006e3b71afbf057d27daa2f2274925) )
+	ROM_LOAD( "p05-07fe-2716.bin",  0x2000, 0x0800, CRC(af9260d7) SHA1(955e466a8989993351dc69d73ca322c1c9af7b63) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "7-2716.bin",         0x0000, 0x0800, CRC(39546539) SHA1(f6ed8bcfd6fcfc25ccfb4639e8b98837c7eacd35) )
+	ROM_LOAD( "6-2716.bin",         0x0800, 0x0800, CRC(d10337c3) SHA1(54bf15f04fe50c9c7b8f7cbdf7a4dde3e9ce31ed) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.6l",          0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
 // Cirsa bootleg
@@ -16311,7 +16328,8 @@ GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_
 GAME( 1979, galkamika,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Electrogame)",                      "Kamikaze (Electrogame, Spanish bootleg of Galaxian)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // Imperfect graphics because of missing ROM
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)",                          "Zero Time (Datamat)",                                                                          MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)",                      "Zero Time (Marti Colls)",                                                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1979, zerotimeu,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Zero Time (Spanish bootleg)",                                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1979, zerotimea,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Zero Time (Spanish bootleg, set 1)",                                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1979, zerotimeb,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Zero Time (Spanish bootleg, set 2)",                                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxcirsa,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Cirsa)",                            "Galaxian (Cirsa Spanish bootleg)",                                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starfght,    galaxian, galaxian,   swarm,      galaxian_state, init_galaxian,   ROT90,  "bootleg (Jeutel)",                           "Star Fighter",                                                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 1)",                                                                    MACHINE_SUPPORTS_SAVE )
