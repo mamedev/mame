@@ -2,7 +2,7 @@
 // detail/win_iocp_socket_service_base.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,7 +27,6 @@
 #include "asio/detail/buffer_sequence_adapter.hpp"
 #include "asio/detail/fenced_block.hpp"
 #include "asio/detail/handler_alloc_helpers.hpp"
-#include "asio/detail/handler_invoke_helpers.hpp"
 #include "asio/detail/memory.hpp"
 #include "asio/detail/mutex.hpp"
 #include "asio/detail/operation.hpp"
@@ -96,7 +95,7 @@ public:
 
   // Move-construct a new socket implementation.
   ASIO_DECL void base_move_construct(base_implementation_type& impl,
-      base_implementation_type& other_impl) ASIO_NOEXCEPT;
+      base_implementation_type& other_impl) noexcept;
 
   // Move-assign from another socket implementation.
   ASIO_DECL void base_move_assign(base_implementation_type& impl,
@@ -214,7 +213,7 @@ public:
   void async_wait(base_implementation_type& impl,
       socket_base::wait_type w, Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     bool is_continuation =
@@ -298,7 +297,7 @@ public:
       const ConstBufferSequence& buffers, socket_base::message_flags flags,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -374,7 +373,7 @@ public:
       const MutableBufferSequence& buffers, socket_base::message_flags flags,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -407,7 +406,7 @@ public:
       const null_buffers&, socket_base::message_flags flags,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -478,7 +477,7 @@ public:
       socket_base::message_flags& out_flags, Handler& handler,
       const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -510,7 +509,7 @@ public:
       socket_base::message_flags& out_flags, Handler& handler,
       const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -569,9 +568,8 @@ protected:
 
   // Helper function to start an asynchronous send_to operation.
   ASIO_DECL void start_send_to_op(base_implementation_type& impl,
-      WSABUF* buffers, std::size_t buffer_count,
-      const socket_addr_type* addr, int addrlen,
-      socket_base::message_flags flags, operation* op);
+      WSABUF* buffers, std::size_t buffer_count, const void* addr,
+      int addrlen, socket_base::message_flags flags, operation* op);
 
   // Helper function to start an asynchronous receive operation.
   ASIO_DECL void start_receive_op(base_implementation_type& impl,
@@ -585,7 +583,7 @@ protected:
 
   // Helper function to start an asynchronous receive_from operation.
   ASIO_DECL void start_receive_from_op(base_implementation_type& impl,
-      WSABUF* buffers, std::size_t buffer_count, socket_addr_type* addr,
+      WSABUF* buffers, std::size_t buffer_count, void* addr,
       socket_base::message_flags flags, int* addrlen, operation* op);
 
   // Helper function to start an asynchronous accept operation.
@@ -599,9 +597,8 @@ protected:
 
   // Start the asynchronous connect operation using the reactor.
   ASIO_DECL int start_connect_op(base_implementation_type& impl,
-      int family, int type, const socket_addr_type* remote_addr,
-      std::size_t remote_addrlen, win_iocp_socket_connect_op_base* op,
-      operation* iocp_op);
+      int family, int type, const void* remote_addr, std::size_t remote_addrlen,
+      win_iocp_socket_connect_op_base* op, operation* iocp_op);
 
   // Helper function to close a socket when the associated object is being
   // destroyed.

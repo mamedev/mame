@@ -115,6 +115,11 @@ PERFORMANCE_TEST_EXES = \
 	tests\performance\server.exe
 
 UNIT_TEST_EXES = \
+	tests\unit\any_completion_executor.exe \
+	tests\unit\any_completion_handler.exe \
+	tests\unit\any_io_executor.exe \
+	tests\unit\append.exe \
+	tests\unit\as_tuple.exe \
 	tests\unit\associated_allocator.exe \
 	tests\unit\associated_cancellation_slot.exe \
 	tests\unit\associated_executor.exe \
@@ -123,21 +128,29 @@ UNIT_TEST_EXES = \
 	tests\unit\awaitable.exe \
 	tests\unit\basic_datagram_socket.exe \
 	tests\unit\basic_deadline_timer.exe \
+	tests\unit\basic_file.exe \
+	tests\unit\basic_random_access_file.exe \
 	tests\unit\basic_raw_socket.exe \
+	tests\unit\basic_readable_pipe.exe \
 	tests\unit\basic_seq_packet_socket.exe \
 	tests\unit\basic_serial_port.exe \
 	tests\unit\basic_signal_set.exe \
 	tests\unit\basic_socket.exe \
 	tests\unit\basic_socket_acceptor.exe \
+	tests\unit\basic_stream_file.exe \
 	tests\unit\basic_stream_socket.exe \
 	tests\unit\basic_streambuf.exe \
 	tests\unit\basic_waitable_timer.exe \
+	tests\unit\basic_writable_pipe.exe \
+	tests\unit\bind_allocator.exe \
 	tests\unit\bind_cancellation_slot.exe \
 	tests\unit\bind_executor.exe \
+	tests\unit\bind_immediate_executor.exe \
 	tests\unit\buffered_read_stream.exe \
 	tests\unit\buffered_stream.exe \
 	tests\unit\buffered_write_stream.exe \
 	tests\unit\buffer.exe \
+	tests\unit\buffer_registration.exe \
 	tests\unit\buffers_iterator.exe \
 	tests\unit\cancellation_signal.exe \
 	tests\unit\cancellation_state.exe \
@@ -146,9 +159,11 @@ UNIT_TEST_EXES = \
 	tests\unit\completion_condition.exe \
 	tests\unit\compose.exe \
 	tests\unit\connect.exe \
+	tests\unit\connect_pipe.exe \
 	tests\unit\coroutine.exe \
 	tests\unit\deadline_timer.exe \
 	tests\unit\defer.exe \
+	tests\unit\deferred.exe \
 	tests\unit\detached.exe \
 	tests\unit\dispatch.exe \
 	tests\unit\error.exe \
@@ -156,29 +171,16 @@ UNIT_TEST_EXES = \
 	tests\unit\execution\any_executor.exe \
 	tests\unit\execution\blocking.exe \
 	tests\unit\execution\blocking_adaptation.exe \
-	tests\unit\execution\bulk_execute.exe \
-	tests\unit\execution\bulk_guarantee.exe \
-	tests\unit\execution\connect.exe \
 	tests\unit\execution\context_as.exe \
-	tests\unit\execution\execute.exe \
 	tests\unit\execution\executor.exe \
 	tests\unit\execution\invocable_archetype.exe \
 	tests\unit\execution\mapping.exe \
-	tests\unit\execution\operation_state.exe \
 	tests\unit\execution\outstanding_work.exe \
 	tests\unit\execution\prefer_only.exe \
-	tests\unit\execution\receiver.exe \
 	tests\unit\execution\relationship.exe \
-	tests\unit\execution\schedule.exe \
-	tests\unit\execution\scheduler.exe \
-	tests\unit\execution\sender.exe \
-	tests\unit\execution\set_done.exe \
-	tests\unit\execution\set_error.exe \
-	tests\unit\execution\set_value.exe \
-	tests\unit\execution\start.exe \
-	tests\unit\execution\submit.exe \
 	tests\unit\executor.exe \
 	tests\unit\executor_work_guard.exe \
+	tests\unit\file_base.exe \
 	tests\unit\generic\basic_endpoint.exe \
 	tests\unit\generic\datagram_protocol.exe \
 	tests\unit\generic\raw_protocol.exe \
@@ -218,17 +220,24 @@ UNIT_TEST_EXES = \
 	tests\unit\packaged_task.exe \
 	tests\unit\placeholders.exe \
 	tests\unit\post.exe \
+	tests\unit\prepend.exe \
+	tests\unit\random_access_file.exe \
 	tests\unit\read.exe \
 	tests\unit\read_at.exe \
 	tests\unit\read_until.exe \
+	tests\unit\readable_pipe.exe \
+	tests\unit\recycling_allocator.exe \
 	tests\unit\redirect_error.exe \
+	tests\unit\registered_buffer.exe \
 	tests\unit\serial_port.exe \
 	tests\unit\serial_port_base.exe \
 	tests\unit\signal_set.exe \
+	tests\unit\signal_set_base.exe \
 	tests\unit\socket_base.exe \
 	tests\unit\static_thread_pool.exe \
 	tests\unit\steady_timer.exe \
 	tests\unit\strand.exe \
+	tests\unit\stream_file.exe \
 	tests\unit\streambuf.exe \
 	tests\unit\system_context.exe \
 	tests\unit\system_executor.exe \
@@ -258,57 +267,58 @@ UNIT_TEST_EXES = \
 	tests\unit\windows\overlapped_ptr.exe \
 	tests\unit\windows\random_access_handle.exe \
 	tests\unit\windows\stream_handle.exe \
+	tests\unit\writable_pipe.exe \
 	tests\unit\write.exe \
 	tests\unit\write_at.exe
 
-CPP03_EXAMPLE_EXES = \
-	examples\cpp03\allocation\server.exe \
-	examples\cpp03\buffers\reference_counted.exe \
-	examples\cpp03\chat\chat_client.exe \
-	examples\cpp03\chat\chat_server.exe \
-	examples\cpp03\echo\async_tcp_echo_server.exe \
-	examples\cpp03\echo\async_udp_echo_server.exe \
-	examples\cpp03\echo\blocking_tcp_echo_client.exe \
-	examples\cpp03\echo\blocking_tcp_echo_server.exe \
-	examples\cpp03\echo\blocking_udp_echo_client.exe \
-	examples\cpp03\echo\blocking_udp_echo_server.exe \
-	examples\cpp03\http\client\async_client.exe \
-	examples\cpp03\http\client\sync_client.exe \
-	examples\cpp03\http\server\http_server.exe \
-	examples\cpp03\http\server2\http_server.exe \
-	examples\cpp03\http\server3\http_server.exe \
-	examples\cpp03\http\server4\http_server.exe \
-	examples\cpp03\icmp\ping.exe \
-	examples\cpp03\invocation\prioritised_handlers.exe \
-	examples\cpp03\iostreams\daytime_client.exe \
-	examples\cpp03\iostreams\daytime_server.exe \
-	examples\cpp03\iostreams\http_client.exe \
-	examples\cpp03\multicast\receiver.exe \
-	examples\cpp03\multicast\sender.exe \
-	examples\cpp03\nonblocking\third_party_lib.exe \
-	examples\cpp03\porthopper\client.exe \
-	examples\cpp03\porthopper\server.exe \
-	examples\cpp03\services\daytime_client.exe \
-	examples\cpp03\socks4\sync_client.exe \
-	examples\cpp03\timeouts\async_tcp_client.exe \
-	examples\cpp03\timeouts\blocking_tcp_client.exe \
-	examples\cpp03\timeouts\blocking_token_tcp_client.exe \
-	examples\cpp03\timeouts\blocking_udp_client.exe \
-	examples\cpp03\timeouts\server.exe \
-	examples\cpp03\timers\time_t_timer.exe \
-	examples\cpp03\tutorial\timer1\timer.exe \
-	examples\cpp03\tutorial\timer2\timer.exe \
-	examples\cpp03\tutorial\timer3\timer.exe \
-	examples\cpp03\tutorial\timer4\timer.exe \
-	examples\cpp03\tutorial\timer5\timer.exe \
-	examples\cpp03\tutorial\daytime1\client.exe \
-	examples\cpp03\tutorial\daytime2\server.exe \
-	examples\cpp03\tutorial\daytime3\server.exe \
-	examples\cpp03\tutorial\daytime4\client.exe \
-	examples\cpp03\tutorial\daytime5\server.exe \
-	examples\cpp03\tutorial\daytime6\server.exe \
-	examples\cpp03\tutorial\daytime7\server.exe \
-	examples\cpp03\windows\transmit_file.exe
+CPP11_EXAMPLE_EXES = \
+	examples\cpp11\allocation\server.exe \
+	examples\cpp11\buffers\reference_counted.exe \
+	examples\cpp11\chat\chat_client.exe \
+	examples\cpp11\chat\chat_server.exe \
+	examples\cpp11\echo\async_tcp_echo_server.exe \
+	examples\cpp11\echo\async_udp_echo_server.exe \
+	examples\cpp11\echo\blocking_tcp_echo_client.exe \
+	examples\cpp11\echo\blocking_tcp_echo_server.exe \
+	examples\cpp11\echo\blocking_udp_echo_client.exe \
+	examples\cpp11\echo\blocking_udp_echo_server.exe \
+	examples\cpp11\http\client\async_client.exe \
+	examples\cpp11\http\client\sync_client.exe \
+	examples\cpp11\http\server\http_server.exe \
+	examples\cpp11\http\server2\http_server.exe \
+	examples\cpp11\http\server3\http_server.exe \
+	examples\cpp11\http\server4\http_server.exe \
+	examples\cpp11\icmp\ping.exe \
+	examples\cpp11\invocation\prioritised_handlers.exe \
+	examples\cpp11\iostreams\daytime_client.exe \
+	examples\cpp11\iostreams\daytime_server.exe \
+	examples\cpp11\iostreams\http_client.exe \
+	examples\cpp11\multicast\receiver.exe \
+	examples\cpp11\multicast\sender.exe \
+	examples\cpp11\nonblocking\third_party_lib.exe \
+	examples\cpp11\porthopper\client.exe \
+	examples\cpp11\porthopper\server.exe \
+	examples\cpp11\services\daytime_client.exe \
+	examples\cpp11\socks4\sync_client.exe \
+	examples\cpp11\timeouts\async_tcp_client.exe \
+	examples\cpp11\timeouts\blocking_tcp_client.exe \
+	examples\cpp11\timeouts\blocking_token_tcp_client.exe \
+	examples\cpp11\timeouts\blocking_udp_client.exe \
+	examples\cpp11\timeouts\server.exe \
+	examples\cpp11\timers\time_t_timer.exe \
+	examples\cpp11\tutorial\timer1\timer.exe \
+	examples\cpp11\tutorial\timer2\timer.exe \
+	examples\cpp11\tutorial\timer3\timer.exe \
+	examples\cpp11\tutorial\timer4\timer.exe \
+	examples\cpp11\tutorial\timer5\timer.exe \
+	examples\cpp11\tutorial\daytime1\client.exe \
+	examples\cpp11\tutorial\daytime2\server.exe \
+	examples\cpp11\tutorial\daytime3\server.exe \
+	examples\cpp11\tutorial\daytime4\client.exe \
+	examples\cpp11\tutorial\daytime5\server.exe \
+	examples\cpp11\tutorial\daytime6\server.exe \
+	examples\cpp11\tutorial\daytime7\server.exe \
+	examples\cpp11\windows\transmit_file.exe
 
 SSL_UNIT_TEST_EXES = \
 	tests\unit\ssl\basic_context.exe \
@@ -321,8 +331,8 @@ SSL_UNIT_TEST_EXES = \
 	tests\unit\ssl\stream_service.exe
 
 SSL_EXAMPLE_EXES = \
-	examples\cpp03\ssl\client.exe \
-	examples\cpp03\ssl\server.exe
+	examples\cpp11\ssl\client.exe \
+	examples\cpp11\ssl\server.exe
 
 !ifdef SEPARATE_COMPILATION
 all: asio.lib
@@ -333,13 +343,14 @@ asio.lib: asio.cpp
 
 !ifdef STANDALONE
 all: \
+	$(CPP11_EXAMPLE_EXES) \
 	$(UNIT_TEST_EXES)
 !else
 all: \
 	$(LATENCY_TEST_EXES) \
 	$(PERFORMANCE_TEST_EXES) \
-	$(UNIT_TEST_EXES) \
-	$(CPP03_EXAMPLE_EXES)
+	$(CPP11_EXAMPLE_EXES) \
+	$(UNIT_TEST_EXES)
 !endif
 
 ssl: \
@@ -382,88 +393,88 @@ tests\unit\unit_test.obj: tests\unit\unit_test.cpp
 {tests\unit\windows}.cpp{tests\unit\windows}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\allocation}.cpp{examples\cpp03\allocation}.exe:
+{examples\cpp11\allocation}.cpp{examples\cpp11\allocation}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\buffers}.cpp{examples\cpp03\buffers}.exe:
+{examples\cpp11\buffers}.cpp{examples\cpp11\buffers}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\chat}.cpp{examples\cpp03\chat}.exe:
+{examples\cpp11\chat}.cpp{examples\cpp11\chat}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\echo}.cpp{examples\cpp03\echo}.exe:
+{examples\cpp11\echo}.cpp{examples\cpp11\echo}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\http\client}.cpp{examples\cpp03\http\client}.exe:
+{examples\cpp11\http\client}.cpp{examples\cpp11\http\client}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\icmp}.cpp{examples\cpp03\icmp}.exe:
+{examples\cpp11\icmp}.cpp{examples\cpp11\icmp}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\invocation}.cpp{examples\cpp03\invocation}.exe:
+{examples\cpp11\invocation}.cpp{examples\cpp11\invocation}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\iostreams}.cpp{examples\cpp03\iostreams}.exe:
+{examples\cpp11\iostreams}.cpp{examples\cpp11\iostreams}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\multicast}.cpp{examples\cpp03\multicast}.exe:
+{examples\cpp11\multicast}.cpp{examples\cpp11\multicast}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\nonblocking}.cpp{examples\cpp03\nonblocking}.exe:
+{examples\cpp11\nonblocking}.cpp{examples\cpp11\nonblocking}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\porthopper}.cpp{examples\cpp03\porthopper}.exe:
+{examples\cpp11\porthopper}.cpp{examples\cpp11\porthopper}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\socks4}.cpp{examples\cpp03\socks4}.exe:
+{examples\cpp11\socks4}.cpp{examples\cpp11\socks4}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\ssl}.cpp{examples\cpp03\ssl}.exe:
+{examples\cpp11\ssl}.cpp{examples\cpp11\ssl}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(SSL_CXXFLAGS) $(DEFINES) $< $(SSL_LIBS) $(LIBS) -link -opt:ref
 
-{examples\cpp03\timeouts}.cpp{examples\cpp03\timeouts}.exe:
+{examples\cpp11\timeouts}.cpp{examples\cpp11\timeouts}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\timers}.cpp{examples\cpp03\timers}.exe:
+{examples\cpp11\timers}.cpp{examples\cpp11\timers}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\timer1}.cpp{examples\cpp03\tutorial\timer1}.exe:
+{examples\cpp11\tutorial\timer1}.cpp{examples\cpp11\tutorial\timer1}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\timer2}.cpp{examples\cpp03\tutorial\timer2}.exe:
+{examples\cpp11\tutorial\timer2}.cpp{examples\cpp11\tutorial\timer2}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\timer3}.cpp{examples\cpp03\tutorial\timer3}.exe:
+{examples\cpp11\tutorial\timer3}.cpp{examples\cpp11\tutorial\timer3}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\timer4}.cpp{examples\cpp03\tutorial\timer4}.exe:
+{examples\cpp11\tutorial\timer4}.cpp{examples\cpp11\tutorial\timer4}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\timer5}.cpp{examples\cpp03\tutorial\timer5}.exe:
+{examples\cpp11\tutorial\timer5}.cpp{examples\cpp11\tutorial\timer5}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\daytime1}.cpp{examples\cpp03\tutorial\daytime1}.exe:
+{examples\cpp11\tutorial\daytime1}.cpp{examples\cpp11\tutorial\daytime1}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\daytime2}.cpp{examples\cpp03\tutorial\daytime2}.exe:
+{examples\cpp11\tutorial\daytime2}.cpp{examples\cpp11\tutorial\daytime2}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\daytime3}.cpp{examples\cpp03\tutorial\daytime3}.exe:
+{examples\cpp11\tutorial\daytime3}.cpp{examples\cpp11\tutorial\daytime3}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\daytime4}.cpp{examples\cpp03\tutorial\daytime4}.exe:
+{examples\cpp11\tutorial\daytime4}.cpp{examples\cpp11\tutorial\daytime4}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\daytime5}.cpp{examples\cpp03\tutorial\daytime5}.exe:
+{examples\cpp11\tutorial\daytime5}.cpp{examples\cpp11\tutorial\daytime5}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\daytime6}.cpp{examples\cpp03\tutorial\daytime6}.exe:
+{examples\cpp11\tutorial\daytime6}.cpp{examples\cpp11\tutorial\daytime6}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\tutorial\daytime7}.cpp{examples\cpp03\tutorial\daytime7}.exe:
+{examples\cpp11\tutorial\daytime7}.cpp{examples\cpp11\tutorial\daytime7}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-{examples\cpp03\windows}.cpp{examples\cpp03\windows}.exe:
+{examples\cpp11\windows}.cpp{examples\cpp11\windows}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
 {examples\cpp11\executors}.cpp{examples\cpp11\executors}.exe:
@@ -475,51 +486,51 @@ tests\unit\unit_test.obj: tests\unit\unit_test.cpp
 {examples\cpp14\operations}.cpp{examples\cpp14\operations}.exe:
 	cl -Fe$@ -Fo$(<:.cpp=.obj) $(CXXFLAGS) $(DEFINES) $< $(LIBS) -link -opt:ref
 
-examples\cpp03\http\server\http_server.exe: \
-		examples\cpp03\http\server\connection.cpp \
-		examples\cpp03\http\server\connection_manager.cpp \
-		examples\cpp03\http\server\main.cpp \
-		examples\cpp03\http\server\mime_types.cpp \
-		examples\cpp03\http\server\reply.cpp \
-		examples\cpp03\http\server\request_handler.cpp \
-		examples\cpp03\http\server\request_parser.cpp \
-		examples\cpp03\http\server\server.cpp
-	cl -Fe$@ -Foexamples\cpp03\http\server\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
+examples\cpp11\http\server\http_server.exe: \
+		examples\cpp11\http\server\connection.cpp \
+		examples\cpp11\http\server\connection_manager.cpp \
+		examples\cpp11\http\server\main.cpp \
+		examples\cpp11\http\server\mime_types.cpp \
+		examples\cpp11\http\server\reply.cpp \
+		examples\cpp11\http\server\request_handler.cpp \
+		examples\cpp11\http\server\request_parser.cpp \
+		examples\cpp11\http\server\server.cpp
+	cl -Fe$@ -Foexamples\cpp11\http\server\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
 
-examples\cpp03\http\server2\http_server.exe: \
-		examples\cpp03\http\server2\connection.cpp \
-		examples\cpp03\http\server2\io_context_pool.cpp \
-		examples\cpp03\http\server2\main.cpp \
-		examples\cpp03\http\server2\mime_types.cpp \
-		examples\cpp03\http\server2\reply.cpp \
-		examples\cpp03\http\server2\request_handler.cpp \
-		examples\cpp03\http\server2\request_parser.cpp \
-		examples\cpp03\http\server2\server.cpp
-	cl -Fe$@ -Foexamples\cpp03\http\server2\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
+examples\cpp11\http\server2\http_server.exe: \
+		examples\cpp11\http\server2\connection.cpp \
+		examples\cpp11\http\server2\io_context_pool.cpp \
+		examples\cpp11\http\server2\main.cpp \
+		examples\cpp11\http\server2\mime_types.cpp \
+		examples\cpp11\http\server2\reply.cpp \
+		examples\cpp11\http\server2\request_handler.cpp \
+		examples\cpp11\http\server2\request_parser.cpp \
+		examples\cpp11\http\server2\server.cpp
+	cl -Fe$@ -Foexamples\cpp11\http\server2\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
 
-examples\cpp03\http\server3\http_server.exe: \
-		examples\cpp03\http\server3\connection.cpp \
-		examples\cpp03\http\server3\main.cpp \
-		examples\cpp03\http\server3\mime_types.cpp \
-		examples\cpp03\http\server3\reply.cpp \
-		examples\cpp03\http\server3\request_handler.cpp \
-		examples\cpp03\http\server3\request_parser.cpp \
-		examples\cpp03\http\server3\server.cpp
-	cl -Fe$@ -Foexamples\cpp03\http\server3\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
+examples\cpp11\http\server3\http_server.exe: \
+		examples\cpp11\http\server3\connection.cpp \
+		examples\cpp11\http\server3\main.cpp \
+		examples\cpp11\http\server3\mime_types.cpp \
+		examples\cpp11\http\server3\reply.cpp \
+		examples\cpp11\http\server3\request_handler.cpp \
+		examples\cpp11\http\server3\request_parser.cpp \
+		examples\cpp11\http\server3\server.cpp
+	cl -Fe$@ -Foexamples\cpp11\http\server3\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
 
-examples\cpp03\http\server4\http_server.exe: \
-		examples\cpp03\http\server4\file_handler.cpp \
-		examples\cpp03\http\server4\main.cpp \
-		examples\cpp03\http\server4\mime_types.cpp \
-		examples\cpp03\http\server4\reply.cpp \
-		examples\cpp03\http\server4\request_parser.cpp \
-		examples\cpp03\http\server4\server.cpp
-	cl -Fe$@ -Foexamples\cpp03\http\server4\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
+examples\cpp11\http\server4\http_server.exe: \
+		examples\cpp11\http\server4\file_handler.cpp \
+		examples\cpp11\http\server4\main.cpp \
+		examples\cpp11\http\server4\mime_types.cpp \
+		examples\cpp11\http\server4\reply.cpp \
+		examples\cpp11\http\server4\request_parser.cpp \
+		examples\cpp11\http\server4\server.cpp
+	cl -Fe$@ -Foexamples\cpp11\http\server4\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
 
-examples\cpp03\services\daytime_client.exe: \
-		examples\cpp03\services\daytime_client.cpp \
-		examples\cpp03\services\logger_service.cpp
-	cl -Fe$@ -Foexamples\cpp03\services\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
+examples\cpp11\services\daytime_client.exe: \
+		examples\cpp11\services\daytime_client.cpp \
+		examples\cpp11\services\logger_service.cpp
+	cl -Fe$@ -Foexamples\cpp11\services\ $(CXXFLAGS) $(DEFINES) $** $(LIBS) -link -opt:ref
 
 clean:
 	-del /q /s asio.lib

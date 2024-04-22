@@ -38,9 +38,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_memory_region m_rom_region;
 	memory_bank_array_creator<3> m_rombank;
-	memory_view m_view0;
-	memory_view m_view1;
-	memory_view m_view2;
+	memory_view m_view[3];
 	u32 m_region_offset;
 	u32 m_sram_address;
 	std::vector<u8> m_sram;

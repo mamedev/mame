@@ -1547,7 +1547,8 @@ u16 tms34010_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
-	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
+	if (!machine().side_effects_disabled())
+		LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1588,7 +1589,8 @@ u16 tms34020_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
-	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg020_name[offset]);
+	if (!machine().side_effects_disabled())
+		LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg020_name[offset]);
 
 	switch (offset)
 	{
@@ -1718,13 +1720,16 @@ u16 tms340x0_device::host_r(offs_t offset)
 			addr = (IOREG(REG_HSTADRH) << 16) | IOREG(REG_HSTADRL);
 			result = TMS34010_RDMEM_WORD(addr & 0xfffffff0);
 
-			/* optional postincrement (it says preincrement, but data is preloaded, so it
-			   is effectively a postincrement */
-			if (IOREG(REG_HSTCTLH) & 0x1000)
+			if (!machine().side_effects_disabled())
 			{
-				addr += 0x10;
-				IOREG(REG_HSTADRH) = addr >> 16;
-				IOREG(REG_HSTADRL) = (uint16_t)addr;
+				/* optional postincrement (it says preincrement, but data is preloaded, so it
+				   is effectively a postincrement */
+				if (IOREG(REG_HSTCTLH) & 0x1000)
+				{
+					addr += 0x10;
+					IOREG(REG_HSTADRH) = addr >> 16;
+					IOREG(REG_HSTADRL) = (uint16_t)addr;
+				}
 			}
 			break;
 
@@ -1735,7 +1740,8 @@ u16 tms340x0_device::host_r(offs_t offset)
 
 		/* error case */
 		default:
-			logerror("tms34010_host_control_r called on invalid register %d\n", reg);
+			if (!machine().side_effects_disabled())
+				logerror("tms34010_host_control_r called on invalid register %d\n", reg);
 			break;
 	}
 
