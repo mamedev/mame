@@ -18,18 +18,12 @@
 #endif
 
 #if defined(_WIN32) && !defined(_WIN32_WINNT)
-#if defined(OSD_WINDOWS)
-#define _WIN32_WINNT 0x0501
-#else
-#define _WIN32_WINNT 0x0603
+#define _WIN32_WINNT 0x0600
 #endif
-#endif
+
 #define ASIO_HEADER_ONLY
 #define ASIO_STANDALONE
 #define ASIO_SEPARATE_COMPILATION
-#define ASIO_NOEXCEPT noexcept(true)
-#define ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
-#define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
 
 #include <asio.hpp>
 #undef interface
