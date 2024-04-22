@@ -3,15 +3,11 @@
 
 defines {
 	"OSD_WINDOWS",
+	"UNICODE",
+	"_UNICODE",
 	"WIN32_LEAN_AND_MEAN",
 	"NOMINMAX",
 }
-
-configuration { "mingw* or vs*" }
-	defines {
-		"UNICODE",
-		"_UNICODE"
-	}
 
 configuration { "vs*" }
 	flags {
