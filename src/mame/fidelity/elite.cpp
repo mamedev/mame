@@ -1105,6 +1105,6 @@ SYST( 1982, fprese,    fpres,  0,      pc,       pc,    elite_state, empty_init,
 SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE )
 SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, feag,      0,      0,      eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag,      0,      0,      eag,      eag,   eag_state,   empty_init,   "Fidelity International", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity International", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity International", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -1339,7 +1339,7 @@ void tx1_state::machine_reset()
 	// TODO: This is connected to the /BUSACK line of the Z80
 	m_maincpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 
-	memset(&m_math, 0, sizeof(m_math));
+	m_math = math_t();
 
 	m_sn74s516.state = 0;
 }

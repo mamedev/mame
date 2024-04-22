@@ -2,7 +2,7 @@
 // io_context_strand.cpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +16,7 @@
 // Test that header file is self-contained.
 #include "asio/io_context_strand.hpp"
 
+#include <functional>
 #include <sstream>
 #include "asio/io_context.hpp"
 #include "asio/dispatch.hpp"
@@ -29,24 +30,14 @@
 # include "asio/steady_timer.hpp"
 #endif // defined(ASIO_HAS_BOOST_DATE_TIME)
 
-#if defined(ASIO_HAS_BOOST_BIND)
-# include <boost/bind/bind.hpp>
-#else // defined(ASIO_HAS_BOOST_BIND)
-# include <functional>
-#endif // defined(ASIO_HAS_BOOST_BIND)
-
 using namespace asio;
 
-#if defined(ASIO_HAS_BOOST_BIND)
-namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
 namespace bindns = std;
-#endif
 
 #if defined(ASIO_HAS_BOOST_DATE_TIME)
 typedef deadline_timer timer;
 namespace chronons = boost::posix_time;
-#elif defined(ASIO_HAS_CHRONO)
+#else // defined(ASIO_HAS_BOOST_DATE_TIME)
 typedef steady_timer timer;
 namespace chronons = asio::chrono;
 #endif // defined(ASIO_HAS_BOOST_DATE_TIME)

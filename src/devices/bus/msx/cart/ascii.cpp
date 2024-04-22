@@ -158,8 +158,7 @@ public:
 		: device_t(mconfig, MSX_CART_ASCII8_SRAM, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
 		, m_rombank(*this, "rombank%u", 0U)
-		, m_view2(*this, "view2")
-		, m_view3(*this, "view3")
+		, m_view{ {*this, "view2"}, {*this, "view3"} }
 		, m_bank_mask(0)
 		, m_sram_select_mask(0)
 	{ }
@@ -177,8 +176,7 @@ private:
 	void mapper_write(offs_t offset, u8 data);
 
 	memory_bank_array_creator<4> m_rombank;
-	memory_view m_view2;
-	memory_view m_view3;
+	memory_view m_view[2];
 	u8 m_bank_mask;
 	u8 m_sram_select_mask;
 };
@@ -187,8 +185,8 @@ void msx_cart_ascii8_sram_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
 		m_rombank[i]->set_entry(0);
-	m_view2.select(0);
-	m_view3.select(0);
+	m_view[0].select(0);
+	m_view[1].select(0);
 }
 
 std::error_condition msx_cart_ascii8_sram_device::initialize_cartridge(std::string &message)
@@ -229,12 +227,12 @@ std::error_condition msx_cart_ascii8_sram_device::initialize_cartridge(std::stri
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
 	page(1)->install_write_handler(0x6000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_sram_device::mapper_write)));
-	page(2)->install_view(0x8000, 0x9fff, m_view2);
-	m_view2[0].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	m_view2[1].install_ram(0x8000, 0x9fff, cart_sram_region()->base());
-	page(2)->install_view(0xa000, 0xbfff, m_view3);
-	m_view3[0].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
-	m_view3[1].install_ram(0xa000, 0xbfff, cart_sram_region()->base());
+	page(2)->install_view(0x8000, 0x9fff, m_view[0]);
+	m_view[0][0].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
+	m_view[0][1].install_ram(0x8000, 0x9fff, cart_sram_region()->base());
+	page(2)->install_view(0xa000, 0xbfff, m_view[1]);
+	m_view[1][0].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
+	m_view[1][1].install_ram(0xa000, 0xbfff, cart_sram_region()->base());
 
 	return std::error_condition();
 }
@@ -244,17 +242,13 @@ void msx_cart_ascii8_sram_device::mapper_write(offs_t offset, u8 data)
 	u8 bank = (offset / 0x800) & 0x03;
 	if (data & m_sram_select_mask)
 	{
-		if (bank == 2)
-			m_view2.select(1);
-		if (bank == 3)
-			m_view3.select(1);
+		if (BIT(bank, 1))
+			m_view[BIT(bank, 0)].select(1);
 	}
 	else
 	{
-		if (bank == 2)
-			m_view2.select(0);
-		if (bank == 3)
-			m_view3.select(0);
+		if (BIT(bank, 1))
+			m_view[BIT(bank, 0)].select(0);
 
 		m_rombank[bank]->set_entry(data & m_bank_mask);
 	}

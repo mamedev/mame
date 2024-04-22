@@ -2,7 +2,7 @@
 // ssl/detail/read_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,7 +30,7 @@ template <typename MutableBufferSequence>
 class read_op
 {
 public:
-  static ASIO_CONSTEXPR const char* tracking_name()
+  static constexpr const char* tracking_name()
   {
     return "ssl::stream<>::async_read_some";
   }
@@ -56,7 +56,7 @@ public:
       const asio::error_code& ec,
       const std::size_t& bytes_transferred) const
   {
-    ASIO_MOVE_OR_LVALUE(Handler)(handler)(ec, bytes_transferred);
+    static_cast<Handler&&>(handler)(ec, bytes_transferred);
   }
 
 private:

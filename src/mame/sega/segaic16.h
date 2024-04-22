@@ -76,45 +76,47 @@ public:
 
 	struct tilemap_callback_info
 	{
-		uint16_t *        rambase;                        /* base of RAM for this tilemap page */
-		const uint8_t *   bank;                           /* pointer to bank array */
-		uint16_t          banksize;                       /* size of banks */
+		uint16_t *                  rambase = nullptr;              // base of RAM for this tilemap page
+		const uint8_t *             bank = nullptr;                 // pointer to bank array
+		uint16_t                    banksize = 0;                   // size of banks
 	};
-
 
 	struct tilemap_info
 	{
-		uint8_t           index;                          /* index of this structure */
-		uint8_t           type;                           /* type of tilemap (see segaic16.h for details) */
-		uint8_t           numpages;                       /* number of allocated pages */
-		uint8_t           flip;                           /* screen flip? */
-		uint8_t           rowscroll, colscroll;           /* are rowscroll/colscroll enabled (if external enables are used) */
-		uint8_t           bank[8];                        /* indexes of the tile banks */
-		uint16_t          banksize;                       /* number of tiles per bank */
-		uint16_t          latched_xscroll[4];             /* latched X scroll values */
-		uint16_t          latched_yscroll[4];             /* latched Y scroll values */
-		uint16_t          latched_pageselect[4];          /* latched page select values */
-		int32_t           xoffs;                          /* X scroll offset */
-		tilemap_t *     tilemaps[16];                   /* up to 16 tilemap pages */
-		tilemap_t *     textmap;                        /* a single text tilemap */
-		struct tilemap_callback_info tmap_info[16];     /* callback info for 16 tilemap pages */
-		struct tilemap_callback_info textmap_info;      /* callback info for a single textmap page */
-		void            (*reset)(screen_device &screen, struct tilemap_info *info);/* reset callback */
-		void            (*draw_layer)(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-		uint16_t *        textram;                        /* pointer to textram pointer */
-		uint16_t *        tileram;                        /* pointer to tileram pointer */
-		emu_timer *     latch_timer;                    /* timer for latching 16b tilemap scroll values */
+		using reset_func = void (*)(screen_device &screen, tilemap_info *info);
+		using draw_layer_func = void (*)(screen_device &screen, tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+
+		uint8_t                     index = 0;                          // index of this structure
+		uint8_t                     type = 0;                           // type of tilemap (see segaic16.h for details)
+		uint8_t                     numpages = 0;                       // number of allocated pages
+		uint8_t                     flip = 0;                           // screen flip?
+		uint8_t                     rowscroll = 0, colscroll = 0;       // are rowscroll/colscroll enabled (if external enables are used)
+		uint8_t                     bank[8] = {0,0,0,0,0,0,0,0};        // indexes of the tile banks
+		uint16_t                    banksize = 0;                       // number of tiles per bank
+		uint16_t                    latched_xscroll[4] = {0,0,0,0};     // latched X scroll values
+		uint16_t                    latched_yscroll[4] = {0,0,0,0};     // latched Y scroll values
+		uint16_t                    latched_pageselect[4] = {0,0,0,0};  // latched page select values
+		int32_t                     xoffs = 0;                          // X scroll offset
+		tilemap_t *                 tilemaps[16]{};                     // up to 16 tilemap pages
+		tilemap_t *                 textmap = nullptr;                  // a single text tilemap
+		tilemap_callback_info       tmap_info[16];                      // callback info for 16 tilemap pages
+		tilemap_callback_info       textmap_info;                       // callback info for a single textmap page
+		reset_func                  reset = nullptr;                    // reset callback
+		draw_layer_func             draw_layer = nullptr;
+		uint16_t *                  textram = nullptr;                  // pointer to textram pointer
+		uint16_t *                  tileram = nullptr;                  // pointer to tileram pointer
+		emu_timer *                 latch_timer = nullptr;              // timer for latching 16b tilemap scroll values
 	};
 
 
 	struct rotate_info
 	{
-		uint8_t           index;                          /* index of this structure */
-		uint8_t           type;                           /* type of rotate system (see segaic16.h for details) */
-		uint16_t          colorbase;                      /* base color index */
-		int32_t           ramsize;                        /* size of rotate RAM */
-		uint16_t *        rotateram;                      /* pointer to rotateram pointer */
-		std::unique_ptr<uint16_t[]>        buffer;                         /* buffered data */
+		uint8_t                     index = 0;                          // index of this structure
+		uint8_t                     type = 0;                           // type of rotate system (see segaic16.h for details)
+		uint16_t                    colorbase = 0;                      // base color index
+		int32_t                     ramsize = 0;                        // size of rotate RAM
+		uint16_t *                  rotateram = nullptr;                // pointer to rotateram pointer
+		std::unique_ptr<uint16_t[]> buffer;                             // buffered data
 	};
 
 	template <typename T> segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&decode_tag)

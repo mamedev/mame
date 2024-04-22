@@ -2,14 +2,13 @@
 // parallel_sort.cpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #include <asio.hpp>
-#include <asio/experimental/append.hpp>
 #include <asio/experimental/parallel_group.hpp>
 #include <algorithm>
 #include <chrono>
@@ -89,7 +88,7 @@ auto parallel_sort(
               [self = std::make_shared<self_type>(std::move(self))]
               {
                 asio::dispatch(
-                    asio::experimental::append(
+                    asio::append(
                       std::move(*self), 0));
               }
             );

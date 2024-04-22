@@ -2,7 +2,7 @@
 // detail/impl/win_iocp_io_context.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,7 +22,6 @@
 #include "asio/error.hpp"
 #include "asio/detail/cstdint.hpp"
 #include "asio/detail/handler_alloc_helpers.hpp"
-#include "asio/detail/handler_invoke_helpers.hpp"
 #include "asio/detail/limits.hpp"
 #include "asio/detail/thread.hpp"
 #include "asio/detail/throw_error.hpp"
@@ -51,7 +50,7 @@ struct win_iocp_io_context::thread_function
 
 struct win_iocp_io_context::work_finished_on_block_exit
 {
-  ~work_finished_on_block_exit()
+  ~work_finished_on_block_exit() noexcept(false)
   {
     io_context_->work_finished();
   }
@@ -168,7 +167,10 @@ void win_iocp_io_context::shutdown()
   }
 
   if (timer_thread_.get())
+  {
     timer_thread_->join();
+    timer_thread_.reset();
+  }
 }
 
 asio::error_code win_iocp_io_context::register_handle(
@@ -527,6 +529,7 @@ size_t win_iocp_io_context::do_one(DWORD msec,
 
 DWORD win_iocp_io_context::get_gqcs_timeout()
 {
+#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0600)
   OSVERSIONINFOEX osvi;
   ZeroMemory(&osvi, sizeof(osvi));
   osvi.dwOSVersionInfoSize = sizeof(osvi);
@@ -539,6 +542,9 @@ DWORD win_iocp_io_context::get_gqcs_timeout()
     return INFINITE;
 
   return default_gqcs_timeout;
+#else // !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0600)
+  return INFINITE;
+#endif // !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0600)
 }
 
 void win_iocp_io_context::do_add_timer_queue(timer_queue_base& queue)
