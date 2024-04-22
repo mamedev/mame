@@ -319,6 +319,7 @@ void timetrv_state::timetrv(machine_config &config)
 	ppi2.in_pc_callback().set_ioport("DSW3");
 
 	NS16450(config, m_uart, 768000); // P82050 (serial interface for Laserdisc player)
+	m_uart->out_dtr_callback().set(m_laserdisc, FUNC(sony_ldp1450hle_device::dsr_w));
 	m_uart->out_tx_callback().set(m_laserdisc, FUNC(sony_ldp1450hle_device::rx_w));
 
 	/* video hardware */

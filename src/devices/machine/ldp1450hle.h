@@ -41,6 +41,8 @@ public:
 
 	void set_baud(int32_t clock) { m_baud = clock; }
 
+	void dsr_w(int state);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -55,6 +57,7 @@ protected:
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
+
 
 	TIMER_CALLBACK_MEMBER(process_vbi_data);
 	TIMER_CALLBACK_MEMBER(process_queue);
@@ -98,7 +101,10 @@ private:
 		CMD_CLEAR_ALL           =0x56,
 		CMD_ADDR_INQ            =0x60,
 		CMD_STATUS_INQ          =0x67,
-		CMD_CHAPTER_SET         =0x69
+		CMD_CHAPTER_SET         =0x69,
+		CMD_USER_INDEX_CTRL     =0x80,
+		CMD_USER_INDEX_ON       =0x81,
+		CMD_USER_INDEX_OFF      =0x82,
 	};
 
 	enum player_mode : uint8_t
@@ -115,7 +121,16 @@ private:
 		MODE_SEARCH_CL,
 		MODE_REPEAT_CMD_MARK,
 		MODE_REPEAT_CMD_REPS,
-		MODE_STILL
+		MODE_STILL,
+		SUBMODE_NORMAL,
+		SUBMODE_USER_INDEX,
+		SUBMODE_USER_INDEX_MODE_1,
+		SUBMODE_USER_INDEX_MODE_2,
+		SUBMODE_USER_INDEX_MODE_3,
+		SUBMODE_USER_INDEX_STRING_1,
+		SUBMODE_USER_INDEX_STRING_2,
+		SUBMODE_USER_INDEX_WINDOW,
+
 	};
 
 	enum address_mode : uint8_t
@@ -147,6 +162,7 @@ private:
 	uint8_t             m_reply;
 
 	uint8_t             m_mode;                 // current player mode
+	uint8_t             m_submode;
 	uint32_t            m_baud;
 	uint32_t            m_chapter;
 	uint32_t            m_time;
@@ -171,6 +187,17 @@ private:
 	uint16_t            m_speed;
 	uint32_t            m_speed_accum;
 	uint32_t            m_curr_frame;
+
+	uint8_t             m_dsr;
+	uint8_t             m_cts;
+
+	uint8_t             m_user_index_x;
+	uint8_t             m_user_index_y;
+	uint8_t             m_user_index_mode;
+	uint8_t             m_user_index_char_idx;
+	uint8_t             m_user_index_window_idx;
+	char                m_user_index_chars[32];
+
 };
 
 #endif // MAME_MACHINE_LDP1450_H
