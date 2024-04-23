@@ -42,8 +42,8 @@ private:
 	static const std::array<s32, 0x80> attack_linear_step;
 	static const std::array<s32, 0x20> decay_linear_step;
 	static const std::array<s32, 16> panmap;
+	static const std::array<u8, 4> dpcm_offset;
 	std::array<s32, 0x80> m_global_step;
-	static const std::array<u8, 4> m_dpcm_offset;
 	std::array<s16, 0x100> m_dpcm;
 
 	static const std::array<u32, 4> lfo_shape_centered_saw;

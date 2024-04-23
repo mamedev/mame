@@ -91,7 +91,7 @@ const std::array<s32, 16> swp00_device::panmap = {
 	0x300, 0x340, 0x380, 0xfff
 };
 
-const std::array<u8, 4> swp00_device::m_dpcm_offset = { 7, 6, 4, 0 };
+const std::array<u8, 4> swp00_device::dpcm_offset = { 7, 6, 4, 0 };
 
 bool swp00_device::istep(s32 &value, s32 limit, s32 step)
 {
@@ -1335,13 +1335,13 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				break;
 
 			case 3: { // 8-bits delta-pcm
-				u8 dpcm_offset = m_dpcm_offset[m_sample_dpcm_and_format[chan] & 3];
-				u8 dpcm_scale = (m_sample_dpcm_and_format[chan] >> 2) & 7;
+				u8 offset = dpcm_offset[m_sample_dpcm_and_format[chan] & 3];
+				u8 scale = (m_sample_dpcm_and_format[chan] >> 2) & 7;
 				u32 target_address = base_address + spos + 1;
 				while(m_dpcm_address[chan] <= target_address) {
 					m_dpcm_current[chan] = m_dpcm_next[chan];
-					m_dpcm_sum[chan] += m_dpcm[read_byte(m_dpcm_address[chan])] - dpcm_offset;
-					s32 sample = (m_dpcm_sum[chan] << dpcm_scale) >> 3;
+					m_dpcm_sum[chan] += m_dpcm[read_byte(m_dpcm_address[chan])] - offset;
+					s32 sample = (m_dpcm_sum[chan] << scale) >> 3;
 					m_dpcm_address[chan] ++;
 					if(sample < -0x8000)
 						sample = -0x8000;
