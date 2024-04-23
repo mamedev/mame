@@ -168,7 +168,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
+	required_device<williams_cvsd_sound_device> m_cvsd_sound;
 
 	uint8_t *m_cvsd_protection_base = nullptr;
 

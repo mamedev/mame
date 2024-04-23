@@ -581,7 +581,7 @@ void midyunit_base_state::machine_start()
 
 void term2_state::machine_start()
 {
-	midyunit_base_state::machine_start();
+	midyunit_adpcm_state::machine_start();
 
 	m_left_flash.resolve();
 	m_right_flash.resolve();
@@ -595,18 +595,24 @@ void term2_state::machine_start()
 
 void midzunit_state::machine_reset()
 {
+	midyunit_base_state::machine_reset();
+
 	m_narc_sound->reset_write(1);
 	m_narc_sound->reset_write(0);
 }
 
 void midyunit_cvsd_state::machine_reset()
 {
+	midyunit_base_state::machine_reset();
+
 	m_cvsd_sound->reset_write(1);
 	m_cvsd_sound->reset_write(0);
 }
 
 void midyunit_adpcm_state::machine_reset()
 {
+	midyunit_base_state::machine_reset();
+
 	m_adpcm_sound->reset_write(1);
 	m_adpcm_sound->reset_write(0);
 }
@@ -644,7 +650,7 @@ void midyunit_cvsd_state::cvsd_sound_w(offs_t offset, uint16_t data, uint16_t me
 	// call through based on the sound type
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 	{
-		m_cvsd_sound->reset_write((~data & 0x100) >> 8);
+		m_cvsd_sound->reset_write(BIT(~data, 8));
 		m_cvsd_sound->write((data & 0xff) | ((data & 0x200) >> 1));
 	}
 }
@@ -661,7 +667,7 @@ void midyunit_adpcm_state::adpcm_sound_w(offs_t offset, uint16_t data, uint16_t 
 	// call through based on the sound type
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 	{
-		m_adpcm_sound->reset_write((~data & 0x100) >> 8);
+		m_adpcm_sound->reset_write(BIT(~data, 8));
 		m_adpcm_sound->write(data);
 	}
 }
