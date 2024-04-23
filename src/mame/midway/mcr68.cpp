@@ -138,7 +138,6 @@ private:
 	emu_timer *m_493_on_timer = nullptr;
 	emu_timer *m_493_off_timer = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
-	tilemap_t *m_fg_tilemap = nullptr;
 
 	void xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blasted_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
