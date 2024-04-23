@@ -21,16 +21,13 @@
 #include "emupal.h"
 
 
-class midyunit_state : public driver_device
+class midyunit_base_state : public driver_device
 {
-public:
-	midyunit_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	midyunit_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
-		, m_narc_sound(*this, "narcsnd")
-		, m_cvsd_sound(*this, "cvsd")
-		, m_adpcm_sound(*this, "adpcm")
 		, m_nvram(*this, "nvram")
 		, m_paletteram(*this, "paletteram")
 		, m_gfx_rom(*this, "gfx_rom", 0x800000, ENDIANNESS_BIG)
@@ -39,30 +36,9 @@ public:
 	{
 	}
 
-	void yunit_adpcm_6bit_fast(machine_config &config);
-	void yunit_adpcm_6bit_faster(machine_config &config);
-	void yunit_core(machine_config &config);
-	void yunit_cvsd_4bit_fast(machine_config &config);
-	void yunit_cvsd_4bit_slow(machine_config &config);
-	void yunit_cvsd_6bit_slow(machine_config &config);
-	void zunit(machine_config &config);
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
-	void init_hiimpact();
-	void init_mkla3bl();
-	void init_mkyturbo();
-	void init_mkyunit();
-	void init_narc();
-	void init_shimpact();
-	void init_smashtv();
-	void init_strkforc();
-	void init_totcarn();
-	void init_trog();
-
-	int narc_talkback_strobe_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
-	int adpcm_irq_state_r();
-
-protected:
 	// protection data types
 	struct protection_data
 	{
@@ -84,9 +60,6 @@ protected:
 
 	required_device<tms34010_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	optional_device<williams_narc_sound_device> m_narc_sound;
-	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
-	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 	required_device<nvram_device> m_nvram;
 
 	required_shared_ptr<uint16_t> m_paletteram;
@@ -102,7 +75,6 @@ protected:
 	uint8_t m_prot_index = 0;
 	const struct protection_data *m_prot_data = nullptr;
 	uint8_t m_cmos_w_enable = 0;
-	uint8_t m_chip_type = 0;
 	uint8_t *m_cvsd_protection_base = nullptr;
 	uint8_t m_autoerase_enable = 0;
 	uint32_t m_palette_mask = 0;
@@ -115,44 +87,140 @@ protected:
 	emu_timer *m_dma_timer = nullptr;
 	emu_timer *m_autoerase_line_timer = nullptr;
 
-	void midyunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t midyunit_cmos_r(offs_t offset);
-	void midyunit_cmos_enable_w(address_space &space, uint16_t data);
-	uint16_t midyunit_protection_r();
-	uint16_t midyunit_input_r(offs_t offset);
-	void midyunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cvsd_protection_w(offs_t offset, uint8_t data);
-	uint16_t mkturbo_prot_r();
-	uint16_t midyunit_gfxrom_r(offs_t offset);
-	void midyunit_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t midyunit_vram_r(offs_t offset);
-	void midyunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void midyunit_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t midyunit_dma_r(offs_t offset);
-	void midyunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cmos_r(offs_t offset);
+	void cmos_enable_w(address_space &space, uint16_t data);
+	uint16_t protection_r();
+	uint16_t input_r(offs_t offset);
+	uint16_t gfxrom_r(offs_t offset);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vram_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-	DECLARE_MACHINE_RESET(midyunit);
-	DECLARE_VIDEO_START(midzunit);
 	DECLARE_VIDEO_START(midyunit_4bit);
 	DECLARE_VIDEO_START(midyunit_6bit);
-	DECLARE_VIDEO_START(common);
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 
+	void dma_draw(uint16_t command);
+	void init_gfxrom(int bpp);
+	void install_hidden_ram(mc6809e_device &cpu, int prot_start, int prot_end);
+
 	void main_map(address_map &map);
 
-	void dma_draw(uint16_t command);
-	void init_generic(int bpp, int sound, int prot_start, int prot_end);
-	void install_hidden_ram(mc6809e_device &cpu, int prot_start, int prot_end);
+	void yunit_core(machine_config &config);
+	void yunit_4bpp(machine_config &config);
+	void yunit_6bpp(machine_config &config);
 };
 
-class term2_state : public midyunit_state
+class midzunit_state : public midyunit_base_state
+{
+public:
+	midzunit_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midyunit_base_state(mconfig, type, tag)
+		, m_narc_sound(*this, "narcsnd")
+	{
+	}
+
+	void zunit(machine_config &config);
+
+	void init_narc();
+
+	int narc_talkback_strobe_r();
+	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<williams_narc_sound_device> m_narc_sound;
+
+	void narc_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void zunit_main_map(address_map &map);
+};
+
+class midyunit_cvsd_state : public midyunit_base_state
+{
+public:
+	midyunit_cvsd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midyunit_base_state(mconfig, type, tag)
+		, m_cvsd_sound(*this, "cvsd")
+	{
+	}
+
+	void yunit_cvsd_4bit_fast(machine_config &config);
+	void yunit_cvsd_4bit_slow(machine_config &config);
+	void yunit_cvsd_6bit_slow(machine_config &config);
+
+	void init_hiimpact();
+	void init_shimpact();
+	void init_smashtv();
+	void init_strkforc();
+	void init_trog();
+
+protected:
+	virtual void machine_reset() override;
+
+	required_device<williams_cvsd_sound_device> m_cvsd_sound;
+
+	uint8_t *m_cvsd_protection_base = nullptr;
+
+	void cvsd_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cvsd_protection_w(offs_t offset, uint8_t data);
+
+	void init_generic(int bpp, int sound, int prot_start, int prot_end);
+
+	void cvsd_main_map(address_map &map);
+
+	void yunit_cvsd_core(machine_config &config);
+};
+
+class midyunit_adpcm_state : public midyunit_base_state
+{
+public:
+	midyunit_adpcm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midyunit_base_state(mconfig, type, tag)
+		, m_adpcm_sound(*this, "adpcm")
+	{
+	}
+
+	void yunit_adpcm_6bit_fast(machine_config &config);
+	void yunit_adpcm_6bit_faster(machine_config &config);
+
+	void init_mkla3bl();
+	void init_mkyturbo();
+	void init_mkyunit();
+	void init_totcarn();
+
+	int adpcm_irq_state_r();
+
+protected:
+	virtual void machine_reset() override;
+
+	required_device<williams_adpcm_sound_device> m_adpcm_sound;
+
+	void adpcm_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mkturbo_prot_r();
+
+	void init_generic(int bpp, int prot_start, int prot_end);
+
+	void adpcm_main_map(address_map &map);
+
+	void yunit_adpcm_core(machine_config &config);
+};
+
+class term2_state : public midyunit_adpcm_state
 {
 public:
 	term2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: midyunit_state(mconfig, type, tag)
+		: midyunit_adpcm_state(mconfig, type, tag)
 		, m_adc(*this, "adc")
 		, m_left_flash(*this, "Left_Flash_%u", 1U)
 		, m_right_flash(*this, "Right_Flash_%u", 1U)
@@ -196,13 +264,15 @@ private:
 	void term2la2_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void term2la1_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void term2_init_common(write16s_delegate hack_w);
+
+	void term2_main_map(address_map &map);
 };
 
-class mkyawdim_state : public midyunit_state
+class mkyawdim_state : public midyunit_base_state
 {
 public:
 	mkyawdim_state(const machine_config &mconfig, device_type type, const char *tag)
-		: midyunit_state(mconfig, type, tag)
+		: midyunit_base_state(mconfig, type, tag)
 		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
 		, m_oki(*this, "oki")
@@ -219,7 +289,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_audiocpu;
-	optional_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<okim6295_device> m_oki;
 
 	void yawdim_oki_bank_w(uint8_t data);
