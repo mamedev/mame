@@ -77,6 +77,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -86,7 +87,7 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	optional_ioport_array<8> m_io_port;
+	required_ioport_array<8> m_io_port;
 
 	uint8_t m_flipscreen = 0;
 	uint8_t m_main_irq_mask = 0;
@@ -108,17 +109,6 @@ protected:
 	void sound_map(address_map &map);
 };
 
-class shettle_state : public wiping_state
-{
-public:
-	using wiping_state::wiping_state;
-
-	void shettle(machine_config &config);
-
-private:
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-};
 
 /***************************************************************************
 
@@ -353,33 +343,6 @@ void wiping_state::sound_map(address_map &map)
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
-void shettle_state::main_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom(); // TODO: some reads after 0x5fff. Interactions with the Z4 chip?
-	map(0x8000, 0x83ff).ram().share(m_videoram);
-	map(0x8400, 0x87ff).ram().share(m_colorram);
-	map(0x8e00, 0x8fff).ram().share(m_spriteram); // TODO: is it really here?
-	map(0x9000, 0x93ff).ram();
-	map(0x9600, 0x97ff).ram().share("main_sound");
-	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xa100, 0xa100).portr("IN0"); // TODO: inputs seem to be read in some convoluted way, but apparently not exactly the same as Wiping
-	map(0xa101, 0xa101).portr("IN1");
-	map(0xa102, 0xa102).portr("IN2");
-	map(0xa103, 0xa103).portr("IN3");
-	map(0xa104, 0xa104).portr("IN4");
-	map(0xa105, 0xa105).portr("IN5");
-	map(0xa106, 0xa106).portr("IN6");
-	map(0xa107, 0xa107).portr("IN7");
-}
-
-void shettle_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x7fff).w("wiping", FUNC(wiping_sound_device::sound_w));
-	map(0x9600, 0x97ff).ram().share("main_sound");
-	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-}
-
 
 static INPUT_PORTS_START( wiping )
 	PORT_START("P1")    // 0
@@ -459,52 +422,6 @@ static INPUT_PORTS_START( rugrats )
 	PORT_DIPSETTING(    0x80, "150000 300000" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( shettle ) // TODO: will have to be redone once the correct way to read the inputs is found
-	PORT_START("IN0")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" ) // TODO: 0x00 1C_1C, 0x01 1C_2C
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
-
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) // TODO: player 1 movement related, verify when sprites are drawn
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) // TODO: player 1 movement related, verify when sprites are drawn
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" ) // TODO: 0x00 3 lives, 0x01 5 lives
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
-
-	PORT_START("IN5")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0xfd, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL // TODO: player 2 movement related, verify when sprites are drawn
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL // TODO: player 2 movement related, verify when sprites are drawn
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-INPUT_PORTS_END
 
 
 static const gfx_layout charlayout =
@@ -588,20 +505,7 @@ void wiping_state::wiping(machine_config &config)
 	WIPING_CUSTOM(config, "wiping", 96'000 / 2).add_route(ALL_OUTPUTS, "mono", 1.0); // 48000 Hz?
 }
 
-void shettle_state::shettle(machine_config &config)
-{
-	wiping(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &shettle_state::main_map);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &shettle_state::sound_map);
-
-	ls259_device &mainlatch(LS259(config.replace(), "mainlatch")); // TODO: verify this
-	mainlatch.q_out_cb<0>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
-	mainlatch.q_out_cb<1>().set(FUNC(shettle_state::main_irq_mask_w));
-	mainlatch.q_out_cb<3>().set(FUNC(shettle_state::sound_irq_mask_w));
-	mainlatch.q_out_cb<4>().set(FUNC(shettle_state::flipscreen_w));
-}
 
 /***************************************************************************
 
@@ -667,46 +571,8 @@ ROM_START( rugrats )
 	ROM_LOAD( "e9.9e",     0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )    // high 4 bits
 ROM_END
 
-// main PCB is marked: "PC-082A" on component side
-// sub PCB is marked: "MADE IN JAPAN", "SCO-102B(C)1983 GRC" on component side
-// main PCB is labeled: "NEW DIGIMATIC GARANZIA 6 MESI DATA OTTOBRE 1984" on component side
-// 2x D780C, 18.432 MHz XTAL, 2x 8 DIP switches banks
-// hardware seems to have similarities both with Wiping (video hardware) and the later Clash-Road / Fire Battle (inputs, sound hook-up)
-// has an unidentified "Z4" 24-pin chip, just like Fire Battle
-ROM_START( shettle )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "1.bin", 0x00000, 0x2000, CRC(e2b25df4) SHA1(781e09ca2ef03ded468b768261074f6e4a25720b) )
-	ROM_LOAD( "2.bin", 0x02000, 0x2000, CRC(a24bf4ad) SHA1(fbe00dfb6ce2306c59e459440f403c3c5f49bdd3) )
-	ROM_LOAD( "3.bin", 0x04000, 0x2000, CRC(b88e8213) SHA1(e3745ad1c25eaf8019dd9d46e3480f2ca8c5a7cf) )
-	ROM_FILL(          0x06000, 0x2000, 0x00 ) // Accessed, could this range map to the Z4 device ?!
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "d.bin", 0x0000, 0x2000, CRC(1e2e7365) SHA1(ad6d0c94d5cb172d3a29523706ccd901a72e90be) )
-
-	ROM_REGION( 0x1000, "chars", 0 )
-	ROM_LOAD( "0.5d", 0x0000, 0x1000, CRC(fa6261da) SHA1(e7ab7eb2ab2ba2497d06606861a804d317d306ff) )
-
-	ROM_REGION( 0x2000, "sprites", 0 )
-	ROM_LOAD( "e.bin", 0x0000, 0x2000, CRC(a3cef381) SHA1(ed511f5b695f0abdbaea8414d9de260f696f5318) )
-
-	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "prom-4.2f",  0x0000, 0x0020, CRC(befab139) SHA1(748c49437067d2d0a99b359bb5d53841a22b4760) ) // MMI 6331 - palette. Only 16 colors?
-	ROM_LOAD( "prom-6.4h",  0x0020, 0x0100, CRC(1abbc864) SHA1(a28d35cb2492f74f847858475aef669c38c3574a) ) // char lookup table? (near 0.5d ROM)
-	ROM_LOAD( "prom-5.3r",  0x0120, 0x0100, CRC(0f64edb9) SHA1(e1bc4acc0778ca13a3a2b8caa653bbf54a3507f9) ) // sprite lookup table? (next to e.4r ROM)
-	ROM_LOAD( "prom-7.7b",  0x0220, 0x0100, CRC(9e824f74) SHA1(03fcde2546b87286038ef93a6939c1c325f74998) ) // unknown (almost identical to clshroad.g10 in clshroad.cpp)
-	ROM_LOAD( "prom-1.bin", 0x0320, 0x0020, CRC(1afc04f0) SHA1(38207cf3e15bac7034ac06469b95708d22b57da4) ) // MMI 6331 - timing? (same as clashrd.g4 in clshroad.cpp)
-
-	ROM_REGION( 0x2000, "wiping:samples", 0 )
-	ROM_LOAD( "4.bin", 0x0000, 0x2000, CRC(c9da4245) SHA1(961c3b52b7608a35493d753a3b482713198fd2eb) )
-
-	ROM_REGION( 0x0200, "wiping:soundproms", 0 ) // 4bit->8bit sample expansion PROMs
-	ROM_LOAD( "prom-2.bin", 0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) ) // low 4 bits, same as wiping, clshroad, firebatl
-	ROM_LOAD( "prom-3.bin", 0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) ) // high 4 bits, same as wiping, clshroad, firebatl
-ROM_END
-
 } // anonymous namespace
 
 
-GAME( 1982, wiping,  0,      wiping,  wiping,  wiping_state,  empty_init, ROT90, "Nichibutsu",    "Wiping",             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rugrats, wiping, wiping,  rugrats, wiping_state,  empty_init, ROT90, "Nichibutsu",    "Rug Rats",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, shettle, 0,      shettle, shettle, shettle_state, empty_init, ROT90, "New Digimatic", "Alone Shettle Crew", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wiping,  0,      wiping, wiping,  wiping_state, empty_init, ROT90, "Nichibutsu", "Wiping",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rugrats, wiping, wiping, rugrats, wiping_state, empty_init, ROT90, "Nichibutsu", "Rug Rats", MACHINE_SUPPORTS_SAVE )
