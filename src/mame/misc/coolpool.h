@@ -14,7 +14,7 @@
 
 class coolpool_base_state : public driver_device
 {
-public:
+protected:
 	coolpool_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -27,7 +27,6 @@ public:
 		, m_dsp_rom(*this, "dspdata")
 	{ }
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -85,8 +84,6 @@ public:
 	{ }
 
 	void amerdart(machine_config &config);
-
-	void init_amerdart();
 
 protected:
 	virtual void machine_start() override;

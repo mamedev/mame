@@ -41,7 +41,7 @@
 #include <algorithm>
 
 #define LOG_PORT    (1U << 1)
-#define LOG_INPUT   (1U << 1)
+#define LOG_INPUT   (1U << 2)
 
 #define LOG_ALL     (LOG_PORT | LOG_INPUT)
 
@@ -164,6 +164,7 @@ void amerdart_state::machine_start()
 {
 	coolpool_base_state::machine_start();
 
+	m_lastresult = 0xffff;
 	save_item(NAME(m_old_cmd));
 }
 
@@ -1103,11 +1104,6 @@ ROM_END
  *
  *************************************/
 
-void amerdart_state::init_amerdart()
-{
-	m_lastresult = 0xffff;
-}
-
 
 void _9ballsht_state::init_9ballsht()
 {
@@ -1151,10 +1147,10 @@ void _9ballsht_state::init_9ballsht()
  *
  *************************************/
 
-GAME( 1989, amerdart,  0,        amerdart,  amerdart, amerdart_state, init_amerdart, ROT0, "Ameri",                               "AmeriDarts (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart2, amerdart, amerdart,  amerdart, amerdart_state, init_amerdart, ROT0, "Ameri",                               "AmeriDarts (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart3, amerdart, amerdart,  amerdart, amerdart_state, init_amerdart, ROT0, "Ameri",                               "AmeriDarts (set 3)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, coolpool,  0,        coolpool,  coolpool, coolpool_state, empty_init,    ROT0, "Catalina",                            "Cool Pool",                    0 )
+GAME( 1989, amerdart,  0,        amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "AmeriDarts (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart2, amerdart, amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "AmeriDarts (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart3, amerdart, amerdart,  amerdart, amerdart_state,  empty_init,    ROT0, "Ameri",                               "AmeriDarts (set 3)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, coolpool,  0,        coolpool,  coolpool, coolpool_state,  empty_init,    ROT0, "Catalina",                            "Cool Pool",                    0 )
 GAME( 1993, 9ballsht,  0,        _9ballsht, 9ballsht, _9ballsht_state, init_9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)",      0 )
 GAME( 1993, 9ballsht2, 9ballsht, _9ballsht, 9ballsht, _9ballsht_state, init_9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)",      0 )
 GAME( 1993, 9ballsht3, 9ballsht, _9ballsht, 9ballsht, _9ballsht_state, init_9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)",      0 )
