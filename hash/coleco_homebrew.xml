@@ -125,6 +125,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="berzerk">
+		<description>Berzerk</description>
+		<year>2022</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="20181">
+				<rom name="berzerk.rom" size="20181" crc="81484efa" sha1="2d31bf8926523c87b3af00404b047c74b40f0468" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bejeweld">
 		<description>Bejeweled</description>
 		<year>2002</year>
@@ -483,6 +494,18 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="galaga">
+		<description>Galaga</description>
+		<year>2014</year>
+		<publisher>CollectorVision Games</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="galaga.rom" size="32768" crc="9f1045e6" sha1="b5365ada274896d8934d9d4fe10bf48621f1e5da" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gauntlet">
 		<description>Gauntlet</description>
 		<year>2019</year>
@@ -573,6 +596,18 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="gulkave-2010.rom" size="32768" crc="81413ff6" sha1="6339135828d4ce4b1d5bda4afa795bfe81283584" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Shows 'Hang-On II' on the title screen -->
+	<software name="hangon">
+		<description>Hang-On</description>
+		<year>2016</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hang-on.rom" size="32768" crc="27818d93" sha1="d7735f1da86421cc92c8339515a7f192c9ddef22" />
 			</dataarea>
 		</part>
 	</software>
