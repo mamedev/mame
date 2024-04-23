@@ -1326,7 +1326,6 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			case 2:   // 8-bits linear
 				val0 = (read_byte(base_address + spos)     << 8);
 				val1 = (read_byte(base_address + spos + 1) << 8);
-				logerror("XX %04x %04x\n", val0, val1);
 				break;
 
 			case 3: { // 8-bits delta-pcm
@@ -1376,9 +1375,7 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			m_lfo_phase[chan] = (m_lfo_phase[chan] + m_global_step[0x20 + (m_lfo_step[chan] & 0x3f)]) & 0x7ffffff;
 
 			u32 sample_increment = ((m_pitch[chan] & 0xfff) << (8 + (s16(m_pitch[chan]) >> 12))) >> 4;
-			m_sample_pos[chan] += 0x8000;//(sample_increment * (0x800 + ((lfo_p_phase * m_lfo_pmod_depth[chan]) >> (m_lfo_step[chan] & 0x40 ? 18 : 19)))) >> 11;
-			(void)lfo_p_phase;
-			(void)sample_increment;
+			m_sample_pos[chan] += (sample_increment * (0x800 + ((lfo_p_phase * m_lfo_pmod_depth[chan]) >> (m_lfo_step[chan] & 0x40 ? 18 : 19)))) >> 11;
 
 			if((m_sample_pos[chan] >> 15) >= m_sample_end[chan]) {
 				if(!m_sample_end[chan])
