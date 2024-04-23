@@ -34128,6 +34128,9 @@ sectrzont                       // (c) 1984 + Alice (on Tecfri PCB)
 seicross                        // (c) 1984 + Alice
 seicrossa                       // (c) 1984 + Alice
 
+@source:nichibutsu/shettle.cpp
+shettle                         // (c) 1984
+
 @source:nichibutsu/terracre.cpp
 amatelas                        // (c) 1986
 amazon                          // (c) 1986
@@ -34148,7 +34151,6 @@ tubepb                          // (c) 1984 + bootleg
 
 @source:nichibutsu/wiping.cpp
 rugrats                         // (c) 1983
-shettle                         // (c) 1984
 wiping                          // (c) 1982
 
 @source:nintendo/aleck64.cpp
