@@ -1041,7 +1041,7 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("3rd Gear")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("4th Gear")
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel */
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM )  /* center edge on steering wheel, IP_ACTIVE_HIGH makes the steering work! Test menu wont work but can be skipped! */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
