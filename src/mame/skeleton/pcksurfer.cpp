@@ -4,7 +4,7 @@
 
 Datawind Pocket Surfer.
 
-Pre-smartphone era pocket internet terminal.
+Pre-smartphone era pocket Internet terminal.
 
 https://web.archive.org/web/20060221032558/http://www.datawind.com/
 https://web.archive.org/web/20060221032551/http://www.datawind.com/specs.html
@@ -43,8 +43,8 @@ Chip labeled "31314 3A05U 511AD" inside the DW-SBTM1 module.
 
 #include "cpu/arm7/arm7.h"
 
-namespace
-{
+
+namespace {
 
 class pcksurfer_state : public driver_device
 {
@@ -81,8 +81,8 @@ ROM_START( pcksurfer )
 	ROM_REGION32_LE( 0x2000, "bootrom", 0 )
 	ROM_LOAD( "lh79524.bootrom.bin", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x100, "keyboard", 0 )
-	ROM_LOAD( "attiny28l.bin", 0x000, 0x100, NO_DUMP ) // 2K Bytes of Flash
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "attiny28l.bin", 0x000, 0x800, NO_DUMP ) // 2K bytes of Flash
 ROM_END
 
 } // anonymous namespace
