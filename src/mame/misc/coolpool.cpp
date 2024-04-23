@@ -9,7 +9,7 @@
     driver by Nicola Salmoria and Aaron Giles
 
 
-    The main cpu is a TMS34010; it is encrypted in 9 Ball Shootout.
+    The main CPU is a TMS34010; it is encrypted in 9 Ball Shootout.
 
     The second CPU in AmeriDarts is a TMS32015; it controls sound and
     the trackball inputs.
@@ -24,7 +24,6 @@
       4U/8U it is actually reading 4U/8U/3U/7U, when testing 3U/7U it
       actually reads 2U/6U/1U/5U. The placement cannot therefore be exactly
       determined by the check passing.
-
 
 ***************************************************************************/
 
@@ -302,7 +301,6 @@ int amerdart_state::amerdart_trackball_direction(int num, int data)
 	uint16_t result_x = (data & 0x0c) >> 2;
 	uint16_t result_y = (data & 0x03) >> 0;
 
-
 	if ((m_dx[num] == 0) && (m_dy[num] < 0))        // Up
 	{
 		if (!machine().side_effects_disabled())
@@ -411,7 +409,6 @@ uint16_t amerdart_state::amerdart_trackball_r(offs_t offset)
 
 */
 
-
 	if (!machine().side_effects_disabled())
 	{
 		m_result = (m_lastresult | 0x00ff);
@@ -465,7 +462,6 @@ void _9ballsht_state::misc_w(uint16_t data)
  *  (from IOP side)
  *
  *************************************/
-
 
 uint16_t _9ballsht_state::dsp_bio_line_r()
 {
@@ -1103,7 +1099,6 @@ ROM_END
  *  Driver init
  *
  *************************************/
-
 
 void _9ballsht_state::init_9ballsht()
 {
