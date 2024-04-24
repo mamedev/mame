@@ -379,6 +379,46 @@ ROM_START( mghammer )
 ROM_END
 
 
+ROM_START( lhfy )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "lhfy_igs036", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-206cn.u11", 0x000000, 0x200000, CRC(45bd9c9f) SHA1(3a9b06bf9c66520136522d67ed12f800569580f5) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "v-206cn.u11", 0x000000, 0x800000, CRC(f7990ed4) SHA1(e8a72bc0926911ba5c079b02dd324ac060e8c768) ) // same as lhzbgqb
+
+	ROM_REGION( 0x10000000, "gfx", ROMREGION_ERASE00 )
+	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V206CN"
+	ROM_LOAD( "cg_v206cn.u1", 0x0000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v206cn.u3", 0x8000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v206cn.u4", 0xc000000, 0x4000000, NO_DUMP )
+ROM_END
+
+
+ROM_START( lhzbgqb )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "lhzbgqb_igs036", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-105cn.u11", 0x000000, 0x200000, CRC(cecbb560) SHA1(262d7df19b57e57aa50cc241ddc25090411d6b74) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "v105cn_u19.u19", 0x000000, 0x800000, CRC(f7990ed4) SHA1(e8a72bc0926911ba5c079b02dd324ac060e8c768) ) // same as lhfy
+
+	ROM_REGION( 0x10000000, "gfx", ROMREGION_ERASE00 )
+	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V105CN"
+	ROM_LOAD( "cg_v105cn.u1", 0x0000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v105cn.u2", 0x4000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v105cn.u3", 0x8000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v105cn.u4", 0xc000000, 0x4000000, NO_DUMP )
+ROM_END
+
+
 void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
@@ -507,5 +547,9 @@ GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp
 GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_IS_SKELETON ) // 龙虎争霸三合一
 
 GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_IS_SKELETON ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
+
+GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Feng Yun (V206CN)", MACHINE_IS_SKELETON )
+
+GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_IS_SKELETON )
 
 GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_IS_SKELETON )

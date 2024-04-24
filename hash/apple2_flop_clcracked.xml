@@ -33,6 +33,8 @@ license:CC0-1.0
 	  disks 1, 2, and 7.
 	-->
 
+	<!--Set "hhlngvwl" (Hugo Hound's Vowel Sounds) may be missing disk 2 - "Short Vowels" based on manual found later.-->
+
 	<!-- Imperfect cracks for Epyx software were missing and never added
 	  to this list, thus only the corrected versions are listed here. -->
 
@@ -1732,19 +1734,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="first degree linear equations (4am crack).dsk" size="143360" crc="bc9f6657" sha1="8ecb52e40aaa9b2888d7c3c10d6dc80ef265309b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="falcons">
-		<description>Falcons (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Piccadilly Software</publisher>
-		<info name="release" value="2015-04-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="falcons (4am crack).dsk" size="143360" crc="b2eb0e24" sha1="b94e95a0f657230684a81637ad3c9b2a3fdfbbfd" />
 			</dataarea>
 		</part>
 	</software>
@@ -6016,19 +6005,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cntcoins">
-		<description>Counting Coins (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2018-06-16"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="counting coins (4am crack).dsk" size="143360" crc="28a6e2e5" sha1="b24c91eb063825bc292ccc9a6a3e1daccdec02c2" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cntptrns">
 		<description>Counting Patterns I (cleanly cracked)</description>
 		<year>1984</year>
@@ -9325,19 +9301,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gacookie">
-		<description>Granny Applebee's Cookie Factory (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2016-10-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="granny applebee's cookie factory (4am crack).dsk" size="143360" crc="07234fbd" sha1="18b9bdc16e7c5adde81a1eccff10791a1c7ff9bf" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="graphmkr">
 		<description>Graph Maker: Introduction to Graphs and Charts (cleanly cracked)</description>
 		<year>1993</year>
@@ -11406,32 +11369,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="islands of beta (4am crack).dsk" size="143360" crc="42f5e0dc" sha1="20e4d10b4b51aef9d2d2a8d6a4e6284cb5dd71b1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="abttime">
-		<description>It's About Time (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>McCarthy-McCormack</publisher>
-		<info name="release" value="2015-06-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="it's about time (4am crack).dsk" size="143360" crc="9be8d4c9" sha1="bcfc08ee08ba58c62d4673d4b422eef74fab0f28" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mabttime">
-		<description>It's About Time (Micrograms) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2018-06-16"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="it's about time (micrograms) (4am crack).dsk" size="143360" crc="f7ae8a72" sha1="530323a118e22e126e6b968ee72b20ae3d7622a9" />
 			</dataarea>
 		</part>
 	</software>
@@ -16315,26 +16252,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="oil's well (4am crack).dsk" size="143360" crc="f37459cf" sha1="f88030fc774e1e5af46b4beb8bcacbff13f0e9da" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="olcrswrd">
-		<description>Oliver's Crosswords (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="release" value="2017-06-22"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="oliver's crosswords (4am crack) disk a.dsk" size="143360" crc="c4b6e6df" sha1="673231fed35ecd2aea32d7e8a6a2ced28e59ba9e" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="oliver's crosswords (4am crack) disk b.dsk" size="143360" crc="c7de0295" sha1="b310a7a7813ae4b049655b1966b971ed247a18eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -26281,84 +26198,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wwmathl3">
-		<description>Wild West Math Level 3 (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-06-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 3 (4am crack) disk a.dsk" size="143360" crc="999709bd" sha1="3668662cdd69b22755767f21f56b1b0f04754d5d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 3 (4am crack) disk b.dsk" size="143360" crc="3ff9505d" sha1="df771c0be34133b44a37bbb139952b6d49facf4f" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 3 (4am crack) disk c.dsk" size="143360" crc="c20f29be" sha1="d98fd9245b3b2eb8a1fe3727b3291d342b9bced8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wwmathl4">
-		<description>Wild West Math Level 4 (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-06-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 4 (4am crack) disk a.dsk" size="143360" crc="26b7e7c3" sha1="2af723a49d5d6aed85aecc139ca9ce2a43461cc7" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 4 (4am crack) disk b.dsk" size="143360" crc="52cb2bd9" sha1="d4c8474ffd42669b2d406dbf1b5367cd034bb7e6" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 4 (4am crack) disk c.dsk" size="143360" crc="aff51478" sha1="1042ab224399638b566f5a858ed1c66f27b5a34b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wwmathl5">
-		<description>Wild West Math Level 5 (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-06-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 5 (4am crack) disk a.dsk" size="143360" crc="ee8492d9" sha1="dce6ffcda41edb06b0ab0278a82d9a015b01260b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 5 (4am crack) disk b.dsk" size="143360" crc="7cead118" sha1="8e32116876c34634b742539a34f00439ad292f2f" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 5 (4am crack) disk c.dsk" size="143360" crc="da77e766" sha1="57145617b4d25b71924ea5d1f1a0fea13a15aaea" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tlktxtwr">
 		<description>Talking Text Writer (cleanly cracked)</description>
 		<year>1986</year>
@@ -28207,19 +28046,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="voodoo island (imperfect 4am crack).dsk" size="143360" crc="551a3285" sha1="64c242b8371add1dd2aed60bffdf80e59bb2fe2e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shppatrn">
-		<description>Shapes and Patterns (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-12-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="shapes and patterns (4am crack).dsk" size="143360" crc="89884218" sha1="213bbee8ddb774e1dad28836ec08bf849d7cc412" />
 			</dataarea>
 		</part>
 	</software>
@@ -34988,19 +34814,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hhlngvwl">
-		<description>Hugo Hound's Vowel Sounds: Long Vowels (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2020-12-30"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="hugo hound's vowel sounds - long vowels (4am crack).dsk" size="143360" crc="b1b4cad8" sha1="bb6ea89ff429fcbb74665b587e551966fdf12709"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="timcatfr">
 		<description>Tim and the Cat and Grog the Frog (cleanly cracked)</description>
 		<year>1992</year>
@@ -35269,19 +35082,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="starship commander (4am crack).dsk" size="143360" crc="10275bba" sha1="35fb4ec9c69cc8ddeb2b0aa02f94da70c5c59226"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uccsbc">
-		<description>Uncle Clyde's Consonant Slides: Beginning Consonants (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-02-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="uncle clyde's consonant slides - beginning consonants (4am crack).dsk" size="143360" crc="239d4daa" sha1="7b530d4f20e8275e767c6a23e37de3cb85f2fe4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38501,34 +38301,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="uccscbd">
-		<description>Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-05-09"/>
-		<!--"Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="uncle clyde's consonant slides - consonant blends and digraphs (4am crack).dsk" size="143360" crc="dec1edfc" sha1="93088790186e6c08bd762196f80d1d5f57837da1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uccsec">
-		<description>Uncle Clyde's Consonant Slides: Ending Consonants (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-05-09"/>
-		<!--"Uncle Clyde's Consonant Slides: Ending Consonants" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="uncle clyde's consonant slides - ending consonants (4am crack).dsk" size="143360" crc="67153156" sha1="211cd07bb41d1dc7b98c2e30dfceb5550676f78f"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chschkbk">
 		<description>Chess, Checkers, and Backgammon (cleanly cracked)</description>
 		<year>1987</year>
@@ -40298,20 +40070,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="winter games (4am crack) side b.dsk" size="143360" crc="b8d713fd" sha1="e2c6b9b0dfdf2f23c59c03ec803b0ffb79135482" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nmbrball">
-		<description>Numberball (cleanly cracked)</description>
-		<year>1994</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-11-10"/>
-		<!--"Numberball" is a 1994 educational game developed and distributed by Micrograms Publishing.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="numberball (4am crack).dsk" size="143360" crc="bd983ba9" sha1="73da61404aa405fd65616a957ef75ffc12f6af04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42139,20 +41897,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B - Pictionary disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="rebus writer (4am crack) side b - pictionary.dsk" size="143360" crc="d42ae5a3" sha1="ed2f9d42a9e023de2156ee05aa1d4b3f534aef67"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="desktzoo">
-		<description>Desktop Zoo (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2022-06-10"/>
-		<!--"Desktop Zoo" is a 1989 educational program developed and distributed by Micrograms.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="desktop zoo (4am crack).dsk" size="143360" crc="369c223c" sha1="a3373b95967dbdc59be845cf3f965f52148e1a89"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44392,6 +44136,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="capbbls">
+		<description>Capitalization: Building Better Language Skills (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="capitalization- building better language skills (4am crack).dsk" size="143360" crc="1206b7d9" sha1="a06fbade81df011c6fa8aa3fa047bfee32b640b6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carbuildr1" cloneof="carbuild">
 		<description>Car Builder (revision 1) (4am crack)</description>
 		<year>1985</year>
@@ -44795,6 +44555,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="classmate (4am crack).dsk" size="143360" crc="c52d247a" sha1="73b904b598e2a8282e3ab2eead0858c1fe5a86a5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clauswhs">
+		<description>Clauses and Whole Sentences (4am crack)</description>
+		<year>1983</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="developer" value="Intellectual Software" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-02-04-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="clauses and whole sentences (4am crack).dsk" size="143360" crc="cdef418b" sha1="211c3d2ab112afd320b32f597c2721e84bcbb7f9" />
 			</dataarea>
 		</part>
 	</software>
@@ -45693,6 +45469,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cntcoins">
+		<description>Counting Coins (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-06-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="counting coins (4am crack).dsk" size="143360" crc="28a6e2e5" sha1="b24c91eb063825bc292ccc9a6a3e1daccdec02c2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cntparr0">
 		<description>Counting Parade (revision 0) (4am crack)</description>
 		<year>1985</year>
@@ -46055,6 +45847,42 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="delta drawing 3.33 (4am crack).dsk" size="143360" crc="38cf358d" sha1="968ceaa46903f90111c4dd1026e58a2da3df44b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktzoor1" cloneof="desktzoo">
+		<description>Desktop Zoo (revision 1) (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<!--Uses uppercase text.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-06-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="desktop zoo (4am crack).dsk" size="143360" crc="369c223c" sha1="a3373b95967dbdc59be845cf3f965f52148e1a89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktzoo">
+		<description>Desktop Zoo (revision 2) (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires an Apple //e or later." />
+		<!--Requires an Apple //e or later due to use of unconditional lowercase text.-->
+		<info name="version" value="revision 2" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="desktop zoo rev. 2 (4am crack).dsk" size="143360" crc="6aa48adc" sha1="57930a6f5d55b3cb3fe70068196ddfd07341844c" />
 			</dataarea>
 		</part>
 	</software>
@@ -46794,6 +46622,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="falconsps" cloneof="falcons">
+		<description>Falcons (4am crack)</description>
+		<year>1981</year>
+		<publisher>Piccadilly Software</publisher>
+		<info name="programmer" value="Thomas Ball and Eric Varsanyi" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-04-28-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="falcons (4am crack).dsk" size="143360" crc="b2eb0e24" sha1="b94e95a0f657230684a81637ad3c9b2a3fdfbbfd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falcons">
+		<description>Falcons (Softsmith) (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Softsmith</publisher>
+		<info name="original_publisher" value="Piccadilly Software" />
+		<info name="programmer" value="Thomas Ball and Eric Varsanyi" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-02-04-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="falcons (softsmith) (4am and san inc crack).dsk" size="143360" crc="54ad4bde" sha1="6e56006b31f5ca1de398f3b4070c22a8f98cee9d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="farmfile">
 		<description>Farmfiler (version 03.11.83) (4am crack)</description>
 		<year>1983</year>
@@ -47525,6 +47386,70 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="grbblsadjadv">
+		<description>Grammar: Building Better Language Skills: Adjectives and Adverbs (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- adjectives and adverbs (4am crack).dsk" size="143360" crc="b0d3fdbc" sha1="30784d416f80f06e5d2bda1f2d8b5ffcac6b2db1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grbblsnoun">
+		<description>Grammar: Building Better Language Skills: Nouns (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- nouns (4am crack).dsk" size="143360" crc="b9eff43a" sha1="8616d1337b068100bd958e079202cacf9b3e9806" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grbblssent">
+		<description>Grammar: Building Better Language Skills: Sentences (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- sentences (4am crack).dsk" size="143360" crc="30c92911" sha1="92639f11206a3b22b96b5ea39be4266d3968146b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grbblsverb">
+		<description>Grammar: Building Better Language Skills: Verbs (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- verbs (4am crack).dsk" size="143360" crc="8681942e" sha1="eb069aea48e455e933e4aac9fd6e5050381e1c8a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grndhous">
 		<description>Grandma's House (4am crack)</description>
 		<year>1984</year>
@@ -47537,6 +47462,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="grandma's house (4am crack).dsk" size="143360" crc="ce2d4423" sha1="94ca7fe043b24504e8e8806de97fa360d149b3e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grancook">
+		<description>Granny Applebee's Cookie Factory (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-10-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="granny applebee's cookie factory (4am crack).dsk" size="143360" crc="07234fbd" sha1="18b9bdc16e7c5adde81a1eccff10791a1c7ff9bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -47793,6 +47734,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hhlngvwl">
+		<description>Hugo Hound's Vowel Sounds: Long Vowels (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-12-30-->
+		<!--May be missing disk 2 - "Short Vowels" based on manual.-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="hugo hound's vowel sounds - long vowels (4am crack).dsk" size="143360" crc="b1b4cad8" sha1="bb6ea89ff429fcbb74665b587e551966fdf12709"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="humbodyex">
 		<description>Human Body Exploration (4am crack)</description>
 		<year>1987</year>
@@ -47930,6 +47888,38 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="inferential anne ii (4am crack).dsk" size="143360" crc="aaccfba4" sha1="47e7fe20de827e9292a8d2a5fe1912db93da2633" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmitsabttm">
+		<description>It's About Time (McCarthy-McCormack) (4am crack)</description>
+		<!--Different program than It's About Time from Micrograms Publishing.-->
+		<year>1983</year>
+		<publisher>McCarthy-McCormack</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-06-02-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="it's about time (4am crack).dsk" size="143360" crc="9be8d4c9" sha1="bcfc08ee08ba58c62d4673d4b422eef74fab0f28" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="itsabttm">
+		<description>It's About Time (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-06-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="it's about time (micrograms) (4am crack).dsk" size="143360" crc="f7ae8a72" sha1="530323a118e22e126e6b968ee72b20ae3d7622a9" />
 			</dataarea>
 		</part>
 	</software>
@@ -48114,6 +48104,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="kidwriter 1.0 (4am crack).dsk" size="143360" crc="5ca27432" sha1="13568d1d25794ead8a5f89e9ac21700f0cb382e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcaddphn">
+		<description>Kinder Critters: Address and Phone Number (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kinder critters- address and phone number (4am crack).dsk" size="143360" crc="6add0391" sha1="fb479acb6cb8fa94fe3c5638bd0b77e7f4eab7b3" />
 			</dataarea>
 		</part>
 	</software>
@@ -50106,6 +50112,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="msaurkind">
+		<description>Mathosaurus: Kindergarten (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathosaurus- kindergarten (4am crack).dsk" size="143360" crc="67deee61" sha1="a91ca89ff42621e8c028116beb3fc0319002cb35" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mdqpres11" cloneof="mdqpres">
 		<description>MECC Dataquest: The Presidents (A-140 version 1.1) (4am crack)</description>
 		<year>1985</year>
@@ -50894,6 +50916,45 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="number bowling (4am crack).dsk" size="143360" crc="62cfab88" sha1="3700731fe0a85236bbb6733e2cf34b714c3f20ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbball">
+		<description>Numberball (4am crack)</description>
+		<year>1994</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-11-10-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="numberball (4am crack).dsk" size="143360" crc="bd983ba9" sha1="73da61404aa405fd65616a957ef75ffc12f6af04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olvcword">
+		<description>Oliver's Crosswords (4am crack)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-22-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="oliver's crosswords (4am crack) disk a.dsk" size="143360" crc="c4b6e6df" sha1="673231fed35ecd2aea32d7e8a6a2ced28e59ba9e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="oliver's crosswords (4am crack) disk b.dsk" size="143360" crc="c7de0295" sha1="b310a7a7813ae4b049655b1966b971ed247a18eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -51822,6 +51883,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pnctbbls">
+		<description>Punctuation: Building Better Language Skills (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="punctuation- building better language skills (4am crack).dsk" size="143360" crc="0cbc57bf" sha1="e676a7e78f2448c0527c5c4a11ee65c482798897" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pzlmastr">
 		<description>Puzzle Master (4am crack)</description>
 		<year>1984</year>
@@ -52684,6 +52761,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="scamble">
+		<description>Scramble (4am crack)</description>
+		<year>1987</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="scramble (4am crack).dsk" size="143360" crc="d4931983" sha1="7084a4fec4c4705cda0f8e3c5a8d255ce431912a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sentdiag">
 		<description>Sentence Diagramming (4am crack)</description>
 		<year>1985</year>
@@ -52718,7 +52811,7 @@ license:CC0-1.0
 				<rom name="sentence diagramming (4am crack) disk 4.dsk" size="143360" crc="e066b500" sha1="e24453611307982f8ac3a9baace9310f084dd9aa" />
 			</dataarea>
 		</part>
-		<!-- Disk #5 is missing. -->
+		<!--Disk #5 is missing.-->
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="143360">
@@ -52808,6 +52901,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="shadows and light (4am crack).dsk" size="143360" crc="b98b2c74" sha1="48b0cf528d775a756864b663313bc3f2cf99b4d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shpspatt">
+		<description>Shapes and Patterns (4am crack)</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-12-29-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="shapes and patterns (4am crack).dsk" size="143360" crc="89884218" sha1="213bbee8ddb774e1dad28836ec08bf849d7cc412" />
 			</dataarea>
 		</part>
 	</software>
@@ -54954,6 +55063,31 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spysnam861001" cloneof="spysnam">
+		<description>The Spy's Adventures in North America (version 1986-10-01) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Polarware</publisher>
+		<info name="developer" value="Magic Tree" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later. Requires a 128K Apple ][+ or later for hi-res graphics." />
+		<info name="version" value="1986-10-01" />
+		<!--According to file metadata-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-26-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1986-10-01 (4am crack) side a.dsk" size="143360" crc="250b9c24" sha1="d4fe728da6b4ab71f5b9f3712593bf747e2fce6a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1986-10-01 (4am crack) side b (boot).dsk" size="143360" crc="d31bbf32" sha1="37b40582d0acb5df88e47bb4e31fdf5e94fa28db" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spysnam870504" cloneof="spysnam">
 		<description>The Spy's Adventures in North America (version 1987-05-04) (4am crack)</description>
 		<year>1987</year>
@@ -55459,6 +55593,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="uccsbcon">
+		<description>Uncle Clyde's Consonant Slides: Beginning Consonants (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-02-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - beginning consonants (4am crack).dsk" size="143360" crc="239d4daa" sha1="7b530d4f20e8275e767c6a23e37de3cb85f2fe4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsbldg">
+		<description>Uncle Clyde's Consonant Slides: Blends and Digraphs (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-05-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - consonant blends and digraphs (4am crack).dsk" size="143360" crc="dec1edfc" sha1="93088790186e6c08bd762196f80d1d5f57837da1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsecon">
+		<description>Uncle Clyde's Consonant Slides: Ending Consonants (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-05-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - ending consonants (4am crack).dsk" size="143360" crc="67153156" sha1="211cd07bb41d1dc7b98c2e30dfceb5550676f78f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="undfire">
 		<description>Under Fire (4am crack)</description>
 		<year>1985</year>
@@ -55834,6 +56016,93 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="what's the problem- where in the world (4am crack).dsk" size="143360" crc="863f4453" sha1="c0edf9d006b4cc49236993b78789c4472172b58c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl3">
+		<description>Wild West Math Level 3 (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 3 (4am crack) disk a.dsk" size="143360" crc="999709bd" sha1="3668662cdd69b22755767f21f56b1b0f04754d5d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 3 (4am crack) disk b.dsk" size="143360" crc="3ff9505d" sha1="df771c0be34133b44a37bbb139952b6d49facf4f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 3 (4am crack) disk c.dsk" size="143360" crc="c20f29be" sha1="d98fd9245b3b2eb8a1fe3727b3291d342b9bced8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl4">
+		<description>Wild West Math Level 4 (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 4 (4am crack) disk a.dsk" size="143360" crc="26b7e7c3" sha1="2af723a49d5d6aed85aecc139ca9ce2a43461cc7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 4 (4am crack) disk b.dsk" size="143360" crc="52cb2bd9" sha1="d4c8474ffd42669b2d406dbf1b5367cd034bb7e6" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 4 (4am crack) disk c.dsk" size="143360" crc="aff51478" sha1="1042ab224399638b566f5a858ed1c66f27b5a34b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl5">
+		<description>Wild West Math Level 5 (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 5 (4am crack) disk a.dsk" size="143360" crc="ee8492d9" sha1="dce6ffcda41edb06b0ab0278a82d9a015b01260b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 5 (4am crack) disk b.dsk" size="143360" crc="7cead118" sha1="8e32116876c34634b742539a34f00439ad292f2f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 5 (4am crack) disk c.dsk" size="143360" crc="da77e766" sha1="57145617b4d25b71924ea5d1f1a0fea13a15aaea" />
 			</dataarea>
 		</part>
 	</software>

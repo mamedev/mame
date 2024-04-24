@@ -10,14 +10,15 @@
 #include "machine/timer.h"
 #include "video/tlc34076.h"
 
-class coolpool_state : public driver_device
+#include "emupal.h"
+
+class coolpool_base_state : public driver_device
 {
-public:
-	coolpool_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	coolpool_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dsp(*this, "dsp")
-		, m_tlc34076(*this, "tlc34076")
 		, m_main2dsp(*this, "main2dsp")
 		, m_dsp2main(*this, "dsp2main")
 		, m_nvram_timer(*this, "nvram_timer")
@@ -26,22 +27,13 @@ public:
 		, m_dsp_rom(*this, "dspdata")
 	{ }
 
-	void _9ballsht(machine_config &config);
-	void coolpool(machine_config &config);
-	void amerdart(machine_config &config);
-
-	void init_amerdart();
-	void init_9ballsht();
-
-protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-private:
 	static constexpr unsigned NVRAM_UNLOCK_SEQ_LEN = 10;
 
 	required_device<tms34010_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
-	optional_device<tlc34076_device> m_tlc34076;
 
 	required_device<generic_latch_16_device> m_main2dsp;
 	required_device<generic_latch_16_device> m_dsp2main;
@@ -66,45 +58,109 @@ private:
 
 	uint16_t m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN]{};
 	uint8_t m_nvram_write_enable = 0U;
-	bool m_old_cmd = false;
 	uint8_t m_same_cmd_count = 0U;
 
 	void nvram_thrash_w(offs_t offset, uint16_t data);
 	void nvram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nvram_thrash_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void amerdart_misc_w(uint16_t data);
-	int amerdart_dsp_bio_line_r();
-	uint16_t amerdart_trackball_r(offs_t offset);
-	void coolpool_misc_w(uint16_t data);
-	uint16_t dsp_bio_line_r();
-	uint16_t dsp_hold_line_r();
 	uint16_t dsp_rom_r();
 	void dsp_romaddr_w(offs_t offset, uint16_t data);
-	uint16_t coolpool_input_r(offs_t offset);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
-	TMS340X0_SCANLINE_RGB32_CB_MEMBER(amerdart_scanline);
-	TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_scanline);
-
-	DECLARE_MACHINE_RESET(amerdart);
-	DECLARE_MACHINE_RESET(coolpool);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);
+};
+
+class amerdart_state : public coolpool_base_state
+{
+public:
+	amerdart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: coolpool_base_state(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_in_xaxis(*this, "XAXIS%u", 1U)
+		, m_in_yaxis(*this, "YAXIS%u", 1U)
+	{ }
+
+	void amerdart(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<palette_device> m_palette;
+
+	required_ioport_array<2> m_in_xaxis;
+	required_ioport_array<2> m_in_yaxis;
+
+	bool m_old_cmd = false;
+
+	void misc_w(uint16_t data);
+	int dsp_bio_line_r();
+	uint16_t amerdart_trackball_r(offs_t offset);
+
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
 
 	int amerdart_trackball_direction(int num, int data);
 
-	void amerdart_dsp_io_map(address_map &map);
-	void amerdart_dsp_pgm_map(address_map &map);
-	void amerdart_map(address_map &map);
-	void coolpool_dsp_io_map(address_map &map);
-	void coolpool_dsp_io_base_map(address_map &map);
-	void coolpool_dsp_pgm_map(address_map &map);
-	void coolpool_map(address_map &map);
+	void dsp_io_map(address_map &map);
+	void dsp_pgm_map(address_map &map);
+	void main_map(address_map &map);
+};
+
+class _9ballsht_state : public coolpool_base_state
+{
+public:
+	_9ballsht_state(const machine_config &mconfig, device_type type, const char *tag)
+		: coolpool_base_state(mconfig, type, tag)
+		, m_tlc34076(*this, "tlc34076")
+	{ }
+
+	void _9ballsht(machine_config &config);
+
+	void init_9ballsht();
+
+protected:
+	required_device<tlc34076_device> m_tlc34076;
+
+	void misc_w(uint16_t data);
+	uint16_t dsp_bio_line_r();
+	uint16_t dsp_hold_line_r();
+
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
+
+	void dsp_io_base_map(address_map &map);
+	void dsp_pgm_map(address_map &map);
+
+private:
 	void nballsht_dsp_io_map(address_map &map);
 	void nballsht_map(address_map &map);
+};
+
+class coolpool_state : public _9ballsht_state
+{
+public:
+	coolpool_state(const machine_config &mconfig, device_type type, const char *tag)
+		: _9ballsht_state(mconfig, type, tag)
+		, m_in1(*this, "IN1")
+		, m_xaxis(*this, "XAXIS")
+		, m_yaxis(*this, "YAXIS")
+	{ }
+
+	void coolpool(machine_config &config);
+
+private:
+	required_ioport m_in1;
+	required_ioport m_xaxis;
+	required_ioport m_yaxis;
+
+	uint16_t coolpool_input_r(offs_t offset);
+
+	void coolpool_dsp_io_map(address_map &map);
+	void coolpool_map(address_map &map);
 };
 
 #endif // MAME_MISC_COOLPOOL_H
