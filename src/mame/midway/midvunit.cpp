@@ -23,7 +23,6 @@
 **************************************************************************/
 
 #include "emu.h"
-
 #include "midvunit.h"
 
 #include "cpu/tms32031/tms32031.h"
@@ -91,15 +90,16 @@ void midvunit_state::machine_start()
 
 void crusnwld_state::machine_start()
 {
-	save_item(NAME(m_bit_index));
-
 	midvunit_state::machine_start();
+
+	save_item(NAME(m_bit_index));
 }
 
 
 void midvplus_state::machine_start()
 {
 	midvunit_base_state::machine_start();
+
 	save_item(NAME(m_lastval));
 }
 
@@ -275,7 +275,7 @@ uint32_t midvunit_base_state::tms32031_control_r(offs_t offset)
 		// timer is clocked at 100ns
 		int const which = (offset >> 4) & 1;
 		int32_t const result = (m_timer[which]->elapsed() * m_timer_rate).as_double();
-//      LOGREGS("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
+		//LOGREGS("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		return result;
 	}
 
@@ -294,15 +294,14 @@ void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint3
 {
 	COMBINE_DATA(&m_tms32031_control[offset]);
 
-	// ignore changes to the memory control register
+	
 	if (offset == 0x64)
-		;
-
-	// watch for accesses to the timers
+		; // ignore changes to the memory control register
 	else if (offset == 0x20 || offset == 0x30)
 	{
+		// watch for accesses to the timers
 		int const which = (offset >> 4) & 1;
-//  LOGREGS("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		//LOGREGS("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 		if (data & 0x40)
 			m_timer[which]->reset();
 
@@ -362,8 +361,9 @@ static const uint32_t bit_data[0x10] =
 
 uint32_t crusnwld_state::bit_data_r(offs_t offset)
 {
-	int const bit = (bit_data[m_bit_index / 32] >> (31 - (m_bit_index % 32))) & 1;
-	m_bit_index = (m_bit_index + 1) % 512;
+	int const bit = BIT(bit_data[m_bit_index >> 5], ~m_bit_index & 0x1f);
+	if (!machine().side_effects_disabled())
+		m_bit_index = (m_bit_index + 1) & 0x1ff;
 	return bit ? m_nvram[offset] : ~m_nvram[offset];
 }
 
@@ -688,6 +688,7 @@ void midvunit_state::midvunit_map(address_map &map)
 void crusnwld_state::offroadc_map(address_map &map)
 {
 	midvunit_map(map);
+
 	map(0x991030, 0x991030).r(FUNC(crusnwld_state::crusnwld_serial_status_r));
 	map(0x994000, 0x994000).w(FUNC(crusnwld_state::crusnwld_control_w));
 	map(0x996000, 0x996000).rw(FUNC(crusnwld_state::crusnwld_serial_data_r), FUNC(crusnwld_state::crusnwld_serial_data_w));
@@ -697,6 +698,7 @@ void crusnwld_state::offroadc_map(address_map &map)
 void crusnwld_state::crusnwld_map(address_map &map)
 {
 	offroadc_map(map);
+
 	map(0x9d0000, 0x9d1fff).r(FUNC(crusnwld_state::bit_data_r));
 	map(0x9d0000, 0x9d0000).w(FUNC(crusnwld_state::bit_reset_w));
 }
@@ -2182,6 +2184,7 @@ void crusnusa_state::init_crusnusa_common(offs_t speedup)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32sm_delegate(*this, FUNC(crusnusa_state::generic_speedup_r)));
 	m_generic_speedup = m_ram_base + speedup;
 }
+
 void crusnusa_state::init_crusnusa()  { init_crusnusa_common(0xc93e); }
 void crusnusa_state::init_crusnu40()  { init_crusnusa_common(0xc957); }
 void crusnusa_state::init_crusnu21()  { init_crusnusa_common(0xc051); }
@@ -2192,11 +2195,13 @@ void crusnwld_state::init_crusnwld_common(offs_t speedup)
 	m_adc_shift = 16;
 
 	// speedups
-	if (speedup) {
+	if (speedup)
+	{
 		m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32sm_delegate(*this, FUNC(crusnwld_state::generic_speedup_r)));
 		m_generic_speedup = m_ram_base + speedup;
 	}
 }
+
 void crusnwld_state::init_crusnwld()  { init_crusnwld_common(0xd4c0); }
 #if 0
 void midvunit_state::init_crusnw20()  { init_crusnwld_common(0xd49c); }
@@ -2217,7 +2222,7 @@ void midvplus_state::init_wargods()
 {
 	uint8_t default_nvram[256];
 
-	// we need proper VRAM
+	// we need proper NVRAM
 	memset(default_nvram, 0xff, sizeof(default_nvram));
 	default_nvram[0x0e] = default_nvram[0x2e] = 0x67;
 	default_nvram[0x0f] = default_nvram[0x2f] = 0x32;
