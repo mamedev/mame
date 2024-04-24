@@ -188,6 +188,7 @@ void hd44102_device::control_w(u8 data)
 				m_y = y;
 			}
 		}
+		break;
 	}
 }
 
