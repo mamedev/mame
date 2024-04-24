@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, ywy, 12Me21
 #ifndef MAME_TAITO_TAITO_F3_H
 #define MAME_TAITO_TAITO_F3_H
 
 #pragma once
 
 #include "taito_en.h"
+
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
+#include <bitset>
+
 
 class taito_f3_state : public driver_device
 {
@@ -24,11 +29,11 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
-		m_textram(*this, "textram", 0x2000, ENDIANNESS_BIG),
 		m_spriteram(*this, "spriteram", 0x10000, ENDIANNESS_BIG),
+		m_pf_ram(*this, "pf_ram", 0xc000, ENDIANNESS_BIG),
+		m_textram(*this, "textram", 0x2000, ENDIANNESS_BIG),
 		m_charram(*this, "charram", 0x2000, ENDIANNESS_BIG),
 		m_line_ram(*this, "line_ram", 0x10000, ENDIANNESS_BIG),
-		m_pf_ram(*this, "pf_ram", 0xc000, ENDIANNESS_BIG),
 		m_pivot_ram(*this, "pivot_ram", 0x10000, ENDIANNESS_BIG),
 		m_input(*this, "IN.%u", 0),
 		m_dial(*this, "DIAL.%u", 0),
@@ -90,8 +95,24 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 
 protected:
-	struct F3config;
+	using fixed8 = s32;
 
+	// should be 30.47618_MHz_XTAL / 2
+	static inline constexpr XTAL F3_MAIN_CLK = 16_MHz_XTAL;
+
+	static inline constexpr int H_TOTAL = 432;
+	static inline constexpr int H_VIS   = 320;
+	static inline constexpr int H_START = 46;
+	static inline constexpr int V_TOTAL = 262;
+	static inline constexpr int V_VIS   = 232;
+	static inline constexpr int V_START = 24;
+
+	static inline constexpr int NUM_PLAYFIELDS = 4;
+	static inline constexpr int NUM_TILEMAPS = 5;
+	static inline constexpr int NUM_SPRITEGROUPS = 4; // high 2 bits of color
+	static inline constexpr int NUM_CLIPPLANES = 4;
+
+	struct F3config;
 	/* This it the best way to allow game specific kludges until the system is fully understood */
 	enum {
 		/* Early F3 class games, these are not cartridge games and system features may be different */
@@ -150,12 +171,14 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<eeprom_serial_base_device> m_eeprom;
 
-	memory_share_creator<u16> m_textram;
 	memory_share_creator<u16> m_spriteram;
+	memory_share_creator<u16> m_pf_ram;
+	memory_share_creator<u16> m_textram;
 	memory_share_creator<u16> m_charram;
 	memory_share_creator<u16> m_line_ram;
-	memory_share_creator<u16> m_pf_ram;
 	memory_share_creator<u16> m_pivot_ram;
+	u16 m_control_0[8]{};
+	u16 m_control_1[8]{};
 
 	optional_ioport_array<6> m_input;
 	optional_ioport_array<2> m_dial;
@@ -167,136 +190,218 @@ protected:
 	std::unique_ptr<u8[]> m_decoded_gfx4;
 	std::unique_ptr<u8[]> m_decoded_gfx5;
 
-	struct tempsprite
-	{
-		int code = 0;
-		u8 color = 0;
-		bool flipx = 0, flipy = 0;
-		int x = 0, y = 0;
-		u16 zoomx = 0, zoomy = 0;
-		u8 pri = 0;
+	struct tempsprite {
+		int code; // 17 bits
+		u8 color;
+		bool flip_x, flip_y;
+		fixed8 x, y;
+		fixed8 scale_x, scale_y;
+		u8 pri;
 	};
 
-	struct f3_playfield_line_inf
-	{
-		u8 alpha_mode[256]{};
-		u16 pri[256]{};
+	struct clip_plane_inf {
+		s16 l;
+		s16 r;
 
-		/* use for draw_scanlines */
-		u16 *src[256]{}, *src_s[256]{}, *src_e[256]{};
-		u8 *tsrc[256]{}, *tsrc_s[256]{};
-		int x_count[256]{};
-		u32 x_zoom[256]{};
-		u32 clip_in[256]{};
-		u32 clip_ex[256]{};
-		u16 pal_add[256]{};
+		clip_plane_inf() { l = 0; r = 0; }
+		clip_plane_inf(s16 left, s16 right)
+		{
+			l = left;
+			r = right;
+		}
+		clip_plane_inf& set_upper(s8 left, s8 right)
+		{
+			l = (l & 0xff) | left<<8;
+			r = (r & 0xff) | right<<8;
+			return *this;
+		}
+		clip_plane_inf& set_lower(u8 left, u8 right)
+		{
+			l = (l & 0x100) | left;
+			r = (r & 0x100) | right;
+			return *this;
+		}
 	};
 
-	struct f3_spritealpha_line_inf
-	{
-		u16 alpha_level[256]{};
-		u16 spri[256]{};
-		u16 sprite_alpha[256]{};
-		u32 sprite_clip_in[256]{};
-		u32 sprite_clip_ex[256]{};
-		s16 clip_l[4][256]{};
-		s16 clip_r[4][256]{};
+	struct draw_source {
+		draw_source() { }
+		draw_source(bitmap_ind16 *bitmap)
+		{
+			src = bitmap;
+			flags = nullptr;
+		}
+		draw_source(tilemap_t *tilemap)
+		{
+			if (!tilemap)
+				return;
+			src = &tilemap->pixmap();
+			flags = &tilemap->flagsmap();
+		};
+		bitmap_ind16 *src{nullptr};
+		bitmap_ind8  *flags{nullptr};
+	};
+
+	struct mix_pix { // per-pixel information for the blending circuit
+		u16 src_pal{0};
+		u16 dst_pal{0};
+		u8  src_blend{0x00};
+		u8  dst_blend{0xff};
+	};
+
+	struct f3_line_inf;
+
+	struct mixable {// layer compositing information
+		draw_source bitmap;
+		bool x_sample_enable{false};
+		u16 mix_value{0};
+		u8 prio{0};
+
+		u8 debug_index{0};
+
+		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; }
+		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; }
+		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); }
+		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); }
+		bool clip_inv_mode() const { return mix_value & 0x1000; }
+		bool layer_enable() const;
+		u8 blend_mask() const { return BIT(mix_value, 14, 2); }
+		bool blend_a() const { return mix_value & 0x4000; }
+		bool blend_b() const { return mix_value & 0x8000; }
+
+		bool operator<(const mixable &rhs) const noexcept { return this->prio < rhs.prio; }
+		bool operator>(const mixable &rhs) const noexcept { return this->prio > rhs.prio; }
+
+		u16 palette_adjust(u16 pal) const { return pal; }
+		int y_index(int y) const;
+		int x_index(int x) const;
+		bool blend_select(const u8 *line_flags, int x) const { return false; }
+
+		bool used(int y) const { return true; }
+		static const char *debug_name() { return "MX"; }
+	};
+
+	struct sprite_inf : mixable {
+		// alpha mode in 6000
+		// mosaic enable in 6400
+		// line enable, clip settings in 7400
+		// priority in 7600
+		bool blend_select_v{false}; // 7400 0xf000
+		u8 (*sprite_pri_usage)[256]{};
+
+		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; }
+		bool layer_enable() const;
+
+		bool used(int y) const { return BIT((*sprite_pri_usage)[y], debug_index); }
+		static const char *debug_name() { return "SP"; };
+	};
+
+	struct pivot_inf : mixable {
+		u8 pivot_control{0};     // 6000
+		bool blend_select_v{false};
+		// mosaic enable in 6400
+		u16 pivot_enable{0}; // 7000 - what is in this word ?
+		// mix info from 7200
+
+		u16 reg_sx{0};
+		u16 reg_sy{0};
+
+		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; }
+		bool use_pix() const { return pivot_control & 0xa0; }
+
+		int y_index(int y) const;
+		int x_index(int x) const;
+		static const char *debug_name() { return "PV"; }
+	};
+
+	struct playfield_inf : mixable {
+		u16 colscroll{0};            // 4000
+		bool alt_tilemap{false};     // 4000
+		// mosaic enable in 6400
+		fixed8 x_scale{0x80};        // 8000
+		fixed8 y_scale{0};           // 8000
+		u16 pal_add{0};              // 9000
+		fixed8 rowscroll{0};         // a000
+
+		fixed8 reg_sx{0};
+		fixed8 reg_sy{0};
+		fixed8 reg_fx_y{0};
+		fixed8 reg_fx_x{0};
+
+		u16 width_mask{0};
+
+		u16 palette_adjust(u16 pal) const;
+		int y_index(int y) const;
+		int x_index(int x) const;
+		bool blend_select(const u8 *line_flags, int x) const { return BIT(line_flags[x], 0); }
+		static const char *debug_name() { return "PF"; }
+	};
+
+	struct pri_mode {
+		u8 src_prio{0};
+		u8 dst_prio{0};
+		u8 src_blendmode{0xff};
+		u8 dst_blendmode{0xff};
+	};
+
+	struct f3_line_inf {
+		int y{0};
+		int screen_y{0};
+		pri_mode pri_alp[432]{};
+		// 5000/4000
+		clip_plane_inf clip[NUM_CLIPPLANES];
+		// 6000 - pivot_control, sprite alpha
+		u16 maybe_sync_reg{0};
+		bool no_opaque_dest{false};
+		// 6200
+		u8 blend[4]{}; // less 0 - 8 more
+		// 6400
+		u8 x_sample{16 - 0}; // mosaic effect
+		u8 fx_6400{0}; // unemulated other effects (palette interpretation + unused bits)
+		// 6600
+		u16 bg_palette{0}; // always palette 0 in existing games
+		// 7200
+		pivot_inf pivot;
+		sprite_inf sp[NUM_SPRITEGROUPS];
+		playfield_inf pf[NUM_PLAYFIELDS];
 	};
 
 	int m_game = 0;
-	tilemap_t *m_tilemap[8]{};
+	tilemap_t *m_tilemap[8] = {nullptr};
 	tilemap_t *m_pixel_layer = nullptr;
 	tilemap_t *m_vram_layer = nullptr;
-	std::unique_ptr<u16[]> m_spriteram16_buffered;
-	u16 m_control_0[8]{};
-	u16 m_control_1[8]{};
 	bool m_flipscreen = false;
+	bool m_extend = false;
 	u8 m_sprite_extra_planes = 0;
 	u8 m_sprite_pen_mask = 0;
+	bool m_sprite_trails = false;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
-	u8 m_sprite_pri_usage = 0;
+	u8 m_sprite_pri_row_usage[256]{};
 	bitmap_ind8 m_pri_alp_bitmap;
-	u8 m_alpha_level_2as = 0;
-	u8 m_alpha_level_2ad = 0;
-	u8 m_alpha_level_3as = 0;
-	u8 m_alpha_level_3ad = 0;
-	u8 m_alpha_level_2bs = 0;
-	u8 m_alpha_level_2bd = 0;
-	u8 m_alpha_level_3bs = 0;
-	u8 m_alpha_level_3bd = 0;
-	u16 m_alpha_level_last = 0;
+	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
 	u16 m_width_mask = 0;
 	u8 m_twidth_mask = 0;
 	u8 m_twidth_mask_bit = 0;
-	std::unique_ptr<u8[]> m_tile_opaque_sp;
-	std::unique_ptr<u8[]> m_tile_opaque_pf[8];
-	int m_alpha_s_1_1 = 0;
-	int m_alpha_s_1_2 = 0;
-	int m_alpha_s_1_4 = 0;
-	int m_alpha_s_1_5 = 0;
-	int m_alpha_s_1_6 = 0;
-	int m_alpha_s_1_8 = 0;
-	int m_alpha_s_1_9 = 0;
-	int m_alpha_s_1_a = 0;
-	int m_alpha_s_2a_0 = 0;
-	int m_alpha_s_2a_4 = 0;
-	int m_alpha_s_2a_8 = 0;
-	int m_alpha_s_2b_0 = 0;
-	int m_alpha_s_2b_4 = 0;
-	int m_alpha_s_2b_8 = 0;
-	int m_alpha_s_3a_0 = 0;
-	int m_alpha_s_3a_1 = 0;
-	int m_alpha_s_3a_2 = 0;
-	int m_alpha_s_3b_0 = 0;
-	int m_alpha_s_3b_1 = 0;
-	int m_alpha_s_3b_2 = 0;
-	u32 m_dval = 0;
-	u8 m_pval = 0;
-	u8 m_tval = 0;
-	u8 m_pdest_2a = 0;
-	u8 m_pdest_2b = 0;
-	s8 m_tr_2a = 0;
-	s8 m_tr_2b = 0;
-	u8 m_pdest_3a = 0;
-	u8 m_pdest_3b = 0;
-	s8 m_tr_3a = 0;
-	s8 m_tr_3b = 0;
-	u16 *m_src[5]{};
-	u16 *m_src_s[5]{};
-	u16 *m_src_e[5]{};
-	u16 m_clip_al[5]{};
-	u16 m_clip_ar[5]{};
-	u16 m_clip_bl[5]{};
-	u16 m_clip_br[5]{};
-	u8 *m_tsrc[5]{};
-	u8 *m_tsrc_s[5]{};
-	u32 m_x_count[5]{};
-	u32 m_x_zoom[5]{};
-	u16 m_pal_add[5]{};
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
-	std::unique_ptr<f3_playfield_line_inf[]> m_pf_line_inf;
-	std::unique_ptr<f3_spritealpha_line_inf[]> m_sa_line_inf;
+	bool m_sprite_bank = 0;
+	//f3_line_inf m_line_inf;
 	const F3config *m_game_config = nullptr;
-	bool (taito_f3_state::*m_dpix_n[8][16])(u32 s_pix);
-	bool (taito_f3_state::**m_dpix_lp[5])(u32 s_pix);
-	bool (taito_f3_state::**m_dpix_sp[9])(u32 s_pix);
 
-	u16 pf_ram_r(offs_t offset);
-	void pf_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void control_0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void control_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_ram_r(offs_t offset);
+	void pf_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 textram_r(offs_t offset);
 	void textram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 charram_r(offs_t offset);
 	void charram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 pivot_r(offs_t offset);
-	void pivot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 lineram_r(offs_t offset);
 	void lineram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pivot_r(offs_t offset);
+	void pivot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void control_0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void control_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_text);
@@ -309,74 +414,19 @@ protected:
 
 	void tile_decode();
 
-	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, int code, u8 color, bool flipx, bool flipy, int sx, int sy, u16 scalex, u16 scaley, u8 pri_dst);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void get_sprite_info(const u16 *spriteram16_ptr);
-	void print_debug_info(bitmap_rgb32 &bitmap);
-	inline void alpha_set_level();
-	inline void alpha_blend32_s(int alphas, u32 s);
-	inline void alpha_blend32_d(int alphas, u32 s);
-	inline void alpha_blend_1_1(u32 s);
-	inline void alpha_blend_1_2(u32 s);
-	inline void alpha_blend_1_4(u32 s);
-	inline void alpha_blend_1_5(u32 s);
-	inline void alpha_blend_1_6(u32 s);
-	inline void alpha_blend_1_8(u32 s);
-	inline void alpha_blend_1_9(u32 s);
-	inline void alpha_blend_1_a(u32 s);
-	inline void alpha_blend_2a_0(u32 s);
-	inline void alpha_blend_2a_4(u32 s);
-	inline void alpha_blend_2a_8(u32 s);
-	inline void alpha_blend_2b_0(u32 s);
-	inline void alpha_blend_2b_4(u32 s);
-	inline void alpha_blend_2b_8(u32 s);
-	inline void alpha_blend_3a_0(u32 s);
-	inline void alpha_blend_3a_1(u32 s);
-	inline void alpha_blend_3a_2(u32 s);
-	inline void alpha_blend_3b_0(u32 s);
-	inline void alpha_blend_3b_1(u32 s);
-	inline void alpha_blend_3b_2(u32 s);
-	bool dpix_1_noalpha(u32 s_pix);
-	inline bool dpix_ret1(u32 s_pix);
-	inline bool dpix_ret0(u32 s_pix);
-	bool dpix_1_1(u32 s_pix);
-	bool dpix_1_2(u32 s_pix);
-	bool dpix_1_4(u32 s_pix);
-	bool dpix_1_5(u32 s_pix);
-	bool dpix_1_6(u32 s_pix);
-	bool dpix_1_8(u32 s_pix);
-	bool dpix_1_9(u32 s_pix);
-	bool dpix_1_a(u32 s_pix);
-	bool dpix_2a_0(u32 s_pix);
-	bool dpix_2a_4(u32 s_pix);
-	bool dpix_2a_8(u32 s_pix);
-	bool dpix_3a_0(u32 s_pix);
-	bool dpix_3a_1(u32 s_pix);
-	bool dpix_3a_2(u32 s_pix);
-	bool dpix_2b_0(u32 s_pix);
-	bool dpix_2b_4(u32 s_pix);
-	bool dpix_2b_8(u32 s_pix);
-	bool dpix_3b_0(u32 s_pix);
-	bool dpix_3b_1(u32 s_pix);
-	bool dpix_3b_2(u32 s_pix);
-	bool dpix_2_0(u32 s_pix);
-	bool dpix_2_4(u32 s_pix);
-	bool dpix_2_8(u32 s_pix);
-	bool dpix_3_0(u32 s_pix);
-	bool dpix_3_1(u32 s_pix);
-	bool dpix_3_2(u32 s_pix);
-	void dpix_1_sprite(u32 s_pix);
-	void dpix_bg(u32 bgcolor);
-	void init_alpha_blend_func();
-	void get_pixmap_pointer(int skip_layer_num, const f3_playfield_line_inf **line_t, int y);
-	void culc_pixmap_pointer(int skip_layer_num);
-	void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const u8 *sprite, u32 orient, int skip_layer_num);
-	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, const u16 *pf_data_n);
-	void calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, u8 &line_enable);
-	void get_spritealphaclip_info();
-	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, const u16 *pf_data_n);
-	void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy);
+	void create_tilemaps(bool extend);
+
+	inline void f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect);
+	void get_sprite_info();
+	void draw_sprites(const rectangle &cliprect);
+	void get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy);
+	void read_line_ram(f3_line_inf &line, int y);
+	void render_line(pen_t *dst, const mix_pix (&z)[432]);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template<typename Mix>
+	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix line);
+	template<typename Mix>
+	bool mix_line(Mix &gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
 
 private:
 	optional_device<taito_en_device> m_taito_en;
@@ -388,7 +438,7 @@ private:
 	void bubsympb_oki_w(u8 data);
 	u32 f3_control_r(offs_t offset);
 	void f3_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void f3_unk_w(offs_t offset, u16 data);
+	void f3_timer_control_w(offs_t offset, u16 data);
 	void sound_reset_0_w(u32 data);
 	void sound_reset_1_w(u32 data);
 	void sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask = ~0);

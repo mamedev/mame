@@ -180,8 +180,6 @@ uint32_t shettle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				sx * 8, sy * 8);
 	}
 
-	// Note, we're counting up on purpose
-
 	for (int offs = m_spriteram.bytes() - 8; offs >= 0; offs -= 8)
 	{
 		int x = m_spriteram[offs + 3] + 0x0b;

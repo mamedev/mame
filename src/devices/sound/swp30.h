@@ -66,6 +66,7 @@ private:
 	static const std::array<u32, 4> lfo_shape_centered_tri;
 	static const std::array<u32, 4> lfo_shape_offset_saw;
 	static const std::array<u32, 4> lfo_shape_offset_tri;
+	static const std::array<u8,  4> dpcm_offset;
 
 	std::array<s32,  0x40> m_sample_start;
 	std::array<s32,  0x40> m_sample_end;
@@ -92,6 +93,7 @@ private:
 	std::array<s16,  0x40> m_dpcm_current;
 	std::array<s16,  0x40> m_dpcm_next;
 	std::array<u32,  0x40> m_dpcm_address;
+	std::array<s32,  0x40> m_dpcm_sum;
 
 	std::array<u64, 0x180> m_meg_program;
 	std::array<s16, 0x180> m_meg_const;

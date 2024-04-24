@@ -3,6 +3,18 @@
 
 /*
 This driver contains early non-CPU Midway dumps, until they are emulated and moved as needed
+
+Technical Manual #s Game Name(s)          Midway Part #s                 Data PROM/ROM Chip Numbers
+---------------------------------------------------------------------------------------------------
+GAME NO. 571        Asteroid (197?)       571-906                        NO
+GAME NO. 589        Ball Park (1975)      589-908-1, 589-908-2, 589-909  YES
+GAME NO. 575 & 579  Leader (1973)         575-900                        YES
+GAME NO. 582        tv Basketball (1974)  582-904                        NO
+GAME NO. 588        T.V. Flipper (1975)   588-910                        ?
+GAME NO. 591        Wheels (1975)         591-901                        NO
+GAME NO. 594        Wheels II (1975)      594-904                        YES           257-269
+GAME NO. 567        Winner (1973)         567-904.                       NO
+GAME NO. 572        Winner IV (1973)      572-902.                       NO
 */
 
 #include "emu.h"
