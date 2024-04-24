@@ -7321,8 +7321,36 @@ ROM_START( theglobp ) // Pac-Man PCB conversion kit. Includes a small daughterca
 	ROM_LOAD( "82s126.3m"  ,  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
+ROM_START( theglobpa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "1-2516.bin",   0x0000, 0x0800, CRC(760f4764) SHA1(fc29aa0a1d5da28a40590ef37bbd1255713fb1a4) )
+	ROM_LOAD( "2-2516.bin",   0x0800, 0x0800, CRC(7d556bc6) SHA1(aef2b6799bd2a51e3de8282361d0c03c5bedb8ad) )
+	ROM_LOAD( "3-2516.bin",   0x1000, 0x0800, CRC(ca9dafca) SHA1(41cb4313f9a46cb40c7b41ea8c7c522c1d4b5d54) )
+	ROM_LOAD( "4-2516.bin",   0x1800, 0x0800, CRC(fff64f47) SHA1(a9b8a5e1641626eff312b4588d8afae8f8811e6d) )
+	ROM_LOAD( "5-2716.bin",   0x2000, 0x0800, CRC(3c352e0f) SHA1(5bc30414da27a96f9e96e3dccccc0a2d66c92731) )
+	ROM_LOAD( "6-2716.bin",   0x2800, 0x0800, CRC(5a7ba8b0) SHA1(d6372ff05ade84957acd25dfc37adcfd47927358) )
+	ROM_LOAD( "7-2716.bin",   0x3000, 0x0800, CRC(09f6b061) SHA1(7a39b8ad3f17f04aa908930ccc340627f2147216) )
+	ROM_LOAD( "8-2716.bin",   0x3800, 0x0800, CRC(192b6d61) SHA1(30324859c7e0acd001b29c95b29ebf2156f2a802) )
 
-//Program roms same as the globp
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "9-2716.bin",   0x0000, 0x0800, CRC(36408c76) SHA1(f5bb18e38de57adc2aed6211048d9f0ee0e58df7) )
+	ROM_LOAD( "11-2716.bin",  0x0800, 0x0800, CRC(b8ba069c) SHA1(f8d8e40afd8214a6d951af8de2761703b0651f79) )
+	ROM_LOAD( "10-2716.bin",  0x1000, 0x0800, CRC(e0478b4e) SHA1(9697c7fd92752d052aea4c46292b1b7cae28f606) )
+	ROM_LOAD( "12-2716.bin",  0x1800, 0x0800, CRC(ffb30caf) SHA1(ecdadd8207bc54548dae751e3e08c6647cd1f25e) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "tbp18s030.8h", 0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
+	ROM_LOAD( "82s129.4a",    0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
+	ROM_LOAD( "63s141.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "63s141.3m",    0x0100, 0x0100, CRC(2ee34ade) SHA1(7cd43283b9648feb9a15466212b7a480fad20a39) ) // Timing - not used
+
+        ROM_REGION( 0x0800, "extra", 0 )
+	ROM_LOAD( "top-2716.bin", 0x0000, 0x0800, CRC(25e74cd5) SHA1(dcee1fda9abe7fdeac3a87ef7897afda946efcb2) ) // EPROM on a subboard configured to replace a BPROM
+ROM_END
+
+// Program ROMs same as the globp
 ROM_START( sprglobp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "u 2 the glob pg02284 eagle.u2", 0x0000, 0x2000, CRC(829d0bea) SHA1(89f52b459a03fb40b9bbd97ac8a292f7ead6faba) )
@@ -7361,7 +7389,6 @@ ROM_START( sprglbpg )
 	ROM_LOAD( "ic51.prm",    0x0000, 0x0100, CRC(c29dea27) SHA1(563c9770028fe39188e62630711589d6ed242a66) )
 	ROM_LOAD( "ic70.prm"  ,  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
 ROM_END
-
 
 // 2 PCB set (G-GA-2 and G-GB-2). It was modified to use one 27128 instead of eight 2716 for the program ROMs.
 ROM_START( theglobme )
@@ -8725,10 +8752,12 @@ GAME( 1983, vanvanb,  vanvan,   vanvan,   vanvank,  pacman_state,  empty_init,  
 GAME( 1983, bwcasino, 0,        acitya,   bwcasino, epospm_state,  empty_init,    ROT90,  "Epos Corporation", "Boardwalk Casino",     MACHINE_SUPPORTS_SAVE )
 GAME( 1983, acitya,   bwcasino, acitya,   acitya,   epospm_state,  empty_init,    ROT90,  "Epos Corporation", "Atlantic City Action", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, theglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 1)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglobpa,suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 2)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Super Glob (Pac-Man hardware)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware) (German bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobme,suprglob, woodpek,  theglobp, epospm_state,  empty_init,    ROT90,  "Magic Electronics Inc.",   "The Glob (Pacman hardware, Magic Electronics Inc. license)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1984, beastfp,  suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Beastie Feastie (Pac-Man conversion)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, eeekkp,   eeekk,    eeekkp,   eeekkp,   epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Eeekk! (Pac-Man conversion)",                                MACHINE_SUPPORTS_SAVE )
 

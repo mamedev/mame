@@ -18644,6 +18644,7 @@ pacmanblb                       // bootleg
 pacmanblc                       // bootleg (Calfesa)
 pacmanblci                      // bootleg (Cirsa)
 pacmanblv                       // bootleg (Video Dens)
+pacmanblva                      // bootleg (Video Dens)
 pajaroes                        // bootleg
 phoenxp2                        // bootleg
 pisces                          // Subelectro
@@ -35318,6 +35319,7 @@ superabc                        // hack
 superabco                       // hack
 theglobme                       // (c) 1983 Magic Electronics
 theglobp                        // (c) 1983 Epos Corporation
+theglobpa                       // (c) 1983 Epos Corporation
 titanpac                        // hack
 vanvan                          // (c) 1983 Sanritsu
 vanvanb                         // (c) 1983 Karateco (bootleg?)
@@ -42041,6 +42043,9 @@ p8000_16                        //
 
 @source:skeleton/palestra.cpp
 palestra
+
+@source:skeleton/pcksurfer.cpp
+pcksurfer                       // (c) 2006 Datawind
 
 @source:skeleton/pdt3100.cpp
 pdt3100                         //

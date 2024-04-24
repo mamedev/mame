@@ -437,6 +437,8 @@ const std::array<u32, 4> swp30_device::lfo_shape_centered_tri = { 0x00000000, 0x
 const std::array<u32, 4> swp30_device::lfo_shape_offset_saw   = { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }; // __////__
 const std::array<u32, 4> swp30_device::lfo_shape_offset_tri   = { 0x00000000, 0x00000000, 0x000fffff, 0x000fffff }; // __/\/\__
 
+const std::array<u8, 4> swp30_device::dpcm_offset = { 7, 6, 4, 0 };
+
 swp30_device::swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SWP30, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
@@ -478,7 +480,7 @@ void swp30_device::device_start()
 	// Delta-packed samples decompression.
 
 	for(int i=0; i<128; i++) {
-		s16 base = ((i & 0x1f) << (5+(i >> 5))) + (((1 << (i >> 5))-1) << 10);
+		s16 base = ((i & 0x1f) << (3+(i >> 5))) + (((1 << (i >> 5))-1) << 8);
 		m_dpcm[i | 0x80] = - base;
 		m_dpcm[i]        = + base;
 	}
@@ -511,6 +513,7 @@ void swp30_device::device_start()
 	save_item(NAME(m_dpcm_current));
 	save_item(NAME(m_dpcm_next));
 	save_item(NAME(m_dpcm_address));
+	save_item(NAME(m_dpcm_sum));
 
 	save_item(NAME(m_sample_history));
 
@@ -568,6 +571,7 @@ void swp30_device::device_reset()
 	std::fill(m_dpcm_current.begin(), m_dpcm_current.end(), false);
 	std::fill(m_dpcm_next.begin(), m_dpcm_next.end(), false);
 	std::fill(m_dpcm_address.begin(), m_dpcm_address.end(), false);
+	std::fill(m_dpcm_sum.begin(), m_dpcm_sum.end(), 0);
 
 	std::fill(m_meg_program.begin(), m_meg_program.end(), 0);
 	std::fill(m_meg_const.begin(), m_meg_const.end(), 0);
@@ -731,6 +735,7 @@ void swp30_device::keyon_w(u16)
 			if(m_sample_end[chan] & 0x80000000)
 				dt = -dt;
 			m_dpcm_address[chan] = ((m_sample_address[chan] & 0xffffff) << 2) - dt;
+			m_dpcm_sum[chan] = 0;
 
 			m_lfo_phase[chan] = 0;
 
@@ -1440,7 +1445,6 @@ void swp30_device::execute_run()
 						break;
 					}
 					}
-					logerror("XX %04x %04x\n", val0, val1);
 					break;
 				}
 
@@ -1477,12 +1481,15 @@ void swp30_device::execute_run()
 				}
 
 				case 3: { // 8-bits delta-pcm
+					u8 offset = dpcm_offset[(m_sample_address[chan] >> 25) & 3];
+					u8 scale = (m_sample_address[chan] >> 27) & 7;
 					offs_t adr = m_dpcm_address[chan];
 					if(m_sample_end[chan] & 0x80000000) {
 						u32 target_address = (base_address << 2) + spos - 1;
 						while(adr >= target_address) {
 							m_dpcm_current[chan] = m_dpcm_next[chan];
-							s32 sample = m_dpcm_next[chan] + m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff];
+							m_dpcm_sum[chan] += m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff] - offset;
+							s32 sample = (m_dpcm_sum[chan] << scale) >> 3;
 							adr --;
 							if(sample < -0x8000)
 								sample = -0x8000;
@@ -1494,7 +1501,8 @@ void swp30_device::execute_run()
 						u32 target_address = (base_address << 2) + spos + 1;
 						while(adr <= target_address) {
 							m_dpcm_current[chan] = m_dpcm_next[chan];
-							s32 sample = m_dpcm_next[chan] + m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff];
+							m_dpcm_sum[chan] += m_dpcm[(m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff] - offset;
+							s32 sample = (m_dpcm_sum[chan] << scale) >> 3;
 							//                          logerror("## +  sample %08x %02x %d\n", adr, (m_rom_cache.read_dword(adr >> 2) >> (8*(adr & 3))) & 0xff, sample);
 							adr ++;
 							if(sample < -0x8000)
@@ -1546,12 +1554,13 @@ void swp30_device::execute_run()
 					else {
 						s32 prev = m_sample_pos[chan];
 						do
-							m_sample_pos[chan] = m_sample_pos[chan] - ((m_sample_end[chan] & 0xffffff) << 8) + ((m_sample_address[chan] >> 22) & 0xfc);
+							m_sample_pos[chan] -= (m_sample_end[chan] & 0xffffff) << 8;
 						while((m_sample_pos[chan] >> 8) >= (m_sample_end[chan] & 0xffffff));
 						if(m_sample_end[chan] & 0x80000000)
 							m_dpcm_address[chan] -= (m_sample_pos[chan] >> 8) - (prev >> 8);
 						else
 							m_dpcm_address[chan] += (m_sample_pos[chan] >> 8) - (prev >> 8);
+						m_dpcm_sum[chan] = 0;
 					}
 				}
 
