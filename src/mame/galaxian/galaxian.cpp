@@ -11451,7 +11451,7 @@ ROM_END
 // Two PCBs, different than the usual Galaxian single PCB.
 ROM_START( pacmanblva ) // Video Dens (not Artic Multi-System)
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "pac-1-2716.bin", 0x0000, 0x0800, CRC(8ba43afd) SHA1(75ae7b4b7cfc658d2742ff0f8e56834386a891b6) )
+	ROM_LOAD( "pac-1-2716.bin", 0x0000, 0x0800, BAD_DUMP CRC(590de3f3) SHA1(99cf9711d9bd4f5750533cdf9c88a9c88c6e531a) ) // Byte 0x14d was 0x00 on this set, instead of 0x40, probably because a bit rot
 	ROM_LOAD( "pac-2-2716.bin", 0x0800, 0x0800, CRC(3954e41c) SHA1(4b3f838d55ab4b5b93e1bcb26b3661f090a9124f) )
 	ROM_LOAD( "pac-3-2716.bin", 0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) )
 	ROM_LOAD( "pac-4-2716.bin", 0x1800, 0x0800, CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) )
