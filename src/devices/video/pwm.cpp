@@ -274,11 +274,11 @@ void pwm_display_device::sync()
 {
 	const attotime now = machine().time();
 	const attotime last = m_sync_time;
-	m_sync_time = now;
 
 	if (last >= now)
 		return;
 
+	m_sync_time = now;
 	const attotime diff = now - last;
 	u64 sel = m_rowsel;
 
