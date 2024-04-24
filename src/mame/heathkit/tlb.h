@@ -39,8 +39,8 @@ public:
 
 	// optional SigmaSet operations
 	virtual void sigma_ctrl_w(u8 data) {}
-	virtual u8   sigma_ctrl_r() { return 0x00; }
-	virtual u8   sigma_video_mem_r() { return 0x00; }
+	virtual u8 sigma_ctrl_r() { return 0x00; }
+	virtual u8 sigma_video_mem_r() { return 0x00; }
 	virtual void sigma_video_mem_w(u8 val) {}
 	virtual void sigma_io_lo_addr_w(u8 val) {}
 	virtual void sigma_io_hi_addr_w(u8 val) {}
