@@ -23,6 +23,7 @@
 #include "emupal.h"
 #include "screen.h"
 
+
 struct midvunit_object_data
 {
 	uint16_t *    destbase = nullptr;
@@ -41,12 +42,12 @@ public:
 	void make_vertices_inclusive(vertex_t *vert);
 
 private:
-	midvunit_base_state &m_state;
-
 	void render_flat(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
 	void render_tex(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
 	void render_textrans(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
 	void render_textransmask(int32_t scanline, const extent_t &extent, const midvunit_object_data &extradata, int threadid);
+
+	midvunit_base_state &m_state;
 };
 
 class midvunit_base_state : public driver_device
@@ -61,6 +62,8 @@ public:
 	required_device<screen_device> m_screen;
 
 protected:
+	static inline constexpr XTAL MIDVUNIT_VIDEO_CLOCK = 33.333333_MHz_XTAL;
+
 	midvunit_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoram(*this, "videoram", 0x200000, ENDIANNESS_LITTLE)
@@ -76,31 +79,10 @@ protected:
 		, m_tms32031_control(*this, "32031_control")
 	{ }
 
-	static constexpr XTAL MIDVUNIT_VIDEO_CLOCK = 33.333333_MHz_XTAL;
-
 	virtual void device_post_load() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-	required_device<tms32031_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<palette_device> m_palette;
-	required_device_array<timer_device, 2> m_timer;
-	required_device<dcs_audio_device> m_dcs;
-	required_shared_ptr<uint32_t> m_paletteram;
-	required_shared_ptr<uint32_t> m_ram_base;
-	required_shared_ptr<uint32_t> m_tms32031_control;
-
-	uint8_t m_cmos_protected = 0;
-	uint16_t m_control_data = 0;
-	double m_timer_rate = 0;
-	uint32_t *m_generic_speedup = nullptr;
-	uint16_t m_video_regs[16]{};
-	uint8_t m_dma_data_index = 0;
-	emu_timer *m_scanline_timer = nullptr;
-	emu_timer *m_eoi_timer = nullptr;
-	std::unique_ptr<midvunit_renderer> m_poly;
 
 	void cmos_protect_w(uint32_t data);
 	void dma_queue_w(uint32_t data);
@@ -127,6 +109,25 @@ protected:
 	TIMER_CALLBACK_MEMBER(eoi_timer_cb);
 
 	void midvcommon(machine_config &config);
+
+	required_device<tms32031_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<palette_device> m_palette;
+	required_device_array<timer_device, 2> m_timer;
+	required_device<dcs_audio_device> m_dcs;
+	required_shared_ptr<uint32_t> m_paletteram;
+	required_shared_ptr<uint32_t> m_ram_base;
+	required_shared_ptr<uint32_t> m_tms32031_control;
+
+	uint8_t m_cmos_protected = 0;
+	uint16_t m_control_data = 0;
+	double m_timer_rate = 0;
+	uint32_t *m_generic_speedup = nullptr;
+	uint16_t m_video_regs[16]{};
+	uint8_t m_dma_data_index = 0;
+	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_eoi_timer = nullptr;
+	std::unique_ptr<midvunit_renderer> m_poly;
 };
 
 class midvunit_state : public midvunit_base_state
@@ -147,6 +148,23 @@ protected:
 	{ }
 
 	virtual void machine_start() override;
+
+	uint32_t port0_r();
+	uint32_t adc_r();
+	void adc_w(uint32_t data);
+	void cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cmos_r(offs_t offset);
+	uint32_t wheel_board_r();
+	void wheel_board_w(uint32_t data);
+	uint32_t intcs_r();
+	uint32_t comcs_r(offs_t offset);
+	void comcs_w(offs_t offset, uint32_t data);
+	void set_input(const char *s);
+
+	uint16_t comm_bus_out();
+	uint16_t comm_bus_in();
+
+	void midvunit_map(address_map &map);
 
 	required_device<adc0844_device> m_adc;
 
@@ -171,23 +189,6 @@ protected:
 	uint32_t m_wheel_board_u8_latch = 0;
 	uint8_t m_comm_flags = 0;
 	uint16_t m_comm_data = 0;
-
-	uint32_t port0_r();
-	uint32_t adc_r();
-	void adc_w(uint32_t data);
-	void cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t cmos_r(offs_t offset);
-	uint32_t wheel_board_r();
-	void wheel_board_w(uint32_t data);
-	uint32_t intcs_r();
-	uint32_t comcs_r(offs_t offset);
-	void comcs_w(offs_t offset, uint32_t data);
-	void set_input(const char *s);
-
-	uint16_t comm_bus_out();
-	uint16_t comm_bus_in();
-
-	void midvunit_map(address_map &map);
 };
 
 class crusnusa_state : public midvunit_state
@@ -205,9 +206,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(motion_r);
 
 protected:
-	required_ioport m_motion;
-
 	void init_crusnusa_common(offs_t speedup);
+
+	required_ioport m_motion;
 };
 
 class crusnwld_state : public midvunit_state
@@ -227,10 +228,6 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	required_device<midway_serial_pic2_device> m_midway_serial_pic2;
-
-	uint16_t m_bit_index = 0;
-
 	void crusnwld_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t crusnwld_serial_status_r();
 	uint32_t crusnwld_serial_data_r();
@@ -241,6 +238,10 @@ protected:
 
 	void crusnwld_map(address_map &map);
 	void offroadc_map(address_map &map);
+
+	required_device<midway_serial_pic2_device> m_midway_serial_pic2;
+
+	uint16_t m_bit_index = 0;
 };
 
 class midvplus_state : public midvunit_base_state
@@ -263,18 +264,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	uint32_t midvplus_misc_r(offs_t offset);
+	void midvplus_misc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midvplus_xf1_w(uint8_t data);
+
+	void midvplus_map(address_map &map);
+
 	required_device<midway_ioasic_device> m_midway_ioasic;
 	required_device<ata_interface_device> m_ata;
 	required_shared_ptr<uint32_t> m_fastram_base;
 	required_shared_ptr<uint32_t> m_midvplus_misc;
 
 	int m_lastval = 0;
-
-	uint32_t midvplus_misc_r(offs_t offset);
-	void midvplus_misc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void midvplus_xf1_w(uint8_t data);
-
-	void midvplus_map(address_map &map);
 };
 
 #endif // MAME_MIDWAY_MIDVUNIT_H
