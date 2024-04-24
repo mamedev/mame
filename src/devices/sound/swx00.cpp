@@ -44,6 +44,8 @@ const std::array<s32, 16> swx00_sound_device::panmap = {
 	0x300, 0x340, 0x380, 0xfff
 };
 
+const std::array<u8, 4> swx00_sound_device::dpcm_offset = { 7, 6, 4, 0 };
+
 swx00_sound_device::swx00_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SWX00_SOUND, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
@@ -93,6 +95,7 @@ void swx00_sound_device::device_start()
 	save_item(NAME(m_dpcm_current));
 	save_item(NAME(m_dpcm_next));
 	save_item(NAME(m_dpcm_address));
+	save_item(NAME(m_dpcm_sum));
 
 
 	for(int i=0; i != 128; i++) {
@@ -111,7 +114,7 @@ void swx00_sound_device::device_start()
 	// Delta-packed samples decompression.
 
 	for(int i=0; i<128; i++) {
-		s16 base = ((i & 0x1f) << (5+(i >> 5))) + (((1 << (i >> 5))-1) << 10);
+		s16 base = ((i & 0x1f) << (3+(i >> 5))) + (((1 << (i >> 5))-1) << 8);
 		m_dpcm[i | 0x80] = - base;
 		m_dpcm[i]        = + base;
 	}
@@ -147,6 +150,7 @@ void swx00_sound_device::device_reset()
 	std::fill(m_dpcm_current.begin(), m_dpcm_current.end(), false);
 	std::fill(m_dpcm_next.begin(), m_dpcm_next.end(), false);
 	std::fill(m_dpcm_address.begin(), m_dpcm_address.end(), false);
+	std::fill(m_dpcm_sum.begin(), m_dpcm_sum.end(), 0);
 
 	m_keyon = 0;
 	m_state_sel = 0;
@@ -346,6 +350,7 @@ void swx00_sound_device::keyon_commit_w(u8)
 			m_dpcm_current[chan] = 0;
 			m_dpcm_next[chan] = 0;
 			m_dpcm_address[chan] = ((m_sample_address[chan] & 0xffffff) << 1) - m_sample_start[chan];
+			m_dpcm_sum[chan] = 0;
 
 			m_glo_level_cur[chan] = (m_glo_pan[chan] >> 4) & 0xff0;
 			m_pan_l[chan] = panmap[(m_glo_pan[chan] >> 4) & 15];
@@ -618,6 +623,8 @@ void swx00_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 			}
 
 			case 3: { // 8-bits delta-pcm
+				u8 offset = dpcm_offset[(m_sample_address[chan] >> 24) & 3];
+				u8 scale = (m_sample_address[chan] >> 26) & 7;
 				u32 target_address = (base_address << 1) + spos + 1;
 				while(m_dpcm_address[chan] <= target_address) {
 					m_dpcm_current[chan] = m_dpcm_next[chan];
@@ -626,7 +633,8 @@ void swx00_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 						idx &= 0xff;
 					else
 						idx >>= 8;
-					s32 sample = m_dpcm_next[chan] + m_dpcm[idx];
+					m_dpcm_sum[chan] += m_dpcm[idx] - offset;
+					s32 sample = (m_dpcm_sum[chan] << scale) >> 3;
 					m_dpcm_address[chan] ++;
 					if(sample < -0x8000)
 						sample = -0x8000;
@@ -667,9 +675,10 @@ void swx00_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 				else {
 					s32 prev = m_sample_pos[chan];
 					do
-						m_sample_pos[chan] -= (m_sample_end[chan] << 15) | ((m_sample_address[chan] & 0x3f000000) >> (24-9));
+						m_sample_pos[chan] -= m_sample_end[chan] << 15;
 					while((m_sample_pos[chan] >> 15) >= m_sample_end[chan]);
 					m_dpcm_address[chan] += (m_sample_pos[chan] >> 15) - (prev >> 15);
+					m_dpcm_sum[chan] = 0;
 				}
 			}
 
