@@ -29,6 +29,7 @@
 #include "cpu/m68000/m68020.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
+
 #include "speaker.h"
 
 
@@ -444,11 +445,10 @@ void taito_f3_state::f3(machine_config &config)
 	// from taito z system and crystal on board
 	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/
 	m_screen->set_raw(
-		26.686_MHz_XTAL / 4,
-		432, 46, 320 + 46,
-		262, 24, 232 + 24
-	);
-	// refresh rate = 26686000/4/432/262 = 58.94..
+			26.686_MHz_XTAL / 4,
+			432, 46, 320 + 46,
+			262, 24, 232 + 24);
+	// refresh rate = 26686000/4/432/262 = 58.94 Hz
 
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));

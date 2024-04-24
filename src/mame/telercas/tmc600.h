@@ -14,6 +14,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/cdp1869.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define SCREEN_TAG          "screen"
@@ -95,6 +96,8 @@ private:
 	void cdp1869_page_ram(address_map &map);
 	void tmc600_io_map(address_map &map);
 	void tmc600_map(address_map &map);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 
 #endif // MAME_TELERCAS_TMC600_H

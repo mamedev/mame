@@ -6,13 +6,17 @@
 #pragma once
 
 #include "taito_en.h"
+
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 #include <bitset>
+
 
 class taito_f3_state : public driver_device
 {
@@ -220,7 +224,7 @@ protected:
 	};
 
 	struct draw_source {
-		draw_source() { };
+		draw_source() { }
 		draw_source(bitmap_ind16 *bitmap)
 		{
 			src = bitmap;
@@ -251,27 +255,29 @@ protected:
 		bool x_sample_enable{false};
 		u16 mix_value{0};
 		u8 prio{0};
-		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; };
-		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; };
-		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); };
-		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); };
-		bool clip_inv_mode() const { return mix_value & 0x1000; };
-		inline bool layer_enable() const;
-		u8 blend_mask() const { return BIT(mix_value, 14, 2); };
-		bool blend_a() const { return mix_value & 0x4000; };
-		bool blend_b() const { return mix_value & 0x8000; };
 
-		inline bool operator<(const mixable &rhs) const noexcept { return this->prio < rhs.prio; };
-		inline bool operator>(const mixable &rhs) const noexcept { return this->prio > rhs.prio; };
-
-		u16 palette_adjust(u16 pal) const { return pal; };
-		inline int y_index(int y) const;
-		inline int x_index(int x) const;
-		bool blend_select(const u8 *line_flags, int x) const { return false; };
-
-		bool used(int y) const { return true; };
 		u8 debug_index{0};
-		const char *debug_name() { return "MX"; };
+
+		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; }
+		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; }
+		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); }
+		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); }
+		bool clip_inv_mode() const { return mix_value & 0x1000; }
+		bool layer_enable() const;
+		u8 blend_mask() const { return BIT(mix_value, 14, 2); }
+		bool blend_a() const { return mix_value & 0x4000; }
+		bool blend_b() const { return mix_value & 0x8000; }
+
+		bool operator<(const mixable &rhs) const noexcept { return this->prio < rhs.prio; }
+		bool operator>(const mixable &rhs) const noexcept { return this->prio > rhs.prio; }
+
+		u16 palette_adjust(u16 pal) const { return pal; }
+		int y_index(int y) const;
+		int x_index(int x) const;
+		bool blend_select(const u8 *line_flags, int x) const { return false; }
+
+		bool used(int y) const { return true; }
+		static const char *debug_name() { return "MX"; }
 	};
 
 	struct sprite_inf : mixable {
@@ -280,28 +286,31 @@ protected:
 		// line enable, clip settings in 7400
 		// priority in 7600
 		bool blend_select_v{false}; // 7400 0xf000
-		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; };
-		inline bool layer_enable() const;
+		u8 (*sprite_pri_usage)[256]{};
 
-		u8 (*sprite_pri_usage)[256]{nullptr};
-		bool used(int y) const { return (*sprite_pri_usage)[y] & (1<<debug_index); }
-		const char *debug_name() { return "SP"; };
+		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; }
+		bool layer_enable() const;
+
+		bool used(int y) const { return BIT((*sprite_pri_usage)[y], debug_index); }
+		static const char *debug_name() { return "SP"; };
 	};
 
 	struct pivot_inf : mixable {
 		u8 pivot_control{0};     // 6000
 		bool blend_select_v{false};
-		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; };
 		// mosaic enable in 6400
 		u16 pivot_enable{0}; // 7000 - what is in this word ?
 		// mix info from 7200
-		bool use_pix() const { return pivot_control & 0xa0; };
 
 		u16 reg_sx{0};
 		u16 reg_sy{0};
-		inline int y_index(int y) const;
-		inline int x_index(int x) const;
-		const char *debug_name() { return "PV"; };
+
+		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; }
+		bool use_pix() const { return pivot_control & 0xa0; }
+
+		int y_index(int y) const;
+		int x_index(int x) const;
+		static const char *debug_name() { return "PV"; }
 	};
 
 	struct playfield_inf : mixable {
@@ -320,11 +329,11 @@ protected:
 
 		u16 width_mask{0};
 
-		inline u16 palette_adjust(u16 pal) const;
-		inline int y_index(int y) const;
-		inline int x_index(int x) const;
-		bool blend_select(const u8 *line_flags, int x) const { return BIT(line_flags[x], 0); };
-		const char *debug_name() { return "PF"; };
+		u16 palette_adjust(u16 pal) const;
+		int y_index(int y) const;
+		int x_index(int x) const;
+		bool blend_select(const u8 *line_flags, int x) const { return BIT(line_flags[x], 0); }
+		static const char *debug_name() { return "PF"; }
 	};
 
 	struct pri_mode {
@@ -417,8 +426,7 @@ protected:
 	template<typename Mix>
 	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix line);
 	template<typename Mix>
-	bool mix_line(Mix *gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
-
+	bool mix_line(Mix &gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
 
 private:
 	optional_device<taito_en_device> m_taito_en;
