@@ -310,7 +310,7 @@ license:CC0-1.0
 	Japanese cart listing (by M code) (M-x on cartridge / box, MC in cart identifier code)
 
 	M-1  *MC0001-ATM  Artist Mini Volume 1 (Aya Matsuura)
-	M-2  *MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
+	M-2  *MC0002-ATM  Artist Mini Volume 2 (PIKA☆NCHI, A・RA・SHI／他)
 	M-3  *MC0003-ATM  Artist Mini Volume 3 (Morning Musume)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
 	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
@@ -2265,7 +2265,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0002">
-		<description>Artist Mini Volume 2 ((untranslated artist) (Japan) (MC0002-ATM)</description>
+		<description>Artist Mini Volume 2 (PIKA☆NCHI, A・RA・SHI／他) (Japan) (MC0002-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
@@ -2963,9 +2963,10 @@ license:CC0-1.0
 	<!-- unusual cartridge, looks like a regular G (Gold series) and is compatible with the same units, but has a GS code instead, no
 	     other GS cartridges have been seen -->
 	<software name="gs01">
-		<description>GS-01 (Japan)</description>
+		<description>Natsukashi no Meikyoku-shū (Japan)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="懐かしの名曲集" />
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
