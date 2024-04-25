@@ -1683,7 +1683,7 @@ void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
 	xavix_cart(config);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("FAMMAT");;
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("FAMMAT");
 }
 
 
