@@ -42257,6 +42257,7 @@ tulip1                          // (c) 1983 CompuData
 
 @source:skeleton/tvcobrasd.cpp
 cobrasd                         // (c) 1998 TourVisión
+cobrasda                        // (c) 1997 TourVisión
 
 @source:skeleton/unistar.cpp
 unistar                         //
