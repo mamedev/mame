@@ -75,9 +75,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="A29L800ATV.u1" size="0x100000" crc="679f92e9" sha1="9af880f7f09c0e616d0f0b3cd499ab42de3ab210"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x8ec4" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x8ec9" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,9 +97,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="cartdump_pink.u1" size="0x200000" crc="235c1c52" sha1="8ce599227e2824d7ca98e3d0f9bb163c09d8fa58"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,9 +129,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="cartdump_blue.u1" size="0x200000" crc="4912b515" sha1="0b004821b07b82eb05c3ce7b0c89e55b35dff20b"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
@@ -150,9 +141,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0801001.u1" size="0x200000" crc="298dff43" sha1="c644a00154d129808261688482943b93440c33dc"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x93b5" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x93ba" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,9 +153,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0801002.u1" size="0x200000" crc="ef4c68f3" sha1="ea9d62d6ba98f3c067f39b6d2e9d8b03d441b315"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x93b5" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x93ba" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
@@ -180,9 +165,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x9412" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x9417" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>

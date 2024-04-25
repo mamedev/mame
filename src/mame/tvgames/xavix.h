@@ -184,6 +184,9 @@ public:
 	}
 
 protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	virtual uint8_t read_io0(uint8_t direction);
 	virtual uint8_t read_io1(uint8_t direction);
@@ -219,9 +222,6 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
@@ -717,7 +717,6 @@ public:
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 	void xavix_cart_evio(machine_config &config);
-	void xavix_cart_hikara(machine_config &config);
 
 protected:
 
@@ -986,12 +985,15 @@ public:
 		m_extra3(*this, "EXTRA3")
 	{ }
 
+	void xavix_cart_hikara(machine_config &config);
+
 	virtual int ekara_multi0_r() override;
 	virtual int ekara_multi1_r() override;
 	int ekara_multi2_r();
 	int ekara_multi3_r();
 
 protected:
+	virtual void machine_reset() override;
 
 	required_ioport m_extra2;
 	required_ioport m_extra3;

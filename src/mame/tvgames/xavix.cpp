@@ -1616,7 +1616,48 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("EKARA");
 }
 
-void xavix_cart_state::xavix_cart_hikara(machine_config &config)
+void xavix_hikara_state::machine_reset()
+{
+	xavix_ekara_state::machine_reset();
+
+	if (!memregion("cartslot:cart:rom"))
+		return;
+
+	// rather crude hack to patch a failing check found in the cartridge ROMS
+	// TODO: remove this!
+	u8* ROM = memregion("cartslot:cart:rom")->base();
+	size_t len = memregion("cartslot:cart:rom")->bytes();
+
+	int foundcount = 0;
+	int firstfound = 0;
+	for (int i = 0; i < len - 6; i++)
+	{
+		int matchcount = 0;
+
+		for (int j = 0; j < 6; j++)
+		{
+			u8 searchfor[6] = { 0xd0,0x14,0xad,0xff,0x1e,0xf0 };
+
+			if (ROM[i + j] == searchfor[j] || (j == 3))
+				matchcount++;
+		}
+
+		if (matchcount == 6)
+		{
+			if (foundcount == 0)
+				firstfound = i;
+			foundcount++;
+		}
+	}
+
+	if (foundcount == 3)
+	{
+		ROM[firstfound] = 0xf0;
+		ROM[firstfound + 5] = 0xd0;
+	}
+}
+
+void xavix_hikara_state::xavix_cart_hikara(machine_config &config)
 {
 	xavix_cart(config);
 
