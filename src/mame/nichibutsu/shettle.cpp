@@ -15,8 +15,8 @@ Hardware has similarities with that of various Nichibutsu games of the same era.
 
 TODO:
 - what is the 24-pin chip marked Z4? Same is present on Clash Road. Maybe some kind of protection?;
-- input reading isn't probably totally correct (see weird lives DIPs);
-- colors are completely wrong according to available pictures;
+- reads area $6000-$61ff on player life loss;
+- input reading isn't correct (see weird lives DIPs);
 - cocktail mode sprite positioning is wrong.
 */
 
@@ -32,6 +32,7 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 namespace {
@@ -55,6 +56,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -75,8 +77,14 @@ private:
 	void main_irq_mask_w(int state);
 	void sound_irq_mask_w(int state);
 
-	void palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 
+	tilemap_t *m_tilemap = nullptr;
+
+	void vram_w(offs_t offset, uint8_t data);
+	void attr_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_extra);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -93,7 +101,7 @@ private:
 
 ***************************************************************************/
 
-void shettle_state::palette(palette_device &palette) const // TODO: wrong, colors don't match available reference pics
+void shettle_state::palette_init(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
@@ -111,22 +119,19 @@ void shettle_state::palette(palette_device &palette) const // TODO: wrong, color
 	{
 		int bit0, bit1, bit2;
 
-		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_weights(rweights, bit0, bit1, bit2);
-
-		// green component
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
 		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
-		// blue component
-		bit0 = BIT(color_prom[i], 6);
-		bit1 = BIT(color_prom[i], 7);
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
 		int const b = combine_weights(bweights, bit0, bit1);
+
+		bit0 = BIT(color_prom[i], 5);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -137,111 +142,84 @@ void shettle_state::palette(palette_device &palette) const // TODO: wrong, color
 	// chars and sprites use colors 0-15
 	for (int i = 0; i < 0x200; i++)
 	{
-		uint8_t const ctabentry = color_prom[i ^ 0x03] & 0x0f;
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
+TILE_GET_INFO_MEMBER(shettle_state::get_tile_info)
+{
+	const u8 tile = m_videoram[tile_index];
+	const u8 attr = m_colorram[tile_index];
+	// unused by the game, ported from wiping.cpp
+	tileinfo.group = (attr >> 7) & 1;
+	tileinfo.set(0, tile, attr & 0x3f, 0);
+}
+
+// same as clshroad.cpp:
+// flips scanning per-column instead of per-row on left/right 16 pixels, for a 288 layout
+TILEMAP_MAPPER_MEMBER(shettle_state::tilemap_scan_rows_extra)
+{
+	if (col <= 0x01)    return row + (col + 0x1e) * 0x20;
+	if (col >= 0x22)    return row + (col - 0x22) * 0x20;
+
+	if (row <= 0x01)    return 0;
+	if (row >= 0x1e)    return 0;
+
+	return (col - 2) + row * 0x20;
+}
+
+
+void shettle_state::vram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void shettle_state::attr_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void shettle_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shettle_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(shettle_state::tilemap_scan_rows_extra)), 8, 8, 36, 32);
+	m_tilemap->set_scrolldy(-16, -16);
+}
+
 uint32_t shettle_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = 0x3ff; offs > 0; offs--)
-	{
-		int sx, sy;
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 
-		int const mx = offs % 32;
-		int const my = offs / 32;
-
-		if (my < 2)
-		{
-			sx = my + 34;
-			sy = mx - 2;
-		}
-		else if (my >= 30)
-		{
-			sx = my - 30;
-			sy = mx - 2;
-		}
-		else
-		{
-			sx = mx + 2;
-			sy = my - 2;
-		}
-
-		if (flip_screen())
-		{
-			sx = 35 - sx;
-			sy = 27 - sy;
-		}
-
-		m_gfxdecode->gfx(0)->opaque(bitmap, cliprect,
-				m_videoram[offs],
-				m_colorram[offs] & 0x3f,
-				flip_screen(), flip_screen(),
-				sx * 8, sy * 8);
-	}
-
-	for (int offs = m_spriteram.bytes() - 8; offs >= 0; offs -= 8)
+	// top to bottom, ensure bridges goes behind player/enemy sprites
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 8)
 	{
 		int x = m_spriteram[offs + 3] + 0x0b;
 		int y = 224 - m_spriteram[offs + 2];
 
-		int code = (m_spriteram[offs + 0] & 0x3f) | (m_spriteram[offs + 4] << 6);
+		u8 color = m_spriteram[offs + 1] & 0x3f;
 
-		int color = m_spriteram[offs + 1] & 0x0f; // TODO: check this
+		// color entry 0 seems fully transparent
+		// (would otherwise "stick" bonus points after using yoyo, transmask?)
+		if (!color)
+			continue;
 
+		u16 code = (m_spriteram[offs + 0] & 0x3f) | (m_spriteram[offs + 4] << 6);
 		int flipx = m_spriteram[offs + 0] & 0x80;
 		int flipy = m_spriteram[offs + 0] & 0x40;
 
 		if (flip_screen())
 		{
-			x = 240 - x; // TODO: wrong
+			y = 209 - y;
 			flipx = !flipx;
-			y = 224 - y;
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 3);
 	}
 
-	// redraw high priority chars
-	for (int offs = 0x3ff; offs > 0; offs--)
-	{
-		if (m_colorram[offs] & 0x80)
-		{
-			int sx, sy;
-
-			int const mx = offs % 32;
-			int const my = offs / 32;
-
-			if (my < 2)
-			{
-				sx = my + 34;
-				sy = mx - 2;
-			}
-			else if (my >= 30)
-			{
-				sx = my - 30;
-				sy = mx - 2;
-			}
-			else
-			{
-				sx = mx + 2;
-				sy = my - 2;
-			}
-
-			if (flip_screen())
-			{
-				sx = 35 - sx;
-				sy = 27 - sy;
-			}
-
-			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect,
-					m_videoram[offs],
-					m_colorram[offs] & 0x3f,
-					flip_screen(), flip_screen(),
-					sx * 8, sy * 8);
-			}
-	}
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 
 	return 0;
 }
@@ -291,8 +269,8 @@ INTERRUPT_GEN_MEMBER(shettle_state::sound_timer_irq)
 void shettle_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // TODO: some reads after 0x5fff. Interactions with the Z4 chip?
-	map(0x8000, 0x83ff).ram().share(m_videoram);
-	map(0x8400, 0x87ff).ram().share(m_colorram);
+	map(0x8000, 0x83ff).ram().w(FUNC(shettle_state::vram_w)).share(m_videoram);
+	map(0x8400, 0x87ff).ram().w(FUNC(shettle_state::attr_w)).share(m_colorram);
 	map(0x8e00, 0x8fff).ram().share(m_spriteram);
 	map(0x9000, 0x93ff).ram();
 	map(0x9600, 0x97ff).ram().share("main_sound");
@@ -357,12 +335,12 @@ static INPUT_PORTS_START( shettle )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x05, 0x00, "0x01" ) PORT_DIPLOCATION("SW2:1,3")
+	PORT_DIPNAME( 0x05, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME (0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME (0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
@@ -385,13 +363,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    // 8*8 characters
-	256,    // 256 characters
-	2,  // 2 bits per pixel
-	{ 0, 4 },   // the two bitplanes are packed in one byte
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8    // every char takes 16 consecutive bytes
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ STEP4(0,1), STEP4(8,1) },
+	{ STEP8(0,8*2) },
+	8*8*2
 };
 
 static const gfx_layout spritelayout =
@@ -408,8 +386,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_wiping )
-	GFXDECODE_ENTRY( "chars",   0, charlayout,      0, 64 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 64*4, 64 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,       0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x100, 64 )
 GFXDECODE_END
 
 
@@ -439,7 +417,7 @@ void shettle_state::shettle(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiping);
-	PALETTE(config, m_palette, FUNC(shettle_state::palette), 64 * 4 + 64 * 4, 32);
+	PALETTE(config, m_palette, FUNC(shettle_state::palette_init), 256 + 256, 32);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -464,10 +442,10 @@ ROM_START( shettle )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "d.bin", 0x0000, 0x2000, CRC(1e2e7365) SHA1(ad6d0c94d5cb172d3a29523706ccd901a72e90be) )
 
-	ROM_REGION( 0x1000, "chars", 0 )
+	ROM_REGION( 0x1000, "chars", ROMREGION_INVERT )
 	ROM_LOAD( "0.5d", 0x0000, 0x1000, CRC(fa6261da) SHA1(e7ab7eb2ab2ba2497d06606861a804d317d306ff) )
 
-	ROM_REGION( 0x2000, "sprites", 0 )
+	ROM_REGION( 0x2000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "e.bin", 0x0000, 0x2000, CRC(a3cef381) SHA1(ed511f5b695f0abdbaea8414d9de260f696f5318) )
 
 	ROM_REGION( 0x0340, "proms", 0 )
