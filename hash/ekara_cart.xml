@@ -2962,7 +2962,7 @@ license:CC0-1.0
 
 	<!-- unusual cartridge, looks like a regular G (Gold series) and is compatible with the same units, but has a GS code instead, no
 	     other GS cartridges have been seen -->
-	<software name="gs01">
+	<software name="gs1">
 		<description>Natsukashi no Meikyoku-shū (Japan)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
