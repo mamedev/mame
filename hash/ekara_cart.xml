@@ -192,9 +192,9 @@ license:CC0-1.0
 	*A-6   Pichi Pichi Pitch Pure Chapter 2 / ぴちぴちピッチピュア第２章
 	*A-7   Pichi Pichi Pitch Pure Chapter 3 / ぴちぴちピッチピュア第３章
 	*A-8   Pichi Pichi Pitch Karaoke Party 2 / ぴちぴちピッチカラオケパーティー２
-	
+
 	***********************************************************************************
-	
+
 	Japanese cart listing (by BH code)  * = dumped
 	 * = dumped
 
@@ -202,13 +202,13 @@ license:CC0-1.0
 
 	For e-kara only
 
-	 BH-01  Best Hit Collection
+	*BH-01  Best Hit Collection
 	*BH-02  Best Hit Collection
 	*BH-03  Best Hit Collection
-	 BH-04  Best Hit Collection
+	*BH-04  Best Hit Collection
 	*BH-05  Best Hit Collection
 	*BH-06  Best Hit Collection
-	 BH-07  Best Hit Collection
+	*BH-07  Best Hit Collection
 
 	***********************************************************************************
 
@@ -294,14 +294,14 @@ license:CC0-1.0
 	*GK-3  Tinkerbell to Tinkle Star Uranai
 
 	***********************************************************************************
-	
+
 	Kids' Song 20 series
 	Japanese cart listing (by KD code)
 	 * = dumped
 
 	*KD-1  Kids 20 - Volume 1
 	*KD-2  Kids 20 - Volume 2
-	 KD-3  Kids 20 - Volume 3
+	*KD-3  Kids 20 - Volume 3
 	 KD-4  Kids 20 - Volume 4
 
 	***********************************************************************************
@@ -310,7 +310,7 @@ license:CC0-1.0
 	Japanese cart listing (by M code) (M-x on cartridge / box, MC in cart identifier code)
 
 	M-1  *MC0001-ATM  Artist Mini Volume 1 (Aya Matsuura)
-	M-2   MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
+	M-2  *MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
 	M-3  *MC0003-ATM  Artist Mini Volume 3 (Morning Musume)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
 	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
@@ -319,7 +319,7 @@ license:CC0-1.0
 	M-8  *MC0008-KSM  Kids Song Mini Volume 3
 	M-9  *MC0009-JPM  J-Pop Mix Mini Volume 1
 	M-10 *MC0010-ATM  Artist Mini Volume 6 (Utada Hikaru)
-	M-11  MC0011-     Kids Song Mini Volume 4 (Fantastic)
+	M-11 *MC0011-KSM  Kids Song Mini Volume 4 (Fantastic)
 	M-12 *MC0012-ATM  Artist Mini Volume 7 (Ayumi Hamasaki)
 	M-13 *MC0013-KSM  Kids Song Mini Volume 5
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
@@ -362,11 +362,11 @@ license:CC0-1.0
 	S-10 *SC0010-HKW  Hikawa Kiyoshi no Karaoke Dōjō
 	S-11 *SC0011-PST  PostPet
 	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
-	S-13  SC0013-SAI  Saiten Cartridge Nesshō vol. 4
+	S-13 *SC0013-SAI  Saiten Cartridge Nesshō vol. 4
 	S-14 *SC0014-SAI  Saiten Cartridge Challenge Idol vol.4
 	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Vol.2
 	S-16 *SC0016-SAI  Saiten Cartridge Nesshō vol. 5
-	S-17  SC0017-SAI  Kids' Challenge Vol.2
+	S-17 *SC0017-SAI  Kids' Challenge Vol.2
 	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki)
 	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
 	S-20 *SC0020-SAI  Saiten Cartridge Challenge Idol vol.5
@@ -403,10 +403,10 @@ license:CC0-1.0
 
 	These are bundled/pack-in cartridges or ones that don't appear to be part of any
 	other series.
-	
+
 	Some pack-in carts were just part of the regular line-ups instead, eg S-1 with the
 	Hello Kitty units, those are in their respective lists.
-	
+
 
 	The numbering for the ones here is a little unusual
 
@@ -415,9 +415,9 @@ license:CC0-1.0
 	*KR-1      Kirarin Revolution (comes in kira kara Starter Set bundled with Kirarin Revolution microphone) (inside cart is marked AC0009-KIR)
 	*BX01-MOR  Morning Musume Special (sticker inside cart is marked CS019-004A)
 	*PR-01 MNG  (c)2002   Morning Musume - I'm Here! (single song 'not for sale' cartridge)
- 	 PR-02 AYY  (c)2003   Aya Matsuura - Prairies Man (single song 'not for sale' cartridge)
+	 PR-02 AYY  (c)2003   Aya Matsuura - Prairies Man (single song 'not for sale' cartridge)
 	*PR-06     Misora Hibari (inside cart is marked AC0009)
-	
+
 	maybe PR03 to PR05 also exist?
 
 	***********************************************************************************
@@ -1320,7 +1320,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌大全" />
-		<sharedfeat name="compatibility" value="EKARA"/>	
+		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0069-etz.u1" size="0x200000" crc="849ebd23" sha1="752c500d3ff48f04b985fef04219824d1d746034"/>
@@ -1332,7 +1332,7 @@ license:CC0-1.0
 		<description>J-Pop Mix Volume 34 (Japan) (EC0070-JPM)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<sharedfeat name="compatibility" value="EKARA"/>	
+		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0070-jpm.u1" size="0x100000" crc="8ba16056" sha1="20df400ce69d78883d082526375736f42b67634f"/>
@@ -1344,7 +1344,7 @@ license:CC0-1.0
 		<description>J-Pop Mix Volume 35 (Japan) (EC0071-JPM)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<sharedfeat name="compatibility" value="EKARA"/>	
+		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0071-jpm.u1" size="0x100000" crc="5d62c9d6" sha1="c50efa872833016612fc69a3ef8ae6068d27a9d8"/>
@@ -1519,19 +1519,19 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌大全 第三篇" />
-		<sharedfeat name="compatibility" value="EKARA"/>	
+		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0085-etz.u1" size="0x200000" crc="6c81fd34" sha1="a8d6a8edea4c7ea6f6d265c87f210170c6bef54f"/>
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
-	
-	
-	<software name="a1" supported="no">
+
+
+	<software name="a1">
 		<description>A-1 Mermaid Melody Pichi Pichi Pitch vol.1 (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
@@ -1545,7 +1545,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="a2" supported="no">
+	<software name="a2">
 		<description>A-2 Mermaid Melody Pichi Pichi Pitch vol.2 (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
@@ -1559,12 +1559,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="a3" supported="no">
+	<software name="a3">
 		<description>A-3 Mermaid Melody Pichi Pichi Pitch vol.3 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.3" />
-		<sharedfeat name="compatibility" value="EKARA"/>	
+		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -1573,7 +1573,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="a4" supported="no">
+	<software name="a4">
 		<description>A-4 Pichi Pichi Pitch Pure Dai 1-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -1614,7 +1614,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="a7" supported="no">
+	<software name="a7">
 		<description>A-7 Pichi Pichi Pitch Pure Dai 3-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -1640,10 +1640,22 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
 
+	<software name="bh01">
+		<description>BH-01 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-01" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh01.bin" size="0x100000" crc="32641f80" sha1="6798e46448f92a9d4ef85390bd970d4c63fb7ba0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="bh02">
 		<description>BH-02 Best Hit Collection (Japan)</description>
@@ -1667,6 +1679,19 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh03.bin" size="0x100000" crc="d17cafd4" sha1="b74fd0f77a726547d4001d4177a5ccd2ea35536a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh04">
+		<description>BH-04 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-04" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh04.bin" size="0x100000" crc="d97cd9c9" sha1="f1a9d5a1c71ed8b2f3b64f4a980ae64de4bc1f48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1696,8 +1721,20 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+	<software name="bh07">
+		<description>BH-07 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-07" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh07.bin" size="0x100000" crc="59818e9b" sha1="14df9777575bf1232d4cbb17111362fa3aab5e3c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- ********************************************************************************************************************************************************************** -->
 
 
@@ -1793,10 +1830,10 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	
+
 	<!-- ********************************************************************************************************************************************************************** -->
-	
-	
+
+
 	<software name="en1">
 		<description>Enka-shū Dai Ichi-hen (Japan) (EN-1)</description> <!-- TODO: correct translation -->
 		<year>2004</year>
@@ -1847,12 +1884,12 @@ license:CC0-1.0
 				<rom name="en-4.u1" size="0x100000" crc="4e9e00fd" sha1="4cc2b6e39a4ceb1c1753463dd6d559331d75848f"/>
 			</dataarea>
 		</part>
-	</software>	
-	
-	
+	</software>
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
-	
-	
+
+
 	<software name="gc0001">
 		<description>Best Artist Volume 1 (Morning Musume, Petit Moni, Tanpopo) (Japan) (GC0001-BAT)</description>
 		<year>2000</year>
@@ -2120,8 +2157,8 @@ license:CC0-1.0
 				<rom name="gc0018-tpj.u1" size="0x100000" crc="5e7fee64" sha1="14ebc6e47808f30de4724ec720c49223c2c6f22d"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 
 	<!-- ********************************************************************************************************************************************************************** -->
 
@@ -2139,7 +2176,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gk2" supported="no">
+	<software name="gk2">
 		<description>GK-2 - Disney Princess: Princess Debut (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -2153,7 +2190,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gk3" supported="no">
+	<software name="gk3">
 		<description>GK-3 - Tinkerbell to Tinkle Star Uranai (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -2167,11 +2204,11 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 
 	<!-- ********************************************************************************************************************************************************************** -->
 
-	
+
 	<software name="kd1"> <!-- KD0001 sticker inside cart -->
 		<description>Kids' Song 20 (Japan) (KD-1)</description>
 		<year>2004</year>
@@ -2196,12 +2233,24 @@ license:CC0-1.0
 				<rom name="kd-2.u1" size="0x100000" crc="620b9b22" sha1="c820e3fa28212cf9f530380b9b6f9c8cfdc7c476"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
+	<software name="kd3">
+		<description>Kids' Song 20 (Japan) (KD-3)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kd3.bin" size="0x100000" crc="00231fe7" sha1="c593a734d0453989f885e6de289e2c3f3064627d"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- ********************************************************************************************************************************************************************** -->
-	
-	
+
+
 	<software name="mc0001">
 		<description>Artist Mini Volume 1 (Matsuura Aya) (Japan) (MC0001-ATM)</description>
 		<year>2003</year>
@@ -2211,6 +2260,18 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0001-atm.u1" size="0x080000" crc="3ef59e82" sha1="d10f0b4a174bef736fea538028eacbeb46af5bbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0002">
+		<description>Artist Mini Volume 2 ((untranslated artist) (Japan) (MC0002-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0002-atm.u1" size="0x080000" crc="4070ad1d" sha1="d0fb82bd945034a279cb6401b1b93c16ba56575d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2319,6 +2380,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mc0011">
+		<description>Kids Song Mini Volume 4 (Fantastic) (Japan) (MC0011-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0011-ksm.u1" size="0x080000" crc="b6c86e18" sha1="737e61c79f93e1ca0720fa3b569f6ef2d8a6d18c"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="mc0012">
 		<description>Artist Mini Volume 7 (Hamasaki Ayumi) (Japan) (MC0012-ATM)</description>
 		<year>2003</year>
@@ -2382,12 +2456,12 @@ license:CC0-1.0
 				<rom name="mc0016-atm.u1" size="0x080000" crc="937c07dd" sha1="6c3570394e781dec96e98d95db3a3c564abe35a4"/>
 			</dataarea>
 		</part>
-	</software>	
-	
-	
+	</software>
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
 
-	
+
 	<software name="pc0001">
 		<description>Best Hit Volume 4 (Japan) (PC0001-BHT)</description>
 		<year>2001</year>
@@ -2453,11 +2527,11 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
-	
-	
+
+
 	<software name="sc0001">
 		<description>Karaoke Ehon Vol.1 Hello Kitty (Japan) (SC0001-KTY)</description>
 		<year>2001</year>
@@ -2615,6 +2689,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sc0013">
+		<description>Saiten Cartridge Nesshō vol. 4 (Japan) (SC0013-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0013-sai.u1" size="0x100000" crc="b1971770" sha1="00e5840fbd60ed31add2bfb7d7a091db35505c59"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sc0014">
 		<description>Saiten Cartridge: Challenge Idol vol.4 (Japan) (SC0014-SAI)</description>
 		<year>2002</year>
@@ -2650,6 +2736,18 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0016-sai.u1" size="0x100000" crc="20f06e17" sha1="0f8c4ae3c175364a84ac32ae5dea6b27cac17319"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0017">
+		<description>Kids' Challenge Vol.2 (Japan) (SC0017-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0017-sai.u1" size="0x100000" crc="f57ec5b1" sha1="b6cb926ff0467106acd5c1d83be11ae93a0c6b14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2718,8 +2816,8 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+
 	<software name="sp01">
 		<description>Super Cartridge: Best Hit (Japan) (SP-01)</description>
 		<year>2004</year>
@@ -2803,12 +2901,12 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
-	
-	<!-- ********************************************************************************************************************************************************************** -->
-	
 
-	<software name="kr1" supported="no">
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="kr1">
 		<description>Kirarin Revolution KR-1 (Japan)</description>
 		<year>2007</year>
 		<publisher>Takara</publisher>
@@ -2821,8 +2919,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pr06" supported="no">
-		<description>Misora Hibari PR-06 (Japan)</description>
+	<software name="pr01">
+		<description>PR-01 Morning Musume - I'm Here! (Not for Sale, Japan)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="pr-01mng.u1" size="0x80000" crc="cce85e77" sha1="1bb5863849e4728294c1a71830ec54d0190010d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pr06">
+		<description>PR-06 Misora Hibari (Japan)</description>
 		<year>2006</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="美空ひばり" />
@@ -2850,10 +2960,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- unusual cartridge, looks like a regular G (Gold series) and is compatible with the same units, but has a GS code instead, no
+	     other GS cartridges have been seen -->
+	<software name="gs01">
+		<description>GS-01</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gs0001-mei.u1" size="0x100000" crc="eebdbe1b" sha1="639f1ecf97404720e3feeeae00e100e546dffd60"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- ********************************************************************************************************************************************************************** -->
 
-	
+
 	<!-- Japanese e-kara web cartridges
 	     this was meant to be used with an e-kara web unit, USB cable and PC software, presumably to transfer songs offered on some online service
 	     e-karaweb.com no longer resolves to anything, these cartridges seem to be blank / unused so have no songs in them -->
@@ -2924,13 +3047,13 @@ license:CC0-1.0
 				<rom name="ekaraweb4.bin" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
 			</dataarea>
 		</part>
-	</software>	
-	
-	
+	</software>
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
-	
-	
-	<software name="jp01" supported="no">
+
+
+	<software name="jp01">
 		<description>JP-01 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -2943,7 +3066,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="jp02" supported="no">
+	<software name="jp02">
 		<description>JP-02 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -2954,12 +3077,12 @@ license:CC0-1.0
 				<rom name="jp2.bin" size="0x200000" crc="f66d8ee8" sha1="3624c89197b1579fc60d5c40ff30bca248428a6c" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
-	
+	</software>
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
-	
-	
+
+
 	<!-- US cartridges -->
 
 	<!-- e-kara US 5-Songs Starter (US-M001)
@@ -3195,9 +3318,9 @@ license:CC0-1.0
 				<rom name="us-e009.u1" size="0x100000" crc="0d9c402b" sha1="95652eb71dab74fbf05f8450f2a9b664b455deeb"/>
 			</dataarea>
 		</part>
-	</software>	
-	
-	
+	</software>
+
+
 	<!-- ********************************************************************************************************************************************************************** -->
 
 
@@ -3439,6 +3562,6 @@ license:CC0-1.0
 				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 </softwarelist>
