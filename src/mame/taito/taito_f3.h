@@ -257,7 +257,7 @@ protected:
 		u8 prio{0};
 		u8 blend_mode;
 
-		u8 debug_index{0};
+		u8 index{0};
 
 		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; blend_mode = BIT(mix_value, 14, 2); };
 		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; };
@@ -277,7 +277,6 @@ protected:
 		int x_index(int x) const;
 		bool blend_select(const u8 *line_flags, int x) const { return false; }
 
-		bool used(int y) const { return true; }
 		static const char *debug_name() { return "MX"; }
 	};
 
@@ -292,7 +291,6 @@ protected:
 		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; }
 		bool layer_enable() const;
 
-		bool used(int y) const { return BIT((*sprite_pri_usage)[y], debug_index); }
 		static const char *debug_name() { return "SP"; };
 	};
 
@@ -329,13 +327,11 @@ protected:
 		fixed8 reg_fx_x{0};
 
 		u16 width_mask{0};
-		u8 (*pf_row_usage)[32]{nullptr};
 
 		u16 palette_adjust(u16 pal) const;
 		int y_index(int y) const;
 		int x_index(int x) const;
 		bool blend_select(const u8 *line_flags, int x) const { return BIT(line_flags[x], 0); }
-		inline bool used(int y) const;
 		static const char *debug_name() { return "PF"; }
 	};
 
@@ -379,8 +375,9 @@ protected:
 	bool m_sprite_trails = false;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
+	u8 m_textram_row_usage[64]{};
 	u8 m_sprite_pri_row_usage[256]{};
-	u8 m_tilemap_row_usage[4][32]{};
+	u8 m_tilemap_row_usage[8][32]{};
 	bitmap_ind8 m_pri_alp_bitmap;
 	bitmap_ind16 m_sprite_framebuffer{};
 	u16 m_width_mask = 0;
@@ -428,7 +425,10 @@ protected:
 	void render_line(pen_t *dst, const mix_pix &z);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template<typename Mix>
-	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix line);
+	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix &layer);
+	inline bool used(const pivot_inf &layer, int y) const;
+	inline bool used(const sprite_inf &layer, int y) const;
+	inline bool used(const playfield_inf &layer, int y) const;
 	template<typename Mix>
 	bool mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f3_line_inf &line, const clip_plane_inf &range);
 
