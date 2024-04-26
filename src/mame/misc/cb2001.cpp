@@ -67,6 +67,7 @@ public:
 	{ }
 
 	void cb2001(machine_config &config);
+	void ndongmul2(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -855,12 +856,33 @@ void cb2001_state::cb2001(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(cb2001_state::cb2001_palette), 0x100);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); // wrong
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void cb2001_state::ndongmul2(machine_config &config)
+{
+	V35(config, m_maincpu, 20000000); // CPU91A-011-9915JK001
+	m_maincpu->set_decryption_table(cb2001_decryption_table);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb2001_state::cb2001_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cb2001_state::vblank_irq));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cb2001);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(cb2001_state::screen_update_cb2001));
+
+	PALETTE(config, m_palette, FUNC(cb2001_state::cb2001_palette), 0x100);
+
+	//I80C51(config, m_mcu, 12_MHz_XTAL); // Actually an AT89C51
 }
 
 
@@ -888,8 +910,65 @@ ROM_START( scherrym )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
+/* New DongmulDongmul 2 (뉴 동물동물 2, New AnimalAnimal 2) runs on slighly different hardware, but with same CPU, custom and I/O.
+   Video from the real hardware: https://youtu.be/VtPV3DonIsY
+   _______________________________________________________________________________
+  |    ________    ________    ________    __________    _________________     _  |
+  |KM6264BLG-10L  |74HC00P| KM6264BLG-10L |29F1610ML|   |  HM27C4096     |    (_) <- Switch (SW8)
+  |                                       |__U15____|   |_____U24________|        |
+  |  _______________               ___________                                    |
+  | | 27C020       |              | DYNA     |         __U23_____  __________     |
+  | |___U10________|              | DC3001   |        |N82S147AN| |74HC374AN|  ___|
+  |                               |          |                                |
+  | __       ___________          |__________|         __U22_____  __________ |___
+  ||SW7     | DYNA     |                     Xtal     |N82S147AN| |74HC374AN|   __|
+  ||Ununsed | CPU 91A  |                   24.000 MHz  __________               __|
+  ||__|     |          |                              |74LS245N_|               __|
+  |         |__________|                  ___U8_____   __________               __|
+  | ________      _________              |PALCE16V8|  |74LS245N_|               __|
+  ||74HC04AN     |__SW6___|               ___U7_____   __________               __|
+  |          _________                   |GAL16V8D_|  |74LS245N_|               __|
+  |         |__SW1___|          ____________________   __________               __|
+  |          _________         | DYNA 22A078803    |  |74LS138N_|               __|
+  |         |__SW2___|         |___________________|   __________   __________  __|
+  |          _________          ____________________  |74LS273N_|  |ULN2003AN|  __|
+  |         |__SW3___|         | JFC 95101         |   __________               __|
+  |          _________         |___________________|  |74LS273N_|             ____|
+  |         |__SW4___|                                                        |
+  |          _________                             Xtal                       |
+  |         |__SW5___|   _______U1___________   12.000 MHz                    |___
+  |         __________  | AT89C51           |                                     |
+  | ___     |MACH 110|  |___________________|                                     |
+  ||   |    |AMD     |    _________   _________                                   |
+  |TDA2009  |________|   |74LS245N_| |74LS245N_|                                  |
+  ||___|     _________    ____ ____                                               |
+  |         |__SW0___|   PC817 PC817                                              |
+  |_______________________________________________________________________________|
+
+*/
+ROM_START( ndongmul2 ) // 뉴 동물동물 2
+	ROM_REGION16_LE( 0x080000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "am27c020.u10", 0x000000, 0x040000, CRC(550e53e5) SHA1(a90ee66e7ae9b58005b6ed412669d86532c75156) )
+
+        ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "mx29f1610ml.u15",     0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "hn27c4096.u24",       0x200000, 0x080000, CRC(d6d14e2a) SHA1(ee6d663f7c31fb76fa56d080aa2cf1c690da61b8) )
+
+	ROM_REGION( 0x000400, "proms", 0 )
+	ROM_LOAD( "n82s147an.u22",       0x000000, 0x000200, CRC(54b76f79) SHA1(d8eca94fda3436a204e71869a88fba5fc4daed18) )
+	ROM_LOAD( "n82s147an.u23",       0x000200, 0x000200, CRC(2e3063c8) SHA1(b1b3d23063faabe7f588dfafe4a1439573d41cb4) )
+
+	ROM_REGION( 0x001000, "mcu", 0)
+	ROM_LOAD( "at89c51.u1",          0x000000, 0x001000, NO_DUMP ) // AT89C51, protected
+
+	ROM_REGION( 0x000200, "plds", 0)
+	ROM_LOAD( "palce16v8h-25.u8",    0x000000, 0x000117, CRC(f1de9b90) SHA1(3b2e76e1f6dc34d16fa1dded9bc8205683e59c0c) )
+	ROM_LOAD( "gal16v8d.u7",         0x000000, 0x000117, CRC(55e39258) SHA1(4546fdbd343290c2a7953b4cd0f8db5aab2fad18) )
+ROM_END
+
 } // anonymous namespace
 
-
-GAME( 2001, cb2001,   0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2001, scherrym, 0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+//    YEAR  NAME       PARENT  MACHINE    INPUT   CLASS         INIT        ROT   COMPANY  FULLNAME                FLAGS
+GAME( 2001, cb2001,    0,      cb2001,    cb2001, cb2001_state, empty_init, ROT0, "Dyna",  "Cherry Bonus 2001",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, ndongmul2, 0,      ndongmul2, cb2001, cb2001_state, empty_init, ROT0, "Dyna",  "New DongmulDongmul 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, scherrym,  0,      cb2001,    cb2001, cb2001_state, empty_init, ROT0, "Dyna",  "Super Cherry Master",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
