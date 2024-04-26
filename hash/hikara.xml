@@ -231,20 +231,6 @@ license:CC0-1.0
 		</part>
 	</software>	
 
-	<software name="ciao" supported="no">
-		<description>Ciao Special</description>
-		<year>2008</year>
-		<publisher>Takara Tomy</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>
-			    <!-- temp patch to boot - this one isn't detected by the hacky patch detection in xavix.cpp -->
-                <rom size="1" value="0xf0" offset="0x81d1" loadflag="fill"/>
-                <rom size="1" value="0xd0" offset="0x81d6" loadflag="fill"/>			
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokemon" supported="no">
 		<description>Pocket Monsters Special</description>
 		<year>2008</year>
@@ -255,6 +241,20 @@ license:CC0-1.0
 			    <!-- temp patch to boot - this one isn't detected by the hacky patch detection in xavix.cpp -->
                 <rom size="1" value="0xf0" offset="0x81ce" loadflag="fill"/>
                 <rom size="1" value="0xd0" offset="0x81d3" loadflag="fill"/>	
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ciao" supported="no">
+		<description>Ciao Special</description>
+		<year>2009</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>
+			    <!-- temp patch to boot - this one isn't detected by the hacky patch detection in xavix.cpp -->
+                <rom size="1" value="0xf0" offset="0x81d1" loadflag="fill"/>
+                <rom size="1" value="0xd0" offset="0x81d6" loadflag="fill"/>			
 			</dataarea>
 		</part>
 	</software>
