@@ -688,7 +688,7 @@ void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 		if (const offs_t where = latched_addr(0, i)) {
 			const u16 colscroll = m_line_ram[where];
 			line.pf[i].colscroll   = colscroll & 0x1ff;
-			line.pf[i].alt_tilemap = colscroll & 0x200;
+			line.pf[i].alt_tilemap = !m_extend && colscroll & 0x200;
 			line.clip[2*(i-2) + 0].set_upper(BIT(colscroll, 12), BIT(colscroll, 13));
 			line.clip[2*(i-2) + 1].set_upper(BIT(colscroll, 14), BIT(colscroll, 15));
 		}
@@ -1111,8 +1111,7 @@ inline bool taito_f3_state::used(const sprite_inf &layer, int y) const
 }
 inline bool taito_f3_state::used(const playfield_inf &layer, int y) const
 {
-	// BROKEN
-	const int y_adj = m_flipscreen ? (32*16 - 1) - layer.y_index(y) : layer.y_index(y);
+	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
 	return m_tilemap_row_usage[layer.index + (2 * layer.alt_tilemap)][y_adj >> 4] > 0;
 }
 
