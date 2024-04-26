@@ -56,7 +56,7 @@ license:CC0-1.0
 	        * Best Hit Collection Volume 8 (no subtitle)    BH0904002   Orange
 
 	        * Pocket Monsters Special                       -none-      Yellow
-			* Ciao Special                                  CC0907001   Translucent Pink - came with the 2009/06 issue of the Ciao (ちゃお) manga
+	        * Ciao Special                                  CC0907001   Translucent Pink - came with the 2009/06 issue of the Ciao (ちゃお) manga
 
 	        2 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
 	        1 User Cartridge (10 Capacity)                  n/a         Translucent Pink
@@ -204,9 +204,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Best Hit Collection Volume 6: Kids' -->
-	
+
 	<software name="bh7" supported="no">
 		<description>Best Hit Collection Volume 7</description>
 		<year>2008</year>
@@ -217,7 +217,7 @@ license:CC0-1.0
 				<rom name="bh0904001.u1" size="0x200000" crc="20d58743" sha1="25e348663d2d41bb96267c4430d2eb858bbb79c4"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="bh8" supported="no">
 		<description>Best Hit Collection Volume 8</description>
@@ -229,7 +229,7 @@ license:CC0-1.0
 				<rom name="bh0904002.u1" size="0x200000" crc="fd24eefa" sha1="015ce9845dd2fb36a04e2c1cdb50d2fc9d4e14c9"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="pokemon" supported="no">
 		<description>Pocket Monsters Special</description>
@@ -238,9 +238,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="r-08b0541.u1" size="0x200000" crc="8b6a6d4b" sha1="5f264bff2deedbd61d844c4f8ba4421ac598636c"/>
-			    <!-- temp patch to boot - this one isn't detected by the hacky patch detection in xavix.cpp -->
-                <rom size="1" value="0xf0" offset="0x81ce" loadflag="fill"/>
-                <rom size="1" value="0xd0" offset="0x81d3" loadflag="fill"/>	
 			</dataarea>
 		</part>
 	</software>
@@ -252,9 +249,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>
-			    <!-- temp patch to boot - this one isn't detected by the hacky patch detection in xavix.cpp -->
-                <rom size="1" value="0xf0" offset="0x81d1" loadflag="fill"/>
-                <rom size="1" value="0xd0" offset="0x81d6" loadflag="fill"/>			
 			</dataarea>
 		</part>
 	</software>

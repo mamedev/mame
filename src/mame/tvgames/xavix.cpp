@@ -1630,19 +1630,19 @@ void xavix_hikara_state::machine_reset()
 
 	int foundcount = 0;
 	int firstfound = 0;
-	for (int i = 0; i < len - 6; i++)
+	for (int i = 0; i < len - 7; i++)
 	{
 		int matchcount = 0;
 
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 5; j++)
 		{
-			u8 searchfor[6] = { 0xd0,0x14,0xad,0xff,0x1e,0xf0 };
-
-			if (ROM[i + j] == searchfor[j] || (j == 3))
+			u8 searchfor[5] = { 0x29, 0x80, 0xd0, 0x14, 0xad };
+	
+			if (ROM[i + j] == searchfor[j])
 				matchcount++;
 		}
 
-		if (matchcount == 6)
+		if (matchcount == 5)
 		{
 			if (foundcount == 0)
 				firstfound = i;
@@ -1650,10 +1650,10 @@ void xavix_hikara_state::machine_reset()
 		}
 	}
 
-	if (foundcount == 3)
+	if ((foundcount == 3) || (foundcount == 1))
 	{
-		ROM[firstfound] = 0xf0;
-		ROM[firstfound + 5] = 0xd0;
+		ROM[firstfound + 2] = 0xf0;
+		ROM[firstfound + 7] = 0xd0;
 	}
 }
 
