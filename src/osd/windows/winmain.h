@@ -92,10 +92,6 @@ public:
 
 	using osd_common_t::poll_input_modules; // Win32 debugger calls this directly, which it shouldn't
 
-protected:
-	virtual void build_slider_list() override;
-	virtual void update_slider_list() override;
-
 private:
 	void process_events(bool ingame, bool nodispatch);
 	virtual void osd_exit() override;

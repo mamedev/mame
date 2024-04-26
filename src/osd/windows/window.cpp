@@ -146,37 +146,10 @@ bool windows_osd_interface::window_init()
 	return true;
 }
 
-void windows_osd_interface::update_slider_list()
-{
-	for (const auto &window : osd_common_t::window_list())
-	{
-		// check if any window has dirty sliders
-		if (window->has_renderer() && window->renderer().sliders_dirty())
-		{
-			build_slider_list();
-			return;
-		}
-	}
-}
 
 int windows_osd_interface::window_count()
 {
 	return osd_common_t::window_list().size();
-}
-
-void windows_osd_interface::build_slider_list()
-{
-	m_sliders.clear();
-
-	for (const auto &window : osd_common_t::window_list())
-	{
-		if (window->has_renderer())
-		{
-			// take the sliders of the first window
-			std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
-			m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
-		}
-	}
 }
 
 void windows_osd_interface::add_audio_to_recording(const int16_t *buffer, int samples_this_frame)
@@ -185,6 +158,7 @@ void windows_osd_interface::add_audio_to_recording(const int16_t *buffer, int sa
 	if (window)
 		window->renderer().add_audio_to_recording(buffer, samples_this_frame);
 }
+
 
 //============================================================
 //  winwindow_exit

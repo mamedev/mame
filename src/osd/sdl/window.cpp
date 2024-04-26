@@ -111,30 +111,6 @@ bool sdl_osd_interface::window_init()
 }
 
 
-void sdl_osd_interface::update_slider_list()
-{
-	for (auto const &window : osd_common_t::window_list())
-	{
-		// check if any window has dirty sliders
-		if (window->renderer().sliders_dirty())
-		{
-			build_slider_list();
-			return;
-		}
-	}
-}
-
-void sdl_osd_interface::build_slider_list()
-{
-	m_sliders.clear();
-
-	for (auto const &window : osd_common_t::window_list())
-	{
-		std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
-		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
-	}
-}
-
 //============================================================
 //  sdlwindow_exit
 //  (main thread)

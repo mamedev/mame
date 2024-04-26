@@ -62,7 +62,7 @@ SDL Keyboard Mapping
 
 
 SDL Input Options
---------------------
+-----------------
 
 .. _mame-scommandline-enabletouch:
 
