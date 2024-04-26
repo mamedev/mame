@@ -506,7 +506,7 @@ void taito_f3_state::video_start()
 	m_sprite_end = &m_spritelist[0];
 	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
-	std::fill_n(m_textram_row_usage, 32, 0);
+	std::fill_n(m_textram_row_usage, 64, 0);
 
 	m_screen->register_screen_bitmap(m_sprite_framebuffer);
 
@@ -1111,6 +1111,7 @@ inline bool taito_f3_state::used(const sprite_inf &layer, int y) const
 }
 inline bool taito_f3_state::used(const playfield_inf &layer, int y) const
 {
+	// BROKEN
 	const int y_adj = m_flipscreen ? (32*16 - 1) - layer.y_index(y) : layer.y_index(y);
 	return m_tilemap_row_usage[layer.index + (2 * layer.alt_tilemap)][y_adj >> 4] > 0;
 }
