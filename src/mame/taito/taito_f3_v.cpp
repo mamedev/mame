@@ -352,9 +352,27 @@ const taito_f3_state::F3config taito_f3_state::f3_config_table[] = {
 
 void taito_f3_state::device_post_load()
 {
-	/* force a reread of the dynamic tiles in the pixel layer */
+	// force a reread of the dynamic tiles in the pixel layer
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 	m_gfxdecode->gfx(1)->mark_all_dirty();
+
+	// refresh tile usage indexes
+	std::fill_n(*m_tilemap_row_usage, 32 * 8, 0);
+	std::fill_n(m_textram_row_usage, 64, 0);
+	// playfield blank tiles
+	for (int offset = 1; offset < 0x4000; offset += 2) {
+		const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
+		const int tmap = m_extend ? offset >> 12 : offset >> 11;
+		if (m_pf_ram[offset] != 0)
+			m_tilemap_row_usage[row][tmap] += 1;
+	}
+	// textram blank tiles
+	for (int offset = 0; offset < 0x1000; offset++) {
+		const u8 tile = BIT(m_textram[offset], 0, 8);
+		const int row  = BIT(offset, 6, 6);
+		if (tile != 0)
+			m_textram_row_usage[row] += 1;
+	}
 }
 
 /******************************************************************************/
@@ -470,8 +488,8 @@ void taito_f3_state::create_tilemaps(bool extend)
 	for (int i = 0; i < 8; i++) {
 		if (m_tilemap[i])
 			m_tilemap[i]->set_transparent_pen(0);
-		std::fill_n(m_tilemap_row_usage[i], 32, 0);
 	}
+	std::fill_n(*m_tilemap_row_usage, 32 * 8, 0);
 
 	if (m_extend) {
 		m_width_mask = 0x3ff; // 10 bits
@@ -542,26 +560,25 @@ void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// [.ttt yyyy yxxx xxa|h] non-extend
 	// [.tty yyyy xxxx xxa|h] extend
-	if (offset & 1 && offset < 0x4000) {
-		const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
-		const u16 prev_tile = m_pf_ram[offset];
-		const int tmap = m_extend ? offset >> 12 : offset >> 11;
-
-		if (prev_tile == 0 && data != 0)
-			m_tilemap_row_usage[tmap][row] += 1;
-		else if (prev_tile != 0 && data == 0)
-			m_tilemap_row_usage[tmap][row] -= 1;
-	}
+	const u16 prev_tile = m_pf_ram[offset];
 
 	COMBINE_DATA(&m_pf_ram[offset]);
 
-	if (m_game_config->extend) {
-		if (offset < 0x4000) {
-			m_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
+	if (offset < 0x4000) {
+		if (offset & 1) {
+			const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
+			const int tmap = m_extend ? offset >> 12 : offset >> 11;
+			if ((prev_tile == 0) && (m_pf_ram[offset] != 0))
+				m_tilemap_row_usage[row][tmap] += 1;
+			else if ((prev_tile != 0) && (m_pf_ram[offset] == 0))
+				m_tilemap_row_usage[row][tmap] -= 1;
 		}
-	} else {
-		if (offset < 0x4000)
+
+		if (m_game_config->extend) {
+			m_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
+		} else {
 			m_tilemap[offset >> 11]->mark_tile_dirty((offset & 0x7ff) >> 1);
+		}
 	}
 }
 
@@ -592,14 +609,16 @@ u16 taito_f3_state::textram_r(offs_t offset)
 
 void taito_f3_state::textram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	const int row  = BIT(offset, 6, 6);
-	const u16 prev_tile = m_textram[offset];
-	if (prev_tile == 0 && data != 0)
-		m_textram_row_usage[row] += 1;
-	else if (prev_tile != 0 && data == 0)
-		m_textram_row_usage[row] -= 1;
+	const u8 prev_tile = BIT(m_textram[offset], 0, 8);
 
 	COMBINE_DATA(&m_textram[offset]);
+
+	const int row = BIT(offset, 6, 6);
+	const u8 tile = BIT(m_textram[offset], 0, 8);
+	if (prev_tile == 0 && tile != 0)
+		m_textram_row_usage[row] += 1;
+	else if (prev_tile != 0 && tile == 0)
+		m_textram_row_usage[row] -= 1;
 
 	m_vram_layer->mark_tile_dirty(offset);
 
@@ -1072,7 +1091,6 @@ void taito_f3_state::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 		rgb_t d_rgb = clut[z.dst_pal[x]];
 
 		// source_color * src_blend + dest_color * dst_blend
-		// by the way, any time i touch this code i lose 10-20% speed. - ywy
 		u16 r1 = s_rgb.r();
 		u16 g1 = s_rgb.g();
 		u16 b1 = s_rgb.b();
@@ -1112,7 +1130,7 @@ inline bool taito_f3_state::used(const sprite_inf &layer, int y) const
 inline bool taito_f3_state::used(const playfield_inf &layer, int y) const
 {
 	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
-	return m_tilemap_row_usage[layer.index + (2 * layer.alt_tilemap)][y_adj >> 4] > 0;
+	return m_tilemap_row_usage[y_adj >> 4][layer.index + (2 * layer.alt_tilemap)] > 0;
 }
 
 void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1162,7 +1180,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			line_data.pivot.bitmap = draw_source(m_vram_layer);
 		}
 
-		// set up line blend pixel and priority buffers 
+		// set up line blend pixel and priority buffers
 		mix_pix line_buf{};
 		pri_mode line_pri{};
 		// background palette -- what contributions should this default to?
