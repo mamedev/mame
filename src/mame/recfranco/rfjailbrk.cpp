@@ -83,12 +83,14 @@ void rfjailbrk_state::rfjailbrk(machine_config &config)
 {
 	I80188(config, m_maincpu, 20.0000_MHz_XTAL); // Intel N80C188XL20
 
+	// Ordered as found on the PCB
 	I8255A(config, "pia2"); // OKI M82C55A-2V
 	I8255A(config, "pia1"); // OKI M82C55A-2V
 	I8255A(config, "pia7"); // OKI M82C55A-2V
 	I8255A(config, "pia3"); // OKI M82C55A-2V
 	I8255A(config, "pia5"); // OKI M82C55A-2V
 	I8255A(config, "pia6"); // OKI M82C55A-2V
+	I8255A(config, "pia4"); // OKI M82C55A-2V
 
 	PIC8259(config, "pic1", 0); // CS82C59A
 	PIC8259(config, "pic2", 0); // CS82C59A
