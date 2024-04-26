@@ -377,7 +377,7 @@ protected:
 	int m_sprite_lag = 0;
 	u8 m_textram_row_usage[64]{};
 	u8 m_sprite_pri_row_usage[256]{};
-	u8 m_tilemap_row_usage[8][32]{};
+	u8 m_tilemap_row_usage[32][8]{};
 	bitmap_ind8 m_pri_alp_bitmap;
 	bitmap_ind16 m_sprite_framebuffer{};
 	u16 m_width_mask = 0;
