@@ -105,14 +105,14 @@ public:
 		create_device<win32_keyboard_device>(DEVICE_CLASS_KEYBOARD, "Win32 Keyboard 1", "Win32 Keyboard 1");
 	}
 
-	virtual bool handle_input_event(input_event eventid, void *eventdata) override
+	virtual bool handle_input_event(input_event eventid, void const *eventdata) override
 	{
 		switch (eventid)
 		{
 		case INPUT_EVENT_KEYDOWN:
 		case INPUT_EVENT_KEYUP:
 			devicelist().for_each_device(
-					[args = static_cast<KeyPressEventArgs const *>(eventdata)] (auto &device)
+					[args = reinterpret_cast<KeyPressEventArgs const *>(eventdata)] (auto &device)
 					{
 						device.queue_events(args, 1);
 					});
@@ -276,13 +276,13 @@ public:
 		create_device<win32_mouse_device>(DEVICE_CLASS_MOUSE, "Win32 Mouse 1", "Win32 Mouse 1");
 	}
 
-	virtual bool handle_input_event(input_event eventid, void *eventdata) override
+	virtual bool handle_input_event(input_event eventid, void const *eventdata) override
 	{
 		if (manager().class_enabled(DEVICE_CLASS_MOUSE))
 		{
 			if ((eventid == INPUT_EVENT_MOUSE_BUTTON) || (eventid == INPUT_EVENT_MOUSE_WHEEL))
 			{
-				auto const *const args = reinterpret_cast<MouseUpdateEventArgs *>(eventdata);
+				auto const *const args = reinterpret_cast<MouseUpdateEventArgs const *>(eventdata);
 				devicelist().for_each_device(
 						[args] (auto &device) { device.queue_events(args, 1); });
 				return true;
@@ -537,13 +537,13 @@ public:
 		}
 	}
 
-	virtual bool handle_input_event(input_event eventid, void *eventdata) override
+	virtual bool handle_input_event(input_event eventid, void const *eventdata) override
 	{
 		if (manager().class_enabled(DEVICE_CLASS_LIGHTGUN))
 		{
 			if ((eventid == INPUT_EVENT_MOUSE_BUTTON) || (eventid == INPUT_EVENT_MOUSE_WHEEL))
 			{
-				auto const *const args = reinterpret_cast<MouseUpdateEventArgs *>(eventdata);
+				auto const *const args = reinterpret_cast<MouseUpdateEventArgs const *>(eventdata);
 				devicelist().for_each_device(
 						[args] (auto &device) { device.queue_events(args, 1); });
 				return true;

@@ -330,7 +330,6 @@ void konamigq_state::machine_start()
 	save_item(NAME(m_sound_intck));
 
 	m_dma_timer = timer_alloc(FUNC(konamigq_state::scsi_dma_transfer), this);
-	m_dma_timer->adjust(attotime::never);
 }
 
 void konamigq_state::machine_reset()
