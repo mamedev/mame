@@ -575,7 +575,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="zen">
+	<software name="zen" supported="no">
 		<description>Zen</description>
 		<year>1983</year>
 		<publisher>Multisoft</publisher>
@@ -777,7 +777,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="sinberg">
+	<software name="sinberg" supported="no">
 		<description>Sin-Berg (Ger)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -883,7 +883,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="antares">
+	<software name="antares" supported="no">
 		<description>Antares (Ger)</description>
 		<year>1986</year>
 		<publisher>BBG Software</publisher>
@@ -894,7 +894,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="amity">
+	<software name="amity" supported="no">
 		<description>Amityville (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -919,7 +919,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="nombres">
+	<software name="nombres" supported="no">
 		<description>Apprentissage des Nombres (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1037,7 +1037,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="bouldash">
+	<software name="bouldash" supported="no">
 		<description>Boulder Dash (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1084,7 +1084,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="catacomb">
+	<software name="catacomb" supported="no">
 		<description>Catacombes (Fra)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -1151,7 +1151,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="complain">
+	<software name="complain" supported="no">
 		<description>Commando Plain</description>
 		<year>1982</year>
 		<publisher>Solo Software</publisher>
@@ -1188,7 +1188,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="comptek">
+	<software name="comptek" supported="no">
 		<description>Computertekenen (Ned)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1263,7 +1263,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="demasaso">
+	<software name="demasaso" supported="no">
 		<description>Demasaso (Fra)</description>
 		<year>1985</year>
 		<publisher>Jean François Campan</publisher>
@@ -1275,7 +1275,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="descente">
+	<software name="descente" supported="no">
 		<description>Descente aux Enfers (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1287,7 +1287,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="destruct">
+	<software name="destruct" supported="no">
 		<description>Destructeurs (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1448,7 +1448,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="globule">
+	<software name="globule" supported="no">
 		<description>Globule (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1495,7 +1495,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="guerre">
+	<software name="guerre" supported="no">
 		<description>Guerre Spatiale (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1530,7 +1530,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="impomiss">
+	<software name="impomiss" supported="no">
 		<description>Impossible Mission (Fra)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -1542,7 +1542,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="isola">
+	<software name="isola" supported="no">
 		<description>Isola (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1554,7 +1554,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="jeuxint">
+	<software name="jeuxint" supported="no">
 		<description>Jeux Intergalactiques (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1566,7 +1566,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="jumprun">
+	<software name="jumprun" supported="no">
 		<description>Jumping-Runner (Fra)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -1616,7 +1616,7 @@ Easidata (English Version)
 	</software>
 
 <!-- What is Part 2 and what does it do? -->
-	<software name="ksmines">
+	<software name="ksmines" supported="no">
 		<description>King Solomon's Mines</description>
 		<year>19??</year>
 		<publisher>Solo Software</publisher>
@@ -1699,7 +1699,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="diaboliq">
+	<software name="diaboliq" supported="no">
 		<description>Le Cadre Diabolique</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1769,7 +1769,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="manza">
+	<software name="manza" supported="no">
 		<description>Manza (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1792,7 +1792,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="matpendu">
+	<software name="matpendu" supported="no">
 		<description>Matpendu (Fra)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -1828,7 +1828,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="missiona">
+	<software name="missiona" supported="no">
 		<description>Mission A</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1840,7 +1840,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="misalpha">
+	<software name="misalpha" supported="no">
 		<description>Mission Alpha (Fra)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -1852,7 +1852,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="misdelta">
+	<software name="misdelta" supported="no">
 		<description>Mission Delta (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1864,7 +1864,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="morpion">
+	<software name="morpion" supported="no">
 		<description>Morpion (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1876,7 +1876,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="morpius">
+	<software name="morpius" supported="no">
 		<description>Morpius (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2030,7 +2030,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="octopuss">
+	<software name="octopuss" supported="no">
 		<description>Octopussy (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2053,7 +2053,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="panique">
+	<software name="panique" supported="no">
 		<description>Panique (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2089,7 +2089,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pendu">
+	<software name="pendu" supported="no">
 		<description>Le Pendu (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2126,7 +2126,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="puiss4">
+	<software name="puiss4" supported="no">
 		<description>Puissance 4 (Fra)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -2138,7 +2138,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="puzzle">
+	<software name="puzzle" supported="no">
 		<description>Puzzle (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2161,7 +2161,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="rebond">
+	<software name="rebond" supported="no">
 		<description>Rebond (Fra)</description>
 		<year>1987</year>
 		<publisher>Jean François Campan</publisher>
@@ -2196,7 +2196,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="rr1906">
+	<software name="rr1906" supported="no">
 		<description>Rolls-Royce 1906 Silverghost (Ger?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2220,7 +2220,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="schac700">
+	<software name="schac700" supported="no">
 		<description>Schach 700 (Ger)</description>
 		<year>1984</year>
 		<publisher>Hobra Soft</publisher>
@@ -2253,7 +2253,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="soudard">
+	<software name="soudard" supported="no">
 		<description>Soudard (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2265,7 +2265,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="spacific">
+	<software name="spacific" supported="no">
 		<description>South Pacific</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2330,7 +2330,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="starfght">
+	<software name="starfght" supported="no">
 		<description>Star Fighter</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2355,7 +2355,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="spoker">
+	<software name="spoker" supported="no">
 		<description>Strip Poker</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -2402,7 +2402,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="supinvdr">
+	<software name="supinvdr" supported="no">
 		<description>Superior Space Invader</description>
 		<year>1983</year>
 		<publisher>P. Dormand</publisher>
@@ -2435,7 +2435,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="suprvrac">
+	<software name="suprvrac" supported="no">
 		<description>Super Vrac (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2447,7 +2447,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="sysxpert">
+	<software name="sysxpert" supported="no">
 		<description>Systeme Expert (Fra)</description>
 		<year>1989</year>
 		<publisher>Jean François Campan</publisher>
@@ -2520,7 +2520,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="urania2">
+	<software name="urania2" supported="no">
 		<description>Urania II (Fra)</description>
 		<year>1984</year>
 		<publisher>Jean François Campan</publisher>
@@ -2545,7 +2545,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="vol676">
+	<software name="vol676" supported="no">
 		<description>Vol 676 (Fra)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -2622,7 +2622,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="yams">
+	<software name="yams" supported="no">
 		<description>Y.A.M.S. (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
