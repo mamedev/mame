@@ -1086,7 +1086,7 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 void taito_f3_state::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 {
 	const pen_t *clut = m_palette->pens();
-	for (int x = H_START; x < H_START + H_VIS; x++) {
+	for (unsigned int x = H_START; x < H_START + H_VIS; x++) {
 		rgb_t s_rgb = clut[z.src_pal[x]];
 		rgb_t d_rgb = clut[z.dst_pal[x]];
 
@@ -1159,7 +1159,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		line_data.pivot.reg_sy = -m_control_1[5];
 	}
 
-	for (int screen_y = 0; screen_y != 256; screen_y += 1) {
+	for (unsigned int screen_y = 0; screen_y != 256; screen_y += 1) {
 		const int y = m_flipscreen ? (255 - screen_y) : screen_y;
 		read_line_ram(line_data, y);
 		line_data.y = screen_y;
