@@ -17,6 +17,21 @@ Symbolic Debugger 5Z-011D
 Easidata (English Version)
 -->
 
+<!--
+	Loading instructions for games that require BASIC
+	1) Initialize the system with the BASIC Interpreter tape
+	2) Type L or LOAD then press enter
+	3) Play tape until BASIC is loaded
+	4) Change to the game's tape
+	5) Type LOAD then press enter
+	6) Play tape until the game is loaded
+
+	Loading instructions for games that don't require BASIC
+	1) Initialize the system with the desire game's tape
+	2) Type L or LOAD then press enter
+	3) Play tape until the game is loaded
+-->
+
 <softwarelist name="mz700_cass" description="Sharp MZ-700 cassettes">
 
 	<software name="1z013b">
