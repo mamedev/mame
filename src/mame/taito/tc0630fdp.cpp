@@ -986,7 +986,7 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		pri_mode line_pri{};
 		// background palette -- what contributions should this default to?
 		std::fill_n(line_buf.dst_pal, H_TOTAL, line_data.bg_palette);
-		std::fill_n(line_buf.dst_blend, H_TOTAL, 0xff);
+		std::fill_n(line_buf.dst_blend, H_TOTAL, 8); // 100%
 		// set an invalid blend mode as it affects mixing
 		std::fill_n(line_pri.src_blendmode, H_TOTAL, 0xff);
 		std::fill_n(line_pri.dst_blendmode, H_TOTAL, 0xff);
