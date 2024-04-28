@@ -66,6 +66,8 @@ protected:
 	u16 m_control_0[8]{};
 	u16 m_control_1[8]{};
 
+	void decode_hi(int low, int high, std::unique_ptr<u8[]> &decoded);
+	
 	std::unique_ptr<u8[]> m_decoded_gfx4;
 	std::unique_ptr<u8[]> m_decoded_gfx5;
 
@@ -281,7 +283,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile_info_text);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
 	
-	inline void f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect);
+	inline void f3_drawgfx(const tempsprite &sprite);
 	void get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy);
 	void read_line_ram(f3_line_inf &line, int y);
 	void render_line(pen_t *dst, const mix_pix (&z)[432]);
@@ -289,7 +291,7 @@ protected:
 	template<typename Mix>
 	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix line);
 	template<typename Mix>
-	bool mix_line(Mix &gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
+	bool mix_line(Mix &layer, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
 
 private:
 };
