@@ -11,6 +11,29 @@
 #include "video/rgbutil.h"
 
 
+#define LOG_ZEUS    (1U << 1)
+#define LOG_PTR     (1U << 2)
+#define LOG_REGS    (1U << 3)
+#define LOG_CMD     (1U << 4)
+#define LOG_MODEL   (1U << 5)
+#define LOG_QUAD    (1U << 6)
+#define LOG_FIFO    (1U << 7)
+#define LOG_WAVE    (1U << 8)
+
+#define LOG_ALL     (LOG_ZEUS | LOG_PTR | LOG_REGS | LOG_CMD | LOG_MODEL | LOG_QUAD | LOG_FIFO | LOG_WAVE)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGZEUS(...)   LOGMASKED(LOG_ZEUS, __VA_ARGS__)
+#define LOGPTR(...)    LOGMASKED(LOG_PTR, __VA_ARGS__)
+#define LOGREGS(...)   LOGMASKED(LOG_REGS, __VA_ARGS__)
+#define LOGCMD(...)    LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGMODEL(...)  LOGMASKED(LOG_MODEL, __VA_ARGS__)
+#define LOGQUAD(...)   LOGMASKED(LOG_QUAD, __VA_ARGS__)
+#define LOGFIFO(...)   LOGMASKED(LOG_FIFO, __VA_ARGS__)
+#define LOGWAVE(...)   LOGMASKED(LOG_WAVE, __VA_ARGS__)
+
 
 /*************************************
  *
@@ -20,20 +43,23 @@
 
 #define DUMP_WAVE_RAM       0
 
-#define WAVERAM0_WIDTH      512
-#define WAVERAM0_HEIGHT     2048
+// turn on for hardcoded video debugging inputs
+static constexpr bool DEBUG_KEYS = false;
 
-#define WAVERAM1_WIDTH      512
-#define WAVERAM1_HEIGHT     512
+static constexpr uint32_t WAVERAM0_WIDTH  = 512;
+static constexpr uint32_t WAVERAM0_HEIGHT = 2048;
 
-#define BLEND_OPAQUE1       0x00000000
-#define BLEND_OPAQUE2       0x4b23cb00
-#define BLEND_OPAQUE3       0x4b23dd00
-#define BLEND_OPAQUE4       0x00004800
-#define BLEND_OPAQUE5       0xdd23dd00
-#define BLEND_ADD1          0x40b68800
-#define BLEND_ADD2          0xc9b78800
-#define BLEND_MUL1          0x4093c800
+static constexpr uint32_t WAVERAM1_WIDTH  = 512;
+static constexpr uint32_t WAVERAM1_HEIGHT = 512;
+
+static constexpr uint32_t BLEND_OPAQUE1 = 0x00000000;
+static constexpr uint32_t BLEND_OPAQUE2 = 0x4b23cb00;
+static constexpr uint32_t BLEND_OPAQUE3 = 0x4b23dd00;
+static constexpr uint32_t BLEND_OPAQUE4 = 0x00004800;
+static constexpr uint32_t BLEND_OPAQUE5 = 0xdd23dd00;
+static constexpr uint32_t BLEND_ADD1    = 0x40b68800;
+static constexpr uint32_t BLEND_ADD2    = 0xc9b78800;
+static constexpr uint32_t BLEND_MUL1    = 0x4093c800;
 
 
 /*************************************
@@ -90,25 +116,25 @@ static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int wid
 
 inline void *midzeus_state::waveram0_ptr_from_block_addr(uint32_t addr)
 {
-	uint32_t blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 12) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
+	uint32_t const blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 12) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 	return WAVERAM_BLOCK0(blocknum);
 }
 
 inline void *midzeus_state::waveram0_ptr_from_expanded_addr(uint32_t addr)
 {
-	uint32_t blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
+	uint32_t const blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 	return WAVERAM_BLOCK0(blocknum);
 }
 
 inline void *midzeus_state::waveram1_ptr_from_expanded_addr(uint32_t addr)
 {
-	uint32_t blocknum = (addr % WAVERAM1_WIDTH) + ((addr >> 16) % WAVERAM1_HEIGHT) * WAVERAM1_WIDTH;
+	uint32_t const blocknum = (addr % WAVERAM1_WIDTH) + ((addr >> 16) % WAVERAM1_HEIGHT) * WAVERAM1_WIDTH;
 	return WAVERAM_BLOCK1(blocknum);
 }
 
 inline void *midzeus_state::waveram0_ptr_from_texture_addr(uint32_t addr, int width)
 {
-	uint32_t blocknum = (((addr & ~1) * width) / 8) % (WAVERAM0_WIDTH * WAVERAM0_HEIGHT);
+	uint32_t const blocknum = (((addr & ~1) * width) / 8) % (WAVERAM0_WIDTH * WAVERAM0_HEIGHT);
 	return WAVERAM_BLOCK0(blocknum);
 }
 
@@ -170,26 +196,26 @@ inline void midzeus_state::waveram_plot_check_depth_nowrite(int y, int x, uint16
 // 4x2 block size
 static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
 {
-	uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
+	uint32_t const byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 }
 
 static inline uint8_t get_texel_8bit(const void *base, int y, int x, int width)
 {
-	uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
+	uint32_t const byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
 	return WAVERAM_READ8(base, byteoffs);
 }
 
 // 2x2 block size
 static inline uint8_t get_texel_alt_4bit(const void *base, int y, int x, int width)
 {
-	uint32_t byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
+	uint32_t const byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 }
 
 static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int width)
 {
-	uint32_t byteoffs =  (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
+	uint32_t const byteoffs =  (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
 	return WAVERAM_READ8(base, byteoffs);
 }
 
@@ -206,25 +232,21 @@ midzeus_renderer::midzeus_renderer(midzeus_state &state)
 
 void midzeus_state::video_start()
 {
-	/* allocate memory for "wave" RAM */
+	// allocate memory for "wave" RAM
 	m_waveram[0] = std::make_unique<uint32_t[]>(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
 	m_waveram[1] = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8/4);
 
-	/* initialize a 5-5-5 palette */
-	for (int i = 0; i < 32768; i++)
-		m_palette->set_pen_color(i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
-
-	/* initialize polygon engine */
+	// initialize polygon engine
 	m_poly = std::make_unique<midzeus_renderer>(*this);
 
-	/* we need to cleanup on exit */
+	// we need to cleanup on exit
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&midzeus_state::exit_handler, this));
 
 	m_yoffs = 0;
 	m_texel_width = 256;
 	m_zeus_renderbase = m_waveram[1].get();
 
-	/* state saving */
+	// state saving
 	save_item(NAME(m_zeus_fifo));
 	save_item(NAME(m_zeus_fifo_words));
 	save_item(NAME(m_zeus_matrix));
@@ -239,7 +261,7 @@ void midzeus_state::video_start()
 	save_pointer(NAME(m_waveram[0]), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(m_waveram[0][0]));
 	save_pointer(NAME(m_waveram[1]), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8 / sizeof(m_waveram[1][0]));
 
-	/* hack */
+	// hack
 	m_is_mk4b = strcmp(machine().system().name, "mk4b") == 0;
 }
 
@@ -274,7 +296,7 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	m_poly->wait("VIDEO_UPDATE");
 
-	if (DEBUG_KEYS && machine().input().code_pressed(KEYCODE_V)) /* waveram drawing case */
+	if (DEBUG_KEYS && machine().input().code_pressed(KEYCODE_V)) // waveram drawing case
 	{
 		const void *base;
 
@@ -298,10 +320,10 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 		popmessage("offs = %06X", m_yoffs << 12);
 	}
-	else /* normal update case */
+	else // normal update case
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
-		int xoffs = screen.visible_area().min_x;
+		int const xoffs = screen.visible_area().min_x;
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint16_t *const dest = &bitmap.pix(y);
@@ -324,7 +346,7 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t midzeus_state::zeus_r(offs_t offset)
 {
-	bool logit = (offset < 0xb0 || offset > 0xb7);
+	bool logit = ((!machine().side_effects_disabled()) && (offset < 0xb0 || offset > 0xb7));
 	uint32_t result = m_zeusbase[offset & ~1];
 
 	switch (offset & ~1)
@@ -355,7 +377,7 @@ uint32_t midzeus_state::zeus_r(offs_t offset)
 			break;
 	}
 
-	/* 32-bit mode */
+	// 32-bit mode
 	if (m_zeusbase[0x80] & 0x00020000)
 	{
 		if (offset & 1)
@@ -363,15 +385,15 @@ uint32_t midzeus_state::zeus_r(offs_t offset)
 		if (logit)
 		{
 			if (offset & 1)
-				logerror("%06X:zeus32_r(%02X) = %08X -- unexpected in 32-bit mode\n", m_maincpu->pc(), offset, result);
+				LOGZEUS("%06X:zeus32_r(%02X) = %08X -- unexpected in 32-bit mode\n", m_maincpu->pc(), offset, result);
 			else if (offset != 0xe0)
-				logerror("%06X:zeus32_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
+				LOGZEUS("%06X:zeus32_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 			else
-				logerror("%06X:zeus32_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
+				LOGZEUS("%06X:zeus32_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		}
 	}
 
-	/* 16-bit mode */
+	// 16-bit mode
 	else
 	{
 		if (offset & 1)
@@ -379,7 +401,7 @@ uint32_t midzeus_state::zeus_r(offs_t offset)
 		else
 			result &= 0xffff;
 		if (logit)
-			logerror("%06X:zeus16_r(%02X) = %04X\n", m_maincpu->pc(), offset, result);
+			LOGZEUS("%06X:zeus16_r(%02X) = %04X\n", m_maincpu->pc(), offset, result);
 	}
 	return result;
 }
@@ -397,13 +419,13 @@ void midzeus_state::zeus_w(offs_t offset, uint32_t data)
 	bool logit = m_zeus_enable_logging || ((offset < 0xb0 || offset > 0xb7) && (offset < 0xe0 || offset > 0xe1));
 
 	if (logit)
-		logerror("%06X:zeus_w", m_maincpu->pc());
+		LOGZEUS("%06X:zeus_w", m_maincpu->pc());
 
-	/* 32-bit mode */
+	// 32-bit mode
 	if (m_zeusbase[0x80] & 0x00020000)
 		zeus_register32_w(offset, data, logit);
 
-	/* 16-bit mode */
+	// 16-bit mode
 	else
 		zeus_register16_w(offset, data, logit);
 }
@@ -424,20 +446,20 @@ void midzeus_state::zeus_pointer_w(uint32_t which, uint32_t data, bool logit)
 		case 0x008000:
 		case 0x018000:
 			if (logit)
-				logerror(" -- setptr(objdata)\n");
+				LOGPTR(" -- setptr(objdata)\n");
 			m_zeus_objdata = data;
 			break;
 
 		// case 0x00c040: -- set in model data in invasn
 		case 0x00c040:
 			if (logit)
-				logerror(" -- setptr(palbase)\n");
+				LOGPTR(" -- setptr(palbase)\n");
 			m_zeus_palbase = data;
 			break;
 
 		case 0x02c0f0:
 			if (logit)
-				logerror(" -- setptr(unkbase)\n");
+				LOGPTR(" -- setptr(unkbase)\n");
 			m_zeus_unkbase = data;
 			break;
 
@@ -469,7 +491,7 @@ void midzeus_state::zeus_pointer_w(uint32_t which, uint32_t data, bool logit)
 
 		default:
 			if (logit)
-				logerror(" -- setptr(%06X)\n", which & 0xffffff);
+				LOGPTR(" -- setptr(%06X)\n", which & 0xffffff);
 			break;
 	}
 
@@ -487,23 +509,23 @@ void midzeus_state::zeus_pointer_w(uint32_t which, uint32_t data, bool logit)
 
 void midzeus_state::zeus_register16_w(offs_t offset, uint16_t data, bool logit)
 {
-	/* writes to register $CC need to force a partial update */
+	// writes to register $CC need to force a partial update
 	if ((offset & ~1) == 0xcc)
 		m_screen->update_partial(m_screen->vpos());
 
-	/* write to high part on odd addresses */
+	// write to high part on odd addresses
 	if (offset & 1)
 		m_zeusbase[offset & ~1] = (m_zeusbase[offset & ~1] & 0x0000ffff) | (data << 16);
 
-	/* write to low part on event addresses */
+	// write to low part on event addresses
 	else
 		m_zeusbase[offset & ~1] = (m_zeusbase[offset & ~1] & 0xffff0000) | (data & 0xffff);
 
-	/* log appropriately */
+	// log appropriately
 	if (logit)
-		logerror("(%02X) = %04X [%08X]\n", offset, data & 0xffff, m_zeusbase[offset & ~1]);
+		LOGREGS("(%02X) = %04X [%08X]\n", offset, data & 0xffff, m_zeusbase[offset & ~1]);
 
-	/* handle the update */
+	// handle the update
 	if ((offset & 1) == 0)
 		zeus_register_update(offset);
 }
@@ -511,25 +533,25 @@ void midzeus_state::zeus_register16_w(offs_t offset, uint16_t data, bool logit)
 
 void midzeus_state::zeus_register32_w(offs_t offset, uint32_t data, bool logit)
 {
-	/* writes to register $CC need to force a partial update */
+	// writes to register $CC need to force a partial update
 	if ((offset & ~1) == 0xcc)
 		m_screen->update_partial(m_screen->vpos());
 
-	/* always write to low word? */
+	// always write to low word?
 	m_zeusbase[offset & ~1] = data;
 
-	/* log appropriately */
+	// log appropriately
 	if (logit)
 	{
 		if (offset & 1)
-			logerror("(%02X) = %08X -- unexpected in 32-bit mode\n", offset, data);
+			LOGREGS("(%02X) = %08X -- unexpected in 32-bit mode\n", offset, data);
 		else if (offset != 0xe0)
-			logerror("(%02X) = %08X\n", offset, data);
+			LOGREGS("(%02X) = %08X\n", offset, data);
 		else
-			logerror("(%02X) = %08X\n", offset, data);
+			LOGREGS("(%02X) = %08X\n", offset, data);
 	}
 
-	/* handle the update */
+	// handle the update
 	if ((offset & 1) == 0)
 		zeus_register_update(offset);
 }
@@ -544,7 +566,7 @@ void midzeus_state::zeus_register32_w(offs_t offset, uint32_t data, bool logit)
 
 void midzeus_state::zeus_register_update(offs_t offset)
 {
-	/* handle the writes; only trigger on low accesses */
+	// handle the writes; only trigger on low accesses
 	switch (offset)
 	{
 		case 0x52:
@@ -552,7 +574,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 			break;
 
 		case 0x60:
-			/* invasn writes here to execute a command (?) */
+			// invasn writes here to execute a command (?)
 			if (m_zeusbase[0x60] & 1)
 			{
 				if ((m_zeusbase[0x80] & 0xffffff) == 0x22FCFF)
@@ -598,7 +620,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					m_poly->wait("Normal");
 				}
 				else
-					logerror("Execute unknown command\n");
+					LOGCMD("Execute unknown command\n");
 			}
 			break;
 
@@ -625,8 +647,8 @@ void midzeus_state::zeus_register_update(offs_t offset)
 			break;
 
 		case 0x84:
-			/* MK4: Written in tandem with 0xcc */
-			/* MK4: Writes either 0x80 (and 0x000000 to 0xcc) or 0x00 (and 0x800000 to 0xcc) */
+			// MK4: Written in tandem with 0xcc
+			// MK4: Writes either 0x80 (and 0x000000 to 0xcc) or 0x00 (and 0x800000 to 0xcc)
 			m_zeus_renderbase = waveram1_ptr_from_expanded_addr(m_zeusbase[0x84] << 16);
 			break;
 
@@ -682,8 +704,8 @@ void midzeus_state::zeus_register_update(offs_t offset)
 		case 0xca:
 			m_screen->update_partial(m_screen->vpos());
 			{
-				int vtotal = m_zeusbase[0xca] >> 16;
-				int htotal = m_zeusbase[0xc6] >> 16;
+				int const vtotal = m_zeusbase[0xca] >> 16;
+				int const htotal = m_zeusbase[0xc6] >> 16;
 
 				rectangle visarea(m_zeusbase[0xc6] & 0xffff, htotal - 3, 0, m_zeusbase[0xc8] & 0xffff);
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
@@ -724,11 +746,11 @@ void midzeus_state::zeus_register_update(offs_t offset)
 
 int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 {
-	/* handle logging */
+	// handle logging
 	switch (data[0] >> 24)
 	{
-		/* 0x00/0x01: set pointer */
-		/* in model data, this is 0x0C */
+		// 0x00/0x01: set pointer
+		// in model data, this is 0x0C
 		case 0x00:
 		case 0x01:
 			if (numwords < 2 && data[0] != 0)
@@ -738,22 +760,22 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			zeus_pointer_w(data[0] & 0xffffff, data[1], m_log_fifo);
 			break;
 
-		/* 0x13: render model based on previously set information */
-		case 0x13:  /* invasn */
+		// 0x13: render model based on previously set information
+		case 0x13:  // invasn
 			if (m_log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus_draw_model((m_zeusbase[0x06] << 16), m_log_fifo);
 			break;
 
-		/* 0x17: write 16-bit value to low registers */
+		// 0x17: write 16-bit value to low registers
 		case 0x17:
 			if (m_log_fifo)
 				log_fifo_command(data, numwords, " -- reg16");
 			zeus_register16_w((data[0] >> 16) & 0x7f, data[0], m_log_fifo);
 			break;
 
-		/* 0x18: write 32-bit value to low registers */
-		/* in model data, this is 0x19 */
+		// 0x18: write 32-bit value to low registers
+		// in model data, this is 0x19
 		case 0x18:
 			if (numwords < 2)
 				return false;
@@ -762,27 +784,27 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			zeus_register32_w((data[0] >> 16) & 0x7f, data[1], m_log_fifo);
 			break;
 
-		/* 0x1A/0x1B: sync pipeline(?) */
+		// 0x1A/0x1B: sync pipeline(?)
 		case 0x1a:
 		case 0x1b:
 			if (m_log_fifo)
 				log_fifo_command(data, numwords, " -- sync\n");
 			break;
 
-		/* 0x1C/0x1E: write matrix and translation vector */
+		// 0x1C/0x1E: write matrix and translation vector
 		case 0x1c:
 		case 0x1e:
 
-			/* single matrix form */
+			// single matrix form
 			if ((data[0] & 0xffff) != 0x7fff)
 			{
-				/* requires 8 words total */
+				// requires 8 words total
 				if (numwords < 8)
 					return false;
 				if (m_log_fifo)
 				{
 					log_fifo_command(data, numwords, "");
-					logerror("\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tvector %8.2f %8.2f %8.5f\n",
+					LOGCMD("\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tvector %8.2f %8.2f %8.5f\n",
 						data[2] & 0xffff,   data[2] >> 16,      data[0] & 0xffff,
 						data[3] & 0xffff,   data[3] >> 16,      data[1] >> 16,
 						data[4] & 0xffff,   data[4] >> 16,      data[1] & 0xffff,
@@ -791,30 +813,30 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 						(double)(int32_t)data[7] * (1.0 / (65536.0 * 512.0)));
 				}
 
-				/* extract the matrix from the raw data */
+				// extract the matrix from the raw data
 				m_zeus_matrix[0][0] = data[2];    m_zeus_matrix[0][1] = data[2] >> 16;  m_zeus_matrix[0][2] = data[0];
 				m_zeus_matrix[1][0] = data[3];    m_zeus_matrix[1][1] = data[3] >> 16;  m_zeus_matrix[1][2] = data[1] >> 16;
 				m_zeus_matrix[2][0] = data[4];    m_zeus_matrix[2][1] = data[4] >> 16;  m_zeus_matrix[2][2] = data[1];
 
-				/* extract the translation point from the raw data */
+				// extract the translation point from the raw data
 				m_zeus_point[0] = data[5];
 				m_zeus_point[1] = data[6];
 				m_zeus_point[2] = data[7];
 			}
 
-			/* double matrix form */
+			// double matrix form
 			else
 			{
 				int16_t matrix1[3][3];
 				int16_t matrix2[3][3];
 
-				/* requires 13 words total */
+				// requires 13 words total
 				if (numwords < 13)
 					return false;
 				if (m_log_fifo)
 				{
 					log_fifo_command(data, numwords, "");
-					logerror("\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tvector %8.2f %8.2f %8.5f\n",
+					LOGCMD("\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tvector %8.2f %8.2f %8.5f\n",
 						data[4] & 0xffff,   data[4] >> 16,      data[5] >> 16,
 						data[8] & 0xffff,   data[8] >> 16,      data[6] >> 16,
 						data[9] & 0xffff,   data[9] >> 16,      data[7] >> 16,
@@ -826,17 +848,17 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 						(double)(int32_t)data[12] * (1.0 / (65536.0 * 512.0)));
 				}
 
-				/* extract the first matrix from the raw data */
+				// extract the first matrix from the raw data
 				matrix1[0][0] = data[4];        matrix1[0][1] = data[4] >> 16;  matrix1[0][2] = data[5] >> 16;
 				matrix1[1][0] = data[8];        matrix1[1][1] = data[8] >> 16;  matrix1[1][2] = data[6] >> 16;
 				matrix1[2][0] = data[9];        matrix1[2][1] = data[9] >> 16;  matrix1[2][2] = data[7] >> 16;
 
-				/* extract the second matrix from the raw data */
+				// extract the second matrix from the raw data
 				matrix2[0][0] = data[1];        matrix2[0][1] = data[2];        matrix2[0][2] = data[3];
 				matrix2[1][0] = data[1] >> 16;  matrix2[1][1] = data[2] >> 16;  matrix2[1][2] = data[3] >> 16;
 				matrix2[2][0] = data[5];        matrix2[2][1] = data[6];        matrix2[2][2] = data[7];
 
-				/* multiply them together to get the final matrix */
+				// multiply them together to get the final matrix
 				m_zeus_matrix[0][0] = ((int64_t)(matrix1[0][0] * matrix2[0][0]) + (int64_t)(matrix1[0][1] * matrix2[1][0]) + (int64_t)(matrix1[0][2] * matrix2[2][0])) >> 16;
 				m_zeus_matrix[0][1] = ((int64_t)(matrix1[0][0] * matrix2[0][1]) + (int64_t)(matrix1[0][1] * matrix2[1][1]) + (int64_t)(matrix1[0][2] * matrix2[2][1])) >> 16;
 				m_zeus_matrix[0][2] = ((int64_t)(matrix1[0][0] * matrix2[0][2]) + (int64_t)(matrix1[0][1] * matrix2[1][2]) + (int64_t)(matrix1[0][2] * matrix2[2][2])) >> 16;
@@ -847,15 +869,15 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 				m_zeus_matrix[2][1] = ((int64_t)(matrix1[2][0] * matrix2[0][1]) + (int64_t)(matrix1[2][1] * matrix2[1][1]) + (int64_t)(matrix1[2][2] * matrix2[2][1])) >> 16;
 				m_zeus_matrix[2][2] = ((int64_t)(matrix1[2][0] * matrix2[0][2]) + (int64_t)(matrix1[2][1] * matrix2[1][2]) + (int64_t)(matrix1[2][2] * matrix2[2][2])) >> 16;
 
-				/* extract the translation point from the raw data */
+				// extract the translation point from the raw data
 				m_zeus_point[0] = data[10];
 				m_zeus_point[1] = data[11];
 				m_zeus_point[2] = data[12];
 			}
 			break;
 
-		/* 0x23: some additional X,Y,Z coordinates */
-		/* 0x2e: same for invasn */
+		// 0x23: some additional X,Y,Z coordinates
+		// 0x2e: same for invasn
 		case 0x23:
 		case 0x2e:
 			if (numwords < 2)
@@ -863,18 +885,18 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			if (m_log_fifo)
 			{
 				log_fifo_command(data, numwords, "");
-				logerror(" -- light xyz = %d,%d,%d\n", (int16_t)data[1], (int16_t)(data[1] >> 16), (int16_t)data[0]);
+				LOGCMD(" -- light xyz = %d,%d,%d\n", (int16_t)data[1], (int16_t)(data[1] >> 16), (int16_t)data[0]);
 			}
 
 			m_zeus_light[0] = (int16_t)(data[1] & 0xffff);
 			m_zeus_light[1] = (int16_t)(data[1] >> 16);
 			m_zeus_light[2] = (int16_t)(data[0] & 0xffff);
 			break;
-		/* 0x25: display control? */
-		/* 0x28: same for mk4b */
-		/* 0x30: same for invasn */
+		// 0x25: display control?
+		// 0x28: same for mk4b
+		// 0x30: same for invasn
 		case 0x25:
-			/* 0x25 is used differently in mk4b. What determines this? */
+			// 0x25 is used differently in mk4b. What determines this?
 			if (m_is_mk4b)
 			{
 				if (numwords < 2)
@@ -893,28 +915,27 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 
 			if ((numwords < 10) && (data[0] & 0xffff7f) == 0)
 			{
-				/* not right -- just a hack */
-				int x, y;
-				for (y = m_zeus_cliprect.min_y; y <= m_zeus_cliprect.max_y; y++)
-					for (x = m_zeus_cliprect.min_x; x <= m_zeus_cliprect.max_x; x++)
+				// not right -- just a hack
+				for (int y = m_zeus_cliprect.min_y; y <= m_zeus_cliprect.max_y; y++)
+					for (int x = m_zeus_cliprect.min_x; x <= m_zeus_cliprect.max_x; x++)
 						waveram_plot_depth(y, x, 0, 0x7fff);
 			}
 			else
 			{
-				uint32_t texdata = (m_zeusbase[0x06] << 16) | (m_zeusbase[0x00] >> 16);
+				uint32_t const texdata = (m_zeusbase[0x06] << 16) | (m_zeusbase[0x00] >> 16);
 				m_poly->zeus_draw_quad(false, data, texdata, m_log_fifo);
 			}
 			break;
 
-		/* 0x2d: unknown - invasn */
-		/* 0x70: same for mk4 */
+		// 0x2d: unknown - invasn
+		// 0x70: same for mk4
 		case 0x2d:
 		case 0x70:
 			if (m_log_fifo)
 				log_fifo_command(data, numwords, "\n");
 			break;
 
-		/* 0x67: render model with inline texture info */
+		// 0x67: render model with inline texture info
 		case 0x67:
 			if (numwords < 3)
 				return false;
@@ -925,7 +946,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			break;
 
 		default:
-			printf("Unknown command %08X\n", data[0]);
+			LOGCMD("Unknown command %08X\n", data[0]);
 			if (m_log_fifo)
 				log_fifo_command(data, numwords, "\n");
 			break;
@@ -945,87 +966,83 @@ void midzeus_state::zeus_draw_model(uint32_t texdata, bool logit)
 {
 	uint32_t databuffer[32];
 	int databufcount = 0;
-	int model_done = false;
+	bool model_done = false;
 
 	if (logit)
-		logerror(" -- model @ %08X\n", m_zeus_objdata);
+		LOGMODEL(" -- model @ %08X\n", m_zeus_objdata);
 
 	while (m_zeus_objdata != 0 && !model_done)
 	{
 		const void *base = waveram0_ptr_from_block_addr(m_zeus_objdata);
-		int count = m_zeus_objdata >> 24;
-		int curoffs;
+		int const count = m_zeus_objdata >> 24;
 
-		/* reset the objdata address */
+		// reset the objdata address
 		m_zeus_objdata = 0;
 
-		/* loop until we run out of data */
-		for (curoffs = 0; curoffs <= count; curoffs++)
+		// loop until we run out of data
+		for (int curoffs = 0; curoffs <= count; curoffs++)
 		{
-			int countneeded;
-			uint8_t cmd;
-
-			/* accumulate 2 words of data */
+			// accumulate 2 words of data
 			databuffer[databufcount++] = WAVERAM_READ32(base, curoffs * 2 + 0);
 			databuffer[databufcount++] = WAVERAM_READ32(base, curoffs * 2 + 1);
 
-			/* if this is enough, process the command */
-			cmd = databuffer[0] >> 24;
-			countneeded = (cmd == 0x25 || cmd == 0x30 || cmd == 0x28) ? 14 : 2;
+			// if this is enough, process the command
+			uint8_t const cmd = databuffer[0] >> 24;
+			int const countneeded = (cmd == 0x25 || cmd == 0x30 || cmd == 0x28) ? 14 : 2;
 			if (databufcount == countneeded)
 			{
-				/* handle logging of the command */
+				// handle logging of the command
 				if (logit)
 				{
 					int offs;
-					logerror("\t");
+					LOGMODEL("\t");
 					for (offs = 0; offs < databufcount; offs++)
-						logerror("%08X ", databuffer[offs]);
-					logerror("-- ");
+						LOGMODEL("%08X ", databuffer[offs]);
+					LOGMODEL("-- ");
 				}
 
-				/* handle the command */
+				// handle the command
 				switch (cmd)
 				{
 					case 0x08:
 						if (logit)
-							logerror("end of model\n");
+							LOGMODEL("end of model\n");
 						model_done = true;
 						break;
 
-					case 0x0c:  /* mk4/invasn */
+					case 0x0c:  // mk4/invasn
 						zeus_pointer_w(databuffer[0] & 0xffffff, databuffer[1], logit);
 						break;
 
-					case 0x17:  /* mk4 */
+					case 0x17:  // mk4
 						if (logit)
-							logerror("reg16");
+							LOGMODEL("reg16");
 						zeus_register16_w((databuffer[0] >> 16) & 0x7f, databuffer[0], logit);
 						if (((databuffer[0] >> 16) & 0x7f) == 0x06)
 							texdata = (texdata & 0xffff) | (m_zeusbase[0x06] << 16);
 						break;
 
-					case 0x19:  /* invasn */
+					case 0x19:  // invasn
 						if (logit)
-							logerror("reg32");
+							LOGMODEL("reg32");
 						zeus_register32_w((databuffer[0] >> 16) & 0x7f, databuffer[1], logit);
 						if (((databuffer[0] >> 16) & 0x7f) == 0x06)
 							texdata = (texdata & 0xffff) | (m_zeusbase[0x06] << 16);
 						break;
 
-					case 0x25:  /* mk4 */
-					case 0x28:  /* mk4r1 */
-					case 0x30:  /* invasn */
+					case 0x25:  // mk4
+					case 0x28:  // mk4r1
+					case 0x30:  // invasn
 						m_poly->zeus_draw_quad(true, databuffer, texdata, logit);
 						break;
 
 					default:
 						if (logit)
-							logerror("unknown\n");
+							LOGMODEL("unknown\n");
 						break;
 				}
 
-				/* reset the count */
+				// reset the count
 				databufcount = 0;
 			}
 		}
@@ -1044,38 +1061,33 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 {
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
-	uint32_t ushift, vshift;
-	float maxy, maxx;
-	uint32_t texbase, texwshift;
-	uint32_t numverts;
 
-	uint32_t ctrl_word = databuffer[long_fmt ? 1 : 9];
+	uint32_t const ctrl_word = databuffer[long_fmt ? 1 : 9];
 
-	texbase = ((texdata >> 10) & 0x3f0000) | (texdata & 0xffff);
-	texwshift = (texdata >> 22) & 7;
+	uint32_t const texbase = ((texdata >> 10) & 0x3f0000) | (texdata & 0xffff);
+	uint32_t const texwshift = (texdata >> 22) & 7;
 
-	ushift = 8 - ((m_state.m_zeusbase[0x04] >> 4) & 3);
-	vshift = 8 - ((m_state.m_zeusbase[0x04] >> 6) & 3);
+	uint32_t const ushift = 8 - ((m_state.m_zeusbase[0x04] >> 4) & 3);
+	uint32_t const vshift = 8 - ((m_state.m_zeusbase[0x04] >> 6) & 3);
 
-	int xy_offset = long_fmt ? 2 : 1;
+	int const xy_offset = long_fmt ? 2 : 1;
 
 	int16_t (*zeus_matrix)[3] = m_state.m_zeus_matrix;
 	int32_t *zeus_point = m_state.m_zeus_point;
 
 	for (uint32_t i = 0; i < 4; i++)
 	{
-		uint32_t ixy = databuffer[xy_offset + i*2];
-		uint32_t iuvz = databuffer[xy_offset + 1 + i*2];
-		int32_t xo = (int16_t)ixy;
-		int32_t yo = (int16_t)(ixy >> 16);
-		int32_t zo = (int16_t)iuvz;
-		uint8_t u = iuvz >> 16;
-		uint8_t v = iuvz >> 24;
-		int64_t x, y, z;
+		uint32_t const ixy = databuffer[xy_offset + i*2];
+		uint32_t const iuvz = databuffer[xy_offset + 1 + i*2];
+		int32_t const xo = (int16_t)ixy;
+		int32_t const yo = (int16_t)(ixy >> 16);
+		int32_t const zo = (int16_t)iuvz;
+		uint8_t const u = iuvz >> 16;
+		uint8_t const v = iuvz >> 24;
 
-		x = (int64_t)(xo * zeus_matrix[0][0]) + (int64_t)(yo * zeus_matrix[0][1]) + (int64_t)(zo * zeus_matrix[0][2]) + zeus_point[0];
-		y = (int64_t)(xo * zeus_matrix[1][0]) + (int64_t)(yo * zeus_matrix[1][1]) + (int64_t)(zo * zeus_matrix[1][2]) + zeus_point[1];
-		z = (int64_t)(xo * zeus_matrix[2][0]) + (int64_t)(yo * zeus_matrix[2][1]) + (int64_t)(zo * zeus_matrix[2][2]) + zeus_point[2];
+		int64_t x = (int64_t)(xo * zeus_matrix[0][0]) + (int64_t)(yo * zeus_matrix[0][1]) + (int64_t)(zo * zeus_matrix[0][2]) + zeus_point[0];
+		int64_t y = (int64_t)(xo * zeus_matrix[1][0]) + (int64_t)(yo * zeus_matrix[1][1]) + (int64_t)(zo * zeus_matrix[1][2]) + zeus_point[1];
+		int64_t z = (int64_t)(xo * zeus_matrix[2][0]) + (int64_t)(yo * zeus_matrix[2][1]) + (int64_t)(zo * zeus_matrix[2][2]) + zeus_point[2];
 
 		// Rounding hack
 		x = (x + 0x00004000) & ~0x00007fffULL;
@@ -1096,7 +1108,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 			rotnormal[1] = normal[0] * zeus_matrix[1][0] + normal[1] * zeus_matrix[1][1] + normal[2] * zeus_matrix[1][2];
 			rotnormal[2] = normal[0] * zeus_matrix[2][0] + normal[1] * zeus_matrix[2][1] + normal[2] * zeus_matrix[2][2];
 
-			int64_t dot = rotnormal[0] * x + rotnormal[1] * y + rotnormal[2] * z;
+			int64_t const dot = rotnormal[0] * x + rotnormal[1] * y + rotnormal[2] * z;
 
 			if (dot >= 0)
 				return;
@@ -1120,6 +1132,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		vert[i].p[2] = v << vshift;
 		vert[i].p[3] = 0xffff;
 
+#if (VERBOSE & LOG_QUAD)
 		if (logit)
 		{
 			m_state.logerror("\t\t(%f,%f,%f) UV:(%02X,%02X) UV_SCALE:(%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
@@ -1129,16 +1142,17 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 					(databuffer[10 + i] >> 20) & 0x3ff, (databuffer[10 + i] >> 10) & 0x3ff, (databuffer[10 + i] >> 0) & 0x3ff,
 					0);
 		}
+#endif
 	}
 
-	numverts = m_state.m_poly->zclip_if_less<4>(4, &vert[0], &clipvert[0], 512.0f);
+	uint32_t const numverts = m_state.m_poly->zclip_if_less<4>(4, &vert[0], &clipvert[0], 512.0f);
 	if (numverts < 3)
 		return;
 
-	maxx = maxy = -1000.0f;
+	float maxx = -1000.0f, maxy = -1000.0f;
 	for (uint32_t i = 0; i < numverts; i++)
 	{
-		float ooz = 512.0f / clipvert[i].p[0];
+		float const ooz = 512.0f / clipvert[i].p[0];
 
 		clipvert[i].x *= ooz;
 		clipvert[i].y *= ooz;
@@ -1148,8 +1162,10 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		maxx = std::max(maxx, clipvert[i].x);
 		maxy = std::max(maxy, clipvert[i].y);
 
+#if (VERBOSE & LOG_QUAD)
 		if (logit)
 			m_state.logerror("\t\t\tTranslated=(%f,%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y, (double) clipvert[i].p[0]);
+#endif
 	}
 	for (uint32_t i = 0; i < numverts; i++)
 	{
@@ -1163,7 +1179,7 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 
 	if (ctrl_word & 0x01000000)
 	{
-		uint32_t tex_type = (texdata >> 16) & 3;
+		uint32_t const tex_type = (texdata >> 16) & 3;
 		extra.texwidth = 512 >> texwshift;
 		extra.voffset = ctrl_word & 0xffff;
 
@@ -1179,7 +1195,9 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		}
 		else
 		{
-			printf("Unknown texture type: %d\n", tex_type);
+#if (VERBOSE & LOG_QUAD)
+			m_state.logerror("Unknown texture type: %d\n", tex_type);
+#endif
 			return;
 		}
 	}
@@ -1220,10 +1238,10 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 	int32_t curu = extent.param[1].start;
 	int32_t curv = extent.param[2].start;
 	int32_t curi = extent.param[3].start;
-	int32_t dzdx = extent.param[0].dpdx;
-	int32_t dudx = extent.param[1].dpdx;
-	int32_t dvdx = extent.param[2].dpdx;
-	int32_t didx = extent.param[3].dpdx;
+	int32_t const dzdx = extent.param[0].dpdx;
+	int32_t const dudx = extent.param[1].dpdx;
+	int32_t const dvdx = extent.param[2].dpdx;
+	int32_t const didx = extent.param[3].dpdx;
 	const void *texbase = object.texbase;
 	const void *palbase = object.palbase;
 	uint16_t transcolor = object.transcolor;
@@ -1248,7 +1266,7 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 
 		if (depth_pass)
 		{
-			rgb_t src=0;
+			rgb_t src = 0;
 
 			bool src_valid = true;
 
@@ -1260,10 +1278,10 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 			}
 			else
 			{
-				uint32_t u0 = curu >> 8;
-				uint32_t v0 = object.voffset + (curv >> 8);
-				uint32_t u1 = u0 + 1;
-				uint32_t v1 = v0 + 1;
+				uint32_t const u0 = curu >> 8;
+				uint32_t const v0 = object.voffset + (curv >> 8);
+				uint32_t const u1 = u0 + 1;
+				uint32_t const v1 = v0 + 1;
 
 				uint8_t texels[4];
 
@@ -1278,7 +1296,7 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 
 					for (uint32_t i = 0; i < 4; ++i)
 					{
-						uint16_t pix = WAVERAM_READ16(palbase, texels[i]);
+						uint16_t const pix = WAVERAM_READ16(palbase, texels[i]);
 
 						color[i].set_r(pal5bit(pix >> 10));
 						color[i].set_g(pal5bit(pix >> 5));
@@ -1295,9 +1313,9 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 
 			if (src_valid)
 			{
-				uint32_t srcr = src.r();
-				uint32_t srcg = src.g();
-				uint32_t srcb = src.b();
+				uint32_t const srcr = src.r();
+				uint32_t const srcg = src.g();
+				uint32_t const srcb = src.b();
 
 				uint32_t dstr = 0;
 				uint32_t dstg = 0;
@@ -1307,13 +1325,13 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 				uint32_t outg = 0;
 				uint32_t outb = 0;
 
-				uint32_t srca = object.alpha & 0xff;
-				uint32_t dsta = (object.alpha >> 8) & 0xff;
+				uint32_t const srca = object.alpha & 0xff;
+				uint32_t const dsta = (object.alpha >> 8) & 0xff;
 
 				// Destination enable?
 				if (object.blend & 0x00800000)
 				{
-					uint16_t dst = WAVERAM_READPIX(m_state.m_zeus_renderbase, scanline, x);
+					uint16_t const dst = WAVERAM_READPIX(m_state.m_zeus_renderbase, scanline, x);
 
 					dstr = (dst >> 10) & 0x1f;
 					dstg = (dst >> 5) & 0x1f;
@@ -1425,11 +1443,10 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 
 void midzeus_renderer::render_poly_solid_fixedz(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid)
 {
-	uint16_t color = object.solidcolor;
-	uint16_t depth = object.zoffset;
-	int x;
+	uint16_t const color = object.solidcolor;
+	uint16_t const depth = object.zoffset;
 
-	for (x = extent.startx; x < extent.stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 		m_state.waveram_plot_depth(scanline, x, color, depth);
 }
 
@@ -1443,12 +1460,10 @@ void midzeus_renderer::render_poly_solid_fixedz(int32_t scanline, const extent_t
 
 void midzeus_state::log_fifo_command(const uint32_t *data, int numwords, const char *suffix)
 {
-	int wordnum;
-
-	logerror("Zeus cmd %02X :", data[0] >> 24);
-	for (wordnum = 0; wordnum < numwords; wordnum++)
-		logerror(" %08X", data[wordnum]);
-	logerror("%s", suffix);
+	LOGFIFO("Zeus cmd %02X :", data[0] >> 24);
+	for (int wordnum = 0; wordnum < numwords; wordnum++)
+		LOGFIFO(" %08X", data[wordnum]);
+	LOGFIFO("%s", suffix);
 }
 
 
@@ -1460,10 +1475,10 @@ void midzeus_state::log_waveram(uint32_t length_and_base)
 		uint32_t checksum;
 	} recent_entries[100];
 
-	uint32_t numoctets = (length_and_base >> 24) + 1;
+	uint32_t const numoctets = (length_and_base >> 24) + 1;
 	const uint32_t *ptr = (const uint32_t *)waveram0_ptr_from_block_addr(length_and_base);
 	uint32_t checksum = length_and_base;
-	int foundit = false;
+	bool foundit = false;
 	int i;
 
 	for (i = 0; i < numoctets; i++)
@@ -1488,5 +1503,5 @@ void midzeus_state::log_waveram(uint32_t length_and_base)
 		return;
 
 	for (i = 0; i < numoctets; i++)
-		logerror("\t%02X: %08X %08X\n", i, ptr[i*2], ptr[i*2+1]);
+		LOGWAVE("\t%02X: %08X %08X\n", i, ptr[i*2], ptr[i*2+1]);
 }
