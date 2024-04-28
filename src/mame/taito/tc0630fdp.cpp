@@ -49,7 +49,8 @@ static const gfx_layout layout_pivot = {
 // the roms connected in parallel to a 48-bit bus:
 // [AAAA AAAA AAAA AAAA|BBBB BBBB BBBB BBBB|CCCC CCCC CCCC CCCC]
 // each item contains data for 8 pixels (6 bits per pixel)
-// [0000 1111 2222 3333|4444 5555 6666 7777|0123 4567 0123 4567]
+// [1111 0000 3333 2222|5555 4444 7777 6666|0123 4567 0123 4567] pixels
+// [0123 0123 0123 0123|0123 0123 0123 0123|444444444 555555555] bitplanes
 // note that the upper two bitplanes are stored in a different order than the first four
 #define NEXT 48
 
@@ -80,7 +81,7 @@ static const gfx_layout layout_tile_hi = {
 // [AAAA AAAA|BBBB BBBB|CCCC CCCC]
 // each item contains data for 4 pixels (6 bits per pixel)
 // [1111 0000|3333 2222|3322 1100] pixels
-// [0123 0123|0123 0123|4545 4545] planes
+// [0123 0123|0123 0123|4545 4545] bitplanes
 // note that the upper two bitplanes are stored in a different order than the first four
 #undef NEXT
 #define NEXT 24
