@@ -58,7 +58,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_post_load(void) override;
 
 	TIMER_CALLBACK_MEMBER(trigger_int3);
 
@@ -75,13 +74,13 @@ protected:
 	emu_timer *m_interrupt3_timer;
 	u32 m_coin_word[2];
 
+	bool m_has_sample_banking{false};
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	void bubsympb_map(address_map &map);
 	void f3_map(address_map &map);
-	
-	bool m_has_sample_banking{false};
 
 private:
 	required_device<FDP> m_fdp;

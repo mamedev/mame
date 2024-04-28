@@ -33,6 +33,32 @@ void FDP::device_add_mconfig(machine_config &config) {
 	m_palette_12bit->set_entries(0x2000);//->set_format(RRRRGGGGBBBBxxxx, 0x2000);
 }
 
+void FDP::device_post_load()
+{
+	// force a reread of the dynamic tiles in the pixel layer
+	gfx(0)->mark_all_dirty();
+	gfx(1)->mark_all_dirty();
+
+	// refresh tile usage indexes
+	std::fill_n(*m_tilemap_row_usage, 32 * 8, 0);
+	std::fill_n(m_textram_row_usage, 64, 0);
+	// playfield blank tiles
+	for (int offset = 1; offset < 0x4000; offset += 2) {
+		const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
+		const int tmap = m_extend ? offset >> 12 : offset >> 11;
+		if (m_pfram[offset] != 0)
+			m_tilemap_row_usage[row][tmap] += 1;
+	}
+	// textram blank tiles
+	for (int offset = 0; offset < 0x1000; offset++) {
+		const u8 tile = BIT(m_textram[offset], 0, 8);
+		const int row  = BIT(offset, 6, 6);
+		if (tile != 0)
+			m_textram_row_usage[row] += 1;
+	}
+}
+
+
 #define INTERLEAVE44(start)  4+(start), 0+(start), 12+(start), 8+(start)
 #define STEP8_INV(START,STEP)  STEP4_INV((START)+4*(STEP),STEP),STEP4_INV(START,STEP)
 
@@ -286,7 +312,6 @@ TILE_GET_INFO_MEMBER(FDP::get_tile_info_pixel)
 void FDP::create_tilemaps(bool extend)
 {
 	m_extend = extend;
-	// TODO: extend can be changed at runtime.. how do we deal with that?
 	if (m_extend) {
 		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -307,6 +332,7 @@ void FDP::create_tilemaps(bool extend)
 		if (m_tilemap[i])
 			m_tilemap[i]->set_transparent_pen(0);
 	}
+	std::fill_n(*m_tilemap_row_usage, 32 * 8, 0);
 
 	if (m_extend) {
 		m_width_mask = 0x3ff; // 10 bits
@@ -322,6 +348,8 @@ void FDP::create_tilemaps(bool extend)
 	m_pixel_layer = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
+	std::fill_n(m_textram_row_usage, 64, 0);
+
 	
 	gfx(0)->set_source_and_total(reinterpret_cast<u8 *>(m_charram.target()), 256);
 	gfx(1)->set_source_and_total(reinterpret_cast<u8 *>(m_pivotram.target()), 2048);
@@ -360,15 +388,27 @@ u16 FDP::pfram_r(offs_t offset)
 
 void FDP::pfram_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	// [.ttt yyyy yxxx xxa|h] non-extend
+	// [.tty yyyy xxxx xxa|h] extend
+	const u16 prev_tile = m_pfram[offset];
+
 	COMBINE_DATA(&m_pfram[offset]);
 
-	if (m_extend) {
-		if (offset < 0x4000) {
-			m_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
+	if (offset < 0x4000) {
+		if (offset & 1) {
+			const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
+			const int tmap = m_extend ? offset >> 12 : offset >> 11;
+			if ((prev_tile == 0) && (m_pfram[offset] != 0))
+				m_tilemap_row_usage[row][tmap] += 1;
+			else if ((prev_tile != 0) && (m_pfram[offset] == 0))
+				m_tilemap_row_usage[row][tmap] -= 1;
 		}
-	} else {
-		if (offset < 0x4000)
+
+		if (m_extend) {
+			m_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
+		} else {
 			m_tilemap[offset >> 11]->mark_tile_dirty((offset & 0x7ff) >> 1);
+		}
 	}
 }
 
@@ -379,7 +419,16 @@ u16 FDP::textram_r(offs_t offset)
 
 void FDP::textram_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	const u8 prev_tile = BIT(m_textram[offset], 0, 8);
+
 	COMBINE_DATA(&m_textram[offset]);
+
+	const int row = BIT(offset, 6, 6);
+	const u8 tile = BIT(m_textram[offset], 0, 8);
+	if (prev_tile == 0 && tile != 0)
+		m_textram_row_usage[row] += 1;
+	else if (prev_tile != 0 && tile == 0)
+		m_textram_row_usage[row] -= 1;
 
 	m_vram_layer->mark_tile_dirty(offset);
 
@@ -460,7 +509,7 @@ void FDP::read_line_ram(f3_line_inf &line, int y)
 		if (const offs_t where = latched_addr(0, i)) {
 			const u16 colscroll = m_lineram[where];
 			line.pf[i].colscroll   = colscroll & 0x1ff;
-			line.pf[i].alt_tilemap = colscroll & 0x200;
+			line.pf[i].alt_tilemap = !m_extend && colscroll & 0x200;
 			line.clip[2*(i-2) + 0].set_upper(BIT(colscroll, 12), BIT(colscroll, 13));
 			line.clip[2*(i-2) + 1].set_upper(BIT(colscroll, 14), BIT(colscroll, 15));
 		}
@@ -489,15 +538,14 @@ void FDP::read_line_ram(f3_line_inf &line, int y)
 		}
 
 		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
-			line.sp[sp_group].mix_value &= 0x3fff;
-			line.sp[sp_group].mix_value |= BIT(line_6000, sp_group * 2, 2) << 14;
+			line.sp[sp_group].set_blend(BIT(line_6000, sp_group * 2, 2));
 		}
 	}
 	if (const offs_t where = latched_addr(2, 1)) { // blend values
 		const u16 blend_vals = m_lineram[where];
 		for (int idx = 0; idx < 4; idx++) {
 			const u8 alpha = BIT(blend_vals, 4 * idx, 4);
-			line.blend[idx] = std::min(255, (0xf - alpha) * 32);
+			line.blend[idx] = std::min(8, (0xf - alpha));
 		}
 	}
 	if (const offs_t where = latched_addr(2, 2)) { // mosaic, palette depth effects
@@ -555,8 +603,8 @@ void FDP::read_line_ram(f3_line_inf &line, int y)
 		}
 
 		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
-			line.sp[group].mix_value = (line.sp[group].mix_value & 0xc00f)
-					| BIT(sprite_mix, 0, 10) << 4;
+			line.sp[group].set_mix((line.sp[group].mix_value & 0xc00f)
+								   | BIT(sprite_mix, 0, 10) << 4);
 			line.sp[group].blend_select_v = BIT(sprite_mix, 12 + group, 1);
 		}
 	}
@@ -647,14 +695,14 @@ template<typename Mix>
 std::vector<FDP::clip_plane_inf>
 FDP::calc_clip(
 		const clip_plane_inf (&clip)[NUM_CLIPPLANES],
-		const Mix line)
+		const Mix &layer)
 {
 	constexpr s16 INF_L = H_START;
 	constexpr s16 INF_R = H_START + H_VIS;
 
-	std::bitset<4> normal_planes = line->clip_enable() & ~line->clip_inv();
-	std::bitset<4> invert_planes = line->clip_enable() & line->clip_inv();
-	if (!line->clip_inv_mode())
+	std::bitset<4> normal_planes = layer.clip_enable() & ~layer.clip_inv();
+	std::bitset<4> invert_planes = layer.clip_enable() & layer.clip_inv();
+	if (!layer.clip_inv_mode())
 		std::swap(normal_planes, invert_planes);
 
 	// start with a visible region spanning the entire space
@@ -713,7 +761,7 @@ static int mosaic(int x, u8 sample)
 
 inline bool FDP::mixable::layer_enable() const
 {
-	return (mix_value & 0x2000) && blend_mask() != 0b11;
+	return (mix_value & 0x2000) && blend_mode != 0b11;
 }
 inline int FDP::mixable::x_index(int x) const
 {
@@ -725,7 +773,7 @@ inline int FDP::mixable::y_index(int y) const
 }
 inline bool FDP::sprite_inf::layer_enable() const
 {
-	return (mix_value & 0x2000) && blend_mask() != 0b00;
+	return (mix_value & 0x2000) && blend_mode != 0b00;
 }
 inline u16 FDP::playfield_inf::palette_adjust(u16 pal) const
 {
@@ -741,7 +789,7 @@ inline int FDP::playfield_inf::y_index(int y) const
 }
 inline int FDP::pivot_inf::x_index(int x) const
 {
-	return (x + reg_sx) & 0x1FF;
+	return (x + reg_sx) & 0x1ff;
 }
 inline int FDP::pivot_inf::y_index(int y) const
 {
@@ -749,68 +797,74 @@ inline int FDP::pivot_inf::y_index(int y) const
 }
 
 template<typename Mix>
-bool FDP::mix_line(Mix &layer, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range)
+bool FDP::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_inf &line, const clip_plane_inf &range)
 {
 	const int y = layer.y_index(line.y);
 	const u16 *src = &layer.bitmap.src->pix(y);
 	const u8 *flags = layer.bitmap.flags ? &layer.bitmap.flags->pix(y) : nullptr;
 
 	for (int x = range.l; x < range.r; x++) {
-		if (layer.blend_mask() == pri[x].src_blendmode)
+		if (layer.blend_mode == pri.src_blendmode[x])
 			continue; // note that layers cannot blend against the same blend mode
 
 		const int real_x = layer.x_sample_enable ? mosaic(x, line.x_sample) : x;
 		const int layer_x = layer.x_index(real_x);
+
+		if constexpr (std::is_same_v<Mix, sprite_inf>) {
+			if (BIT(src[layer_x], 10, 2) != layer.index)
+				continue;
+		}
+
 		// tilemap transparent flag
 		if (flags && !(flags[layer_x] & 0xf0))
 			continue;
 
-		if (layer.prio > pri[x].src_prio) {
+		if (layer.prio > pri.src_prio[x]) {
 			// submit src pix
-			if (const u16 pal = layer.palette_adjust(src[layer_x])) {
+			if (const u16 c = src[layer_x]) {
+				const u16 pal = layer.palette_adjust(c);
 				// could be pulled out of loop for pivot and sprite
 				u8 sel = layer.blend_select(flags, layer_x);
 
-				switch (layer.blend_mask()) {
+				switch (layer.blend_mode) {
 				case 0b01: // normal blend
 					sel = 2 + sel;
 					[[fallthrough]];
 				case 0b10: // reverse blend
 					if (line.blend[sel] == 0)
 						continue; // could be early return for pivot and sprite
-					z[x].src_blend = line.blend[sel];
+					z.src_blend[x] = line.blend[sel];
 					break;
 				case 0b00: case 0b11: default: // opaque layer
 					if (line.blend[sel] + line.blend[2 + sel] == 0)
 						continue; // could be early return for pivot and sprite
-					z[x].src_blend = line.blend[2 + sel];
-					z[x].dst_blend = line.blend[sel];
-					pri[x].dst_prio = layer.prio;
-					z[x].dst_pal = pal;
+					z.src_blend[x] = line.blend[2 + sel];
+					z.dst_blend[x] = line.blend[sel];
+					pri.dst_prio[x] = layer.prio;
+					z.dst_pal[x] = pal;
 					break;
 				}
-
 				// lock in source color for blending and update the prio test buffer
-				z[x].src_pal = pal;
-				pri[x].src_blendmode = layer.blend_mask();
-				pri[x].src_prio = layer.prio;
+				z.src_pal[x] = pal;
+				pri.src_blendmode[x] = layer.blend_mode;
+				pri.src_prio[x] = layer.prio;
 			}
-		} else if (layer.prio >= pri[x].dst_prio) {
+		} else if (layer.prio >= pri.dst_prio[x]) {
 			// submit dest pix
-			if (const u16 pal = layer.palette_adjust(src[layer_x])) {
-				if (layer.prio != pri[x].dst_prio)
-					z[x].dst_pal = pal;
+			if (const u16 c = src[layer_x]) {
+				const u16 pal = layer.palette_adjust(c);
+				if (layer.prio != pri.dst_prio[x])
+					z.dst_pal[x] = pal;
 				else // prio conflict = color line conflict? (dariusg, bubblem)
-					z[x].dst_pal = 0;
-				pri[x].dst_prio = layer.prio;
-
+					z.dst_pal[x] = 0;
+				pri.dst_prio[x] = layer.prio;
 				const bool sel = layer.blend_select(flags, layer_x);
-				switch (pri[x].src_blendmode) {
+				switch (pri.src_blendmode[x]) {
 				case 0b01:
-					z[x].dst_blend = line.blend[sel];
+					z.dst_blend[x] = line.blend[sel];
 					break;
 				case 0b10: case 0b00: case 0b11: default:
-					z[x].dst_blend = line.blend[2 + sel];
+					z.dst_blend[x] = line.blend[2 + sel];
 					break;
 				}
 			}
@@ -821,25 +875,63 @@ bool FDP::mix_line(Mix &layer, mix_pix *z, pri_mode *pri, const f3_line_inf &lin
 	constexpr int DEBUG_Y = 180 + V_START;
 	if (TAITOF3_VIDEO_DEBUG && line.y == DEBUG_Y) {
 		logerror("[%X] %s%d: %d,%d (%d)\n   {pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
-				 layer.prio, layer.debug_name(), layer.debug_index,
+				 layer.prio, layer.debug_name(), layer.index,
 				 layer.blend_b(), layer.blend_a(), layer.blend_select(flags, 82),
-				 z[DEBUG_X].src_pal, z[DEBUG_X].dst_pal,
-				 z[DEBUG_X].src_blend, z[DEBUG_X].dst_blend,
-				 pri[DEBUG_X].src_prio, pri[DEBUG_X].dst_prio);
+				 z.src_pal[DEBUG_X], z.dst_pal[DEBUG_X],
+				 z.src_blend[DEBUG_X], z.dst_blend[DEBUG_X],
+				 pri.src_prio[DEBUG_X], pri.dst_prio[DEBUG_X]);
 	}
 
 	return false; // TODO: determine when we can stop drawing?
 }
 
-void FDP::render_line(pen_t *dst, const mix_pix (&z)[H_TOTAL])
+void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 {
-	const pen_t *clut = &m_palette->pen(0);
-	for (int x = H_START; x < H_START + H_VIS; x++) {
-		const mix_pix mix = z[x];
-		rgb_t s_rgb = clut[mix.src_pal];
-		rgb_t d_rgb = clut[mix.dst_pal];
-		dst[x] = (s_rgb.scale8(mix.src_blend) + d_rgb.scale8(mix.dst_blend)).set_a(255);
+	const pen_t *clut = m_palette->pens();
+	for (unsigned int x = H_START; x < H_START + H_VIS; x++) {
+		rgb_t s_rgb = clut[z.src_pal[x]];
+		rgb_t d_rgb = clut[z.dst_pal[x]];
+
+		// source_color * src_blend + dest_color * dst_blend
+		u16 r1 = s_rgb.r();
+		u16 g1 = s_rgb.g();
+		u16 b1 = s_rgb.b();
+		u16 r2 = d_rgb.r();
+		u16 g2 = d_rgb.g();
+		u16 b2 = d_rgb.b();
+		r1 *= z.src_blend[x]; // these blend contributions have fixed3 precision
+		g1 *= z.src_blend[x]; // i.e. 0 (b0'000) to 8 (b1'000) represents 0.0 to 1.0
+		b1 *= z.src_blend[x];
+		r2 *= z.dst_blend[x];
+		g2 *= z.dst_blend[x];
+		b2 *= z.dst_blend[x];
+		r1 += r2;
+		g1 += g2;
+		b1 += b2;
+
+		r1 >>= 3;
+		g1 >>= 3;
+		b1 >>= 3;
+		r1 = std::min(r1, static_cast<u16>(255));
+		g1 = std::min(g1, static_cast<u16>(255));
+		b1 = std::min(b1, static_cast<u16>(255));
+
+		dst[x] = rgb_t(r1, g1, b1);
 	}
+}
+
+inline bool FDP::used(const pivot_inf &layer, int y) const
+{
+	return layer.use_pix() || (m_textram_row_usage[layer.y_index(y) >> 3] > 0);
+}
+inline bool FDP::used(const sprite_inf &layer, int y) const
+{
+	return m_sprite_pri_row_usage[y] & (1 << layer.index);
+}
+inline bool FDP::used(const playfield_inf &layer, int y) const
+{
+	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
+	return m_tilemap_row_usage[y_adj >> 4][layer.index + (2 * layer.alt_tilemap)] > 0;
 }
 
 void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -849,16 +941,15 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
 	f3_line_inf line_data{};
 	for (int i=0; i < NUM_SPRITEGROUPS; i++) {
-		line_data.sp[i].bitmap = draw_source(&m_sprite_framebuffers[i]);
-		line_data.sp[i].sprite_pri_usage = &m_sprite_pri_row_usage;
-		line_data.sp[i].debug_index = i;
+		line_data.sp[i].bitmap = draw_source(&m_sprite_framebuffer);
+		line_data.sp[i].index = i;
 	}
 	for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
 		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
 
 		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
 		line_data.pf[pf].width_mask = m_width_mask;
-		line_data.pf[pf].debug_index = pf;
+		line_data.pf[pf].index = pf;
 	}
 	if (m_flipscreen) {
 		line_data.pivot.reg_sx = m_control_1[4] - 12;
@@ -868,7 +959,7 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		line_data.pivot.reg_sy = -m_control_1[5];
 	}
 
-	for (int screen_y = 0; screen_y != 256; screen_y += 1) {
+	for (unsigned int screen_y = 0; screen_y != 256; screen_y += 1) {
 		const int y = m_flipscreen ? (255 - screen_y) : screen_y;
 		read_line_ram(line_data, y);
 		line_data.y = screen_y;
@@ -890,10 +981,15 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			line_data.pivot.bitmap = draw_source(m_vram_layer);
 		}
 
-		mix_pix line_buf[H_TOTAL]{};
-		pri_mode line_pri[H_TOTAL]{};
+		// set up line blend pixel and priority buffers
+		mix_pix line_buf{};
+		pri_mode line_pri{};
 		// background palette -- what contributions should this default to?
-		std::fill_n(line_buf, H_TOTAL, mix_pix{0, line_data.bg_palette, 0x0, 0xff});
+		std::fill_n(line_buf.dst_pal, H_TOTAL, line_data.bg_palette);
+		std::fill_n(line_buf.dst_blend, H_TOTAL, 0xff);
+		// set an invalid blend mode as it affects mixing
+		std::fill_n(line_pri.src_blendmode, H_TOTAL, 0xff);
+		std::fill_n(line_pri.dst_blendmode, H_TOTAL, 0xff);
 
 		// sort layers
 		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
@@ -914,10 +1010,11 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			for (auto layer : layers) {
 				std::visit(
 						[this, &line_data, &line_buf, &line_pri] (auto &&arg) {
-							if (arg->layer_enable() && arg->used(line_data.y)) {
-								const auto clip_ranges = calc_clip(line_data.clip, arg);
+							const auto &layer = *arg;
+							if (layer.layer_enable() && used(layer, line_data.y)) {
+								const auto clip_ranges = calc_clip(line_data.clip, layer);
 								for (const auto &clip : clip_ranges) {
-									mix_line(*arg, &line_buf[0], &line_pri[0], line_data, clip);
+									mix_line(layer, line_buf, line_pri, line_data, clip);
 								}
 							}
 						},
@@ -926,9 +1023,9 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			if (TAITOF3_VIDEO_DEBUG == 1) {
 				if (y == 100) {
 					logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
-							 line_buf[180].src_pal, line_buf[180].dst_pal,
-							 line_buf[180].src_blend, line_buf[180].dst_blend,
-							 line_pri[180].src_prio, line_pri[180].dst_prio);
+							 line_buf.src_pal[180], line_buf.dst_pal[180],
+							 line_buf.src_blend[180], line_buf.dst_blend[180],
+							 line_pri.src_prio[180], line_pri.dst_prio[180]);
 					logerror("-' [%hhu,%hhu,%hhu,%hhu] '------------------------- 100\n", line_data.blend[0],
 							 line_data.blend[1], line_data.blend[2], line_data.blend[3]);
 				}
@@ -950,13 +1047,13 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 inline void FDP::f3_drawgfx(const tempsprite &sprite)
 {
-	bitmap_ind16 &dest_bmp = m_sprite_framebuffers[sprite.pri];
+	bitmap_ind16 &dest_bmp = m_sprite_framebuffer;
 
 	gfx_element *gfx2 = gfx(2);
 	const u8 *code_base = gfx2->get_data(sprite.code % gfx2->elements());
 
-	const u8 flipx = sprite.flip_x ? 0xF : 0;
-	const u8 flipy = sprite.flip_y ? 0xF : 0;
+	const u8 flipx = sprite.flip_x ? 0xf : 0;
+	const u8 flipy = sprite.flip_y ? 0xf : 0;
 
 	fixed8 dy8 = (sprite.y);
 	if (!m_flipscreen)
@@ -969,7 +1066,6 @@ inline void FDP::f3_drawgfx(const tempsprite &sprite)
 		dy8 += sprite.scale_y;
 		if (dy < V_START || dy >= V_END)
 			continue;
-		u8 *pri = &m_pri_alp_bitmap.pix(dy);
 		u16 *dest = &dest_bmp.pix(dy);
 		auto &usage = m_sprite_pri_row_usage[dy];
 		const u8 *src = &code_base[(y ^ flipy) * 16];
@@ -984,9 +1080,8 @@ inline void FDP::f3_drawgfx(const tempsprite &sprite)
 			if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
 				continue;
 			const u8 c = src[(x ^ flipx)] & m_sprite_pen_mask;
-			if (c && !pri[dx]) {
+			if (c && !dest[dx]) {
 				dest[dx] = gfx2->colorbase() + (sprite.color<<4 | c);
-				pri[dx] = 1;
 				usage |= 1<<sprite.pri;
 			}
 		}
@@ -1137,11 +1232,8 @@ void FDP::read_sprite_info()
 void FDP::draw_sprites()
 {
 	if (!m_sprite_trails) {
-		m_pri_alp_bitmap.fill(0);
 		std::fill_n(m_sprite_pri_row_usage, 256, 0);
-		for (auto &sp_bitmap : m_sprite_framebuffers) {
-			sp_bitmap.fill(0);
-		}
+		m_sprite_framebuffer.fill(0);
 	}
 
 	for (const auto *spr = m_sprite_end; spr-- != &m_spritelist[0]; ) {

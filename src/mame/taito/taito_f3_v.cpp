@@ -303,13 +303,6 @@ Playfield tile info:
 #include <algorithm>
 #include <variant>
 
-void taito_f3_state::device_post_load()
-{
-	/* force a reread of the dynamic tiles in the pixel layer */
-	m_fdp->gfx(0)->mark_all_dirty();
-	m_fdp->gfx(1)->mark_all_dirty();
-}
-
 /******************************************************************************/
 
 void taito_f3_state::screen_vblank(int state)
