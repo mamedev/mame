@@ -445,6 +445,7 @@ void taito_f3_state::bubsympb(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));
 
 	TC0630FDP(config, m_fdp, 26.686_MHz_XTAL / 4);
+	m_fdp->set_info(FDP::gfx_bubsympb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

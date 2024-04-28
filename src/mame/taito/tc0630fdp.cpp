@@ -137,10 +137,10 @@ GFXDECODE_END
 GFXDECODE_MEMBER( FDP::gfx_bubsympb )
 	GFXDECODE_DEVICE( nullptr,    0, layout_pivot,                 0x0000, 0x0400>>4) /* Dynamically modified */
 	GFXDECODE_DEVICE( nullptr,    0, layout_pivot,                 0x0000, 0x0400>>4) /* Dynamically modified */
-	GFXDECODE_DEVICE( "sprites",  0, layout_sprite_low,       0x1000, 0x1000>>4) /* Sprites area (6bpp planar) */
+	GFXDECODE_DEVICE( "sprites",  0, bubsympb_sprite_layout,       0x1000, 0x1000>>4) /* Sprites area (6bpp planar) */
 	GFXDECODE_DEVICE( "tiles",    0, layout_tile_low,              0x0000, 0x2000>>4) // low 4bpp of 5bpp tilemap data
 	GFXDECODE_DEVICE( "tiles",    0, layout_tile_hi,               0x0000, 0x2000>>4) // hi 1bpp of 5bpp tilemap data
-	GFXDECODE_DEVICE( "sprites",  0, layout_sprite_hi,       0x1000, 0x1000>>4) // dummy gfx duplicate for avoid crash
+//GFXDECODE_DEVICE( "sprites",  0, layout_sprite_hi,       0x1000, 0x1000>>4) // dummy gfx duplicate for avoid crash
 GFXDECODE_END
 
 // the upper 2 bitplanes are interleaved differently than the lower 4, so they have to be merged manually
