@@ -105,7 +105,7 @@ void taito_f3_state::sound_reset_1_w(u32 data)
 
 void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (m_game == KIRAMEKI) {
+	if (m_has_sample_banking) {
 		int idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
 			idx += 1;
@@ -175,14 +175,8 @@ void taito_f3_state::f3_map(address_map &map)
 	map(0x440000, 0x447fff).ram().w(FUNC(taito_f3_state::palette_24bit_w)).share("paletteram");
 	map(0x4a0000, 0x4a001f).rw(FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
 	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_timer_control_w));
-	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::spriteram_r), FUNC(taito_f3_state::spriteram_w));
-	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::pf_ram_r), FUNC(taito_f3_state::pf_ram_w));
-	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::textram_r), FUNC(taito_f3_state::textram_w));
-	map(0x61e000, 0x61ffff).rw(FUNC(taito_f3_state::charram_r), FUNC(taito_f3_state::charram_w));
-	map(0x620000, 0x62ffff).rw(FUNC(taito_f3_state::lineram_r), FUNC(taito_f3_state::lineram_w));
-	map(0x630000, 0x63ffff).rw(FUNC(taito_f3_state::pivot_r), FUNC(taito_f3_state::pivot_w));
-	map(0x660000, 0x66000f).w(FUNC(taito_f3_state::control_0_w));
-	map(0x660010, 0x66001f).w(FUNC(taito_f3_state::control_1_w));
+	map(0x600000, 0x63ffff).m(m_fdp, FUNC(FDP::map_ram));
+	map(0x660000, 0x66001f).m(m_fdp, FUNC(FDP::map_control));
 	map(0xc00000, 0xc007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0xc80000, 0xc80003).w(FUNC(taito_f3_state::sound_reset_0_w));
 	map(0xc80100, 0xc80103).w(FUNC(taito_f3_state::sound_reset_1_w));
@@ -210,14 +204,8 @@ void taito_f3_state::bubsympb_map(address_map &map)
 	map(0x4a001d, 0x4a001d).w(FUNC(taito_f3_state::bubsympb_oki_w));
 	map(0x4a001f, 0x4a001f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x4c0000, 0x4c0003).w(FUNC(taito_f3_state::f3_timer_control_w));
-	map(0x600000, 0x60ffff).rw(FUNC(taito_f3_state::spriteram_r), FUNC(taito_f3_state::spriteram_w));
-	map(0x610000, 0x61bfff).rw(FUNC(taito_f3_state::pf_ram_r), FUNC(taito_f3_state::pf_ram_w));
-	map(0x61c000, 0x61dfff).rw(FUNC(taito_f3_state::textram_r), FUNC(taito_f3_state::textram_w));
-	map(0x61e000, 0x61ffff).rw(FUNC(taito_f3_state::charram_r), FUNC(taito_f3_state::charram_w));
-	map(0x620000, 0x62ffff).rw(FUNC(taito_f3_state::lineram_r), FUNC(taito_f3_state::lineram_w));
-	map(0x630000, 0x63ffff).rw(FUNC(taito_f3_state::pivot_r), FUNC(taito_f3_state::pivot_w));
-	map(0x660000, 0x66000f).w(FUNC(taito_f3_state::control_0_w));
-	map(0x660010, 0x66001f).w(FUNC(taito_f3_state::control_1_w));
+	map(0x600000, 0x63ffff).m(m_fdp, FUNC(FDP::map_ram));
+	map(0x660000, 0x66001f).m(m_fdp, FUNC(FDP::map_control));
 	map(0xc00000, 0xc007ff).ram();
 }
 
@@ -351,57 +339,6 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout charlayout = {
-	8,8,
-	256,
-	4,
-	{ 0,1,2,3 },
-	{ 20, 16, 28, 24, 4, 0, 12, 8 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
-static const gfx_layout pivotlayout = {
-	8,8,
-	2048,
-	4,
-	{ 0,1,2,3 },
-	{ 20, 16, 28, 24, 4, 0, 12, 8 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
-static const gfx_layout layout_6bpp_sprite_hi = {
-	16,16,
-	RGN_FRAC(1,1),
-	6,
-	{ STEP2(0,1)/**/,0,0,0,0/**/ },
-	{ STEP4(3*2,-2), STEP4(7*2,-2), STEP4(11*2,-2), STEP4(15*2,-2) },
-	{ STEP16(0,16*2) },
-	16*16*2
-};
-
-static const gfx_layout layout_6bpp_tile_hi = {
-	16,16,
-	RGN_FRAC(1,1),
-	6,
-	{ 8,0/**/,0,0,0,0/**/ },
-	{ STEP8(7,-1), STEP8(8*2+7,-1) },
-	{ STEP16(0,8*2*2) },
-	16*16*2
-};
-
-static GFXDECODE_START( gfx_taito_f3 )
-	GFXDECODE_ENTRY( nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
-	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
-	GFXDECODE_ENTRY( "tilemap_hi", 0, layout_6bpp_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
-	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_sprite_hi,  0x1000, 0x1000>>4 ) // hi 2bpp of 6bpp sprite data
-GFXDECODE_END
-
-/******************************************************************************/
-
 TIMER_CALLBACK_MEMBER(taito_f3_state::trigger_int3)
 {
 	// some signal from video hardware?
@@ -442,8 +379,7 @@ void taito_f3_state::f3(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// from taito z system and crystal on board
-	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/
+	// measured from hardware
 	m_screen->set_raw(
 			26.686_MHz_XTAL / 4,
 			432, 46, 320 + 46,
@@ -453,8 +389,7 @@ void taito_f3_state::f3(machine_config &config)
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_f3);
-	PALETTE(config, m_palette).set_entries(0x2000);
+	TC0630FDP(config, m_fdp, 26.686_MHz_XTAL / 4);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -488,35 +423,6 @@ void taito_f3_state::f3_224c(machine_config &config)
 	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
 }
 
-static const gfx_layout bubsympb_sprite_layout = {
-	16,16,
-	RGN_FRAC(1,6),
-	6,
-	{ RGN_FRAC(0,6), RGN_FRAC(1,6), RGN_FRAC(2,6), RGN_FRAC(3,6), RGN_FRAC(4,6), RGN_FRAC(5,6) },
-	{ STEP16(15,-1) },
-	{ STEP16(0,16) },
-	16*16
-};
-
-static const gfx_layout bubsympb_layout_5bpp_tile_hi = {
-	16,16,
-	RGN_FRAC(1,1),
-	5,
-	{ 0/**/,0,0,0,0/**/ },
-	{ STEP8(7,-1), STEP8(15,-1) },
-	{ STEP16(0,16) },
-	16*16
-};
-
-
-static GFXDECODE_START( gfx_bubsympb )
-	GFXDECODE_ENTRY( nullptr,      0, charlayout,                   0,  64 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,                  0,  64 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "sprites",    0, bubsympb_sprite_layout,    4096, 256 ) /* Sprites area (6bpp planar) */
-	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb,       0, 512 ) // low 4bpp of 5bpp tilemap data
-	GFXDECODE_ENTRY( "tilemap_hi", 0, bubsympb_layout_5bpp_tile_hi, 0, 512 ) // hi 1bpp of 5bpp tilemap data
-	GFXDECODE_ENTRY( "sprites",    0, bubsympb_sprite_layout,    4096, 256 ) // dummy gfx duplicate for avoid crash
-GFXDECODE_END
 
 void taito_f3_state::bubsympb(machine_config &config)
 {
@@ -531,15 +437,14 @@ void taito_f3_state::bubsympb(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(58.97);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
-	m_screen->set_size(40*8+48*2, 32*8);
-	m_screen->set_visarea(46, 40*8-1 + 46, 31, 31+224-1);
+	m_screen->set_raw(
+			26.686_MHz_XTAL / 4,
+			432, 46, 320 + 46,
+			262, 24, 232 + 24);
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bubsympb);
-	PALETTE(config, m_palette).set_entries(0x2000);
+	TC0630FDP(config, m_fdp, 26.686_MHz_XTAL / 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -547,6 +452,57 @@ void taito_f3_state::bubsympb(machine_config &config)
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // not verified
 	m_oki->set_addrmap(0, &taito_f3_state::bubsympb_oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+/******************************************************************************/
+
+void taito_f3_state::init_common()
+{
+	m_fdp->tile_decode();
+}
+
+void taito_f3_state::init_kirameki()
+{
+	m_has_sample_banking = true;
+	
+	init_common();
+}
+
+void taito_f3_state::init_bubsympb()
+{
+	// almost certainly wrong
+	m_okibank->configure_entries(0, 5, memregion("oki")->base() + 0x30000, 0x10000);
+	
+	init_common();
+}
+
+void taito_f3_state::init_landmkrp()
+{
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
+
+	/* For some reason the least significant byte in the last 2 long words of
+	ROM is swapped.  As the roms have been verified ok, I assume this is some
+	kind of basic security on the prototype development board to prevent 'release'
+	roms running on it.  Easiest thing to do is switch the data around here */
+	ROM[0x1ffff8/4]=0xffffffff; /* From 0xffffff03 */
+	ROM[0x1ffffc/4]=0xffff0003; /* From 0xffff00ff */
+	
+	init_common();
+}
+
+void taito_f3_state::init_pbobbl2p()
+{
+	// has 040092: beq     $30000; (2+)
+	// which eventually causes the game to crash
+	//  -- protection check?? or some kind of checksum fail?
+
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
+
+	/* protection? */
+	ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);
+	ROM[0x40094/4]=0x4e714e71;
+	
+	init_common();
 }
 
 /******************************************************************************/
@@ -3905,437 +3861,105 @@ ROM_END
 
 /******************************************************************************/
 
-void taito_f3_state::tile_decode()
-{
-	/* Setup ROM formats:
-
-	    Some games will only use 4 or 5 bpp sprites, and some only use 4 bpp tiles,
-	    I don't believe this is software or prom controlled but simply the unused data lines
-	    are tied low on the game board if unused.  This is backed up by the fact the palette
-	    indices are always related to 4 bpp data, even in 6 bpp games.
-
-	    Most (all?) games with 5bpp tiles have the sixth bit set. Also, in Arabian Magic
-	    sprites 1200-120f contain 6bpp data which is probably bogus.
-	    video_start clears the fifth and sixth bit of the decoded graphics according
-	    to the bit depth specified in f3_config_table.
-
-	*/
-
-	u8 *dest;
-	// all but bubsymphb (bootleg board with different sprite gfx layout), 2mindril (no sprite gfx roms)
-	if (m_gfxdecode->gfx(5) != nullptr) {
-		gfx_element *spr_gfx = m_gfxdecode->gfx(2);
-		gfx_element *spr_gfx_hi = m_gfxdecode->gfx(5);
-
-		// allocate memory for the assembled data
-		m_decoded_gfx5 = std::make_unique<u8[]>(spr_gfx->elements() * spr_gfx->width() * spr_gfx->height());
-
-		// loop over elements
-		dest = m_decoded_gfx5.get();
-		for (int c = 0; c < spr_gfx->elements(); c++) {
-			const u8 *c1base = spr_gfx->get_data(c);
-			const u8 *c3base = spr_gfx_hi->get_data(c);
-
-			// loop over height
-			for (int y = 0; y < spr_gfx->height(); y++) {
-				const u8 *c1 = c1base;
-				const u8 *c3 = c3base;
-
-				/* Expand 2bits into 4bits format */
-				for (int x = 0; x < spr_gfx->width(); x++)
-					*dest++ = (*c1++ & 0xf) | (*c3++ & 0x30);
-
-				c1base += spr_gfx->rowbytes();
-				c3base += spr_gfx_hi->rowbytes();
-			}
-		}
-
-		spr_gfx->set_raw_layout(m_decoded_gfx5.get(), spr_gfx->width(), spr_gfx->height(), spr_gfx->elements(), 8 * spr_gfx->width(), 8 * spr_gfx->width() * spr_gfx->height());
-		m_gfxdecode->set_gfx(5, nullptr);
-	}
-
-	if (m_gfxdecode->gfx(4) != nullptr) {
-		gfx_element *pf_gfx = m_gfxdecode->gfx(3);
-		gfx_element *pf_gfx_hi = m_gfxdecode->gfx(4);
-
-		// allocate memory for the assembled data
-		m_decoded_gfx4 = std::make_unique<u8[]>(pf_gfx->elements() * pf_gfx->width() * pf_gfx->height());
-
-		// loop over elements
-		dest = m_decoded_gfx4.get();
-		for (int c = 0; c < pf_gfx->elements(); c++) {
-			const u8 *c0base = pf_gfx->get_data(c);
-			const u8 *c2base = pf_gfx_hi->get_data(c);
-
-			// loop over height
-			for (int y = 0; y < pf_gfx->height(); y++) {
-				const u8 *c0 = c0base;
-				const u8 *c2 = c2base;
-
-				for (int x = 0; x < pf_gfx->width(); x++)
-					*dest++ = (*c0++ & 0xf) | (*c2++ & 0x30);
-
-				c0base += pf_gfx->rowbytes();
-				c2base += pf_gfx_hi->rowbytes();
-			}
-		}
-
-		pf_gfx->set_raw_layout(m_decoded_gfx4.get(), pf_gfx->width(), pf_gfx->height(), pf_gfx->elements(), 8 * pf_gfx->width(), 8 * pf_gfx->width() * pf_gfx->height());
-		m_gfxdecode->set_gfx(4, nullptr);
-	}
-}
-
-void taito_f3_state::init_ringrage()
-{
-	m_game=RINGRAGE;
-	tile_decode();
-}
-
-void taito_f3_state::init_arabianm()
-{
-	m_game=ARABIANM;
-	tile_decode();
-}
-
-void taito_f3_state::init_ridingf()
-{
-	m_game=RIDINGF;
-	tile_decode();
-}
-
-void taito_f3_state::init_gseeker()
-{
-	m_game=GSEEKER;
-	tile_decode();
-}
-
-void taito_f3_state::init_gunlock()
-{
-	m_game=GUNLOCK;
-	tile_decode();
-}
-
-void taito_f3_state::init_elvactr()
-{
-	m_game=EACTION2;
-	tile_decode();
-}
-
-void taito_f3_state::init_cupfinal()
-{
-	m_game=SCFINALS;
-	tile_decode();
-}
-
-void taito_f3_state::init_trstaroj()
-{
-	m_game=TRSTAR;
-	tile_decode();
-}
-
-void taito_f3_state::init_scfinals()
-{
-	m_game=SCFINALS;
-	tile_decode();
-}
-
-void taito_f3_state::init_lightbr()
-{
-	m_game=LIGHTBR;
-	tile_decode();
-}
-
-void taito_f3_state::init_kaiserkn()
-{
-	m_game=KAISERKN;
-	tile_decode();
-}
-
-void taito_f3_state::init_dariusg()
-{
-	m_game=DARIUSG;
-	tile_decode();
-}
-
-void taito_f3_state::init_spcinvdj()
-{
-	m_game=SPCINVDX;
-	tile_decode();
-}
-
-void taito_f3_state::init_qtheater()
-{
-	m_game=QTHEATER;
-	tile_decode();
-}
-
-void taito_f3_state::init_spcinv95()
-{
-	m_game=SPCINV95;
-	tile_decode();
-}
-
-void taito_f3_state::init_gekirido()
-{
-	m_game=GEKIRIDO;
-	tile_decode();
-}
-
-void taito_f3_state::init_ktiger2()
-{
-	m_game=KTIGER2;
-	tile_decode();
-}
-
-void taito_f3_state::init_bubsymph()
-{
-	m_game=BUBSYMPH;
-	tile_decode();
-}
-
-void taito_f3_state::init_bubsympb()
-{
-	m_game=BUBSYMPH;
-	tile_decode();
-
-	// almost certainly wrong
-	m_okibank->configure_entries(0, 5, memregion("oki")->base() + 0x30000, 0x10000);
-}
-
-void taito_f3_state::init_bubblem()
-{
-	m_game=BUBBLEM;
-	tile_decode();
-}
-
-void taito_f3_state::init_cleopatr()
-{
-	m_game=CLEOPATR;
-	tile_decode();
-}
-
-void taito_f3_state::init_popnpop()
-{
-	m_game=POPNPOP;
-	tile_decode();
-}
-
-void taito_f3_state::init_landmakr()
-{
-	m_game=LANDMAKR;
-	tile_decode();
-}
-
-void taito_f3_state::init_landmkrp()
-{
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
-
-	/* For some reason the least significant byte in the last 2 long words of
-	ROM is swapped.  As the roms have been verified ok, I assume this is some
-	kind of basic security on the prototype development board to prevent 'release'
-	roms running on it.  Easiest thing to do is switch the data around here */
-	ROM[0x1ffff8/4]=0xffffffff; /* From 0xffffff03 */
-	ROM[0x1ffffc/4]=0xffff0003; /* From 0xffff00ff */
-
-	m_game=LANDMAKR;
-	tile_decode();
-}
-
-void taito_f3_state::init_pbobble3()
-{
-	m_game=PBOBBLE3;
-	tile_decode();
-}
-
-void taito_f3_state::init_pbobble4()
-{
-	m_game=PBOBBLE4;
-	tile_decode();
-}
-
-void taito_f3_state::init_quizhuhu()
-{
-	m_game=QUIZHUHU;
-	tile_decode();
-}
-
-void taito_f3_state::init_pbobble2()
-{
-	m_game=PBOBBLE2;
-	tile_decode();
-}
-
-void taito_f3_state::init_pbobbl2p()
-{
-	// has 040092: beq     $30000; (2+)
-	// which eventually causes the game to crash
-	//  -- protection check?? or some kind of checksum fail?
-
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
-
-	/* protection? */
-	ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);
-	ROM[0x40094/4]=0x4e714e71;
-
-	m_game=PBOBBLE2;
-	tile_decode();
-}
-
-void taito_f3_state::init_pbobbl2x()
-{
-	m_game=PBOBBLE2;
-	tile_decode();
-}
-
-void taito_f3_state::init_hthero95()
-{
-	m_game=HTHERO95;
-	tile_decode();
-}
-
-void taito_f3_state::init_kirameki()
-{
-	m_game=KIRAMEKI;
-	tile_decode();
-}
-
-void taito_f3_state::init_puchicar()
-{
-	m_game=PUCHICAR;
-	tile_decode();
-}
-
-void taito_f3_state::init_twinqix()
-{
-	m_game=TWINQIX;
-	tile_decode();
-}
-
-void taito_f3_state::init_arkretrn()
-{
-	m_game=ARKRETRN;
-	tile_decode();
-}
-
-void taito_f3_state::init_intcup94()
-{
-	m_game=SCFINALS;
-	tile_decode();
-}
-
-void taito_f3_state::init_recalh()
-{
-	m_game=RECALH;
-	tile_decode();
-}
-
-void taito_f3_state::init_commandw()
-{
-	m_game=COMMANDW;
-	tile_decode();
-}
-
-/******************************************************************************/
-
-GAME( 1992, ringrage,   0,        f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito Corporation Japan",   "Ring Rage (Ver 2.3O 1992/08/09)", 0 )
-GAME( 1992, ringragej,  ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito Corporation",         "Ring Rage (Ver 2.3J 1992/08/09)", 0 )
-GAME( 1992, ringrageu,  ringrage, f3_224a, f3, taito_f3_state, init_ringrage, ROT0,   "Taito America Corporation", "Ring Rage (Ver 2.3A 1992/08/09)", 0 )
-GAME( 1992, arabianm,   0,        f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito Corporation Japan",   "Arabian Magic (Ver 1.0O 1992/07/06)", 0 )
-GAME( 1992, arabianmj,  arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito Corporation",         "Arabian Magic (Ver 1.0J 1992/07/06)", 0 )
-GAME( 1992, arabianmu,  arabianm, f3_224a, f3, taito_f3_state, init_arabianm, ROT0,   "Taito America Corporation", "Arabian Magic (Ver 1.0A 1992/07/06)", 0 )
-GAME( 1992, ridingf,    0,        f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito Corporation Japan",   "Riding Fight (Ver 1.0O)", 0 )
-GAME( 1992, ridingfj,   ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito Corporation",         "Riding Fight (Ver 1.0J)", 0 )
-GAME( 1992, ridingfu,   ridingf,  f3_224b, f3, taito_f3_state, init_ridingf,  ROT0,   "Taito America Corporation", "Riding Fight (Ver 1.0A)", 0 )
-GAME( 1992, gseeker,    0,        f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito Corporation Japan",   "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
-GAME( 1992, gseekerj,   gseeker,  f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito Corporation",         "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
-GAME( 1992, gseekeru,   gseeker,  f3_224b, f3, taito_f3_state, init_gseeker,  ROT90,  "Taito America Corporation", "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
-GAME( 1992, commandw,   0,        f3_224b, f3, taito_f3_state, init_commandw, ROT0,   "Taito Corporation",         "Command War - Super Special Battle & War Game (Ver 0.0J, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ringrage,   0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Ring Rage (Ver 2.3O 1992/08/09)", 0 )
+GAME( 1992, ringragej,  ringrage, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Ring Rage (Ver 2.3J 1992/08/09)", 0 )
+GAME( 1992, ringrageu,  ringrage, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Ring Rage (Ver 2.3A 1992/08/09)", 0 )
+GAME( 1992, arabianm,   0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Arabian Magic (Ver 1.0O 1992/07/06)", 0 )
+GAME( 1992, arabianmj,  arabianm, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Arabian Magic (Ver 1.0J 1992/07/06)", 0 )
+GAME( 1992, arabianmu,  arabianm, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Arabian Magic (Ver 1.0A 1992/07/06)", 0 )
+GAME( 1992, ridingf,    0,        f3_224b, f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation Japan",   "Riding Fight (Ver 1.0O)", 0 )
+GAME( 1992, ridingfj,   ridingf,  f3_224b, f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Riding Fight (Ver 1.0J)", 0 )
+GAME( 1992, ridingfu,   ridingf,  f3_224b, f3, taito_f3_state, init_common,  ROT0,   "Taito America Corporation", "Riding Fight (Ver 1.0A)", 0 )
+GAME( 1992, gseeker,    0,        f3_224b, f3, taito_f3_state, init_common,  ROT90,  "Taito Corporation Japan",   "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
+GAME( 1992, gseekerj,   gseeker,  f3_224b, f3, taito_f3_state, init_common,  ROT90,  "Taito Corporation",         "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
+GAME( 1992, gseekeru,   gseeker,  f3_224b, f3, taito_f3_state, init_common,  ROT90,  "Taito America Corporation", "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
+GAME( 1992, commandw,   0,        f3_224b, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Command War - Super Special Battle & War Game (Ver 0.0J, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 /* Most of the football games share some GFX roms but shouldn't be considered clones unless they have the same Taito game code for the program roms */
-GAME( 1993, cupfinal,   0,        f3_224a, f3, taito_f3_state, init_cupfinal, ROT0,   "Taito Corporation Japan",   "Taito Cup Finals (Ver 1.0O 1993/02/28)", 0 )
-GAME( 1993, hthero93,   cupfinal, f3_224a, f3, taito_f3_state, init_cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0J 1993/02/28)", 0 )
-GAME( 1993, hthero93u,  cupfinal, f3_224a, f3, taito_f3_state, init_cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0A 1993/02/28)", 0 )
-GAME( 1993, trstar,     0,        f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (New Version)", 0 )
-GAME( 1993, trstarj,    trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (New Version)", 0 )
-GAME( 1993, trstaro,    trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (Old Version)", 0 )
-GAME( 1993, trstaroj,   trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (Old Version)", 0 )
-GAME( 1993, prmtmfgt,   trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (New Version)", 0 )
-GAME( 1993, prmtmfgto,  trstar,   f3,      f3, taito_f3_state, init_trstaroj, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (Old Version)", 0 )
-GAME( 1993, gunlock,    0,        f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito Corporation Japan",   "Gunlock (Ver 2.3O 1994/01/20)", 0 )
-GAME( 1993, gunlocko,   gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT270, "Taito Corporation Japan",   "Gunlock (Ver 2.0O 1993/12/15)", 0 )
-GAME( 1993, rayforcej,  gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito Corporation",         "Ray Force (Ver 2.3J 1994/01/20)", 0 )
-GAME( 1993, rayforce,   gunlock,  f3_224a, f3, taito_f3_state, init_gunlock,  ROT90,  "Taito America Corporation", "Ray Force (Ver 2.3A 1994/01/20)", 0 )
-GAME( 1993, scfinals,   0,        f3_224a, f3, taito_f3_state, init_scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.2O 1994/01/13, single PCB)", 0 )
-GAME( 1993, scfinalso,  scfinals, f3_224a, f3, taito_f3_state, init_scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19, single PCB)", 0 )
-GAME( 1993, scfinalsoc, scfinals, f3_224a, f3, taito_f3_state, init_scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19, F3 Cartridge)", 0 )
-GAME( 1993, lightbr,    0,        f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito Corporation Japan",   "Light Bringer (Ver 2.2O 1994/04/08)", 0 )
-GAME( 1993, lightbrj,   lightbr,  f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito Corporation",         "Light Bringer (Ver 2.1J 1994/02/18)", 0 )
-GAME( 1993, dungeonm,   lightbr,  f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito Corporation Japan",   "Dungeon Magic (Ver 2.1O 1994/02/18)", 0 )
-GAME( 1993, dungeonmu,  lightbr,  f3_224a, f3, taito_f3_state, init_lightbr,  ROT0,   "Taito America Corporation", "Dungeon Magic (Ver 2.1A 1994/02/18)", 0 )
-GAME( 1994, intcup94,   0,        f3_224a, f3, taito_f3_state, init_intcup94, ROT0,   "Taito Corporation Japan",   "International Cup '94 (Ver 2.2O 1994/05/26)", 0 )
-GAME( 1994, hthero94,   intcup94, f3_224a, f3, taito_f3_state, init_intcup94, ROT0,   "Taito America Corporation", "Hat Trick Hero '94 (Ver 2.2A 1994/05/26)", 0 )
-GAME( 1994, kaiserkn,   0,        f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito Corporation Japan",   "Kaiser Knuckle (Ver 2.1O 1994/07/29)", 0 )
-GAME( 1994, kaiserknj,  kaiserkn, f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito Corporation",         "Kaiser Knuckle (Ver 2.1J 1994/07/29)", 0 )
-GAME( 1994, gblchmp,    kaiserkn, f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito America Corporation", "Global Champion (Ver 2.1A 1994/07/29)", 0 )
-GAME( 1994, dankuga,    0,        f3_224a, kn, taito_f3_state, init_kaiserkn, ROT0,   "Taito Corporation",         "Dan-Ku-Ga (Ver 0.0J 1994/12/13, prototype)", 0 )
-GAME( 1994, dariusg,    0,        f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito Corporation Japan",   "Darius Gaiden - Silver Hawk (Ver 2.5O 1994/09/19)", 0 )
-GAME( 1994, dariusgj,   dariusg,  f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)", 0 )
-GAME( 1994, dariusgu,   dariusg,  f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito America Corporation", "Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)", 0 )
-GAME( 1994, dariusgx,   0,        f3,      f3, taito_f3_state, init_dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
-GAME( 1994, bublbob2,   0,        f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.6O 1994/12/16)", 0 )
-GAME( 1994, bublbob2o,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
-GAME( 1994, bublbob2p,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)", 0 )
-GAME( 1994, bubsymphe,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
-GAME( 1994, bubsymphu,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )
-GAME( 1994, bubsymphj,  bublbob2, f3_224a, f3, taito_f3_state, init_bubsymph, ROT0,   "Taito Corporation",         "Bubble Symphony (Ver 2.5J 1994/10/05)", 0 )
+GAME( 1993, cupfinal,   0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Taito Cup Finals (Ver 1.0O 1993/02/28)", 0 )
+GAME( 1993, hthero93,   cupfinal, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0J 1993/02/28)", 0 )
+GAME( 1993, hthero93u,  cupfinal, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0A 1993/02/28)", 0 )
+GAME( 1993, trstar,     0,        f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (New Version)", 0 )
+GAME( 1993, trstarj,    trstar,   f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (New Version)", 0 )
+GAME( 1993, trstaro,    trstar,   f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (Old Version)", 0 )
+GAME( 1993, trstaroj,   trstar,   f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (Old Version)", 0 )
+GAME( 1993, prmtmfgt,   trstar,   f3,      f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (New Version)", 0 )
+GAME( 1993, prmtmfgto,  trstar,   f3,      f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Prime Time Fighter (Ver 2.1A 1993/05/21) (Old Version)", 0 )
+GAME( 1993, gunlock,    0,        f3_224a, f3, taito_f3_state, init_common,  ROT90,  "Taito Corporation Japan",   "Gunlock (Ver 2.3O 1994/01/20)", 0 )
+GAME( 1993, gunlocko,   gunlock,  f3_224a, f3, taito_f3_state, init_common,  ROT270, "Taito Corporation Japan",   "Gunlock (Ver 2.0O 1993/12/15)", 0 )
+GAME( 1993, rayforcej,  gunlock,  f3_224a, f3, taito_f3_state, init_common,  ROT90,  "Taito Corporation",         "Ray Force (Ver 2.3J 1994/01/20)", 0 )
+GAME( 1993, rayforce,   gunlock,  f3_224a, f3, taito_f3_state, init_common,  ROT90,  "Taito America Corporation", "Ray Force (Ver 2.3A 1994/01/20)", 0 )
+GAME( 1993, scfinals,   0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.2O 1994/01/13, single PCB)", 0 )
+GAME( 1993, scfinalso,  scfinals, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19, single PCB)", 0 )
+GAME( 1993, scfinalsoc, scfinals, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19, F3 Cartridge)", 0 )
+GAME( 1993, lightbr,    0,        f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation Japan",   "Light Bringer (Ver 2.2O 1994/04/08)", 0 )
+GAME( 1993, lightbrj,   lightbr,  f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Light Bringer (Ver 2.1J 1994/02/18)", 0 )
+GAME( 1993, dungeonm,   lightbr,  f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation Japan",   "Dungeon Magic (Ver 2.1O 1994/02/18)", 0 )
+GAME( 1993, dungeonmu,  lightbr,  f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito America Corporation", "Dungeon Magic (Ver 2.1A 1994/02/18)", 0 )
+GAME( 1994, intcup94,   0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "International Cup '94 (Ver 2.2O 1994/05/26)", 0 )
+GAME( 1994, hthero94,   intcup94, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Hat Trick Hero '94 (Ver 2.2A 1994/05/26)", 0 )
+GAME( 1994, kaiserkn,   0,        f3_224a, kn, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Kaiser Knuckle (Ver 2.1O 1994/07/29)", 0 )
+GAME( 1994, kaiserknj,  kaiserkn, f3_224a, kn, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Kaiser Knuckle (Ver 2.1J 1994/07/29)", 0 )
+GAME( 1994, gblchmp,    kaiserkn, f3_224a, kn, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Global Champion (Ver 2.1A 1994/07/29)", 0 )
+GAME( 1994, dankuga,    0,        f3_224a, kn, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Dan-Ku-Ga (Ver 0.0J 1994/12/13, prototype)", 0 )
+GAME( 1994, dariusg,    0,        f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation Japan",   "Darius Gaiden - Silver Hawk (Ver 2.5O 1994/09/19)", 0 )
+GAME( 1994, dariusgj,   dariusg,  f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)", 0 )
+GAME( 1994, dariusgu,   dariusg,  f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito America Corporation", "Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)", 0 )
+GAME( 1994, dariusgx,   0,        f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
+GAME( 1994, bublbob2,   0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.6O 1994/12/16)", 0 )
+GAME( 1994, bublbob2o,  bublbob2, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
+GAME( 1994, bublbob2p,  bublbob2, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)", 0 )
+GAME( 1994, bubsymphe,  bublbob2, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
+GAME( 1994, bubsymphu,  bublbob2, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )
+GAME( 1994, bubsymphj,  bublbob2, f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Bubble Symphony (Ver 2.5J 1994/10/05)", 0 )
 GAME( 1994, bubsymphb,  bublbob2, bubsympb,f3, taito_f3_state, init_bubsympb, ROT0,   "bootleg",                   "Bubble Symphony (bootleg with OKI6295)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // backgrounds don't display, OKI banking is wrong
 GAME( 1994, bubsymphba, bublbob2, bubsympb,f3, taito_f3_state, init_bubsympb, ROT0,   "bootleg (SOFTV)",           "Seoul Symphony (Bubble Symphony bootleg with OKI6295)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // backgrounds don't display, OKI banking is wrong
-GAME( 1994, spcinvdj,   spacedx,  f3,      f3, taito_f3_state, init_spcinvdj, ROT0,   "Taito Corporation",         "Space Invaders DX (Ver 2.6J 1994/09/14) (F3 Version)", 0 )
-GAME( 1994, pwrgoal,    0,        f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation Japan",   "Taito Power Goal (Ver 2.5O 1994/11/03)", 0 )
-GAME( 1994, hthero95,   pwrgoal,  f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation",         "Hat Trick Hero '95 (Ver 2.5J 1994/11/03)", 0 )
-GAME( 1994, hthero95u,  pwrgoal,  f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito America Corporation", "Hat Trick Hero '95 (Ver 2.5A 1994/11/03)", 0 )
-GAME( 1994, hthero95a,  pwrgoal,  f3_224a, f3, taito_f3_state, init_hthero95, ROT0,   "Taito Corporation Japan",   "Hat Trick Hero '95 (Ver 2.6Asia 1994/11/17)", 0 )
-GAME( 1994, qtheater,   0,        f3_224c, f3, taito_f3_state, init_qtheater, ROT0,   "Taito Corporation",         "Quiz Theater - 3tsu no Monogatari (Ver 2.3J 1994/11/10)", 0 )
-GAME( 1994, elvactr,    0,        f3,      f3, taito_f3_state, init_elvactr,  ROT0,   "Taito Corporation Japan",   "Elevator Action Returns (Ver 2.2O 1995/02/20)", 0 )
-GAME( 1994, elvactrj,   elvactr,  f3,      f3, taito_f3_state, init_elvactr,  ROT0,   "Taito Corporation",         "Elevator Action Returns (Ver 2.2J 1995/02/20)", 0 )
-GAME( 1994, elvact2u,   elvactr,  f3,      f3, taito_f3_state, init_elvactr,  ROT0,   "Taito America Corporation", "Elevator Action II (Ver 2.2A 1995/02/20)", 0 )
+GAME( 1994, spcinvdj,   spacedx,  f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Space Invaders DX (Ver 2.6J 1994/09/14) (F3 Version)", 0 )
+GAME( 1994, pwrgoal,    0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Taito Power Goal (Ver 2.5O 1994/11/03)", 0 )
+GAME( 1994, hthero95,   pwrgoal,  f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Hat Trick Hero '95 (Ver 2.5J 1994/11/03)", 0 )
+GAME( 1994, hthero95u,  pwrgoal,  f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Hat Trick Hero '95 (Ver 2.5A 1994/11/03)", 0 )
+GAME( 1994, hthero95a,  pwrgoal,  f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Hat Trick Hero '95 (Ver 2.6Asia 1994/11/17)", 0 )
+GAME( 1994, qtheater,   0,        f3_224c, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Quiz Theater - 3tsu no Monogatari (Ver 2.3J 1994/11/10)", 0 )
+GAME( 1994, elvactr,    0,        f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation Japan",   "Elevator Action Returns (Ver 2.2O 1995/02/20)", 0 )
+GAME( 1994, elvactrj,   elvactr,  f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Elevator Action Returns (Ver 2.2J 1995/02/20)", 0 )
+GAME( 1994, elvact2u,   elvactr,  f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito America Corporation", "Elevator Action II (Ver 2.2A 1995/02/20)", 0 )
 /* There is also a prototype Elevator Action II (US) pcb with the graphics in a different rom format (same program code) */
-GAME( 1994, recalh,     0,        f3,      f3, taito_f3_state, init_recalh,   ROT0,   "Taito Corporation",         "Recalhorn (Ver 1.42J 1994/5/11, prototype)", 0 )
-GAME( 1995, spcinv95,   0,        f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito Corporation Japan",   "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5O 1995/06/14)", 0 )
-GAME( 1995, spcinv95u,  spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito America Corporation", "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)", 0 )
-GAME( 1995, akkanvdr,   spcinv95, f3_224a, f3, taito_f3_state, init_spcinv95, ROT270, "Taito Corporation",         "Akkanbeder (Ver 2.5J 1995/06/14)", 0 )
-GAME( 1995, twinqix,    0,        f3_224a, f3, taito_f3_state, init_twinqix,  ROT0,   "Taito America Corporation", "Twin Qix (Ver 1.0A 1995/01/17, prototype)", 0 )
-GAME( 1995, quizhuhu,   0,        f3,      f3, taito_f3_state, init_quizhuhu, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", 0 )
+GAME( 1994, recalh,     0,        f3,      f3, taito_f3_state, init_common,   ROT0,   "Taito Corporation",         "Recalhorn (Ver 1.42J 1994/5/11, prototype)", 0 )
+GAME( 1995, spcinv95,   0,        f3_224a, f3, taito_f3_state, init_common, ROT270, "Taito Corporation Japan",   "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5O 1995/06/14)", 0 )
+GAME( 1995, spcinv95u,  spcinv95, f3_224a, f3, taito_f3_state, init_common, ROT270, "Taito America Corporation", "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)", 0 )
+GAME( 1995, akkanvdr,   spcinv95, f3_224a, f3, taito_f3_state, init_common, ROT270, "Taito Corporation",         "Akkanbeder (Ver 2.5J 1995/06/14)", 0 )
+GAME( 1995, twinqix,    0,        f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito America Corporation", "Twin Qix (Ver 1.0A 1995/01/17, prototype)", 0 )
+GAME( 1995, quizhuhu,   0,        f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)", 0 )
 GAME( 1995, pbobble2,   0,        f3,      f3, taito_f3_state, init_pbobbl2p, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.3O 1995/07/31)", 0 )
-GAME( 1995, pbobble2o,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.2O 1995/07/20)", 0 )
-GAME( 1995, pbobble2j,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 )
-GAME( 1995, pbobble2u,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito America Corporation", "Bust-A-Move Again (Ver 2.3A 1995/07/31)", 0 )
-GAME( 1995, pbobble2x,  pbobble2, f3,      f3, taito_f3_state, init_pbobbl2x, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2J 1995/11/11)", 0 )
-GAME( 1995, gekiridn,   0,        f3,      f3, taito_f3_state, init_gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3O 1995/09/21)", 0 )
-GAME( 1995, gekiridnj,  gekiridn, f3,      f3, taito_f3_state, init_gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3J 1995/09/21)", 0 )
-GAME( 1995, tcobra2,    0,        f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito Corporation Japan",   "Twin Cobra II (Ver 2.1O 1995/11/30)", 0 )
-GAME( 1995, tcobra2u,   tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito America Corporation", "Twin Cobra II (Ver 2.1A 1995/11/30)", 0 )
-GAME( 1995, ktiger2,    tcobra2,  f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito Corporation",         "Kyukyoku Tiger II (Ver 2.1J 1995/11/30)", 0 )
-GAME( 1995, bubblem,    0,        f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation Japan",   "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.4O 1996/02/15)", 0 )
-GAME( 1995, bubblemu,   bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito America Corporation", "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.5A 1996/02/21)", 0 )
-GAME( 1995, bubblemj,   bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation",         "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)", 0 )
-GAME( 1996, cleopatr,   0,        f3_224a, f3, taito_f3_state, init_cleopatr, ROT0,   "Taito Corporation",         "Cleopatra Fortune (Ver 2.1J 1996/09/05)", 0 )
-GAME( 1996, cleopatro,  cleopatr, f3_224a, f3, taito_f3_state, init_cleopatr, ROT0,   "bootleg",                   "Cleopatra Fortune (Ver 2.1O 1996/09/05, bootleg)", 0 )
-GAME( 1996, pbobble3,   0,        f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1O 1996/09/27)", 0 )
-GAME( 1996, pbobble3u,  pbobble3, f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1A 1996/09/27)", 0 )
-GAME( 1996, pbobble3j,  pbobble3, f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1J 1996/09/27)", 0 )
-GAME( 1997, arkretrn,   0,        f3,      f3, taito_f3_state, init_arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02O 1997/02/10)", 0 )
-GAME( 1997, arkretrnu,  arkretrn, f3,      f3, taito_f3_state, init_arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02A 1997/02/10)", 0 )
-GAME( 1997, arkretrnj,  arkretrn, f3,      f3, taito_f3_state, init_arkretrn, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02J 1997/02/10)", 0 )
+GAME( 1995, pbobble2o,  pbobble2, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.2O 1995/07/20)", 0 )
+GAME( 1995, pbobble2j,  pbobble2, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 )
+GAME( 1995, pbobble2u,  pbobble2, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Bust-A-Move Again (Ver 2.3A 1995/07/31)", 0 )
+GAME( 1995, pbobble2x,  pbobble2, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2J 1995/11/11)", 0 )
+GAME( 1995, gekiridn,   0,        f3,      f3, taito_f3_state, init_common, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3O 1995/09/21)", 0 )
+GAME( 1995, gekiridnj,  gekiridn, f3,      f3, taito_f3_state, init_common, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3J 1995/09/21)", 0 )
+GAME( 1995, tcobra2,    0,        f3,      f3, taito_f3_state, init_common,  ROT270, "Taito Corporation Japan",   "Twin Cobra II (Ver 2.1O 1995/11/30)", 0 )
+GAME( 1995, tcobra2u,   tcobra2,  f3,      f3, taito_f3_state, init_common,  ROT270, "Taito America Corporation", "Twin Cobra II (Ver 2.1A 1995/11/30)", 0 )
+GAME( 1995, ktiger2,    tcobra2,  f3,      f3, taito_f3_state, init_common,  ROT270, "Taito Corporation",         "Kyukyoku Tiger II (Ver 2.1J 1995/11/30)", 0 )
+GAME( 1995, bubblem,    0,        f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation Japan",   "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.4O 1996/02/15)", 0 )
+GAME( 1995, bubblemu,   bubblem,  f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito America Corporation", "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.5A 1996/02/21)", 0 )
+GAME( 1995, bubblemj,   bubblem,  f3_224a, f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)", 0 )
+GAME( 1996, cleopatr,   0,        f3_224a, f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Cleopatra Fortune (Ver 2.1J 1996/09/05)", 0 )
+GAME( 1996, cleopatro,  cleopatr, f3_224a, f3, taito_f3_state, init_common, ROT0,   "bootleg",                   "Cleopatra Fortune (Ver 2.1O 1996/09/05, bootleg)", 0 )
+GAME( 1996, pbobble3,   0,        f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1O 1996/09/27)", 0 )
+GAME( 1996, pbobble3u,  pbobble3, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1A 1996/09/27)", 0 )
+GAME( 1996, pbobble3j,  pbobble3, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1J 1996/09/27)", 0 )
+GAME( 1997, arkretrn,   0,        f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02O 1997/02/10)", 0 )
+GAME( 1997, arkretrnu,  arkretrn, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02A 1997/02/10)", 0 )
+GAME( 1997, arkretrnj,  arkretrn, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Arkanoid Returns (Ver 2.02J 1997/02/10)", 0 )
 GAME( 1997, kirameki,   0,        f3_224a, f3, taito_f3_state, init_kirameki, ROT0,   "Taito Corporation",         "Kirameki Star Road (Ver 2.10J 1997/08/29)", 0 )
-GAME( 1997, puchicar,   0,        f3,      f3, taito_f3_state, init_puchicar, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02O 1997/10/29)", 0 )
-GAME( 1997, puchicaru,  puchicar, f3,      f3, taito_f3_state, init_puchicar, ROT0,   "Taito America Corporation", "Puchi Carat (Ver 2.04A 1997/11/08)", 0 )
-GAME( 1997, puchicarj,  puchicar, f3,      f3, taito_f3_state, init_puchicar, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02J 1997/10/29)", 0 )
-GAME( 1997, pbobble4,   0,        f3,      f3, taito_f3_state, init_pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04O 1997/12/19)", 0 )
-GAME( 1997, pbobble4j,  pbobble4, f3,      f3, taito_f3_state, init_pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04J 1997/12/19)", 0 )
-GAME( 1997, pbobble4u,  pbobble4, f3,      f3, taito_f3_state, init_pbobble4, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04A 1997/12/19)", 0 )
-GAME( 1997, popnpop,    0,        f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07O 1998/02/09)", 0 )
-GAME( 1997, popnpopj,   popnpop,  f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07J 1998/02/09)", 0 )
-GAME( 1997, popnpopu,   popnpop,  f3,      f3, taito_f3_state, init_popnpop,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07A 1998/02/09)", 0 )
-GAME( 1998, landmakr,   0,        f3,      f3, taito_f3_state, init_landmakr, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02)", 0 )
-GAME( 1998, landmakrj,  landmakr, f3,      f3, taito_f3_state, init_landmakr, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.01J 1998/06/01)", 0 )
+GAME( 1997, puchicar,   0,        f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02O 1997/10/29)", 0 )
+GAME( 1997, puchicaru,  puchicar, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito America Corporation", "Puchi Carat (Ver 2.04A 1997/11/08)", 0 )
+GAME( 1997, puchicarj,  puchicar, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puchi Carat (Ver 2.02J 1997/10/29)", 0 )
+GAME( 1997, pbobble4,   0,        f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04O 1997/12/19)", 0 )
+GAME( 1997, pbobble4j,  pbobble4, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04J 1997/12/19)", 0 )
+GAME( 1997, pbobble4u,  pbobble4, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Puzzle Bobble 4 (Ver 2.04A 1997/12/19)", 0 )
+GAME( 1997, popnpop,    0,        f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07O 1998/02/09)", 0 )
+GAME( 1997, popnpopj,   popnpop,  f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07J 1998/02/09)", 0 )
+GAME( 1997, popnpopu,   popnpop,  f3,      f3, taito_f3_state, init_common,  ROT0,   "Taito Corporation",         "Pop'n Pop (Ver 2.07A 1998/02/09)", 0 )
+GAME( 1998, landmakr,   0,        f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02)", 0 )
+GAME( 1998, landmakrj,  landmakr, f3,      f3, taito_f3_state, init_common, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.01J 1998/06/01)", 0 )
 GAME( 1998, landmakrp,  landmakr, f3,      f3, taito_f3_state, init_landmkrp, ROT0,   "Taito Corporation",         "Land Maker (Ver 2.02O 1998/06/02, prototype)", 0 ) // proto or hack/bootleg?
