@@ -13,12 +13,12 @@ FDP::FDP(const machine_config &mconfig, const char *tag, device_t *owner, uint32
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
 	, m_palette(*this, "palette")
 	, m_palette_12bit(*this, "palette_12bit")
-	, m_spriteram(*this, "spriteram", 0x10000, ENDIANNESS_BIG)
-	, m_pfram(*this, "pfram", 0xc000, ENDIANNESS_BIG)
-	, m_textram(*this, "textram", 0x2000, ENDIANNESS_BIG)
-	, m_charram(*this, "charram", 0x2000, ENDIANNESS_BIG)
-	, m_lineram(*this, "lineram", 0x10000, ENDIANNESS_BIG)
-	, m_pivotram(*this, "pivotram", 0x10000, ENDIANNESS_BIG)
+	, m_spriteram(*this, "spriteram", 0x10000, ENDIANNESS_LITTLE)
+	, m_pfram(*this, "pfram", 0xc000, ENDIANNESS_LITTLE)
+	, m_textram(*this, "textram", 0x2000, ENDIANNESS_LITTLE)
+	, m_charram(*this, "charram", 0x2000, ENDIANNESS_LITTLE)
+	, m_lineram(*this, "lineram", 0x10000, ENDIANNESS_LITTLE)
+	, m_pivotram(*this, "pivotram", 0x10000, ENDIANNESS_LITTLE)
 {
 }
 
@@ -153,8 +153,8 @@ static const gfx_layout bubsympb_sprite_layout = {
 };
 
 GFXDECODE_MEMBER( FDP::gfxinfo )
-	GFXDECODE_DEVICE( nullptr,   0, layout_pivot,      0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_DEVICE( nullptr,   0, layout_pivot,      0x0000, 0x0400>>4 ) /* Dynamically modified */
+	GFXDECODE_DEVICE_RAM( "charram",    0, layout_pivot,      0x0000, 0x0400>>4 ) /* Dynamically modified */
+	GFXDECODE_DEVICE_RAM( "pivotram",   0, layout_pivot,      0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_DEVICE( "sprites", 0, layout_sprite_low, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
 	GFXDECODE_DEVICE( "tiles",   0, layout_tile_low,   0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
 	GFXDECODE_DEVICE( "tiles",   0, layout_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
@@ -162,11 +162,11 @@ GFXDECODE_MEMBER( FDP::gfxinfo )
 GFXDECODE_END
 
 GFXDECODE_MEMBER( FDP::gfx_bubsympb )
-	GFXDECODE_DEVICE( nullptr,    0, layout_pivot,                 0x0000, 0x0400>>4) /* Dynamically modified */
-	GFXDECODE_DEVICE( nullptr,    0, layout_pivot,                 0x0000, 0x0400>>4) /* Dynamically modified */
-	GFXDECODE_DEVICE( "sprites",  0, bubsympb_sprite_layout,       0x1000, 0x1000>>4) /* Sprites area (6bpp planar) */
-	GFXDECODE_DEVICE( "tiles",    0, layout_tile_low,              0x0000, 0x2000>>4) // low 4bpp of 5bpp tilemap data
-	GFXDECODE_DEVICE( "tiles",    0, layout_tile_hi,               0x0000, 0x2000>>4) // hi 1bpp of 5bpp tilemap data
+	GFXDECODE_DEVICE_RAM( "charram",     0, layout_pivot,           0x0000, 0x0400>>4) /* Dynamically modified */
+	GFXDECODE_DEVICE_RAM( "pivotram",    0, layout_pivot,           0x0000, 0x0400>>4) /* Dynamically modified */
+	GFXDECODE_DEVICE( "sprites",  0, bubsympb_sprite_layout, 0x1000, 0x1000>>4) /* Sprites area (6bpp planar) */
+	GFXDECODE_DEVICE( "tiles",    0, layout_tile_low,        0x0000, 0x2000>>4) // low 4bpp of 5bpp tilemap data
+	GFXDECODE_DEVICE( "tiles",    0, layout_tile_hi,         0x0000, 0x2000>>4) // hi 1bpp of 5bpp tilemap data
 //GFXDECODE_DEVICE( "sprites",  0, layout_sprite_hi,       0x1000, 0x1000>>4) // dummy gfx duplicate for avoid crash
 GFXDECODE_END
 
@@ -350,9 +350,6 @@ void FDP::create_tilemaps(bool extend)
 	m_pixel_layer->set_transparent_pen(0);
 	std::fill_n(m_textram_row_usage, 64, 0);
 
-	
-	gfx(0)->set_source_and_total(reinterpret_cast<u8 *>(m_charram.target()), 256);
-	gfx(1)->set_source_and_total(reinterpret_cast<u8 *>(m_pivotram.target()), 2048);
 	
 	m_spritelist = std::make_unique<tempsprite[]>(0x400);
 	m_sprite_end = &m_spritelist[0];
