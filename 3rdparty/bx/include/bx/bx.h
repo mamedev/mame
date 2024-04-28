@@ -117,7 +117,7 @@ namespace bx
 	///
 	/// @param[in] _location Source code location where function is called.
 	/// @param[in] _format Printf style format.
-	/// @param[in] ... Arguments for `_format` specification.
+	/// @param[in] _argList Arguments for `_format` specification.
 	///
 	/// @returns True if assert should stop code execution, otherwise returns false.
 	///
@@ -126,6 +126,8 @@ namespace bx
 	/// Set assert handler function.
 	///
 	/// @param[in] _assertHandlerFn Pointer to AssertHandlerFn function.
+	///
+	/// @remarks It can be set only once. This is usually done on application startup.
 	///
 	void setAssertHandler(AssertHandlerFn _assertHandlerFn);
 
