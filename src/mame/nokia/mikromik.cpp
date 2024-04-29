@@ -37,13 +37,25 @@
     RST6.5  8212 INT
     RST7.5  DMA EOP
 
+	Models:
+
+	M1: 1x 160KB floppy
+	M2: 2x 160KB floppy
+	M3: 1x 320KB floppy (96 tpi, single sided)
+	M4: 2x 320KB floppy
+	M5: 1x 640KB floppy (96 tpi, double sided)
+	M6: 2x 640KB floppy
+	M7: 1x 640KB floppy + 5MB hard disk
+	M4G: 2x 320KB floppy + GDC
+	M6G: 2x 640KB floppy + GDC
+	M7G: 1x 640KB floppy + 5MB hard disk + GDC
+
 */
 
 /*
 
     TODO:
 
-    - NEC uPD7220 GDC
     - accurate video timing
     - floppy DRQ during RECALL = 0
     - PCB layout
@@ -216,8 +228,13 @@ void mm1_state::llen_w(int state)
 void mm1_state::motor_on_w(int state)
 {
 	LOG("MOTOR %u\n", state);
+
 	m_floppy[0]->mon_w(!state);
-	m_floppy[1]->mon_w(!state);
+
+	if (m_floppy[1])
+	{
+		m_floppy[1]->mon_w(!state);
+	}
 }
 
 
@@ -225,10 +242,6 @@ void mm1_state::motor_on_w(int state)
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
-
-//-------------------------------------------------
-//  ADDRESS_MAP( mm1_map )
-//-------------------------------------------------
 
 void mm1_state::mm1_map(address_map &map)
 {
@@ -244,6 +257,11 @@ void mm1_state::mmu_io_map(address_map &map)
 	map(0x40, 0x40).mirror(0x0f).rw(m_iop, FUNC(i8212_device::read), FUNC(i8212_device::write));
 	map(0x50, 0x51).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x60, 0x67).mirror(0x08).w("outlatch", FUNC(ls259_device::write_d0));
+}
+
+void mm1_state::mm1g_mmu_io_map(address_map &map)
+{
+	mmu_io_map(map);
 	map(0x70, 0x71).mirror(0x0e).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 }
 
@@ -382,15 +400,17 @@ void mm1_state::floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_MM1_FORMAT);
 }
-/*
-void mm2_state::floppy_formats(format_registration &fr)
-    FLOPPY_MM2_FORMAT
-}
-*/
-static void mm1_floppies(device_slot_interface &device)
+
+static void mm1_floppies_320k(device_slot_interface &device)
 {
-	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("525", FLOPPY_525_QD);
 }
+
+static void mm1_floppies_640k(device_slot_interface &device)
+{
+	device.option_add("525", FLOPPY_525_QD);
+}
+
 
 
 //**************************************************************************
@@ -413,23 +433,12 @@ void mm1_state::machine_start()
 }
 
 
-void mm1_state::machine_reset()
-{
-	// reset FDC
-	m_fdc->reset();
-}
-
-
 
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  machine_config( mm1 )
-//-------------------------------------------------
-
-void mm1_state::mm1(machine_config &config)
+void mm1_state::common(machine_config &config)
 {
 	// basic system hardware
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
@@ -482,8 +491,6 @@ void mm1_state::mm1(machine_config &config)
 	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
 
 	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
 	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
@@ -508,28 +515,73 @@ void mm1_state::mm1(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("mm1_flop");
 }
 
+void mm1_state::mm1(machine_config &config)
+{
+	common(config);
+	mm1_video(config);
+}
 
-//-------------------------------------------------
-//  machine_config( mm1m6 )
-//-------------------------------------------------
+void mm1_state::mm1g(machine_config &config)
+{
+	common(config);
+	mm1g_video(config);
+
+	m_io->set_addrmap(0, &mm1_state::mm1g_mmu_io_map);
+}
+
+void mm1_state::mm1_320k_dual(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1_floppies_320k, "525", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1_floppies_320k, "525", mm1_state::floppy_formats).enable_sound(true);
+}
+
+void mm1_state::mm1m4(machine_config &config)
+{
+	mm1(config);
+	mm1_320k_dual(config);
+}
+
+void mm1_state::mm1m4g(machine_config &config)
+{
+	mm1g(config);
+	mm1_320k_dual(config);
+}
+
+void mm1_state::mm1_640k_dual(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1_floppies_640k, "525", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1_floppies_640k, "525", mm1_state::floppy_formats).enable_sound(true);
+}
 
 void mm1_state::mm1m6(machine_config &config)
 {
 	mm1(config);
-	// video hardware
-	mm1m6_video(config);
+	mm1_640k_dual(config);
 }
 
+void mm1_state::mm1m6g(machine_config &config)
+{
+	mm1g(config);
+	mm1_640k_dual(config);
+}
 
-//-------------------------------------------------
-//  machine_config( mm1m7 )
-//-------------------------------------------------
+void mm1_state::mm1_640k(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1_floppies_640k, "525", mm1_state::floppy_formats).enable_sound(true);
+}
 
 void mm1_state::mm1m7(machine_config &config)
 {
 	mm1(config);
-	// video hardware
-	mm1m6_video(config);
+	mm1_640k(config);
+
+	// TODO hard disk
+}
+
+void mm1_state::mm1m7g(machine_config &config)
+{
+	mm1g(config);
+	mm1_640k(config);
 
 	// TODO hard disk
 }
@@ -539,6 +591,24 @@ void mm1_state::mm1m7(machine_config &config)
 //**************************************************************************
 //  ROMS
 //**************************************************************************
+
+//-------------------------------------------------
+//  ROM( mm1m4 )
+//-------------------------------------------------
+
+ROM_START( mm1m4 )
+	ROM_REGION( 0x4000, I8085A_TAG, 0 ) // BIOS
+	ROM_LOAD( "9081b.ic43", 0x0000, 0x2000, CRC(60841940) SHA1(d755e9be53f27f41d1e93b4c1793f9ea6a3e1229) )
+
+	ROM_REGION( 0x200, "address", 0 ) // address decoder
+	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
+
+	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
+	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
+ROM_END
+
+#define rom_mm1m4g rom_mm1m4
+
 
 //-------------------------------------------------
 //  ROM( mm1m6 )
@@ -555,12 +625,25 @@ ROM_START( mm1m6 )
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
 ROM_END
 
+#define rom_mm1m6g rom_mm1m6
+
 
 //-------------------------------------------------
 //  ROM( mm1m7 )
 //-------------------------------------------------
 
-#define rom_mm1m7 rom_mm1m6
+ROM_START( mm1m7 )
+	ROM_REGION( 0x4000, I8085A_TAG, 0 ) // BIOS
+	ROM_LOAD( "9057c.ic2", 0x0000, 0x2000, CRC(89bbc042) SHA1(7e8800c94934b81ce08b7af862e1159e0517684d) )
+
+	ROM_REGION( 0x200, "address", 0 ) // address decoder
+	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
+
+	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
+	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
+ROM_END
+
+#define rom_mm1m7g rom_mm1m7
 
 
 
@@ -568,6 +651,10 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY       FULLNAME           FLAGS
-COMP( 1981, mm1m6, 0,      0,      mm1m6,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mm1m7, mm1m6,  0,      mm1m7,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY       FULLNAME            FLAGS
+COMP( 1981, mm1m4,  0,     0,      mm1m4,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M4",  MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m4g, mm1m4, 0,      mm1m4g,  mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M4G", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m6,  0,     0,      mm1m6,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6",  MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m6g, mm1m6, 0,      mm1m6g,  mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6G", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m7,  0,     0,      mm1m7,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7",  MACHINE_NOT_WORKING )
+COMP( 1981, mm1m7g, mm1m7, 0,      mm1m7g,  mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7G", MACHINE_NOT_WORKING )

@@ -100,7 +100,13 @@ Notes:
 
     TODO
 
+	- screen update is too fast
+	- cursor on text should blink as dark blue
+	- PRWNOISE and PRBEEP return wrong values
+	- CDP1869 white noise
     - connect expansion bus
+	- series I ROMs
+	- DOS ROMs
 
 */
 
@@ -108,6 +114,11 @@ Notes:
 #include "tmc600.h"
 
 #include "utf8.h"
+
+
+//**************************************************************************
+//  I/O
+//**************************************************************************
 
 uint8_t tmc600_state::rtc_r()
 {
@@ -131,7 +142,62 @@ void tmc600_state::printer_w(uint8_t data)
 	m_centronics->write_strobe(1);
 }
 
-/* Memory Maps */
+int tmc600_state::ef2_r()
+{
+	return m_cassette->input() < 0;
+}
+
+int tmc600_state::ef3_r()
+{
+	return !BIT(m_key_row[(m_out3 >> 3) & 0x07]->read(), m_out3 & 0x07);
+}
+
+void tmc600_state::q_w(int state)
+{
+	m_cassette->output(state ? +1.0 : -1.0);
+}
+
+void tmc600_state::sc_w(uint8_t data)
+{
+	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
+		m_maincpu->int_w(CLEAR_LINE);
+	}
+}
+
+void tmc600_state::out3_w(uint8_t data)
+{
+	m_out3 = data;
+}
+
+QUICKLOAD_LOAD_MEMBER(tmc600_state::quickload_cb)
+{
+	int size = image.length();
+
+	if (size < 16)
+		return std::make_pair(image_error::INVALIDLENGTH, "Image is too short");
+
+	if ((size - 16) > (m_ram->size() - 0x300))
+		return std::make_pair(image_error::INVALIDLENGTH, "Image is larger than RAM");
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	image.fseek(0x5, SEEK_SET);
+	image.fread(program.get_write_ptr(0x6181), 4); // DEFUS and EOP
+	image.fread(program.get_write_ptr(0x6192), 4); // STRING and ARRAY
+	
+	image.fseek(0x9, SEEK_SET);
+	image.fread(program.get_write_ptr(0x6199), 2); // EOD
+
+	image.fseek(0xf, SEEK_SET);
+	image.fread(program.get_write_ptr(0x6300), size); // program
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 void tmc600_state::tmc600_map(address_map &map)
 {
@@ -150,7 +216,10 @@ void tmc600_state::tmc600_io_map(address_map &map)
 	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
-/* Input Ports */
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
 
 static INPUT_PORTS_START( tmc600 )
 	PORT_START("Y0")
@@ -227,71 +296,20 @@ static INPUT_PORTS_START( tmc600 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("(unknown)") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(10)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2190") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
 	PORT_START("RUN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Stop") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_TOGGLE PORT_WRITE_LINE_DEVICE_MEMBER(CDP1802_TAG, cosmac_device, clear_w)
 INPUT_PORTS_END
 
-/* CDP1802 Interface */
 
-int tmc600_state::ef2_r()
-{
-	return m_cassette->input() < 0;
-}
-
-int tmc600_state::ef3_r()
-{
-	return !BIT(m_key_row[(m_out3 >> 3) & 0x07]->read(), m_out3 & 0x07);
-}
-
-void tmc600_state::q_w(int state)
-{
-	m_cassette->output(state ? +1.0 : -1.0);
-}
-
-void tmc600_state::sc_w(uint8_t data)
-{
-	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
-		m_maincpu->int_w(CLEAR_LINE);
-	}
-}
-
-void tmc600_state::out3_w(uint8_t data)
-{
-	m_out3 = data;
-}
-
-QUICKLOAD_LOAD_MEMBER(tmc600_state::quickload_cb)
-{
-	int size = image.length();
-
-	if (size < 16)
-		return std::make_pair(image_error::INVALIDLENGTH, "Image is too short");
-
-	if ((size - 16) > (m_ram->size() - 0x300))
-		return std::make_pair(image_error::INVALIDLENGTH, "Image is larger than RAM");
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	image.fseek(0x5, SEEK_SET);
-	image.fread(program.get_write_ptr(0x6181), 4); // DEFUS and EOP
-	image.fread(program.get_write_ptr(0x6192), 4); // STRING and ARRAY
-	
-	image.fseek(0x9, SEEK_SET);
-	image.fread(program.get_write_ptr(0x6199), 2); // EOD
-
-	image.fseek(0xf, SEEK_SET);
-	image.fread(program.get_write_ptr(0x6300), size); // program
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
-/* Machine Drivers */
+//**************************************************************************
+//  MACHINE DRIVERS
+//**************************************************************************
 
 void tmc600_state::tmc600(machine_config &config)
 {
@@ -347,7 +365,10 @@ void tmc600_state::tmc600(machine_config &config)
 	SOFTWARE_LIST(config, "quik_list").set_original("tmc600_quik");
 }
 
-/* ROMs */
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 #if 0
 ROM_START( tmc600s1 )
@@ -383,7 +404,11 @@ ROM_START( tmc600s2 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
 ROM_END
 
-/* System Drivers */
+
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
+
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME                     FLAGS
 //COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
