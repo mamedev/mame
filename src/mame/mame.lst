@@ -35736,6 +35736,9 @@ compc10                         // 1984 Commodore PC-10, PC-20 and PC-30
 pc10iii                         // 1987 Commodore PC-10 III
 compc1                          // 1984 Commodore PC-1
 
+@source:pc/conliner.cpp
+onlinertp                       // (c) 200? Comatel / Atata Systems
+
 @source:pc/ct486.cpp
 ct486                           // 1993? 486 with CS4031
 
@@ -41669,9 +41672,6 @@ clxvme186                       //
 
 @source:skeleton/codata.cpp
 codata                          //
-
-@source:skeleton/conliner.cpp
-onlinertp                       // (c) 200? Comatel / Atata Systems
 
 @source:skeleton/consola_emt.cpp
 consoemt                        //
