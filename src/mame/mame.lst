@@ -41706,6 +41706,7 @@ cb4_android41                   //
 cb4_android43                   //
 cb4_debiansvr                   //
 cb4_linarodst                   //
+cubieboard4                     //
 monkeyjmp                       // (c) 20?? Falgas
 
 @source:skeleton/cxhumax.cpp
