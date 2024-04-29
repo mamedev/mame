@@ -179,16 +179,12 @@ void heath_z37_fdc_device::device_start()
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_access_track_sector));
-
-	m_irq_allowed = false;
-	m_drq_allowed = false;
-	m_access_track_sector = false;
 }
 
 void heath_z37_fdc_device::device_reset()
 {
-	m_irq_allowed = false;
-	m_drq_allowed = false;
+	m_irq_allowed         = false;
+	m_drq_allowed         = false;
 	m_access_track_sector = false;
 
 	m_irq_cb(0);
@@ -198,14 +194,14 @@ void heath_z37_fdc_device::device_reset()
 
 static void z37_floppies(device_slot_interface &device)
 {
-	// H-17-1
+	// H-17-1 -- SS 48tpi
 	device.option_add("ssdd", FLOPPY_525_SSDD);
 	// SS 96tpi
 	device.option_add("ssqd", FLOPPY_525_SSQD);
 	// DS 48tpi
-	device.option_add("dd", FLOPPY_525_DD);
+	device.option_add("dd",   FLOPPY_525_DD);
 	// H-17-4 / H-17-5 -- DS 96tpi
-	device.option_add("qd", FLOPPY_525_QD);
+	device.option_add("qd",   FLOPPY_525_QD);
 }
 
 void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
@@ -228,12 +224,12 @@ void heath_z37_fdc_device::set_irq(int state)
 {
 	LOGLINES("set irq, allowed: %d state: %d\n", m_irq_allowed, state);
 
-	m_irq_cb(m_irq_allowed ? state : 0);
+	m_irq_cb(m_irq_allowed ? state : CLEAR_LINE);
 }
 
 void heath_z37_fdc_device::set_drq(int state)
 {
 	LOGLINES("set drq, allowed: %d state: %d\n", m_irq_allowed, state);
 
-	m_drq_cb(m_drq_allowed ? state : 0);
+	m_drq_cb(m_drq_allowed ? state : CLEAR_LINE);
 }

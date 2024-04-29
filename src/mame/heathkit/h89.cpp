@@ -314,7 +314,8 @@ u8 h89_base_state::m1_r(offs_t offset)
 	return data;
 }
 
-/*                                 PORT
+/*
+                                   PORT
     Use                      |  Hex  |  Octal
    --------------------------+-------+---------
     Not specified, available |  0-77 |   0-167
