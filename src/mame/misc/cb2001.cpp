@@ -911,7 +911,7 @@ ROM_START( scherrym )
 ROM_END
 
 /* New DongmulDongmul 2 (뉴 동물동물 2, New AnimalAnimal 2) runs on slighly different hardware, but with same CPU, custom and I/O.
-   Video from the real hardware: https://youtu.be/VtPV3DonIsY
+   Video from the real hardware: https://youtu.be/1K9e_7RzeiM
    _______________________________________________________________________________
   |    ________    ________    ________    __________    _________________     _  |
   |KM6264BLG-10L  |74HC00P| KM6264BLG-10L |29F1610ML|   |  HM27C4096     |    (_) <- Switch (SW8)
