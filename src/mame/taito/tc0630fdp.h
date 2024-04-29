@@ -223,6 +223,11 @@ protected:
 		u8 dst_blendmode[H_TOTAL]{};
 	};
 
+	struct fda_settings {
+		bool blur{true};
+		bool palette_12bit{true};
+	};
+	
 	struct f3_line_inf {
 		int y{0};
 		int screen_y{0};
@@ -243,6 +248,8 @@ protected:
 		pivot_inf pivot;
 		sprite_inf sp[NUM_SPRITEGROUPS];
 		playfield_inf pf[NUM_PLAYFIELDS];
+		
+		fda_settings fda;
 	};
 
 	tilemap_t *m_tilemap[8] = {nullptr};
@@ -289,7 +296,7 @@ protected:
 	inline void f3_drawgfx(const tempsprite &sprite);
 	void get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy);
 	void read_line_ram(f3_line_inf &line, int y);
-	void render_line(pen_t *dst, const mix_pix &z);
+	void render_line(pen_t *RESTRICT dst, const mix_pix &z, const fda_settings &fda);
 	
 	template<typename Mix>
 	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix &layer);

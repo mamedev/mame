@@ -559,7 +559,10 @@ void FDP::read_line_ram(f3_line_inf &line, int y)
 		}
 		line.pivot.x_sample_enable = BIT(x_mosaic, 9);
 
-		line.fx_6400 = (x_mosaic & 0xfc00) >> 8; // palette interpretation [unimplemented]
+		line.fda.blur = !BIT(x_mosaic, 13);
+		line.fda.palette_12bit = !BIT(x_mosaic, 14);
+		
+		line.fx_6400 = (x_mosaic & 0x9c00) >> 8;
 		if (TAITOF3_VIDEO_DEBUG == 1) {
 			// gseeker(intro):40, ringrage/arabianm:30/33, ridingf:30/31, spcinvdj:30, gunlock:78
 			if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
@@ -882,9 +885,9 @@ bool FDP::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_in
 	return false; // TODO: determine when we can stop drawing?
 }
 
-void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z)
+void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z, const fda_settings &fda)
 {
-	const pen_t *clut = m_palette->pens();
+	const pen_t *clut = (fda.palette_12bit ? m_palette_12bit : m_palette)->pens();
 	for (unsigned int x = H_START; x < H_START + H_VIS; x++) {
 		rgb_t s_rgb = clut[z.src_pal[x]];
 		rgb_t d_rgb = clut[z.dst_pal[x]];
@@ -914,6 +917,15 @@ void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 		b1 = std::min(b1, static_cast<u16>(255));
 
 		dst[x] = rgb_t(r1, g1, b1);
+	}
+	
+	if (fda.blur) {
+		rgb_t prev{0};
+		for (int x = H_START; x < H_END; x++) {
+			rgb_t col = dst[x];
+			dst[x] = rgb_t(((u16)col.r()+prev.r())/2, ((u16)col.g()+prev.g())/2, ((u16)col.b()+prev.b())/2);
+			prev = col;
+		}
 	}
 }
 
@@ -1028,7 +1040,7 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 			}
 
-			render_line(&bitmap.pix(screen_y), line_buf);
+			render_line(&bitmap.pix(screen_y), line_buf, line_data.fda);
 		}
 
 		if (screen_y != 0) {
