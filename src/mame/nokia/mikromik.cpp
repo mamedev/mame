@@ -41,9 +41,9 @@
 
 	M1: 1x 160KB floppy
 	M2: 2x 160KB floppy
-	M3: 1x 320KB floppy
+	M3: 1x 320KB floppy (96 tpi, single sided)
 	M4: 2x 320KB floppy
-	M5: 1x 640KB floppy
+	M5: 1x 640KB floppy (96 tpi, double sided)
 	M6: 2x 640KB floppy
 	M7: 1x 640KB floppy + 5MB hard disk
 	M4G: 2x 320KB floppy + GDC
@@ -56,7 +56,6 @@
 
     TODO:
 
-    - NEC uPD7220 GDC
     - accurate video timing
     - floppy DRQ during RECALL = 0
     - PCB layout
@@ -404,7 +403,7 @@ void mm1_state::floppy_formats(format_registration &fr)
 
 static void mm1_floppies_320k(device_slot_interface &device)
 {
-	device.option_add("525", FLOPPY_525_DD);
+	device.option_add("525", FLOPPY_525_QD);
 }
 
 static void mm1_floppies_640k(device_slot_interface &device)
