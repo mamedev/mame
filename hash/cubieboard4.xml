@@ -23,7 +23,7 @@ Software list for Cubieboard4 (CC A-20) external SD card slot.
 		</part>
 	</software>
 
-	<software name="cb4_linarodstcrd">
+	<software name="cb4_linardstcrd">
 		<description>Linaro desktop for Cubieboard4 (v1.0)</description>
 		<year>20??</year>
 		<publisher>cubieboard.org</publisher>
@@ -35,7 +35,7 @@ Software list for Cubieboard4 (CC A-20) external SD card slot.
 		</part>
 	</software>
 
-	<software name="cb4_linarosvrcrdh">
+	<software name="cb4_linarsvrcrdh">
 		<description>Linaro server for Cubieboard4 (v2.0, HDMI)</description>
 		<year>20??</year>
 		<publisher>cubieboard.org</publisher>
@@ -47,7 +47,7 @@ Software list for Cubieboard4 (CC A-20) external SD card slot.
 		</part>
 	</software>
 
-	<software name="cb4_linarosvrcrdv">
+	<software name="cb4_linarsvrcrdv">
 		<description>Linaro server for Cubieboard4 (v2.0, VGA)</description>
 		<year>20??</year>
 		<publisher>cubieboard.org</publisher>
