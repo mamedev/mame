@@ -16,8 +16,8 @@ Software list for Cubieboard4 (CC A-20) external SD card slot.
 		<year>20??</year>
 		<publisher>cubieboard.org</publisher>
 		<part name="image" interface="cubieboard4_sdcard">
+			<feature name="video" value="hdmi" />
 			<diskarea name="image">
-				<feature name="video" value="hdmi" />
 				<disk name="cb4-debian-server-hdmi-card-v1.0" sha1="3e98a28e72c913afa5883e040731e17b5f90aad2" writeable="yes" />
 			</diskarea>
 		</part>
