@@ -198,8 +198,8 @@
 #	undef  BX_PLATFORM_IOS
 #	define BX_PLATFORM_IOS 1
 #elif defined(__has_builtin) && __has_builtin(__is_target_os) && __is_target_os(xros)
-#  undef  BX_PLATFORM_VISIONOS
-#  define BX_PLATFORM_VISIONOS 1
+#	undef  BX_PLATFORM_VISIONOS
+#	define BX_PLATFORM_VISIONOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_OSX
 #	define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
@@ -386,8 +386,6 @@
 #	define BX_PLATFORM_NAME "Hurd"
 #elif BX_PLATFORM_IOS
 #	define BX_PLATFORM_NAME "iOS"
-#elif BX_PLATFORM_VISIONOS
-#  define BX_PLATFORM_NAME "visionOS"
 #elif BX_PLATFORM_LINUX
 #	define BX_PLATFORM_NAME "Linux"
 #elif BX_PLATFORM_NONE
@@ -395,13 +393,15 @@
 #elif BX_PLATFORM_NX
 #	define BX_PLATFORM_NAME "NX"
 #elif BX_PLATFORM_OSX
-#	define BX_PLATFORM_NAME "OSX"
+#	define BX_PLATFORM_NAME "macOS"
 #elif BX_PLATFORM_PS4
 #	define BX_PLATFORM_NAME "PlayStation 4"
 #elif BX_PLATFORM_PS5
 #	define BX_PLATFORM_NAME "PlayStation 5"
 #elif BX_PLATFORM_RPI
 #	define BX_PLATFORM_NAME "RaspberryPi"
+#elif BX_PLATFORM_VISIONOS
+#	define BX_PLATFORM_NAME "visionOS"
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT
