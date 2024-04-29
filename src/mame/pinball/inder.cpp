@@ -20,7 +20,7 @@ Note
    holes on a lower panel, while some indicators are on the upper panel. The main scores are on the
    marquee. Each of 4 players has 3 digits. There's other buttons on the marquee too. The game has
    no screen.
-   Gameplay and description can be found on the patent fill (it's a traditional Spanisg game, it's
+   Gameplay and description can be found on the patent fill (it's a traditional Spanish game, it's
    easy to find more info about how to play it):
      https://worldwide.espacenet.com/patent/search/family/008268025/publication/ES1014799U?q=pn%3DES1014799U
    Photos and a (partial) manual can be found at: https://www.recreativas.org/la-rana-1051-inder
