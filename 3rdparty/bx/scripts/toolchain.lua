@@ -82,6 +82,8 @@ function toolchain(_buildDir, _libDir)
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
+			{ "xros-arm64",      "visionOS ARM64"             },
+			{ "xros-simulator",  "visionOS - Simulator"       },
 			{ "mingw-gcc",       "MinGW"                      },
 			{ "mingw-clang",     "MinGW (clang compiler)"     },
 			{ "netbsd",          "NetBSD"                     },
@@ -114,6 +116,7 @@ function toolchain(_buildDir, _libDir)
 			{ "osx", "OSX" },
 			{ "ios", "iOS" },
 			{ "tvos", "tvOS" },
+			{ "xros", "visionOS" },
 		}
 	}
 
@@ -139,6 +142,12 @@ function toolchain(_buildDir, _libDir)
 		trigger     = "with-tvos",
 		value       = "#",
 		description = "Set tvOS target version (default: 9.0).",
+	}
+
+	newoption {
+		trigger     = "with-visionos",
+		value       = "#",
+		description = "Set visionOS target version (default: 1.0).",
 	}
 
 	newoption {
@@ -191,6 +200,11 @@ function toolchain(_buildDir, _libDir)
 	local tvosPlatform = ""
 	if _OPTIONS["with-tvos"] then
 		tvosPlatform = _OPTIONS["with-tvos"]
+	end
+
+	local xrosPlatform = ""
+	if _OPTIONS["with-xros"] then
+		xrosPlatform = _OPTIONS["with-xros"]
 	end
 
 	local windowsPlatform = nil
@@ -248,6 +262,13 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "ios-arm"   == _OPTIONS["gcc"]
 			or "ios-arm64" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
+
+		elseif "xros-arm64"     == _OPTIONS["gcc"]
+			or "xros-simulator" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
@@ -432,6 +453,11 @@ function toolchain(_buildDir, _libDir)
 			action.xcode.tvOSTargetPlatformVersion = str_or(tvosPlatform, "9.0")
 			premake.xcode.toolset = "appletvos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos"))
+
+		elseif "xros" == _OPTIONS["xcode"] then
+			action.xcode.visionOSTargetPlatformVersion = str_or(xrosPlatform, "1.0")
+			premake.xcode.toolset = "xros"
+			location (path.join(_buildDir, "projects", _ACTION .. "-xros"))
 		end
 	end
 
@@ -995,6 +1021,45 @@ function toolchain(_buildDir, _libDir)
 			"-miphoneos-version-min=9.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-fembed-bitcode",
+		}
+
+	configuration { "xros*" }
+		linkoptions {
+			"-lc++",
+		}
+		buildoptions {
+			"-Wfatal-errors",
+			"-Wunused-value",
+			"-Wundef",
+		}
+		includedirs { path.join(bxDir, "include/compat/ios") }
+
+	configuration { "xros-arm64" }
+		targetdir (path.join(_buildDir, "xros-arm64/bin"))
+		objdir (path.join(_buildDir, "xros-arm64/obj"))
+		libdirs { path.join(_libDir, "lib/xros-arm64") }
+		linkoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform.. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..tvosPlatform .. ".sdk",
+		}
+
+	configuration { "xros-simulator" }
+		targetdir (path.join(_buildDir, "xros-simulator/bin"))
+		objdir (path.join(_buildDir, "xros-simulator/obj"))
+		libdirs { path.join(_libDir, "lib/xros-simulator") }
+
+		linkoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform.. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk/System/Library/Frameworks",
+		}
+		buildoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk",
 		}
 
 	configuration { "tvos*" }

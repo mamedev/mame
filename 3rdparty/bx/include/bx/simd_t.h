@@ -39,6 +39,7 @@
 #elif   BX_COMPILER_CLANG \
 	&& !BX_PLATFORM_EMSCRIPTEN \
 	&& !BX_PLATFORM_IOS \
+	&& !BX_PLATFORM_VISIONOS \
 	&&  BX_CLANG_HAS_EXTENSION(attribute_ext_vector_type)
 #	undef  BX_SIMD_LANGEXT
 #	define BX_SIMD_LANGEXT 1

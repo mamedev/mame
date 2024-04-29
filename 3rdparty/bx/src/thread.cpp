@@ -20,7 +20,8 @@
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
 	|| BX_PLATFORM_RPI     \
-	|| BX_PLATFORM_NX
+	|| BX_PLATFORM_NX      \
+	|| BX_PLATFORM_VISIONOS
 #	include <pthread.h>
 #	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
 #		include <sys/prctl.h>
@@ -243,7 +244,8 @@ namespace bx
 #if BX_CRT_NONE
 		BX_UNUSED(_name);
 #elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+	|| BX_PLATFORM_IOS   \
+	|| BX_PLATFORM_VISIONOS
 		pthread_setname_np(_name);
 #elif (BX_CRT_GLIBC >= 21200)
 		pthread_setname_np(ti->m_handle, _name);

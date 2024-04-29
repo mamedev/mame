@@ -9,7 +9,8 @@
 
 #if BX_CRT_NONE
 #elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+	|| BX_PLATFORM_IOS   \
+	|| BX_PLATFORM_VISIONOS
 #	include <dispatch/dispatch.h>
 #elif BX_PLATFORM_POSIX
 #	include <errno.h>
@@ -36,7 +37,8 @@ namespace bx
 #if BX_CRT_NONE
 
 #elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+	|| BX_PLATFORM_IOS   \
+	|| BX_PLATFORM_VISIONOS
 		dispatch_semaphore_t m_handle;
 #elif BX_PLATFORM_POSIX
 		pthread_mutex_t m_mutex;
@@ -70,7 +72,8 @@ namespace bx
 		return false;
 	}
 #elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+	|| BX_PLATFORM_IOS   \
+	|| BX_PLATFORM_VISIONOS
 
 	Semaphore::Semaphore()
 	{

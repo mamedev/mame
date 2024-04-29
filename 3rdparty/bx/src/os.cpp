@@ -26,11 +26,13 @@
 	|| BX_PLATFORM_NX         \
 	|| BX_PLATFORM_OSX        \
 	|| BX_PLATFORM_PS4        \
-	|| BX_PLATFORM_RPI
+	|| BX_PLATFORM_RPI        \
+	|| BX_PLATFORM_VISIONOS
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_IOS       \
 	|| BX_PLATFORM_OSX       \
-	|| BX_PLATFORM_PS4
+	|| BX_PLATFORM_PS4       \
+	|| BX_PLATFORM_VISIONOS
 #		include <pthread.h> // mach_port_t
 #	endif // BX_PLATFORM_*
 
