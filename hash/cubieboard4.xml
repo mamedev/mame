@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Software list for Cubieboard4 (CC A-20) external SD card slot.
+
+-->
+
+<softwarelist name="cubieboard4" description="Cubieboard4 software (for external SD card)">
+
+	<!-- "Official" images from cubieboard.org -->
+
+	<software name="cb4_debiansvrcrd">
+		<description>Debian server for Cubieboard4 (v1.0)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="cubieboard4_sdcard">
+			<diskarea name="image">
+				<feature name="video" value="hdmi" />
+				<disk name="cb4-debian-server-hdmi-card-v1.0" sha1="3e98a28e72c913afa5883e040731e17b5f90aad2" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_linarodstcrd">
+		<description>Linaro desktop for Cubieboard4 (v1.0)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="cubieboard4_sdcard">
+			<diskarea name="image">
+				<feature name="video" value="hdmi" />
+				<disk name="linaro-desktop-cb4-card-hdmi-v1.0" sha1="db646cd4191c3dbbf72764846d6ae5ef32687554" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_linarosvrcrdh">
+		<description>Linaro server for Cubieboard4 (v2.0, HDMI)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="cubieboard4_sdcard">
+			<diskarea name="image">
+				<feature name="video" value="hdmi" />
+				<disk name="linaro-server-cb4-card-hdmi-v2.0" sha1="18a3ca934b3536209bdece46fcdfc3de97135c5b" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_linarosvrcrdv">
+		<description>Linaro server for Cubieboard4 (v2.0, VGA)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="cubieboard4_sdcard">
+			<diskarea name="image">
+				<feature name="video" value="vga" />
+				<disk name="linaro-server-cb4-card-vga-v2.0" sha1="df8fd2c8178420a77e14b0be5197eeafe7bf96de" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
