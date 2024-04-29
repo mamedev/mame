@@ -34888,8 +34888,12 @@ quizpani                        // (c) 1993 NMK
 dbox                            // (c) 1996 Nokia Multimedia
 
 @source:nokia/mikromik.cpp
+mm1m4                           //
+mm1m4g                          //
 mm1m6                           //
+mm1m6g                          //
 mm1m7                           //
+mm1m7g                          //
 
 @source:nokia/nokia_3310.cpp
 noki3210                        //
