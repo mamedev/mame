@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Skeleton driver for Cobra Sport Dart, darts machine from the Spanish company TourVisión.
+Skeleton driver for Cobra Sport Dart, darts machines from the Spanish company TourVisión.
 Manual, pics and some more info can be found at https://www.recreativas.org/cobra-6479-tour-vision-games
 
  COBRA/CPU-1
@@ -33,13 +33,20 @@ Manual, pics and some more info can be found at https://www.recreativas.org/cobr
  |  |MAX691CPE|  |_SN7407N_|       ::::::::::::        :::::::::::::::::::            |
  |____________________________________________________________________________________|
 
+There's another PCB (same connectors, fully compatible) with almost the same layout
+and components, but replacing the sound OKI M6376 with a Winbond WF19054 (AY-3-8910A clone).
+
 */
 
 #include "emu.h"
+
 #include "cpu/nec/v25.h"
 #include "machine/pcf8583.h"
+#include "sound/ay8910.h"
 #include "sound/okim6376.h"
+
 #include "speaker.h"
+
 
 namespace {
 
@@ -51,10 +58,13 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void cobrasd(machine_config &config);
+	void cobrasdoki(machine_config &config);
+	void cobrasday(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	void cobrasd(machine_config &config);
 };
 
 
@@ -88,12 +98,32 @@ void cobrasd_state::cobrasd(machine_config &config)
 	V25(config, m_maincpu, 16_MHz_XTAL);
 
 	PCF8583(config, "rtc", 32.768_kHz_XTAL); // External xtal labeled "S833", unknown frequency
+}
+
+void cobrasd_state::cobrasdoki(machine_config &config)
+{
+	// Basic machine hardware
+
+	cobrasd(config);
 
 	// Sound hardware
 
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6376(config, "oki", 4_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
+}
+
+void cobrasd_state::cobrasday(machine_config &config)
+{
+	// Basic machine hardware
+
+	cobrasd(config);
+
+	// Sound hardware
+
+	SPEAKER(config, "mono").front_center();
+
+	AY8910(config, "psg", 16_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
 }
 
 
@@ -109,8 +139,18 @@ ROM_START(cobrasd)
 	ROM_LOAD("palce16v8h-25.u11", 0x117, 0x117, NO_DUMP) // protected
 ROM_END
 
+ROM_START(cobrasda)
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD("model_sc8_version_2.1.u16", 0x00000, 0x20000, CRC(3ba60087) SHA1(9a2ebc0d99dcb1f5ccf8f586776d7344d0799cf4))
 
-} // Anonymous namespace
+	ROM_REGION(0x22e, "plds", 0)
+	ROM_LOAD("palce16v8h-25.u8",  0x000, 0x117, NO_DUMP)
+	ROM_LOAD("palce16v8h-25.u11", 0x117, 0x117, NO_DUMP)
+ROM_END
+
+} // anonymous namespace
 
 
-GAME(1998, cobrasd, 0, cobrasd, cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart", MACHINE_IS_SKELETON_MECHANICAL) // Also knwon as Tour Sport Dart
+//   YEAR  NAME      PARENT   MACHINE     INPUT    CLASS          INIT        ROT   COMPANY         FULLNAME                                                FLAGS
+GAME(1998, cobrasd,  0,       cobrasdoki, cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart / Tour Sport Dart (OKI M6376 sound)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cobrasda, cobrasd, cobrasday,  cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart / Tour Sport Dart (AY-8910 sound)",   MACHINE_IS_SKELETON_MECHANICAL)

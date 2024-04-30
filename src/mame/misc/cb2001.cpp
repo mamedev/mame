@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Roberto Zandona'
+// copyright-holders: David Haywood, Roberto Zandona'
+
 /*************************************************************************************************
 
   Cherry Bonus 2001  (c)2000/2001 Dyna
@@ -11,7 +12,7 @@ CPU
 
 1x DYNA CPU91A-011-0016JK004 (QFP84) custom
 1x DYNA DC3001-0051A (QFP128) custom
-1x DYNA 22A078803 (DIP42) (I think it's an I/O)
+1x DYNA 22A078803 (DIP42) (basically equivalent to 2x I8255)
 1x WINBOND WF19054 (equivalent to AY-3-8910)
 1x oscillator 24.000MHz
 
@@ -43,13 +44,26 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 *************************************************************************************************/
 
 #include "emu.h"
+
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/nec/v25.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_VIDEOREGS     (1U << 1)
+
+#define VERBOSE (LOG_GENERAL | LOG_VIDEOREGS)
+
+#include "logmacro.h"
+
+#define LOGVIDEOREGS(...)     LOGMASKED(LOG_VIDEOREGS,     __VA_ARGS__)
 
 
 namespace {
@@ -67,8 +81,10 @@ public:
 	{ }
 
 	void cb2001(machine_config &config);
+	void ndongmul2(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -78,63 +94,59 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	int m_videobank = 0;
-	int m_videomode = 0;
-	tilemap_t *m_reel1_tilemap = nullptr;
-	tilemap_t *m_reel2_tilemap = nullptr;
-	tilemap_t *m_reel3_tilemap = nullptr;
-	int m_other1 = 0;
-	int m_other2 = 0;
+	uint8_t m_videobank = 0;
+	uint8_t m_videomode = 0;
+	tilemap_t *m_reel_tilemap[3]{};
+	uint8_t m_other1 = 0;
+	uint8_t m_other2 = 0;
 
-	void cb2001_vidctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cb2001_vidctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cb2001_bg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_cb2001_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_cb2001_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
-	void cb2001_palette(palette_device &palette) const;
-	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vidctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vidctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	void palette_init(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	uint8_t irq_ack_r();
-	void cb2001_io(address_map &map);
-	void cb2001_map(address_map &map);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 };
 
 
-#define xxxx 0x90 /* Unknown */
+#define xxxx 0x90 // Unknown
 
 static const uint8_t cb2001_decryption_table[256] = {
-	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
+	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, // 00
 //    ssss                ---- **** pppp pppp  ssss           pppp                pppp
-	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,0x40,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
+	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,0x40,0xa0,0xd3,0x3a,0x14,0x89,0x1f, // 10
 //    rrrr           **** pppp                 pppp pppp pppp pppp ppp? pppp pppp ssss
-	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,0x39, /* 20 */
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,0x39, // 20
 //         ssss      ssss      pppp pppp       pppp           ssss pppp pppp      ****
-	0x89,xxxx,xxxx,xxxx,xxxx,0x22,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
+	0x89,xxxx,xxxx,xxxx,xxxx,0x22,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, // 30
 //    wwww                     **** pppp                 debu           pppp      ssss
-	xxxx,0xea,xxxx,xxxx,0xd0,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,0xb3, /* 40 */
+	xxxx,0xea,xxxx,xxxx,0xd0,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,0xb3, // 40
 //         ssss           **** pppp pppp            pppp           ssss           pppp
-	0x13,xxxx,0x2c,xxxx,0x9d,xxxx,0x42,0xc0, 0x04,xxxx,0xb7,xxxx,0xeb,0xab,xxxx,xxxx, /* 50 */
+	0x13,xxxx,0x2c,xxxx,0x9d,xxxx,0x42,0xc0, 0x04,xxxx,0xb7,xxxx,0xeb,0xab,xxxx,xxxx, // 50
 //    ????      ssss      ****      pppp pppp  ****      ****      ssss pppp
-	xxxx,xxxx,xxxx,xxxx,0x0a,xxxx,xxxx,xxxx, 0xa1,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
+	xxxx,xxxx,xxxx,xxxx,0x0a,xxxx,xxxx,xxxx, 0xa1,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, // 60
 //                        pppp                 ssss pppp                pppp ssss
-	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,0x34, /* 70 */
+	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,0x34, // 70
 //    ssss pppp pppp ssss           pppp       ssss      pppp           ssss      ****
-	0x26,xxxx,0xd1,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
+	0x26,xxxx,0xd1,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, // 80
 //    pppp      rrrr           pppp **** ssss            pppp      ssss      pppp
-	xxxx,0x3d,0xe9,xxxx,xxxx,0xbe,0xf9,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
+	xxxx,0x3d,0xe9,xxxx,xxxx,0xbe,0xf9,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, // 90
 //         wwww pppp           pppp ****                 pppp      ssss      ssss
-	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
+	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, // A0
 //    ****      pppp ssss pppp **** pppp ssss  pppp      ssss ssss pppp pppp      pppp
-	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x05,0x03,xxxx,0x1e,0x43,0x07,0xcf, /* B0 */
+	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x05,0x03,xxxx,0x1e,0x43,0x07,0xcf, // B0
 //    pppp      ssss           pppp                 pppp pppp      ssss **** ssss ssss
-	0xcb,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,0x48,xxxx,0x2e,xxxx, /* C0 */
+	0xcb,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,0x48,xxxx,0x2e,xxxx, // C0
 //    ssss ssss pppp           ssss pppp                 pppp **** ****      pppp
-	xxxx,0xf2,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,0xff,xxxx,0xfa,0xc7,0x8b, /* D0 */
+	xxxx,0xf2,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,0xff,xxxx,0xfa,0xc7,0x8b, // D0
 //         pppp pppp      ****      pppp pppp  pppp           ssss      **** ssss pppp
-	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,0xb2, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
+	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,0xb2, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, // E0
 //    ssss gggg      ssss      ****      pppp  pppp ****
-	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x3a, xxxx,xxxx,0x34,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
+	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x3a, xxxx,xxxx,0x34,xxxx,0x81,xxxx,xxxx,xxxx, // F0
 //         pppp ssss                     ppp?            wwww      pppp
 };
 
@@ -358,31 +370,35 @@ e3 -> c6
 */
 
 
-uint32_t cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void cb2001_state::machine_start()
 {
-	int count,x,y;
+	save_item(NAME(m_videobank));
+	save_item(NAME(m_videomode));
+	save_item(NAME(m_other1));
+	save_item(NAME(m_other2));
+}
+
+
+uint32_t cb2001_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = 0x0000;
+	int count = 0x0000;
 
 	// render bg as 8x8 tilemaps
 	if (m_other1 & 0x02)
 	{
 		if (!(m_other1 & 0x04))
 		{
-			for (y=0;y<32;y++)
+			for (int y = 0; y < 32; y++)
 			{
-				for (x=0;x<64;x++)
+				for (int x = 0; x < 64; x++)
 				{
-					int tile;
-					int colour;
+					int tile = (m_vram_bg[count] & 0x0fff);
+					int const colour = (m_vram_bg[count] & 0xf000) >> 12;
+					tile += m_videobank * 0x1000;
 
-					tile = (m_vram_bg[count] & 0x0fff);
-					colour = (m_vram_bg[count] & 0xf000)>>12;
-					tile += m_videobank*0x2000;
-
-
-					m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,colour,0,0,x*8,y*8);
+					m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, tile, colour, 0, 0, x * 8, y * 8);
 
 					count++;
 				}
@@ -390,32 +406,28 @@ uint32_t cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 
 		}
 		else
 		{
-			int i;
-
-			for (i= 0;i < 64;i++)
+			for (int i = 0; i < 64; i++)
 			{
-				uint16_t scroll;
+				uint16_t scroll = m_vram_bg[0xa00 / 2 + i / 2];
+				if (i & 1)
+					scroll >>= 8;
+				scroll &= 0xff;
 
-				scroll = m_vram_bg[0xa00/2 + i/2];
-				if (i&1)
-					scroll >>=8;
-				scroll &=0xff;
+				m_reel_tilemap[1]->set_scrolly(i, scroll);
 
-				m_reel2_tilemap->set_scrolly(i, scroll);
+				scroll = m_vram_bg[0x800 / 2 + i / 2];
+				if (i & 1)
+					scroll >>= 8;
+				scroll &= 0xff;
 
-				scroll = m_vram_bg[0x800/2 + i/2];
-				if (i&1)
-					scroll >>=8;
-				scroll &=0xff;
+				m_reel_tilemap[0]->set_scrolly(i, scroll);
 
-				m_reel1_tilemap->set_scrolly(i, scroll);
+				scroll = m_vram_bg[0xc00 / 2 + i / 2];
+				if (i & 1)
+					scroll >>= 8;
+				scroll &= 0xff;
 
-				scroll = m_vram_bg[0xc00/2 + i/2];
-				if (i&1)
-					scroll >>=8;
-				scroll &=0xff;
-
-				m_reel3_tilemap->set_scrolly(i, scroll);
+				m_reel_tilemap[2]->set_scrolly(i, scroll);
 
 			}
 
@@ -424,36 +436,29 @@ uint32_t cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 		}
 	}
 
 	count = 0x0000;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<64;x++)
+		for (int x = 0; x < 64; x++)
 		{
-			int tile;
-			int colour;
+			int tile = (m_vram_fg[count] & 0x0fff);
+			int const colour = (m_vram_fg[count] & 0xf000) >> 12;
+			tile += m_videobank * 0x1000;
 
-			tile = (m_vram_fg[count] & 0x0fff);
-			colour = (m_vram_fg[count] & 0xf000)>>12;
-			tile += m_videobank*0x2000;
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, colour, 0, 0, x * 8, y * 8, 0);
 
-			if (m_other2 & 0x4)
-			{
-				tile += 0x1000;
-			}
-
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
 
-	popmessage("%02x %02x %02x %02x\n",m_videobank,m_videomode, m_other1, m_other2);
+	LOGVIDEOREGS("%02x %02x %02x %02x\n", m_videobank, m_videomode, m_other1, m_other2);
 
 	return 0;
 }
@@ -462,142 +467,106 @@ uint32_t cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 
 /* these ports sometimes get written with similar values
  - they could be hooked up wrong, or subject to change it the code
    is being executed incorrectly */
-void cb2001_state::cb2001_vidctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cb2001_state::vidctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15) // video control?
 	{
-		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
-		m_videobank = (data & 0x0800)>>11;
+		LOGVIDEOREGS("vidctrl_w %04x %04x\n", data, mem_mask);
+		m_videobank = (data & 0x0c00) >> 10;
 	}
 	else // something else
 		m_other1 = data & 0x00ff;
 }
 
-void cb2001_state::cb2001_vidctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cb2001_state::vidctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15) // video control?
 	{
-		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
-		m_videomode = (data>>8) & 0x03; // which bit??
+		LOGVIDEOREGS("vidctrl2_w %04x %04x\n", data, mem_mask); // I think this switches to 'reels' mode
+		m_videomode = (data >> 8) & 0x03; // which bit??
 	}
 	else // something else
 		m_other2 = data & 0x00ff;
 
-//      printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
+//      LOGVIDEOREGS("vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
 }
 
 
-TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel1_tile_info)
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(cb2001_state::get_reel_tile_info)
 {
-	int code = m_vram_bg[(0x0000/2) + tile_index/2];
+	int code = m_vram_bg[(Which * 0x200 / 2) + tile_index / 2];
 
-	if (tile_index&1)
-		code >>=8;
+	if (tile_index & 1)
+		code >>= 8;
 
-	code &=0xff;
+	code &= 0xff;
 
-	int colour = 0;//= (cb2001_out_c&0x7) + 8;
+	int const reel_bank = (m_other2 & 0x0c) << 8;
 
-	tileinfo.set(1,
-			code+0x800,
-			colour,
-			0);
-}
+	int const colour = 0; //= (out_c & 0x7) + 8;
 
-TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel2_tile_info)
-{
-	int code = m_vram_bg[(0x0200/2) + tile_index/2];
-
-	if (tile_index&1)
-		code >>=8;
-
-	code &=0xff;
-
-	int colour = 0;//(cb2001_out_c&0x7) + 8;
-
-	tileinfo.set(1,
-			code+0x800,
-			colour,
-			0);
-}
-
-
-TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel3_tile_info)
-{
-	int code = m_vram_bg[(0x0400/2) + tile_index/2];
-	int colour = 0;//(cb2001_out_c&0x7) + 8;
-
-	if (tile_index&1)
-		code >>=8;
-
-	code &=0xff;
-
-	tileinfo.set(1,
-			code+0x800,
-			colour,
-			0);
+	tileinfo.set(1, code | reel_bank, colour, 0);
 }
 
 
 void cb2001_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cb2001_state::get_cb2001_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cb2001_state::get_cb2001_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cb2001_state::get_cb2001_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cb2001_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cb2001_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cb2001_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
 }
 
-void cb2001_state::cb2001_bg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cb2001_state::bg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg[offset]);
 
 	// also used for the reel tilemaps in a different mode
 /*
-    if (offset<0x200/2)
+    if (offset < 0x200 / 2)
     {
-        m_reel1_tilemap->mark_tile_dirty((offset&0xff)/2);
+        m_reel_tilemap[0]->mark_tile_dirty((offset & 0xff) / 2);
     }
-    else if (offset<0x400/2)
+    else if (offset < 0x400 / 2)
     {
-        m_reel2_tilemap->mark_tile_dirty((offset&0xff)/2);
+        m_reel_tilemap[1]->mark_tile_dirty((offset & 0xff) / 2);
     }
-    else if (offset<0x600/2)
+    else if (offset < 0x600 / 2)
     {
-        m_reel3_tilemap->mark_tile_dirty((offset&0xff)/2);
+        m_reel_tilemap[2]->mark_tile_dirty((offset & 0xff) / 2);
     }
-    else if (offset<0x800/2)
+    else if (offset < 0x800 / 2)
     {
-    //  reel4_tilemap->mark_tile_dirty((offset&0xff)/2);
+    //  m_reel_tilemap[3]->mark_tile_dirty((offset & 0xff) / 2);
     }
 */
-	m_reel1_tilemap->mark_all_dirty();
-	m_reel2_tilemap->mark_all_dirty();
-	m_reel3_tilemap->mark_all_dirty();
-
-
+	m_reel_tilemap[0]->mark_all_dirty();
+	m_reel_tilemap[1]->mark_all_dirty();
+	m_reel_tilemap[2]->mark_all_dirty();
 }
 
-void cb2001_state::cb2001_map(address_map &map)
+void cb2001_state::program_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
-	map(0x20000, 0x20fff).ram().share("vrafg");
-	map(0x21000, 0x21fff).ram().w(FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
+	map(0x20000, 0x20fff).ram().share(m_vram_fg);
+	map(0x21000, 0x21fff).ram().w(FUNC(cb2001_state::bg_w)).share(m_vram_bg);
 	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
 }
 
-void cb2001_state::cb2001_io(address_map &map)
+void cb2001_state::io_map(address_map &map)
 {
-	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));   /* Input Ports */
-	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));   /* DIP switches */
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));   // Input ports
+	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));   // DIP switches
 	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
 
 	map(0x30, 0x30).r(FUNC(cb2001_state::irq_ack_r));
-	map(0x30, 0x31).w(FUNC(cb2001_state::cb2001_vidctrl_w));
-	map(0x32, 0x33).w(FUNC(cb2001_state::cb2001_vidctrl2_w));
+	map(0x30, 0x31).w(FUNC(cb2001_state::vidctrl_w));
+	map(0x32, 0x33).w(FUNC(cb2001_state::vidctrl2_w));
 }
 
 static INPUT_PORTS_START( cb2001 )
@@ -614,12 +583,12 @@ static INPUT_PORTS_START( cb2001 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)  /* Coin D */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)  /* Coin C */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)  // Coin D
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)  // Coin C
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -632,32 +601,32 @@ static INPUT_PORTS_START( cb2001 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:1")  /* OK */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:1")  // OK
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:2")  /* OK */
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:2")  // OK
 	PORT_DIPSETTING(    0x02, "Active Low" )
 	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:3")  /* OK */
+	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:3")  // OK
 	PORT_DIPSETTING(    0x04, "Payout Switch" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:4")  /* not checked */
+	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:4")  // not checked
 	PORT_DIPSETTING(    0x08, "Loss" )
 	PORT_DIPSETTING(    0x00, "Even" )
-	PORT_DIPNAME( 0x10, 0x00, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:5")  /* OK */
+	PORT_DIPNAME( 0x10, 0x00, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:5")  // OK
 	PORT_DIPSETTING(    0x00, "80%" )
 	PORT_DIPSETTING(    0x10, "90%" )
-	PORT_DIPNAME( 0x20, 0x00, "W-UP Game" )         PORT_DIPLOCATION("DSW1:6")  /* OK */
+	PORT_DIPNAME( 0x20, 0x00, "W-UP Game" )         PORT_DIPLOCATION("DSW1:6")  // OK
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )           PORT_DIPLOCATION("DSW1:7,8")    /* OK */
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )           PORT_DIPLOCATION("DSW1:7,8")    // OK
 	PORT_DIPSETTING(    0x00, "16" )
 	PORT_DIPSETTING(    0x40, "32" )
 	PORT_DIPSETTING(    0x80, "64" )
 	PORT_DIPSETTING(    0xc0, "96" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:1,2,3")  /* OK */
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:1,2,3")  // OK
 	PORT_DIPSETTING(    0x07, "35%" )
 	PORT_DIPSETTING(    0x06, "40%" )
 	PORT_DIPSETTING(    0x05, "45%" )
@@ -666,53 +635,53 @@ static INPUT_PORTS_START( cb2001 )
 	PORT_DIPSETTING(    0x02, "60%" )
 	PORT_DIPSETTING(    0x01, "65%" )
 	PORT_DIPSETTING(    0x00, "70%" )
-	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:4,5")    /* OK */
+	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:4,5")    // OK
 	PORT_DIPSETTING(    0x18, "300" )
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x20, 0x00, "100 Odds Sound" )        PORT_DIPLOCATION("DSW2:6")  /* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "100 Odds Sound" )        PORT_DIPLOCATION("DSW2:6")  // not checked
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Key-In Type" )           PORT_DIPLOCATION("DSW2:7")  /* OK */
+	PORT_DIPNAME( 0x40, 0x40, "Key-In Type" )           PORT_DIPLOCATION("DSW2:7")  // OK
 	PORT_DIPSETTING(    0x40, "A-Type" )
 	PORT_DIPSETTING(    0x00, "B-Type" )
-	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:8")  /* related with DSW 4-6 */
+	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:8")  // related with DSW 4-6
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
+	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  // OK
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40) // A-Type
+	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00) // B-Type
+	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  // OK
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
+	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  // OK
+	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4", 0x10, EQUALS, 0x10) // C-Type
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4", 0x10, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4", 0x10, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4", 0x10, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4", 0x10, EQUALS, 0x00) // D-Type
+	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4", 0x10, EQUALS, 0x00)
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  // OK
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* not checked */
+	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    // not checked
 	PORT_DIPSETTING(    0x07, "5,000" )
 	PORT_DIPSETTING(    0x06, "10,000" )
 	PORT_DIPSETTING(    0x05, "20,000" )
@@ -721,46 +690,45 @@ static INPUT_PORTS_START( cb2001 )
 	PORT_DIPSETTING(    0x02, "50,000" )
 	PORT_DIPSETTING(    0x01, "100,000" )
 	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* not working */
+	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") // not working
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
+	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    // OK
 	PORT_DIPSETTING(    0x10, "C-Type" )
 	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
+	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    // OK
 	PORT_DIPSETTING(    0x20, "16 Bet" )
 	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
+	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    // OK
 	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    // not checked
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* not working */
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   // not working
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* not checked */
+	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") // not checked
 	PORT_DIPSETTING(    0x06, "1,000" )
 	PORT_DIPSETTING(    0x04, "5,000" )
 	PORT_DIPSETTING(    0x02, "10,000" )
 	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
+	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") // not checked
 	PORT_DIPSETTING(    0x18, "12-7-1" )
 	PORT_DIPSETTING(    0x10, "9-5-1" )
 	PORT_DIPSETTING(    0x08, "6-3-1" )
 	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   // not checked
 	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")   // listed as unused
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   // not working
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(cb2001_state::vblank_irq)
@@ -802,22 +770,22 @@ static GFXDECODE_START( gfx_cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
 
-void cb2001_state::cb2001_palette(palette_device &palette) const
+void cb2001_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *const proms = memregion("proms")->base();
 	int const length = memregion("proms")->bytes();
 
 	for (int i = 0; i < 0x200; i++)
 	{
-		uint16_t dat = (proms[0x000+i] << 8) | proms[0x200+i];
+		uint16_t dat = (proms[0x000 + i] << 8) | proms[0x200 + i];
 
 		int const b = ((dat >> 1) & 0x1f) << 3;
-		int const r = ((dat >> 6 )& 0x1f) << 3;
-		int const g = ((dat >> 11 ) & 0x1f) << 3;
+		int const r = ((dat >> 6) & 0x1f) << 3;
+		int const g = ((dat >> 11) & 0x1f) << 3;
 
-		if (length == 0x400) // are the cb2001 proms dumped incorrectly?
+		if (length == 0x400) // are the cb2001 PROMs dumped incorrectly?
 		{
-			if (!(i&0x20)) palette.set_pen_color((i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
+			if (!(i & 0x20)) palette.set_pen_color((i & 0x1f) | ((i & ~0x3f) >> 1), rgb_t(r, g, b));
 		}
 		else
 		{
@@ -828,10 +796,10 @@ void cb2001_state::cb2001_palette(palette_device &palette) const
 
 void cb2001_state::cb2001(machine_config &config)
 {
-	V35(config, m_maincpu, 20000000); // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
+	V35(config, m_maincpu, 20'000'000); // CPU91A-011-0016JK004; encrypted CPU like NEC V25/35 used in some Irem games
 	m_maincpu->set_decryption_table(cb2001_decryption_table);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cb2001_state::cb2001_map);
-	m_maincpu->set_addrmap(AS_IO, &cb2001_state::cb2001_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb2001_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &cb2001_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cb2001_state::vblank_irq));
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
@@ -851,16 +819,25 @@ void cb2001_state::cb2001(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
-	screen.set_screen_update(FUNC(cb2001_state::screen_update_cb2001));
+	screen.set_screen_update(FUNC(cb2001_state::screen_update));
 
-	PALETTE(config, m_palette, FUNC(cb2001_state::cb2001_palette), 0x100);
+	PALETTE(config, m_palette, FUNC(cb2001_state::palette_init), 0x100);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); // wrong
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1'500'000)); // wrong
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void cb2001_state::ndongmul2(machine_config &config)
+{
+	cb2001(config);
+
+	m_maincpu->set_clock(24_MHz_XTAL);
+
+	I80C51(config, "mcu", 12_MHz_XTAL).set_disable(); // Actually an AT89C51, currently undumped so disabled
 }
 
 
@@ -881,15 +858,73 @@ ROM_START( scherrym )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
 	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "gfx.12c", 0x000000, 0x80000,NO_DUMP ) // this board uses an unmarked MASK rom at 12c, 12a is unpopulated.  Size unknown.
+	ROM_LOAD( "gfx.12c", 0x000000, 0x80000,NO_DUMP ) // this board uses an unmarked MASK ROM at 12c, 12a is unpopulated.  Size unknown.
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
+/* New DongmulDongmul 2 (뉴 동물동물 2, New AnimalAnimal 2) runs on slightly different hardware, but with same CPU, custom and I/O.
+   Video from the real hardware: https://youtu.be/1K9e_7RzeiM
+   _______________________________________________________________________________
+  |    ________    ________    ________    __________    _________________     _  |
+  |KM6264BLG-10L  |74HC00P| KM6264BLG-10L |29F1610ML|   |  HM27C4096     |    (_) <- Switch (SW8)
+  |                                       |__U15____|   |_____U24________|        |
+  |  _______________               ___________                                    |
+  | | 27C020       |              | DYNA     |         __U23_____  __________     |
+  | |___U10________|              | DC3001   |        |N82S147AN| |74HC374AN|  ___|
+  |                               |          |                                |
+  | __       ___________          |__________|         __U22_____  __________ |___
+  ||SW7     | DYNA     |                     Xtal     |N82S147AN| |74HC374AN|   __|
+  ||Ununsed | CPU 91A  |                   24.000 MHz  __________               __|
+  ||__|     |          |                              |74LS245N_|               __|
+  |         |__________|                  ___U8_____   __________               __|
+  | ________      _________              |PALCE16V8|  |74LS245N_|               __|
+  ||74HC04AN     |__SW6___|               ___U7_____   __________               __|
+  |          _________                   |GAL16V8D_|  |74LS245N_|               __|
+  |         |__SW1___|          ____________________   __________               __|
+  |          _________         | DYNA 22A078803    |  |74LS138N_|               __|
+  |         |__SW2___|         |___________________|   __________   __________  __|
+  |          _________          ____________________  |74LS273N_|  |ULN2003AN|  __|
+  |         |__SW3___|         | JFC 95101         |   __________               __|
+  |          _________         |___________________|  |74LS273N_|             ____|
+  |         |__SW4___|                                                        |
+  |          _________                             Xtal                       |
+  |         |__SW5___|   _______U1___________   12.000 MHz                    |___
+  |         __________  | AT89C51           |                                     |
+  | ___     |MACH 110|  |___________________|                                     |
+  ||   |    |AMD     |    _________   _________                                   |
+  |TDA2009  |________|   |74LS245N_| |74LS245N_|                                  |
+  ||___|     _________    ____ ____                                               |
+  |         |__SW0___|   PC817 PC817                                              |
+  |_______________________________________________________________________________|
+
+*/
+ROM_START( ndongmul2 ) // 뉴 동물동물 2
+	ROM_REGION16_LE( 0x080000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "am27c020.u10", 0x000000, 0x040000, CRC(550e53e5) SHA1(a90ee66e7ae9b58005b6ed412669d86532c75156) )
+
+	ROM_REGION( 0x001000, "mcu", 0)
+	ROM_LOAD( "at89c51.u1",          0x000000, 0x001000, NO_DUMP ) // AT89C51, protected
+
+	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "hn27c4096.u24",       0x000000, 0x080000, CRC(d6d14e2a) SHA1(ee6d663f7c31fb76fa56d080aa2cf1c690da61b8) )
+	ROM_LOAD( "mx29f1610ml.u15",     0x080000, 0x200000, NO_DUMP ) // TODO: or possibly the EEPROM is mapped over this to show the Korean specific stuff?
+
+	ROM_REGION( 0x000400, "proms", 0 )
+	ROM_LOAD( "n82s147an.u22",       0x000000, 0x000200, CRC(54b76f79) SHA1(d8eca94fda3436a204e71869a88fba5fc4daed18) )
+	ROM_LOAD( "n82s147an.u23",       0x000200, 0x000200, CRC(2e3063c8) SHA1(b1b3d23063faabe7f588dfafe4a1439573d41cb4) )
+
+	ROM_REGION( 0x000200, "plds", 0)
+	ROM_LOAD( "palce16v8h-25.u8",    0x000000, 0x000117, CRC(f1de9b90) SHA1(3b2e76e1f6dc34d16fa1dded9bc8205683e59c0c) )
+	ROM_LOAD( "gal16v8d.u7",         0x000000, 0x000117, CRC(55e39258) SHA1(4546fdbd343290c2a7953b4cd0f8db5aab2fad18) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2001, cb2001,   0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2001, scherrym, 0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+//    YEAR  NAME       PARENT  MACHINE    INPUT   CLASS         INIT        ROT   COMPANY  FULLNAME                FLAGS
+GAME( 2001, cb2001,    0,      cb2001,    cb2001, cb2001_state, empty_init, ROT0, "Dyna",  "Cherry Bonus 2001",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ndongmul2, 0,      ndongmul2, cb2001, cb2001_state, empty_init, ROT0, "Dyna",  "New DongmulDongmul 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // goes into the weeds at various point, due to either missing MCU dump or incomplete decryption. Bad reels GFX.
+GAME( 2001, scherrym,  0,      cb2001,    cb2001, cb2001_state, empty_init, ROT0, "Dyna",  "Super Cherry Master",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
