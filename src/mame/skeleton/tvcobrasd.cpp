@@ -39,11 +39,14 @@ and components, but replacing the sound OKI M6376 with a Winbond WF19054 (AY-3-8
 */
 
 #include "emu.h"
+
 #include "cpu/nec/v25.h"
 #include "machine/pcf8583.h"
-#include "sound/okim6376.h"
 #include "sound/ay8910.h"
+#include "sound/okim6376.h"
+
 #include "speaker.h"
+
 
 namespace {
 
@@ -59,8 +62,9 @@ public:
 	void cobrasday(machine_config &config);
 
 private:
-	void cobrasd(machine_config &config);
 	required_device<cpu_device> m_maincpu;
+
+	void cobrasd(machine_config &config);
 };
 
 
@@ -144,8 +148,8 @@ ROM_START(cobrasda)
 	ROM_LOAD("palce16v8h-25.u11", 0x117, 0x117, NO_DUMP)
 ROM_END
 
+} // anonymous namespace
 
-} // Anonymous namespace
 
 //   YEAR  NAME      PARENT   MACHINE     INPUT    CLASS          INIT        ROT   COMPANY         FULLNAME                                                FLAGS
 GAME(1998, cobrasd,  0,       cobrasdoki, cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart / Tour Sport Dart (OKI M6376 sound)", MACHINE_IS_SKELETON_MECHANICAL)
