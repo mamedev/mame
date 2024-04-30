@@ -23,6 +23,10 @@ Some games had different titles during development. Some of these are known (and
 - Labyrinth (then released as Escape from the Mindmaster)
 
 MultiLoad (TM) games, i.e. the few games which had separate chunks of data on the tapes, are currently emulated with separate a26 files for each chunk.
+
+
+Side A and B of the tapes have the same content, however the data on Side B has been recorded at a lower speed. Side B was
+meant to be used when there were problems loading the contents from Side A.
 -->
 
 	<software name="commumut">
