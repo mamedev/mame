@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "slot.h"
 
+//
+// fullset Project Neon
+//
+#include "fxpt_atan2.cpp"
+#include "neo_rand.c"
+
+//
+//
+//
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -404,3 +414,170 @@ void neogeo_cart_slot_device::protection_w(offs_t offset, uint16_t data, uint16_
 	if (m_cart)
 		m_cart->protection_w(offset, data, mem_mask);
 }
+
+//
+// fullset Project Neon r/w port handlers
+//
+int16_t neon_fpga_ver = 0x01;
+int16_t neon_mcu_id = 0x0A;
+int16_t neon_mcu_busy = 0x00;
+int16_t neon_bank = 0;
+int16_t neon_fix_bank = 0;
+int16_t neon_mcu_ram[16];
+bool neon_debug_enabled = false;
+
+void neogeo_cart_slot_device::neon_enable_debug_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
+	neon_debug_enabled = data != 0x00;
+	
+	if (neon_debug_enabled) {
+		printf("neon mcu debug enabled\n");
+	}
+}
+
+void neogeo_cart_slot_device::neon_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
+	//no idea what all needs done here - we're just using the primary bank in Project Neon
+	neon_bank = data;
+	if (neon_debug_enabled) {
+		printf("neon_bank_w(0x%X)\n", data);
+	}
+}
+
+uint16_t neogeo_cart_slot_device::neon_mcu_status_r(offs_t offset) {
+	//no idea what all needs done here - we're just using the primary bank in Project Neon
+	u16 result = neon_bank;
+    
+	if (neon_bank == 0x08) {
+		result = (neon_fpga_ver << 12) + (neon_mcu_id << 8) + (neon_mcu_busy << 7) + (neon_bank << 0); 
+	} else {
+		//need to return proper rom data here, but not sure what to do for that yet
+		result = 0xffff;		
+	}
+
+	if (neon_debug_enabled) {
+		printf("neon_bank_r() = 0x%X\n", result);
+	}
+
+	return result;
+}
+
+void neogeo_cart_slot_device::neon_fixbank_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
+	//no idea what all needs done here - we're just using the primary bank in Project Neon
+	neon_fix_bank = data;
+	if (neon_debug_enabled) {
+		printf("neon_fixbank_w(0x%X) ** not implemented in mame **\n", data);
+	}
+}
+
+void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
+	u32 seed;
+	u16 modVal;
+	u16 retVal16;
+
+	//trigger MCU irq - here in mame, just set MCU as busy
+	neon_mcu_busy = 0x01;
+	if (neon_debug_enabled) {
+		printf("neon_irq_w() ** MCU set to BUSY **\n");
+	}
+
+	//do work here
+	switch (neon_mcu_ram[0] >> 8) {
+		case 0x01: //SMUL
+			//need to look at firware to see what this command is
+
+			if (neon_debug_enabled) {
+				printf("mcu SMUL called\n");
+			}
+			break;
+
+		case 0x02: //atan2 -- only implementing 1 atan calc (for now?)
+			neon_mcu_ram[1] = fxpt_atan2(neon_mcu_ram[1], neon_mcu_ram[2]);
+			
+			if (neon_debug_enabled) {
+				printf("mcu fxp_atan2(%d, %d) = %d\n", neon_mcu_ram[1], neon_mcu_ram[2], neon_mcu_ram[0]);
+			}
+			break;
+
+		case 0x03: //save
+			//do save 
+
+			if (neon_debug_enabled) {
+				printf("mcu SAVE called\n");
+			}
+			break;
+
+		case 0x04: //load
+			//do load
+
+			if (neon_debug_enabled) {
+				printf("mcu LOAD called\n");
+			}
+			break;
+
+		case 0x05: //srand(s) - seed rng
+			seed = ((neon_mcu_ram[0]) << 16) + neon_mcu_ram[1];
+			srand(seed);
+
+			if (neon_debug_enabled) {
+				printf("mcu neo_srand(%d)\n", seed);
+			}
+			break;
+
+		case 0x06: //rand(m) - generate random number and do mod m on value
+			modVal = neon_mcu_ram[0];
+			retVal16 = neo_rand() % modVal;
+			neon_mcu_ram[1] = retVal16; //do random call here
+
+			if (neon_debug_enabled) {
+				printf("mcu neo_rand(%d) = %d\n", modVal, retVal16);
+			}
+			break;
+
+		case 0xAA: //Test
+			// what to do here?
+
+			if (neon_debug_enabled) {
+				printf("** mcu test **\n");
+			}
+			break;
+
+		case 0xff: //mcu reset
+			if (neon_mcu_ram[0] == 0xff00 && neon_mcu_ram[1] == 0xaa55) {
+				//trigger mcu reset here
+				if (neon_debug_enabled) {
+					printf("** mcu reset **\n");
+				}
+			}
+			break;
+
+		default:
+			if (neon_debug_enabled) {
+				printf("** Unhandled MCU command %4X\n", neon_mcu_ram[0]);
+			}
+			break;
+	}
+
+	neon_mcu_busy = 0x00;
+	
+	if (neon_debug_enabled) {
+		printf("neon_irq_w() ** MCU irq done **\n");
+	}
+}
+
+void neogeo_cart_slot_device::neon_mcu_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
+	neon_mcu_ram[offset & 0x001f] = data;
+	if (neon_debug_enabled) {
+		printf("neon_mcu_ram_w() - writing 0x%X (%d) to offset 0x%X\n", data, data, offset & 0x001f);
+	}
+}
+
+uint16_t neogeo_cart_slot_device::neon_mcu_ram_r(offs_t offset) {
+	if (neon_bank == 0x08) {
+		if (neon_debug_enabled) {
+			printf("neon_mcu_ram_r(%x) = %x (%d)\n", 0x210000 + (offset * 2), neon_mcu_ram[offset], neon_mcu_ram[offset]);
+		}
+		return neon_mcu_ram[offset & 0x001f];
+	} else {
+		return 0xffff;
+	}
+}
+
