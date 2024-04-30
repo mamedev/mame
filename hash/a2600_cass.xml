@@ -45,20 +45,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		</part>
 	</software>
 
-	<software name="commumutpv" cloneof="commumut">
-		<description>Communist Mutants from Space (preview)</description>
-		<year>1982</year>
-		<publisher>Arcadia Corporation</publisher>
-		<info name="serial" value="AR-4101"/>
-		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="communist mutants from space (preview) (1982) (arcadia corporation).a26" size="8448" crc="ca6bb788" sha1="ad18885ed38516c3e136293ae565c113f299d223"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="commumute" cloneof="commumut" supported="partial">
 		<description>Communist Mutants from Space (PAL)</description>
 		<year>1982</year>
@@ -76,20 +62,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<part name="cassb" interface="a2600_cass">
 			<dataarea name="cass" size="23479401">
 				<rom name="communist mutants from space  - arcadia corporation (pal, side b).flac" size="23479401" crc="1e882029" sha1="6f75541d6362da2124ce5ce9388c258ec0061ee0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="commumutepv" cloneof="commumut">
-		<description>Communist Mutants from Space (preview) (PAL)</description>
-		<year>1982</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4101"/>
-		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="communist mutants from space (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d1a5b3bb" sha1="b0483e5de99833d630433281953a670dd72a0df4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -114,20 +86,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		</part>
 	</software>
 
-	<software name="dstomperpv" cloneof="dstomper">
-		<description>Dragonstomper (preview)</description>
-		<year>1982</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4100"/>
-		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (preview) (1982) (starpath corporation).a26" size="8448" crc="c483f940" sha1="aa63009fb7dc4ece8cda3078d37f4e93b326c4df"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dstompere" cloneof="dstomper">
 		<description>Dragonstomper (PAL)</description>
 		<year>1982</year>
@@ -144,20 +102,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<part name="cassb" interface="a2600_cass">
 			<dataarea name="cass" size="14617426">
 				<rom name="dragonstomper - starpath corporation (pal, side b).flac" size="14617426" crc="0be59b69" sha1="4fac8cebb88936b5e5b290386e0e617dbd04d717"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dstomperepv" cloneof="dstomper">
-		<description>Dragonstomper (preview) (PAL)</description>
-		<year>1982</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4100"/>
-		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d610fd7e" sha1="7a893558f01e21b4708622cbc4b4db30c849acc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -182,20 +126,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		</part>
 	</software>
 
-	<software name="mindmstrpv" cloneof="mindmstr">
-		<description>Escape from the Mindmaster (preview)</description>
-		<year>1982</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4200"/>
-		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation).a26" size="8448" crc="5a1deb25" sha1="7a32131911eb04957facc87b4333308b44e02c02"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mindmstre" cloneof="mindmstr">
 		<description>Escape from the Mindmaster (PAL)</description>
 		<year>1982</year>
@@ -212,20 +142,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<part name="cassb" interface="a2600_cass">
 			<dataarea name="cass" size="16763727">
 				<rom name="escape from the mindmaster - starpath corporation (pal, side b).flac" size="16763727" crc="6175157c" sha1="0b26b22099535642ccbd09a98cccd81e1b4bd417"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mindmstrepv" cloneof="mindmstr">
-		<description>Escape from the Mindmaster (preview) (PAL)</description>
-		<year>1982</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4200"/>
-		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="cd4bc0e0" sha1="65c7016bc60b7035645cdf1cb50bb396fce60aa0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -303,20 +219,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		</part>
 	</software>
 
-	<software name="fireballpv" cloneof="fireball">
-		<description>Fireball (preview)</description>
-		<year>1982</year>
-		<publisher>Arcadia Corporation</publisher>
-		<info name="serial" value="AR-4300"/>
-		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="fireball (preview) (1982) (arcadia corporation).a26" size="8448" crc="962c498f" sha1="20322ad5eb2ad1c11b454d99126ce3b185351e99"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fireballe" cloneof="fireball" supported="partial">
 		<description>Fireball (PAL)</description>
 		<year>1982</year>
@@ -334,20 +236,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<part name="cassb" interface="a2600_cass">
 			<dataarea name="cass" size="23371984">
 				<rom name="fireball - arcadia corporation (pal, side b).flac" size="23371984" crc="db1baf69" sha1="2be1ce5a31ba26b89446fa09490870bd81228020"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fireballepv" cloneof="fireball">
-		<description>Fireball (preview) (PAL)</description>
-		<year>1982</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4300"/>
-		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="fireball (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="138ccbd1" sha1="f7133999d072ac0560c5a9a4ec46fdd94b52dde6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -533,20 +421,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		</part>
 	</software>
 
-	<software name="partymixpv" cloneof="partymix">
-		<description>Party Mix (preview)</description>
-		<year>1983</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4302"/>
-		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="party mix (preview) (1983) (starpath corporation).a26" size="8448" crc="fb3fe9b1" sha1="035bad1d6142dbe932eb2f2a4e34bbb64692fa9f"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="partymixe" cloneof="partymix">
 		<description>Party Mix (PAL)</description>
 		<year>1983</year>
@@ -567,20 +441,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="party mix (3 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d619142f" sha1="00c90aea85bd8272cb34ce23fd0e5f0d36a1ea48"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="partymixepv" cloneof="partymix">
-		<description>Party Mix (preview) (PAL)</description>
-		<year>1983</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4302"/>
-		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="party mix (preview) (1983) (starpath corporation) (pal).a26" size="8448" crc="57536159" sha1="55e51e131235123d2ab9f8a0209bcb16a7734622"/>
 			</dataarea>
 		</part>
 	</software>
@@ -675,20 +535,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		</part>
 	</software>
 
-	<software name="rabbitpv" cloneof="rabbit">
-		<description>Rabbit Transit (preview)</description>
-		<year>1983</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4104"/>
-		<info name="developer" value="Brian McGhie"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="rabbit transit (preview) (1983) (starpath corporation).a26" size="8448" crc="ba955bb1" sha1="2271944cd9284b499a590cf9fca938560a741990"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rabbite" cloneof="rabbit">
 		<description>Rabbit Transit (PAL)</description>
 		<year>1983</year>
@@ -730,20 +576,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		</part>
 	</software>
 
-	<software name="suicidempv" cloneof="suicidem">
-		<description>Suicide Mission (preview)</description>
-		<year>1982</year>
-		<publisher>Arcadia Corporation</publisher>
-		<info name="serial" value="AR-4102"/>
-		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="suicide mission (preview) (1982) (arcadia corporation).a26" size="8448" crc="4705b9c4" sha1="35061334cd1d26345e2459dfd663d240759eb5f4"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="suicideme" cloneof="suicidem" supported="partial">
 		<description>Suicide Mission (PAL)</description>
 		<year>1982</year>
@@ -761,20 +593,6 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 			<dataarea name="cass" size="22364415">
 				<!-- Escape from the Mindmaster does not load. -->
 				<rom name="suicide mission - starpath corporation (pal, side b).flac" size="22364415" crc="750fafdc" sha1="b99264deeaff3c0e8225b744e9b4dd2fd9563fe3"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="suicidemepv" cloneof="suicidem">
-		<description>Suicide Mission (preview) (PAL)</description>
-		<year>1982</year>
-		<publisher>Starpath Corporation</publisher>
-		<info name="serial" value="AR-4102"/>
-		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
-		<part name="cass" interface="a2600_cass">
-			<dataarea name="cass" size="8448">
-				<rom name="suicide mission (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="67e4a405" sha1="c15c986f92bd068ec844c9cc3da73ff410ec002a"/>
 			</dataarea>
 		</part>
 	</software>
