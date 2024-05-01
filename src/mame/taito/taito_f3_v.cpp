@@ -1121,7 +1121,8 @@ void taito_f3_state::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 
 inline bool taito_f3_state::used(const pivot_inf &layer, int y) const
 {
-	return layer.use_pix() || (m_textram_row_usage[layer.y_index(y) >> 3] > 0);
+	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
+	return layer.use_pix() || (m_textram_row_usage[y_adj >> 3] > 0);
 }
 inline bool taito_f3_state::used(const sprite_inf &layer, int y) const
 {
