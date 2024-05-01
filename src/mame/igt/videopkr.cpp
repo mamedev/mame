@@ -335,8 +335,8 @@ protected:
 	uint8_t videopkr_p2_data_r();
 	void videopkr_p1_data_w(uint8_t data);
 	void videopkr_p2_data_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	int videopkr_t0_latch();
+	void prog_w(int state);
 	uint8_t sound_io_r();
 	void sound_io_w(uint8_t data);
 	uint8_t sound_p2_r();
@@ -427,8 +427,6 @@ private:
 };
 
 
-#define DATA_NVRAM_SIZE     0x100
-
 /*************************
 *     Video Hardware     *
 *************************/
@@ -458,12 +456,11 @@ static uint8_t dec_7seg(int data)
 /* Display a seven digit counter on layout - Index points to less significant digit*/
 void videopkr_state::count_7dig(unsigned long data, uint8_t index)
 {
-	uint8_t i;
-	char strn[8];
-	sprintf(strn,"%7lu",data);
-
-	for (i = 0; i < 7; i++)
-		m_digits[index+i] = dec_7seg((strn[6 - i] | 0x10) - 0x30);
+	for (auto i = 0; i < 7; i++)
+	{
+		m_digits[index+i] = dec_7seg(data % 10);
+		data /= 10;
+	}
 }
 
 void videopkr_state::videopkr_palette(palette_device &palette) const
@@ -781,12 +778,12 @@ void videopkr_state::videopkr_p2_data_w(uint8_t data)
 	m_p2 = data;
 }
 
-READ_LINE_MEMBER(videopkr_state::videopkr_t0_latch)
+int videopkr_state::videopkr_t0_latch()
 {
 	return m_t0_latch;
 }
 
-WRITE_LINE_MEMBER(videopkr_state::prog_w)
+void videopkr_state::prog_w(int state)
 {
 	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
@@ -1241,8 +1238,6 @@ void videopkr_state::machine_start()
 	m_count3 = 0;
 	m_count4 = 0;
 	m_ant_jckp = 0;
-
-	subdevice<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
 }
 
 void babypkr_state::machine_start()
@@ -1277,7 +1272,7 @@ void videopkr_state::videopkr(machine_config &config)
 	soundcpu.p2_in_cb().set(FUNC(videopkr_state::sound_p2_r));
 	soundcpu.p2_out_cb().set(FUNC(videopkr_state::sound_p2_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "data_ram", nvram_device::DEFAULT_ALL_0);
 
 	TIMER(config, "t1_timer").configure_periodic(FUNC(videopkr_state::sound_t1_callback), attotime::from_hz(50));
 
@@ -1408,7 +1403,7 @@ ROM_START( videopkr )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "vpbjorg.col",    0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
-	ROM_END
+ROM_END
 
 ROM_START( blckjack )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -1614,7 +1609,7 @@ ROM_END
 //     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                                FULLNAME                          FLAGS                LAYOUT
 GAMEL( 1984, videopkr, 0,        videopkr, videopkr, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Poker",                    0,                   layout_videopkr )
 GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, videopkr_state, empty_init, ROT0, "IGT - International Game Technology", "Fortune I (PK485-S) Draw Poker", 0,                   layout_videopkr )
-GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, empty_init, ROT0, "InterFlip",                           "Black Jack",                     0,                   layout_blckjack )
+GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, empty_init, ROT0, "InterFlip",                           "Black Jack (InterFlip)",         0,                   layout_blckjack )
 GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Dado",                     0,                   layout_videodad )
 GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Cordoba",                  0,                   layout_videocba )
 GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  babypkr_state,  empty_init, ROT0, "Recreativos Franco",                  "Baby Poker",                     0,                   layout_babypkr  )

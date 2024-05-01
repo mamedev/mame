@@ -41,8 +41,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_VSYSTEM_GGA_H
-#define MAME_VIDEO_VSYSTEM_GGA_H
+#ifndef MAME_VSYSTEM_VSYSTEM_GGA_H
+#define MAME_VSYSTEM_VSYSTEM_GGA_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(VSYSTEM_GGA, vsystem_gga_device)
 
-#endif // MAME_VIDEO_VSYSTEM_GGA_H
+#endif // MAME_VSYSTEM_VSYSTEM_GGA_H

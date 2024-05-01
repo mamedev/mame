@@ -154,12 +154,6 @@ tek410x_keyboard_device::tek410x_keyboard_device(const machine_config &mconfig, 
 {
 }
 
-void tek410x_keyboard_device::device_resolve_objects()
-{
-	m_tdata_callback.resolve_safe();
-	m_rdata_callback.resolve_safe();
-}
-
 void tek410x_keyboard_device::device_start()
 {
 	save_item(NAME(m_select));
@@ -168,7 +162,7 @@ void tek410x_keyboard_device::device_start()
 	save_item(NAME(m_kdo));
 }
 
-WRITE_LINE_MEMBER(tek410x_keyboard_device::kdi_w)
+void tek410x_keyboard_device::kdi_w(int state)
 {
 	m_kdi = state;
 	if (BIT(m_p2_out, 7))
@@ -178,14 +172,14 @@ WRITE_LINE_MEMBER(tek410x_keyboard_device::kdi_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tek410x_keyboard_device::kdo_w)
+void tek410x_keyboard_device::kdo_w(int state)
 {
 	m_kdo = state;
 	if (BIT(m_p2_out, 5))
 		m_rdata_callback(state);
 }
 
-WRITE_LINE_MEMBER(tek410x_keyboard_device::reset_w)
+void tek410x_keyboard_device::reset_w(int state)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)

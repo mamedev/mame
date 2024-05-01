@@ -50,9 +50,9 @@ public:
 	// configuration helpers
 	auto output_cb() { return m_write_output.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(enable_w) { m_enable = (state) ? 1 : 0; } // active low, unused on MM5447 and MM5448
-	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
+	void clock_w(int state);
+	void enable_w(int state) { m_enable = (state) ? 1 : 0; } // active low, unused on MM5447 and MM5448
+	void data_w(int state) { m_data = (state) ? 1 : 0; }
 
 protected:
 	mm5445_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 outpins);

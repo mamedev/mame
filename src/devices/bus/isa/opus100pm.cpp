@@ -31,7 +31,6 @@
 #include "emu.h"
 #include "opus100pm.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_STAT    (1U << 1)
 #define LOG_REG     (1U << 2)
 

@@ -52,6 +52,8 @@ PROMs : NEC B406 (1kx4) x2
 #include "tilemap.h"
 
 
+namespace {
+
 class sbowling_state : public driver_device
 {
 public:
@@ -455,5 +457,8 @@ ROM_START( sbowling )
 	ROM_LOAD( "kb08.7m",        0x0000, 0x0400, CRC(e949e441) SHA1(8e0fe71ed6d4e6f94a703c27a8364da27b443730))
 	ROM_LOAD( "kb09.6m",        0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae))
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, empty_init, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

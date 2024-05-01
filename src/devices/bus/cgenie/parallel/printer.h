@@ -37,10 +37,10 @@ protected:
 	virtual void pb_w(uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_WRITE_LINE_MEMBER(perror_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(fault_w);
+	void busy_w(int state);
+	void perror_w(int state);
+	void select_w(int state);
+	void fault_w(int state);
 
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;

@@ -12,6 +12,9 @@
 #include "machine/fdc37c93x.h"
 #include "machine/pckeybrd.h"
 
+
+namespace {
+
 class at586_state : public driver_device
 {
 public:
@@ -254,6 +257,9 @@ ROM_START(m55hipl)
 	ROM_SYSTEM_BIOS(3, "m55hi03", "m55hi03") // with sound
 	ROMX_LOAD("m55hi03.rom", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(3))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     CLASS        INIT        COMPANY      FULLNAME             FLAGS
 COMP( 1990, at586,    ibm5170, 0,       at586,    0,        at586_state, empty_init, "<generic>", "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )

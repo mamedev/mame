@@ -220,7 +220,7 @@ void warpwarp_state::machine_start()
 }
 
 /* Interrupt Gen */
-WRITE_LINE_MEMBER(warpwarp_state::vblank_irq)
+void warpwarp_state::vblank_irq(int state)
 {
 	if (state && m_ball_on)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -266,32 +266,27 @@ void warpwarp_state::geebee_out6_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::counter_w)
+void warpwarp_state::counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::lock_out_w)
+void warpwarp_state::lock_out_w(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(!state);
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::geebee_bgw_w)
+void warpwarp_state::geebee_bgw_w(int state)
 {
 	m_geebee_bgw = state;
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::ball_on_w)
+void warpwarp_state::ball_on_w(int state)
 {
 	m_ball_on = state;
 	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::inv_w)
-{
-	flip_screen_set(state);
 }
 
 
@@ -781,7 +776,7 @@ void warpwarp_state::geebee(machine_config &config)
 	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
 	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::geebee_bgw_w));
 	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
-	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::flip_screen_set));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -851,7 +846,7 @@ void warpwarp_state::bombbee(machine_config &config)
 	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
 	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::counter_w));
 	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
-	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::flip_screen_set));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -932,11 +927,11 @@ ROM_END
 
 ROM_START( navarone )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "navalone.p1",  0x0000, 0x0800, CRC(5a32016b) SHA1(d856d069eba470a81341de0bf47eca2a629a69a6) )
-	ROM_LOAD( "navalone.p2",  0x0800, 0x0800, CRC(b1c86fe3) SHA1(0293b742806c1517cb126443701115a3427fc60a) )
+	ROM_LOAD( "navarone.p1",  0x0000, 0x0800, CRC(5a32016b) SHA1(d856d069eba470a81341de0bf47eca2a629a69a6) )
+	ROM_LOAD( "navarone.p2",  0x0800, 0x0800, CRC(b1c86fe3) SHA1(0293b742806c1517cb126443701115a3427fc60a) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
-	ROM_LOAD( "navalone.chr", 0x0000, 0x0800, CRC(b26c6170) SHA1(ae0aec2b60e1fd3b212e311afb1c588b2b286433) )
+	ROM_LOAD( "navarone.chr", 0x0000, 0x0800, CRC(b26c6170) SHA1(ae0aec2b60e1fd3b212e311afb1c588b2b286433) )
 ROM_END
 
 ROM_START( kaitein )

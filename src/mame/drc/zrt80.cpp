@@ -27,6 +27,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class zrt80_state : public driver_device
 {
 public:
@@ -317,6 +320,9 @@ ROM_START( zrt80 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD("zrt80chr.z30", 0x0000, 0x0800, CRC(4dbdc60f) SHA1(20e393f7207a8440029c8290cdf2f121d317a37e) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

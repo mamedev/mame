@@ -1,7 +1,7 @@
 /** @file pa_devs.c
-	@ingroup examples_src
+    @ingroup examples_src
     @brief List available devices, including device information.
-	@author Phil Burk http://www.softsynth.com
+    @author Phil Burk http://www.softsynth.com
 
     @note Define PA_USE_ASIO=0 to compile this code on Windows without
         ASIO support.
@@ -34,13 +34,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -106,14 +106,14 @@ int main(void)
     PaStreamParameters inputParameters, outputParameters;
     PaError err;
 
-    
+
     err = Pa_Initialize();
     if( err != paNoError )
     {
         printf( "ERROR: Pa_Initialize returned 0x%x\n", err );
         goto error;
     }
-    
+
     printf( "PortAudio version: 0x%08X\n", Pa_GetVersion());
     printf( "Version text: '%s'\n", Pa_GetVersionInfo()->versionText );
 
@@ -124,13 +124,13 @@ int main(void)
         err = numDevices;
         goto error;
     }
-    
+
     printf( "Number of devices = %d\n", numDevices );
     for( i=0; i<numDevices; i++ )
     {
         deviceInfo = Pa_GetDeviceInfo( i );
         printf( "--------------------------------------- device #%d\n", i );
-                
+
     /* Mark global and API specific default devices */
         defaultDisplayed = 0;
         if( i == Pa_GetDefaultInputDevice() )
@@ -144,7 +144,7 @@ int main(void)
             printf( "[ Default %s Input", hostInfo->name );
             defaultDisplayed = 1;
         }
-        
+
         if( i == Pa_GetDefaultOutputDevice() )
         {
             printf( (defaultDisplayed ? "," : "[") );
@@ -154,7 +154,7 @@ int main(void)
         else if( i == Pa_GetHostApiInfo( deviceInfo->hostApi )->defaultOutputDevice )
         {
             const PaHostApiInfo *hostInfo = Pa_GetHostApiInfo( deviceInfo->hostApi );
-            printf( (defaultDisplayed ? "," : "[") );                
+            printf( (defaultDisplayed ? "," : "[") );
             printf( " Default %s Output", hostInfo->name );
             defaultDisplayed = 1;
         }
@@ -188,7 +188,7 @@ int main(void)
             long minLatency, maxLatency, preferredLatency, granularity;
 
             err = PaAsio_GetAvailableLatencyValues( i,
-		            &minLatency, &maxLatency, &preferredLatency, &granularity );
+                    &minLatency, &maxLatency, &preferredLatency, &granularity );
 
             printf( "ASIO minimum buffer size    = %ld\n", minLatency  );
             printf( "ASIO maximum buffer size    = %ld\n", maxLatency  );
@@ -210,7 +210,7 @@ int main(void)
         inputParameters.sampleFormat = paInt16;
         inputParameters.suggestedLatency = 0; /* ignored by Pa_IsFormatSupported() */
         inputParameters.hostApiSpecificStreamInfo = NULL;
-        
+
         outputParameters.device = i;
         outputParameters.channelCount = deviceInfo->maxOutputChannels;
         outputParameters.sampleFormat = paInt16;

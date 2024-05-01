@@ -5,8 +5,8 @@
     Irem M92 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_M92_H
-#define MAME_INCLUDES_M92_H
+#ifndef MAME_IREM_M92_H
+#define MAME_IREM_M92_H
 
 #pragma once
 
@@ -55,6 +55,7 @@ public:
 	void psoldier(machine_config &config);
 	void rtypeleo(machine_config &config);
 	void gunforc2(machine_config &config);
+	void geostorma(machine_config &config);
 	void nbbatman2bl(machine_config &config);
 	void bmaster(machine_config &config);
 	void nbbatman(machine_config &config);
@@ -64,10 +65,11 @@ public:
 	void majtitl2(machine_config &config);
 	void majtitl2a(machine_config &config);
 	void mysticri(machine_config &config);
+	void leaguemna(machine_config &config);
 
 	void init_bank();
 
-	DECLARE_READ_LINE_MEMBER(sprite_busy_r);
+	int sprite_busy_r();
 
 private:
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -130,4 +132,4 @@ private:
 	TIMER_CALLBACK_MEMBER(spritebuffer_done);
 };
 
-#endif // MAME_INCLUDES_M92_H
+#endif // MAME_IREM_M92_H

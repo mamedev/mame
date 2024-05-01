@@ -74,9 +74,16 @@ public:
 	// Special purpose lists which contain a union of types.
 	// This is needed so we can declare specialization constants and structs in an interleaved fashion,
 	// among other things.
-	// Constants can be of struct type, and struct array sizes can use specialization constants.
-	SmallVector<ID> ids_for_constant_or_type;
+	// Constants can be undef or of struct type, and struct array sizes can use specialization constants.
+	SmallVector<ID> ids_for_constant_undef_or_type;
 	SmallVector<ID> ids_for_constant_or_variable;
+
+	// We need to keep track of the width the Ops that contains a type for the
+	// OpSwitch instruction, since this one doesn't contains the type in the
+	// instruction itself. And in some case we need to cast the condition to
+	// wider types. We only need the width to do the branch fixup since the
+	// type check itself can be done at runtime
+	std::unordered_map<ID, uint32_t> load_type_width;
 
 	// Declared capabilities and extensions in the SPIR-V module.
 	// Not really used except for reflection at the moment.

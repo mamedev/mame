@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/vic4567.h"
+#include "vic4567.h"
 
 #include "screen.h"
 
@@ -155,14 +155,14 @@ vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_
 	, device_video_interface(mconfig, *this)
 	, m_type(vic3_type::NTSC)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_dma_read_cb(*this)
-	, m_dma_read_color_cb(*this)
+	, m_dma_read_cb(*this, 0)
+	, m_dma_read_color_cb(*this, 0)
 	, m_interrupt_cb(*this)
 	, m_port_changed_cb(*this)
-	, m_lightpen_button_cb(*this)
-	, m_lightpen_x_cb(*this)
-	, m_lightpen_y_cb(*this)
-	, m_c64_mem_r_cb(*this)
+	, m_lightpen_button_cb(*this, 0)
+	, m_lightpen_x_cb(*this, 0)
+	, m_lightpen_y_cb(*this, 0)
+	, m_c64_mem_r_cb(*this, 0)
 {
 }
 
@@ -176,18 +176,6 @@ void vic3_device::device_start()
 	int height = screen().height();
 
 	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
-
-	m_dma_read_cb.resolve_safe(0);
-	m_dma_read_color_cb.resolve_safe(0);
-	m_interrupt_cb.resolve_safe();
-
-	m_port_changed_cb.resolve();
-
-	m_c64_mem_r_cb.resolve_safe(0);
-
-	m_lightpen_button_cb.resolve_safe(0);
-	m_lightpen_x_cb.resolve_safe(0);
-	m_lightpen_y_cb.resolve_safe(0);
 
 	m_screendata = std::make_unique<uint8_t []>(216 * 656 / 8);
 	m_screenptr[0] = m_screendata.get();
@@ -1456,13 +1444,9 @@ void vic3_device::port_w(offs_t offset, uint8_t data)
 		m_reg[offset] = data;
 		break;
 	case 0x30:
+		DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 		m_reg[offset] = data;
-		if (!m_port_changed_cb.isnull())
-		{
-			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
-			m_reg[offset] = data;
-			m_port_changed_cb((offs_t)0,data);
-		}
+		m_port_changed_cb(offs_t(0), data);
 		break;
 	case 0x31:
 		m_reg[offset] = data;

@@ -7,6 +7,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class yes_state : public driver_device
 {
 public:
@@ -76,5 +79,8 @@ ROM_START(yes)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD( "yes_23502.bin", 0x0000, 0x2000, CRC(e3324683) SHA1(87c3a6cb7fbe982f88abb85426785228c2b33bb7))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1985, yes, 0, 0, yes, 0, yes_state, empty_init, "Philips", ":YES", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

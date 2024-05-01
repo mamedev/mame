@@ -91,23 +91,23 @@ private:
 	constexpr static int REG_STATUS_DISKCHG = 1 << 5;
 	constexpr static int REG_STATUS_LOW_DENSITY = 1 << 7;
 
-	DECLARE_WRITE_LINE_MEMBER(i8291a_eoi_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_dav_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_nrfd_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_ndac_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_ifc_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_srq_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_atn_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_ren_w);
+	void i8291a_eoi_w(int state);
+	void i8291a_dav_w(int state);
+	void i8291a_nrfd_w(int state);
+	void i8291a_ndac_w(int state);
+	void i8291a_ifc_w(int state);
+	void i8291a_srq_w(int state);
+	void i8291a_atn_w(int state);
+	void i8291a_ren_w(int state);
 
 	uint8_t i8291a_dio_r();
 	void i8291a_dio_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(i8291a_int_w);
-	DECLARE_WRITE_LINE_MEMBER(i8291a_dreq_w);
+	void i8291a_int_w(int state);
+	void i8291a_dreq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void cmd_w(uint8_t data);
 	uint8_t status_r();

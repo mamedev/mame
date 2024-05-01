@@ -155,7 +155,7 @@ huc6230_device::huc6230_device(const machine_config &mconfig, const char *tag, d
 	, m_adpcm_freq(0)
 	, m_pcm_lvol(0)
 	, m_pcm_rvol(0)
-	, m_adpcm_update_cb(*this)
+	, m_adpcm_update_cb(*this, 0)
 	, m_vca_cb(*this)
 {
 }
@@ -176,10 +176,6 @@ void huc6230_device::device_add_mconfig(machine_config &config)
 
 void huc6230_device::device_start()
 {
-	m_adpcm_update_cb.resolve_all_safe(0);
-
-	m_vca_cb.resolve_safe();
-
 	m_stream = stream_alloc(2, 2, clock() / 6);
 	m_adpcm_timer = timer_alloc(FUNC(huc6230_device::adpcm_timer), this);
 

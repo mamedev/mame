@@ -1,84 +1,96 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-
-<softwarelist name="k28m2" description="K28 model 7-232 modules">
-
-	<software name="m1">
-		<description>Expansion Module 1</description>
-		<year>1986?</year>
-		<publisher>Tiger Electronics</publisher>
-		<info name="serial" value="CM62086"/>
-		<part name="cart" interface="k28m2">
-			<dataarea name="rom" size="0x4000">
-				<rom name="cm62086.vsm" size="0x4000" crc="0349798b" sha1="afdad242f9c7dec0c5fd83670e3d8f1637140e76" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="m2">
-		<description>Expansion Module 2</description>
-		<year>1986</year>
-		<publisher>Tiger Electronics</publisher>
-		<info name="serial" value="CM62216"/>
-		<part name="cart" interface="k28m2">
-			<dataarea name="rom" size="0x4000">
-				<rom name="cm62216.vsm" size="0x4000" crc="1c99306f" sha1="7bfadeec79bdc231c4e3447149e2f6542cfe077d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="m3">
-		<description>Expansion Module 3</description>
-		<year>1986</year>
-		<publisher>Tiger Electronics</publisher>
-		<info name="serial" value="CM62215"/>
-		<part name="cart" interface="k28m2">
-			<dataarea name="rom" size="0x4000">
-				<rom name="cm62215.vsm" size="0x4000" crc="f2deb9a2" sha1="9fb264b869d1298ebd76811931bed83ac122fe4b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="m4">
-		<description>Expansion Module 4</description>
-		<year>1986</year>
-		<publisher>Tiger Electronics</publisher>
-		<info name="serial" value="CM62217"/>
-		<part name="cart" interface="k28m2">
-			<dataarea name="rom" size="0x4000">
-				<rom name="cm62217.vsm" size="0x4000" crc="995936b2" sha1="8bd0fea4ade9972d1d6cb521f9367c971c7eead6" />
-			</dataarea>
-		</part>
-	</software>
 
 <!--
-    <software name="m5">
-        <description>Expansion Module 5</description>
-        <year>1987</year>
-        <publisher>Tiger Electronics</publisher>
-        <info name="serial" value="CM62218"/>
-        <part name="cart" interface="k28m2">
-            <dataarea name="rom" size="0x4000">
-                <rom name="cm62218.vsm" size="0x4000" crc="" sha1="" status="nodump" />
-            </dataarea>
-        </part>
-    </software>
+
+Known modules:
+
+1st series:
+- Spelling I: VSM: 16KB CM62086
+- Spelling II: VSM: 16KB CM6????
+- Spelling III: VSM: 16KB CM62087
+- other: ?
+
+2nd series:
+- Spelling 1 (Expansion Module 1): VSM: 16KB CM6????
+- Spelling 2 (Expansion Module 2): VSM: 16KB CM62216
+- Spelling 3 (Expansion Module 3): VSM: 16KB CM62215
+- Spelling 4 (Expansion Module 4): VSM: 16KB CM62217
+- Sentence Superstars (Expansion Module 5): VSM: 16KB CM6????
+- Vowel Detectives (Expansion Module 6): VSM: 16KB CM62219
+
+For the 2nd series, the first 4 are (C) Tiger Electronics, modules 5 and 6 are
+(C) Coleco Industries. The cartridge labels don't show the title, but simply say
+"Expansion Module x" where x = 1-6.
+
+It is assumed that the 1st series Spelling modules are the same as the Expansion
+modules. CM62215 was confirmed to be the same as CM62087.
+
 -->
 
-	<software name="m6">
-		<description>Expansion Module 6</description>
-		<year>1987</year>
+<softwarelist name="k28m2" description="K-2-8 (model 7-232) modules">
+
+	<software name="spell1">
+		<description>Spelling 1 (Expansion Module 1)</description>
+		<year>1985</year>
 		<publisher>Tiger Electronics</publisher>
-		<info name="serial" value="CM62219"/>
+		<info name="serial" value="8111"/>
 		<part name="cart" interface="k28m2">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cm62219.vsm" size="0x4000" crc="177b5cb5" sha1="2ed44fea8f931fc8aa46dafdda1c6c30b8c9dc01" />
+				<rom name="cm62086" size="0x4000" crc="0349798b" sha1="afdad242f9c7dec0c5fd83670e3d8f1637140e76" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="spell2">
+		<description>Spelling 2 (Expansion Module 2)</description>
+		<year>1985</year>
+		<publisher>Tiger Electronics</publisher>
+		<info name="serial" value="8112"/>
+		<part name="cart" interface="k28m2">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62216" size="0x4000" crc="1c99306f" sha1="7bfadeec79bdc231c4e3447149e2f6542cfe077d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spell3">
+		<description>Spelling 3 (Expansion Module 3)</description>
+		<year>1985</year>
+		<publisher>Tiger Electronics</publisher>
+		<info name="serial" value="8113"/>
+		<part name="cart" interface="k28m2">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62215" size="0x4000" crc="f2deb9a2" sha1="9fb264b869d1298ebd76811931bed83ac122fe4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spell4">
+		<description>Spelling 4 (Expansion Module 4)</description>
+		<year>1985</year>
+		<publisher>Tiger Electronics</publisher>
+		<info name="serial" value="8114"/>
+		<part name="cart" interface="k28m2">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62217" size="0x4000" crc="995936b2" sha1="8bd0fea4ade9972d1d6cb521f9367c971c7eead6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdetect">
+		<description>Vowel Detectives (Expansion Module 6)</description>
+		<year>1987</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="8116"/>
+		<part name="cart" interface="k28m2">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62219" size="0x4000" crc="177b5cb5" sha1="2ed44fea8f931fc8aa46dafdda1c6c30b8c9dc01" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

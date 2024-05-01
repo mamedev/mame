@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
-#ifndef MAME_INCLUDES_MPF1_H
-#define MAME_INCLUDES_MPF1_H
+#ifndef MAME_MULTITECH_MPF1_H
+#define MAME_MULTITECH_MPF1_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ private:
 	void mpf1p_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MPF1_H
+#endif // MAME_MULTITECH_MPF1_H

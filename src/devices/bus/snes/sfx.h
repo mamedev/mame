@@ -20,7 +20,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
+	virtual void snes_extern_irq_w(int state);
 
 	// additional reading and writing
 	virtual uint8_t read_l(offs_t offset) override;

@@ -12,9 +12,9 @@ class thomson_525_format : public wd177x_format
 public:
   thomson_525_format();
 
-  virtual const char *name() const override;
-  virtual const char *description() const override;
-  virtual const char *extensions() const override;
+  virtual const char *name() const noexcept override;
+  virtual const char *description() const noexcept override;
+  virtual const char *extensions() const noexcept override;
 
 private:
   static const format formats[];
@@ -25,9 +25,9 @@ class thomson_35_format : public wd177x_format
 public:
   thomson_35_format();
 
-  virtual const char *name() const override;
-  virtual const char *description() const override;
-  virtual const char *extensions() const override;
+  virtual const char *name() const noexcept override;
+  virtual const char *description() const noexcept override;
+  virtual const char *extensions() const noexcept override;
 
 private:
   static const format formats[];

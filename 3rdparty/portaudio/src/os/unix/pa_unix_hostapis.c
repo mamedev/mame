@@ -26,13 +26,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -43,8 +43,10 @@
 #include "pa_hostapi.h"
 
 PaError PaJack_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
+PaError PaPulseAudio_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
 PaError PaAlsa_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
 PaError PaOSS_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
+PaError PaAudioIO_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
 /* Added for IRIX, Pieter, oct 2, 2003: */
 PaError PaSGI_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
 /* Linux AudioScience HPI */
@@ -79,11 +81,15 @@ PaUtilHostApiInitializer *paHostApiInitializers[] =
 
 #endif  /* __linux__ */
 
+#if PA_USE_AUDIOIO
+        PaAudioIO_Initialize,
+#endif
+
 #if PA_USE_JACK
         PaJack_Initialize,
 #endif
                     /* Added for IRIX, Pieter, oct 2, 2003: */
-#if PA_USE_SGI 
+#if PA_USE_SGI
         PaSGI_Initialize,
 #endif
 
@@ -93,6 +99,10 @@ PaUtilHostApiInitializer *paHostApiInitializers[] =
 
 #if PA_USE_COREAUDIO
         PaMacCore_Initialize,
+#endif
+
+#if PA_USE_PULSEAUDIO
+        PaPulseAudio_Initialize,
 #endif
 
 #if PA_USE_SKELETON

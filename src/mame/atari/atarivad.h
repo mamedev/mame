@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ATARIVAD_H
-#define MAME_VIDEO_ATARIVAD_H
+#ifndef MAME_ATARI_ATARIVAD_H
+#define MAME_ATARI_ATARIVAD_H
 
 #include "atarimo.h"
 #include "tilemap.h"
@@ -101,4 +101,4 @@ private:
 };
 
 
-#endif // MAME_VIDEO_ATARIVAD_H
+#endif // MAME_ATARI_ATARIVAD_H

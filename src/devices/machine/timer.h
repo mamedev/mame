@@ -77,14 +77,14 @@ public:
 	template <typename... T> void set_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
 	void set_start_delay(const attotime &delay) { m_start_delay = delay; }
-	void config_param(int param) { m_param = param; }
+	void config_param(s32 param) { m_param = param; }
 
 	// property getters
-	int param() const { return m_timer->param(); }
+	s32 param() const { return m_timer->param(); }
 	bool enabled() const { return m_timer->enabled(); }
 
 	// property setters
-	void set_param(int param) const { if(m_type != TIMER_TYPE_GENERIC) fatalerror("Cannot change parameter on a non-generic timer.\n"); m_timer->set_param(param); }
+	void set_param(s32 param) const { if(m_type != TIMER_TYPE_GENERIC) fatalerror("Cannot change parameter on a non-generic timer.\n"); m_timer->set_param(param); }
 	void enable(bool enable = true) const { m_timer->enable(enable); }
 
 	// adjustments
@@ -97,10 +97,10 @@ public:
 	}
 
 	// timing information
-	attotime time_elapsed() const { return m_timer->elapsed(); }
-	attotime time_left() const { return m_timer->remaining(); }
-	attotime start_time() const { return m_timer->start(); }
-	attotime fire_time() const { return m_timer->expire(); }
+	attotime elapsed() const { return m_timer->elapsed(); }
+	attotime remaining() const { return m_timer->remaining(); }
+	attotime start() const { return m_timer->start(); }
+	attotime expire() const { return m_timer->expire(); }
 	attotime period() const { return m_timer ? m_timer->period() : m_period; }
 
 private:

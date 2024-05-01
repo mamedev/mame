@@ -11,14 +11,17 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
-#include "formats/imd_dsk.h"
 #include "formats/tim011_dsk.h"
 #include "machine/upd765.h"
 #include "bus/rs232/rs232.h"
+#include "bus/tim011/exp.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 #define FDC9266_TAG "u43"
+
+namespace {
 
 class tim011_state : public driver_device
 {
@@ -30,6 +33,7 @@ public:
 		, m_floppy(*this, FDC9266_TAG ":%u", 0)
 		, m_vram(*this, "videoram")
 		, m_palette(*this, "palette")
+		, m_exp(*this, "exp")
 	{ }
 
 	void tim011(machine_config &config);
@@ -48,6 +52,8 @@ private:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_shared_ptr<u8> m_vram;
 	required_device<palette_device> m_palette;
+	required_device<bus::tim011::exp_slot_device> m_exp;
+
 	void tim011_io(address_map &map);
 	void tim011_mem(address_map &map);
 	void tim011_palette(palette_device &palette) const;
@@ -133,7 +139,6 @@ static void tim011_floppies(device_slot_interface &device)
 static void tim011_floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-	fr.add(FLOPPY_IMD_FORMAT);
 	fr.add(FLOPPY_TIM011_FORMAT);
 }
 
@@ -193,6 +198,9 @@ void tim011_state::tim011(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
 	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 	rs232.rxd_handler().set(m_maincpu, FUNC(z180_device::rxa1_w));
+
+	TIM011_EXPANSION_SLOT(config, m_exp, tim011_exp_devices, nullptr);
+	m_exp->set_io_space(m_maincpu, AS_IO);
 }
 
 /* ROM definition */
@@ -202,6 +210,8 @@ ROM_START( tim011 )
 	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASEFF )
 	ROM_LOAD( "keyb_tim011.bin", 0x0000, 0x1000, CRC(a99c40a6) SHA1(d6d505271d91df4e079ec3c0a4abbe75ae9d649b))
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 

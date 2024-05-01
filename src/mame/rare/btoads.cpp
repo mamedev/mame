@@ -93,13 +93,13 @@ uint16_t btoads_state::main_sound_r()
 }
 
 
-READ_LINE_MEMBER( btoads_state::main_to_sound_r )
+int btoads_state::main_to_sound_r()
 {
 	return m_main_to_sound_ready;
 }
 
 
-READ_LINE_MEMBER( btoads_state::sound_to_main_r )
+int btoads_state::sound_to_main_r()
 {
 	return m_sound_to_main_ready;
 }

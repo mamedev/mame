@@ -6,7 +6,6 @@
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
-#include "formats/pc_dsk.h"
 #include "sound/dac.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
@@ -83,7 +82,6 @@ private:
 
 void mindset_module_interface::device_start()
 {
-	m_irq_cb.resolve_safe();
 	save_item(NAME(m_irq_state));
 }
 

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_NMK004_H
-#define MAME_MACHINE_NMK004_H
+#ifndef MAME_NMK_NMK004_H
+#define MAME_NMK_NMK004_H
 
 #include "cpu/tlcs90/tlcs90.h"
 
@@ -23,7 +23,7 @@ public:
 	// host interface
 	void write(uint8_t data);
 	uint8_t read();
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_cpu->set_input_line(INPUT_LINE_NMI, state); }
+	void nmi_w(int state) { m_cpu->set_input_line(INPUT_LINE_NMI, state); }
 
 	void port4_w(uint8_t data);
 	void ym2203_irq_handler(int irq);
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NMK004, nmk004_device)
 
-#endif // MAME_MACHINE_NMK004_H
+#endif // MAME_NMK_NMK004_H

@@ -9,6 +9,9 @@
 ***************************************************************************/
 
 #include "vbiparse.h"
+
+#include "multibyte.h"
+
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -363,22 +366,12 @@ void vbi_parse_all(const uint16_t *source, int sourcerowpixels, int sourcewidth,
 
 void vbi_metadata_pack(uint8_t *dest, uint32_t framenum, const vbi_metadata *vbi)
 {
-	dest[0] = framenum >> 16;
-	dest[1] = framenum >> 8;
-	dest[2] = framenum >> 0;
+	put_u24be(&dest[0], framenum);
 	dest[3] = vbi->white;
-	dest[4] = vbi->line16 >> 16;
-	dest[5] = vbi->line16 >> 8;
-	dest[6] = vbi->line16 >> 0;
-	dest[7] = vbi->line17 >> 16;
-	dest[8] = vbi->line17 >> 8;
-	dest[9] = vbi->line17 >> 0;
-	dest[10] = vbi->line18 >> 16;
-	dest[11] = vbi->line18 >> 8;
-	dest[12] = vbi->line18 >> 0;
-	dest[13] = vbi->line1718 >> 16;
-	dest[14] = vbi->line1718 >> 8;
-	dest[15] = vbi->line1718 >> 0;
+	put_u24be(&dest[4], vbi->line16);
+	put_u24be(&dest[7], vbi->line17);
+	put_u24be(&dest[10], vbi->line18);
+	put_u24be(&dest[13], vbi->line1718);
 }
 
 
@@ -400,10 +393,10 @@ void vbi_metadata_pack(uint8_t *dest, uint32_t framenum, const vbi_metadata *vbi
 void vbi_metadata_unpack(vbi_metadata *vbi, uint32_t *framenum, const uint8_t *source)
 {
 	if (framenum != nullptr)
-		*framenum = (source[0] << 16) | (source[1] << 8) | source[2];
+		*framenum = get_u24be(&source[0]);
 	vbi->white = source[3];
-	vbi->line16 = (source[4] << 16) | (source[5] << 8) | source[6];
-	vbi->line17 = (source[7] << 16) | (source[8] << 8) | source[9];
-	vbi->line18 = (source[10] << 16) | (source[11] << 8) | source[12];
-	vbi->line1718 = (source[13] << 16) | (source[14] << 8) | source[15];
+	vbi->line16 = get_u24be(&source[4]);
+	vbi->line17 = get_u24be(&source[7]);
+	vbi->line18 = get_u24be(&source[10]);
+	vbi->line1718 = get_u24be(&source[13]);
 }

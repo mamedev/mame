@@ -826,6 +826,7 @@ void jongbou_state::jongbou(machine_config &config)
 	/* sound hardware */
 	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.port_b_write_callback().set_nop(); // ?
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.65);
 }
 

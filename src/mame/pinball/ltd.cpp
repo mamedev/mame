@@ -109,7 +109,7 @@ private:
 	u8 ram_r(offs_t);
 	void ram_w(offs_t, u8);
 	u8 sw_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 	void ltd3_map(address_map &map);
 	u8 m_game = 0;
 	u8 m_ram[0x80]{};
@@ -532,7 +532,7 @@ void ltd4_state::machine_reset()
 	mr_common();
 }
 
-WRITE_LINE_MEMBER( ltd3_state::irq_w )
+void ltd3_state::irq_w(int state)
 {
 	// Using /Q output
 	m_maincpu->set_input_line(M6802_IRQ_LINE, !state ? CLEAR_LINE : ASSERT_LINE);
@@ -690,8 +690,8 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 ROM_START(spcpoker)
-	ROM_REGION(0x1000, "roms", 0) // the bad dump was hacked to make it work
-	ROM_LOAD( "spoker.bin",   0x0000, 0x0800, BAD_DUMP CRC(98918b19) SHA1(b1bb3f408dae9fc77d396894c3c4ef08bce8c345) )
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "space_poker_16_jp.bin", 0x0000, 0x0800, CRC(8fc2bdf6) SHA1(48eeae7ef21adbb4801e339565e55a03db6de179) )
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
 

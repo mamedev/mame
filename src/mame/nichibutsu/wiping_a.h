@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
-#ifndef MAME_AUDIO_WIPING_H
-#define MAME_AUDIO_WIPING_H
+#ifndef MAME_NICHIBUTSU_WIPING_A_H
+#define MAME_NICHIBUTSU_WIPING_A_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WIPING_CUSTOM, wiping_sound_device)
 
-#endif // MAME_AUDIO_WIPING_H
+#endif // MAME_NICHIBUTSU_WIPING_A_H

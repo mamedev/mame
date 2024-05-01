@@ -393,8 +393,8 @@
 #include "video/v9938.h"
 #include "speaker.h"
 
-#define UNICODE_10YEN   "\xC2\xA5" "10"
-#define UNICODE_100YEN  "\xC2\xA5" "100"
+
+namespace {
 
 class kurukuru_state : public driver_device
 {
@@ -434,7 +434,7 @@ private:
 	void ym2149_aout_w(uint8_t data);
 	void ym2149_bout_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	void kurukuru_msm5205_vck(int state);
 	void kurukuru_audio_io(address_map &map);
 	void kurukuru_audio_map(address_map &map);
 	void kurukuru_io(address_map &map);
@@ -459,7 +459,7 @@ private:
 *************************************************/
 
 
-WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
+void kurukuru_state::kurukuru_msm5205_vck(int state)
 {
 	m_soundirq->rst30_w(1);
 	m_adpcm->data_w(m_adpcm_data);
@@ -684,14 +684,14 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                   // edge connector pin 15 top
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Medal In")                                 // edge connector pin 15 bottom
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                  // edge connector pin 16 top
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(UNICODE_10YEN " In")                        // edge connector pin 16 bottom
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(u8"¥10 In")                                 // edge connector pin 16 bottom
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 17 top (active)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(UNICODE_100YEN " In") PORT_IMPULSE(2)       // edge connector pin 17 bottom
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(u8"¥100 In") PORT_IMPULSE(2)                // edge connector pin 17 bottom
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback, edge connector pin 24 top
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                 // edge connector pin 24 bottom
 
 	PORT_START("DSW1")  // found in the PCB: 11111111
-	PORT_DIPNAME( 0x07, 0x00, "Coinage A (" UNICODE_100YEN ")" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x00, u8"Coinage A (¥100)" ) PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
 	PORT_DIPSETTING(    0x06, "1 Coin / 4 Medal" )
 	PORT_DIPSETTING(    0x01, "1 Coin / 5 Medal" )
@@ -700,14 +700,14 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
 	PORT_DIPSETTING(    0x04, "1 Coin / 20 Medal" )
 	PORT_DIPSETTING(    0x00, "1 Coin / 50 Medal" )
-	PORT_DIPNAME( 0x18, 0x00, "Coinage B (" UNICODE_10YEN ")" )  PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPNAME( 0x18, 0x00, u8"Coinage B (¥10)" )  PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(    0x00, "3 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x10, "2 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x18, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x08, "1 Coin / 2 Medal" )
 	PORT_DIPNAME( 0x20, 0x00, "Coinage Config" )    PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x00, UNICODE_100YEN " = Credits; Medal In = 2 Credits by Medal" )
-	PORT_DIPSETTING(    0x20, UNICODE_100YEN " = Exchange; Medal In = 1 Credit by Medal" )
+	PORT_DIPSETTING(    0x00, u8"¥100 = Credits; Medal In = 2 Credits by Medal" )
+	PORT_DIPSETTING(    0x20, u8"¥100 = Exchange; Medal In = 1 Credit by Medal" )
 	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, "Automatic" )
 	PORT_DIPSETTING(    0x00, "Manual" )
@@ -764,14 +764,14 @@ static INPUT_PORTS_START( ppj )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                   // edge connector pin 15 top
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Medal In")                                 // edge connector pin 15 bottom
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                  // edge connector pin 16 top
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(UNICODE_10YEN " In")                        // edge connector pin 16 bottom
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME(u8"¥10 In")                                 // edge connector pin 16 bottom
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 17 top (active)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(UNICODE_100YEN " In") PORT_IMPULSE(2)       // edge connector pin 17 bottom
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME(u8"¥100 In") PORT_IMPULSE(2)                // edge connector pin 17 bottom
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)  // hopper feedback, edge connector pin 24 top
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                 // edge connector pin 24 bottom
 
 	PORT_START("DSW1")  // found in the PCB: 00000000 (arranged for sale since they are uncommon settings)
-	PORT_DIPNAME( 0x07, 0x03, "Coinage A (" UNICODE_100YEN ")" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x03, u8"Coinage A (¥100)" ) PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x04, "1 Coin / 2 Medal" )
 	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
@@ -782,8 +782,8 @@ static INPUT_PORTS_START( ppj )
 	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
 	// Coinage B is always 1 Coin / 1 Medal
 	PORT_DIPNAME( 0x08, 0x00, "Coinage Config" )    PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x00, UNICODE_100YEN " = Credits" )
-	PORT_DIPSETTING(    0x08, UNICODE_100YEN " = Exchange" )
+	PORT_DIPSETTING(    0x00, u8"¥100 = Credits" )
+	PORT_DIPSETTING(    0x08, u8"¥100 = Exchange" )
 	PORT_DIPNAME( 0x10, 0x00, "Payout Mode" )       PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, "Automatic" )
 	PORT_DIPSETTING(    0x00, "Manual" )
@@ -956,6 +956,8 @@ ROM_START( ppj )
 	ROM_LOAD( "pal16l8a_no23.ic12",    0x0400, 0x0104, CRC(8a7fbbe0) SHA1(aab8d6b77d46cf2d8620861af1f7c039b6dcda99) )
 	ROM_LOAD( "pal12l6a_7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )  // identical to kurukuru...
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

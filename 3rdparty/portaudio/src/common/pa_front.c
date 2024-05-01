@@ -74,7 +74,7 @@
 #include "pa_types.h"
 #include "pa_hostapi.h"
 #include "pa_stream.h"
-#include "pa_trace.h" /* still usefull?*/
+#include "pa_trace.h" /* still useful?*/
 #include "pa_debugprint.h"
 
 #ifndef PA_GIT_REVISION
@@ -91,7 +91,7 @@
  * This is incremented when we add functionality in a backwards-compatible manner.
  * Or it is set to zero when paVersionMajor is incremented.
  */
-#define paVersionMinor      6
+#define paVersionMinor      7
 
 /**
  * This is incremented when we make backwards-compatible bug fixes.
@@ -106,11 +106,8 @@
  */
 #define paVersion  paMakeVersionNumber(paVersionMajor, paVersionMinor, paVersionSubMinor)
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-
-#define PA_VERSION_STRING_ TOSTRING(paVersionMajor) "." TOSTRING(paVersionMinor) "." TOSTRING(paVersionSubMinor)
-#define PA_VERSION_TEXT_   "PortAudio V" PA_VERSION_STRING_ "-devel, revision " TOSTRING(PA_GIT_REVISION)
+#define PA_VERSION_STRING_ PA_STRINGIZE(paVersionMajor) "." PA_STRINGIZE(paVersionMinor) "." PA_STRINGIZE(paVersionSubMinor)
+#define PA_VERSION_TEXT_   "PortAudio V" PA_VERSION_STRING_ "-devel, revision " PA_STRINGIZE(PA_GIT_REVISION)
 
 int Pa_GetVersion( void )
 {
@@ -126,11 +123,11 @@ static PaVersionInfo versionInfo_ = {
     /*.versionMajor =*/ paVersionMajor,
     /*.versionMinor =*/ paVersionMinor,
     /*.versionSubMinor =*/ paVersionSubMinor,
-    /*.versionControlRevision =*/ TOSTRING(PA_GIT_REVISION),
+    /*.versionControlRevision =*/ PA_STRINGIZE(PA_GIT_REVISION),
     /*.versionText =*/ PA_VERSION_TEXT_
 };
 
-const PaVersionInfo* Pa_GetVersionInfo()
+const PaVersionInfo* Pa_GetVersionInfo( void )
 {
     return &versionInfo_;
 }
@@ -157,6 +154,7 @@ static PaUtilHostApiRepresentation **hostApis_ = 0;
 static int hostApisCount_ = 0;
 static int defaultHostApiIndex_ = 0;
 static int initializationCount_ = 0;
+static int initializing_ = 0;
 static int deviceCount_ = 0;
 
 PaUtilStreamRepresentation *firstOpenStream_ = NULL;
@@ -204,7 +202,7 @@ static PaError InitializeHostApis( void )
 
     initializerCount = CountHostApiInitializers();
 
-    hostApis_ = (PaUtilHostApiRepresentation**)PaUtil_AllocateMemory(
+    hostApis_ = (PaUtilHostApiRepresentation**)PaUtil_AllocateZeroInitializedMemory(
             sizeof(PaUtilHostApiRepresentation*) * initializerCount );
     if( !hostApis_ )
     {
@@ -363,8 +361,21 @@ PaError Pa_Initialize( void )
         ++initializationCount_;
         result = paNoError;
     }
+    else if( initializing_ )
+    {
+        // a concurrent initialization is already running
+        PA_DEBUG(("Attempting to re-enter Pa_Initialize(), aborting!\n"));
+        result = paCanNotInitializeRecursively;
+    }
     else
     {
+        // set initializing_ here to
+        // let recursive calls execute the if branch above.
+        // This can happen if a driver like FlexAsio itself uses portaudio
+        // and avoids a stack overflow in the user application.
+        // https://github.com/PortAudio/portaudio/issues/766
+        initializing_ = 1;
+
         PA_VALIDATE_TYPE_SIZES;
         PA_VALIDATE_ENDIANNESS;
 
@@ -374,6 +385,8 @@ PaError Pa_Initialize( void )
         result = InitializeHostApis();
         if( result == paNoError )
             ++initializationCount_;
+
+        initializing_ = 0;
     }
 
     PA_LOGAPI_EXIT_PAERROR( "Pa_Initialize", result );
@@ -456,11 +469,12 @@ const char *Pa_GetErrorText( PaError errorCode )
     case paCanNotWriteToAnInputOnlyStream:      result = "Can't write to an input only stream"; break;
     case paIncompatibleStreamHostApi: result = "Incompatible stream host API"; break;
     case paBadBufferPtr:             result = "Bad buffer pointer"; break;
+    case paCanNotInitializeRecursively: result = "PortAudio can not be initialized recursively"; break;
     default:
-		if( errorCode > 0 )
-			result = "Invalid error code (value greater than zero)";
+        if( errorCode > 0 )
+            result = "Invalid error code (value greater than zero)";
         else
-			result = "Invalid error code";
+            result = "Invalid error code";
         break;
     }
     return result;
@@ -637,7 +651,7 @@ const PaHostApiInfo* Pa_GetHostApiInfo( PaHostApiIndex hostApi )
 
     }
 
-     return info;
+    return info;
 }
 
 
@@ -805,7 +819,7 @@ static int SampleFormatIsValid( PaSampleFormat format )
 }
 
 /*
-    NOTE: make sure this validation list is kept syncronised with the one in
+    NOTE: make sure this validation list is kept synchronised with the one in
             pa_hostapi.h
 
     ValidateOpenStreamParameters() checks that parameters to Pa_OpenStream()
@@ -865,7 +879,7 @@ static int SampleFormatIsValid( PaSampleFormat format )
         - if supplied its hostApi field matches the output device's host Api
 
     double sampleRate
-        - is not an 'absurd' rate (less than 1000. or greater than 384000.)
+        - is not an 'absurd' rate (less than 1000. or greater than 768000.)
         - sampleRate is NOT validated against device capabilities
 
     PaStreamFlags streamFlags
@@ -884,9 +898,9 @@ static PaError ValidateOpenStreamParameters(
     PaDeviceIndex *hostApiInputDevice,
     PaDeviceIndex *hostApiOutputDevice )
 {
-    int inputHostApiIndex  = -1, /* Surpress uninitialised var warnings: compiler does */
-        outputHostApiIndex = -1; /* not see that if inputParameters and outputParame-  */
-                                 /* ters are both nonzero, these indices are set.      */
+    int inputHostApiIndex  = -1;    /* Suppress uninitialised var warnings: compiler does */
+    int outputHostApiIndex = -1;    /* not see that if inputParameters and outputParameters  */
+                                    /* are both nonzero, these indices are set. */
 
     if( (inputParameters == NULL) && (outputParameters == NULL) )
     {
@@ -1006,7 +1020,7 @@ static PaError ValidateOpenStreamParameters(
 
 
     /* Check for absurd sample rates. */
-    if( (sampleRate < 1000.0) || (sampleRate > 384000.0) )
+    if( (sampleRate < 1000.0) || (sampleRate > 768000.0) )
         return paInvalidSampleRate;
 
     if( ((streamFlags & ~paPlatformSpecificFlags) & ~(paClipOff | paDitherOff | paNeverDropInput | paPrimeOutputBuffersUsingStreamCallback ) ) != 0 )
@@ -1016,7 +1030,7 @@ static PaError ValidateOpenStreamParameters(
     {
         /* must be a callback stream */
         if( !streamCallback )
-             return paInvalidFlag;
+            return paInvalidFlag;
 
         /* must be a full duplex stream */
         if( (inputParameters == NULL) || (outputParameters == NULL) )
@@ -1195,7 +1209,7 @@ PaError Pa_OpenStream( PaStream** stream,
     }
 
     /* Check for parameter errors.
-        NOTE: make sure this validation list is kept syncronised with the one
+        NOTE: make sure this validation list is kept synchronised with the one
         in pa_hostapi.h
     */
 
@@ -1296,8 +1310,8 @@ PaError Pa_OpenDefaultStream( PaStream** stream,
     if( inputChannelCount > 0 )
     {
         hostApiInputParameters.device = Pa_GetDefaultInputDevice();
-		if( hostApiInputParameters.device == paNoDevice )
-			return paDeviceUnavailable;
+        if( hostApiInputParameters.device == paNoDevice )
+            return paDeviceUnavailable;
 
         hostApiInputParameters.channelCount = inputChannelCount;
         hostApiInputParameters.sampleFormat = sampleFormat;
@@ -1319,8 +1333,8 @@ PaError Pa_OpenDefaultStream( PaStream** stream,
     if( outputChannelCount > 0 )
     {
         hostApiOutputParameters.device = Pa_GetDefaultOutputDevice();
-		if( hostApiOutputParameters.device == paNoDevice )
-			return paDeviceUnavailable;
+        if( hostApiOutputParameters.device == paNoDevice )
+            return paDeviceUnavailable;
 
         hostApiOutputParameters.channelCount = outputChannelCount;
         hostApiOutputParameters.sampleFormat = sampleFormat;
@@ -1808,4 +1822,3 @@ PaError Pa_GetSampleSize( PaSampleFormat format )
 
     return (PaError) result;
 }
-

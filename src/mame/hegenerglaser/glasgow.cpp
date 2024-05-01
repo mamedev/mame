@@ -1,23 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering, hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Glasgow 3 S chess computer
 Dirk V.
 sp_rinter@gmx.de
 
-TODO:
-- add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
-  effective speed is less than 10MHz
-
-===============================================================================
-
 Hardware notes:
-- 68000 CPU
-- 64 KB ROM
-- 16 KB RAM
-- 4 Digit LCD
+- R68000C10 or MC68000P12 @ 12MHz, IRQ from 50Hz Seiko SG-10 chip "50H", to IPL0+2
+- 64KB ROM (4*27128), 16KB RAM (2*6264)
+- LCD module same as MMx series, piezo
+
+Other TTL:
 
 3*74LS138 Decoder/Multiplexer
 1*74LS74  Dual positive edge triggered D Flip Flop
@@ -29,16 +24,20 @@ Hardware notes:
 1*74121   Monostable Multivibrator with Schmitt Trigger Inputs
 1*74LS20  Dual 4 Input NAND GAte
 1*74LS367 3 State Hex Buffers
-1*SG-10   Seiko 4-pin plastic XTAL chip "50H", to IPL0+2
 
-******************************************************************************/
+TODO:
+- add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
+  effective speed is around 7.2MHz
+
+*******************************************************************************/
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
 #include "mmboard.h"
-#include "sound/dac.h"
 #include "mmdisplay1.h"
+
+#include "cpu/m68000/m68000.h"
+#include "sound/dac.h"
 
 #include "speaker.h"
 
@@ -51,13 +50,13 @@ namespace {
 class glasgow_state : public driver_device
 {
 public:
-	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
+	glasgow_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void glasgow(machine_config &config);
@@ -69,16 +68,16 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display1_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_keys;
+
+	u8 m_kp_mux = 0;
 
 	void glasgow_mem(address_map &map);
 
 	void control_w(u8 data);
 	u8 keys_r();
 	void keys_w(u8 data);
-
-	u8 m_kp_mux = 0;
 };
 
 void glasgow_state::machine_start()
@@ -88,9 +87,9 @@ void glasgow_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void glasgow_state::control_w(u8 data)
 {
@@ -124,9 +123,9 @@ void glasgow_state::keys_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void glasgow_state::glasgow_mem(address_map &map)
 {
@@ -142,16 +141,16 @@ void glasgow_state::glasgow_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( glasgow )
 	PORT_START("KEY.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E / 5 / Rook") PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("INFO") PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right / White / 0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_P)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H / 8") PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEV") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G / 7 / King") PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
@@ -170,13 +169,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void glasgow_state::glasgow(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_periodic_int(FUNC(glasgow_state::irq5_line_assert), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &glasgow_state::glasgow_mem);
@@ -184,20 +183,20 @@ void glasgow_state::glasgow(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, m_display);
 	config.set_default_layout(layout_mephisto_glasgow);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( glasgow )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -208,7 +207,7 @@ ROM_START( glasgow )
 ROM_END
 
 
-ROM_START( amsterda )
+ROM_START( amsterdg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("vr_1_1", 0x00000, 0x04000, CRC(a186cc81) SHA1(903f93243536de3c2778ba3d38dcf46ae568862d) )
 	ROM_LOAD16_BYTE("vl_2_1", 0x00001, 0x04000, CRC(9b326226) SHA1(1b29319643d63a43ac84c1af08e02a4fc4fc6ffa) )
@@ -216,16 +215,16 @@ ROM_START( amsterda )
 	ROM_LOAD16_BYTE("bl_4_1", 0x08001, 0x04000, CRC(533e584a) SHA1(0e4510977dc627125c278920492bc137793a9554) )
 ROM_END
 
-ROM_START( dallas16a )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+ROM_START( dallas16g )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("dal_g_pr", 0x00000, 0x04000, CRC(66deade9) SHA1(07ec6b923f2f053172737f1fc94aec84f3ea8da1) )
 	ROM_LOAD16_BYTE("dal_g_pl", 0x00001, 0x04000, CRC(c5b6171c) SHA1(663167a3839ed7508ecb44fd5a1b2d3d8e466763) )
 	ROM_LOAD16_BYTE("dal_g_br", 0x08000, 0x04000, CRC(e24d7ec7) SHA1(a936f6fcbe9bfa49bf455f2d8a8243d1395768c1) )
 	ROM_LOAD16_BYTE("dal_g_bl", 0x08001, 0x04000, CRC(144a15e2) SHA1(c4fcc23d55fa5262f5e01dbd000644a7feb78f32) )
 ROM_END
 
-ROM_START( roma16a )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+ROM_START( roma16g )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("roma_r_low",  0x00000, 0x04000, CRC(f2312170) SHA1(82a50ba59f74365aa77478adaadbbace6693dcc1) )
 	ROM_LOAD16_BYTE("roma_l_low",  0x00001, 0x04000, CRC(5fbb72cc) SHA1(458473a62f9f7394c9d02a6ad0939d8e19bae78b) )
 	ROM_LOAD16_BYTE("roma_r_high", 0x08000, 0x04000, CRC(a55917db) SHA1(df9a9a96cdc1c9a7ed0dc70c4ddbb4278236a15f) )
@@ -236,14 +235,14 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                  FLAGS */
-CONS( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE )
 
-// newer chesscomputers on 4-ROM hardware (see mephisto_amsterdam.cpp for parent sets)
-CONS( 1985, amsterda,  amsterd,  0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, dallas16a, dallas32, 0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, roma16a,   roma32,   0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+// newer chesscomputers on 4-ROM hardware (see amsterdam.cpp for parent sets)
+SYST( 1985, amsterdg,  amsterd,  0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas16g, dallas32, 0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, roma16g,   roma32,   0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE )

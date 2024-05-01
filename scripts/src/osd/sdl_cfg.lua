@@ -50,6 +50,17 @@ else
 	}
 end
 
+if _OPTIONS["USE_WAYLAND"]=="1" then
+	defines {
+		"SDLMAME_USE_WAYLAND",
+	}
+	if _OPTIONS["targetos"]=="linux" then
+		buildoptions {
+			backtick(pkgconfigcmd() .. " --cflags wayland-egl"),
+		}
+	end
+end
+
 if _OPTIONS["NO_USE_XINPUT"]=="1" then
 	defines {
 		"USE_XINPUT=0",
@@ -95,20 +106,22 @@ if BASE_TARGETOS=="unix" then
 		"SDLMAME_UNIX",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
-		if _OPTIONS["with-bundled-sdl2"]==nil then
-			if _OPTIONS["USE_LIBSDL"]~="1" then
-				buildoptions {
-					"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
-				}
-			else
-				defines {
-					"MACOSX_USE_LIBSDL",
-				}
-				buildoptions {
-					backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
-				}
-			end
+		if _OPTIONS["USE_LIBSDL"]~="1" then
+			buildoptions {
+				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
+			}
+		else
+			defines {
+				"MACOSX_USE_LIBSDL",
+			}
+			buildoptions {
+				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
+			}
 		end
+	elseif _OPTIONS["targetos"]=="android" then
+		buildoptions {
+			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
+		}
 	else
 		buildoptions {
 			backtick(sdlconfigcmd() .. " --cflags"),
@@ -126,7 +139,7 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"UNICODE",
 			"_UNICODE",
-			"_WIN32_WINNT=0x0501",
+			"_WIN32_WINNT=0x0600",
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX",
 		}

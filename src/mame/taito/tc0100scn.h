@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_VIDEO_TC0100SCN_H
-#define MAME_VIDEO_TC0100SCN_H
+#ifndef MAME_TAITO_TC0100SCN_H
+#define MAME_TAITO_TC0100SCN_H
 
 #pragma once
 
@@ -26,7 +26,6 @@ public:
 
 	// configuration
 	void set_gfxlayout(int layout) { m_gfxlayout = layout; }
-	void set_color_base(u16 base) { m_col_base = base; }
 	template <typename... T> void set_tile_callback(T &&... args) { m_tc0100scn_cb.set(std::forward<T>(args)...); }
 	void set_multiscr_xoffs(int xoffs) { m_multiscrn_xoffs = xoffs; }
 	void set_multiscr_hack(int hack) { m_multiscrn_hack = hack; }
@@ -100,8 +99,6 @@ private:
 	int          m_multiscrn_xoffs;
 	int          m_multiscrn_hack;
 
-	u16          m_col_base;
-
 	template<unsigned Offset, unsigned Colbank> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	template<unsigned Offset, unsigned Gfx> TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
@@ -143,4 +140,4 @@ private:
 DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
 DECLARE_DEVICE_TYPE(TC0620SCC, tc0620scc_device)
 
-#endif // MAME_VIDEO_TC0100SCN_H
+#endif // MAME_TAITO_TC0100SCN_H

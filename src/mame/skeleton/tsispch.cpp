@@ -123,9 +123,8 @@
 
 // defines
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_PARAM     (1U <<  1)
-#define LOG_DSP       (1U <<  2)
+#define LOG_PARAM     (1U << 1)
+#define LOG_DSP       (1U << 2)
 
 #define VERBOSE (LOG_GENERAL | LOG_PARAM)
 //#define LOG_OUTPUT_FUNC printf
@@ -133,7 +132,6 @@
 
 namespace {
 
-#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGPRM(...) LOGMASKED(LOG_PARAM, __VA_ARGS__)
 #define LOGDSP(...) LOGMASKED(LOG_DSP, __VA_ARGS__)
 
@@ -161,8 +159,8 @@ private:
 	void dsp_data_w(uint16_t data);
 	uint16_t dsp_status_r();
 	void dsp_status_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p0_w);
-	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
+	void dsp_to_8086_p0_w(int state);
+	void dsp_to_8086_p1_w(int state);
 
 	void dsp_data_map(address_map &map);
 	void dsp_prg_map(address_map &map);
@@ -238,19 +236,19 @@ uint16_t tsispch_state::dsp_status_r()
 
 void tsispch_state::dsp_status_w(uint16_t data)
 {
-	LOGGEN("warning: upd772x status register should never be written to!\n");
+	LOG("warning: upd772x status register should never be written to!\n");
 	m_dsp->snesdsp_write(false, data);
 }
 
-WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
+void tsispch_state::dsp_to_8086_p0_w(int state)
 {
-	LOGGEN("upd772x changed p0 state to %d!\n",state);
+	LOG("upd772x changed p0 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
-WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
+void tsispch_state::dsp_to_8086_p1_w(int state)
 {
-	LOGGEN("upd772x changed p1 state to %d!\n",state);
+	LOG("upd772x changed p1 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
@@ -259,7 +257,7 @@ WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
 *****************************************************************************/
 void tsispch_state::machine_reset()
 {
-	LOGGEN("machine reset\n");
+	LOG("machine reset\n");
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
@@ -267,7 +265,7 @@ void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
-	LOGGEN("driver init\n");
+	LOG("driver init\n");
 	// unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
 	// source upd7720                  dest upd7725
@@ -532,7 +530,7 @@ ROM_START( prose2k )
 	ROM_LOAD( "am27s19.u77", 0x0000, 0x0020, CRC(a88757fc) SHA1(9066d6dbc009d7a126d75b8461ca464ddf134412))
 	ROM_LOAD( "am27s19.u79", 0x0020, 0x0020, CRC(a165b090) SHA1(bfc413c79915c68906033741318c070ad5dd0f6b))
 	ROM_LOAD( "am27s19.u81", 0x0040, 0x0020, CRC(62e1019b) SHA1(acade372edb08fd0dcb1fa3af806c22c47081880))
-	ROM_END
+ROM_END
 
 ROM_START( prose2ko )
 	// 'Older' prose2k set
@@ -563,7 +561,7 @@ ROM_START( prose2ko )
 	ROM_LOAD( "dm74s288n.u77", 0x0000, 0x0020, CRC(a88757fc) SHA1(9066d6dbc009d7a126d75b8461ca464ddf134412)) // == am27s19.u77
 	ROM_LOAD( "dm74s288n.whitespot.u79", 0x0020, 0x0020, CRC(7faee6cb) SHA1(b6dd2a6909dac9e89e7317c006a013ff0866382d))
 	// no third PROM in this set, a 74S138 is used instead for e0000-fffff ROM mapping
-	ROM_END
+ROM_END
 
 } // anonymous namespace
 

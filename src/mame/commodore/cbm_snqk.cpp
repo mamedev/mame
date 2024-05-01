@@ -24,14 +24,16 @@
  * 0x001c data */
 
 
-image_init_result general_cbm_loadsnap( device_image_interface &image, address_space &space, offs_t offset,
-	void (*cbm_sethiaddress)(address_space &space, uint16_t hiaddress) )
+std::pair<std::error_condition, std::string> general_cbm_loadsnap(
+		device_image_interface &image,
+		address_space &space,
+		offs_t offset,
+		void (*cbm_sethiaddress)(address_space &space, uint16_t hiaddress))
 {
 	char buffer[7];
 	std::vector<uint8_t> data;
 	uint32_t bytesread;
 	uint16_t address = 0;
-	int i;
 
 	int snapshot_size = image.length();
 
@@ -42,29 +44,29 @@ image_init_result general_cbm_loadsnap( device_image_interface &image, address_s
 	else if (image.is_filetype("p00"))
 	{
 		/* p00 files */
-		if (image.fread( buffer, sizeof(buffer)) != sizeof(buffer))
-			goto error;
+		if (image.fread(buffer, sizeof(buffer)) != sizeof(buffer))
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		if (memcmp(buffer, "C64File", sizeof(buffer)))
-			goto error;
+			return std::make_pair(image_error::INVALIDIMAGE, std::string());
 		image.fseek(26, SEEK_SET);
 		snapshot_size -= 26;
 	}
 	else if (image.is_filetype("t64"))
 	{
 		/* t64 files - for GB64 Single T64s loading to x0801 - header is always the same size */
-		if (image.fread( buffer, sizeof(buffer)) != sizeof(buffer))
-			goto error;
+		if (image.fread(buffer, sizeof(buffer)) != sizeof(buffer))
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		if (memcmp(buffer, "C64 tape image file", sizeof(buffer)))
-			goto error;
+			return std::make_pair(image_error::INVALIDIMAGE, std::string());
 		image.fseek(94, SEEK_SET);
 		snapshot_size -= 94;
 	}
 	else
 	{
-		goto error;
+		return std::make_pair(image_error::UNSUPPORTED, std::string());
 	}
 
-	image.fread( &address, 2);
+	image.fread(&address, 2);
 	address = little_endianize_int16(address);
 	if (image.is_filetype("t64"))
 		address = 2049;
@@ -72,21 +74,18 @@ image_init_result general_cbm_loadsnap( device_image_interface &image, address_s
 
 	data.resize(snapshot_size);
 
-	bytesread = image.fread( &data[0], snapshot_size);
+	bytesread = image.fread(&data[0], snapshot_size);
 	if (bytesread != snapshot_size)
-		goto error;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
-	for (i = 0; i < snapshot_size; i++)
+	for (int i = 0; i < snapshot_size; i++)
 		space.write_byte(address + i + offset, data[i]);
 
 	cbm_sethiaddress(space, address + snapshot_size);
-	return image_init_result::PASS;
-
-error:
-	return image_init_result::FAIL;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
-void cbm_quick_sethiaddress( address_space &space, uint16_t hiaddress )
+void cbm_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 {
 	space.write_byte(0xae, hiaddress & 0xff);
 	space.write_byte(0x31, hiaddress & 0xff);

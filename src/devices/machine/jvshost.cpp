@@ -126,14 +126,14 @@ void jvs_host::encode(uint8_t *buffer, uint32_t &size)
 	for(uint32_t i=0; i<size; i++)
 		if(buffer[i] == 0xd0 || buffer[i] == 0xe0)
 			add++;
-	for(uint32_t i=size; i; i--) {
+	for(uint32_t i=size,j=add; i; i--) {
 		uint8_t t = buffer[i-1];
 		if(t == 0xd0 || t == 0xe0) {
-			buffer[i+add-1] = t-1;
-			buffer[i+add-2] = 0xd0;
-			add--;
+			buffer[i+j-1] = t-1;
+			buffer[i+j-2] = 0xd0;
+			j--;
 		} else
-			buffer[i+add-1] = t;
+			buffer[i+j-1] = t;
 	}
 	buffer[0] = 0xe0;
 	size += add;

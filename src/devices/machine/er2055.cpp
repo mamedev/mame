@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/er2055.h"
+#include "er2055.h"
 
 #include "logmacro.h"
 
@@ -85,8 +85,8 @@ void er2055_device::nvram_default()
 
 bool er2055_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_rom_data[0], SIZE_DATA, actual) && actual == SIZE_DATA;
+	auto const [err, actual] = read(file, &m_rom_data[0], SIZE_DATA);
+	return !err && (actual == SIZE_DATA);
 }
 
 
@@ -97,8 +97,8 @@ bool er2055_device::nvram_read(util::read_stream &file)
 
 bool er2055_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_rom_data[0], SIZE_DATA, actual) && actual == SIZE_DATA;
+	auto const [err, actual] = write(file, &m_rom_data[0], SIZE_DATA);
+	return !err;
 }
 
 
@@ -163,7 +163,7 @@ void er2055_device::update_state()
 //  successive write or erase operations
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er2055_device::set_clk)
+void er2055_device::set_clk(int state)
 {
 	uint8_t oldstate = m_control_state;
 	if (state)

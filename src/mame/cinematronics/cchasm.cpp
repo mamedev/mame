@@ -95,8 +95,8 @@ private:
 	void soundlatch4_w(uint8_t data);
 	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t io_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
+	void ctc_timer_1_w(int state);
+	void ctc_timer_2_w(int state);
 
 	void refresh();
 
@@ -295,7 +295,7 @@ uint16_t cchasm_state::io_r(offs_t offset)
 }
 
 
-WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
+void cchasm_state::ctc_timer_1_w(int state)
 {
 	if (state) /* rising edge */
 	{
@@ -304,7 +304,7 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
+void cchasm_state::ctc_timer_2_w(int state)
 {
 	if (state) /* rising edge */
 	{

@@ -93,7 +93,8 @@ void cpc_symbiface2_device::device_start()
 	space.install_readwrite_handler(0xfd00,0xfd07, read8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_r)), write8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_w)));
 	space.install_readwrite_handler(0xfd08,0xfd0f, read8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_r)), write8sm_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_w)));
 	space.install_read_handler(0xfd10,0xfd10, read8smo_delegate(*this, FUNC(cpc_symbiface2_device::mouse_r)));
-	space.install_readwrite_handler(0xfd14,0xfd15, read8sm_delegate(*this, FUNC(cpc_symbiface2_device::rtc_r)), write8sm_delegate(*this, FUNC(cpc_symbiface2_device::rtc_w)));
+	space.install_readwrite_handler(0xfd14,0xfd14, read8smo_delegate(m_rtc, FUNC(mc146818_device::data_r)), write8smo_delegate(m_rtc, FUNC(mc146818_device::data_w)));
+	space.install_write_handler(0xfd15,0xfd15, write8smo_delegate(m_rtc, FUNC(mc146818_device::address_w)));
 	space.install_readwrite_handler(0xfd17,0xfd17, read8smo_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_r)), write8smo_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_w)));
 
 	// set up ROM space (these can be writable, when mapped to &4000, or completely disabled, allowing the built-in ROMs to be visible)
@@ -159,15 +160,6 @@ void cpc_symbiface2_device::ide_cs1_w(offs_t offset, uint8_t data)
 // RTC (Dallas DS1287A)
 // #FD15 (write only) register select
 // #FD14 (read/write) read from or write into selected register
-uint8_t cpc_symbiface2_device::rtc_r(offs_t offset)
-{
-	return m_rtc->read(~offset & 0x01);
-}
-
-void cpc_symbiface2_device::rtc_w(offs_t offset, uint8_t data)
-{
-	m_rtc->write(~offset & 0x01, data);
-}
 
 // PS/2 Mouse connector
 // #FD10 (read only) read mouse status

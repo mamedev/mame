@@ -59,6 +59,7 @@ private:
 	void set_k(u16 value) noexcept;
 	u16 get_ix(int which) const noexcept;
 	void set_ix(int which, u16 value) noexcept;
+	u32 add_ix_masked(int which, int offset) const noexcept;
 	u8 get_xk(int which) const noexcept;
 	void set_xk(int which, u8 value) noexcept;
 	void set_a(u8 value) noexcept;
@@ -82,6 +83,10 @@ private:
 	void mulu16() noexcept;
 	void muls16(bool frac) noexcept;
 	void divu16(bool frac) noexcept;
+	u64 accumulate32(u32 data, bool v) noexcept;
+	void aslm() noexcept;
+	void asrm() noexcept;
+	u16 saturation_value(u64 sum) const noexcept;
 
 	// misc. execution helpers
 	void advance() noexcept;
@@ -120,9 +125,5 @@ private:
 	bool m_start;
 	s32 m_icount;
 };
-
-// device type declaration
-DECLARE_DEVICE_TYPE(MC68HC16Z1, mc68hc16z1_device)
-
 
 #endif // MAME_CPU_M68HC16_CPU16_H

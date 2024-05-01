@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Ernesto Corvi
+
 /***************************************************************************
 
 IQ Block   (c) 1992 IGS
@@ -50,14 +51,156 @@ Grndtour:
 ***************************************************************************/
 
 #include "emu.h"
-#include "iqblock.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class iqblock_state : public driver_device
+{
+public:
+	iqblock_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_rambase(*this, "rambase"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram")
+	{ }
+
+	void iqblock(machine_config &config);
+
+	void init_grndtour();
+	void init_iqblock();
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<uint8_t> m_rambase;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+
+	uint8_t m_videoenable = 0;
+	uint8_t m_video_type = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	void iqblock_prot_w(uint8_t data);
+	void grndtour_prot_w(uint8_t data);
+	void irqack_w(uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void fgscroll_w(offs_t offset, uint8_t data);
+	void port_c_w(uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void program_map(address_map &map);
+	void port_map(address_map &map);
+};
+
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(iqblock_state::get_bg_tile_info)
+{
+	int const code = m_bgvideoram[tile_index] + (m_bgvideoram[tile_index + 0x800] << 8);
+	tileinfo.set(0,
+			code &(m_video_type ? 0x1fff : 0x3fff),
+			m_video_type? (2 * (code >> 13) + 1) : (4 * (code >> 14) + 3),
+			0);
+}
+
+TILE_GET_INFO_MEMBER(iqblock_state::get_fg_tile_info)
+{
+	int const code = m_fgvideoram[tile_index];
+	tileinfo.set(1,
+			code & 0x7f,
+			(code & 0x80) ? 3 : 0,
+			0);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void iqblock_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(iqblock_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(iqblock_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scroll_cols(64);
+
+	save_item(NAME(m_videoenable));
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void iqblock_state::fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void iqblock_state::bgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+}
+
+void iqblock_state::fgscroll_w(offs_t offset, uint8_t data)
+{
+	m_fg_tilemap->set_scrolly(offset, data);
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t iqblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!m_videoenable) return 0;
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
 
 
 void iqblock_state::iqblock_prot_w(uint8_t data)
@@ -72,13 +215,12 @@ void iqblock_state::grndtour_prot_w(uint8_t data)
 	m_rambase[0xe39] = data;
 	m_rambase[0xe3a] = data;
 	m_rambase[0xe2f] = data;
-
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if((scanline % 16) != 0)
 		return;
@@ -96,27 +238,27 @@ void iqblock_state::irqack_w(uint8_t data)
 }
 
 
-void iqblock_state::port_C_w(uint8_t data)
+void iqblock_state::port_c_w(uint8_t data)
 {
-	/* bit 4 unknown; it is pulsed at the end of every NMI */
+	// bit 4 unknown; it is pulsed at the end of every NMI
 
-	/* bit 5 seems to be 0 during screen redraw */
+	// bit 5 seems to be 0 during screen redraw
 	m_videoenable = data & 0x20;
 
-	/* bit 6 is coin counter */
-	machine().bookkeeping().coin_counter_w(0,data & 0x40);
+	// bit 6 is coin counter
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
 
-	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
+	// bit 7 could be a second coin counter, but coin 2 doesn't seem to work...
 }
 
-void iqblock_state::main_map(address_map &map)
+void iqblock_state::program_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xffff).ram().share("rambase");
+	map(0xf000, 0xffff).ram().share(m_rambase);
 }
 
 
-void iqblock_state::main_portmap(address_map &map)
+void iqblock_state::port_map(address_map &map)
 {
 	map(0x2000, 0x23ff).w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2800, 0x2bff).w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
@@ -126,9 +268,9 @@ void iqblock_state::main_portmap(address_map &map)
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // UM3567_data_port_0_w
 	map(0x50c0, 0x50c0).w(FUNC(iqblock_state::irqack_w));
 	map(0x6000, 0x603f).w(FUNC(iqblock_state::fgscroll_w));
-	map(0x6800, 0x69ff).w(FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
-	map(0x7000, 0x7fff).ram().w(FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
-	map(0x8000, 0xffff).rom().region("user1", 0);
+	map(0x6800, 0x69ff).w(FUNC(iqblock_state::fgvideoram_w)).share(m_fgvideoram); // initialized up to 6fff... bug or larger tilemap?
+	map(0x7000, 0x7fff).ram().w(FUNC(iqblock_state::bgvideoram_w)).share(m_bgvideoram);
+	map(0x8000, 0xffff).rom().region("bgmaps", 0);
 }
 
 static INPUT_PORTS_START( iqblock )
@@ -333,27 +475,27 @@ static const gfx_layout tilelayout3 =
 #endif
 
 static GFXDECODE_START( gfx_iqblock )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )    /* only odd color codes are used */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2, 0,  4 )    /* only color codes 0 and 3 used */
+	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout1, 0, 16 )    // only odd color codes are used
+	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout2, 0,  4 )    // only color codes 0 and 3 used
 GFXDECODE_END
 
 
 
 void iqblock_state::iqblock(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2); /* 6 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &iqblock_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &iqblock_state::main_portmap);
+	// basic machine hardware
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &iqblock_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &iqblock_state::port_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(iqblock_state::irq), "screen", 0, 1);
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pa_callback().set_ioport("P1");
 	ppi.in_pb_callback().set_ioport("P2");
 	ppi.in_pc_callback().set_ioport("EXTRA");
-	ppi.out_pc_callback().set(FUNC(iqblock_state::port_C_w));
+	ppi.out_pc_callback().set(FUNC(iqblock_state::port_c_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -365,10 +507,10 @@ void iqblock_state::iqblock(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_iqblock);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 3'579'545).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -403,15 +545,15 @@ ROM_START( iqblock )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u7.v5",        0x0000, 0x10000, CRC(811f306e) SHA1(d0aef80f1624002d05721276358f26a3ef69a3f6) )
 
-	ROM_REGION( 0x8000, "user1", 0 )
-	ROM_LOAD( "u8.6",         0x0000, 0x8000, CRC(2651bc27) SHA1(53e1d6ffd78c8a612863b29b0f8734e740d563c7) )    /* background maps, read by the CPU */
+	ROM_REGION( 0x8000, "bgmaps", 0 )
+	ROM_LOAD( "u8.6",         0x0000, 0x8000, CRC(2651bc27) SHA1(53e1d6ffd78c8a612863b29b0f8734e740d563c7) )    // background maps, read by the CPU
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "bgtiles", 0 )
 	ROM_LOAD( "u28.1",        0x00000, 0x20000, CRC(ec4b64b4) SHA1(000e9df0c0b5fcde5ead218dfcdc156bc4be909d) )
 	ROM_LOAD( "u27.2",        0x20000, 0x20000, CRC(74aa3de3) SHA1(16757c24765d22026793a0c53d3f24c106951a18) )
 	ROM_LOAD( "u26.3",        0x40000, 0x20000, CRC(2896331b) SHA1(51eba9f9f653a11cb96c461ab495d943d34cedc6) )
 
-	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_REGION( 0x8000, "fgtiles", 0 )
 	ROM_LOAD( "u25.4",        0x0000, 0x4000, CRC(8fc222af) SHA1(ac1fb5e6caec391a76e3af51e133aecc65cd5aed) )
 	ROM_LOAD( "u24.5",        0x4000, 0x4000, CRC(61050e1e) SHA1(1f7185b2a5a2e237120276c95344744b146b4bf6) )
 ROM_END
@@ -463,15 +605,15 @@ ROM_START( grndtour )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "grand7.u7",        0x0000, 0x10000, CRC(95cac31e) SHA1(47bbcce6981ea3d38e0aa49ccd3762a4529f3c96) )
 
-	ROM_REGION( 0x8000, "user1", 0 )
-	ROM_LOAD( "grand6.u8",         0x0000, 0x8000, CRC(4c634b86) SHA1(c36df147187bc526f2348bc2f4d4c4e35bb45f38) )   /* background maps, read by the CPU */
+	ROM_REGION( 0x8000, "bgmaps", 0 )
+	ROM_LOAD( "grand6.u8",         0x0000, 0x8000, CRC(4c634b86) SHA1(c36df147187bc526f2348bc2f4d4c4e35bb45f38) )   // background maps, read by the CPU
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_REGION( 0xc0000, "bgtiles", 0 )
 	ROM_LOAD( "grand1.u28",        0x00000, 0x40000, CRC(de85c664) SHA1(3a4b0cac88a0fea1c80541fe49c799e3550bedee) )
 	ROM_LOAD( "grand2.u27",        0x40000, 0x40000, CRC(8456204e) SHA1(b604d501f360670f57b937ad96af64c1c2038ef7) )
 	ROM_LOAD( "grand3.u26",        0x80000, 0x40000, CRC(77632917) SHA1(d91eadec2e0fb3082299362d18814b8ec4c5e068) )
 
-	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_REGION( 0x8000, "fgtiles", 0 )
 	ROM_LOAD( "grand4.u25",        0x0000, 0x4000, CRC(48d09746) SHA1(64669f572b9a98b078ee1ea0b614c117e5dfbec9) )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
@@ -479,7 +621,7 @@ ROM_END
 void iqblock_state::init_iqblock()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	/* decrypt the program ROM */
+	// decrypt the program ROM
 	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x0282) != 0x0282) rom[i] ^= 0x01;
@@ -488,13 +630,13 @@ void iqblock_state::init_iqblock()
 	}
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8smo_delegate(*this, FUNC(iqblock_state::iqblock_prot_w)));
-	m_video_type=1;
+	m_video_type = 1;
 }
 
 void iqblock_state::init_grndtour()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	/* decrypt the program ROM */
+	// decrypt the program ROM
 	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x0282) != 0x0282) rom[i] ^= 0x01;
@@ -503,9 +645,10 @@ void iqblock_state::init_grndtour()
 	}
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8smo_delegate(*this, FUNC(iqblock_state::grndtour_prot_w)));
-	m_video_type=0;
+	m_video_type = 0;
 }
 
+} // anonymous namespace
 
 
 GAME( 1993, iqblock,  0, iqblock, iqblock,  iqblock_state, init_iqblock,  ROT0, "IGS", "IQ-Block (V100U)",   MACHINE_SUPPORTS_SAVE )

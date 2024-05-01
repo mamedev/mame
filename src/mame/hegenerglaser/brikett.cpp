@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Hegener + Glaser Mephisto (I)/1X/II/ESB II/III/Junior
 The base device is nicknamed the "Brikett"
@@ -56,6 +56,7 @@ Mephisto III program module:
 - HCF4556BE (chip select?)
 
 ESB 6000 chessboard:
+- PCB label: DH 5000 00111 12 B
 - CD4017, 74373, 74374
 - 64 reed switches (magnet sensors)
 - 64 leds + power led
@@ -70,25 +71,26 @@ BTANB:
 - bad bug in mephistoj opening library: e4 e6 / d4 d5 / Nd2 c5 / exd5 Qd1xd5,
   in other words: computer makes an illegal move with the WHITE queen
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
+#include "mmdisplay1.h"
 
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_1.lh" // clickable
-#include "mephisto_esb2.lh" // clickable
-#include "mephisto_3.lh" // clickable
-#include "mephisto_junior.lh" // clickable
+#include "mephisto_1.lh"
+#include "mephisto_esb2.lh"
+#include "mephisto_3.lh"
+#include "mephisto_junior.lh"
 
 
 namespace {
@@ -109,7 +111,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { if (newval) machine_reset(); }
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
 
 	// machine configs
 	void mephisto(machine_config &config);
@@ -129,9 +131,14 @@ private:
 	optional_device<sensorboard_device> m_board;
 	required_device<mephisto_display1_device> m_display;
 	optional_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
+
+	bool m_reset = false;
+	u8 m_esb_led = 0;
+	u8 m_esb_row = 0;
+	u8 m_esb_select = 0;
 
 	// address maps
 	void mephisto_map(address_map &map);
@@ -146,20 +153,21 @@ private:
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	u8 input_r(offs_t offset);
 	u8 sound_r();
 
 	void esb_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(esb_r);
+	int esb_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
-
-	bool m_reset = false;
-	u8 m_esb_led = 0;
-	u8 m_esb_row = 0;
-	u8 m_esb_select = 0;
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void brikett_state::machine_start()
 {
@@ -192,18 +200,20 @@ void brikett_state::set_cpu_freq()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
+
+// base hardware
 
 INTERRUPT_GEN_MEMBER(brikett_state::interrupt)
 {
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, HOLD_LINE);
 }
 
-READ_LINE_MEMBER(brikett_state::clear_r)
+int brikett_state::clear_r()
 {
-	// CLEAR low + RESET high resets cpu
+	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
 	m_reset = false;
 	return ret;
@@ -232,6 +242,9 @@ u8 brikett_state::input_r(offs_t offset)
 
 	return data;
 }
+
+
+// ESB 6000
 
 void brikett_state::esb_w(u8 data)
 {
@@ -264,7 +277,7 @@ void brikett_state::esb_w(u8 data)
 	m_led_pwm->matrix(~m_esb_row, m_esb_led);
 }
 
-READ_LINE_MEMBER(brikett_state::esb_r)
+int brikett_state::esb_r()
 {
 	// EF1: read chessboard sensor
 	if (m_board && m_inputs[5].read_safe(0))
@@ -275,9 +288,9 @@ READ_LINE_MEMBER(brikett_state::esb_r)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void brikett_state::mephisto_map(address_map &map)
 {
@@ -326,9 +339,9 @@ void brikett_state::mephistoj_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mephisto )
 	PORT_START("IN.0")
@@ -356,10 +369,10 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 
 	PORT_START("IN.4") // 2nd model main PCB has 2 XTALs on PCB
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0) PORT_CONDITION("IN.4", 0x30, NOTEQUALS, 0x00)
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0) PORT_CONDITION("IN.4", 0x30, NOTEQUALS, 0x00)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
-	PORT_CONFNAME( 0x70, 0x40, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0)
+	PORT_CONFNAME( 0x70, 0x40, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
 	PORT_CONFSETTING(    0x40, "1st Model (1980)" )
 	PORT_CONFSETTING(    0x70, "2nd Model (1982)" )
 
@@ -396,7 +409,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INFO")
 
 	PORT_MODIFY("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("POS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("POS")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left / Black / 9")
 
 	PORT_MODIFY("IN.3")
@@ -404,7 +417,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("MEM")
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0)
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
 	PORT_CONFSETTING(    0x02, "12MHz (Special)" )
@@ -413,13 +426,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void brikett_state::mephistoj(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	CDP1802(config, m_maincpu, 4.194304_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoj_map);
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephistoj_io);
@@ -429,11 +442,11 @@ void brikett_state::mephistoj(machine_config &config)
 	const attotime irq_period = attotime::from_hz(4.194304_MHz_XTAL / 0x10000); // through SAJ300T
 	m_maincpu->set_periodic_int(FUNC(brikett_state::interrupt), irq_period);
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, m_display); // internal
 	config.set_default_layout(layout_mephisto_junior);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
@@ -444,7 +457,7 @@ void brikett_state::mephisto(machine_config &config)
 {
 	mephistoj(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(3.579545_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto_map);
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephisto_io);
@@ -466,7 +479,7 @@ void brikett_state::mephisto2(machine_config &config)
 {
 	mephisto(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto2_map);
 }
 
@@ -474,7 +487,7 @@ void brikett_state::mephisto2e(machine_config &config)
 {
 	mephisto2(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto2e_map);
 	m_maincpu->ef1_cb().set(FUNC(brikett_state::esb_r));
 	m_extport->do_cb().set(FUNC(brikett_state::esb_w));
@@ -491,7 +504,7 @@ void brikett_state::mephisto3(machine_config &config)
 {
 	mephisto2e(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
 	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w));
@@ -501,9 +514,9 @@ void brikett_state::mephisto3(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mephisto ) // ROM serials 911xx have same contents, some modules have both 898xx and 911xx chips
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -542,6 +555,7 @@ ROM_START( mephisto2a ) // cartridge s/n 0037011
 	ROM_LOAD("4005_02_353_01.3", 0x2000, 0x1000, CRC(1f933d33) SHA1(5d5bfd40158354830c434f4c8b4ff1cac8ab4f5c) ) // "
 ROM_END
 
+
 ROM_START( mephisto2e )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("251-11.1", 0x0000, 0x1000, CRC(3c8e2631) SHA1(5960e47f0659b1e5f164107069738e730e3ff255) ) // M2532A
@@ -578,21 +592,22 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME        PARENT    CMP MACHINE     INPUT       STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, mephisto,   0,         0, mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       STATE          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, mephisto,   0,         0,      mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, mephisto1x, 0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, mephistoj,  0,         0, mephistoj,  mephistoj,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // there's also a "Mephisto Junior" from 1990
+SYST( 1981, mephisto1x, 0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, mephistoj,  0,         0,      mephistoj,  mephistoj,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE ) // there's also a "Mephisto Junior" from 1990
 
-CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, mephisto2a, mephisto2, 0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, mephisto2e, mephisto2, 0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, mephisto2,  0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephisto2a, mephisto2, 0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mephisto3a, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mephisto3b, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mephisto3c, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, mephisto2e, 0,         0,      mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1983, mephisto3,  0,         0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3a, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3b, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3c, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE )

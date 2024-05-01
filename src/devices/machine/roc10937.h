@@ -21,9 +21,9 @@ public:
 	virtual void update_display();
 	void shift_clock(int data);
 	void write_char(int data);
-	DECLARE_WRITE_LINE_MEMBER( sclk );
-	DECLARE_WRITE_LINE_MEMBER( data );
-	DECLARE_WRITE_LINE_MEMBER( por );
+	void sclk(int state);
+	void data(int state);
+	void por(int state);
 
 
 protected:
@@ -40,8 +40,8 @@ protected:
 	int m_count;
 	int m_data;
 	int m_duty;
-	int m_disp;
 	int m_sclk;
+	int m_por;
 	uint8_t m_cursor;
 	uint32_t m_chars[16];
 

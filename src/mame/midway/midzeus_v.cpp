@@ -1107,9 +1107,9 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 #if 0
 			// TODO: Lighting
 			uint32_t inormal = databuffer[10 + i];
-			int32_t xn = (int32_t)(((inormal >>  0) & 0x3ff) << 22) >> 22;
-			int32_t yn = (int32_t)(((inormal >> 10) & 0x3ff) << 22) >> 22;
-			int32_t zn = (int32_t)(((inormal >> 20) & 0x3ff) << 22) >> 22;
+			int32_t xn = util::sext((inormal >>  0) & 0x3ff, 10);
+			int32_t yn = util::sext((inormal >> 10) & 0x3ff, 10);
+			int32_t zn = util::sext((inormal >> 20) & 0x3ff, 10);
 #endif
 		}
 

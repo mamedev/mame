@@ -88,6 +88,8 @@
 #include "amusco.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK        22.1184_MHz_XTAL     /* confirmed */
 #define SECOND_CLOCK        15_MHz_XTAL          /* confirmed */
 
@@ -119,7 +121,7 @@ public:
 	void amusco(machine_config &config);
 	void draw88pkr(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(coin_irq);
+	void coin_irq(int state);
 
 protected:
 	virtual void video_start() override;
@@ -431,7 +433,7 @@ static INPUT_PORTS_START( draw88pkr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(amusco_state::coin_irq)
+void amusco_state::coin_irq(int state)
 {
 	m_pic->ir4_w(state ? CLEAR_LINE : HOLD_LINE);
 }
@@ -645,6 +647,9 @@ ROM_START( draw88pkr )
 	ROM_LOAD( "u36.bin",  0x4000, 0x4000, CRC(57d42a97) SHA1(b53b6419a48ecd111faf87fd6e480d82861fe512) )
 	ROM_LOAD( "u37.bin",  0x8000, 0x4000, CRC(6e23b9f2) SHA1(6916828d84d1ecb44dc454e6786f97801a8550c7) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************
 *      Game Drivers      *

@@ -45,14 +45,6 @@ void com52c50_device::map(address_map &map)
 	map(7, 7).w(FUNC(com52c50_device::tx_buffer_eom_w));
 }
 
-void com52c50_device::device_resolve_objects()
-{
-	m_int1_callback.resolve_safe();
-	m_int2_callback.resolve_safe();
-	m_rx_dma_callback.resolve_safe();
-	m_tx_dma_callback.resolve_safe();
-}
-
 void com52c50_device::device_start()
 {
 	save_item(NAME(m_int_mask));

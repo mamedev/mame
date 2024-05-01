@@ -33,23 +33,18 @@
 #include "emu.h"
 #include "joypad2.h"
 
+#include "machine/74157.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(PCE_JOYPAD2,       pce_joypad2_device,       "pce_joypad2",       "NEC PC Engine Pad")
-DEFINE_DEVICE_TYPE(PCE_JOYPAD2_TURBO, pce_joypad2_turbo_device, "pce_joypad2_turbo", "NEC PC Engine/TurboGrafx-16 2 Button Joypad")
-
-
-static INPUT_PORTS_START( pce_joypad2 )
+INPUT_PORTS_START( pce_joypad2 )
 	// II is left of I on the original pad so we map them in reverse order
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button I")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button II")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("Select")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("Run")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("%p Button I")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("%p Button II")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("%p Run")
 
 	PORT_START("DIRECTION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -59,7 +54,7 @@ static INPUT_PORTS_START( pce_joypad2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( pce_joypad2_turbo )
+INPUT_PORTS_START( pce_joypad2_turbo )
 	PORT_INCLUDE( pce_joypad2 )
 
 	PORT_START("TURBO")
@@ -72,6 +67,74 @@ static INPUT_PORTS_START( pce_joypad2_turbo )
 	PORT_CONFSETTING(    0x08, "Slow" )
 	PORT_CONFSETTING(    0x0c, "Fast" )
 INPUT_PORTS_END
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> pce_joypad2_device
+
+class pce_joypad2_device : public device_t, public device_pce_control_port_interface
+{
+public:
+	// construction/destruction
+	pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// construction/destruction
+	pce_joypad2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	// device_pce_control_port_interface overrides
+	virtual u8 peripheral_r() override;
+	virtual void sel_w(int state) override;
+	virtual void clr_w(int state) override;
+
+	// devices
+	required_device<ls157_device> m_muxer;
+};
+
+
+// ======================> pce_joypad2_turbo_device
+
+class pce_joypad2_turbo_device : public pce_joypad2_device
+{
+public:
+	// construction/destruction
+	pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_pce_control_port_interface overrides
+	virtual void clr_w(int state) override;
+
+private:
+	u8 buttons_r();
+
+	// IO ports
+	required_ioport m_buttons_io;
+	required_ioport m_turbo_io;
+
+	// internal states
+	u8 m_counter; // Turbo rate counter, connected on 74xx163 QB and QC.
+	bool m_prev_clr; // previous CLR pin state
+};
+
 
 
 //-------------------------------------------------
@@ -119,7 +182,9 @@ pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char
 pce_joypad2_turbo_device::pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	pce_joypad2_device(mconfig, PCE_JOYPAD2_TURBO, tag, owner, clock),
 	m_buttons_io(*this, "BUTTONS"),
-	m_turbo_io(*this, "TURBO")
+	m_turbo_io(*this, "TURBO"),
+	m_counter(0),
+	m_prev_clr(false)
 {
 }
 
@@ -240,3 +305,14 @@ u8 pce_joypad2_turbo_device::buttons_r()
 	}
 	return ret;
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(PCE_JOYPAD2,       device_pce_control_port_interface, pce_joypad2_device,       "pce_joypad2",       "NEC PC Engine Pad")
+DEFINE_DEVICE_TYPE_PRIVATE(PCE_JOYPAD2_TURBO, device_pce_control_port_interface, pce_joypad2_turbo_device, "pce_joypad2_turbo", "NEC PC Engine/TurboGrafx-16 2 Button Joypad")

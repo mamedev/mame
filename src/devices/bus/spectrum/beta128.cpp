@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "beta128.h"
 
+#include "formats/trd_dsk.h"
+
 
 /***************************************************************************
     DEVICE DEFINITIONS
@@ -175,9 +177,9 @@ void spectrum_beta128_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_beta128_device::romcs)
+bool spectrum_beta128_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 

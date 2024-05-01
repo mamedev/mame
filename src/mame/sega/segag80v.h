@@ -5,8 +5,8 @@
     Sega vector hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SEGAG80V_H
-#define MAME_INCLUDES_SEGAG80V_H
+#ifndef MAME_SEGA_SEGAG80V_H
+#define MAME_SEGA_SEGAG80V_H
 
 #pragma once
 
@@ -81,13 +81,13 @@ public:
 	void init_spacfury();
 	void init_spacfurybl();
 
-	DECLARE_READ_LINE_MEMBER(elim4_joint_coin_r);
-	DECLARE_READ_LINE_MEMBER(draw_r);
-	DECLARE_WRITE_LINE_MEMBER(service_switch_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
+	int elim4_joint_coin_r();
+	int draw_r();
+	void service_switch_w(int state);
+	void irq_ack_w(int state);
 
 	template<int Index>
-	DECLARE_WRITE_LINE_MEMBER( coin_w )
+	void coin_w(int state)
 	{
 		const u8 mask = 1 << Index;
 
@@ -172,4 +172,4 @@ private:
 	void spacfurybl_speech_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SEGAG80V_H
+#endif // MAME_SEGA_SEGAG80V_H

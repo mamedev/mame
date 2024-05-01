@@ -63,11 +63,11 @@ public:
 	void write(u8 data = 0);
 
 	// control line interface
-	DECLARE_WRITE_LINE_MEMBER(rd_w);
-	DECLARE_WRITE_LINE_MEMBER(wr_w);
+	void rd_w(int state);
+	void wr_w(int state);
 
 	// status line interface
-	DECLARE_READ_LINE_MEMBER(intr_r) { return m_intr_active ? 0 : 1; }
+	int intr_r() { return m_intr_active ? 0 : 1; }
 
 protected:
 	adc0804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

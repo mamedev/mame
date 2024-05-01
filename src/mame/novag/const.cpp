@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Super Sensor IV (model 812)
 Novag Constellation (model 831)
@@ -44,7 +44,10 @@ Super Sensor IV:
 - 2 ROM sockets for expansion (blue @ u6, white @ u5)
 
 Known Super Sensor IV expansion ROMs:
-- Quartz Chess Clock (came with the clock accessory)
+- Chess Printer (came with the printer accessory)
+
+Super Sensor IV triggers an NMI on power-off (or power-failure). If this isn't
+done, NVRAM fails at next power-on.
 
 Sensor Dynamic's ROM is identical to Super Sensor IV "1I", the hardware is
 basically a low-budget version of it with peripheral ports removed.
@@ -54,10 +57,14 @@ Super Constellation:
 - 4KB battery-backed RAM (2*TC5516APL-2)
 - 2*32KB ROM custom label
 
+Super Constellation also has a power-off NMI, but it doesn't do anything other
+than writing 0x08 to control_w.
+
 TODO:
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - is Dynamic S a program update of ssensor4 or identical?
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -76,10 +83,10 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_const.lh" // clickable
-#include "novag_constq.lh" // clickable
-#include "novag_ssensor4.lh" // clickable
-#include "novag_supercon.lh" // clickable
+#include "novag_const.lh"
+#include "novag_constq.lh"
+#include "novag_ssensor4.lh"
+#include "novag_supercon.lh"
 
 
 namespace {
@@ -96,7 +103,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 	// machine configs
 	void nconst(machine_config &config);
@@ -120,6 +127,10 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+
 	// address maps
 	void const_map(address_map &map);
 	void ssensor4_map(address_map &map);
@@ -131,12 +142,6 @@ private:
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	void power_off();
-	bool m_power = false;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
 
 void const_state::machine_start()
@@ -147,11 +152,14 @@ void const_state::machine_start()
 	save_item(NAME(m_led_select));
 }
 
-void const_state::power_off()
+INPUT_CHANGED_MEMBER(const_state::power_off)
 {
 	// NMI at power-off (ssensor4 prepares nvram for next power-on)
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	m_power = false;
+	if (newval && m_power)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_power = false;
+	}
 }
 
 void const_state::init_const()
@@ -163,9 +171,9 @@ void const_state::init_const()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::update_display()
 {
@@ -220,9 +228,9 @@ u8 const_state::input2_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::ssensor4_map(address_map &map)
 {
@@ -255,9 +263,9 @@ void const_state::sconst_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( nconst )
 	PORT_START("IN.0")
@@ -314,7 +322,7 @@ static INPUT_PORTS_START( ssensor4 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nconstq )
@@ -339,18 +347,18 @@ static INPUT_PORTS_START( sconst )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power_off, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::nconst(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
@@ -362,11 +370,11 @@ void const_state::nconst(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(250));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
 	config.set_default_layout(layout_novag_const);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2_MHz_XTAL / 0x800); // ~976Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -376,7 +384,7 @@ void const_state::ssensor4(machine_config &config)
 {
 	nconst(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
 
 	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
@@ -386,7 +394,7 @@ void const_state::ssensor4(machine_config &config)
 
 	config.set_default_layout(layout_novag_ssensor4);
 
-	/* expansion */
+	// expansion
 	GENERIC_SOCKET(config, "exrom", generic_plain_slot, "novag_ssensor4");
 	SOFTWARE_LIST(config, "cart_list").set_original("novag_ssensor4");
 }
@@ -395,7 +403,7 @@ void const_state::nconst36(machine_config &config)
 {
 	nconst(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
@@ -403,7 +411,7 @@ void const_state::nconst36(machine_config &config)
 
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 7.2_MHz_XTAL/2 / 0x800); // ~1758Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -412,14 +420,14 @@ void const_state::nconst36a(machine_config &config)
 {
 	nconst36(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
 	// 4020 CLK is 7.2_MHz_XTAL/4, but with IRQ on Q11 instead of Q12, result
 	// frequency and duty cycle are identical to nconst36
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 7.2_MHz_XTAL/4 / 0x800); // ~879Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -428,14 +436,14 @@ void const_state::nconstq(machine_config &config)
 {
 	nconst36a(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(8_MHz_XTAL/2);
 
 	subdevice<clock_device>("irq_clock")->set_clock(8_MHz_XTAL/4 / 0x1000); // ~488Hz (pulse width same as nconst)
 
 	config.set_default_layout(layout_novag_constq);
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 8_MHz_XTAL/4 / 0x800); // ~976Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -444,7 +452,7 @@ void const_state::sconst(machine_config &config)
 {
 	nconstq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config.replace(), m_maincpu, 8_MHz_XTAL/2); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::sconst_map);
 
@@ -458,9 +466,9 @@ void const_state::sconst(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( ssensor4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -500,16 +508,16 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE    INPUT     STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, ssensor4, 0,      0, ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag Industries", "Super Sensor IV", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, const,    0,      0, nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, const36,  const,  0, nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, const36a, const,  0, nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, constq,   const,  0, nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag Industries", "Constellation", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag Industries", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag Industries", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag Industries", "Constellation Quattro", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1984, supercon, 0,      0, sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag Industries", "Super Constellation", MACHINE_SUPPORTS_SAVE )

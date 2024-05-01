@@ -16,6 +16,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class tgtpanic_state : public driver_device
 {
 public:
@@ -179,6 +181,8 @@ ROM_START( tgtpanic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "601_ja_a01.13e", 0x0000, 0x8000, CRC(ece71952) SHA1(0f9cbd8adac2b1950bc608d51f0f122399c8f00f) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

@@ -51,13 +51,17 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "screen.h"
 #include "pcectrl.h"
+
+#include "screen.h"
 
 // slot devices
 #include "joypad2.h"
 #include "joypad6.h"
+#include "mouse.h"
 #include "multitap.h"
+#include "pachinko.h"
+#include "xhe3.h"
 
 
 
@@ -169,14 +173,28 @@ void pce_control_port_devices(device_slot_interface &device)
 	// 2 Button Joypad/Joysticks
 	device.option_add("joypad2",       PCE_JOYPAD2); // bundled pad for White PC Engine
 	device.option_add("joypad2_turbo", PCE_JOYPAD2_TURBO); // Turbo pad and compatibles
+
 	// 6 Button Joypad/Joysticks
 	device.option_add("avenue_pad_6",  PCE_AVENUE_PAD_6);
 	device.option_add("arcade_pad_6",  PCE_ARCADE_PAD_6);
 
+	device.option_add("mouse",         PCE_MOUSE);
+
 	device.option_add("multitap",      PCE_MULTITAP);
+	device.option_add("pachinko",      PCE_PACHINKO);
+
+	device.option_add("pcjoy",         PCE_XHE3); // PC joystick adapter (most useful with analog pad)
+
 	// 3 Button Joypad/Joysticks (ex: Avenue Pad 3)
-	// Pachinko Controller (CJPC-101)
 	// PC Engine Mouse (PI-PD10)
-	// Memory Base 128 (PI-AD19)
+
+	// Memory BRAM storages, connects to joyport and exposes another DIN-8 port
+	// cfr. https://github.com/BlockoS/mb128
+	// NEC Memory Base 128 (PI-AD19, ﾒﾓﾘﾍﾞｰｽ128)
+	// Koei Save-Kun (セーブくん), clone of above?
+
+	// Serial Monitor for PCEMon
+	// https://www.chrismcovell.com/PCEmon/index.html
+
 	// etc...
 }

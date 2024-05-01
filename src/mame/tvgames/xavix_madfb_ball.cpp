@@ -18,8 +18,8 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_MADFB_BALL, xavix_madfb_ball_device, "xavix_madfb_ball", "XaviX / Radica Football Ball")
 
-xavix_madfb_ball_device::xavix_madfb_ball_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, XAVIX_MADFB_BALL, tag, owner, clock),
+xavix_madfb_ball_device::xavix_madfb_ball_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, XAVIX_MADFB_BALL, tag, owner, clock),
 	m_event_out_cb(*this),
 	m_in(*this, "BALL")
 {
@@ -76,7 +76,6 @@ ioport_constructor xavix_madfb_ball_device::device_input_ports() const
 
 void xavix_madfb_ball_device::device_start()
 {
-	m_event_out_cb.resolve_safe();
 	m_event_timer = timer_alloc(FUNC(xavix_madfb_ball_device::event_timer), this);
 }
 

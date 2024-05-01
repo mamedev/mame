@@ -60,8 +60,6 @@ void fmt_scsi_slot_device::device_resolve_objects()
 
 void fmt_scsi_slot_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
 }
 
 

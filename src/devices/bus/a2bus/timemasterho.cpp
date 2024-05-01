@@ -112,8 +112,8 @@ private:
 	void update_irqs();
 	void pia_out_a(uint8_t data);
 	void pia_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
+	void pia_irqa_w(int state);
+	void pia_irqb_w(int state);
 
 	bool m_irqa = false, m_irqb = false;
 	bool m_started = false;
@@ -297,13 +297,13 @@ void a2bus_timemasterho_device::update_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(a2bus_timemasterho_device::pia_irqa_w)
+void a2bus_timemasterho_device::pia_irqa_w(int state)
 {
 	m_irqa = state;
 	update_irqs();
 }
 
-WRITE_LINE_MEMBER(a2bus_timemasterho_device::pia_irqb_w)
+void a2bus_timemasterho_device::pia_irqb_w(int state)
 {
 	m_irqb = state;
 	update_irqs();

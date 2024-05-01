@@ -37,9 +37,10 @@ public:
 		, m_mcu_ram(*this, "mcu_ram")
 	{ }
 
-	virtual void driver_init() override;
+	void driver_init();
 	void common(machine_config &config);
 	void _40love(machine_config &config);
+	void _40lovebl(machine_config &config);
 	void undoukai(machine_config &config);
 
 private:
@@ -51,6 +52,7 @@ private:
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	void _40love_map(address_map &map);
+	void _40lovebl_map(address_map &map);
 	void sound_map(address_map &map);
 	void undoukai_map(address_map &map);
 

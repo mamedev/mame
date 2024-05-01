@@ -64,47 +64,47 @@ Games by Nihon Game/Culture Brain:
 
 /***************************************************************************************/
 
-WRITE_LINE_MEMBER(chinhero_state::sound_enable_w)
+void chinhero_state::sound_enable_w(int state)
 {
 	if (!state)
 		m_aysnd->reset();
 }
 
-WRITE_LINE_MEMBER(dynamski_state::int_enable_1_w)
+void dynamski_state::int_enable_1_w(int state)
 {
 	m_int_enable[0] = state;
 	if (!m_int_enable[0])
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(chinhero_state::int_enable_2_w)
+void chinhero_state::int_enable_2_w(int state)
 {
 	m_int_enable[1] = state;
 	if (!m_int_enable[1])
 		m_bbx->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(chinhero_state::nmi_enable_1_w)
+void chinhero_state::nmi_enable_1_w(int state)
 {
 	m_nmi_enable[0] = state;
 	if (!m_int_enable[0])
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(chinhero_state::nmi_enable_2_w)
+void chinhero_state::nmi_enable_2_w(int state)
 {
 	m_nmi_enable[1] = state;
 	if (!m_nmi_enable[1])
 		m_bbx->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(dynamski_state::irq_1_w)
+void dynamski_state::irq_1_w(int state)
 {
 	if (state && m_int_enable[0])
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(chinhero_state::irq_2_w)
+void chinhero_state::irq_2_w(int state)
 {
 	if (state && m_int_enable[1])
 		m_bbx->set_input_line(0, ASSERT_LINE);
@@ -122,12 +122,12 @@ void chinhero_state::nmiq_2_w(uint8_t data)
 		m_bbx->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(chinhero_state::coin_counter_1_w)
+void chinhero_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(chinhero_state::coin_counter_2_w)
+void chinhero_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }

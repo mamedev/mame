@@ -304,7 +304,7 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 	m_fdc(*this, FDC_TAG),
 	m_hdc9224(*this, HDC_TAG),
 	m_pdc_ram(*this, "pdc_ram"),
-	m_m68k_r_cb(*this),
+	m_m68k_r_cb(*this, 0),
 	m_m68k_w_cb(*this)
 {
 }
@@ -315,10 +315,6 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
-	/* Resolve callbacks */
-	m_m68k_r_cb.resolve_safe(0);
-	m_m68k_w_cb.resolve_safe();
-
 	/* Save States */
 	save_item(NAME(reg_p0));
 	save_item(NAME(reg_p1));

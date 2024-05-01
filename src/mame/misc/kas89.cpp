@@ -201,6 +201,8 @@
 #include "kas89.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK        XTAL(21'477'272)
 #define VDP_MEM             0x40000
 
@@ -837,6 +839,8 @@ void kas89_state::init_kas89()
 		mem[bitswap<16>(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
 	}
 }
+
+} // anonymous namespace
 
 
 /**************************************

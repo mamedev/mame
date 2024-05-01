@@ -289,8 +289,8 @@ uint8_t segag80r_state::spaceod_port_fc_r()
 
 void segag80r_state::coin_count_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
-	machine().bookkeeping().coin_counter_w(1, (data >> 6) & 1);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));
 }
 
 
@@ -304,7 +304,8 @@ void segag80r_state::coin_count_w(uint8_t data)
 
 void segag80r_state::sindbadm_misc_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 //  osd_printf_debug("Unknown = %02X\n", data);
 }
@@ -922,7 +923,7 @@ void segag80r_state::monsterb(machine_config &config)
 void segag80r_state::monster2(machine_config &config)
 {
 	monsterb(config);
-	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_maincpu, VIDEO_CLOCK/4));
+	sega_315_5006_device &maincpu(SEGA_315_5006(config.replace(), m_maincpu, VIDEO_CLOCK/4));
 	maincpu.set_addrmap(AS_PROGRAM, &segag80r_state::main_map);
 	maincpu.set_addrmap(AS_IO, &segag80r_state::main_ppi8255_portmap);
 	maincpu.set_vblank_int("screen", FUNC(segag80r_state::segag80r_vblank_start));
@@ -962,6 +963,7 @@ void segag80r_state::sindbadm(machine_config &config)
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pb_callback().set_ioport("FC");
 	ppi.out_pc_callback().set(FUNC(segag80r_state::sindbadm_misc_w));
+	ppi.tri_pc_callback().set_constant(0x80);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_monsterb);
@@ -1375,6 +1377,22 @@ ROM_START( monsterb )
 	ROM_LOAD( "pr1512.u31",     0x0000, 0x0020, CRC(414ebe9b) SHA1(3df8694e3d26635d19fd4cdf02bd0998e8538b5b) )  /* U31 */
 ROM_END
 
+/*
+
+Monster Bash
+  Main PCB: 834-0318
+ Sound PCB: 834-0316
+
+Set labled as:
+
+2-BOARD NO. REV.
+834-0317
+MONSTER BASH
+83830
+
+Uses a SEGA 315-5006 security CPU
+
+*/
 ROM_START( monsterb2 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "epr-1548.2",   0x0000, 0x2000, CRC(239f77c1) SHA1(2945e4b135c1c46bf3e0d947b3d9be052f12e8d8) )
@@ -1498,14 +1516,14 @@ ROM_START( sindbadm )
 	ROM_LOAD( "epr-5400.4a", 0x0000, 0x2000, CRC(5114f18e) SHA1(343f96c728f96df5d50a9888fc87488d9440d7f4) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "epr-5428.9m", 0x0000, 0x2000, CRC(f6044a1e) SHA1(19622aa0991553604236a1ff64a3e5dd1d881ed8) )
-	ROM_LOAD( "epr-5429.9p", 0x2000, 0x2000, CRC(b23eca10) SHA1(e00ab3b50b52e16d7281ece42d73603fb188c9b3) )
+	ROM_LOAD( "epr-5428.9m", 0x0000, 0x2000, CRC(f6044a1e) SHA1(19622aa0991553604236a1ff64a3e5dd1d881ed8) ) // also found labeled as EPR-5500
+	ROM_LOAD( "epr-5429.9p", 0x2000, 0x2000, CRC(b23eca10) SHA1(e00ab3b50b52e16d7281ece42d73603fb188c9b3) ) // also found labeled as EPR-5499
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "epr-5424.9e", 0x0000, 0x2000, CRC(4bfc2e95) SHA1(7d513df944d5768b14983f44a1e3c76930a55e9a) )
-	ROM_LOAD( "epr-5425.9h", 0x2000, 0x2000, CRC(b654841a) SHA1(9b224fbe5f4c7bbb486a3d15550cc10e4f317631) )
-	ROM_LOAD( "epr-5426.9j", 0x4000, 0x2000, CRC(9de0da28) SHA1(79e01005861e2426a8112544b1bc6d1c6a9ce936) )
-	ROM_LOAD( "epr-5427.9l", 0x6000, 0x2000, CRC(a94f4d41) SHA1(fe4f412ea3680c0e5a6242827eab9e82a841d7c7) )
+	ROM_LOAD( "epr-5424.9e", 0x0000, 0x2000, CRC(4bfc2e95) SHA1(7d513df944d5768b14983f44a1e3c76930a55e9a) ) // also found labeled as EPR-5495
+	ROM_LOAD( "epr-5425.9h", 0x2000, 0x2000, CRC(b654841a) SHA1(9b224fbe5f4c7bbb486a3d15550cc10e4f317631) ) // also found labeled as EPR-5496
+	ROM_LOAD( "epr-5426.9j", 0x4000, 0x2000, CRC(9de0da28) SHA1(79e01005861e2426a8112544b1bc6d1c6a9ce936) ) // also found labeled as EPR-5497
+	ROM_LOAD( "epr-5427.9l", 0x6000, 0x2000, CRC(a94f4d41) SHA1(fe4f412ea3680c0e5a6242827eab9e82a841d7c7) ) // also found labeled as EPR-5498
 ROM_END
 
 
@@ -1739,7 +1757,7 @@ GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob
 GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", 0 )
 GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", 0 )
 GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", 0 )
-GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", 0 | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", 0 )
 GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 

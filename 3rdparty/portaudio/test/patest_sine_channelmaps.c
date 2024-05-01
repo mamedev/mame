@@ -26,21 +26,21 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
 /** @file patest_sine_channelmaps.c
-	@ingroup test_src
-	@brief Plays sine waves using sme simple channel maps.
+    @ingroup test_src
+    @brief Plays sine waves using sme simple channel maps.
           Designed for use with CoreAudio, but should made to work with other APIs
-	@author Bjorn Roche <bjorn@xowave.com>
+    @author Bjorn Roche <bjorn@xowave.com>
    @author Ross Bencina <rossb@audiomulch.com>
    @author Phil Burk <philburk@softsynth.com>
 */
@@ -87,7 +87,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     (void) timeInfo; /* Prevent unused variable warnings. */
     (void) statusFlags;
     (void) inputBuffer;
-    
+
     for( i=0; i<framesPerBuffer; i++ )
     {
         *out++ = data->sine[data->left_phase];  /* left */
@@ -97,7 +97,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
         data->right_phase += 3; /* higher pitch so we can distinguish left and right. */
         if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
     }
-    
+
     return paContinue;
 }
 
@@ -115,17 +115,17 @@ int main(void)
 #endif
     int i;
 
-    
+
     printf("PortAudio Test: output sine wave. SR = %d, BufSize = %d\n", SAMPLE_RATE, FRAMES_PER_BUFFER);
     printf("Output will be mapped to channels 2 and 3 instead of 0 and 1.\n");
-    
+
     /* initialise sinusoidal wavetable */
     for( i=0; i<TABLE_SIZE; i++ )
     {
         data.sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
     data.left_phase = data.right_phase = 0;
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
@@ -135,7 +135,7 @@ int main(void)
     PaMacCore_SetupChannelMap( &macInfo, channelMap, 4 );
 
     for( i=0; i<4; ++i )
-       printf( "channel %d name: %s\n", i, PaMacCore_GetChannelName( Pa_GetDefaultOutputDevice(), i, false ) );
+        printf( "channel %d name: %s\n", i, PaMacCore_GetChannelName( Pa_GetDefaultOutputDevice(), i, false ) );
 #else
     printf( "Channel mapping not supported on this platform. Reverting to normal sine test.\n" );
 #endif
@@ -179,11 +179,11 @@ int main(void)
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

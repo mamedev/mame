@@ -1,20 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-#ifndef MAME_INCLUDES_PC6001_H
-#define MAME_INCLUDES_PC6001_H
+#ifndef MAME_NEC_PC6001_H
+#define MAME_NEC_PC6001_H
 
 #pragma once
 
+#include "pc80s31k.h"
 
 #include "cpu/z80/z80.h"
-#include "formats/dsk_dsk.h"
-#include "formats/msx_dsk.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "pc80s31k.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/ay8910.h"
@@ -24,12 +23,16 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/msx/ctrl/ctrl.h"
 
 #include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 
+#include "formats/dsk_dsk.h"
+#include "formats/msx_dsk.h"
 #include "formats/p6001_cas.h"
+
 
 class pc6001_state : public driver_device
 {
@@ -40,6 +43,8 @@ public:
 		, m_ram(*this, "ram")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_joy(*this, "joy%u", 1U)
+		, m_joymux(*this, "joymux")
 		, m_cassette(*this, "cassette")
 		, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
@@ -47,8 +52,6 @@ public:
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_mode4_dsw(*this, "MODE4_DSW")
-		, m_io_p1(*this, "P1")
-		, m_io_p2(*this, "P2")
 		, m_io_keys(*this, "key%u", 1U)
 		, m_io_fn_keys(*this, "key_fn")
 		, m_io_key_modifiers(*this, "key_modifiers")
@@ -77,12 +80,18 @@ public:
 	void ppi_portc_w(uint8_t data);
 	uint8_t ppi_portc_r();
 
+	uint8_t joystick_r();
+	uint8_t joystick_out_r();
+	void joystick_out_w(uint8_t data);
+
 	void pc6001(machine_config &config);
 protected:
 	required_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device_array<msx_general_purpose_port_device, 2> m_joy;
+	required_device<ls157_x2_device> m_joymux;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
@@ -90,8 +99,6 @@ protected:
 	optional_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
-	required_ioport m_io_p1;
-	required_ioport m_io_p2;
 	required_ioport_array<3> m_io_keys;
 	required_ioport m_io_fn_keys;
 	required_ioport m_io_key_modifiers;
@@ -149,6 +156,8 @@ private:
 	uint32_t m_old_key2 = 0;
 	uint32_t m_old_key3 = 0;
 	u8 m_old_key_fn;
+
+	uint8_t m_joystick_out = 0xff;
 
 	emu_timer *m_sub_trig_timer = nullptr;
 
@@ -369,4 +378,4 @@ private:
 	virtual u8 hw_rev_r() override;
 };
 
-#endif
+#endif // MAME_NEC_PC6001_H

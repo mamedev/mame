@@ -24,6 +24,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class bmjr_state : public driver_device
 {
 public:
@@ -289,7 +291,7 @@ static INPUT_PORTS_START( bmjr )
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_UNUSED)
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("\xC2\xA5 / Left") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(u8"¥ / Left") PORT_CODE(KEYCODE_4_PAD)
 
 	PORT_START("KEY13")
 	PORT_DIPNAME( 0x01, 0x01, "D" )
@@ -392,6 +394,9 @@ ROM_START( bmjr )
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(258c6fd7) SHA1(d7c7dd57d6fc3b3d44f14c32182717a48e24587f)) //taken from a JP emulator
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

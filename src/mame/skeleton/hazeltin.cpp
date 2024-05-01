@@ -39,6 +39,8 @@ References:
 #include "screen.h"
 
 
+namespace {
+
 #define CPU_TAG         "maincpu"
 #define NETLIST_TAG     "videobrd"
 #define UART_TAG        "uart"
@@ -156,9 +158,9 @@ private:
 
 	uint8_t kbd_status_latch_r();
 	uint8_t kbd_encoder_r();
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 
 	void refresh_address_w(uint8_t data);
 
@@ -362,7 +364,7 @@ uint8_t hazl1500_state::kbd_encoder_r()
 	return m_kbdc->b_r() & 0xff; // TODO: This should go through an 8048, but we have no dump of it currently.
 }
 
-READ_LINE_MEMBER(hazl1500_state::ay3600_shift_r)
+int hazl1500_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbd_misc_keys->read() & 0x06)
@@ -373,7 +375,7 @@ READ_LINE_MEMBER(hazl1500_state::ay3600_shift_r)
 	return 0;
 }
 
-READ_LINE_MEMBER(hazl1500_state::ay3600_control_r)
+int hazl1500_state::ay3600_control_r()
 {
 	if (m_kbd_misc_keys->read() & 0x08)
 	{
@@ -383,7 +385,7 @@ READ_LINE_MEMBER(hazl1500_state::ay3600_control_r)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(hazl1500_state::ay3600_data_ready_w)
+void hazl1500_state::ay3600_data_ready_w(int state)
 {
 	if (state)
 		m_kbd_status_latch |= KBD_STATUS_KBDR;
@@ -803,6 +805,9 @@ ROM_START( hazl1552 )
 	ROM_REGION( 0x100, VIDEO_PROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u90.bin", 0x0000, 0x0100, CRC(277bc424) SHA1(528a0de3b54d159bc14411961961706bf9ec41bf))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

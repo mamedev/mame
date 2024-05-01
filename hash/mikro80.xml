@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 The general method of loading a tape is to type I, press Return, select Play. When it's finished, type G and press Return to run it.
 

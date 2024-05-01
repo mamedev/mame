@@ -30,7 +30,7 @@ DIP-SWs
       1  irq3
 */
 
-WRITE_LINE_MEMBER( mpu_pc98_device::mpu_irq_out )
+void mpu_pc98_device::mpu_irq_out(int state)
 {
 }
 

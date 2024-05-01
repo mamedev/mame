@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner, hap
-/***************************************************************************
+/*******************************************************************************
 
 Driver for Ritam Monty Plays Scrabble Brand Crossword Game - Portable Computer Console
 
@@ -28,7 +28,7 @@ TODO:
 - put expansion roms in softwarelist? (note: slot #1 only accepts rom #1,
   slot #2 only accepts rom #2), they can be disabled in-game with option M
 
-****************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -55,7 +55,7 @@ public:
 		, m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(key_pressed);
+	void key_pressed(int state);
 
 	void monty(machine_config &config);
 	void mmonty(machine_config &config);
@@ -69,6 +69,10 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<6> m_inputs;
 
+	u64 m_lcd_data[32] = { };
+	int m_lcd_cs = 0;
+	int m_halt = 0;
+
 	void monty_mem(address_map &map);
 	void mmonty_mem(address_map &map);
 	void monty_io(address_map &map);
@@ -79,17 +83,11 @@ private:
 	void control_w(offs_t offset, u8 data);
 	void lcd_w(offs_t offset, u8 data) { m_lcd[m_lcd_cs]->write(offset, data); }
 	u8 input_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(halt_changed) { m_halt = state; }
-
-	u64 m_lcd_data[32];
-	int m_lcd_cs = 0;
-	int m_halt = 0;
+	void halt_changed(int state) { m_halt = state; }
 };
 
 void monty_state::machine_start()
 {
-	memset(m_lcd_data, 0, sizeof(m_lcd_data));
-
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_cs));
 	save_item(NAME(m_halt));
@@ -97,9 +95,9 @@ void monty_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Video
-******************************************************************************/
+*******************************************************************************/
 
 u32 monty_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
@@ -115,9 +113,9 @@ u32 monty_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, cons
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void monty_state::control_w(offs_t offset, u8 data)
 {
@@ -140,7 +138,7 @@ u8 monty_state::input_r(offs_t offset)
 	return ~data;
 }
 
-WRITE_LINE_MEMBER(monty_state::key_pressed)
+void monty_state::key_pressed(int state)
 {
 	if (state && m_halt)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -148,9 +146,9 @@ WRITE_LINE_MEMBER(monty_state::key_pressed)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void monty_state::monty_mem(address_map &map)
 {
@@ -178,9 +176,9 @@ void monty_state::monty_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( monty )
 	PORT_START("IN.0")
@@ -228,9 +226,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void monty_state::monty(machine_config &config)
 {
@@ -265,9 +263,9 @@ void monty_state::mmonty(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( monty )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -287,10 +285,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                FLAGS
-COMP( 1983, monty,  0,      0,      monty,   monty, monty_state, empty_init, "Ritam", "Monty Plays Scrabble", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, mmonty, 0,      0,      mmonty,  monty, monty_state, empty_init, "Ritam", "Master Monty",         MACHINE_SUPPORTS_SAVE )
+SYST( 1983, monty,  0,      0,      monty,   monty, monty_state, empty_init, "Ritam", "Monty Plays Scrabble", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, mmonty, 0,      0,      mmonty,  monty, monty_state, empty_init, "Ritam", "Master Monty",         MACHINE_SUPPORTS_SAVE )

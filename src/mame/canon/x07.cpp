@@ -35,6 +35,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 /***************************************************************************
     T6834 IMPLEMENTATION
@@ -1062,10 +1064,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state::card_load )
 		const char *card_type = image.get_feature("card_type");
 
 		if (strcmp(card_type, "xp140"))
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported card type");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::BADSOFTWARE, "Unsupported card type");
 	}
 
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
@@ -1073,7 +1072,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state::card_load )
 
 	m_card->ram_alloc(0x1000);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void x07_state::x07_palette(palette_device &palette) const
@@ -1450,10 +1449,12 @@ void x07_state::machine_reset()
 	memset(m_regs_r, 0, sizeof(m_regs_r));
 	memset(m_regs_w, 0, sizeof(m_regs_w));
 	memset(m_alarm, 0, sizeof(m_alarm));
-	memset(&m_in, 0, sizeof(m_in));
-	memset(&m_out, 0, sizeof(m_out));
-	memset(&m_locate, 0, sizeof(m_locate));
-	memset(&m_cursor, 0, sizeof(m_cursor));
+	std::fill(std::begin(m_in.data), std::end(m_in.data), 0);
+	m_in.read = m_in.write = 0;
+	std::fill(std::begin(m_out.data), std::end(m_out.data), 0);
+	m_out.read = m_out.write = 0;
+	m_locate = lcd_position();
+	m_cursor = lcd_position();
 	memset(m_prn_buffer, 0, sizeof(m_prn_buffer));
 	memset(m_lcd_map, 0, sizeof(m_lcd_map));
 

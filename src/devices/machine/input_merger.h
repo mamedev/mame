@@ -23,7 +23,7 @@ public:
 	auto output_handler() { return m_output_handler.bind(); }
 
 	// input lines
-	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(in_w) { static_assert(Bit < 32, "invalid bit"); machine().scheduler().synchronize(timer_expired_delegate(FUNC(input_merger_device::update_state), this), (Bit << 1) | (state ? 1U : 0U)); }
+	template <unsigned Bit> void in_w(int state) { static_assert(Bit < 32, "invalid bit"); machine().scheduler().synchronize(timer_expired_delegate(FUNC(input_merger_device::update_state), this), (Bit << 1) | (state ? 1U : 0U)); }
 	template <unsigned Bit> void in_set(u8 data = 0) { in_w<Bit>(1); }
 	template <unsigned Bit> void in_clear(u8 data = 0) { in_w<Bit>(0); }
 

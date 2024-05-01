@@ -15,13 +15,13 @@
 #include "emu.h"
 #include "memex.h"
 
-#define LOG_WARN        (1U<<1)
-#define LOG_CONFIG      (1U<<2)
-#define LOG_READ        (1U<<3)
-#define LOG_WRITE       (1U<<4)
-#define LOG_BLOCK       (1U<<5)
+#define LOG_WARN        (1U << 1)
+#define LOG_CONFIG      (1U << 2)
+#define LOG_READ        (1U << 3)
+#define LOG_WRITE       (1U << 4)
+#define LOG_BLOCK       (1U << 5)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 

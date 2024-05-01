@@ -44,27 +44,26 @@ public:
 
 	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(clock_in) override;
+	void clock_in(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_hld_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 	uint8_t tms9901_input(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( select_dsk );
-	DECLARE_WRITE_LINE_MEMBER( side_select );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
-	DECLARE_WRITE_LINE_MEMBER( select_card );
-	DECLARE_WRITE_LINE_MEMBER( select_bank );
+	void select_dsk(int state);
+	void side_select(int state);
+	void motor_w(int state);
+	void select_card(int state);
+	void select_bank(int state);
 
 protected:
-	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *dpname, const char *cpname);
 
-	void device_start() override;
-	void device_reset() override;
-	void connect_drives();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override =0;
-	ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void common_config(machine_config& config);
 
@@ -74,8 +73,8 @@ protected:
 	required_device<wd_fdc_device_base>   m_wdc;
 
 	// PALs
-	ccfdc_dec_pal_device* m_decpal;
-	ccfdc_sel_pal_device* m_ctrlpal;
+	required_device<ccfdc_dec_pal_device> m_decpal;
+	required_device<ccfdc_sel_pal_device> m_ctrlpal;
 
 	// Lines that are polled by the PAL chips
 	bool card_selected();
@@ -90,7 +89,7 @@ protected:
 	void operate_ready_line();
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Motor monoflop
 	required_device<ttl74123_device> m_motormf;
@@ -131,52 +130,56 @@ class corcomp_dcc_device : public corcomp_fdc_device
 {
 public:
 	corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-private:
-	void device_add_mconfig(machine_config &config) override;
-	void device_config_complete() override;
-	const tiny_rom_entry *device_rom_region() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // =========== Decoder PAL circuit ================
 class ccfdc_dec_pal_device : public device_t
 {
+	friend class corcomp_fdc_device;
 public:
-	DECLARE_READ_LINE_MEMBER(addresswdc);
-	DECLARE_READ_LINE_MEMBER(address4);
-	DECLARE_READ_LINE_MEMBER(addressram);
-	virtual DECLARE_READ_LINE_MEMBER(address9901);
+	int addresswdc();
+	int address4();
+	int addressram();
+	virtual int address9901();
 
 protected:
 	ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void device_start() override { }
-	void device_config_complete() override;
 
 	corcomp_fdc_device* m_board;
 	required_device<tms9901_device> m_tms9901;
+
+	void set_board(corcomp_fdc_device* board) { m_board = board; }
 };
 
 // =========== Selector PAL circuit ================
 
 class ccfdc_sel_pal_device : public device_t
 {
+	friend class corcomp_fdc_device;
 public:
-	DECLARE_READ_LINE_MEMBER(selectram);
-	virtual DECLARE_READ_LINE_MEMBER(selectwdc);
-	virtual DECLARE_READ_LINE_MEMBER(selectdsr);
-	virtual DECLARE_READ_LINE_MEMBER(ready_out) =0;
+	int selectram();
+	virtual int selectwdc();
+	virtual int selectdsr();
+	virtual int ready_out() =0;
 
 protected:
 	ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void device_start() override { }
-	virtual void device_config_complete() override =0;
+	virtual void device_start() override { }
 
 	corcomp_fdc_device* m_board;
 	ccfdc_dec_pal_device* m_decpal;
 	required_device<ttl74123_device> m_motormf;
 	required_device<tms9901_device> m_tms9901;
 	required_device<wd_fdc_device_base> m_wdc;
+
+	void set_board(corcomp_fdc_device* board) { m_board = board; }
+	void set_decoder(ccfdc_dec_pal_device* decpal) { m_decpal = decpal; }
 };
 
 // =========== Specific decoder PAL circuit of the CCDCC ================
@@ -193,10 +196,7 @@ class ccdcc_palu1_device : public ccfdc_sel_pal_device
 {
 public:
 	ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ_LINE_MEMBER(ready_out) override;
-
-private:
-	void device_config_complete() override;
+	int ready_out() override;
 };
 
 // ============================================================================
@@ -209,10 +209,10 @@ class corcomp_fdca_device : public corcomp_fdc_device
 
 public:
 	corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 private:
-	void device_add_mconfig(machine_config &config) override;
-	void device_config_complete() override;
-	const tiny_rom_entry *device_rom_region() const override;
 	bool ready_trap_active();
 };
 
@@ -222,7 +222,7 @@ class ccfdc_palu12_device : public ccfdc_dec_pal_device
 {
 public:
 	ccfdc_palu12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ_LINE_MEMBER(address9901) override;
+	int address9901() override;
 };
 
 // =========== Specific selector PAL circuit of the CCFDC ================
@@ -231,13 +231,10 @@ class ccfdc_palu6_device : public ccfdc_sel_pal_device
 {
 public:
 	ccfdc_palu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ_LINE_MEMBER(selectwdc) override;
-	DECLARE_READ_LINE_MEMBER(selectdsr) override;
+	int selectwdc() override;
+	int selectdsr() override;
 
-	DECLARE_READ_LINE_MEMBER(ready_out) override;
-
-private:
-	void device_config_complete() override;
+	int ready_out() override;
 };
 
 } // end namespace bus::ti99::peb

@@ -13,38 +13,35 @@
 
 #pragma once
 
-
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-constexpr u32 VTLB_FLAGS_MASK           = 0xff;
-
-constexpr u32 VTLB_READ_ALLOWED         = 0x01;     /* (1 << TRANSLATE_READ) */
-constexpr u32 VTLB_WRITE_ALLOWED        = 0x02;     /* (1 << TRANSLATE_WRITE) */
-constexpr u32 VTLB_FETCH_ALLOWED        = 0x04;     /* (1 << TRANSLATE_FETCH) */
-constexpr u32 VTLB_FLAG_VALID           = 0x08;
-constexpr u32 VTLB_USER_READ_ALLOWED    = 0x10;     /* (1 << TRANSLATE_READ_USER) */
-constexpr u32 VTLB_USER_WRITE_ALLOWED   = 0x20;     /* (1 << TRANSLATE_WRITE_USER) */
-constexpr u32 VTLB_USER_FETCH_ALLOWED   = 0x40;     /* (1 << TRANSLATE_FETCH_USER) */
-constexpr u32 VTLB_FLAG_FIXED           = 0x80;
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-/* represents an entry in the VTLB */
-typedef u32 vtlb_entry;
-
-
-// ======================> device_vtlb_interface
-
 class device_vtlb_interface : public device_interface
 {
 public:
+	using vtlb_entry = u32;
+
+	// Translation type flags
+	// TR_READ/WRITE/FETCH come from device_memory_interface
+	enum {
+		TR_UREAD  = 4,
+		TR_UWRITE = 5,
+		TR_UFETCH = 6,
+
+		TR_TYPE   = 3,
+		TR_USER   = 4
+	};
+
+	enum {
+		FLAGS_MASK           = 0xff,
+
+		READ_ALLOWED         = 0x01,     /* (1 << TR_READ) */
+		WRITE_ALLOWED        = 0x02,     /* (1 << TR_WRITE) */
+		FETCH_ALLOWED        = 0x04,     /* (1 << TR_FETCH) */
+		FLAG_VALID           = 0x08,
+		USER_READ_ALLOWED    = 0x10,     /* (1 << TR_UREAD) */
+		USER_WRITE_ALLOWED   = 0x20,     /* (1 << TR_UWRITE) */
+		USER_FETCH_ALLOWED   = 0x40,     /* (1 << TR_UFETCH) */
+		FLAG_FIXED           = 0x80
+	};
+
 	// construction/destruction
 	device_vtlb_interface(const machine_config &mconfig, device_t &device, int space);
 	virtual ~device_vtlb_interface();
@@ -54,7 +51,7 @@ public:
 	void set_vtlb_fixed_entries(int entries) { m_fixed = entries; }
 
 	// filling
-	bool vtlb_fill(offs_t address, int intention);
+	bool vtlb_fill(offs_t address, offs_t taddress, int intention);
 	void vtlb_load(int entrynum, int numpages, offs_t address, vtlb_entry value);
 	void vtlb_dynload(u32 index, offs_t address, vtlb_entry value);
 

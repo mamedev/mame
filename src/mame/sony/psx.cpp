@@ -15,7 +15,7 @@
 #include "bus/psx/parallel.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/psx/psx.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
 #include "psxcd.h"
 #include "machine/ram.h"
@@ -26,6 +26,8 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
+#include "multibyte.h"
 
 #include <zlib.h>
 
@@ -40,7 +42,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_parallel(*this, "parallel"),
-		m_psxcd(*this, "psxcd")
+		m_psxcd(*this, "psxcd"),
+		m_cd_softlist(*this, "cd_list")
 	{
 	}
 
@@ -51,7 +54,6 @@ public:
 
 private:
 	std::vector<uint8_t> m_exe_buffer;
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void psxexe_conv32(uint32_t *uint32);
 	int load_psxexe(std::vector<uint8_t> buffer);
 	void cpe_set_register(int r, int v);
@@ -70,23 +72,9 @@ private:
 
 	required_device<psx_parallel_slot_device> m_parallel;
 	required_device<psxcd_device> m_psxcd;
+	required_device<software_list_device> m_cd_softlist;
 };
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3,4)  psx1_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-}
 
 void psx1_state::psxexe_conv32(uint32_t *uint32)
 {
@@ -244,8 +232,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 1:
 				/* read bytes */
 				{
-					unsigned int address = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
-					unsigned int size = buffer[offset + 4] | (buffer[offset + 5] << 8) | (buffer[offset + 6] << 16) | (buffer[offset + 7] << 24);
+					uint32_t address = get_u32le(&buffer[offset]);
+					uint32_t size = get_u32le(&buffer[offset + 4]);
 
 					uint8_t *ram_pointer = m_ram->pointer();
 					uint32_t ram_size = m_ram->size();
@@ -267,7 +255,7 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 2:
 				/* run address: not tested */
 				{
-					unsigned int v = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
+					uint32_t v = get_u32le(&buffer[offset]);
 
 					offset += 4;
 
@@ -278,8 +266,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 3:
 				/* set reg to longword */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16) | (buffer[offset + 5] << 24);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint32_t v = get_u32le(&buffer[offset + 2]);
 
 					offset += 6;
 
@@ -290,8 +278,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 4:
 				/* set reg to word: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint16_t v = get_u16le(&buffer[offset + 2]);
 
 					offset += 4;
 
@@ -302,8 +290,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 5:
 				/* set reg to byte: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2];
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint8_t v = buffer[offset + 2];
 
 					offset += 3;
 
@@ -314,8 +302,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 6:
 				/* set reg to 3-byte: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint32_t v = get_u24le(&buffer[offset + 2]);
 
 					offset += 5;
 
@@ -482,10 +470,10 @@ QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), image.length()) != image.length())
 	{
 		m_exe_buffer.resize(0);
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void psx1_state::cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
@@ -545,7 +533,7 @@ void psx1_state::psx_base(machine_config &config)
 	subdevice<psxdma_device>("maincpu:dma")->install_read_handler(3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this));
 	subdevice<psxdma_device>("maincpu:dma")->install_write_handler(3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this));
 
-	SOFTWARE_LIST(config, "cd_list").set_original("psx");
+	SOFTWARE_LIST(config, m_cd_softlist).set_original("psx");
 }
 
 void psx1_state::psj(machine_config &config)
@@ -556,12 +544,17 @@ void psx1_state::psj(machine_config &config)
 	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
 	psx_base(config);
+
+	m_cd_softlist->set_filter("NTSC-J");
 }
 
 void psx1_state::psu(machine_config &config)
 {
 	psj(config);
-	HD63705(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // MC68HC05G6
+
+	HD63705Z0(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // FIXME: actually MC68HC05G6
+
+	m_cd_softlist->set_filter("NTSC-U");
 }
 
 void psx1_state::pse(machine_config &config)
@@ -572,6 +565,8 @@ void psx1_state::pse(machine_config &config)
 	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
 	psx_base(config);
+
+	m_cd_softlist->set_filter("PAL-E");
 }
 
 ROM_START( psj )

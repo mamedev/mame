@@ -2,8 +2,8 @@
 // copyright-holders:Tomasz Slanina, David Haywood
 /* ST0016 - CPU (z80) + Sound + Video */
 
-#ifndef MAME_MACHINE_ST0016_H
-#define MAME_MACHINE_ST0016_H
+#ifndef MAME_SETA_ST0016_H
+#define MAME_SETA_ST0016_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 DECLARE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device)
 
 
-#endif // MAME_MACHINE_ST0016_H
+#endif // MAME_SETA_ST0016_H

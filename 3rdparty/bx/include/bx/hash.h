@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_HASH_H_HEADER_GUARD
@@ -11,45 +11,7 @@
 
 namespace bx
 {
-	/// MurmurHash2 was written by Austin Appleby, and is placed in the public
-	/// domain. The author hereby disclaims copyright to this source code.
-	///
-	class HashMurmur2A
-	{
-	public:
-		///
-		void begin(uint32_t _seed = 0);
-
-		///
-		void add(const void* _data, int _len);
-
-		///
-		template<typename Ty>
-		void add(Ty _value);
-
-		///
-		uint32_t end();
-
-	private:
-		///
-		void addAligned(const void* _data, int _len);
-
-		///
-		void addUnaligned(const void* _data, int _len);
-
-		///
-		static void readUnaligned(const void* _data, uint32_t& _out);
-
-		///
-		void mixTail(const uint8_t*& _data, int& _len);
-
-		uint32_t m_hash;
-		uint32_t m_tail;
-		uint32_t m_count;
-		uint32_t m_size;
-	};
-
-	///
+	/// 32-bit Adler checksum hash.
 	class HashAdler32
 	{
 	public:
@@ -57,11 +19,17 @@ namespace bx
 		void begin();
 
 		///
-		void add(const void* _data, int _len);
+		void add(const void* _data, int32_t _len);
+
+		///
+		void add(const char* _data);
+
+		///
+		void add(const StringView& _data);
 
 		///
 		template<typename Ty>
-		void add(Ty _value);
+		void add(const Ty& _data);
 
 		///
 		uint32_t end();
@@ -71,7 +39,7 @@ namespace bx
 		uint32_t m_b;
 	};
 
-	///
+	/// 32-bit cyclic redundancy checksum hash.
 	class HashCrc32
 	{
 	public:
@@ -88,11 +56,17 @@ namespace bx
 		void begin(Enum _type = Ieee);
 
 		///
-		void add(const void* _data, int _len);
+		void add(const void* _data, int32_t _len);
+
+		///
+		void add(const char* _data);
+
+		///
+		void add(const StringView& _data);
 
 		///
 		template<typename Ty>
-		void add(Ty _value);
+		void add(const Ty& _data);
 
 		///
 		uint32_t end();
@@ -102,21 +76,51 @@ namespace bx
 		uint32_t m_hash;
 	};
 
+	/// 32-bit multiply and rotate hash.
+	class HashMurmur2A
+	{
+	public:
+		///
+		void begin(uint32_t _seed = 0);
+
+		///
+		void add(const void* _data, int32_t _len);
+
+		///
+		void add(const char* _data);
+
+		///
+		void add(const StringView& _data);
+
+		///
+		template<typename Ty>
+		void add(const Ty& _data);
+
+		///
+		uint32_t end();
+
+	private:
+		uint32_t m_hash;
+		uint32_t m_tail;
+		uint32_t m_count;
+		uint32_t m_size;
+	};
+
 	///
 	template<typename HashT>
 	uint32_t hash(const void* _data, uint32_t _size);
 
 	///
-	template<typename HashT, typename Ty>
-	uint32_t hash(const Ty& _data);
+	template<typename HashT>
+	uint32_t hash(const char* _data);
 
 	///
 	template<typename HashT>
 	uint32_t hash(const StringView& _data);
 
 	///
-	template<typename HashT>
-	uint32_t hash(const char* _data);
+	template<typename HashT, typename Ty>
+	uint32_t hash(const Ty& _data);
 
 } // namespace bx
 

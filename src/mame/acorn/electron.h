@@ -9,8 +9,8 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_ELECTRON_H
-#define MAME_INCLUDES_ELECTRON_H
+#ifndef MAME_ACORN_ELECTRON_H
+#define MAME_ACORN_ELECTRON_H
 
 #pragma once
 
@@ -181,10 +181,10 @@ private:
 	uint8_t m_sp64_bank = 0;
 	std::unique_ptr<uint8_t[]> m_sp64_ram;
 
-	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_romi[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_romi[1]); }
 };
 
 
-#endif // MAME_INCLUDES_ELECTRON_H
+#endif // MAME_ACORN_ELECTRON_H

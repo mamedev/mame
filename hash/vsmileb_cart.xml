@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -63,10 +63,11 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 |   XX   | 80-099120(US)     | Barney - Let's Go to a Party                                               |
 +========+===================+============================================================================+
-|   XX   | 80-099140(US)     | Teletubbies                                                                |
-|        | 80-099142(NL)     | Teletubbies                                                                |
-|        | 80-099143(UK)     | Teletubbies                                                                |
-|   XX   | 80-099145(FR)     | Teletubbies                                                                |
+|   XX   | 80-099140(US)     | Teletubbies - Time for Teletubbies                                         |
+|        | 80-099142(NL)     | Teletubbies - Tijd voor Teletubbies                                        |
+|        | 80-099143(UK)     | Teletubbies - Time for Teletubbies                                         |
+|   XX   | 80-099145(FR)     | Teletubbies - C'est l'heure des Teletubbies                                |
+|   XX   | 80-099147(SP)     | Teletubbies - ¡Es la hora de los Teletubbies!                              |
 +========+===================+============================================================================+
 |   XX   | 80-099160(US)     | Discovery with Baby Mickey and Friends                                     |
 |        | 80-099163(UK)     | Discovery with Baby Mickey and Friends                                     |
@@ -94,8 +95,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099040(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Baby Einstein (U) 099040 (Baby).bin" size="8388608" crc="9510fdba" sha1="ab7790b26b17fe000b9cef716e9c2aaa95b570f6" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Baby Einstein (U) 099040 (Baby).bin" size="0x800000" crc="9510fdba" sha1="ab7790b26b17fe000b9cef716e9c2aaa95b570f6" />
 			</dataarea>
 		</part>
 	</software>
@@ -107,8 +108,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099040(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Baby Einstein (U) (Baby).bin" size="8388608" crc="d8f964e4" sha1="b3bb1be91e51b9d19f2d03aeff7d8c3d05f38d74" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Baby Einstein (U) (Baby).bin" size="0x800000" crc="d8f964e4" sha1="b3bb1be91e51b9d19f2d03aeff7d8c3d05f38d74" />
 			</dataarea>
 		</part>
 	</software>
@@ -120,8 +121,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099045(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="099045 - Baby Einstein (BABY) (FR).bin" size="8388608" crc="d0690ae6" sha1="bde281db67b477798974983a505bed7497e25763" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="099045 - Baby Einstein (BABY) (FR).bin" size="0x800000" crc="d0690ae6" sha1="bde281db67b477798974983a505bed7497e25763" />
 			</dataarea>
 		</part>
 	</software>
@@ -133,8 +134,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099240(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="The Backyardigans (U) 099240 (Baby).bin" size="8388608" crc="2a1d80a4" sha1="aeab9a3458f2740a959a05e0ffe8103ecfcee3bf" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="The Backyardigans (U) 099240 (Baby).bin" size="0x800000" crc="2a1d80a4" sha1="aeab9a3458f2740a959a05e0ffe8103ecfcee3bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -146,8 +147,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099120(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Barney (U) 099120 (Baby).bin" size="8388608" crc="77867487" sha1="5c7be12b4767f2679e1148d0ffd4b7232f4f7563" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Barney (U) 099120 (Baby).bin" size="0x800000" crc="77867487" sha1="5c7be12b4767f2679e1148d0ffd4b7232f4f7563" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,8 +160,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099220(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Care Bears (U) 099220 (Baby).bin" size="8388608" crc="4a791d18" sha1="39d70dbeccd6ddf4fcbe3cee5c0630ea9059c3ac" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Care Bears (U) 099220 (Baby).bin" size="0x800000" crc="4a791d18" sha1="39d70dbeccd6ddf4fcbe3cee5c0630ea9059c3ac" />
 			</dataarea>
 		</part>
 	</software>
@@ -172,8 +173,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099060(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="A Day on the Farm (U) (Baby).bin" size="8388608" crc="7f93ea7b" sha1="a130881e45c6a6a6158f64c2e7fb51d55fb2a15f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="A Day on the Farm (U) (Baby).bin" size="0x800000" crc="7f93ea7b" sha1="a130881e45c6a6a6158f64c2e7fb51d55fb2a15f" />
 			</dataarea>
 		</part>
 	</software>
@@ -187,8 +188,8 @@ VTech V.Smile Baby cartridges
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-3" />
 			<feature name="u4" value="U4" /> <!-- ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="27-08788-000.u4" size="8388608" crc="581e16f9" sha1="330b309644db9f017d275b9df0ffe7530ed5bcef" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="27-08788-000.u4" size="0x800000" crc="581e16f9" sha1="330b309644db9f017d275b9df0ffe7530ed5bcef" />
 			</dataarea>
 		</part>
 	</software>
@@ -200,8 +201,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099065(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="099065 - Un Jour A La Ferme (BABY) (FR).bin" size="8388608" crc="a2777808" sha1="bbd2ae83d7ff43caa1e1d74b050d6130a0cd5e6f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="099065 - Un Jour A La Ferme (BABY) (FR).bin" size="0x800000" crc="a2777808" sha1="bbd2ae83d7ff43caa1e1d74b050d6130a0cd5e6f" />
 			</dataarea>
 		</part>
 	</software>
@@ -215,8 +216,8 @@ VTech V.Smile Baby cartridges
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-2" />
 			<feature name="u4" value="U4" /> <!-- ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="99067 - Un Dia en la Granja (SP).bin" size="8388608" crc="03735215" sha1="228dc683ba1f7f7f4a61a34b29d61fe9077d2cab" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="99067 - Un Dia en la Granja (SP).bin" size="0x800000" crc="03735215" sha1="228dc683ba1f7f7f4a61a34b29d61fe9077d2cab" />
 			</dataarea>
 		</part>
 	</software>
@@ -228,8 +229,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099160(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Disney Baby - Discovery with Baby Mickey and Friends (U) (Baby).bin" size="8388608" crc="8b694c2c" sha1="7d3ac29cda9728545bd040af182cb78f9a7b7c02" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Disney Baby - Discovery with Baby Mickey and Friends (U) (Baby).bin" size="0x800000" crc="8b694c2c" sha1="7d3ac29cda9728545bd040af182cb78f9a7b7c02" />
 			</dataarea>
 		</part>
 	</software>
@@ -241,8 +242,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099165(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="099165 - MickeyEtSesAmis (BABY) (FR).bin" size="8388608" crc="2d1e5884" sha1="9b3b00e8a7c29155ce2dfab28c6bc09b0ffa11b8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="099165 - MickeyEtSesAmis (BABY) (FR).bin" size="0x800000" crc="2d1e5884" sha1="9b3b00e8a7c29155ce2dfab28c6bc09b0ffa11b8" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,8 +256,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099002(NL)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="99002 - Dierenhuis (NL).bin" size="8388608" crc="77adb3aa" sha1="0c9f96effb9e113c5e5050b074620ed27013d71f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="99002 - Dierenhuis (NL).bin" size="0x800000" crc="77adb3aa" sha1="0c9f96effb9e113c5e5050b074620ed27013d71f" />
 			</dataarea>
 		</part>
 	</software>
@@ -271,8 +272,8 @@ VTech V.Smile Baby cartridges
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-3" />
 			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="99004.u4" size="8388608" crc="7b48544b" sha1="a736ef1313762c493a366990406c3a7393457b6e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="99004.u4" size="0x800000" crc="7b48544b" sha1="a736ef1313762c493a366990406c3a7393457b6e" />
 			</dataarea>
 		</part>
 	</software>
@@ -285,8 +286,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099005(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="099005 - La Maison Des Animaux (BABY) (FR).bin" size="8388608" crc="4ab4d311" sha1="584a5b359010636286de626a51c71c0c5bdcb864" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="099005 - La Maison Des Animaux (BABY) (FR).bin" size="0x800000" crc="4ab4d311" sha1="584a5b359010636286de626a51c71c0c5bdcb864" />
 			</dataarea>
 		</part>
 	</software>
@@ -298,8 +299,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099200(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Mother Goose (U) 099200 (Baby).bin" size="8388608" crc="1ef9e246" sha1="2093034c442c5bd7ace376eb9aa4e9c8378c75a4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Mother Goose (U) 099200 (Baby).bin" size="0x800000" crc="1ef9e246" sha1="2093034c442c5bd7ace376eb9aa4e9c8378c75a4" />
 			</dataarea>
 		</part>
 	</software>
@@ -311,8 +312,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099100(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Noah's Ark Animal Adventures (U) 99100 (Baby).bin" size="8388608" crc="039d0465" sha1="826fd675f300fb14293344f6f180abc38b794e40" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Noah's Ark Animal Adventures (U) 99100 (Baby).bin" size="0x800000" crc="039d0465" sha1="826fd675f300fb14293344f6f180abc38b794e40" />
 			</dataarea>
 		</part>
 	</software>
@@ -324,8 +325,8 @@ VTech V.Smile Baby cartridges
 		<info name="serial" value="80-099105(FR)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u4" value="U4" />
-			<dataarea name="rom" size="8388608">
-				<rom name="099105 - ArcheDeNoe (BABY) (FR).bin" size="8388608" crc="745f97b3" sha1="a1d82044e215730a4c8ad7440360ee6336e01b01" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="099105 - ArcheDeNoe (BABY) (FR).bin" size="0x800000" crc="745f97b3" sha1="a1d82044e215730a4c8ad7440360ee6336e01b01" />
 			</dataarea>
 		</part>
 	</software>
@@ -336,8 +337,8 @@ VTech V.Smile Baby cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099020(US)" />
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="Disney Baby - Pooh's Hundred Acre Wood Adventure (U) 099020 (Baby).bin" size="8388608" crc="31e6ccc5" sha1="2379b95910b171aa984d41b3a11d295639e5c8da" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Disney Baby - Pooh's Hundred Acre Wood Adventure (U) 099020 (Baby).bin" size="0x800000" crc="31e6ccc5" sha1="2379b95910b171aa984d41b3a11d295639e5c8da" />
 			</dataarea>
 		</part>
 	</software>
@@ -351,8 +352,8 @@ VTech V.Smile Baby cartridges
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-4" />
 			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="99034.u4" size="8388608" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="99034.u4" size="0x800000" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" />
 			</dataarea>
 		</part>
 	</software>
@@ -363,8 +364,8 @@ VTech V.Smile Baby cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099140(US)" />
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="Teletubbies - Time for Teletubbies (U) 099140 (Baby).bin" size="8388608" crc="f4950adb" sha1="92b1d5ca2c6c249872a17a3820082eb24aa0ebe3" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Teletubbies - Time for Teletubbies (U) 099140 (Baby).bin" size="0x800000" crc="f4950adb" sha1="92b1d5ca2c6c249872a17a3820082eb24aa0ebe3" />
 			</dataarea>
 		</part>
 	</software>
@@ -375,8 +376,20 @@ VTech V.Smile Baby cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099145(FR)" />
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="099145 - Teletubbies (BABY) (FR).bin" size="8388608" crc="374cc936" sha1="462bf0a16eb16bd4ca008d9e57a914f88986920b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="099145 - Teletubbies (BABY) (FR).bin" size="0x800000" crc="374cc936" sha1="462bf0a16eb16bd4ca008d9e57a914f88986920b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teletubsp" cloneof="teletub" supported="no">
+		<description>Teletubbies - ¡Es la hora de los Teletubbies! (Spain)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099147(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-099147 - Teletubbies - Es la hora de los Teletubbies (Spain).bin" size="0x800000" crc="51e726e0" sha1="108c68f8b089b337f996c01ca6b2455e34231b82" />
 			</dataarea>
 		</part>
 	</software>

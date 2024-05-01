@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_ATARI_JSA_H
-#define MAME_AUDIO_ATARI_JSA_H
+#ifndef MAME_ATARI_ATARI_JSA_H
+#define MAME_ATARI_ATARI_JSA_H
 
 #pragma once
 
@@ -64,8 +64,8 @@ public:
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
-	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_soundcomm->main_to_sound_ready(); }
-	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_soundcomm->sound_to_main_ready(); }
+	int main_to_sound_ready() { return m_soundcomm->main_to_sound_ready(); }
+	int sound_to_main_ready() { return m_soundcomm->sound_to_main_ready(); }
 
 	// main cpu accessors
 	void main_command_w(uint8_t data);
@@ -74,16 +74,16 @@ public:
 
 	// read/write handlers
 	void ym2151_port_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(main_test_read_line);
+	int main_test_read_line();
 
 	// I/O lines
-	DECLARE_WRITE_LINE_MEMBER(main_int_write_line);
+	void main_int_write_line(int state);
 
 	// 6502 interrupt handlers
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 	void sound_irq_ack_w(u8 data = 0);
 	u8 sound_irq_ack_r();
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
+	void ym2151_irq_gen(int state);
 
 protected:
 	// device-level overrides
@@ -264,4 +264,4 @@ protected:
 };
 
 
-#endif // MAME_AUDIO_ATARI_JSA_H
+#endif // MAME_ATARI_ATARI_JSA_H

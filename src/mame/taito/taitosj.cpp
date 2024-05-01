@@ -806,9 +806,9 @@ static INPUT_PORTS_START( alpine )
 	PORT_DIPSETTING(    0x08, "1:30" )
 	PORT_DIPSETTING(    0x10, "2:00" )
 	PORT_DIPSETTING(    0x18, "2:30" )
-	PORT_DIPNAME( 0x20, 0x00, "End of Race Time Bonus" )   PORT_DIPLOCATION("SWA:6")
-	PORT_DIPSETTING(    0x20, "0:10" )
-	PORT_DIPSETTING(    0x00, "0:20" )
+	PORT_DIPNAME( 0x20, 0x20, "End of Race Time Bonus" )   PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x00, "0:10" )
+	PORT_DIPSETTING(    0x20, "0:20" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1769,31 +1769,26 @@ void taitosj_state::dacvol_w(uint8_t data)
 void taitosj_state::nomcu(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(8'000'000)/2);      // on CPU board
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // on CPU board
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_nomcu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(taitosj_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(6'000'000)/2);    // on GAME board
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // on GAME board
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_audio_map);
-			/* interrupts:
-			   - no interrupts synced with vblank
-			   - NMI triggered by the main CPU
-			   - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(XTAL(6'000'000)/(4*16*16*10*16)));
-
+	// interrupts:
+	// - no interrupts synced with vblank
+	// - NMI triggered by the main CPU
+	// - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz.
+	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(12_MHz_XTAL / (2*4*16*16*10*16)));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // verified from schematics
 	m_screen->set_screen_update(FUNC(taitosj_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitosj);
 	PALETTE(config, m_palette).set_entries(64);
-
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1802,30 +1797,27 @@ void taitosj_state::nomcu(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_soundnmi[1]).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	AY8910(config, m_ay[0], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
+	AY8910(config, m_ay[0], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	m_ay[0]->port_a_read_callback().set_ioport("DSW2");
 	m_ay[0]->port_b_read_callback().set_ioport("DSW3");
 	m_ay[0]->add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	AY8910(config, m_ay[1], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC51
+	AY8910(config, m_ay[1], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC51
 	m_ay[1]->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay[1]->port_a_write_callback().set(m_dac, FUNC(dac_byte_interface::data_w));
 	m_ay[1]->port_b_write_callback().set(FUNC(taitosj_state::dacvol_w));
 	m_ay[1]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	AY8910(config, m_ay[2], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC49
+	AY8910(config, m_ay[2], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC49
 	m_ay[2]->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay[2]->port_a_write_callback().set(FUNC(taitosj_state::input_port_4_f0_w));
 	m_ay[2]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	AY8910(config, m_ay[3], XTAL(6'000'000)/4); // on GAME board, AY-3-8910 @ IC50
+	AY8910(config, m_ay[3], 12_MHz_XTAL / 8); // on GAME board, AY-3-8910 @ IC50
+	// TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open collector inverter, to selectively
+	// tie none, either or both of two capacitors between the ay4 audio output signal and ground,
+	// or between audio output signal and high-z (i.e. do nothing). Bio Attack uses this?
 	m_ay[3]->set_flags(AY8910_SINGLE_OUTPUT);
-	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
-	   collector inverter, to selectively tie none, either or both of two
-	   capacitors between the ay4 audio output signal and ground, or between
-	   audio output signal and high-z (i.e. do nothing).
-	   Bio Attack uses this?
-	*/
 	m_ay[3]->port_b_write_callback().set(FUNC(taitosj_state::sndnmi_msk_w));
 	m_ay[3]->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -1846,7 +1838,7 @@ void taitosj_state::mcu(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_mcu_map);
 
-	TAITO_SJ_SECURITY_MCU(config, m_mcu, XTAL(3'000'000));   // divided by 4 internally
+	TAITO_SJ_SECURITY_MCU(config, m_mcu, 3_MHz_XTAL); // divided by 4 internally
 	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
 	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
 	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
@@ -2065,6 +2057,40 @@ ROM_START( junglekj2 )
 	ROM_REGION( 0x0100, "proms", 0 )      // layer PROM
 	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
+
+
+ROM_START( junglekj2a )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "kn41.bin",     0x00000, 0x1000, CRC(7e4cd631) SHA1(512c08795d7946500b22d6f63a482c5156e6764b) )
+	ROM_LOAD( "kn42.bin",     0x01000, 0x1000, CRC(bade53af) SHA1(c3d2cf776598cb2d8684fa0b3ea7af90af9e8dae) )
+	ROM_LOAD( "kn43.bin",     0x02000, 0x1000, CRC(a20e5a48) SHA1(af961b671dc4c865d0181d08a70b902bb96f29d0) )
+	ROM_LOAD( "kn44.bin",     0x03000, 0x1000, CRC(44c770d3) SHA1(57a1ddc07009f0dbd423cbe111b886e919a8bb0a) )
+	ROM_LOAD( "kn45.bin",     0x04000, 0x1000, CRC(f60a3d06) SHA1(7c387f0aeb9497b026d8838ee6ea7ff11dea506a) )
+	ROM_LOAD( "kn26.bin",     0x05000, 0x1000, CRC(4b5adca2) SHA1(00040491a57e5247a051eacbe57e30763109ef13) ) // a few bytes differences in tables vs junglekj2
+	ROM_LOAD( "kn27.bin",     0x06000, 0x1000, CRC(5c3199e0) SHA1(c57dec92998b971d76aecd23674c25cf7b8be667) )
+	ROM_LOAD( "kn48.bin",     0x07000, 0x1000, CRC(e690b36e) SHA1(25a6c06d6c2bf0082cc776255448c329cb2e74e0) )
+	// 10000-10fff space for another banked ROM (not used)
+	ROM_LOAD( "kn60.bin",     0x11000, 0x1000, CRC(1a9c0a26) SHA1(82f4cebeba90419e83a00427b671985824babd7a) ) // banked at 7000
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "kn37.bin",   0x0000, 0x1000, CRC(60d13095) SHA1(c9a3bdc3a5432945cd09588708b8a24ff7d772c3) ) // significant differences from junglekj2 (but same label as junglehbr?)
+	ROM_LOAD( "kn38.bin",   0x1000, 0x1000, CRC(6950413d) SHA1(263472a25213f411a8be7d30f5dec6aec186c1d4) ) //  ^^
+	ROM_LOAD( "kn59.bin",   0x2000, 0x1000, CRC(cee485fc) SHA1(1e0c52ec6b1d3cfd47247db71bcf3fe476c32039) )
+
+	ROM_REGION( 0x8000, "gfx", 0 )       // graphic ROMs used at runtime
+	ROM_LOAD( "kn49.bin",     0x0000, 0x1000, CRC(fe275213) SHA1(5fcbe2db9371ae46610e7ce261498f3a9b4116ec) )
+	ROM_LOAD( "kn50.bin",     0x1000, 0x1000, CRC(d9f93c55) SHA1(de04845a42b8214eceda1c9aa92af631f3236ee9) )
+	ROM_LOAD( "kn51.bin",     0x2000, 0x1000, CRC(70e8fc12) SHA1(505c90c662d372d28cb38201433054b8e3d723d1) )
+	ROM_LOAD( "kn52.bin",     0x3000, 0x1000, CRC(bcbac1a3) SHA1(bcd5fc9b3791ab67e0ad9f9ced7226853e9a2a00) )
+	ROM_LOAD( "kn53.bin",     0x4000, 0x1000, CRC(b946c87d) SHA1(d16cb6bf38e00ae11c204cbf8f400f8a85c807c2) )
+	ROM_LOAD( "kn54.bin",     0x5000, 0x1000, CRC(f757d8f0) SHA1(896118d990e3733aeb45842c0dc2103cbf2ba1a2) )
+	ROM_LOAD( "kn55.bin",     0x6000, 0x1000, CRC(70aef58f) SHA1(df7454a1c3676181eca698bb3b2ef3253a45ca0f) )
+	ROM_LOAD( "kn56.bin",     0x7000, 0x1000, CRC(932eb667) SHA1(4bf7c01ab212b616931a21a43a453521aa01ff36) )
+
+	ROM_REGION( 0x0100, "proms", 0 )      // layer PROM
+	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+ROM_END
+
 
 ROM_START( jungleh )
 	ROM_REGION( 0x12000, "maincpu", 0 )
@@ -2877,6 +2903,7 @@ GAME( 1981, spacecr,   0,        nomcu,    spacecr,  taitosj_state, init_spacecr
 GAME( 1982, junglek,   0,        nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation",         "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, junglekas, junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation",         "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, junglekj2, junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation",         "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekj2a,junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation",         "Jungle King (Japan, earlier, alt)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, jungleh,   junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, junglehbr, junglek,  nomcu,    junglek,  taitosj_state, init_junglhbr,ROT180, "Taito do Brasil",           "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, piratpet,  junglek,  nomcu,    piratpet, taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
@@ -2894,7 +2921,7 @@ GAME( 1983, elevatorb, elevator, nomcu,    elevator, taitosj_state, init_taitosj
 GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (A10, 4 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tinstara,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (TS, 5 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, waterski,  0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Water Ski", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Bio Attack", MACHINE_SUPPORTS_SAVE ) // Fox Video Games = licensor of movie rights
 GAME( 1984, sfposeid,  0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hwrace,    0,        nomcu,    hwrace,   taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "High Way Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kikstart,  0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kikstart,  0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Kick Start: Wheelie King", MACHINE_SUPPORTS_SAVE )

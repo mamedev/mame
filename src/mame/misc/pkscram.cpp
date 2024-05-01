@@ -24,6 +24,8 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 #include "tilemap.h"
 
 
+namespace {
+
 class pkscram_state : public driver_device
 {
 public:
@@ -55,7 +57,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 
 	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -295,7 +297,7 @@ static GFXDECODE_START( gfx_pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(pkscram_state::irqhandler)
+void pkscram_state::irqhandler(int state)
 {
 	if(m_out & 0x10)
 		m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -355,6 +357,8 @@ ROM_START( pkscram )
 	ROM_LOAD16_BYTE( "pk3.1c", 0x00000, 0x20000, CRC(0b18f2bc) SHA1(32892589442884ba02a1c6059ecb94e4ef516b86) )
 	ROM_LOAD16_BYTE( "pk4.1e", 0x00001, 0x20000, CRC(a232d993) SHA1(1b7b15cf0fabf3b2b2e429506a78ff4c08f4f7a5) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, empty_init, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )

@@ -35,8 +35,8 @@ public:
 		device_sound_interface(mconfig, *this),
 		m_timer{ nullptr, nullptr },
 		m_update_irq(*this),
-		m_io_read{ *this, *this },
-		m_io_write{ *this, *this }
+		m_io_read(*this, 0),
+		m_io_write(*this)
 	{
 	}
 
@@ -92,12 +92,11 @@ protected:
 	}
 
 	// the chip implementation calls this when the state of the IRQ signal has
-	// changed due to a status change; our responsibility is to respons as
+	// changed due to a status change; our responsibility is to response as
 	// needed to the change in IRQ state, signaling any consumers
 	virtual void ymfm_update_irq(bool asserted) override
 	{
-		if (!m_update_irq.isnull())
-			m_update_irq(asserted ? ASSERT_LINE : CLEAR_LINE);
+		m_update_irq(asserted ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	// the chip implementation calls this to indicate that the chip should be
@@ -122,14 +121,14 @@ protected:
 	// of the chip; our responsibility is to provide the data requested
 	virtual uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override
 	{
-		return (type != ymfm::ACCESS_IO || m_io_read[address & 1].isnull()) ? 0 : m_io_read[address & 1]();
+		return (type != ymfm::ACCESS_IO) ? 0 : m_io_read[address & 1]();
 	}
 
 	// the chip implementation calls this whenever data is written outside
 	// of the chip; our responsibility is to pass the written data on to any consumers
 	virtual void ymfm_external_write(ymfm::access_class type, uint32_t address, uint8_t data) override
 	{
-		if (type == ymfm::ACCESS_IO && !m_io_write[address & 1].isnull())
+		if (type == ymfm::ACCESS_IO)
 			m_io_write[address & 1](data);
 	}
 
@@ -140,28 +139,21 @@ protected:
 		for (int tnum = 0; tnum < 2; tnum++)
 			m_timer[tnum] = timer_alloc(FUNC(ym_generic_device::fm_timer_handler), this);
 
-		// resolve the handlers
-		m_update_irq.resolve();
-		m_io_read[0].resolve();
-		m_io_read[1].resolve();
-		m_io_write[0].resolve();
-		m_io_write[1].resolve();
-
 		// remember the busy end time
 		save_item(NAME(m_busy_end));
 	}
 
 	// timer callbacks
-	void fm_mode_write(int param) { m_engine->engine_mode_write(param); }
-	void fm_check_interrupts(int param) { m_engine->engine_check_interrupts(); }
-	void fm_timer_handler(int param) { m_engine->engine_timer_expired(param); }
+	void fm_mode_write(s32 param) { m_engine->engine_mode_write(param); }
+	void fm_check_interrupts(s32 param) { m_engine->engine_check_interrupts(); }
+	void fm_timer_handler(s32 param) { m_engine->engine_timer_expired(param); }
 
 	// internal state
-	attotime m_busy_end;             // busy end time
-	emu_timer *m_timer[2];           // two timers
-	devcb_write_line m_update_irq;   // IRQ update callback
-	devcb_read8 m_io_read[2];        // up to 2 input port handlers
-	devcb_write8 m_io_write[2];      // up to 2 output port handlers
+	attotime m_busy_end;                 // busy end time
+	emu_timer *m_timer[2];               // two timers
+	devcb_write_line m_update_irq;       // IRQ update callback
+	devcb_read8::array<2> m_io_read;     // up to 2 input port handlers
+	devcb_write8::array<2> m_io_write;   // up to 2 output port handlers
 };
 
 

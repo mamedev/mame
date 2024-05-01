@@ -138,12 +138,12 @@ void dio16_98544_device::rom_w(offs_t offset, uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(dio16_98544_device::vblank_w)
+void dio16_98544_device::vblank_w(int state)
 {
 	m_topcat->vblank_w(state);
 }
 
-WRITE_LINE_MEMBER(dio16_98544_device::int_w)
+void dio16_98544_device::int_w(int state)
 {
 	int line = (m_intreg >> 3) & 7;
 

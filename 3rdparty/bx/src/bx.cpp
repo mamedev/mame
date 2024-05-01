@@ -1,9 +1,8 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/debug.h>
 #include <bx/readerwriter.h>
 
@@ -50,20 +49,20 @@ namespace bx
 		, const void* _src
 		, uint32_t _srcStride
 		, uint32_t _stride
-		, uint32_t _num
+		, uint32_t _numStrides
 		)
 	{
 		if (_stride == _srcStride
 		&&  _stride == _dstStride)
 		{
-			memCopy(_dst, _src, _stride*_num);
+			memCopy(_dst, _src, _stride*_numStrides);
 			return;
 		}
 
 		const uint8_t* src = (const uint8_t*)_src;
 		      uint8_t* dst = (uint8_t*)_dst;
 
-		for (uint32_t ii = 0; ii < _num; ++ii, src += _srcStride, dst += _dstStride)
+		for (uint32_t ii = 0; ii < _numStrides; ++ii, src += _srcStride, dst += _dstStride)
 		{
 			memCopy(dst, src, _stride);
 		}
@@ -108,20 +107,20 @@ namespace bx
 		, const void* _src
 		, uint32_t _srcStride
 		, uint32_t _stride
-		, uint32_t _num
+		, uint32_t _numStrides
 		)
 	{
 		if (_stride == _srcStride
 		&&  _stride == _dstStride)
 		{
-			memMove(_dst, _src, _stride*_num);
+			memMove(_dst, _src, _stride*_numStrides);
 			return;
 		}
 
 		const uint8_t* src = (const uint8_t*)_src;
 		      uint8_t* dst = (uint8_t*)_dst;
 
-		for (uint32_t ii = 0; ii < _num; ++ii, src += _srcStride, dst += _dstStride)
+		for (uint32_t ii = 0; ii < _numStrides; ++ii, src += _srcStride, dst += _dstStride)
 		{
 			memMove(dst, src, _stride);
 		}
@@ -186,15 +185,15 @@ namespace bx
 	}
 
 	///
-	void gather(void* _dst, const void* _src, uint32_t _srcStride, uint32_t _stride, uint32_t _num)
+	void gather(void* _dst, const void* _src, uint32_t _srcStride, uint32_t _stride, uint32_t _numStrides)
 	{
-		memMove(_dst, _stride, _src, _srcStride, _stride, _num);
+		memMove(_dst, _stride, _src, _srcStride, _stride, _numStrides);
 	}
 
 	///
-	void scatter(void* _dst, uint32_t _dstStride, const void* _src, uint32_t _stride, uint32_t _num)
+	void scatter(void* _dst, uint32_t _dstStride, const void* _src, uint32_t _stride, uint32_t _numStrides)
 	{
-		memMove(_dst, _dstStride, _src, _stride, _num, _stride);
+		memMove(_dst, _dstStride, _src, _stride, _stride, _numStrides);
 	}
 
 } // namespace bx

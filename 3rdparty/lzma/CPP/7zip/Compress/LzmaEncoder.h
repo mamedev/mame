@@ -1,7 +1,7 @@
 // LzmaEncoder.h
 
-#ifndef __LZMA_ENCODER_H
-#define __LZMA_ENCODER_H
+#ifndef ZIP7_INC_LZMA_ENCODER_H
+#define ZIP7_INC_LZMA_ENCODER_H
 
 #include "../../../C/LzmaEnc.h"
 
@@ -12,25 +12,32 @@
 namespace NCompress {
 namespace NLzma {
 
-class CEncoder:
+class CEncoder Z7_final:
   public ICompressCoder,
   public ICompressSetCoderProperties,
   public ICompressWriteCoderProperties,
+  public ICompressSetCoderPropertiesOpt,
   public CMyUnknownImp
 {
+  Z7_COM_UNKNOWN_IMP_4(
+      ICompressCoder,
+      ICompressSetCoderProperties,
+      ICompressWriteCoderProperties,
+      ICompressSetCoderPropertiesOpt)
+  Z7_IFACE_COM7_IMP(ICompressCoder)
+public:
+  Z7_IFACE_COM7_IMP(ICompressSetCoderProperties)
+  Z7_IFACE_COM7_IMP(ICompressWriteCoderProperties)
+  Z7_IFACE_COM7_IMP(ICompressSetCoderPropertiesOpt)
+
   CLzmaEncHandle _encoder;
   UInt64 _inputProcessed;
-public:
-  MY_UNKNOWN_IMP3(ICompressCoder, ICompressSetCoderProperties, ICompressWriteCoderProperties)
-    
-  STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
-  STDMETHOD(SetCoderProperties)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps);
-  STDMETHOD(WriteCoderProperties)(ISequentialOutStream *outStream);
 
   CEncoder();
-  virtual ~CEncoder();
+  ~CEncoder();
+
   UInt64 GetInputProcessedSize() const { return _inputProcessed; }
+  bool IsWriteEndMark() const { return LzmaEnc_IsWriteEndMark(_encoder) != 0; }
 };
 
 }}

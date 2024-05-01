@@ -16,10 +16,12 @@
 
 #include "formats/imageutl.h"
 
-#include "corefile.h"
 #include "corestr.h"
 #include "opresolv.h"
+#include "path.h"
+#include "strformat.h"
 
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include <cctype>

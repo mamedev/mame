@@ -1,6 +1,6 @@
 #
-# Copyright 2011-2021 Branimir Karadzic. All rights reserved.
-# License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+# Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+# License: https://github.com/bkaradzic/bx/blob/master/LICENSE
 #
 
 GENIE=../bx/tools/bin/$(OS)/genie
@@ -95,6 +95,14 @@ osx-x64-debug: .build/projects/gmake-osx-x64
 osx-x64-release: .build/projects/gmake-osx-x64
 	make -C .build/projects/gmake-osx config=release
 osx-x64: osx-x64-debug osx-x64-release
+
+.build/projects/gmake-osx-arm64:
+	$(GENIE) --gcc=osx-arm64 gmake
+osx-arm64-debug: .build/projects/gmake-osx-arm64
+	make -C .build/projects/gmake-osx-arm64 config=debug
+osx-arm64-release: .build/projects/gmake-osx-arm64
+	make -C .build/projects/gmake-osx-arm64 config=release
+osx-arm64: osx-arm64-debug osx-arm64-release
 
 .build/projects/gmake-ios-arm:
 	$(GENIE) --gcc=ios-arm gmake

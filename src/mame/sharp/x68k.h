@@ -8,17 +8,22 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_X68K_H
-#define MAME_INCLUDES_X68K_H
+#ifndef MAME_SHARP_X68K_H
+#define MAME_SHARP_X68K_H
 
 #pragma once
 
+#include "x68k_crtc.h"
+
+#include "bus/msx/ctrl/ctrl.h"
+#include "bus/x68k/x68kexp.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "imagedev/floppy.h"
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/i8255.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rp5c15.h"
@@ -26,8 +31,6 @@
 #include "sound/flt_vol.h"
 #include "sound/okim6258.h"
 #include "sound/ymopm.h"
-#include "x68k_crtc.h"
-#include "bus/x68k/x68kexp.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -57,19 +60,13 @@ public:
 		, m_ppi(*this, "ppi8255")
 		, m_screen(*this, "screen")
 		, m_upd72065(*this, "upd72065")
+		, m_joy(*this, "joy%u", 1U)
 		, m_expansion(*this, "exp%u", 1U)
 		, m_adpcm_out(*this, {"adpcm_outl", "adpcm_outr"})
 		, m_options(*this, "options")
 		, m_mouse1(*this, "mouse1")
 		, m_mouse2(*this, "mouse2")
 		, m_mouse3(*this, "mouse3")
-		, m_xpd1lr(*this, "xpd1lr")
-		, m_ctrltype(*this, "ctrltype")
-		, m_joy1(*this, "joy1")
-		, m_joy2(*this, "joy2")
-		, m_md3b(*this, "md3b")
-		, m_md6b(*this, "md6b")
-		, m_md6b_extra(*this, "md6b_extra")
 		, m_eject_drv_out(*this, "eject_drv%u", 0U)
 		, m_ctrl_drv_out(*this, "ctrl_drv%u", 0U)
 		, m_access_drv_out(*this, "access_drv%u", 0U)
@@ -82,7 +79,7 @@ public:
 	void x68000_base(machine_config &config);
 	void x68000(machine_config &config);
 
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 protected:
 	template <typename CpuType, typename AddrMap, typename Clock>
@@ -108,6 +105,7 @@ protected:
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
 	required_device<upd72065_device> m_upd72065;
+	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 	required_device_array<x68k_expansion_slot_device, 2> m_expansion;
 
 	required_device_array<filter_volume_device, 2> m_adpcm_out;
@@ -116,13 +114,6 @@ protected:
 	required_ioport m_mouse1;
 	required_ioport m_mouse2;
 	required_ioport m_mouse3;
-	required_ioport m_xpd1lr;
-	required_ioport m_ctrltype;
-	required_ioport m_joy1;
-	required_ioport m_joy2;
-	required_ioport m_md3b;
-	required_ioport m_md6b;
-	required_ioport m_md6b_extra;
 
 	output_finder<4> m_eject_drv_out;
 	output_finder<4> m_ctrl_drv_out;
@@ -138,7 +129,7 @@ protected:
 	bitmap_ind16 m_special;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
-	image_init_result floppy_load(floppy_image_device *dev);
+	void floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 	static void floppy_formats(format_registration &fr);
 
@@ -162,13 +153,6 @@ protected:
 	} m_fdc;
 	struct
 	{
-		int ioc7 = 0;  // "Function B operation of joystick # one option"
-		int ioc6 = 0;  // "Function A operation of joystick # one option"
-		int joy1_enable = 0;  // IOC4
-		int joy2_enable = 0;  // IOC5
-	} m_joy;
-	struct
-	{
 		int rate = 0;  // ADPCM sample rate
 		int pan = 0;  // ADPCM output switch
 		int clock = 0;  // ADPCM clock speed
@@ -182,10 +166,8 @@ protected:
 		int gfxlayer_pri[4]{};  // block displayed for each priority level
 		int tile8_dirty[1024]{};
 		int tile16_dirty[256]{};
-		int bg_visible_height = 0;
-		int bg_visible_width = 0;
-		int bg_hshift = 0;
-		int bg_vshift = 0;
+		int bg_hstart = 0;
+		int bg_vstart = 0;
 		int bg_hvres = 0;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
 	} m_video;
 	struct
@@ -205,18 +187,7 @@ protected:
 		char last_mouse_y = 0;  // previous mouse y-axis value
 		int bufferempty = 0;  // non-zero if buffer is empty
 	} m_mouse;
-	struct
-	{
-		// port A
-		int mux1 = 0;  // multiplexer value
-		int seq1 = 0;  // part of 6-button input sequence.
-		emu_timer* io_timeout1 = nullptr;
-		// port B
-		int mux2 = 0;  // multiplexer value
-		int seq2 = 0;  // part of 6-button input sequence.
-		emu_timer* io_timeout2 = nullptr;
-	} m_mdctrl;
-	uint8_t m_ppi_port[3]{};
+	uint8_t m_ppi_portc = 0;
 	bool m_dmac_int = false;
 	bool m_mfp_int = false;
 	bool m_exp_irq2[2]{};
@@ -227,7 +198,6 @@ protected:
 	emu_timer* m_mouse_timer = nullptr;
 	emu_timer* m_led_timer = nullptr;
 	unsigned char m_scc_prev = 0;
-	uint16_t m_ppi_prev = 0;
 	emu_timer* m_fdc_tc = nullptr;
 	emu_timer* m_adpcm_timer = nullptr;
 	emu_timer* m_bus_error_timer = nullptr;
@@ -249,33 +219,27 @@ protected:
 	TIMER_CALLBACK_MEMBER(adpcm_drq_tick);
 	TIMER_CALLBACK_MEMBER(led_callback);
 	TIMER_CALLBACK_MEMBER(scc_ack);
-	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
-	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
 	TIMER_CALLBACK_MEMBER(bus_error);
 	uint8_t ppi_port_a_r();
 	uint8_t ppi_port_b_r();
 	uint8_t ppi_port_c_r();
 	void ppi_port_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	void fdc_irq(int state);
 	void ct_w(uint8_t data);
 	void adpcm_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
+	void mfp_irq_callback(int state);
 
 	//dmac
-	DECLARE_WRITE_LINE_MEMBER(dma_irq);
+	void dma_irq(int state);
 	void dma_end(offs_t offset, uint8_t data);
 
 	int read_mouse();
 	void set_adpcm();
-	uint8_t md_3button_r(int port);
-	void md_6button_init();
-	uint8_t md_6button_r(int port);
-	uint8_t xpd1lr_r(int port);
 
-	DECLARE_WRITE_LINE_MEMBER(fm_irq);
-	template <int N> DECLARE_WRITE_LINE_MEMBER(irq2_line);
-	template <int N> DECLARE_WRITE_LINE_MEMBER(irq4_line);
-	template <int N> DECLARE_WRITE_LINE_MEMBER(nmi_line);
+	void fm_irq(int state);
+	template <int N> void irq2_line(int state);
+	template <int N> void irq4_line(int state);
+	template <int N> void nmi_line(int state);
 
 	void scc_w(offs_t offset, uint16_t data);
 	uint16_t scc_r(offs_t offset);
@@ -321,11 +285,12 @@ protected:
 	void cpu_space_map(address_map &map);
 
 	inline void plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
-	void draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
+	bool get_text_pixel(int line, int pixel, uint16_t *pix);
 	bool draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
-	void draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
+	bool draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, screen_device &screen, rectangle cliprect);
 	void draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer, bool opaque, rectangle rect);
+	template <bool Blend> rgb_t get_gfx_pixel(int scanline, int pixel, bool gfxblend, rgb_t blendpix);
 
 public:
 	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);
@@ -342,7 +307,7 @@ class x68ksupr_state : public x68k_state
 public:
 	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x68k_state(mconfig, type, tag)
-		, m_scsictrl(*this, "mb89352")
+		, m_scsictrl(*this, "scsi:7:spc")
 	{
 	}
 
@@ -350,11 +315,11 @@ public:
 	void x68kxvi(machine_config &config);
 	void x68ksupr(machine_config &config);
 
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_irq(int state);
+	void scsi_unknown_w(uint8_t data);
 
 	required_device<mb89352_device> m_scsictrl;
 
@@ -371,10 +336,10 @@ public:
 
 	void x68030(machine_config &config);
 
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 protected:
 	void x68030_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_X68K_H
+#endif // MAME_SHARP_X68K_H

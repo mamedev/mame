@@ -26,6 +26,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class roland_s10_state : public driver_device
 {
 public:
@@ -235,7 +238,7 @@ void roland_s10_state::s10(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(roland_s10_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(roland_s10_state::lcd_pixel_update));
 	m_lcdc->set_busy_factor(0.005f);
@@ -298,6 +301,9 @@ ROM_START(s220)
 	ROM_REGION(0x10000, "program", 0)
 	ROM_LOAD("roland_s-220_v1.04_ic25.bin", 0x00000, 0x10000, CRC(1b74b694) SHA1(11ce4b47abe48116eb34d575e3da46387240c2b1))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1986, s10,    0,   0, s10,    s10,    roland_s10_state,  empty_init, "Roland", "S-10 Digital Sampling Keyboard", MACHINE_IS_SKELETON)
 SYST(1987, mks100, s10, 0, mks100, mks100, roland_s10_state,  empty_init, "Roland", "MKS-100 Digital Sampler",        MACHINE_IS_SKELETON)

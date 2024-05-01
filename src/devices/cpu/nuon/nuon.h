@@ -54,7 +54,7 @@ protected:
 
 		// registers
 		uint32_t m_pc;
-	}
+	};
 
 	const address_space_config m_program_configs[4];
 	address_space *m_program[4];

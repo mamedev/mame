@@ -55,11 +55,11 @@ public:
 	void set_a0(int a0) { m_slave_address = (m_slave_address & 0xfd) | (a0 << 1); }
 	void set_a1(int a1) { m_slave_address = (m_slave_address & 0xfb) | (a1 << 2); }
 
-	DECLARE_WRITE_LINE_MEMBER(a0_w);
-	DECLARE_WRITE_LINE_MEMBER(a1_w);
-	DECLARE_WRITE_LINE_MEMBER(scl_w);
-	DECLARE_WRITE_LINE_MEMBER(sda_w);
-	DECLARE_READ_LINE_MEMBER(sda_r);
+	void a0_w(int state);
+	void a1_w(int state);
+	void scl_w(int state);
+	void sda_w(int state);
+	int sda_r();
 
 protected:
 	// device-level overrides

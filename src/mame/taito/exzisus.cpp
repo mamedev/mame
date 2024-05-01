@@ -93,8 +93,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
  Video hardware of this hardware is almost similar with "mexico86". So,
@@ -187,8 +185,6 @@ uint32_t exzisus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 
@@ -407,8 +403,8 @@ void exzisus_state::exzisus(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.50);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag("cpub");
-	ciu.set_slave_tag("audiocpu");
+	ciu.nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 

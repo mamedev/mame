@@ -4,12 +4,12 @@
 
     Game Driver for Video System Mahjong series and Pipe Dream.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/04 -
+    Driver by Takahiro Nogi 2001/02/04 -
     and Bryan McPhail, Nicola Salmoria, Aaron Giles
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_FROMANCE_H
-#define MAME_INCLUDES_FROMANCE_H
+#ifndef MAME_VSYSTEM_FROMANCE_H
+#define MAME_VSYSTEM_FROMANCE_H
 
 #pragma once
 
@@ -112,7 +112,7 @@ private:
 	inline void get_fromance_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	inline void get_nekkyoku_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	void crtc_refresh();
-	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
+	void fromance_adpcm_int(int state);
 	void fromance_main_map(address_map &map);
 	void fromance_sub_io_map(address_map &map);
 	void fromance_sub_map(address_map &map);
@@ -122,4 +122,4 @@ private:
 	void nekkyoku_sub_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FROMANCE_H
+#endif // MAME_VSYSTEM_FROMANCE_H

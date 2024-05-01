@@ -109,11 +109,11 @@ private:
 	uint8_t ppi_portb_r();
 	void ppi_portc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_fault_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_perror_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_select_w);
+	void centronics_busy_w(int state);
+	void centronics_ack_w(int state);
+	void centronics_fault_w(int state);
+	void centronics_perror_w(int state);
+	void centronics_select_w(int state);
 
 	uint8_t centronics_data_r();
 	void centronics_data_w(uint8_t data);
@@ -126,8 +126,8 @@ private:
 	uint8_t palette_r(offs_t offset);
 	void palette_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(i186_timer0_w);
-	DECLARE_WRITE_LINE_MEMBER(i186_timer1_w);
+	void i186_timer0_w(int state);
+	void i186_timer1_w(int state);
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	uint8_t nvram_r(offs_t offset);
@@ -402,28 +402,28 @@ void rc759_state::ppi_portc_w(uint8_t data)
 	m_cas_enabled = BIT(data, 0);
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_busy_w )
+void rc759_state::centronics_busy_w(int state)
 {
 	m_centronics_busy = state;
 	m_pic->ir6_w(state);
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_ack_w )
+void rc759_state::centronics_ack_w(int state)
 {
 	m_centronics_ack = state;
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_fault_w )
+void rc759_state::centronics_fault_w(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_perror_w )
+void rc759_state::centronics_perror_w(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_select_w )
+void rc759_state::centronics_select_w(int state)
 {
 	m_centronics_select = state;
 }
@@ -513,7 +513,7 @@ void rc759_state::rtc_addr_w(uint8_t data)
 //  MACHINE EMULATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( rc759_state::i186_timer0_w )
+void rc759_state::i186_timer0_w(int state)
 {
 	m_cas_data = 1;
 
@@ -523,7 +523,7 @@ WRITE_LINE_MEMBER( rc759_state::i186_timer0_w )
 	m_cas->output(m_cas_data ? -1.0 : 1.0);
 }
 
-WRITE_LINE_MEMBER( rc759_state::i186_timer1_w )
+void rc759_state::i186_timer1_w(int state)
 {
 	m_speaker->level_w(state);
 }

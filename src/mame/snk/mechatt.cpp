@@ -475,21 +475,10 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	128*8
-};
-
 static GFXDECODE_START( gfx_mechatt )
-	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb, 0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   512, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,   768, 16 )
+	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb,                 0, 16 )
+	GFXDECODE_ENTRY( "gfx3",     0, gfx_8x8x4_col_2x2_group_packed_msb, 512, 16 )
+	GFXDECODE_ENTRY( "gfx4",     0, gfx_8x8x4_col_2x2_group_packed_msb, 768, 16 )
 GFXDECODE_END
 
 

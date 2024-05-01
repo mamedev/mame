@@ -99,20 +99,6 @@ kp63a_device::kp63a_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void kp63_device::device_resolve_objects()
-{
-	// Resolve output callbacks
-	m_out_pulse_callback.resolve_all_safe();
-	m_out_strobe_callback.resolve_all_safe();
-}
-
-
-//-------------------------------------------------
 //  timer_expired - handle timed count underflow
 //-------------------------------------------------
 

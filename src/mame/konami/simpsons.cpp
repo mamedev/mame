@@ -97,9 +97,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "simpsons.h"
-#include "konamipt.h"
 
+#include "k052109.h"
+#include "k053251.h"
+#include "k053246_k053247_k055673.h"
+#include "konamipt.h"
+#include "konami_helper.h"
+
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
@@ -107,6 +112,308 @@ Notes:
 #include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
+
+
+namespace {
+
+class simpsons_state : public driver_device
+{
+public:
+	simpsons_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_palette_view(*this, "palette_view"),
+		m_video_view(*this, "video_view"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k052109(*this, "k052109"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251")
+	{ }
+
+	void simpsons(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void bank0000_map(address_map &map);
+	void bank2000_map(address_map &map);
+	void main_map(address_map &map);
+	void z80_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(dma_start);
+	TIMER_CALLBACK_MEMBER(dma_end);
+
+	/* memory pointers */
+	std::unique_ptr<uint16_t[]>   m_spriteram;
+
+	/* video-related */
+	int        m_sprite_colorbase = 0;
+	int        m_layer_colorbase[3]{};
+	int        m_layerpri[3]{};
+	emu_timer *m_dma_start_timer;
+	emu_timer *m_dma_end_timer;
+
+	/* misc */
+	int        m_firq_enabled = 0;
+	emu_timer *m_nmi_blocked;
+
+	/* views */
+	memory_view m_palette_view;
+	memory_view m_video_view;
+
+	/* devices */
+	required_device<konami_cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k052109_device> m_k052109;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	void z80_bankswitch_w(uint8_t data);
+	void z80_arm_nmi_w(uint8_t data);
+	void eeprom_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
+	uint8_t sound_interrupt_r();
+	uint8_t k052109_r(offs_t offset);
+	void k052109_w(offs_t offset, uint8_t data);
+	uint8_t k053247_r(offs_t offset);
+	void k053247_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(periodic_irq);
+	void video_bank_select(int bank);
+	void object_dma();
+	void z80_nmi_w(int state);
+	K052109_CB_MEMBER(tile_callback);
+	void banking_callback(u8 data);
+	K053246_CB_MEMBER(sprite_callback);
+};
+
+
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(simpsons_state::tile_callback)
+{
+	*code |= ((*color & 0x3f) << 8) | (bank << 14);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the K053247
+
+***************************************************************************/
+
+K053246_CB_MEMBER(simpsons_state::sprite_callback)
+{
+	int pri = (*color & 0x0f80) >> 6;   /* ??????? */
+
+	if (pri <= m_layerpri[2])
+		*priority_mask = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority_mask = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority_mask = 0xf0 | 0xcc;
+	else
+		*priority_mask = 0xf0 | 0xcc | 0xaa;
+
+	*color = m_sprite_colorbase + (*color & 0x001f);
+}
+
+
+/***************************************************************************
+
+  Extra video banking
+
+***************************************************************************/
+
+uint8_t simpsons_state::k052109_r(offs_t offset)
+{
+	return m_k052109->read(offset + 0x2000);
+}
+
+void simpsons_state::k052109_w(offs_t offset, uint8_t data)
+{
+	m_k052109->write(offset + 0x2000, data);
+}
+
+uint8_t simpsons_state::k053247_r(offs_t offset)
+{
+	int offs = offset >> 1;
+
+	if (offset & 1)
+		return(m_spriteram[offs] & 0xff);
+	else
+		return(m_spriteram[offs] >> 8);
+}
+
+void simpsons_state::k053247_w(offs_t offset, uint8_t data)
+{
+	int offs = offset >> 1;
+
+	if (offset & 1)
+		m_spriteram[offs] = (m_spriteram[offs] & 0xff00) | data;
+	else
+		m_spriteram[offs] = (m_spriteram[offs] & 0x00ff) | (data << 8);
+}
+
+void simpsons_state::video_bank_select( int bank )
+{
+	if(bank & 1)
+		m_palette_view.select(0);
+	else
+		m_palette_view.disable();
+	m_video_view.select((bank >> 1) & 1);
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t simpsons_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int layer[3], bg_colorbase;
+
+	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI4);
+
+	m_k052109->tilemap_update();
+
+	layer[0] = 0;
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
+	layer[1] = 1;
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
+	layer[2] = 2;
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+
+	konami_sortlayers3(layer, m_layerpri);
+
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(16 * bg_colorbase, cliprect);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+
+	m_k053246->k053247_sprites_draw(bitmap, cliprect);
+	return 0;
+}
+
+
+
+/***************************************************************************
+
+  EEPROM
+
+***************************************************************************/
+
+void simpsons_state::eeprom_w(uint8_t data)
+{
+	if (data == 0xff)
+		return;
+
+	ioport("EEPROMOUT")->write(data, 0xff);
+
+	video_bank_select(data & 0x03);
+
+	m_firq_enabled = data & 0x04;
+	if (!m_firq_enabled)
+		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, CLEAR_LINE);
+}
+
+/***************************************************************************
+
+  Coin Counters, Sound Interface
+
+***************************************************************************/
+
+void simpsons_state::coin_counter_w(uint8_t data)
+{
+	/* bit 0,1 coin counters */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	/* bit 2 selects mono or stereo sound */
+	/* bit 3 = enable char ROM reading through the video RAM */
+	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	/* bit 4 = INIT (unknown) */
+	/* bit 5 = enable sprite ROM reading */
+	m_k053246->k053246_set_objcha_line((~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+uint8_t simpsons_state::sound_interrupt_r()
+{
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+
+	return 0x00;
+}
+
+
+/***************************************************************************
+
+  Banking, initialization
+
+***************************************************************************/
+
+void simpsons_state::banking_callback(u8 data)
+{
+	membank("bank1")->set_entry(data & 0x3f);
+}
+
+void simpsons_state::machine_start()
+{
+	m_spriteram = make_unique_clear<uint16_t[]>(0x1000 / 2);
+
+	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x2000);
+
+	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0);
+	membank("bank2")->configure_entries(2, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
+
+	save_item(NAME(m_firq_enabled));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layerpri));
+	save_pointer(NAME(m_spriteram), 0x1000 / 2);
+
+	m_dma_start_timer = timer_alloc(FUNC(simpsons_state::dma_start), this);
+	m_dma_end_timer = timer_alloc(FUNC(simpsons_state::dma_end), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
+}
+
+void simpsons_state::machine_reset()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_layerpri[i] = 0;
+		m_layer_colorbase[i] = 0;
+	}
+
+	m_sprite_colorbase = 0;
+	m_firq_enabled = 0;
+
+	/* init the default banks */
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
+	video_bank_select(0);
+
+	m_dma_start_timer->adjust(attotime::never);
+	m_dma_end_timer->adjust(attotime::never);
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
 
 
 /***************************************************************************
@@ -313,7 +620,7 @@ INTERRUPT_GEN_MEMBER(simpsons_state::periodic_irq)
 void simpsons_state::simpsons(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &simpsons_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(simpsons_state::periodic_irq)); /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
 	m_maincpu->line().set(FUNC(simpsons_state::banking_callback));
@@ -432,6 +739,35 @@ ROM_START( simpsons4pe ) /* World 4 Player, later? (by use of later leters) */
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "simpsons4pe.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
+ROM_END
+
+ROM_START( simpsons4pe2 ) // PCB is original Konami GX072 but EPROM labels are from E. Devices. Only two of the program ROMs differ.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "2 e. devices.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "1 e. devices.17c", 0x20000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
+	ROM_LOAD( "4 e. devices.13c", 0x40000, 0x20000, CRC(5f0ada6a) SHA1(7aec6083210b751084d32709c9dc50afe524fc02) )
+	ROM_LOAD( "3 e. devices.15c", 0x60000, 0x20000, CRC(22d00d1f) SHA1(ed73695fb55c5cf931e536c34ef504f0f7b6213d) )
+
+	ROM_REGION( 0x28000, "audiocpu", 0 )
+	ROM_LOAD( "5 e. devices.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_CONTINUE(                0x10000, 0x18000 )
+
+	ROM_REGION( 0x100000, "k052109", 0 ) // tiles
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
+	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
+
+	ROM_REGION( 0x400000, "k053246", 0 ) // sprites
+	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) )
+	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
+	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
+	ROM_LOAD64_WORD( "072-b11.16l", 0x000006, 0x100000, CRC(55fab05d) SHA1(54db8559d71ed257de9a29c8808654eaea0df9e2) )
+
+	ROM_REGION( 0x140000, "k053260", 0 ) // samples
+	ROM_LOAD( "072-d05.1f", 0x000000, 0x100000, CRC(1397a73b) SHA1(369422c84cca5472967af54b8351e29fcd69f621) )
+	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "simpsons4pe2.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
 ROM_START( simpsons4pa ) /* Asia 4 Player */
@@ -609,6 +945,8 @@ ROM_START( simpsons2pj ) /* Japan 2 Player */
 	ROM_LOAD( "simpsons2pj.12c.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )
 ROM_END
 
+} // anonymous namespace
+
 
 
 /***************************************************************************
@@ -618,11 +956,12 @@ ROM_END
 ***************************************************************************/
 
 // the region warning, if one exists, is shown after the high-score screen in attract mode
-GAME( 1991, simpsons,    0,        simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons4pe, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players Asia)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pa, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Asia)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons2pj, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons,     0,        simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pe,  simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pe2, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pa,  simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players Asia)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p,   simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p2,  simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2p3,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pa,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Asia)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons2pj,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players Japan)",        MACHINE_SUPPORTS_SAVE )

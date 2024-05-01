@@ -22,19 +22,19 @@ uint8_t m68307_cpu_device::m68307_internal_mbus_r(offs_t offset)
 	switch (offset)
 	{
 		case m68307BUS_MADR:
-			logerror("%08x m68307_internal_mbus_r %08x (MADR - M-Bus Address Register)\n", m_ppc, offset);
+			logerror("%08x m68307_internal_mbus_r %08x (MADR - M-Bus Address Register)\n", m_ipc, offset);
 			return machine().rand();
 
 		case m68307BUS_MFDR:
-			logerror("%08x m68307_internal_mbus_r %08x (MFDR - M-Bus Frequency Divider Register)\n", m_ppc, offset);
+			logerror("%08x m68307_internal_mbus_r %08x (MFDR - M-Bus Frequency Divider Register)\n", m_ipc, offset);
 			return machine().rand();
 
 		case m68307BUS_MBCR:
-			logerror("%08x m68307_internal_mbus_r %08x (MFCR - M-Bus Control Register)\n", m_ppc, offset);
+			logerror("%08x m68307_internal_mbus_r %08x (MFCR - M-Bus Control Register)\n", m_ipc, offset);
 			return mbus.m_MFCR;//machine().rand();
 
 		case m68307BUS_MBSR:
-			logerror("%08x m68307_internal_mbus_r %08x (MBSR - M-Bus Status Register)\n", m_ppc, offset);
+			logerror("%08x m68307_internal_mbus_r %08x (MBSR - M-Bus Status Register)\n", m_ipc, offset);
 			retval = 0;
 			if (mbus.m_busy) retval |= 0x20;
 			if (mbus.m_intpend) retval |= 0x02;
@@ -42,13 +42,13 @@ uint8_t m68307_cpu_device::m68307_internal_mbus_r(offs_t offset)
 			return retval;
 
 		case m68307BUS_MBDR:
-			logerror("%08x m68307_internal_mbus_r %08x (MBDR - M-Bus Data I/O Register)\n", m_ppc, offset);
+			logerror("%08x m68307_internal_mbus_r %08x (MBDR - M-Bus Data I/O Register)\n", m_ipc, offset);
 			mbus.m_intpend = true;
 			mbus_interrupt(1);
 			return 0xff;//machine().rand();
 
 		default:
-			logerror("%08x m68307_internal_mbus_r %08x (UNKNOWN / ILLEGAL)\n", m_ppc, offset);
+			logerror("%08x m68307_internal_mbus_r %08x (UNKNOWN / ILLEGAL)\n", m_ipc, offset);
 			return 0x00;
 	}
 
@@ -63,15 +63,15 @@ void m68307_cpu_device::m68307_internal_mbus_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case m68307BUS_MADR:
-			logerror("%08x m68307_internal_mbus_w %08x, %02x (MADR - M-Bus Address Register)\n", m_ppc, offset,data);
+			logerror("%08x m68307_internal_mbus_w %08x, %02x (MADR - M-Bus Address Register)\n", m_ipc, offset,data);
 			break;
 
 		case m68307BUS_MFDR:
-			logerror("%08x m68307_internal_mbus_w %08x, %02x (MFDR - M-Bus Frequency Divider Register)\n", m_ppc, offset,data);
+			logerror("%08x m68307_internal_mbus_w %08x, %02x (MFDR - M-Bus Frequency Divider Register)\n", m_ipc, offset,data);
 			break;
 
 		case m68307BUS_MBCR:
-			logerror("%08x m68307_internal_mbus_w %08x, %02x (MFCR - M-Bus Control Register)\n", m_ppc, offset,data);
+			logerror("%08x m68307_internal_mbus_w %08x, %02x (MFCR - M-Bus Control Register)\n", m_ipc, offset,data);
 
 			mbus.m_MFCR = data;
 			if (data & 0x80)
@@ -85,11 +85,11 @@ void m68307_cpu_device::m68307_internal_mbus_w(offs_t offset, uint8_t data)
 			break;
 
 		case m68307BUS_MBSR:
-			logerror("%08x m68307_internal_mbus_w %08x, %02x (MBSR - M-Bus Status Register)\n", m_ppc, offset,data);
+			logerror("%08x m68307_internal_mbus_w %08x, %02x (MBSR - M-Bus Status Register)\n", m_ipc, offset,data);
 			break;
 
 		case m68307BUS_MBDR:
-			logerror("%08x m68307_internal_mbus_w %08x, %02x (MBDR - M-Bus Data I/O Register)\n", m_ppc, offset,data);
+			logerror("%08x m68307_internal_mbus_w %08x, %02x (MBDR - M-Bus Data I/O Register)\n", m_ipc, offset,data);
 
 			mbus.m_intpend = true;
 			mbus_interrupt(1);
@@ -97,7 +97,7 @@ void m68307_cpu_device::m68307_internal_mbus_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			logerror("%08x m68307_internal_mbus_w %08x, %02x (UNKNOWN / ILLEGAL)\n", m_ppc, offset,data);
+			logerror("%08x m68307_internal_mbus_w %08x, %02x (UNKNOWN / ILLEGAL)\n", m_ipc, offset,data);
 			break;
 	}
 }

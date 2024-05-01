@@ -32,8 +32,7 @@ protected:
 	// device base class constructor
 	rst_buffer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 
 	// synchronization helpers
@@ -57,13 +56,13 @@ public:
 	rst_pos_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// set RST 1/RST 08H request line (modifies bit 3 of vector)
-	DECLARE_WRITE_LINE_MEMBER(rst1_w) { sync_input(state, 0x08); }
+	void rst1_w(int state) { sync_input(state, 0x08); }
 
 	// set RST 2/RST 10H request line (modifies bit 4 of vector)
-	DECLARE_WRITE_LINE_MEMBER(rst2_w) { sync_input(state, 0x10); }
+	void rst2_w(int state) { sync_input(state, 0x10); }
 
 	// set RST 3/RST 20H request line (modifies bit 5 of vector)
-	DECLARE_WRITE_LINE_MEMBER(rst4_w) { sync_input(state, 0x20); }
+	void rst4_w(int state) { sync_input(state, 0x20); }
 
 protected:
 	// getter (required override)
@@ -79,13 +78,13 @@ public:
 	rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// set RST 30H request line (modifies bit 3 of vector)
-	DECLARE_WRITE_LINE_MEMBER(rst30_w) { sync_input(state, 0x08); }
+	void rst30_w(int state) { sync_input(state, 0x08); }
 
 	// set RST 28H request line (modifies bit 4 of vector)
-	DECLARE_WRITE_LINE_MEMBER(rst28_w) { sync_input(state, 0x10); }
+	void rst28_w(int state) { sync_input(state, 0x10); }
 
 	// set RST 18H request line (modifies bit 5 of vector)
-	DECLARE_WRITE_LINE_MEMBER(rst18_w) { sync_input(state, 0x20); }
+	void rst18_w(int state) { sync_input(state, 0x20); }
 
 protected:
 	// getter (required override)

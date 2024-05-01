@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_MACE_H
-#define MAME_MACHINE_MACE_H
+#ifndef MAME_SGI_MACE_H
+#define MAME_SGI_MACE_H
 
 #pragma once
 
@@ -31,7 +31,6 @@ public:
 	void map(address_map &map);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -113,4 +112,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SGI_MACE, mace_device)
 
-#endif // MAME_MACHINE_MACE_H
+#endif // MAME_SGI_MACE_H

@@ -28,12 +28,7 @@ public:
 	// construction/destruction
 	vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	static void reverse_players(device_t *device) { downcast<vcs_paddles_device &>(*device).m_reverse_players = true; }
 
 	// device_vcs_control_port_interface overrides
 	virtual uint8_t vcs_joy_r() override;
@@ -43,10 +38,19 @@ protected:
 	virtual bool has_pot_x() override { return true; }
 	virtual bool has_pot_y() override { return true; }
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
 	required_ioport m_joy;
 	required_ioport m_potx;
 	required_ioport m_poty;
+
+	bool m_reverse_players;
 };
 
 

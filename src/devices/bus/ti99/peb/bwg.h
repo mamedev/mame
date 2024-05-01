@@ -39,33 +39,32 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 	// Latch callbacks
-	DECLARE_WRITE_LINE_MEMBER( den_w );
-	DECLARE_WRITE_LINE_MEMBER( mop_w );
-	DECLARE_WRITE_LINE_MEMBER( waiten_w );
-	DECLARE_WRITE_LINE_MEMBER( hlt_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel1_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel2_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel3_w );
-	DECLARE_WRITE_LINE_MEMBER( dsel4_w );
-	DECLARE_WRITE_LINE_MEMBER( sidsel_w );
-	DECLARE_WRITE_LINE_MEMBER( dden_w );
+	void den_w(int state);
+	void mop_w(int state);
+	void waiten_w(int state);
+	void hlt_w(int state);
+	void dsel1_w(int state);
+	void dsel2_w(int state);
+	void dsel3_w(int state);
+	void dsel4_w(int state);
+	void sidsel_w(int state);
+	void dden_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( motorona_w );
+	void motorona_w(int state);
 
 	void select_drive(int n, int state);
 
@@ -113,7 +112,7 @@ private:
 	required_device<ram_device> m_buffer_ram;
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Currently selected floppy drive (1-4, 0=none)
 	int m_sel_floppy;

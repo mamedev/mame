@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCO_C355SPR_H
-#define MAME_VIDEO_NAMCO_C355SPR_H
+#ifndef MAME_SHARED_NAMCO_C355SPR_H
+#define MAME_SHARED_NAMCO_C355SPR_H
 
 #pragma once
 
@@ -39,7 +39,7 @@ public:
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 position_r(offs_t offset);
 	void position_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
 	typedef device_delegate<u16(int, u8)> c355_obj_entry_attr_delegate;
@@ -163,4 +163,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device)
 
-#endif // MAME_VIDEO_NAMCO_C355SPR_H
+#endif // MAME_SHARED_NAMCO_C355SPR_H

@@ -1,7 +1,7 @@
 // Windows/FileMapping.h
 
-#ifndef __WINDOWS_FILEMAPPING_H
-#define __WINDOWS_FILEMAPPING_H
+#ifndef ZIP7_INC_WINDOWS_FILE_MAPPING_H
+#define ZIP7_INC_WINDOWS_FILE_MAPPING_H
 
 #include "../Common/MyTypes.h"
 
@@ -34,7 +34,7 @@ public:
     return res;
     #else
     _handle = ::OpenFileMapping(desiredAccess, FALSE, name);
-    if (_handle != 0)
+    if (_handle != NULL)
       return 0;
     return ::GetLastError();
     #endif

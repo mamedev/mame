@@ -72,59 +72,45 @@ puzznici note
 #include "speaker.h"
 
 
-void taitol_state::state_register()
+void taitol_state::machine_start()
 {
 	save_item(NAME(m_last_irq_level));
 }
 
-void taitol_2cpu_state::state_register()
+void taitol_2cpu_state::machine_start()
 {
+	taitol_state::machine_start();
+
 	if (m_audio_bnk.found())
 		m_audio_bnk->configure_entries(0, m_audio_prg->bytes()/0x4000, m_audio_prg->base(), 0x4000);
-
-	taitol_state::state_register();
 }
 
-void fhawk_state::state_register()
+void fhawk_state::machine_start()
 {
+	taitol_2cpu_state::machine_start();
+
 	m_slave_bnk->configure_entries(0, m_slave_prg->bytes()/0x4000, m_slave_prg->base(), 0x4000);
-	taitol_2cpu_state::state_register();
 
 	save_item(NAME(m_slave_rombank));
 }
 
-void champwr_state::state_register()
+void champwr_state::machine_start()
 {
-	fhawk_state::state_register();
+	fhawk_state::machine_start();
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_data));
 }
 
-void taitol_1cpu_state::state_register()
-{
-	taitol_state::state_register();
-}
 
-
-MACHINE_START_MEMBER(taitol_state, taito_l)
-{
-	state_register();
-}
-
-void taitol_state::taito_machine_reset()
+void taitol_state::machine_reset()
 {
 	m_last_irq_level = 0;
 }
 
-void taitol_2cpu_state::taito_machine_reset()
+void fhawk_state::machine_reset()
 {
-	taitol_state::taito_machine_reset();
-}
-
-void fhawk_state::taito_machine_reset()
-{
-	taitol_2cpu_state::taito_machine_reset();
+	taitol_2cpu_state::machine_reset();
 
 	m_slave_rombank = 0;
 	m_slave_bnk->set_entry(m_slave_rombank);
@@ -132,23 +118,12 @@ void fhawk_state::taito_machine_reset()
 	m_audio_bnk->set_entry(1);
 }
 
-void champwr_state::taito_machine_reset()
+void champwr_state::machine_reset()
 {
-	fhawk_state::taito_machine_reset();
+	fhawk_state::machine_reset();
 
 	m_adpcm_pos = 0;
 	m_adpcm_data = -1;
-}
-
-void taitol_1cpu_state::taito_machine_reset()
-{
-	taitol_state::taito_machine_reset();
-}
-
-
-MACHINE_RESET_MEMBER(taitol_state, taito_l)
-{
-	taito_machine_reset();
 }
 
 
@@ -233,7 +208,7 @@ u8 taitol_state::mcu_control_r()
 	return 0x1;
 }
 
-WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
+void champwr_state::msm5205_vck(int state)
 {
 	if (m_adpcm_data != -1)
 	{
@@ -1309,9 +1284,6 @@ void fhawk_state::fhawk(machine_config &config)
 	tc0220ioc.write_4_callback().set(FUNC(taitol_state::coin_control_w));
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
-
 	/* video hardware */
 	l_system_video(config);
 
@@ -1327,8 +1299,8 @@ void fhawk_state::fhawk(machine_config &config)
 	ymsnd.add_route(3, "mono", 0.80);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag("slave");
-	ciu.set_slave_tag(m_audio_cpu);
+	ciu.nmi_callback().set_inputline(m_audio_cpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audio_cpu, INPUT_LINE_RESET);
 }
 
 void champwr_state::champwr(machine_config &config)
@@ -1376,9 +1348,6 @@ void taitol_2cpu_state::raimais(machine_config &config)
 
 	MB8421(config, "dpram");
 
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
-
 	/* video hardware */
 	l_system_video(config);
 
@@ -1392,8 +1361,8 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag("slave");
-	tc0140syt.set_slave_tag(m_audio_cpu);
+	tc0140syt.nmi_callback().set_inputline(m_audio_cpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audio_cpu, INPUT_LINE_RESET);
 }
 
 void taitol_2cpu_state::kurikint(machine_config &config)
@@ -1418,9 +1387,6 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	MB8421(config, "dpram");
-
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);
@@ -1452,9 +1418,6 @@ void taitol_1cpu_state::base(machine_config &config)
 	TC0090LVC(config, m_main_cpu, XTAL(13'330'560)/2);    /* verified freq on pin122 of TC0090LVC cpu */
 	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::plotting_map);
 	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
-
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);
@@ -1495,11 +1458,15 @@ void taitol_1cpu_state::puzznici(machine_config &config)
 
 void horshoes_state::machine_start()
 {
+	taitol_1cpu_state::machine_start();
+
 	save_item(NAME(m_horshoes_gfxbank));
 }
 
 void horshoes_state::machine_reset()
 {
+	taitol_1cpu_state::machine_reset();
+
 	m_horshoes_gfxbank = 0;
 }
 
@@ -1565,9 +1532,6 @@ void taitol_2cpu_state::evilston(machine_config &config)
 	mb8421_device &dpram(MB8421(config, "dpram"));
 	dpram.intl_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
-
 	/* video hardware */
 	l_system_video(config);
 
@@ -1584,59 +1548,71 @@ void taitol_2cpu_state::evilston(machine_config &config)
 
 ROM_START( raimais )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "b36-11-1.bin", 0x00000, 0x20000, CRC(f19fb0d5) SHA1(ba7187dfa5b4a08cebf236913a80066dafbbc59f) )
-	ROM_LOAD( "b36-09.bin",   0x20000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
+	ROM_LOAD( "b36_11-1.ic7", 0x00000, 0x20000, CRC(f19fb0d5) SHA1(ba7187dfa5b4a08cebf236913a80066dafbbc59f) )
+	ROM_LOAD( "b36_09.ic13",  0x20000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "b36-06.bin",   0x00000, 0x10000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
+	ROM_LOAD( "b36_06.ic24",  0x00000, 0x10000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
 
 	ROM_REGION( 0x10000, "slave", 0 )
-	ROM_LOAD( "b36-07.bin",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
+	ROM_LOAD( "b36_07.ic2",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
 
 	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
-	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
-	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
+	ROM_LOAD( "b36-01.ic6",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) ) // mask ROM
+	ROM_LOAD( "b36-02.ic12",  0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) ) // mask ROM
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
-	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
+	ROM_LOAD( "b36-03.ic28",  0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) ) // mask ROM
+
+	ROM_REGION( 0x022e, "plds", 0 )
+	ROM_LOAD( "b36-04.ic3",     0x0000, 0x0117, CRC(59847b86) SHA1(8a861cc0eeb3ea5f39b7fd4d4b1e44c3555dc2da) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "b36-05.ic11",    0x0117, 0x0117, CRC(57342384) SHA1(549ac36668692b5839f59d6915712c48240af21e) ) // PAL16L8 - bruteforced
 ROM_END
 
 ROM_START( raimaisj )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "b36-08-1.bin", 0x00000, 0x20000, CRC(6cc8f79f) SHA1(17b4903f87e6d5447c8557c2baca1728f86245dc) )
-	ROM_LOAD( "b36-09.bin",   0x20000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
+	ROM_LOAD( "b36_08-1.ic7", 0x00000, 0x20000, CRC(6cc8f79f) SHA1(17b4903f87e6d5447c8557c2baca1728f86245dc) )
+	ROM_LOAD( "b36_09.ic13",  0x20000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "b36-06.bin",   0x00000, 0x10000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
+	ROM_LOAD( "b36_06.ic24",  0x00000, 0x10000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
 
 	ROM_REGION( 0x10000, "slave", 0 )
-	ROM_LOAD( "b36-07.bin",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
+	ROM_LOAD( "b36_07.ic2",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
 
 	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
-	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
-	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
+	ROM_LOAD( "b36-01.ic6",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) ) // mask ROM
+	ROM_LOAD( "b36-02.ic12",  0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) ) // mask ROM
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
-	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
+	ROM_LOAD( "b36-03.ic28",  0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) ) // mask ROM
+
+	ROM_REGION( 0x022e, "plds", 0 )
+	ROM_LOAD( "b36-04.ic3",     0x0000, 0x0117, CRC(59847b86) SHA1(8a861cc0eeb3ea5f39b7fd4d4b1e44c3555dc2da) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "b36-05.ic11",    0x0117, 0x0117, CRC(57342384) SHA1(549ac36668692b5839f59d6915712c48240af21e) ) // PAL16L8 - bruteforced
 ROM_END
 
 ROM_START( raimaisjo )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "b36-08.bin", 0x00000, 0x20000, CRC(f40b9178) SHA1(ccf5afcf08cac0d5b2d6ba74abd62d35412f0265) )
-	ROM_LOAD( "b36-09.bin", 0x20000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
+	ROM_LOAD( "b36_08.ic7",   0x00000, 0x20000, CRC(f40b9178) SHA1(ccf5afcf08cac0d5b2d6ba74abd62d35412f0265) )
+	ROM_LOAD( "b36_09.ic13",  0x20000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "b36-06.bin",   0x00000, 0x10000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
+	ROM_LOAD( "b36_06.ic24",  0x00000, 0x10000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
 
 	ROM_REGION( 0x10000, "slave", 0 )
-	ROM_LOAD( "b36-07.bin",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
+	ROM_LOAD( "b36_07.ic2",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
 
 	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
-	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
-	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
+	ROM_LOAD( "b36-01.ic6",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) ) // mask ROM
+	ROM_LOAD( "b36-02.ic12",  0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) ) // mask ROM
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
-	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
+	ROM_LOAD( "b36-03.ic28",  0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) ) // mask ROM
+
+	ROM_REGION( 0x022e, "plds", 0 )
+	ROM_LOAD( "b36-04.ic3",     0x0000, 0x0117, CRC(59847b86) SHA1(8a861cc0eeb3ea5f39b7fd4d4b1e44c3555dc2da) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "b36-05.ic11",    0x0117, 0x0117, CRC(57342384) SHA1(549ac36668692b5839f59d6915712c48240af21e) ) // PAL16L8 - bruteforced
 ROM_END
 
 ROM_START( fhawk )
@@ -2035,7 +2011,6 @@ ROM_START( horshoes )
 
 	ROM_REGION( 0x0200, "plds", 0 ) // PAL20L8BCNS
 	ROM_LOAD( "c47-06.ic12", 0x0000, 0x0144, CRC(4342ca6c) SHA1(9c798a6f1508b03004b76577eb823f004df7298d) )
-
 ROM_END
 
 ROM_START( palamed ) /* Prototype or location test?? - Line 5 of notice screen says "Territory" later sets say "Territories" */

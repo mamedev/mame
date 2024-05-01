@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_VIDEO_TC0280GRD_H
-#define MAME_VIDEO_TC0280GRD_H
+#ifndef MAME_TAITO_TC0280GRD_H
+#define MAME_TAITO_TC0280GRD_H
 
 #pragma once
 
@@ -54,4 +54,4 @@ DECLARE_DEVICE_TYPE(TC0280GRD, tc0280grd_device)
 
 #define TC0430GRW TC0280GRD
 
-#endif // MAME_VIDEO_TC0280GRD_H
+#endif // MAME_TAITO_TC0280GRD_H

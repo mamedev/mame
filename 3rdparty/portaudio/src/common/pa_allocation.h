@@ -29,13 +29,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -44,12 +44,12 @@
 
  @brief Allocation Group prototypes. An Allocation Group makes it easy to
  allocate multiple blocks of memory and free them all at once.
- 
+
  An allocation group is useful for keeping track of multiple blocks
  of memory which are allocated at the same time (such as during initialization)
  and need to be deallocated at the same time. The allocation group maintains
  a list of allocated blocks, and can free all allocations at once. This
- can be usefull for cleaning up after a partially initialized object fails.
+ can be useful for cleaning up after a partially initialized object fails.
 
  The allocation group implementation is built on top of the lower
  level allocation functions defined in pa_util.h
@@ -80,11 +80,12 @@ PaUtilAllocationGroup* PaUtil_CreateAllocationGroup( void );
 */
 void PaUtil_DestroyAllocationGroup( PaUtilAllocationGroup* group );
 
-/** Allocate a block of memory though an allocation group.
+/** Allocate a block of memory through the specified allocation group.
+The allocated block is zero-initialized.
 */
-void* PaUtil_GroupAllocateMemory( PaUtilAllocationGroup* group, long size );
+void* PaUtil_GroupAllocateZeroInitializedMemory( PaUtilAllocationGroup* group, long size );
 
-/** Free a block of memory that was previously allocated though an allocation
+/** Free a block of memory that was allocated through the specified allocation
  group. Calling this function is a relatively time consuming operation.
  Under normal circumstances clients should call PaUtil_FreeAllAllocations to
  free all allocated blocks simultaneously.

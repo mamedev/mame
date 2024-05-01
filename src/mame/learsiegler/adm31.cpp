@@ -29,6 +29,9 @@
 #include "video/tms9927.h"
 #include "screen.h"
 
+
+namespace {
+
 class adm31_state : public driver_device
 {
 public:
@@ -508,6 +511,8 @@ ROM_START(adm31)
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("chargen.bin", 0x0000, 0x0800, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1978, adm31, 0, 0, adm31, adm31, adm31_state, empty_init, "Lear Siegler", "ADM-31 Data Display Terminal", MACHINE_IS_SKELETON)

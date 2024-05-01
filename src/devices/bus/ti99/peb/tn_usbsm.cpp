@@ -42,9 +42,9 @@
 #include "emu.h"
 #include "tn_usbsm.h"
 
-#define LOG_WARN        (1U<<1)    // Warnings
+#define LOG_WARN        (1U << 1)    // Warnings
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE (LOG_WARN)
 #include "logmacro.h"
 
 

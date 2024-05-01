@@ -90,7 +90,7 @@ private:
 	void sh96_protection_region_0_146_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
+	void screen_vblank_mlc(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void draw_sprites( const rectangle &cliprect, int scanline, u32* dest, u8* pri);
 	void drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gfx_element *gfx,

@@ -7,11 +7,11 @@ BEGIN
   IDS_MEM_ERROR  "The system cannot allocate the required amount of memory"
   IDS_CANNOT_CREATE_FOLDER  "Cannot create folder '{0}'"
   IDS_UPDATE_NOT_SUPPORTED  "Update operations are not supported for this archive."
-  IDS_CANT_OPEN_ARCHIVE  "Can not open file '{0}' as archive"
-  IDS_CANT_OPEN_ENCRYPTED_ARCHIVE  "Can not open encrypted archive '{0}'. Wrong password?"
+  IDS_CANT_OPEN_ARCHIVE  "Cannot open file '{0}' as archive"
+  IDS_CANT_OPEN_ENCRYPTED_ARCHIVE  "Cannot open encrypted archive '{0}'. Wrong password?"
   IDS_UNSUPPORTED_ARCHIVE_TYPE  "Unsupported archive type"
 
-  IDS_CANT_OPEN_AS_TYPE   "Can not open the file as {0} archive"
+  IDS_CANT_OPEN_AS_TYPE   "Cannot open the file as {0} archive"
   IDS_IS_OPEN_AS_TYPE     "The file is open as {0} archive"
   IDS_IS_OPEN_WITH_OFFSET "The archive is open with offset"
 
@@ -45,7 +45,7 @@ BEGIN
   IDS_EXTRACT_MSG_DATA_ERROR           "Data error"
   IDS_EXTRACT_MSG_CRC_ERROR            "CRC failed"
   IDS_EXTRACT_MSG_UNAVAILABLE_DATA     "Unavailable data"
-  IDS_EXTRACT_MSG_UEXPECTED_END        "Unexpected end of data";
+  IDS_EXTRACT_MSG_UEXPECTED_END        "Unexpected end of data"
   IDS_EXTRACT_MSG_DATA_AFTER_END       "There are some data after the end of the payload data"  
   IDS_EXTRACT_MSG_IS_NOT_ARC           "Is not archive"  
   IDS_EXTRACT_MSG_HEADERS_ERROR        "Headers Error"

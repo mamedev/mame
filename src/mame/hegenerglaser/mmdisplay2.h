@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-/**********************************************************************
+/*******************************************************************************
 
     Mephisto Modular Display Module (2nd version)
 
-*********************************************************************/
+*******************************************************************************/
 
-#ifndef MAME_VIDEO_MMDISPLAY2_H
-#define MAME_VIDEO_MMDISPLAY2_H
+#ifndef MAME_HEGENERGLASER_MMDISPLAY2_H
+#define MAME_HEGENERGLASER_MMDISPLAY2_H
 
 #pragma once
 
@@ -39,14 +39,14 @@ private:
 	required_device<hd44780_device> m_lcd;
 	required_device<speaker_sound_device> m_dac;
 
+	u8 m_latch;
+	u8 m_ctrl;
+
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
-
-	u8 m_latch = 0;
-	u8 m_ctrl = 0;
 };
 
 
 DECLARE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device)
 
-#endif // MAME_VIDEO_MMDISPLAY2_H
+#endif // MAME_HEGENERGLASER_MMDISPLAY2_H

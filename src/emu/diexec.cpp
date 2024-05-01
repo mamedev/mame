@@ -70,8 +70,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_attoseconds_per_cycle(0)
 	, m_spin_end_timer(nullptr)
 {
-	memset(&m_localtime, 0, sizeof(m_localtime));
-
 	// configure the fast accessor
 	assert(!device.interfaces().m_execute);
 	device.interfaces().m_execute = this;
@@ -520,17 +518,12 @@ void device_execute_interface::interface_clock_changed(bool sync_on_new_clock_do
 
 
 //-------------------------------------------------
-//  standard_irq_callback_member - IRQ acknowledge
+//  standard_irq_callback - IRQ acknowledge
 //  callback; handles HOLD_LINE case and signals
 //  to the debugger
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER( device_execute_interface::standard_irq_callback_member )
-{
-	return device.execute().standard_irq_callback(irqline);
-}
-
-int device_execute_interface::standard_irq_callback(int irqline)
+int device_execute_interface::standard_irq_callback(int irqline, offs_t pc)
 {
 	// get the default vector and acknowledge the interrupt if needed
 	int vector = m_input[irqline].default_irq_callback();
@@ -543,7 +536,7 @@ int device_execute_interface::standard_irq_callback(int irqline)
 
 	// notify the debugger
 	if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
-		device().debug()->interrupt_hook(irqline);
+		device().debug()->interrupt_hook(irqline, pc);
 
 	return vector;
 }

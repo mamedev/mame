@@ -145,24 +145,24 @@ namespace {
 union ADDR_REG
 {
 #ifdef LSB_FIRST
-	struct { uint16_t loword, hiword ; } as16bit;
+	struct { uint16_t loword, hiword; } as16bit;
 	struct { uint8_t addr0, addr1, addr2; } as8bit;
 #else
-	struct { uint16_t hiword, loword ; } as16bit;
+	struct { uint16_t hiword, loword; } as16bit;
 	struct { uint8_t addr2, addr1, addr0; } as8bit;
 #endif
 	uint32_t addr = 0;
 };
 
 /* Blitter register flag bits */
-#define CMD_RUN         0x01
-#define CMD_COLST       0x02
-#define CMD_PARRD       0x04        /* Never used? */
-#define CMD_SRCUP       0x08
-#define CMD_DSTUP       0x10
-#define CMD_LT0         0x20
-#define CMD_LT1         0x40
-#define CMD_LINEDRAW    0x80
+static constexpr uint8_t CMD_RUN         = 0x01;
+static constexpr uint8_t CMD_COLST       = 0x02;
+static constexpr uint8_t CMD_PARRD       = 0x04;        /* Never used? */
+static constexpr uint8_t CMD_SRCUP       = 0x08;
+static constexpr uint8_t CMD_DSTUP       = 0x10;
+static constexpr uint8_t CMD_LT0         = 0x20;
+static constexpr uint8_t CMD_LT1         = 0x40;
+static constexpr uint8_t CMD_LINEDRAW    = 0x80;
 
 
 /* All unconfirmed */
@@ -172,20 +172,20 @@ union ADDR_REG
 #define SRCDST_A_1      0x80        /* This might be correct for line drawing? */
 
 /* These appear to be correct */
-#define MODE_SSIGN      0x80
-#define MODE_DSIGN      0x40
-#define MODE_YFRAC      0x20
-#define MODE_BITTOBYTE  0x04
-#define MODE_PALREMAP   0x10
+static constexpr uint8_t MODE_SSIGN      = 0x80;
+static constexpr uint8_t MODE_DSIGN      = 0x40;
+static constexpr uint8_t MODE_YFRAC      = 0x20;
+static constexpr uint8_t MODE_BITTOBYTE  = 0x04;
+static constexpr uint8_t MODE_PALREMAP   = 0x10;
 
-#define CMPFUNC_LT      0x01
-#define CMPFUNC_EQ      0x02
-#define CMPFUNC_GT      0x04
-#define CMPFUNC_BEQ     0x08
-#define CMPFUNC_LOG0    0x10
-#define CMPFUNC_LOG1    0x20
-#define CMPFUNC_LOG2    0x40
-#define CMPFUNC_LOG3    0x80
+static constexpr uint8_t CMPFUNC_LT      = 0x01;
+static constexpr uint8_t CMPFUNC_EQ      = 0x02;
+static constexpr uint8_t CMPFUNC_GT      = 0x04;
+static constexpr uint8_t CMPFUNC_BEQ     = 0x08;
+static constexpr uint8_t CMPFUNC_LOG0    = 0x10;
+static constexpr uint8_t CMPFUNC_LOG1    = 0x20;
+static constexpr uint8_t CMPFUNC_LOG2    = 0x40;
+static constexpr uint8_t CMPFUNC_LOG3    = 0x80;
 
 /*
     Blitter state
@@ -194,26 +194,26 @@ struct bf_blitter_t
 {
 	ADDR_REG    program;
 
-	uint8_t       control = 0;
-	uint8_t       status = 0;
+	uint8_t     control = 0;
+	uint8_t     status = 0;
 
-	uint8_t       command = 0;
+	uint8_t     command = 0;
 	ADDR_REG    source;
 	ADDR_REG    dest;
-	uint8_t       modectl = 0;
-	uint8_t       compfunc = 0;
-	uint8_t       outercnt = 0;
+	uint8_t     modectl = 0;
+	uint8_t     compfunc = 0;
+	uint8_t     outercnt = 0;
 
-	uint8_t       innercnt = 0;
-	uint8_t       step = 0;
-	uint8_t       pattern = 0;
+	uint8_t     innercnt = 0;
+	uint8_t     step = 0;
+	uint8_t     pattern = 0;
 };
 
 #define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
 
 struct fdc_t
 {
-	uint8_t   MSR = 0;
+	uint8_t MSR = 0;
 
 	int     side = 0;
 	int     track = 0;
@@ -231,8 +231,8 @@ struct fdc_t
 	int     cmd_cnt = 0;
 	int     res_len = 0;
 	int     res_cnt = 0;
-	uint8_t   cmd[10]{};
-	uint8_t   results[8]{};
+	uint8_t cmd[10]{};
+	uint8_t results[8]{};
 };
 
 
@@ -290,10 +290,10 @@ protected:
 	void latch_w(offs_t offset, uint8_t data);
 	uint8_t upd_r();
 	void upd_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void z80_acia_irq(int state);
+	void m6809_data_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -304,7 +304,7 @@ protected:
 	void reset_fdc();
 	void exec_w_phase(uint8_t data);
 	void init_ram();
-	void command_phase(struct fdc_t &fdc, uint8_t data);
+	void command_phase(fdc_t &fdc, uint8_t data);
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z80_bank(int num, int data);
 
@@ -339,7 +339,7 @@ private:
 	uint8_t m_col7bit[256]{};
 	uint8_t m_col6bit[256]{};
 	struct bf_blitter_t m_blitter;
-	struct fdc_t m_fdc;
+	fdc_t m_fdc;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -589,7 +589,7 @@ void bfcobra_state::RunBlit()
 					}
 					if( blitter.source.as8bit.addr0 < blitter.step )
 					{
-						blitter.source.as8bit.addr0 -= blitter.step ;
+						blitter.source.as8bit.addr0 -= blitter.step;
 						blitter.source.as8bit.addr0 += blitter.source.as8bit.addr1;
 
 						if ( blitter.modectl & MODE_YFRAC )
@@ -640,7 +640,7 @@ void bfcobra_state::RunBlit()
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
-							blitter.source.as16bit.loword-- ;
+							blitter.source.as16bit.loword--;
 						else
 							blitter.source.as16bit.loword++;
 
@@ -1058,7 +1058,7 @@ enum command
 
 void bfcobra_state::reset_fdc()
 {
-	memset(&m_fdc, 0, sizeof(m_fdc));
+	m_fdc = fdc_t();
 
 	m_fdc.MSR = 0x80;
 	m_fdc.phase = COMMAND;
@@ -1075,71 +1075,70 @@ uint8_t bfcobra_state::fdctrl_r()
 
 uint8_t bfcobra_state::fddata_r()
 {
-	struct fdc_t &fdc = m_fdc;
-	#define BPS     1024
-	#define SPT     10
-	#define BPT     1024*10
+	constexpr int BPS = 1024;
+	constexpr int SPT = 10;
+	constexpr int BPT = BPS * SPT;
 
 	uint8_t val = 0;
 
-	if (fdc.phase == EXECUTION_R)
+	if (m_fdc.phase == EXECUTION_R)
 	{
-		switch (fdc.cmd[0] & 0x1f)
+		switch (m_fdc.cmd[0] & 0x1f)
 		{
 			/* Specify */
 			case READ_DATA:
 			{
-				if (fdc.setup_read)
+				if (m_fdc.setup_read)
 				{
-					fdc.track = fdc.cmd[2];
-					fdc.side = fdc.cmd[3];
-					fdc.sector = fdc.cmd[4];
-					fdc.number = fdc.cmd[5];
-					fdc.stop_track = fdc.cmd[6];
-					//int GPL = fdc.cmd[7];
-					//int DTL = fdc.cmd[8];
+					m_fdc.track = m_fdc.cmd[2];
+					m_fdc.side = m_fdc.cmd[3];
+					m_fdc.sector = m_fdc.cmd[4];
+					m_fdc.number = m_fdc.cmd[5];
+					m_fdc.stop_track = m_fdc.cmd[6];
+					//int GPL = m_fdc.cmd[7];
+					//int DTL = m_fdc.cmd[8];
 
-					fdc.setup_read = 0;
-					fdc.byte_pos = 0;
+					m_fdc.setup_read = 0;
+					m_fdc.byte_pos = 0;
 				}
 
-				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memregion("user2")->base() + fdc.offset);
+				m_fdc.offset = (BPT * m_fdc.track*2) + (m_fdc.side ? BPT : 0) + (BPS * (m_fdc.sector-1)) + m_fdc.byte_pos++;
+				val = *(memregion("user2")->base() + m_fdc.offset);
 
 				/* Move on to next sector? */
-				if (fdc.byte_pos == 1024)
+				if (m_fdc.byte_pos == 1024)
 				{
-					fdc.byte_pos = 0;
+					m_fdc.byte_pos = 0;
 
-					if (fdc.sector == fdc.stop_track || ++fdc.sector == 11)
+					if (m_fdc.sector == m_fdc.stop_track || ++m_fdc.sector == 11)
 					{
 						/* End of read operation */
-						fdc.MSR = 0xd0;
-						fdc.phase = RESULTS;
+						m_fdc.MSR = 0xd0;
+						m_fdc.phase = RESULTS;
 
-						fdc.results[0] = 0;
-						fdc.results[1] = 0;
-						fdc.results[2] = 0;
+						m_fdc.results[0] = 0;
+						m_fdc.results[1] = 0;
+						m_fdc.results[2] = 0;
 
-						fdc.results[3] = 0;
-						fdc.results[4] = 0;
-						fdc.results[5] = 0;
-						fdc.results[6] = 0;
+						m_fdc.results[3] = 0;
+						m_fdc.results[4] = 0;
+						m_fdc.results[5] = 0;
+						m_fdc.results[6] = 0;
 					}
 				}
 				break;
 			}
 		}
 	}
-	else if (fdc.phase == RESULTS)
+	else if (m_fdc.phase == RESULTS)
 	{
-		val = fdc.results[fdc.res_cnt++];
+		val = m_fdc.results[m_fdc.res_cnt++];
 
-		if (fdc.res_cnt == fdc.res_len)
+		if (m_fdc.res_cnt == m_fdc.res_len)
 		{
-			fdc.phase = COMMAND;
-			fdc.res_cnt = 0;
-			fdc.MSR &= ~0x40;
+			m_fdc.phase = COMMAND;
+			m_fdc.res_cnt = 0;
+			m_fdc.MSR &= ~0x40;
 		}
 	}
 
@@ -1148,12 +1147,11 @@ uint8_t bfcobra_state::fddata_r()
 
 void bfcobra_state::fdctrl_w(uint8_t data)
 {
-	struct fdc_t &fdc = m_fdc;
-	switch (fdc.phase)
+	switch (m_fdc.phase)
 	{
 		case COMMAND:
 		{
-			command_phase(fdc, data);
+			command_phase(m_fdc, data);
 			break;
 		}
 		case EXECUTION_W:
@@ -1168,7 +1166,7 @@ void bfcobra_state::fdctrl_w(uint8_t data)
 	}
 }
 
-void bfcobra_state::command_phase(struct fdc_t &fdc, uint8_t data)
+void bfcobra_state::command_phase(fdc_t &fdc, uint8_t data)
 {
 	if (fdc.cmd_cnt == 0)
 	{
@@ -1572,26 +1570,26 @@ void bfcobra_state::init_ram()
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
+void bfcobra_state::z80_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
+void bfcobra_state::m6809_data_irq(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
+void bfcobra_state::data_acia_tx_w(int state)
 {
 	m_data_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
+void bfcobra_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -1808,16 +1806,16 @@ private:
 	void output0_w(uint8_t data);
 	uint8_t input0_r();
 	uint8_t input1_r();
-	DECLARE_WRITE_LINE_MEMBER(z8s180_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_dreq );
+	void z8s180_acia_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
+	void upd7759_generate_dreq(int state);
 	uint32_t screen_update_bfcobjam(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
-	TIMER_CALLBACK_MEMBER( scanline_callback ) ;
+	TIMER_CALLBACK_MEMBER( scanline_callback );
 	void RunBlit();
 	void update_irqs();
-	void genio_w( uint8_t data ) ;
+	void genio_w( uint8_t data );
 	void dotmatrix_w( uint8_t data );
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z8s180_bank(int num, int data);
@@ -1829,7 +1827,7 @@ private:
 
 void bfcobjam_state::init_bfcobjam()
 {
-	m_rompage = 0 ;
+	m_rompage = 0;
 	m_bank_data[0] = 0;
 	m_bank_data[1] = 0;
 	m_bank_data[2] = 0;
@@ -1855,7 +1853,6 @@ void bfcobjam_state::init_bfcobjam()
 	save_item(NAME(m_bank_data));
 	save_item(NAME(m_genio));
 	save_item(NAME(m_global_volume));
-
 }
 
 /*
@@ -1868,8 +1865,7 @@ void bfcobjam_state::RunBlit()
 #define BLITPRG_READ(x)     blitter.x = *(blitter_get_addr(blitter.program.addr++))
 
 	struct bf_blitter_t &blitter = m_blitter;
-	int cycles_used = 0;
-
+	[[maybe_unused]] int cycles_used = 0;
 
 	do
 	{
@@ -1952,7 +1948,7 @@ void bfcobjam_state::RunBlit()
 					}
 					if( blitter.source.as8bit.addr0 < blitter.step )
 					{
-						blitter.source.as8bit.addr0 -= blitter.step ;
+						blitter.source.as8bit.addr0 -= blitter.step;
 						blitter.source.as8bit.addr0 += blitter.source.as8bit.addr1;
 
 						if ( blitter.modectl & MODE_YFRAC )
@@ -2003,7 +1999,7 @@ void bfcobjam_state::RunBlit()
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
-							blitter.source.as16bit.loword-- ;
+							blitter.source.as16bit.loword--;
 						else
 							blitter.source.as16bit.loword++;
 
@@ -2157,9 +2153,9 @@ uint8_t* bfcobjam_state::blitter_get_addr(uint32_t addr)
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
-		addr += m_rompage * 0x10000 ;
+		addr += m_rompage * 0x10000;
 
-		return (uint8_t*)(memregion("user1")->base() + addr );
+		return (uint8_t*)(memregion("user1")->base() + addr);
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -2214,7 +2210,7 @@ uint8_t bfcobjam_state::chipset_r(offs_t offset)
 		}
 		case 0x22:
 		{
-			val = 0x40 | ioport("CJIN2")->read() | ( m_upd7759_int->busy_r() ? 0x20 : 0 ) ;
+			val = 0x40 | ioport("CJIN2")->read() | ( m_upd7759_int->busy_r() ? 0x20 : 0 );
 			break;
 		}
 		default:
@@ -2245,7 +2241,7 @@ void bfcobjam_state::chipset_w(offs_t offset, uint8_t data)
 
 		case 0x07:
 			m_scanline_timer->adjust(m_screen->time_until_pos(data));
-			break ;
+			break;
 
 		case 0x08:
 		{
@@ -2309,7 +2305,7 @@ void bfcobjam_state::chipset_w(offs_t offset, uint8_t data)
 		case 0x22:
 		{
 			m_flip_22 = data;
-			genio_w( data ) ;
+			genio_w( data );
 			break;
 		}
 		default:
@@ -2390,9 +2386,9 @@ void bfcobjam_state::z8s180_bank(int num, int data)
 	}
 	else if (data < 0x08)
 	{
-		uint32_t offset ;
-		offset = m_rompage * 0x10000 ;
-		offset += (data-4) * 0x4000 ;
+		uint32_t offset;
+		offset = m_rompage * 0x10000;
+		offset += (data-4) * 0x4000;
 
 		membank(bank_names[num])->set_base(memregion("user1")->base() + offset);
 	}
@@ -2424,7 +2420,7 @@ TIMER_CALLBACK_MEMBER( bfcobjam_state::scanline_callback )
 	update_irqs();
 }
 
-WRITE_LINE_MEMBER(bfcobjam_state::z8s180_acia_irq)
+void bfcobjam_state::z8s180_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
@@ -2433,7 +2429,7 @@ WRITE_LINE_MEMBER(bfcobjam_state::z8s180_acia_irq)
 
 void bfcobjam_state::rombank_w(uint8_t data)
 {
-	m_rompage = data ;
+	m_rompage = data;
 
 	membank("bank5")->set_entry(m_rompage & 0x0f);
 }
@@ -2454,15 +2450,15 @@ void bfcobjam_state::rombank_w(uint8_t data)
 */
 void bfcobjam_state::output0_w(uint8_t data)
 {
-	uint8_t changed = m_port_0 ^ data ;
-	m_port_0 = data ;
+	uint8_t changed = m_port_0 ^ data;
+	m_port_0 = data;
 
-	dotmatrix_w( data ) ;
+	dotmatrix_w( data );
 
 	//cobra handling of scl and sda is wrong but devices handle it ok
 	//unfortunately mame emulation of i2c 24c08 doesn't :(
 	//we frig the driving of scl/sda to correct this
-	changed &= 0x60 ;
+	changed &= 0x60;
 
 	if( changed == 0x60 )
 	{
@@ -2488,7 +2484,7 @@ void bfcobjam_state::dotmatrix_w( uint8_t data )
 {
 	if( m_dm01 )
 	{
-		data &= 0x1c ;
+		data &= 0x1c;
 
 		if( data != dm_last_data )
 		{
@@ -2497,25 +2493,25 @@ void bfcobjam_state::dotmatrix_w( uint8_t data )
 			}
 			else
 			{
-				m_dm01->reset() ;
+				m_dm01->reset();
 				dm_shift=0;
 				dm_shift_data=0;
 			}
 			if( !(data & 4 ) && ( dm_last_data & 4 ) && data & 0x10 ) // clock is low but was high and out of reset
 			{
-				dm_shift_data <<= 1 ;
+				dm_shift_data <<= 1;
 				if( !(data & 0x08 ))
 				{
-					dm_shift_data |=1 ;
+					dm_shift_data |= 1;
 				}
 				dm_shift++;
 				if( dm_shift == 8 )
 				{
 					dm_shift=0;
-					m_dm01->writedata( dm_shift_data ) ;
+					m_dm01->writedata( dm_shift_data );
 				}
 			}
-			dm_last_data = data ;
+			dm_last_data = data;
 		}
 	}
 }
@@ -2535,13 +2531,9 @@ void bfcobjam_state::aux_upd7759_w(uint8_t data)
 	if( m_aux_upd7759 )
 	{
 		m_aux_upd7759->set_rom_bank((data>>2)&3);
-
 		m_aux_upd7759->port_w((data>>4)&0xf);
-
 		m_aux_upd7759->md_w(1);
-
 		m_aux_upd7759->reset_w(BIT(data, 0));
-
 		m_aux_upd7759->start_w(!BIT(data, 1));
 	}
 }
@@ -2554,7 +2546,7 @@ uint8_t bfcobjam_state::aux_upd7759_r()
 	}
 	else
 	{
-		return 0 ;
+		return 0;
 	}
 }
 
@@ -2569,9 +2561,9 @@ void bfcobjam_state::genio_w( uint8_t data )
 	//bit 6 = ??
 	//bit 7 = ??
 
-	uint8_t changed = m_genio ^ data ;
+	uint8_t changed = m_genio ^ data;
 
-	m_genio = data ;
+	m_genio = data;
 
 	if ( changed & 0x10)
 	{ // digital volume clock line changed
@@ -2612,7 +2604,7 @@ void bfcobjam_state::upd7759_w(uint8_t data)
 	m_upd7759_int->port_w(data);
 }
 
-WRITE_LINE_MEMBER( bfcobjam_state::upd7759_generate_dreq )
+void bfcobjam_state::upd7759_generate_dreq(int state)
 {
 	if( state )
 	{
@@ -2736,13 +2728,13 @@ void bfcobjam_state::machine_reset()
 		m_palette->set_pen_color(pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
-	m_rompage = 0 ;
+	m_rompage = 0;
 	m_bank_data[0] = 0;
 	m_bank_data[1] = 0;
 	m_bank_data[2] = 0;
 	m_bank_data[3] = 0;
 
-	m_genio = 0 ;
+	m_genio = 0;
 	m_global_volume = 0;
 
 	m_ym2413->reset();
@@ -2753,10 +2745,10 @@ void bfcobjam_state::machine_reset()
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	if( m_dm01 )
-		m_dm01->reset() ;
+		m_dm01->reset();
 }
 
-WRITE_LINE_MEMBER(bfcobjam_state::write_acia_clock)
+void bfcobjam_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -2803,7 +2795,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 {
-	bfcobjam( config ) ;
+	bfcobjam( config );
 
 	UPD7759(config, m_aux_upd7759);
 	m_aux_upd7759->add_route(ALL_OUTPUTS, "mono", 0.40);

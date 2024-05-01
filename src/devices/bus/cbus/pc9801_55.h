@@ -31,7 +31,7 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
+	void scsi_irq_w(int state);
 
 protected:
 	// device-level overrides

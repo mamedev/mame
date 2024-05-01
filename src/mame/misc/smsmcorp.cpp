@@ -225,6 +225,8 @@ U145        1Brown          PAL14H4CN
 #include "speaker.h"
 
 
+namespace {
+
 class smsmfg_state : public driver_device
 {
 public:
@@ -969,6 +971,8 @@ ROM_START( secondch )
 	ROM_LOAD( "@26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
 	ROM_RELOAD(         0x1000, 0x1000 )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, trvhang,  0,       sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) // Version Trivia-1-050185

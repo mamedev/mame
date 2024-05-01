@@ -3,6 +3,8 @@
 
 @section comp_win_asiomsvc1 Portaudio Windows ASIO with MSVC
 
+<i><b>NOTE:</b>This page is for building PortAudio using the legacy MSVC project files located in the msvc// directory. You can also use the cmake build system.</i>
+
 This tutorial describes how to build PortAudio with ASIO support using MSVC *from scratch*, without an existing Visual Studio project. For instructions for building PortAudio (including ASIO support) using the bundled Visual Studio project file see the compiling instructions for \ref compile_windows.
 
 ASIO is a low latency audio API from Steinberg. To compile an ASIO
@@ -54,6 +56,7 @@ pa_stream.c                     (portaudio\src\common)
 pa_trace.c                      (portaudio\src\common)
 pa_win_hostapis.c               (portaudio\src\os\win)
 pa_win_util.c                   (portaudio\src\os\win)
+pa_win_version.c                (portaudio\src\os\win)
 pa_win_coinitialize.c           (portaudio\src\os\win)
 pa_win_waveformat.c             (portaudio\src\os\win)
 pa_x86_plain_converters.c       (portaudio\src\os\win)
@@ -86,6 +89,8 @@ Then, on the same Project Settings tab, go down to Additional Include Directorie
 You'll need to make sure the relative paths are correct for the particular directory layout you're using. The above should work fine if you use the side-by-side layout we recommended earlier.
 
 Some source code in the ASIO SDK is not compatible with the Win32 API UNICODE mode (The ASIO SDK expects the non-Unicode Win32 API). Therefore you need to make sure your project is set to not use Unicode. You do this by setting the project Character Set to "Use Multi-Byte Character Set" (NOT "Use Unicode Character Set"). In VS2010 the Character Set option can be found at Configuration Properties > General > Character Set. (An alternative to setting the project to non-Unicode is to patch asiolist.cpp to work when UNICODE is defined: put #undef UNICODE at the top of the file before windows.h is included.)
+
+Note: There's an array deletion bug in some versions of the ASIO SDK on Windows. To work around this issue you will need to patch the ASIO SDK. Please see src/host/asio/ASIO-README.txt for the fix.
 
 You should now be able to build any of the test executables in the portaudio\\examples directory.
 We suggest that you start with paex_saw.c because it's one of the simplest example files.

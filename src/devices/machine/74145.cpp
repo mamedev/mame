@@ -73,9 +73,6 @@ ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag,
 
 void ttl74145_device::device_start()
 {
-	/* resolve callbacks */
-	m_output_line_cb.resolve_all_safe();
-
 	// register for state saving
 	save_item(NAME(m_number));
 }

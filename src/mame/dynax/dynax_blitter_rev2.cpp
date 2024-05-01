@@ -71,21 +71,6 @@ dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconf
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void dynax_blitter_rev2_device::device_resolve_objects()
-{
-	m_vram_out_cb.resolve_safe();
-	m_scrollx_cb.resolve_safe();
-	m_scrolly_cb.resolve_safe();
-	m_ready_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -329,17 +314,6 @@ cdracula_blitter_device::cdracula_blitter_device(const machine_config &mconfig, 
 	: dynax_blitter_rev2_device(mconfig, CDRACULA_BLITTER, tag, owner, clock)
 	, m_blit_dest_cb(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects -
-//-------------------------------------------------
-
-void cdracula_blitter_device::device_resolve_objects()
-{
-	dynax_blitter_rev2_device::device_resolve_objects();
-	m_blit_dest_cb.resolve_safe();
 }
 
 

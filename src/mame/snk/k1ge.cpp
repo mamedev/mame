@@ -760,7 +760,7 @@ TIMER_CALLBACK_MEMBER( k1ge_device::timer_callback )
 	/* Check if Hint should be triggered */
 	if ( y == K1GE_SCREEN_HEIGHT - 1 || y < 151 )
 	{
-		if (!m_hblank_pin_w.isnull())
+		if (!m_hblank_pin_w.isunset())
 		{
 			if (m_vram[0x000] & 0x40)
 			{
@@ -792,9 +792,6 @@ void k1ge_device::update( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void k1ge_device::device_start()
 {
-	m_vblank_pin_w.resolve();
-	m_hblank_pin_w.resolve();
-
 	m_timer = timer_alloc(FUNC(k1ge_device::timer_callback), this);
 	m_hblank_on_timer = timer_alloc(FUNC(k1ge_device::hblank_on_timer_callback), this);
 	m_vram = make_unique_clear<uint8_t[]>(0x4000);

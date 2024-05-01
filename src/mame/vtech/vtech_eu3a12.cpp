@@ -9,6 +9,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class vreadere_state : public driver_device
 {
 public:
@@ -22,8 +25,8 @@ public:
 
 	void vreadere(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(power_on_w);
-	DECLARE_WRITE_LINE_MEMBER(power_off_w);
+	void power_on_w(int state);
+	void power_off_w(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -86,12 +89,12 @@ EPL43102_UPDATE_CB(vreadere_state::lcd_update)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(vreadere_state::power_on_w)
+void vreadere_state::power_on_w(int state)
 {
 	m_maincpu->set_input_line(riscii_series_device::PA6_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(vreadere_state::power_off_w)
+void vreadere_state::power_off_w(int state)
 {
 	m_maincpu->set_input_line(riscii_series_device::PA7_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -164,5 +167,8 @@ ROM_START( vreadere )
 	ROM_REGION(0x400000, "maincpu", 0)
 	ROM_LOAD( "27-08291.u2", 0x000000, 0x400000, CRC(f2eb801f) SHA1(33e2d28ab2f04b17f66880898832265d50de54d4) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 2004, vreadere, 0, 0, vreadere, vreadere, vreadere_state, empty_init, "Video Technology", "Reader Laptop E (Germany)", MACHINE_IS_SKELETON )

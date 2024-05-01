@@ -14,6 +14,9 @@
 #include "machine/i8255.h"
 //#include "screen.h"
 
+
+namespace {
+
 class ec7915_state : public driver_device
 {
 public:
@@ -88,6 +91,8 @@ ROM_START( ec7915 ) // 6k ram // amber
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "char.bin",                0x0000, 0x0800, CRC(e75a6bc4) SHA1(04b56d1f5ab7f2145699555df5ac44d078804821) )
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(198?, ec7915, 0, 0, ec7915, ec7915, ec7915_state, empty_init, "Mera-Elzab", "EC-7915 (EC-7950)", MACHINE_IS_SKELETON)

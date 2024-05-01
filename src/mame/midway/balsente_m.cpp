@@ -177,7 +177,7 @@ void balsente_state::rombank2_select_w(uint8_t data)
 	int bank = data & 7;
 
 	/* top bit controls which half of the ROMs to use (Name that Tune only) */
-	if (memregion("maincpu")->bytes() > 0x20000) bank |= (data >> 4) & 8;
+	if (m_mainrom->bytes() > 0x20000) bank |= (data >> 4) & 8;
 
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)
@@ -204,42 +204,42 @@ void balsente_state::rombank2_select_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(balsente_state::out0_w)
+void balsente_state::out0_w(int state)
 {
 //      output().set_led_value(0, state);
 }
 
-WRITE_LINE_MEMBER(balsente_state::out1_w)
+void balsente_state::out1_w(int state)
 {
 //      output().set_led_value(1, state);
 }
 
-WRITE_LINE_MEMBER(balsente_state::out2_w)
+void balsente_state::out2_w(int state)
 {
 //      output().set_led_value(2, state);
 }
 
-WRITE_LINE_MEMBER(balsente_state::out3_w)
+void balsente_state::out3_w(int state)
 {
 //      output().set_led_value(3, state);
 }
 
-WRITE_LINE_MEMBER(balsente_state::out4_w)
+void balsente_state::out4_w(int state)
 {
 //      output().set_led_value(4, state);
 }
 
-WRITE_LINE_MEMBER(balsente_state::out5_w)
+void balsente_state::out5_w(int state)
 {
 //      output().set_led_value(5, state);
 }
 
-WRITE_LINE_MEMBER(balsente_state::out6_w)
+void balsente_state::out6_w(int state)
 {
 //      output().set_led_value(6, state);
 }
 
-WRITE_LINE_MEMBER(balsente_state::nvrecall_w)
+void balsente_state::nvrecall_w(int state)
 {
 	m_novram[0]->recall(!state);
 	m_novram[1]->recall(!state);

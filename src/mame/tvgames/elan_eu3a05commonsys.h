@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
-#define MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
+#ifndef MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H
+#define MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H
 
 #include "cpu/m6502/m6502.h"
 #include "machine/bankdev.h"
@@ -70,4 +70,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_COMMONSYS, elan_eu3a05commonsys_device)
 
-#endif // MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
+#endif // MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- license:CC0 -->
+<!-- license:CC0-1.0 -->
 
 <!--
     Missing carts:
@@ -19,7 +19,7 @@
         Star Wars - Jedi Trials
 -->
 
-<softwarelist name="leapfrog_didj_cart" description="LeapFrog Didj Cartridges">
+<softwarelist name="leapfrog_didj_cart" description="LeapFrog Didj cartridges">
 	<!-- NAND ROMs, dumps not yet verified as good, although they do contain a filesystem -->
 
 	<software name="andinvasn" supported="no">
@@ -47,13 +47,13 @@
 	</software>
 
 	<software name="spbobfifo" supported="no">
-		<description>Nickelodeon Spongebob Squarepants - Fists of Foam (USA)</description>
+		<description>Nickelodeon SpongeBob SquarePants - Fists of Foam (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13291-B"/>
 		<part name="cart" interface="leapfrog_didj_cart">
 			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="500-13291-B - Spongebob Squarepants - Fists of Foam (US).bin" size="0x4200000" crc="4edb2270" sha1="8a6752bcdfa94cb68f05764b808ce1142a8919ac" />
+				<rom loadflag="load16_word_swap" name="500-13291-B - SpongeBob SquarePants - Fists of Foam (US).bin" size="0x4200000" crc="4edb2270" sha1="8a6752bcdfa94cb68f05764b808ce1142a8919ac" />
 			</dataarea>
 		</part>
 	</software>

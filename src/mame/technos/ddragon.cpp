@@ -333,7 +333,7 @@ void ddragon_state::ddragonba_port_w(uint8_t data)
  *
  *************************************/
 
-READ_LINE_MEMBER(ddragon_state::subcpu_bus_free_r)
+int ddragon_state::subcpu_bus_free_r()
 {
 	// Corresponds to BA (Bus Available) on the HD63701
 	if (m_subcpu)
@@ -441,12 +441,12 @@ void ddragon_state::dd_adpcm_int( int chip )
 	}
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_1)
+void ddragon_state::dd_adpcm_int_1(int state)
 {
 	dd_adpcm_int(0);
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_2)
+void ddragon_state::dd_adpcm_int_2(int state)
 {
 	dd_adpcm_int(1);
 }
@@ -544,10 +544,7 @@ void ddragon_state::dd2_map(address_map &map)
 
 void ddragon_state::sub_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_subcpu, FUNC(hd63701y0_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram();
 	map(0x8000, 0x81ff).ram().share("comram");
-	map(0xc000, 0xffff).rom().region("sub", 0);
 }
 
 void ddragon_state::sub_6309_map(address_map &map)
@@ -960,7 +957,7 @@ void ddragon_state::ddragon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::ddragon_scanline), "screen", 0, 1);
 
-	hd63701y0_cpu_device &subcpu(HD63701Y0(config, m_subcpu, MAIN_CLOCK / 2));  /* HD63701YOP, 6 MHz / 4 internally */
+	hd63701y0_cpu_device &subcpu(HD63701Y0(config, m_subcpu, MAIN_CLOCK / 2));  /* HD63701Y0P, 6 MHz / 4 internally */
 	subcpu.set_addrmap(AS_PROGRAM, &ddragon_state::sub_map);
 	subcpu.out_p6_cb().set(FUNC(ddragon_state::sub_port6_w));
 
@@ -1712,9 +1709,9 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "26j6-0.bin",   0x00000, 0x20000, CRC(a84b2a29) SHA1(9cb529e4939c16a0a42f45dd5547c76c2f86f07b) )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
+	ROM_LOAD( "prom.16",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
 
@@ -1750,8 +1747,9 @@ ROM_START( ddragon2j )
 	ROM_LOAD( "26j6-0.bin",   0x00000, 0x20000, CRC(a84b2a29) SHA1(9cb529e4939c16a0a42f45dd5547c76c2f86f07b) )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, BAD_DUMP CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
 ROM_START( ddragon2u )
@@ -1786,8 +1784,9 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "26j6-0.bin",   0x00000, 0x20000, CRC(a84b2a29) SHA1(9cb529e4939c16a0a42f45dd5547c76c2f86f07b) )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, BAD_DUMP CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
 ROM_START( ddragon2b )
@@ -1832,8 +1831,9 @@ ROM_START( ddragon2b )
 	ROM_LOAD( "8",   0x20000, 0x10000, CRC(151b22b4) SHA1(3b0470df9b719dd76115d8c549010ec92e28d0d0) )
 	ROM_LOAD( "10",  0x30000, 0x10000, CRC(ae2fc028) SHA1(94fea9088b7b412706b6aaf7aac856709649fb63) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) // wasn't in this set, is it still present?
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
+	ROM_REGION( 0x0300, "proms", 0 ) // wasn't in this set, is it still present?
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, BAD_DUMP CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
 ROM_START( tstrike )
@@ -2222,10 +2222,10 @@ GAME( 1987, ddragonba,    ddragon,  ddragonba,   ddragon,  ddragon_state,  init_
 GAME( 1987, ddragon6809,  ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
 GAME( 1987, ddragon6809a, ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
 
-GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2b,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2b,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II: The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,      0,        darktowr,    tstrike,  darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Thunder Strike (set 1)",        MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?

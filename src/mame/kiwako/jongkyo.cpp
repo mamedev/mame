@@ -207,6 +207,12 @@ void jongkyo_state::videoram2_w(offs_t offset, uint8_t data)
 	m_videoram2[offset] = data;
 }
 
+// TODO: this actually looks some kind of memory space protection device, probably tied internally in the 315-5084 (unique for this game) within $4x
+// $4d - $4e HL (source?)
+// $46 trigger strobe?
+// $40 reads (val & 0xf) != 0xa, writes 0x1 to RAM $7530 (buffer?), 0 otherwise
+// $4c - $4f DE (VRAM bank destination?)
+// $46 writes 0 or 1 depending on $7530 above
 void jongkyo_state::unknown_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
@@ -584,4 +590,4 @@ void jongkyo_state::init_jongkyo()
  *
  *************************************/
 
-GAME( 1985, jongkyo, 0, jongkyo, jongkyo, jongkyo_state, init_jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, jongkyo, 0, jongkyo, jongkyo, jongkyo_state, init_jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

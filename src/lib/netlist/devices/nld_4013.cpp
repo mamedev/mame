@@ -78,7 +78,7 @@ namespace netlist::devices {
 			}
 			else
 			{
-				newstate_setreset(set, reset);
+				set_reset(set, reset);
 				m_CLK.inactivate();
 				m_D.inactivate();
 			}
@@ -86,7 +86,7 @@ namespace netlist::devices {
 
 		NETLIB_HANDLERI(clk)
 		{
-			newstate_clk(m_nextD);
+			set_output(m_nextD);
 			m_CLK.inactivate();
 		}
 
@@ -101,14 +101,14 @@ namespace netlist::devices {
 
 		nld_power_pins m_power_pins;
 
-		void newstate_clk(const netlist_sig_t stateQ)
+		void set_output(const netlist_sig_t stateQ)
 		{
-			static constexpr auto delay = NLTIME_FROM_NS(150);
+			static constexpr const auto delay = NLTIME_FROM_NS(150);
 			m_Q.push(stateQ, delay);
 			m_QQ.push(!stateQ, delay);
 		}
 
-		void newstate_setreset(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
+		void set_reset(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
 		{
 			// Q: 150 ns, QQ: 200 ns
 			static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(150), NLTIME_FROM_NS(200) };

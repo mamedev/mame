@@ -37,19 +37,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// configure devices
-
-#define DECLARE_READ_LINE_MEMBER(name)      int  name()
-#define READ_LINE_MEMBER(name)              int  name()
-#define DECLARE_WRITE_LINE_MEMBER(name)     void name([[maybe_unused]] int state)
-#define WRITE_LINE_MEMBER(name)             void name([[maybe_unused]] int state)
-
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -478,8 +465,7 @@ class device_t : public delegate_late_bind
 
 	friend class simple_list<device_t>;
 	friend class running_machine;
-	friend class finder_base;
-	friend class devcb_base;
+	friend class device_resolver_base;
 
 	class subdevice_list
 	{
@@ -647,8 +633,8 @@ public:
 	// interface helpers
 	interface_list &interfaces() { return m_interfaces; }
 	const interface_list &interfaces() const { return m_interfaces; }
-	template<class DeviceClass> bool interface(DeviceClass *&intf) { intf = dynamic_cast<DeviceClass *>(this); return (intf != nullptr); }
-	template<class DeviceClass> bool interface(DeviceClass *&intf) const { intf = dynamic_cast<const DeviceClass *>(this); return (intf != nullptr); }
+	template <class DeviceClass> bool interface(DeviceClass *&intf) { intf = dynamic_cast<DeviceClass *>(this); return (intf != nullptr); }
+	template <class DeviceClass> bool interface(DeviceClass *&intf) const { intf = dynamic_cast<const DeviceClass *>(this); return (intf != nullptr); }
 
 	// specialized helpers for common core interfaces
 	bool interface(device_execute_interface *&intf) { intf = m_interfaces.m_execute; return (intf != nullptr); }
@@ -671,8 +657,42 @@ public:
 	ioport_port *ioport(std::string_view tag) const;
 	device_t *subdevice(std::string_view tag) const;
 	device_t *siblingdevice(std::string_view tag) const;
-	template<class DeviceClass> DeviceClass *subdevice(std::string_view tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
-	template<class DeviceClass> DeviceClass *siblingdevice(std::string_view tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
+	template <class DeviceClass>
+	DeviceClass *subdevice(std::string_view tag) const
+	{
+		device_t *const found = subdevice(tag);
+		if constexpr (std::is_base_of_v<device_t, DeviceClass>)
+		{
+			return downcast<DeviceClass *>(found);
+		}
+		else
+		{
+			auto const result = dynamic_cast<DeviceClass *>(found);
+#if defined(MAME_DEBUG)
+			if (found && !result)
+				report_bad_device_cast(found, typeid(device_t), typeid(DeviceClass));
+#endif
+			return result;
+		}
+	}
+	template <class DeviceClass>
+	DeviceClass *siblingdevice(std::string_view tag) const
+	{
+		device_t *const found = siblingdevice(tag);
+		if constexpr (std::is_base_of_v<device_t, DeviceClass>)
+		{
+			return downcast<DeviceClass *>(found);
+		}
+		else
+		{
+			auto const result = dynamic_cast<DeviceClass *>(found);
+#if defined(MAME_DEBUG)
+			if (found && !result)
+				report_bad_device_cast(found, typeid(device_t), typeid(DeviceClass));
+#endif
+			return result;
+		}
+	}
 	std::string parameter(std::string_view tag) const;
 
 	// configuration helpers
@@ -771,7 +791,7 @@ public:
 	/// \param [in] index A numeric value to distinguish between saved
 	///   items with the same name.
 	/// \sa save_item
-	template<typename ItemType>
+	template <typename ItemType>
 	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0)
 	{
 		assert(m_save);
@@ -800,7 +820,7 @@ public:
 	/// \param [in] index A numeric value to distinguish between saved
 	///   items with the same name.
 	/// \sa save_item
-	template<typename ItemType, typename StructType, typename ElementType>
+	template <typename ItemType, typename StructType, typename ElementType>
 	void ATTR_COLD save_pointer(ItemType &&value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
 	{
 		assert(m_save);
@@ -829,8 +849,7 @@ protected:
 	void pre_save();
 	void post_load();
 	void notify_clock_changed(bool sync_on_new_clock_domain = false);
-	finder_base *register_auto_finder(finder_base &autodev);
-	void register_callback(devcb_base &callback);
+	device_resolver_base *register_auto_finder(device_resolver_base &autodev);
 
 	//------------------- begin derived class overrides
 
@@ -1009,9 +1028,8 @@ private:
 	std::string             m_basetag;              // base part of the tag
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
-	finder_base *           m_auto_finder_list;     // list of objects to auto-find
+	device_resolver_base *  m_auto_finder_list;     // list of objects to auto-find
 	mutable std::vector<rom_entry>  m_rom_entries;
-	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
 
 	// string formatting buffer for logerror

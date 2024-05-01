@@ -5,18 +5,22 @@
     Galivan - Cosmo Police
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GALIVAN_H
-#define MAME_INCLUDES_GALIVAN_H
+#ifndef MAME_NICHIBUTSU_GALIVAN_H
+#define MAME_NICHIBUTSU_GALIVAN_H
 
 #pragma once
 
 #include "nb1412m2.h"
 #include "nb1414m4.h"
+
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "sound/flt_biquad.h"
+
 #include "screen.h"
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class galivan_state : public driver_device
 {
@@ -31,6 +35,9 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
+		, m_dacfilter1(*this, "dacfilter1")
+		, m_dacfilter2(*this, "dacfilter2")
+		, m_ymfilter(*this, "ymfilter")
 		, m_rombank(*this, "rombank")
 	{ }
 
@@ -42,6 +49,8 @@ public:
 
 protected:
 	void io_map(address_map &map);
+
+	void galivan_common(machine_config &config);
 	void video_config(machine_config &config);
 
 	required_device<cpu_device> m_maincpu;
@@ -98,6 +107,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<filter_biquad_device> m_dacfilter1;
+	required_device<filter_biquad_device> m_dacfilter2;
+	required_device<filter_biquad_device> m_ymfilter;
 	memory_bank_creator m_rombank;
 
 	void galivan_map(address_map &map);
@@ -123,4 +135,4 @@ private:
 	void dangarj_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_GALIVAN_H
+#endif // MAME_NICHIBUTSU_GALIVAN_H

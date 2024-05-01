@@ -113,17 +113,17 @@ private:
 	void video_w(u8 data);
 	void videoram_w(offs_t offset, u8 data);
 	void videoattr_w(offs_t offset, u8 data);
-	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(video_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(intst_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_intst_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_w);
+	template <unsigned Bit> void video_bank_w(int state);
+	void intst_w(int state);
+	void nmi_intst_w(int state);
+	void flip_w(int state);
 	u8 col_r();
 	u8 sound_r();
 	u8 porta_r();
 	u8 portc_r();
 	u8 rsw_r();
-	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
+	void vblank_int_w(int state);
+	void vblank_nmi_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -432,28 +432,28 @@ void mrgame_state::videoattr_w(offs_t offset, u8 data)
 }
 
 template <unsigned Bit>
-WRITE_LINE_MEMBER(mrgame_state::video_bank_w)
+void mrgame_state::video_bank_w(int state)
 {
 	m_gfx_bank &= 0x0f & ~(u8(1) << Bit);
 	m_gfx_bank |= u8(state ? 1 : 0) << Bit;
 	m_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(mrgame_state::intst_w)
+void mrgame_state::intst_w(int state)
 {
 	m_intst = state;
 	if (!state)
 		m_videocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mrgame_state::nmi_intst_w)
+void mrgame_state::nmi_intst_w(int state)
 {
 	m_intst = state;
 	if (!state)
 		m_videocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mrgame_state::flip_w)
+void mrgame_state::flip_w(int state)
 {
 	m_flip = state;
 	m_tilemap->mark_all_dirty();
@@ -530,13 +530,13 @@ void mrgame_state::machine_reset()
 	m_row = 0;
 }
 
-WRITE_LINE_MEMBER(mrgame_state::vblank_int_w)
+void mrgame_state::vblank_int_w(int state)
 {
 	if (state && m_intst)
 		m_videocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(mrgame_state::vblank_nmi_w)
+void mrgame_state::vblank_nmi_w(int state)
 {
 	if (state && m_intst)
 		m_videocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -856,7 +856,7 @@ ROM_START(motrshowb)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
 
 	ROM_REGION(0x10000, "chargen", 0)
-	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
+	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db)) // a PCB has been found with this ROM edited to blank the Zaccaria copyright
 	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
 
 	ROM_REGION(0x0020, "proms", 0)
@@ -974,10 +974,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Dakar",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Dakar",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

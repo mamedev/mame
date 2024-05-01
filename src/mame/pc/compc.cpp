@@ -39,6 +39,8 @@ Options: 8087 FPU
 #include "softlist_dev.h"
 
 
+namespace {
+
 class compc_state : public driver_device
 {
 public:
@@ -282,6 +284,9 @@ ROM_START( compc1 )
 	ROM_REGION(0x8000, "gfx1", 0)
 	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT     CLASS        INIT        COMPANY                        FULLNAME               FLAGS
 COMP( 1984, compc10, ibm5150, 0,      compc,   compc,    compc_state, empty_init, "Commodore Business Machines", "Commodore PC 10",     MACHINE_NOT_WORKING )

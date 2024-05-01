@@ -45,26 +45,26 @@ void atari1050_device::step_w(u8 data)
 void atari1050_device::mem_map(address_map &map)
 {
 	map(0x0000, 0x007f).mirror(0x0900).ram(); // MCM6810
-	map(0x0080, 0x00ff).mirror(0x0900).m(m_pia, FUNC(mos6532_new_device::ram_map));
-	map(0x0280, 0x029f).mirror(0x0960).m(m_pia, FUNC(mos6532_new_device::io_map));
+	map(0x0080, 0x00ff).mirror(0x0900).m(m_pia, FUNC(mos6532_device::ram_map));
+	map(0x0280, 0x029f).mirror(0x0960).m(m_pia, FUNC(mos6532_device::io_map));
 	map(0x0400, 0x0403).mirror(0x0bfc).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x1000, 0x1fff).rom().region("rom", 0);
 }
 
 
-WRITE_LINE_MEMBER(atari1050_device::data_out_w)
+void atari1050_device::data_out_w(int state)
 {
-	m_pia->pb6_w(state);
+	m_pia->pb_bit_w<6>(state);
 }
 
-WRITE_LINE_MEMBER(atari1050_device::command_w)
+void atari1050_device::command_w(int state)
 {
-	m_pia->pb7_w(state);
+	m_pia->pb_bit_w<7>(state);
 }
 
-WRITE_LINE_MEMBER(atari1050_device::ready_w)
+void atari1050_device::ready_w(int state)
 {
-	m_pia->pb1_w(state);
+	m_pia->pb_bit_w<1>(state);
 }
 
 
@@ -88,17 +88,17 @@ void atari1050_device::device_add_mconfig(machine_config &config)
 	m6507_device &fdcpu(M6507(config, "fdcpu", 4_MHz_XTAL / 4));
 	fdcpu.set_addrmap(AS_PROGRAM, &atari1050_device::mem_map);
 
-	MOS6532_NEW(config, m_pia, 4_MHz_XTAL / 4);
+	MOS6532(config, m_pia, 4_MHz_XTAL / 4);
 	m_pia->pa_rd_callback().set_ioport("SELECT");
 	m_pia->pa_wr_callback().set(m_fdc, FUNC(wd2793_device::dden_w)).bit(3);
 	//m_pia->pa_wr_callback().append(atari1050_device::motor_control_w)).bit(1);
 	m_pia->pb_wr_callback().set(FUNC(atari1050_device::step_w));
-	m_pia->irq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa6_w)).invert();
+	m_pia->irq_wr_callback().set(m_pia, FUNC(mos6532_device::pa_bit_w<6>)).invert();
 	//m_pia->irq_wr_callback().append(m_fdc, FUNC(wd2793_device::ip_w));
 
 	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa7_w));
-	m_fdc->enp_wr_callback().set(m_pia, FUNC(mos6532_new_device::pa4_w));
+	m_fdc->drq_wr_callback().set(m_pia, FUNC(mos6532_device::pa_bit_w<7>));
+	m_fdc->enp_wr_callback().set(m_pia, FUNC(mos6532_device::pa_bit_w<4>));
 }
 
 

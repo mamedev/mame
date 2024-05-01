@@ -36,17 +36,15 @@ hp80_io_slot_device::~hp80_io_slot_device()
 
 void hp80_io_slot_device::device_start()
 {
-	m_irl_cb_func.resolve_safe();
-	m_halt_cb_func.resolve_safe();
 }
 
-WRITE_LINE_MEMBER(hp80_io_slot_device::irl_w)
+void hp80_io_slot_device::irl_w(int state)
 {
 	LOG("irl_w slot %u=%d\n" , m_slot_no , state);
 	m_irl_cb_func(m_slot_no , state , 0xff);
 }
 
-WRITE_LINE_MEMBER(hp80_io_slot_device::halt_w)
+void hp80_io_slot_device::halt_w(int state)
 {
 	LOG("halt_w slot %u=%d\n" , m_slot_no , state);
 	m_halt_cb_func(m_slot_no , state , 0xff);
@@ -128,14 +126,14 @@ device_hp80_io_interface::~device_hp80_io_interface()
 {
 }
 
-WRITE_LINE_MEMBER(device_hp80_io_interface::irl_w)
+void device_hp80_io_interface::irl_w(int state)
 {
 	if (VERBOSE & LOG_GENERAL) device().logerror("irl_w card=%d\n" , state);
 	hp80_io_slot_device *slot = downcast<hp80_io_slot_device *>(device().owner());
 	slot->irl_w(state);
 }
 
-WRITE_LINE_MEMBER(device_hp80_io_interface::halt_w)
+void device_hp80_io_interface::halt_w(int state)
 {
 	if (VERBOSE & LOG_GENERAL) device().logerror("halt_w card=%d\n" , state);
 	hp80_io_slot_device *slot = downcast<hp80_io_slot_device *>(device().owner());

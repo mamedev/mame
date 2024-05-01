@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SEGAIC16_H
-#define MAME_MACHINE_SEGAIC16_H
+#ifndef MAME_SEGA_SEGAIC16_M_H
+#define MAME_SEGA_SEGAIC16_M_H
 
 #pragma once
 
@@ -79,7 +79,7 @@ public:
 	auto zint_callback() { return m_zint_callback.bind(); }
 
 	// public interface
-	DECLARE_WRITE_LINE_MEMBER(exck_w);
+	void exck_w(int state);
 	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 zread();
@@ -113,4 +113,4 @@ DECLARE_DEVICE_TYPE(SEGA_315_5249_DIVIDER,       sega_315_5249_divider_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5250_COMPARE_TIMER, sega_315_5250_compare_timer_device)
 
 
-#endif // MAME_MACHINE_SEGAIC16_H
+#endif // MAME_SEGA_SEGAIC16_M_H

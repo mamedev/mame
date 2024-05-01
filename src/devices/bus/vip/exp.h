@@ -74,18 +74,18 @@ public:
 	uint8_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ_LINE_MEMBER(ef1_r);
-	DECLARE_READ_LINE_MEMBER(ef3_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
+	int ef1_r();
+	int ef3_r();
+	int ef4_r();
 	void sc_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE_LINE_MEMBER(tpb_w);
-	DECLARE_WRITE_LINE_MEMBER(run_w);
+	void q_w(int state);
+	void tpb_w(int state);
+	void run_w(int state);
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER(interrupt_w) { m_write_int(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_out_w) { m_write_dma_out(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_in_w) { m_write_dma_in(state); }
+	void interrupt_w(int state) { m_write_int(state); }
+	void dma_out_w(int state) { m_write_dma_out(state); }
+	void dma_in_w(int state) { m_write_dma_in(state); }
 
 protected:
 	// device-level overrides

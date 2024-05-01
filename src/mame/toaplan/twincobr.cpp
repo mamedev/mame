@@ -25,7 +25,7 @@ Supported games:
     Taito game number:      B30
         Twin Cobra (World)
         Twin Cobra (USA license)
-        Kyukyoku Tiger (Japan license)
+        Kyukyoku Tiger (Japan license, two sets)
 
     Comad Board Number:     ??????
     Comad game number:      ???
@@ -438,6 +438,15 @@ void twincobr_state::sound_io_map(address_map &map)
 	map(0x50, 0x50).portr("DSWB");
 }
 
+void twincobr_state::fnshark_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0x10, 0x10).portr("SYSTEM");         // Twin Cobra - Coin/Start
+	map(0x20, 0x20).w(m_coinlatch, FUNC(ls259_device::write_nibble_d0));      // Twin Cobra coin count-lockout
+	map(0x40, 0x40).portr("DSWA");
+	map(0x50, 0x50).portr("DSWB");
+}
 
 /***************************** TMS32010 Memory Map **************************/
 
@@ -513,8 +522,17 @@ static INPUT_PORTS_START( twincobru )
 	TOAPLAN_COINAGE_JAPAN_LOC(SW1)  // Table at 0x0c20 (COIN1 AND COIN2) in CPU1
 INPUT_PORTS_END
 
-// Verified from M68000 and Z80 code
 static INPUT_PORTS_START( ktiger )
+	PORT_INCLUDE( twincobru )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, "Invulnerability" ) PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+INPUT_PORTS_END
+
+// Verified from M68000 and Z80 code
+static INPUT_PORTS_START( ktigera )
 	PORT_INCLUDE( twincobru )
 
 	PORT_MODIFY("DSWA")
@@ -728,6 +746,17 @@ void twincobr_state::fshark(machine_config &config)
 	m_spritegen->set_xoffsets(32, 14);
 }
 
+void twincobr_state::fnshark(machine_config &config)
+{
+	fshark(config);
+
+	subdevice<cpu_device>("audiocpu")->set_addrmap(AS_IO, &twincobr_state::fnshark_sound_io_map);
+
+	ym3526_device &ymsnd(YM3526(config.replace(), "ymsnd", XTAL(28'000'000) / 8));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 void twincobr_state::fsharkbt(machine_config &config)
 {
 	fshark(config);
@@ -839,6 +868,50 @@ ROM_START( twincobru )
 ROM_END
 
 ROM_START( ktiger )
+	ROM_REGION( 0x30000, "maincpu", 0 ) // Main 68K code
+	ROM_LOAD16_BYTE( "b30_01.7j", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
+	ROM_LOAD16_BYTE( "b30_03.7h", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
+	ROM_LOAD16_BYTE( "b30_02.8j", 0x20000, 0x08000, CRC(321e2be6) SHA1(03b2c530326d1859b66829b49555d862be235643) )
+	ROM_LOAD16_BYTE( "b30_04.8h", 0x20001, 0x08000, CRC(c3f960ff) SHA1(cbebf576d677cc02f4d0f22dcc226e898d4832c6) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    // Sound Z80 code
+	ROM_LOAD( "b30_05.4f", 0x0000, 0x8000, CRC(1a8f1e10) SHA1(0c37a7a50b2523506ad77ac03ae752eb94092ff6) )
+
+	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10 MCU code
+	ROM_LOAD( "d70015u_gxc-03_mcu_74002", 0x0000, 0x0c00, CRC(265b6f32) SHA1(1b548edeada4144baf732aba7e7013281c8e9608) ) // decapped, real label D70015U GXC-03 MCU ^ 74002
+
+	ROM_REGION( 0x0c000, "gfx1", 0 )    // Chars
+	ROM_LOAD( "b30_08.8c",  0x00000, 0x04000, CRC(0a254133) SHA1(17e9cc5e36fb4696012d0f9229fa172034cd843a) )
+	ROM_LOAD( "b30_07.10b", 0x04000, 0x04000, CRC(e9e2d4b1) SHA1(e0a19dd46a9ba85d95bba7fbf81d8dc36dbfeabd) )
+	ROM_LOAD( "b30_06.8b",  0x08000, 0x04000, CRC(a599d845) SHA1(732001f2d378d890f148e6b616c287d71fae832a) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )    // fg tiles
+	ROM_LOAD( "b30_16.20b", 0x00000, 0x10000, CRC(15b3991d) SHA1(f5e7ed7a7721ed7e6dfd440634160390b7a294e4) )
+	ROM_LOAD( "b30_15.18b", 0x10000, 0x10000, CRC(d9e2e55d) SHA1(0409e6df836d1d5198b64b21b42192631aa6d096) )
+	ROM_LOAD( "b30_13.18c", 0x20000, 0x10000, CRC(13daeac8) SHA1(1cb103f434e2ecf193fa936ca7ea9194064c5b39) )
+	ROM_LOAD( "b30_14.20c", 0x30000, 0x10000, CRC(8cc79357) SHA1(31064df2b796ca85ad3caccf626b684dff1104a1) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles
+	ROM_LOAD( "b30_12.16c", 0x00000, 0x08000, CRC(b5d48389) SHA1(a00c5b9c231d3d580fa20c7ad3f8b6fd990e6594) )
+	ROM_LOAD( "b30_11.14c", 0x08000, 0x08000, CRC(97f20fdc) SHA1(7cb3cd0637b0db889a3d552fd7c1a916eee5ca27) )
+	ROM_LOAD( "b30_10.12c", 0x10000, 0x08000, CRC(170c01db) SHA1(f4c5a1600f6cbb48abbace66c6f7514f79138e8b) )
+	ROM_LOAD( "b30_09.10c", 0x18000, 0x08000, CRC(44f5accd) SHA1(2f9bdebe71c8be195332356df68992fd38d86994) )
+
+	ROM_REGION( 0x40000, "scu", 0 )    // Sprites
+	ROM_LOAD( "b30_20.12d", 0x00000, 0x10000, CRC(cb4092b8) SHA1(35b1d1e04af760fa106124bd5a94174d63ff9705) )
+	ROM_LOAD( "b30_19.14d", 0x10000, 0x10000, CRC(9cb8675e) SHA1(559c21d505c60401f7368d4ab2b686b15075c5c5) )
+	ROM_LOAD( "b30_18.15d", 0x20000, 0x10000, CRC(806fb374) SHA1(3eebefadcbdf713bf2a65b438092746b07edd3f0) )
+	ROM_LOAD( "b30_17.16d", 0x30000, 0x10000, CRC(4264bff8) SHA1(3271b8b23f51346d1928ae01f8b547fed49181e6) )
+
+	ROM_REGION( 0x260, "proms", 0 ) // Nibble BPROMs, lo/hi order to be determined
+	ROM_LOAD( "82s129.d3",  0x000, 0x100, CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )    // sprite priority control ??
+	ROM_LOAD( "82s129.d4",  0x100, 0x100, CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )    // sprite priority control ??
+	ROM_LOAD( "82s123.d2",  0x200, 0x020, CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )    // sprite control ??
+	ROM_LOAD( "82s123.e18", 0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )    // sprite attribute (flip/position) ??
+	ROM_LOAD( "82s123.b24", 0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )    // tile to sprite priority ??
+ROM_END
+
+ROM_START( ktigera )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // Main 68K code
 	ROM_LOAD16_BYTE( "b30_01.7j", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
 	ROM_LOAD16_BYTE( "b30_03.7h", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
@@ -1200,6 +1273,7 @@ ROM_START( fsharkbt )
 	ROM_LOAD( "clr3.bpr",   0x200, 0x100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )    // ??
 ROM_END
 
+// second dump comes from 250687 A [192] main PCB + 250687 and 250687 C sub PCBs
 ROM_START( fnshark ) // Based on a different version of the game code? (only a ~70% match on the program roms compared to any other set)
 	ROM_REGION( 0x30000, "maincpu", 0 ) // Main 68K code
 	ROM_LOAD16_BYTE( "h.ic226", 0x00000, 0x10000, CRC(ea4bcb43) SHA1(4b5fda235908a9081fdd4cca98294e9e9a34bbf2) )
@@ -1226,17 +1300,13 @@ ROM_START( fnshark ) // Based on a different version of the game code? (only a ~
 
 	// ugly bootleg logo (and corrupt 0 text)
 	ROM_REGION( 0x0c000, "gfx1", 0 )    // Chars
-	ROM_LOAD( "7.ic119", 0x00000, 0x04000, CRC(a0f8890d) SHA1(ba03589524087acdf35e879b5a3b29b764da7819) )
-	ROM_LOAD( "6.ic120", 0x04000, 0x04000, CRC(c5bfca95) SHA1(ae587c4603d0e73debe4b6fb0008aedda04a40d3) )
-	ROM_LOAD( "5.ic121", 0x08000, 0x04000, CRC(b8c370bc) SHA1(cd2c28c3d3cbc2cdb871fec5b03b1c516ada2ee7) )
-
-	// same data on larger EPROMs with first half empty
-//  ROM_LOAD( "5.bin", 0x08000, 0x04000, CRC(ca8badd2) SHA1(e81863ac03c9219a8de01b03dbac522022212b14) )
-//  ROM_CONTINUE(0x08000,0x04000)
-//  ROM_LOAD( "6.bin", 0x04000, 0x04000, CRC(b7f717fb) SHA1(3f3cd092d13566792f0816d5b705011c89b8f662) )
-//  ROM_CONTINUE(0x04000,0x04000)
-//  ROM_LOAD( "7.bin", 0x00000, 0x04000, CRC(d2b05463) SHA1(25131b64e63cd3791bc84d525b7e4b2a398be6ca) )
-//  ROM_CONTINUE(0x00000,0x04000)
+	// same data on larger EPROMs with first half empty, verified on 2 different PCBs
+	ROM_LOAD( "7.bin", 0x00000, 0x04000, CRC(d2b05463) SHA1(25131b64e63cd3791bc84d525b7e4b2a398be6ca) )
+	ROM_CONTINUE(0x00000,0x04000)
+	ROM_LOAD( "6.bin", 0x04000, 0x04000, CRC(b7f717fb) SHA1(3f3cd092d13566792f0816d5b705011c89b8f662) )
+	ROM_CONTINUE(0x04000,0x04000)
+	ROM_LOAD( "5.bin", 0x08000, 0x04000, CRC(ca8badd2) SHA1(e81863ac03c9219a8de01b03dbac522022212b14) )
+	ROM_CONTINUE(0x08000,0x04000)
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    // fg tiles
 	ROM_LOAD( "b.ic114", 0x00000, 0x08000, CRC(733b9997) SHA1(75e874a1d148fcc8fa09bb724ce8346565ace4e5) )
@@ -1415,17 +1485,18 @@ void twincobr_state::init_twincobr()
 }
 
 
-GAME( 1987, fshark,    0,        fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Flying Shark (World)",                  0 )
-GAME( 1987, skyshark,  fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 1)",                 0 )
-GAME( 1987, skysharka, fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 2)",                 0 )
-GAME( 1987, hishouza,  fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Hishou Zame (Japan)",                   0 )
-GAME( 1987, fsharkb,   fshark,   fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (World, bootleg)",         0 )
-GAME( 1987, hishouzab, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Hishou Zame (Japan, bootleg)",          0 )
-GAME( 1987, fsharkbt,  fshark,   fsharkbt,  skyshark,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (bootleg with 8741)",      0 )
-GAME( 1987, fnshark,   fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flyin' Shark (bootleg of Hishou Zame)", 0 )
-GAME( 1987, skysharkb, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Sky Shark (bootleg)",                   0 )
-GAME( 1987, twincobr,  0,        twincobrw, twincobr,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Twin Cobra (World)",                    0 )
-GAME( 1987, twincobru, twincobr, twincobrw, twincobru, twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Twin Cobra (US)",                       0 )
-GAME( 1987, ktiger,    twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan)",                0 )
-GAME( 1991, gulfwar2,  0,        twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 1)",                   0 )
-GAME( 1991, gulfwar2a, gulfwar2, twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 2)",                   0 )
+GAME( 1987, fshark,    0,        fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Flying Shark (World)",                         0 )
+GAME( 1987, skyshark,  fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 1)",                        0 )
+GAME( 1987, skysharka, fshark,   fshark,    skyshark,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Sky Shark (US, set 2)",                        0 )
+GAME( 1987, hishouza,  fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Hishou Zame (Japan)",                          0 )
+GAME( 1987, fsharkb,   fshark,   fshark,    fshark,    twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (World, bootleg)",                0 )
+GAME( 1987, hishouzab, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Hishou Zame (Japan, bootleg)",                 0 )
+GAME( 1987, fsharkbt,  fshark,   fsharkbt,  skyshark,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (bootleg with 8741)",             0 )
+GAME( 1987, fnshark,   fshark,   fnshark,   hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flyin' Shark (bootleg of Hishou Zame)",        0 )
+GAME( 1987, skysharkb, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Sky Shark (bootleg)",                          0 )
+GAME( 1987, twincobr,  0,        twincobrw, twincobr,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Twin Cobra (World)",                           0 )
+GAME( 1987, twincobru, twincobr, twincobrw, twincobru, twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Twin Cobra (US)",                              0 )
+GAME( 1989, ktiger,    twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, 2 player cooperative)", 0 )
+GAME( 1987, ktigera,   twincobr, twincobr,  ktigera,   twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan, 2 player alternate)",   0 )
+GAME( 1991, gulfwar2,  0,        twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 1)",                          0 )
+GAME( 1991, gulfwar2a, gulfwar2, twincobr,  gulfwar2,  twincobr_state, init_twincobr, ROT270, "Comad",                                                 "Gulf War II (set 2)",                          0 )

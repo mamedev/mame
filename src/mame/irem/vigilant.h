@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
-#ifndef MAME_INCLUDES_VIGILANT_H
-#define MAME_INCLUDES_VIGILANT_H
+#ifndef MAME_IREM_VIGILANT_H
+#define MAME_IREM_VIGILANT_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ private:
 	void bowmen_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_VIGILANT_H
+#endif // MAME_IREM_VIGILANT_H

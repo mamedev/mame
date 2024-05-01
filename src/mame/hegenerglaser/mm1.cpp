@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto MM I, the first H+G slide-in chesscomputer module
 
-The module was included with either the Modular or Modular Exclusive chessboards.
+The module was included with either the Modular or Exclusive chessboards.
 Initially, the module itself didn't have a name. It was only later in retrospect,
 after the release of Modul MM II that it became known as the MM I. The program is
 actually more like a prequel of III-S Glasgow, same chess engine authors too.
@@ -25,34 +25,34 @@ LCD module is assumed to be same as MM II and others.
 
 Mephisto Mirage is on similar hardware, but it's a single module (LCD is included
 on the main PCB). Like MM I, the module by itself didn't have a name at first.
-The boards that were included with the product were either Mephisto Mobil, or
-Mephisto Mirage (both ledless, push-sensory). The module also works on the more
-expensive wooden chessboards like Modular Exclusive or Muenchen, as long as it
-supports the higher voltage.
+The boards that were included with the product were either Mephisto Mirage
+(button sensors, no leds), or Mephisto Mobil (no sensors, no leds). The module
+also works on the more expensive wooden chessboards like Modular, Exclusive or
+Muenchen, as long as it supports the higher voltage.
 
 TODO:
-- remove external interrupt hack when timer interrupt is added to CDP1806 device
 - mmirage unknown_w
 - mm1 unknown expansion rom at $c000?
 - add mm1 STP/ON buttons? (they're off/on, game continues when ON again)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
+#include "mmboard.h"
+#include "mmdisplay1.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/cosmac/cosmac.h"
-#include "mmboard.h"
 #include "sound/dac.h"
-#include "mmdisplay1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_mm1.lh" // clickable
-#include "mephisto_mirage.lh" // clickable
+#include "mephisto_mm1.lh"
+#include "mephisto_mirage.lh"
 
 
 namespace {
@@ -82,8 +82,11 @@ private:
 	// devices/pointers
 	required_device<cdp1806_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
+
+	bool m_reset = false;
+	u8 m_kp_mux = 0;
 
 	// address maps
 	void mirage_map(address_map &map);
@@ -91,16 +94,12 @@ private:
 	void mm1_io(address_map &map);
 
 	// I/O handlers
-	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_display();
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	void sound_w(u8 data);
 	void unknown_w(u8 data);
 	void keypad_w(u8 data);
-	template<int N> DECLARE_READ_LINE_MEMBER(keypad_r);
-
-	bool m_reset = false;
-	u8 m_kp_mux = 0;
+	template<int N> int keypad_r();
 };
 
 void mm1_state::machine_start()
@@ -117,18 +116,13 @@ void mm1_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(mm1_state::interrupt)
+int mm1_state::clear_r()
 {
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, HOLD_LINE);
-}
-
-READ_LINE_MEMBER(mm1_state::clear_r)
-{
-	// CLEAR low + RESET high resets cpu
+	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
 	m_reset = false;
 	return ret;
@@ -152,7 +146,7 @@ void mm1_state::keypad_w(u8 data)
 }
 
 template<int N>
-READ_LINE_MEMBER(mm1_state::keypad_r)
+int mm1_state::keypad_r()
 {
 	// EF3,EF4: multiplexed inputs (keypad)
 	return (m_inputs[N]->read() & m_kp_mux) ? 1 : 0;
@@ -160,9 +154,9 @@ READ_LINE_MEMBER(mm1_state::keypad_r)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mm1_state::mirage_map(address_map &map)
 {
@@ -190,16 +184,16 @@ void mm1_state::mm1_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mm1 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E / 5 / Rook")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INFO")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right / White / 0")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("POS")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("POS")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("LEV")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G / 7 / King")
@@ -239,7 +233,7 @@ static INPUT_PORTS_START( mirage )
 
 	PORT_START("FAKE") // module came with buttons sensorboard by default
 	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mm1_state, mirage_switch_sensor_type, 0)
-	PORT_CONFSETTING(    0x00, "Buttons (Mobil)" )
+	PORT_CONFSETTING(    0x00, "Buttons (Mirage)" )
 	PORT_CONFSETTING(    0x01, "Magnets (Modular)" )
 INPUT_PORTS_END
 
@@ -250,13 +244,13 @@ INPUT_CHANGED_MEMBER(mm1_state::mirage_switch_sensor_type)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mm1_state::mirage(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	CDP1806(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mirage_map);
 	m_maincpu->set_addrmap(AS_IO, &mm1_state::mm1_io);
@@ -265,18 +259,14 @@ void mm1_state::mirage(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(mm1_state::keypad_r<0>));
 	m_maincpu->ef4_cb().set(FUNC(mm1_state::keypad_r<1>));
 
-	// wrong! uses internal timer interrupt
-	const attotime irq_period = attotime::from_ticks(8 * 32 * 0x71, 8_MHz_XTAL); // LDC = 0x71
-	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), irq_period);
-
 	MEPHISTO_BUTTONS_BOARD(config, m_board); // see mirage_switch_sensor_type
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, "display");
 	config.set_default_layout(layout_mephisto_mirage);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -285,13 +275,9 @@ void mm1_state::mm1(machine_config &config)
 {
 	mirage(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
 	m_maincpu->q_cb().set("display", FUNC(mephisto_display1_device::strobe_w));
-
-	// wrong! uses internal timer interrupt
-	const attotime irq_period = attotime::from_ticks(8 * 32 * 0xfa, 8_MHz_XTAL); // LDC = 0xFA
-	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), irq_period);
 
 	MEPHISTO_SENSORS_BOARD(config.replace(), m_board);
 	m_board->set_delay(attotime::from_msec(200));
@@ -304,9 +290,9 @@ void mm1_state::mm1(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mm1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -329,12 +315,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE INPUT   STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, mm1,     0,      0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mm1b,    mm1,    0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1983, mm1,     0,      0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mm1b,    mm1,    0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1984, mmirage, 0,      0, mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, mmirage, 0,      0,      mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE )

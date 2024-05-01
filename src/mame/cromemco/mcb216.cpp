@@ -35,6 +35,8 @@ only storage is paper-tape.
 #include "bus/rs232/rs232.h"
 
 
+namespace {
+
 class mcb216_state : public driver_device
 {
 public:
@@ -160,6 +162,9 @@ ROM_START( cb308 )
 	ROM_REGION(0x20, "prom", 0)
 	ROM_LOAD( "74904.ic25", 0x00, 0x20, NO_DUMP ) // TBP18S030 or equivalent
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

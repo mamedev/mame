@@ -26,6 +26,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class pzletime_state : public driver_device
 {
 public:
@@ -47,7 +49,7 @@ public:
 
 	void pzletime(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ticket_status_r);
+	int ticket_status_r();
 
 private:
 	/* memory pointers */
@@ -212,7 +214,7 @@ void pzletime_state::oki_bank_w(uint16_t data)
 	m_oki->set_rom_bank(data & 0x3);
 }
 
-READ_LINE_MEMBER(pzletime_state::ticket_status_r)
+int pzletime_state::ticket_status_r()
 {
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }
@@ -354,5 +356,8 @@ ROM_START( pzletime )
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "pzletime.nv", 0x0000, 0x0080, CRC(e5ed3d40) SHA1(8c163a6e5839e5c82d52f046d3268202fdf9f4d1) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 199?, pzletime, 0, pzletime,  pzletime, pzletime_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Puzzle Time (prototype)", MACHINE_SUPPORTS_SAVE )

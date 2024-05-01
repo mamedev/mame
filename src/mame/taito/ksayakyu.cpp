@@ -142,8 +142,6 @@ private:
 };
 
 
-// video
-
 void ksayakyu_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset]=data;
@@ -273,8 +271,6 @@ uint32_t ksayakyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-// machine
-
 void ksayakyu_state::bank_select_w(uint8_t data)
 {
 	/*
@@ -373,9 +369,9 @@ static INPUT_PORTS_START( ksayakyu )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x040, 0x00, "Continue" )
+	PORT_DIPNAME( 0x40, 0x00, "Continue" )
 	PORT_DIPSETTING(    0x00, "7th inning" )
-	PORT_DIPSETTING(    0x040, "1st inning" )
+	PORT_DIPSETTING(    0x40, "1st inning" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
@@ -468,7 +464,6 @@ void ksayakyu_state::ksayakyu(machine_config &config)
 	audiocpu.set_periodic_int(FUNC(ksayakyu_state::irq0_line_hold), attotime::from_hz(60)); //guess, controls music tempo
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
-
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

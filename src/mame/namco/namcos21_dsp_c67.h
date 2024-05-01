@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_NAMCOS21_DSP_C67_H
-#define MAME_VIDEO_NAMCOS21_DSP_C67_H
+#ifndef MAME_NAMCO_NAMCOS21_DSP_C67_H
+#define MAME_NAMCO_NAMCOS21_DSP_C67_H
 
 #pragma once
 
@@ -9,6 +9,7 @@
 #include "namcos21_3d.h"
 
 #include <algorithm>
+#include <memory>
 
 
 #define ENABLE_LOGGING      0
@@ -81,7 +82,7 @@ private:
 	required_device<cpu_device> m_c67master;
 	required_device_array<cpu_device,4> m_c67slave;
 	required_region_ptr<int32_t> m_ptrom24;
-	std::vector<uint16_t> m_dspram16;
+	std::unique_ptr<uint16_t []> m_dspram16;
 
 	required_shared_ptr<uint16_t> m_master_dsp_ram;
 
@@ -90,7 +91,7 @@ private:
 
 	std::unique_ptr<dsp_state> m_mpDspState;
 
-	std::unique_ptr<uint8_t[]> m_pointram;
+	std::unique_ptr<uint8_t []> m_pointram;
 	int m_pointram_idx;
 	uint16_t m_pointram_control;
 	uint32_t m_pointrom_idx;
@@ -153,4 +154,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCOS21_DSP_C67, namcos21_dsp_c67_device)
 
-#endif // MAME_VIDEO_NAMCOS21_DSP_C67_H
+#endif // MAME_NAMCO_NAMCOS21_DSP_C67_H

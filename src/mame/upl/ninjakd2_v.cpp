@@ -421,7 +421,7 @@ uint32_t omegaf_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 
 }
 
 
-WRITE_LINE_MEMBER(ninjakd2_state::screen_vblank_ninjakd2)
+void ninjakd2_state::screen_vblank_ninjakd2(int state)
 {
 	// rising edge
 	if (state)

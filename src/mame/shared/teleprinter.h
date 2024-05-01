@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef MAME_MACHINE_TELEPRINTER_H
-#define MAME_MACHINE_TELEPRINTER_H
+#ifndef MAME_SHARED_TELEPRINTER_H
+#define MAME_SHARED_TELEPRINTER_H
 
 #pragma once
 
@@ -29,8 +29,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	static constexpr unsigned WIDTH = 80;
-	static constexpr unsigned HEIGHT = 50;
+	static inline constexpr unsigned WIDTH = 80;
+	static inline constexpr unsigned HEIGHT = 50;
+
 	uint32_t tp_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void scroll_line();
 	void write_char(uint8_t data);
@@ -39,4 +40,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TELEPRINTER, teleprinter_device)
 
-#endif // MAME_MACHINE_TELEPRINTER_H
+#endif // MAME_SHARED_TELEPRINTER_H

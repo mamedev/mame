@@ -449,13 +449,13 @@ inline void unsp_device::trigger_fiq()
 	if (!m_core->m_enable_fiq || m_core->m_fiq)
 		return;
 
+	standard_irq_callback(UNSP_FIQ_LINE, m_core->m_r[REG_PC]);
 	m_core->m_fiq = 1;
 
 	push(m_core->m_r[REG_PC], &m_core->m_r[REG_SP]);
 	push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
 	m_core->m_r[REG_PC] = read16(m_vectorbase + 0x06);
 	m_core->m_r[REG_SR] = 0;
-	standard_irq_callback(UNSP_FIQ_LINE);
 }
 
 inline void unsp_device::trigger_irq(int line)
@@ -463,6 +463,7 @@ inline void unsp_device::trigger_irq(int line)
 	if ((m_core->m_ine == 0 && m_core->m_irq == 1) || m_core->m_pri <= line || !m_core->m_enable_irq)
 		return;
 
+	standard_irq_callback(UNSP_IRQ0_LINE+line, m_core->m_r[REG_PC]);
 	m_core->m_irq = 1;
 
 	push(m_core->m_r[REG_PC], &m_core->m_r[REG_SP]);
@@ -477,7 +478,6 @@ inline void unsp_device::trigger_irq(int line)
 
 	m_core->m_r[REG_PC] = read16(m_vectorbase + 0x08 + line);
 	m_core->m_r[REG_SR] = 0;
-	standard_irq_callback(UNSP_IRQ0_LINE+line);
 }
 
 void unsp_device::check_irqs()

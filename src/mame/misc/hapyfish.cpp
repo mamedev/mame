@@ -51,21 +51,24 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2440.h"
-#include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include <algorithm>
 
-#define LOG_GPIO    (1 << 0)
-#define LOG_ADC     (1 << 1)
-#define LOG_I2C     (1 << 2)
-#define LOG_INPUTS  (1 << 3)
+#define LOG_GPIO    (1U << 1)
+#define LOG_ADC     (1U << 2)
+#define LOG_I2C     (1U << 3)
+#define LOG_INPUTS  (1U << 4)
 
 #define VERBOSE     (LOG_GPIO | LOG_ADC | LOG_I2C | LOG_INPUTS)
 #include "logmacro.h"
+
+
+namespace {
 
 class hapyfish_state : public driver_device
 {
@@ -83,12 +86,10 @@ public:
 
 	void hapyfish(machine_config &config);
 
-	void init_mini2440();
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
-	required_device<nand_device> m_nand, m_nand2;
+	required_device<samsung_k9lag08u0m_device> m_nand, m_nand2;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_ioport_array<6> m_inputs;
@@ -469,8 +470,6 @@ uint32_t hapyfish_state::s3c2440_adc_data_r()
 
 void hapyfish_state::machine_start()
 {
-	m_nand->set_data_ptr(memregion("nand")->base());
-	m_nand2->set_data_ptr(memregion("nand2")->base());
 	m_nand_select = true; // select NAND #1 (S3C2440 bootloader will happen before machine_reset())
 	m_input_select = 7;
 }
@@ -506,11 +505,6 @@ void hapyfish_state::hapyfish_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-void hapyfish_state::init_mini2440()
-{
-	// do nothing
-}
-
 void hapyfish_state::hapyfish(machine_config &config)
 {
 	ARM920T(config, m_maincpu, 100000000);
@@ -543,12 +537,10 @@ void hapyfish_state::hapyfish(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9LAG08U0M);
+	SAMSUNG_K9LAG08U0M(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 
-	NAND(config, m_nand2, 0);
-	m_nand2->set_nand_type(nand_device::chip::K9LAG08U0M);
+	SAMSUNG_K9LAG08U0M(config, m_nand2, 0);
 	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 
@@ -610,5 +602,8 @@ ROM_START( hapyfsh2 )
 	ROM_REGION( 0x84000000, "nand2", 0 )
 	ROM_LOAD( "flash.u28",        0x00000000, 0x84000000, CRC(f00a25cd) SHA1(9c33f8e26b84cea957d9c37fb83a686b948c6834) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_IS_SKELETON )

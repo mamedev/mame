@@ -58,8 +58,8 @@ public:
 	void io32k_map(address_map &map);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(clock_tick);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void clock_tick(int state);
+	void irq_w(int state);
 	void scanlines_w(u8);
 	void digit_w(u8);
 	void ay0_a_w(u8);
@@ -298,12 +298,12 @@ u8 macp_state::ay1_b_r()
 	return 0x7f | (m_relay_ctrl ? 0 : 0x80);  // Temporary for testing
 }
 
-WRITE_LINE_MEMBER( macp_state::irq_w )
+void macp_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( macp_state::clock_tick )
+void macp_state::clock_tick(int state)
 {
 	if (state)
 	{

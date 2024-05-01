@@ -30,6 +30,8 @@
 #include "screen.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -185,6 +187,8 @@ ROM_START( olytext )
 	ROM_REGION( 0x1000, "chargen", 0) // this is firmware for the NS405 cpu
 	ROM_LOAD( "1220-041_33702.bin", 0x0000, 0x1000, CRC(a6d39c2a) SHA1(b7a4c65edc7d46d1ab8b0b3aa52141c61c66bf32) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

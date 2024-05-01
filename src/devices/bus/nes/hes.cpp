@@ -18,12 +18,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -61,7 +60,7 @@ nes_hes_device::nes_hes_device(const machine_config &mconfig, const char *tag, d
 
 void nes_hes_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("hes write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("hes write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	if (BIT(offset, 8)) // $41xx, $43xx, ... $5fxx

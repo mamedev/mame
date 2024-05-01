@@ -32,18 +32,18 @@
 // ----------------------------------
 // Flags for debugging
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_CONFIG      (1U<<2)    // Configuration
-#define LOG_EPROM       (1U<<3)    // Access to EPROM
-#define LOG_CONTR       (1U<<4)    // Access to controller
-#define LOG_RAM         (1U<<5)    // Access to SRAM
-#define LOG_READY       (1U<<6)    // READY line
-#define LOG_SIGNALS     (1U<<7)    // IRQ and HLD lines
-#define LOG_DRQ         (1U<<8)    // DRQ line (too noisy in SIGNALS)
-#define LOG_DRIVE       (1U<<9)    // Drive operations
-#define LOG_CRU         (1U<<10)   // CRU operations
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_CONFIG      (1U << 2)    // Configuration
+#define LOG_EPROM       (1U << 3)    // Access to EPROM
+#define LOG_CONTR       (1U << 4)    // Access to controller
+#define LOG_RAM         (1U << 5)    // Access to SRAM
+#define LOG_READY       (1U << 6)    // READY line
+#define LOG_SIGNALS     (1U << 7)    // IRQ and HLD lines
+#define LOG_DRQ         (1U << 8)    // DRQ line (too noisy in SIGNALS)
+#define LOG_DRIVE       (1U << 9)    // Drive operations
+#define LOG_CRU         (1U << 10)   // CRU operations
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG)
 #include "logmacro.h"
 
 #define CCDCC_TAG "ti99_ccdcc"
@@ -72,12 +72,13 @@ namespace bus::ti99::peb {
 
 // ----------------------------------
 
-corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *dpname, const char *cpname):
 	  device_t(mconfig, type, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_wdc(*this, WDC_TAG),
-	  m_decpal(nullptr),
-	  m_ctrlpal(nullptr),
+	  m_decpal(*this, dpname),
+	  m_ctrlpal(*this, cpname),
+	  m_floppy(*this, "%u", 0),
 	  m_motormf(*this, MOTORMF_TAG),
 	  m_tms9901(*this, TMS9901_TAG),
 	  m_buffer_ram(*this, BUFFER),
@@ -177,19 +178,19 @@ void corcomp_fdc_device::operate_ready_line()
 /*
     Callbacks from the WDC chip
 */
-WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_irq_w )
+void corcomp_fdc_device::fdc_irq_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "INTRQ callback = %d\n", state);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_drq_w )
+void corcomp_fdc_device::fdc_drq_w(int state)
 {
 	LOGMASKED(LOG_DRQ, "DRQ callback = %d\n", state);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_hld_w )
+void corcomp_fdc_device::fdc_hld_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", state);
 }
@@ -281,7 +282,7 @@ void corcomp_fdc_device::cruwrite(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::clock_in )
+void corcomp_fdc_device::clock_in(int state)
 {
 	m_tms9901->phi_line(state);
 }
@@ -329,7 +330,7 @@ uint8_t corcomp_fdc_device::tms9901_input(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::select_dsk )
+void corcomp_fdc_device::select_dsk(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -363,49 +364,51 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::select_dsk )
 		}
 		LOGMASKED(LOG_DRIVE, "Select drive DSK%d\n", m_selected_drive);
 
-		if (m_floppy[m_selected_drive-1] != nullptr)
+		if (m_floppy[m_selected_drive-1]->get_device() != nullptr)
 		{
-			m_wdc->set_floppy(m_floppy[m_selected_drive-1]);
-			m_floppy[m_selected_drive-1]->ss_w(m_tms9901->read_bit(tms9901_device::INT15_P7));
+			m_wdc->set_floppy(m_floppy[m_selected_drive-1]->get_device());
+			m_floppy[m_selected_drive-1]->get_device()->ss_w(m_tms9901->read_bit(tms9901_device::INT15_P7));
 		}
 	}
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::side_select )
+void corcomp_fdc_device::side_select(int state)
 {
 	// Select side of disk (bit 7)
 	if (m_selected_drive != 0)
 	{
 		LOGMASKED(LOG_DRIVE, "Set side (bit 7) = %d on DSK%d\n", state, m_selected_drive);
-		m_floppy[m_selected_drive-1]->ss_w(state);
+		m_floppy[m_selected_drive-1]->get_device()->ss_w(state);
 	}
 }
 
 /*
     All floppy motors are operated by the same line.
 */
-WRITE_LINE_MEMBER( corcomp_fdc_device::motor_w )
+void corcomp_fdc_device::motor_w(int state)
 {
 	LOGMASKED(LOG_DRIVE, "Motor %s\n", state? "on" : "off");
 	m_wdc->set_force_ready(state==ASSERT_LINE);
 
 	// Set all motors
-	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
+	for (auto &elem : m_floppy)
+		if (elem->get_device() != nullptr)
+			elem->get_device()->mon_w((state==ASSERT_LINE)? 0 : 1);
+
 	operate_ready_line();
 }
 
 /*
     Push the P11 state to the variable.
 */
-WRITE_LINE_MEMBER( corcomp_fdc_device::select_bank )
+void corcomp_fdc_device::select_bank(int state)
 {
 	LOGMASKED(LOG_CRU, "Set bank %d\n", state);
 	m_banksel = (state==ASSERT_LINE);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::select_card )
+void corcomp_fdc_device::select_card(int state)
 {
 	LOGMASKED(LOG_CRU, "Select card = %d\n", state);
 	m_cardsel = (state==ASSERT_LINE);
@@ -426,24 +429,17 @@ void corcomp_fdc_device::device_start()
 
 void corcomp_fdc_device::device_reset()
 {
-	for (int i=0; i < 4; i++)
+	for (auto &flop : m_floppy)
 	{
-		if (m_floppy[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", i, m_floppy[i]->name());
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", flop->basetag(), flop->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", i);
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
-}
 
-void corcomp_fdc_device::connect_drives()
-{
-	for (auto & elem : m_floppy)
-		elem = nullptr;
-
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
-	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
+	m_decpal->set_board(this);
+	m_ctrlpal->set_board(this);
+	m_ctrlpal->set_decoder(m_decpal);
 }
 
 INPUT_PORTS_START( cc_fdc )
@@ -528,10 +524,10 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_motormf->set_clear_pin_value(1);
 	m_motormf->out_cb().set(FUNC(corcomp_fdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, "0", ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "3", ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
 
 	// SRAM 2114 1Kx4
 	RAM(config, BUFFER).set_default_size("1k").set_default_value(0);
@@ -542,7 +538,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 // ============================================================================
 
 corcomp_dcc_device::corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	  corcomp_fdc_device(mconfig, TI99_CCDCC, tag, owner, clock)
+	  corcomp_fdc_device(mconfig, TI99_CCDCC, tag, owner, clock, CCDCC_PALU2_TAG, CCDCC_PALU1_TAG)
 {
 }
 
@@ -564,13 +560,6 @@ ROM_START( cc_dcc )
 	ROM_LOAD("ccdcc_v89.u3", 0x0000, 0x2000, CRC(de3f9476) SHA1(b88aea1141769dad4e4bea5f93ac4f63a627cc82)) /* 8K single ROM bank 1*/
 	ROM_LOAD("ccdcc_v89.u4", 0x2000, 0x2000, CRC(9c4e5c08) SHA1(26f8096ae60f3839902b4e8764c5fde283ad4ba2)) /* 8K single ROM bank 2*/
 ROM_END
-
-void corcomp_dcc_device::device_config_complete()
-{
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(subdevice(CCDCC_PALU2_TAG));
-	m_ctrlpal = static_cast<ccfdc_sel_pal_device*>(subdevice(CCDCC_PALU1_TAG));
-	connect_drives();
-}
 
 ioport_constructor corcomp_fdc_device::device_input_ports() const
 {
@@ -603,15 +592,10 @@ ccfdc_sel_pal_device::ccfdc_sel_pal_device(const machine_config &mconfig, device
 {
 }
 
-void ccfdc_dec_pal_device::device_config_complete()
-{
-	m_board = static_cast<corcomp_fdc_device*>(owner());
-}
-
 /*
     Indicates 9901 addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::address9901 )
+int ccfdc_dec_pal_device::address9901()
 {
 	return ((m_board->get_address() & 0xff80)==0x1100)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -619,7 +603,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::address9901 )
 /*
     Indicates SRAM addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::addressram )
+int ccfdc_dec_pal_device::addressram()
 {
 	return ((m_board->card_selected()) &&
 		(m_board->get_address() & 0xff80)==0x4000)? ASSERT_LINE : CLEAR_LINE;
@@ -628,7 +612,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::addressram )
 /*
     Indicates WDC addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::addresswdc )
+int ccfdc_dec_pal_device::addresswdc()
 {
 	return ((m_board->card_selected()) &&
 		(m_board->get_address() & 0xff80)==0x5f80)? ASSERT_LINE : CLEAR_LINE;
@@ -637,7 +621,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::addresswdc )
 /*
     Indicates DSR addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::address4 )
+int ccfdc_dec_pal_device::address4()
 {
 	return ((m_board->card_selected()) &&
 		(m_board->get_address() & 0xe000)==0x4000)? ASSERT_LINE : CLEAR_LINE;
@@ -646,7 +630,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::address4 )
 /*
     Indicates SRAM selection.
 */
-READ_LINE_MEMBER( ccfdc_sel_pal_device::selectram )
+int ccfdc_sel_pal_device::selectram()
 {
 	return (m_decpal->addressram() && (m_board->upper_bank()))
 		? ASSERT_LINE : CLEAR_LINE;
@@ -655,7 +639,7 @@ READ_LINE_MEMBER( ccfdc_sel_pal_device::selectram )
 /*
     Indicates WDC selection.
 */
-READ_LINE_MEMBER( ccfdc_sel_pal_device::selectwdc )
+int ccfdc_sel_pal_device::selectwdc()
 {
 	return (m_decpal->addresswdc() && ((m_board->get_address()&1)==0))? ASSERT_LINE : CLEAR_LINE;
 }
@@ -663,7 +647,7 @@ READ_LINE_MEMBER( ccfdc_sel_pal_device::selectwdc )
 /*
     Indicates EPROM selection.
 */
-READ_LINE_MEMBER( ccfdc_sel_pal_device::selectdsr )
+int ccfdc_sel_pal_device::selectdsr()
 {
 	return (m_decpal->address4()
 		&& !m_decpal->addresswdc()
@@ -690,7 +674,7 @@ ccdcc_palu1_device::ccdcc_palu1_device(const machine_config &mconfig, const char
 /*
     Wait state logic
 */
-READ_LINE_MEMBER( ccdcc_palu1_device::ready_out )
+int ccdcc_palu1_device::ready_out()
 {
 	bool wdc = m_decpal->addresswdc();                         // Addressing the WDC
 	bool lastdig = (m_board->get_address()&7)==6;              // Address ends with 6 or e (5ff6, 5ffe)
@@ -705,18 +689,12 @@ READ_LINE_MEMBER( ccdcc_palu1_device::ready_out )
 	return ready;
 }
 
-void ccdcc_palu1_device::device_config_complete()
-{
-	m_board = static_cast<corcomp_fdc_device*>(owner());
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCDCC_PALU2_TAG));
-}
-
 // ============================================================================
 // Revised CorComp floppy disk controller card REV A
 // ============================================================================
 
 corcomp_fdca_device::corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	  corcomp_fdc_device(mconfig, TI99_CCFDC, tag, owner, clock)
+	  corcomp_fdc_device(mconfig, TI99_CCFDC, tag, owner, clock, CCFDC_PALU12_TAG, CCFDC_PALU6_TAG)
 {
 }
 
@@ -746,13 +724,6 @@ ROM_START( cc_fdcmg )
 	ROM_LOAD("ccfdc_v89mg.u2", 0x2000, 0x2000, CRC(0cad8f5b) SHA1(7744f777b51eedf614f766576bbc3f8c2c2e0042)) /* 16K single ROM */
 ROM_END
 
-void corcomp_fdca_device::device_config_complete()
-{
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(subdevice(CCFDC_PALU12_TAG));
-	m_ctrlpal = static_cast<ccfdc_sel_pal_device*>(subdevice(CCFDC_PALU6_TAG));
-	connect_drives();
-}
-
 const tiny_rom_entry *corcomp_fdca_device::device_rom_region() const
 {
 	return ROM_NAME( cc_fdcmg );
@@ -773,7 +744,7 @@ ccfdc_palu12_device::ccfdc_palu12_device(const machine_config &mconfig, const ch
     Indicates 9901 addressing. In this PAL version, the A9 address line is
     also used.
 */
-READ_LINE_MEMBER( ccfdc_palu12_device::address9901 )
+int ccfdc_palu12_device::address9901()
 {
 	return ((m_board->get_address() & 0xffc0)==0x1100)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -788,7 +759,7 @@ ccfdc_palu6_device::ccfdc_palu6_device(const machine_config &mconfig, const char
     That is, when writing (/WE=0), A12 must be 1 (addresses 5ff8..e),
     otherwise (/WE=1), A12 must be 0 (addresses 5ff0..6)
 */
-READ_LINE_MEMBER( ccfdc_palu6_device::selectwdc )
+int ccfdc_palu6_device::selectwdc()
 {
 	return (m_decpal->addresswdc()
 		&& ((m_board->get_address()&1)==0)
@@ -799,7 +770,7 @@ READ_LINE_MEMBER( ccfdc_palu6_device::selectwdc )
     Indicates EPROM selection. The Rev A selector PAL leads back some of
     its outputs for this calculation.
 */
-READ_LINE_MEMBER( ccfdc_palu6_device::selectdsr )
+int ccfdc_palu6_device::selectdsr()
 {
 	return (m_decpal->address4() && !selectwdc() && !selectram())? ASSERT_LINE : CLEAR_LINE;
 }
@@ -809,11 +780,16 @@ READ_LINE_MEMBER( ccfdc_palu6_device::selectdsr )
     board which evaluates whether the trap is active.
 */
 
-READ_LINE_MEMBER( ccfdc_palu6_device::ready_out )
+int ccfdc_palu6_device::ready_out()
 {
 	bool wdc = m_decpal->addresswdc();                   // Addressing the WDC
 	bool even = (m_board->get_address()&1)==0;          // A15 = 0
-	bool trap = static_cast<corcomp_fdca_device*>(m_board)->ready_trap_active();   // READY trap active
+	bool trap = false;
+
+	// The PAL u6 is only used on the Rev A board
+	corcomp_fdca_device* boarda = static_cast<corcomp_fdca_device*>(m_board);
+	trap = boarda->ready_trap_active();   // READY trap active
+
 	bool waitbyte = m_wdc->drq_r()==CLEAR_LINE;          // We are waiting for a byte
 	bool noterm = m_wdc->intrq_r()==CLEAR_LINE;          // There is no interrupt yet
 
@@ -821,12 +797,6 @@ READ_LINE_MEMBER( ccfdc_palu6_device::ready_out )
 
 	LOGMASKED(LOG_READY, "READY = %d (%d,%d,%d,%d,%d)\n", ready, wdc, even, trap, waitbyte, noterm);
 	return ready;
-}
-
-void ccfdc_palu6_device::device_config_complete()
-{
-	m_board = static_cast<corcomp_fdca_device*>(owner());
-	m_decpal = static_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCFDC_PALU12_TAG));
 }
 
 } // end namespace bus::ti99::peb

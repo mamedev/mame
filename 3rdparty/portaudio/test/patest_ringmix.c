@@ -1,9 +1,9 @@
 /** @file patest_ringmix.c
-	@ingroup test_src
-	@brief Ring modulate inputs to left output, mix inputs to right output.
+    @ingroup test_src
+    @brief Ring modulate inputs to left output, mix inputs to right output.
 */
 /*
- * $Id$ 
+ * $Id$
  *
  * This program uses the PortAudio Portable Audio Library.
  * For more information see: http://www.portaudio.com
@@ -30,13 +30,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -51,7 +51,7 @@ static int myCallback( const void *inputBuffer, void *outputBuffer,
                             void *userData )
 {
     const float *in  = (const float *) inputBuffer;
-	float *out = (float *) outputBuffer;    
+    float *out = (float *) outputBuffer;
     float leftInput, rightInput;
     unsigned int i;
 

@@ -123,7 +123,7 @@ public:
 	virtual void chip_write(offs_t offset, uint8_t data) { }
 	virtual void speedup_addon_bios_access() {}
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void nvram_alloc(uint32_t size);
 	void rtc_ram_alloc(uint32_t size);
 	void addon_bios_alloc(uint32_t size);
@@ -143,7 +143,7 @@ public:
 protected:
 	device_sns_cart_interface(const machine_config &mconfig, device_t &device);
 
-	DECLARE_WRITE_LINE_MEMBER(write_irq);
+	void write_irq(int state);
 	uint8_t read_open_bus();
 	int scanlines_r();
 	offs_t address_r();
@@ -177,13 +177,13 @@ public:
 	void set_scanlines(int scanlines) { m_scanlines = scanlines; }
 	void set_address(offs_t address) { m_address = address; }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	void get_cart_type_addon(const uint8_t *ROM, uint32_t len, int &type, int &addon) const;
@@ -212,7 +212,7 @@ public:
 	uint8_t chip_read(offs_t offset);
 	void chip_write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
+	void write_irq(int state) { m_irq_callback(state); }
 	uint8_t read_open_bus() { return m_open_bus_callback(); }
 	int scanlines_r() { return m_scanlines; }
 	offs_t address_r() { return m_address; }
@@ -236,7 +236,7 @@ public:
 protected:
 	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -311,13 +311,5 @@ public:
 DECLARE_DEVICE_TYPE(SNS_CART_SLOT,        sns_cart_slot_device)
 DECLARE_DEVICE_TYPE(SNS_SUFAMI_CART_SLOT, sns_sufami_cart_slot_device)
 DECLARE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define SNSSLOT_ROM_REGION_TAG ":cart:rom"
-
 
 #endif // MAME_BUS_SNES_SNES_SLOT_H

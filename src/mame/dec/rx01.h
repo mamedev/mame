@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_RX01_H
-#define MAME_MACHINE_RX01_H
+#ifndef MAME_DEC_RX01_H
+#define MAME_DEC_RX01_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(RX01, rx01_device)
 
-#endif // MAME_MACHINE_RX01_H
+#endif // MAME_DEC_RX01_H

@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "bus/nscsi/cdd2000.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 DEFINE_DEVICE_TYPE(CDD2000, cdd2000_device, "cdd2000", "Philips CDD2000 CD-R")
 
@@ -17,18 +17,25 @@ cdd2000_device::cdd2000_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, CDD2000, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "scsic")
 	, m_cdcpu(*this, "cdcpu")
+	, m_rombank(*this, "bank")
 {
 }
 
 void cdd2000_device::device_start()
 {
+	m_rombank->configure_entries(0, 4, memregion("flash")->base() + 0x1000, 0x10000);
+}
+
+void cdd2000_device::device_reset()
+{
+	m_rombank->set_entry(3); // FIXME: MC68HC11 core should take care of this
 }
 
 void cdd2000_device::mem_map(address_map &map)
 {
 	map(0x0400, 0x040f).m("scsic", FUNC(ncr53cf94_device::map));
 	// 0x0800, 0x080f is another device
-	map(0x1000, 0xffff).rom().region("flash", 0x31000); // TODO: banking
+	map(0x1000, 0xffff).bankr(m_rombank);
 	map(0x2000, 0x3fff).ram();
 }
 
@@ -37,8 +44,10 @@ void cdd2000_device::device_add_mconfig(machine_config &config)
 	mc68hc11f1_device &cdcpu(MC68HC11F1(config, m_cdcpu, 8'000'000)); // type and clock guessed
 	cdcpu.set_addrmap(AS_PROGRAM, &cdd2000_device::mem_map);
 	cdcpu.set_default_config(0x0b);
+	cdcpu.out_pa_callback().set_membank(m_rombank).mask(0x60).rshift(5);
 
-	NCR53CF94(config, "scsic", 25'000'000); // type and clock guessed
+	ncr53cf94_device &scsic(NCR53CF94(config, "scsic", 25'000'000)); // type and clock guessed
+	scsic.irq_handler_cb().set_inputline(m_cdcpu, MC68HC11_IRQ_LINE);
 }
 
 ROM_START(cdd2000)

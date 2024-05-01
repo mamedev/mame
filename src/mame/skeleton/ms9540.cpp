@@ -28,6 +28,8 @@ Chips:
 #include "machine/terminal.h"
 
 
+namespace {
+
 class ms9540_state : public driver_device
 {
 public:
@@ -135,6 +137,8 @@ ROM_START( ms9540 )
 	ROM_LOAD( "z80-hd.bin",   0x0000, 0x1000, CRC(b1c37286) SHA1(36b38fec9ef46e3e594423bbd1c64c5e9a4bc74d) )
 	ROM_LOAD( "z80-flp.bin",  0x1000, 0x0800, CRC(f256b8c3) SHA1(780b444e999c3149eb0f137733703682d65746b4) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

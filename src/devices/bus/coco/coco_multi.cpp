@@ -65,7 +65,6 @@
 
 #define SWITCH_CONFIG_TAG   "switch"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_CART   (1U << 1) // shows cart line changes
 #define LOG_SWITCH (1U << 2) // shows switch changes
 //#define VERBOSE (LOG_CART|LOG_SWITCH)
@@ -190,7 +189,7 @@ void coco_multipak_device::device_add_mconfig(machine_config &config)
 	m_slots[2]->cart_callback().set([this](int state) { update_line(3, line::CART); });
 	m_slots[2]->nmi_callback().set([this](int state) { update_line(3, line::NMI); });
 	m_slots[2]->halt_callback().set([this](int state) { update_line(3, line::HALT); });
-	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot4, "fdcv11");
+	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot4, "fdc");
 	m_slots[3]->cart_callback().set([this](int state) { update_line(4, line::CART); });
 	m_slots[3]->nmi_callback().set([this](int state) { update_line(4, line::NMI); });
 	m_slots[3]->halt_callback().set([this](int state) { update_line(4, line::HALT); });

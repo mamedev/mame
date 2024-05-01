@@ -136,40 +136,42 @@
    -----+--------------------------+---------+---------+----------+---------+----------+---------+---------------+------+------+-------
     VER |  NAME                    | SYSTEM  | PROGRAM | CHAR GEN | CG P/N  | CLR PROM | CP P/N  | GAME TYPE     | DUMP | STAT | ADDED
    -----+--------------------------+---------+---------+----------+---------+----------+---------+---------------+------+------+-------
- *  7.4 | Gaming Poker (w. export) |   903   | AUG/81  | PKCG     | 6300010 | unknown  | 6600020 | Gaming        | Yes  | OK   | Yes
+ *  7.4 | Gaming Poker (w. export) |   903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | Yes  | OK   | Yes
     7.6 | Poker                    |   903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
  *  7.9 | Arcade Poker             |   903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
  *  8.0 | Arcade Black Jack        |   903   | SEP/81  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
  *  9.4 | Keno                     |   903   | DEC/81  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
- * 10.7 | Big Game                 |   903   | MAR/82  | LOTCG    | unknown | BCLR     | unknown | Amusement?    | Yes  | OK   | Yes
+   10.2 | Keno                     |   903   | DEC/81  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | No   |      | No
+ * 10.7 | Big Game Lottery         |   904   | MAR/82  | LOTCG    | 6300050 | LOTCLR   | 6600030 | Gaming        | Yes  | OK   | Yes
  * 11.3 | Black Jack               |   903   |         | CPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement?    | No   |      | No
  * 12.3 | Ticket Poker             |   903   | JUN/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- * 12.5 | Bingo                    |   903   | JUN/82  | NBCG     | unknown | BCLR     | unknown | Amusement     | Yes  | OK   | Yes
- * 12.7 | Keno                     |  903/4? | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ * 12.5 | Nudge Bingo              |   903   | JUN/82  | NBCG     | 6300040 | BCLR     | 6300040 | Amusement     | Yes  | OK   | Yes
+ * 12.7 | Keno                     |   903   | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
  * 12.8 | Arcade Game (Draw Poker) |   903   | JUL/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
    13.4 | Nudge Bingo              |   903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
    14.5 | Pixels                   |   903   | DEC/82  | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | BD   | Yes
    14.7 | Nudge Bingo              |   903   |         | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | No   |      | No
    15.0 | Punchboard               |   903   |         | PBCG     | 6300190 | PBCLR    | 6600130 | Gaming Wash   | No   |      | No
    15.7 | Double-Draw Poker        |   903   | JAN/83  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   15.8 | Poker Montana            |    ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   15.8 | Poker Montana            |   904   |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
    15.9 | Wild Double-Up           |   905   | JAN/83  | JKR2CG   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   16.2 | Gaming Lottery           |    ?    |         | LCG      | 6300050 | LOTCLR   | 6600030 | Gaming        | No   |      | No
-   16.3 | Black Jack               |    ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.2 | Gaming Lottery           |   904   |         | LCG      | 6300050 | LOTCLR   | 6600030 | Gaming        | No   |      | No
+   16.3 | Black Jack               |   903   |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
    16.4 | K.I.S.S. Keno            |   904   | MAY/83  | KCG      | 6300060 | PCLR     | 6600020 | Amusement     | Yes  | IC   | Yes
-   16.5 | K.I.S.S. Poker           |    ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.6 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   16.7 | Poker                    |    ?    |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.8 | Keno                     |   903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   17.0 | Poker                    |   905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | Yes  |      | Yes
-   17.1 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   16.5 | K.I.S.S. Poker           |   903   |         | POKER    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.6 | Nudge Bingo              |   903   |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   16.7 | Poker                    |   903   |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.8 | Arcade Keno              |   903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ * 16.9 | Keno                     |   904   |         | KCG      |         |          |         | Gaming        | No   |      | No
+   17.0 | Amusement Poker          |   905   |         | JKRPKR   | 6300010 | PKRCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+   17.1 | Nudge Bingo              |   903   |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
    17.2 | Double/Double Poker      |   905   | MAY/83  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   17.3 | Casino Poker             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   17.4 | Gin Gaming               |    ?    |         | GCG0.2   | 6300080 | GINCLR   | 6600060 | Nevada Gaming | No   |      | No
-   17.5 | Gaming Draw Poker        |   903   | DEC/84  | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   17.3 | Casino Poker             |   904   |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   17.4 | Gin Gaming               |   904   |         | GCG0.2   | 6300080 | GINCLR   | 6600060 | Nevada Gaming | No   |      | No
+   17.5 | Gaming Draw Poker        |   904   | DEC/84  | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
    17.6 | Nudge                    |   903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   17.7 | Keno                     |    ?    |         | KCG      | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   17.9 | AWP Poker                |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   17.7 | Keno                     |   904   |         | KCG      | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   17.9 | AWP Poker                |   904   |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
  * 18.0 | Gin                      |   905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
    18.1 | Nudge                    |    ?    | JUL/83  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
    18.2 | Amusement Poker          |   905   |         | JKRCG02  | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
@@ -195,7 +197,7 @@
    20.9 | Gaming Poker-Europe      |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
    21.1 | AWP Poker                |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
    21.2 | Video Slot               |    ?    |         | SL1CG    | 6300180 | SLC1     | 6600120 | Gaming        | No   |      | No
-   21.4 | Wild Double-Up Poker     |    ?    |         | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   21.4 | Wild Double-Up Poker     |   905   | MAY/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | IC   | Yes
    21.5 | Double/Double Poker      |    ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
  * 21.6 | Wild Double-Up?          |   905   | JUN/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
  * 21.7 | Poker?                   |   905   | MAY/84  | GPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
@@ -261,6 +263,7 @@
         |                          |         |         |          |         |          |         |               |      |      |
    51.07| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
    51.08| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
+ * 60.04| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
         |                          |         |         |          |         |          |         |               |      |      |
  * 903d | System 903 Diag.PROM     |   903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
  * 905d | System 905 Diag.PROM     |   905   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
@@ -341,7 +344,9 @@
 
     El Grande - 5 Card Draw:
 
-    This game was created by Tuni Electro Service and was licensed to E.T. Marketing,Inc.
+    This game was created by Tuni Electro Service (later known as Enter-Tech) and was
+    published by E.T. Marketing, Inc., which is basically the marketing branch of
+    E.T. Industries (parent company of Tuni/Enter-Tech).
     This is the new version. The old one is still undumped, but looks like Golden Poker D-Up.
 
     Flyer: https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=4542&image=1
@@ -737,7 +742,7 @@
 *               Read/Write Handlers               *
 **************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
+void calomega_state::update_aciabaud_scale(int state)
 {
 	uint8_t dsw2 = m_sw2->read();
 
@@ -890,7 +895,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_2 )
 	// logerror("Timer_2 event : state=%d\n", m_timer);
 }
 
-WRITE_LINE_MEMBER(calomega_state::vblank0_w)
+void calomega_state::vblank0_w(int state)
 {
 	m_pia[0]->read(0);
 	m_pia[0]->read(0);
@@ -899,14 +904,14 @@ WRITE_LINE_MEMBER(calomega_state::vblank0_w)
 	// logerror("V_BLANK_0 event : state=%d\n", state);
 }
 
-WRITE_LINE_MEMBER(calomega_state::vblank1_w)
+void calomega_state::vblank1_w(int state)
 {
 	m_pia[0]->read(2);
 	m_pia[0]->cb1_w(state);
 	// logerror("V_BLANK_1 event (sale ): state=%d\n", state);
 }
 
-WRITE_LINE_MEMBER(calomega_state::vblank2_w)
+void calomega_state::vblank2_w(int state)
 {
 	m_pia[1]->read(0);
 	m_pia[1]->read(0);
@@ -915,7 +920,7 @@ WRITE_LINE_MEMBER(calomega_state::vblank2_w)
 	// logerror("V_BLANK_2 event : state=%d\n", state);
 }
 
-WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
+void calomega_state::pia1_cb2_w(int state)
 {
 	// Output to L9
 	m_lamps[8] = ~state;  // L9 (Door?)
@@ -933,7 +938,7 @@ void calomega_state::dummy_pia_w(uint8_t data)
 	m_pia_data = data;
 }
 
-WRITE_LINE_MEMBER(calomega_state::dummy_pia_line_w)
+void calomega_state::dummy_pia_line_w(int state)
 {
 }
 
@@ -4562,14 +4567,14 @@ GFXDECODE_END
 *                 ACIA Interface                 *
 *************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
+void calomega_state::write_acia_clock(int state)
 {
 	m_acia6850[0]->write_txc(state);
 	m_acia6850[0]->write_rxc(state);
 	update_aciabaud_scale(0);
 }
 
-WRITE_LINE_MEMBER(calomega_state::w_903kb_acia_clock)
+void calomega_state::w_903kb_acia_clock(int state)
 {
 	m_acia6850[0]->write_txc(state);
 	m_acia6850[0]->write_rxc(state);
@@ -4590,7 +4595,7 @@ void calomega_state::sys903(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4600,7 +4605,7 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4663,7 +4668,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_kstec->t0_in_cb().set("uart", FUNC(i8251_device::txrdy_r));                                    // uart tx handshake
 	m_kstec->t1_in_cb().set([this] () { return calomega_state::m_rxrdy; });                          // uart rx handshake
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4673,7 +4678,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4757,12 +4762,12 @@ void calomega_state::sys905(machine_config &config)
 
 	screen.screen_vblank().set(FUNC(calomega_state::vblank1_w));
 
-	PIA6821(config.replace(), m_pia[0], 0);
+	PIA6821(config.replace(), m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));    // Muxed inputs read.
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));       // Full Lamps - OK.
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
-	PIA6821(config.replace(), m_pia[1], 0);
+	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");                             // Full port.
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));        // Mux. Scan Lines.(Lower Nibble). Hopper & Coin Lockout (Upper nibble).
 	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.    (PIA -> CPU)
@@ -4793,14 +4798,14 @@ void calomega_state::sys906(machine_config &config)
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
 	screen.screen_vblank().set(FUNC(calomega_state::vblank2_w));
-	PIA6821(config.replace(), m_pia[0], 0);
+	PIA6821(config.replace(), m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("SW1");                             // Bit 7 - CGBANK ???? input?-output?
 	m_pia[0]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Ignored
 	m_pia[0]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Diverter
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));       // Bit 7 - CGBANK ???? input?-output?
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));       // Meters ??? (M1-M5), coils, hopper
 
-	PIA6821(config.replace(), m_pia[1], 0);
+	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));         // Mux. Button read.
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
 	m_pia[1]->ca1_w(0);                                                       // Timer Interrupt Ack.      (CPU -> PIA)
@@ -4895,7 +4900,7 @@ ROM_START( comg079 )  // Cal Omega v7.9 (Arcade Poker)
 	ROM_LOAD( "pkcga.u68",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+	ROM_LOAD( "clrprom_7.9.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
 ROM_START( comg080 )  // Cal Omega v8.0 (Arcade Black Jack)
@@ -5424,6 +5429,30 @@ ROM_START( comg208 )  // Cal Omega v20.8 (Winner's Choice)
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(ab8960a6) SHA1(2414b445739860a0c3e533f2992291ff8a471d76) )
 ROM_END
 
+ROM_START( comg214 )  // Cal Omega v21.4 (Wild Double-Up Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
+	ROM_LOAD( "21.43.bin",  0x5000, 0x1000, CRC(9ea9f6c5) SHA1(659dd68922de7142de9050e7d6495bdabbf15abb) )
+
+	// bad programmed eprom. It has the same contents of 21.43.bin
+	// the original one should have checksum16 = AD9F (as quoted in some notes)
+	ROM_LOAD( "21.44.bin",  0x6000, 0x1000, BAD_DUMP CRC(9ea9f6c5) SHA1(659dd68922de7142de9050e7d6495bdabbf15abb))
+
+	ROM_LOAD( "21.45.bin",  0x7000, 0x1000, CRC(199b77f8) SHA1(3c669469edfd83458441659866040ed57d4c1b88) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "cg0.bin",  0x0000, 0x0800, CRC(987b3e4d) SHA1(ae4b5dc0e4d1195bbf18b375c1a4dbf880f5f38c) )
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "cg2c.bin",  0x0000, 0x0800, CRC(5b96f5e0) SHA1(4733349798eb059998a4814331f57e7f09e02490) )
+	ROM_LOAD( "cg2b.bin",  0x0800, 0x0800, CRC(d77dda31) SHA1(e11b476cf0b609a8a40981b81b4d83b3c86678dc) )
+	ROM_LOAD( "cg2a.bin",  0x1000, 0x0800, CRC(def60756) SHA1(fe71424fc638761d9ff65391261a030a2889ad5e) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
+
 ROM_START( comg227 )  // Cal Omega v22.7 (Amusement Poker (Double Double))
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
@@ -5447,7 +5476,7 @@ ROM_END
 ROM_START( comg230 )  // Cal Omega v23.0 (FC Bingo (4-card))
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
-	ROM_LOAD( "23-02.u6",   0x4000, 0x1000, BAD_DUMP CRC(f154670a) SHA1(e0c66649d1434eca3435033a32634cb90cef0f31) )
+	ROM_LOAD( "23-02.u6",   0x4000, 0x1000, NO_DUMP )
 	ROM_LOAD( "23-03.u7",   0x5000, 0x1000, BAD_DUMP CRC(daf93757) SHA1(27d57007a24a5f892f7ee201072fcd5817373cad) )
 	ROM_LOAD( "23-04.u8",   0x6000, 0x1000, CRC(ebb5531a) SHA1(9fd003fcba5a5120332bcbd3c845d555c60875e9) )
 	ROM_LOAD( "23-05.u9",   0x7000, 0x1000, BAD_DUMP CRC(cca254a0) SHA1(9dc7c660e0f2d5766756e4ef8cb5a7eddec18069) )
@@ -5623,8 +5652,8 @@ ROM_START( comg272b )  // Cal Omega v27.2 (Keno (gaming))
 	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
-/*
 
+/*
   CEI Video Poker
   Jacks or Better
   V 51.08
@@ -5633,41 +5662,111 @@ ROM_END
   PROMS 2764
 
 */
-
 ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. checked in offset $8034
-	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
-	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
-	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
-	ROM_LOAD( "epr5.u32",   0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
+	ROM_LOAD( "epr1_s05f.u28",  0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. checked in offset $8034
+	ROM_LOAD( "epr2_5008.u29",  0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
+	ROM_LOAD( "epr3_5008.u30",  0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
+	ROM_LOAD( "epr4_5008.u31",  0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
+	ROM_LOAD( "epr5_5008.u32",  0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "cg2c.u4",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
-	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
-	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
 	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
-	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
+
+ROM_START( comg5108a )  // Cal Omega v51.08a (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr1_s09f.u28",  0x6000, 0x2000, CRC(6eccf229) SHA1(e3185d4f3848ece90bfbe6b0aac95e62c8b39faf) )  // schedule eprom 09F. checked in offset $8034
+	ROM_LOAD( "epr2_5008.u29",  0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
+	ROM_LOAD( "epr3_5008.u30",  0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
+	ROM_LOAD( "epr4_5008.u31",  0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
+	ROM_LOAD( "epr5_5008.u32",  0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
+
+ROM_START( comg5108b )  // Cal Omega v51.08b (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr1_s21f.u28",  0x6000, 0x2000, CRC(33b1bb5b) SHA1(86f439ef96f7dafe320c394878ff4fda3f94c631) )  // schedule eprom 21F. checked in offset $8034
+	ROM_LOAD( "epr2_5008.u29",  0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
+	ROM_LOAD( "epr3_5008.u30",  0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
+	ROM_LOAD( "epr4_5008.u31",  0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
+	ROM_LOAD( "epr5_5008.u32",  0xe000, 0x2000, CRC(b0981cea) SHA1(e56278176df1a6c20acfb8cbf2f5e7a946d93111) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.u16",     0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
 ROM_START( comg5107 )  // Cal Omega v51.07 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. same as the 51.08 set
-	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(1cefe40d) SHA1(9169c466903485d6e78c53bd104dc61722437509) )
-	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(0bc9be3e) SHA1(bce88a6a37ded6396954ec8c11e19af66f658e4d) )
-	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(34e7d16f) SHA1(c4901e00a5dbaeb6277dbe9bdcad93827c5aa947) )
-	ROM_LOAD( "epr5.u32",   0xe000, 0x2000, CRC(e5a252b5) SHA1(7a226c771ba16944b4e50c22db0cd5d7fc530e11) )
+	ROM_LOAD( "epr1_s05f.u28",  0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F
+	ROM_LOAD( "epr2_5007.u29",  0x8000, 0x2000, CRC(1cefe40d) SHA1(9169c466903485d6e78c53bd104dc61722437509) )
+	ROM_LOAD( "epr3_5007.u30",  0xa000, 0x2000, CRC(0bc9be3e) SHA1(bce88a6a37ded6396954ec8c11e19af66f658e4d) )
+	ROM_LOAD( "epr4_5007.u31",  0xc000, 0x2000, CRC(34e7d16f) SHA1(c4901e00a5dbaeb6277dbe9bdcad93827c5aa947) )
+	ROM_LOAD( "epr5_5007.u32",  0xe000, 0x2000, CRC(e5a252b5) SHA1(7a226c771ba16944b4e50c22db0cd5d7fc530e11) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "cg2c.u4",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
-	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
-	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
 	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
-	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
+/*
+  CEI 906III POKER
+  V60.04  1989  906III board
+
+  Jumper 8,9
+  EPR 1-5 2764
+  CG's    2764
+  Labeled UCMC
+
+  EPR1   075B   E3185D4F3848ECE90BFBE6B0AAC95E62C8B39FAF
+  EPR2   442A   474B6B2CC592518836C1D3804FE77CAE505FCC97
+  EPR3   E8E9   AE259FCFA34B20F0C9C71CA48275426F2E9CFFBE
+  EPR4   65A3   B8A16A8B8BA245901D4F347250E0DCB7E6D36E0A
+  EPR5   3D40   53D33F3B251D27F6EC40E3E3B059EA7BA8A2EFE0
+
+  CG2A   961D   68472E7271F835656197109620BB3988FC52308A
+  CG2B   B319   B2BCE60E24DD61977F7BF6EE4705CA7D104AB388
+  CG2C   DF06   3AF5F568DE3F2AF1A6BBB00D673BDBFF16C87A40
+  Color  076A   CBFF2CB60137462DC0B7C7719A64574218D96C62
+
+*/
+ROM_START( comg6004 )  // Cal Omega v60.04 (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr1_s09f.u28",  0x6000, 0x2000, CRC(6eccf229) SHA1(e3185d4f3848ece90bfbe6b0aac95e62c8b39faf) )  // schedule eprom 09F
+	ROM_LOAD( "epr2_6004.u29",  0x8000, 0x2000, CRC(9f5af552) SHA1(474b6b2cc592518836c1d3804fe77cae505fcc97) )
+	ROM_LOAD( "epr3_6004.u30",  0xa000, 0x2000, CRC(98799fa0) SHA1(ae259fcfa34b20f0c9c71ca48275426f2e9cffbe) )
+	ROM_LOAD( "epr4_6004.u31",  0xc000, 0x2000, CRC(eff6fbb3) SHA1(b8a16a8b8ba245901d4f347250e0dcb7e6d36e0a) )
+	ROM_LOAD( "epr5_6004.u32",  0xe000, 0x2000, CRC(fc4b7c2f) SHA1(53d33f3b251d27f6ec40e3e3b059ea7ba8a2efe0) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.u4",        0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",        0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",        0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.u16",      0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
 
 
 /*********************** Diagnostic PROMs ***********************/
@@ -5710,7 +5809,7 @@ ROM_END
 
 
 
-/****************** Unofficial / 3rd part games *****************/
+/****************** Unofficial / 3rd party games *****************/
 
 /*
 
@@ -6132,7 +6231,7 @@ GAMEL( 1983, comg164,  0,        sys903kb, keno_903, calomega_state, empty_init,
 GAMEL( 1983, comg168,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
 GAME(  1983, comg170,  0,        sys905,   comg170,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.0 (Amusement Poker)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1983, comg172,  0,        sys905,   comg172,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
-GAME(  1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker, Sch 07-0T)", MACHINE_SUPPORTS_SAVE )
 GAME(  1982, comg176,  0,        sys903,   nudgensw, calomega_state, init_comg176, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
 GAME(  1982, comg181,  0,        sys903,   nudgesw,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
 GAME(  1983, comg183,  0,        sys905,   pixels,   calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                   MACHINE_SUPPORTS_SAVE )
@@ -6142,6 +6241,7 @@ GAME(  1983, comg186,  0,        sys905,   pixels,   calomega_state, empty_init,
 GAME(  1983, comg187,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
 GAME(  1984, comg204,  0,        sys905,   comg204,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1984, comg208,  0,        sys905,   comg208 , calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1984, comg214,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 21.4 (Wild Double-Up Poker)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // incomplete dump
 GAME(  1984, comg227,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
 GAME(  1984, comg230,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
 GAME(  1984, comg236,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_SUPPORTS_SAVE )
@@ -6152,22 +6252,25 @@ GAMEL( 1985, comg272a, 0,        sys903kb, keno_903, calomega_state, empty_init,
 GAMEL( 1985, comg272b, 0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",             MACHINE_SUPPORTS_SAVE,                         layout_kenokb )
 
 //************ Diagnostic Sets ************
-GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, empty_init,    ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, empty_init,    ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg903d,  0,        sys903,   stand903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg905d,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
 
 //************* 906-III games **************
-GAME( 1988, comg5107, 0,        sys906,   stand906, calomega_state, empty_init,    ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,    ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5107,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker, Schedule 05F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker, Schedule 05F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108a, comg5108, sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker, Schedule 09F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108b, comg5108, sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker, Schedule 21F)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, comg6004,  0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 60.04 (CEI 906-III Poker, Schedule 09F)",      MACHINE_SUPPORTS_SAVE )
 
-//****** Unofficial 903/904/905 3rd part games *******
-GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v2.4)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v3.0)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v4.0)",                               MACHINE_SUPPORTS_SAVE )
+//****** Unofficial 903/904/905 3rd party games *******
+GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Tuni Electro Service",                  "El Grande - 5 Card Draw (New)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 1)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 2)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v2.4)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v3.0)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                   "SSI Poker (v4.0)",                                 MACHINE_SUPPORTS_SAVE )
 
-//****** Unofficial 906-III family 3rd part games *******
+//****** Unofficial 906-III family 3rd party games *******
 GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Casino 21 UCMC/IWC (ver 30.08)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pokeriwc,  0,        sys906,   pokeriwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Poker UCMC/IWC (ver 162.03)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pokiwc162, pokeriwc, sys906,   pokeriwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Poker UCMC/IWC (ver 162.03 20-6-91)",              MACHINE_SUPPORTS_SAVE )

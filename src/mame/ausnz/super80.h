@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-#ifndef MAME_INCLUDES_SUPER80_H
-#define MAME_INCLUDES_SUPER80_H
+#ifndef MAME_AUSNZ_SUPER80_H
+#define MAME_AUSNZ_SUPER80_H
 
 #pragma once
 
@@ -147,7 +147,7 @@ protected:
 	void port3f_w(u8 data);
 	u8 port3e_r();
 	std::unique_ptr<u8[]> m_vram;
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void busreq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
@@ -185,4 +185,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_SUPER80_H
+#endif // MAME_AUSNZ_SUPER80_H

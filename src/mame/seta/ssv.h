@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_SSV_H
-#define MAME_INCLUDES_SSV_H
+#ifndef MAME_SETA_SSV_H
+#define MAME_SETA_SSV_H
 
 #pragma once
 
@@ -180,7 +180,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(adc_int_w);
+	void adc_int_w(int state);
 
 	uint16_t eeprom_r();
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -256,4 +256,4 @@ private:
 	required_ioport m_io_service;
 };
 
-#endif // MAME_INCLUDES_SSV_H
+#endif // MAME_SETA_SSV_H

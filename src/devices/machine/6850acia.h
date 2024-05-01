@@ -31,11 +31,11 @@ public:
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( write_cts );
-	DECLARE_WRITE_LINE_MEMBER( write_dcd );
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
-	DECLARE_WRITE_LINE_MEMBER( write_rxc );
-	DECLARE_WRITE_LINE_MEMBER( write_txc );
+	void write_cts(int state);
+	void write_dcd(int state);
+	void write_rxd(int state);
+	void write_rxc(int state);
+	void write_txc(int state);
 
 protected:
 	acia6850_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

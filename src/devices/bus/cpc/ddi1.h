@@ -37,7 +37,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void set_mapping(uint8_t type) override;
-	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
+	virtual void romen_w(int state) override { m_romen = state; }
 
 private:
 	cpc_expansion_slot_device *m_slot;

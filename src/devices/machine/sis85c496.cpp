@@ -14,17 +14,27 @@
 
 #include "emu.h"
 #include "sis85c496.h"
+
 #include "bus/pc_kbd/keyboards.h"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
+DEFINE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device, "sis85c496_host", "SiS 85C496/497 chipset")
 
 void sis85c496_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
 	map(0x40, 0x40).rw(FUNC(sis85c496_host_device::dram_config_r), FUNC(sis85c496_host_device::dram_config_w));
 	map(0x44, 0x45).rw(FUNC(sis85c496_host_device::shadow_config_r), FUNC(sis85c496_host_device::shadow_config_w));
+	map(0x48, 0x4f).lrw8(
+		NAME([this] (offs_t offset) { return m_dram_boundary[offset]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("SiS496: DRAM boundary [%02x] set %02x\n", offset, data);
+			m_dram_boundary[offset] = data;
+		})
+	);
+	map(0x58, 0x59).rw(FUNC(sis85c496_host_device::ide_vesa_config_r), FUNC(sis85c496_host_device::ide_vesa_config_w));
 	map(0x5a, 0x5a).rw(FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
+	map(0xc0, 0xc3).rw(FUNC(sis85c496_host_device::pirqrc_r), FUNC(sis85c496_host_device::pirqrc_w));
 	map(0xc8, 0xcb).rw(FUNC(sis85c496_host_device::mailbox_r), FUNC(sis85c496_host_device::mailbox_w));
 	map(0xd0, 0xd0).rw(FUNC(sis85c496_host_device::bios_config_r), FUNC(sis85c496_host_device::bios_config_w));
 	map(0xd1, 0xd1).rw(FUNC(sis85c496_host_device::isa_decoder_r), FUNC(sis85c496_host_device::isa_decoder_w));
@@ -34,27 +44,21 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 {
 	pci_host_device::io_configuration_access_map(map);
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0020, 0x0021).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+//  map(0x0022, 0x0023) 85C497 super I/O
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0063).rw(FUNC(sis85c496_host_device::at_keybc_r), FUNC(sis85c496_host_device::at_keybc_w));
 	map(0x0064, 0x0067).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
-	map(0x0070, 0x007f).rw("rtc", FUNC(ds12885_device::read), FUNC(ds12885_device::write));
+	map(0x0070, 0x0070).lr8(NAME([this] () { return m_ds12885->get_address(); })).w(FUNC(sis85c496_host_device::rtc_address_nmi_w));
+	map(0x0071, 0x0071).rw("rtc", FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w));
 	map(0x0080, 0x009f).rw(FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
-	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00a0, 0x00a1).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(sis85c496_host_device::at_dma8237_2_r), FUNC(sis85c496_host_device::at_dma8237_2_w));
 	map(0x00e0, 0x00ef).noprw();
 }
 
 void sis85c496_host_device::device_add_mconfig(machine_config &config)
 {
-	PIT8254(config, m_pit8254, 0);
-	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
-	m_pit8254->out_handler<0>().set(FUNC(sis85c496_host_device::at_pit8254_out0_changed));
-	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
-	m_pit8254->out_handler<1>().set(FUNC(sis85c496_host_device::at_pit8254_out1_changed));
-	m_pit8254->set_clk<2>(4772720/4); // PIO port C pin 4, and speaker polling enough
-	m_pit8254->out_handler<2>().set(FUNC(sis85c496_host_device::at_pit8254_out2_changed));
-
 	AM9517A(config, m_dma8237_1, XTAL(14'318'181)/3);
 	m_dma8237_1->out_hreq_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq0_w));
 	m_dma8237_1->out_eop_callback().set(FUNC(sis85c496_host_device::at_dma8237_out_eop));
@@ -89,7 +93,7 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_dma8237_2->out_dack_callback<3>().set(FUNC(sis85c496_host_device::pc_dack7_w));
 
 	PIC8259(config, m_pic8259_master, 0);
-	m_pic8259_master->out_int_callback().set(FUNC(sis85c496_host_device::cpu_int_w));
+	m_pic8259_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic8259_master->in_sp_callback().set_constant(1);
 	m_pic8259_master->read_slave_ack_callback().set(FUNC(sis85c496_host_device::get_slave_ack));
 
@@ -97,10 +101,19 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_pic8259_slave->out_int_callback().set(m_pic8259_master, FUNC(pic8259_device::ir2_w));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
+	PIT8254(config, m_pit8254, 0);
+	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
+	m_pit8254->out_handler<0>().set(m_pic8259_master, FUNC(pic8259_device::ir0_w));
+	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
+	m_pit8254->out_handler<1>().set(FUNC(sis85c496_host_device::at_pit8254_out1_changed));
+	m_pit8254->set_clk<2>(4772720/4); // PIO port C pin 4, and speaker polling enough
+	m_pit8254->out_handler<2>().set(FUNC(sis85c496_host_device::at_pit8254_out2_changed));
+
+	// TODO: PS/2
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
 	m_keybc->hot_res().set(FUNC(sis85c496_host_device::cpu_reset_w));
 	m_keybc->gate_a20().set(FUNC(sis85c496_host_device::cpu_a20_w));
-	m_keybc->kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
+	m_keybc->kbd_irq().set(m_pic8259_master, FUNC(pic8259_device::ir1_w));
 	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
@@ -112,6 +125,36 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_ds12885->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
 	m_ds12885->set_century_index(0x32);
 
+	// TODO: ISA bus clock, irqs
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
+	m_isabus->irq3_callback().set(FUNC(sis85c496_host_device::pc_irq3_w));
+	m_isabus->irq4_callback().set(FUNC(sis85c496_host_device::pc_irq4_w));
+	m_isabus->irq5_callback().set(FUNC(sis85c496_host_device::pc_irq5_w));
+	m_isabus->irq6_callback().set(FUNC(sis85c496_host_device::pc_irq6_w));
+	m_isabus->irq7_callback().set(FUNC(sis85c496_host_device::pc_irq7_w));
+	m_isabus->irq2_callback().set(FUNC(sis85c496_host_device::pc_irq9_w));
+	m_isabus->irq10_callback().set(FUNC(sis85c496_host_device::pc_irq10_w));
+	m_isabus->irq11_callback().set(FUNC(sis85c496_host_device::pc_irq11_w));
+	m_isabus->irq12_callback().set(FUNC(sis85c496_host_device::pc_irq12m_w));
+	m_isabus->irq14_callback().set(FUNC(sis85c496_host_device::pc_irq14_w));
+	m_isabus->irq15_callback().set(FUNC(sis85c496_host_device::pc_irq15_w));
+	m_isabus->drq0_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
+	m_isabus->iochck_callback().set(FUNC(sis85c496_host_device::iochck_w));
+
+	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+	m_ide[0]->irq_handler().set(m_pic8259_slave, FUNC(pic8259_device::ir6_w));
+
+	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
+	m_ide[1]->irq_handler().set(m_pic8259_slave, FUNC(pic8259_device::ir7_w));
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -119,7 +162,7 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 
 
 sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, SIS85C496, tag, owner, clock),
+	: pci_host_device(mconfig, SIS85C496_HOST, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_pic8259_master(*this, "pic8259_master"),
 	m_pic8259_slave(*this, "pic8259_slave"),
@@ -130,6 +173,8 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 	m_speaker(*this, "speaker"),
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "kbd"),
+	m_isabus(*this, "isabus"),
+	m_ide(*this, "ide%u", 1U),
 	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }
@@ -148,8 +193,10 @@ void sis85c496_host_device::device_start()
 {
 	pci_host_device::device_start();
 
-	memory_space = &m_maincpu->space(AS_PROGRAM);
-	io_space = &m_maincpu->space(AS_IO);
+	set_spaces(&m_maincpu->space(AS_PROGRAM), &m_maincpu->space(AS_IO));
+
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(sis85c496_host_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(sis85c496_host_device::irq_handler)));
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;
@@ -166,6 +213,8 @@ void sis85c496_host_device::device_start()
 	m_smramctrl = 0;
 
 	ram.resize(ram_size/4);
+
+	save_item(NAME(m_shadctrl));
 }
 
 void sis85c496_host_device::reset_all_mappings()
@@ -189,6 +238,18 @@ void sis85c496_host_device::device_reset()
 	m_isa_decoder = 0xff;
 	m_shadctrl = 0;
 	m_smramctrl = 0;
+	m_ide_vesa_ctrl = 0;
+
+	memset(m_pirqrc, 0x80, sizeof(m_pirqrc));
+}
+
+void sis85c496_host_device::device_config_complete()
+{
+	auto isabus = m_isabus.finder_target();
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_memspace(m_maincpu, AS_PROGRAM);
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_iospace(m_maincpu, AS_IO);
+
+	pci_device::device_config_complete();
 }
 
 void sis85c496_host_device::map_bios(address_space *memory_space, uint32_t start, uint32_t end)
@@ -221,12 +282,12 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 		if (m_smramctrl & 0x08)
 		{
 			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000b0000/4]);
-			logerror("Sis496: SMRAM at Exxxx, phys Bxxxx\n");
+			logerror("SiS496: SMRAM at Exxxx, phys Bxxxx\n");
 		}
 		else
 		{
 			memory_space->install_ram(0x000e0000, 0x000effff, &ram[0x000a0000/4]);
-			logerror("Sis496: SMRAM at Exxxx, phys Axxxx\n");
+			logerror("SiS496: SMRAM at Exxxx, phys Axxxx\n");
 		}
 
 		// map the high BIOS at FFFExxxx if enabled
@@ -312,13 +373,32 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	// is SMRAM enabled at 6xxxx?
 	if ((m_smramctrl & 0x12) == 0x02)
 	{
-		fatalerror("Sis486: SMRAM enabled at 6xxxx, not yet supported!\n");
+		throw emu_fatalerror("SiS496: SMRAM enabled at 6xxxx, not yet supported!\n");
 	}
+
+	// TODO: determined by ISA decoder
+	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
+	m_isabus->remap(AS_IO, 0, 0xffff);
 
 	if (m_isa_decoder & 0x01)
 	{
 		logerror("SiS496: ISA base 640K enabled\n");
 		memory_space->install_ram(0x00000000, 0x0009ffff, &ram[0x00000000/4]);
+	}
+
+	if (BIT(m_ide_vesa_ctrl, 8))
+	{
+		// TODO: doesn't seem to work right for anything after IDE[0] primary
+		// bit 9: swaps IDE channels
+		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_w)));
+
+		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_w)));
+
+		//if (!BIT(m_ide_vesa_ctrl, 6))
+		io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_w)));
+
+		//if (!BIT(m_ide_vesa_ctrl, 7))
+		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_w)));
 	}
 
 	// 32 megs of RAM (todo: don't hardcode)
@@ -340,21 +420,13 @@ void sis85c496_host_device::at_speaker_set_spkrdata(uint8_t data)
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
-
-
-WRITE_LINE_MEMBER( sis85c496_host_device::at_pit8254_out0_changed )
-{
-	if (m_pic8259_master)
-		m_pic8259_master->ir0_w(state);
-}
-
-WRITE_LINE_MEMBER( sis85c496_host_device::at_pit8254_out1_changed )
+void sis85c496_host_device::at_pit8254_out1_changed(int state)
 {
 	if(state)
 		m_refresh = !m_refresh;
 }
 
-WRITE_LINE_MEMBER( sis85c496_host_device::at_pit8254_out2_changed )
+void sis85c496_host_device::at_pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -408,7 +480,7 @@ void sis85c496_host_device::at_page8_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dma_hrq_changed )
+void sis85c496_host_device::pc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -483,7 +555,7 @@ void sis85c496_host_device::pc_dma8237_5_dack_w(uint8_t data) { } //m_isabus->da
 void sis85c496_host_device::pc_dma8237_6_dack_w(uint8_t data) { } //m_isabus->dack_w(6, data); }
 void sis85c496_host_device::pc_dma8237_7_dack_w(uint8_t data) { } //m_isabus->dack_w(7, data); }
 
-WRITE_LINE_MEMBER( sis85c496_host_device::at_dma8237_out_eop )
+void sis85c496_host_device::at_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	//if(m_dma_channel != -1)
@@ -507,14 +579,137 @@ void sis85c496_host_device::pc_select_dma_channel(int channel, bool state)
 }
 
 
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack4_w ) { m_dma8237_1->hack_w( state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack5_w ) { pc_select_dma_channel(5, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
+void sis85c496_host_device::pc_dack0_w(int state) { pc_select_dma_channel(0, state); }
+void sis85c496_host_device::pc_dack1_w(int state) { pc_select_dma_channel(1, state); }
+void sis85c496_host_device::pc_dack2_w(int state) { pc_select_dma_channel(2, state); }
+void sis85c496_host_device::pc_dack3_w(int state) { pc_select_dma_channel(3, state); }
+void sis85c496_host_device::pc_dack4_w(int state) { m_dma8237_1->hack_w( state ? 0 : 1); } // it's inverted
+void sis85c496_host_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state); }
+void sis85c496_host_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
+void sis85c496_host_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
+
+void sis85c496_host_device::pc_irq1_w(int state)   { m_pic8259_master->ir1_w(state); }
+void sis85c496_host_device::pc_irq3_w(int state)   { m_pic8259_master->ir3_w(state); }
+void sis85c496_host_device::pc_irq4_w(int state)   { m_pic8259_master->ir4_w(state); }
+void sis85c496_host_device::pc_irq5_w(int state)   { m_pic8259_master->ir5_w(state); }
+void sis85c496_host_device::pc_irq6_w(int state)   { m_pic8259_master->ir6_w(state); }
+void sis85c496_host_device::pc_irq7_w(int state)   { m_pic8259_master->ir7_w(state); }
+void sis85c496_host_device::pc_irq8n_w(int state)  { m_pic8259_slave->ir0_w(state); }
+void sis85c496_host_device::pc_irq9_w(int state)   { m_pic8259_slave->ir1_w(state); }
+void sis85c496_host_device::pc_irq10_w(int state)  { m_pic8259_slave->ir2_w(state); }
+void sis85c496_host_device::pc_irq11_w(int state)  { m_pic8259_slave->ir3_w(state); }
+void sis85c496_host_device::pc_irq12m_w(int state) { m_pic8259_slave->ir4_w(state); }
+void sis85c496_host_device::pc_irq14_w(int state)  { m_pic8259_slave->ir6_w(state); }
+void sis85c496_host_device::pc_irq15_w(int state)  { m_pic8259_slave->ir7_w(state); }
+
+uint8_t sis85c496_host_device::pirqrc_r(offs_t offset)
+{
+	return m_pirqrc[offset];
+}
+
+void sis85c496_host_device::pirqrc_w(offs_t offset, uint8_t data)
+{
+	m_pirqrc[offset] = data;
+	logerror("pirqrc[%d] = %02x\n", offset, m_pirqrc[offset]);
+}
+
+int sis85c496_host_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4 || (m_pirqrc[pin] & 0x80))
+		return -1;
+	return m_pirqrc[pin];
+}
+
+void sis85c496_host_device::irq_handler(int line, int state)
+{
+	if(line < 0 && line >= 16)
+		return;
+
+	logerror("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
+void sis85c496_host_device::pc_pirqa_w(int state)
+{
+	int irq = m_pirqrc[0] & 15;
+
+	if (!(BIT(m_pirqrc[0], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::pc_pirqb_w(int state)
+{
+	int irq = m_pirqrc[1] & 15;
+
+	if (!(BIT(m_pirqrc[1], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::pc_pirqc_w(int state)
+{
+	int irq = m_pirqrc[2] & 15;
+
+	if (!(BIT(m_pirqrc[2], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::pc_pirqd_w(int state)
+{
+	int irq = m_pirqrc[3] & 15;
+
+	if (!(BIT(m_pirqrc[3], 7)))
+		return;
+	redirect_irq(irq, state);
+}
+
+void sis85c496_host_device::redirect_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 8:
+	case 13:
+		break;
+	case 3:
+		m_pic8259_master->ir3_w(state);
+		break;
+	case 4:
+		m_pic8259_master->ir4_w(state);
+		break;
+	case 5:
+		m_pic8259_master->ir5_w(state);
+		break;
+	case 6:
+		m_pic8259_master->ir6_w(state);
+		break;
+	case 7:
+		m_pic8259_master->ir7_w(state);
+		break;
+	case 9:
+		m_pic8259_slave->ir1_w(state);
+		break;
+	case 10:
+		m_pic8259_slave->ir2_w(state);
+		break;
+	case 11:
+		m_pic8259_slave->ir3_w(state);
+		break;
+	case 12:
+		m_pic8259_slave->ir4_w(state);
+		break;
+	case 14:
+		m_pic8259_slave->ir6_w(state);
+		break;
+	case 15:
+		m_pic8259_slave->ir7_w(state);
+		break;
+	}
+}
 
 uint8_t sis85c496_host_device::at_portb_r()
 {
@@ -538,17 +733,24 @@ void sis85c496_host_device::at_portb_w(uint8_t data)
 	m_pit8254->write_gate2(BIT(data, 0));
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
-	//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	if (m_channel_check)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+void sis85c496_host_device::iochck_w(int state)
+{
+	if (!state && !m_channel_check && m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 uint8_t sis85c496_host_device::at_dma8237_2_r(offs_t offset)
 {
-	return m_dma8237_2->read( offset / 2);
+	return m_dma8237_2->read(offset / 2);
 }
 
 void sis85c496_host_device::at_dma8237_2_w(offs_t offset, uint8_t data)
 {
-	m_dma8237_2->write( offset / 2, data);
+	m_dma8237_2->write(offset / 2, data);
 }
 
 uint8_t sis85c496_host_device::at_keybc_r(offs_t offset)
@@ -571,30 +773,19 @@ void sis85c496_host_device::at_keybc_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-void sis85c496_host_device::write_rtc(offs_t offset, uint8_t data)
+void sis85c496_host_device::rtc_address_nmi_w(uint8_t data)
 {
-	if (offset==0) {
-		m_nmi_enabled = BIT(data,7);
-		//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
-		m_ds12885->write(0,data);
-	}
-	else {
-		m_ds12885->write(offset,data);
-	}
+	m_nmi_enabled = BIT(data, 7);
+	//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	m_ds12885->address_w(data);
 }
 
-WRITE_LINE_MEMBER(sis85c496_host_device::cpu_int_w)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
-WRITE_LINE_MEMBER(sis85c496_host_device::cpu_a20_w)
+void sis85c496_host_device::cpu_a20_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_A20, state);
 }
 
-WRITE_LINE_MEMBER(sis85c496_host_device::cpu_reset_w)
+void sis85c496_host_device::cpu_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }

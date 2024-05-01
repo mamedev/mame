@@ -126,6 +126,8 @@ Notes:
 #include "tilemap.h"
 
 
+namespace {
+
 class jollyjgr_state : public driver_device
 {
 public:
@@ -174,7 +176,7 @@ private:
 	void jollyjgr_palette(palette_device &palette) const;
 	uint32_t screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_bitmap( bitmap_rgb32 &bitmap );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -651,7 +653,7 @@ GFXDECODE_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jollyjgr_state::vblank_irq)
+void jollyjgr_state::vblank_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -777,6 +779,7 @@ ROM_START( fspiderb )
 	ROM_LOAD( "82s123.1f", 0x0000, 0x0020, CRC(cda6001a) SHA1(e10fe848e8123e53bd2db8a14cfa2d8c6621d6aa) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

@@ -37,6 +37,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -978,10 +980,12 @@ ROM_START( samcoupe )
 	ROMX_LOAD( "atom.z5",   0x0000, 0x8000, CRC(dec75f58) SHA1(cd342579f066c0863e4f769c2e6757085e21b0a1), ROM_BIOS(14) )
 ROM_END
 
+} // anonymous namespace
+
 
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME     FLAGS
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", u8"SAM Coupé", MACHINE_SUPPORTS_SAVE )

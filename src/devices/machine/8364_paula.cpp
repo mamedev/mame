@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "MOS 8364 \"Paul
 paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PAULA_8364, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_chipmem_r(*this)
+	, m_chipmem_r(*this, 0)
 	, m_int_w(*this)
 	, m_stream(nullptr)
 {
@@ -59,10 +59,6 @@ paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *
 
 void paula_8364_device::device_start()
 {
-	// resolve callbacks
-	m_chipmem_r.resolve_safe(0);
-	m_int_w.resolve_safe();
-
 	// initialize channels
 	for (int i = 0; i < 4; i++)
 	{
@@ -211,8 +207,9 @@ TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 void paula_8364_device::dma_reload(audio_channel *chan, bool startup)
 {
 	chan->curlocation = chan->loc;
-	// TODO: how to treat length == 0?
-	chan->curlength = chan->len;
+	// TODO: Unconfirmed, assume max size if length is 0.
+	// cfr. wrestlmn and videokid, where they pratically never get even close to buffer exhaustion.
+	chan->curlength = chan->len == 0 ? 0x10000 : chan->len;
 	// TODO: on startup=false irq should be delayed two cycles
 	if (startup)
 		chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227

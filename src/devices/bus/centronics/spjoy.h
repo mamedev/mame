@@ -25,14 +25,14 @@ protected:
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_busy_ack(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_busy_ack(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { if (state) m_data |= 0x04; else m_data &= ~0x04; update_busy_ack(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { if (state) m_data |= 0x08; else m_data &= ~0x08; update_busy_ack(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { if (state) m_data |= 0x10; else m_data &= ~0x10; update_busy_ack(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { if (state) m_data |= 0x20; else m_data &= ~0x20; update_busy_ack(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { if (state) m_data |= 0x40; else m_data &= ~0x40; update_busy_ack(); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (state) m_data |= 0x80; else m_data &= ~0x80; update_busy_ack(); }
+	virtual void input_data0(int state) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_busy_ack(); }
+	virtual void input_data1(int state) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_busy_ack(); }
+	virtual void input_data2(int state) override { if (state) m_data |= 0x04; else m_data &= ~0x04; update_busy_ack(); }
+	virtual void input_data3(int state) override { if (state) m_data |= 0x08; else m_data &= ~0x08; update_busy_ack(); }
+	virtual void input_data4(int state) override { if (state) m_data |= 0x10; else m_data &= ~0x10; update_busy_ack(); }
+	virtual void input_data5(int state) override { if (state) m_data |= 0x20; else m_data &= ~0x20; update_busy_ack(); }
+	virtual void input_data6(int state) override { if (state) m_data |= 0x40; else m_data &= ~0x40; update_busy_ack(); }
+	virtual void input_data7(int state) override { if (state) m_data |= 0x80; else m_data &= ~0x80; update_busy_ack(); }
 
 private:
 	required_ioport_array<2> m_joy;

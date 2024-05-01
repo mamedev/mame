@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "emupal.h"
@@ -47,6 +48,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -106,11 +109,10 @@ private:
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
-	void nmi_control_w(uint8_t data);
-	void crt_direction_w(uint8_t data);
-	void back_color_select_w(uint8_t data);
-	void vram_page_select_w(uint8_t data);
-	void intcycle_w(offs_t offset, uint8_t data);
+	void nmi_control_w(int state);
+	void back_color_select_w(int state);
+	void vram_page_select_w(int state);
+	template <int N> void intcycle_w(int state);
 	uint8_t subcpu_nmi_r();
 	uint8_t subcpu_reset_r();
 	void ay1_w(offs_t offset, uint8_t data);
@@ -135,11 +137,7 @@ void popper_state::main_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().share("sprite_ram");
 	map(0xd800, 0xdfff).ram().share("shared");
 	map(0xe000, 0xe003).mirror(0x03fc).r(FUNC(popper_state::inputs_r));
-	map(0xe000, 0xe000).mirror(0x1ff8).w(FUNC(popper_state::nmi_control_w));
-	map(0xe001, 0xe001).mirror(0x1ff8).w(FUNC(popper_state::crt_direction_w));
-	map(0xe002, 0xe002).mirror(0x1ff8).w(FUNC(popper_state::back_color_select_w));
-	map(0xe003, 0xe003).mirror(0x1ff8).w(FUNC(popper_state::vram_page_select_w));
-	map(0xe004, 0xe007).mirror(0x1ff8).w(FUNC(popper_state::intcycle_w));
+	map(0xe000, 0xe007).mirror(0x1ff8).w("outlatch", FUNC(addressable_latch_device::write_d0));
 	map(0xe400, 0xe400).mirror(0x03ff).r(FUNC(popper_state::subcpu_nmi_r));
 	map(0xe800, 0xf7ff).noprw();
 	map(0xf800, 0xf800).mirror(0x03ff).r(FUNC(popper_state::subcpu_reset_r));
@@ -305,19 +303,14 @@ TIMER_CALLBACK_MEMBER(popper_state::scanline_tick)
 	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, 0));
 }
 
-void popper_state::crt_direction_w(uint8_t data)
+void popper_state::back_color_select_w(int state)
 {
-	flip_screen_set(data);
+	m_back_color = state;
 }
 
-void popper_state::back_color_select_w(uint8_t data)
+void popper_state::vram_page_select_w(int state)
 {
-	m_back_color = data & 1;
-}
-
-void popper_state::vram_page_select_w(uint8_t data)
-{
-	m_vram_page = data & 1;
+	m_vram_page = state;
 }
 
 uint32_t popper_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -489,15 +482,16 @@ void popper_state::ay1_w(offs_t offset, uint8_t data)
 //  MACHINE EMULATION
 //**************************************************************************
 
-void popper_state::nmi_control_w(uint8_t data)
+void popper_state::nmi_control_w(int state)
 {
-	m_nmi_enable = data & 1;
+	m_nmi_enable = state;
 }
 
-void popper_state::intcycle_w(offs_t offset, uint8_t data)
+template <int N>
+void popper_state::intcycle_w(int state)
 {
 	// set to 0 and apparently not used by the game
-	logerror("intcycle_w: %d = %02x\n", offset, data);
+	logerror("intcycle_w<%d> = %d\n", N, state);
 }
 
 uint8_t popper_state::watchdog_clear_r()
@@ -546,6 +540,16 @@ void popper_state::popper(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(popper_state::nmi_control_w));
+	outlatch.q_out_cb<1>().set(FUNC(popper_state::flip_screen_set));
+	outlatch.q_out_cb<2>().set(FUNC(popper_state::back_color_select_w));
+	outlatch.q_out_cb<3>().set(FUNC(popper_state::vram_page_select_w));
+	outlatch.q_out_cb<4>().set(FUNC(popper_state::intcycle_w<0>));
+	outlatch.q_out_cb<5>().set(FUNC(popper_state::intcycle_w<1>));
+	outlatch.q_out_cb<6>().set(FUNC(popper_state::intcycle_w<2>));
+	outlatch.q_out_cb<7>().set(FUNC(popper_state::intcycle_w<3>));
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240);
@@ -590,10 +594,12 @@ ROM_START( popper )
 	ROM_LOAD("p.m4", 0x20, 0x20, CRC(384de5c1) SHA1(892c89a01c11671c5708113b4e4c27b84be37ea6))
 ROM_END
 
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY                     FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori Electric Co., Ltd.", "Popper", MACHINE_SUPPORTS_SAVE )

@@ -38,27 +38,27 @@ public:
 	auto zb_cb() { return m_zb_cb.bind(); }
 
 	// select
-	DECLARE_WRITE_LINE_MEMBER(s0_w);
-	DECLARE_WRITE_LINE_MEMBER(s1_w);
+	void s0_w(int state);
+	void s1_w(int state);
 	void s_w(uint8_t data);
 
 	// input a
-	DECLARE_WRITE_LINE_MEMBER(i0a_w);
-	DECLARE_WRITE_LINE_MEMBER(i1a_w);
-	DECLARE_WRITE_LINE_MEMBER(i2a_w);
-	DECLARE_WRITE_LINE_MEMBER(i3a_w);
+	void i0a_w(int state);
+	void i1a_w(int state);
+	void i2a_w(int state);
+	void i3a_w(int state);
 	void ia_w(uint8_t data);
 
 	// input b
-	DECLARE_WRITE_LINE_MEMBER(i0b_w);
-	DECLARE_WRITE_LINE_MEMBER(i1b_w);
-	DECLARE_WRITE_LINE_MEMBER(i2b_w);
-	DECLARE_WRITE_LINE_MEMBER(i3b_w);
+	void i0b_w(int state);
+	void i1b_w(int state);
+	void i2b_w(int state);
+	void i3b_w(int state);
 	void ib_w(uint8_t data);
 
 	// output
-	DECLARE_READ_LINE_MEMBER(za_r);
-	DECLARE_READ_LINE_MEMBER(zb_r);
+	int za_r();
+	int zb_r();
 
 protected:
 	// device-level overrides

@@ -153,10 +153,10 @@ private:
 	u8 m_drvif_select;
 	u8 m_sustain_fuzz;
 
-	WRITE_LINE_MEMBER(write_acia_clock) { m_acia->write_txc(state); m_acia->write_rxc(state); }
-	WRITE_LINE_MEMBER(acia_irq_w) { m_acia_irq = state; recalc_irqs(); }
-	WRITE_LINE_MEMBER(ym_irq_w) { m_ym_irq = state; recalc_irqs(); }
-	WRITE_LINE_MEMBER(ryp4_irq_w) { m_ym2154_irq = state; recalc_irqs(); }
+	void write_acia_clock(int state) { m_acia->write_txc(state); m_acia->write_rxc(state); }
+	void acia_irq_w(int state) { m_acia_irq = state; recalc_irqs(); }
+	void ym_irq_w(int state) { m_ym_irq = state; recalc_irqs(); }
+	void ryp4_irq_w(int state) { m_ym2154_irq = state; recalc_irqs(); }
 
 	u8 ryp4_an_r(offs_t offset);
 	void ryp4_out_w(u8 data);
@@ -738,5 +738,5 @@ ROM_END
 
 } // namespace
 
-CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
-CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
+CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND)
+CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND)

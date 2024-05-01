@@ -115,7 +115,7 @@ void micro3d_state::micro3d_xfer3dk_w(uint16_t data)
 	m_xfer3dk = data;
 }
 
-WRITE_LINE_MEMBER(micro3d_state::tms_interrupt)
+void micro3d_state::tms_interrupt(int state)
 {
 //  mc68901_int_gen(device->machine(), GPIP4);
 }

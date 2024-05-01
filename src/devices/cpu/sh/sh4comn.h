@@ -15,25 +15,24 @@
 
 #include "sh.h"
 
-#define VERBOSE 0
+#define VERBOSE (0)
+#include "logmacro.h"
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
-#define EXPPRI(pl,po,p,n)   (((4-(pl)) << 24) | ((15-(po)) << 16) | ((p) << 8) | (255-(n)))
-#define NMIPRI()            EXPPRI(3,0,16,SH4_INTC_NMI)
-#define INTPRI(p,n)         EXPPRI(4,2,p,n)
+#define EXPPRI(pl, po, p, n)    (((4 - (pl)) << 24) | ((15 - (po)) << 16) | ((p) << 8) | (255 - (n)))
+#define NMIPRI()                EXPPRI(3, 0, 16, SH4_INTC_NMI)
+#define INTPRI(p, n)            EXPPRI(4, 2, p, n)
 
 #define FP_RS(r) m_sh2_state->m_fr[(r)] // binary representation of single precision floating point register r
-#define FP_RFS(r) *( (float  *)(m_sh2_state->m_fr+(r)) ) // single precision floating point register r
-#define FP_RFD(r) *( (double *)(m_sh2_state->m_fr+(r)) ) // double precision floating point register r
+#define FP_RFS(r) *( (float  *)(m_sh2_state->m_fr + (r)) ) // single precision floating point register r
+#define FP_RFD(r) *( (double *)(m_sh2_state->m_fr + (r)) ) // double precision floating point register r
 #define FP_XS(r) m_sh2_state->m_xf[(r)] // binary representation of extended single precision floating point register r
-#define FP_XFS(r) *( (float  *)(m_sh2_state->m_xf+(r)) ) // single precision extended floating point register r
-#define FP_XFD(r) *( (double *)(m_sh2_state->m_xf+(r)) ) // double precision extended floating point register r
+#define FP_XFS(r) *( (float  *)(m_sh2_state->m_xf + (r)) ) // single precision extended floating point register r
+#define FP_XFD(r) *( (double *)(m_sh2_state->m_xf + (r)) ) // double precision extended floating point register r
 #ifdef LSB_FIRST
 #define FP_RS2(r) m_sh2_state->m_fr[(r) ^ m_sh2_state->m_fpu_pr]
-#define FP_RFS2(r) *( (float  *)(m_sh2_state->m_fr+((r) ^ m_sh2_state->m_fpu_pr)) )
+#define FP_RFS2(r) *( (float  *)(m_sh2_state->m_fr + ((r) ^ m_sh2_state->m_fpu_pr)) )
 #define FP_XS2(r) m_sh2_state->m_xf[(r) ^ m_sh2_state->m_fpu_pr]
-#define FP_XFS2(r) *( (float  *)(m_sh2_state->m_xf+((r) ^ m_sh2_state->m_fpu_pr)) )
+#define FP_XFS2(r) *( (float  *)(m_sh2_state->m_xf + ((r) ^ m_sh2_state->m_fpu_pr)) )
 #endif
 
 #define FPSCR           mem(&m_sh2_state->m_fpscr)
@@ -55,7 +54,7 @@ enum
 /* 29 bits */
 #define SH34_AM  0x1fffffff
 
-#define SH34_FLAGS   (MD|sRB|BL|FD|SH_M|SH_Q|SH_I|SH_S|SH_T)
+#define SH34_FLAGS   (MD | sRB | BL | FD | SH_M | SH_Q | SH_I | SH_S | SH_T)
 
 /* Bits in FPSCR */
 #define RM  0x00000003

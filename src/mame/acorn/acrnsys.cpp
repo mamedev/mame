@@ -65,6 +65,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/acorn/bus.h"
 #include "softlist_dev.h"
+#include "utf8.h"
 
 namespace {
 

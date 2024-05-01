@@ -8,13 +8,13 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
+#include "nl_config.h"
+#include "nltypes.h"
+
 #include "plib/ppreprocessor.h"
 #include "plib/psource.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
-
-#include "nl_config.h"
-#include "nltypes.h"
 
 #include <initializer_list>
 #include <memory>
@@ -26,118 +26,95 @@
 //  MACROS - netlist definitions
 //============================================================
 
-#define NET_STR(x) # x
+#define NET_STR(x) #x
 
-#define NET_MODEL(model)                                                       \
-	setup.register_model(model);
+#define NET_MODEL(model) setup.register_model(model);
 
-#define ALIAS(alias, name)                                                     \
-	setup.register_alias(# alias, # name);
+#define ALIAS(alias, name) setup.register_alias(#alias, #name);
 
 #define DIPPINS(pin1, ...)                                                     \
-		setup.register_dip_alias_arr( # pin1 ", " # __VA_ARGS__);
+	setup.register_dip_alias_arr(#pin1 ", " #__VA_ARGS__);
 
 // to be used to reference new library truth table devices
-#define NET_REGISTER_DEV(type, name)                                           \
-		setup.register_dev(# type, # name);
+#define NET_REGISTER_DEV(type, name) setup.register_dev(#type, #name);
 
 // name is first element so that __VA_ARGS__ always has one element
-#define NET_REGISTER_DEVEXT(type, ...)                                   \
-		setup.register_dev(# type, { PSTRINGIFY_VA(__VA_ARGS__) });
+#define NET_REGISTER_DEVEXT(type, ...)                                         \
+	setup.register_dev(#type, {PSTRINGIFY_VA(__VA_ARGS__)});
 
 #define NET_CONNECT(name, input, output)                                       \
-		setup.register_link(# name "." # input, # output);
+	setup.register_link(#name "." #input, #output);
 
 #define NET_C(term1, ...)                                                      \
-		setup.register_connection_arr( # term1 ", " # __VA_ARGS__);
+	setup.register_connection_arr(#term1 ", " #__VA_ARGS__);
 
-#define PARAM(name, val)                                                       \
-		setup.register_param(NET_STR(name), NET_STR(val));
+#define PARAM(name, val) setup.register_param(NET_STR(name), NET_STR(val));
 
 #define DEFPARAM(name, val)                                                    \
-		setup.register_default_param(NET_STR(name), NET_STR(val));
+	setup.register_default_param(NET_STR(name), NET_STR(val));
 
-#define HINT(name, val)                                                        \
-		setup.register_hint(# name , ".HINT_" # val);
+#define HINT(name, val) setup.register_hint(#name, ".HINT_" #val);
 
 #define NETDEV_PARAMI(name, param, val)                                        \
-		setup.register_param(# name "." # param, val);
+	setup.register_param(#name "." #param, val);
 
-#define NETLIST_NAME(name) netlist ## _ ## name
+#define NETLIST_NAME(name) netlist##_##name
 
 #define NETLIST_EXTERNAL(name)                                                 \
-		void NETLIST_NAME(name)(netlist::nlparse_t &setup);
+	void NETLIST_NAME(name)(netlist::nlparse_t & setup);
 
 #define NETLIST_START(name)                                                    \
-void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
+	void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t & setup)
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source_proc(# name, &NETLIST_NAME(name));
+	setup.register_source_proc(#name, &NETLIST_NAME(name));
 
 #define EXTERNAL_SOURCE(name)                                                  \
-		setup.register_source_proc(# name, &NETLIST_NAME(name));
+	setup.register_source_proc(#name, &NETLIST_NAME(name));
 
 #define LOCAL_LIB_ENTRY_2(type, name)                                          \
-		type ## _SOURCE(name)                                                  \
-		setup.register_lib_entry(# name, "", PSOURCELOC());
+	type##_SOURCE(name) setup.register_lib_entry(#name, "", PSOURCELOC());
 
 #define LOCAL_LIB_ENTRY_3(type, name, param_spec)                              \
-		type ## _SOURCE(name)                                                  \
-		setup.register_lib_entry(# name, param_spec, PSOURCELOC());
+	type##_SOURCE(name)                                                        \
+		setup.register_lib_entry(#name, param_spec, PSOURCELOC());
 
 #define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, LOCAL, __VA_ARGS__)
 
-#define EXTERNAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, EXTERNAL, __VA_ARGS__)
+#define EXTERNAL_LIB_ENTRY(...)                                                \
+	PCALLVARARG(LOCAL_LIB_ENTRY_, EXTERNAL, __VA_ARGS__)
 
-#define INCLUDE(name)                                                          \
-		setup.include(# name);
+#define INCLUDE(name) setup.include(#name);
 
 #define SUBMODEL(model, name)                                                  \
-		setup.namespace_push(# name);                                          \
-		setup.include(# model);                                                \
-		setup.namespace_pop();
+	setup.namespace_push(#name);                                               \
+	setup.include(#model);                                                     \
+	setup.namespace_pop();
 
 #define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                 \
-		setup.register_frontier(# attach, PSTRINGIFY_VA(r_in), PSTRINGIFY_VA(r_out));
+	setup.register_frontier(#attach, PSTRINGIFY_VA(r_in), PSTRINGIFY_VA(r_out));
 
 // -----------------------------------------------------------------------------
 // truth table defines
 // -----------------------------------------------------------------------------
 
-#if 0
-#define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
-	void NETLIST_NAME(cname ## _impl)(netlist::tt_desc &desc);                 \
-	static NETLIST_START(cname)
-{                                                \
-		netlist::tt_desc xdesc{ #cname, in, out, "" };                         \
-		auto sloc = PSOURCELOC();                                              \
-		const pstring def_params = pdef_params;                                \
-		NETLIST_NAME(cname ## _impl)(xdesc);                                   \
-		setup.truth_table_create(xdesc, def_params, std::move(sloc));          \
-	}                                                              \
-	static void NETLIST_NAME(cname ## _impl)(netlist::tt_desc &desc)           \
-	{
-#else
-#define TRUTH_TABLE(cname, in, out, pdef_params)                               \
-	void NETLIST_NAME(cname ## _impl)(netlist::nlparse_t &setup, netlist::tt_desc &desc); \
-	static void NETLIST_NAME(cname)(netlist::nlparse_t &setup)      \
-	{ \
-		netlist::tt_desc desc{ #cname, in, out, "", {} };   \
-		NETLIST_NAME(cname ## _impl)(setup, desc); \
-		setup.truth_table_create(desc, pdef_params, PSOURCELOC()); \
-	} \
-	static void NETLIST_NAME(cname ## _impl)([[maybe_unused]] netlist::nlparse_t &setup, netlist::tt_desc &desc)      \
+#define TRUTH_TABLE(cname, in, out, params)                                    \
+	void NETLIST_NAME(cname##_impl)(netlist::nlparse_t & setup,                \
+									netlist::tt_desc & desc);                  \
+	static void NETLIST_NAME(cname)(netlist::nlparse_t & setup)                \
+	{                                                                          \
+		netlist::tt_desc desc{#cname, in, out, "", {}};                        \
+		NETLIST_NAME(cname##_impl)(setup, desc);                               \
+		setup.truth_table_create(desc, params, PSOURCELOC());                  \
+	}                                                                          \
+	static void NETLIST_NAME(cname##_impl)(                                    \
+		[[maybe_unused]] netlist::nlparse_t & setup, netlist::tt_desc & desc)
 
-#endif
+#define TT_HEAD(x) desc.desc.emplace_back(x);
 
-#define TT_HEAD(x) \
-		desc.desc.emplace_back(x);
+#define TT_LINE(x) desc.desc.emplace_back(x);
 
-#define TT_LINE(x) \
-		desc.desc.emplace_back(x);
-
-#define TT_FAMILY(x) \
-		desc.family = x;
+#define TT_FAMILY(x) desc.family = x;
 
 #define TRUTHTABLE_ENTRY(name)                                                 \
 	LOCAL_SOURCE(name)                                                         \
@@ -152,10 +129,10 @@ namespace netlist
 
 	struct tt_desc
 	{
-		pstring name;
-		unsigned long ni;
-		unsigned long no;
-		pstring family;
+		pstring              name;
+		unsigned long        ni;
+		unsigned long        no;
+		pstring              family;
 		std::vector<pstring> desc;
 	};
 
@@ -193,25 +170,29 @@ namespace netlist
 		/// \param type the alias type see \ref alias_type
 		/// \param alias the alias to be qualified
 		/// \param points_to the pin aliased
-		void register_alias(detail::alias_type type, const pstring &alias, const pstring &points_to);
+		void register_alias(detail::alias_type type, const pstring &alias,
+							const pstring &points_to);
 		/// \brief Register an aliases where alias and references are fully qualified names
 		/// \param type the alias type see \ref alias_type
 		/// \param alias the alias to be qualified
 		/// \param points_to the pin aliased
-		void register_fqn_alias(detail::alias_type type, const pstring &alias, const pstring &points_to);
+		void register_fqn_alias(detail::alias_type type, const pstring &alias,
+								const pstring &points_to);
 		void register_dip_alias_arr(const pstring &terms);
 
 		// last argument only needed by nltool
 		void register_dev(const pstring &classname, const pstring &name,
-			const std::vector<pstring> &params_and_connections,
-			factory::element_t **factory_element = nullptr);
-		void register_dev(const pstring &classname, std::initializer_list<const char *> more_parameters);
+						  const std::vector<pstring> &params_and_connections,
+						  factory::element_t **factory_element = nullptr);
+		void register_dev(const pstring                      &classname,
+						  std::initializer_list<const char *> more_parameters);
 		void register_dev(const pstring &classname, const pstring &name)
 		{
 			register_dev(classname, name, std::vector<pstring>());
 		}
 
-		void register_hint(const pstring &object_name, const pstring &hint_name);
+		void
+		register_hint(const pstring &object_name, const pstring &hint_name);
 
 		void register_connection(const pstring &sin, const pstring &sout);
 		void register_connection_arr(const pstring &terms);
@@ -230,20 +211,23 @@ namespace netlist
 			register_param_fp(param, plib::narrow_cast<nl_fptype>(value));
 		}
 
-		void register_lib_entry(const pstring &name, const pstring &def_params, plib::source_location &&loc);
+		void register_lib_entry(const pstring &name, const pstring &def_params,
+								plib::source_location &&loc);
 
-		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
+		void register_frontier(const pstring &attach, const pstring &r_IN,
+							   const pstring &r_OUT);
 
 		// register a source
 		template <typename S, typename... Args>
-		void register_source(Args&&... args)
+		void register_source(Args &&...args)
 		{
 			m_sources.add_source<S>(std::forward<Args>(args)...);
 		}
 
 		void register_source_proc(const pstring &name, nlsetup_func func);
 
-		void truth_table_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc);
+		void truth_table_create(tt_desc &desc, const pstring &def_params,
+								plib::source_location &&loc);
 
 		// include other files
 
@@ -256,17 +240,18 @@ namespace netlist
 
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::istream_uptr &&in_stream, const pstring &name);
-		bool parse_tokens(const plib::detail::token_store_t &tokens, const pstring &name);
+		bool parse_tokens(const plib::detail::token_store_t &tokens,
+						  const pstring                     &name);
 
 		template <typename S, typename... Args>
-		void add_include(Args&&... args)
+		void add_include(Args &&...args)
 		{
 			m_includes.add_source<S>(std::forward<Args>(args)...);
 		}
 
 		void add_define(const pstring &def, const pstring &val)
 		{
-			m_defines.insert({ def, plib::ppreprocessor::define_t(def, val)});
+			m_defines.insert({def, plib::ppreprocessor::define_t(def, val)});
 		}
 
 		void add_define(const pstring &define);
@@ -274,10 +259,10 @@ namespace netlist
 		// register a list of logs
 		void register_dynamic_log_devices(const std::vector<pstring> &log_list);
 
-		factory::list_t &factory() noexcept;
+		factory::list_t       &factory() noexcept;
 		const factory::list_t &factory() const noexcept;
 
-		log_type &log() noexcept { return m_log; }
+		log_type       &log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
 		plib::istream_uptr get_data_stream(const pstring &name);
@@ -285,23 +270,22 @@ namespace netlist
 	private:
 		pstring namespace_prefix() const;
 		pstring build_fqn(const pstring &obj_name) const;
-		void register_param_fp(const pstring &param, nl_fptype value);
-		bool device_exists(const pstring &name) const;
+		void    register_param_fp(const pstring &param, nl_fptype value);
+		bool    device_exists(const pstring &name) const;
 
 		// FIXME: stale? - remove later
 		void remove_connections(const pstring &pin);
 
-		plib::ppreprocessor::defines_map_type       m_defines;
-		plib::psource_collection_t                  m_includes;
-		std::stack<pstring>                         m_namespace_stack;
-		plib::psource_collection_t                  m_sources;
-		detail::abstract_t &                        m_abstract;
+		plib::ppreprocessor::defines_map_type m_defines;
+		plib::psource_collection_t            m_includes;
+		std::stack<pstring>                   m_namespace_stack;
+		plib::psource_collection_t            m_sources;
+		detail::abstract_t                   &m_abstract;
 
 		log_type &m_log;
-		unsigned m_frontier_cnt;
+		unsigned  m_frontier_cnt;
 	};
 
 } // namespace netlist
-
 
 #endif // NLSETUP_H_

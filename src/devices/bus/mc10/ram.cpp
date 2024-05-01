@@ -34,7 +34,7 @@ namespace
 		mc10_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	protected:
-		// device-level overrides
+		// device_t implementation
 		virtual void device_start() override;
 	private:
 		memory_share_creator<u8> m_share;

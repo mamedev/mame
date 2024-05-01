@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="ibmpcjr_cart" description="IBM PC Jr cartridges">
+<softwarelist name="ibmpcjr_cart" description="IBM PCjr cartridges">
 <!--
 Known cartridge software according to http://www.brutman.com/PCjr/pcjr_options.html:
 

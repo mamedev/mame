@@ -21,6 +21,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class z22_state : public driver_device
 {
 public:
@@ -50,7 +53,7 @@ private:
 	u8 status_r();
 	void control_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(eeprom_clock_w);
+	void eeprom_clock_w(int state);
 
 	void mem_map(address_map &map);
 
@@ -125,7 +128,7 @@ void z22_state::control_w(u8 data)
 	//m_keyboard->keyout_w(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(z22_state::eeprom_clock_w)
+void z22_state::eeprom_clock_w(int state)
 {
 	m_eeprom_clk = state;
 	if (state)
@@ -211,5 +214,8 @@ ROM_START(z22)
 	ROM_LOAD("u39.bin", 0x0000, 0x2000, CRC(2f62c1f8) SHA1(448581d987fee6b4303e481e78f46d3255baccbb)) // D2764A-3
 	ROM_LOAD("u38.bin", 0x2000, 0x2000, CRC(f0bfe9b5) SHA1(8807841b28549d0ddf30275fc6035a66093f8768)) // D2764A-3
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1984, z22, 0, 0, z22, z22, z22_state, empty_init, "Zenith Data Systems", "Z-22 Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

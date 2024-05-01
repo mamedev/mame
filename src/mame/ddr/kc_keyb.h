@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_KC_KEYB_H
-#define MAME_MACHINE_KC_KEYB_H
+#ifndef MAME_DDR_KC_KEYB_H
+#define MAME_DDR_KC_KEYB_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(KC_KEYBOARD, kc_keyboard_device)
 
-#endif // MAME_MACHINE_KC_KEYB_H
+#endif // MAME_DDR_KC_KEYB_H

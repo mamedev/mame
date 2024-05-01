@@ -26,10 +26,10 @@ protected:
 	virtual void write_dma(u16 data) override;
 	virtual void write_cs0(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
 	virtual void write_cs1(offs_t offset, u16 data, u16 mem_mask = 0xffff) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
+	virtual void write_dmack(int state) override;
+	virtual void write_csel(int state) override;
+	virtual void write_dasp(int state) override;
+	virtual void write_pdiag(int state) override;
 
 private:
 	void frcpu_map(address_map &map);

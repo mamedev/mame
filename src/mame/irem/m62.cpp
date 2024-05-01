@@ -948,9 +948,7 @@ void m62_state::ldrun(machine_config &config)
 	PALETTE(config, m_spr_palette, FUNC(m62_state::m62_spr), 256);
 
 	// sound hardware
-	//m62_audio(config);
 	IREM_M62_AUDIO(config, m_audio, 0);
-
 }
 
 
@@ -1047,7 +1045,6 @@ void m62_state::lotlot(machine_config &config)
 	m_chr_decode->set_info(gfx_m62_tiles_lotlot);
 
 	PALETTE(config, m_fg_palette, FUNC(m62_state::m62_lotlot_fg), 256);
-
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,lotlot)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_lotlot));

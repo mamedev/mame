@@ -5,8 +5,8 @@
     Atari Basketball hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BSKTBALL_H
-#define MAME_INCLUDES_BSKTBALL_H
+#ifndef MAME_ATARI_BSKTBALL_H
+#define MAME_ATARI_BSKTBALL_H
 
 #pragma once
 
@@ -41,9 +41,9 @@ public:
 	void bsktball(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(nmion_w);
-	DECLARE_WRITE_LINE_MEMBER(ld1_w);
-	DECLARE_WRITE_LINE_MEMBER(ld2_w);
+	void nmion_w(int state);
+	void ld1_w(int state);
+	void ld2_w(int state);
 	uint8_t bsktball_in0_r();
 	void bsktball_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -94,4 +94,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( bsktball_discrete );
 
-#endif // MAME_INCLUDES_BSKTBALL_H
+#endif // MAME_ATARI_BSKTBALL_H

@@ -8,8 +8,10 @@
 
 #include "timeparameter.h"
 
-bgfx_time_parameter::bgfx_time_parameter(std::string name, parameter_type type, double limit)
-	: bgfx_parameter(name, type)
+#include <utility>
+
+bgfx_time_parameter::bgfx_time_parameter(std::string &&name, parameter_type type, double limit)
+	: bgfx_parameter(std::move(name), type)
 	, m_current_time(0)
 	, m_limit(limit)
 {

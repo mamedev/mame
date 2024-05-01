@@ -2,7 +2,7 @@
 // copyright-holders:Daniel Coulom,Sandro Ronco
 /*********************************************************************
 
-    ef9345.c
+    ef9345.cpp
 
     Thomson EF9345 video controller emulator code
 

@@ -140,8 +140,8 @@ to a 1602 or 1702 PROM (150 millisecond cycle time).
 When pulled low, RW A initiates a 20% programming duty cycle for writing
 to a 1602A or 1702A PROM (15 millisecond cycle time).
 */
-#ifndef MAME_MACHINE_IMM6_76_H
-#define MAME_MACHINE_IMM6_76_H
+#ifndef MAME_INTEL_IMM6_76_H
+#define MAME_INTEL_IMM6_76_H
 
 #pragma once
 
@@ -152,8 +152,8 @@ public:
 	intel_imm6_76_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	// device_image_interface static info
@@ -169,12 +169,12 @@ public:
 	void di_w(u8 data);
 	void a_w(u8 data);
 	u8 do_r() const;
-	DECLARE_WRITE_LINE_MEMBER(data_out_enable);     // 1 = asserted
-	DECLARE_WRITE_LINE_MEMBER(data_in_positive);    // 1 = asserted
-	DECLARE_WRITE_LINE_MEMBER(data_out_positive);   // 0 = asserted
-	DECLARE_WRITE_LINE_MEMBER(r_w);                 // 1 = read, 0 = write
-	DECLARE_WRITE_LINE_MEMBER(r_w_a);               // 1 = read, 0 = write
-	DECLARE_WRITE_LINE_MEMBER(prgm_prom_pwr);       // 0 = asserted
+	void data_out_enable(int state);    // 1 = asserted
+	void data_in_positive(int state);   // 1 = asserted
+	void data_out_positive(int state);  // 0 = asserted
+	void r_w(int state);                // 1 = read, 0 = write
+	void r_w_a(int state);              // 1 = read, 0 = write
+	void prgm_prom_pwr(int state);      // 0 = asserted
 
 protected:
 	// device_t implementation
@@ -199,4 +199,4 @@ private:
 
 DECLARE_DEVICE_TYPE(INTEL_IMM6_76, intel_imm6_76_device)
 
-#endif // MAME_MACHINE_IMM6_76_H
+#endif // MAME_INTEL_IMM6_76_H

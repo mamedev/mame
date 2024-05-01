@@ -14,7 +14,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/hd61603.h"
+#include "hd61603.h"
 
 
 DEFINE_DEVICE_TYPE(HD61603, hd61603_device, "hd61603", "Hitachi HD61603 LCD Driver")
@@ -35,8 +35,11 @@ hd61603_device::hd61603_device(const machine_config &mconfig, const char *tag, d
 
 void hd61603_device::device_start()
 {
-	// resolve callbacks
-	m_write_segs.resolve_safe();
+	// zerofill
+	m_blank = 0;
+	m_count = 0;
+	m_data = 0;
+	m_ram = 0;
 
 	// register for savestates
 	save_item(NAME(m_blank));

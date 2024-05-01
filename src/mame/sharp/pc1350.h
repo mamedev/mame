@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1350_H
-#define MAME_INCLUDES_PC1350_H
+#ifndef MAME_SHARP_PC1350_H
+#define MAME_SHARP_PC1350_H
 
 #include "pocketc.h"
 #include "machine/ram.h"
@@ -57,4 +57,4 @@ private:
 	static const char* const s_sml[5];
 };
 
-#endif // MAME_INCLUDES_PC1350_H
+#endif // MAME_SHARP_PC1350_H

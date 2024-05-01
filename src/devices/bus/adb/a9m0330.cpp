@@ -256,13 +256,13 @@ void a9m0330_device::p2_w(u8 data)
 	}
 }
 
-DECLARE_READ_LINE_MEMBER(a9m0330_device::t0_r)
+int a9m0330_device::t0_r()
 {
 	// appears to be a config jumper of some sort
 	return 0;
 }
 
-DECLARE_READ_LINE_MEMBER(a9m0330_device::t1_r)
+int a9m0330_device::t1_r()
 {
 	return m_adb_state & 1;
 }

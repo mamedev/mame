@@ -82,12 +82,6 @@ void z29_keyboard_port_device::device_config_complete()
 	m_kbd = get_card_device();
 }
 
-void z29_keyboard_port_device::device_resolve_objects()
-{
-	m_keyin_callback.resolve_safe();
-	m_reset_callback.resolve_safe();
-}
-
 void z29_keyboard_port_device::device_start()
 {
 }

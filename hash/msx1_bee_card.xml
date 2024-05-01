@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="msx1_bee_card" description="MSX1 Hudson Soft Bee Cards">
+
+<!--
+Known releases:
+BC-M1  Baseball Craze (Japan)
+*BC-M1E Baseball Craze (Spain, UK)
+BC-M2  Star Force (Japan)
+BC-M3  Jet Set Willy (Spain, Japan, UK)
+*BC-M4  T-Plan (Italy)
+BC-M5  Konami's Pooyan (Japan)
+BC-M7  Bomber Man Special (Japan)
+BC-M8  Star Soldier (Japan)
+BC-M9  Master Takahashi's Adventure Island (Japan)
+
+No dump known for entries marked with a *
+-->
+
+	<software name="bombmnsp">
+		<description>Bomber Man Special (Japan)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M7" />
+		<info name="alt_title" value="ボンバーマンスペシャル" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="bomber man special (japan).rom" size="0x8000" crc="042ad44d" sha1="e700493e1c4c14f711e9c1c262fe3e8d76931ca3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetsetw">
+		<description>Jet Set Willy</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M3" />
+		<info name="alt_title" value="ジェットセットウィリー" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x4000">
+				<rom name="jet set willy (japan).rom" size="0x4000" crc="9191c890" sha1="45b5b0e9dd8d11d034e09803f92ec9720cda1e3c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooyan">
+		<description>Pooyan (Japan)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M5" />
+		<info name="alt_title" value="コナミのプーヤン ~ Konami no Pooyan (Box?)" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x4000">
+				<rom name="pooyan (japan).rom" size="0x4000" crc="558a09f6" sha1="692a55393e8eef0800a612c01456e9cecd9c1418" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfrce">
+		<description>Star Force (Japan)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M2" />
+		<info name="alt_title" value="スターフォース" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="star force (japan).rom" size="0x8000" crc="c14e53a1" sha1="c1746efeb4b44dcc80dfc4f429009feac91d9c48" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfrcea" cloneof="starfrce">
+		<description>Star Force (Japan, alt)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M2" />
+		<info name="alt_title" value="スターフォース" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="star force (japan) (alt 1).rom" size="0x8000" crc="e9de7e32" sha1="5fe86465119343804a722ce4768eb33de806a39f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starsold">
+		<description>Star Soldier (Japan)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M8" />
+		<info name="alt_title" value="スターソルジャー" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="star soldier (japan).rom" size="0x8000" crc="0b3d975d" sha1="6a56b46b8bf014b25863433d6d96e64641a93eef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starsolda" cloneof="starsold">
+		<description>Star Soldier (Japan, alt)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M8" />
+		<info name="alt_title" value="スターソルジャー" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="star soldier (japan) (alt 1).rom" size="0x8000" crc="f6d4e101" sha1="b58caf47c953b6f00935a201bfccf7ee968dff32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takameij">
+		<description>Takahashi Meijin no Boukenjima (Japan)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M9" />
+		<info name="alt_title" value="高橋名人の冒険島" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="wonder boy (japan).rom" size="0x8000" crc="892266ca" sha1="d74c381ea17acb94527ef3abaa280793a824d322" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takameija" cloneof="takameij">
+		<description>Takahashi Meijin no Boukenjima (Japan, alt)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M9" />
+		<info name="alt_title" value="高橋名人の冒険島" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="wonder boy (japan) (alt 1).rom" size="0x8000" crc="5130c27b" sha1="1672af5bc1740480e8302f7690589ea5b5391bcb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yakyukyo">
+		<description>Yakyuu Kyou (Japan)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="BC-M1" />
+		<info name="alt_title" value="野球狂" />
+		<part name="cart" interface="bee_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="baseball (japan).rom" size="0x8000" crc="24b94274" sha1="f27721cf9ec316ea3b18233f699febf739b25678" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

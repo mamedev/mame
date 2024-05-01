@@ -200,21 +200,20 @@ private:
 	void m63_videoram_w(offs_t offset, uint8_t data);
 	void m63_colorram_w(offs_t offset, uint8_t data);
 	void m63_videoram2_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pal_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(m63_flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(fghtbskt_flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_w);
+	void pal_bank_w(int state);
+	void fghtbskt_flipscreen_w(int state);
+	void coin1_w(int state);
+	void coin2_w(int state);
 	void snd_irq_w(uint8_t data);
 	void snddata_w(offs_t offset, uint8_t data);
 	void p1_w(uint8_t data);
 	void p2_w(uint8_t data);
 	uint8_t snd_status_r();
-	DECLARE_READ_LINE_MEMBER(irq_r);
+	int irq_r();
 	uint8_t snddata_r(offs_t offset);
 	void fghtbskt_samples_w(uint8_t data);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void m63_palette(palette_device &palette) const;
@@ -302,19 +301,13 @@ void m63_state::m63_videoram2_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(m63_state::pal_bank_w)
+void m63_state::pal_bank_w(int state)
 {
 	m_pal_bank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(m63_state::m63_flipscreen_w)
-{
-	flip_screen_set(!state);
-	machine().tilemap().mark_all_dirty();
-}
-
-WRITE_LINE_MEMBER(m63_state::fghtbskt_flipscreen_w)
+void m63_state::fghtbskt_flipscreen_w(int state)
 {
 	flip_screen_set(state);
 	m_fg_flag = flip_screen() ? TILE_FLIPX : 0;
@@ -399,12 +392,12 @@ uint32_t m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE_LINE_MEMBER(m63_state::coin1_w)
+void m63_state::coin1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(m63_state::coin2_w)
+void m63_state::coin2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -448,7 +441,7 @@ uint8_t m63_state::snd_status_r()
 	return m_sound_status;
 }
 
-READ_LINE_MEMBER(m63_state::irq_r)
+int m63_state::irq_r()
 {
 	if (m_sound_irq)
 	{
@@ -474,7 +467,7 @@ void m63_state::fghtbskt_samples_w(uint8_t data)
 		m_samples->start_raw(0, m_samplebuf.get() + ((data & 0xf0) << 8), 0x2000, 8000);
 }
 
-WRITE_LINE_MEMBER(m63_state::nmi_mask_w)
+void m63_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 }
@@ -747,7 +740,7 @@ void m63_state::m63(machine_config &config)
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // probably chip at E7 obscured by pulldown resistor
 	outlatch.q_out_cb<0>().set(FUNC(m63_state::nmi_mask_w));
-	outlatch.q_out_cb<2>().set(FUNC(m63_state::m63_flipscreen_w));
+	outlatch.q_out_cb<2>().set(FUNC(m63_state::flip_screen_set)).invert();
 	outlatch.q_out_cb<3>().set(FUNC(m63_state::pal_bank_w));
 	outlatch.q_out_cb<6>().set(FUNC(m63_state::coin1_w));
 	outlatch.q_out_cb<7>().set(FUNC(m63_state::coin2_w));

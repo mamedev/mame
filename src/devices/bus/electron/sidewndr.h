@@ -27,7 +27,7 @@ public:
 	electron_sidewndr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	// optional information overrides
@@ -39,7 +39,7 @@ protected:
 	virtual void expbus_w(offs_t offset, uint8_t data) override;
 
 private:
-	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom[1]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }

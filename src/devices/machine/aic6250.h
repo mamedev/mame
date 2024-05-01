@@ -23,7 +23,7 @@ public:
 	auto port_b_r_cb() { return m_port_b_r_cb.bind(); }
 	auto port_b_w_cb() { return m_port_b_w_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(back_w);
+	void back_w(int state);
 
 	u8 read(address_space &space, offs_t offset);
 	void write(offs_t offset, u8 data);

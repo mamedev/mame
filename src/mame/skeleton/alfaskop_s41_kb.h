@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edström
-#ifndef MAME_MACHINE_ALFASKOP_S41_KB_H
-#define MAME_MACHINE_ALFASKOP_S41_KB_H
+#ifndef MAME_SKELETON_ALFASKOP_S41_KB_H
+#define MAME_SKELETON_ALFASKOP_S41_KB_H
 
 #pragma once
 
@@ -19,9 +19,9 @@ public:
 	alfaskop_s41_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(key);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	//DECLARE_WRITE_LINE_MEMBER(hold_w);
-	DECLARE_WRITE_LINE_MEMBER(rst_line_w);
+	void rxd_w(int state);
+	//void hold_w(int state);
+	void rst_line_w(int state);
 
 protected:
 	virtual void device_start() override;
@@ -45,4 +45,4 @@ protected:
 	void alfaskop_s41_kb_mem(address_map &map);
 };
 
-#endif // MAME_MACHINE_ALFASKOP_S41_KB_H
+#endif // MAME_SKELETON_ALFASKOP_S41_KB_H

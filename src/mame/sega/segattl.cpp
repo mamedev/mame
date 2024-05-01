@@ -62,6 +62,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -172,5 +175,7 @@ ROM_START( fonz )
 	ROM_LOAD( "pr-08.50",     0x500, 0x100, CRC(6c763af7) SHA1(fdfa310f54b88610c1f59345f5fc72b3b90641ad) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1976, fonz, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz [TTL]", MACHINE_IS_SKELETON )
+
+GAME( 1976, fonz, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz", MACHINE_IS_SKELETON )

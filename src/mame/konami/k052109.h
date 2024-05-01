@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
-#ifndef MAME_VIDEO_K052109_H
-#define MAME_VIDEO_K052109_H
+#ifndef MAME_KONAMI_K052109_H
+#define MAME_KONAMI_K052109_H
 
 #pragma once
 
@@ -46,14 +46,10 @@ public:
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
-	u16 word_r(offs_t offset);
-	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_rmrd_line(int state);
 	int get_rmrd_line();
 	void tilemap_update();
-	int is_irq_enabled() { return m_irq_enabled; } // FIXME: remove
-	void tilemap_mark_dirty(int tmap_num);
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
 
 	void vblank_callback(screen_device &screen, bool state);
@@ -108,4 +104,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K052109, k052109_device)
 
-#endif // MAME_VIDEO_K052109_H
+#endif // MAME_KONAMI_K052109_H

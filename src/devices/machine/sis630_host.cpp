@@ -53,8 +53,7 @@ void sis630_host_device::device_start()
 	io_window_end   = 0xffff;
 	io_offset       = 0;
 
-	memory_space = &m_host_cpu->space(AS_PROGRAM);
-	io_space = &m_host_cpu->space(AS_IO);
+	set_spaces(&m_host_cpu->space(AS_PROGRAM), &m_host_cpu->space(AS_IO));
 	add_map(8*1024*1024, M_MEM, FUNC(sis630_host_device::memory_map));
 
 	m_ram.resize(m_ram_size/4);

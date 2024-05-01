@@ -25,7 +25,7 @@ public:
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 
 	uint16_t video_r(offs_t offset);
 	void video_w(offs_t offset, uint16_t data);

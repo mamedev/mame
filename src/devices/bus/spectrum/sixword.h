@@ -14,7 +14,6 @@
 #include "machine/wd_fdc.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "formats/swd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -49,7 +48,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -64,7 +63,7 @@ protected:
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_joy;
 
-	int m_romcs;
+	bool m_romcs;
 	u8 m_ram[0x2000];
 	u16 m_rombank;
 	u8 m_control;
@@ -92,7 +91,7 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; }
+	void busy_w(int state) { m_busy = state; }
 
 	required_device<centronics_device> m_centronics;
 	required_ioport m_conf;

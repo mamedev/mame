@@ -47,6 +47,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class bowltry_state : public driver_device
 {
 public:
@@ -61,7 +64,6 @@ public:
 
 protected:
 	void bowltry_map(address_map &map);
-	void bowltry_io(address_map &map);
 
 	uint32_t screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -143,13 +145,6 @@ void bowltry_state::bowltry_map(address_map &map)
 	map(0x60e000, 0x60ffff).rw(FUNC(bowltry_state::vregs_r), FUNC(bowltry_state::vregs_w)).share("vregs");
 }
 
-void bowltry_state::bowltry_io(address_map &map)
-{
-	// these looks either EEPROM or touchscreen style writes, with chip select etc.
-//  map(0x09, 0x09).r(FUNC(bowltry_state::fake_io_r));
-//  map(0x0a, 0x0a).r(FUNC(bowltry_state::fake_io_r));
-}
-
 static INPUT_PORTS_START( bowltry )
 INPUT_PORTS_END
 
@@ -157,7 +152,6 @@ void bowltry_state::bowltry(machine_config &config)
 {
 	H83008(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bowltry_state::bowltry_map);
-	m_maincpu->set_addrmap(AS_IO, &bowltry_state::bowltry_io);
 	// uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
 	// no vblank, most likely handled by YGV video register bit at 0x090/2
 	// TODO: serial hookup, comms with a LED type ring display?
@@ -191,6 +185,8 @@ ROM_START( bowltry )
 	ROM_REGION( 0x400000, "tt5665", 0 ) // sound
 	ROM_LOAD( "u24_v1.00.u24", 0x000000, 0x400000, CRC(4e082d58) SHA1(d2eb58bc3d8ade2ea556960013d580f0fb952090) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 200?, bowltry, 0, bowltry, bowltry, bowltry_state, empty_init, ROT0, "Atlus", "Bowling Try!", MACHINE_IS_SKELETON_MECHANICAL )

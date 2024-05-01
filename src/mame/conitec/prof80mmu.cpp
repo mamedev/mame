@@ -85,7 +85,7 @@ void prof80_mmu_device::par_w(offs_t offset, uint8_t data)
 //  mme_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( prof80_mmu_device::mme_w )
+void prof80_mmu_device::mme_w(int state)
 {
 	m_enabled = (state == 1);
 }

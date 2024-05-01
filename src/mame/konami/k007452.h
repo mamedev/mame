@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_K007452_H
-#define MAME_MACHINE_K007452_H
+#ifndef MAME_KONAMI_K007452_H
+#define MAME_KONAMI_K007452_H
 
 #pragma once
 
@@ -43,4 +43,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(KONAMI_007452_MATH, k007452_device)
 
-#endif // MAME_MACHINE_K007452_H
+#endif // MAME_KONAMI_K007452_H

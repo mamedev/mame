@@ -280,7 +280,7 @@ const char *drcuml_state::symbol_find(void *base, u32 *offset)
 //  if generated
 //-------------------------------------------------
 
-void drcuml_state::log_vprintf(util::format_argument_pack<std::ostream> const &args)
+void drcuml_state::log_vprintf(util::format_argument_pack<char> const &args)
 {
 	// if we have a file, print to it
 	if (m_umllog)

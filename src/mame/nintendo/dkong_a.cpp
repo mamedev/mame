@@ -1292,17 +1292,18 @@ void dkong_state::radarscp1_sound_io_map(address_map &map)
 
 void dkong_state::dkong3_sound1_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
-	map(0x4016, 0x4016).r("latch1", FUNC(latch8_device::read));       /* overwrite default */
+	map(0x0000, 0x07ff).mirror(0x7800).ram();
+	map(0x4016, 0x4016).r("latch1", FUNC(latch8_device::read));
 	map(0x4017, 0x4017).r("latch2", FUNC(latch8_device::read));
-	map(0xe000, 0xffff).rom();
+	map(0x8000, 0x9fff).mirror(0x6000).rom();
 }
 
 void dkong_state::dkong3_sound2_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
-	map(0x4016, 0x4016).r("latch3", FUNC(latch8_device::read));       /* overwrite default */
-	map(0xe000, 0xffff).rom();
+	map(0x0000, 0x07ff).mirror(0x7800).ram();
+	map(0x4016, 0x4016).r("latch3", FUNC(latch8_device::read));
+	map(0x4017, 0x4017).nopr();
+	map(0x8000, 0x9fff).mirror(0x6000).rom();
 }
 
 /*************************************
@@ -1428,13 +1429,13 @@ void dkong_state::dkong3_audio(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	n2a03_device &n2a03a(N2A03(config, "n2a03a", NTSC_APU_CLOCK));
-	n2a03a.set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound1_map);
-	n2a03a.add_route(ALL_OUTPUTS, "mono", 0.50);
+	rp2a03_device &rp2a03a(RP2A03(config, "rp2a03a", NTSC_APU_CLOCK));
+	rp2a03a.set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound1_map);
+	rp2a03a.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	n2a03_device &n2a03b(N2A03(config, "n2a03b", NTSC_APU_CLOCK));
-	n2a03b.set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound2_map);
-	n2a03b.add_route(ALL_OUTPUTS, "mono", 0.50);
+	rp2a03_device &rp2a03b(RP2A03(config, "rp2a03b", NTSC_APU_CLOCK));
+	rp2a03b.set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound2_map);
+	rp2a03b.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* sound latches */
 	LATCH8(config, "latch1");

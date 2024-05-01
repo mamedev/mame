@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Compatibility tags:
+MC68000 - 68000 CPU
+MC68020 - 68020 CPU
+MC68020_32 - 68020 CPU with 32-bit clean ROMs (orignal LC)
+MC68030 - 68030 CPU
+MC68030_32 - 68030 CPU with 32-bit clean ROMs (IIci and later)
+MC68040 - 68040 CPU
+PPC601 - PowerPC 601 CPU (either NuBus or PCI)
+PPC601_PCI - PowerPC 601 CPU with PCI
+PPC603 - PowerPC 603/603E/603EV CPU
+PPC604 - PowerPC 604 CPU
+PPC750 - PowerPC 750 (G3) CPU
+-->
+<softwarelist name="mac_cdrom" description="Apple Macintosh CD-ROMs">
+	<software name="aplegrec">
+		<description>Apple Legacy Recovery</description>
+		<year>1998</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aplegrec" sha1="888ceee315e0f11f9a5f1a0db527f296470c80ea"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac70a9">
+		<description>System Software 7.0a9 ("Big Bang" pre-release)</description>
+		<year>1991</year>
+		<publisher>Apple</publisher>
+		<sharedfeat name="compatibility" value="MC68000,MC68020,MC68030,MC68040" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac70a9" sha1="b56813d7227e4844243bd1e0acec63c254f9daf3"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac71">
+		<description>System Software 7.1 (US English)</description>
+		<year>1992</year>
+		<publisher>Apple</publisher>
+		<sharedfeat name="compatibility" value="MC68000,MC68020,MC68030,MC68040" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac71" sha1="2e7e36cd94b82d447b0481007080195d316a8c4c"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac712p_q630">
+		<description>Performa CD (System 7.1.2P for Quadra 630 and LC/Performa 580) (US English)</description>
+		<year>1994</year>
+		<publisher>Apple</publisher>
+		<sharedfeat name="compatibility" value="MC68000,MC68020,MC68030,MC68040,PPC601" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac712p_q630" sha1="f367d20f76e8eb891dd5cdf14540f7cb2cc4516e"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac75">
+		<description>System Software 7.5 (US English)</description>
+		<year>1994</year>
+		<publisher>Apple</publisher>
+		<sharedfeat name="compatibility" value="MC68000,MC68020,MC68030,MC68040,PPC601" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac75" sha1="9cff3aac53454405e37cd880acc5d2bbd33e1de4"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac753">
+		<description>System Software 7.5.3 (US English)</description>
+		<year>1996</year>
+		<publisher>Apple</publisher>
+		<sharedfeat name="compatibility" value="MC68000,MC68020,MC68030,MC68040,PPC601" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac753" sha1="67536c42db6c69491072a48a4a02f02e7956e644"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac76">
+		<description>Mac OS 7.6 (US English)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac76" sha1="dd400ae4776f9258dbebc2a5d06ce58e7a10d54f"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac76_de">
+		<description>Mac OS 7.6 (German)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac76_de" sha1="b5a0d5a826a130808c07473f78fe205d92eb3151"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac761">
+		<description>Mac OS 7.6.1 (US English)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac761" sha1="ce0c2c7810be05a033c80cdf36bae0e5a5b3d22a"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac80_jp">
+		<description>Mac OS 8 (Japanese)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Runs on any 68040, PowerPC 601, 603, or 604" />
+		<sharedfeat name="compatibility" value="MC68040,PPC601,PPC601_PCI,PPC603,PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac80_jp" sha1="a2702185e6ac03d068375554e7709405dc5e39fd"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="mac81">
+		<description>Mac OS 8.1 (US English)</description>
+		<year>1998</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Runs on any 68040, PowerPC 601, 603, 604, or G3" />
+		<sharedfeat name="compatibility" value="MC68040,PPC601,PPC601_PCI,PPC603,PPC604,PPC750" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mac81" sha1="cd3d8a45c20b271c27f80d957559071f525759f7"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="pwrmaccd">
+		<description>Power Macintosh 6100/7100/8100 CD (System Software 7.1.2P) (US English)</description>
+		<year>1994</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Runs on most 68040s and NuBus Power Macs" />
+		<sharedfeat name="compatibility" value="MC68040,PPC601" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pwrmaccd" sha1="8fd11f42298af430a4b7e3b056336f2e6eec5ce2"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

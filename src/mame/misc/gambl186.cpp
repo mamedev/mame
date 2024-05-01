@@ -57,7 +57,7 @@ TODO:
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 #include "speaker.h"
 
@@ -387,15 +387,13 @@ void gambl186_state::gambl186_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share("nvram");
 	map(0x40000, 0x7ffff).bankr(m_data_bank);
-	map(0xa0000, 0xbffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0xa0000, 0xbffff).rw("vga", FUNC(cirrus_gd5428_vga_device::mem_r), FUNC(cirrus_gd5428_vga_device::mem_w));
 	map(0xc0000, 0xfffff).rom().region("ipl", 0);
 }
 
 void gambl186_state::gambl186_io(address_map &map)
 {
-	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5428_vga_device::io_map));
 	map(0x0400, 0x0401).w(FUNC(gambl186_state::upd_w));      // upd7759 sample index/input
 	map(0x0500, 0x0501).portr("IN0");
 	map(0x0502, 0x0503).portr("IN1");
@@ -511,9 +509,9 @@ void gambl186_state::gambl186(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_vga_device::screen_update));
 
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
+	cirrus_gd5428_vga_device &vga(CIRRUS_GD5428_VGA(config, "vga", 0));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 
@@ -608,6 +606,22 @@ ROM_START( gambl186d ) // labels unreadable or hand written with just a number. 
 	ROM_LOAD( "5", 0x00000, 0x20000, CRC(1d6d1743) SHA1(df0e8d311ccaf77fb5dfc341124a11051154e79c) )
 ROM_END
 
+ROM_START( gambl186e ) // has Casino 10, Roulette, 21 Blackjack and Bingo 10 selection
+	ROM_REGION( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "ie398j.u11", 0x00000, 0x80000, CRC(86ad7cab) SHA1(b701c3701db630d218a9b1700f216f795a1b1272) )
+	ROM_LOAD16_BYTE( "io398j.u12", 0x00001, 0x80000, CRC(0a036f34) SHA1(63d0b87c7d4c902413f28c0b55d78e5fda511f4f) )
+
+	ROM_REGION16_LE( 0x40000, "ipl", 0 )
+	ROM_LOAD16_BYTE( "se398j.u9",  0x00000, 0x20000, CRC(abab8a79) SHA1(185318108db4fec3b4daa885244ccfd411e098e0) )
+	ROM_LOAD16_BYTE( "so398j.u10", 0x00001, 0x20000, CRC(68b61b8f) SHA1(f34c515deaed2c4e9c36faa7abd585f4fdb5ea7b) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "89c52.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "upd", 0 ) // upd7759 sound samples
+	ROM_LOAD( "347.u302", 0x00000, 0x20000, CRC(7ce8f490) SHA1(2f856e31d189e9d46ba6b322133d99133e0b52ac) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -617,3 +631,4 @@ GAME( 1997, gambl186a, gambl186, gambl186, gambl186,  gambl186_state, empty_init
 GAME( 1997, gambl186b, gambl186, gambl186, gambl186,  gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Italian, Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97
 GAME( 2000, gambl186c, gambl186, gambl186, gambl186c, gambl186_state, empty_init, ROT0, "EGD", "Multi Game (French / English, Version Soft 4.4.8T - 4.0.5, 26-OCT-00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Version Soft 4.4.8T (4.0.5), CSMB-0020E (HX) - hdpr-hx - Oct 26 2000 - 15:01:24
 GAME( 2000, gambl186d, gambl186, gambl186, gambl186,  gambl186_state, empty_init, ROT0, "EGD", "Multi Game (English, Version Soft 4.1.2T - 1.5.7, 16-MAY-00(397))",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Version 4.1.2T (1.5.7), carapor2, SLC_PORT_2_VII (POR) - 16-MAY-00(397)
+GAME( 1997, gambl186e, gambl186, gambl186, gambl186,  gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Italian, Versione 3.9.8 - 1.5.7, 01-JUL-98)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)

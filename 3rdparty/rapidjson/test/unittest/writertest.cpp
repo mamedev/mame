@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -19,6 +19,11 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/memorybuffer.h"
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
 
 using namespace rapidjson;
 
@@ -93,6 +98,19 @@ TEST(Writer, String) {
         EXPECT_STREQ("\"Hello\\n\"", buffer.GetString());
     }
 #endif
+}
+
+TEST(Writer, Issue_889) {
+    char buf[100] = "Hello";
+    
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.String(buf);
+    writer.EndArray();
+    
+    EXPECT_STREQ("[\"Hello\"]", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
 }
 
 TEST(Writer, ScanWriteUnescapedString) {
@@ -394,8 +412,10 @@ TEST(Writer, ValidateEncoding) {
         EXPECT_TRUE(writer.String("\xC2\xA2"));         // Cents sign U+00A2
         EXPECT_TRUE(writer.String("\xE2\x82\xAC"));     // Euro sign U+20AC
         EXPECT_TRUE(writer.String("\xF0\x9D\x84\x9E")); // G clef sign U+1D11E
+        EXPECT_TRUE(writer.String("\x01"));             // SOH control U+0001
+        EXPECT_TRUE(writer.String("\x1B"));             // Escape control U+001B
         writer.EndArray();
-        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\"]", buffer.GetString());
+        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\",\"\\u0001\",\"\\u001B\"]", buffer.GetString());
     }
 
     // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
@@ -435,6 +455,28 @@ TEST(Writer, InvalidEventSequence) {
         Writer<StringBuffer> writer(buffer);
         writer.StartObject();
         EXPECT_THROW(writer.Int(1), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 'a' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 'a':'b','c' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        writer.String("b");
+        writer.Key("c");
+        EXPECT_THROW(writer.EndObject(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
 }
@@ -495,3 +537,62 @@ TEST(Writer, RawValue) {
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
 }
+
+TEST(Write, RawValue_Issue1152) {
+    {
+        GenericStringBuffer<UTF32<> > sb;
+        Writer<GenericStringBuffer<UTF32<> >, UTF8<>, UTF32<> > writer(sb);
+        writer.RawValue("null", 4, kNullType);
+        EXPECT_TRUE(writer.IsComplete());
+        const unsigned *out = sb.GetString();
+        EXPECT_EQ(static_cast<unsigned>('n'), out[0]);
+        EXPECT_EQ(static_cast<unsigned>('u'), out[1]);
+        EXPECT_EQ(static_cast<unsigned>('l'), out[2]);
+        EXPECT_EQ(static_cast<unsigned>('l'), out[3]);
+        EXPECT_EQ(static_cast<unsigned>(0  ), out[4]);
+    }
+
+    {
+        GenericStringBuffer<UTF8<> > sb;
+        Writer<GenericStringBuffer<UTF8<> >, UTF16<>, UTF8<> > writer(sb);
+        writer.RawValue(L"null", 4, kNullType);
+        EXPECT_TRUE(writer.IsComplete());
+        EXPECT_STREQ("null", sb.GetString());
+    }
+
+    {
+        // Fail in transcoding
+        GenericStringBuffer<UTF16<> > buffer;
+        Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
+        EXPECT_FALSE(writer.RawValue("\"\xfe\"", 3, kStringType));
+    }
+
+    {
+        // Fail in encoding validation
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteValidateEncodingFlag> writer(buffer);
+        EXPECT_FALSE(writer.RawValue("\"\xfe\"", 3, kStringType));
+    }
+}
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+static Writer<StringBuffer> WriterGen(StringBuffer &target) {
+    Writer<StringBuffer> writer(target);
+    writer.StartObject();
+    writer.Key("a");
+    writer.Int(1);
+    return writer;
+}
+
+TEST(Writer, MoveCtor) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(WriterGen(buffer));
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"a\":1}", buffer.GetString());
+}
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif

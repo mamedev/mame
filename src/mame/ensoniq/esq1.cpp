@@ -335,7 +335,8 @@ void esq1_filters::recalc_filter(filter &f)
 void esq1_filters::device_start()
 {
 	stream = stream_alloc(8, 2, 44100);
-	memset(filters, 0, sizeof(filters));
+	for(auto & elem : filters)
+		elem = filter();
 	for(auto & elem : filters)
 		recalc_filter(elem);
 }
@@ -383,11 +384,14 @@ void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_st
 	}
 }
 
+
+namespace {
+
 class esq1_state : public driver_device
 {
 public:
-	esq1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	esq1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_filters(*this, "filters"),
@@ -724,6 +728,8 @@ ROM_START( esqm )
 	ROM_LOAD( "esq1wavlo.bin", 0x0000, 0x8000, CRC(4d04ac87) SHA1(867b51229b0a82c886bf3b216aa8893748236d8b) )
 	ROM_LOAD( "esq1wavhi.bin", 0x8000, 0x8000, CRC(94c554a3) SHA1(ed0318e5253637585559e8cf24c06d6115bd18f6) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, empty_init, "Ensoniq", "ESQ-1 Digital Wave Synthesizer", MACHINE_NOT_WORKING )

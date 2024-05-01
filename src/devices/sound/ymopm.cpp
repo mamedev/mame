@@ -52,7 +52,7 @@ void ym2151_device::data_w(u8 data)
 //  reset_w - reset line, active LOW
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ym2151_device::reset_w)
+void ym2151_device::reset_w(int state)
 {
 	if (state != m_reset_state)
 	{

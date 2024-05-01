@@ -49,7 +49,7 @@ void yamaha_sy35_state::sy35(machine_config &config)
 	m_maincpu->set_mode(3); // internal ROM disabled
 	m_maincpu->set_addrmap(AS_PROGRAM, &yamaha_sy35_state::mem_map);
 
-	HD63705(config, m_scancpu, 8_MHz_XTAL).set_disable(); // HD63B05V0C85P
+	HD6305V0(config, m_scancpu, 8_MHz_XTAL).set_disable(); // HD63B05V0C85P
 
 	//TMC3493PH(config, "gew5a", 12.8_MHz_XTAL);
 	//TMC3493PH(config, "gew5b", 12.8_MHz_XTAL);

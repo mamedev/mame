@@ -32,8 +32,7 @@ public:
 	void local_w(offs_t offset, u8 data);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -13,19 +13,21 @@
 
 // ======================> a26_rom_cm_device
 
-class a26_rom_cm_device : public a26_rom_f6_device
+class a26_rom_cm_device : public a26_rom_base_device
 {
 public:
 	// construction/destruction
 	a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	virtual void install_memory_handlers(address_space *space) override;
+
+protected:
 	virtual void device_reset() override;
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
+	memory_bank_creator m_bank;
 };
 
 

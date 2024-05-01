@@ -114,6 +114,8 @@ silkscreened by Falgas and the cab contains Falgas logos with a small note that 
 #include "imolagp.lh"
 
 
+namespace {
+
 class imolagp_state : public driver_device
 {
 public:
@@ -159,7 +161,7 @@ private:
 	uint8_t imola_draw_mode_r(offs_t offset);
 	void vreg_control_w(uint8_t data);
 	void vreg_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
 	void imolagp_palette(palette_device &palette) const;
@@ -259,7 +261,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 		m_steer_pot_timer->adjust(attotime::from_msec(20));
 }
 
-WRITE_LINE_MEMBER(imolagp_state::vblank_irq)
+void imolagp_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -552,8 +554,7 @@ void imolagp_state::imolagp(machine_config &config)
 	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
 	ppi.in_pa_callback().set_ioport("IN0");
-	ppi.in_pb_callback().set_log("PPI8255 - unmapped read port B");
-	ppi.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ppi.out_pb_callback().set([this](uint8_t data) { logerror("%s PPI write port B: %02X\n", machine().describe_context(), data); });
 	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
@@ -621,6 +622,8 @@ ROM_START( imolagpo )
 	ROM_LOAD( "xr.bin",   0x3800, 0x0400, CRC(8a8667aa) SHA1(53f34b6c5327d4398de644d7f318d460da56c2de) ) // ? gfx: sign+explosion
 	ROM_LOAD( "xe.bin",   0x3c00, 0x0400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) ) // ? car+misc
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    CLASS,         INIT,       MONITOR, COMPANY,      FULLNAME,                   FLAGS

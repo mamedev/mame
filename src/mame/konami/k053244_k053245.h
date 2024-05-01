@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_K053244_K053245_H
-#define MAME_VIDEO_K053244_K053245_H
+#ifndef MAME_KONAMI_K053244_K053245_H
+#define MAME_KONAMI_K053244_K053245_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ private:
 DECLARE_DEVICE_TYPE(K053244, k05324x_device)
 static auto &K053245 = K053244;
 
-#endif // MAME_VIDEO_K053244_K053245_H
+#endif // MAME_KONAMI_K053244_K053245_H

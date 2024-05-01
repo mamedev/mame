@@ -30,11 +30,11 @@ public:
 	// construction/destruction
 	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( wr_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
-	DECLARE_WRITE_LINE_MEMBER( data_w );
+	void ce_w(int state);
+	void wr_w(int state);
+	void clk_w(int state);
+	int data_r();
+	void data_w(int state);
 
 	auto data_cb() { return m_data_cb.bind(); }
 

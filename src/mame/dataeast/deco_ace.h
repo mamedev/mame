@@ -9,8 +9,8 @@
     Original source (from deco32.cpp) by Bryan McPhail, split by cam900.
 
 **************************************************************************/
-#ifndef MAME_VIDEO_DECO_ACE_H
-#define MAME_VIDEO_DECO_ACE_H
+#ifndef MAME_DATAEAST_DECO_ACE_H
+#define MAME_DATAEAST_DECO_ACE_H
 
 #pragma once
 
@@ -43,7 +43,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 2048 * 2; }
+	virtual uint32_t palette_entries() const noexcept override { return 2048 * 2; }
 
 private:
 	// internal state
@@ -55,4 +55,4 @@ private:
 DECLARE_DEVICE_TYPE(DECO_ACE, deco_ace_device)
 
 
-#endif // MAME_VIDEO_DECO_ACE_H
+#endif // MAME_DATAEAST_DECO_ACE_H

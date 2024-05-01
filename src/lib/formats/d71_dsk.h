@@ -19,9 +19,9 @@ class d71_format : public d64_format
 public:
 	d71_format();
 
-	virtual const char *name() const override;
-	virtual const char *description() const override;
-	virtual const char *extensions() const override;
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
 
 protected:
 	static const format formats[];

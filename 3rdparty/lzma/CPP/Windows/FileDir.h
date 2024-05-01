@@ -1,7 +1,7 @@
 // Windows/FileDir.h
 
-#ifndef __WINDOWS_FILE_DIR_H
-#define __WINDOWS_FILE_DIR_H
+#ifndef ZIP7_INC_WINDOWS_FILE_DIR_H
+#define ZIP7_INC_WINDOWS_FILE_DIR_H
 
 #include "../Common/MyString.h"
 
@@ -14,8 +14,33 @@ namespace NDir {
 bool GetWindowsDir(FString &path);
 bool GetSystemDir(FString &path);
 
-bool SetDirTime(CFSTR path, const FILETIME *cTime, const FILETIME *aTime, const FILETIME *mTime);
+/*
+WIN32 API : SetFileTime() doesn't allow to set zero timestamps in file
+but linux : allows unix time = 0 in filesystem
+*/
+
+bool SetDirTime(CFSTR path, const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime);
+
+
+#ifdef _WIN32
+
 bool SetFileAttrib(CFSTR path, DWORD attrib);
+
+/*
+  Some programs store posix attributes in high 16 bits of windows attributes field.
+  Also some programs use additional flag markers: 0x8000 or 0x4000.
+  SetFileAttrib_PosixHighDetect() tries to detect posix field, and it extracts only attribute
+  bits that are related to current system only.
+*/
+#else
+
+int my_chown(CFSTR path, uid_t owner, gid_t group);
+
+#endif
+
+bool SetFileAttrib_PosixHighDetect(CFSTR path, DWORD attrib);
+
+
 bool MyMoveFile(CFSTR existFileName, CFSTR newFileName);
 
 #ifndef UNDER_CE
@@ -48,7 +73,9 @@ bool GetCurrentDir(FString &resultPath);
 
 bool MyGetTempPath(FString &resultPath);
 
-class CTempFile
+bool CreateTempFile2(CFSTR prefix, bool addRandom, AString &postfix, NIO::COutFile *outFile);
+
+class CTempFile  MY_UNCOPYABLE
 {
   bool _mustBeDeleted;
   FString _path;
@@ -63,7 +90,9 @@ public:
   bool MoveTo(CFSTR name, bool deleteDestBefore);
 };
 
-class CTempDir
+
+#ifdef _WIN32
+class CTempDir  MY_UNCOPYABLE
 {
   bool _mustBeDeleted;
   FString _path;
@@ -75,9 +104,11 @@ public:
   bool Create(CFSTR namePrefix) ;
   bool Remove();
 };
+#endif
+
 
 #if !defined(UNDER_CE)
-class CCurrentDirRestorer
+class CCurrentDirRestorer  MY_UNCOPYABLE
 {
   FString _path;
 public:

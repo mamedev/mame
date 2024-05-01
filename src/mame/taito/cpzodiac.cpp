@@ -37,6 +37,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class cpzodiac_state : public driver_device
 {
 public:
@@ -199,8 +201,8 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
 	tc0140syt_device &syt(TC0140SYT(config, "syt", 0));
-	syt.set_master_tag(m_maincpu);
-	syt.set_slave_tag(m_audiocpu);
+	syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -240,6 +242,8 @@ ROM_START( cpzodiacj )
 	ROM_REGION( 0x1000, "pals", 0 )
 	ROM_LOAD( "d52-02.ic38", 0x0000, 0x0aee, CRC(6be9b935) SHA1(d36af591b03873aee3098b7c74b53ac6370ca064) ) // PAL16L8BCN
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY              FULLNAME                  FLAGS

@@ -8,15 +8,17 @@
  *
  */
 
-#ifndef MAME_INCLUDES_APOLLO_H
-#define MAME_INCLUDES_APOLLO_H
+#ifndef MAME_APOLLO_APOLLO_H
+#define MAME_APOLLO_APOLLO_H
 
 #pragma once
 
 
 #include "apollo_kbd.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 
 #include "machine/6840ptm.h"
 #include "machine/am9517a.h"
@@ -69,7 +71,7 @@
 std::string apollo_cpu_context(running_machine &machine);
 
 // enable/disable the FPU
-void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff);
+void apollo_set_cpu_has_fpu(m68000_musashi_device *device, int onoff);
 
 // check for excessive logging
 void apollo_check_log();
@@ -166,7 +168,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint32_t> m_messram_ptr;
 
@@ -240,19 +242,19 @@ private:
 	u16 apollo_irq_acknowledge(offs_t offset);
 	u16 apollo_pic_get_vector();
 	void apollo_bus_error();
-	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
-	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
-	DECLARE_WRITE_LINE_MEMBER( sio_irq_handler );
+	int apollo_kbd_is_german();
+	void apollo_dma8237_out_eop(int state);
+	void apollo_dma_1_hrq_changed(int state);
+	void apollo_dma_2_hrq_changed(int state);
+	void apollo_pic8259_master_set_int_line(int state);
+	void apollo_pic8259_slave_set_int_line(int state);
+	void sio_irq_handler(int state);
 	void sio_output(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( sio2_irq_handler );
-	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
-	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
+	void sio2_irq_handler(int state);
+	void apollo_ptm_irq_function(int state);
+	void apollo_ptm_timer_tick(int state);
 	uint8_t apollo_pic8259_get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( apollo_rtc_irq_function );
+	void apollo_rtc_irq_function(int state);
 
 	uint8_t pc_dma8237_0_dack_r();
 	uint8_t pc_dma8237_1_dack_r();
@@ -268,19 +270,19 @@ private:
 	void pc_dma8237_5_dack_w(uint8_t data);
 	void pc_dma8237_6_dack_w(uint8_t data);
 	void pc_dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
 
-	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
+	void apollo_reset_instr_callback(int state);
 
 	void common(machine_config &config);
 	void apollo(machine_config &config);
@@ -385,8 +387,8 @@ public:
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "ani,bin"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual const char *image_type_name() const noexcept override { return "node_id"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "ni"; }
@@ -714,4 +716,4 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device)
 #endif /* APOLLO_XXL */
 
-#endif // MAME_INCLUDES_APOLLO_H
+#endif // MAME_APOLLO_APOLLO_H

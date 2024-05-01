@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Vas Crabb
 
 #include "netlist/devices/net_lib.h"

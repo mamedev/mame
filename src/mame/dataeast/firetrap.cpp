@@ -265,7 +265,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	void sound_map(address_map &map);
 };
@@ -329,8 +329,6 @@ private:
 	void main_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -555,8 +553,6 @@ uint32_t base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-// machine
-
 void base_state::nmi_disable_w(uint8_t data)
 {
 	m_nmi_enable = ~data & 1;
@@ -661,7 +657,7 @@ void base_state::sound_bankselect_w(uint8_t data)
 	m_audiobank->set_entry(data & 0x01);
 }
 
-WRITE_LINE_MEMBER(base_state::adpcm_int)
+void base_state::adpcm_int(int state)
 {
 	if (state)
 	{

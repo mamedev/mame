@@ -5,8 +5,8 @@
     Burger Time hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_BTIME_H
-#define MAME_INCLUDES_BTIME_H
+#ifndef MAME_DATAEAST_BTIME_H
+#define MAME_DATAEAST_BTIME_H
 
 #pragma once
 
@@ -160,4 +160,4 @@ public:
 	void zoar_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BTIME_H
+#endif // MAME_DATAEAST_BTIME_H

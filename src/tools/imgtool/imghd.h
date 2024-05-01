@@ -13,6 +13,7 @@
 
 #include "imgterrs.h"
 
+#include "chd.h"
 #include "harddisk.h"
 
 

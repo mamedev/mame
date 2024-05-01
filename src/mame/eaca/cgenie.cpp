@@ -27,6 +27,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -69,8 +71,8 @@ public:
 	uint8_t keyboard_r(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER(rst_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(rs232_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
+	void rs232_rx_w(int state);
+	void rs232_dcd_w(int state);
 
 	void cgenie(machine_config &config);
 	void cgenie_io(address_map &map);
@@ -277,12 +279,12 @@ uint8_t cgenie_state::control_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER( cgenie_state::rs232_rx_w )
+void cgenie_state::rs232_rx_w(int state)
 {
 	m_rs232_rx = state;
 }
 
-WRITE_LINE_MEMBER( cgenie_state::rs232_dcd_w )
+void cgenie_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
@@ -517,6 +519,8 @@ ROM_START( cgenienz )
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

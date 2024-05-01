@@ -11,28 +11,19 @@ DEFINE_DEVICE_TYPE(XAVIX_ADC, xavix_adc_device, "xavix_adc", "XaviX ADC")
 
 xavix_adc_device::xavix_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XAVIX_ADC, tag, owner, clock)
-	, m_in0_cb(*this)
-	, m_in1_cb(*this)
-	, m_in2_cb(*this)
-	, m_in3_cb(*this)
-	, m_in4_cb(*this)
-	, m_in5_cb(*this)
-	, m_in6_cb(*this)
-	, m_in7_cb(*this)
+	, m_in0_cb(*this, 0xff)
+	, m_in1_cb(*this, 0xff)
+	, m_in2_cb(*this, 0xff)
+	, m_in3_cb(*this, 0xff)
+	, m_in4_cb(*this, 0xff)
+	, m_in5_cb(*this, 0xff)
+	, m_in6_cb(*this, 0xff)
+	, m_in7_cb(*this, 0xff)
 {
 }
 
 void xavix_adc_device::device_start()
 {
-	m_in0_cb.resolve_safe(0xff);
-	m_in1_cb.resolve_safe(0xff);
-	m_in2_cb.resolve_safe(0xff);
-	m_in3_cb.resolve_safe(0xff);
-	m_in4_cb.resolve_safe(0xff);
-	m_in5_cb.resolve_safe(0xff);
-	m_in6_cb.resolve_safe(0xff);
-	m_in7_cb.resolve_safe(0xff);
-
 	m_adc_timer = timer_alloc(FUNC(xavix_adc_device::adc_timer_done), this);
 
 	save_item(NAME(m_adc_control));

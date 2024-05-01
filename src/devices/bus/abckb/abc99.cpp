@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor ABC-99 keyboard and mouse emulation
+    Luxor ABC-99 keyboard emulation
 
 *********************************************************************/
 
@@ -43,17 +43,14 @@ Notes:
 
     TODO:
 
-    - verify cursor keys
-    - language DIP
-    - mouse
-    - MCS-48 PC:01DC - Unimplemented opcode = 75
-        - 75 = ENT0 CLK : enable CLK (unscaled_clock/3) output on T0
-        - halt Z2 when Z5 is reset, resume Z2 when Z5 executes ENT0 CLK instruction
+    - watchdog clock
+    - output leds
 
 */
 
 #include "emu.h"
 #include "abc99.h"
+
 #include "speaker.h"
 
 
@@ -62,8 +59,9 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8035_Z2_TAG        "z2"
-#define I8035_Z5_TAG        "z5"
+#define I8035_Z2_TAG "z2"
+#define I8035_Z5_TAG "z5"
+#define R8_TAG       "r8"
 
 
 
@@ -81,10 +79,10 @@ DEFINE_DEVICE_TYPE(ABC99, abc99_device, "abc99", "Luxor ABC 99")
 ROM_START( abc99 )
 	ROM_SYSTEM_BIOS( 0, "107268", "107268-17" )
 	ROM_SYSTEM_BIOS( 1, "106819", "106819-09" )
-	ROM_DEFAULT_BIOS("107268")
+	ROM_DEFAULT_BIOS("106819")
 
 	ROM_REGION( 0x1000, I8035_Z2_TAG, 0 )
-	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(0) )
+	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(0) ) // UP/DOWN mode is broken
 	ROMX_LOAD( "106819-09.z3", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7), ROM_BIOS(1) ) // ABC 99 6490423-01
 
 	ROM_REGION( 0x800, I8035_Z5_TAG, 0 )
@@ -104,46 +102,31 @@ const tiny_rom_entry *abc99_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc99_z2_mem )
+//  ADDRESS_MAP( keyboard_mem )
 //-------------------------------------------------
 
-void abc99_device::abc99_z2_mem(address_map &map)
+void abc99_device::keyboard_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region(I8035_Z2_TAG, 0);
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc99_z2_io )
+//  ADDRESS_MAP( keyboard_io )
 //-------------------------------------------------
 
-void abc99_device::abc99_z2_io(address_map &map)
+void abc99_device::keyboard_io(address_map &map)
 {
-	map(0x21, 0x21).w(FUNC(abc99_device::z2_led_w));
-	map(0x30, 0x30).portr("X0").nopw();
-	map(0x31, 0x31).portr("X1").nopw();
-	map(0x32, 0x32).portr("X2").nopw();
-	map(0x33, 0x33).portr("X3").nopw();
-	map(0x34, 0x34).portr("X4").nopw();
-	map(0x35, 0x35).portr("X5").nopw();
-	map(0x36, 0x36).portr("X6").nopw();
-	map(0x37, 0x37).portr("X7").nopw();
-	map(0x38, 0x38).portr("X8").nopw();
-	map(0x39, 0x39).portr("X9").nopw();
-	map(0x3a, 0x3a).portr("X10").nopw();
-	map(0x3b, 0x3b).portr("X11").nopw();
-	map(0x3c, 0x3c).portr("X12").nopw();
-	map(0x3d, 0x3d).portr("X13").nopw();
-	map(0x3e, 0x3e).portr("X14").nopw();
-	map(0x3f, 0x3f).portr("X15").nopw();
+	map(0x21, 0x21).w(FUNC(abc99_device::led_w));
+	map(0x30, 0x3f).rw(FUNC(abc99_device::key_y_r), FUNC(abc99_device::key_x_w));
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc99_z5_mem )
+//  ADDRESS_MAP( mouse_mem )
 //-------------------------------------------------
 
-void abc99_device::abc99_z5_mem(address_map &map)
+void abc99_device::mouse_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).rom().region(I8035_Z5_TAG, 0);
 }
@@ -156,22 +139,27 @@ void abc99_device::abc99_z5_mem(address_map &map)
 void abc99_device::device_add_mconfig(machine_config &config)
 {
 	// keyboard CPU
-	I8035(config, m_maincpu, XTAL(6'000'000)/3); // from Z5 T0 output
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z2_mem);
-	m_maincpu->set_addrmap(AS_IO, &abc99_device::abc99_z2_io);
+	I8035(config, m_maincpu, 0); // from Z5 T0 output
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::keyboard_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc99_device::keyboard_io);
 	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(abc99_device::z2_p2_r));
-	m_maincpu->t0_in_cb().set(FUNC(abc99_device::z2_t0_r));
+	m_maincpu->t0_in_cb().set_constant(0); // mouse connected
 	m_maincpu->t1_in_cb().set(FUNC(abc99_device::z2_t1_r));
 
 	// mouse CPU
 	I8035(config, m_mousecpu, XTAL(6'000'000));
-	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z5_mem);
-	//m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
-	//m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
-	//m_mousecpu->set_t0_clk_cb(); // Z2 CLK
-	//m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
-	m_mousecpu->set_disable(); // HACK fix for broken serial I/O
+	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::mouse_mem);
+	m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
+	m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
+	m_mousecpu->set_t0_clk_cb(I8035_Z2_TAG, FUNC(device_t::set_unscaled_clock_int));
+	m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
+
+	// watchdog
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(0));
+
+	// mouse
+	LUXOR_R8(config, m_mouse, 0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -196,11 +184,53 @@ INPUT_CHANGED_MEMBER( abc99_device::keyboard_reset )
 //  INPUT_PORTS( abc99 )
 //-------------------------------------------------
 
-INPUT_PORTS_START( abc99 )
+CUSTOM_INPUT_MEMBER( abc99_device::cursor_x4_r )
+{
+	u8 cursor = m_cursor->read();
+	u8 data = 0;
+	switch (cursor & 0xf)
+	{
+		case 0x1: // up
+		case 0x9: // up-right
+			data = 0x1;
+			break;
+		case 0x2: // down
+		case 0xa: // down-right
+			data = 0x2;
+			break;
+		case 0x8: // right
+			data = 0x3;
+			break;
+	}
+	return data;
+}
+
+CUSTOM_INPUT_MEMBER( abc99_device::cursor_x6_r )
+{
+	u8 cursor = m_cursor->read();
+	u8 data = 0;
+	switch (cursor & 0xf)
+	{
+		case 0x1: // up
+		case 0x5: // up-left
+			data = 0x1;
+			break;
+		case 0x2: // down
+		case 0x6: // down-left
+			data = 0x2;
+			break;
+		case 0x4: // left
+			data = 0x3;
+			break;
+	}
+	return data;
+}
+
+static INPUT_PORTS_START( abc99 )
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF13") PORT_CODE(KEYCODE_PRTSCR)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT"|") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"\u2192|") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t') // U+2192 = →
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LF") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
@@ -242,8 +272,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF15") PORT_CODE(KEYCODE_PAUSE)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // cursor B
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // cursor D
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(abc99_device, cursor_x4_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -251,7 +280,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF12") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00FC) PORT_CHAR(0x00DC)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
@@ -262,17 +291,16 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF14") PORT_CODE(KEYCODE_SCRLOCK)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // cursor A
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // cursor C
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(abc99_device, cursor_x6_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 
 	PORT_START("X7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF11") PORT_CODE(KEYCODE_F11) PORT_CHAR(UCHAR_MAMEKEY(F11))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00E9) PORT_CHAR(0x00C9)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(U'é') PORT_CHAR(U'É')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'å') PORT_CHAR(U'Å')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
@@ -285,14 +313,14 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("|" UTF8_LEFT) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"|\u2190") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) // U+2190 = ←
 
 	PORT_START("X9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
@@ -335,7 +363,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 \xC2\xA4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0x00A4)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(U'¤')
 
 	PORT_START("X14")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -359,28 +387,23 @@ INPUT_PORTS_START( abc99 )
 
 	PORT_START("Z14")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("Z14:1,2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, "Swedish" )
+	PORT_DIPSETTING(    0x01, "US English" )
+	PORT_DIPSETTING(    0x02, "Spanish" )
+	PORT_DIPSETTING(    0x03, "Danish" )
+	PORT_DIPSETTING(    0x04, "Norwegian" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Unused ) )
 	PORT_DIPNAME( 0x08, 0x08, "Keyboard Program" ) PORT_DIPLOCATION("Z14:4")
 	PORT_DIPSETTING(    0x00, "Internal (8048)" )
 	PORT_DIPSETTING(    0x08, "External PROM" )
 
-	PORT_START("MOUSEB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+	PORT_START("CURSOR")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // U+2191 = ↑
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"\u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // U+2193 = ↓
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // U+2190 = ←
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // U+2192 = →
 
 	PORT_START("J4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc99_device, keyboard_reset, 0)
@@ -410,21 +433,6 @@ void abc99_device::serial_input()
 
 
 //-------------------------------------------------
-//  serial_output -
-//-------------------------------------------------
-
-void abc99_device::serial_output(int state)
-{
-	if (m_txd != state)
-	{
-		m_txd = state;
-
-		m_slot->write_rx(m_txd);
-	}
-}
-
-
-//-------------------------------------------------
 //  serial_clock -
 //-------------------------------------------------
 
@@ -433,30 +441,6 @@ TIMER_CALLBACK_MEMBER(abc99_device::serial_clock)
 	m_slot->trxc_w(1);
 	m_slot->trxc_w(0);
 }
-
-
-//-------------------------------------------------
-//  scan_mouse -
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(abc99_device::scan_mouse)
-{
-}
-
-
-//-------------------------------------------------
-//  keydown -
-//-------------------------------------------------
-
-void abc99_device::key_down(int state)
-{
-	if (m_keydown != state)
-	{
-		m_slot->keydown_w(state);
-		m_keydown = state;
-	}
-}
-
 
 
 //**************************************************************************
@@ -469,23 +453,26 @@ void abc99_device::key_down(int state)
 
 abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC99, tag, owner, clock),
-	abc_keyboard_interface(mconfig, *this), m_serial_timer(nullptr), m_mouse_timer(nullptr),
+	abc_keyboard_interface(mconfig, *this),
+	m_serial_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
 	m_mousecpu(*this, I8035_Z5_TAG),
+	m_watchdog(*this, "watchdog"),
 	m_speaker(*this, "speaker"),
+	m_mouse(*this, R8_TAG),
+	m_x(*this, "X%u", 0),
 	m_z14(*this, "Z14"),
-	m_mouseb(*this, "MOUSEB"),
+	m_cursor(*this, "CURSOR"),
 	m_leds(*this, "led%u", 0U),
+	m_keylatch(0),
 	m_si(1),
 	m_si_en(1),
 	m_so_z2(1),
 	m_so_z5(1),
-	m_keydown(0),
 	m_t1_z2(0),
 	m_t1_z5(0),
-	m_led_en(0),
-	m_reset(1),
-	m_txd(1)
+	m_led_en(1),
+	m_reset(1)
 {
 }
 
@@ -497,23 +484,22 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 void abc99_device::device_start()
 {
 	m_leds.resolve();
+
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
-	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
-
-	m_mouse_timer = timer_alloc(FUNC(abc99_device::scan_mouse), this);
+	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock()); // 8333 bps
+	m_serial_timer->adjust(serial_clock, 0, serial_clock);
 
 	// state saving
+	save_item(NAME(m_keylatch));
 	save_item(NAME(m_si));
 	save_item(NAME(m_si_en));
 	save_item(NAME(m_so_z2));
 	save_item(NAME(m_so_z5));
-	save_item(NAME(m_keydown));
 	save_item(NAME(m_t1_z2));
 	save_item(NAME(m_t1_z5));
 	save_item(NAME(m_led_en));
 	save_item(NAME(m_reset));
-	save_item(NAME(m_txd));
 }
 
 
@@ -523,7 +509,7 @@ void abc99_device::device_start()
 
 void abc99_device::device_reset()
 {
-	// set EA lines
+	// external access
 	m_maincpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 
@@ -546,10 +532,20 @@ void abc99_device::txd_w(int state)
 
 
 //-------------------------------------------------
-//  z2_bus_w -
+//  reset_w -
 //-------------------------------------------------
 
-void abc99_device::z2_led_w(uint8_t data)
+void abc99_device::reset_w(int state)
+{
+	m_mousecpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+
+//-------------------------------------------------
+//  key_x_w -
+//-------------------------------------------------
+
+void abc99_device::led_w(uint8_t data)
 {
 	if (m_led_en) return;
 
@@ -561,6 +557,31 @@ void abc99_device::z2_led_w(uint8_t data)
 	m_leds[LED_6] = BIT(data, 5);
 	m_leds[LED_7] = BIT(data, 6);
 	m_leds[LED_8] = BIT(data, 7);
+}
+
+
+//-------------------------------------------------
+//  key_y_r -
+//-------------------------------------------------
+
+uint8_t abc99_device::key_y_r()
+{
+	return m_x[m_keylatch]->read();
+}
+
+
+//-------------------------------------------------
+//  key_x_w -
+//-------------------------------------------------
+
+void abc99_device::key_x_w(offs_t offset, uint8_t data)
+{
+	m_keylatch = offset & 0x0f;
+
+	if (m_keylatch == 14)
+	{
+		m_watchdog->watchdog_reset();
+	}
 }
 
 
@@ -587,18 +608,18 @@ void abc99_device::z2_p1_w(uint8_t data)
 
 	// serial output
 	m_so_z2 = BIT(data, 0);
-	serial_output(m_so_z2 && m_so_z5);
+	m_slot->write_rx(m_so_z2 && m_so_z5);
 
 	// key down
-	key_down(!BIT(data, 1));
+	m_slot->keydown_w(!BIT(data, 1));
 
 	// master T1
 	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
-	m_leds[LED_INS] = BIT(data, 3);
-	m_leds[LED_ALT] = BIT(data, 4);
-	m_leds[LED_CAPS_LOCK] = BIT(data, 5);
+	m_leds[LED_INS] = !BIT(data, 3);
+	m_leds[LED_ALT] = !BIT(data, 4);
+	m_leds[LED_CAPS_LOCK] = !BIT(data, 5);
 
 	// speaker output
 	m_speaker->level_w(!BIT(data, 6));
@@ -636,26 +657,6 @@ uint8_t abc99_device::z2_p2_r()
 
 
 //-------------------------------------------------
-//  z2_t0_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc99_device::z2_t0_r )
-{
-	return 1; // 0=mouse connected, 1=no mouse
-}
-
-
-//-------------------------------------------------
-//  z2_t1_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc99_device::z2_t1_r )
-{
-	return m_t1_z2;
-}
-
-
-//-------------------------------------------------
 //  z5_p1_r -
 //-------------------------------------------------
 
@@ -678,8 +679,8 @@ uint8_t abc99_device::z5_p1_r()
 
 	uint8_t data = 0;
 
-	// mouse buttons
-	data |= (m_mouseb->read() & 0x07) << 4;
+	// mouse
+	data |= m_mouse->read() & 0x7f;
 
 	// serial input
 	data |= m_si << 7;
@@ -721,27 +722,17 @@ void abc99_device::z5_p2_w(uint8_t data)
 	// Z2 reset
 	int reset = BIT(data, 5);
 
-	if (!m_reset && reset)
+	if (m_reset != reset)
 	{
-		m_maincpu->reset();
+		m_maincpu->set_input_line(INPUT_LINE_RESET, reset ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	m_reset = reset;
 
 	// serial output
 	m_so_z5 = BIT(data, 6);
-	serial_output(m_so_z2 && m_so_z5);
+	m_slot->write_rx(m_so_z2 && m_so_z5);
 
 	// keyboard CPU T1
 	m_t1_z2 = BIT(data, 7);
-}
-
-
-//-------------------------------------------------
-//  z5_t1_r -
-//-------------------------------------------------
-
-uint8_t abc99_device::z5_t1_r()
-{
-	return m_t1_z5;
 }

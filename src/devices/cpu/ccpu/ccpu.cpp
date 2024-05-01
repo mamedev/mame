@@ -45,7 +45,9 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
 #define NEXT_ACC_A       do { SET_MI(*m_acc); m_acc = &m_A; } while (0)
 #define NEXT_ACC_B       do { SET_MI(*m_acc); if (m_acc == &m_A) m_acc = &m_B; else m_acc = &m_A; } while (0)
 
-#define CYCLES(x)         do { m_icount -= (x); } while (0)
+#define CYCLES(x)        do { m_icount -= (x); } while (0)
+
+#define ASR(x)           (((x) >> 1) | ((x) & 0x800))
 
 #define STANDARD_ACC_OP(resexp,cmpval) \
 do { \
@@ -67,7 +69,7 @@ ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 5, 0)
-	, m_external_input(*this)
+	, m_external_input(*this, 0)
 	, m_vector_callback(*this)
 	, m_flags(0)
 {
@@ -102,9 +104,7 @@ void ccpu_cpu_device::wdt_timer_trigger()
 void ccpu_cpu_device::device_start()
 {
 	/* copy input params */
-	m_external_input.resolve_safe(0);
-	m_vector_callback.resolve();
-	assert(!m_vector_callback.isnull());
+	m_vector_callback.resolve_safe();
 
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
@@ -478,8 +478,8 @@ void ccpu_cpu_device::execute_run()
 			/* DV */
 			case 0xe0:
 				{
-					int16_t stopX = (int16_t)(m_A << 4) >> 4;
-					int16_t stopY = (int16_t)(m_B << 4) >> 4;
+					int16_t stopX = util::sext(m_A, 12);
+					int16_t stopY = util::sext(m_B, 12);
 
 					stopX = ((int16_t)(stopX - m_X) >> m_T) + m_X;
 					stopY = ((int16_t)(stopY - m_Y) >> m_T) + m_Y;
@@ -527,7 +527,7 @@ void ccpu_cpu_device::execute_run()
 						uint16_t result;
 						m_cmpacc = m_B;
 						m_A = (m_A >> 1) | ((m_B << 11) & 0x800);
-						m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
+						m_B = ASR(m_B);
 						result = m_B + tempval;
 						SET_NC(result);
 						SET_MI(result);
@@ -539,7 +539,7 @@ void ccpu_cpu_device::execute_run()
 						m_cmpacc = m_A;
 						result = m_A + tempval;
 						m_A = (m_A >> 1) | ((m_B << 11) & 0x800);
-						m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
+						m_B = ASR(m_B);
 						SET_NC(result);
 						SET_MI(result);
 					}
@@ -548,7 +548,7 @@ void ccpu_cpu_device::execute_run()
 				{
 					uint16_t result;
 					m_cmpacc = m_B;
-					m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
+					m_B = ASR(m_B);
 					result = m_B + tempval;
 					SET_NC(result);
 					SET_MI(result);
@@ -633,7 +633,7 @@ void ccpu_cpu_device::execute_run()
 			/* SHR */
 			case 0xeb:
 			case 0xfb:
-				tempval = ((m_acc == &m_A) ? (m_A >> 1) : ((int16_t)(m_B << 4) >> 5)) & 0xfff;
+				tempval = (m_acc == &m_A) ? (m_A >> 1) : ASR(m_B);
 				tempval |= (*m_acc + (0xb0b | (opcode & 0xf0))) & 0x1000;
 				STANDARD_ACC_OP(tempval, 0xb0b | (opcode & 0xf0));
 				NEXT_ACC_A; CYCLES(1);
@@ -651,7 +651,7 @@ void ccpu_cpu_device::execute_run()
 			/* ASR */
 			case 0xed:
 			case 0xfd:
-				tempval = ((int16_t)(*m_acc << 4) >> 5) & 0xfff;
+				tempval = ASR(*m_acc);
 				STANDARD_ACC_OP(tempval, 0xd0d | (opcode & 0xf0));
 				NEXT_ACC_A; CYCLES(1);
 				break;
@@ -662,10 +662,10 @@ void ccpu_cpu_device::execute_run()
 				if (m_acc == &m_A)
 				{
 					tempval = (m_A >> 1) | ((m_B << 11) & 0x800);
-					m_B = ((int16_t)(m_B << 4) >> 5) & 0xfff;
+					m_B = ASR(m_B);
 				}
 				else
-					tempval = ((int16_t)(m_B << 4) >> 5) & 0xfff;
+					tempval = ASR(m_B);
 				tempval |= (*m_acc + (0xe0e | (opcode & 0xf0))) & 0x1000;
 				STANDARD_ACC_OP(tempval, 0xe0e | (opcode & 0xf0));
 				NEXT_ACC_A; CYCLES(1);
@@ -688,8 +688,8 @@ void ccpu_cpu_device::execute_run()
 
 			/* IV */
 			case 0xf0:
-				m_X = (int16_t)(m_A << 4) >> 4;
-				m_Y = (int16_t)(m_B << 4) >> 4;
+				m_X = util::sext(m_A, 12);
+				m_Y = util::sext(m_B, 12);
 				NEXT_ACC_A; CYCLES(1);
 				break;
 		}

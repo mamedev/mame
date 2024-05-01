@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
-#ifndef MAME_INCLUDES_GAPLUS_H
-#define MAME_INCLUDES_GAPLUS_H
+#ifndef MAME_NAMCO_GAPLUS_H
+#define MAME_NAMCO_GAPLUS_H
 
 #pragma once
 
@@ -57,12 +57,12 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(namcoio0_run);
 	TIMER_CALLBACK_MEMBER(namcoio1_run);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void starfield_init();
 	void starfield_render(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect ) const;
@@ -72,7 +72,7 @@ public:
 	void cpu2_map(address_map &map);
 	void cpu3_map(address_map &map);
 
-	virtual void driver_init() override;
+	void driver_init();
 
 protected:
 	virtual void machine_start() override;
@@ -131,7 +131,7 @@ public:
 	void gapluso(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 };
 
 class gaplus_state : public gaplus_base_state {
@@ -153,4 +153,4 @@ protected:
 	output_finder<2> m_lamps;
 };
 
-#endif // MAME_INCLUDES_GAPLUS_H
+#endif // MAME_NAMCO_GAPLUS_H

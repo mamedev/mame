@@ -20,7 +20,7 @@ void kaypro_state::kaypro_palette(palette_device &palette) const
 	palette.set_pen_color(2, rgb_t(0, 110, 0)); // low intensity green
 }
 
-u32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 kayproii_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /* The display consists of 80 columns and 24 rows. Each row is allocated 128 bytes of ram,
     but only the first 80 are used. The total video ram therefore is 0x0c00 bytes.
@@ -70,7 +70,7 @@ u32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-u32 kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 kayproii_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 sy=0,ma=0;
 
@@ -113,7 +113,7 @@ u32 kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-u32 kaypro_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 kaypro84_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
 	m_crtc->screen_update(screen, bitmap, cliprect);
@@ -133,7 +133,7 @@ u32 kaypro_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &b
     Not sure how the attributes interact, for example does an underline blink? */
 
 
-MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
+MC6845_UPDATE_ROW( kaypro84_state::kaypro484_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 *p = &bitmap.pix(y);
@@ -196,7 +196,7 @@ MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 /* Resize the screen within the limits of the hardware. Expand the image to fill the screen area.
     Standard screen is 640 x 400 = 0x7d0 bytes. */
 
-void kaypro_state::mc6845_screen_configure()
+void kaypro84_state::mc6845_screen_configure()
 {
 	u16 width = m_mc6845_reg[1]*8-1;                         // width in pixels
 	u16 height = m_mc6845_reg[6]*(m_mc6845_reg[9]+1)-1;                  // height in pixels
@@ -210,20 +210,20 @@ void kaypro_state::mc6845_screen_configure()
 
 /**************************** I/O PORTS *****************************************************************/
 
-u8 kaypro_state::kaypro484_status_r()
+u8 kaypro84_state::kaypro484_status_r()
 {
 /* Need bit 7 high or computer hangs */
 
 	return 0x80 | m_crtc->register_r();
 }
 
-void kaypro_state::kaypro484_index_w(u8 data)
+void kaypro84_state::kaypro484_index_w(u8 data)
 {
 	m_mc6845_ind = data & 0x1f;
 	m_crtc->address_w(data);
 }
 
-void kaypro_state::kaypro484_register_w(u8 data)
+void kaypro84_state::kaypro484_register_w(u8 data)
 {
 	static const u8 mcmask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
@@ -241,23 +241,12 @@ void kaypro_state::kaypro484_register_w(u8 data)
 		m_mc6845_video_address = m_mc6845_reg[19] | ((m_mc6845_reg[18] & 0x3f) << 8);   /* internal ULA address */
 }
 
-u8 kaypro_state::kaypro_videoram_r(offs_t offset)
-{
-	return m_vram[offset];
-}
-
-void kaypro_state::kaypro_videoram_w(offs_t offset, u8 data)
-{
-	m_vram[offset] = data;
-}
-
-u8 kaypro_state::kaypro484_videoram_r()
+u8 kaypro84_state::kaypro484_videoram_r()
 {
 	return m_vram[m_mc6845_video_address];
 }
 
-void kaypro_state::kaypro484_videoram_w(u8 data)
+void kaypro84_state::kaypro484_videoram_w(u8 data)
 {
 	m_vram[m_mc6845_video_address] = data;
 }
-

@@ -40,15 +40,17 @@ Status:
 ToDo:
 - Coin slot 3 not working. Pressing it a lot kills all the coin slots.
 
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "genpin.h"
+
 #include "cpu/m6502/m6504.h"
+#include "machine/input_merger.h"
 #include "machine/mos6530.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+
 #include "allied.lh"
 
 namespace {
@@ -61,6 +63,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ic1(*this, "ic1")
 		, m_ic2(*this, "ic2")
+		, m_ic3(*this, "ic3")
 		, m_ic4(*this, "ic4")
 		, m_ic5(*this, "ic5")
 		, m_ic6(*this, "ic6")
@@ -73,11 +76,14 @@ public:
 
 	void allied(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	void ic1_b_w(u8 data);
 	void ic2_b_w(u8 data);
 	void ic2_cb2_w(int state);
-	void ic3_b_w(u8 data);
 	void ic4_b_w(u8 data);
 	void ic4_cb2_w(int state);
 	void ic5_b_w(u8 data);
@@ -106,11 +112,11 @@ private:
 	u8 m_ic6a2 = 0U;
 	u8 m_ic6b4 = 0U;
 	u8 m_ic6b7 = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
 	required_device<pia6821_device> m_ic2;
+	required_device<mos6530_device> m_ic3;
 	required_device<pia6821_device> m_ic4;
 	required_device<mos6530_device> m_ic5;
 	required_device<mos6530_device> m_ic6;
@@ -118,22 +124,24 @@ private:
 	required_device<pia6821_device> m_ic8;
 	output_finder<42> m_digits;
 	output_finder<7> m_leds;
-	output_finder<40> m_io_outputs;  // 16 solenoids + 24 lamps
+	output_finder<40> m_io_outputs; // 16 solenoids + 24 lamps
 };
 
 
 void allied_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x003f).ram(); // ic6
+	map(0x0000, 0x003f).m(m_ic6, FUNC(mos6530_device::ram_map));
 	map(0x0044, 0x0047).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0048, 0x004b).rw(m_ic1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0050, 0x0053).rw(m_ic7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0060, 0x0063).rw(m_ic4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0080, 0x008f).rw(m_ic5, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x0840, 0x084f).rw(m_ic6, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x0080, 0x008f).m(m_ic5, FUNC(mos6530_device::io_map));
+	map(0x0840, 0x084f).m(m_ic6, FUNC(mos6530_device::io_map));
 	map(0x00c0, 0x00c3).rw(m_ic8, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0100, 0x013f).ram(); // ic5
-	map(0x1400, 0x1fff).rom();
+	map(0x0100, 0x013f).m(m_ic5, FUNC(mos6530_device::ram_map));
+	map(0x1400, 0x17ff).m(m_ic5, FUNC(mos6530_device::rom_map));
+	map(0x1800, 0x1bff).m(m_ic6, FUNC(mos6530_device::rom_map));
+	map(0x1c00, 0x1fff).m(m_ic3, FUNC(mos6530_device::rom_map));
 }
 
 static INPUT_PORTS_START( allied )
@@ -410,11 +418,6 @@ void allied_state::ic2_cb2_w(int state)
 	}
 }
 
-void allied_state::ic3_b_w(u8 data)
-{
-	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
-}
-
 // 6 switches
 u8 allied_state::ic4_a_r()
 {
@@ -493,8 +496,6 @@ void allied_state::ic5_b_w(u8 data)
 
 	for (u8 i = 0; i < 6; i++)
 		m_io_outputs[i] = !BIT(data, i);
-
-	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 // 4 adjustments, 3 coin slots, slam tilt
@@ -514,8 +515,6 @@ void allied_state::ic6_b_w(u8 data)
 // PB0-3 to drop targets
 	for (u8 i = 0; i < 4; i++)
 		m_io_outputs[i+6] = !BIT(data, i);
-
-	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 // 6 inputs
@@ -664,8 +663,11 @@ void allied_state::machine_reset()
 void allied_state::allied(machine_config &config)
 {
 	/* basic machine hardware */
-	M6504(config, m_maincpu, 3572549/4);
+	M6504(config, m_maincpu, 3.579545_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &allied_state::mem_map);
+
+	input_merger_device &main_irqs(INPUT_MERGER_ANY_HIGH(config, "main_irqs"));
+	main_irqs.output_handler().set_inputline(m_maincpu, M6504_IRQ_LINE);
 
 	/* Video */
 	config.set_default_layout(layout_allied);
@@ -674,80 +676,86 @@ void allied_state::allied(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_ic1, 0);
+	PIA6821(config, m_ic1);
 	m_ic1->readpa_handler().set(FUNC(allied_state::ic1_a_r));
 	//m_ic1->writepa_handler().set(FUNC(allied_state::ic1_a_w));
 	//m_ic1->readpb_handler().set(FUNC(allied_state::ic1_b_r));
 	m_ic1->writepb_handler().set(FUNC(allied_state::ic1_b_w));
 	//m_ic1->ca2_handler().set(FUNC(allied_state::ic1_ca2_w));
 	//m_ic1->cb2_handler().set(FUNC(allied_state::ic1_cb2_w));
-	m_ic1->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic1->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	m_ic1->irqa_handler().set("main_irqs", FUNC(input_merger_device::in_w<0>));
+	m_ic1->irqb_handler().set("main_irqs", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_ic2, 0);
+	PIA6821(config, m_ic2);
 	m_ic2->readpa_handler().set(FUNC(allied_state::ic2_a_r));
 	//m_ic2->writepa_handler().set(FUNC(allied_state::ic2_a_w));
 	//m_ic2->readpb_handler().set(FUNC(allied_state::ic2_b_r));
 	m_ic2->writepb_handler().set(FUNC(allied_state::ic2_b_w));
 	//m_ic2->ca2_handler().set(FUNC(allied_state::ic2_ca2_w));
 	m_ic2->cb2_handler().set(FUNC(allied_state::ic2_cb2_w));
-	m_ic2->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic2->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	m_ic2->irqa_handler().set("main_irqs", FUNC(input_merger_device::in_w<2>));
+	m_ic2->irqb_handler().set("main_irqs", FUNC(input_merger_device::in_w<3>));
 
-	PIA6821(config, m_ic4, 0);
+	PIA6821(config, m_ic4);
 	m_ic4->readpa_handler().set(FUNC(allied_state::ic4_a_r));
 	//m_ic4->writepa_handler().set(FUNC(allied_state::ic4_a_w));
 	//m_ic4->readpb_handler().set(FUNC(allied_state::ic4_b_r));
 	m_ic4->writepb_handler().set(FUNC(allied_state::ic4_b_w));
 	//m_ic4->ca2_handler().set(FUNC(allied_state::ic4_ca2_w));
 	m_ic4->cb2_handler().set(FUNC(allied_state::ic4_cb2_w));
-	m_ic4->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic4->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	m_ic4->irqa_handler().set("main_irqs", FUNC(input_merger_device::in_w<4>));
+	m_ic4->irqb_handler().set("main_irqs", FUNC(input_merger_device::in_w<5>));
 
-	PIA6821(config, m_ic7, 0);
+	PIA6821(config, m_ic7);
 	m_ic7->readpa_handler().set(FUNC(allied_state::ic7_a_r));
 	//m_ic7->writepa_handler().set(FUNC(allied_state::ic7_a_w));
 	//m_ic7->readpb_handler().set(FUNC(allied_state::ic7_b_r));
 	m_ic7->writepb_handler().set(FUNC(allied_state::ic7_b_w));
 	//m_ic7->ca2_handler().set(FUNC(allied_state::ic7_ca2_w));
 	//m_ic7->cb2_handler().set(FUNC(allied_state::ic7_cb2_w));
-	m_ic7->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic7->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	m_ic7->irqa_handler().set("main_irqs", FUNC(input_merger_device::in_w<6>));
+	m_ic7->irqb_handler().set("main_irqs", FUNC(input_merger_device::in_w<7>));
 
-	PIA6821(config, m_ic8, 0);
+	PIA6821(config, m_ic8);
 	//m_ic8->readpa_handler().set(FUNC(allied_state::ic8_a_r));
 	m_ic8->writepa_handler().set(FUNC(allied_state::ic8_a_w));
 	//m_ic8->readpb_handler().set(FUNC(allied_state::ic8_b_r));
 	m_ic8->writepb_handler().set(FUNC(allied_state::ic8_b_w));
 	//m_ic8->ca2_handler().set(FUNC(allied_state::ic8_ca2_w));
 	m_ic8->cb2_handler().set(FUNC(allied_state::ic8_cb2_w));
-	m_ic8->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic8->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	m_ic8->irqa_handler().set("main_irqs", FUNC(input_merger_device::in_w<8>));
+	m_ic8->irqb_handler().set("main_irqs", FUNC(input_merger_device::in_w<9>));
 
-	mos6530_device &ic3(MOS6530(config, "ic3", 3572549/4)); // unknown where the ram and i/o is located
-	ic3.out_pb_callback().set(FUNC(allied_state::ic3_b_w));
+	MOS6530(config, m_ic3, 3.579545_MHz_XTAL/4); // unknown where the ram and i/o is located
+	m_ic3->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<10>));
 
-	MOS6530(config, m_ic5, 3572549/4);
-	m_ic5->in_pa_callback().set(FUNC(allied_state::ic5_a_r));
-	//m_ic5->out_pa_callback().set(FUNC(allied_state::ic5_a_w));
-	//m_ic5->in_pb_callback().set(FUNC(allied_state::ic5_b_r));
-	m_ic5->out_pb_callback().set(FUNC(allied_state::ic5_b_w));
+	MOS6530(config, m_ic5, 3.579545_MHz_XTAL/4);
+	m_ic5->pa_rd_callback().set(FUNC(allied_state::ic5_a_r));
+	//m_ic5->pa_wr_callback().set(FUNC(allied_state::ic5_a_w));
+	//m_ic5->pb_rd_callback().set(FUNC(allied_state::ic5_b_r));
+	m_ic5->pb_wr_callback().set(FUNC(allied_state::ic5_b_w));
+	m_ic5->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<11>));
 
-	MOS6530(config, m_ic6, 3572549/4);
-	m_ic6->in_pa_callback().set(FUNC(allied_state::ic6_a_r));
-	//m_ic6->out_pa_callback().set(FUNC(allied_state::ic6_a_w));
-	m_ic6->in_pb_callback().set(FUNC(allied_state::ic6_b_r));
-	m_ic6->out_pb_callback().set(FUNC(allied_state::ic6_b_w));
+	MOS6530(config, m_ic6, 3.579545_MHz_XTAL/4);
+	m_ic6->pa_rd_callback().set(FUNC(allied_state::ic6_a_r));
+	//m_ic6->pa_wr_callback().set(FUNC(allied_state::ic6_a_w));
+	m_ic6->pb_rd_callback().set(FUNC(allied_state::ic6_b_r));
+	m_ic6->pb_wr_callback().set(FUNC(allied_state::ic6_b_w));
+	m_ic6->irq_wr_callback().set("main_irqs", FUNC(input_merger_device::in_w<12>));
 
 	TIMER(config, "timer_a").configure_periodic(FUNC(allied_state::timer_a), attotime::from_hz(50));
 }
 
 
 ROM_START( allied )
-	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "6530-009.u5", 0x1400, 0x0400, CRC(e4fb64fb) SHA1(a3d9de7cbfb42180a860e0bbbeaeba96d8bd1e20))
-	ROM_LOAD( "6530-010.u6", 0x1800, 0x0400, CRC(dca980dd) SHA1(3817d75413854d889fc1ce4fd6a51d820d1e0534))
-	ROM_LOAD( "6530-011.u3", 0x1c00, 0x0400, CRC(13f42789) SHA1(baa0f73fda08a3c5d6f1423fb329e4febb07ef97))
+	ROM_REGION( 0x400, "ic5", 0 )
+	ROM_LOAD( "6530-009.u5", 0x0000, 0x0400, CRC(e4fb64fb) SHA1(a3d9de7cbfb42180a860e0bbbeaeba96d8bd1e20))
+
+	ROM_REGION( 0x400, "ic6", 0 )
+	ROM_LOAD( "6530-010.u6", 0x0000, 0x0400, CRC(dca980dd) SHA1(3817d75413854d889fc1ce4fd6a51d820d1e0534))
+
+	ROM_REGION( 0x400, "ic3", 0 )
+	ROM_LOAD( "6530-011.u3", 0x0000, 0x0400, CRC(13f42789) SHA1(baa0f73fda08a3c5d6f1423fb329e4febb07ef97))
 ROM_END
 
 #define rom_suprpick    rom_allied
@@ -764,15 +772,15 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1977,  allied,   0,      allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Allied System",               MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-GAME(1977,  suprpick, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Super Picker",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1977,  royclark, allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1977,  thndbolt, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Thunderbolt",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  hoedown,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hoe Down",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  takefive, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Take Five",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  heartspd, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hearts & Spades",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  foathens, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Flame of Athens",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  disco79,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Disco '79",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  erosone,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Eros One",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  circa33,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Circa 1933",                  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  starshot, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Star Shooter",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, allied,   0,      allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Allied System",               MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 1977, suprpick, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Super Picker",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, royclark, allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, thndbolt, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Thunderbolt",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, hoedown,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hoe Down",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, takefive, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Take Five",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, heartspd, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hearts & Spades",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, foathens, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Flame of Athens",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, disco79,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Disco '79",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, erosone,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Eros One",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, circa33,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Circa 1933",                  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starshot, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Star Shooter",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -38,7 +38,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/ra17xx.h"
+#include "ra17xx.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(RA17XX, ra17xx_device, "ra17xx", "Rockwell A17xx")
 ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RA17XX, tag, owner, clock)
 	, m_enable(false)
-	, m_iord(*this)
+	, m_iord(*this, 0)
 	, m_iowr(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
@@ -66,9 +66,6 @@ ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, dev
  */
 void ra17xx_device::device_start()
 {
-	m_iord.resolve();
-	m_iowr.resolve();
-
 	save_item(NAME(m_line));
 }
 

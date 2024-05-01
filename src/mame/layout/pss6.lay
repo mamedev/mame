@@ -1,0 +1,402 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<!-- general grey backdrop -->
+	<element name="greyback">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="border">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+	<!-- text elements -->
+	<element name="voice"><text string="VOICE" /></element>
+	<element name="song"><text string="SONG" /></element>
+	<element name="jamtrack"><text string="JAM TRACK" /></element>
+	<element name="song_sm"><text string="SONG" align="2" /></element>
+	<element name="jam_sm"><text string="JAM" align="2" /></element>
+	<element name="track_sm"><text string="TRACK" align="2" /></element>
+	<element name="song_jamtrack"><text string="SONG/JAM TRACK" /></element>
+	<element name="minus"><text string="MINUS" align="1" /></element>
+	<element name="one"><text string="ONE" align="1" /></element>
+	<element name="start"><text string="START" /></element>
+	<element name="stop"><text string="/STOP" /></element>
+	<element name="tempo"><text string="TEMPO" /></element>
+	<element name="volume"><text string="VOLUME" /></element>
+
+	<element name="variation"><text string="VARIATION" /></element>
+	<element name="normal"><text string="NORMAL" /></element>
+	<element name="vari1"><text string="VARI 1" /></element>
+	<element name="vari2"><text string="VARI 2" /></element>
+	<element name="vari3"><text string="VARI 3" /></element>
+
+	<element name="voice1"><text string="PIANO" align="1" /></element>
+	<element name="voice2"><text string="E PIANO" align="1" /></element>
+	<element name="voice3"><text string="HARPSICHORD" align="1" /></element>
+	<element name="voice4"><text string="CLAVI" align="1" /></element>
+	<element name="voice5"><text string="E ORGAN" align="1" /></element>
+	<element name="voice6"><text string="FOLK GUITAR" align="1" /></element>
+	<element name="voice7"><text string="E GUITAR" align="1" /></element>
+	<element name="voice8"><text string="BANJO" align="1" /></element>
+	<element name="voice9"><text string="HARP" align="1" /></element>
+	<element name="voice10"><text string="STRINGS" align="1" /></element>
+	<element name="voice11"><text string="VIOLIN" align="1" /></element>
+	<element name="voice12"><text string="VIBRAPHONE" align="1" /></element>
+	<element name="voice13"><text string="MARIMBA" align="1" /></element>
+	<element name="voice14"><text string="FLUTE" align="1" /></element>
+	<element name="voice15"><text string="CLARINET" align="1" /></element>
+	<element name="voice16"><text string="SAXOPHONE" align="1" /></element>
+	<element name="voice17"><text string="HARMONICA" align="1" /></element>
+	<element name="voice18"><text string="ACCORDION" align="1" /></element>
+	<element name="voice19"><text string="TRUMPET" align="1" /></element>
+	<element name="voice20"><text string="HORN" align="1" /></element>
+	<element name="voice21"><text string="FANTASY" align="1" /></element>
+	<element name="voice22"><text string="WOOD BASS" align="1" /></element>
+	<element name="voice23"><text string="E BASS" align="1" /></element>
+	<element name="voice24"><text string="SLAP BASS" align="1" /></element>
+	<element name="voice25"><text string="PIANO SPLIT" align="1" /></element>
+
+	<element name="song1"><text string="Original Song 1" align="1" /></element>
+	<element name="song2"><text string="Original Song 2" align="1" /></element>
+	<element name="song3"><text string="Original Song 3" align="1" /></element>
+	<element name="song4"><text string="Deck the Halls" align="1" /></element>
+	<element name="song5a"><text string="Sur Le Pont" align="1" /></element>
+	<element name="song5b"><text string="d'Avignon" align="1" /></element>
+	<element name="song6"><text string="Beautiful Dreamer" align="1" /></element>
+	<element name="song7"><text string="Londonderry Air" align="1" /></element>
+	<element name="song8"><text string="Symphony #40" align="1" /></element>
+	<element name="song9"><text string="La Cucaracha" align="1" /></element>
+	<element name="song10a"><text string="House of" align="1" /></element>
+	<element name="song10b"><text string="the Rising Sun" align="1" /></element>
+	<element name="song11"><text string="Silent Night" align="1" /></element>
+	<element name="song12"><text string="Oh! Susanna" align="1" /></element>
+	<element name="song13"><text string="Song of Joy" align="1" /></element>
+	<element name="song14"><text string="O, Vreneli" align="1" /></element>
+	<element name="song15"><text string="Troika" align="1" /></element>
+	<element name="song16"><text string="DANCE" align="1" /></element>
+	<element name="song17"><text string="RAP" align="1" /></element>
+	<element name="song18"><text string="FUNK" align="1" /></element>
+	<element name="song19"><text string="ROCK" align="1" /></element>
+	<element name="song20"><text string="MINOR BLUES" align="1" /></element>
+	<element name="song21"><text string="ROCK'N'ROLL" align="1" /></element>
+	<element name="song22"><text string="R&amp;B" align="1" /></element>
+	<element name="song23"><text string="SLOW ROCK" align="1" /></element>
+	<element name="song24"><text string="JAZZ BLUES" align="1" /></element>
+	<element name="song25"><text string="FUSION" align="1" /></element>
+	<element name="song26"><text string="BOSSA NOVA" align="1" /></element>
+	<element name="song27"><text string="SAMBA" align="1" /></element>
+	<element name="song28"><text string="TANGO" align="1" /></element>
+	<element name="song29"><text string="MARCH" align="1" /></element>
+	<element name="song30"><text string="WALTZ" align="1" /></element>
+
+	<!-- button primitives -->
+	<element name="button-yellow" defstate="0">
+		<rect><bounds x="0" y="0" width="60" height="20" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect state="0"><bounds x="5" y="5" width="50" height="10" /><color red="1.0" green="0.82" blue="0.0" /></rect>
+		<rect state="1"><bounds x="5" y="5" width="50" height="10" /><color red="0.9" green="0.75" blue="0.0" /></rect>
+	</element>
+	<element name="button-purple" defstate="0">
+		<rect><bounds x="0" y="0" width="60" height="20" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect state="0"><bounds x="5" y="5" width="50" height="10" /><color red="0.58" green="0.44" blue="0.89" /></rect>
+		<rect state="1"><bounds x="5" y="5" width="50" height="10" /><color red="0.47" green="0.36" blue="0.7" /></rect>
+	</element>
+	<element name="button-start-stop" defstate="0">
+		<rect><bounds x="0" y="0" width="60" height="20" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect state="0"><bounds x="5" y="5" width="50" height="10" /><color red="0.93" green="0.11" blue="0.14" /></rect>
+		<rect state="1"><bounds x="5" y="5" width="50" height="10" /><color red="0.8" green="0.09" blue="0.13" /></rect>
+	</element>
+
+	<!-- LED primitives -->
+	<element name="ledr" defstate="0">
+		<disk><color red="0.05" green="0.05" blue="0.05" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.6" height="0.6" /><color red="0.2" green="0.1" blue="0.1" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.6" height="0.6" /><color red="1.0" green="0.1" blue="0.1" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk><color red="0.05" green="0.05" blue="0.05" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.6" height="0.6" /><color red="0.1" green="0.2" blue="0.1" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.6" height="0.6" /><color red="0.1" green="1.0" blue="0.1" /></disk>
+	</element>
+
+	<element name="bullets">
+		<disk><bounds x="0" y="0" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="0" y="25" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="0" y="50" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="0" y="75" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="0" y="100" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+	</element>
+
+	<element name="button-back">
+		<rect><bounds x="0" y="0" width="1045" height="300" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds x="0" y="0" width="1025" height="140" /><color red="0.29" green="0.38" blue="0.82" /></rect>
+		<rect><bounds x="0" y="150" width="1025" height="140" /><color red="0.93" green="0.11" blue="0.14" /></rect>
+
+		<!-- dividers -->
+		<rect><bounds xc="140" y="0" width="8" height="300" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds xc="285" y="0" width="8" height="300" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds xc="430" y="0" width="8" height="300" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds xc="575" y="0" width="8" height="300" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds xc="720" y="0" width="8" height="300" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds xc="865" y="0" width="8" height="300" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+
+		<!-- variation box -->
+		<rect><bounds x="723" y="20" width="145" height="8" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<disk><bounds xc="792.5" yc="80" width="80" height="80" /></disk>
+		<disk><bounds xc="792.5" yc="80" width="70" height="70" /><color red="0.29" green="0.38" blue="0.82" /></disk>
+		<rect><bounds xc="765" yc="45" width="65" height="25" /><color red="0.29" green="0.38" blue="0.82" /></rect>
+		<rect><bounds xc="765" yc="45" width="60" height="18" /></rect>
+		<rect><bounds xc="825" yc="70" width="55" height="25" /><color red="0.29" green="0.38" blue="0.82" /></rect>
+		<rect><bounds xc="825" yc="70" width="50" height="18" /></rect>
+		<rect><bounds xc="760" yc="95" width="55" height="25" /><color red="0.29" green="0.38" blue="0.82" /></rect>
+		<rect><bounds xc="760" yc="95" width="50" height="18" /></rect>
+		<rect><bounds xc="810" yc="120" width="55" height="25" /><color red="0.29" green="0.38" blue="0.82" /></rect>
+		<rect><bounds xc="810" yc="120" width="50" height="18" /></rect>
+
+		<!-- song/jamtrack labels -->
+		<rect><bounds x="0" y="292" width="365" height="2" /></rect>
+		<rect><bounds x="435" y="292" width="365" height="2" /></rect>
+		<rect><bounds x="365" y="270" width="68" height="20" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds x="800" y="270" width="68" height="20" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+
+		<!-- white lines around buttons & song/jamtrack LED -->
+		<rect><bounds xc="925" yc="236" width="90" height="2" /></rect>
+		<rect><bounds x="1050" yc="160" width="140" height="2" /></rect>
+	</element>
+
+	<!-- keyboard primitives -->
+	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="whitekey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="79" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="79" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-l" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-m" defstate="0">
+		<rect state="0"><bounds x="13" y="0" width="53" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="13" y="0" width="53" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-lm" defstate="0">
+		<rect state="0"><bounds x="10" y="0" width="44" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="10" y="0" width="44" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-rm" defstate="0">
+		<rect state="0"><bounds x="22" y="0" width="44" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="22" y="0" width="44" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-r" defstate="0">
+		<rect state="0"><bounds x="34" y="0" width="45" height="252" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="252" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="34" y="0" width="45" height="252" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="252" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="44" height="252" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="4" y="0" width="36" height="248" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="44" height="252" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="4" y="0" width="36" height="248" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<group name="buttons">
+		<bounds x="-5" y="0" width="2608" height="300" />
+
+		<element ref="button-back"><bounds x="0" y="0" width="1190" height="300" /></element>
+
+		<element ref="bullets"><bounds x="-5" yc="70" width="10" height="110" /></element>
+		<element ref="voice1"><bounds x="10" yc="20" width="300" height="18"></bounds></element>
+		<element ref="voice2"><bounds x="10" yc="45" width="300" height="18"></bounds></element>
+		<element ref="voice3"><bounds x="10" yc="70" width="300" height="18"></bounds></element>
+		<element ref="voice4"><bounds x="10" yc="95" width="300" height="18"></bounds></element>
+		<element ref="voice5"><bounds x="10" yc="120" width="300" height="18"></bounds></element>
+
+		<element ref="button-yellow" inputtag="KEY7" inputmask="0x08"><bounds xc="67.5" yc="145" width="60" height="20" /></element>
+
+		<element ref="bullets"><bounds x="-5" yc="220" width="10" height="110" /></element>
+		<element ref="song1"><bounds x="10" yc="170" width="300" height="18"></bounds></element>
+		<element ref="song2"><bounds x="10" yc="195" width="300" height="18"></bounds></element>
+		<element ref="song3"><bounds x="10" yc="220" width="300" height="18"></bounds></element>
+		<element ref="song4"><bounds x="10" yc="245" width="300" height="18"></bounds></element>
+		<element ref="song5a"><bounds x="10" yc="263" width="300" height="18"></bounds></element>
+		<element ref="song5b"><bounds x="60" yc="277" width="300" height="18"></bounds></element>
+
+		<element ref="bullets"><bounds x="140" yc="70" width="10" height="110" /></element>
+		<element ref="voice6"><bounds x="155" yc="20" width="300" height="18"></bounds></element>
+		<element ref="voice7"><bounds x="155" yc="45" width="300" height="18"></bounds></element>
+		<element ref="voice8"><bounds x="155" yc="70" width="300" height="18"></bounds></element>
+		<element ref="voice9"><bounds x="155" yc="95" width="300" height="18"></bounds></element>
+		<element ref="voice10"><bounds x="155" yc="120" width="300" height="18"></bounds></element>
+
+		<element ref="button-yellow" inputtag="KEY5" inputmask="0x08"><bounds xc="212.5" yc="145" width="60" height="20" /></element>
+
+		<element ref="bullets"><bounds x="140" yc="220" width="10" height="110" /></element>
+		<element ref="song6"><bounds x="155" yc="170" width="300" height="18"></bounds></element>
+		<element ref="song7"><bounds x="155" yc="195" width="300" height="18"></bounds></element>
+		<element ref="song8"><bounds x="155" yc="220" width="300" height="18"></bounds></element>
+		<element ref="song9"><bounds x="155" yc="245" width="300" height="18"></bounds></element>
+		<element ref="song10a"><bounds x="155" yc="263" width="300" height="18"></bounds></element>
+		<element ref="song10b"><bounds x="175" yc="277" width="300" height="18"></bounds></element>
+
+		<element ref="bullets"><bounds x="285" yc="70" width="10" height="110" /></element>
+		<element ref="voice11"><bounds x="300" yc="20" width="300" height="18"></bounds></element>
+		<element ref="voice12"><bounds x="300" yc="45" width="300" height="18"></bounds></element>
+		<element ref="voice13"><bounds x="300" yc="70" width="300" height="18"></bounds></element>
+		<element ref="voice14"><bounds x="300" yc="95" width="300" height="18"></bounds></element>
+		<element ref="voice15"><bounds x="300" yc="120" width="300" height="18"></bounds></element>
+
+		<element ref="button-yellow" inputtag="KEY6" inputmask="0x08"><bounds xc="357.5" yc="145" width="60" height="20" /></element>
+
+		<element ref="bullets"><bounds x="285" yc="220" width="10" height="110" /></element>
+		<element ref="song11"><bounds x="300" yc="170" width="300" height="18"></bounds></element>
+		<element ref="song12"><bounds x="300" yc="195" width="300" height="18"></bounds></element>
+		<element ref="song13"><bounds x="300" yc="220" width="300" height="18"></bounds></element>
+		<element ref="song14"><bounds x="300" yc="245" width="300" height="18"></bounds></element>
+		<element ref="song15"><bounds x="300" yc="270" width="300" height="18"></bounds></element>
+
+		<element ref="bullets"><bounds x="430" yc="70" width="10" height="110" /></element>
+		<element ref="voice16"><bounds x="445" yc="20" width="300" height="18"></bounds></element>
+		<element ref="voice17"><bounds x="445" yc="45" width="300" height="18"></bounds></element>
+		<element ref="voice18"><bounds x="445" yc="70" width="300" height="18"></bounds></element>
+		<element ref="voice19"><bounds x="445" yc="95" width="300" height="18"></bounds></element>
+		<element ref="voice20"><bounds x="445" yc="120" width="300" height="18"></bounds></element>
+
+		<element ref="button-yellow" inputtag="KEY7" inputmask="0x04"><bounds xc="502.5" yc="145" width="60" height="20" /></element>
+
+		<element ref="bullets"><bounds x="430" yc="220" width="10" height="110" /></element>
+		<element ref="song16"><bounds x="445" yc="170" width="300" height="18"></bounds></element>
+		<element ref="song17"><bounds x="445" yc="195" width="300" height="18"></bounds></element>
+		<element ref="song18"><bounds x="445" yc="220" width="300" height="18"></bounds></element>
+		<element ref="song19"><bounds x="445" yc="245" width="300" height="18"></bounds></element>
+		<element ref="song20"><bounds x="445" yc="270" width="300" height="18"></bounds></element>
+
+		<element ref="bullets"><bounds x="575" yc="70" width="10" height="110" /></element>
+		<element ref="voice21"><bounds x="590" yc="20" width="300" height="18"></bounds></element>
+		<element ref="voice22"><bounds x="590" yc="45" width="300" height="18"></bounds></element>
+		<element ref="voice23"><bounds x="590" yc="70" width="300" height="18"></bounds></element>
+		<element ref="voice24"><bounds x="590" yc="95" width="300" height="18"></bounds></element>
+		<element ref="voice25"><bounds x="590" yc="120" width="300" height="18"></bounds></element>
+
+		<element ref="button-yellow" inputtag="KEY6" inputmask="0x04"><bounds xc="647.5" yc="145" width="60" height="20" /></element>
+
+		<element ref="bullets"><bounds x="575" yc="220" width="10" height="110" /></element>
+		<element ref="song21"><bounds x="590" yc="170" width="300" height="18"></bounds></element>
+		<element ref="song22"><bounds x="590" yc="195" width="300" height="18"></bounds></element>
+		<element ref="song23"><bounds x="590" yc="220" width="300" height="18"></bounds></element>
+		<element ref="song24"><bounds x="590" yc="245" width="300" height="18"></bounds></element>
+		<element ref="song25"><bounds x="590" yc="270" width="300" height="18"></bounds></element>
+
+		<element ref="button-yellow" inputtag="KEY5" inputmask="0x04"><bounds xc="792.5" yc="145" width="60" height="20" /></element>
+
+		<element ref="bullets"><bounds x="720" yc="220" width="10" height="110" /></element>
+		<element ref="song26"><bounds x="735" yc="170" width="300" height="18"></bounds></element>
+		<element ref="song27"><bounds x="735" yc="195" width="300" height="18"></bounds></element>
+		<element ref="song28"><bounds x="735" yc="220" width="300" height="18"></bounds></element>
+		<element ref="song29"><bounds x="735" yc="245" width="300" height="18"></bounds></element>
+		<element ref="song30"><bounds x="735" yc="270" width="300" height="18"></bounds></element>
+
+		<element ref="song_sm"><bounds x="365" y="278" width="60" height="18" /><color red="1.0" green="1.0" blue="1.0" /></element>
+		<element ref="jam_sm"><bounds x="800" y="270" width="60" height="15" /><color red="1.0" green="1.0" blue="1.0" /></element>
+		<element ref="track_sm"><bounds x="800" y="280" width="60" height="15" /><color red="1.0" green="1.0" blue="1.0" /></element>
+
+		<element ref="variation"><bounds xc="792.5" yc="10" width="200" height="18" /></element>
+		<element ref="normal"><bounds xc="765" yc="45" width="200" height="17" /><color red="0.29" green="0.38" blue="0.82" /></element>
+		<element ref="vari3"><bounds xc="825" yc="70" width="200" height="17" /><color red="0.29" green="0.38" blue="0.82" /></element>
+		<element ref="vari1"><bounds xc="760" yc="95" width="200" height="17" /><color red="0.29" green="0.38" blue="0.82" /></element>
+		<element ref="vari2"><bounds xc="810" yc="120" width="200" height="17" /><color red="0.29" green="0.38" blue="0.82" /></element>
+
+		<element ref="button-yellow" inputtag="KEY6" inputmask="0x10"><bounds xc="1000" yc="145" width="60" height="20" /></element>
+
+		<element ref="voice"><bounds xc="925" yc="70" width="200" height="32" /></element>
+		<element ref="song"><bounds xc="925" yc="220" width="200" height="32" /></element>
+		<element ref="jamtrack"><bounds xc="925" yc="248" width="200" height="22" /></element>
+
+		<element ref="ledg" name="led1"><bounds xc="900" yc="115" width="20" height="20" /></element>
+		<element ref="ledr" name="led0"><bounds xc="900" yc="175" width="20" height="20" /></element>
+
+		<element ref="minus"><bounds x="1052" y="98" width="300" height="18" /></element>
+		<element ref="one"><bounds x="1052" y="113" width="300" height="18" /></element>
+		<element ref="button-purple" inputtag="KEY7" inputmask="0x10"><bounds xc="1080" yc="145" width="60" height="20" /></element>
+		<element ref="start"><bounds xc="1160" y="98" width="300" height="18" /></element>
+		<element ref="stop"><bounds xc="1160" y="113" width="300" height="18" /></element>
+		<element ref="button-start-stop" inputtag="KEY5" inputmask="0x10"><bounds xc="1160" yc="145" width="60" height="20" /></element>
+		<element ref="song_jamtrack"><bounds xc="1120" y="165" width="300" height="18" /></element>
+
+		<element ref="tempo"><bounds xc="1240" y="98" width="300" height="18" /></element>
+		<element ref="button-purple" inputtag="KEY5" inputmask="0x20"><bounds xc="1240" yc="145" width="60" height="20" /></element>
+		<element ref="volume"><bounds xc="1320" y="98" width="300" height="18" /></element>
+		<element ref="button-purple" inputtag="KEY7" inputmask="0x20"><bounds xc="1320" yc="145" width="60" height="20" /></element>
+	</group>
+
+	<!-- keyboard group -->
+	<group name="keyboard">
+		<element ref="keyfill"><bounds x="892" y="98" width="1576" height="444" /></element>
+
+		<!-- octave 2 -->
+		<element ref="blackkey"    inputtag="KEY4" inputmask="0x10"><bounds x="947" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY2" inputmask="0x10"><bounds x="1041" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY0" inputmask="0x10"><bounds x="1135" y="108" width="44" height="252" /></element>
+		<element ref="whitekey-l"  inputtag="KEY0" inputmask="0x20"><bounds x="902" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-lm" inputtag="KEY3" inputmask="0x10"><bounds x="984" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-rm" inputtag="KEY1" inputmask="0x10"><bounds x="1066" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="KEY4" inputmask="0x08"><bounds x="1148" y="108" width="79" height="424" /></element>
+
+		<!-- octave 3 -->
+		<element ref="blackkey"    inputtag="KEY2" inputmask="0x08"><bounds x="1278" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY0" inputmask="0x08"><bounds x="1381" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY2" inputmask="0x04"><bounds x="1521" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY0" inputmask="0x04"><bounds x="1615" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY6" inputmask="0x02"><bounds x="1709" y="108" width="44" height="252" /></element>
+		<element ref="whitekey-l"  inputtag="KEY3" inputmask="0x08"><bounds x="1230" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-m"  inputtag="KEY1" inputmask="0x08"><bounds x="1312" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="KEY4" inputmask="0x04"><bounds x="1394" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-l"  inputtag="KEY3" inputmask="0x04"><bounds x="1476" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-lm" inputtag="KEY1" inputmask="0x04"><bounds x="1558" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-rm" inputtag="KEY7" inputmask="0x02"><bounds x="1640" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="KEY5" inputmask="0x02"><bounds x="1722" y="108" width="79" height="424" /></element>
+
+		<!-- octave 4 -->
+		<element ref="blackkey"    inputtag="KEY3" inputmask="0x02"><bounds x="1852" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY1" inputmask="0x02"><bounds x="1955" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY6" inputmask="0x01"><bounds x="2095" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY4" inputmask="0x01"><bounds x="2189" y="108" width="44" height="252" /></element>
+		<element ref="blackkey"    inputtag="KEY2" inputmask="0x01"><bounds x="2283" y="108" width="44" height="252" /></element>
+		<element ref="whitekey-l"  inputtag="KEY4" inputmask="0x02"><bounds x="1804" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-m"  inputtag="KEY2" inputmask="0x02"><bounds x="1886" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="KEY0" inputmask="0x02"><bounds x="1968" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-l"  inputtag="KEY7" inputmask="0x01"><bounds x="2050" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-lm" inputtag="KEY5" inputmask="0x01"><bounds x="2132" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-rm" inputtag="KEY3" inputmask="0x01"><bounds x="2214" y="108" width="79" height="424" /></element>
+		<element ref="whitekey-r"  inputtag="KEY1" inputmask="0x01"><bounds x="2296" y="108" width="79" height="424" /></element>
+
+		<!-- final key -->
+		<element ref="whitekey"    inputtag="KEY0" inputmask="0x01"><bounds x="2378" y="108" width="79" height="424" /></element>
+	</group>
+
+	<view name="Keyboard">
+		<!-- overall background -->
+		<element ref="greyback"><bounds x="0" y="0" width="1585" height="670" /></element>
+
+		<!-- buttons -->
+		<group ref="buttons"><bounds x="50" y="10" width="2608" height="300" /></group>
+
+		<!-- keyboard -->
+		<group ref="keyboard"><bounds x="50" y="310" width="1485" height="350" /></group>
+	</view>
+</mamelayout>

@@ -8,7 +8,7 @@
 
 #include "machine/nscsi_bus.h"
 #include "cpu/h8/h83042.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 class crd254sh_device : public device_t, public nscsi_slot_card_interface
 {
@@ -24,7 +24,6 @@ protected:
 
 private:
 	void mem_map(address_map &map);
-	void io_map(address_map &map);
 
 	required_device<h83040_device> m_mcu;
 	required_device<ncr53c94_device> m_scsi;

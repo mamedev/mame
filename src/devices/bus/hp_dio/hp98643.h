@@ -62,7 +62,7 @@ private:
 	uint16_t novram_r(offs_t offset);
 	void novram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(lance_int_w);
+	void lance_int_w(int state);
 	void lance_dma_out(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t lance_dma_in(offs_t offset);
 

@@ -30,6 +30,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class cesclassic_state : public driver_device
 {
 public:
@@ -294,7 +297,9 @@ ROM_START(tsclass)
 	ROM_LOAD( "tsclassic-v100-u28.bin", 0x00000, 0x80000, CRC(5bf53ca3) SHA1(5767391175fa9488ba0fb17a16de6d5013712a01) )
 ROM_END
 
+} // anonymous namespace
 
-GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )

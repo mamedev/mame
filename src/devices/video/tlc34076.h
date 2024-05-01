@@ -50,7 +50,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x100; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
 
 private:
 	// internal helpers

@@ -91,13 +91,6 @@ sbus_device::sbus_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
-void sbus_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_irq_cb.resolve_all_safe();
-	m_buserr.resolve_safe();
-}
-
 void sbus_device::device_start()
 {
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);

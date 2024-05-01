@@ -164,9 +164,6 @@ void atari_vad_device::device_start()
 	if (m_eof_data == nullptr)
 		throw emu_fatalerror("EOF data not found!");
 
-	// resolve callbacks
-	m_scanline_int_cb.resolve_safe();
-
 	// allocate timers
 	m_scanline_int_timer = timer_alloc(FUNC(atari_vad_device::scanline_int), this);
 	m_tilerow_update_timer = timer_alloc(FUNC(atari_vad_device::update_tilerow), this);

@@ -64,7 +64,7 @@ public:
 	virtual uint8_t read_io(offs_t offset) { return 0xff; }
 	virtual void write_io(offs_t offset, uint8_t data) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 
 	virtual void late_bank_setup() { }
@@ -116,24 +116,24 @@ public:
 	sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~sega8_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "sms_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 	int get_cart_type(const uint8_t *ROM, uint32_t len) const;
 
 	void setup_ram();
-	void internal_header_logging(uint8_t *ROM, uint32_t len, uint32_t nvram_len);
-	image_verify_result verify_cart(uint8_t *magic, int size);
-	void set_lphaser_xoffset(uint8_t *rom, int size);
+	void internal_header_logging(const uint8_t *ROM, uint32_t len, uint32_t nvram_len);
+	std::error_condition verify_cart(const uint8_t *magic, int size);
+	void set_lphaser_xoffset(const uint8_t *rom, int size);
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
@@ -152,12 +152,12 @@ public:
 protected:
 	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card = false);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	int m_type;
 	bool const m_is_card;
-	device_sega8_cart_interface*       m_cart;
+	device_sega8_cart_interface *m_cart;
 };
 
 // ======================> sega8_card_slot_device
@@ -345,12 +345,6 @@ DECLARE_DEVICE_TYPE(SMS_CART_SLOT,       sms_cart_slot_device)
 DECLARE_DEVICE_TYPE(GAMEGEAR_CART_SLOT,  gamegear_cart_slot_device)
 DECLARE_DEVICE_TYPE(SMS_CARD_SLOT,       sms_card_slot_device)
 DECLARE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device)
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define S8SLOT_ROM_REGION_TAG ":cart:rom"
 
 
 // slot interfaces

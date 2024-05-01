@@ -26,8 +26,8 @@ class isa8_fdc_device :
 	public device_isa8_card_interface
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void irq_w(int state);
+	void drq_w(int state);
 	static void floppy_formats(format_registration &fr);
 
 protected:
@@ -57,8 +57,8 @@ protected:
 	uint8_t dir_r();
 	void ccr_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 private:
 	bool irq, drq, fdc_drq, fdc_irq;
@@ -135,7 +135,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER( aux_irq_w );
+	void aux_irq_w(int state);
 
 	required_device<bus_mouse_device> m_bus_mouse;
 };

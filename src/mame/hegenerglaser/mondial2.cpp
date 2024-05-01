@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Mondial II
 
@@ -11,7 +11,7 @@ Hardware notes:
 - expansion slot at underside (not used)
 - 8*8 chessboard buttons, 24 leds, piezo
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -31,13 +31,13 @@ namespace {
 class mondial2_state : public driver_device
 {
 public:
-	mondial2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_led_pwm(*this, "led_pwm")
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
+	mondial2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_led_pwm(*this, "led_pwm"),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void mondial2(machine_config &config);
@@ -49,8 +49,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_keys;
+
+	u8 m_keypad_mux = 0;
+	u8 m_board_mux = 0;
+	u8 m_led_data = 0;
 
 	void mondial2_mem(address_map &map);
 
@@ -58,10 +62,6 @@ private:
 	void control_w(u8 data);
 	void board_w(u8 data);
 	u8 input_r(offs_t offset);
-
-	u8 m_keypad_mux = 0;
-	u8 m_board_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void mondial2_state::machine_start()
@@ -73,9 +73,9 @@ void mondial2_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mondial2_state::update_leds()
 {
@@ -121,9 +121,9 @@ u8 mondial2_state::input_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mondial2_state::mondial2_mem(address_map &map)
 {
@@ -136,9 +136,9 @@ void mondial2_state::mondial2_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mondial2 )
 	PORT_START("KEY.0")
@@ -155,7 +155,7 @@ static INPUT_PORTS_START( mondial2 )
 
 	PORT_START("KEY.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("PLAY")       PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")        PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")        PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM")        PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO")       PORT_CODE(KEYCODE_I)
 
@@ -168,13 +168,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mondial2_state::mondial2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65SC02(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial2_state::mondial2_mem);
 
@@ -185,20 +185,20 @@ void mondial2_state::mondial2(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(250));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 3);
 	config.set_default_layout(layout_mephisto_mondial2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mondial2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -209,9 +209,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY             FULLNAME               FLAGS */
-CONS( 1987, mondial2, 0,      0,      mondial2, mondial2, mondial2_state, empty_init, "Hegener + Glaser", "Mephisto Mondial II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1987, mondial2, 0,      0,      mondial2, mondial2, mondial2_state, empty_init, "Hegener + Glaser", "Mephisto Mondial II", MACHINE_SUPPORTS_SAVE )

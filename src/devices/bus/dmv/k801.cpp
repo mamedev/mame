@@ -206,7 +206,7 @@ ioport_constructor dmv_k213_device::device_input_ports() const
 	return INPUT_PORTS_NAME( dmv_k213 );
 }
 
-WRITE_LINE_MEMBER(dmv_k801_device::pci_irq_w)
+void dmv_k801_device::pci_irq_w(int state)
 {
 	out_irq(state);
 }

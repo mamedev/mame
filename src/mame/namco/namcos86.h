@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_NAMCOS86_H
-#define MAME_INCLUDES_NAMCOS86_H
+#ifndef MAME_NAMCO_NAMCOS86_H
+#define MAME_NAMCO_NAMCOS86_H
 
 #pragma once
 
@@ -75,7 +75,7 @@ private:
 	void namcos86_palette(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void scroll_w(offs_t offset, int data, int layer);
 
@@ -120,4 +120,4 @@ private:
 	void set_scroll(int layer);
 };
 
-#endif // MAME_INCLUDES_NAMCOS86_H
+#endif // MAME_NAMCO_NAMCOS86_H

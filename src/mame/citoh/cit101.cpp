@@ -67,6 +67,9 @@ The NVR checksum error reported when the terminal is first used is nonfatal. Def
 
 #include "cit101_kbd.h"
 
+
+namespace {
+
 class cit101_state : public driver_device
 {
 public:
@@ -102,7 +105,7 @@ private:
 	u8 e0_latch_r();
 	void e0_latch_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(blink_w);
+	void blink_w(int state);
 	void screen_control_w(u8 data);
 	void screen_control_101e_w(u8 data);
 	void brightness_w(u8 data);
@@ -282,7 +285,7 @@ void cit101_state::e0_latch_w(u8 data)
 	m_e0_latch = data;
 }
 
-WRITE_LINE_MEMBER(cit101_state::blink_w)
+void cit101_state::blink_w(int state)
 {
 	m_blink = state;
 }
@@ -530,6 +533,9 @@ ROM_START(cit101e)
 	ROM_LOAD("4s=it1=__.bin", 0x180, 0x020, NO_DUMP) // position labeled (TBP)18S030
 	ROM_LOAD("4t=it2=06.bin", 0x1a0, 0x020, NO_DUMP) // position labeled (TBP)18S030
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1980, cit101,  0, 0, cit101,  cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101 Video Terminal", MACHINE_SUPPORTS_SAVE)
 COMP(1983, cit101e, 0, 0, cit101e, cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101e Video Terminal", MACHINE_SUPPORTS_SAVE)

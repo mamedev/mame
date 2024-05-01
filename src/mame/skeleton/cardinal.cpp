@@ -23,6 +23,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class cardinal_state : public driver_device
 {
 public:
@@ -168,6 +171,8 @@ ROM_START(cardinal)
 	ROM_REGION(0x1000, "program", 0)
 	ROM_LOAD("smc_8031_crt9028.bin", 0x0000, 0x1000, CRC(486705d0) SHA1(39f3fd80a72756b3267d771202cf917060eb04e1))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1984, cardinal, 0, 0, cardinal, cardinal, cardinal_state, empty_init, "Standard Microsystems", "Cardinal Video Terminal", MACHINE_IS_SKELETON)

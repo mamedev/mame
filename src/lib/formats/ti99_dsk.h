@@ -2,7 +2,7 @@
 // copyright-holders:Michael Zapf
 /*********************************************************************
 
-    formats/ti99_dsk.c
+    formats/ti99_dsk.h
 
     TI99 and Geneve disk images
 
@@ -22,9 +22,9 @@
 class ti99_floppy_format : public floppy_image_format_t
 {
 public:
-	bool supports_save() const override { return true; }
-	bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
-	bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	bool supports_save() const noexcept override { return true; }
+	bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
 protected:
 	static uint8_t get_data_from_encoding(uint16_t raw);
@@ -39,8 +39,8 @@ protected:
 
 	static int get_encoding(int cell_size);
 
-	static void generate_fm_track_from_sectors(floppy_image *image, uint8_t *sectordata, int sector_count, int *sector, int *secoffset, int track, int trackid, int head);
-	static void generate_mfm_track_from_sectors(floppy_image *image, uint8_t *sectordata, int sector_count, int *sector, int *secoffset, int track, int trackid, int head);
+	static void generate_fm_track_from_sectors(floppy_image &image, uint8_t *sectordata, int sector_count, int *sector, int *secoffset, int track, int trackid, int head);
+	static void generate_mfm_track_from_sectors(floppy_image &image, uint8_t *sectordata, int sector_count, int *sector, int *secoffset, int track, int trackid, int head);
 
 	// Debugging
 	static void dumpbytes(const uint8_t* trackdata, int length);
@@ -54,9 +54,9 @@ class ti99_sdf_format : public ti99_floppy_format
 {
 public:
 	int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	const char *name() const override;
-	const char *description() const override;
-	const char *extensions() const override;
+	const char *name() const noexcept override;
+	const char *description() const noexcept override;
+	const char *extensions() const noexcept override;
 
 private:
 	void determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks) const override;
@@ -93,9 +93,9 @@ class ti99_tdf_format : public ti99_floppy_format
 {
 public:
 	int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	const char *name() const override;
-	const char *description() const override;
-	const char *extensions() const override;
+	const char *name() const noexcept override;
+	const char *description() const noexcept override;
+	const char *extensions() const noexcept override;
 
 private:
 	void determine_sizes(util::random_read &io, int& cell_size, int& sector_count, int& heads, int& tracks) const override;

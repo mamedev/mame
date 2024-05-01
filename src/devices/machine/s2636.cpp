@@ -119,7 +119,7 @@
 *************************************************************/
 
 #include "emu.h"
-#include "machine/s2636.h"
+#include "s2636.h"
 
 #include "screen.h"
 
@@ -206,8 +206,6 @@ void s2636_device::device_start()
 	m_stream = stream_alloc(0, 1, machine().sample_rate());
 	save_item(NAME(m_sample_cnt));
 	save_item(NAME(m_sound_lvl));
-
-	m_intreq_cb.resolve_safe();
 }
 
 

@@ -6,6 +6,9 @@
 // Note: the X1 input (typically an XTAL) is divided by 2 internally.
 // The device clock should therefore be twice the desired operating
 // frequency (and twice the speed rating suffixed to the part number).
+// Some high-performance AMD versions, however, generate the system
+// clock with a PLL and only support XTAL dividers other than 1 for
+// compatibility and power-saving modes.
 
 #include "emu.h"
 #include "i186.h"
@@ -127,19 +130,27 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 
 DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel 80186")
 DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel 80188")
-
-i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
-{
-	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
-}
+DEFINE_DEVICE_TYPE(AM186EM, am186em_device, "am186em", "AMD Am186EM")
+DEFINE_DEVICE_TYPE(AM188EM, am188em_device, "am188em", "AMD Am188EM")
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
-	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
+}
+
+i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
+{
+}
+
+am186em_device::am186em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80186_cpu_device(mconfig, AM186EM, tag, owner, clock, 16)
+{
+}
+
+am188em_device::am188em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80186_cpu_device(mconfig, AM188EM, tag, owner, clock, 8)
+{
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
@@ -147,7 +158,7 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
-	, m_read_slave_ack_func(*this)
+	, m_read_slave_ack_func(*this, 0)
 	, m_out_chip_select_func(*this)
 	, m_out_tmrout0_func(*this)
 	, m_out_tmrout1_func(*this)
@@ -155,6 +166,8 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_irqa_cb(*this)
 	, m_irmx_irq_ack(*this)
 {
+	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 
 device_memory_interface::space_config_vector i80186_cpu_device::memory_space_config() const
@@ -720,13 +733,7 @@ void i80186_cpu_device::device_start()
 	m_timer[1].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
 	m_timer[2].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
 
-	m_out_tmrout0_func.resolve_safe();
-	m_out_tmrout1_func.resolve_safe();
-	m_read_slave_ack_func.resolve_safe(0);
-	m_out_chip_select_func.resolve_safe();
-	m_irmx_irq_cb.resolve_safe();
-	m_irqa_cb.resolve_safe();
-	m_irmx_irq_ack.resolve();
+	m_irmx_irq_ack.resolve_safe(0);
 }
 
 void i80186_cpu_device::device_reset()
@@ -888,17 +895,11 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
  *************************************/
 IRQ_CALLBACK_MEMBER(i80186_cpu_device::inta_callback)
 {
-	if (!m_irqa_cb.isnull()) // s-state 0 is irqack
-	{
-		m_irqa_cb(ASSERT_LINE);
-		m_irqa_cb(CLEAR_LINE);
-	}
+	// s-state 0 is irqack
+	m_irqa_cb(ASSERT_LINE);
+	m_irqa_cb(CLEAR_LINE);
 	if (BIT(m_reloc, 14))
-	{
-		if (!m_irmx_irq_ack.isnull())
-			return m_irmx_irq_ack(device, irqline);
-		return 0;
-	}
+		return m_irmx_irq_ack(device, irqline);
 	return int_callback(device, irqline);
 }
 
@@ -1257,9 +1258,9 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 
 	if (which == 2)
 	{
-		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == TIMER_DRQ)
+		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
 			drq_callback(0);
-		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == TIMER_DRQ)
+		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
 			drq_callback(1);
 		if ((m_timer[0].control & 0x800c) == 0x8008)
 			inc_timer(0);
@@ -1307,9 +1308,13 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 void i80186_cpu_device::restart_timer(int which)
 {
 	timer_state *t = &m_timer[which];
+	/* Only run timer 0,1 when not incremented via timer 2 pre-scaler */
+	if (which != 2 && (t->control & 0x800c) == 0x8008)
+		return;
+
 	int count = (t->control & 0x1000) ? t->maxB : t->maxA;
 	if (!(t->control & 4))
-		t->int_timer->adjust((attotime::from_hz(clock() / 8) * (count ? count : 0x10000)), which);
+		t->int_timer->adjust(cycles_to_attotime(4 * (count ? count : 0x10000)), which);
 }
 
 void i80186_cpu_device::internal_timer_sync(int which)
@@ -1318,7 +1323,7 @@ void i80186_cpu_device::internal_timer_sync(int which)
 
 	/* if we have a timing timer running, adjust the count */
 	if ((t->control & 0x8000) && !(t->control & 0x0c) && t->int_timer->enabled())
-		t->count = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->int_timer->remaining().as_ticks(clock() / 8);
+		t->count = ((t->control & 0x1000) ? t->maxB : t->maxA) - attotime_to_cycles(t->int_timer->remaining()) / 4;
 }
 
 void i80186_cpu_device::inc_timer(int which)
@@ -1442,7 +1447,7 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 			int diff = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->count;
 			if (diff <= 0)
 				diff += 0x10000;
-			t->int_timer->adjust(attotime::from_hz(clock()/8) * diff, which);
+			t->int_timer->adjust(cycles_to_attotime(4 * diff), which);
 			LOGMASKED(LOG_TIMER, "Set interrupt timer for %d\n", which);
 		}
 		else
@@ -1484,11 +1489,6 @@ void i80186_cpu_device::update_dma_control(int which, int new_control)
 	if (!(new_control & CHG_NOCHG))
 		new_control = (new_control & ~ST_STOP) | (d->control & ST_STOP);
 	new_control &= ~CHG_NOCHG;
-
-	/* check for control bits we don't handle */
-	int diff = new_control ^ d->control;
-	if (diff & 0x6811)
-		LOGMASKED(LOG_DMA, "%05X:ERROR! - unsupported DMA mode %04X\n", m_pc, new_control);
 
 	LOGMASKED(LOG_DMA, "Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 

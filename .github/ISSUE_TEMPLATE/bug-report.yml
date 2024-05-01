@@ -1,0 +1,91 @@
+name: "Bug report"
+description: Report incorrect or unexpected behaviour.
+body:
+- type: markdown
+  attributes:
+    value: |
+      ## Important: Read First
+
+      Issues are not to be used for support requests or discussion.  They are only to be used for reporting reproducible issues.
+
+      Before reporting an issue:
+      * Please ensure you have read the [guidelines for contributors](https://docs.mamedev.org/contributing/).
+      * We only accept bug reports against the latest version of MAME.  Older versions are not supported.
+      * Only official versions of MAME are supported.  Derivative versions (e.g. MAMEUI, NegaMAME or RetroArch cores) are not supported.
+      * User-facing bugs in released versions of MAME should generally be reported at [MAME Testers](https://mametesters.org/).
+      * Please search for existing [issues on GitHub](https://github.com/mamedev/mame/issues) and [bug reports at MAME Testers](https://mametesters.org/view_all_bug_page.php) before opening a new issue!
+
+- type: input
+  attributes:
+    label: MAME version
+    description: |
+      You can obtain the version from MAME itself, either by running `mame -version` at the command line or from the main menu.  Include the git commit hash if not a tagged release.
+    placeholder: "0.xxx (mame0xxx-nn-gxxxxxxxxxxx)"
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: System information
+    description: Provide environment details, including your operating system, CPU architecture, system locale and display language, if applicable.  For video output bugs, include your video hardware (GPU), driver version, and the MAME video output module you’re using (e.g. opengl or bgfx).  For input handling bugs, include the input peripherals and MAME input modules you’re using.
+    placeholder: |
+      Windows 11, 64-bit, version 22H2, USA, US English
+      x86-64, 32GB system RAM, GeForce RTX 4090 driver version 516.54
+      Using a Hori RAP4 Kai arcade stick in XInput mode connected via USB
+      bgfx video output (vulkan backend), winhybrid joystick module
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: INI configuration details
+    description: Copy your mame.ini here.
+    placeholder: |
+      #
+      # CORE CONFIGURATION OPTIONS
+      #
+      readconfig                1
+      writeconfig               0
+    render: INI
+
+- type: input
+  attributes:
+    label: Emulated system/software
+    description: |
+      The exact emulated system and software affected.  Please include short names for systems and software list items.  Include version and media type.  May not be applicable for issues with parts of MAME’s UI, like the system selection menu.
+    placeholder: PC Engine (pce), CD-ROM² Super System Card (v3.0) (pce:scdsys), Forgotten Worlds (Japan) (pcecd:forgottnj)
+
+- type: textarea
+  attributes:
+    label: Incorrect behaviour
+    description: |
+      A concise description of the undesirable behaviour you're experiencing.  Be specific – just saying it “doesn’t work” isn’t enough detail.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Expected behaviour
+    description: |
+      A concise description of what you expect should happen.  For emulation issues, include an original reference for the correct behaviour if possible.  If you have access to the original hardware for the emulated system, it helps to make a recording of the correct behaviour for comparison.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Steps to reproduce
+    description: |
+      Steps to reproduce the issue.  Assume the person reading is familiar with MAME itself, but not necessarily familiar with the emulated system and software in question.  For emulation issues, input recordings and/or saved state files for reproducing the issue can be invaluable.
+    placeholder: |
+      1. I started MAME with the following command line (where applicable):
+      2. I did the following steps..
+      3.
+      4. I received this error or undesired result.
+
+- type: textarea
+  attributes:
+    label: Additional details
+    description: |
+      Any additional relevant details.  Include things like the selected BIOS version, and emulated peripheral (slot device) configuration.
+    placeholder: |
+      SuperMac Spectrum/8 Series III card with firmware version 1.2 in NuBus slot 9.

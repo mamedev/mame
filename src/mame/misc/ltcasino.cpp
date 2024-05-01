@@ -83,6 +83,8 @@ Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
 #include "ltcasinn.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -628,13 +630,15 @@ ROM_START( ltcasin2a )
 	ROM_LOAD( "v17_00_rv.bin", 0x0000, 0x1000, CRC(84cbee7b) SHA1(742831d5ae0db6c7c644a18a837831ee0474d472) )
 ROM_END
 
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT         ROTATION  COMPANY                            FULLNAME                  FLAGS
-GAMEL( 1982, ltcasino,  0,        ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasino )
-GAMEL( 1983, mv4in1,    0,        mv4in1,   mv4in1,    ltcasino_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasinn )
-GAMEL( 1984, ltcasin2,  0,        ltcasin2, ltcasin2,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II v18.1", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasinn )
-GAMEL( 1984, ltcasin2a, ltcasin2, ltcasin2, ltcasin2a, ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II v17.0", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_ltcasinn )
+GAMEL( 1982, ltcasino,  0,        ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino",          MACHINE_SUPPORTS_SAVE, layout_ltcasino )
+GAMEL( 1983, mv4in1,    0,        mv4in1,   mv4in1,    ltcasino_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",        MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2,  0,        ltcasin2, ltcasin2,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II v18.1", MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2a, ltcasin2, ltcasin2, ltcasin2a, ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II v17.0", MACHINE_SUPPORTS_SAVE, layout_ltcasinn )

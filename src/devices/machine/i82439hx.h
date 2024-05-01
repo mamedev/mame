@@ -15,7 +15,6 @@ public:
 	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
 		: i82439hx_host_device(mconfig, tag, owner, clock)
 	{
-		set_ids_host(0x80861250, 0x03, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
 	}
@@ -24,9 +23,11 @@ public:
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
 
-	DECLARE_WRITE_LINE_MEMBER(smi_act_w);
+	void smi_act_w(int state);
 
 protected:
+	i82439hx_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -36,6 +37,8 @@ protected:
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override;
+
+	virtual std::tuple<bool, bool> read_memory_holes();
 
 private:
 	int ram_size;

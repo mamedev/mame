@@ -68,7 +68,7 @@ protected:
 	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 	required_device<ata_interface_device> m_ide;
 	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;

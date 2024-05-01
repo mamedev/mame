@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { m_ie15->rs232_conn_rxd_w(state); }
+	virtual void input_txd(int state) override { m_ie15->rs232_conn_rxd_w(state); }
 
 protected:
 	virtual void device_start() override { }

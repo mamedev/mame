@@ -125,7 +125,7 @@ namespace netlist::analog
 
 	NETLIB_TIMESTEP(L)
 	{
-		if (ts_type == time_step_type::FORWARD)
+		if (ts_type == detail::time_step_type::FORWARD)
 		{
 			m_last_I = m_I;
 			m_last_G = m_G;

@@ -23,6 +23,9 @@
 #include "video/tms9927.h"
 #include "screen.h"
 
+
+namespace {
+
 // character matrix is supposed to be only 7x7, but 15 produces correct timings
 #define V100_CH_WIDTH 15
 
@@ -52,7 +55,7 @@ private:
 	void key_row_w(u8 data);
 	void port48_w(u8 data);
 	void picu_w(u8 data);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(picu_r_w);
+	template<int N> void picu_r_w(int state);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	void ppi_porta_w(u8 data);
 
@@ -197,7 +200,7 @@ void v100_state::picu_w(u8 data)
 }
 
 template<int N>
-WRITE_LINE_MEMBER(v100_state::picu_r_w)
+void v100_state::picu_r_w(int state)
 {
 	m_picu->r_w(N, state);
 }
@@ -438,5 +441,8 @@ ROM_START( v100 )
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1980, v100, 0, 0, v100, v100, v100_state, empty_init, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )

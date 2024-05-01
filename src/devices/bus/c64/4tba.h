@@ -32,8 +32,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pet_user_port_interface overrides
-	virtual WRITE_LINE_MEMBER( input_4 ) override { output_6(state); }
-	virtual WRITE_LINE_MEMBER( input_6 ) override { output_4(state); }
+	virtual void input_4(int state) override { output_6(state); }
+	virtual void input_6(int state) override { output_4(state); }
 
 protected:
 	// device-level overrides

@@ -17,6 +17,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class magnum_state : public driver_device
 {
 public:
@@ -39,7 +42,7 @@ private:
 	void sysctl_w(offs_t offset, u8 data);
 	u16 irqstat_r();
 	void port50_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(rtcirq_w);
+	void rtcirq_w(int state);
 
 	void check_irq();
 	void magnum_io(address_map &map);
@@ -251,7 +254,7 @@ void magnum_state::port50_w(u16 data)
 {
 }
 
-WRITE_LINE_MEMBER(magnum_state::rtcirq_w)
+void magnum_state::rtcirq_w(int state)
 {
 	m_rtcirq = state == ASSERT_LINE;
 	check_irq();
@@ -333,5 +336,8 @@ ROM_START( magnum )
 	ROM_REGION(0x1000, "char", 0)
 	ROM_LOAD("dulmontcharrom.bin", 0x0000, 0x1000, CRC(9dff89bf) SHA1(d359aeba7f0b0c81accf3bca25e7da636c033721))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, magnum, 0, 0, magnum, magnum, magnum_state, empty_init, "Dulmont", "Magnum", MACHINE_IMPERFECT_SOUND)

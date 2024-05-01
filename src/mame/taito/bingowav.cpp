@@ -40,12 +40,14 @@
 
 #include "emu.h"
 #include "speaker.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/tmp68301.h"
 #include "cpu/z80/z80.h"
 #include "machine/te7750.h"
-#include "machine/tmp68301.h"
 #include "sound/ymopn.h"
 #include "taitosnd.h"
+
+
+namespace {
 
 class bingowav_state : public driver_device
 {
@@ -113,7 +115,7 @@ INPUT_PORTS_END
 
 void bingowav_state::bingowav(machine_config &config)
 {
-	TMP68301(config, m_maincpu, 12000000); // actually TMP63803F-16
+	TMP68303(config, m_maincpu, 12000000); // TMP63803F-16
 	m_maincpu->set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_main_map);
 
 	te7750_device &mainioh(TE7750(config, "mainioh"));
@@ -133,10 +135,10 @@ void bingowav_state::bingowav(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag("audiocpu");
+	tc0140syt.nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 
-	m68000_device &termcpu(M68000(config, "termcpu", 12000000)); // actually TMP63803F-16
+	m68000_device &termcpu(TMP68303(config, "termcpu", 12000000)); // actually TMP63803F-16
 	termcpu.set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_drive_map);
 	termcpu.set_disable();
 
@@ -163,6 +165,8 @@ ROM_START( bingowav )
 	ROM_REGION( 0x20000, "ctrlcpu", 0 )
 	ROM_LOAD( "ic1", 0x00000, 0x20000, CRC(d257bbaf) SHA1(9d1414594dc1c1fca256ab5b6039e733bff1414a) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, empty_init, ROT0, "Taito", "Bingo Wave", MACHINE_IS_SKELETON )

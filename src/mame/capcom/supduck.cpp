@@ -45,7 +45,7 @@ There are known flyers that show an alternate title of HELL OUT
 
 
 // configurable logging
-#define LOG_UNKWRITE     (1U <<  1)
+#define LOG_UNKWRITE     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE)
 

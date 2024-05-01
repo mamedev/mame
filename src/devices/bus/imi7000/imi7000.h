@@ -80,10 +80,10 @@ public:
 	template <typename T, typename U, typename V, typename W>
 	void set_slot_default_options(T &&def1, U &&def2, V &&def3, W &&def4)
 	{
-		subdevice<imi7000_slot_device>(m_units[0].finder_tag())->set_default_option(std::forward<T>(def1));
-		subdevice<imi7000_slot_device>(m_units[1].finder_tag())->set_default_option(std::forward<U>(def2));
-		subdevice<imi7000_slot_device>(m_units[2].finder_tag())->set_default_option(std::forward<V>(def3));
-		subdevice<imi7000_slot_device>(m_units[3].finder_tag())->set_default_option(std::forward<W>(def4));
+		m_units[0].lookup()->set_default_option(std::forward<T>(def1));
+		m_units[1].lookup()->set_default_option(std::forward<U>(def2));
+		m_units[2].lookup()->set_default_option(std::forward<V>(def3));
+		m_units[3].lookup()->set_default_option(std::forward<W>(def4));
 	}
 
 protected:

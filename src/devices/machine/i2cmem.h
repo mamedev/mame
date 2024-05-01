@@ -40,13 +40,13 @@ public:
 	i2cmem_device & set_wc(int wc) { m_wc = wc; return *this; }
 
 	// I/O operations
-	DECLARE_WRITE_LINE_MEMBER( write_e0 );
-	DECLARE_WRITE_LINE_MEMBER( write_e1 );
-	DECLARE_WRITE_LINE_MEMBER( write_e2 );
-	DECLARE_WRITE_LINE_MEMBER( write_sda );
-	DECLARE_WRITE_LINE_MEMBER( write_scl );
-	DECLARE_WRITE_LINE_MEMBER( write_wc );
-	DECLARE_READ_LINE_MEMBER( read_sda );
+	void write_e0(int state);
+	void write_e1(int state);
+	void write_e2(int state);
+	void write_sda(int state);
+	void write_scl(int state);
+	void write_wc(int state);
+	int read_sda();
 
 protected:
 	// construction/destruction
@@ -115,9 +115,11 @@ DECLARE_I2C_DEVICE(x2404p);
 DECLARE_I2C_DEVICE(24c08);
 DECLARE_I2C_DEVICE(24c16);
 DECLARE_I2C_DEVICE(24c64);
+DECLARE_I2C_DEVICE(24c128);
+DECLARE_I2C_DEVICE(24c256);
 DECLARE_I2C_DEVICE(24c512);
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(I2C_X24C01,  i2c_x24c01_device)
 DECLARE_DEVICE_TYPE(I2C_24C01,   i2c_24c01_device)
 DECLARE_DEVICE_TYPE(I2C_PCF8570, i2c_pcf8570_device)
@@ -130,6 +132,8 @@ DECLARE_DEVICE_TYPE(I2C_X2404P,  i2c_x2404p_device)
 DECLARE_DEVICE_TYPE(I2C_24C08,   i2c_24c08_device)
 DECLARE_DEVICE_TYPE(I2C_24C16,   i2c_24c16_device)
 DECLARE_DEVICE_TYPE(I2C_24C64,   i2c_24c64_device)
+DECLARE_DEVICE_TYPE(I2C_24C128,  i2c_24c128_device)
+DECLARE_DEVICE_TYPE(I2C_24C256,  i2c_24c256_device)
 DECLARE_DEVICE_TYPE(I2C_24C512,  i2c_24c512_device)
 
 #endif // MAME_MACHINE_I2CMEM_H

@@ -7,10 +7,13 @@
 #include "../../../Common/StringConvert.h"
 
 #include "../../../Windows/FileDir.h"
+#include "../../../Windows/FileName.h"
+#include "../../../Windows/ErrorMsg.h"
 #include "../../../Windows/PropVariant.h"
 #include "../../../Windows/PropVariantConv.h"
 
 #include "../Common/ExtractingFilePath.h"
+#include "../Common/HashCalc.h"
 
 #include "Extract.h"
 #include "SetProperties.h"
@@ -18,6 +21,19 @@
 using namespace NWindows;
 using namespace NFile;
 using namespace NDir;
+
+
+static void SetErrorMessage(const char *message,
+    const FString &path, HRESULT errorCode,
+    UString &s)
+{
+  s = message;
+  s += " : ";
+  s += NError::MyFormatMessage(errorCode);
+  s += " : ";
+  s += fs2us(path);
+}
+
 
 static HRESULT DecompressArchive(
     CCodecs *codecs,
@@ -27,6 +43,7 @@ static HRESULT DecompressArchive(
     const CExtractOptions &options,
     bool calcCrc,
     IExtractCallbackUI *callback,
+    IFolderArchiveExtractCallback *callbackFAE,
     CArchiveExtractCallback *ecs,
     UString &errorMessage,
     UInt64 &stdInProcessed)
@@ -47,11 +64,11 @@ static HRESULT DecompressArchive(
     // So it extracts different archives to one folder.
     // We will use top level archive name
     const CArc &arc0 = arcLink.Arcs[0];
-    if (StringsAreEqualNoCase_Ascii(codecs->Formats[arc0.FormatIndex].Name, "pe"))
+    if (arc0.FormatIndex >= 0 && StringsAreEqualNoCase_Ascii(codecs->Formats[(unsigned)arc0.FormatIndex].Name, "pe"))
       replaceName = arc0.DefaultName;
   }
 
-  outDir.Replace(FSTRING_ANY_MASK, us2fs(Get_Correct_FsFile_Name(replaceName)));
+  outDir.Replace(FString("*"), us2fs(Get_Correct_FsFile_Name(replaceName)));
 
   bool elimIsPossible = false;
   UString elimPrefix; // only pure name without dir delimiter
@@ -73,20 +90,25 @@ static HRESULT DecompressArchive(
     }
   }
 
-  bool allFilesAreAllowed = wildcardCensor.AreAllAllowed();
+  const bool allFilesAreAllowed = wildcardCensor.AreAllAllowed();
 
   if (!options.StdInMode)
   {
     UInt32 numItems;
-    RINOK(archive->GetNumberOfItems(&numItems));
+    RINOK(archive->GetNumberOfItems(&numItems))
     
     CReadArcItem item;
 
     for (UInt32 i = 0; i < numItems; i++)
     {
-      if (elimIsPossible || !allFilesAreAllowed)
+      if (elimIsPossible
+          || !allFilesAreAllowed
+          || options.ExcludeDirItems
+          || options.ExcludeFileItems)
       {
-        RINOK(arc.GetItem(i, item));
+        RINOK(arc.GetItem(i, item))
+        if (item.IsDir ? options.ExcludeDirItems : options.ExcludeFileItems)
+          continue;
       }
       else
       {
@@ -94,7 +116,7 @@ static HRESULT DecompressArchive(
         item.IsAltStream = false;
         if (!options.NtOptions.AltStreams.Val && arc.Ask_AltStream)
         {
-          RINOK(Archive_IsItem_AltStream(arc.Archive, i, item.IsAltStream));
+          RINOK(Archive_IsItem_AltStream(arc.Archive, i, item.IsAltStream))
         }
         #endif
       }
@@ -156,7 +178,7 @@ static HRESULT DecompressArchive(
   #endif
 
   if (outDir.IsEmpty())
-    outDir = FTEXT(".") FSTRING_PATH_SEPARATOR;
+    outDir = "." STRING_PATH_SEPARATOR;
   /*
   #ifdef _WIN32
   else if (NName::IsAltPathPrefix(outDir)) {}
@@ -164,11 +186,8 @@ static HRESULT DecompressArchive(
   */
   else if (!CreateComplexDir(outDir))
   {
-    HRESULT res = ::GetLastError();
-    if (res == S_OK)
-      res = E_FAIL;
-    errorMessage.SetFromAscii("Can not create output directory: ");
-    errorMessage += fs2us(outDir);
+    const HRESULT res = GetLastError_noZero_HRESULT();
+    SetErrorMessage("Cannot create output directory", outDir, res, errorMessage);
     return res;
   }
 
@@ -176,7 +195,7 @@ static HRESULT DecompressArchive(
       options.NtOptions,
       options.StdInMode ? &wildcardCensor : NULL,
       &arc,
-      callback,
+      callbackFAE,
       options.StdOutMode, options.TestMode,
       outDir,
       removePathParts, false,
@@ -189,14 +208,17 @@ static HRESULT DecompressArchive(
       !options.TestMode &&
       options.NtOptions.HardLinks.Val)
   {
-    RINOK(ecs->PrepareHardLinks(&realIndices));
+    RINOK(ecs->PrepareHardLinks(&realIndices))
   }
     
   #endif
 
   
   HRESULT result;
-  Int32 testMode = (options.TestMode && !calcCrc) ? 1: 0;
+  const Int32 testMode = (options.TestMode && !calcCrc) ? 1: 0;
+
+  CArchiveExtractCallback_Closer ecsCloser(ecs);
+
   if (options.StdInMode)
   {
     result = archive->Extract(NULL, (UInt32)(Int32)-1, testMode, ecs);
@@ -206,8 +228,11 @@ static HRESULT DecompressArchive(
   }
   else
     result = archive->Extract(&realIndices.Front(), realIndices.Size(), testMode, ecs);
-  if (result == S_OK && !options.StdInMode)
-    result = ecs->SetDirsTimes();
+  
+  const HRESULT res2 = ecsCloser.Close();
+  if (result == S_OK)
+    result = res2;
+
   return callback->ExtractResult(result);
 }
 
@@ -215,17 +240,18 @@ static HRESULT DecompressArchive(
    Sorted list for file paths was sorted with case insensitive compare function.
    But FindInSorted function did binary search via case sensitive compare function */
 
-int Find_FileName_InSortedVector(const UStringVector &fileName, const UString &name)
+int Find_FileName_InSortedVector(const UStringVector &fileNames, const UString &name);
+int Find_FileName_InSortedVector(const UStringVector &fileNames, const UString &name)
 {
-  unsigned left = 0, right = fileName.Size();
+  unsigned left = 0, right = fileNames.Size();
   while (left != right)
   {
-    unsigned mid = (left + right) / 2;
-    const UString &midValue = fileName[mid];
-    int compare = CompareFileNames(name, midValue);
-    if (compare == 0)
-      return mid;
-    if (compare < 0)
+    const unsigned mid = (unsigned)(((size_t)left + (size_t)right) / 2);
+    const UString &midVal = fileNames[mid];
+    const int comp = CompareFileNames(name, midVal);
+    if (comp == 0)
+      return (int)mid;
+    if (comp < 0)
       right = mid;
     else
       left = mid + 1;
@@ -233,7 +259,10 @@ int Find_FileName_InSortedVector(const UStringVector &fileName, const UString &n
   return -1;
 }
 
+
+
 HRESULT Extract(
+    // DECL_EXTERNAL_CODECS_LOC_VARS
     CCodecs *codecs,
     const CObjectVector<COpenType> &types,
     const CIntVector &excludedFormats,
@@ -242,7 +271,8 @@ HRESULT Extract(
     const CExtractOptions &options,
     IOpenCallbackUI *openCallback,
     IExtractCallbackUI *extractCallback,
-    #ifndef _SFX
+    IFolderArchiveExtractCallback *faeCallback,
+    #ifndef Z7_SFX
     IHashCalc *hash,
     #endif
     UString &errorMessage,
@@ -262,11 +292,19 @@ HRESULT Extract(
     fi.Size = 0;
     if (!options.StdInMode)
     {
-      const FString &arcPath = us2fs(arcPaths[i]);
-      if (!fi.Find(arcPath))
-        throw "there is no such archive";
+      const FString arcPath = us2fs(arcPaths[i]);
+      if (!fi.Find_FollowLink(arcPath))
+      {
+        const HRESULT errorCode = GetLastError_noZero_HRESULT();
+        SetErrorMessage("Cannot find archive file", arcPath, errorCode, errorMessage);
+        return errorCode;
+      }
       if (fi.IsDir())
-        throw "can't decompress folder";
+      {
+        HRESULT errorCode = E_FAIL;
+        SetErrorMessage("The item is a directory", arcPath, errorCode, errorMessage);
+        return errorCode;
+      }
     }
     arcSizes.Add(fi.Size);
     totalPackSize += fi.Size;
@@ -278,15 +316,22 @@ HRESULT Extract(
 
   CArchiveExtractCallback *ecs = new CArchiveExtractCallback;
   CMyComPtr<IArchiveExtractCallback> ec(ecs);
-  bool multi = (numArcs > 1);
-  ecs->InitForMulti(multi, options.PathMode, options.OverwriteMode);
-  #ifndef _SFX
+  
+  const bool multi = (numArcs > 1);
+  
+  ecs->InitForMulti(multi,
+      options.PathMode,
+      options.OverwriteMode,
+      options.ZoneMode,
+      false // keepEmptyDirParts
+      );
+  #ifndef Z7_SFX
   ecs->SetHashMethods(hash);
   #endif
 
   if (multi)
   {
-    RINOK(extractCallback->SetTotal(totalPackSize));
+    RINOK(faeCallback->SetTotal(totalPackSize))
   }
 
   UInt64 totalPackProcessed = 0;
@@ -297,31 +342,41 @@ HRESULT Extract(
     if (skipArcs[i])
       continue;
 
+    ecs->InitBeforeNewArchive();
+
     const UString &arcPath = arcPaths[i];
     NFind::CFileInfo fi;
     if (options.StdInMode)
     {
-      fi.Size = 0;
-      fi.Attrib = 0;
+      // do we need ctime and mtime?
+      fi.ClearBase();
+      fi.Size = 0; // (UInt64)(Int64)-1;
+      fi.SetAsFile();
+      // NTime::GetCurUtc_FiTime(fi.MTime);
+      // fi.CTime = fi.ATime = fi.MTime;
     }
     else
     {
-      if (!fi.Find(us2fs(arcPath)) || fi.IsDir())
-        throw "there is no such archive";
+      if (!fi.Find_FollowLink(us2fs(arcPath)) || fi.IsDir())
+      {
+        const HRESULT errorCode = GetLastError_noZero_HRESULT();
+        SetErrorMessage("Cannot find archive file", us2fs(arcPath), errorCode, errorMessage);
+        return errorCode;
+      }
     }
 
     /*
-    #ifndef _NO_CRYPTO
+    #ifndef Z7_NO_CRYPTO
     openCallback->Open_Clear_PasswordWasAsked_Flag();
     #endif
     */
 
-    RINOK(extractCallback->BeforeOpen(arcPath, options.TestMode));
+    RINOK(extractCallback->BeforeOpen(arcPath, options.TestMode))
     CArchiveLink arcLink;
 
     CObjectVector<COpenType> types2 = types;
     /*
-    #ifndef _SFX
+    #ifndef Z7_SFX
     if (types.IsEmpty())
     {
       int pos = arcPath.ReverseFind(L'.');
@@ -349,7 +404,7 @@ HRESULT Extract(
     */
 
     COpenOptions op;
-    #ifndef _SFX
+    #ifndef Z7_SFX
     op.props = &options.Properties;
     #endif
     op.codecs = codecs;
@@ -365,19 +420,54 @@ HRESULT Extract(
       return result;
 
     // arcLink.Set_ErrorsText();
-    RINOK(extractCallback->OpenResult(codecs, arcLink, arcPath, result));
+    RINOK(extractCallback->OpenResult(codecs, arcLink, arcPath, result))
 
     if (result != S_OK)
     {
       thereAreNotOpenArcs = true;
       if (!options.StdInMode)
-      {
-        NFind::CFileInfo fi2;
-        if (fi2.Find(us2fs(arcPath)))
-          if (!fi2.IsDir())
-            totalPackProcessed += fi2.Size;
-      }
+        totalPackProcessed += fi.Size;
       continue;
+    }
+
+   #if defined(_WIN32) && !defined(UNDER_CE) && !defined(Z7_SFX)
+    if (options.ZoneMode != NExtract::NZoneIdMode::kNone
+        && !options.StdInMode)
+    {
+      ReadZoneFile_Of_BaseFile(us2fs(arcPath), ecs->ZoneBuf);
+    }
+   #endif
+    
+
+    if (arcLink.Arcs.Size() != 0)
+    {
+      if (arcLink.GetArc()->IsHashHandler(op))
+      {
+        if (!options.TestMode)
+        {
+          /* real Extracting to files is possible.
+             But user can think that hash archive contains real files.
+             So we block extracting here. */
+          // v23.00 : we don't break process.
+          RINOK(extractCallback->OpenResult(codecs, arcLink, arcPath, E_NOTIMPL))
+          thereAreNotOpenArcs = true;
+          if (!options.StdInMode)
+            totalPackProcessed += fi.Size;
+          continue;
+          // return E_NOTIMPL; // before v23
+        }
+        FString dirPrefix = us2fs(options.HashDir);
+        if (dirPrefix.IsEmpty())
+        {
+          if (!NFile::NDir::GetOnlyDirPrefix(us2fs(arcPath), dirPrefix))
+          {
+            // return GetLastError_noZero_HRESULT();
+          }
+        }
+        if (!dirPrefix.IsEmpty())
+          NName::NormalizeDirPathPrefix(dirPrefix);
+        ecs->DirPathPrefix_for_HashFiles = dirPrefix;
+      }
     }
 
     if (!options.StdInMode)
@@ -389,7 +479,7 @@ HRESULT Extract(
       // numArcs = arcPaths.Size();
       if (arcLink.VolumePaths.Size() != 0)
       {
-        Int64 correctionSize = arcLink.VolumesSize;
+        Int64 correctionSize = (Int64)arcLink.VolumesSize;
         FOR_VECTOR (v, arcLink.VolumePaths)
         {
           int index = Find_FileName_InSortedVector(arcPathsFull, arcLink.VolumePaths[v]);
@@ -407,8 +497,8 @@ HRESULT Extract(
           Int64 newPackSize = (Int64)totalPackSize + correctionSize;
           if (newPackSize < 0)
             newPackSize = 0;
-          totalPackSize = newPackSize;
-          RINOK(extractCallback->SetTotal(totalPackSize));
+          totalPackSize = (UInt64)newPackSize;
+          RINOK(faeCallback->SetTotal(totalPackSize))
         }
       }
     }
@@ -416,24 +506,29 @@ HRESULT Extract(
     /*
     // Now openCallback and extractCallback use same object. So we don't need to send password.
 
-    #ifndef _NO_CRYPTO
+    #ifndef Z7_NO_CRYPTO
     bool passwordIsDefined;
     UString password;
-    RINOK(openCallback->Open_GetPasswordIfAny(passwordIsDefined, password));
+    RINOK(openCallback->Open_GetPasswordIfAny(passwordIsDefined, password))
     if (passwordIsDefined)
     {
-      RINOK(extractCallback->SetPassword(password));
+      RINOK(extractCallback->SetPassword(password))
     }
     #endif
     */
 
     CArc &arc = arcLink.Arcs.Back();
-    arc.MTimeDefined = (!options.StdInMode && !fi.IsDevice);
-    arc.MTime = fi.MTime;
+    arc.MTime.Def = !options.StdInMode
+        #ifdef _WIN32
+        && !fi.IsDevice
+        #endif
+        ;
+    if (arc.MTime.Def)
+      arc.MTime.Set_From_FiTime(fi.MTime);
 
     UInt64 packProcessed;
-    bool calcCrc =
-        #ifndef _SFX
+    const bool calcCrc =
+        #ifndef Z7_SFX
           (hash != NULL);
         #else
           false;
@@ -446,7 +541,8 @@ HRESULT Extract(
         wildcardCensor,
         options,
         calcCrc,
-        extractCallback, ecs, errorMessage, packProcessed));
+        extractCallback, faeCallback, ecs,
+        errorMessage, packProcessed))
 
     if (!options.StdInMode)
       packProcessed = fi.Size + arcLink.VolumesSize;
@@ -459,8 +555,8 @@ HRESULT Extract(
 
   if (multi || thereAreNotOpenArcs)
   {
-    RINOK(extractCallback->SetTotal(totalPackSize));
-    RINOK(extractCallback->SetCompleted(&totalPackProcessed));
+    RINOK(faeCallback->SetTotal(totalPackSize))
+    RINOK(faeCallback->SetCompleted(&totalPackProcessed))
   }
 
   st.NumFolders = ecs->NumFolders;

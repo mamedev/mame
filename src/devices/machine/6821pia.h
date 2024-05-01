@@ -65,18 +65,18 @@ public:
 	uint8_t a_output();
 	void set_port_a_input_overrides_output_mask(uint8_t mask) { m_a_input_overrides_output_mask = mask; }
 
-	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { write_porta_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { write_porta_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { write_porta_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { write_porta_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { write_porta_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { write_porta_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { write_porta_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { write_porta_line(7, state); }
+	void pa0_w(int state) { write_porta_line(0, state); }
+	void pa1_w(int state) { write_porta_line(1, state); }
+	void pa2_w(int state) { write_porta_line(2, state); }
+	void pa3_w(int state) { write_porta_line(3, state); }
+	void pa4_w(int state) { write_porta_line(4, state); }
+	void pa5_w(int state) { write_porta_line(5, state); }
+	void pa6_w(int state) { write_porta_line(6, state); }
+	void pa7_w(int state) { write_porta_line(7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( ca1_w );
+	void ca1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ca2_w );
+	void ca2_w(int state);
 	bool ca2_output();
 	bool ca2_output_z();
 
@@ -84,18 +84,18 @@ public:
 	void write_portb_line(int line, bool state);
 	uint8_t b_output();
 
-	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { write_portb_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { write_portb_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { write_portb_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { write_portb_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { write_portb_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { write_portb_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { write_portb_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { write_portb_line(7, state); }
+	void pb0_w(int state) { write_portb_line(0, state); }
+	void pb1_w(int state) { write_portb_line(1, state); }
+	void pb2_w(int state) { write_portb_line(2, state); }
+	void pb3_w(int state) { write_portb_line(3, state); }
+	void pb4_w(int state) { write_portb_line(4, state); }
+	void pb5_w(int state) { write_portb_line(5, state); }
+	void pb6_w(int state) { write_portb_line(6, state); }
+	void pb7_w(int state) { write_portb_line(7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( cb1_w );
+	void cb1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( cb2_w );
+	void cb2_w(int state);
 	bool cb2_output();
 	bool cb2_output_z();
 
@@ -103,8 +103,7 @@ public:
 	int irq_b_state() const { return m_irq_b_state; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

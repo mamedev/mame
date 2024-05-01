@@ -39,7 +39,7 @@ pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconf
 	device_t(mconfig, PET_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_pet_expansion_card_interface>(mconfig, *this),
 	m_card(nullptr),
-	m_read_dma(*this),
+	m_read_dma(*this, 0),
 	m_write_dma(*this)
 {
 }
@@ -81,10 +81,6 @@ device_pet_expansion_card_interface::~device_pet_expansion_card_interface()
 void pet_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_read_dma.resolve_safe(0);
-	m_write_dma.resolve_safe();
 }
 
 
@@ -128,7 +124,7 @@ void pet_expansion_slot_device::write(offs_t offset, uint8_t data, int &sel)
 //  diag_r - DIAG read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( pet_expansion_slot_device::diag_r )
+int pet_expansion_slot_device::diag_r()
 {
 	return m_card ? m_card->pet_diag_r() : 1;
 }
@@ -138,7 +134,7 @@ READ_LINE_MEMBER( pet_expansion_slot_device::diag_r )
 //  irq_w - IRQ write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pet_expansion_slot_device::irq_w )
+void pet_expansion_slot_device::irq_w(int state)
 {
 	if (m_card) m_card->pet_irq_w(state);
 }

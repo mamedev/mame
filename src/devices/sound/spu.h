@@ -25,8 +25,9 @@ class spu_device : public device_t, public device_sound_interface
 		dirtyflag_irq=0x04000000
 	};
 
+	sound_stream_flags m_stream_flags;
+
 protected:
-	static constexpr unsigned int spu_base_frequency_hz=44100;
 	class reverb;
 
 	// device-level overrides
@@ -37,14 +38,13 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	static constexpr float ms_to_rate(float ms) { return 1.0f / (ms * (float(spu_base_frequency_hz) / 1000.0f)); }
-	static constexpr float s_to_rate(float s) { return ms_to_rate(s * 1000.0f); }
-	static const float linear_rate[];
-	static const float pos_exp_rate[];
-	static const float neg_exp_rate[];
-	static const float decay_rate[];
-	static const float linear_release_rate[];
-	static const float exp_release_rate[];
+	float spu_base_frequency_hz;
+	float linear_rate[108];
+	float pos_exp_rate[100];
+	float neg_exp_rate[108];
+	float decay_rate[16];
+	float linear_release_rate[27];
+	float exp_release_rate[27];
 
 	// internal state
 	devcb_write_line m_irq_handler;
@@ -145,6 +145,9 @@ protected:
 	static reverb_preset reverb_presets[];
 	static reverb_params *spu_reverb_cfg;
 
+	float ms_to_rate(float ms) const { return 1.0f / (ms * (spu_base_frequency_hz / 1000.0f)); }
+	float s_to_rate(float s) const { return ms_to_rate(s * 1000.0f); }
+
 	void key_on(const int v);
 	void key_off(const int v);
 	bool update_envelope(const int v);
@@ -187,17 +190,25 @@ protected:
 	void write_cache_pointer(outfile *fout, cache_pointer *cp, sample_loop_cache *lc=nullptr);
 	void read_cache_pointer(infile *fin, cache_pointer *cp, sample_loop_cache **lc=nullptr);
 #endif
-	static float get_linear_rate(const int n);
-	static float get_linear_rate_neg_phase(const int n);
-	static float get_pos_exp_rate(const int n);
-	static float get_pos_exp_rate_neg_phase(const int n);
-	static float get_neg_exp_rate(const int n);
-	static float get_neg_exp_rate_neg_phase(const int n);
-	static float get_decay_rate(const int n);
-	static float get_sustain_level(const int n);
-	static float get_linear_release_rate(const int n);
-	static float get_exp_release_rate(const int n);
-	static reverb_preset *find_reverb_preset(const unsigned short *param);
+
+	void generate_linear_rate_table();
+	void generate_pos_exp_rate_table();
+	void generate_neg_exp_rate_table();
+	void generate_decay_rate_table();
+	void generate_linear_release_rate_table();
+	void generate_exp_release_rate_table();
+
+	float get_linear_rate(const int n);
+	float get_linear_rate_neg_phase(const int n);
+	float get_pos_exp_rate(const int n);
+	float get_pos_exp_rate_neg_phase(const int n);
+	float get_neg_exp_rate(const int n);
+	float get_neg_exp_rate_neg_phase(const int n);
+	float get_decay_rate(const int n);
+	float get_sustain_level(const int n);
+	float get_linear_release_rate(const int n);
+	float get_exp_release_rate(const int n);
+	reverb_preset *find_reverb_preset(const unsigned short *param);
 
 public:
 	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
@@ -205,6 +216,7 @@ public:
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
+	void set_stream_flags(sound_stream_flags flags) { m_stream_flags = flags; }
 
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );

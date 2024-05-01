@@ -37,7 +37,6 @@
 #pragma once
 
 #include "imagedev/cartrom.h"
-#include "formats/cbm_crt.h"
 
 
 //**************************************************************************
@@ -73,27 +72,27 @@ public:
 	// computer interface
 	uint8_t cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
 	void cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
-	DECLARE_READ_LINE_MEMBER( p0_r );
-	DECLARE_WRITE_LINE_MEMBER( p0_w );
+	int p0_r();
+	void p0_w(int state);
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( res_w ) { m_write_res(state); }
-	DECLARE_WRITE_LINE_MEMBER( cnt_w ) { m_write_cnt(state); }
-	DECLARE_WRITE_LINE_MEMBER( sp_w ) { m_write_sp(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void res_w(int state) { m_write_res(state); }
+	void cnt_w(int state) { m_write_cnt(state); }
+	void sp_w(int state) { m_write_sp(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "vic10_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "80,e0"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	devcb_write_line   m_write_irq;

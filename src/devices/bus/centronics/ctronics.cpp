@@ -51,25 +51,6 @@ void centronics_device::device_reset()
 
 void centronics_device::device_start()
 {
-	m_strobe_handler.resolve_safe();
-	m_data0_handler.resolve_safe();
-	m_data1_handler.resolve_safe();
-	m_data2_handler.resolve_safe();
-	m_data3_handler.resolve_safe();
-	m_data4_handler.resolve_safe();
-	m_data5_handler.resolve_safe();
-	m_data6_handler.resolve_safe();
-	m_data7_handler.resolve_safe();
-	m_ack_handler.resolve_safe();
-	m_busy_handler.resolve_safe();
-	m_perror_handler.resolve_safe();
-	m_select_handler.resolve_safe();
-	m_autofd_handler.resolve_safe();
-	m_fault_handler.resolve_safe();
-	m_init_handler.resolve_safe();
-	m_sense_handler.resolve_safe();
-	m_select_in_handler.resolve_safe();
-
 	m_sense_handler(0);
 
 	// pull up
@@ -104,23 +85,23 @@ void centronics_device::set_output_latch(output_latch_device &latch)
 	latch.bit_handler<7>().set(*this, FUNC(centronics_device::write_data7));
 }
 
-WRITE_LINE_MEMBER( centronics_device::write_strobe ) { if (m_dev) m_dev->input_strobe(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data0 ) { if (m_dev) m_dev->input_data0(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data1 ) { if (m_dev) m_dev->input_data1(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data2 ) { if (m_dev) m_dev->input_data2(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data3 ) { if (m_dev) m_dev->input_data3(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data4 ) { if (m_dev) m_dev->input_data4(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data5 ) { if (m_dev) m_dev->input_data5(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data6 ) { if (m_dev) m_dev->input_data6(state); }
-WRITE_LINE_MEMBER( centronics_device::write_data7 ) { if (m_dev) m_dev->input_data7(state); }
-WRITE_LINE_MEMBER( centronics_device::write_ack ) { if (m_dev) m_dev->input_ack(state); }
-WRITE_LINE_MEMBER( centronics_device::write_busy ) { if (m_dev) m_dev->input_busy(state); }
-WRITE_LINE_MEMBER( centronics_device::write_perror ) { if (m_dev) m_dev->input_perror(state); }
-WRITE_LINE_MEMBER( centronics_device::write_select ) { if (m_dev) m_dev->input_select(state); }
-WRITE_LINE_MEMBER( centronics_device::write_autofd ) { if (m_dev) m_dev->input_autofd(state); }
-WRITE_LINE_MEMBER( centronics_device::write_fault ) { if (m_dev) m_dev->input_fault(state); }
-WRITE_LINE_MEMBER( centronics_device::write_init ) { if (m_dev) m_dev->input_init(state); }
-WRITE_LINE_MEMBER( centronics_device::write_select_in ) { if (m_dev) m_dev->input_select_in(state); }
+void centronics_device::write_strobe(int state) { if (m_dev) m_dev->input_strobe(state); }
+void centronics_device::write_data0(int state) { if (m_dev) m_dev->input_data0(state); }
+void centronics_device::write_data1(int state) { if (m_dev) m_dev->input_data1(state); }
+void centronics_device::write_data2(int state) { if (m_dev) m_dev->input_data2(state); }
+void centronics_device::write_data3(int state) { if (m_dev) m_dev->input_data3(state); }
+void centronics_device::write_data4(int state) { if (m_dev) m_dev->input_data4(state); }
+void centronics_device::write_data5(int state) { if (m_dev) m_dev->input_data5(state); }
+void centronics_device::write_data6(int state) { if (m_dev) m_dev->input_data6(state); }
+void centronics_device::write_data7(int state) { if (m_dev) m_dev->input_data7(state); }
+void centronics_device::write_ack(int state) { if (m_dev) m_dev->input_ack(state); }
+void centronics_device::write_busy(int state) { if (m_dev) m_dev->input_busy(state); }
+void centronics_device::write_perror(int state) { if (m_dev) m_dev->input_perror(state); }
+void centronics_device::write_select(int state) { if (m_dev) m_dev->input_select(state); }
+void centronics_device::write_autofd(int state) { if (m_dev) m_dev->input_autofd(state); }
+void centronics_device::write_fault(int state) { if (m_dev) m_dev->input_fault(state); }
+void centronics_device::write_init(int state) { if (m_dev) m_dev->input_init(state); }
+void centronics_device::write_select_in(int state) { if (m_dev) m_dev->input_select_in(state); }
 
 
 // class device_centronics_peripheral_interface
@@ -142,10 +123,12 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "epson_lx810l.h"
 #include "nec_p72.h"
 #include "printer.h"
+#include "digiblst.h"
 #include "covox.h"
 #include "samdac.h"
 #include "chessmec.h"
 #include "smartboard.h"
+#include "nlq401.h"
 
 void centronics_devices(device_slot_interface &device)
 {
@@ -156,9 +139,11 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("ap2000", EPSON_AP2000);
 	device.option_add("p72", NEC_P72);
 	device.option_add("printer", CENTRONICS_PRINTER);
+	device.option_add("digiblst", CENTRONICS_DIGIBLASTER);
 	device.option_add("covox", CENTRONICS_COVOX);
 	device.option_add("covox_stereo", CENTRONICS_COVOX_STEREO);
 	device.option_add("samdac", CENTRONICS_SAMDAC);
 	device.option_add("chessmec", CENTRONICS_CHESSMEC);
 	device.option_add("smartboard", CENTRONICS_SMARTBOARD);
+	device.option_add("nlq401", NLQ401);
 }

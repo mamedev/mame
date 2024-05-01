@@ -16,7 +16,7 @@ public:
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void set_fb_width(int width) { m_fb_width = width; }
 	void set_fb_height(int height) { m_fb_height = height; }

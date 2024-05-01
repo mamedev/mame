@@ -104,7 +104,7 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -113,6 +113,9 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 #include "tilemap.h"
 
 #include <algorithm>
+
+
+namespace {
 
 class dreamwld_state : public driver_device
 {
@@ -188,7 +191,7 @@ private:
 	template<int Chip> void okibank_w(u8 data);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void baryon_map(address_map &map);
 	void dreamwld_map(address_map &map);
@@ -307,7 +310,7 @@ void dreamwld_state::video_start()
 
 }
 
-WRITE_LINE_MEMBER(dreamwld_state::screen_vblank)
+void dreamwld_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -1259,6 +1262,9 @@ ROM_START( gaialast )
 	ROM_REGION( 0x10000, "unknown", 0 )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )

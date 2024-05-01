@@ -44,6 +44,8 @@ Dumped: 06/04/2009 f205v
 #include "speaker.h"
 
 
+namespace {
+
 class murogmbl_state : public driver_device
 {
 public:
@@ -418,6 +420,9 @@ ROM_START(slotunbl)
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, empty_init, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 

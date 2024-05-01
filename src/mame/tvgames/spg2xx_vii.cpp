@@ -9,6 +9,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class vii_state : public spg2xx_game_state
 {
 public:
@@ -134,18 +136,15 @@ TIMER_CALLBACK_MEMBER(vii_state::poll_controls)
 
 DEVICE_IMAGE_LOAD_MEMBER(vii_state::cart_load_vii)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if (size < 0x800000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size < 0x80'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be at least 8M)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void vii_state::vii(machine_config &config)
@@ -170,6 +169,9 @@ ROM_START( vii )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
+
+} // anonymous namespace
+
 
 // Jungle Soft TV games
 CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,      "Jungle Soft / KenSingTon / Siatronics",       "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part

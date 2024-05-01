@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_COMX35_H
-#define MAME_INCLUDES_COMX35_H
+#ifndef MAME_COMX_COMX35_H
+#define MAME_COMX_COMX35_H
 
 #include "bus/comx35/exp.h"
 #include "cpu/cosmac/cosmac.h"
@@ -77,14 +77,14 @@ private:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	void cdp1869_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef4_r();
+	void q_w(int state);
 	void sc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( prd_w );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
+	void irq_w(int state);
+	void prd_w(int state);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
@@ -103,4 +103,4 @@ private:
 	int m_cr1 = 0;                  // interrupt enable
 };
 
-#endif
+#endif // MAME_COMX_COMX35_H

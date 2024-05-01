@@ -40,6 +40,8 @@ TODO:
 #include "tilemap.h"
 
 
+namespace {
+
 class rmhaihai_state : public driver_device
 {
 public:
@@ -780,10 +782,12 @@ void rmhaihai_state::init_rmhaihai()
 	}
 }
 
+} // anonymous namespace
+
 
 GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
 GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan, set 1)", MACHINE_SUPPORTS_SAVE )

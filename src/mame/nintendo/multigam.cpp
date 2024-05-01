@@ -107,12 +107,14 @@ Eproms are 27512,27010,274001
 */
 
 #include "emu.h"
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "video/ppu2c0x.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class multigam_state : public driver_device
 {
@@ -139,7 +141,7 @@ public:
 	void init_multigam();
 	void init_multigm3();
 
-	DECLARE_READ_LINE_MEMBER(multigam_inputs_r);
+	int multigam_inputs_r();
 
 protected:
 	virtual void machine_start() override;
@@ -147,7 +149,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_ioport m_p1;
 	required_ioport m_p2;
@@ -191,7 +193,6 @@ private:
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
 
-	void sprite_dma_w(address_space &space, uint8_t data);
 	uint8_t multigam_IN0_r();
 	void multigam_IN0_w(uint8_t data);
 	uint8_t multigam_IN1_r();
@@ -281,18 +282,6 @@ void multigam_state::set_videoram_bank( int start, int count, int bank, int bank
 	}
 }
 
-/******************************************************
-
-   NES interface
-
-*******************************************************/
-
-void multigam_state::sprite_dma_w(address_space &space, uint8_t data)
-{
-	int source = (data & 7);
-	m_ppu->spriteram_dma(space, source);
-}
-
 
 /******************************************************
 
@@ -328,7 +317,7 @@ uint8_t multigam_state::multigam_IN1_r()
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-READ_LINE_MEMBER(multigam_state::multigam_inputs_r)
+int multigam_state::multigam_inputs_r()
 {
 	/* bit 0: serial input (dsw)
 	   bit 1: coin */
@@ -395,7 +384,7 @@ void multigam_state::multigam_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x0800, 0x0fff).ram(); /* additional RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
 	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
 	map(0x5000, 0x5ffe).rom();
@@ -414,7 +403,7 @@ void multigam_state::multigmt_map(address_map &map)
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 	map(0x3000, 0x3000).w(FUNC(multigam_state::multigam_switch_prg_rom));
 	map(0x3fff, 0x3fff).w(FUNC(multigam_state::multigam_switch_gfx_rom));
-	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
 	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));     /* IN1 - input port 2 / PSG second control register */
 	map(0x5000, 0x5ffe).rom();
@@ -686,7 +675,7 @@ void multigam_state::multigm3_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x0800, 0x0fff).ram(); /* additional RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
 	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
 	map(0x5001, 0x5001).w(FUNC(multigam_state::multigm3_switch_prg_rom));
@@ -980,7 +969,7 @@ void multigam_state::supergm3_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x0800, 0x0fff).ram(); /* additional RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
 	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
 	map(0x4fff, 0x4fff).portr("IN0");
@@ -1184,7 +1173,7 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 void multigam_state::multigam(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigam_map);
 
 	/* video hardware */
@@ -1321,7 +1310,6 @@ ROM_START( multigmt )
 	ROM_LOAD( "r11.7", 0x00000, 0x20000, CRC(e6fdcabb) SHA1(9ff3adb61b81d5cac4e88520fe4281414d7e5311) )
 	ROM_LOAD( "4.27",  0x20000, 0x10000, CRC(e6ed25fe) SHA1(e5723efab5652da3b276b13cd72ca5dc14f37a8b) )
 	ROM_LOAD( "10.72", 0x30000, 0x10000, CRC(43f393ee) SHA1(4a307264bedfe77286a6dde47a7f1009a2698ab5) )
-
 ROM_END
 
 ROM_START( sgmt1 )
@@ -1416,6 +1404,9 @@ void multigam_state::init_multigmt()
 
 	multigam_switch_prg_rom(0x01);
 }
+
+} // anonymous namespace
+
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )

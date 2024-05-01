@@ -6,8 +6,8 @@
 *
 *
 */
-#ifndef MAME_MACHINE_DECIOGA_H
-#define MAME_MACHINE_DECIOGA_H
+#ifndef MAME_DEC_DECIOGA_H
+#define MAME_DEC_DECIOGA_H
 
 #pragma once
 
@@ -20,10 +20,10 @@ public:
 	void map(address_map &map);
 
 	// irq inputs
-	DECLARE_WRITE_LINE_MEMBER(rtc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(lance_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scc0_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scc1_irq_w);
+	void rtc_irq_w(int state);
+	void lance_irq_w(int state);
+	void scc0_irq_w(int state);
+	void scc1_irq_w(int state);
 
 	// multiplex irq output
 	auto irq_out() { return m_irq_out_cb.bind(); }
@@ -59,4 +59,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECSTATION_IOGA, dec_ioga_device)
 
-#endif // MAME_MACHINE_DECIOGA_H
+#endif // MAME_DEC_DECIOGA_H

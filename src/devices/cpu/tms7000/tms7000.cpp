@@ -119,7 +119,7 @@ tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, d
 tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
-	m_port_in_cb(*this),
+	m_port_in_cb(*this, 0xff),
 	m_port_out_cb(*this),
 	m_info_flags(info_flags),
 	m_divider(2)
@@ -203,9 +203,6 @@ void tms7000_device::device_start()
 
 	m_irq_state[TMS7000_INT1_LINE] = false;
 	m_irq_state[TMS7000_INT3_LINE] = false;
-
-	m_port_in_cb.resolve_all_safe(0xff);
-	m_port_out_cb.resolve_all_safe();
 
 	m_idle_state = false;
 	m_idle_halt = false;
@@ -420,12 +417,12 @@ void tms7000_device::do_interrupt(int irqline)
 	else
 		m_icount -= 19;
 
+	standard_irq_callback(irqline, m_pc);
+
 	push8(m_sr);
 	push16(m_pc);
 	m_sr = 0;
 	m_pc = read_mem16(0xfffc - irqline * 2);
-
-	standard_irq_callback(irqline);
 }
 
 

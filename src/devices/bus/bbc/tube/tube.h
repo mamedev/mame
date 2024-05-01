@@ -73,7 +73,7 @@ public:
 	uint8_t host_r(offs_t offset);
 	void host_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
 
 protected:
 	// device-level overrides
@@ -100,7 +100,7 @@ public:
 protected:
 	device_bbc_tube_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_tube_slot_device *m_slot;
+	bbc_tube_slot_device *const m_slot;
 };
 
 

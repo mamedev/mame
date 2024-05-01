@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_VC4000_H
-#define MAME_AUDIO_VC4000_H
+#ifndef MAME_INTERTON_VC4000_A_H
+#define MAME_INTERTON_VC4000_A_H
 
 #pragma once
 
@@ -43,4 +43,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VC4000_SND, vc4000_sound_device)
 
-#endif // MAME_AUDIO_VC4000_H
+#endif // MAME_INTERTON_VC4000_A_H

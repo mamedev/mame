@@ -47,21 +47,21 @@ protected:
 
 private:
 	// PHI write CBs
-	DECLARE_WRITE_LINE_MEMBER(phi_eoi_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_dav_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_nrfd_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_ndac_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_ifc_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_srq_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_atn_w);
-	DECLARE_WRITE_LINE_MEMBER(phi_ren_w);
+	void phi_eoi_w(int state);
+	void phi_dav_w(int state);
+	void phi_nrfd_w(int state);
+	void phi_ndac_w(int state);
+	void phi_ifc_w(int state);
+	void phi_srq_w(int state);
+	void phi_atn_w(int state);
+	void phi_ren_w(int state);
 
 	// PHI DIO r/w CBs
 	uint8_t phi_dio_r();
 	void phi_dio_w(uint8_t data);
 
 	// PHI IRQ/Z80 NMI
-	DECLARE_WRITE_LINE_MEMBER(phi_int_w);
+	void phi_int_w(int state);
 
 	// Z80 IRQ
 	void z80_m1_w(uint8_t data);
@@ -105,7 +105,7 @@ private:
 
 	required_device<z80_device> m_cpu;
 	required_device<phi_device> m_phi;
-	required_device<floppy_connector> m_drives[ 2 ];
+	required_device_array<floppy_connector, 2> m_drives;
 	required_ioport m_switches;
 
 	bool m_cpu_irq;

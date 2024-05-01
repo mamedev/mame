@@ -13,7 +13,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/tube.h"
+#include "tube.h"
 
 
 
@@ -46,13 +46,6 @@ tube_device::tube_device(const machine_config &mconfig, const char *tag, device_
 
 void tube_device::device_start()
 {
-	// resolve callbacks
-	m_hirq_handler.resolve_safe();
-	m_pnmi_handler.resolve_safe();
-	m_pirq_handler.resolve_safe();
-	m_prst_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_ph1));
 	save_item(NAME(m_ph2));

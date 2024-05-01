@@ -94,7 +94,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// palette implementation
-	virtual uint32_t palette_entries() const override;
+	virtual uint32_t palette_entries() const noexcept override;
 
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
@@ -184,7 +184,7 @@ ioport_constructor nubus_spec8s3_device::device_input_ports() const
 //  palette_entries - entries in color palette
 //-------------------------------------------------
 
-uint32_t nubus_spec8s3_device::palette_entries() const
+uint32_t nubus_spec8s3_device::palette_entries() const noexcept
 {
 	return 256;
 }

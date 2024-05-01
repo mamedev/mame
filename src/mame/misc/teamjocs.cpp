@@ -38,6 +38,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class teamjocs_state : public driver_device
 {
 public:
@@ -77,6 +79,8 @@ ROM_START(diaelite)
 	ROM_REGION(0x800, "28c17", 0)
 	ROM_LOAD( "m28c17.ic13", 0x000, 0x800, CRC(4a292b0d) SHA1(1f86e52b52ed53a7a8197e1ee394876dfc51fb91) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(199?, diaelite, 0, teamjocs, teamjocs, teamjocs_state, empty_init, ROT0, "Recreativos Presas", "Diana Elite", MACHINE_IS_SKELETON_MECHANICAL)

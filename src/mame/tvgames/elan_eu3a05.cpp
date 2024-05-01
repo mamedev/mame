@@ -223,6 +223,9 @@ Set 5043 bit 0 low
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+
+namespace {
+
 class elan_eu3a05_state : public driver_device
 {
 public:
@@ -286,12 +289,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_end0) { m_sys->generate_custom_interrupt(2); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end1) { m_sys->generate_custom_interrupt(3); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end2) { m_sys->generate_custom_interrupt(4); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end3) { m_sys->generate_custom_interrupt(5); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
-	DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
+	void sound_end0(int state) { m_sys->generate_custom_interrupt(2); }
+	void sound_end1(int state) { m_sys->generate_custom_interrupt(3); }
+	void sound_end2(int state) { m_sys->generate_custom_interrupt(4); }
+	void sound_end3(int state) { m_sys->generate_custom_interrupt(5); }
+	void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
+	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 };
 
 class elan_eu3a05_buzztime_state : public elan_eu3a05_state
@@ -359,18 +362,15 @@ void elan_eu3a05_buzztime_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if (size != 0x200000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size != 0x20'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (only 2M supported)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_NATIVE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
@@ -613,6 +613,31 @@ static INPUT_PORTS_START( sudoku )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sudoku2p )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( carlecfg )
@@ -913,6 +938,14 @@ ROM_START( sudelan )
 	ROM_RELOAD(0x200000,0x200000)
 ROM_END
 
+ROM_START( sudoku2p )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "1596.bin", 0x00000, 0x100000, CRC(fe8ce5bc) SHA1(8fb1463c6d349e07f6483da2b6cce10a4f25fcec) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
 
 
 ROM_START( carlecfg )
@@ -922,6 +955,13 @@ ROM_START( carlecfg )
 	ROM_RELOAD(0x200000,0x100000)
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
+
+ROM_START( pvmil8 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "millionare_8bit.bin", 0x000000, 0x200000, CRC(8934a8d6) SHA1(24681e06d02f1567a57b84ec1c6f0a23a5f308ac) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
 
 ROM_START( pvmilfin )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -972,6 +1012,9 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 	ROM[0x3f8d94] = 0xea;
 }
 
+} // anonymous namespace
+
+
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
 CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
@@ -987,10 +1030,15 @@ CONS( 2006, sudelan3, 0,        0, elan_sudoku,      sudoku,   elan_eu3a05_state
 // Senario also distributed this version in the US without the '3 in 1' text on the box, ROM has not been verified to match
 CONS( 2005, sudelan, 0,         0, elan_sudoku_pal,  sudoku,   elan_eu3a05_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
 
-CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+CONS( 2005, sudoku2p, 0,        0, elan_sudoku_pal,  sudoku2p, elan_eu3a05_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
 
+CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+
+// this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
+// however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit
+CONS( 2005, pvmil8,   0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmilfin, pvmil8,   0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
 
 CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 

@@ -643,7 +643,7 @@ NETLIST_START(stuntcyc)
 	ALIAS(R2, M8.QB)
 	ALIAS(R3, M8.QC)
 
-//	TTL_74193(L8, FIXED_RAMP_ZONE_Q, FIXED_RAMP_ZONE, P, P, JUMP_Q, LOAD_Q, P, GRAVITY) // Schematics say C and D should be to VCC - maybe ground instead?
+//  TTL_74193(L8, FIXED_RAMP_ZONE_Q, FIXED_RAMP_ZONE, P, P, JUMP_Q, LOAD_Q, P, GRAVITY) // Schematics say C and D should be to VCC - maybe ground instead?
 // changed C,D to GROUND and bike will jump, so maybe schematics incorrect
 	TTL_74193(L8, FIXED_RAMP_ZONE_Q, FIXED_RAMP_ZONE, GROUND, GROUND, JUMP_Q, LOAD_Q, P, GRAVITY) // Schematics say C and D should be to VCC - maybe ground instead?
 

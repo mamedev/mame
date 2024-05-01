@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Allard van der Bas
+// copyright-holders: Allard van der Bas
+
 /***************************************************************************
 
 Vastar memory map (preliminary)
@@ -73,24 +74,24 @@ Bottom Bord DVL/B-V
 
 The PCB seems to be a bootleg/prototype:
 On the upper board there are some pads for jumpers , some empty spaces left unpopulated for additional TTLs and an XTAL.
-All 5 sockets for 2732 eproms were modified to accept 2764 eproms.
+All 5 sockets for 2732 EPROMs were modified to accept 2764 EPROMs.
 The AY8910 pin 26 (TEST 2) is grounded with a flying wire
 Lack of manufacturer on title/copyright screen (there is room in the ROM - 15 characters - after the year string for a copyright message,
   however it is filled with the 'string termination' character rather than a string.)
 
 Upper board chips:
-5x 2764 eproms
-1x 2128 static ram (2k ram)
+5x 2764 EPROMs
+1x 2128 static RAM (2k RAM)
 2x z80B
 1x AY8910
 2x 8 positions dipswitches
 
 Bottom Board chips:
-5x 2764 eproms
-2x 2128 static ram (2kx8 ram)
-4x 93422 DRAM (256x4 dram)
+5x 2764 EPROMs
+2x 2128 static RAM (2kx8 RAM)
+4x 93422 DRAM (256x4 DRAM)
 1x 6301 PROM (probably used for background ?)
-3x 82s129 Colour PROMS (connected to resistors)
+3x 82s129 Colour PROMs (connected to resistors)
 
 Clocks measured:
 
@@ -103,15 +104,94 @@ Vsync : 60.58hz
 
 
 #include "emu.h"
-#include "vastar.h"
+
+#include "orca40c.h"
+#include "vastar_viddev.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "orca40c.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+// configurable logging
+#define LOG_PRIORITY     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PRIORITY)
+
+#include "logmacro.h"
+
+#define LOGPRIORITY(...)     LOGMASKED(LOG_PRIORITY,     __VA_ARGS__)
+
+
+namespace {
+
+class vastar_common_state : public driver_device
+{
+public:
+	vastar_common_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_sharedram(*this, "sharedram")
+	{ }
+
+	void common(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+
+	required_shared_ptr<uint8_t> m_sharedram;
+
+	uint8_t m_nmi_mask = 0;
+
+	void nmi_mask_w(int state);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	void cpu2_map(address_map &map);
+	void cpu2_port_map(address_map &map);
+	void main_port_map(address_map &map);
+};
+
+class vastar_state : public vastar_common_state
+{
+public:
+	vastar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vastar_common_state(mconfig, type, tag),
+		m_vasvid(*this, "vasvid")
+	{ }
+
+	void vastar(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<vastar_video_device> m_vasvid;
+
+	void main_map(address_map &map);
+};
+
+class dogfightp_state : public vastar_common_state
+{
+public:
+	dogfightp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vastar_common_state(mconfig, type, tag)
+	{ }
+
+	void dogfightp(machine_config &config);
+
+private:
+	void main_map(address_map &map);
+};
 
 
 void vastar_common_state::machine_start()
@@ -121,35 +201,22 @@ void vastar_common_state::machine_start()
 
 void vastar_state::machine_reset()
 {
-	m_sprite_priority[0] = 0;
-
-	m_spriteram1 = m_fgvideoram + 0x000;
-	m_bg1_scroll = m_fgvideoram + 0x3c0;
-	m_bg2_scroll = m_fgvideoram + 0x3e0;
-	m_spriteram2 = m_fgvideoram + 0x400;
-	m_spriteram3 = m_fgvideoram + 0x800;
 }
 
-WRITE_LINE_MEMBER(vastar_state::flip_screen_w)
-{
-	flip_screen_set(state);
-}
-
-WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
+void vastar_common_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 }
 
-
 void vastar_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(FUNC(vastar_state::bg2videoram_w)).share("bg2videoram").mirror(0x2000);
-	map(0x9000, 0x9fff).ram().w(FUNC(vastar_state::bg1videoram_w)).share("bg1videoram").mirror(0x2000);
-	map(0xc000, 0xc000).writeonly().share("sprite_priority");   /* sprite/BG priority */
-	map(0xc400, 0xcfff).ram().w(FUNC(vastar_state::fgvideoram_w)).share("fgvideoram"); // fg videoram + sprites
+	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<1>)).share("bg1videoram").mirror(0x2000);
+	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<0>)).share("bg0videoram").mirror(0x2000);
+	map(0xc000, 0xc000).w(m_vasvid, FUNC(vastar_video_device::priority_w));
+	map(0xc400, 0xcfff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("fgvideoram");
 	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0xf000, 0xf7ff).ram().share("sharedram");
+	map(0xf000, 0xf7ff).ram().share(m_sharedram);
 }
 
 void vastar_common_state::main_port_map(address_map &map)
@@ -162,7 +229,7 @@ void vastar_common_state::main_port_map(address_map &map)
 void vastar_common_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x47ff).ram().share("sharedram");
+	map(0x4000, 0x47ff).ram().share(m_sharedram);
 	map(0x8000, 0x8000).portr("P2");
 	map(0x8040, 0x8040).portr("P1");
 	map(0x8080, 0x8080).portr("SYSTEM");
@@ -175,7 +242,7 @@ void vastar_common_state::cpu2_port_map(address_map &map)
 	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 }
 
-void dogfightp_state::dogfightp_main_map(address_map &map)
+void dogfightp_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x9000, 0x903f).ram().w("videopcb", FUNC(orca_ovg_40c_device::attributes_w)).share("videopcb:attributeram");
@@ -185,7 +252,7 @@ void dogfightp_state::dogfightp_main_map(address_map &map)
 	map(0xa000, 0xa3ff).ram().w("videopcb", FUNC(orca_ovg_40c_device::videoram_w)).share("videopcb:videoram");
 	map(0xb000, 0xb3ff).ram().w("videopcb", FUNC(orca_ovg_40c_device::videoram2_w)).share("videopcb:videoram_2");
 	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0xf000, 0xf7ff).ram().share("sharedram");
+	map(0xf000, 0xf7ff).ram().share(m_sharedram);
 }
 
 static INPUT_PORTS_START( vastar )
@@ -374,52 +441,6 @@ static INPUT_PORTS_START( pprobe )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8
-};
-
-static const gfx_layout spritelayoutdw =
-{
-	16,32,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
-			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
-			96*8, 97*8, 98*8, 99*8, 100*8, 101*8, 102*8, 103*8 },
-	128*8
-};
-
-static GFXDECODE_START( gfx_vastar )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayoutdw, 0, 64 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0, 64 )
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout,     0, 64 )
-GFXDECODE_END
 
 
 INTERRUPT_GEN_MEMBER(vastar_common_state::vblank_irq)
@@ -430,16 +451,16 @@ INTERRUPT_GEN_MEMBER(vastar_common_state::vblank_irq)
 
 void vastar_common_state::common(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(18'432'000) / 6);
 	m_maincpu->set_addrmap(AS_IO, &vastar_common_state::main_port_map);
 
-	Z80(config, m_subcpu, XTAL(18'432'000)/6);
+	Z80(config, m_subcpu, XTAL(18'432'000) / 6);
 	m_subcpu->set_addrmap(AS_PROGRAM, &vastar_common_state::cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &vastar_common_state::cpu2_port_map);
-	m_subcpu->set_periodic_int(FUNC(vastar_common_state::irq0_line_hold), attotime::from_hz(242)); /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
+	m_subcpu->set_periodic_int(FUNC(vastar_common_state::irq0_line_hold), attotime::from_hz(242)); // 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now
 
-	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(vastar_common_state::nmi_mask_w));
@@ -447,10 +468,10 @@ void vastar_common_state::common(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000)/12));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000) / 12));
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -461,30 +482,34 @@ void vastar_state::vastar(machine_config &config)
 	common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &vastar_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vastar_common_state::vblank_irq));
+	m_maincpu->set_vblank_int("screen", FUNC(vastar_state::vblank_irq));
 
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
-	mainlatch.q_out_cb<1>().set(FUNC(vastar_state::flip_screen_w));
+	mainlatch.q_out_cb<1>().set(m_vasvid, FUNC(vastar_video_device::flipscreen_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60.58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(vastar_state::screen_update));
-	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vastar);
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	m_vasvid->set_screen("screen");
+	m_vasvid->set_bg_bases(0x800, 0x000, 0xc00);
+	m_vasvid->set_fg_bases(0x800, 0x400, 0x000);
+	m_vasvid->set_other_bases(0x000, 0x400, 0x800, 0x3c0, 0x3e0);
+	m_vasvid->set_bg0ram_tag("bg0videoram");
+	m_vasvid->set_bg1ram_tag("bg1videoram");
+	m_vasvid->set_fgram_tag("fgvideoram");
 }
 
 void dogfightp_state::dogfightp(machine_config &config)
 {
 	common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &dogfightp_state::dogfightp_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vastar_common_state::vblank_irq));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dogfightp_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dogfightp_state::vblank_irq));
 
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
 	mainlatch.q_out_cb<1>().set("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
@@ -513,30 +538,30 @@ ROM_START( vastar )
 	ROM_LOAD( "e_n7.rom",     0x6000, 0x1000, CRC(31b6be39) SHA1(be0d03db9c6c8982b2f38ad534a6e213bbde1802) )
 	ROM_LOAD( "e_n5.rom",     0x7000, 0x1000, CRC(f63f0e78) SHA1(a029e340b11b358dbe0dcf2d1a0e6c6c093bbc9d) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "e_f2.rom",     0x0000, 0x1000, CRC(713478d8) SHA1(9cbd1fb689d93a8964f48e59d4effaa4878b2945) )
 	ROM_LOAD( "e_j2.rom",     0x1000, 0x1000, CRC(e4535442) SHA1(280d93bec5cf6183250827ce70ed5ddff968bba5) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "fgtiles", 0 )
 	ROM_LOAD( "c_c9.rom",     0x0000, 0x2000, CRC(34f067b6) SHA1(45d7f8be5bd1dc9e5e511aa2e99c216c5ff12273) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "c_f7.rom",     0x0000, 0x2000, CRC(edbf3b13) SHA1(9d6ddf16e83c68c831fec28607584471b5cbcbd2) )
 	ROM_LOAD( "c_f9.rom",     0x2000, 0x2000, CRC(8f309e22) SHA1(f5bbc5cf70687415061a0674e273e20fbfcc1f8f) )
 
-	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_REGION( 0x2000, "bgtiles0", 0 )
 	ROM_LOAD( "c_n4.rom",     0x0000, 0x2000, CRC(b5f9c866) SHA1(17fc38cd40638e4f5d25c0cae70df3b8f03425dd) )
 
-	ROM_REGION( 0x2000, "gfx4", 0 )
+	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    /* red component */
-	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    /* green component */
-	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    /* blue component */
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
+	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
+	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
+	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
-	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    /* ???? */
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
+	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
 ROM_START( vastar2 )
@@ -550,30 +575,30 @@ ROM_START( vastar2 )
 	ROM_LOAD( "10.6n",        0x6000, 0x1000, CRC(80df74ba) SHA1(5cbc75fb96ad6d63186ec42a5e9af6aae209d78f) )
 	ROM_LOAD( "9.5n",         0x7000, 0x1000, CRC(239ec84e) SHA1(8b516c63d858d5c4acc3701a9abf9c3d53ddf7ff) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "e_f2.rom",     0x0000, 0x1000, CRC(713478d8) SHA1(9cbd1fb689d93a8964f48e59d4effaa4878b2945) )
 	ROM_LOAD( "e_j2.rom",     0x1000, 0x1000, CRC(e4535442) SHA1(280d93bec5cf6183250827ce70ed5ddff968bba5) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "fgtiles", 0 )
 	ROM_LOAD( "c_c9.rom",     0x0000, 0x2000, CRC(34f067b6) SHA1(45d7f8be5bd1dc9e5e511aa2e99c216c5ff12273) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "c_f7.rom",     0x0000, 0x2000, CRC(edbf3b13) SHA1(9d6ddf16e83c68c831fec28607584471b5cbcbd2) )
 	ROM_LOAD( "c_f9.rom",     0x2000, 0x2000, CRC(8f309e22) SHA1(f5bbc5cf70687415061a0674e273e20fbfcc1f8f) )
 
-	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_REGION( 0x2000, "bgtiles0", 0 )
 	ROM_LOAD( "c_n4.rom",     0x0000, 0x2000, CRC(b5f9c866) SHA1(17fc38cd40638e4f5d25c0cae70df3b8f03425dd) )
 
-	ROM_REGION( 0x2000, "gfx4", 0 )
+	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    /* red component */
-	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    /* green component */
-	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    /* blue component */
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
+	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
+	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
+	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
-	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    /* ???? */
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
+	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
 ROM_START( vastar3 )
@@ -582,7 +607,7 @@ ROM_START( vastar3 )
 	ROM_LOAD( "vst_3.4h",     0x2000, 0x2000, CRC(2276c5d0) SHA1(1070a952c4e8a8d97036511b48656602ce8e6848) )
 	ROM_LOAD( "vst_4.4j",     0x4000, 0x2000, CRC(deca2aa1) SHA1(88920ae4c4094a748d3f3c37093186e05f1ed284) )
 	ROM_LOAD( "vst_5.6n",     0x6000, 0x2000, CRC(743ed1c7) SHA1(34b2e952113c6c2137dc0c8916276ae344a7c9df) )
-	/* same roms but split??
+	/* same ROMs but split??
 	ROM_LOAD( "e_f4.rom",     0x0000, 0x1000, CRC(fecb46d6) SHA1(2d03af431f44ff13f535e1659c1cb15cd99da4a8) )
 	ROM_LOAD( "e_k4.rom",     0x1000, 0x1000, CRC(cd45a64d) SHA1(dd08f12df013c36218a827b6423acd33b7aa6cbf) )
 	ROM_LOAD( "e_h4.rom",     0x2000, 0x1000, CRC(9b0aee71) SHA1(0439706e5f7029dea316a497fb2a0c60a358c9f5) )
@@ -593,33 +618,33 @@ ROM_START( vastar3 )
 	ROM_LOAD( "e_n5.rom",     0x7000, 0x1000, CRC(896af6c8) SHA1(b262ee3b161ec00541d629f02ece6f978beea0ac) )
 	*/
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "vst_0.2f",     0x0000, 0x1000, CRC(713478d8) SHA1(9cbd1fb689d93a8964f48e59d4effaa4878b2945) )
 	ROM_LOAD( "vst_1.2j",     0x1000, 0x1000, CRC(e4535442) SHA1(280d93bec5cf6183250827ce70ed5ddff968bba5) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "fgtiles", 0 )
 	ROM_LOAD( "c_c9.rom",     0x0000, 0x2000, CRC(34f067b6) SHA1(45d7f8be5bd1dc9e5e511aa2e99c216c5ff12273) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "c_f7.rom",     0x0000, 0x2000, CRC(edbf3b13) SHA1(9d6ddf16e83c68c831fec28607584471b5cbcbd2) )
 	ROM_LOAD( "c_f9.rom",     0x2000, 0x2000, CRC(8f309e22) SHA1(f5bbc5cf70687415061a0674e273e20fbfcc1f8f) )
 
-	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_REGION( 0x2000, "bgtiles0", 0 )
 	ROM_LOAD( "c_n4.rom",     0x0000, 0x2000, CRC(b5f9c866) SHA1(17fc38cd40638e4f5d25c0cae70df3b8f03425dd) )
 
-	ROM_REGION( 0x2000, "gfx4", 0 )
+	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    /* red component */
-	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    /* green component */
-	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    /* blue component */
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
+	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
+	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
+	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
-	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    /* ???? */
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
+	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
-ROM_START( vastar4 ) /* minimal changes (2 bytes) from parent set */
+ROM_START( vastar4 ) // minimal changes (2 bytes) from parent set
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.bin",        0x0000, 0x1000, CRC(d2b8f177) SHA1(c45941cc59873d9d2fc1ae0ce36bf76c9b8ed040) )
 	ROM_LOAD( "e_k4.rom",     0x1000, 0x1000, CRC(84531982) SHA1(bf2fd92d821734f64ad72e13f4e1aae8e055aa43) )
@@ -630,30 +655,30 @@ ROM_START( vastar4 ) /* minimal changes (2 bytes) from parent set */
 	ROM_LOAD( "e_n7.rom",     0x6000, 0x1000, CRC(31b6be39) SHA1(be0d03db9c6c8982b2f38ad534a6e213bbde1802) )
 	ROM_LOAD( "e_n5.rom",     0x7000, 0x1000, CRC(f63f0e78) SHA1(a029e340b11b358dbe0dcf2d1a0e6c6c093bbc9d) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "e_f2.rom",     0x0000, 0x1000, CRC(713478d8) SHA1(9cbd1fb689d93a8964f48e59d4effaa4878b2945) )
 	ROM_LOAD( "e_j2.rom",     0x1000, 0x1000, CRC(e4535442) SHA1(280d93bec5cf6183250827ce70ed5ddff968bba5) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "fgtiles", 0 )
 	ROM_LOAD( "c_c9.rom",     0x0000, 0x2000, CRC(34f067b6) SHA1(45d7f8be5bd1dc9e5e511aa2e99c216c5ff12273) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "c_f7.rom",     0x0000, 0x2000, CRC(edbf3b13) SHA1(9d6ddf16e83c68c831fec28607584471b5cbcbd2) )
 	ROM_LOAD( "c_f9.rom",     0x2000, 0x2000, CRC(8f309e22) SHA1(f5bbc5cf70687415061a0674e273e20fbfcc1f8f) )
 
-	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_REGION( 0x2000, "bgtiles0", 0 )
 	ROM_LOAD( "c_n4.rom",     0x0000, 0x2000, CRC(b5f9c866) SHA1(17fc38cd40638e4f5d25c0cae70df3b8f03425dd) )
 
-	ROM_REGION( 0x2000, "gfx4", 0 )
+	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    /* red component */
-	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    /* green component */
-	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    /* blue component */
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
+	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
+	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
+	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
-	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    /* ???? */
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
+	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
 ROM_START( dogfightp ) // all 2732
@@ -689,27 +714,30 @@ ROM_START( pprobe )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "pb1.bin",   0x0000, 0x2000, CRC(cd624df9) SHA1(0645ce8dc1b361904da4f6e7adc9b7de109b2d14) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "fgtiles", 0 )
 	ROM_LOAD( "pb9.bin",  0x0000, 0x2000, CRC(82294dd6) SHA1(24b8eac3d476d4a4d91dd169e26bd075b0d1bf45) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "pb8.bin",  0x0000, 0x2000, CRC(8d809e45) SHA1(70f99626acdceaadbe03de49bcf778266ddff893) )
 	ROM_LOAD( "pb10.bin", 0x2000, 0x2000, CRC(895f9dd3) SHA1(919861482598aa35a9ad476da19f9efa30904cd4) )
 
-	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_REGION( 0x2000, "bgtiles0", 0 )
 	ROM_LOAD( "pb6.bin",  0x0000, 0x2000, CRC(ff309239) SHA1(4e52833fafd54d4502ad09091fbfb1a8a2ff8828) )
 
-	ROM_REGION( 0x2000, "gfx4", 0 )
+	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "pb7.bin",  0x0000, 0x2000, CRC(439978f7) SHA1(ba80dd919a9bb6f8c516d4eb794c02ae0f0dea00) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
 	ROM_LOAD( "n82s129.3",   0x0000, 0x0100, CRC(dfb6b97c) SHA1(e35eda4f3022e661b021b952c53054d96481fb49) )
 	ROM_LOAD( "n82s129.1",   0x0100, 0x0100, CRC(3cc696a2) SHA1(0a1407c19c63ee0f02c3e8b95b0c199b9aec3ce5) )
 	ROM_LOAD( "dm74s287.2",  0x0200, 0x0100, CRC(64fea033) SHA1(19bbb325f71cb17ea069958b3c246fa908f0008e) )
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
-	ROM_LOAD( "mmi6301-1.bin",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )  /* ???? == vastar - tbp24s10.8n */
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
+	ROM_LOAD( "mmi6301-1.bin",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )  // ???? == vastar - tbp24s10.8n
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1983, vastar,    0,        vastar,    vastar,  vastar_state,    empty_init, ROT90,  "Orca (Sesame Japan license)", "Vastar (set 1)",              MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
 GAME( 1983, vastar2,   vastar,   vastar,    vastar,  vastar_state,    empty_init, ROT90,  "Orca (Sesame Japan license)", "Vastar (set 2)",              MACHINE_SUPPORTS_SAVE )

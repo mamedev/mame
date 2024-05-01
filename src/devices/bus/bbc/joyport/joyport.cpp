@@ -57,10 +57,6 @@ bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, 
 void bbc_joyport_slot_device::device_start()
 {
 	m_device = get_card_device();
-
-	// resolve callbacks
-	m_cb1_handler.resolve_safe();
-	m_cb2_handler.resolve_safe();
 }
 
 

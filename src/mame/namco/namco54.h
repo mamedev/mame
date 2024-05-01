@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_NAMCO54_H
-#define MAME_AUDIO_NAMCO54_H
+#ifndef MAME_NAMCO_NAMCO54_H
+#define MAME_NAMCO_NAMCO54_H
 
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
@@ -15,8 +15,8 @@ public:
 	template <typename T> void set_discrete(T &&tag) { m_discrete.set_tag(std::forward<T>(tag)); }
 	void set_basenote(int node) { m_basenode = node; }
 
-	DECLARE_WRITE_LINE_MEMBER( reset );
-	WRITE_LINE_MEMBER( chip_select );
+	void reset(int state);
+	void chip_select(int state);
 	void write(uint8_t data);
 
 protected:
@@ -51,4 +51,4 @@ DECLARE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device)
 #define NAMCO_54XX_P_DATA(base)     (NODE_RELATIVE(base, 3))
 
 
-#endif // MAME_AUDIO_NAMCO54_H
+#endif // MAME_NAMCO_NAMCO54_H

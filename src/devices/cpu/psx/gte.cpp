@@ -11,6 +11,8 @@
 #include "gte.h"
 
 #if 0
+#include <cstdarg>
+
 void ATTR_PRINTF(2,3) GTELOG( uint32_t pc, const char *a, ...)
 {
 	va_list va;

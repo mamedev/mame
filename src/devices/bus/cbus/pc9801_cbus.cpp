@@ -88,18 +88,6 @@ void pc9801_slot_device::device_config_complete()
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void pc9801_slot_device::device_resolve_objects()
-{
-	m_int_callback.resolve_all_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

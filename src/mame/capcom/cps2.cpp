@@ -668,6 +668,7 @@ public:
 		, m_output(*this, "output")
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
+		, m_dsw(*this, "DSW%c", 'A')
 		, m_cps2_dial_type(0)
 		, m_ecofghtr_dial_direction0(0)
 		, m_ecofghtr_dial_direction1(0)
@@ -695,7 +696,6 @@ private:
 	void gigaman2_gfx_reorder();
 	void cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t cps2_qsound_volume_r();
-	uint16_t kludge_r();
 	uint16_t joy_or_paddle_r();
 	uint16_t joy_or_paddle_ecofghtr_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
@@ -741,6 +741,7 @@ private:
 
 	optional_ioport m_io_in0;
 	optional_ioport m_io_in1;
+	optional_ioport_array<3> m_dsw;
 
 	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
@@ -1314,11 +1315,6 @@ uint16_t cps2_state::cps2_qsound_volume_r()
  *
  *************************************/
 
-uint16_t cps2_state::kludge_r()
-{
-	return 0xffff;
-}
-
 uint16_t cps2_state::joy_or_paddle_r()
 {
 	if (m_readpaddle != 0)
@@ -1417,7 +1413,7 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                                            // Unknown (xmcotaj hangs if this is 0)
+	map(0x8040b0, 0x8040b2).lr8(NAME([this](offs_t offset) { return m_dsw[offset]->read(); }));                                       // DIP switches (only present on development hardware)
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1456,7 +1452,7 @@ void cps2_state::dead_cps2_map(address_map &map)
 	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
 	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	map(0x8040b0, 0x8040b3).r(FUNC(cps2_state::kludge_r));                                                                            // Unknown (xmcotaj hangs if this is 0)
+	map(0x8040b0, 0x8040b2).lr8(NAME([this](offs_t offset) { return m_dsw[offset]->read(); }));                                       // DIP switches (only present on development hardware)
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
@@ -1543,6 +1539,93 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_START( "DIGITALVOL" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_VOLUME_UP )
+
+	// Machine configuration for dev hardware with DIPs
+	PORT_START( "HW_TYPE" )
+	PORT_CONFNAME( 0x01, 0x00, "Hardware" )
+	PORT_CONFSETTING(    0x00, "Production" )
+	PORT_CONFSETTING(    0x01, "Development (Enable Debug DIPs)" )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "1-1" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "1-2" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "1-3" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "1-4" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "1-5" ) PORT_DIPLOCATION("SW1:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "1-6" ) PORT_DIPLOCATION("SW1:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "1-7" ) PORT_DIPLOCATION("SW1:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "1-8" ) PORT_DIPLOCATION("SW1:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x00)
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, "2-1" ) PORT_DIPLOCATION("SW2:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "2-2" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "2-3" ) PORT_DIPLOCATION("SW2:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "2-4" ) PORT_DIPLOCATION("SW2:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "2-5" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "2-6" ) PORT_DIPLOCATION("SW2:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "2-7" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "2-8" ) PORT_DIPLOCATION("SW2:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x00)
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "3-1" ) PORT_DIPLOCATION("SW3:1") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "3-2" ) PORT_DIPLOCATION("SW3:2") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "3-3" ) PORT_DIPLOCATION("SW3:3") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "3-4" ) PORT_DIPLOCATION("SW3:4") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "3-5" ) PORT_DIPLOCATION("SW3:5") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "3-6" ) PORT_DIPLOCATION("SW3:6") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "3-7" ) PORT_DIPLOCATION("SW3:7") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "3-8" ) PORT_DIPLOCATION("SW3:8") PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("HW_TYPE", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 // 4 players and 3 buttons
@@ -1796,7 +1879,7 @@ void cps2_state::cps2(machine_config &config)
 	M68000(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
 
@@ -12602,7 +12685,7 @@ GAME( 1996, megaman2,   0,        cps2,     cps2_2p3b, cps2_state, init_cps2,   
 GAME( 1996, megaman2a,  megaman2, cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, rockman2j,  megaman2, cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, megaman2h,  megaman2, cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Hispanic 960712)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1996, qndream,    0,        cps2,     qndream,   cps2_state, init_cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 96086)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, qndream,    0,        cps2,     qndream,   cps2_state, init_cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsf,      0,        cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfr1,    xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xmvsfu,     xmvsf,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)",                                         MACHINE_SUPPORTS_SAVE )
@@ -12644,7 +12727,7 @@ GAME( 1997, cscluba,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,   
 GAME( 1997, csclubj,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Japan 970722)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1997, csclubjy,   csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Japan 970722, yellow case)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1997, csclubh,    csclub,   cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Capcom Sports Club (Hispanic 970722)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sgemf,      0,        cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter Mini Mix (USA 970904)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sgemf,      0,        cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (USA 970904)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pfghtj,     sgemf,    cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Pocket Fighter (Japan 970904)",                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1997, sgemfa,     sgemf,    cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Asia 970904)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1997, sgemfh,     sgemf,    cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Hispanic 970904)",                                 MACHINE_SUPPORTS_SAVE )
@@ -12732,7 +12815,7 @@ GAME( 1994, ringdstd,   ringdest, dead_cps2,     cps2_2p6b, cps2_state, init_cps
 GAME( 1994, ssf2tad,    ssf2t,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II Turbo (Asia 940223 Phoenix Edition) (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssf2xjr1d,  ssf2t,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II X: Grand Master Challenge (Japan 940223 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotar1d,  xmcota,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "X-Men: Children of the Atom (Euro 950105 Phoenix Edition) (bootleg)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, mshud,      msh,      dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Super Heroes (US 951024 Phoenix Edition) (bootleg)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, mshud,      msh,      dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Super Heroes (USA 951024 Phoenix Edition) (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, cybotsud,   cybots,   dead_cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "bootleg", "Cyberbots: Fullmetal Madness (USA 950424 Phoenix Edition) (bootleg)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, cybotsjd,   cybots,   dead_cps2,     cybots,    cps2_state, init_cps2,     ROT0,   "bootleg", "Cyberbots: Fullmetal Madness (Japan 950424) (decrypted bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1995, nwarrud,    nwarr,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Night Warriors: Darkstalkers' Revenge (USA 950406 Phoenix Edition) (bootleg)",               MACHINE_SUPPORTS_SAVE )
@@ -12750,7 +12833,7 @@ GAME( 1996, xmvsfu1d,   xmvsf,    dead_cps2,     cps2_2p6b, cps2_state, init_cps
 GAME( 1997, batcird,    batcir,   dead_cps2,     cps2_4p2b, cps2_state, init_cps2,     ROT0,   "bootleg", "Battle Circuit (Euro 970319 Phoenix Edition) (bootleg)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1997, csclub1d,   csclub,   dead_cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Capcom Sports Club (Euro 970722 Phoenix Edition) (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1997, mshvsfu1d,  mshvsf,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Super Heroes Vs. Street Fighter (USA 970625 Phoenix Edition) (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sgemfd,     sgemf,    dead_cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Gem Fighter Mini Mix (USA 970904 Phoenix Edition) (bootleg)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sgemfd,     sgemf,    dead_cps2,     cps2_2p3b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Gem Fighter: Mini Mix (USA 970904 Phoenix Edition) (bootleg)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsavd,      vsav,     dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Vampire Savior: The Lord of Vampire (Euro 970519 Phoenix Edition) (bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vhunt2d,    vhunt2,   dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970913 Phoenix Edition) (bootleg)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1997, vsav2d,     vsav2,    dead_cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Vampire Savior 2: The Lord of Vampire (Japan 970913 Phoenix Edition) (bootleg)",             MACHINE_SUPPORTS_SAVE )

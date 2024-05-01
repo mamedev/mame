@@ -9,8 +9,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_SEGAG80R
-#define MAME_AUDIO_SEGAG80R
+#ifndef MAME_SEGA_SEGAG80R_A_H
+#define MAME_SEGA_SEGAG80R_A_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(MONSTERB_SOUND, monsterb_sound_device)
 
-#endif // MAME_AUDIO_SEGAG80R
+#endif // MAME_SEGA_SEGAG80R_A_H

@@ -14,6 +14,10 @@
 #include "emu.h"
 #include "zs01.h"
 
+#include <cstdarg>
+#include <tuple>
+
+
 #define VERBOSE_LEVEL ( 0 )
 
 inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char *s_fmt, ... )
@@ -97,7 +101,7 @@ void zs01_device::device_reset()
 	m_previous_byte = 0;
 }
 
-WRITE_LINE_MEMBER( zs01_device::write_rst )
+void zs01_device::write_rst(int state)
 {
 	if( m_rst != state )
 	{
@@ -115,7 +119,7 @@ WRITE_LINE_MEMBER( zs01_device::write_rst )
 	m_rst = state;
 }
 
-WRITE_LINE_MEMBER( zs01_device::write_cs )
+void zs01_device::write_cs(int state)
 {
 	if( m_cs != state )
 	{
@@ -335,7 +339,7 @@ int zs01_device::data_offset()
 	return m_write_buffer[ 1 ] * SIZE_DATA_BUFFER;
 }
 
-WRITE_LINE_MEMBER( zs01_device::write_scl )
+void zs01_device::write_scl(int state)
 {
 	if( m_scl != state )
 	{
@@ -595,7 +599,7 @@ WRITE_LINE_MEMBER( zs01_device::write_scl )
 	m_scl = state;
 }
 
-WRITE_LINE_MEMBER( zs01_device::write_sda )
+void zs01_device::write_sda(int state)
 {
 	if( m_sdaw != state )
 	{
@@ -635,7 +639,7 @@ WRITE_LINE_MEMBER( zs01_device::write_sda )
 	m_sdaw = state;
 }
 
-READ_LINE_MEMBER( zs01_device::read_sda )
+int zs01_device::read_sda()
 {
 	if( m_cs != 0 )
 	{
@@ -692,22 +696,32 @@ void zs01_device::nvram_default()
 
 bool zs01_device::nvram_read( util::read_stream &file )
 {
+	std::error_condition err;
 	std::size_t actual;
-	bool result = !file.read( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.read( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
-	result = result && !file.read( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
-	result = result && !file.read( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
-	result = result && !file.read( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
-	return result;
+	std::tie( err, actual ) = read( file, m_response_to_reset, sizeof( m_response_to_reset ) );
+	if( err || ( sizeof( m_response_to_reset ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_command_key, sizeof( m_command_key ) );
+	if( err || ( sizeof( m_command_key ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_data_key, sizeof( m_data_key ) );
+	if( err || ( sizeof( m_data_key ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_configuration_registers, sizeof( m_configuration_registers ) );
+	if( err || ( sizeof( m_configuration_registers ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_data, sizeof( m_data ) );
+	if( err || ( sizeof( m_data ) != actual ) )
+		return false;
+	return true;
 }
 
 bool zs01_device::nvram_write( util::write_stream &file )
 {
-	std::size_t actual;
-	bool result = !file.write( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.write( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
-	result = result && !file.write( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
-	result = result && !file.write( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
-	result = result && !file.write( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	bool result = !write( file, m_response_to_reset, sizeof( m_response_to_reset ) ).first;
+	result = result && !write( file, m_command_key, sizeof( m_command_key ) ).first;
+	result = result && !write( file, m_data_key, sizeof( m_data_key ) ).first;
+	result = result && !write( file, m_configuration_registers, sizeof( m_configuration_registers ) ).first;
+	result = result && !write( file, m_data, sizeof( m_data ) ).first;
 	return result;
 }

@@ -55,7 +55,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	TIMER_CALLBACK_MEMBER(deferred_reset);
 	TIMER_CALLBACK_MEMBER(deferred_reg_write);
@@ -89,7 +89,7 @@ private:
 	emu_timer *                 m_deferred_reg_write;
 	emu_timer *                 m_deferred_data_write;
 
-	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
+	int tms_write_pending_r();
 };
 
 

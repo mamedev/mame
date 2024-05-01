@@ -7,8 +7,8 @@
     Phill Harvey-Smith
     2011-01-29.
 */
-#ifndef MAME_INCLUDES_MBC55X_H
-#define MAME_INCLUDES_MBC55X_H
+#ifndef MAME_SANYO_MBC55X_H
+#define MAME_SANYO_MBC55X_H
 
 #pragma once
 
@@ -26,11 +26,7 @@
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
-#include "debug/debugcon.h"
-#include "debugger.h"
 #include "emupal.h"
-
-#include "formats/pc_dsk.h"
 
 
 #define MAINCPU_TAG "maincpu"
@@ -111,12 +107,12 @@ private:
 	uint8_t printer_status_r();
 	void printer_data_w(uint8_t data);
 	void disk_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_paper_end_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
+	void printer_busy_w(int state);
+	void printer_paper_end_w(int state);
+	void printer_select_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(vid_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
+	void vid_hsync_changed(int state);
+	void vid_vsync_changed(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void mbc55x_palette(palette_device &palette) const;
@@ -140,7 +136,6 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 
-	uint32_t      m_debug_video = 0;
 	uint8_t       m_video_mem[VIDEO_MEM_SIZE];
 	uint8_t       m_vram_page = 0;
 	uint8_t       m_printer_status = 0;
@@ -148,8 +143,6 @@ private:
 	double        m_x_calibration = 0, m_y_calibration = 0;
 	bool          m_ls123_strobe = false;
 	double        m_ls123_clear_time[4];
-
-	void video_debug(const std::vector<std::string> &params);
 };
 
 /*----------- defined in machine/mbc55x.c -----------*/
@@ -185,4 +178,4 @@ private:
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
 
-#endif // MAME_INCLUDES_MBC55X_H
+#endif // MAME_SANYO_MBC55X_H

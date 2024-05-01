@@ -41,14 +41,14 @@ constexpr unsigned TEMP_BUFFER_SIZE(4096U);
 
 void write_escaped(core_file &file, std::string const &str)
 {
+	// FIXME: check for errors
 	std::string::size_type pos = 0;
 	while ((str.size() > pos) && (std::string::npos != pos))
 	{
 		std::string::size_type const found = str.find_first_of("\"&<>", pos);
 		if (found != std::string::npos)
 		{
-			std::size_t written;
-			file.write(&str[pos], found - pos, written);
+			write(file, &str[pos], found - pos);
 			switch (str[found])
 			{
 			case '"': file.puts("&quot;"); pos = found + 1; break;
@@ -60,8 +60,7 @@ void write_escaped(core_file &file, std::string const &str)
 		}
 		else
 		{
-			std::size_t written;
-			file.write(&str[pos], str.size() - pos, written);
+			write(file, &str[pos], str.size() - pos);
 			pos = found;
 		}
 	}
@@ -77,10 +76,12 @@ void write_escaped(core_file &file, std::string const &str)
 
 struct parse_info
 {
+	parse_info() { memset(&parser, 0, sizeof(parser)); }
+
 	XML_Parser      parser;
 	file::ptr       rootnode;
-	data_node *     curnode;
-	uint32_t        flags;
+	data_node *     curnode = nullptr;
+	uint32_t        flags = 0;
 };
 
 
@@ -134,8 +135,7 @@ file::ptr file::read(read_stream &file, parse_options const *opts)
 		char tempbuf[TEMP_BUFFER_SIZE];
 
 		// read as much as we can
-		size_t bytes;
-		file.read(tempbuf, sizeof(tempbuf), bytes); // TODO: better error handling
+		auto const [err, bytes] = util::read(file, tempbuf, sizeof(tempbuf)); // FIXME: better error handling
 		done = !bytes;
 
 		// parse the data
@@ -465,8 +465,14 @@ data_node *data_node::copy_into(data_node &parent) const
 			}
 			else
 			{
-				dst = dst->get_parent();
-				src = src->get_parent()->get_next_sibling();
+				do
+				{
+					dst = dst->get_parent();
+					src = src->get_parent();
+					next = src->get_next_sibling();
+				}
+				while (!next && (&parent != dst));
+				src = next;
 			}
 		}
 	}
@@ -776,29 +782,24 @@ void data_node::set_attribute_float(const char *name, float value)
 //  to ensure it doesn't contain embedded tags
 //-------------------------------------------------
 
-const char *normalize_string(const char *string)
+std::string normalize_string(std::string_view string)
 {
-	static char buffer[1024];
-	char *d = &buffer[0];
+	std::string result;
+	result.reserve(string.length());
 
-	if (string != nullptr)
+	for (char ch : string)
 	{
-		while (*string)
+		switch (ch)
 		{
-			switch (*string)
-			{
-				case '\"' : d += sprintf(d, "&quot;"); break;
-				case '&'  : d += sprintf(d, "&amp;"); break;
-				case '<'  : d += sprintf(d, "&lt;"); break;
-				case '>'  : d += sprintf(d, "&gt;"); break;
-				default:
-					*d++ = *string;
-			}
-			++string;
+		case '\"':  result.append("&quot;");    break;
+		case '&':   result.append("&amp;");     break;
+		case '<':   result.append("&lt;");      break;
+		case '>':   result.append("&gt;");      break;
+		default:    result.append(1, ch);       break;
 		}
 	}
-	*d++ = 0;
-	return buffer;
+
+	return result;
 }
 
 
@@ -808,50 +809,13 @@ const char *normalize_string(const char *string)
 //**************************************************************************
 
 //-------------------------------------------------
-//  expat_malloc/expat_realloc/expat_free -
-//  wrappers for memory allocation functions so
-//  that they pass through out memory tracking
-//  systems
-//-------------------------------------------------
-
-static void *expat_malloc(size_t size)
-{
-	auto *result = (uint32_t *)malloc(size + 4 * sizeof(uint32_t));
-	*result = size;
-	return &result[4];
-}
-
-static void expat_free(void *ptr)
-{
-	if (ptr != nullptr)
-		free(&((uint32_t *)ptr)[-4]);
-}
-
-static void *expat_realloc(void *ptr, size_t size)
-{
-	void *newptr = expat_malloc(size);
-	if (newptr == nullptr)
-		return nullptr;
-	if (ptr != nullptr)
-	{
-		uint32_t oldsize = ((uint32_t *)ptr)[-4];
-		memcpy(newptr, ptr, oldsize);
-		expat_free(ptr);
-	}
-	return newptr;
-}
-
-
-//-------------------------------------------------
 //  expat_setup_parser - set up expat for parsing
 //-------------------------------------------------
 
 static bool expat_setup_parser(parse_info &info, parse_options const *opts)
 {
-	XML_Memory_Handling_Suite memcallbacks;
-
 	// setup info structure
-	memset(&info, 0, sizeof(info));
+	info = parse_info();
 	if (opts != nullptr)
 	{
 		info.flags = opts->flags;
@@ -870,11 +834,8 @@ static bool expat_setup_parser(parse_info &info, parse_options const *opts)
 	info.curnode = info.rootnode.get();
 
 	// create the XML parser
-	memcallbacks.malloc_fcn = expat_malloc;
-	memcallbacks.realloc_fcn = expat_realloc;
-	memcallbacks.free_fcn = expat_free;
-	info.parser = XML_ParserCreate_MM(nullptr, &memcallbacks, nullptr);
-	if (info.parser == nullptr)
+	info.parser = XML_ParserCreate(nullptr);
+	if (!info.parser)
 	{
 		info.rootnode.reset();
 		return false;

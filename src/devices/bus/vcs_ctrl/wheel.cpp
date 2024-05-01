@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(VCS_WHEEL, vcs_wheel_device, "vcs_wheel", "Atari / CBM Drivin
 
 static INPUT_PORTS_START( vcs_wheel )
 	PORT_START("JOY")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                     // Pin 6
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_WRITE_LINE_MEMBER(vcs_wheel_device, trigger_w) // Pin 6
 	PORT_BIT( 0xdc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("WHEEL")
@@ -73,5 +73,5 @@ uint8_t vcs_wheel_device::vcs_joy_r()
 {
 	static const uint8_t driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
 
-	return m_joy->read() | driving_lookup[ ( m_wheel->read() & 0x18 ) >> 3 ];
+	return m_joy->read() | driving_lookup[BIT(m_wheel->read(), 3, 2)];
 }

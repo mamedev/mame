@@ -131,10 +131,6 @@ void mb89374_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_po_cb.resolve_all_safe();
-
 	// state saving
 	save_item(NAME(m_irq));
 	save_item(NAME(m_po));

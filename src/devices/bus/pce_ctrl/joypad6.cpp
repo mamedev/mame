@@ -26,23 +26,100 @@
 #include "emu.h"
 #include "joypad6.h"
 
+#include "machine/74157.h"
 
+
+namespace {
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PCE_AVENUE_PAD_6, pce_avenue_pad_6_device, "pce_avenue_pad_6", "NEC Avenue Pad 6")
-DEFINE_DEVICE_TYPE(PCE_ARCADE_PAD_6, pce_arcade_pad_6_device, "pce_arcade_pad_6", "NEC Arcade Pad 6")
+// ======================> pce_joypad6_base_device
+
+class pce_joypad6_base_device : public device_t,
+							public device_pce_control_port_interface
+{
+public:
+	DECLARE_INPUT_CHANGED_MEMBER(joypad_mode_changed);
+
+protected:
+	// construction/destruction
+	pce_joypad6_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_pce_control_port_interface overrides
+	virtual u8 peripheral_r() override;
+	virtual void sel_w(int state) override;
+	virtual void clr_w(int state) override;
+
+	// button handlers
+	void buttonset_update();
+
+	// devices
+	required_device_array<ls157_device, 3> m_muxer;
+
+	// IO ports
+	required_ioport m_joypad_mode;
+
+	// internal states
+	u8 m_counter; // buttonset select, autofire counter (74xx163 QA-QB pin)
+	bool m_prev_clr; // previous CLR pin state
+};
 
 
-static INPUT_PORTS_START( pce_joypad6 )
+// ======================> pce_avenue_pad_6_device
+
+class pce_avenue_pad_6_device : public pce_joypad6_base_device
+{
+public:
+	// construction/destruction
+	pce_avenue_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// construction/destruction
+	pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	template<unsigned Buttonset> u8 buttons_r();
+
+	// IO ports
+	required_ioport_array<2> m_buttons_io;
+	required_ioport m_turbo_io;
+};
+
+
+// ======================> pce_arcade_pad_6_device
+
+class pce_arcade_pad_6_device : public pce_avenue_pad_6_device
+{
+public:
+	// construction/destruction
+	pce_arcade_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+
+
+INPUT_PORTS_START( pce_joypad6 )
 	// Action button order on original pad is bottom row: III, II, I, and top row: IV, V, VI
 	PORT_START("BUTTONS_0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button I")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button II")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("Select")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("Run")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("%p Button I")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("%p Button II")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("%p Select")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("%p Run")
 
 	PORT_START("DIRECTION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -51,10 +128,10 @@ static INPUT_PORTS_START( pce_joypad6 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 
 	PORT_START("BUTTONS_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button III")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button IV")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Button V")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Button VI")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("%p Button III")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("%p Button IV")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("%p Button V")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("%p Button VI")
 
 	PORT_START("JOY_MODE")
 	PORT_CONFNAME( 0x01, 0x00, "Joypad Mode" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pce_joypad6_base_device, joypad_mode_changed, 0)
@@ -135,7 +212,9 @@ pce_joypad6_base_device::pce_joypad6_base_device(const machine_config &mconfig, 
 	device_t(mconfig, type, tag, owner, clock),
 	device_pce_control_port_interface(mconfig, *this),
 	m_muxer(*this, "mux_%u", 0U),
-	m_joypad_mode(*this, "JOY_MODE")
+	m_joypad_mode(*this, "JOY_MODE"),
+	m_counter(0),
+	m_prev_clr(false)
 {
 }
 
@@ -296,3 +375,14 @@ u8 pce_avenue_pad_6_device::buttons_r()
 	}
 	return ret;
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(PCE_AVENUE_PAD_6, device_pce_control_port_interface, pce_avenue_pad_6_device, "pce_avenue_pad_6", "NEC Avenue Pad 6")
+DEFINE_DEVICE_TYPE_PRIVATE(PCE_ARCADE_PAD_6, device_pce_control_port_interface, pce_arcade_pad_6_device, "pce_arcade_pad_6", "NEC Arcade Pad 6")

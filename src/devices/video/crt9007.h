@@ -71,15 +71,17 @@ public:
 	void ack_w(int state);
 	void lpstb_w(int state);
 
+	// cursor location
+	bool cursor_active(unsigned x, unsigned y);
+
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 	TIMER_CALLBACK_MEMBER(hsync_update);

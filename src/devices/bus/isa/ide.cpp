@@ -35,7 +35,7 @@ void isa16_ide_device::alt_map(address_map &map)
 	map(0x6, 0x6).rw(FUNC(isa16_ide_device::ide16_alt_r), FUNC(isa16_ide_device::ide16_alt_w));
 }
 
-WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
+void isa16_ide_device::ide_interrupt(int state)
 {
 	if (is_primary())
 	{

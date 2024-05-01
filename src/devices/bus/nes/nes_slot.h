@@ -205,9 +205,9 @@ public:
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
 
-	void prg_alloc(size_t size, const char *tag);
-	void vrom_alloc(size_t size, const char *tag);
-	void misc_rom_alloc(size_t size, const char *tag);
+	void prg_alloc(size_t size);
+	void vrom_alloc(size_t size);
+	void misc_rom_alloc(size_t size);
 	void prgram_alloc(size_t size);
 	void vram_alloc(size_t size);
 	void battery_alloc(size_t size);
@@ -265,7 +265,7 @@ public:
 protected:
 	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
-	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
+	void set_irq_line(int state);
 
 	// internal state
 	uint8_t *m_prg;
@@ -398,8 +398,8 @@ public:
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -407,7 +407,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "nes,unf,unif"; }
 	virtual u32 unhashed_header_length() const noexcept override { return 16; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
@@ -438,7 +438,7 @@ public:
 	int m_pcb_id;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
@@ -453,14 +453,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
-#define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
-#define NESSLOT_MISC_ROM_REGION_TAG ":cart:misc_rom"
 
 #endif // MAME_BUS_NES_NES_SLOT_H

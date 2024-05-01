@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SPECPLS3_H
-#define MAME_INCLUDES_SPECPLS3_H
+#ifndef MAME_SINCLAIR_SPECPLS3_H
+#define MAME_SINCLAIR_SPECPLS3_H
 
 #include "spectrum.h"
 #include "spec128.h"
@@ -55,4 +55,4 @@ private:
 	optional_device_array<floppy_connector, 2> m_flop;
 };
 
-#endif // MAME_INCLUDES_SPECPLS3_H
+#endif // MAME_SINCLAIR_SPECPLS3_H

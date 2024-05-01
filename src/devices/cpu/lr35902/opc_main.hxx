@@ -229,6 +229,7 @@ case 0x0F: /*      RRCA */
 	}
 	break;
 case 0x10: /*      STOP */
+	mem_read_byte( m_PC++ );
 	if ( m_gb_speed_change_pending )
 	{
 		if (m_gb_speed == 1)

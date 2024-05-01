@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_VIDEO_TC0080VCO_H
-#define MAME_VIDEO_TC0080VCO_H
+#ifndef MAME_TAITO_TC0080VCO_H
+#define MAME_TAITO_TC0080VCO_H
 
 #pragma once
 
@@ -36,7 +36,7 @@ public:
 	u16 sprram_r(int offset);
 	u16 scrram_r(int offset);
 	void scrollram_w(offs_t offset, u16 data);
-	READ_LINE_MEMBER( flipscreen_r );
+	int flipscreen_r();
 
 	int get_sprite_x() { return m_sprite.x0; }
 	int get_sprite_y() { return m_sprite.y0; }
@@ -103,4 +103,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TC0080VCO, tc0080vco_device)
 
-#endif // MAME_VIDEO_TC0080VCO_H
+#endif // MAME_TAITO_TC0080VCO_H

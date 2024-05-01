@@ -14,7 +14,6 @@
 #pragma once
 
 #include "imagedev/floppy.h"
-#include "formats/flopimg.h"
 #include "machine/74259.h"
 
 //**************************************************************************

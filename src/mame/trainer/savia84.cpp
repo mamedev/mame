@@ -33,6 +33,8 @@ Here is a test program. Copy the text and Paste into the emulator.
 #include "savia84.lh"
 
 
+namespace {
+
 class savia84_state : public driver_device
 {
 public:
@@ -200,6 +202,9 @@ ROM_START( savia84 )
 	// Note - the below is a bad dump and does not work
 	//ROM_LOAD("savia84_1kb.bin", 0x0000, 0x0400, CRC(23a5c15e) SHA1(7e769ed8960d8c591a25cfe4effffcca3077c94b))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

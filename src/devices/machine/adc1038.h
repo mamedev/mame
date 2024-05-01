@@ -35,10 +35,10 @@ public:
 
 	void set_gti_club_hack(bool hack) { m_gticlub_hack = hack; }
 
-	DECLARE_READ_LINE_MEMBER( do_read );
-	DECLARE_READ_LINE_MEMBER( sars_read );
-	DECLARE_WRITE_LINE_MEMBER( di_write );
-	DECLARE_WRITE_LINE_MEMBER( clk_write );
+	int do_read();
+	int sars_read();
+	void di_write(int state);
+	void clk_write(int state);
 
 protected:
 	// device-level overrides

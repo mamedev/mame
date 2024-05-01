@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_RC759_KBD_H
-#define MAME_MACHINE_RC759_KBD_H
+#ifndef MAME_REGNECENTRALEN_RC759_KBD_H
+#define MAME_REGNECENTRALEN_RC759_KBD_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(RC759_KBD_HLE, rc759_kbd_hle_device)
 
-#endif // MAME_MACHINE_RC759_KBD_H
+#endif // MAME_REGNECENTRALEN_RC759_KBD_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
-#ifndef MAME_AUDIO_WARPWARP_H
-#define MAME_AUDIO_WARPWARP_H
+#ifndef MAME_NAMCO_WARPWARP_A_H
+#define MAME_NAMCO_WARPWARP_A_H
 
 #pragma once
 
@@ -50,4 +50,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WARPWARP_SOUND, warpwarp_sound_device)
 
-#endif // MAME_AUDIO_WARPWARP_H
+#endif // MAME_NAMCO_WARPWARP_A_H

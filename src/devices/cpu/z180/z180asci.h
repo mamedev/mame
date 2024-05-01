@@ -40,10 +40,10 @@ public:
 	void astcl_w(uint8_t data);
 	void astch_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( rxa_wr );
-	DECLARE_WRITE_LINE_MEMBER( cts_wr );
-	DECLARE_WRITE_LINE_MEMBER( dcd_wr );
-	DECLARE_WRITE_LINE_MEMBER( cka_wr );
+	void rxa_wr(int state);
+	void cts_wr(int state);
+	void dcd_wr(int state);
+	void cka_wr(int state);
 
 	virtual void state_add(device_state_interface &parent) = 0;
 
@@ -52,10 +52,9 @@ public:
 protected:
 	z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_clock_changed() override;
 
 	void transmit_edge();
@@ -143,7 +142,8 @@ public:
 	void state_add(device_state_interface &parent) override;
 protected:
 	z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
-	// device-level overrides
+
+	// device_t implementation
 	virtual void device_reset() override;
 };
 
@@ -162,7 +162,8 @@ public:
 	void state_add(device_state_interface &parent) override;
 protected:
 	z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
-	// device-level overrides
+
+	// device_t implementation
 	virtual void device_reset() override;
 };
 

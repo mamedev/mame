@@ -31,6 +31,8 @@
 #include "cardline.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK XTAL(12'000'000)
 
 class cardline_state : public driver_device
@@ -65,8 +67,8 @@ private:
 
 	void cardline_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -147,7 +149,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(cardline_state::hsync_changed)
+void cardline_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 	m_hsync_q = (state ? 0x00 : 0x10);
@@ -155,7 +157,7 @@ WRITE_LINE_MEMBER(cardline_state::hsync_changed)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE_LINE_MEMBER(cardline_state::vsync_changed)
+void cardline_state::vsync_changed(int state)
 {
 	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -280,19 +282,8 @@ static INPUT_PORTS_START( cardline )
 
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7  },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*8*8
-};
-
 static GFXDECODE_START( gfx_cardline )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x8_raw,     0, 2 )
 GFXDECODE_END
 
 void cardline_state::cardline_palette(palette_device &palette) const
@@ -390,5 +381,8 @@ ROM_START( cardline )
 	ROM_LOAD( "82s147.u33",   0x0000, 0x0200, CRC(a3b95911) SHA1(46850ea38950cdccbc2ad91d968218ac964c0eb5) )
 
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 199?, cardline, 0, cardline, cardline, cardline_state, empty_init, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)

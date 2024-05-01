@@ -12,21 +12,14 @@
 #include "emu.h"
 #include "n64.h"
 
-#include "cpu/rsp/rsp.h"
-#include "cpu/mips/mips3.h"
-#include "sound/dmadac.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "imagedev/harddriv.h"
 #include "emupal.h"
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
-class n64_mess_state : public n64_state
+class n64_console_state : public n64_state
 {
 public:
-	n64_mess_state(const machine_config &mconfig, device_type type, const char *tag)
+	n64_console_state(const machine_config &mconfig, device_type type, const char *tag)
 		: n64_state(mconfig, type, tag)
 		{ }
 
@@ -35,26 +28,25 @@ public:
 
 private:
 	uint32_t dd_null_r();
+	void n64_map(address_map &map);
+	void n64dd_map(address_map &map);
+
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void mempak_format(uint8_t* pak);
-	image_init_result disk_load(device_image_interface &image);
+	std::error_condition disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_n64dd);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_n64dd);
-	void n64_map(address_map &map);
-	void n64dd_map(address_map &map);
 	void rsp_imem_map(address_map &map);
 	void rsp_dmem_map(address_map &map);
 };
 
-uint32_t n64_mess_state::dd_null_r()
+uint32_t n64_console_state::dd_null_r()
 {
 	return 0xffffffff;
 }
 
-void n64_mess_state::n64_map(address_map &map)
+void n64_console_state::n64_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram().share("rdram");                   // RDRAM
 	map(0x03f00000, 0x03f00027).rw("rcp", FUNC(n64_periphs::rdram_reg_r), FUNC(n64_periphs::rdram_reg_w));
@@ -68,41 +60,27 @@ void n64_mess_state::n64_map(address_map &map)
 	map(0x04600000, 0x046fffff).rw("rcp", FUNC(n64_periphs::pi_reg_r), FUNC(n64_periphs::pi_reg_w));    // Peripheral Interface
 	map(0x04700000, 0x047fffff).rw("rcp", FUNC(n64_periphs::ri_reg_r), FUNC(n64_periphs::ri_reg_w));    // RDRAM Interface
 	map(0x04800000, 0x048fffff).rw("rcp", FUNC(n64_periphs::si_reg_r), FUNC(n64_periphs::si_reg_w));    // Serial Interface
-	map(0x05000508, 0x0500050b).r(FUNC(n64_mess_state::dd_null_r));
+	map(0x05000508, 0x0500050b).r(FUNC(n64_console_state::dd_null_r));
 	map(0x08000000, 0x0801ffff).ram().share("sram");                                        // Cartridge SRAM
 	map(0x10000000, 0x13ffffff).rom().region("user2", 0);                                   // Cartridge
 	map(0x1fc00000, 0x1fc007bf).rom().region("user1", 0);                                   // PIF ROM
 	map(0x1fc007c0, 0x1fc007ff).rw("rcp", FUNC(n64_periphs::pif_ram_r), FUNC(n64_periphs::pif_ram_w));
 }
 
-void n64_mess_state::n64dd_map(address_map &map)
+void n64_console_state::n64dd_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).ram().share("rdram");               // RDRAM
-	map(0x03f00000, 0x03f00027).rw("rcp", FUNC(n64_periphs::rdram_reg_r), FUNC(n64_periphs::rdram_reg_w));
-	map(0x04000000, 0x04000fff).ram().share("rsp_dmem");                    // RSP DMEM
-	map(0x04001000, 0x04001fff).ram().share("rsp_imem");                    // RSP IMEM
-	map(0x04040000, 0x040fffff).rw("rcp", FUNC(n64_periphs::sp_reg_r), FUNC(n64_periphs::sp_reg_w));  // RSP
-	map(0x04100000, 0x041fffff).rw("rcp", FUNC(n64_periphs::dp_reg_r), FUNC(n64_periphs::dp_reg_w));  // RDP
-	map(0x04300000, 0x043fffff).rw("rcp", FUNC(n64_periphs::mi_reg_r), FUNC(n64_periphs::mi_reg_w));    // MIPS Interface
-	map(0x04400000, 0x044fffff).rw("rcp", FUNC(n64_periphs::vi_reg_r), FUNC(n64_periphs::vi_reg_w));    // Video Interface
-	map(0x04500000, 0x045fffff).rw("rcp", FUNC(n64_periphs::ai_reg_r), FUNC(n64_periphs::ai_reg_w));    // Audio Interface
-	map(0x04600000, 0x046fffff).rw("rcp", FUNC(n64_periphs::pi_reg_r), FUNC(n64_periphs::pi_reg_w));    // Peripheral Interface
-	map(0x04700000, 0x047fffff).rw("rcp", FUNC(n64_periphs::ri_reg_r), FUNC(n64_periphs::ri_reg_w));    // RDRAM Interface
-	map(0x04800000, 0x048fffff).rw("rcp", FUNC(n64_periphs::si_reg_r), FUNC(n64_periphs::si_reg_w));    // Serial Interface
+	n64_console_state::n64_map(map);
+	// TODO: expansion bus
 	map(0x05000000, 0x05ffffff).rw("rcp", FUNC(n64_periphs::dd_reg_r), FUNC(n64_periphs::dd_reg_w)); // 64DD Interface
 	map(0x06000000, 0x063fffff).rom().region("ddipl", 0);                                   // 64DD IPL ROM
-	map(0x08000000, 0x0801ffff).ram().share("sram");                                        // Cartridge SRAM
-	map(0x10000000, 0x13ffffff).rom().region("user2", 0);                                   // Cartridge
-	map(0x1fc00000, 0x1fc007bf).rom().region("user1", 0);                                   // PIF ROM
-	map(0x1fc007c0, 0x1fc007ff).rw("rcp", FUNC(n64_periphs::pif_ram_r), FUNC(n64_periphs::pif_ram_w));
 }
 
-void n64_mess_state::rsp_imem_map(address_map &map)
+void n64_console_state::rsp_imem_map(address_map &map)
 {
 	map(0x00000000, 0x00000fff).ram().share("rsp_imem");
 }
 
-void n64_mess_state::rsp_dmem_map(address_map &map)
+void n64_console_state::rsp_dmem_map(address_map &map)
 {
 	map(0x00000000, 0x00000fff).ram().share("rsp_dmem");
 }
@@ -261,7 +239,7 @@ static INPUT_PORTS_START( n64 )
 
 INPUT_PORTS_END
 
-void n64_mess_state::mempak_format(uint8_t* pak)
+void n64_console_state::mempak_format(uint8_t* pak)
 {
 	unsigned char pak_header[] =
 	{
@@ -309,7 +287,7 @@ void n64_mess_state::mempak_format(uint8_t* pak)
 	memcpy(pak+512, pak_inode_table, 256); // Mirror
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::cart_load)
+DEVICE_IMAGE_LOAD_MEMBER(n64_console_state::cart_load)
 {
 	int i, length;
 	uint8_t *cart = memregion("user2")->base();
@@ -359,7 +337,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::cart_load)
 	logerror("cart length = %d\n", length);
 
 	device_image_interface *battery_image = dynamic_cast<device_image_interface *>(m_rcp_periphs->m_nvram_image);
-	if(battery_image)
+	if (battery_image)
 	{
 		//printf("Loading\n");
 		uint8_t data[0x30800];
@@ -380,85 +358,65 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::cart_load)
 		mempak_format(m_rcp_periphs->m_save_data.mempak[1]);
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
-MACHINE_START_MEMBER(n64_mess_state,n64dd)
+MACHINE_START_MEMBER(n64_console_state,n64dd)
 {
 	machine_start();
 	m_rcp_periphs->dd_present = true;
-	uint8_t *ipl = memregion("ddipl")->base();
-
-	for (int i = 0; i < 0x400000; i += 4)
-	{
-		uint8_t b1 = ipl[i + 0];
-		uint8_t b2 = ipl[i + 1];
-		uint8_t b3 = ipl[i + 2];
-		uint8_t b4 = ipl[i + 3];
-		ipl[i + 0] = b1;
-		ipl[i + 1] = b2;
-		ipl[i + 2] = b3;
-		ipl[i + 3] = b4;
-	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::load_n64dd)
-{
-	return disk_load(image);
-}
-
-DEVICE_IMAGE_UNLOAD_MEMBER(n64_mess_state::unload_n64dd)
-{
-	disk_unload(image);
-}
-
-image_init_result n64_mess_state::disk_load(device_image_interface &image)
+std::error_condition n64_console_state::disk_load(device_image_interface &image)
 {
 	image.fseek(0, SEEK_SET);
 	image.fread(memregion("disk")->base(), image.length());
 	m_rcp_periphs->disk_present = true;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
-void n64_mess_state::disk_unload(device_image_interface &image)
+void n64_console_state::disk_unload(device_image_interface &image)
 {
 	m_rcp_periphs->disk_present = false;
 }
 
-INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
+INTERRUPT_GEN_MEMBER(n64_console_state::n64_reset_poll)
 {
 	m_rcp_periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);
 }
 
-void n64_mess_state::n64(machine_config &config)
+void n64_console_state::n64(machine_config &config)
 {
 	/* basic machine hardware */
 	VR4300BE(config, m_vr4300, 93750000);
-	m_vr4300->set_force_no_drc(true);
+	m_vr4300->set_force_no_drc(false);
 	//m_vr4300->set_icache_size(16384);
 	//m_vr4300->set_dcache_size(8192);
 	//m_vr4300->set_system_clock(62500000);
-	m_vr4300->set_addrmap(AS_PROGRAM, &n64_mess_state::n64_map);
-	m_vr4300->set_vblank_int("screen", FUNC(n64_mess_state::n64_reset_poll));
+	m_vr4300->set_addrmap(AS_PROGRAM, &n64_console_state::n64_map);
+	m_vr4300->set_vblank_int("screen", FUNC(n64_console_state::n64_reset_poll));
 
 	RSP(config, m_rsp, 62500000);
-	m_rsp->set_force_no_drc(true);
+	m_rsp->set_force_no_drc(false);
 	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
 	m_rsp->dp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_w));
 	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
 	m_rsp->sp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_w));
 	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
-	m_rsp->set_addrmap(AS_PROGRAM, &n64_mess_state::rsp_imem_map);
-	m_rsp->set_addrmap(AS_DATA, &n64_mess_state::rsp_dmem_map);
+	m_rsp->set_addrmap(AS_PROGRAM, &n64_console_state::rsp_imem_map);
+	m_rsp->set_addrmap(AS_DATA, &n64_console_state::rsp_dmem_map);
 
 	config.set_maximum_quantum(attotime::from_hz(500000));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* Video DACRATE is for quarter pixels, so the horizontal is also given in quarter pixels.  However, the horizontal and vertical timing and sizing is adjustable by register and will be reset when the registers are written. */
-	screen.set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
-	screen.set_screen_update(FUNC(n64_state::screen_update_n64));
-	screen.screen_vblank().set(FUNC(n64_state::screen_vblank_n64));
+	// TODO: with 480 vertical will generate invalid vblanks
+	// cfr. amenairc -drc
+	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
+	//m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,480);
+	m_screen->set_screen_update(FUNC(n64_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
@@ -473,26 +431,28 @@ void n64_mess_state::n64(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(n64_mess_state::cart_load));
+	cartslot.set_device_load(FUNC(n64_console_state::cart_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("n64");
 }
 
-void n64_mess_state::n64dd(machine_config &config)
+// TODO: different xtal for PAL
+
+void n64_console_state::n64dd(machine_config &config)
 {
 	n64(config);
-	m_vr4300->set_addrmap(AS_PROGRAM, &n64_mess_state::n64dd_map);
+	m_vr4300->set_addrmap(AS_PROGRAM, &n64_console_state::n64dd_map);
 
-	MCFG_MACHINE_START_OVERRIDE(n64_mess_state, n64dd)
+	MCFG_MACHINE_START_OVERRIDE(n64_console_state, n64dd)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "n64_cart"));
 	cartslot.set_extensions("v64,z64,rom,n64,bin");
-	cartslot.set_device_load(FUNC(n64_mess_state::cart_load));
+	cartslot.set_device_load(FUNC(n64_console_state::cart_load));
 
 	harddisk_image_device &hdd(HARDDISK(config, "n64disk"));
-	hdd.set_device_load(FUNC(n64_mess_state::load_n64dd));
-	hdd.set_device_unload(FUNC(n64_mess_state::unload_n64dd));
+	hdd.set_device_load(FUNC(n64_console_state::disk_load));
+	hdd.set_device_unload(FUNC(n64_console_state::disk_unload));
 	hdd.set_interface("n64dd_disk");
 
 	SOFTWARE_LIST(config, "dd_list").set_original("n64dd");
@@ -502,7 +462,7 @@ ROM_START( n64 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
 
 	ROM_REGION32_BE( 0x800, "user1", 0 )
-	ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+	ROM_LOAD( "pifntsc.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
 
 	ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
 
@@ -512,6 +472,22 @@ ROM_START( n64 )
 	ROM_REGION16_BE( 0x80, "normslope", 0 )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
+
+ROM_START( n64pal )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
+
+	ROM_REGION32_BE( 0x800, "user1", 0 )
+	ROM_LOAD( "pifpal.bin", 0x0000, 0x0800, CRC(2ae77e68) SHA1(46cae59d31f9298b93f3380879454fcef54ee6cc) )
+
+	ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+	ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
+ROM_END
+
 
 ROM_START( n64dd )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
@@ -533,6 +509,6 @@ ROM_START( n64dd )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
-CONS(1996, n64,   0,   0, n64,   n64, n64_mess_state, empty_init, "Nintendo", "Nintendo 64",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS(1996, n64dd, n64, 0, n64dd, n64, n64_mess_state, empty_init, "Nintendo", "Nintendo 64DD", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
+CONS(1996, n64,    0,   0, n64,   n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1997, n64pal, n64, 0, n64,   n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64 (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1999, n64dd,  n64, 0, n64dd, n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64DD",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

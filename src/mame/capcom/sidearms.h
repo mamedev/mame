@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Curt Coder
-#ifndef MAME_INCLUDES_SIDEARMS_H
-#define MAME_INCLUDES_SIDEARMS_H
+#ifndef MAME_CAPCOM_SIDEARMS_H
+#define MAME_CAPCOM_SIDEARMS_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 	void whizz_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SIDEARMS_H
+#endif // MAME_CAPCOM_SIDEARMS_H

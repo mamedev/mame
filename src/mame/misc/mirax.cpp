@@ -110,6 +110,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "speaker.h"
 
 
+namespace {
+
 class mirax_state : public driver_device
 {
 public:
@@ -151,12 +153,12 @@ private:
 	uint8_t m_flipscreen_y = 0;
 
 	void audio_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	void sound_cmd_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter0_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter1_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void coin_counter0_w(int state);
+	void coin_counter1_w(int state);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	void ay1_sel(uint8_t data);
 	void ay2_sel(uint8_t data);
 
@@ -166,7 +168,7 @@ private:
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void mirax_main_map(address_map &map);
 	void mirax_sound_map(address_map &map);
 };
@@ -287,7 +289,7 @@ void mirax_state::ay2_sel(uint8_t data)
 	m_ay[1]->data_w(data);
 }
 
-WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
+void mirax_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -301,22 +303,22 @@ void mirax_state::sound_cmd_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(mirax_state::coin_counter0_w)
+void mirax_state::coin_counter0_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(mirax_state::coin_counter1_w)
+void mirax_state::coin_counter1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(mirax_state::flip_screen_x_w)
+void mirax_state::flip_screen_x_w(int state)
 {
 	m_flipscreen_x = state;
 }
 
-WRITE_LINE_MEMBER(mirax_state::flip_screen_y_w)
+void mirax_state::flip_screen_y_w(int state)
 {
 	m_flipscreen_y = state;
 }
@@ -465,7 +467,7 @@ static GFXDECODE_START( gfx_mirax )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(mirax_state::vblank_irq)
+void mirax_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -585,6 +587,9 @@ void mirax_state::init_mirax()
 	for (int i = 0x8000; i < 0xc000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 }
+
+} // anonymous namespace
+
 
 GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 2)", MACHINE_SUPPORTS_SAVE )

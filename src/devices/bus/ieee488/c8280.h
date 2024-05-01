@@ -12,10 +12,8 @@
 #pragma once
 
 #include "ieee488.h"
-#include "cpu/m6502/m6502.h"
-#include "formats/c8280_dsk.h"
 #include "imagedev/floppy.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/wd_fdc.h"
 
 
@@ -65,13 +63,12 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
-	required_device<mos6532_new_device> m_riot0;
-	required_device<mos6532_new_device> m_riot1;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
 	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_ioport m_address;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_selected_floppy;
 	output_finder<4> m_leds;
 
 	// IEEE-488 bus

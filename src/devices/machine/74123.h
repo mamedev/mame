@@ -84,12 +84,12 @@ public:
 
 	auto out_cb() { return m_output_changed_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(a_w);
-	DECLARE_WRITE_LINE_MEMBER(b_w);
-	DECLARE_WRITE_LINE_MEMBER(clear_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void a_w(int state);
+	void b_w(int state);
+	void clear_w(int state);
+	void reset_w(int state);
 
-	DECLARE_READ_LINE_MEMBER(q_r) { return timer_running(); }
+	int q_r() { return timer_running(); }
 
 protected:
 	// device-level overrides

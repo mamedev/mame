@@ -70,12 +70,12 @@ tc0040ioc_device::tc0040ioc_device(const machine_config &mconfig, const char *ta
 	device_t(mconfig, TC0040IOC, tag, owner, clock),
 	m_port(0),
 	m_watchdog(*this, "watchdog"),
-	m_read_0_cb(*this),
-	m_read_1_cb(*this),
-	m_read_2_cb(*this),
-	m_read_3_cb(*this),
+	m_read_0_cb(*this, 0),
+	m_read_1_cb(*this, 0),
+	m_read_2_cb(*this, 0),
+	m_read_3_cb(*this, 0),
 	m_write_4_cb(*this),
-	m_read_7_cb(*this)
+	m_read_7_cb(*this, 0)
 {
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
@@ -86,13 +86,6 @@ tc0040ioc_device::tc0040ioc_device(const machine_config &mconfig, const char *ta
 
 void tc0040ioc_device::device_start()
 {
-	m_read_0_cb.resolve_safe(0);
-	m_read_1_cb.resolve_safe(0);
-	m_read_2_cb.resolve_safe(0);
-	m_read_3_cb.resolve_safe(0);
-	m_write_4_cb.resolve_safe();
-	m_read_7_cb.resolve_safe(0);
-
 	save_item(NAME(m_regs));
 	save_item(NAME(m_port));
 }
@@ -215,13 +208,13 @@ DEFINE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device, "tc0220ioc", "Taito TC0220IOC")
 tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TC0220IOC, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
-	m_read_0_cb(*this),
-	m_read_1_cb(*this),
-	m_read_2_cb(*this),
-	m_read_3_cb(*this),
+	m_read_0_cb(*this, 0),
+	m_read_1_cb(*this, 0),
+	m_read_2_cb(*this, 0),
+	m_read_3_cb(*this, 0),
 	m_write_3_cb(*this),
 	m_write_4_cb(*this),
-	m_read_7_cb(*this)
+	m_read_7_cb(*this, 0)
 {
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
@@ -232,14 +225,6 @@ tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *ta
 
 void tc0220ioc_device::device_start()
 {
-	m_read_0_cb.resolve_safe(0);
-	m_read_1_cb.resolve_safe(0);
-	m_read_2_cb.resolve_safe(0);
-	m_read_3_cb.resolve_safe(0);
-	m_write_3_cb.resolve_safe();
-	m_write_4_cb.resolve_safe();
-	m_read_7_cb.resolve_safe(0);
-
 	save_item(NAME(m_regs));
 }
 
@@ -333,13 +318,13 @@ DEFINE_DEVICE_TYPE(TC0510NIO, tc0510nio_device, "tc0510nio", "Taito TC0510NIO")
 tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0510NIO, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
-	m_read_0_cb(*this),
-	m_read_1_cb(*this),
-	m_read_2_cb(*this),
-	m_read_3_cb(*this),
+	m_read_0_cb(*this, 0),
+	m_read_1_cb(*this, 0),
+	m_read_2_cb(*this, 0),
+	m_read_3_cb(*this, 0),
 	m_write_3_cb(*this),
 	m_write_4_cb(*this),
-	m_read_7_cb(*this)
+	m_read_7_cb(*this, 0)
 {
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
@@ -350,14 +335,6 @@ tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *ta
 
 void tc0510nio_device::device_start()
 {
-	m_read_0_cb.resolve_safe(0);
-	m_read_1_cb.resolve_safe(0);
-	m_read_2_cb.resolve_safe(0);
-	m_read_3_cb.resolve_safe(0);
-	m_write_3_cb.resolve_safe();
-	m_write_4_cb.resolve_safe();
-	m_read_7_cb.resolve_safe(0);
-
 	save_item(NAME(m_regs));
 }
 
@@ -475,12 +452,12 @@ DEFINE_DEVICE_TYPE(TC0640FIO, tc0640fio_device, "tc0640fio", "Taito TC0640FIO")
 tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0640FIO, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
-	m_read_0_cb(*this),
-	m_read_1_cb(*this),
-	m_read_2_cb(*this),
-	m_read_3_cb(*this),
+	m_read_0_cb(*this, 0),
+	m_read_1_cb(*this, 0),
+	m_read_2_cb(*this, 0),
+	m_read_3_cb(*this, 0),
 	m_write_4_cb(*this),
-	m_read_7_cb(*this)
+	m_read_7_cb(*this, 0)
 {
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
@@ -491,13 +468,6 @@ tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *ta
 
 void tc0640fio_device::device_start()
 {
-	m_read_0_cb.resolve_safe(0);
-	m_read_1_cb.resolve_safe(0);
-	m_read_2_cb.resolve_safe(0);
-	m_read_3_cb.resolve_safe(0);
-	m_write_4_cb.resolve_safe();
-	m_read_7_cb.resolve_safe(0);
-
 	save_item(NAME(m_regs));
 }
 

@@ -63,7 +63,7 @@ protected:
 	virtual void write_cb2(int state) override;
 
 private:
-	bool m_turbo;;
+	bool m_turbo;
 };
 
 

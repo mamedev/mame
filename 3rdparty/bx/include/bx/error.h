@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_ERROR_H_HEADER_GUARD
@@ -38,7 +38,6 @@ namespace bx
 	{
 		BX_CLASS(Error
 			, NO_COPY
-			, NO_ASSIGNMENT
 			);
 
 	public:
@@ -71,12 +70,42 @@ namespace bx
 		uint32_t   m_code;
 	};
 
+	/// Do nothing even if error is set.
+	class ErrorIgnore : public Error
+	{
+	public:
+		///
+		operator Error*();
+	};
+
+	/// In debug build assert if error is set.
+	class ErrorAssert : public Error
+	{
+	public:
+		///
+		~ErrorAssert();
+
+		///
+		operator Error*();
+	};
+
+	/// Exit application if error is set.
+	class ErrorFatal : public Error
+	{
+	public:
+		///
+		~ErrorFatal();
+
+		///
+		operator Error*();
+	};
+
 	///
 	class ErrorScope
 	{
 		BX_CLASS(ErrorScope
+			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_ASSIGNMENT
 			);
 
 	public:

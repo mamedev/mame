@@ -44,14 +44,14 @@ public:
 	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 
-	DECLARE_WRITE_LINE_MEMBER(senila);
-	DECLARE_WRITE_LINE_MEMBER(senilb);
+	void senila(int state);
+	void senilb(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( memen_in ) override;
-	DECLARE_WRITE_LINE_MEMBER( msast_in ) override;
+	void memen_in(int state) override;
+	void msast_in(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in ) override;
-	DECLARE_WRITE_LINE_MEMBER( reset_in ) override;
+	void clock_in(int state) override;
+	void reset_in(int state) override;
 
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
@@ -125,7 +125,7 @@ public:
 	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 /*
@@ -137,7 +137,7 @@ public:
 	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -163,7 +163,7 @@ public:
 	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 /*****************************************************************************
@@ -181,8 +181,8 @@ public:
 	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
 	virtual void setaddress_dbin(offs_t offset, int state) { }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
-	virtual DECLARE_WRITE_LINE_MEMBER(reset_in) { }
+	virtual void clock_in(int state) { }
+	virtual void reset_in(int state) { }
 
 	void    set_senila(int state) { m_senila = state; }
 	void    set_senilb(int state) { m_senilb = state; }
@@ -233,16 +233,16 @@ public:
 	void write(offs_t offset, uint8_t data);
 	void setaddress_dbin(offs_t offset, int state);
 
-	DECLARE_WRITE_LINE_MEMBER(senila);
-	DECLARE_WRITE_LINE_MEMBER(senilb);
-	DECLARE_WRITE_LINE_MEMBER(clock_in);
-	DECLARE_WRITE_LINE_MEMBER(reset_in);
+	void senila(int state);
+	void senilb(int state);
+	void clock_in(int state);
+	void reset_in(int state);
 
 	// Called from the card (direction to box)
-	DECLARE_WRITE_LINE_MEMBER( set_inta );
-	DECLARE_WRITE_LINE_MEMBER( set_intb );
-	DECLARE_WRITE_LINE_MEMBER( lcp_line );
-	DECLARE_WRITE_LINE_MEMBER( set_ready );
+	void set_inta(int state);
+	void set_intb(int state);
+	void lcp_line(int state);
+	void set_ready(int state);
 
 	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
@@ -251,12 +251,13 @@ public:
 	void set_number(int number) { m_slotnumber = number; }
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 private:
 	int get_index_from_tagname();
 	device_ti99_peribox_card_interface *m_card;
+	peribox_device *m_peb;
 	int m_slotnumber;
 	const char* card_name() { return m_card->device().tag(); }
 };

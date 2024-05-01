@@ -26,14 +26,13 @@ CPU speed. It should be around 14-16MHz. The ARM CPU is rated 12MHz, they
 probably went for this solution to get optimum possible speed for each module.
 
 TODO:
-- PC version still gives a sync error on boot sometimes, probably related to quantum
 - is interrupt handling correct?
 - timer shouldn't be needed for disabling bootrom, real ARM has already read the next opcode
 
 */
 
 #include "emu.h"
-#include "machine/chessmachine.h"
+#include "chessmachine.h"
 
 
 DEFINE_DEVICE_TYPE(CHESSMACHINE, chessmachine_device, "chessmachine", "Tasc ChessMachine")
@@ -59,8 +58,9 @@ chessmachine_device::chessmachine_device(const machine_config &mconfig, const ch
 
 void chessmachine_device::device_start()
 {
-	// resolve callbacks
-	m_data_out.resolve_safe();
+	// zerofill
+	m_bootrom_enabled = false;
+	memset(m_latch, 0, sizeof(m_latch));
 
 	// register for savestates
 	save_item(NAME(m_bootrom_enabled));
@@ -73,35 +73,48 @@ void chessmachine_device::device_start()
 //  external handlers
 //-------------------------------------------------
 
-void chessmachine_device::sync0_callback(s32 param)
+void chessmachine_device::data0_w_sync(s32 param)
 {
-	m_latch[0] = (m_latch[0] & 0x80) | param;
+	if ((m_latch[0] & 1) != param)
+	{
+		machine().scheduler().perfect_quantum(attotime::from_usec(50));
+		m_latch[0] = (m_latch[0] & 0x80) | param;
+	}
 }
 
 void chessmachine_device::data0_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync0_callback), this), state ? 1 : 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::data0_w_sync), this), state ? 1 : 0);
 }
 
-void chessmachine_device::sync1_callback(s32 param)
+void chessmachine_device::data1_w_sync(s32 param)
 {
-	m_latch[0] = (m_latch[0] & 1) | param;
+	if ((m_latch[0] & 0x80) != param)
+	{
+		machine().scheduler().perfect_quantum(attotime::from_usec(50));
+		m_latch[0] = (m_latch[0] & 1) | param;
 
-	// cause interrupt?
-	m_maincpu->set_input_line(ARM_FIRQ_LINE, param ? ASSERT_LINE : CLEAR_LINE);
+		// cause interrupt?
+		m_maincpu->set_input_line(ARM_FIRQ_LINE, param ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void chessmachine_device::data1_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync1_callback), this), state ? 0x80 : 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::data1_w_sync), this), state ? 0x80 : 0);
+}
+
+void chessmachine_device::reset_w_sync(s32 param)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+
+	if (!m_bootrom_enabled && param)
+		install_bootrom(true);
 }
 
 void chessmachine_device::reset_w(int state)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
-
-	if (!m_bootrom_enabled && state)
-		install_bootrom(true);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::reset_w_sync), this), state ? 1 : 0);
 }
 
 

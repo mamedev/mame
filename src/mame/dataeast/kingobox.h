@@ -5,8 +5,8 @@
     King of Boxer - Ring King
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_KINGOBOX_H
-#define MAME_INCLUDES_KINGOBOX_H
+#ifndef MAME_DATAEAST_KINGOBOX_H
+#define MAME_DATAEAST_KINGOBOX_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 	void ringking_video_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_KINGOBOX_H
+#endif // MAME_DATAEAST_KINGOBOX_H

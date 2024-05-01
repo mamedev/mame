@@ -6,107 +6,30 @@
 
     Input/output port handling.
 
-****************************************************************************
-
-    Theory of operation
-
-    ------------
-    OSD controls
-    ------------
-
-    There are three types of controls that the OSD can provide as potential
-    input devices: digital controls, absolute analog controls, and relative
-    analog controls.
-
-    Digital controls have only two states: on or off. They are generally
-    mapped to buttons and digital joystick directions (like a gamepad or a
-    joystick hat). The OSD layer must return either 0 (off) or 1 (on) for
-    these types of controls.
-
-    Absolute analog controls are analog in the sense that they return a
-    range of values depending on how much a given control is moved, but they
-    are physically bounded. This means that there is a minimum and maximum
-    limit to how far the control can be moved. They are generally mapped to
-    analog joystick axes, lightguns, most PC steering wheels, and pedals.
-    The OSD layer must determine the minimum and maximum range of each
-    analog device and scale that to a value between -65536 and +65536
-    representing the position of the control. -65536 generally refers to
-    the topmost or leftmost position, while +65536 refers to the bottommost
-    or rightmost position. Note that pedals are a special case here, the
-    OSD layer needs to return half axis as full -65536 to + 65536 range.
-
-    Relative analog controls are analog as well, but are not physically
-    bounded. They can be moved continually in one direction without limit.
-    They are generally mapped to trackballs and mice. Because they are
-    unbounded, the OSD layer can only return delta values since the last
-    read. Because of this, it is difficult to scale appropriately. For
-    MAME's purposes, when mapping a mouse devices to a relative analog
-    control, one pixel of movement should correspond to 512 units. Other
-    analog control types should be scaled to return values of a similar
-    magnitude. Like absolute analog controls, negative values refer to
-    upward or leftward movement, while positive values refer to downward
-    or rightward movement.
-
-    -------------
-    Game controls
-    -------------
-
-    Similarly, the types of controls used by arcade games fall into the same
-    three categories: digital, absolute analog, and relative analog. The
-    tricky part is how to map any arbitrary type of OSD control to an
-    arbitrary type of game control.
-
-    Digital controls: used for game buttons and standard 4/8-way joysticks,
-    as well as many other types of game controls. Mapping an OSD digital
-    control to a game's OSD control is trivial. For OSD analog controls,
-    the MAME core does not directly support mapping any OSD analog devices
-    to digital controls. However, the OSD layer is free to enumerate digital
-    equivalents for analog devices. For example, each analog axis in the
-    Windows OSD code enumerates to two digital controls, one for the
-    negative direction (up/left) and one for the position direction
-    (down/right). When these "digital" inputs are queried, the OSD layer
-    checks the axis position against the center, adding in a dead zone,
-    and returns 0 or 1 to indicate its position.
-
-    Absolute analog controls: used for analog joysticks, lightguns, pedals,
-    and wheel controls. Mapping an OSD absolute analog control to this type
-    is easy. OSD relative analog controls can be mapped here as well by
-    accumulating the deltas and bounding the results. OSD digital controls
-    are mapped to these types of controls in pairs, one for a decrement and
-    one for an increment, but apart from that, operate the same as the OSD
-    relative analog controls by accumulating deltas and applying bounds.
-    The speed of the digital delta is user-configurable per analog input.
-    In addition, most absolute analog control types have an autocentering
-    feature that is activated when using the digital increment/decrement
-    sequences, which returns the control back to the center at a user-
-    controllable speed if no digital sequences are pressed.
-
-    Relative analog controls: used for trackballs and dial controls. Again,
-    mapping an OSD relative analog control to this type is straightforward.
-    OSD absolute analog controls can't map directly to these, but if the OSD
-    layer provides a digital equivalent for each direction, it can be done.
-    OSD digital controls map just like they do for absolute analog controls,
-    except that the accumulated deltas are not bounded, but rather wrap.
-
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
+
 #include "config.h"
+#include "emuopts.h"
 #include "fileio.h"
-#include "xmlfile.h"
-#include "profiler.h"
-#include "ui/uimain.h"
 #include "inputdev.h"
+#include "main.h"
 #include "natkeyboard.h"
+#include "profiler.h"
+
+#include "ui/uimain.h"
 
 #include "util/corestr.h"
 #include "util/ioprocsfilter.h"
 #include "util/language.h"
+#include "util/multibyte.h"
 #include "util/unicode.h"
+#include "util/xmlfile.h"
 
 #include "osdepend.h"
 
+#include <algorithm>
 #include <cctype>
 #include <ctime>
 
@@ -161,6 +84,22 @@ inline s64 recip_scale(s64 scale)
 inline s32 apply_scale(s32 value, s64 scale)
 {
 	return (s64(value) * scale) / (1 << 24);
+}
+
+//-------------------------------------------------
+//  compute_shift -- get shift required to right-
+//  align an I/O port field value
+//-------------------------------------------------
+
+inline u8 compute_shift(ioport_value mask)
+{
+	u8 result = 0U;
+	while (mask && !BIT(mask, 0))
+	{
+		mask >>= 1;
+		++result;
+	}
+	return result;
 }
 
 
@@ -367,15 +306,7 @@ public:
 	}
 	u64 get_basetime() const
 	{
-		return
-				(u64(m_data[OFFS_BASETIME + 0]) << (0 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 1]) << (1 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 2]) << (2 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 3]) << (3 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 4]) << (4 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 5]) << (5 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 6]) << (6 * 8)) |
-				(u64(m_data[OFFS_BASETIME + 7]) << (7 * 8));
+		return get_u64le(m_data + OFFS_BASETIME);
 	}
 	unsigned get_majversion() const
 	{
@@ -400,14 +331,7 @@ public:
 	}
 	void set_basetime(u64 time)
 	{
-		m_data[OFFS_BASETIME + 0] = u8((time >> (0 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 1] = u8((time >> (1 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 2] = u8((time >> (2 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 3] = u8((time >> (3 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 4] = u8((time >> (4 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 5] = u8((time >> (5 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 6] = u8((time >> (6 * 8)) & 0x00ff);
-		m_data[OFFS_BASETIME + 7] = u8((time >> (7 * 8)) & 0x00ff);
+		put_u64le(m_data + OFFS_BASETIME, time);
 	}
 	void set_version()
 	{
@@ -948,7 +872,7 @@ ioport_type_class ioport_field::type_class() const noexcept
 		return INPUT_CLASS_KEYBOARD;
 
 	// configuration settings (specific names required)
-	if (m_type == IPT_CONFIG)
+	if (m_type == IPT_CONFIG || m_type == IPT_ADJUSTER)
 		return INPUT_CLASS_CONFIG;
 
 	// DIP switches (specific names required)
@@ -1562,12 +1486,16 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));
 		}
 
-		// trim extra spaces
-		name = strtrimspace(name);
-
 		// special case
 		if (name.empty())
 			name.assign("Unnamed Key");
+		else
+		{
+			// trim extra spaces
+			auto pos = name.find_last_not_of(' ');
+			assert(pos < name.size());
+			name.erase(pos + 1);
+		}
 	}
 }
 
@@ -1742,14 +1670,14 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 	for (ioport_field *field = m_fieldlist.first(); field != nullptr; field = nextfield)
 	{
 		nextfield = field->next();
-		if ((field->mask() & newfield.mask()) != 0 &&
+		if ((field->mask() & newfield.mask()) &&
 			(newfield.condition().none() || field->condition().none() || field->condition() == newfield.condition()))
 		{
 			// reduce the mask of the field we found
 			field->reduce_mask(newfield.mask());
 
 			// if the new entry fully overrides the previous one, we nuke
-			if (INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS || field->mask() == 0)
+			if (!field->mask() || (INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS && (field->type() != IPT_UNUSED) && (field->type() != IPT_UNKNOWN)))
 				m_fieldlist.remove(*field);
 		}
 	}
@@ -1849,6 +1777,7 @@ ioport_manager::ioport_manager(running_machine &machine)
 	, m_playback_accumulated_speed(0)
 	, m_playback_accumulated_frames(0)
 	, m_deselected_card_config()
+	, m_applied_device_defaults(false)
 {
 	for (auto &entries : m_type_to_entry)
 		std::fill(std::begin(entries), std::end(entries), nullptr);
@@ -1907,14 +1836,14 @@ time_t ioport_manager::initialize()
 		port.second->init_live_state();
 
 	// handle autoselection of devices
-	init_autoselect_devices(IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z, OPTION_ADSTICK_DEVICE,    "analog joystick");
-	init_autoselect_devices(IPT_PADDLE,      IPT_PADDLE_V,     0,              OPTION_PADDLE_DEVICE,     "paddle");
-	init_autoselect_devices(IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3,     OPTION_PEDAL_DEVICE,      "pedal");
-	init_autoselect_devices(IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y,   0,              OPTION_LIGHTGUN_DEVICE,   "lightgun");
-	init_autoselect_devices(IPT_POSITIONAL,  IPT_POSITIONAL_V, 0,              OPTION_POSITIONAL_DEVICE, "positional");
-	init_autoselect_devices(IPT_DIAL,        IPT_DIAL_V,       0,              OPTION_DIAL_DEVICE,       "dial");
-	init_autoselect_devices(IPT_TRACKBALL_X, IPT_TRACKBALL_Y,  0,              OPTION_TRACKBALL_DEVICE,  "trackball");
-	init_autoselect_devices(IPT_MOUSE_X,     IPT_MOUSE_Y,      0,              OPTION_MOUSE_DEVICE,      "mouse");
+	init_autoselect_devices({ IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z }, OPTION_ADSTICK_DEVICE,    "analog joystick");
+	init_autoselect_devices({ IPT_PADDLE,      IPT_PADDLE_V },                     OPTION_PADDLE_DEVICE,     "paddle");
+	init_autoselect_devices({ IPT_PEDAL,       IPT_PEDAL2,       IPT_PEDAL3 },     OPTION_PEDAL_DEVICE,      "pedal");
+	init_autoselect_devices({ IPT_LIGHTGUN_X,  IPT_LIGHTGUN_Y },                   OPTION_LIGHTGUN_DEVICE,   "lightgun");
+	init_autoselect_devices({ IPT_POSITIONAL,  IPT_POSITIONAL_V },                 OPTION_POSITIONAL_DEVICE, "positional");
+	init_autoselect_devices({ IPT_DIAL,        IPT_DIAL_V },                       OPTION_DIAL_DEVICE,       "dial");
+	init_autoselect_devices({ IPT_TRACKBALL_X, IPT_TRACKBALL_Y },                  OPTION_TRACKBALL_DEVICE,  "trackball");
+	init_autoselect_devices({ IPT_MOUSE_X,     IPT_MOUSE_Y },                      OPTION_MOUSE_DEVICE,      "mouse");
 
 	// look for 4-way diagonal joysticks and change the default map if we find any
 	const char *joystick_map_default = machine().options().joystick_map();
@@ -1972,39 +1901,71 @@ void ioport_manager::init_port_types()
 //  in and the corresponding option
 //-------------------------------------------------
 
-void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame)
+void ioport_manager::init_autoselect_devices(std::initializer_list<ioport_type> types, std::string_view option, std::string_view ananame)
 {
+	static std::pair<char const *, char const *> const CLASS_OPTIONS[] = {
+			{ "mouse",     OPTION_MOUSE },
+			{ "joystick",  OPTION_JOYSTICK },
+			{ "lightgun",  OPTION_LIGHTGUN } };
+
 	// if nothing specified, ignore the option
-	const char *stemp = machine().options().value(option);
-	if (stemp[0] == 0 || strcmp(stemp, "none") == 0)
+	auto const autooption = machine().options().get_entry(option);
+	char const *const autoclass = autooption->value();
+	if (!autoclass || !*autoclass || !std::strcmp(autoclass, "none"))
 		return;
 
-	// extract valid strings
+	// if the device class is enabled anyway or disabled at a higher priority level, do nothing
+	auto const classname = std::find_if(
+			std::begin(CLASS_OPTIONS),
+			std::end(CLASS_OPTIONS),
+			[&autoclass] (auto const &x) { return !std::strcmp(autoclass, x.first); });
+	if (std::end(CLASS_OPTIONS) != classname)
+	{
+		if (machine().options().bool_value(classname->second))
+			return;
+
+		auto const classoption = machine().options().get_entry(classname->second);
+		if (classoption->priority() > autooption->priority())
+		{
+			osd_printf_verbose("Input: Won't autoenable %s in presence of a %s as it's disabled at a higher priority\n", autoclass, ananame);
+			return;
+		}
+	}
+
+	// find matching device class
 	input_class *autoenable_class = nullptr;
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
-		if (strcmp(stemp, machine().input().device_class(devclass).name()) == 0)
+	{
+		if (!std::strcmp(autoclass, machine().input().device_class(devclass).name()))
 		{
 			autoenable_class = &machine().input().device_class(devclass);
 			break;
 		}
-	if (autoenable_class == nullptr)
+	}
+	if (!autoenable_class)
 	{
-		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
+		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, autoclass);
 		autoenable_class = &machine().input().device_class(DEVICE_CLASS_KEYBOARD);
 	}
 
-	// only scan the list if we haven't already enabled this class of control
-	if (!autoenable_class->enabled())
-		for (auto &port : m_portlist)
-			for (ioport_field const &field : port.second->fields())
+	// nothing to do if the class is already enabled
+	if (autoenable_class->enabled())
+		return;
 
-				// if this port type is in use, apply the autoselect criteria
-				if ((type1 != 0 && field.type() == type1) || (type2 != 0 && field.type() == type2) || (type3 != 0 && field.type() == type3))
-				{
-					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autoenable_class->name(), ananame);
-					autoenable_class->enable();
-					break;
-				}
+	// scan the port list
+	for (auto &port : m_portlist)
+	{
+		for (ioport_field const &field : port.second->fields())
+		{
+			// if this port type is in use, apply the autoselect criteria
+			if (std::find(std::begin(types), std::end(types), field.type()) != std::end(types))
+			{
+				osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autoenable_class->name(), ananame);
+				autoenable_class->enable();
+				return;
+			}
+		}
+	}
 }
 
 
@@ -2195,7 +2156,7 @@ void ioport_manager::frame_update_callback()
 
 void ioport_manager::frame_update()
 {
-	g_profiler.start(PROFILER_INPUT);
+	auto profile = g_profiler.start(PROFILER_INPUT);
 
 	// record/playback information about the current frame
 	attotime curtime = machine().time();
@@ -2232,8 +2193,6 @@ void ioport_manager::frame_update()
 			if (dynfield.field().type() != IPT_OUTPUT)
 				dynfield.write(newvalue);
 	}
-
-	g_profiler.stop();
 }
 
 
@@ -2261,6 +2220,17 @@ s32 ioport_manager::frame_interpolate(s32 oldval, s32 newval)
 
 void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
+	// make sure device defaults get applied at some point
+	if ((cfg_type > config_type::CONTROLLER) && !m_applied_device_defaults)
+	{
+		apply_device_defaults();
+
+		// after applying controller config, push that to the backup, as it's what we'll diff against
+		for (input_type_entry &entry : m_typelist)
+			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
+				entry.defseq(seqtype) = entry.seq(seqtype);
+	}
+
 	// in the completion phase, we finish the initialization with the final ports
 	if (cfg_type == config_type::FINAL)
 	{
@@ -2275,9 +2245,7 @@ void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, u
 	// load device map table for controller configs only
 	if (cfg_type == config_type::CONTROLLER)
 	{
-		// iterate over all the remap nodes
-		load_remap_table(*parentnode);
-
+		// iterate over device remapping entries
 		input_manager::devicemap_table devicemap;
 		for (util::xml::data_node const *mapdevice_node = parentnode->get_child("mapdevice"); mapdevice_node != nullptr; mapdevice_node = mapdevice_node->get_next_sibling("mapdevice"))
 		{
@@ -2287,9 +2255,23 @@ void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, u
 				devicemap.emplace(devicename, controllername);
 		}
 
-		// map device to controller if we have a device map
-		if (!devicemap.empty())
-			machine().input().map_device_to_controller(devicemap);
+		// we can't rearrange controllers after applying device-supplied defaults
+		if (!m_applied_device_defaults)
+		{
+			// map device to controller if we have a device map
+			if (!devicemap.empty())
+				machine().input().map_device_to_controller(devicemap);
+
+			// add extra default assignments for input devices
+			apply_device_defaults();
+		}
+		else if (!devicemap.empty())
+		{
+			osd_printf_warning("Controller configuration: Only <mapdevice> elements from the first applicable <system> element are applied\n");
+		}
+
+		// iterate over any input code remapping nodes
+		load_remap_table(*parentnode);
 	}
 
 	// iterate over all the port nodes
@@ -2332,16 +2314,16 @@ void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, u
 			load_default_config(type, player, newseq);
 	}
 
-	// after applying the controller config, push that back into the backup, since that is
-	// what we will diff against
 	if (cfg_type == config_type::CONTROLLER)
+	{
+		// after applying the controller config, push that back into the backup, since that is what we will diff against
 		for (input_type_entry &entry : m_typelist)
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				entry.defseq(seqtype) = entry.seq(seqtype);
-
-	// load keyboard enable/disable state
-	if (cfg_type == config_type::SYSTEM)
+	}
+	else if (cfg_type == config_type::SYSTEM)
 	{
+		// load keyboard enable/disable state
 		std::vector<bool> kbd_enable_set;
 		bool keyboard_enabled = false, missing_enabled = false;
 		natural_keyboard &natkbd = machine().natkeyboard();
@@ -2498,6 +2480,7 @@ bool ioport_manager::load_controller_config(
 
 	// find the matching field
 	ioport_value const defvalue = portnode.get_attribute_int("defvalue", 0);
+	bool matched = false;
 	for (ioport_field &field : port->second->fields())
 	{
 		// find the matching mask and default value
@@ -2559,13 +2542,16 @@ bool ioport_manager::load_controller_config(
 #endif
 			}
 
-			// successfully applied
-			return true;
+			// only break out of the loop for unconditional inputs
+			if (field.condition().condition() == ioport_condition::ALWAYS)
+				return true;
+			else
+				matched = true;
 		}
 	}
 
-	// no matching field
-	return false;
+	// return whether any field matched
+	return matched;
 }
 
 
@@ -2636,7 +2622,10 @@ void ioport_manager::load_system_config(
 					else if (revstring && !strcmp(revstring, "no"))
 						field.live().analog->m_reverse = false;
 				}
-				break;
+
+				// only break out of the loop for unconditional inputs
+				if (field.condition().condition() == ioport_condition::ALWAYS)
+					break;
 			}
 		}
 	}
@@ -2667,6 +2656,82 @@ void ioport_manager::load_system_config(
 						break;
 					}
 				}
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  apply_device_defaults - add default assignments
+//  supplied by input devices
+//-------------------------------------------------
+
+void ioport_manager::apply_device_defaults()
+{
+	// make sure this only happens once
+	assert(!m_applied_device_defaults);
+	m_applied_device_defaults = true;
+
+	// TODO: come up with a way to deal with non-multi device classes here?
+	for (input_device_class classno = DEVICE_CLASS_FIRST_VALID; DEVICE_CLASS_LAST_VALID >= classno; ++classno)
+	{
+		input_class &devclass = machine().input().device_class(classno);
+		for (int devnum = 0; devclass.maxindex() >= devnum; ++devnum)
+		{
+			// make sure device exists
+			input_device const *const device = devclass.device(devnum);
+			if (!device)
+				continue;
+
+			// iterate over default assignments
+			for (auto [porttype, seqtype, seq] : device->default_assignments())
+			{
+				assert(!seq.empty());
+				assert(seq.is_valid());
+				assert(!seq.is_default());
+
+				// only apply UI assignments for first device in a class
+				if ((IPT_UI_FIRST < porttype) && (IPT_UI_LAST > porttype) && (device->devindex() != 0))
+					continue;
+
+				// limit to maximum player count
+				if (device->devindex() >= MAX_PLAYERS)
+					continue;
+
+				// find a matching port in the list
+				auto const found = std::find_if(
+						m_typelist.begin(),
+						m_typelist.end(),
+						[type = porttype, device] (input_type_entry const &entry)
+						{
+							return (entry.type() == type) && (entry.player() == device->devindex());
+						});
+				if (m_typelist.end() == found)
+					continue;
+
+				// start with the current setting
+				input_seq remapped(found->seq(seqtype));
+				if (!remapped.empty())
+					remapped += input_seq::or_code;
+
+				// append adjusting the device index
+				for (int i = 0, len = seq.length(); i < len; ++i)
+				{
+					input_code code = seq[i];
+					if (!code.internal())
+					{
+						assert(code.device_class() == classno);
+						assert(code.device_index() == 0);
+						assert(code.item_id() >= ITEM_ID_FIRST_VALID);
+						assert(code.item_id() <= ITEM_ID_ABSOLUTE_MAXIMUM);
+						code.set_device_index(device->devindex());
+					}
+					remapped += code;
+				}
+
+				// apply to the entry
+				found->set_seq(seqtype, remapped);
 			}
 		}
 	}
@@ -2784,7 +2849,7 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 	// iterate over ports
 	for (auto &port : m_portlist)
 		for (ioport_field const &field : port.second->fields())
-			if (save_this_input_field_type(field.type()))
+			if (save_this_input_field_type(field.type()) && field.enabled())
 			{
 				// determine if we changed
 				bool changed = false;
@@ -2881,9 +2946,13 @@ Type ioport_manager::playback_read(Type &result)
 		return result = Type(0);
 
 	// read the value; if we fail, end playback
-	size_t read;
-	m_playback_stream->read(&result, sizeof(result), read);
-	if (sizeof(result) != read)
+	auto const [err, actual] = read(*m_playback_stream, &result, sizeof(result));
+	if (err)
+	{
+		playback_end("Read error");
+		return result = Type(0);
+	}
+	else if (sizeof(result) != actual)
 	{
 		playback_end("End of file");
 		return result = Type(0);
@@ -3067,9 +3136,8 @@ void ioport_manager::record_write(Type value)
 		value = little_endianize_int16(value);
 
 	// write the value; if we fail, end recording
-	size_t written;
-	if (m_record_stream->write(&value, sizeof(value), written) || (sizeof(value) != written))
-		record_end("Out of space");
+	if (write(*m_record_stream, &value, sizeof(value)).first)
+		record_end("Write error");
 }
 
 template<>
@@ -3345,7 +3413,7 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 {
 	// make sure we have a field
 	if (!m_curfield)
-		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
+		throw emu_fatalerror("setting_alloc called with no active field (value=%X name=%s)\n", value, name);
 
 	// append a new setting
 	m_cursetting = &m_curfield->m_settinglist.emplace_back(*m_curfield, value & m_curfield->mask(), string_from_token(name));
@@ -3398,9 +3466,9 @@ ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value
 //-------------------------------------------------
 
 dynamic_field::dynamic_field(ioport_field &field)
-	: m_field(field),
-		m_shift(0),
-		m_oldval(field.defvalue())
+	: m_field(field)
+	, m_shift(0)
+	, m_oldval(field.defvalue())
 {
 	// fill in the data
 	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
@@ -3455,45 +3523,36 @@ void dynamic_field::write(ioport_value newval)
 //-------------------------------------------------
 
 analog_field::analog_field(ioport_field &field)
-	: m_field(field),
-		m_shift(0),
-		m_adjdefvalue(field.defvalue() & field.mask()),
-		m_adjmin(field.minval() & field.mask()),
-		m_adjmax(field.maxval() & field.mask()),
-		m_adjoverride(field.defvalue() & field.mask()),
-		m_sensitivity(field.sensitivity()),
-		m_reverse(field.analog_reverse()),
-		m_delta(field.delta()),
-		m_centerdelta(field.centerdelta()),
-		m_accum(0),
-		m_previous(0),
-		m_previousanalog(0),
-		m_minimum(osd::INPUT_ABSOLUTE_MIN),
-		m_maximum(osd::INPUT_ABSOLUTE_MAX),
-		m_center(0),
-		m_reverse_val(0),
-		m_scalepos(0),
-		m_scaleneg(0),
-		m_keyscalepos(0),
-		m_keyscaleneg(0),
-		m_positionalscale(0),
-		m_absolute(false),
-		m_wraps(false),
-		m_autocenter(false),
-		m_single_scale(false),
-		m_interpolate(false),
-		m_lastdigital(false),
-		m_use_adjoverride(false)
+	: m_field(field)
+	, m_shift(compute_shift(field.mask()))
+	, m_adjdefvalue((field.defvalue() & field.mask()) >> m_shift)
+	, m_adjmin((field.minval() & field.mask()) >> m_shift)
+	, m_adjmax((field.maxval() & field.mask()) >> m_shift)
+	, m_adjoverride((field.defvalue() & field.mask()) >> m_shift)
+	, m_sensitivity(field.sensitivity())
+	, m_reverse(field.analog_reverse())
+	, m_delta(field.delta())
+	, m_centerdelta(field.centerdelta())
+	, m_accum(0)
+	, m_previous(0)
+	, m_previousanalog(0)
+	, m_minimum(osd::input_device::ABSOLUTE_MIN)
+	, m_maximum(osd::input_device::ABSOLUTE_MAX)
+	, m_center(0)
+	, m_reverse_val(0)
+	, m_scalepos(0)
+	, m_scaleneg(0)
+	, m_keyscalepos(0)
+	, m_keyscaleneg(0)
+	, m_positionalscale(0)
+	, m_absolute(false)
+	, m_wraps(false)
+	, m_autocenter(false)
+	, m_single_scale(false)
+	, m_interpolate(false)
+	, m_lastdigital(false)
+	, m_use_adjoverride(false)
 {
-	// compute the shift amount and number of bits
-	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
-		m_shift++;
-
-	// initialize core data
-	m_adjdefvalue >>= m_shift;
-	m_adjmin >>= m_shift;
-	m_adjmax >>= m_shift;
-
 	// set basic parameters based on the configured type
 	switch (field.type())
 	{
@@ -3512,7 +3571,7 @@ analog_field::analog_field(ioport_field &field)
 		case IPT_PEDAL:
 		case IPT_PEDAL2:
 		case IPT_PEDAL3:
-			m_center = osd::INPUT_ABSOLUTE_MIN;
+			m_center = osd::input_device::ABSOLUTE_MIN;
 			m_accum = apply_inverse_sensitivity(m_center);
 			m_absolute = true;
 			m_autocenter = true;
@@ -3531,7 +3590,7 @@ analog_field::analog_field(ioport_field &field)
 		// set each position to be 512 units
 		case IPT_POSITIONAL:
 		case IPT_POSITIONAL_V:
-			m_positionalscale = compute_scale(field.maxval(), osd::INPUT_ABSOLUTE_MAX - osd::INPUT_ABSOLUTE_MIN);
+			m_positionalscale = compute_scale(field.maxval(), osd::input_device::ABSOLUTE_MAX - osd::input_device::ABSOLUTE_MIN);
 			m_adjmin = 0;
 			m_adjmax = field.maxval() - 1;
 			m_wraps = field.analog_wraps();
@@ -3557,21 +3616,23 @@ analog_field::analog_field(ioport_field &field)
 			fatalerror("Unknown analog port type -- don't know if it is absolute or not\n");
 	}
 
-	// further processing for absolute controls
 	if (m_absolute)
 	{
+		// further processing for absolute controls
+
 		// if the default value is pegged at the min or max, use a single scale value for the whole axis
 		m_single_scale = (m_adjdefvalue == m_adjmin) || (m_adjdefvalue == m_adjmax);
 
 		// if not "single scale", compute separate scales for each side of the default
 		if (!m_single_scale)
 		{
-			// unsigned
-			m_scalepos = compute_scale(m_adjmax - m_adjdefvalue, osd::INPUT_ABSOLUTE_MAX - 0);
-			m_scaleneg = compute_scale(m_adjdefvalue - m_adjmin, 0 - osd::INPUT_ABSOLUTE_MIN);
-
-			if (m_adjmin > m_adjmax)
-				m_scaleneg = -m_scaleneg;
+			// unsigned, potentially passing through zero
+			m_scalepos = compute_scale(
+					(m_adjmax - m_adjdefvalue) & (field.mask() >> m_shift),
+					osd::input_device::ABSOLUTE_MAX);
+			m_scaleneg = compute_scale(
+					(m_adjdefvalue - m_adjmin) & (field.mask() >> m_shift),
+					-osd::input_device::ABSOLUTE_MIN);
 
 			// reverse point is at center
 			m_reverse_val = 0;
@@ -3579,7 +3640,7 @@ analog_field::analog_field(ioport_field &field)
 		else
 		{
 			// single axis that increases from default
-			m_scalepos = compute_scale(m_adjmax - m_adjmin, osd::INPUT_ABSOLUTE_MAX - osd::INPUT_ABSOLUTE_MIN);
+			m_scalepos = compute_scale(m_adjmax - m_adjmin, osd::input_device::ABSOLUTE_MAX - osd::input_device::ABSOLUTE_MIN);
 
 			// make the scaling the same for easier coding when we need to scale
 			m_scaleneg = m_scalepos;
@@ -3588,11 +3649,11 @@ analog_field::analog_field(ioport_field &field)
 			m_reverse_val = m_maximum;
 		}
 	}
-
-	// relative and positional controls all map directly with a 512x scale factor
 	else
 	{
-		// The relative code is set up to allow specifing PORT_MINMAX and default values.
+		// relative and positional controls all map directly with a 512x scale factor
+
+		// The relative code is set up to allow specifying PORT_MINMAX and default values.
 		// The validity checks are purposely set up to not allow you to use anything other
 		// a default of 0 and PORT_MINMAX(0,mask).  This is in case the need arises to use
 		// this feature in the future.  Keeping the code in does not hurt anything.
@@ -3603,15 +3664,17 @@ analog_field::analog_field(ioport_field &field)
 		if (m_wraps)
 			m_adjmax++;
 
-		m_minimum = (m_adjmin - m_adjdefvalue) * osd::INPUT_RELATIVE_PER_PIXEL;
-		m_maximum = (m_adjmax - m_adjdefvalue) * osd::INPUT_RELATIVE_PER_PIXEL;
+		m_minimum = (m_adjmin - m_adjdefvalue) * osd::input_device::RELATIVE_PER_PIXEL;
+		m_maximum = (m_adjmax - m_adjdefvalue) * osd::input_device::RELATIVE_PER_PIXEL;
 
 		// make the scaling the same for easier coding when we need to scale
-		m_scaleneg = m_scalepos = compute_scale(1, osd::INPUT_RELATIVE_PER_PIXEL);
+		m_scaleneg = m_scalepos = compute_scale(1, osd::input_device::RELATIVE_PER_PIXEL);
 
 		if (m_field.analog_reset())
+		{
 			// delta values reverse from center
 			m_reverse_val = 0;
+		}
 		else
 		{
 			// positional controls reverse from their max range
@@ -3620,11 +3683,11 @@ analog_field::analog_field(ioport_field &field)
 			// relative controls reverse from 1 past their max range
 			if (m_wraps)
 			{
-				// FIXME: positional needs -1, using osd::INPUT_RELATIVE_PER_PIXEL skips a position (and reads outside the table array)
-				if(field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
-					m_reverse_val --;
+				// FIXME: positional needs -1, using osd::input_device::RELATIVE_PER_PIXEL skips a position (and reads outside the table array)
+				if (field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
+					m_reverse_val--;
 				else
-					m_reverse_val -= osd::INPUT_RELATIVE_PER_PIXEL;
+					m_reverse_val -= osd::input_device::RELATIVE_PER_PIXEL;
 			}
 		}
 	}
@@ -3697,7 +3760,7 @@ s32 analog_field::apply_settings(s32 value) const
 	else if (m_single_scale)
 		// it's a pedal or the default value is equal to min/max
 		// so we need to adjust the center to the minimum
-		value -= osd::INPUT_ABSOLUTE_MIN;
+		value -= osd::input_device::ABSOLUTE_MIN;
 
 	// map differently for positive and negative values
 	if (value >= 0)
@@ -3802,7 +3865,7 @@ void analog_field::frame_update(running_machine &machine)
 				// if port is positional, we will take the full analog control and divide it
 				// into positions, that way as the control is moved full scale,
 				// it moves through all the positions
-				rawvalue = apply_scale(rawvalue - osd::INPUT_ABSOLUTE_MIN, m_positionalscale) * osd::INPUT_RELATIVE_PER_PIXEL + m_minimum;
+				rawvalue = apply_scale(rawvalue - osd::input_device::ABSOLUTE_MIN, m_positionalscale) * osd::input_device::RELATIVE_PER_PIXEL + m_minimum;
 
 				// clamp the high value so it does not roll over
 				rawvalue = std::min(rawvalue, m_maximum);

@@ -44,11 +44,11 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 	: cpu_device(mconfig, SATURN, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
-	, m_in_func(*this)
+	, m_in_func(*this, 0)
 	, m_reset_func(*this)
 	, m_config_func(*this)
 	, m_unconfig_func(*this)
-	, m_id_func(*this)
+	, m_id_func(*this, 0)
 	, m_crc_func(*this)
 	, m_rsi_func(*this)
 	, m_pc(0), m_oldpc(0), m_p(0), m_out(0), m_carry(0), m_decimal(0), m_st(0), m_hst(0)
@@ -94,15 +94,6 @@ void saturn_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-
-	m_out_func.resolve_safe();
-	m_in_func.resolve_safe(0);
-	m_reset_func.resolve_safe();
-	m_config_func.resolve_safe();
-	m_unconfig_func.resolve_safe();
-	m_id_func.resolve_safe(0);
-	m_crc_func.resolve_safe();
-	m_rsi_func.resolve_safe();
 
 	memset(m_reg, 0, sizeof(m_reg));
 	memset(m_d, 0, sizeof(m_d));
@@ -332,15 +323,14 @@ void saturn_device::device_reset()
 
 void saturn_device::saturn_take_irq()
 {
+	LOG("SATURN takes IRQ ($%04x)\n", m_pc);
+	standard_irq_callback(SATURN_IRQ_LINE, m_pc);
+
 	m_in_irq = 1;       /* reset by software, using RTI */
 	m_pending_irq = 0;
 	m_icount -= 7;
 	saturn_push(m_pc);
 	m_pc=IRQ_ADDRESS;
-
-	LOG("SATURN takes IRQ ($%04x)\n", m_pc);
-
-	standard_irq_callback(SATURN_IRQ_LINE);
 }
 
 void saturn_device::execute_run()
@@ -398,7 +388,6 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			if (m_sleeping && state==1)
 			{
 				LOG("SATURN set_wakeup_line(ASSERT)\n");
-				standard_irq_callback(SATURN_WAKEUP_LINE);
 				m_sleeping = 0;
 			}
 			break;

@@ -45,6 +45,19 @@
 #include "screen.h"
 
 
+#define LOG_VRAM      (1U << 1)
+#define LOG_DEBUG     (1U << 2)
+
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGVRAM(...) LOGMASKED(LOG_VRAM, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
+
+namespace {
+
 // these are unverified
 static constexpr int KCGD_TOTAL_HORZ = 977;
 static constexpr int KCGD_DISP_HORZ = 800;
@@ -56,18 +69,6 @@ static constexpr int KCGD_VERT_START = 0;
 
 static constexpr int KCGD_PAGE_0 = 015574;
 static constexpr int KCGD_PAGE_1 = 005574;
-
-
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_VRAM      (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
-
-//#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC osd_printf_info
-#include "logmacro.h"
-
-#define LOGVRAM(...) LOGMASKED(LOG_VRAM, __VA_ARGS__)
-#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class kcgd_state : public driver_device
@@ -198,7 +199,7 @@ TIMER_CALLBACK_MEMBER(kcgd_state::toggle_500hz)
 
 void kcgd_state::machine_reset()
 {
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 }
 
 void kcgd_state::machine_start()
@@ -391,7 +392,7 @@ void kcgd_state::kcgd(machine_config &config)
 
 	timer_device &scantimer(TIMER(config, "scantimer"));
 	scantimer.configure_periodic(FUNC(kcgd_state::scanline_callback), attotime::from_hz(50 * 28 * 11));
-	scantimer.set_start_delay(attotime::from_hz(XTAL(30'800'000) / KCGD_HORZ_START));
+	scantimer.set_start_delay(attotime::from_ticks(KCGD_HORZ_START, XTAL(30'800'000)));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(kcgd_state::screen_update));
@@ -412,8 +413,8 @@ void kcgd_state::kcgd(machine_config &config)
 	m_dl11host->txd_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 // future
 //  m_dl11host->rts_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
-//  m_dl11host->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
-//  m_dl11host->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11host->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
+//  m_dl11host->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(m_dl11host, FUNC(dl11_device::rx_w));
@@ -426,8 +427,8 @@ void kcgd_state::kcgd(machine_config &config)
 	m_dl11kbd->set_txvec(064);
 	m_dl11kbd->txd_wr_callback().set(m_ms7004, FUNC(ms7004_device::write_rxd));
 // future
-//  m_dl11kbd->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
-//  m_dl11kbd->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11kbd->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
+//  m_dl11kbd->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 
 	MS7004(config, m_ms7004, 0);
 	m_ms7004->tx_handler().set(m_dl11kbd, FUNC(dl11_device::rx_w));
@@ -441,6 +442,9 @@ ROM_START( dvk_kcgd )
 	ROM_SYSTEM_BIOS(1, "182", "mask 182")
 	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

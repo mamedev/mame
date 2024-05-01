@@ -50,17 +50,17 @@
 // ----------------------------------
 // Flags for debugging
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_RW          (1U<<2)     // Read and write accesses
-#define LOG_CRU         (1U<<3)    // Show CRU bit accesses
-#define LOG_CRUD        (1U<<4)    // Show CRU bit accesses (details)
-#define LOG_READY       (1U<<5)    // Show ready line activity
-#define LOG_SIGNALS     (1U<<6)    // Show detailed signal activity
-#define LOG_ADDRESS     (1U<<7)    // Show address bus operations
-#define LOG_MOTOR       (1U<<8)    // Show motor operations
-#define LOG_CONFIG      (1U<<9)    // Configuration
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_RW          (1U << 2)    // Read and write accesses
+#define LOG_CRU         (1U << 3)    // Show CRU bit accesses
+#define LOG_CRUD        (1U << 4)    // Show CRU bit accesses (details)
+#define LOG_READY       (1U << 5)    // Show ready line activity
+#define LOG_SIGNALS     (1U << 6)    // Show detailed signal activity
+#define LOG_ADDRESS     (1U << 7)    // Show address bus operations
+#define LOG_MOTOR       (1U << 8)    // Show motor operations
+#define LOG_CONFIG      (1U << 9)    // Configuration
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_BWG, bus::ti99::peb::snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
@@ -94,6 +94,7 @@ snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag,
 	  m_address(0),
 	  m_dsrrom(nullptr),
 	  m_buffer_ram(*this, BUFFER),
+	  m_floppy(*this, "%u", 0),
 	  m_sel_floppy(0),
 	  m_wd1773(*this, FDC_TAG),
 	  m_clock(*this, CLOCK_TAG),
@@ -123,7 +124,7 @@ void snug_bwg_device::operate_ready_line()
 /*
     Callbacks from the WD1773 chip
 */
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
+void snug_bwg_device::fdc_irq_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "set intrq = %d\n", state);
 	m_IRQ = (line_state)state;
@@ -132,7 +133,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
+void snug_bwg_device::fdc_drq_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "set drq = %d\n", state);
 	m_DRQ = (line_state)state;
@@ -355,10 +356,10 @@ void snug_bwg_device::crureadz(offs_t offset, uint8_t *value)
 		if ((offset & 0x00f0)==0)
 		{
 			// Check what drives are not connected
-			reply = ((m_floppy[0] != nullptr)? 0 : 0x02)       // DSK1
-					| ((m_floppy[1] != nullptr)? 0 : 0x04) // DSK2
-					| ((m_floppy[2] != nullptr)? 0 : 0x08) // DSK3
-					| ((m_floppy[3] != nullptr)? 0 : 0x01);    // DSK4
+			reply = ((m_floppy[0]->get_device() != nullptr)? 0 : 0x02)       // DSK1
+					| ((m_floppy[1]->get_device() != nullptr)? 0 : 0x04) // DSK2
+					| ((m_floppy[2]->get_device() != nullptr)? 0 : 0x08) // DSK3
+					| ((m_floppy[3]->get_device() != nullptr)? 0 : 0x01);    // DSK4
 
 			// DIP switches for step and date/time display
 			if (m_dip1 != 0) reply |= 0x10;
@@ -390,19 +391,19 @@ void snug_bwg_device::cruwrite(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::den_w)
+void snug_bwg_device::den_w(int state)
 {
 	// (De)select the card. Indicated by a LED on the board.
 	m_selected = state;
 	LOGMASKED(LOG_CRU, "Map DSR (bit 0) = %d\n", m_selected);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::mop_w)
+void snug_bwg_device::mop_w(int state)
 {
 	m_motormf->b_w(state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::waiten_w)
+void snug_bwg_device::waiten_w(int state)
 {
 	/* Set disk ready/hold (bit 2) */
 	// 0: ignore IRQ and DRQ
@@ -412,29 +413,29 @@ WRITE_LINE_MEMBER(snug_bwg_device::waiten_w)
 	LOGMASKED(LOG_CRU, "Arm wait state logic (bit 2) = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::hlt_w)
+void snug_bwg_device::hlt_w(int state)
 {
 	// Load disk heads (HLT pin) (bit 3). Not implemented.
 	LOGMASKED(LOG_CRU, "Set head load (bit 3) = %d\n", state);
 }
 
 /* Drive selects */
-WRITE_LINE_MEMBER(snug_bwg_device::dsel1_w)
+void snug_bwg_device::dsel1_w(int state)
 {
 	select_drive(1, state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dsel2_w)
+void snug_bwg_device::dsel2_w(int state)
 {
 	select_drive(2, state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dsel3_w)
+void snug_bwg_device::dsel3_w(int state)
 {
 	select_drive(3, state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dsel4_w)
+void snug_bwg_device::dsel4_w(int state)
 {
 	select_drive(4, state);
 }
@@ -463,26 +464,26 @@ void snug_bwg_device::select_drive(int n, int state)
 			LOGMASKED(LOG_WARN, "Warning: DSK%d selected while DSK%d not yet unselected\n", n, m_sel_floppy);
 		}
 
-		if (m_floppy[n-1] != nullptr)
+		if (m_floppy[n-1]->get_device() != nullptr)
 		{
 			m_sel_floppy = n;
-			m_wd1773->set_floppy(m_floppy[n-1]);
-			m_floppy[n-1]->ss_w(m_crulatch0_7->q7_r());
+			m_wd1773->set_floppy(m_floppy[n-1]->get_device());
+			m_floppy[n-1]->get_device()->ss_w(m_crulatch0_7->q7_r());
 		}
 	}
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::sidsel_w)
+void snug_bwg_device::sidsel_w(int state)
 {
 	// Select side of disk (bit 7)
 	if (m_sel_floppy != 0)
 	{
 		LOGMASKED(LOG_CRU, "Set side (bit 7) = %d on DSK%d\n", state, m_sel_floppy);
-		m_floppy[m_sel_floppy-1]->ss_w(m_crulatch0_7->q7_r());
+		m_floppy[m_sel_floppy-1]->get_device()->ss_w(m_crulatch0_7->q7_r());
 	}
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dden_w)
+void snug_bwg_device::dden_w(int state)
 {
 	/* double density enable (active low) */
 	LOGMASKED(LOG_CRU, "Set density (bit 10) = %d (%s)\n", state, (state!=0)? "single" : "double");
@@ -492,7 +493,7 @@ WRITE_LINE_MEMBER(snug_bwg_device::dden_w)
 /*
     All floppy motors are operated by the same line.
 */
-WRITE_LINE_MEMBER(snug_bwg_device::motorona_w)
+void snug_bwg_device::motorona_w(int state)
 {
 	m_MOTOR_ON = state;
 	LOGMASKED(LOG_MOTOR, "Motor %s\n", state? "on" : "off");
@@ -502,7 +503,8 @@ WRITE_LINE_MEMBER(snug_bwg_device::motorona_w)
 
 	// Set all motors
 	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
+		if (elem->get_device() != nullptr)
+			elem->get_device()->mon_w((state==ASSERT_LINE)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -542,12 +544,12 @@ void snug_bwg_device::device_reset()
 	m_WDsel = false;
 	m_WDsel0 = false;
 
-	for (int i=0; i < 4; i++)
+	for (auto &flop : m_floppy)
 	{
-		if (m_floppy[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", i, m_floppy[i]->name());
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", flop->basetag(), flop->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", i);
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
 
 	m_wd1773->set_floppy(nullptr);
@@ -555,18 +557,6 @@ void snug_bwg_device::device_reset()
 	m_dip1 = ioport("BWGDIP1")->read();
 	m_dip2 = ioport("BWGDIP2")->read();
 	m_dip34 = ioport("BWGDIP34")->read();
-}
-
-void snug_bwg_device::device_config_complete()
-{
-	for (auto & elem : m_floppy)
-		elem = nullptr;
-
-	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
-	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
 }
 
 INPUT_PORTS_START( bwg_fdc )
@@ -615,10 +605,10 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 
 	MM58274C(config, CLOCK_TAG, 32.768_kHz_XTAL).set_mode_and_day(1, 0); // 24h, sunday
 
-	FLOPPY_CONNECTOR(config, "0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
 
 	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
 

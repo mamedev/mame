@@ -4,7 +4,7 @@
 
     nbmj8891 - Nichibutsu Mahjong games for years 1988-1991
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 1999/11/05 -
+    Driver by Takahiro Nogi 1999/11/05 -
 
 ******************************************************************************/
 /******************************************************************************
@@ -565,7 +565,7 @@ void nbmj8891_state::taiwanmb_io_map(address_map &map)
  * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
  * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
  * or should they only check the flag at inputport3? */
-READ_LINE_MEMBER( nbmj8891_state::nb1413m3_outcoin_flag_r )
+int nbmj8891_state::nb1413m3_outcoin_flag_r()
 {
 	return m_nb1413m3->m_outcoin_flag & 0x01;
 }
@@ -2191,7 +2191,8 @@ void nbmj8891_state::gionbana(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::gionbana_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8891_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0, NB1413M3_GIONBANA);
+	NB1413M3(config, m_nb1413m3, 0, nb1413m3_device::NB1413M3_GIONBANA);
+	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2221,7 +2222,7 @@ void nbmj8891_state::mgion(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::mgion_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::mgion_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MGION);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MGION);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2234,7 +2235,7 @@ void nbmj8891_state::omotesnd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::omotesnd_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::omotesnd_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_OMOTESND);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_OMOTESND);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2249,7 +2250,7 @@ void nbmj8891_state::abunai(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_ABUNAI);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_ABUNAI);
 }
 
 /* NBMJDRV2 */
@@ -2260,7 +2261,7 @@ void nbmj8891_state::mjcamerb(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::hanamomo_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MJCAMERB);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJCAMERB);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2276,7 +2277,7 @@ void nbmj8891_state::mmcamera(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::hanamomo_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MMCAMERA);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MMCAMERA);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2293,7 +2294,7 @@ void nbmj8891_state::hanamomo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::hanamomo_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::hanamomo_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_HANAMOMO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_HANAMOMO);
 
 	/* video hardware */
 	m_screen->set_visarea(0, 512-1, 16, 240-1);
@@ -2308,7 +2309,7 @@ void nbmj8891_state::msjiken(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::gionbana_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::msjiken_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MSJIKEN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MSJIKEN);
 }
 
 /* NBMJDRV3 */
@@ -2316,7 +2317,7 @@ void nbmj8891_state::telmahjn(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_TELMAHJN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_TELMAHJN);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
@@ -2326,7 +2327,7 @@ void nbmj8891_state::mgmen89(machine_config &config)
 {
 	telmahjn(config);
 
-	m_nb1413m3->set_type(NB1413M3_MGMEN89);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MGMEN89);
 }
 
 /* NBMJDRV4 */
@@ -2336,7 +2337,7 @@ void nbmj8891_state::mjfocus(machine_config &config)
 
 	/* basic machine hardware */
 
-	m_nb1413m3->set_type(NB1413M3_MJFOCUS);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJFOCUS);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
@@ -2346,14 +2347,14 @@ void nbmj8891_state::pairsnb(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_PAIRSNB);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_PAIRSNB);
 }
 
 void nbmj8891_state::pairsten(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_PAIRSTEN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_PAIRSTEN);
 }
 
 /* NBMJDRV5 */
@@ -2364,7 +2365,7 @@ void nbmj8891_state::mjnanpas(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::club90s_map);
 
-	m_nb1413m3->set_type(NB1413M3_MJNANPAS);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJNANPAS);
 }
 
 void nbmj8891_state::maiko(machine_config &config)
@@ -2375,7 +2376,7 @@ void nbmj8891_state::maiko(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::maiko_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::maiko_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MAIKO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MAIKO);
 }
 
 void nbmj8891_state::mmaiko(machine_config &config)
@@ -2385,7 +2386,7 @@ void nbmj8891_state::mmaiko(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::mmaiko_map);
 
-	m_nb1413m3->set_type(NB1413M3_MMAIKO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MMAIKO);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2398,7 +2399,7 @@ void nbmj8891_state::lovehous(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::lovehous_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::lovehous_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_LOVEHOUS);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_LOVEHOUS);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2410,7 +2411,7 @@ void nbmj8891_state::hanaoji(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::hanaoji_map);
 
-	m_nb1413m3->set_type(NB1413M3_HANAOJI);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_HANAOJI);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2441,7 +2442,7 @@ void nbmj8891_state::scandal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::scandalm_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::scandal_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_SCANDAL);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_SCANDAL);
 }
 
 void nbmj8891_state::bananadr(machine_config &config)
@@ -2452,7 +2453,7 @@ void nbmj8891_state::bananadr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::scandalm_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::bananadr_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_BANANADR);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_BANANADR);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2461,21 +2462,21 @@ void nbmj8891_state::club90s(machine_config &config)
 {
 	mjnanpas(config);
 
-	m_nb1413m3->set_type(NB1413M3_CLUB90S);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_CLUB90S);
 }
 
 void nbmj8891_state::mladyhtr(machine_config &config)
 {
 	mjnanpas(config);
 
-	m_nb1413m3->set_type(NB1413M3_MLADYHTR);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MLADYHTR);
 }
 
 void nbmj8891_state::chinmoku(machine_config &config)
 {
 	mjnanpas(config);
 
-	m_nb1413m3->set_type(NB1413M3_CHINMOKU);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_CHINMOKU);
 }
 
 /* NBMJDRV6 */
@@ -2487,7 +2488,7 @@ void nbmj8891_state::mjfocusm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::scandalm_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::scandalm_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MJFOCUSM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJFOCUSM);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2506,7 +2507,7 @@ void nbmj8891_state::scandalm(machine_config &config)
 {
 	mjfocusm(config);
 
-	m_nb1413m3->set_type(NB1413M3_SCANDALM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_SCANDALM);
 }
 
 void nbmj8891_state::taiwanmb(machine_config &config)
@@ -2518,7 +2519,7 @@ void nbmj8891_state::taiwanmb(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::taiwanmb_io_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(nbmj8891_state::irq0_line_hold));
 
-	m_nb1413m3->set_type(NB1413M3_TAIWANMB);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_TAIWANMB);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3530,32 +3531,32 @@ GAME( 1988, hanamomo,  0,        hanamomo, hanamomo, nbmj8891_state, empty_init,
 GAME( 1988, hanamomb,  hanamomo, hanamomo, hanamomo, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881125)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, telmahjn,  0,        telmahjn, msjiken,  nbmj8891_state, init_telmahjn, ROT270, "Nichibutsu", "Telephone Mahjong (Japan 890111)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gionbana,  0,        gionbana, gionbana, nbmj8891_state, init_gionbana, ROT0,   "Nichibutsu", "Gionbana (Japan 890120)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgion,     0,        mgion,    mgion,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgion,     0,        mgion,    mgion,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Gionbana (Japan 890207, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, omotesnd,  0,        omotesnd, omotesnd, nbmj8891_state, init_omotesnd, ROT0,   "Anime Tec", "Omotesandou (Japan 890215)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, abunai,    0,        abunai,   abunai,   nbmj8891_state, empty_init,    ROT0,   "Green Soft", "Abunai Houkago - Mou Matenai (Japan 890325)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, init_mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus [BET] (Japan 890510)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, init_mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890510, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou [BET] (Japan 890509)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 890509, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, scandal,   0,        scandal,  scandal,  nbmj8891_state, init_scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Scandal Mahjong [BET] (Japan 890217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890217, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mgmen89,   0,        mgmen89,  mgmen89,  nbmj8891_state, init_mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpas,  0,        mjnanpas, mjnanpas, nbmj8891_state, init_mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890713)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpaa,  mjnanpas, mjnanpas, mjnanpaa, nbmj8891_state, init_mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890712)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpau,  mjnanpas, mjnanpas, mjnanpas, nbmj8891_state, init_mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Ura) (Japan 890805)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bananadr,  0,        bananadr, bananadr, nbmj8891_state, empty_init,    ROT0,   "Digital Soft", "Mahjong Banana Dream [BET] (Japan 891124)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bananadr,  0,        bananadr, bananadr, nbmj8891_state, empty_init,    ROT0,   "Digital Soft", "Mahjong Banana Dream (Japan 891124)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mladyhtr,  0,        mladyhtr, mladyhtr, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong The Lady Hunter (Japan 900509)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, maiko,     0,        maiko,    maiko,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana [BET] (Japan 900911)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900911, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnageman,  0,        hnageman, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, club90s,   0,        club90s,  club90s,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, club90sa,  club90s,  club90s,  club90s,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lovehous,  club90s,  lovehous, lovehous, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Taiwan Mahjong [BET] (Japan 881208)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lovehous,  club90s,  lovehous, lovehous, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Love House (Japan 901024)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Taiwan Mahjong (Japan 881208)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pairsnb,   0,        pairsnb,  pairsnb,  nbmj8891_state, init_pairsnb,  ROT0,   "Nichibutsu", "Pairs (Nichibutsu) (Japan 890822)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pairsten,  pairsnb,  pairsten, pairsnb,  nbmj8891_state, init_pairsten, ROT0,   "System Ten", "Pairs (System Ten) (Japan 890826)", MACHINE_SUPPORTS_SAVE )

@@ -273,6 +273,9 @@ Namco System 21 Video Hardware
 
 #define ENABLE_LOGGING      0
 
+
+namespace {
+
 class namcos21_c67_state : public driver_device
 {
 public:
@@ -350,7 +353,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
-	DECLARE_WRITE_LINE_MEMBER(yield_hack);
+	void yield_hack(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -867,7 +870,7 @@ void namcos21_c67_state::cybsled(machine_config &config)
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_CYBERSLED);
 }
 
-WRITE_LINE_MEMBER(namcos21_c67_state::yield_hack)
+void namcos21_c67_state::yield_hack(int state)
 {
 	m_maincpu->yield();
 }
@@ -1230,6 +1233,9 @@ void namcos21_c67_state::init_solvalou()
 	mem[0x20cf4/2+1] = 0x4e71;
 	mem[0x20cf4/2+2] = 0x4e71;
 }
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
 

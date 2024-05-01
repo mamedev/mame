@@ -1045,9 +1045,6 @@ void omegaf_state::omegaf(machine_config &config)
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &omegaf_state::ninjakid_nopcm_sound_cpu);
 
-//  MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
-//  MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
-
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(omegaf_state,omegaf)
 

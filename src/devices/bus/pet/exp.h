@@ -48,8 +48,8 @@ public:
 	int norom_r(offs_t offset, int sel);
 	uint8_t read(offs_t offset, uint8_t data, int &sel);
 	void write(offs_t offset, uint8_t data, int &sel);
-	DECLARE_READ_LINE_MEMBER( diag_r );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
+	int diag_r();
+	void irq_w(int state);
 
 	// cartridge interface
 	uint8_t dma_bd_r(offs_t offset);

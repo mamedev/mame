@@ -29,15 +29,6 @@ Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound
 
 To Do:
 
-- All games uses PORT_VBLANK and legacy screen parameters (which is already
-  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30
-  or 59.90 Hz).
-  The most blunt examples of something being wrong with timings are with
-  Gunbird and Tengai: they both have FOUR frames of input lag, the real thing
-  doesn't sport anything like that.
-  Given the above, all games are marked with MACHINE_IMPERFECT_TIMING until
-  somebody provides accurate H/Vsync signals for at least one game of this
-  driver.
 - tengai / tengaij: "For use in Japan" screen is supposed to output the
   typical blue Psikyo backdrop gradient instead of being pure black as it is
   now;
@@ -45,6 +36,12 @@ To Do:
 
 NOTE: Despite being mentioned in the manual Strikers 1945 doesn't seem to
       have a Free Play mode.
+
+The tengai PIC dump has been tested on PCB with the available s1945 program ROMs:
+s1945 (World) - working ok
+s1945a (Japan / World) - resets when start pressed
+s1945k (Korea) - working ok
+s1945j (Japan) - boots but locks up with black screen when start pressed
 
 ***************************************************************************/
 
@@ -82,7 +79,7 @@ This was pointed out by Bart Puype
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/lz8420m.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -94,7 +91,7 @@ This was pointed out by Bart Puype
                         Strikers 1945 / Tengai MCU
 ***************************************************************************/
 
-READ_LINE_MEMBER(psikyo_state::mcu_status_r)
+int psikyo_state::mcu_status_r()
 {
 	int ret = 0x00;
 
@@ -435,7 +432,7 @@ void psikyo_state::s1945_sound_io_map(address_map &map)
 
 ***************************************************************************/
 
-READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
+int psikyo_state::z80_nmi_r()
 {
 	int ret = 0x00;
 
@@ -1034,7 +1031,7 @@ void psikyo_state::sngkace(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::sngkace_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq4_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(32'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::sngkace_sound_map);
@@ -1042,11 +1039,7 @@ void psikyo_state::sngkace(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1080,7 +1073,7 @@ void psikyo_state::gunbird(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq4_line_hold));
 
 	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
@@ -1088,11 +1081,7 @@ void psikyo_state::gunbird(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1162,21 +1151,19 @@ void psikyo_state::s1945(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq4_line_hold));
 
 	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::s1945_sound_io_map);
 
-	PIC16C57(config, "mcu", 4_MHz_XTAL).set_disable();  // Internal ROM isn't dumped (there's one weirdly sized dump available from a Korean version, actually. TODO: verify it's good and hook it up)
+	/* Dumped by decapping on a Tengai PCB (and there's one weirdly sized dump available from a Korean version of Strikers 1945).
+	   TODO: verify it's good and hook it up. Verify if the same PIC dump works also on clones. */
+	PIC16C57(config, "mcu", 4_MHz_XTAL).set_disable();
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.9229);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1189,7 +1176,7 @@ void psikyo_state::s1945(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL)); // YMF268-K instead on some PCBs
 	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -1243,7 +1230,6 @@ ROM_START( samuraia )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
-
 ROM_END
 
 ROM_START( sngkace )
@@ -1596,7 +1582,7 @@ Notes:
       PS2001B  - Psikyo Custom (QFP160)
       PS3103   - Psikyo Custom (QFP160)
       6116     - 2k x8 SRAM (x4, DIP24)
-      LH5168   - Sharp LH5168 2k x8 SRAM (x3, DIP24)
+      LH5168   - Sharp LH5168 8k x8 SRAM (x3, DIP28)
       62256    - NKK N341256 32k x8 SRAM (x14, DIP28)
       6264     - ISSI IS61C64 8k x8 SRAM (x4, DIP28)
       MB3771   - Fujitsu MB3771 Master Reset IC (DIP8)
@@ -1626,7 +1612,11 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
-SYNCS:  HSync 15.2183kHz, VSync 59.9229Hz
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/
@@ -1656,7 +1646,6 @@ ROM_START( s1945 )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 ROM_START( s1945a )
@@ -1684,7 +1673,6 @@ ROM_START( s1945a )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 ROM_START( s1945j )
@@ -1712,7 +1700,6 @@ ROM_START( s1945j )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no effect on this set */
@@ -1740,7 +1727,6 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 
@@ -1756,69 +1742,82 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 Chips:  PS2001B
         PS3103
         PS3204
         PS3305
 
-4-U59      security (PIC16C57; not dumped)
+4-U59      security (PIC16C57)
 
 ***************************************************************************/
 
 ROM_START( tengai )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // Main CPU Code
 	ROM_LOAD32_WORD_SWAP( "5-u40.bin", 0x000000, 0x080000, CRC(90088195) SHA1(8ec48d581ecd14b3dad36edc65d5a273324cf3c1) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "4-u41.bin", 0x000002, 0x080000, CRC(0d53196c) SHA1(454bb4695b13ce44ca5dac7c6d4142a8b9afa798) ) // 3&2
 
-	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       // Sound CPU Code
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x001000, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x01000, NO_DUMP )
+	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
+	/* PIC configuration:
+	     -User ID: 37EA
+	     -Watchdog Timer: unknown - tested on PCB: both settings work
+	     -Oscillator Mode: probably XT (unconfirmed) - tested on PCB: HS and XT work, LP and RC don't
+	*/
+	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) )
 
-	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(8d21caee) SHA1(2a68af8b2be2158dcb152c434e91a75871478d41) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(efe34eed) SHA1(7891495b443a5acc7b2f17fe694584f6cb0afacc) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 0 + 1 */
-	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) /* four banks of 0x100000 */
+	ROM_REGION( 0x400000, "gfx2", 0 )   // Layer 0 + 1
+	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) // four banks of 0x100000
 
-	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
-	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )    // 8 bit signed pcm (16KHz)
+	ROM_REGION( 0x400000, "ymf", 0 )    // Samples
+	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) ) // 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  // Sprites LUT
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
-
 ROM_END
 
 ROM_START( tengaij )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // Main CPU Code
 	ROM_LOAD32_WORD_SWAP( "2-u40.bin", 0x000000, 0x080000, CRC(ab6fe58a) SHA1(6687a3af192b3eab60d75ca286ebb8e0636297b5) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3-u41.bin", 0x000002, 0x080000, CRC(02e42e39) SHA1(6cdb7b1cebab50c0a44cd60cd437f0e878ccac5c) ) // 3&2
 
-	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       // Sound CPU Code
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x001000, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x01000, NO_DUMP )
+	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
+	/* PIC configuration:
+	     -User ID: 37EA
+	     -Watchdog Timer: unknown - tested on PCB: both settings work
+	     -Oscillator Mode: probably XT (unconfirmed) - tested on PCB: HS and XT work, LP and RC don't
+	*/
+	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) ) // From a World PCB
 
-	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(8d21caee) SHA1(2a68af8b2be2158dcb152c434e91a75871478d41) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(efe34eed) SHA1(7891495b443a5acc7b2f17fe694584f6cb0afacc) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 0 + 1 */
-	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) /* four banks of 0x100000 */
+	ROM_REGION( 0x400000, "gfx2", 0 )   // Layer 0 + 1
+	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) // four banks of 0x100000
 
-	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
-	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )    // 8 bit signed pcm (16KHz)
+	ROM_REGION( 0x400000, "ymf", 0 )    // Samples
+	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) ) // 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  // Sprites LUT
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
-
 ROM_END
 
 /***************************************************************************
@@ -1960,24 +1959,24 @@ void psikyo_state::init_s1945bl()
 
 ***************************************************************************/
 
-GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Samurai Aces (World)",                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 1)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 2)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Samurai Aces (World)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 2)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)",                                                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",                                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // game code is still multi-region, but sound rom appears to be Korea specific at least
+GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)",                                          MACHINE_SUPPORTS_SAVE ) // game code is still multi-region, but sound rom appears to be Korea specific at least
 
-GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
-GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",                                  MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)",                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II (Japan) / Tengai (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II (Japan) / Tengai (World)", MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World

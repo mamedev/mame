@@ -18,6 +18,9 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class k8915_state : public driver_device
 {
 public:
@@ -179,6 +182,9 @@ ROM_START( k8915 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

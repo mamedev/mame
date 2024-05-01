@@ -10,6 +10,9 @@
 #include "cpu/m6502/st2204.h"
 #include "cpu/m6502/st2205u.h"
 
+
+namespace {
+
 class inteladv_state : public driver_device
 {
 public:
@@ -22,8 +25,8 @@ public:
 	void inteladv(machine_config &config);
 	void dyndesk(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(st2205u_power_w);
-	DECLARE_WRITE_LINE_MEMBER(st2202_power_w);
+	void st2205u_power_w(int state);
+	void st2202_power_w(int state);
 
 private:
 	void inteladv_map(address_map &map);
@@ -43,13 +46,13 @@ void inteladv_state::dyndesk_map(address_map &map)
 	map(0x800000, 0x807fff).ram();
 }
 
-WRITE_LINE_MEMBER(inteladv_state::st2205u_power_w)
+void inteladv_state::st2205u_power_w(int state)
 {
 	if (!state)
 		m_maincpu->set_state_int(st2xxx_device::ST_IREQ, m_maincpu->state_int(st2xxx_device::ST_IREQ) | 0x0020);
 }
 
-WRITE_LINE_MEMBER(inteladv_state::st2202_power_w)
+void inteladv_state::st2202_power_w(int state)
 {
 	if (!state)
 		m_maincpu->set_state_int(st2xxx_device::ST_IREQ, m_maincpu->state_int(st2xxx_device::ST_IREQ) | 0x0010);
@@ -96,6 +99,9 @@ ROM_START( cars2lap )
 	// Flash dump contains some 65C02 code starting at $000D6A, but mostly appears to be custom bytecode or non-executable data banked in 32K blocks
 	ROM_LOAD("n25s16.u6", 0x00000, 0x200000, CRC(ec1ba96e) SHA1(51b8844ae77adf20f74f268d380d268c9ce19785))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                              FLAGS
 COMP( 2005, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R (Germany)", MACHINE_IS_SKELETON )

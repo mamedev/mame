@@ -7,12 +7,12 @@ fetch
 		if(level != 7)
 			pending_irq &= ~(1<<level);
 		OP1 = level;
+		standard_irq_callback(OP1, PC);
 		TMP = reg_r16(0x18);
 		TMP -= 2;
 		reg_w16(0x18, TMP);
 		any_w16(TMP, PC);
 		PC = any_r16(0x2000+2*OP1);
-		standard_irq_callback(OP1);
 		check_irq();
 	}
 	PPC = PC;

@@ -57,6 +57,8 @@ Dumped by Chackn
 #include "tilemap.h"
 
 
+namespace {
+
 class m14_state : public driver_device
 {
 public:
@@ -155,8 +157,6 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 void m14_state::video_start()
 {
 	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m14_state::m14_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-
 }
 
 void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -187,8 +187,6 @@ void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &clip
 			if(cliprect.contains(resx,resy))
 				bitmap.pix(resy, resx) = m_palette->pen(white_pen);
 		}
-
-
 }
 
 
@@ -363,7 +361,7 @@ static INPUT_PORTS_START( m14 )
 	PORT_START("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Reach")
 
-	PORT_START("DSW") //this whole port is stored at work ram $2112.
+	PORT_START("DSW") // this whole port is stored at work ram $2112.
 	PORT_DIPNAME( 0x01, 0x01, "Show available tiles" ) // difficulty even
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
@@ -472,5 +470,8 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa9.bin",   0x0000, 0x0400, CRC(cb68b4ec) SHA1(2cf596affb155ae38729fcd95cae424073faf74d) )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1979, ptrmj, 0, m14, m14, m14_state, empty_init, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer

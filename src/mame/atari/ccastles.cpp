@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders: Aaron Giles
+
 /***************************************************************************
 
     Atari Crystal Castles hardware
@@ -120,21 +121,436 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ccastles.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
+#include "machine/x2212.h"
 #include "sound/pokey.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    (10000000)
+namespace {
 
-#define PIXEL_CLOCK     (MASTER_CLOCK/2)
-#define HTOTAL          (320)
-#define VTOTAL          (256)
+class ccastles_state : public driver_device
+{
+public:
+	ccastles_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nvram_4b(*this, "nvram_4b"),
+		m_nvram_4a(*this, "nvram_4a"),
+		m_outlatch(*this, "outlatch%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_syncprom(*this, "syncprom"),
+		m_wpprom(*this, "wpprom"),
+		m_priprom(*this, "priprom"),
+		m_leta(*this, "LETA%u", 0U)
+	{ }
 
+	int vblank_r();
+	void ccastles(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<m6502_device> m_maincpu;
+	required_device<x2212_device> m_nvram_4b;
+	required_device<x2212_device> m_nvram_4a;
+	required_device_array<ls259_device, 2> m_outlatch;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_region_ptr<uint8_t> m_syncprom;
+	required_region_ptr<uint8_t> m_wpprom;
+	required_region_ptr<uint8_t> m_priprom;
+
+	required_ioport_array<4> m_leta;
+
+	// video-related
+	bitmap_ind16 m_spritebitmap = 0;
+	double m_rweights[3]{};
+	double m_gweights[3]{};
+	double m_bweights[3]{};
+	uint8_t m_bitmode_addr[2]{};
+	uint8_t m_hscroll = 0U;
+	uint8_t m_vscroll = 0U;
+
+	// misc
+	int m_vblank_start = 0;
+	int m_vblank_end = 0;
+	emu_timer *m_irq_timer = nullptr;
+	uint8_t m_irq_state = 0U;
+
+	static constexpr int MASTER_CLOCK = 10'000'000;
+	static constexpr int PIXEL_CLOCK = MASTER_CLOCK / 2;
+	static constexpr int HTOTAL = 320;
+	static constexpr int VTOTAL = 256;
+
+	void irq_ack_w(uint8_t data);
+	uint8_t leta_r(offs_t offset);
+	void nvram_recall_w(uint8_t data);
+	void nvram_store_w(int state);
+	uint8_t nvram_r(address_space &space, offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
+	void hscroll_w(uint8_t data);
+	void vscroll_w(uint8_t data);
+	void video_control_w(offs_t offset, uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t bitmode_r();
+	void bitmode_w(uint8_t data);
+	void bitmode_addr_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(clock_irq);
+	inline void write_vram(uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba);
+	inline void bitmode_autoinc();
+	inline void schedule_next_irq(int curscanline);
+	void main_map(address_map &map);
+};
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+void ccastles_state::video_start()
+{
+	static const int resistances[3] = { 22000, 10000, 4700 };
+
+	// compute the color output resistor weights at startup
+	compute_resistor_weights(0, 255, -1.0,
+			3,  resistances, m_rweights, 1000, 0,
+			3,  resistances, m_gweights, 1000, 0,
+			3,  resistances, m_bweights, 1000, 0);
+
+	// allocate a bitmap for drawing sprites
+	m_screen->register_screen_bitmap(m_spritebitmap);
+
+	// register for savestates
+	save_item(NAME(m_bitmode_addr));
+	save_item(NAME(m_hscroll));
+	save_item(NAME(m_vscroll));
+}
+
+
+
+/*************************************
+ *
+ *  Video control registers
+ *
+ *************************************/
+
+void ccastles_state::hscroll_w(uint8_t data)
+{
+	m_screen->update_partial(m_screen->vpos());
+	m_hscroll = data;
+}
+
+
+void ccastles_state::vscroll_w(uint8_t data)
+{
+	m_vscroll = data;
+}
+
+
+void ccastles_state::video_control_w(offs_t offset, uint8_t data)
+{
+	// only D3 matters
+	m_outlatch[1]->write_bit(offset, BIT(data, 3));
+}
+
+
+
+/*************************************
+ *
+ *  Palette RAM accesses
+ *
+ *************************************/
+
+void ccastles_state::paletteram_w(offs_t offset, uint8_t data)
+{
+	int bit0, bit1, bit2;
+	int r, g, b;
+
+	// extract the raw RGB bits
+	r = ((data & 0xc0) >> 6) | ((offset & 0x20) >> 3);
+	b = (data & 0x38) >> 3;
+	g = (data & 0x07);
+
+	// red component (inverted)
+	bit0 = (~r >> 0) & 0x01;
+	bit1 = (~r >> 1) & 0x01;
+	bit2 = (~r >> 2) & 0x01;
+	r = combine_weights(m_rweights, bit0, bit1, bit2);
+
+	// green component (inverted)
+	bit0 = (~g >> 0) & 0x01;
+	bit1 = (~g >> 1) & 0x01;
+	bit2 = (~g >> 2) & 0x01;
+	g = combine_weights(m_gweights, bit0, bit1, bit2);
+
+	// blue component (inverted)
+	bit0 = (~b >> 0) & 0x01;
+	bit1 = (~b >> 1) & 0x01;
+	bit2 = (~b >> 2) & 0x01;
+	b = combine_weights(m_bweights, bit0, bit1, bit2);
+
+	m_palette->set_pen_color(offset & 0x1f, rgb_t(r, g, b));
+}
+
+
+
+/*************************************
+ *
+ *  Video RAM access via the write
+ *  protect PROM
+ *
+ *************************************/
+
+inline void ccastles_state::write_vram(uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba)
+{
+	uint8_t *dest = &m_videoram[addr & 0x7ffe];
+	uint8_t promaddr = 0;
+
+	/*
+	    Inputs to the write-protect PROM:
+
+	    Bit 7 = BA1520 = 0 if (BA15-BA12 != 0), or 1 otherwise
+	    Bit 6 = DRBA11
+	    Bit 5 = DRBA10
+	    Bit 4 = /BITMD
+	    Bit 3 = GND
+	    Bit 2 = BA0
+	    Bit 1 = PIXB
+	    Bit 0 = PIXA
+	*/
+	promaddr |= ((addr & 0xf000) == 0) << 7;
+	promaddr |= (addr & 0x0c00) >> 5;
+	promaddr |= (!bitmd) << 4;
+	promaddr |= (addr & 0x0001) << 2;
+	promaddr |= (pixba << 0);
+
+	// look up the PROM result
+	uint8_t wpbits = m_wpprom[promaddr];
+
+	// write to the appropriate parts of VRAM depending on the result
+	if (!(wpbits & 1))
+		dest[0] = (dest[0] & 0xf0) | (data & 0x0f);
+	if (!(wpbits & 2))
+		dest[0] = (dest[0] & 0x0f) | (data & 0xf0);
+	if (!(wpbits & 4))
+		dest[1] = (dest[1] & 0xf0) | (data & 0x0f);
+	if (!(wpbits & 8))
+		dest[1] = (dest[1] & 0x0f) | (data & 0xf0);
+}
+
+
+
+/*************************************
+ *
+ *  Autoincrement control for bit mode
+ *
+ *************************************/
+
+inline void ccastles_state::bitmode_autoinc()
+{
+	// auto increment in the x-direction if it's enabled
+	if (!m_outlatch[1]->q0_r()) // /AX
+	{
+		if (!m_outlatch[1]->q2_r()) // /XINC
+			m_bitmode_addr[0]++;
+		else
+			m_bitmode_addr[0]--;
+	}
+
+	// auto increment in the y-direction if it's enabled
+	if (!m_outlatch[1]->q1_r()) // /AY
+	{
+		if (!m_outlatch[1]->q3_r()) // /YINC
+			m_bitmode_addr[1]++;
+		else
+			m_bitmode_addr[1]--;
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Standard video RAM access
+ *
+ *************************************/
+
+void ccastles_state::videoram_w(offs_t offset, uint8_t data)
+{
+	// direct writes to VRAM go through the write protect PROM as well
+	write_vram(offset, data, 0, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Bit mode video RAM access
+ *
+ *************************************/
+
+uint8_t ccastles_state::bitmode_r()
+{
+	// in bitmode, the address comes from the autoincrement latches
+	uint16_t const addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
+
+	// the appropriate pixel is selected into the upper 4 bits
+	uint8_t const result = m_videoram[addr] << ((~m_bitmode_addr[0] & 1) * 4);
+
+	// autoincrement because /BITMD was selected
+	bitmode_autoinc();
+
+	// the low 4 bits of the data lines are not driven so make them all 1's
+	return result | 0x0f;
+}
+
+
+void ccastles_state::bitmode_w(uint8_t data)
+{
+	// in bitmode, the address comes from the autoincrement latches
+	uint16_t const addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
+
+	// the upper 4 bits of data are replicated to the lower 4 bits
+	data = (data & 0xf0) | (data >> 4);
+
+	// write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA
+	write_vram(addr, data, 1, m_bitmode_addr[0] & 3);
+
+	// autoincrement because /BITMD was selected
+	bitmode_autoinc();
+}
+
+
+void ccastles_state::bitmode_addr_w(offs_t offset, uint8_t data)
+{
+	// write through to video RAM and also to the addressing latches
+	write_vram(offset, data, 0, 0);
+	m_bitmode_addr[offset] = data;
+}
+
+
+
+/*************************************
+ *
+ *  Video updating
+ *
+ *************************************/
+
+uint32_t ccastles_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const spriteaddr = &m_spriteram[m_outlatch[1]->q7_r() * 0x100];   // BUF1/BUF2
+	int const flip = m_outlatch[1]->q4_r() ? 0xff : 0x00;    // PLAYER2
+	pen_t const black = m_palette->black_pen();
+
+	// draw the sprites
+	m_spritebitmap.fill(0x0f, cliprect);
+	for (int offs = 0; offs < 320 / 2; offs += 4)
+	{
+		int const x = spriteaddr[offs + 3];
+		int const y = 256 - 16 - spriteaddr[offs + 1];
+		int const which = spriteaddr[offs];
+		int const color = spriteaddr[offs + 2] >> 7;
+
+		m_gfxdecode->gfx(0)->transpen(m_spritebitmap, cliprect, which, color, flip, flip, x, y, 7);
+	}
+
+	// draw the bitmap to the screen, looping over Y
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint16_t *const dst = &bitmap.pix(y);
+
+		// if we're in the VBLANK region, just fill with black
+		if (m_syncprom[y] & 1)
+		{
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+				dst[x] = black;
+		}
+
+		// non-VBLANK region: merge the sprites and the bitmap
+		else
+		{
+			uint16_t const *const mosrc = &m_spritebitmap.pix(y);
+
+			// the "POTATO" chip does some magic here; this is just a guess
+			int effy = (((y - m_vblank_end) + (flip ? 0 : m_vscroll)) ^ flip) & 0xff;
+			if (effy < 24)
+				effy = 24;
+			uint8_t const *const src = &m_videoram[effy * 128];
+
+			// loop over X
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			{
+				// if we're in the HBLANK region, just store black
+				if (x >= 256)
+					dst[x] = black;
+
+				// otherwise, process normally
+				else
+				{
+					int const effx = (m_hscroll + (x ^ flip)) & 255;
+
+					// low 4 bits = left pixel, high 4 bits = right pixel
+					uint8_t pix = (src[effx / 2] >> ((effx & 1) * 4)) & 0x0f;
+					uint8_t const mopix = mosrc[x];
+
+					/* Inputs to the priority PROM:
+
+					    Bit 7 = GND
+					    Bit 6 = /CRAM
+					    Bit 5 = BA4
+					    Bit 4 = MV2
+					    Bit 3 = MV1
+					    Bit 2 = MV0
+					    Bit 1 = MPI
+					    Bit 0 = BIT3
+					*/
+					uint8_t prindex = 0x40;
+					prindex |= (mopix & 7) << 2;
+					prindex |= (mopix & 8) >> 2;
+					prindex |= (pix & 8) >> 3;
+					uint8_t const prvalue = m_priprom[prindex];
+
+					// Bit 1 of prvalue selects the low 4 bits of the final pixel
+					if (prvalue & 2)
+						pix = mopix;
+
+					// Bit 0 of prvalue selects bit 4 of the final color
+					pix |= (prvalue & 1) << 4;
+
+					// store the pixel value and also a priority value based on the topmost bit
+					dst[x] = pix;
+				}
+			}
+		}
+	}
+	return 0;
+}
 
 
 /************************************* *
@@ -142,38 +558,38 @@
  *
  *************************************/
 
-inline void ccastles_state::schedule_next_irq( int curscanline )
+inline void ccastles_state::schedule_next_irq(int curscanline)
 {
-	/* scan for a rising edge on the IRQCK signal */
+	// scan for a rising edge on the IRQCK signal
 	for (curscanline++; ; curscanline = (curscanline + 1) & 0xff)
 		if ((m_syncprom[(curscanline - 1) & 0xff] & 8) == 0 && (m_syncprom[curscanline] & 8) != 0)
 			break;
 
-	/* next one at the start of this scanline */
+	// next one at the start of this scanline
 	m_irq_timer->adjust(m_screen->time_until_pos(curscanline), curscanline);
 }
 
 
 TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 {
-	/* assert the IRQ if not already asserted */
+	// assert the IRQ if not already asserted
 	if (!m_irq_state)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 		m_irq_state = 1;
 	}
 
-	/* force an update now */
+	// force an update now
 	m_screen->update_partial(m_screen->vpos());
 
-	/* find the next edge */
+	// find the next edge
 	schedule_next_irq(param);
 }
 
 
-READ_LINE_MEMBER(ccastles_state::vblank_r)
+int ccastles_state::vblank_r()
 {
-	int scanline = m_screen->vpos();
+	int const scanline = m_screen->vpos();
 	return m_syncprom[scanline & 0xff] & 1;
 }
 
@@ -189,37 +605,34 @@ void ccastles_state::machine_start()
 {
 	rectangle visarea;
 
-	/* initialize globals */
-	m_syncprom = memregion("proms")->base() + 0x000;
-
-	/* find the start of VBLANK in the SYNC PROM */
+	// find the start of VBLANK in the SYNC PROM
 	for (m_vblank_start = 0; m_vblank_start < 256; m_vblank_start++)
 		if ((m_syncprom[(m_vblank_start - 1) & 0xff] & 1) == 0 && (m_syncprom[m_vblank_start] & 1) != 0)
 			break;
 	if (m_vblank_start == 0)
 		m_vblank_start = 256;
 
-	/* find the end of VBLANK in the SYNC PROM */
+	// find the end of VBLANK in the SYNC PROM
 	for (m_vblank_end = 0; m_vblank_end < 256; m_vblank_end++)
 		if ((m_syncprom[(m_vblank_end - 1) & 0xff] & 1) != 0 && (m_syncprom[m_vblank_end] & 1) == 0)
 			break;
 
-	/* can't handle the wrapping case */
+	// can't handle the wrapping case
 	assert(m_vblank_end < m_vblank_start);
 
-	/* reconfigure the visible area to match */
+	// reconfigure the visible area to match
 	visarea.set(0, 255, m_vblank_end, m_vblank_start - 1);
 	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
-	/* configure the ROM banking */
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);
+	// configure the ROM banking
+	membank("rombank")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);
 
-	/* create a timer for IRQs and set up the first callback */
+	// create a timer for IRQs and set up the first callback
 	m_irq_timer = timer_alloc(FUNC(ccastles_state::clock_irq), this);
 	m_irq_state = 0;
 	schedule_next_irq(0);
 
-	/* setup for save states */
+	// setup for save states
 	save_item(NAME(m_irq_state));
 }
 
@@ -250,9 +663,7 @@ void ccastles_state::irq_ack_w(uint8_t data)
 
 uint8_t ccastles_state::leta_r(offs_t offset)
 {
-	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
-
-	return ioport(letanames[offset])->read();
+	return m_leta[offset]->read();
 }
 
 
@@ -274,7 +685,7 @@ void ccastles_state::nvram_recall_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
+void ccastles_state::nvram_store_w(int state)
 {
 	m_nvram_4b->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());
 	m_nvram_4a->store(!m_outlatch[0]->q2_r() && m_outlatch[0]->q3_r());
@@ -283,7 +694,7 @@ WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
 
 uint8_t ccastles_state::nvram_r(address_space &space, offs_t offset)
 {
-	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space,offset) << 4);
+	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space, offset) << 4);
 }
 
 
@@ -301,28 +712,28 @@ void ccastles_state::nvram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-/* complete memory map derived from schematics */
+// complete memory map derived from schematics
 void ccastles_state::main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().w(FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
-	map(0x0000, 0x0001).w(FUNC(ccastles_state::ccastles_bitmode_addr_w));
-	map(0x0002, 0x0002).rw(FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
+	map(0x0000, 0x7fff).ram().w(FUNC(ccastles_state::videoram_w)).share(m_videoram);
+	map(0x0000, 0x0001).w(FUNC(ccastles_state::bitmode_addr_w));
+	map(0x0002, 0x0002).rw(FUNC(ccastles_state::bitmode_r), FUNC(ccastles_state::bitmode_w));
 	map(0x8000, 0x8dff).ram();
-	map(0x8e00, 0x8fff).ram().share("spriteram");
+	map(0x8e00, 0x8fff).ram().share(m_spriteram);
 	map(0x9000, 0x90ff).mirror(0x0300).rw(FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
 	map(0x9400, 0x9403).mirror(0x01fc).r(FUNC(ccastles_state::leta_r));
 	map(0x9600, 0x97ff).portr("IN0");
 	map(0x9800, 0x980f).mirror(0x01f0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x9a00, 0x9a0f).mirror(0x01f0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x9c00, 0x9c7f).w(FUNC(ccastles_state::nvram_recall_w));
-	map(0x9c80, 0x9cff).w(FUNC(ccastles_state::ccastles_hscroll_w));
-	map(0x9d00, 0x9d7f).w(FUNC(ccastles_state::ccastles_vscroll_w));
+	map(0x9c80, 0x9cff).w(FUNC(ccastles_state::hscroll_w));
+	map(0x9d00, 0x9d7f).w(FUNC(ccastles_state::vscroll_w));
 	map(0x9d80, 0x9dff).w(FUNC(ccastles_state::irq_ack_w));
 	map(0x9e00, 0x9e7f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x9e80, 0x9e87).mirror(0x0078).w("outlatch0", FUNC(ls259_device::write_d0));
-	map(0x9f00, 0x9f07).mirror(0x0078).w(FUNC(ccastles_state::ccastles_video_control_w));
-	map(0x9f80, 0x9fbf).mirror(0x0040).w(FUNC(ccastles_state::ccastles_paletteram_w));
-	map(0xa000, 0xdfff).bankr("bank1");
+	map(0x9e80, 0x9e87).mirror(0x0078).w(m_outlatch[0], FUNC(ls259_device::write_d0));
+	map(0x9f00, 0x9f07).mirror(0x0078).w(FUNC(ccastles_state::video_control_w));
+	map(0x9f80, 0x9fbf).mirror(0x0040).w(FUNC(ccastles_state::paletteram_w));
+	map(0xa000, 0xdfff).bankr("rombank");
 	map(0xe000, 0xffff).rom();
 }
 
@@ -335,19 +746,19 @@ void ccastles_state::main_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( ccastles )
-	PORT_START("IN0")   /* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ccastles_state, vblank_r)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Jump/1P Start Upright")    PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* left Jump, non-cocktail start1 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Jump")           PORT_CONDITION("IN1",0x20,EQUALS,0x20)  /* 1p Jump, cocktail */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Jump/2P Start Upright")   PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* right Jump, non-cocktail start2 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("2P Jump") PORT_CONDITION("IN1",0x20,EQUALS,0x20)  /* 2p Jump, cocktail */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Jump/1P Start Upright")    PORT_CONDITION("IN1", 0x20, EQUALS, 0x00)  // left Jump, non-cocktail start1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Jump")           PORT_CONDITION("IN1", 0x20, EQUALS, 0x20)  // 1p Jump, cocktail
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Jump/2P Start Upright")   PORT_CONDITION("IN1", 0x20, EQUALS, 0x00)  // right Jump, non-cocktail start2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("2P Jump") PORT_CONDITION("IN1", 0x20, EQUALS, 0x20)  // 2p Jump, cocktail
 
-	PORT_START("IN1")   /* IN1 */
+	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -357,8 +768,8 @@ static INPUT_PORTS_START( ccastles )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("1P Start Cocktail")  /* cocktail only */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("2P Start Cocktail")  /* cocktail only */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("1P Start Cocktail")  // cocktail only
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("2P Start Cocktail")  // cocktail only
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
@@ -371,10 +782,10 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(30)
 
 	PORT_START("LETA2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_COCKTAIL PORT_SENSITIVITY(10) PORT_KEYDELTA(30) PORT_REVERSE   /* cocktail only */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_COCKTAIL PORT_SENSITIVITY(10) PORT_KEYDELTA(30) PORT_REVERSE   // cocktail only
 
 	PORT_START("LETA3")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_COCKTAIL PORT_SENSITIVITY(10) PORT_KEYDELTA(30)            /* cocktail only */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_COCKTAIL PORT_SENSITIVITY(10) PORT_KEYDELTA(30)            // cocktail only
 INPUT_PORTS_END
 
 
@@ -422,7 +833,7 @@ static const gfx_layout ccastles_spritelayout =
 
 
 static GFXDECODE_START( gfx_ccastles )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, ccastles_spritelayout,  0, 2 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, ccastles_spritelayout,  0, 2 )
 GFXDECODE_END
 
 
@@ -434,8 +845,8 @@ GFXDECODE_END
 
 void ccastles_state::ccastles(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	// basic machine hardware
+	M6502(config, m_maincpu, MASTER_CLOCK / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ccastles_state::main_map);
 
 	LS259(config, m_outlatch[0]); // 8N
@@ -445,7 +856,7 @@ void ccastles_state::ccastles(machine_config &config)
 	m_outlatch[0]->q_out_cb<3>().set(FUNC(ccastles_state::nvram_store_w));
 	m_outlatch[0]->q_out_cb<5>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
 	m_outlatch[0]->q_out_cb<6>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
-	m_outlatch[0]->q_out_cb<7>().set_membank("bank1");
+	m_outlatch[0]->q_out_cb<7>().set_membank("rombank");
 
 	LS259(config, m_outlatch[1]); // 6P
 
@@ -454,25 +865,25 @@ void ccastles_state::ccastles(machine_config &config)
 	X2212(config, "nvram_4b").set_auto_save(true);
 	X2212(config, "nvram_4a").set_auto_save(true);
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ccastles);
 	PALETTE(config, m_palette).set_entries(32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 24, 256); // potentially adjusted later
-	m_screen->set_screen_update(FUNC(ccastles_state::screen_update_ccastles));
+	m_screen->set_screen_update(FUNC(ccastles_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/8));
-	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK / 8));
+	// NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference
 	pokey1.set_output_opamp(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0);
 	pokey1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/8));
-	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK / 8));
+	// NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference
 	pokey2.set_output_opamp(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0);
 	pokey2.allpot_r().set_ioport("IN1");
 	pokey2.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -494,15 +905,21 @@ ROM_START( ccastles )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "syncprom", 0 )
 	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -514,15 +931,21 @@ ROM_START( ccastlesg )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_REGION( 0x0100, "syncprom", 0 )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -534,15 +957,21 @@ ROM_START( ccastlesp )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_REGION( 0x0100, "syncprom", 0 )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -554,15 +983,21 @@ ROM_START( ccastlesf )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_REGION( 0x0100, "syncprom", 0 )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -574,15 +1009,21 @@ ROM_START( ccastles3 )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_REGION( 0x0100, "syncprom", 0 )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -594,15 +1035,21 @@ ROM_START( ccastles2 )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_REGION( 0x0100, "syncprom", 0 )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -614,15 +1061,21 @@ ROM_START( ccastles1 )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_REGION( 0x0100, "syncprom", 0 )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
 
@@ -634,17 +1087,24 @@ ROM_START( ccastlesj )
 	ROM_LOAD( "136022-102.1h", 0x10000, 0x2000, CRC(f6ccfbd4) SHA1(69c3da2cbefc5e03a77357e817e3015da5d8334a) )
 	ROM_LOAD( "136022-101.1f", 0x12000, 0x2000, CRC(e2e17236) SHA1(81fa95b4d9beacb06d6b4afdf346d94117396557) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "136022-106.8d", 0x0000, 0x2000, CRC(9d1d89fc) SHA1(01c279edee322cc28f34506c312e4a9e3363b1be) )
 	ROM_LOAD( "136022-107.8b", 0x2000, 0x2000, CRC(39960b7d) SHA1(82bdf764ac23e72598883283c5e957169387abd4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) )
-	ROM_LOAD( "82s129-136022-109.6l",  0x0100, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) )
-	ROM_LOAD( "82s129-136022-110.11l", 0x0200, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) )
-	ROM_LOAD( "82s129-136022-111.10k", 0x0300, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) )
+	ROM_REGION( 0x0100, "syncprom", 0 )
+	ROM_LOAD( "82s129-136022-108.7k",  0x0000, 0x0100, CRC(6ed31e3b) SHA1(c3f3e4e7f313ecfd101cc52dfc44bd6b51a2ac88) ) // vertical sync generation
+
+	ROM_REGION( 0x0100, "addressprom", 0 )
+	ROM_LOAD( "82s129-136022-109.6l",  0x0000, 0x0100, CRC(b3515f1a) SHA1(c1bf077242481ef2f958580602b8113532b58612) ) // address decoding
+
+	ROM_REGION( 0x0100, "wpprom", 0 )
+	ROM_LOAD( "82s129-136022-110.11l", 0x0000, 0x0100, CRC(068bdc7e) SHA1(ae155918fdafd14299bc448b43eed8ad9c1ef5ef) ) // DRAM write protection
+
+	ROM_REGION( 0x0100, "priprom", 0 )
+	ROM_LOAD( "82s129-136022-111.10k", 0x0000, 0x0100, CRC(c29c18d9) SHA1(278bf61a290ae72ddaae2bafb4ab6739d3fb6238) ) // color selection
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************
@@ -653,11 +1113,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ccastles,  0,        ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesg, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, German)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles,  0,        ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 4)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesg, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, German)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ccastlesp, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesf, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, French)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles3, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles2, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastles1, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj, ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (joystick version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesf, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3, French)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles3, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 3)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles2, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastles1, ccastles, ccastles, ccastles,  ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (version 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ccastlesj, ccastles, ccastles, ccastlesj, ccastles_state, empty_init, ROT0, "Atari", "Crystal Castles (joystick version)",   MACHINE_SUPPORTS_SAVE )

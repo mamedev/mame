@@ -1,18 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Дебют / Дебют-М (Debut) Chess Computer
 
 Released in 1994 in Russian Federation by ЭНЕРГОПРИБОР (Energopribor), Moscow.
 It's running the Mirage chess engine by Vladimir Rybinkin, originally made for MS-DOS.
+Also sold in 1996 as Феникс (Fenix), same ROM contents as Debut-M.
 
 TODO:
 - where does the interrupt come from?
 - Debut-M is an updated version? Or is it the same program as Debut with a redesigned case?
 
-*******************************************************************************
+********************************************************************************
 
 Hardware notes:
 - КР1810ВМ86 (i8086 clone), 16200K XTAL
@@ -41,7 +42,7 @@ Keypad legend:
 ВВ  - ввод позиции (enter position)
 СБ  - сброс / новая игра (reset / new game)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -53,7 +54,7 @@ Keypad legend:
 #include "speaker.h"
 
 // internal artwork
-#include "debutm.lh" // clickable
+#include "debutm.lh"
 
 
 namespace {
@@ -85,9 +86,13 @@ private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	output_finder<4> m_out_digit;
 	required_ioport m_inputs;
+
+	u8 m_latch[5] = { };
+	u8 m_dac_data = 0;
+	u8 m_lcd_update = 0;
 
 	// address maps
 	void main_map(address_map &map);
@@ -97,11 +102,7 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	u8 input_r(offs_t offset);
 	void latch_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
-
-	u8 m_latch[5] = { };
-	u8 m_dac_data = 0;
-	u8 m_lcd_update = 0;
+	void lcd_update_w(int state);
 };
 
 void debut_state::machine_start()
@@ -117,9 +118,9 @@ void debut_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 INTERRUPT_GEN_MEMBER(debut_state::interrupt)
 {
@@ -165,7 +166,7 @@ void debut_state::latch_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(debut_state::lcd_update_w)
+void debut_state::lcd_update_w(int state)
 {
 	// 8086 S5 also goes to the lcd panel
 	if (!state && m_lcd_update)
@@ -181,9 +182,9 @@ WRITE_LINE_MEMBER(debut_state::lcd_update_w)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void debut_state::main_map(address_map &map)
 {
@@ -199,16 +200,16 @@ void debut_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( debutm )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME(u8"АН (Analysis)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME(u8"ХОД (Force Move)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME(u8"ИНТ (Switch 1P/2P)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME(u8"ПОЗ (Position Mode)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME(u8"ПОЗ (Position Mode)")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"ВФ (Select Piece)")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME(u8"ВП (Take Back)")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME(u8"УР (Level)")
@@ -220,9 +221,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void debut_state::debutm(machine_config &config)
 {
@@ -249,9 +250,9 @@ void debut_state::debutm(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( debutm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -263,9 +264,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT CMP MACHINE INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1994, debutm, 0,      0, debutm, debutm, debut_state, empty_init, "Energopribor", "Debut-M", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1994, debutm, 0,      0,      debutm,  debutm, debut_state, empty_init, "Energopribor", "Debut-M", MACHINE_SUPPORTS_SAVE )

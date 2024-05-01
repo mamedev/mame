@@ -39,6 +39,9 @@ OSC: 16.000, 21.477270, 1.8432
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class olivpc1_state : public driver_device
 {
 public:
@@ -208,5 +211,8 @@ ROM_START( olivpc1 )
 	ROM_REGION(0x2000, "gfx1", 0)
 	ROM_LOAD("xu4600_pc1_prodest_font101.bin", 0x0000, 0x2000, CRC(5c21981e) SHA1(d0db791079ece9c9e50bb7f38b5b11024ba7ec99))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1987, olivpc1,        ibm5150, 0,      olivpc1,        olivpc1,    olivpc1_state, empty_init,      "Olivetti",                        "Prodest PC 1",          MACHINE_NOT_WORKING )

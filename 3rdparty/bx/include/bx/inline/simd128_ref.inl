@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_SIMD_T_H_HEADER_GUARD
@@ -136,10 +136,10 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf)
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd_shuf_AxBy(simd128_ref_t _a, simd128_ref_t _b)
 	{
 		simd128_ref_t result;
-		result.uxyzw[0] = _a.uxyzw[1];
-		result.uxyzw[1] = _b.uxyzw[1];
-		result.uxyzw[2] = _a.uxyzw[0];
-		result.uxyzw[3] = _b.uxyzw[0];
+		result.uxyzw[0] = _b.uxyzw[0];
+		result.uxyzw[1] = _a.uxyzw[0];
+		result.uxyzw[2] = _b.uxyzw[1];
+		result.uxyzw[3] = _a.uxyzw[1];
 		return result;
 	}
 

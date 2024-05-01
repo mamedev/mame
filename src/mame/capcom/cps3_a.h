@@ -5,8 +5,8 @@
     Capcom CPS-3 Sound Hardware
 
 ****************************************************************************/
-#ifndef MAME_AUDIO_CPS3_H
-#define MAME_AUDIO_CPS3_H
+#ifndef MAME_CAPCOM_CPS3_A_H
+#define MAME_CAPCOM_CPS3_A_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CPS3, cps3_sound_device)
 
-#endif // MAME_AUDIO_CPS3_H
+#endif // MAME_CAPCOM_CPS3_A_H

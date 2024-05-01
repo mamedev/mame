@@ -18,7 +18,7 @@ Point 1 has been ensured through bisimulation with the gate-level simulation per
 The 6502 family
 ---------------
 
-The MOS 6502 family has been large and productive. A large number of variants exist, varying on bus sizes, I/O, and even opcodes. Some offshots (g65c816, hu6280) even exist that live elsewhere in the mame tree. The final class hierarchy is this:
+The MOS 6502 family has been large and productive. A large number of variants exist, varying on bus sizes, I/O, and even opcodes. Some offshoots (g65c816, hu6280) even exist that live elsewhere in the mame tree. The final class hierarchy is this:
 
 ::
 
@@ -26,7 +26,7 @@ The MOS 6502 family has been large and productive. A large number of variants ex
                             |
          +------+--------+--+--+-------+-------+
          |      |        |     |       |       |
-       6510   deco16   6504   6509   n2a03   65c02
+       6510   deco16   6504   6509   rp2a03  65c02
          |                                     |
    +-----+-----+                            r65c02
    |     |     |                               |
@@ -38,7 +38,7 @@ The MOS 6502 family has been large and productive. A large number of variants ex
 
 
 
-The 6510 adds an up to 8 bits I/O port, with the 6510t, 7501 and 8502 being software-identical variants with different pin count (hence I/O count), die process (NMOS, HNMOS, etc) and clock support.
+The 6510 adds an up to 8 bits I/O port, with the 6510t, 7501 and 8502 being software-identical variants with different pin count (hence I/O count), die process (NMOS, HNMOS, etc.) and clock support.
 
 The deco16 is a Deco variant with a small number of not really understood additional instructions and some I/O.
 
@@ -46,7 +46,7 @@ The 6504 is a pin and address-bus reduced version.
 
 The 6509 adds internal support for paging.
 
-The n2a03 is the NES variant with the D flag disabled and sound functionality integrated.
+The rp2a03 is the NES variant with the D flag disabled and sound functionality integrated.
 
 The 65c02 is the very first cmos variant with some additional instructions, some fixes, and most of the undocumented instructions turned into nops. The R (Rockwell, but eventually produced by WDC too among others) variant adds a number of bitwise instructions and also stp and wai. The SC variant, used by the Lynx portable console, looks identical to the R variant. The 'S' probably indicates a static-ram-cell process allowing full DC-to-max clock control.
 
@@ -374,6 +374,6 @@ Current TO-DO:
 
 - Integrate the I/O subsystems in the 4510
 
-- Possibly integrate the sound subsytem in the n2a03
+- Possibly integrate the sound subsytem in the rp2a03
 
 - Add decent hookups for the Apple 3 madness

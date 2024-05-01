@@ -70,7 +70,7 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "machine/mb87078.h"
+#include "mb87078.h"
 
 
 /*****************************************************************************
@@ -91,8 +91,6 @@ mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, d
 
 void mb87078_device::device_start()
 {
-	m_gain_changed_cb.resolve_safe();
-
 	m_data = 0;
 	m_control = 0;
 

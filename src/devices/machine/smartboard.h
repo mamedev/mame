@@ -43,17 +43,17 @@ private:
 
 	void update_output();
 	bool piece_available(u8 id);
-	void init_cb(int state);
+	void init_cb(u8 data);
 	u8 spawn_cb(offs_t offset);
 
 	// i/o lines
-	int m_data0 = 0;
-	int m_data1 = 0;
-	int m_output = 0;
+	int m_data0;
+	int m_data1;
+	int m_output;
 
 	// internal use
-	bool m_scan_pending = false;
-	u32 m_pos = 0;
+	bool m_scan_pending;
+	u32 m_pos;
 	u32 m_squares[64]; // board state
 };
 

@@ -17,6 +17,7 @@
     Application JP,1995-104333 (Unexamined Publication JP,H08-307371,A) (Not examined or registered) https://patents.google.com/patent/JPH08307371A/en <- something unrelated to adpcm, wireless transmission error detection related?
     Application JP,1995-162009 (Unexamined Publication JP,H09-018425,A) (Not examined or registered) https://patents.google.com/patent/JPH0918425A/en <- looks like ADPCM2 maybe?
         Application JP,1988-176215 (Unexamined Publication JP,H02-026426,A) (Not examined or registered) https://patents.google.com/patent/JPH0226426A/en <- Fujitsu variant on (G.726/727?) SB-ADPCM, cited by above
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -131,7 +132,7 @@ void oki_adpcm_state::compute_tables()
 		for (int nib = 0; nib < 16; nib++)
 		{
 			s_diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
-				(stepval   * nbl2bit[nib][1] +
+					(stepval * nbl2bit[nib][1] +
 					stepval/2 * nbl2bit[nib][2] +
 					stepval/4 * nbl2bit[nib][3] +
 					stepval/8);
@@ -250,7 +251,7 @@ void oki_adpcm2_state::compute_tables()
 		for (int nib = 0; nib < 16; nib++)
 		{
 			s_diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
-				(stepval   * nbl2bit[nib][1] +
+					(stepval * nbl2bit[nib][1] +
 					stepval/2 * nbl2bit[nib][2] +
 					stepval/4 * nbl2bit[nib][3] +
 					stepval/8);

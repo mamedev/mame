@@ -11,6 +11,9 @@
 #include "machine/nvram.h"
 //#include "screen.h"
 
+
+namespace {
+
 class telex1192_state : public driver_device
 {
 public:
@@ -80,5 +83,8 @@ ROM_START(telex1192)
 	ROM_REGION(0x10000, "datarom", 0)
 	ROM_LOAD("206253-003.u6", 0x00000, 0x10000, CRC(8d7d9356) SHA1(0b2eda8b04b2a6651f4fbf4cd6cdd129a70110ee))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1989, telex1192, 0, 0, telex1192, telex1192, telex1192_state, empty_init, "Memorex Telex", "Telex 1192", MACHINE_IS_SKELETON)

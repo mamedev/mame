@@ -18,6 +18,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -153,6 +156,8 @@ ROM_START( fun4a )
 	ROM_LOAD( "bailey1.g4",     0x0000, 0x0020, CRC(99f918d5) SHA1(74fb3a0f0f86b2900a1bd0dac77ae7e129885a1d) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1976, fun4,  0,    bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, fun4a, fun4, bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 2) [TTL]", MACHINE_IS_SKELETON )
+
+GAME( 1976, fun4,  0,    bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 1)", MACHINE_IS_SKELETON )
+GAME( 1976, fun4a, fun4, bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 2)", MACHINE_IS_SKELETON )

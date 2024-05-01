@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PP01_H
-#define MAME_INCLUDES_PP01_H
+#ifndef MAME_ZVT_PP01_H
+#define MAME_ZVT_PP01_H
 
 #pragma once
 
@@ -64,7 +64,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void pp01_palette(palette_device &palette) const;
 	uint32_t screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(z2_w);
+	void z2_w(int state);
 	uint8_t ppi1_porta_r();
 	void ppi1_porta_w(uint8_t data);
 	uint8_t ppi1_portb_r();
@@ -88,4 +88,4 @@ private:
 	required_ioport_array<17> m_io_keyboard;
 };
 
-#endif // MAME_INCLUDES_PP01_H
+#endif // MAME_ZVT_PP01_H

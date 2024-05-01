@@ -15,7 +15,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(CENTRONICS_DIGIBLASTER, centronics_digiblaster_device, "digiblst", "Digiblaster (DIY)")
+DEFINE_DEVICE_TYPE(CENTRONICS_DIGIBLASTER, centronics_digiblaster_device, "cpcdigiblst", "Digiblaster (DIY)")
 
 
 /***************************************************************************

@@ -206,8 +206,6 @@ informer_213_kbd_hle_device::informer_213_kbd_hle_device(const machine_config &m
 
 void informer_213_kbd_hle_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
 }
 
 //-------------------------------------------------

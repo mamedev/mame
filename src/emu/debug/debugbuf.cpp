@@ -82,6 +82,8 @@ void debug_disasm_buffer::debug_data_buffer::fill(offs_t lstart, offs_t size) co
 		}
 	}
 
+	// FIXME: This buffer tends to hog more memory than necessary for typical disassembly tasks.
+	// If the PC values supplied are far enough apart, the buffer may suddenly increase in size to a gigabyte or more.
 	if(m_buffer.empty()) {
 		m_lstart = lstart;
 		m_lend = lend;
@@ -209,8 +211,9 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = m_intf.pc_linear_to_real(lpc);
-						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
-							*dest++ = m_space->read_word(tpc);
+						address_space *space;
+						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+							*dest++ = space->read_word(tpc);
 						else
 							*dest++ = 0;
 					}
@@ -220,14 +223,13 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					auto dis = m_space->device().machine().disable_side_effects();
 					u8 *dest = get_ptr<u8>(lstart);
-					u32 steps = 0;
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = m_intf.pc_linear_to_real(lpc);
-						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
-							*dest++ = m_space->read_byte(tpc);
+						address_space *space;
+						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+							*dest++ = space->read_byte(tpc);
 						else
 							*dest++ = 0;
-						steps++;
 					}
 				};
 				break;
@@ -241,8 +243,9 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					u64 *dest = get_ptr<u64>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
-						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
-							*dest++ = m_space->read_qword(tpc);
+						address_space *space;
+						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+							*dest++ = space->read_qword(tpc);
 						else
 							*dest++ = 0;
 					}
@@ -255,8 +258,9 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					u32 *dest = get_ptr<u32>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
-						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
-							*dest++ = m_space->read_dword(tpc);
+						address_space *space;
+						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+							*dest++ = space->read_dword(tpc);
 						else
 							*dest++ = 0;
 					}
@@ -269,8 +273,9 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
-						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
-							*dest++ = m_space->read_word(tpc);
+						address_space *space;
+						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+							*dest++ = space->read_word(tpc);
 						else
 							*dest++ = 0;
 					}
@@ -283,8 +288,9 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					u8 *dest = get_ptr<u8>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
-						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
-							*dest++ = m_space->read_byte(tpc);
+						address_space *space;
+						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+							*dest++ = space->read_byte(tpc);
 						else
 							*dest++ = 0;
 					}
@@ -297,8 +303,9 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					u16 *dest = reinterpret_cast<u16 *>(&m_buffer[0]) + ((lstart - m_lstart) >> 4);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 0x10) & m_pc_mask) {
 						offs_t tpc = lpc;
-						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
-							*dest++ = m_space->read_word(tpc);
+						address_space *space;
+						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+							*dest++ = space->read_word(tpc);
 						else
 							*dest++ = 0;
 					}
@@ -1390,7 +1397,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	// pc to string conversion
 	int aw = pspace.logaddr_width();
 	bool is_octal = pspace.is_octal();
-	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
+	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL && aw > (m_dintf.page_address_bits() + m_dintf.page2_address_bits())) {
 		int bits1 = m_dintf.page_address_bits();
 		int bits2 = m_dintf.page2_address_bits();
 		int bits3 = aw - bits1 - bits2;
@@ -1421,7 +1428,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			};
 		}
 
-	} else if(m_flags & util::disasm_interface::PAGED) {
+	} else if((m_flags & util::disasm_interface::PAGED) && aw > m_dintf.page_address_bits()) {
 		int bits1 = m_dintf.page_address_bits();
 		int bits2 = aw - bits1;
 		offs_t sm1 = (1 << bits1) - 1;

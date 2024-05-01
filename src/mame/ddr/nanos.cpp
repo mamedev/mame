@@ -28,6 +28,8 @@ Status:
 #include "screen.h"
 
 
+namespace {
+
 class nanos_state : public driver_device
 {
 public:
@@ -61,11 +63,11 @@ protected:
 
 private:
 	void tc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
+	void z80daisy_interrupt(int state);
 	uint8_t port_a_r();
 	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
@@ -117,21 +119,21 @@ void nanos_state::tc_w(uint8_t data)
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER(nanos_state::ctc_z0_w)
+void nanos_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(nanos_state::ctc_z1_w)
+void nanos_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(nanos_state::ctc_z2_w)
+void nanos_state::ctc_z2_w(int state)
 {
 }
 
 /* Z80-SIO Interface */
 
-WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
+void nanos_state::z80daisy_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
@@ -537,6 +539,9 @@ ROM_START( nanos )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "zg_nanos.rom", 0x0000, 0x0800, CRC(5682d3f9) SHA1(5b738972c815757821c050ee38b002654f8da163))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

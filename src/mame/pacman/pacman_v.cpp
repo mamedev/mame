@@ -114,6 +114,59 @@ void pacman_state::pacman_palette(palette_device &palette) const
 	}
 }
 
+void pacman_state::pacman_rbg_palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances[3] = { 1000, 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[3], bweights[3], gweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], bweights, 0, 0,
+			2, &resistances[1], gweights, 0, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 32; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const b = combine_weights(bweights, bit0, bit1, bit2);
+
+		// green component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const g = combine_weights(gweights, bit0, bit1);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 32;
+
+	// allocate the colortable
+	for (int i = 0; i < 64*4; i++)
+	{
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
+
+		// first palette bank
+		palette.set_pen_indirect(i, ctabentry);
+
+		// second palette bank
+		palette.set_pen_indirect(i + 64*4, 0x10 | ctabentry);
+	}
+}
+
 TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
 {
 	int offs;
@@ -194,7 +247,7 @@ void pacman_state::pacman_colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(pacman_state::flipscreen_w)
+void pacman_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * (TILEMAP_FLIPX + TILEMAP_FLIPY));
@@ -207,7 +260,7 @@ void mspactwin_state::mspactwin_videoram_w(offs_t offset, uint8_t data)
 	pacman_videoram_w(offset, data);
 }
 
-WRITE_LINE_MEMBER(mspactwin_state::flipscreen_w)
+void mspactwin_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * (TILEMAP_FLIPX + TILEMAP_FLIPY));
@@ -338,19 +391,19 @@ VIDEO_START_MEMBER(pacman_state,pengo)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pacman_state::pacman_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(pacman_state::pacman_scan_rows)), 8, 8, 36, 28);
 }
 
-WRITE_LINE_MEMBER(pacman_state::pengo_palettebank_w)
+void pacman_state::pengo_palettebank_w(int state)
 {
 	m_palettebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pacman_state::pengo_colortablebank_w)
+void pacman_state::pengo_colortablebank_w(int state)
 {
 	m_colortablebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pacman_state::pengo_gfxbank_w)
+void pacman_state::pengo_gfxbank_w(int state)
 {
 	m_spritebank = state;
 	m_charbank = state;
@@ -569,13 +622,13 @@ void pacman_state::jrpacman_videoram_w(offs_t offset, uint8_t data)
 	jrpacman_mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(pacman_state::jrpacman_charbank_w)
+void pacman_state::jrpacman_charbank_w(int state)
 {
 	m_charbank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pacman_state::jrpacman_spritebank_w)
+void pacman_state::jrpacman_spritebank_w(int state)
 {
 	m_spritebank = state;
 }
@@ -588,7 +641,7 @@ void pacman_state::jrpacman_scroll_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(pacman_state::jrpacman_bgpriority_w)
+void pacman_state::jrpacman_bgpriority_w(int state)
 {
 	m_bgpriority = state;
 }

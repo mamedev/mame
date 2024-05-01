@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_JAG_BLITTER_H
-#define MAME_MACHINE_JAG_BLITTER_H
+#ifndef MAME_ATARI_JAG_BLITTER_H
+#define MAME_ATARI_JAG_BLITTER_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ DECLARE_DEVICE_TYPE(JAG_BLITTER, jag_blitter_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_JAG_BLITTER_H
+#endif // MAME_ATARI_JAG_BLITTER_H

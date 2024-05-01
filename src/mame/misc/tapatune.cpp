@@ -47,6 +47,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 /*************************************
  *
  *  Driver state
@@ -92,7 +94,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	void crtc_vsync(int state);
 
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t read_from_z80();
@@ -211,7 +213,7 @@ void tapatune_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 
-WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
+void tapatune_state::crtc_vsync(int state)
 {
 	m_videocpu->set_input_line(2, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -642,6 +644,9 @@ ROM_START( smartoss )
 	ROM_REGION( 0x40000, "unkdata", 0 )
 	ROM_LOAD( "s-tossem.u27", 0x0000, 0x40000, CRC(703d19b7) SHA1(75641d885885a67bd66afa38577c7907fa505b0b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

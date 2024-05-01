@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
-#ifndef MAME_INCLUDES_SATURN_H
-#define MAME_INCLUDES_SATURN_H
+#ifndef MAME_SEGA_SATURN_H
+#define MAME_SEGA_SATURN_H
 
 #pragma once
 
@@ -9,10 +9,7 @@
 #include "bus/generic/carts.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/sh/sh2.h"
-
-#include "debug/debugcon.h"
-#include "debug/debugcmd.h"
+#include "cpu/sh/sh7604.h"
 
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
@@ -22,7 +19,6 @@
 
 #include "sound/scsp.h"
 
-#include "debugger.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -51,15 +47,15 @@ public:
 	void scsp_irq(offs_t offset, uint8_t data);
 
 	// SMPC HLE delegates
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
-	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
+	void master_sh2_reset_w(int state);
+	void master_sh2_nmi_w(int state);
+	void slave_sh2_reset_w(int state);
+	void sound_68k_reset_w(int state);
+	void system_reset_w(int state);
+	void system_halt_w(int state);
+	void dot_select_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 
 protected:
 	required_region_ptr<uint32_t> m_rom;
@@ -123,8 +119,8 @@ protected:
 		int       old_tvmd = 0;
 	}m_vdp2;
 
-	required_device<sh2_device> m_maincpu;
-	required_device<sh2_device> m_slave;
+	required_device<sh7604_device> m_maincpu;
+	required_device<sh7604_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
@@ -170,12 +166,12 @@ protected:
 
 
 	/* VDP1 */
-	void stv_set_framebuffer_config( void );
-	void stv_prepare_framebuffers( void );
-	void stv_vdp1_change_framebuffers( void );
-	void video_update_vdp1( void );
-	void stv_vdp1_process_list( void );
-	void stv_vdp1_set_drawpixel( void );
+	void stv_set_framebuffer_config();
+	void stv_prepare_framebuffers();
+	void stv_vdp1_change_framebuffers();
+	void video_update_vdp1();
+	void stv_vdp1_process_list();
+	void stv_vdp1_set_drawpixel();
 
 	void stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite_type);
 	void stv_vdp1_draw_scaled_sprite(const rectangle &cliprect);
@@ -206,14 +202,14 @@ protected:
 							int32_t g1, int32_t g2, int32_t slg1, int32_t slg2, int32_t *ng1, int32_t *ng2,
 							int32_t b1, int32_t b2, int32_t slb1, int32_t slb2, int32_t *nb1, int32_t *nb2,
 							int32_t _y1, int32_t y2);
-	uint16_t stv_vdp1_apply_gouraud_shading( int x, int y, uint16_t pix );
+	uint16_t stv_vdp1_apply_gouraud_shading(int x, int y, uint16_t pix);
 	void stv_vdp1_setup_shading(const struct spoint* q, const rectangle &cliprect);
-	uint8_t stv_read_gouraud_table( void );
-	void stv_clear_gouraud_shading(void);
+	uint8_t stv_read_gouraud_table();
+	void stv_clear_gouraud_shading();
 
-	void stv_clear_framebuffer( int which_framebuffer );
-	void stv_vdp1_state_save_postload( void );
-	int stv_vdp1_start ( void );
+	void stv_clear_framebuffer(int which_framebuffer);
+	void stv_vdp1_state_save_postload();
+	int stv_vdp1_start();
 
 	struct stv_vdp1_poly_scanline
 	{
@@ -267,19 +263,19 @@ protected:
 
 	/* VDP2 */
 
-	uint8_t get_vblank( void );
-	uint8_t get_hblank( void );
-	int get_hcounter( void );
-	int get_vcounter( void );
-	int get_vblank_duration( void );
-	int get_hblank_duration( void );
-	int get_pixel_clock( void );
-	uint8_t get_odd_bit( void );
-	void stv_vdp2_dynamic_res_change( void );
-	int get_vblank_start_position( void );
-	int get_ystep_count( void );
+	uint8_t get_vblank();
+	uint8_t get_hblank();
+	int get_hcounter();
+	int get_vcounter();
+	int get_vblank_duration();
+	int get_hblank_duration();
+	int get_pixel_clock();
+	uint8_t get_odd_bit();
+	void stv_vdp2_dynamic_res_change();
+	int get_vblank_start_position();
+	int get_ystep_count();
 
-	void refresh_palette_data( void );
+	void refresh_palette_data();
 	inline int stv_vdp2_window_process(int x,int y);
 	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
 	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
@@ -296,8 +292,8 @@ protected:
 
 	void stv_vdp2_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
 	void stv_vdp2_drawgfxzoom_rgb555(bitmap_rgb32 &dest_bmp,const rectangle &clip,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
-	void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
-	void stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
+	void stv_vdp2_drawgfx_rgb555(bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
+	void stv_vdp2_drawgfx_rgb888(bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
 
 	void stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparency, int alpha);
 	void stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparency);
@@ -310,17 +306,17 @@ protected:
 	inline bool stv_vdp2_roz_window(int x, int y);
 	inline bool stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter);
 	inline int get_roz_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable,uint8_t winarea);
-	void stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter );
-	uint8_t stv_vdp2_check_vram_cycle_pattern_registers( uint8_t access_command_pnmdr, uint8_t access_command_cpdr, uint8_t bitmap_enable );
-	uint8_t stv_vdp2_is_rotation_applied(void);
-	uint8_t stv_vdp2_are_map_registers_equal(void);
-	void stv_vdp2_get_map_page( int x, int y, int *_map, int *_page );
+	void stv_vdp2_fill_rotation_parameter_table(uint8_t rot_parameter);
+	uint8_t stv_vdp2_check_vram_cycle_pattern_registers(uint8_t access_command_pnmdr, uint8_t access_command_cpdr, uint8_t bitmap_enable);
+	uint8_t stv_vdp2_is_rotation_applied();
+	uint8_t stv_vdp2_are_map_registers_equal();
+	void stv_vdp2_get_map_page(int x, int y, int *_map, int *_page);
 
 	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t is_roz);
-	void stv_vdp2_fade_effects( void );
-	void stv_vdp2_compute_color_offset( int *r, int *g, int *b, int cor );
+	void stv_vdp2_fade_effects();
+	void stv_vdp2_compute_color_offset(int *r, int *g, int *b, int cor);
 	void stv_vdp2_compute_color_offset_UINT32(rgb_t *rgb, int cor);
-	void stv_vdp2_check_fade_control_for_layer( void );
+	void stv_vdp2_check_fade_control_for_layer();
 
 	void stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -332,9 +328,9 @@ protected:
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t pri);
 	int true_vcount[263][4];
 
-	void stv_vdp2_state_save_postload( void );
-	void stv_vdp2_exit ( void );
-	int stv_vdp2_start ( void );
+	void stv_vdp2_state_save_postload();
+	void stv_vdp2_exit();
+	int stv_vdp2_start();
 
 	uint8_t m_vdpdebug_roz = 0;
 
@@ -440,14 +436,9 @@ protected:
 
 	} stv_rbg_cache_data;
 
-//  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+//  void scudsp_end_w(int state);
 //  uint16_t scudsp_dma_r(offs_t offset);
 //  void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-//  void debug_scudma_command(int ref, const std::vector<std::string> &params);
-//  void debug_scuirq_command(int ref, const std::vector<std::string> &params);
-//  void debug_help_command(int ref, const std::vector<std::string> &params);
-//  void debug_commands(int ref, const std::vector<std::string> &params);
 };
 
 
@@ -465,4 +456,4 @@ protected:
 
 extern gfx_decode_entry const gfx_stv[];
 
-#endif // MAME_INCLUDES_SATURN_H
+#endif // MAME_SEGA_SATURN_H

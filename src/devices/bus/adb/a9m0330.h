@@ -35,8 +35,8 @@ private:
 	u8 bus_r();
 	void p1_w(u8 data);
 	void p2_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t0_r();
+	int t1_r();
 
 	int m_adb_state;
 	int m_kbd_row;

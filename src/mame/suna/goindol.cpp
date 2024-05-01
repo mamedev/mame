@@ -34,7 +34,7 @@ Notes:
 
 
 // configurable logging
-#define LOG_PROTECTION     (1U <<  1)
+#define LOG_PROTECTION     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_PROTECTION)
 
@@ -109,8 +109,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -228,8 +226,6 @@ uint32_t goindol_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void goindol_state::bankswitch_w(uint8_t data)
 {

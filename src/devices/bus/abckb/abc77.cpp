@@ -41,6 +41,14 @@ Notes:
 
 */
 
+/*
+
+    TODO:
+
+    - serial input is not working, fails systest1600 keyboard test
+
+*/
+
 #include "emu.h"
 #include "abc77.h"
 #include "speaker.h"
@@ -166,7 +174,7 @@ INPUT_CHANGED_MEMBER( abc77_device::keyboard_reset )
 //  INPUT_PORTS( abc55 )
 //-------------------------------------------------
 
-INPUT_PORTS_START( abc55 )
+static INPUT_PORTS_START( abc55 )
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -192,17 +200,17 @@ INPUT_PORTS_START( abc55 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) // U+2190 = ←
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // U+2192 = →
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00E9) PORT_CHAR(0x00C9)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(U'é') PORT_CHAR(U'É')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00FC) PORT_CHAR(0x00DC)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'å') PORT_CHAR(U'Å')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -213,7 +221,7 @@ INPUT_PORTS_START( abc55 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
 
@@ -238,7 +246,7 @@ INPUT_PORTS_START( abc55 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4 \xC2\xA4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0x00A4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(U'¤')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
@@ -323,7 +331,7 @@ ioport_constructor abc55_device::device_input_ports() const
 //  INPUT_PORTS( abc77 )
 //-------------------------------------------------
 
-INPUT_PORTS_START( abc77 )
+static INPUT_PORTS_START( abc77 )
 	PORT_INCLUDE( abc55 )
 
 	PORT_MODIFY("X9")
@@ -364,21 +372,6 @@ ioport_constructor abc77_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  serial_output -
-//-------------------------------------------------
-
-inline void abc77_device::serial_output(int state)
-{
-	if (m_txd != state)
-	{
-		m_txd = state;
-
-		m_slot->write_rx(m_txd);
-	}
-}
-
-
-//-------------------------------------------------
 //  serial_clock -
 //-------------------------------------------------
 
@@ -387,20 +380,6 @@ TIMER_CALLBACK_MEMBER(abc77_device::serial_clock)
 	m_clock = !m_clock;
 
 	m_slot->trxc_w(!m_clock);
-}
-
-
-//-------------------------------------------------
-//  keydown -
-//-------------------------------------------------
-
-inline void abc77_device::key_down(int state)
-{
-	if (m_keydown != state)
-	{
-		m_slot->keydown_w(state);
-		m_keydown = state;
-	}
 }
 
 
@@ -421,10 +400,12 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 	m_discrete(*this, DISCRETE_TAG),
 	m_x(*this, "X%u", 0),
 	m_dsw(*this, "DSW"),
-	m_txd(1), m_keylatch(0),
-	m_keydown(1),
-	m_clock(0), m_hys(0),
-	m_stb(1), m_j3(0), m_serial_timer(nullptr), m_reset_timer(nullptr)
+	m_keylatch(0),
+	m_clock(0),
+	m_stb(1),
+	m_j3(0),
+	m_serial_timer(nullptr),
+	m_reset_timer(nullptr)
 {
 }
 
@@ -443,7 +424,8 @@ void abc77_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc77_device::serial_clock), this);
-	m_serial_timer->adjust(attotime::from_hz(19200), 0, attotime::from_hz(19200)); // ALE/32
+	attotime serial_clock = attotime::from_hz((m_maincpu->get_ale_clock()/32)*2); // 600 bps
+	m_serial_timer->adjust(serial_clock, 0, serial_clock);
 
 	m_reset_timer = timer_alloc(FUNC(abc77_device::reset_tick), this);
 }
@@ -485,6 +467,16 @@ TIMER_CALLBACK_MEMBER(abc77_device::reset_tick)
 void abc77_device::txd_w(int state)
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  reset_w -
+//-------------------------------------------------
+
+void abc77_device::reset_w(int state)
+{
+	// connected to NE556 pin 8
 }
 
 
@@ -558,41 +550,8 @@ void abc77_device::p2_w(uint8_t data)
 	m_discrete->write(NODE_01, BIT(data, 4));
 
 	// transmit data
-	serial_output(BIT(data, 5));
+	m_slot->write_rx(BIT(data, 5));
 
 	// key down
-	key_down(BIT(data, 6));
-
-	// hysteresis
-	m_hys = BIT(data, 7);
-}
-
-
-//-------------------------------------------------
-//  t1_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc77_device::t1_r )
-{
-	return m_clock;
-}
-
-
-//-------------------------------------------------
-//  prog_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc77_device::prog_w )
-{
-	m_stb = state;
-}
-
-
-//-------------------------------------------------
-//  j3_w -
-//-------------------------------------------------
-
-void abc77_device::j3_w(uint8_t data)
-{
-	m_j3 = data;
+	m_slot->keydown_w(BIT(data, 6));
 }

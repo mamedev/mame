@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_DIGILOG_KBD_H
-#define MAME_MACHINE_DIGILOG_KBD_H
+#ifndef MAME_SKELETON_DIGILOG_KBD_H
+#define MAME_SKELETON_DIGILOG_KBD_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DIGILOG_KBD, digilog_kbd_device)
 
-#endif // MAME_MACHINE_DIGILOG_KBD_H
+#endif // MAME_SKELETON_DIGILOG_KBD_H

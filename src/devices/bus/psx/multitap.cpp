@@ -31,10 +31,10 @@ void psx_multitap_device::device_add_mconfig(machine_config &config)
 
 void psx_multitap_device::device_start()
 {
-	m_porta->setup_ack_cb(psx_controller_port_device::void_cb(&psx_multitap_device::ack, this));
-	m_portb->setup_ack_cb(psx_controller_port_device::void_cb(&psx_multitap_device::ack, this));
-	m_portc->setup_ack_cb(psx_controller_port_device::void_cb(&psx_multitap_device::ack, this));
-	m_portd->setup_ack_cb(psx_controller_port_device::void_cb(&psx_multitap_device::ack, this));
+	m_porta->set_ack_cb(*this, FUNC(psx_multitap_device::ack));
+	m_portb->set_ack_cb(*this, FUNC(psx_multitap_device::ack));
+	m_portc->set_ack_cb(*this, FUNC(psx_multitap_device::ack));
+	m_portd->set_ack_cb(*this, FUNC(psx_multitap_device::ack));
 	m_nextmode = false;
 
 	save_item(NAME(m_activeport));

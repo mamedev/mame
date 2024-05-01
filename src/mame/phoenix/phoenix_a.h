@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Richard Davies
-#ifndef MAME_AUDIO_PHOENIX_H
-#define MAME_AUDIO_PHOENIX_H
+#ifndef MAME_PHOENIX_PHOENIX_A_H
+#define MAME_PHOENIX_PHOENIX_A_H
 
 #pragma once
 
@@ -41,10 +41,10 @@ private:
 	};
 
 	// internal state
-	struct c_state      m_c24_state;
-	struct c_state      m_c25_state;
-	struct n_state      m_noise_state;
-	uint8_t               m_sound_latch_a = 0;
+	c_state             m_c24_state;
+	c_state             m_c25_state;
+	n_state             m_noise_state;
+	uint8_t             m_sound_latch_a = 0;
 	sound_stream *      m_channel = nullptr;
 	std::unique_ptr<uint32_t[]> m_poly18;
 	required_device<discrete_device> m_discrete;
@@ -59,4 +59,4 @@ DECLARE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device)
 
 DISCRETE_SOUND_EXTERN(phoenix_discrete);
 
-#endif // MAME_AUDIO_PHOENIX_H
+#endif // MAME_PHOENIX_PHOENIX_A_H

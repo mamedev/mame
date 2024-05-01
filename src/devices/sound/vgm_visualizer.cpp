@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/vgm_visualizer.h"
+#include "vgm_visualizer.h"
 
 #include "wdlfft/fft.h"
 
@@ -88,7 +88,7 @@ void vgmviz_device::device_start()
 
 void vgmviz_device::fill_window()
 {
-	float window_pos_delta = (3.14159265358979f * 2) / FFT_LENGTH;
+	float window_pos_delta = (M_PI * 2) / FFT_LENGTH;
 	float power = 0;
 	for (int i = 0; i < (FFT_LENGTH / 2) + 1; i++)
 	{

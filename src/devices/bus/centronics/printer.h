@@ -17,16 +17,16 @@ public:
 	// construction/destruction
 	centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (state) m_data |= 0x02; else m_data &= ~0x02; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { if (state) m_data |= 0x04; else m_data &= ~0x04; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { if (state) m_data |= 0x08; else m_data &= ~0x08; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { if (state) m_data |= 0x10; else m_data &= ~0x10; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { if (state) m_data |= 0x20; else m_data &= ~0x20; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { if (state) m_data |= 0x40; else m_data &= ~0x40; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (state) m_data |= 0x80; else m_data &= ~0x80; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) override;
+	virtual void input_strobe(int state) override;
+	virtual void input_data0(int state) override { if (state) m_data |= 0x01; else m_data &= ~0x01; }
+	virtual void input_data1(int state) override { if (state) m_data |= 0x02; else m_data &= ~0x02; }
+	virtual void input_data2(int state) override { if (state) m_data |= 0x04; else m_data &= ~0x04; }
+	virtual void input_data3(int state) override { if (state) m_data |= 0x08; else m_data &= ~0x08; }
+	virtual void input_data4(int state) override { if (state) m_data |= 0x10; else m_data &= ~0x10; }
+	virtual void input_data5(int state) override { if (state) m_data |= 0x20; else m_data &= ~0x20; }
+	virtual void input_data6(int state) override { if (state) m_data |= 0x40; else m_data &= ~0x40; }
+	virtual void input_data7(int state) override { if (state) m_data |= 0x80; else m_data &= ~0x80; }
+	virtual void input_init(int state) override;
 
 protected:
 	// device-level overrides
@@ -37,7 +37,7 @@ protected:
 	virtual bool supports_pin35_5v() override { return true; }
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( printer_online );
+	void printer_online(int state);
 
 	TIMER_CALLBACK_MEMBER(ack_timer_tick);
 	TIMER_CALLBACK_MEMBER(busy_timer_tick);

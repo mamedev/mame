@@ -18,16 +18,15 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// sound stream update overrides
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
+	// device_rom_interface implementation
+	virtual void rom_bank_pre_change() override;
 
 	static int16_t decode_sample(int8_t data);
 	static int16_t sample_interpolate(int16_t smp1, int16_t smp2, uint16_t frac);
@@ -47,6 +46,7 @@ private:
 		uint32_t start = 0;     // start address (18.14 fixed point)
 		uint16_t end = 0;       // end offset (high word)
 		uint16_t loop = 0;      // loop offset (high word)
+
 		// work variables
 		bool enable = false;
 		int8_t play_dir = 0;    // playing direction, -1 [backwards] / 0 [stopped] / +1 [forwards]

@@ -99,6 +99,8 @@ ToDo
 #include "mmd2.lh"
 
 
+namespace {
+
 class mmd2_state : public driver_device
 {
 public:
@@ -395,6 +397,9 @@ ROM_START( mmd2 )
 	ROM_LOAD( "mmd2350.bin", 0x1000, 0x0800, CRC(359f577c) SHA1(9405ca0c1977721e4540a4017907c06dab08d398))
 	ROM_LOAD( "mmd2360.bin", 0x1800, 0x0800, CRC(967e69b8) SHA1(c21ec8bef955806a2c6e1b1c8e9068662fb88038))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

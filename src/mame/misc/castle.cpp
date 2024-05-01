@@ -48,6 +48,9 @@
 #include "cpu/m6800/m6801.h"
 #include "machine/6821pia.h"
 
+
+namespace {
+
 class castle_state : public driver_device
 {
 public:
@@ -125,6 +128,8 @@ ROM_START( castfpt )
 	ROM_LOAD( "fp2.bin", 0x0000, 0x008000, CRC(c49138d1) SHA1(e7813703e57b2f356aff7a17152c03af70b00683) )
 	ROM_LOAD( "fp1.bin", 0x8000, 0x008000, CRC(fb458850) SHA1(71343099c7b83db1a4e093f546e5061b9761aa3a) )
 ROM_END
+
+} // anonymous namespace
 
 
 // 4.00 JACKPOT. VERSION 1 (for revision E CPU) Written by and copyright of David John Powell - 25th February 1987

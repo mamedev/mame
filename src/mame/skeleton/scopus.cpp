@@ -31,6 +31,9 @@
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
+
+namespace {
+
 class sagitta180_state : public driver_device
 {
 public:
@@ -47,7 +50,7 @@ public:
 	void init_sagitta180();
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
@@ -98,15 +101,16 @@ I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 
 	uint8_t pixels;
-	if (lten) {
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) {
 		pixels = ~0;
-	} else if (vsp != 0 || (linecount & 8) != 0) {
+	} else if (BIT(attrcode, VSP) || (linecount & 8) != 0) {
 		pixels = 0;
 	} else {
 		pixels = chargen_byte;
 	}
 
-	if (rvv) {
+	if (BIT(attrcode, RVV)) {
 		pixels = ~pixels;
 	}
 
@@ -160,7 +164,7 @@ static INPUT_PORTS_START( sagitta180 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:1" )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
+void sagitta180_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma8257->hlda_w(state);
@@ -234,6 +238,9 @@ ROM_START( sagitta180 )
 	ROM_REGION( 0x1000, "chargen", 0 ) /* data copied from ibm-pc-jr driver */
 	ROM_LOAD("cga.chr",  0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card (Actual IC is a 2708 that I was not able to dump yet)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR    NAME       PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY   FULLNAME       FLAGS */
 COMP( 1979?, sagitta180, 0,      0,      sagitta180, sagitta180, sagitta180_state, empty_init, "Scopus", "Sagitta 180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

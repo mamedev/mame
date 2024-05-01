@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Eugene Sandulenko
-#ifndef MAME_INCLUDES_TIAMC1_H
-#define MAME_INCLUDES_TIAMC1_H
+#ifndef MAME_USSR_TIAMC1_H
+#define MAME_USSR_TIAMC1_H
 
 #pragma once
 
@@ -57,7 +57,7 @@ private:
 	void tiamc1_palette_w(offs_t offset, uint8_t data);
 	void kot_bankswitch_w(uint8_t data);
 	void kot_videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_2_w);
+	void pit8253_2_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
@@ -79,4 +79,4 @@ private:
 	void update_bg_palette();
 };
 
-#endif // MAME_INCLUDES_TIAMC1_H
+#endif // MAME_USSR_TIAMC1_H

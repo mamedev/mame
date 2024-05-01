@@ -138,7 +138,7 @@ void galpani2_state::machine_start()
 
 void galpani2_state::machine_reset()
 {
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
+	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
 }
 
 static void galpani2_write_kaneko(cpu_device *cpu)

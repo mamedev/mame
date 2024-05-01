@@ -12,7 +12,8 @@
 
         Note:
         - 4 lines display has an custom LCD controller derived from an HD66780
-        - NVRAM works only if the machine is turned off (with OFF menu) before closing MESS
+        - NVRAM works only if the machine is turned off (with OFF menu) before closing MAME
+        - psion1 goes into standby right after a cold boot, so press the ON button
 
         More info:
             http://archive.psion2.org/org2/techref/index.htm
@@ -46,7 +47,7 @@ uint8_t psion_state::kb_read()
 	}
 	else
 	{
-		//Read all the input lines
+		// Read all the input lines
 		for (int line = 0; line < 7; line++)
 			data &= m_kb_lines[line]->read();
 	}
@@ -120,9 +121,8 @@ void psion_state::io_rw(uint16_t offset)
 	{
 	case 0xc0:
 		/* switch off, CPU goes into standby mode */
-		m_enable_nmi = 0;
-		m_stby_pwr = 1;
-		m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
+		m_enable_nmi = false;
+		m_maincpu->set_input_line(M6801_STBY_LINE, ASSERT_LINE);
 		break;
 	case 0x100:
 		m_pulse = 1;
@@ -156,7 +156,7 @@ void psion_state::io_rw(uint16_t offset)
 			update_banks();
 		}
 		else
-			m_enable_nmi = 1;
+			m_enable_nmi = true;
 		break;
 	case 0x2c0:
 		if (offset == 0x2e0 && m_rom_bank_count)
@@ -165,7 +165,7 @@ void psion_state::io_rw(uint16_t offset)
 			update_banks();
 		}
 		else
-			m_enable_nmi = 0;
+			m_enable_nmi = false;
 		break;
 	}
 }
@@ -179,6 +179,7 @@ void psion_state::io_w(offs_t offset, uint8_t data)
 		break;
 	default:
 		io_rw(offset);
+		break;
 	}
 }
 
@@ -191,6 +192,7 @@ uint8_t psion_state::io_r(offs_t offset)
 	default:
 		if (!machine().side_effects_disabled())
 			io_rw(offset);
+		break;
 	}
 
 	return 0;
@@ -199,55 +201,49 @@ uint8_t psion_state::io_r(offs_t offset)
 INPUT_CHANGED_MEMBER(psion_state::psion_on)
 {
 	/* reset the CPU for resume from standby */
-	if (m_maincpu->suspended(SUSPEND_REASON_HALT))
-		m_maincpu->reset();
+	if (newval && m_maincpu->standby())
+	{
+		m_maincpu->set_input_line(M6801_STBY_LINE, CLEAR_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	}
 }
 
 uint8_t psion1_state::reset_kb_counter_r()
 {
-	m_kb_counter = 0;
+	if (!machine().side_effects_disabled())
+		m_kb_counter = 0;
+
 	return 0;
 }
 
 uint8_t psion1_state::inc_kb_counter_r()
 {
-	m_kb_counter++;
+	if (!machine().side_effects_disabled())
+		m_kb_counter++;
+
 	return 0;
 }
 
 uint8_t psion1_state::switchoff_r()
 {
-	if (!m_stby_pwr)
-	{
-		m_stby_pwr = 1;
-		m_maincpu->reset();
-	}
-	return 0;
-}
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M6801_STBY_LINE, ASSERT_LINE);
 
-void psion_state::psion_int_reg(address_map &map)
-{
-	// FIXME: this should all be made internal to the CPU device
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::hd6301x_io));
+	return 0;
 }
 
 void psion1_state::psion1_mem(address_map &map)
 {
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x2000, 0x2001).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x2800, 0x2800).r(FUNC(psion1_state::reset_kb_counter_r));
 	map(0x2e00, 0x2e00).r(FUNC(psion1_state::switchoff_r));
 	map(0x3000, 0x3000).r(FUNC(psion1_state::inc_kb_counter_r));
 	map(0x4000, 0x47ff).ram().share("ram");
-	map(0xf000, 0xffff).rom();
 }
 
 void psion_state::psioncm_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x2000, 0x3fff).ram().share("ram");
 	map(0x8000, 0xffff).rom();
@@ -256,8 +252,6 @@ void psion_state::psioncm_mem(address_map &map)
 void psion_state::psionla_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x5fff).ram().share("ram");
 	map(0x8000, 0xffff).rom();
@@ -266,8 +260,6 @@ void psion_state::psionla_mem(address_map &map)
 void psion_state::psionp350_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x3fff).ram().share("ram");
 	map(0x4000, 0x7fff).bankrw("rambank");
@@ -277,8 +269,6 @@ void psion_state::psionp350_mem(address_map &map)
 void psion_state::psionlam_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x7fff).ram().share("ram");
 	map(0x8000, 0xbfff).bankr("rombank");
@@ -288,8 +278,6 @@ void psion_state::psionlam_mem(address_map &map)
 void psion_state::psionlz_mem(address_map &map)
 {
 	map.unmap_value_low();
-	psion_int_reg(map);
-	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x3fff).ram().share("ram");
 	map(0x4000, 0x7fff).bankrw("rambank");
@@ -417,13 +405,6 @@ INPUT_PORTS_START( psion1 )
 INPUT_PORTS_END
 
 
-void psion_state::nvram_init(nvram_device &nvram, void *data, size_t size)
-{
-	//cold start (by default is 1=warm start)
-	m_stby_pwr = 0;
-}
-
-
 void psion_state::machine_start()
 {
 	if (!strcmp(machine().system().name, "psionlam"))
@@ -469,14 +450,12 @@ void psion_state::machine_start()
 		membank("rambank")->set_entry(0);
 	}
 
-	m_nvram1->set_base(m_sys_register, 0xc0);
-	m_nvram2->set_base(m_ram, m_ram.bytes());
-	if (m_nvram3)
-		m_nvram3->set_base(m_paged_ram.get(), m_ram_bank_count * 0x4000);
+	m_nvram1->set_base(m_ram, m_ram.bytes());
+	if (m_nvram2)
+		m_nvram2->set_base(m_paged_ram.get(), m_ram_bank_count * 0x4000);
 
 	save_item(NAME(m_kb_counter));
 	save_item(NAME(m_enable_nmi));
-	save_item(NAME(m_stby_pwr));
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_ram_bank));
@@ -485,24 +464,20 @@ void psion_state::machine_start()
 
 void psion_state::machine_reset()
 {
-	m_enable_nmi=0;
-	m_kb_counter=0;
-	m_ram_bank=0;
-	m_rom_bank=0;
-	m_pulse=0;
+	m_enable_nmi = false;
+	m_kb_counter = 0;
+	m_ram_bank = 0;
+	m_rom_bank = 0;
+	m_pulse = 0;
 
 	if (m_rom_bank_count || m_ram_bank_count)
 		update_banks();
-
-	// enable warm boot
-	u8 mcu_rp5cr = m_maincpu->space(AS_PROGRAM).read_byte(0x14);
-	m_maincpu->space(AS_PROGRAM).write_byte(0x14, (mcu_rp5cr & 0x7f) | (m_stby_pwr << 7));
 }
 
 void psion1_state::machine_reset()
 {
 	psion_state::machine_reset();
-	m_enable_nmi = 1;
+	m_enable_nmi = true;
 }
 
 HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
@@ -518,14 +493,14 @@ HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
 		};
 
 		uint8_t char_pos = psion_display_layout[line*40 + pos];
-		bitmap.pix((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
+		bitmap.pix((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = m_maincpu->standby() ? 0 : state;
 	}
 }
 
 HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 {
 	if (pos < 8 && line < 2)
-		bitmap.pix(y, (line * 8 + pos) * 6 + x) = state;
+		bitmap.pix(y, (line * 8 + pos) * 6 + x) = m_maincpu->standby() ? 0 : state;
 }
 
 void psion_state::psion_palette(palette_device &palette) const
@@ -554,6 +529,7 @@ void psion_state::psion_2lines(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6303X(config, m_maincpu, 3.6864_MHz_XTAL); // internal operating frequency is 0.9216 MHz
+	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->in_p2_cb().set(FUNC(psion_state::port2_r));
 	m_maincpu->out_p2_cb().set(FUNC(psion_state::port2_w));
 	m_maincpu->in_p5_cb().set(FUNC(psion_state::port5_r));
@@ -566,21 +542,20 @@ void psion_state::psion_2lines(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_size(6*16, 9*2);
-	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
+	screen.set_visarea_full();
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device? Custom? clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
-	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // RAM
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(psion_state::nmi_timer), attotime::from_seconds(1));
 
@@ -596,9 +571,10 @@ void psion_state::psion_2lines(machine_config &config)
 void psion_state::psion_4lines(machine_config &config)
 {
 	psion_2lines(config);
+
 	/* video hardware */
 	subdevice<screen_device>("screen")->set_size(6*20, 9*4);
-	subdevice<screen_device>("screen")->set_visarea(0, 6*20-1, 0, 9*4-1);
+	subdevice<screen_device>("screen")->set_visarea_full();
 
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(psion_state::lz_pixel_update));
@@ -607,18 +583,22 @@ void psion_state::psion_4lines(machine_config &config)
 void psion1_state::psion1(machine_config &config)
 {
 	psion_2lines(config);
+
 	HD6301X0(config.replace(), m_maincpu, 3.6864_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion1_state::psion1_mem);
+	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->in_p2_cb().set(FUNC(psion1_state::port2_r));
 	m_maincpu->out_p2_cb().set(FUNC(psion1_state::port2_w));
 	m_maincpu->in_p5_cb().set(FUNC(psion1_state::port5_r));
 	m_maincpu->in_p6_cb().set(FUNC(psion1_state::port6_r));
 	m_maincpu->out_p6_cb().set(FUNC(psion1_state::port6_w));
 
-	subdevice<timer_device>("nmi_timer")->set_start_delay(attotime::from_seconds(1));
+	timer_device &nmi_timer(TIMER(config.replace(), "nmi_timer"));
+	nmi_timer.configure_periodic(FUNC(psion1_state::nmi_timer), attotime::from_msec(500));
+	nmi_timer.set_start_delay(attotime::from_seconds(1));
 
 	subdevice<screen_device>("screen")->set_size(6*16, 1*8);
-	subdevice<screen_device>("screen")->set_visarea(0, 6*16-1, 0, 8*1-1);
+	subdevice<screen_device>("screen")->set_visarea_full();
 
 	m_lcdc->set_lcd_size(1, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update));
@@ -654,7 +634,7 @@ void psion_state::psionp350(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionp350_mem);
 
-	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // paged RAM
 }
 
 void psion_state::psionlz(machine_config &config)
@@ -663,15 +643,15 @@ void psion_state::psionlz(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion_state::psionlz_mem);
 
-	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // paged RAM
 }
 
 /* ROM definition */
 
 ROM_START( psion1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "Organiser I")
-	ROMX_LOAD( "psion1.rom",  0xf000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(0))
+	ROMX_LOAD( "psion1.rom",  0x0000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(0))
 ROM_END
 
 ROM_START( psioncm )

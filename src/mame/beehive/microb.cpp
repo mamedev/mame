@@ -53,7 +53,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(dmac_hrq_w);
+	void dmac_hrq_w(int state);
 	u8 dmac_mem_r(offs_t offset);
 	void dmac_mem_w(offs_t offset, u8 data);
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
@@ -75,7 +75,7 @@ private:
 	u8 m_keyline = 0U;
 };
 
-WRITE_LINE_MEMBER(microb_state::dmac_hrq_w)
+void microb_state::dmac_hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dmac->hlda_w(state);
@@ -280,12 +280,14 @@ void microb_state::machine_start()
 
 I8275_DRAW_CHARACTER_MEMBER(microb_state::draw_character)
 {
-	u8 dots = lten ? 0xff : (vsp || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
-	if (rvv)
+	using namespace i8275_attributes;
+
+	u8 dots = BIT(attrcode, LTEN) ? 0xff : (BIT(attrcode, VSP) || linecount == 9) ? 0 : m_p_chargen[(charcode << 4) | linecount];
+	if (BIT(attrcode, RVV))
 		dots ^= 0xff;
 
 	// HLGT is active on status line
-	rgb_t const fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	rgb_t const fg = BIT(attrcode, HLGT) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 
 	u32 *pix = &bitmap.pix(y, x);
 	for (int i = 0; i < 8; i++)

@@ -11,6 +11,9 @@
 #ifndef MAME_CPU_M6502_M6502_H
 #define MAME_CPU_M6502_M6502_H
 
+#pragma once
+
+
 class m6502_device : public cpu_device {
 public:
 	enum {
@@ -19,17 +22,6 @@ public:
 		NMI_LINE = INPUT_LINE_NMI,
 		V_LINE   = INPUT_LINE_IRQ0 + 16
 	};
-
-	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	bool get_sync() const { return sync; }
-
-	auto sync_cb() { return sync_w.bind(); }
-
-	devcb_write_line sync_w;
-
-protected:
-	m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	class memory_interface {
 	public:
@@ -45,6 +37,27 @@ protected:
 		virtual void write(uint16_t adr, uint8_t val) = 0;
 		virtual void write_9(uint16_t adr, uint8_t val);
 	};
+
+	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_address_width(int width, bool custom_interface) {
+		program_config.m_addr_width = width;
+		sprogram_config.m_addr_width = width;
+		uses_custom_memory_interface = custom_interface;
+	}
+
+	void set_custom_memory_interface(std::unique_ptr<memory_interface> interface) {
+		mintf = std::move(interface);
+	}
+
+	bool get_sync() const { return sync; }
+
+	auto sync_cb() { return sync_w.bind(); }
+
+	devcb_write_line sync_w;
+
+protected:
+	m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	class mi_default : public memory_interface {
 	public:
@@ -85,6 +98,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint32_t execute_input_lines() const noexcept override;
@@ -116,23 +130,24 @@ protected:
 	uint8_t   Y;                      /* Y index register */
 	uint8_t   P;                      /* Processor status */
 	uint8_t   IR;                     /* Prefetched instruction register */
-	int     inst_state_base;        /* Current instruction bank */
+	int       inst_state_base;        /* Current instruction bank */
 
 	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
 	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
 	bool nmi_pending, irq_taken, sync, inhibit_interrupts;
+	bool uses_custom_memory_interface;
 
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
 	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
 	void write_9(uint16_t adr, uint8_t val) { mintf->write_9(adr, val); }
 	uint8_t read_arg(uint16_t adr) { return mintf->read_arg(adr); }
-	uint8_t read_pc() { return mintf->read_arg(PC++); }
-	uint8_t read_pc_noinc() { return mintf->read_arg(PC); }
-	void prefetch();
-	void prefetch_noirq();
+	uint8_t read_pc() { return mintf->read_arg(PC); }
+	void prefetch_start();
+	void prefetch_end();
+	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
 
 	u32 XPC;
@@ -263,18 +278,6 @@ protected:
 	O(kil_non);
 
 #undef O
-};
-
-class m6502_mcu_device : public m6502_device {
-protected:
-	m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	void internal_update() { internal_update(total_cycles()); }
-	virtual void internal_update(uint64_t current_time) = 0;
-	void recompute_bcount(uint64_t event_time);
-	static void add_event(uint64_t &event_time, uint64_t new_event);
-
-	virtual void execute_run() override;
 };
 
 class m6512_device : public m6502_device {

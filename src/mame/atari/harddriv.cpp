@@ -322,6 +322,13 @@ Notes:
       68010 clock input - 8.000MHz [32/4]
       34010 clock input - 48.000MHz
 
+      strtdriv brake calibration doesn't work properly.  You need to have
+      the brake fully depressed when it says to "TAKE YOUR HANDS AND FEET
+      OFF ALL CONTROLS" and "TAKE YOUR FOOT OFF THE BRAKE".  When it says
+      "NOW STEP ON THE BRAKE FIRMLY AND RELEASE" you need to release the
+      brake and then press it again.  If you abort the calibration, the
+      defaults will work anyway.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -339,132 +346,131 @@ Notes:
  *
  *************************************/
 
-harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-/*  device_video_interface(mconfig, *this, false), */
-			m_maincpu(*this, "maincpu"),
-			m_gsp(*this, "gsp"),
-			m_msp(*this, "msp"),
-			m_adsp(*this, "adsp"),
-			m_jsacpu(*this, "jsacpu"),
-			m_dsp32(*this, "dsp32"),
-			m_ds3sdsp(*this, "ds3sdsp"),
-			m_ds3xdsp(*this, "ds3xdsp"),
-			m_ds3sdsp_region(*this, "ds3sdsp"),
-			m_ds3xdsp_region(*this, "ds3xdsp"),
-			m_ldac(*this, "ldac"),
-			m_rdac(*this, "rdac"),
-			m_harddriv_sound(*this, "harddriv_sound"),
-			m_jsa(*this, "jsa"),
-			m_screen(*this, "screen"),
-			m_duartn68681(*this, "duartn68681"),
-			m_adc8(*this, "adc8"),
-			m_lamps(*this, "lamp%u", 1U),
-			m_sel(*this, "SEL%u", 1U),
-			m_wheel(*this, "wheel"),
-			m_hd34010_host_access(0),
-			m_msp_ram(*this, "msp_ram"),
-			m_dsk_ram(nullptr),
-			m_dsk_rom(nullptr),
-			m_dsk_10c(*this, "dsk_10c"),
-			m_dsk_30c(*this, "dsk_30c"),
-			m_dsk_pio_access(0),
-			m_m68k_sloop_base(nullptr),
-			m_m68k_sloop_alt_base(nullptr),
-			m_200e(*this, "200e"),
-			m_210e(*this, "210e"),
-			m_adsp_data_memory(*this, "adsp_data"),
-			m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
-			m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
-			m_ds3sdsp_pgm_memory(*this, "ds3sdsp_pgm"),
-			m_ds3xdsp_pgm_memory(*this, "ds3xdsp_pgm"),
-			m_dsp32_ram(*this, "dsp32_ram"),
-			m_gsp_protection(nullptr),
-			m_gsp_speedup_pc(0),
-			m_msp_speedup_addr(nullptr),
-			m_msp_speedup_pc(0),
-			m_ds3_speedup_addr(nullptr),
-			m_ds3_speedup_pc(0),
-			m_ds3_transfer_pc(0),
-			m_gsp_multisync(0),
-			m_gsp_vram(*this, "gsp_vram"),
-			m_gsp_control_lo(*this, "gsp_control_lo"),
-			m_gsp_control_hi(*this, "gsp_control_hi"),
-			m_gsp_paletteram_lo(*this, "gsp_palram_lo", 1024*2, ENDIANNESS_LITTLE),
-			m_gsp_paletteram_hi(*this, "gsp_palram_hi", 1024*2, ENDIANNESS_LITTLE),
-			m_in0(*this, "IN0"),
-			m_sw1(*this, "SW1"),
-			m_a80000(*this, "a80000"),
-			m_12badc(*this, "12BADC.%u", 0),
-			m_irq_state(0),
-			m_gsp_irq_state(0),
-			m_msp_irq_state(0),
-			m_adsp_irq_state(0),
-			m_ds3sdsp_irq_state(0),
-			m_duart_irq_state(0),
-			m_last_gsp_shiftreg(0),
-			m_m68k_zp1(0),
-			m_m68k_zp2(0),
-			m_m68k_adsp_buffer_bank(0),
-			m_adsp_halt(0),
-			m_adsp_br(0),
-			m_adsp_xflag(0),
-			m_adsp_sim_address(0),
-			m_adsp_som_address(0),
-			m_adsp_eprom_base(0),
-			m_sim_memory(*this, "user1"),
-			m_adsp_pgm_memory_word(nullptr),
-			m_ds3_sdata_memory(nullptr),
-			m_ds3_sdata_memory_size(0),
-			m_ds3_gcmd(0),
-			m_ds3_gflag(0),
-			m_ds3_g68irqs(0),
-			m_ds3_gfirqs(0),
-			m_ds3_g68flag(0),
-			m_ds3_send(0),
-			m_ds3_reset(0),
-			m_ds3_gdata(0),
-			m_ds3_g68data(0),
-			m_ds3_sim_address(0),
-			m_ds3_scmd(0),
-			m_ds3_sflag(0),
-			m_ds3_s68irqs(0),
-			m_ds3_sfirqs(0),
-			m_ds3_s68flag(0),
-			m_ds3_sreset(0),
-			m_ds3_sdata(0),
-			m_ds3_s68data(0),
-			m_ds3_sdata_address(0),
-			m_ds3sdsp_timer_en(0),
-			m_ds3sdsp_sdata(0),
-			m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
-			m_ds3xdsp_timer_en(0),
-			m_ds3xdsp_sdata(0),
-			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
-			m_adc_control(0),
-			m_adc12_select(0),
-			m_adc12_byte(0),
-			m_adc12_data(0),
-			m_hdc68k_last_wheel(0),
-			m_hdc68k_last_port1(0),
-			m_hdc68k_wheel_edge(0),
-			m_hdc68k_shifter_state(0),
-			m_st68k_sloop_bank(0),
-			m_st68k_last_alt_sloop_offset(0),
-			m_next_msp_sync(0),
-			m_vram_mask(0),
-			m_shiftreg_enable(0),
-			m_gsp_shiftreg_source(nullptr),
-			m_gfx_finescroll(0),
-			m_gfx_palettebank(0),
-			m_duart(*this, "duartn68681"),
-			m_asic65(*this, "asic65"),
-			m_sound_int_state(0),
-			m_video_int_state(0),
-			m_palette(*this, "palette"),
-			m_slapstic(*this, "slapstic"),
-			m_slapstic_bank(*this, "slapstic_bank"),
-			m_rs232(*this, "rs232")
+harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(*this, "maincpu"),
+	m_gsp(*this, "gsp"),
+	m_msp(*this, "msp"),
+	m_adsp(*this, "adsp"),
+	m_jsacpu(*this, "jsacpu"),
+	m_dsp32(*this, "dsp32"),
+	m_ds3sdsp(*this, "ds3sdsp"),
+	m_ds3xdsp(*this, "ds3xdsp"),
+	m_ds3sdsp_region(*this, "ds3sdsp"),
+	m_ds3xdsp_region(*this, "ds3xdsp"),
+	m_ldac(*this, "ldac"),
+	m_rdac(*this, "rdac"),
+	m_harddriv_sound(*this, "harddriv_sound"),
+	m_jsa(*this, "jsa"),
+	m_screen(*this, "screen"),
+	m_duartn68681(*this, "duartn68681"),
+	m_adc8(*this, "adc8"),
+	m_lamps(*this, "lamp%u", 1U),
+	m_sel(*this, "SEL%u", 1U),
+	m_wheel(*this, "wheel"),
+	m_hd34010_host_access(0),
+	m_msp_ram(*this, "msp_ram"),
+	m_dsk_ram(nullptr),
+	m_dsk_rom(nullptr),
+	m_dsk_10c(*this, "dsk_10c"),
+	m_dsk_30c(*this, "dsk_30c"),
+	m_dsk_pio_access(0),
+	m_m68k_sloop_base(nullptr),
+	m_m68k_sloop_alt_base(nullptr),
+	m_200e(*this, "200e"),
+	m_210e(*this, "210e"),
+	m_adsp_data_memory(*this, "adsp_data"),
+	m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
+	m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
+	m_ds3sdsp_pgm_memory(*this, "ds3sdsp_pgm"),
+	m_ds3xdsp_pgm_memory(*this, "ds3xdsp_pgm"),
+	m_dsp32_ram(*this, "dsp32_ram"),
+	m_gsp_protection(nullptr),
+	m_gsp_speedup_pc(0),
+	m_msp_speedup_addr(nullptr),
+	m_msp_speedup_pc(0),
+	m_ds3_speedup_addr(nullptr),
+	m_ds3_speedup_pc(0),
+	m_ds3_transfer_pc(0),
+	m_gsp_multisync(0),
+	m_gsp_vram(*this, "gsp_vram"),
+	m_gsp_control_lo(*this, "gsp_control_lo"),
+	m_gsp_control_hi(*this, "gsp_control_hi"),
+	m_gsp_paletteram_lo(*this, "gsp_palram_lo", 1024*2, ENDIANNESS_LITTLE),
+	m_gsp_paletteram_hi(*this, "gsp_palram_hi", 1024*2, ENDIANNESS_LITTLE),
+	m_in0(*this, "IN0"),
+	m_sw1(*this, "SW1"),
+	m_a80000(*this, "a80000"),
+	m_12badc(*this, "12BADC.%u", 0),
+	m_irq_state(0),
+	m_gsp_irq_state(0),
+	m_msp_irq_state(0),
+	m_adsp_irq_state(0),
+	m_ds3sdsp_irq_state(0),
+	m_duart_irq_state(0),
+	m_last_gsp_shiftreg(0),
+	m_m68k_zp1(0),
+	m_m68k_zp2(0),
+	m_m68k_adsp_buffer_bank(0),
+	m_adsp_halt(0),
+	m_adsp_br(0),
+	m_adsp_xflag(0),
+	m_adsp_sim_address(0),
+	m_adsp_som_address(0),
+	m_adsp_eprom_base(0),
+	m_sim_memory(*this, "user1"),
+	m_adsp_pgm_memory_word(nullptr),
+	m_ds3_sdata_memory(nullptr),
+	m_ds3_sdata_memory_size(0),
+	m_ds3_gcmd(0),
+	m_ds3_gflag(0),
+	m_ds3_g68irqs(0),
+	m_ds3_gfirqs(0),
+	m_ds3_g68flag(0),
+	m_ds3_send(0),
+	m_ds3_reset(0),
+	m_ds3_gdata(0),
+	m_ds3_g68data(0),
+	m_ds3_sim_address(0),
+	m_ds3_scmd(0),
+	m_ds3_sflag(0),
+	m_ds3_s68irqs(0),
+	m_ds3_sfirqs(0),
+	m_ds3_s68flag(0),
+	m_ds3_sreset(0),
+	m_ds3_sdata(0),
+	m_ds3_s68data(0),
+	m_ds3_sdata_address(0),
+	m_ds3sdsp_timer_en(0),
+	m_ds3sdsp_sdata(0),
+	m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
+	m_ds3xdsp_timer_en(0),
+	m_ds3xdsp_sdata(0),
+	m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
+	m_adc_control(0),
+	m_adc12_select(0),
+	m_adc12_byte(0),
+	m_adc12_data(0),
+	m_hdc68k_last_wheel(0),
+	m_hdc68k_last_port1(0),
+	m_hdc68k_wheel_edge(0),
+	m_hdc68k_shifter_state(0),
+	m_st68k_sloop_bank(0),
+	m_st68k_last_alt_sloop_offset(0),
+	m_next_msp_sync(0),
+	m_vram_mask(0),
+	m_shiftreg_enable(0),
+	m_gsp_shiftreg_source(nullptr),
+	m_gfx_finescroll(0),
+	m_gfx_palettebank(0),
+	m_duart(*this, "duartn68681"),
+	m_asic65(*this, "asic65"),
+	m_sound_int_state(0),
+	m_video_int_state(0),
+	m_palette(*this, "palette"),
+	m_slapstic(*this, "slapstic"),
+	m_slapstic_bank(*this, "slapstic_bank"),
+	m_rs232(*this, "rs232")
 {
 	int i;
 
@@ -508,11 +514,11 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 class harddriv_new_state : public driver_device
 {
 public:
-	harddriv_new_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_mainpcb(*this, "mainpcb")
-		, m_leftpcb(*this, "leftpcb")
-		, m_rightpcb(*this, "rightpcb")
+	harddriv_new_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_mainpcb(*this, "mainpcb"),
+		m_leftpcb(*this, "leftpcb"),
+		m_rightpcb(*this, "rightpcb")
 	{ }
 
 	void steeltal1_machine(machine_config &config);
@@ -532,7 +538,7 @@ public:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(hack_timer);
-	DECLARE_WRITE_LINE_MEMBER(tx_a);
+	void tx_a(int state);
 
 	required_device<harddriv_state> m_mainpcb;
 	optional_device<harddriv_state> m_leftpcb;
@@ -790,8 +796,8 @@ static INPUT_PORTS_START( harddriv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("mainpcb:SW1")       /* 600002 */
 	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
@@ -996,8 +1002,8 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("mainpcb:SW1")       /* 60c002 */
 	PORT_DIPNAME( 0x01, 0x01, "SW1:8" )
@@ -1313,8 +1319,8 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_START("mainpcb:8BADC.1")        /* b00000 - 8 bit ADC 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - voice mic */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - brake */
+	PORT_BIT( 0xff, 0x20, IPT_PEDAL2 ) PORT_MINMAX(0x20, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_NAME("Brake")
 
 	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - volume */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
@@ -1325,14 +1331,14 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_START("mainpcb:8BADC.5")        /* b00000 - 8 bit ADC 5 - canopy */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
-	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_NAME("Brake") PORT_REVERSE
+	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - ADC input for voice mic? Not verified */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT(0xfff, 0x800, IPT_PADDLE) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT(0xfff, 0x200, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")       /* FAKE */
@@ -1422,7 +1428,7 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT(0xfff, 0x800, IPT_PADDLE) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
+	PORT_BIT(0xfff, 0x200, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")
@@ -1440,7 +1446,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(harddriv_state::video_int_write_line)
+void harddriv_state::video_int_write_line(int state)
 {
 	if (state)
 	{
@@ -1665,7 +1671,7 @@ void harddriv_state::dsk2(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
+void harddriv_state::sound_int_write_line(int state)
 {
 	m_sound_int_state = state;
 	update_interrupts();
@@ -2073,7 +2079,7 @@ void harddriv_new_state::steeltalp_machine(machine_config &config)
 	STEELTALP_BOARD(config, "mainpcb", 0);
 }
 
-WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
+void harddriv_new_state::tx_a(int state)
 {
 	// passive connection, one way, to both screens
 	m_leftpcb->get_duart()->rx_a_w(state);

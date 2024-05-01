@@ -52,7 +52,7 @@ private:
 
 	uint8_t m_ext_reg;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 };
 
 

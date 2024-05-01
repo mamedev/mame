@@ -16,6 +16,8 @@ http://oldcomputer.info/terminal/
 #include "cpu/mcs51/mcs51.h"
 
 
+namespace {
+
 class terminal_state : public driver_device
 {
 public:
@@ -93,6 +95,8 @@ ROM_START( teleguide ) // order unknown // i8051, i8031 (layout very similar to 
 	ROM_LOAD( "mainboard_18764-063_349-1173.bin",  0x10000, 0x20000, CRC(eb5c2d05) SHA1(dba2f72f928487e83741ad24d70b568e4510988e) )
 	ROM_LOAD( "module_19315-051_349-01173.bin",    0x20000, 0x08000, CRC(29c4b49d) SHA1(9bf37616eb130cb6bf86954b4a4952ea99d43ce8) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

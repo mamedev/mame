@@ -38,7 +38,7 @@ private:
 	required_memory_region m_eprom;
 	required_device<tms9929a_device> m_vdp;
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 };
 
 

@@ -39,7 +39,8 @@ TS 2006.12.22:
 - Rebus protection patch sits at the end of trap $b (rtos call) and in some cases returns 0 in D0.
   It's not a real protection check I think.
 - Ring & Ball is mostly decrypted, currently stops at 'scheda da inizializzare' (board must be initialized). Switching the dip to clear RAM it says
-  'Inizializzazione ok, ver 2.6' (Initialization ok, ver 2.6) then stops. By switching DSW2.8 it's possible to enter test mode.
+  'Inizializzazione ok, ver 2.6' (Initialization ok, ver 2.6), it initializes it and then, once the dip is switched back off, jumps into the weeds.
+  Possibly caused by protection? By switching DSW2.8 it's possible to enter test mode.
 
 More notes about Funny Strip protection issues at the bottom of source file (init_funystrp)
 
@@ -55,22 +56,22 @@ More notes about Funny Strip protection issues at the bottom of source file (ini
 #include "screen.h"
 #include "speaker.h"
 
-WRITE_LINE_MEMBER(splash_state::coin1_lockout_w)
+void splash_state::coin1_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-WRITE_LINE_MEMBER(splash_state::coin2_lockout_w)
+void splash_state::coin2_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(1, !state);
 }
 
-WRITE_LINE_MEMBER(splash_state::coin1_counter_w)
+void splash_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(splash_state::coin2_counter_w)
+void splash_state::coin2_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -103,7 +104,7 @@ void splash_state::splash_adpcm_control_w(uint8_t data)
 	m_msm->reset_w(!BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
+void splash_state::splash_msm5205_int(int state)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
@@ -147,7 +148,7 @@ void splash_state::roldfrog_vblank_ack_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(splash_state::ym_irq)
+void splash_state::ym_irq(int state)
 {
 	m_sound_irq = state;
 	roldfrog_update_irq();
@@ -249,15 +250,15 @@ void splash_state::funystrp_sound_map(address_map &map)
 void funystrp_state::ringball_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	//map(0x2fff00, 0x2fff03); // trackballs read here
+	//map(0x2fff00, 0x2fff03); // TODO: trackballs read here
 	map(0x800000, 0x83ffff).ram().share("pixelram");
 	map(0x840000, 0x840001).portr("DSW1");
 	map(0x840002, 0x840003).portr("DSW2");
 	map(0x840004, 0x840005).portr("P1");
 	map(0x840006, 0x840007).portr("P2");
 	map(0x840008, 0x840009).portr("SYSTEM");
-	map(0x84000a, 0x84000a).w(FUNC(funystrp_state::eeprom_w)); // EEPROM doesn't seem to be written, wrong hook up?
-	map(0x84000e, 0x84000e).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // check when game works
+	map(0x84000b, 0x84000b).w(FUNC(funystrp_state::eeprom_w));
+	//map(0x84000e, 0x84000e).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // TODO: where is this hooked up?
 	map(0x880000, 0x8817ff).ram().w(FUNC(funystrp_state::vram_w)).share("videoram");
 	map(0x881800, 0x881803).ram().share("vregs");
 	map(0x881804, 0x881fff).ram();
@@ -470,7 +471,7 @@ static INPUT_PORTS_START( ringball )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8") // TODO: switching this doesn't shown it as on in test mode as all the others do. Why?
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8") // TODO: switching this doesn't show it as on in test mode as all the others do. Why?
 
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
@@ -484,7 +485,7 @@ static INPUT_PORTS_START( ringball )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// TODO: Missing controls wrt test mode: Track left, Track right (always stuck on for some reason)
+	// TODO: Missing controls wrt test mode: Track left, Track right (read in the 0x2fff00-0x2fff03 range)
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // Hopper in - Hopper out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // Ticket in - Ticket out
@@ -660,7 +661,7 @@ void splash_state::roldfrog(machine_config &config)
 	ymsnd.add_route(3, "mono", 1.0);
 }
 
-WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
+void funystrp_state::adpcm_int1(int state)
 {
 	if (m_snd_interrupt_enable1  || m_msm_toggle1 == 1)
 	{
@@ -675,7 +676,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 	}
 }
 
-WRITE_LINE_MEMBER(funystrp_state::adpcm_int2)
+void funystrp_state::adpcm_int2(int state)
 {
 	if (m_snd_interrupt_enable2 || m_msm_toggle2 == 1)
 	{
@@ -1558,4 +1559,4 @@ GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   splash_state,   init_roldfro
 GAME( 1995, rebus,    0,        roldfrog, splash,   splash_state,   init_rebus,    ROT0, "Microhard",              "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ringball, funystrp, ringball, ringball, funystrp_state, init_ringball, ROT0, "Microhard",              "Ring Ball (Ver. 2.6)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...
+GAME( 1995, ringball, funystrp, ringball, ringball, funystrp_state, init_ringball, ROT0, "Microhard",              "Ring Ball (Ver. 2.6)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Ring Ball in test mode, may be Ring & Ball

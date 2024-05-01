@@ -37,7 +37,7 @@ device_videobrain_expansion_card_interface::device_videobrain_expansion_card_int
 
 
 //-------------------------------------------------
-//  videobrain_roml_pointer - get low ROM pointer
+//  videobrain_rom_pointer - get ROM pointer
 //-------------------------------------------------
 
 uint8_t* device_videobrain_expansion_card_interface::videobrain_rom_pointer(running_machine &machine, size_t size)
@@ -45,7 +45,6 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_rom_pointer(runn
 	if (m_rom.empty())
 	{
 		m_rom.resize(size);
-
 		m_rom_mask = size - 1;
 	}
 
@@ -62,7 +61,6 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runn
 	if (m_ram.empty())
 	{
 		m_ram.resize(size);
-
 		m_ram_mask = size - 1;
 	}
 
@@ -95,9 +93,6 @@ videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine
 void videobrain_expansion_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_write_extres.resolve_safe();
 }
 
 
@@ -105,29 +100,29 @@ void videobrain_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result videobrain_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> videobrain_expansion_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		size_t size;
-
 		if (!loaded_through_softlist())
 		{
-			size = length();
+			size_t const romsize = length();
 
-			fread(m_cart->videobrain_rom_pointer(machine(), size), size);
+			fread(m_cart->videobrain_rom_pointer(machine(), romsize), romsize);
 		}
 		else
 		{
-			size = get_software_region_length("rom");
-			if (size) memcpy(m_cart->videobrain_rom_pointer(machine(), size), get_software_region("rom"), size);
+			size_t const romsize = get_software_region_length("rom");
+			if (romsize)
+				memcpy(m_cart->videobrain_rom_pointer(machine(), romsize), get_software_region("rom"), romsize);
 
-			size = get_software_region_length("ram");
-			if (size) memset(m_cart->videobrain_ram_pointer(machine(), size), 0, size);
+			size_t const ramsize = get_software_region_length("ram");
+			if (ramsize)
+				memset(m_cart->videobrain_ram_pointer(machine(), ramsize), 0, ramsize);
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -147,12 +142,16 @@ std::string videobrain_expansion_slot_device::get_default_card_software(get_defa
 
 // slot devices
 #include "std.h"
+#include "comp_language.h"
+#include "info_manager.h"
 #include "money_minder.h"
 #include "timeshare.h"
 
 void vidbrain_expansion_cards(device_slot_interface &device)
 {
 	device.option_add_internal("standard", VB_STD);
-	device.option_add_internal("moneyminder", VB_MONEY_MINDER);
+	device.option_add_internal("comp_language", VB_COMP_LANGUAGE);
+	device.option_add_internal("info_manager", VB_INFO_MANAGER);
+	device.option_add_internal("money_minder", VB_MONEY_MINDER);
 	device.option_add_internal("timeshare", VB_TIMESHARE);
 }

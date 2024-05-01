@@ -142,6 +142,8 @@ small ics.
 #include "formats/spc1000_cas.h"
 
 
+namespace {
+
 class spc1000_state : public driver_device
 {
 public:
@@ -162,11 +164,11 @@ public:
 private:
 	void iplk_w(uint8_t data);
 	uint8_t iplk_r();
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 	void gmode_w(uint8_t data);
 	uint8_t gmode_r();
 	uint8_t porta_r();
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
+	void centronics_busy_w(int state) { m_centronics_busy = state; }
 	uint8_t mc6847_videoram_r(offs_t offset);
 	void cass_w(uint8_t data);
 	uint8_t keyboard_r(offs_t offset);
@@ -457,7 +459,7 @@ uint8_t spc1000_state::porta_r()
 }
 
 // irq is inverted in emulation, so we need this trampoline
-WRITE_LINE_MEMBER( spc1000_state::irq_w )
+void spc1000_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
@@ -525,6 +527,8 @@ ROM_START( spc1000 )
 	//ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2fbb6eca) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))  // bad?
 	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(240426be) SHA1(8eb32e147c17a6d0f947b8bb3c6844750a7b64a8))
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

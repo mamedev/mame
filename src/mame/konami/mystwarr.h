@@ -98,7 +98,7 @@ private:
 	uint32_t screen_update_dadandrn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_martchmp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddd_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void k054539_nmi_gen(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);

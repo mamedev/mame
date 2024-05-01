@@ -34,6 +34,8 @@ TODO:
 
 #include "pcshare.h"
 
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/idectrl.h"
 #include "machine/lpci.h"
@@ -501,6 +503,7 @@ void pinball2k_state::mediagx_map(address_map &map)
 	map(0x40008300, 0x400083ff).rw(FUNC(pinball2k_state::disp_ctrl_r), FUNC(pinball2k_state::disp_ctrl_w));
 	map(0x40008400, 0x400084ff).rw(FUNC(pinball2k_state::memory_ctrl_r), FUNC(pinball2k_state::memory_ctrl_w));
 	map(0x40800000, 0x40bfffff).ram().share("vram");
+	map(0xf8000000, 0xfbffffff).rom().region("prism", 0); // BIOS checks for this location, likely remapped by PCI
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
@@ -625,9 +628,16 @@ void pinball2k_state::mediagx(machine_config &config)
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device(18, FUNC(pinball2k_state::cx5510_pci_r), FUNC(pinball2k_state::cx5510_pci_w));
+	// TODO: prism code do hard checks for PCIR vendor 0x146e (Williams) device 0x0001
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+
+	isa16_device &isa(ISA16(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+	// VGA hook is for temp debugging aid
+	ISA16_SLOT(config, "isa1", 0, "isa", pc_isa16_cards, "vga", false);
 
 	RAMDAC(config, m_ramdac, 0, m_palette);
 	m_ramdac->set_addrmap(0, &pinball2k_state::ramdac_map);
@@ -669,17 +679,17 @@ ROM_START( swe1pb )
 
 	ROM_REGION32_LE(0x4000000, "prism", 0)
 	// bank 0
-	ROM_LOAD( "swe1_u100.rom",   0x0000000, 0x800000, CRC(db2c9709) SHA1(14e8db2c0b09c4da6306a4a1f7fe54b2a334c5ed) )
-	ROM_LOAD( "swe1_u101.rom",   0x0800000, 0x800000, CRC(a039e80d) SHA1(8f63e8ab83e043232fc17ed3dff1f251396a178a) )
+	ROM_LOAD32_WORD( "swe1_u100.rom",   0x0000000, 0x800000, CRC(db2c9709) SHA1(14e8db2c0b09c4da6306a4a1f7fe54b2a334c5ed) )
+	ROM_LOAD32_WORD( "swe1_u101.rom",   0x0000002, 0x800000, CRC(a039e80d) SHA1(8f63e8ab83e043232fc17ed3dff1f251396a178a) )
 	// bank 1
-	ROM_LOAD( "swe1_u102.rom",   0x1000000, 0x800000, CRC(c9feb7bc) SHA1(a34acd34c3f91f082b67e385b1f4da2e5b6e5087) )
-	ROM_LOAD( "swe1_u103.rom",   0x1800000, 0x800000, CRC(7a692466) SHA1(9adf5ae9c12bd5b6314913f6c01d4566ee453fe1) )
+	ROM_LOAD32_WORD( "swe1_u102.rom",   0x1000000, 0x800000, CRC(c9feb7bc) SHA1(a34acd34c3f91f082b67e385b1f4da2e5b6e5087) )
+	ROM_LOAD32_WORD( "swe1_u103.rom",   0x1000002, 0x800000, CRC(7a692466) SHA1(9adf5ae9c12bd5b6314913f6c01d4566ee453fe1) )
 	// bank 2
-	ROM_LOAD( "swe1_u104.rom",   0x2000000, 0x800000, CRC(76e2dd7e) SHA1(9bc20a1423b11c46eb2f5a514e985151defb5651) )
-	ROM_LOAD( "swe1_u105.rom",   0x2800000, 0x800000, CRC(87f2460c) SHA1(cdc05e017367f61280e3d5682096e67e4c200150) )
+	ROM_LOAD32_WORD( "swe1_u104.rom",   0x2000000, 0x800000, CRC(76e2dd7e) SHA1(9bc20a1423b11c46eb2f5a514e985151defb5651) )
+	ROM_LOAD32_WORD( "swe1_u105.rom",   0x2000002, 0x800000, CRC(87f2460c) SHA1(cdc05e017367f61280e3d5682096e67e4c200150) )
 	// bank 3
-	ROM_LOAD( "swe1_u106.rom",   0x3000000, 0x800000, CRC(84877e2f) SHA1(6dd8c761b2e26313ae9e159690b3a4a170cb3bd8) )
-	ROM_LOAD( "swe1_u107.rom",   0x3800000, 0x800000, CRC(dc433c89) SHA1(9f1273debc9168c04202078503cfc4f1ca8cb30b) )
+	ROM_LOAD32_WORD( "swe1_u106.rom",   0x3000000, 0x800000, CRC(84877e2f) SHA1(6dd8c761b2e26313ae9e159690b3a4a170cb3bd8) )
+	ROM_LOAD32_WORD( "swe1_u107.rom",   0x3000002, 0x800000, CRC(dc433c89) SHA1(9f1273debc9168c04202078503cfc4f1ca8cb30b) )
 
 	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD( "28f800.bin",      0x000000, 0x100000, CRC(5fc1fd2c) SHA1(0967db9b6e82d386d3a8415bbef40bcab5a06654) )
@@ -700,17 +710,17 @@ ROM_START( rfmpb )
 
 	ROM_REGION32_LE(0x4000000, "prism", 0)
 	// bank 0
-	ROM_LOAD( "rfm_u100.rom",    0x0000000, 0x800000, CRC(b3548b1b) SHA1(874a16282bb778886cea2567d68ec7024dc5ed22) )
-	ROM_LOAD( "rfm_u101.rom",    0x0800000, 0x800000, CRC(8bef301d) SHA1(2eade00b1a4cd3f5e98ebe8ed8f549e328188e77) )
+	ROM_LOAD32_WORD( "rfm_u100.rom",    0x0000000, 0x800000, CRC(b3548b1b) SHA1(874a16282bb778886cea2567d68ec7024dc5ed22) )
+	ROM_LOAD32_WORD( "rfm_u101.rom",    0x0000002, 0x800000, CRC(8bef301d) SHA1(2eade00b1a4cd3f5e98ebe8ed8f549e328188e77) )
 	// bank 1
-	ROM_LOAD( "rfm_u102.rom",    0x1000000, 0x800000, CRC(749f5c59) SHA1(2d8850e7f8ea3e07e8b444d7dd4dc4195a547ae7) )
-	ROM_LOAD( "rfm_u103.rom",    0x1800000, 0x800000, CRC(a9ec5e97) SHA1(ce7c38dcbf34ce10d6e204a3176cd2c7a83b525a) )
+	ROM_LOAD32_WORD( "rfm_u102.rom",    0x1000000, 0x800000, CRC(749f5c59) SHA1(2d8850e7f8ea3e07e8b444d7dd4dc4195a547ae7) )
+	ROM_LOAD32_WORD( "rfm_u103.rom",    0x1000002, 0x800000, CRC(a9ec5e97) SHA1(ce7c38dcbf34ce10d6e204a3176cd2c7a83b525a) )
 	// bank 2
-	ROM_LOAD( "rfm_u104.rom",    0x2000000, 0x800000, CRC(0a1acd70) SHA1(dcca4de92eadeb82ac776953326410a9687838cb) )
-	ROM_LOAD( "rfm_u105.rom",    0x2800000, 0x800000, CRC(1ef31684) SHA1(141900a7426ad483384606cddb018d186952f439) )
+	ROM_LOAD32_WORD( "rfm_u104.rom",    0x2000000, 0x800000, CRC(0a1acd70) SHA1(dcca4de92eadeb82ac776953326410a9687838cb) )
+	ROM_LOAD32_WORD( "rfm_u105.rom",    0x2000002, 0x800000, CRC(1ef31684) SHA1(141900a7426ad483384606cddb018d186952f439) )
 	// bank 3
-	ROM_LOAD( "rfm_u106.rom",    0x3000000, 0x800000, CRC(daf4e1dc) SHA1(0612495468fb962b833057e50f620c5f69cd5840) )
-	ROM_LOAD( "rfm_u107.rom",    0x3800000, 0x800000, CRC(e737ab39) SHA1(0e978923db19e2893fdb4aae69d6ed3c3f664a31) )
+	ROM_LOAD32_WORD( "rfm_u106.rom",    0x3000000, 0x800000, CRC(daf4e1dc) SHA1(0612495468fb962b833057e50f620c5f69cd5840) )
+	ROM_LOAD32_WORD( "rfm_u107.rom",    0x3000002, 0x800000, CRC(e737ab39) SHA1(0e978923db19e2893fdb4aae69d6ed3c3f664a31) )
 
 	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD( "28f800.bin",      0x000000, 0x100000, CRC(a57c55ad) SHA1(60ee230b8978b7c5f1482b1b587d1c6db5fdd20e) )
@@ -727,17 +737,17 @@ ROM_START( rfmpbr2 )
 
 	ROM_REGION32_LE(0x4000000, "prism", 0)
 	// bank 0
-	ROM_LOAD( "rfm_u100r2.rom",  0x0000000, 0x800000, CRC(d4278a9b) SHA1(ec07b97190acb6b34b9ed6cda505ee8fefd66fec) )
-	ROM_LOAD( "rfm_u101r2.rom",  0x0800000, 0x800000, CRC(e5d4c0ed) SHA1(cfc7d9d2324cc02c9eaf53fd674f7db24736699c) )
+	ROM_LOAD32_WORD( "rfm_u100r2.rom",  0x0000000, 0x800000, CRC(d4278a9b) SHA1(ec07b97190acb6b34b9ed6cda505ee8fefd66fec) )
+	ROM_LOAD32_WORD( "rfm_u101r2.rom",  0x0000002, 0x800000, CRC(e5d4c0ed) SHA1(cfc7d9d2324cc02c9eaf53fd674f7db24736699c) )
 	// bank 1
-	ROM_LOAD( "rfm_u102.rom",    0x1000000, 0x800000, CRC(749f5c59) SHA1(2d8850e7f8ea3e07e8b444d7dd4dc4195a547ae7) )
-	ROM_LOAD( "rfm_u103.rom",    0x1800000, 0x800000, CRC(a9ec5e97) SHA1(ce7c38dcbf34ce10d6e204a3176cd2c7a83b525a) )
+	ROM_LOAD32_WORD( "rfm_u102.rom",    0x1000000, 0x800000, CRC(749f5c59) SHA1(2d8850e7f8ea3e07e8b444d7dd4dc4195a547ae7) )
+	ROM_LOAD32_WORD( "rfm_u103.rom",    0x1000002, 0x800000, CRC(a9ec5e97) SHA1(ce7c38dcbf34ce10d6e204a3176cd2c7a83b525a) )
 	// bank 2
-	ROM_LOAD( "rfm_u104.rom",    0x2000000, 0x800000, CRC(0a1acd70) SHA1(dcca4de92eadeb82ac776953326410a9687838cb) )
-	ROM_LOAD( "rfm_u105.rom",    0x2800000, 0x800000, CRC(1ef31684) SHA1(141900a7426ad483384606cddb018d186952f439) )
+	ROM_LOAD32_WORD( "rfm_u104.rom",    0x2000000, 0x800000, CRC(0a1acd70) SHA1(dcca4de92eadeb82ac776953326410a9687838cb) )
+	ROM_LOAD32_WORD( "rfm_u105.rom",    0x2000002, 0x800000, CRC(1ef31684) SHA1(141900a7426ad483384606cddb018d186952f439) )
 	// bank 3
-	ROM_LOAD( "rfm_u106.rom",    0x3000000, 0x800000, CRC(daf4e1dc) SHA1(0612495468fb962b833057e50f620c5f69cd5840) )
-	ROM_LOAD( "rfm_u107.rom",    0x3800000, 0x800000, CRC(e737ab39) SHA1(0e978923db19e2893fdb4aae69d6ed3c3f664a31) )
+	ROM_LOAD32_WORD( "rfm_u106.rom",    0x3000000, 0x800000, CRC(daf4e1dc) SHA1(0612495468fb962b833057e50f620c5f69cd5840) )
+	ROM_LOAD32_WORD( "rfm_u107.rom",    0x3000002, 0x800000, CRC(e737ab39) SHA1(0e978923db19e2893fdb4aae69d6ed3c3f664a31) )
 
 	ROM_REGION(0xc00000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD( "28f800.bin",      0x000000, 0x100000, CRC(5fc1fd2c) SHA1(0967db9b6e82d386d3a8415bbef40bcab5a06654) )

@@ -76,7 +76,7 @@ uint8_t atom_econet_device::statid_r()
 	return 0xfe;
 }
 
-WRITE_LINE_MEMBER(atom_econet_device::bus_irq_w)
+void atom_econet_device::bus_irq_w(int state)
 {
 	m_bus->irq_w(state);
 }

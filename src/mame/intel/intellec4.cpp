@@ -83,8 +83,8 @@ public:
 	void ram1_out(u8 data);
 
 	// universal slot outputs
-	DECLARE_WRITE_LINE_MEMBER(bus_reset_4002);
-	DECLARE_WRITE_LINE_MEMBER(bus_user_reset);
+	void bus_reset_4002(int state);
+	void bus_user_reset(int state);
 
 	// front panel switches
 	DECLARE_INPUT_CHANGED_MEMBER(sw_reset);
@@ -498,13 +498,13 @@ void intellec4_state::ram1_out(u8 data)
   Bus signal handlers
 ----------------------------------*/
 
-WRITE_LINE_MEMBER(intellec4_state::bus_reset_4002)
+void intellec4_state::bus_reset_4002(int state)
 {
 	m_bus_reset_4002 = 0 == state;
 	check_4002_reset();
 }
 
-WRITE_LINE_MEMBER(intellec4_state::bus_user_reset)
+void intellec4_state::bus_user_reset(int state)
 {
 	if (!state)
 		trigger_reset();
@@ -1038,7 +1038,7 @@ public:
 	}
 
 	// universal slot outputs
-	DECLARE_WRITE_LINE_MEMBER(bus_test);
+	void bus_test(int state);
 
 	// front panel switches
 	DECLARE_INPUT_CHANGED_MEMBER(sw_hold);
@@ -1091,7 +1091,7 @@ INPUT_PORTS_END
   Bus signal handlers
 ----------------------------------*/
 
-WRITE_LINE_MEMBER(mod4_state::bus_test)
+void mod4_state::bus_test(int state)
 {
 	if (!m_one_shot && !m_sw_hold)
 		m_cpu->set_input_line(I4004_TEST_LINE, state ? CLEAR_LINE : ASSERT_LINE);
@@ -1230,11 +1230,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(stp_ack);
+	void stp_ack(int state);
 
 	// universal slot outputs
-	DECLARE_WRITE_LINE_MEMBER(bus_stop);
-	DECLARE_WRITE_LINE_MEMBER(bus_test);
+	void bus_stop(int state);
+	void bus_test(int state);
 
 	// front panel switches
 	DECLARE_INPUT_CHANGED_MEMBER(sw_stop);
@@ -1287,7 +1287,7 @@ INPUT_PORTS_END
   CPU output handlers
 ----------------------------------*/
 
-WRITE_LINE_MEMBER(mod40_state::stp_ack)
+void mod40_state::stp_ack(int state)
 {
 	// resets the single-step monostable
 	if (m_stp_ack && state)
@@ -1307,7 +1307,7 @@ WRITE_LINE_MEMBER(mod40_state::stp_ack)
 }
 
 
-WRITE_LINE_MEMBER(mod40_state::bus_stop)
+void mod40_state::bus_stop(int state)
 {
 	// will not allow the CPU to step/run
 	if (m_single_step || !m_sw_stop)
@@ -1320,7 +1320,7 @@ WRITE_LINE_MEMBER(mod40_state::bus_stop)
   Bus signal handlers
 ----------------------------------*/
 
-WRITE_LINE_MEMBER(mod40_state::bus_test)
+void mod40_state::bus_test(int state)
 {
 	m_cpu->set_input_line(I4040_TEST_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -1486,5 +1486,5 @@ ROM_END
 ***********************************************************************/
 
 //    YEAR   NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME             FLAGS
-COMP( 1973?, intlc44,  0,      0,      mod4,    mod4,  mod4_state,  empty_init, "Intel", "INTELLEC 4/MOD 4",  MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
-COMP( 1974?, intlc440, 0,      0,      mod40,   mod40, mod40_state, empty_init, "Intel", "INTELLEC 4/MOD 40", MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK | MACHINE_SUPPORTS_SAVE )
+COMP( 1973?, intlc44,  0,      0,      mod4,    mod4,  mod4_state,  empty_init, "Intel", "INTELLEC 4/MOD 4",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1974?, intlc440, 0,      0,      mod40,   mod40, mod40_state, empty_init, "Intel", "INTELLEC 4/MOD 40", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -5,8 +5,8 @@
     Namco 6-speed Gearbox device
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_NAMCOIO_GEARBOX_H
-#define MAME_MACHINE_NAMCOIO_GEARBOX_H
+#ifndef MAME_NAMCO_NAMCOIO_GEARBOX_H
+#define MAME_NAMCO_NAMCOIO_GEARBOX_H
 
 #pragma once
 
@@ -25,7 +25,7 @@ public:
 
 	// I/O operations
 	DECLARE_CUSTOM_INPUT_MEMBER( in_r );
-	DECLARE_READ_LINE_MEMBER( clutch_r );
+	int clutch_r();
 	uint8_t m_gearbox_state = 0;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -40,4 +40,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCOIO_GEARBOX, namcoio_gearbox_device)
 
-#endif // MAME_MACHINE_NAMCOIO_GEARBOX_H
+#endif // MAME_NAMCO_NAMCOIO_GEARBOX_H

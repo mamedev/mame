@@ -13,9 +13,18 @@ Change Log:
 MAY-2015 System11
 
 - added turtshipko and turtshipkn.
-- amended comments for T-5 instances, A14 is tied high on the PCBs hence the need to load the higher half of the ROM only
-- order of age is guessed - turtshipko has grey bullets and a different level order, 3x horizontal and then 3x vertical (as far as tested).  Bullets probably fixed based on feedback before it was licensed to Sharp Image and Pacific Games - differences between US/JP/Korea versions previously in MAME are minimal.
-- turtshipkn I assume is newer, the disclaimer is in pure Korean and the orange bullets are retained.  Given the 88/9 release date from the startup screen it would seem unlikely that this came out first, then got grey bullets and back to orange in time for it to still be a 1988 game in other countries.
+- amended comments for T-5 instances, A14 is tied high on the PCBs hence
+  the need to load the higher half of the ROM only
+- order of age is guessed - turtshipko has grey bullets and a different
+  level order, 3x horizontal and then 3x vertical (as far as tested).
+  Bullets probably fixed based on feedback before it was licensed to Sharp
+  Image and Pacific Games - differences between US/JP/Korea versions
+  previously in MAME are minimal.
+- turtshipkn I assume is newer, the disclaimer is in pure Korean and the
+  orange bullets are retained.  Given the 88/9 release date from the
+  startup screen it would seem unlikely that this came out first, then
+  got grey bullets and back to orange in time for it to still be a 1988
+  game in other countries.
 
 JUL-2003 AAT
 
@@ -1370,7 +1379,7 @@ GAME( 1988, turtship,   0,        turtship, turtship, sidearms_state, init_turts
 GAME( 1988, turtshipj,  turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, turtshipk,  turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, turtshipko, turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                         "Turtle Ship (Korea, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipkn, turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                       "Turtle Ship (Korea, 88/9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipkn, turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                         "Turtle Ship (Korea, 88/9)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, dyger,      0,        turtship, dyger,    sidearms_state, init_dyger,    ROT270, "Philko", "Dyger (Korea set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, dygera,     dyger,    turtship, dyger,    sidearms_state, init_dyger,    ROT270, "Philko", "Dyger (Korea set 2)", MACHINE_SUPPORTS_SAVE )

@@ -11,15 +11,14 @@
 
 #pragma once
 
-
 #include "osdcomm.h"
 
 #include "strformat.h"
 
-#include <cstdarg>
 #include <cstdint>
 #include <iosfwd>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -36,7 +35,7 @@ const char *osd_getenv(const char *name);
 /// \brief Get current process ID
 ///
 /// \return The process ID of the current process.
-int osd_getpid();
+int osd_getpid() noexcept;
 
 
 /*-----------------------------------------------------------------------------
@@ -87,7 +86,7 @@ typedef uint64_t osd_ticks_t;
         accurate. It is ok if this call is not ultra-fast, since it is
         primarily used for once/frame synchronization.
 -----------------------------------------------------------------------------*/
-osd_ticks_t osd_ticks();
+osd_ticks_t osd_ticks() noexcept;
 
 
 /*-----------------------------------------------------------------------------
@@ -102,7 +101,7 @@ osd_ticks_t osd_ticks();
         an osd_ticks_t value which represents the number of ticks per
         second
 -----------------------------------------------------------------------------*/
-osd_ticks_t osd_ticks_per_second();
+osd_ticks_t osd_ticks_per_second() noexcept;
 
 
 /*-----------------------------------------------------------------------------
@@ -127,7 +126,7 @@ osd_ticks_t osd_ticks_per_second();
         sleep occurs for, the OSD layer should strive to sleep for less time
         than specified rather than sleeping too long.
 -----------------------------------------------------------------------------*/
-void osd_sleep(osd_ticks_t duration);
+void osd_sleep(osd_ticks_t duration) noexcept;
 
 /***************************************************************************
     WORK ITEM INTERFACES
@@ -351,35 +350,6 @@ void osd_work_item_release(osd_work_item *item);
 void osd_break_into_debugger(const char *message);
 
 
-/// \brief Get clipboard text
-///
-/// Gets current clipboard content as UTF-8 text.  Returns an empty
-/// string if the clipboard contents cannot be converted to plain text.
-/// \return Clipboard contents or an empty string.
-std::string osd_get_clipboard_text();
-
-
-/***************************************************************************
-    MIDI I/O INTERFACES
-***************************************************************************/
-
-class osd_midi_device
-{
-public:
-	virtual ~osd_midi_device() { }
-	// free result with osd_close_midi_channel()
-	virtual bool open_input(const char *devname) = 0;
-	// free result with osd_close_midi_channel()
-	virtual bool open_output(const char *devname) = 0;
-	virtual void close() = 0;
-	virtual bool poll() = 0;
-	virtual int read(uint8_t *pOut) = 0;
-	virtual void write(uint8_t data) = 0;
-};
-
-//FIXME: really needed here?
-void osd_list_network_adapters();
-
 
 /***************************************************************************
     UNCATEGORIZED INTERFACES
@@ -568,14 +538,14 @@ public:
 	osd_output() { }
 	virtual ~osd_output() { }
 
-	virtual void output_callback(osd_output_channel channel, util::format_argument_pack<std::ostream> const &args) = 0;
+	virtual void output_callback(osd_output_channel channel, util::format_argument_pack<char> const &args) = 0;
 
 	static void push(osd_output *delegate);
 	static void pop(osd_output *delegate);
 
 protected:
 
-	void chain_output(osd_output_channel channel, util::format_argument_pack<std::ostream> const &args) const
+	void chain_output(osd_output_channel channel, util::format_argument_pack<char> const &args) const
 	{
 		if (m_chain)
 			m_chain->output_callback(channel, args);
@@ -585,11 +555,11 @@ private:
 	osd_output *m_chain = nullptr;
 };
 
-void osd_vprintf_error(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_warning(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_info(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_verbose(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args);
+void osd_vprintf_error(util::format_argument_pack<char> const &args);
+void osd_vprintf_warning(util::format_argument_pack<char> const &args);
+void osd_vprintf_info(util::format_argument_pack<char> const &args);
+void osd_vprintf_verbose(util::format_argument_pack<char> const &args);
+void osd_vprintf_debug(util::format_argument_pack<char> const &args);
 
 /// \brief Print error message
 ///

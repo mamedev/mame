@@ -125,10 +125,9 @@ public:
 	void init_cpoker300us();
 	void init_igs_ncs2();
 	void init_cpokerpk();
-	void init_kungfu();
 	void init_kungfua();
 
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int hopper_r();
 
 protected:
 	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
@@ -397,7 +396,7 @@ void igspoker_state::custom_io_w(uint8_t data)
 	}
 }
 
-READ_LINE_MEMBER(igspoker_state::hopper_r)
+int igspoker_state::hopper_r()
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);
@@ -2965,23 +2964,6 @@ void igspoker_state::init_pktet346()
 	rom[0xbb0c] = 0xc3;
 }
 
-ROM_START( kungfu ) // IGS PCB N0- 0139
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "kung fu v202n.u23", 0x00000, 0x10000, CRC(53396dd3) SHA1(1bab42394f016f800dbd80603c70defc25380fd7) )
-	ROM_LOAD( "kungfu-7.u22",      0x10000, 0x08000, CRC(0568f20b) SHA1(a51a10deee0d581b79d0fee354cedceaa660f55c) ) // 1ST AND 2ND HALF IDENTICAL, otherwise same as the other set
-	ROM_IGNORE(                             0x08000 )
-
-	ROM_REGION( 0x60000, "gfx1", 0 )
-	ROM_LOAD( "kungfu-4.u4", 0x00000, 0x20000, CRC(df4afedb) SHA1(56ab18c46a199653c284417a8e9edc9f32374318) )
-	ROM_LOAD( "kungfu-5.u5", 0x20000, 0x20000, CRC(25c9c98e) SHA1(2d3a399d8d53ee5cb8106d2b35d1ab1778439f81) )
-	ROM_LOAD( "kungfu-6.u6", 0x40000, 0x20000, CRC(f1ec5f0d) SHA1(0aa888e13312ed5d98953c81f03a61c6175c7fec) )
-
-	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD( "kungfu-1.u1", 0x00000, 0x4000, CRC(abaada6b) SHA1(a6b910db7451e8ca737f43f32dfc8fc5ecf865f4) )
-	ROM_LOAD( "kungfu-2.u2", 0x10000, 0x4000, CRC(927b3060) SHA1(a780ea5aaee04287cc9533c2d258dc18f8426530) )
-	ROM_LOAD( "kungfu-3.u3", 0x20000, 0x4000, CRC(bbf78e03) SHA1(06fee093e75e2611d00c076c2e0a681938fa8b74) )
-ROM_END
-
 /*
 
 Cherry master looking board
@@ -3040,18 +3022,6 @@ ROM_START( kungfua )
 	ROM_LOAD( "kungfu.u48", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
 ROM_END
 
-void igspoker_state::init_kungfu()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-	for (int A = 0; A < 0x10000; A++)
-	{
-		rom[A] ^= 0x01;
-		if ((A & 0x0060) == 0x0020) rom[A] ^= 0x20;
-		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
-		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
-	}
-}
-
 void igspoker_state::init_kungfua()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -3099,5 +3069,4 @@ GAMEL( 1993?,pktet346,    0,        pktetris, pktet346, igspoker_state, init_pkt
 GAMEL( 199?, igstet341,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
 GAMEL( 199?, igstet342,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v342R)",                               0, layout_igspoker )
 
-GAMEL( 199?, kungfu,     0,         igspoker, cpoker,   igspoker_state, init_kungfu,    ROT0, "IGS",                  "Kung Fu (IGS, v202N)",                         MACHINE_NOT_WORKING, layout_igspoker ) // decryption should be good, needs proper address map
-GAMEL( 1992, kungfua,    kungfu,    igspoker, cpoker,   igspoker_state, init_kungfua,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker ) // missing internal ROM dump
+GAMEL( 1992, kungfua,    kungfu,    igspoker, cpoker,   igspoker_state, init_kungfua,   ROT0, "IGS",                  "Kung Fu Fighters (IGS, v100)",                 MACHINE_NOT_WORKING, layout_igspoker ) // missing internal ROM dump

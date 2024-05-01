@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "exp.h"
 
+#include <tuple>
+
 
 
 //**************************************************************************
@@ -67,9 +69,6 @@ adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mco
 void adam_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
 }
 
 
@@ -77,17 +76,20 @@ void adam_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result adam_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> adam_expansion_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
-		size_t size;
-
 		if (!loaded_through_softlist())
 		{
-			size = length();
+			size_t const size = length();
 
-			fread(m_card->m_rom, size);
+			std::size_t actual;
+			std::tie(err, m_card->m_rom, actual) = read(image_core_file(), size);
+			if (!err && (actual != size))
+				err = std::errc::io_error;
 		}
 		else
 		{
@@ -95,7 +97,7 @@ image_init_result adam_expansion_slot_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(err, std::string());
 }
 
 

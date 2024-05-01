@@ -201,11 +201,9 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 	m_smioc_ram(*this, "smioc_ram"),
 	m_dma_timer(nullptr),
 	m_451_timer(nullptr),
-	m_m68k_r_cb(*this),
+	m_m68k_r_cb(*this, 0),
 	m_m68k_w_cb(*this)
 {
-
-
 }
 
 //-------------------------------------------------
@@ -216,10 +214,6 @@ void smioc_device::device_start()
 {
 	m_dma_timer = timer_alloc(FUNC(smioc_device::raise_drq), this);
 	m_451_timer = timer_alloc(FUNC(smioc_device::raise_int1), this);
-
-	/* Resolve callbacks */
-	m_m68k_r_cb.resolve_safe(0);
-	m_m68k_w_cb.resolve_safe();
 
 	m_451_timer->adjust(attotime::from_msec(200), 0, attotime::from_msec(200));
 }

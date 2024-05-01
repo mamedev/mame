@@ -20,6 +20,8 @@ Inputs and Dip Switches by Stephh
 #include "sidewndr.lh"
 
 
+namespace {
+
 class acefruit_state : public driver_device
 {
 public:
@@ -43,9 +45,9 @@ public:
 
 	void init_sidewndr();
 
-	template <int Mask> DECLARE_READ_LINE_MEMBER(sidewndr_payout_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_coinage_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_payout_r);
+	template <int Mask> int sidewndr_payout_r();
+	template <int Mask> int starspnr_coinage_r();
+	template <int Mask> int starspnr_payout_r();
 
 protected:
 	virtual void machine_start() override;
@@ -745,6 +747,8 @@ ROM_START( acefruit  )
 	ROM_LOAD( "16-1-101.b10", 0x0100, 0x0100, NO_DUMP )
 	ROM_LOAD( "16-1-101.b11", 0x0200, 0x0100, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1981?, sidewndr, 0, acefruit, sidewndr, acefruit_state, init_sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )

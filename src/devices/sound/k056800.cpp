@@ -8,12 +8,10 @@
 ***********************************************************************/
 
 #include "emu.h"
-#include "sound/k056800.h"
-
+#include "k056800.h"
 
 
 DEFINE_DEVICE_TYPE(K056800, k056800_device, "k056800", "K056800 MIRAC")
-
 
 
 //-------------------------------------------------
@@ -37,8 +35,6 @@ k056800_device::k056800_device(const machine_config &mconfig, const char *tag, d
 
 void k056800_device::device_start()
 {
-	m_int_handler.resolve_safe();
-
 	save_item(NAME(m_int_pending));
 	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_host_to_snd_regs));

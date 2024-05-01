@@ -48,8 +48,8 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_cb(state); }
+	void intrq_w(int state) { m_intrq_cb(state); }
+	void drq_w(int state) { m_drq_cb(state); }
 
 protected:
 	// device-level overrides

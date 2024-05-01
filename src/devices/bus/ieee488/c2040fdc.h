@@ -11,10 +11,6 @@
 
 #pragma once
 
-#include "formats/c3040_dsk.h"
-#include "formats/c4040_dsk.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
 #include "imagedev/floppy.h"
 
 
@@ -37,16 +33,16 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ds0_w );
-	DECLARE_WRITE_LINE_MEMBER( ds1_w );
-	DECLARE_WRITE_LINE_MEMBER( drv_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( mode_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( mtr0_w );
-	DECLARE_WRITE_LINE_MEMBER( mtr1_w );
+	void ds0_w(int state);
+	void ds1_w(int state);
+	void drv_sel_w(int state);
+	void mode_sel_w(int state);
+	void rw_sel_w(int state);
+	void mtr0_w(int state);
+	void mtr1_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
-	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
+	int wps_r() { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
+	int sync_r() { return checkpoint_live.sync; }
 
 	void stp0_w(int stp);
 	void stp1_w(int stp);

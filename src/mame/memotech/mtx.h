@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_MTX_H
-#define MAME_INCLUDES_MTX_H
+#ifndef MAME_MEMOTECH_MTX_H
+#define MAME_MEMOTECH_MTX_H
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -118,17 +118,17 @@ private:
 	void hrx_attr_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_tick);
-	DECLARE_WRITE_LINE_MEMBER(ctc_trg1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_trg2_w);
+	void ctc_trg1_w(int state);
+	void ctc_trg2_w(int state);
 	uint8_t mtx_strobe_r();
 	uint8_t mtx_sound_strobe_r();
 	void mtx_cst_w(uint8_t data);
 	void mtx_cst_motor_w(uint8_t data);
 	uint8_t mtx_prt_r();
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
+	void write_centronics_select(int state);
 	void bankswitch(uint8_t data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -139,4 +139,4 @@ private:
 	void rs128_io(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MTX_H
+#endif // MAME_MEMOTECH_MTX_H

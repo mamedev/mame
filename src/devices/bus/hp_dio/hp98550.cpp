@@ -174,7 +174,7 @@ void dio32_98550_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		ce->vram_w(offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(dio32_98550_device::vblank_w)
+void dio32_98550_device::vblank_w(int state)
 {
 	for (auto &ce: m_catseye)
 		ce->vblank_w(state);

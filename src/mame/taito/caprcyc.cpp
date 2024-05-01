@@ -19,6 +19,8 @@ TODO:
 #include "cpu/mips/mips3.h"
 
 
+namespace {
+
 class caprcyc_state : public driver_device
 {
 public:
@@ -93,6 +95,8 @@ ROM_START( caprcyc )
 	ROM_REGION32_LE( 0x200000, "zsg2", 0 )
 	ROM_LOAD( "e69-02.ic3",  0x000000, 0x200000, CRC(ca0ea2ed) SHA1(de2306207c8b8faa0dac3559ad93904cb957fa28) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1999, caprcyc, 0, caprcyc, caprcyc, caprcyc_state, empty_init, ROT0, "Taito", "Capriccio Cyclone", MACHINE_IS_SKELETON_MECHANICAL )

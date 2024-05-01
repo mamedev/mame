@@ -100,6 +100,11 @@ opl_registers_base<Revision>::opl_registers_base() :
 			}
 		}
 	}
+
+	// OPL3/OPL4 have dynamic operators, so initialize the fourop_enable value here
+	// since operator_map() is called right away, prior to reset()
+	if (Revision > 2)
+		m_regdata[0x104 % REGISTERS] = 0;
 }
 
 

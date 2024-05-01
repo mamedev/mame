@@ -1,11 +1,11 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
 
-#if BGFX_CONFIG_RENDERER_DIRECT3D11 || BGFX_CONFIG_RENDERER_DIRECT3D12
+#if BGFX_CONFIG_RENDERER_DIRECT3D11 || (BGFX_CONFIG_RENDERER_DIRECT3D12 && !BX_PLATFORM_LINUX)
 
 #include "dxgi.h"
 #include "renderer_d3d.h"
@@ -128,15 +128,26 @@ namespace bgfx
 
 	bool Dxgi::init(Caps& _caps)
 	{
-#if BX_PLATFORM_WINDOWS
-		m_dxgiDll = bx::dlopen("dxgi.dll");
+#if BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
+
+		const char* dxgiDllName =
+#if BX_PLATFORM_LINUX
+				"dxgi.so"
+#else
+				"dxgi.dll"
+#endif // BX_PLATFORM_LINUX
+				;
+		m_dxgiDll = bx::dlopen(dxgiDllName);
+
 		if (NULL == m_dxgiDll)
 		{
-			BX_TRACE("Init error: Failed to load dxgi.dll.");
+			BX_TRACE("Init error: Failed to load %s.", dxgiDllName);
 			return false;
 		}
 
+#	if BX_PLATFORM_WINDOWS
 		m_dxgiDebugDll = bx::dlopen("dxgidebug.dll");
+
 		if (NULL != m_dxgiDebugDll)
 		{
 			DXGIGetDebugInterface  = (PFN_GET_DEBUG_INTERFACE )bx::dlsym(m_dxgiDebugDll, "DXGIGetDebugInterface");
@@ -161,6 +172,7 @@ namespace bgfx
 			BX_TRACE("Init error: Function CreateDXGIFactory not found.");
 			return false;
 		}
+#	endif // BX_PLATFORM_WINDOWS
 #endif // BX_PLATFORM_WINDOWS
 
 		HRESULT hr = S_OK;
@@ -206,10 +218,20 @@ namespace bgfx
 							, desc.SubSysId
 							, desc.Revision
 							);
-						BX_TRACE("\tMemory: %" PRIi64 " (video), %" PRIi64 " (system), %" PRIi64 " (shared)"
-							, desc.DedicatedVideoMemory
-							, desc.DedicatedSystemMemory
-							, desc.SharedSystemMemory
+
+						char dedicatedVideo[16];
+						bx::prettify(dedicatedVideo, BX_COUNTOF(dedicatedVideo), desc.DedicatedVideoMemory);
+
+						char dedicatedSystem[16];
+						bx::prettify(dedicatedSystem, BX_COUNTOF(dedicatedSystem), desc.DedicatedSystemMemory);
+
+						char sharedSystem[16];
+						bx::prettify(sharedSystem, BX_COUNTOF(sharedSystem), desc.SharedSystemMemory);
+
+						BX_TRACE("\tMemory: %s (video), %s (system), %s (shared)"
+							, dedicatedVideo
+							, dedicatedSystem
+							, sharedSystem
 							);
 
 						_caps.gpu[ii].vendorId = (uint16_t)desc.VendorId;
@@ -263,7 +285,7 @@ namespace bgfx
 						BX_TRACE("\t\t    AttachedToDesktop: %d", outputDesc.AttachedToDesktop);
 						BX_TRACE("\t\t             Rotation: %d", outputDesc.Rotation);
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
 						IDXGIOutput6* output6;
 						hr = output->QueryInterface(IID_IDXGIOutput6, (void**)&output6);
 						if (SUCCEEDED(hr) )
@@ -298,6 +320,7 @@ namespace bgfx
 				}
 
 				_caps.supported |= hdr10 ? BGFX_CAPS_HDR10 : 0;
+				_caps.supported |= BX_ENABLED(BX_PLATFORM_WINRT) ? BGFX_CAPS_TRANSPARENT_BACKBUFFER : 0;
 
 				DX_RELEASE(adapter, adapter == m_adapter ? 1 : 0);
 			}
@@ -362,15 +385,13 @@ namespace bgfx
 		DX_RELEASE_I(dxgiDevice);
 	}
 
-	static const GUID IID_ID3D12CommandQueue = { 0x0ec870a6, 0x5d7e, 0x4c22, { 0x8c, 0xfc, 0x5b, 0xaa, 0xe0, 0x76, 0x16, 0xed } };
-
 	HRESULT Dxgi::createSwapChain(IUnknown* _device, const SwapChainDesc& _scd, SwapChainI** _swapChain)
 	{
 		HRESULT hr = S_OK;
 
 		uint32_t scdFlags = _scd.flags;
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
 		IDXGIFactory5* factory5;
 		hr = m_factory->QueryInterface(IID_IDXGIFactory5, (void**)&factory5);
 
@@ -417,17 +438,6 @@ namespace bgfx
 			, &scd
 			, reinterpret_cast<IDXGISwapChain**>(_swapChain)
 			);
-
-		if (SUCCEEDED(hr) )
-		{
-			IDXGIDevice1* dxgiDevice1;
-			_device->QueryInterface(IID_IDXGIDevice1, (void**)&dxgiDevice1);
-			if (NULL != dxgiDevice1)
-			{
-				dxgiDevice1->SetMaximumFrameLatency(_scd.maxFrameLatency);
-				DX_RELEASE_I(dxgiDevice1);
-			}
-		}
 #else
 		DXGI_SWAP_CHAIN_DESC1 scd;
 		scd.Width  = _scd.width;
@@ -529,13 +539,29 @@ namespace bgfx
 		}
 #endif // BX_PLATFORM_WINDOWS
 
+		if (SUCCEEDED(hr) )
+		{
+			IDXGIDevice1* dxgiDevice1;
+			_device->QueryInterface(IID_IDXGIDevice1, (void**)&dxgiDevice1);
+			if (NULL != dxgiDevice1)
+			{
+				hr = dxgiDevice1->SetMaximumFrameLatency(_scd.maxFrameLatency);
+				if (FAILED(hr) )
+				{
+					BX_TRACE("Failed to set maximum frame latency, hr 0x%08x", hr);
+					hr = S_OK;
+				}
+				DX_RELEASE_I(dxgiDevice1);
+			}
+		}
+
 		if (FAILED(hr) )
 		{
 			BX_TRACE("Failed to create swap chain.");
 			return hr;
 		}
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
 		if (SUCCEEDED(hr) )
 		{
 			for (uint32_t ii = 0; ii < BX_COUNTOF(s_dxgiSwapChainIIDs); ++ii)
@@ -568,7 +594,7 @@ namespace bgfx
 				}
 			}
 		}
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
 
 		updateHdr10(*_swapChain, _scd);
 
@@ -717,7 +743,7 @@ namespace bgfx
 
 		uint32_t scdFlags = _scd.flags;
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
 		IDXGIFactory5* factory5;
 		hr = m_factory->QueryInterface(IID_IDXGIFactory5, (void**)&factory5);
 

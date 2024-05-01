@@ -13,24 +13,17 @@
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 
-#define VERBOSE       0
-#define VERBOSE_IRQ   0
-#define VERBOSE_KBD   0  /* TO8 / TO9 / TO9+ keyboard */
-#define VERBOSE_BANK  0
-#define VERBOSE_VIDEO 0  /* video & lightpen */
-#define VERBOSE_IO    0  /* serial & parallel I/O */
-#define VERBOSE_MIDI  0
+#define LOG_KBD    (1U << 1) /* TO8 / TO9 / TO9+ keyboard */
+#define LOG_BANK   (1U << 2)
+#define LOG_VIDEO  (1U << 3) /* video & lightpen */
+#define LOG_EXTRA  (1U << 4)
+#define LOG_ERRORS (1U << 5)
+
+#define VERBOSE (LOG_ERRORS)
+#include "logmacro.h"
+
 
 #define PRINT(x) osd_printf_info x
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-#define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)
-#define LOG_IRQ(x) do { if (VERBOSE_IRQ) logerror x; } while (0)
-#define LOG_KBD(x) do { if (VERBOSE_KBD) logerror x; } while (0)
-#define LOG_BANK(x) do { if (VERBOSE_BANK) logerror x; } while (0)
-#define LOG_VIDEO(x) do { if (VERBOSE_VIDEO) logerror x; } while (0)
-#define LOG_IO(x) do { if (VERBOSE_IO) logerror x; } while (0)
-#define LOG_MIDI(x) do { if (VERBOSE_MIDI) logerror x; } while (0)
 
 /* This set to 1 handle the .k7 files without passing through .wav */
 /* It must be set accordingly in formats/thom_cas.c */
@@ -83,9 +76,9 @@ int thomson_state::to7_get_cassette()
 			/* hack, feed existing bits */
 			if ( bitpos >= m_to7_k7_bitsize )
 				bitpos = m_to7_k7_bitsize -1;
-			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
+			LOGMASKED(LOG_EXTRA, "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
 				m_maincpu->pc(), machine().time().as_double(), state, pos, bitpos,
-				m_to7_k7_bits[ bitpos ] ));
+				m_to7_k7_bits[ bitpos ]);
 			return m_to7_k7_bits[ bitpos ];
 		}
 		else
@@ -104,9 +97,9 @@ int thomson_state::to7_get_cassette()
 					chg++;
 			}
 			k = ( chg >= 13 ) ? 1 : 0;
-			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
+			LOGMASKED(LOG_EXTRA, "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
 				m_maincpu->pc(), machine().time().as_double(), state, pos, bitpos,
-				k, chg ));
+				k, chg);
 			return k;
 		}
 
@@ -118,21 +111,21 @@ int thomson_state::to7_get_cassette()
 
 
 /* 1-bit cassette output */
-WRITE_LINE_MEMBER(thomson_state::to7_set_cassette)
+void thomson_state::to7_set_cassette(int state)
 {
 	m_cassette->output(state ? 1. : -1. );
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_set_cassette_motor )
+void thomson_state::to7_set_cassette_motor(int state)
 {
 	cassette_state cassstate =  m_cassette->get_state();
 	double pos = m_cassette->get_position();
 
-	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
+	LOG("$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
 			m_maincpu->pc(), machine().time().as_double(), state ? "off" : "on",
-			(int) (pos / TO7_BIT_LENGTH) ));
+			(int) (pos / TO7_BIT_LENGTH));
 
 	if ( (cassstate & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !state && pos > 0.3 )
 	{
@@ -178,9 +171,9 @@ int thomson_state::mo5_get_cassette()
 		cass->get_sample( 0, pos, 0, &hbit );
 		hbit = hbit >= 0;
 
-		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
+		LOGMASKED(LOG_EXTRA, "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
 			m_maincpu->pc(), machine().time().as_double(), state, pos,
-			(int) (pos / MO5_HBIT_LENGTH), hbit ));
+			(int) (pos / MO5_HBIT_LENGTH), hbit);
 		return hbit;
 	}
 	else
@@ -196,14 +189,14 @@ void thomson_state::mo5_set_cassette( int data )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo5_set_cassette_motor )
+void thomson_state::mo5_set_cassette_motor(int state)
 {
 	cassette_state cassstate = m_cassette->get_state();
 	double pos = m_cassette->get_position();
 
-	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
+	LOG("$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
 			m_maincpu->pc(), machine().time().as_double(), state ? "off" : "on",
-			(int) (pos / MO5_HBIT_LENGTH) ));
+			(int) (pos / MO5_HBIT_LENGTH));
 
 	if ( (cassstate & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !state && pos > 0.3 )
 	{
@@ -231,18 +224,6 @@ void thomson_state::thom_irq_reset()
 
 
 
-/*
-   current IRQ usage:
-
-   line 0 => 6846 interrupt
-   line 1 => 6821 interrupts (shared for all 6821)
-   line 2 => TO8 lightpen interrupt (from gate-array)
-   line 3 => TO9 keyboard interrupt (from 6850 ACIA)
-   line 4 => MIDI interrupt (from 6850 ACIA)
-*/
-
-
-
 /* ------------ 6850 defines ------------ */
 
 #define ACIA_6850_RDRF  0x01    /* Receive data register full */
@@ -260,52 +241,49 @@ void thomson_state::thom_irq_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 {
-	int i,j;
-	uint8_t* pos = &m_cart_rom[0];
 	offs_t size;
-	char name[129];
-
 	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
 
-	/* get size & number of 16-KB banks */
-	if ( size <= 0x04000 )
+	// get size & number of 16-KB banks
+	if (size <= 0x04000)
 		m_thom_cart_nb_banks = 1;
-	else if ( size == 0x08000 )
+	else if (size == 0x08000)
 		m_thom_cart_nb_banks = 2;
-	else if ( size == 0x0c000 )
+	else if (size == 0x0c000)
 		m_thom_cart_nb_banks = 3;
-	else if ( size == 0x10000 )
+	else if (size == 0x10000)
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %u", size).c_str());
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Invalid cartridge size %u", size));
 	}
 
+	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
-		if ( image.fread( pos, size ) != size )
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Read error");
-			return image_init_result::FAIL;
-		}
+		if (image.fread(pos, size) != size)
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 	}
 	else
 	{
 		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
-	/* extract name */
-	for ( i = 0; i < size && pos[i] != ' '; i++ );
-	for ( i++, j = 0; i + j < size && j < 128 && pos[i+j] >= 0x20; j++)
+	// extract name
+	int i,j;
+	char name[129];
+	for (i = 0; i < size && pos[i] != ' '; i++);
+	for (i++, j = 0; i + j < size && j < 128 && pos[i+j] >= 0x20; j++)
 		name[j] = pos[i+j];
 	name[j] = 0;
 
-	/* sanitize name */
-	for ( i = 0; name[i]; i++)
+	// sanitize name
+	for (i = 0; name[i]; i++)
 	{
 		if ( name[i] < ' ' || name[i] >= 127 )
 			name[i] = '?';
@@ -313,7 +291,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 
 	PRINT (( "to7_cartridge_load: cartridge \"%s\" banks=%i, size=%i\n", name, m_thom_cart_nb_banks, size ));
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -334,7 +312,7 @@ void thomson_state::to7_update_cart_bank()
 	{
 		m_cartbank->set_entry( bank );
 		m_old_cart_bank = bank;
-		LOG_BANK(( "to7_update_cart_bank: CART is cartridge bank %i\n", bank ));
+		LOGMASKED(LOG_BANK, "to7_update_cart_bank: CART is cartridge bank %i\n", bank);
 	}
 }
 
@@ -405,7 +383,7 @@ void thomson_state::to7_lightpen_cb( int step )
 	if ( ! m_to7_lightpen )
 		return;
 
-	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", machine().time().as_double(), step ));
+	LOGMASKED(LOG_VIDEO, "%f to7_lightpen_cb: step=%i\n", machine().time().as_double(), step);
 	m_pia_sys->cb1_w( 1 );
 	m_pia_sys->cb1_w( 0 );
 	m_to7_lightpen_step = step;
@@ -421,7 +399,7 @@ void thomson_state::to7_set_init( int init )
 {
 	/* INIT signal wired to system PIA 6821 */
 
-	LOG_VIDEO(( "%f to7_set_init: init=%i\n", machine().time().as_double(), init ));
+	LOGMASKED(LOG_VIDEO, "%f to7_set_init: init=%i\n", machine().time().as_double(), init);
 	m_pia_sys->ca1_w( init );
 }
 
@@ -431,7 +409,7 @@ void thomson_state::to7_set_init( int init )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_sys_cb2_out )
+void thomson_state::to7_sys_cb2_out(int state)
 {
 	m_to7_lightpen = !state;
 }
@@ -478,226 +456,6 @@ uint8_t thomson_state::to7_sys_portb_in()
 {
 	/* lightpen low */
 	return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step ) & 0xff;
-}
-
-
-
-/* ------------ CC 90-232 I/O extension ------------ */
-
-/* Features:
-   - 6821 PIA
-   - serial RS232: bit-banging?
-   - parallel CENTRONICS: a printer (-prin) is emulated
-   - usable on TO7(/70), MO5(E) only; not on TO9 and higher
-
-   Note: it seems impossible to connect both a serial & a parallel device
-   because the Data Transmit Ready bit is shared in an incompatible way!
-*/
-
-DEFINE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device, "to7_io_line", "TO7 Serial source")
-
-//-------------------------------------------------
-//  to7_io_line_device - constructor
-//-------------------------------------------------
-
-to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TO7_IO_LINE, tag, owner, clock),
-	m_pia_io(*this, THOM_PIA_IO),
-	m_rs232(*this, "rs232"),
-	m_last_low(0)
-{
-}
-
-void to7_io_line_device::device_add_mconfig(machine_config &config)
-{
-	/// THIS PIO is part of CC 90-232 expansion
-	PIA6821(config, m_pia_io, 0);
-	m_pia_io->readpa_handler().set(FUNC(to7_io_line_device::porta_in));
-	m_pia_io->writepa_handler().set(FUNC(to7_io_line_device::porta_out));
-	m_pia_io->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
-	m_pia_io->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
-	m_pia_io->irqa_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
-	m_pia_io->irqb_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(FUNC(to7_io_line_device::write_rxd));
-	m_rs232->cts_handler().set(FUNC(to7_io_line_device::write_cts));
-	m_rs232->dsr_handler().set(FUNC(to7_io_line_device::write_dsr));
-
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
-	centronics.ack_handler().set(m_pia_io, FUNC(pia6821_device::cb1_w));
-	centronics.busy_handler().set(FUNC(to7_io_line_device::write_centronics_busy));
-
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	centronics.set_output_latch(cent_data_out);
-}
-
-
-void to7_io_line_device::device_start()
-{
-	m_rs232->write_dtr(0);
-}
-
-void to7_io_line_device::porta_out(uint8_t data)
-{
-	int txd = (data >> 0) & 1;
-	int rts = (data >> 1) & 1;
-
-	LOG_IO(( "%s %f to7_io_porta_out: txd=%i, rts=%i\n",  machine().describe_context(), machine().time().as_double(), txd, rts ));
-
-	m_rs232->write_txd(txd);
-	m_rs232->write_rts(rts);
-}
-
-
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_rxd )
-{
-	m_rxd = state;
-}
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_dsr )
-{
-	if (!state) m_last_low = 0;
-
-	m_dsr = state;
-}
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_cts )
-{
-	m_pia_io->ca1_w(state);
-	m_cts = state;
-}
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_centronics_busy )
-{
-	if (!state) m_last_low = 1;
-
-	m_centronics_busy = state;
-}
-
-
-uint8_t to7_io_line_device::porta_in()
-{
-	LOG_IO(( "%s %f to7_io_porta_in: select=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), m_centronics_busy, m_cts, m_dsr, m_rxd ));
-
-	/// HACK: without high impedance we can't tell whether a device is driving a line high or if it's being pulled up.
-	/// so assume the last device to drive it low is active.
-	int dsr;
-	if (m_last_low == 0)
-		dsr = m_dsr;
-	else
-		dsr = !m_centronics_busy;
-
-	return (0x1f /* not required when converted to write_pa */) | (m_cts << 5) | (dsr << 6) | (m_rxd << 7);
-}
-
-
-
-/* ------------ RF 57-932 RS232 extension ------------ */
-
-/* Features:
-   - SY 6551 ACIA.
-   - higher transfer rates than the CC 90-232
-   - usable on all computer, including TO9 and higher
- */
-
-
-
-/* ------------  MD 90-120 MODEM extension (not functional) ------------ */
-
-/* Features:
-   - 6850 ACIA
-   - 6821 PIA
-   - asymetric 1200/ 75 bauds (reversable)
-
-   TODO!
- */
-
-
-WRITE_LINE_MEMBER( thomson_state::to7_modem_cb )
-{
-	LOG(( "to7_modem_cb: called %i\n", state ));
-}
-
-
-
-WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
-{
-	m_to7_modem_tx = state;
-}
-
-
-WRITE_LINE_MEMBER( thomson_state::write_acia_clock )
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
-
-void thomson_state::to7_modem_reset()
-{
-	LOG (( "to7_modem_reset called\n" ));
-	m_acia->write_rxd(0);
-	m_to7_modem_tx = 0;
-	/* pia_reset() is called in machine_reset */
-	/* acia_6850 has no reset (?) */
-}
-
-
-
-void thomson_state::to7_modem_init()
-{
-	LOG (( "to7_modem_init: MODEM not implemented!\n" ));
-	save_item(NAME(m_to7_modem_tx));
-}
-
-
-
-/* ------------  dispatch MODEM / speech extension ------------ */
-
-uint8_t thomson_state::to7_modem_mea8000_r(offs_t offset)
-{
-	if ( machine().side_effects_disabled() )
-	{
-		return 0;
-	}
-
-	if ( m_io_mconfig->read() & 1 )
-	{
-		return m_mea8000->read(offset);
-	}
-	else
-	{
-		switch (offset)
-		{
-		case 0:
-		case 1:
-			return m_acia->read(offset & 1);
-
-		default:
-			return 0;
-		}
-	}
-}
-
-
-
-void thomson_state::to7_modem_mea8000_w(offs_t offset, uint8_t data)
-{
-	if ( m_io_mconfig->read() & 1 )
-	{
-		m_mea8000->write(offset, data);
-	}
-	else
-	{
-		switch (offset)
-		{
-		case 0:
-		case 1:
-			m_acia->write(offset & 1, data);
-			break;
-		}
-	}
 }
 
 
@@ -824,7 +582,7 @@ void thomson_state::to7_game_portb_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_game_cb2_out )
+void thomson_state::to7_game_cb2_out(int state)
 {
 	/* undocumented */
 	/* some TO8 games (e.g.: F15) seem to write here a lot */
@@ -866,7 +624,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::to7_game_update_cb)
 
 void thomson_state::to7_game_init()
 {
-	LOG (( "to7_game_init called\n" ));
+	LOG("to7_game_init called\n");
 	m_to7_game_timer = timer_alloc(FUNC(thomson_state::to7_game_update_cb), this);
 	m_to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	save_item(NAME(m_to7_game_sound));
@@ -877,66 +635,11 @@ void thomson_state::to7_game_init()
 
 void thomson_state::to7_game_reset()
 {
-	LOG (( "to7_game_reset called\n" ));
+	LOG("to7_game_reset called\n");
 	m_pia_game->ca1_w( 0 );
 	m_to7_game_sound = 0;
 	m_to7_game_mute = 0;
 	to7_game_sound_update();
-}
-
-
-
-/* ------------ MIDI extension ------------ */
-
-/* IMPORTANT NOTE:
-   The following is experimental and not compiled in by default.
-   It relies on the existence of an hypothetical "character device" API able
-   to transmit bytes between the MAME driver and the outside world
-   (using, e.g., character device special files on some UNIX).
-*/
-
-/* Features an EF 6850 ACIA
-
-   MIDI protocol is a serial asynchronous protocol
-   Each 8-bit byte is transmitted as:
-   - 1 start bit
-   - 8 data bits
-   - 1 stop bits
-   320 us per transmitted byte => 31250 baud
-
-   Emulation is based on the Motorola 6850 documentation, not EF 6850.
-
-   We do not emulate the seral line but pass bytes directly between the
-   6850 registers and the MIDI device.
-*/
-
-
-uint8_t thomson_state::to7_midi_r()
-{
-	if(!machine().side_effects_disabled())
-		logerror( "to7_midi_r: not implemented\n" );
-	return 0;
-}
-
-
-
-void thomson_state::to7_midi_w(uint8_t data)
-{
-	logerror( "to7_midi_w: not implemented\n" );
-}
-
-
-
-void thomson_state::to7_midi_reset()
-{
-	logerror( "to7_midi_reset: not implemented\n" );
-}
-
-
-
-void thomson_state::to7_midi_init()
-{
-	logerror( "to7_midi_init: not implemented\n" );
 }
 
 
@@ -947,16 +650,14 @@ void thomson_state::to7_midi_init()
 
 MACHINE_RESET_MEMBER( thomson_state, to7 )
 {
-	LOG (( "to7: machine reset called\n" ));
+	LOG("to7: machine reset called\n");
 
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
@@ -983,15 +684,13 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "to7: machine start called\n" ));
+	LOG("to7: machine start called\n");
 
 	/* subsystems */
 	to7_game_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -1039,10 +738,10 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to770_sys_cb2_out )
+void thomson_state::to770_sys_cb2_out(int state)
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
-	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", m_maincpu->pc(), state ));
+	LOG("$%04x to770_sys_cb2_out: video overlay %i\n", m_maincpu->pc(), state);
 }
 
 
@@ -1079,7 +778,7 @@ void thomson_state::to770_update_ram_bank()
 	case 0xf8: return;
 
 	default:
-		logerror( "to770_update_ram_bank unknown bank $%02X\n", portb & 0xf8 );
+		LOGMASKED(LOG_ERRORS, "to770_update_ram_bank unknown bank $%02X\n", portb & 0xf8);
 		return;
 	}
 
@@ -1096,7 +795,7 @@ void thomson_state::to770_update_ram_bank()
 			space.nop_readwrite(0xa000, 0xdfff);
 		}
 		m_old_ram_bank = bank;
-		LOG_BANK(( "to770_update_ram_bank: RAM bank change %i\n", bank ));
+		LOGMASKED(LOG_BANK, "to770_update_ram_bank: RAM bank change %i\n", bank);
 	}
 }
 
@@ -1152,7 +851,7 @@ uint8_t thomson_state::to770_gatearray_r(offs_t offset)
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x to770_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset );
+		LOGMASKED(LOG_ERRORS, "$%04x to770_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
 		return 0;
 	}
 }
@@ -1173,16 +872,14 @@ void thomson_state::to770_gatearray_w(offs_t offset, uint8_t data)
 
 MACHINE_RESET_MEMBER( thomson_state, to770 )
 {
-	LOG (( "to770: machine reset called\n" ));
+	LOG("to770: machine reset called\n");
 
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
@@ -1211,15 +908,13 @@ MACHINE_START_MEMBER( thomson_state, to770 )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "to770: machine start called\n" ));
+	LOG("to770: machine start called\n");
 
 	/* subsystems */
 	to7_game_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -1347,7 +1042,7 @@ uint8_t mo5_state::mo5_gatearray_r(offs_t offset)
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (init << 7);
 	default:
-		logerror( "$%04x mo5_gatearray_r: invalid offset %i\n",  m_maincpu->pc(), offset );
+		LOGMASKED(LOG_ERRORS, "$%04x mo5_gatearray_r: invalid offset %i\n",  m_maincpu->pc(), offset);
 		return 0;
 	}
 }
@@ -1368,52 +1063,50 @@ void mo5_state::mo5_gatearray_w(offs_t offset, uint8_t data)
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 {
-	uint8_t* pos = &m_cart_rom[0];
 	uint64_t size, i;
 	int j;
-	char name[129];
 
 	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
 
-	/* get size & number of 16-KB banks */
-	if ( size > 32 && size <= 0x04000 )
+	// get size & number of 16-KB banks
+	if (size > 32 && size <= 0x04000)
 		m_thom_cart_nb_banks = 1;
-	else if ( size == 0x08000 )
+	else if (size == 0x08000)
 		m_thom_cart_nb_banks = 2;
-	else if ( size == 0x0c000 )
+	else if (size == 0x0c000)
 		m_thom_cart_nb_banks = 3;
-	else if ( size == 0x10000 )
+	else if (size == 0x10000)
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %d", size).c_str());
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Invalid cartridge size %u", size));
 	}
 
+	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
-		if ( image.fread(pos, size ) != size )
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Read error");
-			return image_init_result::FAIL;
-		}
+		if (image.fread(pos, size) != size)
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 	}
 	else
 	{
 		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
-	/* extract name */
+	// extract name
 	i = size - 32;
-	while ( i < size && !pos[i] ) i++;
-	for ( j = 0; i < size && pos[i] >= 0x20; j++, i++)
+	char name[129];
+	while (i < size && !pos[i]) i++;
+	for (j = 0; i < size && pos[i] >= 0x20; j++, i++)
 		name[j] = pos[i];
 	name[j] = 0;
 
-	/* sanitize name */
+	// sanitize name
 	for ( j = 0; name[j]; j++)
 	{
 		if ( name[j] < ' ' || name[j] >= 127 ) name[j] = '?';
@@ -1421,7 +1114,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 
 	PRINT (( "mo5_cartridge_load: cartridge \"%s\" banks=%i, size=%u\n", name, m_thom_cart_nb_banks, (unsigned) size ));
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -1445,7 +1138,7 @@ void mo5_state::mo5_update_cart_bank()
 				space.install_read_bank( 0xb000, 0xefff, m_cartbank);
 				space.nop_write( 0xb000, 0xefff);
 			}
-			LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank ));
+			LOGMASKED(LOG_BANK, "mo5_update_cart_bank: CART is cartridge bank %i (A7CB style)\n", bank);
 		}
 	}
 	else if ( rom_is_ram )
@@ -1465,9 +1158,9 @@ void mo5_state::mo5_update_cart_bank()
 			{
 				space.install_readwrite_bank( 0xb000, 0xefff, m_cartbank);
 			}
-			LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (%s)\n",
+			LOGMASKED(LOG_BANK, "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (%s)\n",
 						m_mo5_reg_cart & 3,
-						bank_is_read_only ? "read-only":"read-write"));
+						bank_is_read_only ? "read-only":"read-write");
 			m_old_cart_bank_was_read_only = bank_is_read_only;
 		}
 	}
@@ -1485,7 +1178,7 @@ void mo5_state::mo5_update_cart_bank()
 					space.install_write_handler( 0xb000, 0xefff, write8sm_delegate(*this, FUNC(mo5_state::mo5_cartridge_w)) );
 					space.install_read_handler( 0xbffc, 0xbfff, read8sm_delegate(*this, FUNC(mo5_state::mo5_cartridge_r)) );
 				}
-				LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i\n", bank ));
+				LOGMASKED(LOG_BANK, "mo5_update_cart_bank: CART is cartridge bank %i\n", bank);
 			}
 		}
 		else
@@ -1495,7 +1188,7 @@ void mo5_state::mo5_update_cart_bank()
 						{
 				space.install_read_bank( 0xb000, 0xefff, m_cartbank);
 				space.install_write_handler( 0xb000, 0xefff, write8sm_delegate(*this, FUNC(mo5_state::mo5_cartridge_w)) );
-				LOG_BANK(( "mo5_update_cart_bank: CART is internal\n"));
+				LOGMASKED(LOG_BANK, "mo5_update_cart_bank: CART is internal\n");
 			}
 		}
 	}
@@ -1556,13 +1249,11 @@ void mo5_state::mo5_ext_w(uint8_t data)
 
 MACHINE_RESET_MEMBER( mo5_state, mo5 )
 {
-	LOG (( "mo5: machine reset called\n" ));
+	LOG("mo5: machine reset called\n");
 
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 	mo5_init_timer();
 
 	/* video */
@@ -1591,16 +1282,14 @@ MACHINE_START_MEMBER( mo5_state, mo5 )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "mo5: machine start called\n" ));
+	LOG("mo5: machine start called\n");
 
 	/* subsystems */
 	to7_game_init();
-	to7_modem_init();
-	to7_midi_init();
 	m_mo5_periodic_timer = timer_alloc(FUNC(mo5_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7d0, 0xa7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7c0, 0xa7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -1641,14 +1330,14 @@ MACHINE_START_MEMBER( mo5_state, mo5 )
 
 void to9_state::to9_ieee_w(offs_t offset, uint8_t data)
 {
-	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", m_maincpu->pc(), machine().time().as_double(), data, offset );
+	LOGMASKED(LOG_ERRORS, "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", m_maincpu->pc(), machine().time().as_double(), data, offset);
 }
 
 
 
 uint8_t to9_state::to9_ieee_r(offs_t offset)
 {
-	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", m_maincpu->pc(), machine().time().as_double(), offset );
+	LOGMASKED(LOG_ERRORS, "$%04x %f to9_ieee_r: unhandled read from register %i\n", m_maincpu->pc(), machine().time().as_double(), offset);
 	return 0;
 }
 
@@ -1679,7 +1368,7 @@ uint8_t to9_state::to9_gatearray_r(offs_t offset)
 	case 2: return (lt3 << 7) | (inil << 6);
 	case 3: return (v.init << 7) | (init << 6); /* != TO7/70 */
 	default:
-		logerror( "$%04x to9_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset );
+		LOGMASKED(LOG_ERRORS, "$%04x to9_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
 		return 0;
 	}
 }
@@ -1746,7 +1435,7 @@ void to9_state::to9_set_video_mode( uint8_t data, int style )
 	case 0x5b: thom_set_video_mode( THOM_VMODE_BITMAP16_ALT ); break;
 
 	default:
-		logerror( "to9_set_video_mode: unknown mode $%02X tr=%i phi=%i mod=%i\n", data, (data >> 5) & 3, (data >> 3) & 2, data & 7 );
+		LOGMASKED(LOG_ERRORS, "to9_set_video_mode: unknown mode $%02X tr=%i phi=%i mod=%i\n", data, (data >> 5) & 3, (data >> 3) & 2, data & 7);
 	}
 }
 
@@ -1774,7 +1463,7 @@ uint8_t to9_state::to9_vreg_r(offs_t offset)
 		return 0;
 
 	default:
-		logerror( "to9_vreg_r: invalid read offset %i\n", offset );
+		LOGMASKED(LOG_ERRORS, "to9_vreg_r: invalid read offset %i\n", offset);
 		return 0;
 	}
 }
@@ -1783,7 +1472,7 @@ uint8_t to9_state::to9_vreg_r(offs_t offset)
 
 void to9_state::to9_vreg_w(offs_t offset, uint8_t data)
 {
-	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7da + offset, data ));
+	LOGMASKED(LOG_VIDEO, "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7da + offset, data);
 
 	switch ( offset )
 	{
@@ -1812,7 +1501,7 @@ void to9_state::to9_vreg_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror( "to9_vreg_w: invalid write offset %i data=$%02X\n", offset, data );
+		LOGMASKED(LOG_ERRORS, "to9_vreg_w: invalid write offset %i data=$%02X\n", offset, data);
 	}
 }
 
@@ -1848,7 +1537,7 @@ void to9_state::to9_update_cart_bank()
 			{
 				space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
 			}
-			LOG_BANK(( "to9_update_cart_bank: CART is BASIC bank %i\n", m_to9_soft_bank ));
+			LOGMASKED(LOG_BANK, "to9_update_cart_bank: CART is BASIC bank %i\n", m_to9_soft_bank);
 		}
 		break;
 	case 1:
@@ -1860,7 +1549,7 @@ void to9_state::to9_update_cart_bank()
 			{
 				space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
 			}
-			LOG_BANK(( "to9_update_cart_bank: CART is software 1 bank %i\n", m_to9_soft_bank ));
+			LOGMASKED(LOG_BANK, "to9_update_cart_bank: CART is software 1 bank %i\n", m_to9_soft_bank);
 		}
 		break;
 	case 2:
@@ -1872,7 +1561,7 @@ void to9_state::to9_update_cart_bank()
 			{
 				space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
 			}
-			LOG_BANK(( "to9_update_cart_bank: CART is software 2 bank %i\n", m_to9_soft_bank ));
+			LOGMASKED(LOG_BANK, "to9_update_cart_bank: CART is software 2 bank %i\n", m_to9_soft_bank);
 		}
 		break;
 	case 3:
@@ -1888,7 +1577,7 @@ void to9_state::to9_update_cart_bank()
 					space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to9_state::to9_cartridge_w)) );
 					space.install_read_handler( 0x0000, 0x0003, read8sm_delegate(*this, FUNC(to9_state::to9_cartridge_r)) );
 				}
-				LOG_BANK(( "to9_update_cart_bank: CART is cartridge bank %i\n",  m_thom_cart_bank ));
+				LOGMASKED(LOG_BANK, "to9_update_cart_bank: CART is cartridge bank %i\n", m_thom_cart_bank);
 			}
 		}
 		else
@@ -1896,7 +1585,7 @@ void to9_state::to9_update_cart_bank()
 			if ( m_old_cart_bank != 0 )
 			{
 				space.nop_read( 0x0000, 0x3fff);
-				LOG_BANK(( "to9_update_cart_bank: CART is unmapped\n"));
+				LOGMASKED(LOG_BANK, "to9_update_cart_bank: CART is unmapped\n");
 			}
 		}
 		break;
@@ -1973,7 +1662,7 @@ void to9_state::to9_update_ram_bank()
 	case 0: return;
 
 	default:
-		logerror( "to9_update_ram_bank: unknown RAM bank pia=$%02X disk=%i\n", portb & 0xf8, disk );
+		LOGMASKED(LOG_ERRORS, "to9_update_ram_bank: unknown RAM bank pia=$%02X disk=%i\n", portb & 0xf8, disk);
 		return;
 	}
 
@@ -1988,7 +1677,7 @@ void to9_state::to9_update_ram_bank()
 			space.nop_readwrite( 0xa000, 0xdfff);
 		}
 		m_old_ram_bank = bank;
-		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
+		LOGMASKED(LOG_BANK, "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk);
 	}
 }
 
@@ -2082,13 +1771,13 @@ uint8_t to9_state::to9_kbd_r(offs_t offset)
 		/* bit 6:     parity error */
 		/* bit 7:     interrupt */
 
-		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
+		LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
 				m_maincpu->pc(), machine().time().as_double(), m_to9_kbd_status,
 				(m_to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
 				(m_to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 				(m_to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
 				(m_to9_kbd_status & ACIA_6850_PE) ? 1 : 0,
-				(m_to9_kbd_status & ACIA_6850_irq) ? 1 : 0 ));
+				(m_to9_kbd_status & ACIA_6850_irq) ? 1 : 0 );
 		return m_to9_kbd_status;
 
 	case 1: /* get input data */
@@ -2100,13 +1789,13 @@ uint8_t to9_state::to9_kbd_r(offs_t offset)
 			else
 				m_to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 			m_to9_kbd_overrun = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", m_maincpu->pc(), machine().time().as_double(), m_to9_kbd_in ));
+			LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_r: read data $%02X\n", m_maincpu->pc(), machine().time().as_double(), m_to9_kbd_in);
 			to9_kbd_update_irq();
 		}
 		return m_to9_kbd_in;
 
 	default:
-		logerror( "$%04x to9_kbd_r: invalid offset %i\n", m_maincpu->pc(),  offset );
+		LOGMASKED(LOG_ERRORS, "$%04x to9_kbd_r: invalid offset %i\n", m_maincpu->pc(), offset);
 		return 0;
 	}
 }
@@ -2127,7 +1816,7 @@ void to9_state::to9_kbd_w(offs_t offset, uint8_t data)
 			m_to9_kbd_overrun = 0;
 			m_to9_kbd_status = ACIA_6850_TDRE;
 			m_to9_kbd_intr = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", m_maincpu->pc(), machine().time().as_double(), data ));
+			LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_w: reset (data=$%02X)\n", m_maincpu->pc(), machine().time().as_double(), data);
 		}
 		else
 		{
@@ -2140,10 +1829,10 @@ void to9_state::to9_kbd_w(offs_t offset, uint8_t data)
 			/* bit 7:    interrupt on receive */
 			m_to9_kbd_intr = data >> 5;
 
-			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
+			LOGMASKED(LOG_KBD, "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
 					m_maincpu->pc(), machine().time().as_double(),
 					data, m_to9_kbd_parity, m_to9_kbd_intr >> 2,
-					(m_to9_kbd_intr & 3) ? 1 : 0 ));
+					(m_to9_kbd_intr & 3) ? 1 : 0);
 		}
 		to9_kbd_update_irq();
 		break;
@@ -2172,19 +1861,19 @@ void to9_state::to9_kbd_w(offs_t offset, uint8_t data)
 		case 0xFE: m_to9_kbd_periph = 0; break;
 
 		default:
-			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", m_maincpu->pc(), machine().time().as_double(), data );
+			LOGMASKED(LOG_ERRORS, "$%04x %f to9_kbd_w: unknown kbd command %02X\n", m_maincpu->pc(), machine().time().as_double(), data);
 		}
 
 		m_caps_led = !m_to9_kbd_caps;
 
-		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
+		LOG("$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
 				m_maincpu->pc(), machine().time().as_double(), data,
-				m_to9_kbd_caps, m_to9_kbd_pad, m_to9_kbd_periph ));
+				m_to9_kbd_caps, m_to9_kbd_pad, m_to9_kbd_periph);
 
 		break;
 
 	default:
-		logerror( "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", m_maincpu->pc(), offset, data );
+		LOGMASKED(LOG_ERRORS, "$%04x to9_kbd_w: invalid offset %i (data=$%02X) \n", m_maincpu->pc(), offset, data);
 	}
 }
 
@@ -2200,7 +1889,7 @@ void to9_state::to9_kbd_send( uint8_t data, int parity )
 	{
 		/* overrun will be set when the current valid byte is read */
 		m_to9_kbd_overrun = 1;
-		LOG_KBD(( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", machine().time().as_double(), data, parity ));
+		LOGMASKED(LOG_KBD, "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", machine().time().as_double(), data, parity);
 	}
 	else
 	{
@@ -2211,7 +1900,7 @@ void to9_state::to9_kbd_send( uint8_t data, int parity )
 			m_to9_kbd_status &= ~ACIA_6850_PE; /* parity OK */
 		else
 			m_to9_kbd_status |= ACIA_6850_PE;  /* parity error */
-		LOG_KBD(( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", machine().time().as_double(), data, parity, m_to9_kbd_status ));
+		LOGMASKED(LOG_KBD, "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", machine().time().as_double(), data, parity, m_to9_kbd_status);
 	}
 	to9_kbd_update_irq();
 }
@@ -2329,14 +2018,14 @@ int to9_state::to9_kbd_get_key()
 			m_to9_kbd_key_count++;
 			if ( m_to9_kbd_key_count < TO9_KBD_REPEAT_DELAY || (m_to9_kbd_key_count - TO9_KBD_REPEAT_DELAY) % TO9_KBD_REPEAT_PERIOD )
 				return 0;
-			LOG_KBD(( "to9_kbd_get_key: repeat key $%02X '%c'\n", asc, asc ));
+			LOGMASKED(LOG_KBD, "to9_kbd_get_key: repeat key $%02X '%c'\n", asc, asc);
 			return asc;
 		}
 		else
 		{
 			m_to9_kbd_last_key = key;
 			m_to9_kbd_key_count = 0;
-			LOG_KBD(( "to9_kbd_get_key: key down $%02X '%c'\n", asc, asc ));
+			LOGMASKED(LOG_KBD, "to9_kbd_get_key: key down $%02X '%c'\n", asc, asc);
 			return asc;
 		}
 	}
@@ -2403,7 +2092,7 @@ TIMER_CALLBACK_MEMBER(to9_state::to9_kbd_timer_cb)
 
 void to9_state::to9_kbd_reset()
 {
-	LOG(( "to9_kbd_reset called\n" ));
+	LOG("to9_kbd_reset called\n");
 	m_to9_kbd_overrun = 0;  /* no byte lost */
 	m_to9_kbd_status = ACIA_6850_TDRE;  /* clear to transmit */
 	m_to9_kbd_intr = 0;     /* interrupt disabled */
@@ -2422,7 +2111,7 @@ void to9_state::to9_kbd_reset()
 
 void to9_state::to9_kbd_init()
 {
-	LOG(( "to9_kbd_init called\n" ));
+	LOG("to9_kbd_init called\n");
 	m_to9_kbd_timer = timer_alloc(FUNC(to9_state::to9_kbd_timer_cb), this);
 	save_item(NAME(m_to9_kbd_parity));
 	save_item(NAME(m_to9_kbd_intr));
@@ -2446,7 +2135,7 @@ uint8_t to9_state::to9_sys_porta_in()
 {
 	uint8_t ktest = to9_kbd_ktest();
 
-	LOG_KBD(( "to9_sys_porta_in: ktest=%i\n", ktest ));
+	LOGMASKED(LOG_KBD, "to9_sys_porta_in: ktest=%i\n", ktest);
 
 	// PB1-7 are not connected, and are pulled hi internally
 	return ktest | 0xfe;
@@ -2475,7 +2164,7 @@ void to9_state::to9_sys_portb_out(uint8_t data)
 	to9_update_ram_bank();
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
-		LOG(( "to9_sys_portb_out: video overlay not handled\n" ));
+		LOG("to9_sys_portb_out: video overlay not handled\n");
 }
 
 
@@ -2498,17 +2187,15 @@ void to9_state::to9_timer_port_out(uint8_t data)
 
 MACHINE_RESET_MEMBER( to9_state, to9 )
 {
-	LOG (( "to9: machine reset called\n" ));
+	LOG("to9: machine reset called\n");
 
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
 	to9_kbd_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO9 );
@@ -2537,17 +2224,15 @@ MACHINE_START_MEMBER( to9_state, to9 )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "to9: machine start called\n" ));
+	LOG("to9: machine start called\n");
 
 	/* subsystems */
 	to7_game_init();
 	to9_kbd_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_vram = ram;
@@ -2588,7 +2273,7 @@ MACHINE_START_MEMBER( to9_state, to9 )
    PIA ports.
 
    Note: if we conform to the (scarce) documentation the CPU tend to lock
-   waitting for keyboard input.
+   waiting for keyboard input.
    The protocol documentation is pretty scarce and does not account for these
    behaviors!
    The emulation code contains many hacks (delays, timeouts, spurious
@@ -2714,7 +2399,7 @@ void to9_state::to8_kbd_timer_func()
 {
 	attotime d;
 
-	LOG_KBD(( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", machine().time().as_double(), m_to8_kbd_step, m_to8_kbd_ack, m_to8_kbd_data ));
+	LOGMASKED(LOG_KBD, "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", machine().time().as_double(), m_to8_kbd_step, m_to8_kbd_ack, m_to8_kbd_data);
 
 	if( ! m_to8_kbd_step )
 	{
@@ -2732,7 +2417,7 @@ void to9_state::to8_kbd_timer_func()
 		else
 		{
 			/* got key! */
-			LOG_KBD(( "to8_kbd_timer_cb: got key $%03X\n", k ));
+			LOGMASKED(LOG_KBD, "to8_kbd_timer_cb: got key $%03X\n", k);
 			m_to8_kbd_data = k;
 			m_to8_kbd_step = 1;
 			d = attotime::from_usec( 100 );
@@ -2799,13 +2484,13 @@ void to9_state::to8_kbd_set_ack( int data )
 	if ( data )
 	{
 		double len = m_to8_kbd_signal->elapsed( ).as_double() * 1000. - 2.;
-		LOG_KBD(( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", machine().time().as_double(), len ));
+		LOGMASKED(LOG_KBD, "%f to8_kbd_set_ack: CPU end ack, len=%f\n", machine().time().as_double(), len);
 		if ( m_to8_kbd_data == 0xfff )
 		{
 			/* end signal from CPU */
 			if ( len >= 0.6 && len <= 0.8 )
 			{
-				LOG (( "%f to8_kbd_set_ack: INIT signal\n", machine().time().as_double() ));
+				LOG("%f to8_kbd_set_ack: INIT signal\n", machine().time().as_double());
 				m_to8_kbd_last_key = 0xff;
 				m_to8_kbd_key_count = 0;
 				m_to8_kbd_caps = 1;
@@ -2820,12 +2505,12 @@ void to9_state::to8_kbd_set_ack( int data )
 				m_to8_kbd_timer->adjust(TO8_KBD_POLL_PERIOD);
 				if ( len >= 1.2 && len <= 1.4 )
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", machine().time().as_double() ));
+					LOG("%f to8_kbd_set_ack: CAPS on signal\n", machine().time().as_double());
 					m_to8_kbd_caps = 1;
 				}
 				else if ( len >= 1.8 && len <= 2.0 )
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS off signal\n", machine().time().as_double() ));
+					LOG("%f to8_kbd_set_ack: CAPS off signal\n", machine().time().as_double());
 					m_to8_kbd_caps = 0;
 				}
 			}
@@ -2855,7 +2540,7 @@ void to9_state::to8_kbd_set_ack( int data )
 			m_to8_kbd_timer->adjust(attotime::from_usec( 400 ));
 			m_to8_kbd_signal->adjust(attotime::never);
 		}
-		LOG_KBD(( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", machine().time().as_double(), m_to8_kbd_data ));
+		LOGMASKED(LOG_KBD, "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", machine().time().as_double(), m_to8_kbd_data);
 	}
 }
 
@@ -2915,7 +2600,7 @@ void to9_state::to8_update_ram_bank()
 		case 0xd8: bank = 7; break;
 		case 0xf8: return;
 		default:
-			logerror( "to8_update_ram_bank: unknown RAM bank=$%02X\n", portb & 0xf8 );
+			LOGMASKED(LOG_ERRORS, "to8_update_ram_bank: unknown RAM bank=$%02X\n", portb & 0xf8);
 			return;
 		}
 	}
@@ -2943,7 +2628,7 @@ void to9_state::to8_update_ram_bank()
 		}
 		m_to8_data_vpage = bank;
 		m_old_ram_bank = bank;
-		LOG_BANK(( "to8_update_ram_bank: select bank %i (%s style)\n", bank, (m_to8_reg_sys1 & 0x10) ? "new" : "old"));
+		LOGMASKED(LOG_BANK, "to8_update_ram_bank: select bank %i (%s style)\n", bank, (m_to8_reg_sys1 & 0x10) ? "new" : "old");
 	}
 }
 
@@ -3010,9 +2695,7 @@ void to9_state::to8_update_cart_bank()
 				 * bank requested */
 				space.nop_readwrite( 0x0000, 0x3fff);
 			}
-			LOG_BANK(( "to8_update_cart_bank: CART is RAM bank %i (%s)\n",
-									m_to8_cart_vpage,
-									bank_is_read_only ? "read-only":"read-write"));
+			LOGMASKED(LOG_BANK, "to8_update_cart_bank: CART is RAM bank %i (%s)\n", m_to8_cart_vpage, bank_is_read_only ? "read-only" : "read-write");
 		}
 		else
 		{
@@ -3033,9 +2716,7 @@ void to9_state::to8_update_cart_bank()
 						space.install_readwrite_bank( 0x0000, 0x3fff, m_cartbank );
 					}
 				}
-				LOG_BANK(( "to8_update_cart_bank: update CART bank %i write status to %s\n",
-											m_to8_cart_vpage,
-											bank_is_read_only ? "read-only":"read-write"));
+				LOGMASKED(LOG_BANK, "to8_update_cart_bank: update CART bank %i write status to %s\n", m_to8_cart_vpage, bank_is_read_only ? "read-only" : "read-write");
 			}
 		}
 		m_old_cart_bank_was_read_only = bank_is_read_only;
@@ -3053,7 +2734,7 @@ void to9_state::to8_update_cart_bank()
 					space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
 					space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to9_state::to8_cartridge_w)) );
 				}
-				LOG_BANK(( "to8_update_cart_bank: CART is internal bank %i\n", m_to8_soft_bank ));
+				LOGMASKED(LOG_BANK, "to8_update_cart_bank: CART is internal bank %i\n", m_to8_soft_bank);
 			}
 		}
 		else
@@ -3070,7 +2751,7 @@ void to9_state::to8_update_cart_bank()
 						space.install_write_handler( 0x0000, 0x3fff, write8sm_delegate(*this, FUNC(to9_state::to8_cartridge_w)) );
 						space.install_read_handler( 0x0000, 0x0003, read8sm_delegate(*this, FUNC(to9_state::to8_cartridge_r)) );
 					}
-					LOG_BANK(( "to8_update_cart_bank: CART is external cartridge bank %i\n", bank ));
+					LOGMASKED(LOG_BANK, "to8_update_cart_bank: CART is external cartridge bank %i\n", bank);
 				}
 			}
 			else
@@ -3078,7 +2759,7 @@ void to9_state::to8_update_cart_bank()
 				if ( m_old_cart_bank != 0 )
 				{
 					space.nop_read( 0x0000, 0x3fff);
-					LOG_BANK(( "to8_update_cart_bank: CART is unmapped\n"));
+					LOGMASKED(LOG_BANK, "to8_update_cart_bank: CART is unmapped\n");
 				}
 			}
 		}
@@ -3182,13 +2863,11 @@ uint8_t to9_state::to8_gatearray_r(offs_t offset)
 		break;
 
 	default:
-		logerror( "$%04x to8_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset );
+		LOGMASKED(LOG_ERRORS, "$%04x to8_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
 		res = 0;
 	}
 
-	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-			m_maincpu->pc(), machine().time().as_double(),
-			offset, 0xe7e4 + offset, res, m_to7_lightpen ));
+	LOGMASKED(LOG_VIDEO, "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7e4 + offset, res, m_to7_lightpen);
 
 	return res;
 }
@@ -3197,9 +2876,7 @@ uint8_t to9_state::to8_gatearray_r(offs_t offset)
 
 void to9_state::to8_gatearray_w(offs_t offset, uint8_t data)
 {
-	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
-			m_maincpu->pc(), machine().time().as_double(),
-			offset, 0xe7e4 + offset, data ));
+	LOGMASKED(LOG_VIDEO, "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7e4 + offset, data);
 
 	switch ( offset )
 	{
@@ -3227,8 +2904,7 @@ void to9_state::to8_gatearray_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror( "$%04x to8_gatearray_w: invalid offset %i (data=$%02X)\n",
-				m_maincpu->pc(), offset, data );
+		LOGMASKED(LOG_ERRORS, "$%04x to8_gatearray_w: invalid offset %i (data=$%02X)\n", m_maincpu->pc(), offset, data);
 	}
 }
 
@@ -3269,7 +2945,7 @@ uint8_t to9_state::to8_vreg_r(offs_t offset)
 		return 0;
 
 	default:
-		logerror( "to8_vreg_r: invalid read offset %i\n", offset );
+		LOGMASKED(LOG_ERRORS, "to8_vreg_r: invalid read offset %i\n", offset);
 		return 0;
 	}
 }
@@ -3278,9 +2954,7 @@ uint8_t to9_state::to8_vreg_r(offs_t offset)
 
 void to9_state::to8_vreg_w(offs_t offset, uint8_t data)
 {
-	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
-			m_maincpu->pc(), machine().time().as_double(),
-			offset, 0xe7da + offset, data ));
+	LOGMASKED(LOG_VIDEO, "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7da + offset, data);
 
 	switch ( offset )
 	{
@@ -3319,7 +2993,7 @@ void to9_state::to8_vreg_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror( "to8_vreg_w: invalid write offset %i data=$%02X\n", offset, data );
+		LOGMASKED(LOG_ERRORS, "to8_vreg_w: invalid write offset %i data=$%02X\n", offset, data);
 	}
 }
 
@@ -3332,7 +3006,7 @@ uint8_t to9_state::to8_sys_porta_in()
 {
 	int ktest = to8_kbd_ktest();
 
-	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", m_maincpu->pc(), machine().time().as_double(), ktest ));
+	LOGMASKED(LOG_KBD, "$%04x %f: to8_sys_porta_in ktest=%i\n", m_maincpu->pc(), machine().time().as_double(), ktest);
 
 	// PB1-7 are not connected, and are pulled hi internally
 	return ktest | 0xfe;
@@ -3348,7 +3022,7 @@ void to9_state::to8_sys_portb_out(uint8_t data)
 	to8_update_ram_bank();
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
-		LOG(( "to8_sys_portb_out: video overlay not handled\n" ));
+		LOG("to8_sys_portb_out: video overlay not handled\n");
 }
 
 
@@ -3356,7 +3030,7 @@ void to9_state::to8_sys_portb_out(uint8_t data)
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
-WRITE_LINE_MEMBER(to9_state::write_centronics_busy )
+void to9_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -3385,7 +3059,7 @@ void to9_state::to8_timer_port_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( to9_state::to8_timer_cp2_out )
+void to9_state::to8_timer_cp2_out(int state)
 {
 	/* mute */
 	m_to7_game_mute = state;
@@ -3415,14 +3089,12 @@ void to9_state::to8_lightpen_cb( int step )
 
 MACHINE_RESET_MEMBER( to9_state, to8 )
 {
-	LOG (( "to8: machine reset called\n" ));
+	LOG("to8: machine reset called\n");
 
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
 	to8_kbd_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	/* gate-array */
 	m_to7_lightpen = 0;
@@ -3463,17 +3135,15 @@ MACHINE_START_MEMBER( to9_state, to8 )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "to8: machine start called\n" ));
+	LOG("to8: machine start called\n");
 
 	/* subsystems */
 	to7_game_init();
 	to8_kbd_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -3564,14 +3234,12 @@ void to9_state::to9p_timer_port_out(uint8_t data)
 
 MACHINE_RESET_MEMBER( to9_state, to9p )
 {
-	LOG (( "to9p: machine reset called\n" ));
+	LOG("to9p: machine reset called\n");
 
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
 	to9_kbd_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	/* gate-array */
 	m_to7_lightpen = 0;
@@ -3611,17 +3279,15 @@ MACHINE_START_MEMBER( to9_state, to9p )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "to9p: machine start called\n" ));
+	LOG("to9p: machine start called\n");
 
 	/* subsystems */
 	to7_game_init();
 	to9_kbd_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -3686,7 +3352,7 @@ void mo6_state::mo6_update_ram_bank()
 		m_datahibank->set_entry( bank );
 		m_to8_data_vpage = bank;
 		m_old_ram_bank = bank;
-		LOG_BANK(( "mo6_update_ram_bank: select bank %i (new style)\n", bank ));
+		LOGMASKED(LOG_BANK, "mo6_update_ram_bank: select bank %i (new style)\n", bank);
 	}
 }
 
@@ -3751,9 +3417,7 @@ void mo6_state::mo6_update_cart_bank()
 						}
 					}
 				}
-				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (%s)\n",
-					m_to8_cart_vpage,
-					bank_is_read_only ? "read-only":"read-write"));
+				LOGMASKED(LOG_BANK, "mo6_update_cart_bank: CART is RAM bank %i (%s)\n", m_to8_cart_vpage, bank_is_read_only ? "read-only" : "read-write");
 			}
 			else if ( bank_is_read_only != m_old_cart_bank_was_read_only )
 			{
@@ -3774,9 +3438,7 @@ void mo6_state::mo6_update_cart_bank()
 						space.install_readwrite_bank( 0xc000, 0xefff, m_carthibank );
 					}
 				}
-				LOG_BANK(( "mo6_update_cart_bank: update CART bank %i write status to %s\n",
-											m_to8_cart_vpage,
-											bank_is_read_only ? "read-only":"read-write"));
+				LOGMASKED(LOG_BANK, "mo6_update_cart_bank: update CART bank %i write status to %s\n", m_to8_cart_vpage, bank_is_read_only ? "read-only" : "read-write");
 			}
 			m_old_cart_bank_was_read_only = bank_is_read_only;
 		}
@@ -3792,7 +3454,7 @@ void mo6_state::mo6_update_cart_bank()
 										space.install_read_bank( 0xc000, 0xefff, m_carthibank );
 					space.nop_write( 0xb000, 0xefff);
 				}
-				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
+				LOGMASKED(LOG_BANK, "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank);
 			}
 		}
 		else
@@ -3817,9 +3479,7 @@ void mo6_state::mo6_update_cart_bank()
 						space.install_readwrite_bank( 0xc000, 0xefff, m_carthibank );
 					}
 				}
-				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (MO5 compat.) (%s)\n",
-											m_to8_cart_vpage,
-											bank_is_read_only ? "read-only":"read-write"));
+				LOGMASKED(LOG_BANK, "mo6_update_cart_bank: CART is RAM bank %i (MO5 compat.) (%s)\n", m_to8_cart_vpage, bank_is_read_only ? "read-only" : "read-write");
 			}
 			else if ( bank_is_read_only != m_old_cart_bank_was_read_only )
 			{
@@ -3834,9 +3494,7 @@ void mo6_state::mo6_update_cart_bank()
 					space.install_readwrite_bank( 0xb000, 0xbfff, m_cartlobank );
 					space.install_readwrite_bank( 0xc000, 0xefff, m_carthibank );
 				}
-				LOG_BANK(( "mo5_update_cart_bank: update CART bank %i write status to %s\n",
-											m_to8_cart_vpage,
-											bank_is_read_only ? "read-only":"read-write"));
+				LOGMASKED(LOG_BANK, "mo5_update_cart_bank: update CART bank %i write status to %s\n", m_to8_cart_vpage, bank_is_read_only ? "read-only" : "read-write");
 			}
 			m_old_cart_bank_was_read_only = bank_is_read_only;
 		}
@@ -3863,7 +3521,7 @@ void mo6_state::mo6_update_cart_bank()
 					space.install_read_bank( 0xc000, 0xefff, m_carthibank );
 					space.install_write_handler( 0xb000, 0xefff, write8sm_delegate(*this, FUNC(mo6_state::mo6_cartridge_w)) );
 				}
-				LOG_BANK(( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b ));
+				LOGMASKED(LOG_BANK, "mo6_update_cart_bank: CART is internal ROM bank %i\n", b);
 			}
 		}
 		else
@@ -3881,7 +3539,7 @@ void mo6_state::mo6_update_cart_bank()
 						space.install_write_handler( 0xb000, 0xefff, write8sm_delegate(*this, FUNC(mo6_state::mo6_cartridge_w)) );
 						space.install_read_handler( 0xbffc, 0xbfff, read8sm_delegate(*this, FUNC(mo6_state::mo6_cartridge_r)) );
 					}
-					LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank ));
+					LOGMASKED(LOG_BANK, "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank);
 				}
 			}
 			else
@@ -3889,7 +3547,7 @@ void mo6_state::mo6_update_cart_bank()
 				if ( m_old_cart_bank != 0 )
 				{
 					space.nop_read( 0xb000, 0xefff );
-					LOG_BANK(( "mo6_update_cart_bank: CART is unmapped\n"));
+					LOGMASKED(LOG_BANK, "mo6_update_cart_bank: CART is unmapped\n");
 				}
 			}
 		}
@@ -3952,7 +3610,7 @@ void mo6_state::mo6_ext_w(uint8_t data)
 /* similar to SX 90-018, but with a few differences: mute, printer */
 
 
-WRITE_LINE_MEMBER( mo6_state::mo6_centronics_busy )
+void mo6_state::mo6_centronics_busy(int state)
 {
 	m_pia_game->cb1_w(state);
 }
@@ -3960,7 +3618,7 @@ WRITE_LINE_MEMBER( mo6_state::mo6_centronics_busy )
 
 void mo6_state::mo6_game_porta_out(uint8_t data)
 {
-	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), data ));
+	LOG("$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), data);
 
 	/* centronics data */
 	m_cent_data_out->write(data);
@@ -3968,9 +3626,9 @@ void mo6_state::mo6_game_porta_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( mo6_state::mo6_game_cb2_out )
+void mo6_state::mo6_game_cb2_out(int state)
 {
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
+	LOG("$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state);
 
 	/* centronics strobe */
 	m_centronics->write_strobe(state);
@@ -4000,7 +3658,7 @@ TIMER_CALLBACK_MEMBER(mo6_state::mo6_game_update_cb)
 
 void mo6_state::mo6_game_init()
 {
-	LOG (( "mo6_game_init called\n" ));
+	LOG("mo6_game_init called\n");
 	m_to7_game_timer = timer_alloc(FUNC(mo6_state::mo6_game_update_cb), this);
 	m_to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	save_item(NAME(m_to7_game_sound));
@@ -4011,7 +3669,7 @@ void mo6_state::mo6_game_init()
 
 void mo6_state::mo6_game_reset()
 {
-	LOG (( "mo6_game_reset called\n" ));
+	LOG("mo6_game_reset called\n");
 	m_pia_game->ca1_w( 0 );
 	m_to7_game_sound = 0;
 	m_to7_game_mute = 0;
@@ -4065,10 +3723,10 @@ void mo6_state::mo6_sys_porta_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( mo6_state::mo6_sys_cb2_out )
+void mo6_state::mo6_sys_cb2_out(int state)
 {
 	/* SCART pin 8 = slow switch (?) */
-	LOG(( "mo6_sys_cb2_out: SCART slow switch set to %i\n", state ));
+	LOG("mo6_sys_cb2_out: SCART slow switch set to %i\n", state);
 }
 
 
@@ -4125,13 +3783,11 @@ uint8_t mo6_state::mo6_gatearray_r(offs_t offset)
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset );
+		LOGMASKED(LOG_ERRORS, "$%04x mo6_gatearray_r: invalid offset %i\n", m_maincpu->pc(), offset);
 		res = 0;
 	}
 
-	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-			m_maincpu->pc(), machine().time().as_double(),
-			offset, 0xa7e4 + offset, res, m_to7_lightpen ));
+	LOGMASKED(LOG_VIDEO, "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xa7e4 + offset, res, m_to7_lightpen);
 
 	return res;
 }
@@ -4140,9 +3796,7 @@ uint8_t mo6_state::mo6_gatearray_r(offs_t offset)
 
 void mo6_state::mo6_gatearray_w(offs_t offset, uint8_t data)
 {
-	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
-			m_maincpu->pc(), machine().time().as_double(),
-			offset, 0xa7e4 + offset, data ));
+	LOGMASKED(LOG_VIDEO, "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xa7e4 + offset, data);
 
 	switch ( offset )
 	{
@@ -4170,7 +3824,7 @@ void mo6_state::mo6_gatearray_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror( "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", m_maincpu->pc(), offset, data );
+		LOGMASKED(LOG_ERRORS, "$%04x mo6_gatearray_w: invalid offset %i (data=$%02X)\n", m_maincpu->pc(), offset, data);
 	}
 }
 
@@ -4199,7 +3853,7 @@ uint8_t mo6_state::mo6_vreg_r(offs_t offset)
 		return 0;
 
 	default:
-		logerror( "mo6_vreg_r: invalid read offset %i\n", offset );
+		LOGMASKED(LOG_ERRORS, "mo6_vreg_r: invalid read offset %i\n", offset);
 		return 0;
 	}
 }
@@ -4208,9 +3862,7 @@ uint8_t mo6_state::mo6_vreg_r(offs_t offset)
 
 void mo6_state::mo6_vreg_w(offs_t offset, uint8_t data)
 {
-	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
-			m_maincpu->pc(), machine().time().as_double(),
-			offset, 0xa7da + offset, data ));
+	LOGMASKED(LOG_VIDEO, "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xa7da + offset, data);
 
 	switch ( offset )
 	{
@@ -4240,7 +3892,7 @@ void mo6_state::mo6_vreg_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror( "mo6_vreg_w: invalid write offset %i data=$%02X\n", offset, data );
+		LOGMASKED(LOG_ERRORS, "mo6_vreg_w: invalid write offset %i data=$%02X\n", offset, data);
 	}
 }
 
@@ -4252,13 +3904,11 @@ void mo6_state::mo6_vreg_w(offs_t offset, uint8_t data)
 
 MACHINE_RESET_MEMBER( mo6_state, mo6 )
 {
-	LOG (( "mo6: machine reset called\n" ));
+	LOG("mo6: machine reset called\n");
 
 	/* subsystems */
 	thom_irq_reset();
 	mo6_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 	mo5_init_timer();
 
 	/* gate-array */
@@ -4296,17 +3946,15 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "mo6: machine start called\n" ));
+	LOG("mo6: machine start called\n");
 
 	/* subsystems */
 	mo6_game_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 	m_mo5_periodic_timer = timer_alloc(FUNC(mo6_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7d0, 0xa7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7c0, 0xa7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -4360,31 +4008,6 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 
 
 
-/* ------------ printer ------------ */
-
-/* Unlike the TO8, TO9, TO9+, MO6, the printer has its own ports and does not
-   go through the 6821 PIA.
-*/
-
-
-uint8_t mo5nr_state::mo5nr_prn_r()
-{
-	uint8_t result = 0;
-
-	result |= m_centronics_busy << 7;
-
-	return result;
-}
-
-
-void mo5nr_state::mo5nr_prn_w(uint8_t data)
-{
-	/* TODO: understand other bits */
-	m_centronics->write_strobe(BIT(data, 3));
-}
-
-
-
 /* ------------ system PIA 6821 ------------ */
 
 
@@ -4422,7 +4045,7 @@ void mo5nr_state::mo5nr_sys_porta_out(uint8_t data)
 
 void mo5nr_state::mo5nr_game_init()
 {
-	LOG (( "mo5nr_game_init called\n" ));
+	LOG("mo5nr_game_init called\n");
 	m_to7_game_timer = timer_alloc(FUNC(mo5nr_state::mo6_game_update_cb), this);
 	m_to7_game_timer->adjust( TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	save_item(NAME(m_to7_game_sound));
@@ -4433,7 +4056,7 @@ void mo5nr_state::mo5nr_game_init()
 
 void mo5nr_state::mo5nr_game_reset()
 {
-	LOG (( "mo5nr_game_reset called\n" ));
+	LOG("mo5nr_game_reset called\n");
 	m_pia_game->ca1_w( 0 );
 	m_to7_game_sound = 0;
 	m_to7_game_mute = 0;
@@ -4452,15 +4075,13 @@ uint8_t mo5nr_state::id_r()
 
 MACHINE_RESET_MEMBER( mo5nr_state, mo5nr )
 {
-	LOG (( "mo5nr: machine reset called\n" ));
+	LOG("mo5nr: machine reset called\n");
 
 	m_extension_view.select(m_nanoreseau_config->read() & 1);
 
 	/* subsystems */
 	thom_irq_reset();
 	mo5nr_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 	mo5_init_timer();
 
 	/* gate-array */
@@ -4498,19 +4119,17 @@ MACHINE_START_MEMBER( mo5nr_state, mo5nr )
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
-	LOG (( "mo5nr: machine start called\n" ));
+	LOG("mo5nr: machine start called\n");
 
 	/* subsystems */
 	mo5nr_game_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 	m_mo5_periodic_timer = timer_alloc(FUNC(mo5nr_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_extension_view[0], 0xa000, 0xa7bf);
-	m_extension->io_map (m_extension_view[0], 0xa7d0, 0xa7df);
+	m_extension->io_map (m_extension_view[0], 0xa7c0, 0xa7ff);
 	m_extension_view[1].install_device(0xa000, 0xa7bf, *m_nanoreseau, &nanoreseau_device::rom_map );
-	m_extension_view[1].install_device(0xa7d0, 0xa7df, *m_nanoreseau, &nanoreseau_device::io_map  );
+	m_extension_view[1].install_device(0xa7c0, 0xa7ff, *m_nanoreseau, &nanoreseau_device::io_map  );
 
 	/* memory */
 	m_thom_cart_bank = 0;

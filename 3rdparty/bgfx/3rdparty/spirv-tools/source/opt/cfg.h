@@ -30,7 +30,7 @@ class CFG {
  public:
   explicit CFG(Module* module);
 
-  // Return the list of predecesors for basic block with label |blkid|.
+  // Return the list of predecessors for basic block with label |blkid|.
   // TODO(dnovillo): Move this to BasicBlock.
   const std::vector<uint32_t>& preds(uint32_t blk_id) const {
     assert(label2preds_.count(blk_id));
@@ -64,6 +64,14 @@ class CFG {
   // constructs of their header, and continue blocks come after all of the
   // blocks in the body of their loop.
   void ComputeStructuredOrder(Function* func, BasicBlock* root,
+                              std::list<BasicBlock*>* order);
+
+  // Compute structured block order into |order| for |func| starting at |root|
+  // and ending at |end|. This order has the property that dominators come
+  // before all blocks they dominate, merge blocks come after all blocks that
+  // are in the control constructs of their header, and continue blocks come
+  // after all the blocks in the body of their loop.
+  void ComputeStructuredOrder(Function* func, BasicBlock* root, BasicBlock* end,
                               std::list<BasicBlock*>* order);
 
   // Applies |f| to all blocks that can be reach from |bb| in post order.

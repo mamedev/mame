@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     ZX Spectrum MGT Disciple / +D disk images
 
@@ -23,7 +23,7 @@ license:CC0
     v1a rom -> system disk/system tape ver 2a
 -->
 
-<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT DISCiPLE/+D disks">
+<softwarelist name="spectrum_mgt_flop" description="Sinclair ZX Spectrum MGT DISCiPLE/+D disks">
 	<software name="plusdsys">
 		<description>Plus D System Disk v2a</description>
 		<year>1986</year>

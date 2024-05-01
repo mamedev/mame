@@ -188,6 +188,8 @@
 #include "nl_cocoloco.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(20'000'000)     // confirmed
 #define CPU_CLOCK       MASTER_CLOCK / 16    // confirmed
 #define SND_CLOCK       MASTER_CLOCK / 8     // confirmed
@@ -447,7 +449,7 @@ static INPUT_PORTS_START( cocoloco )
 	PORT_DIPNAME( 0x20, 0x00, "Monsters" )                  PORT_DIPLOCATION("DSW2:!6")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0xc0, 0x00, "Vitamine Time" )             PORT_DIPLOCATION("DSW2:!7,!8")
+	PORT_DIPNAME( 0xc0, 0x00, "Vitamin Time" )              PORT_DIPLOCATION("DSW2:!7,!8")
 	PORT_DIPSETTING(    0x00, "Long" )
 	PORT_DIPSETTING(    0x40, "Medium-Long" )
 	PORT_DIPSETTING(    0x80, "Medium-Short" )
@@ -549,6 +551,8 @@ ROM_START( cocolocob )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp18s22n.bin", 0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )  // verified.
 ROM_END
+
+} // anonymous namespace
 
 
 /***********************************

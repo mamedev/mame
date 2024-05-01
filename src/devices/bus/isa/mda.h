@@ -31,8 +31,8 @@ public:
 	virtual uint8_t status_r();
 	virtual void mode_control_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -51,7 +51,7 @@ protected:
 	optional_device<pc_lpt_device> m_lpt;
 
 private:
-	WRITE_LINE_MEMBER(pc_cpu_line);
+	void pc_cpu_line(int state);
 
 	MC6845_UPDATE_ROW( mda_text_inten_update_row );
 	MC6845_UPDATE_ROW( mda_text_blink_update_row );

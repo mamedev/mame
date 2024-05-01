@@ -218,7 +218,7 @@ private:
 	void msm5205_stop_w(u8 data);
 	void colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
+	void msm5205_vck(int state);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
@@ -265,7 +265,7 @@ void rastan_state::sound_bankswitch_w(u8 data)
 	m_audiobank->set_entry(data & 3);
 }
 
-WRITE_LINE_MEMBER(rastan_state::msm5205_vck)
+void rastan_state::msm5205_vck(int state)
 {
 	if (!state)
 		return;
@@ -452,11 +452,9 @@ void rastan_state::rastan(machine_config &config)
 	screen.set_screen_update(FUNC(rastan_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_rastan);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfxdecode_tag("gfxdecode");
+	PC080SN(config, m_pc080sn, 0, "palette", gfx_rastan);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
@@ -480,8 +478,8 @@ void rastan_state::rastan(machine_config &config)
 	m_adpcm_sel->out_callback().set(m_msm, FUNC(msm5205_device::data_w));
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -821,5 +819,5 @@ GAME( 1987, rastsaga,    rastan, rastan, rastsaga, rastan_state, empty_init, ROT
 GAME( 1987, rastanb,     rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World, earlier code base)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastanub,    rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US, earlier code base)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastsagaa,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, earlier code base)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagaabl, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (bootleg, Japan Rev 1, earlier code base)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagaabl, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "bootleg",                   "Rastan Saga (bootleg, Japan Rev 1, earlier code base)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastsagab,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan, earlier code base)",                MACHINE_SUPPORTS_SAVE )

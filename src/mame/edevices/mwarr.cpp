@@ -48,6 +48,9 @@ Notes:
 #include "speaker.h"
 #include "edevices.h"
 
+
+namespace {
+
 #define MASTER_CLOCK     XTAL(12'000'000)
 #define SOUND_CLOCK      XTAL(45'000'000)
 
@@ -334,6 +337,7 @@ void mwarr_state::mwarr(machine_config &config)
 	m_video->set_spriteram_tag("spriteram");
 	m_video->set_gfxdecode_tag("gfxdecode");
 	m_video->set_palette_tag("palette");
+	m_video->set_spritexoffset(9);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -401,6 +405,9 @@ ROM_START( mwarr )
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Samples */
 	ROM_LOAD( "oki1",   0x000000, 0x80000, CRC(bcde2330) SHA1(452d871360fa907d2e4ebad93c3fba9a3fa32fa7) ) // no date
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

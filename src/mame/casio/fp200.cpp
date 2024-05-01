@@ -26,6 +26,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 static constexpr XTAL MAIN_CLOCK = 6.144_MHz_XTAL;
 
 class fp200_state : public driver_device
@@ -69,8 +72,8 @@ private:
 	uint8_t fp200_keyb_r(offs_t offset);
 	void fp200_keyb_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	void sod_w(int state);
+	int sid_r();
 
 	void fp200_palette(palette_device &palette) const;
 	void fp200_io(address_map &map);
@@ -570,12 +573,12 @@ void fp200_state::fp200_palette(palette_device &palette) const
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
 }
 
-WRITE_LINE_MEMBER( fp200_state::sod_w )
+void fp200_state::sod_w(int state)
 {
 	m_io_type = state;
 }
 
-READ_LINE_MEMBER( fp200_state::sid_r )
+int fp200_state::sid_r()
 {
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
@@ -622,5 +625,8 @@ ROM_START( fp200 )
 
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1982, fp200, 0, 0, fp200, fp200, fp200_state, empty_init, "Casio", "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

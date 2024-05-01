@@ -107,10 +107,10 @@ const tiny_rom_entry *d9060_device_base::device_rom_region() const
 
 void d9060_device_base::main_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x0100).m(m_riot0, FUNC(mos6532_new_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x0100).m(m_riot1, FUNC(mos6532_new_device::ram_map));
-	map(0x0200, 0x021f).mirror(0x0d60).m(m_riot0, FUNC(mos6532_new_device::io_map));
-	map(0x0280, 0x029f).mirror(0x0d60).m(m_riot1, FUNC(mos6532_new_device::io_map));
+	map(0x0000, 0x007f).mirror(0x0100).m(m_riot0, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x0100).m(m_riot1, FUNC(mos6532_device::ram_map));
+	map(0x0200, 0x021f).mirror(0x0d60).m(m_riot0, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0d60).m(m_riot1, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x13ff).mirror(0x0c00).ram().share("share1");
 	map(0x2000, 0x23ff).mirror(0x0c00).ram().share("share2");
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().share("share3");
@@ -328,12 +328,12 @@ void d9060_device_base::via_pb_w(uint8_t data)
 	m_sasibus->write_rst(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( d9060_device_base::ack_w )
+void d9060_device_base::ack_w(int state)
 {
 	m_sasibus->write_ack(!state);
 }
 
-WRITE_LINE_MEMBER( d9060_device_base::enable_w )
+void d9060_device_base::enable_w(int state)
 {
 	m_enable = state;
 
@@ -368,11 +368,11 @@ void d9060_device_base::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, XTAL(4'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &d9060_device::main_mem);
 
-	MOS6532_NEW(config, m_riot0, XTAL(4'000'000)/4);
+	MOS6532(config, m_riot0, XTAL(4'000'000)/4);
 	m_riot0->pa_rd_callback().set(FUNC(d9060_device_base::dio_r));
 	m_riot0->pb_wr_callback().set(FUNC(d9060_device_base::dio_w));
 
-	MOS6532_NEW(config, m_riot1, XTAL(4'000'000)/4);
+	MOS6532(config, m_riot1, XTAL(4'000'000)/4);
 	m_riot1->pa_rd_callback().set(FUNC(d9060_device_base::riot1_pa_r));
 	m_riot1->pa_wr_callback().set(FUNC(d9060_device_base::riot1_pa_w));
 	m_riot1->pb_rd_callback().set(FUNC(d9060_device_base::riot1_pb_r));
@@ -542,7 +542,7 @@ void d9060_device_base::device_reset()
 
 	m_hdccpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 
-	m_riot1->pa7_w(1);
+	m_riot1->pa_bit_w<7>(1);
 }
 
 
@@ -554,7 +554,7 @@ void d9060_device_base::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa7_w(state);
+	m_riot1->pa_bit_w<7>(state);
 }
 
 

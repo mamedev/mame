@@ -70,6 +70,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class clickstart_state : public driver_device
 {
 public:
@@ -193,12 +196,12 @@ void clickstart_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_CALLBACK_MEMBER(clickstart_state::handle_uart_tx)
@@ -471,6 +474,9 @@ ROM_START( clikstrt )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "clickstartbios.bin", 0x000000, 0x800000, CRC(7c833bd0) SHA1(2e9ef38e1a7582705920339e6b9944f6404fcf9b) )
 ROM_END
+
+} // anonymous namespace
+
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 CONS( 2007, clikstrt,  0,      0, clickstart,  clickstart, clickstart_state, empty_init, "LeapFrog Enterprises", "ClickStart",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'My First Computer' tagline

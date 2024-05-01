@@ -23,17 +23,202 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "gradius3.h"
+
+#include "k052109.h"
+#include "k051960.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "speaker.h"
+
+
+namespace {
+
+class gradius3_state : public driver_device
+{
+public:
+	gradius3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_gfxram(*this, "k052109"),
+		m_gfxrom(*this, "k051960"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub"),
+		m_k007232(*this, "k007232"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960")
+	{ }
+
+	void gradius3(machine_config &config);
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_gfxram;
+	required_region_ptr<uint8_t> m_gfxrom;
+
+	/* misc */
+	int         m_priority = 0;
+	int         m_irqAen = 0;
+	int         m_irqBmask = 0;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<k007232_device> m_k007232;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+
+	uint16_t k052109_halfword_r(offs_t offset);
+	void k052109_halfword_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpuB_irqenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpuB_irqtrigger_w(uint16_t data);
+	void sound_irq_w(uint16_t data);
+	uint16_t gradius3_gfxrom_r(offs_t offset);
+	void gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_bank_w(uint8_t data);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
+	void gradius3_postload();
+	void volume_callback(uint8_t data);
+	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
+	void gradius3_map(address_map &map);
+	void gradius3_map2(address_map &map);
+	void gradius3_s_map(address_map &map);
+};
+
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(gradius3_state::tile_callback)
+{
+	static const int layer_colorbase[] = { 0 / 16, 512 / 16, 768 / 16 };
+
+	/* (color & 0x02) is flip y handled internally by the 052109 */
+	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
+	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+}
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(gradius3_state::sprite_callback)
+{
+	enum { sprite_colorbase = 256 / 16 };
+
+	#define L0 GFX_PMASK_1
+	#define L1 GFX_PMASK_2
+	#define L2 GFX_PMASK_4
+	static const int primask[2][4] =
+	{
+		{ L0|L2, L0, L0|L2, L0|L1|L2 },
+		{ L1|L2, L2, 0,     L0|L1|L2 }
+	};
+	#undef L0
+	#undef L1
+	#undef L2
+
+	int pri = ((*color & 0x60) >> 5);
+
+	if (m_priority == 0)
+		*priority = primask[0][pri];
+	else
+		*priority = primask[1][pri];
+
+	*code |= (*color & 0x01) << 13;
+	*color = sprite_colorbase + ((*color & 0x1e) >> 1);
+}
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void gradius3_state::gradius3_postload()
+{
+	m_k052109->gfx(0)->mark_all_dirty();
+}
+
+void gradius3_state::video_start()
+{
+	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_state::gradius3_postload), this));
+}
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+uint16_t gradius3_state::gradius3_gfxrom_r(offs_t offset)
+{
+	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
+}
+
+void gradius3_state::gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int oldword = m_gfxram[offset];
+
+	COMBINE_DATA(&m_gfxram[offset]);
+
+	if (oldword != m_gfxram[offset])
+		m_k052109->gfx(0)->mark_dirty(offset / 16);
+}
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
+	m_k052109->write(0x1d80, 0x10);
+	m_k052109->write(0x1f00, 0x32);
+
+	m_k052109->tilemap_update();
+
+	screen.priority().fill(0, cliprect);
+	if (m_priority == 0)
+	{
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 4);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
+	}
+	else
+	{
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 4);
+	}
+
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	return 0;
+}
 
 
 uint16_t gradius3_state::k052109_halfword_r(offs_t offset)
@@ -486,6 +671,7 @@ ROM_START( gradius3a )
 	ROM_LOAD( "945_l11b.c20", 0x60000, 0x20000, CRC(89ea3baf) SHA1(8edcbaa7969185cfac48c02559826d1b8b081f3f) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )

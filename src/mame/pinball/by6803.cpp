@@ -122,10 +122,10 @@ private:
 	void pia1b_w(u8 data);
 	void pia0a_g1w(u8 data);
 	void pia1a_g1w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_g1w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
+	void pia0_ca2_g1w(int state);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
+	void pia1_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
 
 	void by6803_map(address_map &map);
@@ -265,7 +265,7 @@ void by6803_state::port2_w(u8 data)
 }
 
 // display latch strobes; display blanking
-WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
+void by6803_state::pia0_ca2_w(int state)
 {
 	if (state)
 	{
@@ -278,13 +278,13 @@ WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
 }
 
 // lamp strobe 1 when high
-WRITE_LINE_MEMBER( by6803_state::pia0_cb2_w )
+void by6803_state::pia0_cb2_w(int state)
 {
 	//printf("CB02=%X,m_pia0_a=%X ",state,m_pia0_a);
 }
 
 // sol bank select (0 to enable sol selection)
-WRITE_LINE_MEMBER( by6803_state::pia1_cb2_w )
+void by6803_state::pia1_cb2_w(int state)
 {
 	//printf("CB12=%X ",state);
 }
@@ -417,7 +417,7 @@ void by6803_state::pia1a_g1w(u8 data)
 		m_segment[4] = BIT(m_pia0_a, 4, 4);
 }
 
-WRITE_LINE_MEMBER( by6803_state::pia0_ca2_g1w )
+void by6803_state::pia0_ca2_g1w(int state)
 {
 	static const u8 patterns[16] = { 0x3f,0x06,0xdb,0xcf,0xe6,0xed,0xfd,0x07,0xff,0xef,0,0,0,0,0,0 }; // MC14543
 	if (state)
@@ -504,18 +504,18 @@ void by6803_state::by6803(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(by6803_state::pia0a_r));
 	m_pia0->writepa_handler().set(FUNC(by6803_state::pia0a_w));
 	m_pia0->readpb_handler().set(FUNC(by6803_state::pia0b_r));
 	m_pia0->writepb_handler().set(FUNC(by6803_state::pia0b_w));
 	m_pia0->ca2_handler().set(FUNC(by6803_state::pia0_ca2_w));
 	m_pia0->cb2_handler().set(FUNC(by6803_state::pia0_cb2_w));
-	m_pia0->irqa_handler().set_inputline("maincpu", M6803_IRQ_LINE);
-	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ_LINE);
+	m_pia0->irqa_handler().set_inputline("maincpu", M6803_IRQ1_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ1_LINE);
 	TIMER(config, "timer_z").configure_periodic(FUNC(by6803_state::pia0_timer), attotime::from_hz(120)); // mains freq*2
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(by6803_state::pia1a_r));
 	m_pia1->writepa_handler().set(FUNC(by6803_state::pia1a_w));
 	m_pia1->writepb_handler().set(FUNC(by6803_state::pia1b_w));

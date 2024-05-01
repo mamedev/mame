@@ -291,7 +291,7 @@ private:
 	bool m_sample_select;
 
 	void sound_bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	void mstworld2_io_map(address_map &map);
 	void pangba_sound_map(address_map &map);
@@ -340,8 +340,6 @@ private:
 	void io_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -428,14 +426,11 @@ void mitchell_state::colorram_w(offs_t offset, uint8_t data)
 
 void mitchell_state::gfxctrl_w(uint8_t data)
 {
-logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
-{
+	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
+
 #if 0
-	char baf[40];
-	sprintf(baf, "%02x", data);
-	popmessage(baf);
+	popmessage("%02x", data);
 #endif
-}
 
 	// bit 0 is unknown (used, maybe back color enable?)
 
@@ -467,11 +462,8 @@ logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
 void mstworld_state::gfxctrl_w(uint8_t data)
 {
 	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
-{
-	char baf[40];
-	sprintf(baf, "%02x", data);
-//  popmessage(baf);
-}
+
+	// popmessage("%02x", data);
 
 	// bit 0 is unknown (used, maybe back color enable?)
 
@@ -548,8 +540,6 @@ uint32_t mitchell_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -1885,7 +1875,7 @@ static GFXDECODE_START( gfx_mstworld2 )
 	GFXDECODE_ENTRY( "sprites", 0, mstworld_spritelayout, 0, 0x40 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(spangbl_state::adpcm_int)
+void spangbl_state::adpcm_int(int state)
 {
 	if (!state)
 		return;
@@ -2201,6 +2191,40 @@ ROM_START( pkladiesbl )
 	ROM_LOAD("3.ic127", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
 ROM_END
 
+ROM_START( pkladiesblu )  // uncensored encrypted bootleg. ROMs 1, 2, 3, 16 & 17 are identical to set pkladiesbl
+	ROM_REGION( 0x50000*2, "maincpu", 0 )
+	// only pklbu1.bin is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses.
+	ROM_LOAD( "pklbu1.bin", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
+	ROM_CONTINUE(0x00000,0x08000)
+	ROM_LOAD( "pklbu2.bin", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x10000,0x10000)
+
+	ROM_REGION( 0x240000, "chars", ROMREGION_INVERT )
+	ROM_LOAD32_BYTE("pklbu20.bin", 0x000000, 0x20000, CRC(1f537087) SHA1(87ea5bee67bb2a1f8bbe191ed3e8a83491a3cd0f) )
+	ROM_LOAD32_BYTE("pklbu14.bin", 0x000001, 0x20000, CRC(3fd2684d) SHA1(0f14cce27551af64ccc607fa14689cfceb0bb367) )
+	ROM_LOAD32_BYTE("pklbu10.bin", 0x000002, 0x20000, CRC(97424238) SHA1(9c3ef3d5524133ba79929318288010ec5a15641a) )
+	ROM_LOAD32_BYTE("pklbu6.bin",  0x000003, 0x20000, CRC(96c7eed0) SHA1(d435e6785cc447bee538dc89c1cbbe84071301d8) )
+	ROM_LOAD32_BYTE("pklbu21.bin", 0x080000, 0x20000, CRC(6c18df0d) SHA1(eef87c710bbb2f643a7ea8ba2b2f609fb663b579) )
+	ROM_LOAD32_BYTE("pklbu15.bin", 0x080001, 0x20000, CRC(0a52206a) SHA1(68f2aa9cda53fb9d545fd5ec29ac7e1ccf0faac7) )
+	ROM_LOAD32_BYTE("pklbu11.bin", 0x080002, 0x20000, CRC(7f995c59) SHA1(cb533d524dd35d1058cb319e8f7b60c9d675c858) )
+	ROM_LOAD32_BYTE("pklbu7.bin",  0x080003, 0x20000, CRC(d6a7a95b) SHA1(2a4b4ed65dbca88d38f5977f49b6800f8adc519b) )
+	ROM_LOAD32_BYTE("pklbu18.bin", 0x100000, 0x20000, CRC(1280a069) SHA1(e2622f528d08eb05dd178fda003b4648828eaf06) )
+	ROM_LOAD32_BYTE("pklbu12.bin", 0x100001, 0x20000, CRC(09aa3215) SHA1(d8bfd9eeba33e5b965b6f10421cfee675c44cd61) )
+	ROM_LOAD32_BYTE("pklbu8.bin",  0x100002, 0x20000, CRC(2132c239) SHA1(fd770fc212476d32e08e2fae3af3fa42bce5abe2) )
+	ROM_LOAD32_BYTE("pklbu4.bin",  0x100003, 0x20000, CRC(b798d926) SHA1(de21e5efff32ef421f68545ccbddfb18db54436b) )
+	ROM_LOAD32_BYTE("pklbu19.bin", 0x180000, 0x20000, CRC(95d838cf) SHA1(179634dc6628f858e3f099070604599257aafbe9) )
+	ROM_LOAD32_BYTE("pklbu13.bin", 0x180001, 0x20000, CRC(10be806b) SHA1(36cc07a93412be2a0e90bcc133b52febfed8bd90) )
+	ROM_LOAD32_BYTE("pklbu9.bin",  0x180002, 0x20000, CRC(9059d383) SHA1(5e8a5a6079838b51363c3a763475b9ca4326d598) )
+	ROM_LOAD32_BYTE("pklbu5.bin",  0x180003, 0x20000, CRC(8819affb) SHA1(095d951fa77ae09c4a68c4d971f532c517cb295a) )
+
+	ROM_REGION( 0x040000, "sprites", ROMREGION_INVERT )
+	ROM_LOAD("pklbu16.bin", 0x020000, 0x20000, CRC(c6decb5e) SHA1(3d35cef348deb16a62a066acdfbabebcf11fa997) )
+	ROM_LOAD("pklbu17.bin", 0x000000, 0x20000, CRC(5a6efdcc) SHA1(04120dd4da0ff8df514f98a44d7eee7100e4c033) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD("pklbu3.bin", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
+ROM_END
+
 ROM_START( pkladiesbl2 ) // same as the above but without the z80 block, only 1.ic112 differs
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(cadb9925) SHA1(d88353501a29ff855335f9c8822e095ef5196246) ) //sldh
@@ -2326,19 +2350,19 @@ ROM_START( pompingw )
 	ROM_LOAD( "pwj_07.13h", 0x10000, 0x20000, CRC(a9402420) SHA1(2ca3aa59d561826477e3509fcaeeec753d64d419) )
 
 	ROM_REGION( 0x100000, "chars", ROMREGION_ERASEFF )
-	ROM_LOAD( "pw_02.1e", 0x000000, 0x20000, CRC(4b5992e4) SHA1(2071a1fcfc739d7ca837c03133909101b462d5a6) )
-	ROM_LOAD( "pw_03.2e", 0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
+	ROM_LOAD( "pwj_02.1e", 0x000000, 0x20000, CRC(4b5992e4) SHA1(2071a1fcfc739d7ca837c03133909101b462d5a6) )
+	ROM_LOAD( "pwj_03.2e", 0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
 	// 40000-7ffff empty
 	ROM_LOAD( "pwj_04.1g", 0x080000, 0x20000, CRC(01e49081) SHA1(a29ffec199f196a2b3731e4863e863bdd04e2c58) )
-	ROM_LOAD( "pw_05.2g",  0x0a0000, 0x20000, CRC(2fb3db6c) SHA1(328814d28569fec763975a8ae4c2767517a680af) )
+	ROM_LOAD( "pwj_05.2g", 0x0a0000, 0x20000, CRC(2fb3db6c) SHA1(328814d28569fec763975a8ae4c2767517a680af) )
 	// c0000-fffff empty
 
 	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "pw_10.2k", 0x000000, 0x20000, CRC(fdba4f6e) SHA1(9a2412a97682bbd25b8942520a0c02616bd59353) )
-	ROM_LOAD( "pw_9.1k",  0x020000, 0x20000, CRC(39f47a63) SHA1(05675ad45909a7d723acaf4d53b4e588d4e048b9) )
+	ROM_LOAD( "pwj_10.2k", 0x000000, 0x20000, CRC(83a81c02) SHA1(fced1b5798442b7633cef0c5f87546b1845df096) )
+	ROM_LOAD( "pwj_9.1k",  0x020000, 0x20000, CRC(6b628232) SHA1(7b3848f289ad96f314076ddeb8b0a196d5102b36) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "pw_01.1d", 0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
+	ROM_LOAD( "pwj_01.1d", 0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
 ROM_END
 
 ROM_START( pangb )
@@ -3274,7 +3298,8 @@ GAME( 1989, mgakuen2,    0,        marukin,    marukin,    mitchell_state,   ini
 GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesblu, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Uncensored bootleg, encrypted)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
 GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, not encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? needs inputs, EEPROM (?), MSM5205 hook up, GFX fixes
 
 GAME( 1989, dokaben,     0,        pang,       pang,       mitchell_state,   init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )

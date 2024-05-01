@@ -12,6 +12,9 @@
 #include "cpu/z80/z80.h"
 #include "machine/msm5832.h"
 
+
+namespace {
+
 class lms46_state : public driver_device
 {
 public:
@@ -107,6 +110,8 @@ ROM_START(lms46)
 	// Code organization also suggests the use of two separate 8K ROMs rather than one 16K ROM.
 	ROM_LOAD("lms4002.rom", 0x0000, 0x4000, CRC(d9bc2384) SHA1(979038c53f5611bb9078d6a44e1c521093207881) BAD_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1988, lms46, 0, 0, lms46, lms46, lms46_state, empty_init, "Litek Information Systems", "LMS46-V9", MACHINE_IS_SKELETON)

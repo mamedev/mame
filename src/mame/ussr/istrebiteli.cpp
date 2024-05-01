@@ -158,7 +158,7 @@ public:
 	void istreb(machine_config &config);
 	void motogonki(machine_config &config);
 
-	template <int ID> DECLARE_READ_LINE_MEMBER(collision_r);
+	template <int ID> int collision_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
@@ -464,7 +464,7 @@ void istrebiteli_state::moto_io_map(address_map &map)
 }
 
 template <int ID>
-READ_LINE_MEMBER(istrebiteli_state::collision_r)
+int istrebiteli_state::collision_r()
 {
 	// piece of HACK
 	// real hardware does per-pixel sprite collision detection

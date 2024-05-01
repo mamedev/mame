@@ -28,15 +28,15 @@ public:
 	// construction/destruction
 	pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
+	virtual void input_m(int state) override;
 
 	// device_pet_user_port_interface overrides
-	WRITE_LINE_MEMBER( write_up1 ) { m_up1 = state; update_port1(); }
-	WRITE_LINE_MEMBER( write_down1 ) { m_down1 = state; update_port1(); }
-	WRITE_LINE_MEMBER( write_fire1 ) { m_fire1 = state; update_port1(); }
-	WRITE_LINE_MEMBER( write_up2 ) { m_up2 = state; update_port2(); }
-	WRITE_LINE_MEMBER( write_down2 ) { m_down2 = state; update_port2(); }
-	WRITE_LINE_MEMBER( write_fire2 ) { m_fire2 = state; update_port2(); }
+	void write_up1(int state) { m_up1 = state; update_port1(); }
+	void write_down1(int state) { m_down1 = state; update_port1(); }
+	void write_fire1(int state) { m_fire1 = state; update_port1(); }
+	void write_up2(int state) { m_up2 = state; update_port2(); }
+	void write_down2(int state) { m_down2 = state; update_port2(); }
+	void write_fire2(int state) { m_fire2 = state; update_port2(); }
 
 protected:
 	// device-level overrides

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_ELF_H
-#define MAME_INCLUDES_ELF_H
+#ifndef MAME_NETRONICS_ELF_H
+#define MAME_NETRONICS_ELF_H
 
 #pragma once
 
@@ -48,13 +48,13 @@ private:
 	uint8_t data_r();
 	void data_w(uint8_t data);
 	void memory_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( wait_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int wait_r();
+	int clear_r();
+	int ef4_r();
+	void q_w(int state);
 	uint8_t dma_r();
 	void sc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( da_w );
+	void da_w(int state);
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
@@ -78,4 +78,4 @@ private:
 	uint8_t m_data = 0;
 };
 
-#endif
+#endif // MAME_NETRONICS_ELF_H

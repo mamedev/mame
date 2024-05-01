@@ -19,6 +19,9 @@ Interrupts: INT6 is output of Timer 2, INT7 is output of Timer 3 (refresh),
 #include "machine/am9513.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 class ft68m_state : public driver_device
 {
 public:
@@ -128,6 +131,8 @@ ROM_START( ft68m )
 	ROM_LOAD("23-0037-00.e7",  0x500, 0x100, CRC(9ed4b7f6) SHA1(136a74567094d8462c3a4de1b7e6eb8f30fe71ca) )
 	ROM_LOAD("23-0038-00.f1",  0x600, 0x100, CRC(3e56cce5) SHA1(f30a8d5d744bfc25493cd1e92961bbb75f9e0d05) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

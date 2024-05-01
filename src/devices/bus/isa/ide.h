@@ -33,7 +33,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	uint8_t ide16_alt_r();
 	void ide16_alt_w(uint8_t data);
 	bool is_primary() { return m_is_primary; }

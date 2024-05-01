@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:David Graves, Jarek Burczynski
 // thanks-to:Richard Bush
-/***************************************************************************
+/*******************************************************************************
 
 Darius    (c) Taito 1986
 ======
@@ -127,11 +127,12 @@ TODO
 When you add a coin there is temporary volume distortion of other
 sounds.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
-#include "darius.h"
 #include "taitosnd.h"
+
+#include "pc080sn.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -139,11 +140,226 @@ sounds.
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "darius.lh"
 
+
+namespace {
+
+#define VOL_MAX    (3 * 2 + 2)
+#define PAN_MAX    (2 + 2 + 1)   /* FM 2port + PSG 2port + DA 1port */
+
+class darius_state : public driver_device
+{
+public:
+	darius_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
+		m_fg_ram(*this, "fg_ram"),
+		m_audiobank(*this, "audiobank"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm"),
+		m_cpub(*this, "cpub"),
+		m_adpcm(*this, "adpcm"),
+		m_pc080sn(*this, "pc080sn"),
+		m_filter_l{{*this, "filter0.%ul", 0U}, {*this, "filter1.%ul", 0U}},
+		m_filter_r{{*this, "filter0.%ur", 0U}, {*this, "filter1.%ur", 0U}},
+		m_msm5205_l(*this, "msm5205.l"),
+		m_msm5205_r(*this, "msm5205.r"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
+
+	void darius(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	/* memory pointers */
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_fg_ram;
+	required_memory_bank m_audiobank;
+
+	/* video-related */
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	/* misc */
+	u16 m_cpua_ctrl = 0;
+	u16 m_coin_word = 0;
+	u8 m_adpcm_command = 0;
+	u8 m_nmi_enable = 0;
+	u32 m_def_vol[0x10]{};
+	u8 m_vol[VOL_MAX]{};
+	u8 m_pan[PAN_MAX]{};
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
+	required_device<cpu_device> m_cpub;
+	required_device<cpu_device> m_adpcm;
+	required_device<pc080sn_device> m_pc080sn;
+
+	required_device_array<filter_volume_device, 4> m_filter_l[2];
+	required_device_array<filter_volume_device, 4> m_filter_r[2];
+	required_device<filter_volume_device> m_msm5205_l;
+	required_device<filter_volume_device> m_msm5205_r;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	void cpua_ctrl_w(u16 data);
+	u16 coin_r();
+	void coin_w(u16 data);
+	void sound_bankswitch_w(u8 data);
+	void adpcm_command_w(u8 data);
+	void fm0_pan_w(u8 data);
+	void fm1_pan_w(u8 data);
+	void psg0_pan_w(u8 data);
+	void psg1_pan_w(u8 data);
+	void da_pan_w(u8 data);
+	u8 adpcm_command_r();
+	u8 readport2();
+	u8 readport3();
+	void adpcm_nmi_disable(u8 data);
+	void adpcm_nmi_enable(u8 data);
+	void fg_layer_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void write_portA0(u8 data);
+	void write_portA1(u8 data);
+	void write_portB0(u8 data);
+	void write_portB1(u8 data);
+	void adpcm_data_w(u8 data);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	u32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
+	u32 screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
+	u32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs);
+	u32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs);
+	void parse_control(); // assumes Z80 sandwiched between 68Ks
+	void update_fm0();
+	void update_fm1();
+	void update_psg0(int port);
+	void update_psg1(int port);
+	void update_da();
+	void adpcm_int(int state);
+	void darius_cpub_map(address_map &map);
+	void darius_map(address_map &map);
+	void darius_sound2_io_map(address_map &map);
+	void darius_sound2_map(address_map &map);
+	void darius_sound_map(address_map &map);
+};
+
+
+/*******************************************************************************
+        VIDEO HARDWARE
+*******************************************************************************/
+
+TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
+{
+	u16 code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
+	u16 attr = m_fg_ram[tile_index];
+
+	tileinfo.set(1,
+			code,
+			(attr & 0x7f),
+			TILE_FLIPYX((attr & 0xc000) >> 14));
+}
+
+void darius_state::video_start()
+{
+	m_gfxdecode->gfx(1)->set_granularity(16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darius_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+void darius_state::fg_layer_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_fg_ram[offset]);
+	if (offset < 0x4000)
+		m_fg_tilemap->mark_tile_dirty((offset & 0x1fff));
+}
+
+/***************************************************************************/
+
+void darius_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs)
+{
+	static const u32 primask[2] =
+	{
+		GFX_PMASK_2, // draw sprites with priority 0 which are under the mid layer
+		0  // draw sprites with priority 1 which are over the mid layer
+	};
+
+	for (int offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	{
+		const u32 code = m_spriteram[offs + 2] & 0x1fff;
+
+		if (code)
+		{
+			u16 data = m_spriteram[offs];
+			const int sy = (256 - data) & 0x1ff;
+
+			data = m_spriteram[offs + 1];
+			const int sx = data & 0x3ff;
+
+			data = m_spriteram[offs + 2];
+			const bool flipx = ((data & 0x4000) >> 14);
+			const bool flipy = ((data & 0x8000) >> 15);
+
+			data = m_spriteram[offs + 3];
+			const int priority = (data & 0x80) >> 7;  // 0 = low
+			const u32 color = (data & 0x7f);
+
+			int curx = sx - x_offs;
+			int cury = sy + y_offs;
+
+			if (curx > 900) curx -= 1024;
+			if (cury > 400) cury -= 512;
+
+			m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+					code, color,
+					flipx, flipy,
+					curx, cury,
+					screen.priority(), primask[priority], 0);
+		}
+	}
+}
+
+
+u32 darius_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs)
+{
+	screen.priority().fill(0, cliprect);
+	m_pc080sn->tilemap_update();
+
+	// draw bottom layer(always active)
+	m_pc080sn->tilemap_draw_offset(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1, -xoffs, 0);
+
+	// draw middle layer
+	m_pc080sn->tilemap_draw_offset(screen, bitmap, cliprect, 1, 0, 2, -xoffs, 0);
+
+	/* Sprites can be under/over the layer below text layer */
+	draw_sprites(screen, bitmap, cliprect, xoffs, -8);
+
+	/* top(text) layer is in fixed position */
+	m_fg_tilemap->set_scrollx(0, 0 + xoffs);
+	m_fg_tilemap->set_scrolly(0, -8);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+/*******************************************************************************
+        MISC. CONTROL
+*******************************************************************************/
 
 void darius_state::parse_control()   /* assumes Z80 sandwiched between 68Ks */
 {
@@ -166,9 +382,9 @@ void darius_state::cpua_ctrl_w(u16 data)
 }
 
 
-/**********************************************************
-                        GAME INPUTS
-**********************************************************/
+/*******************************************************************************
+        GAME INPUTS
+*******************************************************************************/
 
 u16 darius_state::coin_r()
 {
@@ -188,9 +404,9 @@ void darius_state::coin_w(u16 data)
 }
 
 
-/***********************************************************
-                     MEMORY STRUCTURES
-***********************************************************/
+/*******************************************************************************
+        MEMORY STRUCTURES
+*******************************************************************************/
 
 void darius_state::darius_map(address_map &map)
 {
@@ -231,9 +447,9 @@ void darius_state::darius_cpub_map(address_map &map)
 }
 
 
-/*****************************************************
-                        SOUND
-*****************************************************/
+/*******************************************************************************
+        SOUND
+*******************************************************************************/
 
 void darius_state::sound_bankswitch_w(u8 data)
 {
@@ -254,9 +470,9 @@ void darius_state::display_value(u8 data)
 #endif
 
 
-/*****************************************************
-               Sound mixer/pan control
-*****************************************************/
+/*******************************************************************************
+        Sound mixer/pan control
+*******************************************************************************/
 
 void darius_state::update_fm0()
 {
@@ -264,9 +480,9 @@ void darius_state::update_fm0()
 	const int right = ((0xff - m_pan[0]) * m_vol[6]) >> 8;
 
 	if (m_filter_l[0][3] != nullptr)
-		m_filter_l[0][3]->flt_volume_set_volume(left / 100.0);
+		m_filter_l[0][3]->set_gain(left / 100.0);
 	if (m_filter_r[0][3] != nullptr)
-		m_filter_r[0][3]->flt_volume_set_volume(right / 100.0); /* FM #0 */
+		m_filter_r[0][3]->set_gain(right / 100.0); /* FM #0 */
 }
 
 void darius_state::update_fm1()
@@ -275,9 +491,9 @@ void darius_state::update_fm1()
 	const int right = ((0xff - m_pan[1]) * m_vol[7]) >> 8;
 
 	if (m_filter_l[1][3] != nullptr)
-		m_filter_l[1][3]->flt_volume_set_volume(left / 100.0);
+		m_filter_l[1][3]->set_gain(left / 100.0);
 	if (m_filter_r[1][3] != nullptr)
-		m_filter_r[1][3]->flt_volume_set_volume(right / 100.0); /* FM #1 */
+		m_filter_r[1][3]->set_gain(right / 100.0); /* FM #1 */
 }
 
 void darius_state::update_psg0(int port)
@@ -296,9 +512,9 @@ void darius_state::update_psg0(int port)
 	const int right = ((0xff - m_pan[2]) * m_vol[port]) >> 8;
 
 	if (lvol != nullptr)
-		lvol->flt_volume_set_volume(left / 100.0);
+		lvol->set_gain(left / 100.0);
 	if (rvol != nullptr)
-		rvol->flt_volume_set_volume(right / 100.0);
+		rvol->set_gain(right / 100.0);
 }
 
 void darius_state::update_psg1(int port)
@@ -317,9 +533,9 @@ void darius_state::update_psg1(int port)
 	const int right = ((0xff - m_pan[3]) * m_vol[port + 3]) >> 8;
 
 	if (lvol != nullptr)
-		lvol->flt_volume_set_volume(left / 100.0);
+		lvol->set_gain(left / 100.0);
 	if (rvol != nullptr)
-		rvol->flt_volume_set_volume(right / 100.0);
+		rvol->set_gain(right / 100.0);
 }
 
 void darius_state::update_da()
@@ -328,9 +544,9 @@ void darius_state::update_da()
 	const int right = m_def_vol[(m_pan[4] >> 4) & 0x0f];
 
 	if (m_msm5205_l != nullptr)
-		m_msm5205_l->flt_volume_set_volume(left / 100.0);
+		m_msm5205_l->set_gain(left / 100.0);
 	if (m_msm5205_r != nullptr)
-		m_msm5205_r->flt_volume_set_volume(right / 100.0);
+		m_msm5205_r->set_gain(right / 100.0);
 }
 
 void darius_state::fm0_pan_w(u8 data)
@@ -415,9 +631,9 @@ void darius_state::write_portB1(u8 data)
 }
 
 
-/*****************************************************
-           Sound memory structures / ADPCM
-*****************************************************/
+/*******************************************************************************
+        Sound memory structures / ADPCM
+*******************************************************************************/
 
 void darius_state::darius_sound_map(address_map &map)
 {
@@ -445,7 +661,7 @@ void darius_state::darius_sound2_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(darius_state::adpcm_int)
+void darius_state::adpcm_int(int state)
 {
 	if (m_nmi_enable)
 		m_adpcm->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -495,9 +711,9 @@ void darius_state::darius_sound2_io_map(address_map &map)
 }
 
 
-/***********************************************************
-                      INPUT PORTS, DIPs
-***********************************************************/
+/*******************************************************************************
+        INPUT PORTS, DIPs
+*******************************************************************************/
 
 #define TAITO_COINAGE_JAPAN_16 \
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6") \
@@ -614,9 +830,9 @@ static INPUT_PORTS_START( dariusu ) // US version uses the Japan coinage setting
 INPUT_PORTS_END
 
 
-/**************************************************************
-                           GFX DECODING
-**************************************************************/
+/*******************************************************************************
+        GFX DECODING
+*******************************************************************************/
 
 static const gfx_layout tilelayout =
 {
@@ -642,14 +858,17 @@ static const gfx_layout textlayout =
 
 static GFXDECODE_START( gfx_darius )
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0, 128 )  /* sprites */
-	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 )  /* scr tiles */
 	GFXDECODE_ENTRY( "text",    0, textlayout,           0, 128 )  /* top layer scr tiles */
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_darius_tmap )
+	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 )  /* scr tiles */
+GFXDECODE_END
 
-/***********************************************************
-                       MACHINE DRIVERS
-***********************************************************/
+
+/*******************************************************************************
+        MACHINE DRIVERS
+*******************************************************************************/
 
 void darius_state::device_post_load()
 {
@@ -746,12 +965,10 @@ void darius_state::darius(machine_config &config)
 	rscreen.set_screen_update(FUNC(darius_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(1);
+	PC080SN(config, m_pc080sn, 0, m_palette, gfx_darius_tmap);
 	m_pc080sn->set_offsets(-16, 8);
 	m_pc080sn->set_yinvert(0);
 	m_pc080sn->set_dblwidth(1);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -801,14 +1018,14 @@ void darius_state::darius(machine_config &config)
 	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
-/***************************************************************************
-                                  DRIVERS
-***************************************************************************/
+/*******************************************************************************
+        ROM DEFINITIONS
+*******************************************************************************/
 
 ROM_START( darius )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
@@ -1093,6 +1310,12 @@ ROM_START( dariuse )
 	ROM_LOAD16_BYTE( "a96-26.165", 0x0800, 0x0400, CRC(4891b9c0) SHA1(1f550a9a4ad3ca379f88f5865ed1b281c7b87f31) )
 ROM_END
 
+} // anonymous namespace
+
+
+/*******************************************************************************
+        DRIVERS
+*******************************************************************************/
 
 GAME( 1986, darius,  0,       darius,  darius,  darius_state, empty_init, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dariusu, darius,  darius,  dariusu, darius_state, empty_init, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )

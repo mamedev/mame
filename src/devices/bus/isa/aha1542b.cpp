@@ -79,12 +79,12 @@ void aha1542a_device::scsi_rstreq_clear_w(u8 data)
 {
 }
 
-READ_LINE_MEMBER(aha1542a_device::host_int_r)
+int aha1542a_device::host_int_r()
 {
 	return 0;
 }
 
-READ_LINE_MEMBER(aha1542a_device::scsi_rstreq_r)
+int aha1542a_device::scsi_rstreq_r()
 {
 	return 0;
 }

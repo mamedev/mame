@@ -56,6 +56,8 @@
 #include "machine/nvram.h"
 
 
+namespace {
+
 class eacc_state : public driver_device
 {
 public:
@@ -77,9 +79,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(scan_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(inputs_w);
+	void scan_w(int state);
+	void cb2_w(int state);
+	void inputs_w(int state);
 	uint8_t keyboard_r();
 	void digit_w(uint8_t data);
 	void segment_w(uint8_t data);
@@ -164,7 +166,7 @@ void eacc_state::machine_start()
 	save_item(NAME(m_disp));
 }
 
-WRITE_LINE_MEMBER( eacc_state::inputs_w )
+void eacc_state::inputs_w(int state)
 {
 	if (state)
 		m_pia->ca1_w(machine().rand() & 1); // movement
@@ -186,13 +188,13 @@ void eacc_state::do_nmi(bool in_scan, bool in_cb2)
 	}
 }
 
-WRITE_LINE_MEMBER( eacc_state::cb2_w )
+void eacc_state::cb2_w(int state)
 {
 	m_cb2 = state ? 1 : 0;
 	do_nmi(m_scan, m_cb2);
 }
 
-WRITE_LINE_MEMBER( eacc_state::scan_w )
+void eacc_state::scan_w(int state)
 {
 	m_scan = state ? 1 : 0;
 	do_nmi(m_scan, m_cb2);
@@ -259,7 +261,7 @@ void eacc_state::eacc(machine_config &config)
 
 	config.set_default_layout(layout_eacc);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpb_handler().set(FUNC(eacc_state::keyboard_r));
 	m_pia->writepa_handler().set(FUNC(eacc_state::segment_w));
 	m_pia->writepb_handler().set(FUNC(eacc_state::digit_w));
@@ -292,6 +294,8 @@ ROM_START(eacc)
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_LOAD("eacc.bin", 0x0000, 0x0800, CRC(287a63c0) SHA1(f61b397d33ea40e5742e34d5f5468572125e8b39) )
 ROM_END
+
+} // anonymous namespace
 
 
 /******************************************************************************

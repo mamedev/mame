@@ -40,6 +40,9 @@ Lower board (MGP_01):
 
 #include "monzagp.lh"
 
+
+namespace {
+
 class monzagp_state : public driver_device
 {
 public:
@@ -604,6 +607,8 @@ ROM_START( monzagpb )
 	ROM_LOAD( "6300.6",      0x0500, 0x0100, CRC(8274f838) SHA1(c3518c668bda98759b1b1d4690062ced6c639efe) )
 	ROM_LOAD( "6300.7",      0x0600, 0x0100, CRC(3248ba56) SHA1(d449f4be8df1b4189afca55a4cf0cc2e19eb4dd4) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, empty_init, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND, layout_monzagp )

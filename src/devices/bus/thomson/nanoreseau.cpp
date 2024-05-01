@@ -85,9 +85,9 @@ void nanoreseau_device::rom_map(address_map &map)
 
 void nanoreseau_device::io_map(address_map &map)
 {
-	map(0, 3).rw(m_mc6854, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
+	map(0x10, 0x13).rw(m_mc6854, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
 	if (!m_no_id)
-		map(8, 8).r(FUNC(nanoreseau_device::id_r));
+		map(0x18, 0x18).r(FUNC(nanoreseau_device::id_r));
 }
 
 const tiny_rom_entry *nanoreseau_to_device::device_rom_region() const

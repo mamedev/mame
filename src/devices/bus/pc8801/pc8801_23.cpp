@@ -81,7 +81,7 @@ void pc8801_23_device::irq_mask_w(u8 data)
 		int4_w(m_irq_pending);
 }
 
-WRITE_LINE_MEMBER( pc8801_23_device::int4_w )
+void pc8801_23_device::int4_w(int state)
 {
 	bool irq_state = (!m_irq_mask) & state;
 	pc8801_exp_device::int4_w(irq_state);

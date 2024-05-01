@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -17,6 +17,11 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filewritestream.h"
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
 
 using namespace rapidjson;
 
@@ -162,6 +167,7 @@ TEST(PrettyWriter, OStreamWrapper) {
 TEST(PrettyWriter, FileWriteStream) {
     char filename[L_tmpnam];
     FILE* fp = TempFile(filename);
+    ASSERT_TRUE(fp!=NULL);
     char buffer[16];
     FileWriteStream os(fp, buffer, sizeof(buffer));
     PrettyWriter<FileWriteStream> writer(os);
@@ -201,3 +207,167 @@ TEST(PrettyWriter, RawValue) {
         "}",
         buffer.GetString());
 }
+
+TEST(PrettyWriter, InvalidEventSequence) {
+    // {]
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.EndArray(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // [}
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartArray();
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 1:
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.Int(1), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 'a' }
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 'a':'b','c' }
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        writer.String("b");
+        writer.Key("c");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+}
+
+TEST(PrettyWriter, NaN) {
+    double nan = std::numeric_limits<double>::quiet_NaN();
+
+    EXPECT_TRUE(internal::Double(nan).IsNan());
+    StringBuffer buffer;
+    {
+        PrettyWriter<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(nan));
+    }
+    {
+        PrettyWriter<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(nan));
+        EXPECT_STREQ("NaN", buffer.GetString());
+    }
+    GenericStringBuffer<UTF16<> > buffer2;
+    PrettyWriter<GenericStringBuffer<UTF16<> > > writer2(buffer2);
+    EXPECT_FALSE(writer2.Double(nan));
+}
+
+TEST(PrettyWriter, Inf) {
+    double inf = std::numeric_limits<double>::infinity();
+
+    EXPECT_TRUE(internal::Double(inf).IsInf());
+    StringBuffer buffer;
+    {
+        PrettyWriter<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(inf));
+    }
+    {
+        PrettyWriter<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(-inf));
+    }
+    {
+        PrettyWriter<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(inf));
+    }
+    {
+        PrettyWriter<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(-inf));
+    }
+    EXPECT_STREQ("Infinity-Infinity", buffer.GetString());
+}
+
+TEST(PrettyWriter, Issue_889) {
+    char buf[100] = "Hello";
+    
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.String(buf);
+    writer.EndArray();
+    
+    EXPECT_STREQ("[\n    \"Hello\"\n]", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
+}
+
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+static PrettyWriter<StringBuffer> WriterGen(StringBuffer &target) {
+    PrettyWriter<StringBuffer> writer(target);
+    writer.StartObject();
+    writer.Key("a");
+    writer.Int(1);
+    return writer;
+}
+
+TEST(PrettyWriter, MoveCtor) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(WriterGen(buffer));
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ(
+        "{\n"
+        "    \"a\": 1\n"
+        "}",
+        buffer.GetString());
+}
+#endif
+
+TEST(PrettyWriter, Issue_1336) {
+#define T(meth, val, expected)                          \
+    {                                                   \
+        StringBuffer buffer;                            \
+        PrettyWriter<StringBuffer> writer(buffer);      \
+        writer.meth(val);                               \
+                                                        \
+        EXPECT_STREQ(expected, buffer.GetString());     \
+        EXPECT_TRUE(writer.IsComplete());               \
+    }
+
+    T(Bool, false, "false");
+    T(Bool, true, "true");
+    T(Int, 0, "0");
+    T(Uint, 0, "0");
+    T(Int64, 0, "0");
+    T(Uint64, 0, "0");
+    T(Double, 0, "0.0");
+    T(String, "Hello", "\"Hello\"");
+#undef T
+
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.Null();
+
+    EXPECT_STREQ("null", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete());
+}
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif

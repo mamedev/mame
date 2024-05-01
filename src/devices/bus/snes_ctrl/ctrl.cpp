@@ -85,8 +85,8 @@ snes_control_port_device::~snes_control_port_device()
 void snes_control_port_device::device_start()
 {
 	m_device = get_card_device();
-	m_onscreen_cb.resolve();
-	m_gunlatch_cb.resolve();
+	m_onscreen_cb.resolve_safe(true);
+	m_gunlatch_cb.resolve_safe();
 }
 
 

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -188,7 +188,8 @@ namespace bgfx { namespace gl
 		GLenum m_fmt;
 		GLenum m_fmtSrgb;
 		GLenum m_type;
-		bool m_supported;
+		bool   m_supported;
+		GLint  m_mapping[4];
 	};
 
 // In desktop OpenGL 4+ and OpenGL ES 3.0+, specific GL formats GL_x_INTEGER are used for integer textures.
@@ -208,91 +209,116 @@ namespace bgfx { namespace gl
 
 	static TextureFormatInfo s_textureFormat[] =
 	{
-		{ GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT,       GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,            GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,            GL_ZERO,                         false }, // BC1
-		{ GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT,       GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,            GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,            GL_ZERO,                         false }, // BC2
-		{ GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,       GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,            GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,            GL_ZERO,                         false }, // BC3
-		{ GL_COMPRESSED_LUMINANCE_LATC1_EXT,           GL_ZERO,                                      GL_COMPRESSED_LUMINANCE_LATC1_EXT,           GL_COMPRESSED_LUMINANCE_LATC1_EXT,           GL_ZERO,                         false }, // BC4
-		{ GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     GL_ZERO,                                      GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     GL_ZERO,                         false }, // BC5
-		{ GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     GL_ZERO,                                      GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     GL_ZERO,                         false }, // BC6H
-		{ GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,           GL_ZERO,                                      GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,           GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,           GL_ZERO,                         false }, // BC7
-		{ GL_ETC1_RGB8_OES,                            GL_ZERO,                                      GL_ETC1_RGB8_OES,                            GL_ETC1_RGB8_OES,                            GL_ZERO,                         false }, // ETC1
-		{ GL_COMPRESSED_RGB8_ETC2,                     GL_ZERO,                                      GL_COMPRESSED_RGB8_ETC2,                     GL_COMPRESSED_RGB8_ETC2,                     GL_ZERO,                         false }, // ETC2
-		{ GL_COMPRESSED_RGBA8_ETC2_EAC,                GL_COMPRESSED_SRGB8_ETC2,                     GL_COMPRESSED_RGBA8_ETC2_EAC,                GL_COMPRESSED_RGBA8_ETC2_EAC,                GL_ZERO,                         false }, // ETC2A
-		{ GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO,                         false }, // ETC2A1
-		{ GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          GL_COMPRESSED_SRGB_PVRTC_2BPPV1_EXT,          GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          GL_ZERO,                         false }, // PTC12
-		{ GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          GL_COMPRESSED_SRGB_PVRTC_4BPPV1_EXT,          GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          GL_ZERO,                         false }, // PTC14
-		{ GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         GL_COMPRESSED_SRGB_ALPHA_PVRTC_2BPPV1_EXT,    GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         GL_ZERO,                         false }, // PTC12A
-		{ GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         GL_COMPRESSED_SRGB_ALPHA_PVRTC_4BPPV1_EXT,    GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         GL_ZERO,                         false }, // PTC14A
-		{ GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         GL_ZERO,                                      GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         GL_ZERO,                         false }, // PTC22
-		{ GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_ZERO,                                      GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_ZERO,                         false }, // PTC24
-		{ GL_ATC_RGB_AMD,                              GL_ZERO,                                      GL_ATC_RGB_AMD,                              GL_ATC_RGB_AMD,                              GL_ZERO,                         false }, // ATC
-		{ GL_ATC_RGBA_EXPLICIT_ALPHA_AMD,              GL_ZERO,                                      GL_ATC_RGBA_EXPLICIT_ALPHA_AMD,              GL_ATC_RGBA_EXPLICIT_ALPHA_AMD,              GL_ZERO,                         false }, // ATCE
-		{ GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          GL_ZERO,                                      GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          GL_ZERO,                         false }, // ATCI
-		{ GL_COMPRESSED_RGBA_ASTC_4x4_KHR,             GL_COMPRESSED_SRGB8_ASTC_4x4_KHR,             GL_COMPRESSED_RGBA_ASTC_4x4_KHR,             GL_COMPRESSED_RGBA_ASTC_4x4_KHR,             GL_ZERO,                         false }, // ASTC4x4
-		{ GL_COMPRESSED_RGBA_ASTC_5x5_KHR,             GL_COMPRESSED_SRGB8_ASTC_5x5_KHR,             GL_COMPRESSED_RGBA_ASTC_5x5_KHR,             GL_COMPRESSED_RGBA_ASTC_5x5_KHR,             GL_ZERO,                         false }, // ASTC5x5
-		{ GL_COMPRESSED_RGBA_ASTC_6x6_KHR,             GL_COMPRESSED_SRGB8_ASTC_6x6_KHR,             GL_COMPRESSED_RGBA_ASTC_6x6_KHR,             GL_COMPRESSED_RGBA_ASTC_6x6_KHR,             GL_ZERO,                         false }, // ASTC6x6
-		{ GL_COMPRESSED_RGBA_ASTC_8x5_KHR,             GL_COMPRESSED_SRGB8_ASTC_8x5_KHR,             GL_COMPRESSED_RGBA_ASTC_8x5_KHR,             GL_COMPRESSED_RGBA_ASTC_8x5_KHR,             GL_ZERO,                         false }, // ASTC8x5
-		{ GL_COMPRESSED_RGBA_ASTC_8x6_KHR,             GL_COMPRESSED_SRGB8_ASTC_8x6_KHR,             GL_COMPRESSED_RGBA_ASTC_8x6_KHR,             GL_COMPRESSED_RGBA_ASTC_8x6_KHR,             GL_ZERO,                         false }, // ASTC8x6
-		{ GL_COMPRESSED_RGBA_ASTC_10x5_KHR,            GL_COMPRESSED_SRGB8_ASTC_10x5_KHR,            GL_COMPRESSED_RGBA_ASTC_10x5_KHR,            GL_COMPRESSED_RGBA_ASTC_10x5_KHR,            GL_ZERO,                         false }, // ASTC10x5
-		{ GL_ZERO,                                     GL_ZERO,                                      GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         false }, // Unknown
-		{ GL_ZERO,                                     GL_ZERO,                                      GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         false }, // R1
-		{ GL_ALPHA,                                    GL_ZERO,                                      GL_ALPHA,                                    GL_ALPHA,                                    GL_UNSIGNED_BYTE,                false }, // A8
-		{ GL_R8,                                       GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_UNSIGNED_BYTE,                false }, // R8
-		{ GL_R8I,                                      GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_BYTE,                         false }, // R8I
-		{ GL_R8UI,                                     GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_UNSIGNED_BYTE,                false }, // R8U
-		{ GL_R8_SNORM,                                 GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_BYTE,                         false }, // R8S
-		{ GL_R16,                                      GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_UNSIGNED_SHORT,               false }, // R16
-		{ GL_R16I,                                     GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_SHORT,                        false }, // R16I
-		{ GL_R16UI,                                    GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_UNSIGNED_SHORT,               false }, // R16U
-		{ GL_R16F,                                     GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_HALF_FLOAT,                   false }, // R16F
-		{ GL_R16_SNORM,                                GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_SHORT,                        false }, // R16S
-		{ GL_R32I,                                     GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_INT,                          false }, // R32I
-		{ GL_R32UI,                                    GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_UNSIGNED_INT,                 false }, // R32U
-		{ GL_R32F,                                     GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_FLOAT,                        false }, // R32F
-		{ GL_RG8,                                      GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_UNSIGNED_BYTE,                false }, // RG8
-		{ GL_RG8I,                                     GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_BYTE,                         false }, // RG8I
-		{ GL_RG8UI,                                    GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_UNSIGNED_BYTE,                false }, // RG8U
-		{ GL_RG8_SNORM,                                GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_BYTE,                         false }, // RG8S
-		{ GL_RG16,                                     GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_UNSIGNED_SHORT,               false }, // RG16
-		{ GL_RG16I,                                    GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_SHORT,                        false }, // RG16I
-		{ GL_RG16UI,                                   GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_UNSIGNED_SHORT,               false }, // RG16U
-		{ GL_RG16F,                                    GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_HALF_FLOAT,                   false }, // RG16F
-		{ GL_RG16_SNORM,                               GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_SHORT,                        false }, // RG16S
-		{ GL_RG32I,                                    GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_INT,                          false }, // RG32I
-		{ GL_RG32UI,                                   GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_UNSIGNED_INT,                 false }, // RG32U
-		{ GL_RG32F,                                    GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_FLOAT,                        false }, // RG32F
-		{ GL_RGB8,                                     GL_SRGB8,                                     GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_BYTE,                false }, // RGB8
-		{ GL_RGB8I,                                    GL_ZERO,                                      RGB_INTEGER,                                 GL_RGB_INTEGER,                              GL_BYTE,                         false }, // RGB8I
-		{ GL_RGB8UI,                                   GL_ZERO,                                      RGB_INTEGER,                                 GL_RGB_INTEGER,                              GL_UNSIGNED_BYTE,                false }, // RGB8U
-		{ GL_RGB8_SNORM,                               GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_BYTE,                         false }, // RGB8S
-		{ GL_RGB9_E5,                                  GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_INT_5_9_9_9_REV,     false }, // RGB9E5F
-		{ GL_RGBA8,                                    GL_SRGB8_ALPHA8,                              GL_BGRA,                                     GL_BGRA,                                     GL_UNSIGNED_BYTE,                false }, // BGRA8
-		{ GL_RGBA8,                                    GL_SRGB8_ALPHA8,                              GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_BYTE,                false }, // RGBA8
-		{ GL_RGBA8I,                                   GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_BYTE,                         false }, // RGBA8I
-		{ GL_RGBA8UI,                                  GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_UNSIGNED_BYTE,                false }, // RGBA8U
-		{ GL_RGBA8_SNORM,                              GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_BYTE,                         false }, // RGBA8S
-		{ GL_RGBA16,                                   GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_SHORT,               false }, // RGBA16
-		{ GL_RGBA16I,                                  GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_SHORT,                        false }, // RGBA16I
-		{ GL_RGBA16UI,                                 GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_UNSIGNED_SHORT,               false }, // RGBA16U
-		{ GL_RGBA16F,                                  GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_HALF_FLOAT,                   false }, // RGBA16F
-		{ GL_RGBA16_SNORM,                             GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_SHORT,                        false }, // RGBA16S
-		{ GL_RGBA32I,                                  GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_INT,                          false }, // RGBA32I
-		{ GL_RGBA32UI,                                 GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_UNSIGNED_INT,                 false }, // RGBA32U
-		{ GL_RGBA32F,                                  GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_FLOAT,                        false }, // RGBA32F
-		{ GL_RGB565,                                   GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_SHORT_5_6_5,         false }, // R5G6B5
-		{ GL_RGBA4,                                    GL_ZERO,                                      GL_BGRA,                                     GL_BGRA,                                     GL_UNSIGNED_SHORT_4_4_4_4_REV,   false }, // RGBA4
-		{ GL_RGB5_A1,                                  GL_ZERO,                                      GL_BGRA,                                     GL_BGRA,                                     GL_UNSIGNED_SHORT_1_5_5_5_REV,   false }, // RGB5A1
-		{ GL_RGB10_A2,                                 GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_INT_2_10_10_10_REV,  false }, // RGB10A2
-		{ GL_R11F_G11F_B10F,                           GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_INT_10F_11F_11F_REV, false }, // RG11B10F
-		{ GL_ZERO,                                     GL_ZERO,                                      GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         false }, // UnknownDepth
-		{ GL_DEPTH_COMPONENT16,                        GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_UNSIGNED_SHORT,               false }, // D16
-		{ GL_DEPTH_COMPONENT24,                        GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_UNSIGNED_INT,                 false }, // D24
-		{ GL_DEPTH24_STENCIL8,                         GL_ZERO,                                      GL_DEPTH_STENCIL,                            GL_DEPTH_STENCIL,                            GL_UNSIGNED_INT_24_8,            false }, // D24S8
-		{ GL_DEPTH_COMPONENT32,                        GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_UNSIGNED_INT,                 false }, // D32
-		{ GL_DEPTH_COMPONENT32F,                       GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false }, // D16F
-		{ GL_DEPTH_COMPONENT32F,                       GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false }, // D24F
-		{ GL_DEPTH_COMPONENT32F,                       GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false }, // D32F
-		{ GL_STENCIL_INDEX8,                           GL_ZERO,                                      GL_STENCIL_INDEX,                            GL_STENCIL_INDEX,                            GL_UNSIGNED_BYTE,                false }, // D0S8
+#define $_ -1
+#define $0 GL_ZERO
+#define $1 GL_ONE
+#define $R GL_RED
+#define $G GL_GREEN
+#define $B GL_BLUE
+#define $A GL_ALPHA
+		{ GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT,       GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,            GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,            GL_ZERO,                         false, { $_, $_, $_, $_ } }, // BC1
+		{ GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT,       GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,            GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,            GL_ZERO,                         false, { $_, $_, $_, $_ } }, // BC2
+		{ GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,       GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,            GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,            GL_ZERO,                         false, { $_, $_, $_, $_ } }, // BC3
+		{ GL_COMPRESSED_LUMINANCE_LATC1_EXT,           GL_ZERO,                                      GL_COMPRESSED_LUMINANCE_LATC1_EXT,           GL_COMPRESSED_LUMINANCE_LATC1_EXT,           GL_ZERO,                         false, { $_, $_, $_, $_ } }, // BC4
+		{ GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     GL_ZERO,                                      GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,     GL_ZERO,                         false, { $_, $_, $_, $_ } }, // BC5
+		{ GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     GL_ZERO,                                      GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,     GL_ZERO,                         false, { $_, $_, $_, $_ } }, // BC6H
+		{ GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,           GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB,      GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,           GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,           GL_ZERO,                         false, { $_, $_, $_, $_ } }, // BC7
+		{ GL_ETC1_RGB8_OES,                            GL_ZERO,                                      GL_ETC1_RGB8_OES,                            GL_ETC1_RGB8_OES,                            GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ETC1
+		{ GL_COMPRESSED_RGB8_ETC2,                     GL_ZERO,                                      GL_COMPRESSED_RGB8_ETC2,                     GL_COMPRESSED_RGB8_ETC2,                     GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ETC2
+		{ GL_COMPRESSED_RGBA8_ETC2_EAC,                GL_COMPRESSED_SRGB8_ETC2,                     GL_COMPRESSED_RGBA8_ETC2_EAC,                GL_COMPRESSED_RGBA8_ETC2_EAC,                GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ETC2A
+		{ GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ETC2A1
+		{ GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          GL_COMPRESSED_SRGB_PVRTC_2BPPV1_EXT,          GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG,          GL_ZERO,                         false, { $_, $_, $_, $_ } }, // PTC12
+		{ GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          GL_COMPRESSED_SRGB_PVRTC_4BPPV1_EXT,          GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,          GL_ZERO,                         false, { $_, $_, $_, $_ } }, // PTC14
+		{ GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         GL_COMPRESSED_SRGB_ALPHA_PVRTC_2BPPV1_EXT,    GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG,         GL_ZERO,                         false, { $_, $_, $_, $_ } }, // PTC12A
+		{ GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         GL_COMPRESSED_SRGB_ALPHA_PVRTC_4BPPV1_EXT,    GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG,         GL_ZERO,                         false, { $_, $_, $_, $_ } }, // PTC14A
+		{ GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         GL_ZERO,                                      GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG,         GL_ZERO,                         false, { $_, $_, $_, $_ } }, // PTC22
+		{ GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_ZERO,                                      GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_ZERO,                         false, { $_, $_, $_, $_ } }, // PTC24
+		{ GL_ATC_RGB_AMD,                              GL_ZERO,                                      GL_ATC_RGB_AMD,                              GL_ATC_RGB_AMD,                              GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ATC
+		{ GL_ATC_RGBA_EXPLICIT_ALPHA_AMD,              GL_ZERO,                                      GL_ATC_RGBA_EXPLICIT_ALPHA_AMD,              GL_ATC_RGBA_EXPLICIT_ALPHA_AMD,              GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ATCE
+		{ GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          GL_ZERO,                                      GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ATCI
+		{ GL_COMPRESSED_RGBA_ASTC_4x4_KHR,             GL_COMPRESSED_SRGB8_ASTC_4x4_KHR,             GL_COMPRESSED_RGBA_ASTC_4x4_KHR,             GL_COMPRESSED_RGBA_ASTC_4x4_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC4x4
+		{ GL_COMPRESSED_RGBA_ASTC_5x4_KHR,             GL_COMPRESSED_SRGB8_ASTC_5x4_KHR,             GL_COMPRESSED_RGBA_ASTC_5x4_KHR,             GL_COMPRESSED_RGBA_ASTC_5x4_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC5x4
+		{ GL_COMPRESSED_RGBA_ASTC_5x5_KHR,             GL_COMPRESSED_SRGB8_ASTC_5x5_KHR,             GL_COMPRESSED_RGBA_ASTC_5x5_KHR,             GL_COMPRESSED_RGBA_ASTC_5x5_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC5x5
+		{ GL_COMPRESSED_RGBA_ASTC_6x5_KHR,             GL_COMPRESSED_SRGB8_ASTC_6x5_KHR,             GL_COMPRESSED_RGBA_ASTC_6x5_KHR,             GL_COMPRESSED_RGBA_ASTC_6x5_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC6x5
+		{ GL_COMPRESSED_RGBA_ASTC_6x6_KHR,             GL_COMPRESSED_SRGB8_ASTC_6x6_KHR,             GL_COMPRESSED_RGBA_ASTC_6x6_KHR,             GL_COMPRESSED_RGBA_ASTC_6x6_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC6x6
+		{ GL_COMPRESSED_RGBA_ASTC_8x5_KHR,             GL_COMPRESSED_SRGB8_ASTC_8x5_KHR,             GL_COMPRESSED_RGBA_ASTC_8x5_KHR,             GL_COMPRESSED_RGBA_ASTC_8x5_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC8x5
+		{ GL_COMPRESSED_RGBA_ASTC_8x6_KHR,             GL_COMPRESSED_SRGB8_ASTC_8x6_KHR,             GL_COMPRESSED_RGBA_ASTC_8x6_KHR,             GL_COMPRESSED_RGBA_ASTC_8x6_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC8x6
+		{ GL_COMPRESSED_RGBA_ASTC_8x8_KHR,             GL_COMPRESSED_SRGB8_ASTC_8x8_KHR,             GL_COMPRESSED_RGBA_ASTC_8x8_KHR,             GL_COMPRESSED_RGBA_ASTC_8x8_KHR,             GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC8x8
+		{ GL_COMPRESSED_RGBA_ASTC_10x5_KHR,            GL_COMPRESSED_SRGB8_ASTC_10x5_KHR,            GL_COMPRESSED_RGBA_ASTC_10x5_KHR,            GL_COMPRESSED_RGBA_ASTC_10x5_KHR,            GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC10x5
+		{ GL_COMPRESSED_RGBA_ASTC_10x6_KHR,            GL_COMPRESSED_SRGB8_ASTC_10x6_KHR,            GL_COMPRESSED_RGBA_ASTC_10x6_KHR,            GL_COMPRESSED_RGBA_ASTC_10x6_KHR,            GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC10x6
+		{ GL_COMPRESSED_RGBA_ASTC_10x8_KHR,            GL_COMPRESSED_SRGB8_ASTC_10x8_KHR,            GL_COMPRESSED_RGBA_ASTC_10x8_KHR,            GL_COMPRESSED_RGBA_ASTC_10x8_KHR,            GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC10x8
+		{ GL_COMPRESSED_RGBA_ASTC_10x10_KHR,           GL_COMPRESSED_SRGB8_ASTC_10x10_KHR,           GL_COMPRESSED_RGBA_ASTC_10x10_KHR,           GL_COMPRESSED_RGBA_ASTC_10x10_KHR,           GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC10x10
+		{ GL_COMPRESSED_RGBA_ASTC_12x10_KHR,           GL_COMPRESSED_SRGB8_ASTC_12x10_KHR,           GL_COMPRESSED_RGBA_ASTC_12x10_KHR,           GL_COMPRESSED_RGBA_ASTC_12x10_KHR,           GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC12x10
+		{ GL_COMPRESSED_RGBA_ASTC_12x12_KHR,           GL_COMPRESSED_SRGB8_ASTC_12x12_KHR,           GL_COMPRESSED_RGBA_ASTC_12x12_KHR,           GL_COMPRESSED_RGBA_ASTC_12x12_KHR,           GL_ZERO,                         false, { $_, $_, $_, $_ } }, // ASTC12x12
+		{ GL_ZERO,                                     GL_ZERO,                                      GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         false, { $_, $_, $_, $_ } }, // Unknown
+		{ GL_ZERO,                                     GL_ZERO,                                      GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         false, { $_, $_, $_, $_ } }, // R1
+		{ GL_ALPHA,                                    GL_ZERO,                                      GL_ALPHA,                                    GL_ALPHA,                                    GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // A8
+		{ GL_R8,                                       GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // R8
+		{ GL_R8I,                                      GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_BYTE,                         false, { $_, $_, $_, $_ } }, // R8I
+		{ GL_R8UI,                                     GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // R8U
+		{ GL_R8_SNORM,                                 GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_BYTE,                         false, { $_, $_, $_, $_ } }, // R8S
+		{ GL_R16,                                      GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_UNSIGNED_SHORT,               false, { $_, $_, $_, $_ } }, // R16
+		{ GL_R16I,                                     GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_SHORT,                        false, { $_, $_, $_, $_ } }, // R16I
+		{ GL_R16UI,                                    GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_UNSIGNED_SHORT,               false, { $_, $_, $_, $_ } }, // R16U
+		{ GL_R16F,                                     GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_HALF_FLOAT,                   false, { $_, $_, $_, $_ } }, // R16F
+		{ GL_R16_SNORM,                                GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_SHORT,                        false, { $_, $_, $_, $_ } }, // R16S
+		{ GL_R32I,                                     GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_INT,                          false, { $_, $_, $_, $_ } }, // R32I
+		{ GL_R32UI,                                    GL_ZERO,                                      RED_INTEGER,                                 GL_RED_INTEGER,                              GL_UNSIGNED_INT,                 false, { $_, $_, $_, $_ } }, // R32U
+		{ GL_R32F,                                     GL_ZERO,                                      GL_RED,                                      GL_RED,                                      GL_FLOAT,                        false, { $_, $_, $_, $_ } }, // R32F
+		{ GL_RG8,                                      GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // RG8
+		{ GL_RG8I,                                     GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_BYTE,                         false, { $_, $_, $_, $_ } }, // RG8I
+		{ GL_RG8UI,                                    GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // RG8U
+		{ GL_RG8_SNORM,                                GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_BYTE,                         false, { $_, $_, $_, $_ } }, // RG8S
+		{ GL_RG16,                                     GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_UNSIGNED_SHORT,               false, { $_, $_, $_, $_ } }, // RG16
+		{ GL_RG16I,                                    GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_SHORT,                        false, { $_, $_, $_, $_ } }, // RG16I
+		{ GL_RG16UI,                                   GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_UNSIGNED_SHORT,               false, { $_, $_, $_, $_ } }, // RG16U
+		{ GL_RG16F,                                    GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_HALF_FLOAT,                   false, { $_, $_, $_, $_ } }, // RG16F
+		{ GL_RG16_SNORM,                               GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_SHORT,                        false, { $_, $_, $_, $_ } }, // RG16S
+		{ GL_RG32I,                                    GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_INT,                          false, { $_, $_, $_, $_ } }, // RG32I
+		{ GL_RG32UI,                                   GL_ZERO,                                      RG_INTEGER,                                  GL_RG_INTEGER,                               GL_UNSIGNED_INT,                 false, { $_, $_, $_, $_ } }, // RG32U
+		{ GL_RG32F,                                    GL_ZERO,                                      GL_RG,                                       GL_RG,                                       GL_FLOAT,                        false, { $_, $_, $_, $_ } }, // RG32F
+		{ GL_RGB8,                                     GL_SRGB8,                                     GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // RGB8
+		{ GL_RGB8I,                                    GL_ZERO,                                      RGB_INTEGER,                                 GL_RGB_INTEGER,                              GL_BYTE,                         false, { $_, $_, $_, $_ } }, // RGB8I
+		{ GL_RGB8UI,                                   GL_ZERO,                                      RGB_INTEGER,                                 GL_RGB_INTEGER,                              GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // RGB8U
+		{ GL_RGB8_SNORM,                               GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_BYTE,                         false, { $_, $_, $_, $_ } }, // RGB8S
+		{ GL_RGB9_E5,                                  GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_INT_5_9_9_9_REV,     false, { $_, $_, $_, $_ } }, // RGB9E5F
+		{ GL_RGBA8,                                    GL_SRGB8_ALPHA8,                              GL_BGRA,                                     GL_BGRA,                                     GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // BGRA8
+		{ GL_RGBA8,                                    GL_SRGB8_ALPHA8,                              GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // RGBA8
+		{ GL_RGBA8I,                                   GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_BYTE,                         false, { $_, $_, $_, $_ } }, // RGBA8I
+		{ GL_RGBA8UI,                                  GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // RGBA8U
+		{ GL_RGBA8_SNORM,                              GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_BYTE,                         false, { $_, $_, $_, $_ } }, // RGBA8S
+		{ GL_RGBA16,                                   GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_SHORT,               false, { $_, $_, $_, $_ } }, // RGBA16
+		{ GL_RGBA16I,                                  GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_SHORT,                        false, { $_, $_, $_, $_ } }, // RGBA16I
+		{ GL_RGBA16UI,                                 GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_UNSIGNED_SHORT,               false, { $_, $_, $_, $_ } }, // RGBA16U
+		{ GL_RGBA16F,                                  GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_HALF_FLOAT,                   false, { $_, $_, $_, $_ } }, // RGBA16F
+		{ GL_RGBA16_SNORM,                             GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_SHORT,                        false, { $_, $_, $_, $_ } }, // RGBA16S
+		{ GL_RGBA32I,                                  GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_INT,                          false, { $_, $_, $_, $_ } }, // RGBA32I
+		{ GL_RGBA32UI,                                 GL_ZERO,                                      RGBA_INTEGER,                                GL_RGBA_INTEGER,                             GL_UNSIGNED_INT,                 false, { $_, $_, $_, $_ } }, // RGBA32U
+		{ GL_RGBA32F,                                  GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_FLOAT,                        false, { $_, $_, $_, $_ } }, // RGBA32F
+		{ GL_RGB565,                                   GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_SHORT_5_6_5,         false, { $_, $_, $_, $_ } }, // B5G6R5
+		{ GL_RGB565,                                   GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_SHORT_5_6_5,         false, { $_, $_, $_, $_ } }, // R5G6B5
+		{ GL_RGBA4,                                    GL_ZERO,                                      GL_BGRA,                                     GL_BGRA,                                     GL_UNSIGNED_SHORT_4_4_4_4_REV,   false, { $_, $_, $_, $_ } }, // BGRA4
+		{ GL_RGBA4,                                    GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_SHORT_4_4_4_4_REV,   false, { $_, $_, $_, $_ } }, // RGBA4
+		{ GL_RGB5_A1,                                  GL_ZERO,                                      GL_BGRA,                                     GL_BGRA,                                     GL_UNSIGNED_SHORT_1_5_5_5_REV,   false, { $_, $_, $_, $_ } }, // BGR5A1
+		{ GL_RGB5_A1,                                  GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_SHORT_1_5_5_5_REV,   false, { $_, $_, $_, $_ } }, // RGB5A1
+		{ GL_RGB10_A2,                                 GL_ZERO,                                      GL_RGBA,                                     GL_RGBA,                                     GL_UNSIGNED_INT_2_10_10_10_REV,  false, { $_, $_, $_, $_ } }, // RGB10A2
+		{ GL_R11F_G11F_B10F,                           GL_ZERO,                                      GL_RGB,                                      GL_RGB,                                      GL_UNSIGNED_INT_10F_11F_11F_REV, false, { $_, $_, $_, $_ } }, // RG11B10F
+		{ GL_ZERO,                                     GL_ZERO,                                      GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         false, { $_, $_, $_, $_ } }, // UnknownDepth
+		{ GL_DEPTH_COMPONENT16,                        GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_UNSIGNED_SHORT,               false, { $_, $_, $_, $_ } }, // D16
+		{ GL_DEPTH_COMPONENT24,                        GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_UNSIGNED_INT,                 false, { $_, $_, $_, $_ } }, // D24
+		{ GL_DEPTH24_STENCIL8,                         GL_ZERO,                                      GL_DEPTH_STENCIL,                            GL_DEPTH_STENCIL,                            GL_UNSIGNED_INT_24_8,            false, { $_, $_, $_, $_ } }, // D24S8
+		{ GL_DEPTH_COMPONENT32,                        GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_UNSIGNED_INT,                 false, { $_, $_, $_, $_ } }, // D32
+		{ GL_DEPTH_COMPONENT32F,                       GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false, { $_, $_, $_, $_ } }, // D16F
+		{ GL_DEPTH_COMPONENT32F,                       GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false, { $_, $_, $_, $_ } }, // D24F
+		{ GL_DEPTH_COMPONENT32F,                       GL_ZERO,                                      GL_DEPTH_COMPONENT,                          GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false, { $_, $_, $_, $_ } }, // D32F
+		{ GL_STENCIL_INDEX8,                           GL_ZERO,                                      GL_STENCIL_INDEX,                            GL_STENCIL_INDEX,                            GL_UNSIGNED_BYTE,                false, { $_, $_, $_, $_ } }, // D0S8
+#undef $_
+#undef $0
+#undef $1
+#undef $R
+#undef $G
+#undef $B
+#undef $A
 	};
 	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_textureFormat) );
 
@@ -321,11 +347,19 @@ namespace bgfx { namespace gl
 		GL_ZERO,               // ATCE
 		GL_ZERO,               // ATCI
 		GL_ZERO,               // ASTC4x4
+		GL_ZERO,               // ASTC5x4
 		GL_ZERO,               // ASTC5x5
+		GL_ZERO,               // ASTC6x5
 		GL_ZERO,               // ASTC6x6
 		GL_ZERO,               // ASTC8x5
 		GL_ZERO,               // ASTC8x6
+		GL_ZERO,               // ASTC8x8
 		GL_ZERO,               // ASTC10x5
+		GL_ZERO,               // ASTC10x6
+		GL_ZERO,               // ASTC10x8
+		GL_ZERO,               // ASTC10x10
+		GL_ZERO,               // ASTC12x10
+		GL_ZERO,               // ASTC12x12
 		GL_ZERO,               // Unknown
 		GL_ZERO,               // R1
 		GL_ALPHA,              // A8
@@ -371,8 +405,11 @@ namespace bgfx { namespace gl
 		GL_RGBA32I,            // RGBA32I
 		GL_RGBA32UI,           // RGBA32U
 		GL_RGBA32F,            // RGBA32F
+		GL_RGB565,             // B5G6R5
 		GL_RGB565,             // R5G6B5
+		GL_RGBA4,              // BGRA4
 		GL_RGBA4,              // RGBA4
+		GL_RGB5_A1,            // BGR5A1
 		GL_RGB5_A1,            // RGB5A1
 		GL_RGB10_A2,           // RGB10A2
 		GL_R11F_G11F_B10F,     // RG11B10F
@@ -411,11 +448,19 @@ namespace bgfx { namespace gl
 		GL_ZERO,           // ATCE
 		GL_ZERO,           // ATCI
 		GL_ZERO,           // ASTC4x4
+		GL_ZERO,           // ASTC5x4
 		GL_ZERO,           // ASTC5x5
+		GL_ZERO,           // ASTC6x5
 		GL_ZERO,           // ASTC6x6
 		GL_ZERO,           // ASTC8x5
 		GL_ZERO,           // ASTC8x6
+		GL_ZERO,           // ASTC8x8
 		GL_ZERO,           // ASTC10x5
+		GL_ZERO,           // ASTC10x6
+		GL_ZERO,           // ASTC10x8
+		GL_ZERO,           // ASTC10x10
+		GL_ZERO,           // ASTC12x10
+		GL_ZERO,           // ASTC12x12
 		GL_ZERO,           // Unknown
 		GL_ZERO,           // R1
 		GL_ALPHA,          // A8
@@ -461,8 +506,11 @@ namespace bgfx { namespace gl
 		GL_RGBA32I,        // RGBA32I
 		GL_RGBA32UI,       // RGBA32U
 		GL_RGBA32F,        // RGBA32F
+		GL_RGB565,         // B5G6R5
 		GL_RGB565,         // R5G6B5
+		GL_RGBA4,          // BGRA4
 		GL_RGBA4,          // RGBA4
+		GL_RGB5_A1,        // BGR5A1
 		GL_RGB5_A1,        // RGB5A1
 		GL_RGB10_A2,       // RGB10A2
 		GL_R11F_G11F_B10F, // RG11B10F
@@ -515,6 +563,7 @@ namespace bgfx { namespace gl
 			ARB_get_program_binary,
 			ARB_half_float_pixel,
 			ARB_half_float_vertex,
+			ARB_indirect_parameters,
 			ARB_instanced_arrays,
 			ARB_internalformat_query,
 			ARB_internalformat_query2,
@@ -732,6 +781,7 @@ namespace bgfx { namespace gl
 		{ "ARB_get_program_binary",                   BGFX_CONFIG_RENDERER_OPENGL >= 41, true  },
 		{ "ARB_half_float_pixel",                     BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
 		{ "ARB_half_float_vertex",                    BGFX_CONFIG_RENDERER_OPENGL >= 30, true  },
+		{ "ARB_indirect_parameters",                  BGFX_CONFIG_RENDERER_OPENGL >= 46, true  },
 		{ "ARB_instanced_arrays",                     BGFX_CONFIG_RENDERER_OPENGL >= 33, true  },
 		{ "ARB_internalformat_query",                 BGFX_CONFIG_RENDERER_OPENGL >= 42, true  },
 		{ "ARB_internalformat_query2",                BGFX_CONFIG_RENDERER_OPENGL >= 43, true  },
@@ -1077,20 +1127,20 @@ namespace bgfx { namespace gl
 			) );
 	}
 
-	static void GL_APIENTRY stubMultiDrawArraysIndirect(GLenum _mode, const void* _indirect, GLsizei _drawcount, GLsizei _stride)
+	static void GL_APIENTRY stubMultiDrawArraysIndirect(GLenum _mode, const void* _indirect, GLsizei _drawCount, GLsizei _stride)
 	{
 		const uint8_t* args = (const uint8_t*)_indirect;
-		for (GLsizei ii = 0; ii < _drawcount; ++ii)
+		for (GLsizei ii = 0; ii < _drawCount; ++ii)
 		{
 			GL_CHECK(glDrawArraysIndirect(_mode, (void*)args) );
 			args += _stride;
 		}
 	}
 
-	static void GL_APIENTRY stubMultiDrawElementsIndirect(GLenum _mode, GLenum _type, const void* _indirect, GLsizei _drawcount, GLsizei _stride)
+	static void GL_APIENTRY stubMultiDrawElementsIndirect(GLenum _mode, GLenum _type, const void* _indirect, GLsizei _drawCount, GLsizei _stride)
 	{
 		const uint8_t* args = (const uint8_t*)_indirect;
-		for (GLsizei ii = 0; ii < _drawcount; ++ii)
+		for (GLsizei ii = 0; ii < _drawCount; ++ii)
 		{
 			GL_CHECK(glDrawElementsIndirect(_mode, _type, (void*)args) );
 			args += _stride;
@@ -1633,8 +1683,11 @@ namespace bgfx { namespace gl
 		{
 			case TextureFormat::A8:
 			case TextureFormat::R8: // Luminance
+			case TextureFormat::B5G6R5:
 			case TextureFormat::R5G6B5:
+			case TextureFormat::BGRA4:
 			case TextureFormat::RGBA4:
+			case TextureFormat::BGR5A1:
 			case TextureFormat::RGB5A1:
 				// GLES2 formats without sRGB.
 				return !_srgb;
@@ -1885,8 +1938,11 @@ namespace bgfx { namespace gl
 		switch(_format)
 		{
 			// GLES2 textures
+			case TextureFormat::B5G6R5:
 			case TextureFormat::R5G6B5:
+			case TextureFormat::BGRA4:
 			case TextureFormat::RGBA4:
+			case TextureFormat::BGR5A1:
 			case TextureFormat::RGB5A1:
 			case TextureFormat::D16:
 				return !_srgb;
@@ -2143,6 +2199,7 @@ namespace bgfx { namespace gl
 		{ "Advanced Micro Devices, Inc.", BGFX_PCI_ID_AMD    },
 		{ "Intel",                        BGFX_PCI_ID_INTEL  },
 		{ "ATI Technologies Inc.",        BGFX_PCI_ID_AMD    },
+		{ "ARM",                          BGFX_PCI_ID_ARM    },
 	};
 
 	struct Workaround
@@ -2185,6 +2242,7 @@ namespace bgfx { namespace gl
 			, m_hash( (BX_PLATFORM_WINDOWS<<1) | BX_ARCH_64BIT)
 			, m_backBufferFbo(0)
 			, m_msaaBackBufferFbo(0)
+			, m_msaaBlitProgram(0)
 			, m_clearQuadColor(BGFX_INVALID_HANDLE)
 			, m_clearQuadDepth(BGFX_INVALID_HANDLE)
 		{
@@ -2217,7 +2275,7 @@ namespace bgfx { namespace gl
 			bx::memSet(m_uniforms, 0, sizeof(m_uniforms) );
 			bx::memSet(&m_resolution, 0, sizeof(m_resolution) );
 
-			setRenderContextSize(_init.resolution.width, _init.resolution.height);
+			setRenderContextSize(_init.resolution.width, _init.resolution.height, _init.resolution.reset);
 
 			m_vendor      = getGLString(GL_VENDOR);
 			m_renderer    = getGLString(GL_RENDERER);
@@ -2225,8 +2283,6 @@ namespace bgfx { namespace gl
 			m_glslVersion = getGLString(GL_SHADING_LANGUAGE_VERSION);
 
 			{
-				int32_t glVersion = 0;
-
 				if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
 				{
 					int32_t majorGlVersion = 0;
@@ -2240,15 +2296,16 @@ namespace bgfx { namespace gl
 
 					bx::fromString(&majorGlVersion, version);
 					bx::fromString(&minorGlVersion, version + 2);
-					glVersion = majorGlVersion*10 + minorGlVersion;
+					int32_t glVersion = majorGlVersion*10 + minorGlVersion;
 
 					BX_TRACE("WebGL context version %d (%d.%d).", glVersion, majorGlVersion, minorGlVersion);
-				}
 
-				m_gles3 = false
-					||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30)
-					|| (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES) && glVersion >= 30)
-					;
+					m_gles3 = glVersion >= 30;
+				}
+				else
+				{
+					m_gles3 = BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30);
+				}
 			}
 
 			for (uint32_t ii = 0; ii < BX_COUNTOF(s_vendorIds); ++ii)
@@ -2353,7 +2410,7 @@ namespace bgfx { namespace gl
 				if (NULL != extensions)
 				{
 					bx::StringView ext(extensions);
-					uint32_t index = 0;
+
 					while (!ext.isEmpty() )
 					{
 						const bx::StringView space = bx::strFind(ext, ' ');
@@ -2361,8 +2418,6 @@ namespace bgfx { namespace gl
 						updateExtension(token);
 
 						ext.set(space.getPtr() + (space.isEmpty() ? 0 : 1), ext.getTerm() );
-
-						++index;
 					}
 				}
 				else if (NULL != glGetStringi)
@@ -2498,14 +2553,23 @@ namespace bgfx { namespace gl
 						// internalFormat and format must match:
 						// https://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexImage2D.xml
 						setTextureFormat(TextureFormat::RGBA8,  GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+						setTextureFormat(TextureFormat::B5G6R5, GL_RGB,  GL_RGB,  GL_UNSIGNED_SHORT_5_6_5_REV);
 						setTextureFormat(TextureFormat::R5G6B5, GL_RGB,  GL_RGB,  GL_UNSIGNED_SHORT_5_6_5_REV);
+						setTextureFormat(TextureFormat::BGRA4,  GL_BGRA, GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4_REV);
 						setTextureFormat(TextureFormat::RGBA4,  GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4_REV);
+						setTextureFormat(TextureFormat::BGR5A1, GL_BGRA, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV);
 						setTextureFormat(TextureFormat::RGB5A1, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV);
 
 						if (s_extension[Extension::EXT_sRGB].m_supported)
 						{
 							setTextureFormatSrgb(TextureFormat::RGBA8, GL_SRGB_ALPHA_EXT, GL_SRGB_ALPHA_EXT);
 							setTextureFormatSrgb(TextureFormat::RGB8, GL_SRGB_EXT, GL_SRGB_EXT);
+						}
+
+						if (s_extension[Extension::EXT_texture_swizzle].m_supported)
+						{
+							s_textureFormat[TextureFormat::R5G6B5].m_mapping[0] = GL_BLUE;
+							s_textureFormat[TextureFormat::R5G6B5].m_mapping[2] = GL_RED;
 						}
 
 						if (s_extension[Extension::OES_texture_half_float].m_supported
@@ -2549,6 +2613,11 @@ namespace bgfx { namespace gl
 						setTextureFormat(TextureFormat::D32F,  GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
 						setTextureFormat(TextureFormat::D0S8,  GL_STENCIL_INDEX8, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE); // Only works as renderbuffer, not as texture
 					}
+				}
+				else
+				{
+					setTextureFormat(TextureFormat::R5G6B5, GL_BGR,  GL_BGR,  GL_UNSIGNED_SHORT_5_6_5);
+					setTextureFormatSrgb(TextureFormat::R5G6B5, GL_ZERO,  GL_BGR);
 				}
 
 				if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
@@ -2602,8 +2671,11 @@ namespace bgfx { namespace gl
 				if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
 				{
 					// OpenGL ES does not have reversed BGRA4 and BGR5A1 support.
+					setTextureFormat(TextureFormat::BGRA4,  GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4);
 					setTextureFormat(TextureFormat::RGBA4,  GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4);
+					setTextureFormat(TextureFormat::BGR5A1, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1);
 					setTextureFormat(TextureFormat::RGB5A1, GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1);
+					setTextureFormat(TextureFormat::B5G6R5, GL_RGB,  GL_RGB,  GL_UNSIGNED_SHORT_5_6_5);
 					setTextureFormat(TextureFormat::R5G6B5, GL_RGB,  GL_RGB,  GL_UNSIGNED_SHORT_5_6_5);
 
 					if (!m_gles3)
@@ -2783,6 +2855,11 @@ namespace bgfx { namespace gl
 					: 0
 					;
 
+				g_caps.supported |= s_extension[Extension::ARB_indirect_parameters].m_supported
+					? BGFX_CAPS_DRAW_INDIRECT_COUNT
+					: 0
+					;
+
 				if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN)
 				||  NULL == glPolygonMode)
 				{
@@ -2802,7 +2879,7 @@ namespace bgfx { namespace gl
 					: 0
 					;
 
-				g_caps.supported |= (m_readBackSupported || BX_ENABLED(BGFX_GL_CONFIG_TEXTURE_READ_BACK_EMULATION))
+				g_caps.supported |= (m_readBackSupported || BX_ENABLED(BGFX_GL_CONFIG_TEXTURE_READ_BACK_EMULATION) )
 					? BGFX_CAPS_TEXTURE_READ_BACK
 					: 0
 					;
@@ -2830,7 +2907,7 @@ namespace bgfx { namespace gl
 					;
 
 				g_caps.limits.maxTextureSize     = uint16_t(glGet(GL_MAX_TEXTURE_SIZE) );
-				g_caps.limits.maxTextureLayers   = BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL >= 31) || BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 31) || s_extension[Extension::EXT_texture_array].m_supported ? uint16_t(bx::max(glGet(GL_MAX_ARRAY_TEXTURE_LAYERS), 1) ) : 1;
+				g_caps.limits.maxTextureLayers   = BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL >= 30) || BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) || s_extension[Extension::EXT_texture_array].m_supported ? uint16_t(bx::max(glGet(GL_MAX_ARRAY_TEXTURE_LAYERS), 1) ) : 1;
 				g_caps.limits.maxComputeBindings = computeSupport ? BGFX_MAX_COMPUTE_BINDINGS : 0;
 				g_caps.limits.maxVertexStreams   = BGFX_CONFIG_MAX_VERTEX_STREAMS;
 
@@ -2868,12 +2945,12 @@ namespace bgfx { namespace gl
 					GL_CHECK(glGenVertexArrays(1, &m_vao) );
 				}
 
-				m_samplerObjectSupport = !BX_ENABLED(BX_PLATFORM_EMSCRIPTEN)
-					&& (m_gles3
-						|| s_extension[Extension::ARB_sampler_objects].m_supported
-						);
+				m_samplerObjectSupport = false
+					|| m_gles3
+					|| s_extension[Extension::ARB_sampler_objects].m_supported
+					;
 
-				m_shadowSamplersSupport = !!(BGFX_CONFIG_RENDERER_OPENGL || BGFX_CONFIG_RENDERER_OPENGLES >= 30)
+				m_shadowSamplersSupport = !!(BGFX_CONFIG_RENDERER_OPENGL || m_gles3)
 					|| s_extension[Extension::EXT_shadow_samplers].m_supported
 					;
 
@@ -3026,6 +3103,8 @@ namespace bgfx { namespace gl
 					? BGFX_CAPS_VIEWPORT_LAYER_ARRAY
 					: 0
 					;
+
+				g_caps.supported |= BX_ENABLED(BX_PLATFORM_WINRT) ? BGFX_CAPS_TRANSPARENT_BACKBUFFER : 0;
 
 				if (s_extension[Extension::ARB_debug_output].m_supported
 				||  s_extension[Extension::KHR_debug].m_supported)
@@ -3329,7 +3408,7 @@ namespace bgfx { namespace gl
 
 				GL_CHECK(glBindTexture(texture.m_target, 0) );
 			}
-			else if (BX_ENABLED(BGFX_GL_CONFIG_TEXTURE_READ_BACK_EMULATION))
+			else if (BX_ENABLED(BGFX_GL_CONFIG_TEXTURE_READ_BACK_EMULATION) )
 			{
 				const TextureGL& texture = m_textures[_handle.idx];
 				const bool compressed    = bimg::isCompressed(bimg::TextureFormat::Enum(texture.m_textureFormat) );
@@ -3350,8 +3429,7 @@ namespace bgfx { namespace gl
 						, at[0].mip
 						) );
 
-					if (!BX_ENABLED(BX_PLATFORM_EMSCRIPTEN)
-					&&  !BX_ENABLED(BX_PLATFORM_IOS) )
+					if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || m_gles3)
 					{
 						GL_CHECK(glReadBuffer(GL_COLOR_ATTACHMENT0) );
 					}
@@ -3383,7 +3461,7 @@ namespace bgfx { namespace gl
 
 			bx::StaticMemoryBlockWriter writer(mem->data, mem->size);
 			uint32_t magic = BGFX_CHUNK_MAGIC_TEX;
-			bx::write(&writer, magic);
+			bx::write(&writer, magic, bx::ErrorAssert{});
 
 			TextureCreate tc;
 			tc.m_width     = _width;
@@ -3394,7 +3472,7 @@ namespace bgfx { namespace gl
 			tc.m_format    = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap   = false;
 			tc.m_mem       = NULL;
-			bx::write(&writer, tc);
+			bx::write(&writer, tc, bx::ErrorAssert{});
 
 			texture.destroy();
 			texture.create(mem, texture.m_flags, 0);
@@ -3577,7 +3655,6 @@ namespace bgfx { namespace gl
 		void submitBlit(BlitState& _bs, uint16_t _view);
 
 		void submit(Frame* _render, ClearQuad& _clearQuad, TextVideoMemBlitter& _textVideoMemBlitter) override;
-
 		void blitSetup(TextVideoMemBlitter& _blitter) override
 		{
 			if (0 != m_vao)
@@ -3617,13 +3694,9 @@ namespace bgfx { namespace gl
 
 			if (!BX_ENABLED(BX_PLATFORM_OSX) )
 			{
-				if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
-				||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
+				if (m_samplerObjectSupport)
 				{
-					if (m_samplerObjectSupport)
-					{
-						GL_CHECK(glBindSampler(0, 0) );
-					}
+					GL_CHECK(glBindSampler(0, 0) );
 				}
 			}
 		}
@@ -3803,34 +3876,177 @@ namespace bgfx { namespace gl
 		void createMsaaFbo(uint32_t _width, uint32_t _height, uint32_t _msaa)
 		{
 			if (0 == m_msaaBackBufferFbo // iOS
-			&&  1 < _msaa)
+			&&  1 < _msaa
+			&& !m_glctx.m_msaaContext)
 			{
-				GLenum storageFormat = (m_resolution.reset & BGFX_RESET_SRGB_BACKBUFFER)
+				GLenum storageFormat = m_resolution.reset & BGFX_RESET_SRGB_BACKBUFFER
 					? GL_SRGB8_ALPHA8
 					: GL_RGBA8
 					;
 
-				GL_CHECK(glGenFramebuffers(1, &m_msaaBackBufferFbo) );
-				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_msaaBackBufferFbo) );
-				GL_CHECK(glGenRenderbuffers(BX_COUNTOF(m_msaaBackBufferRbos), m_msaaBackBufferRbos) );
-				GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, m_msaaBackBufferRbos[0]) );
-				GL_CHECK(glRenderbufferStorageMultisample(GL_RENDERBUFFER, _msaa, storageFormat, _width, _height) );
-				GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, m_msaaBackBufferRbos[1]) );
-				GL_CHECK(glRenderbufferStorageMultisample(GL_RENDERBUFFER, _msaa, GL_DEPTH24_STENCIL8, _width, _height) );
-				GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_msaaBackBufferRbos[0]) );
-
-				GLenum attachment = BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30)
+				GLenum attachment = BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || m_gles3
 					? GL_DEPTH_STENCIL_ATTACHMENT
 					: GL_DEPTH_ATTACHMENT
 					;
-				GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, m_msaaBackBufferRbos[1]) );
 
-				BX_ASSERT(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
-					, "glCheckFramebufferStatus failed 0x%08x"
-					, glCheckFramebufferStatus(GL_FRAMEBUFFER)
-					);
-
+				GL_CHECK(glGenFramebuffers(1, &m_msaaBackBufferFbo) );
 				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_msaaBackBufferFbo) );
+
+				if (m_gles3)
+				{
+					GL_CHECK(glGenTextures(BX_COUNTOF(m_msaaBackBufferTextures), m_msaaBackBufferTextures) );
+					GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_msaaBackBufferTextures[0]) );
+					GL_CHECK(glTexStorage2D(GL_TEXTURE_2D, 1, storageFormat, _width, _height) );
+					GL_CHECK(glFramebufferTexture2DMultisampleEXT(
+						  GL_FRAMEBUFFER
+						, GL_COLOR_ATTACHMENT0
+						, GL_TEXTURE_2D
+						, m_msaaBackBufferTextures[0]
+						, 0
+						, _msaa
+						) );
+					GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_msaaBackBufferFbo) );
+
+					GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_msaaBackBufferTextures[1]) );
+					GL_CHECK(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, _width, _height) );
+					GL_CHECK(glFramebufferTexture2DMultisampleEXT(
+						  GL_FRAMEBUFFER
+						, attachment
+						, GL_TEXTURE_2D
+						, m_msaaBackBufferTextures[1]
+						, 0
+						, _msaa
+						) );
+					GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+
+					BX_ASSERT(GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_FRAMEBUFFER)
+						, "glCheckFramebufferStatus failed 0x%08x"
+						, glCheckFramebufferStatus(GL_FRAMEBUFFER)
+						);
+
+					if (0 == m_msaaBlitProgram)
+					{
+						static const char* msaa_blit_vs =
+							R"(#version 300 es
+							precision highp float;
+							out vec2 UV;
+							void main()
+							{
+								float x = -1.0 + float( (gl_VertexID & 1) << 2);
+								float y = -1.0 + float( (gl_VertexID & 2) << 1);
+								gl_Position = vec4(x, y, 0, 1);
+								UV = vec2(gl_Position.x + 1.0, gl_Position.y + 1.0) * 0.5;
+							}
+						)";
+
+						static const char* msaa_blit_fs =
+							R"(#version 300 es
+							precision mediump float;
+							in vec2 UV;
+							uniform sampler2D msaaTexture;
+							out vec4 oFragColor;
+							void main()
+							{
+								oFragColor = texture(msaaTexture, UV);
+							}
+						)";
+
+						const GLchar *const vs = msaa_blit_vs;
+						const GLchar *const fs = msaa_blit_fs;
+
+						GLuint shader_vs = glCreateShader(GL_VERTEX_SHADER);
+						{
+							BX_WARN(0 != shader_vs, "Failed to create msaa Blit Vertex shader.");
+							GL_CHECK(glShaderSource(shader_vs, 1, &vs, NULL) );
+							GL_CHECK(glCompileShader(shader_vs) );
+
+							GLint compiled = 0;
+							GL_CHECK(glGetShaderiv(shader_vs, GL_COMPILE_STATUS, &compiled) );
+							BX_WARN(0 == shader_vs, "Unable to compile msaa Blit Vertex shader.");
+						}
+
+						GLuint shader_fs = glCreateShader(GL_FRAGMENT_SHADER);
+						{
+							BX_WARN(0 != shader_fs, "Failed to create msaa Blit Fragment shader.");
+							GL_CHECK(glShaderSource(shader_fs, 1, &fs, NULL) );
+							GL_CHECK(glCompileShader(shader_fs) );
+
+							GLint compiled = 0;
+							GL_CHECK(glGetShaderiv(shader_fs, GL_COMPILE_STATUS, &compiled) );
+							BX_WARN(0 == shader_vs, "Unable to compile msaa Blit Fragment shader.");
+						}
+
+						m_msaaBlitProgram = glCreateProgram();
+
+						if (m_msaaBlitProgram)
+						{
+							GL_CHECK(glAttachShader(m_msaaBlitProgram, shader_vs) );
+							GL_CHECK(glAttachShader(m_msaaBlitProgram, shader_fs) );
+							GL_CHECK(glLinkProgram(m_msaaBlitProgram) );
+
+							GLint linked = 0;
+							GL_CHECK(glGetProgramiv(m_msaaBlitProgram, GL_LINK_STATUS, &linked) );
+
+							if (0 == linked)
+							{
+								char log[1024];
+								GL_CHECK(glGetProgramInfoLog(
+									  m_msaaBlitProgram
+									, sizeof(log)
+									, NULL
+									, log
+									) );
+								BX_TRACE("%d: %s", linked, log);
+							}
+
+							GL_CHECK(glDetachShader(m_msaaBlitProgram, shader_vs) );
+							GL_CHECK(glDeleteShader(shader_vs) );
+
+							GL_CHECK(glDetachShader(m_msaaBlitProgram, shader_fs) );
+							GL_CHECK(glDeleteShader(shader_fs) );
+						}
+					}
+				}
+				else
+				{
+					GL_CHECK(glGenRenderbuffers(BX_COUNTOF(m_msaaBackBufferRbos), m_msaaBackBufferRbos) );
+
+					GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, m_msaaBackBufferRbos[0]) );
+					GL_CHECK(glRenderbufferStorageMultisample(
+						  GL_RENDERBUFFER
+						, _msaa
+						, storageFormat
+						, _width
+						, _height
+						) );
+
+					GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, m_msaaBackBufferRbos[1]) );
+					GL_CHECK(glRenderbufferStorageMultisample(
+						  GL_RENDERBUFFER
+						, _msaa
+						, GL_DEPTH24_STENCIL8
+						, _width
+						, _height
+						) );
+
+					GL_CHECK(glFramebufferRenderbuffer(
+						  GL_FRAMEBUFFER
+						, GL_COLOR_ATTACHMENT0
+						, GL_RENDERBUFFER
+						, m_msaaBackBufferRbos[0]
+						) );
+					GL_CHECK(glFramebufferRenderbuffer(
+						  GL_FRAMEBUFFER
+						, attachment
+						, GL_RENDERBUFFER
+						, m_msaaBackBufferRbos[1]
+						) );
+
+					BX_ASSERT(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
+						, "glCheckFramebufferStatus failed 0x%08x"
+						, glCheckFramebufferStatus(GL_FRAMEBUFFER)
+						);
+				}
 			}
 		}
 
@@ -3842,11 +4058,28 @@ namespace bgfx { namespace gl
 				GL_CHECK(glDeleteFramebuffers(1, &m_msaaBackBufferFbo) );
 				m_msaaBackBufferFbo = 0;
 
-				if (0 != m_msaaBackBufferRbos[0])
+				if (m_gles3)
 				{
-					GL_CHECK(glDeleteRenderbuffers(BX_COUNTOF(m_msaaBackBufferRbos), m_msaaBackBufferRbos) );
-					m_msaaBackBufferRbos[0] = 0;
-					m_msaaBackBufferRbos[1] = 0;
+					if (0 != m_msaaBackBufferTextures[0])
+					{
+						GL_CHECK(glDeleteTextures(BX_COUNTOF(m_msaaBackBufferTextures), m_msaaBackBufferTextures) );
+						m_msaaBackBufferTextures[0] = 0;
+						m_msaaBackBufferTextures[1] = 0;
+					}
+					if (0 != m_msaaBlitProgram)
+					{
+						GL_CHECK(glDeleteProgram(m_msaaBlitProgram) );
+						m_msaaBlitProgram = 0;
+					}
+				}
+				else
+				{
+					if (0 != m_msaaBackBufferRbos[0])
+					{
+						GL_CHECK(glDeleteRenderbuffers(BX_COUNTOF(m_msaaBackBufferRbos), m_msaaBackBufferRbos) );
+						m_msaaBackBufferRbos[0] = 0;
+						m_msaaBackBufferRbos[1] = 0;
+					}
 				}
 			}
 		}
@@ -3860,23 +4093,37 @@ namespace bgfx { namespace gl
 				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_backBufferFbo) );
 				GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaBackBufferFbo) );
 				GL_CHECK(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0) );
-				uint32_t width  = m_resolution.width;
-				uint32_t height = m_resolution.height;
-				GLenum filter = BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES < 30)
+
+				const uint32_t width  = m_resolution.width;
+				const uint32_t height = m_resolution.height;
+				const GLenum filter = BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || !m_gles3
 					? GL_NEAREST
 					: GL_LINEAR
 					;
-				GL_CHECK(glBlitFramebuffer(0
-					, 0
-					, width
-					, height
-					, 0
-					, 0
-					, width
-					, height
-					, GL_COLOR_BUFFER_BIT
-					, filter
-					) );
+
+				if (m_gles3)
+				{
+					GL_CHECK(glUseProgram(m_msaaBlitProgram) );
+					GL_CHECK(glActiveTexture(GL_TEXTURE0) );
+					GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_msaaBackBufferTextures[0]) );
+					GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 3) );
+				}
+				else
+				{
+					GL_CHECK(glBlitFramebuffer(
+						  0
+						, 0
+						, width
+						, height
+						, 0
+						, 0
+						, width
+						, height
+						, GL_COLOR_BUFFER_BIT
+						, filter
+						) );
+				}
+
 				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_backBufferFbo) );
 			}
 		}
@@ -3888,7 +4135,7 @@ namespace bgfx { namespace gl
 			{
 				if (!m_glctx.isValid() )
 				{
-					m_glctx.create(_width, _height);
+					m_glctx.create(_width, _height, _flags);
 
 #if BX_PLATFORM_IOS
 					// iOS: need to figure out how to deal with FBO created by context.
@@ -3913,8 +4160,7 @@ namespace bgfx { namespace gl
 
 		void invalidateCache()
 		{
-			if ( (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
-			&&  m_samplerObjectSupport)
+			if (m_samplerObjectSupport)
 			{
 				m_samplerStateCache.invalidate();
 			}
@@ -3922,110 +4168,108 @@ namespace bgfx { namespace gl
 
 		void setSamplerState(uint32_t _stage, uint32_t _numMips, uint32_t _flags, const float _rgba[4])
 		{
-			if ( (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
-			&&  m_samplerObjectSupport)
+			BX_ASSERT(m_samplerObjectSupport, "Cannot use Sampler Objects");
+
+			if (0 == (BGFX_SAMPLER_INTERNAL_DEFAULT & _flags) )
 			{
-				if (0 == (BGFX_SAMPLER_INTERNAL_DEFAULT & _flags) )
+				const uint32_t index = (_flags & BGFX_SAMPLER_BORDER_COLOR_MASK) >> BGFX_SAMPLER_BORDER_COLOR_SHIFT;
+
+				_flags &= ~BGFX_SAMPLER_RESERVED_MASK;
+				_flags &= BGFX_SAMPLER_BITS_MASK;
+				_flags |= _numMips<<BGFX_SAMPLER_RESERVED_SHIFT;
+
+				GLuint sampler;
+
+				bool hasBorderColor = false;
+				bx::HashMurmur2A murmur;
+				uint32_t hash;
+
+				murmur.begin();
+				murmur.add(_flags);
+				if (!needBorderColor(_flags) )
 				{
-					const uint32_t index = (_flags & BGFX_SAMPLER_BORDER_COLOR_MASK) >> BGFX_SAMPLER_BORDER_COLOR_SHIFT;
+					murmur.add(-1);
+					hash = murmur.end();
 
-					_flags &= ~BGFX_SAMPLER_RESERVED_MASK;
-					_flags &= BGFX_SAMPLER_BITS_MASK;
-					_flags |= _numMips<<BGFX_SAMPLER_RESERVED_SHIFT;
-
-					GLuint sampler;
-
-					bool hasBorderColor = false;
-					bx::HashMurmur2A murmur;
-					uint32_t hash;
-
-					murmur.begin();
-					murmur.add(_flags);
-					if (!needBorderColor(_flags) )
-					{
-						murmur.add(-1);
-						hash = murmur.end();
-
-						sampler = m_samplerStateCache.find(hash);
-					}
-					else
-					{
-						murmur.add(index);
-						hash = murmur.end();
-
-						if (NULL != _rgba)
-						{
-							hasBorderColor = true;
-							sampler = UINT32_MAX;
-						}
-						else
-						{
-							sampler = m_samplerStateCache.find(hash);
-						}
-					}
-
-					if (UINT32_MAX == sampler)
-					{
-						sampler = m_samplerStateCache.add(hash);
-
-						GL_CHECK(glSamplerParameteri(sampler
-							, GL_TEXTURE_WRAP_S
-							, s_textureAddress[(_flags&BGFX_SAMPLER_U_MASK)>>BGFX_SAMPLER_U_SHIFT]
-							) );
-						GL_CHECK(glSamplerParameteri(sampler
-							, GL_TEXTURE_WRAP_T
-							, s_textureAddress[(_flags&BGFX_SAMPLER_V_MASK)>>BGFX_SAMPLER_V_SHIFT]
-							) );
-						GL_CHECK(glSamplerParameteri(sampler
-							, GL_TEXTURE_WRAP_R
-							, s_textureAddress[(_flags&BGFX_SAMPLER_W_MASK)>>BGFX_SAMPLER_W_SHIFT]
-							) );
-
-						GLenum minFilter;
-						GLenum magFilter;
-						getFilters(_flags, 1 < _numMips, magFilter, minFilter);
-						GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, magFilter) );
-						GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, minFilter) );
-
-						if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
-						{
-							GL_CHECK(glSamplerParameterf(sampler, GL_TEXTURE_LOD_BIAS, float(BGFX_CONFIG_MIP_LOD_BIAS) ) );
-						}
-
-						if (m_borderColorSupport
-						&&  hasBorderColor)
-						{
-							GL_CHECK(glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, _rgba) );
-						}
-
-						if (0 != (_flags & (BGFX_SAMPLER_MIN_ANISOTROPIC|BGFX_SAMPLER_MAG_ANISOTROPIC) )
-						&&  0.0f < m_maxAnisotropy)
-						{
-							GL_CHECK(glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy) );
-						}
-
-						if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30)
-						||  m_shadowSamplersSupport)
-						{
-							const uint32_t cmpFunc = (_flags&BGFX_SAMPLER_COMPARE_MASK)>>BGFX_SAMPLER_COMPARE_SHIFT;
-							if (0 == cmpFunc)
-							{
-								GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE) );
-							}
-							else
-							{
-								GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE) );
-								GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC, s_cmpFunc[cmpFunc]) );
-							}
-						}
-					}
-
-					GL_CHECK(glBindSampler(_stage, sampler) );
+					sampler = m_samplerStateCache.find(hash);
 				}
 				else
 				{
-					GL_CHECK(glBindSampler(_stage, 0) );
+					murmur.add(index);
+					hash = murmur.end();
+
+					if (NULL != _rgba)
+					{
+						hasBorderColor = true;
+						sampler = UINT32_MAX;
+					}
+					else
+					{
+						sampler = m_samplerStateCache.find(hash);
+					}
 				}
+
+				if (UINT32_MAX == sampler)
+				{
+					sampler = m_samplerStateCache.add(hash);
+
+					GL_CHECK(glSamplerParameteri(sampler
+						, GL_TEXTURE_WRAP_S
+						, s_textureAddress[(_flags&BGFX_SAMPLER_U_MASK)>>BGFX_SAMPLER_U_SHIFT]
+						) );
+					GL_CHECK(glSamplerParameteri(sampler
+						, GL_TEXTURE_WRAP_T
+						, s_textureAddress[(_flags&BGFX_SAMPLER_V_MASK)>>BGFX_SAMPLER_V_SHIFT]
+						) );
+					GL_CHECK(glSamplerParameteri(sampler
+						, GL_TEXTURE_WRAP_R
+						, s_textureAddress[(_flags&BGFX_SAMPLER_W_MASK)>>BGFX_SAMPLER_W_SHIFT]
+						) );
+
+					GLenum minFilter;
+					GLenum magFilter;
+					getFilters(_flags, 1 < _numMips, magFilter, minFilter);
+					GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, magFilter) );
+					GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, minFilter) );
+
+					if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
+					{
+						GL_CHECK(glSamplerParameterf(sampler, GL_TEXTURE_LOD_BIAS, float(BGFX_CONFIG_MIP_LOD_BIAS) ) );
+					}
+
+					if (m_borderColorSupport
+					&&  hasBorderColor)
+					{
+						GL_CHECK(glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, _rgba) );
+					}
+
+					if (0 != (_flags & (BGFX_SAMPLER_MIN_ANISOTROPIC|BGFX_SAMPLER_MAG_ANISOTROPIC) )
+					&&  0.0f < m_maxAnisotropy)
+					{
+						GL_CHECK(glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy) );
+					}
+
+					if (m_gles3
+					||  m_shadowSamplersSupport)
+					{
+						const uint32_t cmpFunc = (_flags&BGFX_SAMPLER_COMPARE_MASK)>>BGFX_SAMPLER_COMPARE_SHIFT;
+						if (0 == cmpFunc)
+						{
+							GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE) );
+						}
+						else
+						{
+							GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE) );
+							GL_CHECK(glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC, s_cmpFunc[cmpFunc]) );
+						}
+					}
+				}
+
+				GL_CHECK(glBindSampler(_stage, sampler) );
+			}
+			else
+			{
+				GL_CHECK(glBindSampler(_stage, 0) );
 			}
 		}
 
@@ -4105,10 +4349,11 @@ namespace bgfx { namespace gl
 					void* data = BX_ALLOC(g_allocator, length);
 					if (g_callback->cacheRead(_id, data, length) )
 					{
+						bx::Error err;
 						bx::MemoryReader reader(data, length);
 
 						GLenum format;
-						bx::read(&reader, format);
+						bx::read(&reader, format, &err);
 
 						GL_CHECK(glProgramBinary(programId, format, reader.getDataPtr(), (GLsizei)reader.remaining() ) );
 					}
@@ -4197,6 +4442,7 @@ namespace bgfx { namespace gl
 						setUniform1i(loc, *(int32_t*)data);
 					}
 					break;
+
 				case UniformType::Vec4:
 					if (num > 1)
 					{
@@ -4216,7 +4462,8 @@ namespace bgfx { namespace gl
 				case UniformType::Vec4:
 					setUniform4fv(loc, num, (float*)data);
 					break;
-#endif
+#endif // BX_PLATFORM_EMSCRIPTEN
+
 				case UniformType::Mat3:
 					setUniformMatrix3fv(loc, num, GL_FALSE, (float*)data);
 					break;
@@ -4346,14 +4593,18 @@ namespace bgfx { namespace gl
 				{
 					const UniformRegInfo* infoClearColor = m_uniformReg.find("bgfx_clear_color");
 					if (NULL != infoClearColor)
+					{
 						m_clearQuadColor = infoClearColor->m_handle;
+					}
 				}
 
 				if (m_clearQuadDepth.idx == kInvalidHandle)
 				{
 					const UniformRegInfo* infoClearDepth = m_uniformReg.find("bgfx_clear_depth");
 					if (NULL != infoClearDepth)
+					{
 						m_clearQuadDepth = infoClearDepth->m_handle;
+					}
 				}
 
 				float mrtClearDepth[4] = { g_caps.homogeneousDepth ? (_clear.m_depth * 2.0f - 1.0f) : _clear.m_depth };
@@ -4542,7 +4793,11 @@ namespace bgfx { namespace gl
 		GLenum m_readPixelsFmt;
 		GLuint m_backBufferFbo;
 		GLuint m_msaaBackBufferFbo;
-		GLuint m_msaaBackBufferRbos[2];
+		union {
+			GLuint m_msaaBackBufferRbos[2];
+			GLuint m_msaaBackBufferTextures[2];
+		};
+		GLuint m_msaaBlitProgram;
 		GlContext m_glctx;
 		bool m_needPresent;
 
@@ -5121,13 +5376,16 @@ namespace bgfx { namespace gl
 		m_usedCount = (uint8_t)used;
 
 		used = 0;
-		for (uint32_t ii = 0; ii < BX_COUNTOF(s_instanceDataName); ++ii)
+		for (uint32_t ii = 0, baseVertex = 0; ii < BX_COUNTOF(s_instanceDataName); ++ii, baseVertex += 16)
 		{
 			GLint loc = glGetAttribLocation(m_id, s_instanceDataName[ii]);
 			if (-1 != loc)
 			{
 				BX_TRACE("instance data %s: %d", s_instanceDataName[ii], loc);
-				m_instanceData[used++] = loc;
+				m_instanceData[used]   = loc;
+				m_instanceOffset[used] = uint16_t(baseVertex);
+
+				used++;
 			}
 		}
 		BX_ASSERT(used < BX_COUNTOF(m_instanceData)
@@ -5140,7 +5398,7 @@ namespace bgfx { namespace gl
 
 	void ProgramGL::bindAttributesBegin()
 	{
-		bx::memCopy(m_unboundUsedAttrib, m_used, sizeof(m_unboundUsedAttrib));
+		bx::memCopy(m_unboundUsedAttrib, m_used, sizeof(m_unboundUsedAttrib) );
 	}
 
 	void ProgramGL::bindAttributes(const VertexLayout& _layout, uint32_t _baseVertex)
@@ -5164,8 +5422,8 @@ namespace bgfx { namespace gl
 					GL_CHECK(glVertexAttribDivisor(loc, 0) );
 
 					uint32_t baseVertex = _baseVertex*_layout.m_stride + _layout.m_offset[attr];
-					if ( (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL >= 30) ||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 31) )
-					&& (AttribType::Uint8 == type || AttribType::Int16 == type)
+					if ( (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL >= 30) || s_renderGL->m_gles3)
+					&&  !isFloat(type)
 					&&  !normalized)
 					{
 						GL_CHECK(glVertexAttribIPointer(loc
@@ -5194,14 +5452,14 @@ namespace bgfx { namespace gl
 
 	void ProgramGL::bindInstanceData(uint32_t _stride, uint32_t _baseVertex) const
 	{
-		uint32_t baseVertex = _baseVertex;
 		for (uint32_t ii = 0; -1 != m_instanceData[ii]; ++ii)
 		{
 			GLint loc = m_instanceData[ii];
 			lazyEnableVertexAttribArray(loc);
-			GL_CHECK(glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, _stride, (void*)(uintptr_t)baseVertex));
-			GL_CHECK(glVertexAttribDivisor(loc, 1));
-			baseVertex += 16;
+
+			const uint32_t baseVertex = _baseVertex + m_instanceOffset[ii];
+			GL_CHECK(glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, _stride, (void*)(uintptr_t)baseVertex) );
+			GL_CHECK(glVertexAttribDivisor(loc, 1) );
 		}
 	}
 
@@ -5382,7 +5640,7 @@ namespace bgfx { namespace gl
 						, _height
 						) );
 				}
-				else if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL || BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
+				else if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || s_renderGL->m_gles3)
 				{
 					GL_CHECK(glRenderbufferStorageMultisample(GL_RENDERBUFFER
 						, msaaQuality
@@ -5637,6 +5895,23 @@ namespace bgfx { namespace gl
 				}
 			}
 
+			GLint mapping[4] = {
+				s_textureFormat[m_textureFormat].m_mapping[0],
+				s_textureFormat[m_textureFormat].m_mapping[1],
+				s_textureFormat[m_textureFormat].m_mapping[2],
+				s_textureFormat[m_textureFormat].m_mapping[3],
+			};
+			if (s_renderGL->m_textureSwizzleSupport
+			&& (-1 != mapping[0] || -1 != mapping[1] || -1 != mapping[2] || -1 != mapping[3]) )
+			{
+				mapping[0] = -1 == mapping[0] ? GL_RED   : mapping[0];
+				mapping[1] = -1 == mapping[1] ? GL_GREEN : mapping[1];
+				mapping[2] = -1 == mapping[2] ? GL_BLUE  : mapping[2];
+				mapping[3] = -1 == mapping[3] ? GL_ALPHA : mapping[3];
+
+				GL_CHECK(glTexParameteriv(m_target, GL_TEXTURE_SWIZZLE_RGBA, mapping));
+			}
+
 			if (NULL != temp)
 			{
 				BX_FREE(g_allocator, temp);
@@ -5696,8 +5971,16 @@ namespace bgfx { namespace gl
 			|| swizzle
 			;
 
-		const uint32_t width  = _rect.m_width;
-		const uint32_t height = _rect.m_height;
+		Rect rect;
+		rect.setIntersect(_rect
+			, {
+				0, 0,
+				uint16_t(bx::max(1u, m_width  >> _mip) ),
+				uint16_t(bx::max(1u, m_height >> _mip) ),
+			});
+
+		uint32_t width  = rect.m_width;
+		uint32_t height = rect.m_height;
 
 		uint8_t* temp = NULL;
 		if (convert
@@ -5720,17 +6003,17 @@ namespace bgfx { namespace gl
 				bimg::imageCopy(temp, width, height, 1, bpp, srcpitch, data);
 				data = temp;
 			}
-			const GLenum internalFmt = (0 != (m_flags & BGFX_TEXTURE_SRGB))
+			const GLenum internalFmt = (0 != (m_flags & BGFX_TEXTURE_SRGB) )
 				? s_textureFormat[m_textureFormat].m_internalFmtSrgb
 				: s_textureFormat[m_textureFormat].m_internalFmt
 				;
 			GL_CHECK(compressedTexSubImage(target+_side
 				, _mip
-				, _rect.m_x
-				, _rect.m_y
+				, rect.m_x
+				, rect.m_y
 				, _z
-				, _rect.m_width
-				, _rect.m_height
+				, rect.m_width
+				, rect.m_height
 				, _depth
 				, internalFmt
 				, _mem->size
@@ -5758,11 +6041,11 @@ namespace bgfx { namespace gl
 
 			GL_CHECK(texSubImage(target+_side
 				, _mip
-				, _rect.m_x
-				, _rect.m_y
+				, rect.m_x
+				, rect.m_y
 				, _z
-				, _rect.m_width
-				, _rect.m_height
+				, rect.m_width
+				, rect.m_height
 				, _depth
 				, m_fmt
 				, m_type
@@ -5784,7 +6067,7 @@ namespace bgfx { namespace gl
 
 	void TextureGL::setSamplerState(uint32_t _flags, const float _rgba[4])
 	{
-		if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES < 30)
+		if (!s_renderGL->m_gles3
 		&&  !s_textureFilter[m_textureFormat])
 		{
 			// Force point sampling when texture format doesn't support linear sampling.
@@ -5827,7 +6110,7 @@ namespace bgfx { namespace gl
 			GL_CHECK(glTexParameteri(target, GL_TEXTURE_WRAP_S, s_textureAddress[(flags&BGFX_SAMPLER_U_MASK)>>BGFX_SAMPLER_U_SHIFT]) );
 			GL_CHECK(glTexParameteri(target, GL_TEXTURE_WRAP_T, s_textureAddress[(flags&BGFX_SAMPLER_V_MASK)>>BGFX_SAMPLER_V_SHIFT]) );
 
-			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL || BGFX_CONFIG_RENDERER_OPENGLES >= 30)
+			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || s_renderGL->m_gles3
 			||  s_extension[Extension::APPLE_texture_max_level].m_supported)
 			{
 				GL_CHECK(glTexParameteri(targetMsaa, GL_TEXTURE_MAX_LEVEL, numMips-1) );
@@ -5861,7 +6144,7 @@ namespace bgfx { namespace gl
 				GL_CHECK(glTexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY_EXT, s_renderGL->m_maxAnisotropy) );
 			}
 
-			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30)
+			if (s_renderGL->m_gles3
 			||  s_renderGL->m_shadowSamplersSupport)
 			{
 				const uint32_t cmpFunc = (flags&BGFX_SAMPLER_COMPARE_MASK)>>BGFX_SAMPLER_COMPARE_SHIFT;
@@ -5891,29 +6174,13 @@ namespace bgfx { namespace gl
 		GL_CHECK(glActiveTexture(GL_TEXTURE0+_stage) );
 		GL_CHECK(glBindTexture(m_target, m_id) );
 
-		if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES)
-		&&  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES < 30) )
+		if (s_renderGL->m_samplerObjectSupport)
 		{
-			// GLES2 doesn't have support for sampler object.
-			setSamplerState(flags, _palette[index]);
-		}
-		else if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
-			 &&  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL < 31) )
-		{
-			// In case that GL 2.1 sampler object is supported via extension.
-			if (s_renderGL->m_samplerObjectSupport)
-			{
-				s_renderGL->setSamplerState(_stage, m_numMips, flags, _palette[index]);
-			}
-			else
-			{
-				setSamplerState(flags, _palette[index]);
-			}
+			s_renderGL->setSamplerState(_stage, m_numMips, flags, _palette[index]);
 		}
 		else
 		{
-			// Everything else has sampler object.
-			s_renderGL->setSamplerState(_stage, m_numMips, flags, _palette[index]);
+			setSamplerState(flags, _palette[index]);
 		}
 	}
 
@@ -5942,8 +6209,10 @@ namespace bgfx { namespace gl
 		bx::MemoryReader reader(_mem->data, _mem->size);
 		m_hash = bx::hash<bx::HashMurmur2A>(_mem->data, _mem->size);
 
+		bx::ErrorAssert err;
+
 		uint32_t magic;
-		bx::read(&reader, magic);
+		bx::read(&reader, magic, &err);
 
 		if (isShaderType(magic, 'C') )
 		{
@@ -5959,7 +6228,7 @@ namespace bgfx { namespace gl
 		}
 
 		uint32_t hashIn;
-		bx::read(&reader, hashIn);
+		bx::read(&reader, hashIn, &err);
 
 		uint32_t hashOut;
 
@@ -5969,11 +6238,11 @@ namespace bgfx { namespace gl
 		}
 		else
 		{
-			bx::read(&reader, hashOut);
+			bx::read(&reader, hashOut, &err);
 		}
 
 		uint16_t count;
-		bx::read(&reader, count);
+		bx::read(&reader, count, &err);
 
 		BX_TRACE("%s Shader consts %d"
 			, getShaderTypeName(magic)
@@ -5983,39 +6252,39 @@ namespace bgfx { namespace gl
 		for (uint32_t ii = 0; ii < count; ++ii)
 		{
 			uint8_t nameSize = 0;
-			bx::read(&reader, nameSize);
+			bx::read(&reader, nameSize, &err);
 
 			char name[256];
-			bx::read(&reader, &name, nameSize);
+			bx::read(&reader, &name, nameSize, &err);
 			name[nameSize] = '\0';
 
 			uint8_t type;
-			bx::read(&reader, type);
+			bx::read(&reader, type, &err);
 
 			uint8_t num;
-			bx::read(&reader, num);
+			bx::read(&reader, num, &err);
 
 			uint16_t regIndex;
-			bx::read(&reader, regIndex);
+			bx::read(&reader, regIndex, &err);
 
 			uint16_t regCount;
-			bx::read(&reader, regCount);
+			bx::read(&reader, regCount, &err);
 
 			if (!isShaderVerLess(magic, 8) )
 			{
 				uint16_t texInfo = 0;
-				bx::read(&reader, texInfo);
+				bx::read(&reader, texInfo, &err);
 			}
 
 			if (!isShaderVerLess(magic, 10) )
 			{
 				uint16_t texFormat = 0;
-				bx::read(&reader, texFormat);
+				bx::read(&reader, texFormat, &err);
 			}
 		}
 
 		uint32_t shaderSize;
-		bx::read(&reader, shaderSize);
+		bx::read(&reader, shaderSize, &err);
 
 		m_id = glCreateShader(m_type);
 		BX_WARN(0 != m_id, "Failed to create shader.");
@@ -6031,8 +6300,6 @@ namespace bgfx { namespace gl
 				char* temp = (char*)alloca(tempLen);
 				bx::StaticMemoryBlockWriter writer(temp, tempLen);
 
-				bx::Error err;
-
 				if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES)
 				&&  !s_renderGL->m_gles3)
 				{
@@ -6041,6 +6308,7 @@ namespace bgfx { namespace gl
 						  "#define flat\n"
 						  "#define noperspective\n"
 						  "#define smooth\n"
+						, &err
 						);
 
 					bool usesDerivatives = s_extension[Extension::OES_standard_derivatives].m_supported
@@ -6060,7 +6328,7 @@ namespace bgfx { namespace gl
 
 					if (usesDerivatives)
 					{
-						bx::write(&writer, "#extension GL_OES_standard_derivatives : enable\n");
+						bx::write(&writer, "#extension GL_OES_standard_derivatives : enable\n", &err);
 					}
 
 					if (usesFragData)
@@ -6069,7 +6337,7 @@ namespace bgfx { namespace gl
 							||  s_extension[Extension::WEBGL_draw_buffers].m_supported
 							, "EXT_draw_buffers is used but not supported by GLES2 driver."
 							);
-						bx::write(&writer, "#extension GL_EXT_draw_buffers : enable\n");
+						bx::write(&writer, "#extension GL_EXT_draw_buffers : enable\n", &err);
 					}
 
 					bool insertFragDepth = false;
@@ -6081,13 +6349,14 @@ namespace bgfx { namespace gl
 							bx::write(&writer
 								, "#extension GL_EXT_frag_depth : enable\n"
 								  "#define bgfx_FragDepth gl_FragDepthEXT\n"
+								, &err
 								);
 
 							char str[128];
 							bx::snprintf(str, BX_COUNTOF(str), "%s float gl_FragDepthEXT;\n"
 								, s_extension[Extension::OES_fragment_precision_high].m_supported ? "highp" : "mediump"
 								);
-							bx::write(&writer, str);
+							bx::write(&writer, str, &err);
 						}
 						else
 						{
@@ -6103,6 +6372,7 @@ namespace bgfx { namespace gl
 								, "#extension GL_EXT_shadow_samplers : enable\n"
 								  "#define shadow2D shadow2DEXT\n"
 								  "#define shadow2DProj shadow2DProjEXT\n"
+								, &err
 								);
 						}
 						else
@@ -6111,13 +6381,14 @@ namespace bgfx { namespace gl
 								, "#define sampler2DShadow sampler2D\n"
 								  "#define shadow2D(_sampler, _coord) step(_coord.z, texture2D(_sampler, _coord.xy).x)\n"
 								  "#define shadow2DProj(_sampler, _coord) step(_coord.z/_coord.w, texture2DProj(_sampler, _coord).x)\n"
+								, &err
 								);
 						}
 					}
 
 					if (usesTexture3D)
 					{
-						bx::write(&writer, "#extension GL_OES_texture_3D : enable\n");
+						bx::write(&writer, "#extension GL_OES_texture_3D : enable\n", &err);
 					}
 
 					if (usesTextureLod)
@@ -6137,6 +6408,7 @@ namespace bgfx { namespace gl
 								  "#define texture2DGrad     texture2DGradARB\n"
 								  "#define texture2DProjGrad texture2DProjGradARB\n"
 								  "#define textureCubeGrad   textureCubeGradARB\n"
+								, &err
 								);
 						}
 						else
@@ -6148,6 +6420,7 @@ namespace bgfx { namespace gl
 									  "#define texture2DLod     texture2DLodEXT\n"
 									  "#define texture2DProjLod texture2DProjLodEXT\n"
 									  "#define textureCubeLod   textureCubeLodEXT\n"
+									, &err
 									);
 							}
 							else
@@ -6156,6 +6429,7 @@ namespace bgfx { namespace gl
 									, "#define texture2DLod(_sampler, _coord, _level) texture2D(_sampler, _coord)\n"
 									  "#define texture2DProjLod(_sampler, _coord, _level) texture2DProj(_sampler, _coord)\n"
 									  "#define textureCubeLod(_sampler, _coord, _level) textureCube(_sampler, _coord)\n"
+									, &err
 									);
 							}
 						}
@@ -6165,11 +6439,11 @@ namespace bgfx { namespace gl
 					{
 						if (s_extension[Extension::INTEL_fragment_shader_ordering].m_supported)
 						{
-							bx::write(&writer, "#extension GL_INTEL_fragment_shader_ordering : enable\n");
+							bx::write(&writer, "#extension GL_INTEL_fragment_shader_ordering : enable\n", &err);
 						}
 						else
 						{
-							bx::write(&writer, "#define beginFragmentShaderOrdering()\n");
+							bx::write(&writer, "#define beginFragmentShaderOrdering()\n", &err);
 						}
 					}
 
@@ -6177,8 +6451,8 @@ namespace bgfx { namespace gl
 						, m_type == GL_FRAGMENT_SHADER ? "mediump" : "highp"
 						);
 
-					bx::write(&writer, code);
-					bx::write(&writer, '\0');
+					bx::write(&writer, code, &err);
+					bx::write(&writer, '\0', &err);
 
 					if (insertFragDepth)
 					{
@@ -6279,66 +6553,67 @@ namespace bgfx { namespace gl
 								  "#define texture2DGrad     texture2DGradARB\n"
 								  "#define texture2DProjGrad texture2DProjGradARB\n"
 								  "#define textureCubeGrad   textureCubeGradARB\n"
+								, &err
 								);
 						}
 					}
 
 					if (usesInstanceID)
 					{
-						bx::write(&writer, "#extension GL_ARB_draw_instanced : enable\n");
+						bx::write(&writer, "#extension GL_ARB_draw_instanced : enable\n", &err);
 					}
 
 					if (usesGpuShader4)
 					{
-						bx::write(&writer, "#extension GL_EXT_gpu_shader4 : enable\n");
+						bx::write(&writer, "#extension GL_EXT_gpu_shader4 : enable\n", &err);
 					}
 
 					if (usesGpuShader5)
 					{
-						bx::write(&writer, "#extension GL_ARB_gpu_shader5 : enable\n");
+						bx::write(&writer, "#extension GL_ARB_gpu_shader5 : enable\n", &err);
 					}
 
 					if (usesViewportLayerArray)
 					{
-						bx::write(&writer, "#extension GL_ARB_shader_viewport_layer_array : enable\n");
+						bx::write(&writer, "#extension GL_ARB_shader_viewport_layer_array : enable\n", &err);
 					}
 
 					if (usesPacking)
 					{
-						bx::write(&writer, "#extension GL_ARB_shading_language_packing : enable\n");
+						bx::write(&writer, "#extension GL_ARB_shading_language_packing : enable\n", &err);
 					}
 
 					if (usesTextureMS)
 					{
-						bx::write(&writer, "#extension GL_ARB_texture_multisample : enable\n");
+						bx::write(&writer, "#extension GL_ARB_texture_multisample : enable\n", &err);
 					}
 
 					if (usesTextureArray)
 					{
-						bx::write(&writer, "#extension GL_EXT_texture_array : enable\n");
+						bx::write(&writer, "#extension GL_EXT_texture_array : enable\n", &err);
 
 						if (BX_ENABLED(BX_PLATFORM_OSX) )
 						{
-							bx::write(&writer, "#define texture2DArrayLod texture2DArray\n");
+							bx::write(&writer, "#define texture2DArrayLod texture2DArray\n", &err);
 						}
 						else
 						{
-							bx::write(&writer, "#define texture2DArrayLodEXT texture2DArrayLod\n");
-							bx::write(&writer, "#define textureArray texture\n");
+							bx::write(&writer, "#define texture2DArrayLodEXT texture2DArrayLod\n", &err);
+							bx::write(&writer, "#define textureArray texture\n", &err);
 						}
 					}
 
 					if (usesTexture3D)
 					{
-						bx::write(&writer, "#define texture3DEXT texture3D\n");
+						bx::write(&writer, "#define texture3DEXT texture3D\n", &err);
 
 						if (BX_ENABLED(BX_PLATFORM_OSX) )
 						{
-							bx::write(&writer, "#define texture3DLodEXT texture3D\n");
+							bx::write(&writer, "#define texture3DLodEXT texture3D\n", &err);
 						}
 						else
 						{
-							bx::write(&writer, "#define texture3DLodEXT texture3DLod\n");
+							bx::write(&writer, "#define texture3DLodEXT texture3DLod\n", &err);
 						}
 					}
 
@@ -6348,12 +6623,12 @@ namespace bgfx { namespace gl
 						{
 							if (m_type == GL_FRAGMENT_SHADER)
 							{
-								bx::write(&writer, "#define varying in\n");
+								bx::write(&writer, "#define varying in\n", &err);
 							}
 							else
 							{
-								bx::write(&writer, "#define attribute in\n");
-								bx::write(&writer, "#define varying out\n");
+								bx::write(&writer, "#define attribute in\n", &err);
+								bx::write(&writer, "#define varying out\n", &err);
 							}
 						}
 
@@ -6374,56 +6649,63 @@ namespace bgfx { namespace gl
 						if (0 != fragData)
 						{
 							bx::write(&writer, &err, "out vec4 bgfx_FragData[%d];\n", fragData);
-							bx::write(&writer, "#define gl_FragData bgfx_FragData\n");
+							bx::write(&writer, "#define gl_FragData bgfx_FragData\n", &err);
 						}
 						else if (!bx::findIdentifierMatch(code, "gl_FragColor").isEmpty() )
 						{
-							bx::write(&writer, "out vec4 bgfx_FragColor;\n");
-							bx::write(&writer, "#define gl_FragColor bgfx_FragColor\n");
+							bx::write(&writer
+								, "out vec4 bgfx_FragColor;\n"
+								  "#define gl_FragColor bgfx_FragColor\n"
+								, &err
+								);
 						}
 					}
 					else
 					{
 						if (m_type == GL_FRAGMENT_SHADER)
 						{
-							bx::write(&writer, "#define in varying\n");
+							bx::write(&writer, "#define in varying\n", &err);
 						}
 						else
 						{
 							bx::write(&writer
 								, "#define in attribute\n"
 								  "#define out varying\n"
+								, &err
 								);
 						}
 					}
 
-					bx::write(&writer,
-						"#define lowp\n"
-						"#define mediump\n"
-						"#define highp\n"
+					bx::write(&writer
+						, "#define lowp\n"
+						  "#define mediump\n"
+						  "#define highp\n"
+						, &err
 						);
 
 					if (!usesInterpQ)
 					{
-						bx::write(&writer,
-							"#define centroid\n"
-							"#define flat\n"
-							"#define noperspective\n"
-							"#define smooth\n"
+						bx::write(&writer
+							,
+							  "#define centroid\n"
+							  "#define flat\n"
+							  "#define noperspective\n"
+							  "#define smooth\n"
+							, &err
 							);
 					}
 
 					if (version == 430)
 					{
 						int32_t verLen = bx::strLen("#version 430\n");
-						bx::write(&writer, code.getPtr()+verLen, code.getLength()-verLen);
+						bx::write(&writer, code.getPtr()+verLen, code.getLength()-verLen, &err);
 					}
 					else
 					{
-						bx::write(&writer, code);
+						bx::write(&writer, code, &err);
 					}
 
-					bx::write(&writer, '\0');
+					bx::write(&writer, '\0', &err);
 				}
 				else if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL   >= 31)
 					 ||  s_renderGL->m_gles3)
@@ -6438,7 +6720,7 @@ namespace bgfx { namespace gl
 					}
 					else
 					{
-						bx::write(&writer, "#version 140\n");
+						bx::write(&writer, "#version 140\n", &err);
 					}
 
 					bx::write(&writer
@@ -6448,33 +6730,47 @@ namespace bgfx { namespace gl
 						  "#define texture2DGrad   textureGrad\n"
 						  "#define texture3DGrad   textureGrad\n"
 						  "#define textureCubeGrad textureGrad\n"
+						, &err
 						);
 
 					if (m_type == GL_FRAGMENT_SHADER)
 					{
 						bx::write(&writer
-							, "#define varying       in\n"
-							  "#define texture2D     texture\n"
-							  "#define texture2DProj textureProj\n"
+							, "#define varying        in\n"
+							  "#define texture2D      texture\n"
+							  "#define texture2DArray texture\n"
+							  "#define texture2DProj  textureProj\n"
+							, &err
 							);
 
 						if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
 						{
-							bx::write(&writer, "#define shadow2D(_sampler, _coord) vec2(textureProj(_sampler, vec4(_coord, 1.0) ) )\n");
-							bx::write(&writer, "#define shadow2DProj(_sampler, _coord) vec2(textureProj(_sampler, _coord) ) )\n");
+							bx::write(&writer
+								, "#define shadow2D(_sampler, _coord) vec2(textureProj(_sampler, vec4(_coord, 1.0) ) )\n"
+								  "#define shadow2DProj(_sampler, _coord) vec2(textureProj(_sampler, _coord) )\n"
+								, &err
+								);
 						}
 						else
 						{
-							bx::write(&writer, "#define shadow2D(_sampler, _coord) (textureProj(_sampler, vec4(_coord, 1.0) ) )\n");
-							bx::write(&writer, "#define shadow2DProj(_sampler, _coord) (textureProj(_sampler, _coord) ) )\n");
+							bx::write(&writer
+								, "#define shadow2D(_sampler, _coord) (textureProj(_sampler, vec4(_coord, 1.0) ) )\n"
+								  "#define shadow2DProj(_sampler, _coord) (textureProj(_sampler, _coord) )\n"
+								, &err
+								);
 						}
 
-						bx::write(&writer, "#define texture3D   texture\n");
-						bx::write(&writer, "#define textureCube texture\n");
+						bx::write(&writer
+							, "#define texture3D   texture\n"
+							  "#define textureCube texture\n"
+							, &err
+							);
 
 						uint32_t fragData = 0;
 
-						if (!bx::findIdentifierMatch(code, "gl_FragData").isEmpty() )
+						bool patchedFragData = s_renderGL->m_gles3 && !bx::findIdentifierMatch(code, "bgfx_FragData").isEmpty();
+
+						if (!patchedFragData && !bx::findIdentifierMatch(code, "gl_FragData").isEmpty() )
 						{
 							for (uint32_t ii = 0, num = g_caps.limits.maxFBAttachments; ii < num; ++ii)
 							{
@@ -6490,30 +6786,37 @@ namespace bgfx { namespace gl
 						{
 							if (s_extension[Extension::INTEL_fragment_shader_ordering].m_supported)
 							{
-								bx::write(&writer, "#extension GL_INTEL_fragment_shader_ordering : enable\n");
+								bx::write(&writer, "#extension GL_INTEL_fragment_shader_ordering : enable\n", &err);
 							}
 							else
 							{
-								bx::write(&writer, "#define beginFragmentShaderOrdering()\n");
+								bx::write(&writer, "#define beginFragmentShaderOrdering()\n", &err);
 							}
 						}
 
 						if (!bx::findIdentifierMatch(code, s_ARB_texture_multisample).isEmpty() )
 						{
-							bx::write(&writer, "#extension GL_ARB_texture_multisample : enable\n");
+							bx::write(&writer, "#extension GL_ARB_texture_multisample : enable\n", &err);
 						}
 
 						if (0 != fragData)
 						{
-							bx::write(&writer, &err, "out vec4 bgfx_FragData[%d];\n", fragData);
-							bx::write(&writer, "#define gl_FragData bgfx_FragData\n");
+							if (!patchedFragData)
+							{
+								bx::write(&writer, &err, "out vec4 bgfx_FragData[%d];\n", fragData);
+								bx::write(&writer, "#define gl_FragData bgfx_FragData\n", &err);
+							}
 						}
-						else
+						else if (!patchedFragData)
 						{
-							bx::write(&writer
-								, "out vec4 bgfx_FragColor;\n"
-								  "#define gl_FragColor bgfx_FragColor\n"
-								);
+							if (bx::findIdentifierMatch(code, "bgfx_FragColor").isEmpty() )
+							{
+								bx::write(&writer
+									, "out vec4 bgfx_FragColor;\n"
+									  "#define gl_FragColor bgfx_FragColor\n"
+									, &err
+									);
+							}
 						}
 					}
 					else
@@ -6521,20 +6824,22 @@ namespace bgfx { namespace gl
 						bx::write(&writer
 							, "#define attribute in\n"
 							  "#define varying   out\n"
+							, &err
 							);
 					}
 
-					if (!BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
+					if (!s_renderGL->m_gles3)
 					{
 						bx::write(&writer
 							, "#define lowp\n"
 							  "#define mediump\n"
 							  "#define highp\n"
+							, &err
 							);
 					}
 
-					bx::write(&writer, code.getPtr(), code.getLength() );
-					bx::write(&writer, '\0');
+					bx::write(&writer, code.getPtr(), code.getLength(), &err);
+					bx::write(&writer, '\0', &err);
 				}
 
 				code.set(temp);
@@ -6557,11 +6862,12 @@ namespace bgfx { namespace gl
 					  "#define texture2DGrad            textureGrad\n"
 					  "#define texture3DGrad            textureGrad\n"
 					  "#define textureCubeGrad          textureGrad\n"
+					, &err
 					);
 
 				int32_t verLen = bx::strLen("#version 430\n");
-				bx::write(&writer, code.getPtr()+verLen, codeLen-verLen);
-				bx::write(&writer, '\0');
+				bx::write(&writer, code.getPtr()+verLen, codeLen-verLen, &err);
+				bx::write(&writer, '\0', &err);
 
 				code = temp;
 			}
@@ -6584,7 +6890,7 @@ namespace bgfx { namespace gl
 				{
 					bx::StringView str = lineReader.next();
 					BX_TRACE("%3d %.*s", line, str.getLength(), str.getPtr() );
-					BX_UNUSED(str);
+					BX_UNUSED(str, line);
 				}
 
 				GLsizei len;
@@ -6683,8 +6989,8 @@ namespace bgfx { namespace gl
 
 					if (0 != texture.m_rbo)
 					{
-#if !(BGFX_CONFIG_RENDERER_OPENGL >= 30 || BGFX_CONFIG_RENDERER_OPENGLES >= 30)
-						if (GL_DEPTH_STENCIL_ATTACHMENT == attachment)
+						if (!(BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL >= 30) || s_renderGL->m_gles3)
+							&& GL_DEPTH_STENCIL_ATTACHMENT == attachment)
 						{
 							GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER
 								, GL_DEPTH_ATTACHMENT
@@ -6698,7 +7004,6 @@ namespace bgfx { namespace gl
 								) );
 						}
 						else
-#endif
 						{
 							GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER
 								, attachment
@@ -6754,22 +7059,19 @@ namespace bgfx { namespace gl
 
 			m_num = uint8_t(colorIdx);
 
-			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL || BGFX_CONFIG_RENDERER_OPENGLES >= 31) )
+			if (0 == colorIdx && BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
 			{
-				if (0 == colorIdx)
-				{
-					if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
-					{
-						// When only depth is attached disable draw buffer to avoid
-						// GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER.
-						GL_CHECK(glDrawBuffer(GL_NONE) );
-					}
-				}
-				else
-				{
-					GL_CHECK(glDrawBuffers(colorIdx, buffers) );
-				}
+				// When only depth is attached disable draw buffer to avoid
+				// GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER.
+				GL_CHECK(glDrawBuffer(GL_NONE) );
+			}
+			else if (g_caps.limits.maxFBAttachments > 0)
+			{
+				GL_CHECK(glDrawBuffers(colorIdx, buffers) );
+			}
 
+			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || s_renderGL->m_gles3)
+			{
 				// Disable read buffer to avoid GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER.
 				GL_CHECK(glReadBuffer(GL_NONE) );
 			}
@@ -6850,7 +7152,7 @@ namespace bgfx { namespace gl
 
 	uint16_t FrameBufferGL::destroy()
 	{
-		if (0 != m_num)
+		if (0 != m_fbo[0])
 		{
 			GL_CHECK(glDeleteFramebuffers(0 == m_fbo[1] ? 1 : 2, m_fbo) );
 			m_num = 0;
@@ -6889,12 +7191,16 @@ namespace bgfx { namespace gl
 
 					if (!bimg::isDepth(format) )
 					{
-						GL_CHECK(glDisable(GL_SCISSOR_TEST));
+						GL_CHECK(glDisable(GL_SCISSOR_TEST) );
+
 						GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo[0]) );
 						GL_CHECK(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo[1]) );
+
 						GL_CHECK(glReadBuffer(GL_COLOR_ATTACHMENT0 + colorIdx) );
 						GL_CHECK(glDrawBuffer(GL_COLOR_ATTACHMENT0 + colorIdx) );
+
 						colorIdx++;
+
 						GL_CHECK(glBlitFramebuffer(0
 							, 0
 							, m_width
@@ -6906,18 +7212,14 @@ namespace bgfx { namespace gl
 							, GL_COLOR_BUFFER_BIT
 							, GL_LINEAR
 							) );
+					}
+					else if (!writeOnly)
+					{
+						GL_CHECK(glDisable(GL_SCISSOR_TEST) );
 
-					} else if (!writeOnly) {
-						GL_CHECK(glDisable(GL_SCISSOR_TEST));
-						// blit depth attachment as well if it doesn't have
-						// BGFX_TEXTURE_RT_WRITE_ONLY render target flag. In most cases it's
-						// not necessary to blit the depth buffer.
 						GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo[0]) );
 						GL_CHECK(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo[1]) );
-						// OpenGL complains about missing buffer if set
-						// attachment. not sure what I'm missing...
-						// GL_CHECK(glReadBuffer(GL_DEPTH_ATTACHMENT) );
-						// GL_CHECK(glDrawBuffer(GL_DEPTH_ATTACHMENT) );
+
 						GL_CHECK(glBlitFramebuffer(0
 							, 0
 							, m_width
@@ -6934,7 +7236,12 @@ namespace bgfx { namespace gl
 			}
 
 			GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo[0]) );
-			GL_CHECK(glReadBuffer(GL_NONE) );
+
+			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || s_renderGL->m_gles3)
+			{
+				GL_CHECK(glReadBuffer(GL_NONE) );
+			}
+
 			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, s_renderGL->m_msaaBackBufferFbo) );
 		}
 
@@ -7103,7 +7410,7 @@ namespace bgfx { namespace gl
 				const TextureGL& src = m_textures[bi.m_src.idx];
 				const TextureGL& dst = m_textures[bi.m_dst.idx];
 
-				BX_ASSERT(0 == bi.m_srcZ && 0 == bi.m_dstZ && 0 == bi.m_depth
+				BX_ASSERT(0 == bi.m_srcZ && 0 == bi.m_dstZ && 1 >= bi.m_depth
 					, "Blitting 3D regions is not supported"
 					);
 
@@ -7137,7 +7444,7 @@ namespace bgfx { namespace gl
 					) );
 
 				GL_CHECK(glDeleteFramebuffers(1, &fbo) );
-				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_currentFbo) );
 			}
 		}
 	}
@@ -7181,7 +7488,7 @@ namespace bgfx { namespace gl
 		if (m_timerQuerySupport
 		&&  !BX_ENABLED(BX_PLATFORM_OSX) )
 		{
-			frameQueryIdx = m_gpuTimer.begin(BGFX_CONFIG_MAX_VIEWS);
+			frameQueryIdx = m_gpuTimer.begin(BGFX_CONFIG_MAX_VIEWS, _render->m_frameNum);
 		}
 
 		if (0 < _render->m_iboffset)
@@ -7605,8 +7912,8 @@ namespace bgfx { namespace gl
 					 | BGFX_STATE_BLEND_MASK
 					 | BGFX_STATE_CONSERVATIVE_RASTER
 					 | BGFX_STATE_CULL_MASK
-					 | BGFX_STATE_DEPTH_TEST_MASK
 					 | BGFX_STATE_FRONT_CCW
+					 | BGFX_STATE_DEPTH_TEST_MASK
 					 | BGFX_STATE_LINEAA
 					 | BGFX_STATE_MSAA
 					 | BGFX_STATE_POINT_SIZE_MASK
@@ -8082,6 +8389,19 @@ namespace bgfx { namespace gl
 								GL_CHECK(glBindBuffer(GL_DRAW_INDIRECT_BUFFER, vb.m_id) );
 							}
 
+							uint32_t numOffsetIndirect = 0;
+							if (isValid(draw.m_numIndirectBuffer) )
+							{
+								if (currentState.m_numIndirectBuffer.idx != draw.m_numIndirectBuffer.idx)
+								{
+									const IndexBufferGL& nb = m_indexBuffers[draw.m_numIndirectBuffer.idx];
+									currentState.m_numIndirectBuffer = draw.m_numIndirectBuffer;
+									GL_CHECK(glBindBuffer(GL_PARAMETER_BUFFER_ARB, nb.m_id) );
+								}
+
+								numOffsetIndirect = draw.m_numIndirectIndex * sizeof(uint32_t);
+							}
+
 							if (isValid(draw.m_indexBuffer) )
 							{
 								const IndexBufferGL& ib = m_indexBuffers[draw.m_indexBuffer.idx];
@@ -8097,11 +8417,24 @@ namespace bgfx { namespace gl
 									;
 
 								uintptr_t args = draw.m_startIndirect * BGFX_CONFIG_DRAW_INDIRECT_STRIDE;
-								GL_CHECK(glMultiDrawElementsIndirect(prim.m_type, indexFormat
-									, (void*)args
-									, numDrawIndirect
-									, BGFX_CONFIG_DRAW_INDIRECT_STRIDE
-									) );
+
+								if (isValid(draw.m_numIndirectBuffer) )
+								{
+									GL_CHECK(glMultiDrawElementsIndirectCount(prim.m_type, indexFormat
+										, (void*)args
+										, numOffsetIndirect
+										, numDrawIndirect
+										, BGFX_CONFIG_DRAW_INDIRECT_STRIDE
+										) );
+								}
+								else
+								{
+									GL_CHECK(glMultiDrawElementsIndirect(prim.m_type, indexFormat
+										, (void*)args
+										, numDrawIndirect
+										, BGFX_CONFIG_DRAW_INDIRECT_STRIDE
+										) );
+								}
 							}
 							else
 							{
@@ -8111,11 +8444,24 @@ namespace bgfx { namespace gl
 									;
 
 								uintptr_t args = draw.m_startIndirect * BGFX_CONFIG_DRAW_INDIRECT_STRIDE;
-								GL_CHECK(glMultiDrawArraysIndirect(prim.m_type
-									, (void*)args
-									, numDrawIndirect
-									, BGFX_CONFIG_DRAW_INDIRECT_STRIDE
-									) );
+
+								if (isValid(draw.m_numIndirectBuffer) )
+								{
+									GL_CHECK(glMultiDrawArraysIndirectCount(prim.m_type
+										, (void*)args
+										, numOffsetIndirect
+										, numDrawIndirect
+										, BGFX_CONFIG_DRAW_INDIRECT_STRIDE
+										) );
+								}
+								else
+								{
+									GL_CHECK(glMultiDrawArraysIndirect(prim.m_type
+										, (void*)args
+										, numDrawIndirect
+										, BGFX_CONFIG_DRAW_INDIRECT_STRIDE
+										) );
+								}
 							}
 						}
 						else
@@ -8124,6 +8470,12 @@ namespace bgfx { namespace gl
 							{
 								currentState.m_indirectBuffer.idx = kInvalidHandle;
 								GL_CHECK(glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0) );
+
+								if (isValid(currentState.m_numIndirectBuffer) )
+								{
+									currentState.m_numIndirectBuffer.idx = kInvalidHandle;
+									GL_CHECK(glBindBuffer(GL_PARAMETER_BUFFER_ARB, 0) );
+								}
 							}
 
 							if (isValid(draw.m_indexBuffer) )
@@ -8270,6 +8622,7 @@ namespace bgfx { namespace gl
 		perfStats.numCompute    = statsKeyType[1];
 		perfStats.numBlit       = _render->m_numBlitItems;
 		perfStats.maxGpuLatency = maxGpuLatency;
+		perfStats.gpuFrameNum   = result.m_frameNum;
 		bx::memCopy(perfStats.numPrims, statsNumPrimsRendered, sizeof(perfStats.numPrims) );
 		perfStats.gpuMemoryMax  = -INT64_MAX;
 		perfStats.gpuMemoryUsed = -INT64_MAX;

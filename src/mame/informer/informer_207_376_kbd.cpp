@@ -201,8 +201,6 @@ informer_207_376_kbd_hle_device::informer_207_376_kbd_hle_device(const machine_c
 
 void informer_207_376_kbd_hle_device::device_start()
 {
-	// resolve callbacks
-	m_tx_handler.resolve_safe();
 }
 
 //-------------------------------------------------

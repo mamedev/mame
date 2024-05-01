@@ -8,7 +8,7 @@
 
 #include "emu.h"
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "machine/nvram.h"
 #include "sound/x1_010.h"
 #include "video/x1_001.h"
@@ -37,9 +37,8 @@ protected:
 private:
 	void row_select_w(u16 data);
 	u16 input_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(kiwame_vblank);
+	void kiwame_vblank(int state);
 
-	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kiwame_map(address_map &map);
@@ -70,20 +69,6 @@ u16 kiwame_state::input_r(offs_t offset)
 			return m_key[i + (offset == 0 ? 0 : 5)]->read();
 
 	return 0xffff;
-}
-
-WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
-{
-	if (state)
-		m_maincpu->external_interrupt_0();
-}
-
-X1_001_SPRITE_GFXBANK_CB_MEMBER(kiwame_state::setac_gfxbank_callback)
-{
-	const int bank = (color & 0x06) >> 1;
-	code = (code & 0x3fff) + (bank * 0x4000);
-
-	return code;
 }
 
 u32 kiwame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -284,12 +269,11 @@ void kiwame_state::kiwame(machine_config &config)
 	/* basic machine hardware */
 	TMP68301(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kiwame_state::kiwame_map);
-	m_maincpu->out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
+	m_maincpu->parallel_w_cb().set(FUNC(kiwame_state::row_select_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x LH52B256D-70LL + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x LH52B256D-70LL + battery (possibly only lower bytes battery-backed)
 
 	X1_001(config, m_spritegen, 16000000, "palette", gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(kiwame_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(-16, 0); // correct (test grid)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -302,7 +286,7 @@ void kiwame_state::kiwame(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 56*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(kiwame_state::screen_update));
-	screen.screen_vblank().set(FUNC(kiwame_state::kiwame_vblank));
+	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512);    // sprites only

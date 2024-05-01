@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NAMCO68_H
-#define MAME_MACHINE_NAMCO68_H
+#ifndef MAME_NAMCO_NAMCO68_H
+#define MAME_NAMCO_NAMCO68_H
 
 #pragma once
 
-#include "machine/bankdev.h"
 #include "cpu/m6502/m3745x.h"
 
 DECLARE_DEVICE_TYPE(NAMCOC68, namcoc68_device)
@@ -47,7 +46,6 @@ protected:
 	void c68_default_am(address_map &map);
 
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_reset() override;
@@ -96,4 +94,4 @@ private:
 	uint8_t m_player_mux;
 };
 
-#endif // MAME_MACHINE_NAMCO68_H
+#endif // MAME_NAMCO_NAMCO68_H

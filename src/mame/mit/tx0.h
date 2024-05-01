@@ -175,7 +175,7 @@ protected:
 	virtual void video_start() override;
 	void tx0_palette(palette_device &palette) const;
 	uint32_t screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tx0);
+	void screen_vblank_tx0(int state);
 	INTERRUPT_GEN_MEMBER(tx0_interrupt);
 	TIMER_CALLBACK_MEMBER(reader_callback);
 	TIMER_CALLBACK_MEMBER(puncher_callback);
@@ -202,15 +202,15 @@ protected:
 	void typewriter_out(uint8_t data);
 
 	void tx0_keyboard();
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_cpy);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_r1l);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_r3l);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_p6h);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_p7h);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_prt);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_dis);
-	DECLARE_WRITE_LINE_MEMBER(tx0_sel);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_reset_callback);
+	void tx0_io_cpy(int state);
+	void tx0_io_r1l(int state);
+	void tx0_io_r3l(int state);
+	void tx0_io_p6h(int state);
+	void tx0_io_p7h(int state);
+	void tx0_io_prt(int state);
+	void tx0_io_dis(int state);
+	void tx0_sel(int state);
+	void tx0_io_reset_callback(int state);
 	void magtape_callback();
 
 	void tx0_64kw_map(address_map &map);

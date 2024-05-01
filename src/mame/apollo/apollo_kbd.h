@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef MAME_MACHINE_APOLLO_KBD_H
-#define MAME_MACHINE_APOLLO_KBD_H
+#ifndef MAME_APOLLO_APOLLO_KBD_H
+#define MAME_APOLLO_APOLLO_KBD_H
 
 #pragma once
 
@@ -44,17 +44,17 @@ public:
 	auto german_cb() { return m_german_r.bind(); }
 
 private:
-	// device-level overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// serial overrides
+	// device_serial_interface implementation
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
+
 	void input_callback(uint8_t state);
 
 	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
@@ -149,4 +149,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(APOLLO_KBD, apollo_kbd_device)
 
-#endif // MAME_MACHINE_APOLLO_KBD_H
+#endif // MAME_APOLLO_APOLLO_KBD_H

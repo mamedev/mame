@@ -5,8 +5,8 @@
     Taito Ensoniq ES5505-based sound hardware
 
 ****************************************************************************/
-#ifndef MAME_AUDIO_TAITO_EN_H
-#define MAME_AUDIO_TAITO_EN_H
+#ifndef MAME_TAITO_TAITO_EN_H
+#define MAME_TAITO_TAITO_EN_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TAITO_EN, taito_en_device)
 
-#endif // MAME_AUDIO_TAITO_EN_H
+#endif // MAME_TAITO_TAITO_EN_H

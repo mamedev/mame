@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_315_5881_CRYPT_H
-#define MAME_MACHINE_315_5881_CRYPT_H
+#ifndef MAME_SEGA_315_5881_CRYPT_H
+#define MAME_SEGA_315_5881_CRYPT_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 
 };
 
-#endif // MAME_MACHINE_315_5881_CRYPT_H
+#endif // MAME_SEGA_315_5881_CRYPT_H

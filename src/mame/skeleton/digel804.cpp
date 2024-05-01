@@ -41,6 +41,8 @@
 #include "digel804.lh"
 
 
+namespace {
+
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
@@ -115,8 +117,8 @@ protected:
 	void acia_command_w(uint8_t data);
 	uint8_t acia_control_r();
 	void acia_control_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( da_w );
+	void acia_irq_w(int state);
+	void da_w(int state);
 
 	void z80_mem_804_1_4(address_map &map);
 	void z80_io_1_4(address_map &map);
@@ -162,7 +164,7 @@ public:
 	void ep804(machine_config &config);
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
+	void ep804_acia_irq_w(int state);
 
 	void z80_mem_804_1_2(address_map &map);
 	void z80_io_1_2(address_map &map);
@@ -623,19 +625,19 @@ DEVICE_INPUT_DEFAULTS_END
  Machine Drivers
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( digel804_state::da_w )
+void digel804_state::da_w(int state)
 {
 	m_key_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
+void digel804_state::acia_irq_w(int state)
 {
 	m_acia_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( ep804_state::ep804_acia_irq_w )
+void ep804_state::ep804_acia_irq_w(int state)
 {
 }
 
@@ -791,6 +793,7 @@ ROM_START(ep804) // pcb v1.0; address mapper 804-1-2
 	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30dd4721) SHA1(e4b2f5756118be4c8ab56c708dc4f42469c7e51b)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************

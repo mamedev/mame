@@ -114,16 +114,30 @@ public:
 	ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	bool is_read_access_not_rom(void) override;
 	bool is_write_access_not_rom(void) override;
 	uint8_t read_extra(offs_t offset) override;
 	void write_extra(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(write_sda) override;
-	DECLARE_WRITE_LINE_MEMBER(write_scl) override;
-	DECLARE_READ_LINE_MEMBER(read_sda ) override;
+	void write_sda(int state) override;
+	void write_scl(int state) override;
+	int read_sda() override;
 };
+
+class ekara_rom_i2c_24lc08_evio_device : public ekara_rom_i2c_24lc02_gc0010_device
+{
+public:
+	// construction/destruction
+	ekara_rom_i2c_24lc08_evio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(EKARA_ROM_PLAIN,       ekara_rom_plain_device)
@@ -132,5 +146,6 @@ DECLARE_DEVICE_TYPE(EKARA_ROM_I2C_24C08_EPITCH,   ekara_rom_i2c_24c08_epitch_dev
 DECLARE_DEVICE_TYPE(EKARA_ROM_I2C_24LC04,  ekara_rom_i2c_24lc04_device)
 DECLARE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02,  ekara_rom_i2c_24lc02_device)
 DECLARE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02_GC0010,  ekara_rom_i2c_24lc02_gc0010_device)
+DECLARE_DEVICE_TYPE(EKARA_ROM_I2C_24LC08_EVIO,  ekara_rom_i2c_24lc08_evio_device)
 
 #endif // MAME_BUS_EKARA_ROM_H

@@ -88,7 +88,6 @@
 
 #include "emu.h"
 
-#include "macrtc.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
@@ -99,6 +98,7 @@
 #include "machine/z80scc.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
@@ -109,6 +109,9 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+
+namespace {
 
 #define C32M (31.3344_MHz_XTAL)
 #define C15M (C32M/2)
@@ -177,7 +180,7 @@ private:
 	void mac_via_out_a(uint8_t data);
 	void mac_via_out_b(uint8_t data);
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
+	void via_irq_w(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	int m_via_cycles = 0, m_via_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
 	int m_ca1_data = 0;
@@ -218,7 +221,7 @@ private:
 	// returns nonzero if no PDS RAM expansion, 0 if present
 	uint16_t mac_config_r() { return 0xffff; }
 
-	DECLARE_WRITE_LINE_MEMBER(asc_irq_w)
+	void asc_irq_w(int state)
 	{
 		m_asc_interrupt = state;
 		field_interrupts();
@@ -362,7 +365,7 @@ void macportable_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	m_maincpu->adjust_icount(m_via_cycles);
 }
 
-WRITE_LINE_MEMBER(macportable_state::via_irq_w)
+void macportable_state::via_irq_w(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
@@ -422,7 +425,7 @@ void macportable_state::scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void macportable_state::scsi_berr_w(uint8_t data)
 {
-	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+	m_maincpu->trigger_bus_error();
 }
 
 /***************************************************************************
@@ -507,6 +510,7 @@ void macportable_state::macprtb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macportable_state::macprtb_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macportable_state::pmu_data_r));
@@ -534,7 +538,6 @@ void macportable_state::macprtb(machine_config &config)
 	m_screen->set_screen_update(FUNC(macportable_state::screen_update));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macportable_state::set_adb_line));
 
 	SWIM1(config, m_swim, C15M);
@@ -588,6 +591,8 @@ void macportable_state::macprtb(machine_config &config)
 	m_ram->set_default_size("1M");
 	m_ram->set_extra_options("1M,3M,5M,7M,9M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
@@ -614,6 +619,9 @@ ROM_START(macpb100)
 	ROM_REGION(0xc00, "kybd", 0)
 	ROM_LOAD("342s0743-1.u29", 0x000, 0xc00, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1989, macprtb,  0, 0, macprtb, macadb, macportable_state, init_macprtb, "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING)
 COMP(1991, macpb100, 0, 0, macprtb, macadb, macportable_state, init_macprtb, "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )

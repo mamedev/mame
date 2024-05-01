@@ -39,7 +39,6 @@ void maple_dc_device::device_start()
 {
 	logerror("maple_dc_device started\n");
 	timer = timer_alloc(FUNC(maple_dc_device::dma_timer_tick), this);
-	irq_cb.resolve_safe();
 
 	mdstar = 0;
 

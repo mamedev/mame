@@ -14,8 +14,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_DECORMC3_H
-#define MAME_VIDEO_DECORMC3_H
+#ifndef MAME_DATAEAST_DECORMC3_H
+#define MAME_DATAEAST_DECORMC3_H
 
 #pragma once
 
@@ -49,7 +49,6 @@ public:
 //  void set_endianness(endianness_t endianness);
 	void set_entries(u32 entries) { m_entries = entries; }
 	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
-	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }
 	template <typename T> void set_prom_region(T &&tag) { m_prom_region.set_tag(std::forward<T>(tag)); }
 
 	// palette RAM accessors
@@ -87,8 +86,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return m_entries; }
-	virtual u32 palette_indirect_entries() const override { return m_indirect_entries; }
+	virtual u32 palette_entries() const noexcept override { return m_entries; }
+	virtual u32 palette_indirect_entries() const noexcept override { return m_indirect_entries; }
 
 private:
 	void update_for_write(offs_t byte_offset, int bytes_modified, bool indirect = false);
@@ -111,4 +110,4 @@ private:
 	memory_array        m_paletteram_ext;       // extended memory
 };
 
-#endif  // MAME_VIDEO_DECORMC3_H
+#endif  // MAME_DATAEAST_DECORMC3_H

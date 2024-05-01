@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
 
@@ -678,7 +678,7 @@ license:CC0
 	</software>
 
 	<software name="spongebobg" supported="no">
-		<description>Spongebob Schwammkopf - Meeres-Geschichten (Germany)</description>
+		<description>SpongeBob Schwammkopf - Meeres-Geschichten (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11540"/>
@@ -687,7 +687,7 @@ license:CC0
 			<feature name="pcb_rev" value="Rev.00"/>
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11540 - Spongebob Schwammkopf - Meeres-Geschichten (GER).bin" size="0x400000" crc="cf81398e" sha1="52c8cd56c49d53a20129b3870527f180e22683b4" />
+				<rom name="500-11540 - SpongeBob Schwammkopf - Meeres-Geschichten (GER).bin" size="0x400000" crc="cf81398e" sha1="52c8cd56c49d53a20129b3870527f180e22683b4" />
 			</dataarea>
 		</part>
 	</software>

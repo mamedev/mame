@@ -46,6 +46,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 #define MASTER_CLOCK XTAL(23'814'000)
 
 class tv950_state : public driver_device
@@ -73,12 +76,12 @@ private:
 	void via_a_w(uint8_t data);
 	void via_b_w(uint8_t data);
 	uint8_t via_b_r();
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs_w);
+	void crtc_vs_w(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	void row_addr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
+	void via_crtc_reset_w(int state);
 
 	void tv950_mem(address_map &map);
 
@@ -206,12 +209,12 @@ void tv950_state::machine_reset()
 	m_attr_screen = 0;
 }
 
-WRITE_LINE_MEMBER(tv950_state::crtc_vs_w)
+void tv950_state::crtc_vs_w(int state)
 {
 	m_attr_screen = 0;
 }
 
-WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
+void tv950_state::via_crtc_reset_w(int state)
 {
 	//printf("via_crtc_reset_w: %d\n", state);
 	m_via->write_ca1(state);
@@ -359,6 +362,9 @@ ROM_START( tv950 )
 	ROM_LOAD( "1800000-003a.a32", 0x0000, 0x1000, CRC(eaef0138) SHA1(7198851299fce07c95d18e32cbfbe936c0dbec2a) )
 	ROM_LOAD( "1800000-002a.a33", 0x0000, 0x1000, CRC(856dd85c) SHA1(e2570017e098b0e1ead7749e9c2ac40be2367433) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME                            FLAGS

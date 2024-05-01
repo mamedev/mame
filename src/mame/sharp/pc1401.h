@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1401_H
-#define MAME_INCLUDES_PC1401_H
+#ifndef MAME_SHARP_PC1401_H
+#define MAME_SHARP_PC1401_H
 
 #include "pocketc.h"
 
@@ -36,7 +36,7 @@ protected:
 	void pc1401_mem(address_map &map);
 	void pc1402_mem(address_map &map);
 
-	DECLARE_READ_LINE_MEMBER(reset_r);
+	int reset_r();
 	void out_b_w(uint8_t data);
 	void out_c_w(uint8_t data);
 	uint8_t in_a_r();
@@ -63,4 +63,4 @@ private:
 	static const char* const s_e[5];
 };
 
-#endif // MAME_INCLUDES_PC1401_H
+#endif // MAME_SHARP_PC1401_H

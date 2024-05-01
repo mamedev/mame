@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Ryan Holtz
-#ifndef MAME_INCLUDES_STARCRUS_H
-#define MAME_INCLUDES_STARCRUS_H
+#ifndef MAME_RAMTEK_STARCRUS_H
+#define MAME_RAMTEK_STARCRUS_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ private:
 	required_device_array<netlist_mame_logic_input_device, 2> m_engine;
 };
 
-#endif // MAME_INCLUDES_STARCRUS_H
+#endif // MAME_RAMTEK_STARCRUS_H

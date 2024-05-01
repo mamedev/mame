@@ -184,6 +184,9 @@ iLinkSGUID=0x--------
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class ps2sony_state : public driver_device
 {
 public:
@@ -248,7 +251,7 @@ protected:
 	uint64_t ee_iop_ram_r(offs_t offset);
 	void iop_debug_w(uint32_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
+	void iop_timer_irq(int state);
 
 	void mem_map(address_map &map);
 	void iop_map(address_map &map);
@@ -511,7 +514,7 @@ void ps2sony_state::ipu_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(ps2sony_state::iop_timer_irq)
+void ps2sony_state::iop_timer_irq(int state)
 {
 	logerror("%s: iop_timer_irq: %d\n", machine().describe_context(), state);
 	if (state)
@@ -921,5 +924,8 @@ ROM_START( ps2 )
 	ROM_SYSTEM_BIOS( 62, "scph70002_a", "SCPH-70002/SCPH-75002 (Version 5.0 06/14/04 A)" )
 	ROMX_LOAD( "ps2-0200a-20040614_alt.bin", 0x000000, 0x400000, CRC(3e0aa788) SHA1(597841bfea6e334f5ec4116299091ae2ed3da479), ROM_BIOS(62) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )

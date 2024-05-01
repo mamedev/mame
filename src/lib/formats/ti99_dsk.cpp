@@ -17,7 +17,7 @@
   bytes long. The most common formats are 9 sectors per track, single-sided,
   40 tracks, which yields 90 KiB of sector data (known as SSSD), and 18
   sectors per track, double-sided, and 40 tracks, which is 360 KiB (known as
-  DSDD). There are rare occurances of 16 sectors/track
+  DSDD). There are rare occurrences of 16 sectors/track
   (prototypical TI double-density controller) and 35 track media. Newer
   controllers and ROMs allow for up to 36 sectors per track and 80 tracks on
   both sides, which is 1,44 MiB (DSHD80).
@@ -55,13 +55,13 @@
 
 #define LOG_OUTPUT_FUNC osd_printf_info
 
-#define LOG_WARN       (1U<<1)   // Warnings
-#define LOG_HEADER     (1U<<2)   // Header
-#define LOG_SHIFT      (1U<<3)   // Shift register
-#define LOG_INTERLEAVE (1U<<4)   // Interleave information
-#define LOG_INFO       (1U<<5)   // Disk info
-#define LOG_DETAIL     (1U<<6)   // Details
-#define LOG_TRACK      (1U<<7)   // Track output
+#define LOG_WARN       (1U << 1)   // Warnings
+#define LOG_HEADER     (1U << 2)   // Header
+#define LOG_SHIFT      (1U << 3)   // Shift register
+#define LOG_INTERLEAVE (1U << 4)   // Interleave information
+#define LOG_INFO       (1U << 5)   // Disk info
+#define LOG_DETAIL     (1U << 6)   // Details
+#define LOG_TRACK      (1U << 7)   // Track output
 
 #define VERBOSE ( LOG_WARN )
 
@@ -81,7 +81,7 @@ int ti99_floppy_format::get_encoding(int cell_size)
 /*
     Load the image from disk and convert it into a sequence of flux levels.
 */
-bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t file_size;
 	if (io.length(file_size))
@@ -101,7 +101,7 @@ bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const
 	// (the track count as defined by the file system)
 	determine_sizes(io, cell_size, sector_count, heads, log_track_count);
 
-	image->get_maximal_geometry(track_count, head_count);
+	image.get_maximal_geometry(track_count, head_count);
 	drive_high_tpi = (track_count > 44);
 
 	// Depends on the image format (SDF or TDF)
@@ -215,7 +215,7 @@ bool ti99_floppy_format::load(util::random_read &io, uint32_t form_factor, const
 /*
     Save all tracks to the image file.
 */
-bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	uint8_t sectordata[9216];   // max size (36*256)
 
@@ -224,7 +224,7 @@ bool ti99_floppy_format::save(util::random_read_write &io, const std::vector<uin
 	// Do we use double-stepping?
 	// If our image was loaded into a 80-track drive, we will always write 80 tracks.
 	int track_count, head_count;
-	image->get_maximal_geometry(track_count, head_count);
+	image.get_maximal_geometry(track_count, head_count);
 
 	if (track_count > 80) track_count = 80;
 	else
@@ -329,7 +329,7 @@ enum
 /*
     Build a new track from sector contents.
 */
-void ti99_floppy_format::generate_fm_track_from_sectors(floppy_image *image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
+void ti99_floppy_format::generate_fm_track_from_sectors(floppy_image &image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
 {
 	std::vector<uint32_t> buffer;
 
@@ -423,7 +423,7 @@ void ti99_floppy_format::generate_fm_track_from_sectors(floppy_image *image, uin
 	generate_track_from_levels(track, head, buffer, 0, image);
 }
 
-void ti99_floppy_format::generate_mfm_track_from_sectors(floppy_image *image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
+void ti99_floppy_format::generate_mfm_track_from_sectors(floppy_image &image, uint8_t *sectordata, int sector_count, int *sectornmb, int *secoffset, int track, int trackid, int head)
 {
 	// MFM16:  (80,50,22,50,4e,12)
 	// MFM18/36:  (10,30,22,21,4e,12)
@@ -905,17 +905,17 @@ uint8_t ti99_floppy_format::get_data_from_encoding(uint16_t raw)
     bad sector map, we just check whether there are 3 more sectors and ignore
     them.
 */
-const char *ti99_sdf_format::name() const
+const char *ti99_sdf_format::name() const noexcept
 {
 	return "ti99";
 }
 
-const char *ti99_sdf_format::description() const
+const char *ti99_sdf_format::description() const noexcept
 {
 	return "TI99 sector dump floppy disk image";
 }
 
-const char *ti99_sdf_format::extensions() const
+const char *ti99_sdf_format::extensions() const noexcept
 {
 	return "dsk";
 }
@@ -954,8 +954,7 @@ int ti99_sdf_format::identify(util::random_read &io, uint32_t form_factor, const
 	{
 		// Read first sector (Volume Information Block)
 		ti99vib vib;
-		size_t actual;
-		io.read_at(0, &vib, sizeof(ti99vib), actual);
+		/*auto const [err, actual] =*/ read_at(io, 0, &vib, sizeof(ti99vib)); // FIXME: check for errors and premature EOF
 
 		// Check from contents
 		if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
@@ -993,8 +992,7 @@ void ti99_sdf_format::determine_sizes(util::random_read &io, int& cell_size, int
 
 	// Read first sector
 	ti99vib vib;
-	size_t actual;
-	io.read_at(0, &vib, sizeof(ti99vib), actual);
+	/*auto const [err, actual] =*/ read_at(io, 0, &vib, sizeof(ti99vib)); // FIXME: check for errors and premature EOF
 
 	// Check from contents
 	if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
@@ -1079,8 +1077,7 @@ void ti99_sdf_format::load_track(util::random_read &io, uint8_t *sectordata, int
 	int logicaltrack = (head==0)? track : (2*trackcount - track - 1);
 	int position = logicaltrack * get_track_size(sectorcount);
 
-	size_t actual;
-	io.read_at(position, sectordata, sectorcount*SECTOR_SIZE, actual);
+	/*auto const [err, actual] =*/ read_at(io, position, sectordata, sectorcount*SECTOR_SIZE); // FIXME: check for errors and premature EOF
 
 	// Interleave and skew
 	int interleave = 7;
@@ -1158,8 +1155,7 @@ void ti99_sdf_format::write_track(util::random_read_write &io, uint8_t *sectorda
 	{
 		uint8_t const *const buf = sectordata + i * SECTOR_SIZE;
 		LOGMASKED(LOG_DETAIL, "[ti99_dsk] Writing sector %d (offset %06x)\n", sector[i], sector[i] * SECTOR_SIZE);
-		size_t actual;
-		io.write_at(trackoffset + sector[i] * SECTOR_SIZE, buf, SECTOR_SIZE, actual);
+		/*auto const [err, actual] =*/ write_at(io, trackoffset + sector[i] * SECTOR_SIZE, buf, SECTOR_SIZE); // FIXME: check for errors
 	}
 }
 
@@ -1205,17 +1201,17 @@ const ti99_sdf_format FLOPPY_TI99_SDF_FORMAT;
 
     (Head,Track): (0,0) (0,1) (0,2) ... (0,38) (0,39) (1,0) (1,1) ... (1,39)
 */
-const char *ti99_tdf_format::name() const
+const char *ti99_tdf_format::name() const noexcept
 {
 	return "tdf";
 }
 
-const char *ti99_tdf_format::description() const
+const char *ti99_tdf_format::description() const noexcept
 {
 	return "TI99 track dump floppy disk image";
 }
 
-const char *ti99_tdf_format::extensions() const
+const char *ti99_tdf_format::extensions() const noexcept
 {
 	return "dsk,dtk";
 }
@@ -1246,8 +1242,7 @@ int ti99_tdf_format::identify(util::random_read &io, uint32_t form_factor, const
 		LOGMASKED(LOG_INFO, "[ti99_dsk] Image file length matches TDF\n");
 
 		// Fetch track 0
-		size_t actual;
-		io.read_at(0, fulltrack, get_track_size(sector_count), actual);
+		/*auto const [err, actual] =*/ read_at(io, 0, fulltrack, get_track_size(sector_count)); // FIXME: check for errors and premature EOF
 
 		if (sector_count == 9)
 		{
@@ -1358,12 +1353,11 @@ void ti99_tdf_format::determine_sizes(util::random_read &io, int& cell_size, int
 */
 void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount) const
 {
-	size_t actual;
 	uint8_t fulltrack[12544]; // space for a full TDF track
 
 	// Read beginning of track 0. We need this to get the first gap, according
 	// to the format
-	io.read_at(0, fulltrack, 100, actual);
+	read_at(io, 0, fulltrack, 100); // FIXME: check for errors and premature EOF
 
 	int offset = 0;
 	int tracksize = get_track_size(sectorcount);
@@ -1404,7 +1398,7 @@ void ti99_tdf_format::load_track(util::random_read &io, uint8_t *sectordata, int
 
 	int base = (head * trackcount + track) * tracksize;
 	int position = 0;
-	io.read_at(base, fulltrack, tracksize, actual);
+	read_at(io, base, fulltrack, tracksize); // FIXME: check for errors and premature EOF
 
 	for (int i=0; i < sectorcount; i++)
 	{
@@ -1506,8 +1500,7 @@ void ti99_tdf_format::write_track(util::random_read_write &io, uint8_t *sectorda
 		for (int i=0; i < param[WGAP3]; i++) trackdata[pos++] = param[WGAPBYTE];
 	}
 	for (int i=0; i < param[WGAP4]; i++) trackdata[pos++] = param[WGAPBYTE];
-	size_t actual;
-	io.write_at(offset, trackdata, get_track_size(sector_count), actual);
+	/*auto const [err, actual] =*/ write_at(io, offset, trackdata, get_track_size(sector_count)); // FIXME: check for errors
 }
 
 int ti99_tdf_format::get_track_size(int sector_count) const

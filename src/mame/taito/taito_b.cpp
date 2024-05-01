@@ -1908,8 +1908,8 @@ void taitob_state::rastsag2(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -1964,8 +1964,8 @@ void taitob_state::masterw(machine_config &config)
 	ymsnd.add_route(3, "mono", 0.80);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2033,8 +2033,8 @@ void taitob_state::ashura(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2087,8 +2087,8 @@ void taitob_state::crimec(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2146,8 +2146,8 @@ void hitice_state::hitice(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2200,8 +2200,8 @@ void taitob_state::rambo3p(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2254,8 +2254,8 @@ void taitob_state::rambo3(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2313,8 +2313,8 @@ void taitob_state::pbobble(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2372,8 +2372,8 @@ void taitob_state::spacedx(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2426,8 +2426,8 @@ void taitob_state::spacedxo(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2485,8 +2485,8 @@ void taitob_state::qzshowby(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2544,8 +2544,8 @@ void taitob_state::viofight(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2598,8 +2598,8 @@ void taitob_state::silentd(machine_config &config) /* ET910000B PCB */
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2652,8 +2652,8 @@ void taitob_state::selfeena(machine_config &config) /* ET910000A PCB */
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 #if 0
@@ -2724,8 +2724,8 @@ void taitob_state::sbm(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -2782,8 +2782,8 @@ void taitob_c_state::realpunc(machine_config &config)
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 /***************************************************************************
@@ -3180,24 +3180,24 @@ ROM_END
 
 ROM_START( pbobble )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "pb-1c18.bin", 0x00000, 0x40000, CRC(5de14f49) SHA1(91d537748f26e19a5c32de4b8dad341750de39ef) )
-	ROM_LOAD16_BYTE( "pb-ic2.bin",  0x00001, 0x40000, CRC(2abe07d1) SHA1(2bb78b606a7341d74cced0447f8bd5ccc635cc4c) )
+	ROM_LOAD16_BYTE( "pb-ic18.ic18", 0x00000, 0x40000, CRC(5de14f49) SHA1(91d537748f26e19a5c32de4b8dad341750de39ef) )
+	ROM_LOAD16_BYTE( "pb-ic2.ic2",   0x00001, 0x40000, CRC(2abe07d1) SHA1(2bb78b606a7341d74cced0447f8bd5ccc635cc4c) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 128k for Z80 code */
-	ROM_LOAD( "pb-ic27.bin", 0x00000, 0x20000, CRC(26efa4c4) SHA1(795af8f6d23c2cbe2c811ec9ab1f14a4eee3f99e) )
+	ROM_LOAD( "pb-ic27.ic27", 0x00000, 0x20000, CRC(26efa4c4) SHA1(795af8f6d23c2cbe2c811ec9ab1f14a4eee3f99e) )
 
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
-	ROM_LOAD( "pb-ic14.bin", 0x00000, 0x80000, CRC(55f90ea4) SHA1(793c79e5b72171124368ad09dd31235252c541f5) )
-	ROM_LOAD( "pb-ic9.bin",  0x80000, 0x80000, CRC(3253aac9) SHA1(916d85aa96e2914630833292a0655b0389b4a39b) )
+	ROM_LOAD( "pb-ic14.ic14", 0x00000, 0x80000, CRC(55f90ea4) SHA1(793c79e5b72171124368ad09dd31235252c541f5) )
+	ROM_LOAD( "pb-ic9.ic9",   0x80000, 0x80000, CRC(3253aac9) SHA1(916d85aa96e2914630833292a0655b0389b4a39b) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
-	ROM_LOAD( "pb-ic15.bin", 0x000000, 0x100000, CRC(0840cbc4) SHA1(1adbd7aef44fa80832f63dfb8efdf69fd7256a57) )
+	ROM_LOAD( "pb-ic15.ic15", 0x000000, 0x100000, CRC(0840cbc4) SHA1(1adbd7aef44fa80832f63dfb8efdf69fd7256a57) )
 ROM_END
 
 ROM_START( bublbust ) // Purportedly a location test version, but has the same version number and build date as the released Japanese set below
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 512k for 68000 code - located on Taito C0503005B main board
 	ROM_LOAD16_BYTE( "p.bobble_prg_h_kyotsu_6-15_c681.ic18", 0x00000, 0x40000, CRC(ba83e398) SHA1(2512ea5a805f0e5c470c4d216d679f3dc3c4aa82) ) // hand written label P.ボブル PRG H 共通 6/15 C681
-	ROM_LOAD16_BYTE( "p.bobble_prg_l_usa_6-15_e9e1.ic2",  0x00001, 0x40000, CRC(a12cb3f2) SHA1(06271d3a0af101a959e6e777f1f9e99bae1e6076) ) // hand written label P.ボブル PRG L USA 6/15 E9E1
+	ROM_LOAD16_BYTE( "p.bobble_prg_l_usa_6-15_e9e1.ic2",     0x00001, 0x40000, CRC(a12cb3f2) SHA1(06271d3a0af101a959e6e777f1f9e99bae1e6076) ) // hand written label P.ボブル PRG L USA 6/15 E9E1
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // 128k for Z80 code - located on Taito C0503005B main board
 	ROM_LOAD( "prg_snd.ic27", 0x00000, 0x20000, CRC(2f288fe0) SHA1(4ba707f4b3a1ca0e573652d1c733ee889f9fef8a) ) // hand written label PRG SND IC 27 - no checksum listed
@@ -3214,18 +3214,18 @@ ROM_END
 
 ROM_START( spacedx )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "d89-06",     0x00000, 0x40000, CRC(7122751e) SHA1(4b4eb58af28f1988ff102251407449d0affbd4c2) )
-	ROM_LOAD16_BYTE( "d89-xx.ic2", 0x00001, 0x40000, CRC(56b0be6c) SHA1(37e3e28a23fb4af35bdf7c751e4c3a743e505c46) )
+	ROM_LOAD16_BYTE( "d89-06.ic18", 0x00000, 0x40000, CRC(7122751e) SHA1(4b4eb58af28f1988ff102251407449d0affbd4c2) )
+	ROM_LOAD16_BYTE( "d89-xx.ic2",  0x00001, 0x40000, CRC(56b0be6c) SHA1(37e3e28a23fb4af35bdf7c751e4c3a743e505c46) ) // need to verify / correct ROM label
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "d89-07.27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
+	ROM_LOAD( "d89-07.ic27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
 
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
-	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
-	ROM_LOAD( "d89-01.9",  0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
+	ROM_LOAD( "d89-02.ic14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
+	ROM_LOAD( "d89-01.ic9",  0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
+	ROM_LOAD( "d89-03.ic15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-d72-05.ic37",   0x0000, 0x0104, CRC(c3d4cb7e) SHA1(1f3453a543dd98d02183595d66c67773fbf0ed07) ) /* Matches D72-05 in qzshowby */
@@ -3238,18 +3238,18 @@ ROM_END
 
 ROM_START( spacedxj )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "d89-06", 0x00000, 0x40000, CRC(7122751e) SHA1(4b4eb58af28f1988ff102251407449d0affbd4c2) )
-	ROM_LOAD16_BYTE( "d89-05", 0x00001, 0x40000, CRC(be1638af) SHA1(5d28af674dd355159602e323800419a33e0b77d2) )
+	ROM_LOAD16_BYTE( "d89-06.ic18", 0x00000, 0x40000, CRC(7122751e) SHA1(4b4eb58af28f1988ff102251407449d0affbd4c2) )
+	ROM_LOAD16_BYTE( "d89-05.ic2",  0x00001, 0x40000, CRC(be1638af) SHA1(5d28af674dd355159602e323800419a33e0b77d2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "d89-07.27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
+	ROM_LOAD( "d89-07.ic27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
 
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
-	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
-	ROM_LOAD( "d89-01.9" , 0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
+	ROM_LOAD( "d89-02.ic14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
+	ROM_LOAD( "d89-01.ic9" , 0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
+	ROM_LOAD( "d89-03.ic15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-d72-05.ic37",   0x0000, 0x0104, CRC(c3d4cb7e) SHA1(1f3453a543dd98d02183595d66c67773fbf0ed07) ) /* Matches D72-05 in qzshowby */
@@ -3266,14 +3266,14 @@ ROM_START( spacedxo ) // different PCB type, similar to Silent Dragon
 	ROM_LOAD16_BYTE( "d89-09.bin",  0x00001, 0x20000, CRC(7f0a0ba4) SHA1(479df027929201997aeebbea5901a0a494f2dd61) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "d89-07.27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
+	ROM_LOAD( "d89-07.ic27", 0x00000, 0x10000, CRC(bd743401) SHA1(bf1ff2255bbd79be21855814d52daced71fbe198) )
 
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "d89-12.bin",0x00000, 0x80000, CRC(53df86f1) SHA1(f03d77dd54eb455462133a29dd8fec007abedcfd) )
 	ROM_LOAD( "d89-13.bin",0x80000, 0x80000, CRC(c44c1352) SHA1(78a04fe0ade6e8f9e6bbda7652a54a79b6208fdd) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
-	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
+	ROM_LOAD( "d89-03.ic15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 ROM_END
 
 ROM_START( qzshowby )

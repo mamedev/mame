@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "cpu/cop400/cop400.h"
 
+
+namespace {
+
 class t400_test_suite_state : public driver_device
 {
 public:
@@ -54,6 +57,9 @@ ROM_START( test420 )
 	ROM_REGION( 0x400, "maincpu", 0 )
 	ROM_LOAD( "rom_42x.bin", 0x000, 0x400, BAD_DUMP CRC(e4e80001) SHA1(8fdca9d08de1cc83387a7d141f6b254117902442) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 2008, test410, 0,       0, test_t410, 0, t400_test_suite_state, empty_init, "T400 uController project", "T410 test suite", MACHINE_NO_SOUND_HW )
 COMP( 2008, test420, test410, 0, test_t420, 0, t400_test_suite_state, empty_init, "T400 uController project", "T420 test suite", MACHINE_NO_SOUND_HW )

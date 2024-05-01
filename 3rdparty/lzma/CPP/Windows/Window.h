@@ -1,7 +1,7 @@
 // Windows/Window.h
 
-#ifndef __WINDOWS_WINDOW_H
-#define __WINDOWS_WINDOW_H
+#ifndef ZIP7_INC_WINDOWS_WINDOW_H
+#define ZIP7_INC_WINDOWS_WINDOW_H
 
 #include "../Common/MyWindows.h"
 #include "../Common/MyString.h"
@@ -9,22 +9,99 @@
 #include "Defs.h"
 
 #ifndef UNDER_CE
+#ifdef WM_CHANGEUISTATE
+#define Z7_WIN_WM_CHANGEUISTATE  WM_CHANGEUISTATE
+#define Z7_WIN_WM_UPDATEUISTATE  WM_UPDATEUISTATE
+#define Z7_WIN_WM_QUERYUISTATE   WM_QUERYUISTATE
+#else
+// these are defined for (_WIN32_WINNT >= 0x0500):
+#define Z7_WIN_WM_CHANGEUISTATE  0x0127
+#define Z7_WIN_WM_UPDATEUISTATE  0x0128
+#define Z7_WIN_WM_QUERYUISTATE   0x0129
+#endif
 
-#define MY__WM_CHANGEUISTATE  0x0127
-#define MY__WM_UPDATEUISTATE  0x0128
-#define MY__WM_QUERYUISTATE   0x0129
+#ifdef UIS_SET
 
+#define Z7_WIN_UIS_SET         UIS_SET
+#define Z7_WIN_UIS_CLEAR       UIS_CLEAR
+#define Z7_WIN_UIS_INITIALIZE  UIS_INITIALIZE
+
+#define Z7_WIN_UISF_HIDEFOCUS  UISF_HIDEFOCUS
+#define Z7_WIN_UISF_HIDEACCEL  UISF_HIDEACCEL
+
+#else
+// these are defined for (_WIN32_WINNT >= 0x0500):
 // LOWORD(wParam) values in WM_*UISTATE
-#define MY__UIS_SET         1
-#define MY__UIS_CLEAR       2
-#define MY__UIS_INITIALIZE  3
+#define Z7_WIN_UIS_SET         1
+#define Z7_WIN_UIS_CLEAR       2
+#define Z7_WIN_UIS_INITIALIZE  3
 
 // HIWORD(wParam) values in WM_*UISTATE
-#define MY__UISF_HIDEFOCUS  0x1
-#define MY__UISF_HIDEACCEL  0x2
-#define MY__UISF_ACTIVE     0x4
+#define Z7_WIN_UISF_HIDEFOCUS  0x1
+#define Z7_WIN_UISF_HIDEACCEL  0x2
+// defined for for (_WIN32_WINNT >= 0x0501):
+// #define Z7_WIN_UISF_ACTIVE     0x4
 
 #endif
+
+#endif // UNDER_CE
+
+
+#ifdef Z7_OLD_WIN_SDK
+
+// #define VK_OEM_1          0xBA   // ';:' for US
+#define VK_OEM_PLUS       0xBB   // '+' any country
+// #define VK_OEM_COMMA      0xBC   // ',' any country
+#define VK_OEM_MINUS      0xBD   // '-' any country
+// #define VK_OEM_PERIOD     0xBE   // '.' any country
+// #define VK_OEM_2          0xBF   // '/?' for US
+// #define VK_OEM_3          0xC0   // '`~' for US
+
+// #ifndef GWLP_USERDATA
+#define GWLP_WNDPROC        (-4)
+#define GWLP_USERDATA       (-21)
+// #endif
+#define DWLP_MSGRESULT  0
+// #define DWLP_DLGPROC    DWLP_MSGRESULT + sizeof(LRESULT)
+// #define DWLP_USER       DWLP_DLGPROC + sizeof(DLGPROC)
+
+#define BTNS_BUTTON     TBSTYLE_BUTTON      // 0x0000
+
+/*
+vc6 defines INT_PTR via long:
+  typedef long INT_PTR, *PINT_PTR;
+  typedef unsigned long UINT_PTR, *PUINT_PTR;
+but newer sdk (sdk2003+) defines INT_PTR via int:
+  typedef _W64 int INT_PTR, *PINT_PTR;
+  typedef _W64 unsigned int UINT_PTR, *PUINT_PTR;
+*/
+
+#define IS_INTRESOURCE(_r) (((ULONG_PTR)(_r) >> 16) == 0)
+
+#define GetWindowLongPtrA   GetWindowLongA
+#define GetWindowLongPtrW   GetWindowLongW
+#ifdef UNICODE
+#define GetWindowLongPtr  GetWindowLongPtrW
+#else
+#define GetWindowLongPtr  GetWindowLongPtrA
+#endif // !UNICODE
+
+#define SetWindowLongPtrA   SetWindowLongA
+#define SetWindowLongPtrW   SetWindowLongW
+#ifdef UNICODE
+#define SetWindowLongPtr  SetWindowLongPtrW
+#else
+#define SetWindowLongPtr  SetWindowLongPtrA
+#endif // !UNICODE
+
+#define ListView_SetCheckState(hwndLV, i, fCheck) \
+  ListView_SetItemState(hwndLV, i, INDEXTOSTATEIMAGEMASK((fCheck)?2:1), LVIS_STATEIMAGEMASK)
+
+#endif // Z7_OLD_WIN_SDK
+
+inline bool LRESULTToBool(LRESULT v) { return (v != FALSE); }
+
+#define MY_int_TO_WPARAM(i) ((WPARAM)(INT_PTR)(i))
 
 namespace NWindows {
 
@@ -52,12 +129,13 @@ bool MySetWindowText(HWND wnd, LPCWSTR s);
 
 class CWindow
 {
+  Z7_CLASS_NO_COPY(CWindow)
 private:
-   // bool ModifyStyleBase(int styleOffset, DWORD remove, DWORD add, UINT flags);
+  // bool ModifyStyleBase(int styleOffset, DWORD remove, DWORD add, UINT flags);
 protected:
   HWND _window;
 public:
-  CWindow(HWND newWindow = NULL): _window(newWindow){};
+  CWindow(HWND newWindow = NULL): _window(newWindow) {}
   CWindow& operator=(HWND newWindow)
   {
     _window = newWindow;
@@ -171,9 +249,10 @@ public:
   bool Update() { return BOOLToBool(::UpdateWindow(_window)); }
   bool InvalidateRect(LPCRECT rect, bool backgroundErase = true)
     { return BOOLToBool(::InvalidateRect(_window, rect, BoolToBOOL(backgroundErase))); }
-  void SetRedraw(bool redraw = true) { SendMsg(WM_SETREDRAW, BoolToBOOL(redraw), 0); }
+  void SetRedraw(bool redraw = true) { SendMsg(WM_SETREDRAW, (WPARAM)BoolToBOOL(redraw), 0); }
 
   LONG_PTR SetStyle(LONG_PTR style) { return SetLongPtr(GWL_STYLE, style); }
+  // LONG_PTR SetStyle(DWORD style) { return SetLongPtr(GWL_STYLE, (LONG_PTR)style); }
   LONG_PTR GetStyle() const { return GetLongPtr(GWL_STYLE); }
   // bool MyIsMaximized() const { return ((GetStyle() & WS_MAXIMIZE) != 0); }
 
@@ -244,21 +323,21 @@ public:
 
   int GetTextLength() const
     { return GetWindowTextLength(_window); }
-  UINT GetText(LPTSTR string, int maxCount) const
+  int GetText(LPTSTR string, int maxCount) const
     { return GetWindowText(_window, string, maxCount); }
-  bool GetText(CSysString &s);
+  bool GetText(CSysString &s) const;
   #ifndef _UNICODE
   /*
   UINT GetText(LPWSTR string, int maxCount) const
     { return GetWindowTextW(_window, string, maxCount); }
   */
-  bool GetText(UString &s);
+  bool GetText(UString &s) const;
   #endif
 
   bool Enable(bool enable)
     { return BOOLToBool(::EnableWindow(_window, BoolToBOOL(enable))); }
   
-  bool IsEnabled()
+  bool IsEnabled() const
     { return BOOLToBool(::IsWindowEnabled(_window)); }
   
   #ifndef UNDER_CE
@@ -266,7 +345,7 @@ public:
     { return ::GetSystemMenu(_window, BoolToBOOL(revert)); }
   #endif
 
-  UINT_PTR SetTimer(UINT_PTR idEvent, UINT elapse, TIMERPROC timerFunc = 0)
+  UINT_PTR SetTimer(UINT_PTR idEvent, UINT elapse, TIMERPROC timerFunc = NULL)
     { return ::SetTimer(_window, idEvent, elapse, timerFunc); }
   bool KillTimer(UINT_PTR idEvent)
     {return BOOLToBool(::KillTimer(_window, idEvent)); }

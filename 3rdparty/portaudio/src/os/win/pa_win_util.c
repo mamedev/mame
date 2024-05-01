@@ -27,13 +27,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -42,16 +42,16 @@
 
  @brief Win32 implementation of platform-specific PaUtil support functions.
 */
- 
+
 #include <windows.h>
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-	#include <sys/timeb.h> /* for _ftime_s() */
+    #include <sys/timeb.h> /* for _ftime_s() */
 #else
-	#include <mmsystem.h> /* for timeGetTime() */
-	#if (defined(WIN32) && (defined(_MSC_VER) && (_MSC_VER >= 1200))) && !defined(_WIN32_WCE) /* MSC version 6 and above */
-	#pragma comment( lib, "winmm.lib" )
-	#endif
+    #include <mmsystem.h> /* for timeGetTime() */
+    #if (defined(WIN32) && (defined(_MSC_VER) && (_MSC_VER >= 1200))) && !defined(_WIN32_WCE) /* MSC version 6 and above */
+    #pragma comment( lib, "winmm.lib" )
+    #endif
 #endif
 
 #include "pa_util.h"
@@ -65,9 +65,9 @@ static int numAllocations_ = 0;
 #endif
 
 
-void *PaUtil_AllocateMemory( long size )
+void *PaUtil_AllocateZeroInitializedMemory( long size )
 {
-    void *result = GlobalAlloc( GPTR, size );
+    void *result = GlobalAlloc( GMEM_FIXED | GMEM_ZEROINIT, size );
 
 #if PA_TRACK_MEMORY
     if( result != NULL ) numAllocations_ += 1;
@@ -135,7 +135,7 @@ double PaUtil_GetTime( void )
             This is documented here:
             http://support.microsoft.com/default.aspx?scid=KB;EN-US;Q274323&
 
-            The work-arounds are not very paletable and involve querying GetTickCount 
+            The work-arounds are not very paletable and involve querying GetTickCount
             at every time step.
 
             Using rdtsc is not a good option on multi-core systems.
@@ -148,13 +148,30 @@ double PaUtil_GetTime( void )
     else
     {
 #ifndef UNDER_CE
-	#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
         return GetTickCount64() * .001;
-	#else
+    #else
         return timeGetTime() * .001;
-	#endif
+    #endif
 #else
         return GetTickCount() * .001;
-#endif                
+#endif
     }
+}
+
+void PaWinUtil_SetLastSystemErrorInfo( PaHostApiTypeId hostApiType, long winError )
+{
+    wchar_t wide_msg[1024]; //PA_LAST_HOST_ERROR_TEXT_LENGTH_
+    FormatMessageW(
+        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        winError,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        wide_msg,
+        1024,
+        NULL
+    );
+    char msg[1024];
+    WideCharToMultiByte( CP_UTF8, 0, wide_msg, -1, msg, 1024, NULL, NULL );
+    PaUtil_SetLastHostErrorInfo( hostApiType, winError, msg );
 }

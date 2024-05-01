@@ -68,6 +68,8 @@ Unable to locate any manuals so unable to proceed.
 #include "aim65_40.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  MACROS/CONSTANTS
 //**************************************************************************
@@ -163,6 +165,9 @@ ROM_START( aim65_40 )
 	ROM_LOAD( "r2332lp r3224-11.z70",    0x2000, 0x1000, CRC(0878b399) SHA1(483e92b57d64be51643a9f6490521a8572aa2f68) ) // Assembler
 	ROM_LOAD( "i-of v1.0 r32t3-12.z73",  0x3000, 0x1000, CRC(a62bec4a) SHA1(a2fc69a33dc3b7684bf3399beff7b22eaf05c843) )
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
     GAME DRIVERS

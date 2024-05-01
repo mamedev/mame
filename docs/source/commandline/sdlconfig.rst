@@ -1,8 +1,8 @@
-SDL-Specific Commandline Options
-================================
+SDL-Specific Command-line Options
+=================================
 
-
-This section contains configuration options that are specific to any build supported by SDL (including Windows where compiled as SDL instead of native).
+This section contains configuration options that are specific to any build
+supported by SDL (including Windows when built with SDL instead of native).
 
 
 
@@ -13,7 +13,9 @@ Performance Options
 
 **-[no]sdlvideofps**
 
-	Enable output of benchmark data on the SDL video subsystem, including your system's video driver, X server (if applicable), and OpenGL stack in **-video opengl** mode.
+    Enable output of benchmark data on the SDL video subsystem, including your
+    system’s video driver, X server (if applicable), and OpenGL stack in
+    **-video opengl** mode.
 
 
 Video Options
@@ -23,13 +25,13 @@ Video Options
 
 **-[no]centerh**
 
-	Center horizontally within the view area. Default is ON (**-centerh**).
+    Center horizontally within the view area. Default is ON (**-centerh**).
 
 .. _mame-scommandline-centerv:
 
 **-[no]centerv**
 
-	Center vertically within the view area. Default is ON (**-centerv**).
+    Center vertically within the view area. Default is ON (**-centerv**).
 
 
 Video Soft-Specific Options
@@ -39,7 +41,8 @@ Video Soft-Specific Options
 
 **-scalemode**
 
-	Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (**-video soft** only). Default is *none*.
+    Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (**-video soft** only).
+    Default is *none*.
 
 
 SDL Keyboard Mapping
@@ -49,54 +52,84 @@ SDL Keyboard Mapping
 
 **-keymap**
 
-	Enable keymap. Default is OFF (**-nokeymap**)
+    Enable keymap.  Default is OFF (**-nokeymap**)
 
 .. _mame-scommandline-keymapfile:
 
 **-keymap_file** *<file>*
 
-	Keymap Filename. Default is ``keymap.dat``.
+    Keymap file name.  Default is ``keymap.dat``.
 
 
-SDL Joystick Mapping
---------------------
+SDL Input Options
+-----------------
 
-.. _mame-scommandline-joyidx:
+.. _mame-scommandline-enabletouch:
 
-|
-| **-joy_idx1** *<name>*
-| **-joy_idx2** *<name>*
-| ...
-| **-joy_idx8** *<name>*
-|
+**-enable_touch**
 
-Name of joystick mapped to a given joystick slot, default is *auto*.
-
+    Enable support for touch input.  If this option is switched off, mouse input
+    simulated from touch devices will be used instead.  Default is OFF
+    (**-noenable_touch**)
 
 .. _mame-scommandline-sixaxis:
 
 **-sixaxis**
 
-	Use special handling for PS3 SixAxis controllers. Default is OFF (**-nosixaxis**)
+    Use special handling for PlayStation 3 SixAxis controllers.  May cause
+    undesirable behaviour with other controllers.  Only affects the ``sdljoy``
+    joystick provider.  Default is OFF (**-nosixaxis**)
+
+.. _mame-scommandline-duallightgun:
+
+**-[no]dual_lightgun** / **-[no]dual**
+
+    Controls whether or not MAME attempts to track two lightguns that appear as
+    a single mouse.  This option requires the :ref:`lightgun option
+    <mame-commandline-nolightgun>` to be on and the :ref:`lightgunprovider
+    option <mame-commandline-lightgunprovider>` to be set to *sdl*.
+
+    This option supports dual lightgun setups that work by setting the mouse
+    pointer location at the moment a lightgun trigger is activated.  The primary
+    and secondary triggers on the first lightgun correspond to the first and
+    second mouse buttons, and the primary and secondary triggers on the second
+    lightgun correspond to the third and fourth mouse buttons.
+
+    The default is OFF (**-nodual_lightgun**).
+
+
+SDL Lightgun Mapping
+--------------------
+
+.. _mame-scommandline-lightgunindex:
+
+|
+| **-lightgun_index1** *<name>*
+| **-lightgun_index2** *<name>*
+| ...
+| **-lightgun_index8** *<name>*
+|
+
+Device name or ID mapped to a given lightgun slot.
 
 
 SDL Low-level Driver Options
-~---------------------------
+----------------------------
 
 .. _mame-scommandline-videodriver:
 
 **-videodriver** *<driver>*
 
-	SDL video driver to use ('x11', 'directfb', ... or '*auto*' for SDL default)
+    SDL video driver to use ('x11', 'directfb', ... or '*auto*' for SDL default)
 
 .. _mame-scommandline-audiodriver:
 
 **-audiodriver** *<driver>*
 
-	SDL audio driver to use ('alsa', 'arts', ... or '*auto*' for SDL default)
+    SDL audio driver to use ('alsa', 'arts', ... or '*auto*' for SDL default)
 
 .. _mame-scommandline-gllib:
 
 **-gl_lib** *<driver>*
 
-	Alternative **libGL.so** to use; '*auto*' for system default
+    Alternative **libGL.so** to use; '*auto*' for system default

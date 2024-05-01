@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_VIDEO_STIC_H
-#define MAME_VIDEO_STIC_H
+#ifndef MAME_MATTEL_STIC_H
+#define MAME_MATTEL_STIC_H
 
 // the Intellivision emulation scales to match the output format at the last
 // step. The Intellivision keyboard component appears to be 320x96, but can
@@ -182,4 +182,4 @@ private:
 DECLARE_DEVICE_TYPE(STIC, stic_device)
 
 
-#endif // MAME_VIDEO_STIC_H
+#endif // MAME_MATTEL_STIC_H

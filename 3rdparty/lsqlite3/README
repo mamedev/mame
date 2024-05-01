@@ -1,8 +1,16 @@
 
-LuaSQLite 3 provides a means to manipulate SQLite3 
+LuaSQLite3 provides a means to manipulate SQLite3 
 databases directly from lua using Lua 5.
 
-To use this library you need SQLite3 library.
+There are two modules, identical except that one links
+SQLite3 dynamically, the other statically.
+
+The module lsqlite3 links SQLite3 dynamically.
+To use this module you need the SQLite3 library.
 You can get it from http://www.sqlite.org/
+
+The module lsqlite3complete links SQLite3 statically.
+The SQLite3 amalgamation source code is included in 
+the LuaSQLite3 distribution.
 
 Lua 5 is available from http://www.lua.org/

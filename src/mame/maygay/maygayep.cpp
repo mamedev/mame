@@ -38,6 +38,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class maygayep_state : public driver_device
 {
 public:
@@ -4258,11 +4260,11 @@ ROM_END
 	SS010003 DATA
 	VIDEO EPOCH
 
-	Fujistu MPF3102AT (10.2GB HDD)
+	Fujitsu MPF3102AT (10.2GB HDD)
 	*/
 
 #define EP_PHARO_HDD \
-	DISK_REGION( "ata:0:hdd:image" ) \
+	DISK_REGION( "ata:0:hdd" ) \
 	DISK_IMAGE( "ep_pharo", 0, SHA1(daf56705178bb2b6f3547418a98c361478702aed) )
 
 
@@ -7045,6 +7047,8 @@ ROM_START( ep_party )
 	ROM_LOAD16_BYTE( "p_party.g1", 0x00001, 0x020000, CRC(d5cf55db) SHA1(f8aac12d1fd83072644311f5e4402f02db37a00c) )
 	MISSING_SOUND
 ROM_END
+
+} // anonymous namespace
 
 
 /* header info */

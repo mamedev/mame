@@ -61,8 +61,6 @@ colecovision_control_port_device::colecovision_control_port_device(const machine
 void colecovision_control_port_device::device_start()
 {
 	m_device = get_card_device();
-
-	m_write_irq.resolve_safe();
 }
 
 

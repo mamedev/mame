@@ -102,7 +102,7 @@ private:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x2000; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x2000; }
 
 	// Initializers
 	void set_revision(uint32_t revision) { m_revision = revision; }
@@ -139,7 +139,7 @@ public:
 	uint16_t next_did_line_entry();
 	uint8_t get_cursor_pixel(int x, int y);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	auto vert_int() { return m_vert_int.bind(); }
 	auto screen_timing_changed() { return m_screen_timing_changed.bind(); } // Hack. TODO: Figure out a better way
@@ -297,8 +297,8 @@ public:
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vrint_w);
-	DECLARE_WRITE_LINE_MEMBER(update_screen_size);
+	void vrint_w(int state);
+	void update_screen_size(int state);
 
 	auto write_mask() { return m_write_mask_w.bind(); }
 	auto draw_flags() { return m_draw_flags_w.bind(); }
@@ -484,6 +484,7 @@ protected:
 		uint8_t loop;
 	};
 	uint8_t get_octant(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dx, int32_t dy);
+	void do_setup();
 	void do_fline(uint32_t color);
 	void do_iline(uint32_t color);
 

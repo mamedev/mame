@@ -76,7 +76,7 @@ public:
 	auto int_handler() { return m_int_handler.bind(); }
 
 	// called from cart device
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
+	void int_w(int state) { m_int_handler(state); }
 
 	// called from host
 	uint8_t mreq_r(offs_t offset);
@@ -84,8 +84,8 @@ public:
 	uint8_t iorq_r(offs_t offset);
 	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( xmem_w );
-	DECLARE_WRITE_LINE_MEMBER( print_w );
+	void xmem_w(int state);
+	void print_w(int state);
 
 protected:
 	// device-level overrides

@@ -283,7 +283,8 @@ to the same bank as defined through A20.
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/sh/sh2.h"
+#include "cpu/sh/sh7032.h"
+#include "cpu/sh/sh7604.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "315_5649.h"
@@ -295,6 +296,8 @@ to the same bank as defined through A20.
 
 #include "aquastge.lh"
 
+
+namespace {
 
 #define CLIPMAXX_FULL (496-1)
 #define CLIPMAXY_FULL (384-1)
@@ -348,8 +351,8 @@ public:
 	uint32_t m_clipvals[2][3];
 	uint8_t  m_clipblitterMode[2]; // hack
 
-	required_device<sh2_device> m_maincpu;
-	required_device<sh2_device> m_subcpu;
+	required_device<sh7604_device> m_maincpu;
+	required_device<sh7032_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
@@ -392,8 +395,8 @@ public:
 	template<int Chip> uint16_t soundram_r(offs_t offset);
 	template<int Chip> void soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void lamps_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
+	void scsp1_to_sh1_irq(int state);
+	void scsp2_to_sh1_irq(int state);
 	void sound_to_sh1_w(uint8_t data);
 	void init_coolridr();
 	void init_aquastge();
@@ -1908,7 +1911,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		uint32_t lastSpriteNumber = 0xffffffff;
 		uint16_t blankcount = 0;
-		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
+		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
 		int color_offs2 = (object->colbase + (b2colorNumber & 0x7ff))*0x40 * 5;
 		for (int h = 0; h < used_hCellCount; h++)
 		{
@@ -3155,26 +3158,24 @@ void coolridr_state::machine_start()
 	int count = 0;
 	for (int i=0;i<size/2/10;i++)
 	{
-		m_rearranged_16bit_gfx[count+0] = ((compressed[i+((0x0400000/2)*0)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*0)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+1] = ((compressed[i+((0x0400000/2)*1)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*1)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+2] = ((compressed[i+((0x0400000/2)*2)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*2)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+3] = ((compressed[i+((0x0400000/2)*3)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*3)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+4] = ((compressed[i+((0x0400000/2)*4)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*4)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+5] = ((compressed[i+((0x0400000/2)*5)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*5)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+6] = ((compressed[i+((0x0400000/2)*6)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*6)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+7] = ((compressed[i+((0x0400000/2)*7)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*7)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+8] = ((compressed[i+((0x0400000/2)*8)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*8)]&0xff00) >> 8);
-		m_rearranged_16bit_gfx[count+9] = ((compressed[i+((0x0400000/2)*9)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*9)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+0] = swapendian_int16(compressed[i+((0x0400000/2)*0)]);
+		m_rearranged_16bit_gfx[count+1] = swapendian_int16(compressed[i+((0x0400000/2)*1)]);
+		m_rearranged_16bit_gfx[count+2] = swapendian_int16(compressed[i+((0x0400000/2)*2)]);
+		m_rearranged_16bit_gfx[count+3] = swapendian_int16(compressed[i+((0x0400000/2)*3)]);
+		m_rearranged_16bit_gfx[count+4] = swapendian_int16(compressed[i+((0x0400000/2)*4)]);
+		m_rearranged_16bit_gfx[count+5] = swapendian_int16(compressed[i+((0x0400000/2)*5)]);
+		m_rearranged_16bit_gfx[count+6] = swapendian_int16(compressed[i+((0x0400000/2)*6)]);
+		m_rearranged_16bit_gfx[count+7] = swapendian_int16(compressed[i+((0x0400000/2)*7)]);
+		m_rearranged_16bit_gfx[count+8] = swapendian_int16(compressed[i+((0x0400000/2)*8)]);
+		m_rearranged_16bit_gfx[count+9] = swapendian_int16(compressed[i+((0x0400000/2)*9)]);
 		count+=10;
 	}
 
 
 	if (0)
 	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"expanded_%s_gfx", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "expanded_" + std::string(machine().system().name) + "_gfx";
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (int i=0;i<(0x800000*8);i++)
@@ -3182,7 +3183,6 @@ void coolridr_state::machine_start()
 				fwrite((uint8_t*)m_expanded_10bit_gfx.get()+(i^1), 1, 1, fp);
 			}
 			fclose(fp);
-
 		}
 	}
 
@@ -3207,7 +3207,7 @@ void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 	m_soundcpu->set_input_line(offset, data);
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
+void coolridr_state::scsp1_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
@@ -3216,7 +3216,7 @@ WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 		m_sound_data &= ~0x10;
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
+void coolridr_state::scsp2_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
@@ -3228,14 +3228,14 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 
 void coolridr_state::coolridr(machine_config &config)
 {
-	SH2(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
+	SH7604(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
 	M68000(config, m_soundcpu, XTAL(32'000'000)/2); // 16 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	SH1(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
+	SH7032(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
@@ -3394,6 +3394,9 @@ void coolridr_state::init_aquastge()
 
 	m_colbase = 0;
 }
+
+} // anonymous namespace
+
 
 GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
 GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

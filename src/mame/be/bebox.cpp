@@ -13,19 +13,19 @@
 #include "bebox.h"
 
 /* Components */
-#include "video/clgd542x.h"
 #include "bus/lpci/cirrus.h"
+#include "bus/lpci/mpc105.h"
+#include "bus/scsi/scsi.h"
 #include "sound/ymopl.h"
 #include "machine/mc146818.h"
 #include "machine/pckeybrd.h"
-#include "bus/lpci/mpc105.h"
-#include "bus/scsi/scsi.h"
+#include "video/pc_vga_cirrus.h"
+
 #include "speaker.h"
 
 /* Devices */
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
-#include "formats/pc_dsk.h"
 #include "machine/8042kbdc.h"
 
 uint8_t bebox_state::at_dma8237_1_r(offs_t offset) { return m_dma8237[1]->read(offset / 2); }
@@ -43,7 +43,8 @@ void bebox_state::main_mem(address_map &map)
 	map(0x80000020, 0x8000003F).rw(m_pic8259[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x80000040, 0x8000005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x80000060, 0x8000006F).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x80000070, 0x8000007F).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x80000070, 0x8000007F).w("rtc", FUNC(mc146818_device::address_w)).umask64(0xff00ff00ff00ff00);
+	map(0x80000070, 0x8000007F).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask64(0x00ff00ff00ff00ff);
 	map(0x80000080, 0x8000009F).rw(FUNC(bebox_state::bebox_page_r), FUNC(bebox_state::bebox_page_w));
 	map(0x800000A0, 0x800000BF).rw(m_pic8259[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x800000C0, 0x800000DF).rw(FUNC(bebox_state::at_dma8237_1_r), FUNC(bebox_state::at_dma8237_1_w));
@@ -51,9 +52,7 @@ void bebox_state::main_mem(address_map &map)
 	map(0x800002F8, 0x800002FF).rw("ns16550_1", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000380, 0x80000387).rw("ns16550_2", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000388, 0x8000038F).rw("ns16550_3", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x800003b0, 0x800003bf).rw(m_vga, FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
-	map(0x800003c0, 0x800003cf).rw(m_vga, FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
-	map(0x800003d0, 0x800003df).rw(m_vga, FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x800003B0, 0x800003DF).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
 	map(0x800003F0, 0x800003F7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 	map(0x800003F0, 0x800003F7).m(m_smc37c78, FUNC(smc37c78_device::map));
 	map(0x800003F8, 0x800003FF).rw("ns16550_0", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
@@ -62,8 +61,8 @@ void bebox_state::main_mem(address_map &map)
 	//map(0x800042E8, 0x800042EF).w("cirrus", FUNC(cirrus_device::cirrus_42E8_w));
 
 	map(0xBFFFFFF0, 0xBFFFFFFF).r(FUNC(bebox_state::bebox_interrupt_ack_r));
-	map(0xC00A0000, 0xC00BFFFF).rw(m_vga, FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
-	map(0xC1000000, 0xC11FFFFF).rw(m_vga, FUNC(cirrus_gd5428_device::mem_linear_r), FUNC(cirrus_gd5428_device::mem_linear_w));
+	map(0xC00A0000, 0xC00BFFFF).rw(m_vga, FUNC(cirrus_gd5446_vga_device::mem_r), FUNC(cirrus_gd5446_vga_device::mem_w));
+	map(0xC1000000, 0xC11FFFFF).rw(m_vga, FUNC(cirrus_gd5446_vga_device::mem_linear_r), FUNC(cirrus_gd5446_vga_device::mem_linear_w));
 	map(0xFFF00000, 0xFFF03FFF).bankr("bank2");
 	map(0xFFF04000, 0xFFFFFFFF).rw(FUNC(bebox_state::bebox_flash_r), FUNC(bebox_state::bebox_flash_w));
 }
@@ -130,7 +129,7 @@ void bebox_state::cirrus_config(device_t *device)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
+void bebox_state::bebox_keyboard_interrupt(int state)
 {
 	bebox_set_irq_bit(16, state);
 	m_pic8259[0]->ir1_w(state);
@@ -188,9 +187,10 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(cirrus_gd5428_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(cirrus_gd5446_vga_device::screen_update));
 
-	CIRRUS_GD5428(config, m_vga, 0);
+	// was GD5428, assume mistake (GD5446 is PCI)
+	CIRRUS_GD5446_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 
@@ -242,6 +242,10 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_ppc[0], INPUT_LINE_RESET);
 	kbdc.input_buffer_full_callback().set(FUNC(bebox_state::bebox_keyboard_interrupt));
+	kbdc.set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
+	at_keyb.keypress().set("kbdc", FUNC(kbdc8042_device::keyboard_w));
 
 	/* internal ram */
 	RAM(config, m_ram);

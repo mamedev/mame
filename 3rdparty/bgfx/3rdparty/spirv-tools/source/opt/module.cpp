@@ -90,6 +90,8 @@ void Module::ForEachInst(const std::function<void(Instruction*)>& f,
   DELEGATE(extensions_);
   DELEGATE(ext_inst_imports_);
   if (memory_model_) memory_model_->ForEachInst(f, run_on_debug_line_insts);
+  if (sampled_image_address_mode_)
+    sampled_image_address_mode_->ForEachInst(f, run_on_debug_line_insts);
   DELEGATE(entry_points_);
   DELEGATE(execution_modes_);
   DELEGATE(debugs1_);
@@ -113,6 +115,9 @@ void Module::ForEachInst(const std::function<void(const Instruction*)>& f,
   for (auto& i : ext_inst_imports_) DELEGATE(i);
   if (memory_model_)
     static_cast<const Instruction*>(memory_model_.get())
+        ->ForEachInst(f, run_on_debug_line_insts);
+  if (sampled_image_address_mode_)
+    static_cast<const Instruction*>(sampled_image_address_mode_.get())
         ->ForEachInst(f, run_on_debug_line_insts);
   for (auto& i : entry_points_) DELEGATE(i);
   for (auto& i : execution_modes_) DELEGATE(i);
@@ -139,7 +144,7 @@ void Module::ToBinary(std::vector<uint32_t>* binary, bool skip_nop) const {
   // TODO(antiagainst): should we change the generator number?
   binary->push_back(header_.generator);
   binary->push_back(header_.bound);
-  binary->push_back(header_.reserved);
+  binary->push_back(header_.schema);
 
   size_t bound_idx = binary->size() - 2;
   DebugScope last_scope(kNoDebugScope, kNoInlinedAt);
@@ -260,9 +265,7 @@ bool Module::HasExplicitCapability(uint32_t cap) {
 
 uint32_t Module::GetExtInstImportId(const char* extstr) {
   for (auto& ei : ext_inst_imports_)
-    if (!strcmp(extstr,
-                reinterpret_cast<const char*>(&(ei.GetInOperand(0).words[0]))))
-      return ei.result_id();
+    if (!ei.GetInOperand(0).AsString().compare(extstr)) return ei.result_id();
   return 0;
 }
 

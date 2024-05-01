@@ -13,6 +13,9 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+
+namespace {
+
 class mmm_state : public driver_device
 {
 public:
@@ -206,6 +209,8 @@ ROM_START( mmm_ldip )
 	ROM_LOAD( "ld3.bin", 0x2000, 0x1000, CRC(9e7158ae) SHA1(7f3b8730add127ed0608365875be3042fb2e3e7a) )
 	ROM_LOAD( "ld4.bin", 0x3000, 0x1000, CRC(970b749f) SHA1(fe6da7abc699db69c0761304f588b5bed899c674) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, mmm_state, empty_init, ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_IS_SKELETON_MECHANICAL)

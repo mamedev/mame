@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PARTNER_H
-#define MAME_INCLUDES_PARTNER_H
+#ifndef MAME_USSR_PARTNER_H
+#define MAME_USSR_PARTNER_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_PARTNER_H
+#endif // MAME_USSR_PARTNER_H

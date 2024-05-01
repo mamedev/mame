@@ -50,7 +50,9 @@ MR_01-.3A    [a0b758aa]
 #include "screen.h"
 #include "speaker.h"
 
-// mirage_state was also defined in mess/drivers/mirage.c
+
+namespace {
+
 class miragemj_state : public driver_device
 {
 public:
@@ -364,5 +366,8 @@ void miragemj_state::init_mirage()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
+
+} // anonymous namespace
+
 
 GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, init_mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -31,6 +31,9 @@
 //#include "screen.h"
 //#include "speaker.h"
 
+
+namespace {
+
 class gnat10_state : public driver_device
 {
 public:
@@ -232,5 +235,8 @@ ROM_START(gnat10)
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD("chargen.bin", 0x000, 0x800, NO_DUMP) // TMS2716 or TMS2732
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1980, gnat10, 0, 0, gnat10, gnat10, gnat10_state, empty_init, "GNAT Computers", "GNAT System 10", MACHINE_IS_SKELETON)

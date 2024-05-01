@@ -102,8 +102,8 @@ sticker from Jan 95 and factory sticker 94*41.
 #include "tilemap.h"
 
 // configurable logging
-#define LOG_CPUBANK     (1U <<  1)
-#define LOG_OKIBANK     (1U <<  2)
+#define LOG_CPUBANK     (1U << 1)
+#define LOG_OKIBANK     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CPUBANK | LOG_OKIBANK)
 
@@ -210,8 +210,6 @@ private:
 	void torus_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -497,8 +495,6 @@ uint32_t paradise_state::screen_update_madball(screen_device &screen, bitmap_ind
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 /***************************************************************************
 

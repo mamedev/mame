@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_BERT_H
-#define MAME_MACHINE_BERT_H
+#ifndef MAME_NCD_BERT_M_H
+#define MAME_NCD_BERT_M_H
 
 #pragma once
 
@@ -37,4 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BERT, bert_device)
 
-#endif // MAME_MACHINE_BERT_H
+#endif // MAME_NCD_BERT_M_H

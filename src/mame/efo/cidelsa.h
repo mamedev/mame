@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_CIDELSA_H
-#define MAME_INCLUDES_CIDELSA_H
+#ifndef MAME_EFO_CIDELSA_H
+#define MAME_EFO_CIDELSA_H
 
 #pragma once
 
@@ -51,11 +51,11 @@ public:
 	void destryer_out1_w(uint8_t data);
 	void altair_out1_w(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER( clear_r );
+	int clear_r();
 
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE_LINE_MEMBER( prd_w );
-	DECLARE_READ_LINE_MEMBER( cdp1869_pcb_r );
+	void q_w(int state);
+	void prd_w(int state);
+	int cdp1869_pcb_r();
 
 	CDP1869_CHAR_RAM_READ_MEMBER(cidelsa_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(cidelsa_charram_w);
@@ -133,4 +133,4 @@ protected:
 	int m_psg_latch = 0;
 };
 
-#endif // MAME_INCLUDES_CIDELSA_H
+#endif // MAME_EFO_CIDELSA_H

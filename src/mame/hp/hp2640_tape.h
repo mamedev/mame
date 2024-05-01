@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP2640_TAPE_H
-#define MAME_MACHINE_HP2640_TAPE_H
+#ifndef MAME_HP_HP2640_TAPE_H
+#define MAME_HP_HP2640_TAPE_H
 
 #pragma once
 
@@ -34,7 +34,7 @@ public:
 	uint8_t poll_r   () const;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -95,4 +95,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP2640_TAPE, hp2640_tape_device)
 
-#endif /* MAME_MACHINE_HP2640_TAPE_H */
+#endif /* MAME_HP_HP2640_TAPE_H */

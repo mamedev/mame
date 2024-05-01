@@ -164,8 +164,6 @@ private:
 };
 
 
-// video
-
 TILE_GET_INFO_MEMBER(himesiki_state::get_bg_tile_info)
 {
 	int code = m_bg_ram[tile_index * 2] + m_bg_ram[tile_index * 2 + 1] * 0x100;
@@ -281,8 +279,6 @@ uint32_t himesiki_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void himesiki_state::rombank_w(uint8_t data)
 {

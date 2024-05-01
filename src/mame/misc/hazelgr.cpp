@@ -14,6 +14,8 @@
 #include "machine/z80pio.h"
 
 
+namespace {
+
 class haze_state : public driver_device
 {
 public:
@@ -115,6 +117,8 @@ ROM_START( hg_frd )
 	ROM_LOAD( "fd v 3-2 b.bin", 0x0800, 0x0800, CRC(c8654bdf) SHA1(342fa389b80fb9519e3fad488cea2063e88b30fa) )
 	ROM_LOAD( "fd v 3-2 c.bin", 0x1000, 0x0800, CRC(77bb8d8c) SHA1(65b7dd8024747175c3bd5bc341e2e1a92699f1c6) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 198?, hg_frd, 0, haze, haze, haze_state, empty_init, ROT0, "Hazel Grove", "Fruit Deuce (Hazel Grove)", MACHINE_IS_SKELETON_MECHANICAL)

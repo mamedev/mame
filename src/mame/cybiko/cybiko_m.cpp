@@ -15,11 +15,15 @@
 #include "emu.h"
 #include "cybiko.h"
 
-#define LOG_LEVEL  1
-#define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
+#define LOG_LEVEL0 (1U << 1)
+#define LOG_LEVEL1 (1U << 2)
+#define LOG_LEVEL2 (1U << 3)
+
+#define VERBOSE (LOG_LEVEL0)
+#include "logmacro.h"
+
 
 #define RAMDISK_SIZE (512 * 1024)
-
 
 ////////////////////////
 // DRIVER INIT & EXIT //
@@ -27,13 +31,13 @@
 
 void cybiko_state::init_cybiko()
 {
-	_logerror( 0, ("init_cybikov1\n"));
+	LOGMASKED(LOG_LEVEL0, "init_cybikov1\n");
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
 void cybiko_state::init_cybikoxt()
 {
-	_logerror( 0, ("init_cybikoxt\n"));
+	LOGMASKED(LOG_LEVEL0, "init_cybikoxt\n");
 	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, m_ram->pointer());
 }
 
@@ -41,7 +45,7 @@ QUICKLOAD_LOAD_MEMBER(cybiko_state::quickload_cybiko)
 {
 	image.fread(m_flash1->get_ptr(), std::min(image.length(), uint64_t(0x84000)));
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 QUICKLOAD_LOAD_MEMBER(cybiko_state::quickload_cybikoxt)
@@ -54,7 +58,7 @@ QUICKLOAD_LOAD_MEMBER(cybiko_state::quickload_cybikoxt)
 	for (int byte = 0; byte < size; byte++)
 		dest.write_byte(0x400000 + byte, buffer[byte]);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 ///////////////////
@@ -109,7 +113,7 @@ int cybiko_state::cybiko_key_r(offs_t offset, int mem_mask)
 	}
 	if (data != 0xFFFF)
 	{
-		_logerror( 1, ("cybiko_key_r (%08X/%04X) %04X\n", offset, mem_mask, data));
+		LOGMASKED(LOG_LEVEL1, "cybiko_key_r (%08X/%04X) %04X\n", offset, mem_mask, data);
 	}
 	return data;
 }
@@ -137,7 +141,7 @@ uint16_t cybiko_state::cybikov1_io_reg_r(offs_t offset)
 {
 	uint16_t data = 0;
 #if 0
-	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
+	LOGMASKED(LOG_LEVEL2, "cybikov1_io_reg_r (%08X)\n", offset);
 	switch (offset)
 	{
 		// keyboard
@@ -185,7 +189,7 @@ uint16_t cybiko_state::cybikov2_io_reg_r(offs_t offset)
 {
 	uint16_t data = 0;
 #if 0
-	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
+	LOGMASKED(LOG_LEVEL2, "cybikov2_io_reg_r (%08X)\n", offset);
 	switch (offset)
 	{
 		// keyboard
@@ -233,7 +237,7 @@ uint16_t cybiko_state::cybikoxt_io_reg_r(offs_t offset)
 {
 	uint16_t data = 0;
 #if 0
-	_logerror( 2, ("cybikoxt_io_reg_r (%08X)\n", offset));
+	LOGMASKED(LOG_LEVEL2, "cybikoxt_io_reg_r (%08X)\n", offset);
 	switch (offset)
 	{
 		// rs232
@@ -272,7 +276,7 @@ uint16_t cybiko_state::cybikoxt_io_reg_r(offs_t offset)
 void cybiko_state::cybikov1_io_reg_w(offs_t offset, uint16_t data)
 {
 #if 0
-	_logerror( 2, ("cybikov1_io_reg_w (%08X/%02X)\n", offset, data));
+	LOGMASKED(LOG_LEVEL2, "cybikov1_io_reg_w (%08X/%02X)\n", offset, data);
 	switch (offset)
 	{
 		// speaker
@@ -315,7 +319,7 @@ void cybiko_state::cybikov1_io_reg_w(offs_t offset, uint16_t data)
 void cybiko_state::cybikov2_io_reg_w(offs_t offset, uint16_t data)
 {
 #if 0
-	_logerror( 2, ("cybikov2_io_reg_w (%08X/%02X)\n", offset, data));
+	LOGMASKED(LOG_LEVEL2, "cybikov2_io_reg_w (%08X/%02X)\n", offset, data);
 	switch (offset)
 	{
 		// speaker
@@ -358,7 +362,7 @@ void cybiko_state::cybikov2_io_reg_w(offs_t offset, uint16_t data)
 void cybiko_state::cybikoxt_io_reg_w(offs_t offset, uint16_t data)
 {
 #if 0
-	_logerror( 2, ("cybikoxt_io_reg_w (%08X/%02X)\n", offset, data));
+	LOGMASKED(LOG_LEVEL2, "cybikoxt_io_reg_w (%08X/%02X)\n", offset, data);
 	switch (offset)
 	{
 		// speaker
@@ -397,6 +401,6 @@ void cybiko_state::cybikoxt_io_reg_w(offs_t offset, uint16_t data)
 // 20/00, 23/08, 27/01, 2F/08, 2C/02, 2B/08, 28/01, 37/08, 34/04, 33/08, 30/03, 04/80, 05/02, 1B/6C, 00/C8
 void cybiko_state::cybiko_usb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (ACCESSING_BITS_8_15) _logerror( 2, ("[%08X] <- %02X\n", 0x200000 + offset * 2 + 0, (data >> 8) & 0xFF));
-	if (ACCESSING_BITS_0_7) _logerror( 2, ("[%08X] <- %02X\n", 0x200000 + offset * 2 + 1, (data >> 0) & 0xFF));
+	if (ACCESSING_BITS_8_15) LOGMASKED(LOG_LEVEL2, "[%08X] <- %02X\n", 0x200000 + offset * 2 + 0, (data >> 8) & 0xFF);
+	if (ACCESSING_BITS_0_7) LOGMASKED(LOG_LEVEL2, "[%08X] <- %02X\n", 0x200000 + offset * 2 + 1, (data >> 0) & 0xFF);
 }

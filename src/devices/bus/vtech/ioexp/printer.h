@@ -39,7 +39,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;
 
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	void busy_w(int state);
 	uint8_t busy_r();
 	void strobe_w(uint8_t data);
 

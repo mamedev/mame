@@ -10,6 +10,8 @@ exports.author = { name = "Carl" }
 
 local cheatfind = exports
 
+local reset_subscription
+
 function cheatfind.startplugin()
 	local cheat = {}
 
@@ -333,7 +335,7 @@ function cheatfind.startplugin()
 		end
 	end
 
-	emu.register_start(start)
+	reset_subscription = emu.add_machine_reset_notifier(start)
 
 	local menu_is_showing = false
 	local tabbed_out = false
@@ -965,7 +967,7 @@ function cheatfind.startplugin()
 								end
 							end
 						end
-						cheat_save.path = emu.subst_env(manager.machine.options.entries.cheatpath:value()):match("([^;]+)")
+						cheat_save.path = manager.machine.options.entries.cheatpath:value():match("([^;]+)")
 						cheat_save.filename = string.format("%s/%s", cheat_save.path, setname)
 						cheat_save.name = cheat.desc
 						local json = require("json")
@@ -1044,7 +1046,7 @@ function cheatfind.startplugin()
 	end
 
 	local function menu_callback(index, event)
-		if event == "cancel" and pausesel == 1 then
+		if event == "back" and pausesel == 1 then
 			emu.unpause()
 			menu_is_showing = false
 			return false -- return false so menu will be popped off the stack

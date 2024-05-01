@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli
+// copyright-holders: Pierpaolo Prazzoli
+
 /*
     Jibun wo Migaku Culture School Mahjong Hen
     (c)1994 Face
@@ -8,18 +9,21 @@
 
     thanks to David Haywood for some precious advice
 
+    TODO: PCB has a 93C46 but it isn't hooked up in the driver. Is it unused?
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/bankdev.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
-#define MCLK 16000000
+
+namespace {
 
 class cultures_state : public driver_device
 {
@@ -28,46 +32,41 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_vrambank(*this, "vrambank"),
+		m_vramview(*this, "vramview"),
 		m_prgbank(*this, "prgbank"),
 		m_okibank(*this, "okibank"),
-		m_bg1_rom(*this, "bg1"),
-		m_bg2_rom(*this, "bg2"),
+		m_bg_rom(*this, "bg%u", 1U),
 		m_bg0_videoram(*this, "bg0_videoram"),
-		m_bg0_regs_x(*this, "bg0_regs_x"),
-		m_bg0_regs_y(*this, "bg0_regs_y"),
-		m_bg1_regs_x(*this, "bg1_regs_x"),
-		m_bg1_regs_y(*this, "bg1_regs_y"),
-		m_bg2_regs_x(*this, "bg2_regs_x"),
-		m_bg2_regs_y(*this, "bg2_regs_y")
+		m_bg_regs_x(*this, "bg%u_regs_x", 0U),
+		m_bg_regs_y(*this, "bg%u_regs_y", 0U)
 	{ }
 
-	/* devices */
+	void cultures(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<address_map_bank_device> m_vrambank;
+
+	// memory pointers
+	memory_view m_vramview;
 	required_memory_bank m_prgbank;
 	required_memory_bank m_okibank;
-
-	/* memory pointers */
-	required_region_ptr<uint16_t> m_bg1_rom;
-	required_region_ptr<uint16_t> m_bg2_rom;
-
+	required_region_ptr_array<uint16_t, 2> m_bg_rom;
 	required_shared_ptr<uint8_t> m_bg0_videoram;
-	required_shared_ptr<uint8_t> m_bg0_regs_x;
-	required_shared_ptr<uint8_t> m_bg0_regs_y;
-	required_shared_ptr<uint8_t> m_bg1_regs_x;
-	required_shared_ptr<uint8_t> m_bg1_regs_y;
-	required_shared_ptr<uint8_t> m_bg2_regs_x;
-	required_shared_ptr<uint8_t> m_bg2_regs_y;
+	required_shared_ptr_array<uint8_t, 3> m_bg_regs_x;
+	required_shared_ptr_array<uint8_t, 3> m_bg_regs_y;
 
-	/* video-related */
-	tilemap_t  *m_bg0_tilemap;
-	tilemap_t  *m_bg1_tilemap;
-	tilemap_t  *m_bg2_tilemap;
-	int      m_irq_enable;
-	int      m_bg1_bank;
-	int      m_bg2_bank;
+	// video-related
+	tilemap_t *m_bg_tilemap[3];
+	uint8_t m_irq_enable;
+	uint8_t m_bg_rombank[2];
+
 	void cpu_bankswitch_w(uint8_t data);
 	void bg0_videoram_w(offs_t offset, uint8_t data);
 	void misc_w(uint8_t data);
@@ -75,29 +74,24 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cultures_interrupt);
-	void cultures(machine_config &config);
-	void cultures_io_map(address_map &map);
-	void cultures_map(address_map &map);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 	void oki_map(address_map &map);
-	void vrambank_map(address_map &map);
 };
 
 
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg1_tile_info)
 {
-	int const code = m_bg1_rom[0x200000/2 + m_bg1_bank * 0x80000/2 + tile_index];
+	int const code = m_bg_rom[0][0x200000 / 2 + m_bg_rombank[0] * 0x80000 / 2 + tile_index];
 	tileinfo.set(1, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg2_tile_info)
 {
-	int const code = m_bg2_rom[0x200000/2 + m_bg2_bank * 0x80000/2 + tile_index];
+	int const code = m_bg_rom[1][0x200000 / 2 + m_bg_rombank[1] * 0x80000 / 2 + tile_index];
 	tileinfo.set(2, code, code >> 12, 0);
 }
 
@@ -109,47 +103,45 @@ TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 
 void cultures_state::video_start()
 {
-	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
 
-	m_bg1_tilemap->set_transparent_pen(0);
-	m_bg0_tilemap->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
 
-	m_bg0_tilemap->set_scrolldx(502, -118);
-	m_bg1_tilemap->set_scrolldx(502, -118);
-	m_bg2_tilemap->set_scrolldx(502, -118);
+	m_bg_tilemap[0]->set_scrolldx(502, -118);
+	m_bg_tilemap[1]->set_scrolldx(502, -118);
+	m_bg_tilemap[2]->set_scrolldx(502, -118);
 
-	m_bg0_tilemap->set_scrolldy(255, -16);
-	m_bg1_tilemap->set_scrolldy(255, -16);
-	m_bg2_tilemap->set_scrolldy(255, -16);
+	m_bg_tilemap[0]->set_scrolldy(255, -16);
+	m_bg_tilemap[1]->set_scrolldy(255, -16);
+	m_bg_tilemap[2]->set_scrolldy(255, -16);
 }
 
-uint32_t cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cultures_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int attr;
-
 	// tilemaps attributes
-	attr = (m_bg0_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (m_bg0_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	m_bg0_tilemap->set_flip(attr);
+	int attr = (m_bg_regs_x[0][3] & 1 ? TILEMAP_FLIPX : 0) | (m_bg_regs_y[0][3] & 1 ? TILEMAP_FLIPY : 0);
+	m_bg_tilemap[0]->set_flip(attr);
 
-	attr = (m_bg1_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (m_bg1_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	m_bg1_tilemap->set_flip(attr);
+	attr = (m_bg_regs_x[1][3] & 1 ? TILEMAP_FLIPX : 0) | (m_bg_regs_y[1][3] & 1 ? TILEMAP_FLIPY : 0);
+	m_bg_tilemap[1]->set_flip(attr);
 
-	attr = (m_bg2_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (m_bg2_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	m_bg2_tilemap->set_flip(attr);
+	attr = (m_bg_regs_x[2][3] & 1 ? TILEMAP_FLIPX : 0) | (m_bg_regs_y[2][3] & 1 ? TILEMAP_FLIPY : 0);
+	m_bg_tilemap[2]->set_flip(attr);
 
 	// tilemaps scrolls
-	m_bg0_tilemap->set_scrollx(0, (m_bg0_regs_x[2] << 8) + m_bg0_regs_x[0]);
-	m_bg1_tilemap->set_scrollx(0, (m_bg1_regs_x[2] << 8) + m_bg1_regs_x[0]);
-	m_bg2_tilemap->set_scrollx(0, (m_bg2_regs_x[2] << 8) + m_bg2_regs_x[0]);
-	m_bg0_tilemap->set_scrolly(0, (m_bg0_regs_y[2] << 8) + m_bg0_regs_y[0]);
-	m_bg1_tilemap->set_scrolly(0, (m_bg1_regs_y[2] << 8) + m_bg1_regs_y[0]);
-	m_bg2_tilemap->set_scrolly(0, (m_bg2_regs_y[2] << 8) + m_bg2_regs_y[0]);
+	m_bg_tilemap[0]->set_scrollx(0, (m_bg_regs_x[0][2] << 8) + m_bg_regs_x[0][0]);
+	m_bg_tilemap[1]->set_scrollx(0, (m_bg_regs_x[1][2] << 8) + m_bg_regs_x[1][0]);
+	m_bg_tilemap[2]->set_scrollx(0, (m_bg_regs_x[2][2] << 8) + m_bg_regs_x[2][0]);
+	m_bg_tilemap[0]->set_scrolly(0, (m_bg_regs_y[0][2] << 8) + m_bg_regs_y[0][0]);
+	m_bg_tilemap[1]->set_scrolly(0, (m_bg_regs_y[1][2] << 8) + m_bg_regs_y[1][0]);
+	m_bg_tilemap[2]->set_scrolly(0, (m_bg_regs_y[2][2] << 8) + m_bg_regs_y[2][0]);
 
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -157,34 +149,34 @@ uint32_t cultures_state::screen_update_cultures(screen_device &screen, bitmap_in
 void cultures_state::cpu_bankswitch_w(uint8_t data)
 {
 	m_prgbank->set_entry(data & 0x0f);
-	m_vrambank->set_bank((data & 0x20)>>5);
+	m_vramview.select((data & 0x20) >> 5);
 }
 
 
 void cultures_state::bg0_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg0_videoram[offset] = data;
-	m_bg0_tilemap->mark_tile_dirty(offset >> 1);
+	m_bg_tilemap[0]->mark_tile_dirty(offset >> 1);
 }
 
 void cultures_state::misc_w(uint8_t data)
 {
-	m_okibank->set_entry(data&0x0f);
+	m_okibank->set_entry(data & 0x0f);
 	m_irq_enable = data & 0x80;
 }
 
 void cultures_state::bg_bank_w(uint8_t data)
 {
-	if (m_bg1_bank != (data & 3))
+	if (m_bg_rombank[0] != (data & 3))
 	{
-		m_bg1_bank = data & 3;
-		m_bg1_tilemap->mark_all_dirty();
+		m_bg_rombank[0] = data & 3;
+		m_bg_tilemap[1]->mark_all_dirty();
 	}
 
-	if (m_bg2_bank != ((data & 0xc) >> 2))
+	if (m_bg_rombank[1] != ((data & 0xc) >> 2))
 	{
-		m_bg2_bank = (data & 0xc) >> 2;
-		m_bg2_tilemap->mark_all_dirty();
+		m_bg_rombank[1] = (data & 0xc) >> 2;
+		m_bg_tilemap[2]->mark_all_dirty();
 	}
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
@@ -193,35 +185,31 @@ void cultures_state::bg_bank_w(uint8_t data)
 void cultures_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
-void cultures_state::vrambank_map(address_map &map)
-{
-	map(0x0000, 0x3fff).ram().w(FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
-	map(0x4000, 0x6fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-}
-
-void cultures_state::cultures_map(address_map &map)
+void cultures_state::program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("prgbank");
-	map(0x8000, 0xbfff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x7fff).bankr(m_prgbank);
+	map(0x8000, 0xbfff).view(m_vramview);
+	m_vramview[0](0x8000, 0xbfff).ram().w(FUNC(cultures_state::bg0_videoram_w)).share(m_bg0_videoram);
+	m_vramview[1](0x8000, 0xafff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xc000, 0xdfff).ram();
 	map(0xf000, 0xffff).ram();
 }
 
-void cultures_state::cultures_io_map(address_map &map)
+void cultures_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).ram();
 	map(0x10, 0x13).ram();
-	map(0x20, 0x23).ram().share("bg0_regs_x");
-	map(0x30, 0x33).ram().share("bg0_regs_y");
-	map(0x40, 0x43).ram().share("bg1_regs_x");
-	map(0x50, 0x53).ram().share("bg1_regs_y");
-	map(0x60, 0x63).ram().share("bg2_regs_x");
-	map(0x70, 0x73).ram().share("bg2_regs_y");
+	map(0x20, 0x23).ram().share(m_bg_regs_x[0]);
+	map(0x30, 0x33).ram().share(m_bg_regs_y[0]);
+	map(0x40, 0x43).ram().share(m_bg_regs_x[1]);
+	map(0x50, 0x53).ram().share(m_bg_regs_y[1]);
+	map(0x60, 0x63).ram().share(m_bg_regs_x[2]);
+	map(0x70, 0x73).ram().share(m_bg_regs_y[2]);
 	map(0x80, 0x80).w(FUNC(cultures_state::cpu_bankswitch_w));
 	map(0x90, 0x90).w(FUNC(cultures_state::misc_w));
 	map(0xa0, 0xa0).w(FUNC(cultures_state::bg_bank_w));
@@ -357,8 +345,6 @@ static INPUT_PORTS_START( cultures )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
-/*** GFX Decode ***/
-
 
 static const gfx_layout gfxlayout =
 {
@@ -377,7 +363,7 @@ static GFXDECODE_START( gfx_cultures )
 	GFXDECODE_ENTRY("bg2", 0, gfxlayout, 0x1000, 8 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(cultures_state::cultures_interrupt)
+INTERRUPT_GEN_MEMBER(cultures_state::interrupt)
 {
 	if (m_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -390,47 +376,46 @@ void cultures_state::machine_start()
 	m_okibank->set_entry(0);
 
 	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_bg1_bank));
-	save_item(NAME(m_bg2_bank));
+	save_item(NAME(m_bg_rombank));
 }
 
 void cultures_state::machine_reset()
 {
 	m_okibank->set_entry(0);
-	m_vrambank->set_bank(1);
+	m_vramview.select(1);
 	m_irq_enable = 0;
-	m_bg1_bank = 0;
-	m_bg2_bank = 0;
+	m_bg_rombank[0] = 0;
+	m_bg_rombank[1] = 0;
 }
 
 
 
 void cultures_state::cultures(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MCLK/2); /* 8.000 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cultures_state::cultures_map);
-	m_maincpu->set_addrmap(AS_IO, &cultures_state::cultures_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cultures_state::cultures_interrupt));
+	static constexpr XTAL MCLK = 16_MHz_XTAL;
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&cultures_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x4000);
+	// basic machine hardware
+	Z80(config, m_maincpu, MCLK / 2); // 8.000 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &cultures_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &cultures_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cultures_state::interrupt));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(cultures_state::screen_update_cultures));
+	screen.set_screen_update(FUNC(cultures_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_cultures);
 	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 0x3000/2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", MCLK/8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", MCLK / 8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.30);
 	oki.set_addrmap(0, &cultures_state::oki_map);
 }
@@ -482,21 +467,23 @@ ROM_START( cultures )
 	ROM_REGION( 0x400000, "bg0", ROMREGION_ERASE00 )
 	ROM_LOAD( "bg0c.u45",     0x000000, 0x200000, CRC(ad2e1263) SHA1(b28a3d82aaa0421a7b4df837814147b109e7d1a5) )
 	ROM_LOAD( "bg0c2.u46",    0x200000, 0x100000, CRC(97c71c09) SHA1(ffbcee1d9cb39d0824f3aa652c3a24579113cf2e) )
-	/* 0x300000 - 0x3fffff empty */
+	// 0x300000 - 0x3fffff empty
 
 	ROM_REGION16_LE( 0x400000, "bg1", ROMREGION_ERASE00 )
 	ROM_LOAD( "bg2c.u68",     0x000000, 0x200000, CRC(fa598644) SHA1(532249e456c34f18a787d5a028df82f2170f604d) )
 	ROM_LOAD( "bg1t.u67",     0x200000, 0x100000, CRC(d2e594ee) SHA1(a84b5ab62dec1867d433ccaeb1381e7593958cf0) )
-	/* 0x300000 - 0x3fffff empty */
+	// 0x300000 - 0x3fffff empty
 
 	ROM_REGION16_LE( 0x400000, "bg2", ROMREGION_ERASE00 )
 	ROM_LOAD( "bg1c.u80",     0x000000, 0x200000, CRC(9ab99bd9) SHA1(bce41b6f5d83c8262ba8d37b2dfcd5d7a5e7ace7) )
 	ROM_LOAD( "bg2t.u79",     0x200000, 0x100000, CRC(0610a79f) SHA1(9fc6b2e5c573ed682b2f7fa462c8f42ff99da5ba) )
-	/* 0x300000 - 0x3fffff empty */
+	// 0x300000 - 0x3fffff empty
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "pcm.u87",      0x000000, 0x200000, CRC(84206475) SHA1(d1423bd5c7425e121fb4e7845cf57801e9afa7b3) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1994, cultures, 0, cultures, cultures, cultures_state, empty_init, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )

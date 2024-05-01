@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_EDEVICES_H
-#define MAME_VIDEO_EDEVICES_H
+#ifndef MAME_EDEVICES_EDEVICES_H
+#define MAME_EDEVICES_EDEVICES_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ protected:
 DECLARE_DEVICE_TYPE(EDEVICES_VID, edevices_device)
 DECLARE_DEVICE_TYPE(EDEVICES_SFORCE_VID, edevices_sforce_device)
 
-#endif // MAME_VIDEO_EDEVICES_H
+#endif // MAME_EDEVICES_EDEVICES_H

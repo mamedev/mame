@@ -15,6 +15,13 @@
 
 #include "diserial.h"
 
+#include "interface/midiport.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -27,11 +34,12 @@ class midiin_device :    public device_t,
 public:
 	// construction/destruction
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~midiin_device();
 
 	auto input_callback() { return m_input_cb.bind(); }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	// image device
@@ -39,18 +47,18 @@ public:
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
-	virtual const char *file_extensions() const noexcept override { return "mid"; }
+	virtual const char *file_extensions() const noexcept override { return "mid,syx"; }
 	virtual bool core_opens_image_file() const noexcept override { return false; }
 	virtual const char *image_type_name() const noexcept override { return "midiin"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "min"; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// serial overrides
+	// device_serial_interface implementation
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
 
@@ -61,7 +69,7 @@ private:
 
 	void xmit_char(uint8_t data);
 
-	std::unique_ptr<osd_midi_device> m_midi;
+	std::unique_ptr<osd::midi_input_port> m_midi;
 	required_ioport m_config;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;
@@ -154,7 +162,7 @@ private:
 		void clear() { m_list.clear(); }
 
 		// parse a new sequence
-		bool parse(util::random_read &stream, u32 length);
+		std::error_condition parse(util::random_read &stream, u32 length);
 
 		// rewind to the start of time
 		void rewind(attotime const &basetime);
@@ -167,6 +175,7 @@ private:
 		midi_event &event_at(u32 tick);
 		u32 parse_track_data(midi_parser &buffer, u32 start_tick);
 		void parse_midi_data(midi_parser &buffer);
+		void parse_sysex_data(midi_parser &buffer);
 
 		// internal state
 		std::list<midi_event> m_list;

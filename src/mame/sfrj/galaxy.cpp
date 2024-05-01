@@ -28,15 +28,331 @@ ToDo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "galaxy.h"
 
 #include "cpu/z80/z80.h"
 #include "formats/gtp_cas.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
+#include "machine/ram.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
+namespace {
+
+class galaxy_state : public driver_device
+{
+public:
+	galaxy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_cassette(*this, "cassette")
+		, m_ram(*this, RAM_TAG)
+		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "LINE%u", 0U)
+	{ }
+
+	void galaxy(machine_config &config);
+	void galaxyp(machine_config &config);
+
+	void init_galaxy();
+
+private:
+	uint8_t keyboard_r(offs_t offset);
+	void latch_w(uint8_t data);
+	void machine_start() override;
+	void machine_reset() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(gal_video);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void set_timer();
+	void setup_snapshot (const uint8_t * data, uint32_t size);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	void galaxy_mem(address_map &map);
+	void galaxyp_io(address_map &map);
+	void galaxyp_mem(address_map &map);
+
+	int m_interrupts_enabled = 0;
+	uint8_t m_latch_value = 0U;
+	uint32_t m_gal_cnt = 0U;
+	uint8_t m_code = 0U;
+	uint8_t m_first = 0U;
+	uint32_t m_start_addr = 0U;
+	emu_timer *m_gal_video_timer = nullptr;
+	bitmap_ind16 m_bitmap{};
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<cassette_image_device> m_cassette;
+	optional_device<ram_device> m_ram;
+	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<8> m_io_keyboard;
+};
+
+/***************************************************************************
+  I/O devices
+***************************************************************************/
+
+uint8_t galaxy_state::keyboard_r(offs_t offset)
+{
+	if (offset == 0)
+	{
+		double level = m_cassette->input();
+		return (level >  -0.1) ? 0xff : 0xfe;
+	}
+	else
+		return m_io_keyboard[(offset>>3) & 0x07]->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
+}
+
+void galaxy_state::latch_w(uint8_t data)
+{
+	double val = (BIT(data,6) ^ BIT(data,2)) ? 0 : BIT(data,6) ? -1.0f : +1.0f;
+	m_latch_value = data;
+	m_cassette->output(val);
+}
+
+/***************************************************************************
+  Interrupts
+***************************************************************************/
+
+IRQ_CALLBACK_MEMBER(galaxy_state::irq_callback)
+{
+	set_timer();
+	m_interrupts_enabled = true;
+	return 0xff;
+}
+
+/***************************************************************************
+  Snapshot files (GAL)
+***************************************************************************/
+
+#define GALAXY_SNAPSHOT_V1_SIZE 8268
+#define GALAXY_SNAPSHOT_V2_SIZE 8244
+
+void galaxy_state::setup_snapshot(const uint8_t * data, uint32_t size)
+{
+	switch (size)
+	{
+		case GALAXY_SNAPSHOT_V1_SIZE:
+			m_maincpu->set_state_int(Z80_AF,   data[0x00] | data[0x01] << 8);
+			m_maincpu->set_state_int(Z80_BC,   data[0x04] | data[0x05] << 8);
+			m_maincpu->set_state_int(Z80_DE,   data[0x08] | data[0x09] << 8);
+			m_maincpu->set_state_int(Z80_HL,   data[0x0c] | data[0x0d] << 8);
+			m_maincpu->set_state_int(Z80_IX,   data[0x10] | data[0x11] << 8);
+			m_maincpu->set_state_int(Z80_IY,   data[0x14] | data[0x15] << 8);
+			m_maincpu->set_state_int(Z80_PC,   data[0x18] | data[0x19] << 8);
+			m_maincpu->set_state_int(Z80_SP,   data[0x1c] | data[0x1d] << 8);
+			m_maincpu->set_state_int(Z80_AF2,  data[0x20] | data[0x21] << 8);
+			m_maincpu->set_state_int(Z80_BC2,  data[0x24] | data[0x25] << 8);
+			m_maincpu->set_state_int(Z80_DE2,  data[0x28] | data[0x29] << 8);
+			m_maincpu->set_state_int(Z80_HL2,  data[0x2c] | data[0x2d] << 8);
+			m_maincpu->set_state_int(Z80_IFF1, data[0x30]);
+			m_maincpu->set_state_int(Z80_IFF2, data[0x34]);
+			m_maincpu->set_state_int(Z80_HALT, data[0x38]);
+			m_maincpu->set_state_int(Z80_IM,   data[0x3c]);
+			m_maincpu->set_state_int(Z80_I,    data[0x40]);
+			m_maincpu->set_state_int(Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
+
+			memcpy (m_ram->pointer(), data + 0x084c, (m_ram->size() < 0x1800) ? m_ram->size() : 0x1800);
+
+			break;
+		case GALAXY_SNAPSHOT_V2_SIZE:
+			m_maincpu->set_state_int(Z80_AF,   data[0x00] | data[0x01] << 8);
+			m_maincpu->set_state_int(Z80_BC,   data[0x02] | data[0x03] << 8);
+			m_maincpu->set_state_int(Z80_DE,   data[0x04] | data[0x05] << 8);
+			m_maincpu->set_state_int(Z80_HL,   data[0x06] | data[0x07] << 8);
+			m_maincpu->set_state_int(Z80_IX,   data[0x08] | data[0x09] << 8);
+			m_maincpu->set_state_int(Z80_IY,   data[0x0a] | data[0x0b] << 8);
+			m_maincpu->set_state_int(Z80_PC,   data[0x0c] | data[0x0d] << 8);
+			m_maincpu->set_state_int(Z80_SP,   data[0x0e] | data[0x0f] << 8);
+			m_maincpu->set_state_int(Z80_AF2,  data[0x10] | data[0x11] << 8);
+			m_maincpu->set_state_int(Z80_BC2,  data[0x12] | data[0x13] << 8);
+			m_maincpu->set_state_int(Z80_DE2,  data[0x14] | data[0x15] << 8);
+			m_maincpu->set_state_int(Z80_HL2,  data[0x16] | data[0x17] << 8);
+
+			m_maincpu->set_state_int(Z80_IFF1, data[0x18] & 0x01);
+			m_maincpu->set_state_int(Z80_IFF2, (uint64_t)0);
+
+			m_maincpu->set_state_int(Z80_HALT, (uint64_t)0);
+
+			m_maincpu->set_state_int(Z80_IM,   (data[0x18] >> 1) & 0x03);
+
+			m_maincpu->set_state_int(Z80_I,    data[0x19]);
+			m_maincpu->set_state_int(Z80_R,    data[0x1a]);
+
+			memcpy (m_ram->pointer(), data + 0x0834, (m_ram->size() < 0x1800) ? m_ram->size() : 0x1800);
+
+			break;
+	}
+
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
+{
+	uint32_t const snapshot_size = image.length();
+	switch (snapshot_size)
+	{
+		case GALAXY_SNAPSHOT_V1_SIZE:
+		case GALAXY_SNAPSHOT_V2_SIZE:
+			break;
+		default:
+			return std::make_pair(
+					image_error::INVALIDLENGTH,
+					util::string_format("Unsupported image size (must be %u or %u bytes)", GALAXY_SNAPSHOT_V1_SIZE, GALAXY_SNAPSHOT_V2_SIZE));
+	}
+
+	std::vector<uint8_t> snapshot_data(snapshot_size);
+	image.fread(&snapshot_data[0], snapshot_size);
+
+	setup_snapshot(&snapshot_data[0], snapshot_size);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+/***************************************************************************
+  Driver Initialization
+***************************************************************************/
+
+void galaxy_state::init_galaxy()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_ram( 0x2800, 0x2800 + m_ram->size() - 1, m_ram->pointer());
+
+	if (m_ram->size() < (6 + 48) * 1024)
+		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);
+}
+
+/***************************************************************************
+  Machine Initialization
+***************************************************************************/
+
+void galaxy_state::machine_reset()
+{
+	m_interrupts_enabled = true;
+}
+
+TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (m_interrupts_enabled == true)
+	{
+		uint8_t dat = BIT(m_latch_value, 2, 4);
+		if ((m_gal_cnt >= 48 * 2) && (m_gal_cnt < 48 * 210))  // display on screen just m_first 208 lines
+		{
+			uint16_t addr = (m_maincpu->state_int(Z80_I) << 8) | m_maincpu->state_int(Z80_R) | (~m_latch_value & 0x80);
+			if (!BIT(m_latch_value, 1)) // bit 2 latch represents mode
+			{
+				// Text mode
+				if (m_first == 0 && (m_maincpu->state_int(Z80_R) & 0x1f) == 0)
+				{
+					// Due to a fact that on real processor latch value is set at
+					// the end of last cycle we need to skip display of double
+					// m_first char in each row
+					m_code = 0x00;
+					m_first = 1;
+				}
+				else
+				{
+					m_code = space.read_byte(addr) & 0xbf;
+					m_code += (m_code & 0x80) >> 1;
+					m_code = m_p_chargen[(m_code & 0x7f) +(dat << 7 )] ^ 0xff;
+					m_first = 0;
+				}
+				int y = m_gal_cnt / 48 - 2;
+				int x = (m_gal_cnt % 48) * 8;
+
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 0);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 1);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 2);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 3);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 4);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 5);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 6);
+				m_bitmap.pix(y, x   ) = BIT(m_code, 7);
+			}
+			else
+			{ // Graphics mode
+				if (m_first < 4 && (m_maincpu->state_int(Z80_R) & 0x1f) == 0)
+				{
+					// Due to a fact that on real processor latch value is set at
+					// the end of last cycle we need to skip display of 4 times
+					// m_first char in each row
+					m_code = 0x00;
+					m_first++;
+				}
+				else
+				{
+					m_code = space.read_byte(addr) ^ 0xff;
+					m_first = 0;
+				}
+				int y = m_gal_cnt / 48 - 2;
+				int x = (m_gal_cnt % 48) * 8;
+
+				/* hack - until calc of R is fixed in Z80 */
+				if (x == 11 * 8 && y == 0)
+					m_start_addr = addr;
+
+				if ((x / 8 >= 11) && (x / 8 < 44))
+					m_code = space.read_byte(m_start_addr + y * 32 + (m_gal_cnt % 48) - 11) ^ 0xff;
+				else
+					m_code = 0x00;
+				/* end of hack */
+
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 0);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 1);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 2);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 3);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 4);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 5);
+				m_bitmap.pix(y, x++ ) = BIT(m_code, 6);
+				m_bitmap.pix(y, x   ) = BIT(m_code, 7);
+			}
+		}
+		m_gal_cnt++;
+	}
+}
+
+void galaxy_state::set_timer()
+{
+	m_gal_cnt = 0;
+	m_gal_video_timer->adjust(attotime::zero, 0, attotime::from_hz(6144000 / 8));
+}
+
+void galaxy_state::machine_start()
+{
+	m_gal_cnt = 0;
+
+	m_gal_video_timer = timer_alloc(FUNC(galaxy_state::gal_video), this);
+	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
+
+	m_screen->register_screen_bitmap(m_bitmap);
+
+	save_item(NAME(m_interrupts_enabled));
+	save_item(NAME(m_latch_value));
+	save_item(NAME(m_gal_cnt));
+	save_item(NAME(m_code));
+	save_item(NAME(m_first));
+	save_item(NAME(m_start_addr));
+}
+
+uint32_t galaxy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
+	if (m_interrupts_enabled == false)
+	{
+		const rectangle black_area(0, 384 - 1, 0, 208 - 1);
+		m_bitmap.fill(0, black_area);
+	}
+	m_interrupts_enabled = false;
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
 
 void galaxy_state::galaxyp_io(address_map &map)
 {
@@ -238,25 +554,59 @@ void galaxy_state::galaxyp(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 }
 
+// Original Galaksija kit came with v28 version of ROM A
+// at end of 1984 ROM B appeared and people patched their ROM A v28
+// to make it auto boot ROM B
+// later official v29 was made to auto boot ROM B
+// chargen also include prompt char with logo of Mipro, Voja Antonic company
+// Elektronika inzinjering have different chargen, modified to include logo char
 ROM_START (galaxy)
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "galrom1.dd8", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
-	ROM_LOAD( "galrom2.dd9", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+	ROM_DEFAULT_BIOS("v29")
+	ROM_SYSTEM_BIOS( 0, "v29",  "ROM A v29 + ROM B" )
+	ROMX_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(0) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v29ei","ROM A v29 + ROM B Elektronika inzinjering" )
+	ROMX_LOAD( "rom_a_v29.dd8", 0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(1) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v28p", "ROM A v28 + ROM B auto" )
+	ROMX_LOAD( "rom_a_v28p.dd8",0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739), ROM_BIOS(2) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v28b", "ROM A v28 + ROM B" )
+	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(3) )
+	ROMX_LOAD( "rom_b_v5.dd9",  0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v28a", "ROM A v28 only" )
+	ROMX_LOAD( "rom_a_v28.dd8", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358), ROM_BIOS(4) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(0) )
+	ROMX_LOAD( "chr_eling.dd3", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88), ROM_BIOS(1) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(2) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(3) )
+	ROMX_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8), ROM_BIOS(4) )
 ROM_END
 
+// Galaksija plus was hardware modification of original, and could not be considered extension board since it
+// was not using expansion port and was also requiring changes on main computer board in order to work.
+// It was on separate board and it also included RAM expansion and AY sound generator.
+// Instuctions to build also included how to patch ROM A to make it auto boot ROM C.
 ROM_START (galaxyp)
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
-	ROM_LOAD( "galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
-	ROM_LOAD( "galplus.bin", 0x2000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee) )
+	ROM_DEFAULT_BIOS("v29c")
+	ROM_SYSTEM_BIOS( 0, "v29c", "ROM A v29 boot ROM C" )
+	ROMX_LOAD( "rom_a_v29c.dd8", 0x0000, 0x1000, CRC(5cb8fb2a) SHA1(fdddae2b08d0dc81eb6191a92e60ac411d8150e9), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v29",  "ROM A v29" )
+	ROMX_LOAD( "rom_a_v29.dd8",  0x0000, 0x1000, CRC(e6853bc1) SHA1(aea7a4c0c7ffe1f212f7b9faecfd728862ac6904), ROM_BIOS(1) )
+
+	ROM_LOAD( "rom_b_v5.dd9",    0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+	ROM_LOAD( "rom_c.bin",       0x2000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
+	ROM_LOAD( "chr_mipro.dd3", 0x0000, 0x0800, CRC(fd77b6d2) SHA1(cc73b0386b84383b4841e58a1c328cb67b0121d8) )
 ROM_END
+
+} // Anonymous namespace
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
 COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      MACHINE_SUPPORTS_SAVE )
-COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, empty_init,   "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )

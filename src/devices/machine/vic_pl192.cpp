@@ -4,7 +4,7 @@
 // ARM PrimeCell PL190/PL192 VIC emulation
 
 #include "emu.h"
-#include "machine/vic_pl192.h"
+#include "vic_pl192.h"
 
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -100,13 +100,6 @@ device_memory_interface::space_config_vector vic_pl190_device::memory_space_conf
 	return space_config_vector{
 		std::make_pair(0, &m_mmio_config)
 	};
-}
-
-void vic_pl190_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_func.resolve_safe();
-	m_out_fiq_func.resolve_safe();
 }
 
 void vic_pl190_device::map(address_map &map)

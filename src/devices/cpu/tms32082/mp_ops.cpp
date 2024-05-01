@@ -21,9 +21,6 @@
 #define OP_P2() ((m_ir >> 7) & 0x3)
 #define OP_ACC() ((m_ir >> 15) & 0x2) | ((m_ir >> 11) & 1)
 
-#define ROTATE_L(x, r) ((x << r) | (x >> (32-r)))
-#define ROTATE_R(x, r) ((x >> r) | (x << (32-r)))
-
 
 
 bool tms32082_mp_device::test_condition(int condition, uint32_t value)
@@ -246,11 +243,11 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -275,14 +272,14 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 				// sign extend
 				if (res & (1 << (end - 1)))
 					res |= 0xffffffff << end;
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 				// sign extend makes no sense to left..
 			}
 
@@ -309,11 +306,11 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -339,11 +336,11 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = (ROTATE_R(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (rotr_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 			else        // left
 			{
-				res = (ROTATE_L(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (rotl_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 
 			if (rd)
@@ -369,14 +366,14 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 				// sign extend
 				if (res & (1 << (31 - rot)))
 					res |= 0xffffffff << (31 - rot);
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 				// sign extend makes no sense to left..
 			}
 
@@ -403,11 +400,11 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -433,11 +430,11 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = (ROTATE_R(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (rotr_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 			else        // left
 			{
-				res = (ROTATE_L(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+				res = (rotl_32(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 
 			if (rd)
@@ -890,11 +887,11 @@ void tms32082_mp_device::execute_reg_long_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -920,14 +917,14 @@ void tms32082_mp_device::execute_reg_long_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 				// sign extend
 				if (res & (1 << (31 - rot)))
 					res |= 0xffffffff << (31 - rot);
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 			}
 
 			if (rd)
@@ -953,11 +950,11 @@ void tms32082_mp_device::execute_reg_long_imm()
 			uint32_t res;
 			if (r)      // right
 			{
-				res = ROTATE_R(source, rot) & compmask;
+				res = rotr_32(source, rot) & compmask;
 			}
 			else        // left
 			{
-				res = ROTATE_L(source, rot) & compmask;
+				res = rotl_32(source, rot) & compmask;
 			}
 
 			if (rd)

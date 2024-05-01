@@ -27,33 +27,38 @@ Games on System 246/256/S256 include.....
 Name from title screen                           System   Media ID            (HDD/CD/DVD)  Cart ID   Revision               Company/Year                  Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB
-Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *?                      Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A otherwise no boot-up
-Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | Dongle selects region using same HDD's
-Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /  HDD: Maxtor Fireball 3 30GB 2F030L0
+Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900068A(?)           Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A otherwise no boot-up; dongle selects region using same HDDs
+Battle Gear 3 (US).............................. ------X *?                    HDD (20GB)   NM00010? *?                      Taito 2002                     | 2004 Betson release; contrary to flyer, does *not* remove Honda cars (contrast sidebs2u/batlgear)
+Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | HDD: Maxtor Fireball 3 30GB 2F030L0
+Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
 Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires RAYS I/O PCB and IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
 Dragon Chronicles (satellite)................... ------X *DCO31-TS CD0        *CD           NM00020   DC001 Ver.A            Namco 2002                    \
 Dragon Chronicles Legend of the Master Ark (sat) ------X *DGC11 CD0           *CD          *NM00014  *DGC11 Ver.A1           Namco 200?                    | server is a custom PC
-Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    |
+Druaga Online The Story Of Aon (satellite)...... XXXX56X  DOL160-1-ST-DVD0-H   DVD          NM00028   DOL165-1-ST-I Ver1.65  Namco 2004                    | Uses the V290 or V300 I/O Boards.
    "                                      ...... XXXX56X  DOL150-1-ST-DVD0-G   DVD          NM00028  *?                      Namco 2004                    |
    "                                      ...... XXXX56X  DOL140-1-ST-DVD0-F   DVD          NM00028  *?                      Namco 2004                    |
    "                                      ...... XXXX56X  DOL120-1-ST-DVD0-D   DVD          NM00028  *?                      Namco 2004                    |
    "                                      ...... XXXX56X  DOL110-1-ST-DVD0-C   DVD          NM00028  *?                      Namco 2004                    /
 Fate / Unlimited Codes.......................... X23456X  FUD-HDD0-A           HDD (80GB)   NM00048   FUD1 Ver.A             Capcom/Type-Moon/Cavia/8ing 2008 HDD: Western Digital WD800BB
 Gundam vs Gundam Next........................... XXXX56X  GNX100-1-NA-HDD0-A   HDD (80GB)   NM00052   GNX1001-NA-A           Bandai/Capcom 2009            HDD: Western Digital WD800BB
-Idol Master..................................... ------X *IDM1-HA             *HDD         *NM00022  *IDMS1 Ver.A            Namco 2004
+THE IDOLM@STER (Station)........................ XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMS1 Ver.D            Namco 2004                    Uses the V290 or V300 I/O Boards.
+THE IDOLM@STER (Tower).......................... XXX45-X  IDM1-HA              HDD (40GB)   NM00022   IDMT1 Ver.D            Namco 2004                    Uses the V290 or V300 I/O Boards. Can be a Local server for Station units.
 Kinnikuman Muscle Grand Prix.................... XXXX56X  KN1-B                DVD          NM00029   KN1 Ver.A              Banpresto 2006                #
 Kinnikuman Muscle Grand Prix 2.................. XXXX56X  KN2                  DVD          NM00040   KN2 Ver.A              Banpresto 2007                #
-Minna de Kitaeru Zenno Training................. ------X *ZNT100-1-NA-DVD0    *DVD          NM00036   ZNT100-1-ST-A          Namco 2006
-Minna de Kitaeru Zenno Training.(Ver. 1.50)..... ------X  ZNT100-1-NA-DVD0-B   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
+Minna de Kitaeru Zenno Training................. ----56X  ZNT100-1-NA-DVD0-A   DVD          NM00036   ZNT100-1-ST-A          Namco 2006
+Minna de Kitaeru Zenno Training.(Ver. 1.50)..... ----56X  ZNT150-1-NA-DVD0-A   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
+Minna de Kitaeru Zenno Training.(Ver. 1.50)..... ----56X  ZNT150-1-NA-DVD0-B   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
+Minna de Kitaeru Zenno Training.(Ver. 1.60)..... ----56X  ZNT150-1-NA-DVD0-A   DVD          NM00036   ZNT100-1-ST-A          Namco 2007
 Mobile Suit Gundam - Gundam vs Gundam........... XXXX56X  GVS1 DVD0B           DVD          NM00043   GVS1 Ver.A             Bandai/Capcom 2008
 Mobile Suit Gundam SEED O.M.N.I. vs Z.A.F.T..... 123456X  SED1 DVD0            DVD          NM00024   SED1 Ver.A             Banpresto 2005                % #
 M.S. Gundam SEED Destiny O.M.N.I. vs Z.A.F.T. II 123456X  GSD1 DVD0            DVD          NM00034   GSD1 Ver.A             Banpresto 2006                % #
 Mobile Suit Z Gundam A.E.U.G. vs Titans......... 123456X  ZGA1 DVD0            DVD          NM00013   ZGA1 Ver.A             Capcom/Banpresto 2003         %
 Mobile Suit Z Gundam DX A.E.U.G. vs Titans...... 12X456X  ZDX1 DVD0            DVD          NM00017   ZDX1 Ver.A             Capcom/Banpresto 2003         %
-Moto GP......................................... XXXX56X  MGP1004-NA-HDD0-A    HDD (80GB)   NM00039   MGP1004-NA-B           Namco 2007                    HDD: Western Digital WD800BB (note only about 2.5GB is used and the remainder of the drive is 00-filled)
-Netchuu Pro Yakyuu 2002......................... X23XXXX  NPY1 CD0B            CD           NM00009   NPY Ver.B              Namco 2002
+MotoGP.......................................... XXXX56X  MGP1004-NA-HDD0-A    HDD (80GB)   NM00039   MGP1004-NA-B           Namco 2007                    HDD: Western Digital WD800BB (note only about 2.5GB is used and the remainder of the drive is 00-filled)
+Netchuu Pro Yakyuu 2002.        ................ X23XXXX  NPY1 CD0B            CD           NM00009   NPY Ver.B              Namco 2002
+Netchuu Pro Yakyuu 2002.        ................ X23XXXX  NPY1 CD0C            CD           NM00009   NPY Ver.C              Namco 2002
 Pride GP 2003................................... 123456X  PR21 DVD0            DVD          NM00011   PR21 Ver.A             Capcom 2003                   %
 Quiz Mobile Suit Gundam Tou Senshi.............. 123456X  QG1                  DVD          NM00030   QG1 Ver.A              Banpresto 2006                %
 Ridge Racer V Arcade Battle..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV1 Ver.A             Namco 2000
@@ -73,7 +78,7 @@ Taiko no Tatsujin 7............................. ------X  TK71 DVD0            D
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
 Taiko no Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
 Taiko no Tatsujin 10............................ XXXX56X  TK10100-1-NA-DVD0-A  DVD          NM00041   TK101001-NA-A          Namco 2007
-Taiko no Tatsujin 11............................ ------X *TK11100-1-NA-DVD0-A *DVD         *NM00044  *TK111001-NA-A          Namco 2008
+Taiko no Tatsujin 11............................ ------X  TK11100-1-NA-DVD0-A  DVD         *NM00044  *TK111001-NA-A          Namco 2008
 Taiko no Tatsujin 12............................ ------X *TK12-HA             *HDD         *NM00051  *TK121001-NA-A          Namco 2008
 Taiko no Tatsujin 12 More....................... ------X *TK12200-1-NA-HDD-A  *HDD         *NM00051  *TK121001-NA-A          Namco 2008
 Taiko no Tatsujin 13............................ ------X *TK1301-NA-HDD0-A1   *HDD         *NM00056  *TK1301-NA-A            Namco 2009
@@ -613,11 +618,17 @@ Notes:
 
 V290 FCB PCB is almost identical to FCA PCB. The main differences are changed internal MCU code & PIC code,
 some extra/different connectors, less D1017 driver transistors and an added RS-232 IC.
-The V290 FCB PCB is used with touchscreen games such as Dragon Chronicles, Druaga Online, Idol Master etc.
+The V290 FCB PCB is used with touchscreen games such as Dragon Chronicles, Druaga Online, THE IDOLM@STER etc.
 It supports a serial touchscreen interface, card readers and buttons.
 The additional devices are supported via J108 which connects to another PCB 'XOU020-A' which contains a
 Texas Instruments TMS32VC540x DSP, TSOP32 flash ROM and other components.
 
+V300 FCB PCB
+2606960100 (2582960101)
+
+Notes: V300 FCB PCB is almost identical to the V290 FCB PCB. The main differences are changed internal MCU
+code & PIC code, more output transistors and an traded the RS-232 for a RS-232C IC.
+[to-do]
 
 System246 JAMMA(B) PCB
 8908962701 (8908972701)
@@ -867,15 +878,21 @@ Notes:
           CN3 - 40 pin connector with perpendicular adapter board plugged into main board to connector J11
           CN6 - 2 pin connector joined with a small cable to the board where the dongle plugs in
           CN7 - 6 pin connector (unused)
+
+
+TODO: all DVD dumps but taiko8 and taiko11 should be updated with chdman's createdvd option
+
 ***************************************************************************/
 
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
 #include "cpu/mips/mips1.h"
+#include "cpu/mips/mips3.h"
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class namcops2_state : public driver_device
 {
@@ -921,7 +938,7 @@ INPUT_PORTS_END
 
 void namcops2_state::system246(machine_config &config)
 {
-	R5000LE(config, m_maincpu, 294000000); // actually R5900 @ 294 MHz
+	R5000LE(config, m_maincpu, 294'000'000); // actually R5900 @ 294 MHz
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcops2_state::ps2_map);
@@ -1010,7 +1027,18 @@ ROM_START( kinniku2 )
 	DISK_IMAGE_READONLY( "kn2", 0, SHA1(3e1b773cc584911b673d46f9296a5b1a2cef9a45) )
 ROM_END
 
-ROM_START( netchu02 )
+ROM_START( netchu02c )
+	ROM_REGION32_LE(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "npy1verc.ic002", 0x000000, 0x840000, CRC(87a5b771) SHA1(7c707e0de59fb469f04f3036283ce08acf8d3a9f) )
+
+	DISK_REGION("dvd") // actually a CD
+	DISK_IMAGE_READONLY( "npy1cd0c", 0, SHA1(6b7a85dfdc90080a876e973b1c782a31491362d7) )
+ROM_END
+
+ROM_START( netchu02b )
 	ROM_REGION32_LE(0x200000, "bios", 0)
 	SYSTEM246_BIOS
 
@@ -1128,6 +1156,9 @@ ROM_START( taiko7 )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tk71dvd0", 0, SHA1(622ffc8f71f50e93069a8e91b56a7e63cf98b5ae) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk71_cd01", 0, SHA1(f2a88cfcc3cf8691987bed27c3e20a7fc828a7db) ) // firmware updater
 ROM_END
 
 ROM_START( taiko8 )
@@ -1139,7 +1170,7 @@ ROM_START( taiko8 )
 	ROM_LOAD( "tk81001-na-a_spr.ic002", 0x800000, 0x040000, CRC(590c8d80) SHA1(30622142428e37b8c3b91dee7fdd147d593b4d6f) )
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "tk8100-1-na-dvd0-a", 0, SHA1(81a2a9d7164495af825ad038fbf6f696e755ab9c) )
+	DISK_IMAGE_READONLY( "tk8100-1-na-dvd0-a", 0, SHA1(a06b32741b3eb61084d8176306005d08d36eb987) ) // read confirmed from two different DVDs
 ROM_END
 
 ROM_START( zoidsinf )
@@ -1212,6 +1243,18 @@ ROM_START( taiko10 )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tk10100-1-na-dvd0-a", 0, SHA1(9aef4a6b64295a6684d56334904b4c92a20abe15) )
+ROM_END
+
+ROM_START( taiko11 )
+	ROM_REGION32_LE(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "t111001-na-a.ic002",     0x000000, 0x800000, NO_DUMP )
+	ROM_LOAD( "t111001-na-a_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "t11100-1-na-dvd0-a", 0, SHA1(5d06c17582db871a6430397e465914afbf1840a5) )
 ROM_END
 
 ROM_START( tekken4 )
@@ -1400,7 +1443,7 @@ ROM_START( cobrata )
 	ROM_LOAD( "cbr1verb_spr.ic002", 0x800000, 0x040000, CRC(65aaadcf) SHA1(5cc642f71bef3b5e44db5e999e8abccca7fdaa4c) )
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "cbr1-ha", 0, SHA1(a20d4ace91a2f2caab0804ebdf62c87ab267239b) )
+	DISK_IMAGE_READONLY( "cbr1-ha", 0, SHA1(aaaa389c6c0779c2177d2742b00f24ebe7039937) )
 ROM_END
 
 ROM_START( rrvac )
@@ -1642,6 +1685,20 @@ ROM_START( motogp )
 	DISK_IMAGE_READONLY( "mgp1004-na-hdd0-a", 0, SHA1(599940b9fe7fc8e46fd80a32c7e795ae143ee645) )
 ROM_END
 
+ROM_START( acedriv3 )
+	ROM_REGION32_LE(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "adt1005-na-a.ic002", 0x000000, 0x840000, CRC(5f4d48bf) SHA1(19fa62e97c6bf2b8ae62cb99e31a06ec87a5e203) )
+
+	DISK_REGION("dvd")  // actually HDD for this game
+	DISK_IMAGE_READONLY( "adt1005-na-hdd0a", 0, SHA1(9df73a5ada38e6346fbfcc2890faf399110bdc4a) )
+ROM_END
+
+} // anonymous namespace
+
+
 // System 246
 GAME(2001, sys246,          0, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "System 246 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
 GAME(2000, rrvac,      sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", MACHINE_IS_SKELETON)
@@ -1655,7 +1712,8 @@ GAME(2001, tekken4b,  tekken4, system246, system246, namcops2_state, empty_init,
 GAME(2001, tekken4c,  tekken4, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", MACHINE_IS_SKELETON)
 GAME(2001, wanganmd,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, dragchrn,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, netchu02,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2002, netchu02c,  sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. C)", MACHINE_IS_SKELETON)
+GAME(2002, netchu02b,netchu02c,system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. B)", MACHINE_IS_SKELETON)
 GAME(2002, scptour,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Smash Court Pro Tournament (SCP1)", MACHINE_IS_SKELETON)
 GAME(2002, soulclb2,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, soulcl2a, soulclb2, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", MACHINE_IS_SKELETON)
@@ -1680,6 +1738,7 @@ GAME(2005, taiko7,     sys246, system246, system246, namcops2_state, empty_init,
 GAME(2006, taiko8,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, qgundam,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2007, minnadk,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Minna de Kitaeru Zenno Training (Ver. 1.50)", MACHINE_IS_SKELETON)
+GAME(2008, acedriv3,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ace Driver 3: Final Turn", MACHINE_IS_SKELETON)
 GAME(2008, fateulc,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", MACHINE_IS_SKELETON)
 GAME(2008, fateulcb,  fateulc, system246, system246, namcops2_state, empty_init, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", MACHINE_IS_SKELETON)
 GAME(2008, sbxc,       sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", MACHINE_IS_SKELETON)
@@ -1695,8 +1754,9 @@ GAME(2006, taiko9,     sys256, system256, system246, namcops2_state, empty_init,
 GAME(2006, yuyuhaku,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", MACHINE_IS_SKELETON)
 GAME(2006, zoidiexp,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", MACHINE_IS_SKELETON)
 GAME(2007, kinniku2,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2007, motogp,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Moto GP (MGP1004-NA-B)", MACHINE_IS_SKELETON)
+GAME(2007, motogp,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "MotoGP (MGP1004-NA-B)", MACHINE_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2008, taiko11,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 11 (T111001-NA-A)", MACHINE_IS_SKELETON)
 GAME(2008, gdvsgd,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2009, gdvsgdnx,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", MACHINE_IS_SKELETON)
 

@@ -50,10 +50,11 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 }
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void c352_device::rom_bank_updated()
+void c352_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

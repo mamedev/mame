@@ -45,6 +45,8 @@ dy_6.bin (near Z80)
 #include "tilemap.h"
 
 
+namespace {
+
 class dynadice_state : public driver_device
 {
 public:
@@ -316,5 +318,8 @@ void dynadice_state::init_dynadice()
 		for (int j = 0; j < 8; j++)
 			gfx2[(i << 3) + j] = (gfx1[i] & (0x80 >> j)) ? (usr1[i] & 7) : (usr1[i] >> 4);
 }
+
+} // anonymous namespace
+
 
 GAME( 19??, dynadice, 0, dynadice, dynadice, dynadice_state, init_dynadice, ROT90, "<unknown>", "Dynamic Dice", MACHINE_SUPPORTS_SAVE )

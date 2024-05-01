@@ -16,6 +16,8 @@
 #include "rendertypes.h"
 #include "screen.h"
 
+#include "interface/uievents.h"
+
 #include <array>
 #include <functional>
 #include <map>
@@ -71,6 +73,7 @@ class layout_element
 {
 public:
 	using environment = emu::render::detail::layout_environment;
+	using draw_delegate = delegate<void (int, bitmap_argb32 &)>;
 
 	// construction/destruction
 	layout_element(environment &env, util::xml::data_node const &elemnode);
@@ -81,8 +84,13 @@ public:
 	int default_state() const { return m_defstate; }
 	render_texture *state_texture(int state);
 
+	// set handlers
+	void set_draw_callback(draw_delegate &&handler);
+
 	// operations
 	void preload();
+	void invalidate() { m_invalidated = true; }
+	void prepare();
 
 private:
 	/// \brief A drawing component within a layout element
@@ -192,6 +200,8 @@ private:
 	int                         m_statemask;    // mask to apply to state values
 	bool                        m_foldhigh;     // whether we need to fold state values above the mask range
 	std::vector<texture>        m_elemtex;      // array of element textures used for managing the scaled bitmaps
+	draw_delegate               m_draw;         // draw delegate (called after components are drawn)
+	bool                        m_invalidated;  // force redrawing on next frame if set
 };
 
 
@@ -428,6 +438,9 @@ public:
 	using prepare_items_delegate = delegate<void ()>;
 	using preload_delegate = delegate<void ()>;
 	using recomputed_delegate = delegate<void ()>;
+	using pointer_updated_delegate = delegate<void (osd::ui_event_handler::pointer, u16, u16, float, float, u32, u32, u32, s16)>;
+	using pointer_left_delegate = delegate<void (osd::ui_event_handler::pointer, u16, u16, float, float, u32, s16)>;
+	using forget_pointers_delegate = delegate<void ()>;
 
 	using item = layout_view_item;
 	using item_list = std::list<item>;
@@ -514,19 +527,51 @@ public:
 	const visibility_toggle_vector &visibility_toggles() const { return m_vistoggles; }
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }
+	bool show_pointers() const { return m_show_ptr; }
+	bool hide_inactive_pointers() const { return m_ptr_time_out; }
+
+	// setters
+	void set_show_pointers(bool value) noexcept;
+	void set_hide_inactive_pointers(bool value) noexcept ATTR_COLD;
 
 	// set handlers
-	void set_prepare_items_callback(prepare_items_delegate &&handler);
-	void set_preload_callback(preload_delegate &&handler);
-	void set_recomputed_callback(recomputed_delegate &&handler);
+	void set_prepare_items_callback(prepare_items_delegate &&handler) ATTR_COLD;
+	void set_preload_callback(preload_delegate &&handler) ATTR_COLD;
+	void set_recomputed_callback(recomputed_delegate &&handler) ATTR_COLD;
+	void set_pointer_updated_callback(pointer_updated_delegate &&handler) ATTR_COLD;
+	void set_pointer_left_callback(pointer_left_delegate &&handler) ATTR_COLD;
+	void set_pointer_aborted_callback(pointer_left_delegate &&handler) ATTR_COLD;
+	void set_forget_pointers_callback(forget_pointers_delegate &&handler) ATTR_COLD;
 
 	// operations
-	void prepare_items() { if (!m_prepare_items.isnull()) m_prepare_items(); }
+	void prepare_items();
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
 	void preload();
 
 	// resolve tags, if any
 	void resolve_tags();
+
+	// pointer input
+	void pointer_updated(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 buttons, u32 pressed, u32 released, s16 clicks)
+	{
+		if (!m_pointer_updated.isnull())
+			m_pointer_updated(type, ptrid, device, x, y, buttons, pressed, released, clicks);
+	}
+	void pointer_left(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 released, s16 clicks)
+	{
+		if (!m_pointer_left.isnull())
+			m_pointer_left(type, ptrid, device, x, y, released, clicks);
+	}
+	void pointer_aborted(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 released, s16 clicks)
+	{
+		if (!m_pointer_aborted.isnull())
+			m_pointer_aborted(type, ptrid, device, x, y, released, clicks);
+	}
+	void forget_pointers()
+	{
+		if (!m_forget_pointers.isnull())
+			m_forget_pointers();
+	}
 
 private:
 	struct layer_lists;
@@ -568,15 +613,23 @@ private:
 	prepare_items_delegate      m_prepare_items;    // prepare items for adding to render container
 	preload_delegate            m_preload;          // additional actions when visible items change
 	recomputed_delegate         m_recomputed;       // additional actions on resizing/visibility change
+	pointer_updated_delegate    m_pointer_updated;  // pointer state updated
+	pointer_left_delegate       m_pointer_left;     // pointer left normally
+	pointer_left_delegate       m_pointer_aborted;  // pointer left abnormally
+	forget_pointers_delegate    m_forget_pointers;  // stop processing pointer input
 
 	// cold items
 	std::string                 m_name;             // display name for the view
 	std::string                 m_unqualified_name; // the name exactly as specified in the layout file
+	element_map &               m_elemmap;          // reference to shared elements
 	item_id_map                 m_items_by_id;      // items with non-empty ID indexed by ID
 	visibility_toggle_vector    m_vistoggles;       // collections of items that can be shown/hidden
 	render_bounds               m_expbounds;        // explicit bounds of the view
 	u32                         m_defvismask;       // default visibility mask
 	bool                        m_has_art;          // true if the layout contains non-screen elements
+	bool                        m_show_ptr;         // whether pointers should be displayed
+	bool                        m_ptr_time_out;     // whether pointers should be hidden after inactivity
+	s8                          m_exp_show_ptr;     // explicitly configured pointer visibility
 };
 
 
@@ -598,6 +651,7 @@ public:
 
 	// getters
 	device_t &device() const { return m_device; }
+	element_map &elements() { return m_elemmap; }
 	element_map const &elements() const { return m_elemmap; }
 	view_list &views() { return m_viewlist; }
 	view_list const &views() const { return m_viewlist; }

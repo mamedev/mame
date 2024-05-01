@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex W. Jackson
-#ifndef MAME_MACHINE_C117_H
-#define MAME_MACHINE_C117_H
+#ifndef MAME_NAMCO_C117_H
+#define MAME_NAMCO_C117_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C117, namco_c117_device)
 
-#endif // MAME_MACHINE_C117_H
+#endif // MAME_NAMCO_C117_H

@@ -58,6 +58,7 @@ private:
 	required_ioport_array<4> m_keypad;
 };
 
+
 /*********************************************************************************
  *
  *  Memory maps
@@ -84,10 +85,11 @@ void astrocde_home_state::astrocade_mem(address_map &map)
 void astrocde_home_state::astrocade_io(address_map &map)
 {
 	map(0x00, 0x0f).select(0xff00).rw(FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
-	map(0x10, 0x1f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
-	map(0x10, 0x18).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
+	map(0x10, 0x1f).select(0xff00).r(m_astrocade_sound[0], FUNC(astrocade_io_device::read));
+	map(0x10, 0x18).select(0xff00).w(m_astrocade_sound[0], FUNC(astrocade_io_device::write));
 	map(0x19, 0x19).mirror(0xff00).w(FUNC(astrocde_state::expand_register_w));
 }
+
 
 /*************************************
  *
@@ -122,7 +124,7 @@ uint8_t astrocde_home_state::inputs_r(offs_t offset)
 
 static INPUT_PORTS_START( astrocde )
 	PORT_START("KEYPAD0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("%   \xC3\xB7         [   ]   LIST") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"%   ÷         [   ]   LIST") PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("/   x     J   K   L   NEXT") PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("x   -     V   W   X   IF") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("-   +     &   @   *   GOTO") PORT_CODE(KEYCODE_MINUS_PAD)
@@ -131,19 +133,19 @@ static INPUT_PORTS_START( astrocde )
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEYPAD1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("\xE2\x86\x93   HALT              RUN") PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"\u2193   HALT              RUN") PORT_CODE(KEYCODE_PGDN) // U+2193 = ↓
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CH  9     G   H   I   STEP") PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9   6     S   T   U   RND") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6   3     \xE2\x86\x91   .   \xE2\x86\x93   BOX") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"6   3     \u2191   .   \u2193   BOX") PORT_CODE(KEYCODE_6) // U+2191 = ↑, U+2193 = ↓
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3   ERASE (   ;   )") PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(".   BLUE Shift") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("KEYPAD2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("\xE2\x86\x91   PAUSE     /   \\") PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"\u2191   PAUSE     /   \\") PORT_CODE(KEYCODE_PGUP) // U+2191 = ↑
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("MS  8     D   E   F   TO") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8   5     P   Q   R   RETN") PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("5   2     \xE2\x86\x90   '   \xE2\x86\x92   LINE") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"5   2     \u2190   '   \u2192   LINE") PORT_CODE(KEYCODE_5) // U+2190 = ←,  U+2192 = →
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2   0     <   \"   >   INPUT") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0   RED Shift") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -210,13 +212,13 @@ void astrocde_home_state::astrocde(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
-	m_astrocade_sound1->si_cb().set(FUNC(astrocde_home_state::inputs_r));
-	m_astrocade_sound1->pot_cb<0>().set(m_ctrl[0], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->pot_cb<1>().set(m_ctrl[1], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->pot_cb<2>().set(m_ctrl[2], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->pot_cb<3>().set(m_ctrl[3], FUNC(astrocade_ctrl_port_device::read_knob));
-	m_astrocade_sound1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	ASTROCADE_IO(config, m_astrocade_sound[0], ASTROCADE_CLOCK/4);
+	m_astrocade_sound[0]->si_cb().set(FUNC(astrocde_home_state::inputs_r));
+	m_astrocade_sound[0]->pot_cb<0>().set(m_ctrl[0], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->pot_cb<1>().set(m_ctrl[1], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->pot_cb<2>().set(m_ctrl[2], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->pot_cb<3>().set(m_ctrl[3], FUNC(astrocade_ctrl_port_device::read_knob));
+	m_astrocade_sound[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* expansion port */
 	ASTROCADE_EXP_SLOT(config, m_exp, astrocade_exp, nullptr);
@@ -253,6 +255,7 @@ ROM_START( astrocdw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf) )
 ROM_END
+
 
 /*************************************
  *

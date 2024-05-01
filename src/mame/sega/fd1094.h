@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_FD1094_H
-#define MAME_MACHINE_FD1094_H
+#ifndef MAME_SEGA_FD1094_H
+#define MAME_SEGA_FD1094_H
 
 #pragma once
 
@@ -103,7 +103,7 @@ protected:
 
 	// static helpers
 	void cmp_callback(offs_t offset, uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(rte_callback);
+	void rte_callback(int state);
 
 	// internal state
 	uint8_t                   m_state;
@@ -127,4 +127,4 @@ struct fd1094_constraint
 	uint16_t  mask;
 };
 
-#endif // MAME_MACHINE_FD1094_H
+#endif // MAME_SEGA_FD1094_H

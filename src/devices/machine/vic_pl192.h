@@ -15,7 +15,7 @@ public:
 	auto out_fiq_cb() { return m_out_fiq_func.bind(); }
 
 	template<unsigned IRQ>
-	DECLARE_WRITE_LINE_MEMBER(irq_w) { set_irq_line(IRQ, state); }
+	void irq_w(int state) { set_irq_line(IRQ, state); }
 
 	void map(address_map &map);
 
@@ -52,10 +52,9 @@ public:
 protected:
 	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
 
 	virtual space_config_vector memory_space_config() const override;
 

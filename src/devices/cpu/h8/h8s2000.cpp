@@ -4,10 +4,10 @@
 #include "h8s2000.h"
 #include "h8s2000d.h"
 
-h8s2000_device::h8s2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
+h8s2000_device::h8s2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate) :
 	h8h_device(mconfig, type, tag, owner, clock, map_delegate)
 {
-	has_exr = true;
+	m_has_exr = true;
 }
 
 std::unique_ptr<util::disasm_interface> h8s2000_device::create_disassembler()

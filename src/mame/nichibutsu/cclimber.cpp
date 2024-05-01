@@ -1514,24 +1514,24 @@ ROM_START( ccbootmm )
 	ROM_LOAD( "1_mm", 0x4000, 0x1000, CRC(499c0625) SHA1(55a407fcce207e3e9bd25d5db6d4aed883b75600) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "13_mm", 0x0000, 0x0800, BAD_DUMP CRC(755426e3) SHA1(623866660fbafe0305a8cd53f3dbcfaeea3a3478) )
+	ROM_LOAD( "13_mm", 0x0000, 0x0800, CRC(2f303f40) SHA1(39606c19b041e3f090aa4f9a3f645255425b4cd5) )
 	// 0x0800-0x0fff - empty
 	ROM_LOAD( "12_mm", 0x1000, 0x0800, CRC(056af36b) SHA1(756a295bbf7ede201b2e4cb106ce67a127e008de) )
 	// 0x1800-0xffff - empty
-	ROM_LOAD( "11_mm", 0x2000, 0x0800, BAD_DUMP CRC(75bbf31d) SHA1(4bdcb54f5bc4df39523ffe6386fe6d255a135055) )
+	ROM_LOAD( "11_mm", 0x2000, 0x0800, CRC(850dbb52) SHA1(4aebad9e1cbeb470b742e052dae439ac7db35573) )
 	// 0x2800-0x2fff - empty
-	ROM_LOAD( "10_mm", 0x3000, 0x0800, BAD_DUMP CRC(e7b9df03) SHA1(b4be9546b1eb53b21dbd7d78947b45b156229cdd) )
+	ROM_LOAD( "10_mm", 0x3000, 0x0800, CRC(71fb3ed9) SHA1(b9114a4aa88a375bd1e02753e3d0e7031218a48d) )
 	// 0x3800-0x3fff - empty
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "9_mm", 0x0000, 0x0800, BAD_DUMP CRC(98c5cfcd) SHA1(b4c1a6d0be5c5af1a33ffd8f2432ddc7227699ee) )
-	ROM_LOAD( "8_mm", 0x0800, 0x0800, BAD_DUMP CRC(21acf226) SHA1(ebc9c13ea8645af2a80975e8612174efd2da64eb) )
+	ROM_LOAD( "9_mm", 0x0000, 0x0800, BAD_DUMP CRC(943858c2) SHA1(255473793cae7ef40d3a738cb7e7b2b767859a6d) ) // hand fixed, needs redump
+	ROM_LOAD( "8_mm", 0x0800, 0x0800, BAD_DUMP CRC(76d75e83) SHA1(8f7232155d5c70b0056e59a29aaa19892a1de102) ) // "
 
-	ROM_REGION( 0x0160, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, BAD_DUMP CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
-	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, BAD_DUMP CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
-	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, BAD_DUMP CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
-	ROM_LOAD( "ccboot.prm",   0x0060, 0x0100, BAD_DUMP CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    // decryption table (not used)
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
+	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
+	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
+	ROM_LOAD( "ccboot.prm",   0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    // decryption table (not used)
 
 	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "mm_7", 0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
@@ -2808,7 +2808,7 @@ GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_i
 GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King",                              MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
-GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish bootleg of Crazy Kong)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
@@ -2829,10 +2829,10 @@ GAME( 1981, ckongpt2b2,  ckongpt2, cclimber,  ckongb2,   cclimber_state, empty_i
 // see bagman.cpp for parent
 GAME( 1982, bagmanf,     bagman,   bagmanf,   bagmanf,   cclimber_state, empty_init,     ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",              MACHINE_SUPPORTS_SAVE)
-GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",               MACHINE_SUPPORTS_SAVE)
+GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land (hack of River Patrol)", MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
 GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" ,        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game

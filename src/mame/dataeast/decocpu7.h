@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_DECOCPU7_H
-#define MAME_MACHINE_DECOCPU7_H
+#ifndef MAME_DATAEAST_DECOCPU7_H
+#define MAME_DATAEAST_DECOCPU7_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(DECO_CPU7, deco_cpu7_device)
 
-#endif // MAME_MACHINE_DECOCPU7_H
+#endif // MAME_DATAEAST_DECOCPU7_H

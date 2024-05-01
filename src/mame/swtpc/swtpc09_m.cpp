@@ -36,7 +36,7 @@ void swtpc09_state::unmapped_w(offs_t offset, uint8_t data)
 	logerror("%s Unmapped write to addr %04x with data %02x\n", machine().describe_context(), offset, data);
 }
 
-WRITE_LINE_MEMBER(swtpc09_state::io_irq_w)
+void swtpc09_state::io_irq_w(int state)
 {
 	if (state)
 		swtpc09_irq_handler(IO_IRQ, ASSERT_LINE);
@@ -47,20 +47,20 @@ WRITE_LINE_MEMBER(swtpc09_state::io_irq_w)
 /******* MC6840 PTM on MPID Board *******/
 
 // 6840 PTM handlers
-WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
+void swtpc09_state::ptm_o1_callback(int state)
 {
 	m_pia_counter++;
 	//pia_counter = pia_counter && 0xff;
 	if (m_pia_counter & 0x80) m_pia->ca1_w(1);
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::ptm_o3_callback )
+void swtpc09_state::ptm_o3_callback(int state)
 {
 	// the output from timer3 is the input clock for timer2
 	//m_ptm->set_c2(state);
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )
+void swtpc09_state::ptm_irq(int state)
 {
 	if (state)
 		swtpc09_irq_handler(PTM_IRQ, ASSERT_LINE);
@@ -76,7 +76,7 @@ uint8_t swtpc09_state::pia0_a_r()
 	return m_pia_counter;
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
+void swtpc09_state::pia0_irq_a(int state)
 {
 	if ( m_pia->irq_a_state())
 		swtpc09_irq_handler(PIA_IRQ, ASSERT_LINE);
@@ -339,7 +339,7 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 }
 
 /* handlers for fdc */
-WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
+void swtpc09_state::fdc_intrq_w(int state)
 {
 	if ( m_system_type == UNIFLEX_DMAF3 )
 	{
@@ -385,7 +385,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
+void swtpc09_state::fdc_drq_w(int state)
 {
 	if (state)
 	{
@@ -398,7 +398,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
 		m_fdc_status &= 0x7f;
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::fdc_sso_w )
+void swtpc09_state::fdc_sso_w(int state)
 {
 	// The DMAF2 and DMAF3 do not appear to use a SSO output?
 }
@@ -461,14 +461,14 @@ void swtpc09_state::dmaf3_via_write_portb(uint8_t data)
 	m_dmaf3_via_portb &= data;
 }
 
-//WRITE_LINE_MEMBER( swtpc09_state::dmaf3_via_write_ca1 )
+//void swtpc09_state::dmaf3_via_write_ca1(int state)
 //{
 //  return m_via_ca1_input;
 //    logerror("swtpc09_dmaf3_via_write_ca1 %02X\n", state);
 
 //}
 
-WRITE_LINE_MEMBER( swtpc09_state::dmaf3_via_irq )
+void swtpc09_state::dmaf3_via_irq(int state)
 {
 	if (state)
 		swtpc09_irq_handler(VIA_IRQ, ASSERT_LINE);
@@ -535,7 +535,7 @@ void swtpc09_state::dmaf3_control_reg_w(uint8_t data)
 
 // DMAF3 WD1000 hard disk controller.
 
-WRITE_LINE_MEMBER( swtpc09_state::dmaf3_hdc_intrq_w )
+void swtpc09_state::dmaf3_hdc_intrq_w(int state)
 {
 	// The IRQ from WD1000 is connected into VIA CB2 inverted, and perhaps
 	// connected to a VIA port B bit 3?
@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( swtpc09_state::dmaf3_hdc_intrq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::dmaf3_hdc_drq_w )
+void swtpc09_state::dmaf3_hdc_drq_w(int state)
 {
 	if (state)
 		m6844_hdc_dma_transfer(1);

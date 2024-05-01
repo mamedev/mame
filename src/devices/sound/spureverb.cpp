@@ -308,7 +308,7 @@ void spu_device::reverb::process(signed short *output,
 	signed short *sp=(signed short *)reverb_input,
 								*dp=(signed short *)output;
 
-	if (rp->band_gain>0.0f)
+	if (rp && rp->band_gain>0.0f)
 	{
 		// Do reverb processing
 

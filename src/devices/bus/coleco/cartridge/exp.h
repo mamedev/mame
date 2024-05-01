@@ -65,20 +65,21 @@ public:
 	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
-	uint8_t bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000);
+	uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000);
+	void write(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "coleco_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "rom,col,bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	device_colecovision_cartridge_interface *m_card;
@@ -92,7 +93,8 @@ class device_colecovision_cartridge_interface : public device_interface
 	friend class colecovision_cartridge_slot_device;
 
 public:
-	virtual uint8_t bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
+	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) { }
 
 	void rom_alloc(size_t size);
 

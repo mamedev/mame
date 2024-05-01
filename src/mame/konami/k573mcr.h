@@ -4,8 +4,8 @@
  * Konami 573 Memory Card Reader
  *
  */
-#ifndef MAME_MACHINE_K573_MCR_H
-#define MAME_MACHINE_K573_MCR_H
+#ifndef MAME_KONAMI_K573_MCR_H
+#define MAME_KONAMI_K573_MCR_H
 
 #pragma once
 
@@ -27,11 +27,9 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	void write_rxd(int state);
 
 protected:
-	template <uint8_t First> void set_port_tags() { }
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -78,4 +76,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_573_MEMORY_CARD_READER, k573mcr_device)
 
-#endif // MAME_MACHINE_K573_MCR_H
+#endif // MAME_KONAMI_K573_MCR_H

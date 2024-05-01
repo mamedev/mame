@@ -18,6 +18,9 @@ terminal which could decode simple commands into complex graphics.
 #include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 
+
+namespace {
+
 class vectrix_state : public driver_device
 {
 public:
@@ -64,5 +67,8 @@ ROM_START( vectrix )
 	ROM_LOAD( "vectrixl.bin", 0x0000, 0x2000, CRC(10b93e38) SHA1(0b1a23d384bfde4cd27c482f667eedd94f8f2406) )
 	ROM_LOAD( "vectrixr.bin", 0x2000, 0x2000, CRC(33f9b06b) SHA1(6a1dffe5c2c0254824a8dddb8543f86d9ad8f173) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, empty_init, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )

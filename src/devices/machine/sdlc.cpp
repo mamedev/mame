@@ -7,7 +7,6 @@
 #include <sstream>
 
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_RXBIT       (1U << 1)
 #define LOG_RXFLAG      (1U << 2)
 #define LOG_LINESTATE   (1U << 3)
@@ -140,7 +139,7 @@ sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const
 {
 }
 
-WRITE_LINE_MEMBER(sdlc_logger_device::clock_w)
+void sdlc_logger_device::clock_w(int state)
 {
 	if (bool(state) != bool(m_current_clock))
 	{

@@ -57,6 +57,8 @@ For Model III:
 #include "emu.h"
 #include "trs80.h"
 
+#include "trs80_quik.h"
+
 #include "bus/centronics/ctronics.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
@@ -65,6 +67,11 @@ For Model III:
 
 #include "emupal.h"
 #include "softlist_dev.h"
+
+#include "utf8.h"
+
+
+namespace {
 
 class meritum_state : public trs80_state
 {
@@ -392,9 +399,7 @@ void meritum_state::meritum1(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
-	quickload.set_load_callback(FUNC(meritum_state::quickload_cb));
-	quickload.set_interface("trs80_quik");
+	TRS80_QUICKLOAD(config, "quickload", m_maincpu, attotime::from_seconds(1));
 	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("M1");
 }
 
@@ -466,6 +471,8 @@ ROM_START( meritum_net )
 	ROM_REGION(0x1000, "chargen", ROMREGION_INVERT)
 	ROM_LOAD( "char.ic72", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT      CLASS          INIT             COMPANY              FULLNAME                FLAGS

@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_INCLUDES_HH_SM510_H
-#define MAME_INCLUDES_HH_SM510_H
+#ifndef MAME_HANDHELD_HH_SM510_H
+#define MAME_HANDHELD_HH_SM510_H
 
 #pragma once
 
@@ -113,4 +113,4 @@ protected:
 };
 
 
-#endif // MAME_INCLUDES_HH_SM510_H
+#endif // MAME_HANDHELD_HH_SM510_H

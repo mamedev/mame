@@ -7,8 +7,8 @@
  * Rockwell AIM-65
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_AIM65_H
-#define MAME_INCLUDES_AIM65_H
+#ifndef MAME_ROCKWELL_AIM65_H
+#define MAME_ROCKWELL_AIM65_H
 
 #pragma once
 
@@ -19,7 +19,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/ram.h"
 #include "video/dl1416.h"
 #include "emupal.h"
@@ -92,7 +92,7 @@ private:
 	TIMER_CALLBACK_MEMBER(printer_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
 
 	void mem_map(address_map &map);
 
@@ -125,9 +125,9 @@ private:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<pia6821_device> m_pia;
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_ioport_array<8> m_io_keyboard;
 };
 
 
-#endif // MAME_INCLUDES_AIM65_H
+#endif // MAME_ROCKWELL_AIM65_H

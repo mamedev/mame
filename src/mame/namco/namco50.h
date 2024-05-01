@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_MACHINE_NAMCO50_H
-#define MAME_MACHINE_NAMCO50_H
+#ifndef MAME_NAMCO_NAMCO50_H
+#define MAME_NAMCO_NAMCO50_H
 
 #pragma once
 
@@ -13,9 +13,9 @@ class namco_50xx_device : public device_t
 public:
 	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	WRITE_LINE_MEMBER( reset );
-	WRITE_LINE_MEMBER( chip_select );
-	WRITE_LINE_MEMBER( rw );
+	void reset(int state);
+	void chip_select(int state);
+	void rw(int state);
 	void write(uint8_t data);
 	uint8_t read();
 
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCO_50XX, namco_50xx_device)
 
-#endif // MAME_MACHINE_NAMCO50_H
+#endif // MAME_NAMCO_NAMCO50_H

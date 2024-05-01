@@ -7,15 +7,16 @@
     Percussion Generator
 
     TODO:
-    - Play MUTED and ACCENTED
+    - Correct MUTED and ACCENTED (currently just changes volume)
     - T1 input
-    - 8 channels?
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "upd934g.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -35,7 +36,7 @@ DEFINE_DEVICE_TYPE(UPD934G, upd934g_device, "upd934g", "NEC uPD934G")
 upd934g_device::upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UPD934G, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_data_cb(*this),
+	device_rom_interface(mconfig, *this),
 	m_stream(nullptr),
 	m_sample(0),
 	m_ready(false)
@@ -51,18 +52,12 @@ void upd934g_device::device_start()
 	// create sound stream
 	m_stream = stream_alloc(0, 4, 20000);
 
-	// resolve callbacks
-	m_data_cb.resolve_safe(0);
-
 	// register for save states
 	save_pointer(NAME(m_addr), 16);
 
-	for (unsigned i = 0; i < 4; i++)
-	{
-		save_item(NAME(m_channel[i].pos), i);
-		save_item(NAME(m_channel[i].playing), i);
-		save_item(NAME(m_channel[i].volume), i);
-	}
+	save_item(STRUCT_MEMBER(m_channel, pos));
+	save_item(STRUCT_MEMBER(m_channel, playing));
+	save_item(STRUCT_MEMBER(m_channel, effect));
 
 	save_item(NAME(m_sample));
 	save_item(NAME(m_ready));
@@ -95,8 +90,13 @@ void upd934g_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 			for (unsigned i = 0; i < outputs[ch].samples(); i++)
 			{
-				int8_t raw = static_cast<int8_t>(m_data_cb(m_channel[ch].pos));
-				outputs[ch].put_int(i, raw * (m_channel[ch].volume + 1), 32768 / 64);
+				int16_t raw = static_cast<int8_t>(read_byte(m_channel[ch].pos)) * 4;
+
+				// normal, muted, accented
+				const double adjust[] = { 0, 0.7, 0.4, 1.0 };
+				raw *= adjust[m_channel[ch].effect];
+
+				outputs[ch].put_int(i, raw, 32768 / 64);
 
 				if (++m_channel[ch].pos >= end)
 				{
@@ -124,27 +124,24 @@ void upd934g_device::write(offs_t offset, uint8_t data)
 		// format of data written here is:
 		// 76------  command
 		// --5432--  sample number
-		// ------10  volume?
+		// ------10  output channel
 		m_sample = (data >> 2) & 0x0f;
+
 		switch (data >> 6)
 		{
 		case 0:
-			logerror("CMD STORE ADDRESS sample %x\n", m_sample);
+			LOG("CMD STORE ADDRESS sample %x\n", m_sample);
 			break;
-		case 1:
-			logerror("CMD PLAY sample %x (channel %d)\n", m_sample, m_sample >> 1);
-			if (m_sample < 8)
+		case 1: // normal
+		case 2: // muted
+		case 3: // accented
 			{
-				m_channel[m_sample >> 1].pos = m_addr[m_sample];
-				m_channel[m_sample >> 1].playing = m_sample;
-				m_channel[m_sample >> 1].volume = data & 0x03;
+				const u8 ch = (data & 3) ^ 2; // effective order seems to be "2, 3, 0, 1"
+				LOG("CMD PLAY sample %x (channel %d, effect %d)\n", m_sample, ch, data >> 6);
+				m_channel[ch].pos = m_addr[m_sample];
+				m_channel[ch].playing = m_sample;
+				m_channel[ch].effect = data >> 6;
 			}
-			break;
-		case 2:
-			logerror("CMD PLAY MUTED sample %x (channel %d)\n", m_sample, m_sample >> 1);
-			break;
-		case 3:
-			logerror("CMD PLAY ACCENTED sample %x (channel %d)\n", m_sample, m_sample >> 1);
 			break;
 		}
 		break;
@@ -153,7 +150,7 @@ void upd934g_device::write(offs_t offset, uint8_t data)
 		break;
 	case 2:
 		m_addr[m_sample] = (m_addr[m_sample] & 0x00ff) | (data << 8);
-		logerror("  sample %x address = %04x\n", m_sample, m_addr[m_sample]);
+		LOG("  sample %x address = %04x\n", m_sample, m_addr[m_sample]);
 		break;
 	case 3:
 		m_ready = true;

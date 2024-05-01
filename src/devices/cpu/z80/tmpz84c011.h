@@ -30,7 +30,7 @@
 class tmpz84c011_device : public z80_device
 {
 public:
-	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	auto zc0_callback() { return m_zc0_cb.bind(); }
@@ -50,10 +50,10 @@ public:
 	auto in_pe_callback() { return m_inportse.bind(); }
 
 	// CTC public interface
-	DECLARE_WRITE_LINE_MEMBER( trg0 ) { m_ctc->trg0(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg1 ) { m_ctc->trg1(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg2 ) { m_ctc->trg2(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg3 ) { m_ctc->trg3(state); }
+	void trg0(int state) { m_ctc->trg0(state); }
+	void trg1(int state) { m_ctc->trg1(state); }
+	void trg2(int state) { m_ctc->trg2(state); }
+	void trg3(int state) { m_ctc->trg3(state); }
 
 	/////////////////////////////////////////////////////////
 
@@ -115,9 +115,9 @@ private:
 	devcb_write_line m_zc1_cb;
 	devcb_write_line m_zc2_cb;
 
-	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
+	void zc0_cb_trampoline_w(int state) { m_zc0_cb(state); }
+	void zc1_cb_trampoline_w(int state) { m_zc1_cb(state); }
+	void zc2_cb_trampoline_w(int state) { m_zc2_cb(state); }
 };
 
 

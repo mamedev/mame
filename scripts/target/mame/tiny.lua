@@ -41,7 +41,7 @@ SOUNDS["HC55516"] = true
 SOUNDS["OKIM6295"] = true
 SOUNDS["SAMPLES"] = true
 SOUNDS["TMS5220"] = true
-SOUNDS["VOTRAX"] = true
+SOUNDS["VOTRAX_SC01"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM3812"] = true
 
@@ -63,10 +63,11 @@ MACHINES["ADC0808"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["INPUT_MERGER"] = true
+MACHINES["MOS6530"] = true
 MACHINES["NETLIST"] = true
 MACHINES["OUTPUT_LATCH"] = true
 MACHINES["PIT8253"] = true
-MACHINES["RIOT6532"] = true
+MACHINES["SEGACRPT"] = true
 MACHINES["TICKET"] = true
 MACHINES["TIMEKPR"] = true
 MACHINES["TTL74148"] = true
@@ -162,8 +163,6 @@ files{
 	MAME_DIR .. "src/mame/gaelco/gaelco_v.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelcrpt.cpp",
 	MAME_DIR .. "src/mame/gaelco/wrally.cpp",
-	MAME_DIR .. "src/mame/gaelco/wrally.h",
-	MAME_DIR .. "src/mame/gaelco/wrally_v.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco_wrally_sprites.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco_wrally_sprites.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.cpp",

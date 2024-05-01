@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "utilfwd.h"
+
 #include <type_traits>
 
 
@@ -36,24 +38,6 @@ class output_module;
 // declared in osdepend.h
 class osd_font;
 class osd_interface;
-
-
-
-//----------------------------------
-// lib/util
-//----------------------------------
-
-// declared in aviio.h
-class avi_file;
-
-// declared in chd.h
-class chd_file;
-
-// declared in unzip.h
-namespace util { class archive_file; }
-
-// declared in xmlfile.h
-namespace util::xml { class data_node; class file; }
 
 
 
@@ -98,6 +82,7 @@ class symbol_table;
 class debug_breakpoint;
 class debug_watchpoint;
 class debug_registerpoint;
+class debug_exceptionpoint;
 
 // declared in debugger.h
 class debugger_manager;
@@ -107,6 +92,7 @@ class devcb_base;
 template <typename Input, std::make_unsigned_t<Input> DefaultMask> class devcb_write;
 
 // declared in devfind.h
+class device_resolver_base;
 class finder_base;
 template <class DeviceClass, bool Required> class device_finder;
 
@@ -128,6 +114,9 @@ class device_image_interface;
 
 // declared in dimemory.h
 class device_memory_interface;
+
+// declared in dinetwork.h
+class device_network_interface;
 
 // declared in dipalette.h
 class device_palette_interface;
@@ -190,6 +179,9 @@ namespace emu::detail { class machine_config_replace; }
 struct internal_layout;
 class machine_config;
 
+// declared in main.h
+class machine_manager;
+
 // declared in natkeyboard.h
 class natural_keyboard;
 
@@ -204,6 +196,9 @@ class render_container;
 class render_manager;
 class render_target;
 class render_texture;
+
+// declared in rendertypes.h
+struct render_bounds;
 
 // declared in rendfont.h
 class render_font;

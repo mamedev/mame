@@ -33,7 +33,7 @@ OP(op,17) { RLA;                                                    } /* RLA    
 OP(op,18) { JR();                                                   } /* JR   o           */
 OP(op,19) { ADD16(HL,DE);                                           } /* ADD  HL,DE       */
 OP(op,1a) { _A = RM(_DE);                                         } /* LD   A,(DE)      */
-OP(op,1b) { _DE--;                ;                                   } /* DEC  DE          */
+OP(op,1b) { _DE--;                                                    } /* DEC  DE          */
 OP(op,1c) { _E = INC(_E);                                         } /* INC  E           */
 OP(op,1d) { _E = DEC(_E);                                         } /* DEC  E           */
 OP(op,1e) { _E = ARG();                                           } /* LD   E,n         */
@@ -308,7 +308,7 @@ int z180_device::take_interrupt(int irq)
 	{
 		// retrieve the IRQ vector from the daisy chain or CPU interface
 		device_z80daisy_interface *intf = daisy_get_irq_device();
-		irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
+		irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_PC.w.l);
 
 		LOG("Z180 single int. irq_vector $%02x\n", irq_vector);
 

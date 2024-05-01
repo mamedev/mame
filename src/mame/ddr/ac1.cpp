@@ -28,6 +28,9 @@
 #include "sound/spkrdev.h"
 #include "emupal.h"
 
+
+namespace {
+
 class ac1_state : public driver_device
 {
 public:
@@ -425,6 +428,9 @@ ROM_START( ac1scch )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD("zg_scch.bin", 0x0000, 0x0800, CRC(fbfaf5da) SHA1(667568c5909e9a17675cf09dfbce2fc090c420ab))
 ROM_END
+
+} // anonymous namespace
+
 
 // Driver
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY         FULLNAME                                 FLAGS

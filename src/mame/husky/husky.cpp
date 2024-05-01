@@ -31,6 +31,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class husky_state : public driver_device
 {
 public:
@@ -75,10 +77,10 @@ private:
 	void page_w(offs_t offset, uint8_t data);
 	void husky_palette(palette_device &palette) const;
 
-	DECLARE_WRITE_LINE_MEMBER(timer0_out);
-	DECLARE_WRITE_LINE_MEMBER(timer1_out);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
+	void timer0_out(int state);
+	void timer1_out(int state);
+	void cts_w(int state);
+	void rxd_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -432,25 +434,25 @@ void husky_state::husky_palette(palette_device &palette) const
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // LCD pixel off
 }
 
-WRITE_LINE_MEMBER(husky_state::timer0_out)
+void husky_state::timer0_out(int state)
 {
 	if(state == ASSERT_LINE)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(husky_state::timer1_out)
+void husky_state::timer1_out(int state)
 {
 	if(BIT(m_irq_mask, 7))
 		m_maincpu->set_input_line(NSC800_RSTA, state);
 }
 
-WRITE_LINE_MEMBER(husky_state::cts_w)
+void husky_state::cts_w(int state)
 {
 	if(BIT(m_irq_mask, 1))
 		m_maincpu->set_input_line(NSC800_RSTC, state);
 }
 
-WRITE_LINE_MEMBER(husky_state::rxd_w)
+void husky_state::rxd_w(int state)
 {
 	if(BIT(m_irq_mask, 2))
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
@@ -532,6 +534,9 @@ ROM_START( husky )
 	ROMX_LOAD( "03-jun-03.ic24", 0xc000, 0x2000, CRC(8fd629d1) SHA1(ef2821c9ce1c1375326d80cad3bfc74e75548172), ROM_BIOS(2) )
 	ROM_RELOAD(                  0xe000, 0x2000)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS
 COMP( 1981, husky, 0,      0,      husky,   husky, husky_state, init_husky, "DVW Microelectronics", "Husky",  0 )

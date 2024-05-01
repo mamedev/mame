@@ -7,6 +7,8 @@
 #include "pvmil.lh"
 
 
+namespace {
+
 class pvmil_state : public spg2xx_game_state
 {
 public:
@@ -22,7 +24,7 @@ public:
 
 	void pvmil(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(pvmil_p4buttons_r);
+	int pvmil_p4buttons_r();
 
 protected:
 	virtual void machine_start() override;
@@ -64,7 +66,7 @@ void pvmil_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 
-READ_LINE_MEMBER(pvmil_state::pvmil_p4buttons_r)
+int pvmil_state::pvmil_p4buttons_r()
 {
 	return m_latchbit;
 }
@@ -224,8 +226,12 @@ void pvmil_state::pvmil(machine_config &config)
 }
 
 ROM_START( pvmil )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) // Fujistu 29Z0002TN, read as ST M29W320FB
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) // Fujitsu 29Z0002TN, read as ST M29W320FB
 	ROM_LOAD16_WORD_SWAP( "millionare4.bin", 0x000000, 0x400000, CRC(9c43d0f2) SHA1(fb4ba0115000b10b7c0e0d44b9fa3234c900e694) )
 ROM_END
 
-CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    pvmil_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+} // anonymous namespace
+
+
+// see note for the pvmil8 set in tvgames/elan_eu3a05.cpp
+CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    pvmil_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 16-bit version)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

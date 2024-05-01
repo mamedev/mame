@@ -112,10 +112,10 @@ private:
 	void round_leds_w(offs_t offset, u8 data);
 	u8 keyboard_r();
 	u8 port13_r();
-	DECLARE_READ_LINE_MEMBER(si);
-	DECLARE_WRITE_LINE_MEMBER(so);
+	int si();
+	void so(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_WRITE_LINE_MEMBER(kansas_w);
+	void kansas_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -176,17 +176,17 @@ u8 mmd1_state::port13_r()
 	return data;
 }
 
-READ_LINE_MEMBER( mmd1_state::si )
+int mmd1_state::si()
 {
 	return m_cassinbit;
 }
 
-WRITE_LINE_MEMBER( mmd1_state::so )
+void mmd1_state::so(int state)
 {
 	m_cassoutbit = state;
 }
 
-WRITE_LINE_MEMBER( mmd1_state::kansas_w )
+void mmd1_state::kansas_w(int state)
 {
 	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 	{

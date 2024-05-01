@@ -77,11 +77,6 @@ device_memory_interface::space_config_vector rx01_cpu_device::memory_space_confi
 	};
 }
 
-void rx01_cpu_device::device_resolve_objects()
-{
-	m_interface_callback.resolve_all_safe();
-}
-
 void rx01_cpu_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_inst_cache);

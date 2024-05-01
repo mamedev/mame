@@ -14,7 +14,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(spc1000_vdp_exp_device::vdp_interrupt)
+void spc1000_vdp_exp_device::vdp_interrupt(int state)
 {
 	// nothing here?
 }

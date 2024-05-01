@@ -56,7 +56,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/rstbuf.h"
+#include "rstbuf.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(RST_POS_BUFFER, rst_pos_buffer_device, "rst_pos_buffer", "RST Interrupt Buffer (positive modification)")
@@ -96,18 +96,6 @@ rst_pos_buffer_device::rst_pos_buffer_device(const machine_config &mconfig, cons
 rst_neg_buffer_device::rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: rst_buffer_device(mconfig, RST_NEG_BUFFER, tag, owner, clock)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void rst_buffer_device::device_resolve_objects()
-{
-	m_int_cb.resolve_safe();
 }
 
 

@@ -5,8 +5,8 @@
     Namco C148 - CPU Bus Manager
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_NAMCO_C148_H
-#define MAME_MACHINE_NAMCO_C148_H
+#ifndef MAME_NAMCO_NAMCO_C148_H
+#define MAME_NAMCO_NAMCO_C148_H
 
 #pragma once
 
@@ -116,4 +116,4 @@ private:
 DECLARE_DEVICE_TYPE(NAMCO_C148, namco_c148_device)
 
 
-#endif // MAME_MACHINE_NAMCO_C148_H
+#endif // MAME_NAMCO_NAMCO_C148_H

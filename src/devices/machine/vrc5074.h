@@ -40,11 +40,11 @@ public:
 	void sdram_addr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// PCI interrupts
-	DECLARE_WRITE_LINE_MEMBER(pci_intr_a);
-	DECLARE_WRITE_LINE_MEMBER(pci_intr_b);
-	DECLARE_WRITE_LINE_MEMBER(pci_intr_c);
-	DECLARE_WRITE_LINE_MEMBER(pci_intr_d);
-	DECLARE_WRITE_LINE_MEMBER(pci_intr_e);
+	void pci_intr_a(int state);
+	void pci_intr_b(int state);
+	void pci_intr_c(int state);
+	void pci_intr_d(int state);
+	void pci_intr_e(int state);
 	void update_pci_irq(const int index, const int state);
 
 	//cpu bus registers
@@ -65,7 +65,7 @@ public:
 	void target1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// Serial port
-	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
+	void uart_irq_callback(int state);
 
 protected:
 	address_space *m_cpu_space;

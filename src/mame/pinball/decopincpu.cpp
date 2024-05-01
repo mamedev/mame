@@ -83,7 +83,7 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
 		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
+void decocpu_type1_device::cpu_pia_irq(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -198,13 +198,13 @@ void decocpu_type1_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &decocpu_type1_device::decocpu1_map);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0); // 5F - PIA at 0x2100
+	PIA6821(config, m_pia21); // 5F - PIA at 0x2100
 	m_pia21->writepb_handler().set(FUNC(decocpu_type1_device::solenoid1_w));
 	m_pia21->cb2_handler().set(FUNC(decocpu_type1_device::pia21_cb2_w));
 	m_pia21->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia21->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	PIA6821(config, m_pia24, 0); // 11D - PIA at 0x2400
+	PIA6821(config, m_pia24); // 11D - PIA at 0x2400
 	m_pia24->writepa_handler().set(FUNC(decocpu_type1_device::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(decocpu_type1_device::lamp1_w));
 	m_pia24->ca2_handler().set(FUNC(decocpu_type1_device::pia24_ca2_w));
@@ -212,14 +212,14 @@ void decocpu_type1_device::device_add_mconfig(machine_config &config)
 	m_pia24->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia24->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	PIA6821(config, m_pia28, 0); // 11B - PIA at 0x2800
+	PIA6821(config, m_pia28); // 11B - PIA at 0x2800
 	m_pia28->readpa_handler().set(FUNC(decocpu_type1_device::display_strobe_r));
 	m_pia28->writepa_handler().set(FUNC(decocpu_type1_device::display_strobe_w));
 	m_pia28->writepb_handler().set(FUNC(decocpu_type1_device::display_out1_w));
 	m_pia28->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia28->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	PIA6821(config, m_pia2c, 0); // 9B - PIA at 0x2c00
+	PIA6821(config, m_pia2c); // 9B - PIA at 0x2c00
 	m_pia2c->readpb_handler().set(FUNC(decocpu_type1_device::display_in3_r));
 	m_pia2c->writepa_handler().set(FUNC(decocpu_type1_device::display_out2_w));
 	m_pia2c->writepb_handler().set(FUNC(decocpu_type1_device::display_out3_w));
@@ -228,7 +228,7 @@ void decocpu_type1_device::device_add_mconfig(machine_config &config)
 	m_pia2c->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia2c->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	PIA6821(config, m_pia30, 0); // 8H - PIA at 0x3000
+	PIA6821(config, m_pia30); // 8H - PIA at 0x3000
 	m_pia30->readpa_handler().set(FUNC(decocpu_type1_device::switch_r));
 	m_pia30->writepb_handler().set(FUNC(decocpu_type1_device::switch_w));
 	m_pia30->ca2_handler().set(FUNC(decocpu_type1_device::pia30_ca2_w));
@@ -236,7 +236,7 @@ void decocpu_type1_device::device_add_mconfig(machine_config &config)
 	m_pia30->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia30->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	PIA6821(config, m_pia34, 0); // 7B - PIA at 0x3400
+	PIA6821(config, m_pia34); // 7B - PIA at 0x3400
 	m_pia34->readpa_handler().set(FUNC(decocpu_type1_device::dmdstatus_r));
 	m_pia34->writepa_handler().set(FUNC(decocpu_type1_device::display_out4_w));
 	m_pia34->writepb_handler().set(FUNC(decocpu_type1_device::sound_w));
@@ -268,11 +268,11 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device
 		, m_pia34(*this, "pia34")
 		, m_rom(*this, finder_base::DUMMY_TAG)
 		, m_diags(*this, "DIAGS")
-		, m_read_display(*this)
+		, m_read_display(*this, 0)
 		, m_write_display(*this)
-		, m_read_dmdstatus(*this)
+		, m_read_dmdstatus(*this, 0)
 		, m_write_soundlatch(*this)
-		, m_read_switch(*this)
+		, m_read_switch(*this, 0)
 		, m_write_switch(*this)
 		, m_write_lamp(*this)
 		, m_write_solenoid(*this)
@@ -282,16 +282,6 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device
 
 void decocpu_type1_device::device_start()
 {
-	// resolve callbacks
-	m_read_display.resolve_safe(0);
-	m_write_display.resolve_safe();
-	m_read_dmdstatus.resolve_safe(0);
-	m_write_soundlatch.resolve_safe();
-	m_read_switch.resolve_safe(0);
-	m_write_switch.resolve_safe();
-	m_write_lamp.resolve_safe();
-	m_write_solenoid.resolve_safe();
-
 	m_irq_timer = timer_alloc(FUNC(decocpu_type1_device::irq_trigger), this);
 	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES, E_CLOCK), 1);
 	m_irq_active = false;

@@ -251,7 +251,7 @@ ROM_START(d2k300axp)
 	ROM_LOAD("srom.bin", 0x00000, 0x2000, NO_DUMP)
 
 	ROM_REGION32_LE(0x100000, "feprom1", 0)
-	ROM_SYSTEM_BIOS(0, "feprom", "")
+	ROM_SYSTEM_BIOS(0, "feprom", "Unknown version")
 	ROMX_LOAD("feprom1.bin", 0x00000, 0x100000, NO_DUMP, ROM_BIOS(0))
 ROM_END
 
@@ -260,7 +260,7 @@ ROM_START(d2k500axp)
 	ROM_LOAD("srom.bin", 0x00000, 0x2000, NO_DUMP)
 
 	ROM_REGION32_LE(0x100000, "feprom1", 0)
-	ROM_SYSTEM_BIOS(0, "feprom", "")
+	ROM_SYSTEM_BIOS(0, "feprom", "Unknown version")
 	ROMX_LOAD("feprom1.bin", 0x00000, 0x100000, NO_DUMP, ROM_BIOS(0))
 ROM_END
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="mz2500" description="MZ-2500 disk images">
@@ -110,7 +110,7 @@ license:CC0
 	<software name="gomokuna">
 		<description>Gomoku Narabe</description>
 		<year>198?</year>
-		<publisher>Renju</publisher>
+		<publisher>ウスヰパソコンセンター (Usui Pasocom Center)</publisher>
 		<info name="alt_title" value="五目並べ"/>
 
 		<part name="flop1" interface="floppy_3_5">

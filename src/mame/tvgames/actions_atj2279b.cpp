@@ -32,6 +32,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class actions_atj2279b_state : public driver_device
 {
 public:
@@ -97,6 +99,8 @@ ROM_START( rbitgen )
 	// TC58NVG2S3?A00  (there is a yellow stripe on the label before A00 obscuring the text)
 	ROM_LOAD16_WORD_SWAP( "nand.bin", 0x000000, 0x21000000, CRC(92576add) SHA1(1fe61ef1d2dd24e5b5d48c477846ef0c83ec6568) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags

@@ -361,7 +361,7 @@ Sets a method of the current device or driver to read, write or both
 for the current entry.  The prototype of the method can take multiple
 forms making some elements optional.  ``uNN`` represents ``u8``,
 ``u16``, ``u32`` or ``u64`` depending on the data width of the handler.
-The handler can be narrower than the bus itself (for instance a 8-bit
+The handler can be narrower than the bus itself (for instance an 8-bit
 device on a 32-bit bus).
 
 The offset passed in is built from the access address.  It starts at
@@ -603,7 +603,7 @@ parameter is that trigger width (would be 16 in the 68000 case).
 
 This parameter allows to set user-defined flags on the handler which
 can then be retrieved by an accessing device to change their
-behaviour.  An example of use the the i960 which marks burstable zones
+behaviour.  An example of use the i960 which marks burstable zones
 that way (they have a specific hardware-level support).
 
 
@@ -653,7 +653,7 @@ changed on-the-fly.  They’re powerful but have some issues:
 * changing the mappings repeatedly can be slow
 * the address space state is not saved in the saved states, so it has to
   be rebuilt after state load
-* they can be hidden anywhere rather that be grouped in an address map,
+* they can be hidden anywhere rather than be grouped in an address map,
   which can be less readable
 
 The methods, rather than decomposing the information in handler, handler

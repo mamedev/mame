@@ -22,7 +22,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/er1400.h"
+#include "er1400.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -106,10 +106,10 @@ void er1400_device::nvram_default()
 
 bool er1400_device::nvram_read(util::read_stream &file)
 {
-	size_t size = 100 * sizeof(m_data_array[0]);
-	size_t actual;
+	size_t const size = 100 * sizeof(m_data_array[0]);
 
-	return !file.read(&m_data_array[0], size, actual) && actual == size;
+	auto const [err, actual] = read(file, &m_data_array[0], size);
+	return !err && (actual == size);
 }
 
 
@@ -120,10 +120,10 @@ bool er1400_device::nvram_read(util::read_stream &file)
 
 bool er1400_device::nvram_write(util::write_stream &file)
 {
-	size_t size = 100 * sizeof(m_data_array[0]);
-	size_t actual;
+	size_t const size = 100 * sizeof(m_data_array[0]);
 
-	return !file.write(&m_data_array[0], size, actual) && actual == size;
+	auto const [err, actual] = write(file, &m_data_array[0], size);
+	return !err;
 }
 
 
@@ -245,7 +245,7 @@ void er1400_device::erase_data()
 //  data_w - write data input line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::data_w)
+void er1400_device::data_w(int state)
 {
 	m_data_input = bool(state);
 }
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER(er1400_device::data_w)
 //  c1_w - write to first control line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::c1_w)
+void er1400_device::c1_w(int state)
 {
 	if (bool(state) == BIT(m_code_input, 2))
 		return;
@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER(er1400_device::c1_w)
 //  c2_w - write to second control line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::c2_w)
+void er1400_device::c2_w(int state)
 {
 	if (bool(state) == BIT(m_code_input, 1))
 		return;
@@ -285,7 +285,7 @@ WRITE_LINE_MEMBER(er1400_device::c2_w)
 //  c3_w - write to third control line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::c3_w)
+void er1400_device::c3_w(int state)
 {
 	if (bool(state) == BIT(m_code_input, 0))
 		return;
@@ -316,14 +316,14 @@ TIMER_CALLBACK_MEMBER(er1400_device::propagate_data)
 //  clock_w - write to clock line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::clock_w)
+void er1400_device::clock_w(int state)
 {
 	if (m_clock_input == bool(state))
 		return;
 	m_clock_input = bool(state);
 
 	// Commands are clocked by a logical 1 -> 0 transition (i.e. rising edge)
-	if (!state)
+	if (state)
 	{
 		if (machine().time() >= m_write_time)
 			write_data();
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 //  data_r - read data line
 //-------------------------------------------------
 
-READ_LINE_MEMBER(er1400_device::data_r)
+int er1400_device::data_r()
 {
-	return m_data_input | m_data_output;
+	return m_data_input & m_data_output;
 }

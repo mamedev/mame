@@ -49,8 +49,6 @@ private:
 	uint8_t p3_r();
 	uint8_t p4_r();
 	void p4_w(uint8_t data);
-
-	void adam_prn_mem(address_map &map);
 };
 
 

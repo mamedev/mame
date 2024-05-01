@@ -192,7 +192,7 @@ void m1comm_device::device_reset_after_children()
 	m_dlc->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(m1comm_device::dma_hreq_w)
+void m1comm_device::dma_hreq_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dma->hack_w(state);
@@ -208,7 +208,7 @@ void m1comm_device::dma_mem_w(offs_t offset, uint8_t data)
 	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-WRITE_LINE_MEMBER(m1comm_device::dlc_int7_w)
+void m1comm_device::dlc_int7_w(int state)
 {
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }

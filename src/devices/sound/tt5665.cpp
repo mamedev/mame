@@ -251,10 +251,11 @@ void tt5665_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void tt5665_device::rom_bank_updated()
+void tt5665_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

@@ -66,13 +66,13 @@ void taitoio_yoke_device::device_reset()
 // TODO: requires LEFT/RIGHT_AD_STICK in framework
 static INPUT_PORTS_START( yoke_inputs )
 	PORT_START("STICK_X")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke X")
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke X")
 
 	PORT_START("STICK_Y")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke Y")
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke Y")
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_NAME("Throttle Lever")
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_CENTERDELTA(0) PORT_NAME("Throttle Lever")
 INPUT_PORTS_END
 
 ioport_constructor taitoio_yoke_device::device_input_ports() const
@@ -100,42 +100,42 @@ u16 taitoio_yoke_device::throttle_r()
 	return m_throttle->read();
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::slot_down_r )
+int taitoio_yoke_device::slot_down_r()
 {
 	uint16_t throttle = m_throttle->read();
 
 	return (throttle & 0xe00) == 0x600;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::slot_up_r )
+int taitoio_yoke_device::slot_up_r()
 {
 	uint16_t throttle = m_throttle->read();
 
 	return (throttle & 0xe00) == 0x800;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_left_r )
+int taitoio_yoke_device::handle_left_r()
 {
 	uint16_t x = m_stick_x->read();
 
 	return (x & 0xe00) == 0x800;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_right_r )
+int taitoio_yoke_device::handle_right_r()
 {
 	uint16_t x = m_stick_x->read();
 
 	return (x & 0xe00) == 0x600;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_up_r )
+int taitoio_yoke_device::handle_up_r()
 {
 	uint16_t y = m_stick_y->read();
 
 	return (y & 0xe00) == 0x800;
 }
 
-READ_LINE_MEMBER( taitoio_yoke_device::handle_down_r )
+int taitoio_yoke_device::handle_down_r()
 {
 	uint16_t y = m_stick_y->read();
 

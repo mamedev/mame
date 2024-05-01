@@ -31,7 +31,7 @@ public:
 	uint8_t io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(co_w);
+	void co_w(int state);
 
 	uint8_t px_r();
 
@@ -100,7 +100,7 @@ private:
 	floppy_image_device *m_current_drive;
 	uint8_t m_px_s1s0;  // C-A16-11 & C-A16-13
 	uint8_t m_cmd;      // C-A8
-	cpu_device *m_cpu;  // When != nullptr: CPU is suspended in wait state
+	bool m_2nd_pass;
 	bool m_cpu_rd;
 	uint8_t m_ready_in;
 	uint8_t m_ready_ff; // I-A44 & I-A43

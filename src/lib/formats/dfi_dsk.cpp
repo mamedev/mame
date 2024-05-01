@@ -14,8 +14,11 @@
 #include "dfi_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include "osdcore.h" // osd_printf_*
+
+#include <tuple>
 
 
 #define NUMBER_OF_MULTIREADS 3
@@ -39,22 +42,22 @@ dfi_format::dfi_format() : floppy_image_format_t()
 {
 }
 
-const char *dfi_format::name() const
+const char *dfi_format::name() const noexcept
 {
 	return "dfi";
 }
 
-const char *dfi_format::description() const
+const char *dfi_format::description() const noexcept
 {
 	return "DiscFerret flux dump format";
 }
 
-const char *dfi_format::extensions() const
+const char *dfi_format::extensions() const noexcept
 {
 	return "dfi";
 }
 
-bool dfi_format::supports_save() const
+bool dfi_format::supports_save() const noexcept
 {
 	return false;
 }
@@ -62,16 +65,23 @@ bool dfi_format::supports_save() const
 int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char sign[4];
-	size_t actual;
-	io.read_at(0, sign, 4, actual);
+	auto const [err, actual] = read_at(io, 0, sign, 4);
+	if(err || (4 != actual)) {
+		return 0;
+	}
 	return memcmp(sign, "DFE2", 4) ? 0 : FIFID_SIGN;
 }
 
-bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
+
 	char sign[4];
-	io.read_at(0, sign, 4, actual);
+	std::tie(err, actual) = read_at(io, 0, sign, 4);
+	if(err || (4 != actual)) {
+		return false;
+	}
 	if(memcmp(sign, "DFER", 4) == 0) {
 		osd_printf_error("dfi_dsk: Old type Discferret image detected; the MAME Discferret decoder will not handle this properly, bailing out!\n");
 		return false;
@@ -88,11 +98,11 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	[[maybe_unused]] int rpm=360; // drive rpm
 	while(pos < size) {
 		uint8_t h[10];
-		io.read_at(pos, h, 10, actual);
-		uint16_t track = (h[0] << 8) | h[1];
-		uint16_t head  = (h[2] << 8) | h[3];
+		std::tie(err, actual) = read_at(io, pos, h, 10); // FIXME: check for errors and premature EOF
+		uint16_t track = get_u16be(&h[0]);
+		uint16_t head  = get_u16be(&h[2]);
 		// Ignore sector
-		uint32_t tsize = (h[6] << 24) | (h[7] << 16) | (h[8] << 8) | h[9];
+		uint32_t tsize = get_u32be(&h[6]);
 
 		// if the position-so-far-in-file plus 10 (for the header) plus track size
 		// is larger than the size of the file, free buffers and bail out
@@ -104,7 +114,7 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		data.resize(tsize);
 
 		pos += 10; // skip the header, we already read it
-		io.read_at(pos, &data[0], tsize, actual);
+		std::tie(err, actual) = read_at(io, pos, &data[0], tsize); // FIXME: check for errors and premature EOF
 		pos += tsize; // for next time we read, increment to the beginning of next header
 
 		int index_time = 0; // what point the last index happened
@@ -164,7 +174,7 @@ bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		if(!index_time)
 			index_time = total_time;
 
-		std::vector<uint32_t> &buf = image->get_buffer(track, head);
+		std::vector<uint32_t> &buf = image.get_buffer(track, head);
 		buf.resize(tsize);
 
 		int cur_time = 0;

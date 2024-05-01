@@ -221,8 +221,8 @@ void vboysnd_device::device_start()
 	for (int i=0; i<8; i++)
 		waveEnv2LenTbl[i] = (i + 1) * 4 * 120;
 
-	for (int i = 0; i < 5; i++)
-		memset(&snd_channel[i], 0, sizeof(s_snd_channel));
+	for (auto &chan : snd_channel)
+		chan = s_snd_channel();
 
 	memset(m_aram, 0, 0x600);
 }
@@ -384,8 +384,8 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		note_left = (note_left << 5) | ((note_left >> 6) & 0x1f);
 		note_right = (note_right << 5) | ((note_right >> 6) & 0x1f);
 
-		outL.put_int_clamp(j, (int16_t)note_left, 32768);
-		outR.put_int_clamp(j, (int16_t)note_right, 32768);
+		outL.put_int_clamp(j, note_left, 32768);
+		outR.put_int_clamp(j, note_right, 32768);
 	}
 }
 

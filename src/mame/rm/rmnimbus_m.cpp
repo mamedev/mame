@@ -63,10 +63,19 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #include <functional>
 
 #include "rmnimbus.h"
-#include "debugger.h"
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
 #include "imagedev/floppy.h"
+
+#define LOG_SIO             (1U << 1)
+#define LOG_DISK_HDD        (1U << 2)
+#define LOG_DISK            (1U << 3)
+#define LOG_PC8031          (1U << 4)
+#define LOG_PC8031_186      (1U << 5)
+#define LOG_PC8031_PORT     (1U << 6)
+#define LOG_IOU             (1U << 7)
+#define LOG_RAM             (1U << 8)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 
@@ -109,13 +118,13 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-#define MOUSE_NONE      0x00
-#define MOUSE_LEFT      0x01
-#define MOUSE_RIGHT     0x02
-#define MOUSE_DOWN      0x04
-#define MOUSE_UP        0x08
-#define MOUSE_LBUTTON   0x10
-#define MOUSE_RBUTTON   0x20
+#define CONTROLLER_NONE         0x00
+#define CONTROLLER_LEFT         0x01
+#define CONTROLLER_RIGHT        0x02
+#define CONTROLLER_DOWN         0x04
+#define CONTROLLER_UP           0x08
+#define CONTROLLER_BUTTON0      0x10
+#define CONTROLLER_BUTTON1      0x20
 
 // Frequency in Hz to poll for mouse movement.
 #define MOUSE_POLL_FREQUENCY    500
@@ -126,61 +135,6 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
 
-#define LOG_SIO             0
-#define LOG_DISK_HDD        0
-#define LOG_DISK            0
-#define LOG_PC8031          0
-#define LOG_PC8031_186      0
-#define LOG_PC8031_PORT     0
-#define LOG_IOU             0
-#define LOG_RAM             0
-
-/* Debugging */
-
-#define DEBUG_SET(flags)        ((m_debug_machine & (flags))==(flags))
-#define DEBUG_SET_STATE(flags)  ((state->m_debug_machine & (flags))==(flags))
-
-#define DEBUG_NONE          0x0000000
-#define DECODE_BIOS         0x0000002
-#define DECODE_BIOS_RAW     0x0000004
-#define DECODE_DOS21        0x0000008
-
-/* Nimbus sub-bios structures for debugging */
-
-struct t_area_params
-{
-	uint16_t  ofs_brush;
-	uint16_t  seg_brush;
-	uint16_t  ofs_data;
-	uint16_t  seg_data;
-	uint16_t  count;
-};
-
-struct t_plot_string_params
-{
-	uint16_t  ofs_font;
-	uint16_t  seg_font;
-	uint16_t  ofs_data;
-	uint16_t  seg_data;
-	uint16_t  x;
-	uint16_t  y;
-	uint16_t  length;
-};
-
-struct t_nimbus_brush
-{
-	uint16_t  style;
-	uint16_t  style_index;
-	uint16_t  colour1;
-	uint16_t  colour2;
-	uint16_t  transparency;
-	uint16_t  boundary_spec;
-	uint16_t  boundary_colour;
-	uint16_t  save_colour;
-};
-
-
-static int instruction_hook(device_t &device, offs_t curpc);
 
 void rmnimbus_state::external_int(uint8_t vector, bool state)
 {
@@ -217,645 +171,9 @@ void rmnimbus_state::machine_start()
 {
 	m_nimbus_mouse.m_mouse_timer = timer_alloc(FUNC(rmnimbus_state::do_mouse), this);
 
-	/* setup debug commands */
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-	{
-		using namespace std::placeholders;
-		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1));
-
-		/* set up the instruction hook */
-		m_maincpu->debug()->set_instruction_hook(instruction_hook);
-	}
-
-	m_debug_machine=DEBUG_NONE;
-	m_debug_trap=0;
 	m_voice_enabled=false;
 	m_fdc->dden_w(0);
 	//m_fdc->overide_delays(64,m_fdc->get_cmd_delay());
-}
-
-void rmnimbus_state::debug_command(const std::vector<std::string> &params)
-{
-	if (params.size() > 0)
-	{
-		int temp;
-		sscanf(params[0].c_str(), "%d", &temp);
-		m_debug_machine = temp;
-	}
-	else
-	{
-		machine().debugger().console().printf("Error usage : nimbus_debug <debuglevel>\n");
-		machine().debugger().console().printf("Current debuglevel=%02X\n", m_debug_machine);
-	}
-}
-
-/*-----------------------------------------------
-    instruction_hook - per-instruction hook
------------------------------------------------*/
-
-static int instruction_hook(device_t &device, offs_t curpc)
-{
-	rmnimbus_state  *state = device.machine().driver_data<rmnimbus_state>();
-	address_space   &space = device.memory().space(AS_PROGRAM);
-	uint8_t         *addr_ptr;
-	uint8_t         first;
-
-	addr_ptr = (uint8_t*)space.get_read_ptr(curpc);
-
-	first = (curpc & 0x01) ? 1 : 0;
-
-	if(DEBUG_SET_STATE(DECODE_BIOS) && (curpc == state->m_debug_trap) && (0 != state->m_debug_trap))
-	{
-		state->decode_subbios_return(&device,curpc);
-	}
-
-	if ((addr_ptr !=nullptr) && (addr_ptr[first]==0xCD))
-	{
-		if(DEBUG_SET_STATE(DECODE_BIOS) && (addr_ptr[first+1]==0xF0))
-			state->decode_subbios(&device,curpc);
-
-		if(DEBUG_SET_STATE(DECODE_DOS21) && (addr_ptr[first+1]==0x21))
-			state->decode_dos21(&device,curpc);
-	}
-
-	return 0;
-}
-
-void rmnimbus_state::decode_subbios_return(device_t *device, offs_t pc)
-{
-	uint16_t  ax = m_maincpu->state_int(I8086_AX);
-	uint16_t  ds = m_maincpu->state_int(I8086_DS);
-	uint16_t  si = m_maincpu->state_int(I8086_SI);
-
-	if(!DEBUG_SET(DECODE_BIOS_RAW))
-	{
-		logerror("at %05X sub-bios return code : %04X\n",pc,ax);
-		decode_dssi_generic(ds,si);
-		logerror("=======================================================================\n");
-	}
-	else
-		logerror("%05X :: %04X\n",pc,ax);
-
-	m_debug_trap=0;
-}
-
-#define set_type(type_name)     sprintf(type_str,type_name)
-#define set_drv(drv_name)       sprintf(drv_str,drv_name)
-#define set_func(func_name)     sprintf(func_str,func_name)
-
-void rmnimbus_state::decode_subbios(device_t *device,offs_t pc)
-{
-	char    type_str[80];
-	char    drv_str[80];
-	char    func_str[80];
-
-	void (rmnimbus_state::*dump_dssi)(uint16_t, uint16_t) = &rmnimbus_state::decode_dssi_none;
-
-	uint16_t  ax = m_maincpu->state_int(I8086_AX);
-	uint16_t  bx = m_maincpu->state_int(I8086_BX);
-	uint16_t  cx = m_maincpu->state_int(I8086_CX);
-	uint16_t  ds = m_maincpu->state_int(I8086_DS);
-	uint16_t  si = m_maincpu->state_int(I8086_SI);
-
-	// Set the address to trap after the sub-bios call.
-	m_debug_trap=pc+2;
-
-	// *** TEMP Don't show f_enquire_display_line calls !
-	if((cx==6) && (ax==43))
-		return;
-	// *** END TEMP
-
-	if(!DEBUG_SET(DECODE_BIOS_RAW))
-	{
-		logerror("=======================================================================\n");
-		logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
-	}
-
-	set_type("invalid");
-	set_drv("invalid");
-	set_func("invalid");
-
-	switch (cx)
-	{
-		case 0   :
-		{
-			set_type("t_mummu");
-			set_drv("d_mummu");
-
-			switch (ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-				case 1  : set_func("f_add_type_code"); break;
-				case 2  : set_func("f_del_typc_code"); break;
-				case 3  : set_func("f_get_TCB"); break;
-				case 4  : set_func("f_add_driver_code"); break;
-				case 5  : set_func("f_del_driver_code"); break;
-				case 6  : set_func("f_get_DCB"); break;
-				case 7  : set_func("f_get_copyright"); break;
-			}
-		}; break;
-
-		case 1   :
-		{
-			set_type("t_character");
-			set_drv("d_printer");
-
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-				case 1  : set_func("f_get_output_status"); break;
-				case 2  : set_func("f_output_character"); break;
-				case 3  : set_func("f_get_input_status"); break;
-				case 4  : set_func("f_get_and_remove"); break;
-				case 5  : set_func("f_get_no_remove"); break;
-				case 6  : set_func("f_get_last_and_remove"); break;
-				case 7  : set_func("f_get_last_no_remove"); break;
-				case 8  : set_func("f_set_IO_parameters"); break;
-			}
-		}; break;
-
-		case 2   :
-		{
-			set_type("t_disk");
-
-			switch(bx)
-			{
-				case 0  : set_drv("d_floppy"); break;
-				case 1  : set_drv("d_winchester"); break;
-				case 2  : set_drv("d_tape"); break;
-				case 3  : set_drv("d_rompack"); break;
-				case 4  : set_drv("d_eeprom"); break;
-			}
-
-			dump_dssi = &rmnimbus_state::decode_dssi_generic;
-
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-				case 1  : set_func("f_initialise_unit"); break;
-				case 2  : set_func("f_pseudo_init_unit"); break;
-				case 3  : set_func("f_get_device_status"); break;
-				case 4  : set_func("f_read_n_sectors"); dump_dssi = &rmnimbus_state::decode_dssi_f_rw_sectors; break;
-				case 5  : set_func("f_write_n_sectors"); dump_dssi = &rmnimbus_state::decode_dssi_f_rw_sectors; break;
-				case 6  : set_func("f_verify_n_sectors"); dump_dssi = &rmnimbus_state::decode_dssi_f_rw_sectors; break;
-				case 7  : set_func("f_media_check"); break;
-				case 8  : set_func("f_recalibrate"); break;
-				case 9  : set_func("f_motors_off"); break;
-			}
-
-		}; break;
-
-		case 3   :
-		{
-			set_type("t_piconet");
-			set_drv("d_piconet");
-
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-				case 1  : set_func("f_get_slave_status"); break;
-				case 2  : set_func("f_get_slave_map"); break;
-				case 3  : set_func("f_change_slave_addr"); break;
-				case 4  : set_func("f_read_slave_control"); break;
-				case 5  : set_func("f_write_slave_control"); break;
-				case 6  : set_func("f_send_data_byte"); break;
-				case 7  : set_func("f_request_data_byte"); break;
-				case 8  : set_func("f_send_data_block"); break;
-				case 9  : set_func("f_request_data_block"); break;
-				case 10 : set_func("f_reset_slave"); break;
-
-			}
-		}; break;
-
-		case 4   :
-		{
-			set_type("t_tick");
-			set_drv("d_tick");
-
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-				case 1  : set_func("f_ticks_per_second"); break;
-				case 2  : set_func("f_link_tick_routine"); break;
-				case 3  : set_func("f_unlink_tick_routine"); break;
-			}
-		}; break;
-
-		case 5   :
-		{
-			set_type("t_graphics_input");
-
-			switch(bx)
-			{
-				case 0  : set_drv("d_mouse"); break;
-				case 1  : set_drv("d_joystick_1"); break;
-				case 2  : set_drv("d_joystick_2"); break;
-			}
-
-
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-				case 1  : set_func("f_graphics_input_cold_start"); break;
-				case 2  : set_func("f_graphics_input_device_off"); break;
-				case 3  : set_func("f_return_button_status"); break;
-				case 4  : set_func("f_return_switch_and_button_stat"); break;
-				case 5  : set_func("f_start_tracking"); break;
-				case 6  : set_func("f_stop_tracking"); break;
-				case 7  : set_func("f_enquire_position"); break;
-				case 8  : set_func("f_set_position"); break;
-
-				case 10 : set_func("f_return_button_press_info"); break;
-				case 11 : set_func("f_return_button_release_info"); break;
-				case 12 : set_func("f_set_gain/f_set_squeaks_per_pixel_ratio"); break;
-				case 13 : set_func("f_enquire_graphics_in_misc_data"); break;
-			}
-		}; break;
-
-		case 6   :
-		{
-			set_type("t_graphics_output");
-			set_drv("d_ngc_screen");
-
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number");                 break;
-				case 1  : set_func("f_graphics_output_cold_start");         break;
-				case 2  : set_func("f_graphics_output_warm_start");         break;
-				case 3  : set_func("f_graphics_output_off");                break;
-				case 4  : set_func("f_reinit_graphics_output");             break;
-				case 5  : set_func("f_polymarker");                         break;
-				case 6  : set_func("f_polyline"); dump_dssi = &rmnimbus_state::decode_dssi_f_fill_area; break;
-				case 7  : set_func("f_fill_area"); dump_dssi = &rmnimbus_state::decode_dssi_f_fill_area; break;
-				case 8  : set_func("f_flood_fill_area"); break;
-				case 9  : set_func("f_plot_character_string"); dump_dssi = &rmnimbus_state::decode_dssi_f_plot_character_string; break;
-				case 10 : set_func("f_define_graphics_clipping_area"); break;
-				case 11 : set_func("f_enquire_clipping_area_limits"); break;
-				case 12 : set_func("f_select_graphics_clipping_area"); break;
-				case 13 : set_func("f_enq_selctd_graphics_clip_area"); break;
-				case 14 : set_func("f_set_clt_element"); break;
-				case 15 : set_func("f_enquire_clt_element"); break;
-				case 16 : set_func("f_set_new_clt"); dump_dssi = &rmnimbus_state::decode_dssi_f_set_new_clt; break;
-				case 17 : set_func("f_enquire_clt_contents"); break;
-				case 18 : set_func("f_define_dithering_pattern"); break;
-				case 19 : set_func("f_enquire_dithering_pattern"); break;
-				case 20 : set_func("f_draw_sprite"); break;
-				case 21 : set_func("f_move_sprite"); break;
-				case 22 : set_func("f_erase_sprite"); break;
-				case 23 : set_func("f_read_pixel"); break;
-				case 24 : set_func("f_read_to_limit"); break;
-				case 25 : set_func("f_read_area_pixel"); break;
-				case 26 : set_func("f_write_area_pixel"); break;
-				case 27 : set_func("f_copy_area_pixel"); break;
-
-				case 29 : set_func("f_read_area_word"); break;
-				case 30 : set_func("f_write_area_word"); break;
-				case 31 : set_func("f_copy_area_word"); break;
-				case 32 : set_func("f_swap_area_word"); break;
-				case 33 : set_func("f_set_border_colour"); break;
-				case 34 : set_func("f_enquire_border_colour"); break;
-				case 35 : set_func("f_enquire_miscellaneous_data"); break;
-				case 36  : set_func("f_circle"); break;
-
-				case 38 : set_func("f_arc_of_ellipse"); break;
-				case 39 : set_func("f_isin"); break;
-				case 40 : set_func("f_icos"); break;
-				case 41 : set_func("f_define_hatching_pattern"); break;
-				case 42 : set_func("f_enquire_hatching_pattern"); break;
-				case 43 : set_func("f_enquire_display_line"); break;
-				case 44 : set_func("f_plonk_logo"); break;
-			}
-		}; break;
-
-		case 7   :
-		{
-			set_type("t_zend");
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-			}
-		}; break;
-
-		case 8   :
-		{
-			set_type("t_zep");
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-			}
-		}; break;
-
-		case 9   :
-		{
-			set_type("t_raw_console");
-
-			switch(bx)
-			{
-				case 0  :
-				{
-					set_drv("d_screen");
-
-					switch(ax)
-					{
-						case 0  : set_func("f_get_version_number"); break;
-						case 1  : set_func("f_plonk_char"); dump_dssi = &rmnimbus_state::decode_dssi_f_plonk_char; break;
-						case 2  : set_func("f_plonk_cursor"); break;
-						case 3  : set_func("f_kill_cursor"); break;
-						case 4  : set_func("f_scroll"); break;
-						case 5  : set_func("f_width"); dump_dssi = &rmnimbus_state::decode_dssi_generic; break;
-						case 6  : set_func("f_get_char_set"); break;
-						case 7  : set_func("f_set_char_set"); break;
-						case 8  : set_func("f_reset_char_set"); break;
-						case 9  : set_func("f_set_plonk_parameters"); break;
-						case 10 : set_func("f_set_cursor_flash_rate"); break;
-					}
-				}; break;
-
-				case 1  :
-				{
-					set_drv("d_keyboard");
-
-					switch(ax)
-					{
-						case 0  : set_func("f_get_version_number"); break;
-						case 1  : set_func("f_init_keyboard"); break;
-						case 2  : set_func("f_get_last_key_code"); break;
-						case 3  : set_func("f_get_bitmap"); break;
-					}
-				}; break;
-			}
-		}; break;
-
-		case 10   :
-		{
-			set_type("t_acoustics");
-
-			switch(bx)
-			{
-				case 0  :
-				{
-					set_drv("d_sound");
-
-					switch(ax)
-					{
-						case 0  : set_func("f_get_version_number"); break;
-						case 1  : set_func("f_sound_enable"); break;
-						case 2  : set_func("f_play_note"); break;
-						case 3  : set_func("f_get_queue_status"); break;
-					}
-				}; break;
-
-				case 1  :
-				{
-					set_drv("d_voice");
-
-					switch(ax)
-					{
-						case 0  : set_func("f_get_version_number"); break;
-						case 1  : set_func("f_talk"); break;
-						case 2  : set_func("f_wait_and_talk"); break;
-						case 3  : set_func("f_test_talking"); break;
-					}
-				}
-			}
-		}; break;
-
-		case 11   :
-		{
-			set_type("t_hard_sums");
-			switch(ax)
-			{
-				case 0  : set_func("f_get_version_number"); break;
-			}
-		}; break;
-	}
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-	{
-		(this->*dump_dssi)(ds, si);
-	}
-	else
-	{
-		logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
-
-		(this->*dump_dssi)(ds, si);
-		logerror("=======================================================================\n");
-	}
-}
-
-static inline void *get_regpair_ptr(address_space &space, uint16_t   segment, uint16_t offset)
-{
-	int             addr;
-
-	addr=((segment<<4)+offset);
-
-	return space.get_read_ptr(addr);
-}
-
-void rmnimbus_state::decode_dssi_none(uint16_t ds, uint16_t si)
-{
-}
-
-void rmnimbus_state::decode_dssi_generic(uint16_t ds, uint16_t si)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint16_t  *params;
-	int     count;
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-		return;
-
-	params=(uint16_t  *)get_regpair_ptr(space,ds,si);
-
-	for(count=0; count<10; count++)
-		logerror("%04X ",params[count]);
-
-	logerror("\n");
-}
-
-
-void rmnimbus_state::decode_dssi_f_fill_area(uint16_t ds, uint16_t si)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	uint16_t          *addr_ptr;
-	t_area_params   *area_params;
-	t_nimbus_brush  *brush;
-	int             cocount;
-
-	area_params = (t_area_params   *)get_regpair_ptr(space,ds,si);
-
-	if (!DEBUG_SET(DECODE_BIOS_RAW))
-		OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
-
-	brush=(t_nimbus_brush  *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-	{
-		logerror("\tdw\t%04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, ",
-					brush->style,brush->style_index,brush->colour1,brush->colour2,
-					brush->transparency,brush->boundary_spec,brush->boundary_colour,brush->save_colour,
-					area_params->count);
-	}
-	else
-	{
-		logerror("Brush params\n");
-		logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
-		logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
-		logerror("transparency=%04X,   boundary_spec=%04X\n",brush->transparency,brush->boundary_spec);
-		logerror("boundary colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
-
-
-		OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
-	}
-
-	addr_ptr = (uint16_t *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
-	for(cocount=0; cocount < area_params->count; cocount++)
-	{
-		if(DEBUG_SET(DECODE_BIOS_RAW))
-		{
-			if(cocount!=(area_params->count-1))
-				logerror("%04X, %04X, ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
-			else
-				logerror("%04X, %04X ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
-		}
-		else
-			logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
-	}
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-		logerror("\n");
-}
-
-void rmnimbus_state::decode_dssi_f_plot_character_string(uint16_t ds, uint16_t si)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	uint8_t                   *char_ptr;
-	t_plot_string_params    *plot_string_params;
-	int                     charno;
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-		return;
-
-	plot_string_params=(t_plot_string_params   *)get_regpair_ptr(space,ds,si);
-
-	OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
-	OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
-
-	logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
-
-	char_ptr=(uint8_t*)space.get_read_ptr(LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
-
-	if (plot_string_params->length==0xFFFF)
-		logerror("%s",char_ptr);
-	else
-		for(charno=0;charno<plot_string_params->length;charno++)
-			logerror("%c",char_ptr[charno]);
-
-	logerror("\n");
-}
-
-void rmnimbus_state::decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint16_t  *new_colours;
-	int     colour;
-	new_colours=(uint16_t  *)get_regpair_ptr(space,ds,si);
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-		return;
-
-	OUTPUT_SEGOFS("SegColours:OfsColours",ds,si);
-
-	for(colour=0;colour<16;colour++)
-		logerror("colour #%02X=%04X\n",colour,new_colours[colour]);
-
-}
-
-void rmnimbus_state::decode_dssi_f_plonk_char(uint16_t ds, uint16_t si)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint16_t  *params;
-	params=(uint16_t  *)get_regpair_ptr(space,ds,si);
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-		return;
-
-	OUTPUT_SEGOFS("SegParams:OfsParams",ds,si);
-
-	logerror("plonked_char=%c\n",params[0]);
-}
-
-void rmnimbus_state::decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint16_t  *params;
-	int     param_no;
-
-	if(DEBUG_SET(DECODE_BIOS_RAW))
-		return;
-
-	params=(uint16_t  *)get_regpair_ptr(space,ds,si);
-
-	logerror("unitno=%04X, count=%02X, first_sector=%08X buffer=%04X:%04X (%05X)\n",
-			 params[0],
-			 params[1],
-			 ((params[3] * 65536)+params[2]),
-			 params[5],params[4],
-			 ((params[5]*16)+params[4])
-			 );
-
-	for(param_no=0;param_no<16;param_no++)
-		logerror("%04X ",params[param_no]);
-
-	logerror("\n");
-}
-
-void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	//uint16_t  *params;
-	char    *path;
-
-	uint16_t  ax = m_maincpu->state_int(I8086_AX);
-	uint16_t  bx = m_maincpu->state_int(I8086_BX);
-	uint16_t  cx = m_maincpu->state_int(I8086_CX);
-	uint16_t  dx = m_maincpu->state_int(I8086_DX);
-	uint16_t  cs = m_maincpu->state_int(I8086_CS);
-	uint16_t  ds = m_maincpu->state_int(I8086_DS);
-	uint16_t  es = m_maincpu->state_int(I8086_ES);
-	uint16_t  ss = m_maincpu->state_int(I8086_SS);
-
-	uint16_t  si = m_maincpu->state_int(I8086_SI);
-	uint16_t  di = m_maincpu->state_int(I8086_DI);
-	uint16_t  bp = m_maincpu->state_int(I8086_BP);
-
-	uint8_t dosfn = ax >> 8;    // Dos function is AH, upper half of AX.
-
-	logerror("=======================================================================\n");
-	logerror("DOS Int 0x21 call at %05X\n",pc);
-	logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
-	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
-	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
-	logerror("=======================================================================\n");
-
-	if (((dosfn >= 0x39)  && (dosfn <= 0x3d))
-		|| (0x43 == dosfn)
-		|| (0x4e == dosfn)
-		|| (0x56 == dosfn)
-		|| ((dosfn >= 0x5a) && (dosfn <= 0x5b)) )
-	{
-		path=(char *)get_regpair_ptr(space,ds,dx);
-		logerror("Path at DS:DX=%s\n",path);
-
-		if (0x56 == dosfn)
-		{
-			path=(char *)get_regpair_ptr(space,es,di);
-			logerror("Path at ES:DI=%s\n",path);
-		}
-		logerror("=======================================================================\n");
-	}
 }
 
 #define CBUFLEN 32
@@ -1028,7 +346,7 @@ void rmnimbus_state::nimbus_bank_memory()
 	map_blocks[1]  = (ramblocks[ramblock][1].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][1].blockbase*1024];
 	map_blocks[2]  = (ramblocks[ramblock][2].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][2].blockbase*1024];
 
-	//if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
+	//LOGMASKED(LOG_RAM, "\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
 
 	for(blockno=0;blockno<8;blockno++)
 	{
@@ -1045,7 +363,7 @@ void rmnimbus_state::nimbus_bank_memory()
 		block_ofs=(ramsel==0x07) ? 0 : ((blockno % 4)*128);
 
 
-		if(LOG_RAM) logerror("mapped %s",bank);
+		LOGMASKED(LOG_RAM, "mapped %s",bank);
 
 		if((map_blockno>-1) && (block_ofs < ramblocks[ramblock][map_blockno].blocksize) &&
 			(map_blocks[map_blockno]!=nullptr))
@@ -1054,12 +372,12 @@ void rmnimbus_state::nimbus_bank_memory()
 
 			membank(bank)->set_base(map_base);
 			space.install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, membank(bank));
-			//if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
+			//LOGMASKED(LOG_RAM, ", base=%X\n",(int)map_base);
 		}
 		else
 		{
 			space.nop_readwrite(memmap[blockno].start, memmap[blockno].end);
-			if(LOG_RAM) logerror("NOP\n");
+			LOGMASKED(LOG_RAM, "NOP\n");
 		}
 	}
 }
@@ -1090,10 +408,9 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
+void rmnimbus_state::sio_interrupt(int state)
 {
-	if(LOG_SIO)
-		logerror("SIO Interrupt state=%02X\n",state);
+	LOGMASKED(LOG_SIO, "SIO Interrupt state=%02X\n",state);
 
 	external_int(0, state);
 }
@@ -1106,10 +423,9 @@ void rmnimbus_state::fdc_reset()
 	m_scsi_ctrl_out->write(0);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
+void rmnimbus_state::nimbus_fdc_intrq_w(int state)
 {
-	if(LOG_DISK)
-		logerror("nimbus_drives_intrq = %d\n",state);
+	LOGMASKED(LOG_DISK, "nimbus_drives_intrq = %d\n",state);
 
 	if(m_iou_reg092 & DISK_INT_ENABLE)
 	{
@@ -1117,15 +433,14 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
+void rmnimbus_state::nimbus_fdc_drq_w(int state)
 {
-	if(LOG_DISK)
-		logerror("nimbus_drives_drq_w(%d)\n", state);
+	LOGMASKED(LOG_DISK, "nimbus_drives_drq_w(%d)\n", state);
 
 	m_maincpu->drq1_w(state && FDC_DRQ_ENABLED());
 }
 
-READ_LINE_MEMBER(rmnimbus_state::nimbus_fdc_enmf_r)
+int rmnimbus_state::nimbus_fdc_enmf_r()
 {
 	return false;
 }
@@ -1193,8 +508,7 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 			break;
 	}
 
-	if(LOG_DISK_HDD)
-		logerror("Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x410,result);
+	LOGMASKED(LOG_DISK_HDD, "Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x410,result);
 
 	return result;
 }
@@ -1246,8 +560,7 @@ void rmnimbus_state::scsi_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
-	if(LOG_DISK_HDD)
-		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
+	LOGMASKED(LOG_DISK_HDD, "Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
 
 	switch(offset*2)
 	{
@@ -1287,7 +600,7 @@ void rmnimbus_state::check_scsi_irq()
 	nimbus_fdc_intrq_w(m_scsi_io && m_scsi_cd && m_scsi_req && m_scsi_iena);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
+void rmnimbus_state::write_scsi_iena(int state)
 {
 	m_scsi_iena = state;
 	check_scsi_irq();
@@ -1321,12 +634,12 @@ void rmnimbus_state::hdc_drq(bool state)
 	m_maincpu->drq1_w(HDC_DRQ_ENABLED() && !m_scsi_cd && state);
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
+void rmnimbus_state::write_scsi_bsy(int state)
 {
 	m_scsi_bsy = state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
+void rmnimbus_state::write_scsi_cd(int state)
 {
 	m_scsi_cd = state;
 
@@ -1336,7 +649,7 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
+void rmnimbus_state::write_scsi_io(int state)
 {
 	m_scsi_io = state;
 
@@ -1347,12 +660,12 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_msg )
+void rmnimbus_state::write_scsi_msg(int state)
 {
 	m_scsi_msg = !state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
+void rmnimbus_state::write_scsi_req(int state)
 {
 	// Detect rising edge on req, IC11b, clock
 	int rising = ((m_scsi_req == 0) && (state == 1));
@@ -1383,7 +696,7 @@ void rmnimbus_state::pc8031_reset()
 {
 	logerror("peripheral controller reset\n");
 
-	memset(&m_ipc_interface,0,sizeof(m_ipc_interface));
+	m_ipc_interface = decltype(m_ipc_interface)();
 }
 
 
@@ -1415,8 +728,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_r(offs_t offset)
 		default : result=0; break;
 	}
 
-	if(LOG_PC8031_186)
-		logerror("Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
+	LOGMASKED(LOG_PC8031_186, "Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
 
 	return result;
 }
@@ -1440,9 +752,7 @@ void rmnimbus_state::nimbus_pc8031_w(offs_t offset, uint8_t data)
 						break;
 	}
 
-	if(LOG_PC8031_186)
-		logerror("Nimbus PCIOW %08X write of %02X to %04X\n",pc,data,(offset*2)+0xC0);
-
+	LOGMASKED(LOG_PC8031_186, "Nimbus PCIOW %08X write of %02X to %04X\n",pc,data,(offset*2)+0xC0);
 }
 
 /* 8031/8051 Peripheral controller 8031/8051 side */
@@ -1466,8 +776,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_iou_r(offs_t offset)
 	if(((offset==2) || (offset==3)) && (m_iou_reg092 & PC8031_INT_ENABLE))
 		external_int(EXTERNAL_INT_PC8031_8C, true);
 
-	if(LOG_PC8031)
-		logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
+	LOGMASKED(LOG_PC8031, "8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
 
 	return result;
 }
@@ -1476,8 +785,7 @@ void rmnimbus_state::nimbus_pc8031_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_iocpu->pc();
 
-	if(LOG_PC8031)
-		logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
+	LOGMASKED(LOG_PC8031, "8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
 
 	switch(offset & 0x03)
 	{
@@ -1516,8 +824,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_port1_r()
 	int pc=m_iocpu->pc();
 	uint8_t   result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
 
-	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
+	LOGMASKED(LOG_PC8031_PORT, "8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
 
 	return result;
 }
@@ -1527,8 +834,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_port3_r()
 	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
-	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
+	LOGMASKED(LOG_PC8031_PORT, "8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
 
 	return result;
 }
@@ -1552,16 +858,13 @@ void rmnimbus_state::nimbus_pc8031_port1_w(uint8_t data)
 	m_eeprom->clk_write((data & 1) ? 1 : 0);
 	m_eeprom_bits = data;
 
-	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to P1\n",pc,data);
+	LOGMASKED(LOG_PC8031_PORT, "8031 PCPORTW %04X write of %02X to P1\n",pc,data);
 }
 
 void rmnimbus_state::nimbus_pc8031_port3_w(uint8_t data)
 {
-	int pc=m_iocpu->pc();
-
-	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to P3\n",pc,data);
+	int pc = m_iocpu->pc();
+	LOGMASKED(LOG_PC8031_PORT, "8031 PCPORTW %04X write of %02X to P3\n",pc,data);
 }
 
 
@@ -1576,8 +879,7 @@ uint8_t rmnimbus_state::nimbus_iou_r(offs_t offset)
 		result=m_iou_reg092;
 	}
 
-	if(LOG_IOU)
-		logerror("Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
+	LOGMASKED(LOG_IOU, "Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
 
 	return result;
 }
@@ -1586,8 +888,7 @@ void rmnimbus_state::nimbus_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
-	if(LOG_IOU)
-		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
+	LOGMASKED(LOG_IOU, "Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
 
 	if(offset==0)
 	{
@@ -1663,7 +964,7 @@ void rmnimbus_state::nimbus_sound_ay8910_portb_w(uint8_t data)
 	m_ay8910_b=data;
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
+void rmnimbus_state::nimbus_msm5205_vck(int state)
 {
 	if(m_iou_reg092 & MSM5205_INT_ENABLE)
 		external_int(EXTERNAL_INT_MSM5205,state);
@@ -1679,6 +980,29 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	int8_t  xdiff;          // Difference from previous X and Y
 	int8_t  ydiff;
 
+	// Read mose positions and calculate difference from previous value
+	mouse_x = m_io_mousex->read();
+	mouse_y = m_io_mousey->read();
+
+	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
+	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
+
+	if (m_io_config->read() & 0x01)
+	{
+		do_mouse_hle(xdiff, ydiff);
+	}
+	else
+	{
+		do_mouse_real(xdiff, ydiff);
+	}
+
+	// Update current mouse position
+	m_nimbus_mouse.m_mouse_x = mouse_x;
+	m_nimbus_mouse.m_mouse_y = mouse_y;
+}
+
+void rmnimbus_state::do_mouse_real(int8_t xdiff, int8_t ydiff)
+{
 	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
 	uint8_t intstate_y;
 	int     xint;           // X and Y interrupts to trigger
@@ -1688,16 +1012,6 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 	uint8_t   mxb;
 	uint8_t   mya;
 	uint8_t   myb;
-
-	// Read mouse buttons
-	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read();
-
-	// Read mose positions and calculate difference from previous value
-	mouse_x = m_io_mousex->read();
-	mouse_y = m_io_mousey->read();
-
-	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
-	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
 
 	// convert movement into emulated movement of quadrature encoder in mouse.
 	if (xdiff < 0)
@@ -1751,17 +1065,78 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::do_mouse)
 		m_nimbus_mouse.m_reg0a4 |= ( myb & 0x01) << 0; // YB
 	}
 
-	// Update current mouse position
-	m_nimbus_mouse.m_mouse_x = mouse_x;
-	m_nimbus_mouse.m_mouse_y = mouse_y;
-
 	// and interrupt state
 	m_nimbus_mouse.m_intstate_x=intstate_x;
 	m_nimbus_mouse.m_intstate_y=intstate_y;
 }
 
+void rmnimbus_state::do_mouse_hle(int8_t xdiff, int8_t ydiff)
+{
+	if (MOUSE_INT_ENABLED(this))
+	{
+		// bypass bios ISR and update mouse cursor position locations directly
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+
+		if (xdiff)
+		{
+			uint16_t x = space.read_word_unaligned(m_nimbus_mouse.xpos_loc);
+			if ((xdiff < 0) && (x != space.read_word_unaligned(m_nimbus_mouse.xmax_loc)))
+			{
+				x++;
+			}
+			else if (x != space.read_word_unaligned(m_nimbus_mouse.xmin_loc))
+			{
+				x--;
+			}
+			space.write_word_unaligned(m_nimbus_mouse.xpos_loc, x);
+		}
+
+		if (ydiff)
+		{
+			uint16_t y = space.read_word_unaligned(m_nimbus_mouse.ypos_loc);
+			if ((ydiff < 0) && (y != space.read_word_unaligned(m_nimbus_mouse.ymin_loc)))
+			{
+				y--;
+			}
+			else if (y != space.read_word_unaligned(m_nimbus_mouse.ymax_loc))
+			{
+				y++;
+			}
+			space.write_word_unaligned(m_nimbus_mouse.ypos_loc, y);
+		}
+	}
+	else
+	{
+		// store status to support polling operation of mouse
+		// (not tested as no software seems to use this method!)
+		if (xdiff || ydiff)
+		{
+			m_nimbus_mouse.m_reg0a4 = 0;
+		}
+		if (xdiff < 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_RIGHT;
+		}
+		else if (xdiff > 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_LEFT;
+		}
+		if (ydiff < 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_DOWN;
+		}
+		else if (ydiff > 0)
+		{
+			m_nimbus_mouse.m_reg0a4 |= CONTROLLER_UP;
+		}
+
+	}
+}
+
 void rmnimbus_state::mouse_js_reset()
 {
+	constexpr uint16_t bios_addresses[] = { 0x18cd, 0x196d, 0x196d, 0x1a6d, 0x1a6d, 0x1a77 };
+
 	m_nimbus_mouse.m_mouse_x=128;
 	m_nimbus_mouse.m_mouse_y=128;
 	m_nimbus_mouse.m_mouse_pcx=0;
@@ -1770,8 +1145,52 @@ void rmnimbus_state::mouse_js_reset()
 	m_nimbus_mouse.m_intstate_y=0;
 	m_nimbus_mouse.m_reg0a4=0xC0;
 
+	// calculate addresses for mouse related variable used by the bios mouse ISR
+	auto bios_base = bios_addresses[system_bios() - 1];
+	m_nimbus_mouse.xpos_loc = bios_base + 8;
+	m_nimbus_mouse.ypos_loc = bios_base + 10;
+	m_nimbus_mouse.xmin_loc = bios_base;
+	m_nimbus_mouse.ymin_loc = bios_base + 4;
+	m_nimbus_mouse.xmax_loc = bios_base + 2;
+	m_nimbus_mouse.ymax_loc = bios_base + 6;
+
 	// Setup timer to poll the mouse
 	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
+
+	m_selected_js_idx = 0;
+}
+
+uint8_t rmnimbus_state::nimbus_joystick_r()
+{
+	/* Only the joystick drection data is read from this port
+	   (which corresponds to the the low nibble of the selected joystick port).
+	   The joystick buttons are read from the mouse data port instead.
+	   Unused bits are set to 1. */
+	uint8_t result = m_io_joysticks[m_selected_js_idx]->read() | 0xf0;
+
+	if (result & CONTROLLER_RIGHT)
+	{
+		// when the stick is pushed right the left bit must also be set!
+		result |= CONTROLLER_LEFT;
+	}
+
+	if (result & CONTROLLER_UP)
+	{
+		// when the stick is pushed up the down bit must also be set!
+		result |= CONTROLLER_DOWN;
+	}
+
+	return result;
+}
+
+void rmnimbus_state::nimbus_joystick_select(offs_t offset, uint8_t data)
+{
+	/* NB joystick 0 is selected by writing to address 0xa0, and
+	   joystick 1 is selected by writing to address 0xa2 */
+	if (offset % 2 == 0)
+	{
+		m_selected_js_idx = offset >> 1;
+	}
 }
 
 uint8_t rmnimbus_state::nimbus_mouse_js_r()
@@ -1780,28 +1199,23 @@ uint8_t rmnimbus_state::nimbus_mouse_js_r()
 
 	    bit     description
 
-	    0       JOY 0-Up    or mouse XB
-	    1       JOY 0-Down  or mouse XA
-	    2       JOY 0-Left  or mouse YA
-	    3       JOY 0-Right or mouse YB
-	    4       JOY 0-b0    or mouse rbutton
-	    5       JOY 0-b1    or mouse lbutton
+	    0       mouse XB
+	    1       mouse XA
+	    2       mouse YA
+	    3       mouse YB
+	    4       JOY 1-button or mouse rbutton
+	    5       JOY 0-button or mouse lbutton
 	    6       ?? always reads 1
 	    7       ?? always reads 1
 
 	*/
-	uint8_t result;
-	//int pc=m_maincpu->_pc();
+	uint8_t result = m_nimbus_mouse.m_reg0a4 | 0xc0;
 
-	if (m_io_config->read() & 0x01)
-	{
-		result=m_nimbus_mouse.m_reg0a4 | 0xC0;
-		//logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
-	}
-	else
-	{
-		result = m_io_joystick0->read() | 0xC0;
-	}
+	// set button bits if either mouse or joystick buttons are pressed
+	result |= m_io_mouse_button->read();
+	// NB only the button bits of the joystick(s) are read from this port
+	result |= m_io_joysticks[0]->read() & 0x20;
+	result |= m_io_joysticks[1]->read() & 0x10;
 
 	return result;
 }

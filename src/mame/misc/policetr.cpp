@@ -109,7 +109,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
  *
  *************************************/
 
-WRITE_LINE_MEMBER(policetr_state::vblank)
+void policetr_state::vblank(int state)
 {
 	m_maincpu->set_input_line(state ? INPUT_LINE_IRQ4 : INPUT_LINE_IRQ5, ASSERT_LINE);
 }
@@ -192,7 +192,7 @@ void policetr_state::bsmt2000_data_w(offs_t offset, uint32_t data, uint32_t mem_
 }
 
 
-READ_LINE_MEMBER(policetr_state::bsmt_status_r)
+int policetr_state::bsmt_status_r()
 {
 	return m_bsmt->read_status();
 }
@@ -740,7 +740,7 @@ ROM_END
  *
  *************************************/
 
-void policetr_state::driver_init()
+void policetr_state::driver_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32s_delegate(*this, FUNC(policetr_state::speedup_w)));
 	m_speedup_data = m_rambase + m_speedup_addr/4;

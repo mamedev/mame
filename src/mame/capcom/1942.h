@@ -5,8 +5,8 @@
     1942
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_1942_H
-#define MAME_INCLUDES_1942_H
+#ifndef MAME_CAPCOM_1942_H
+#define MAME_CAPCOM_1942_H
 
 #pragma once
 
@@ -32,7 +32,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void driver_init() override;
+	void driver_init();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -107,4 +107,4 @@ protected:
 	required_shared_ptr<uint8_t> m_protopal;
 };
 
-#endif // MAME_INCLUDES_1942_H
+#endif // MAME_CAPCOM_1942_H

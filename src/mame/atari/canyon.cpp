@@ -39,12 +39,162 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "canyon.h"
+
+#include "canyon_a.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class canyon_state : public driver_device
+{
+public:
+	canyon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch"),
+		m_discrete(*this, "discrete"),
+		m_in(*this, "IN%u", 1U),
+		m_dsw(*this, "DSW")
+	{ }
+
+	void canyon(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<f9334_device> m_outlatch;
+	required_device<discrete_sound_device> m_discrete;
+
+	required_ioport_array<2> m_in;
+	required_ioport m_dsw;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	uint8_t switches_r(offs_t offset);
+	uint8_t options_r(offs_t offset);
+	void output_latch_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void motor_w(offs_t offset, uint8_t data);
+	void explode_w(uint8_t data);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bombs(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+};
+
+
+/*************************************
+ *
+ *  Write handlers
+ *
+ *************************************/
+
+void canyon_state::motor_w(offs_t offset, uint8_t data)
+{
+	m_discrete->write(NODE_RELATIVE(CANYON_MOTOR1_DATA, (offset & 0x01)), data & 0x0f);
+}
+
+
+void canyon_state::explode_w(uint8_t data)
+{
+	m_discrete->write(CANYON_EXPLODE_DATA, data >> 4);
+}
+
+
+void canyon_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+TILE_GET_INFO_MEMBER(canyon_state::get_bg_tile_info)
+{
+	uint8_t const code = m_videoram[tile_index];
+
+	tileinfo.set(0, code & 0x3f, code >> 7, 0);
+}
+
+
+void canyon_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(canyon_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+
+void canyon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		int const x = m_videoram[0x3d0 + 2 * i + 0x1];
+		int const y = m_videoram[0x3d0 + 2 * i + 0x8];
+		int const c = m_videoram[0x3d0 + 2 * i + 0x9];
+
+
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+			c >> 3,
+			i,
+			!(c & 0x80), 0,
+			224 - x,
+			240 - y, 0);
+	}
+}
+
+
+void canyon_state::draw_bombs(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		int const sx = 254 - m_videoram[0x3d0 + 2 * i + 0x5];
+		int const sy = 246 - m_videoram[0x3d0 + 2 * i + 0xc];
+
+		rectangle rect(sx, sx + 1, sy, sy + 1);
+		rect &= cliprect;
+
+		bitmap.fill(1 + 2 * i, rect);
+	}
+}
+
+
+uint32_t canyon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(bitmap, cliprect);
+
+	draw_bombs(bitmap, cliprect);
+
+	// watchdog is disabled during service mode
+	m_watchdog->watchdog_enable(!(m_in[1]->read() & 0x10));
+
+	return 0;
+}
 
 
 /*************************************
@@ -53,7 +203,7 @@
  *
  *************************************/
 
-void canyon_state::canyon_palette(palette_device &palette) const
+void canyon_state::palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); // GREY
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // BLACK
@@ -68,23 +218,23 @@ void canyon_state::canyon_palette(palette_device &palette) const
  *
  *************************************/
 
-uint8_t canyon_state::canyon_switches_r(offs_t offset)
+uint8_t canyon_state::switches_r(offs_t offset)
 {
 	uint8_t val = 0;
 
-	if ((ioport("IN2")->read() >> (offset & 7)) & 1)
+	if ((m_in[1]->read() >> (offset & 7)) & 1)
 		val |= 0x80;
 
-	if ((ioport("IN1")->read() >> (offset & 3)) & 1)
+	if ((m_in[0]->read() >> (offset & 3)) & 1)
 		val |= 0x01;
 
 	return val;
 }
 
 
-uint8_t canyon_state::canyon_options_r(offs_t offset)
+uint8_t canyon_state::options_r(offs_t offset)
 {
-	return (ioport("DSW")->read() >> (2 * (~offset & 3))) & 3;
+	return (m_dsw->read() >> (2 * (~offset & 3))) & 3;
 }
 
 
@@ -115,13 +265,13 @@ void canyon_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x00ff).mirror(0x100).ram();
-	map(0x0400, 0x0401).w(FUNC(canyon_state::canyon_motor_w));
-	map(0x0500, 0x0500).w(FUNC(canyon_state::canyon_explode_w));
-	map(0x0501, 0x0501).w(m_watchdog, FUNC(watchdog_timer_device::reset_w)); /* watchdog, disabled in service mode */
+	map(0x0400, 0x0401).w(FUNC(canyon_state::motor_w));
+	map(0x0500, 0x0500).w(FUNC(canyon_state::explode_w));
+	map(0x0501, 0x0501).w(m_watchdog, FUNC(watchdog_timer_device::reset_w)); // watchdog, disabled in service mode
 	map(0x0600, 0x0603).select(0x0180).w(FUNC(canyon_state::output_latch_w));
-	map(0x0800, 0x0bff).ram().w(FUNC(canyon_state::canyon_videoram_w)).share("videoram");
-	map(0x1000, 0x17ff).r(FUNC(canyon_state::canyon_switches_r)).nopw();  /* sloppy code writes here */
-	map(0x1800, 0x1fff).r(FUNC(canyon_state::canyon_options_r));
+	map(0x0800, 0x0bff).ram().w(FUNC(canyon_state::videoram_w)).share(m_videoram);
+	map(0x1000, 0x17ff).r(FUNC(canyon_state::switches_r)).nopw();  // sloppy code writes here
+	map(0x1800, 0x1fff).r(FUNC(canyon_state::options_r));
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -140,8 +290,8 @@ static INPUT_PORTS_START( canyon )
 	PORT_DIPSETTING(    0x01, DEF_STR( Spanish ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( German ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW:3" )    /* Manual says these are unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW:4" )    /* Manual says these are unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW:3" )    // Manual says these are unused
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW:4" )    // Manual says these are unused
 	PORT_DIPNAME( 0x30, 0x00, "Misses Per Play" ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -227,8 +377,8 @@ static const gfx_layout sprite_layout =
 
 
 static GFXDECODE_START( gfx_canyon )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 2 )
+	GFXDECODE_ENTRY( "tiles",   0, tile_layout,   0, 2 )
+	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0, 2 )
 GFXDECODE_END
 
 
@@ -241,7 +391,7 @@ GFXDECODE_END
 
 void canyon_state::canyon(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 12.096_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &canyon_state::main_map);
 
@@ -255,17 +405,17 @@ void canyon_state::canyon(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // HSYNC = 15,750 Hz
-	screen.set_screen_update(FUNC(canyon_state::screen_update_canyon));
+	screen.set_screen_update(FUNC(canyon_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, m6502_device::NMI_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_canyon);
-	PALETTE(config, m_palette, FUNC(canyon_state::canyon_palette), 4);
+	PALETTE(config, m_palette, FUNC(canyon_state::palette), 4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -288,15 +438,15 @@ ROM_START( canyon )
 	ROM_LOAD_NIB_HIGH( "9503-01.p1", 0x3000, 0x0400, CRC(1eddbe28) SHA1(7d30280bf9edff743c16386d7cdec78094477996) )
 	ROM_LOAD         ( "9496-01.d1", 0x3800, 0x0800, CRC(8be15080) SHA1(095c15e9ac91623b2d514858dca2e4c261d36fd0) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_REGION( 0x0400, "tiles", 0 )
 	ROM_LOAD( "9492-01.n8", 0x0000, 0x0400, CRC(7449f754) SHA1(a8ffc39e1a86c94487551f5026eedbbd066b12c9) )
 
-	ROM_REGION( 0x0100, "gfx2", 0 )
+	ROM_REGION( 0x0100, "sprites", 0 )
 	ROM_LOAD_NIB_LOW ( "9506-01.m5", 0x0000, 0x0100, CRC(0d63396a) SHA1(147fae3b02a86310c8d022a7e7cfbf71ea511616) )
 	ROM_LOAD_NIB_HIGH( "9505-01.n5", 0x0000, 0x0100, CRC(60507c07) SHA1(fcb76890cbaa37e02392bf8b97f7be9a6fe6a721) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* sync (not used) */
+	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  // sync (not used)
 ROM_END
 
 
@@ -307,17 +457,18 @@ ROM_START( canyonp )
 	ROM_LOAD_NIB_LOW ( "cbp3800l.h1", 0x3800, 0x0800, CRC(c7ee4431) SHA1(7a0f4454a981c4e9ee27e273e9a8379458e660e5) )
 	ROM_LOAD_NIB_HIGH( "cbp3800m.r1", 0x3800, 0x0800, CRC(94246a9a) SHA1(5ff8b69fb744a5f62d4cf291e8f25e3620b479e7) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_REGION( 0x0400, "tiles", 0 )
 	ROM_LOAD( "9492-01.n8", 0x0000, 0x0400, CRC(7449f754) SHA1(a8ffc39e1a86c94487551f5026eedbbd066b12c9) )
 
-	ROM_REGION( 0x0100, "gfx2", 0 )
+	ROM_REGION( 0x0100, "sprites", 0 )
 	ROM_LOAD_NIB_LOW ( "9506-01.m5", 0x0000, 0x0100, CRC(0d63396a) SHA1(147fae3b02a86310c8d022a7e7cfbf71ea511616) )
 	ROM_LOAD_NIB_HIGH( "9505-01.n5", 0x0000, 0x0100, CRC(60507c07) SHA1(fcb76890cbaa37e02392bf8b97f7be9a6fe6a721) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* sync (not used) */
+	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  // sync (not used)
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************
@@ -326,5 +477,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, canyon,  0,      canyon, canyon, canyon_state, empty_init, ROT0, "Atari", "Canyon Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, canyon,  0,      canyon, canyon, canyon_state, empty_init, ROT0, "Atari", "Canyon Bomber",             MACHINE_SUPPORTS_SAVE )
 GAME( 1977, canyonp, canyon, canyon, canyon, canyon_state, empty_init, ROT0, "Atari", "Canyon Bomber (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -33,10 +33,10 @@ public:
 	// construction/destruction
 	nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( sk_w );
-	DECLARE_WRITE_LINE_MEMBER( di_w );
-	DECLARE_READ_LINE_MEMBER( do_r );
+	void cs_w(int state);
+	void sk_w(int state);
+	void di_w(int state);
+	int do_r();
 
 protected:
 	// device-level overrides
@@ -49,21 +49,21 @@ protected:
 
 private:
 	inline uint16_t read(offs_t offset);
-	inline void write(offs_t offset, uint16_t data);
+	inline void write(offs_t offset, u16 data);
 	inline void erase(offs_t offset);
 
 	uint16_t m_register[16];
 
 	int m_bits;
 	int m_state;
-	uint8_t m_command;
-	uint8_t m_address;
-	uint16_t m_data;
+	u8 m_command;
+	u8 m_address;
+	u16 m_data;
 	bool m_ewen;
-	int m_cs;
-	int m_sk;
-	int m_do;
-	int m_di;
+	bool m_cs;
+	bool m_sk;
+	bool m_do;
+	bool m_di;
 };
 
 

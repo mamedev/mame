@@ -9,14 +9,16 @@
 #include "emu.h"
 #include "hpc3.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_PBUS_DMA    (1 << 1)
-#define LOG_SCSI        (1 << 2)
-#define LOG_SCSI_DMA    (1 << 3)
-#define LOG_SCSI_IRQ    (1 << 4)
-#define LOG_ETHERNET    (1 << 5)
-#define LOG_CHAIN       (1 << 6)
-#define LOG_EEPROM      (1 << 7)
+#include <algorithm>
+
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_PBUS_DMA    (1U << 2)
+#define LOG_SCSI        (1U << 3)
+#define LOG_SCSI_DMA    (1U << 4)
+#define LOG_SCSI_IRQ    (1U << 5)
+#define LOG_ETHERNET    (1U << 6)
+#define LOG_CHAIN       (1U << 7)
+#define LOG_EEPROM      (1U << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_SCSI_IRQ | LOG_ETHERNET | LOG_CHAIN | LOG_EEPROM)
 
 #define VERBOSE         (0)
@@ -42,14 +44,14 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 	, m_hal2(*this, finder_base::DUMMY_TAG)
 	, m_enet(*this, finder_base::DUMMY_TAG)
 	, m_enet_intr_out_cb(*this)
-	, m_hd_rd_cb(*this)
+	, m_hd_rd_cb(*this, 0)
 	, m_hd_wr_cb(*this)
-	, m_hd_dma_rd_cb(*this)
+	, m_hd_dma_rd_cb(*this, 0)
 	, m_hd_dma_wr_cb(*this)
 	, m_hd_reset_cb(*this)
-	, m_bbram_rd_cb(*this)
+	, m_bbram_rd_cb(*this, 0)
 	, m_bbram_wr_cb(*this)
-	, m_eeprom_dati_cb(*this)
+	, m_eeprom_dati_cb(*this, 0)
 	, m_eeprom_dato_cb(*this)
 	, m_eeprom_clk_cb(*this)
 	, m_eeprom_cs_cb(*this)
@@ -72,24 +74,6 @@ device_memory_interface::space_config_vector hpc3_device::memory_space_config() 
 		std::make_pair(AS_PIO8, &m_pio_space_config[8]),
 		std::make_pair(AS_PIO9, &m_pio_space_config[9])
 	};
-}
-
-void hpc3_device::device_resolve_objects()
-{
-	m_enet_intr_out_cb.resolve_safe();
-	m_hd_rd_cb.resolve_all();
-	m_hd_wr_cb.resolve_all();
-	m_hd_dma_rd_cb.resolve_all_safe(0);
-	m_hd_dma_wr_cb.resolve_all_safe();
-	m_hd_reset_cb.resolve_all_safe();
-	m_bbram_rd_cb.resolve_safe(0);
-	m_bbram_wr_cb.resolve_safe();
-	m_eeprom_dati_cb.resolve_safe(0);
-	m_eeprom_dato_cb.resolve_safe();
-	m_eeprom_clk_cb.resolve_safe();
-	m_eeprom_cs_cb.resolve_safe();
-	m_eeprom_pre_cb.resolve_safe();
-	m_dma_complete_int_cb.resolve_safe();
 }
 
 void hpc3_device::device_start()
@@ -173,7 +157,7 @@ void hpc3_device::device_reset()
 {
 	m_cpu_aux_ctrl = 0;
 
-	memset(m_scsi_dma, 0, sizeof(scsi_dma_t) * 2);
+	std::fill(std::begin(m_scsi_dma), std::end(m_scsi_dma), scsi_dma_t());
 
 	for (uint32_t i = 0; i < 8; i++)
 	{
@@ -692,7 +676,7 @@ template void hpc3_device::fifo_w<hpc3_device::FIFO_ENET_XMIT>(offs_t offset, ui
 template<uint32_t index>
 uint32_t hpc3_device::hd_r(offs_t offset, uint32_t mem_mask)
 {
-	if (ACCESSING_BITS_0_7 && !m_hd_rd_cb[index].isnull())
+	if (ACCESSING_BITS_0_7 && !m_hd_rd_cb[index].isunset())
 	{
 		const uint8_t ret = m_hd_rd_cb[index](offset);
 		LOGMASKED(LOG_SCSI, "%s: SCSI%d Read %02x: %02x\n", machine().describe_context(), index, offset, ret);
@@ -709,7 +693,7 @@ uint32_t hpc3_device::hd_r(offs_t offset, uint32_t mem_mask)
 template<uint32_t index>
 void hpc3_device::hd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (ACCESSING_BITS_0_7 && !m_hd_wr_cb[index].isnull())
+	if (ACCESSING_BITS_0_7 && !m_hd_wr_cb[index].isunset())
 	{
 		LOGMASKED(LOG_SCSI, "%s: SCSI%d Write %02x = %02x\n", machine().describe_context(), index, offset, (uint8_t)data);
 		m_hd_wr_cb[index](offset, data & 0xff);
@@ -1044,12 +1028,12 @@ void hpc3_device::do_scsi_dma(int channel)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc3_device::scsi0_drq)
+void hpc3_device::scsi0_drq(int state)
 {
 	scsi_drq(state, 0);
 }
 
-WRITE_LINE_MEMBER(hpc3_device::scsi1_drq)
+void hpc3_device::scsi1_drq(int state)
 {
 	scsi_drq(state, 1);
 }
@@ -1089,7 +1073,7 @@ void hpc3_device::eeprom_w(uint32_t data)
 	m_eeprom_clk_cb(BIT(data, 2));
 }
 
-void hpc3_device::enet_transmit(int param)
+void hpc3_device::enet_transmit(int32_t param)
 {
 	// save the first transmit buffer descriptor pointer
 	// TODO: not sure how cpfbdp and ppfbdp work, perhaps round-robin?

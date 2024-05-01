@@ -15,8 +15,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/s3520cf.h"
-
+#include "s3520cf.h"
 
 
 //**************************************************************************
@@ -44,6 +43,7 @@ s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, d
 s3520cf_device::s3520cf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_region(*this, DEVICE_SELF)
 	, m_dir(0), m_latch(0), m_reset_line(0), m_read_latch(0), m_bitstream(0), m_stream_pos(0), m_mode(0), m_sysr(0), m_cntrl1(0), m_cntrl2(0)
 {
@@ -108,17 +108,6 @@ void s3520cf_device::device_start()
 	m_timer = timer_alloc(FUNC(s3520cf_device::timer_callback), this);
 	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 
-	system_time systime;
-	machine().base_datetime(systime);
-
-	m_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
-	m_rtc.month = (((systime.local_time.month+1) / 10) << 4) | (((systime.local_time.month+1) % 10) & 0xf);
-	m_rtc.wday = systime.local_time.weekday;
-	m_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
-	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
-	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
-	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
-
 	save_item(NAME(m_dir));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_reset_line));
@@ -174,8 +163,8 @@ void s3520cf_device::nvram_default()
 
 bool s3520cf_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_nvdata, 15, actual) && actual == 15;
+	auto const [err, actual] = read(file, m_nvdata, 15);
+	return !err && (actual == 15);
 }
 
 //-------------------------------------------------
@@ -185,8 +174,19 @@ bool s3520cf_device::nvram_read(util::read_stream &file)
 
 bool s3520cf_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_nvdata, 15, actual) && actual == 15;
+	auto const [err, actual] = write(file, m_nvdata, 15);
+	return !err;
+}
+
+void s3520cf_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_rtc.day = ((day / 10)<<4) | ((day % 10) & 0xf);
+	m_rtc.month = ((month / 10) << 4) | ((month % 10) & 0xf);
+	m_rtc.wday = day_of_week - 1;
+	m_rtc.year = (((year % 100)/10)<<4) | ((year % 10) & 0xf);
+	m_rtc.hour = ((hour / 10)<<4) | ((hour % 10) & 0xf);
+	m_rtc.min = ((minute / 10)<<4) | ((minute % 10) & 0xf);
+	m_rtc.sec = ((second / 10)<<4) | ((second % 10) & 0xf);
 }
 
 //-------------------------------------------------
@@ -281,19 +281,19 @@ inline void s3520cf_device::rtc_write(u8 offset,u8 data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ_LINE_MEMBER( s3520cf_device::read_bit )
+int s3520cf_device::read_bit()
 {
 	return m_read_latch;
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_dir_line )
+void s3520cf_device::set_dir_line(int state)
 {
 	//printf("%d DIR LINE\n",state);
 
 	m_dir = state;
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
+void s3520cf_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -307,13 +307,13 @@ WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
 	}
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::write_bit )
+void s3520cf_device::write_bit(int state)
 {
 	m_latch = state;
 //  printf("%d LATCH LINE\n",state);
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )
+void s3520cf_device::set_clock_line(int state)
 {
 	// NOTE: this device use 1-cycle (8 clocks) delayed data output
 	if(state == 1 && m_reset_line == CLEAR_LINE)

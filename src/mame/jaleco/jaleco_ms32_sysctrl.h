@@ -6,8 +6,8 @@ Jaleco MS32 System Control Unit
 
 ******************************************************************************/
 
-#ifndef MAME_MACHINE_JALECO_MS32_SYSCTRL_H
-#define MAME_MACHINE_JALECO_MS32_SYSCTRL_H
+#ifndef MAME_JALECO_JALECO_MS32_SYSCTRL_H
+#define MAME_JALECO_JALECO_MS32_SYSCTRL_H
 
 #pragma once
 
@@ -47,7 +47,6 @@ public:
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -112,4 +111,4 @@ DECLARE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_JALECO_MS32_SYSCTRL_H
+#endif // MAME_JALECO_JALECO_MS32_SYSCTRL_H

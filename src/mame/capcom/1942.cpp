@@ -181,6 +181,7 @@ constexpr XTAL MASTER_CLOCK(12_MHz_XTAL);
 constexpr XTAL MAIN_CPU_CLOCK(MASTER_CLOCK/4);
 constexpr XTAL SOUND_CPU_CLOCK(MASTER_CLOCK/4);
 constexpr XTAL AUDIO_CLOCK(MASTER_CLOCK/8);
+
 /* 20mhz OSC - both Z80s are 4 MHz */
 constexpr XTAL MASTER_CLOCK_1942P(20_MHz_XTAL);
 constexpr XTAL MAIN_CPU_CLOCK_1942P(MASTER_CLOCK_1942P/5);
@@ -188,6 +189,7 @@ constexpr XTAL SOUND_CPU_CLOCK_1942P(MASTER_CLOCK_1942P/5);
 constexpr XTAL AUDIO_CLOCK_1942P(MASTER_CLOCK_1942P/16);
 
 } // anonymous namespace
+
 
 void _1942_state::_1942_bankswitch_w(uint8_t data)
 {
@@ -216,8 +218,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::_1942_scanline)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
-
-
 
 
 void _1942_state::_1942_map(address_map &map)
@@ -359,7 +359,7 @@ static INPUT_PORTS_START( 1942 )
 	PORT_DIPSETTING(    0x20, "20K 100K 100K+" )
 	PORT_DIPSETTING(    0x10, "30K 80K 80K+" )
 	PORT_DIPSETTING(    0x00, "30K 100K 100K+" )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWA:2,1")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWA:2,1")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
@@ -468,7 +468,7 @@ static INPUT_PORTS_START( 1942p )
 	PORT_DIPSETTING(    0x20, "20K 100K 100K+" )
 	PORT_DIPSETTING(    0x10, "30K 80K 80K+" )
 	PORT_DIPSETTING(    0x00, "30K 100K 100K+" )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWA:2,1")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWA:2,1")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
@@ -844,9 +844,9 @@ ROM_END
 /* set contained only three program ROMs, other ROMs should be checked against a real PCB */
 ROM_START( 1942h )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
-	ROM_LOAD( "supercharger_1942_@3.m3",  0x00000, 0x4000, CRC(ec70785f) SHA1(2010a945e1d5c984a14cf7f47a883d04bd71567d) )   /* label confirmed from auction post */
-	ROM_LOAD( "supercharger_1942_@4.m4",  0x04000, 0x4000, CRC(cc11355f) SHA1(44fceb449f406f657494eeee4e6b43bf063f2013) )   /* label confirmed from auction post */
-	ROM_LOAD( "supercharger_1942_@5.m5",  0x10000, 0x4000, CRC(42746d75) SHA1(ede6919b84653b94fddeb40b3004e44336880ba2) )   /* label confirmed from auction post */
+	ROM_LOAD( "supercharger_1942_@3.m3",  0x00000, 0x4000, CRC(ec70785f) SHA1(2010a945e1d5c984a14cf7f47a883d04bd71567d) ) /* labeled as SuperCharger 1942 #3 (c)1991 TBS - handwritten 1.28A */
+	ROM_LOAD( "supercharger_1942_@4.m4",  0x04000, 0x4000, CRC(cc11355f) SHA1(44fceb449f406f657494eeee4e6b43bf063f2013) ) /* labeled as SuperCharger 1942 #4 (c)1991 TBS - handwritten 1.28  */
+	ROM_LOAD( "supercharger_1942_@5.m5",  0x10000, 0x4000, CRC(42746d75) SHA1(ede6919b84653b94fddeb40b3004e44336880ba2) ) /* labeled as SuperCharger 1942 #5 (c)1991 TBS - handwritten 1.28  */
 	ROM_LOAD( "srb-06.m6", 0x14000, 0x2000, CRC(466f8248) SHA1(2ccc8fc59962d3001fbc10e8d2f20a254a74f251) )
 	ROM_LOAD( "srb-07.m7", 0x18000, 0x4000, CRC(0d31038c) SHA1(b588eaf6fddd66ecb2d9832dc197f286f1ccd846) )
 
@@ -990,7 +990,6 @@ ROM_START( 1942w )
 ROM_END
 
 
-
 ROM_START( 1942p )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "1.bin",    0x00000, 0x8000, CRC(d8506aee) SHA1(aebdce3203e7743d70a8465a5e5766f9f47cb33f) ) // sldh
@@ -1027,10 +1026,11 @@ void _1942_state::driver_init()
 }
 
 
-GAME( 1984, 1942,    0,    _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE)
-GAME( 1984, 1942a,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE)
-GAME( 1984, 1942abl, 1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE) // data is the same as 1942a set, different rom format
-GAME( 1991, 1942h,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE)
-GAME( 1984, 1942b,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE)
-GAME( 1985, 1942w,   1942, _1942,  1942,  _1942_state,  driver_init, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE) /* Based on 1942 (Revision B) */
-GAME( 1984, 1942p,   1942, _1942p, 1942p, _1942p_state, driver_init, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS         INIT         ROT     COMPANY, FULLNAME, FLAGS
+GAME( 1984, 1942,    0,      _1942,   1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE)
+GAME( 1984, 1942a,   1942,   _1942,   1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE)
+GAME( 1984, 1942abl, 1942,   _1942,   1942,  _1942_state,  driver_init, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE) // data is the same as 1942a set, different rom format
+GAME( 1991, 1942h,   1942,   _1942,   1942,  _1942_state,  driver_init, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE) // v1.28A of hack
+GAME( 1984, 1942b,   1942,   _1942,   1942,  _1942_state,  driver_init, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE)
+GAME( 1985, 1942w,   1942,   _1942,   1942,  _1942_state,  driver_init, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE) // based on 1942 (Revision B)
+GAME( 1984, 1942p,   1942,   _1942p,  1942p, _1942p_state, driver_init, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )

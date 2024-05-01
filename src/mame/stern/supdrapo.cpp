@@ -67,6 +67,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(12'000'000)
 #define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
 #define SND_CLOCK       MASTER_CLOCK/8  /* guess */
@@ -605,6 +607,8 @@ ROM_START( supdrapob )
 	ROM_LOAD( "dm74s287n.9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
 	ROM_LOAD( "dm74s287n.9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************************************

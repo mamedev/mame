@@ -46,6 +46,9 @@ Viking?s Fun Mill
 #include "cpu/arm7/arm7core.h"
 #include "speaker.h"
 
+
+namespace {
+
 class belatra_state : public driver_device
 {
 public:
@@ -124,6 +127,8 @@ ROM_START( ldrinka )
 	ROM_LOAD( "zld-0012534-1belatra.bin", 0x000000, 0x200000, CRC(7a9b1e9f) SHA1(d9c7551b812bda509ba5ade09d2f82a77a5215d3) )
 	ROM_LOAD( "zld-0012534-2belatra.bin", 0x200000, 0x200000, CRC(e3e74597) SHA1(0157dbf806eb2e5f0c9b9e8ed68d38748a713a6e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2004, fairyl2,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (set 1)",   MACHINE_IS_SKELETON )

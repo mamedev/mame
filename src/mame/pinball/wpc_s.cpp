@@ -49,6 +49,8 @@ ToDo:
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 
+#include "speaker.h"
+
 namespace {
 
 class wpc_s_state : public driver_device
@@ -100,7 +102,7 @@ private:
 	void dcs_reset_w(uint8_t data);
 	uint8_t rtc_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
+	void scanline_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
 	void wpc_s_map(address_map &map);
@@ -254,7 +256,7 @@ void wpc_s_state::watchdog_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_s_state::scanline_irq)
+void wpc_s_state::scanline_irq(int state)
 {
 	m_firq_src = 0x00;
 	m_maincpu->set_input_line(1, state);
@@ -2057,7 +2059,12 @@ void wpc_s_state::wpc_s(machine_config &config)
 	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	SPEAKER(config, "mono").front_center();
+
 	DCS_AUDIO_8K(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 /*-----------------
@@ -2340,23 +2347,23 @@ ROM_START(nf_20)
 	ROM_LOAD16_BYTE("nfu7s", 0xa00000, 0x080000, CRC(61002bdd) SHA1(e623399ff95f59a4ab7efdd7c69b1a1370479398))
 ROM_END
 
-ROM_START(nf_10)
+ROM_START(nf_10f)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("nofe1_0.rom", 0x00000, 0x80000, CRC(f8f6521c) SHA1(5c26f4878f257b157c2a1c46995ec8100fa20723))
 	ROM_REGION(0x800000, "dcs", 0)
-	ROM_LOAD16_BYTE("nfu2s", 0x000000, 0x080000, CRC(136caeb9) SHA1(61a56b29a7655e8aab4987d300173e1acf27c77c))
-	ROM_LOAD16_BYTE("nfu3s", 0x100000, 0x080000, CRC(983e5578) SHA1(374b1397abbdde5fd9257fd45fd8613c94fbd02d))
-	ROM_LOAD16_BYTE("nfu4s", 0x200000, 0x080000, CRC(9469cd40) SHA1(8a1dd1088f24018f48b114c0b27f0331263d4eea))
-	ROM_LOAD16_BYTE("nfu5s", 0x300000, 0x080000, CRC(e14d4315) SHA1(63d5ae800cc8a750ea2e3a87c646ab175b60abc7))
-	ROM_LOAD16_BYTE("nfu6s", 0x400000, 0x080000, CRC(40a58903) SHA1(78f7e99f39efc83f3cf17801a30e6dc6e4864125))
-	ROM_LOAD16_BYTE("nfu7s", 0x500000, 0x080000, CRC(61002bdd) SHA1(e623399ff95f59a4ab7efdd7c69b1a1370479398))
+	ROM_LOAD16_BYTE("snd-u2.sl1", 0x000000, 0x080000, CRC(84f48e27) SHA1(cdf0ff55c1493ea5ac7cef618c985f41442c6f60))
+	ROM_LOAD16_BYTE("nfu3s",      0x100000, 0x080000, CRC(983e5578) SHA1(374b1397abbdde5fd9257fd45fd8613c94fbd02d))
+	ROM_LOAD16_BYTE("nfu4s",      0x200000, 0x080000, CRC(9469cd40) SHA1(8a1dd1088f24018f48b114c0b27f0331263d4eea))
+	ROM_LOAD16_BYTE("nfu5s",      0x300000, 0x080000, CRC(e14d4315) SHA1(63d5ae800cc8a750ea2e3a87c646ab175b60abc7))
+	ROM_LOAD16_BYTE("nfu6s",      0x400000, 0x080000, CRC(40a58903) SHA1(78f7e99f39efc83f3cf17801a30e6dc6e4864125))
+	ROM_LOAD16_BYTE("nfu7s",      0x500000, 0x080000, CRC(61002bdd) SHA1(e623399ff95f59a4ab7efdd7c69b1a1370479398))
 ROM_END
 
 ROM_START(nf_08x)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("nofe0_8x.rom", 0x00000, 0x80000, CRC(64871e6a) SHA1(0e116104b06446b0d435f715c33535080cdd2378))
 	ROM_REGION(0x800000, "dcs", 0)
-	ROM_LOAD16_BYTE("snd-u2.sl1", 0x000000, 0x080000, CRC(84f48e27) SHA1(cdf0ff55c1493ea5ac7cef618c985f41442c6f60))// this was found separate from nofe0_8x.rom, but it's added to the oldest revision available
+	ROM_LOAD16_BYTE("snd-u2.sl1", 0x000000, 0x080000, CRC(84f48e27) SHA1(cdf0ff55c1493ea5ac7cef618c985f41442c6f60))
 	ROM_LOAD16_BYTE("nfu3s",      0x100000, 0x080000, CRC(983e5578) SHA1(374b1397abbdde5fd9257fd45fd8613c94fbd02d))
 	ROM_LOAD16_BYTE("nfu4s",      0x200000, 0x080000, CRC(9469cd40) SHA1(8a1dd1088f24018f48b114c0b27f0331263d4eea))
 	ROM_LOAD16_BYTE("nfu5s",      0x300000, 0x080000, CRC(e14d4315) SHA1(63d5ae800cc8a750ea2e3a87c646ab175b60abc7))
@@ -2450,6 +2457,19 @@ ROM_START(rs_lx2)
 	ROM_LOAD("rshw_lx2.rom", 0x00000, 0x80000, CRC(317210d0) SHA1(38adcf9c72552bd371b096080b172c63d0f843d3))
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("rs_u2_s.l1", 0x000000, 0x080000, CRC(5a2db20c) SHA1(34ce236cc874b820db2d2268cc77815ed7ca061b))
+	ROM_LOAD16_BYTE("rs_u3_s.l1", 0x200000, 0x080000, CRC(719be036) SHA1(fa975a6a93fcaefddcbd1c0b97c49bd9f9608ad4))
+	ROM_LOAD16_BYTE("rs_u4_s.l1", 0x400000, 0x080000, CRC(d452d007) SHA1(b850bc8e17d8940f93c1e7b6a0ab786b092694b3))
+	ROM_LOAD16_BYTE("rs_u5_s.l1", 0x600000, 0x080000, CRC(1faa04c9) SHA1(817bbd7fc0781d84af6c40cb477adf83cef07ab2))
+	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
+	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
+	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+ROM_END
+
+ROM_START(rs_pa2)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("rs-u6.pa2", 0x00000, 0x80000, CRC(674fd680) SHA1(68a4ef5c40fea6b5eae69fbd0ea4339b5757d572))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("rs_u2_s.p3", 0x000000, 0x080000, CRC(3a987553) SHA1(bb174cc48533e19906b5ef9d099670e03a04cc89))
 	ROM_LOAD16_BYTE("rs_u3_s.l1", 0x200000, 0x080000, CRC(719be036) SHA1(fa975a6a93fcaefddcbd1c0b97c49bd9f9608ad4))
 	ROM_LOAD16_BYTE("rs_u4_s.l1", 0x400000, 0x080000, CRC(d452d007) SHA1(b850bc8e17d8940f93c1e7b6a0ab786b092694b3))
 	ROM_LOAD16_BYTE("rs_u5_s.l1", 0x600000, 0x080000, CRC(1faa04c9) SHA1(817bbd7fc0781d84af6c40cb477adf83cef07ab2))
@@ -2627,6 +2647,18 @@ ROM_END
 ROM_START(ts_lf6)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("u6-lf6.rom", 0x00000, 0x080000, CRC(a1692f1a) SHA1(9df2ecd991a08c661cc22f91dfc6c3dfffcfc3e5))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("ts_u2_s.l1", 0x000000, 0x080000, CRC(f1486cfb) SHA1(a916917cb4e46b5d1e04eb4dd52b4193e48d4da8))
+	ROM_LOAD16_BYTE("ts_u3_s.l1", 0x200000, 0x080000, CRC(b9e39c3f) SHA1(183730dcaa84f8b83b6d26521e90fdb0fc558b4c))
+	ROM_LOAD16_BYTE("ts_u4_s.l1", 0x400000, 0x080000, CRC(a1d1ab66) SHA1(5380f347cb3970bac4aab5917a51d2d64fbca541))
+	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
+	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
+	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+ROM_END
+
+ROM_START(ts_lf4)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("shad_lf4.rom", 0x00000, 0x080000, CRC(5ff11d88) SHA1(04a2a1cbe9883ec95981bab783886302ec2151d0))
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("ts_u2_s.l1", 0x000000, 0x080000, CRC(f1486cfb) SHA1(a916917cb4e46b5d1e04eb4dd52b4193e48d4da8))
 	ROM_LOAD16_BYTE("ts_u3_s.l1", 0x200000, 0x080000, CRC(b9e39c3f) SHA1(183730dcaa84f8b83b6d26521e90fdb0fc558b4c))
@@ -2903,68 +2935,70 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1994,  corv_21,    0,          wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (2.1)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_px4,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX4 Prototype)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_px3,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX3 Prototype)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX1)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX2)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LA1)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  dh_lx2,     0,          wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LX-2)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  dh_lf2,     dh_lx2,     wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LF-2)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  i500_11r,   0,          wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.0R)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jb_10r,     0,          wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0R)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jb_10b,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jb_04a,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (0.4A prototype)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jm_12r,     0,          wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jm_12b,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jm_05r,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_23x,     0,          wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3X)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_23,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_23f,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3F)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_22,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.2)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_20,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.0)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_10,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (1.0)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_08x,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (0.8X)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_l6,      0,          wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (L-6)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_la5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-5)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-5)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_la4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-4)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-4)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx3,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-3)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-2)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx5,     0,          wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-5)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-2)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_sp2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (SP-2)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx3,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-3)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx4,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-4)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_la5,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LA-5)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_lx5,     0,          wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-5)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_lh6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LH-6)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_lx4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-4)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_la4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-4)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_la2,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-2)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_pa1,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (PA-1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_lf6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LF-6) French",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_lm6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LM-6) Mild",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_13,     0,          wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.3X)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(2005,  tom_14h,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom14, ROT0,  "Bally",        "Theatre Of Magic (1.4H)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_12,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2X)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_12a,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2A)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_10f,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.0 French)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_06,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (0.6a)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_12,      0,          wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_12g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2 Germany)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_11,      wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_10r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 R)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_10g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 Germany)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_10f,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 French)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_03r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.3 R)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_048r,    wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.48 R)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_l2,     0,          wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_l1,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-1)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_la2,    wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (La-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_p2,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Pa-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_p3,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Px-3)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  tfs_12,     0,          wpc_s,  tfs,  wpc_s_state,  init_tfs,   ROT0,  "Bally",        "WPC Test Fixture: Security (1.2)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_21,    0,          wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (2.1)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_px4,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX4 Prototype)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_px3,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX3 Prototype)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX1)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX2)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LA1)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  dh_lx2,     0,          wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LX-2)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  dh_lf2,     dh_lx2,     wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LF-2)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  i500_11r,   0,          wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.0R)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jb_10r,     0,          wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0R)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jb_10b,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jb_04a,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (0.4A prototype)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jm_12r,     0,          wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jm_12b,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jm_05r,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_23x,     0,          wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3X)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_23,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_23f,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3F)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_22,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.2)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_20,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.0)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_10f,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (1.0F)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_08x,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (0.8X)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_l6,      0,          wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (L-6)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_la5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-5)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-5)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_la4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-4)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-4)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx3,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-3)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-2)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_pa2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (PA-2 prototype)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx5,     0,          wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-5)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-2)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_sp2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (SP-2)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx3,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-3)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx4,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-4)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_la5,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LA-5)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_lx5,     0,          wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-5)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_lh6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LH-6)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_lx4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-4)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_la4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-4)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_la2,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-2)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_pa1,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (PA-1)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_lf6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LF-6) French",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_lf4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LF-4) French",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_lm6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LM-6) Mild",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_13,     0,          wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.3X)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(2005,  tom_14h,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom14, ROT0,  "Bally",        "Theatre Of Magic (1.4H)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_12,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2X)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_12a,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2A)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_10f,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.0 French)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_06,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (0.6a)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_12,      0,          wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_12g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2 Germany)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_11,      wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.1)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_10r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 R)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_10g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 Germany)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_10f,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 French)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_03r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.3 R)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_048r,    wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.48 R)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_l2,     0,          wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_l1,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_la2,    wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (La-2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_p2,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Pa-2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_p3,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Px-3)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  tfs_12,     0,          wpc_s,  tfs,  wpc_s_state,  init_tfs,   ROT0,  "Bally",        "WPC Test Fixture: Security (1.2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

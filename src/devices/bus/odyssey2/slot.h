@@ -68,7 +68,7 @@ public:
 	virtual u8 io_read(offs_t offset) { return 0xff; }
 	virtual void bus_write(u8 data) { }
 	virtual u8 bus_read() { return 0xff; }
-	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
+	virtual int t0_read() { return 0; }
 	virtual int b_read() { return -1; }
 
 	virtual void cart_init() { } // called after loading ROM
@@ -112,15 +112,15 @@ public:
 	o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~o2_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override { }
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "odyssey_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
@@ -133,14 +133,14 @@ public:
 	u8 io_read(offs_t offset);
 	void bus_write(u8 data);
 	u8 bus_read();
-	DECLARE_READ_LINE_MEMBER(t0_read);
+	int t0_read();
 	int b_read();
 
 	void write_p1(u8 data) { if (m_cart) m_cart->write_p1(data); }
 	void write_p2(u8 data) { if (m_cart) m_cart->write_p2(data); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	int m_type;

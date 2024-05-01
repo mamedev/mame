@@ -207,7 +207,6 @@ TI-86 ports:
 #include "cpu/z80/z80.h"
 #include "cpu/z80/ez80.h"
 #include "imagedev/snapquik.h"
-#include "machine/bankdev.h"
 #include "screen.h"
 
 

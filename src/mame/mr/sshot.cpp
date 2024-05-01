@@ -171,6 +171,8 @@ Given CS numbers this is released after the other GunChamp
 #include "gunchamps.lh"
 
 
+namespace {
+
 class supershot_state : public driver_device
 {
 public:
@@ -391,6 +393,8 @@ ROM_START( gunchamps )
 	ROM_LOAD( "snd82s129.a5",  0x0000, 0x0100, CRC(1d74dc30) SHA1(b956d8c6564cc3cc1b5f5f55b05ad4aa13f247e6) )
 	ROM_LOAD( "snd82s23.b7",   0x0100, 0x0020, CRC(f4fa91d4) SHA1(0e0903532c8609c2d42491c2013647a42d13749a) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1979, sshot,     0,        supershot, supershot, supershot_state, empty_init, ROT0, "Model Racing", "Super Shot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

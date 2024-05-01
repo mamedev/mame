@@ -23,12 +23,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -68,13 +67,13 @@ nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, cons
 
  iNES: mapper 177
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_hengg_srich_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("hengg_srich write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("hengg_srich write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(data);
 	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -95,13 +94,13 @@ void nes_hengg_srich_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 179
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_hengg_xhzs_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("hengg_xhzs write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("hengg_xhzs write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x4100;
 
 	if (offset & 0x5000)
@@ -110,7 +109,7 @@ void nes_hengg_xhzs_device::write_l(offs_t offset, uint8_t data)
 
 void nes_hengg_xhzs_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("hengg_xhzs write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("hengg_xhzs write_h, offset: %04x, data: %02x\n", offset, data);
 
 	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }

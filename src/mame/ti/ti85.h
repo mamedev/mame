@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_TI85_H
-#define MAME_INCLUDES_TI85_H
+#ifndef MAME_TI_TI85_H
+#define MAME_TI_TI85_H
 
 #pragma once
 
@@ -259,4 +259,4 @@ private:
 	//address_space &asic;
 };
 
-#endif // MAME_INCLUDES_TI85_H
+#endif // MAME_TI_TI85_H

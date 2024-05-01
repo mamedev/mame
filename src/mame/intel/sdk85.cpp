@@ -54,6 +54,8 @@ Press 0 to restart.
 #include "sdk85.lh"
 
 
+namespace {
+
 class sdk85_state : public driver_device
 {
 public:
@@ -72,11 +74,11 @@ public:
 
 	void sdk85(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE_LINE_MEMBER(vect_intr_w);
+	void reset_w(int state);
+	void vect_intr_w(int state);
 
 private:
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	int sid_r();
 
 	void scanlines_w(u8 data);
 	void digit_w(u8 data);
@@ -112,7 +114,7 @@ void sdk85_state::machine_start()
 	save_item(NAME(m_digit));
 }
 
-WRITE_LINE_MEMBER(sdk85_state::reset_w)
+void sdk85_state::reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)
@@ -125,12 +127,12 @@ WRITE_LINE_MEMBER(sdk85_state::reset_w)
 	}
 }
 
-WRITE_LINE_MEMBER(sdk85_state::vect_intr_w)
+void sdk85_state::vect_intr_w(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(sdk85_state::sid_r)
+int sdk85_state::sid_r()
 {
 	// Actual HW has S25 switch to ground SID when using keyboard input instead of TTY RX
 	if (m_tty->get_card_device() == nullptr)
@@ -265,6 +267,9 @@ ROM_START( sdk85 )
 	ROM_SYSTEM_BIOS(1, "mastermind", "Mastermind")
 	ROMX_LOAD( "mastermind.a14", 0x0000, 0x0800, CRC(36b694ae) SHA1(4d8a5ae5d10e8f72a6e349c7eeaf1aa00c4e45e1), ROM_BIOS(1) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -108,18 +108,18 @@ static const z80_daisy_config z80_daisy_chain[] =
 //  Z80CTC
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( imi5000h_device::ctc_z0_w )
+void imi5000h_device::ctc_z0_w(int state)
 {
 	m_ctc->trg1(state);
 }
 
-WRITE_LINE_MEMBER( imi5000h_device::ctc_z1_w )
+void imi5000h_device::ctc_z1_w(int state)
 {
 	m_ctc->trg2(state);
 	m_ctc->trg3(state);
 }
 
-WRITE_LINE_MEMBER( imi5000h_device::ctc_z2_w )
+void imi5000h_device::ctc_z2_w(int state)
 {
 	//m_memory_enable = state;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);

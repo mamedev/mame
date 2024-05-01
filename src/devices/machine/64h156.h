@@ -60,9 +60,6 @@
 #pragma once
 
 #include "imagedev/floppy.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
-#include "formats/d71_dsk.h"
 
 
 
@@ -85,18 +82,18 @@ public:
 	uint8_t yb_r();
 	void yb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( test_w );
-	DECLARE_WRITE_LINE_MEMBER( accl_w );
-	DECLARE_WRITE_LINE_MEMBER( ted_w );
-	DECLARE_WRITE_LINE_MEMBER( mtr_w );
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( soe_w );
-	DECLARE_WRITE_LINE_MEMBER( atni_w );
-	DECLARE_WRITE_LINE_MEMBER( atna_w );
+	void test_w(int state);
+	void accl_w(int state);
+	void ted_w(int state);
+	void mtr_w(int state);
+	void oe_w(int state);
+	void soe_w(int state);
+	void atni_w(int state);
+	void atna_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
-	DECLARE_READ_LINE_MEMBER( byte_r ) { return checkpoint_live.byte; }
-	DECLARE_READ_LINE_MEMBER( atn_r ) { return m_atni ^ m_atna; }
+	int sync_r() { return checkpoint_live.sync; }
+	int byte_r() { return checkpoint_live.byte; }
+	int atn_r() { return m_atni ^ m_atna; }
 
 	void stp_w(int stp);
 	void ds_w(int ds);
@@ -120,28 +117,28 @@ private:
 
 	struct live_info {
 		attotime tm;
-		int state, next_state;
-		int sync;
-		int byte;
-		int ds;
-		int oe;
-		int soe;
-		int accl;
-		uint8_t accl_yb;
+		int state = 0, next_state = 0;
+		int sync = 0;
+		int byte = 0;
+		int ds = 0;
+		int oe = 0;
+		int soe = 0;
+		int accl = 0;
+		uint8_t accl_yb = 0;
 
 		attotime edge;
-		uint16_t shift_reg;
-		int cycle_counter;
-		int cell_counter;
-		int bit_counter;
-		int zero_counter;
-		int cycles_until_random_flux;
+		uint16_t shift_reg = 0;
+		int cycle_counter = 0;
+		int cell_counter = 0;
+		int bit_counter = 0;
+		int zero_counter = 0;
+		int cycles_until_random_flux = 0;
 
-		uint8_t yb;
-		uint8_t shift_reg_write;
+		uint8_t yb = 0;
+		uint8_t shift_reg_write = 0;
 		attotime write_start_time;
 		attotime write_buffer[32];
-		int write_position;
+		int write_position = 0;
 	};
 
 	devcb_write_line m_write_atn;

@@ -91,7 +91,7 @@ Smitdogg
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 namespace {
 
@@ -181,7 +181,7 @@ void pcat_nit_state::pcat_map(address_map &map)
 void pcat_nit_state::bonanza_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5428_vga_device::mem_r), FUNC(cirrus_gd5428_vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
 	map(0x000d0000, 0x000d3fff).ram().share("disk_bios");
 	map(0x000d7000, 0x000d7000).w(FUNC(pcat_nit_state::pcat_nit_rombank_w));
@@ -210,9 +210,7 @@ void pcat_nit_state::pcat_nit_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
@@ -221,9 +219,7 @@ void pcat_nit_state::bonanza_io_map(address_map &map)
 	pcat32_io_common(map);
 	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
-	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5428_vga_device::io_map));
 	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
@@ -255,7 +251,14 @@ void pcat_nit_state::pcat_nit(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	pcvideo_vga(config);
+	// TODO: map to ISA bus, pinpoint what BIOS this refers to
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+
+	vga_device &vga(VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 
 	pcat_common(config);
 
@@ -277,7 +280,14 @@ void pcat_nit_state::bonanza(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	pcvideo_cirrus_gd5428(config);
+	// TODO: map to ISA bus
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_vga_device::screen_update));
+
+	cirrus_gd5428_vga_device &vga(CIRRUS_GD5428_VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x200000);
 
 	pcat_common(config);
 	ns16450_device &uart(NS16450(config, "ns16450_0", XTAL(1'843'200)));

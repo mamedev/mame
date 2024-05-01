@@ -86,6 +86,7 @@ private:
 
 	devcb_write_line intrq_cb;
 
+	void updatebaudtimer(int ch);
 	void updateirqs();
 	void initchannel(int ch);
 	void resetchannel(int ch);

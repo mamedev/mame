@@ -8,6 +8,7 @@ $output v_color0, v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3
 
 // Autos
 uniform vec4 u_source_size;
+uniform vec4 u_inv_view_dims;
 
 // User-supplied
 uniform vec4 u_converge_red;
@@ -20,6 +21,9 @@ uniform vec4 u_radial_converge_blue;
 void main()
 {
 	gl_Position = mul(u_viewProj, vec4(a_position.xy, 0.0, 1.0));
+#if BGFX_SHADER_LANGUAGE_HLSL && BGFX_SHADER_LANGUAGE_HLSL <= 300
+	gl_Position.xy += u_inv_view_dims.xy * gl_Position.w;
+#endif
 
 	vec2 half_value = vec2(0.5, 0.5);
 

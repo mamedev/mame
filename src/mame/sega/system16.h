@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
-#ifndef MAME_INCLUDES_SYSTEM16_H
-#define MAME_INCLUDES_SYSTEM16_H
+#ifndef MAME_SEGA_SYSTEM16_H
+#define MAME_SEGA_SYSTEM16_H
 
 #pragma once
 
@@ -70,6 +70,7 @@ public:
 	void tturfbl(machine_config &config);
 	void altbeastbl(machine_config &config);
 	void system18(machine_config &config);
+	void bloxeedbl(machine_config &config);
 
 	void init_passsht();
 	void init_wb3bbl();
@@ -168,14 +169,15 @@ private:
 	void set_fg_page( int data );
 	void set_bg_page( int data );
 	void datsu_set_pages(  );
-	DECLARE_WRITE_LINE_MEMBER(tturfbl_msm5205_callback);
-	DECLARE_WRITE_LINE_MEMBER(datsu_msm5205_callback);
-	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
-	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
+	void tturfbl_msm5205_callback(int state);
+	void datsu_msm5205_callback(int state);
+	void shdancbl_msm5205_callback(int state);
+	void sound_cause_nmi(int state);
 
 	void bayrouteb1_map(address_map &map);
 	void bayrouteb2_map(address_map &map);
 	void beautyb_map(address_map &map);
+	void bloxeedbl_map(address_map &map);
 	void ddcrewbl_map(address_map &map);
 	void dduxbl_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
@@ -310,4 +312,4 @@ private:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_SYSTEM16_H
+#endif // MAME_SEGA_SYSTEM16_H

@@ -74,28 +74,6 @@ Notes:
 
 ****************************************************************************
 
-Change Log
-----------
-
-AT070403:
-
-tilemap.h,tilemap.cpp
-- added tilemap_get_transparency_data() for transparency cache manipulation
-
-video\konamiic.cpp
-- added preliminary K056832 tilemap<->linemap switching and tileline code
-
-drivers\gijoe.cpp
-- updated video settings, memory map and irq handler
-- added object blitter
-
-video\gijoe.cpp
-- completed K054157 to K056832 migration
-- added ground scroll emulation
-- fixed sprite and BG priority
-- improved shadows and layer alignment
-
-
 Known Issues
 ------------
 
@@ -105,18 +83,254 @@ Known Issues
 ***************************************************************************/
 
 #include "emu.h"
-#include "gijoe.h"
+
+#include "k053251.h"
+#include "k054156_k054157_k056832.h"
+#include "k053246_k053247_k055673.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/k054321.h"
 #include "sound/k054539.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
+namespace {
+
 #define JOE_DEBUG 0
 #define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
+
+
+class gijoe_state : public driver_device
+{
+public:
+	gijoe_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
+		m_workram(*this, "workram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k054539(*this, "k054539"),
+		m_k056832(*this, "k056832"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251"),
+		m_palette(*this, "palette"),
+		m_k054321(*this, "k054321")
+	{ }
+
+	void gijoe(machine_config &config);
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_workram;
+
+	/* video-related */
+	int         m_avac_bits[4]{};
+	int         m_avac_occupancy[4]{};
+	int         m_layer_colorbase[4]{};
+	int         m_layer_pri[4]{};
+	int         m_avac_vrc = 0;
+	int         m_sprite_colorbase = 0;
+
+	/* misc */
+	uint16_t      m_cur_control2 = 0U;
+	emu_timer   *m_dmadelay_timer = nullptr;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k054539_device> m_k054539;
+	required_device<k056832_device> m_k056832;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	required_device<palette_device> m_palette;
+	required_device<k054321_device> m_k054321;
+
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(gijoe_interrupt);
+	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	void gijoe_objdma();
+	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
+	void gijoe_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+K053246_CB_MEMBER(gijoe_state::sprite_callback)
+{
+	int pri = (*color & 0x03e0) >> 4;
+
+	if (pri <= m_layer_pri[3])
+		*priority_mask = 0;
+	else if (pri >  m_layer_pri[3] && pri <= m_layer_pri[2])
+		*priority_mask = 0xff00;
+	else if (pri >  m_layer_pri[2] && pri <= m_layer_pri[1])
+		*priority_mask = 0xff00 | 0xf0f0;
+	else if (pri >  m_layer_pri[1] && pri <= m_layer_pri[0])
+		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
+	else
+		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
+
+	*color = m_sprite_colorbase | (*color & 0x001f);
+}
+
+K056832_CB_MEMBER(gijoe_state::tile_callback)
+{
+	int tile = *code;
+
+	if (tile >= 0xf000 && tile <= 0xf4ff)
+	{
+		tile &= 0x0fff;
+		if (tile < 0x0310)
+		{
+			m_avac_occupancy[layer] |= 0x0f00;
+			tile |= m_avac_bits[0];
+		}
+		else if (tile < 0x0470)
+		{
+			m_avac_occupancy[layer] |= 0xf000;
+			tile |= m_avac_bits[1];
+		}
+		else
+		{
+			m_avac_occupancy[layer] |= 0x00f0;
+			tile |= m_avac_bits[2];
+		}
+		*code = tile;
+	}
+
+	*color = (*color >> 2 & 0x0f) | m_layer_colorbase[layer];
+}
+
+void gijoe_state::video_start()
+{
+	int i;
+
+	m_k056832->linemap_enable(1);
+
+	for (i = 0; i < 4; i++)
+	{
+		m_avac_occupancy[i] = 0;
+		m_avac_bits[i] = 0;
+		m_layer_colorbase[i] = 0;
+		m_layer_pri[i] = 0;
+	}
+
+	m_avac_vrc = 0xffff;
+
+	save_item(NAME(m_avac_vrc));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_avac_occupancy));
+	save_item(NAME(m_avac_bits));   // these could possibly be re-created at postload k056832 elements
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layer_pri));
+}
+
+uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
+	int layer[4];
+	int vrc_mode, vrc_new, colorbase_new, /*primode,*/ dirty, i;
+	int mask = 0;
+
+	// update tile offsets
+	m_k056832->read_avac(&vrc_mode, &vrc_new);
+
+	if (vrc_mode)
+	{
+		for (dirty = 0xf000; dirty; dirty >>= 4)
+			if ((m_avac_vrc & dirty) != (vrc_new & dirty))
+				mask |= dirty;
+
+		m_avac_vrc = vrc_new;
+		m_avac_bits[0] = vrc_new << 4  & 0xf000;
+		m_avac_bits[1] = vrc_new       & 0xf000;
+		m_avac_bits[2] = vrc_new << 8  & 0xf000;
+		m_avac_bits[3] = vrc_new << 12 & 0xf000;
+	}
+	else
+		m_avac_bits[3] = m_avac_bits[2] = m_avac_bits[1] = m_avac_bits[0] = 0xf000;
+
+	// update color info and refresh tilemaps
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+
+	for (i = 0; i < 4; i++)
+	{
+		dirty = 0;
+		colorbase_new = m_k053251->get_palette_index(K053251_CI[i]);
+		if (m_layer_colorbase[i] != colorbase_new)
+		{
+			m_layer_colorbase[i] = colorbase_new;
+			dirty = 1;
+		}
+		if (m_avac_occupancy[i] & mask)
+			dirty = 1;
+
+		if (dirty)
+		{
+			m_avac_occupancy[i] = 0;
+			m_k056832->mark_plane_dirty( i);
+		}
+	}
+
+	/*
+	    Layer A is supposed to be a non-scrolling status display with static X-offset.
+	    The weird thing is tilemap alignment only follows the 832 standard when 2 is
+	    written to the layer's X-scroll register otherwise the chip expects totally
+	    different alignment values.
+	*/
+	if (m_k056832->read_register(0x14) == 2)
+	{
+		m_k056832->set_layer_offs(0,  2, 0);
+		m_k056832->set_layer_offs(1,  4, 0);
+		m_k056832->set_layer_offs(2,  6, 0); // 7?
+		m_k056832->set_layer_offs(3,  8, 0);
+	}
+	else
+	{
+		m_k056832->set_layer_offs(0,  0, 0);
+		m_k056832->set_layer_offs(1,  8, 0);
+		m_k056832->set_layer_offs(2, 14, 0);
+		m_k056832->set_layer_offs(3, 16, 0); // smaller?
+	}
+
+	// seems to switch the K053251 between different priority modes, detail unknown
+	// primode = m_k053251->get_priority(k053251_device::CI1);
+
+	layer[0] = 0;
+	m_layer_pri[0] = 0; // not sure
+	layer[1] = 1;
+	m_layer_pri[1] = m_k053251->get_priority(k053251_device::CI2);
+	layer[2] = 2;
+	m_layer_pri[2] = m_k053251->get_priority(k053251_device::CI3);
+	layer[3] = 3;
+	m_layer_pri[3] = m_k053251->get_priority(k053251_device::CI4);
+
+	konami_sortlayers4(layer, m_layer_pri);
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
+
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+	return 0;
+}
 
 
 uint16_t gijoe_state::control2_r()
@@ -544,6 +758,8 @@ ROM_START( gijoea )
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(6363513c) SHA1(181cbf2bd4960740d437c714dc70bb7e64c95348) ) // sldh
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )

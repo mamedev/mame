@@ -68,11 +68,6 @@ vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconf
 void vip_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_int.resolve_safe();
-	m_write_dma_out.resolve_safe();
-	m_write_dma_in.resolve_safe();
 }
 
 
@@ -182,7 +177,7 @@ uint32_t vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 	return value;
 }
 
-READ_LINE_MEMBER(vip_expansion_slot_device::ef1_r)
+int vip_expansion_slot_device::ef1_r()
 {
 	int state = CLEAR_LINE;
 	if (m_card != nullptr)
@@ -190,7 +185,7 @@ READ_LINE_MEMBER(vip_expansion_slot_device::ef1_r)
 	return state;
 }
 
-READ_LINE_MEMBER(vip_expansion_slot_device::ef3_r)
+int vip_expansion_slot_device::ef3_r()
 {
 	int state = CLEAR_LINE;
 	if (m_card != nullptr)
@@ -198,7 +193,7 @@ READ_LINE_MEMBER(vip_expansion_slot_device::ef3_r)
 	return state;
 }
 
-READ_LINE_MEMBER(vip_expansion_slot_device::ef4_r)
+int vip_expansion_slot_device::ef4_r()
 {
 	int state = CLEAR_LINE;
 	if (m_card != nullptr)
@@ -212,19 +207,19 @@ void vip_expansion_slot_device::sc_w(offs_t offset, uint8_t data)
 		m_card->vip_sc_w(offset, data);
 }
 
-WRITE_LINE_MEMBER(vip_expansion_slot_device::q_w)
+void vip_expansion_slot_device::q_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->vip_q_w(state);
 }
 
-WRITE_LINE_MEMBER(vip_expansion_slot_device::tpb_w)
+void vip_expansion_slot_device::tpb_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->vip_tpb_w(state);
 }
 
-WRITE_LINE_MEMBER(vip_expansion_slot_device::run_w)
+void vip_expansion_slot_device::run_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->vip_run_w(state);

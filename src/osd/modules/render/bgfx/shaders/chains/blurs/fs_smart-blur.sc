@@ -39,26 +39,26 @@ uniform vec4 SB_THRESHOLD;
 
 bool eq(vec3 c1, vec3 c2)
 {
-    vec3 df = abs(c1 - c2);
-    return df.r < SB_THRESHOLD.r && df.g < SB_THRESHOLD.g && df.b < SB_THRESHOLD.b;
+	vec3 df = abs(c1 - c2);
+	return df.r < SB_THRESHOLD.r && df.g < SB_THRESHOLD.g && df.b < SB_THRESHOLD.b;
 }
 
 void main()
 {
-    vec3 A = texture2D(s_p, v_texcoord1.xw).xyz;
-    vec3 B = texture2D(s_p, v_texcoord1.yw).xyz;
-    vec3 C = texture2D(s_p, v_texcoord1.zw).xyz;
-    vec3 D = texture2D(s_p, v_texcoord2.xw).xyz;
-    vec3 E = texture2D(s_p, v_texcoord2.yw).xyz;
-    vec3 F = texture2D(s_p, v_texcoord2.zw).xyz;
-    vec3 G = texture2D(s_p, v_texcoord3.xw).xyz;
-    vec3 H = texture2D(s_p, v_texcoord3.yw).xyz;
-    vec3 I = texture2D(s_p, v_texcoord3.zw).xyz;
+	vec3 A = texture2D(s_p, v_texcoord1.xw).xyz;
+	vec3 B = texture2D(s_p, v_texcoord1.yw).xyz;
+	vec3 C = texture2D(s_p, v_texcoord1.zw).xyz;
+	vec3 D = texture2D(s_p, v_texcoord2.xw).xyz;
+	vec3 E = texture2D(s_p, v_texcoord2.yw).xyz;
+	vec3 F = texture2D(s_p, v_texcoord2.zw).xyz;
+	vec3 G = texture2D(s_p, v_texcoord3.xw).xyz;
+	vec3 H = texture2D(s_p, v_texcoord3.yw).xyz;
+	vec3 I = texture2D(s_p, v_texcoord3.zw).xyz;
 
-    if (eq(E,F) && eq(E,H) && eq(E,I) && eq(E,B) && eq(E,C) && eq(E,A) && eq(E,D) && eq(E,G))
-    {
-        E = (A + B + C + D + E + F + G + H + I) / 9.0;
-    }
+	if (eq(E,F) && eq(E,H) && eq(E,I) && eq(E,B) && eq(E,C) && eq(E,A) && eq(E,D) && eq(E,G))
+	{
+		E = (A + B + C + D + E + F + G + H + I) / 9.0;
+	}
 
-    gl_FragColor = vec4(E, 1.0);
+	gl_FragColor = vec4(E, 1.0);
 }

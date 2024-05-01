@@ -193,10 +193,11 @@ void kc82_device::mmu_w(offs_t offset, u8 data)
 //  physical addresses
 //-------------------------------------------------
 
-bool kc82_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool kc82_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	if (spacenum == AS_PROGRAM || spacenum == AS_OPCODES)
 		address = (address + m_mmu_base[(address & 0xfc00) >> 10]) & 0xfffff;
+	target_space = &space(spacenum);
 	return true;
 }
 
@@ -205,7 +206,7 @@ bool kc82_device::memory_translate(int spacenum, int intention, offs_t &address)
 //  rm - read one byte from memory
 //-------------------------------------------------
 
-u8 kc82_device::rm(u16 addr)
+u8 kc82_device::data_read(u16 addr)
 {
 	return m_data.read_byte(addr + m_mmu_base[addr >> 10]);
 }
@@ -215,7 +216,7 @@ u8 kc82_device::rm(u16 addr)
 //  wm - write one byte to memory
 //-------------------------------------------------
 
-void kc82_device::wm(u16 addr, u8 value)
+void kc82_device::data_write(u16 addr, u8 value)
 {
 	m_data.write_byte(addr + m_mmu_base[addr >> 10], value);
 }
@@ -225,10 +226,9 @@ void kc82_device::wm(u16 addr, u8 value)
 //  rop - read opcode
 //-------------------------------------------------
 
-u8 kc82_device::rop()
+u8 kc82_device::opcode_read()
 {
 	u32 pc = m_pc.w.l + m_mmu_base[m_pc.b.h >> 2];
-	m_pc.w.l++;
 	// no refresh
 	return m_opcodes.read_byte(pc);
 }
@@ -238,21 +238,8 @@ u8 kc82_device::rop()
 //  arg - read 8-bit argument
 //-------------------------------------------------
 
-u8 kc82_device::arg()
+u8 kc82_device::arg_read()
 {
 	u32 pc = m_pc.w.l + m_mmu_base[m_pc.b.h >> 2];
-	m_pc.w.l++;
 	return m_args.read_byte(pc);
-}
-
-
-//-------------------------------------------------
-//  arg16 - read 16-bit argument
-//-------------------------------------------------
-
-u16 kc82_device::arg16()
-{
-	u16 d16 = arg();
-	d16 |= u16(arg()) << 8;
-	return d16;
 }

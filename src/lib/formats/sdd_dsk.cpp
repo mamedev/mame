@@ -2,7 +2,7 @@
 // copyright-holders:MetalliC
 /*********************************************************************
 
-    formats/sdd_dsk.c
+    formats/sdd_dsk.cpp
 
     Speccy-DOS SDD disk images
 
@@ -17,17 +17,17 @@ sdd_format::sdd_format() : wd177x_format(formats)
 {
 }
 
-const char *sdd_format::name() const
+const char *sdd_format::name() const noexcept
 {
 	return "sdd";
 }
 
-const char *sdd_format::description() const
+const char *sdd_format::description() const noexcept
 {
 	return "SDD floppy disk image";
 }
 
-const char *sdd_format::extensions() const
+const char *sdd_format::extensions() const noexcept
 {
 	return "sdd";
 }

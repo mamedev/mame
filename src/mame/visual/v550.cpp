@@ -26,6 +26,9 @@
 #include "video/upd7220.h"
 #include "screen.h"
 
+
+namespace {
+
 class v550_state : public driver_device
 {
 public:
@@ -161,5 +164,8 @@ ROM_START( v550 )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("e242-085_r03_u97.bin", 0x0000, 0x1000, CRC(8a491cee) SHA1(d8a9546a7dd2ffc0a5e54524ee16068dde56975c))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_IS_SKELETON )

@@ -68,7 +68,7 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
 
 protected:
 	// device-level overrides

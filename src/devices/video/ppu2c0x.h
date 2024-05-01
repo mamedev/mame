@@ -127,8 +127,6 @@ public:
 
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
-	// some bootleg / clone hardware appears to ignore this
-	void use_sprite_write_limitation_disable() { m_use_sprite_write_limitation = false; }
 	uint16_t get_vram_dest();
 	void set_vram_dest(uint16_t dest);
 
@@ -244,8 +242,6 @@ private:
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
 	emu_timer                   *m_nmi_timer;           /* NMI timer */
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
-
-	bool m_use_sprite_write_limitation;
 };
 
 class ppu2c0x_rgb_device : public ppu2c0x_device {

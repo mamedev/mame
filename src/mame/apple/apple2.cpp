@@ -59,7 +59,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "formats/ap2_dsk.h"
+#include "utf8.h"
 
 
 namespace {
@@ -100,7 +100,7 @@ public:
 	required_device<timer_device> m_scantimer;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
-	required_device<a2_video_device> m_video;
+	required_device<a2_video_device_composite> m_video;
 	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
 	required_device<apple2_gameio_device> m_gameio;
@@ -118,16 +118,6 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	template <bool invert, bool flip>
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	u32 screen_update_ff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, false>(screen, bitmap, cliprect); }
-	u32 screen_update_ft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, true>(screen, bitmap, cliprect); }
-	u32 screen_update_tf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, false>(screen, bitmap, cliprect); }
-	u32 screen_update_tt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, true>(screen, bitmap, cliprect); }
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
@@ -152,13 +142,13 @@ public:
 	void c800_w(offs_t offset, u8 data);
 	u8 inh_r(offs_t offset);
 	void inh_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 
 	void apple2_common(machine_config &config);
 	void apple2jp(machine_config &config);
@@ -187,6 +177,8 @@ private:
 
 	int m_inh_bank;
 
+	bool m_reset_latch;
+
 	double m_x_calibration, m_y_calibration;
 
 	device_a2bus_card_interface *m_slotdevice[8];
@@ -209,18 +201,18 @@ offs_t apple2_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util
 	return m_a2common->dasm_override(stream, pc, opcodes, params);
 }
 
-WRITE_LINE_MEMBER(apple2_state::a2bus_irq_w)
+void apple2_state::a2bus_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(apple2_state::a2bus_nmi_w)
+void apple2_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // This code makes a ton of assumptions because we can guarantee a pre-IIe machine!
-WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
+void apple2_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -302,6 +294,7 @@ void apple2_state::machine_start()
 	}
 
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
+	m_reset_latch = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -317,12 +310,11 @@ void apple2_state::machine_start()
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
 	save_item(NAME(m_anykeydown));
+	save_item(NAME(m_reset_latch));
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
+	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 }
 
 void apple2_state::machine_reset()
@@ -330,6 +322,13 @@ void apple2_state::machine_reset()
 	m_inh_slot = 0;
 	m_cnxx_slot = -1;
 	m_anykeydown = false;
+
+	// reset the cards
+	m_a2bus->reset_bus();
+	// reset the 6502 now as a card may have pulled /INH on the reset vector
+	logerror("machine_reset\n");
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -340,158 +339,53 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	// update the video system's shadow copy of the system config at the end of the frame
 	if (scanline == 192)
 	{
-		m_video->m_sysconfig = m_sysconfig->read();
-
 		// check reset
-		if (m_resetdip.found()) // if reset DIP is present, use it
+		if ((m_resetdip.found()) && (m_resetdip->read() & 1)) // if reset DIP is present, use it
 		{
-			if (m_resetdip->read() & 1)
-			{       // CTRL-RESET
-				if ((m_kbspecial->read() & 0x88) == 0x88)
+			// CTRL-RESET
+			if ((m_kbspecial->read() & 0x88) == 0x88)
+			{
+				if (!m_reset_latch)
 				{
-					m_maincpu->reset();
+					m_reset_latch = true;
+					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				}
 			}
-			else    // plain RESET
+			else
 			{
-				if (m_kbspecial->read() & 0x80)
+				if (m_reset_latch)
 				{
-					m_maincpu->reset();
+					m_reset_latch = false;
+					// allow cards to see reset
+					m_a2bus->reset_bus();
+					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				}
 			}
 		}
-		else    // no DIP, so always plain RESET
+		else    // plain RESET
 		{
 			if (m_kbspecial->read() & 0x80)
 			{
-				m_maincpu->reset();
-			}
-		}
-	}
-}
-
-template <bool invert, bool flip>
-u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// always update the flash timer here so it's smooth regardless of mode switches
-	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
-
-	if (m_video->m_graphics)
-	{
-		if (m_video->m_hires)
-		{
-			if (m_video->m_mix)
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
+				if (!m_reset_latch)
+				{
+					m_reset_latch = true;
+					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				}
 			}
 			else
 			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-		else    // lo-res
-		{
-			if (m_video->m_mix)
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
+				if (m_reset_latch)
+				{
+					m_reset_latch = false;
+					// allow cards to see reset
+					m_a2bus->reset_bus();
+					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				}
 			}
 		}
 	}
-	else
-	{
-		m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 0, 191);
-	}
-
-	return 0;
-}
-
-u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// always update the flash timer here so it's smooth regardless of mode switches
-	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
-
-	if (m_video->m_graphics)
-	{
-		if (m_video->m_hires)
-		{
-			if (m_video->m_mix)
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-		else    // lo-res
-		{
-			if (m_video->m_mix)
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-	}
-	else
-	{
-		m_video->text_update_jplus(screen, bitmap, cliprect, 0, 191);
-	}
-
-	return 0;
-}
-
-u32 apple2_state::screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// always update the flash timer here so it's smooth regardless of mode switches
-	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
-
-	if (m_video->m_graphics)
-	{
-		if (m_video->m_hires)
-		{
-			if (m_video->m_mix)
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-		else // lo-res
-		{
-			if (m_video->m_mix)
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-	}
-	else
-	{
-		m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
-	}
-
-	return 0;
 }
 
 /***************************************************************************
@@ -809,9 +703,9 @@ u8 apple2_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
-	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_video->m_page2 ? 1 : 0;
+	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
+	Mixed    = m_video->get_mix() ? 1 : 0;
+	Page2    = m_video->get_page2() ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard
@@ -942,7 +836,7 @@ void apple2_state::apple2_map(address_map &map)
     KEYBOARD
 ***************************************************************************/
 
-READ_LINE_MEMBER(apple2_state::ay3600_shift_r)
+int apple2_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -953,7 +847,7 @@ READ_LINE_MEMBER(apple2_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple2_state::ay3600_control_r)
+int apple2_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -1018,7 +912,7 @@ static const u8 a2_key_remap[0x32][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
-WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
+void apple2_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -1043,7 +937,7 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2_state::ay3600_ako_w)
+void apple2_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 }
@@ -1066,12 +960,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::ay3600_repeat)
 
 INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-
 	PORT_CONFNAME(0x04, 0x04, "Shift key mod")  // default to installed
 	PORT_CONFSETTING(0x00, "Not present")
 	PORT_CONFSETTING(0x04, "Installed")
@@ -1243,12 +1131,12 @@ void apple2_state::apple2_common(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tt));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
@@ -1340,25 +1228,25 @@ void apple2_state::space84(machine_config &config)
 void apple2_state::apple2jp(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_jp));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>)));
 }
 
 void apple2_state::dodo(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tf));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, false>)));
 }
 
 void apple2_state::albert(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ft));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, true>)));
 }
 
 void apple2_state::ivelultr(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ultr));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>)));
 }
 
 #if 0
@@ -1398,7 +1286,7 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROMX_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "autostart", "Autostart Monitor")
 	ROMX_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098), ROM_BIOS(1)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Was sometimes mounted on Language card; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
-	ROM_END
+ROM_END
 
 ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) basic in rom; optional card with monitor and integer basic was possible but isn't yet supported */
 	ROM_REGION(0x0800,"gfx1",0)

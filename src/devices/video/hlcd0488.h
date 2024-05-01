@@ -47,8 +47,8 @@ public:
 	// configuration helpers
 	auto write_cols() { return m_write_cols.bind(); } // COL pins in data, ROW pins in offset
 
-	DECLARE_WRITE_LINE_MEMBER(latch_pulse_w);
-	DECLARE_WRITE_LINE_MEMBER(data_clk_w);
+	void latch_pulse_w(int state);
+	void data_clk_w(int state);
 	void data_w(u8 data);
 
 protected:

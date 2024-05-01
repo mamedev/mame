@@ -69,7 +69,11 @@
 */
 
 #include "emu.h"
+
 #include "coleco.h"
+
+#include "bus/coleco/expansion/expansion.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -160,7 +164,7 @@ void coleco_state::coleco_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x63ff).ram().mirror(0x1c00);
-	map(0x8000, 0xffff).rom();
+	map(0x8000, 0xffff).rw(FUNC(coleco_state::cart_r), FUNC(coleco_state::cart_w));
 }
 
 void bit90_state::bit90_map(address_map &map)
@@ -169,7 +173,7 @@ void bit90_state::bit90_map(address_map &map)
 	map(0x2000, 0x3fff).rom();
 	map(0x4000, 0x5fff).rom();  // Decoded through pin 5 of the Bit90 expansion port
 	map(0x6000, 0x67ff).ram().mirror(0x1800);
-	map(0x8000, 0xffff).ram();
+	map(0x8000, 0xffff).rw(FUNC(coleco_state::cart_r), FUNC(coleco_state::cart_w));
 }
 
 void coleco_state::coleco_io_map(address_map &map)
@@ -346,7 +350,7 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
+void coleco_state::coleco_vdp_interrupt(int state)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)
@@ -412,7 +416,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 
 uint8_t coleco_state::cart_r(offs_t offset)
 {
-	return m_cart->bd_r(offset & 0x7fff, 0, 0, 0, 0, 0);
+	return m_cart->read(offset, 0, 0, 0, 0);
+}
+
+void coleco_state::cart_w(offs_t offset, uint8_t data)
+{
+	m_cart->write(offset, data, 0, 0, 0, 0);
 }
 
 uint8_t coleco_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1)
@@ -520,9 +529,6 @@ void coleco_state::machine_start()
 		m_joy_analog_state[port] = 0;
 	}
 
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*this, FUNC(coleco_state::cart_r)));
-
 	save_item(NAME(m_joy_mode));
 	save_item(NAME(m_last_nmi_state));
 	save_item(NAME(m_joy_irq_state));
@@ -549,15 +555,15 @@ void bit90_state::machine_reset()
 	m_bank->set_entry(0);
 }
 
-//static image_verify_result coleco_cart_verify(const uint8_t *cartdata, size_t size)
+//static std::error_condition coleco_cart_verify(const uint8_t *cartdata, size_t size)
 //{
-//  int retval = image_verify_result::FAIL;
+//  std::error_condition retval = image_error::INVALIDIMAGE;
 //
 //  /* Verify the file is in Colecovision format */
 //  if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
-//      retval = image_verify_result::PASS;
+//      retval = std::error_condition();
 //  if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
-//      retval = image_verify_result::PASS;
+//      retval = std::error_condition();
 //
 //  return retval;
 //}
@@ -591,8 +597,16 @@ void coleco_state::coleco(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "homebrew_list").set_original("coleco_homebrew");
 
 	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_state::paddle_update_callback), attotime::from_msec(20));
+
+	coleco_expansion_device &exp(COLECO_EXPANSION(config, "exp", nullptr));
+	exp.set_program_space(m_maincpu, AS_PROGRAM);
+	exp.set_io_space(m_maincpu, AS_IO);
+	exp.int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // TODO: Merge with other IRQs?
+	exp.nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	exp.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void coleco_state::colecop(machine_config &config)
@@ -632,6 +646,7 @@ void bit90_state::bit90(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "homebrew_list").set_original("coleco_homebrew");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K,16K");
@@ -642,6 +657,8 @@ void bit90_state::bit90(machine_config &config)
 void coleco_state::czz50(machine_config &config)
 {
 	coleco(config);
+
+	config.device_remove("exp"); // this system has a different expansion port
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::czz50_map); // note: cpu speed unverified, assume it's the same as ColecoVision
@@ -663,11 +680,7 @@ void coleco_state::dina(machine_config &config)
 
 ROM_START (coleco)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "original", "Original" )
-	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "thick", "Thick characters" )
-	// differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
-	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(1) )
+	ROM_LOAD( "313_10031-4005_73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
 ROM_END
 
 /*  ONYX (Prototype)

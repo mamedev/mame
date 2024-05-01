@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/**********************************************************************
+/*******************************************************************************
 
     Mephisto Modular Display Module (1st version)
 
-*********************************************************************/
+*******************************************************************************/
 
-#ifndef MAME_VIDEO_MMDISPLAY1_H
-#define MAME_VIDEO_MMDISPLAY1_H
+#ifndef MAME_HEGENERGLASER_MMDISPLAY1_H
+#define MAME_HEGENERGLASER_MMDISPLAY1_H
 
 #pragma once
 
@@ -21,6 +21,7 @@ public:
 	auto output_digit() { return m_output_digit.bind(); }
 
 	void strobe_w(int state);
+	int strobe_r() { return m_strobe; }
 	void data_w(u8 data);
 
 protected:
@@ -32,14 +33,14 @@ private:
 	output_finder<4> m_digits;
 	devcb_write8 m_output_digit;
 
-	void update_lcd();
+	int m_strobe;
+	u8 m_digit_idx;
+	u8 m_digit_data[4];
 
-	int m_strobe = 0;
-	u8 m_digit_idx = 0;
-	u8 m_digit_data[4] = { 0, 0, 0, 0 };
+	void update_lcd();
 };
 
 
 DECLARE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE1, mephisto_display1_device)
 
-#endif // MAME_VIDEO_MMDISPLAY1_H
+#endif // MAME_HEGENERGLASER_MMDISPLAY1_H

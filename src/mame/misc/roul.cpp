@@ -74,6 +74,8 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "roul.lh"
 
 
+namespace {
+
 class roul_state : public driver_device
 {
 public:
@@ -355,5 +357,8 @@ ROM_START(roul)
 	ROM_LOAD( "roul.u53",   0x0000, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
 	ROM_LOAD( "roul.u38",   0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1990, roul, 0, roul, roul, roul_state, empty_init, ROT0, "bootleg", "Super Lucky Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_roul )

@@ -11,31 +11,42 @@
 
 #pragma once
 
+#include "machine/mc88200.h"
 #include "softfloat3/source/include/softfloat.h"
 
 class mc88100_device : public cpu_device
 {
 public:
 	// construction/destruction
-	mc88100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc88100_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	template <typename T> void set_cmmu_d(T &&tag) { m_cmmu_d.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cmmu_i(T &&tag) { m_cmmu_i.set_tag(std::forward<T>(tag)); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	void execute(u32 const inst);
 	void exception(unsigned vector, bool const trap = false);
+
+	// memory helpers
+	void fetch(u32 &address, u32 &inst);
+	template <typename T, bool Usr = false> void ld(u32 address, unsigned const reg);
+	template <typename T, bool Usr = false> void st(u32 address, unsigned const reg);
+	template <typename T, bool Usr = false> void xmem(u32 address, unsigned const reg);
 
 	// integer helpers
 	void set_cr(unsigned const cr, u32 const data);
@@ -53,8 +64,11 @@ private:
 	// address spaces
 	address_space_config m_code_config;
 	address_space_config m_data_config;
-	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_inst_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_inst_space;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_data_space;
+
+	optional_device<mc88200_device> m_cmmu_d;
+	optional_device<mc88200_device> m_cmmu_i;
 
 	// register storage
 	u32 m_xip; // execute instruction pointer

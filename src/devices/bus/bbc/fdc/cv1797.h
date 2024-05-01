@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-
 #ifndef MAME_BUS_BBC_FDC_CV1797_H
 #define MAME_BUS_BBC_FDC_CV1797_H
 
@@ -15,8 +14,6 @@
 #include "fdc.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
-#include "formats/fsd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -44,8 +41,8 @@ protected:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_sso_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_sso_w(int state);
+	void fdc_hld_w(int state);
 
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppies;

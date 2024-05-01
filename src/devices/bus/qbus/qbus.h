@@ -13,6 +13,9 @@
 
 #include "machine/z80daisy.h"
 
+#include <functional>
+#include <vector>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -25,12 +28,9 @@ class qbus_device;
 class device_qbus_card_interface : public device_interface
 {
 	friend class qbus_device;
-	template <class ElementType> friend class simple_list;
 
 public:
-	device_qbus_card_interface *next() const { return m_next; }
-
-	// device_qbus_card_interface overrides
+	// Q-Bus interface
 	virtual void biaki_w(int state) { }
 	virtual void bdmgi_w(int state) { }
 
@@ -42,10 +42,7 @@ protected:
 	virtual int z80daisy_irq_ack() { return -1; }
 	virtual void z80daisy_irq_reti() { }
 
-	qbus_device  *m_bus;
-
-private:
-	device_qbus_card_interface *m_next;
+	qbus_device *m_bus;
 };
 
 
@@ -67,41 +64,36 @@ public:
 
 	qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	~qbus_device() { m_device_list.detach_all(); }
+	~qbus_device();
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 
-	virtual space_config_vector memory_space_config() const override
-	{
-		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config)
-		};
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	auto birq4() { return m_out_birq4_cb.bind(); }
 	auto birq5() { return m_out_birq6_cb.bind(); }
 	auto birq6() { return m_out_birq6_cb.bind(); }
 	auto birq7() { return m_out_birq7_cb.bind(); }
 
-	void add_card(device_qbus_card_interface *card);
+	void add_card(device_qbus_card_interface &card);
 	void install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask=0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER(birq4_w) { m_out_birq4_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(birq5_w) { m_out_birq5_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(birq6_w) { m_out_birq6_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(birq7_w) { m_out_birq7_cb(state); }
+	void birq4_w(int state) { m_out_birq4_cb(state); }
+	void birq5_w(int state) { m_out_birq5_cb(state); }
+	void birq6_w(int state) { m_out_birq6_cb(state); }
+	void birq7_w(int state) { m_out_birq7_cb(state); }
 
-	DECLARE_WRITE_LINE_MEMBER(bdmr_w) { m_out_bdmr_cb(state); }
+	void bdmr_w(int state) { m_out_bdmr_cb(state); }
 
 	const address_space_config m_program_config;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_z80daisy_interface overrides
+	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
@@ -110,13 +102,15 @@ protected:
 	required_address_space m_space;
 
 private:
+	using card_vector = std::vector<std::reference_wrapper<device_qbus_card_interface> >;
+
 	devcb_write_line m_out_birq4_cb;
 	devcb_write_line m_out_birq5_cb;
 	devcb_write_line m_out_birq6_cb;
 	devcb_write_line m_out_birq7_cb;
 	devcb_write_line m_out_bdmr_cb;
 
-	simple_list<device_qbus_card_interface> m_device_list;
+	card_vector m_device_list;
 };
 
 
@@ -138,11 +132,11 @@ public:
 	qbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
-	DECLARE_WRITE_LINE_MEMBER( biaki_w ) { if (m_card) m_card->biaki_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( bdmgi_w ) { if (m_card) m_card->bdmgi_w(state); }
+	void biaki_w(int state) { if (m_card) m_card->biaki_w(state); }
+	void bdmgi_w(int state) { if (m_card) m_card->bdmgi_w(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 

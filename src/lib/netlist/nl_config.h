@@ -134,7 +134,7 @@ namespace netlist
 		/// brief default minimum alignment of mempool_arena
 		///
 		/// 256 is the best compromise between logic applications like MAME
-		/// TTL games (e.g. pong) and analog applications like e.g. kidnikik
+		/// TTL games (e.g. pong) and analog applications like e.g. kidniki
 		/// sound.
 		///
 		/// Best performance for pong is achieved with a value of 16, but this
@@ -178,7 +178,7 @@ namespace netlist
 		///  |  63  | 1,000,000,000,000 |     9,223,372 |     107|   0.3 |
 		///
 		using INTERNAL_RES = std::integral_constant<long long int,
-			10'000'000'000LL>; // NOLINT
+													10'000'000'000LL>; // NOLINT
 
 		/// \brief Recommended clock to be used
 		///
@@ -187,7 +187,7 @@ namespace netlist
 		/// contains code illustrating how to deal with remainders if \ref
 		/// INTERNAL_RES is bigger than NETLIST_CLOCK.
 		using DEFAULT_CLOCK = std::integral_constant<int,
-			1'000'000'000>; // NOLINT
+													 1'000'000'000>; // NOLINT
 
 		/// \brief Default logic family
 		///
@@ -196,27 +196,27 @@ namespace netlist
 		/// \brief Maximum queue size
 		///
 		using max_queue_size = std::integral_constant<std::size_t,
-			1024>; // NOLINT
+													  1024>; // NOLINT
 
 		/// \brief Maximum queue size for solvers
 		///
 		using max_solver_queue_size = std::integral_constant<std::size_t,
-			512>; // NOLINT
+															 512>; // NOLINT
 
 		/// \brief Support float type for matrix calculations.
 		///
 		/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
-		using use_float_matrix = std::integral_constant<bool,
-			NL_USE_ACADEMIC_SOLVERS>;
+		using use_float_matrix = std::integral_constant<
+			bool, NL_USE_ACADEMIC_SOLVERS>;
 
 		/// \brief Support long double type for matrix calculations.
 		///
 		/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
-		using use_long_double_matrix = std::integral_constant<bool,
-			NL_USE_ACADEMIC_SOLVERS>;
+		using use_long_double_matrix = std::integral_constant<
+			bool, NL_USE_ACADEMIC_SOLVERS>;
 
 		using use_float128_matrix = std::integral_constant<bool,
-			NL_USE_FLOAT128>;
+														   NL_USE_FLOAT128>;
 
 		/// \brief  Floating point types used
 		///
@@ -242,7 +242,7 @@ namespace netlist
 		/// the default approach. It is ~20% slower.
 		///
 		using use_copy_instead_of_reference = std::integral_constant<bool,
-			false>;
+																	 false>;
 
 		/// \brief Avoid unnecessary queue pushes
 		///
@@ -415,17 +415,5 @@ namespace netlist
 	};
 #endif
 } // namespace netlist
-
-//============================================================
-//  Asserts
-//============================================================
-
-#define nl_assert(x)                                                           \
-	do                                                                         \
-	{                                                                          \
-		if (NL_DEBUG)                                                          \
-			passert_always(x);                                                 \
-	} while (0)
-#define nl_assert_always(x, msg) passert_always_msg(x, msg)
 
 #endif // NLCONFIG_H_

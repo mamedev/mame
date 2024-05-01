@@ -61,7 +61,7 @@ uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitma
 			if((m_spriteram[count+3] & 0xff) == 0xff)
 				return 0;
 
-			uint16 tile = m_spriteram[count];
+			uint16_t tile = m_spriteram[count];
 			int y = (511 - 14) - (m_spriteram[count+1] & 0x1ff);
 			int x = (m_spriteram[count+2] >> 7) - 7;
 			int color = (m_spriteram[count+3] >> 8) & 7;

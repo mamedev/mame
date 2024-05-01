@@ -124,6 +124,9 @@
 #include "machine/eepromser.h"
 #include "screen.h"
 
+
+namespace {
+
 #define BILINEAR 1
 
 struct rollext_polydata
@@ -794,6 +797,8 @@ ROM_START(rollext)
 	ROM_LOAD32_BYTE("roe.ic58", 0x000002, 0x800000, CRC(67ad4561) SHA1(56f41b4ebd827fec49902f377c5ed054c02d9e6c))
 	ROM_LOAD32_BYTE("roe.ic60", 0x000003, 0x800000, CRC(a64524af) SHA1(31bef17656ab025f90cd222d3d6d0cb62dee29ee))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1999, rollext, 0, rollext, rollext, rollext_state, init_rollext, ROT0, "Gaelco (Namco America license)", "ROLLing eX.tre.me (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

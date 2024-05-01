@@ -160,7 +160,6 @@ public:
 	void com_delay_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t com_delay_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);
 
 	void psxcpu_internal_map(address_map &map);
@@ -310,7 +309,7 @@ protected:
 	devcb_read8 m_cd_read_handler;
 	devcb_write8 m_cd_write_handler;
 	required_device<ram_device> m_ram;
-	memory_region *m_rom;
+	required_memory_region m_rom;
 	bool m_disable_rom_berr;
 
 private:

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 
 
 class spg290_cdservo_device : public device_t
@@ -37,7 +37,7 @@ protected:
 private:
 	void change_status();
 	void add_qsub(int sector, uint8_t addrctrl, uint8_t track, uint8_t index, uint32_t rel_msf, uint32_t abs_msf, uint16_t crc16=0);
-	void generate_qsub(cdrom_file *cdrom);
+	void generate_qsub();
 	void servo_cmd_r();
 	void servo_cmd_w();
 

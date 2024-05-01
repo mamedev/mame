@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver, Bernd Wiebelt, Allard van der Bas
 
-#ifndef MAME_INCLUDES_BWIDOW_H
-#define MAME_INCLUDES_BWIDOW_H
+#ifndef MAME_ATARI_BWIDOW_H
+#define MAME_ATARI_BWIDOW_H
 
 #include "video/avgdvg.h"
 #include "machine/er2055.h"
@@ -34,7 +34,7 @@ public:
 	void bwidow_audio(machine_config &config);
 	void gravitar_audio(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	int clock_r();
 
 protected:
 	uint8_t spacduel_IN3_r(offs_t offset);
@@ -64,4 +64,4 @@ protected:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_BWIDOW_H
+#endif // MAME_ATARI_BWIDOW_H

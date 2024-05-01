@@ -65,13 +65,6 @@ cpc_expansion_slot_device::~cpc_expansion_slot_device()
 void cpc_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_reset_cb.resolve_safe();
-	m_out_romdis_cb.resolve_safe();
-	m_out_rom_select.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -92,8 +85,8 @@ void cpc_expansion_slot_device::device_config_complete()
 }
 
 
-WRITE_LINE_MEMBER( cpc_expansion_slot_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( cpc_expansion_slot_device::nmi_w ) { m_out_nmi_cb(state); }
-WRITE_LINE_MEMBER( cpc_expansion_slot_device::reset_w ) { m_out_reset_cb(state); }
-WRITE_LINE_MEMBER( cpc_expansion_slot_device::romdis_w ) { m_out_romdis_cb(state); }
+void cpc_expansion_slot_device::irq_w(int state) { m_out_irq_cb(state); }
+void cpc_expansion_slot_device::nmi_w(int state) { m_out_nmi_cb(state); }
+void cpc_expansion_slot_device::reset_w(int state) { m_out_reset_cb(state); }
+void cpc_expansion_slot_device::romdis_w(int state) { m_out_romdis_cb(state); }
 void cpc_expansion_slot_device::rom_select(uint8_t data) { m_out_rom_select(data); }

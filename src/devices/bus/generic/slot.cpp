@@ -95,7 +95,7 @@ void device_generic_cart_interface::rom_alloc(u32 size, int width, endianness_t 
 	std::string fulltag(tag);
 	fulltag.append(GENERIC_ROM_REGION_TAG);
 	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
-	m_rom = device().machine().memory().region_alloc(fulltag.c_str(), size, width, endian)->base();
+	m_rom = device().machine().memory().region_alloc(fulltag, size, width, endian)->base();
 	m_rom_size = size;
 }
 
@@ -148,6 +148,14 @@ generic_slot_device::~generic_slot_device()
 {
 }
 
+generic_socket_device::~generic_socket_device()
+{
+}
+
+generic_cartslot_device::~generic_cartslot_device()
+{
+}
+
 void generic_slot_device::device_start()
 {
 	m_cart = get_card_device();
@@ -160,24 +168,25 @@ void generic_slot_device::device_start()
  call load
  -------------------------------------------------*/
 
-image_init_result generic_slot_device::call_load()
+std::pair<std::error_condition, std::string> generic_slot_device::call_load()
 {
-	if (m_cart)
+	if (!m_cart)
 	{
-		if (!m_device_image_load.isnull())
-			return m_device_image_load(*this);
-		else
-		{
-			u32 len = common_get_size("rom");
-
-			rom_alloc(len, m_width, m_endianness);
-			common_load_rom(get_rom_base(), len, "rom");
-
-			return image_init_result::PASS;
-		}
+		return std::make_pair(std::error_condition(), std::string());
 	}
+	else if (!m_device_image_load.isnull())
+	{
+		return m_device_image_load(*this);
+	}
+	else
+	{
+		u32 const len = common_get_size("rom");
 
-	return image_init_result::PASS;
+		rom_alloc(len, m_width, m_endianness);
+		common_load_rom(get_rom_base(), len, "rom");
+
+		return std::make_pair(std::error_condition(), std::string());
+	}
 }
 
 

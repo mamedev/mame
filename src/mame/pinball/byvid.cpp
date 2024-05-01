@@ -157,12 +157,12 @@ private:
 	void u11_a_w(u8 data);
 	u8 u11_b_r();
 	void u11_b_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(u7_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u7_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	void u7_ca2_w(int state);
+	void u10_ca2_w(int state);
+	void u11_ca2_w(int state);
+	void u7_cb2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void granny_crtc_w(offs_t offset, u8 data);
@@ -558,22 +558,22 @@ void by133_state::sound_data_w(u8 data)
 	m_vid_to_mpu = data;
 }
 
-WRITE_LINE_MEMBER( by133_state::u7_ca2_w )
+void by133_state::u7_ca2_w(int state)
 {
 	// comms out
 }
 
-WRITE_LINE_MEMBER( by133_state::u10_ca2_w )
+void by133_state::u10_ca2_w(int state)
 {
 	// enable digital display
 }
 
-WRITE_LINE_MEMBER( by133_state::u11_ca2_w )
+void by133_state::u11_ca2_w(int state)
 {
 	// green led
 }
 
-WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
+void by133_state::u7_cb2_w(int state)
 {
 	// red led
 	m_beep->set_clock(950);
@@ -581,13 +581,13 @@ WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 	m_sound_int_handler(state);
 }
 
-WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
+void by133_state::u10_cb2_w(int state)
 {
 	// lamp strobe #1
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by133_state::u11_cb2_w )
+void by133_state::u11_cb2_w(int state)
 {
 	// solenoid-sound selector
 
@@ -738,8 +738,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )
 void by133_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_sound_select_handler.resolve();
-	m_sound_int_handler.resolve();
 	m_io_outputs.resolve();
 
 	save_item(NAME(m_mpu_to_vid));
@@ -795,7 +793,7 @@ void by133_state::by133(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia_u7, 0);
+	PIA6821(config, m_pia_u7);
 	m_pia_u7->readpa_handler().set(FUNC(by133_state::u7_a_r));
 	m_pia_u7->writepa_handler().set(FUNC(by133_state::u7_a_w));
 	m_pia_u7->readpb_handler().set(FUNC(by133_state::u7_b_r));
@@ -805,7 +803,7 @@ void by133_state::by133(machine_config &config)
 	m_pia_u7->irqa_handler().set_inputline("videocpu", M6809_FIRQ_LINE);
 	m_pia_u7->irqa_handler().set_inputline("videocpu", M6809_FIRQ_LINE);
 
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(by133_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(by133_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(by133_state::u10_b_r));
@@ -816,7 +814,7 @@ void by133_state::by133(machine_config &config)
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	TIMER(config, "babypac1").configure_periodic(FUNC(by133_state::u10_timer), attotime::from_hz(120)); // mains freq*2
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(by133_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by133_state::u11_a_w));
 	m_pia_u11->readpb_handler().set(FUNC(by133_state::u11_b_r));

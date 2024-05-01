@@ -41,6 +41,8 @@ TODO:
 #include "crei680.lh"
 
 
+namespace {
+
 class crei680_state : public driver_device
 {
 public:
@@ -291,14 +293,14 @@ void crei680_state::crei680(machine_config &config)
 	BEEP(config, "beeper", 900).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set_ioport("X1");
 	m_pia0->writepb_handler().set(FUNC(crei680_state::pia0b_w));
 	//m_pia0->cb2_handler().set(FUNC(crei680_state::screen_w));
 	m_pia0->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia0->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("X0");
 	m_pia1->writepb_handler().set(FUNC(crei680_state::pia1b_w));
 	//m_pia1->cb2_handler().set(FUNC(crei680_state::screen_w));
@@ -334,6 +336,9 @@ ROM_START( crei680 )
 	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD( "mcm6674p.u9", 0x0000, 0x0400, CRC(1c22088a) SHA1(b5f0bd0cfdec0cd5c1cb764506bef3c17d6af0eb) )  // video board
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT          COMPANY                               FULLNAME      FLAGS
 COMP( 19??, crei680, 0,      0,      crei680,   crei680, crei680_state, empty_init, "Capital Radio Engineering Institute", "CREI 680", MACHINE_SUPPORTS_SAVE )

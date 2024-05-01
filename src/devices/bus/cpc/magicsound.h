@@ -56,17 +56,17 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(da0_w);
+	void da0_w(int state);
 	uint8_t dma_read_byte(offs_t offset);
 	void dma_write_byte(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(sam0_w);
-	DECLARE_WRITE_LINE_MEMBER(sam1_w);
-	DECLARE_WRITE_LINE_MEMBER(sam2_w);
-	DECLARE_WRITE_LINE_MEMBER(sam3_w);
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
+	void sam0_w(int state);
+	void sam1_w(int state);
+	void sam2_w(int state);
+	void sam3_w(int state);
 
 	cpc_expansion_slot_device *m_slot;
 

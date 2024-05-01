@@ -69,6 +69,9 @@
 #include "speaker.h"
 //#include "sound/ay8910.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(5'000'000)
 
 class apc_state : public driver_device
@@ -155,12 +158,12 @@ private:
 	}m_keyb;
 
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(apc_tc_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack3_w);
+	void apc_dma_hrq_changed(int state);
+	void apc_tc_w(int state);
+	void apc_dack0_w(int state);
+	void apc_dack1_w(int state);
+	void apc_dack2_w(int state);
+	void apc_dack3_w(int state);
 	uint8_t apc_dma_read_byte(offs_t offset);
 	void apc_dma_write_byte(offs_t offset, uint8_t data);
 
@@ -845,7 +848,7 @@ uint8_t apc_state::get_slave_ack(offs_t offset)
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(apc_state::apc_dma_hrq_changed)
+void apc_state::apc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -854,7 +857,7 @@ WRITE_LINE_MEMBER(apc_state::apc_dma_hrq_changed)
 //  printf("%02x HLDA\n",state);
 }
 
-WRITE_LINE_MEMBER( apc_state::apc_tc_w )
+void apc_state::apc_tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(state);
@@ -888,10 +891,10 @@ inline void apc_state::set_dma_channel(int channel, int state)
 	if (!state) m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
+void apc_state::apc_dack0_w(int state) { /*printf("%02x 0\n",state);*/ set_dma_channel(0, state); }
+void apc_state::apc_dack1_w(int state) { /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
+void apc_state::apc_dack2_w(int state) { /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
+void apc_state::apc_dack3_w(int state) { /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
 /*
 CH0: CRT
@@ -998,5 +1001,8 @@ void apc_state::init_apc()
 {
 	// ...
 }
+
+} // anonymous namespace
+
 
 COMP( 1982, apc, 0, 0, apc, apc, apc_state, init_apc, "NEC", "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

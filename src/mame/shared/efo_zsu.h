@@ -43,13 +43,13 @@ private:
 
 	void ay1_porta_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(fifo_dor_w);
+	void ctc1_z0_w(int state);
+	void ctc1_z1_w(int state);
+	void ctc1_z2_w(int state);
+	void ctc0_z0_w(int state);
+	void ctc0_z1_w(int state);
+	void ctc0_z2_w(int state);
+	void fifo_dor_w(int state);
 
 	TIMER_CALLBACK_MEMBER(fifo_shift);
 	TIMER_CALLBACK_MEMBER(adpcm_clock);

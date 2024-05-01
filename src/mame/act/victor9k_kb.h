@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_VICTOR9K_KB_H
-#define MAME_MACHINE_VICTOR9K_KB_H
+#ifndef MAME_ACT_VICTOR9K_KB_H
+#define MAME_ACT_VICTOR9K_KB_H
 
 
 #pragma once
@@ -31,7 +31,7 @@ public:
 	auto kbrdy_handler() { return m_kbrdy_cb.bind(); }
 	auto kbdata_handler() { return m_kbdata_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( kback_w );
+	void kback_w(int state);
 
 protected:
 	// device-level overrides
@@ -59,11 +59,11 @@ private:
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
 	void kb_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t1_r();
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(VICTOR9K_KEYBOARD, victor_9000_keyboard_device)
 
-#endif // MAME_MACHINE_VICTOR9K_KB_H
+#endif // MAME_ACT_VICTOR9K_KB_H

@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <vector>
 
 
 
@@ -31,11 +32,11 @@ public:
 	auto clk_wr_callback() { return m_write_clk.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
 
-	void add_device(device_t *target, int address);
+	void add_device(device_econet_interface &target, int address);
 
 	// writes for host (driver_device)
-	DECLARE_WRITE_LINE_MEMBER( host_clk_w );
-	DECLARE_WRITE_LINE_MEMBER( host_data_w );
+	void host_clk_w(int state);
+	void host_data_w(int state);
 
 	// writes for peripherals (device_t)
 	void clk_w(device_t *device, int state);
@@ -49,31 +50,33 @@ protected:
 		SIGNAL_COUNT
 	};
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-
 	class daisy_entry
 	{
 	public:
-		daisy_entry(device_t *device);
-		daisy_entry *next() const { return m_next; }
+		daisy_entry(device_econet_interface &device);
 
-		daisy_entry *               m_next;         // next device
-		device_t *                  m_device;       // associated device
-		device_econet_interface *   m_interface;    // associated device's daisy interface
+		device_t &device() { return *m_device; }
+		device_econet_interface &interface() { return *m_interface; }
 
 		int m_line[SIGNAL_COUNT];
+
+	private:
+		device_t *                  m_device;       // associated device
+		device_econet_interface *   m_interface;    // associated device's daisy interface
 	};
 
-	simple_list<daisy_entry> m_device_list;
+	// device_t implementation
+	virtual void device_start() override;
+	virtual void device_stop() override;
+
+	std::vector<daisy_entry> m_device_list;
 
 private:
 	devcb_write_line   m_write_clk;
 	devcb_write_line   m_write_data;
 
-	inline void set_signal(device_t *device, int signal, int state);
-	inline int get_signal(int signal);
+	void set_signal(device_t *device, int signal, int state);
+	int get_signal(int signal);
 
 	int m_line[SIGNAL_COUNT];
 };
@@ -81,8 +84,7 @@ private:
 
 // ======================> econet_slot_device
 
-class econet_slot_device : public device_t,
-							public device_slot_interface
+class econet_slot_device : public device_t, public device_single_card_slot_interface<device_econet_interface>
 {
 public:
 	// construction/destruction
@@ -115,11 +117,8 @@ private:
 class device_econet_interface : public device_interface
 {
 	friend class econet_device;
-	template <class ElementType> friend class simple_list;
 
 public:
-	device_econet_interface *next() const { return m_next; }
-
 	virtual void econet_clk(int state) = 0;
 	virtual void econet_data(int state) = 0;
 
@@ -129,9 +128,6 @@ protected:
 
 	econet_device  *m_econet;
 	uint8_t m_address;
-
-private:
-	device_econet_interface *m_next;
 };
 
 

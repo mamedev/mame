@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1403_H
-#define MAME_INCLUDES_PC1403_H
+#ifndef MAME_SHARP_PC1403_H
+#define MAME_SHARP_PC1403_H
 
 #include "pocketc.h"
 
@@ -37,7 +37,7 @@ protected:
 	void pc1421_readmem(address_map &map);
 	void pc1421_writemem(address_map &map);
 
-	DECLARE_READ_LINE_MEMBER(reset_r);
+	int reset_r();
 	void out_c_w(uint8_t data);
 	uint8_t in_a_r();
 
@@ -83,4 +83,4 @@ protected:
 	virtual void video_start() override;
 };
 
-#endif // MAME_INCLUDES_PC1403_H
+#endif // MAME_SHARP_PC1403_H

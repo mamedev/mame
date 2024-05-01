@@ -106,16 +106,15 @@ protected:
 	virtual uint8_t key_codes(int mode, int x, int y) override;
 };
 
-//class kr2376_12_device : public kr2376_device
-//{
-//public:
-//  // construction/destruction
-//  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//protected:
-//  virtual uint8_t key_codes(int mode, int x, int y) override;
-//};
+class kr2376_12_device : public kr2376_device
+{
+public:
+  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+  virtual uint8_t key_codes(int mode, int x, int y) override;
+};
 
 DECLARE_DEVICE_TYPE(KR2376_ST, kr2376_st_device)
-//DECLARE_DEVICE_TYPE(KR2376_12, kr2376_12_device)
+DECLARE_DEVICE_TYPE(KR2376_12, kr2376_12_device)
 
 #endif // MAME_MACHINE_KR2376_H

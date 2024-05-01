@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_DRGNMST_H
-#define MAME_INCLUDES_DRGNMST_H
+#ifndef MAME_UNICO_DRGNMST_H
+#define MAME_UNICO_DRGNMST_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_DRGNMST_H
+#endif // MAME_UNICO_DRGNMST_H

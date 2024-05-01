@@ -27,6 +27,9 @@ Status:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class milwaukee_state : public driver_device
 {
 public:
@@ -68,8 +71,8 @@ void milwaukee_state::milwaukee(machine_config &config)
 	pit.set_clk<1>(16_MHz_XTAL / 2 / 13 / 2048 / 5); // 60.09 Hz?
 	pit.out_handler<1>().set("pit", FUNC(pit8253_device::write_clk2)).invert();
 
-	PIA6821(config, "pia1",  0);
-	PIA6821(config, "pia2",  0);
+	PIA6821(config, "pia1");
+	PIA6821(config, "pia2");
 	ACIA6850(config, "acia2", 0);
 	MC6852(config, "ssda", 0);
 
@@ -91,5 +94,8 @@ ROM_START( mc1200 )
 	ROM_LOAD( "mfm_6-29-82_10_sector.u15", 0x0000, 0x0800, CRC(40b0af66) SHA1(c988e1f90c9abb93171c4e40a6585ce9cc3fd495) )
 	ROM_LOAD( "2758.u14", 0x0800, 0x0400, CRC(b20e2345) SHA1(da498cc0c746897a85d6f2d1a5bd70a726c1e4ef) ) // big white sticker, but nothing on it
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1980, mc1200, 0, 0, milwaukee, milwaukee, milwaukee_state, empty_init, "Milwaukee Computers", "MC-1200", MACHINE_IS_SKELETON )

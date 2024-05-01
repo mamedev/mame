@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
-#ifndef MAME_INCLUDES_TAITO_B_H
-#define MAME_INCLUDES_TAITO_B_H
+#ifndef MAME_TAITO_TAITO_B_H
+#define MAME_TAITO_TAITO_B_H
 
 #pragma once
 
@@ -172,4 +172,4 @@ private:
 	required_shared_ptr<uint16_t> m_pixelram;
 };
 
-#endif // MAME_INCLUDES_TAITO_B_H
+#endif // MAME_TAITO_TAITO_B_H

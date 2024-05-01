@@ -48,7 +48,7 @@ O36 48 |  *                                             | 13 K2
        |________________________________________________/
 
           1   2   3   4   5   6   7   8   9  10  11  12
-         O26 O16 R4  R3  R2  R1  GND _T  bt  al  ACL K1   note: bt = beta symbol, al = alpha symbol
+         O26 O16 R4  R3  R2  R1  GND _T   β  α   ACL K1
 */
 
 class sm500_device : public sm510_base_device

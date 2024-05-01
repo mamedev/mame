@@ -83,11 +83,11 @@ protected:
 	u8 port05_r();
 	void port06_w(u8 data);
 	void port07_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef1_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
+	int clear_r();
+	int ef1_r();
+	int ef4_r();
 	void clockcnt_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(clock2_w);
+	void clock2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(snd_off_callback) { m_1863->set_output_gain(0, 0.00); }
 
 	void play_2_io(address_map &map);
@@ -360,7 +360,7 @@ void play_2_state::port07_w(u8 data)
 			m_io_outputs[8+i*3+j] = (BIT(t, j) && (data == i)) ? 1 : 0;
 }
 
-READ_LINE_MEMBER( play_2_state::clear_r )
+int play_2_state::clear_r()
 {
 	// A hack to make the machine reset itself on boot
 	if (m_resetcnt < 0xff)
@@ -368,12 +368,12 @@ READ_LINE_MEMBER( play_2_state::clear_r )
 	return (m_resetcnt < 0xf0) ? 0 : 1;
 }
 
-READ_LINE_MEMBER( play_2_state::ef1_r )
+int play_2_state::ef1_r()
 {
 	return (!BIT(m_4020->count(), 10)); // inverted
 }
 
-READ_LINE_MEMBER( play_2_state::ef4_r )
+int play_2_state::ef4_r()
 {
 	return BIT(m_io_keyboard[7]->read(), 0); // inverted test button - doesn't seem to do anything
 }
@@ -384,7 +384,7 @@ void play_2_state::clockcnt_w(u16 data)
 		m_4013b->preset_w(!BIT(data, 10)); // Q10 output
 }
 
-WRITE_LINE_MEMBER( play_2_state::clock2_w )
+void play_2_state::clock2_w(int state)
 {
 	m_4013b->clock_w(state);
 	m_maincpu->ef3_w(state); // inverted
@@ -631,12 +631,12 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (Playmatic, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (Playmatic, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

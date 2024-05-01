@@ -16,6 +16,9 @@ Skeleton driver for "third generation" TeleVideo terminals (905, 955, 9220).
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class tv955_state : public driver_device
 {
 public:
@@ -40,7 +43,7 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void control_latch_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
+	void system_reset_w(int state);
 
 	void mem_map(address_map &map);
 	void char_map(address_map &map);
@@ -102,7 +105,7 @@ void tv955_state::control_latch_w(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(tv955_state::system_reset_w)
+void tv955_state::system_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)
@@ -218,5 +221,8 @@ ROM_START( tv955 )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "t180002-26b.u45",     0x0000, 0x1000, CRC(69c9ebc7) SHA1(32282c816ec597a7c45e939acb7a4155d35ea584) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1985, tv955, 0, 0, tv955, tv955, tv955_state, empty_init, "TeleVideo Systems", "TeleVideo 955", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

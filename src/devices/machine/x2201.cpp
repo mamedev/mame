@@ -23,7 +23,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/x2201.h"
+#include "x2201.h"
 
 #include <algorithm>
 
@@ -99,8 +99,8 @@ void x2201_device::nvram_default()
 
 bool x2201_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_eeprom[0], 1024 / 8, actual) && actual == 1024 / 8;
+	auto const [err, actual] = util::read(file, &m_eeprom[0], 1024 / 8);
+	return !err && (actual == 1024 / 8);
 }
 
 
@@ -111,8 +111,8 @@ bool x2201_device::nvram_read(util::read_stream &file)
 
 bool x2201_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_eeprom[0], 1024 / 8, actual) && actual == 1024 / 8;
+	auto const [err, actual] = util::write(file, &m_eeprom[0], 1024 / 8);
+	return !err;
 }
 
 
@@ -152,7 +152,7 @@ void x2201_device::write(offs_t offset, u8 data)
 //  cs_w - write to the CS line (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(x2201_device::cs_w)
+void x2201_device::cs_w(int state)
 {
 	m_cs = !state;
 }
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER(x2201_device::cs_w)
 //  (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(x2201_device::store_w)
+void x2201_device::store_w(int state)
 {
 	if (m_cs && !state && !m_store)
 		std::copy_n(&m_ram[0], 1024 / 8, &m_eeprom[0]);
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER(x2201_device::store_w)
 //  into RAM (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(x2201_device::array_recall_w)
+void x2201_device::array_recall_w(int state)
 {
 	if (m_cs && !state && !m_array_recall)
 		std::copy_n(&m_eeprom[0], 1024 / 8, &m_ram[0]);

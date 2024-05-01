@@ -35,6 +35,7 @@
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/epson_qx/keyboard/keyboard.h"
 #include "bus/epson_qx/option.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
@@ -45,7 +46,6 @@
 #include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "qx10kbd.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
@@ -58,6 +58,8 @@
 #include "softlist_dev.h"
 #include "imagedev/snapquik.h"
 
+
+namespace {
 
 #define MAIN_CLK    15974400
 
@@ -115,15 +117,13 @@ private:
 	void qx10_18_w(uint8_t data);
 	void prom_sel_w(uint8_t data);
 	void cmos_sel_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
+	void qx10_upd765_interrupt(int state);
 	void update_fdd_motor(uint8_t state);
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
 	void zoom_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void tc_w(int state);
 	void sqw_out(uint8_t state);
-	uint8_t mc146818_r(offs_t offset);
-	void mc146818_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER( inta_call );
 	uint8_t get_slave_ack(offs_t offset);
 	uint8_t vram_bank_r();
@@ -142,15 +142,15 @@ private:
 	void centronics_select_handler(uint8_t state);
 	void centronics_sense_handler(uint8_t state);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
-	DECLARE_WRITE_LINE_MEMBER(speaker_freq);
-	DECLARE_WRITE_LINE_MEMBER(speaker_duration);
+	void keyboard_clk(int state);
+	void keyboard_irq(int state);
+	void speaker_freq(int state);
+	void speaker_duration(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void qx10_palette(palette_device &palette) const;
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	void dma_hrq_changed(int state);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -171,7 +171,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
-	required_device<rs232_port_device> m_kbd;
+	required_device<bus::epson_qx::keyboard::keyboard_port_device> m_kbd;
 	required_device<centronics_device> m_centronics;
 	required_device<bus::epson_qx::option_bus_device> m_bus;
 	required_device<speaker_sound_device>   m_speaker;
@@ -429,7 +429,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	/* The right RAM bank must be active */
 	m_membank = 0;
@@ -439,7 +439,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, std::string());
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -448,7 +448,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -459,7 +459,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);       // start program
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*
@@ -471,7 +471,7 @@ static void qx10_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
+void qx10_state::qx10_upd765_interrupt(int state)
 {
 	m_fdcint = state;
 
@@ -561,13 +561,13 @@ void qx10_state::portc_w(uint8_t data)
 /*
     DMA8237
 */
-WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
+void qx10_state::dma_hrq_changed(int state)
 {
 	/* Assert HLDA */
 	m_dma_1->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( qx10_state::tc_w )
+void qx10_state::tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(!state);
@@ -621,36 +621,27 @@ void qx10_state::sqw_out(uint8_t state)
 	m_counter = cnt;
 }
 
-void qx10_state::mc146818_w(offs_t offset, uint8_t data)
-{
-	m_rtc->write(!offset, data);
-}
-
-uint8_t qx10_state::mc146818_r(offs_t offset)
-{
-	return m_rtc->read(!offset);
-}
-
-WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
+void qx10_state::keyboard_irq(int state)
 {
 	m_scc->m1_r(); // always set
 	m_pic_m->ir4_w(state);
 }
 
-WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
+void qx10_state::keyboard_clk(int state)
 {
 	// clock keyboard too
+	m_kbd->clk_w(state);
 	m_scc->rxca_w(state);
 	m_scc->txca_w(state);
 }
 
-WRITE_LINE_MEMBER(qx10_state::speaker_duration)
+void qx10_state::speaker_duration(int state)
 {
 	m_pit1_out0 = state;
 	update_speaker();
 }
 
-WRITE_LINE_MEMBER(qx10_state::speaker_freq)
+void qx10_state::speaker_freq(int state)
 {
 	m_spkr_freq = state;
 	update_speaker();
@@ -742,7 +733,8 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 	map(0x3a, 0x3a).w(FUNC(qx10_state::zoom_w));
 //  map(0x3b, 0x3b) GDC light pen req
-	map(0x3c, 0x3d).rw(FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
+	map(0x3c, 0x3c).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
+	map(0x3d, 0x3d).w(m_rtc, FUNC(mc146818_device::address_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
@@ -897,11 +889,6 @@ void qx10_state::upd7220_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w)).mirror(0x30000);
 }
 
-static void keyboard(device_slot_interface &device)
-{
-	device.option_add("qx10", QX10_KEYBOARD);
-}
-
 void qx10_state::qx10(machine_config &config)
 {
 	/* basic machine hardware */
@@ -960,7 +947,7 @@ void qx10_state::qx10(machine_config &config)
 
 	UPD7201(config, m_scc, MAIN_CLK/4); // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
-	m_scc->out_txda_callback().set(m_kbd, FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set(m_kbd, FUNC(bus::epson_qx::keyboard::keyboard_port_device::rxd_w));
 	// Channel B: RS232
 	m_scc->out_txdb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtrb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
@@ -1006,8 +993,8 @@ void qx10_state::qx10(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_scc, FUNC(upd7201_device::rxb_w));
 
-	RS232_PORT(config, m_kbd, keyboard, "qx10");
-	m_kbd->rxd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
+	EPSON_QX_KEYBOARD_PORT(config, m_kbd, bus::epson_qx::keyboard::keyboard_devices, "qx10_hasci");
+	m_kbd->txd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
 
 	output_latch_device &prndata(OUTPUT_LATCH(config, "prndata"));
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
@@ -1078,6 +1065,9 @@ ROM_START( qx10 )
 //  ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 	ROM_LOAD( "qga.2e",   0x0000, 0x1000, CRC(4120b128) SHA1(9b96f6d78cfd402f8aec7c063ffb70a21b78eff0))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

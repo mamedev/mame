@@ -69,7 +69,7 @@ u8 ccs7710_device::read_cnxx(u8 offset)
 	return m_firmware[offset];
 }
 
-WRITE_LINE_MEMBER(ccs7710_device::acia_irq_w)
+void ccs7710_device::acia_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 		raise_slot_irq();
@@ -77,7 +77,7 @@ WRITE_LINE_MEMBER(ccs7710_device::acia_irq_w)
 		lower_slot_irq();
 }
 
-WRITE_LINE_MEMBER(ccs7710_device::external_clock_w)
+void ccs7710_device::external_clock_w(int state)
 {
 	m_external_clock = state;
 	if (!BIT(m_baud_select->read(), 0))

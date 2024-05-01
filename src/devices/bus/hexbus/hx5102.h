@@ -38,18 +38,18 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
 	void external_operation(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( board_ready );
-	DECLARE_WRITE_LINE_MEMBER( board_reset );
+	void clock_out(int state);
+	void board_ready(int state);
+	void board_reset(int state);
 	static void floppy_formats(format_registration &fr);
 
-	void device_start() override;
-	void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void hexbus_value_changed(uint8_t data) override;
 
 private:
@@ -59,29 +59,29 @@ private:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(mspeed_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void motor_w(int state);
+	void mspeed_w(int state);
 
 	uint8_t fdc_read(offs_t offset);
 	void fdc_write(offs_t offset, uint8_t data);
 	uint8_t ibc_read(offs_t offset);
 	void ibc_write(offs_t offset, uint8_t data);
 	void hexbus_out(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(hsklatch_out);
+	void hsklatch_out(int state);
 
 	uint8_t cruread(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(nocomp_w);
-	DECLARE_WRITE_LINE_MEMBER(diren_w);
-	DECLARE_WRITE_LINE_MEMBER(dacken_w);
-	DECLARE_WRITE_LINE_MEMBER(stepen_w);
-	DECLARE_WRITE_LINE_MEMBER(ds1_w);
-	DECLARE_WRITE_LINE_MEMBER(ds2_w);
-	DECLARE_WRITE_LINE_MEMBER(ds3_w);
-	DECLARE_WRITE_LINE_MEMBER(ds4_w);
-	DECLARE_WRITE_LINE_MEMBER(aux_motor_w);
-	DECLARE_WRITE_LINE_MEMBER(wait_w);
+	void nocomp_w(int state);
+	void diren_w(int state);
+	void dacken_w(int state);
+	void stepen_w(int state);
+	void ds1_w(int state);
+	void ds2_w(int state);
+	void ds3_w(int state);
+	void ds4_w(int state);
+	void aux_motor_w(int state);
+	void wait_w(int state);
 	void update_drive_select();
 
 	// Operate the floppy motors
@@ -101,6 +101,8 @@ private:
 	void update_readyff_input();
 
 	// Link to the attached floppy drives
+	required_device<floppy_connector> m_flopcon0;
+	required_device<floppy_connector> m_flopcon1;
 	floppy_image_device*    m_floppy[2];
 	floppy_image_device*    m_current_floppy;
 	int m_floppy_select, m_floppy_select_last;

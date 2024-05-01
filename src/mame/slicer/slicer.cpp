@@ -15,6 +15,9 @@
 #include "bus/isa/isa.h"
 #include "bus/scsi/scsi.h"
 
+
+namespace {
+
 class slicer_state : public driver_device
 {
 public:
@@ -29,8 +32,8 @@ public:
 
 private:
 	void sio_out_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(drive_size_w);
-	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
+	void drive_size_w(int state);
+	template<unsigned int drive> void drive_sel_w(int state);
 
 	void slicer_io(address_map &map);
 	void slicer_map(address_map &map);
@@ -55,7 +58,7 @@ void slicer_state::sio_out_w(uint8_t data)
 }
 
 template<unsigned int drive>
-WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
+void slicer_state::drive_sel_w(int state)
 {
 	floppy_image_device *floppy;
 	char devname[8];
@@ -68,7 +71,7 @@ WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
 	m_fdc->set_floppy(floppy);
 }
 
-WRITE_LINE_MEMBER(slicer_state::drive_size_w)
+void slicer_state::drive_size_w(int state)
 {
 	m_fdc->set_unscaled_clock (state ? 1'000'000 : 2'000'000);
 }
@@ -164,5 +167,8 @@ ROM_START( slicer )
 	ROM_LOAD( "slvid_o.bin",  0x000000, 0x001000, CRC(c62dda77) SHA1(1d0b9abc53412b0725072d4c33c478fb5358ab5c) )
 	ROM_LOAD( "slvid_e.bin",  0x000000, 0x001000, CRC(8694274f) SHA1(8373baaea8d689bf52699b587942a57f26baf740) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, slicer, 0, 0, slicer, 0, slicer_state, empty_init, "Slicer Computers", "Slicer", MACHINE_NO_SOUND )

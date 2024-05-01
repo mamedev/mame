@@ -27,6 +27,12 @@
 
 #define THOM_GPL_PER_LINE 40
 
+/* maximum number of video pages:
+   1 for TO7 generation (including MO5)
+   4 for TO8 generation (including TO9, MO6)
+ */
+#define THOM_NB_PAGES 4
+
 
 /****************** dynamic screen size *****************/
 
@@ -1038,7 +1044,7 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_set_init )
 }
 
 /* call this at the very beginning of each new frame */
-WRITE_LINE_MEMBER(thomson_state::thom_vblank)
+void thomson_state::thom_vblank(int state)
 {
 	// rising edge
 	if (state)

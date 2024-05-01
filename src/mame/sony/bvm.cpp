@@ -31,6 +31,9 @@
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class bvm_state : public driver_device
 {
 public:
@@ -84,5 +87,8 @@ ROM_START(bvm20f1e)
 	ROM_LOAD("cd93-27c256.ic107", 0x0000, 0x8000, CRC(f8da1f2f) SHA1(b2f5a730d0f26f2a12fd62a111ee429da8426877))
 	ROM_LOAD("541d-27c256.ic108", 0x8000, 0x8000, CRC(9da347f9) SHA1(413096830bdcae6404e9d686abb56e60d58bdc2f))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1998, bvm20f1e, 0, 0, bvm, bvm, bvm_state, empty_init, "Sony", "Trinitron Color Video Monitor BVM-20F1E", MACHINE_IS_SKELETON)

@@ -9,32 +9,31 @@ This is similar - but not the same - as Gottlieb System 1. Used by various Spani
 pinball manufacturers. Recel is the name used for export Petaco machines.
 
 Known machines:
-Alaska, Black Magic, Black Magic 4, Cavalier, Conquistador, Crazy Race, Don Quijote, Fair Fight,
-Hot & Cold, Mr Doom, Mr Evil, Poker Plus, Screech, Space Game, Swashbuckler, Torneo.
+Alaska, Hot & Cold, Screech, Mr. Evil, Torneo, Crazy Race, Fair Fight, Poker Plus, Mr. Doom, Cavalier, SwashBuckler,
+Don Quijote, Space Game, Space Game (Bingo 6+1), The Flipper Game, Black Magic, Black Magic 4, Conquistador.
 
 Suspected machines:
-Bingo Space, Black Aritipe, Criterium 75, Formula 1, Lucky Roll, Pin Ball, The Flipper Game.
+Bingo Space, Black Aritipe, Formula 1, Lucky Roll.
 
 Chips used:
-B1   A2362-13  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O
-B2   A2361-13  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O
-B3   11696     General Purpose I/O expander (no datasheet found, assuming it's similar to 10696)
-B4   11660     Rockwell Parallel Processing System 4-bit CPU (PPS/4-2)
-B5   10788     Display driver
-C2   HM6508    1x 1024-bit static RAM, battery-backed.
-C5   1702A     Personality PROM (can be replaced by 2716 with adaptor)
-C4   10738     Bus Interface Circuit }
-C6   10738     Bus Interface Circuit } These 2 interface the C5 eprom to the CPU
+B1   A2361-13 or A1761-13|14  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O.
+B2   A2362-13 or A1762-13|14  Early RIOT-type device: Custom 1kx8 ROM, 128x4 RAM, 16x1 I/O.
+B3   11696                    General Purpose I/O expander (no datasheet found, assuming it's similar to 10696).
+B4   11660                    Rockwell Parallel Processing System 4-bit CPU (PPS/4-2).
+B5   10788                    Display driver.
+C2   HM6508                   1x1024-bit static RAM, battery-backed.
+C5   1702A or 2716            Personality PROM (the first revision of the Recel PCB uses 1702A as EPROM, a later revision upgraded to 2716).
+C4   10738                    Bus Interface Circuit }
+C6   10738                    Bus Interface Circuit } These 2 interface the C5 EPROM to the CPU.
 
 
 ToDo:
-- Everything (the code below is mostly a carry-over from gts1 and is incomplete or guesswork)
-- Need dumps of bios roms from B1/B2
-- There's lots of manuals, with lots of info, but not what we need. For example, no proper schematics.
-- No info on the sound (all it says is 4 TTL chips controlled by 6 bits of the IO expander)
+- Everything (the code below is mostly a carry-over from gts1 and is incomplete or guesswork).
+- There are lots of manuals, with lots of info, but not what we need. For example, no proper schematics.
+- No info on the sound (all it says is 4 TTL chips controlled by 6 bits of the I/O expander).
 - A plug-in printer is used to view and alter settings. We have no info about it.
-- Default layout
-- Outputs
+- Default layout.
+- Outputs.
 
 *****************************************************************************************************/
 
@@ -117,12 +116,12 @@ void recel_state::recel_io(address_map &map) // to be done
 	//map(0x20, 0x2f).rw("b2", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w));
 	//map(0x30, 0x3f).rw("b3", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w));
 	//map(0x50, 0x5f).rw("b5", FUNC(r10788_device::io_r), FUNC(r10788_device::io_w));
-	// map(0x??, 0x?f).r(FUNC(recel_state::bic_r)); //  get module data via BIC C6
+	//map(0x??, 0x?f).r(FUNC(recel_state::bic_r)); //  get module data via BIC C6
 }
 
 static INPUT_PORTS_START( recel )
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD)     PORT_NAME("Play/Test")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Play/Test")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP10")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP20")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP30")
@@ -177,6 +176,7 @@ static INPUT_PORTS_START( recel )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Slam Tilt")
 INPUT_PORTS_END
 
+
 void recel_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -198,8 +198,8 @@ void recel_state::machine_reset()
 	m_nvram_data = 0;
 	m_nvram_prev_clk = 0;
 	m_prom_addr = 0xff;
-
 }
+
 
 u8 recel_state::solenoids_r(offs_t offset)  // anything to be done?
 {
@@ -262,7 +262,7 @@ void recel_state::switches_w(offs_t offset, u8 data) // to be done
 
 void recel_state::display_w(offs_t offset, u8 data) // to be tested
 {
-	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
 	data ^= 0xff;  // It was stored in the 10788 inverted
 	u8 a = patterns[BIT(data, 0, 4)];
 	u8 b = patterns[BIT(data, 4, 4)];
@@ -349,7 +349,7 @@ void recel_state::bic_w(offs_t offset, u8 data)  // to be tested
 
 void recel_state::recel(machine_config & config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	PPS4_2(config, m_maincpu, XTAL(3'579'545));  // divided by 18 in the CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &recel_state::recel_map);
 	m_maincpu->set_addrmap(AS_DATA, &recel_state::recel_data);
@@ -361,7 +361,7 @@ void recel_state::recel(machine_config & config)
 
 	ra17xx_device &u5(RA17XX(config, "b2", 0));
 	u5.iord_cb().set(FUNC(recel_state::nvram_r));
-	u5.iowr_cb().set(FUNC(recel_state::nvram_w));     // control nvram, printer
+	u5.iowr_cb().set(FUNC(recel_state::nvram_w));     // control NVRAM, printer
 	u5.set_cpu_tag(m_maincpu);
 
 	ra17xx_device &u4(RA17XX(config, "b1", 0));
@@ -371,24 +371,31 @@ void recel_state::recel(machine_config & config)
 
 	r10696_device &u3(R10696(config, "b3", 0));
 	u3.iord_cb().set(FUNC(recel_state::solenoids_r));
-	u3.iowr_cb().set(FUNC(recel_state::solenoids_w));   // to sound,solenoids,lamps
+	u3.iowr_cb().set(FUNC(recel_state::solenoids_w));   // to sound, solenoids, lamps
 
 	r10788_device &u6(R10788(config, "b5", XTAL(3'579'545) / 18 ));  // divided in the circuit
 	u6.update_cb().set(FUNC(recel_state::display_w));
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_recel);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 }
 
-// Is this the correct order?
-#define RECEL_BIOS \
-	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF ) \
-	ROM_LOAD("a2362.b2", 0x0000, 0x0400, NO_DUMP ) \
-	ROM_LOAD("a2361.b1", 0x0400, 0x0400, NO_DUMP )
 
+/* The BIOS is the same for all sets, but is labeled differently depending on the ROM type:
+    -13: For machines with personality PROM 1702.
+    -14: For machines with 2716 EPROM.
+   In both cases, the second half of each chip is not used, with their A11 pins grounded
+   (these chips have A1 to A11, there's no A0).
+*/
+#define RECEL_BIOS \
+	ROM_REGION( 0x800, "maincpu", ROMREGION_ERASEFF ) \
+	ROM_LOAD("a2361.b1", 0x0000, 0x0400, CRC(d0c4695d) SHA1(4846adb3f6c292626840ba5255ffc5e788a69301) ) \
+		ROM_IGNORE( 0x400 ) \
+	ROM_LOAD("a2362.b2", 0x0400, 0x0400, CRC(39a70611) SHA1(8545e168a5f256150bcff12d1e6d8efffd08c3cd) ) \
+		ROM_IGNORE( 0x400 )
 
 ROM_START( recel )
 	RECEL_BIOS
@@ -400,124 +407,154 @@ ROM_START(r_alaska)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("al.c5",   0x0000, 0x0100, CRC(905ef624) SHA1(ab0bb2e7262650b670524ce9f88bd1f14ffd749a) )
+	ROM_LOAD("al.c5",         0x0000, 0x0100, CRC(905ef624) SHA1(ab0bb2e7262650b670524ce9f88bd1f14ffd749a) )
 ROM_END
 
+/* There's no Hot & Cold version for 2716, but some collectors made fake ROMs just repeating the content until filling
+   0x800, so they can replace the original personality PROM 1702 with a more common 2716 EPROM. */
 ROM_START(r_hotcold)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("hc.c5",   0x0000, 0x0100, CRC(f58d0c05) SHA1(54ecf9f67ce3a5264bfd9c063353705f9202d524) )
+	ROM_LOAD("hc.c5",         0x0000, 0x0100, CRC(f58d0c05) SHA1(54ecf9f67ce3a5264bfd9c063353705f9202d524) )
 ROM_END
 
+/* There's a fake set (CRC(ddf2beac) SHA1(2ce67e2679bf7d545434a90209c462ad53c50e01)) made by collectors
+   for replacing the original personality PROM 1702 with a more common 2716 EPROM. */
 ROM_START(r_screech)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("sc.c5",   0x0000, 0x0800, CRC(ddf2beac) SHA1(2ce67e2679bf7d545434a90209c462ad53c50e01) )
+	ROM_LOAD("sc_1_1702.bin", 0x0000, 0x0100, CRC(c9185ef3) SHA1(3ace6cccc96375c5eab3d43f86f52bf52124334e) )
 ROM_END
 
 ROM_START(r_mrevil)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("me.c5",   0x0000, 0x0100, CRC(58cb2c60) SHA1(f6da41c54ed6f1eba10de05d87c7d956bc510b4e) )
-	//ROM_LOAD( "me2.c5", 0x0000, 0x0800, CRC(5241090f) SHA1(2a3f1a0c2c313266eb39c20b8c99fc22079a52af) )
-	//ROM_LOAD( "me3.c5", 0x0000, 0x0100, CRC(53ce24a0) SHA1(42d376e3e7a4e94a09db2f974af8d4869579d0f5) )
-	//ROM_LOAD( "me4.c5", 0x0000, 0x0800, CRC(3abb3c80) SHA1(e691c7c10f353e2fe3e887ce86f3ca1ab1bcc288) )
+	ROM_LOAD( "me.c5",        0x0000, 0x0100, CRC(53ce24a0) SHA1(42d376e3e7a4e94a09db2f974af8d4869579d0f5) )
 ROM_END
 
 ROM_START(r_torneo)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("to.c5",   0x0000, 0x0100, CRC(06518bca) SHA1(6e8d4dba3cc5713208794aafc40cad6aca558aa6) )
+	ROM_LOAD("to.c5",         0x0000, 0x0100, CRC(06518bca) SHA1(6e8d4dba3cc5713208794aafc40cad6aca558aa6) )
 ROM_END
 
 ROM_START(r_crzyrace)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("cr.c5",   0x0000, 0x0800, CRC(60088804) SHA1(a73a7f8a0583a79588f9823a5e65ed28edad96a3) )
+	ROM_LOAD("cr.c5",         0x0000, 0x0800, CRC(60088804) SHA1(a73a7f8a0583a79588f9823a5e65ed28edad96a3) )
 ROM_END
 
 ROM_START(r_fairfght)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("fa.c5",   0x0000, 0x0100, CRC(5d3694da) SHA1(4d0a8033acb6ef2e2af107f76540fd19b4a39b12) )
+	ROM_LOAD("fa.c5",         0x0000, 0x0100, CRC(5d3694da) SHA1(4d0a8033acb6ef2e2af107f76540fd19b4a39b12) )
 ROM_END
 
 ROM_START(r_pokrplus)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("po.c5",   0x0000, 0x0100, CRC(60a199a8) SHA1(045d61f56ea03a694722da810d465ab65d85cbfd) )
-	//ROM_LOAD( "po2.c5", 0x0000, 0x0100, CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) )
-	//ROM_LOAD( "po3.c5", 0x0000, 0x0800, CRC(fadd715a) SHA1(6c5b6e8fcf77be2b0b7076dc1139760f7e4d5688) )
+	ROM_LOAD("po.c5",         0x0000, 0x0100, CRC(60a199a8) SHA1(045d61f56ea03a694722da810d465ab65d85cbfd) )
+	//ROM_LOAD( "po2.c5",       0x0000, 0x0100, CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) )
+	//ROM_LOAD( "po3.c5",       0x0000, 0x0800, CRC(fadd715a) SHA1(6c5b6e8fcf77be2b0b7076dc1139760f7e4d5688) )
 ROM_END
 
 ROM_START(r_mrdoom)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("md.c5",   0x0000, 0x0100, CRC(ca679a69) SHA1(f08f0cfe646f08882473dcd5d23889fffe4a03c8) )
+	ROM_LOAD("md.c5",         0x0000, 0x0100, CRC(ca679a69) SHA1(f08f0cfe646f08882473dcd5d23889fffe4a03c8) )
 ROM_END
 
 ROM_START(r_cavalier)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("ca.c5",   0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
-	//ROM_LOAD( "ca2.c5", 0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
-	//ROM_LOAD( "ca3.c5", 0x0000, 0x0800, CRC(fddd2373) SHA1(d0c79aefd2806066455c721a1361d11d6dab7d5f) )
+	ROM_LOAD("ca.c5",         0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
+	//ROM_LOAD( "ca2.c5",       0x0000, 0x0100, CRC(dc2e865f) SHA1(3f15f90dafa9d5e42381605044b6c9b529afd3af) )
+	//ROM_LOAD( "ca3.c5",       0x0000, 0x0800, CRC(fddd2373) SHA1(d0c79aefd2806066455c721a1361d11d6dab7d5f) )
 ROM_END
 
 ROM_START(r_swash)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("sw.c5",   0x0000, 0x0100, CRC(69326f5f) SHA1(f0bb4251f579ccf97c1cabb63254ba466ccd141e) )
+	ROM_LOAD("sw.c5",         0x0000, 0x0100, CRC(69326f5f) SHA1(f0bb4251f579ccf97c1cabb63254ba466ccd141e) )
 ROM_END
 
 ROM_START(r_quijote)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("qu.c5",   0x0000, 0x0100, CRC(1fd535d0) SHA1(a9c9a72881d195a0de751f10fa54fb181523a33f) )
-	//ROM_LOAD( "qu2.c5", 0x0000, 0x0100, CRC(a88224ee) SHA1(cb85edcacc6001a9d865ef7e22711d6f62f1fdc1) )
-	//ROM_LOAD( "qu3.c5", 0x0000, 0x0800, CRC(6eb5a08d) SHA1(3bfec2c0fdd1d8e1b03a5c189d2f37e1a52d065b) )
+	ROM_LOAD("qu.c5",         0x0000, 0x0100, CRC(1fd535d0) SHA1(a9c9a72881d195a0de751f10fa54fb181523a33f) )
+	//ROM_LOAD( "qu2.c5",       0x0000, 0x0100, CRC(a88224ee) SHA1(cb85edcacc6001a9d865ef7e22711d6f62f1fdc1) )
+	//ROM_LOAD( "qu3.c5",       0x0000, 0x0800, CRC(6eb5a08d) SHA1(3bfec2c0fdd1d8e1b03a5c189d2f37e1a52d065b) )
+ROM_END
+
+// PCB modified to use two 2716 instead of only one.
+ROM_START(r_spcgame7)
+	RECEL_BIOS
+
+	ROM_REGION( 0x1000, "module", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "spcgme_system_iii_l.bin", 0x0001, 0x0800, CRC(8700559c) SHA1(cd61e16cf30420e976537ee0b8ba9e95e3577ddc) )
+	ROM_LOAD16_BYTE( "spcgme_system_iii_h.bin", 0x0000, 0x0800, CRC(13eb1f52) SHA1(d0607b88314e86a37486ac8118d7fd0a17beb404) )
+ROM_END
+
+// Formula 1 was renamed as Antar for the Portuguese market, being distributed by Gorsam (without Recel logos).
+ROM_START(r_antar)
+	RECEL_BIOS
+
+	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
+	ROM_LOAD("antar.bin",     0x0000, 0x0800, CRC(17882b53) SHA1(6a4f34fcc2fa88aee0c7843be00f75c9f3af03ba) ) // TMS2516
 ROM_END
 
 ROM_START(r_flipper)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("fl.c5",   0x0000, 0x0800, CRC(76ee0370) SHA1(f2a835a0b76f7258d5e65390c239f5456e30e87a) )
+	ROM_LOAD("fl.c5",         0x0000, 0x0800, CRC(76ee0370) SHA1(f2a835a0b76f7258d5e65390c239f5456e30e87a) )
+ROM_END
+
+ROM_START(r_blackmag)
+	RECEL_BIOS
+
+	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
+	ROM_LOAD("bm_1065_1.bin", 0x0000, 0x0800, CRC(a917718c) SHA1(0b4fdf270560df902e95b34c25cca20e91f1071c) )
 ROM_END
 
 ROM_START(r_blackm4)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("b4.c5",   0x0000, 0x0800, CRC(cd383f5b) SHA1(c38acaae46e5fd2660efbd0e2d35e295892e60a5) )
+	ROM_LOAD("b4.c5",         0x0000, 0x0800, CRC(cd383f5b) SHA1(c38acaae46e5fd2660efbd0e2d35e295892e60a5) )
 ROM_END
 
 } // anonymous namespace
 
-GAME(1977,  recel,       0,       recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Recel Bios",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+//   YEAR   NAME        PARENT  MACHINE  INPUT  CLASS        INIT        ROT   COMPANY      FULLNAME                  FLAGS
 
-GAME(1978,  r_alaska,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_hotcold,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_screech,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Screech",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_mrevil,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Evil",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_torneo,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Torneo",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_crzyrace,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Crazy Race",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_fairfght,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Fair Fight",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  r_pokrplus,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Poker Plus",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_mrdoom,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Doom",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_cavalier,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Cavalier",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_swash,     recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Swashbuckler",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  r_quijote,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_flipper,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  r_blackm4,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1977,  recel,      0,      recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Recel BIOS",             MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+
+GAME(1978,  r_alaska,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Interflip", "Alaska",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_hotcold,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_screech,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Inder",     "Screech",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_mrevil,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Evil",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_torneo,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Torneo",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_crzyrace, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Crazy Race",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_fairfght, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Fair Fight",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_pokrplus, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Poker Plus",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_mrdoom,   recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Mr. Doom",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_cavalier, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Cavalier",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_swash,    recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "SwashBuckler",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_quijote,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Don Quijote",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_spcgame7, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Space Game (Bingo 6+1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_antar,    recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Antar (Recel)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_flipper,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "The Flipper Game",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackmag, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackm4,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

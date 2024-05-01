@@ -30,6 +30,9 @@
 #include "speaker.h"
 #include "debugger.h"
 
+
+namespace {
+
 class riscpc_state : public driver_device
 {
 public:
@@ -67,29 +70,29 @@ private:
 	void riscpc_map(address_map &map);
 
 	bool m_i2cmem_clock = false;
-	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
-	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
-	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
+	int iocr_od0_r();
+	int iocr_od1_r();
+	void iocr_od0_w(int state);
+	void iocr_od1_w(int state);
 };
 
-READ_LINE_MEMBER(riscpc_state::iocr_od1_r)
+int riscpc_state::iocr_od1_r()
 {
 	// TODO: presuming same as Acorn Archimedes, where i2c clock can be readback
 	return (m_i2cmem_clock == true) ? 1 : 0;
 }
 
-READ_LINE_MEMBER(riscpc_state::iocr_od0_r)
+int riscpc_state::iocr_od0_r()
 {
 	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
 }
 
-WRITE_LINE_MEMBER(riscpc_state::iocr_od0_w)
+void riscpc_state::iocr_od0_w(int state)
 {
 	m_i2cmem->write_sda(state == true ? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(riscpc_state::iocr_od1_w)
+void riscpc_state::iocr_od1_w(int state)
 {
 	m_i2cmem_clock = state;
 	m_i2cmem->write_scl(state == true ? 1 : 0);
@@ -321,6 +324,9 @@ ROM_START(sarpc_j233)
 	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

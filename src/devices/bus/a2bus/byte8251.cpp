@@ -142,7 +142,7 @@ void a2bus_byte8251_device::device_add_mconfig(machine_config &config)
 	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
 }
 
-} // aonymous namespace
+} // anonymous namespace
 
 
 // device type definition

@@ -48,7 +48,8 @@ abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig
 	device_single_card_slot_interface<abc_keyboard_interface>(mconfig, *this),
 	m_out_rx_handler(*this),
 	m_out_trxc_handler(*this),
-	m_out_keydown_handler(*this), m_card(nullptr)
+	m_out_keydown_handler(*this),
+	m_card(nullptr)
 {
 }
 
@@ -60,11 +61,20 @@ abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig
 void abc_keyboard_port_device::device_start()
 {
 	m_card = get_card_device();
+}
 
-	// resolve callbacks
-	m_out_rx_handler.resolve_safe();
-	m_out_trxc_handler.resolve_safe();
-	m_out_keydown_handler.resolve_safe();
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void abc_keyboard_port_device::device_reset()
+{
+	if (m_card)
+	{
+		m_card->reset_w(ASSERT_LINE);
+		m_card->reset_w(CLEAR_LINE);
+	}
 }
 
 
@@ -72,7 +82,7 @@ void abc_keyboard_port_device::device_start()
 //  write_rx -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::write_rx )
+void abc_keyboard_port_device::write_rx(int state)
 {
 	m_out_rx_handler(state);
 }
@@ -82,7 +92,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::write_rx )
 //  txd_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::txd_w )
+void abc_keyboard_port_device::txd_w(int state)
 {
 	if (m_card)
 		m_card->txd_w(state);
@@ -93,7 +103,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::txd_w )
 //  trxc_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::trxc_w )
+void abc_keyboard_port_device::trxc_w(int state)
 {
 	m_out_trxc_handler(state);
 }
@@ -103,7 +113,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::trxc_w )
 //  keydown_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::keydown_w )
+void abc_keyboard_port_device::keydown_w(int state)
 {
 	m_out_keydown_handler(state);
 }
@@ -118,9 +128,13 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::keydown_w )
 #include "abc77.h"
 #include "abc99.h"
 
+void abc800_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add_internal("abc800", ABC800_KEYBOARD);
+}
+
 void abc_keyboard_devices(device_slot_interface &device)
 {
-	device.option_add("abc800", ABC800_KEYBOARD);
 	device.option_add("abc55", ABC55);
 	device.option_add("abc77", ABC77);
 	device.option_add("abc99", ABC99);

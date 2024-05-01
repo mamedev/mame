@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  debugview.c - Win32 debug window handling
+//  debugviewinfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -12,8 +12,11 @@
 #include "debugwininfo.h"
 #include "uimetrics.h"
 #include "debugger.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+
+#include "util/xmlfile.h"
 
 #include "strconv.h"
 
@@ -21,6 +24,8 @@
 
 #include <mmsystem.h>
 
+
+namespace osd::debugger::win {
 
 // debugger view styles
 #define DEBUG_VIEW_STYLE    WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
@@ -180,6 +185,18 @@ void debugview_info::send_pagedown()
 }
 
 
+int debugview_info::source_index() const
+{
+	if (m_view)
+	{
+		debug_view_source const *const source = m_view->source();
+		if (source)
+			return m_view->source_index(*source);
+	}
+	return -1;
+}
+
+
 char const *debugview_info::source_name() const
 {
 	if (m_view)
@@ -281,6 +298,56 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 		m_view->set_source(*cursource);
 	}
 	return result;
+}
+
+
+void debugview_info::restore_configuration_from_node(util::xml::data_node const &node)
+{
+	if (m_view->cursor_supported())
+	{
+		util::xml::data_node const *const selection = node.get_child(NODE_WINDOW_SELECTION);
+		if (selection)
+		{
+			debug_view_xy pos = m_view->cursor_position();
+			m_view->set_cursor_visible(0 != selection->get_attribute_int(ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0));
+			selection->get_attribute_int(ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->get_attribute_int(ATTR_SELECTION_CURSOR_Y, pos.y);
+			m_view->set_cursor_position(pos);
+		}
+	}
+
+	util::xml::data_node const *const scroll = node.get_child(NODE_WINDOW_SCROLL);
+	if (scroll)
+	{
+		debug_view_xy origin = m_view->visible_position();
+		origin.x = scroll->get_attribute_int(ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width()) / metrics().debug_font_width();
+		origin.y = scroll->get_attribute_int(ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height()) / metrics().debug_font_height();
+		m_view->set_visible_position(origin);
+	}
+}
+
+
+void debugview_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	if (m_view->cursor_supported())
+	{
+		util::xml::data_node *const selection = node.add_child(NODE_WINDOW_SELECTION, nullptr);
+		if (selection)
+		{
+			debug_view_xy const pos = m_view->cursor_position();
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_Y, pos.y);
+		}
+	}
+
+	util::xml::data_node *const scroll = node.add_child(NODE_WINDOW_SCROLL, nullptr);
+	if (scroll)
+	{
+		debug_view_xy const origin = m_view->visible_position();
+		scroll->set_attribute_int(ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width());
+		scroll->set_attribute_int(ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height());
+	}
 }
 
 
@@ -433,7 +500,7 @@ void debugview_info::draw_contents(HDC windc)
 		for (int iter = 0; iter < 2; iter++)
 		{
 			COLORREF fgcolor;
-			COLORREF bgcolor = RGB(0xff,0xff,0xff);
+			COLORREF bgcolor = metrics().view_colors(DCA_NORMAL).second;
 			HBRUSH bgbrush = nullptr;
 			int last_attrib = -1;
 			TCHAR buffer[256];
@@ -457,20 +524,8 @@ void debugview_info::draw_contents(HDC windc)
 				{
 					COLORREF oldbg = bgcolor;
 
-					// pick new background color
-					bgcolor = RGB(0xff,0xff,0xff);
-					if (viewdata[col].attrib & DCA_VISITED) bgcolor = RGB(0xc6, 0xe2, 0xff);
-					if (viewdata[col].attrib & DCA_ANCILLARY) bgcolor = RGB(0xe0,0xe0,0xe0);
-					if (viewdata[col].attrib & DCA_SELECTED) bgcolor = RGB(0xff,0x80,0x80);
-					if (viewdata[col].attrib & DCA_CURRENT) bgcolor = RGB(0xff,0xff,0x00);
-					if ((viewdata[col].attrib & DCA_SELECTED) && (viewdata[col].attrib & DCA_CURRENT)) bgcolor = RGB(0xff,0xc0,0x80);
-
-					// pick new foreground color
-					fgcolor = RGB(0x00,0x00,0x00);
-					if (viewdata[col].attrib & DCA_CHANGED) fgcolor = RGB(0xff,0x00,0x00);
-					if (viewdata[col].attrib & DCA_INVALID) fgcolor = RGB(0x00,0x00,0xff);
-					if (viewdata[col].attrib & DCA_DISABLED) fgcolor = RGB((GetRValue(fgcolor) + GetRValue(bgcolor)) / 2, (GetGValue(fgcolor) + GetGValue(bgcolor)) / 2, (GetBValue(fgcolor) + GetBValue(bgcolor)) / 2);
-					if (viewdata[col].attrib & DCA_COMMENT) fgcolor = RGB(0x00,0x80,0x00);
+					// pick new colors
+					std::tie(fgcolor, bgcolor) = metrics().view_colors(viewdata[col].attrib);
 
 					// flush any pending drawing
 					if (count > 0)
@@ -481,7 +536,7 @@ void debugview_info::draw_contents(HDC windc)
 							FillRect(dc, &bounds, bgbrush);
 							if (do_filldown)
 							{
-								COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+								COLORREF const filldown = metrics().view_colors(last_attrib & DCA_ANCILLARY).second;
 								if (oldbg != filldown)
 								{
 									DeleteObject(bgbrush);
@@ -528,7 +583,7 @@ void debugview_info::draw_contents(HDC windc)
 				FillRect(dc, &bounds, bgbrush);
 				if (do_filldown)
 				{
-					COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+					COLORREF const filldown = metrics().view_colors(last_attrib & DCA_ANCILLARY).second;
 					if (bgcolor != filldown)
 					{
 						DeleteObject(bgbrush);
@@ -1021,3 +1076,5 @@ void debugview_info::register_window_class()
 		s_window_class_registered = true;
 	}
 }
+
+} // namespace osd::debugger::win

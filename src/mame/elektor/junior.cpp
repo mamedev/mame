@@ -38,11 +38,13 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/mos6530n.h"
+#include "machine/mos6530.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
 #include "junior.lh"
 
+
+namespace {
 
 class junior_state : public driver_device
 {
@@ -70,7 +72,7 @@ private:
 
 	void mem_map(address_map &map);
 
-	required_device<mos6532_new_device> m_riot;
+	required_device<mos6532_device> m_riot;
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_io_keyboard;
@@ -84,8 +86,8 @@ void junior_state::mem_map(address_map &map)
 	map.global_mask(0x1FFF);
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram(); // 1K RAM
-	map(0x1a00, 0x1a7f).m(m_riot, FUNC(mos6532_new_device::ram_map));
-	map(0x1a80, 0x1a9f).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x1a00, 0x1a7f).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x1a80, 0x1a9f).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0x1c00, 0x1fff).rom().region("maincpu", 0); // Monitor
 }
 
@@ -201,7 +203,7 @@ void junior_state::junior(machine_config &config)
 	m_display->set_segmask(0x3f0, 0x7f);
 
 	/* Devices */
-	MOS6532_NEW(config, m_riot, 1_MHz_XTAL);
+	MOS6532(config, m_riot, 1_MHz_XTAL);
 	m_riot->pa_rd_callback().set(FUNC(junior_state::riot_a_r));
 	m_riot->pa_wr_callback().set(FUNC(junior_state::riot_a_w));
 	m_riot->pb_wr_callback().set(FUNC(junior_state::riot_b_w));
@@ -223,6 +225,9 @@ ROM_START( junior )
 	ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732)" )
 	ROMX_LOAD( "junior27321a.ic2", 0x0000, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

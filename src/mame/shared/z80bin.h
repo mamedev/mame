@@ -8,11 +8,19 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_Z80BIN_H
-#define MAME_MACHINE_Z80BIN_H
+#ifndef MAME_SHARED_Z80BIN_H
+#define MAME_SHARED_Z80BIN_H
 
 #pragma once
 
-image_init_result z80bin_load_file(device_image_interface &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr);
+#include <cstdint>
+#include <string>
+#include <system_error>
+#include <utility>
 
-#endif // MAME_MACHINE_Z80BIN_H
+
+class snapshot_image_device;
+
+std::pair<std::error_condition, std::string> z80bin_load_file(snapshot_image_device &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr);
+
+#endif // MAME_SHARED_Z80BIN_H

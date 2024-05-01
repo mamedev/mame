@@ -34,17 +34,17 @@ public:
 	virtual void setaddress_dbin(offs_t offset, int state) { }
 	virtual void crureadz(offs_t offset, uint8_t *value) { }
 	virtual void cruwrite(offs_t offset, uint8_t data) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( memen_in ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( msast_in ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_in ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( reset_in ) { }
+	virtual void memen_in(int state) { }
+	virtual void msast_in(int state) { }
+	virtual void clock_in(int state) { }
+	virtual void reset_in(int state) { }
 
 	void set_ioport(ioport_device* ioport) { m_ioport = ioport; }
 
 protected:
 	// Methods called from the external device
-	DECLARE_WRITE_LINE_MEMBER( set_extint );
-	DECLARE_WRITE_LINE_MEMBER( set_ready );
+	void set_extint(int state);
+	void set_ready(int state);
 private:
 	ioport_device* m_ioport;
 };
@@ -53,7 +53,7 @@ private:
     I/O port
 ********************************************************************/
 
-class ioport_device : public device_t, public device_slot_interface
+class ioport_device : public device_t, public device_single_card_slot_interface<ioport_attached_device>
 {
 	friend class ioport_attached_device;
 
@@ -76,18 +76,18 @@ public:
 	void setaddress_dbin(offs_t offset, int state);
 	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( memen_in );
-	DECLARE_WRITE_LINE_MEMBER( msast_in );
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( reset_in );
+	void memen_in(int state);
+	void msast_in(int state);
+	void clock_in(int state);
+	void reset_in(int state);
 
 	// Callbacks
 	auto extint_cb() { return m_console_extint.bind(); }
 	auto ready_cb() { return m_console_ready.bind(); }
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// Methods called back from the external device
 	devcb_write_line m_console_extint;   // EXTINT line

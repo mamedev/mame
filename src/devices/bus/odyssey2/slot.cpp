@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "slot.h"
 
+#include <tuple>
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -130,8 +133,10 @@ static const char *o2_get_slot(int type)
  call load
 -------------------------------------------------*/
 
-image_init_result o2_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> o2_cart_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_cart)
 	{
 		if (loaded_through_softlist())
@@ -152,25 +157,34 @@ image_init_result o2_cart_slot_device::call_load()
 		}
 		else
 		{
-			u32 size = length();
-			fread(m_cart->m_rom, size);
+			u32 const size = length();
+			size_t actual;
+			std::tie(err, m_cart->m_rom, actual) = read(image_core_file(), size);
+			if (!err && (actual != size))
+				err = std::errc::io_error;
 
-			m_cart->m_rom_size = size;
-			m_cart->m_exrom_size = 0;
-			m_cart->m_voice_size = 0;
-			m_b = 0;
+			if (!err)
+			{
+				m_cart->m_rom_size = size;
+				m_cart->m_exrom_size = 0;
+				m_cart->m_voice_size = 0;
+				m_b = 0;
 
-			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
+				m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
+			}
 		}
 
 		if (m_cart->get_rom_size() > 0)
-		{
 			m_cart->cart_init();
-			return image_init_result::PASS;
-		}
+		else if (!err)
+			err = image_error::UNSPECIFIED;
+	}
+	else
+	{
+		err = image_error::UNSPECIFIED;
 	}
 
-	return image_init_result::FAIL;
+	return std::make_pair(err, std::string());
 }
 
 
@@ -241,7 +255,7 @@ u8 o2_cart_slot_device::bus_read()
 	return (m_cart) ? m_cart->bus_read() : 0xff;
 }
 
-READ_LINE_MEMBER(o2_cart_slot_device::t0_read)
+int o2_cart_slot_device::t0_read()
 {
 	return (m_cart) ? m_cart->t0_read() : 0;
 }

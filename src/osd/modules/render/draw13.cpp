@@ -2,7 +2,7 @@
 // copyright-holders: Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
-//  draw13.c - SDL 2.0 drawing implementation
+//  draw13.cpp - SDL 2.0 drawing implementation
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -10,23 +10,201 @@
 //
 //============================================================
 
-// standard C headers
-#include <cmath>
-#include <cstdio>
+#include "render_module.h"
 
-// MAME headers
-#include "emu.h"
-#include "options.h"
+#include "modules/osdmodule.h"
+
+#if defined(OSD_SDL)
 
 // OSD headers
-#include "osdsdl.h"
+#include "sdlopts.h"
 #include "window.h"
 
-#include "draw13.h"
+// lib/util
+#include "options.h"
+
+// emu
+#include "emucore.h"
+#include "render.h"
+
+// standard SDL headers
+#include <SDL2/SDL.h>
+
+// standard C headers
+#include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <iterator>
+#include <list>
+
+
+namespace osd {
+
+namespace {
+
+struct quad_setup_data
+{
+	quad_setup_data() = default;
+
+	void compute(const render_primitive &prim, const int prescale);
+
+	int32_t   dudx = 0, dvdx = 0, dudy = 0, dvdy = 0;
+	int32_t   startu = 0, startv = 0;
+	int32_t   rotwidth = 0, rotheight = 0;
+};
 
 //============================================================
-//  DEBUGGING
+//  Textures
 //============================================================
+
+class renderer_sdl2;
+struct copy_info_t;
+
+/* texture_info holds information about a texture */
+class texture_info
+{
+public:
+	texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const uint32_t flags);
+	~texture_info();
+
+	void set_data(const render_texinfo &texsource, const uint32_t flags);
+	void render_quad(const render_primitive &prim, const int x, const int y);
+	bool matches(const render_primitive &prim, const quad_setup_data &setup);
+
+	copy_info_t const *compute_size_type();
+
+	void                *m_pixels;            // pixels for the texture
+	int                 m_pitch;
+
+	copy_info_t const   *m_copyinfo;
+	quad_setup_data     m_setup;
+
+	osd_ticks_t         m_last_access;
+
+	int raw_width() const { return m_texinfo.width; }
+	int raw_height() const { return m_texinfo.height; }
+
+	const render_texinfo &texinfo() const { return m_texinfo; }
+	render_texinfo &texinfo() { return m_texinfo; }
+
+	HashT hash() const { return m_hash; }
+	uint32_t flags() const { return m_flags; }
+
+private:
+	bool is_pixels_owned() const;
+
+	void set_coloralphamode(SDL_Texture *texture_id, const render_color *color);
+
+	Uint32              m_sdl_access;
+	renderer_sdl2 *     m_renderer;
+	render_texinfo      m_texinfo;            // copy of the texture info
+	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
+	uint32_t            m_flags;              // rendering flags
+
+	SDL_Texture *       m_texture_id;
+	bool                m_is_rotated;
+
+	int                 m_format;             // texture format
+	SDL_BlendMode       m_sdl_blendmode;
+};
+
+// inline functions and macros
+#include "blit13.ipp"
+
+//============================================================
+//  TEXCOPY FUNCS
+//============================================================
+
+enum SDL_TEXFORMAT_E
+{
+	SDL_TEXFORMAT_ARGB32 = 0,
+	SDL_TEXFORMAT_RGB32,
+	SDL_TEXFORMAT_RGB32_PALETTED,
+	SDL_TEXFORMAT_YUY16,
+	SDL_TEXFORMAT_YUY16_PALETTED,
+	SDL_TEXFORMAT_PALETTE16,
+	SDL_TEXFORMAT_RGB15,
+	SDL_TEXFORMAT_RGB15_PALETTED,
+	SDL_TEXFORMAT_PALETTE16A,
+	SDL_TEXFORMAT_PALETTE16_ARGB1555,
+	SDL_TEXFORMAT_RGB15_ARGB1555,
+	SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555,
+	SDL_TEXFORMAT_LAST = SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555
+};
+
+struct copy_info_t
+{
+	int                 src_fmt;
+	Uint32              dst_fmt;
+	const blit_base     *blitter;
+	Uint32              bm_mask;
+	const char          *srcname;
+	const char          *dstname;
+	/* Statistics */
+	mutable uint64_t    pixel_count;
+	mutable int64_t     time;
+	mutable int         samples;
+	mutable int         perf;
+	/* list */
+	copy_info_t const   *next;
+};
+
+/* renderer_sdl2 is the information about SDL for the current screen */
+class renderer_sdl2 : public osd_renderer
+{
+public:
+	renderer_sdl2(
+			osd_window &window,
+			copy_info_t const *const (&blit_info)[SDL_TEXFORMAT_LAST + 1]);
+
+	virtual ~renderer_sdl2()
+	{
+		destroy_all_textures();
+		SDL_DestroyRenderer(m_sdl_renderer);
+		m_sdl_renderer = nullptr;
+	}
+
+	virtual int create() override;
+	virtual int draw(const int update) override;
+	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
+	virtual render_primitive_list *get_primitives() override;
+
+	int RendererSupportsFormat(Uint32 format, Uint32 access, const char *sformat);
+
+	SDL_Renderer *m_sdl_renderer;
+	copy_info_t const *const (&m_blit_info)[SDL_TEXFORMAT_LAST + 1];
+
+private:
+	void render_quad(texture_info *texture, const render_primitive &prim, const int x, const int y);
+
+	texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
+	texture_info *texture_update(const render_primitive &prim);
+
+	void destroy_all_textures();
+
+	int32_t         m_blittimer;
+
+	std::list<texture_info> m_texlist;                // list of active textures
+
+	float           m_last_hofs;
+	float           m_last_vofs;
+
+	int             m_width;
+	int             m_height;
+
+	osd_dim         m_blit_dim;
+
+	struct
+	{
+		Uint32  format;
+		int     status;
+	} fmt_support[30];
+
+	// Stats
+	int64_t         m_last_blit_time;
+	int64_t         m_last_blit_pixels;
+};
+
 
 //============================================================
 //  CONSTANTS
@@ -60,9 +238,12 @@ static inline bool is_transparent(const float &a)
 //  CONSTRUCTOR & DESTRUCTOR
 //============================================================
 
-renderer_sdl2::renderer_sdl2(std::shared_ptr<osd_window> window, int extra_flags)
-	: osd_renderer(window,  FLAG_NEEDS_OPENGL | extra_flags)
+renderer_sdl2::renderer_sdl2(
+		osd_window &window,
+		copy_info_t const *const (&blit_info)[SDL_TEXFORMAT_LAST + 1])
+	: osd_renderer(window)
 	, m_sdl_renderer(nullptr)
+	, m_blit_info(blit_info)
 	, m_blittimer(0)
 	, m_last_hofs(0)
 	, m_last_vofs(0)
@@ -77,111 +258,7 @@ renderer_sdl2::renderer_sdl2(std::shared_ptr<osd_window> window, int extra_flags
 		fmt_support[i].format = 0;
 		fmt_support[i].status = 0;
 	}
-
-	if (!s_blit_info_initialized)
-	{
-		/* On OSX, calling this from drawsdl2_init will
-		 * prohibit fullscreen toggling. It is than not possible
-		 * to toggle from fullscreen to window mode.
-		 */
-		expand_copy_info(s_blit_info_default);
-		s_blit_info_initialized = true;
-	}
 }
-
-
-//============================================================
-//  STATIC VARIABLES
-//============================================================
-
-#define BM_ALL (UINT32_MAX)
-//( SDL_BLENDMODE_MASK | SDL_BLENDMODE_BLEND | SDL_BLENDMODE_ADD | SDL_BLENDMODE_MOD)
-
-#define ENTRY(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, 0}
-#define ENTRY_BM(a,b,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
-#define ENTRY_LR(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
-
-const copy_info_t renderer_sdl2::s_blit_info_default[] =
-{
-	/* no rotation */
-	ENTRY(ARGB32,           ARGB8888,   argb32_argb32),
-	ENTRY_LR(ARGB32,        RGB888,     argb32_rgb32),
-	/* Entry primarily for directfb */
-	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_NONE),
-
-	ENTRY(RGB32,            ARGB8888,   rgb32_argb32),
-	ENTRY(RGB32,            RGB888,     rgb32_rgb32),
-
-	ENTRY(RGB32_PALETTED,   ARGB8888,   rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,   RGB888,     rgb32pal_argb32),
-
-	ENTRY(YUY16,            UYVY,       yuv16_uyvy),
-	ENTRY(YUY16,            YUY2,       yuv16_yuy2),
-	ENTRY(YUY16,            YVYU,       yuv16_yvyu),
-	ENTRY(YUY16,            ARGB8888,   yuv16_argb32),
-	ENTRY(YUY16,            RGB888,     yuv16_argb32),
-
-	ENTRY(YUY16_PALETTED,   UYVY,       yuv16pal_uyvy),
-	ENTRY(YUY16_PALETTED,   YUY2,       yuv16pal_yuy2),
-	ENTRY(YUY16_PALETTED,   YVYU,       yuv16pal_yvyu),
-	ENTRY(YUY16_PALETTED,   ARGB8888,   yuv16pal_argb32),
-	ENTRY(YUY16_PALETTED,   RGB888,     yuv16pal_argb32),
-
-	ENTRY(PALETTE16,        ARGB8888,   pal16_argb32),
-	ENTRY(PALETTE16,        RGB888,     pal16_argb32),
-
-	ENTRY(RGB15,            RGB555,     rgb15_rgb555),
-	ENTRY(RGB15,            ARGB1555,   rgb15_argb1555),
-	ENTRY(RGB15,            ARGB8888,   rgb15_argb32),
-	ENTRY(RGB15,            RGB888,     rgb15_argb32),
-
-	ENTRY(RGB15_PALETTED,   ARGB8888,   rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,   RGB888,     rgb15pal_argb32),
-
-	ENTRY(PALETTE16A,       ARGB8888,   pal16a_argb32),
-	ENTRY(PALETTE16A,       RGB888,     pal16a_rgb32),
-
-	/* rotation */
-	ENTRY(ARGB32,           ARGB8888,   rot_argb32_argb32),
-	ENTRY_LR(ARGB32,        RGB888,     rot_argb32_rgb32),
-	/* Entry primarily for directfb */
-	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_NONE),
-
-	ENTRY(RGB32,            ARGB8888,   rot_rgb32_argb32),
-	ENTRY(RGB32,            RGB888,     rot_argb32_argb32),
-
-	ENTRY(RGB32_PALETTED,   ARGB8888,   rot_rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,   RGB888,     rot_rgb32pal_argb32),
-
-	ENTRY(YUY16,            ARGB8888,   rot_yuv16_argb32rot),
-	ENTRY(YUY16,            RGB888,     rot_yuv16_argb32rot),
-
-	ENTRY(YUY16_PALETTED,   ARGB8888,   rot_yuv16pal_argb32rot),
-	ENTRY(YUY16_PALETTED,   RGB888,     rot_yuv16pal_argb32rot),
-
-	ENTRY(PALETTE16,        ARGB8888,   rot_pal16_argb32),
-	ENTRY(PALETTE16,        RGB888,     rot_pal16_argb32),
-
-	ENTRY(RGB15,            RGB555,     rot_rgb15_argb1555),
-	ENTRY(RGB15,            ARGB1555,   rot_rgb15_argb1555),
-	ENTRY(RGB15,            ARGB8888,   rot_rgb15_argb32),
-	ENTRY(RGB15,            RGB888,     rot_rgb15_argb32),
-
-	ENTRY(RGB15_PALETTED,   ARGB8888,   rot_rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,   RGB888,     rot_rgb15pal_argb32),
-
-	ENTRY(PALETTE16A,       ARGB8888,   rot_pal16a_argb32),
-	ENTRY(PALETTE16A,       RGB888,     rot_pal16a_rgb32),
-
-{ -1 },
-};
-
-copy_info_t* renderer_sdl2::s_blit_info[SDL_TEXFORMAT_LAST+1] = { nullptr };
-bool renderer_sdl2::s_blit_info_initialized = false;
 
 //============================================================
 //  INLINES
@@ -277,7 +354,7 @@ void renderer_sdl2::render_quad(texture_info *texture, const render_primitive &p
 
 	if (texture)
 	{
-		copy_info_t *copyinfo = texture->m_copyinfo;
+		copy_info_t const *copyinfo = texture->m_copyinfo;
 		copyinfo->time -= osd_ticks();
 		texture->render_quad(prim, x, y);
 		copyinfo->time += osd_ticks();
@@ -288,7 +365,7 @@ void renderer_sdl2::render_quad(texture_info *texture, const render_primitive &p
 			copyinfo->time += (m_last_blit_time * (int64_t) (texture->raw_width() * texture->raw_height())) / (int64_t) m_last_blit_pixels;
 		}
 		copyinfo->samples++;
-		copyinfo->perf = ( texture->m_copyinfo->pixel_count * (osd_ticks_per_second()/1000)) / texture->m_copyinfo->time;
+		copyinfo->perf = (texture->m_copyinfo->pixel_count * (osd_ticks_per_second()/1000)) / std::max<int64_t>(texture->m_copyinfo->time, 1);
 	}
 	else
 	{
@@ -327,59 +404,6 @@ int renderer_sdl2::RendererSupportsFormat(Uint32 format, Uint32 access, const ch
 	osd_printf_verbose("Pixelformat <%s> not supported\n", sformat);
 	fmt_support[i].status = 0;
 	return 0;
-}
-
-//============================================================
-//  drawsdl_init
-//============================================================
-
-void renderer_sdl2::add_list(copy_info_t **head, const copy_info_t *element, Uint32 bm)
-{
-	copy_info_t *newci = new copy_info_t;
-	*newci = *element;
-
-	newci->bm_mask = bm;
-	newci->next = *head;
-	*head = newci;
-}
-
-void renderer_sdl2::expand_copy_info(const copy_info_t *list)
-{
-	for (const copy_info_t *bi = list; bi->src_fmt != -1; bi++)
-	{
-		if (bi->bm_mask == BM_ALL)
-		{
-			add_list(&s_blit_info[bi->src_fmt], bi, SDL_BLENDMODE_NONE);
-			add_list(&s_blit_info[bi->src_fmt], bi, SDL_BLENDMODE_ADD);
-			add_list(&s_blit_info[bi->src_fmt], bi, SDL_BLENDMODE_MOD);
-			add_list(&s_blit_info[bi->src_fmt], bi, SDL_BLENDMODE_BLEND);
-		}
-		else
-		{
-			add_list(&s_blit_info[bi->src_fmt], bi, bi->bm_mask);
-		}
-	}
-}
-
-// FIXME: machine only used to access options.
-void renderer_sdl2::init(running_machine &machine)
-{
-	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
-
-#if USE_OPENGL
-	// Load the GL library now - else MT will fail
-	const char *stemp = downcast<sdl_options &>(machine.options()).gl_lib();
-#else
-	const char *stemp = nullptr;
-#endif
-	if (stemp != nullptr && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
-		stemp = nullptr;
-
-	// No fatalerror here since not all video drivers support GL !
-	if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==nullptr
-		osd_printf_warning("Warning: Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
-	else
-		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 }
 
 
@@ -434,12 +458,10 @@ int renderer_sdl2::create()
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 	}
 
-	auto win = assert_window();
-
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{
@@ -483,18 +505,14 @@ int renderer_sdl2::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 void renderer_sdl2::destroy_all_textures()
 {
-	auto win = assert_window();
-	if (win == nullptr)
-		return;
-
-	if(win->m_primlist)
+	if (window().m_primlist)
 	{
-		win->m_primlist->acquire_lock();
-		m_texlist.reset();
-		win->m_primlist->release_lock();
+		window().m_primlist->acquire_lock();
+		m_texlist.clear();
+		window().m_primlist->release_lock();
 	}
 	else
-		m_texlist.reset();
+		m_texlist.clear();
 }
 
 //============================================================
@@ -507,13 +525,7 @@ int renderer_sdl2::draw(int update)
 	float vofs, hofs;
 	int blit_pixels = 0;
 
-	if (video_config.novideo)
-	{
-		return 0;
-	}
-
-	auto win = assert_window();
-	osd_dim wdim = win->get_size();
+	osd_dim wdim = window().get_size();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
@@ -560,10 +572,10 @@ int renderer_sdl2::draw(int update)
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
 
-	win->m_primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (render_primitive &prim : *win->m_primlist)
+	for (render_primitive &prim : *window().m_primlist)
 	{
 		Uint8 sr, sg, sb, sa;
 
@@ -593,7 +605,7 @@ int renderer_sdl2::draw(int update)
 		}
 	}
 
-	win->m_primlist->release_lock();
+	window().m_primlist->release_lock();
 
 	m_last_blit_pixels = blit_pixels;
 	m_last_blit_time = -osd_ticks();
@@ -612,22 +624,23 @@ int renderer_sdl2::draw(int update)
 //  texture_compute_size and type
 //============================================================
 
-copy_info_t *texture_info::compute_size_type()
+copy_info_t const *texture_info::compute_size_type()
 {
-	copy_info_t *result = nullptr;
+	copy_info_t const *result = nullptr;
 	int maxperf = 0;
 
-	for (copy_info_t *bi = renderer_sdl2::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
+	for (copy_info_t const *bi = m_renderer->m_blit_info[m_format]; bi != nullptr; bi = bi->next)
 	{
-		if ((m_is_rotated == bi->blitter->m_is_rot)
-				&& (m_sdl_blendmode == bi->bm_mask))
+		if ((m_is_rotated == bi->blitter->m_is_rot) && (m_sdl_blendmode == bi->bm_mask))
 		{
 			if (m_renderer->RendererSupportsFormat(bi->dst_fmt, m_sdl_access, bi->dstname))
 			{
-				int perf = bi->perf;
+				int const perf = bi->perf;
 				if (perf == 0)
+				{
 					return bi;
-				else if (perf > (maxperf * 102) / 100)
+				}
+				else if (perf > ((maxperf * 102) / 100))
 				{
 					result = bi;
 					maxperf = perf;
@@ -639,23 +652,21 @@ copy_info_t *texture_info::compute_size_type()
 	if (result)
 		return result;
 
-	/* try last resort handlers */
-	for (copy_info_t *bi = renderer_sdl2::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
+	// try last resort handlers
+	for (copy_info_t const *bi = m_renderer->m_blit_info[m_format]; bi != nullptr; bi = bi->next)
 	{
-		if ((m_is_rotated == bi->blitter->m_is_rot)
-			&& (m_sdl_blendmode == bi->bm_mask))
+		if ((m_is_rotated == bi->blitter->m_is_rot) && (m_sdl_blendmode == bi->bm_mask))
 			if (m_renderer->RendererSupportsFormat(bi->dst_fmt, m_sdl_access, bi->dstname))
 				return bi;
 	}
-	//FIXME: crash implement a -do nothing handler */
+	//FIXME: crash implement a -do nothing handler
 	return nullptr;
 }
 
-// FIXME:
 bool texture_info::is_pixels_owned() const
-{ // do we own / allocated it ?
-	return ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
-			&& (m_copyinfo->blitter->m_is_passthrough));
+{
+	// do we own / allocated it ?
+	return (m_sdl_access == SDL_TEXTUREACCESS_STATIC) && !m_copyinfo->blitter->m_is_passthrough;
 }
 
 //============================================================
@@ -745,12 +756,11 @@ texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsou
 			m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->blitter->m_dest_bpp);
 	}
 	m_last_access = osd_ticks();
-
 }
 
 texture_info::~texture_info()
 {
-	if ( is_pixels_owned() && (m_pixels != nullptr) )
+	if (is_pixels_owned() && m_pixels)
 		free(m_pixels);
 	SDL_DestroyTexture(m_texture_id);
 }
@@ -764,7 +774,7 @@ void texture_info::set_data(const render_texinfo &texsource, const uint32_t flag
 	m_copyinfo->time -= osd_ticks();
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
-		if ( m_copyinfo->blitter->m_is_passthrough )
+		if (m_copyinfo->blitter->m_is_passthrough)
 		{
 			m_pixels = texsource.base;
 			m_pitch = m_texinfo.rowpixels * m_copyinfo->blitter->m_dest_bpp;
@@ -778,11 +788,11 @@ void texture_info::set_data(const render_texinfo &texsource, const uint32_t flag
 	}
 	else
 	{
-		SDL_LockTexture(m_texture_id, nullptr, (void **) &m_pixels, &m_pitch);
+		SDL_LockTexture(m_texture_id, nullptr, (void **)&m_pixels, &m_pitch);
 		if ( m_copyinfo->blitter->m_is_passthrough )
 		{
-			uint8_t *src = (uint8_t *) texsource.base;
-			uint8_t *dst = (uint8_t *) m_pixels;
+			const uint8_t *src = (uint8_t *)texsource.base;
+			uint8_t *dst = (uint8_t *)m_pixels;
 			int spitch = texsource.rowpixels * m_copyinfo->blitter->m_dest_bpp;
 			int num = texsource.width * m_copyinfo->blitter->m_dest_bpp;
 			int h = texsource.height;
@@ -868,61 +878,35 @@ void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 
 texture_info *renderer_sdl2::texture_find(const render_primitive &prim, const quad_setup_data &setup)
 {
-	HashT texhash = texture_compute_hash(prim.texture, prim.flags);
-	texture_info *texture;
-	osd_ticks_t now = osd_ticks();
+	const HashT texhash = texture_compute_hash(prim.texture, prim.flags);
+	const osd_ticks_t now = osd_ticks();
 
 	// find a match
-	for (texture = m_texlist.first(); texture != nullptr; )
-		if (texture->hash() == texhash &&
-			texture->matches(prim, setup))
+	for (auto texture = m_texlist.begin(); texture != m_texlist.end(); )
+	{
+		if ((texture->hash() == texhash) && texture->matches(prim, setup))
 		{
-			/* would we choose another blitter based on performance ? */
+			// would we choose another blitter based on performance?
 			if ((texture->m_copyinfo->samples & 0x7f) == 0x7f)
 			{
 				if (texture->m_copyinfo != texture->compute_size_type())
 					return nullptr;
 			}
 			texture->m_last_access = now;
-			return texture;
+			return &*texture;
 		}
 		else
 		{
-			/* free resources not needed any longer? */
-			texture_info *expire = texture;
-			texture = texture->next();
-			if (now - expire->m_last_access > osd_ticks_per_second())
-				m_texlist.remove(*expire);
+			// free resources not needed any longer?
+			if ((now - texture->m_last_access) > osd_ticks_per_second())
+				texture = m_texlist.erase(texture);
+			else
+				++texture;
 		}
+	}
 
 	// nothing found
 	return nullptr;
-}
-
-//============================================================
-//  exit
-//============================================================
-
-void renderer_sdl2::exit()
-{
-	if (s_blit_info_initialized)
-	{
-		for (int i = 0; i <= SDL_TEXFORMAT_LAST; i++)
-		{
-			for (copy_info_t *bi = s_blit_info[i]; bi != nullptr; )
-			{
-				if (bi->pixel_count)
-					osd_printf_verbose("%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n", bi->srcname, bi->dstname,
-							bi->blitter->m_is_rot ? "rot" : "norot", bi->bm_mask, bi->samples,
-							(int) bi->perf);
-				copy_info_t *freeme = bi;
-				bi = bi->next;
-				delete freeme;
-			}
-			s_blit_info[i] = nullptr;
-		}
-		s_blit_info_initialized = false;
-	}
 }
 
 //============================================================
@@ -934,22 +918,20 @@ texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 	quad_setup_data setup;
 	texture_info *texture;
 
-	auto win = assert_window();
-	setup.compute(prim, win->prescale());
+	setup.compute(prim, window().prescale());
 
 	texture = texture_find(prim, setup);
 
 	// if we didn't find one, create a new texture
-	if (texture == nullptr && prim.texture.base != nullptr)
+	if (!texture && prim.texture.base)
 	{
-		texture = new texture_info(this, prim.texture, setup, prim.flags);
-		/* add us to the texture list */
-		m_texlist.prepend(*texture);
+		// add us to the texture list
+		texture = &m_texlist.emplace_front(this, prim.texture, setup, prim.flags);
 	}
 
-	if (texture != nullptr)
+	if (texture)
 	{
-		if (prim.texture.base != nullptr && texture->texinfo().seqid != prim.texture.seqid)
+		if (prim.texture.base && (texture->texinfo().seqid != prim.texture.seqid))
 		{
 			texture->texinfo().seqid = prim.texture.seqid;
 			// if we found it, but with a different seqid, copy the data
@@ -962,16 +944,249 @@ texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 
 render_primitive_list *renderer_sdl2::get_primitives()
 {
-	auto win = assert_window();
-	if (win == nullptr)
-		return nullptr;
-
-	osd_dim nd = win->get_size();
+	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
 		notify_changed();
 	}
-	win->target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), win->pixel_aspect());
-	return &win->target()->get_primitives();
+	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
+	return &window().target()->get_primitives();
 }
+
+
+class video_sdl2 : public osd_module, public render_module
+{
+public:
+	video_sdl2()
+		: osd_module(OSD_RENDERER_PROVIDER, "accel")
+		, m_blit_info_initialized(false)
+		, m_gllib_loaded(false)
+	{
+		std::fill(std::begin(m_blit_info), std::end(m_blit_info), nullptr);
+	}
+	~video_sdl2()
+	{
+		free_copy_info();
+	}
+
+	virtual int init(osd_interface &osd, osd_options const &options) override;
+	virtual void exit() override { free_copy_info(); }
+
+	virtual std::unique_ptr<osd_renderer> create(osd_window &window) override;
+
+protected:
+	virtual unsigned flags() const override { return FLAG_INTERACTIVE | FLAG_SDL_NEEDS_OPENGL; }
+
+private:
+	static inline constexpr Uint32 BM_ALL = UINT32_MAX; // SDL_BLENDMODE_MASK | SDL_BLENDMODE_BLEND | SDL_BLENDMODE_ADD | SDL_BLENDMODE_MOD
+
+	void expand_copy_info();
+	void free_copy_info();
+
+	static void add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm);
+
+	copy_info_t const *m_blit_info[SDL_TEXFORMAT_LAST + 1];
+	bool m_blit_info_initialized;
+	bool m_gllib_loaded;
+
+	static copy_info_t const s_blit_info_default[];
+};
+
+int video_sdl2::init(osd_interface &osd, osd_options const &options)
+{
+	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
+
+	// Load the GL library now - else MT will fail
+	char const *libname = nullptr;
+#if USE_OPENGL
+	libname = dynamic_cast<sdl_options const &>(options).gl_lib();
+	if (libname && (!*libname || !std::strcmp(libname, OSDOPTVAL_AUTO)))
+		libname = nullptr;
+#endif
+
+	if (!m_gllib_loaded)
+	{
+		// No fatalerror here since not all video drivers support GL!
+		if (SDL_GL_LoadLibrary(libname) != 0)
+		{
+			osd_printf_error("Unable to load OpenGL shared library: %s\n", libname ? libname : "<default>");
+			m_gllib_loaded = true;
+		}
+		else
+		{
+			osd_printf_verbose("Loaded OpenGL shared library: %s\n", libname ? libname : "<default>");
+		}
+	}
+
+	return 0;
+}
+
+std::unique_ptr<osd_renderer> video_sdl2::create(osd_window &window)
+{
+	if (!m_blit_info_initialized)
+	{
+		// On macOS, calling this from drawsdl2_init will prohibit fullscreen toggling.
+		// It is than not possible to toggle from fullscreen to window mode.
+		expand_copy_info();
+		m_blit_info_initialized = true;
+	}
+
+	return std::make_unique<renderer_sdl2>(window, m_blit_info);
+}
+
+void video_sdl2::expand_copy_info()
+{
+	for (const copy_info_t *bi = s_blit_info_default; bi->src_fmt != -1; bi++)
+	{
+		if (bi->bm_mask == BM_ALL)
+		{
+			add_list(m_blit_info[bi->src_fmt], *bi, SDL_BLENDMODE_NONE);
+			add_list(m_blit_info[bi->src_fmt], *bi, SDL_BLENDMODE_ADD);
+			add_list(m_blit_info[bi->src_fmt], *bi, SDL_BLENDMODE_MOD);
+			add_list(m_blit_info[bi->src_fmt], *bi, SDL_BLENDMODE_BLEND);
+		}
+		else
+		{
+			add_list(m_blit_info[bi->src_fmt], *bi, bi->bm_mask);
+		}
+	}
+}
+
+void video_sdl2::free_copy_info()
+{
+	if (m_blit_info_initialized)
+	{
+		for (int i = 0; i <= SDL_TEXFORMAT_LAST; i++)
+		{
+			for (copy_info_t const *bi = m_blit_info[i]; bi != nullptr; )
+			{
+				if (bi->pixel_count)
+				{
+					osd_printf_verbose(
+							"%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n",
+							bi->srcname,
+							bi->dstname,
+							bi->blitter->m_is_rot ? "rot" : "norot",
+							bi->bm_mask,
+							bi->samples,
+							bi->perf);
+				}
+				delete std::exchange(bi, bi->next);
+			}
+			m_blit_info[i] = nullptr;
+		}
+		m_blit_info_initialized = false;
+	}
+}
+
+void video_sdl2::add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm)
+{
+	copy_info_t *const newci = new copy_info_t(element);
+
+	newci->bm_mask = bm;
+	newci->next = head;
+	head = newci;
+}
+
+
+//============================================================
+//  STATIC VARIABLES
+//============================================================
+
+#define ENTRY(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, 0}
+#define ENTRY_BM(a,b,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
+#define ENTRY_LR(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
+
+copy_info_t const video_sdl2::s_blit_info_default[] =
+{
+	/* no rotation */
+	ENTRY(ARGB32,           ARGB8888,   argb32_argb32),
+	ENTRY_LR(ARGB32,        RGB888,     argb32_rgb32),
+	/* Entry primarily for directfb */
+	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_NONE),
+
+	ENTRY(RGB32,            ARGB8888,   rgb32_argb32),
+	ENTRY(RGB32,            RGB888,     rgb32_rgb32),
+
+	ENTRY(RGB32_PALETTED,   ARGB8888,   rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   RGB888,     rgb32pal_argb32),
+
+	ENTRY(YUY16,            UYVY,       yuv16_uyvy),
+	ENTRY(YUY16,            YUY2,       yuv16_yuy2),
+	ENTRY(YUY16,            YVYU,       yuv16_yvyu),
+	ENTRY(YUY16,            ARGB8888,   yuv16_argb32),
+	ENTRY(YUY16,            RGB888,     yuv16_argb32),
+
+	ENTRY(YUY16_PALETTED,   UYVY,       yuv16pal_uyvy),
+	ENTRY(YUY16_PALETTED,   YUY2,       yuv16pal_yuy2),
+	ENTRY(YUY16_PALETTED,   YVYU,       yuv16pal_yvyu),
+	ENTRY(YUY16_PALETTED,   ARGB8888,   yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   RGB888,     yuv16pal_argb32),
+
+	ENTRY(PALETTE16,        ARGB8888,   pal16_argb32),
+	ENTRY(PALETTE16,        RGB888,     pal16_argb32),
+
+	ENTRY(RGB15,            RGB555,     rgb15_rgb555),
+	ENTRY(RGB15,            ARGB1555,   rgb15_argb1555),
+	ENTRY(RGB15,            ARGB8888,   rgb15_argb32),
+	ENTRY(RGB15,            RGB888,     rgb15_argb32),
+
+	ENTRY(RGB15_PALETTED,   ARGB8888,   rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   RGB888,     rgb15pal_argb32),
+
+	ENTRY(PALETTE16A,       ARGB8888,   pal16a_argb32),
+	ENTRY(PALETTE16A,       RGB888,     pal16a_rgb32),
+
+	/* rotation */
+	ENTRY(ARGB32,           ARGB8888,   rot_argb32_argb32),
+	ENTRY_LR(ARGB32,        RGB888,     rot_argb32_rgb32),
+	/* Entry primarily for directfb */
+	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_NONE),
+
+	ENTRY(RGB32,            ARGB8888,   rot_rgb32_argb32),
+	ENTRY(RGB32,            RGB888,     rot_argb32_argb32),
+
+	ENTRY(RGB32_PALETTED,   ARGB8888,   rot_rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   RGB888,     rot_rgb32pal_argb32),
+
+	ENTRY(YUY16,            ARGB8888,   rot_yuv16_argb32rot),
+	ENTRY(YUY16,            RGB888,     rot_yuv16_argb32rot),
+
+	ENTRY(YUY16_PALETTED,   ARGB8888,   rot_yuv16pal_argb32rot),
+	ENTRY(YUY16_PALETTED,   RGB888,     rot_yuv16pal_argb32rot),
+
+	ENTRY(PALETTE16,        ARGB8888,   rot_pal16_argb32),
+	ENTRY(PALETTE16,        RGB888,     rot_pal16_argb32),
+
+	ENTRY(RGB15,            RGB555,     rot_rgb15_argb1555),
+	ENTRY(RGB15,            ARGB1555,   rot_rgb15_argb1555),
+	ENTRY(RGB15,            ARGB8888,   rot_rgb15_argb32),
+	ENTRY(RGB15,            RGB888,     rot_rgb15_argb32),
+
+	ENTRY(RGB15_PALETTED,   ARGB8888,   rot_rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   RGB888,     rot_rgb15pal_argb32),
+
+	ENTRY(PALETTE16A,       ARGB8888,   rot_pal16a_argb32),
+	ENTRY(PALETTE16A,       RGB888,     rot_pal16a_rgb32),
+
+	{ -1 },
+};
+
+} // anonymous namespace
+
+} // namespace osd
+
+
+#else // defined(OSD_SDL)
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl2, OSD_RENDERER_PROVIDER, "accel") } }
+
+#endif // defined(OSD_SDL)
+
+
+MODULE_DEFINITION(RENDERER_SDL2, osd::video_sdl2)

@@ -15,7 +15,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "bus/centronics/ctronics.h"
-#include "formats/opd_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -46,7 +45,7 @@ protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_opcode_fetch(offs_t offset) override { m_exp->pre_opcode_fetch(offset); }
@@ -57,18 +56,17 @@ protected:
 private:
 	void pia_out_a(uint8_t data);
 	void pia_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	void busy_w(int state);
 
 	required_ioport m_joy;
 	required_memory_region m_rom;
 	required_device<pia6821_device> m_pia;
 	required_device<wd_fdc_device_base> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
-	int m_romcs;
+	bool m_romcs;
 	uint8_t m_ram[4 * 1024];
 };
 

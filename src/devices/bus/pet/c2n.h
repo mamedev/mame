@@ -12,7 +12,6 @@
 #pragma once
 
 #include "cass.h"
-#include "formats/cbm_tap.h"
 #include "imagedev/cassette.h"
 
 

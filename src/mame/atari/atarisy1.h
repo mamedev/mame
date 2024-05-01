@@ -5,8 +5,8 @@
     Atari System 1 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ATARISY1_H
-#define MAME_INCLUDES_ATARISY1_H
+#ifndef MAME_ATARI_ATARISY1_H
+#define MAME_ATARI_ATARISY1_H
 
 #pragma once
 
@@ -124,8 +124,8 @@ protected:
 	void adc_w(offs_t offset, uint8_t data);
 	uint16_t trakball_r(offs_t offset);
 	uint8_t switch_6502_r();
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	void coin_counter_right_w(int state);
+	void coin_counter_left_w(int state);
 	void via_pb_w(uint8_t data);
 	uint8_t via_pb_r();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -164,4 +164,4 @@ public:
 	virtual void update_timers(int scanline) override;
 };
 
-#endif // MAME_INCLUDES_ATARISY1_H
+#endif // MAME_ATARI_ATARISY1_H

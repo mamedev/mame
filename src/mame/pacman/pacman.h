@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_PACMAN_H
-#define MAME_INCLUDES_PACMAN_H
+#ifndef MAME_PACMAN_PACMAN_H
+#define MAME_PACMAN_PACMAN_H
 
 #pragma once
 
@@ -109,8 +109,8 @@ protected:
 	void nmouse_interrupt_vector_w(uint8_t data);
 	void mspacii_interrupt_vector_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(interrupt_vector_r);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_lockout_global_w);
+	void coin_counter_w(int state);
+	void coin_lockout_global_w(int state);
 	void alibaba_sound_w(offs_t offset, uint8_t data);
 	uint8_t alibaba_mystery_1_r();
 	uint8_t alibaba_mystery_2_r();
@@ -143,31 +143,32 @@ protected:
 	void mspacman_disable_decode_w(uint8_t data);
 	uint8_t mspacman_enable_decode_r_0x3ff8(offs_t offset);
 	void mspacman_enable_decode_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void irq_mask_w(int state);
+	void nmi_mask_w(int state);
 	uint8_t mspacii_protection_r(offs_t offset);
 	uint8_t cannonbp_protection_r(offs_t offset);
 	void pacman_videoram_w(offs_t offset, uint8_t data);
 	void pacman_colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(pengo_palettebank_w);
-	DECLARE_WRITE_LINE_MEMBER(pengo_colortablebank_w);
-	DECLARE_WRITE_LINE_MEMBER(pengo_gfxbank_w);
+	void flipscreen_w(int state);
+	void pengo_palettebank_w(int state);
+	void pengo_colortablebank_w(int state);
+	void pengo_gfxbank_w(int state);
 	void s2650games_videoram_w(offs_t offset, uint8_t data);
 	void s2650games_colorram_w(offs_t offset, uint8_t data);
 	void s2650games_scroll_w(offs_t offset, uint8_t data);
 	void s2650games_tilesbank_w(offs_t offset, uint8_t data);
 	void jrpacman_videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(jrpacman_charbank_w);
-	DECLARE_WRITE_LINE_MEMBER(jrpacman_spritebank_w);
+	void jrpacman_charbank_w(int state);
+	void jrpacman_spritebank_w(int state);
 	void jrpacman_scroll_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(jrpacman_bgpriority_w);
+	void jrpacman_bgpriority_w(int state);
 	void superabc_bank_w(uint8_t data);
 
 public:
 	void init_maketrax();
 	void init_drivfrcp();
 	void init_mspacmbe();
+	void init_mspackpls();
 	void init_ponpoko();
 	void init_eyes();
 	void init_woodpek();
@@ -191,6 +192,7 @@ protected:
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
 	DECLARE_VIDEO_START(pacman);
 	void pacman_palette(palette_device &palette) const;
+	void pacman_rbg_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(birdiy);
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);
@@ -200,10 +202,10 @@ protected:
 	DECLARE_VIDEO_START(jrpacman);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(periodic_irq);
-	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);
-	DECLARE_WRITE_LINE_MEMBER(s2650_interrupt);
+	void vblank_nmi(int state);
+	void s2650_interrupt(int state);
 
 private:
 	void init_save_state();
@@ -223,6 +225,7 @@ public:
 	void vanvan(machine_config &config);
 	void s2650games(machine_config &config);
 	void woodpek(machine_config &config);
+	void woodpek_rbg(machine_config &config);
 	void crushs(machine_config &config);
 	void superabc(machine_config &config);
 	void numcrash(machine_config &config);
@@ -307,7 +310,7 @@ public:
 
 	void init_mspactwin();
 
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 
 private:
 	required_device<screen_device> m_screen;
@@ -323,4 +326,4 @@ protected:
 };
 
 
-#endif // MAME_INCLUDES_PACMAN_H
+#endif // MAME_PACMAN_PACMAN_H

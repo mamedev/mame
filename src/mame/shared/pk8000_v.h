@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef MAME_INCLUDES_PK8000_V_H
-#define MAME_INCLUDES_PK8000_V_H
+#ifndef MAME_SHARED_PK8000_V_H
+#define MAME_SHARED_PK8000_V_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ protected:
 	required_device<cpu_device> m_maincpu;
 };
 
-#endif // MAME_INCLUDES_PK8000_V_H
+#endif // MAME_SHARED_PK8000_V_H

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
                             -= Jaleco Mega System 1 =-
@@ -199,18 +199,14 @@ actual code sent to the hardware.
 
 
 
-VIDEO_START_MEMBER(megasys1_state,megasys1)
+void megasys1_state::video_start()
 {
-	m_spriteram = &m_ram[0x8000/2];
-
 	m_buffer_objectram = std::make_unique<u16[]>(0x2000);
 	m_buffer_spriteram16 = std::make_unique<u16[]>(0x2000);
 	m_buffer2_objectram = std::make_unique<u16[]>(0x2000);
 	m_buffer2_spriteram16 = std::make_unique<u16[]>(0x2000);
 
 	m_active_layers = m_sprite_bank = m_screen_flag = m_sprite_flag = 0;
-
-	m_hardware_type_z = 0;
 
 	m_screen->register_screen_bitmap(m_sprite_buffer_bitmap);
 
@@ -221,13 +217,10 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 	save_item(NAME(m_screen_flag));
 	save_item(NAME(m_active_layers));
 	save_item(NAME(m_sprite_flag));
+	save_item(NAME(m_sprite_bank)); // only on type C
 }
 
-VIDEO_START_MEMBER(megasys1_state,megasys1_z)
-{
-	VIDEO_START_CALL_MEMBER(megasys1);
-	m_hardware_type_z = 1;
-}
+
 
 /***************************************************************************
 
@@ -279,7 +272,7 @@ void megasys1_state::soundlatch_w(u16 data)
 	m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
-void megasys1_state::soundlatch_z_w(u16 data)
+void megasys1_typez_state::soundlatch_z_w(u16 data)
 {
 	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(5, HOLD_LINE);
@@ -429,115 +422,110 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 }
 
-void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+// Legend of Makai / Makai Densetsu only
+void megasys1_typez_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int color,code,sx,sy,flipx,flipy,attr,sprite;
+	u16 *spriteram16 = &m_ram[0x8000/2];
 
+	/* MS1-Z just draws Sprite Data, and in reverse order */
 
+	for (sprite = 0x80-1;sprite >= 0;sprite--)
+	{
+		u16 *spritedata = &spriteram16[ sprite * 0x10/2];
 
-/* objram: 0x100*4 entries      spritedata: 0x80 entries */
+		attr = spritedata[ 8/2 ];
+
+		sx = spritedata[0x0A/2] % 512;
+		sy = spritedata[0x0C/2] % 512;
+
+		if (sx > 256-1) sx -= 512;
+		if (sy > 256-1) sy -= 512;
+
+		code  = spritedata[0x0E/2];
+		color = (attr & 0x0F);
+
+		flipx = attr & 0x40;
+		flipy = attr & 0x80;
+
+		if (m_screen_flag & 1)
+		{
+			flipx = !flipx;     flipy = !flipy;
+			sx = 240-sx;        sy = 240-sy;
+		}
+
+		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy,
+				screen.priority(),
+				(attr & 0x08) ? 0x0c : 0x0a,15);
+	}   /* sprite */
+}
+
+void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	/* objram: 0x100*4 entries      spritedata: 0x80 entries */
 
 	/* sprite order is from first in Sprite Data RAM (frontmost) to last */
 
-	if (m_hardware_type_z == 0)  /* standard sprite hardware */
-	{
-		if (!(m_sprite_flag&0x10))
-			m_sprite_buffer_bitmap.fill(0x7fff, cliprect);
-		else
-		{
-			// P47 sprite trails effect.. not quite right tho
-			// I think the low 4 bits are used to clear specific pens?
-			// when the hardware wants to clear the trails from the screen
-			// it increases the value from 0x00 to 0x0e
-			//printf("m_sprite_flag %02x\n", m_sprite_flag);
-			partial_clear_sprite_bitmap(screen, bitmap, cliprect, m_sprite_flag&0x0f);
-		}
-
-		s32 color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
-
-		u16 *objectram = (u16*)m_buffer2_objectram.get();
-		u16 *spriteram = (u16*)m_buffer2_spriteram16.get();
-
-		for (s32 offs = (0x800-8)/2; offs >= 0; offs -= 4)
-		{
-			for (s32 sprite = 0; sprite < 4 ; sprite ++)
-			{
-				u16 *objectdata = &objectram[offs + (0x800/2) * sprite];
-				u16 *spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
-
-				s32 attr = spritedata[4];
-				if (((attr & 0xc0) >> 6) != sprite) continue;
-
-				s32 sx = (spritedata[5] + objectdata[1]) & 0x1ff;
-				s32 sy = (spritedata[6] + objectdata[2]) & 0x1ff;
-
-				if (sx > 255) sx -= 512;
-				if (sy > 255) sy -= 512;
-
-				s32 code  = spritedata[7] + objectdata[3];
-				s32 color = attr & color_mask;
-
-				s32 flipx = attr & 0x40;
-				s32 flipy = attr & 0x80;
-				//s32 pri  = (attr & 0x08) ? 0x0c : 0x0a;
-				s32 pri  = (attr & 0x08)>>3;
-				s32 mosaic = (attr & 0x0f00)>>8;
-				s32 mossol = (attr & 0x1000)>>8;
-
-				code = (code & 0xfff) + ((m_sprite_bank & 1) << 12);
-
-				if (m_screen_flag & 1)
-				{
-					flipx = !flipx;
-					flipy = !flipy;
-					sx = 240 - sx;
-					sy = 240 - sy;
-				}
-
-				draw_16x16_priority_sprite(screen,bitmap,cliprect,code, color, sx, sy - 16, flipx, flipy, mosaic, mossol, pri);
-			}
-		}
-	}   /* non Z hw */
+	if (!(m_sprite_flag&0x10))
+		m_sprite_buffer_bitmap.fill(0x7fff, cliprect);
 	else
 	{
-		u16 *spriteram16 = m_spriteram;
+		// P47 sprite trails effect.. not quite right tho
+		// I think the low 4 bits are used to clear specific pens?
+		// when the hardware wants to clear the trails from the screen
+		// it increases the value from 0x00 to 0x0e
+		//printf("m_sprite_flag %02x\n", m_sprite_flag);
+		partial_clear_sprite_bitmap(screen, bitmap, cliprect, m_sprite_flag&0x0f);
+	}
 
-		/* MS1-Z just draws Sprite Data, and in reverse order */
+	s32 color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
 
-		for (sprite = 0x80-1;sprite >= 0;sprite--)
+	u16 *objectram = (u16*)m_buffer2_objectram.get();
+	u16 *spriteram = (u16*)m_buffer2_spriteram16.get();
+
+	for (s32 offs = (0x800-8)/2; offs >= 0; offs -= 4)
+	{
+		for (s32 sprite = 0; sprite < 4 ; sprite ++)
 		{
-			u16 *spritedata = &spriteram16[ sprite * 0x10/2];
+			u16 *objectdata = &objectram[offs + (0x800/2) * sprite];
+			u16 *spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
 
-			attr = spritedata[ 8/2 ];
+			s32 attr = spritedata[4];
+			if (((attr & 0xc0) >> 6) != sprite) continue;
 
-			sx = spritedata[0x0A/2] % 512;
-			sy = spritedata[0x0C/2] % 512;
+			s32 sx = (spritedata[5] + objectdata[1]) & 0x1ff;
+			s32 sy = (spritedata[6] + objectdata[2]) & 0x1ff;
 
-			if (sx > 256-1) sx -= 512;
-			if (sy > 256-1) sy -= 512;
+			if (sx > 255) sx -= 512;
+			if (sy > 255) sy -= 512;
 
-			code  = spritedata[0x0E/2];
-			color = (attr & 0x0F);
+			s32 code  = spritedata[7] + objectdata[3];
+			s32 color = attr & color_mask;
 
-			flipx = attr & 0x40;
-			flipy = attr & 0x80;
+			s32 flipx = attr & 0x40;
+			s32 flipy = attr & 0x80;
+			//s32 pri  = (attr & 0x08) ? 0x0c : 0x0a;
+			s32 pri  = (attr & 0x08)>>3;
+			s32 mosaic = (attr & 0x0f00)>>8;
+			s32 mossol = (attr & 0x1000)>>8;
+
+			code = (code & 0xfff) + ((m_sprite_bank & 1) << 12);
 
 			if (m_screen_flag & 1)
 			{
-				flipx = !flipx;     flipy = !flipy;
-				sx = 240-sx;        sy = 240-sy;
+				flipx = !flipx;
+				flipy = !flipy;
+				sx = 240 - sx;
+				sy = 240 - sy;
 			}
 
-			m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx, sy,
-					screen.priority(),
-					(attr & 0x08) ? 0x0c : 0x0a,15);
-		}   /* sprite */
-	}   /* Z hw */
-
+			draw_16x16_priority_sprite(screen,bitmap,cliprect,code, color, sx, sy - 16, flipx, flipy, mosaic, mossol, pri);
+		}
+	}
 }
 
 
@@ -871,7 +859,7 @@ u32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE_LINE_MEMBER(megasys1_state::screen_vblank)
+void megasys1_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -882,7 +870,7 @@ WRITE_LINE_MEMBER(megasys1_state::screen_vblank)
 		memcpy(m_buffer_objectram.get(), m_objectram, 0x2000);
 	//spriteram16
 		memcpy(m_buffer2_spriteram16.get(), m_buffer_spriteram16.get(), 0x2000);
-		memcpy(m_buffer_spriteram16.get(), m_spriteram, 0x2000);
+		memcpy(m_buffer_spriteram16.get(), &m_ram[0x8000/2], 0x2000);
 	}
 
 }

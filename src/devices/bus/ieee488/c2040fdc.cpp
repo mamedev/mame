@@ -105,11 +105,6 @@ c2040_fdc_device::c2040_fdc_device(const machine_config &mconfig, const char *ta
 
 void c2040_fdc_device::device_start()
 {
-	// resolve callbacks
-	m_write_sync.resolve_safe();
-	m_write_ready.resolve_safe();
-	m_write_error.resolve_safe();
-
 	// allocate timer
 	t_gen = timer_alloc(FUNC(c2040_fdc_device::update_state), this);
 
@@ -467,19 +462,19 @@ void c2040_fdc_device::write(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_device::ds0_w )
+void c2040_fdc_device::ds0_w(int state)
 {
 	m_ds0 = state;
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_device::ds1_w )
+void c2040_fdc_device::ds1_w(int state)
 {
 	m_ds1 = state;
 
 	ds_w(m_ds1 << 1 | m_ds0);
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_device::drv_sel_w )
+void c2040_fdc_device::drv_sel_w(int state)
 {
 	if (m_drv_sel != state)
 	{
@@ -491,7 +486,7 @@ WRITE_LINE_MEMBER( c2040_fdc_device::drv_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_device::mode_sel_w )
+void c2040_fdc_device::mode_sel_w(int state)
 {
 	if (m_mode_sel != state)
 	{
@@ -503,7 +498,7 @@ WRITE_LINE_MEMBER( c2040_fdc_device::mode_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_device::rw_sel_w )
+void c2040_fdc_device::rw_sel_w(int state)
 {
 	if (m_rw_sel != state)
 	{
@@ -520,7 +515,7 @@ WRITE_LINE_MEMBER( c2040_fdc_device::rw_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_device::mtr0_w )
+void c2040_fdc_device::mtr0_w(int state)
 {
 	if (m_mtr0 != state)
 	{
@@ -542,7 +537,7 @@ WRITE_LINE_MEMBER( c2040_fdc_device::mtr0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_device::mtr1_w )
+void c2040_fdc_device::mtr1_w(int state)
 {
 	if (m_mtr1 != state)
 	{

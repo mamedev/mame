@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_X820KB_H
-#define MAME_MACHINE_X820KB_H
+#ifndef MAME_XEROX_X820KB_H
+#define MAME_XEROX_X820KB_H
 
 #pragma once
 
@@ -53,8 +53,8 @@ private:
 	uint8_t kb_p1_r();
 	void kb_p1_w(uint8_t data);
 	uint8_t kb_p2_r();
-	DECLARE_READ_LINE_MEMBER( kb_t0_r );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	int kb_t0_r();
+	int kb_t1_r();
 	void kb_bus_w(uint8_t data);
 };
 
@@ -63,4 +63,4 @@ private:
 DECLARE_DEVICE_TYPE(XEROX_820_KEYBOARD, xerox_820_keyboard_device)
 
 
-#endif // MAME_MACHINE_X820KB_H
+#endif // MAME_XEROX_X820KB_H

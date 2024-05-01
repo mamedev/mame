@@ -11,6 +11,9 @@
 #include "cpu/mn1880/mn1880.h"
 #include "machine/eeprompar.h"
 
+
+namespace {
+
 class drumsta_state : public driver_device
 {
 public:
@@ -68,5 +71,8 @@ ROM_START(drumsta)
 	ROM_REGION(0x80000, "samples", 0)
 	ROM_LOAD("v1.2.u28", 0x00000, 0x80000, CRC(dbbc9cfe) SHA1(61474c0bc6cfff3efe95527c57e4891f886b02aa))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1995, drumsta, 0, 0, drumsta, drumsta, drumsta_state, empty_init, "Novation", "Drum Station", MACHINE_IS_SKELETON)

@@ -20,15 +20,16 @@ class upd775x_device : public device_t,
 public:
 	enum : u32 { STANDARD_CLOCK = 640'000 };
 
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	DECLARE_WRITE_LINE_MEMBER( start_w );
-	DECLARE_READ_LINE_MEMBER( busy_r );
+	void reset_w(int state);
+	void start_w(int state);
+	int busy_r();
 	virtual void port_w(u8 data);
 	void set_start_delay(uint32_t data) { m_start_delay = data; }
 
 protected:
-	virtual TIMER_CALLBACK_MEMBER(internal_start_w) = 0;
+	virtual TIMER_CALLBACK_MEMBER(internal_start_w);
 	virtual TIMER_CALLBACK_MEMBER(internal_reset_w);
+	virtual TIMER_CALLBACK_MEMBER(internal_port_w);
 
 	enum
 	{
@@ -59,8 +60,8 @@ protected:
 	// chip modes
 	enum
 	{
-		MODE_STAND_ALONE,
-		MODE_SLAVE
+		MODE_SLAVE,
+		MODE_STAND_ALONE
 	};
 
 	upd775x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -70,15 +71,13 @@ protected:
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void update_adpcm(int data);
 	virtual void advance_state();
-
-	TIMER_CALLBACK_MEMBER(sync_port_write);
 
 	// internal state
 	sound_stream  *m_channel;                   // stream channel for playback
@@ -130,16 +129,13 @@ public:
 
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
-	DECLARE_WRITE_LINE_MEMBER( md_w );
+	void md_w(int state);
 
 protected:
 	upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	virtual TIMER_CALLBACK_MEMBER(internal_start_w) override;
-	virtual TIMER_CALLBACK_MEMBER(internal_reset_w) override;
 
 	TIMER_CALLBACK_MEMBER(drq_update);
 
@@ -158,8 +154,6 @@ protected:
 	upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_reset() override;
-
-	virtual TIMER_CALLBACK_MEMBER(internal_start_w) override;
 };
 
 DECLARE_DEVICE_TYPE(UPD7759, upd7759_device)

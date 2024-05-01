@@ -17,19 +17,19 @@
 #include "formats/ti99_dsk.h"
 #include "machine/rescap.h"
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_CONFIG      (1U<<2)
-#define LOG_RW          (1U<<3)
-#define LOG_PORTS       (1U<<4)    // too noisy in RW
-#define LOG_CRU         (1U<<5)
-#define LOG_READY       (1U<<6)
-#define LOG_SIGNALS     (1U<<7)
-#define LOG_DRQ         (1U<<8)    // too noisy in SIGNALS
-#define LOG_DATA        (1U<<9)
-#define LOG_MOTOR       (1U<<10)
-#define LOG_ADDRESS     (1U<<11)
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_CONFIG      (1U << 2)
+#define LOG_RW          (1U << 3)
+#define LOG_PORTS       (1U << 4)    // too noisy in RW
+#define LOG_CRU         (1U << 5)
+#define LOG_READY       (1U << 6)
+#define LOG_SIGNALS     (1U << 7)
+#define LOG_DRQ         (1U << 8)    // too noisy in SIGNALS
+#define LOG_DATA        (1U << 9)
+#define LOG_MOTOR       (1U << 10)
+#define LOG_ADDRESS     (1U << 11)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_FDC, bus::ti99::peb::ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
@@ -56,6 +56,7 @@ ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, dev
 	m_crulatch(*this, "crulatch"),
 	m_motormf(*this, "motormf"),
 	m_dsrrom(nullptr),
+	m_floppy(*this, "%u", 0),
 	m_sel_floppy(0)
 {
 }
@@ -79,21 +80,21 @@ void ti_fdc_device::operate_ready_line()
 /*
  * Callbacks from the FD1771 chip
  */
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_irq_w )
+void ti_fdc_device::fdc_irq_w(int state)
 {
 	m_IRQ = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "INTRQ callback = %d\n", m_IRQ);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_drq_w )
+void ti_fdc_device::fdc_drq_w(int state)
 {
 	m_DRQ = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_DRQ, "DRQ callback = %d\n", m_DRQ);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_hld_w )
+void ti_fdc_device::fdc_hld_w(int state)
 {
 	m_HLD = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", m_HLD);
@@ -230,7 +231,7 @@ void ti_fdc_device::cruwrite(offs_t offset, uint8_t data)
 		m_crulatch->write_bit((offset >> 1) & 0x07, BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dskpgena_w)
+void ti_fdc_device::dskpgena_w(int state)
 {
 	// (De)select the card. Indicated by a LED on the board.
 	m_selected = state;
@@ -240,12 +241,12 @@ WRITE_LINE_MEMBER(ti_fdc_device::dskpgena_w)
 /*
     Trigger the motor monoflop.
 */
-WRITE_LINE_MEMBER(ti_fdc_device::kaclk_w)
+void ti_fdc_device::kaclk_w(int state)
 {
 	m_motormf->b_w(state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dvena_w)
+void ti_fdc_device::dvena_w(int state)
 {
 	m_DVENA = state;
 	LOGMASKED(LOG_MOTOR, "Motor %s\n", state? "on" : "off");
@@ -255,13 +256,14 @@ WRITE_LINE_MEMBER(ti_fdc_device::dvena_w)
 
 	// Set all motors
 	for (auto & elem : m_floppy)
-		if (elem != nullptr) elem->mon_w((state==ASSERT_LINE)? 0 : 1);
+		if (elem->get_device() != nullptr)
+			elem->get_device()->mon_w((state==ASSERT_LINE)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::waiten_w)
+void ti_fdc_device::waiten_w(int state)
 {
 	// Set disk ready/hold (bit 2)
 	// 0: ignore IRQ and DRQ
@@ -271,33 +273,34 @@ WRITE_LINE_MEMBER(ti_fdc_device::waiten_w)
 	LOGMASKED(LOG_CRU, "Arm wait state logic (bit 2) = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::hlt_w)
+void ti_fdc_device::hlt_w(int state)
 {
 	// Load disk heads (HLT pin) (bit 3). Not implemented.
 	LOGMASKED(LOG_CRU, "Set head load (bit 3) = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::sidsel_w)
+void ti_fdc_device::sidsel_w(int state)
 {
 	// Select side of disk (bit 7)
 	LOGMASKED(LOG_CRU, "Set side (bit 7) = %d\n", state);
-	if (m_sel_floppy != 0) m_floppy[m_sel_floppy-1]->ss_w(state);
+	if (m_sel_floppy > 0)
+		m_floppy[m_sel_floppy-1]->get_device()->ss_w(state);
 }
 
 /*
     Drive selects
 */
-WRITE_LINE_MEMBER(ti_fdc_device::dsel1_w)
+void ti_fdc_device::dsel1_w(int state)
 {
 	select_drive(1, state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dsel2_w)
+void ti_fdc_device::dsel2_w(int state)
 {
 	select_drive(2, state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dsel3_w)
+void ti_fdc_device::dsel3_w(int state)
 {
 	select_drive(3, state);
 }
@@ -324,11 +327,11 @@ void ti_fdc_device::select_drive(int n, int state)
 			LOGMASKED(LOG_WARN, "Warning: DSK%d selected while DSK%d not yet unselected\n", n, m_sel_floppy);
 		}
 
-		if (m_floppy[n-1] != nullptr)
+		if (m_floppy[n-1]->get_device() != nullptr)
 		{
 			m_sel_floppy = n;
-			m_fd1771->set_floppy(m_floppy[n-1]);
-			m_floppy[n-1]->ss_w(m_crulatch->q7_r());
+			m_fd1771->set_floppy(m_floppy[n-1]->get_device());
+			m_floppy[n-1]->get_device()->ss_w(m_crulatch->q7_r());
 		}
 	}
 }
@@ -358,25 +361,15 @@ void ti_fdc_device::device_reset()
 	m_inDsrArea = false;
 	m_WDsel = false;
 
-	for (int i=0; i < 3; i++)
+	for (auto &flop : m_floppy)
 	{
-		if (m_floppy[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", i, m_floppy[i]->name());
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", flop->basetag(), flop->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "No floppy attached to connector %d\n", i);
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
 	}
 
 	m_sel_floppy = 0;
-}
-
-void ti_fdc_device::device_config_complete()
-{
-	// Seems to be null when doing a "-listslots"
-	for (auto &elem : m_floppy)
-		elem = nullptr;
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
 }
 
 void ti_fdc_device::floppy_formats(format_registration &fr)
@@ -404,9 +397,9 @@ void ti_fdc_device::device_add_mconfig(machine_config& config)
 	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
 	m_fd1771->hld_wr_callback().set(FUNC(ti_fdc_device::fdc_hld_w));
 
-	FLOPPY_CONNECTOR(config, "0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", tifdc_floppies, nullptr, ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], tifdc_floppies, nullptr, ti_fdc_device::floppy_formats).enable_sound(true);
 
 	LS259(config, m_crulatch); // U23
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_fdc_device::dskpgena_w));

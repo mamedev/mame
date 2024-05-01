@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
-#ifndef MAME_INCLUDES_LUCKY74_H
-#define MAME_INCLUDES_LUCKY74_H
+#ifndef MAME_WING_LUCKY74_H
+#define MAME_WING_LUCKY74_H
 
 #pragma once
 
@@ -51,7 +51,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	void prg_map(address_map &map);
 	void portmap(address_map &map);
 
@@ -75,4 +75,4 @@ private:
 	output_finder<12> m_lamps;
 };
 
-#endif // MAME_INCLUDES_LUCKY74_H
+#endif // MAME_WING_LUCKY74_H

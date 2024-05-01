@@ -38,7 +38,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	void cass_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_p);
 

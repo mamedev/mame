@@ -12,14 +12,18 @@
 #include "leland.h"
 #include "leland_a.h"
 
+/* debugging */
+#define LOG_WARN    (1U << 1)
+#define LOG_COMM    (1U << 2)
+
+#define VERBOSE     LOG_WARN
+#include "logmacro.h"
+
 
 /* constants */
 static constexpr int VRAM_SIZE = 0x10000;
 static constexpr int QRAM_SIZE = 0x10000;
 
-
-/* debugging */
-#define LOG_COMM    0
 
 /*************************************
  *
@@ -242,15 +246,15 @@ int leland_state::vram_port_r(offs_t offset, int num)
 			break;
 
 		default:
-			logerror("%s: Warning: Unknown video port %02x read (address=%04x)\n",
+			LOGMASKED(LOG_WARN, "%s: Warning: Unknown video port %02x read (address=%04x)\n",
 						machine().describe_context(), offset, addr);
 			ret = 0;
 			break;
 	}
 	state->m_addr = addr;
 
-	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm read %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, ret);
+	if (addr >= 0xf000)
+		LOGMASKED(LOG_COMM, "%s:%s comm read %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, ret);
 
 	return ret;
 }
@@ -276,8 +280,8 @@ void leland_state::vram_port_w(offs_t offset, u8 data, int num)
 	if (scanline > 0)
 		m_screen->update_partial(scanline - 1);
 
-	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm write %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, data);
+	if (addr >= 0xf000)
+		LOGMASKED(LOG_COMM, "%s:%s comm write %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, data);
 
 	/* based on the low 3 bits of the offset, update the destination */
 	switch (offset & 7)
@@ -328,7 +332,7 @@ void leland_state::vram_port_w(offs_t offset, u8 data, int num)
 			break;
 
 		default:
-			logerror("%s:Warning: Unknown video port write (address=%04x value=%02x)\n",
+			LOGMASKED(LOG_WARN, "%s:Warning: Unknown video port write (address=%04x value=%02x)\n",
 						machine().describe_context(), offset, addr);
 			break;
 	}
@@ -490,23 +494,12 @@ static const gfx_layout leland_layout =
 	8*8
 };
 
-static const gfx_layout ataxx_layout =
-{
-	8,8,
-	RGN_FRAC(1,6),
-	6,
-	{ RGN_FRAC(5,6), RGN_FRAC(4,6), RGN_FRAC(3,6), RGN_FRAC(2,6), RGN_FRAC(1,6), RGN_FRAC(0,6) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_leland )
 	GFXDECODE_ENTRY( "bg_gfx", 0, leland_layout, 0, 8*16) // *16 is foreground
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ataxx )
-	GFXDECODE_ENTRY( "bg_gfx", 0, ataxx_layout, 0, 16) // 16 is foreground
+	GFXDECODE_ENTRY( "bg_gfx", 0, gfx_8x8x6_planar, 0, 16) // 16 is foreground
 GFXDECODE_END
 
 void leland_state::leland_video(machine_config &config)

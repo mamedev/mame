@@ -5,8 +5,8 @@
     Taito Air System
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TAITOAIR_H
-#define MAME_INCLUDES_TAITOAIR_H
+#ifndef MAME_TAITO_TAITOAIR_H
+#define MAME_TAITO_TAITOAIR_H
 
 #pragma once
 
@@ -152,4 +152,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TAITOAIR_H
+#endif // MAME_TAITO_TAITOAIR_H

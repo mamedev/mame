@@ -1214,7 +1214,7 @@ void sega_segacd_device::segacd_stopwatch_timer_w(uint16_t data)
 
 uint16_t sega_segacd_device::segacd_stopwatch_timer_r()
 {
-	int32_t result = (m_stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
+	int32_t result = (m_stopwatch_timer->elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
 
 	return result & 0xfff;
 }
@@ -1872,11 +1872,14 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, u
 		}
 		else if (destination==DMA_PCM)
 		{
-			dest = nullptr;//fatalerror("PCM RAM DMA unimplemented!\n");
+			dest = nullptr;
+			//fatalerror("PCM RAM DMA unimplemented!\n");
 		}
 		else
 		{
-			fatalerror("Unknown DMA Destination!!\n");
+			// TODO: audio CD player accesses this
+			dest = nullptr;
+			//fatalerror("Unknown DMA Destination!!\n");
 		}
 
 		if (PCM_DMA)

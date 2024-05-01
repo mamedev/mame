@@ -68,9 +68,9 @@ ALLOW_SAVE_TYPE(mac_scsi_helper_device::mode);
 
 mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MAC_SCSI_HELPER, tag, owner, clock)
-	, m_scsi_read_callback(*this)
+	, m_scsi_read_callback(*this, BAD_BYTE)
 	, m_scsi_write_callback(*this)
-	, m_scsi_dma_read_callback(*this)
+	, m_scsi_dma_read_callback(*this, BAD_BYTE)
 	, m_scsi_dma_write_callback(*this)
 	, m_cpu_halt_callback(*this)
 	, m_timeout_error_callback(*this)
@@ -82,16 +82,6 @@ mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, co
 	, m_read_fifo_data(0)
 	, m_write_fifo_data(0)
 {
-}
-
-void mac_scsi_helper_device::device_resolve_objects()
-{
-	m_scsi_read_callback.resolve_safe(BAD_BYTE);
-	m_scsi_write_callback.resolve_safe();
-	m_scsi_dma_read_callback.resolve_safe(BAD_BYTE);
-	m_scsi_dma_write_callback.resolve_safe();
-	m_cpu_halt_callback.resolve_safe();
-	m_timeout_error_callback.resolve_safe();
 }
 
 void mac_scsi_helper_device::device_start()
@@ -147,7 +137,7 @@ void mac_scsi_helper_device::write_fifo_process()
 	}
 }
 
-WRITE_LINE_MEMBER(mac_scsi_helper_device::drq_w)
+void mac_scsi_helper_device::drq_w(int state)
 {
 	if (state)
 	{
@@ -273,7 +263,7 @@ void mac_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, u8 da
 			{
 				m_write_fifo_data = (m_write_fifo_data << 8) | data;
 				++m_write_fifo_bytes;
-				logerror("%s: CPU writing byte %02X into FIFO (%d/4 filled)\n", machine().describe_context(), data, m_write_fifo_bytes);
+				LOG("%s: CPU writing byte %02X into FIFO (%d/4 filled)\n", machine().describe_context(), data, m_write_fifo_bytes);
 				if (!m_pseudo_dma_timer->enabled())
 				{
 					m_pseudo_dma_timer->adjust(m_timeout);

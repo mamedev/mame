@@ -41,7 +41,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO Slot")
+DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8-bit SIO Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -74,13 +74,6 @@ void a8sio_device::device_resolve_objects()
 	m_device = get_card_device();
 	if (m_device)
 		m_device->set_a8sio_device(this);
-
-	// resolve callbacks
-	m_out_clock_in_cb.resolve_safe();
-	m_out_data_in_cb.resolve_safe();
-	m_out_proceed_cb.resolve_safe();
-	m_out_audio_in_cb.resolve_safe();
-	m_out_interrupt_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -104,41 +97,41 @@ device_a8sio_card_interface *a8sio_device::get_a8sio_card()
 	return m_device;
 }
 
-WRITE_LINE_MEMBER( a8sio_device::clock_in_w )
+void a8sio_device::clock_in_w(int state)
 {
 	m_out_clock_in_cb(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::clock_out_w )
+void a8sio_device::clock_out_w(int state)
 {
 	if (m_device)
 		m_device->clock_out_w(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::data_in_w )
+void a8sio_device::data_in_w(int state)
 {
 	m_out_data_in_cb(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::data_out_w )
+void a8sio_device::data_out_w(int state)
 {
 	if (m_device)
 		m_device->data_out_w(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::command_w )
+void a8sio_device::command_w(int state)
 {
 	if (m_device)
 		m_device->command_w(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::motor_w )
+void a8sio_device::motor_w(int state)
 {
 	if (m_device)
 		m_device->motor_w(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::proceed_w )
+void a8sio_device::proceed_w(int state)
 {
 	m_out_proceed_cb(state);
 }
@@ -148,7 +141,7 @@ void a8sio_device::audio_in_w(uint8_t data)
 	m_out_audio_in_cb(data);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::interrupt_w )
+void a8sio_device::interrupt_w(int state)
 {
 	m_out_interrupt_cb(state);
 }
@@ -182,24 +175,24 @@ void device_a8sio_card_interface::set_a8sio_device(a8sio_device *sio)
 	m_a8sio = sio;
 }
 
-WRITE_LINE_MEMBER( device_a8sio_card_interface::clock_out_w )
+void device_a8sio_card_interface::clock_out_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( device_a8sio_card_interface::data_out_w )
+void device_a8sio_card_interface::data_out_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( device_a8sio_card_interface::command_w )
+void device_a8sio_card_interface::command_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( device_a8sio_card_interface::motor_w )
+void device_a8sio_card_interface::motor_w(int state)
 {
 	//printf("device_a8sio_card_interface::motor_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER( device_a8sio_card_interface::ready_w )
+void device_a8sio_card_interface::ready_w(int state)
 {
 }
 

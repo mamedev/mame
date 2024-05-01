@@ -13,6 +13,7 @@
         * Astro Combat (2 sets)
         * Super Star Battle
         * Space Fighter Mark II (2 sets)
+        * Saturn: Space Fighter 3D
         * Tomahawk 777 late version with changed game play
         * Tomahawk 777 early version
 
@@ -36,13 +37,18 @@
 
           Set 3:    8Kbit ROMs
                     Blue/Solid empty fuel bar.
-                   300 points for every seven bombs destroyed.
+                    300 points for every seven bombs destroyed.
 
         * I know there must be at least one other ROM set for Astro Fighter
           I have played one that stoped between waves to show the next enemy
 
+        * Saturn: Space Fighter 3D is basically Space Fighter with extra game modes.
+          It's not 3-dimensional. The game modes are: Storm, Sweeper, Scramble.
+
     Known issues/to-do's:
         * Analog sound in all games
+        * satsf3d color prom is not dumped, using the one from spfghmk2 instead
+          (it looks good compared to photo)
 
     About Colours:
         * It was fairly common to have wiremods on these PCBs to change the
@@ -51,9 +57,10 @@
           emulates an unmodified PCB, you can enable the hacks in the DRIVER
           CONFIGURATION menu.
 
+          B&W cabinet versions of the Space Fighter games also exist.
+
           Versions of Tomahawk using the Astro Fighter PROM have been seen,
           see notes in ROM loading.
-
 
 ****************************************************************************/
 
@@ -492,7 +499,6 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
 
-
 	/* the red background circuit is disabled */
 	m_red_on = false;
 
@@ -916,7 +922,6 @@ void astrof_state::base(machine_config &config)
 	TIMER(config, "vblank").configure_scanline(FUNC(astrof_state::irq_callback), "screen", VBSTART, 0);
 
 	/* video hardware */
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 }
@@ -944,7 +949,6 @@ void astrof_state::abattle(machine_config &config)
 	astrof(config);
 
 	/* basic machine hardware */
-
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,abattle)
 	MCFG_MACHINE_RESET_OVERRIDE(astrof_state,abattle)
 }
@@ -1042,6 +1046,20 @@ ROM_START( astrof3 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
+ROM_END
+
+// from an original Taito PCB with silkscreen
+ROM_START( astroft )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "as_19.bin",       0xd000, 0x0800, CRC(fa9e5607) SHA1(246a3591196939ecca9088f44035cceb4ee3531e) )
+	ROM_LOAD( "as_18.bin",       0xd800, 0x0800, CRC(1c104d3d) SHA1(20015808ad87421e90c0eac806bb39dee5226b51) )
+	ROM_LOAD( "as_17.bin",       0xe000, 0x0800, CRC(20dc4d50) SHA1(cfb3d98677f213e21593116db4804f965e6467f9) )
+	ROM_LOAD( "as_16.bin",       0xe800, 0x0800, CRC(4b488aa5) SHA1(fd5177b99215ec6bb73b0bb0cd0ef7745168636f) )
+	ROM_LOAD( "as_15.bin",       0xf000, 0x0800, CRC(47fbe257) SHA1(0aa01be624c701822463060a0be943d5b7788b38) )
+	ROM_LOAD( "as_14.bin",       0xf800, 0x0800, CRC(91476301) SHA1(2f47ab248538e5fe7462486f395072dec8af1012) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.bin",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
 // Famaresa "500" PCB set (500-001, 500-002, 500-003 and 500-004).
@@ -1328,7 +1346,6 @@ ROM_START( spfghmk2 )
 	ROM_LOAD( "709-5.1a",     0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
-
 ROM_START( spfghmk22 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2708mkii.5e",  0xe400, 0x0400, CRC(27d7060d) SHA1(796c44a395e1c54769dc57050503b4b111bde7ef) )
@@ -1341,6 +1358,23 @@ ROM_START( spfghmk22 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "709-5.1a",     0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
+ROM_END
+
+
+ROM_START( satsf3d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b8-2.5d",  0xdc00, 0x0400, CRC(4f0fc817) SHA1(b4fed244f93425107d36fa8f61ada5dc92034716) )
+	ROM_LOAD( "b7-1.4e",  0xe000, 0x0400, CRC(6235c388) SHA1(57645eeffea61b06e38819e5f17fbeaa412f673d) )
+	ROM_LOAD( "b6-1.4f",  0xe400, 0x0400, CRC(56735767) SHA1(73cd8a4dfa88de4d9e9451b36440688984af79a4) )
+	ROM_LOAD( "b5-2.5e",  0xe800, 0x0400, CRC(0af82ccf) SHA1(7924b6be2a71361a1f054bf7cb95a00367516267) )
+	ROM_LOAD( "b4-1.5f",  0xec00, 0x0400, CRC(d68b9c7a) SHA1(b03322557be60d14d56b624a120807bcaa18a905) )
+	ROM_LOAD( "b3-1.4h",  0xf000, 0x0400, CRC(cc4ecb1b) SHA1(8ecf39c62ec6a4a8a7bf02a044c9cc492070e1aa) )
+	ROM_LOAD( "b2-1.4k",  0xf400, 0x0400, CRC(84cb830c) SHA1(ddc67c48ae80f8833330517015fac66433a65759) )
+	ROM_LOAD( "b1-1.5h",  0xf800, 0x0400, CRC(53e32287) SHA1(9a924dfc3c175641c15b759302ddcc4edf44fe74) )
+	ROM_LOAD( "b0-1.5k",  0xfc00, 0x0400, CRC(c79a8346) SHA1(a46a66e080603c2cee09378f59f52986f48c6151) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "709-5.1a", 0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) BAD_DUMP )
 ROM_END
 
 
@@ -1364,7 +1398,6 @@ ROM_START( tomahawk )
 	// Fighter without the PROM properly replaced tho.
 	//ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
-
 
 ROM_START( tomahawk1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1459,25 +1492,28 @@ void astrof_state::init_asterion()
  *
  *************************************/
 
-GAME( 1979, astrof,    0,        astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 1)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astrof2,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 2)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astrof3,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 3)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",    "Astro Fighter (Famaresa bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astroff2,  astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",    "Astro Fighter (Famaresa bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)", "Astro Fire",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_asterion, ROT90, "bootleg? (Olympia)",    "Asterion",                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat,   astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (newer, CB)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombato,  astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (older, PZ)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat3,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat4,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg (Proel)",       "Astro Combat (encrypted)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof,    0,        astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",                "Astro Fighter (set 1)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof2,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",                "Astro Fighter (set 2)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof3,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",                "Astro Fighter (set 3)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroft,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East (Taito license)","Astro Fighter (Taito)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",       "Astro Fighter (Famaresa bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroff2,  astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",       "Astro Fighter (Famaresa bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",         "Astro Battle (set 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",         "Astro Battle (set 2)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)",    "Astro Fire",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_asterion, ROT90, "bootleg? (Olympia)",       "Asterion",                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat,   astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",                  "Astro Combat (newer, CB)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombato,  astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",                  "Astro Combat (older, PZ)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat3,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (Proel)",          "Astro Combat (unencrypted)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat4,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg (Proel)",          "Astro Combat (encrypted)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, strfight,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (VGG)",         "Star Fighter (bootleg of Astro Fighter)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sstarbtl,  astrof,   abattle,  abattle,   astrof_state, init_sstarbtl, ROT90, "bootleg (SG-Florence)", "Super Star Battle",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, strfight,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (VGG)",            "Star Fighter (bootleg of Astro Fighter)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sstarbtl,  astrof,   abattle,  abattle,   astrof_state, init_sstarbtl, ROT90, "bootleg (SG-Florence)",    "Super Star Battle",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, spfghmk2,  0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spfghmk22, spfghmk2, spfghmk2, spfghmk22, astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spfghmk2,  0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",                "Space Fighter Mark II (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spfghmk22, spfghmk2, spfghmk2, spfghmk22, astrof_state, empty_init,    ROT90, "Data East",                "Space Fighter Mark II (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, tomahawk,  0,        tomahawk, tomahawk,  astrof_state, empty_init,    ROT90, "Data East",             "Tomahawk 777 (rev 5)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tomahawk1, tomahawk, tomahawk, tomahawk1, astrof_state, empty_init,    ROT90, "Data East",             "Tomahawk 777 (rev 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, satsf3d,   0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",                "Saturn: Space Fighter 3D",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1980, tomahawk,  0,        tomahawk, tomahawk,  astrof_state, empty_init,    ROT90, "Data East",                "Tomahawk 777 (rev 5)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tomahawk1, tomahawk, tomahawk, tomahawk1, astrof_state, empty_init,    ROT90, "Data East",                "Tomahawk 777 (rev 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

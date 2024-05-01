@@ -57,19 +57,18 @@ protected:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
-	virtual bool nvram_can_write() override { return m_base && m_length; }
 
 	// internal helpers
 	void determine_final_base();
 
 	// configuration state
-	optional_memory_region      m_region;
-	default_value               m_default_value;
-	init_delegate         m_custom_handler;
+	optional_memory_region  m_region;
+	default_value           m_default_value;
+	init_delegate           m_custom_handler;
 
 	// runtime state
-	void *                      m_base;
-	size_t                      m_length;
+	void *                  m_base;
+	size_t                  m_length;
 };
 
 DECLARE_DEVICE_TYPE(NVRAM, nvram_device)

@@ -3,8 +3,8 @@
 /* */
 
 /* todo: remove code from header, linker starts throwing silly messages when I try due to the templates.. make sense of them */
-#ifndef MAME_INCLUDES_K053246_K053247_K055673_H
-#define MAME_INCLUDES_K053246_K053247_K055673_H
+#ifndef MAME_KONAMI_K053246_K053247_K055673_H
+#define MAME_KONAMI_K053246_K053247_K055673_H
 
 #pragma once
 
@@ -68,6 +68,7 @@ public:
 
 	u16 k055673_rom_word_r(offs_t offset);
 	u16 k055673_ps_rom_word_r(offs_t offset);
+	u16 k055673_gr_rom_word_r(offs_t offset);
 	u16 k055673_5bpp_rom_word_r(offs_t offset);
 
 	u8 k053247_r(offs_t offset);
@@ -467,4 +468,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K055673, k055673_device)
 
-#endif // MAME_INCLUDES_K053246_K053247_K055673_H
+#endif // MAME_KONAMI_K053246_K053247_K055673_H

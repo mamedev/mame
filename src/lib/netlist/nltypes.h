@@ -14,9 +14,6 @@
 
 #include "nl_config.h"
 
-#include "plib/pmempool.h"
-#include "plib/ppmf.h"
-#include "plib/pstring.h"
 #include "plib/ptime.h"
 #include "plib/ptypes.h"
 
@@ -170,12 +167,12 @@ namespace netlist
 	///
 	/// \note This is not the right location yet.
 	///
-
 	using device_arena = std::conditional_t<
 		config::use_mempool::value,
 		plib::mempool_arena<plib::aligned_arena<>,
 							config::mempool_align::value>,
 		plib::aligned_arena<>>;
+
 	using host_arena = plib::aligned_arena<>;
 
 	using log_type = plib::plog_base<NL_DEBUG>;
@@ -184,24 +181,18 @@ namespace netlist
 	//  Types needed by various includes
 	//============================================================
 
-	/// \brief Time step type.
-	///
-	/// May be either FORWARD or RESTORE
-	///
-	enum class time_step_type
-	{
-		FORWARD, //!< forward time
-		RESTORE  //!< restore state before last forward
-	};
-
-	/// \brief Delegate type for device notification.
-	///
-	using nl_delegate = plib::pmfp<void()>;
-	using nl_delegate_ts = plib::pmfp<void(time_step_type, nl_fptype)>;
-	using nl_delegate_dyn = plib::pmfp<void()>;
-
 	namespace detail
 	{
+
+		/// \brief Time step type.
+		///
+		/// May be either FORWARD or RESTORE
+		///
+		enum class time_step_type
+		{
+			FORWARD, //!< forward time
+			RESTORE  //!< restore state before last forward
+		};
 
 		/// \brief Enum specifying the type of object
 		///
@@ -220,10 +211,10 @@ namespace netlist
 		///
 		enum class alias_type
 		{
-			UNKNOWN,     //!< Used as a placeholder during code changes
-			INTERNAL,    //!< the alias references a internal pin
-			FUNCTIONAL,  //!< Used for aliases e.g. in BJTs : ALIAS("B",
-						 //!< somesub.p())
+			UNKNOWN,    //!< Used as a placeholder during code changes
+			INTERNAL,   //!< the alias references a internal pin
+			FUNCTIONAL, //!< Used for aliases e.g. in BJTs : ALIAS("B",
+						//!< somesub.p())
 			PACKAGE_PIN, //!< the alias references a package pin, e.g. ALIAS(13,
 						 //!< B.CLK)
 			READABILITY, //!< the alias is used to improved readability, e.g.
@@ -315,37 +306,6 @@ namespace netlist
 
 		template <typename T, T V>
 		using desc_const_t = std::integral_constant<const T, V>;
-	};
-
-	//============================================================
-	//  Exceptions
-	//============================================================
-
-	/// \brief Generic netlist exception.
-	///  The exception is used in all events which are considered fatal.
-
-	class nl_exception : public plib::pexception
-	{
-	public:
-		/// \brief Constructor.
-		///  Allows a descriptive text to be passed to the exception
-
-		explicit nl_exception(const pstring &text //!< text to be passed
-							  )
-		: plib::pexception(text)
-		{
-		}
-
-		/// \brief Constructor.
-		///  Allows to use \ref plib::pfmt logic to be used in exception
-
-		template <typename... Args>
-		explicit nl_exception(const pstring &fmt, //!< format to be used
-							  Args &&...args      //!< arguments to be passed
-							  )
-		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...))
-		{
-		}
 	};
 
 } // namespace netlist

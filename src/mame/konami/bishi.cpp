@@ -86,11 +86,126 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "bishi.h"
+
+#include "k054156_k054157_k056832.h"
+#include "k054338.h"
+#include "k055555.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 #include "sound/ymz280b.h"
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+
+namespace {
+
+class bishi_state : public driver_device
+{
+public:
+	bishi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_k056832(*this, "k056832"),
+		m_k054338(*this, "k054338"),
+		m_k055555(*this, "k055555"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
+	{ }
+
+	void bishi(machine_config &config);
+
+private:
+	uint16_t control_r();
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t bishi_mirror_r(offs_t offset);
+	uint16_t bishi_K056832_rom_r(offs_t offset);
+	uint32_t screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
+	K056832_CB_MEMBER(tile_callback);
+
+	void main_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+private:
+	/* misc */
+	uint16_t     m_cur_control = 0U;
+	uint16_t     m_cur_control2 = 0U;
+
+	/* video-related */
+	int        m_layer_colorbase[4]{};
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<k056832_device> m_k056832;
+	required_device<k054338_device> m_k054338;
+	required_device<k055555_device> m_k055555;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+};
+
+
+K056832_CB_MEMBER(bishi_state::tile_callback)
+{
+//  *code -= '0';
+//  *color = m_layer_colorbase[layer] | (*color>>2 & 0x0f);
+//  K055555GX_decode_vmixcolor(layer, color);
+//  if (*color) osd_printf_debug("plane %x col %x [55 %x %x]\n", layer, *color, layer_colorbase[layer], K055555_get_palette_index(layer));
+
+	*color = m_layer_colorbase[layer] + ((*color & 0xf0));
+}
+
+void bishi_state::video_start()
+{
+	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
+
+	m_k056832->set_layer_association(0);
+
+	m_k056832->set_layer_offs(0, -2, 0);
+	m_k056832->set_layer_offs(1,  2, 0);
+	m_k056832->set_layer_offs(2,  4, 0);
+	m_k056832->set_layer_offs(3,  6, 0);
+
+	// the 55555 is set to "0x10, 0x11, 0x12, 0x13", but these values are almost correct...
+	m_layer_colorbase[0] = 0x00;
+	m_layer_colorbase[1] = 0x40;    // this one is wrong
+	m_layer_colorbase[2] = 0x80;
+	m_layer_colorbase[3] = 0xc0;
+}
+
+uint32_t bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int layers[4], layerpri[4], i;/*, old;*/
+/*  int bg_colorbase, new_colorbase, plane, dirty; */
+	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
+	static const int enables[4] = { K55_INP_VRAM_A, K55_INP_VRAM_B, K55_INP_VRAM_C, K55_INP_VRAM_D };
+
+	m_k054338->update_all_shadows(0, *m_palette);
+	m_k054338->fill_solid_bg(bitmap, cliprect);
+
+	for (i = 0; i < 4; i++)
+	{
+		layers[i] = i;
+		layerpri[i] = m_k055555->K055555_read_register(pris[i]);
+	}
+
+	konami_sortlayers4(layers, layerpri);
+
+	screen.priority().fill(0, cliprect);
+
+	for (i = 0; i < 4; i++)
+	{
+		if (m_k055555->K055555_read_register(K55_INPUT_ENABLES) & enables[layers[i]])
+		{
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[i], 0, 1 << i);
+		}
+	}
+	return 0;
+}
 
 
 uint16_t bishi_state::control_r()
@@ -376,6 +491,9 @@ void bishi_state::machine_reset()
 
 void bishi_state::bishi(machine_config &config)
 {
+	constexpr XTAL CPU_CLOCK = 24_MHz_XTAL / 2;
+	constexpr XTAL SOUND_CLOCK = 16.9344_MHz_XTAL;
+
 	/* basic machine hardware */
 	M68000(config, m_maincpu, CPU_CLOCK); /* 12MHz (24MHz OSC / 2 ) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bishi_state::main_map);
@@ -501,6 +619,8 @@ ROM_START( sbishika )
 	ROM_LOAD( "675kaa03.6f", 0x100000, 0x080000, CRC(83f91beb) SHA1(3af95f503f26fc88e75c786a9fef8a333c21d1d6) )
 	ROM_LOAD( "675kaa04.8f", 0x180000, 0x080000, CRC(ebcbd813) SHA1(d67540d0ea303f09866f4a766e2d5162f05cd4ac) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Bishi Bashi Champ Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -330,7 +330,7 @@ ROM_START( mk3snes )
 	ROM_LOAD("1.u1", 0x200000, 0x080000, CRC(4cab6332) SHA1(3c417ba6d35532b4e2ca9ae4a3b730c589d26aee))
 	ROM_LOAD("2.u2", 0x280000, 0x080000, CRC(0327999b) SHA1(dc6bb11a925e893453e0e5e5d88b8ace8d6cf859))
 	ROM_LOAD("3.u3", 0x300000, 0x080000, CRC(229af2de) SHA1(1bbb02aec08afab979ffbe4b68a48dc4cc923f73))
-	// this rom has 1 byte changed compared to sns-a3me-0.u1 (mk3u in snes softlist)
+	// this ROM has 1 byte changed compared to sns-a3me-0.u1 (mk3u in snes softlist). It has been confirmed on 2 different PCBs
 	ROM_LOAD("4.u4", 0x380000, 0x080000, CRC(b51930d9) SHA1(220f00d64809a6218015a738e53f11d8dc81578f))
 
 	ROM_REGION(0x1000, "mcu", 0)
@@ -340,16 +340,35 @@ ROM_START( mk3snes )
 	ROM_LOAD("spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0))
 ROM_END
 
+ROM_START( kinstsnes )
+	ROM_REGION(0x400000, "user3", 0)
+	ROM_LOAD("5.u5", 0x000000, 0x080000, CRC(8212bf7f) SHA1(d52b581f5ec29638b373678b3eac692822c5065e))
+	ROM_LOAD("6.u6", 0x080000, 0x080000, CRC(39f2dad2) SHA1(2fa3cb2cd4c984484367bce443c526c399e3efec))
+	ROM_LOAD("7.u7", 0x100000, 0x080000, CRC(972b6ba9) SHA1(3f85921b4806b0f3959fa20176a985d2621907d8))
+	ROM_LOAD("8.u8", 0x180000, 0x080000, CRC(6d1b3a01) SHA1(3dc26e5e508242330971847d6d132a4742646f4f))
+	ROM_LOAD("1.u1", 0x200000, 0x080000, CRC(462362da) SHA1(448f5a363680e2deba0d75935f18eb431d11d151))
+	ROM_LOAD("2.u2", 0x280000, 0x080000, CRC(3eaf9f96) SHA1(7c79af81fb16e6aef702af269de9d0411df5be68))
+	ROM_LOAD("3.u3", 0x300000, 0x080000, CRC(05f37f39) SHA1(2b4d3c117bb0188620cc3890a7b3a135922d2369))
+	ROM_LOAD("4.u4", 0x380000, 0x080000, CRC(7151f37d) SHA1(37106e06fa8c3016d8b03f5272905a3a555729b9))
+
+	ROM_REGION(0x1000, "mcu", 0)
+	ROM_LOAD("d87c51.u9", 0x0000, 0x1000, NO_DUMP)
+ROM_END
+
 ROM_START( snes4sl )
 	ROM_REGION(0x400000, "user3", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x8000, "mcu", 0)
-	ROM_SYSTEM_BIOS(0, "1207", "12-07") // Found on PCB with Siemens SAB 8051A-P (4KBytes internal ROM undumped)
-	ROMX_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "1103", "11-03") // Found on PCB with WD1016D-PL
-	ROMX_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "940601", "94-06-01") // Found on PCB with Intel P80C31BH, has 'SISTEME FRANCE' string in ROM
+	ROMX_LOAD("27c256_06_01.u43", 0x0000, 0x8000, CRC(d0f4849f) SHA1(971743c9b5a2c0ba267dd8a1ce9ff3821759b4fe), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "940415", "94-04-15") // Found on a PCB with NBA Jam installed
+	ROMX_LOAD("27c256_04_15.u43", 0x0000, 0x8000, CRC(af8a64e3) SHA1(f13187d213fe7c2a0edcb88d4e828bd24112e812), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "931207", "93-12-07") // Found on PCB with Siemens SAB 8051A-P (4KBytes internal ROM undumped)
+	ROMX_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "931103", "93-11-03") // Found on PCB with WD1016D-PL
+	ROMX_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670), ROM_BIOS(3))
 
-	ROM_DEFAULT_BIOS("1207")
+	ROM_DEFAULT_BIOS("940601")
 ROM_END
 
 ROM_START( snes4sln )
@@ -391,8 +410,9 @@ void snesb51_state::init_fatfurspb()
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  MACHINE   INPUT    CLASS          INIT             ROT   COMPANY    FULLNAME                                 FLAGS
-GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)",        MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",           MACHINE_IS_SKELETON )
-GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)", MACHINE_IS_SKELETON )
-GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg)",     MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT  MACHINE   INPUT    CLASS          INIT             ROT   COMPANY    FULLNAME                                     FLAGS
+GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
+GAME( 199?, kinstsnes, 0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Killer Instinct (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
+GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",                  MACHINE_IS_SKELETON )
+GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)",        MACHINE_IS_SKELETON )
+GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg with timer)", MACHINE_IS_SKELETON )

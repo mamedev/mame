@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/hd44352.h"
+#include "hd44352.h"
 
 #define     LCD_BYTE_INPUT          0x01
 #define     LCD_BYTE_OUTPUT         0x02
@@ -55,8 +55,6 @@ void hd44352_device::device_validity_check(validity_checker &valid) const
 
 void hd44352_device::device_start()
 {
-	m_on_cb.resolve_safe();
-
 	m_on_timer = timer_alloc(FUNC(hd44352_device::on_tick), this);
 	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
 

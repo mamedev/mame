@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_NICK_H
-#define MAME_VIDEO_NICK_H
+#ifndef MAME_ENTERPRISE_NICK_H
+#define MAME_ENTERPRISE_NICK_H
 
 #pragma once
 
@@ -164,4 +164,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NICK, nick_device)
 
-#endif // MAME_VIDEO_NICK_H
+#endif // MAME_ENTERPRISE_NICK_H

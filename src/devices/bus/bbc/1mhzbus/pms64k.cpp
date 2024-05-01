@@ -4,9 +4,6 @@
 
     PMS 64K Non-Volatile Ram Module
 
-    TODO:
-    - Find accompanying software, needed to install utilities to RAM.
-
 **********************************************************************/
 
 
@@ -19,6 +16,25 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(BBC_PMS64K, bbc_pms64k_device, "bbc_pms64k", "PMS 64K Non-Volatile Ram Module");
+
+
+//-------------------------------------------------
+//  ROM( pms64k )
+//-------------------------------------------------
+
+ROM_START(pms64k)
+	ROM_REGION(0x4000, "exp_rom", 0)
+	ROM_LOAD("pms_utility_12d.rom", 0x0000, 0x4000, CRC(c630990e) SHA1(da9abe3b1b0bf34ee5d6ed7ee032686403436289))
+ROM_END
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *bbc_pms64k_device::device_rom_region() const
+{
+	return ROM_NAME(pms64k);
+}
 
 
 //-------------------------------------------------
@@ -54,6 +70,9 @@ void bbc_pms64k_device::device_start()
 {
 	m_ram = std::make_unique<uint8_t[]>(0x10000);
 	m_nvram->set_base(m_ram.get(), 0x10000);
+
+	save_pointer(NAME(m_ram), 0x10000);
+	save_item(NAME(m_ram_page));
 }
 
 

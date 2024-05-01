@@ -210,8 +210,6 @@ private:
 };
 
 
-// video
-
 void buggychl_state::palette(palette_device &palette) const
 {
 	// arbitrary blue shading for the sky, estimation
@@ -226,8 +224,6 @@ void buggychl_state::video_start()
 
 	save_item(NAME(m_tmp_bitmap[0]));
 	save_item(NAME(m_tmp_bitmap[1]));
-
-	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
 void buggychl_state::chargen_w(offs_t offset, uint8_t data)
@@ -362,7 +358,7 @@ void buggychl_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
@@ -413,8 +409,6 @@ void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			}
 		}
 	}
-
-	g_profiler.stop();
 }
 
 
@@ -434,8 +428,6 @@ uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void buggychl_state::bankswitch_w(uint8_t data)
 {
@@ -786,7 +778,7 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_buggychl )
-	GFXDECODE_ENTRY( nullptr,   0, charlayout,   0, 8 ) // decoded at runtime
+	GFXDECODE_RAM(   "charram", 0, charlayout,   0, 8 ) // decoded at runtime
 	// sprites are drawn pixel by pixel by draw_sprites()
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 8 )
 GFXDECODE_END
@@ -896,7 +888,7 @@ void buggychl_state::buggychl(machine_config &config)
 	m_ay[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MSM5232(config, m_msm, 8_MHz_XTAL / 4);
-	m_msm->set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6); // default 0.39 uF capacitors (not verified)
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); // default 1 uF capacitors (not verified)
 	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1

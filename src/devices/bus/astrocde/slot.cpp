@@ -44,11 +44,11 @@ device_astrocade_cart_interface::~device_astrocade_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_astrocade_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_astrocade_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(ASTROCADESLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -134,12 +134,12 @@ static const char *astrocade_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result astrocade_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		m_cart->rom_alloc(size, tag());
+		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		m_cart->rom_alloc(size);
 
 		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), size);
@@ -163,11 +163,9 @@ image_init_result astrocade_cart_slot_device::call_load()
 		}
 
 		//printf("Type: %s\n", astrocade_get_slot(m_type));
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

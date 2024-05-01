@@ -15,7 +15,12 @@
 
 #include "fs_coco_os9.h"
 #include "coco_rawdsk.h"
+#include "fsblk.h"
+
+#include "multibyte.h"
 #include "strformat.h"
+
+#include <optional>
 
 
 using namespace fs;
@@ -26,7 +31,8 @@ namespace {
 
 // ======================> coco_os9_impl
 
-class coco_os9_impl : public filesystem_t {
+class coco_os9_impl : public filesystem_t
+{
 public:
 	// ======================> volume_header
 
@@ -95,7 +101,7 @@ public:
 
 	private:
 		fsblk_t::block_t    m_block;
-		std::string			m_filename;
+		std::string         m_filename;
 	};
 
 	// ctor/dtor
@@ -114,7 +120,6 @@ public:
 
 	static std::string pick_os9_string(std::string_view raw_string);
 	static std::string to_os9_string(std::string_view s, size_t length);
-	static u32 pick_integer_be(const u8 *data, int length);
 	static util::arbitrary_datetime from_os9_date(u32 os9_date, u16 os9_time = 0);
 	static std::tuple<u32, u16> to_os9_date(const util::arbitrary_datetime &datetime);
 	static bool is_ignored_filename(std::string_view name);
@@ -123,7 +128,8 @@ public:
 private:
 	volume_header   m_volume_header;
 };
-}
+
+} // anonymous namespace
 
 //**************************************************************************
 //  IMPLEMENTATION
@@ -153,13 +159,10 @@ const char *coco_os9_image::description() const
 //  enumerate_f
 //-------------------------------------------------
 
-void coco_os9_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void coco_os9_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSDD))
-	{
-		fe.add(FLOPPY_COCO_RAWDSK_FORMAT, 161280, "coco_rawdsk_os9_35", "CoCo Raw Disk OS-9 single-sided 35 tracks");
-		fe.add(FLOPPY_COCO_RAWDSK_FORMAT, 184320, "coco_rawdsk_os9_40", "CoCo Raw Disk OS-9 single-sided 40 tracks");
-	}
+	fe.add(FLOPPY_COCO_RAWDSK_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 161280, "coco_rawdsk_os9_35", "CoCo Raw Disk OS-9 single-sided 35 tracks");
+	fe.add(FLOPPY_COCO_RAWDSK_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 184320, "coco_rawdsk_os9_40", "CoCo Raw Disk OS-9 single-sided 40 tracks");
 }
 
 
@@ -523,7 +526,7 @@ void coco_os9_impl::iterate_directory_entries(const file_header &header, const s
 			continue;
 
 		// set up the child header
-		u32 lsn = pick_integer_be(&directory_data[i * 32] + 29, 3);
+		u32 lsn = get_u24be(&directory_data[i * 32] + 29);
 
 		// invoke the callback
 		done = callback(std::move(filename), lsn);
@@ -600,19 +603,6 @@ std::string coco_os9_impl::to_os9_string(std::string_view s, size_t length)
 
 
 //-------------------------------------------------
-//  pick_integer_be
-//-------------------------------------------------
-
-u32 coco_os9_impl::pick_integer_be(const u8 *data, int length)
-{
-	u32 result = 0;
-	for (int i = 0; i < length; i++)
-		result |= u32(data[length - i - 1]) << i * 8;
-	return result;
-}
-
-
-//-------------------------------------------------
 //  from_os9_date
 //-------------------------------------------------
 
@@ -652,7 +642,7 @@ bool coco_os9_impl::validate_filename(std::string_view name)
 {
 	return !is_ignored_filename(name)
 		&& name.size() <= 29
-		&& std::find_if(name.begin(), name.end(), [](const char ch) { return ch == '\0' || ch == '/' || ch >= 0x80; }) == name.end();
+		&& std::find_if(name.begin(), name.end(), [](const char ch) { return ch == '\0' || ch == '/' || (ch & 0x80); }) == name.end();
 }
 
 

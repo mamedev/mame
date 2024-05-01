@@ -398,6 +398,8 @@ Notes:
 #include "screen.h"
 
 
+namespace {
+
 #define CPU_CLOCK (200000000)
 
 class hikaru_state : public driver_device
@@ -871,8 +873,10 @@ ROM_START( hikcheck )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+
+GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 GAME( 1999, braveff,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, airtrix,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, airtrixo,  airtrix,  hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

@@ -36,6 +36,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class m79152pc_state : public driver_device
 {
 public:
@@ -58,9 +60,9 @@ protected:
 
 private:
 	void beep_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(latch_full_w);
-	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
-	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
+	void latch_full_w(int state);
+	int mcu_t0_r();
+	int mcu_t1_r();
 	void mcu_p1_w(u8 data);
 	void mcu_p2_w(u8 data);
 	void lc_reset_w(u8 data);
@@ -101,17 +103,17 @@ void m79152pc_state::beep_w(offs_t offset, uint8_t data)
 	m_beep->set_state(BIT(offset, 2));
 }
 
-WRITE_LINE_MEMBER(m79152pc_state::latch_full_w)
+void m79152pc_state::latch_full_w(int state)
 {
 	m_latch_full = state == ASSERT_LINE;
 }
 
-READ_LINE_MEMBER(m79152pc_state::mcu_t0_r)
+int m79152pc_state::mcu_t0_r()
 {
 	return m_latch_full ? 0 : 1;
 }
 
-READ_LINE_MEMBER(m79152pc_state::mcu_t1_r)
+int m79152pc_state::mcu_t1_r()
 {
 	return m_hsync ? 0 : 1;
 }
@@ -359,6 +361,9 @@ ROM_START( m79152pc )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "7641apc.bin", 0x0000, 0x0200, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

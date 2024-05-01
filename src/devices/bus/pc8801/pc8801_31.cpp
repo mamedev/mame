@@ -74,12 +74,6 @@ void pc8801_31_device::device_add_mconfig(machine_config &config)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc8801_31_device::device_resolve_objects()
-{
-	m_rom_bank_cb.resolve();
-}
-
-
 void pc8801_31_device::device_start()
 {
 	m_sel_off_timer = timer_alloc(FUNC(pc8801_31_device::select_off), this);

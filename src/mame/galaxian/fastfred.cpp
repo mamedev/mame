@@ -137,14 +137,13 @@ uint8_t fastfred_state::boggy84_custom_io_r(offs_t offset)
     Imago sprites DMA
 */
 
-
 MACHINE_START_MEMBER(fastfred_state,imago)
 {
 	machine_start();
 	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);
 }
 
-WRITE_LINE_MEMBER(fastfred_state::imago_dma_irq_w)
+void fastfred_state::imago_dma_irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -177,7 +176,7 @@ uint8_t fastfred_state::imago_sprites_offset_r(offs_t offset)
 	return 0xff; //not really used
 }
 
-WRITE_LINE_MEMBER(fastfred_state::nmi_mask_w)
+void fastfred_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -598,7 +597,7 @@ static GFXDECODE_START( gfx_imago )
 	GFXDECODE_ENTRY( "gfx4",  0,      gfx_8x8x1,       0x140,  1 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(fastfred_state::vblank_irq)
+void fastfred_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -613,10 +612,10 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 void fastfred_state::fastfred(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'432'000)/4);   /* 3.108 MHz; xtal from pcb pics, divider not verified */
+	Z80(config, m_maincpu, 18.432_MHz_XTAL/3/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::fastfred_map);
 
-	Z80(config, m_audiocpu, XTAL(12'432'000)/8);  /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL/3/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fastfred_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(fastfred_state::sound_timer_irq), attotime::from_hz(4*60));
 
@@ -634,7 +633,7 @@ void fastfred_state::fastfred(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); //CLOCK/16/60
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // CLOCK/16/60
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(fastfred_state::screen_update_fastfred));
@@ -651,9 +650,8 @@ void fastfred_state::fastfred(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "ay8910.1", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
-
-	AY8910(config, "ay8910.2", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	AY8910(config, "ay8910.1", 18.432_MHz_XTAL/3/4).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay8910.2", 18.432_MHz_XTAL/3/4).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void fastfred_state::jumpcoas(machine_config &config)

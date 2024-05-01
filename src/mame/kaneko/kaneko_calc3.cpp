@@ -1519,58 +1519,50 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 
 void kaneko_calc3_device::initial_scan_tables()
 {
-	uint8_t numregions;
 	uint8_t* datarom = memregion(":calc3_rom")->base();
 
-	int x;
-
 	m_mcu_crc = 0;
-	for (x=0;x<0x20000;x++)
+	for (int x=0;x<0x20000;x++)
 	{
 		m_mcu_crc+=datarom[x];
 	}
 	//printf("crc %04x\n",m_mcu_crc);
-	numregions = datarom[0];
 
-	for (x=0;x<numregions;x++)
+#if VERBOSE_OUTPUT
+	uint8_t numregions = datarom[0];
+
+	for (int x=0; x<numregions; x++)
 	{
-		std::vector<uint8_t> tmpdstram(0x2000);
-#if VERBOSE_OUTPUT
-		int length;
-#endif
+		std::vector<uint8_t> tmpdstram(0x2000, 0x00);
 
-		memset(&tmpdstram[0], 0x00,0x2000);
-
-#if VERBOSE_OUTPUT
-		length = decompress_table(x, tmpdstram, 0);
+		int length = decompress_table(x, tmpdstram.data(), 0);
 		// dump to file
 		if (length)
 		{
-			FILE *fp;
-			char filename[256];
+			std::string filename;
 
 			if (m_blocksize_offset==3)
 			{
-				sprintf(filename,"data_%s_table_%04x k%02x m%02x u%02x length %04x",
-						machine().system().name,
-						x, m_decryption_key_byte, m_mode, m_alternateswaps, length);
+				filename = util::string_format("data_%s_table_%04x k%02x m%02x u%02x length %04x",
+					machine().system().name,
+					x, m_decryption_key_byte, m_mode, m_alternateswaps, length);
 			}
 			else
 			{
-				sprintf(filename,"data_%s_table_%04x k%02x (use indirect size %02x) m%02x u%02x length %04x",
+				filename = util::string_format("data_%s_table_%04x k%02x (use indirect size %02x) m%02x u%02x length %04x",
 					machine().system().name,
 					x, m_decryption_key_byte, m_blocksize_offset-3, m_mode, m_alternateswaps, length);
 			}
 
-			fp=fopen(filename, "w+b");
+			auto fp = fopen(filename.c_str(), "w+b");
 			if (fp)
 			{
-				fwrite(tmpdstram, length, 1, fp);
+				fwrite(tmpdstram.data(), length, 1, fp);
 				fclose(fp);
 			}
 		}
-#endif
 	}
+#endif
 
 	// there is also a 0x1000 block of data at the end.. same on both games, maybe it's related to the decryption tables??
 	// the calc3_dataend points to the data after the last block processed, as we process all the blocks in the above loop, we assume this points
@@ -1579,13 +1571,8 @@ void kaneko_calc3_device::initial_scan_tables()
 	// dump out the 0x1000 sized block at the end
 #if VERBOSE_OUTPUT
 	{
-		FILE *fp;
-		char filename[256];
-
-		sprintf(filename,"data_%s_finalblock",
-		machine().system().name);
-
-		fp=fopen(filename, "w+b");
+		auto filename = util::string_format("data_%s_finalblock", machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			fwrite(&datarom[m_dataend], 0x1000, 1, fp);

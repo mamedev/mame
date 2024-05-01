@@ -46,7 +46,6 @@ To Do:
 #include "emu.h"
 #include "realbrk.h"
 
-#include "cpu/m68000/m68000.h"
 #include "sound/ymopl.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
@@ -748,29 +747,22 @@ GFXDECODE_END
                         Billiard Academy Real Break
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(realbrk_state::vblank_irq)
-{
-	/* VBlank is connected to INT1 (external interrupts pin 1) */
-	if (state)
-		m_maincpu->external_interrupt_1();
-}
-
 void realbrk_state::realbrk(machine_config &config)
 {
 	/* basic machine hardware */
 	TMP68301(config, m_maincpu, XTAL(32'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::realbrk_mem);
-	m_maincpu->out_parallel_callback().set(FUNC(realbrk_state::realbrk_flipscreen_w));
+	m_maincpu->parallel_w_cb().set(FUNC(realbrk_state::realbrk_flipscreen_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(0x140, 0xe0);
 	m_screen->set_visarea(0, 0x140-1, 0, 0xe0-1);
 	m_screen->set_screen_update(FUNC(realbrk_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(realbrk_state::vblank_irq));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_realbrk);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
@@ -793,7 +785,7 @@ void realbrk_state::pkgnsh(machine_config &config)
 	realbrk(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::pkgnsh_mem);
-	m_maincpu->out_parallel_callback().set_nop();
+	m_maincpu->parallel_w_cb().set_nop();
 }
 
 void realbrk_state::pkgnshdx(machine_config &config)
@@ -808,7 +800,7 @@ void realbrk_state::dai2kaku(machine_config &config)
 	realbrk(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::dai2kaku_mem);
-	m_maincpu->out_parallel_callback().set(FUNC(realbrk_state::dai2kaku_flipscreen_w));
+	m_maincpu->parallel_w_cb().set(FUNC(realbrk_state::dai2kaku_flipscreen_w));
 
 	m_gfxdecode->set_info(gfx_dai2kaku);
 	m_screen->set_screen_update(FUNC(realbrk_state::screen_update_dai2kaku));

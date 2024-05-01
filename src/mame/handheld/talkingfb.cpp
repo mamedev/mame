@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/******************************************************************************
+/*******************************************************************************
 
 Parker Brothers Superstar Lineup Talking Football
 
@@ -25,11 +25,13 @@ TODO:
 - verify keypad (everything seems ok, but "Pursue" and "Go For Turnover" might
   be swapped, their function is nearly identical so it's hard to test)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 
@@ -56,11 +58,11 @@ private:
 	required_region_ptr<u8> m_rom;
 	required_ioport_array<5> m_inputs;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-
 	u8 m_bank = 0;
 	u8 m_inp_mux = 0;
+
+	void main_map(address_map &map);
+	void main_io(address_map &map);
 
 	// I/O handlers
 	void bank_w(u8 data);
@@ -78,9 +80,9 @@ void talkingfb_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void talkingfb_state::bank_w(u8 data)
 {
@@ -122,9 +124,9 @@ u8 talkingfb_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void talkingfb_state::main_map(address_map &map)
 {
@@ -141,9 +143,9 @@ void talkingfb_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 /* keypad layout is like this: (P1 = Home, P2 = Away, both keypads are same)
 
@@ -215,29 +217,29 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void talkingfb_state::talkingfb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &talkingfb_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &talkingfb_state::main_io);
 	m_maincpu->port_out_cb<1>().set("dac", FUNC(dac_8bit_r2r_device::write));
 	m_maincpu->port_out_cb<3>().set(FUNC(talkingfb_state::bank_w));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( talkingfb )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -248,9 +250,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1989, talkingfb, 0,      0, talkingfb, talkingfb, talkingfb_state, empty_init, "Parker Brothers", "Superstar Lineup Talking Football", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1989, talkingfb, 0,      0,      talkingfb, talkingfb, talkingfb_state, empty_init, "Parker Brothers", "Superstar Lineup Talking Football", MACHINE_SUPPORTS_SAVE )

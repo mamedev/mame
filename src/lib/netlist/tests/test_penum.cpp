@@ -91,7 +91,7 @@ namespace plib
 					return;
 				}
 		}
-		constexpr operator const char * () const noexcept { return staticf::m_str[static_cast<std::size_t>(m_v)]; } \
+		constexpr operator const char * () const noexcept { return staticf::m_str[static_cast<std::size_t>(m_v)]; }
 		constexpr operator E () const noexcept { return m_v; }
 	protected:
 		E m_v;

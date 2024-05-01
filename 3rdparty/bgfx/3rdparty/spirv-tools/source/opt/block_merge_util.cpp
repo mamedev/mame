@@ -125,6 +125,26 @@ bool CanMergeWithSuccessor(IRContext* context, BasicBlock* block) {
       return false;
     }
   }
+
+  if (succ_is_merge || IsContinue(context, lab_id)) {
+    auto* struct_cfg = context->GetStructuredCFGAnalysis();
+    auto switch_block_id = struct_cfg->ContainingSwitch(block->id());
+    if (switch_block_id) {
+      auto switch_merge_id = struct_cfg->SwitchMergeBlock(switch_block_id);
+      const auto* switch_inst =
+          &*block->GetParent()->FindBlock(switch_block_id)->tail();
+      for (uint32_t i = 1; i < switch_inst->NumInOperands(); i += 2) {
+        auto target_id = switch_inst->GetSingleWordInOperand(i);
+        if (target_id == block->id() && target_id != switch_merge_id) {
+          // Case constructs must be structurally dominated by the OpSwitch.
+          // Since the successor is the merge/continue for another construct,
+          // merging the blocks would break that requirement.
+          return false;
+        }
+      }
+    }
+  }
+
   return true;
 }
 
@@ -171,12 +191,17 @@ void MergeWithSuccessor(IRContext* context, Function* func,
       // and OpBranchConditional.
       auto terminator = bi->terminator();
       auto& vec = terminator->dbg_line_insts();
-      auto& new_vec = merge_inst->dbg_line_insts();
-      new_vec.insert(new_vec.end(), vec.begin(), vec.end());
-      terminator->ClearDbgLineInsts();
-      for (auto& l_inst : new_vec)
-        context->get_def_use_mgr()->AnalyzeInstDefUse(&l_inst);
-
+      if (vec.size() > 0) {
+        merge_inst->ClearDbgLineInsts();
+        auto& new_vec = merge_inst->dbg_line_insts();
+        new_vec.insert(new_vec.end(), vec.begin(), vec.end());
+        terminator->ClearDbgLineInsts();
+        for (auto& l_inst : new_vec)
+          context->get_def_use_mgr()->AnalyzeInstDefUse(&l_inst);
+      }
+      // Clear debug scope of terminator to avoid DebugScope
+      // emitted between terminator and merge.
+      terminator->SetDebugScope(DebugScope(kNoDebugScope, kNoInlinedAt));
       // Move the merge instruction to just before the terminator.
       merge_inst->InsertBefore(terminator);
     }

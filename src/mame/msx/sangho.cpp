@@ -23,7 +23,7 @@ matter of time before that board dies too.
 
 It is thought that these games are based on MSX hardware
 as some of the Puzzle Star roms appear to be a hacked
-MSX Bios.  If we're lucky then the FGPA may only contain
+MSX BIOS.  If we're lucky then the FGPA may only contain
 Sang Ho's MSX simulation, rather than any specific game code.
 
 The FGPA is labeled 'Custom 3'
@@ -53,6 +53,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class sangho_state : public driver_device
 {
@@ -577,6 +579,9 @@ void pzlestar_state::init_pzlestar()
 	ROM[0x12ca7] = 0x00;
 	ROM[0x12ca8] = 0x00;
 }
+
+} // anonymous namespace
+
 
 GAME( 1991, pzlestar,  0,        pzlestar, pzlestar, pzlestar_state, init_pzlestar, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, sexyboom,  0,        sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Sexy Boom", 0 )

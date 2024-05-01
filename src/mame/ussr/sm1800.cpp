@@ -24,6 +24,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class sm1800_state : public driver_device
 {
 public:
@@ -99,18 +101,21 @@ INTERRUPT_GEN_MEMBER(sm1800_state::vblank_interrupt)
 
 I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 {
+	using namespace i8275_attributes;
+
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint8_t const *const charmap = memregion("chargen")->base();
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp)
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<8;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
@@ -202,6 +207,9 @@ ROM_START( sm1800 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.bin", 0x0000, 0x0800, CRC(28ed9ebc) SHA1(f561136962a06a5dcb5a0436931d29e940155d24))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 
