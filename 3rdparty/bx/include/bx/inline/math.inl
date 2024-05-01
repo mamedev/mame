@@ -164,7 +164,7 @@ namespace bx
 
 	inline void sinCosApprox(float _a, float* _outSin, float* _outCos)
 	{
-		const float aa     = _a - floor(_a/kPi2)*kPi2;
+		const float aa     = _a - floor(_a*kInvPi2)*kPi2;
 		const float absA   = abs(aa);
 		const float cosA   = cos(absA);
 		const float cosASq = square(cosA);

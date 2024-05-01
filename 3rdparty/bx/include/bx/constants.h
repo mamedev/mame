@@ -20,8 +20,11 @@ namespace bx
 	/// The ratio of a circle's circumference to its radius. Pi multiplied by 2, or Tau. pi*2
 	constexpr float    kPi2            = 6.2831853071795864769252867665590f;
 
-	/// The reciprocal of pi. 1/pi
+	/// The reciprocal of kPi. 1/kPi
 	constexpr float    kInvPi          = 1.0f/kPi;
+
+	/// The reciprocal of kPi2. 1/kPi2
+	constexpr float    kInvPi2         = 1.0f/kPi2;
 
 	/// Pi divided by two. pi/2
 	constexpr float    kPiHalf         = 1.5707963267948966192313216916398f;
