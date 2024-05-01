@@ -1,6 +1,6 @@
 id: org.mamedev.MAME
 runtime: org.kde.Platform
-runtime-version: 5.15-21.08
+runtime-version: 5.15-23.08
 sdk: org.kde.Sdk
 command: mame
 separate-locales: false
@@ -11,6 +11,7 @@ finish-args:
   - --filesystem=host:ro
   - --share=network
   - --share=ipc
+  - --socket=x11
   - --socket=fallback-x11
   - --socket=pulseaudio
   - --socket=wayland
@@ -24,6 +25,9 @@ modules:
     build-commands:
       - make
           -j ${FLATPAK_BUILDER_N_JOBS}
+          CFLAGS+=-Wno-error=restrict
+          TOOLS=1
+          USE_WAYLAND=1
           USE_SYSTEM_LIB_FLAC=1
           SDL_INI_PATH='$$HOME/.APP_NAME;/app/share/APP_NAME/ini'
           LDOPTS=-Wl,-s
@@ -56,8 +60,8 @@ modules:
       - cp -r samples/ ${FLATPAK_DEST}/share/mame/
     sources:
       - type: archive
-        url: https://github.com/mamedev/mame/archive/refs/tags/mame0247.tar.gz
-        sha256: a2486d34b15f13c3d7028436f7da373d37c7fd47f34a2ea19ff48cf57daf29e1
+        url: https://github.com/mamedev/mame/archive/refs/tags/mame0265.tar.gz
+        sha256: 3de68db66efb783eb5c5d7ccad1f4a4f5eadc6c7a29c1a9c2097e532c3e0b8b1
       - type: file
         path: mame16x16.png
       - type: file
@@ -78,3 +82,9 @@ modules:
         path: org.mamedev.MAME.metainfo.xml
       - type: file
         path: mame.ini
+      - type: patch
+        path: floppy.patch
+      - type: patch
+        path: sound.patch
+      - type: patch
+        path: ym3802.patch

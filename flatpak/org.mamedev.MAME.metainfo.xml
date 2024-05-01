@@ -7,6 +7,7 @@
   <summary>
     MAME is a multi-purpose emulation framework.
   </summary>
+  <developer_name>MAMEDev and contributors</developer_name>
   <description>
     <p>
         MAME&apos;s purpose is to preserve decades of software history. As electronic technology continues to rush
@@ -27,6 +28,24 @@
   <url type="homepage">https://www.mamedev.org</url>
   <launchable type="desktop-id">org.mamedev.MAME.desktop</launchable>
   <releases>
+    <release version="0.265" date="2024-04-25"/>
+    <release version="0.264" date="2024-03-27"/>
+    <release version="0.263" date="2024-02-28"/>
+    <release version="0.262" date="2024-01-31"/>
+    <release version="0.261" date="2023-11-29"/>
+    <release version="0.260" date="2023-10-25"/>
+    <release version="0.259" date="2023-09-29"/>
+    <release version="0.258" date="2023-08-30"/>
+    <release version="0.257" date="2023-07-28"/>
+    <release version="0.256" date="2023-06-28"/>
+    <release version="0.255" date="2023-05-31"/>
+    <release version="0.254" date="2023-04-27"/>
+    <release version="0.253" date="2023-03-30"/>
+    <release version="0.252" date="2023-02-22"/>
+    <release version="0.251" date="2022-12-31"/>
+    <release version="0.250" date="2022-11-30"/>
+    <release version="0.249" date="2022-10-27"/>
+    <release version="0.248" date="2022-09-28"/>
     <release version="0.247" date="2022-08-31"/>
     <release version="0.246" date="2022-07-31"/>
     <release version="0.245" date="2022-06-30"/>
