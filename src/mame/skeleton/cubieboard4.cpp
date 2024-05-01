@@ -36,8 +36,8 @@ class cubiecca80_state : public driver_device
 public:
 	cubiecca80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_cart_sdcard(*this, "emmcslot"),
-		m_cart_emmc(*this, "sdcardslot"),
+		m_cart_ext(*this, "emmcslot"),
+		m_cart_int(*this, "sdcardslot"),
 		m_maincpu(*this, "maincpu")
 
 	{ }
@@ -45,8 +45,8 @@ public:
 	void cubiecca80(machine_config &config);
 
 protected:
-	optional_device<generic_slot_device> m_cart_sdcard;
-	optional_device<generic_slot_device> m_cart_emmc;
+	optional_device<generic_slot_device> m_cart_ext;
+	optional_device<generic_slot_device> m_cart_int;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,8 +66,8 @@ void cubiecca80_state::cubiecca80(machine_config &config)
 	// Audio hardware
 	//SPEAKER(...)
 
-	GENERIC_CARTSLOT(config, m_cart_sdcard, generic_plain_slot, "sdcard"); // Removable MicroSD
-	GENERIC_CARTSLOT(config, m_cart_emmc, generic_plain_slot, "emmc");   // Internal eMMC
+	GENERIC_CARTSLOT(config, m_cart_ext, generic_plain_slot, "sdcard"); // Removable MicroSD
+	GENERIC_CARTSLOT(config, m_cart_int, generic_plain_slot, "emmc");   // Internal eMMC
 
 	// Software list for adding other compatible software (Linux distros, etc.).
 	SOFTWARE_LIST(config, "software_list").set_original("cubieboard4");
