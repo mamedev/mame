@@ -441,6 +441,36 @@ TEST_CASE("sin", "[math][libm]")
 	}
 }
 
+TEST_CASE("sinCos", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
+
+	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	{
+		float ss, cc;
+		bx::sinCosApprox(xx, &ss, &cc);
+
+		bx::write(writer, &err, "sinCos(%f) == sin %f (expected: %f)\n", xx, ss, ::sinf(xx) );
+		bx::write(writer, &err, "sinCos(%f) == cos %f (expected: %f)\n", xx, cc, ::cosf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(ss, ::sinf(xx), 0.001f) );
+		REQUIRE(bx::isEqual(cc, ::cosf(xx), 0.00001f) );
+	}
+
+	for (float xx = -bx::kPi2; xx < bx::kPi2; xx += 0.0001f)
+	{
+		float ss, cc;
+		bx::sinCosApprox(xx, &ss, &cc);
+
+		bx::write(writer, &err, "sinCos(%f) == sin %f (expected: %f)\n", xx, ss, ::sinf(xx) );
+		bx::write(writer, &err, "sinCos(%f) == cos %f (expected: %f)\n", xx, cc, ::cosf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(ss, ::sinf(xx), 0.001f) );
+		REQUIRE(bx::isEqual(cc, ::cosf(xx), 0.00001f) );
+	}
+}
+
 TEST_CASE("sinh", "[math][libm]")
 {
 	bx::WriterI* writer = bx::getNullOut();

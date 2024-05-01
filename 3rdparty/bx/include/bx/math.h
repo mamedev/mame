@@ -203,6 +203,13 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float square(float _a);
 
+	/// Returns the both sine and cosine of the argument _a.
+	///
+	/// @remarks The function calculates cosine, and then approximates sine based on the cosine
+	///   result. Therefore calculation of sine is less accurate than calling `bx::sin` function.
+	///
+	void sinCosApprox(float _a, float* _outSin, float* _outCos);
+
 	/// Returns the sine of the argument _a.
 	///
 	BX_CONST_FUNC float sin(float _a);
