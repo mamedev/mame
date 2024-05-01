@@ -6654,7 +6654,7 @@ Various Nokia [monitor] drivers, 44x-based
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="zk0001.img" size="1474560" crc="115a9bd4" sha1="852f95526f0af38bd1cfff25969816d666302a3d"/>
+				<rom name="zk0001.img" size="1474560" crc="9ac0b2e8" sha1="8539cfe9990d0b6f842e0218c6536e9688898e4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24180,7 +24180,7 @@ Bombs: An amusing little desktop game.
 
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk2.img" size="1474560" crc="229aa2e8" sha1="101ae68c06471bfa84f25ec3e71385e0f9e41b4e"/>
+				<rom name="disk2.img" size="1474560" crc="9a6f2fdc" sha1="75d3ad80a155214cddcf3df7e97ae64d1ccc1212"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24192,7 +24192,7 @@ Bombs: An amusing little desktop game.
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk.img" size="737280" crc="a40d0e91" sha1="e84d6d698ce711272c6726b380ce22e16c9f6371"/>
+				<rom name="disk.img" size="737280" crc="90bd7c5b" sha1="b3ae2ba4e0ac43934b04fe8845ce216d382929b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24204,7 +24204,7 @@ Bombs: An amusing little desktop game.
 		
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="c2184-10016.img" size="1474560" crc="20884dbf" sha1="a344e0e36ca99499afc0f0d4056ba3d760a5971d"/>
+				<rom name="c2184-10016.img" size="1474560" crc="601c263d" sha1="d7e8d4892a519aad964dd5f3b08fe73a9ebc066a"/>
 			</dataarea>
 		</part>
 		

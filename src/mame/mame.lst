@@ -18516,6 +18516,7 @@ floritas                        // bootleg
 floritasm                       // bootleg (Multivideo)
 frogf                           // bootleg
 frogg                           // bootleg
+froggeg                         // bootleg (Hermatic)
 frogger                         // GX392 (c) 1981 Konami
 froggeram                       // bootleg
 froggereb                       // bootleg
@@ -18525,8 +18526,8 @@ froggers1                       // (c) 1981 Sega
 froggers2                       // 834-0068 (c) 1981 Sega
 froggers3                       //
 froggert                        // 834-0222 (c) 1981 Sega
-froggrs                         //
 froggervd                       // Video Dens
+froggrs                         // bootleg (Coin Music)
 fourplay                        // multigame
 galactica2                      // bootleg (Cirsa)
 galap1                          // hack
@@ -18682,6 +18683,7 @@ scrammr                         // bootleg (Model Racing)
 scrampt                         // bootleg (Petaco S.A.)
 scramrf                         // bootleg (Recreativos Franco)
 sfx                             // (c) 1983 Nichibutsu
+sgalwars                        // bootleg
 sirio2                          // bootleg (Calfesa S.L.)
 skelagon                        // (c) 1983 Nichibutsu USA
 skybase                         // (c) 1982 Omori Electric Co., Ltd.
@@ -35754,6 +35756,9 @@ hostinv                         // (c) 1998 The Game Room
 compc10                         // 1984 Commodore PC-10, PC-20 and PC-30
 pc10iii                         // 1987 Commodore PC-10 III
 compc1                          // 1984 Commodore PC-1
+
+@source:pc/conliner.cpp
+onlinertp                       // (c) 200? Comatel / Atata Systems
 
 @source:pc/ct486.cpp
 ct486                           // 1993? 486 with CS4031
