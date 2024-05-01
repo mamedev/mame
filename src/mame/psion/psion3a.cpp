@@ -380,6 +380,40 @@ static INPUT_PORTS_START( psion3a_fr )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( psion3a_it )
+	PORT_INCLUDE(psion3a)
+
+	PORT_MODIFY("COL0")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)                                   PORT_NAME("Invio")
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192 Fine") // U+2192 = →
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190 Inizio") // U+2190 = ←
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(u8"\u2193 Pag") // U+2193 = ↓
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))                    PORT_NAME("Foglio")          PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F5))                    PORT_NAME("Ora")             PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))                    PORT_NAME("Archivi")         PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+
+	PORT_MODIFY("COL1")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))                    PORT_NAME("Calc")            PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)         PORT_CHAR(UCHAR_MAMEKEY(F4))                    PORT_NAME("Agenda")          PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))                    PORT_NAME("Sistema")         PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+
+	PORT_MODIFY("COL2")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(0x08)                                 PORT_NAME("Canc.")
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))              PORT_NAME("Ctrl")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)         PORT_CHAR(UCHAR_MAMEKEY(F6))                    PORT_NAME("Mondo")           PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)         PORT_CHAR(UCHAR_MAMEKEY(F3))                    PORT_NAME("Testi")           PORT_CHANGED_MEMBER(DEVICE_SELF, psion3a_state, wakeup, 0)
+
+	PORT_MODIFY("COL3")
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))                   PORT_NAME("Aiuto Telef.")
+
+	PORT_MODIFY("COL4")
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))              PORT_NAME("\xe2\x97\x86 Maiusc.")
+
+	PORT_MODIFY("COL7")
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))                    PORT_NAME(u8"\u2191 Pag") // U+2191 = ↑
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( psion3c )
 	PORT_INCLUDE(psion3a)
 
@@ -580,6 +614,12 @@ ROM_START(psion3a2_us)
 	ROMX_LOAD("s3a_v3.40f_usa.bin", 0x000000, 0x200000, CRC(6028294b) SHA1(9dfcb02af268797a15b070ac62e29689f2d18c86), ROM_BIOS(0))
 ROM_END
 
+ROM_START(psion3a2_it)
+	ROM_REGION16_LE(0x200000, "rom", 0)
+	ROM_SYSTEM_BIOS(0, "340f", "V3.40F/ITA")
+	ROMX_LOAD("s3a_v3.40f_ita.bin", 0x000000, 0x200000, CRC(0e54df7b) SHA1(c4ed29db1c799fda53acf909a5ef553b4953dc32), ROM_BIOS(0))
+ROM_END
+
 ROM_START(psion3a2_de)
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "341f", "V3.41F/DEU")
@@ -626,6 +666,7 @@ COMP( 1993, psion3a,      0,        0,      psion3a,   psion3a,     psion3a_stat
 COMP( 1994, pocketbk2,    psion3a,  0,      psion3a,   pocketbk2,   psion3a_state,  empty_init,  "Acorn Computers",  "Pocket Book II",           MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2,     psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M)",           MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2_us,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (US)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1995, psion3a2_it,  psion3a,  0,      psion3a2,  psion3a_it,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Italian)", MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (German)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Russian)", MACHINE_SUPPORTS_SAVE )
 COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3c_state,  empty_init,  "Psion",            "Series 3c",                MACHINE_SUPPORTS_SAVE )
