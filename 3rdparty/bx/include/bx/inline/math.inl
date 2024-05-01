@@ -162,7 +162,7 @@ namespace bx
 		return _a * _a;
 	}
 
-	inline void sinCosApprox(float _a, float* _outSin, float* _outCos)
+	inline void sinCosApprox(float _a, float* _outSinApprox, float* _outCos)
 	{
 		const float aa     = _a - floor(_a*kInvPi2)*kPi2;
 		const float absA   = abs(aa);
@@ -172,7 +172,7 @@ namespace bx
 		const float tmp1   = aa > 0.0f && aa < kPi ? 1.0f : -1.0f;
 		const float sinA   = mul(tmp0, tmp1);
 
-		*_outSin = sinA;
+		*_outSinApprox = sinA;
 		*_outCos = cosA;
 	}
 

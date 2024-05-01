@@ -208,7 +208,7 @@ namespace bx
 	/// @remarks The function calculates cosine, and then approximates sine based on the cosine
 	///   result. Therefore calculation of sine is less accurate than calling `bx::sin` function.
 	///
-	void sinCosApprox(float _a, float* _outSin, float* _outCos);
+	void sinCosApprox(float _a, float* _outSinApprox, float* _outCos);
 
 	/// Returns the sine of the argument _a.
 	///
