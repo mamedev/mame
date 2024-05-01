@@ -58,7 +58,7 @@ float sinCosNonApproxBench()
 	bx::Error err;
 
 	elapsed += bx::getHPCounter();
-	bx::write(writer, &err, "%-20s: %15f\n", "sinCosNonApproxBench", double(elapsed) );
+	bx::write(writer, &err, "%-20s: %15f\n", "sin + cos", double(elapsed) );
 
 	return result;
 }
