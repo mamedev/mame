@@ -124,6 +124,69 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		switch (op)
 		{
+		case 0:
+		{
+			u16 comp = get_compute_compfunc(opcode);
+			if (comp == 0x0e6)
+			{
+				u8 src1 = get_src1(opcode);
+
+				if (src1 == 0)
+				{
+					util::stream_format(stream, "mstart (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				}
+				else
+				{
+					util::stream_format(stream, "??? (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				}
+			}
+			else if (comp == 0x099)
+			{
+				util::stream_format(stream, "mstep (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x166)
+			{
+				util::stream_format(stream, "dstep (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "??? (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+			}
+			break;
+		}
+
+		case 1:
+		{
+			u16 comp = get_compute_compfunc(opcode);
+
+			if (comp == 0x080)
+			{
+				util::stream_format(stream, "rotlcb (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x0c0)
+			{
+				util::stream_format(stream, "rotlb (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if ((comp & 0x0f8) == 0x020)
+			{
+				util::stream_format(stream, "sh (%02x, %02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7);
+			}
+			else if ((comp & 0x0f8) == 0x010)
+			{
+				u8 src2 = get_src2_dest(opcode);
+
+				if (src2 == 0x0)
+				{
+					util::stream_format(stream, "asr (%02x, %02x, %02x)", get_src1(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7);
+				}
+			}
+			else
+			{
+				util::stream_format(stream, "??? (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+			}
+			break;
+		}
+
 		case 4:
 		{
 			u16 comp = get_compute_compfunc(opcode);
@@ -236,6 +299,21 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		default:
 		{
 			util::stream_format(stream, "Unhandled TY2 (%08x)", opcode);
+			break;
+		}
+		}
+		break;
+	}
+
+	case 3:
+	{
+		u8 op = get_op(opcode);
+
+		switch (op)
+		{
+		default:
+		{
+			util::stream_format(stream, "Unhandled TY3 (%08x)", opcode);
 			break;
 		}
 		}
