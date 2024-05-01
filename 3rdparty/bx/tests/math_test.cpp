@@ -449,7 +449,7 @@ TEST_CASE("sinCos", "[math][libm]")
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
 		float ss, cc;
-		bx::sinCosApprox(xx, &ss, &cc);
+		bx::sinCosApprox(ss, cc, xx);
 
 		bx::write(writer, &err, "sinCos(%f) == sin %f (expected: %f)\n", xx, ss, ::sinf(xx) );
 		bx::write(writer, &err, "sinCos(%f) == cos %f (expected: %f)\n", xx, cc, ::cosf(xx) );
@@ -461,7 +461,7 @@ TEST_CASE("sinCos", "[math][libm]")
 	for (float xx = -bx::kPi2; xx < bx::kPi2; xx += 0.0001f)
 	{
 		float ss, cc;
-		bx::sinCosApprox(xx, &ss, &cc);
+		bx::sinCosApprox(ss, cc, xx);
 
 		bx::write(writer, &err, "sinCos(%f) == sin %f (expected: %f)\n", xx, ss, ::sinf(xx) );
 		bx::write(writer, &err, "sinCos(%f) == cos %f (expected: %f)\n", xx, cc, ::cosf(xx) );
