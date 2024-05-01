@@ -36,7 +36,8 @@ class cubiecca80_state : public driver_device
 public:
 	cubiecca80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_cart(*this, "cartslot"),
+		m_cart_sdcard(*this, "emmcslot"),
+		m_cart_emmc(*this, "sdcardslot"),
 		m_maincpu(*this, "maincpu")
 
 	{ }
@@ -44,7 +45,8 @@ public:
 	void cubiecca80(machine_config &config);
 
 protected:
-	optional_device<generic_slot_device> m_cart;
+	optional_device<generic_slot_device> m_cart_sdcard;
+	optional_device<generic_slot_device> m_cart_emmc;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -64,13 +66,14 @@ void cubiecca80_state::cubiecca80(machine_config &config)
 	// Audio hardware
 	//SPEAKER(...)
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "cubieboard4_sdcard");
+	GENERIC_CARTSLOT(config, m_cart_sdcard, generic_plain_slot, "sdcard"); // Removable MicroSD
+	GENERIC_CARTSLOT(config, m_cart_emmc, generic_plain_slot, "emmc");   // Internal eMMC
 
 	// Software list for adding other compatible software (Linux distros, etc.).
 	SOFTWARE_LIST(config, "software_list").set_original("cubieboard4");
 }
 
-// Main machine, for booting SD card images from the software list
+// Main machine, for booting SD card and eMMC images from the software list
 
 ROM_START( cubieboard4 )
 ROM_END
@@ -88,40 +91,10 @@ ROM_START( monkeyjmp )
 	ROM_LOAD( "pic18f46k22.bin", 0x0000, 0x2000, NO_DUMP ) // 1024 bytes internal ROM
 ROM_END
 
-// Other "official" software (from cubieboard.org) for the internal eMMC
-
-ROM_START( cb4_android41 )
-	DISK_REGION( "nand" )
-	DISK_IMAGE( "android4.4-cb4-emmc-v4.1.20161119", 0, SHA1(ccf854e17936e3c57a1701f9edb3c63b704d4d59) )
-ROM_END
-
-ROM_START( cb4_android43 )
-	DISK_REGION( "nand" )
-	DISK_IMAGE( "android4.4-cb4-emmc-v4.3.20170717", 0, SHA1(bb386ce76686698ad7f25b0469970c58abf4745e) )
-ROM_END
-
-ROM_START( cb4_debiansvr )
-	DISK_REGION( "nand" )
-	DISK_IMAGE( "cb4-debian-server-hdmi-emmc-v1.0",  0, SHA1(31db5866016cfd6f1be331c70859cdb27022a7aa) )
-ROM_END
-
-ROM_START( cb4_linarodst )
-	DISK_REGION( "nand" )
-	DISK_IMAGE( "linaro-desktop-cb4-emmc-hdmi-v1.1", 0, SHA1(249095e6faaee11e330eaf59285c2e68d0b5a30f) )
-ROM_END
-
-
 } // anonymous namespace
-
 
 // Main machine
 COMP( 20??, cubieboard4, 0, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "Cubietech Limited", "Cubieboard4 (CC A-20)", MACHINE_IS_SKELETON )
 
 // Arcade games
 GAME( 20??, monkeyjmp, cubieboard4, cubiecca80, cubiecca80, cubiecca80_state, empty_init, ROT90, "Falgas", "Monkey Jump", MACHINE_IS_SKELETON )
-
-// Other software for the internal eMMC
-COMP( 20??, cb4_android41, cubieboard4, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "cubieboard.org", "Android 4.1.20161119 for Cubieboard4", MACHINE_IS_SKELETON )
-COMP( 20??, cb4_android43, cubieboard4, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "cubieboard.org", "Android 4.3.20170717 for Cubieboard4", MACHINE_IS_SKELETON )
-COMP( 20??, cb4_debiansvr, cubieboard4, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "cubieboard.org", "Debian server for Cubieboard4",        MACHINE_IS_SKELETON )
-COMP( 20??, cb4_linarodst, cubieboard4, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "cubieboard.org", "Linaro desktop for Cubieboard4",       MACHINE_IS_SKELETON )
