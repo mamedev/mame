@@ -24,6 +24,8 @@ private:
 	int get_offset(u32 opcode);
 	int get_sq(u32 opcode);
 	int get_disp(u32 opcode);
+	int get_compute_dest(u32 opcode);
+	int get_compute_compfunc(u32 opcode);
 
 };
 

@@ -29,6 +29,16 @@ int mipsx_disassembler::get_src2_dest(u32 opcode)
 	return (opcode & 0x003e0000) >> 17;
 }
 
+int mipsx_disassembler::get_compute_dest(u32 opcode)
+{
+	return (opcode & 0x0001f000) >> 12;
+}
+
+int mipsx_disassembler::get_compute_compfunc(u32 opcode)
+{
+	return (opcode & 0x00000fff) >> 0;
+}
+
 int mipsx_disassembler::get_offset(u32 opcode)
 {
 	return (opcode & 0x0001ffff) >> 0;
@@ -44,6 +54,15 @@ int mipsx_disassembler::get_disp(u32 opcode)
 	return (opcode & 0x0000ffff) >> 0;
 }
 
+/*
+
+
+AJR: I took a look and think it's definitely MIPS-X of the big-endian variety. There might be some undocumented instruction set extensions, though.
+AJR: The giveaway is the prevalence of the word 0x60000019, which performs the operation r0 + r0 -> r0, in other words a no-op.
+
+
+*/
+
 
 offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const data_buffer& opcodes, const data_buffer& params)
 {
@@ -55,7 +74,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 	{
 	case 0:
 	{
-		uint8_t op = get_op(opcode);
+		u8 op = get_op(opcode);
 
 		switch (op)
 		{
@@ -98,9 +117,87 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		}
 		break;
 	}
+
+	case 1:
+	{
+		u8 op = get_op(opcode);
+
+		switch (op)
+		{
+		case 4:
+		{
+			u16 comp = get_compute_compfunc(opcode);
+
+			if (comp == 0x00b)
+			{
+				util::stream_format(stream, "blc (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x00f)
+			{
+				util::stream_format(stream, "not (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x019)
+			{
+				u8 src2 = get_src2_dest(opcode);
+				if (src2 == 0)
+				{
+					u8 src1 = get_src1(opcode);
+					u8 dest = get_compute_dest(opcode);
+
+					if ((src1 == 0) && (dest == 0))
+					{
+						util::stream_format(stream, "nop");
+					}
+					else
+					{
+						util::stream_format(stream, "mov (%02x, %02x)", get_src1(opcode), get_compute_dest(opcode));
+					}
+				}
+				else
+				{
+					util::stream_format(stream, "add (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				}
+			}
+			else if (comp == 0x01b)
+			{
+				util::stream_format(stream, "xor (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x023)
+			{
+				util::stream_format(stream, "and (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x026)
+			{
+				util::stream_format(stream, "subnc (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x03b)
+			{
+				util::stream_format(stream, "or (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else if (comp == 0x066)
+			{
+				util::stream_format(stream, "sub (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "??? (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+			}
+			break;
+		}
+
+		default:
+		{
+			util::stream_format(stream, "Unhandled TY1 (%08x)", opcode);
+			break;
+		}
+		}
+		break;
+
+	}
+
 	case 2:
 	{
-		uint8_t op = get_op(opcode);
+		u8 op = get_op(opcode);
 
 		switch (op)
 		{

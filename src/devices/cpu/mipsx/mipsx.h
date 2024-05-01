@@ -1,11 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/*********************************\
-
- MIPSXtangent (A4) core
- MIPSX == Argonaut RISC Core
-
-\*********************************/
 
 #ifndef MAME_CPU_MIPSX_MIPSX_H
 #define MAME_CPU_MIPSX_MIPSX_H

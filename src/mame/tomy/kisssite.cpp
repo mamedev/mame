@@ -74,7 +74,7 @@ void kisssite_state::mem(address_map &map)
 
 void kisssite_state::kisssite(machine_config &config)
 {
-	MIPSX(config, m_maincpu, 60'000'000); // is this really MIPS-X? - unknown frequency
+	MIPSX(config, m_maincpu, 60'000'000); // there is MIPS-X code at at around 0xe2e0 in the ROM, 0x60000019 is "r0 + r0 -> r0" which acts as a NOP
 	m_maincpu->set_addrmap(AS_PROGRAM, &kisssite_state::mem);
 }
 
@@ -82,8 +82,8 @@ INPUT_PORTS_START(kisssite)
 INPUT_PORTS_END
 
 ROM_START(kisssite)
-	ROM_REGION32_LE(0x040000, "maincpu", 0 )
-	ROM_LOAD32_DWORD("ht27c020.u10", 0x000000, 0x040000, CRC(ccedce2b) SHA1(28dd3dfd0b8de0c5aa1c37d193ffc479d46563a1) )
+	ROM_REGION32_BE(0x040000, "maincpu", 0 )
+	ROM_LOAD("ht27c020.u10", 0x000000, 0x040000, CRC(ccedce2b) SHA1(28dd3dfd0b8de0c5aa1c37d193ffc479d46563a1) )
 ROM_END
 
 } // anonymous namespace
