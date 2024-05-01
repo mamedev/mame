@@ -2,7 +2,7 @@
 // copyright-holders:
 /**************************************************************************************************
 
- Skeleton driver for Recreativos Franco slot games on PCB "53396607".
+ Skeleton driver for Recreativos Franco slot games on PCB ""53396607".
                   __________________________         _________________         __________________________
        _________|          J1             |________|     J5         |________|          J2             |_____
       |         |_________________________|        |________________|        |_________________________|    |
@@ -58,7 +58,7 @@ public:
 	rfjailbrk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_okim6376(*this, "oki")
+		, m_oki(*this, "oki")
 	{
 	}
 
@@ -69,7 +69,7 @@ protected:
 
 private:
 	required_device<i80188_cpu_device> m_maincpu;
-	required_device<okim6376_device> m_okim6376;
+	required_device<okim6376_device> m_oki;
 };
 
 void rfjailbrk_state::machine_start()
@@ -83,14 +83,12 @@ void rfjailbrk_state::rfjailbrk(machine_config &config)
 {
 	I80188(config, m_maincpu, 20.0000_MHz_XTAL); // Intel N80C188XL20
 
-	// Ordered as found on the PCB
 	I8255A(config, "pia2"); // OKI M82C55A-2V
 	I8255A(config, "pia1"); // OKI M82C55A-2V
 	I8255A(config, "pia7"); // OKI M82C55A-2V
 	I8255A(config, "pia3"); // OKI M82C55A-2V
 	I8255A(config, "pia5"); // OKI M82C55A-2V
 	I8255A(config, "pia6"); // OKI M82C55A-2V
-	I8255A(config, "pia4"); // OKI M82C55A-2V
 
 	PIC8259(config, "pic1", 0); // CS82C59A
 	PIC8259(config, "pic2", 0); // CS82C59A
@@ -99,7 +97,7 @@ void rfjailbrk_state::rfjailbrk(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6376(config, m_okim6376, 2.4576_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
+	OKIM6376(config, m_oki, 2.4576_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
 }
 
 // Only one PCB found, probably the game uses more PCBs for reels, etc.
