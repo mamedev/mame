@@ -423,10 +423,12 @@ SDL Keyboard Mapping
 | :ref:`keymap_file <mame-scommandline-keymapfile>`
 
 
-SDL Joystick Mapping
+SDL Input Options
 ~~~~~~~~~~~~~~~~~~~~
 
-| :ref:`sixaxis <mame-scommandline-sixaxis>`
+| :ref:`[no]enable_touch <mame-scommandline-enabletouch>`
+| :ref:`[no]sixaxis <mame-scommandline-sixaxis>`
+| :ref:`[no]dual_lightgun <mame-scommandline-duallightgun>`
 
 
 SDL Lightgun Mapping

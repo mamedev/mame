@@ -18516,6 +18516,7 @@ floritas                        // bootleg
 floritasm                       // bootleg (Multivideo)
 frogf                           // bootleg
 frogg                           // bootleg
+froggeg                         // bootleg (Hermatic)
 frogger                         // GX392 (c) 1981 Konami
 froggeram                       // bootleg
 froggereb                       // bootleg
@@ -18525,8 +18526,8 @@ froggers1                       // (c) 1981 Sega
 froggers2                       // 834-0068 (c) 1981 Sega
 froggers3                       //
 froggert                        // 834-0222 (c) 1981 Sega
-froggrs                         //
 froggervd                       // Video Dens
+froggrs                         // bootleg (Coin Music)
 fourplay                        // multigame
 galactica2                      // bootleg (Cirsa)
 galap1                          // hack
@@ -18682,6 +18683,7 @@ scrammr                         // bootleg (Model Racing)
 scrampt                         // bootleg (Petaco S.A.)
 scramrf                         // bootleg (Recreativos Franco)
 sfx                             // (c) 1983 Nichibutsu
+sgalwars                        // bootleg
 sirio2                          // bootleg (Calfesa S.L.)
 skelagon                        // (c) 1983 Nichibutsu USA
 skybase                         // (c) 1982 Omori Electric Co., Ltd.
@@ -29000,6 +29002,7 @@ castrev                         // Revolution
 
 @source:misc/cb2001.cpp
 cb2001                          // (c) 2001 Dyna Electronics
+ndongmul2                       // (c) 1999 Dyna Electronics
 scherrym                        // (c) 2001? Dyna Electronics
 
 @source:misc/chameleonrx1.cpp
@@ -33260,7 +33263,8 @@ topracera                       // bootleg
 topracern                       // bootleg
 
 @source:namco/quickncrash.cpp
-qncrash
+qncrash                         // (c) 1999 Namco
+qncrasha                        // (c) 1999 Namco
 
 @source:namco/rallyx.cpp
 commsega                        // (c) 1983 Sega
@@ -34888,8 +34892,12 @@ quizpani                        // (c) 1993 NMK
 dbox                            // (c) 1996 Nokia Multimedia
 
 @source:nokia/mikromik.cpp
+mm1m4                           //
+mm1m4g                          //
 mm1m6                           //
+mm1m6g                          //
 mm1m7                           //
+mm1m7g                          //
 
 @source:nokia/nokia_3310.cpp
 noki3210                        //
@@ -35748,6 +35756,9 @@ hostinv                         // (c) 1998 The Game Room
 compc10                         // 1984 Commodore PC-10, PC-20 and PC-30
 pc10iii                         // 1987 Commodore PC-10 III
 compc1                          // 1984 Commodore PC-1
+
+@source:pc/conliner.cpp
+onlinertp                       // (c) 200? Comatel / Atata Systems
 
 @source:pc/ct486.cpp
 ct486                           // 1993? 486 with CS4031
@@ -36932,6 +36943,7 @@ ufo_x                           //
 @source:pinball/recel.cpp
 recel                           //
 r_alaska                        //
+r_antar                         //
 r_blackm4                       //
 r_blackmag                      //
 r_cavalier                      //
@@ -42257,6 +42269,7 @@ tulip1                          // (c) 1983 CompuData
 
 @source:skeleton/tvcobrasd.cpp
 cobrasd                         // (c) 1998 TourVisión
+cobrasda                        // (c) 1997 TourVisión
 
 @source:skeleton/unistar.cpp
 unistar                         //

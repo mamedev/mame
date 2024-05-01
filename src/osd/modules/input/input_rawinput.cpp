@@ -749,14 +749,14 @@ protected:
 				rawinputdevice.hDevice);
 	}
 
-	virtual bool handle_input_event(input_event eventid, void *eventdata) override
+	virtual bool handle_input_event(input_event eventid, void const *eventdata) override
 	{
 		switch (eventid)
 		{
 		// handle raw input data
 		case INPUT_EVENT_RAWINPUT:
 			{
-				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+				HRAWINPUT const rawinputdevice = *reinterpret_cast<HRAWINPUT const *>(eventdata);
 
 				union { RAWINPUT r; BYTE b[4096]; } small_buffer;
 				std::unique_ptr<BYTE []> larger_buffer;
@@ -786,7 +786,7 @@ protected:
 				{
 					std::lock_guard<std::mutex> scope_lock(m_module_lock);
 
-					auto *input = reinterpret_cast<RAWINPUT *>(data);
+					auto *const input = reinterpret_cast<RAWINPUT const *>(data);
 					if (!input->header.hDevice)
 						return false;
 
@@ -809,7 +809,7 @@ protected:
 
 		case INPUT_EVENT_ARRIVAL:
 			{
-				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+				HRAWINPUT const rawinputdevice = *reinterpret_cast<HRAWINPUT const *>(eventdata);
 
 				// determine the length of the device name, allocate it, and fetch it if not nameless
 				UINT name_length = 0;
@@ -842,7 +842,7 @@ protected:
 
 		case INPUT_EVENT_REMOVAL:
 			{
-				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+				HRAWINPUT const rawinputdevice = *reinterpret_cast<HRAWINPUT const *>(eventdata);
 
 				std::lock_guard<std::mutex> scope_lock(m_module_lock);
 

@@ -40,7 +40,7 @@ bool windows_osd_interface::should_hide_mouse() const
 	return true;
 }
 
-bool windows_osd_interface::handle_input_event(input_event eventid, void *eventdata) const
+bool windows_osd_interface::handle_input_event(input_event eventid, void const *eventdata) const
 {
 	bool handled = false;
 

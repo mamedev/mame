@@ -52,7 +52,7 @@ public:
 		m_mpsc(*this, UPD7201_TAG),
 		m_hgdc(*this, UPD7220_TAG),
 		m_palette(*this, "palette"),
-		m_floppy(*this, UPD765_TAG ":%u:525qd", 0U),
+		m_floppy(*this, UPD765_TAG ":%u:525", 0U),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_rs232c(*this, RS232_C_TAG),
@@ -68,14 +68,23 @@ public:
 		m_fdc_tc(0)
 	{ }
 
+	void common(machine_config &config);
 	void mm1(machine_config &config);
+	void mm1g(machine_config &config);
+	void mm1m4(machine_config &config);
+	void mm1m4g(machine_config &config);
 	void mm1m6(machine_config &config);
-	void mm1m6_video(machine_config &config);
+	void mm1m6g(machine_config &config);
 	void mm1m7(machine_config &config);
+	void mm1m7g(machine_config &config);
+	void mm1_320k_dual(machine_config &config);
+	void mm1_640k(machine_config &config);
+	void mm1_640k_dual(machine_config &config);
+	void mm1_video(machine_config &config);
+	void mm1g_video(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -86,9 +95,9 @@ private:
 	required_device<i8275_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7201_device> m_mpsc;
-	required_device<upd7220_device> m_hgdc;
+	optional_device<upd7220_device> m_hgdc;
 	required_device<palette_device> m_palette;
-	required_device_array<floppy_image_device, 2> m_floppy;
+	optional_device_array<floppy_image_device, 2> m_floppy;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<rs232_port_device> m_rs232c;
@@ -96,7 +105,7 @@ private:
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
 	required_memory_region m_char_rom;
-	required_shared_ptr<uint16_t> m_video_ram;
+	optional_shared_ptr<uint16_t> m_video_ram;
 
 	int m_a8;
 
@@ -147,6 +156,7 @@ private:
 	void mm1_palette(palette_device &palette) const;
 	void mm1_map(address_map &map);
 	void mmu_io_map(address_map &map);
+	void mm1g_mmu_io_map(address_map &map);
 	void mm1_upd7220_map(address_map &map);
 };
 

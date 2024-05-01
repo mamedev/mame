@@ -88,7 +88,10 @@ uint32_t mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_crtc->screen_update(screen, bitmap, cliprect);
 
 	/* graphics */
-	m_hgdc->screen_update(screen, bitmap, cliprect);
+	if (m_hgdc)
+	{
+		m_hgdc->screen_update(screen, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -128,10 +131,10 @@ void mm1_state::mm1_palette(palette_device &palette) const
 
 
 //-------------------------------------------------
-//  machine_config( mm1m6_video )
+//  machine_config( mm1_video )
 //-------------------------------------------------
 
-void mm1_state::mm1m6_video(machine_config &config)
+void mm1_state::mm1_video(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz( 50 );
@@ -147,8 +150,19 @@ void mm1_state::mm1m6_video(machine_config &config)
 	m_crtc->set_character_width(HORIZONTAL_CHARACTER_PIXELS);
 	m_crtc->set_display_callback(FUNC(mm1_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
-	m_crtc->vrtc_wr_callback().set(m_hgdc, FUNC(upd7220_device::ext_sync_w));
 	m_crtc->set_screen("screen");
+}
+
+
+//-------------------------------------------------
+//  machine_config( mm1g_video )
+//-------------------------------------------------
+
+void mm1_state::mm1g_video(machine_config &config)
+{
+	mm1_video(config);
+
+	m_crtc->vrtc_wr_callback().set(m_hgdc, FUNC(upd7220_device::ext_sync_w));
 
 	UPD7220(config, m_hgdc, XTAL(18'720'000)/8);
 	m_hgdc->set_addrmap(0, &mm1_state::mm1_upd7220_map);
