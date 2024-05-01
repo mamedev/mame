@@ -25,6 +25,7 @@ Easidata (English Version)
 	4) Change to the game's tape
 	5) Type LOAD then press enter
 	6) Play tape until the game is loaded
+	7) Type RUN
 
 	Loading instructions for games that don't require BASIC
 	1) Initialize the system with the desire game's tape
@@ -65,7 +66,6 @@ Easidata (English Version)
 		</part>
 	</software>
 
-<!-- This is a straight recording of the tape. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation? -->
 	<software name="1z013bswe" cloneof="1z013b">
 		<description>BASIC Interpreter 1Z-013B V1.0A (Sweden)</description>
 		<year>1983</year>
@@ -77,7 +77,6 @@ Easidata (English Version)
 		</part>
 	</software>
 
-<!-- This is a straight recording of the tape. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation? -->
 	<software name="10gamesa" cloneof="10games">
 		<description>10 Games for MZ-700 (alt)</description>
 		<year>1983?</year>
@@ -108,8 +107,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-<!-- This is a straight recording of the tape. The tape seems to have been destroyed by time and as such a possible bad dump. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation?
-     Side A of the dumped tape had been taped over, hence the nodump. -->
+<!-- Side A of the dumped tape had been taped over, hence the nodump. -->
 	<software name="1z013b_a" cloneof="1z013b">
 		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A (alt)</description>
 		<year>1983</year>
@@ -205,7 +203,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pcgbasic">
+	<software name="pcgbasic" supported="partial">
 		<description>PCG BASIC Interpreter (Germany)</description>
 		<year>19??</year>
 		<publisher>Ursoft</publisher>
@@ -625,7 +623,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pcgaid">
+	<software name="pcgaid" supported="no">
 		<description>PCGAID-700 V1.0 (Japan)</description>
 		<year>19??</year>
 		<publisher>HAL Laboratory</publisher>
@@ -637,7 +635,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pcgaide" cloneof="pcgaid">
+	<software name="pcgaide" cloneof="pcgaid" supported="no">
 		<description>PCGAID-700 V1.0 (Europe)</description>
 		<year>19??</year>
 		<publisher>HAL Laboratory</publisher>
@@ -754,7 +752,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="moleatck">
+	<software name="moleatck" supported="no">
 		<description>Mole Attack</description>
 		<year>1982</year>
 		<publisher>HAL Laboratory</publisher>
@@ -767,7 +765,7 @@ Easidata (English Version)
 	</software>
 
 <!-- Has boot modes for several siffernt MZ models including 80K, 1200, 700 etc. -->
-	<software name="tomahawk">
+	<software name="tomahawk" supported="partial">
 		<description>Tomahawk (Germany)</description>
 		<year>19??</year>
 		<publisher>Hiroshi Masuko</publisher>
@@ -779,7 +777,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="lissajou">
+	<software name="lissajou" supported="no">
 		<description>Lissajou-Figur (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
