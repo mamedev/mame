@@ -86,7 +86,7 @@ void mipsx_cpu_device::state_import(const device_state_entry &entry)
 
 void mipsx_cpu_device::device_reset()
 {
-	m_pc = 0x00000000;
+	m_pc = 0xe2cc >> 2; // temp, there is code here in kisssite
 }
 
 /*****************************************************************************/
