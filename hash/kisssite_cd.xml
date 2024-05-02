@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="kisssite_cd" description="Tomy Kiss-Site CD-ROMs">
+	<software name="pokemon" supported="no">
+		<description>Anime Karaoke Series - Pocket Monsters 1 (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Anime Karaoke Series - Pocket Monsters 1 (Japan)" sha1="c282269e073f627c0f1540886b3965ce149e9f38"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

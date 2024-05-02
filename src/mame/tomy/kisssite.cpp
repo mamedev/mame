@@ -45,6 +45,9 @@ fnn0040L
 
 #include "emu.h"
 
+#include "softlist_dev.h"
+
+#include "bus/ata/atapicdr.h"
 #include "cpu/mipsx/mipsx.h"
 
 namespace {
@@ -76,6 +79,9 @@ void kisssite_state::kisssite(machine_config &config)
 {
 	MIPSX(config, m_maincpu, 60'000'000); // there is MIPS-X code at at around 0xe2e0 in the ROM, 0x60000019 is "r0 + r0 -> r0" which acts as a NOP
 	m_maincpu->set_addrmap(AS_PROGRAM, &kisssite_state::mem);
+
+	CDROM(config, "cdrom").set_interface("cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_original("kisssite_cd");
 }
 
 INPUT_PORTS_START(kisssite)
