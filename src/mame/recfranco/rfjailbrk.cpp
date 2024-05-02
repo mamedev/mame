@@ -81,7 +81,7 @@ INPUT_PORTS_END
 
 void rfjailbrk_state::rfjailbrk(machine_config &config)
 {
-	I80188(config, m_maincpu, 20.0000_MHz_XTAL); // Intel N80C188XL20
+	I80188(config, m_maincpu, 24_MHz_XTAL); // Intel N80C188XL20
 
 	I8255A(config, "pia2"); // OKI M82C55A-2V
 	I8255A(config, "pia1"); // OKI M82C55A-2V
