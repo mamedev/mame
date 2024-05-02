@@ -53,13 +53,14 @@ public:
 
 protected:
 	// should be 30.47618_MHz_XTAL / 2
-	static inline constexpr XTAL F3_MAIN_CLK = 16_MHz_XTAL;
+	static inline constexpr XTAL F3_MAIN_CLK = 30.47618_MHz_XTAL / 2;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	TIMER_CALLBACK_MEMBER(trigger_int3);
+	TIMER_CALLBACK_MEMBER(trigger_int5);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<watchdog_timer_device> m_watchdog;
@@ -72,6 +73,7 @@ protected:
 	optional_ioport m_eepromout;
 
 	emu_timer *m_interrupt3_timer;
+	emu_timer *m_interrupt5_timer;
 	u32 m_coin_word[2];
 
 	bool m_has_sample_banking{false};
