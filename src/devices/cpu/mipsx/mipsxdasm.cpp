@@ -223,7 +223,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (comp == 0x080)
 			{
-				util::stream_format(stream, "rotlcb %s, %s, %s)", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
+				util::stream_format(stream, "rotlcb %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x0c0)
 			{
@@ -314,7 +314,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else if (comp == 0x066)
 			{
-				util::stream_format(stream, "sub %s, %s, %s)", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
+				util::stream_format(stream, "sub %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else
 			{
@@ -341,7 +341,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		switch (op)
 		{
-		case 0: 
+		case 0:
 		{
 			// ld - Load
 			// ld Offset[rSrc1], rDest
@@ -561,14 +561,14 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 6:
 		{
-			if ((opcode & 0x07fff807) == 0x00000003) 
+			if ((opcode & 0x07fff807) == 0x00000003)
 			{
 				int vector = (opcode & 0x000007f8) >> 3;
-				util::stream_format(stream, "trap %02x", vector);	
+				util::stream_format(stream, "trap %02x", vector);
 			}
 			else
 			{
-				util::stream_format(stream, "illegal trap form");	
+				util::stream_format(stream, "illegal trap form");
 			}
 			break;
 		}
