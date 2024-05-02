@@ -27,7 +27,7 @@ on sub PCB:
 6x TMM2064P-10 RAM
 
 TODO:
-- everything GFX related;
+- "ERROR 14", keeps checking location $e400 (irq or shared comms), "SET MY NUMBER" if bypassed.
 - inputs;
 - verify sound. The sound program is almost identical to the one of irem/shisen.cpp games.
   Copied over sound handling from there for now.
@@ -51,15 +51,16 @@ TODO:
 
 namespace {
 
-class blackjack_state : public driver_device
+class m78_state : public driver_device
 {
 public:
-	blackjack_state(const machine_config &mconfig, device_type type, const char *tag)
+	m78_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "tileram"),
+		m_attrram(*this, "attrram"),
 		m_colorram(*this, "colorram")
 	{}
 
@@ -74,14 +75,18 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_tileram;
+	required_shared_ptr<uint8_t> m_attrram;
 	required_shared_ptr<uint8_t> m_colorram;
 
 	tilemap_t *m_tilemap = nullptr;
+
+	void palette_init(palette_device &palette) const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_nmi) { m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
 	TILE_GET_INFO_MEMBER(get_tile_info) ATTR_COLD;
 	void tileram_w(offs_t offset, uint8_t data);
+	void attrram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -91,33 +96,71 @@ private:
 	void audio_io_map(address_map &map) ATTR_COLD;
 };
 
-
-void blackjack_state::video_start()
+void m78_state::palette_init(palette_device &palette) const
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blackjack_state::get_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	uint8_t const *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 256; i++)
+	{
+		int bit0, bit1, bit2;
+
+		const u8 data = (color_prom[i] << 4) | (color_prom[i | 0x100]);
+
+		bit0 = 0;
+		bit1 = BIT(data, 6);
+		bit2 = BIT(data, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(data, 3);
+		bit1 = BIT(data, 4);
+		bit2 = BIT(data, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(data, 0);
+		bit1 = BIT(data, 1);
+		bit2 = BIT(data, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
-TILE_GET_INFO_MEMBER(blackjack_state::get_tile_info)
-{
-	int const code = m_tileram[tile_index];
-	int const attr = m_colorram[tile_index];
 
-	tileinfo.set(0, code, attr, 0);
+void m78_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m78_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
 }
 
-void blackjack_state::tileram_w(offs_t offset, uint8_t data)
+// TODO: theorical mapping, to be verified
+// NOTE: conceals ROM/RAM messages unless a NG is returned, seems intentional
+TILE_GET_INFO_MEMBER(m78_state::get_tile_info)
+{
+	int const attr = m_attrram[tile_index];
+	int const code = m_tileram[tile_index] | ((attr & 0x1f) << 8);
+	const u8 color = m_colorram[tile_index] & 0x1f;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void m78_state::tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-void blackjack_state::colorram_w(offs_t offset, uint8_t data)
+void m78_state::attrram_w(offs_t offset, uint8_t data)
+{
+	m_attrram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void m78_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-uint32_t blackjack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -125,13 +168,13 @@ uint32_t blackjack_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-void blackjack_state::main_program_map(address_map &map)
+void m78_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0xe000, 0xe7ff).ram();
 }
 
-void blackjack_state::main_io_map(address_map &map)
+void m78_state::main_io_map(address_map &map)
 {
 	//map(0x0000, 0x0000).r
 	//map(0x0000, 0x0000).w // observed values: 0xfb, 0xfd, 0xfe
@@ -142,9 +185,9 @@ void blackjack_state::main_io_map(address_map &map)
 	//map(0x4000, 0x4000).r
 	//map(0x4000, 0x4000).w // observed values: 0x00
 	map(0x5000, 0x5000).portr("IN0"); // ??
-	map(0x8000, 0x8fff).ram().w(FUNC(blackjack_state::tileram_w)).share(m_tileram);
-	map(0x9000, 0x9fff).ram().w(FUNC(blackjack_state::colorram_w)).share(m_colorram);
-	map(0xa000, 0xafff).ram(); // again writes at the same offsets of the former two
+	map(0x8000, 0x8fff).ram().w(FUNC(m78_state::tileram_w)).share(m_tileram);
+	map(0x9000, 0x9fff).ram().w(FUNC(m78_state::attrram_w)).share(m_attrram);
+	map(0xa000, 0xafff).ram().w(FUNC(m78_state::colorram_w)).share(m_colorram);
 	map(0xb000, 0xbfff).ram();
 	map(0xc000, 0xcfff).ram(); // writes here
 	map(0xd000, 0xdfff).ram();
@@ -152,13 +195,13 @@ void blackjack_state::main_io_map(address_map &map)
 	map(0xf000, 0xffff).ram();
 }
 
-void blackjack_state::audio_program_map(address_map &map)
+void m78_state::audio_program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("audiocpu", 0);
 	map(0xfd00, 0xffff).ram();
 }
 
-void blackjack_state::audio_io_map(address_map &map)
+void m78_state::audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
@@ -171,16 +214,17 @@ void blackjack_state::audio_io_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( bj92 ) // TODO: mapped for testing, fix this
+static INPUT_PORTS_START( bj92 )
+	// TODO: mapped for testing, fix this
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1)
 
 	PORT_START("DSW1") // only 1 8-DIP bank
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
@@ -193,38 +237,50 @@ static INPUT_PORTS_START( bj92 ) // TODO: mapped for testing, fix this
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
 INPUT_PORTS_END
 
+static const gfx_layout charlayout =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
+};
 
 static const gfx_layout tilelayout =
-{
+ {
 	16,16,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
+		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 , 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	32*8
 };
 
 static GFXDECODE_START( gfx_blackjack )
+	GFXDECODE_ENTRY( "tiles",  0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "tiles2", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "tiles",  0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "tiles2", 0, tilelayout, 0, 32 )
 GFXDECODE_END
 
 
-void blackjack_state::bj92(machine_config &config)
+void m78_state::bj92(machine_config &config)
 {
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &blackjack_state::main_program_map);
-	m_maincpu->set_addrmap(AS_IO, &blackjack_state::main_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m78_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &m78_state::main_io_map);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 3.579545_MHz_XTAL));
-	audiocpu.set_addrmap(AS_PROGRAM, &blackjack_state::audio_program_map);
-	audiocpu.set_addrmap(AS_IO, &blackjack_state::audio_io_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &m78_state::audio_program_map);
+	audiocpu.set_addrmap(AS_IO, &m78_state::audio_io_map);
 	// IRQs are generated by main Z80 and YM2151
 	audiocpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
-	TIMER(config, "v1").configure_scanline(FUNC(blackjack_state::sound_nmi), "screen", 1, 2);  // clocked by V1? (Vigilante)
+	TIMER(config, "v1").configure_scanline(FUNC(m78_state::sound_nmi), "screen", 1, 2);  // clocked by V1? (Vigilante)
 
 	// all wrong
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -232,12 +288,12 @@ void blackjack_state::bj92(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(blackjack_state::screen_update));
+	screen.set_screen_update(FUNC(m78_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_blackjack);
-	PALETTE(config, "palette").set_entries(256);
+	PALETTE(config, "palette", FUNC(m78_state::palette_init), 256);
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
@@ -282,10 +338,10 @@ ROM_START( bj92 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.ic67", 0x000, 0x100, CRC(3e2128b6) SHA1(71e74999c18a2a4e59a7c8388b6deb0918afd669) )
-	ROM_LOAD( "82s129.ic69", 0x000, 0x100, CRC(6fdff4a5) SHA1(71fda10c4bf830787218e9be1223259face1cd8e) )
+	ROM_LOAD( "82s129.ic69", 0x100, 0x100, CRC(6fdff4a5) SHA1(71fda10c4bf830787218e9be1223259face1cd8e) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1992, bj92, 0, bj92, bj92, blackjack_state, empty_init, ROT90, "Irem", "Black Jack (Irem)", MACHINE_IS_SKELETON )
+GAME( 1992, bj92, 0, bj92, bj92, m78_state, empty_init, ROT90, "Irem", "Black Jack (Irem)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
