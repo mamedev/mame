@@ -335,6 +335,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="vt100bt">
+		<description>VT100 Emulator V3.3BT</description>
+		<year>1997</year>
+		<publisher>Widget Software</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="VT100_Emulator_V3.3BT.bin" size="131072" crc="02406742" sha1="3a7d7fc477365251ace2b887922afb8ff5933c96"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wgames3a">
 		<description>Widget Games 3a</description>
 		<year>1995</year>
