@@ -14,4 +14,115 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="dance01" supported="no">
+		<description>Dance Karaoke Series 01 - Mickey Mouse March - Eurobeat Version &amp; White Love (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 01 - Mickey Mouse March - Eurobeat Version and White Love (Japan)" sha1="a0cf1cdb25f515814e8f774542ffba2e19a25372"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance02" supported="no">
+		<description>Dance Karaoke Series 02 - LOVE Machine &amp; Goldfinger '99 (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 02 - LOVE Machine and Goldfinger '99 (Japan)" sha1="7547f626537c1daf1e4f4351092092ba685c9e8e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance03" supported="no">
+		<description>Dance Karaoke Series 03 - Happy Summer Wedding &amp; Nanda Kanda (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 03 - Happy Summer Wedding and Nanda Kanda (Japan)" sha1="a79a08c0d26cf8010ddd9c9d37ba1e2de3d45426"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance04" supported="no">
+		<description>Dance Karaoke Series 04 - Koi no Dance Site &amp; Night of Fire (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 04 - Koi no Dance Site and Night of Fire (Japan)" sha1="d3e102197aa0a6273c63fcb68c27b949c7e31593"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance05" supported="no">
+		<description>Dance Karaoke Series 05 - Fly High - Euro-Power Mix &amp; Respect the Power of Love (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 05 - Fly High - Euro-Power Mix and Respect the Power of Love (Japan)" sha1="831d69723d0592c73379940ce02fc0e3567a1b50"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance06" supported="no">
+		<description>Dance Karaoke Series 06 - Chokotto Love &amp; My Graduation (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 06 - Chokotto Love and My Graduation (Japan)" sha1="286f6e346270384226f826a325a93deeb0b23b1e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance07" supported="no">
+		<description>Dance Karaoke Series 07 - Daite Hold on Me! &amp; Try Me - Watashi o Shinjite (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 07 - Daite Hold on Me! and Try Me - Watashi o Shinjite (Japan)" sha1="813c39e7ba9f2d76fb97a9c86f207a2e8002701c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance08" supported="no">
+		<description>Dance Karaoke Series 08 - Akai Nikkichou &amp; Time After Time (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 08 - Akai Nikkichou and Time After Time (Japan)" sha1="d0fc434e186740c015793bc683e5ae518aec3f30"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance09" supported="no">
+		<description>Dance Karaoke Series 09 - Kiiroi Osora de Boom Boom Boom &amp; Don't Wanna Cry (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 09 - Kiiroi Osora de Boom Boom Boom and Don't Wanna Cry (Japan)" sha1="6d967b717a57cb8fd76137cfa1e60357d0be6645"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance10" supported="no">
+		<description>Dance Karaoke Series 10 - Manatsu no Kousen &amp; A Walk in the Park (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 10 - Manatsu no Kousen and A Walk in the Park (Japan)" sha1="56e15c6f72ae2736d22c7bff788b6073f020440a"/>
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
