@@ -229,7 +229,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else
 			{
-				util::stream_format(stream, "unkonwn TY1 subcase 0 (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+				util::stream_format(stream, "unknown TY1 subcase 0 (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
 			}
 			break;
 		}
