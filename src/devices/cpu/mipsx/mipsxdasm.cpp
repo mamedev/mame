@@ -94,7 +94,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		u8 op = get_op(opcode);
 		int disp = get_disp(opcode) << 2;
 		disp = util::sext(disp & 0x3fffc, 18);
-		u32 basepc = pc;
+		u32 basepc = pc + 8;
 		int src1 = get_src1(opcode);
 		int src2 = get_src2_dest(opcode);
 
