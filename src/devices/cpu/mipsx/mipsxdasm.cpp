@@ -44,6 +44,11 @@ int mipsx_disassembler::get_offset(u32 opcode)
 	return (opcode & 0x0001ffff) >> 0;
 }
 
+int mipsx_disassembler::get_imm17(u32 opcode)
+{
+	return (opcode & 0x0001ffff) >> 0;
+}
+
 int mipsx_disassembler::get_sq(u32 opcode)
 {
 	return (opcode & 0x00010000) >> 16;
@@ -169,7 +174,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else if ((comp & 0xf80) == 0x200)
 			{
-				util::stream_format(stream, "sh (%02x, %02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7);
+				util::stream_format(stream, "sh (%02x, %02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7f);
 			}
 			else if ((comp & 0xf80) == 0x100)
 			{
@@ -177,7 +182,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 				if (src2 == 0x0)
 				{
-					util::stream_format(stream, "asr (%02x, %02x, %02x)", get_src1(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7);
+					util::stream_format(stream, "asr (%02x, %02x, %02x)", get_src1(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7f);
 				}
 				else
 				{
@@ -270,27 +275,27 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 		case 0:
 		{
-			util::stream_format(stream, "ld (%02x, %02x, %05x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			util::stream_format(stream, "ld (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
 			break;
 		}
 		case 1:
 		{
-			util::stream_format(stream, "ldt (%02x, %02x, %05x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			util::stream_format(stream, "ldt (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
 			break;
 		}
 		case 2:
 		{
-			util::stream_format(stream, "st (%02x, %02x, %05x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			util::stream_format(stream, "st (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
 			break;
 		}
 		case 3:
 		{
-			util::stream_format(stream, "stt (%02x, %02x, %05x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			util::stream_format(stream, "stt (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
 			break;
 		}
 		case 4:
 		{
-			util::stream_format(stream, "ldf (%02x, %02x, %05x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			util::stream_format(stream, "ldf (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
 			break;
 		}
 		case 5: // movfrc or aluc
@@ -315,7 +320,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		}
 		case 6:
 		{
-			util::stream_format(stream, "stf (%02x, %02x, %05x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			util::stream_format(stream, "stf (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
 			break;
 		}
 		case 7: // movtoc
@@ -353,6 +358,129 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		switch (op)
 		{
+		case 0:
+		{
+			util::stream_format(stream, "jspci (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_imm17(opcode));
+			break;
+		}
+
+		case 1:
+		{
+			// Halt and Spontaneously Combust
+			util::stream_format(stream, "hsc");
+			break;
+		}
+
+		case 2:
+		{
+			u16 comp = get_compute_compfunc(opcode);
+			if ((comp & 0xffc) == 0x000)
+			{
+				u8 dest = get_src2_dest(opcode);
+
+				if (dest == 0x00)
+				{
+					u8 src = get_src1(opcode);
+					util::stream_format(stream, "movtos (%02x, %04x)", src, comp & 0x3);
+				}
+				else
+				{
+					util::stream_format(stream, "illegal movtos form");
+				}
+			}
+			else
+			{
+				util::stream_format(stream, "illegal movtos form");
+			}
+			break;
+
+		}
+
+		case 3:
+		{
+			u16 comp = get_compute_compfunc(opcode);
+			if ((comp & 0xffc) == 0x000)
+			{
+				u8 src = get_src1(opcode);
+				if (src == 0x00)
+				{
+					u8 dest = get_src2_dest(opcode);
+					util::stream_format(stream, "movfrs (%02x, %04x)", dest, comp & 0x3);
+				}
+				else
+				{
+					util::stream_format(stream, "illegal movfrs form");
+				}
+			}
+			else
+			{
+				util::stream_format(stream, "illegal movfrs form");
+			}
+			break;
+
+		}
+
+		case 4:
+		{
+			util::stream_format(stream, "addi (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_imm17(opcode));
+			break;
+		}
+
+		case 5:
+		{
+			u16 comp = get_compute_compfunc(opcode);
+			if (comp == 0x03)
+			{
+				u8 dest = get_src2_dest(opcode);
+				u8 src = get_src1(opcode);
+
+				if ((src == 0x00) && (dest == 0x00))
+				{
+					util::stream_format(stream, "jpc (%02x, %02x, %04x)");
+				}
+				else
+				{
+					util::stream_format(stream, "illegal jpc form");
+				}
+			}
+			else
+			{
+				util::stream_format(stream, "illegal jpc form");
+			}
+			break;
+		}
+
+		case 6:
+		{
+			util::stream_format(stream, "trap");
+			break;
+		}
+
+
+		case 7:
+		{
+			u16 comp = get_compute_compfunc(opcode);
+			if (comp == 0x03)
+			{
+				u8 dest = get_src2_dest(opcode);
+				u8 src = get_src1(opcode);
+
+				if ((src == 0x00) && (dest == 0x00))
+				{
+					util::stream_format(stream, "jpcrs (%02x, %02x, %04x)");
+				}
+				else
+				{
+					util::stream_format(stream, "illegal jpcrs form");
+				}
+			}
+			else
+			{
+				util::stream_format(stream, "illegal jpcrs form");
+			}
+			break;
+		}
+
 		default:
 		{
 			util::stream_format(stream, "Unhandled TY3 (%08x)", opcode);

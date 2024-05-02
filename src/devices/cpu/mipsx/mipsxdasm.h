@@ -22,6 +22,7 @@ private:
 	int get_src1(u32 opcode);
 	int get_src2_dest(u32 opcode);
 	int get_offset(u32 opcode);
+	int get_imm17(u32 opcode);
 	int get_sq(u32 opcode);
 	int get_disp(u32 opcode);
 	int get_compute_dest(u32 opcode);
