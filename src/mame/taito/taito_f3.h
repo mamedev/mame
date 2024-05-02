@@ -276,6 +276,7 @@ protected:
 		int y_index(int y) const;
 		int x_index(int x) const;
 		bool blend_select(const u8 *line_flags, int x) const { return false; }
+		bool inactive_group(u16 color) const { return false; }
 
 		static const char *debug_name() { return "MX"; }
 	};
@@ -290,6 +291,7 @@ protected:
 
 		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; }
 		bool layer_enable() const;
+		bool inactive_group(u16 color) const { return BIT(color, 10, 2) != index; }
 
 		static const char *debug_name() { return "SP"; };
 	};

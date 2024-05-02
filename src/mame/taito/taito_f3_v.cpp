@@ -1008,10 +1008,11 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 		const int real_x = gfx.x_sample_enable ? mosaic(x, line.x_sample) : x;
 		const int gfx_x = gfx.x_index(real_x);
 
-		if constexpr (std::is_same_v<Mix, sprite_inf>) {
-			if (BIT(src[gfx_x], 10, 2) != gfx.index)
-				continue;
-		}
+		// this check is for ensuring sprite group draw ordering
+		// (benchmarked: do not combine with color 0 check)
+		const u16 color = src[gfx_x];
+		if (gfx.inactive_group(color))
+			continue;
 
 		// tilemap transparent flag
 		if (flags && !(flags[gfx_x] & 0xf0))
@@ -1019,8 +1020,8 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 
 		if (gfx.prio > pri.src_prio[x]) {
 			// submit src pix
-			if (const u16 c = src[gfx_x]) {
-				const u16 pal = gfx.palette_adjust(c);
+			if (color) {
+				const u16 pal = gfx.palette_adjust(color);
 				// could be pulled out of loop for pivot and sprite
 				u8 sel = gfx.blend_select(flags, gfx_x);
 
@@ -1049,8 +1050,8 @@ bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f
 			}
 		} else if (gfx.prio >= pri.dst_prio[x]) {
 			// submit dest pix
-			if (const u16 c = src[gfx_x]) {
-				const u16 pal = gfx.palette_adjust(c);
+			if (color) {
+				const u16 pal = gfx.palette_adjust(color);
 				if (gfx.prio != pri.dst_prio[x])
 					z.dst_pal[x] = pal;
 				else // prio conflict = color line conflict? (dariusg, bubblem)
