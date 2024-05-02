@@ -46269,6 +46269,11 @@ mu100b                          // 1998 MU-100B
 @source:yamaha/ymmu128.cpp
 mu128
 
+@source:yamaha/ymmu2000.cpp
+mu500
+mu1000
+mu2000
+
 @source:yamaha/ympcs30.cpp
 pcs30                           // 1984
 
