@@ -31,7 +31,8 @@ void virge_pci_device::mmio_map(address_map& map)
 	// image transfer ports
 	map(0x0000,0x7fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
-	//map(0x8180,0x81ff) primary/secondary stream control
+	//map(0x8000,0x8043) PCI Configuration Space regs
+	map(0x8180,0x81ff).m(m_vga, FUNC(s3virge_vga_device::streams_control_map));
 
 	//map(0x8200,0x821f) memory port controller
 	//map(0x8220,0x8227) DMA control
@@ -39,23 +40,33 @@ void virge_pci_device::mmio_map(address_map& map)
 	// MMIO address map
 	map(0x83b0,0x83df).m(m_vga, FUNC(s3virge_vga_device::io_map));
 	map(0x8504,0x8507).rw(m_vga, FUNC(s3virge_vga_device::s3d_sub_status_r), FUNC(s3virge_vga_device::s3d_sub_control_w));
+	// TODO: writeable
 	map(0x850c,0x850f).r(m_vga, FUNC(s3virge_vga_device::s3d_func_ctrl_r));
 
 	//map(0x8580,0x858b) video DMA
 	//map(0x8590,0x859f) command DMA
 
 	// S3D engine registers
-	map(0xa000,0xb7ff).rw(m_vga, FUNC(s3virge_vga_device::s3d_register_r), FUNC(s3virge_vga_device::s3d_register_w));
+	map(0xa000,0xb7ff).m(m_vga, FUNC(s3virge_vga_device::s3d_register_map));
 
 	// alternate image transfer ports
 	map(0xd000,0xefff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
-	//map(0xff00, 0xff43) LPB control
+	//map(0xff00, 0xff5f) LPB Local Peripheral Bus control
+	//map(0xff1c, 0xff1f) LPB GIP/GOP General Input/Output Port (for OEM implementations)
+	//map(0xff20, 0xff23) Serial Port Register (DDC/I2C, pins 205-206, aliased at I/O ports $e2 or $e8)
+	//map(0xff24, 0xff27) LPB Video Input Window Size
+	//map(0xff28, 0xff2b) LPB Video Data Offsets
+	//map(0xff2c, 0xff2f) LPB Horizontal Decimation Control Register
+	//map(0xff30, 0xff33) LPB Vertical Decimation Control Register
+	//map(0xff34, 0xff37) LPB Line Stride
+	//map(0xff40, 0xff5f) LPB Output FIFO Register
 }
 
 void virge_pci_device::lfb_map(address_map& map)
 {
-	map(0x0, 0x00ffffff).rw(m_vga, FUNC(s3virge_vga_device::fb_r), FUNC(s3virge_vga_device::fb_w));
+	// NOTE: upper mirror is i/f for BE hosts.
+	map(0x0, 0x00ffffff).mirror(0x02000000).rw(m_vga, FUNC(s3virge_vga_device::fb_r), FUNC(s3virge_vga_device::fb_w));
 }
 
 void virge_pci_device::config_map(address_map &map)
@@ -152,6 +163,12 @@ void virge_pci_device::device_start()
 	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
 
+	command = 0x0000;
+	// DAC SNP / BME / MEM / I/O
+	command_mask = 0x27;
+	// medium DEVSELB
+	status = 0x0200;
+
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));
 }
@@ -174,18 +191,23 @@ void virgedx_pci_device::device_start()
 void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(virge_pci_device::vram_r)), write8sm_delegate(*this, FUNC(virge_pci_device::vram_w)));
-
-	io_space->install_device(0x03b0, 0x03df, *this, &virge_pci_device::legacy_io_map);
-
-	// NOTE: this looks unrelated to the linear addressing
-	// xubuntu 6.10 and BeOS 3.x definitely wants it this way.
-	if(downcast<s3virge_vga_device *>(m_vga.target())->is_new_mmio_active())
+	if (BIT(command, 1))
 	{
-		const u32 get_bar_address = get_vga_linear_address() | 0x01000000;
+		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(virge_pci_device::vram_r)), write8sm_delegate(*this, FUNC(virge_pci_device::vram_w)));
+		// NOTE: this looks unrelated to the linear addressing
+		// xubuntu 6.10 and BeOS 3.x definitely wants it this way.
+		if(downcast<s3virge_vga_device *>(m_vga.target())->is_new_mmio_active())
+		{
+			u32 get_bar_address = get_vga_linear_address() | 0x01000000;
+			memory_space->install_device(get_bar_address, get_bar_address | 0xffff, *this, &virge_pci_device::mmio_map);
 
-		memory_space->install_device(get_bar_address, get_bar_address | 0xffff, *this, &virge_pci_device::mmio_map);
+			get_bar_address |= 0x02000000;
+			memory_space->install_device(get_bar_address, get_bar_address | 0xffff, *this, &virge_pci_device::mmio_map);
+		}
 	}
+
+	if (BIT(command, 0))
+		io_space->install_device(0x03b0, 0x03df, *this, &virge_pci_device::legacy_io_map);
 }
 
 void virge_pci_device::device_add_mconfig(machine_config &config)
