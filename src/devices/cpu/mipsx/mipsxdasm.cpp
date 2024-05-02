@@ -388,7 +388,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (src == 0)
 			{
-				util::stream_format(stream, "movfrc %s, (%02x, %02x, %02x, %02x)", get_regname(get_src1(dest)), op, func, c1, c2);
+				util::stream_format(stream, "movfrc %s, (%02x, %02x, %02x, %02x)", get_regname(dest), op, func, c1, c2);
 			}
 			else
 			{
@@ -416,11 +416,13 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (src == 0)
 			{
-				util::stream_format(stream, "movtoc %s, (%02x, %02x, %02x, %02x)", get_regname(get_src1(dest)), op, func, c1, c2);
+				util::stream_format(stream, "movtoc %s, (%02x, %02x, %02x, %02x)", get_regname(dest), op, func, c1, c2);
 			}
 			else
 			{
-				util::stream_format(stream, "illegal movtoc form");
+				//util::stream_format(stream, "illegal movtoc form");
+				// this form appears to be used
+				util::stream_format(stream, "movtoc %s, (%02x, %02x, %02x, %02x) (src1 == %s)", get_regname(dest), op, func, c1, c2, get_regname(src));
 			}
 			break;
 
