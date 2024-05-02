@@ -27,6 +27,8 @@ private:
 	int get_disp(u32 opcode);
 	int get_compute_dest(u32 opcode);
 	int get_compute_compfunc(u32 opcode);
+	int get_asr_amount(int shift);
+	int get_sh_amount(int shift);
 
 	std::string get_regname(u8 reg);
 
