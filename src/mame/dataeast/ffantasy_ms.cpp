@@ -4,6 +4,7 @@
 /*
     Fighting Fantasy (Modular System)
     Dragon Ninja (Modular System)
+    Secret Agent (Modular System)
 
     As with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
@@ -30,6 +31,21 @@
     MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0462) with no chips, just routing along one edge.
     MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0463) with no chips, just routing along one edge.
     MOD 4/2 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0464) with no chips, just routing along one edge.
+
+    PCBs pictures and dip listing are available at: https://www.recreativas.org/modular-system-dragon-ninja-4319-gaelco-sa
+
+    For Secret Agent the Modular System cage contains 8 main boards and 1 sub board.
+
+    MOD-6/1 - MC68000P10, 4 ROMs, RAMs, 22.1184 MHz XTAL.
+    MOD 21/1(?) - 20 MHz XTAL.
+    MOD 1/2 - Sound board (NEC D780C-2 Z80 compatible, 2 x YM2203C, 2 x Y3014B). 2 8-dips banks + small sub board with OKI M5205.
+    MOD 51/3 - Sprite board, has logic + 4 empty ROM sockets. Sprite ROMs are actually on the below board.
+    MODULAR SYSTEM 2 MOD 5/1 - red sprite ROM board, 8 sprite ROMs populated (maximum 24 ROMs)
+    MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0462) with no chips, just routing along one edge.
+    MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0463) with no chips, just routing along one edge.
+    MOD 4/2 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0464) with no chips, just routing along one edge.
+
+    PCBs pictures and dip listing are available at: https://www.recreativas.org/modular-system-secret-agent-11088-gaelco-sa
 */
 
 
@@ -58,6 +74,7 @@ public:
 	{ }
 
 	void ffantasym(machine_config &config);
+	void secretagm(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -114,13 +131,13 @@ GFXDECODE_END
 
 void ffantasy_ms_state::ffantasym(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 20_MHz_XTAL / 2); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &ffantasy_ms_state::ffantasym_map);
 
 	Z80(config, "audiocpu", 20_MHz_XTAL / 5).set_disable(); // divisor unknown
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
@@ -133,7 +150,7 @@ void ffantasy_ms_state::ffantasym(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ffantasy_ms);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -143,6 +160,14 @@ void ffantasy_ms_state::ffantasym(machine_config &config)
 	YM2203(config, "ym2", 20_MHz_XTAL / 5).add_route(ALL_OUTPUTS, "mono", 0.15); // divisor unknown
 
 	MSM5205(config, "msm", 20_MHz_XTAL / 5).add_route(ALL_OUTPUTS, "mono", 0.15); // divisor unknown
+}
+
+void ffantasy_ms_state::secretagm(machine_config &config)
+{
+	ffantasym(config);
+
+	// Exactly the same hardware configuration as 'ffantasym', but with a 22.1184 MHz xtal on the CPU PCB.
+	m_maincpu->set_clock(22.1184_MHz_XTAL);
 }
 
 ROM_START( ffantasym )
@@ -249,8 +274,64 @@ ROM_START( drgninjam )
 	ROM_LOAD( "51-3_503_gal16v8.ic46",    0xa00, 0x117, CRC(11470ea1) SHA1(cfcafbcc7e55be717348f895df61e144fdd0cc9b) )
 ROM_END
 
+ROM_START( secretagm )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // on MOD 6/1 board
+	ROM_LOAD16_BYTE( "mod_6-1_ag_603.ic17", 0x00000, 0x10000, CRC(4a61489b) SHA1(41f3b99bbd60ebac567477b98dc7c0158f972d60) )
+	ROM_LOAD16_BYTE( "mod_6-1_ag_606.ic8",  0x00001, 0x10000, CRC(94dfe5a1) SHA1(01a4c25fa883b0a4bea5d8555e38eb40c302b6d5) )
+	ROM_LOAD16_BYTE( "mod_6-1_ag_602.ic20", 0x20000, 0x10000, CRC(bc67dfa0) SHA1(0e32ab1ef9008e95c2e0b8a6916766b255681987) )
+	ROM_LOAD16_BYTE( "mod_6-1_ag_605.ic11", 0x20001, 0x10000, CRC(ba149ce8) SHA1(6c405a670983a5c3b5c98248298924b87c350274) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on MOD 1/2 board
+	ROM_LOAD( "mod_1-2_ag_110.ic12", 0x00000, 0x10000, CRC(7446d17e) SHA1(be0c2c5359af20e17f76c0a5ea59de9357735ab8) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // on one of the MOD 4/3 boards
+	ROM_LOAD( "mod_4-3_0_ag_404.ic14", 0x00000, 0x8000, CRC(4b00d933) SHA1(dd8113f24f8a9f408fbf3e955c8bf61c89744e53) )
+	ROM_LOAD( "mod_4-3_0_ag_402.ic16", 0x08000, 0x8000, CRC(7a4bf6b0) SHA1(63a1d0e10903fc2548a24126961d057e8b5806bd) )
+	ROM_LOAD( "mod_4-3_0_ag_403.ic15", 0x10000, 0x8000, CRC(dec5f0dc) SHA1(6df6c0d1c3f83b0cc896083f0dce3ce93f67a49b) )
+	ROM_LOAD( "mod_4-3_0_ag_401.ic17", 0x18000, 0x8000, CRC(0a56829f) SHA1(444d3ef0c701810d8f2a53fc42565d5d04073b1c) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // on a second MOD 4/3 board
+	ROM_LOAD( "mod_4-3_a_ag_4a1.ic17", 0x00000, 0x8000, CRC(58e496f2) SHA1(2cabd84bff6047be81f79c3cd55f480828aa3d3d) )
+	ROM_LOAD( "mod_4-3_a_ag_4a2.ic16", 0x08000, 0x8000, CRC(3bbd9e82) SHA1(79926cd1f227762174de50f9af62f54060021a63) )
+	ROM_LOAD( "mod_4-3_a_ag_4a3.ic15", 0x10000, 0x8000, CRC(3fd968a0) SHA1(ddecb3f01ce6227653607878c933bd17c96483e6) )
+	ROM_LOAD( "mod_4-3_a_ag_4a4.ic14", 0x18000, 0x8000, CRC(960007ad) SHA1(9e7058385110acc149ba42c8ec64bd871debd0b9) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 ) // on a third MOD 4/3 board
+	ROM_LOAD( "mod_4-3_b_ag_4b1.ic17", 0x00000, 0x10000, CRC(e06bc56d) SHA1(5a189c7f6e131fc6d6eebd2bb1c9c8c3cff9d6f8) )
+	ROM_LOAD( "mod_4-3_b_ag_4b2.ic16", 0x10000, 0x10000, CRC(f46fd920) SHA1(925f0c9c5d2990dcff09a18363b88a69c19f0d01) )
+	ROM_LOAD( "mod_4-3_b_ag_4b3.ic15", 0x20000, 0x10000, CRC(51ef5441) SHA1(eb06022174e177f6785d1b621e6e3fdaca67c122) )
+	ROM_LOAD( "mod_4-3_b_ag_4b4.ic14", 0x30000, 0x10000, CRC(3beeddde) SHA1(1127d78a9b29787aaae47e0b4359be7b2528f6d9) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 ) // on MOD 51/1 board
+	ROM_LOAD( "mod_5-1_ag_501.ic5",  0x20000, 0x10000, CRC(d234cae5) SHA1(0cd07bf087a4da19a5da29785385de9eee52d0fb) )
+	ROM_LOAD( "mod_5-1_ag_502.ic6",  0x30000, 0x10000, CRC(dc6a38df) SHA1(9043df911389d3f085299f2f2202cab356473a32) )
+	ROM_LOAD( "mod_5-1_ag_503.ic14", 0x60000, 0x10000, CRC(447e4f0b) SHA1(97db103e505a6e11eb9bdb3622e4aa3b796a9714) )
+	ROM_LOAD( "mod_5-1_ag_504.ic15", 0x70000, 0x10000, CRC(d29bc22e) SHA1(ce0935d09f7e94fa32247c86e14a74b73514b29e) )
+	ROM_LOAD( "mod_5-1_ag_505.ic20", 0xa0000, 0x10000, CRC(bd17ddc5) SHA1(edb847378c4a95b18bd3b49b6cbf8c06598d9d3b) )
+	ROM_LOAD( "mod_5-1_ag_506.ic21", 0xb0000, 0x10000, CRC(f61972c8) SHA1(fa9ddca3473091b4879171d8f3b302e8f2b45149) )
+	ROM_LOAD( "mod_5-1_ag_507.ic26", 0xe0000, 0x10000, CRC(ff72b838) SHA1(fdc48ecdd2225fc69472313f34973f6add8fb558) )
+	ROM_LOAD( "mod_5-1_ag_508.ic27", 0xf0000, 0x10000, CRC(54fcbc39) SHA1(293a6799193b01424c3eac86cf90cc023aa771db) )
+
+	ROM_REGION( 0x0400, "proms", 0 )    // PROMs (function unknown)
+	ROM_LOAD( "mod_1-2_110_82s123.ic20",    0x000, 0x020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
+	ROM_LOAD( "mod_21-1_201_82s129.ic4",    0x100, 0x100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
+	ROM_LOAD( "mod_21-1_205_82s129.ic12",   0x200, 0x100, CRC(204a7aee) SHA1(322164134aa65c37a9389024f921364a81d13e88) )
+	ROM_LOAD( "mod_51-3_p0502_82s129.ic10", 0x300, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
+
+	ROM_REGION( 0x200, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "mod_6-1_604_gal16v8.ic13",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "mod_6-1_637_gal16v8.ic7",       0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "mod_4-3_0_10403_pal16r8a.ic29", 0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "mod_4-3_a_p0403_pal16r8.ic29",  0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "mod_4-3_b_403_pal16r8.ic29",    0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "mod_51-3_503_gal16v8.ic46",     0x000, 0x117, CRC(11470ea1) SHA1(cfcafbcc7e55be717348f895df61e144fdd0cc9b) )
+	ROM_LOAD( "mod_5-1_s137_gal16v8.ic9",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "mod_5-1_s237_gal16v8.ic8",      0x000, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 199?, ffantasym,  hippodrm,  ffantasym,  ffantasym,  ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Fighting Fantasy (Modular System)", MACHINE_IS_SKELETON )
-GAME( 199?, drgninjam,  baddudes,  ffantasym,  ffantasym,  ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Dragon Ninja (Modular System)",     MACHINE_IS_SKELETON )
+GAME( 199?, drgninjam, baddudes, ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Dragon Ninja (Modular System)",     MACHINE_IS_SKELETON )
+GAME( 199?, ffantasym, hippodrm, ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Fighting Fantasy (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, secretagm, secretag, secretagm, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Secret Agent (Modular System)",     MACHINE_IS_SKELETON )
