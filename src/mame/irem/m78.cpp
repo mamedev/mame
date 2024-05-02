@@ -2,6 +2,8 @@
 // copyright-holders:
 
 /*
+Irem M78
+
 Black Jack (1992)
 Flyers show this game has a main screen and 5 user screens.
 Is this the main unit or the satellite one?
@@ -277,6 +279,10 @@ ROM_START( bj92 )
 
 	ROM_REGION( 0x40000, "m72_audio", ROMREGION_ERASE00 )
 	// there are 2 empty sockets near the scratched off sound chip. ROMs removed or never populated?
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.ic67", 0x000, 0x100, CRC(3e2128b6) SHA1(71e74999c18a2a4e59a7c8388b6deb0918afd669) )
+	ROM_LOAD( "82s129.ic69", 0x000, 0x100, CRC(6fdff4a5) SHA1(71fda10c4bf830787218e9be1223259face1cd8e) )
 ROM_END
 
 } // anonymous namespace
