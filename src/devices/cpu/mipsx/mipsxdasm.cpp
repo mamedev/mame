@@ -59,15 +59,14 @@ int mipsx_disassembler::get_disp(u32 opcode)
 	return (opcode & 0x0000ffff) >> 0;
 }
 
-/*
-
-
-AJR: I took a look and think it's definitely MIPS-X of the big-endian variety. There might be some undocumented instruction set extensions, though.
-AJR: The giveaway is the prevalence of the word 0x60000019, which performs the operation r0 + r0 -> r0, in other words a no-op.
-
-
-*/
-
+std::string mipsx_disassembler::get_regname(u8 reg)
+{
+	// general purpose register 0 just acts as a constant 0, it can't be changed.
+	if (reg == 0)
+		return "#0";
+	else
+		return "r" + std::to_string(reg);
+}
 
 offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const data_buffer& opcodes, const data_buffer& params)
 {
@@ -85,32 +84,74 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 		case 1:
 		{
-			util::stream_format(stream, "beq (%02x, %02x, %01x %04x)", get_src1(opcode), get_src2_dest(opcode), get_sq(opcode), get_disp(opcode));
+			if (get_sq(opcode))
+			{
+				util::stream_format(stream, "beqsq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "beq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
 			break;
 		}
 		case 2:
 		{
-			util::stream_format(stream, "bhs (%02x, %02x, %01x %04x)", get_src1(opcode), get_src2_dest(opcode), get_sq(opcode), get_disp(opcode));
+			if (get_sq(opcode))
+			{
+				util::stream_format(stream, "bhssq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "bhs %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
 			break;
 		}
 		case 3:
 		{
-			util::stream_format(stream, "blt (%02x, %02x, %01x %04x)", get_src1(opcode), get_src2_dest(opcode), get_sq(opcode), get_disp(opcode));
+			if (get_sq(opcode))
+			{
+				util::stream_format(stream, "bltsq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "blt %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
 			break;
 		}
 		case 5:
 		{
-			util::stream_format(stream, "bne (%02x, %02x, %01x %04x)", get_src1(opcode), get_src2_dest(opcode), get_sq(opcode), get_disp(opcode));
+			if (get_sq(opcode))
+			{
+				util::stream_format(stream, "bnesq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "bne %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
 			break;
 		}
 		case 6:
 		{
-			util::stream_format(stream, "blo (%02x, %02x, %01x %04x)", get_src1(opcode), get_src2_dest(opcode), get_sq(opcode), get_disp(opcode));
+			if (get_sq(opcode))
+			{
+				util::stream_format(stream, "blosq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "blo %s, %s, %04x",get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
 			break;
 		}
 		case 7:
 		{
-			util::stream_format(stream, "bge (%02x, %02x, %01x %04x)", get_src1(opcode), get_src2_dest(opcode), get_sq(opcode), get_disp(opcode));
+			if (get_sq(opcode))
+			{
+				util::stream_format(stream, "bgesq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
+			else
+			{
+				util::stream_format(stream, "bge %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+			}
 			break;
 		}
 
@@ -138,20 +179,20 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 				if (src1 == 0)
 				{
-					util::stream_format(stream, "mstart (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+					util::stream_format(stream, "mstart %s, %s", get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 				}
 				else
 				{
-					util::stream_format(stream, "illegal mstart (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+					util::stream_format(stream, "illegal mstart form");
 				}
 			}
 			else if (comp == 0x099)
 			{
-				util::stream_format(stream, "mstep (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "mstep %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x166)
 			{
-				util::stream_format(stream, "dstep (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "dstep %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else
 			{
@@ -166,15 +207,15 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (comp == 0x080)
 			{
-				util::stream_format(stream, "rotlcb (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "rotlcb %s, %s, %s)", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x0c0)
 			{
-				util::stream_format(stream, "rotlb (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "rotlb %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if ((comp & 0xf80) == 0x200)
 			{
-				util::stream_format(stream, "sh (%02x, %02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7f);
+				util::stream_format(stream, "sh %s, %s, %s, #%02x)", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)), get_compute_compfunc(opcode) & 0x7f);
 			}
 			else if ((comp & 0xf80) == 0x100)
 			{
@@ -182,7 +223,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 				if (src2 == 0x0)
 				{
-					util::stream_format(stream, "asr (%02x, %02x, %02x)", get_src1(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode) & 0x7f);
+					util::stream_format(stream, "asr %s, %s, %02x", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)), get_compute_compfunc(opcode) & 0x7f);
 				}
 				else
 				{
@@ -202,11 +243,18 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (comp == 0x00b)
 			{
-				util::stream_format(stream, "blc (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "blc %s, %s,%s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x00f)
 			{
-				util::stream_format(stream, "not (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				if (get_src2_dest(opcode) == 0x00)
+				{
+					util::stream_format(stream, "not %s, %s", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)));
+				}
+				else
+				{
+					util::stream_format(stream, "illegal not form");
+				}
 			}
 			else if (comp == 0x019)
 			{
@@ -222,33 +270,33 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 					}
 					else
 					{
-						util::stream_format(stream, "mov (%02x, %02x)", get_src1(opcode), get_compute_dest(opcode));
+						util::stream_format(stream, "mov %s, %s", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)));
 					}
 				}
 				else
 				{
-					util::stream_format(stream, "add (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+					util::stream_format(stream, "add %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 				}
 			}
 			else if (comp == 0x01b)
 			{
-				util::stream_format(stream, "xor (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "xor %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x023)
 			{
-				util::stream_format(stream, "and (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "and %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x026)
 			{
-				util::stream_format(stream, "subnc (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "subnc %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x03b)
 			{
-				util::stream_format(stream, "or (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "or %s, %s, %s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x066)
 			{
-				util::stream_format(stream, "sub (%02x, %02x, %02x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode));
+				util::stream_format(stream, "sub %s, %s, %s)", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else
 			{
@@ -273,30 +321,41 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		switch (op)
 		{
-		case 0:
+		case 0: 
 		{
-			util::stream_format(stream, "ld (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			// ld - Load
+			// ld Offset[rSrc1], rDest
+			util::stream_format(stream, "ld %08x[%s], %s", get_offset(opcode), get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 1:
 		{
-			util::stream_format(stream, "ldt (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			// ldt - Load Through
+			// ldt Offset[rSrc1], rDest
+			util::stream_format(stream, "ldt %08x[%s], %s", get_offset(opcode), get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 2:
 		{
-			util::stream_format(stream, "st (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			// st - Store
+			// st Offset[rSrc1], rDest
+			util::stream_format(stream, "st %08x[%s], %s", get_offset(opcode), get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 3:
 		{
-			util::stream_format(stream, "stt (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			// stt - Store Through
+			// stt Offset[rSrc1], rDest
+			util::stream_format(stream, "stt %08x[%s], %s", get_offset(opcode), get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 4:
 		{
-			util::stream_format(stream, "ldf (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			// ldf - Load Floating Point
+			// ldf Offset[rSrc1], rDest
+			util::stream_format(stream, "ldf %08x[%s], %s", get_offset(opcode), get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
+
 		}
 		case 5: // movfrc or aluc
 		{
@@ -309,7 +368,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (src == 0)
 			{
-				util::stream_format(stream, "movfrc (%02x, %02x, %02x, %02x, %02x)", dest, op, func, c1, c2);
+				util::stream_format(stream, "movfrc %s, (%02x, %02x, %02x, %02x)", get_regname(get_src1(dest)), op, func, c1, c2);
 			}
 			else
 			{
@@ -320,7 +379,9 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		}
 		case 6:
 		{
-			util::stream_format(stream, "stf (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_offset(opcode));
+			// stf - Store Floating Point
+			// stf Offset[rSrc1], rDest
+			util::stream_format(stream, "stf %08x[%s], %s", get_offset(opcode), get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 7: // movtoc
@@ -334,7 +395,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (src == 0)
 			{
-				util::stream_format(stream, "movtoc (%02x, %02x, %02x, %02x, %02x)", dest, op, func, c1, c2);
+				util::stream_format(stream, "movtoc %s, (%02x, %02x, %02x, %02x)", get_regname(get_src1(dest)), op, func, c1, c2);
 			}
 			else
 			{
@@ -360,7 +421,9 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 		case 0:
 		{
-			util::stream_format(stream, "jspci (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_imm17(opcode));
+			// jspci - Jump Indexed and Store PC
+			// jspci rSrc1,#Immed,Rdest
+			util::stream_format(stream, "jspci %s, #%02x, %s", get_regname(get_src1(opcode)), get_imm17(opcode), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 
@@ -373,15 +436,21 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 2:
 		{
+			// movtos - Move to Special Register
+			// movtos rSrc1, SpecialReg
+
+			// psw  001
+			// md   010
+			// pcm1 100
 			u16 comp = get_compute_compfunc(opcode);
-			if ((comp & 0xffc) == 0x000)
+			if ((comp & 0xffe) == 0x000)
 			{
 				u8 dest = get_src2_dest(opcode);
 
 				if (dest == 0x00)
 				{
 					u8 src = get_src1(opcode);
-					util::stream_format(stream, "movtos (%02x, %04x)", src, comp & 0x3);
+					util::stream_format(stream, "movtos %s, %01x", get_regname(src), comp & 0x7);
 				}
 				else
 				{
@@ -398,14 +467,20 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 3:
 		{
+			// movfrs - Move from Special Register
+			// movfrs SpecialReg, rDest
+
+			// psw  001
+			// md   010
+			// pcm4 100
 			u16 comp = get_compute_compfunc(opcode);
-			if ((comp & 0xffc) == 0x000)
+			if ((comp & 0xffe) == 0x000)
 			{
 				u8 src = get_src1(opcode);
 				if (src == 0x00)
 				{
 					u8 dest = get_src2_dest(opcode);
-					util::stream_format(stream, "movfrs (%02x, %04x)", dest, comp & 0x3);
+					util::stream_format(stream, "movfrs %01x, %s", comp & 0x7, get_regname(dest));
 				}
 				else
 				{
@@ -422,7 +497,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 4:
 		{
-			util::stream_format(stream, "addi (%02x, %02x, %04x)", get_src1(opcode), get_src2_dest(opcode), get_imm17(opcode));
+			util::stream_format(stream, "addi %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_imm17(opcode));
 			break;
 		}
 
@@ -436,7 +511,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 				if ((src == 0x00) && (dest == 0x00))
 				{
-					util::stream_format(stream, "jpc (%02x, %02x, %04x)");
+					util::stream_format(stream, "jpc");
 				}
 				else
 				{
@@ -467,7 +542,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 				if ((src == 0x00) && (dest == 0x00))
 				{
-					util::stream_format(stream, "jpcrs (%02x, %02x, %04x)");
+					util::stream_format(stream, "jpcrs");
 				}
 				else
 				{

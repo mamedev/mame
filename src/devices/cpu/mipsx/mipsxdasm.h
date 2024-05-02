@@ -28,6 +28,8 @@ private:
 	int get_compute_dest(u32 opcode);
 	int get_compute_compfunc(u32 opcode);
 
+	std::string get_regname(u8 reg);
+
 };
 
 #endif
