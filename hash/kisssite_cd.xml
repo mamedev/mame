@@ -87,7 +87,7 @@ license:CC0-1.0
 		<publisher>Tomy</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Dance Karaoke Series 07 - Daite Hold on Me! and Try Me - Watashi o Shinjite (Japan)" sha1="813c39e7ba9f2d76fb97a9c86f207a2e8002701c"/>
+				<disk name="Dance Karaoke Series 07 - Daite Hold on Me and Try Me - Watashi o Shinjite (Japan)" sha1="813c39e7ba9f2d76fb97a9c86f207a2e8002701c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@ license:CC0-1.0
 		<publisher>Tomy</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Dance Karaoke Series 11 - Com'on! Be My Girl! and Crazy Beat Goes On! (Japan)" sha1="ef48e7023e28d5541c43c6528f63481c2197c6e9"/>
+				<disk name="Dance Karaoke Series 11 - Com'on Be My Girl and Crazy Beat Goes On (Japan)" sha1="ef48e7023e28d5541c43c6528f63481c2197c6e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@ license:CC0-1.0
 		<publisher>Tomy</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Dance Karaoke Series 16 - Wake Me Up! and Timing (Japan)" sha1="e78abc1db3ea3d89bea0d9f70b25c0910735f273"/>
+				<disk name="Dance Karaoke Series 16 - Wake Me Up and Timing (Japan)" sha1="e78abc1db3ea3d89bea0d9f70b25c0910735f273"/>
 			</diskarea>
 		</part>
 	</software>
@@ -230,7 +230,7 @@ license:CC0-1.0
 		<publisher>Tomy</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Dance Karaoke Series 20 - Love 2000 and Seishun Jidai 1.2.3! (Japan)" sha1="d0004391436b2414f8ce3cad289d011790c0b4db"/>
+				<disk name="Dance Karaoke Series 20 - Love 2000 and Seishun Jidai 1.2.3 (Japan)" sha1="d0004391436b2414f8ce3cad289d011790c0b4db"/>
 			</diskarea>
 		</part>
 	</software>
@@ -274,7 +274,7 @@ license:CC0-1.0
 		<publisher>Tomy</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Dance Karaoke Series 24 - Koi wa Thrill, Shock, Suspense and Love is Energy! (Japan)" sha1="8ba796343933105cd965f670307c70f4115e6214"/>
+				<disk name="Dance Karaoke Series 24 - Koi wa Thrill, Shock, Suspense and Love is Energy (Japan)" sha1="8ba796343933105cd965f670307c70f4115e6214"/>
 			</diskarea>
 		</part>
 	</software>
@@ -329,7 +329,7 @@ license:CC0-1.0
 		<publisher>Tomy</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Oha Star Series 02 - Oha Ska! (Japan)" sha1="ddbb3a2626e5b7cff3b2b2d3371c81d5b311c4aa"/>
+				<disk name="Oha Star Series 02 - Oha Ska (Japan)" sha1="ddbb3a2626e5b7cff3b2b2d3371c81d5b311c4aa"/>
 			</diskarea>
 		</part>
 	</software>
