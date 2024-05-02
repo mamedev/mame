@@ -1110,9 +1110,9 @@ void taito_f3_state::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 		r1 >>= 3;
 		g1 >>= 3;
 		b1 >>= 3;
-		r1 = std::min(r1, static_cast<u16>(255));
-		g1 = std::min(g1, static_cast<u16>(255));
-		b1 = std::min(b1, static_cast<u16>(255));
+		r1 = std::min<u16>(r1, 255);
+		g1 = std::min<u16>(g1, 255);
+		b1 = std::min<u16>(b1, 255);
 
 		dst[x] = rgb_t(r1, g1, b1);
 	}
