@@ -79,6 +79,9 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 	case 0:
 	{
 		u8 op = get_op(opcode);
+		int disp = get_disp(opcode) << 2;
+		disp = util::sext(disp & 0x3fffc, 18);
+		u32 basepc = pc;
 
 		switch (op)
 		{
@@ -86,11 +89,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if (get_sq(opcode))
 			{
-				util::stream_format(stream, "beqsq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "beqsq %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			else
 			{
-				util::stream_format(stream, "beq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "beq %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			break;
 		}
@@ -98,11 +101,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if (get_sq(opcode))
 			{
-				util::stream_format(stream, "bhssq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "bhssq %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			else
 			{
-				util::stream_format(stream, "bhs %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "bhs %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			break;
 		}
@@ -110,11 +113,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if (get_sq(opcode))
 			{
-				util::stream_format(stream, "bltsq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "bltsq %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			else
 			{
-				util::stream_format(stream, "blt %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "blt %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			break;
 		}
@@ -122,11 +125,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if (get_sq(opcode))
 			{
-				util::stream_format(stream, "bnesq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "bnesq %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			else
 			{
-				util::stream_format(stream, "bne %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "bne %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			break;
 		}
@@ -134,11 +137,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if (get_sq(opcode))
 			{
-				util::stream_format(stream, "blosq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "blosq %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			else
 			{
-				util::stream_format(stream, "blo %s, %s, %04x",get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "blo %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			break;
 		}
@@ -146,11 +149,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if (get_sq(opcode))
 			{
-				util::stream_format(stream, "bgesq %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "bgesq %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			else
 			{
-				util::stream_format(stream, "bge %s, %s, %04x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_disp(opcode));
+				util::stream_format(stream, "bge %s, %s, %08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), basepc + disp);
 			}
 			break;
 		}
@@ -215,7 +218,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else if ((comp & 0xf80) == 0x200)
 			{
-				util::stream_format(stream, "sh %s, %s, %s, #%02x)", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)), get_compute_compfunc(opcode) & 0x7f);
+				util::stream_format(stream, "sh %s, %s, %s, #%02x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)), get_compute_compfunc(opcode) & 0x7f);
 			}
 			else if ((comp & 0xf80) == 0x100)
 			{
@@ -386,6 +389,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		}
 		case 7: // movtoc
 		{
+			// this is just a suggested form
 			u8 c2 =   (opcode & 0x0000000f);
 			u8 c1 =   (opcode & 0x000000f0) >> 4;
 			u8 func = (opcode & 0x00003f00) >> 8;
