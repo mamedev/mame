@@ -213,4 +213,4 @@ ROM_END
 
 
 GAME( 2004, sweetld4,  0, sweetland4, sweetld4,  sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2004, tairyouda, 0, tairyouda,  tairyouda, sweetland4_state, empty_init, ROT0, "Namco", "Tairyou-Daiko 337 Byoshi",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000, tairyouda, 0, tairyouda,  tairyouda, sweetland4_state, empty_init, ROT0, "Namco", "Tairyou-Daiko 337 Byoshi",            MACHINE_IS_SKELETON_MECHANICAL )
