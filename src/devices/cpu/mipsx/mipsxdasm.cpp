@@ -11,52 +11,52 @@ u32 mipsx_disassembler::opcode_alignment() const
 
 int mipsx_disassembler::get_ty(u32 opcode)
 {
-	return (opcode & 0xc0000000) >> 30;
+	return BIT(opcode, 30, 2);
 }
 
 int mipsx_disassembler::get_op(u32 opcode)
 {
-	return (opcode & 0x38000000) >> 27;
+	return BIT(opcode, 27, 3);
 }
 
 int mipsx_disassembler::get_src1(u32 opcode)
 {
-	return (opcode & 0x07c00000) >> 22;
+	return BIT(opcode, 22, 5);
 }
 
 int mipsx_disassembler::get_src2_dest(u32 opcode)
 {
-	return (opcode & 0x003e0000) >> 17;
+	return BIT(opcode, 17, 5);
 }
 
 int mipsx_disassembler::get_compute_dest(u32 opcode)
 {
-	return (opcode & 0x0001f000) >> 12;
+	return BIT(opcode, 12, 5);
 }
 
 int mipsx_disassembler::get_compute_compfunc(u32 opcode)
 {
-	return (opcode & 0x00000fff) >> 0;
+	return BIT(opcode, 0, 12);
 }
 
 int mipsx_disassembler::get_offset(u32 opcode)
 {
-	return (opcode & 0x0001ffff) >> 0;
+	return BIT(opcode, 0, 17);
 }
 
 int mipsx_disassembler::get_imm17(u32 opcode)
 {
-	return (opcode & 0x0001ffff) >> 0;
+	return BIT(opcode, 0, 17);
 }
 
 int mipsx_disassembler::get_sq(u32 opcode)
 {
-	return (opcode & 0x00010000) >> 16;
+	return BIT(opcode, 16, 1);
 }
 
 int mipsx_disassembler::get_disp(u32 opcode)
 {
-	return (opcode & 0x0000ffff) >> 0;
+	return BIT(opcode, 0, 16);
 }
 
 int mipsx_disassembler::get_asr_amount(int shift)
