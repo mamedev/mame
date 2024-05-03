@@ -349,12 +349,13 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		}
 		case 5: // movfrc or aluc
 		{
-			u8 c2 =   (opcode & 0x0000000f);
-			u8 c1 =   (opcode & 0x000000f0) >> 4;
-			u8 func = (opcode & 0x00003f00) >> 8;
-			u8 op =   (opcode & 0x0001c000) >> 14;
+			// this is just a suggested form
+			u8 c2 =   BIT(opcode, 0, 4);
+			u8 c1 =   BIT(opcode, 4, 4);
+			u8 func = BIT(opcode, 8, 6);
+			u8 op =   BIT(opcode, 14, 3);
 			u8 dest = get_src2_dest(opcode);
-			u8 src = get_src1(opcode);
+			u8 src =  get_src1(opcode);
 
 			if (src == 0)
 			{
@@ -377,12 +378,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		case 7: // movtoc
 		{
 			// this is just a suggested form
-			u8 c2 =   (opcode & 0x0000000f);
-			u8 c1 =   (opcode & 0x000000f0) >> 4;
-			u8 func = (opcode & 0x00003f00) >> 8;
-			u8 op =   (opcode & 0x0001c000) >> 14;
+			u8 c2 =   BIT(opcode, 0, 4);
+			u8 c1 =   BIT(opcode, 4, 4);
+			u8 func = BIT(opcode, 8, 6);
+			u8 op =   BIT(opcode, 14, 3);
 			u8 dest = get_src2_dest(opcode);
-			u8 src = get_src1(opcode);
+			u8 src =  get_src1(opcode);
 
 			if (src == 0)
 			{
@@ -417,9 +418,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			// jspci - Jump Indexed and Store PC
 			// jspci rSrc1,#Immed,Rdest
 			int imm17 = get_imm17(opcode);
-			imm17 = util::sext(imm17 & 0x1ffff, 17);
-			// should imm17 be shifted?
-
+			imm17 = util::sext(imm17, 17) * 2;
 			util::stream_format(stream, "jspci %s, #%02x, %s", get_regname(get_src1(opcode)), imm17, get_regname(get_src2_dest(opcode)));
 			break;
 		}
@@ -544,7 +543,6 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			break;
 		}
-
 
 		case 7:
 		{
