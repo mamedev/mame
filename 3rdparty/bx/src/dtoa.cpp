@@ -8,8 +8,6 @@
 #include <bx/string.h>
 #include <bx/uint32_t.h>
 
-#include <type_traits>
-
 namespace bx
 {
 	/*
@@ -481,12 +479,8 @@ namespace bx
 				return 0;
 			}
 
-			_max = toString(_dst + 1
-				, _max - 1
-				, typename std::make_unsigned<Ty>::type(-_value)
-				, _base
-				, _separator
-				);
+			_max = toString(_dst + 1, _max - 1, asUnsigned(-_value), _base, _separator);
+
 			if (_max == 0)
 			{
 				return 0;
@@ -496,12 +490,7 @@ namespace bx
 			return int32_t(_max + 1);
 		}
 
-		return toString(_dst
-			, _max
-			, typename std::make_unsigned<Ty>::type(_value)
-			, _base
-			, _separator
-			);
+		return toString(_dst, _max, asUnsigned(_value), _base, _separator);
 	}
 
 	int32_t toString(char* _dst, int32_t _max, int32_t _value, uint32_t _base, char _separator)
