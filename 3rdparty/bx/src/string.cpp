@@ -758,7 +758,7 @@ namespace bx
 				len--;
 			}
 
-			int32_t padding = _param.width > len ? _param.width - len - hasSign: 0;
+			const int32_t padding = _param.width > len ? _param.width - len - hasSign: 0;
 
 			if (!_param.left)
 			{
@@ -769,7 +769,24 @@ namespace bx
 					sign = '\0';
 				}
 
-				size += writeRep(_writer, _param.fill, max(0, padding), _err);
+				if (_param.width < _param.prec)
+				{
+					size += writeRep(_writer, _param.fill, max(0, padding), _err);
+				}
+				else
+				{
+					const int32_t maxPrec = max(_param.prec, len);
+					const int32_t fillLen = max(0, _param.width - maxPrec - hasSign);
+					size += writeRep(_writer, _param.fill, fillLen, _err);
+
+					if ('\0' != sign)
+					{
+						size += write(_writer, sign, _err);
+						sign = '\0';
+					}
+
+					size += writeRep(_writer, '0', max(0, padding-fillLen), _err);
+				}
 			}
 
 			if ('\0' != sign)

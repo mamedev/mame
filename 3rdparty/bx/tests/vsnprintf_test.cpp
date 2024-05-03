@@ -64,7 +64,16 @@ static bool test(const char* _expected, const char* _format, ...)
 
 	if (!result)
 	{
-		printf("result (%d) '%s', expected (%d) '%s'\n", len, temp, max-1, _expected);
+		printf("---\n");
+		printf("printf format '%s'\n", _format);
+		printf("       result (%4d) '%s'\n", len, temp);
+		printf("     expected (%4d) '%s'\n", max-1, _expected);
+
+		va_start(argList, _format);
+		len = ::vsnprintf(temp, max, _format, argList);
+		va_end(argList);
+
+		printf("CRT vsnprintf (%d) '%s'\n", len, temp);
 	}
 
 	return result;
@@ -243,6 +252,10 @@ TEST_CASE("Format modifiers", "[string][printf]")
 	REQUIRE(test("|1         |", "|%-10.0f|",   1.0f) );
 	REQUIRE(test("|1.        |", "|%#-10.0f|",  1.0f) );
 	REQUIRE(test("|+1.       |", "|%+#-10.0f|", 1.0f) );
+
+	REQUIRE(test("|     00013:    -00089|", "|%10.5d:%10.5d|",   13, -89) );
+	REQUIRE(test("|    -00013:    +00089|", "|%10.5d:%+10.5d|", -13,  89) );
+	REQUIRE(test("|    -00013:    -00089|", "|%10.5d:%10.5d|",  -13, -89) );
 }
 
 TEST_CASE("Format %p", "[string][printf]")
