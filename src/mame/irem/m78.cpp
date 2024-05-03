@@ -27,11 +27,12 @@ on sub PCB:
 6x TMM2064P-10 RAM
 
 TODO:
-- I/O section (are inputs tested against lamps?);
+- I/O section;
 - video registers;
 - Undumped sound ROMs. The sound program is almost identical to the one of irem/shisen.cpp games.
   Copied over sound handling from there for now;
 - comms;
+
 */
 
 #include "emu.h"
@@ -97,7 +98,7 @@ private:
 	void audio_io_map(address_map &map) ATTR_COLD;
 };
 
-// BBRRGGII
+// BBRRGGII, almost likely wrong
 void m78_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *color_prom = memregion("proms")->base();
@@ -259,6 +260,7 @@ static INPUT_PORTS_START( bj92 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
+	// TODO: these looks switches
 	PORT_START("DSW1") // only 1 8-DIP bank
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
@@ -281,7 +283,7 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
 	8*8
@@ -292,7 +294,7 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 , 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
