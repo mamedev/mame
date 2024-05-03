@@ -62,7 +62,7 @@ void mipsx_cpu_device::state_export(const device_state_entry &entry)
 	{
 		case MIPSX_PC:
 		case STATE_GENPCBASE:
-			m_debugger_temp = m_pc << 2;
+			m_debugger_temp = m_pc;
 			break;
 	}
 }
@@ -79,14 +79,14 @@ void mipsx_cpu_device::state_import(const device_state_entry &entry)
 	{
 		case MIPSX_PC:
 		case STATE_GENPCBASE:
-			m_pc = (m_debugger_temp & 0xfffffffc) >> 2;
+			m_pc = (m_debugger_temp & 0xffffffff);
 			break;
 	}
 }
 
 void mipsx_cpu_device::device_reset()
 {
-	m_pc = 0xe2cc >> 2; // temp, there is code here in kisssite
+	m_pc = 0xe2cc; // temp, there is code here in kisssite
 }
 
 /*****************************************************************************/
@@ -100,8 +100,8 @@ void mipsx_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(m_pc<<2);
-		m_pc++;
+		debugger_instruction_hook(m_pc);
+		m_pc += 4;
 		m_icount--;
 	}
 }

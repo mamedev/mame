@@ -75,28 +75,30 @@ int mipsx_disassembler::get_sh_amount(int shift)
 std::string mipsx_disassembler::get_regname(u8 reg)
 {
 	// general purpose register 0 just acts as a constant 0, it can't be changed.
-	if (reg == 0)
+	if ((reg == 0) && (SHOW_R0_AS_0))
 		return "#0";
-	else
-		return "r" + std::to_string(reg);
+
+	const std::string regnames[32] = { "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",  "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"
+									   "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31" };
+
+	return regnames[reg];
 }
 
 offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const data_buffer& opcodes, const data_buffer& params)
 {
-	u32 opcode = opcodes.r32(pc);
-
-	u8 ty = get_ty(opcode);
+	const u32 opcode = opcodes.r32(pc);
+	const u8 ty = get_ty(opcode);
 
 	switch (ty)
 	{
 	case 0:
 	{
-		u8 op = get_op(opcode);
-		int disp = get_disp(opcode) << 2;
-		disp = util::sext(disp & 0x3fffc, 18);
-		u32 basepc = pc + 8;
-		int src1 = get_src1(opcode);
-		int src2 = get_src2_dest(opcode);
+		const u8 op = get_op(opcode);
+		const int disp = util::sext(opcode, 16) * 4;
+		const u32 basepc = pc + 8;
+		const int src1 = get_src1(opcode);
+		const int src2 = get_src2_dest(opcode);
+		const std::string squash = get_sq(opcode) ? "sq" : "";
 
 		switch (op)
 		{
@@ -105,86 +107,37 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			if ((src1 == 0) && (src2 == 0))
 			{
 				// beq #0, #0, offset is used as an alias for unconditional branch
-				if (get_sq(opcode))
-				{
-					util::stream_format(stream, "brasq %08x", basepc + disp);
-				}
-				else
-				{
-					util::stream_format(stream, "bra %08x", basepc + disp);
-				}
+				util::stream_format(stream, "bra%s %08x", squash, basepc + disp);
 			}
 			else
 			{
-				if (get_sq(opcode))
-				{
-					util::stream_format(stream, "beqsq %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-				}
-				else
-				{
-					util::stream_format(stream, "beq %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-				}
+				util::stream_format(stream, "beq%s %s, %s, %08x", squash, get_regname(src1), get_regname(src2), basepc + disp);
 			}
 			break;
 		}
 		case 2:
 		{
-			if (get_sq(opcode))
-			{
-				util::stream_format(stream, "bhssq %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
-			else
-			{
-				util::stream_format(stream, "bhs %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
+			util::stream_format(stream, "bhs%s %s, %s, %08x", squash, get_regname(src1), get_regname(src2), basepc + disp);
 			break;
 		}
 		case 3:
 		{
-			if (get_sq(opcode))
-			{
-				util::stream_format(stream, "bltsq %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
-			else
-			{
-				util::stream_format(stream, "blt %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
+			util::stream_format(stream, "blt%s %s, %s, %08x", squash, get_regname(src1), get_regname(src2), basepc + disp);
 			break;
 		}
 		case 5:
 		{
-			if (get_sq(opcode))
-			{
-				util::stream_format(stream, "bnesq %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
-			else
-			{
-				util::stream_format(stream, "bne %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
+			util::stream_format(stream, "bne%s %s, %s, %08x", squash, get_regname(src1), get_regname(src2), basepc + disp);
 			break;
 		}
 		case 6:
 		{
-			if (get_sq(opcode))
-			{
-				util::stream_format(stream, "blosq %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
-			else
-			{
-				util::stream_format(stream, "blo %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
+			util::stream_format(stream, "blo%s %s, %s, %08x", squash, get_regname(src1), get_regname(src2), basepc + disp);
 			break;
 		}
 		case 7:
 		{
-			if (get_sq(opcode))
-			{
-				util::stream_format(stream, "bgesq %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
-			else
-			{
-				util::stream_format(stream, "bge %s, %s, %08x", get_regname(src1), get_regname(src2), basepc + disp);
-			}
+			util::stream_format(stream, "bge%s %s, %s, %08x", squash, get_regname(src1), get_regname(src2), basepc + disp);
 			break;
 		}
 
@@ -354,7 +307,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 	{
 		u8 op = get_op(opcode);
 		int imm17 = get_offset(opcode);
-		imm17 = util::sext(imm17 & 0x1ffff, 17);
+		imm17 = util::sext(imm17, 17);
 
 		switch (op)
 		{
