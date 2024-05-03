@@ -5365,3 +5365,14 @@ if (MACHINES["CAT702"]~=null) then
 		MAME_DIR .. "src/devices/machine/cat702.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sci4.h,MACHINES["SCI4"] = true
+---------------------------------------------------
+if (MACHINES["SCI4"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sci4.cpp",
+		MAME_DIR .. "src/devices/machine/sci4.h",
+	}
+end

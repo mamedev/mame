@@ -21170,9 +21170,6 @@ vc4000                          // Interton vc4000
 vc6000                          //
 vmdtbase                        //
 
-@source:irem/blackjack92.cpp
-bj92
-
 @source:irem/m10.cpp
 andromed                        // (c) 1979
 greenber                        // Irem
@@ -21289,6 +21286,9 @@ rtypem82b                       // bootleg
 rtypeu                          // (c) 1987 + Nintendo USA license (US)
 xmultipl                        // (c) 1989 (Japan)
 xmultiplm72                     // (c) 1989 (Japan)
+
+@source:irem/m78.cpp
+bj92
 
 @source:irem/m90.cpp
 atompunk                        // (c) 1991 Irem America (licensed from Hudson Soft)
@@ -38371,6 +38371,7 @@ psion3a                         // 1993 Psion Series 3a
 psion3a2                        // 1995 Psion Series 3a
 psion3a2_us                     // 1995 Psion Series 3a (US)
 psion3a2_de                     // 1995 Psion Series 3a (German)
+psion3a2_it                     // 1995 Psion Series 3a (Italian)
 psion3a2_ru                     // 1997 Psion Series 3a (Russian)
 psion3c                         // 1996 Psion Series 3c
 psion3mx                        // 1998 Psion Series 3mx
@@ -46267,6 +46268,11 @@ mu100b                          // 1998 MU-100B
 
 @source:yamaha/ymmu128.cpp
 mu128
+
+@source:yamaha/ymmu2000.cpp
+mu500
+mu1000
+mu2000
 
 @source:yamaha/ympcs30.cpp
 pcs30                           // 1984

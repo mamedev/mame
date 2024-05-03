@@ -11,24 +11,42 @@
 // 1 = everything
 static constexpr int V = 0;
 
-DEFINE_DEVICE_TYPE(SH_ADC, sh_adc_device, "sh_adc", "SH2/704x ADC")
+DEFINE_DEVICE_TYPE(SH_ADC_MS, sh_adc_ms_device, "sh_adc_ms", "SH2/704x ADC (medium speed)")
+DEFINE_DEVICE_TYPE(SH_ADC_HS, sh_adc_hs_device, "sh_adc_hs", "SH2/704x ADC (high speed)")
 
-sh_adc_device::sh_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, SH_ADC, tag, owner, clock),
+sh_adc_device::sh_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG),
-	m_intc_vector(0), m_adcsr(0), m_adcr(0), m_register_mask(0), m_trigger(0), m_start_mode(0), m_start_channel(0),
+	m_intc_vector(0), m_adcsr(0), m_adcr(0), m_trigger(0), m_start_mode(0), m_start_channel(0),
 	m_end_channel(0), m_start_count(0), m_mode(0), m_channel(0), m_count(0), m_analog_powered(false), m_adtrg(false), m_next_event(0)
 {
-	m_suspend_on_interrupt = true;
-	m_register_mask = 7;
-	m_analog_power_control = false;
 }
+
+sh_adc_ms_device::sh_adc_ms_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sh_adc_device(mconfig, SH_ADC_MS, tag, owner, clock)
+{
+	m_is_hs = false;
+	m_port_base = 0;
+	m_port_mask = 3;
+	m_port_shift = 6;
+	m_analog_powered = true;
+}
+
+sh_adc_hs_device::sh_adc_hs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sh_adc_device(mconfig, SH_ADC_HS, tag, owner, clock)
+{
+	m_is_hs = true;
+	m_port_base = 0;
+	m_port_mask = 7;
+	m_port_shift = 0;
+	m_analog_powered = false;
+}
+
 
 u16 sh_adc_device::addr_r(offs_t offset)
 {
-	if(V>=1) logerror("addr_r %d %03x\n", offset, m_addr[offset]);
-	return m_addr[offset];
+	return m_addr[offset] << m_port_shift;
 }
 
 u8 sh_adc_device::adcsr_r()
@@ -47,7 +65,7 @@ void sh_adc_device::adcsr_w(u8 data)
 {
 	if(V>=1) logerror("adcsr_w %02x\n", data);
 	u8 prev = m_adcsr;
-	m_adcsr = (data & 0x7f) | (m_adcsr & data & F_ADF);
+	m_adcsr = (data & (0x70 | m_port_mask)) | (m_adcsr & data & F_ADF);
 	mode_update();
 	if((prev & F_ADF) && !(m_adcsr & F_ADF)) {
 		if(m_mode & HALTED) {
@@ -98,7 +116,6 @@ void sh_adc_device::device_start()
 	save_item(NAME(m_end_channel));
 	save_item(NAME(m_start_count));
 	save_item(NAME(m_suspend_on_interrupt));
-	save_item(NAME(m_analog_power_control));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_channel));
 	save_item(NAME(m_count));
@@ -121,7 +138,6 @@ void sh_adc_device::device_reset()
 	m_count = 0;
 	m_next_event = 0;
 	mode_update();
-	m_analog_powered = !m_analog_power_control;
 	m_adtrg = true;
 }
 
@@ -154,13 +170,11 @@ void sh_adc_device::conversion_wait(bool first, bool poweron, u64 current_time)
 
 void sh_adc_device::buffer_value(int port, int buffer)
 {
-	m_buf[buffer] = m_cpu->do_read_adc(port);
-	if(V>=1) logerror("adc buffer %d -> %d:%03x\n", port, buffer, m_buf[buffer]);
+	m_buf[buffer] = m_cpu->do_read_adc(port + m_port_base);
 }
 
 void sh_adc_device::commit_value(int reg, int buffer)
 {
-	reg &= m_register_mask;
 	if(V>=1) logerror("adc commit %d -> %d:%03x\n", buffer, reg, m_buf[buffer]);
 	m_addr[reg] = m_buf[buffer];
 }
@@ -259,27 +273,42 @@ int sh_adc_device::conversion_time(bool first, bool poweron)
 
 void sh_adc_device::mode_update()
 {
-	m_trigger = 1 << ((m_adcr >> 4) & 3);
-	m_analog_power_control = !(m_adcr & 0x40);
+	if(m_is_hs) {
+		m_trigger = 1 << ((m_adcr >> 4) & 3);
+		m_analog_power_control = !(m_adcr & 0x40);
 
-	m_mode = ACTIVE | (m_adcr & 0x08 ? REPEAT : 0);
+		m_mode = ACTIVE | (m_adcr & 0x08 ? REPEAT : 0);
 
-	if(m_adcsr & 0x03) {
-		m_mode |= BUFFER;
+		if(m_adcr & 0x03) {
+			m_mode |= BUFFER;
 
-	}
+		}
 
-	if(m_adcsr & 0x08) {
-		m_mode |= ROTATE;
-		m_start_channel = 0;
-		if(m_adcr & 0x04) {
-			m_mode |= DUAL;
-			m_end_channel = (m_adcsr & 6)+1;
+		if(m_adcsr & 0x08) {
+			m_mode |= ROTATE;
+			m_start_channel = 0;
+			if(m_adcr & 0x04) {
+				m_mode |= DUAL;
+				m_end_channel = (m_adcsr & 6)+1;
+			} else
+				m_end_channel = m_adcsr & 7;
 		} else
-			m_end_channel = m_adcsr & 7;
-	} else
-		m_start_channel = m_end_channel = m_adcsr & 7;
+			m_start_channel = m_end_channel = m_adcsr & 7;
 
+	} else {
+		m_trigger = T_SOFT;
+
+		m_mode = ACTIVE;
+
+		if(m_adcsr & 0x08) {
+			m_mode |= ROTATE;
+			m_start_channel = 0;
+			m_end_channel = m_adcsr & 3;
+		} else
+			m_start_channel = m_end_channel = m_adcsr & 3;
+		if(m_start_channel == 2)
+			machine().debug_break();
+	}
 }
 
 void sh_adc_device::do_buffering(int buffer)

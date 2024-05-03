@@ -5,13 +5,19 @@
 
 #pragma once
 
+#include "mm1kb.h"
+#include "bus/nscsi/devices.h"
+#include "bus/scsi/scsihd.h"
+#include "bus/scsi/s1410.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/floppy.h"
+#include "machine/74259.h"
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/i8212.h"
-#include "mm1kb.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cb.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
@@ -32,6 +38,7 @@
 #define I8275_TAG       "ic59"
 #define UPD7201_TAG     "ic11"
 #define UPD7220_TAG     "ic101"
+#define LS249_TAG       "ic48"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define RS232_C_TAG     "rs232c"
@@ -51,8 +58,10 @@ public:
 		m_fdc(*this, UPD765_TAG),
 		m_mpsc(*this, UPD7201_TAG),
 		m_hgdc(*this, UPD7220_TAG),
+		m_outlatch(*this, LS249_TAG),
 		m_palette(*this, "palette"),
 		m_floppy(*this, UPD765_TAG ":%u:525", 0U),
+		m_sasi(*this, "sasi:7:scsicb"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_rs232c(*this, RS232_C_TAG),
@@ -78,7 +87,7 @@ public:
 	void mm1m7(machine_config &config);
 	void mm1m7g(machine_config &config);
 	void mm1_320k_dual(machine_config &config);
-	void mm1_640k(machine_config &config);
+	void mm1_640k_winchester(machine_config &config);
 	void mm1_640k_dual(machine_config &config);
 	void mm1_video(machine_config &config);
 	void mm1g_video(machine_config &config);
@@ -96,8 +105,10 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7201_device> m_mpsc;
 	optional_device<upd7220_device> m_hgdc;
+	optional_device<ls259_device> m_outlatch;
 	required_device<palette_device> m_palette;
 	optional_device_array<floppy_image_device, 2> m_floppy;
+	optional_device<nscsi_callback_device> m_sasi;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<rs232_port_device> m_rs232c;
@@ -107,35 +118,39 @@ private:
 	required_memory_region m_char_rom;
 	optional_shared_ptr<uint16_t> m_video_ram;
 
-	int m_a8;
+	bool m_a8;
 
 	// video state
-	int m_llen = 0;
+	bool m_leen = 0;
 
 	// serial state
-	int m_intc = 0;
-	int m_rx21 = 0;
-	int m_tx21 = 0;
-	int m_rcl = 0;
+	bool m_intc = 0;
+	bool m_rx21 = 0;
+	bool m_tx21 = 0;
+	bool m_rcl = 0;
 
 	// floppy state
-	int m_recall;
-	int m_dack3;
-	int m_tc;
-	int m_fdc_tc;
+	bool m_recall;
+	bool m_dack3;
+	bool m_tc;
+	bool m_fdc_tc;
+	bool m_switch;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	void a8_w(int state);
+	void a8_w(int state) { m_a8 = state; }
 	void recall_w(int state);
-	void rx21_w(int state);
-	void tx21_w(int state);
-	void rcl_w(int state);
-	void intc_w(int state);
-	void llen_w(int state);
+	void rx21_w(int state) { m_rx21 = state; }
+	void tx21_w(int state) { m_tx21 = state; }
+	void rcl_w(int state) { m_rcl = state; }
+	void intc_w(int state) { m_intc = state; }
+	void leen_w(int state) { m_leen = state; }
 	void motor_on_w(int state);
+	void switch_w(int state);
+	uint8_t sasi_status_r(offs_t offset);
+	void sasi_cmd_w(offs_t offset, uint8_t data);
 	void dma_hrq_w(int state);
 	uint8_t mpsc_dack_r();
 	void mpsc_dack_w(uint8_t data);
