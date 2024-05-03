@@ -16,7 +16,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	const bool SHOW_R0_AS_0 = true;
+	const bool SHOW_R0_AS_0 = false;
 
 	int get_ty(u32 opcode);
 	int get_op(u32 opcode);
