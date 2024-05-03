@@ -27,10 +27,11 @@ on sub PCB:
 6x TMM2064P-10 RAM
 
 TODO:
-- "ERROR 14", keeps checking location $e400 (irq or shared comms), "SET MY NUMBER" if bypassed.
-- inputs;
-- verify sound. The sound program is almost identical to the one of irem/shisen.cpp games.
-  Copied over sound handling from there for now.
+- I/O section (are inputs tested against lamps?);
+- video registers;
+- Undumped sound ROMs. The sound program is almost identical to the one of irem/shisen.cpp games.
+  Copied over sound handling from there for now;
+- comms;
 */
 
 #include "emu.h"
@@ -59,9 +60,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_tileram(*this, "tileram"),
-		m_attrram(*this, "attrram"),
-		m_colorram(*this, "colorram")
+		m_tileram(*this, "tileram%u", 0),
+		m_attrram(*this, "attrram%u", 0),
+		m_colorram(*this, "colorram%u", 0)
 	{}
 
 	void bj92(machine_config &config) ATTR_COLD;
@@ -74,20 +75,20 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<uint8_t> m_tileram;
-	required_shared_ptr<uint8_t> m_attrram;
-	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr_array<u8, 2> m_tileram;
+	required_shared_ptr_array<u8, 2> m_attrram;
+	required_shared_ptr_array<u8, 2> m_colorram;
 
-	tilemap_t *m_tilemap = nullptr;
+	tilemap_t *m_tilemap[2] = {};
 
 	void palette_init(palette_device &palette) const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_nmi) { m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
-	TILE_GET_INFO_MEMBER(get_tile_info) ATTR_COLD;
-	void tileram_w(offs_t offset, uint8_t data);
-	void attrram_w(offs_t offset, uint8_t data);
-	void colorram_w(offs_t offset, uint8_t data);
+	template <unsigned N> TILE_GET_INFO_MEMBER(get_tile_info) ATTR_COLD;
+	template <unsigned N> void tileram_w(offs_t offset, uint8_t data);
+	template <unsigned N> void attrram_w(offs_t offset, uint8_t data);
+	template <unsigned N> void colorram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_program_map(address_map &map) ATTR_COLD;
@@ -96,30 +97,30 @@ private:
 	void audio_io_map(address_map &map) ATTR_COLD;
 };
 
+// BBRRGGII
 void m78_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2;
+		int bit0, bit1;
 
 		const u8 data = (color_prom[i] << 4) | (color_prom[i | 0x100]);
-
-		bit0 = 0;
-		bit1 = BIT(data, 6);
-		bit2 = BIT(data, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(data, 3);
-		bit1 = BIT(data, 4);
-		bit2 = BIT(data, 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const br_bit0 = BIT(data, 6);
+		int const br_bit1 = BIT(data, 7);
 
 		bit0 = BIT(data, 0);
 		bit1 = BIT(data, 1);
-		bit2 = BIT(data, 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+
+		bit0 = BIT(data, 2);
+		bit1 = BIT(data, 3);
+		int const r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+
+		bit0 = BIT(data, 4);
+		bit1 = BIT(data, 5);
+		int const g = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -128,41 +129,51 @@ void m78_state::palette_init(palette_device &palette) const
 
 void m78_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m78_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m78_state::get_tile_info<0>)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m78_state::get_tile_info<1>)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
+
+	m_tilemap[0]->set_transparent_pen(0);
+	//m_tilemap[1]->set_transparent_pen(0);
 }
 
-// TODO: theorical mapping, to be verified
-// NOTE: conceals ROM/RAM messages unless a NG is returned, seems intentional
-TILE_GET_INFO_MEMBER(m78_state::get_tile_info)
+template <unsigned N> TILE_GET_INFO_MEMBER(m78_state::get_tile_info)
 {
-	int const attr = m_attrram[tile_index];
-	int const code = m_tileram[tile_index] | ((attr & 0x1f) << 8);
-	const u8 color = m_colorram[tile_index] & 0x1f;
+	int const attr = m_attrram[N][tile_index];
+	int const code = m_tileram[N][tile_index] | ((attr & 0x1f) << 8);
+	const u8 color = m_colorram[N][tile_index];
+	u8 flags = 0;
 
-	tileinfo.set(0, code, color, 0);
+	if (BIT(color, 4))
+		flags |= TILE_FLIPX;
+	if (BIT(color, 5))
+		flags |= TILE_FLIPY;
+
+	tileinfo.set(0, code, color & 0xf, flags);
 }
 
-void m78_state::tileram_w(offs_t offset, uint8_t data)
+template <unsigned N> void m78_state::tileram_w(offs_t offset, uint8_t data)
 {
-	m_tileram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset);
+	m_tileram[N][offset] = data;
+	m_tilemap[N]->mark_tile_dirty(offset);
 }
 
-void m78_state::attrram_w(offs_t offset, uint8_t data)
+template <unsigned N> void m78_state::attrram_w(offs_t offset, uint8_t data)
 {
-	m_attrram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset);
+	m_attrram[N][offset] = data;
+	m_tilemap[N]->mark_tile_dirty(offset);
 }
 
-void m78_state::colorram_w(offs_t offset, uint8_t data)
+template <unsigned N> void m78_state::colorram_w(offs_t offset, uint8_t data)
 {
-	m_colorram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset);
+	m_colorram[N][offset] = data;
+	m_tilemap[N]->mark_tile_dirty(offset);
 }
 
 uint32_t m78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	//bitmap.fill(0, cliprect);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -178,21 +189,21 @@ void m78_state::main_io_map(address_map &map)
 {
 	//map(0x0000, 0x0000).r
 	//map(0x0000, 0x0000).w // observed values: 0xfb, 0xfd, 0xfe
-	//map(0x1000, 0x1000).w // observed values: 0x00, 0x40
+	//map(0x1000, 0x1000).w // hopper output?
 	map(0x2000, 0x2000).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write)); // ??
-	//map(0x3000, 0x3000).r
-	//map(0x3000, 0x3000).w // observed values: 0x00
+	map(0x3000, 0x3000).portr("IN1");
+	//map(0x3000, 0x3000).w // lamps for IN1?
 	//map(0x4000, 0x4000).r
 	//map(0x4000, 0x4000).w // observed values: 0x00
 	map(0x5000, 0x5000).portr("IN0"); // ??
-	map(0x8000, 0x8fff).ram().w(FUNC(m78_state::tileram_w)).share(m_tileram);
-	map(0x9000, 0x9fff).ram().w(FUNC(m78_state::attrram_w)).share(m_attrram);
-	map(0xa000, 0xafff).ram().w(FUNC(m78_state::colorram_w)).share(m_colorram);
-	map(0xb000, 0xbfff).ram();
-	map(0xc000, 0xcfff).ram(); // writes here
-	map(0xd000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram(); // writes at the same offsets of 0xc000-0xcfff
-	map(0xf000, 0xffff).ram();
+	map(0x8000, 0x8fff).ram().w(FUNC(m78_state::tileram_w<1>)).share(m_tileram[1]);
+	map(0x9000, 0x9fff).ram().w(FUNC(m78_state::attrram_w<1>)).share(m_attrram[1]);
+	map(0xa000, 0xafff).ram().w(FUNC(m78_state::colorram_w<1>)).share(m_colorram[1]);
+//	map(0xb000, 0xbfff).ram(); // vregs, $b000, $b400, $b800, $bc00
+	map(0xc000, 0xcfff).ram().w(FUNC(m78_state::tileram_w<0>)).share(m_tileram[0]);
+	map(0xd000, 0xdfff).ram().w(FUNC(m78_state::attrram_w<0>)).share(m_attrram[0]);
+	map(0xe000, 0xefff).ram().w(FUNC(m78_state::colorram_w<0>)).share(m_colorram[0]);
+//	map(0xf000, 0xffff).ram(); // layer control at $f000?
 }
 
 void m78_state::audio_program_map(address_map &map)
@@ -215,26 +226,54 @@ void m78_state::audio_io_map(address_map &map)
 
 
 static INPUT_PORTS_START( bj92 )
-	// TODO: mapped for testing, fix this
+	// TODO: Doesn't look PIO input, bit 2-5 high causes hang
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_NAME("Stand")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) PORT_NAME("Hit")
+	PORT_DIPNAME( 0x04, 0x00, "IN1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1") // only 1 8-DIP bank
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5") // data clear
+	PORT_DIPNAME( 0xe0, 0x20, "ID number" ) PORT_DIPLOCATION("DSW1:6,7,8")
+	PORT_DIPSETTING(      0x0000, "Service Mode?" ) // press stand on "set my number"
+	PORT_DIPSETTING(      0x0020, "1" )
+	PORT_DIPSETTING(      0x0040, "2" )
+	PORT_DIPSETTING(      0x0060, "3" )
+	PORT_DIPSETTING(      0x0080, "4" )
+	PORT_DIPSETTING(      0x00a0, "5" )
+	PORT_DIPSETTING(      0x00c0, "0xc0 (invalid)" )
+	PORT_DIPSETTING(      0x00e0, "0xe0 (invalid)" )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -285,8 +324,8 @@ void m78_state::bj92(machine_config &config)
 	// all wrong
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 64*8);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(512, 384);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(m78_state::screen_update));
 	screen.set_palette("palette");
@@ -334,7 +373,10 @@ ROM_START( bj92 )
 	ROM_LOAD( "10.c2.ic85", 0x20000, 0x10000, CRC(c2a2ae52) SHA1(2f91722725b03250e58242fd772a83441789dbce) )
 
 	ROM_REGION( 0x40000, "m72_audio", ROMREGION_ERASE00 )
-	// there are 2 empty sockets near the scratched off sound chip. ROMs removed or never populated?
+	// there are 2 empty sockets near the scratched off sound chip.
+	// Outputs DAC sound if populated
+	ROM_LOAD("3.v0.ic46", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD("4.v1.ic47", 0x20000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.ic67", 0x000, 0x100, CRC(3e2128b6) SHA1(71e74999c18a2a4e59a7c8388b6deb0918afd669) )
@@ -344,4 +386,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, bj92, 0, bj92, bj92, m78_state, empty_init, ROT90, "Irem", "Black Jack (Irem)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// revision under Dip-Switch Test
+GAME( 1992, bj92, 0, bj92, bj92, m78_state, empty_init, ROT90, "Irem", "Black Jack (Irem, satellite unit, rev. T)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
