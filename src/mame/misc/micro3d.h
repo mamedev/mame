@@ -40,8 +40,7 @@ public:
 		m_vgb_uart(*this, "uart"),
 		m_palette(*this, "palette"),
 		m_duart(*this, "duart"),
-		m_noise_1(*this, "noise_1"),
-		m_noise_2(*this, "noise_2"),
+		m_noise(*this, "noise_%u", 1U),
 		m_adc(*this, "adc"),
 		m_vertex(*this, "vertex"),
 		m_sound_sw(*this, "SOUND_SW"),
@@ -93,8 +92,7 @@ private:
 	required_device<scn2651_device> m_vgb_uart;
 	required_device<palette_device> m_palette;
 	required_device<mc68681_device> m_duart;
-	required_device<micro3d_sound_device> m_noise_1;
-	required_device<micro3d_sound_device> m_noise_2;
+	required_device_array<micro3d_sound_device, 2> m_noise;
 	optional_device<adc0844_device> m_adc;
 	required_memory_region m_vertex;
 
@@ -106,13 +104,13 @@ private:
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t             m_m68681_tx0 = 0;
 
-	/* Sound */
+	// Sound
 	uint8_t             m_sound_port_latch[4]{};
 
-	/* Hardware version-check latch for BOTSS 1.1a */
+	// Hardware version-check latch for BOTSS 1.1a
 	uint8_t             m_botss_latch = 0;
 
-	/* MAC */
+	// MAC
 	required_shared_ptr<uint32_t> m_mac_sram;
 	emu_timer           *m_mac_done_timer = nullptr;
 	uint32_t            m_sram_r_addr = 0;
@@ -122,18 +120,18 @@ private:
 	uint32_t            m_mac_stat = 0;
 	uint32_t            m_mac_inst = 0;
 
-	/* 2D video */
+	// 2D video
 	required_shared_ptr<uint16_t> m_sprite_vram;
 	uint16_t            m_creg = 0;
 	uint16_t            m_xfer3dk = 0;
 
-	/* 3D pipeline */
+	// 3D pipeline
 	uint32_t            m_pipe_data = 0;
 	uint32_t            m_pipeline_state = 0;
 	int32_t             m_vtx_fifo[512]{};
 	uint32_t            m_fifo_idx = 0;
 	uint32_t            m_draw_cmd = 0;
-	int                 m_draw_state = 0;
+	uint32_t            m_draw_state = 0;
 	int32_t             m_x_min = 0;
 	int32_t             m_x_max = 0;
 	int32_t             m_y_min = 0;
@@ -142,43 +140,43 @@ private:
 	int32_t             m_z_max = 0;
 	int32_t             m_x_mid = 0;
 	int32_t             m_y_mid = 0;
-	int                 m_dpram_bank = 0;
+	uint32_t            m_dpram_bank = 0;
 	uint32_t            m_draw_dpram[1024]{};
 	std::unique_ptr<uint16_t[]> m_frame_buffers[2];
 	std::unique_ptr<uint16_t[]> m_tmp_buffer;
-	int                 m_drawing_buffer = 0;
-	int                 m_display_buffer = 0;
+	uint8_t             m_drawing_buffer = 0;
+	uint8_t             m_display_buffer = 0;
 
 	void vgb_uart_w(offs_t offset, uint8_t data);
 	uint8_t vgb_uart_r(offs_t offset);
-	void micro3d_mac1_w(uint32_t data);
-	uint32_t micro3d_mac2_r();
-	void micro3d_mac2_w(uint32_t data);
-	uint16_t micro3d_encoder_h_r();
-	uint16_t micro3d_encoder_l_r();
+	void mac1_w(uint32_t data);
+	uint32_t mac2_r();
+	void mac2_w(uint32_t data);
+	uint16_t encoder_h_r();
+	uint16_t encoder_l_r();
 	uint8_t adc_volume_r();
 	uint16_t botss_140000_r();
 	uint16_t botss_180000_r();
-	void micro3d_reset_w(uint16_t data);
+	void reset_w(uint16_t data);
 	void host_drmath_int_w(uint16_t data);
-	void micro3d_shared_w(offs_t offset, uint32_t data);
-	uint32_t micro3d_shared_r(offs_t offset);
+	void shared_w(offs_t offset, uint32_t data);
+	uint32_t shared_r(offs_t offset);
 	void drmath_int_w(uint32_t data);
 	void drmath_intr2_ack(uint32_t data);
-	void micro3d_creg_w(uint16_t data);
-	void micro3d_xfer3dk_w(uint16_t data);
-	void micro3d_fifo_w(uint32_t data);
-	void micro3d_alt_fifo_w(uint32_t data);
-	uint32_t micro3d_pipe_r();
-	void micro3d_snd_dac_a(uint8_t data);
-	void micro3d_snd_dac_b(uint8_t data);
-	void micro3d_sound_p1_w(uint8_t data);
-	void micro3d_sound_p3_w(uint8_t data);
-	uint8_t micro3d_sound_p1_r();
-	uint8_t micro3d_sound_p3_r();
-	INTERRUPT_GEN_MEMBER(micro3d_vblank);
+	void creg_w(uint16_t data);
+	void xfer3dk_w(uint16_t data);
+	void fifo_w(uint32_t data);
+	void alt_fifo_w(uint32_t data);
+	uint32_t pipe_r();
+	void snd_dac_a(uint8_t data);
+	void snd_dac_b(uint8_t data);
+	void sound_p1_w(uint8_t data);
+	void sound_p3_w(uint8_t data);
+	uint8_t sound_p1_r();
+	uint8_t sound_p3_r();
+	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
-	void micro3d_upd7759_w(uint8_t data);
+	void upd7759_w(uint8_t data);
 	void duart_irq_handler(int state);
 	uint8_t duart_input_r();
 	void duart_output_w(uint8_t data);
@@ -186,7 +184,7 @@ private:
 	void tms_interrupt(int state);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
-	/* 3D graphics */
+	// 3D graphics
 	int inside(micro3d_vtx *v, enum planes plane);
 	micro3d_vtx intersect(micro3d_vtx *v1, micro3d_vtx *v2, enum planes plane);
 	inline void write_span(uint32_t y, uint32_t x);

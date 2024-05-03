@@ -16,6 +16,8 @@
 
 #include "cpu/am29000/am29000.h"
 
+#include <algorithm>
+
 
 /*************************************
  *
@@ -41,10 +43,36 @@ enum
 
 void micro3d_state::video_start()
 {
-	/* Allocate 512x12 x 2 3D frame buffers */
-	m_frame_buffers[0] = std::make_unique<uint16_t[]>(1024 * 512);
-	m_frame_buffers[1] = std::make_unique<uint16_t[]>(1024 * 512);
+	// Allocate 512x12 x 2 3D frame buffers
+	for (int i = 0; i < 2; i++)
+	{
+		m_frame_buffers[i] = std::make_unique<uint16_t[]>(1024 * 512);
+		save_pointer(NAME(m_frame_buffers[i]), 1024 * 512, i);
+	}
+
 	m_tmp_buffer = std::make_unique<uint16_t[]>(1024 * 512);
+	save_pointer(NAME(m_tmp_buffer), 1024 * 512);
+
+	save_item(NAME(m_creg));
+	save_item(NAME(m_xfer3dk));
+	save_item(NAME(m_pipe_data));
+	save_item(NAME(m_pipeline_state));
+	save_item(NAME(m_vtx_fifo));
+	save_item(NAME(m_fifo_idx));
+	save_item(NAME(m_draw_cmd));
+	save_item(NAME(m_draw_state));
+	save_item(NAME(m_x_min));
+	save_item(NAME(m_x_max));
+	save_item(NAME(m_y_min));
+	save_item(NAME(m_y_max));
+	save_item(NAME(m_z_min));
+	save_item(NAME(m_z_max));
+	save_item(NAME(m_x_mid));
+	save_item(NAME(m_y_mid));
+	save_item(NAME(m_dpram_bank));
+	save_item(NAME(m_draw_dpram));
+	save_item(NAME(m_drawing_buffer));
+	save_item(NAME(m_display_buffer));
 }
 
 
@@ -69,14 +97,14 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 	uint16_t const *const src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	uint16_t *dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr;
-	int sd_11_7 = (m_creg & 0x1f) << 7;
+	int const sd_11_7 = (m_creg & 0x1f) << 7;
 
 	scanline = std::max((scanline - params->veblnk), 0);
 	uint16_t const *frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
 
-	/* TODO: XFER3DK - X/Y offsets for 3D */
+	// TODO: XFER3DK - X/Y offsets for 3D
 
-	/* Copy the non-blanked portions of this scanline */
+	// Copy the non-blanked portions of this scanline
 	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t pix = src[coladdr++ & 0x1ff];
@@ -102,7 +130,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 	}
 }
 
-void micro3d_state::micro3d_creg_w(uint16_t data)
+void micro3d_state::creg_w(uint16_t data)
 {
 	if (~data & 0x80)
 		m_vgb->set_input_line(0, CLEAR_LINE);
@@ -110,7 +138,7 @@ void micro3d_state::micro3d_creg_w(uint16_t data)
 	m_creg = data;
 }
 
-void micro3d_state::micro3d_xfer3dk_w(uint16_t data)
+void micro3d_state::xfer3dk_w(uint16_t data)
 {
 	m_xfer3dk = data;
 }
@@ -234,31 +262,30 @@ micro3d_state::micro3d_vtx micro3d_state::intersect(micro3d_vtx *v1, micro3d_vtx
 
 inline void micro3d_state::write_span(uint32_t y, uint32_t x)
 {
-	uint32_t *draw_dpram = m_draw_dpram;
-	int addr = y << 1;
+	int const addr = y << 1;
 
-	if (draw_dpram[addr] == 0x3ff000)
+	if (m_draw_dpram[addr] == 0x3ff000)
 	{
-		draw_dpram[addr] = (x << 12) | x;
+		m_draw_dpram[addr] = (x << 12) | x;
 	}
 	else
 	{
-		/* Check start */
+		// Check start
 		if (x < (m_draw_dpram[addr] & 0x3ff))
 		{
-			draw_dpram[addr] &= ~0x3ff;
-			draw_dpram[addr] |= x;
+			m_draw_dpram[addr] &= ~0x3ff;
+			m_draw_dpram[addr] |= x;
 		}
-		/* Check end */
-		if (x > (draw_dpram[addr] >> 12))
+		// Check end
+		if (x > (m_draw_dpram[addr] >> 12))
 		{
-			draw_dpram[addr] &= ~0x3ff000;
-			draw_dpram[addr] |= (x << 12);
+			m_draw_dpram[addr] &= ~0x3ff000;
+			m_draw_dpram[addr] |= (x << 12);
 		}
 	}
 }
 
-/* This is the same algorithm used in the 3D tests */
+// This is the same algorithm used in the 3D tests
 void micro3d_state::draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2)
 {
 	uint32_t tmp2;
@@ -270,15 +297,8 @@ void micro3d_state::draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2
 
 	if (x2 < x1)
 	{
-		uint32_t tmp;
-
-		tmp = x1;
-		x1 = x2;
-		x2 = tmp;
-
-		tmp = y1;
-		y1 = y2;
-		y2 = tmp;
+		std::swap<uint32_t>(x1, x2);
+		std::swap<uint32_t>(y1, y2);
 	}
 
 	dx = x2 - x1;
@@ -364,16 +384,14 @@ void micro3d_state::draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2
 
 void micro3d_state::rasterise_spans(uint32_t min_y, uint32_t max_y, uint32_t attr)
 {
-	int y;
-	int color = attr & 0xfff;
+	int const color = attr & 0xfff;
 
 	if ((attr >> 24) == 0x85)
 	{
-		for (y = min_y; y <= max_y; ++y)
+		for (int y = min_y; y <= max_y; ++y)
 		{
-			int x;
-			int addr = y << 1;
-			uint16_t *dest = &m_tmp_buffer[y * 1024];
+			int const addr = y << 1;
+			uint16_t *const dest = &m_tmp_buffer[y * 1024];
 
 			if (m_draw_dpram[addr] == 0x3ff000)
 			{
@@ -381,10 +399,10 @@ void micro3d_state::rasterise_spans(uint32_t min_y, uint32_t max_y, uint32_t att
 			}
 			else
 			{
-				int start = m_draw_dpram[addr] & 0x3ff;
-				int end = (m_draw_dpram[addr] >> 12) & 0x3ff;
+				int const start = m_draw_dpram[addr] & 0x3ff;
+				int const end = (m_draw_dpram[addr] >> 12) & 0x3ff;
 
-				for (x = start; x <= end; ++x)
+				for (int x = start; x <= end; ++x)
 					dest[x] = color;
 			}
 		}
@@ -410,11 +428,10 @@ void micro3d_state::rasterise_spans(uint32_t min_y, uint32_t max_y, uint32_t att
 		int noise_val = (attr >> 12) & 0x3ff;
 		int noise_taps = 0;
 
-		for (y = min_y; y <= max_y; ++y)
+		for (int y = min_y; y <= max_y; ++y)
 		{
-			int x;
-			int addr = y << 1;
-			uint16_t *dest = &m_tmp_buffer[y * 1024];
+			int const addr = y << 1;
+			uint16_t *const dest = &m_tmp_buffer[y * 1024];
 
 			if (m_draw_dpram[addr] == 0x3ff000)
 			{
@@ -422,10 +439,10 @@ void micro3d_state::rasterise_spans(uint32_t min_y, uint32_t max_y, uint32_t att
 			}
 			else
 			{
-				int start = m_draw_dpram[addr] & 0x3ff;
-				int end = (m_draw_dpram[addr] >> 12) & 0x3ff;
+				int const start = m_draw_dpram[addr] & 0x3ff;
+				int const end = (m_draw_dpram[addr] >> 12) & 0x3ff;
 
-				for (x = start; x <= end; ++x)
+				for (int x = start; x <= end; ++x)
 				{
 					int fb;
 
@@ -444,27 +461,26 @@ int micro3d_state::clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vert
 {
 	micro3d_vtx clip_out[10];
 
-	int i;
 	int prev_i = num_vertices - 1;
 	int clip_verts = 0;
 
-	for (i = 0; i < num_vertices; ++i)
+	for (int i = 0; i < num_vertices; ++i)
 	{
 		int v1_in = inside(&v[i], plane);
 		int v2_in = inside(&v[prev_i], plane);
 
-		/* Edge is inside */
+		// Edge is inside
 		if (v1_in && v2_in)
 		{
 			clip_out[clip_verts++] = v[i];
 		}
-		/* Edge is leaving */
+		// Edge is leaving
 		else if (v1_in && !v2_in)
 		{
 			clip_out[clip_verts++] = intersect(&v[i], &v[prev_i], plane);
 			clip_out[clip_verts++] = v[i];
 		}
-		/* Edge is entering */
+		// Edge is entering
 		else if (!v1_in && v2_in)
 		{
 			clip_out[clip_verts++] = intersect(&v[i], &v[prev_i], plane);
@@ -479,13 +495,12 @@ int micro3d_state::clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vert
 
 void micro3d_state::draw_triangles(uint32_t attr)
 {
-	int i;
 	bool triangles = false;
-	int vertices = m_fifo_idx / 3;
+	int const vertices = m_fifo_idx / 3;
 	int min_y = 0x3ff;
 	int max_y = 0;
 
-	/* This satisifes the burst write test */
+	// This satisifes the burst write test
 	if (vertices == 0)
 	{
 		int y;
@@ -497,10 +512,9 @@ void micro3d_state::draw_triangles(uint32_t attr)
 		return;
 	}
 
-	/* Draw triangles as fans */
-	for (i = 2; i < vertices; ++i)
+	// Draw triangles as fans
+	for (int i = 2; i < vertices; ++i)
 	{
-		int k;
 		int clip_vertices = 3;
 
 		micro3d_vtx vo, vm, vn;
@@ -522,25 +536,25 @@ void micro3d_state::draw_triangles(uint32_t attr)
 		vclip_list[1] = vm;
 		vclip_list[2] = vn;
 
-		/* Clip against near Z and far Z planes */
+		// Clip against near Z and far Z planes
 		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Z_MIN);
 		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Z_MAX);
 
-		/* Perform perspective divide */
-		for (k = 0; k < clip_vertices; ++k)
+		// Perform perspective divide
+		for (int k = 0; k < clip_vertices; ++k)
 		{
 			vclip_list[k].x = vclip_list[k].x * m_z_min / vclip_list[k].z;
 			vclip_list[k].y = vclip_list[k].y * m_z_min / vclip_list[k].z;
 			vclip_list[k].z = 0;
 		}
 
-		/* Perform screen-space clipping */
+		// Perform screen-space clipping
 		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Y_MAX);
 		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_X_MIN);
 		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_X_MAX);
 		clip_vertices = clip_triangle(vclip_list, vclip_list, clip_vertices, CLIP_Y_MIN);
 
-		/* Rasterise */
+		// Rasterise
 		if (clip_vertices >= 3)
 		{
 			micro3d_vtx a = vclip_list[0];
@@ -554,7 +568,7 @@ void micro3d_state::draw_triangles(uint32_t attr)
 			b.x += m_x_mid;
 			b.y += m_y_mid;
 
-			/* Keep track of the y-extents so we don't have to scan every line later */
+			// Keep track of the y-extents so we don't have to scan every line later
 			if (a.y < min_y)
 				min_y = a.y;
 			if (a.y > max_y)
@@ -565,10 +579,10 @@ void micro3d_state::draw_triangles(uint32_t attr)
 			if (b.y > max_y)
 				max_y = b.y;
 
-			/* Draw the first line of the triangle/fan */
+			// Draw the first line of the triangle/fan
 			draw_line(a.x, a.y, b.x, b.y);
 
-			for (k = 2; k < clip_vertices; ++k)
+			for (int k = 2; k < clip_vertices; ++k)
 			{
 				micro3d_vtx c = vclip_list[k];
 
@@ -617,9 +631,9 @@ bc000000-1fc DPRAM address for read access
 
 ******************************************************************************/
 
-void micro3d_state::micro3d_fifo_w(uint32_t data)
+void micro3d_state::fifo_w(uint32_t data)
 {
-	uint32_t opcode = data >> 24;
+	uint32_t const opcode = data >> 24;
 
 	switch (m_draw_state)
 	{
@@ -642,14 +656,13 @@ void micro3d_state::micro3d_fifo_w(uint32_t data)
 				}
 				case 0xbc:
 				{
-					uint32_t dpram_r_addr = (((data & 0x01ff) << 1) | m_dpram_bank);
+					uint32_t const dpram_r_addr = (((data & 0x01ff) << 1) | m_dpram_bank);
 					m_pipe_data = m_draw_dpram[dpram_r_addr];
 					m_drmath->set_input_line(AM29000_INTR1, ASSERT_LINE);
 					break;
 				}
 				case 0x80:
 				{
-					int addr;
 					m_fifo_idx = 0;
 					m_draw_state = STATE_DRAW_VTX_DATA;
 
@@ -657,19 +670,19 @@ void micro3d_state::micro3d_fifo_w(uint32_t data)
 					 * TODO: Not sure this is the right place for it -
 					 * causes monitor mode draw tests to fail
 					 */
-					for (addr = 0; addr < 512; ++addr)
+					for (int addr = 0; addr < 512; ++addr)
 						m_draw_dpram[addr << 1] = 0x3ff000;
 
 					break;
 				}
 				case 0xf8:
 				{
-					/* 3D pipeline health LEDs toggle */
+					// 3D pipeline health LEDs toggle
 					break;
 				}
 				case 0xd8:
 				{
-					/* TODO: We shouldn't need this extra buffer - is there some sort of sync missing? */
+					// TODO: We shouldn't need this extra buffer - is there some sort of sync missing?
 					memcpy(m_frame_buffers[m_drawing_buffer].get(), m_tmp_buffer.get(), 512*1024*2);
 					m_drawing_buffer ^= 1;
 					m_vgb->set_input_line(0, ASSERT_LINE);
@@ -717,18 +730,19 @@ void micro3d_state::micro3d_fifo_w(uint32_t data)
 	}
 }
 
-void micro3d_state::micro3d_alt_fifo_w(uint32_t data)
+void micro3d_state::alt_fifo_w(uint32_t data)
 {
 	m_vtx_fifo[m_fifo_idx++] = VTX_SEX(data);
 }
 
-uint32_t micro3d_state::micro3d_pipe_r()
+uint32_t micro3d_state::pipe_r()
 {
-	m_drmath->set_input_line(AM29000_INTR1, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_drmath->set_input_line(AM29000_INTR1, CLEAR_LINE);
 	return m_pipe_data;
 }
 
-INTERRUPT_GEN_MEMBER(micro3d_state::micro3d_vblank)
+INTERRUPT_GEN_MEMBER(micro3d_state::vblank)
 {
 //  mc68901_int_gen(machine(), GPIP7);
 
