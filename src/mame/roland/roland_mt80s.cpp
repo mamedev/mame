@@ -62,4 +62,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, mt80s,    0, 0, mt80s,    mt80s, roland_mt80s_state, empty_init, "Roland", "MT-80S Music Player", MACHINE_IS_SKELETON)
+SYST(1995, mt80s,    0, 0, mt80s,    mt80s, roland_mt80s_state, empty_init, "Roland", "MT 80s Music Player", MACHINE_IS_SKELETON)
