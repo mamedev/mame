@@ -35,7 +35,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/ldp1450hle.h"
-#include "machine/mos6551.h"
+#include "machine/r65c52.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
@@ -68,8 +68,7 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_sn(*this, "snsnd")
 		, m_ld(*this, "laserdisc")
-		, m_acia1(*this, "acia_1")
-		, m_acia2(*this, "acia_2")
+		, m_dacia(*this, "dacia")
 		// , m_watchdog(*this, "watchdog")
 		, m_switches(*this, "SW%u", 0U)
 		, m_steer(*this, "STEER")
@@ -110,7 +109,7 @@ private:
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<sn76489_device> m_sn;
 	required_device<sony_ldp1450hle_device> m_ld;
-   	required_device<mos6551_device> m_acia1, m_acia2;
+   	required_device<r65c52_device> m_dacia;
     // required_device<watchdog_timer_device> m_watchdog;
 	required_ioport_array<3> m_switches;
 	optional_ioport m_steer;
@@ -197,19 +196,19 @@ uint8_t cops_state::cdrom_data_r()
 
 /*************************************
  *
- * 6552 DACIA (cheated as 2 6551s)
+ * 6552 DACIA - IRQs are inverted
  *
  *************************************/
 
 void cops_state::acia1_irq(int state)
 {
-	m_acia1_irq=state;
+	m_acia1_irq=!state;
 	dacia_irq();
 }
 
 void cops_state::acia2_irq(int state)
 {
-	m_acia2_irq=state;
+	m_acia2_irq=!state;
 	dacia_irq();
 }
 
@@ -217,7 +216,6 @@ void cops_state::dacia_irq()
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_acia1_irq | m_acia2_irq? ASSERT_LINE:CLEAR_LINE);
 }
-
 
 /*************************************
  *
@@ -458,17 +456,10 @@ void cops_state::via1_irq(int state)
 void cops_state::via1_a_w(uint8_t data)
 {
 
-//	logerror("via1_w, data = %02x\n", data);
+	logerror("via1_w, data = %02x\n", data);
 
 // D7 seems to set line A13 on the System Rom, which will effectively add to the perceived address
-	if (data & 0x80)
-	{
-		membank("sysbank1")->set_entry(3);
-	}
-	else
-	{
-		membank("sysbank1")->set_entry(2);
-	}
+
 }
 
 void cops_state::via1_b_w(uint8_t data)
@@ -522,8 +513,7 @@ void cops_state::cops_map(address_map &map)
 	map(0xb000, 0xb00f).m("via6522_1", FUNC(via6522_device::map));  /* VIA 1 */
 	map(0xb800, 0xb80f).m("via6522_2", FUNC(via6522_device::map));  /* VIA 2 */
 	map(0xc000, 0xcfff).rw(FUNC(cops_state::io2_r), FUNC(cops_state::io2_w));
-	map(0xd000, 0xd003).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write)); /* DACIA */
-	map(0xd004, 0xd007).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write)); /* DACIA */
+	map(0xd000, 0xd007).rw(m_dacia, FUNC(r65c52_device::read), FUNC(r65c52_device::write)); /* DACIA */
 	map(0xd800, 0xd80f).m("via6522_3", FUNC(via6522_device::map));  /* VIA 3 */
 	map(0xe000, 0xffff).bankr("sysbank1");
 }
@@ -535,8 +525,7 @@ void cops_state::revlatns_map(address_map &map)
 	map(0xa000, 0xafff).rw(FUNC(cops_state::io1_r), FUNC(cops_state::io1_w));
 	map(0xb000, 0xb00f).m("via6522_1", FUNC(via6522_device::map));  /* VIA 1 */
 	map(0xc000, 0xc00f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xd000, 0xd003).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write)); /* DACIA */
-	map(0xd004, 0xd007).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write)); /* DACIA */
+	map(0xd000, 0xd007).rw(m_dacia, FUNC(r65c52_device::read), FUNC(r65c52_device::write)); /* DACIA */
 	map(0xe000, 0xffff).bankr("sysbank1");
 }
 
@@ -641,7 +630,7 @@ void cops_state::base(machine_config &config)
 	m_ld->add_route(1, "mono", 0.50);
 	m_ld->set_baud(9600);
 	m_ld->add_ntsc_screen(config, "screen");
-	m_ld->serial_tx().set(m_acia2, FUNC(mos6551_device::write_rxd));
+	m_ld->serial_tx().set("dacia", FUNC(r65c52_device::write_rxd1));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -654,15 +643,10 @@ void cops_state::base(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	/* acia (really a 65C52 dacia, but we're splitting for now)*/
-
-	MOS6551(config, m_acia1, DACIA_CLOCK);
-	m_acia1->txd_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
-	m_acia1->irq_handler().set(FUNC(cops_state::acia1_irq));
-
-	MOS6551(config, m_acia2, DACIA_CLOCK);
-	//rxd for status
-	m_acia2->irq_handler().set(FUNC(cops_state::acia2_irq));
+	R65C52(config, m_dacia, DACIA_CLOCK);
+	m_dacia->txd1_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
+	m_dacia->irq1_handler().set(FUNC(cops_state::acia1_irq));
+	m_dacia->irq2_handler().set(FUNC(cops_state::acia2_irq));
 
 	SN76489(config, m_sn, MAIN_CLOCK/2);
 	m_sn->add_route(ALL_OUTPUTS, "mono", 0.50);

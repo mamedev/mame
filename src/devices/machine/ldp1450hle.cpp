@@ -128,11 +128,6 @@ uint32_t sony_ldp1450hle_device::bcd_to_literal(uint32_t bcd)
 	return value;
 }
 
-void sony_ldp1450hle_device::dsr_w(int state)
-{
-	m_dsr = state;
-}
-
 //-------------------------------------------------
 //  process_command - processes a single command
 //  from the command buffer
@@ -140,489 +135,483 @@ void sony_ldp1450hle_device::dsr_w(int state)
 
 void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 {
-	if (!m_dsr)
+	switch (m_submode)
 	{
-		queue_reply(0x0b, 4.3);
-	}
-	else
-	{
-		switch (m_submode)
+		case SUBMODE_USER_INDEX:
 		{
-			case SUBMODE_USER_INDEX:
+			switch (command)
 			{
-				switch (command)
+				case 0x00:
 				{
-					case 0x00:
-					{
-						m_submode = SUBMODE_USER_INDEX_MODE_1;
-						queue_reply(0x0a, 4.3);
-						break;
-					}
-					case 0x01:
-					{
-						m_submode = SUBMODE_USER_INDEX_STRING_1;
-						queue_reply(0x0a, 4.3);
-						break;
-					}
-					case 0x02:
-					{
-						m_submode = SUBMODE_USER_INDEX_WINDOW;
-						queue_reply(0x0a, 4.3);
-						break;
-					}
+					m_submode = SUBMODE_USER_INDEX_MODE_1;
+					queue_reply(0x0a, 4.3);
+					break;
 				}
-				break;
-			}
-			case SUBMODE_USER_INDEX_MODE_1:
-			{
-				m_user_index_x = (command & 0x3f);
-				m_submode = SUBMODE_USER_INDEX_MODE_2;
-				queue_reply(0x0a, 4.3);
-				break;
-			}
-			case SUBMODE_USER_INDEX_MODE_2:
-			{
-				m_user_index_y = (command & 0x3f);
-				m_submode = SUBMODE_USER_INDEX_MODE_3;
-				queue_reply(0x0a, 4.3);
-				break;
-			}
-			case SUBMODE_USER_INDEX_MODE_3:
-			{
-				m_user_index_mode = command;
-				m_submode = SUBMODE_NORMAL;
-				queue_reply(0x0a, 4.3);
-				break;
-			}
-			case SUBMODE_USER_INDEX_STRING_1:
-			{
-				m_user_index_char_idx = (command & 0x1f);
-				m_submode = SUBMODE_USER_INDEX_STRING_2;
-				queue_reply(0x0a, 4.3);
-				break;
-			}
-			case SUBMODE_USER_INDEX_STRING_2:
-			{
-				m_user_index_chars[m_user_index_char_idx] = (char)(command & 0x5f);
-				if (command == 0x1a)
+				case 0x01:
 				{
-					m_submode = SUBMODE_NORMAL;
+					m_submode = SUBMODE_USER_INDEX_STRING_1;
+					queue_reply(0x0a, 4.3);
+					break;
+				}
+				case 0x02:
+				{
+					m_submode = SUBMODE_USER_INDEX_WINDOW;
+					queue_reply(0x0a, 4.3);
+					break;
+				}
+			}
+			break;
+		}
+		case SUBMODE_USER_INDEX_MODE_1:
+		{
+			m_user_index_x = (command & 0x3f);
+			m_submode = SUBMODE_USER_INDEX_MODE_2;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_MODE_2:
+		{
+			m_user_index_y = (command & 0x3f);
+			m_submode = SUBMODE_USER_INDEX_MODE_3;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_MODE_3:
+		{
+			m_user_index_mode = command;
+			m_submode = SUBMODE_NORMAL;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_STRING_1:
+		{
+			m_user_index_char_idx = (command & 0x1f);
+			m_submode = SUBMODE_USER_INDEX_STRING_2;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_STRING_2:
+		{
+			m_user_index_chars[m_user_index_char_idx] = (char)(command & 0x5f);
+			if (command == 0x1a)
+			{
+				m_submode = SUBMODE_NORMAL;
+			}
+			else
+			{
+				m_user_index_char_idx++;
+				if (m_user_index_char_idx > 32)
+				{
+					m_user_index_char_idx = 0;
+				}
+			}
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_WINDOW:
+		{
+			m_user_index_window_idx = (command & 0x1f);
+			m_submode = SUBMODE_NORMAL;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+
+		default:
+		{
+			if (command >= 0x30 && command <=0x39)
+			{
+				if (m_mode == MODE_SEARCH_CMD || m_mode == MODE_REPEAT_CMD_MARK || m_mode == MODE_REPEAT_CMD_REPS || m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE  )
+				{
+					//Reset flags
+					if (m_cmd_buffer == -2)
+					{
+						m_cmd_buffer = 0;
+					}
+
+					if (m_cmd_buffer != 0)
+					{
+						m_cmd_buffer *= 10;
+					}
+					m_cmd_buffer += (command - 0x30);
+					queue_reply(0x0a, 4.3);
 				}
 				else
 				{
-					m_user_index_char_idx++;
-					if (m_user_index_char_idx > 32)
-					{
-						m_user_index_char_idx = 0;
-					}
+						queue_reply(0x0b, 4.3);
 				}
-				queue_reply(0x0a, 4.3);
-				break;
 			}
-			case SUBMODE_USER_INDEX_WINDOW:
+			else {
+			switch (command)
 			{
-				m_user_index_window_idx = (command & 0x1f);
-				m_submode = SUBMODE_NORMAL;
-				queue_reply(0x0a, 4.3);
-				break;
-			}
-
-			default:
-			{
-				if (command >= 0x30 && command <=0x39)
+				case CMD_ENTER:
 				{
-					if (m_mode == MODE_SEARCH_CMD || m_mode == MODE_REPEAT_CMD_MARK || m_mode == MODE_REPEAT_CMD_REPS || m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE  )
+					if (m_mode == MODE_SEARCH_CMD)
 					{
-						//Reset flags
-						if (m_cmd_buffer == -2)
-						{
-							m_cmd_buffer = 0;
-						}
-
-						if (m_cmd_buffer != 0)
-						{
-							m_cmd_buffer *= 10;
-						}
-						m_cmd_buffer += (command - 0x30);
-						queue_reply(0x0a, 4.3);
+						begin_search(m_cmd_buffer);
+						m_mode = MODE_SEARCH;
 					}
-					else
+					else if (m_mode == MODE_REPEAT_CMD_MARK)
 					{
-							queue_reply(0x0b, 4.3);
-					}
-				}
-				else {
-				switch (command)
-				{
-					case CMD_ENTER:
-					{
-						if (m_mode == MODE_SEARCH_CMD)
-						{
-							begin_search(m_cmd_buffer);
-							m_mode = MODE_SEARCH;
-						}
-						else if (m_mode == MODE_REPEAT_CMD_MARK)
-						{
-							if (m_address_flag == ADDRESS_FRAME)
-							{
-								m_repeat_frame_end = m_cmd_buffer;
-							}
-							else if (m_address_flag == ADDRESS_CHAPTER)
-							{
-								m_repeat_chapter_end = m_cmd_buffer;
-							}
-							m_mode = MODE_REPEAT_CMD_REPS;
-							m_cmd_buffer = -2;
-						}
-						else if (m_mode == MODE_REPEAT_CMD_REPS)
-						{
-							// if no number, presume 1
-							if (m_cmd_buffer == -2)
-							{
-								m_cmd_buffer = 1;
-							}
-							else if (m_cmd_buffer == 0)
-							{
-								m_cmd_buffer = -1; // infinite
-							}
-							m_repeat_repetitions = m_cmd_buffer;
-							m_mode = MODE_PLAY;
-							m_cmd_buffer = 0;
-							update_video_enable();
-							update_audio_squelch();
-						}
-						else if (m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE)
-						{
-							m_speed = m_base_speed / m_cmd_buffer;
-							update_video_enable();
-							update_audio_squelch();
-						}
-						queue_reply(0x0a, 1.3);
-						break;
-					}
-					case CMD_STEP_STILL:
-					{
-						m_mode = MODE_STILL;
-						set_audio_squelch(true, true);
-						m_mark_frame = ~uint32_t(0);
-						advance_slider(1);
-						queue_reply(0x0a, 1.4);
-						break;
-					}
-					case CMD_STEP_STILL_REVERSE:
-					{
-						m_mode = MODE_STILL;
-						set_audio_squelch(true, true);
-						m_mark_frame = ~uint32_t(0);
-						advance_slider(-1);
-						queue_reply(0x0a, 1.4);
-						break;
-					}
-					case CMD_STOP:
-					{
-						m_mode = MODE_PARK;
-						set_audio_squelch(true, true);
-						set_video_squelch(true);
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_PLAY:
-					{
-						m_speed_accum = 0;
-						m_speed = m_base_speed;
-						m_mode = MODE_PLAY;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_FAST_FORWARD:
-					{
-						m_speed_accum = 0;
-						m_speed = m_base_speed * 3;
-						m_mode = MODE_MS_FORWARD;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_SLOW_FORWARD:
-					{
-						m_speed_accum = 0;
-						m_speed = m_base_speed / 5;
-						m_mode = MODE_MS_FORWARD;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_STEP_FORWARD:
-					{
-						// Most ROM revisions start at a slow speed, and then update to correct one
-						m_speed = m_base_speed / 7;
-						m_mode = MODE_MS_FORWARD;
-						set_audio_squelch(true, true);
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_SCAN_FORWARD:
-					{
-						m_speed_accum = 0;
-						m_speed = m_base_speed * 100;
-						m_mode = MODE_MS_FORWARD;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_PLAY_REVERSE:
-					{
-						m_speed_accum = 0;
-						m_speed = m_base_speed;
-						m_mode = MODE_MS_REVERSE;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_FAST_REVERSE:
-					{
-						m_speed_accum = 0;
-						m_speed = m_base_speed * 3;
-						m_mode = MODE_MS_REVERSE;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_SLOW_REVERSE:
-					{
-						m_speed_accum = 0;
-						m_speed = m_base_speed / 5;
-						m_mode = MODE_MS_REVERSE;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_STEP_REVERSE:
-					{
-						m_speed = m_base_speed / 7;
-						m_mode = MODE_MS_REVERSE;
-						set_audio_squelch(true, true);
-						m_mark_frame = 0;
-						advance_slider(-1);
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_SCAN_REVERSE:
-					{
-						m_speed = m_base_speed / 7;
-						m_mode = MODE_MS_REVERSE;
-						update_audio_squelch();
-						update_video_enable();
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_STILL:
-					{
-						m_mode = MODE_STILL;
-						set_audio_squelch(true, true);
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_SEARCH:
-					{
-						m_mode = MODE_SEARCH_CMD;
-						m_cmd_buffer = 0;
-						m_repeat_frame_start = 0;
-						m_repeat_frame_end = 0;
-						m_repeat_chapter_start = 0;
-						m_repeat_chapter_end = 0;
-						m_repeat_repetitions = 0;
-						m_search_frame = ~uint32_t(0);
-						update_audio_squelch();
-						queue_reply(0x0a, 9.0);
-						break;
-					}
-					case CMD_REPEAT:
-					{
-						m_mode = MODE_REPEAT_CMD_MARK;
-						m_cmd_buffer = 0;
 						if (m_address_flag == ADDRESS_FRAME)
 						{
-							m_repeat_frame_start = m_curr_frame;
+							m_repeat_frame_end = m_cmd_buffer;
 						}
 						else if (m_address_flag == ADDRESS_CHAPTER)
 						{
-							m_repeat_chapter_start = m_chapter;
+							m_repeat_chapter_end = m_cmd_buffer;
 						}
-						m_repeat_frame_end = 0;
-						m_repeat_chapter_end = 0;
-						m_repeat_repetitions = 0;
-						update_video_enable();
-						update_audio_squelch();
-						queue_reply(0x0a, 8.0);
-						break;
+						m_mode = MODE_REPEAT_CMD_REPS;
+						m_cmd_buffer = -2;
 					}
-					case CMD_FRAME_SET:
+					else if (m_mode == MODE_REPEAT_CMD_REPS)
 					{
-						m_address_flag = ADDRESS_FRAME;
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_CHAPTER_SET:
-					{
-						m_address_flag = ADDRESS_CHAPTER;
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_CLEAR:
-					{
+						// if no number, presume 1
+						if (m_cmd_buffer == -2)
+						{
+							m_cmd_buffer = 1;
+						}
+						else if (m_cmd_buffer == 0)
+						{
+							m_cmd_buffer = -1; // infinite
+						}
+						m_repeat_repetitions = m_cmd_buffer;
+						m_mode = MODE_PLAY;
 						m_cmd_buffer = 0;
-						queue_reply(0x0a, 8.0);
-						break;
-					}
-					case CMD_CLEAR_ALL:
-					{
-						m_cmd_buffer = 0;
-						m_search_frame = 0;
-						m_search_chapter = 0;
-						m_repeat_chapter_start = 0;
-						m_repeat_frame_start = 0;
-						m_repeat_chapter_end = 0;
-						m_repeat_frame_end = 0;
-						m_repeat_repetitions = 0;
-						m_speed = m_base_speed;
-						m_mode = MODE_STILL;
-						queue_reply(0x0a, 5.5);
-						break;
-					}
-					case CMD_CH1_ON:
-					{
-						m_ch1_switch=true;
-						update_audio_squelch();
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_CH1_OFF:
-					{
-						m_ch1_switch=false;
-						update_audio_squelch();
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_CH2_ON:
-					{
-						m_ch2_switch=true;
-						update_audio_squelch();
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_CH2_OFF:
-					{
-						m_ch2_switch=false;
-						update_audio_squelch();
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_AUDIO_ON:
-					{
-						m_ch1_switch=true;
-						m_ch2_switch=true;
-						update_audio_squelch();
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_AUDIO_OFF:
-					{
-						m_ch1_switch=false;
-						m_ch2_switch=false;
-						update_audio_squelch();
-						queue_reply(0x0a, 0.4);
-						break;
-					}
-					case CMD_VIDEO_ON:
-					{
-						m_video_switch = 1;
 						update_video_enable();
-						queue_reply(0x0a, 0.4);
-						break;
+						update_audio_squelch();
 					}
-					case CMD_VIDEO_OFF:
+					else if (m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE)
 					{
-						m_video_switch = 0;
+						m_speed = m_base_speed / m_cmd_buffer;
 						update_video_enable();
-						queue_reply(0x0a, 0.4);
-						break;
+						update_audio_squelch();
 					}
-					case CMD_INDEX_ON:
+					queue_reply(0x0a, 1.3);
+					break;
+				}
+				case CMD_STEP_STILL:
+				{
+					m_mode = MODE_STILL;
+					set_audio_squelch(true, true);
+					m_mark_frame = ~uint32_t(0);
+					advance_slider(1);
+					queue_reply(0x0a, 1.4);
+					break;
+				}
+				case CMD_STEP_STILL_REVERSE:
+				{
+					m_mode = MODE_STILL;
+					set_audio_squelch(true, true);
+					m_mark_frame = ~uint32_t(0);
+					advance_slider(-1);
+					queue_reply(0x0a, 1.4);
+					break;
+				}
+				case CMD_STOP:
+				{
+					m_mode = MODE_PARK;
+					set_audio_squelch(true, true);
+					set_video_squelch(true);
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_PLAY:
+				{
+					m_speed_accum = 0;
+					m_speed = m_base_speed;
+					m_mode = MODE_PLAY;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_FAST_FORWARD:
+				{
+					m_speed_accum = 0;
+					m_speed = m_base_speed * 3;
+					m_mode = MODE_MS_FORWARD;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_SLOW_FORWARD:
+				{
+					m_speed_accum = 0;
+					m_speed = m_base_speed / 5;
+					m_mode = MODE_MS_FORWARD;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_STEP_FORWARD:
+				{
+					// Most ROM revisions start at a slow speed, and then update to correct one
+					m_speed = m_base_speed / 7;
+					m_mode = MODE_MS_FORWARD;
+					set_audio_squelch(true, true);
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_SCAN_FORWARD:
+				{
+					m_speed_accum = 0;
+					m_speed = m_base_speed * 100;
+					m_mode = MODE_MS_FORWARD;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_PLAY_REVERSE:
+				{
+					m_speed_accum = 0;
+					m_speed = m_base_speed;
+					m_mode = MODE_MS_REVERSE;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_FAST_REVERSE:
+				{
+					m_speed_accum = 0;
+					m_speed = m_base_speed * 3;
+					m_mode = MODE_MS_REVERSE;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_SLOW_REVERSE:
+				{
+					m_speed_accum = 0;
+					m_speed = m_base_speed / 5;
+					m_mode = MODE_MS_REVERSE;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_STEP_REVERSE:
+				{
+					m_speed = m_base_speed / 7;
+					m_mode = MODE_MS_REVERSE;
+					set_audio_squelch(true, true);
+					m_mark_frame = 0;
+					advance_slider(-1);
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_SCAN_REVERSE:
+				{
+					m_speed = m_base_speed / 7;
+					m_mode = MODE_MS_REVERSE;
+					update_audio_squelch();
+					update_video_enable();
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_STILL:
+				{
+					m_mode = MODE_STILL;
+					set_audio_squelch(true, true);
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_SEARCH:
+				{
+					m_mode = MODE_SEARCH_CMD;
+					m_cmd_buffer = 0;
+					m_repeat_frame_start = 0;
+					m_repeat_frame_end = 0;
+					m_repeat_chapter_start = 0;
+					m_repeat_chapter_end = 0;
+					m_repeat_repetitions = 0;
+					m_search_frame = ~uint32_t(0);
+					update_audio_squelch();
+					queue_reply(0x0a, 9.0);
+					break;
+				}
+				case CMD_REPEAT:
+				{
+					m_mode = MODE_REPEAT_CMD_MARK;
+					m_cmd_buffer = 0;
+					if (m_address_flag == ADDRESS_FRAME)
 					{
-						m_display_switch = 1;
-						queue_reply(0x0a, 0.4);
-						break;
+						m_repeat_frame_start = m_curr_frame;
 					}
-					case CMD_INDEX_OFF:
+					else if (m_address_flag == ADDRESS_CHAPTER)
 					{
-						m_display_switch =0;
-						queue_reply(0x0a, 0.4);
-						break;
+						m_repeat_chapter_start = m_chapter;
 					}
-					case CMD_ADDR_INQ:
+					m_repeat_frame_end = 0;
+					m_repeat_chapter_end = 0;
+					m_repeat_repetitions = 0;
+					update_video_enable();
+					update_audio_squelch();
+					queue_reply(0x0a, 8.0);
+					break;
+				}
+				case CMD_FRAME_SET:
+				{
+					m_address_flag = ADDRESS_FRAME;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_CHAPTER_SET:
+				{
+					m_address_flag = ADDRESS_CHAPTER;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_CLEAR:
+				{
+					m_cmd_buffer = 0;
+					queue_reply(0x0a, 8.0);
+					break;
+				}
+				case CMD_CLEAR_ALL:
+				{
+					m_cmd_buffer = 0;
+					m_search_frame = 0;
+					m_search_chapter = 0;
+					m_repeat_chapter_start = 0;
+					m_repeat_frame_start = 0;
+					m_repeat_chapter_end = 0;
+					m_repeat_frame_end = 0;
+					m_repeat_repetitions = 0;
+					m_speed = m_base_speed;
+					m_mode = MODE_STILL;
+					queue_reply(0x0a, 5.5);
+					break;
+				}
+				case CMD_CH1_ON:
+				{
+					m_ch1_switch=true;
+					update_audio_squelch();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_CH1_OFF:
+				{
+					m_ch1_switch=false;
+					update_audio_squelch();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_CH2_ON:
+				{
+					m_ch2_switch=true;
+					update_audio_squelch();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_CH2_OFF:
+				{
+					m_ch2_switch=false;
+					update_audio_squelch();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_AUDIO_ON:
+				{
+					m_ch1_switch=true;
+					m_ch2_switch=true;
+					update_audio_squelch();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_AUDIO_OFF:
+				{
+					m_ch1_switch=false;
+					m_ch2_switch=false;
+					update_audio_squelch();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_VIDEO_ON:
+				{
+					m_video_switch = 1;
+					update_video_enable();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_VIDEO_OFF:
+				{
+					m_video_switch = 0;
+					update_video_enable();
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_INDEX_ON:
+				{
+					m_display_switch = 1;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_INDEX_OFF:
+				{
+					m_display_switch =0;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+				case CMD_ADDR_INQ:
+				{
+					uint8_t frame_buffer[5];
+					uint32_t frame_val = m_curr_frame;
+					for (uint8_t i = 0; i < 5; i++)
 					{
-						uint8_t frame_buffer[5];
-						uint32_t frame_val = m_curr_frame;
-						for (uint8_t i = 0; i < 5; i++)
-						{
-							frame_buffer[5 - i] = frame_val%10;
-							frame_val /= 10;
-						}
-						for (uint8_t i = 0; i < 5; i++)
-						{
-							queue_reply(frame_buffer[i], 1.3);
-						}
-						break;
+						frame_buffer[5 - i] = frame_val%10;
+						frame_val /= 10;
 					}
-					case CMD_STATUS_INQ:
+					for (uint8_t i = 0; i < 5; i++)
 					{
-						queue_reply(0x80, 1.3);
-						queue_reply(0x00, 1.3);
-						queue_reply(0x10, 1.3);
-						queue_reply(0x00, 1.3);
+						queue_reply(frame_buffer[i], 1.3);
+					}
+					break;
+				}
+				case CMD_STATUS_INQ:
+				{
+					queue_reply(0x80, 1.3);
+					queue_reply(0x00, 1.3);
+					queue_reply(0x10, 1.3);
+					queue_reply(0x00, 1.3);
 
-						if (m_mode == MODE_PLAY || m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE)
-						{
-							queue_reply(0x01, 1.3);
-						}
-						else if (m_mode == MODE_PAUSE || m_mode == MODE_STILL)
-						{
-							queue_reply(0x20, 1.3);
-						}
-						break;
-					}
-					case CMD_USER_INDEX_CTRL:
+					if (m_mode == MODE_PLAY || m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE)
 					{
-						m_submode = SUBMODE_USER_INDEX;
-						queue_reply(0x0a, 0.4);
-						break;
+						queue_reply(0x01, 1.3);
 					}
+					else if (m_mode == MODE_PAUSE || m_mode == MODE_STILL)
+					{
+						queue_reply(0x20, 1.3);
+					}
+					break;
+				}
+				case CMD_USER_INDEX_CTRL:
+				{
+					m_submode = SUBMODE_USER_INDEX;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
 
-					case CMD_USER_INDEX_ON:
-					{
-						popmessage("X %x Y %x M%x T%s (Start %x)", m_user_index_x, m_user_index_y, m_user_index_mode, m_user_index_chars,m_user_index_window_idx);
-						queue_reply(0x0a, 0.4);
-						break;
-					}
+				case CMD_USER_INDEX_ON:
+				{
+					popmessage("X %x Y %x M%x T%s (Start %x)", m_user_index_x, m_user_index_y, m_user_index_mode, m_user_index_chars,m_user_index_window_idx);
+					queue_reply(0x0a, 0.4);
+					break;
+				}
 
-					default:
-					{
-						popmessage("no implementation cmd %x", command);
-						break;
-					}
+				default:
+				{
+					popmessage("no implementation cmd %x", command);
+					queue_reply(0x0b, 0.4);
+					break;
 				}
 			}
-			LOGMASKED(LOG_SEARCHES, "Command %d\n", command);
-			}
+		}
+		LOGMASKED(LOG_SEARCHES, "Command %d\n", command);
 		}
 	}
 }
@@ -723,9 +712,6 @@ void sony_ldp1450hle_device::device_start()
 	save_item(NAME(m_repeat_frame_start));
 	save_item(NAME(m_repeat_frame_end));
 
-	save_item(NAME(m_cts));
-	save_item(NAME(m_dsr));
-
 }
 
 
@@ -737,6 +723,7 @@ void sony_ldp1450hle_device::device_reset()
 {
 	// pass through to the parent
 	laserdisc_device::device_reset();
+
 
 	// initialize diserial
 	set_tra_rate(attotime::from_hz(m_baud));
@@ -796,12 +783,6 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 			m_curr_frame = bcd_to_literal(line & 0x7ffff);
 
 		LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
-			get_field_code(LASERDISC_CODE_LINE16, false),
-			get_field_code(LASERDISC_CODE_LINE17, false),
-			get_field_code(LASERDISC_CODE_LINE18, false),
-			line);
-
-		popmessage("Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
 			get_field_code(LASERDISC_CODE_LINE16, false),
 			get_field_code(LASERDISC_CODE_LINE17, false),
 			get_field_code(LASERDISC_CODE_LINE18, false),
@@ -980,7 +961,6 @@ int32_t sony_ldp1450hle_device::player_update(const vbi_metadata &vbi, int field
 void sony_ldp1450hle_device::rcv_complete()
 {
 	receive_register_extract();
-	printf("CHAR%x\n", get_received_char());
 	add_command_byte(get_received_char());
 }
 

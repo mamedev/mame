@@ -41,8 +41,6 @@ public:
 
 	void set_baud(int32_t clock) { m_baud = clock; }
 
-	void dsr_w(int state);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -187,9 +185,6 @@ private:
 	uint16_t            m_speed;
 	uint32_t            m_speed_accum;
 	uint32_t            m_curr_frame;
-
-	uint8_t             m_dsr;
-	uint8_t             m_cts;
 
 	uint8_t             m_user_index_x;
 	uint8_t             m_user_index_y;

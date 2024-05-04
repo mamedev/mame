@@ -3049,6 +3049,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/r65c52.h,MACHINES["R65C52"] = true
+---------------------------------------------------
+
+if (MACHINES["R65C52"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/r65c52.cpp",
+		MAME_DIR .. "src/devices/machine/r65c52.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ra17xx.h,MACHINES["RA17XX"] = true
 ---------------------------------------------------
 
