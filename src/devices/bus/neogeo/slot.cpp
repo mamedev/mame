@@ -514,7 +514,7 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 			break;
 
 		case 0x05: //srand(s) - seed rng
-			seed = ((neon_mcu_ram[0]) << 16) + neon_mcu_ram[1];
+			seed = (neon_mcu_ram[1] << 16) + neon_mcu_ram[2];
 			srand(seed);
 
 			if (neon_debug_enabled) {
@@ -523,7 +523,7 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 			break;
 
 		case 0x06: //rand(m) - generate random number and do mod m on value
-			modVal = neon_mcu_ram[0];
+			modVal = neon_mcu_ram[1];
 			retVal16 = neo_rand() % modVal;
 			neon_mcu_ram[1] = retVal16; //do random call here
 
