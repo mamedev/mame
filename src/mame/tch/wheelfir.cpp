@@ -763,7 +763,7 @@ static const gfx_layout wheelfir512x5125x8_texlayout =
 };
 
 static GFXDECODE_START( gfx_wheelfir )
-	GFXDECODE_ENTRY( "gfx1", 0, wheelfir512x5125x8_texlayout, 0x0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, wheelfir512x5125x8_texlayout, 0x0, 1 )
 GFXDECODE_END
 
 void wheelfir_state::wheelfir(machine_config &config)
