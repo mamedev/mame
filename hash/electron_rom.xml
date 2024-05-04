@@ -593,8 +593,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pluscom10" cloneof="pluscom">
+		<description>Pluscom + v1.0</description>
+		<year>1987</year>
+		<publisher>Project Expansions</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PluscomPlus-1.00.rom" size="16384" crc="3b11bb14" sha1="b26bf134d0a1054f8fa8fa9d720d7bef9da3b746"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pluscom">
-		<description>Pluscom Plus v2.00</description>
+		<description>Pluscom Plus v2.0</description>
 		<year>1987</year>
 		<publisher>Project Expansions</publisher>
 		<part name="rom" interface="electron_rom">

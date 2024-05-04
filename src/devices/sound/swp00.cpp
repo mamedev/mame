@@ -346,7 +346,7 @@ void swp00_device::device_start()
 	save_item(NAME(m_dpcm_address));
 	save_item(NAME(m_dpcm_sum));
 
-	for(int i=0; i<128; i++) {
+	for(int i=0; i != 128; i++) {
 		u32 v = 0;
 		switch(i >> 3) {
 		default:  v = ((i & 7) + 8) << (1 + (i >> 3)); break;
@@ -907,8 +907,6 @@ void swp00_device::keyon(int chan)
 	logerror("keyon %02x a=%02x/%02x d=%02x/%02x glo=%02x pan=%02x [%x %x %x %x]\n", chan, m_attack_speed[chan], m_attack_level[chan], m_decay_speed[chan], m_decay_level[chan], m_glo_level[chan], m_panning[chan], m_sample_start[chan], m_sample_end[chan], m_sample_address[chan], m_sample_dpcm_and_format[chan]);
 	m_lfo_phase[chan] = 0;
 	m_sample_pos[chan] = -m_sample_start[chan] << 15;
-
-	m_sample_pos[chan] = 0;
 
 	m_active[chan] = true;
 	m_decay[chan] = false;

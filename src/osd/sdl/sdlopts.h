@@ -28,6 +28,7 @@
 
 #define SDLOPTION_ENABLE_TOUCH          "enable_touch"
 #define SDLOPTION_SIXAXIS               "sixaxis"
+#define SDLOPTION_DUAL_LIGHTGUN         "dual_lightgun"
 #if defined(USE_XINPUT) && USE_XINPUT
 #define SDLOPTION_LIGHTGUNINDEX         "lightgun_index"
 #endif
@@ -86,6 +87,7 @@ public:
 	// input options
 	bool enable_touch() const { return bool_value(SDLOPTION_ENABLE_TOUCH); }
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }
+	bool dual_lightgun() const { return bool_value(SDLOPTION_DUAL_LIGHTGUN); }
 
 	const char *video_driver() const { return value(SDLOPTION_VIDEODRIVER); }
 	const char *render_driver() const { return value(SDLOPTION_RENDERDRIVER); }

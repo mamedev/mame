@@ -4,7 +4,7 @@
 license:CC0-1.0
 -->
 
-<softwarelist name="apc" description="NEC Advanced Personal Computer Disk Images">
+<softwarelist name="apc" description="NEC Advanced Personal Computer disk images">
 	<software name="apctd17">
 		<description>TurboDOS 8086 Linker</description>
 		<year>1984</year>
@@ -97,7 +97,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm8607a" cloneof="cpm86">
-		<description>CP/M-86 Ver 1.1 (1.107:015;B Rev 07) (Alt)</description>
+		<description>CP/M-86 Ver 1.1 (1.107:015;B Rev 07) (alt)</description>
 		<year>1983</year>
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">

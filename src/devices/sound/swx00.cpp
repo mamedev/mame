@@ -420,7 +420,8 @@ u8 swx00_sound_device::state_r()
 	}
 
 	default:
-		logerror("state_r %02x\n", m_state_sel);
+		if(0)
+			logerror("state_r %02x\n", m_state_sel);
 		break;
 	}
 	return 0;

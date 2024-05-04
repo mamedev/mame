@@ -69,6 +69,7 @@ const options_entry f_sdl_option_entries[] =
 	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL INPUT OPTIONS" },
 	{ SDLOPTION_ENABLE_TOUCH,                "0",            core_options::option_type::BOOLEAN,    "enable touch input support" },
 	{ SDLOPTION_SIXAXIS,                     "0",            core_options::option_type::BOOLEAN,    "use special handling for PS3 Sixaxis controllers" },
+	{ SDLOPTION_DUAL_LIGHTGUN ";dual",       "0",            core_options::option_type::BOOLEAN,    "enable dual lightgun input" },
 
 #if (USE_XINPUT)
 	// lightgun mapping

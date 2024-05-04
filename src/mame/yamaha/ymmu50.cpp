@@ -20,12 +20,13 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83003.h"
-#include "mulcd.h"
-#include "sound/swp00.h"
 #include "machine/nvram.h"
+#include "sound/swp00.h"
 
-#include "debugger.h"
+#include "mulcd.h"
 #include "speaker.h"
+
+#include "mu50.lh"
 
 
 namespace {
@@ -266,6 +267,8 @@ void mu50_state::mu50(machine_config &config)
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
 	m_mu50cpu->write_sci_tx<1>().set(mdout, FUNC(midi_port_device::write_txd));
+
+	config.set_default_layout(layout_mu50);
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

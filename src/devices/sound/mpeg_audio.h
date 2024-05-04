@@ -38,6 +38,7 @@ public:
 	// output_samples = number of samples written to output per channel
 	// sample_rate    = output sample rate
 	// channels       = number of channels written to output (total sample count is output_samples*channels)
+	// atbl           = parameters index for older AMMSL CBR samples
 	//
 	// returns true if the buffer was complete and the new position in pos, false otherwise
 	//
@@ -50,7 +51,7 @@ public:
 	// 1152 in the amm case, <1152 indicating end of stream).
 
 	bool decode_buffer(int &pos, int limit, short *output,
-						int &output_samples, int &sample_rate, int &channels);
+						int &output_samples, int &sample_rate, int &channels, int atbl = 0);
 
 
 	// Clear audio buffer
@@ -80,7 +81,7 @@ private:
 	int accepted, position_align;
 
 	int sampling_rate, last_frame_number;
-	int param_index;
+	int param_index, cbr_param_index;
 
 	int channel_count, total_bands, joint_bands;
 

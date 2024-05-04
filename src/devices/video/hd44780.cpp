@@ -753,7 +753,7 @@ u8 hd44780_device::control_read()
 
 void hd44780_device::data_write(u8 data)
 {
-	if (m_busy_flag)
+	if (false && m_busy_flag)
 	{
 		logerror("HD44780: Ignoring data write %02x due of busy flag\n", data);
 		return;

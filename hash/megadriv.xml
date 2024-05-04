@@ -17211,7 +17211,18 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="ferias frustradas do pica-pau (bra).bin" size="1048576" crc="7b2e416d" sha1="ec546d1c00c88554b5e9135f097cb1c388cfd68f"/>
+				<rom name="ferias frustradas do pica-pau (bra).bin" size="1048576" crc="b03507c4" sha1="295e3fe1eaec3e5181e7dcb46cec6507d393b82d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feriasp" cloneof="ferias">
+		<description>Férias Frustradas do Pica-Pau (Brazil, pirate)</description>
+		<year>1995</year>
+		<publisher>Tec Toy</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="ferias frustradas do pica-pau (pirate).bin" size="1048576" crc="7b2e416d" sha1="ec546d1c00c88554b5e9135f097cb1c388cfd68f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27745,6 +27756,20 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 		</part>
 	</software>
 
+	<software name="sonic1jp2" cloneof="sonic">
+		<description>Sonic The Hedgehog (JP2, ripped from Sonic Mega Collection)</description>
+		<year>2002</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Official modification of rev. A which changes the spike damage behavior to be like that of later titles.
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="sonic the hedgehog (jp2) (sonic mega collection).bin" size="524288" crc="6382b2c5" sha1="95b6aac7e11bb2d908aafa06973ffeb45817a992"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sonicpir" cloneof="sonic">
 		<description>Sonic The Hedgehog (pirate, ripped from Golden 10 in 1)</description>
 		<year>1991?</year>
@@ -27911,6 +27936,22 @@ Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
 				<rom loadflag="load16_byte" name="md sonic 2 5 21.8 alpha.eprom" size="131072" crc="6f66f6ad" sha1="8a4692be96940a8752a9bcbb97921810927dd62f" offset="0x080000"/>
 				<rom loadflag="load16_byte" name="md sonic 2 6 21.8 alpha.eprom" size="131072" crc="b83b188c" sha1="e8ba63b92ffcc19c8913d0a7de051972b392f535" offset="0x0c0001"/>
 				<rom loadflag="load16_byte" name="md sonic 2 7 21.8 alpha.eprom" size="131072" crc="4e40d221" sha1="3a8e66fd5e8408f284c7a687f6a3926a43416f08" offset="0x0c0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic2p12" cloneof="sonic2">
+		<description>Sonic The Hedgehog 2 (prototype 199209xx, pirate, hacked)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Earlier than the "Beta 4" prototype. No equivalent build has been found in the Sega QA Archive.
+Original scene release which was altered to include a cracktro and bypass the copy protection. Dump originally in smd format and converted to raw binary for it to work without a Super Magic Drive or compatible device.
+]]></notes>
+		<info name="release" value="19921109"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="sonic2.bin" size="1048576" crc="0de5d90b" sha1="cc29b1e9325f16cb0e66660129e861e743dab071"/>
 			</dataarea>
 		</part>
 	</software>

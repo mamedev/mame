@@ -277,9 +277,6 @@ public:
 protected:
 	virtual bool input_init();
 
-	virtual void build_slider_list() { }
-	virtual void update_slider_list() { }
-
 	void poll_input_modules(bool relative_reset);
 
 	static std::list<std::unique_ptr<osd_window> > s_window_list;
