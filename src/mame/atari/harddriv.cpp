@@ -4732,10 +4732,10 @@ ROM_START( hdrivairp )
 	ROM_LOAD16_BYTE( "ms2cproc.0h", 0x1c0000, 0x20000, CRC(19024f2d) SHA1(a94e8836cdc147cea5816b99b8a1ad5ff669d984) )
 	ROM_LOAD16_BYTE( "ms2cproc.0l", 0x1c0001, 0x20000, CRC(1e48bd46) SHA1(1a903d889f48604bd8d2d9a0bda4ee20e7ad968b) )
 
-	ROM_REGION( 0x10000 + 0x10000, "mainpcb:dsp32", 0 ) /* dummy region for ADSP 2105 */
+	ROM_REGION( 0x10000 + 0x10000, "mainpcb:asic65:asic65cpu", 0 ) /* dummy region for ADSP 2105 */
 	ROM_LOAD( "sboota.bin", 0x10000 + 0x00000, 0x10000, CRC(3ef819cd) SHA1(c547b869a3a37a82fb46584fe0ef0cfe21a4f882) )
 
-	ROM_REGION( 0x10000 + 0x10000, "mainpcb:asic65:asic65cpu", 0 )    /* dummy region for ADSP 2105 */
+	ROM_REGION( 0x10000 + 0x10000, "mainpcb:dsp32", 0 )    /* dummy region for ADSP 2105 */
 	ROM_LOAD( "xboota.bin", 0x10000 + 0x00000, 0x10000, CRC(d9c49901) SHA1(9f90ae3a47eb1ef00c3ec3661f60402c2eae2108) )
 
 	ROM_REGION16_BE( 0xc0000, "mainpcb:user1", 0 )       /* 768k for object ROM */
@@ -4751,10 +4751,10 @@ ROM_START( hdrivairp )
 	ROM_LOAD16_BYTE( "dskpics.lo",  0x00001, 0x80000, CRC(8c6f0750) SHA1(4cb23cedc500c1509dc875c3291a5771c8473f73) )
 
 	ROM_REGION32_LE( 0x200000, "mainpcb:user4", 0 )/* 2MB for ASIC61 ROMs */
-	ROM_LOAD16_BYTE( "roads.0",     0x000000, 0x80000, CRC(cab2e335) SHA1(914996c5b7905f1c20fcda6972af88debbee59cd) )
-	ROM_LOAD16_BYTE( "roads.1",     0x000001, 0x80000, CRC(62c244ba) SHA1(f041a269f35a9d187c90241c5b64173663ad5268) )
-	ROM_LOAD16_BYTE( "roads.2",     0x000002, 0x80000, CRC(ba57f415) SHA1(1daf5a014e9bef15466b282bcca2395fec2b0628) )
-	ROM_LOAD16_BYTE( "roads.3",     0x000003, 0x80000, CRC(1e6a4ca0) SHA1(2cf06d6c73be11cf10515246fca2baa05ce5091b) )
+	ROM_LOAD32_BYTE( "roads.0",     0x000000, 0x80000, CRC(cab2e335) SHA1(914996c5b7905f1c20fcda6972af88debbee59cd) )
+	ROM_LOAD32_BYTE( "roads.1",     0x000001, 0x80000, CRC(62c244ba) SHA1(f041a269f35a9d187c90241c5b64173663ad5268) )
+	ROM_LOAD32_BYTE( "roads.2",     0x000002, 0x80000, CRC(ba57f415) SHA1(1daf5a014e9bef15466b282bcca2395fec2b0628) )
+	ROM_LOAD32_BYTE( "roads.3",     0x000003, 0x80000, CRC(1e6a4ca0) SHA1(2cf06d6c73be11cf10515246fca2baa05ce5091b) )
 
 	ROM_REGION( 0x10000, "mainpcb:ds3sdsp", 0 ) /* DS IV sound ADSP-2105 */
 	ROM_LOAD( "sboota.bin", 0x00000, 0x10000, CRC(3ef819cd) SHA1(c547b869a3a37a82fb46584fe0ef0cfe21a4f882) )
