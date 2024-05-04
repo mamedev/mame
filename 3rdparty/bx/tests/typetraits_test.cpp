@@ -227,6 +227,20 @@ TEST_CASE("type-traits isTriviallyDestructible", "")
 	STATIC_REQUIRE(!bx::isTriviallyDestructible<TestClassVirtualDtor >() );
 }
 
+TEST_CASE("type-traits isConst", "")
+{
+	STATIC_REQUIRE(!bx::isConst<char>() );
+	STATIC_REQUIRE( bx::isConst<const char>() );
+	STATIC_REQUIRE( bx::isConst<bx::AddConstType<char>>() );
+}
+
+TEST_CASE("type-traits isVolatile", "")
+{
+	STATIC_REQUIRE(!bx::isVolatile<char>() );
+	STATIC_REQUIRE( bx::isVolatile<volatile char>() );
+	STATIC_REQUIRE( bx::isVolatile<bx::AddVolatileType<char>>() );
+}
+
 TEST_CASE("type-traits isSigned", "")
 {
 	STATIC_REQUIRE(!bx::isSigned<bool                   >() );
@@ -333,17 +347,14 @@ TEST_CASE("type-traits MakeSignedT", "")
 	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<double                 >::Type >() );
 	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<long double            >::Type >() );
 
-	enum struct E : unsigned short {};
-	using char_type = std::make_signed_t<unsigned char>;
-	using int_type  = std::make_signed_t<unsigned int>;
-	using long_type = std::make_signed_t<volatile unsigned long>;
-	using enum_type = std::make_signed_t<E>;
+	using charType = bx::MakeSignedType<unsigned char>;
+	using intType  = bx::MakeSignedType<unsigned int>;
+	using longType = bx::MakeSignedType<volatile unsigned long>;
 
 	STATIC_REQUIRE(true
-		&& bx::isSame<char_type, signed char>()
-		&& bx::isSame<int_type, signed int>()
-		&& bx::isSame<long_type, volatile signed long>()
-		&& bx::isSame<enum_type, signed short>()
+		&& bx::isSame<charType, signed char>()
+		&& bx::isSame<intType, signed int>()
+		&& bx::isSame<longType, volatile signed long>()
 		);
 }
 
@@ -377,14 +388,14 @@ TEST_CASE("type-traits MakeUnsignedT", "")
 	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<ptrdiff_t              >::Type >() );
 	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<size_t                 >::Type >() );
 
-	using uchar_type = std::make_unsigned_t<char>;
-	using uint_type  = std::make_unsigned_t<int>;
-	using ulong_type = std::make_unsigned_t<volatile long>;
+	using ucharType = bx::MakeUnsignedType<char>;
+	using uintType  = bx::MakeUnsignedType<int>;
+	using ulongType = bx::MakeUnsignedType<volatile long>;
 
 	STATIC_REQUIRE(true
-		&& bx::isSame<uchar_type, unsigned char>()
-		&& bx::isSame<uint_type, unsigned int>()
-		&& bx::isSame<ulong_type, volatile unsigned long>()
+		&& bx::isSame<ucharType, unsigned char>()
+		&& bx::isSame<uintType, unsigned int>()
+		&& bx::isSame<ulongType, volatile unsigned long>()
 		);
 }
 

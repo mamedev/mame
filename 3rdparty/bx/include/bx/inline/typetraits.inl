@@ -468,9 +468,9 @@ namespace bx
 	template<typename Ty> struct MakeSignedT { using Type = Ty; };
 	template<typename Ty>  using MakeSignedType = typename MakeSignedT<Ty>::Type;
 
-	template<typename Ty> struct MakeSignedT<const          Ty> : AddConstType   <MakeSignedType<Ty>> {};
-	template<typename Ty> struct MakeSignedT<volatile       Ty> : AddVolatileType<MakeSignedType<Ty>> {};
-	template<typename Ty> struct MakeSignedT<const volatile Ty> : AddCvType      <MakeSignedType<Ty>> {};
+	template<typename Ty> struct MakeSignedT<const          Ty> : AddConstT   <MakeSignedType<Ty>> {};
+	template<typename Ty> struct MakeSignedT<volatile       Ty> : AddVolatileT<MakeSignedType<Ty>> {};
+	template<typename Ty> struct MakeSignedT<const volatile Ty> : AddCvT      <MakeSignedType<Ty>> {};
 
 	template<>            struct MakeSignedT<         char     > { using Type = signed char;      };
 	template<>            struct MakeSignedT<  signed char     > { using Type = signed char;      };
@@ -485,18 +485,18 @@ namespace bx
 	template<>            struct MakeSignedT<unsigned long long> { using Type = signed long long; };
 
 	template<typename Ty>
-	inline constexpr auto asSigned(Ty _t)
+	inline constexpr auto asSigned(Ty _value)
 	{
-		return MakeSignedType<Ty>(_t);
+		return MakeSignedType<Ty>(_value);
 	}
 
 	//---
 	template<typename Ty> struct MakeUnsignedT { using Type = Ty; };
 	template<typename Ty>  using MakeUnsignedType = typename MakeUnsignedT<Ty>::Type;
 
-	template<typename Ty> struct MakeUnsignedT<const          Ty> : AddConstType   <MakeUnsignedType<Ty>> {};
-	template<typename Ty> struct MakeUnsignedT<volatile       Ty> : AddVolatileType<MakeUnsignedType<Ty>> {};
-	template<typename Ty> struct MakeUnsignedT<const volatile Ty> : AddCvType      <MakeUnsignedType<Ty>> {};
+	template<typename Ty> struct MakeUnsignedT<const          Ty> : AddConstT   <MakeUnsignedType<Ty>> {};
+	template<typename Ty> struct MakeUnsignedT<volatile       Ty> : AddVolatileT<MakeUnsignedType<Ty>> {};
+	template<typename Ty> struct MakeUnsignedT<const volatile Ty> : AddCvT      <MakeUnsignedType<Ty>> {};
 
 	template<>            struct MakeUnsignedT<         char     > { using Type = unsigned char;      };
 	template<>            struct MakeUnsignedT<  signed char     > { using Type = unsigned char;      };
@@ -511,9 +511,9 @@ namespace bx
 	template<>            struct MakeUnsignedT<unsigned long long> { using Type = unsigned long long; };
 
 	template<typename Ty>
-	inline constexpr auto asUnsigned(Ty _t)
+	inline constexpr auto asUnsigned(Ty _value)
 	{
-		return MakeUnsignedType<Ty>(_t);
+		return MakeUnsignedType<Ty>(_value);
 	}
 
 	//---

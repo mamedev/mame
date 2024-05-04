@@ -167,11 +167,11 @@ namespace bx
 
 	/// Returns value of `_t` as signed type value.
 	template<typename Ty>
-	constexpr auto asSigned(Ty _t);
+	constexpr auto asSigned(Ty _value);
 
 	/// Returns value of `_t` as unsigned type value.
 	template<typename Ty>
-	constexpr auto asUnsigned(Ty _t);
+	constexpr auto asUnsigned(Ty _value);
 
 	/// Returns true if type `Ty` is integer type, otherwise returns false.
 	template<typename Ty>
