@@ -50,16 +50,19 @@
 	M6G: 2x 640KB floppy + GDC
 	M7G: 1x 640KB floppy + 5MB hard disk + GDC
 
+
+	./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
+
 */
 
 /*
 
     TODO:
 
+	- M7 boot floppy
     - accurate video timing
     - PCB layouts
     - NEC uPD7201 MPSC
-    - model M7 5MB hard disk
 
 */
 
@@ -191,28 +194,128 @@ void mm1_state::switch_w(int state)
 
 	if (m_switch)
 	{
-		// winchester
 		m_io->space().install_readwrite_handler(0x50, 0x50, read8sm_delegate(*this, FUNC(mm1_state::sasi_status_r)), write8sm_delegate(*this, FUNC(mm1_state::sasi_cmd_w)));
-		m_io->space().install_readwrite_handler(0x51, 0x51, emu::rw_delegate(*m_sasi, FUNC(nscsi_callback_device::read)), emu::rw_delegate(*m_sasi, FUNC(nscsi_callback_device::write)));
+		m_io->space().install_readwrite_handler(0x51, 0x51, emu::rw_delegate(*this, FUNC(mm1_state::sasi_data_r)), write8sm_delegate(*this, FUNC(mm1_state::sasi_data_w)));
 	}
 	else
 	{
-		// floppy
 		m_io->space().install_device(0x50, 0x51, *m_fdc, &upd765a_device::map);
 	}
+
+	m_floppy[0]->mon_w(state);
 }
 
 uint8_t mm1_state::sasi_status_r(offs_t offset)
 {
-	LOG("SASI STATUS\n");
-	return 0xff;
+	uint8_t data = 0;
+
+	data |= m_sasi->bsy_r();
+	data |= m_sasi->msg_r() << 2;
+	data |= m_sasi->cd_r() << 3;
+	data |= m_sasi->req_r() << 4;
+	data |= m_sasi->io_r() << 5;
+	
+	//LOG("%s SASI STATUS %02x\n",machine().describe_context(),data);
+
+	return data;
 }
 
 void mm1_state::sasi_cmd_w(offs_t offset, uint8_t data)
 {
-	LOG("SASI CMD %02x\n", data);
+	LOG("%s SASI CMD %02x\n", machine().describe_context(), data);
+
+	m_sasi->sel_w(BIT(data, 0));
+	m_sasi->rst_w(BIT(data, 1));
 }
 
+uint8_t mm1_state::sasi_data_r(offs_t offset)
+{
+	uint8_t data = m_sasi->read();
+
+	LOG("%s SASI DATA R %02x\n", machine().describe_context(), data);
+
+	if (m_sasi->req_r())
+	{
+		m_sasi->ack_w(1);
+	}
+
+	return data;
+}
+
+void mm1_state::sasi_data_w(offs_t offset, uint8_t data)
+{
+	m_sasi_data = data;
+
+	if (!m_sasi->io_r())
+	{
+		m_sasi->write(data);
+	}
+
+	LOG("%s SASI DATA W %02x\n", machine().describe_context(), data);
+
+	if (m_sasi->req_r())
+	{
+		m_sasi->ack_w(1);
+	}
+}
+
+uint8_t mm1_state::sasi_ior3_r(offs_t offset)
+{
+	uint8_t data = 0;
+
+	if (m_switch)
+	{
+		data = sasi_data_r(0);
+	}
+	else
+	{
+		data = m_fdc->dma_r();
+	}
+	
+	return data;
+}
+
+void mm1_state::sasi_iow3_w(offs_t offset, uint8_t data)
+{
+	if (m_switch)
+	{
+		sasi_data_w(0, data);
+	}
+	else
+	{
+		m_fdc->dma_w(data);
+	}
+}
+
+void mm1_state::sasi_bsy_w(int state)
+{
+	if (state)
+	{
+		m_sasi->sel_w(0);
+	}
+}
+
+void mm1_state::sasi_req_w(int state)
+{
+	if (!state)
+	{		
+		m_sasi->ack_w(0);
+	}
+
+	m_dmac->dreq3_w(state);
+}
+
+void mm1_state::sasi_io_w(int state)
+{
+	if (state)
+	{
+		m_sasi->write(0);
+	}
+	else
+	{
+		m_sasi->write(m_sasi_data);
+	}
+}
 
 
 //**************************************************************************
@@ -406,6 +509,7 @@ void mm1_state::machine_start()
 	save_item(NAME(m_tc));
 	save_item(NAME(m_fdc_tc));
 	save_item(NAME(m_switch));
+	save_item(NAME(m_sasi_data));
 }
 
 
@@ -548,9 +652,17 @@ void mm1_state::mm1_640k_winchester(machine_config &config)
 	NSCSI_BUS(config, "sasi");
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
 	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "scsicb", true)
-		.option_add_internal("scsicb", NSCSI_CB);
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this](device_t* device) {
+			downcast<nscsi_callback_device&>(*device).bsy_callback().set(*this, FUNC(mm1_state::sasi_bsy_w));
+			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(mm1_state::sasi_req_w));
+			downcast<nscsi_callback_device&>(*device).io_callback().set(*this, FUNC(mm1_state::sasi_io_w));
+		});
 
 	m_outlatch->q_out_cb<7>().set(FUNC(mm1_state::switch_w));
+
+	m_dmac->in_ior_callback<3>().set(*this, FUNC(mm1_state::sasi_ior3_r));
+	m_dmac->out_iow_callback<3>().set(*this, FUNC(mm1_state::sasi_iow3_w));
 }
 
 void mm1_state::mm1m7(machine_config &config)
@@ -635,5 +747,5 @@ COMP( 1981, mm1m4,  0,     0,      mm1m4,   mm1,   mm1_state, empty_init, "Nokia
 COMP( 1981, mm1m4g, mm1m4, 0,      mm1m4g,  mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M4G", MACHINE_SUPPORTS_SAVE )
 COMP( 1981, mm1m6,  0,     0,      mm1m6,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6",  MACHINE_SUPPORTS_SAVE )
 COMP( 1981, mm1m6g, mm1m6, 0,      mm1m6g,  mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6G", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mm1m7,  0,     0,      mm1m7,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7",  MACHINE_NOT_WORKING )
-COMP( 1981, mm1m7g, mm1m7, 0,      mm1m7g,  mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7G", MACHINE_NOT_WORKING )
+COMP( 1981, mm1m7,  0,     0,      mm1m7,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7",  MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m7g, mm1m7, 0,      mm1m7g,  mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7G", MACHINE_SUPPORTS_SAVE )
