@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Tomasz Slanina
+// copyright-holders:Tomasz Slanina
 /****************************************************************
 
 Wheels & Fire
+Power Ball
 
 driver by
- David Haywood
  Tomasz Slanina
 
 
@@ -204,11 +204,14 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_adc_eoc(0)
+		m_adc_eoc(0),
+		m_is_pwball(false)
 	{ }
 
 	void wheelfir(machine_config &config);
 	int adc_eoc_r();
+
+	void init_pwball();
 
 protected:
 	virtual void machine_start() override;
@@ -262,6 +265,8 @@ private:
 	void wheelfir_main(address_map &map);
 	void wheelfir_sub(address_map &map);
 	int m_adc_eoc;
+
+	bool m_is_pwball;
 };
 
 
@@ -328,13 +333,16 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		int page=((m_blitter_data[6])>>10)*0x40000;
 
 
-		if(page>=0x400000) /* src set to  unav. page before direct write to the framebuffer */
+		if (!m_is_pwball)
 		{
-			m_direct_write_x0=dst_x0;
-			m_direct_write_x1=dst_x1;
-			m_direct_write_y0=dst_y0;
-			m_direct_write_y1=dst_y1;
-			m_direct_write_idx=0;
+			if (page >= 0x400000) /* src set to  unav. page before direct write to the framebuffer */
+			{
+				m_direct_write_x0 = dst_x0;
+				m_direct_write_x1 = dst_x1;
+				m_direct_write_y0 = dst_y0;
+				m_direct_write_y1 = dst_y1;
+				m_direct_write_idx = 0;
+			}
 		}
 
 		if(x_dst_step<0)
@@ -409,10 +417,14 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		if(scale_x==0 || scale_y==0) return;
 
 
-		const float scale_x_step=100.f/scale_x;
-		const float scale_y_step=100.f/scale_y;
+		float scale_x_step = 100.f / scale_x;
+		float scale_y_step = 100.f / scale_y;
 
-
+		if (m_is_pwball)
+		{
+			scale_x_step = 1.0f;
+			scale_y_step = 1.0f;
+		}
 
 		int vpage=LAYER_FG;
 		if(m_blitter_data[0x7]&0x10)
@@ -460,7 +472,7 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 				int screen_y=y;
 
 
-				if(page>=0x400000)
+				if ((page>=0x400000) && (!m_is_pwball))
 				{
 					//hack for clear
 					if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
@@ -468,7 +480,7 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 				//      m_tmp_bitmap[vpage]->pix(screen_y , screen_x ) =0;
 					}
 				}
-				else
+
 				{
 					if (vpage == LAYER_FG) screen_y&=0xff;
 
@@ -598,7 +610,7 @@ void wheelfir_state::wheelfir_sub(address_map &map)
 }
 
 
-static INPUT_PORTS_START( wheelfir )
+static INPUT_PORTS_START( pwball )
 	PORT_START("P1")    /* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -629,12 +641,21 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STEERING")
+	PORT_START("ACCELERATOR")
+	PORT_START("BRAKE")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( wheelfir )
+	PORT_INCLUDE(pwball)
+
+	PORT_MODIFY("STEERING")
 	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel") PORT_REVERSE
 
-	PORT_START("ACCELERATOR")
+	PORT_MODIFY("ACCELERATOR")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_INVERT PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Accelerator Pedal") PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 
-	PORT_START("BRAKE")
+	PORT_MODIFY("BRAKE")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_INVERT PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -669,6 +690,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
 		//m_screen->update_partial(param);
+
+		if ((param == 0) && m_is_pwball)
+		{
+			m_maincpu->set_input_line(1, HOLD_LINE);
+		}
 	}
 	else
 	{
@@ -719,6 +745,27 @@ void wheelfir_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
+
+static const uint32_t texlayout_xoffset[512] = { STEP512(0,8) };
+static const uint32_t texlayout_yoffset[512] = { STEP512(0,4096) };
+
+static const gfx_layout wheelfir512x5125x8_texlayout =
+{
+	512, 512,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	512*512*8,
+	texlayout_xoffset,
+	texlayout_yoffset
+};
+
+static GFXDECODE_START( gfx_wheelfir )
+	GFXDECODE_ENTRY( "gfx1", 0, wheelfir512x5125x8_texlayout, 0x0, 0x100 )
+GFXDECODE_END
+
 void wheelfir_state::wheelfir(machine_config &config)
 {
 	M68000(config, m_maincpu, 32000000/2);
@@ -744,6 +791,8 @@ void wheelfir_state::wheelfir(machine_config &config)
 	m_screen->set_screen_update(FUNC(wheelfir_state::screen_update_wheelfir));
 	m_screen->screen_vblank().set(FUNC(wheelfir_state::screen_vblank_wheelfir));
 	m_screen->set_palette(m_palette);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_wheelfir);
 
 	PALETTE(config, m_palette).set_entries(NUM_COLORS);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
@@ -771,7 +820,7 @@ ROM_START( wheelfir )
 	ROM_LOAD16_BYTE( "tch3.u83",  0x00001, 0x80000, CRC(43c014a6) SHA1(6c01a08dda204f36e8768795dd5d405576a49140) )
 	ROM_LOAD16_BYTE( "tch11.u65", 0x00000, 0x80000, CRC(fc894b2e) SHA1(ebe6d1adf889731fb6f53b4ce5f09c60e2aefb97) )
 
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00  ) // 512x512 gfx pages
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00  ) // each ROM contains 2 512x512 8bpp gfx pages
 	ROM_LOAD( "tch4.u52", 0x000000, 0x80000, CRC(fe4bc2c7) SHA1(33a2ef79cb13f9e7e7d513915c6e13c4e7fe0188) )
 	ROM_LOAD( "tch5.u53", 0x080000, 0x80000, CRC(a38b9ca5) SHA1(083c9f700b9df1039fb553e918e205c6d32057ad) )
 	ROM_LOAD( "tch6.u54", 0x100000, 0x80000, CRC(2733ae6b) SHA1(ebd91e123b670159f79be19a552d1ae0c8a0faff) )
@@ -785,7 +834,40 @@ ROM_START( wheelfir )
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
 ROM_END
 
+
+ROM_START( pwball )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "pball.u19", 0x00001, 0x80000, CRC(52f433ce) SHA1(f25c43188c320636d69fec2de2605303ef79a2f8) )
+	ROM_LOAD16_BYTE( "pball.u21", 0x00000, 0x80000, CRC(c0250bc8) SHA1(c7ad2dd0e7fde337a638b09fd325c0cfe1b0b966) )
+
+	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_LOAD16_BYTE( "pball.u63", 0x00001, 0x80000, CRC(ab8bba31) SHA1(cc89d1c8b5998b712161dda4283856acd8d91723) )
+	ROM_LOAD16_BYTE( "pball.u65", 0x00000, 0x80000, CRC(f2583796) SHA1(f044a575ae3dafaac8ad05aee6d4b672166af969) )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00  ) // each ROM contains 2 512x512 8bpp gfx pages
+	ROM_LOAD( "pball.u52", 0x000000, 0x80000, CRC(ad8567d3) SHA1(348a85388a5a98b3baa9484c947af6f878c4b70b) )
+	ROM_LOAD( "pball.u53", 0x080000, 0x80000, CRC(9b954f59) SHA1(2cd9afea1677bb11e6d914c14e013da84e623356) )
+	ROM_LOAD( "pball.u54", 0x100000, 0x80000, CRC(6979682d) SHA1(517abe80f4a44810427dd6da9187141ffd4a881c) )
+	ROM_LOAD( "pball.u55", 0x180000, 0x80000, CRC(33593547) SHA1(9d13af4644e7fab01005609897c61acc50db8282) )
+	ROM_LOAD( "pball.u56", 0x200000, 0x80000, CRC(bb64c0ed) SHA1(fa39121978412c02e7eb7adcf4d3b0b012904fee) )
+	ROM_LOAD( "pball.u57", 0x280000, 0x80000, CRC(eb187063) SHA1(accd174cf5f582d6ed7ab3373bbe9e1bb1d1dbb8) )
+	ROM_LOAD( "pball.u58", 0x300000, 0x80000, CRC(2cf2057d) SHA1(da075980892b43cac89d11c76d30b91c85c09af6) )
+	ROM_LOAD( "pball.u59", 0x380000, 0x80000, CRC(e1c656f4) SHA1(9bc3713d4b5185b417f4d027ae97dace1feec065) )
+	ROM_LOAD( "pball.u200",0x400000, 0x80000, CRC(26e68e24) SHA1(d88994a521ad14ac91e2c3cdc646ea7fb1ca8e72) )
+	ROM_LOAD( "pball.u201",0x480000, 0x80000, CRC(bc8575fc) SHA1(0b1e237ee321f046f9b268e3515d07be206b4d76) )
+	ROM_LOAD( "pball.u202",0x500000, 0x80000, CRC(97e2cf4f) SHA1(82ce199b0918762b0593b56bc8c19947993cfb59) )
+	ROM_LOAD( "pball.u203",0x580000, 0x80000, CRC(89605b33) SHA1(6fb4ebacfd686266142317b3f864705d90ce97ca) )
+	ROM_LOAD( "pball.u204",0x600000, 0x80000, CRC(efddd379) SHA1(903a931a7012f16df516b3cbec8b689a4fc0ba9c) )
+	// u205 is empty (missing or unused?)
+ROM_END
+
 } // anonymous namespace
 
+void wheelfir_state::init_pwball()
+{
+	// temp hack as pwball doesn't like zooming and other things (maybe different FPGA programming?)
+	m_is_pwball = true;
+}
 
-GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, pwball,      0, wheelfir,    pwball  , wheelfir_state, init_pwball,ROT0,  "TCH", "Power Ball",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // possibly a prototype
