@@ -40,8 +40,10 @@ AI-4116  Ranran Melody
 
 3rd Set: "English Wonder School" / えいごわんだーすくーるー 1989-5-1
 ================================================================
+C-9531   Eigo no Uta 1
 C-9532   Eigo de Ohanashi 1
 C-9533   Eigo de Game 1: Popo no Yume
+C-9534   Eigo no Uta 2
 C-9535   Eigo de Ohanashi 2
 C-9536   Eigo de Game 2: Popoland no Himitsu
 
@@ -572,6 +574,7 @@ AI-8003  Pinpon Music Melody
 		<description>Pinpon Numbers</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<notes>Released on both black and white my-cards.</notes>
 		<info name="serial" value="AI-8001"/>
 		<info name="alt_title" value="ピンポン　ナンバーズ"/>
 		<part name="card" interface="segaai_card">
@@ -587,16 +590,35 @@ AI-8003  Pinpon Music Melody
 
 	<software name="pinponmr" supported="no">
 		<description>Pinpon Music Rhythm</description>
-		<year>1987</year>
+		<year>1988</year> <!-- Need confirmation whether this was released in 1988 or 1989. -->
 		<publisher>Sega</publisher>
-		<notes>No sound and cannot start a game.</notes>
+		<notes>No sound and cannot start a game. Released on a white my-card.</notes>
 		<info name="serial" value="AI-8002"/>
 		<info name="alt_title" value="ピンポン　ミュージック　リズム"/>
 		<info name="usage" value="Requires Soundbox."/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
-				<rom name="pinpon music rhythm.bin" size="0x20000" crc="376195cb" sha1="709d53959082a3e5477fb15c187612c98b0baac5"/>
+				<rom name="pinpon music rhythm.bin" size="0x20000" crc="eb17ce84" sha1="42a04e7b8eac3a0e9852c75ec612a4e997d5505e"/>
+			</dataarea>
+			<dataarea name="overlay" size="363366">
+				<rom name="pinpon music rhythm.jpg" size="363366" crc="4a66fef5" sha1="f4c5626e06f1d032a153c73c45139bb87a8e8d72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinponmro" cloneof="pinponmr" supported="no">
+		<description>Pinpon Music Rhythm (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>No sound and cannot start a game. Released on a black my-card.</notes>
+		<info name="serial" value="AI-8002"/>
+		<info name="alt_title" value="ピンポン　ミュージック　リズム"/>
+		<info name="usage" value="Requires Soundbox."/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon music rhythm (1987).bin" size="0x20000" crc="376195cb" sha1="709d53959082a3e5477fb15c187612c98b0baac5"/>
 			</dataarea>
 			<dataarea name="overlay" size="363366">
 				<rom name="pinpon music rhythm.jpg" size="363366" crc="4a66fef5" sha1="f4c5626e06f1d032a153c73c45139bb87a8e8d72"/>
@@ -606,16 +628,35 @@ AI-8003  Pinpon Music Melody
 
 	<software name="pinponmm" supported="no">
 		<description>Pinpon Music Melody</description>
-		<year>1987</year>
+		<year>1988</year> <!-- Need confirmation whether this was released in 1988 or 1989. -->
 		<publisher>Sega</publisher>
-		<notes>No sound and cannot start a game.</notes>
+		<notes>No sound and cannot start a game. Released on a white my-card.</notes>
 		<info name="serial" value="AI-8003"/>
 		<info name="alt_title" value="ピンポン　ミュージック　メロディー"/>
 		<info name="usage" value="Requires Soundbox."/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
 			<dataarea name="rom" size="0x20000">
-				<rom name="pinpon music melody.bin" size="0x20000" crc="2deecb0c" sha1="3bddf3950921d09cf34e6def23cf491c8fa670c2"/>
+				<rom name="pinpon music melody.bin" size="0x20000" crc="be1d6294" sha1="2f68fb9df67946faf8d2b28d29ba50bf76e83004"/>
+			</dataarea>
+			<dataarea name="overlay" size="336083">
+				<rom name="pinpon music melody.jpg" size="336083" crc="8b3ef04f" sha1="1b73747727c1d9febb5fb1e8f7164c17d66f7873"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinponmmo" cloneof="pinponmm" supported="no">
+		<description>Pinpon Music Melody (1987)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<notes>No sound and cannot start a game. Released on a black my-card.</notes>
+		<info name="serial" value="AI-8003"/>
+		<info name="alt_title" value="ピンポン　ミュージック　メロディー"/>
+		<info name="usage" value="Requires Soundbox."/>
+		<part name="card" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="pinpon music melody (1987).bin" size="0x20000" crc="2deecb0c" sha1="3bddf3950921d09cf34e6def23cf491c8fa670c2"/>
 			</dataarea>
 			<dataarea name="overlay" size="336083">
 				<rom name="pinpon music melody.jpg" size="336083" crc="8b3ef04f" sha1="1b73747727c1d9febb5fb1e8f7164c17d66f7873"/>
@@ -705,10 +746,46 @@ AI-8003  Pinpon Music Melody
 		</part>
 	</software>
 
+	<software name="eigouta" supported="no">
+		<!-- Packaging missing, full name unknown. -->
+		<description>Eigo no Uta</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<notes>Cassette is not supported yet.</notes>
+		<info name="alt_title" value="えいごのうた"/>
+		<part name="card1" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<feature name="part_id" value="C-9531 - えいごのうた１"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="eigo no uta 1.bin" size="0x20000" crc="8df52aaa" sha1="89be8e65fdad6d81148ecba1a1cda5af84a6e214"/>
+			</dataarea>
+		</part>
+		<part name="cass1" interface="flac_cass">
+			<feature name="part_id" value="えいごのうた１"/>
+			<dataarea name="cass" size="1">
+				<rom name="eigo no uta 1.flac" size="1" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="card2" interface="segaai_card">
+			<feature name="slot" value="rom_128"/>
+			<feature name="part_id" value="C-9534 - えいごのうた２"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="eigo no uta 2.bin" size="0x20000" crc="db423710" sha1="adb9d9c8d0e74cc87eb2a53039f2abddcb5cb5f7"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="flac_cass">
+			<feature name="part_id" value="えいごのうた２"/>
+			<dataarea name="cass" size="1">
+				<rom name="eigo no uta2.flac" size="1" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aienikki">
 		<description>AI Enikki</description>
 		<year>1989</year>
 		<publisher>Sega?</publisher>
+		<notes>Released on a white my-card.</notes>
 		<info name="alt_title" value="ＡＩえにっき"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
@@ -726,6 +803,7 @@ AI-8003  Pinpon Music Melody
 		<description>AI Enikki (1986)</description>
 		<year>1986</year>
 		<publisher>Sega?</publisher>
+		<notes>Released on a black my-card.</notes>
 		<info name="alt_title" value="ＡＩえにっき"/>
 		<part name="card" interface="segaai_card">
 			<feature name="slot" value="rom_128"/>
