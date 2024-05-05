@@ -17759,6 +17759,9 @@ e9161                           //
 @source:ericsson/eispc.cpp
 epc                             // 1984 Ericsson PC
 
+@source:esprit/esp250c.cpp
+esp250c                         // 2005 Esprit Systems
+
 @source:esprit/executive10.cpp
 exe10102                        // 1983 Esprit Systems
 
