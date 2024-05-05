@@ -24,7 +24,7 @@ public:
 	heath_h_88_cass_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void write(offs_t reg, u8 val);
-	u8   read(offs_t reg);
+	u8 read(offs_t reg);
 
 protected:
 
@@ -38,13 +38,13 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 
-	required_device<i8251_device> m_uart;
+	required_device<i8251_device>          m_uart;
 	required_device<cassette_image_device> m_cass_player;
 	required_device<cassette_image_device> m_cass_recorder;
 
-	u8   m_cass_data[4];
-	bool m_cassbit;
-	bool m_cassold;
+	u8                                     m_cass_data[4];
+	bool                                   m_cassbit;
+	bool                                   m_cassold;
 };
 
 DECLARE_DEVICE_TYPE(HEATH_H88_CASS, heath_h_88_cass_device)

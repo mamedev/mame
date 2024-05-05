@@ -18,18 +18,16 @@ class heath_intr_socket;
 class device_heath_intr_interface : public device_interface
 {
 public:
-	// required operation
-	virtual void set_irq_level(uint8_t level, int state) = 0;
+	virtual void set_irq_level(u8 level, int state) = 0;
 
 	virtual void set_drq(int state) {}
 	virtual void set_irq(int state) {}
-	virtual void block_interrupts(uint8_t data) {}
+	virtual void block_interrupts(u8 data) {}
 
 protected:
-	// construction/destruction
 	device_heath_intr_interface(const machine_config &mconfig, device_t &device);
 
-	virtual uint8_t get_instruction() = 0;
+	virtual u8 get_instruction() = 0;
 
 	heath_intr_socket *const m_socket;
 
@@ -38,26 +36,26 @@ protected:
 
 
 /**
- * Heath interrupt controller
+ * Heath original interrupt controller
  *
  */
 class heath_intr_cntrl : public device_t,
-						public device_heath_intr_interface
+						 public device_heath_intr_interface
 {
 public:
-	heath_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	heath_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void set_irq_level(uint8_t level, int state) override;
+	virtual void set_irq_level(u8 level, int state) override;
 
 protected:
-	heath_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	heath_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual uint8_t get_instruction() override;
+	virtual u8 get_instruction() override;
 	virtual void update_intr_line();
 
 	virtual void device_start() override;
 
-	uint8_t m_intr_lines;
+	u8 m_intr_lines;
 };
 
 /**
@@ -67,14 +65,14 @@ protected:
 class z37_intr_cntrl : public heath_intr_cntrl
 {
 public:
-	z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void set_drq(int state) override;
 	virtual void set_irq(int state) override;
-	virtual void block_interrupts(uint8_t data) override;
+	virtual void block_interrupts(u8 data) override;
 
 protected:
-	virtual uint8_t get_instruction() override;
+	virtual u8 get_instruction() override;
 	virtual void update_intr_line() override;
 
 	virtual void device_start() override;
@@ -85,12 +83,12 @@ private:
 	bool m_irq_raised;
 };
 
-DECLARE_DEVICE_TYPE(HEATH_INTR_CNTRL, heath_intr_cntrl)
+DECLARE_DEVICE_TYPE(HEATH_INTR_CNTRL,     heath_intr_cntrl)
 DECLARE_DEVICE_TYPE(HEATH_Z37_INTR_CNTRL, z37_intr_cntrl)
 
 
 class heath_intr_socket : public device_t,
-							public device_single_card_slot_interface<device_heath_intr_interface>
+						  public device_single_card_slot_interface<device_heath_intr_interface>
 {
 public:
 
@@ -104,13 +102,13 @@ public:
 		set_fixed(fixed);
 	}
 
-	heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~heath_intr_socket();
 
 	auto irq_line_cb() { return m_irq_line.bind(); }
 
 	// required operation
-	void set_irq_level(uint8_t level, int state) { if (m_cntrl) { m_cntrl->set_irq_level(level, state); }}
+	void set_irq_level(u8 level, int state) { if (m_cntrl) { m_cntrl->set_irq_level(level, state); }}
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -118,13 +116,13 @@ public:
 
 	void set_irq(int state) { if (m_cntrl) { m_cntrl->set_irq(state); } }
 	void set_drq(int state) { if (m_cntrl) { m_cntrl->set_drq(state); } }
-	void block_interrupts(uint8_t data) { if (m_cntrl) { m_cntrl->block_interrupts(data); } }
+	void block_interrupts(u8 data) { if (m_cntrl) { m_cntrl->block_interrupts(data); } }
 
 protected:
 
 	virtual void device_start() override;
 
-	devcb_write8 m_irq_line;
+	devcb_write8                 m_irq_line;
 
 	device_heath_intr_interface *m_cntrl;
 };

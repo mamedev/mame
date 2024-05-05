@@ -37,13 +37,13 @@ private:
 
 static void tlb_options(device_slot_interface &device)
 {
-	device.option_add("heath", HEATH_TLB);
-	device.option_add("gp19", HEATH_GP19);
+	device.option_add("heath",      HEATH_TLB);
+	device.option_add("gp19",       HEATH_GP19);
 	device.option_add("imaginator", HEATH_IMAGINATOR);
-	device.option_add("super19", HEATH_SUPER19);
-	device.option_add("superset", HEATH_SUPERSET);
-	device.option_add("ultrarom", HEATH_ULTRA);
-	device.option_add("watzman", HEATH_WATZ);
+	device.option_add("super19",    HEATH_SUPER19);
+	device.option_add("superset",   HEATH_SUPERSET);
+	device.option_add("ultrarom",   HEATH_ULTRA);
+	device.option_add("watzman",    HEATH_WATZ);
 }
 
 void h19_state::h19(machine_config &config)
@@ -68,5 +68,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT   CLASS      INIT        COMPANY          FULLNAME                         FLAGS
-COMP( 1979, h19,     0,      0,      h19,             0,   h19_state, empty_init, "Heath Company", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
+//    year  name     parent  compat  machine       input   class      init        company          fullname                         flags
+COMP( 1979, h19,     0,      0,      h19,          0,      h19_state, empty_init, "Heath Company", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
