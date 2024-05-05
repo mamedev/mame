@@ -486,24 +486,23 @@ const u8 *hd44780_device::render()
 			{
 				uint16_t char_pos = line * 0x40 + ((pos + m_disp_shift) % line_size);
 
-				int char_base;
+				const u8 *src;
 				if (m_ddram[char_pos] < 0x10)
 				{
 					// draw CGRAM characters
 					if (m_char_size == 8)
-						char_base = (m_ddram[char_pos] & 0x07) * 8;
+						src = m_cgram + (m_ddram[char_pos] & 0x07) * 8;
 					else
-						char_base = ((m_ddram[char_pos] >> 1) & 0x03) * 16;
+						src = m_cgram + ((m_ddram[char_pos] >> 1) & 0x03) * 16;
 				}
 				else
 				{
 					// draw CGROM characters
-					char_base = m_ddram[char_pos] * 0x10;
+					src = m_cgrom + m_ddram[char_pos] * 0x10;
 				}
 
-				const u8 *charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
 				u8 *dest = m_render_buf + 16 * (line * line_size + pos);
-				memcpy (dest, charset + char_base, m_char_size);
+				memcpy (dest, src, m_char_size);
 
 				if (char_pos == m_ac)
 				{

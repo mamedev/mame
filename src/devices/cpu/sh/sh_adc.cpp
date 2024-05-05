@@ -306,8 +306,6 @@ void sh_adc_device::mode_update()
 			m_end_channel = m_adcsr & 3;
 		} else
 			m_start_channel = m_end_channel = m_adcsr & 3;
-		if(m_start_channel == 2)
-			machine().debug_break();
 	}
 }
 

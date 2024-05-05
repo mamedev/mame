@@ -20,6 +20,7 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_swx00(*this, "swx00"),
 		  m_lcdc(*this, "ks0066"),
+		  m_inputs(*this, "B%u", 1U),
 		  m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
 		  m_sustain(*this, "SUSTAIN"),
 		  m_pitch_bend(*this, "PITCH_BEND")
@@ -31,6 +32,7 @@ private:
 	required_device<sh7042_device> m_maincpu;
 	required_device<swx00_sound_device> m_swx00;
 	required_device<hd44780_device> m_lcdc;
+	required_ioport_array<8> m_inputs;
 	output_finder<80, 8, 5> m_outputs;
 	required_ioport m_sustain;
 	required_ioport m_pitch_bend;
@@ -69,15 +71,16 @@ void psr540_state::render_w(int state)
 		}
 
 	if(1)
-	for(int x1=0; x1 != 4; x1++)
+	for(int x1=1; x1 != 2; x1++)
 		for(int yy=0; yy != 8; yy++) {
 			std::string s;
-			for(int x=0; x != 10; x++) {
-				uint8_t v = render[16*(x+10*x1) + yy];
+			for(int x=0; x != 16; x++) {
+				uint8_t v = render[16*(x+40*x1) + yy];
 				for(int xx=0; xx != 5; xx++)
 					s += ((v >> (4-xx)) & 1) ? '#' : '.';
+				s += ' ';
 			}
-			logerror("XX %02d.%d %s\n", x1*10, yy, s);
+			logerror("XX %02d.%d %s\n", x1*40, yy, s);
 		}
 }
 
@@ -117,6 +120,7 @@ void psr540_state::psr540(machine_config &config)
 	m_maincpu->read_adc<2>().set(FUNC(psr540_state::adc_battery_r));
 	m_maincpu->read_adc<3>().set_constant(0);
 	m_maincpu->read_adc<4>().set_ioport(m_pitch_bend);
+	m_maincpu->read_adc<5>().set_constant(0); // Actually used as pf5
 	m_maincpu->read_porte().set(FUNC(psr540_state::pe_r));
 	m_maincpu->write_porte().set(FUNC(psr540_state::pe_w));
 	m_maincpu->read_portf().set(FUNC(psr540_state::pf_r));
@@ -140,20 +144,36 @@ void psr540_state::psr540(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+// Port E:
+//  15:    N10
+//  14:    (dack0)
+//  13-12: N9-8
+//  11:    lcd_rs
+//  10:    N7
+//   9:    lcd_en
+//   8:    rdens
+//   7-5:  N6-4
+
+// Port F:
+//  7-5:   N3-1
+//  4-0:   (ad inputs)
+
 u16 psr540_state::pe_r()
 {
-	return 0xffff;
+	u32 n = m_inputs[m_scan]->read();
+	return util::bitswap(~n | 0x8000, 9, 15, 8, 7, 15, 6, 15, 15, 5, 4, 3, 15, 15, 15, 15, 15);
 }
 
 u8 psr540_state::pf_r()
 {
-	return 0xff;
+	u32 n = m_inputs[m_scan]->read();
+	return util::bitswap(~n | 0x8000, 2, 1, 0, 15, 15, 15, 15, 15);
 }
 
 void psr540_state::pe_w(u16 data)
 {
 	m_pe = data;
-	logerror("pe lcd_rs=%x lcd_en=%x ldcic=%d fdcic=%d\n", BIT(m_pe, 11), BIT(m_pe, 9), BIT(m_pe, 4), BIT(m_pe, 3));
+	logerror("pe lcd_rs=%x lcd_en=%x ldcic=%d fdcic=%d (%s)\n", BIT(m_pe, 11), BIT(m_pe, 9), BIT(m_pe, 4), BIT(m_pe, 3), machine().describe_context());
 	m_lcdc->rs_w(BIT(m_pe, 11));
 	m_lcdc->e_w(BIT(m_pe, 9));
 
@@ -205,6 +225,101 @@ static INPUT_PORTS_START( psr540 )
 	PORT_START("PITCH_BEND")
 	PORT_BIT(0x3ff, 0x200, IPT_PADDLE) PORT_NAME("Pitch Bend") PORT_SENSITIVITY(30)
 
+	PORT_START("B1")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Exit") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Utility") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Save") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Load") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part R2") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part R1") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Part L") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+
+	PORT_START("B2")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Voice L") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Voice R1") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Voice R2") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 11")
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 12")
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 13")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 14")
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 15")
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 16")
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Style") PORT_CODE(KEYCODE_P)
+
+	PORT_START("B3")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 1")
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 2")
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 3")
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 4")
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 5")
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 6")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 7")
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 8")
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 9")
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Track 10")
+
+	PORT_START("B4")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Vocal Chg") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Mixer") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Direct Access") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Next") PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Best") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Harmony/Echo") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Sustain") PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Touch") PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Fast/Slow") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("DSP") PORT_CODE(KEYCODE_COLON)
+
+	PORT_START("B5")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("2")     PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1")     PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("6")     PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("5")     PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("4")     PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("7")     PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("+/Yes") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("0")     PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("-/No")  PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("3")     PORT_CODE(KEYCODE_3)
+
+	PORT_START("B6")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Song") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Function") PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Acmp/Song Vol") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Transpose") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Tempo/Tap") PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Fingering") PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Acmp On/Off") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Record") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Demo") PORT_CODE(KEYCODE_STOP)
+
+	PORT_START("B7")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pad 1")
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pad 2")
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pad 3")
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pad 4")
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pad Stop")
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Intro")
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Sync Stop")
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Sync Start")
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Start/Stop")
+
+	PORT_START("B8")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Reg 4")
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Reg 3")
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Reg 1")
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Memory")
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Freeze")
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Reg 2")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main A")
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main B")
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Ending")
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Reg./OTS")
 INPUT_PORTS_END
 
 ROM_START( psr540 )
