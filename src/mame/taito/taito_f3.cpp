@@ -105,7 +105,7 @@ void taito_f3_state::sound_reset_1_w(u32 data)
 
 void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (m_has_sample_banking) {
+	if (m_has_audiocpu_banking) {
 		int idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
 			idx += 1;
@@ -451,7 +451,7 @@ void taito_f3_state::init_common()
 
 void taito_f3_state::init_kirameki()
 {
-	m_has_sample_banking = true;
+	m_has_audiocpu_banking = true;
 	
 	init_common();
 }

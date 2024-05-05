@@ -76,7 +76,7 @@ protected:
 	emu_timer *m_interrupt5_timer;
 	u32 m_coin_word[2];
 
-	bool m_has_sample_banking{false};
+	bool m_has_audiocpu_banking{false};
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
