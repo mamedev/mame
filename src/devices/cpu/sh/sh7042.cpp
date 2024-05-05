@@ -356,11 +356,6 @@ void sh7042_device::device_add_mconfig(machine_config &config)
 
 }
 
-void sh7042_device::do_sci_w(int sci, int state)
-{
-	logerror("sci %d %d\n", sci, state);
-}
-
 void sh7042_device::internal_update()
 {
 	internal_update(current_cycles());

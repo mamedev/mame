@@ -6,6 +6,7 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/sh/sh7042.h"
+#include "machine/nvram.h"
 #include "sound/swx00.h"
 #include "video/hd44780.h"
 
@@ -20,6 +21,7 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_swx00(*this, "swx00"),
 		  m_lcdc(*this, "ks0066"),
+		  m_nvram(*this, "ram"),
 		  m_inputs(*this, "B%u", 1U),
 		  m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
 		  m_sustain(*this, "SUSTAIN"),
@@ -32,6 +34,7 @@ private:
 	required_device<sh7042_device> m_maincpu;
 	required_device<swx00_sound_device> m_swx00;
 	required_device<hd44780_device> m_lcdc;
+	required_device<nvram_device> m_nvram;
 	required_ioport_array<8> m_inputs;
 	output_finder<80, 8, 5> m_outputs;
 	required_ioport m_sustain;
@@ -137,6 +140,8 @@ void psr540_state::psr540(machine_config &config)
 	m_lcdc->set_default_bios_tag("f05");
 	m_lcdc->set_lcd_size(2, 40);
 
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
 	/* video hardware */
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
 	screen.set_refresh_hz(60);
@@ -213,7 +218,7 @@ void psr540_state::map(address_map &map)
 	// 200000 fdc
 	map(0x00200000, 0x00200000).lr8(NAME([]() -> u8 { return 0x80; }));
 	// 280000 sram (battery-backed)
-	map(0x00280000, 0x0029ffff).ram();
+	map(0x00280000, 0x0029ffff).ram().share("ram");
 	// 2c0000 leds/scanning
 	map(0x002c0000, 0x002c0001).w(FUNC(psr540_state::led_data_w));
 	// 300000 lcd
@@ -346,9 +351,8 @@ ROM_START( psr540 )
 	ROM_LOAD16_WORD_SWAP( "xw25410.ic210", 0, 0x400000, CRC(c7c4736d) SHA1(ff1052eb076557071ed8652e6c2fc0925144fbd5))
 	ROM_LOAD16_WORD_SWAP( "xw25520.ic220", 0x400000, 0x200000, CRC(9ef56c4e) SHA1(f26b588f9bcfd7bdbf1c0b38e4a1ea57e2f29f10))
 
-	// Warning: will change, only the grid is mapped at this point
-	ROM_REGION(800000, "screen", ROMREGION_ERASE00)
-	ROM_LOAD("psr540-lcd.svg", 0, 0x95f72, CRC(15adfc4d) SHA1(92c5bb43ef253bb33ec2b3a77c11d23db8322dc1))
+	ROM_REGION(634769, "screen", ROMREGION_ERASE00)
+	ROM_LOAD("psr540-lcd.svg", 0, 634769, CRC(7609d582) SHA1(8241cc57dfa02f3185af25bd98831f531fb3e1d7))
 ROM_END
 
 SYST( 1999, psr540, 0, 0, psr540, psr540, psr540_state, empty_init, "Yamaha", "PSR540", MACHINE_IS_SKELETON )
