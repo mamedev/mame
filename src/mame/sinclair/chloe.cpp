@@ -10,8 +10,9 @@
 #include "spec128.h"
 
 #include "machine/spi_sdcard.h"
-#include "screen.h"
 #include "sound/ay8910.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -73,6 +74,7 @@ protected:
 	void port_1ffd_w(u8 data);
 	void port_f4_w(u8 data);
 	void port_ff_w(u8 data);
+	void port_e3_w(u8 data);
 	u8 spi_data_r();
 	void spi_data_w(u8 data);
 	void spi_miso_w(u8 data);
@@ -92,13 +94,12 @@ private:
 	required_device<screen_ula_plus_device> m_ula;
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
 
-	u8 m_port_f4_data;
+	u8 m_timex_mmu;
 	u8 m_port_ff_data;
 	bool m_core_boot;
 	u8 m_reg_selected;
 	bool m_divmmc_paged;
-	bool m_divmmc_on_delayed;
-	u8 m_divmmc_reg;
+	u8 m_divmmc_ctrl;
 	u8 m_uno_regs_data[256];
 	u8 m_palpen_selected;
 
@@ -118,33 +119,54 @@ void chloe_state::update_memory()
 	const bool ext = BIT(m_port_ff_data, 7); // 0 - DOC 7xxxx=28+; 1 - EXT 6xxxx=24+
 	m_bank0_view.disable();
 	m_bank1_view.disable();
+	const u8 divmmc_sram_page = BIT(m_divmmc_ctrl, 0, 6);
+	const bool divmmc_sram_page_is_valid = BIT(divmmc_sram_page, 4, 2) == 0;
+	const bool mapram_mode = BIT(m_divmmc_ctrl, 6);
+	const bool conmem = BIT(m_divmmc_ctrl, 7);
+	const bool divmmc_rom_active = m_divmmc_paged || conmem;
 	for (auto i = 0; i < 8; ++i)
 	{
-		const bool paged = BIT(m_port_f4_data, i);
+		const bool paged = BIT(m_timex_mmu, i);
 
 		u8 pg;
-		if (i == 0 && (m_divmmc_paged || !paged))
+		if (i == 0 && (divmmc_rom_active || !paged))
 		{
+			if (divmmc_rom_active)
+			{
+				if (!mapram_mode || conmem)
+					pg = 24;
+				else
+					pg = 35;
+			}
+			else
+			{
+				pg = (8 + BIT(m_port_7ffd_data, 4)) << 1;
+			}
 			m_bank0_view.select(0);
-			if (m_divmmc_paged)
-				pg = 12;
-			else
-				pg = 8 + BIT(m_port_7ffd_data, 4);
-			m_bank_ram[0]->set_entry(pg << 1);
+			m_bank_ram[0]->set_entry(pg);
 		}
-		else if (i == 1 && (m_divmmc_paged || !paged))
+		else if (i == 1 && (divmmc_rom_active || !paged))
 		{
-			if (m_divmmc_paged)
+			if (divmmc_rom_active)
 			{
-				pg = 16;
-				m_bank_ram[1]->set_entry((pg << 1) + (m_divmmc_reg & 0x0f));
+				pg = 32 + (divmmc_sram_page & 0x0f);
+				if (!mapram_mode || conmem)
+				{
+					if (!divmmc_sram_page_is_valid)
+						m_bank1_view.select(0);
+				}
+				else
+				{
+					if ((mapram_mode && (divmmc_sram_page == 3)) || !divmmc_sram_page_is_valid)
+						m_bank1_view.select(0);
+				}
 			}
 			else
 			{
+				pg = ((8 + BIT(m_port_7ffd_data, 4)) << 1) + 1;
 				m_bank1_view.select(0);
-				pg = 8 + BIT(m_port_7ffd_data, 4);
-				m_bank_ram[1]->set_entry((pg << 1) + 1);
 			}
+			m_bank_ram[1]->set_entry(pg);
 		}
 		else if (paged)
 		{
@@ -193,7 +215,8 @@ void chloe_state::port_1ffd_w(u8 data)
 	if (m_port_7ffd_data & 0x20)
 		return;
 
-	m_port_1ffd_data = data;
+	m_port_7ffd_data = data;
+	update_memory();
 }
 
 void chloe_state::port_ff_w(u8 data)
@@ -206,7 +229,16 @@ void chloe_state::port_ff_w(u8 data)
 
 void chloe_state::port_f4_w(u8 data)
 {
-	m_port_f4_data = data;
+	m_timex_mmu = data;
+	update_memory();
+}
+
+void chloe_state::port_e3_w(u8 data)
+{
+	if (m_divmmc_ctrl & 0x40)
+		m_divmmc_ctrl = data | 0x40;
+	else
+		m_divmmc_ctrl = data;
 	update_memory();
 }
 
@@ -345,7 +377,7 @@ void chloe_state::map_io(address_map &map)
 	map(0x1ffd, 0x1ffd).w(FUNC(chloe_state::port_1ffd_w));
 	map(0x00f4, 0x00f4).mirror(0xff00).w(FUNC(chloe_state::port_f4_w));
 
-	map(0x00e3, 0x00e3).mirror(0xff00).lw8(NAME([this](u8 data) { m_divmmc_reg = data; update_memory(); }));
+	map(0x00e3, 0x00e3).mirror(0xff00).w(FUNC(chloe_state::port_e3_w));
 	map(0x00e7, 0x00e7).mirror(0xff00).lw8(NAME([this](u8 data) { m_sdcard->spi_ss_w(data & 1); }));
 	map(0x00eb, 0x00eb).mirror(0xff00).rw(FUNC(chloe_state::spi_data_r), FUNC(chloe_state::spi_data_w));
 
@@ -442,6 +474,7 @@ void chloe_state::machine_start()
 	}
 
 	m_core_boot = 1;
+	m_divmmc_ctrl = 0;
 
 	//save_item(NAME(...));
 }
@@ -454,13 +487,12 @@ void chloe_state::machine_reset()
 	m_spi_clock_cycles = 0;
 	m_spi_clock_state = false;
 
-	m_port_f4_data = 0;
+	m_timex_mmu = 0;
 	m_port_ff_data = 0;
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
-	m_divmmc_paged = 0;
-	m_divmmc_on_delayed = 0;
-	m_divmmc_reg = 0;
+	m_divmmc_paged = 01;
+	m_divmmc_ctrl &= 0x40;
 
 	update_memory();
 }
@@ -539,4 +571,4 @@ ROM_END
 } // Anonymous namespace
 
 /*    YEAR   NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY               FULLNAME       FLAGS */
-COMP( 1999,  chloe,   spec128, 0,      chloe,   chloe,  chloe_state,  empty_init,  "Chloe Corporation",  "Chloe 280SE", MACHINE_NOT_WORKING )
+COMP( 1999,  chloe,   spec128, 0,      chloe,   chloe,  chloe_state,  empty_init,  "Chloe Corporation",  "Chloe 280SE", MACHINE_IMPERFECT_SOUND )
