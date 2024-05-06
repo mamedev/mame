@@ -379,9 +379,9 @@ void _2mindril_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 	const u16 color = m_paletteram[offset];
 	
 	//PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
-	// .... .... .... .... RRRR GGGG BBBB ....
+	// .... .... .... .... RRRR GGGG BBBB rgb.
 	// .... .... RRRR rrrr GGGG gggg BBBB bbbb
-	m_fdp->m_palette_12bit->set_pen_color(offset, rgb_t(BIT(color, 12, 4) * 16, BIT(color, 8, 4) * 16, BIT(color, 4, 4) * 16)); // maybe?
+	m_fdp->m_palette_12bit->set_pen_color(offset, rgb_t(BIT(color, 12, 4) * 16 + BIT(color, 3) * 8, BIT(color, 8, 4) * 16 + BIT(color, 2) * 8, BIT(color, 4, 4) * 16 + BIT(color, 1) * 8));//m_fdp->m_palette_12bit->set_pen_color(offset, rgb_t(BIT(color, 12, 4) * 16, BIT(color, 8, 4) * 16, BIT(color, 4, 4) * 16)); // maybe?
 	//m_palette->set_pen_color(offset, rgb_t(color).set_a(255));
 }
 
