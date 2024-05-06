@@ -242,8 +242,9 @@ void scobra_state::hustlerb_map(address_map &map)
 void scobra_state::hustlerb6_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4800, 0x4800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	// map(0x4803, 0x4803).r();
+	map(0x4800, 0x4800).portr("IN0").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x4801, 0x4801).portr("IN1");
+	map(0x4803, 0x4803).portr("IN2");
 	map(0x5000, 0x5000).w(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8bff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
@@ -255,7 +256,7 @@ void scobra_state::hustlerb6_map(address_map &map)
 	map(0xa802, 0xa802).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
 	map(0xa806, 0xa806).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
 	map(0xa808, 0xa808).nopw();    /* coin counters */
-	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xb800, 0xb800).lr8(NAME([] () -> uint8_t { return 0xff; })); // doesn't boot with 0x00
 }
 
 void scobra_state::mimonkeyug_map(address_map &map)
@@ -825,6 +826,53 @@ static INPUT_PORTS_START( hustler )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( hustlerb6 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) // 0x01 also controls cocktail / upright, leftover not connected in this bootleg?
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "Infinite (Cheat)" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( mimonkeyug )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1156,6 +1204,7 @@ void scobra_state::hustlerb6(machine_config &config)
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
+	config.device_remove("watchdog");
 }
 
 /***************************************************************************
@@ -1818,6 +1867,6 @@ GAME( 1981, hustlerb,   hustler,  hustlerb,   hustler,    scobra_state,  empty_i
 GAME( 1981, hustlerb2,  hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "bootleg",                            "Fatsy Gambler (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb4,  hustler,  hustlerb4,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb5,  hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerb6,  hustler,  hustlerb6,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // stuck on boot, dump verified good
+GAME( 1981, hustlerb6,  hustler,  hustlerb6,  hustlerb6,  scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, mimonkeyug, mimonkey, mimonkeyug, mimonkeyug, scobra_state,  empty_init,    ROT90,  "bootleg (U.Games)",                  "Mighty Monkey (U.Games bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing discrete sound components emulation
