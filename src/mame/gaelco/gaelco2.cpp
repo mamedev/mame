@@ -2776,7 +2776,7 @@ GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state, i
 
 GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Champion Pool (v1.0)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
-GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "New Impeuropex Corp. / New Chitarrina", "Jungle's Animals", MACHINE_NOT_WORKING ) // Developed by Nova Desitec, missing ds5002fp dump
+GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "New Impeuropex Corp. / New Chitarrina", "Jungle's Animals (v3.0)", MACHINE_NOT_WORKING ) // Developed by Nova Desitec, missing ds5002fp dump
 
 // Gym equipment
 GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state, init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", 0 ) // Same board and ROM as Pro Reclimber
