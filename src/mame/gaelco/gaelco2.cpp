@@ -1010,7 +1010,6 @@ ROM_START( jungleani )
 	ROM_LOAD( "pal16l8acn.u17", 0x117, 0x104, NO_DUMP )
 ROM_END
 
-
 void gaelco2_state::play2000(machine_config &config)
 {
 	/* basic machine hardware */
