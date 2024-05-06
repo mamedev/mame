@@ -358,7 +358,7 @@ void taito_f3_state::video_start()
 		{ "pbobble4",  0,     1 },
 		{ "popnpop",   1,     1 },
 		{ "landmakr",  1,     1 },
-		{ "2mindril",  1,     0 },
+		//{ "2mindril",  1,     0 },
 		{ nullptr,     1,     1 },
 	};
 

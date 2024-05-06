@@ -63,6 +63,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<screen_device> m_screen;
@@ -333,6 +334,14 @@ void _2mindril_state::drill(machine_config &config)
 	ymsnd.add_route(0, "rspeaker", 0.25);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
+}
+
+// temp copied from taito f3
+void _2mindril_state::video_start()
+{
+	m_fdp->create_tilemaps(true);
+	
+	m_fdp->m_sprite_lag = false;
 }
 
 // temp copied from taito f3
