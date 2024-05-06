@@ -988,6 +988,7 @@ ROM_START( chmppool )
 	ROM_LOAD( "pal16l8acn.u17", 0x117, 0x104, NO_DUMP )
 ROM_END
 
+// Sequel of "Super Gran Safari", also developed by Nova Desitec for New Impeuropex Corp.
 ROM_START( jungleani )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.u44", 0x000001, 0x010000, CRC(23c700d6) SHA1(14ee6b525b6410b784540a9c5ae647affcb7320a) )
