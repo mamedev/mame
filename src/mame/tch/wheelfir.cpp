@@ -205,13 +205,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_adc_eoc(0),
-		m_is_pwball(false)
+		m_is_pwball(false),
+		m_disable_raster_irq(false)
 	{ }
 
 	void wheelfir(machine_config &config);
+	void kongball(machine_config &config);
+
 	int adc_eoc_r();
 
 	void init_pwball();
+	void init_kongball();
 
 protected:
 	virtual void machine_start() override;
@@ -267,6 +271,7 @@ private:
 	int m_adc_eoc;
 
 	bool m_is_pwball;
+	bool m_disable_raster_irq;
 };
 
 
@@ -457,8 +462,8 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			float idx_y = 0;
 			for(int y=dst_y0; !endy; y+=y_dst_step, idx_y+=scale_y_step)
 			{
-				endx=(x==dst_x1);
-				endy=(y==dst_y1);
+				endx=(x==(dst_x1+1));
+				endy=(y==(dst_y1+1));
 
 
 				int xx=src_x0+x_src_step*idx_x;
@@ -685,7 +690,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 
 		//visible scanline
 		m_scanline_cnt--;
-		if(m_scanline_cnt==0)
+
+		if ((m_scanline_cnt==0) && (!m_disable_raster_irq))
 		{
 			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
@@ -807,7 +813,13 @@ void wheelfir_state::wheelfir(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
-;
+}
+
+
+void wheelfir_state::kongball(machine_config& config)
+{
+	wheelfir(config);
+	m_subcpu->set_disable(); // sound ROMS were not present, so don't run sound CPU
 }
 
 
@@ -861,6 +873,55 @@ ROM_START( pwball )
 	// u205 is empty (missing or unused?)
 ROM_END
 
+ROM_START( kongball )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "kong.u19", 0x00001, 0x80000, CRC(0283df0a) SHA1(559b547127728c78ba66191278bba4b4cce37eba) )
+	ROM_LOAD16_BYTE( "kong.u21", 0x00000, 0x80000, CRC(ca6ad0da) SHA1(d5e07d7827587263b8d3028ab006dc0be454a7c7) )
+
+	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	// these were not present on the PCB (empty sockets) was sound never programmed, or were they removed at some point?
+	ROM_LOAD16_BYTE( "kong.u63", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "kong.u65", 0x00000, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00  ) // each ROM contains 2 512x512 8bpp gfx pages
+	ROM_LOAD( "kong.u52", 0x000000, 0x80000, CRC(52487271) SHA1(a15a4011b1b23f5b2af0d7b6d05b3df3ae1daebb) )
+	ROM_LOAD( "kong.u53", 0x080000, 0x80000, CRC(aaaa3840) SHA1(0dcd2d70687d3c646198c40743b8b0a64cafced0) )
+	ROM_LOAD( "kong.u54", 0x100000, 0x80000, CRC(cb7ef2c2) SHA1(293b694e201221a5b27b22a1b729db5d7e52bf99) )
+	ROM_LOAD( "kong.u55", 0x180000, 0x80000, CRC(c9596c6f) SHA1(dd989d3e0c0be696331a8c42e03439fec8685bc8) )
+	ROM_LOAD( "kong.u56", 0x200000, 0x80000, CRC(cbb69adc) SHA1(244d36e6913feb7edc606fdaa7a80f2a8a480efa) )
+	ROM_LOAD( "kong.u57", 0x280000, 0x80000, CRC(f33af567) SHA1(8cbf9cc78b95edf33fb250bd232f032b4d7f4881) )
+	ROM_LOAD( "kong.u58", 0x300000, 0x80000, CRC(17818ee8) SHA1(7e857f7c5c146cfcdaa9b1077c63bbee1d143438) )
+	ROM_LOAD( "kong.u59", 0x380000, 0x80000, CRC(6d35e911) SHA1(d37bc2d364ced0d828598af9b2fe7abf6ffb4f82) )
+	ROM_LOAD( "kong.u200",0x400000, 0x80000, CRC(ec552e97) SHA1(7a9a06ff77ef7fc51782caa4d4514864bf8099e7) )
+ROM_END
+
+
+ROM_START( radendur )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "endu.u19", 0x00001, 0x80000, CRC(d24ca61c) SHA1(64d2648959579d35fbf4c8479c0ff75781d28146) )
+	ROM_LOAD16_BYTE( "endu.u21", 0x00000, 0x80000, CRC(45244675) SHA1(69be2eca3548644f97b9f6956bb3ff979740b1e4) )
+
+	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_LOAD16_BYTE( "endu.u63", 0x00001, 0x80000, CRC(43c35368) SHA1(62167a434bfe00825f2f97ecadd0af3e2d2b63f2) )
+	ROM_LOAD16_BYTE( "endu.u65", 0x00000, 0x80000, CRC(25259894) SHA1(b260324760dba1595ab8bd53e1bbc20c04b640dd) )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00  ) // each ROM contains 2 512x512 8bpp gfx pages
+	ROM_LOAD( "endu.u52", 0x000000, 0x80000, CRC(2b686f81) SHA1(9d9aa0f6e1a3dc7e96f647ddda3214f1f4c6bf1d) )
+	ROM_LOAD( "endu.u53", 0x080000, 0x80000, CRC(1a224c69) SHA1(ed1a8fdd97ea0caa649d3f1238fa13b1fd19376c) )
+	ROM_LOAD( "endu.u54", 0x100000, 0x80000, CRC(217a9725) SHA1(14240e457967c5b23c54d4395fc1ab7394a59fc9) )
+	ROM_LOAD( "endu.u55", 0x180000, 0x80000, CRC(bfce1b17) SHA1(415ab6815836dafb1a0b86464e84f3aaa5d1075d) )
+	ROM_LOAD( "endu.u56", 0x200000, 0x80000, CRC(4b9460a8) SHA1(d2b9484f133d5d9abbe6a163c57d079944b3221f) )
+	ROM_LOAD( "endu.u57", 0x280000, 0x80000, CRC(f17d5752) SHA1(354a76e9e130f10fc103ab83ea15bf1f47fca391) ) // mostly blank ROM (contains a single image)
+	ROM_LOAD( "endu.u58", 0x300000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) ) // blank ROM (intentional)
+	ROM_LOAD( "endu.u59", 0x380000, 0x80000, CRC(037648df) SHA1(19b0cbdb60ac4b14f06dd71ddf4e3b2d2dbdb19d) ) // FIXED BITS (111xxxxx) but correct, not all 8bpp used
+	ROM_LOAD( "endu.u200",0x400000, 0x80000, CRC(e1417f94) SHA1(dba02ce1f9bbe18e78c67e770fe84184e227799b) )
+	ROM_LOAD( "endu.u201",0x480000, 0x80000, CRC(25d9db1c) SHA1(c61491ae2dc97ea5c9f0f0d58f32edf0a3a94d95) )
+	ROM_LOAD( "endu.u202",0x500000, 0x80000, CRC(15f4fbd4) SHA1(2ad28af1bd0924fc3f1f6e026ca834c7df774b64) )
+	ROM_LOAD( "endu.u203",0x580000, 0x80000, CRC(e6361a27) SHA1(826be3b326e68c3b7c0f5c3d84993a971b32f84e) )
+	ROM_LOAD( "endu.u204",0x600000, 0x80000, CRC(0db97872) SHA1(56e38a9034082c3ceb78c0f3aba6125ce6fabd49) )
+	ROM_LOAD( "endu.u205",0x680000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) ) // blank ROM (intentional)
+ROM_END
+
 } // anonymous namespace
 
 void wheelfir_state::init_pwball()
@@ -869,5 +930,16 @@ void wheelfir_state::init_pwball()
 	m_is_pwball = true;
 }
 
-GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, pwball,      0, wheelfir,    pwball  , wheelfir_state, init_pwball,ROT0,  "TCH", "Power Ball",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // possibly a prototype
+void wheelfir_state::init_kongball()
+{
+	init_pwball();
+	m_disable_raster_irq = true; // the raster interrupt points outside of code
+}
+
+
+GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init,    ROT0,  "TCH", "Wheels & Fire", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, pwball,      0, wheelfir,    pwball,   wheelfir_state, init_pwball,   ROT0,  "TCH", "Power Ball (prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // mostly complete
+
+// these might not be fully functional games
+GAME( 199?, kongball,    0, kongball,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH", "Kong Ball (early prototype)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // can't get ingame?
+GAME( 199?, radendur,    0, wheelfir,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // can get ingame if you overclock CPUs significantly (IRQ problems?)
