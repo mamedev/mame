@@ -53,6 +53,7 @@ public:
 		m_screen(*this, "screen"),
 		m_maincpu(*this, "maincpu"),
 		m_fdp(*this, "fdp"),
+		m_paletteram(*this, "paletteram"),
 		m_in0(*this, "IN0")
 	{ }
 
@@ -69,6 +70,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_maincpu;
 	required_device<FDP> m_fdp;
+	optional_shared_ptr<u16> m_paletteram;
 	
 	/* input-related */
 	required_ioport m_in0;
@@ -83,6 +85,7 @@ private:
 	void sensors_w(u16 data);
 	u16 irq_r();
 	void irq_w(offs_t offset, u16 data, u16 mem_mask);
+	void paletteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
@@ -212,7 +215,7 @@ void _2mindril_state::drill_map(address_map &map)
 	map(0x300000, 0x3000ff).ram();
 	map(0x400000, 0x43ffff).m(m_fdp, FUNC(FDP::map_ram));
 	map(0x460000, 0x46001f).m(m_fdp, FUNC(FDP::map_control));
-	//map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x501fff).ram().w(FUNC(_2mindril_state::paletteram_w)).share("paletteram");
 	map(0x502022, 0x502023).nopw(); //countinously switches between 0 and 2
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::irq_r), FUNC(_2mindril_state::irq_w));
@@ -368,6 +371,20 @@ u32 _2mindril_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	return 0;
 }
+	
+// temp copied from taito f3
+void _2mindril_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_paletteram[offset]);
+	const u16 color = m_paletteram[offset];
+	
+	//PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
+	// .... .... .... .... RRRR GGGG BBBB ....
+	// .... .... RRRR rrrr GGGG gggg BBBB bbbb
+	m_fdp->m_palette_12bit->set_pen_color(offset, rgb_t(BIT(color, 12, 4) * 16, BIT(color, 8, 4) * 16, BIT(color, 4, 4) * 16)); // maybe?
+	//m_palette->set_pen_color(offset, rgb_t(color).set_a(255));
+}
+
 
 #define ROM_LOAD48_WORD(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(4))
 
