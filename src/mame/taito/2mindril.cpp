@@ -35,7 +35,7 @@ DAC               -26.6860Mhz
 */
 
 #include "emu.h"
-#include "taito_f3.h"
+#include "tc0630fdp.h"
 
 #include "cpu/m68000/m68000.h"
 #include "taitoio.h"
@@ -45,11 +45,14 @@ DAC               -26.6860Mhz
 
 namespace {
 
-class _2mindril_state : public taito_f3_state
+class _2mindril_state : public driver_device
 {
 public:
 	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag) :
-		taito_f3_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_screen(*this, "screen"),
+		m_maincpu(*this, "maincpu"),
+		m_fdp(*this, "fdp"),
 		m_in0(*this, "IN0")
 	{ }
 
@@ -62,6 +65,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	required_device<screen_device> m_screen;
+	required_device<cpu_device> m_maincpu;
+	required_device<FDP> m_fdp;
+	
 	/* input-related */
 	required_ioport m_in0;
 	u8         m_defender_sensor;
@@ -82,6 +89,8 @@ private:
 
 	void drill_map(address_map &map);
 
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
+	
 	#ifdef UNUSED_FUNCTION
 protected:
 	TIMER_CALLBACK_MEMBER(set_shutter_req);
@@ -200,15 +209,9 @@ void _2mindril_state::drill_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x3000ff).ram();
-	map(0x400000, 0x40ffff).ram().share("spriteram");
-	map(0x410000, 0x41bfff).ram().w(FUNC(_2mindril_state::pf_ram_w)).share("pf_ram");
-	map(0x41c000, 0x41dfff).ram().w(FUNC(_2mindril_state::textram_w)).share("textram");
-	map(0x41e000, 0x41ffff).ram().w(FUNC(_2mindril_state::charram_w)).share("charram");
-	map(0x420000, 0x42ffff).ram().share("line_ram");
-	map(0x430000, 0x43ffff).ram().w(FUNC(_2mindril_state::pivot_w)).share("pivot_ram");
-	map(0x460000, 0x46000f).w(FUNC(_2mindril_state::control_0_w));
-	map(0x460010, 0x46001f).w(FUNC(_2mindril_state::control_1_w));
-	map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x43ffff).m(m_fdp, FUNC(FDP::map_ram));
+	map(0x460000, 0x46001f).m(m_fdp, FUNC(FDP::map_control));
+	//map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x502022, 0x502023).nopw(); //countinously switches between 0 and 2
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::irq_r), FUNC(_2mindril_state::irq_w));
@@ -258,60 +261,6 @@ static INPUT_PORTS_START( drill )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Select SW-4")
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	256,
-	4,
-	{ 0,1,2,3 },
-	{ 20, 16, 28, 24, 4, 0, 12, 8 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
-static const gfx_layout pivotlayout =
-{
-	8,8,
-	2048,
-	4,
-	{ 0,1,2,3 },
-	{ 20, 16, 28, 24, 4, 0, 12, 8 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
-static const gfx_layout layout_6bpp_sprite_hi =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	6,
-	{ STEP2(0,1)/**/,0,0,0,0/**/ },
-	{ STEP4(3*2,-2), STEP4(7*2,-2), STEP4(11*2,-2), STEP4(15*2,-2) },
-	{ STEP16(0,16*2) },
-	16*16*2
-};
-
-static const gfx_layout layout_6bpp_tile_hi =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	6,
-	{ 8,0/**/,0,0,0,0/**/ },
-	{ STEP8(7,-1), STEP8(8*2+7,-1) },
-	{ STEP16(0,8*2*2) },
-	16*16*2
-};
-
-static GFXDECODE_START( gfx_2mindril )
-	GFXDECODE_ENTRY( nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
-	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
-	GFXDECODE_ENTRY( "tilemap_hi", 0, layout_6bpp_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
-	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_sprite_hi,  0x1000, 0x1000>>4 ) // hi 2bpp of 6bpp sprite data
-GFXDECODE_END
-
-
 INTERRUPT_GEN_MEMBER(_2mindril_state::vblank_irq)
 {
 	device.execute().set_input_line(4, ASSERT_LINE);
@@ -355,8 +304,9 @@ void _2mindril_state::drill(machine_config &config)
 	M68000(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_2mindril_state::drill_map);
 	m_maincpu->set_vblank_int("screen", FUNC(_2mindril_state::vblank_irq));
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2mindril);
-
+	
+	TC0630FDP(config, m_fdp, 26.686_MHz_XTAL / 4);
+	
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_0_callback().set_ioport("DSW");
 	tc0510nio.read_1_callback().set(FUNC(_2mindril_state::arm_pwr_r));
@@ -370,9 +320,9 @@ void _2mindril_state::drill(machine_config &config)
 	m_screen->set_size(40*8+48*2, 32*8);
 	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
 	m_screen->set_screen_update(FUNC(_2mindril_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(_2mindril_state::screen_vblank));
+	//m_screen->screen_vblank().set(FUNC(_2mindril_state::screen_vblank));
 
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
+	//PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -385,6 +335,32 @@ void _2mindril_state::drill(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
+// temp copied from taito f3
+u32 _2mindril_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_fdp->machine().tilemap().set_flip_all(m_fdp->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
+	bitmap.fill(0, cliprect);
+
+	// TODO: presumably "sprite lag" is timing of sprite ram/framebuffer access.
+	if (m_fdp->m_sprite_lag == 0) {
+		m_fdp->read_sprite_info();
+		m_fdp->draw_sprites();
+		m_fdp->scanline_draw(bitmap, cliprect);
+	} else if (m_fdp->m_sprite_lag == 1) {
+		m_fdp->scanline_draw(bitmap, cliprect);
+		m_fdp->read_sprite_info();
+		m_fdp->draw_sprites();
+	} else { // 2
+		m_fdp->scanline_draw(bitmap, cliprect);
+		m_fdp->draw_sprites();
+		m_fdp->read_sprite_info();
+	}
+
+	return 0;
+}
+
+#define ROM_LOAD48_WORD(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(4))
 
 ROM_START( 2mindril )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
@@ -394,15 +370,12 @@ ROM_START( 2mindril )
 	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
 
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
-	ROM_REGION( 0x200000, "sprites_hi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "sprites", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x400000, "tilemap", 0 )
-	ROM_LOAD32_WORD( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
-	ROM_LOAD32_WORD( "d58-09.ic28", 0x000002, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
-
-	ROM_REGION( 0x200000, "tilemap_hi", 0 )
-	ROM_LOAD       ( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
+	ROM_REGION( 0x600000, "tilemap", 0 )
+	ROM_LOAD48_WORD( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
+	ROM_LOAD48_WORD( "d58-09.ic28", 0x000002, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
+	ROM_LOAD48_WORD( "d58-10.ic29", 0x000004, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
 ROM_END
 
 ROM_START( 2mindrila )
@@ -413,21 +386,18 @@ ROM_START( 2mindrila )
 	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
 
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
-	ROM_REGION( 0x200000, "sprites_hi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "sprites", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x400000, "tilemap", 0 )
-	ROM_LOAD32_WORD( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
-	ROM_LOAD32_WORD( "d58-09.ic28", 0x000002, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
-
-	ROM_REGION( 0x200000, "tilemap_hi", 0 )
-	ROM_LOAD       ( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
+	ROM_REGION( 0x600000, "tilemap", 0 )
+	ROM_LOAD48_WORD( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
+	ROM_LOAD48_WORD( "d58-09.ic28", 0x000002, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
+	ROM_LOAD48_WORD( "d58-10.ic29", 0x000004, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
 ROM_END
 
 void _2mindril_state::init_drill()
 {
-	m_game = TMDRILL;
-	tile_decode();
+	//m_game = TMDRILL;
+	m_fdp->tile_decode();
 }
 
 } // anonymous namespace
