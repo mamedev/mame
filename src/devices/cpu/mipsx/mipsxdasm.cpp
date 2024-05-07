@@ -46,19 +46,9 @@ int mipsx_disassembler::get_offset(u32 opcode)
 	return BIT(opcode, 0, 17);
 }
 
-int mipsx_disassembler::get_imm17(u32 opcode)
-{
-	return BIT(opcode, 0, 17);
-}
-
 int mipsx_disassembler::get_sq(u32 opcode)
 {
 	return BIT(opcode, 16, 1);
-}
-
-int mipsx_disassembler::get_disp(u32 opcode)
-{
-	return BIT(opcode, 0, 16);
 }
 
 int mipsx_disassembler::get_asr_amount(int shift)
@@ -159,7 +149,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 		case 0:
 		{
-			u16 comp = get_compute_compfunc(opcode);
+			const u16 comp = get_compute_compfunc(opcode);
 			if (comp == 0x0e6)
 			{
 				u8 src1 = get_src1(opcode);
@@ -190,7 +180,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 1:
 		{
-			u16 comp = get_compute_compfunc(opcode);
+			const u16 comp = get_compute_compfunc(opcode);
 
 			if (comp == 0x080)
 			{
@@ -207,7 +197,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else if ((comp & 0xf80) == 0x100)
 			{
-				u8 src2 = get_src2_dest(opcode);
+				const u8 src2 = get_src2_dest(opcode);
 
 				if (src2 == 0x0)
 				{
@@ -228,7 +218,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 4:
 		{
-			u16 comp = get_compute_compfunc(opcode);
+			const u16 comp = get_compute_compfunc(opcode);
 
 			if (comp == 0x00b)
 			{
@@ -250,8 +240,8 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 				u8 src2 = get_src2_dest(opcode);
 				if (src2 == 0)
 				{
-					u8 src1 = get_src1(opcode);
-					u8 dest = get_compute_dest(opcode);
+					const u8 src1 = get_src1(opcode);
+					const u8 dest = get_compute_dest(opcode);
 
 					if ((src1 == 0) && (dest == 0))
 					{
@@ -306,9 +296,8 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 	case 2:
 	{
-		u8 op = get_op(opcode);
-		int imm17 = get_offset(opcode);
-		imm17 = util::sext(imm17, 17);
+		const u8 op = get_op(opcode);
+		const int imm17 = util::sext(opcode, 17);
 
 		switch (op)
 		{
@@ -351,12 +340,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		case 5: // movfrc or aluc
 		{
 			// this is just a suggested form
-			u8 c2 =   BIT(opcode, 0, 4);
-			u8 c1 =   BIT(opcode, 4, 4);
-			u8 func = BIT(opcode, 8, 6);
-			u8 op =   BIT(opcode, 14, 3);
-			u8 dest = get_src2_dest(opcode);
-			u8 src =  get_src1(opcode);
+			const u8 c2 =   BIT(opcode, 0, 4);
+			const u8 c1 =   BIT(opcode, 4, 4);
+			const u8 func = BIT(opcode, 8, 6);
+			const u8 op =   BIT(opcode, 14, 3);
+			const u8 dest = get_src2_dest(opcode);
+			const u8 src =  get_src1(opcode);
 
 			if (src == 0)
 			{
@@ -379,12 +368,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		case 7: // movtoc
 		{
 			// this is just a suggested form
-			u8 c2 =   BIT(opcode, 0, 4);
-			u8 c1 =   BIT(opcode, 4, 4);
-			u8 func = BIT(opcode, 8, 6);
-			u8 op =   BIT(opcode, 14, 3);
-			u8 dest = get_src2_dest(opcode);
-			u8 src =  get_src1(opcode);
+			const u8 c2 =   BIT(opcode, 0, 4);
+			const u8 c1 =   BIT(opcode, 4, 4);
+			const u8 func = BIT(opcode, 8, 6);
+			const u8 op =   BIT(opcode, 14, 3);
+			const u8 dest = get_src2_dest(opcode);
+			const u8 src =  get_src1(opcode);
 
 			if (src == 0)
 			{
@@ -410,7 +399,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 	case 3:
 	{
-		u8 op = get_op(opcode);
+		const u8 op = get_op(opcode);
 
 		switch (op)
 		{
@@ -418,8 +407,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			// jspci - Jump Indexed and Store PC
 			// jspci rSrc1,#Immed,Rdest
-			int imm17 = get_imm17(opcode);
-			imm17 = util::sext(imm17, 17) * 2;
+			const int imm17 = util::sext(opcode, 17) * 2;
 			util::stream_format(stream, "jspci %s,#%02x,%s", get_regname(get_src1(opcode)), imm17, get_regname(get_src2_dest(opcode)));
 			break;
 		}
@@ -446,7 +434,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			// psw  001
 			// md   010
 			// pcm1 100
-			u16 comp = get_compute_compfunc(opcode);
+			const u16 comp = get_compute_compfunc(opcode);
 			if ((comp & 0xffe) == 0x000)
 			{
 				u8 dest = get_src2_dest(opcode);
@@ -478,13 +466,13 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			// psw  001
 			// md   010
 			// pcm4 100
-			u16 comp = get_compute_compfunc(opcode);
+			const u16 comp = get_compute_compfunc(opcode);
 			if ((comp & 0xffe) == 0x000)
 			{
 				u8 src = get_src1(opcode);
 				if (src == 0x00)
 				{
-					u8 dest = get_src2_dest(opcode);
+					const u8 dest = get_src2_dest(opcode);
 					// TODO: name register?
 					util::stream_format(stream, "movfrs %01x,%s", comp & 0x7, get_regname(dest));
 				}
@@ -503,19 +491,18 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 4:
 		{
-			int imm17 = get_imm17(opcode);
-			imm17 = util::sext(imm17 & 0x1ffff, 17);
+			const int imm17 = util::sext(opcode, 17);
 			util::stream_format(stream, "addi %s,%s,0x%08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), imm17);
 			break;
 		}
 
 		case 5:
 		{
-			u16 comp = get_compute_compfunc(opcode);
+			const u16 comp = get_compute_compfunc(opcode);
 			if (comp == 0x03)
 			{
-				u8 dest = get_src2_dest(opcode);
-				u8 src = get_src1(opcode);
+				const u8 dest = get_src2_dest(opcode);
+				const u8 src = get_src1(opcode);
 
 				if ((src == 0x00) && (dest == 0x00))
 				{
@@ -537,7 +524,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if ((opcode & 0x07fff807) == 0x00000003)
 			{
-				int vector = (opcode & 0x000007f8) >> 3;
+				const int vector = (opcode & 0x000007f8) >> 3;
 				util::stream_format(stream, "trap %02x", vector);
 			}
 			else
@@ -549,11 +536,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		case 7:
 		{
-			u16 comp = get_compute_compfunc(opcode);
+			const u16 comp = get_compute_compfunc(opcode);
 			if (comp == 0x03)
 			{
-				u8 dest = get_src2_dest(opcode);
-				u8 src = get_src1(opcode);
+				const u8 dest = get_src2_dest(opcode);
+				const u8 src = get_src1(opcode);
 
 				if ((src == 0x00) && (dest == 0x00))
 				{
@@ -587,5 +574,5 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 	}
 	}
 
-	return 4 | SUPPORTED;
+	return 4;
 }
