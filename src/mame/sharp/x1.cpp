@@ -776,7 +776,6 @@ void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0x0ffc:
-			m_fdc_ctrl = data;
 			floppy = m_floppy[data & 0x03]->get_device();
 
 			m_fdc->set_floppy(floppy);
@@ -784,8 +783,12 @@ void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 			if (floppy)
 			{
 				floppy->ss_w(BIT(data, 4));
-				floppy->mon_w(!BIT(data, 7));
+				if(BIT(m_fdc_ctrl, 7) && !BIT(data, 7))
+					m_motor_timer->adjust(attotime::from_seconds(1.2));
+				else if(BIT(data, 7))
+					floppy->mon_w(0);
 			}
+			m_fdc_ctrl = data;
 			break;
 
 		case 0x0ffd:
@@ -801,10 +804,14 @@ void x1_state::fdc_drq_w(int state)
 	m_dma->rdy_w(state ^ 1);
 }
 
-void x1_state::hdl_w(int state)
+TIMER_CALLBACK_MEMBER(x1_state::motor_off_callback)
 {
-	if (state)
-		m_floppy[m_fdc_ctrl & 0x03]->get_device()->mon_w(CLEAR_LINE);
+	if(!BIT(m_fdc_ctrl, 7))
+	{
+		floppy_image_device *floppy = m_floppy[m_fdc_ctrl & 0x03]->get_device();
+		if(floppy)
+			floppy->mon_w(1);
+	}
 }
 
 /*************************************
@@ -2148,6 +2155,7 @@ void x1_state::machine_start()
 		m_rtc_timer = timer_alloc(FUNC(x1_state::x1_rtc_increment), this);
 	}
 
+	m_motor_timer = timer_alloc(FUNC(x1_state::motor_off_callback), this);
 	m_work_ram = make_unique_clear<uint8_t[]>(0x10000*0x10);
 	m_emm_ram = make_unique_clear<uint8_t[]>(0x1000000);
 	m_pcg_ram = make_unique_clear<uint8_t[]>(0x1800);
@@ -2216,8 +2224,6 @@ void x1_state::x1(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16); // clocked by SED9421C0B
-	// TODO: guesswork, try to implicitly start the motor
-	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "dd", x1_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "dd", x1_state::floppy_formats);
