@@ -2171,7 +2171,9 @@ Not extensively tested
 		<year>1986</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<notes><![CDATA[
-Fatal errors in [D88] loader: expects offset 0x1c to contain the file size but in that image it's file size/2.
+[D88] expects offset 0x1c to contain the file size but in that image it's file size/2. (worked around)
+Expects [KBD] number presses with shift held
+Cannot select a move set
 ]]></notes>
 
 		<info name="release" value="198608xx"/>

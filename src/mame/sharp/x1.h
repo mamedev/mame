@@ -143,7 +143,6 @@ public:
   	TIMER_CALLBACK_MEMBER(fdc_motor_off_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(cmt_seek_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(sub_keyboard_cb);
-	void hdl_w(int state);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
