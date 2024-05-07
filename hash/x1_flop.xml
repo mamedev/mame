@@ -19,20 +19,17 @@ Games I haven't managed to start (possibly due to my mistakes):
 * gatlabyr: how to start a game?
 * gambler2: how to pass the first menu?
 * crimson, crimsona: which disk combination is expected?
-* blassty: stuck at no animation menu
 
 Games with possible issues (either in emulation or in dump):
 * wizardry->4: can't add character name. also how to create a duplicate disk (in pc8801 they were in the disk set)?
 * profmj: true 400 lines mode not implemented?
 * hydlide2b has no saved data, while hydlide2 &amp; hydlide2a have characters in them
 * hydlide3b: fails to see the user disk + the set contains at least 1 hydlide disk (check crc16)
-* gruppe: starts loading then errors out as if the disk is not recognized
 * frontlin: input issue?
 * dione: does not display text correctly
 * blckonyx: is it missing a data disk?
 * bastard: does not start. input issue?
 * aokiooka: glitches (chars cut in half)
-* advfant: glitches
 * ys: character sprite is glitched until you enter a new area
 
 Games which start loading but never reach the program:
@@ -101,29 +98,30 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="advfant">
+	<software name="advfant" supported="no">
 		<description>Advanced Fantasian - Quest for Lost Sanctuary</description>
 		<year>1989</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Cannot select other options in main menu, including user disk creation [KBD]
+]]></notes>
+
 		<info name="release" value="198905xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="advfant_main.d88" size="348848" crc="64291b34" sha1="5c5fe39a1dc43d00ab738974988c532df80d3b3b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="advfant_scenario.d88" size="348848" crc="a4fd9761" sha1="aa91bf27b183a5e24605c06dc63c26e5ec353df9"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="advfantd" cloneof="advfant">
-		<description>Advanced Fantasian - Quest for Lost Sanctuary (Demo)</description>
-		<year>1989</year>
-		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Demo Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="advfant_demo.d88" size="348848" crc="8493aed0" sha1="a4a7b7dc0b7f884d55ff05b581b587cc6a27e27d"/>
 			</dataarea>
@@ -445,10 +443,14 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="blassty">
+	<software name="blassty" supported="no">
 		<description>Cruise Chaser - Blassty</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
+		<notes><![CDATA[
+Unresponsive [KBD]
+]]></notes>
+
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ブラスティ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -938,10 +940,14 @@ IPL loading resolves to a red and corrupt screen, baddump?
 		</part>
 	</software>
 
-	<software name="gruppe">
+	<software name="gruppe" supported="no">
 		<description>Gruppe</description>
 		<year>1985</year>
 		<publisher>SPS</publisher>
+		<notes><![CDATA[
+Shows a random bitmap graphic then returns "program load error", wants [FDC] write protection enabled (regression)
+]]></notes>
+
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ぐるっぺ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2842,10 +2848,14 @@ Broken [kanji]
 		</part>
 	</software>
 
-	<software name="slaydock">
+	<software name="slaydock" supported="partial">
 		<description>Super Laydock - Mission Striker</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Expects [KBD] name entry presses with shift held
+]]></notes>
+
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="スーパーレイドック"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2860,10 +2870,14 @@ Broken [kanji]
 		</part>
 	</software>
 
-	<software name="slaydocka" cloneof="slaydock">
+	<software name="slaydocka" cloneof="slaydock" supported="partial">
 		<description>Super Laydock - Mission Striker (alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Expects [KBD] name entry presses with shift held
+]]></notes>
+
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="スーパーレイドック"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2878,8 +2892,9 @@ Broken [kanji]
 		</part>
 	</software>
 
-	<software name="slaydocm">
-		<description>Super Laydock Muteki</description>
+	<!-- TODO: pending removal, Muteki -> Invincibility -->
+	<software name="slaydocm" cloneof="slaydock" supported="partial">
+		<description>Super Laydock - Mission Striker (Muteki hack)</description>
 		<year>19??</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -6445,10 +6460,16 @@ HP Osho
 		</part>
 	</software>
 
-	<software name="dezalis">
+	<software name="dezalis" supported="no">
 		<description>Dezalis</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Has [6845] abuses during gameplay
+]]></notes>
+		<info name="alt_title" value="デザリス"/>
+		<!-- Same dev as several pc8001_flop games such as flgworld and various2 -->
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="0x050000">
 				<rom name="dezalis.2d" size="0x050000" crc="d9ba6eb6" sha1="6a6a564b2eabc35dbc1591abb8efcf6a9e98bd10"/>

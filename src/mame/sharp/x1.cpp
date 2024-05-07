@@ -5,7 +5,18 @@
 
 Sharp X1 (c) 1983 Sharp Corporation
 
+References:
+- http://www.x1center.org/
+- http://ematei.s602.xrea.com/kenkyu/x1syasin.htm
+- http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html
+- https://eaw.app/sharpx1-manuals/
+- https://www.leadedsolder.com/tag/sharp-x1-turbo
+- http://takeda-toshiya.my.coocan.jp/x1twin/index.html
+- https://monochromeeffect.org/JVCC/2019/05/01/sharp-x1-turbo-z/
+- https://monochromeeffect.org/JVCC/2019/06/24/sharp-x1-d/
+
 TODO:
+- clean-up QA, is ugly and outdated;
 - clean-ups, split components into devices if necessary and maybe separate turbo/turboz features into specific file(s);
 - refactor base video into a true scanline renderer, expect it to break 6845 drawing delegation support badly;
 - support extended x1turboz video features (need more test cases?);
@@ -56,7 +67,6 @@ Notes:
     [0x14 -  0x15] destination address start address
     [0x16 to 0x17] start boot jump vector
     [0x1d to 0x1f] start boot data vector
-- Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (!) (btanb)
 - Maidum: you need to load BOTH disk with write protection disabled, otherwise it refuses to run. (btanb)
 - Marvelous: needs write protection disabled (btanb)
 - Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
@@ -158,9 +168,6 @@ Notes:
 
     X1turboZIII (CZ-888C) - December, 1988
      * same as turboZII, but no more built-in cassette drive
-
-    Please refer to http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html for
-    more info
 
     BASIC has to be loaded from external media (tape or disk), the
     computer only has an Initial Program Loader (IPL)
@@ -1465,8 +1472,8 @@ uint8_t x1_state::x1_portb_r()
 {
 	//logerror("PPI Port B read\n");
 	uint8_t res = 0;
-    // TODO: ys3 is unhappy about V-DISP
-    // NOTE: all PCG games actively reads from here, touching this uncarefully *will* break stuff
+	// TODO: ys3 is unhappy about V-DISP
+	// NOTE: all PCG games actively reads from here, touching this uncarefully *will* break stuff
 	int vblank_line = m_crtc_vreg[6] * (m_crtc_vreg[9]+1);
 	int vsync_line = m_crtc_vreg[7] * (m_crtc_vreg[9]+1);
 	m_vdisp = (m_screen->vpos() < vblank_line) ? 0x80 : 0x00;
@@ -2178,7 +2185,7 @@ static void x1_floppies(device_slot_interface &device)
 {
 	// TODO: 3" (!?) and 8" options, verify if vanilla X1 has them all
 	device.option_add("525dd", FLOPPY_525_DD);
-//	device.option_add("525hd", FLOPPY_525_HD);
+//  device.option_add("525hd", FLOPPY_525_HD);
 }
 
 void x1_state::x1(machine_config &config)
@@ -2245,10 +2252,8 @@ void x1_state::x1(machine_config &config)
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(0, "lspeaker", 0.25);
-	ay.add_route(0, "rspeaker", 0.25);
-	ay.add_route(1, "lspeaker", 0.5);
-	ay.add_route(2, "rspeaker", 0.5);
+	ay.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	ay.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
@@ -2391,7 +2396,6 @@ void x1_state::init_x1_kanji()
 }
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT           COMPANY  FULLNAME              FLAGS
 COMP( 1982, x1,        0,      0,      x1,      x1,      x1_state,      empty_init,    "Sharp", "X1 (CZ-800C)",       0 )
 // x1twin in x1twin.cpp
 COMP( 1984, x1turbo,   x1,     0,      x1turbo, x1turbo, x1turbo_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10

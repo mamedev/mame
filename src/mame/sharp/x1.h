@@ -140,7 +140,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	TIMER_CALLBACK_MEMBER(rtc_tick_cb);
-  	TIMER_CALLBACK_MEMBER(fdc_motor_off_cb);
+	TIMER_CALLBACK_MEMBER(fdc_motor_off_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(cmt_seek_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(sub_keyboard_cb);
 

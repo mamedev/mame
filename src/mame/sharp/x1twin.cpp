@@ -505,10 +505,8 @@ void x1twin_state::x1twin(machine_config &config)
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(0, "x1_l", 0.25);
-	ay.add_route(0, "x1_r", 0.25);
-	ay.add_route(1, "x1_l", 0.5);
-	ay.add_route(2, "x1_r", 0.5);
+	ay.add_route(ALL_OUTPUTS, "x1_l", 0.25);
+	ay.add_route(ALL_OUTPUTS, "x1_r", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
