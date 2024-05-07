@@ -64,11 +64,20 @@ public:
 
 	void kisssite(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 
 	void mem(address_map &map);
 };
+
+
+void kisssite_state::machine_reset()
+{
+	m_maincpu->set_state_int(STATE_GENPC, 0xe2cc); // temp, there is code here, but this is unlikely to be the entry point
+}
 
 void kisssite_state::mem(address_map &map)
 {

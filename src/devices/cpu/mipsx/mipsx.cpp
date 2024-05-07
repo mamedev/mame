@@ -13,7 +13,6 @@ mipsx_cpu_device::mipsx_cpu_device(const machine_config &mconfig, const char *ta
 	: cpu_device(mconfig, MIPSX, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
 	, m_pc(0)
-	, m_debugger_temp(0)
 	, m_program(nullptr)
 	, m_icount(0)
 {
@@ -38,63 +37,19 @@ device_memory_interface::space_config_vector mipsx_cpu_device::memory_space_conf
 
 void mipsx_cpu_device::device_start()
 {
-	m_pc = 0;
-
-	m_debugger_temp = 0;
-
 	m_program = &space(AS_PROGRAM);
 
-	state_add(MIPSX_PC,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
-	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
+	state_add(STATE_GENPC,      "GENPC",     m_pc).formatstr("%08X");
+	state_add(STATE_GENPCBASE,  "CURPC",     m_pc).callexport().noshow();
 
 	set_icountptr(m_icount);
 }
 
-
-//-------------------------------------------------
-//  state_export - export state from the device,
-//  to a known location where it can be read
-//-------------------------------------------------
-
-void mipsx_cpu_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case MIPSX_PC:
-		case STATE_GENPCBASE:
-			m_debugger_temp = m_pc;
-			break;
-	}
-}
-
-
-//-------------------------------------------------
-//  state_import - import state into the device,
-//  after it has been set
-//-------------------------------------------------
-
-void mipsx_cpu_device::state_import(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case MIPSX_PC:
-		case STATE_GENPCBASE:
-			m_pc = (m_debugger_temp & 0xffffffff);
-			break;
-	}
-}
-
 void mipsx_cpu_device::device_reset()
 {
-	m_pc = 0xe2cc; // temp, there is code here in kisssite
 }
 
 /*****************************************************************************/
-
-void mipsx_cpu_device::execute_set_input(int irqline, int state)
-{
-}
-
 
 void mipsx_cpu_device::execute_run()
 {
