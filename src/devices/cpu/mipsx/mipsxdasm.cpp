@@ -108,7 +108,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			if ((src1 == 0) && (src2 == 0))
 			{
 				// beq #0, #0, offset is used as an alias for unconditional branch
-				util::stream_format(stream, "bra%s %08x", squash, basepc + disp);
+				util::stream_format(stream, "bra%s 0x%08x", squash, basepc + disp);
 			}
 			else
 			{
@@ -316,35 +316,35 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			// ld - Load
 			// ld Offset[rSrc1], rDest
-			util::stream_format(stream, "ld %08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
+			util::stream_format(stream, "ld 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 1:
 		{
 			// ldt - Load Through
 			// ldt Offset[rSrc1], rDest
-			util::stream_format(stream, "ldt %08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
+			util::stream_format(stream, "ldt 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 2:
 		{
 			// st - Store
 			// st Offset[rSrc1], rDest
-			util::stream_format(stream, "st %08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
+			util::stream_format(stream, "st 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 3:
 		{
 			// stt - Store Through
 			// stt Offset[rSrc1], rDest
-			util::stream_format(stream, "stt %08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
+			util::stream_format(stream, "stt 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 4:
 		{
 			// ldf - Load Floating Point
 			// ldf Offset[rSrc1], rDest
-			util::stream_format(stream, "ldf %08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
+			util::stream_format(stream, "ldf 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 
 		}
@@ -373,7 +373,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			// stf - Store Floating Point
 			// stf Offset[rSrc1], rDest
-			util::stream_format(stream, "stf %08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
+			util::stream_format(stream, "stf 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
 		case 7: // movtoc
@@ -505,7 +505,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			int imm17 = get_imm17(opcode);
 			imm17 = util::sext(imm17 & 0x1ffff, 17);
-			util::stream_format(stream, "addi %s,%s,%08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), imm17);
+			util::stream_format(stream, "addi %s,%s,0x%08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), imm17);
 			break;
 		}
 
