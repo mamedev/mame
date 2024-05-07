@@ -142,6 +142,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
+	TIMER_CALLBACK_MEMBER(motor_off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
 	void fdc_drq_w(int state);
@@ -249,6 +250,7 @@ protected:
 	turbo_reg_t m_turbo_reg;    /**< Turbo Z Video Registers. */
 	x1_rtc_t m_rtc;         /**< Struct for RTC related variables */
 	emu_timer *m_rtc_timer = nullptr;     /**< Pointer for RTC timer. */
+	emu_timer *m_motor_timer = nullptr;     /**< Pointer for RTC timer. */
 	uint8_t m_pcg_write_addr = 0;     /**< @todo Unused variable. */
 	uint8_t m_sub_cmd = 0;        /**< MCU side: current command issued from Main to Sub. */
 	uint8_t m_sub_cmd_length = 0;     /**< MCU side: number of parameters, in bytes. */
