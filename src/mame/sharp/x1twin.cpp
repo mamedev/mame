@@ -66,7 +66,7 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 void x1twin_state::x1_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(x1twin_state::mem_r), FUNC(x1twin_state::mem_w));
 }
 
 void x1twin_state::x1_io(address_map &map)
@@ -518,8 +518,8 @@ void x1twin_state::x1twin(machine_config &config)
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
-	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::x1_keyboard_callback), attotime::from_hz(250));
-	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::x1_cmt_wind_timer), attotime::from_hz(16));
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::sub_keyboard_cb), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::cmt_seek_cb), attotime::from_hz(16));
 }
 
 ROM_START( x1twin )
