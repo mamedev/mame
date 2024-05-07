@@ -35,8 +35,8 @@ namespace {
 class x1twin_state : public x1_state
 {
 public:
-	x1twin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: x1_state(mconfig, type, tag)
+	x1twin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		x1_state(mconfig, type, tag)
 	{ }
 
 	void x1twin(machine_config &config);
@@ -483,8 +483,6 @@ void x1twin_state::x1twin(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MB8877(config, m_fdc, MAIN_CLOCK / 16);
-	// TODO: guesswork, try to implicitly start the motor
-	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "dd", x1_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "dd", x1_state::floppy_formats);

@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Barry Rodewald
 /*****************************************************************************
  *
- * includes/x1.h
+ * sharp/x1.h
  *
  ****************************************************************************/
 
@@ -187,6 +187,7 @@ public:
 	void x1_mem(address_map &map);
 	void x1turbo_io_banks(address_map &map);
 	void x1turbo_mem(address_map &map);
+
 protected:
 	struct scrn_reg_t
 	{
@@ -250,7 +251,7 @@ protected:
 	turbo_reg_t m_turbo_reg;    /**< Turbo Z Video Registers. */
 	x1_rtc_t m_rtc;         /**< Struct for RTC related variables */
 	emu_timer *m_rtc_timer = nullptr;     /**< Pointer for RTC timer. */
-	emu_timer *m_motor_timer = nullptr;     /**< Pointer for RTC timer. */
+	emu_timer *m_motor_timer = nullptr;   /**< Pointer for FDC motor timer. */
 	uint8_t m_pcg_write_addr = 0;     /**< @todo Unused variable. */
 	uint8_t m_sub_cmd = 0;        /**< MCU side: current command issued from Main to Sub. */
 	uint8_t m_sub_cmd_length = 0;     /**< MCU side: number of parameters, in bytes. */
