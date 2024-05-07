@@ -121,6 +121,7 @@ public:
 	void theend_protection_w(uint8_t data);
 	uint8_t theend_protection_r();
 	template <int N> int theend_protection_alt_r();
+	uint8_t scrammr_protection_r();
 	void explorer_sound_control_w(uint8_t data);
 	uint8_t frogger_ppi8255_r(offs_t offset);
 	void frogger_ppi8255_w(offs_t offset, uint8_t data);
@@ -319,6 +320,7 @@ public:
 	void mimonscr(machine_config &config);
 	void galartic(machine_config &config);
 	void bigkonggx(machine_config &config);
+	void scrammr(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> int ckongs_coinage_r();
