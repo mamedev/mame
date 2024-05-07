@@ -134,7 +134,10 @@ private:
 	bool m_dack3;
 	bool m_tc;
 	bool m_fdc_tc;
+
+	// SASI state
 	bool m_switch;
+	uint8_t m_sasi_data;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -151,6 +154,13 @@ private:
 	void switch_w(int state);
 	uint8_t sasi_status_r(offs_t offset);
 	void sasi_cmd_w(offs_t offset, uint8_t data);
+	uint8_t sasi_data_r(offs_t offset);
+	void sasi_data_w(offs_t offset, uint8_t data);
+	uint8_t sasi_ior3_r(offs_t offset);
+	void sasi_iow3_w(offs_t offset, uint8_t data);
+	void sasi_bsy_w(int state);
+	void sasi_req_w(int state);
+	void sasi_io_w(int state);
 	void dma_hrq_w(int state);
 	uint8_t mpsc_dack_r();
 	void mpsc_dack_w(uint8_t data);

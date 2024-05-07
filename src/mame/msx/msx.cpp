@@ -708,13 +708,14 @@ void msx2p_base_state::machine_start()
 
 	m_boot_flags = m_cold_boot_flags;
 	save_item(NAME(m_boot_flags));
+	save_item(NAME(m_vdp_mode));
 }
 
 void msx2p_base_state::msx2plus_io_map(address_map &map)
 {
 	msx2_v9958_io_map(map);
-	// f3 - vdp display mode?
-	map(0xf4, 0xf4).lrw8(NAME([this]() { return m_boot_flags;}), NAME([this](u8 data) { m_boot_flags = data; }));
+	map(0xf3, 0xf3).lrw8(NAME([this]() { return m_vdp_mode; }), NAME([this](u8 data) { m_vdp_mode = data; }));
+	map(0xf4, 0xf4).lrw8(NAME([this]() { return m_boot_flags; }), NAME([this](u8 data) { m_boot_flags = data; }));
 }
 
 void msx2p_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)

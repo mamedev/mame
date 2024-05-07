@@ -124,8 +124,8 @@ void heath_h_88_cass_device::device_reset()
 	LOGFUNC("%s\n", FUNCNAME);
 
 	// cassette
-	m_cassbit = 1;
-	m_cassold = 0;
+	m_cassbit      = 1;
+	m_cassold      = 0;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
 	m_cass_data[2] = 0;

@@ -15,22 +15,29 @@
     Input can also come from the serial port.
 
   Known Issues:
-    - With gp19 slot option
+    - With gp19
       - 49/50 row mode only shows half the screen.
       - In 49/50 row mode, character descenders are cut off.
       - Screen saver does not disable the screen
-    - With superset slot option
+    - With Superset
       - Screensaver freezes the screen instead of blanking the screen
 
-  Not Implemented (yet)
+  Not Currently Implemented
+    - With Imaginator I-100
+      - Support for Tektronics Emulation (missing ROM image)
     - With SigmaSoft IGC
       - Interlace video support (with higher resolution)
       - Joystick support
       - Centronics support
       - Lightpen support
       - Alternate Font ROM support (missing ROM image)
-    - With Imaginator I-100
-      - Support for Tektronics Emulation (missing ROM image)
+    - With Super19
+      - Interlace video
+      - Alternate Font19 alt 128 mode and extended 256 mode (missing ROM images)
+      - ANSI character set selection (missing ROM image)
+      - light pen support
+    - With UltraROM
+      - Interace mode
 
 ****************************************************************************/
 /***************************************************************************
@@ -86,49 +93,49 @@
 #endif
 
 // Clocks
-static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
+static constexpr XTAL MASTER_CLOCK     = XTAL(12'288'000);
 
 // DOT clocks
-static constexpr XTAL BASE_DOT_CLOCK = MASTER_CLOCK;
+static constexpr XTAL BASE_DOT_CLOCK   = MASTER_CLOCK;
 static constexpr XTAL GP19_DOT_CLOCK_1 = XTAL(20'282'000);   // 132 columns
 static constexpr XTAL GP19_DOT_CLOCK_2 = XTAL(12'292'000);   // 80 columns
 static constexpr XTAL GP19_DOT_CLOCK_3 = XTAL(10'644'000);   // Graphics mode
 
 // Standard H19 used a 2.048 MHz clock for Z80
-static constexpr XTAL H19_CLOCK = MASTER_CLOCK / 6;
-static constexpr XTAL H19_3MHZ = MASTER_CLOCK / 4;
-static constexpr XTAL H19_4MHZ = MASTER_CLOCK / 3;
-static constexpr XTAL H19_6MHZ = MASTER_CLOCK / 2;
+static constexpr XTAL H19_CLOCK        = MASTER_CLOCK / 6;
+static constexpr XTAL H19_3MHZ         = MASTER_CLOCK / 4;
+static constexpr XTAL H19_4MHZ         = MASTER_CLOCK / 3;
+static constexpr XTAL H19_6MHZ         = MASTER_CLOCK / 2;
 
-static constexpr XTAL INS8250_CLOCK = MASTER_CLOCK / 4;
+static constexpr XTAL INS8250_CLOCK    = MASTER_CLOCK / 4;
 
 // Beep Frequency is 1 KHz
-static constexpr XTAL H19_BEEP_FRQ = (H19_CLOCK / 2048);
+static constexpr XTAL H19_BEEP_FRQ     = (H19_CLOCK / 2048);
 
 // Capacitor value in pF
-static constexpr uint32_t H19_KEY_DEBOUNCE_CAPACITOR = 5000;
-#define MM5740_CLOCK (mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
+static constexpr u32 H19_KEY_DEBOUNCE_CAPACITOR = 5000;
+static const     u32 MM5740_CLOCK               = mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR);
 
 // Keyboard flag masks
-static constexpr uint8_t KB_STATUS_SHIFT_KEYS_MASK = 0x01;
-static constexpr uint8_t KB_STATUS_CONTROL_KEY_MASK = 0x10;
-static constexpr uint8_t KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
+static constexpr u8 KB_STATUS_SHIFT_KEYS_MASK      = 0x01;
+static constexpr u8 KB_STATUS_CONTROL_KEY_MASK     = 0x10;
+static constexpr u8 KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
-DEFINE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector, "heath_tlb_connector", "Heath Terminal Logic board connector abstraction")
+DEFINE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector,          "heath_tlb_connector",          "Heath Terminal Logic board connector abstraction")
 
-DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board")
-DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM")
-DEFINE_DEVICE_TYPE(HEATH_SUPERSET, heath_superset_tlb_device, "heath_superset_tlb", "Heath Terminal Logic Board w/Superset ROM")
-DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM")
-DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM")
-DEFINE_DEVICE_TYPE(HEATH_GP19, heath_gp19_tlb_device, "heath_gp19_tlb", "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
-DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR, heath_imaginator_tlb_device, "heath_imaginator_tlb", "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
+DEFINE_DEVICE_TYPE(HEATH_TLB,           heath_tlb_device,             "heath_tlb",                    "Heath Terminal Logic Board")
+DEFINE_DEVICE_TYPE(HEATH_SUPER19,       heath_super19_tlb_device,     "heath_super19_tlb",            "Heath Terminal Logic Board w/Super19 ROM")
+DEFINE_DEVICE_TYPE(HEATH_SUPERSET,      heath_superset_tlb_device,    "heath_superset_tlb",           "Heath Terminal Logic Board w/Superset ROM")
+DEFINE_DEVICE_TYPE(HEATH_ULTRA,         heath_ultra_tlb_device,       "heath_ultra_tlb",              "Heath Terminal Logic Board w/Ultra ROM")
+DEFINE_DEVICE_TYPE(HEATH_WATZ,          heath_watz_tlb_device,        "heath_watz_tlb",               "Heath Terminal Logic Board w/Watzman ROM")
+DEFINE_DEVICE_TYPE(HEATH_GP19,          heath_gp19_tlb_device,        "heath_gp19_tlb",               "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
+DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR,    heath_imaginator_tlb_device,  "heath_imaginator_tlb",         "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
 
 // Devices for the terminal boards compatible with SigmaSoft IGC
-DEFINE_DEVICE_TYPE(HEATH_IGC, heath_igc_tlb_device, "heath_igc_tlb_device", "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
-DEFINE_DEVICE_TYPE(HEATH_IGC_SUPER19, heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
-DEFINE_DEVICE_TYPE(HEATH_IGC_ULTRA, heath_igc_ultra_tlb_device, "heath_igc_ultra_tlb_device", "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
-DEFINE_DEVICE_TYPE(HEATH_IGC_WATZ, heath_igc_watz_tlb_device, "heath_igc_watz_tlb_device", "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC,           heath_igc_tlb_device,         "heath_igc_tlb_device",         "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_SUPER19,   heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_ULTRA,     heath_igc_ultra_tlb_device,   "heath_igc_ultra_tlb_device",   "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE(HEATH_IGC_WATZ,      heath_igc_watz_tlb_device,    "heath_igc_watz_tlb_device",    "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
 
 
 device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device) :
@@ -141,12 +148,12 @@ device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_c
 /**
  * original Heath H19 functionality
  */
-heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
 {
 }
 
-heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_heath_tlb_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -230,19 +237,19 @@ void heath_tlb_device::device_start()
 	save_item(NAME(m_break_key_irq_raised));
 	save_item(NAME(m_allow_vsync_nmi));
 
-	m_strobe = false;
-	m_key_click_active = false;
-	m_bell_active = false;
-	m_reset_pending = false;
-	m_right_shift = false;
-	m_reset_key = false;
-	m_keyboard_irq_raised = false;
-	m_serial_irq_raised = false;
+	m_strobe               = false;
+	m_key_click_active     = false;
+	m_bell_active          = false;
+	m_reset_pending        = false;
+	m_right_shift          = false;
+	m_reset_key            = false;
+	m_keyboard_irq_raised  = false;
+	m_serial_irq_raised    = false;
 	m_break_key_irq_raised = false;
-	m_allow_vsync_nmi = false;
+	m_allow_vsync_nmi      = false;
 
-	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
-	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
+	m_key_click_timer      = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
+	m_bell_timer           = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
 
 	// Flip bits in font ROM to avoid having to flip them during scan out since some
 	// boards with graphics has the pixel graphic reversed from the font layout. Doing
@@ -255,10 +262,10 @@ void heath_tlb_device::device_start()
 
 void heath_tlb_device::device_reset()
 {
-	m_strobe = false;
+	m_strobe           = false;
 	m_key_click_active = false;
-	m_bell_active = false;
-	m_allow_vsync_nmi = false;
+	m_bell_active      = false;
+	m_allow_vsync_nmi  = false;
 
 	ioport_value const cfg(m_config->read());
 
@@ -297,7 +304,7 @@ void heath_tlb_device::device_reset()
 	}
 }
 
-void heath_tlb_device::key_click_w(uint8_t data)
+void heath_tlb_device::key_click_w(u8 data)
 {
 	// Keyclick - 6 mSec
 	m_beep->set_state(1);
@@ -305,7 +312,7 @@ void heath_tlb_device::key_click_w(uint8_t data)
 	m_key_click_timer->adjust(attotime::from_msec(6));
 }
 
-void heath_tlb_device::bell_w(uint8_t data)
+void heath_tlb_device::bell_w(u8 data)
 {
 	// Bell (^G) - 200 mSec
 	m_beep->set_state(1);
@@ -316,14 +323,14 @@ void heath_tlb_device::bell_w(uint8_t data)
 /**
  * MM5740 B Mapping to the ROM address
  */
-uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
+u16 heath_tlb_device::translate_mm5740_b(u16 b)
 {
 	return bitswap<9>(b, 7, 6, 8, 5, 4, 3, 2, 1, 0);
 }
 
-uint8_t heath_tlb_device::kbd_key_r()
+u8 heath_tlb_device::kbd_key_r()
 {
-	m_strobe = false;
+	m_strobe              = false;
 	m_keyboard_irq_raised = false;
 
 	set_irq_line();
@@ -333,10 +340,10 @@ uint8_t heath_tlb_device::kbd_key_r()
 	return m_transchar;
 }
 
-uint8_t heath_tlb_device::kbd_flags_r()
+u8 heath_tlb_device::kbd_flags_r()
 {
-	uint16_t modifiers = m_kbspecial->read();
-	uint8_t rv = modifiers & 0x7e;
+	u16 modifiers = m_kbspecial->read();
+	u8 rv         = modifiers & 0x7e;
 
 	// check both shifts
 	if ((modifiers & 0x120) != 0x120)
@@ -366,24 +373,24 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 {
 	if (state)
 	{
-		uint8_t *decode = m_kbdrom->base();
+		u8 *decode            = m_kbdrom->base();
 
-		m_transchar = decode[translate_mm5740_b(m_mm5740->b_r())];
-		m_strobe = true;
+		m_transchar           = decode[translate_mm5740_b(m_mm5740->b_r())];
+		m_strobe              = true;
 		m_keyboard_irq_raised = true;
 
 		set_irq_line();
 	}
 }
 
-void heath_tlb_device::crtc_addr_w(offs_t reg, uint8_t val)
+void heath_tlb_device::crtc_addr_w(offs_t reg, u8 val)
 {
 	m_allow_vsync_nmi = bool(BIT(reg, 2));
 
 	m_crtc->address_w(val);
 }
 
-uint8_t heath_tlb_device::crtc_reg_r(offs_t reg)
+u8 heath_tlb_device::crtc_reg_r(offs_t reg)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -393,7 +400,7 @@ uint8_t heath_tlb_device::crtc_reg_r(offs_t reg)
 	return m_crtc->register_r();
 }
 
-void heath_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
+void heath_tlb_device::crtc_reg_w(offs_t reg, u8 val)
 {
 	m_allow_vsync_nmi = bool(BIT(reg, 2));
 
@@ -466,14 +473,14 @@ void heath_tlb_device::break_key_w(int state)
 MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix(y);
+	u32               *p       = &bitmap.pix(y);
 
 	if (de)
 	{
 		for (int x = 0; x < x_count; x++)
 		{
-			uint8_t inv = (x == cursor_x) ? 0xff : 0;
-			uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+			u8 inv = (x == cursor_x) ? 0xff : 0;
+			u8 chr = m_p_videoram[(ma + x) & 0x7ff];
 
 			if (chr & 0x80)
 			{
@@ -482,7 +489,7 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			}
 
 			// get pattern of pixels for that character scanline
-			uint8_t const gfx = m_p_chargen[(chr << 4) | ra] ^ inv;
+			u8 const gfx = m_p_chargen[(chr << 4) | ra] ^ inv;
 
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
@@ -522,15 +529,15 @@ static INPUT_PORTS_START( tlb )
 
 	PORT_START("MODIFIERS")
 	// bit 0 - 0x001 connects to B8 of MM5740 - low if either shift key is
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK)  PORT_TOGGLE
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)     PORT_WRITE_LINE_MEMBER(heath_tlb_device, break_key_w)
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OffLine")    PORT_CODE(KEYCODE_F12)       PORT_TOGGLE
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")       PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_RALT)      PORT_WRITE_LINE_MEMBER(heath_tlb_device, repeat_key_w)
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK)   PORT_TOGGLE
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)      PORT_WRITE_LINE_MEMBER(heath_tlb_device, break_key_w)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OffLine")    PORT_CODE(KEYCODE_F12)        PORT_TOGGLE
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")       PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_RALT)       PORT_WRITE_LINE_MEMBER(heath_tlb_device, repeat_key_w)
 	// bit 7 - 0x080 is low if any key is pressed
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)    PORT_WRITE_LINE_MEMBER(heath_tlb_device, right_shift_w)
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)       PORT_WRITE_LINE_MEMBER(heath_tlb_device, reset_key_w)
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)     PORT_WRITE_LINE_MEMBER(heath_tlb_device, right_shift_w)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)        PORT_WRITE_LINE_MEMBER(heath_tlb_device, reset_key_w)
 
 	PORT_START("X1")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")          PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
@@ -545,9 +552,9 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';')  PORT_CHAR(':')
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' \"")       PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("{ }")        PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("{ }")        PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{')  PORT_CHAR('}')
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")     PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -557,8 +564,8 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")          PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ ]")        PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR(']')
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")          PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ ]")        PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[')  PORT_CHAR(']')
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |")       PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed")  PORT_CODE(KEYCODE_RWIN)       PORT_CHAR(10)
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL")        PORT_CODE(KEYCODE_DEL)        PORT_CHAR(127)
@@ -569,10 +576,10 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )")        PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _")        PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= +")        PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ~")        PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )")        PORT_CODE(KEYCODE_0)          PORT_CHAR('0')  PORT_CHAR(')')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _")        PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-')  PORT_CHAR('_')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= +")        PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=')  PORT_CHAR('+')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ~")        PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`')  PORT_CHAR('~')
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back Space") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X1")
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-7 IC")    PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
@@ -593,55 +600,55 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")          PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")          PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")          PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")          PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")          PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")          PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")          PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")        PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")        PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")          PORT_CODE(KEYCODE_Z)          PORT_CHAR('z')  PORT_CHAR('Z')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")          PORT_CODE(KEYCODE_X)          PORT_CHAR('x')  PORT_CHAR('X')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")          PORT_CODE(KEYCODE_C)          PORT_CHAR('c')  PORT_CHAR('C')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")          PORT_CODE(KEYCODE_V)          PORT_CHAR('v')  PORT_CHAR('V')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")          PORT_CODE(KEYCODE_B)          PORT_CHAR('b')  PORT_CHAR('B')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")          PORT_CODE(KEYCODE_N)          PORT_CHAR('n')  PORT_CHAR('N')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")          PORT_CODE(KEYCODE_M)          PORT_CHAR('m')  PORT_CHAR('M')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")        PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR('<')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")        PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR('>')
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")      PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 
 	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")          PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")          PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")          PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")          PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")          PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")          PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")          PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")          PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")          PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")          PORT_CODE(KEYCODE_A)          PORT_CHAR('a')  PORT_CHAR('A')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")          PORT_CODE(KEYCODE_S)          PORT_CHAR('s')  PORT_CHAR('S')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")          PORT_CODE(KEYCODE_D)          PORT_CHAR('d')  PORT_CHAR('D')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")          PORT_CODE(KEYCODE_F)          PORT_CHAR('f')  PORT_CHAR('F')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")          PORT_CODE(KEYCODE_G)          PORT_CHAR('g')  PORT_CHAR('G')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")          PORT_CODE(KEYCODE_H)          PORT_CHAR('h')  PORT_CHAR('H')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")          PORT_CODE(KEYCODE_J)          PORT_CHAR('j')  PORT_CHAR('J')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")          PORT_CODE(KEYCODE_K)          PORT_CHAR('k')  PORT_CHAR('K')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")          PORT_CODE(KEYCODE_L)          PORT_CHAR('l')  PORT_CHAR('L')
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Scroll")     PORT_CODE(KEYCODE_F11)
 
 	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")          PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")          PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")          PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")          PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")          PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")          PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")          PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")          PORT_CODE(KEYCODE_Q)          PORT_CHAR('q')  PORT_CHAR('Q')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")          PORT_CODE(KEYCODE_W)          PORT_CHAR('w')  PORT_CHAR('W')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")          PORT_CODE(KEYCODE_E)          PORT_CHAR('e')  PORT_CHAR('E')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")          PORT_CODE(KEYCODE_R)          PORT_CHAR('r')  PORT_CHAR('R')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")          PORT_CODE(KEYCODE_T)          PORT_CHAR('t')  PORT_CHAR('T')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")          PORT_CODE(KEYCODE_Y)          PORT_CHAR('y')  PORT_CHAR('Y')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")          PORT_CODE(KEYCODE_U)          PORT_CHAR('u')  PORT_CHAR('U')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i')  PORT_CHAR('I')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o')  PORT_CHAR('O')
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
 
 	PORT_START("X9")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")        PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @")        PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #")        PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $")        PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %")        PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ^")        PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &")        PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 *")        PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (")        PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")        PORT_CODE(KEYCODE_1)          PORT_CHAR('1')  PORT_CHAR('!')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @")        PORT_CODE(KEYCODE_2)          PORT_CHAR('2')  PORT_CHAR('@')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #")        PORT_CODE(KEYCODE_3)          PORT_CHAR('3')  PORT_CHAR('#')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $")        PORT_CODE(KEYCODE_4)          PORT_CHAR('4')  PORT_CHAR('$')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %")        PORT_CODE(KEYCODE_5)          PORT_CHAR('5')  PORT_CHAR('%')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ^")        PORT_CODE(KEYCODE_6)          PORT_CHAR('6')  PORT_CHAR('^')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &")        PORT_CODE(KEYCODE_7)          PORT_CHAR('7')  PORT_CHAR('&')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 *")        PORT_CODE(KEYCODE_8)          PORT_CHAR('8')  PORT_CHAR('*')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (")        PORT_CODE(KEYCODE_9)          PORT_CHAR('9')  PORT_CHAR('(')
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
 
 	PORT_START("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
 	PORT_DIPSETTING(    0x03, "300")
@@ -655,54 +662,54 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPSETTING(    0x0b, "7200")
 	PORT_DIPSETTING(    0x0c, "9600")
 	PORT_DIPSETTING(    0x0d, "19200")
-	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Parity")                                      PORT_DIPLOCATION("SW401:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "Odd")
 	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x30, "Even")
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")                                 PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, "Stick")
-	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")                                      PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
 	PORT_START("SW402")
-	PORT_DIPNAME( 0x01, 0x00, "Cursor")              PORT_DIPLOCATION("SW402:1")
+	PORT_DIPNAME( 0x01, 0x00, "Cursor")                                      PORT_DIPLOCATION("SW402:1")
 	PORT_DIPSETTING(    0x00, "Underline")
 	PORT_DIPSETTING(    0x01, "Block")
-	PORT_DIPNAME( 0x02, 0x00, "Keyclick")            PORT_DIPLOCATION("SW402:2")
+	PORT_DIPNAME( 0x02, 0x00, "Keyclick")                                    PORT_DIPLOCATION("SW402:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")         PORT_DIPLOCATION("SW402:3")
+	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")                                 PORT_DIPLOCATION("SW402:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")       PORT_DIPLOCATION("SW402:4")
+	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")                               PORT_DIPLOCATION("SW402:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")       PORT_DIPLOCATION("SW402:5")
+	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")                               PORT_DIPLOCATION("SW402:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Mode")                PORT_DIPLOCATION("SW402:6")
+	PORT_DIPNAME( 0x20, 0x00, "Mode")                                        PORT_DIPLOCATION("SW402:6")
 	PORT_DIPSETTING(    0x00, "Heath/VT52")
 	PORT_DIPSETTING(    0x20, "ANSI")
-	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")      PORT_DIPLOCATION("SW402:7")
+	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")                              PORT_DIPLOCATION("SW402:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "Refresh")             PORT_DIPLOCATION("SW402:8")
+	PORT_DIPNAME( 0x80, 0x00, "Refresh")                                     PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "60Hz")
 	PORT_DIPSETTING(    0x80, "50Hz")
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x00, "CPU Clock")
-	PORT_CONFSETTING(0x00, "2 MHz")
-	PORT_CONFSETTING(0x01, "3 MHz")
-	PORT_CONFSETTING(0x02, "4 MHz")
-	PORT_CONFSETTING(0x03, "6 MHz")
+	PORT_CONFSETTING(   0x00, "2 MHz")
+	PORT_CONFSETTING(   0x01, "3 MHz")
+	PORT_CONFSETTING(   0x02, "4 MHz")
+	PORT_CONFSETTING(   0x03, "6 MHz")
 	PORT_CONFNAME(0x0C, 0x00, "CRT Color")
-	PORT_CONFSETTING(0x00, "Green")
-	PORT_CONFSETTING(0x04, "White")
-	PORT_CONFSETTING(0x08, "Amber")
+	PORT_CONFSETTING(   0x00, "Green")
+	PORT_CONFSETTING(   0x04, "White")
+	PORT_CONFSETTING(   0x08, "Amber")
 INPUT_PORTS_END
 
 
@@ -710,7 +717,7 @@ static INPUT_PORTS_START( super19 )
   PORT_INCLUDE( tlb )
 
   PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
 	PORT_DIPSETTING(    0x03, "300")
@@ -725,7 +732,7 @@ static INPUT_PORTS_START( super19 )
 	PORT_DIPSETTING(    0x0c, "9600")
 	PORT_DIPSETTING(    0x0d, "19200")
 	PORT_DIPSETTING(    0x0e, "38400")
-	PORT_DIPNAME( 0x70, 0x00, "8 bit mode")          PORT_DIPLOCATION("SW401:5,6,7")
+	PORT_DIPNAME( 0x70, 0x00, "8 bit mode")                                  PORT_DIPLOCATION("SW401:5,6,7")
 	PORT_DIPSETTING(    0x00, "Mode A/0 - 8th bit ignored, sent as 0")
 	PORT_DIPSETTING(    0x10, "Mode B/1 - 8th bit ignored, sent as 1")
 	PORT_DIPSETTING(    0x20, "Mode C/2 - 8 bit escape mode")
@@ -734,15 +741,15 @@ static INPUT_PORTS_START( super19 )
 	PORT_DIPSETTING(    0x50, "Mode F/5 - 8 bit data mode, invert 8th bit")
 	PORT_DIPSETTING(    0x60, "7 bit data with odd parity, 8th bit ignored on input")
 	PORT_DIPSETTING(    0x70, "7 bit data with even parity, 8th bit ignored on input")
-	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")                                      PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
 	PORT_MODIFY("SW402")
-	PORT_DIPNAME( 0x02, 0x00, "Transmit mode")       PORT_DIPLOCATION("SW402:2")
+	PORT_DIPNAME( 0x02, 0x00, "Transmit mode")                               PORT_DIPLOCATION("SW402:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, "Slow")
-	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")    PORT_DIPLOCATION("SW402:8")
+	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")                            PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -752,7 +759,7 @@ static INPUT_PORTS_START( superset )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "75")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
@@ -769,16 +776,16 @@ static INPUT_PORTS_START( superset )
 	PORT_DIPSETTING(    0x0d, "19200")
 	PORT_DIPSETTING(    0x0e, "38400")
 	PORT_DIPSETTING(    0x0f, "134.5")
-	PORT_DIPNAME( 0x10, 0x10, "Duplex")              PORT_DIPLOCATION("SW401:5")
+	PORT_DIPNAME( 0x10, 0x10, "Duplex")                                      PORT_DIPLOCATION("SW401:5")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
-	PORT_DIPNAME( 0x20, 0x00, "Word Length")         PORT_DIPLOCATION("SW401:6")
+	PORT_DIPNAME( 0x20, 0x00, "Word Length")                                 PORT_DIPLOCATION("SW401:6")
 	PORT_DIPSETTING(    0x00, "8-bit" )
 	PORT_DIPSETTING(    0x20, "7-bit" )
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")                                 PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
 	PORT_DIPSETTING(    0x40, "Even")
-	PORT_DIPNAME( 0x80, 0x80, "Parity")              PORT_DIPLOCATION("SW401:8")
+	PORT_DIPNAME( 0x80, 0x80, "Parity")                                      PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Disabled")
 	PORT_DIPSETTING(    0x80, "Enabled")
 INPUT_PORTS_END
@@ -788,7 +795,7 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x07, 0x05, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3")
+	PORT_DIPNAME( 0x07, 0x05, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3")
 	PORT_DIPSETTING(    0x00, "110")
 	PORT_DIPSETTING(    0x01, "300")
 	PORT_DIPSETTING(    0x02, "1200")
@@ -797,35 +804,35 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPSETTING(    0x05, "9600")
 	PORT_DIPSETTING(    0x06, "19200")
 	PORT_DIPSETTING(    0x07, "38400")
-	PORT_DIPNAME( 0x08, 0x00, "Parity")              PORT_DIPLOCATION("SW401:4")
+	PORT_DIPNAME( 0x08, 0x00, "Parity")                                      PORT_DIPLOCATION("SW401:4")
 	PORT_DIPSETTING(    0x00, "Disabled")
 	PORT_DIPSETTING(    0x08, "Enabled")
-	PORT_DIPNAME( 0x10, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:5")
+	PORT_DIPNAME( 0x10, 0x00, "Parity Type")                                 PORT_DIPLOCATION("SW401:5")
 	PORT_DIPSETTING(    0x00, "Odd")
 	PORT_DIPSETTING(    0x10, "Even")
-	PORT_DIPNAME( 0x20, 0x00, "Data Size")           PORT_DIPLOCATION("SW401:6")
+	PORT_DIPNAME( 0x20, 0x00, "Data Size")                                   PORT_DIPLOCATION("SW401:6")
 	PORT_DIPSETTING(    0x00, "8-bit")
 	PORT_DIPSETTING(    0x20, "7-bit")
-	PORT_DIPNAME( 0x40, 0x40, "Duplex")              PORT_DIPLOCATION("SW401:7")
+	PORT_DIPNAME( 0x40, 0x40, "Duplex")                                      PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x40, "Full")
-	PORT_DIPNAME( 0x80, 0x80, "Software Handshaking")  PORT_DIPLOCATION("SW401:8")
+	PORT_DIPNAME( 0x80, 0x80, "Software Handshaking")                        PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Enabled")
 	PORT_DIPSETTING(    0x80, "Disabled")
 
 	PORT_MODIFY("SW402")
-	PORT_DIPNAME( 0x08, 0x00, "Keypad Shifted")      PORT_DIPLOCATION("SW402:4")
+	PORT_DIPNAME( 0x08, 0x00, "Keypad Shifted")                              PORT_DIPLOCATION("SW402:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "Default Key Values")  PORT_DIPLOCATION("SW402:5")
+	PORT_DIPNAME( 0x10, 0x00, "Default Key Values")                          PORT_DIPLOCATION("SW402:5")
 	PORT_DIPSETTING(    0x00, "HDOS Values")
 	PORT_DIPSETTING(    0x10, "CP/M Values")
-	PORT_DIPNAME( 0x60, 0x60, "Cursor Blink")        PORT_DIPLOCATION("SW402:6,7")
+	PORT_DIPNAME( 0x60, 0x60, "Cursor Blink")                                PORT_DIPLOCATION("SW402:6,7")
 	PORT_DIPSETTING(    0x00, "Steady")
 	PORT_DIPSETTING(    0x20, "Invisible")
 	PORT_DIPSETTING(    0x40, "Fast Blink")
 	PORT_DIPSETTING(    0x60, "Slow Blink")
-	PORT_DIPNAME( 0x80, 0x00, "Interlace Scan Mode") PORT_DIPLOCATION("SW402:8")
+	PORT_DIPNAME( 0x80, 0x00, "Interlace Scan Mode")                         PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -835,7 +842,7 @@ static INPUT_PORTS_START( watz19 )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "75")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
@@ -852,10 +859,10 @@ static INPUT_PORTS_START( watz19 )
 	PORT_DIPSETTING(    0x0d, "19200")
 	PORT_DIPSETTING(    0x0e, "38400")
 	PORT_DIPSETTING(    0x0f, "134.5")
-	PORT_DIPNAME( 0x40, 0x00, "Word Size")           PORT_DIPLOCATION("SW401:7")
+	PORT_DIPNAME( 0x40, 0x00, "Word Size")                                   PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, "8-bit Word")
 	PORT_DIPSETTING(    0x40, "7-bit Word")
-	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")                                      PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 INPUT_PORTS_END
@@ -865,7 +872,7 @@ static INPUT_PORTS_START( gp19 )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW402")
-	PORT_DIPNAME( 0x80, 0x00, "Automatic Holdscreen")    PORT_DIPLOCATION("SW402:8")
+	PORT_DIPNAME( 0x80, 0x00, "Automatic Holdscreen")                        PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "Disabled (VT100 mode)")
 	PORT_DIPSETTING(    0x80, "Enabled (Z19 mode)")
 
@@ -899,29 +906,29 @@ INPUT_PORTS_END
 ROM_START( h19 )
 	// Original terminal code
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "2732_444-46_h19code.u437", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
+	ROM_LOAD( "2732_444-46_h19code.u437",         0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
 
 	// Original font
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	ROM_LOAD( "2716_444-29_h19font.u420",         0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+	ROM_LOAD( "2716_444-37_h19keyb.u445",         0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
 ROM_START( super19 )
 	// Super-19 ROM
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "2732_super19_h447.u437", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
+	ROM_LOAD( "2732_super19_h447.u437",           0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
 
 	// Original font
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	ROM_LOAD( "2716_444-29_h19font.u420",         0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+	ROM_LOAD( "2716_444-37_h19keyb.u445",         0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
 ROM_START( superset )
@@ -939,7 +946,7 @@ ROM_START( superset )
 
 	// Superset Keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716_101-422_superset_kbd.u445", 0x0000, 0x0800, CRC(549d15b3) SHA1(981962e5e05bbdc5a66b0e86870853ce5596e877))
+	ROM_LOAD( "2716_101-422_superset_kbd.u445",   0x0000, 0x0800, CRC(549d15b3) SHA1(981962e5e05bbdc5a66b0e86870853ce5596e877))
 ROM_END
 
 ROM_START( watz19 )
@@ -948,65 +955,65 @@ ROM_START( watz19 )
 
 	// Watzman ROM
 	ROM_SYSTEM_BIOS(0, "watzman", "Watzman")
-	ROMX_LOAD("watzman.u437", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(0))
+	ROMX_LOAD("watzman.u437",                     0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "watzman-a", "Watzman w/clock persists after reset")
-	ROMX_LOAD("watzman-a.u437", 0x0000, 0x1000, CRC(1f7553e9) SHA1(ac6ddb12b4fb46c1a0ad08ee43978ad3153b51aa), ROM_BIOS(1))
+	ROMX_LOAD("watzman-a.u437",                   0x0000, 0x1000, CRC(1f7553e9) SHA1(ac6ddb12b4fb46c1a0ad08ee43978ad3153b51aa), ROM_BIOS(1))
 
 	// Original font
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	ROM_LOAD( "2716_444-29_h19font.u420",         0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Watzman keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "keybd.u445", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
+	ROM_LOAD( "keybd.u445",                       0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
 ROM_START( ultra19 )
 	// Ultra ROM
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "2532_h19_ultra_firmware.u437", 0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3))
+	ROM_LOAD( "2532_h19_ultra_firmware.u437",     0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3))
 
 	// Original font
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	ROM_LOAD( "2716_444-29_h19font.u420",         0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Ultra keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716_h19_ultra_keyboard.u445", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
+	ROM_LOAD( "2716_h19_ultra_keyboard.u445",     0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
 ROM_END
 
 ROM_START( gp19 )
 	// GP-19 ROMs
 	ROM_REGION( 0x3000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "gp19_rom_1_ver_1_1.u26", 0x0000, 0x1000, CRC(7cbe8e0d) SHA1(977df895b067fa4e4646b4518cffb08d4e6bb6e0))
-	ROM_LOAD( "gp19_rom_2_ver_1_1.u25", 0x1000, 0x1000, CRC(a85e3bc4) SHA1(f64e851c5d3ef98a9a48e0fc482baa576773ff43))
-	ROM_LOAD( "gp19_rom_3_ver_1_1.u24", 0x2000, 0x1000, CRC(878f577c) SHA1(0756435914dcfb981de4e40d5f81af3e0f5bb1c5))
+	ROM_LOAD( "gp19_rom_1_ver_1_1.u26",           0x0000, 0x1000, CRC(7cbe8e0d) SHA1(977df895b067fa4e4646b4518cffb08d4e6bb6e0))
+	ROM_LOAD( "gp19_rom_2_ver_1_1.u25",           0x1000, 0x1000, CRC(a85e3bc4) SHA1(f64e851c5d3ef98a9a48e0fc482baa576773ff43))
+	ROM_LOAD( "gp19_rom_3_ver_1_1.u24",           0x2000, 0x1000, CRC(878f577c) SHA1(0756435914dcfb981de4e40d5f81af3e0f5bb1c5))
 
 	// GP-19 font
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "gp19_char_gen_cg_1.u21", 0x0000, 0x1000, CRC(49ec9242) SHA1(770a8c7b5b15bcfe465fd84326d0ae3dcaa85311))
+	ROM_LOAD( "gp19_char_gen_cg_1.u21",           0x0000, 0x1000, CRC(49ec9242) SHA1(770a8c7b5b15bcfe465fd84326d0ae3dcaa85311))
 
 	// Original keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+	ROM_LOAD( "2716_444-37_h19keyb.u445",         0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
 ROM_START( imaginator )
 	// Program code
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	// Original terminal code
-	ROM_LOAD( "2732_444-46_h19code.u437", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
+	ROM_LOAD( "2732_444-46_h19code.u437",                     0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
 	// Imaginator ROMs
 	ROM_LOAD( "2732_imaginator_gpc_rev_1.2_pn_9000_0002.u9a", 0x2000, 0x1000, CRC(507bb13f) SHA1(5b210f8d77e22fdf063f611eb5c29636cdb01250))
 
 	// Original font
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "2716_444-29_h19font.u420", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	ROM_LOAD( "2716_444-29_h19font.u420",                     0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
 	// Original keyboard
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716_444-37_h19keyb.u445", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+	ROM_LOAD( "2716_444-37_h19keyb.u445",                     0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
 
@@ -1118,7 +1125,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
  *
  * Developed by ATG Systems
  */
-heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_SUPER19, tag, owner, clock)
 {
 }
@@ -1133,12 +1140,13 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(super19);
 }
 
+
 /**
  * Superset ROM
  *
  * Developed by TMSI
  */
-heath_superset_tlb_device::heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_superset_tlb_device::heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock),
 	m_selected_char_set(0)
 {
@@ -1201,7 +1209,7 @@ ioport_constructor heath_superset_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(superset);
 }
 
-uint8_t heath_superset_tlb_device::crtc_reg_r(offs_t reg)
+u8 heath_superset_tlb_device::crtc_reg_r(offs_t reg)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -1211,7 +1219,7 @@ uint8_t heath_superset_tlb_device::crtc_reg_r(offs_t reg)
 	return heath_tlb_device::crtc_reg_r(reg);
 }
 
-void heath_superset_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
+void heath_superset_tlb_device::crtc_reg_w(offs_t reg, u8 val)
 {
 	m_reverse_video_disabled = bool(BIT(reg, 3));
 
@@ -1221,15 +1229,15 @@ void heath_superset_tlb_device::crtc_reg_w(offs_t reg, uint8_t val)
 MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix(y);
+	u32               *p       = &bitmap.pix(y);
 
 	if (de)
 	{
 		for (int x = 0; x < x_count; x++)
 		{
-			uint8_t inv = (x == cursor_x) ? 0xff : 0;
-			uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
-			uint16_t char_set_base_offset = (m_selected_char_set << 11);
+			u8  inv                  = (x == cursor_x) ? 0xff : 0;
+			u8  chr                  = m_p_videoram[(ma + x) & 0x7ff];
+			u16 char_set_base_offset = (m_selected_char_set << 11);
 
 			if (chr & 0x80)
 			{
@@ -1247,7 +1255,7 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 			}
 
 			// get pattern of pixels for the character scanline
-			uint8_t const gfx = m_p_chargen[char_set_base_offset | (chr << 4) | ra] ^ inv;
+			u8 const gfx = m_p_chargen[char_set_base_offset | (chr << 4) | ra] ^ inv;
 
 			// Display a scanline of a character (8 pixels)
 			for (int b = 0; 8 > b; ++b)
@@ -1280,12 +1288,13 @@ void heath_superset_tlb_device::out2_internal(int data)
 	m_selected_char_set = (m_selected_char_set & 0x0a) | (data & 0x01);
 }
 
+
 /**
  * Watzman ROM
  *
  * Developed by Barry Watzman, sold by HUG (Heath Users Group)
 */
-heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_WATZ, tag, owner, clock)
 {
 }
@@ -1300,12 +1309,13 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(watz19);
 }
 
+
 /**
  * UltraROM
  *
  * Developed by William G. Parrott, III, sold by Software Wizardry, Inc.
  */
-heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock)
 {
 }
@@ -1338,10 +1348,11 @@ ioport_constructor heath_ultra_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ultra19);
 }
 
+
 /**
  * Northwest Digital Systems GP-19 add-in board
  */
-heath_gp19_tlb_device::heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_gp19_tlb_device::heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_GP19, tag, owner, clock)
 {
 }
@@ -1368,9 +1379,9 @@ void heath_gp19_tlb_device::device_start()
 	save_item(NAME(m_col_132));
 	save_item(NAME(m_reverse_video));
 
-	m_char_gen_a11 = false;
-	m_graphic_mode = false;
-	m_col_132 = false;
+	m_char_gen_a11  = false;
+	m_graphic_mode  = false;
+	m_col_132       = false;
 	m_reverse_video = false;
 }
 
@@ -1386,7 +1397,6 @@ void heath_gp19_tlb_device::mem_map(address_map &map)
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
 	map(0x8000, 0xbfff).mirror(0x4000).ram().share(m_p_videoram);
 }
-
 
 void heath_gp19_tlb_device::io_map(address_map &map)
 {
@@ -1411,12 +1421,12 @@ void heath_gp19_tlb_device::io_map(address_map &map)
  *  Q3 Alt Character L
  *  Q4-Q7 LED indicators (debug LEDs on circuit board)
  */
-void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
+void heath_gp19_tlb_device::latch_u5_w(u8 data)
 {
-	m_graphic_mode = bool(BIT(data, 0));
-	m_col_132 = bool(BIT(data, 1));
+	m_graphic_mode  = bool(BIT(data, 0));
+	m_col_132       = bool(BIT(data, 1));
 	m_reverse_video = bool(BIT(data, 2));
-	m_char_gen_a11 = bool(BIT(data, 3));
+	m_char_gen_a11  = bool(BIT(data, 3));
 
 	// TODO handle LED indicators
 
@@ -1434,21 +1444,20 @@ void heath_gp19_tlb_device::latch_u5_w(uint8_t data)
 	}
 }
 
-
 MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix(y);
+	u32               *p       = &bitmap.pix(y);
 
 	if (de)
 	{
-		uint8_t screen_inv = m_reverse_video ? 0xff : 0x00;
+		u8 screen_inv = m_reverse_video ? 0xff : 0x00;
 
 		if (m_graphic_mode)
 		{
 			for (int x = 0; x < x_count; x++)
 			{
-				uint8_t const gfx = m_p_videoram[((ma << 1) + (ra * x_count) + x) & 0x3fff] ^ screen_inv;
+				u8 const gfx = m_p_videoram[((ma << 1) + (ra * x_count) + x) & 0x3fff] ^ screen_inv;
 
 				for (int b = 0; 8 > b; ++b)
 				{
@@ -1458,12 +1467,12 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 		}
 		else
 		{
-			uint16_t const base = m_char_gen_a11 ? 0x800 : 0x0;
+			u16 const base = m_char_gen_a11 ? 0x800 : 0x0;
 
 			for (int x = 0; x < x_count; x++)
 			{
-				uint8_t inv = (x == cursor_x) ? 0xff : 0;
-				uint8_t chr = m_p_videoram[(ma + x) & 0x3fff];
+				u8 inv = (x == cursor_x) ? 0xff : 0;
+				u8 chr = m_p_videoram[(ma + x) & 0x3fff];
 
 				if (chr & 0x80)
 				{
@@ -1474,7 +1483,7 @@ MC6845_UPDATE_ROW(heath_gp19_tlb_device::crtc_update_row)
 				inv ^= screen_inv;
 
 				// select proper character set
-				uint8_t const gfx = m_p_chargen[base | (chr << 4) | ra] ^ inv;
+				u8 const gfx = m_p_chargen[base | (chr << 4) | ra] ^ inv;
 
 				// Display a scanline of a character (8 pixels)
 				for (int b = 0; 8 > b; ++b)
@@ -1518,9 +1527,9 @@ ioport_constructor heath_gp19_tlb_device::device_input_ports() const
  *   - horizontal retrace interrupt
  *
  */
-heath_imaginator_tlb_device::heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_imaginator_tlb_device::heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_IMAGINATOR, tag, owner, clock),
-	m_mem_bank(*this, "membank"),
+	m_mem_bank(*this,      "membank"),
 	m_p_graphic_ram(*this, "graphicram")
 {
 }
@@ -1550,8 +1559,8 @@ void heath_imaginator_tlb_device::device_start()
 	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
-			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
-			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } },
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_8000h(); } });
 }
 
 void heath_imaginator_tlb_device::device_reset()
@@ -1561,28 +1570,17 @@ void heath_imaginator_tlb_device::device_reset()
 	m_mem_bank->set_entry(1);
 	m_tap_6000h.remove();
 	m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
-			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
-			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
 
 	m_alphanumeric_mode_active = true;
-	m_graphics_mode_active = false;
+	m_graphics_mode_active     = false;
 
-	m_hsync_irq_raised = false;
+	m_hsync_irq_raised         = false;
 
 	allow_tlb_intr();
 }
 
-/*
- *  Memory map for the I-100
- *
- *    0x0000-0x1fff    Program ROM (Heath TLB board)
- *    0x2000-0x3fff    Graphics Command Processor(GCP) ROM (I-100)
- *    0x4000-0x5fff    Scratchpad RAM (Heath TLB board)
- *    0x6000-0x7fff    Graphics Scratchpad  R/W RAM (I-100)
- *    0x8000-0xbfff    Graphics Display R/W RAM(I-100)
- *    0xc000-0xdfff    Optional Graphics Command Processor memory (I-100)
- *    0xe000-0xffff    Display Memory (Heath TLB board)
- */
 void heath_imaginator_tlb_device::mem_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -1606,7 +1604,6 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 
 	// Alphanumeric RAM
 	map(0xe000, 0xe7ff).mirror(0x1800).ram().share(m_p_videoram);
-
 }
 
 void heath_imaginator_tlb_device::tap_6000h()
@@ -1627,16 +1624,16 @@ void heath_imaginator_tlb_device::tap_8000h()
 
 void heath_imaginator_tlb_device::allow_tlb_intr()
 {
-	m_allow_tlb_interrupts = true;
+	m_allow_tlb_interrupts        = true;
 	m_allow_imaginator_interrupts = false;
-	m_im2_val = 0x02;
+	m_im2_val                     = 0x02;
 }
 
 void heath_imaginator_tlb_device::allow_hsync_intr()
 {
-	m_allow_tlb_interrupts = false;
+	m_allow_tlb_interrupts        = false;
 	m_allow_imaginator_interrupts = true;
-	m_im2_val = 0x00;
+	m_im2_val                     = 0x00;
 }
 
 /**
@@ -1662,9 +1659,9 @@ IRQ_CALLBACK_MEMBER(heath_imaginator_tlb_device::irq_ack_cb)
 	return m_im2_val;
 }
 
-void heath_imaginator_tlb_device::config_irq_w(offs_t reg, uint8_t val)
+void heath_imaginator_tlb_device::config_irq_w(offs_t reg, u8 val)
 {
-	if (BIT(reg,3))
+	if (BIT(reg, 3))
 	{
 		allow_tlb_intr();
 	}
@@ -1676,13 +1673,13 @@ void heath_imaginator_tlb_device::config_irq_w(offs_t reg, uint8_t val)
 	set_irq_line();
 }
 
-void heath_imaginator_tlb_device::display_enable_w(offs_t reg, uint8_t val)
+void heath_imaginator_tlb_device::display_enable_w(offs_t reg, u8 val)
 {
 	m_alphanumeric_mode_active = bool(BIT(reg, 7));
-	m_graphics_mode_active = bool(BIT(reg, 6));
+	m_graphics_mode_active     = bool(BIT(reg, 6));
 }
 
-void heath_imaginator_tlb_device::nop_w(offs_t, uint8_t)
+void heath_imaginator_tlb_device::nop_w(offs_t, u8)
 {
 }
 
@@ -1694,18 +1691,18 @@ const tiny_rom_entry *heath_imaginator_tlb_device::device_rom_region() const
 MC6845_UPDATE_ROW(heath_imaginator_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix(y);
+	u32               *p       = &bitmap.pix(y);
 
 	if (de)
 	{
 		for (int x = 0; x < x_count; x++)
 		{
-			uint8_t output = 0x00;
+			u8 output = 0x00;
 
 			if (m_alphanumeric_mode_active)
 			{
-				uint8_t inv = (x == cursor_x) ? 0xff : 0;
-				uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+				u8 inv = (x == cursor_x) ? 0xff : 0;
+				u8 chr = m_p_videoram[(ma + x) & 0x7ff];
 
 				if (chr & 0x80)
 				{
@@ -1754,12 +1751,12 @@ void heath_imaginator_tlb_device::set_irq_line()
  *
  *
  */
-heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
 {
 }
 
-heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	heath_tlb_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -1775,7 +1772,7 @@ void heath_igc_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
-	m_p_graphic_ram = make_unique_clear<uint8_t[]>(0x3ffff);
+	m_p_graphic_ram = make_unique_clear<u8[]>(0x3ffff);
 	save_pointer(NAME(m_p_graphic_ram), 0x3ffff);
 
 	save_item(NAME(m_data_reg));
@@ -1795,23 +1792,23 @@ void heath_igc_tlb_device::device_reset()
 	heath_tlb_device::device_reset();
 
 	sigma_ctrl_w(0);
-	m_data_reg = 0x00;
-	m_io_address = 0x0000;
+	m_data_reg       = 0x00;
+	m_io_address     = 0x0000;
 	m_window_address = 0x0000;
 }
 
-void heath_igc_tlb_device::sigma_ctrl_w(uint8_t data)
+void heath_igc_tlb_device::sigma_ctrl_w(u8 data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
-	m_pixel_video_enabled = bool(BIT(data, 0));
-	m_character_video_disabled = bool(BIT(data, 1));
-	m_video_invert_enabled = bool(BIT(data, 2));
+	m_pixel_video_enabled             = bool(BIT(data, 0));
+	m_character_video_disabled        = bool(BIT(data, 1));
+	m_video_invert_enabled            = bool(BIT(data, 2));
 	m_alternate_character_set_enabled = bool(BIT(data, 3));
-	m_video_fill_enabled = bool(BIT(data, 4));
+	m_video_fill_enabled              = bool(BIT(data, 4));
 	m_read_address_increment_disabled = bool(BIT(data, 5));
 
-	m_memory_bank_select = bitswap<2>(data, 6, 7);
+	m_memory_bank_select              = bitswap<2>(data, 6, 7);
 
 	if (m_video_fill_enabled)
 	{
@@ -1819,15 +1816,15 @@ void heath_igc_tlb_device::sigma_ctrl_w(uint8_t data)
 	}
 }
 
-uint8_t heath_igc_tlb_device::sigma_ctrl_r()
+u8 heath_igc_tlb_device::sigma_ctrl_r()
 {
-	uint8_t ret_val = 0x00;
+	u8 ret_val = 0x00;
 
-	ret_val |= m_pixel_video_enabled ? 0x01 : 0x00;
-	ret_val |= m_character_video_disabled ? 0x02 : 0x00;
-	ret_val |= m_video_invert_enabled ? 0x04 : 0x00;
+	ret_val |= m_pixel_video_enabled             ? 0x01 : 0x00;
+	ret_val |= m_character_video_disabled        ? 0x02 : 0x00;
+	ret_val |= m_video_invert_enabled            ? 0x04 : 0x00;
 	ret_val |= m_alternate_character_set_enabled ? 0x08 : 0x00;
-	ret_val |= m_video_fill_enabled ? 0x10 : 0x00;
+	ret_val |= m_video_fill_enabled              ? 0x10 : 0x00;
 	ret_val |= m_read_address_increment_disabled ? 0x20 : 0x00;
 
 	ret_val |= bitswap<2>(m_memory_bank_select, 0, 1) << 6;
@@ -1837,47 +1834,47 @@ uint8_t heath_igc_tlb_device::sigma_ctrl_r()
 	return ret_val;
 }
 
-void heath_igc_tlb_device::sigma_video_mem_w(uint8_t data)
+void heath_igc_tlb_device::sigma_video_mem_w(u8 data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
-	m_data_reg = data;
+	m_data_reg                                                     = data;
 
 	m_p_graphic_ram[(m_memory_bank_select << 16) + m_io_address++] = data;
 }
 
-uint8_t heath_igc_tlb_device::sigma_video_mem_r()
+u8 heath_igc_tlb_device::sigma_video_mem_r()
 {
 	// control whether m_io_address is incremented during a read
-	uint32_t addr = (m_read_address_increment_disabled || machine().side_effects_disabled()) ?
+	u32 addr = (m_read_address_increment_disabled || machine().side_effects_disabled()) ?
 		((m_memory_bank_select << 16) + m_io_address) :
 		((m_memory_bank_select << 16) + m_io_address++);
 
 	return m_p_graphic_ram[addr];
 }
 
-void heath_igc_tlb_device::sigma_io_lo_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_io_lo_addr_w(u8 data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
 	m_io_address = (m_io_address & 0xff00) | data;
 }
 
-void heath_igc_tlb_device::sigma_io_hi_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_io_hi_addr_w(u8 data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
 	m_io_address = (data << 8) | (m_io_address & 0x00ff);
 }
 
-void heath_igc_tlb_device::sigma_window_lo_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_window_lo_addr_w(u8 data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
 	m_window_address = (m_window_address & 0xff00) | data;
 }
 
-void heath_igc_tlb_device::sigma_window_hi_addr_w(uint8_t data)
+void heath_igc_tlb_device::sigma_window_hi_addr_w(u8 data)
 {
 	LOGREG("%s: data: %02x\n", FUNCNAME, data);
 
@@ -1887,20 +1884,20 @@ void heath_igc_tlb_device::sigma_window_hi_addr_w(uint8_t data)
 MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix(y);
+	u32               *p       = &bitmap.pix(y);
 
 	if (de)
 	{
-		uint8_t video_invert = m_video_invert_enabled ? 0xff : 0;
+		u8 video_invert = m_video_invert_enabled ? 0xff : 0;
 
 		for (int x = 0; x < x_count; x++)
 		{
-			uint8_t output = 0x00;
+			u8 output = 0x00;
 
 			if (!m_character_video_disabled)
 			{
-				uint8_t inv = (x == cursor_x) ? 0xff : 0;
-				uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
+				u8 inv = (x == cursor_x) ? 0xff : 0;
+				u8 chr = m_p_videoram[(ma + x) & 0x7ff];
 
 				if (chr & 0x80)
 				{
@@ -1936,7 +1933,7 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
  * SigmaSoft and Systems IGC plus TLB with Super-19 ROM
  *
  */
-heath_igc_super19_tlb_device::heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_igc_super19_tlb_device::heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_igc_tlb_device(mconfig, HEATH_IGC_SUPER19, tag, owner, clock)
 {
 }
@@ -1956,7 +1953,7 @@ ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
  * SigmaSoft and Systems IGC plus TLB with UltraROM
  *
  */
-heath_igc_ultra_tlb_device::heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_igc_ultra_tlb_device::heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock)
 {
 }
@@ -1993,8 +1990,8 @@ ioport_constructor heath_igc_ultra_tlb_device::device_input_ports() const
 /**
  * SigmaSoft and Systems IGC plus TLB with Watzman ROM
  *
-*/
-heath_igc_watz_tlb_device::heath_igc_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ */
+heath_igc_watz_tlb_device::heath_igc_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	heath_igc_tlb_device(mconfig, HEATH_IGC_WATZ, tag, owner, clock)
 {
 }
@@ -2014,7 +2011,7 @@ ioport_constructor heath_igc_watz_tlb_device::device_input_ports() const
  * Terminal Logic Board Connector
  *
  */
-heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, HEATH_TLB_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface(mconfig, *this),
 	m_write_sd(*this),
@@ -2024,7 +2021,6 @@ heath_tlb_connector::heath_tlb_connector(const machine_config &mconfig, const ch
 	m_tlb(nullptr)
 {
 }
-
 
 heath_tlb_connector::~heath_tlb_connector()
 {
