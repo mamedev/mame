@@ -16,8 +16,6 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	const bool SHOW_R0_AS_0 = false;
-
 	int get_ty(u32 opcode);
 	int get_op(u32 opcode);
 	int get_src1(u32 opcode);
@@ -31,7 +29,7 @@ private:
 	int get_asr_amount(int shift);
 	int get_sh_amount(int shift);
 
-	std::string get_regname(u8 reg);
+	const char *get_regname(u8 reg);
 };
 
 #endif
