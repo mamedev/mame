@@ -1210,6 +1210,10 @@ static INPUT_PORTS_START( epo_tfp2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Player 2 Start / Blue")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tvpc_tom )
+	PORT_INCLUDE(xavix_i2c)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( has_wamg )
 	PORT_INCLUDE(xavix)
 
@@ -1506,6 +1510,14 @@ void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 	I2C_24C08(config, "i2cmem", 0);
 }
 
+void xavix_i2c_state::xavix_i2c_24c16(machine_config& config)
+{
+	xavix(config);
+
+	I2C_24C16(config, "i2cmem", 0);
+}
+
+
 void xavix_state::xavixp(machine_config &config)
 {
 	// other clocks should change too!
@@ -1565,8 +1577,7 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 
 	I2C_24C02(config, "i2cmem", 0); // 24LC02
 
-	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("TAIKO");
 }
 
 void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
@@ -1577,8 +1588,7 @@ void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
 
 	I2C_24C02(config, "i2cmem", 0); // 24LC02
 
-	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("JPOPIRA");
 }
 
 void xavix_cart_state::xavix_cart_evio(machine_config &config)
@@ -1603,25 +1613,51 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	xavix_cart(config);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list_us").set_original("ekara_us");
-	SOFTWARE_LIST(config, "cart_list_pal").set_original("ekara_pal");
-	SOFTWARE_LIST(config, "cart_list_japan").set_original("ekara_japan");
-	SOFTWARE_LIST(config, "cart_list_japan_g").set_original("ekara_japan_g");
-	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
-	SOFTWARE_LIST(config, "cart_list_japan_s").set_original("ekara_japan_s");
-	SOFTWARE_LIST(config, "cart_list_japan_m").set_original("ekara_japan_m");
-	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
-	SOFTWARE_LIST(config, "cart_list_japan_en").set_original("ekara_japan_en");
-	SOFTWARE_LIST(config, "cart_list_japan_kd").set_original("ekara_japan_kd");
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
-	SOFTWARE_LIST(config, "cart_list_japan_web").set_original("ekara_japan_web");
-	SOFTWARE_LIST(config, "cart_list_japan_a").set_original("ekara_japan_a");
-	SOFTWARE_LIST(config, "cart_list_japan_gk").set_original("ekara_japan_gk");
-	SOFTWARE_LIST(config, "cart_list_japan_bh").set_original("ekara_japan_bh");
-	SOFTWARE_LIST(config, "cart_list_japan_packin").set_original("ekara_japan_packin");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("EKARA");
 }
 
-void xavix_cart_state::xavix_cart_hikara(machine_config &config)
+void xavix_hikara_state::machine_reset()
+{
+	xavix_ekara_state::machine_reset();
+
+	if (!memregion("cartslot:cart:rom"))
+		return;
+
+	// rather crude hack to patch a failing check found in the cartridge ROMS
+	// TODO: remove this!
+	u8* ROM = memregion("cartslot:cart:rom")->base();
+	size_t len = memregion("cartslot:cart:rom")->bytes();
+
+	int foundcount = 0;
+	int firstfound = 0;
+	for (int i = 0; i < len - 7; i++)
+	{
+		int matchcount = 0;
+
+		for (int j = 0; j < 5; j++)
+		{
+			u8 searchfor[5] = { 0x29, 0x80, 0xd0, 0x14, 0xad };
+	
+			if (ROM[i + j] == searchfor[j])
+				matchcount++;
+		}
+
+		if (matchcount == 5)
+		{
+			if (foundcount == 0)
+				firstfound = i;
+			foundcount++;
+		}
+	}
+
+	if ((foundcount == 3) || (foundcount == 1))
+	{
+		ROM[firstfound + 2] = 0xf0;
+		ROM[firstfound + 7] = 0xd0;
+	}
+}
+
+void xavix_hikara_state::xavix_cart_hikara(machine_config &config)
 {
 	xavix_cart(config);
 
@@ -1643,10 +1679,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list_japan_g").set_original("ekara_japan_g");
-	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
-	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("POPIRA");
 }
 
 // see code at 028060, using table from 00eb6d for conversion
@@ -1691,8 +1724,7 @@ void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
 	xavix_cart(config);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
-	//SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp"); // not for this system, but unlike other carts, actually tells you this if inserted rather than crashing the system
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("FAMMAT");
 }
 
 
@@ -2064,11 +2096,19 @@ ROM_END
 
 ROM_START( epo_tenn )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
-	ROM_LOAD("excitetennis.u4", 0x000000, 0x100000, CRC(10b0e1dd) SHA1(ba438201434f2b51792b119a3e3d07cc3e53b89a) )
-	ROM_LOAD("excitetennis.u2", 0x400000, 0x200000, CRC(6c2cdc90) SHA1(3c5b391e5e7b4a9a73038ef619df564143724437) )
+	ROM_LOAD( "excitetennis.u4", 0x000000, 0x100000, CRC(10b0e1dd) SHA1(ba438201434f2b51792b119a3e3d07cc3e53b89a) )
+	ROM_LOAD( "excitetennis.u2", 0x400000, 0x200000, CRC(6c2cdc90) SHA1(3c5b391e5e7b4a9a73038ef619df564143724437) )
 ROM_END
 
+ROM_START( tvpc_tom )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tvpc_thomas.u1", 0x000000, 0x400000, CRC(507f334e) SHA1(d66efd13f166fcd2a66133dc981c8a67b2a26d5f) )
+ROM_END
 
+ROM_START( tvpc_dor )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tvpc_doreamon.u3", 0x000000, 0x400000, CRC(6f2edbb2) SHA1(98fa86f85e00aa40e7a585ff0bc930cb5ca88362) )
+ROM_END
 
 /* XaviX hardware titles (1st Generation)
 
@@ -2209,3 +2249,7 @@ CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_
 CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
+
+CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2003, tvpc_dor,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// A Hamtaro TV-PC also exists
