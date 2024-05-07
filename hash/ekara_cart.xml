@@ -277,6 +277,11 @@ license:CC0-1.0
 	G-17 *GC0017-TPJ  TV Pop Junior Volume 6
 	G-18 *GC0018-TPJ  TV Pop Junior Volume 7
 
+	One unusual cartridge looks like a regular G (Gold series) and is compatible with the same units, but
+	has a GS code instead; no other GS cartridges have been seen.
+
+	GS-1 *GS0001-MEI  Natsukashi no Meikyoku-shū
+
 	***********************************************************************************
 
 	Game and Karaoke Cartridge series
@@ -2987,8 +2992,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- unusual cartridge, looks like a regular G (Gold series) and is compatible with the same units, but has a GS code instead, no
-	     other GS cartridges have been seen -->
 	<software name="gs1">
 		<description>Natsukashi no Meikyoku-shū (Japan)</description>
 		<year>2002</year>
