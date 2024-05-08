@@ -38620,6 +38620,7 @@ w30                             //
 @source:roland/roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
 sc155                           // 1992 Sound Canvas SC-155
+cm300                           // 1991 Sound Canvas CM-300
 
 @source:roland/roland_sc55mk2.cpp
 sc55mk2                         // 1994 Sound Canvas SC-55mkii
