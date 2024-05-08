@@ -294,14 +294,14 @@ void gdfs_state::adc_int_w(int state)
 */
 void ssv_state::lockout_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//  popmessage("%02X",data & 0xff);
+//  logerror("%s - Unknown lockout bit written %02X\n", machine().describe_context(), data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 0));
 		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 1));
 		machine().bookkeeping().coin_counter_w(1, BIT( data, 2));
 		machine().bookkeeping().coin_counter_w(0, BIT( data, 3));
-//                        data & 0x40?
+//      Bit 6 is unknown
 		enable_video(BIT(data, 7));
 	}
 }
@@ -309,14 +309,14 @@ void ssv_state::lockout_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 // Same as above but with inverted lockout lines
 void ssv_state::lockout_inv_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//  popmessage("%02X",data & 0xff);
+//  logerror("%s - Unknown lockout bit written %02X\n", machine().describe_context(), data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_lockout_w(1, BIT(data, 0));
 		machine().bookkeeping().coin_lockout_w(0, BIT(data, 1));
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 		machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
-//                        data & 0x40?
+//      Bit 6 is unknown
 		enable_video(BIT(data, 7));
 	}
 }
@@ -458,7 +458,7 @@ uint16_t gdfs_state::eeprom_r()
 void gdfs_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x7b00)
-		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -2793,9 +2793,6 @@ void drifto94_state::stmblade(machine_config &config)
 	UPD96050(config, m_dsp, 10000000);
 	m_dsp->set_addrmap(AS_PROGRAM, &drifto94_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &drifto94_state::dsp_data_map);
-
-	// don't need this, game just does a simple check at boot then the DSP stalls into a tight loop.
-	//config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

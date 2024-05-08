@@ -401,9 +401,7 @@ void ssv_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_screen->update_partial(m_screen->vpos() - 1); // pastelis FOR USE IN JAPAN screen polls the vblank / hblank to do a raster effect
 	COMBINE_DATA(m_scroll + offset);
 
-//  offsets 60-7f: CRT Controller  
-//  if(((offset*2) & 0x70) == 0x60)
-//      printf("%04x %04x\n",data,offset*2);
+//  offsets 60-7f: CRT Controller
 }
 
 /***************************************************************************
