@@ -1,0 +1,351 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="kisssite_cd" description="Tomy Kiss-Site CD-ROMs">
+	<software name="pokemon" supported="no">
+		<description>Anime Karaoke Series - Pocket Monsters 1 (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Anime Karaoke Series - Pocket Monsters 1 (Japan)" sha1="c282269e073f627c0f1540886b3965ce149e9f38"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance01" supported="no">
+		<description>Dance Karaoke Series 01 - Mickey Mouse March - Eurobeat Version &amp; White Love (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 01 - Mickey Mouse March - Eurobeat Version and White Love (Japan)" sha1="a0cf1cdb25f515814e8f774542ffba2e19a25372"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance02" supported="no">
+		<description>Dance Karaoke Series 02 - LOVE Machine &amp; Goldfinger '99 (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 02 - LOVE Machine and Goldfinger '99 (Japan)" sha1="7547f626537c1daf1e4f4351092092ba685c9e8e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance03" supported="no">
+		<description>Dance Karaoke Series 03 - Happy Summer Wedding &amp; Nanda Kanda (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 03 - Happy Summer Wedding and Nanda Kanda (Japan)" sha1="a79a08c0d26cf8010ddd9c9d37ba1e2de3d45426"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance04" supported="no">
+		<description>Dance Karaoke Series 04 - Koi no Dance Site &amp; Night of Fire (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 04 - Koi no Dance Site and Night of Fire (Japan)" sha1="d3e102197aa0a6273c63fcb68c27b949c7e31593"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance05" supported="no">
+		<description>Dance Karaoke Series 05 - Fly High - Euro-Power Mix &amp; Respect the Power of Love (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 05 - Fly High - Euro-Power Mix and Respect the Power of Love (Japan)" sha1="831d69723d0592c73379940ce02fc0e3567a1b50"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance06" supported="no">
+		<description>Dance Karaoke Series 06 - Chokotto Love &amp; My Graduation (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 06 - Chokotto Love and My Graduation (Japan)" sha1="286f6e346270384226f826a325a93deeb0b23b1e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance07" supported="no">
+		<description>Dance Karaoke Series 07 - Daite Hold on Me! &amp; Try Me - Watashi o Shinjite (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 07 - Daite Hold on Me and Try Me - Watashi o Shinjite (Japan)" sha1="813c39e7ba9f2d76fb97a9c86f207a2e8002701c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance08" supported="no">
+		<description>Dance Karaoke Series 08 - Akai Nikkichou &amp; Time After Time (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 08 - Akai Nikkichou and Time After Time (Japan)" sha1="d0fc434e186740c015793bc683e5ae518aec3f30"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance09" supported="no">
+		<description>Dance Karaoke Series 09 - Kiiroi Osora de Boom Boom Boom &amp; Don't Wanna Cry (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 09 - Kiiroi Osora de Boom Boom Boom and Don't Wanna Cry (Japan)" sha1="6d967b717a57cb8fd76137cfa1e60357d0be6645"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance10" supported="no">
+		<description>Dance Karaoke Series 10 - Manatsu no Kousen &amp; A Walk in the Park (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 10 - Manatsu no Kousen and A Walk in the Park (Japan)" sha1="56e15c6f72ae2736d22c7bff788b6073f020440a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance11" supported="no">
+		<description>Dance Karaoke Series 11 - Com'on! Be My Girl! &amp; Crazy Beat Goes On! (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 11 - Com'on Be My Girl and Crazy Beat Goes On (Japan)" sha1="ef48e7023e28d5541c43c6528f63481c2197c6e9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance12" supported="no">
+		<description>Dance Karaoke Series 12 - Kore ga Watashi no Ikiru Michi &amp; Ai no Shirushi (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 12 - Kore ga Watashi no Ikiru Michi and Ai no Shirushi (Japan)" sha1="c0d47d5aeff8ee8740eec988e20e3b79a4a2aa16"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance13" supported="no">
+		<description>Dance Karaoke Series 13 - UFO &amp; Southpaw (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 13 - UFO and Southpaw (Japan)" sha1="8013cfc6b2d80ff131d09c4aaf21f82844f2972f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance14" supported="no">
+		<description>Dance Karaoke Series 14 - Body &amp; Soul &amp; Long Way Home (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 14 - Body and Soul and Long Way Home (Japan)" sha1="e5f470132732fc0d137d48a59076b2aca1cfb8be"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance15" supported="no">
+		<description>Dance Karaoke Series 15 - Steady &amp; Alive (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 15 - Steady and Alive (Japan)" sha1="13f7834520e655a597bb749eb7e628a5f8b51889"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance16" supported="no">
+		<description>Dance Karaoke Series 16 - Wake Me Up! &amp; Timing (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 16 - Wake Me Up and Timing (Japan)" sha1="e78abc1db3ea3d89bea0d9f70b25c0910735f273"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance17" supported="no">
+		<description>Dance Karaoke Series 17 - Red Beat of My Life &amp; Bright Daylight (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 17 - Red Beat of My Life and Bright Daylight (Japan)" sha1="1d47027ca7b6acdc15b629aef4b5eb28adad5531"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance18" supported="no">
+		<description>Dance Karaoke Series 18 - Nakatta Koto ni Shite &amp; Otome Pasta ni Kandou (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 18 - Nakatta Koto ni Shite and Otome Pasta ni Kandou (Japan)" sha1="debd40ed320965e2f8790618b52f108c13f24db1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance19" supported="no">
+		<description>Dance Karaoke Series 19 - Ride on Time &amp; Give Me a Shake (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 19 - Ride on Time and Give Me a Shake (Japan)" sha1="d9c4fb029417a575c3f862f90adc2c9568817522"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance20" supported="no">
+		<description>Dance Karaoke Series 20 - Love 2000 &amp; Seishun Jidai 1.2.3! (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 20 - Love 2000 and Seishun Jidai 1.2.3 (Japan)" sha1="d0004391436b2414f8ce3cad289d011790c0b4db"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance21" supported="no">
+		<description>Dance Karaoke Series 21 - I Wish &amp; Luv Is Magic (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 21 - I Wish and Luv Is Magic (Japan)" sha1="b2a853bc96952035f4095338282a8fe33abb8bfa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance22" supported="no">
+		<description>Dance Karaoke Series 22 - Barashoku no Hibi &amp; Ginga no Chikai (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 22 - Barashoku no Hibi and Ginga no Chikai (Japan)" sha1="081096002cda684476d8b86fc369fb2d37699002"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance23" supported="no">
+		<description>Dance Karaoke Series 23 - Please Smile Again &amp; Treasure (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 23 - Please Smile Again and Treasure (Japan)" sha1="c12b4fff34c5c8d8c55ab4d7d8e8a32beac619be"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance24" supported="no">
+		<description>Dance Karaoke Series 24 - Koi wa Thrill, Shock, Suspense &amp; Love is Energy! (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 24 - Koi wa Thrill, Shock, Suspense and Love is Energy (Japan)" sha1="8ba796343933105cd965f670307c70f4115e6214"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dance25" supported="no">
+		<description>Dance Karaoke Series 25 - Renai Revolution 21 &amp; S.O.S (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series 25 - Renai Revolution 21 and S.O.S (Japan)" sha1="0f8a3cf18e01318058d502b756a6b9fe50998479"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Dance Karaoke Series 26 - not dumped -->
+	
+	<!-- Dance Karaoke Series 27 - seen but not dumped -->
+
+	<!-- Dance Karaoke Series 28 - not dumped -->
+
+	<!-- Dance Karaoke Series 29 - not dumped -->
+
+	<!-- Dance Karaoke Series 30 - not dumped -->
+
+	<!-- Dance Karaoke Series 31 - seen but not dumped -->
+	
+	<!-- are there discs numbered higher than 31? -->
+
+	<software name="dancebst" supported="no">
+		<description>Dance Karaoke Series - Best Selection (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dance Karaoke Series - Best Selection (Japan)" sha1="0fb3bc12d868ad0022c242894bfa2dd2ae0de363"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="moviebst" supported="no">
+		<description>Movie Karaoke Series - Best Selection - Ballade 1 (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Movie Karaoke Series - Best Selection - Ballade 1 (Japan)" sha1="3a82ed7c65d10d43acbf19122f649e1953a95002"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oha01" supported="no">
+		<description>Oha Star Series 01 - Zonapara (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Oha Star Series 01 - Zonapara (Japan)" sha1="777f838335441b121c80861d7d8aaa79bc4049dc"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oha02" supported="no">
+		<description>Oha Star Series 02 - Oha Ska! (Japan)</description>
+		<year>200?</year>
+		<publisher>Tomy</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Oha Star Series 02 - Oha Ska (Japan)" sha1="ddbb3a2626e5b7cff3b2b2d3371c81d5b311c4aa"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
