@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "pccard_sram.h"
+#include "sram.h"
 #include "machine/nvram.h"
 
 #define LOG_ATTRIBUTE (1U << 1)
@@ -34,15 +34,15 @@ DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_d
 
 static INPUT_PORTS_START( card )
 	PORT_START("switches")
-	PORT_CONFNAME(0x01, 0x00, "Battery Failed") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_1_w)
-	PORT_CONFSETTING(   0x01, DEF_STR(Yes))
-	PORT_CONFSETTING(   0x00, DEF_STR(No))
-	PORT_CONFNAME(0x02, 0x00, "Battery Low")    PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_2_w)
-	PORT_CONFSETTING(   0x02, DEF_STR(Yes))
-	PORT_CONFSETTING(   0x00, DEF_STR(No))
-	PORT_CONFNAME(0x04, 0x04, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, write_protect_w)
-	PORT_CONFSETTING(   0x04, DEF_STR(No))
+	PORT_CONFNAME(0x01, 0x01, "Battery Failed") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_1_w)
 	PORT_CONFSETTING(   0x00, DEF_STR(Yes))
+	PORT_CONFSETTING(   0x01, DEF_STR(No))
+	PORT_CONFNAME(0x02, 0x02, "Battery Low")    PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_2_w)
+	PORT_CONFSETTING(   0x00, DEF_STR(Yes))
+	PORT_CONFSETTING(   0x02, DEF_STR(No))
+	PORT_CONFNAME(0x04, 0x00, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, write_protect_w)
+	PORT_CONFSETTING(   0x04, DEF_STR(Yes))
+	PORT_CONFSETTING(   0x00, DEF_STR(No))
 INPUT_PORTS_END
 
 ioport_constructor pccard_sram_device::device_input_ports() const
@@ -64,8 +64,10 @@ pccard_sram_device::pccard_sram_device(const machine_config &mconfig, device_typ
 	device_memory_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	device_pccard_interface(mconfig, *this),
-	m_card_detect(false),
-	m_switches(*this, "switches")
+	m_cd(1),
+	m_bvd1(1),
+	m_bvd2(1),
+	m_wp(0)
 {
 }
 
@@ -75,27 +77,12 @@ pccard_sram_device::pccard_sram_device(const machine_config &mconfig, device_typ
 
 void pccard_sram_device::device_start()
 {
-}
+	save_item(NAME(m_cd));
+	save_item(NAME(m_bvd1));
+	save_item(NAME(m_bvd2));
+	save_item(NAME(m_wp));
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void pccard_sram_device::device_reset()
-{
-	// forward initial state of battery/write protect to slot
-	if (m_card_detect)
-	{
-		m_slot->battery_voltage_1_w(BIT(m_switches->read(), 0));
-		m_slot->battery_voltage_2_w(BIT(m_switches->read(), 1));
-		m_slot->write_protect_w(BIT(m_switches->read(), 2));
-	}
-	else
-	{
-		m_slot->battery_voltage_1_w(0);
-		m_slot->battery_voltage_2_w(0);
-		m_slot->write_protect_w(0);
-	}
+	set_cd(m_cd);
 }
 
 //-------------------------------------------------
@@ -119,7 +106,7 @@ uint16_t pccard_sram_device::read_memory(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
-	if (m_card_detect)
+	if (!m_cd)
 		data = space(0).read_word(offset * 2, mem_mask);
 
 	return data;
@@ -127,7 +114,7 @@ uint16_t pccard_sram_device::read_memory(offs_t offset, uint16_t mem_mask)
 
 void pccard_sram_device::write_memory(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (m_card_detect && BIT(m_switches->read(), 2))
+	if (!m_cd && !m_wp)
 		space(0).write_word(offset * 2, data, mem_mask);
 }
 
@@ -135,7 +122,7 @@ uint16_t pccard_sram_device::read_reg(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
-	if (has_configured_map(1) && m_card_detect)
+	if (!m_cd && has_configured_map(1))
 		data = space(1).read_word(offset * 2, mem_mask);
 
 	LOGMASKED(LOG_ATTRIBUTE, "attribute memory r: %06x = %04x & %04x\n", offset, data, mem_mask);
@@ -147,16 +134,52 @@ void pccard_sram_device::write_reg(offs_t offset, uint16_t data, uint16_t mem_ma
 {
 	LOGMASKED(LOG_ATTRIBUTE, "attribute memory w: %06x = %04x & %04x\n", offset, data, mem_mask);
 
-	if (has_configured_map(1) && m_card_detect && BIT(m_switches->read(), 2))
+	if (!m_cd && !m_wp && has_configured_map(1))
 		space(1).write_word(offset * 2, data & 0x00ff, mem_mask);
 }
 
-void pccard_sram_device::card_inserted(bool state)
+void pccard_sram_device::set_cd(bool state)
 {
-	m_card_detect = state;
-	m_slot->card_detect_w(state ? 1 : 0);
+	m_cd = state;
+	m_cd1_cb(m_cd);
+	m_cd2_cb(m_cd);
+	m_bvd1_cb(m_bvd1 || m_cd);
+	m_bvd2_cb(m_bvd2 || m_cd);
+	m_wp_cb(m_wp || m_cd);
 }
 
+void pccard_sram_device::battery_voltage_1_w(int state)
+{
+	if (m_bvd1 != state)
+	{
+		m_bvd1 = state;
+
+		if (!m_cd)
+			m_bvd1_cb(m_bvd1);
+	}
+}
+
+void pccard_sram_device::battery_voltage_2_w(int state)
+{
+	if (m_bvd2 != state)
+	{
+		m_bvd2 = state;
+
+		if (!m_cd)
+			m_bvd2_cb(m_bvd2);
+	}
+}
+
+void pccard_sram_device::write_protect_w(int state)
+{
+	if (m_wp != state)
+	{
+		m_wp = state;
+
+		if (!m_cd)
+			m_wp_cb(m_wp);
+	}
+}
 
 /***************************************************************************
 
@@ -174,7 +197,7 @@ pccard_mitsubishi_sram_device::pccard_mitsubishi_sram_device(const machine_confi
 
 std::pair<std::error_condition, std::string> pccard_mitsubishi_sram_device::call_load()
 {
-	card_inserted(false);
+	set_cd(1);
 
 	if (length() != m_sram.bytes())
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
@@ -182,14 +205,14 @@ std::pair<std::error_condition, std::string> pccard_mitsubishi_sram_device::call
 	if (fread(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
 		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
-	card_inserted(true);
+	set_cd(0);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
 
 std::pair<std::error_condition, std::string> pccard_mitsubishi_sram_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	card_inserted(false);
+	set_cd(1);
 
 	// clear ram
 	std::fill_n(&m_sram[0], m_sram.length(), 0);
@@ -197,14 +220,14 @@ std::pair<std::error_condition, std::string> pccard_mitsubishi_sram_device::call
 	if (fwrite(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
 		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
-	card_inserted(true);
+	set_cd(0);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pccard_mitsubishi_sram_device::call_unload()
 {
-	if (m_card_detect && !is_readonly())
+	if (!m_cd && !is_readonly())
 	{
 		fseek(0, SEEK_SET);
 		fwrite(&m_sram[0], m_sram.bytes());
@@ -212,7 +235,7 @@ void pccard_mitsubishi_sram_device::call_unload()
 
 	std::fill_n(&m_sram[0], m_sram.length(), 0);
 
-	card_inserted(false);
+	set_cd(1);
 }
 
 pccard_mitsubishi_mf31m1_lycat01_device::pccard_mitsubishi_mf31m1_lycat01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -256,7 +279,7 @@ pccard_centennial_sram_device::pccard_centennial_sram_device(const machine_confi
 
 std::pair<std::error_condition, std::string> pccard_centennial_sram_device::call_load()
 {
-	card_inserted(false);
+	set_cd(1);
 
 	if (length() != m_sram.bytes() + m_eeprom.bytes())
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
@@ -267,14 +290,14 @@ std::pair<std::error_condition, std::string> pccard_centennial_sram_device::call
 	if (fread(&m_eeprom[0], m_eeprom.bytes()) != m_eeprom.bytes())
 		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
-	card_inserted(true);
+	set_cd(0);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
 
 std::pair<std::error_condition, std::string> pccard_centennial_sram_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	card_inserted(false);
+	set_cd(1);
 
 	// clear ram
 	std::fill_n(&m_sram[0], m_sram.length(), 0);
@@ -288,14 +311,14 @@ std::pair<std::error_condition, std::string> pccard_centennial_sram_device::call
 	if (fwrite(&m_eeprom[0], m_eeprom.bytes()) != m_eeprom.bytes())
 		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
-	card_inserted(true);
+	set_cd(0);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pccard_centennial_sram_device::call_unload()
 {
-	if (m_card_detect && !is_readonly())
+	if (!m_cd && !is_readonly())
 	{
 		fseek(0, SEEK_SET);
 		fwrite(&m_sram[0], m_sram.bytes());
@@ -305,7 +328,7 @@ void pccard_centennial_sram_device::call_unload()
 	std::fill_n(&m_sram[0], m_sram.length(), 0);
 	std::fill_n(&m_eeprom[0], m_eeprom.length(), 0);
 
-	card_inserted(false);
+	set_cd(1);
 }
 
 pccard_centennial_sl01m_15_11194_device::pccard_centennial_sl01m_15_11194_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

@@ -18,14 +18,13 @@
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
 #include "bus/ata/ataintf.h"
+#include "bus/pccard/sram.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6525tpi.h"
 #include "machine/mos6526.h"
 #include "machine/gayle.h"
 #include "machine/dmac.h"
-#include "machine/pccard.h"
-#include "machine/pccard_sram.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
 #include "machine/amigafdc.h"
@@ -2037,10 +2036,11 @@ void a600_state::a600(machine_config &config)
 	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
 	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
-	m_pcmcia->card_detect_cb().set("gayle", FUNC(gayle_device::cc_cd_w));
-	m_pcmcia->battery_voltage_1_cb().set("gayle", FUNC(gayle_device::cc_bvd1_w));
-	m_pcmcia->battery_voltage_2_cb().set("gayle", FUNC(gayle_device::cc_bvd2_w));
-	m_pcmcia->write_protect_cb().set("gayle", FUNC(gayle_device::cc_wp_w));
+	m_pcmcia->cd1().set("gayle", FUNC(gayle_device::cc_cd1_w));
+	m_pcmcia->cd2().set("gayle", FUNC(gayle_device::cc_cd2_w));
+	m_pcmcia->bvd1().set("gayle", FUNC(gayle_device::cc_bvd1_w));
+	m_pcmcia->bvd2().set("gayle", FUNC(gayle_device::cc_bvd2_w));
+	m_pcmcia->wp().set("gayle", FUNC(gayle_device::cc_wp_w));
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
@@ -2104,10 +2104,11 @@ void a1200_state::a1200(machine_config &config)
 #endif
 
 	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
-	m_pcmcia->card_detect_cb().set("gayle", FUNC(gayle_device::cc_cd_w));
-	m_pcmcia->battery_voltage_1_cb().set("gayle", FUNC(gayle_device::cc_bvd1_w));
-	m_pcmcia->battery_voltage_2_cb().set("gayle", FUNC(gayle_device::cc_bvd2_w));
-	m_pcmcia->write_protect_cb().set("gayle", FUNC(gayle_device::cc_wp_w));
+	m_pcmcia->cd1().set("gayle", FUNC(gayle_device::cc_cd1_w));
+	m_pcmcia->cd2().set("gayle", FUNC(gayle_device::cc_cd2_w));
+	m_pcmcia->bvd1().set("gayle", FUNC(gayle_device::cc_bvd1_w));
+	m_pcmcia->bvd2().set("gayle", FUNC(gayle_device::cc_bvd2_w));
+	m_pcmcia->wp().set("gayle", FUNC(gayle_device::cc_wp_w));
 
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");

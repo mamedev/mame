@@ -73,22 +73,29 @@
 */
 
 k573npu_device::k573npu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, KONAMI_573_NETWORK_PCB_UNIT, tag, owner, clock)
+	device_t(mconfig, KONAMI_573_NETWORK_PCB_UNIT, tag, owner, clock),
+	device_pccard_interface(mconfig, *this)
 {
+}
+
+ROM_START( k573npu )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "29f400.24e",   0x000000, 0x080000, CRC(8dcf294b) SHA1(efac79e18db22c30886463ec1bc448187da7a95a) )
+ROM_END
+
+const tiny_rom_entry *k573npu_device::device_rom_region() const
+{
+	return ROM_NAME( k573npu );
 }
 
 void k573npu_device::device_start()
 {
 }
 
-ROM_START( k573npu )
-	ROM_REGION( 0x080000, "tmpr3927", 0 )
-	ROM_LOAD( "29f400.24e",   0x000000, 0x080000, CRC(8dcf294b) SHA1(efac79e18db22c30886463ec1bc448187da7a95a) )
-ROM_END
-
-const tiny_rom_entry *k573npu_device::device_rom_region() const
+void k573npu_device::maincpu_program_map(address_map &map)
 {
-	return ROM_NAME( k573npu );
+	map(0x00000000, 0x007fffff).ram();
+	map(0x1fc00000, 0x1fc7ffff).rom().region("maincpu", 0);
 }
 
 DEFINE_DEVICE_TYPE(KONAMI_573_NETWORK_PCB_UNIT, k573npu_device, "k573npu", "Konami 573 Network PCB Unit")
