@@ -70,18 +70,22 @@ void psr540_state::render_w(int state)
 				m_outputs[x][yy][xx] = (v >> xx) & 1;
 		}
 
-	if(1)
-	for(int x1=1; x1 != 2; x1++)
-		for(int yy=0; yy != 8; yy++) {
-			std::string s;
-			for(int x=0; x != 16; x++) {
-				uint8_t v = render[16*(x+40*x1) + yy];
-				for(int xx=0; xx != 5; xx++)
-					s += ((v >> (4-xx)) & 1) ? '#' : '.';
-				s += ' ';
+	if(1) {
+		logerror("XX\n");
+		for(int x1=1; x1 != 2; x1++)
+			for(int yy=0; yy != 8; yy++) {
+				std::string s;
+				for(int x=0; x != 16; x++) {
+					uint8_t v = render[16*(x+40*x1) + yy];
+					for(int xx=0; xx != 5; xx++)
+						s += ((v >> (4-xx)) & 1) ? '#' : '.';
+					s += ' ';
+					if(x == 7)
+						s += "| ";
+				}
+				logerror("XX %02d.%d %s\n", x1*40, yy, s);
 			}
-			logerror("XX %02d.%d %s\n", x1*40, yy, s);
-		}
+	}
 }
 
 void psr540_state::machine_start()
@@ -142,6 +146,14 @@ void psr540_state::psr540(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
+	auto &mdin(MIDI_PORT(config, "mdin"));
+	midiin_slot(mdin);
+	mdin.rxd_handler().set(m_maincpu, FUNC(sh7042a_device::sci_rx_w<0>));
+
+	auto &mdout(MIDI_PORT(config, "mdout"));
+	midiout_slot(mdout);
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 // Port E:
