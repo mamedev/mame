@@ -1024,7 +1024,8 @@ int galaxian_state::theend_protection_alt_r()
 	return (m_protection_result >> 7) & 1;
 }
 
-uint8_t galaxian_state::scrammr_protection_r() // TODO: this is really crude, should probably be done similarly to theend_protection_w
+// HACK: this is really crude, should probably be done similarly to theend_protection_w
+uint8_t galaxian_state::scrammr_protection_r()
 {
 	logerror("%s protection read\n", machine().describe_context());
 	if (m_maincpu->pc() == 0x12e)

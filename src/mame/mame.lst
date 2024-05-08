@@ -44072,21 +44072,22 @@ saiyugoub2                      // bootleg
 
 @source:technos/ddragon.cpp
 darktowr                        // Game Room
-ddragon                         // TA-0021 (c) 1987
+ddragon                         // TA-0021 (c) 1987 Taito
 ddragon2                        // TA-0026 (c) 1988 (World)
-ddragon2b                       // bootleg
+ddragon2bl                      // bootleg
 ddragon2j                       // TA-0026 (c) 1988 (Japan)
 ddragon2u                       // TA-0026 (c) 1988 (US)
 ddragon6809                     // bootleg
 ddragon6809a                    // bootleg
-ddragonb                        // bootleg
-ddragonb2                       // bootleg
-ddragonba                       // bootleg
+ddragona                        // TA-0021 (c) 1987 Taito
+ddragonbl                       // bootleg
+ddragonbl2                      // bootleg
+ddragonbla                      // bootleg
+ddragonj                        // TA-0021 (c) 1987
+ddragonja                       // TA-0021 (c) 1987
 ddragonu                        // TA-0021 (c) 1987 Taito America
 ddragonua                       // TA-0021 (c) 1987 Taito America
 ddragonub                       // TA-0021 (c) 1987 Taito America
-ddragonw                        // TA-0021 (c) 1987 Taito
-ddragonw1                       // TA-0021 (c) 1987 Taito
 ddungeon                        // Game Room
 ddungeone                       // East Coast Coin Company (Melbourne)
 stoffy                          // (c) 1994 Midas
