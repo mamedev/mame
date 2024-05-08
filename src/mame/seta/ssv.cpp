@@ -294,14 +294,14 @@ void gdfs_state::adc_int_w(int state)
 */
 void ssv_state::lockout_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//  logerror("%s - Unknown lockout bit written %02X\n", machine().describe_context(), data & 0xff);
+	//logerror("%s - Unknown lockout bit written %02X\n", machine().describe_context(), data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 0));
 		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 1));
 		machine().bookkeeping().coin_counter_w(1, BIT( data, 2));
 		machine().bookkeeping().coin_counter_w(0, BIT( data, 3));
-//      Bit 6 is unknown
+		// Bit 6 is unknown
 		enable_video(BIT(data, 7));
 	}
 }
@@ -309,14 +309,14 @@ void ssv_state::lockout_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 // Same as above but with inverted lockout lines
 void ssv_state::lockout_inv_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//  logerror("%s - Unknown lockout bit written %02X\n", machine().describe_context(), data & 0xff);
+	//logerror("%s - Unknown lockout bit written %02X\n", machine().describe_context(), data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_lockout_w(1, BIT(data, 0));
 		machine().bookkeeping().coin_lockout_w(0, BIT(data, 1));
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 		machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
-//      Bit 6 is unknown
+		// Bit 6 is unknown
 		enable_video(BIT(data, 7));
 	}
 }
@@ -511,13 +511,12 @@ uint16_t ssv_state::hypreact_input_r()
 {
 	const uint16_t input_sel = *m_input_sel;
 
-	if (BIT(input_sel, 0)) return m_io_key[0]->read();
-	if (BIT(input_sel, 1)) return m_io_key[1]->read();
-	if (BIT(input_sel, 2)) return m_io_key[2]->read();
-	if (BIT(input_sel, 3)) return m_io_key[3]->read();
-	if (!machine().side_effects_disabled())
-		logerror("CPU #0 PC %06X: unknown input read: %04X\n", m_maincpu->pc(), input_sel);
-	return 0xffff;
+	uint16_t result = 0xffff;
+	if (BIT(input_sel, 0)) result &= m_io_key[0]->read();
+	if (BIT(input_sel, 1)) result &= m_io_key[1]->read();
+	if (BIT(input_sel, 2)) result &= m_io_key[2]->read();
+	if (BIT(input_sel, 3)) result &= m_io_key[3]->read();
+	return result;
 }
 
 void ssv_state::hypreact_map(address_map &map)
@@ -642,13 +641,12 @@ uint16_t ssv_state::srmp4_input_r()
 {
 	const uint16_t input_sel = *m_input_sel;
 
-	if (BIT(input_sel, 1)) return m_io_key[0]->read();
-	if (BIT(input_sel, 2)) return m_io_key[1]->read();
-	if (BIT(input_sel, 3)) return m_io_key[2]->read();
-	if (BIT(input_sel, 4)) return m_io_key[3]->read();
-	if (!machine().side_effects_disabled())
-		logerror("CPU #0 PC %06X: unknown input read: %04X\n", m_maincpu->pc(), input_sel);
-	return 0xffff;
+	uint16_t result = 0xffff;
+	if (BIT(input_sel, 1)) result &= m_io_key[0]->read();
+	if (BIT(input_sel, 2)) result &= m_io_key[1]->read();
+	if (BIT(input_sel, 3)) result &= m_io_key[2]->read();
+	if (BIT(input_sel, 4)) result &= m_io_key[3]->read();
+	return result;
 }
 
 void ssv_state::srmp4_map(address_map &map)
@@ -2567,18 +2565,18 @@ void ssv_state::init_srmp7()
 }
 
 
-static constexpr XTAL SSV_MASTER_CLOCK = XTAL(48'000'000)/3;
-
-static constexpr XTAL SSV_PIXEL_CLOCK  = XTAL(42'954'545)/6;
-static constexpr uint32_t SSV_HTOTAL = 0x1c6;
-static constexpr uint32_t SSV_HBEND = 0;
-static constexpr uint32_t SSV_HBSTART = 0x150;
-static constexpr uint32_t SSV_VTOTAL = 0x106;
-static constexpr uint32_t SSV_VBEND = 0;
-static constexpr uint32_t SSV_VBSTART = 0xf0;
-
 void ssv_state::ssv(machine_config &config)
 {
+	constexpr XTAL SSV_MASTER_CLOCK = XTAL(48'000'000) / 3;
+
+	constexpr XTAL SSV_PIXEL_CLOCK  = XTAL(42'954'545) / 6;
+	constexpr uint32_t SSV_HTOTAL = 0x1c6;
+	constexpr uint32_t SSV_HBEND = 0;
+	constexpr uint32_t SSV_HBSTART = 0x150;
+	constexpr uint32_t SSV_VTOTAL = 0x106;
+	constexpr uint32_t SSV_VBEND = 0;
+	constexpr uint32_t SSV_VBSTART = 0xf0;
+
 	// basic machine hardware
 	V60(config, m_maincpu, SSV_MASTER_CLOCK); // Based on STA-0001 & STA-0001B System boards
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ssv_state::irq_callback));
