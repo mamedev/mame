@@ -10,29 +10,100 @@ Known carts:
 +======+=======+=========================+
 |Dumped| Serial|Title                    |
 +======+=======+=========================+
-|  NO  |2315998|J-Pop - Blue             |
-|  NO  |2315999|Aikatsu Ver. Best        |
-|  NO  |2316073|J-Pop - Strawberry       |
-|  NO  |2316095|J-Pop - Green            |
-|  NO  |2316096|J-Pop - Pink             |
-|  NO  |2316097|J-Pop - Lemmon Yellow    |
+| YES  |2315998|J-Pop - Blue             |
+| YES  |2315999|Aikatsu Ver. Best        |
+| YES  |2316073|J-Pop - Strawberry       |
+| YES  |2316095|J-Pop - Green            |
+| YES  |2316096|J-Pop - Pink             |
+| YES  |2316097|Kid's Pop - Lemon Yellow |
 | YES  |2323098|Yo-Kai Watch Selection   |
 | YES  |2333250|J-Pop - Purple           |
 | YES  |2333251|J-Pop - White            |
 | YES  |2333252|J-Pop - Rose             |
-|  NO  |2333253|J-Pop - Red              |
+| YES  |2333253|Kid's Pop - Red          |
 | YES  |2333254|Vocaloid                 |
-|  NO  |2336074|J-Pop - Apple Green      |
-|  NO  |2336075|J-Pop - Grapefruit       |
-|  NO  |2336076|Disney Dream Hit Song    |
-|  NO  |2350534|J-Pop - Mint             |
-|  NO  |2350535|Best Hit Song            |
+| YES  |2336074|Kid's Pop - Apple Green  |
+| YES  |2336075|J-Pop - Grapefruit       |
+| YES  |2336076|Disney Dream Hit Song    |
+| YES  |2350534|J-Pop - Mint             |
+| YES  |2350535|Best Hit Song            |
 +======+=======+=========================+
-(some of these are J-Pop Kids, check which)
 
 -->
 
 <softwarelist name="bkrankp_cart" description="Bandai Karaoke Ranking Party cartridges">
+
+	<software name="blue" supported="no">
+		<description>J-Pop Blue</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2315998" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpopblue_mx25l3206e_c22016.bin" size="0x400000" crc="14f02988" sha1="5cdc744c589a76ed79fd0cbda49e3a5f76957d90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aikatsu" supported="no">
+		<description>Aikatsu Ver. Best</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2315999" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="Thatguy_mx25l6406e_c22017.BIN" size="0x800000" crc="fafdef3a" sha1="d15ca3c2a823100f584e1ef851d76035403c4b24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strawbry" supported="no">
+		<description>J-Pop - Strawberry</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2316073" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpopstrawberry_mx25l3206e_c22016.bin" size="0x400000" crc="9436b612" sha1="aa76dbac5a8935c9e1a49a0c228951091ba6305b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="green" supported="no">
+		<description>J-Pop - Green</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2316095" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpopgreen_mx25l3206e_c22016.bin" size="0x400000" crc="65e12828" sha1="63ed843f7bb79f55dcc942b1b41aaa783dc9c4a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pink" supported="no">
+		<description>J-Pop - Pink</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2316096" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpoppink_mx25l3206e_c22016.bin" size="0x400000" crc="430fa105" sha1="105c11c1e6f1695e3de7d0cf8a819dd4fb890a6d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemon" supported="no">
+		<description>Kid's Pop - Lemon Yellow</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2316097" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="poplemonyellow_mx25l3206e_c22016.BIN" size="0x400000" crc="12c03f28" sha1="b73220ccaf4a3f64788473d727de7bcbb7f05a75" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="yokai" supported="no">
 		<description>Yo-Kai Watch</description>
@@ -85,6 +156,18 @@ Known carts:
 		</part>
 	</software>
 
+	<software name="red" supported="no">
+		<description>Kid's Pop - Red</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2333253" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="popred_mx25l3206e_c22016.BIN" size="0x400000" crc="10340cc3" sha1="7a1affc521d10392b5e6332757755954b00555ca" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vocaloid" supported="no">
 		<description>Vocaloid</description>
 		<year>2015</year>
@@ -93,6 +176,66 @@ Known carts:
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="vocaloid_mx25l3206e_c22016.BIN" size="0x400000" crc="17569b76" sha1="9205fb80ac03092be274b9fd78eaffad52ef8d15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apple" supported="no">
+		<description>Kid's Pop - Apple Green</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2336074" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="popapplegreen_mx25l3206e_c22016.BIN" size="0x400000" crc="1a571859" sha1="7ffda73a054b850d54150f0099eeb8e681ee39bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grapefrt" supported="no">
+		<description>J-Pop - Grapefruit</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2336075" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpopgrapefruit_mx25l3206e_c22016.bin" size="0x400000" crc="7be53435" sha1="1e17f6c5257411446a9464313781be6fc0350d92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disney" supported="no">
+		<description>Disney Dream Hit Song</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2336076" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="Disney_mx25l6406e_c22017.BIN" size="0x800000" crc="777a37de" sha1="27116702adbaed782677b3f64215c4f0f022fa65" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mint" supported="no">
+		<description>J-Pop - Mint</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2350534" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="jpopmint_mx25l3206e_c22016.bin" size="0x400000" crc="9296075c" sha1="59e2a379ec843da108a45c08474e89e2793d7806" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="besthit" supported="no">
+		<description>Best Hit Song</description>
+		<year>2015</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="2350535" />
+		<part name="cart" interface="bkrankp_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="besthit_mx25l3206e_c22016.BIN" size="0x400000" crc="92cd2cb4" sha1="5a3ba4ba3ae9fcffb45d46ebd4e6fc3486c235b5" />
 			</dataarea>
 		</part>
 	</software>

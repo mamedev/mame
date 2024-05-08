@@ -362,6 +362,7 @@ protected:
 
 	u8 m_cold_boot_flags;
 	u8 m_boot_flags;
+	u8 m_vdp_mode;
 };
 
 #endif // MAME_MSX_MSX_H

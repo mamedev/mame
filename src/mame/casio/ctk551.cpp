@@ -459,8 +459,7 @@ void ctk551_state::ap10(machine_config& config)
 	m_maincpu->write_port2().set_nop();
 	m_maincpu->read_port3().set_constant(0);
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	NVRAM(config, "nvram");
 
@@ -495,8 +494,7 @@ void ctk551_state::ctk530(machine_config& config)
 	m_maincpu->read_port2().set_constant(0);
 	m_maincpu->write_port2().set_nop();
 	m_maincpu->read_port3().set_constant(0);
-	m_maincpu->write_port3().set_nop();
-	m_maincpu->write_port4().set_ioport("PLE");
+	m_maincpu->write_ple().set_ioport("PLE");
 
 	// MIDI
 	auto& mdin(MIDI_PORT(config, "mdin"));
@@ -532,8 +530,7 @@ void ctk551_state::gz70sp(machine_config& config)
 	m_maincpu->write_port2().set_ioport("P2");
 	m_maincpu->read_port3().set_constant(0);
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	// MIDI (sci0 for RS232/422, sci1 for standard MIDI)
 	auto& mdin(MIDI_PORT(config, "mdin"));
@@ -559,8 +556,7 @@ void ctk551_state::ctk601(machine_config& config)
 	m_maincpu->write_port2().set_ioport("P2");
 	m_maincpu->read_port3().set_constant(0); // port 3 pins are shared w/ key matrix
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	// TODO: DSP
 
@@ -604,8 +600,7 @@ void ctk551_state::ctk551(machine_config &config)
 	m_maincpu->write_port2().set_ioport("P2");
 	m_maincpu->read_port3().set_constant(0); // port 3 pins are shared w/ key matrix
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));

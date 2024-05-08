@@ -33,7 +33,7 @@
 
 DEFINE_DEVICE_TYPE(SIGMASOFT_PARALLEL_PORT, sigmasoft_parallel_port, "sigmasoft_parallel_port", "SigmaSoft Universal Parallel Board");
 
-sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, SIGMASOFT_PARALLEL_PORT, tag, owner, clock),
 	m_ctrl_r(*this, 0x00),
 	m_video_mem_r(*this, 0x00),
@@ -46,37 +46,37 @@ sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, 
 {
 }
 
-void sigmasoft_parallel_port::video_mem_w(uint8_t val)
+void sigmasoft_parallel_port::video_mem_w(u8 val)
 {
 	m_video_mem_w(val);
 }
 
-void sigmasoft_parallel_port::io_lo_addr_w(uint8_t val)
+void sigmasoft_parallel_port::io_lo_addr_w(u8 val)
 {
 	m_io_lo_addr(val);
 }
 
-void sigmasoft_parallel_port::io_hi_addr_w(uint8_t val)
+void sigmasoft_parallel_port::io_hi_addr_w(u8 val)
 {
 	m_io_hi_addr(val);
 }
 
-void sigmasoft_parallel_port::window_lo_addr_w(uint8_t val)
+void sigmasoft_parallel_port::window_lo_addr_w(u8 val)
 {
 	m_window_lo_addr(val);
 }
 
-void sigmasoft_parallel_port::window_hi_addr_w(uint8_t val)
+void sigmasoft_parallel_port::window_hi_addr_w(u8 val)
 {
 	m_window_hi_addr(val);
 }
 
-void sigmasoft_parallel_port::ctrl_w(uint8_t val)
+void sigmasoft_parallel_port::ctrl_w(u8 val)
 {
 	m_ctrl_w(val);
 }
 
-void sigmasoft_parallel_port::write(offs_t reg, uint8_t val)
+void sigmasoft_parallel_port::write(offs_t reg, u8 val)
 {
 	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, val);
 
@@ -109,22 +109,22 @@ void sigmasoft_parallel_port::write(offs_t reg, uint8_t val)
 	}
 }
 
-uint8_t sigmasoft_parallel_port::video_mem_r()
+u8 sigmasoft_parallel_port::video_mem_r()
 {
 	// get video memory value from igc device
 	return m_video_mem_r();
 }
 
-uint8_t sigmasoft_parallel_port::ctrl_r()
+u8 sigmasoft_parallel_port::ctrl_r()
 {
 	// get control register from igc device
 	return m_ctrl_r();
 }
 
-uint8_t sigmasoft_parallel_port::read(offs_t reg)
+u8 sigmasoft_parallel_port::read(offs_t reg)
 {
 	// default return for the h89
-	uint8_t value = 0xff;
+	u8 value = 0xff;
 
 	switch (reg)
 	{

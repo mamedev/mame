@@ -45,32 +45,75 @@ void sh_intc_device::device_start()
 	save_item(NAME(m_ipr));
 	save_item(NAME(m_icr));
 	save_item(NAME(m_isr));
+	save_item(NAME(m_pending));
+	save_item(NAME(m_lines));
 
 	std::fill(m_ipr.begin(), m_ipr.end(), 0);
 	m_isr = 0;
 	m_icr = 0;
+	m_lines = 0;
 }
 
 void sh_intc_device::device_reset()
 {
+	std::fill(m_pending.begin(), m_pending.end(), 0);
 }
 
-int sh_intc_device::interrupt_taken(int vector)
+void sh_intc_device::interrupt_taken(int irqline, int vector)
 {
-	return 0;
+	// Don't clear an external interrupt which is level and still active
+	if(vector < 64 || vector >= 72 || BIT(m_icr, 7-(vector & 7)) || !BIT(m_lines, vector & 7))
+		m_pending[vector >> 5] &= ~(1 << (vector & 31));
+		
+	update_irq();
+}
+
+void sh_intc_device::update_irq()
+{
+	int best_level = -1;
+	int best_vector = 0;
+
+	for(u32 bv = 64/32; bv != 160/32; bv ++) {
+		if(!m_pending[bv])
+			continue;
+		for(u32 iv = 0; iv != 32; iv++) {
+			if(!BIT(m_pending[bv], iv))
+				continue;
+			u32 vector = bv*32 + iv;
+			u32 slot = pribit[vector];
+			u32 shift = 12-4*(slot & 3);
+			int level = (m_ipr[slot >> 2] >> shift) & 15;
+			if(level > best_level) {
+				best_level = level;
+				best_vector = vector;
+			}
+		}
+	}
+	m_cpu->set_internal_interrupt(best_level, best_vector);
 }
 
 void sh_intc_device::internal_interrupt(int vector)
 {
-	u32 slot = pribit[vector];
-	u32 shift = 12-4*(slot & 3);
-	u32 level = (m_ipr[slot >> 2] >> shift) & 15;
-	logerror("Internal interrupt %d / %d (ipr%c %d-%d)\n", vector, level, 'a' + (slot >> 2), shift + 3, shift);
-	m_cpu->set_internal_interrupt(level, vector);
+	m_pending[vector >> 5] |= 1 << (vector & 31);
+	update_irq();
 }
 
 void sh_intc_device::set_input(int inputnum, int state)
 {
+	if(BIT(m_lines, inputnum) == state)
+		return;
+	if(BIT(m_icr, 7-inputnum)) {
+		// Level interrupt
+		if(state)
+			m_pending[64 >> 5] |= 1 << inputnum;
+		else
+			m_pending[64 >> 5] &= ~(1 << inputnum);
+	} else {
+		// Edge interrupt
+		if(state)
+			m_pending[64 >> 5] |= 1 << inputnum;
+	}
+	update_irq();
 }
 
 u16 sh_intc_device::icr_r()

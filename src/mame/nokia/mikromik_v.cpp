@@ -18,7 +18,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 	bool vsp = BIT(attrcode, VSP);
 	bool lten = BIT(attrcode, LTEN);
 	bool gpa0 = BIT(attrcode, GPA0);    // general purpose attribute 0
-	int llen = m_llen;                  // light enable
+	int leen = m_leen;                  // light enable
 	bool compl_in = BIT(attrcode, RVV); // reverse video
 	bool hlt_in = BIT(attrcode, HLGT);  // highlight
 	int color;                          // 0 = black, 1 = dk green, 2 = lt green; on MikroMikko 1, "highlight" is actually the darker shade of green
@@ -40,7 +40,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 			// Step 3: Fill in missing 2 pixels in the screen bitmap by repeating last column of the char bitmap
 			// (works better with MikroMikko 1 font than duplicating the first and the last column)
 			int qh = d7 & d6; // extend pixels on the right side only if there were two adjacent ones before shifting out the MSB
-			int video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
+			int video_in = ((((d7 & leen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
 			color = (hlt_in ? 1 : 2) * (video_in ^ compl_in);
 			bitmap.pix(y, x + 8) = m_palette->pen(color);
 			bitmap.pix(y, x + 9) = m_palette->pen(color);
@@ -49,7 +49,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 		for (int i = 0; i < 8; ++i) // ...and now the actual character bitmap bits for this scanline
 		{
 			int qh = BIT(data, i);
-			int video_in = ((((d7 & llen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
+			int video_in = ((((d7 & leen) | (vsp ? 0 : 1)) & (gpa0 ? 0 : 1)) & qh) | lten;
 			color = (hlt_in ? 1 : 2)*(video_in ^ compl_in);
 			bitmap.pix(y, x + i) = m_palette->pen(color);
 		}

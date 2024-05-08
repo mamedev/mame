@@ -95,22 +95,22 @@ protected:
 
 	void h89_base(machine_config &config);
 
-	required_device<z80_device> m_maincpu;
-	required_memory_region m_maincpu_region;
-	memory_view m_mem_view;
-	required_device<ram_device> m_ram;
-	required_shared_ptr<uint8_t> m_floppy_ram;
-	required_device<heath_tlb_connector> m_tlbc;
-	required_device<heath_intr_socket> m_intr_socket;
-	required_device<ins8250_device> m_console;
-	required_device<ins8250_device> m_serial1;
-	required_device<ins8250_device> m_serial2;
-	required_device<ins8250_device> m_serial3;
-	required_ioport m_config;
+	required_device<z80_device>                          m_maincpu;
+	required_memory_region                               m_maincpu_region;
+	memory_view                                          m_mem_view;
+	required_device<ram_device>                          m_ram;
+	required_shared_ptr<u8>                              m_floppy_ram;
+	required_device<heath_tlb_connector>                 m_tlbc;
+	required_device<heath_intr_socket>                   m_intr_socket;
+	required_device<ins8250_device>                      m_console;
+	required_device<ins8250_device>                      m_serial1;
+	required_device<ins8250_device>                      m_serial2;
+	required_device<ins8250_device>                      m_serial3;
+	required_ioport                                      m_config;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	// General Purpose Port (GPP)
-	uint8_t m_gpp;
+	u8   m_gpp;
 
 	bool m_rom_enabled;
 	bool m_timer_intr_enabled;
@@ -122,22 +122,22 @@ protected:
 	bool m_555b_latch;
 	bool m_556b_latch;
 
-	uint32_t m_cpu_speed_multiplier;
+	u32  m_cpu_speed_multiplier;
 
 	// Clocks
-	static constexpr XTAL H89_CLOCK = XTAL(12'288'000) / 6;
-	static constexpr XTAL INS8250_CLOCK = XTAL(1'843'200);
+	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
+	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
 
-	static constexpr uint8_t GPP_SINGLE_STEP_BIT = 0;
-	static constexpr uint8_t GPP_ENABLE_TIMER_INTERRUPT_BIT = 1;
-	static constexpr uint8_t GPP_SPEED_SELECT_BIT = 4;
-	static constexpr uint8_t GPP_DISABLE_ROM_BIT = 5;
-	static constexpr uint8_t GPP_H17_SIDE_SELECT_BIT = 6;
+	static constexpr u8   GPP_SINGLE_STEP_BIT            = 0;
+	static constexpr u8   GPP_ENABLE_TIMER_INTERRUPT_BIT = 1;
+	static constexpr u8   GPP_SPEED_SELECT_BIT           = 4;
+	static constexpr u8   GPP_DISABLE_ROM_BIT            = 5;
+	static constexpr u8   GPP_H17_SIDE_SELECT_BIT        = 6;
 
 	void update_mem_view();
 
-	void update_gpp(uint8_t gpp);
-	void port_f2_w(uint8_t data);
+	void update_gpp(u8 gpp);
+	void port_f2_w(u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -145,13 +145,13 @@ protected:
 
 	void h89_mem(address_map &map);
 	void map_fetch(address_map &map);
-	uint8_t m1_r(offs_t offset);
+	u8 m1_r(offs_t offset);
 
 	void h89_base_io(address_map &map);
 
-	uint8_t raise_NMI_r();
-	void raise_NMI_w(uint8_t data);
-	void console_intr(uint8_t data);
+	u8 raise_NMI_r();
+	void raise_NMI_w(u8 data);
+	void console_intr(int data);
 	void reset_line(int data);
 	void reset_single_step_state();
 };
@@ -283,9 +283,9 @@ void h89_base_state::map_fetch(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(h89_base_state::m1_r));
 }
 
-uint8_t h89_base_state::m1_r(offs_t offset)
+u8 h89_base_state::m1_r(offs_t offset)
 {
-	uint8_t data = m_program.read_byte(offset);
+	u8 data = m_program.read_byte(offset);
 
 	if (!machine().side_effects_disabled() && m_single_step_enabled && !m_556b_latch)
 	{
@@ -307,14 +307,15 @@ uint8_t h89_base_state::m1_r(offs_t offset)
 		{
 			m_556b_latch = true;
 
-			m_intr_socket->set_irq_level(2, 1);
+			m_intr_socket->set_irq_level(2, ASSERT_LINE);
 		}
 	}
 
 	return data;
 }
 
-/*                                 PORT
+/*
+                                   PORT
     Use                      |  Hex  |  Octal
    --------------------------+-------+---------
     Not specified, available |  0-77 |   0-167
@@ -329,25 +330,24 @@ uint8_t h89_base_state::m1_r(offs_t offset)
     General purpose port     | F2    | 362
     Cassette I/O(MTR-88)     | F8-F9 | 370-371
     NMI                      | FA-FB | 372-373
+
+    Disk I/O #1 - 0170-0173 (0x78-0x7b)
+       Heath Options
+         - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
+         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
+         - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
+
+    Disk I/O #2 - 0174-0177 (0x7c-0x7f)
+       Heath Options
+         - 5-1/4" Hard-sectored Controller - supported by all ROMs
+         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
+         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
+
 */
 void h89_base_state::h89_base_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-
-	// Disk I/O #1 - 0170-0173 (0x78-0x7b)
-	//   Options
-	//     - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
-	//     - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-	//     - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
-	// map(0x78, 0x7b)
-
-	// Disk I/O #2 - 0174-0177 (0x7c-0x7f)
-	//   Options
-	//     - 5-1/4" Hard-sectored Controller - supported by all ROMs
-	//     - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-	//     - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
-	// map(0x7c, 0x7f)
 
 	// 8250 UART DCE 0320 (0xd0)
 	map(0xd0, 0xd7).rw(m_serial1, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
@@ -389,7 +389,7 @@ void h89_sigmasoft_state::h89_sigmasoft_io(address_map &map)
 {
 	h89_io(map);
 
-	// Add parallel port board.
+	// Add SigmaSoft parallel port board, required for IGC graphics
 	map(0x08,0x0f).rw(m_sigma_parallel, FUNC(sigmasoft_parallel_port::read), FUNC(sigmasoft_parallel_port::write));
 }
 
@@ -405,19 +405,19 @@ static INPUT_PORTS_START( h88 )
 	PORT_DIPUNUSED_DIPLOC(0x08, 0x00, "SW501:4")
 	PORT_DIPUNUSED_DIPLOC(0x10, 0x00, "SW501:5")
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0xc0, 0x00, "Console Baud rate" )                  PORT_DIPLOCATION("SW501:7,8")
-	PORT_DIPSETTING( 0x00, "9600" )
-	PORT_DIPSETTING( 0x40, "19200" )
-	PORT_DIPSETTING( 0x80, "38400" )
-	PORT_DIPSETTING( 0xc0, "57600" )
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x40, "19200" )
+	PORT_DIPSETTING(    0x80, "38400" )
+	PORT_DIPSETTING(    0xc0, "57600" )
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
-	PORT_CONFSETTING(0x00, DEF_STR( None ) )
-	PORT_CONFSETTING(0x01, "2 / 4 MHz")
-	PORT_CONFSETTING(0x02, "2 / 6 MHz")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Clock Speed Upgrade")
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x01, "2 / 4 MHz")
+	PORT_CONFSETTING(    0x02, "2 / 6 MHz")
 
 INPUT_PORTS_END
 
@@ -427,198 +427,198 @@ static INPUT_PORTS_START( h89 )
 	PORT_START("SW501")
 	// Generic definition
 	PORT_DIPNAME( 0x01, 0x00, "Switch 0" )                           PORT_DIPLOCATION("SW501:1")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Switch 1" )                           PORT_DIPLOCATION("SW501:2")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "Switch 2" )                           PORT_DIPLOCATION("SW501:3")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Switch 3" )                           PORT_DIPLOCATION("SW501:4")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "Switch 4" )                           PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Switch 5" )                           PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "Switch 6" )                           PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Switch 7" )                           PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	// MTR-90 (444-84 or 444-142)
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
-	PORT_DIPSETTING( 0x00, "H-88-1 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x02, "Z-67 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x03, "Undefined" )
+	PORT_DIPSETTING(    0x00, "H-88-1 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x01, "H/Z-47 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x02, "Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x03, "Undefined" )
 	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
-	PORT_DIPSETTING( 0x00, "H-89-37" )
-	PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x08, "Z-67 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x0c, "Undefined" )
+	PORT_DIPSETTING(    0x00, "H-89-37" )
+	PORT_DIPSETTING(    0x04, "H/Z-47 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x08, "Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x0c, "Undefined" )
 	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
-	PORT_DIPSETTING( 0x00, "Disk I/O #2" )
-	PORT_DIPSETTING( 0x10, "Disk I/O #1" )
+	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
+	PORT_DIPSETTING(    0x10, "Disk I/O #1" )
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )                  PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
-	PORT_DIPSETTING( 0x00, "9600" )
-	PORT_DIPSETTING( 0x40, "19200" )
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x40, "19200" )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x04)
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x80, "Auto" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
 
 	// MTR-89 (444-62)
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x00, "H-88-1" )
-	PORT_DIPSETTING( 0x01, "H/Z-47" )
-	PORT_DIPSETTING( 0x02, "Undefined" )
-	PORT_DIPSETTING( 0x03, "Undefined" )
+	PORT_DIPSETTING(    0x00, "H-88-1" )
+	PORT_DIPSETTING(    0x01, "H/Z-47" )
+	PORT_DIPSETTING(    0x02, "Undefined" )
+	PORT_DIPSETTING(    0x03, "Undefined" )
 	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x00, "Unused" )
-	PORT_DIPSETTING( 0x04, "H/Z-47" )
-	PORT_DIPSETTING( 0x08, "Undefined" )
-	PORT_DIPSETTING( 0x0c, "Undefined" )
+	PORT_DIPSETTING(    0x00, "Unused" )
+	PORT_DIPSETTING(    0x04, "H/Z-47" )
+	PORT_DIPSETTING(    0x08, "Undefined" )
+	PORT_DIPSETTING(    0x0c, "Undefined" )
 	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x00, "Disk I/O #2" )
-	PORT_DIPSETTING( 0x10, "Disk I/O #1" )
+	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
+	PORT_DIPSETTING(    0x10, "Disk I/O #1" )
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )                  PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x00, "9600" )
-	PORT_DIPSETTING( 0x40, "19200" )
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x40, "19200" )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x08)
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x80, "Auto" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
 
 	// MMS 444-84B (and possibly 444-84A)
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
-	PORT_DIPSETTING( 0x00, "H-88-1" )
-	PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x02, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x03, "MMS 77422 Network Controller" )
+	PORT_DIPSETTING(    0x00, "H-88-1" )
+	PORT_DIPSETTING(    0x01, "H/Z-47 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x02, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x03, "MMS 77422 Network Controller" )
 	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
-	PORT_DIPSETTING( 0x00, "H-89-37" )
-	PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x08, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
-	PORT_DIPSETTING( 0x0c, "MMS 77422 Network Controller" )
+	PORT_DIPSETTING(    0x00, "H-89-37" )
+	PORT_DIPSETTING(    0x04, "H/Z-47 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x08, "MMS 77320 SASI or Z-67 (Not yet implemented)" )
+	PORT_DIPSETTING(    0x0c, "MMS 77422 Network Controller" )
 	PORT_DIPNAME( 0x70, 0x00, "Default Boot Device" )                PORT_DIPLOCATION("SW501:5,6,7")   PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
-	PORT_DIPSETTING( 0x00, "MMS 77316 Dbl Den 5\"" )
-	PORT_DIPSETTING( 0x10, "MMS 77316 Dbl Den 8\"" )
-	PORT_DIPSETTING( 0x20, "Disk Device at 0x7C" )
-	PORT_DIPSETTING( 0x30, "Disk Device at 0x78" )
-	PORT_DIPSETTING( 0x40, "reserved for future use" )
-	PORT_DIPSETTING( 0x50, "reserved for future use" )
-	PORT_DIPSETTING( 0x60, "MMS Network (77422)" )
-	PORT_DIPSETTING( 0x70, "Use MMS I/O board Config Port" )
+	PORT_DIPSETTING(    0x00, "MMS 77316 Dbl Den 5\"" )
+	PORT_DIPSETTING(    0x10, "MMS 77316 Dbl Den 8\"" )
+	PORT_DIPSETTING(    0x20, "Disk Device at 0x7C" )
+	PORT_DIPSETTING(    0x30, "Disk Device at 0x78" )
+	PORT_DIPSETTING(    0x40, "reserved for future use" )
+	PORT_DIPSETTING(    0x50, "reserved for future use" )
+	PORT_DIPSETTING(    0x60, "MMS Network (77422)" )
+	PORT_DIPSETTING(    0x70, "Use MMS I/O board Config Port" )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x0c)
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x80, "Auto" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
 
 	// Kres KMR-100
 	PORT_DIPNAME( 0x0f, 0x00, "Default Boot Device" )                PORT_DIPLOCATION("SW501:1,2,3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
-	PORT_DIPSETTING( 0x00, "H-17 hard-sectored 5\" floppy units 0-2" )
-	PORT_DIPSETTING( 0x01, "H-37 soft-sectored 5\" floppy units 0-3" )
-	PORT_DIPSETTING( 0x02, "Corvus hard disk/Magnolia interface, partitions 0-8" )
-	PORT_DIPSETTING( 0x03, "CDR 5\"/8\" double density floppy, units 0-3" )
-	PORT_DIPSETTING( 0x04, "H-47 8\" floppy at port 0x78/0170, units 0-3" )
-	PORT_DIPSETTING( 0x05, "H-47 8\" floppy at port 0x7c/0174, units 0-3" )
-	PORT_DIPSETTING( 0x06, "Reserved" )
-	PORT_DIPSETTING( 0x07, "Help - lists boot devices" )
-	PORT_DIPSETTING( 0x08, "Reserved" )
-	PORT_DIPSETTING( 0x09, "SASI controller or Z-67 at port 0x78/0170, units 0-7" )
-	PORT_DIPSETTING( 0x0a, "SASI controller or Z-67 at port 0x7c/0174, units 0-7" )
-	PORT_DIPSETTING( 0x0b, "Livingston 8\" single density floppy, units 0-3" )
-	PORT_DIPSETTING( 0x0c, "Magnolia 5\"/8\" double density floppy, units 0-3 (8\"), 4-7 (5\")" )
-	PORT_DIPSETTING( 0x0d, "Reserved" )
-	PORT_DIPSETTING( 0x0e, "Reserved" )
-	PORT_DIPSETTING( 0x0f, "Magnolia 128K pseudo disk, banks 0-1" )
+	PORT_DIPSETTING(    0x00, "H-17 hard-sectored 5\" floppy units 0-2" )
+	PORT_DIPSETTING(    0x01, "H-37 soft-sectored 5\" floppy units 0-3" )
+	PORT_DIPSETTING(    0x02, "Corvus hard disk/Magnolia interface, partitions 0-8" )
+	PORT_DIPSETTING(    0x03, "CDR 5\"/8\" double density floppy, units 0-3" )
+	PORT_DIPSETTING(    0x04, "H-47 8\" floppy at port 0x78/0170, units 0-3" )
+	PORT_DIPSETTING(    0x05, "H-47 8\" floppy at port 0x7c/0174, units 0-3" )
+	PORT_DIPSETTING(    0x06, "Reserved" )
+	PORT_DIPSETTING(    0x07, "Help - lists boot devices" )
+	PORT_DIPSETTING(    0x08, "Reserved" )
+	PORT_DIPSETTING(    0x09, "SASI controller or Z-67 at port 0x78/0170, units 0-7" )
+	PORT_DIPSETTING(    0x0a, "SASI controller or Z-67 at port 0x7c/0174, units 0-7" )
+	PORT_DIPSETTING(    0x0b, "Livingston 8\" single density floppy, units 0-3" )
+	PORT_DIPSETTING(    0x0c, "Magnolia 5\"/8\" double density floppy, units 0-3 (8\"), 4-7 (5\")" )
+	PORT_DIPSETTING(    0x0d, "Reserved" )
+	PORT_DIPSETTING(    0x0e, "Reserved" )
+	PORT_DIPSETTING(    0x0f, "Magnolia 128K pseudo disk, banks 0-1" )
 	PORT_DIPNAME( 0x10, 0x00, "Map ROM into RAM on boot" )           PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
-	PORT_DIPSETTING( 0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, "Have a LLL controller installed" )    PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
-	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x10)
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x80, "Auto" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
 
 	// Ultimeth MTRHEX-4k
 	// (values based on testing and comparison with the Kres KMR-100 ROM which was also written by Ultimeth)
 	PORT_DIPNAME( 0x0f, 0x00, "Default Boot Device" )                PORT_DIPLOCATION("SW501:1,2,3,4") PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
-	PORT_DIPSETTING( 0x00, "H-17 hard-sectored 5\" floppy" )
-	PORT_DIPSETTING( 0x01, "H-37 soft-sectored 5\" floppy" )
-	PORT_DIPSETTING( 0x02, "? Corvus hard disk/Magnolia interface" )
-	PORT_DIPSETTING( 0x03, "? CDR 5\"/8\" double density floppy" )
-	PORT_DIPSETTING( 0x04, "? H-47 8\" floppy at port 0x78/0170" )
-	PORT_DIPSETTING( 0x05, "? H-47 8\" floppy at port 0x7c/0174" )
-	PORT_DIPSETTING( 0x06, "? Reserved" )
-	PORT_DIPSETTING( 0x07, "? Reserved" )
-	PORT_DIPSETTING( 0x08, "? Reserved" )
-	PORT_DIPSETTING( 0x09, "? SASI controller or Z-67 at port 0x78/0170" )
-	PORT_DIPSETTING( 0x0a, "? SASI controller or Z-67 at port 0x7c/0174" )
-	PORT_DIPSETTING( 0x0b, "? Livingston 8\" single density floppy" )
-	PORT_DIPSETTING( 0x0c, "? Magnolia 5\"/8\" double density floppy" )
-	PORT_DIPSETTING( 0x0d, "? Reserved" )
-	PORT_DIPSETTING( 0x0e, "? Reserved" )
-	PORT_DIPSETTING( 0x0f, "? Magnolia 128K pseudo disk" )
+	PORT_DIPSETTING(    0x00, "H-17 hard-sectored 5\" floppy" )
+	PORT_DIPSETTING(    0x01, "H-37 soft-sectored 5\" floppy" )
+	PORT_DIPSETTING(    0x02, "? Corvus hard disk/Magnolia interface" )
+	PORT_DIPSETTING(    0x03, "? CDR 5\"/8\" double density floppy" )
+	PORT_DIPSETTING(    0x04, "? H-47 8\" floppy at port 0x78/0170" )
+	PORT_DIPSETTING(    0x05, "? H-47 8\" floppy at port 0x7c/0174" )
+	PORT_DIPSETTING(    0x06, "? Reserved" )
+	PORT_DIPSETTING(    0x07, "? Reserved" )
+	PORT_DIPSETTING(    0x08, "? Reserved" )
+	PORT_DIPSETTING(    0x09, "? SASI controller or Z-67 at port 0x78/0170" )
+	PORT_DIPSETTING(    0x0a, "? SASI controller or Z-67 at port 0x7c/0174" )
+	PORT_DIPSETTING(    0x0b, "? Livingston 8\" single density floppy" )
+	PORT_DIPSETTING(    0x0c, "? Magnolia 5\"/8\" double density floppy" )
+	PORT_DIPSETTING(    0x0d, "? Reserved" )
+	PORT_DIPSETTING(    0x0e, "? Reserved" )
+	PORT_DIPSETTING(    0x0f, "? Magnolia 128K pseudo disk" )
 	PORT_DIPNAME( 0x10, 0x00, "? Map ROM into RAM on boot" )         PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
-	PORT_DIPSETTING( 0x00, "? Yes" )
-	PORT_DIPSETTING( 0x10, "? No" )
+	PORT_DIPSETTING(    0x00, "? Yes" )
+	PORT_DIPSETTING(    0x10, "? No" )
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, "? Have a LLL controller installed" )  PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
-	PORT_DIPSETTING( 0x00, "? No" )
-	PORT_DIPSETTING( 0x40, "? Yes" )
+	PORT_DIPSETTING(    0x00, "? No" )
+	PORT_DIPSETTING(    0x40, "? Yes" )
 	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x14)
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x80, "Auto" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
 
 	// Ultimeth MTRHEX-2k
 	PORT_DIPNAME( 0x03, 0x00, "Default Boot Device" )                PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
-	PORT_DIPSETTING( 0x00, "H-17 hard-sectored 5\" floppy" )
-	PORT_DIPSETTING( 0x01, "H-47 8\" floppy at port 0x78/0170" )
-	PORT_DIPSETTING( 0x02, "H-47 8\" floppy at port 0x7c/0174" )
-	PORT_DIPSETTING( 0x03, "Magnolia 5\"/8\" double density floppy" )
+	PORT_DIPSETTING(    0x00, "H-17 hard-sectored 5\" floppy" )
+	PORT_DIPSETTING(    0x01, "H-47 8\" floppy at port 0x78/0170" )
+	PORT_DIPSETTING(    0x02, "H-47 8\" floppy at port 0x7c/0174" )
+	PORT_DIPSETTING(    0x03, "Magnolia 5\"/8\" double density floppy" )
 	PORT_DIPUNUSED_DIPLOC(0x04, 0x00, "SW501:3")                                                       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
 	PORT_DIPUNUSED_DIPLOC(0x08, 0x00, "SW501:4")                                                       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
 	PORT_DIPUNUSED_DIPLOC(0x10, 0x00, "SW501:5")                                                       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
-	PORT_DIPSETTING( 0x20, DEF_STR( No ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x40, "Auto" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, "Auto" )
 	PORT_DIPNAME( 0x80, 0x00, "Baud Rate" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x18)
-	PORT_DIPSETTING( 0x00, "9600" )
-	PORT_DIPSETTING( 0x80, "19200" )
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x80, "19200" )
 
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
-	PORT_CONFSETTING(0x00, DEF_STR( None ) )
-	PORT_CONFSETTING(0x01, "2 / 4 MHz")
-	PORT_CONFSETTING(0x02, "2 / 6 MHz")
+	PORT_CONFSETTING(   0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(   0x01, "2 / 4 MHz")
+	PORT_CONFSETTING(   0x02, "2 / 6 MHz")
 	PORT_CONFNAME(0x3c, 0x04, "Switch SW501 Definitions")
-	PORT_CONFSETTING(0x00, "Generic" )
-	PORT_CONFSETTING(0x04, "Heath MTR-90")
-	PORT_CONFSETTING(0x08, "Heath MTR-89")
-	PORT_CONFSETTING(0x0c, "MMS 444-84B/444-84A")
-	PORT_CONFSETTING(0x10, "Kres KMR-100")
-	PORT_CONFSETTING(0x14, "Ultimeth MTRHEX-4k")
-	PORT_CONFSETTING(0x18, "Ultimeth MTRHEX-2k")
+	PORT_CONFSETTING(   0x00, "Generic" )
+	PORT_CONFSETTING(   0x04, "Heath MTR-90")
+	PORT_CONFSETTING(   0x08, "Heath MTR-89")
+	PORT_CONFSETTING(   0x0c, "MMS 444-84B/444-84A")
+	PORT_CONFSETTING(   0x10, "Kres KMR-100")
+	PORT_CONFSETTING(   0x14, "Ultimeth MTRHEX-4k")
+	PORT_CONFSETTING(   0x18, "Ultimeth MTRHEX-2k")
 
 INPUT_PORTS_END
 
@@ -638,15 +638,17 @@ void h89_base_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	// update RAM mappings based on RAM size
-	uint8_t *m_ram_ptr = m_ram->pointer();
-	uint32_t ram_size = m_ram->size();
+	u8 *m_ram_ptr = m_ram->pointer();
+	u32 ram_size  = m_ram->size();
 
 	if (ram_size == 0x10000)
 	{
 		// system has a full 64k
 		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, m_ram_ptr);
 
-		// TODO: install shadow writing to RAM when in ROM mode
+		// install shadow writing to RAM when in ROM mode
+		m_mem_view[0].install_writeonly(0x0000, 0x1fff, m_ram_ptr + 0xe000);
+		m_mem_view[1].install_writeonly(0x0000, 0x1fff, m_ram_ptr + 0xe000);
 
 		// Only the CP/M - Org 0 view will have RAM at the lower 8k
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + 0xe000);
@@ -657,7 +659,7 @@ void h89_base_state::machine_start()
 
 		// for views with ROM visible, the top of memory is 8k higher than
 		// the memory size, since the base starts at 8k.
-		uint32_t ram_top = ram_size + 0x1fff;
+		u32 ram_top = ram_size + 0x1fff;
 
 		m_mem_view[0].install_ram(0x2000, ram_top, m_ram_ptr);
 		m_mem_view[1].install_ram(0x2000, ram_top, m_ram_ptr);
@@ -672,16 +674,16 @@ void h89_base_state::machine_start()
 
 void h89_base_state::machine_reset()
 {
-	m_rom_enabled = true;
-	m_timer_intr_enabled = true;
+	m_rom_enabled         = true;
+	m_timer_intr_enabled  = true;
 	m_single_step_enabled = false;
-	m_floppy_ram_wp = false;
+	m_floppy_ram_wp       = false;
 	reset_single_step_state();
 
 	ioport_value const cfg(m_config->read());
 
 	// CPU clock speed
-	const uint8_t selected_clock_upgrade = cfg & 0x3;
+	const u8 selected_clock_upgrade = cfg & 0x3;
 
 	switch (selected_clock_upgrade)
 	{
@@ -705,19 +707,19 @@ void h89_base_state::machine_reset()
 	update_mem_view();
 }
 
-uint8_t h89_base_state::raise_NMI_r()
+u8 h89_base_state::raise_NMI_r()
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
 
 	return 0x00;
 }
 
-void h89_base_state::raise_NMI_w(uint8_t)
+void h89_base_state::raise_NMI_w(u8)
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
 }
 
-void h89_base_state::console_intr(uint8_t data)
+void h89_base_state::console_intr(int data)
 {
 	m_intr_socket->set_irq_level(3, data);
 }
@@ -750,7 +752,7 @@ void h89_base_state::reset_single_step_state()
 	m_555a_latch = false;
 	m_555b_latch = false;
 	m_556b_latch = false;
-	m_intr_socket->set_irq_level(2, 0);
+	m_intr_socket->set_irq_level(2, CLEAR_LINE);
 }
 
 // General Purpose Port
@@ -766,9 +768,9 @@ void h89_base_state::reset_single_step_state()
 //  6    Latched bit I/O 0 on I/O exp connector
 //  7    Latched bit I/O 1 on I/O exp connector
 //
-void h89_base_state::update_gpp(uint8_t gpp)
+void h89_base_state::update_gpp(u8 gpp)
 {
-	uint8_t changed_gpp = gpp ^ m_gpp;
+	u8 changed_gpp = gpp ^ m_gpp;
 
 	m_gpp = gpp;
 
@@ -800,7 +802,7 @@ void h89_base_state::update_gpp(uint8_t gpp)
 }
 
 // General Purpose Port
-void h89_base_state::port_f2_w(uint8_t data)
+void h89_base_state::port_f2_w(u8 data)
 {
 	update_gpp(data);
 
@@ -809,30 +811,30 @@ void h89_base_state::port_f2_w(uint8_t data)
 
 static void tlb_options(device_slot_interface &device)
 {
-	device.option_add("heath", HEATH_TLB);
-	device.option_add("gp19", HEATH_GP19);
+	device.option_add("heath",      HEATH_TLB);
+	device.option_add("gp19",       HEATH_GP19);
 	device.option_add("imaginator", HEATH_IMAGINATOR);
-	device.option_add("super19", HEATH_SUPER19);
-	device.option_add("superset", HEATH_SUPERSET);
-	device.option_add("ultrarom", HEATH_ULTRA);
-	device.option_add("watzman", HEATH_WATZ);
+	device.option_add("super19",    HEATH_SUPER19);
+	device.option_add("superset",   HEATH_SUPERSET);
+	device.option_add("ultrarom",   HEATH_ULTRA);
+	device.option_add("watzman",    HEATH_WATZ);
 }
 
 
 static void sigma_tlb_options(device_slot_interface *device)
 {
 	device->option_reset();
-	device->option_add("igc", HEATH_IGC);
-	device->option_add("igc_super19", HEATH_IGC_SUPER19);
+	device->option_add("igc",          HEATH_IGC);
+	device->option_add("igc_super19",  HEATH_IGC_SUPER19);
 	device->option_add("igc_ultrarom", HEATH_IGC_ULTRA);
-	device->option_add("igc_watzman", HEATH_IGC_WATZ);
+	device->option_add("igc_watzman",  HEATH_IGC_WATZ);
 	device->set_default_option("igc");
 }
 
 static void intr_ctrl_options(device_slot_interface &device)
 {
 	device.option_add("original", HEATH_INTR_CNTRL);
-	device.option_add("h37", HEATH_Z37_INTR_CNTRL);
+	device.option_add("h37",      HEATH_Z37_INTR_CNTRL);
 }
 
 void h89_base_state::h89_base(machine_config &config)
@@ -928,9 +930,9 @@ void h89_sigmasoft_state::h89_sigmasoft(machine_config & config)
 ROM_START( h88 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 
-	ROM_LOAD( "2716_444-19_h17.u520", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
-	ROM_LOAD("2716_444-40_mtr88.u518", 0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
+	ROM_LOAD("2716_444-40_mtr88.u518",    0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
 ROM_END
 
 // ROM definition
@@ -938,70 +940,68 @@ ROM_START( h89 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
-	ROM_LOAD( "2716_444-19_h17.u520", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
 	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
-	ROMX_LOAD("2732_444-142_mtr90.u518", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "mtr89", "MTR-89 (444-62)")
-	ROMX_LOAD("2716_444-62_mtr89.u518", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
+	ROMX_LOAD("2716_444-62_mtr89.u518",   0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "mms84b", "MMS 444-84B")
-	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
+	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
 	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth 4k ROM")
-	ROMX_LOAD("2732_mtrhex_4k.u518", 0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
+	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
 
 	ROM_SYSTEM_BIOS(5, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
-	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
+	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
 
 	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
+	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
 
 	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
-	ROMX_LOAD("2716_mtrhex.u518", 0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
+	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
 ROM_END
 
 ROM_START( h89_sigmasoft )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
-	ROM_LOAD( "2716_444-19_h17.u520", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
 	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
-	ROMX_LOAD("2732_444-142_mtr90.u518", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "mtr89", "MTR-89 (444-62)")
-	ROMX_LOAD("2716_444-62_mtr89.u518", 0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
+	ROMX_LOAD("2716_444-62_mtr89.u518",   0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "mms84b", "MMS 444-84B")
-	ROMX_LOAD("2732_444_84b_mms.u518", 0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
+	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
 	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth ROM")
-	ROMX_LOAD("2732_mtrhex_4k.u518", 0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
+	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
 
 	ROM_SYSTEM_BIOS(5, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
-	ROMX_LOAD("2732_444-84_mtr90.u518", 0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
+	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
 
 	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518", 0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
+	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
 
 	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
-	ROMX_LOAD("2716_mtrhex.u518", 0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
+	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
 ROM_END
 
 } // anonymous namespace
 
 
-// Driver
-
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME        FLAGS
-COMP( 1979, h88,  h89,    0,      h88,     h88,   h88_state, empty_init, "Heath Company", "Heathkit H88", MACHINE_SUPPORTS_SAVE)
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_SUPPORTS_SAVE)
-COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company", "Heathkit H89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)
+//    year  name           parent compat  machine        input class                init        company          fullname                           flags
+COMP( 1979, h88,           h89,   0,      h88,           h88,  h88_state,           empty_init, "Heath Company", "Heathkit H88",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1979, h89,           0,     0,      h89,           h89,  h89_state,           empty_init, "Heath Company", "Heathkit H89",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1984, h89_sigmasoft, h89,   0,      h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company", "Heathkit H89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)

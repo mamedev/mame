@@ -48,16 +48,17 @@ license:CC0-1.0
 
 	        * Best Hit Collection Volume 1: J-Pop 1         BH0801001   Light Blue
 	        * Best Hit Collection Volume 2: J-Pop 2         BH0801002   Bright Pink
-	          Best Hit Collection Volume 3: J-Pop 3         BH0801003   Grey
+	        * Best Hit Collection Volume 3: J-Pop 3         BH0801003   Grey
 	        * Best Hit Collection Volume 4: Anime Song 1    BH0802001   Deep Pink
-	          Best Hit Collection Volume 5: Anime Song 2    BH0802002   Yellow
+	        * Best Hit Collection Volume 5: Anime Song 2    BH0802002   Yellow
 	          Best Hit Collection Volume 6: Kid's Songs 1   BH0803001   Green
-	          Best Hit Collection Volume 7 (no subtitle)    BH0904001   Blue
-	          Best Hit Collection Volume 8 (no subtitle)    BH0904002   Orange
+	        * Best Hit Collection Volume 7 (no subtitle)    BH0904001   Blue
+	        * Best Hit Collection Volume 8 (no subtitle)    BH0904002   Orange
 
-	          Pocket Monsters Special                       unknown     Yellow
+	        * Pocket Monsters Special                       -none-      Yellow
+	        * Ciao Special                                  CC0907001   Translucent Pink - came with the 2009/06 issue of the Ciao (ちゃお) manga
 
-	        1 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
+	        2 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
 	        1 User Cartridge (10 Capacity)                  n/a         Translucent Pink
 	        1 User Cartridge (20 Capacity)                  n/a         Translucent Blue
 	-->
@@ -75,9 +76,17 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="A29L800ATV.u1" size="0x100000" crc="679f92e9" sha1="9af880f7f09c0e616d0f0b3cd499ab42de3ab210"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x8ec4" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x8ec9" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="user5a" cloneof="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 4 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_4songs.bin" size="0x100000" crc="e0c3d088" sha1="d2063a65e0e9526ac0f9907fcf82d1f55bd488ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,9 +109,6 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="cartdump_pink.u1" size="0x200000" crc="235c1c52" sha1="8ce599227e2824d7ca98e3d0f9bb163c09d8fa58"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,14 +141,11 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="cartdump_blue.u1" size="0x200000" crc="4912b515" sha1="0b004821b07b82eb05c3ce7b0c89e55b35dff20b"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x8e56" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x8e5b" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jpop1" supported="no">
+	<software name="bh1jpop1" supported="no">
 		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
@@ -150,14 +153,11 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0801001.u1" size="0x200000" crc="298dff43" sha1="c644a00154d129808261688482943b93440c33dc"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x93b5" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x93ba" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jpop2" supported="no">
+	<software name="bh2jpop2" supported="no">
 		<description>Best Hit Collection Volume 2: J-Pop 2 (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
@@ -165,14 +165,23 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0801002.u1" size="0x200000" crc="ef4c68f3" sha1="ea9d62d6ba98f3c067f39b6d2e9d8b03d441b315"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x93b5" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x93ba" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="anime1" supported="no">
+	<software name="bh3jpop3" supported="no">
+		<description>Best Hit Collection Volume 3: J-Pop 3 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.3 J-POP③"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801003.u1" size="0x200000" crc="66fbff9d" sha1="02cc6f288a56ec4d598b6d51d920985caa8a7458"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh4anim1" supported="no">
 		<description>Best Hit Collection Volume 4: Anime Song 1</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
@@ -180,9 +189,66 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
-				<!-- temp patch to boot -->
-				<rom size="1" value="0xf0" offset="0x9412" loadflag="fill"/>
-				<rom size="1" value="0xd0" offset="0x9417" loadflag="fill"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh5anim2" supported="no">
+		<description>Best Hit Collection Volume 5: Anime Song 2</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.5 アニメソング②"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0802002.u1" size="0x200000" crc="d367d127" sha1="9bbe04ca274caf9b70f542e317ea71028a4886ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Best Hit Collection Volume 6: Kids' -->
+
+	<software name="bh7" supported="no">
+		<description>Best Hit Collection Volume 7</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.7"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0904001.u1" size="0x200000" crc="20d58743" sha1="25e348663d2d41bb96267c4430d2eb858bbb79c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh8" supported="no">
+		<description>Best Hit Collection Volume 8</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.8"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0904002.u1" size="0x200000" crc="fd24eefa" sha1="015ce9845dd2fb36a04e2c1cdb50d2fc9d4e14c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemon" supported="no">
+		<description>Pocket Monsters Special</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="r-08b0541.u1" size="0x200000" crc="8b6a6d4b" sha1="5f264bff2deedbd61d844c4f8ba4421ac598636c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ciao" supported="no">
+		<description>Ciao Special</description>
+		<year>2009</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>
 			</dataarea>
 		</part>
 	</software>

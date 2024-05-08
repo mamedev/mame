@@ -57,7 +57,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="31046">
-				<rom name="anteta.opk" size="31046" crc="0ca68683" sha1="2599a7240f3d361a375e61e4d3d11e4ba2d63fef" offset="0" />
+				<rom name="anteta.opk" size="31046" crc="0ca68683" sha1="2599a7240f3d361a375e61e4d3d11e4ba2d63fef" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,19 +69,19 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="64978">
-				<rom name="airnav.opk" size="64978" crc="e5e5b8b4" sha1="0a11ee4eb491962faacdac4dfe296a97475c0b6e" offset="0" />
+				<rom name="airnav.opk" size="64978" crc="e5e5b8b4" sha1="0a11ee4eb491962faacdac4dfe296a97475c0b6e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="anglerpa">
 		<description>Angler Pack</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>Skyfact Software</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="9365">
-				<rom name="angler.opk" size="9365" crc="92bc7d19" sha1="feaf62bc4349e91ac9c7beb6bd4a5e5cb548d520" offset="0" />
+				<rom name="angler.opk" size="9365" crc="92bc7d19" sha1="feaf62bc4349e91ac9c7beb6bd4a5e5cb548d520" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16328">
-				<rom name="ascribe411.opk" size="16328" crc="62c9fda6" sha1="f49b48b82eed30e4dc862f1e7d256e94f3c80f24" offset="0" />
+				<rom name="ascribe411.opk" size="16328" crc="62c9fda6" sha1="f49b48b82eed30e4dc862f1e7d256e94f3c80f24" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16026">
-				<rom name="ascribe511.opk" size="16026" crc="f15837ff" sha1="a23eba4ba8e94bdc3d3e3245cf13aad82093a03d" offset="0" />
+				<rom name="ascribe511.opk" size="16026" crc="f15837ff" sha1="a23eba4ba8e94bdc3d3e3245cf13aad82093a03d" />
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="30276">
-				<rom name="assem.opk" size="30276" crc="a3f863c7" sha1="505afa975ed0068c5cce0a004c924824f8004674" offset="0" />
+				<rom name="assem.opk" size="30276" crc="a3f863c7" sha1="505afa975ed0068c5cce0a004c924824f8004674" />
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16389">
-				<rom name="barcodeprinter.opk" size="16389" crc="9db80aad" sha1="2b39f10c9d09d3b473c816e434929893bffe8b62" offset="0" />
+				<rom name="barcodeprinter.opk" size="16389" crc="9db80aad" sha1="2b39f10c9d09d3b473c816e434929893bffe8b62" />
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/POS"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="flop" size="103611">
-				<rom name="cipher7604.opk" size="103611" crc="6e1f4e6d" sha1="c67d83f0fcd73160e0c6e2b565b1d7b4807470d2" offset="0" />
+				<rom name="cipher7604.opk" size="103611" crc="6e1f4e6d" sha1="c67d83f0fcd73160e0c6e2b565b1d7b4807470d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -153,12 +153,12 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="32270">
-				<rom name="clip.opk" size="32270" crc="6c7afbdd" sha1="6505cb269ec5cc63cd57cc54b0b12181f155f9f3" offset="0" />
+				<rom name="clip.opk" size="32270" crc="6c7afbdd" sha1="6505cb269ec5cc63cd57cc54b0b12181f155f9f3" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="psion_pack">
 			<dataarea name="rom" size="16007">
-				<rom name="notice.opk" size="16007" crc="e1a5d6e0" sha1="46e4f89ba13381e8684fe40194ea2ddaa4f8c924" offset="0" />
+				<rom name="notice.opk" size="16007" crc="e1a5d6e0" sha1="46e4f89ba13381e8684fe40194ea2ddaa4f8c924" />
 			</dataarea>
 		</part>
 	</software>
@@ -170,68 +170,67 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="25888">
-				<rom name="coastal31.opk" size="25888" crc="87b055bf" sha1="1ca616d5a31a6589de7cb206cba84054ee921627" offset="0" />
+				<rom name="coastal31.opk" size="25888" crc="87b055bf" sha1="1ca616d5a31a6589de7cb206cba84054ee921627" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="coastal4">
 		<description>Coastal v4.2</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>Maritek Ltd</publisher>
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32659">
-				<rom name="coastal42.opk" size="32659" crc="380bf6a2" sha1="46fd072f43bf92afadf0bb3e0f7a5beef9c8443d" offset="0" />
+				<rom name="coastal42.opk" size="32659" crc="380bf6a2" sha1="46fd072f43bf92afadf0bb3e0f7a5beef9c8443d" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dataorg">
 		<description>The Data Organiser v2.4</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16254">
-				<rom name="hvdo24.opk" size="16254" crc="c1718598" sha1="f18ee33dcdeb7ccb1d3d80ef9c4bd6c806476ff9" offset="0" />
+				<rom name="hvdo24.opk" size="16254" crc="c1718598" sha1="f18ee33dcdeb7ccb1d3d80ef9c4bd6c806476ff9" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dataorgs">
 		<description>The Data Organiser v2.5 (Spanish)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16387">
-				<rom name="hvdo25s.opk" size="16387" crc="6b146a51" sha1="10c80af1591c11865a9eb30edf84edae97dcc9ba" offset="0" />
+				<rom name="hvdo25s.opk" size="16387" crc="6b146a51" sha1="10c80af1591c11865a9eb30edf84edae97dcc9ba" />
 			</dataarea>
 		</part>
 	</software>
 
-
 	<software name="datorgd">
 		<description>The Data Organiser v2.52 (German)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16386">
-				<rom name="hvdo252d.opk" size="16386" crc="f3f5f53b" sha1="6f8dfff172c25953c893c5ef106ffda25e30291a" offset="0" />
+				<rom name="hvdo252d.opk" size="16386" crc="f3f5f53b" sha1="6f8dfff172c25953c893c5ef106ffda25e30291a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="datorgi">
 		<description>The Data Organiser v2.52 (Italian)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16387">
-				<rom name="hvdo252i.opk" size="16387" crc="b05824d8" sha1="d3dd7a5fed08eef6e53d54508f6f2d4a2e48432c" offset="0" />
+				<rom name="hvdo252i.opk" size="16387" crc="b05824d8" sha1="d3dd7a5fed08eef6e53d54508f6f2d4a2e48432c" />
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +242,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16357">
-				<rom name="ferret51n.opk" size="16357" crc="0c374de4" sha1="604308fbaeadc8f4bc0b6d79de1ac9e03bd7bfab" offset="0" />
+				<rom name="ferret51n.opk" size="16357" crc="0c374de4" sha1="604308fbaeadc8f4bc0b6d79de1ac9e03bd7bfab" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +254,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16335">
-				<rom name="filemaster375.opk" size="16335" crc="810554d7" sha1="505c7a52dc9f4563908532706d2b0e8122d59ce5" offset="0" />
+				<rom name="filemaster375.opk" size="16335" crc="810554d7" sha1="505c7a52dc9f4563908532706d2b0e8122d59ce5" />
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +266,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16201">
-				<rom name="filemaster376.opk" size="16201" crc="1c8cd832" sha1="6fe29328f19d3c36780a261c6df7e6cef5c291f8" offset="0" />
+				<rom name="filemaster376.opk" size="16201" crc="1c8cd832" sha1="6fe29328f19d3c36780a261c6df7e6cef5c291f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -279,7 +278,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16194">
-				<rom name="filemaster3762.opk" size="16194" crc="f626ed8a" sha1="08d70630ecf3b0160ee7a5c509bece1e1cc5bc39" offset="0" />
+				<rom name="filemaster3762.opk" size="16194" crc="f626ed8a" sha1="08d70630ecf3b0160ee7a5c509bece1e1cc5bc39" />
 			</dataarea>
 		</part>
 	</software>
@@ -291,36 +290,36 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16240">
-				<rom name="filemaster.opk" size="16240" crc="1386cc71" sha1="1468a8c93adbe8af4dea563073ffd77db8e537df" offset="0" />
+				<rom name="filemaster.opk" size="16240" crc="1386cc71" sha1="1468a8c93adbe8af4dea563073ffd77db8e537df" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="finance">
 		<description>Finance Pack</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Aware</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="16379">
-				<rom name="finance1b.opk" size="16379" crc="1c34e46b" sha1="5ada96fe015abfc6712236c65d9e6644ac0826e7" offset="0" />
+				<rom name="finance1b.opk" size="16379" crc="1c34e46b" sha1="5ada96fe015abfc6712236c65d9e6644ac0826e7" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="psion_pack">
 			<dataarea name="rom" size="16359">
-				<rom name="finance1a.opk" size="16359" crc="33cca342" sha1="89d90fbeb27c30dae069db392cc06fd914dc2652" offset="0" />
+				<rom name="finance1a.opk" size="16359" crc="33cca342" sha1="89d90fbeb27c30dae069db392cc06fd914dc2652" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="finance2">
 		<description>Finance Pack II</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>Aware</publisher>
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32709">
-				<rom name="finance2.opk" size="32709" crc="e9295ae2" sha1="e168479fd171777e63441d7dd63ec6a46914d678" offset="0" />
+				<rom name="finance2.opk" size="32709" crc="e9295ae2" sha1="e168479fd171777e63441d7dd63ec6a46914d678" />
 			</dataarea>
 		</part>
 	</software>
@@ -332,7 +331,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="13753">
-				<rom name="hvfo13.opk" size="13753" crc="84d9d158" sha1="9dcc8f2abfa9808e151686d5342dbfb0115167f4" offset="0" />
+				<rom name="hvfo13.opk" size="13753" crc="84d9d158" sha1="9dcc8f2abfa9808e151686d5342dbfb0115167f4" />
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +343,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="13890">
-				<rom name="hvfo14.opk" size="13890" crc="36785487" sha1="51a6abfcb68846425ae90e63ee228b39eba6ebb2" offset="0" />
+				<rom name="hvfo14.opk" size="13890" crc="36785487" sha1="51a6abfcb68846425ae90e63ee228b39eba6ebb2" />
 			</dataarea>
 		</part>
 	</software>
@@ -356,7 +355,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="12033">
-				<rom name="hvfo14i.opk" size="12033" crc="c744ea48" sha1="5124337b4e75104d88e2dd0338444f5f88a4fc7d" offset="0" />
+				<rom name="hvfo14i.opk" size="12033" crc="c744ea48" sha1="5124337b4e75104d88e2dd0338444f5f88a4fc7d" />
 			</dataarea>
 		</part>
 	</software>
@@ -368,7 +367,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="12968">
-				<rom name="hvfo15d.opk" size="12968" crc="ded87814" sha1="19965f5644f7682ab727ab1c9987792c2471ae6f" offset="0" />
+				<rom name="hvfo15d.opk" size="12968" crc="ded87814" sha1="19965f5644f7682ab727ab1c9987792c2471ae6f" />
 			</dataarea>
 		</part>
 	</software>
@@ -380,12 +379,12 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="130236">
-				<rom name="flghtmstr219a.opk" size="130236" crc="47ad1343" sha1="f228c64bf9fc5a849f38fd52bc24f22f94c0c9b3" offset="0" />
+				<rom name="flghtmstr219a.opk" size="130236" crc="47ad1343" sha1="f228c64bf9fc5a849f38fd52bc24f22f94c0c9b3" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="psion_pack">
 			<dataarea name="rom" size="130806">
-				<rom name="flghtmstr219b.opk" size="130806" crc="a8dbcfd4" sha1="36826de1fcc552b4698ee6a10d06a269fc1f8977" offset="0" />
+				<rom name="flghtmstr219b.opk" size="130806" crc="a8dbcfd4" sha1="36826de1fcc552b4698ee6a10d06a269fc1f8977" />
 			</dataarea>
 		</part>
 	</software>
@@ -397,12 +396,12 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="130684">
-				<rom name="flghtmstr228a.opk" size="130684" crc="1d720f92" sha1="00e4e1898aed868faf89debba152b84623da55ef" offset="0" />
+				<rom name="flghtmstr228a.opk" size="130684" crc="1d720f92" sha1="00e4e1898aed868faf89debba152b84623da55ef" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="psion_pack">
 			<dataarea name="rom" size="131038">
-				<rom name="flghtmstr228b.opk" size="131038" crc="08a685eb" sha1="98a9ba0ec54f8b7c5ad7a005fb5ce95cedcfa0e5" offset="0" />
+				<rom name="flghtmstr228b.opk" size="131038" crc="08a685eb" sha1="98a9ba0ec54f8b7c5ad7a005fb5ce95cedcfa0e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -414,7 +413,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="4333">
-				<rom name="fnkey31.opk" size="4333" crc="46c198dc" sha1="1f9a94216c738649f00b51e3e5d07a0487a1bff9" offset="0" />
+				<rom name="fnkey31.opk" size="4333" crc="46c198dc" sha1="1f9a94216c738649f00b51e3e5d07a0487a1bff9" />
 			</dataarea>
 		</part>
 	</software>
@@ -426,7 +425,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="6822">
-				<rom name="fnkey40.opk" size="6822" crc="39ca0011" sha1="6a40cdb13c895ff5ac8e37894389b99a2bfbc4fe" offset="0" />
+				<rom name="fnkey40.opk" size="6822" crc="39ca0011" sha1="6a40cdb13c895ff5ac8e37894389b99a2bfbc4fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -438,7 +437,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16342">
-				<rom name="filepak20.opk" size="16342" crc="c24a599b" sha1="c3042eee28bd58174828a04a599818c91a011756" offset="0" />
+				<rom name="filepak20.opk" size="16342" crc="c24a599b" sha1="c3042eee28bd58174828a04a599818c91a011756" />
 			</dataarea>
 		</part>
 	</software>
@@ -450,7 +449,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16234">
-				<rom name="formmaster.opk" size="16234" crc="9e457b90" sha1="04d1f60543faeec8d4aa7fd7134ed3a636c954c8" offset="0" />
+				<rom name="formmaster.opk" size="16234" crc="9e457b90" sha1="04d1f60543faeec8d4aa7fd7134ed3a636c954c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -462,7 +461,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="31604">
-				<rom name="xform1.opk" size="31604" crc="5a690ead" sha1="c226ade8e78bbbcccadfb4cf5007107f1ffe06d2" offset="0" />
+				<rom name="xform1.opk" size="31604" crc="5a690ead" sha1="c226ade8e78bbbcccadfb4cf5007107f1ffe06d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -474,43 +473,43 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32407">
-				<rom name="xform2.opk" size="32407" crc="cf3fd9c4" sha1="712ebace6fb711bd98ea7053105f3a072ffa695c" offset="0" />
+				<rom name="xform2.opk" size="32407" crc="cf3fd9c4" sha1="712ebace6fb711bd98ea7053105f3a072ffa695c" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gamesorg">
 		<description>The Games Organiser v0.2</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32770">
-				<rom name="hvgo02.opk" size="32770" crc="7120b260" sha1="5e707aacb669960406ece6d1d304c1e1009502c0" offset="0" />
+				<rom name="hvgo02.opk" size="32770" crc="7120b260" sha1="5e707aacb669960406ece6d1d304c1e1009502c0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gorgit">
 		<description>The Games Organiser (Italian)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16377">
-				<rom name="hvgoti.opk" size="16377" crc="87b94723" sha1="42628f60499c6beca4aaca21771aaa73a98e4742" offset="0" />
+				<rom name="hvgoti.opk" size="16377" crc="87b94723" sha1="42628f60499c6beca4aaca21771aaa73a98e4742" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gpack">
 		<description>Games Pack</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>S.I.S. Ltd, Psion</publisher>
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32633">
-				<rom name="games.opk" size="32633" crc="1e31b975" sha1="66cd712eb36ce145b465a32f5c256a315452a31c" offset="0" />
+				<rom name="games.opk" size="32633" crc="1e31b975" sha1="66cd712eb36ce145b465a32f5c256a315452a31c" />
 			</dataarea>
 		</part>
 	</software>
@@ -522,7 +521,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16559">
-				<rom name="gpack.opk" size="16559" crc="508604b2" sha1="866639b6ae22011a40f47cbdfdee684790f073a0" offset="0" />
+				<rom name="gpack.opk" size="16559" crc="508604b2" sha1="866639b6ae22011a40f47cbdfdee684790f073a0" />
 			</dataarea>
 		</part>
 	</software>
@@ -534,7 +533,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="31521">
-				<rom name="hvsc12.opk" size="31521" crc="51fe98ea" sha1="9579f63e3f2991ceeb1933645a038620eee62361" offset="0" />
+				<rom name="hvsc12.opk" size="31521" crc="51fe98ea" sha1="9579f63e3f2991ceeb1933645a038620eee62361" />
 			</dataarea>
 		</part>
 	</software>
@@ -546,7 +545,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="52306">
-				<rom name="hvsc11s.opk" size="52306" crc="8b235ac7" sha1="fc8af39daba209b9aa6fafc20802a74356d0ea16" offset="0" />
+				<rom name="hvsc11s.opk" size="52306" crc="8b235ac7" sha1="fc8af39daba209b9aa6fafc20802a74356d0ea16" />
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +557,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="40884">
-				<rom name="hvsc12i.opk" size="40884" crc="55b1083b" sha1="e4b1cd281a10afb6d2c971331c64aa565a7f2c17" offset="0" />
+				<rom name="hvsc12i.opk" size="40884" crc="55b1083b" sha1="e4b1cd281a10afb6d2c971331c64aa565a7f2c17" />
 			</dataarea>
 		</part>
 	</software>
@@ -570,7 +569,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="15904">
-				<rom name="hvio23s.opk" size="15904" crc="6610186b" sha1="9100666f4fc7ae9b67d499346f1955e938c8a79f" offset="0" />
+				<rom name="hvio23s.opk" size="15904" crc="6610186b" sha1="9100666f4fc7ae9b67d499346f1955e938c8a79f" />
 			</dataarea>
 		</part>
 	</software>
@@ -582,7 +581,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16031">
-				<rom name="hvio23i.opk" size="16031" crc="ecac1464" sha1="4a19152755613337205c8a3749a252b509e7f513" offset="0" />
+				<rom name="hvio23i.opk" size="16031" crc="ecac1464" sha1="4a19152755613337205c8a3749a252b509e7f513" />
 			</dataarea>
 		</part>
 	</software>
@@ -594,7 +593,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16244">
-				<rom name="hvlo311i.opk" size="16244" crc="7cba777a" sha1="1f2a3b68bd6e2bee5f80e9410e8790e2c1c2fe28" offset="0" />
+				<rom name="hvlo311i.opk" size="16244" crc="7cba777a" sha1="1f2a3b68bd6e2bee5f80e9410e8790e2c1c2fe28" />
 			</dataarea>
 		</part>
 	</software>
@@ -606,7 +605,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16374">
-				<rom name="hvlo32s.opk" size="16374" crc="cdcd065c" sha1="b96198b53eeadb1d5fbb2d8b12c2ff41848c0190" offset="0" />
+				<rom name="hvlo32s.opk" size="16374" crc="cdcd065c" sha1="b96198b53eeadb1d5fbb2d8b12c2ff41848c0190" />
 			</dataarea>
 		</part>
 	</software>
@@ -618,7 +617,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="29394">
-				<rom name="hvso101.opk" size="29394" crc="69752fd1" sha1="fd7a54ec04d0efdee4601c0a10316d8edc403ade" offset="0" />
+				<rom name="hvso101.opk" size="29394" crc="69752fd1" sha1="fd7a54ec04d0efdee4601c0a10316d8edc403ade" />
 			</dataarea>
 		</part>
 	</software>
@@ -630,7 +629,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="41585">
-				<rom name="hvsafe.opk" size="41585" crc="6f306437" sha1="e24ad66550381b6c4413639d95e5f8c5a6157353" offset="0" />
+				<rom name="hvsafe.opk" size="41585" crc="6f306437" sha1="e24ad66550381b6c4413639d95e5f8c5a6157353" />
 			</dataarea>
 		</part>
 	</software>
@@ -642,7 +641,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="44571">
-				<rom name="hvsams13.opk" size="44571" crc="81488b12" sha1="92ad09a032d60993bff7ab0be37efc65a1aa35ec" offset="0" />
+				<rom name="hvsams13.opk" size="44571" crc="81488b12" sha1="92ad09a032d60993bff7ab0be37efc65a1aa35ec" />
 			</dataarea>
 		</part>
 	</software>
@@ -654,7 +653,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="26686">
-				<rom name="hvslep.opk" size="26686" crc="a5476e29" sha1="23b596a46a1ae82a7c4d6837d7919cd33079a62d" offset="0" />
+				<rom name="hvslep.opk" size="26686" crc="a5476e29" sha1="23b596a46a1ae82a7c4d6837d7919cd33079a62d" />
 			</dataarea>
 		</part>
 	</software>
@@ -666,7 +665,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="42674">
-				<rom name="hvsold12.opk" size="42674" crc="a302f1a5" sha1="39111deada8cca0af85f09d2b4165c8ecfe5aa41" offset="0" />
+				<rom name="hvsold12.opk" size="42674" crc="a302f1a5" sha1="39111deada8cca0af85f09d2b4165c8ecfe5aa41" />
 			</dataarea>
 		</part>
 	</software>
@@ -678,7 +677,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ/POS"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="48983">
-				<rom name="inkas.opk" size="48983" crc="fbade179" sha1="803c827124a59ff45ceaaf9f66b76b8ff08aba23" offset="0" />
+				<rom name="inkas.opk" size="48983" crc="fbade179" sha1="803c827124a59ff45ceaaf9f66b76b8ff08aba23" />
 			</dataarea>
 		</part>
 	</software>
@@ -690,19 +689,19 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32749">
-				<rom name="jotter25.opk" size="32749" crc="4129ad0a" sha1="8f602c2fb1d84c9315e204098f4a32af5a759cb5" offset="0" />
+				<rom name="jotter25.opk" size="32749" crc="4129ad0a" sha1="8f602c2fb1d84c9315e204098f4a32af5a759cb5" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="maths">
 		<description>Maths Pack</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16089">
-				<rom name="maths.opk" size="16089" crc="8cce0583" sha1="9b847068e2f6af575b1ba760245007f436bdf1dd" offset="0" />
+				<rom name="maths.opk" size="16089" crc="8cce0583" sha1="9b847068e2f6af575b1ba760245007f436bdf1dd" />
 			</dataarea>
 		</part>
 	</software>
@@ -714,7 +713,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32280">
-				<rom name="numbase.opk" size="32280" crc="c6eb1d7a" sha1="c16a48671cab827c37684907cbcff4bfd76d7bec" offset="0" />
+				<rom name="numbase.opk" size="32280" crc="c6eb1d7a" sha1="c16a48671cab827c37684907cbcff4bfd76d7bec" />
 			</dataarea>
 		</part>
 	</software>
@@ -726,7 +725,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="15527">
-				<rom name="textbase.opk" size="15527" crc="84dcbde2" sha1="7d9e7b20012e51a958d49dc395898df6ac081435" offset="0" />
+				<rom name="textbase.opk" size="15527" crc="84dcbde2" sha1="7d9e7b20012e51a958d49dc395898df6ac081435" />
 			</dataarea>
 		</part>
 	</software>
@@ -738,19 +737,19 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16179">
-				<rom name="persfin.opk" size="16179" crc="2fb0f433" sha1="21bedf9bd3de307650c9b6cad3f11dc9094d0a92" offset="0" />
+				<rom name="persfin.opk" size="16179" crc="2fb0f433" sha1="21bedf9bd3de307650c9b6cad3f11dc9094d0a92" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="portfoli">
 		<description>Portfolio Pack</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>DIP, Psion</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16361">
-				<rom name="portfolio.opk" size="16361" crc="d2836be1" sha1="ca207dedec6f14c0c32ed1092ef13bdb60431ad4" offset="0" />
+				<rom name="portfolio.opk" size="16361" crc="d2836be1" sha1="ca207dedec6f14c0c32ed1092ef13bdb60431ad4" />
 			</dataarea>
 		</part>
 	</software>
@@ -762,7 +761,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16382">
-				<rom name="result.opk" size="16382" crc="8a7cd79f" sha1="40a385ab126c4a6b5ee23ed2097da15ec73aceb1" offset="0" />
+				<rom name="result.opk" size="16382" crc="8a7cd79f" sha1="40a385ab126c4a6b5ee23ed2097da15ec73aceb1" />
 			</dataarea>
 		</part>
 	</software>
@@ -774,31 +773,31 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="52878">
-				<rom name="sdrp.opk" size="52878" crc="550d0a7e" sha1="53669d69ec7aada6ea73f86697cd2eca6ed98a90" offset="0" />
+				<rom name="sdrp.opk" size="52878" crc="550d0a7e" sha1="53669d69ec7aada6ea73f86697cd2eca6ed98a90" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cosc1">
 		<description>Concise Oxford Spelling Checker v0.1</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65537">
-				<rom name="spllchk1.opk" size="65537" crc="39348a17" sha1="ba85c07037bcc84774d00c58811d664af5b0338b" offset="0" />
+				<rom name="spllchk1.opk" size="65537" crc="39348a17" sha1="ba85c07037bcc84774d00c58811d664af5b0338b" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cosc2">
 		<description>Concise Oxford Spelling Checker v2.0</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65537">
-				<rom name="spllchk2.opk" size="65537" crc="8d23cb58" sha1="1cdf200e3361fd6dd4a64d56fc94397002084cfb" offset="0" />
+				<rom name="spllchk2.opk" size="65537" crc="8d23cb58" sha1="1cdf200e3361fd6dd4a64d56fc94397002084cfb" />
 			</dataarea>
 		</part>
 	</software>
@@ -810,19 +809,19 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ/LZ64"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="219159">
-				<rom name="nss43.opk" size="219159" crc="91b563c3" sha1="a72c6f6fd586d9400a2c3dfcb712d3175da46685" offset="0" />
+				<rom name="nss43.opk" size="219159" crc="91b563c3" sha1="a72c6f6fd586d9400a2c3dfcb712d3175da46685" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="purefin">
 		<description>Pure Finance Pack</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>DIP</publisher>
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16388">
-				<rom name="purfin.opk" size="16388" crc="0f7c25df" sha1="3c04b2273029cf0df4c7535c78e36afea06b52c4" offset="0" />
+				<rom name="purfin.opk" size="16388" crc="0f7c25df" sha1="3c04b2273029cf0df4c7535c78e36afea06b52c4" />
 			</dataarea>
 		</part>
 	</software>
@@ -834,7 +833,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32727">
-				<rom name="prakfrvc.opk" size="32727" crc="17137e83" sha1="e64f4da7bb1804bd759bdda9bab4d1122f12f6da" offset="0" />
+				<rom name="prakfrvc.opk" size="32727" crc="17137e83" sha1="e64f4da7bb1804bd759bdda9bab4d1122f12f6da" />
 			</dataarea>
 		</part>
 	</software>
@@ -846,7 +845,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="165556">
-				<rom name="prudential233.opk" size="165556" crc="8128b048" sha1="1cbeafa4b0676895fdb69726a41bd152c71a26a5" offset="0" />
+				<rom name="prudential233.opk" size="165556" crc="8128b048" sha1="1cbeafa4b0676895fdb69726a41bd152c71a26a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -858,7 +857,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="29806">
-				<rom name="sprdsht_v12.opk" size="29806" crc="3eaf213f" sha1="b0cbc97cc42a98738b3fcc3ea7af79415234d041" offset="0" />
+				<rom name="sprdsht_v12.opk" size="29806" crc="3eaf213f" sha1="b0cbc97cc42a98738b3fcc3ea7af79415234d041" />
 			</dataarea>
 		</part>
 	</software>
@@ -870,7 +869,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="30385">
-				<rom name="sprdsht_v13.opk" size="30385" crc="435e34ab" sha1="10e2c95d668e2b27c9a9326a54fc0adc7010e954" offset="0" />
+				<rom name="sprdsht_v13.opk" size="30385" crc="435e34ab" sha1="10e2c95d668e2b27c9a9326a54fc0adc7010e954" />
 			</dataarea>
 		</part>
 	</software>
@@ -882,7 +881,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32504">
-				<rom name="sprdsht_v33.opk" size="32504" crc="28e2fcdb" sha1="f8869c5ff1bfb0ee4bec33eeadd5205962ec4ade" offset="0" />
+				<rom name="sprdsht_v33.opk" size="32504" crc="28e2fcdb" sha1="f8869c5ff1bfb0ee4bec33eeadd5205962ec4ade" />
 			</dataarea>
 		</part>
 	</software>
@@ -894,7 +893,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32508">
-				<rom name="sprdsht_v34.opk" size="32508" crc="6afc6dcc" sha1="b0b2059fd1c59ba7c7b55235745fd36186bdd5ca" offset="0" />
+				<rom name="sprdsht_v34.opk" size="32508" crc="6afc6dcc" sha1="b0b2059fd1c59ba7c7b55235745fd36186bdd5ca" />
 			</dataarea>
 		</part>
 	</software>
@@ -903,12 +902,12 @@ Undumped datapack:
 		<!-- This 256K pack has custom circuitry that uses a different addressing method. -->
 		<!-- Do not install on a normal datapak or rampak as that will simply not work and cause a Device Load error. -->
 		<description>Thesaurus and Spelling Checker</description>
-		<year>198?</year>
+		<year>1990</year>
 		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="262150">
-				<rom name="thesaurus.opk" size="262150" crc="b24ca0af" sha1="31ba8482e5a0c17e2fe83341f393668c0bdcae0f" offset="0" />
+				<rom name="thesaurus.opk" size="262150" crc="b24ca0af" sha1="31ba8482e5a0c17e2fe83341f393668c0bdcae0f" />
 			</dataarea>
 		</part>
 	</software>
@@ -920,7 +919,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16338">
-				<rom name="topfin21.opk" size="16338" crc="480d3056" sha1="4d869fd7429465db78ceaa0f59ca5a447316474b" offset="0" />
+				<rom name="topfin21.opk" size="16338" crc="480d3056" sha1="4d869fd7429465db78ceaa0f59ca5a447316474b" />
 			</dataarea>
 		</part>
 	</software>
@@ -932,7 +931,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16350">
-				<rom name="topfin22.opk" size="16350" crc="8bfbfc3f" sha1="add342d0125896f802908bd6b6a13aa13a942311" offset="0" />
+				<rom name="topfin22.opk" size="16350" crc="8bfbfc3f" sha1="add342d0125896f802908bd6b6a13aa13a942311" />
 			</dataarea>
 		</part>
 	</software>
@@ -944,7 +943,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65458">
-				<rom name="travel12.opk" size="65458" crc="03946bc2" sha1="49be125001d557ea654aabd2dabab5c4f71f626f" offset="0" />
+				<rom name="travel12.opk" size="65458" crc="03946bc2" sha1="49be125001d557ea654aabd2dabab5c4f71f626f" />
 			</dataarea>
 		</part>
 	</software>
@@ -956,7 +955,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65493">
-				<rom name="travel15.opk" size="65493" crc="38310574" sha1="5be0e7b121998c7d238fe8c639b732d0272d70ea" offset="0" />
+				<rom name="travel15.opk" size="65493" crc="38310574" sha1="5be0e7b121998c7d238fe8c639b732d0272d70ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -968,7 +967,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65535">
-				<rom name="travel20.opk" size="65535" crc="2f00fb63" sha1="ec1898eb489ba01c137d712d9dd604f4da699124" offset="0" />
+				<rom name="travel20.opk" size="65535" crc="2f00fb63" sha1="ec1898eb489ba01c137d712d9dd604f4da699124" />
 			</dataarea>
 		</part>
 	</software>
@@ -980,7 +979,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16350">
-				<rom name="xbase2.opk" size="16350" crc="faecaac5" sha1="6bcc4d0fed68fdac3c628ab5858c6a81da7627a7" offset="0" />
+				<rom name="xbase2.opk" size="16350" crc="faecaac5" sha1="6bcc4d0fed68fdac3c628ab5858c6a81da7627a7" />
 			</dataarea>
 		</part>
 	</software>
@@ -992,7 +991,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16350">
-				<rom name="xbase3.opk" size="16336" crc="4a97fe68" sha1="a1dde293b421ffbb248459e2af465fdbdba7f2bb" offset="0" />
+				<rom name="xbase3.opk" size="16336" crc="4a97fe68" sha1="a1dde293b421ffbb248459e2af465fdbdba7f2bb" />
 			</dataarea>
 		</part>
 	</software>
@@ -1004,7 +1003,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32773">
-				<rom name="xforma.opk" size="32773" crc="462ad96e" sha1="221235da3ecf22ac71a7ab248afc2d681ccd6d6d" offset="0" />
+				<rom name="xforma.opk" size="32773" crc="462ad96e" sha1="221235da3ecf22ac71a7ab248afc2d681ccd6d6d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1016,7 +1015,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="47862">
-				<rom name="xformtop.opk" size="47862" crc="9e109d42" sha1="a91e9eb195ce865c38099cd56ceb29ec52323377" offset="0" />
+				<rom name="xformtop.opk" size="47862" crc="9e109d42" sha1="a91e9eb195ce865c38099cd56ceb29ec52323377" />
 			</dataarea>
 		</part>
 	</software>
@@ -1029,7 +1028,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16275">
-				<rom name="diallink.opk" size="16275" crc="e435edd2" sha1="394e343881b669d8764304706d788df4fd029632" offset="0" />
+				<rom name="diallink.opk" size="16275" crc="e435edd2" sha1="394e343881b669d8764304706d788df4fd029632" />
 			</dataarea>
 		</part>
 	</software>
@@ -1042,7 +1041,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="29134">
-				<rom name="digitron110.opk" size="29134" crc="37d2dcee" sha1="05a17b8fdd0206fe1dd4e496aed1a973b9591402" offset="0" />
+				<rom name="digitron110.opk" size="29134" crc="37d2dcee" sha1="05a17b8fdd0206fe1dd4e496aed1a973b9591402" />
 			</dataarea>
 		</part>
 	</software>
@@ -1055,7 +1054,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="29326">
-				<rom name="digitron114.opk" size="29326" crc="a838a41c" sha1="22b2e76828dafcdf8caab7c651f7078e730f1a39" offset="0" />
+				<rom name="digitron114.opk" size="29326" crc="a838a41c" sha1="22b2e76828dafcdf8caab7c651f7078e730f1a39" />
 			</dataarea>
 		</part>
 	</software>
@@ -1068,7 +1067,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="54157">
-				<rom name="digitron27.opk" size="54157" crc="aa2a1682" sha1="d6b3362574c5171350bf1f8320b566e1a65d1a7a" offset="0" />
+				<rom name="digitron27.opk" size="54157" crc="aa2a1682" sha1="d6b3362574c5171350bf1f8320b566e1a65d1a7a" />
 			</dataarea>
 		</part>
 	</software>
@@ -1081,7 +1080,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="7135">
-				<rom name="flashpak.opk" size="7135" crc="1138998a" sha1="954a60febab3c86233e2d62ddf42d6e4940eb858" offset="0" />
+				<rom name="flashpak.opk" size="7135" crc="1138998a" sha1="954a60febab3c86233e2d62ddf42d6e4940eb858" />
 			</dataarea>
 		</part>
 	</software>
@@ -1094,7 +1093,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="29662">
-				<rom name="geac.opk" size="29662" crc="2787177f" sha1="ff39d6158111a807a44832b89d092dacbd083fe7" offset="0" />
+				<rom name="geac.opk" size="29662" crc="2787177f" sha1="ff39d6158111a807a44832b89d092dacbd083fe7" />
 			</dataarea>
 		</part>
 	</software>
@@ -1107,7 +1106,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="7983">
-				<rom name="paralink22f.opk" size="7983" crc="5bad3e99" sha1="216da892a6c4877678effc5bfc0346279e66a608" offset="0" />
+				<rom name="paralink22f.opk" size="7983" crc="5bad3e99" sha1="216da892a6c4877678effc5bfc0346279e66a608" />
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1119,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="54730">
-				<rom name="msp100.opk" size="54730" crc="62bac741" sha1="c6af1491665adf744142ad354b6f52b1dcfde813" offset="0" />
+				<rom name="msp100.opk" size="54730" crc="62bac741" sha1="c6af1491665adf744142ad354b6f52b1dcfde813" />
 			</dataarea>
 		</part>
 	</software>
@@ -1134,7 +1133,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="2430">
-				<rom name="owi.bin" size="2430" crc="958509a9" sha1="934a729911d070c7de106684c354eebf16ee78ae" offset="0" />
+				<rom name="owi.bin" size="2430" crc="958509a9" sha1="934a729911d070c7de106684c354eebf16ee78ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -1148,7 +1147,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16238">
-				<rom name="psitex200.opk" size="16238" crc="cce04194" sha1="f6498b365ddff6e0df07b7286a69d1e78f4a2f4d" offset="0" />
+				<rom name="psitex200.opk" size="16238" crc="cce04194" sha1="f6498b365ddff6e0df07b7286a69d1e78f4a2f4d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1162,7 +1161,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="8248">
-				<rom name="sigset201.opk" size="8248" crc="8696fb8a" sha1="ada45c41b083b68c1823da0a951b7a8a593d1648" offset="0" />
+				<rom name="sigset201.opk" size="8248" crc="8696fb8a" sha1="ada45c41b083b68c1823da0a951b7a8a593d1648" />
 			</dataarea>
 		</part>
 	</software>
@@ -1176,7 +1175,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16521">
-				<rom name="sony_lisa1.opk" size="16521" crc="417a9b34" sha1="b2747bcf6be33f0c27f263dbbdfe2512e68e1810" offset="0" />
+				<rom name="sony_lisa1.opk" size="16521" crc="417a9b34" sha1="b2747bcf6be33f0c27f263dbbdfe2512e68e1810" />
 			</dataarea>
 		</part>
 	</software>
@@ -1189,7 +1188,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="9789">
-				<rom name="sony_prm1.opk" size="9789" crc="2983982e" sha1="13caa1fee9578759401c1dcc091d8de4f5cca1da" offset="0" />
+				<rom name="sony_prm1.opk" size="9789" crc="2983982e" sha1="13caa1fee9578759401c1dcc091d8de4f5cca1da" />
 			</dataarea>
 		</part>
 	</software>
@@ -1202,7 +1201,7 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="CM/XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="3677">
-				<rom name="dynaplat.opk" size="3677" crc="5ac6177f" sha1="205dc67dbf5ff265ba04b8f0fdb0ce9a160f784c" offset="0" />
+				<rom name="dynaplat.opk" size="3677" crc="5ac6177f" sha1="205dc67dbf5ff265ba04b8f0fdb0ce9a160f784c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1215,12 +1214,10 @@ Undumped datapack:
 		<sharedfeat name="compatibility" value="LZ/LZ64"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16667">
-				<rom name="treplz16.opk" size="16667" crc="3d270a1e" sha1="f1c460ee457dac2f311cab98c0a374065ba85cbd" offset="0" />
+				<rom name="treplz16.opk" size="16667" crc="3d270a1e" sha1="f1c460ee457dac2f311cab98c0a374065ba85cbd" />
 			</dataarea>
 		</part>
 	</software>
-
-
 
 	<!-- Devices -->
 
@@ -1231,7 +1228,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="8137">
-				<rom name="comms11.opk" size="8137" crc="48c1564b" sha1="2c81bc1174290ed825945508f5ff4f62505831d6" offset="0" />
+				<rom name="comms11.opk" size="8137" crc="48c1564b" sha1="2c81bc1174290ed825945508f5ff4f62505831d6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1242,7 +1239,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="7736">
-				<rom name="comms15.opk" size="7736" crc="b11cd524" sha1="b7d09c946c45915f854ac79cab24f652914ebd68" offset="0" />
+				<rom name="comms15.opk" size="7736" crc="b11cd524" sha1="b7d09c946c45915f854ac79cab24f652914ebd68" />
 			</dataarea>
 		</part>
 	</software>
@@ -1253,7 +1250,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="22448">
-				<rom name="comms22.opk" size="22448" crc="5e5dc3eb" sha1="7901979615bbdb2a1f260cc8eed447c99723d18b" offset="0" />
+				<rom name="comms22.opk" size="22448" crc="5e5dc3eb" sha1="7901979615bbdb2a1f260cc8eed447c99723d18b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1264,7 +1261,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="22515">
-				<rom name="comms24.opk" size="22515" crc="3a42d92f" sha1="b7603f07f5479b1939e0486d819e1552a0e7dcac" offset="0" />
+				<rom name="comms24.opk" size="22515" crc="3a42d92f" sha1="b7603f07f5479b1939e0486d819e1552a0e7dcac" />
 			</dataarea>
 		</part>
 	</software>
@@ -1275,7 +1272,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="22510">
-				<rom name="comms25.opk" size="22510" crc="5c985379" sha1="dd4e5d17b83883cac75c5220dad0c51ddb6ba1c1" offset="0" />
+				<rom name="comms25.opk" size="22510" crc="5c985379" sha1="dd4e5d17b83883cac75c5220dad0c51ddb6ba1c1" />
 			</dataarea>
 		</part>
 	</software>
@@ -1286,7 +1283,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32312">
-				<rom name="comms40.opk" size="32312" crc="9d210b51" sha1="2307a773b30a95f3f09225821d619ff6cdd8ae7d" offset="0" />
+				<rom name="comms40.opk" size="32312" crc="9d210b51" sha1="2307a773b30a95f3f09225821d619ff6cdd8ae7d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1297,7 +1294,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32403">
-				<rom name="comms41.opk" size="32403" crc="dfb1dc85" sha1="4f0a6dd1cdeb4d3ed0d8e84017e2d73ac7f5e0c2" offset="0" />
+				<rom name="comms41.opk" size="32403" crc="dfb1dc85" sha1="4f0a6dd1cdeb4d3ed0d8e84017e2d73ac7f5e0c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1308,7 +1305,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32411">
-				<rom name="comms42.opk" size="32411" crc="9d7aa280" sha1="2d31f4c48f222ffa67fafe5689cc19d8187eafed" offset="0" />
+				<rom name="comms42.opk" size="32411" crc="9d7aa280" sha1="2d31f4c48f222ffa67fafe5689cc19d8187eafed" />
 			</dataarea>
 		</part>
 	</software>
@@ -1320,7 +1317,7 @@ Undumped datapack:
 		<publisher>Extech</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="25112">
-				<rom name="barcomm30.opk" size="25112" crc="58770787" sha1="129ec0fd2642bdef02a92e8432825f650cfacfbd" offset="0" />
+				<rom name="barcomm30.opk" size="25112" crc="58770787" sha1="129ec0fd2642bdef02a92e8432825f650cfacfbd" />
 			</dataarea>
 		</part>
 	</software>
@@ -1332,7 +1329,7 @@ Undumped datapack:
 		<publisher>Extech</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="46397">
-				<rom name="extprt43.opk" size="46397" crc="443d0905" sha1="10a3576786f5ac65082b2856bc1578373f30d6fc" offset="0" />
+				<rom name="extprt43.opk" size="46397" crc="443d0905" sha1="10a3576786f5ac65082b2856bc1578373f30d6fc" />
 			</dataarea>
 		</part>
 	</software>
@@ -1344,7 +1341,7 @@ Undumped datapack:
 		<publisher>Dynasys Technologies Inc.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="55408">
-				<rom name="dynapen44.opk" size="55408" crc="fecb74ce" sha1="452c3776029475d025d9f7cfd562e3c5f24fe310" offset="0" />
+				<rom name="dynapen44.opk" size="55408" crc="fecb74ce" sha1="452c3776029475d025d9f7cfd562e3c5f24fe310" />
 			</dataarea>
 		</part>
 	</software>
@@ -1356,7 +1353,7 @@ Undumped datapack:
 		<publisher>Dynasys Technologies Inc.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="52482">
-				<rom name="dynapen43.opk" size="52482" crc="6f2d2423" sha1="86c3452242a0782656bfbefd07e22eda75482f79" offset="0" />
+				<rom name="dynapen43.opk" size="52482" crc="6f2d2423" sha1="86c3452242a0782656bfbefd07e22eda75482f79" />
 			</dataarea>
 		</part>
 	</software>
@@ -1368,7 +1365,7 @@ Undumped datapack:
 		<publisher>Dynasys Technologies Inc.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="47391">
-				<rom name="relay42.opk" size="47391" crc="ab218a1e" sha1="3b138489f0fbb00e027a3ca67cc33a7b09052c63" offset="0" />
+				<rom name="relay42.opk" size="47391" crc="ab218a1e" sha1="3b138489f0fbb00e027a3ca67cc33a7b09052c63" />
 			</dataarea>
 		</part>
 	</software>
@@ -1381,7 +1378,7 @@ Undumped datapack:
 		<publisher>Dynasys Technologies Inc.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="52674">
-				<rom name="barcomm42.opk" size="52674" crc="d099ef44" sha1="38c277f8f71b10780cdc34da8f7c8c356c6b2585" offset="0" />
+				<rom name="barcomm42.opk" size="52674" crc="d099ef44" sha1="38c277f8f71b10780cdc34da8f7c8c356c6b2585" />
 			</dataarea>
 		</part>
 	</software>
@@ -1392,7 +1389,7 @@ Undumped datapack:
 		<publisher>Dynasys Technologies Inc.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="1545">
-				<rom name="dynapoll.opk" size="1545" crc="3d6d1f77" sha1="b02dd1d1b9e0558cc7844ed8d029b958f13ca67c" offset="0" />
+				<rom name="dynapoll.opk" size="1545" crc="3d6d1f77" sha1="b02dd1d1b9e0558cc7844ed8d029b958f13ca67c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1403,7 +1400,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="4550">
-				<rom name="printer16.opk" size="4550" crc="cb3c7bff" sha1="b3d3ef91ce07584504a5ddc92503e2bc291c8832" offset="0" />
+				<rom name="printer16.opk" size="4550" crc="cb3c7bff" sha1="b3d3ef91ce07584504a5ddc92503e2bc291c8832" />
 			</dataarea>
 		</part>
 	</software>
@@ -1414,7 +1411,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="4913">
-				<rom name="printer21.opk" size="4913" crc="701f489e" sha1="784d07d2ad525bed5dc9511bd1716029cc91f1fc" offset="0" />
+				<rom name="printer21.opk" size="4913" crc="701f489e" sha1="784d07d2ad525bed5dc9511bd1716029cc91f1fc" />
 			</dataarea>
 		</part>
 	</software>
@@ -1425,7 +1422,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="4945">
-				<rom name="printer22.opk" size="4945" crc="d12a5b5d" sha1="18b2b5e7d84c8dbe7fe96c9c046e8239af65b9e6" offset="0" />
+				<rom name="printer22.opk" size="4945" crc="d12a5b5d" sha1="18b2b5e7d84c8dbe7fe96c9c046e8239af65b9e6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1436,7 +1433,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="748">
-				<rom name="swipe20.opk" size="748" crc="a7d1d051" sha1="325ac98d9330bb68d23d72610899c9176998a26b" offset="0" />
+				<rom name="swipe20.opk" size="748" crc="a7d1d051" sha1="325ac98d9330bb68d23d72610899c9176998a26b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1447,7 +1444,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="11263">
-				<rom name="bar31.opk" size="11263" crc="3951726d" sha1="4ae19527dee89dc2909e716d1dbff40f17a1f361" offset="0" />
+				<rom name="bar31.opk" size="11263" crc="3951726d" sha1="4ae19527dee89dc2909e716d1dbff40f17a1f361" />
 			</dataarea>
 		</part>
 	</software>
@@ -1458,7 +1455,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="11375">
-				<rom name="bar32.opk" size="11375" crc="d5c7079c" sha1="a04eeafcc3125131d18a0063b7db56e7a59f5108" offset="0" />
+				<rom name="bar32.opk" size="11375" crc="d5c7079c" sha1="a04eeafcc3125131d18a0063b7db56e7a59f5108" />
 			</dataarea>
 		</part>
 	</software>
@@ -1469,18 +1466,18 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="15226">
-				<rom name="pager13.opk" size="15226" crc="05045d72" sha1="4ccc8d32d34e65ec0bc3b0f50cda9b1146d1b6af" offset="0" />
+				<rom name="pager13.opk" size="15226" crc="05045d72" sha1="4ccc8d32d34e65ec0bc3b0f50cda9b1146d1b6af" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="plink20" supported="no">
 		<description>Paralink 2.0</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>Silvertree Engineering Ltd.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="6062">
-				<rom name="paralink20.opk" size="6062" crc="75a3596d" sha1="43dfdd4b39d9da00ccb7aa74b66d610e90867b75" offset="0" />
+				<rom name="paralink20.opk" size="6062" crc="75a3596d" sha1="43dfdd4b39d9da00ccb7aa74b66d610e90867b75" />
 			</dataarea>
 		</part>
 	</software>
@@ -1491,7 +1488,7 @@ Undumped datapack:
 		<publisher>Silvertree Engineering Ltd.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16352">
-				<rom name="paralink33.opk" size="16352" crc="b672445b" sha1="b3b49dd46fa6b0753d8aa5df4e447c263dbb58f5" offset="0" />
+				<rom name="paralink33.opk" size="16352" crc="b672445b" sha1="b3b49dd46fa6b0753d8aa5df4e447c263dbb58f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1502,7 +1499,7 @@ Undumped datapack:
 		<publisher>Silvertree Engineering Ltd.</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16352">
-				<rom name="paralink34.opk" size="16352" crc="3a22f0ae" sha1="e55cf03aed678da812096a926e70355f26ea2229" offset="0" />
+				<rom name="paralink34.opk" size="16352" crc="3a22f0ae" sha1="e55cf03aed678da812096a926e70355f26ea2229" />
 			</dataarea>
 		</part>
 	</software>
@@ -1513,7 +1510,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="12959">
-				<rom name="andover.opk" size="12959" crc="dee5a895" sha1="a2fe553b3d0d5dc38ec5efb393e665676223b3dd" offset="0" />
+				<rom name="andover.opk" size="12959" crc="dee5a895" sha1="a2fe553b3d0d5dc38ec5efb393e665676223b3dd" />
 			</dataarea>
 		</part>
 	</software>
@@ -1524,7 +1521,7 @@ Undumped datapack:
 		<publisher>Psion</publisher>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="60686">
-				<rom name="cnf41_10.opk" size="60686" crc="720be551" sha1="74b7162acbada7f35a77010c201cf5506d909aae" offset="0" />
+				<rom name="cnf41_10.opk" size="60686" crc="720be551" sha1="74b7162acbada7f35a77010c201cf5506d909aae" />
 			</dataarea>
 		</part>
 	</software>

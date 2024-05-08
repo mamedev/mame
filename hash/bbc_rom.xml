@@ -1153,6 +1153,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="amfax">
+		<description>AMFAX 3.1</description>
+		<year>1988</year>
+		<publisher>AMDAT</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AMFAX-3.1.rom" size="16384" crc="e8f715e9" sha1="929f4ea8563f9f75207f1a9b8c09c4f75267a0e6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ample">
 		<description>AMPLE Nucleus (patched)</description>
 		<year>1986</year>
@@ -3265,6 +3276,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ddos202">
+		<description>Opus DDOS 2.02</description>
+		<year>198?</year>
+		<publisher>Slogger</publisher>
+		<info name="usage" value="Requires Opus 8272 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus8272"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Opus-DDOS-2.02.rom" size="16384" crc="f7d2da9d" sha1="b30d718d2fbd015cf2088b0fd6435e2cd6b65740"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ddos300" cloneof="ddos305">
 		<description>Opus DDOS 3.00</description>
 		<year>1984</year>
@@ -3485,6 +3510,20 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.45r30.rom" size="16384" crc="1f018797" sha1="f92aecd52ebe6f8265131b142303dce47590c75b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddos345r35" cloneof="ddos346">
+		<description>Opus DDOS 3.45 Rev.35</description>
+		<year>1986</year>
+		<publisher>Slogger</publisher>
+		<info name="usage" value="Requires Opus D-DOS(B) 1770 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus1770"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Opus-DDOS-3.45r35.rom" size="16384" crc="0497c96f" sha1="3614ac7627a698d3a2d61f278da4624310eee168"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4158,6 +4197,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dblprecsn">
+		<description>Double Precision</description>
+		<year>1985</year>
+		<publisher>J.Matzak</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DoublePrecision-1.0.rom" size="8192" crc="a9024477" sha1="5cdc7db7713bc06b8767f2e3767bd8baec71bd26"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dblview">
 		<description>DoubleView</description>
 		<year>1988</year>
@@ -4338,6 +4388,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="EasyTalk-2.00.rom" size="8192" crc="7f02a470" sha1="8d1875f35cc819d3f3de5a0d576c6bfbf6fa6535"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ebbs">
+		<description>EBBS Data ROM 2.00</description>
+		<year>1988</year>
+		<publisher>O.C.S.</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="EBBSDataROM-2.00.rom" size="8192" crc="3b7b3570" sha1="7891a47c70ea281511ba226818dbcf63e4faa717"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5246,6 +5307,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="PMSGenieJunior-1.1u.rom" size="16384" crc="e635d89e" sha1="9d046c9eaea8aa96b46efaa32e23e06a70e9e1ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genutils314" cloneof="genutils">
+		<description>General Utilities 3.14</description>
+		<year>1984</year>
+		<publisher>Creative Junior Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GeneralUtils-3.14.rom" size="8192" crc="f7e3ffb1" sha1="71d99206a0d02499b42af921eaea638e68bbba8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7984,6 +8056,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pascalerr">
+		<description>Pascal Errors</description>
+		<year>1985</year>
+		<publisher>Bob Milsom</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="PascalErrors-1.0.rom" size="8192" crc="319c881e" sha1="f3dde7bd120c3ecb9981d8761f47f4942034c10a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pascalt">
 		<description>Pascal-T</description>
 		<year>1983</year>
@@ -8347,6 +8430,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Prestel-4.8n.rom" size="8192" crc="7b021ee3" sha1="a5250165b10d317c1a593fbb5ec6b2504a42de44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prestel71" cloneof="prestel" supported="no">
+		<description>Prestel 7.1b</description>
+		<year>1985</year>
+		<publisher>SofMac</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Prestel-7.1b.rom" size="8192" crc="6a44c988" sha1="d0ec9f14976deba1619d2b65c6ce31858f2db1e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9073,7 +9167,7 @@ license:CC0-1.0
 		<description>Replay System WD1770W 1.28</description>
 		<year>1986</year>
 		<publisher>Vine Micros</publisher>
-		<info name="usage" value="Requires Watford Electronics DDB2 1772 FDC" />
+		<info name="usage" value="Requires Watford Electronics DDB2 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -10892,7 +10986,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tcl125_202" cloneof="tcl125">
+	<software name="tcl125_202" cloneof="tcl125_2">
 		<description>Boxford TCL 125/240 2.02</description>
 		<year>198?</year>
 		<publisher>MW Controls</publisher>
@@ -10903,7 +10997,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tcl125">
+	<software name="tcl125_2">
 		<description>Boxford TCL 125/240 2.04</description>
 		<year>198?</year>
 		<publisher>MW Controls</publisher>
@@ -10914,13 +11008,35 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tcl125_600" cloneof="tcl125">
+	<software name="tcl125_600" cloneof="tcl125_6">
 		<description>Boxford TCL 125/240 6.00</description>
 		<year>1989</year>
 		<publisher>MW Controls</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="TCL125-240-6.00.rom" size="16384" crc="992b167d" sha1="a8aaaaf574b4351e25cc530de17512b513c4aa81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tcl125_601" cloneof="tcl125_6">
+		<description>Boxford TCL 125/240 6.01</description>
+		<year>1989</year>
+		<publisher>MW Controls</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TCL125-240-6.01.rom" size="16384" crc="4ec93f57" sha1="d76bddb23ab0c6c6753a00f915827589d6776115"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tcl125_6">
+		<description>Boxford TCL 125/240 6.04</description>
+		<year>1989</year>
+		<publisher>MW Controls</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TCL125-240-6.04.rom" size="16384" crc="a11f60bd" sha1="cb1f309f82207b553e5eaaab19419709316eec8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11592,6 +11708,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="TurboPROM-1.0.rom" size="8192" crc="a8b5bd76" sha1="1e430b38225f68e17411d168fe6f057d15d90010"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtle">
+		<description>Turtle 0.68</description>
+		<year>1982</year>
+		<publisher>J.Pixton</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Turtle-0.68.rom" size="8192" crc="debd4dc3" sha1="30d776b9384925420fd5c2a146885cc896fbc3e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12522,6 +12649,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="vtclock134m">
+		<description>VT Clock Model 134M</description>
+		<year>1985</year>
+		<publisher>Interactive Research</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="VTClock-134M.rom" size="16384" crc="8ff9887a" sha1="e9d0fc6fc0535a813e29343086a467fe86229430"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wapping">
 		<description>The Wapping Editor 1.30</description>
 		<year>1988</year>
@@ -12550,7 +12688,7 @@ license:CC0-1.0
 		<description>Watford Electronics DDFS 1.40</description>
 		<year>1984</year>
 		<publisher>Watford Electronics</publisher>
-		<info name="usage" value="Requires Watford Electronics DDB2 1772 FDC" />
+		<info name="usage" value="Requires Watford Electronics DDB2 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<sharedfeat name="fdc_default" value="weddb2"/>
 		<part name="rom1" interface="bbc_rom">
@@ -12564,7 +12702,7 @@ license:CC0-1.0
 		<description>Watford Electronics DDFS 1.50</description>
 		<year>1984</year>
 		<publisher>Watford Electronics</publisher>
-		<info name="usage" value="Requires Watford Electronics DDB2 1772 FDC" />
+		<info name="usage" value="Requires Watford Electronics DDB2 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<sharedfeat name="fdc_default" value="weddb2"/>
 		<part name="rom1" interface="bbc_rom">
@@ -12578,7 +12716,7 @@ license:CC0-1.0
 		<description>Watford Electronics DDFS 1.53</description>
 		<year>1985</year>
 		<publisher>Watford Electronics</publisher>
-		<info name="usage" value="Requires Watford Electronics DDB2 1772 FDC" />
+		<info name="usage" value="Requires Watford Electronics DDB2 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<sharedfeat name="fdc_default" value="weddb2"/>
 		<part name="rom1" interface="bbc_rom">
@@ -13284,13 +13422,35 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gr_hopper">
+		<description>GameROM: Hopper 1.10</description>
+		<year>201?</year>
+		<publisher>G-ROMS</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="G-ROM_Hopper-1.10.rom" size="16384" crc="b983027a" sha1="f095f89dceed31c99efb815a21055d926520e09c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gr_rocketra">
 		<description>GameROM: Rocket Raid 1.10</description>
 		<year>201?</year>
 		<publisher>G-ROMS</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="G-ROM_RocketRaid.rom" size="16384" crc="31fa38f9" sha1="dc1b44fea90dc7a725e6c17c9d3c5a1b3a03e76d"/>
+				<rom name="G-ROM_RocketRaid-1.10.rom" size="16384" crc="31fa38f9" sha1="dc1b44fea90dc7a725e6c17c9d3c5a1b3a03e76d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gr_snapper">
+		<description>GameROM: Snapper 1.20</description>
+		<year>2015</year>
+		<publisher>G-ROMS</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="G-ROM_Snapper-1.20.rom" size="16384" crc="049c191b" sha1="ce0dc47d9162e42963eca6918bb22fe9d76adee4"/>
 			</dataarea>
 		</part>
 	</software>

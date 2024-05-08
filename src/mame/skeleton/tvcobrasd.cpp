@@ -62,10 +62,31 @@ public:
 	void cobrasday(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<v25_device> m_maincpu;
 
 	void cobrasd(machine_config &config);
+
+	void program_map(address_map &map);
+	void io_map(address_map &map);
+	void data_map(address_map &map);
 };
+
+
+void cobrasd_state::program_map(address_map &map)
+{
+	map(0x00000, 0x03fff).ram();
+	map(0xe0000, 0xfffff).rom().region("maincpu", 0);
+}
+
+void cobrasd_state::io_map(address_map &map)
+{
+	// map(0x8000, 0x8000).w();
+}
+
+void cobrasd_state::data_map(address_map &map)
+{
+	map(0x000, 0x1ff).ram();
+}
 
 
 static INPUT_PORTS_START(cobrasd)
@@ -96,6 +117,16 @@ void cobrasd_state::cobrasd(machine_config &config)
 	// Basic machine hardware
 
 	V25(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cobrasd_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &cobrasd_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &cobrasd_state::data_map);
+	m_maincpu->pt_in_cb().set([this] () { logerror("%s: pt in\n", machine().describe_context()); return uint8_t(0); });
+	m_maincpu->p0_in_cb().set([this] () { logerror("%s: p0 in\n", machine().describe_context()); return uint8_t(0); });
+	m_maincpu->p1_in_cb().set([this] () { logerror("%s: p1 in\n", machine().describe_context()); return uint8_t(0); });
+	m_maincpu->p2_in_cb().set([this] () { logerror("%s: p2 in\n", machine().describe_context()); return uint8_t(0); });
+	m_maincpu->p0_out_cb().set([this] (uint8_t data) { logerror("%s: p0 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->p1_out_cb().set([this] (uint8_t data) { logerror("%s: p1 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->p2_out_cb().set([this] (uint8_t data) { logerror("%s: p2 out %02X\n", machine().describe_context(), data); });
 
 	PCF8583(config, "rtc", 32.768_kHz_XTAL); // External xtal labeled "S833", unknown frequency
 }

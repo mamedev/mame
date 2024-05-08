@@ -22,6 +22,8 @@
 ****************************************************************************
 
     Known bugs:
+        * pdrift & clones lock up issues after m68k rewrite, TAS opcode?
+		  Perfect quantum or changing IRQ2 timing won't fix it, see MT8783.
         * pdriftl's comms don't work
 
 ****************************************************************************
@@ -624,7 +626,6 @@ void segaybd_state::pdrift_output_cb1(uint16_t data)
 						m_bank_motor_position = 4;
 						m_pdrift_bank = 4;
 						break;
-
 				}
 			}
 		}
@@ -632,7 +633,7 @@ void segaybd_state::pdrift_output_cb1(uint16_t data)
 		{
 			// the vibration value uses the first few bits to give a number between 0 and 7
 			m_vibration_motor = data & 7;
-			// normalize the data and subtract the vibration value from it*/
+			// normalize the data and subtract the vibration value from it
 
 			m_pdrift_bank = data - (data & 7);
 			m_bank_data_raw = m_pdrift_bank & 0xff;
@@ -1553,7 +1554,7 @@ void segaybd_state::yboard_deluxe(machine_config &config)
 //  CPU: 68000 (317-????)
 //  GAME BD:  834-6614-02 GALAXY FORCE 2
 //  DRIVE BD: 839-0161
-
+//
 ROM_START( gforce2 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
 	ROM_LOAD16_BYTE( "epr-11688.25",   0x000000, 0x20000, CRC(c845f2df) SHA1(17586a5f83170e99f28cd35b28e85e503e7bbe75) )
@@ -1878,7 +1879,7 @@ ROM_END
 //  VIDEO BD    837-7301-02
 //  GAME BD     834-7300-07 G-LOC
 //  DRIVE BD:   839-0341
-
+//
 ROM_START( gloc )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
 	ROM_LOAD16_BYTE( "epr-13172.25",  0x000000, 0x20000, CRC(75e7174c) SHA1(ef052a6973cf49267463a0c14e8c392a083c62fb) )
@@ -2185,7 +2186,7 @@ ROM_END
 //   CPU BD POWER DRIFT   837-6695-08 (or 837-6695-09)
 //   VIDEO BD POWER DRIFT 837-6696-01 (or 837-6696-02)
 //   DRIVE BD:            839-0213
-
+//
 ROM_START( pdrift )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
 	ROM_LOAD16_BYTE( "epr-12017.25",  0x000000, 0x20000, CRC(31190322) SHA1(18df4bd6078b1c76c7061c05a476a7cbf7d0b37b) )
@@ -3030,12 +3031,12 @@ GAME( 1990, glocu,     gloc,     yboard,        gloc,     segaybd_state, init_gl
 GAME( 1990, glocr360,  gloc,     yboard,        glocr360, segaybd_state, init_r360,    ROT0,   "Sega", "G-LOC R360 (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, glocr360j, gloc,     yboard,        glocr360, segaybd_state, init_r360,    ROT0,   "Sega", "G-LOC R360 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
-GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_pdrift )
 
 GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
