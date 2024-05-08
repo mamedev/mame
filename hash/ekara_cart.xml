@@ -1,0 +1,3598 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="ekara_cart" description="Takara e-kara / Popira / Jumping Popira / Taiko de Popira / Dance Dance Revolution Family Mat cartridges">
+
+	<!-- The cartridge form factor for all these cartridges are the same, the software determines which units they work with -->
+
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+
+	<!--
+
+	Japanese e-kara carts appear to have a number of different genres split across various
+	cart sub-series (often supporting different hardware types) special releases etc.
+
+	This file is for the base set (number on case, ECxxxx-xxx part numbers)
+
+	The genres in the Japanese games are represented by the code after the EC/DC/MC/GC/PC etc. number
+	ANM = AniSon Club (anime theme songs - abbreviated from Anime Song Club)
+	ATM = Artist Mini
+	ATS = Artist Selection (all songs by a single artist or related artists)
+	BAT = Best Artist (all song by a single artist or related artists)
+	BHT = Best Hit
+	BSC = Best Scene
+	DCS = Detective Conan Saiten Cartridge
+	DUE = Duet Song
+	ENK = Enkamichi
+	ETZ = Enka Taizen
+	G73 = 2th Century Gallery 1973-75
+	G76 = 2th Century Gallery 1976-78
+	G79 = 2th Century Gallery 1979-81
+	G82 = 2th Century Gallery 1982-84
+	HKW = Hikawa Kiyoshi
+	JPM = J-Pop Mix
+	KID = Kids' Song
+	KIR = Kirarin Revolution
+	KSB = Kids' Song Best
+	KSM = Kids' Song Mini
+	KTY = Hello Kitty
+	MIN = mini-moni
+	SAI = Saiten Cartridge (supports scoring)
+	TPJ = TV Pop Junior
+
+	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
+	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
+	                                                EN (EN-X on case, no part numbers)        (see ekara_japan_en.xml) (for e-kara - custom presentation)
+	                                                BH (BG-XX on case, BH-xxxx on PCB)        (see ekara_japan_bh.xml) (for e-kara - custom presentation)
+	                                                GK (GK-X on case)                         (see ekara_japan_gk.xml) (for e-kara / e-pitch - custom presentation)
+	                                                G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
+	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
+	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko de Popira)
+	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
+	                                                A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
+	                                                                        AC (KR-xx on cart, maybe part of A series)
+	                                                JP (JP-x on case)                         (see ekara_japan_jp.xml) (for Jumping Popira Only)
+
+	these exist but haven't got any
+	Some Japanese carts have a number starting with
+	                                                KE (for Kids Lyric book device Only?)
+	                                                KD (for e-kara?)
+	                                                PR (seen a PR-02 AYY) (what is it?)
+
+	(there are others, need to document them)
+
+
+	There are also e-kara Web cartridges that were meant to be programmed using a special unit connected to a PC using the defunct e-kara web service (see ekara_japan_web.xml)
+
+	Genres can cross multiple cart types, eg. TV Pop 1,3,4,5,6 are in the 'G' series, while TV Pop 2 is in the 'P' series, and TV Pop 9 is in the 'D' series (where are 7,8?)
+
+	for non-Japanese carts see ekara_us.xml and ekara_pal.xml, the PAL ones are noteworthy for using a different timing system
+
+	***********************************************************************************
+
+	Japanese cart listing (by 'just number' code) (number on cartridge / box, EC in cart identifier code)
+	* = dumped
+
+	The EC number is printed on the left side of the cart label, as well as in the serial code
+	Carts EC0001-0010 don't have a number printed on the box, only the title - the number was added starting with EC0011
+
+	No known undumped carts in main series (assuming highest number is 85)
+
+	..  *EC0001-JPM  J-Pop Mix Volume 1
+	..  *EC0002-JPM  J-Pop Mix Volume 2
+	..  *EC0003-JPM  J-Pop Mix Volume 3
+	..  *EC0004-JPM  J-Pop Mix Volume 4
+	..  *EC0005-JPM  J-Pop Mix Volume 5
+	..  *EC0006-ENK  Enkamichi Volume 1
+	..  *EC0007-G76  20th Century Gallery 1976-78 Volume 1
+	..  *EC0008-G79  20th Century Gallery 1979-81 Volume 1
+	..  *EC0009-ANM  AniSon Club Volume 1
+
+	..  *EC0010-KID  Kids' Song Volume 1
+	11  *EC0011-JPM  J-Pop Mix Volume 6
+	12  *EC0012-JPM  J-Pop Mix Volume 7
+	13  *EC0013-JPM  J-Pop Mix Volume 8
+	14  *EC0014-ATS  Artist Selection Volume 1 - Southern All Stars, Kuwata Keisuke
+	15  *EC0015-ATS  Artist Selection Volume 2 - Shīna Ringo, Tomosaka Rie
+	16  *EC0016-ENK  Enkamichi Volume 2
+	17  *EC0017-G73  20th Century Gallery 1973-75 Volume 1
+	18  *EC0018-G82  20th Century Gallery 1982-84 Volume 1
+	19  *EC0019-BSC  Best Scene Volume 1 - Wedding-hen
+
+	20  *EC0020-KID  Kids' Song Volume 2
+	21  *EC0021-JPM  J-Pop Mix Volume 9
+	22  *EC0022-JPM  J-Pop Mix Volume 10
+	23  *EC0023-JPM  J-Pop Mix Volume 11
+	24  *EC0024-JPM  J-Pop Mix Volume 12
+	25  *EC0025-JPM  J-Pop Mix Volume 13
+	26  *EC0026-JPM  J-Pop Mix Volume 14
+	27  *EC0027-JPM  J-Pop Mix Volume 15
+	28  *EC0028-JPM  J-Pop Mix Volume 16
+	29  *EC0029-ATS  Artist Selection Volume 3 - Dreams Come True
+
+	30  *EC0030-ENK  Enkamichi Volume 3
+	31  *EC0031-ATS  Artist Selection Volume 4 - Ishihara Yūjirō
+	32  *EC0032-ANM  AniSon Club Volume 2
+	33  *EC0033-JPM  J-Pop Mix Volume 17
+	34  *EC0034-KID  Kids' Song Volume 3
+	35  *EC0035-ATS  Artist Selection Volume 5 - Matsuda Seiko
+	36  *EC0036-ATS  Artist Selection Volume 6 - KinKi Kids
+	37  *EC0037-ENK  Enkamichi Volume 4
+	38  *EC0038-BSC  Best Scene Volume 2 - Sotsugyō/Hagemashi-hen
+	39  *EC0039-ATS  Artist Selection Volume 7 - B'z
+
+	40  *EC0040-JPM  J-Pop Mix Volume 18
+	41  *EC0041-ATS  Artist Selection Volume 8 - Hamasaki Ayumi
+	42  *EC0042-JPM  J-Pop Mix Volume 19
+	43  *EC0043-ENK  Enkamichi Volume 5
+	44  *EC0044-ATS  Artist Selection Volume 9 - Every Little Thing
+	45  *EC0045-ATS  Artist Selection Volume 10 - Mr. Children
+	46  *EC0046-JPM  J-Pop Mix Volume 20
+	47  *EC0047-DUE  Duet Song Volume 1
+	48  *EC0048-ENK  Enkamichi Volume 6
+	49  *EC0049-ATS  Artist Selection Volume 11 - Judy and Mary
+
+	50  *EC0050-ATS  Artist Selection Volume 12 - The Beatles
+	51  *EC0051-JPM  J-Pop Mix Volume 21
+	52  *EC0052-ENK  Enkamichi Volume 7
+	53  *EC0053-JPM  J-Pop Mix Volume 22
+	54  *EC0054-JPM  J-Pop Mix Volume 23
+	55  *EC0055-ATS  Artist Selection Volume 13 - TUBE
+	56  *EC0056-JPM  J-Pop Mix Volume 24
+	57  *EC0057-ATS  Artist Selection Volume 14 - SMAP
+	58  *EC0058-ENK  Enkamichi Volume 8
+	59  *EC0059-JPM  J-Pop Mix Volume 25
+
+	60  *EC0060-JPM  J-Pop Mix Volume 26
+	61  *EC0061-JPM  J-Pop Mix Volume 27
+	62  *EC0062-JPM  J-Pop Mix Volume 28
+	63  *EC0063-JPM  J-Pop Mix Volume 29
+	64  *EC0064-ENK  Enkamichi Volume 9
+	65  *EC0065-JPM  J-Pop Mix Volume 30
+	66  *EC0066-JPM  J-Pop Mix Volume 31
+	67  *EC0067-JPM  J-Pop Mix Volume 32
+	68  *EC0068-JPM  J-Pop Mix Volume 33
+	69  *EC0069-ETZ  Enka Taizen (custom presentation etc.)
+
+	70  *EC0070-JPM  J-Pop Mix Volume 34
+	71  *EC0071-JPM  J-Pop Mix Volume 35
+	72  *EC0072-JPM  J-Pop Mix Volume 36
+	73  *EC0073-MKC  Mood Kayō Collection Volume 1
+	74  *EC0074-JPM  J-Pop Mix Volume 37
+	75  *EC0075-JPM  J-Pop Mix Volume 38
+	76  *EC0076-JPM  J-Pop Mix Volume 39
+	77  *EC0077-ATS  Artist Selection Volume 15 - Keisuke Kuwata (should be Vol 15? sales sheet lists 5?)
+	78  *EC0078-JPM  J-Pop Mix Volume 40
+	79  *EC0079-ETZ  Enka Taizen Volume 2 (custom presentation etc.)
+
+	80  *EC0080-JPM  J-Pop Mix Volume 41
+	81  *EC0081-JPM  J-Pop Mix Volume 42
+	82  *EC0082-MBH  Matthew's Best Hit Selection
+	83  *EC0083-JPM  J-Pop Mix Volume 43
+	84  *EC0084-KSB  Kids' Song Best 40
+	85  *EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.)
+
+	***********************************************************************************
+
+	Japanese cart listing (by A code)  (A-x on cartridge)
+
+	These are for use with e-pitch / e-kara (e-pitch internal ROM is the same as e-kara Japan, just button layout is changed)
+
+	https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10109392860
+
+	* = dumped
+
+	*A-1   Pichi Pichi Pitch vol.1 / ぴちぴちピッチvol.1
+	*A-2   Pichi Pichi Pitch vol.2 / ぴちぴちピッチvol.2
+	*A-3   Pichi Pichi Pitch vol.3 / ぴちぴちピッチvol.3
+	*A-4   Pichi Pichi Pitch Pure Chapter 1 / ぴちぴちピッチピュア第１章
+	*A-5   Pichi Pichi Pitch Karaoke Party / ぴちぴちピッチカラオケパーティー
+	*A-6   Pichi Pichi Pitch Pure Chapter 2 / ぴちぴちピッチピュア第２章
+	*A-7   Pichi Pichi Pitch Pure Chapter 3 / ぴちぴちピッチピュア第３章
+	*A-8   Pichi Pichi Pitch Karaoke Party 2 / ぴちぴちピッチカラオケパーティー２
+
+	***********************************************************************************
+
+	Japanese cart listing (by BH code)  * = dumped
+	 * = dumped
+
+	A secondary 4-digit naming scheme BHxxxx (no extension) appears on a sticker on the cartridge PCB only
+
+	For e-kara only
+
+	*BH-01  Best Hit Collection
+	*BH-02  Best Hit Collection
+	*BH-03  Best Hit Collection
+	*BH-04  Best Hit Collection
+	*BH-05  Best Hit Collection
+	*BH-06  Best Hit Collection
+	*BH-07  Best Hit Collection
+
+	***********************************************************************************
+
+	Dream Cartridge (ドリームカートリッジ) series
+	Japanese cart listing (by D code)  (D-xx on cartridge / box, DC in cart identifier code)
+	 * = dumped
+
+	These are for use with 4 units
+	1. e-Kara
+	2. Taiko De Popira
+	3. Popira
+	4. Popira 2
+
+	note BAT and BHT aren't the same series
+
+	*D-1   DC0001-BHT  Best Hit Volume 8 (most other BHT carts are in G series or P series)
+	*D-2   DC0002-BAT  Best Artist Volume 6
+	*D-3   DC0003-BHT  Best Hit Volume 9
+	*D-4   DC0004-TPJ  TV Pop Junior Volume 8
+	*D-5   DC0005-TPJ  TV Pop Junior Volume 9
+	*D-6   DC0006-BHT  Best Hit Volume 10
+	 D-7   DC0007-KID  Kids' Song Volume 4 (volumes 1, 2 and 3 are in the main EC series)
+	*D-8   DC0008-BAT  Best Artist Volume 7
+	*D-9   DC0009-TPJ  TV Pop Junior (no volume number on cover)
+
+	***********************************************************************************
+
+	Enka-shū (演歌集) series
+	Japanese cart listing (by EN code)  * = dumped
+	 * = dumped
+
+	These don't seem to have a secondary numbering scheme (eg ENxxxx-xxx)
+
+	(check what units these are for)
+
+	*EN-1  Enka Collection - Volume 1
+	*EN-2  Enka Collection - Volume 2
+	*EN-3  Enka Collection - Volume 3
+	*EN-4  Enka Collection - Volume 4
+
+	***********************************************************************************
+
+	Gold Cartridge (ゴールドカートリッジ) series
+	Japanese cart listing (by G code)  (G-x on cartridge / box, GC in cart identifier code)
+
+	These are for use with 2 different units
+	1. e-Kara
+	2. Popira (and Popira 2? - earlier carts will run it as regular Popira, later carts have full Popira 2 support)
+
+	G-1  *GC0001-BAT  Best Artist Volume 1
+	G-2  *GC0002-BHT  Best Hit Volume 1
+	G-3  *GC0003-BAT  Best Artist Volume 2
+	G-4  *GC0004-BHT  Best Hit Volume 2
+	G-5  *GC0005-TPJ  TV Pop Junior Volume 1
+	G-6  *GC0006-BHT  Best Hit Volume 3
+	G-7  *GC0007-BAT  Best Artist Volume 3
+	G-8  *GC0008-MIN  mini-moni
+	G-9  *GC0009-TPJ  TV Pop Junior Volume 3 (Volume 2 is 'P-2' in 'P' series)
+	G-10 *GC0010-BAT  Best Artist Volume 4
+	G-11 *GC0011-TPJ  TV Pop Junior Volume 4
+	G-12 *GC0012-BHT  Best Hit Volume 5 (Volume 4 is 'P-1' in 'P' series)
+	G-13 *GC0013-BHT  Best Hit Volume 6
+	G-14 *GC0014-MIN  mini-moni Volume 2
+	G-15 *GC0015-BAT  Best Artist Volume 5
+	G-16 *GC0016-TPJ  TV Pop Junior Volume 5
+	G-17 *GC0017-TPJ  TV Pop Junior Volume 6
+	G-18 *GC0018-TPJ  TV Pop Junior Volume 7
+
+	One unusual cartridge looks like a regular G (Gold series) and is compatible with the same units, but
+	has a GS code instead; no other GS cartridges have been seen.
+
+	GS-1 *GS0001-MEI  Natsukashi no Meikyoku-shū
+
+	***********************************************************************************
+
+	Game and Karaoke Cartridge series
+	GK-1 calls it ゲーム&カラオケカートリッジ
+	GK-2 and GK-3 call it カラオケはもちろんゲームもできるカートリッジ
+	Japanese cart listing (by GK code)  * = dumped
+	 * = dumped
+
+	A secondary 4-digit naming scheme GKxxxx (no extension) appears on a sticker on the cartridge PCB only
+
+	(check what units these are for)
+
+	*GK-1  Detective Conan
+	*GK-2  Disney Princess: Princess Debut
+	*GK-3  Tinkerbell to Tinkle Star Uranai
+
+	***********************************************************************************
+
+	Kids' Song 20 series
+	Japanese cart listing (by KD code)
+	 * = dumped
+
+	*KD-1  Kids 20 - Volume 1
+	*KD-2  Kids 20 - Volume 2
+	*KD-3  Kids 20 - Volume 3
+	 KD-4  Kids 20 - Volume 4
+
+	***********************************************************************************
+
+	Sen'yō Saiten Cartridge mini (専用採点カートリッジ mini) series
+	Japanese cart listing (by M code) (M-x on cartridge / box, MC in cart identifier code)
+
+	M-1  *MC0001-ATM  Artist Mini Volume 1 (Aya Matsuura)
+	M-2  *MC0002-ATM  Artist Mini Volume 2 (PIKA☆NCHI, A・RA・SHI／他)
+	M-3  *MC0003-ATM  Artist Mini Volume 3 (Morning Musume)
+	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
+	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
+	M-6  *MC0006-KSM  Kids Song Mini Volume 2 (TV Hero)
+	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids, ARASHI, TOKIO)
+	M-8  *MC0008-KSM  Kids Song Mini Volume 3
+	M-9  *MC0009-JPM  J-Pop Mix Mini Volume 1
+	M-10 *MC0010-ATM  Artist Mini Volume 6 (Utada Hikaru)
+	M-11 *MC0011-KSM  Kids Song Mini Volume 4 (Fantastic)
+	M-12 *MC0012-ATM  Artist Mini Volume 7 (Ayumi Hamasaki)
+	M-13 *MC0013-KSM  Kids Song Mini Volume 5
+	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
+	M-15 *MC0015-TPM  TV Pop Mini Volume 1
+	M-16 *MC0016-ATM  Artist Mini Volume 9  (Yamaguchi Momoe)
+	M-17  MC0017-     TV Pop Mini Volume 2?
+
+	***********************************************************************************
+
+	Platinum Cartridge (プラチナカートリッジ) series
+	Japanese cart listing (by P code) (for use on multiple devices, including DDR) (P on box, P/PC on cart)
+
+	These are for use with 3 different units
+	1. e-Kara
+	2. Popira (and Popira 2?)
+	3. Konami DDR Family Mat
+
+	*P-1  Best Hit Volume 4 (1,2,3,5,6 in G series)
+	*P-2  TV Pop Junior Volume 2 (1,3,4,5,6,7 in G series)
+	*P-3  Enkamichi Best Volume 1
+	*P-4  Best Hit Volume 7
+
+	***********************************************************************************
+
+	Saiten Cartridge (採点カートリッジ) series
+	Japanese cart listing (by S code) (S-x on cartridge / box, SC in cart identifier code)
+
+	This is the 'Saiten Cartridge' (Scoring Cartridge) series with all titles ranking you on
+	your performance
+
+	S-1  *SC0001-KTY  Karaoke Ehon Vol.1 Hello Kitty
+	S-2  *SC0002-SAI  Saiten Cartridge Challenge Idol vol.1
+	S-3  *SC0003-SAI  Kids' Challenge Vol.1
+	S-4  *SC0004-SAI  Saiten Cartridge Enka no Tatsujin
+	S-5  *SC0005-SAI  Saiten Cartridge Nesshō vol. 1
+	S-6  *SC0006-SAI  Saiten Cartridge Nesshō vol. 2
+	S-7  *SC0007-DCS  Saiten Cartridge Detective Conan Vol.1
+	S-8  *SC0008-SAI  Saiten Cartridge Challenge Idol vol.2
+	S-9  *SC0009-SAI  Saiten Cartridge Nesshō vol. 3
+	S-10 *SC0010-HKW  Hikawa Kiyoshi no Karaoke Dōjō
+	S-11 *SC0011-PST  PostPet
+	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
+	S-13 *SC0013-SAI  Saiten Cartridge Nesshō vol. 4
+	S-14 *SC0014-SAI  Saiten Cartridge Challenge Idol vol.4
+	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Vol.2
+	S-16 *SC0016-SAI  Saiten Cartridge Nesshō vol. 5
+	S-17 *SC0017-SAI  Kids' Challenge Vol.2
+	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki)
+	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
+	S-20 *SC0020-SAI  Saiten Cartridge Challenge Idol vol.5
+	S-21 *SC0021-SAI  Saiten Cartridge Nesshō vol. 7
+	S-22 *SC0022-SAI  Saiten Cartridge Nesshō vol. 8
+
+	***********************************************************************************
+
+	Super Cartridge (スーパーカートリッジ) series
+	Japanese cart listing (by SP code)  * = dumped
+
+	A secondary 4-digit naming scheme SPxxxx (no extension) appears on a sticker on the cartridge PCB only
+
+	These are for use with 5 different units
+	1. e-Kara
+	2. Popira (Yellow)
+	3. Popira 2 (Blue/Green) ( https://www.youtube.com/watch?v=iY1I-jfXw7U )
+	4. Taiko de Popira
+	5. Jumping Popira (Stepping Mat type thing) ( https://www.youtube.com/watch?v=yJruMOBdLFY )
+
+	If you plug this into a DDR Family Mat you get the message (in Japanese)
+
+	 "please play this cartridge on e-kara series, popira, popira 2, taiko de popira or jumping popira"
+
+	*SP-01  'Super Cartridge' SP-01 Best Hit
+	*SP-02  'Super Cartridge' SP-02 Best Hit
+	*SP-03  'Super Cartridge' SP-03 TV Pop Junior
+	*SP-04  'Super Cartridge' SP-04 Best Hit
+	*SP-05  'Super Cartridge' SP-05 TV Pop Junior
+	*SP-06  'Super Cartridge' SP-06 TV Pop Junior
+	 SP-07  'Super Cartridge' SP-07 Best Hit
+
+	***********************************************************************************
+
+	These are bundled/pack-in cartridges or ones that don't appear to be part of any
+	other series.
+
+	Some pack-in carts were just part of the regular line-ups instead, eg S-1 with the
+	Hello Kitty units, those are in their respective lists.
+
+
+	The numbering for the ones here is a little unusual
+
+	Both KR-1 and PR-06 cart have 'AC0009' on the PCB (along with a PR0006 sticker)
+
+	*KR-1      Kirarin Revolution (comes in kira kara Starter Set bundled with Kirarin Revolution microphone) (inside cart is marked AC0009-KIR)
+	*BX01-MOR  Morning Musume Special (sticker inside cart is marked CS019-004A)
+	*PR-01 MNG  (c)2002   Morning Musume - I'm Here! (single song 'not for sale' cartridge)
+	 PR-02 AYY  (c)2003   Aya Matsuura - Prairies Man (single song 'not for sale' cartridge)
+	*PR-06     Misora Hibari (inside cart is marked AC0009)
+
+	maybe PR03 to PR05 also exist?
+
+	***********************************************************************************
+
+	Japanese cart listing (by JP  code)  * = dumped
+
+	A secondary 4-digit naming scheme JPxxxx (no extension) appears on a sticker on the cartridge PCB only
+
+	These are for use with Jumping Popira ONLY (form factor is the same as e-Kara cartridges as Jumping
+	Popira also works with certain e-kara carts such as the SP series)
+
+	*JP-01  'Jumping Popira' JP-1
+	*JP-02  'Jumping Popira' JP-2
+
+
+	************************************************************************************************************************************************************
+	 Everything below is not standard e-kara / XaviX based hardware, listed for reference
+	************************************************************************************************************************************************************
+
+	Japanese e-Kara Kids devices (by KH/KE code)
+
+	These are audio-only devices, not XaviX based and do not connect to a TV.  They are still e-Kara branded but have
+	nothing in common hardware-wise.  This information has been left here for reference only.
+
+	The base units are as follows, they appear to contain an MCU rather than a ROM
+
+	KH-01  Standard
+	KH-02  Mini-Moni
+
+	The cartridges are as follows, as with the base unit they appear to contain an MCU rather than ROM
+
+	KE-01  Dōyō 1 (どうよう 1)
+	KE-02  Television 1 (テレビ 1)
+	KE-03 - ??
+	KE-04 - ??
+	KE-05 - Ultraman
+	KE-06 - This is a mini-piano keyboard that plugs into where the cartridge would usually plug
+
+	***********************************************************************************
+
+	-->
+
+	<!-- Japanese e-kara cartridges EC series -->
+
+	<software name="ec0001">
+		<description>J-Pop Mix Volume 1 (Japan) (EC0001-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0001-jpm.u1" size="0x100000" crc="f8f314dc" sha1="743b33c835def29dcf129a26ab4636d1eec177be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0002">
+		<description>J-Pop Mix Volume 2 (Japan) (EC0002-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0002-jpm.u1" size="0x100000" crc="15283b18" sha1="3248957019f8732bf32685906eb3aa1b997390f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0003">
+		<description>J-Pop Mix Volume 3 (Japan) (EC0003-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0003-jpm.u1" size="0x100000" crc="bb6a6edf" sha1="48b0a04865f8aa2b34022e29d37f44a9468a315c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0004">
+		<description>J-Pop Mix Volume 4 (Japan) (EC0004-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0004-jpm.u1" size="0x100000" crc="9fb5af56" sha1="499ed9795f6e9854b362c7196bcc13cb8f06fabf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0005">
+		<description>J-Pop Mix Volume 5 (Japan) (EC0005-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0005-jpm.u1" size="0x100000" crc="023b36b9" sha1="5066a9a7a0004fbd048a7b42645e42d6133b9dc2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0006">
+		<description>Enkamichi Volume 1 (Japan) (EC0006-ENK)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0006-enk.u1" size="0x100000" crc="294a0639" sha1="f1f58057a80257c9083093be146ed287ca1aee39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0007">
+		<description>20-seiki Gallery 1976-78 Volume 1 (Japan) (EC0007-G76)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1976～78 Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0007-g76.u1" size="0x100000" crc="c474f87c" sha1="1818ff5be084e6aca697cc8151a357b77947eb5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0008">
+		<description>20-seiki Gallery 1979-81 Volume 1 (Japan) (EC0008-G79)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1979～81 Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0008-g79.u1" size="0x100000" crc="0151f46b" sha1="942f9d5c1e54753d806fbadc508624ea41963b6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0009">
+		<description>AniSon Club Volume 1 (Japan) (EC0009-ANM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アニソンクラブ Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0009-anm.u1" size="0x100000" crc="1dbbd209" sha1="b8ca02ed1a36aa9caa067db95377cda107b1046b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0010">
+		<description>Kids' Song Volume 1 (Japan) (EC0010-KID)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0010-kid.u1" size="0x100000" crc="3cc17df6" sha1="50e5916850ac20921a6a7aa98f4fff126943b7b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0011">
+		<description>J-Pop Mix Volume 6 (Japan) (EC0011-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0011-jpm.u1" size="0x100000" crc="5d0ca1e7" sha1="0c1bf33b3a436da2c19bd7171ab1a234a623987c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0012">
+		<description>J-Pop Mix Volume 7 (Japan) (EC0012-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0012-jpm.u1" size="0x100000" crc="6df0e8f5" sha1="122744fc5b17348a00778b08855626b8b1c2f9e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0013">
+		<description>J-Pop Mix Volume 8 (Japan) (EC0013-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0013-jpm.u1" size="0x100000" crc="75d0d784" sha1="a7d2f937a5f4cc5894a90992a32cf2dbce50dadf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0014">
+		<description>Artist Selection Volume 1 (Southern All Stars, Kuwata Keisuke) (Japan) (EC0014-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0014-ats.u1" size="0x100000" crc="71aba436" sha1="520a9d5ac99c3b9d1d6286946f994065ef33e1cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0015">
+		<description>Artist Selection Volume 2 (Shīna Ringo, Tomosaka Rie) (Japan) (EC0015-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0015-ats.u1" size="0x100000" crc="3ae1c656" sha1="53e1e8b8b742ef6c5c9c76c7830949ee6fcb6631"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0016">
+		<description>Enkamichi Volume 2 (Japan) (EC0016-ENK)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.2" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0016-enk.u1" size="0x100000" crc="1bac5cc7" sha1="d80e266d079ea2e8a5acb8c1ed97a94c5d31e6ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0017">
+		<description>20-seiki Gallery 1973-75 Volume 1 (Japan) (EC0017-G73)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1973～75 Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0017-g73.u1" size="0x100000" crc="7f4efd49" sha1="32403cf65f4ae372da64cef25e03ddd66cdffa25"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0018">
+		<description>20-seiki Gallery 1982-84 Volume 1 (Japan) (EC0018-G82)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1982～84 Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0018-g82.u1" size="0x100000" crc="04327372" sha1="a0fe161aa9b9b6715e2386c15f01f35fdfba76a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0019">
+		<description>Best Scene Volume 1 - Wedding-hen (Japan) (EC0019-BSC)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストシーン Vol.1 ウェディング編" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0019-bsc.u1" size="0x100000" crc="c7de4c19" sha1="2cfc8c8b684f7b5ddac384840665fae97b8d9829"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0020">
+		<description>Kids' Song Volume 2 (Japan) (EC0020-KID)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング Vol.2" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0020-kid.u1" size="0x100000" crc="ed3e5c2c" sha1="c9ca415b50a7b87d8bf54beb3c9f794bd928e489"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0021">
+		<description>J-Pop Mix Volume 9 (Japan) (EC0021-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0021-jpm.u1" size="0x100000" crc="cb299d6a" sha1="662bb45b5ddcb4aab17ace1f16b7021dc09d5960"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0022">
+		<description>J-Pop Mix Volume 10 (Japan) (EC0022-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0022-jpm.u1" size="0x100000" crc="6dfb1b9c" sha1="1554df7fa710e398fbe69951bf187e0260bc71d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0023">
+		<description>J-Pop Mix Volume 11 (Japan) (EC0023-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0023-jpm.u1" size="0x100000" crc="7d5f623b" sha1="fe33d2c72bc7b5327362d4566c9621ac5f70b9d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0024">
+		<description>J-Pop Mix Volume 12 (Japan) (EC0024-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0024-jpm.u1" size="0x100000" crc="7ec21709" sha1="17c603655ac74b2b45a7c23776b6139fc6d013dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0025">
+		<description>J-Pop Mix Volume 13 (Japan) (EC0025-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0025-jpm.u1" size="0x100000" crc="c95830e0" sha1="263bdddaaa3016a2e71feaf5f3017c3d7d6e857e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0026">
+		<description>J-Pop Mix Volume 14 (Japan) (EC0026-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0026-jpm.u1" size="0x100000" crc="bae82f82" sha1="cb2d61796d79bc82866c8f0f711c567887df608a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0027">
+		<description>J-Pop Mix Volume 15 (Japan) (EC0027-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0027-jpm.u1" size="0x100000" crc="d72b685c" sha1="519da4b496e4c90d04f48043eb537c3644e8d0d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0028">
+		<description>J-Pop Mix Volume 16 (Japan) (EC0028-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0028-jpm.u1" size="0x100000" crc="f671ce7e" sha1="d901d6196d7864f5e512fbb6d539ec0580417385"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0029">
+		<description>Artist Selection Volume 3 (Dreams Come True) (Japan) (EC0029-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.3 (Dreams Come True)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0029-ats.u1" size="0x100000" crc="cb9b1ab0" sha1="70f1c40e58aac1dcd6777c90063c2ae8d0cbb895"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0030">
+		<description>Enkamichi Volume 3 (Japan) (EC0030-ENK)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.3" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0030-enk.u1" size="0x100000" crc="28556ca2" sha1="bf5b14208e339369e2d719441e673bf2c6534978"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0031">
+		<description>Artist Selection Volume 4 (Ishihara Yūjirō) (Japan) (EC0031-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.4 (石原裕次郎 他)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0031-ats.u1" size="0x100000" crc="0e4f6c31" sha1="3f42e80fde8c5d5cf6321b0fe1547ad2d1936e5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0032">
+		<description>AniSon Club Volume 2 (Japan) (EC0032-ANM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アニソンクラブ Vol.2" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0032-anm.u1" size="0x100000" crc="6b46c0f8" sha1="c5d8cc10d89e5057b476d792509cabe333b0f497"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0033">
+		<description>J-Pop Mix Volume 17 (Japan) (EC0033-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0033-jpm.u1" size="0x100000" crc="f68736f0" sha1="36ec70646542a4c4bc5e69372d19b5365b2b7dbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0034">
+		<description>Kids' Song Volume 3 (Japan) (EC0034-KID)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング Vol.3" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0034-kid.u1" size="0x100000" crc="80fb5241" sha1="5619605ae7099e955fff69466a0a2f0b2ce3049a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0035">
+		<description>Artist Selection Volume 5 (Matsuda Seiko) (Japan) (EC0035-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.5 (松田 聖子)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0035-ats.u1" size="0x100000" crc="54a09158" sha1="0570d09e761a3d15cdb8910540c535780c20c833"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0036">
+		<description>Artist Selection Volume 6 (KinKi Kids) (Japan) (EC0036-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.6 (KinKi Kids)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0036-ats.u1" size="0x100000" crc="c8a7117d" sha1="a3b4a48816119c898acbf5078c906692f2fc68c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0037">
+		<description>Enkamichi Volume 4 (Japan) (EC0037-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.4" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0037-enk.u1" size="0x100000" crc="3c61036c" sha1="b09096a58f361f70041b35c29a02b768ef1758d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0038">
+		<description>Best Scene Volume 2 - Sotsugyō/Hagemashi-hen (Japan) (EC0038-BSC)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストシーン Vol.2 卒業・励まし編" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0038-bsc.u1" size="0x100000" crc="34817291" sha1="a6069419bf3fd143fb247ba625c41b42000cda27"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0039">
+		<description>Artist Selection Volume 7 (B'z) (Japan) (EC0039-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.7 (B'z)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0039-ats.u1" size="0x100000" crc="aa50b08a" sha1="91a97c0591e137e50b20f052b402ce52b70a16eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0040">
+		<description>J-Pop Mix Volume 18 (Japan) (EC0040-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0040-jpm.u1" size="0x100000" crc="e2cb7232" sha1="c9c1f7d316f0c239c659632296695081e50b85e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0041">
+		<description>Artist Selection Volume 8 (Hamasaki Ayumi) (Japan) (EC0041-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.8 (浜崎 あゆみ)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0041-ats.u1" size="0x100000" crc="a784e312" sha1="86e15ebfe7ff8c5e5f15065b735c8422ddc15f42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0042">
+		<description>J-Pop Mix Volume 19 (Japan) (EC0042-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0042-jpm.u1" size="0x100000" crc="4082d883" sha1="66c517f72cef5fceffe94cc4ed1b5d7c0f16b151"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0043">
+		<description>Enkamichi Volume 5 (Japan) (EC0043-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.5" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0043-enk.u1" size="0x100000" crc="c730037d" sha1="c283b99fe4ae51adc3e13a6fae4eaffb891ec20d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0044">
+		<description>Artist Selection Volume 9 (Every Little Thing) (Japan) (EC0044-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.7 (Every Little Thing)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0044-ats.u1" size="0x100000" crc="5ed25544" sha1="2cb30b442d97813af32530c6f61d7fcc7653f533"/>
+				<!-- this has 0x0b at address 0x00007 in an otherwise list of ascending values, above dump has 0x0f and looks more correct
+				     both dumps have been verified multiple times, so this appears to be a case of bitrot in the cartridge the dump below was taken from -->
+				<!--<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985"/>-->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0045">
+		<description>Artist Selection Volume 10 (Mr. Children) (Japan) (EC0045-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.10 (Mr.Children)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0045-ats.u1" size="0x100000" crc="d1f4ba12" sha1="385a341a9e92881ae362294bd61cb66bf05e2b08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0046">
+		<description>J-Pop Mix Volume 20 (Japan) (EC0046-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0046-jpm.u1" size="0x100000" crc="becc678f" sha1="30c6700b43dd691ff633fa469e6a34472481af59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0047">
+		<description>Duet Song Volume 1 (Japan) (EC0047-DUE)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="デュエットソング Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0047-due.u1" size="0x100000" crc="3438b438" sha1="f75fbfc54e4843908e3307de3d2a03658ec74db7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0048">
+		<description>Enkamichi Volume 6 (Japan) (EC0048-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.6" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0048-enk.u1" size="0x100000" crc="32ad1da7" sha1="7033988a6652fffca840348c68d5d54e5e28f225"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0049">
+		<description>Artist Selection Volume 11 (Judy and Mary) (Japan) (EC0049-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.11 (JUDY AND MARY)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0049-ats.u1" size="0x100000" crc="110a1cde" sha1="339901556bcb54e3d09b5291038746687bfaed14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0050">
+		<description>Artist Selection Volume 12 (The Beatles) (Japan) (EC0050-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.12 (THE BEATLES)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ec0050-ats.u1" size="0x200000" crc="56ce5d3a" sha1="c499bae5faa00e0987b89185d0e2ec142054773a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0051">
+		<description>J-Pop Mix Volume 21 (Japan) (EC0051-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0051-jpm.u1" size="0x100000" crc="812b00a6" sha1="4329469ff7e7ad5598ae676386c4ecd98a58f811"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0052">
+		<description>Enkamichi Volume 7 (Japan) (EC0052-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.7" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0052-enk.u1" size="0x100000" crc="120662ff" sha1="292d15f49f6bf450662f343e805fd49c484a04ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0053">
+		<description>J-Pop Mix Volume 22 (Japan) (EC0053-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0053-jpm.u1" size="0x100000" crc="6f799665" sha1="bf029d5c10efb8b76bff7dda0806bf943d0fff01"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0054">
+		<description>J-Pop Mix Volume 23 (Japan) (EC0054-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0054-jpm.u1" size="0x100000" crc="3dcf6eb2" sha1="f235126a900544bb44397ebe9e0fd963927d6cdb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0055">
+		<description>Artist Selection Volume 13 (TUBE) (Japan) (EC0055-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.13 (ＴＵＢＥ)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0055-ats.u1" size="0x100000" crc="af6b0f2a" sha1="719bd1bc88517e4e067e99416547afe9ca1ff93f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0056">
+		<description>J-Pop Mix Volume 24 (Japan) (EC0056-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0056-jpm.u1" size="0x100000" crc="8c0b175b" sha1="697d7eb50a84001ddb66f50a50c682c63c21ed60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0057">
+		<description>Artist Selection Volume 14 (SMAP) (Japan) (EC0057-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.14 (ＳＭＡＰ)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0057-ats.u1" size="0x100000" crc="15345511" sha1="7e5197a8f7a0ec0160d7f5214428b153f35619f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0058">
+		<description>Enkamichi Volume 8 (Japan) (EC0058-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.8" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0058-enk.u1" size="0x100000" crc="99ff438f" sha1="87e1175f6a9372226112384c2b7f12f17a4e7994"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0059">
+		<description>J-Pop Mix Volume 25 (Japan) (EC0059-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0059-jpm.u1" size="0x100000" crc="e72ab46f" sha1="ef1fc7fba2beae7549edce697b12dd3b48dd1103"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0060">
+		<description>J-Pop Mix Volume 26 (Japan) (EC0060-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0060-jpm.u1" size="0x100000" crc="04a0b834" sha1="916bac4b58210a0cbd8c9d76c39c802b6d68be32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0061">
+		<description>J-Pop Mix Volume 27 (Japan) (EC0061-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0061-jpm.u1" size="0x100000" crc="562d2549" sha1="7a6de3b4802e0f4249e1c1f82fd7d9f10cee96c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0062">
+		<description>J-Pop Mix Volume 28 (Japan) (EC0062-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0062-jpm.u1" size="0x100000" crc="b3ea4218" sha1="4b186085ca5767f0c5dc3e67b4a316a3023a44bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0063">
+		<description>J-Pop Mix Volume 29 (Japan) (EC0063-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0063-jpm.u1" size="0x100000" crc="b3761268" sha1="c7488771ff83793c4a189bd31f6ecd8235463779"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0064">
+		<description>Enkamichi Volume 9 (Japan) (EC0064-ENK)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道 Vol.9" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0064-enk.u1" size="0x100000" crc="ec2fefb3" sha1="1a56f251d32ff3eb5a20c70ac040c6e0f7d9307d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0065">
+		<description>J-Pop Mix Volume 30 (Japan) (EC0065-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0065-jpm.u1" size="0x100000" crc="fbf39688" sha1="fdf955de31bdb5bea078c0ae1305b67076093749"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0066">
+		<description>J-Pop Mix Volume 31 (Japan) (EC0066-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0066-jpm.u1" size="0x100000" crc="aa7b1374" sha1="07b61dc24273c41088c2a15e07f112fd7917d0bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0067">
+		<description>J-Pop Mix Volume 32 (Japan) (EC0067-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0067-jpm.u1" size="0x100000" crc="972cd1f3" sha1="0972800c5b64259e0a5953547c6c825ad68b0d83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0068">
+		<description>J-Pop Mix Volume 33 (Japan) (EC0068-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0068-jpm.u1" size="0x100000" crc="71a49880" sha1="adbb182e1346e4a87765962f8587b1a465ff907b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- box art says 大ヒット演歌 五十曲入り -->
+	<software name="ec0069"> <!-- custom presentation -->
+		<description>Enka Taizen (Japan) (EC0069-ETZ)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ec0069-etz.u1" size="0x200000" crc="849ebd23" sha1="752c500d3ff48f04b985fef04219824d1d746034"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0070">
+		<description>J-Pop Mix Volume 34 (Japan) (EC0070-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0070-jpm.u1" size="0x100000" crc="8ba16056" sha1="20df400ce69d78883d082526375736f42b67634f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0071">
+		<description>J-Pop Mix Volume 35 (Japan) (EC0071-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0071-jpm.u1" size="0x100000" crc="5d62c9d6" sha1="c50efa872833016612fc69a3ef8ae6068d27a9d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0072">
+		<description>J-Pop Mix Volume 36 (Japan) (EC0072-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0072-jpm.u1" size="0x100000" crc="e49a1e4b" sha1="43f2677610dc3bbd8f21430f48ce290eaf7ff8bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0073">
+		<description>Mood Kayō Collection Volume 1 (Japan) (EC0073-MKC)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ムード歌謡コレクション Vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0073-mkc.u1" size="0x100000" crc="e1ffa625" sha1="ee1bcd579a10085c4c094037e25345c17c063c7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0074">
+		<description>J-Pop Mix Volume 37 (Japan) (EC0074-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0074-jpm.u1" size="0x100000" crc="12aa9070" sha1="2b645d1cbc5716cd1f58a9d2f820a5b50b0d9448"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0075">
+		<description>J-Pop Mix Volume 38 (Japan) (EC0075-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0075-jpm.u1" size="0x100000" crc="cbb8e615" sha1="5fbbfbf4278ce7e289d859e389808b155bb16e4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0076">
+		<description>J-Pop Mix Volume 39 (Japan) (EC0076-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0076-jpm.u1" size="0x100000" crc="ccdc18d1" sha1="bf0ee7b17ed258495a2805d2608e960f64d5ec5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0077">
+		<description>Artist Selection Volume 15 (Kuwata Keisuke, Southern All Stars) (Japan) (EC0077-ATS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.15 (桑田佳祐 他)" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0077-ats.u1" size="0x100000" crc="368b0daf" sha1="8274a06ca2e3dbcd5176ac1b916be4a5a0df12ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0078">
+		<description>J-Pop Mix Volume 40 (Japan) (EC0078-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0078-jpm.u1" size="0x100000" crc="a76c022f" sha1="983fb1a78f457edcac9c7eb0226bb1b629ec27a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- box art says 大ヒット演歌 五十曲入り -->
+	<software name="ec0079"> <!-- custom presentation -->
+		<description>Enka Taizen Dai Ni-hen (Japan) (EC0079-ETZ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全 第二篇" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ec0079-etz.u1" size="0x200000" crc="c03b5411" sha1="a88156aec4e0f024461f129c955a953647f51554"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0080">
+		<description>J-Pop Mix Volume 41 (Japan) (EC0080-JPM)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0080-jpm.u1" size="0x100000" crc="6fc0b669" sha1="a712b5c25551b99b0c4a3650f71380087b5a54a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0081">
+		<description>J-Pop Mix Vol.42 (Japan) (EC0081-JPM)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0081-jpm.u1" size="0x100000" crc="6266252d" sha1="1533f2f76725e45122b719b8482899ab71e25d38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0082"> <!-- custom presentation -->
+		<description>Matthew's Best Hit Selection (Japan) (EC0082-MBH)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0082-mbh.u1" size="0x100000" crc="3998e478" sha1="29dad31dfd79c57b2ccec0caac81b3489946b798"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0083">
+		<description>J-Pop Mix Vol.43 (Japan) (EC0083-JPM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0083-jpm.u1" size="0x100000" crc="b8eb7a8f" sha1="e6d169860938b92947dc54718dbfd4225a930248"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0084"> <!-- custom presentation -->
+		<description>Kids' Song Best 40 (Japan) (EC0084-KSB)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングベスト40" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ec0084-ksb.u1" size="0x200000" crc="dab58ce4" sha1="e427df85cc1a06a055fcb4e1aa28cc083b558e69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- box art says 大ヒット演歌 五十曲入り -->
+	<software name="ec0085"> <!-- custom presentation -->
+		<description>Enka Taizen Dai San-hen (Japan) (EC0085-ETZ)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全 第三篇" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ec0085-etz.u1" size="0x200000" crc="6c81fd34" sha1="a8d6a8edea4c7ea6f6d265c87f210170c6bef54f"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="a1">
+		<description>A-1 Mermaid Melody Pichi Pichi Pitch vol.1 (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.1" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekaraa1.bin" size="0x200000" crc="5f69a977" sha1="33e7b453e1e78ac5e4a20c81c00f5c0c1260c6b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a2">
+		<description>A-2 Mermaid Melody Pichi Pichi Pitch vol.2 (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.2" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekara_a2.bin" size="0x200000" crc="b6fef794" sha1="be006eacd157f9c2d896730d66f1cd746ad7b9b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a3">
+		<description>A-3 Mermaid Melody Pichi Pichi Pitch vol.3 (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.3" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekara_a3.bin" size="0x200000" crc="19b79adf" sha1="31f82e8bf66f1b03df9d64061af628df3466c5ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a4">
+		<description>A-4 Pichi Pichi Pitch Pure Dai 1-shō (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第1章" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekaraa4.bin" size="0x200000" crc="03dcc45a" sha1="ae884128c09b4fc7521f0010bbe9624419a3d0b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a5">
+		<description>A-5 Pichi Pichi Pitch Karaoke Party (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ カラオケパーティー" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraa5.bin" size="0x100000" crc="6cec888a" sha1="5cb4abefb4a5aaec8827bf2d6abc2dfda8099136"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a6">
+		<description>A-6 Pichi Pichi Pitch Pure Dai 2-shō (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第2章" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekaraa6.bin" size="0x200000" crc="1a554414" sha1="cf8e5dcca9ac2b757482113f98dd8a75b3bc20a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a7">
+		<description>A-7 Pichi Pichi Pitch Pure Dai 3-shō (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第3章" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekaraa7.bin" size="0x200000" crc="5b59900e" sha1="fdb8148211f00d0119b9ad082bf8fd348d509800"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a8" >
+		<description>A-8 Pichi Pichi Pitch Karaoke Party 2 (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ カラオケパーティー2" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraa8.bin" size="0x100000" crc="252ce01f" sha1="2b4c06f7a636d4b8179bf25cb08f6e07b6366bb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+	<software name="bh01">
+		<description>BH-01 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-01" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh01.bin" size="0x100000" crc="32641f80" sha1="6798e46448f92a9d4ef85390bd970d4c63fb7ba0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh02">
+		<description>BH-02 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-02" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh02.bin" size="0x100000" crc="05ada4d7" sha1="abee397597f04f89b80bca69fa2daa4e2af7056b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh03">
+		<description>BH-03 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-03" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh03.bin" size="0x100000" crc="d17cafd4" sha1="b74fd0f77a726547d4001d4177a5ccd2ea35536a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh04">
+		<description>BH-04 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-04" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh04.bin" size="0x100000" crc="d97cd9c9" sha1="f1a9d5a1c71ed8b2f3b64f4a980ae64de4bc1f48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh05">
+		<description>BH-05 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-05" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh05.bin" size="0x100000" crc="9713f0c1" sha1="1ccd666771dcaed304e69c7dee06ae11df4ab091"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh06">
+		<description>BH-06 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-06" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh06.bin" size="0x100000" crc="6e264ecb" sha1="6c3e4253565242c0c6dcdab7698f5b1e28544b2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh07">
+		<description>BH-07 Best Hit Collection (Japan)</description>
+		<year>2005</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットコレクション BH-07" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bh07.bin" size="0x100000" crc="59818e9b" sha1="14df9777575bf1232d4cbb17111362fa3aab5e3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<!-- The first two releases will show Dream Cartridge Volume 1 or 2 (series details) when used with Popira, rather than the cartridge title -->
+	<software name="dc0001">
+		<description>Dream Cartridge: Best Hit Vol.8 (Japan) (DC0001-BHT)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.8"/> <!-- from cover art -->
+		<info name="alt_title" value="ドリームカートリッジvol.1"/> <!-- shown on-screen when run on Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0001-bht.u1" size="0x100000" crc="bd0c4044" sha1="496f9270c0285480ad513c2628260a5ed629dfd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0002">
+		<description>Dream Cartridge: Best Artist Vol.6 (Morning Musume, 7AIR, SALT5, 11WATER, mini-moni, Gotō Maki, Matsuura Aya) (Japan) (DC0002-BAT)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストアーティスト Vol.6"/> <!-- from cover art -->
+		<info name="alt_title" value="ドリームカートリッジvol.2"/> <!-- shown on-screen when run on Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0002-bat.u1" size="0x100000" crc="bb4e13a7" sha1="f9d3a669de1b7ad3080eb428575905ee2170458c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The remaining releases show the cartridge name -->
+	<software name="dc0003">
+		<description>Dream Cartridge: Best Hit Vol.9 (Japan) (DC0003-BHT)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.9"/> <!-- from cover art -->
+		<info name="alt_title" value="ベストヒットvol.9"/> <!-- shown on-screen when run on Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0003-bht.u1" size="0x100000" crc="fd15d60f" sha1="c017d3fa1e10ad13cc130b92bd149a347d5c996c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0004">
+		<description>Dream Cartridge: TV Pop Junior Vol.8 (Japan) (DC0004-TPJ)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0004-tpj.u1" size="0x100000" crc="32589091" sha1="eea46b9579c0dd8f9a0a6a6fc99013a3c3a924c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0005">
+		<description>Dream Cartridge: TV Pop Junior Vol.9 (Japan) (DC0005-TPJ)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア Vol.9"/> <!-- from cover art -->
+		<info name="alt_title" value="TV POPジュニアvol.9"/> <!-- shown on-screen when run on Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0005-tpj.u1" size="0x100000" crc="515c125f" sha1="a7c7bf758b1afecb8fb55eb5766343325c1acc89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0006">
+		<description>Dream Cartridge: Best Hit Vol.10 (Japan) (DC0006-BHT)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.10"/> <!-- NOT VERIFIED: from cover art -->
+		<info name="alt_title" value="ベストヒットvol.10"/> <!-- NOT VERIFIED: shown on-screen when run on Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0006-bht.u1" size="0x100000" crc="62368c46" sha1="fdedb4b81c3b1642eb3a8993cdcf58dbc29f9a03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0008">
+		<description>Dream Cartridge: Best Artist Vol.7 (Japan) (DC0008-BAT)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストアーティスト Vol.7"/> <!-- NOT VERIFIED: from cover art -->
+		<info name="alt_title" value="ドリームカートリッジvol.7"/> <!-- NOT VERIFIED: shown on-screen when run on Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0008-bat.u1" size="0x100000" crc="b97472a5" sha1="681990c795094cf83b200c947ed34624d1fc90b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dc0009">
+		<description>Dream Cartridge: TV Pop Junior Vol.10 (Japan) (DC0009-TPJ)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア"/> <!-- from cover art -->
+		<info name="alt_title" value="TV POPジュニアvol.10"/> <!-- shown on-screen when run on Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0009-tpj.u1" size="0x100000" crc="c99f7b5c" sha1="4eeccbafe6396ab3732308a0d4e8b117f4a8f9b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="en1">
+		<description>Enka-shū Dai Ichi-hen (Japan) (EN-1)</description> <!-- TODO: correct translation -->
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第一篇" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-1.u1" size="0x100000" crc="7f9f61f3" sha1="f6efdcc7d00c181864009662a0e8671296c174b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="en2">
+		<description>Enka-shū Dai Ni-hen (Japan) (EN-2)</description> <!-- TODO: correct translation -->
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第二篇" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-2.u1" size="0x100000" crc="be342a04" sha1="db355d3b9372fbfc0831133482d96110aa377915"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="en3">
+		<description>Enka-shū Dai San-hen (Japan) (EN-3)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第三篇" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-3.u1" size="0x100000" crc="e3686ff4" sha1="e7e9a53a778739c406b2b226300d2f525cd9676b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="en4">
+		<description>Enka-shū Dai Yon-hen (Japan) (EN-4)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第四篇" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-4.u1" size="0x100000" crc="4e9e00fd" sha1="4cc2b6e39a4ceb1c1753463dd6d559331d75848f"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="gc0001">
+		<description>Best Artist Volume 1 (Morning Musume, Petit Moni, Tanpopo) (Japan) (GC0001-BAT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0001-bat.u1" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0002">
+		<description>Best Hit Volume 1 (Japan) (GC0002-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0003">
+		<description>Best Artist Volume 2 (Utada Hikaru) (Japan) (GC0003-BAT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.2 (宇多田ヒカル)"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0003-bat.u1" size="0x100000" crc="49536d5a" sha1="c112b6ac62f586fc1d1615406362fc659e587772"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0004">
+		<description>Best Hit Volume 2 (Japan) (GC0004-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.2"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0004-bht.u1" size="0x100000" crc="6d2e9711" sha1="0478578c297f14d78a6612ecd61387129bd6df42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0005">
+		<description>TV Pop Junior Volume 1 (Japan) (GC0005-TPJ)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアVol.1"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0005-tpj.u1" size="0x100000" crc="b1fda1a4" sha1="a135226aa400c5a78060b08d5f64eb6a06c990e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0006">
+		<description>Best Hit Volume 3 (Japan) (GC0006-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.3"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0006-bht.u1" size="0x100000" crc="76bbefae" sha1="a2a41f58b5750fafa92d6e3094562dd05a5d9029"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0007">
+		<description>Best Artist Volume 3 (Morning Musume, San-nin Matsuri, 7-nin Matsuri, 10-nin Matsuri) (Japan) (GC0007-BAT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.3 (モーニング娘。他)"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0007-bat.u1" size="0x100000" crc="27b49bdb" sha1="2b64d978fc5df5869bc3c27d16642727e2d38999"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0008">
+		<description>mini-moni (Japan) (GC0008-MIN) (set 1)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ミニモニ。"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="gc0008-min.u1" size="0x200000" crc="8414c402" sha1="340c432eec8eb2108b8364b5936dd22dc34b51a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0008a" cloneof="gc0008">
+		<description>mini-moni (Japan) (GC0008-MIN) (set 2)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ミニモニ。"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="gc0008-min(alt).u1" size="0x200000" crc="b34d1721" sha1="3621f02423f55c43d1b16855c01189719ddbcb6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0009">
+		<description>TV Pop Junior Volume 3 (Japan) (GC0009-TPJ)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアVol.3"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0009-tpj.u1" size="0x100000" crc="aed34640" sha1="2a55eb5e518ca18a5fd66d4e43269954015bb238"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes from Sean
+
+	    G10 has a 24LC02, but no 74HC125, and pin 2 isn't connected.
+
+	    G10 is very odd; the SEEPROM's SDA is tied high with a 4.7K resistor and connected to pin 4 through a 220 ohm resistor.
+	    Pin 4 on the other carts I've looked at is VCC, also connected to pins 21 and 35, but on this one, it isn't.
+	    Likewise, SCL is tied low with a 47K resistor and connected to pin 32, which on all the other carts is connected to pins 1 and 44, which are ground.
+
+	    e-Kara units, Popira, Taiko de Popira and DDR all of them have pin 4 of the cart connector going to VCC and pin 32 going to ground.  So none of them can communicate with the SEEPROM in G10
+
+	    Popira 2 however can make use of these pins -->
+
+	<software name="gc0010">
+		<description>Best Artist Volume 4 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki) (Japan) (GC0010-BAT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.4 (モーニング娘。他)"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02_gc0010"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0011">
+		<description>TV Pop Junior Volume 4 (Japan) (GC0011-TPJ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアVol.4"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02_gc0010"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0011-tpj.u1" size="0x100000" crc="4ca23131" sha1="297cea5f456c90820adc97cf0f8a40b058edb0b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0012">
+		<description>Best Hit Volume 5 (Japan) (GC0012-BHT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.5"/> <!-- shown as "ベストヒットvol.5" on-screen with Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0012-bht.u1" size="0x100000" crc="e68d10ee" sha1="7d91e83420dc8af6f2fad6d5080e491c7ea2e001"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0013">
+		<description>Best Hit Volume 6 (Japan) (GC0013-BHT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.6"/> <!-- shown as "ベストヒットvol.6" on-screen with Popira -->
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0013-bht.u1" size="0x100000" crc="0bc2b917" sha1="fb43650f57e6e90abcb60c15b4a8794649571232"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0014">
+		<description>mini-moni Volume 2 (GC0014-MIN)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ミニモニ。 Vol.2"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="gc0014-min.u1" size="0x200000" crc="309e0337" sha1="ac68ad33fd15d7c2cc507efc645a04a2e6d08d49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- G15 looks like G16- 74HC125 and 24LC02. -->
+	<software name="gc0015">
+		<description>Best Artist Volume 5 (Morning Musume, Petit Moni, Tanpopo) (Japan) (GC0015-BAT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.5 (モーニング娘。他)"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0015-bat.u1" size="0x100000" crc="a839b745" sha1="a02bd29383baf1f92b3573aaa6343cc309a6f589"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0016">
+		<description>TV Pop Junior Volume 5 (Japan) (GC0016-TPJ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.5"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0016-tpj.u1" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0017">
+		<description>TV Pop Junior Volume 6 (Japan) (GC0017-TPJ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.6"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0017-tpj.u1" size="0x100000" crc="2c7d00a2" sha1="5976b9f3a95afb3b23f1d1d996de0b7aa41ee25c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0018">
+		<description>TV Pop Junior Volume 7 (Japan) (GC0018-TPJ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.7"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>   <!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0018-tpj.u1" size="0x100000" crc="5e7fee64" sha1="14ebc6e47808f30de4724ec720c49223c2c6f22d"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="gk1">
+		<description>GK-1 - Detective Conan (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 名探偵コナン" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="gk1.bin" size="0x200000" crc="775608cd" sha1="8b53fd4e8ced709df2716c839abfd7e41cc719d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gk2">
+		<description>GK-2 - Disney Princess: Princess Debut (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ディズニープリンセス プリンセス デビュー" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="gk2.u1" size="0x200000" crc="d4413f35" sha1="ef9999422adfea77c7ca4abd4f2f21e75d66be77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gk3">
+		<description>GK-3 - Tinkerbell to Tinkle Star Uranai (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ディンカー・ベルとティンクルスターうらない" /> <!-- from box art -->
+		<info name="alt_title" value="ディンカー・ベル ティンクルスターうらない" /> <!-- from title screen -->
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="gk3.u1" size="0x200000" crc="5877877b" sha1="c789b96ffcb3c303d552b236e01fd5fb587df7d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="kd1"> <!-- KD0001 sticker inside cart -->
+		<description>Kids' Song 20 (Japan) (KD-1)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kd-1.u1" size="0x100000" crc="f351f615" sha1="791ecb6d951669e7c41f1a08a20173fa5c51f901"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kd2">
+		<description>Kids' Song 20 (Japan) (KD-2)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kd-2.u1" size="0x100000" crc="620b9b22" sha1="c820e3fa28212cf9f530380b9b6f9c8cfdc7c476"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kd3">
+		<description>Kids' Song 20 (Japan) (KD-3)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kd3.bin" size="0x100000" crc="00231fe7" sha1="c593a734d0453989f885e6de289e2c3f3064627d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="mc0001">
+		<description>Artist Mini Volume 1 (Matsuura Aya) (Japan) (MC0001-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0001-atm.u1" size="0x080000" crc="3ef59e82" sha1="d10f0b4a174bef736fea538028eacbeb46af5bbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0002">
+		<description>Artist Mini Volume 2 (PIKA☆NCHI, A・RA・SHI／他) (Japan) (MC0002-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0002-atm.u1" size="0x080000" crc="4070ad1d" sha1="d0fb82bd945034a279cb6401b1b93c16ba56575d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0003">
+		<description>Artist Mini Volume 3 (Morning Musume) (Japan) (MC0003-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.3 (モーニング娘)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0003-atm.u1" size="0x080000" crc="d9778b40" sha1="55c875d0925c031320ccf7affe721bd07ef6175b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0004">
+		<description>Artist Mini Volume 4 (w-inds) (Japan) (MC0004-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.4 (w-inds.)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0004-atm.u1" size="0x080000" crc="e9ba14c1" sha1="3cad1a6b0d1ba24dfb6c1aec84a6d87816b16d54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0005">
+		<description>Kids Song Mini Volume 1 (TV Song) (Japan) (MC0005-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングミニ mini vol.1 (TVソング)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0005-ksm.u1" size="0x080000" crc="a84c6d0d" sha1="dee82de4609ec93ed5152d01860e59d8693b9736"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0006">
+		<description>Kids Song Mini Volume 2 (TV Hero) (Japan) (MC0006-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングミニ mini vol.2 (TVヒーロー)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0006-ksm.u1" size="0x080000" crc="6d3c8c02" sha1="568a0e156a2189156149578277b6d615fe4e157f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0007">
+		<description>Artist Mini Volume 5 (SMAP, KinKi Kids, ARASHI, TOKIO) (Japan) (MC0007-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.5 (SMAP・KinKi Kids・嵐 他)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0007-atm.u1" size="0x080000" crc="a9a19914" sha1="556adfad645ae635901b690ee57173766a5e497a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0008">
+		<description>Kids Song Mini Volume 2 (Japan) (MC0008-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングミニ mini vol.3"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0008-ksm.u1" size="0x080000" crc="5238a3d4" sha1="8da36edcc6c28de31e955edca1cf893cc5d7fce3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0009">
+		<description>J-Pop Mix Mini Volume 1 (Japan) (MC0009-JPM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="J-POP MIXミニ mini vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0009-jpm.u1" size="0x080000" crc="794a82ae" sha1="f97cdf42bd62731363eee02dec6235b5c8a798d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0010">
+		<description>Artist Mini Volume 6 (Utada Hikaru) (Japan) (MC0010-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.6 (宇多田ヒカル)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0010-atm.u1" size="0x080000" crc="aae13f60" sha1="87ea122aebb467ebc4785482961160766db90fcd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0011">
+		<description>Kids Song Mini Volume 4 (Fantastic) (Japan) (MC0011-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0011-ksm.u1" size="0x080000" crc="b6c86e18" sha1="737e61c79f93e1ca0720fa3b569f6ef2d8a6d18c"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="mc0012">
+		<description>Artist Mini Volume 7 (Hamasaki Ayumi) (Japan) (MC0012-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.7 (浜崎あゆみ)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0012-atm.u1" size="0x080000" crc="f31d3de9" sha1="41e4de960b2f348a4bed3b9b6d51229878e8c8f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0013">
+		<description>Kids Song Mini Volume 5 (Japan) (MC0013-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングミニ mini vol.5"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0013-ksm.u1" size="0x080000" crc="db05eafa" sha1="b58efcc41ad8d5571c319e0d88fa8a3d9badbe93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0014">
+		<description>Artist Mini Volume 8 (BoA) (Japan) (MC0014-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.8 (BoA)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0014-atm.u1" size="0x080000" crc="170e02af" sha1="02b38146db7d74727f7dccf6dcc3d004979210a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0015">
+		<description>TV Pop Mini Vol.1 (Japan) (MC0015-TPM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPミニ mini vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0015-tpm.u1" size="0x080000" crc="c0e87576" sha1="c239c22499591b85bdb2737d22417489a02ffb44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0016">
+		<description>Artist Mini Volume 9 (Yamaguchi Momoe) (Japan) (MC0016-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.9 (山口百恵)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0016-atm.u1" size="0x080000" crc="937c07dd" sha1="6c3570394e781dec96e98d95db3a3c564abe35a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="pc0001">
+		<description>Best Hit Volume 4 (Japan) (PC0001-BHT)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.4"/>
+		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="pc0001-bht.u1" size="0x100000" crc="4fbc13a6" sha1="142191a6522c1aa9c7772de6dc1b5706816258de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc0002">
+		<description>TV Pop Junior Volume 2 (Japan) (PC0002-TPJ) (set 1)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.2"/>
+		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="pc0002-tpj.u1" size="0x100000" crc="2ce065ed" sha1="1c0ae8050f7093a53f74637f27063f720f19610c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc0002a" cloneof="pc0002">
+		<description>TV Pop Junior Volume 2 (Japan) (PC0002-TPJ) ('World Trade Center' image removed)</description> <!-- The song 'Run Run Run' features an image containing the twin towers in the original release, it is swapped for another here -->
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.2"/>
+		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="pc0002-tpj(alt).u1" size="0x100000" crc="f8c54474" sha1="4ae876d8deed068c710700499cba22b88bea3d17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc0003">
+		<description>Enkamichi Best Volume 1 (Japan) (PC0003-ENB)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="pc0003-enb.u1" size="0x100000" crc="2fa57d12" sha1="01954a20e190c3f9e1d16c4285c9ec39f601eb80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc0004">
+		<description>Best Hit Volume 7 (Japan) (PC0004-BHT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒットvol.7"/>
+		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- no incompatibility message with taikodp and jpopira, but still not compatible -->
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="pc0004-bht.u1" size="0x100000" crc="95e35899" sha1="a9bd2694f5ee4b964e8d73afc3e88c0eb18ca1d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="sc0001">
+		<description>Karaoke Ehon Vol.1 Hello Kitty (Japan) (SC0001-KTY)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="カラオケえほん Vol.1 ハローキティ"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="01.bin" size="0x100000" crc="0635e39f" sha1="bfe33b0de01e8618abfdd190abf752cee53a6403"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0002">
+		<description>Saiten Cartridge: Challenge Idol vol.1 (Japan) (SC0002-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0002-sai.u1" size="0x100000" crc="b6687799" sha1="a5350b06bf5a18e0fb84b03ac7257468c26a2019"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0003">
+		<description>Kids' Challenge Vol.1 (Japan) (SC0003-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ キッズチャレンジ Vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0003-sai.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0004">
+		<description>Saiten Cartridge: Enka no Tatsujin (Japan) (SC0004-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 演歌の達人"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0004-sai.u1" size="0x100000" crc="c2a080da" sha1="6eb803bc8587308002f7f8a15b1928c8f726c192"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0005">
+		<description>Saiten Cartridge: Nesshō vol. 1 (Japan) (SC0005-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 1"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0005-sai.u1" size="0x100000" crc="f919b155" sha1="60fc9985d277422d4d64fb4f0cebf2732e2958aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0006">
+		<description>Saiten Cartridge: Nesshō vol. 2 (Japan) (SC0006-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 2"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0006-sai.u1" size="0x100000" crc="4bd8669e" sha1="e77d16ecead2a6c660fedcbca3a1e0e719648be4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0007">
+		<description>Saiten Cartridge: Detective Conan Vol.1 (Japan) (SC0007-DCS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.1"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0007-dcs.u1" size="0x200000" crc="5b8cf5ee" sha1="b31e610110fda7c7b49e7318d3191967fcf49ed8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this crashes on the scoring screen, the same occurs on real hardware, ROM confirmed from 2 different cartridges, does a fixed version exist? -->
+	<software name="sc0008">
+		<description>Saiten Cartridge: Challenge Idol vol.2 (Japan) (SC0008-SAI) (broken master)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.2"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0008-sai.u1" size="0x100000" crc="5d887910" sha1="5e32cccd99ba7e19974c6a9462e13cb7f8543b2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0009">
+		<description>Saiten Cartridge: Nesshō vol. 3 (Japan) (SC0009-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 3"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0009-sai.u1" size="0x100000" crc="61413fd5" sha1="47dad178faa99301009ae74554a39b15c01e0db2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0010">
+		<description>Hikawa Kiyoshi no Karaoke Dōjō (Japan) (SC0010-HKW)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="氷川きよしのカラオケ道場"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0010-hkw.u1" size="0x200000" crc="fd6dc588" sha1="fece06706399eb36f3e69f7693116c944fe890e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0011">
+		<description>Saiten Cartridge: PostPet (Japan) (SC0011-PST)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ PostPet"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0011-pst.u1" size="0x100000" crc="6cc02f14" sha1="497702bd93bdf5fbdec6921e3dddf781bc23189c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0012">
+		<description>Saiten Cartridge: Challenge Idol vol.3 (Japan) (SC0012-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.3"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0012-sai.u1" size="0x100000" crc="8b971664" sha1="5f748d3406dbe74ce06c68aa07bafa9e288d5b51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0013">
+		<description>Saiten Cartridge Nesshō vol. 4 (Japan) (SC0013-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0013-sai.u1" size="0x100000" crc="b1971770" sha1="00e5840fbd60ed31add2bfb7d7a091db35505c59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0014">
+		<description>Saiten Cartridge: Challenge Idol vol.4 (Japan) (SC0014-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.4"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0014-sai.u1" size="0x100000" crc="1c07e017" sha1="257d878578fcbf14d7c951bbe68fd25bee3c8db0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0015">
+		<description>Saiten Cartridge: Detective Conan Vol.2 (Japan) (SC0015-DCS)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.2"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0015-dcs.u1" size="0x200000" crc="a1b31faa" sha1="e5508940c5e674a1e12ef2cc9a5d10365ac4fa64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0016">
+		<description>Saiten Cartridge: Nesshō Vol. 5 (Japan) (SC0016-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 Vol.5"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0016-sai.u1" size="0x100000" crc="20f06e17" sha1="0f8c4ae3c175364a84ac32ae5dea6b27cac17319"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0017">
+		<description>Kids' Challenge Vol.2 (Japan) (SC0017-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0017-sai.u1" size="0x100000" crc="f57ec5b1" sha1="b6cb926ff0467106acd5c1d83be11ae93a0c6b14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0018">
+		<description>Saiten Cartridge: Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki) (Japan) (SC0018-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアーティスト (モーニング娘。他)"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0018-sai.u1" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0019">
+		<description>Saiten Cartridge: Nesshō vol. 6 (Japan) (SC0019-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 6"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0020">
+		<description>Saiten Cartridge: Challenge Idol vol.5 (Japan) (SC0020-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.5"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0020-sai.u1" size="0x100000" crc="081cb211" sha1="daf08db6d342605a8efd797a43c859b9559d6f26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0021">
+		<description>Saiten Cartridge: Nesshō vol. 7 - Mrs Selection (Japan) (SC0021-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 7 ～ミセスセレクション～"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0021-sai.u1" size="0x100000" crc="fbc77e6c" sha1="eee3c8a68807dbac62c8021f9c755d08076925e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0022">
+		<description>Saiten Cartridge: Nesshō vol. 8 (Japan) (SC0022-SAI)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 8"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0022-sai.u1" size="0x100000" crc="d631d890" sha1="a0953aa347c9ec152e64bc455fc360056c5c0807"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="sp01">
+		<description>Super Cartridge: Best Hit (Japan) (SP-01)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp01.u1" size="0x200000" crc="af1e8755" sha1="4282635c1aac5a7e2f1edf1c21127d33e713fcbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp02">
+		<description>Super Cartridge: Best Hit (Japan) (SP-02)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp03">
+		<description>Super Cartridge: TV Pop Junior (Japan) (SP-03)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp04">
+		<description>Super Cartridge: Best Hit (Japan) (SP-04)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp05">
+		<description>Super Cartridge: TV Pop Junior (Japan) (SP-05)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp05.u1" size="0x200000" crc="f5ae63b2" sha1="d471ee862aa2ab790defb57873a10862531fd76b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp06">
+		<description>Super Cartridge: TV Pop Junior (Japan) (SP-06)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp06.u1" size="0x200000" crc="b4c4b62d" sha1="5808badf75ad7974bcfc904faf4b6b6d9a0f91f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="kr1">
+		<description>Kirarin Revolution KR-1 (Japan)</description>
+		<year>2007</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="きらりん☆レボリューション" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekara_ac0009-kir.bin" size="0x100000" crc="351c99c3" sha1="86c2d231d0d07f5e214e19f49dc1bda3aac42eb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pr01">
+		<description>PR-01 Morning Musume - I'm Here! (Not for Sale, Japan)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="pr-01mng.u1" size="0x80000" crc="cce85e77" sha1="1bb5863849e4728294c1a71830ec54d0190010d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pr06">
+		<description>PR-06 Misora Hibari (Japan)</description>
+		<year>2006</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="美空ひばり" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="PR-06.u1" size="0x100000" crc="a08a5e06" sha1="c0abd221733002ab120e44f01c59d478547fc0d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- these are also pack-in cartridges, but don't fit elsewhere -->
+
+	<!-- CS019-004A on a sticker inside the cartridge -->
+	<software name="bx01">
+		<description>Saiten Cartridge: Morning Musume Special (Japan) (BX01-MOR)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ モーニング娘。スペシャル" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="bx01-mor.u1" size="0x100000" crc="51a55097" sha1="44345f5ead30288cde83f023f7aabbecb2a53d63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gs1">
+		<description>Natsukashi no Meikyoku-shū (Japan)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="懐かしの名曲集" />
+		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gs0001-mei.u1" size="0x100000" crc="eebdbe1b" sha1="639f1ecf97404720e3feeeae00e100e546dffd60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<!-- Japanese e-kara web cartridges
+	     this was meant to be used with an e-kara web unit, USB cable and PC software, presumably to transfer songs offered on some online service
+	     e-karaweb.com no longer resolves to anything, these cartridges seem to be blank / unused so have no songs in them -->
+	<software name="ekaraweb28">
+		<description>e-kara Web cartridge 28M (blank) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="web.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ekaraweb12">
+		<description>e-kara Web cartridge 12M (blank) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb2.bin" size="0x100000" crc="9149a3a8" sha1="01277650706c1b168c5125b0ddcceacbd207be25"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     河内おとこ節              中村美律子      Kawachi Otokobushi          Nakamura Mitsuko
+	     珍島(チンド)物語          天童よしみ      Chindo Monogatari           Tendō Yoshimi
+	     こころ酒                  藤あや子        Kokoro Sake                 Fuji Ayako
+	     夜桜お七                  坂本冬美        Yozakura O-shichi           Sakamoto Fuyumi
+	     愛燦燦(あいさんさん)      美空ひばり      Ai Sansan                   Misora Hibari
+	     川の流れのように          美空ひばり      Kawa no Nagare no Yō ni     Misora Hibari
+	     真赤な太陽                美空ひばり      Makkana TaiYō               Misora Hibari -->
+	<software name="ekaraweb12a">
+		<description>e-kara Web cartridge 12M (used, with 7 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb3.bin" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     さくらんぼ                  大塚愛              Sakuranbo                                  Ōtsuka Ai
+	     花                          ORANGE RANGE        Hana                                       Orange Range
+	     ロコローション              ORANGE RANGE        Locolotion                                 Orange Range
+	     solitude～真実のサヨナラ～  KinKi Kids          Solitude - Shinjitsu no Sayonara           KinKi Kids
+	     薄荷キャンディー            KinKi Kids          Hakka Candy                                KinKi Kids
+	     ボクの背中には羽根がある    KinKi Kids          Boku no Senaka ni wa Hane ga Aru           KinKi Kids
+	     愛の温度℃                   ぴちぴちピッチ      Ai no Ondo °C                              Pichi Pichi Pitch
+	     世界で一番早く朝が来る場所  ぴちぴちピッチ      Sekai de Ichiban Hayaku Asa ga Kuru Basho  Pichi Pichi Pitch
+	     YUME日和                    島谷ひとみ          Yume Biyori                                Shimatani Hitomi
+	     LOVE LOVE LOVE              DREAMS COME TRUE    Love Love Love                             Dreams Come True
+	     キラリ☆セーラードリーム     小枝(さえ)          Kirari ☆ Sailor Dream                      Koeda (Sae)
+	     夏祭り                      Whiteberry          Natsu Matsuri                              Whiteberry -->
+	<software name="ekaraweb12b">
+		<description>e-kara Web cartridge 12M (used, with 12 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb4.bin" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<software name="jp01">
+		<description>JP-01 (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="JPOPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="jp1.bin" size="0x200000" crc="106544c5" sha1="1bff363ce13c0eaf344a8f36ed004c78e0ddd007" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jp02">
+		<description>JP-02 (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="JPOPIRA"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="jp2.bin" size="0x200000" crc="f66d8ee8" sha1="3624c89197b1579fc60d5c40ff30bca248428a6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<!-- US cartridges -->
+
+	<!-- e-kara US 5-Songs Starter (US-M001)
+	1. "Stronger"                  Britney Spears
+	2. "Bye Bye Bye"               *N Sync
+	3. "Independent Woman Part 1"  Destiny's Child
+	4. "I Want It That Way"        Backstreet Boys
+	5. "Yellow Submarine"          The Beatles
+	-->
+	<software name="us_strt">
+		<description>e-kara US 5-Songs Starter (US-M001)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="us-m001.u1" size="0x080000" crc="8c12c0c2" sha1="8cc1b098894af25a4bfccada884125b66f5fe8b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 1 (US-E001)
+	1.  "Oops!...I Did It Again"       Britney Spears
+	2.  "...Baby One More Time"        Britney Spears
+	3.  "Bye Bye Bye"                  *N Sync
+	4.  "It's Gonna Be Me"             *N Sync
+	5.  "Take On Me"                   a1
+	6.  "Aaron's Party (Come Get It)"  Aaron Carter
+	7.  "If Only"                      Hanson
+	8.  "He Loves U Not"               Dream
+	9.  "The First Night"              Monica
+	10. "I Need You"                   LeAnn Rimes
+	-->
+	<software name="us_vol1">
+		<description>e-kara US Volume 1 (US-E001)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e001.u1" size="0x100000" crc="29df4aea" sha1="b95835aaf8630b61b47e5da0968cd4a1dd3bc517"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 2 (US-E002)
+	1.  "Larger Than Life"          Backstreet Boys
+	2.  "I'll Be There For You"     Backstreet Boys
+	3.  "My Everything"             98 Degrees
+	4.  "Dizzy"                     98 Degrees
+	5.  "Independent Woman Part 1"  Destiny's Child
+	6.  "Waiting For Tonight"       Jennifer Lopez
+	7.  "Let Me Let Go"             Faith Hill
+	8.  "There's Your Trouble"      Dixie Chicks
+	9.  "5678"                      Steps
+	10. "Stomp"                     Steps
+	-->
+	<software name="us_vol2">
+		<description>e-kara US Volume 2 (US-E002)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e002.u1" size="0x100000" crc="6c66772e" sha1="e1e719df1e51caaafd9b3af187059334f7abbba3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 3 (US-E003)
+	1.  "Doesn't Really Matter (radio edit)"   Janet Jackson
+	2.  "Saving All My Love For You"           Whitney Houston
+	3.  "Water Runs Dry"                       Boys II Men
+	4.  "I Want It That Way"                   Backstreet Boys
+	5.  "Back To Your Heart"                   Backstreet Boys
+	6.  "I Just Called To Say I Love You"      Stevie Wonder
+	7.  "We're All Alone"                      Boz Scaggs
+	8.  "Crazy For You"                        Madonna
+	9.  "True Colors"                          Cyndi Lauper
+	10. "Lovin' You"                           Minnie Riperton
+	-->
+	<software name="us_vol3">
+		<description>e-kara US Volume 3 (US-E003)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e003.u1" size="0x100000" crc="d90a7e58" sha1="37b899676935fb3dda266dc5614ef53cb2c33980"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 4 (US-E004)
+	1.  "Can't Buy Me Love"   The Beatles
+	2.  "A Hard Day's Night"  The Beatles
+	3.  "Ticket To Ride"      The Beatles
+	4.  "Yesterday"           The Beatles
+	5.  "Help"                The Beatles
+	6.  "Michelle"            The Beatles
+	7.  "Yellow Submarine"    The Beatles
+	8.  "All My Loving"       The Beatles
+	9.  "Drive My Car"        The Beatles
+	10. "We Can Work It Out"  The Beatles
+	-->
+	<software name="us_vol4">
+		<description>e-kara US Volume 4 (US-E004)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e004.u1" size="0x100000" crc="790822e9" sha1="cc5806fdc79f777a42980d6825c92837b07fd80d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 5 (US-E005)
+	1.  "Lucy In the Sky With Diamonds"  The Beatles
+	2.  "All You Need Is Love"           The Beatles
+	3.  "Hello Goodbye"                  The Beatles
+	4.  "Hey Jude"                       The Beatles
+	5.  "Ob-La-Di, Ob-La-Da"             The Beatles
+	6.  "Get Back"                       The Beatles
+	7.  "Come Together"                  The Beatles
+	8.  "Oh! Darling"                    The Beatles
+	9.  "Let It Be"                      The Beatles
+	10. "The Long And Winding Road"      The Beatles
+	-->
+	<software name="us_vol5">
+		<description>e-kara US Volume 5 (US-E005)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e005.u1" size="0x100000" crc="edf1e4ce" sha1="7e5e3116f62897ae023c84842036f24b19c926cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 6 (US-E006)
+	1.  "Survivor (Album Version)"             Destiny's Child
+	2.  "Jumpin', Jumpin'"                     Destiny's Child
+	3.  "I Turn To You"                        Christina Aguilera
+	4.  "As Long As You're Loving Me"          Vitamin C
+	5.  "Body II Body"                         Samantha Mumba
+	6.  "Love Don't Cost a Thing"              Jennifer Lopez
+	7.  "Again"                                Janet Jackson
+	8.  "If I Fall You're Going Down With Me"  Dixie Chicks
+	9.  "Can't Fight The Moonlight"            LeAnn Rimes
+	10. "American Pie (Album Version)"         Madonna
+	-->
+	<software name="us_vol6">
+		<description>e-kara US Volume 6 (US-E006)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e006.u1" size="0x100000" crc="e9aaca2f" sha1="983086f068ee38b970c01d2304e757148474aee3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 7 (US-E007)
+	1.  "Show Me The Meaning of Being Lonely"  Backstreet Boys
+	2.  "Lucky"                                Britney Spears
+	3.  "When It's Over"                       Sugar Ray
+	4.  "Bootylicious"                         Destiny's Child
+	5.  "Nobody Wants to be Lonely"            Ricky Martin & Christina Aguilera
+	6.  "Breathe"                              Faith Hill
+	7.  "It's Gonna Be Me"                     *N Sync
+	8.  "Don't Think I'm Not"                  Kandi
+	9.  "Lady Marmalade"                       Christina Aguilera, Lik'Kim, Mya & Pink
+	10. "God Bless The U.S.A."                 Lee Greenwood
+	-->
+	<software name="us_vol7">
+		<description>e-kara US Volume 7 (US-E007)</description>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e007.u1" size="0x100000" crc="b7f5ca53" sha1="84af6d96512de96dbab03c236b3416b2e604f753"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 8 'No Boys Allowed' (US-E008)
+	1.  "I'm A Slave 4 U"           Britney Spears
+	2.  "Stronger"                  Britney Spears
+	3.  "Oops!...I Did It Again"    Britney Spears
+	4.  "Breathe"                   Faith Hill
+	5.  "Thank You"                 Dido
+	6.  "He Loves U Not"            Dream
+	7.  "Believe"                   Cher
+	8.  "Case Of The Ex"            Mya
+	9.  "Crush"                     Jennifer Paige
+	10. "Back and Forth"            Aaliyah
+	-->
+	<software name="us_vol8">
+		<description>e-kara US Volume 8 'No Boys Allowed' (US-E008)</description>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e008.u1" size="0x100000" crc="5cddaf1f" sha1="345ae679974ae5ae9b506b32323ada234c01f984"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara US Volume 9 'No Boys Allowed' (US-E009)
+	1.  "So In Love With Two"        Mikaila
+	2.  "Lady Marmalade"             Christina Aguilera, Lik'Kim, Mya & Pink
+	3.  "Genie In A Bottle"          Christina Aguilera
+	4.  "Bootylicious"               Destiny's Child
+	5.  "Can't Fight The Moonlight"  LeAnn Rimes
+	6.  "You Can't Hurry Love"       Dixie Chicks
+	7.  "Hot Stuff"                  Donna Summer
+	8.  "Crazy For You"              Madonna
+	9.  "Someone To Call My Lover"   Janet Jackson
+	10.  "All For You"               Janet Jackson
+	-->
+	<software name="us_vol9">
+		<description>e-kara US Volume 9 'No Boys Allowed' (US-E009)</description>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e009.u1" size="0x100000" crc="0d9c402b" sha1="95652eb71dab74fbf05f8450f2a9b664b455deeb"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- ********************************************************************************************************************************************************************** -->
+
+
+	<!-- UK / Europe cartridges - these have 'UK' part codes, but multiple languages on the case (except for Vol4/5) suggesting they were used for the whole of Europe -->
+
+	<!-- e-kara UK / Europe Volume 1 (UK-E001)
+	1.  "Oops!...I Did It Again"       Britney Spears
+	2.  "Thank You"                    Dido
+	3.  "Bootylicious"                 Destiny's Child
+	4.  "I Need You"                   LeAnn Rimes
+	5.  "Love Don't Cost a Thing"      Jennifer Lopez
+	6.  "Don't Think I'm Not"          Kandi
+	7.  "Again"                        Janet Jackson
+	8.  "Hot Stuff"                    Donna Summer
+	9.  "Nobody Wants to be Lonely"    Ricky Martin & Christina Aguilera
+	10. "I Want It That Way"           Backstreet Boys
+	-->
+	<software name="uk_vol1">
+		<description>e-kara UK / Europe Volume 1 (UK-E001)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e001.u1" size="0x100000" crc="fc0ea770" sha1="47e2ef544cbb35431dd138b74d1f9b7290eba02d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 2 (UK-E002)
+	1.  "Independent Woman Part 1"             Destiny's Child
+	2.  "Lucky"                                Britney Spears
+	3.  "Back and Forth"                       Aaliyah
+	4.  "Thank You"                            Dido
+	5.  "Crush"                                Jennifer Paige
+	6.  "Stomp"                                Steps
+	7.  "All For You"                          Janet Jackson
+	8.  "Saving All My Love For You"           Whitney Houston
+	9.  "Take On Me"                           a1
+	10. "Show Me The Meaning of Being Lonely"  Backstreet Boys
+	-->
+	<software name="uk_vol2">
+		<description>e-kara UK / Europe Volume 2 (UK-E002)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e002.u1" size="0x100000" crc="ab011ea3" sha1="dd5c9cc330956861b0d172c5a07a72eb315009a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 3 (UK-E003)
+	1.  "Stronger"                   Britney Spears
+	2.  "I Turn To You"              Christina Aguilera
+	3.  "Survivor (Album Version)"   Destiny's Child
+	4.  "He Loves U Not"             Dream
+	5.  "5,6,7,8"                    Steps
+	6.  "Can't Fight The Moonlight"  LeAnn Rimes
+	7.  "Body II Body"               Samantha Mumba
+	8.  "Believe"                    Cher
+	9.  "Larger Than Life"           Backstreet Boys
+	10. "Bye Bye Bye"                *N Sync
+	-->
+	<software name="uk_vol3">
+		<description>e-kara UK / Europe Volume 3 (UK-E003)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e003.u1" size="0x100000" crc="ee16321c" sha1="cc6d22e164164dc678c75a65e13397fb29024b14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 4 (UK-E004)
+	1.  "Can't Buy Me Love"   The Beatles
+	2.  "A Hard Day's Night"  The Beatles
+	3.  "Ticket To Ride"      The Beatles
+	4.  "Yesterday"           The Beatles
+	5.  "Help"                The Beatles
+	6.  "Michelle"            The Beatles
+	7.  "Yellow Submarine"    The Beatles
+	8.  "All My Loving"       The Beatles
+	9.  "Drive My Car"        The Beatles
+	10. "We Can Work It Out"  The Beatles
+	-->
+	<software name="uk_vol4">
+		<description>e-kara UK / Europe Volume 4 (UK-E004)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e004.bin" size="0x100000" crc="d3739137" sha1="e3c404bc916cac4acccc46b8345defd9495431fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 5 (UK-E005)
+	1.  "Lucy In the Sky With Diamonds"  The Beatles
+	2.  "All You Need Is Love"           The Beatles
+	3.  "Hello Goodbye"                  The Beatles
+	4.  "Hey Jude"                       The Beatles
+	5.  "Ob-La-Di, Ob-La-Da"             The Beatles
+	6.  "Get Back"                       The Beatles
+	7.  "Come Together"                  The Beatles
+	8.  "Oh! Darling"                    The Beatles
+	9.  "Let It Be"                      The Beatles
+	10. "The Long And Winding Road"      The Beatles
+	-->
+	<software name="uk_vol5">
+		<description>e-kara UK / Europe Volume 5 (UK-E005)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e005.bin" size="0x100000" crc="e8e2c9cd" sha1="d1bdcfe88bb28012e52e51dc1b39c20284d30b26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 6 (UK-E006)
+	1.  "Genie In A Bottle"             Christina Aguilera
+	2.  "Oops!... I Did it Again"       Britney Spears
+	3.  "Jumpin', Jumpin'"              Destiny's Child
+	4.  "Case Of The Ex"                Mya
+	5.  "The First Night"               Monica
+	6.  "Someone To Call My Lover"      Janet Jackson
+	7.  "American Pie (Album Version)"  Madonna
+	8.  "Lovin' You"                    Minnie Riperton
+	9.  "Let Me Let Go"                 Faith Hill
+	10. "Back To Your Heart"            Backstreet Boys
+	-->
+	<software name="uk_vol6">
+		<description>e-kara UK / Europe Volume 6 (UK-E006)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e006.u1" size="0x100000" crc="fad51dc4" sha1="522adfab98c2634bfaa9a01e3b7aebba2f867c1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	1.  "I'm A Slave 4 U"                    Britney Spears
+	2.  "It's Gonna Be Me"                   *N Sync
+	3.  "Doesn't Really Matter (radio edit)" Janet Jackson
+	4.  "Love Don't Cost a Thing"            Jennifer Lopez
+	5.  "I'll Be There For You"              Backstreet Boys
+	6.  "I Just Called To Say I Love You"    Stevie Wonder
+	7.  "Crazy For You"                      Madonna
+	8.  "True Colors"                        Cyndi Lauper
+	9.  "When It's Over"                     Sugar Ray
+	10. "Breathe"                            Faith Hill
+	-->
+	<software name="uk_vol7">
+		<description>e-kara UK / Europe Volume 7 (UK-E007)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e007.u1" size="0x100000" crc="753ce591" sha1="e12ac98470f1dbc470f2e3d957f1b72f0a90bee1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Note, same lineup as US Starter, but with 2002 copyright, different background picture on 'Stronger'
+	     this has a 'GER' code, which suggests there might be ones for other regions where the ROM will need checking
+	1. "Stronger"                  Britney Spears
+	2. "Bye Bye Bye"               *N Sync
+	3. "Independent Woman Part 1"  Destiny's Child
+	4. "I Want It That Way"        Backstreet Boys
+	5. "Yellow Submarine"          The Beatles
+	-->
+	<software name="ger_strt">
+		<description>e-kara Germany 5-Songs Starter (GER-M001)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="ger-m001.u1" size="0x080000" crc="ff2881f3" sha1="3470fc1ed81da5e2c929205fcd290da82d031c4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the Spanish carts do not have a part number on the cartridge, PCB or box -->
+
+	<!--
+	1.  "Cuéntame Al Oído"               La Oreja De Van Gogh
+	2.  "La Última Noche"                Luis Miguel
+	3.  "Corazón Latino"                 David Bisbal
+	4.  "Además De Ti"                   David Bustamante
+	5.  "Quiero"                         Raúl
+	6.  "No Rompas Mi Corazón"           Coyote Daxx
+	7.  "Atrévete"                       Chenoa
+	8.  "Europe's Living A Celebration"  Rosa
+	9.  "María"                          Ricky Martin
+	10. "Sin Miedo A Nada"               Alex Ubago
+	-->
+	<software name="spainvol1">
+		<description>e-kara Spain 10-Songs Volume 1</description>
+		<year>2002</year>
+		<publisher>Takara / newgent</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="spainvol1.bin" size="0x100000" crc="b90366cc" sha1="f6bab71fc8cb420728ffa721d7c12767719099e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	1.  "Héroe"               Enrique Iglesias
+	2.  "Vida"                Gisela
+	3.  "Suerte"              Shakira
+	4.  "Torero"              Chayanne
+	5.  "Dile Que La Quiero"  David Civera
+	6.  "Soledad"             La Oreja De Van Gogh
+	7.  "Aserejé"             Las Ketchup
+	8.  "Sueño Su Boca"       Raul
+	9.  "La Apuesta"          Rosa
+	10  "Ave María"           David Bisbal
+	-->
+	<software name="spainvol2">
+		<description>e-kara Spain 10-Songs Volume 2</description>
+		<year>2002</year>
+		<publisher>Takara / newgent</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

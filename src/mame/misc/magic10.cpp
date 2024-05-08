@@ -1621,8 +1621,9 @@ ROM_END
   1x 8 DIP switches bank
 
   Notes:
-  PCB is marked: "COMP01" and "ALL.01A" on component side
-  PCB is labelled: "GRAN SAFARI ORIGINALE NEW IMPEUROPEX CORP. COPYRIGHT 1996 No. 9603125" and "SUPER GRAN SAFARI SPC46" on component side
+  PCB is marked: "COMP01" and "ALL.01A" on component side.
+  PCB is labelled: "GRAN SAFARI ORIGINALE NEW IMPEUROPEX CORP. COPYRIGHT 1996 No. 9603125" and "SUPER GRAN SAFARI SPC46" on component side.
+  The game was developed by Nova Desitec.
 
   STATUS:
 

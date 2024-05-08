@@ -9,7 +9,7 @@
     Known games that run on this hardware:
     ======================================
     Game                   | Year | Chip        | Ref      |Protected
-    -----------------------+------+-------------+----------+--------------------------------------------------
+    -----------------------+------+-------------+----------+--------------------------------------------------------------
     Alligator Hunt         | 1994 | GAE1 449    | 940411   | DS5002FP (unprotected version available)
     Alligator Hunt (proto) | 1994 | GAE1 CS438  |          | DS5002FP
     World Rally 2          | 1995 | GAE1 449    | 950510   | DS5002FP
@@ -19,13 +19,14 @@
     Maniac Square          | 1996 | GAE1 501    | 940411   | DS5002FP (unprotected version available)
     Maniac Square          | 1996 | CG-1V 427   | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
     Snow Board             | 1996 | CG-1V 366   | 960419/1 | Lattice IspLSI 1016-80LJ
-    Cardioline Cycle       | 1997 | GAE1 501    | 970410   | IO board ST62T15C6 MCU (not really protection)
-    Cardioline Stepper     | 1997 | CG-1V 288   | 970410   | IO board ST62T15B6 MCU (not really protection)
+    Cardioline Cycle       | 1997 | GAE1 501    | 970410   | I/O board ST62T15C6 MCU (not really protection)
+    Cardioline Stepper     | 1997 | CG-1V 288   | 970410   | I/O board ST62T15B6 MCU (not really protection)
+    Jungle's Animals       | 1997 | CG-1V-366   |          | DS5002FP (by New Impeuropex Corp., developer by Nova Desitec)
     Bang!                  | 1998 | CG-1V 388   | 980921/1 | No
     Super Roller           | 1998 | CG-1V-218   |          | DS5002FP (by Nova Desitec)
     Champion Pool          | 1999 | CG-1V-138   | 0005487  | DS5002FP (by Nova Desitec)
     Play 2000              | 1999 | CG-1V-149   | 990315   | DS5002FP (by Nova Desitec)
-    -----------------------+------+-------------+----------+--------------------------------------------------
+    -----------------------+------+-------------+----------+--------------------------------------------------------------
 
     Notes:
     touchgo:
@@ -981,6 +982,28 @@ ROM_START( chmppool )
 	ROM_LOAD( "nd3.u51", 0x0200000, 0x020000, CRC(926ca7d5) SHA1(9129f4738a46b829f73b50f53641e60acb1ce2ba) )
 	ROM_LOAD( "nd6.u48", 0x0400000, 0x020000, CRC(a5c25b87) SHA1(593418f15d593206f8fe3dde35571496aae71500) )
 	ROM_LOAD( "nd4.u50", 0x0600000, 0x020000, CRC(d4f349cc) SHA1(c786c4142942f19f62bd3cf4f45e68d8a44aab38) )
+
+	ROM_REGION( 0x21b, "pals", 0 )
+	ROM_LOAD( "palce16v8h.u16", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.u17", 0x117, 0x104, NO_DUMP )
+ROM_END
+
+// Sequel of "Super Gran Safari", also developed by Nova Desitec for New Impeuropex Corp.
+ROM_START( jungleani )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2.u44", 0x000001, 0x010000, CRC(23c700d6) SHA1(14ee6b525b6410b784540a9c5ae647affcb7320a) )
+	ROM_LOAD16_BYTE( "1.u45", 0x000000, 0x010000, CRC(37596388) SHA1(f5367ea3b47a603e55d23e0346f67de3c866abea) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 )
+	ROM_LOAD( "jungleani.ds5002fp", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0a00000, "gfx1", ROMREGION_ERASE00 ) // GFX + Sound
+	ROM_LOAD( "5.u49", 0x0000000, 0x040000, CRC(50ed5f50) SHA1(4dbfb6fb6a1737bd625f929a8da23e16e11269a7) )
+	ROM_LOAD( "3.u51", 0x0200000, 0x020000, CRC(d19613d8) SHA1(e07614cc5c81ea3da45b2807aa0954d785e53ed3) )
+	ROM_LOAD( "6.u48", 0x0400000, 0x020000, CRC(0c10fca9) SHA1(c730491862362d954c9c82e0ddcf8937ccfff10a) )
+	ROM_LOAD( "4.u50", 0x0600000, 0x020000, CRC(61878c1f) SHA1(05e135c3b530841ca9786e73fffd3b16d85a64ab) )
 
 	ROM_REGION( 0x21b, "pals", 0 )
 	ROM_LOAD( "palce16v8h.u16", 0x000, 0x117, NO_DUMP )
@@ -2742,15 +2765,18 @@ GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, gaelco2_state, i
 GAME( 1998, bang,        0,         bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
-// 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
-// these are Italian versions, English versions also exist
+// Hardware manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
+
+// 2-in-1 gambling game, these are Italian versions, English versions also exist
 GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  0 )
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_NOT_WORKING ) // bad dump
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
 GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
-GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Champion Pool (v1.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
+GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Champion Pool (v1.0)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
+
+GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "New Impeuropex Corp. / New Chitarrina", "Jungle's Animals (v3.0)", MACHINE_NOT_WORKING ) // Developed by Nova Desitec, missing ds5002fp dump
 
 // Gym equipment
 GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state, init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", 0 ) // Same board and ROM as Pro Reclimber
