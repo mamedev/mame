@@ -30,25 +30,29 @@
 //#define REAL_PCI_CHIPSET
 
 #include "emu.h"
+
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/hdd.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
-#include "machine/at.h"
-#include "machine/ram.h"
 #include "machine/8042kbdc.h"
-#include "machine/nvram.h"
-#include "machine/ins8250.h"
-#include "machine/microtch.h"
+#include "machine/at.h"
 #include "machine/bankdev.h"
-#include "machine/intelfsh.h"
-#include "machine/ds128x.h"
 #include "machine/ds1205.h"
+#include "machine/ds128x.h"
+#include "machine/ins8250.h"
+#include "machine/intelfsh.h"
+#include "machine/microtch.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
 #ifdef REAL_PCI_CHIPSET
 #include "machine/sis85c496.h"
 #endif
 #include "sound/ad1848.h"
+
 #include "speaker.h"
+
+#include "mtouchxl.lh"
 
 
 namespace {
@@ -287,6 +291,8 @@ void mtxl_state::at486(machine_config &config)
 	// FIXME: This MCFG fragment does not compile. -R
 	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
+
+	config.set_default_layout(layout_mtouchxl);
 }
 
 void mtxl_state::at486hd(machine_config &config)
@@ -346,6 +352,8 @@ void mtxl_state::at486hd(machine_config &config)
 	// FIXME: This MCFG fragment does not compile. -R
 	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
+
+	config.set_default_layout(layout_mtouchxl);
 }
 
 #ifdef REAL_PCI_CHIPSET

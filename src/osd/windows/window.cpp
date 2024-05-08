@@ -464,7 +464,7 @@ void windows_osd_interface::process_events(bool ingame, bool nodispatch)
 
 			// dispatch if necessary
 			if (dispatch)
-				winwindow_dispatch_message(machine(), &message);
+				winwindow_dispatch_message(machine(), message);
 		}
 	}
 	while (ui_temp_pause > 0);
@@ -480,12 +480,12 @@ void windows_osd_interface::process_events(bool ingame, bool nodispatch)
 //  (main thread)
 //============================================================
 
-void winwindow_dispatch_message(running_machine &machine, MSG *message)
+void winwindow_dispatch_message(running_machine &machine, MSG const &message)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// dispatch our special communication messages
-	switch (message->message)
+	switch (message.message)
 	{
 		// special case for quit
 		case WM_QUIT:
@@ -494,8 +494,8 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 
 		// everything else dispatches normally
 		default:
-			TranslateMessage(message);
-			DispatchMessage(message);
+			TranslateMessage(&message);
+			DispatchMessage(&message);
 			break;
 	}
 }
@@ -2293,17 +2293,17 @@ std::vector<win_window_info::win_pointer_info>::iterator win_window_info::find_m
 
 bool winwindow_qt_filter(void *message)
 {
-	MSG *msg = (MSG *)message;
+	MSG *const msg = reinterpret_cast<MSG *>(message);
 
-	if(is_mame_window(msg->hwnd) || (!msg->hwnd && (msg->message >= WM_USER)))
+	if (is_mame_window(msg->hwnd) || (!msg->hwnd && (msg->message >= WM_USER)))
 	{
 		LONG_PTR ptr;
-		if(msg->hwnd) // get the machine associated with this window
+		if (msg->hwnd) // get the machine associated with this window
 			ptr = GetWindowLongPtr(msg->hwnd, GWLP_USERDATA);
 		else // any one will have to do
 			ptr = (LONG_PTR)osd_common_t::window_list().front().get();
 
-		winwindow_dispatch_message(((win_window_info *)ptr)->machine(), msg);
+		winwindow_dispatch_message(reinterpret_cast<win_window_info *>(ptr)->machine(), *msg);
 		return true;
 	}
 	return false;
