@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
+// copyright-holders: Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
+
 /*************************************************************************
 
     Double Dragon & Double Dragon II (but also China Gate)
@@ -47,8 +48,8 @@ public:
 
 	void ddragon(machine_config &config);
 	void ddragon6809(machine_config &config);
-	void ddragonb(machine_config &config);
-	void ddragonba(machine_config &config);
+	void ddragonbl(machine_config &config);
+	void ddragonbla(machine_config &config);
 	void ddragon2(machine_config &config);
 
 	void init_ddragon2();
@@ -70,16 +71,23 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	// memory pointers
 	optional_memory_bank m_mainbank;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	optional_shared_ptr<uint8_t> m_comram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrollx_lo;
+	required_shared_ptr<uint8_t> m_scrolly_lo;
 
-	/* video-related */
+	// video-related
 	tilemap_t      *m_fg_tilemap = nullptr;
 	tilemap_t      *m_bg_tilemap = nullptr;
 	uint8_t        m_technos_video_hw = 0;
 	uint8_t        m_scrollx_hi = 0;
 	uint8_t        m_scrolly_hi = 0;
 
-	/* misc */
+	// misc
 	uint8_t        m_ddragon_sub_port = 0;
 	uint8_t        m_sprite_irq = 0;
 	uint8_t        m_adpcm_sound_irq = 0;
@@ -88,8 +96,8 @@ protected:
 	bool           m_adpcm_idle[2]{};
 	int            m_adpcm_data[2]{};
 
-	void ddragon_bgvideoram_w(offs_t offset, uint8_t data);
-	void ddragon_fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(background_scan);
 
@@ -98,55 +106,45 @@ protected:
 
 	int scanline_to_vcount(int scanline);
 
-	uint32_t screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ddragon_base_map(address_map &map);
+	void base_map(address_map &map);
 
 private:
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_bgvideoram;
-	required_shared_ptr<uint8_t> m_fgvideoram;
-	optional_shared_ptr<uint8_t> m_comram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_scrollx_lo;
-	required_shared_ptr<uint8_t> m_scrolly_lo;
-
-	/* devices */
+	// devices
 	optional_device_array<msm5205_device, 2> m_adpcm;
 
 	optional_region_ptr_array<uint8_t, 2> m_adpcm_rom;
 
-	void ddragon_interrupt_ack(offs_t offset, uint8_t data);
-	void dd_adpcm_int(int chip);
+	void interrupt_ack(offs_t offset, uint8_t data);
+	template <uint8_t Which> void ddragon_adpcm_int(int state);
 
-	/* video/ddragon.cpp */
+	// video/ddragon.cpp
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void ddragon_bankswitch_w(uint8_t data);
-	uint8_t ddragon_interrupt_r(offs_t offset);
-	void ddragon_interrupt_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	uint8_t interrupt_r(offs_t offset);
+	void interrupt_w(offs_t offset, uint8_t data);
 	void ddragon2_sub_irq_ack_w(uint8_t data);
 	void ddragon2_sub_irq_w(uint8_t data);
 	void sub_port6_w(uint8_t data);
-	uint8_t ddragon_comram_r(offs_t offset);
-	void ddragon_comram_w(offs_t offset, uint8_t data);
-	void dd_adpcm_w(offs_t offset, uint8_t data);
-	uint8_t dd_adpcm_status_r();
-	void ddragonba_port_w(uint8_t data);
-	void dd_adpcm_int_1(int state);
-	void dd_adpcm_int_2(int state);
+	uint8_t comram_r(offs_t offset);
+	void comram_w(offs_t offset, uint8_t data);
+	void ddragon_adpcm_w(offs_t offset, uint8_t data);
+	uint8_t ddragon_adpcm_status_r();
+	void ddragonbla_port_w(uint8_t data);
 
-	void dd2_map(address_map &map);
-	void dd2_sound_map(address_map &map);
-	void dd2_sub_map(address_map &map);
-	void ddragon_map(address_map &map);
-	void ddragonba_sub_map(address_map &map);
-	void sound_map(address_map &map);
+	void ddragon2_main_map(address_map &map);
+	void ddragon2_sound_map(address_map &map);
+	void ddragon2_sub_map(address_map &map);
+	void ddragon_main_map(address_map &map);
+	void ddragonbla_sub_map(address_map &map);
+	void ddragon_sound_map(address_map &map);
 	void ddragon6809_sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void ddragon_sub_map(address_map &map);
 	void sub_6309_map(address_map &map);
 	void sub_6809_map(address_map &map);
 };
@@ -158,7 +156,7 @@ public:
 	darktowr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddragon_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
-		, m_darktowr_bank(*this, "darktowr_bank")
+		, m_bank(*this, "darktowr_bank")
 		, m_rambase(*this, "rambase")
 		, m_mcu_port_a_out(0xff)
 	{
@@ -169,16 +167,16 @@ public:
 	void init_darktowr();
 
 private:
-	uint8_t darktowr_mcu_bank_r(offs_t offset);
-	void darktowr_mcu_bank_w(offs_t offset, uint8_t data);
-	void darktowr_bankswitch_w(uint8_t data);
+	uint8_t mcu_bank_r(offs_t offset);
+	void mcu_bank_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
 	void mcu_port_a_w(offs_t offset, uint8_t data);
 
-	void darktowr_map(address_map &map);
-	void darktowr_banked_map(address_map &map);
+	void main_map(address_map &map);
+	void banked_map(address_map &map);
 
 	required_device<m68705p_device> m_mcu;
-	required_device<address_map_bank_device> m_darktowr_bank;
+	required_device<address_map_bank_device> m_bank;
 	required_shared_ptr<uint8_t> m_rambase;
 
 	uint8_t m_mcu_port_a_out = 0;
@@ -198,9 +196,9 @@ public:
 	void init_toffy();
 
 private:
-	void toffy_bankswitch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 
-	void toffy_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 #endif // MAME_TECHNOS_DDRAGON_H

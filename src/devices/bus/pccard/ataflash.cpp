@@ -3,8 +3,6 @@
 #include "emu.h"
 #include "ataflash.h"
 
-DEFINE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device, "ataflash", "ATA Flash PC Card")
-
 ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ata_flash_pccard_device(mconfig, ATA_FLASH_PCCARD, tag, owner, clock)
 {
@@ -16,15 +14,43 @@ ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, 
 {
 }
 
+void ata_flash_pccard_device::device_start()
+{
+	cf_device_base::device_start();
+
+	m_cd1_cb(0);
+	m_cd2_cb(0);
+}
+
 void ata_flash_pccard_device::device_reset()
 {
 	cf_device_base::device_reset();
 
-	if (m_image->exists())
-	{
-		m_image->get_cis_data(m_cis);
-	}
+	bool cis = m_image->exists() && !m_image->get_cis_data(m_cis);
 	m_cis.resize(512, 0xff);
+
+	if (!cis)
+	{
+		m_cis[0] = 0x01; // CISTPL_DEVICE
+		m_cis[1] = 0x04; // TPL_LINK
+		m_cis[2] = 0xdf; // 4:device type/1:WPS/3:device speed
+		m_cis[3] = 0x4a; // extended device speed (1:ext 4:mantissa 3:speed) (if speed==7)
+		m_cis[4] = 0x01; // device size byte (5:# of address units -1 3: size code)
+		m_cis[5] = 0xff; // end of device info field
+		m_cis[6] = 0x1a; // CISTPL_CONFIG
+		m_cis[7] = 0x05; // TPL_LINK
+		m_cis[8] = 0x01; // Size of Fields Byte (2:TPCC_RFSZ 4:TPCC_RMSZ 2:TPCC_RASZ)
+		m_cis[9] = 0x03; // TPCC_LAST (2:RFU 6:Last Index) (count of 0x1b?)
+		m_cis[10] = 0x00; // TPCC_RADR
+		m_cis[11] = 0x02; // TPCC_RADR 
+		m_cis[12] = 0x0f; // TPCC_RMSK
+		m_cis[13] = 0x21; // CISTPL_FUNCID
+		m_cis[14] = 0x02; // TPL_LINK
+		m_cis[15] = 0x04; // TPLFID_FUNCTION
+		m_cis[16] = 0x01; // TPLFID_SYSINIT
+		m_cis[17] = 0xff; // CISTPL_END
+		m_cis[18] = 0xff; // TPL_LINK
+	}
 
 	m_configuration_option = 0;
 	m_configuration_and_status = 0;
@@ -110,8 +136,12 @@ void ata_flash_pccard_device::write_reg(offs_t offset, uint16_t data, uint16_t m
 	}
 }
 
+void ata_flash_pccard_device::ide_build_identify_device()
+{
+	cf_device_base::ide_build_identify_device();
+	m_identify_buffer[0] = 0x848a;                     /*  0: configuration bits */
+}
 
-DEFINE_DEVICE_TYPE(TAITO_PCCARD1, taito_pccard1_device, "taito_pccard1", "Taito PC Card (Type 1)")
 
 taito_pccard1_device::taito_pccard1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_flash_pccard_device(mconfig, TAITO_PCCARD1, tag, owner, clock),
@@ -199,8 +229,6 @@ bool taito_pccard1_device::is_ready()
 {
 	return m_locked == 0;
 }
-
-DEFINE_DEVICE_TYPE(TAITO_PCCARD2, taito_pccard2_device, "taito_pccard2", "Taito PC Card (Type 2)")
 
 taito_pccard2_device::taito_pccard2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_flash_pccard_device(mconfig, TAITO_PCCARD2, tag, owner, clock),
@@ -297,7 +325,6 @@ bool taito_pccard2_device::is_ready()
 	return !m_locked;
 }
 
-DEFINE_DEVICE_TYPE(TAITO_COMPACT_FLASH, taito_compact_flash_device, "taito_cf", "Taito Compact Flash")
 
 taito_compact_flash_device::taito_compact_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_flash_pccard_device(mconfig, TAITO_COMPACT_FLASH, tag, owner, clock),
@@ -364,3 +391,8 @@ bool taito_compact_flash_device::is_ready()
 {
 	return !m_locked;
 }
+
+DEFINE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device, "ataflash", "ATA Flash PC Card")
+DEFINE_DEVICE_TYPE(TAITO_PCCARD1, taito_pccard1_device, "taito_pccard1", "Taito PC Card (Type 1)")
+DEFINE_DEVICE_TYPE(TAITO_PCCARD2, taito_pccard2_device, "taito_pccard2", "Taito PC Card (Type 2)")
+DEFINE_DEVICE_TYPE(TAITO_COMPACT_FLASH, taito_compact_flash_device, "taito_cf", "Taito Compact Flash")

@@ -6,9 +6,7 @@
 #pragma once
 
 #include "pccard.h"
-#include "atastorage.h"
-
-DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
+#include "machine/atastorage.h"
 
 class ata_flash_pccard_device : public cf_device_base, public device_pccard_interface
 {
@@ -24,10 +22,12 @@ protected:
 	ata_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	// ata_hle_device_base implementation
+	virtual void ide_build_identify_device() override;
 	virtual void set_irq_out(int state) override { }
 	virtual void set_dmarq_out(int state) override { }
 	virtual void set_dasp_out(int state) override { }
@@ -38,8 +38,6 @@ private:
 	uint8_t m_configuration_and_status;
 	uint8_t m_pin_replacement;
 };
-
-DECLARE_DEVICE_TYPE(TAITO_PCCARD1, taito_pccard1_device)
 
 class taito_pccard1_device : public ata_flash_pccard_device
 {
@@ -59,8 +57,6 @@ private:
 	std::vector<uint8_t> m_key;
 	uint16_t m_locked;
 };
-
-DECLARE_DEVICE_TYPE(TAITO_PCCARD2, taito_pccard2_device)
 
 class taito_pccard2_device : public ata_flash_pccard_device
 {
@@ -82,8 +78,6 @@ private:
 	bool m_locked;
 };
 
-DECLARE_DEVICE_TYPE(TAITO_COMPACT_FLASH, taito_compact_flash_device)
-
 class taito_compact_flash_device : public ata_flash_pccard_device
 {
 public:
@@ -101,5 +95,10 @@ private:
 	std::vector<uint8_t> m_key;
 	bool m_locked;
 };
+
+DECLARE_DEVICE_TYPE(TAITO_PCCARD1, taito_pccard1_device)
+DECLARE_DEVICE_TYPE(TAITO_PCCARD2, taito_pccard2_device)
+DECLARE_DEVICE_TYPE(TAITO_COMPACT_FLASH, taito_compact_flash_device)
+DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 
 #endif // MAME_MACHINE_ATAFLASH_H

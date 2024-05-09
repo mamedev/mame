@@ -69,12 +69,6 @@ menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container &con
 
 	if (device)
 	{
-		m_notifier = device->add_media_change_notifier(
-				[this] (device_image_interface::media_change_event ev)
-				{
-					// repopulate the menu if an image is mounted or unmounted
-					reset(reset_options::REMEMBER_POSITION);
-				});
 	}
 }
 
@@ -94,9 +88,17 @@ menu_tape_control::~menu_tape_control()
 
 void menu_tape_control::populate()
 {
+	m_notifier.reset();
 	m_slider_item_index = -1;
 	if (current_device())
 	{
+		// repopulate the menu if an image is mounted or unmounted
+		m_notifier = current_device()->add_media_change_notifier(
+				[this] (device_image_interface::media_change_event ev)
+				{
+					reset(reset_options::REMEMBER_POSITION);
+				});
+
 		// name of tape
 		item_append(current_display_name(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
 

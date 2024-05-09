@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_PCCARD_SRAM_H
-#define MAME_MACHINE_PCCARD_SRAM_H
+#ifndef MAME_BUS_PCCARD_SRAM_H
+#define MAME_BUS_PCCARD_SRAM_H
 
 #pragma once
 
-#include "machine/pccard.h"
+#include "pccard.h"
 
 
 //**************************************************************************
@@ -27,9 +27,9 @@ class pccard_sram_device :
 	public device_pccard_interface
 {
 public:
-	void battery_voltage_1_w(int state) { m_slot->battery_voltage_1_w(state); }
-	void battery_voltage_2_w(int state) { m_slot->battery_voltage_2_w(state); }
-	void write_protect_w(int state) { m_slot->write_protect_w(state); }
+	void battery_voltage_1_w(int state);
+	void battery_voltage_2_w(int state);
+	void write_protect_w(int state);
 
 protected:
 	// construction/destruction
@@ -38,7 +38,6 @@ protected:
 	// device_t overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -59,15 +58,15 @@ protected:
 	virtual void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
-	void card_inserted(bool state);
+	void set_cd(bool state);
 
 	address_space_config m_memory_space_config;
 	address_space_config m_attribute_space_config;
 
-	bool m_card_detect;
-
-private:
-	required_ioport m_switches;
+	int8_t m_cd;
+	int8_t m_bvd1;
+	int8_t m_bvd2;
+	int8_t m_wp;
 };
 
 class pccard_mitsubishi_sram_device : public pccard_sram_device
@@ -163,4 +162,4 @@ DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_1M, pccard_centennial_sl01m_15_11194_
 DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_2M, pccard_centennial_sl02m_15_11194_device)
 DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_device)
 
-#endif // MAME_MACHINE_PCCARD_SRAM_H
+#endif // MAME_BUS_PCCARD_SRAM_H
