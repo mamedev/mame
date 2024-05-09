@@ -154,6 +154,7 @@ private:
 		MPEPROM,
 		MPSRAM,
 		MPSRAMX,
+		MPSRAMF,
 		MBOX,
 
 		CARTPROT
