@@ -63,6 +63,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -111,6 +112,10 @@ INPUT_PORTS_END
 void ganbaremo_state::ganbaremo(machine_config &config)
 {
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // Guess
+
+	I8255A(config, "pia1"); // NEC D8255AC-2
+	I8255A(config, "pia2"); // NEC D8255AC-2
+	I8255A(config, "pia3"); // NEC D8255AC-2
 
 	// Sound hardware
 
