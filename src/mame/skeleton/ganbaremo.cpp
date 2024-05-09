@@ -77,7 +77,7 @@ public:
 	ganbaremo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_ay8910(*this, "aysnd")
 		, m_5205(*this, "musicrom")
 	{
