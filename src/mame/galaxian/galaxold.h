@@ -154,6 +154,7 @@ public:
 	void init_bullsdrtg();
 	void init_ladybugg();
 	void init_4in1();
+	void init_superbikg();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -261,6 +262,7 @@ public:
 	void scrambleo(machine_config &config);
 	void scrambler(machine_config &config);
 	void spcwarp(machine_config &config);
+	void superbikg(machine_config &config);
 	void dkongjrmc(machine_config &config);
 	void bullsdrtg(machine_config &config);
 	void drivfrcg(machine_config &config);
@@ -292,10 +294,16 @@ public:
 	void scrambleo_map(address_map &map);
 	void scrambler_map(address_map &map);
 	void spcwarp_map(address_map &map);
+	void superbikg_data(address_map &map);
+	void superbikg_io(address_map &map);
+	void superbikg_map(address_map &map);
 	void tazzmang_map(address_map &map);
 
 protected:
 	virtual void machine_start() override { m_leds.resolve(); }
+
+private:
+	uint8_t m_superbikg_latch = 0;
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
