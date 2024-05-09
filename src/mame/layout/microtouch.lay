@@ -49,8 +49,8 @@ license:CC0-1.0
 					if (x >= l) and (x < r) and (y >= t) and (y < b) then
 						inside = true
 						btn_field:set_value(1)
-						x_field:set_value(floor((x - l) * x_scale))
-						y_field:set_value(floor((y - t) * y_scale))
+						x_field:set_value(floor(0.5 + ((x - l) * x_scale)))
+						y_field:set_value(floor(0.5 + ((y - t) * y_scale)))
 					elseif inside then
 						inside = false
 						release_touch()
