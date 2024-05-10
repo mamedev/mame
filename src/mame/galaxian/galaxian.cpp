@@ -2509,35 +2509,11 @@ void monsterz_state::monsterz_map(address_map &map)
 /* changes from galaxian map:
     galaxian sound removed
     $4800-$57ff: contains video and object RAM (normally at $5000-$5fff)
-    $5800-$5fff: AY-8910 access added
     $6002-$6006: graphics banking controls replace coin lockout, coin counter, and lfo
     $7002: coin counter (moved from $6003)
     $8000-$afff: additional ROM area
     $b000-$bfff: protection (T00 custom chip)
 */
-void galaxian_state::jumpbug_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0x5800, 0x5800).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::data_w));
-	map(0x5900, 0x5900).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::address_w));
-	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
-	map(0x6002, 0x6006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_gfxbank_w));
-	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
-	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
-	map(0x7001, 0x7001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7002, 0x7002).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x7004, 0x7004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0x8000, 0xafff).rom();
-	map(0xb000, 0xbfff).r(FUNC(galaxian_state::jumpbug_protection_r));
-}
-
-// Same as 'jumpbug_map' but without the AY-8910
 void galaxian_state::jumpbugbrf_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2556,6 +2532,16 @@ void galaxian_state::jumpbugbrf_map(address_map &map)
 	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x8000, 0xafff).rom();
 	map(0xb000, 0xbfff).r(FUNC(galaxian_state::jumpbug_protection_r));
+}
+
+/* changes from jumpbugbrf map:
+    $5800-$5fff: AY-8910 access added
+*/
+void galaxian_state::jumpbug_map(address_map &map)
+{
+	jumpbugbrf_map(map);
+	map(0x5800, 0x5800).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::data_w));
+	map(0x5900, 0x5900).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::address_w));
 }
 
 
