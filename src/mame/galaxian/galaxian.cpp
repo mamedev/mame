@@ -7890,23 +7890,23 @@ void guttangt_state::guttangts3(machine_config &config)
 
 void galaxian_state::jumpbugbrf(machine_config &config)
 {
-    galaxian_base(config);
+	galaxian_base(config);
 
-    config.device_remove("watchdog");
+	config.device_remove("watchdog");
 
-    // basic machine hardware
-    m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::jumpbugbrf_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::jumpbugbrf_map);
 }
 
 void galaxian_state::jumpbug(machine_config &config)
 {
-    jumpbugbrf(config);
+	jumpbugbrf(config);
 
-    // basic machine hardware
-    m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::jumpbug_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::jumpbug_map);
 
-    // sound hardware
-    AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5); // matches PCB video - unconfirmed
+	// sound hardware
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5); // matches PCB video - unconfirmed
 }
 
 
