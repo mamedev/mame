@@ -15854,7 +15854,7 @@ buraiken                        // 2/1987 (c) 1987 (Japan)
 buraikenb                       // 2/1987 (c) 1987 (Japan)
 fball                           //
 lwings                          // 11/1986 (c) 1986
-lwings2                         // 11/1986 (c) 1986
+lwingsa                         // 11/1986 (c) 1986
 lwingsb                         // 11/1986 (c) 1986 (bootleg)
 lwingsj                         // 11/1986 (c) 1986
 lwingsja                        // 11/1986 (c) 1986
@@ -15867,6 +15867,7 @@ trojanj                         // 4/1986 (c) 1986 (Japan)
 trojanjo                        // 4/1986 (c) 1986 (Japan)
 trojanlt                        // location test
 trojanr                         // 4/1986 (c) 1986 + Romstar
+trojanra                        // 4/1986 (c) 1986 + Romstar
 
 @source:capcom/mitchell.cpp
 7toitsu                         // (c) 1988 Yuga
