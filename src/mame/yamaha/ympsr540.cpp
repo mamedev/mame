@@ -65,30 +65,12 @@ void psr540_state::render_w(int state)
 		return;
 
 	const u8 *render = m_lcdc->render();
-	if(1)
 	for(int yy=0; yy != 8; yy++)
 		for(int x=0; x != 80; x++) {
 			uint8_t v = render[16*x + yy];
 			for(int xx=0; xx != 5; xx++)
 				m_outputs[x][yy][xx] = (v >> xx) & 1;
 		}
-
-	if(1) {
-		logerror("XX\n");
-		for(int x1=1; x1 != 2; x1++)
-			for(int yy=0; yy != 8; yy++) {
-				std::string s;
-				for(int x=0; x != 16; x++) {
-					uint8_t v = render[16*(x+40*x1) + yy];
-					for(int xx=0; xx != 5; xx++)
-						s += ((v >> (4-xx)) & 1) ? '#' : '.';
-					s += ' ';
-					if(x == 7)
-						s += "| ";
-				}
-				logerror("XX %02d.%d %s\n", x1*40, yy, s);
-			}
-	}
 }
 
 void psr540_state::machine_start()
@@ -351,8 +333,8 @@ ROM_START( psr540 )
 	ROM_LOAD16_WORD_SWAP( "xw25410.ic210", 0, 0x400000, CRC(c7c4736d) SHA1(ff1052eb076557071ed8652e6c2fc0925144fbd5))
 	ROM_LOAD16_WORD_SWAP( "xw25520.ic220", 0x400000, 0x200000, CRC(9ef56c4e) SHA1(f26b588f9bcfd7bdbf1c0b38e4a1ea57e2f29f10))
 
-	ROM_REGION(634769, "screen", ROMREGION_ERASE00)
-	ROM_LOAD("psr540-lcd.svg", 0, 634769, CRC(7609d582) SHA1(8241cc57dfa02f3185af25bd98831f531fb3e1d7))
+	ROM_REGION(634772, "screen", ROMREGION_ERASE00)
+	ROM_LOAD("psr540-lcd.svg", 0, 634772, CRC(6b934a60) SHA1(478d24f7002d0996d77df86ea2e9f99ca0c0e0ca))
 ROM_END
 
 SYST( 1999, psr540, 0, 0, psr540, psr540, psr540_state, empty_init, "Yamaha", "PSR540", MACHINE_IS_SKELETON )
