@@ -41732,6 +41732,10 @@ cp1                             //
 @source:skeleton/ct909e_segadvd.cpp
 megatrix
 
+@source:skeleton/cubieboard4.cpp
+cubieboard4                     //
+monkeyjmp                       // (c) 20?? Falgas
+
 @source:skeleton/cxhumax.cpp
 hxhdci2k                        //
 
