@@ -4201,7 +4201,8 @@ ROM_END
 
 /* Lucky Seven. String "KAM 1.2" on program ROM.
    Same PCB as "sevenlnd", but with a PAL soldered to SW0 dip switches bank (this socket is empty on "sevenlnd").
-   Bad graphics on title screen, but happens also on real hardware, so one ROM may be bad.
+   Bad graphics on title screen, but happens also on real hardware. Mismatched program and tile ROMs,
+   a poor effort at a hack, or a buggy development version?
    There's a gray stripe on the title screen that isn't present on the real hardware.
    Recording from real hardware: https://youtu.be/By7Xi5jf2Qc
 */
