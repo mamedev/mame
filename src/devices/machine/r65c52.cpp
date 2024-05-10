@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "r65c52.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -151,15 +151,18 @@ void r65c52_device::device_reset()
 	for (int i=0; i<2; i++)
 	{
 		m_tdre[i]=true;
-		m_status[i] &= ~SR_DSR;
-		m_status[i] &= ~SR_DCD;
-		m_status[i] &= ~SR_CTS;
+		m_rdrf[i] = true;
+
+		m_status[i] = SR_FRAMING_ERROR;
 
 		m_aux_ctrl[i] = 0;
 		m_compare[i] = 0;
 		m_rdr[i] = 0x00;
-		m_isr[i] = 0x00;
+		m_isr[i] = 0x80;
 		m_ier[i] = 0x80;
+
+		m_rts[i] = 1;
+		m_dtr[i] = 1;
 
 		output_rts(i, 1);
 
@@ -227,6 +230,14 @@ void r65c52_device::output_rts(int idx, int rts)
 	{
 		m_rts[idx] = rts;
 		m_rts_handler[idx](m_rts[idx]);
+		if (rts)
+		{
+			m_status[idx] |= SR_RTS;
+		}
+		else
+		{
+			m_status[idx] &= ~SR_RTS;
+		}
 	}
 }
 
@@ -246,7 +257,7 @@ void r65c52_device::output_dtr(int idx, int dtr)
 			m_status[idx] &= ~SR_DTR;
 		}
 	}
-	update_divider(idx);
+	// update_divider(idx);
 
 }
 
@@ -317,6 +328,8 @@ uint8_t r65c52_device::read_rdr(int idx)
 uint8_t r65c52_device::read_status(int idx)
 {
 	LOG("R65C52: %x  STATUS %x \n", idx+1, m_status[idx]);
+	m_dtr[idx]=false;
+	m_rts[idx]=false;
 	return m_status[idx];
 }
 
@@ -331,7 +344,7 @@ void r65c52_device::write_ier(int idx, uint8_t data)
 		m_ier[idx] &= ~(data & 0x7f);
 	}
 
-	m_ier[idx] &= 0x7f;
+	// m_ier[idx] &= 0x7f;
 	LOG("R65C52: %x  IER %x \n", idx+1, m_ier[idx]);
 }
 
@@ -357,7 +370,7 @@ void r65c52_device::write_control(int idx, uint8_t data)
 	m_stoplength[idx] = 1 + ((m_control[idx] >> 5) & 1);
 
 
-	LOG("R65C52: %x  ECHO %x STOP%x\n", idx+1, m_echo_mode[idx], m_stoplength[idx]);
+	LOG("R65C52: %x CTRL%X ECHO %x STOP%x\n", idx+1, m_control[idx], m_echo_mode[idx], m_stoplength[idx]);
 
 }
 
@@ -385,7 +398,7 @@ void r65c52_device::write_format(int idx, uint8_t data)
 	m_wordlength[idx] = 5 + ((m_format[idx] >> 5) & 3);
 
 
-	LOG("R65C52: %x RTS %x DTR %x PARITY %x WORDLENGTH %x \n", idx+1, (m_format[idx] >> 0) & 1, (m_format[idx] >> 1)& 1, m_parity[idx], m_wordlength[idx]);
+	LOG("R65C52: %x FMT %x RTS %x DTR %x PARITY %x WORDLENGTH %x \n", idx+1, m_format[idx], (m_format[idx] >> 0) & 1, (m_format[idx] >> 1)& 1, m_parity[idx], m_wordlength[idx]);
 
 	update_divider(idx);
 }
@@ -393,8 +406,6 @@ void r65c52_device::write_format(int idx, uint8_t data)
 void r65c52_device::write_aux_ctrl(int idx, uint8_t data)
 {
 	m_aux_ctrl[idx] = data;
-
-	//TODO: Fix parity_err
 
 	// bit 0
 	m_parity_err_mode[idx] = (m_format[idx] >> 0) & 1;
@@ -491,7 +502,7 @@ void r65c52_device::write(offs_t offset, uint8_t data)
 			break;
 
 		case 2:
-			if (data & 0x80)
+			if (data & 0x40)
 			{
 				write_aux_ctrl(0, data);
 			}
@@ -512,22 +523,22 @@ void r65c52_device::write(offs_t offset, uint8_t data)
 		case 5:
 			if (data & 0x80)
 			{
-				write_control(1, data);
+				write_format(1, data);
 			}
 			else
 			{
-				write_format(1, data);
+				write_control(1, data);
 			}
 			break;
 
 		case 6:
-			if (data & 0x80)
+			if (data & 0x40)
 			{
-				write_compare(1, data);
+				write_aux_ctrl(1,data);
 			}
 			else
 			{
-				write_aux_ctrl(1,data);
+				write_compare(1, data);
 			}
 			break;
 
@@ -621,6 +632,8 @@ void r65c52_device::_write_cts(int idx, int state)
 		}
 		update_irq(idx);
 	}
+	LOG("R65C52: %x  CTS STATUS %x \n", idx+1, m_status[idx]);
+
 }
 
 void r65c52_device::write_dsr1(int state)
@@ -650,6 +663,8 @@ void r65c52_device::_write_dsr(int idx, int state)
 		}
 		update_irq(idx);
 	}
+	LOG("R65C52: %x  DSR STATUS %x \n", idx+1, m_status[idx]);
+
 }
 
 void r65c52_device::write_dcd1(int state)
@@ -781,6 +796,18 @@ void r65c52_device::receiver_clock(int idx, int state)
 							m_parity_err[idx] = false;
 						}
 
+						if (m_parity_err_mode[idx])
+						{
+							if (m_parity_err[idx])
+							{
+								m_isr[idx] |= IRQ_PAR; 
+							}
+							else
+							{
+								m_isr[idx] &= ~IRQ_PAR; 
+							}
+							update_irq(idx);
+						}
 						m_rdr[idx] = m_rx_shift[idx];
 
 						if (m_wordlength[idx] == 7 && m_parity[idx] != PARITY_NONE)
@@ -940,6 +967,19 @@ void r65c52_device::transmitter_clock(int idx, int state)
 							if (m_tx_output[idx] == OUTPUT_TXD)
 							{
 								LOG("R65C52: TX%x PARITY BIT %d\n", idx+1, m_txd);
+							}
+
+							if (!m_parity_err_mode[idx])
+							{
+								if (m_tx_parity[idx])
+								{
+									m_isr[idx] |= IRQ_PAR; 
+								}
+								else
+								{
+									m_isr[idx] &= ~IRQ_PAR; 
+								}
+								update_irq(idx);
 							}
 						}
 						else

@@ -10,14 +10,14 @@ license:CC0-1.0
 	</element>
 	<view name="LED Overlay">
 		<screen index="0">
-			<bounds left="0" top="0" right="256" bottom="256" />
+			<bounds left="0" top="16" right="704" bottom="544" />
 		</screen>
 
 		<repeat count="16">
 			<param name="digit" start="0" increment="1" />
-			<param name="x" start="60" increment="9" />
+			<param name="x" start="140" increment="28" />
 			<element name="digit~digit~" ref="led" blend="add" state="0">
-				<bounds x="~x~" y="270" width="9" height="9"/>
+				<bounds x="~x~" y="580" width="28" height="28"/>
 			</element>
 		</repeat>
 	</view>

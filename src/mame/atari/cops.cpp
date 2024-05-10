@@ -44,6 +44,7 @@
 #include "speaker.h"
 
 #include "cops.lh"
+#include "revlatns.lh"
 
 #define LOG_CDROM   (1U << 1)
 
@@ -548,8 +549,9 @@ static INPUT_PORTS_START( cops )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("100P LEVEL") PORT_CODE(KEYCODE_W)
 
-	PORT_START("SW2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("SW2") //GUN?
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) //Left floating, games will fail to boot if this is low
 
 	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -584,7 +586,7 @@ static INPUT_PORTS_START( revlatns )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) //Left floating, games will fail to boot if this is low
 INPUT_PORTS_END
 
 void cops_state::machine_start()
@@ -607,7 +609,7 @@ void cops_state::machine_reset()
 	m_irq = 0;
 	m_lcd_addr_l = m_lcd_addr_h = 0;
 	m_lcd_data_l = m_lcd_data_h = 0;
-}
+	}
 
 
 void cops_state::init_cops()
@@ -621,7 +623,7 @@ void cops_state::init_cops()
 
 void cops_state::base(machine_config &config)
 {
-	M6502(config, m_maincpu, MAIN_CLOCK/2); //?
+	M6502(config, m_maincpu, MAIN_CLOCK/2/2); // fed through two dividers
 
 	SONY_LDP1450HLE(config, m_ld, 0);
 	m_ld->set_screen("screen");
@@ -728,4 +730,4 @@ ROM_END
 
 GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                      "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
 GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions / Deith Leisure", "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions",                 "Revelations", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions",                 "Revelations", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_revlatns )

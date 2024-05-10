@@ -27,9 +27,9 @@
         * Repeat behaviour for reverse play should restart in reverse
         * Delay timing of queue is a guess based on LDP1000A guide
         * Not all features are fully hooked up
-		* Still step back and forth in level select doesn't stay in place	
+		* Still step back and forth in Time Traveler glitches
+		  - (level select doesn't stay in place)	
 *************************************************************************/
-
 
 #include "emu.h"
 #include "ldp1450hle.h"
@@ -599,6 +599,12 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 				case CMD_USER_INDEX_ON:
 				{
 					popmessage("X %x Y %x M%x T%s (Start %x)", m_user_index_x, m_user_index_y, m_user_index_mode, m_user_index_chars,m_user_index_window_idx);
+					queue_reply(0x0a, 0.4);
+					break;
+				}
+
+				case CMD_USER_INDEX_OFF:
+				{
 					queue_reply(0x0a, 0.4);
 					break;
 				}
