@@ -119,7 +119,7 @@ void psr540_state::psr540(machine_config &config)
 	m_swx00->add_route(1, "rspeaker", 1.0);
 
 	KS0066(config, m_lcdc, 270000); // OSC = 91K resistor, TODO: actually KS0066U-10B
-	m_lcdc->set_default_bios_tag("f05");
+	m_lcdc->set_default_bios_tag("f00");
 	m_lcdc->set_lcd_size(2, 40);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
@@ -334,7 +334,7 @@ ROM_START( psr540 )
 	ROM_LOAD16_WORD_SWAP( "xw25520.ic220", 0x400000, 0x200000, CRC(9ef56c4e) SHA1(f26b588f9bcfd7bdbf1c0b38e4a1ea57e2f29f10))
 
 	ROM_REGION(634772, "screen", ROMREGION_ERASE00)
-	ROM_LOAD("psr540-lcd.svg", 0, 634772, CRC(6b934a60) SHA1(478d24f7002d0996d77df86ea2e9f99ca0c0e0ca))
+	ROM_LOAD("psr540-lcd.svg", 0, 634772, CRC(606d85ab) SHA1(6eff1f028c531cdcd070b21949e4624af0a586a1))
 ROM_END
 
 SYST( 1999, psr540, 0, 0, psr540, psr540, psr540_state, empty_init, "Yamaha", "PSR540", MACHINE_IS_SKELETON )
