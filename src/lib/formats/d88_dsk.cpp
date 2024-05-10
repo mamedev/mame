@@ -417,7 +417,7 @@ int d88_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	if(err || (32 != actual))
 		return 0;
 
-	if((get_u32le(h+0x1c) == size) &&
+	if(((get_u32le(h+0x1c) == size) || (get_u32le(h+0x1c) == (size >> 1))) &&
 		(h[0x1b] == 0x00 || h[0x1b] == 0x10 || h[0x1b] == 0x20 || h[0x1b] == 0x30 || h[0x1b] == 0x40))
 		return FIFID_SIZE|FIFID_STRUCT;
 

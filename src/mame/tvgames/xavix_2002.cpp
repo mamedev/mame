@@ -606,5 +606,5 @@ CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / 
 CONS( 2004, suprtvpc,    0,        0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // hangs after 'loading' sequence
 CONS( 200?, suprtvpchk,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// Hamtaro and Doraemon themed Super TV PC units also exist, likely with their own internal ROMs
+// A Doraemon themed Super TV PC units also exist, likely with different internal ROM
 

@@ -37,6 +37,7 @@ extern char const *const DOOLY;
 extern char const *const EASISPEECH;
 extern char const *const EC701;
 extern char const *const FMPAC;
+extern char const *const FRANKY;
 extern char const *const FS_SR021;
 extern char const *const FS_SR022;
 extern char const *const GAMEMASTER2;

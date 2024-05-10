@@ -308,6 +308,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_SDL);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
@@ -462,9 +463,6 @@ void osd_common_t::update(bool skip_redraw)
 	//
 	if (m_watchdog != nullptr)
 		m_watchdog->reset();
-
-	update_slider_list();
-
 }
 
 
@@ -567,6 +565,31 @@ void osd_common_t::customize_input_type_list(std::vector<input_type_entry> &type
 
 std::vector<ui::menu_item> osd_common_t::get_slider_list()
 {
+	// check if any window has dirty sliders
+	bool dirty = false;
+	for (const auto &window : window_list())
+	{
+		if (window->has_renderer() && window->renderer().sliders_dirty())
+		{
+			dirty = true;
+			break;
+		}
+	}
+
+	if (dirty)
+	{
+		m_sliders.clear();
+
+		for (const auto &window : osd_common_t::window_list())
+		{
+			if (window->has_renderer())
+			{
+				std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
+				m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
+			}
+		}
+	}
+
 	return m_sliders;
 }
 

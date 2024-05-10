@@ -184,7 +184,28 @@ ROM_START( qncrash )
 	ROM_LOAD( "j4155.ic5", 0x400, 0x155, NO_DUMP )
 ROM_END
 
+ROM_START( qncrasha )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "qc3_mpr0.ic3", 0x00000, 0x10000, CRC(42c54dec) SHA1(0f6ca4bec7ae4f60b1943dad756933d02cd660c4) )
+
+	ROM_REGION( 0x20000, "dotcpu", 0 )
+	ROM_LOAD( "qc1_dot0.ic7", 0x00000, 0x20000, CRC(45dda645) SHA1(27efcef0e3a09390eec0d7859465a13caf52f9df) )
+
+	ROM_REGION( 0x800000, "oki", 0 )
+	ROM_LOAD( "qc1_snd0.ic12", 0x000000, 0x400000, CRC(d72713d2) SHA1(556a0be2bb08fc9b4a2476b0ce8a23aa66858809) )
+	ROM_LOAD( "qc1_snd1.ic13", 0x400000, 0x400000, CRC(70e472a1) SHA1(df06270cede1d00e2ec231276e5e5466ab549794) ) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66n.ic5", 0x000, 0x200, CRC(1ba66a58) SHA1(adb7f1685cf81585ed30613adc39e9091e63af84) )
+
+	ROM_REGION( 0x600, "dot_plds", ROMREGION_ERASE00 ) // all 18CV8P
+	ROM_LOAD( "j4153.ic2", 0x000, 0x155, NO_DUMP )
+	ROM_LOAD( "j4154.ic3", 0x200, 0x155, NO_DUMP )
+	ROM_LOAD( "j4155.ic5", 0x400, 0x155, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1999, qncrash, 0, qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (V2.200)", MACHINE_IS_SKELETON_MECHANICAL ) // version listed at 0xa97a in program ROM
+GAME( 1999, qncrash,  0,       qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (set 1, V2.200)", MACHINE_IS_SKELETON_MECHANICAL ) // version listed at 0xa97a in program ROM
+GAME( 1999, qncrasha, qncrash, qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (set 2)",         MACHINE_IS_SKELETON_MECHANICAL )

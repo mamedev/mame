@@ -681,6 +681,19 @@ ROM_START(rollr_d2) // American Drops 2 - sample/prototype with 8 drop targets
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
+ROM_START(rollr_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("rolr_u26.l1", 0x4000, 0x4000, CRC(8808dc0c) SHA1(19239e0884859e17e4c6f4de4d1e06f9e9913777))
+	ROM_LOAD("rolr_u27.l1", 0x8000, 0x8000, CRC(7e816a7b) SHA1(546dd3b12f2152148749de501b2540f4a2506c32))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("rolr_u4.l3", 0x00000, 0x10000, CRC(d366c705) SHA1(76018305b5040b2e5d8c45cc81a18f13e1a8f8da))
+	ROM_RELOAD(0x10000, 0x10000)
+	ROM_LOAD("rolr_u19.l3", 0x20000, 0x10000, CRC(45a89e55) SHA1(3aff897514d242c83a8e7575d430d594a873736e))
+	ROM_RELOAD(0x30000, 0x10000)
+	ROM_LOAD("rolr_u20.l3", 0x40000, 0x10000, CRC(77f89aff) SHA1(dcd9fe233f33ef8f97cdeaaa365532e485a28944))
+	ROM_RELOAD(0x50000, 0x10000)
+ROM_END
+
 /*---------------------------------
 / The Bally Game Show 4/90 (#2003)
 /---------------------------------*/
@@ -792,6 +805,7 @@ GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0, 
 GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_l1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LA-1)",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

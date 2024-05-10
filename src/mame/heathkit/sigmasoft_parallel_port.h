@@ -15,42 +15,42 @@
 class sigmasoft_parallel_port : public device_t
 {
 public:
-	sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void    write(offs_t reg, uint8_t val);
-	uint8_t read(offs_t reg);
+	void write(offs_t reg, u8 val);
+	u8 read(offs_t reg);
 
-	auto ctrl_r_cb()      { return m_ctrl_r.bind(); }
+	auto ctrl_r_cb() { return m_ctrl_r.bind(); }
 	auto video_mem_r_cb() { return m_video_mem_r.bind(); }
 
-	auto video_mem_cb()   { return m_video_mem_w.bind(); }
-	auto io_lo_cb()       { return m_io_lo_addr.bind(); }
-	auto io_hi_cb()       { return m_io_hi_addr.bind(); }
-	auto window_lo_cb()   { return m_window_lo_addr.bind(); }
-	auto window_hi_cb()   { return m_window_hi_addr.bind(); }
-	auto ctrl_cb()        { return m_ctrl_w.bind(); }
+	auto video_mem_cb() { return m_video_mem_w.bind(); }
+	auto io_lo_cb() { return m_io_lo_addr.bind(); }
+	auto io_hi_cb() { return m_io_hi_addr.bind(); }
+	auto window_lo_cb() { return m_window_lo_addr.bind(); }
+	auto window_hi_cb() { return m_window_hi_addr.bind(); }
+	auto ctrl_cb() { return m_ctrl_w.bind(); }
 
 protected:
 
 	virtual void device_start() override;
 
-	uint8_t video_mem_r();
-	void video_mem_w(uint8_t val);
+	u8 video_mem_r();
+	void video_mem_w(u8 val);
 
-	void io_lo_addr_w(uint8_t val);
-	void io_hi_addr_w(uint8_t val);
+	void io_lo_addr_w(u8 val);
+	void io_hi_addr_w(u8 val);
 
-	void window_lo_addr_w(uint8_t val);
-	void window_hi_addr_w(uint8_t val);
+	void window_lo_addr_w(u8 val);
+	void window_hi_addr_w(u8 val);
 
-	void ctrl_w(uint8_t val);
-	uint8_t ctrl_r();
+	void ctrl_w(u8 val);
+	u8 ctrl_r();
 
 private:
 
 	// Reads
-	devcb_read8 m_ctrl_r;
-	devcb_read8 m_video_mem_r;
+	devcb_read8  m_ctrl_r;
+	devcb_read8  m_video_mem_r;
 
 	// Writes
 	devcb_write8 m_video_mem_w;

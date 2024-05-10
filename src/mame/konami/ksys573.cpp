@@ -334,60 +334,7 @@ Notes: (all ICs shown)
         U20        - (unpopulated SOIC16)
         U21        - (unpopulated SOIC16)
 
-
-  PCMCIA Flash Card
-  -----------------
-
-  Front
-
-  |----PCMCIA CONNECTOR-----|
-  |                         |
-  | HT04A MB624018 MB624019 |
-  | AT28C16                 |
-  |                         |
-  | 29F017A.1L   29F017A.1U |
-  | 90PFTR       90PFTN     |
-  |                         |
-  | 29F017A.2L   29F017A.2U |
-  | 90PFTN       90PFTR     |
-  |                         |
-  | 29F017A.3L   29F017A.3U |
-  | 90PFTR       90PFTN     |
-  |                         |
-  | 29F017A.4L   29F017A.4U |
-  | 90PFTN       90PFTR     |
-  |                         |
-  |------------------SWITCH-|
-
-  Back
-
-  |----PCMCIA CONNECTOR-----|
-  |                         |
-  |                         |
-  |                         |
-  |                         |
-  | 29F017A.5U   29F017A.5L |
-  | 90PFTR       90PFTN     |
-  |                         |
-  | 29F017A.6U   29F017A.6L |
-  | 90PFTN       90PFTR     |
-  |                         |
-  | 29F017A.7U   29F017A.7L |
-  | 90PFTR       90PFTN     |
-  |                         |
-  | 29F017A.8U   29F017A.8L |
-  | 90PFTN       90PFTR     |
-  |                         |
-  |-SWITCH------------------|
-
-  Texas Instruments HT04A
-  Fujitsu MB624018 CMOS GATE ARRAY
-  Fujitsu MB624019 CMOS GATE ARRAY
-  Atmel AT28C16 16K (2K x 8) Parallel EEPROM
-  Fujitsu 29F017A-90PFTR 16M (2M x 8) BIT Flash Memory Reverse Pinout (Gachaga Champ card used 29F017-12PFTR instead)
-  Fujitsu 29F017A-90PFTN 16M (2M x 8) BIT Flash Memory Standard Pinout
-
-  */
+*/
 
 #include "emu.h"
 
@@ -397,16 +344,17 @@ Notes: (all ICs shown)
 #include "k573mcal.h"
 #include "k573mcr.h"
 #include "k573msu.h"
-#include "k573npu.h"
 
 #include "cpu/psx/psx.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/cr589.h"
+#include "bus/pccard/k573npu.h"
+#include "bus/pccard/konami_dual.h"
+#include "bus/pccard/linflash.h"
 #include "machine/adc083x.h"
 #include "machine/bankdev.h"
 #include "machine/ds2401.h"
 #include "machine/jvshost.h"
-#include "machine/linflash.h"
 #include "machine/mb89371.h"
 #include "machine/ram.h"
 #include "machine/timekpr.h"
@@ -2488,10 +2436,10 @@ void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 	FUJITSU_29F016A(config, "29f016a.27h");
 
 	PCCARD_SLOT(config, m_pccard1, 0);
-	m_pccard1->card_detect_cb().set([this](int state) { m_pccard_cd[0] = state; });
+	m_pccard1->cd1().set([this](int state) { m_pccard_cd[0] = state; });
 
 	PCCARD_SLOT(config, m_pccard2, 0);
-	m_pccard2->card_detect_cb().set([this](int state) { m_pccard_cd[1] = state; });
+	m_pccard2->cd1().set([this](int state) { m_pccard_cd[1] = state; });
 
 	ADDRESS_MAP_BANK(config, m_flashbank ).set_map( &ksys573_state::flashbank_map ).set_options( ENDIANNESS_LITTLE, 16, 32, 0x400000);
 
@@ -2551,26 +2499,28 @@ void ksys573_state::k573ak(machine_config &config)
 
 void ksys573_state::pccard1_16mb(machine_config &config)
 {
-	m_pccard1->option_add("16mb", LINEAR_FLASH_PCCARD_16MB);
+	m_pccard1->option_add("16mb", FUJITSU_16MB_FLASH_CARD);
 	m_pccard1->set_default_option("16mb");
 }
 
 void ksys573_state::pccard1_32mb(machine_config &config)
 {
-	m_pccard1->option_add("32mb", LINEAR_FLASH_PCCARD_32MB);
+	m_pccard1->option_add("32mb", FUJITSU_32MB_FLASH_CARD);
+	m_pccard1->option_add("id245p01", ID245P01);
 	m_pccard1->set_default_option("32mb");
 }
 
 void ksys573_state::pccard2_32mb(machine_config &config)
 {
-	m_pccard2->option_add("32mb", LINEAR_FLASH_PCCARD_32MB);
+	m_pccard2->option_add("32mb", FUJITSU_32MB_FLASH_CARD);
+	m_pccard2->option_add("id245p01", ID245P01);
 	m_pccard2->set_default_option("32mb");
 }
 
 void ksys573_state::pccard2_64mb(machine_config &config)
 {
-	m_pccard2->option_add("64mb", LINEAR_FLASH_PCCARD_64MB);
-	m_pccard2->set_default_option("64mb");
+	m_pccard2->option_add("konami_dual", KONAMI_DUAL_PCCARD);
+	m_pccard2->set_default_option("konami_dual");
 }
 
 // Security eeprom variants
@@ -3095,8 +3045,8 @@ static INPUT_PORTS_START( konami573 )
 //  PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, pccard_cd_r<0> )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, pccard_cd_r<1> )
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, pccard_cd_r<0> )
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, pccard_cd_r<1> )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 //  PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )

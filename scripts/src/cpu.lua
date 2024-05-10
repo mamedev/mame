@@ -903,12 +903,20 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh7042.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_adc.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_adc.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_bsc.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_bsc.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_cmt.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_cmt.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_dmac.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_dmac.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_intc.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_intc.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_mtu.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_mtu.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_port.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_port.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_sci.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_sci.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_bus.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_bus.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_sci.cpp",
@@ -1572,6 +1580,23 @@ end
 if opt_tool(CPUS, "PSX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/psx/psxdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/psx/psxdasm.h")
+end
+
+--------------------------------------------------
+-- MIPS-X
+--@src/devices/cpu/mipsx/mipsx.h,CPUS["MIPSX"] = true
+--------------------------------------------------
+
+if CPUS["MIPSX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mipsx/mipsx.cpp",
+		MAME_DIR .. "src/devices/cpu/mipsx/mipsx.h",
+	}
+end
+
+if opt_tool(CPUS, "MIPSX") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mipsx/mipsxdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mipsx/mipsxdasm.h")
 end
 
 --------------------------------------------------

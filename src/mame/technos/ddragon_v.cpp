@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
+// copyright-holders: Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
+
 /***************************************************************************
 
   Video Hardware for some Technos games:
@@ -54,14 +55,14 @@ Sprite layout.
 
 TILEMAP_MAPPER_MEMBER(ddragon_state::background_scan)
 {
-	/* logical (col,row) -> memory offset */
+	// logical (col,row) -> memory offset
 	return (col & 0x0f) | ((row & 0x0f) << 4) | ((col & 0x10) << 4) | ((row & 0x10) << 5);
 }
 
 TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 {
 	tile_index <<= 1;
-	uint8_t attr = m_bgvideoram[tile_index];
+	uint8_t const attr = m_bgvideoram[tile_index];
 	tileinfo.set(2,
 			m_bgvideoram[tile_index | 1] | ((attr & 0x07) << 8),
 			(attr >> 3) & 0x07,
@@ -71,7 +72,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 {
 	tile_index <<= 1;
-	uint8_t attr = m_fgvideoram[tile_index];
+	uint8_t const attr = m_fgvideoram[tile_index];
 	tileinfo.set(0,
 			m_fgvideoram[tile_index | 1] | ((attr & 0x07) << 8),
 			attr >> 5,
@@ -81,7 +82,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
 {
 	tile_index <<= 1;
-	uint8_t attr = m_fgvideoram[tile_index];
+	uint8_t const attr = m_fgvideoram[tile_index];
 	tileinfo.set(0,
 			m_fgvideoram[tile_index | 1] | ((attr & 0x0f) << 8),
 			attr >> 4,
@@ -114,13 +115,13 @@ void ddragon_state::video_start()
 
 ***************************************************************************/
 
-void ddragon_state::ddragon_bgvideoram_w(offs_t offset, uint8_t data)
+void ddragon_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-void ddragon_state::ddragon_fgvideoram_w(offs_t offset, uint8_t data)
+void ddragon_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -145,12 +146,12 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 	for (uint32_t i = 0; i < bytes; i += 5)
 	{
-		int attr = src[i + 1];
-		if (attr & 0x80)  /* visible */
+		int const attr = src[i + 1];
+		if (attr & 0x80)  // visible
 		{
 			int sx = 240 - src[i + 4] + ((attr & 2) << 7);
 			int sy = 232 - src[i + 0] + ((attr & 1) << 8);
-			int size = (attr & 0x30) >> 4;
+			int const size = (attr & 0x30) >> 4;
 			int flipx = attr & 8;
 			int flipy = attr & 4;
 			int dx = -16, dy = -16;
@@ -158,17 +159,17 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			int which;
 			int color;
 
-			if (m_technos_video_hw == 2)     /* Double Dragon 2 */
+			if (m_technos_video_hw == 2)     // Double Dragon 2
 			{
 				color = src[i + 2] >> 5;
 				which = src[i + 3] | ((src[i + 2] & 0x1f) << 8);
 			}
 			else
 			{
-				if (m_technos_video_hw == 1)     /* China Gate */
+				if (m_technos_video_hw == 1)     // China Gate
 				{
-					if ((sx < -7) && (sx > -16)) sx += 256; /* fix sprite clip */
-					if ((sy < -7) && (sy > -16)) sy += 256; /* fix sprite clip */
+					if ((sx < -7) && (sx > -16)) sx += 256; // fix sprite clip
+					if ((sy < -7) && (sy > -16)) sy += 256; // fix sprite clip
 				}
 				color = src[i + 2] >> 4;
 				which = src[i + 3] | ((src[i + 2] & 0x0f) << 8);
@@ -188,16 +189,16 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 			switch (size)
 			{
-				case 0: /* normal */
+				case 0: // normal
 				DRAW_SPRITE(0, sx, sy);
 				break;
 
-				case 1: /* double y */
+				case 1: // double y
 				DRAW_SPRITE(0, sx, sy + dy);
 				DRAW_SPRITE(1, sx, sy);
 				break;
 
-				case 2: /* double x */
+				case 2: // double x
 				DRAW_SPRITE(0, sx + dx, sy);
 				DRAW_SPRITE(2, sx, sy);
 				break;
@@ -216,15 +217,15 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 #undef DRAW_SPRITE
 
 
-uint32_t ddragon_state::screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddragon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int scrollx = (m_scrollx_hi << 8) | *m_scrollx_lo;
-	int scrolly = (m_scrolly_hi << 8) | *m_scrolly_lo;
+	int const scrollx = (m_scrollx_hi << 8) | *m_scrollx_lo;
+	int const scrolly = (m_scrolly_hi << 8) | *m_scrolly_lo;
 
 	m_bg_tilemap->set_scrollx(0, scrollx);
 	m_bg_tilemap->set_scrolly(0, scrolly);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

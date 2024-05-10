@@ -58787,4 +58787,20 @@ ExtractDisk  [03]"backup          " -> "z's staff kid88_03.d88"
 		</part>
 	</software>
 
+	<software name="srdemo" supported="partial">
+		<description>PC-8801mkIISR Demonstration</description>
+		<year>19??</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Carigraph item don't draw (verify, used pc8801ma as base)
+]]></notes>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="sr_demo.d88" size="348848" crc="de25efe7" sha1="6ee78c3c231ef33bd7dd259c7edb1b10f2b56fdf"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 </softwarelist>

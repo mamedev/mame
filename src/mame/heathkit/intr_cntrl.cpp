@@ -28,12 +28,12 @@ device_heath_intr_interface::device_heath_intr_interface(const machine_config &m
  * Original Heath interrrupt controller
  *
  */
-heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	heath_intr_cntrl(mconfig, HEATH_INTR_CNTRL, tag, owner, clock)
 {
 }
 
-heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+heath_intr_cntrl::heath_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, type, tag, owner, 0),
 	device_heath_intr_interface(mconfig, *this)
 {
@@ -54,7 +54,7 @@ void heath_intr_cntrl::update_intr_line()
 	}
 }
 
-void heath_intr_cntrl::set_irq_level(uint8_t level, int data)
+void heath_intr_cntrl::set_irq_level(u8 level, int data)
 {
 	// only 0 to 7 is valid
 	level &= 0x7;
@@ -71,7 +71,7 @@ void heath_intr_cntrl::set_irq_level(uint8_t level, int data)
 	update_intr_line();
 }
 
-uint8_t heath_intr_cntrl::get_instruction()
+u8 heath_intr_cntrl::get_instruction()
 {
 
 	// determine top priority instruction
@@ -85,8 +85,8 @@ uint8_t heath_intr_cntrl::get_instruction()
 	}
 
 	// ideally this would be handled with a function like ffs()
-	uint8_t level = 0;
-	uint8_t mask = 0x01;
+	u8 level = 0;
+	u8 mask  = 0x01;
 
 	while (mask)
 	{
@@ -113,7 +113,7 @@ uint8_t heath_intr_cntrl::get_instruction()
  * It will take control of the interrupt system and block all other
  * interrupts while it is waiting for Z37 events.
  */
-z37_intr_cntrl::z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+z37_intr_cntrl::z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	heath_intr_cntrl(mconfig, HEATH_Z37_INTR_CNTRL, tag, owner, clock)
 {
 }
@@ -125,7 +125,7 @@ void z37_intr_cntrl::update_intr_line()
 		(!m_intr_blocked && (m_intr_lines != 0))) ? 1 : 0);
 }
 
-uint8_t z37_intr_cntrl::get_instruction()
+u8 z37_intr_cntrl::get_instruction()
 {
 
 	if (m_drq_raised)
@@ -174,11 +174,11 @@ void z37_intr_cntrl::device_start()
 	save_item(NAME(m_irq_raised));
 
 	m_intr_blocked = false;
-	m_drq_raised = false;
-	m_irq_raised = false;
+	m_drq_raised   = false;
+	m_irq_raised   = false;
 }
 
-void z37_intr_cntrl::block_interrupts(uint8_t data)
+void z37_intr_cntrl::block_interrupts(u8 data)
 {
 	m_intr_blocked = bool(data);
 
@@ -191,7 +191,7 @@ void z37_intr_cntrl::block_interrupts(uint8_t data)
  *
  * Allows choice of interrupt controllers for Heath 8-bit computers.
  */
-heath_intr_socket::heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+heath_intr_socket::heath_intr_socket(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, HEATH_INTR_SOCKET, tag, owner, clock),
 	device_single_card_slot_interface(mconfig, *this),
 	m_irq_line(*this),
@@ -211,7 +211,7 @@ void heath_intr_socket::device_start()
 IRQ_CALLBACK_MEMBER(heath_intr_socket::irq_callback)
 {
 	// assume NO-OP
-	uint8_t instr = 0x00;
+	u8 instr = 0x00;
 
 	if (m_cntrl)
 	{

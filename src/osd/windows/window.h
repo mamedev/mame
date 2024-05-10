@@ -207,7 +207,7 @@ void winwindow_toggle_fsfx(void);
 void winwindow_ui_pause(running_machine &machine, int pause);
 int winwindow_ui_is_paused(running_machine &machine);
 
-void winwindow_dispatch_message(running_machine &machine, MSG *message);
+void winwindow_dispatch_message(running_machine &machine, MSG const &message);
 
 
 

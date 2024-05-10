@@ -1,76 +1,79 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese, Barry Rodewald
+// copyright-holders: Angelo Salese, Barry Rodewald
+// thanks-to: Dirk Best
 /************************************************************************************************
 
-    Sharp X1 (c) 1983 Sharp Corporation
+Sharp X1 (c) 1983 Sharp Corporation
 
-    driver by Angelo Salese & Barry Rodewald,
-    special thanks to Dirk Best for various wd17xx fixes
+References:
+- http://www.x1center.org/
+- http://ematei.s602.xrea.com/kenkyu/x1syasin.htm
+- http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html
+- https://eaw.app/sharpx1-manuals/
+- https://www.leadedsolder.com/tag/sharp-x1-turbo
+- http://takeda-toshiya.my.coocan.jp/x1twin/index.html
+- https://monochromeeffect.org/JVCC/2019/05/01/sharp-x1-turbo-z/
+- https://monochromeeffect.org/JVCC/2019/06/24/sharp-x1-d/
 
-    TODO:
-    - clean-ups, split components into devices if necessary and maybe separate turbo/turboz features into specific file(s);
-    - refactor base video into a true scanline renderer, expect it to break 6845 drawing delegation support badly;
-    - support extended x1turboz video features (need more test cases?);
-    - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
-    - Fix the 0xe80/0xe83 kanji ROM readback;
-    - x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
-    - Hook-up remaining .tap image formats;
-    - Implement APSS tape commands;
-    - Sort out / redump the BIOS gfx roms, and understand if TurboZ really have same BIOS as
-      vanilla Turbo like Jp emulators seems to suggest;
-    - X1Turbo: Implement SIO.
-    - Implement true 400 lines mode (i.e. Chatnoir no Mahjong v2.1, Casablanca)
-    - Implement SASI HDD interface;
-    - Driver Configuration switches:
-        - OPN for X1
-        - EMM, and hook-up for X1 too
-        - RAM size for EMM
-        - specific x1turboz features?
+TODO:
+- clean-up QA, is ugly and outdated;
+- clean-ups, split components into devices if necessary and maybe separate turbo/turboz features into specific file(s);
+- refactor base video into a true scanline renderer, expect it to break 6845 drawing delegation support badly;
+- support extended x1turboz video features (need more test cases?);
+- Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
+- Fix the 0xe80/0xe83 kanji ROM readback;
+- x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
+- Hook-up remaining .tap image formats;
+- Implement APSS tape commands;
+- Sort out / redump the BIOS gfx roms, and understand if TurboZ really have same BIOS as
+    vanilla Turbo like Jp emulators seems to suggest;
+- X1Turbo: Implement SIO.
+- Implement true 400 lines mode (i.e. Chatnoir no Mahjong v2.1, Casablanca)
+- Implement SASI HDD interface;
+- Driver Configuration switches:
+    - OPN for X1
+    - EMM, and hook-up for X1 too
+    - RAM size for EMM
+    - specific x1turboz features?
 
-    per-game/program specific TODO (to be moved to hash file):
-    - CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
-    - Chack'n Pop: game is too fast, presumably missing wait states;
-    - Dragon Buster: it crashed to me once with a obj flag hang;
-    - The Goonies (x1 only): goes offsync with the PCG beam positions;
-    - Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
-    - Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?
-    - Hydlide 3: can't get the user disk to work properly, could be a bad dump;
-    - Lupin the 3rd: don't know neither how to "data load" nor how to "create a character" ... does the game hangs?
-    - Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
-    - "newtype": trips a z80dma assert, worked around for now;
-    - Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
-    - Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
-    - Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
-    - Trivia-Q: dunno what to do on the selection screen, missing inputs?
-    - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
-    - Will 2: doesn't load, fdc issue presumably (note: it's a x1turbo game ONLY);
-    - X1F Demo ("New X1 Demo"): needs partial updates, but they doesn't cope well with current video system;
-    - Ys 2: crashes after the disclaimer screen;
-    - Ys 3: missing user disk, to hack it (and play with x1turboz features): bp 81ca,pc += 2
-    - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
+per-game/program specific TODO (to be moved to hash file):
+- CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
+- Chack'n Pop: game is too fast, presumably missing wait states;
+- Dragon Buster: it crashed to me once with a obj flag hang;
+- The Goonies (x1 only): goes offsync with the PCG beam positions;
+- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
+- Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?
+- Hydlide 3: can't get the user disk to work properly, could be a bad dump;
+- Lupin the 3rd: don't know neither how to "data load" nor how to "create a character" ... does the game hangs?
+- Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
+- "newtype": trips a z80dma assert, worked around for now;
+- Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
+- Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
+- Trivia-Q: dunno what to do on the selection screen, missing inputs?
+- X1F Demo ("New X1 Demo"): needs partial updates, but they doesn't cope well with current video system;
+- Ys 2: crashes after the disclaimer screen;
+- Ys 3: missing user disk, to hack it (and play with x1turboz features): bp 81ca,pc += 2
+- Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
 
-    Notes:
-    - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
-      does a 1->0 transition, any write to the i/o space accesses 2 or 3 banks gradients of the bitmap RAM
-      with a single write (generally used for layer clearances and bitmap-style sprites).
-      Any i/o read disables this extended bitmap ram.
-    - I/O port $700 bit 7 of X1 Turbo is a sound (dip-)switch / jumper setting. I don't know yet what is for,
-      but King's Knight needs it to be active otherwise it refuses to boot.
-    - ROM format header:
-      [0x00] ROM identifier, must be 0x01 / SOH
-      [0x01 to 0x0d] ROM header, i.e. title for the loader
-      [0x12 -  0x13] initial copy size
-      [0x14 -  0x15] destination address start address
-      [0x16 to 0x17] start boot jump vector
-      [0x1d to 0x1f] start boot data vector
-    - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (!) (btanb)
-    - Maidum: you need to load BOTH disk with write protection disabled, otherwise it refuses to run. (btanb)
-    - Marvelous: needs write protection disabled (btanb)
-    - Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
-      Substitute bin with load and press enter. Finally, do a run once that it loaded correctly.
-    - Faeries Residence: to load this game, put a basic v2.0 in drive 0, then execute a NEWON command. Load game disks into drive 0 and 1 then
-      type run"START" (case sensitive)
-    - POPLEMON: same as above, but you need to type run"POP"
+Notes:
+- An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
+    does a 1->0 transition, any write to the i/o space accesses 2 or 3 banks gradients of the bitmap RAM
+    with a single write (generally used for layer clearances and bitmap-style sprites).
+    Any i/o read disables this extended bitmap ram.
+- ROM format header (TODO: document, it's a full on expansion slot *inside* the machine, BASIC variant known to exist):
+    [0x00] ROM identifier, must be 0x01 / SOH
+    [0x01 to 0x0d] ROM header, i.e. title for the loader
+    [0x12 -  0x13] initial copy size
+    [0x14 -  0x15] destination address start address
+    [0x16 to 0x17] start boot jump vector
+    [0x1d to 0x1f] start boot data vector
+- Maidum: you need to load BOTH disk with write protection disabled, otherwise it refuses to run. (btanb)
+- Marvelous: needs write protection disabled (btanb)
+- Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
+    Substitute bin with load and press enter. Finally, do a run once that it loaded correctly.
+- Faeries Residence: to load this game, put a basic v2.0 in drive 0, then execute a NEWON command. Load game disks into drive 0 and 1 then
+    type run"START" (case sensitive)
+- POPLEMON: same as above, but you need to type run"POP"
 
 =================================================================================================
 
@@ -165,9 +168,6 @@
 
     X1turboZIII (CZ-888C) - December, 1988
      * same as turboZII, but no more built-in cassette drive
-
-    Please refer to http://www2s.biglobe.ne.jp/~ITTO/x1/x1menu.html for
-    more info
 
     BASIC has to be loaded from external media (tape or disk), the
     computer only has an Initial Program Loader (IPL)
@@ -433,7 +433,7 @@ uint8_t x1_state::get_game_key(uint8_t port)
 	return ret;
 }
 
-uint8_t x1_state::x1_sub_io_r()
+uint8_t x1_state::sub_io_r()
 {
 	uint8_t ret,bus_res;
 
@@ -533,7 +533,7 @@ void x1_state::cmt_command( uint8_t cmd )
 	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(x1_state::cmt_seek_cb)
 {
 	if(m_cassette->get_image() == nullptr) //avoid a crash if a disk game tries to access this
 		return;
@@ -555,7 +555,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
 	}
 }
 
-void x1_state::x1_sub_io_w(uint8_t data)
+void x1_state::sub_io_w(uint8_t data)
 {
 	/* sub-routine at $10e sends to these sub-routines when a keyboard input is triggered:
 	 $17a -> floppy
@@ -685,7 +685,7 @@ void x1_state::x1_sub_io_w(uint8_t data)
  *************************************/
 
 
-uint8_t x1_state::x1_rom_r()
+uint8_t x1_state::rom_r()
 {
 //  logerror("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
@@ -694,17 +694,17 @@ uint8_t x1_state::x1_rom_r()
 		return 0;
 }
 
-void x1_state::x1_rom_w(offs_t offset, uint8_t data)
+void x1_state::rom_w(offs_t offset, uint8_t data)
 {
 	m_rom_index[offset] = data;
 }
 
-void x1_state::x1_rom_bank_0_w(uint8_t data)
+void x1_state::rom_bank_0_w(uint8_t data)
 {
 	m_ram_bank = 0x10;
 }
 
-void x1_state::x1_rom_bank_1_w(uint8_t data)
+void x1_state::rom_bank_1_w(uint8_t data)
 {
 	m_ram_bank = 0x00;
 }
@@ -715,7 +715,7 @@ void x1_state::x1_rom_bank_1_w(uint8_t data)
  *
  *************************************/
 
-uint8_t x1_state::x1_fdc_r(offs_t offset)
+uint8_t x1_state::fdc_r(offs_t offset)
 {
 	//uint8_t ret = 0;
 
@@ -756,7 +756,7 @@ uint8_t x1_state::x1_fdc_r(offs_t offset)
 	return 0x00;
 }
 
-void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
+void x1_state::fdc_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -776,7 +776,6 @@ void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0x0ffc:
-			m_fdc_ctrl = data;
 			floppy = m_floppy[data & 0x03]->get_device();
 
 			m_fdc->set_floppy(floppy);
@@ -784,8 +783,12 @@ void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 			if (floppy)
 			{
 				floppy->ss_w(BIT(data, 4));
-				floppy->mon_w(!BIT(data, 7));
+				if(BIT(m_fdc_ctrl, 7) && !BIT(data, 7))
+					m_motor_timer->adjust(attotime::from_seconds(1.2));
+				else if(BIT(data, 7))
+					floppy->mon_w(0);
 			}
+			m_fdc_ctrl = data;
 			break;
 
 		case 0x0ffd:
@@ -796,15 +799,19 @@ void x1_state::x1_fdc_w(offs_t offset, uint8_t data)
 	}
 }
 
-void x1_state::fdc_drq_w(int state)
+TIMER_CALLBACK_MEMBER(x1_state::fdc_motor_off_cb)
 {
-	m_dma->rdy_w(state ^ 1);
+	if(!BIT(m_fdc_ctrl, 7))
+	{
+		floppy_image_device *floppy = m_floppy[m_fdc_ctrl & 0x03]->get_device();
+		if(floppy)
+			floppy->mon_w(1);
+	}
 }
 
-void x1_state::hdl_w(int state)
+void x1turbo_state::fdc_drq_w(int state)
 {
-	if (state)
-		m_floppy[m_fdc_ctrl & 0x03]->get_device()->mon_w(CLEAR_LINE);
+	m_dma->rdy_w(state ^ 1);
 }
 
 /*************************************
@@ -844,7 +851,7 @@ uint16_t x1_state::get_pcg_addr( uint16_t width, uint8_t y_char_size )
 	return pcg_offset;
 }
 
-uint8_t x1_state::x1_pcg_r(offs_t offset)
+uint8_t x1_state::pcg_r(offs_t offset)
 {
 	int addr;
 	int pcg_offset;
@@ -880,7 +887,7 @@ uint8_t x1_state::x1_pcg_r(offs_t offset)
 	return res;
 }
 
-void x1_state::x1_pcg_w(offs_t offset, uint8_t data)
+void x1_state::pcg_w(offs_t offset, uint8_t data)
 {
 	int addr,pcg_offset;
 
@@ -951,19 +958,19 @@ void x1_state::set_current_palette()
 
 /* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
          In 4096 color mode, it's used for reading the value back. */
-void x1_state::x1_pal_r_w(uint8_t data)
+void x1_state::pal_r_w(uint8_t data)
 {
 	m_x_r = data;
 	set_current_palette();
 }
 
-void x1_state::x1_pal_g_w(uint8_t data)
+void x1_state::pal_g_w(uint8_t data)
 {
 	m_x_g = data;
 	set_current_palette();
 }
 
-void x1_state::x1_pal_b_w(uint8_t data)
+void x1_state::pal_b_w(uint8_t data)
 {
 	m_x_b = data;
 	set_current_palette();
@@ -1005,19 +1012,19 @@ void x1_state::x1turboz_4096_palette_w(offs_t offset, uint8_t data)
 		switch (offset & 0x0300)
 		{
 		case 0x0000:
-			x1_pal_b_w(data);
+			pal_b_w(data);
 			break;
 		case 0x0100:
-			x1_pal_r_w(data);
+			pal_r_w(data);
 			break;
 		case 0x0200:
-			x1_pal_g_w(data);
+			pal_g_w(data);
 			break;
 		}
 	}
 }
 
-uint8_t x1_state::x1_ex_gfxram_r(offs_t offset)
+uint8_t x1_state::ex_gfxram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -1030,7 +1037,7 @@ uint8_t x1_state::x1_ex_gfxram_r(offs_t offset)
 	}
 }
 
-void x1_state::x1_ex_gfxram_w(offs_t offset, uint8_t data)
+void x1_state::ex_gfxram_w(offs_t offset, uint8_t data)
 {
 	uint8_t ex_mask;
 
@@ -1057,7 +1064,7 @@ void x1_state::x1_ex_gfxram_w(offs_t offset, uint8_t data)
     d6(40) = 0:8-raster graphics      1:16-raster graphics
     d7(80) = 0:don't display          1:display  <- underline (when 1, graphics are not displayed)
 */
-void x1_state::x1_scrn_w(uint8_t data)
+void x1_state::scrn_w(uint8_t data)
 {
 	m_scrn_reg.pcg_mode = BIT(data, 5);
 	m_bitmapbank->set_entry(BIT(data, 4));
@@ -1071,24 +1078,10 @@ void x1_state::x1_scrn_w(uint8_t data)
 		logerror("SCRN sets true 400 lines mode\n");
 }
 
-void x1_state::x1_pri_w(uint8_t data)
+void x1_state::pri_w(uint8_t data)
 {
 	m_scrn_reg.pri = data;
 //  logerror("PRI = %02x\n",data);
-}
-
-void x1_state::x1_6845_w(offs_t offset, uint8_t data)
-{
-	if(offset == 0)
-	{
-		m_crtc_index = data & 31;
-		m_crtc->address_w(data);
-	}
-	else
-	{
-		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(data);
-	}
 }
 
 uint8_t x1_state::x1turboz_blackclip_r()
@@ -1186,7 +1179,7 @@ uint16_t x1_state::jis_convert(int kanji_addr)
 	return 0x0000;
 }
 
-uint8_t x1_state::x1_kanji_r(offs_t offset)
+uint8_t x1_state::kanji_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -1198,7 +1191,7 @@ uint8_t x1_state::x1_kanji_r(offs_t offset)
 	return res;
 }
 
-void x1_state::x1_kanji_w(offs_t offset, uint8_t data)
+void x1_state::kanji_w(offs_t offset, uint8_t data)
 {
 //  if(offset < 2)
 
@@ -1228,7 +1221,7 @@ void x1_state::x1_kanji_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t x1_state::x1_emm_r(offs_t offset)
+uint8_t x1_state::emm_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -1252,7 +1245,7 @@ uint8_t x1_state::x1_emm_r(offs_t offset)
 	return res;
 }
 
-void x1_state::x1_emm_w(offs_t offset, uint8_t data)
+void x1_state::emm_w(offs_t offset, uint8_t data)
 {
 	if(offset & ~3)
 	{
@@ -1295,7 +1288,7 @@ void x1_state::x1turbo_bank_w(uint8_t data)
 }
 
 /* TODO: waitstate penalties */
-uint8_t x1_state::x1_mem_r(offs_t offset)
+uint8_t x1_state::mem_r(offs_t offset)
 {
 	if((offset & 0x8000) == 0 && (m_ram_bank == 0))
 	{
@@ -1305,25 +1298,25 @@ uint8_t x1_state::x1_mem_r(offs_t offset)
 	return m_work_ram[offset]; //RAM
 }
 
-void x1_state::x1_mem_w(offs_t offset, uint8_t data)
+void x1_state::mem_w(offs_t offset, uint8_t data)
 {
 	m_work_ram[offset] = data; //RAM
 }
 
-uint8_t x1_state::x1turbo_mem_r(offs_t offset)
+uint8_t x1turbo_state::x1turbo_mem_r(offs_t offset)
 {
 	if((m_ex_bank & 0x10) == 0)
 		return m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)];
 
-	return x1_mem_r(offset);
+	return mem_r(offset);
 }
 
-void x1_state::x1turbo_mem_w(offs_t offset, uint8_t data)
+void x1turbo_state::x1turbo_mem_w(offs_t offset, uint8_t data)
 {
 	if((m_ex_bank & 0x10) == 0)
 		m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)] = data; //RAM
 	else
-		x1_mem_w(offset,data);
+		mem_w(offset,data);
 }
 
 /*************************************
@@ -1336,22 +1329,34 @@ void x1_state::x1_io_banks_common(address_map &map)
 {
 	map.unmap_value_high();
 
-	map(0x0e00, 0x0e02).w(FUNC(x1_state::x1_rom_w));
-	map(0x0e03, 0x0e03).r(FUNC(x1_state::x1_rom_r));
+	map(0x0e00, 0x0e02).w(FUNC(x1_state::rom_w));
+	map(0x0e03, 0x0e03).r(FUNC(x1_state::rom_r));
 
-	map(0x0ff8, 0x0fff).rw(FUNC(x1_state::x1_fdc_r), FUNC(x1_state::x1_fdc_w));
+	map(0x0ff8, 0x0fff).rw(FUNC(x1_state::fdc_r), FUNC(x1_state::fdc_w));
 
-	map(0x1300, 0x1300).mirror(0x00ff).w(FUNC(x1_state::x1_pri_w));
-	map(0x1400, 0x17ff).rw(FUNC(x1_state::x1_pcg_r), FUNC(x1_state::x1_pcg_w));
+	map(0x1300, 0x1300).mirror(0x00ff).w(FUNC(x1_state::pri_w));
+	map(0x1400, 0x17ff).rw(FUNC(x1_state::pcg_r), FUNC(x1_state::pcg_w));
 
-	map(0x1800, 0x1801).w(FUNC(x1_state::x1_6845_w));
+	// TODO: verify if also readable
+	map(0x1800, 0x1800).lw8(
+		NAME([this](offs_t offset, u8 data) {
+			m_crtc_index = data & 31;
+			m_crtc->address_w(data);
+		})
+	);
+	map(0x1801, 0x1801).lw8(
+		NAME([this](offs_t offset, u8 data) {
+			m_crtc_vreg[m_crtc_index] = data;
+			m_crtc->register_w(data);
+		})
+	);
 
-	map(0x1900, 0x1900).mirror(0x00ff).rw(FUNC(x1_state::x1_sub_io_r), FUNC(x1_state::x1_sub_io_w));
+	map(0x1900, 0x1900).mirror(0x00ff).rw(FUNC(x1_state::sub_io_r), FUNC(x1_state::sub_io_w));
 	map(0x1a00, 0x1a03).mirror(0x00fc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x1b00, 0x1b00).mirror(0x00ff).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x1c00, 0x1c00).mirror(0x00ff).w("ay", FUNC(ay8910_device::address_w));
-	map(0x1d00, 0x1d00).mirror(0x00ff).w(FUNC(x1_state::x1_rom_bank_1_w));
-	map(0x1e00, 0x1e00).mirror(0x00ff).w(FUNC(x1_state::x1_rom_bank_0_w));
+	map(0x1d00, 0x1d00).mirror(0x00ff).w(FUNC(x1_state::rom_bank_1_w));
+	map(0x1e00, 0x1e00).mirror(0x00ff).w(FUNC(x1_state::rom_bank_0_w));
 
 	map(0x1fa0, 0x1fa3).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1fa8, 0x1fab).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -1360,7 +1365,7 @@ void x1_state::x1_io_banks_common(address_map &map)
 
 	map(0x4000, 0xffff).bankrw("bitmapbank");
 
-	map(0x10000, 0x1ffff).rw(FUNC(x1_state::x1_ex_gfxram_r), FUNC(x1_state::x1_ex_gfxram_w));
+	map(0x10000, 0x1ffff).rw(FUNC(x1_state::ex_gfxram_r), FUNC(x1_state::ex_gfxram_w));
 }
 
 
@@ -1370,42 +1375,44 @@ void x1_state::x1_io_banks(address_map &map)
 
 //  map(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
 
-	map(0x1000, 0x1000).mirror(0x00ff).w(FUNC(x1_state::x1_pal_b_w));
-	map(0x1100, 0x1100).mirror(0x00ff).w(FUNC(x1_state::x1_pal_r_w));
-	map(0x1200, 0x1200).mirror(0x00ff).w(FUNC(x1_state::x1_pal_g_w));
+	map(0x1000, 0x1000).mirror(0x00ff).w(FUNC(x1_state::pal_b_w));
+	map(0x1100, 0x1100).mirror(0x00ff).w(FUNC(x1_state::pal_r_w));
+	map(0x1200, 0x1200).mirror(0x00ff).w(FUNC(x1_state::pal_g_w));
 
-	map(0x3000, 0x37ff).mirror(0x0800).ram().share("tvram"); // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
+	// Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
+	map(0x3000, 0x37ff).mirror(0x0800).ram().share("tvram");
 }
 
 
-void x1_state::x1turbo_io_banks(address_map &map)
+void x1turbo_state::x1turbo_io_banks(address_map &map)
 {
 	x1_io_banks_common(map);
 
-	// a * at the end states devices used on plain X1 too
+	// TODO: a ** at head states devices used on plain X1 too, as option board
 
-	map(0x0700, 0x0701).r(FUNC(x1_state::ym_r)).w("ym", FUNC(ym2151_device::write));
+/**/map(0x0700, 0x0701).r(FUNC(x1_state::ym_r)).w("ym", FUNC(ym2151_device::write));
 	// 0x704 is FM sound detection port on X1 turboZ
-	map(0x0704, 0x0707).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0704, 0x0707).rw(m_ctc_ym, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	map(0x0800, 0x0800).w(FUNC(x1_state::color_board_w));                          // *
-	map(0x0801, 0x0801).r(FUNC(x1_state::color_board_r));                           // *
-	map(0x0802, 0x0802).w(FUNC(x1_state::color_board_2_w));                        // *
-	map(0x0803, 0x0803).r(FUNC(x1_state::color_board_2_r));                         // *
-	map(0x0a00, 0x0a07).rw(FUNC(x1_state::stereo_board_r), FUNC(x1_state::stereo_board_w));     // *
+/**/map(0x0800, 0x0800).w(FUNC(x1_state::color_board_w));
+/**/map(0x0801, 0x0801).r(FUNC(x1_state::color_board_r));
+/**/map(0x0802, 0x0802).w(FUNC(x1_state::color_board_2_w));
+/**/map(0x0803, 0x0803).r(FUNC(x1_state::color_board_2_r));
+/**/map(0x0a00, 0x0a07).rw(FUNC(x1_state::stereo_board_r), FUNC(x1_state::stereo_board_w));
 	map(0x0b00, 0x0b00).rw(FUNC(x1_state::x1turbo_bank_r), FUNC(x1_state::x1turbo_bank_w));
-	map(0x0c00, 0x0cff).rw(FUNC(x1_state::rs232_r), FUNC(x1_state::rs232_w));                   // *
-	map(0x0d00, 0x0dff).rw(FUNC(x1_state::x1_emm_r), FUNC(x1_state::x1_emm_w));                 // *
-	map(0x0e80, 0x0e81).r(FUNC(x1_state::x1_kanji_r));
-	map(0x0e80, 0x0e83).w(FUNC(x1_state::x1_kanji_w));
-	map(0x0fd0, 0x0fd3).rw(FUNC(x1_state::sasi_r), FUNC(x1_state::sasi_w));                     // *
-	map(0x0fe8, 0x0fef).rw(FUNC(x1_state::fdd8_r), FUNC(x1_state::fdd8_w));                     // *
+/**/map(0x0c00, 0x0cff).rw(FUNC(x1_state::rs232_r), FUNC(x1_state::rs232_w));
+/**/map(0x0d00, 0x0dff).rw(FUNC(x1_state::emm_r), FUNC(x1_state::emm_w));
+	map(0x0e80, 0x0e81).r(FUNC(x1_state::kanji_r));
+	map(0x0e80, 0x0e83).w(FUNC(x1_state::kanji_w));
+/**/map(0x0fd0, 0x0fd3).rw(FUNC(x1_state::sasi_r), FUNC(x1_state::sasi_w));
+/**/map(0x0fe8, 0x0fef).rw(FUNC(x1_state::fdd8_r), FUNC(x1_state::fdd8_w));
 
 	map(0x1000, 0x12ff).w(FUNC(x1_state::x1turboz_4096_palette_w));
 
 	map(0x1f80, 0x1f80).mirror(0x000f).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x1f90, 0x1f93).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x1f98, 0x1f9f).rw(FUNC(x1_state::ext_sio_ctc_r), FUNC(x1_state::ext_sio_ctc_w));
+	// FIXME: identify disks with Turbo Z capabilities, potentially move to subclass
 	map(0x1fb0, 0x1fb0).rw(FUNC(x1_state::x1turbo_pal_r), FUNC(x1_state::x1turbo_pal_w));       // Z only!
 	map(0x1fb8, 0x1fbf).rw(FUNC(x1_state::x1turbo_txpal_r), FUNC(x1_state::x1turbo_txpal_w));   // Z only!
 	map(0x1fc0, 0x1fc0).rw(FUNC(x1_state::x1turbo_txdisp_r), FUNC(x1_state::x1turbo_txdisp_w)); // Z only!
@@ -1415,7 +1422,7 @@ void x1_state::x1turbo_io_banks(address_map &map)
 	map(0x1fc4, 0x1fc4).w(FUNC(x1_state::z_extra_scroll_w));                       // Z only!
 	map(0x1fc5, 0x1fc5).rw(FUNC(x1_state::x1turbo_gfxpal_r), FUNC(x1_state::x1turbo_gfxpal_w)); // Z only!
 //  map(0x1fd0, 0x1fdf).r(FUNC(x1_state::x1_scrn_r));                               // Z only!
-	map(0x1fd0, 0x1fd0).mirror(0x000f).w(FUNC(x1_state::x1_scrn_w));
+	map(0x1fd0, 0x1fd0).mirror(0x000f).w(FUNC(x1_state::scrn_w));
 	map(0x1fe0, 0x1fe0).rw(FUNC(x1_state::x1turboz_blackclip_r), FUNC(x1_state::x1turbo_blackclip_w));
 	map(0x1ff0, 0x1ff0).portr("X1TURBO_DSW");
 
@@ -1426,12 +1433,12 @@ void x1_state::x1turbo_io_banks(address_map &map)
 
 void x1_state::x1_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(x1_state::x1_mem_r), FUNC(x1_state::x1_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(x1_state::mem_r), FUNC(x1_state::mem_w));
 }
 
-void x1_state::x1turbo_mem(address_map &map)
+void x1turbo_state::x1turbo_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(x1_state::x1turbo_mem_r), FUNC(x1_state::x1turbo_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(x1turbo_state::x1turbo_mem_r), FUNC(x1turbo_state::x1turbo_mem_w));
 }
 
 void x1_state::x1_io(address_map &map)
@@ -1451,21 +1458,22 @@ uint8_t x1_state::x1_porta_r()
 	return 0xff;
 }
 
-/* this port is system related */
+/*
+x--- ---- V-DISP
+-x-- ---- "sub cpu ibf"
+--x- ---- "sub cpu obf"
+---x ---- IPL RESET (0=ROM, 1=RAM)
+---- x--- "busy" <- allow printer data output
+---- -x-- CV-SYNC "v sync"
+---- --x- READ DATA "cmt read"
+---- ---x -BREAK "cmt test" (active low) <- actually this is "Sub CPU detected BREAK"
+*/
 uint8_t x1_state::x1_portb_r()
 {
 	//logerror("PPI Port B read\n");
-	/*
-	x--- ---- "v disp"
-	-x-- ---- "sub cpu ibf"
-	--x- ---- "sub cpu obf"
-	---x ---- ROM/RAM flag (0=ROM, 1=RAM)
-	---- x--- "busy" <- allow printer data output
-	---- -x-- "v sync"
-	---- --x- "cmt read"
-	---- ---x "cmt test" (active low) <- actually this is "Sub CPU detected BREAK"
-	*/
 	uint8_t res = 0;
+	// TODO: ys3 is unhappy about V-DISP
+	// NOTE: all PCG games actively reads from here, touching this uncarefully *will* break stuff
 	int vblank_line = m_crtc_vreg[6] * (m_crtc_vreg[9]+1);
 	int vsync_line = m_crtc_vreg[7] * (m_crtc_vreg[9]+1);
 	m_vdisp = (m_screen->vpos() < vblank_line) ? 0x80 : 0x00;
@@ -1534,25 +1542,25 @@ void x1_state::x1_portc_w(uint8_t data)
 	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
 }
 
-uint8_t x1_state::memory_read_byte(offs_t offset)
+uint8_t x1turbo_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-void x1_state::memory_write_byte(offs_t offset, uint8_t data)
+void x1turbo_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
 
-uint8_t x1_state::io_read_byte(offs_t offset)
+uint8_t x1turbo_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-void x1_state::io_write_byte(offs_t offset, uint8_t data)
+void x1turbo_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
@@ -1561,6 +1569,8 @@ void x1_state::io_write_byte(offs_t offset, uint8_t data)
 uint8_t x1_state::ym_r(offs_t offset)
 {
 	uint8_t result = m_ym->read(offset);
+	// TODO: kingkngt x1turbo expects this to be high when in OPM mode
+	// is it just covering some tight OPM busy flag?
 	if (!BIT(offset, 0))
 		result = (result & 0x7f) | (m_sound_sw->read() & 0x80);
 	return result;
@@ -1697,10 +1707,7 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1_state, nmi_reset,0) PORT_NAME("NMI reset")
 
 	PORT_START("SOUND_SW")
-	// TODO: this is X1Turbo specific and likely OPN busy flag instead
-	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOSYS")
 	// TODO: route front-panel DIP-SW here
@@ -1749,6 +1756,7 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// TODO: move me to x1_keyboard_device
 	PORT_START("key1") //0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED) //0x00 null
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0-2") PORT_CHAR(1)
@@ -1885,7 +1893,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( x1turbo )
 	PORT_INCLUDE( x1 )
-	// X1TURBO TODO: add other keys (ROLL UP, ROLL DOWN, HELP, COPY, XFER)
+	// TODO: add other keys (ROLL UP, ROLL DOWN, HELP, COPY, XFER)
+
+	PORT_MODIFY("SOUND_SW")
+	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("X1TURBO_DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Interlace mode" )
@@ -1968,9 +1981,11 @@ static const z80_daisy_config x1_daisy[] =
 	{ nullptr }
 };
 
+// TODO: verify order, suppose ctc_ym really goes as generic ext pin instead.
 static const z80_daisy_config x1turbo_daisy[] =
 {
 	{ "x1kb" },
+	{ "ctc_ym" },
 	{ "ctc" },
 	{ "dma" },
 	{ "sio" },
@@ -2004,7 +2019,7 @@ IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 }
 #endif
 
-TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(x1_state::sub_keyboard_cb)
 {
 	uint32_t key1 = ioport("key1")->read();
 	uint32_t key2 = ioport("key2")->read();
@@ -2020,7 +2035,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3) || (key4 != m_old_key4) || (f_key != m_old_fkey))
 		{
 			// generate keyboard IRQ
-			x1_sub_io_w(0xe6);
+			sub_io_w(0xe6);
 			m_irq_vector = m_key_irq_vector;
 			m_key_irq_flag = 1;
 			m_maincpu->set_input_line(0,ASSERT_LINE);
@@ -2033,7 +2048,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
+TIMER_CALLBACK_MEMBER(x1_state::rtc_tick_cb)
 {
 	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
@@ -2145,9 +2160,10 @@ void x1_state::machine_start()
 		m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
 		m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
 
-		m_rtc_timer = timer_alloc(FUNC(x1_state::x1_rtc_increment), this);
+		m_rtc_timer = timer_alloc(FUNC(x1_state::rtc_tick_cb), this);
 	}
 
+	m_motor_timer = timer_alloc(FUNC(x1_state::fdc_motor_off_cb), this);
 	m_work_ram = make_unique_clear<uint8_t[]>(0x10000*0x10);
 	m_emm_ram = make_unique_clear<uint8_t[]>(0x1000000);
 	m_pcg_ram = make_unique_clear<uint8_t[]>(0x1800);
@@ -2167,7 +2183,9 @@ void x1_state::floppy_formats(format_registration &fr)
 
 static void x1_floppies(device_slot_interface &device)
 {
-	device.option_add("dd", FLOPPY_525_DD);
+	// TODO: 3" (!?) and 8" options, verify if vanilla X1 has them all
+	device.option_add("525dd", FLOPPY_525_DD);
+//  device.option_add("525hd", FLOPPY_525_HD);
 }
 
 void x1_state::x1(machine_config &config)
@@ -2183,6 +2201,7 @@ void x1_state::x1(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "ctc", MAIN_CLOCK/4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set("ctc", FUNC(z80ctc_device::trg3));
+	// TODO: clocks for SIO
 	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
@@ -2216,13 +2235,11 @@ void x1_state::x1(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16); // clocked by SED9421C0B
-	// TODO: guesswork, try to implicitly start the motor
-	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "dd", x1_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "dd", x1_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", x1_floppies, "dd", x1_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", x1_floppies, "dd", x1_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
 
@@ -2231,14 +2248,12 @@ void x1_state::x1(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
+	// TODO: fix thru schematics (formation of resistors tied to ABC outputs)
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(0, "lspeaker", 0.25);
-	ay.add_route(0, "rspeaker", 0.25);
-	ay.add_route(1, "lspeaker", 0.5);
-	ay.add_route(2, "rspeaker", 0.5);
+	ay.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	ay.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
@@ -2248,20 +2263,20 @@ void x1_state::x1(machine_config &config)
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
-	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::x1_keyboard_callback), attotime::from_hz(250));
-	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::x1_cmt_wind_timer), attotime::from_hz(16));
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::sub_keyboard_cb), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::cmt_seek_cb), attotime::from_hz(16));
 }
 
-void x1_state::x1turbo(machine_config &config)
+void x1turbo_state::x1turbo(machine_config &config)
 {
 	x1(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1turbo_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1turbo_state::x1turbo_mem);
 	m_maincpu->set_daisy_config(x1turbo_daisy);
 
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
-	m_iobank->set_map(&x1_state::x1turbo_io_banks);
+	m_iobank->set_map(&x1turbo_state::x1turbo_io_banks);
 
 	z80sio_device& sio(Z80SIO(config, "sio", MAIN_CLOCK/4));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -2269,14 +2284,20 @@ void x1_state::x1turbo(machine_config &config)
 	Z80DMA(config, m_dma, MAIN_CLOCK/4);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_dma->in_mreq_callback().set(FUNC(x1_state::memory_read_byte));
-	m_dma->out_mreq_callback().set(FUNC(x1_state::memory_write_byte));
-	m_dma->in_iorq_callback().set(FUNC(x1_state::io_read_byte));
-	m_dma->out_iorq_callback().set(FUNC(x1_state::io_write_byte));
+	m_dma->in_mreq_callback().set(FUNC(x1turbo_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(x1turbo_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(x1turbo_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(x1turbo_state::io_write_byte));
 
-	m_fdc->drq_wr_callback().set(FUNC(x1_state::fdc_drq_w));
+	m_fdc->drq_wr_callback().set(FUNC(x1turbo_state::fdc_drq_w));
 
-	YM2151(config, m_ym, MAIN_CLOCK/8); //option board
+	// TODO: as sub-board option, CZ-8BS1
+	Z80CTC(config, m_ctc_ym, MAIN_CLOCK/4);
+	// FIXME: check intr
+	m_ctc_ym->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_ym->zc_callback<0>().set(m_ctc_ym, FUNC(z80ctc_device::trg3));
+
+	YM2151(config, m_ym, MAIN_CLOCK/8);
 	m_ym->add_route(0, "lspeaker", 0.50);
 	m_ym->add_route(1, "rspeaker", 0.50);
 }
@@ -2375,9 +2396,8 @@ void x1_state::init_x1_kanji()
 }
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT           COMPANY  FULLNAME              FLAGS
-COMP( 1982, x1,        0,      0,      x1,      x1,      x1_state, empty_init,    "Sharp", "X1 (CZ-800C)",       0 )
+COMP( 1982, x1,        0,      0,      x1,      x1,      x1_state,      empty_init,    "Sharp", "X1 (CZ-800C)",       0 )
 // x1twin in x1twin.cpp
-COMP( 1984, x1turbo,   x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
-COMP( 1985, x1turbo40, x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
+COMP( 1984, x1turbo,   x1,     0,      x1turbo, x1turbo, x1turbo_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
+COMP( 1985, x1turbo40, x1,     0,      x1turbo, x1turbo, x1turbo_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
 //COMP( 1986, x1turboz,  x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )

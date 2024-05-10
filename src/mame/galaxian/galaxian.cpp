@@ -1024,6 +1024,22 @@ int galaxian_state::theend_protection_alt_r()
 	return (m_protection_result >> 7) & 1;
 }
 
+// HACK: this is really crude, should probably be done similarly to theend_protection_w
+uint8_t galaxian_state::scrammr_protection_r()
+{
+	logerror("%s protection read\n", machine().describe_context());
+	if (m_maincpu->pc() == 0x12e)
+		return 0x90;
+	else if (m_maincpu->pc() == 0x1ca)
+		return 0x90;
+	else if (m_maincpu->pc() == 0xbf1)
+		return 0xa0;
+	else if (m_maincpu->pc() == 0xc3c)
+		return 0x90;
+	else
+		return 0x00;
+}
+
 /*************************************
  *
  *  Explorer I/O
@@ -1911,6 +1927,12 @@ void galaxian_state::bongo_map(address_map &map)
 	map(0xb000, 0xb000).mirror(0x7f8).nopw(); // interrupt enable moved
 	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::irq_enable_w));
 	map(0xb800, 0xb800).mirror(0x7ff).nopw(); // written once at start
+}
+
+void galaxian_state::bongoa_map(address_map &map)
+{
+	bongo_map(map);
+	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW");
 }
 
 void galaxian_state::bongo_io_map(address_map &map)
@@ -7786,6 +7808,15 @@ void galaxian_state::bongo(machine_config &config)
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
+void galaxian_state::bongoa(machine_config &config)
+{
+	bongo(config);
+
+	// dip switches are read via the memory map instead of the AY8910
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bongoa_map);
+	m_ay8910[0]->port_a_read_callback().set_constant(0xff);
+}
+
 void bmxstunts_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
@@ -8090,6 +8121,13 @@ void galaxian_state::scramble(machine_config &config)
 
 	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::theend_protection_r));
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::theend_protection_w));
+}
+
+void galaxian_state::scrammr(machine_config &config)
+{
+	scramble(config);
+
+	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::scrammr_protection_r));
 }
 
 void galaxian_state::jungsub(machine_config &config)
@@ -10055,6 +10093,22 @@ ROM_START( galaxianiii ) // this was found on a genuine Midway PCB
 	ROM_LOAD( "6l.bpr", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( sgalwars ) // this was found on 2 genuine Midway PCB sets
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "2716.5", 0x0000, 0x0800, CRC(e8f3aa67) SHA1(a0e9576784dbe602dd9780e667f01f31defd7c00) )
+	ROM_LOAD( "2716.4", 0x0800, 0x0800, CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) )
+	ROM_LOAD( "2716.3", 0x1000, 0x0800, CRC(ddeabdae) SHA1(daa5109a32c7c9a80bdb212dc3e4e3e3c104a731) )
+	ROM_LOAD( "2716.2", 0x1800, 0x0800, CRC(9463f753) SHA1(d9cb35c19aafec43d08b048bbe2337a790f6ba9d) )
+	ROM_LOAD( "2716.1", 0x2000, 0x0800, CRC(dfc20e57) SHA1(53d8d832be8b4bd0d0220ecca20536146248514f) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "2716.1jh", 0x0000, 0x0800, CRC(84decf98) SHA1(2e565cb6057b1816a6b4541e6dfadd3c3762fa36) )
+	ROM_LOAD( "2716.1lk", 0x0800, 0x0800, CRC(c31ada9e) SHA1(237ebb48549b34ca59a13cc2706512d957413ec4) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bpr", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 ROM_START( swarm )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "swarm1.bin",   0x0000, 0x0800, CRC(21eba3d0) SHA1(d07f141d785c86faca8c40af034c26f2789e9346) )
@@ -11424,6 +11478,7 @@ ROM_START( pacmanbla ) // Content is the same as the above bootleg, but arranged
 	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) // Same as pisces
 ROM_END
 
+// Single PCB, the usual Galaxian PCB layout (made by Recreativos Franco).
 ROM_START( pacmanblv ) // Video Dens (not Artic Multi-System)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pacvideodens-1-2516.bin",  0x0000, 0x0800, CRC(590de3f3) SHA1(99cf9711d9bd4f5750533cdf9c88a9c88c6e531a) ) // Dumped as Intel 2716
@@ -11445,6 +11500,33 @@ ROM_START( pacmanblv ) // Video Dens (not Artic Multi-System)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pacvideodens-im5610cpe.6l", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) ) // Dumped as 82s123
+ROM_END
+
+// Two PCBs, different to the usual Galaxian single PCB.
+ROM_START( pacmanblva ) // Video Dens (not Artic Multi-System)
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "pac-1-2716.bin", 0x0000, 0x0800, BAD_DUMP CRC(590de3f3) SHA1(99cf9711d9bd4f5750533cdf9c88a9c88c6e531a) ) // Byte 0x14d was 0x00 on this set, instead of 0x40, probably because of bit rot
+	ROM_LOAD( "pac-2-2716.bin", 0x0800, 0x0800, CRC(3954e41c) SHA1(4b3f838d55ab4b5b93e1bcb26b3661f090a9124f) )
+	ROM_LOAD( "pac-3-2716.bin", 0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) )
+	ROM_LOAD( "pac-4-2716.bin", 0x1800, 0x0800, CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) )
+	ROM_LOAD( "pac-5-2716.bin", 0x2000, 0x0800, CRC(42f08538) SHA1(a5ce713921771c7b253fc01b6dd6aa1f1af38fc0) )
+	ROM_LOAD( "pac-6-2716.bin", 0x2800, 0x0800, CRC(7aa90d69) SHA1(2271ea03d1d98415bf5121ada4daa0f829f969b1) )
+	ROM_LOAD( "pac-7-2716.bin", 0x3000, 0x0800, CRC(2bbed46e) SHA1(96648411af4ab7c43a9b91f7d0bc25f772fb5177) )
+
+	ROM_REGION( 0x2000, "tempgfx", 0 )
+	ROM_LOAD( "1-2732.hj",      0x0000, 0x1000, CRC(f2d8c01e) SHA1(d4a5789476fa7859bb936df10590775e97e87578) )
+	ROM_LOAD( "2732.kl",        0x1000, 0x1000, CRC(346a1720) SHA1(e152c9161f4e8ef53153b9c4a8ecef9fdbbe2463) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_COPY( "tempgfx",        0x0800, 0x0000, 0x0800 )
+	ROM_COPY( "tempgfx",        0x1800, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_COPY( "tempgfx",        0x0000, 0x0000, 0x0800 )
+	ROM_COPY( "tempgfx",        0x1000, 0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6l",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( pacmanblc ) // Calfesa bootleg? (not Artic Multi-System)
@@ -13929,6 +14011,24 @@ ROM_START( frogg )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
+ROM_START( froggeg ) // Hermatic bootleg on Video Game / Electro Game hardware
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "f1-2716-satellite_low.bin", 0x0000, 0x0800, CRC(1762b266) SHA1(2cf34dcfe00dc476b327f9d762a8d2aa268a2d25) )
+	ROM_LOAD( "f2-2716-satellite_low.bin", 0x0800, 0x0800, CRC(c4037087) SHA1(8987ea6380263058156b0c13da5780f68701a21b) )
+	ROM_LOAD( "f3-2716-satellite_low.bin", 0x1000, 0x0800, CRC(28bd6151) SHA1(1a5bc540168fa5fef01bd7bc2cdbdb910c9a4ba4) )
+	ROM_LOAD( "f4-2516-satellite_low.bin", 0x1800, 0x0800, CRC(5a69ab18) SHA1(40b7bf200f87e0fb3fb54726ba79387889446052) )
+	ROM_LOAD( "f5-2516-satellite_up.bin",  0x2000, 0x0800, CRC(7acfd5e3) SHA1(a9120e837e163224159637b2f8967a42e1430b5c) )
+	ROM_LOAD( "f6-2716-satellite_up.bin",  0x2800, 0x0800, CRC(0cbdf821) SHA1(8904ecc6dded284a8a0f62318c5f4113463db420) )
+	ROM_LOAD( "f7-2716-satellite_up.bin",  0x3000, 0x0800, CRC(de3edc8c) SHA1(634d54fb19b422b56576a196bdaf95733c52c7ee) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "fr8-2716.bin",              0x0000, 0x0800, CRC(05f7d883) SHA1(78831fd287da18928651a8adb7e578d291493eff) )
+	ROM_LOAD( "fr7-2716.bin",              0x0800, 0x0800, CRC(658745f8) SHA1(e4e5c3e011c8a7233a36d29e10e08905873500aa) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin",                0x0000, 0x0020, CRC(c5f12bc3) SHA1(b746ba06b596d4227fdc730a23bdf495f84e6a72) )
+ROM_END
+
 ROM_START( froggrs )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 64k for code
 	ROM_LOAD( "frog4.bin",    0x0000, 0x1000, CRC(4d563992) SHA1(25a197f711498112e202fa88ca576b247d24e228) )
@@ -14694,11 +14794,13 @@ ROM_START( scramrf )
 	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+// MEF00280 + MEF00281 PCBs
+// data bit 2 was problematic in the original dump of 303.fg2, but ROM is clearly the same as the one in scramrf. Left as BAD_DUMP just as extreme precaution.
 ROM_START( scrammr )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "301.cd2",      0x0000, 0x1000, CRC(680c9355) SHA1(e23cfc1ec839b9bf3d8d9d5d09f0df5c67f8bbb5) )
 	ROM_LOAD( "302.e2",       0x1000, 0x1000, CRC(5b500c90) SHA1(45b1bad1d93f3e474395a193d2fe00e105ba39e5) )
-	ROM_LOAD( "303.fg2",      0x2000, 0x1000, CRC(664437d7) SHA1(1fb7cb724b0dcfe6fcd2213f8e47dfd46e51f90f) )
+	ROM_LOAD( "303.fg2",      0x2000, 0x1000, BAD_DUMP CRC(179e1c1f) SHA1(a86d3e7a1340a396e418df4580e73fb6c76ce175) )
 	ROM_LOAD( "304.h2",       0x3000, 0x1000, CRC(b66c90d6) SHA1(7aea3055b0b538ea8197623ff5d5aae76133f156) )
 
 	ROM_REGION( 0x3000, "audiocpu", 0 )
@@ -14710,7 +14812,7 @@ ROM_START( scrammr )
 	ROM_LOAD( "309.fg5",      0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "74188.k6",     0x0000, 0x0020, CRC(aec6cb4e) SHA1(747c442d338b1b679619dfffc8a7c7fa9a43a073) )
+	ROM_LOAD( "74188.k6",     0x0000, 0x0020, CRC(aec6cb4e) SHA1(747c442d338b1b679619dfffc8a7c7fa9a43a073) ) // TODO: probably a bad dump
 ROM_END
 
 ROM_START( scramblebf )
@@ -14862,10 +14964,10 @@ ROM_START( ncentury )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "08.bin", 0x0000, 0x0800, CRC(6af06290) SHA1(39a2564f7718fbcb65088e5dff8dead9d3633cd4) )
 	ROM_LOAD( "04.bin", 0x0800, 0x0800, CRC(b82ac737) SHA1(45e50fe66e2fb26232383c4403c4bea9a83b2cd8) )
-	ROM_LOAD( "09.bin", 0x1000, 0x0800, CRC(1efa0f6f) SHA1(48292bc7851bf1411bfe4a71e5f905b929bb5167) )
+	ROM_LOAD( "09.bin", 0x1000, 0x0800, BAD_DUMP CRC(1efa0f6f) SHA1(48292bc7851bf1411bfe4a71e5f905b929bb5167) ) // heavy corruption
 	ROM_LOAD( "05.bin", 0x1800, 0x0800, CRC(dd380a22) SHA1(125e713a58cc5f2c1e38f67dad29f8c985ce5a8b) )
 	ROM_LOAD( "10.bin", 0x2000, 0x0800, CRC(92980e72) SHA1(7e0605b461ace534f8f91028bb82968ecd907ca1) )
-	ROM_LOAD( "06.bin", 0x2800, 0x0800, CRC(53ca2a3b) SHA1(c44fd6e9f1520892af06db0bdd9f59f00d19b1e6) )
+	ROM_LOAD( "06.bin", 0x2800, 0x0800, BAD_DUMP CRC(53ca2a3b) SHA1(c44fd6e9f1520892af06db0bdd9f59f00d19b1e6) ) // problems with data bits 0 and 2
 	ROM_LOAD( "11.bin", 0x3000, 0x0800, CRC(88ac07a0) SHA1(c57061db5984b472039356bf84a050b5b66e3813) )
 	ROM_LOAD( "07.bin", 0x3800, 0x0800, CRC(70a731f1) SHA1(bdea2c8e4566e1abca069859a4eea4cd34032600) )
 
@@ -16347,6 +16449,7 @@ GAME( 1979, galaxyx,     galaxian, galaxian,   superg,     galaxian_state, init_
 GAME( 1979, mcwars,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Macro-Cosm Wars (bootleg of Galaxian)",                                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galartic,    galaxian, galartic,   galartic,   galaxian_state, init_galaxian,   ROT270, "bootleg (Artic System)",                     "Galaxian (Artic System bootleg)",                                                              MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianiii, galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian III (bootleg of Galaxian)",                                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sgalwars,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Competitive Video)",                "Super Galactic Wars (bootleg of Galaxian)",                                                    MACHINE_SUPPORTS_SAVE )
 
 // These have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien",                             MACHINE_SUPPORTS_SAVE ) // endorsed by Namco, or bootleg?
@@ -16421,22 +16524,23 @@ GAME( 1980, pajaroes,    uniwars,  pisces,     asideral,   pisces_state,   init_
 GAME( 1980, vueloesp,    uniwars,  pisces,     asideral,   pisces_state,   init_pisces,     ROT90,  "bootleg (Centromatic)",      "Vuelo Espacial (Spanish bootleg of UniWar S)",     MACHINE_SUPPORTS_SAVE )
 
 // Artic Multi-System games - separate tile/sprite ROMs
-GAME( 1980, streakng,    0,        pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei",                        "Streaking (set 1)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, streaknga,   streakng, pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei",                        "Streaking (set 2)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanbl,    puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (bootleg on Galaxian hardware, set 1)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (bootleg on Galaxian hardware, set 2)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg",                      "Pac-Man (bootleg on Moon Alien 'AL-10A1' hardware)",         MACHINE_SUPPORTS_SAVE ) // Doesn't have separate tile / sprite roms, probably should move it
-GAME( 1981, pacmanblc,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Calfesa)",            "Pac-Man (Calfesa, Spanish bootleg on Galaxian hardware)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )  // same PROM as Moon Cresta, gives very strange colors and sprites get cut
-GAME( 1981, pacmanblci,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cirsa)",              "Pac-Man (Cirsa, Spanish bootleg on Galaxian hardware)",      MACHINE_SUPPORTS_SAVE )
-GAME( 199?, komemokos,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "hack",                         "Komemokos (hack of 'Pac-Man (Cirsa, Spanish bootleg)')",     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, crazym,      puckman,  galaxian,   pacmanblb,  galaxian_state, init_crazym,     ROT90,  "bootleg (Game-A-Tron)",        "Crazy Mazey",                                                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher",                                              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenxp2,    phoenix,  pisces,     phoenxp2,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Phoenix Part 2",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, batman2,     phoenix,  pisces,     batman2,    pisces_state,   init_batman2,    ROT270, "bootleg",                      "Batman Part 2",                                              MACHINE_SUPPORTS_SAVE ) // Similar to pisces, but with different video banking characteristics
-GAME( 1983, ladybugg,    ladybug,  pisces,     ladybugg,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Lady Bug (bootleg on Galaxian hardware)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_galaxian,   ROT270, "bootleg",                      "Battle of Atlantis (bootleg)",                               MACHINE_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
-GAME( 1982, tenspot,     0,        tenspot,    tenspot,    tenspot_state,  init_tenspot,    ROT270, "Thomas Automatics",            "Ten Spot",                                                   MACHINE_NOT_WORKING ) // Work out how menu works
+GAME( 1980, streakng,    0,        pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei",                        "Streaking (set 1)",                                                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, streaknga,   streakng, pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei",                        "Streaking (set 2)",                                                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanbl,    puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (bootleg on Galaxian hardware, set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (bootleg on Galaxian hardware, set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg",                      "Pac-Man (bootleg on Moon Alien 'AL-10A1' hardware)",                MACHINE_SUPPORTS_SAVE ) // Doesn't have separate tile / sprite roms, probably should move it
+GAME( 1981, pacmanblc,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Calfesa)",            "Pac-Man (Calfesa, Spanish bootleg on Galaxian hardware)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )  // same PROM as Moon Cresta, gives very strange colors and sprites get cut
+GAME( 1981, pacmanblci,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cirsa)",              "Pac-Man (Cirsa, Spanish bootleg on Galaxian hardware)",             MACHINE_SUPPORTS_SAVE )
+GAME( 199?, komemokos,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "hack",                         "Komemokos (hack of 'Pac-Man (Cirsa, Spanish bootleg)')",            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanblva,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, crazym,      puckman,  galaxian,   pacmanblb,  galaxian_state, init_crazym,     ROT90,  "bootleg (Game-A-Tron)",        "Crazy Mazey",                                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher",                                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenxp2,    phoenix,  pisces,     phoenxp2,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Phoenix Part 2",                                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, batman2,     phoenix,  pisces,     batman2,    pisces_state,   init_batman2,    ROT270, "bootleg",                      "Batman Part 2",                                                     MACHINE_SUPPORTS_SAVE ) // Similar to pisces, but with different video banking characteristics
+GAME( 1983, ladybugg,    ladybug,  pisces,     ladybugg,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Lady Bug (bootleg on Galaxian hardware)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_galaxian,   ROT270, "bootleg",                      "Battle of Atlantis (bootleg)",                                      MACHINE_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
+GAME( 1982, tenspot,     0,        tenspot,    tenspot,    tenspot_state,  init_tenspot,    ROT270, "Thomas Automatics",            "Ten Spot",                                                          MACHINE_NOT_WORKING ) // Work out how menu works
 
 // Separate tile/sprite ROMs, plus INT instead of NMI
 GAME( 1982, devilfshg,   devilfsh, devilfshg,  devilfshg,  galaxian_state, init_devilfshg,  ROT270, "Artic", "Devil Fish (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
@@ -16513,7 +16617,7 @@ GAME( 1980, galactica2,  moonal2,  mooncrst,   moonal2,    galaxian_state, init_
 // Larger romspace, interrupt enable moved
 GAME( 198?, thepitm,     thepit,   thepitm,    thepitm,    galaxian_state, init_mooncrsu,   ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ PCB, even if the memory map appears closer to Moon Cresta
 GAME( 1983, bongo,       0,        bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 1)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bongoa,      bongo,    bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 2)",                             MACHINE_SUPPORTS_SAVE ) // on an original Namco PCB
+GAME( 1983, bongoa,      bongo,    bongoa,     bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 2)",                             MACHINE_SUPPORTS_SAVE ) // on an original Namco PCB
 
 
 // Crazy Kong & Bagman bootlegs on galaxian/mooncrst hardware
@@ -16583,6 +16687,7 @@ GAME( 1981, froggermc,   frogger,  froggermc,  froggermc,  galaxian_state, init_
 GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg",               "Frog",                                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Falcon)",      "Frog (Falcon bootleg)",                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogg,       frogger,  frogg,      frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg",               "Frog (bootleg on Galaxian hardware)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggeg,     frogger,  frogg,      frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg (Hermatic)",    "Frog (Hermatic, bootleg on Galaxian hardware from Electro Game)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, init_froggrs,    ROT90,  "bootleg (Coin Music)",  "Frogger (Coin Music, bootleg on Scramble hardware)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggervd,   frogger,  froggervd,  frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg (Hermatic)",    "Frogger (Hermatic, bootleg on Scramble hardware from Video Dens)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, froggereb,   frogger,  frogger,    frogger,    galaxian_state, init_frogger,    ROT90,  "bootleg (Eurobed)",     "Frogger - New Serie 92 (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
@@ -16635,10 +16740,10 @@ GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, init_
 GAME( 1981, scrampt,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "Scramble (Petaco S.A., Spanish bootleg)",                     MACHINE_SUPPORTS_SAVE ) // ^^
 GAME( 1981, scramrf,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Recreativos Franco)",       "Scramble (Recreativos Franco, Spanish bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1981, offensiv,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Video Dens)",               "Offensive (Spanish bootleg of Scramble)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ncentury,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "New Century (Spanish bootleg of Scramble)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
-GAME( 1981, scrammr,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Model Racing)",             "Scramble (Model Racing, Italian bootleg)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
+GAME( 1981, ncentury,    scramble, scrammr,    scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "New Century (Spanish bootleg of Scramble)",                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump, protection crudely circumvented
+GAME( 1981, scrammr,     scramble, scrammr,    scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Model Racing)",             "Scramble (Model Racing, Italian bootleg)",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection crudely circumvented
 GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg?",                           "Scramble (bootleg?)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scramblebun, scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg",                            "Scramble (unknown bootleg)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
+GAME( 1981, scramblebun, scramble, scrammr,    scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg",                            "Scramble (unknown bootleg)",                                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection crudely circumvented
 GAME( 1981, kamikazesp,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Euromatic S.A.)",           "Kamikaze (Euromatic S.A., Spanish bootleg of Scramble)",      MACHINE_SUPPORTS_SAVE )
 GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)",                     "Bomber (bootleg of Scramble)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 198?, spcmission,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (SegaSA / Sonic)",           "Space Mission (SegaSA / Sonic, Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )

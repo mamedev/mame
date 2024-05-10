@@ -3,66 +3,39 @@
 <!--
 license:CC0-1.0
 
+TODO:
+- Move x1turbo only games as sharedfeat;
+- Add feature disk labels;
+
 Titles, publishers and release dates taken from:
   - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
 but the website only covers post 1985 titles...
 
 Games I haven't managed to start (possibly due to my mistakes):
-* zeliard: at the end of the intro it prints "read EMM address [00]" while waiting for something
-* suikoden, sangoku2, sangoku2a, nobuseng: sits to a jpn message waiting for who knows what
-* revolty2: waits for something to happen
-* reviver: waits for something to happen
 * mule, mulea: waits for something to happen
 * mugen2: waits for something to happen
 * lastarma: sits forever at the first intro screen
-* lagrange, dside: incomplete dump, needs system disc?
 * hajafuin: waits for something to happen
 * gatlabyr: how to start a game?
 * gambler2: how to pass the first menu?
 * crimson, crimsona: which disk combination is expected?
-* blassty: stuck at no animation menu
 
 Games with possible issues (either in emulation or in dump):
 * wizardry->4: can't add character name. also how to create a duplicate disk (in pc8801 they were in the disk set)?
 * profmj: true 400 lines mode not implemented?
-* mightmag: corrupted chars
-* lizard: waits for something to happen
 * hydlide2b has no saved data, while hydlide2 &amp; hydlide2a have characters in them
 * hydlide3b: fails to see the user disk + the set contains at least 1 hydlide disk (check crc16)
-* gruppe: starts loading then errors out as if the disk is not recognized
-* gradiusk: is this supposed to do something?
 * frontlin: input issue?
 * dione: does not display text correctly
 * blckonyx: is it missing a data disk?
 * bastard: does not start. input issue?
-* arcus: black screen after wolfteam logo
 * aokiooka: glitches (chars cut in half)
-* alpha: is the title screen correct or is it glitched (I'd bet the latter)?
-* advfant: glitches
 * ys: character sprite is glitched until you enter a new area
 
 Games which start loading but never reach the program:
-* vipc
-* vipd
 * turbobas (but not the clone turbobasa)
 * turbzbas
-* scruiser
-* psyoblad
-* powermj
-* kingkngt
-* jesus
-* jesusd
 * hydlide3, hydlide3a (invalid disks 2?)
-* aztec
-* ys3
-
-Games which are completely not recognized (maybe not for x1?)
-* unk_fl1
-* srdemo
-* robowres
-* punchbal
-* manilove
-* fmdata
 
 Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 
@@ -115,7 +88,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>A-Ressha de Ikou</description>
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="A列車で行こう"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -125,40 +98,45 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="advfant">
+	<software name="advfant" supported="no">
 		<description>Advanced Fantasian - Quest for Lost Sanctuary</description>
 		<year>1989</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Cannot select other options in main menu, including user disk creation [KBD]
+]]></notes>
+
 		<info name="release" value="198905xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="advfant_main.d88" size="348848" crc="64291b34" sha1="5c5fe39a1dc43d00ab738974988c532df80d3b3b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="advfant_scenario.d88" size="348848" crc="a4fd9761" sha1="aa91bf27b183a5e24605c06dc63c26e5ec353df9"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="advfantd" cloneof="advfant">
-		<description>Advanced Fantasian - Quest for Lost Sanctuary (Demo)</description>
-		<year>1989</year>
-		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Demo Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="advfant_demo.d88" size="348848" crc="8493aed0" sha1="a4a7b7dc0b7f884d55ff05b581b587cc6a27e27d"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alpha">
+	<software name="alpha" supported="partial">
 		<description>Alpha</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Corrupt space ship GFX on first gameplay screen, [z80dma] or [FDC]
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="アルファ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -185,7 +163,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Aoki Ookami to Shiroki Mejika</description>
 		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198606xx"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -195,10 +173,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="arcus">
+	<software name="arcus" supported="no">
 		<description>Arcus</description>
 		<year>1988</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
+		<notes><![CDATA[
+Black screen after WolfTeam logo
+]]></notes>
+
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="アークス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -277,7 +259,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="aztec" supported="no">
+	<software name="aztec">
 		<description>Aztec</description>
 		<year>1985</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
@@ -461,10 +443,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="blassty">
+	<software name="blassty" supported="no">
 		<description>Cruise Chaser - Blassty</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
+		<notes><![CDATA[
+Unresponsive [KBD]
+]]></notes>
+
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ブラスティ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -479,10 +465,13 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="dside">
+	<software name="dside" supported="no">
 		<description>D-Side - Lagrange L-2 Part II</description>
 		<year>1986</year>
 		<publisher>コムパック (Compaq)</publisher>
+		<notes><![CDATA[
+Prompts user for a System Disk, Data Disk for Lagrange L-2?
+]]></notes>
 		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="ラグランジュL-2 パートⅡ- D-SIDE"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -869,7 +858,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Gandhara</description>
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198712xx"/>
 		<info name="alt_title" value="ガンダーラ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -940,6 +929,10 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Gradius Kai</description>
 		<year>19??</year>
 		<publisher>コナミ (Konami)</publisher>
+		<notes><![CDATA[
+IPL loading resolves to a red and corrupt screen, baddump?
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gra_kai.d88" size="348848" crc="008bada3" sha1="b19eee31909e555e8f96900bcf49469e1891cd37"/>
@@ -947,10 +940,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="gruppe">
+	<software name="gruppe" supported="no">
 		<description>Gruppe</description>
 		<year>1985</year>
 		<publisher>SPS</publisher>
+		<notes><![CDATA[
+Shows a random bitmap graphic then returns "program load error", wants [FDC] write protection enabled (regression)
+]]></notes>
+
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ぐるっぺ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1209,11 +1206,16 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="jesus">
+	<software name="jesus" supported="partial">
 		<description>Jesus</description>
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Expects [KBD] number presses with shift held
+Not extensively tested
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198711xx"/>
 		<info name="alt_title" value="ジーザス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1226,18 +1228,25 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 				<rom name="jesus_2.d88" size="348848" crc="87eab1e7" sha1="b82f423f66188db1498f1c904d6b335ba6ddff15"/>
 			</dataarea>
 		</part>
+		<!-- baddump: non-factory default save -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="jesus_3.d88" size="348848" crc="ba4a6d72" sha1="f098d2ef3097057f937b7e60bbb983e6290e6ab1"/>
+				<rom name="jesus_3.d88" size="348848" crc="ba4a6d72" sha1="f098d2ef3097057f937b7e60bbb983e6290e6ab1" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jesusd" cloneof="jesus">
-		<description>Jesus (Demo)</description>
+	<software name="jesusd" cloneof="jesus" supported="partial">
+		<description>Jesus (Demo?)</description>
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Expects [KBD] number presses with shift held
+Not extensively tested
+Doesn't really seem an auto demo?
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="ジーザス =店頭DEMO="/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="367888">
@@ -1277,10 +1286,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="kingkngt" supported="no">
+	<software name="kingkngt" supported="partial">
 		<description>King's Knight Special</description>
 		<year>1987</year>
 		<publisher>スクウェア (Square)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="usage" value="x1turbo: Needs OPM Sound Setting to be ON" />
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="キングスナイトスペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1295,11 +1308,15 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="powermj" supported="no">
+	<software name="powermj" supported="partial">
 		<description>Kon'yamo Asamade Powerful Mahjong</description>
 		<year>1988</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="今夜も朝までパワフルまぁじゃん"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1354,6 +1371,9 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Lagrange L-2 - Escape from the Space Colony</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
+		<notes><![CDATA[
+Prompts user for a System Disk, Data Disk for Lagrange L-2?
+]]></notes>
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ラグランジュＬ-2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1500,7 +1520,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Lupin the Third - Cagliostro no Shiro</description>
 		<year>1986</year>
 		<publisher>東宝 (Toho)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ルパン三世 カリオストロの城"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1703,51 +1723,6 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="manilove" supported="no">
-		<description>The Man I Love</description>
-		<year>1987</year>
-		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
-		<info name="release" value="198709xx"/>
-		<info name="alt_title" value="マスターオブモンスターズ"/>
-		<!--combined image-->
-		<!--rom name="the man i love.d88" size="2025568" crc="c2df00bb" sha1="a52355adfcd1ef200c18a8e2ab7d776fdc85a9f9"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System" />
-			<dataarea name="flop" size="359520">
-				<rom name="the man i love (disk 1).d88" size="359520" crc="76f54932" sha1="41e4d82da2b482b496a6d56a7f715322d4591bc0"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Map" />
-			<dataarea name="flop" size="359248">
-				<rom name="the man i love (disk 2).d88" size="359248" crc="79b9c679" sha1="278383e57bfd268474e597f758cf0ea455f9435b"/>
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Campaign" />
-			<dataarea name="flop" size="359248">
-				<rom name="the man i love (disk 3).d88" size="359248" crc="2daa8353" sha1="5eb5b011315f6ea01944afe29ab80ed712e5f9eb"/>
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
-			<dataarea name="flop" size="473776">
-				<rom name="the man i love (disk 4).d88" size="473776" crc="2232089a" sha1="db3310cdbf3a7f56e96cc81b47c26ae43a6ffb2f"/>
-			</dataarea>
-		</part>
-
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="User Campaign" />
-			<dataarea name="flop" size="473776">
-				<rom name="the man i love (disk 5).d88" size="473776" crc="211c2f0e" sha1="f5a30bfe9b0f6ba830a86e740ffa0d23493b9453"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="manhatrq">
 		<description>J.B. Harold Series #2 - Manhattan Requiem - Angels Flying in the Dark</description>
 		<year>1987</year>
@@ -1783,10 +1758,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="mightmag" supported="partial">
+	<software name="mightmag" supported="no">
 		<description>Might and Magic</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+Broken [kanji]
+]]></notes>
+
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="マイト&amp;マジック"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1881,7 +1860,12 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Broken [kanji]
+Fails [FDC] disk swap after title screen
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198903xx"/>
 		<info name="alt_title" value="信長の野望・戦国群雄伝"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2017,7 +2001,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Phantasie - Jerunoa no Shu</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="ファンタジー ジェルノアの章"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2049,37 +2033,49 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Psy-O-Blade</description>
 		<year>1989</year>
 		<publisher>T&amp;E Soft</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Broken [kanji] in places
+Optionally supports [mouse] device
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198902xx"/>
 		<info name="alt_title" value="サイオブレード"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="392368">
-				<rom name="psy-a.d88" size="392368" crc="bd0cd71f" sha1="dd5aef2daf1d79e6409ff7e1fbb14fddacd699ce"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="392368">
-				<rom name="psy-b.d88" size="392368" crc="67322f16" sha1="e64c1bea2c2d894dfa243a1895e94d0e73f3bf07"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="392368">
-				<rom name="psy-c.d88" size="392368" crc="9e088573" sha1="9a8e8014bec3a02433352b01b58863386c1a9e09"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<dataarea name="flop" size="392368">
-				<rom name="psy-d.d88" size="392368" crc="73d2c58a" sha1="87e4925ffac0c151a8a237ea4f5bb133f863ac8b"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="392368">
 				<rom name="psy-p.d88" size="392368" crc="3ef3fe30" sha1="e839e3949f7a4cd23705f50ab32d39e4809976c1"/>
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="392368">
-				<rom name="psy-u.d88" size="392368" crc="e923271d" sha1="edffcae5b90c8eb2ed951065a71de527341f6fda"/>
+				<rom name="psy-a.d88" size="392368" crc="bd0cd71f" sha1="dd5aef2daf1d79e6409ff7e1fbb14fddacd699ce"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="392368">
+				<rom name="psy-b.d88" size="392368" crc="67322f16" sha1="e64c1bea2c2d894dfa243a1895e94d0e73f3bf07"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="392368">
+				<rom name="psy-c.d88" size="392368" crc="9e088573" sha1="9a8e8014bec3a02433352b01b58863386c1a9e09"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="392368">
+				<rom name="psy-d.d88" size="392368" crc="73d2c58a" sha1="87e4925ffac0c151a8a237ea4f5bb133f863ac8b"/>
+			</dataarea>
+		</part>
+		<!-- baddump: non-factory save, shouldn't exist -->
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="392368">
+				<rom name="psy-u.d88" size="392368" crc="e923271d" sha1="edffcae5b90c8eb2ed951065a71de527341f6fda" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2102,10 +2098,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="reviver">
+	<software name="reviver" supported="partial">
 		<description>Reviver</description>
 		<year>1987</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
+		<notes><![CDATA[
+Garbage GFXs on [6845] rightmost column
+]]></notes>
+
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="リバイバー"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2125,10 +2125,16 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="revolty2">
+	<software name="revolty2" supported="partial">
 		<description>Revolty 2</description>
 		<year>1989</year>
 		<publisher>風雅システム (Fuga System)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
+		<!-- TODO: disk labels, prompts for "Game Disk 2 in Drive 1" -->
+		<info name="usage" value="Insert flop3 after intro in secondary drive" />
 		<info name="release" value="198901xx"/>
 		<info name="alt_title" value="リボルティーII"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2166,10 +2172,16 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="robowres">
+	<software name="robowres" supported="no">
 		<description>RoboWres 2001</description>
 		<year>1986</year>
 		<publisher>マイクロネット (Micronet)</publisher>
+		<notes><![CDATA[
+[D88] expects offset 0x1c to contain the file size but in that image it's file size/2. (worked around)
+Expects [KBD] number presses with shift held
+Cannot select a move set
+]]></notes>
+
 		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="ロボレス2001"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2205,11 +2217,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="sangoku2">
+	<software name="sangoku2" supported="no">
 		<description>Sangokushi II</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Broken [kanji] on gameplay
+]]></notes>
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="199006xx"/>
 		<info name="alt_title" value="三国志2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2229,11 +2244,15 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="sangoku2a" cloneof="sangoku2">
+	<software name="sangoku2a" supported="no">
 		<description>Sangokushi II Turbo</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Broken [kanji] during gameplay (half height)
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="199006xx"/>
 		<info name="alt_title" value="三国志2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2359,7 +2378,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Shin Kugyokuden</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="新九玉伝"/>
 
@@ -2401,7 +2420,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Silver Ghost</description>
 		<year>1988</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="シルバーゴースト"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2425,7 +2444,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19880520"/>
 		<info name="alt_title" value="ソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2459,7 +2478,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian (alt?)</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19880520"/>
 		<info name="alt_title" value="ソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2493,7 +2512,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Gilgamesh Sorcerian</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19901016"/>
 		<info name="alt_title" value="ギルガメッシュソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2512,7 +2531,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian New Scenario Vol.1 - Uchuu kara no Houmonsha</description>
 		<year>1989</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19890825"/>
 		<info name="alt_title" value="ソーサリアン NEWシナリオ Vol.1 宇宙からの訪問者"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2531,7 +2550,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian Tsuika Scenario</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19880729"/>
 		<info name="alt_title" value="ソーサリアン追加シナリオ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2545,7 +2564,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian Tsuika Scenario 2 - Sengoku Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19881021"/>
 		<info name="alt_title" value="ソーサリアン追加シナリオ2 戦国ソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2565,7 +2584,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian Tsuika Scenario 3 - Pyramid Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19891223"/>
 		<info name="alt_title" value="ソーサリアン追加シナリオ3 ピラミッドソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2584,7 +2603,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Selected Sorcerian 1</description>
 		<year>1989</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19891208"/>
 		<info name="alt_title" value="セレクテッドソーサリアン1"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2603,7 +2622,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Selected Sorcerian 2</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19900210"/>
 		<info name="alt_title" value="セレクテッドソーサリアン2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2622,7 +2641,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Selected Sorcerian 3</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19900511"/>
 		<info name="alt_title" value="セレクテッドソーサリアン3"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2641,7 +2660,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Selected Sorcerian 4</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19900613"/>
 		<info name="alt_title" value="セレクテッドソーサリアン4"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2660,7 +2679,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Selected Sorcerian 5</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19900731"/>
 		<info name="alt_title" value="セレクテッドソーサリアン5"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2679,7 +2698,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian Utility Disk Vol.1</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19880729"/>
 		<info name="alt_title" value="ソーサリアン ユーティリティディスク"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2693,7 +2712,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Sorcerian Utility Disk Vol.1 (alt)</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="19880729"/>
 		<info name="alt_title" value="ソーサリアン ユーティリティディスク"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2780,7 +2799,10 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Star Cruiser</description>
 		<year>1988</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Hangs on [EMM] upload
+]]></notes>
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198806xx"/>
 		<info name="alt_title" value="スタークルーザー"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2795,34 +2817,45 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="suikoden">
+	<software name="suikoden" supported="no">
 		<description>Suikoden - Tenmei no Chikai</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Broken [kanji]
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198904xx"/>
 		<info name="alt_title" value="水滸伝・天命の誓い"/>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="380880">
 				<rom name="suikoden (turbo)_a.d88" size="380880" crc="9cfee564" sha1="4577565f450c8c842ebf6b55f39bdb65dbe18e7d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="380864">
 				<rom name="suikoden (turbo)_b.d88" size="380864" crc="1211d3f9" sha1="908418cd67d9950b33c9c2dbe4dd962a84c56021"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="380864">
 				<rom name="suikoden (turbo)_c.d88" size="380864" crc="286becd8" sha1="63559c99ee26ba389e133bfa4bfec53c7b0288ee"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="slaydock">
+	<software name="slaydock" supported="partial">
 		<description>Super Laydock - Mission Striker</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Expects [KBD] name entry presses with shift held
+]]></notes>
+
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="スーパーレイドック"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2837,10 +2870,14 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="slaydocka" cloneof="slaydock">
+	<software name="slaydocka" cloneof="slaydock" supported="partial">
 		<description>Super Laydock - Mission Striker (alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Expects [KBD] name entry presses with shift held
+]]></notes>
+
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="スーパーレイドック"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2855,8 +2892,9 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="slaydocm">
-		<description>Super Laydock Muteki</description>
+	<!-- TODO: pending removal, Muteki -> Invincibility -->
+	<software name="slaydocm" cloneof="slaydock" supported="partial">
+		<description>Super Laydock - Mission Striker (Muteki hack)</description>
 		<year>19??</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2875,7 +2913,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Super Mario Bros. Special</description>
 		<year>1986</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2889,7 +2927,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Super Mario Bros. Special (alt)</description>
 		<year>1986</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2926,7 +2964,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Tankentai 2 - Makyou Amazon no Okuchi ni Ougon Densetsu o Mita!</description>
 		<year>1985</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="探検隊 第2弾 魔境アマゾンの奥地に黄金伝説を見た!"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -3224,7 +3262,11 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Will - The Death Trap II</description>
 		<year>1985</year>
 		<publisher>スクウェア (Square)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Hangs on [FDC] check on initial boot PC=1e18 bit 7
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="ウィル -デス・トラップ2-"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -3362,7 +3404,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>World Golf II</description>
 		<year>1988</year>
 		<publisher>エニックス (Enix)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="ワールドゴルフ2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -3460,7 +3502,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Ys II - Ancient Ys Vanished The Final Chapter</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="イース2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -3485,11 +3527,15 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="zeliard">
+	<software name="zeliard" supported="partial">
 		<description>Zeliard X1</description>
 		<year>1988</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Desyncs during Game Arts logo [YM] speech synth, proceeds booting.
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198806xx"/>
 		<info name="alt_title" value="ゼリアード"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -3838,10 +3884,16 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="lizard">
+	<software name="lizard" supported="partial">
 		<description>Lizard</description>
 		<year>1984?</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Requires katakana domain language, not extensively tested
+Save to disk untested
+]]></notes>
+
+		<info name="usage" value="For a new game press 1, press enter, 1 (yes), select a class, 1 (yes)" />
 		<info name="alt_title" value="リザード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346032">
@@ -3958,6 +4010,10 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Punch Ball Mario Bros.</description>
 		<year>1984?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+"File mode error"
+]]></notes>
+
 		<info name="alt_title" value="パンチボールマリオ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4133,6 +4189,10 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>V.I.P. - Visual Instrument Player (alt 3?)</description>
 		<year>19??</year>
 		<publisher>Kamiya</publisher>
+		<notes><![CDATA[
+Throws segmentation fault when mounted [D88]
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="system_z.d88" size="1089776" crc="f3e03a73" sha1="321c6631ba11ca04cd2dfdbd95d2b941b6cc6fd4"/>
@@ -4144,6 +4204,10 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Music Tool V.I.P.</description>
 		<year>19??</year>
 		<publisher>シャープ (Sharp)</publisher>
+		<notes><![CDATA[
+Throws segmentation fault when mounted [D88]
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="fm ongen.d88" size="1089776" crc="3676fbc2" sha1="483023bae28c20c9de8cdba005ceeebd063fa5ae"/>
@@ -4190,7 +4254,13 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Wanderers from Ys</description>
 		<year>1989?</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<notes><![CDATA[
+Unhappy about [6845] de readback in $1a01 (black screen)
+Black screens after intro anyway, [FDC] or [z80dma]
+Is this actually a x1turboz only game?
+]]></notes>
+
+		<info name="usage" value="x1turbo only" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="ys3_prg.d88" size="415840" crc="6698bb78" sha1="cbdd1c7c2df31b7b7e0ca86a647ed499e347d4fc"/>
@@ -4464,7 +4534,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Arctic</description>
 		<year>1988</year>
 		<publisher>アートディンク (Artdink)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="アークティック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4477,7 +4547,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Asteka</description>
 		<year>1985</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="アステカ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="436912">
@@ -4515,7 +4585,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Battle Gorilla</description>
 		<year>1988</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="バトルゴリラ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4559,7 +4629,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Casablanca</description>
 		<year>1986</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="カサブランカに愛を"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="413296">
@@ -4579,7 +4649,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<info name="alt_title" value="コズミックソルジャー"/>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="376928">
 				<rom name="cosmics.d88" size="376928" crc="afa30003" sha1="a75324488debe364017d3414cdb2f06b1422b6c0"/>
@@ -4592,7 +4662,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>システムサコム (System Sacom)</publisher>
 		<info name="alt_title" value="ドーム"/>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="dome-1.d88" size="415840" crc="a73bb6b0" sha1="a060a4995729a15fff4d5c49462fffcce13e5114"/>
@@ -4682,7 +4752,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Harajuku After Dark</description>
 		<year>1988</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="原宿アフターダーク"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4714,7 +4784,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Hayato</description>
 		<year>1987</year>
 		<publisher>タケル (Takeru)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hayatoa.d88" size="348848" crc="33935c73" sha1="17d59dd9b05996e7f7cef84789b136e383a96b72"/>
@@ -4745,7 +4815,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Ishin no Arashi</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="維新の嵐"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380864">
@@ -4896,7 +4966,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Melon Soda</description>
 		<year>1987</year>
 		<publisher>パスカル2 (Pascal2)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="メロンソーダ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4915,7 +4985,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Nukenin Densetsu</description>
 		<year>1987</year>
 		<publisher>ブレイングレイ (Brain Gray)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="抜忍伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Opening" />
@@ -4969,7 +5039,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Produce</description>
 		<year>1987</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="プロデュース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -5061,7 +5131,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Satsujin wa Tegami ni Notte</description>
 		<year>1988</year>
 		<publisher>ツインソフト (Twin Soft)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="殺人は手紙にのって"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
@@ -5127,7 +5197,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Urusei Yatsura</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="うる星やつら"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380064">
@@ -5174,7 +5244,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Yaksa Demo?</description>
 		<year>1987</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
-		<!-- Turbo only -->
+		<info name="usage" value="x1turbo only" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416416">
 				<rom name="yaksa_demo.d88" size="416416" crc="d6cf37e4" sha1="4e325055da184724b6f1a6638bfb8dddb2b7601b"/>
@@ -5278,19 +5348,6 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="srdemo" supported="no">
-		<description>SR Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="sr_demo.d88" size="348848" crc="de25efe7" sha1="6ee78c3c231ef33bd7dd259c7edb1b10f2b56fdf"/>
-			</dataarea>
-		</part>
-	</software>
-
-
 
 	<software name="hubasic1">
 		<description>HuBASIC CZ-8FB01 (v1.0, Disk vers.)</description>
@@ -5586,8 +5643,12 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 
 	<software name="fmdata" supported="no">
 		<description>FM data</description>
-		<year>19??</year>
+		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Contains .VMD/.VTD BASIC files
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="zzz-unk-fm_data.d88" size="348848" crc="3c3e7e3a" sha1="9b113bf140e80a105c69422d780822970a32764d"/>
@@ -5597,7 +5658,7 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 
 <!-- is this part of a multi-disk game? -->
 
-	<software name="unk_fl1">
+	<software name="unk_fl1" supported="no">
 		<description>Unknown Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5609,10 +5670,14 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 	</software>
 
 
-	<software name="blank">
+	<software name="blank" supported="no">
 		<description>Blank Disk?</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not actually "blank", user disk for something?
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="brank.2d" size="327680" crc="166f974a" sha1="27c77f2d2eb6898e0c388b1f5a6b5c6a76575385"/>
@@ -6395,10 +6460,16 @@ HP Osho
 		</part>
 	</software>
 
-	<software name="dezalis">
+	<software name="dezalis" supported="no">
 		<description>Dezalis</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Has [6845] abuses during gameplay
+]]></notes>
+		<info name="alt_title" value="デザリス"/>
+		<!-- Same dev as several pc8001_flop games such as flgworld and various2 -->
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="0x050000">
 				<rom name="dezalis.2d" size="0x050000" crc="d9ba6eb6" sha1="6a6a564b2eabc35dbc1591abb8efcf6a9e98bd10"/>

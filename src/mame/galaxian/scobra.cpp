@@ -242,8 +242,9 @@ void scobra_state::hustlerb_map(address_map &map)
 void scobra_state::hustlerb6_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4800, 0x4800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	// map(0x4803, 0x4803).r();
+	map(0x4800, 0x4800).portr("IN0").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x4801, 0x4801).portr("IN1");
+	map(0x4803, 0x4803).portr("IN2");
 	map(0x5000, 0x5000).w(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8bff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
@@ -255,7 +256,7 @@ void scobra_state::hustlerb6_map(address_map &map)
 	map(0xa802, 0xa802).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
 	map(0xa806, 0xa806).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
 	map(0xa808, 0xa808).nopw();    /* coin counters */
-	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xb800, 0xb800).lr8(NAME([] () -> uint8_t { return 0xff; })); // doesn't boot with 0x00
 }
 
 void scobra_state::mimonkeyug_map(address_map &map)
@@ -825,6 +826,53 @@ static INPUT_PORTS_START( hustler )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( hustlerb6 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) // 0x01 also controls cocktail / upright, leftover not connected in this bootleg?
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "Infinite (Cheat)" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( mimonkeyug )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1156,6 +1204,7 @@ void scobra_state::hustlerb6(machine_config &config)
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
+	config.device_remove("watchdog");
 }
 
 /***************************************************************************
@@ -1768,6 +1817,23 @@ ROM_START( hustlerb6 ) // dump confirmed from two different PCBs, seems most sim
 	ROM_LOAD( "6331-1j.1k",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
 
+ROM_START( hustlerb7 ) // bootleg from Marti Colls (Spain)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mcbi.1.10l",     0x0000, 0x1000, CRC(15748377) SHA1(9f4a88cbef0b3860bb35cc8d208c47db16924837) )
+	ROM_LOAD( "b1.2.10l",       0x1000, 0x1000, CRC(dc6752ec) SHA1(b103021079646286156e4141fe34dd92ccfd34bd) )
+	ROM_LOAD( "mcbi.3.8l",      0x2000, 0x1000, CRC(73a011f0) SHA1(b7948ba93a77c9a7bf469a1ae38afa81e231ac90) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "mcbi.7_2732.3b", 0x0000, 0x1000, CRC(7d4085eb) SHA1(4f7a7860223ab823cf5b697e17c2e83783442697) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "mcbi.5f.5h",     0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
+	ROM_LOAD( "mcbi.5h.3h",     0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mcbi_prom.1k",   0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+ROM_END
+
 ROM_START( mimonkeyug ) // this bootleg has significant hardware changes: no audio CPU or sound chips, no 8255s. Only discrete sound. Also 0x800 more ROM.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mig.m.1-g.7l-bottom",    0x0000, 0x1000, CRC(5667c124) SHA1(49e5393bc0d2e54c3466e6567a934ed048624dfb) )
@@ -1793,31 +1859,32 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, stratgyx,   0,        stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami",                             "Strategy X", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, stratgyx,   0,        stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami",                             "Strategy X",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1981, stratgys,   stratgyx, stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, strongx,    stratgyx, stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "bootleg",                            "Strong X", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, strongx,    stratgyx, stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "bootleg",                            "Strong X",                       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, darkplnt,   0,        darkplnt,   darkplnt,   scobra_state,  init_darkplnt, ROT180, "Stern Electronics",                  "Dark Planet", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, tazmani2,   tazmania, type2,      tazmani2,   scobra_state,  init_tazmani2, ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tazmani3,   tazmania, tazmani3,   tazmani3,   scobra_state,  empty_init,    ROT90,  "bootleg (Arfyc / Rodmar)",           "Tazz-Mania (Arfyc / Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazmani2,   tazmania, type2,      tazmani2,   scobra_state,  init_tazmani2, ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazmani3,   tazmania, tazmani3,   tazmani3,   scobra_state,  empty_init,    ROT90,  "bootleg (Arfyc / Rodmar)",           "Tazz-Mania (Arfyc / Rodmar bootleg)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazmaniet,  tazmania, tazmani3,   tazmani3,   scobra_state,  init_tazmaniet,ROT90,  "bootleg (U.R.V. BBCPE)",             "Tazz-Mania - El Trompa (U.R.V. BBCPE bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, rescue,     0,        rescue,     rescue,     scobra_state,  init_rescue,   ROT90,  "Stern Electronics",                  "Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, rescueb,    rescue,   rescueb,    rescue,     scobra_state,  init_rescue,   ROT90,  "bootleg (Videl Games)",              "Tuono Blu (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, aponow,     rescue,   rescue,     rescue,     scobra_state,  init_rescue,   ROT90,  "bootleg",                            "Apocaljpse Now (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rescue,     0,        rescue,     rescue,     scobra_state,  init_rescue,   ROT90,  "Stern Electronics",                  "Rescue",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rescueb,    rescue,   rescueb,    rescue,     scobra_state,  init_rescue,   ROT90,  "bootleg (Videl Games)",              "Tuono Blu (bootleg of Rescue)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, aponow,     rescue,   rescue,     rescue,     scobra_state,  init_rescue,   ROT90,  "bootleg",                            "Apocaljpse Now (bootleg of Rescue)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1982, rescuefe,   rescue,   rescuefe,   rescue,     scobra_state,  empty_init,    ROT90,  "bootleg (Free Enterprise Games)",    "Rescue (Free Enterprise Games, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, minefld,    0,        minefld,    minefld,    scobra_state,  init_minefld,  ROT90,  "Stern Electronics",                  "Minefield", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, minefld,    0,        minefld,    minefld,    scobra_state,  init_minefld,  ROT90,  "Stern Electronics",                  "Minefield",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1983, minefldfe,  minefld,  minefldfe,  minefldfe,  scobra_state,  empty_init,    ROT90,  "bootleg (The Logicshop)",            "Minefield (The Logicshop, bootleg)", MACHINE_SUPPORTS_SAVE ) // The Logicshop ('licensed' from Free Enterprise Games?
 
-GAME( 1981, hustler,    0,        hustler,    hustler,    scobra_state,  init_hustler,  ROT90,  "Konami",                             "Video Hustler", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerd,   hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustler,    0,        hustler,    hustler,    scobra_state,  init_hustler,  ROT90,  "Konami",                             "Video Hustler",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerd,   hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, billiard,   hustler,  hustler,    hustler,    scobra_state,  init_billiard, ROT90,  "bootleg",                            "The Billiards (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerb,   hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb,   hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb2,  hustler,  hustler,    hustler,    scobra_state,  init_hustlerd, ROT90,  "bootleg",                            "Fatsy Gambler (bootleg of Video Hustler)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerb4,  hustler,  hustlerb4,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerb5,  hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hustlerb6,  hustler,  hustlerb6,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // stuck on boot, dump verified good
+GAME( 1981, hustlerb4,  hustler,  hustlerb4,  hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb5,  hustler,  hustlerb,   hustler,    scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 3)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb6,  hustler,  hustlerb6,  hustlerb6,  scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 4)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb7,  hustler,  hustlerb6,  hustlerb6,  scobra_state,  empty_init,    ROT90,  "bootleg (Marti Colls)",              "Video Hustler (bootleg, set 5)",           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, mimonkeyug, mimonkey, mimonkeyug, mimonkeyug, scobra_state,  empty_init,    ROT90,  "bootleg (U.Games)",                  "Mighty Monkey (U.Games bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing discrete sound components emulation

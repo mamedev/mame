@@ -31,6 +31,7 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	device_mixer_interface(mconfig, *this, 2),
 	m_rom(*this, DEVICE_SELF),
 	m_data_config("data", ENDIANNESS_BIG, 16, 22, 0),
+	m_write_ple(*this),
 	m_intc(*this, "intc"),
 	m_sound(*this, "gt_sound"),
 	m_kbd(*this, "kbd"),
@@ -54,7 +55,7 @@ void gt913_device::map(address_map &map)
 	/* ctk530 writes here to latch LED matrix data, which generates an active high strobe on pin 99 (PLE/P16)
 	   there's otherwise no external address decoding (or the usual read/write strobes) used for the LED latches.
 	   just treat as a 16-bit write-only port for now */
-	map(0xe000, 0xe001).lw16(NAME([this](u16 data) { do_write_port(h8_device::PORT_4, data, ~0); }));
+	map(0xe000, 0xe001).lw16(NAME([this](u16 data) { m_write_ple(data); }));
 
 	map(0xfac0, 0xffbf).ram();
 

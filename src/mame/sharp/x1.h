@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Barry Rodewald
 /*****************************************************************************
  *
- * includes/x1.h
+ * sharp/x1.h
  *
  ****************************************************************************/
 
@@ -54,31 +54,32 @@ private:
 class x1_state : public driver_device
 {
 public:
-	x1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "x1_cpu"),
-		m_cassette(*this, "cassette"),
-		m_cart(*this, "cartslot"),
-		m_fdc(*this, "fdc"),
-		m_floppy(*this, "fdc:%u", 0),
-		m_crtc(*this, "crtc"),
-		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_dma(*this, "dma"),
-		m_iobank(*this, "iobank"),
-		m_ym(*this, "ym"),
-		m_sound_sw(*this, "SOUND_SW"),
-		m_tvram(*this, "tvram"),
-		m_avram(*this, "avram"),
-		m_kvram(*this, "kvram"),
-		m_bitmapbank(*this, "bitmapbank"),
-		m_ipl_rom(*this, "ipl"),
-		m_cg_rom(*this, "cgrom"),
-		m_kanji_rom(*this, "kanji")
+	x1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "x1_cpu")
+		, m_cassette(*this, "cassette")
+		, m_cart(*this, "cartslot")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0)
+		, m_crtc(*this, "crtc")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_iobank(*this, "iobank")
+		, m_ym(*this, "ym")
+		, m_sound_sw(*this, "SOUND_SW")
+		, m_tvram(*this, "tvram")
+		, m_avram(*this, "avram")
+		, m_kvram(*this, "kvram")
+		, m_bitmapbank(*this, "bitmapbank")
+		, m_ipl_rom(*this, "ipl")
+		, m_cg_rom(*this, "cgrom")
+		, m_kanji_rom(*this, "kanji")
 	{ }
 
 	static void floppy_formats(format_registration &fr);
+
+	void x1(machine_config &config);
 
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -88,30 +89,29 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 
-	uint8_t x1_mem_r(offs_t offset);
-	void x1_mem_w(offs_t offset, uint8_t data);
-	uint8_t x1_sub_io_r();
-	void x1_sub_io_w(uint8_t data);
-	uint8_t x1_rom_r();
-	void x1_rom_w(offs_t offset, uint8_t data);
-	void x1_rom_bank_0_w(uint8_t data);
-	void x1_rom_bank_1_w(uint8_t data);
-	uint8_t x1_fdc_r(offs_t offset);
-	void x1_fdc_w(offs_t offset, uint8_t data);
-	uint8_t x1_pcg_r(offs_t offset);
-	void x1_pcg_w(offs_t offset, uint8_t data);
-	void x1_pal_r_w(uint8_t data);
-	void x1_pal_g_w(uint8_t data);
-	void x1_pal_b_w(uint8_t data);
-	uint8_t x1_ex_gfxram_r(offs_t offset);
-	void x1_ex_gfxram_w(offs_t offset, uint8_t data);
-	void x1_scrn_w(uint8_t data);
-	void x1_pri_w(uint8_t data);
-	void x1_6845_w(offs_t offset, uint8_t data);
-	uint8_t x1_kanji_r(offs_t offset);
-	void x1_kanji_w(offs_t offset, uint8_t data);
-	uint8_t x1_emm_r(offs_t offset);
-	void x1_emm_w(offs_t offset, uint8_t data);
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	uint8_t sub_io_r();
+	void sub_io_w(uint8_t data);
+	uint8_t rom_r();
+	void rom_w(offs_t offset, uint8_t data);
+	void rom_bank_0_w(uint8_t data);
+	void rom_bank_1_w(uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t pcg_r(offs_t offset);
+	void pcg_w(offs_t offset, uint8_t data);
+	void pal_r_w(uint8_t data);
+	void pal_g_w(uint8_t data);
+	void pal_b_w(uint8_t data);
+	uint8_t ex_gfxram_r(offs_t offset);
+	void ex_gfxram_w(offs_t offset, uint8_t data);
+	void scrn_w(uint8_t data);
+	void pri_w(uint8_t data);
+	uint8_t kanji_r(offs_t offset);
+	void kanji_w(offs_t offset, uint8_t data);
+	uint8_t emm_r(offs_t offset);
+	void emm_w(offs_t offset, uint8_t data);
 	uint8_t x1turbo_pal_r();
 	uint8_t x1turbo_txpal_r(offs_t offset);
 	uint8_t x1turbo_txdisp_r();
@@ -121,8 +121,6 @@ public:
 	void x1turbo_txdisp_w(uint8_t data);
 	void x1turbo_gfxpal_w(uint8_t data);
 	void x1turbo_blackclip_w(uint8_t data);
-	uint8_t x1turbo_mem_r(offs_t offset);
-	void x1turbo_mem_w(offs_t offset, uint8_t data);
 	void x1turboz_4096_palette_w(offs_t offset, uint8_t data);
 	uint8_t x1turboz_blackclip_r();
 	uint8_t x1turbo_bank_r();
@@ -141,21 +139,13 @@ public:
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
-	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
-	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
-	void fdc_drq_w(int state);
-	void hdl_w(int state);
+	TIMER_CALLBACK_MEMBER(rtc_tick_cb);
+	TIMER_CALLBACK_MEMBER(fdc_motor_off_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(cmt_seek_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(sub_keyboard_cb);
 
-	uint8_t memory_read_byte(offs_t offset);
-	void memory_write_byte(offs_t offset, uint8_t data);
-	uint8_t io_read_byte(offs_t offset);
-	void io_write_byte(offs_t offset, uint8_t data);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<z80dma_device> m_dma;
-	void x1turbo(machine_config &config);
-	void x1(machine_config &config);
 
 	uint8_t ym_r(offs_t offset);
 	uint8_t color_board_r(address_space &space);
@@ -184,8 +174,6 @@ public:
 	void x1_io_banks(address_map &map);
 	void x1_io_banks_common(address_map &map);
 	void x1_mem(address_map &map);
-	void x1turbo_io_banks(address_map &map);
-	void x1turbo_mem(address_map &map);
 protected:
 	struct scrn_reg_t
 	{
@@ -211,7 +199,7 @@ protected:
 		uint8_t sec = 0, min = 0, hour = 0, day = 0, wday = 0, month = 0, year = 0;
 	};
 
-	void x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,uint16_t pen,uint8_t width,uint8_t height);
+	void draw_pixel(bitmap_rgb32 &bitmap,int y,int x,uint16_t pen,uint8_t width,uint8_t height);
 	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);
 	uint8_t check_prev_height(int x,int y,int x_size);
@@ -249,6 +237,7 @@ protected:
 	turbo_reg_t m_turbo_reg;    /**< Turbo Z Video Registers. */
 	x1_rtc_t m_rtc;         /**< Struct for RTC related variables */
 	emu_timer *m_rtc_timer = nullptr;     /**< Pointer for RTC timer. */
+	emu_timer *m_motor_timer = nullptr;   /**< Pointer for FDC motor timer. */
 	uint8_t m_pcg_write_addr = 0;     /**< @todo Unused variable. */
 	uint8_t m_sub_cmd = 0;        /**< MCU side: current command issued from Main to Sub. */
 	uint8_t m_sub_cmd_length = 0;     /**< MCU side: number of parameters, in bytes. */
@@ -335,6 +324,35 @@ protected:
 
 	uint8_t m_fdc_ctrl = 0;
 
+};
+
+class x1turbo_state : public x1_state
+{
+public:
+	x1turbo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: x1_state(mconfig, type, tag)
+		, m_dma(*this, "dma")
+		, m_ctc_ym(*this, "ctc_ym")
+	{ }
+
+	void x1turbo(machine_config &config);
+protected:
+	void x1turbo_io_banks(address_map &map);
+	void x1turbo_mem(address_map &map);
+
+private:
+	required_device<z80dma_device> m_dma;
+	required_device<z80ctc_device> m_ctc_ym;
+
+	uint8_t x1turbo_mem_r(offs_t offset);
+	void x1turbo_mem_w(offs_t offset, uint8_t data);
+
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
+
+	void fdc_drq_w(int state);
 };
 
 /*----------- defined in machine/x1.c -----------*/

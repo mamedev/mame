@@ -29,10 +29,21 @@ sh_cmt_device::sh_cmt_device(const machine_config &mconfig, const char *tag, dev
 
 void sh_cmt_device::device_start()
 {
+	save_item(NAME(m_next_event));
+	save_item(NAME(m_str));
+	save_item(NAME(m_csr));
+	save_item(NAME(m_cnt));
+	save_item(NAME(m_cor));
+
 }
 
 void sh_cmt_device::device_reset()
 {
+	std::fill(m_next_event.begin(), m_next_event.end(), 0);
+	m_str = 0;
+	std::fill(m_csr.begin(), m_csr.end(), 0);
+	std::fill(m_cnt.begin(), m_cnt.end(), 0);
+	std::fill(m_cor.begin(), m_cor.end(), 0xffff);
 }
 
 u64 sh_cmt_device::internal_update(u64 current_time)
@@ -125,7 +136,6 @@ void sh_cmt_device::cmstr_w(offs_t, u16 data, u16 mem_mask)
 	cnt_update(1, m_cpu->current_cycles());
 	u16 old = m_str;
 	COMBINE_DATA(&m_str);
-	logerror("active %c %c\n", m_str & 1 ? '0' : '-', m_str & 2 ? '1' : '-');
 	for(int i=0; i != 2; i++)
 		if(!BIT(old, i) && BIT(m_str, i))
 			clock_start(i);
@@ -137,18 +147,12 @@ void sh_cmt_device::cmstr_w(offs_t, u16 data, u16 mem_mask)
 void sh_cmt_device::csr_w(int reg, u16 data, u16 mem_mask)
 {
 	cnt_update(reg, m_cpu->current_cycles());
-	u16 old = m_csr[reg];
 	COMBINE_DATA(&m_csr[reg]);
-	if(!(old & 0x80))
-		m_csr[reg] &= ~0x80;
-	if((old ^ m_csr[reg]) & 0x7f)
-		logerror("csr_w %d f=%d ie=%d div=%d\n", reg, BIT(m_csr[reg], 7), BIT(m_csr[reg], 6), 8 << (2*BIT(m_csr[reg], 0, 2)));
 }
 
 void sh_cmt_device::cnt_w(int reg, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_cnt[reg]);
-	logerror("cnt_w %d, %04x\n", reg, m_cnt[reg]);
 	if((m_str >> reg) & 1) {
 		compute_next_event(reg);
 		m_cpu->internal_update();
@@ -159,7 +163,6 @@ void sh_cmt_device::cor_w(int reg, u16 data, u16 mem_mask)
 {
 	cnt_update(reg, m_cpu->current_cycles());
 	COMBINE_DATA(&m_cor[reg]);
-	logerror("cor_w %d, %04x\n", reg, m_cor[reg]);
 	if((m_str >> reg) & 1) {
 		compute_next_event(reg);
 		m_cpu->internal_update();
@@ -168,7 +171,7 @@ void sh_cmt_device::cor_w(int reg, u16 data, u16 mem_mask)
 
 void sh_cmt_device::clock_start(int clk)
 {
-	logerror("start clock %d %dHz\n", clk, (m_cpu->clock() >> (3 + 2*BIT(m_csr[clk], 0, 2))) / (m_cor[clk] + 1));
+	//	logerror("start clock %d %dHz\n", clk, (m_cpu->clock() >> (3 + 2*BIT(m_csr[clk], 0, 2))) / (m_cor[clk] + 1));
 	compute_next_event(clk);
 }
 
@@ -190,8 +193,10 @@ void sh_cmt_device::cnt_update(int clk, u64 current_time)
 	if(!((m_str >> clk) & 1))
 		return;
 	u64 step = (m_cor[clk] + 1) << (3 + 2*BIT(m_csr[clk], 0, 2));
-	while(current_time >= m_next_event[clk])
-		m_next_event[clk] += step;
-	u64 delta = m_next_event[clk] - current_time;
-	m_cnt[clk] = m_cor[clk] - ((delta - 1) >> (3 + 2*BIT(m_csr[clk], 0, 2)));
+	if(m_next_event[clk]) {
+		while(current_time >= m_next_event[clk])
+			m_next_event[clk] += step;
+		u64 delta = m_next_event[clk] - current_time;
+		m_cnt[clk] = m_cor[clk] - ((delta - 1) >> (3 + 2*BIT(m_csr[clk], 0, 2)));
+	}
 }

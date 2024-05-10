@@ -41,6 +41,7 @@ function layout.startplugin()
 				print_info = emu.print_info,
 				print_debug = emu.print_debug },
 			file = file,
+			math = math,
 			print = print,
 			pairs = pairs,
 			ipairs = ipairs,

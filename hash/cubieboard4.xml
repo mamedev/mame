@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Software list for Cubieboard4 (CC A-20) external SD card slot.
+
+-->
+
+<softwarelist name="cubieboard4" description="Cubieboard4 software">
+
+	<!-- "Official" images from cubieboard.org for the MicroSD card -->
+
+	<software name="cb4_debiansvrcrd">
+		<description>Debian server for Cubieboard4 (v1.0, MicroSD card)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="sdcard">
+			<feature name="video" value="hdmi" />
+			<diskarea name="image">
+				<disk name="cb4-debian-server-hdmi-card-v1.0" sha1="3e98a28e72c913afa5883e040731e17b5f90aad2" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_linardstcrdh">
+		<description>Linaro desktop for Cubieboard4 (v1.0, HDMI, MicroSD card)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="sdcard">
+			<feature name="video" value="hdmi" />
+			<diskarea name="image">
+				<disk name="linaro-desktop-cb4-card-hdmi-v1.0" sha1="db646cd4191c3dbbf72764846d6ae5ef32687554" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_linarsvrcrdh">
+		<description>Linaro server for Cubieboard4 (v2.0, HDMI, MicroSD card)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="sdcard">
+			<feature name="video" value="hdmi" />
+			<diskarea name="image">
+				<disk name="linaro-server-cb4-card-hdmi-v2.0" sha1="18a3ca934b3536209bdece46fcdfc3de97135c5b" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_linarsvrcrdv">
+		<description>Linaro server for Cubieboard4 (v2.0, VGA, MicroSD card)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="sdcard">
+			<feature name="video" value="vga" />
+			<diskarea name="image">
+				<disk name="linaro-server-cb4-card-vga-v2.0" sha1="df8fd2c8178420a77e14b0be5197eeafe7bf96de" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- "Official" images from cubieboard.org for the internal eMMC -->
+
+	<software name="cb4_android41mmc">
+		<description>Android 4.1.20161119 for Cubieboard4 (v4.4, internal eMMC)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="emmc">
+			<diskarea name="image">
+				<disk name="android4.4-cb4-emmc-v4.1.20161119" sha1="ccf854e17936e3c57a1701f9edb3c63b704d4d59" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_android43mmc">
+		<description>Android 4.3.20170717 for Cubieboard4 (v4.4, internal eMMC)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="emmc">
+			<diskarea name="image">
+				<disk name="android4.4-cb4-emmc-v4.3.20170717" sha1="bb386ce76686698ad7f25b0469970c58abf4745e" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_debiansvrmmc">
+		<description>Debian server for Cubieboard4 (v1.0, internal eMMC)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="emmc">
+			<feature name="video" value="hdmi" />
+			<diskarea name="image">
+				<disk name="cb4-debian-server-hdmi-emmc-v1.0" sha1="31db5866016cfd6f1be331c70859cdb27022a7aa" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cb4_linardstmmeh">
+		<description>Linaro desktop for Cubieboard4 (v1.1, HDMI, internal eMMC)</description>
+		<year>20??</year>
+		<publisher>cubieboard.org</publisher>
+		<part name="image" interface="emmc">
+			<feature name="video" value="hdmi" />
+			<diskarea name="image">
+				<disk name="linaro-desktop-cb4-emmc-hdmi-v1.1" sha1="249095e6faaee11e330eaf59285c2e68d0b5a30f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
