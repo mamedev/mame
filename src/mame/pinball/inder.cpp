@@ -1669,6 +1669,7 @@ ROM_END
 
 /*---------------------------------------------------------------------------------------------------------------
 / Unknown gambling game on Inder pinball hardware.
+/ According to PinMAME dev:
 / By inspecting the program ROMs, it seems that the game will "spin" several lamps so a pattern emerges.
 / If a certain pattern appears (a win), two to five tries can be made to increase your win, using three buttons.
 / You may also wait, not pushing anything, in which case the win stays the same.
