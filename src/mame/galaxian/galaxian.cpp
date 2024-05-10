@@ -1929,6 +1929,12 @@ void galaxian_state::bongo_map(address_map &map)
 	map(0xb800, 0xb800).mirror(0x7ff).nopw(); // written once at start
 }
 
+void galaxian_state::bongoa_map(address_map &map)
+{
+	bongo_map(map);
+	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW");
+}
+
 void galaxian_state::bongo_io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -7800,6 +7806,15 @@ void galaxian_state::bongo(machine_config &config)
 	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/4);
 	m_ay8910[0]->port_a_read_callback().set_ioport("DSW");
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
+
+void galaxian_state::bongoa(machine_config &config)
+{
+	bongo(config);
+
+	// dip switches are read via the memory map instead of the AY8910
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bongoa_map);
+	m_ay8910[0]->port_a_read_callback().set_constant(0xff);
 }
 
 void bmxstunts_state::bmxstunts(machine_config &config)
@@ -16602,7 +16617,7 @@ GAME( 1980, galactica2,  moonal2,  mooncrst,   moonal2,    galaxian_state, init_
 // Larger romspace, interrupt enable moved
 GAME( 198?, thepitm,     thepit,   thepitm,    thepitm,    galaxian_state, init_mooncrsu,   ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ PCB, even if the memory map appears closer to Moon Cresta
 GAME( 1983, bongo,       0,        bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 1)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bongoa,      bongo,    bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 2)",                             MACHINE_SUPPORTS_SAVE ) // on an original Namco PCB
+GAME( 1983, bongoa,      bongo,    bongoa,     bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo (set 2)",                             MACHINE_SUPPORTS_SAVE ) // on an original Namco PCB
 
 
 // Crazy Kong & Bagman bootlegs on galaxian/mooncrst hardware

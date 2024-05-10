@@ -612,11 +612,11 @@ void jackal_state::jackal(machine_config &config)
  *************************************/
 
 ROM_START( jackal ) // 8-Way Joystick: You can only shoot in one direction regardless of travel - up the screen
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Banked 64k for 1st CPU
+	ROM_REGION( 0x14000, "maincpu", 0 ) // Banked 64k for 1st CPU
 	ROM_LOAD( "631_v03.16d", 0x00000, 0x04000, CRC(3e0dfb83) SHA1(5ba7073751eee33180e51143b348256597909516) )
 	ROM_LOAD( "631_v02.15d", 0x04000, 0x10000, CRC(0b7e0584) SHA1(e4019463345a4c020d5a004c9a400aca4bdae07b) )
 
-	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
+	ROM_REGION( 0x8000, "slave", 0 ) // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_t01.11d", 0x0000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )
@@ -625,45 +625,40 @@ ROM_START( jackal ) // 8-Way Joystick: You can only shoot in one direction regar
 	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t07.13h", 0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) ) // Silkscreened MASK1M
 
-	ROM_REGION( 0x0200, "proms", 0 )    // color lookup tables
+	ROM_REGION( 0x0200, "proms", 0 ) // color lookup tables
 	ROM_LOAD( "631r08.9h",  0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) ) // MMI 63S141AN or compatible (silkscreened 6301)
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) // MMI 63S141AN or compatible (silkscreened 6301)
 ROM_END
 
 ROM_START( jackalr ) // Rotary Joystick: Shot direction is controlled via the rotary function of the joystick
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Banked 64k for 1st CPU
+	ROM_REGION( 0x14000, "maincpu", 0 ) // Banked 64k for 1st CPU
 	ROM_LOAD( "631_q03.16d", 0x00000, 0x04000, CRC(b9d34836) SHA1(af23a0c844fb9e60a757511ca898d73eef4c2e51) )
 	ROM_LOAD( "631_q02.15d", 0x04000, 0x10000, CRC(ed2a7d66) SHA1(3d9b31fa8b31e509880d617feb0dd4bd9790d2d5) )
 
-	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
+	ROM_REGION( 0x8000, "slave", 0 ) // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_q01.11d", 0x0000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) )
 
-	ROM_REGION( 0x80000, "gfx", 0 )
-	ROM_LOAD16_BYTE( "631t04.7h",  0x00000, 0x20000, CRC(457f42f0) SHA1(08413a13d128875dddcf4f6ad302363096bf1d41) ) // Silkscreened MASK1M
-	ROM_LOAD16_BYTE( "631t05.8h",  0x00001, 0x20000, CRC(732b3fc1) SHA1(7e89650b9e5e2b7ae82f8c55ac9995740f6fdfe1) ) // Silkscreened MASK1M
-	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) // Silkscreened MASK1M
-	ROM_LOAD16_BYTE( "631t07.13h", 0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) ) // Silkscreened MASK1M
-		// These roms are on a tiny riser board - two smaller roms instead of MASK1M roms
-//  ROM_LOAD16_BYTE( "631_q04.7h",  0x20000, 0x10000, NO_DUMP )
-//  ROM_LOAD16_BYTE( "631_q05.7h",  0x00000, 0x10000, NO_DUMP )
-//  ROM_LOAD16_BYTE( "631_q06.8h",  0x20001, 0x10000, NO_DUMP )
-//  ROM_LOAD16_BYTE( "631_q07.8h",  0x00001, 0x10000, NO_DUMP ) // 631 Q04 through 631 Q11 need to be redumped and verified. Should be the same data
-//  ROM_LOAD16_BYTE( "631_q08.12h", 0x40000, 0x10000, NO_DUMP ) // until then we are going to use the standard MASK1M roms - Will fixed when dumped
-//  ROM_LOAD16_BYTE( "631_q09.12h", 0x60000, 0x10000, NO_DUMP )
-//  ROM_LOAD16_BYTE( "631_q10.13h", 0x40001, 0x10000, NO_DUMP )
-//  ROM_LOAD16_BYTE( "631_q11.13h", 0x60001, 0x10000, NO_DUMP )
+	ROM_REGION( 0x80000, "gfx", 0 ) // Paired ROMs are on tiny riser boards instead of larger single MASK1M type ROMs per socket
+	ROM_LOAD16_BYTE( "631_q05.7h",  0x00000, 0x10000, CRC(bcf5d0a8) SHA1(c406d6b3eaf251d9505b809b9ef927ecd6d672c0) ) // ROM located over socket on riser for 7H socket == 631t04 1/2
+	ROM_LOAD16_BYTE( "631_q06.8h",  0x00001, 0x10000, CRC(4cb5df22) SHA1(f4f6346459f4ddf6ddb34d143d77836d10710769) ) // ROM located over socket on riser for 8H socket == 631t05 1/2
+	ROM_LOAD16_BYTE( "631_q04.7h",  0x20000, 0x10000, CRC(e1e9aa42) SHA1(5b12537b7263663ee7ab52f98328f2334066216e) ) // ROM located left edge of riser for 7H socket == 631t04 2/2
+	ROM_LOAD16_BYTE( "631_q07.8h",  0x20001, 0x10000, CRC(cc68c5b8) SHA1(2fa475bd261532ded42240db14dcda4359bb94a3) ) // ROM located right edge of riser for 8H socket == 631t05 2/2
+	ROM_LOAD16_BYTE( "631_q09.12h", 0x40000, 0x10000, CRC(55ea6852) SHA1(2027ff887ecc6b7a96f24b14bd6ac89197fd963f) ) // ROM located over socket on riser for 12H socket == 631t06 1/2
+	ROM_LOAD16_BYTE( "631_q10.13h", 0x40001, 0x10000, CRC(fe93e217) SHA1(7b43ec09dd819fe9a9bdaffed0211e0359d17980) ) // ROM located over socket on riser for 13H socket == 631t07 1/2
+	ROM_LOAD16_BYTE( "631_q08.12h", 0x60000, 0x10000, CRC(d2492b8b) SHA1(a2563d73f7e03b144367354a5c207303fd91f670) ) // ROM located left edge of riser for 12H socket == 621t06 2/2
+	ROM_LOAD16_BYTE( "631_q11.13h", 0x60001, 0x10000, CRC(563ae24c) SHA1(224435bcbc543fe735521ec5a5a8bbd124d0a88a) ) // ROM located right edge of riser for 13H socket == 631t07 2/2
 
-	ROM_REGION( 0x0200, "proms", 0 )    // color lookup tables
+	ROM_REGION( 0x0200, "proms", 0 ) // color lookup tables
 	ROM_LOAD( "631r08.9h",  0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) ) // MMI 63S141AN or compatible (silkscreened 6301)
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) // MMI 63S141AN or compatible (silkscreened 6301)
 ROM_END
 
-ROM_START( topgunr ) // 8-Way Joystick:  You can only shoot in one direction regardless of travel - up the screen
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Banked 64k for 1st CPU
+ROM_START( topgunr ) // 8-Way Joystick: You can only shoot in one direction regardless of travel - up the screen
+	ROM_REGION( 0x14000, "maincpu", 0 ) // Banked 64k for 1st CPU
 	ROM_LOAD( "631_u03.16d", 0x00000, 0x04000, CRC(c086844e) SHA1(4d6f27ac3aabb4b2d673aa619e407e417ad89337) )
 	ROM_LOAD( "631_u02.15d", 0x04000, 0x10000, CRC(f7e28426) SHA1(db2d5f252a574b8aa4d8406a8e93b423fd2a7fef) )
 
-	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
+	ROM_REGION( 0x8000, "slave", 0 ) // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_t01.11d", 0x0000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )
@@ -672,17 +667,17 @@ ROM_START( topgunr ) // 8-Way Joystick:  You can only shoot in one direction reg
 	ROM_LOAD16_BYTE( "631u06.12h", 0x40000, 0x20000, CRC(37dbbdb0) SHA1(f94db780d69e7dd40231a75629af79469d957378) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631u07.13h", 0x40001, 0x20000, CRC(22effcc8) SHA1(4d174b0ce64def32050f87343c4b1424e0fef6f7) ) // Silkscreened MASK1M
 
-	ROM_REGION( 0x0200, "proms", 0 )    // color lookup tables
+	ROM_REGION( 0x0200, "proms", 0 ) // color lookup tables
 	ROM_LOAD( "631r08.9h",  0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) ) // MMI 63S141AN or compatible (silkscreened 6301)
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) // MMI 63S141AN or compatible (silkscreened 6301)
 ROM_END
 
 ROM_START( jackalj ) // 8-Way Joystick: You can only shoot in the direction you're traveling
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Banked 64k for 1st CPU
+	ROM_REGION( 0x14000, "maincpu", 0 ) // Banked 64k for 1st CPU
 	ROM_LOAD( "631_t03.16d", 0x00000, 0x04000, CRC(fd5f9624) SHA1(2520c1ff54410ef498ecbf52877f011900baed4c) )
 	ROM_LOAD( "631_t02.15d", 0x04000, 0x10000, CRC(14db6b1a) SHA1(b469ea50aa94a2bda3bd0442300aa1272e5f30c4) )
 
-	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
+	ROM_REGION( 0x8000, "slave", 0 ) // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "631_t01.11d", 0x0000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )
@@ -691,22 +686,21 @@ ROM_START( jackalj ) // 8-Way Joystick: You can only shoot in the direction you'
 	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t07.13h", 0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) ) // Silkscreened MASK1M
 
-	ROM_REGION( 0x0200, "proms", 0 )    // color lookup tables
+	ROM_REGION( 0x0200, "proms", 0 ) // color lookup tables
 	ROM_LOAD( "631r08.9h",  0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) ) // MMI 63S141AN or compatible (silkscreened 6301)
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) // MMI 63S141AN or compatible (silkscreened 6301)
 ROM_END
 
 ROM_START( jackalbl ) // This is based on jackalr. Was dumped from 2 different PCBs.
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Banked 64k for 1st CPU
+	ROM_REGION( 0x14000, "maincpu", 0 ) // Banked 64k for 1st CPU
 	ROM_LOAD( "epr-a-2.bin", 0x00000, 0x04000, CRC(ae2a290a) SHA1(e9bee75a02aef5cf330dccb9e7a45b0171a8c1d7) ) // also found labeled "2.20"
 	ROM_LOAD( "epr-a-3.bin", 0x04000, 0x08000, CRC(5fffee27) SHA1(224d5fd26dd1e0f15a3c99fd2fffbb76f641416e) ) // also found labeled "3.17"
 	ROM_LOAD( "epr-a-4.bin", 0x0c000, 0x08000, CRC(976c8431) SHA1(c199f57c25380d741aec85b0e0bfb6acf383e6a6) ) // also found labeled "4.18"
 
-	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
+	ROM_REGION( 0x8000, "slave", 0 ) // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "epr-a-1.bin", 0x0000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) ) // also found labeled "1.19"
 
-	ROM_REGION( 0x80000, "gfx", 0 )
-	// same data, different layout
+	ROM_REGION( 0x80000, "gfx", 0 ) // same data, different layout
 	ROM_LOAD16_WORD_SWAP( "epr-a-17.bin", 0x00000, 0x08000, CRC(a96720b6) SHA1(d3c2a1848fa9d9d1232e58e412bdd69032fe2c83) ) // also found labeled "17.5"
 	ROM_LOAD16_WORD_SWAP( "epr-a-18.bin", 0x08000, 0x08000, CRC(932d0ecb) SHA1(20bf789f45c5b3ba90012e1a945523236578a014) ) // also found labeled "18.6"
 	ROM_LOAD16_WORD_SWAP( "epr-a-19.bin", 0x10000, 0x08000, CRC(1e3412e7) SHA1(dc0be23d6c89b7b131c3bd5cd117123e5f9d971c) ) // also found labeled "19.7"
@@ -724,7 +718,7 @@ ROM_START( jackalbl ) // This is based on jackalr. Was dumped from 2 different P
 	ROM_LOAD16_WORD_SWAP( "epr-a-11.bin", 0x70000, 0x08000, CRC(a48e9f60) SHA1(6d5af16c16b40fb092fdba6dce852b94ac4767f4) ) // also found labeled "11.15"
 	ROM_LOAD16_WORD_SWAP( "epr-a-12.bin", 0x78000, 0x08000, CRC(79b7c71c) SHA1(8510226114ab9098ec48e02840465fc8b69b5262) ) // also found labeled "12.16"
 
-	ROM_REGION( 0x0200, "proms", 0 )    // color lookup tables
+	ROM_REGION( 0x0200, "proms", 0 ) // color lookup tables
 	ROM_LOAD( "n82s129n.prom2", 0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "n82s129n.prom1", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 
@@ -740,16 +734,15 @@ ROM_START( jackalbl ) // This is based on jackalr. Was dumped from 2 different P
 ROM_END
 
 ROM_START( topgunbl ) // Rotary Joystick: Shot direction is controlled via the Rotary function of the joystick
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Banked 64k for 1st CPU
+	ROM_REGION( 0x14000, "maincpu", 0 ) // Banked 64k for 1st CPU
 	ROM_LOAD( "t-2.c6", 0x00000, 0x04000, CRC(d53172e5) SHA1(44b7f180c17f9a121a2f06f2d3471920a8989e21) )
 	ROM_LOAD( "t-3.c5", 0x04000, 0x08000, CRC(7826ad38) SHA1(875e87867924905b9b83bc203eb7ffe81cf72233) )
 	ROM_LOAD( "t-4.c4", 0x0c000, 0x08000, CRC(976c8431) SHA1(c199f57c25380d741aec85b0e0bfb6acf383e6a6) ) // == 2nd half of 631_q02.15d
 
-	ROM_REGION( 0x8000, "slave", 0 )     // 64k for 2nd cpu (Graphics & Sound)
+	ROM_REGION( 0x8000, "slave", 0 ) // 64k for 2nd cpu (Graphics & Sound)
 	ROM_LOAD( "t-1.c14", 0x0000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) ) // == 631_q01.11d
 
-	ROM_REGION( 0x80000, "gfx", 0 )
-	// same data, different layout
+	ROM_REGION( 0x80000, "gfx", 0 ) // same data, different layout
 	ROM_LOAD16_WORD_SWAP( "t-17.n12", 0x00000, 0x08000, CRC(e8875110) SHA1(73f4c47ab039dce8c285bf222253084c860c95bf) )
 	ROM_LOAD16_WORD_SWAP( "t-18.n13", 0x08000, 0x08000, CRC(cf14471d) SHA1(896aa8d7c93f837f6661d30bd0d6e19d16669107) )
 	ROM_LOAD16_WORD_SWAP( "t-19.n14", 0x10000, 0x08000, CRC(46ee5dd2) SHA1(1a910984a197af341f13b4683babee857aafb245) )
@@ -767,7 +760,7 @@ ROM_START( topgunbl ) // Rotary Joystick: Shot direction is controlled via the R
 	ROM_LOAD16_WORD_SWAP( "t-11.n6",  0x70000, 0x08000, CRC(7895c22d) SHA1(c81ae51116fb32ac99d37eb7c2000c990d089b8d) )
 	ROM_LOAD16_WORD_SWAP( "t-12.n7",  0x78000, 0x08000, CRC(15606dfc) SHA1(829492da49dbe70f81d15237803c5203aa011957) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // color lookup tables
+	ROM_REGION( 0x0200, "proms", 0 ) // color lookup tables
 	ROM_LOAD( "631r08.bpr", 0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END

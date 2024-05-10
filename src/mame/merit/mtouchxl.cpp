@@ -31,6 +31,8 @@
 
 #include "emu.h"
 
+#include "microtouchlayout.h"
+
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/hdd.h"
 #include "bus/isa/isa_cards.h"
@@ -51,8 +53,6 @@
 #include "sound/ad1848.h"
 
 #include "speaker.h"
-
-#include "mtouchxl.lh"
 
 
 namespace {
@@ -292,7 +292,7 @@ void mtxl_state::at486(machine_config &config)
 	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
 
-	config.set_default_layout(layout_mtouchxl);
+	config.set_default_layout(layout_microtouch);
 }
 
 void mtxl_state::at486hd(machine_config &config)
@@ -353,7 +353,7 @@ void mtxl_state::at486hd(machine_config &config)
 	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
 
-	config.set_default_layout(layout_mtouchxl);
+	config.set_default_layout(layout_microtouch);
 }
 
 #ifdef REAL_PCI_CHIPSET

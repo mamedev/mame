@@ -312,6 +312,7 @@ public:
 	void thepitm(machine_config &config);
 	void kong(machine_config &config);
 	void bongo(machine_config &config);
+	void bongoa(machine_config &config);
 	void scorpnmc(machine_config &config);
 	void ckongg(machine_config &config);
 	void ckongmc(machine_config &config);
@@ -341,6 +342,7 @@ protected:
 	void astroamb_map(address_map &map);
 	void bigkonggx_map(address_map &map);
 	void bongo_map(address_map &map);
+	void bongoa_map(address_map &map);
 	void bongo_io_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);

@@ -734,10 +734,12 @@ void geneve_gate_array_device::get_page(geneve_gate_array_device::decdata* dec)
 	}
 }
 
-const geneve_gate_array_device::physentry_t geneve_gate_array_device::s_physmap[7] =
+const geneve_gate_array_device::physentry_t geneve_gate_array_device::s_physmap[8] =
 {
 	{ 0x00, 0x3f, MPDRAM,  "DRAM" },
 	{ 0x40, 0x3f, MPEXP,  "Future exp (on-board)" },
+	{ 0xc0, 0x1f, MPSRAMF,  "Future SRAM exp" },
+	{ 0xe0, 0x07, MPSRAMF,  "Future SRAM exp" },
 	{ 0xe8, 0x03, MPSRAMX,  "SRAM exp" },
 	{ 0xec, 0x03, MPSRAM,  "SRAM" },
 	{ 0xf0, 0x0f, MPEPROM,  "Boot ROM/PFM" },
@@ -774,7 +776,7 @@ void geneve_gate_array_device::decode_physical(geneve_gate_array_device::decdata
 
 		// Search for the matching page interval. Cartridge space will be decoded as DRAM.
 		bool found = false;
-		for (int i = 0; (i < 6) && !found; i++)
+		for (int i = 0; (i < 8) && !found; i++)
 		{
 			if ((dec->physpage & ~s_physmap[i].mask) == s_physmap[i].base)
 			{
@@ -814,7 +816,7 @@ bool geneve_gate_array_device::accessing_dram_s(int function)
 
 bool geneve_gate_array_device::accessing_sram_s(int function)
 {
-	return (function == MPSRAM) || (function == MPSRAMX);
+	return (function == MPSRAM) || (function == MPSRAMX) || (function == MPSRAMF);
 }
 
 bool geneve_gate_array_device::accessing_devs_s(int function)

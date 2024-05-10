@@ -480,6 +480,42 @@ void galaxold_state::hunchbkg_data(address_map &map)
 }
 
 
+void galaxold_state::superbikg_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1480, 0x14bf).mirror(0x6000).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x14c0, 0x14df).mirror(0x6000).writeonly().share("spriteram");
+	map(0x14e0, 0x14ff).mirror(0x6000).writeonly().share("bulletsram");
+	map(0x1500, 0x1500).mirror(0x6000).portr("IN0");
+	map(0x1500, 0x1501).mirror(0x6000).w(FUNC(galaxold_state::galaxold_leds_w));
+	map(0x1502, 0x1502).mirror(0x6000).w(FUNC(galaxold_state::galaxold_coin_lockout_w));
+	map(0x1503, 0x1503).mirror(0x6000).w(FUNC(galaxold_state::galaxold_coin_counter_w));
+	map(0x1504, 0x1507).mirror(0x6000).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x1580, 0x1580).mirror(0x6000).portr("IN1");
+	map(0x1580, 0x1587).mirror(0x6000).w("cust", FUNC(galaxian_sound_device::sound_w));
+	map(0x1680, 0x1680).mirror(0x6000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));
+	map(0x1700, 0x1700).mirror(0x6000).portr("DSW0").nopw();
+	map(0x1701, 0x1701).mirror(0x6000).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
+	//map(0x1704, 0x1704).mirror(0x6000).w(FUNC(galaxold_state::galaxold_stars_enable_w)); // TODO: writes here, verify on PCB if stars are actually shown
+	map(0x1706, 0x1706).mirror(0x6000).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
+	map(0x1707, 0x1707).mirror(0x6000).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
+	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
+	map(0x1c00, 0x1fff).mirror(0x6000).ram();
+	map(0x2000, 0x2fff).rom();
+	map(0x4000, 0x4fff).rom();
+	map(0x6000, 0x6fff).rom();
+}
+
+void galaxold_state::superbikg_io(address_map &map)
+{
+	map(0x00, 0x00).lr8(NAME([this] () -> uint8_t { return m_superbikg_latch; }));
+}
+
+void galaxold_state::superbikg_data(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).lw8(NAME([this] (uint8_t data) { m_superbikg_latch = (data << 4); }));
+}
+
 void galaxold_state::drivfrcg_program(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
@@ -1320,6 +1356,48 @@ static INPUT_PORTS_START( drivfrcg )
 INPUT_PORTS_END
 
 
+// 1 bank of 6 DIP-switches
+static INPUT_PORTS_START( superbikg )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Green") PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Start/Red")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Start/Green")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Red") PORT_COCKTAIL
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x40, "A 2C/1C  B 1C/3C" )
+	PORT_DIPSETTING(    0x00, "A 1C/1C  B 1C/5C" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( racknrol )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1781,6 +1859,18 @@ void galaxold_state::spcwarp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::spcwarp_map);
 }
 
+void galaxold_state::superbikg(machine_config &config)
+{
+	galaxold_base(config);
+
+	s2650_device &s2650(S2650(config.replace(), m_maincpu, PIXEL_CLOCK / 4));
+	s2650.set_addrmap(AS_PROGRAM, &galaxold_state::superbikg_map);
+	s2650.set_addrmap(AS_IO, &galaxold_state::superbikg_io);
+	s2650.set_addrmap(AS_DATA, &galaxold_state::superbikg_data);
+	s2650.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
+
+	galaxian_audio(config);
+}
 
 void galaxold_state::tazzmang(machine_config &config)
 {
@@ -2233,6 +2323,28 @@ ROM_START( spcwarp )
 	ROM_LOAD( "gal_hb_cp",    0x0000, 0x0020, BAD_DUMP CRC(cbff6762) SHA1(4515a6e12a0a5c485a55291feee17a571120a549) )
 ROM_END
 
+// GX-01 main PCB + MV-2 ROM board + HB CPU board
+// In-game it still shows the Century copyright but the PCB has no sign of being an original
+ROM_START( superbikg )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "moto1-2516.bin", 0x0000, 0x0800, CRC(2903f8c8) SHA1(288401a941853751caa8d1d69e6908dbfbcfb5ac) )
+	ROM_LOAD( "moto2-2516.bin", 0x0800, 0x0800, CRC(057c1473) SHA1(e2021e006642aacb1e51b2ca6e2c0d22d7033d54) )
+	ROM_LOAD( "moto3-2516.bin", 0x2000, 0x0800, CRC(6c8f82fa) SHA1(b698e4af9462e915b4c1b6126ea475f25903d22e) )
+	ROM_LOAD( "moto4-2516.bin", 0x2800, 0x0800, CRC(ba38fe2c) SHA1(29b5d9b66d1d80107852f647e7f89479747dcf3a) )
+	ROM_LOAD( "moto5-2532.bin", 0x4000, 0x1000, CRC(ac1180a3) SHA1(dcd6c0f95ac017a29f4f928b70ef16975aaa178e) )
+	ROM_LOAD( "moto6-2532.bin", 0x6000, 0x1000, CRC(f5b7627a) SHA1(02dfa62b0bf5962ad56d922084888f2216eca497) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // these are the same as sbdk in nintendo/dkong.cpp
+	ROM_LOAD( "m0kl-2716.bin",  0x0000, 0x0800, CRC(ea5f9f88) SHA1(5742d3554d967ed1e90f7c6f73dafbd302f0f244) )
+	ROM_LOAD( "m0hj-2716.bin",  0x0800, 0x0800, CRC(b1d76b59) SHA1(aed57ec67d80abdff1a4bfc3a713fa01c0dd15a2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l",     0x0000, 0x0020, CRC(c5f12bc3) SHA1(b746ba06b596d4227fdc730a23bdf495f84e6a72) ) // same as amidarc, bongoa and froggervd in galaxian/galaxian.cpp
+
+	ROM_REGION( 0x0120, "other_proms", 0 )
+	ROM_LOAD( "mmi6331-db.bin", 0x0000, 0x0020, CRC(39376e52) SHA1(f988c95e3837fe5e5a0d6815cd0bf644ff1eb081) )
+	ROM_LOAD( "mmi6309-mb.bin", 0x0020, 0x0100, CRC(b6b9ff46) SHA1(8f16938d9c9c66308823b702f5d75843bd7de046) ) // near CPU, address decoding related?
+ROM_END
 
 ROM_START( drivfrcg )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -2540,6 +2652,7 @@ GAME( 1981, froggerv,  frogger,  videotron, froggerv,  galaxold_state, empty_ini
 GAME( 1983, hunchbkg,  hunchbak, hunchbkg,  hunchbkg,  galaxold_state, empty_init,     ROT90,  "Century Electronics",                                 "Hunchback (Galaxian hardware)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbgb,  hunchbak, hunchbkg,  hunchbkg,  galaxold_state, empty_init,     ROT90,  "bootleg (FAR S.A.)",                                  "Hunchback (FAR S.A. bootleg on Galaxian hardware)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  galaxold_state, empty_init,     ROT90,  "Century Electronics",                                 "Space Warp? (Cosmos conversion on Galaxian hardware)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // bad dump
+GAME( 1983, superbikg, superbik, superbikg, superbikg, galaxold_state, init_superbikg, ROT90,  "bootleg",                                             "Superbike (bootleg on Galaxian hardware)",                    MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // needs real hw references for correcting colors
 GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Shinkai Inc. (Magic Electronics USA license)",        "Driving Force (Galaxian conversion)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (EMT Germany)",                               "Top Racer (bootleg of Driving Force)",                        MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (Elsys Software)",                            "Driving Force (Galaxian conversion bootleg)",                 MACHINE_SUPPORTS_SAVE )
