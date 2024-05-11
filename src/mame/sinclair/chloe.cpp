@@ -75,6 +75,7 @@ protected:
 	u8 divmmc_neutral_r(offs_t offset);
 	u8 divmmc_enable_r(offs_t offset);
 	u8 divmmc_disable_r(offs_t offset);
+	void dma_reg_w(offs_t offset, u8 data);
 	void port_7ffd_w(u8 data);
 	void port_f4_w(u8 data);
 	void port_ff_w(u8 data);
@@ -86,12 +87,17 @@ protected:
 
 	void update_memory();
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void raster_irq_adjust();
 
 private:
 	TIMER_CALLBACK_MEMBER(spi_clock);
+	TIMER_CALLBACK_MEMBER(raster_irq_on);
+	TIMER_CALLBACK_MEMBER(raster_irq_off);
+	INTERRUPT_GEN_MEMBER(chloe_interrupt);
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_uno_regs;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_bank0_view, m_bank1_view;
 	required_device<address_map_bank_device> m_regs_map;
@@ -112,6 +118,15 @@ private:
 	u8 m_uno_regs_data[256];
 	u8 m_palpen_selected;
 	u8 m_ay_selected;
+	bool m_dma_hilo;
+	u8 m_dma_src_latch;
+	u8 m_dma_dst_latch;
+	u8 m_dma_pre_latch;
+	u8 m_dma_len_latch;
+	u8 m_dma_prob_latch;
+
+	emu_timer *m_irq_raster_on_timer;
+	emu_timer *m_irq_raster_off_timer;
 
 	emu_timer *m_spi_clock;
 	int m_spi_clock_cycles;
@@ -346,13 +361,91 @@ u8 chloe_state::divmmc_disable_r(offs_t offset)
 	return op;
 }
 
+void chloe_state::dma_reg_w(offs_t offset, u8 data)
+{
+	// TODO dma stub
+	m_uno_regs_data[0xa0 + offset] = data;
+	m_dma_hilo = !m_dma_hilo;
+
+	switch (offset + 10 * m_dma_hilo)
+	{
+	case 0: case 10: // DMACTRL
+		// 07;
+		break;
+	case  1: // DMASRC
+		//m_dma->((m_dma_src_latch << 8) | data);
+		break;
+	case 11:
+		m_dma_src_latch = data;
+		break;
+	case  2: // DMADST
+		//m_dma->((m_dma_dst_latch << 8) | data);
+		break;
+	case 12:
+		m_dma_dst_latch = data;
+		break;
+	case  3: // DMAPRE
+		//m_dma->((m_dma_pre_latch << 8) | data);
+		break;
+	case 13:
+		m_dma_pre_latch = data;
+		break;
+	case  4: // DMALEN
+		//m_dma->((m_dma_len_latch << 8) | data);
+		break;
+	case 14:
+		m_dma_len_latch = data;
+		break;
+	case  5: // DMAPROB
+		//m_dma->((m_dma_prob_latch << 8) | data);
+		break;
+	case 15:
+		m_dma_prob_latch = data;
+		break;
+	case 6: case 16: // DMASTAT
+		break;
+	}
+}
+
+void chloe_state::raster_irq_adjust()
+{
+	if (BIT(m_uno_regs_data[0x0d], 1)) {
+		u16 line = (BIT(m_uno_regs_data[0x0d], 0) << 8) | m_uno_regs_data[0x0c];
+		m_irq_raster_on_timer->adjust(m_screen->time_until_pos((SCR_256x192.top() + line) % m_screen->height()));
+	}
+	else
+		m_irq_raster_on_timer->reset();
+}
+
+TIMER_CALLBACK_MEMBER(chloe_state::raster_irq_on)
+{
+	m_screen->update_now();
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_irq_raster_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+}
+
+TIMER_CALLBACK_MEMBER(chloe_state::raster_irq_off)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	raster_irq_adjust();
+}
+
+INTERRUPT_GEN_MEMBER(chloe_state::chloe_interrupt)
+{
+	if (BIT(~m_uno_regs_data[0x0d], 2))
+	{
+		m_irq_on_timer->adjust(m_screen->time_until_pos(SCR_256x192.top(), SCR_256x192.left())
+			- attotime::from_ticks(14365, m_maincpu->unscaled_clock())); // TODO confirm
+	}
+}
+
 void chloe_state::map_fetch(address_map &map)
 {
 	map(0x0000, 0x3fff).r(FUNC(chloe_state::divmmc_neutral_r));
 	map(0x0000, 0x0000).lr8(NAME([this]() { return divmmc_enable_r(0x0000); }));
 	map(0x0008, 0x0008).lr8(NAME([this]() { return divmmc_enable_r(0x0008); }));
 	map(0x0038, 0x0038).lr8(NAME([this]() { return divmmc_enable_r(0x0038); }));
-	//map(0x0066, 0x0066).lr8(NAME([this]() { return divmmc_enable_r(0x0066); }));
+	map(0x0066, 0x0066).lr8(NAME([this]() { return divmmc_enable_r(0x0066); }));
 	map(0x04c6, 0x04c6).lr8(NAME([this]() { return divmmc_enable_r(0x04c6); }));
 	map(0x0562, 0x0562).lr8(NAME([this]() { return divmmc_enable_r(0x0562); }));
 	map(0x1ff8, 0x1fff).lr8(NAME([this](offs_t offset) { return divmmc_disable_r(0x1ff8 + offset); }));
@@ -375,7 +468,7 @@ void chloe_state::map_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(chloe_state::kbd_fe_r), FUNC(chloe_state::spectrum_ula_w));
-	map(0x00ff, 0x00ff).mirror(0xff00).w(FUNC(chloe_state::port_ff_w));
+	map(0x00ff, 0x00ff).mirror(0xff00).lr8(NAME([this]() { return m_port_ff_data; })).w(FUNC(chloe_state::port_ff_w));
 	map(0x7ffd, 0x7ffd).w(FUNC(chloe_state::port_7ffd_w));
 	map(0x1ffd, 0x1ffd).w(FUNC(chloe_state::port_7ffd_w));
 	map(0x00f4, 0x00f4).mirror(0xff00).w(FUNC(chloe_state::port_f4_w));
@@ -418,7 +511,7 @@ void chloe_state::map_io(address_map &map)
 				m_ula->ulap_en_w(data & 1);
 		}));
 	map(0xfc3b, 0xfc3b).lrw8(NAME([this]() { return m_reg_selected; })
-		, NAME([this](u8 data) { m_reg_selected = data; }));
+		, NAME([this](u8 data) { m_dma_hilo = 0; m_reg_selected = data; }));
 	map(0xfd3b, 0xfd3b).lrw8(NAME([this]() { return m_uno_regs.read_byte(m_reg_selected); })
 		, NAME([this](u8 data) { m_uno_regs.write_byte(m_reg_selected, data); }));
 
@@ -430,6 +523,9 @@ void chloe_state::map_io(address_map &map)
 	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
 	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
 	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+
+	map(0x00f7, 0x00f7).mirror(0xff00).nopw(); // Audio Mixer. No support for now, using default ACB
+	map(0x8e3b, 0x8e3b).nopw(); // PRISMSPEEDCTRL used by software compatible with Prism
 }
 
 void chloe_state::map_regs(address_map &map)
@@ -455,6 +551,12 @@ void chloe_state::map_regs(address_map &map)
 		m_uno_regs_data[0x0b] = data;
 		m_maincpu->set_clock_scale(1 << BIT(data, 6, 2));
 	}));
+	map(0x0c, 0x0d).lw8(NAME([this](offs_t offset, u8 data)
+	{
+		m_uno_regs_data[0x0c + offset] = data;
+		raster_irq_adjust();
+	}));
+	map(0xa0, 0xa6).w(FUNC(chloe_state::dma_reg_w));
 }
 
 u8 chloe_state::kbd_fe_r(offs_t offset)
@@ -485,8 +587,6 @@ u8 chloe_state::kbd_fe_r(offs_t offset)
 		data &= ~0x02; // SS
 
 	data |= 0xe0;
-	data ^= 0x40;
-
 	/* cassette input from wav */
 	if (m_cassette->input() > 0.0038 )
 		data &= ~0x40;
@@ -658,9 +758,12 @@ void chloe_state::machine_start()
 	spectrum_128_state::machine_start();
 
 	m_spi_clock = timer_alloc(FUNC(chloe_state::spi_clock), this);
+	m_irq_raster_on_timer = timer_alloc(FUNC(chloe_state::raster_irq_on), this);
+	m_irq_raster_off_timer = timer_alloc(FUNC(chloe_state::raster_irq_off), this);
 
 	m_regs_map->space(AS_PROGRAM).specific(m_uno_regs);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_maincpu->space(AS_IO).specific(m_io);
 
 	for (auto i = 0; i < 8; i++)
 	{
@@ -673,16 +776,40 @@ void chloe_state::machine_start()
 	m_core_boot = 1;
 	m_divmmc_ctrl = 0;
 
+	// Save
+	save_item(NAME(m_timex_mmu));
+	save_item(NAME(m_port_ff_data));
+	save_item(NAME(m_core_boot));
+	save_item(NAME(m_reg_selected));
+	save_item(NAME(m_divmmc_paged));
+	save_item(NAME(m_divmmc_ctrl));
 	save_pointer(NAME(m_uno_regs_data), 256);
+	save_item(NAME(m_palpen_selected));
+	save_item(NAME(m_ay_selected));
+	save_item(NAME(m_dma_hilo));
+	save_item(NAME(m_dma_src_latch));
+	save_item(NAME(m_dma_dst_latch));
+	save_item(NAME(m_dma_pre_latch));
+	save_item(NAME(m_dma_len_latch));
+	save_item(NAME(m_dma_prob_latch));
+
+	save_item(NAME(m_spi_clock_cycles));
+	save_item(NAME(m_spi_clock_state));
+	save_item(NAME(m_spi_mosi_dat));
+	save_item(NAME(m_spi_miso_dat));
 }
 
 void chloe_state::machine_reset()
 {
 	spectrum_128_state::machine_reset();
 
+	m_irq_raster_on_timer->reset();
+	m_irq_raster_off_timer->reset();
+
 	m_spi_clock->reset();
 	m_spi_clock_cycles = 0;
 	m_spi_clock_state = false;
+	m_dma_hilo = 0;
 
 	m_timex_mmu = 0;
 	m_port_ff_data = 0;
@@ -712,7 +839,7 @@ GFXDECODE_END
 void chloe_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {}; // No contention for now
+	m_contention_pattern = {}; // Has no contention
 
 	const u8 *ram = m_ram->pointer();
 	m_ula->set_host_ram_ptr(ram);
@@ -730,10 +857,19 @@ void chloe_state::chloe(machine_config &config)
 	m_maincpu->set_m1_map(&chloe_state::map_fetch);
 	m_maincpu->set_memory_map(&chloe_state::map_mem);
 	m_maincpu->set_io_map(&chloe_state::map_io);
-	m_maincpu->set_vblank_int("screen", FUNC(chloe_state::spec_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(chloe_state::chloe_interrupt));
 	m_maincpu->nomreq_cb().set_nop();
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&chloe_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
+
+	/*
+	???DMA(config, m_dma, 28_MHz_XTAL / 8);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	m_dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
+	*/
 
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->spi_miso_callback().set(FUNC(chloe_state::spi_miso_w));
@@ -761,7 +897,7 @@ void chloe_state::chloe(machine_config &config)
 		.add_route(2, "rspeaker", 0.25)
 		.add_route(1, "rspeaker", 0.50);
 
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_covox, 0)
+	DAC_8BIT_R2R(config, m_covox, 0)
 		.add_route(ALL_OUTPUTS, "lspeaker", 0.75)
 		.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 
@@ -780,4 +916,4 @@ ROM_END
 } // Anonymous namespace
 
 /*    YEAR   NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY               FULLNAME       FLAGS */
-COMP( 1999,  chloe,   spec128, 0,      chloe,   chloe,  chloe_state,  empty_init,  "Chloe Corporation",  "Chloe 280SE", MACHINE_IMPERFECT_SOUND )
+COMP( 1999,  chloe,   spec128, 0,      chloe,   chloe,  chloe_state,  empty_init,  "Chloe Corporation",  "Chloe 280SE", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS )

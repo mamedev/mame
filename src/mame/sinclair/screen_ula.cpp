@@ -220,8 +220,10 @@ std::pair<rgb_t, rgb_t> screen_ula_device::parse_attribute(u8 attr)
 	}
 	else
 	{
-		ink = 0x00 | ((attr & 0x40) >> 3) | BIT(attr, 0, 3);
-		pap = 0x10 | ((attr & 0x40) >> 3) | BIT(attr, 3, 3);
+		ink = ((attr & 0x40) >> 3) | BIT(attr, 0, 3);
+		pap = ((attr & 0x40) >> 3) | BIT(attr, 3, 3);
+		if (m_ula_type == ULA_TYPE_NEXT)
+			pap |= 0x10;
 	}
 
 	return { palette().pen_color(pal_base + pap), palette().pen_color(pal_base + ink) };
