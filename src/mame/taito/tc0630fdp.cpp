@@ -810,10 +810,11 @@ bool FDP::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_in
 		const int real_x = layer.x_sample_enable ? mosaic(x, line.x_sample) : x;
 		const int layer_x = layer.x_index(real_x);
 
-		if constexpr (std::is_same_v<Mix, sprite_inf>) {
-			if (BIT(src[layer_x], 10, 2) != layer.index)
-				continue;
-		}
+		// this check is for ensuring sprite group draw ordering
+		// (benchmarked: do not combine with color 0 check)
+		const u16 color = src[layer_x];
+		if (layer.inactive_group(color))
+			continue;
 
 		// tilemap transparent flag
 		if (flags && !(flags[layer_x] & 0xf0))
@@ -821,8 +822,8 @@ bool FDP::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_in
 
 		if (layer.prio > pri.src_prio[x]) {
 			// submit src pix
-			if (const u16 c = src[layer_x]) {
-				const u16 pal = layer.palette_adjust(c);
+			if (color) {
+				const u16 pal = layer.palette_adjust(color);
 				// could be pulled out of loop for pivot and sprite
 				u8 sel = layer.blend_select(flags, layer_x);
 
@@ -851,8 +852,8 @@ bool FDP::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_in
 			}
 		} else if (layer.prio >= pri.dst_prio[x]) {
 			// submit dest pix
-			if (const u16 c = src[layer_x]) {
-				const u16 pal = layer.palette_adjust(c);
+			if (color) {
+				const u16 pal = layer.palette_adjust(color);
 				if (layer.prio != pri.dst_prio[x])
 					z.dst_pal[x] = pal;
 				else // prio conflict = color line conflict? (dariusg, bubblem)
@@ -912,9 +913,9 @@ void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z, const fda_settings 
 		r1 >>= 3;
 		g1 >>= 3;
 		b1 >>= 3;
-		r1 = std::min(r1, static_cast<u16>(255));
-		g1 = std::min(g1, static_cast<u16>(255));
-		b1 = std::min(b1, static_cast<u16>(255));
+		r1 = std::min<u16>(r1, 255);
+		g1 = std::min<u16>(g1, 255);
+		b1 = std::min<u16>(b1, 255);
 
 		dst[x] = rgb_t(r1, g1, b1);
 	}
@@ -931,7 +932,8 @@ void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z, const fda_settings 
 
 inline bool FDP::used(const pivot_inf &layer, int y) const
 {
-	return layer.use_pix() || (m_textram_row_usage[layer.y_index(y) >> 3] > 0);
+	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
+	return layer.use_pix() || (m_textram_row_usage[y_adj >> 3] > 0);
 }
 inline bool FDP::used(const sprite_inf &layer, int y) const
 {
