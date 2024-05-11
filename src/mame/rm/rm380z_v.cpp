@@ -446,9 +446,10 @@ void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 				if (ra < 10)
 				{
 					const uint8_t chr = m_vram.get_char(y, x);
-					gfx = m_chargen[(chr << 4) | ra ];
+					gfx = m_chargen[(chr << 4) | ra];
 				}
-				/* Display a scanline of a character */
+
+				// Display a scanline of a character
 				*p++ = BIT(gfx, 7);
 				*p++ = BIT(gfx, 6);
 				*p++ = BIT(gfx, 5);
@@ -459,6 +460,5 @@ void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 				*p++ = BIT(gfx, 0);
 			}
 		}
-		ma += 64;
 	}
 }

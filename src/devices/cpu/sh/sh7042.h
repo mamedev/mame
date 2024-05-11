@@ -24,7 +24,7 @@ public:
 	sh7042_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template<int Port> auto read_adc() { return m_read_adc[Port].bind(); }
-	template<int Sci> void sci_rx_w(int state) { do_sci_w(Sci, state); }
+	template<int Sci> void sci_rx_w(int state) {  m_sci[Sci]->do_rx_w(state); }
 	template<int Sci> void sci_clk_w(int state) { m_sci[Sci]->do_clk_w(state); }
 	template<int Sci> auto write_sci_tx() { return m_sci_tx[Sci].bind(); }
 	template<int Sci> auto write_sci_clk() { return m_sci_clk[Sci].bind(); }
@@ -144,8 +144,6 @@ private:
 	void recompute_timer(u64 event_time);
 	TIMER_CALLBACK_MEMBER(event_timer_tick);
 	void internal_update(u64 current_time);
-
-	void do_sci_w(int sci, int state);
 
 	u16 pcf_ah_r();
 	void pcf_ah_w(offs_t, u16 data, u16 mem_mask);
