@@ -322,23 +322,28 @@ P1-049-A
 #include "speaker.h"
 #include "tilemap.h"
 
+#define LOG_PROT     (1U << 1)
+
+#define LOG_ALL      (LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
 
 namespace {
 
-class downtown_state : public driver_device
+class tndrcade_state : public driver_device
 {
 public:
-	downtown_state(const machine_config &mconfig, device_type type, const char *tag) :
+	tndrcade_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_screen(*this, "screen"),
 		m_spritegen(*this, "spritegen"),
-		m_tiles(*this, "tiles"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch%u", 1U),
-		m_x1snd(*this, "x1snd"),
-		m_rot(*this, "ROT%u", 1),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
 		m_dsw(*this, "DSW"),
@@ -348,31 +353,39 @@ public:
 		m_subbank(*this, "subbank")
 	{ }
 
-	void calibr50(machine_config &config);
-	void downtown(machine_config &config);
-	void metafox(machine_config &config);
-	void arbalest(machine_config &config);
 	void tndrcade(machine_config &config);
-	void twineagl(machine_config &config);
-
-	void init_downtown();
-	void init_twineagl();
-	void init_metafox();
-	void init_arbalest();
 
 protected:
 	virtual void machine_start() override;
+
+	u16 ipl1_ack_r();
+	void ipl1_ack_w(u16 data = 0);
+
+	void seta_coin_lockout_w(u8 data);
+	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	u8 sharedram_68000_r(offs_t offset);
+	void sharedram_68000_w(offs_t offset, u8 data);
+	void sub_ctrl_w(offs_t offset, u8 data);
+	void sub_bankswitch_w(u8 data);
+	void sub_bankswitch_lockout_w(u8 data);
+	u8 ff_r();
+	u8 dsw1_r();
+	u8 dsw2_r();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
+
+	void tndrcade_map(address_map &map);
+	void tndrcade_sub_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<screen_device> m_screen;
 	required_device<x1_001_device> m_spritegen;
-	optional_device<x1_012_device> m_tiles;
 	required_device<palette_device> m_palette;
 	optional_device_array<generic_latch_8_device, 2> m_soundlatch;
-	optional_device<x1_010_device> m_x1snd;
 
-	optional_ioport_array<2> m_rot;
 	optional_ioport m_p1;
 	optional_ioport m_p2;
 	required_ioport m_dsw;
@@ -384,29 +397,38 @@ protected:
 	required_memory_bank m_subbank;
 
 	u8 m_sub_ctrl_data = 0;
-	u8 m_twineagl_xram[8] = { };
-	u8 m_twineagl_tilebank[4] = { };
+};
 
-	std::unique_ptr<u8[]> m_downtown_protection;
+class downtown_state : public tndrcade_state
+{
+public:
+	downtown_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tndrcade_state(mconfig, type, tag),
+		m_tiles(*this, "tiles"),
+		m_x1snd(*this, "x1snd"),
+		m_rot(*this, "ROT%u", 1)
+	{ }
 
-	u16 ipl1_ack_r();
-	void ipl1_ack_w(u16 data = 0);
+	void calibr50(machine_config &config);
+	void downtown(machine_config &config);
+	void metafox(machine_config &config);
+	void arbalest(machine_config &config);
+	void twineagl(machine_config &config);
+
+	void init_downtown();
+	void init_twineagl();
+	void init_metafox();
+	void init_arbalest();
+
+protected:
 	u16 ipl2_ack_r();
 	void ipl2_ack_w(u16 data = 0);
 
-	void seta_coin_lockout_w(u8 data);
-	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_downtown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vram_layer0_vctrl_raster_trampoline_w(offs_t offset, u16 data, u16 mem_mask);
 
 	u16 metafox_protection_r(offs_t offset);
 	void twineagl_tilebank_w(offs_t offset, u8 data);
-	u8 sharedram_68000_r(offs_t offset);
-	void sharedram_68000_w(offs_t offset, u8 data);
-	void sub_ctrl_w(offs_t offset, u8 data);
-	void sub_bankswitch_w(u8 data);
-	void sub_bankswitch_lockout_w(u8 data);
-	u8 ff_r();
 	u8 downtown_ip_r(offs_t offset);
 	void calibr50_sub_bankswitch_w(u8 data);
 	void calibr50_soundlatch2_w(u8 data);
@@ -417,14 +439,11 @@ protected:
 	u16 downtown_protection_r(offs_t offset);
 	void downtown_protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 arbalest_debug_r();
-	u8 dsw1_r();
-	u8 dsw2_r();
 
 	DECLARE_MACHINE_RESET(calibr50);
 	u16 twineagl_tile_offset(u16 code);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 
 	void calibr50_map(address_map &map);
@@ -432,9 +451,17 @@ protected:
 	void downtown_map(address_map &map);
 	void downtown_sub_map(address_map &map);
 	void metafox_sub_map(address_map &map);
-	void tndrcade_map(address_map &map);
-	void tndrcade_sub_map(address_map &map);
 	void twineagl_sub_map(address_map &map);
+
+	required_device<x1_012_device> m_tiles;
+	required_device<x1_010_device> m_x1snd;
+
+	optional_ioport_array<2> m_rot;
+
+	u8 m_twineagl_xram[8] = { };
+	u8 m_twineagl_tilebank[4] = { };
+
+	std::unique_ptr<u8[]> m_downtown_protection;
 };
 
 class usclssic_state : public downtown_state
@@ -501,7 +528,7 @@ u16 usclssic_state::tile_offset(u16 code)
 	return m_tiles_offset + code;
 }
 
-X1_001_SPRITE_GFXBANK_CB_MEMBER(downtown_state::setac_gfxbank_callback)
+X1_001_SPRITE_GFXBANK_CB_MEMBER(tndrcade_state::setac_gfxbank_callback)
 {
 	const int bank = (color & 0x06) >> 1;
 	code = (code & 0x3fff) + (bank * 0x4000);
@@ -575,30 +602,33 @@ void usclssic_state::usclssic_set_pens()
 
 ***************************************************************************/
 
-u32 downtown_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 tndrcade_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_tiles.found())
-	{
-		const rectangle &visarea = screen.visible_area();
-		const int vis_dimy = visarea.max_y - visarea.min_y + 1;
+	bitmap.fill(0x1f0, cliprect);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, 0x1000);
 
-		const int flip = m_spritegen->is_flipped();
-		m_tiles->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	return 0;
+}
 
-		/* the hardware wants different scroll values when flipped */
+u32 downtown_state::screen_update_downtown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const rectangle &visarea = screen.visible_area();
+	const int vis_dimy = visarea.max_y - visarea.min_y + 1;
 
-		/*  bg x scroll      flip
-		    metafox     0000 025d = 0, $400-$1a3 = $400 - $190 - $13
-		    eightfrc    ffe8 0272
-		                fff0 0260 = -$10, $400-$190 -$10
-		                ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
+	const int flip = m_spritegen->is_flipped();
+	m_tiles->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-		m_tiles->update_scroll(vis_dimy, flip);
+	// the hardware wants different scroll values when flipped
 
-		m_tiles->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	}
-	else
-		bitmap.fill(0x1f0, cliprect);
+	/*  bg x scroll      flip
+	    metafox     0000 025d = 0, $400-$1a3 = $400 - $190 - $13
+	    eightfrc    ffe8 0272
+	                fff0 0260 = -$10, $400-$190 -$10
+	                ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
+
+	m_tiles->update_scroll(vis_dimy, flip);
+
+	m_tiles->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, 0x1000);
 
@@ -608,7 +638,7 @@ u32 downtown_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 u32 usclssic_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	usclssic_set_pens();
-	return screen_update(screen, bitmap, cliprect);
+	return screen_update_downtown(screen, bitmap, cliprect);
 }
 
 
@@ -627,12 +657,12 @@ u32 usclssic_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &
 
 */
 
-u8 downtown_state::sharedram_68000_r(offs_t offset)
+u8 tndrcade_state::sharedram_68000_r(offs_t offset)
 {
 	return m_sharedram[offset];
 }
 
-void downtown_state::sharedram_68000_w(offs_t offset, u8 data)
+void tndrcade_state::sharedram_68000_w(offs_t offset, u8 data)
 {
 	m_sharedram[offset] = data & 0xff;
 }
@@ -644,7 +674,7 @@ void downtown_state::sharedram_68000_w(offs_t offset, u8 data)
 
 */
 
-void downtown_state::sub_ctrl_w(offs_t offset, u8 data)
+void tndrcade_state::sub_ctrl_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -668,20 +698,20 @@ void downtown_state::sub_ctrl_w(offs_t offset, u8 data)
 
 }
 
-/* DSW reading for 8 bit CPUs */
+// DSW reading for 8 bit CPUs
 
-u8 downtown_state::dsw1_r()
+u8 tndrcade_state::dsw1_r()
 {
 	return (m_dsw->read() >> 8) & 0xff;
 }
 
-u8 downtown_state::dsw2_r()
+u8 tndrcade_state::dsw2_r()
 {
 	return (m_dsw->read() >> 0) & 0xff;
 }
 
 
-void downtown_state::seta_coin_lockout_w(u8 data)
+void tndrcade_state::seta_coin_lockout_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -697,14 +727,14 @@ void downtown_state::seta_coin_lockout_w(u8 data)
 ***************************************************************************/
 
 
-u16 downtown_state::ipl1_ack_r()
+u16 tndrcade_state::ipl1_ack_r()
 {
 	if (!machine().side_effects_disabled())
 		ipl1_ack_w();
 	return 0;
 }
 
-void downtown_state::ipl1_ack_w(u16 data)
+void tndrcade_state::ipl1_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
@@ -734,22 +764,22 @@ void downtown_state::ipl2_ack_w(u16 data)
    writing to sharedram! */
 
 
-void downtown_state::tndrcade_map(address_map &map)
+void tndrcade_state::tndrcade_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                             // ROM
-	map(0x200000, 0x200001).w(FUNC(downtown_state::ipl1_ack_w));
+	map(0x200000, 0x200001).w(FUNC(tndrcade_state::ipl1_ack_w));
 	map(0x280000, 0x280001).nopw();                        // ? 0 / 1 (sub cpu related?)
 	map(0x300000, 0x300001).nopw();                        // ? 0 / 1
-	map(0x380000, 0x3803ff).ram().share("palette").w("palette", FUNC(palette_device::write16)); // Palette
+	map(0x380000, 0x3803ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
 	map(0x400000, 0x400000).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));
 	map(0x600000, 0x6005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
 	map(0x600600, 0x600607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 
-	map(0x800000, 0x800007).w(FUNC(downtown_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
-	map(0xa00000, 0xa00fff).rw(FUNC(downtown_state::sharedram_68000_r), FUNC(downtown_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
+	map(0x800000, 0x800007).w(FUNC(tndrcade_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
+	map(0xa00000, 0xa00fff).rw(FUNC(tndrcade_state::sharedram_68000_r), FUNC(tndrcade_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
 	map(0xc00000, 0xc03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xe00000, 0xe03fff).ram().share("share1");                  // RAM (Mirrored?)
-	map(0xffc000, 0xffffff).ram().share("share1");                  // RAM (Mirrored?)
+	map(0xe00000, 0xe03fff).ram().share("mainram");                  // RAM (Mirrored?)
+	map(0xffc000, 0xffffff).ram().share("mainram");                  // RAM (Mirrored?)
 }
 
 
@@ -777,7 +807,7 @@ void downtown_state::downtown_map(address_map &map)
 	map(0x500001, 0x500001).w(FUNC(downtown_state::twineagl_ctrl_w));
 	map(0x600001, 0x600001).r(FUNC(downtown_state::dsw1_r));
 	map(0x600003, 0x600003).r(FUNC(downtown_state::dsw2_r));
-	map(0x700000, 0x7003ff).ram().share("palette").w("palette", FUNC(palette_device::write16));  // Palette
+	map(0x700000, 0x7003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x800000, 0x800005).w(m_tiles, FUNC(x1_012_device::vctrl_w));// VRAM Ctrl
 	map(0x900000, 0x903fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles"); // VRAM
 	map(0xa00000, 0xa00007).w(FUNC(downtown_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
@@ -804,7 +834,7 @@ void downtown_state::calibr50_map(address_map &map)
 	map(0x500000, 0x500001).nopw();                        // ?
 	map(0x600001, 0x600001).r(FUNC(downtown_state::dsw1_r));
 	map(0x600003, 0x600003).r(FUNC(downtown_state::dsw2_r));
-	map(0x700000, 0x7003ff).ram().share("palette").w("palette", FUNC(palette_device::write16));  // Palette
+	map(0x700000, 0x7003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x800000, 0x800005).w(FUNC(downtown_state::vram_layer0_vctrl_raster_trampoline_w));// VRAM Ctrl
 	map(0x900000, 0x903fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles"); // VRAM
 	map(0x904000, 0x904fff).ram();                             //
@@ -876,12 +906,11 @@ void usclssic_state::lockout_w(u8 data)
 void usclssic_state::usclssic_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                 // ROM
-	map(0xff0000, 0xffffff).ram();                                 // RAM
 	map(0x800000, 0x8005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16)); // Sprites Y
 	map(0x800600, 0x800607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 	map(0x900000, 0x900000).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));
 	map(0xa00000, 0xa00005).rw(m_tiles, FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));         // VRAM Ctrl
-	map(0xb00000, 0xb003ff).ram().share("paletteram");  // Palette
+	map(0xb00000, 0xb003ff).ram().share(m_paletteram);  // Palette
 	map(0xb40000, 0xb40007).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
 	map(0xb40001, 0xb40001).w(FUNC(usclssic_state::lockout_w));  // Coin Lockout + Tiles Banking
 	map(0xb4000a, 0xb4000b).w(FUNC(usclssic_state::ipl1_ack_w));
@@ -894,6 +923,7 @@ void usclssic_state::usclssic_map(address_map &map)
 	map(0xd00000, 0xd03fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles"); // VRAM
 	map(0xd04000, 0xd04fff).ram();                                 //
 	map(0xe00000, 0xe00fff).ram();                                 // NVRAM? (odd bytes)
+	map(0xff0000, 0xffffff).ram();                                 // RAM
 }
 
 
@@ -903,12 +933,12 @@ void usclssic_state::usclssic_map(address_map &map)
 
 ***************************************************************************/
 
-void downtown_state::sub_bankswitch_w(u8 data)
+void tndrcade_state::sub_bankswitch_w(u8 data)
 {
 	m_subbank->set_entry(data >> 4);
 }
 
-void downtown_state::sub_bankswitch_lockout_w(u8 data)
+void tndrcade_state::sub_bankswitch_lockout_w(u8 data)
 {
 	sub_bankswitch_w(data);
 	seta_coin_lockout_w(data);
@@ -922,23 +952,23 @@ void downtown_state::sub_bankswitch_lockout_w(u8 data)
                                 Thundercade
 ***************************************************************************/
 
-u8 downtown_state::ff_r(){return 0xff;}
+u8 tndrcade_state::ff_r(){return 0xff;}
 
-void downtown_state::tndrcade_sub_map(address_map &map)
+void tndrcade_state::tndrcade_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                             // RAM
-	map(0x0800, 0x0800).r(FUNC(downtown_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
+	map(0x0800, 0x0800).r(FUNC(tndrcade_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
 	//map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             //
 	//map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("P1");                 // P1
-	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
+	map(0x1000, 0x1000).w(FUNC(tndrcade_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");                 // P2
 	map(0x1002, 0x1002).portr("COINS");              // Coins
 	map(0x2000, 0x2001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x3000, 0x3001).w("ym2", FUNC(ym3812_device::write));
-	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
+	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
 	map(0x6000, 0x7fff).rom();                             // ROM
-	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
+	map(0x8000, 0xbfff).bankr(m_subbank);                        // Banked ROM
 	map(0xc000, 0xffff).rom();                             // ROM
 }
 
@@ -956,9 +986,9 @@ void downtown_state::twineagl_sub_map(address_map &map)
 	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");             // P2
 	map(0x1002, 0x1002).portr("COINS");          // Coins
-	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
+	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
 	map(0x7000, 0x7fff).rom();                         // ROM
-	map(0x8000, 0xbfff).bankr("subbank");                    // Banked ROM
+	map(0x8000, 0xbfff).bankr(m_subbank);                    // Banked ROM
 	map(0xc000, 0xffff).rom();                         // ROM
 }
 
@@ -997,9 +1027,9 @@ void downtown_state::downtown_sub_map(address_map &map)
 	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1007).r(FUNC(downtown_state::downtown_ip_r));         // Input Ports
 	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
-	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
+	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
 	map(0x7000, 0x7fff).rom();                         // ROM
-	map(0x8000, 0xbfff).bankr("subbank");                    // Banked ROM
+	map(0x8000, 0xbfff).bankr(m_subbank);                    // Banked ROM
 	map(0xc000, 0xffff).rom();                         // ROM
 }
 
@@ -1026,8 +1056,8 @@ void downtown_state::calibr50_sub_bankswitch_w(u8 data)
 	if (!BIT(data, 2))
 		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, CLEAR_LINE);
 
-	// Bit 1: PCMMUTE
-	m_x1snd->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 0.0f : 1.0f);
+	// Bit 1: /PCMMUTE
+	m_x1snd->set_output_gain(ALL_OUTPUTS, BIT(data, 1) ? 1.0f : 0.0f);
 }
 
 void downtown_state::calibr50_soundlatch2_w(u8 data)
@@ -1043,7 +1073,7 @@ void downtown_state::calibr50_sub_map(address_map &map)
 								 NAME([this](offs_t offset, u8 data) { m_x1snd->write(offset ^ 0x1000, data); })); // Sound
 	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             // From Main CPU
 	map(0x4000, 0x4000).w(FUNC(downtown_state::calibr50_sub_bankswitch_w));        // Bankswitching
-	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
+	map(0x8000, 0xbfff).bankr(m_subbank);                        // Banked ROM
 	map(0xc000, 0xffff).rom();                             // ROM
 	map(0xc000, 0xc000).w(FUNC(downtown_state::calibr50_soundlatch2_w));   // To Main CPU
 }
@@ -1063,9 +1093,9 @@ void downtown_state::metafox_sub_map(address_map &map)
 	map(0x1002, 0x1002).portr("P1");             // P1
 	//map(0x1004, 0x1004).nopr();                // ?
 	map(0x1006, 0x1006).portr("P2");             // P2
-	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
+	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
 	map(0x7000, 0x7fff).rom();                         // ROM
-	map(0x8000, 0xbfff).bankr("subbank");                    // Banked ROM
+	map(0x8000, 0xbfff).bankr(m_subbank);                    // Banked ROM
 	map(0xc000, 0xffff).rom();                         // ROM
 }
 
@@ -1152,16 +1182,16 @@ static INPUT_PORTS_START( arbalest )
 	PORT_INCLUDE(common_type2)
 
 	PORT_START("DSW")   // 2 DSWs - $600001 & 3.b
-	PORT_DIPNAME( 0x0001, 0x0001, "Licensed To" )       PORT_DIPLOCATION("SW1:1") /* Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x0001, 0x0001, "Licensed To" )       PORT_DIPLOCATION("SW1:1") // Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x0000, "Taito" )             PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
 	PORT_DIPSETTING(      0x0001, "Jordan" )            PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
 	PORT_DIPSETTING(      0x0000, "Taito" )             PORT_CONDITION("DSW",0x4000,EQUALS,0x4000)
-	PORT_DIPSETTING(      0x0001, "Romstar" )           PORT_CONDITION("DSW",0x4000,EQUALS,0x4000) /* Manual shows DSW1-1=Off & DSW2-7=Off */
+	PORT_DIPSETTING(      0x0001, "Romstar" )           PORT_CONDITION("DSW",0x4000,EQUALS,0x4000) // Manual shows DSW1-1=Off & DSW2-7=Off
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4") /* Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4") // Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")
@@ -1197,10 +1227,10 @@ static INPUT_PORTS_START( arbalest )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x3000, "3" )
 	PORT_DIPSETTING(      0x2000, "5" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") /* Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x4000, 0x4000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") // Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x4000, "Option 1" )
 	PORT_DIPSETTING(      0x0000, "Option 2" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") /* Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") // Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x8000, "Coin Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Coin Mode 2" )
 INPUT_PORTS_END
@@ -1214,11 +1244,11 @@ static INPUT_PORTS_START( calibr50 )
 	PORT_INCLUDE(common_type2)
 
 	PORT_START("DSW")   //2 DSWs - $600001 & 3.b
-	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )       PORT_DIPLOCATION("SW1:1") /* Romstar's Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )       PORT_DIPLOCATION("SW1:1") // Romstar's Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x0000, "Seta (Japan only)" )     PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
 	PORT_DIPSETTING(      0x0001, "Seta USA / Romstar" )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
 	PORT_DIPSETTING(      0x0000, "Seta / Taito" )          PORT_CONDITION("DSW",0x4000,EQUALS,0x4000)
-	PORT_DIPSETTING(      0x0001, "Seta USA / Taito America" )  PORT_CONDITION("DSW",0x4000,EQUALS,0x4000) /* Romstar's Manual shows DSW1-1=Off & DSW2-7=Off */
+	PORT_DIPSETTING(      0x0001, "Seta USA / Taito America" )  PORT_CONDITION("DSW",0x4000,EQUALS,0x4000) // Romstar's Manual shows DSW1-1=Off & DSW2-7=Off
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1261,10 +1291,10 @@ static INPUT_PORTS_START( calibr50 )
 	PORT_DIPNAME( 0x2000, 0x2000, "Erase Backup Ram" )  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") /* Romstar's Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x4000, 0x4000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") // Romstar's Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x4000, "Option 1" )
 	PORT_DIPSETTING(      0x0000, "Option 2" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") /* Romstar's Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") // Romstar's Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x8000, "Coin Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Coin Mode 2" )
 
@@ -1283,7 +1313,7 @@ static INPUT_PORTS_START( downtown )
 	PORT_INCLUDE(common_type2)
 
 	PORT_START("DSW")   //2 DSWs - $600001 & 3.b
-	PORT_DIPNAME( 0x0001, 0x0000, "Sales" ) PORT_DIPLOCATION("SW1:1")       /* Manual for USA version says "Always Off" */
+	PORT_DIPNAME( 0x0001, 0x0000, "Sales" ) PORT_DIPLOCATION("SW1:1")       // Manual for USA version says "Always Off"
 	PORT_DIPSETTING(      0x0001, "Japan Only" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( World ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
@@ -1329,10 +1359,10 @@ static INPUT_PORTS_START( downtown )
 	PORT_DIPSETTING(      0x3000, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPSETTING(      0x2000, "5" )
-	PORT_DIPNAME( 0x4000, 0x0000, "World License" ) PORT_DIPLOCATION("SW2:7") /* Manual for USA version says "Unused" */
+	PORT_DIPNAME( 0x4000, 0x0000, "World License" ) PORT_DIPLOCATION("SW2:7") // Manual for USA version says "Unused"
 	PORT_DIPSETTING(      0x4000, "Romstar" )
 	PORT_DIPSETTING(      0x0000, "Taito" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" ) PORT_DIPLOCATION("SW2:8") /* Manual for USA version says "Unused" */
+	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" ) PORT_DIPLOCATION("SW2:8") // Manual for USA version says "Unused"
 	PORT_DIPSETTING(      0x8000, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
 
@@ -1353,11 +1383,11 @@ static INPUT_PORTS_START( metafox )
 	PORT_INCLUDE(common_type2)
 
 	PORT_START("DSW") //$600001 & 3.b
-	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )   PORT_DIPLOCATION("SW1:1") /* Romstar's Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )   PORT_DIPLOCATION("SW1:1") // Romstar's Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x0000, "Seta USA / Taito America" )  PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
 	PORT_DIPSETTING(      0x0001, "Seta / Jordan I.S." )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
 	PORT_DIPSETTING(      0x0000, "Seta / Taito" )          PORT_CONDITION("DSW",0x4000,EQUALS,0x4000)
-	PORT_DIPSETTING(      0x0001, "Seta USA / Romstar" )        PORT_CONDITION("DSW",0x4000,EQUALS,0x4000) /* Romstar's Manual shows DSW1-1=Off & DSW2-7=Off */
+	PORT_DIPSETTING(      0x0001, "Seta USA / Romstar" )        PORT_CONDITION("DSW",0x4000,EQUALS,0x4000) // Romstar's Manual shows DSW1-1=Off & DSW2-7=Off
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1398,10 +1428,10 @@ static INPUT_PORTS_START( metafox )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x3000, "3" )
 	PORT_DIPSETTING(      0x2000, "5" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") /* Romstar's Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x4000, 0x4000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") // Romstar's Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x4000, "Option 1" )
 	PORT_DIPSETTING(      0x0000, "Option 2" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") /* Romstar's Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") // Romstar's Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x8000, "Coin Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Coin Mode 2" )
 INPUT_PORTS_END
@@ -1513,16 +1543,16 @@ static INPUT_PORTS_START( twineagl )
 	// Most likely these are overwritten by the lead JPs that the board has
 	// (4x3 near SW2 at J2, 2x3 near two empty ROM sockets U31/U37 at C10).
 	PORT_START("DSW") //2 DSWs - $600001 & 3.b
-	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )   PORT_DIPLOCATION("SW1:1") /* Always "Seta" if sim. players = 1 */
+	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )   PORT_DIPLOCATION("SW1:1") // Always "Seta" if sim. players = 1
 	PORT_DIPSETTING(      0x0000, "Taito America / Romstar" )   PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
-	PORT_DIPSETTING(      0x0001, "Taito Corp Japan" )      PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)   /* "World" Copyright */
+	PORT_DIPSETTING(      0x0001, "Taito Corp Japan" )      PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)   // "World" Copyright
 	PORT_DIPSETTING(      0x0000, "Taito America" )         PORT_CONDITION("DSW",0x4000,EQUALS,0x4000)
-	PORT_DIPSETTING(      0x0001, "Seta / Taito" )          PORT_CONDITION("DSW",0x4000,EQUALS,0x4000)  /* Japan Only Notice */
+	PORT_DIPSETTING(      0x0001, "Seta / Taito" )          PORT_CONDITION("DSW",0x4000,EQUALS,0x4000)  // Japan Only Notice
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:4") /* Only if simultaneous players = 1 */
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:4") // Only if simultaneous players = 1
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")
@@ -1558,10 +1588,10 @@ static INPUT_PORTS_START( twineagl )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x3000, "3" )
 	PORT_DIPSETTING(      0x2000, "5" )
-	PORT_DIPNAME( 0x4000, 0x0000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") /* Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x4000, 0x0000, "Licensor Option" )   PORT_DIPLOCATION("SW2:7") // Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x4000, "Option 1" )
 	PORT_DIPSETTING(      0x0000, "Option 2" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") /* Manual states "Don't Touch" */
+	PORT_DIPNAME( 0x8000, 0x8000, "Coinage Type" )      PORT_DIPLOCATION("SW2:8") // Manual states "Don't Touch"
 	PORT_DIPSETTING(      0x8000, "Coin Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Coin Mode 2" )
 INPUT_PORTS_END
@@ -1579,16 +1609,16 @@ static INPUT_PORTS_START( usclssic )
 	PORT_START("TRACKY")
 	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(usclssic_state, trackball_y_r)
 
-	PORT_START("TRACK1_X")     /* muxed port 0 */
+	PORT_START("TRACK1_X")     // muxed port 0
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
-	PORT_START("TRACK1_Y")     /* muxed port 0 */
+	PORT_START("TRACK1_Y")     // muxed port 0
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
-	PORT_START("TRACK2_X")     /* muxed port 1 */
+	PORT_START("TRACK2_X")     // muxed port 1
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_COCKTAIL
 
-	PORT_START("TRACK2_Y")     /* muxed port 1 */
+	PORT_START("TRACK2_Y")     // muxed port 1
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_COCKTAIL
 
 	PORT_START("BUTTONS")
@@ -1666,10 +1696,10 @@ or 6 planes deep and are stored in a wealth of formats.
 
 ***************************************************************************/
 
-						/* First the 4 bit tiles */
+						// First the 4 bit tiles
 
 
-/* The tilemap bitplanes are packed togheter */
+// The tilemap bitplanes are packed togheter
 static const gfx_layout layout_tilemap =
 {
 	16,16,
@@ -1682,7 +1712,7 @@ static const gfx_layout layout_tilemap =
 };
 
 
-/* The sprite bitplanes are separated (but there are 2 per rom) */
+// The sprite bitplanes are separated (but there are 2 per rom)
 static const gfx_layout layout_sprites =
 {
 	16,16,
@@ -1695,10 +1725,10 @@ static const gfx_layout layout_sprites =
 };
 
 
-						/* Then the 6 bit tiles */
+						// Then the 6 bit tiles
 
 
-/* The tilemap bitplanes are packed together */
+// The tilemap bitplanes are packed together
 static const gfx_layout layout_tilemap_6bpp =
 {
 	16,16,
@@ -1716,7 +1746,7 @@ static const gfx_layout layout_tilemap_6bpp =
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_downtown )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap, 0, 32 ) // [0] Layer 1
+	GFXDECODE_ENTRY( "tiles", 0, layout_tilemap, 0, 32 ) // [0] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -1724,7 +1754,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_sprites )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites, 0, 32 ) // Sprites
+	GFXDECODE_ENTRY( "sprites", 0, layout_sprites, 0, 32 ) // Sprites
 GFXDECODE_END
 
 
@@ -1734,8 +1764,8 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_usclssic )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 512+64*32*0, 32 ) // [0] Layer 1
-	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 512+64*32*1, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "tiles", 0, layout_tilemap_6bpp, 512+64*32*0, 32 ) // [0] Layer 1
+	GFXDECODE_ENTRY( "tiles", 0, layout_tilemap_6bpp, 512+64*32*1, 32 ) // [1] Layer 1
 GFXDECODE_END
 
 
@@ -1761,7 +1791,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::seta_sub_interrupt)
                                 Thundercade
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::tndrcade_sub_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_state::tndrcade_sub_interrupt)
 {
 	int scanline = param;
 
@@ -1772,44 +1802,44 @@ TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::tndrcade_sub_interrupt)
 		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, ASSERT_LINE);
 }
 
-void downtown_state::tndrcade(machine_config &config)
+void tndrcade_state::tndrcade(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL / 2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::tndrcade_map);
+	// basic machine hardware
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // 8 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &tndrcade_state::tndrcade_map);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); /* 2 MHz */
-	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::tndrcade_sub_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(downtown_state::tndrcade_sub_interrupt), "screen", 0, 1);
+	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &tndrcade_state::tndrcade_sub_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(tndrcade_state::tndrcade_sub_interrupt), "screen", 0, 1);
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(tndrcade_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // correct (start grid, wall at beginning of game)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(downtown_state::screen_update));
+	screen.set_screen_update(FUNC(tndrcade_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 2, ASSERT_LINE);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);    // sprites only
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL / 4));   /* 4 MHz */
-	ym1.port_a_read_callback().set(FUNC(downtown_state::dsw1_r));     /* input A: DSW 1 */
-	ym1.port_b_read_callback().set(FUNC(downtown_state::dsw2_r));     /* input B: DSW 2 */
+	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL / 4));   // 4 MHz
+	ym1.port_a_read_callback().set(FUNC(tndrcade_state::dsw1_r));     // input A: DSW 1
+	ym1.port_b_read_callback().set(FUNC(tndrcade_state::dsw2_r));     // input B: DSW 2
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 16_MHz_XTAL / 4));   /* 4 MHz */
+	ym3812_device &ym2(YM3812(config, "ym2", 16_MHz_XTAL / 4));   // 4 MHz
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -1822,15 +1852,15 @@ void downtown_state::tndrcade(machine_config &config)
    the sub cpu reads the ip at different locations,
    the visible area seems different. */
 
-/* twineagl lev 3 = lev 2 + lev 1 ! */
+// twineagl lev 3 = lev 2 + lev 1 !
 
 void downtown_state::twineagl(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL / 2); /* 8 MHz */
+	// basic machine hardware
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); /* 2 MHz */
+	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::twineagl_sub_map);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
@@ -1841,13 +1871,13 @@ void downtown_state::twineagl(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57.42); // Possibly lower than 60Hz, Correct?
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(downtown_state::screen_update));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_downtown));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 3, ASSERT_LINE);
 
@@ -1858,13 +1888,13 @@ void downtown_state::twineagl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	X1_010(config, m_x1snd, 16_MHz_XTAL);   /* 16 MHz */
+	X1_010(config, m_x1snd, 16_MHz_XTAL);   // 16 MHz
 	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -1873,15 +1903,15 @@ void downtown_state::twineagl(machine_config &config)
                                 DownTown
 ***************************************************************************/
 
-/* downtown lev 3 = lev 2 + lev 1 ! */
+// downtown lev 3 = lev 2 + lev 1 !
 
 void downtown_state::downtown(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL / 2); /* verified on pcb */
+	// basic machine hardware
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); /* verified on pcb */
+	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_sub_map);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
@@ -1892,13 +1922,13 @@ void downtown_state::downtown(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.42); /* verified on pcb */
+	screen.set_refresh_hz(57.42); // verified on pcb
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(downtown_state::screen_update));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_downtown));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 2, ASSERT_LINE);
 
@@ -1909,13 +1939,13 @@ void downtown_state::downtown(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	X1_010(config, m_x1snd, 16_MHz_XTAL);   /* 16 MHz */
+	X1_010(config, m_x1snd, 16_MHz_XTAL);   // 16 MHz
 	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -1955,14 +1985,14 @@ void usclssic_state::machine_start()
 
 void usclssic_state::usclssic(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL / 2); /* 8 MHz */
+	// basic machine hardware
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &usclssic_state::usclssic_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(usclssic_state::calibr50_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); /* 2 MHz */
+	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &usclssic_state::calibr50_sub_map);
 
 	UPD4701A(config, m_upd4701);
@@ -1983,7 +2013,7 @@ void usclssic_state::usclssic(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -2000,14 +2030,14 @@ void usclssic_state::usclssic(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, m65c02_device::NMI_LINE);
 	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	X1_010(config, m_x1snd, 16_MHz_XTAL);   /* 16 MHz */
+	X1_010(config, m_x1snd, 16_MHz_XTAL);   // 16 MHz
 	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -2023,8 +2053,8 @@ void usclssic_state::usclssic(machine_config &config)
 
 void downtown_state::calibr50(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL / 2); /* verified on pcb */
+	// basic machine hardware
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::calibr50_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(downtown_state::calibr50_interrupt), "screen", 0, 1);
 
@@ -2032,7 +2062,7 @@ void downtown_state::calibr50(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); /* verified on pcb */
+	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::calibr50_sub_map);
 	m_subcpu->set_periodic_int(FUNC(downtown_state::irq0_line_assert), attotime::from_hz(4*60));  // IRQ: 4/frame
 
@@ -2049,13 +2079,13 @@ void downtown_state::calibr50(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.42); /* verified on pcb */
+	screen.set_refresh_hz(57.42); // verified on pcb
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(downtown_state::screen_update));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_downtown));
 	screen.set_palette(m_palette);
 	//screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
@@ -2065,7 +2095,7 @@ void downtown_state::calibr50(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
@@ -2074,7 +2104,7 @@ void downtown_state::calibr50(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	X1_010(config, m_x1snd, 16_MHz_XTAL);   /* 16 MHz */
+	X1_010(config, m_x1snd, 16_MHz_XTAL);   // 16 MHz
 	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -2083,15 +2113,15 @@ void downtown_state::calibr50(machine_config &config)
                                 Meta Fox
 ***************************************************************************/
 
-/* metafox lev 3 = lev 2 + lev 1 ! */
+// metafox lev 3 = lev 2 + lev 1 !
 
 void downtown_state::metafox(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	// basic machine hardware
+	M68000(config, m_maincpu, 16000000/2); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
 
-	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	M65C02(config, m_subcpu, 16000000/8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::metafox_sub_map);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
@@ -2102,13 +2132,13 @@ void downtown_state::metafox(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(downtown_state::screen_update));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_downtown));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, 3, ASSERT_LINE);
 
@@ -2119,13 +2149,13 @@ void downtown_state::metafox(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	X1_010(config, m_x1snd, 16000000);   /* 16 MHz */
+	X1_010(config, m_x1snd, 16000000);   // 16 MHz
 	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -2148,17 +2178,17 @@ void downtown_state::arbalest(machine_config &config)
 #define ROM_LOAD24_BYTE(name, offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_SKIP(2))
 
 ROM_START( tndrcade )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "ua0-4.u19", 0x000000, 0x020000, CRC(73bd63eb) SHA1(5d410d2a77f1c3c4c37a9fe1e56019335891fe67) )
 	ROM_LOAD16_BYTE( "ua0-2.u17", 0x000001, 0x020000, CRC(e96194b1) SHA1(c5084d06a2e4f7ba3112be1ccc314f7d712bb45e) )
 	ROM_LOAD16_BYTE( "ua0-3.u18", 0x040000, 0x020000, CRC(0a7b1c41) SHA1(ede14ac08d7e63972c21fd2d0717276e73153f18) )
 	ROM_LOAD16_BYTE( "ua0-1.u16", 0x040001, 0x020000, CRC(fa906626) SHA1(a1d28328afa8dda98dd20f3f5a19c0dbf2ebaf36) )
 
-	ROM_REGION( 0x02c000, "sub", 0 )        /* 65c02 Code */
+	ROM_REGION( 0x02c000, "sub", 0 )        // 65c02 Code
 	ROM_LOAD( "ua10-5.u24", 0x004000, 0x020000, CRC(8eff6122) SHA1(1adc1643018e612df85643014b78525106478889) )  // $1fffd=2 (country code)
 	ROM_RELOAD(             0x00c000, 0x020000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "ua0-10.u12", 0x000000, 0x040000, CRC(aa7b6757) SHA1(9157cc930760c846cce95e18bf38e7ea241f7a8e) )
 	ROM_LOAD( "ua0-11.u13", 0x040000, 0x040000, CRC(11eaf931) SHA1(ba1dfc4b0f87b1bbdc6c2e36deaecda2b4655d57) )
 	ROM_LOAD( "ua0-12.u14", 0x080000, 0x040000, CRC(00b5381c) SHA1(6fc3138dd0e2b3f99872b1f0d177094df5bed39d) )
@@ -2170,17 +2200,17 @@ ROM_START( tndrcade )
 ROM_END
 
 ROM_START( tndrcadej )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "ua0-4.u19", 0x000000, 0x020000, CRC(73bd63eb) SHA1(5d410d2a77f1c3c4c37a9fe1e56019335891fe67) )
 	ROM_LOAD16_BYTE( "ua0-2.u17", 0x000001, 0x020000, CRC(e96194b1) SHA1(c5084d06a2e4f7ba3112be1ccc314f7d712bb45e) )
 	ROM_LOAD16_BYTE( "ua0-3.u18", 0x040000, 0x020000, CRC(0a7b1c41) SHA1(ede14ac08d7e63972c21fd2d0717276e73153f18) )
 	ROM_LOAD16_BYTE( "ua0-1.u16", 0x040001, 0x020000, CRC(fa906626) SHA1(a1d28328afa8dda98dd20f3f5a19c0dbf2ebaf36) )
 
-	ROM_REGION( 0x02c000, "sub", 0 )        /* 65c02 Code */
+	ROM_REGION( 0x02c000, "sub", 0 )        // 65c02 Code
 	ROM_LOAD( "thcade5.u24", 0x004000, 0x020000, CRC(8cb9df7b) SHA1(5b504657f4cc1ea265913ff670aed108ceddba46) ) // $1fffd=1 (country code jp)
 	ROM_RELOAD(              0x00c000, 0x020000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "ua0-10.u12", 0x000000, 0x040000, CRC(aa7b6757) SHA1(9157cc930760c846cce95e18bf38e7ea241f7a8e) )
 	ROM_LOAD( "ua0-11.u13", 0x040000, 0x040000, CRC(11eaf931) SHA1(ba1dfc4b0f87b1bbdc6c2e36deaecda2b4655d57) )
 	ROM_LOAD( "ua0-12.u14", 0x080000, 0x040000, CRC(00b5381c) SHA1(6fc3138dd0e2b3f99872b1f0d177094df5bed39d) )
@@ -2192,151 +2222,151 @@ ROM_START( tndrcadej )
 ROM_END
 
 ROM_START( twineagl )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_WORD( "ua2-1", 0x000000, 0x080000, CRC(5c3fe531) SHA1(e484dad25cda906fb1b0606fb10ae50056c64e6a) )
 
-	ROM_REGION( 0x010000, "sub", 0 )        /* 65c02 Code */
+	ROM_REGION( 0x010000, "sub", 0 )        // 65c02 Code
 	ROM_LOAD( "ua2-2", 0x006000, 0x002000, CRC(783ca84e) SHA1(21e19f74812de50e98b755dd1f68c187dd1e7e81) )
 	ROM_RELOAD(        0x008000, 0x002000  )
 	ROM_RELOAD(        0x00a000, 0x002000  )
 	ROM_RELOAD(        0x00c000, 0x002000  )
 	ROM_RELOAD(        0x00e000, 0x002000  )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "ua2-4",  0x000000, 0x040000, CRC(8b7532d6) SHA1(ec42d21bc44f004282f822b3da36b5442eabd87a) )
 	ROM_LOAD16_BYTE( "ua2-3",  0x000001, 0x040000, CRC(1124417a) SHA1(c908f51b943188946486c639a0cb9712114b5437) )
 	ROM_LOAD16_BYTE( "ua2-6",  0x080000, 0x040000, CRC(99d8dbba) SHA1(ac2a3c5cad23e0207eba52935c72e23203c8e0af) )
 	ROM_LOAD16_BYTE( "ua2-5",  0x080001, 0x040000, CRC(6e450d28) SHA1(d0050afcc3f425ac70768271c9d2d55ab7fba622) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "ua2-7",  0x000001, 0x080000, CRC(fce56907) SHA1(5d0d2d6dfdbadb21f1d61d84b8992ec0e527e18d) )
 	ROM_LOAD16_BYTE( "ua2-8",  0x000000, 0x080000, CRC(7d3a8d73) SHA1(d6a0bea124d7d228818f8ea8c804ad2ba8cead4b) )
 	ROM_LOAD16_BYTE( "ua2-9",  0x100001, 0x080000, CRC(a451eae9) SHA1(c236c92d9ecf56f8d8f4a5ee493e3791be0d3db4) )
 	ROM_LOAD16_BYTE( "ua2-10", 0x100000, 0x080000, CRC(5bbe1f56) SHA1(309bc43884816dafeb0f47e71ff5272d4d7cac54) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "ua2-11", 0x000000, 0x080000, CRC(624e6057) SHA1(0e8e4d4b6bc5febf5ca83eea92e3ed06f16e7df0) )
 	ROM_LOAD( "ua2-12", 0x080000, 0x080000, CRC(3068ff64) SHA1(7c06a48a99ebb9e7f3709f25bd0caa4c9d7a2688) )
 ROM_END
 
 ROM_START( downtown )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "ud2-001-000.3c",  0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) /* 40 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-003.11c", 0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) /* 40 pin MASK rom */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "ud2-001-000.3c",  0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) // 40 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-003.11c", 0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) // 40 pin MASK rom
 	ROM_LOAD16_BYTE( "ud2001002.9b", 0x080000, 0x010000, CRC(a300e3ac) SHA1(958cb121787444cdc6938fc5aad1e92238e39c13) )
 	ROM_LOAD16_BYTE( "ud2001001.8b", 0x080001, 0x010000, CRC(d2918094) SHA1(c135939ad12e3cf0688db148c49f99e757ad7b0d) )
 
-	ROM_REGION( 0x04c000, "sub", 0 )        /* 65c02 Code */
-	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) /* 40 pin MASK rom */
+	ROM_REGION( 0x04c000, "sub", 0 )        // 65c02 Code
+	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) // 40 pin MASK rom
 	ROM_RELOAD(                  0x00c000, 0x040000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x080000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) // 32 pin MASK rom
 ROM_END
 
 ROM_START( downtown2 )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "ud2-001-000.3c",  0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) /* 40 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-003.11c", 0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) /* 40 pin MASK rom */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "ud2-001-000.3c",  0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) // 40 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-003.11c", 0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) // 40 pin MASK rom
 	ROM_LOAD16_BYTE( "ud2000002.9b",    0x080000, 0x010000, CRC(ca976b24) SHA1(3b2e362f414b0103dd02c9af6a5d480ec2cf9ca3) )
 	ROM_LOAD16_BYTE( "ud2000001.8b",    0x080001, 0x010000, CRC(1708aebd) SHA1(337a9e8d5da5b13a7ea4ee728de6b82fe92e16c5) )
 
-	ROM_REGION( 0x04c000, "sub", 0 )        /* 65c02 Code */
-	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) /* 40 pin MASK rom */
+	ROM_REGION( 0x04c000, "sub", 0 )        // 65c02 Code
+	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) // 40 pin MASK rom
 	ROM_RELOAD(                  0x00c000, 0x040000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x080000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) // 32 pin MASK rom
 ROM_END
 
 ROM_START( downtownj )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "ud2-001-000.3c",  0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) /* 40 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-003.11c", 0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) /* 40 pin MASK rom */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "ud2-001-000.3c",  0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) // 40 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-003.11c", 0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) // 40 pin MASK rom
 	ROM_LOAD16_BYTE( "u37.9b",          0x080000, 0x010000, CRC(73047657) SHA1(731663101d809170aad3cd39e901ef494494c5a1) )
 	ROM_LOAD16_BYTE( "u31.8b",          0x080001, 0x010000, CRC(6a050240) SHA1(6a1a305b7d32bb2ad17842b4eeabc891fce02160) )
 
-	ROM_REGION( 0x04c000, "sub", 0 )        /* 65c02 Code */
-	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) /* 40 pin MASK rom */
+	ROM_REGION( 0x04c000, "sub", 0 )        // 65c02 Code
+	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) // 40 pin MASK rom
 	ROM_RELOAD(                  0x00c000, 0x040000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x080000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) // 32 pin MASK rom
 ROM_END
 
 ROM_START( downtownp )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "ud2-001-000.3c",   0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) /* 40 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-003.11c",  0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) /* 40 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2_even_v061.9b", 0x080000, 0x010000, CRC(251d6552) SHA1(0f78bf142db826e956f670ba81102804e88fa2ed) ) /* handwritten label UD2 EVEN V0.61 2/13 */
-	ROM_LOAD16_BYTE( "ud2_odd_v061.8b",  0x080001, 0x010000, CRC(6394a7c0) SHA1(9f5099b32b3c3e100441f6c0ccbe88c19b01a9e5) ) /* handwritten label UD2 ODD V0.61 2/13  */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "ud2-001-000.3c",   0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) ) // 40 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-003.11c",  0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) ) // 40 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2_even_v061.9b", 0x080000, 0x010000, CRC(251d6552) SHA1(0f78bf142db826e956f670ba81102804e88fa2ed) ) // handwritten label UD2 EVEN V0.61 2/13
+	ROM_LOAD16_BYTE( "ud2_odd_v061.8b",  0x080001, 0x010000, CRC(6394a7c0) SHA1(9f5099b32b3c3e100441f6c0ccbe88c19b01a9e5) ) // handwritten label UD2 ODD V0.61 2/13 
 
-	ROM_REGION( 0x04c000, "sub", 0 )        /* 65c02 Code */
-	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) /* 40 pin MASK rom */
+	ROM_REGION( 0x04c000, "sub", 0 )        // 65c02 Code
+	ROM_LOAD( "ud2-002-004.17c", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) ) // 40 pin MASK rom
 	ROM_RELOAD(                  0x00c000, 0x040000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-005-t01.2n", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-006-t02.3n", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-007-t03.5n", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) // 32 pin MASK rom
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) // 32 pin MASK rom
 
-	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
+	ROM_REGION( 0x080000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) // 32 pin MASK rom
 ROM_END
 
 ROM_START( usclssic )
-	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "ue2001.u20", 0x000000, 0x020000, CRC(18b41421) SHA1(74e96071d46eda152aaa82cf87d09203f225b504) )
 	ROM_LOAD16_BYTE( "ue2000.u14", 0x000001, 0x020000, CRC(69454bc2) SHA1(19a3b6ca65770353401544c50e04d895e391612c) )
 	ROM_LOAD16_BYTE( "ue2002.u22", 0x040000, 0x020000, CRC(a7bbe248) SHA1(8f7ffeffb8b6ef0e1ab5e7fbba31a1b97bbd7f8c) )
 	ROM_LOAD16_BYTE( "ue2003.u30", 0x040001, 0x020000, CRC(29601906) SHA1(9cdf2d80a72317a4eb7a335aaaae381822da24b1) )
 
-	ROM_REGION( 0x04c000, "sub", 0 )        /* 65c02 Code */
+	ROM_REGION( 0x04c000, "sub", 0 )        // 65c02 Code
 	ROM_LOAD( "ue002u61.004", 0x004000, 0x040000, CRC(476e9f60) SHA1(940c09eb472652a88d5d34130270ff55a5f5ba27) )
 	ROM_RELOAD(               0x00c000, 0x040000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "ue001009.119", 0x000000, 0x080000, CRC(dc065204) SHA1(0478b8126cd3ce3dee64cb7de2b30b509636eb1a) )
 	ROM_LOAD16_BYTE( "ue001008.118", 0x000001, 0x080000, CRC(5947d9b5) SHA1(de3a63c55b558451bbbe98bf8d71561ba32c5e60) )
 	ROM_LOAD16_BYTE( "ue001007.117", 0x100000, 0x080000, CRC(b48a885c) SHA1(8c0d458d6967c2ff4bdcf37aaa8025341fe90bbc) )
 	ROM_LOAD16_BYTE( "ue001006.116", 0x100001, 0x080000, CRC(a6ab6ef4) SHA1(9f54f116d1d8e54d64ba541195baa66c5ca960bd) )
 
-	ROM_REGION( 0x600000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x600000, "tiles", 0 )
 	ROM_LOAD24_BYTE( "ue001010.120", 0x000000, 0x080000, CRC(dd683031) SHA1(06ed38a243666c1acaf8eb3fdba51d18fc2a70bc) )    // planes 01
 	ROM_LOAD24_BYTE( "ue001011.121", 0x180000, 0x080000, CRC(0e27bc49) SHA1(f9ec4f4c15c86f608607a5ec916f5182a8e265fa) )
 	ROM_LOAD24_BYTE( "ue001012.122", 0x300000, 0x080000, CRC(961dfcdc) SHA1(9de95692860abd4206db22ad7ade9f02f0c03506) )
@@ -2352,95 +2382,95 @@ ROM_START( usclssic )
 	ROM_LOAD24_BYTE( "ue001020.130", 0x300002, 0x080000, CRC(bc07403f) SHA1(f994b6d1dee23f5dabdb328f955f4380a8ca9d52) )
 	ROM_LOAD24_BYTE( "ue001021.131", 0x480002, 0x080000, CRC(98c03efd) SHA1(761c51d5573e6f35c48b8b9ee5d88cbde02e92a7) )
 
-	ROM_REGION( 0x400, "proms", 0 ) /* Extra Colours */
+	ROM_REGION( 0x400, "proms", 0 ) // Extra Colours
 	ROM_LOAD16_BYTE( "ue1-022.prm", 0x000, 0x200, CRC(1a23129e) SHA1(110eb54ab83ecb8375164a5c96f522b2737c379c) )
 	ROM_LOAD16_BYTE( "ue1-023.prm", 0x001, 0x200, CRC(a13192a4) SHA1(86e312e0f7400b7fa08fbe8fced1eb95a32502ca) )
 
-	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x080000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "ue001005.132", 0x000000, 0x080000, CRC(c5fea37c) SHA1(af4f09dd36af06e50262f607ff14eedc33beffd2) )
 ROM_END
 
 ROM_START( calibr50 )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "uh-002-001.3b",  0x000000, 0x040000, CRC(eb92e7ed) SHA1(2aee8a7bce549ef7d7b35d1c248ebbdbc906e38d) )
 	ROM_LOAD16_BYTE( "uh-002-004.11b", 0x000001, 0x040000, CRC(5a0ed31e) SHA1(d6ee7654354ac9f1dc7add1ef9f68a147b6f2953) )
 	ROM_LOAD16_BYTE( "uh_001_003.9b",  0x080000, 0x010000, CRC(0d30d09f) SHA1(8a48511b628e85b72fda0968d813f4faebd0c418) )
 	ROM_LOAD16_BYTE( "uh_001_002.7b",  0x080001, 0x010000, CRC(7aecc3f9) SHA1(2454d9c758fa623d4d81a9230871b67d31d16cef) )
 
-	ROM_REGION( 0x04c000, "sub", 0 )        /* 65c02 Code */
+	ROM_REGION( 0x04c000, "sub", 0 )        // 65c02 Code
 	ROM_LOAD( "uh-001-005.17e", 0x004000, 0x040000, CRC(4a54c085) SHA1(f53ff257ce3d95f945a6befcfb61f1b570f0eafe) )
 	ROM_RELOAD(                 0x00c000, 0x040000  )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "uh-001-006.2m", 0x000000, 0x080000, CRC(fff52f91) SHA1(fd7807e9a8dd5a88df1fcd13746b44a33adbc0fa) )
 	ROM_LOAD16_BYTE( "uh-001-007.4m", 0x000001, 0x080000, CRC(b6c19f71) SHA1(eb8bbaeaf4af07e178100ff16b228b537aa36272) )
 	ROM_LOAD16_BYTE( "uh-001-008.5m", 0x100000, 0x080000, CRC(7aae07ef) SHA1(1db666db20efce1efe5b5769b8e3c78bbf508466) )
 	ROM_LOAD16_BYTE( "uh-001-009.6m", 0x100001, 0x080000, CRC(f85da2c5) SHA1(d090e49b3a897729c7fb05f9386939448fe1d3d9) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "uh-001-010.8m", 0x000000, 0x080000, CRC(f986577a) SHA1(8f6c2fca271fed21a1c04e93c3f50dc41348ae30) )
 	ROM_LOAD16_BYTE( "uh-001-011.9m", 0x000001, 0x080000, CRC(08620052) SHA1(e2ab49dbabc139e6b276401340085ccab1ae3892) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "uh-001-013.12m", 0x000000, 0x080000, CRC(09ec0df6) SHA1(57c68d05074ea4a1e133be2ce6e25c594f04a712) )
 	ROM_LOAD( "uh-001-012.11m", 0x080000, 0x080000, CRC(bb996547) SHA1(0c8f570ef4454b10a023e0c463001c22a8cf99cd) )
 ROM_END
 
 ROM_START( arbalest )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "uk-001-003",  0x000000, 0x040000, CRC(ee878a2c) SHA1(f7d5817015382ce6af317c02746b473ec798bb4f) ) /* Mask ROM on P1-037A sub PCB */
-	ROM_LOAD16_BYTE( "uk-001-004",  0x000001, 0x040000, CRC(902bb4e3) SHA1(e37a361a7c03aee2d6ac8c96c2dd6c1e411b46fb) ) /* Mask ROM on P1-037A sub PCB */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "uk-001-003",  0x000000, 0x040000, CRC(ee878a2c) SHA1(f7d5817015382ce6af317c02746b473ec798bb4f) ) // Mask ROM on P1-037A sub PCB
+	ROM_LOAD16_BYTE( "uk-001-004",  0x000001, 0x040000, CRC(902bb4e3) SHA1(e37a361a7c03aee2d6ac8c96c2dd6c1e411b46fb) ) // Mask ROM on P1-037A sub PCB
 
-	ROM_REGION( 0x010000, "sub", 0 )        /* 65c02 Code */
-	/* Label is correct, 1st & 2nd halves identical is correct. Chip is a 27128 - Verified on 2 different PCBs */
-	ROM_LOAD( "uk6005", 0x006000, 0x004000, CRC(48c73a4a) SHA1(1284ae7236a82a5898a57ec0451b7dcc4d409099) ) /* EPROM on P1-037A sub PCB */
+	ROM_REGION( 0x010000, "sub", 0 )        // 65c02 Code
+	// Label is correct, 1st & 2nd halves identical is correct. Chip is a 27128 - Verified on 2 different PCBs
+	ROM_LOAD( "uk6005", 0x006000, 0x004000, CRC(48c73a4a) SHA1(1284ae7236a82a5898a57ec0451b7dcc4d409099) ) // EPROM on P1-037A sub PCB
 	ROM_RELOAD(         0x00a000, 0x004000  )
 	ROM_RELOAD(         0x00e000, 0x002000  )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "uk001.06", 0x000000, 0x040000, CRC(11c75746) SHA1(7faf9a26534397d21211d5ef25ca53c4eb286474) )
 	ROM_LOAD16_BYTE( "uk001.07", 0x000001, 0x040000, CRC(01b166c7) SHA1(d1b5b73a55025a264a22dd950ea79ba8172c4bed) )
 	ROM_LOAD16_BYTE( "uk001.08", 0x080000, 0x040000, CRC(78d60ba3) SHA1(c4fa546e4ca637d67ecc1b085b91c753606ccdb3) )
 	ROM_LOAD16_BYTE( "uk001.09", 0x080001, 0x040000, CRC(b4748ae0) SHA1(a71e671754ed5bba737f0b5f7be510a23d5e925c) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "uk-001-010-t26", 0x000000, 0x080000, CRC(c1e2f823) SHA1(892473351e7b590c59c578047a67fc235bd31e02) ) /* Mask ROM on P1-036A sub PCB */
-	ROM_LOAD16_BYTE( "uk-001-011-t27", 0x100000, 0x080000, CRC(09dfe56a) SHA1(077627627d3cb8f79ffdd83e46157bd3c473c4a1) ) /* Mask ROM on P1-036A sub PCB */
-	ROM_LOAD16_BYTE( "uk-001-012-t28", 0x000001, 0x080000, CRC(818a4085) SHA1(fd8b5658fc7f5fa6d3daebb4be17aeabd60c9028) ) /* Mask ROM on P1-036A sub PCB */
-	ROM_LOAD16_BYTE( "uk-001-013-t29", 0x100001, 0x080000, CRC(771fa164) SHA1(a91214318808f991846a828f0e309c0ff430245e) ) /* Mask ROM on P1-036A sub PCB */
+	ROM_REGION( 0x200000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "uk-001-010-t26", 0x000000, 0x080000, CRC(c1e2f823) SHA1(892473351e7b590c59c578047a67fc235bd31e02) ) // Mask ROM on P1-036A sub PCB
+	ROM_LOAD16_BYTE( "uk-001-011-t27", 0x100000, 0x080000, CRC(09dfe56a) SHA1(077627627d3cb8f79ffdd83e46157bd3c473c4a1) ) // Mask ROM on P1-036A sub PCB
+	ROM_LOAD16_BYTE( "uk-001-012-t28", 0x000001, 0x080000, CRC(818a4085) SHA1(fd8b5658fc7f5fa6d3daebb4be17aeabd60c9028) ) // Mask ROM on P1-036A sub PCB
+	ROM_LOAD16_BYTE( "uk-001-013-t29", 0x100001, 0x080000, CRC(771fa164) SHA1(a91214318808f991846a828f0e309c0ff430245e) ) // Mask ROM on P1-036A sub PCB
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "uk-001-015-t31", 0x000000, 0x080000, CRC(ce9df5dd) SHA1(91d879b774b5b367adb5bd511fda827bc0bae0a9) ) /* Mask ROM on P1-036A sub PCB */
-	ROM_LOAD( "uk-001-014-t30", 0x080000, 0x080000, CRC(016b844a) SHA1(1fe091233746ced358292014393896af730f5940) ) /* Mask ROM on P1-036A sub PCB */
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "uk-001-015-t31", 0x000000, 0x080000, CRC(ce9df5dd) SHA1(91d879b774b5b367adb5bd511fda827bc0bae0a9) ) // Mask ROM on P1-036A sub PCB
+	ROM_LOAD( "uk-001-014-t30", 0x080000, 0x080000, CRC(016b844a) SHA1(1fe091233746ced358292014393896af730f5940) ) // Mask ROM on P1-036A sub PCB
 ROM_END
 
 ROM_START( metafox )
-	ROM_REGION( 0x0a0000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x0a0000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "p1003161", 0x000000, 0x040000, CRC(4fd6e6a1) SHA1(11a830d76ef737bcfac73d0958425fe4329f0dcd) )
 	ROM_LOAD16_BYTE( "p1004162", 0x000001, 0x040000, CRC(b6356c9a) SHA1(182a1ea9f0643b05b14ad2a2cd820f5ca2086c4c) )
 	ROM_LOAD16_BYTE( "up001002", 0x080000, 0x010000, CRC(ce91c987) SHA1(63546fa1342371a7080ac3cf59b41a01ac313c8c) )
 	ROM_LOAD16_BYTE( "up001001", 0x080001, 0x010000, CRC(0db7a505) SHA1(d593da2f7d8b54724cae017cbabc3c0909893da1) )
 
-	ROM_REGION( 0x010000, "sub", 0 )        /* 65c02 Code */
+	ROM_REGION( 0x010000, "sub", 0 )        // 65c02 Code
 	ROM_LOAD( "up001005", 0x006000, 0x002000, CRC(2ac5e3e3) SHA1(b794554cd25bdd48a21a0a2861daf8369e798ce8) )
 	ROM_RELOAD(           0x008000, 0x002000  )
 	ROM_RELOAD(           0x00a000, 0x002000  )
 	ROM_RELOAD(           0x00c000, 0x002000  )
 	ROM_RELOAD(           0x00e000, 0x002000  )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "p1006163", 0x000000, 0x040000, CRC(80f69c7c) SHA1(df323e801ebec6316ba17fe0371f7c87fad19295) )
 	ROM_LOAD16_BYTE( "p1007164", 0x000001, 0x040000, CRC(d137e1a3) SHA1(0e0234f1d0adb7db6d0508263e3b0b31fe7071b9) )
 	ROM_LOAD16_BYTE( "p1008165", 0x080000, 0x040000, CRC(57494f2b) SHA1(28d620254e81d7e63dfed07b29b252b975a81248) )
 	ROM_LOAD16_BYTE( "p1009166", 0x080001, 0x040000, CRC(8344afd2) SHA1(7348b423405ad00b9240d152b119cf5341754815) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "up001010", 0x000000, 0x080000, CRC(bfbab472) SHA1(d3e7b20d14de48134c4fbe3da31feb928c1c655b) )
 	ROM_LOAD16_BYTE( "up001011", 0x100000, 0x080000, CRC(26cea381) SHA1(b4bfd2a13ef6051376fe3ed57e2331a072970f86) )
 	ROM_LOAD16_BYTE( "up001012", 0x000001, 0x080000, CRC(fed2c5f9) SHA1(81f0f19a500b665c937f5431000ebde7abd97c30) )
 	ROM_LOAD16_BYTE( "up001013", 0x100001, 0x080000, CRC(adabf9ea) SHA1(db28e4e565e567a97a6b05a4803a55a403e24a0e) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "up001015", 0x000000, 0x080000, CRC(2e20e39f) SHA1(6f8bd4a76ed5c2150015698e7a98044d060157be) )
 	ROM_LOAD( "up001014", 0x080000, 0x080000, CRC(fca6315e) SHA1(cef2385ec43f8b7a2d655b42c18ef44e46ff7364) )
 ROM_END
@@ -2475,7 +2505,7 @@ u16 downtown_state::twineagl_debug_r()
 	return 0;
 }
 
-void downtown_state::machine_start()
+void tndrcade_state::machine_start()
 {
 	u8 *rom = memregion("sub")->base();
 	const u32 max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
@@ -2490,17 +2520,18 @@ void downtown_state::machine_start()
 		m_subbank->configure_entries(0, 16, &rom[0xc000], 0); // Not bankswitched : for avoid crashing when accessing bank functions
 }
 
-/* Extra RAM ? Check code at 0x00ba90 */
-/* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
+// Extra RAM ? Check code at 0x00ba90
+// 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too
 u16 downtown_state::twineagl_200100_r(offs_t offset)
 {
 	// protection check at boot
-	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(), offset);
+	if (!machine().side_effects_disabled())
+		LOGPROT("%04x: twineagl_200100_r %d\n",m_maincpu->pc(), offset);
 	return m_twineagl_xram[offset];
 }
 void downtown_state::twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(), offset,data);
+	LOGPROT("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(), offset,data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2510,16 +2541,16 @@ void downtown_state::twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask)
 
 void downtown_state::init_twineagl()
 {
-	/* debug? */
+	// debug?
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16smo_delegate(*this, FUNC(downtown_state::twineagl_debug_r)));
 
-	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
+	// This allows 2 simultaneous players and the use of the "Copyright" Dip Switch.
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200100, 0x20010f, read16sm_delegate(*this, FUNC(downtown_state::twineagl_200100_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200100, 0x20010f, write16s_delegate(*this, FUNC(downtown_state::twineagl_200100_w)));
 }
 
 
-/* Protection? NVRAM is handled writing commands here */
+// Protection? NVRAM is handled writing commands here
 u16 downtown_state::downtown_protection_r(offs_t offset)
 {
 	const int job = m_downtown_protection[0xf8/2] & 0xff;
@@ -2552,7 +2583,7 @@ void downtown_state::init_downtown()
 	// initializing with 0xff is enough for host CPU to catch up and default it with sensible defaults.
 	for (int i = 0; i < 0x100; i++)
 		m_downtown_protection[i] = 0xff;
-	save_pointer(NAME(m_downtown_protection), 0x200/2);
+	save_pointer(NAME(m_downtown_protection), 0x100);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2001ff, read16sm_delegate(*this, FUNC(downtown_state::downtown_protection_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x2001ff, write16s_delegate(*this, FUNC(downtown_state::downtown_protection_w)));
@@ -2617,8 +2648,8 @@ void downtown_state::init_metafox()
 
 ***************************************************************************/
 
-GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  downtown_state, empty_init,     ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  downtown_state, empty_init,     ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  tndrcade_state, empty_init,     ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  tndrcade_state, empty_init,     ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 
 GAME( 1988, twineagl,  0,        twineagl,  twineagl,  downtown_state, init_twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 
