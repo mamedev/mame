@@ -384,7 +384,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case 12: regs.idb = bitswap<16>(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
 	case 13: regs.idb = regs.k; break;
 	case 14: regs.idb = regs.l; break;
-	case 15: regs.idb = dataRAM[regs.dp]; break;
+	case 15: regs.idb = dataRAM[regs.dp & 0x07ff]; break;
 	}
 
 	if(alu) {
@@ -573,10 +573,10 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
 	case 11: regs.k = id; regs.l = m_data.read_word(regs.rp); break;
-	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;
+	case 12: regs.l = id; regs.k = dataRAM[(regs.dp & 0x7ff) | 0x40]; break;
 	case 13: regs.l = id; break;
 	case 14: regs.trb = id; break;
-	case 15: dataRAM[regs.dp] = id; break;
+	case 15: dataRAM[regs.dp & 0x7ff] = id; break;
 	}
 }
 
