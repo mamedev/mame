@@ -1932,6 +1932,7 @@ void galaxian_state::bongo_map(address_map &map)
 void galaxian_state::bongoa_map(address_map &map)
 {
 	bongo_map(map);
+	mooncrst_map_discrete(map);
 	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW");
 }
 
@@ -7810,11 +7811,13 @@ void galaxian_state::bongo(machine_config &config)
 
 void galaxian_state::bongoa(machine_config &config)
 {
-	bongo(config);
+	galaxian_base(config);
 
-	// dip switches are read via the memory map instead of the AY8910
+	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bongoa_map);
-	m_ay8910[0]->port_a_read_callback().set_constant(0xff);
+
+	// sound hardware
+	BONGO_SOUND(config, "cust", 0);
 }
 
 void bmxstunts_state::bmxstunts(machine_config &config)
