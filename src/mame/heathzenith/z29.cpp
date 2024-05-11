@@ -176,5 +176,8 @@ ROM_END
 
 } // anonymous namespace
 
+#define rom_h29 rom_z29
 
-COMP(1983, z29, 0, 0, z29, z29, z29_state, empty_init, "Zenith Data Systems", "Z-29", MACHINE_IS_SKELETON)
+//    year  name   parent compat  machine  input class      init        company                fullname          flags
+COMP( 1983, h29,   z29,   0,      z29,     z29,  z29_state, empty_init, "Zenith Data Systems", "Z-29 Terminal",  MACHINE_IS_SKELETON)
+COMP( 1983, z29,   0,     0,      z29,     z29,  z29_state, empty_init, "Heath Company",       "H-29 Terminal",  MACHINE_IS_SKELETON)

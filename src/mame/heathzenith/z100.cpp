@@ -901,6 +901,9 @@ ROM_START( z100 )
 	ROM_LOAD("444-127.u370", 0x0000, 0x0100, CRC(ac386f6b) SHA1(2b62b939d704d90edf59923a8a1a51ef1902f4d7) BAD_DUMP)
 ROM_END
 
+//#define rom_h100 rom_z100
+static const auto rom_h100 = rom_z100;
+
 } // anonymous namespace
 
 
@@ -908,3 +911,4 @@ ROM_END
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY                FULLNAME  FLAGS
 COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, empty_init, "Zenith Data Systems", "Z-100",  MACHINE_NOT_WORKING )
+COMP( 1982, h100, z100,   0,      z100,    z100,  z100_state, empty_init, "Heath Company",       "H-100",  MACHINE_NOT_WORKING )

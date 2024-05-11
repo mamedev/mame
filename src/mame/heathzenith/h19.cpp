@@ -3,6 +3,7 @@
 /***************************************************************************
 
   Heathkit H19
+  Zenith Data Systems Z-19
 
     A smart terminal designed and manufactured by Heath Company. This
     is identical to the Zenith Data Systems Z-19.
@@ -66,7 +67,11 @@ void h19_state::h19(machine_config &config)
 ROM_START( h19 )
 ROM_END
 
+ROM_START( z19 )
+ROM_END
+
 } // anonymous namespace
 
-//    year  name     parent  compat  machine       input   class      init        company          fullname                         flags
-COMP( 1979, h19,     0,      0,      h19,          0,      h19_state, empty_init, "Heath Company", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
+//    year  name  parent  compat  machine input  class       init         company                fullname          flags
+COMP( 1979, h19,  0,      0,      h19,    0,     h19_state,  empty_init,  "Heath Company",       "H-19 Terminal",  MACHINE_SUPPORTS_SAVE )
+COMP( 1980, z19,  h19,    0,      h19,    0,     h19_state,  empty_init,  "Zenith Data Systems", "Z-19 Terminal",  MACHINE_SUPPORTS_SAVE )
