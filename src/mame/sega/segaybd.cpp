@@ -1428,13 +1428,13 @@ INPUT_PORTS_END
 void segaybd_state::yboard(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	M68000MUSASHI(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaybd_state::main_map);
 
-	M68000(config, m_subx, MASTER_CLOCK/4);
+	M68000MUSASHI(config, m_subx, MASTER_CLOCK/4);
 	m_subx->set_addrmap(AS_PROGRAM, &segaybd_state::subx_map);
 
-	M68000(config, m_suby, MASTER_CLOCK/4);
+	M68000MUSASHI(config, m_suby, MASTER_CLOCK/4);
 	m_suby->set_addrmap(AS_PROGRAM, &segaybd_state::suby_map);
 
 	Z80(config, m_soundcpu, SOUND_CLOCK/8);
