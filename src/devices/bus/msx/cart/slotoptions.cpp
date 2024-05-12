@@ -63,6 +63,7 @@ char const *const MM768K          = "mm768k";
 char const *const MM1024K         = "mm1024k";
 char const *const MM2048K         = "mm2048k";
 char const *const MM4096K         = "mm4096k";
+char const *const MMM             = "mmm";
 char const *const MOONSOUND       = "moonsound";
 char const *const MSXAUD_FSCA1    = "msxaud_fsca1";
 char const *const MSXAUD_HXMU900  = "msxaud_hxmu900";
