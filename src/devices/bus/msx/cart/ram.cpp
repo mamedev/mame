@@ -339,7 +339,7 @@ class msx_cart_mmm_device : public msx_cart_base_mm_ram_device
 {
 public:
 	msx_cart_mmm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: msx_cart_base_mm_ram_device(mconfig, MSX_CART_1024K_MM_RAM, tag, owner, clock, 1024 * 1024)
+		: msx_cart_base_mm_ram_device(mconfig, MSX_CART_MMM, tag, owner, clock, 1024 * 1024)
 		, m_sn76489a(*this, "sn76489a")
 		, m_access_enabled(false)
 		, m_sn76489_enabled(false)
