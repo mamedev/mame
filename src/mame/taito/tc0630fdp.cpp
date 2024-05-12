@@ -6,9 +6,9 @@
 
 constexpr int TAITOF3_VIDEO_DEBUG = 0;
 
-DEFINE_DEVICE_TYPE(TC0630FDP, FDP, "tc0630fdp", "Taito TC0630FDP")
+DEFINE_DEVICE_TYPE(TC0630FDP, tc0630fdp_device, "tc0630fdp", "Taito TC0630FDP")
 
-FDP::FDP(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0630fdp_device::tc0630fdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0630FDP, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
 	, m_palette(*this, "palette")
@@ -22,10 +22,10 @@ FDP::FDP(const machine_config &mconfig, const char *tag, device_t *owner, uint32
 {
 }
 
-void FDP::device_start() {
+void tc0630fdp_device::device_start() {
 }
 
-void FDP::device_add_mconfig(machine_config &config) {
+void tc0630fdp_device::device_add_mconfig(machine_config &config) {
 	PALETTE(config, m_palette);
 	m_palette->set_entries(0x2000);
 	set_palette(m_palette); // i guess..
@@ -33,7 +33,7 @@ void FDP::device_add_mconfig(machine_config &config) {
 	m_palette_12bit->set_entries(0x2000);//->set_format(RRRRGGGGBBBBxxxx, 0x2000);
 }
 
-void FDP::device_post_load()
+void tc0630fdp_device::device_post_load()
 {
 	// force a reread of the dynamic tiles in the pixel layer
 	gfx(0)->mark_all_dirty();
@@ -152,7 +152,7 @@ static const gfx_layout bubsympb_sprite_layout = {
 	16*16
 };
 
-GFXDECODE_MEMBER( FDP::gfxinfo )
+GFXDECODE_MEMBER( tc0630fdp_device::gfxinfo )
 	GFXDECODE_DEVICE_RAM( "charram",    0, layout_pivot,      0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_DEVICE_RAM( "pivotram",   0, layout_pivot,      0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_DEVICE( "sprites", 0, layout_sprite_low, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
@@ -161,7 +161,7 @@ GFXDECODE_MEMBER( FDP::gfxinfo )
 	GFXDECODE_DEVICE( "sprites", 0, layout_sprite_hi,  0x1000, 0x1000>>4 ) // hi 2bpp of 6bpp sprite data
 GFXDECODE_END
 
-GFXDECODE_MEMBER( FDP::gfx_bubsympb )
+GFXDECODE_MEMBER( tc0630fdp_device::gfx_bubsympb )
 	GFXDECODE_DEVICE_RAM( "charram",     0, layout_pivot,           0x0000, 0x0400>>4) /* Dynamically modified */
 	GFXDECODE_DEVICE_RAM( "pivotram",    0, layout_pivot,           0x0000, 0x0400>>4) /* Dynamically modified */
 	GFXDECODE_DEVICE( "sprites",  0, bubsympb_sprite_layout, 0x1000, 0x1000>>4) /* Sprites area (6bpp planar) */
@@ -171,7 +171,7 @@ GFXDECODE_MEMBER( FDP::gfx_bubsympb )
 GFXDECODE_END
 
 // the upper 2 bitplanes are interleaved differently than the lower 4, so they have to be merged manually
-void FDP::decode_hi(int low, int high, std::unique_ptr<u8[]> &decoded)
+void tc0630fdp_device::decode_hi(int low, int high, std::unique_ptr<u8[]> &decoded)
 {
 	gfx_element *gfx_lo = gfx(low);
 	gfx_element *gfx_hi = gfx(high);
@@ -203,7 +203,7 @@ void FDP::decode_hi(int low, int high, std::unique_ptr<u8[]> &decoded)
 	set_gfx(high, nullptr);
 }
 
-void FDP::tile_decode()
+void tc0630fdp_device::tile_decode()
 {
 	// all but bubsymphb (bootleg board with different sprite gfx layout), 2mindril (no sprite gfx roms)
 	if (gfx(5))
@@ -212,24 +212,24 @@ void FDP::tile_decode()
 		decode_hi(3, 4, m_decoded_gfx4);
 }
 
-void FDP::map_ram(address_map &map) {
-	map(0x00000, 0x0ffff).rw(FUNC(FDP::spriteram_r), FUNC(FDP::spriteram_w));
-	map(0x10000, 0x1bfff).rw(FUNC(FDP::pfram_r), FUNC(FDP::pfram_w));
-	map(0x1c000, 0x1dfff).rw(FUNC(FDP::textram_r), FUNC(FDP::textram_w));
-	map(0x1e000, 0x1ffff).rw(FUNC(FDP::charram_r), FUNC(FDP::charram_w));
-	map(0x20000, 0x2ffff).rw(FUNC(FDP::lineram_r), FUNC(FDP::lineram_w));
-	map(0x30000, 0x3ffff).rw(FUNC(FDP::pivotram_r), FUNC(FDP::pivotram_w));
+void tc0630fdp_device::map_ram(address_map &map) {
+	map(0x00000, 0x0ffff).rw(FUNC(tc0630fdp_device::spriteram_r), FUNC(tc0630fdp_device::spriteram_w));
+	map(0x10000, 0x1bfff).rw(FUNC(tc0630fdp_device::pfram_r), FUNC(tc0630fdp_device::pfram_w));
+	map(0x1c000, 0x1dfff).rw(FUNC(tc0630fdp_device::textram_r), FUNC(tc0630fdp_device::textram_w));
+	map(0x1e000, 0x1ffff).rw(FUNC(tc0630fdp_device::charram_r), FUNC(tc0630fdp_device::charram_w));
+	map(0x20000, 0x2ffff).rw(FUNC(tc0630fdp_device::lineram_r), FUNC(tc0630fdp_device::lineram_w));
+	map(0x30000, 0x3ffff).rw(FUNC(tc0630fdp_device::pivotram_r), FUNC(tc0630fdp_device::pivotram_w));
 }
 
-void FDP::map_control(address_map &map) {
-	map(0x00, 0x0f).w(FUNC(FDP::control_0_w));
-	map(0x10, 0x1f).w(FUNC(FDP::control_1_w));
+void tc0630fdp_device::map_control(address_map &map) {
+	map(0x00, 0x0f).w(FUNC(tc0630fdp_device::control_0_w));
+	map(0x10, 0x1f).w(FUNC(tc0630fdp_device::control_1_w));
 }
 
 /******************************************************************************/
 
 template<unsigned Layer>
-TILE_GET_INFO_MEMBER(FDP::get_tile_info)
+TILE_GET_INFO_MEMBER(tc0630fdp_device::get_tile_info)
 {
 	u16 *tilep = &m_pf_data[Layer][tile_index * 2];
 	// tile info:
@@ -255,7 +255,7 @@ TILE_GET_INFO_MEMBER(FDP::get_tile_info)
 	tileinfo.pen_mask = ((extra_planes & ~palette_code) << 4) | 0x0f;
 }
 
-TILE_GET_INFO_MEMBER(FDP::get_tile_info_text)
+TILE_GET_INFO_MEMBER(tc0630fdp_device::get_tile_info_text)
 {
 	const u16 vram_tile = m_textram[tile_index];
 	// text tile info:
@@ -275,7 +275,7 @@ TILE_GET_INFO_MEMBER(FDP::get_tile_info_text)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(FDP::get_tile_info_pixel)
+TILE_GET_INFO_MEMBER(tc0630fdp_device::get_tile_info_pixel)
 {
 	/* attributes are shared with VRAM layer */
 	// convert the index:
@@ -309,24 +309,24 @@ TILE_GET_INFO_MEMBER(FDP::get_tile_info_pixel)
 
 /******************************************************************************/
 
-void FDP::create_tilemaps(bool extend)
+void tc0630fdp_device::create_tilemaps(bool extend)
 {
 	m_extend = extend;
 	if (m_extend) {
-		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-		m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-		m_tilemap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[4] = m_tilemap[5] = m_tilemap[6] = m_tilemap[7] = nullptr;
 	} else {
-		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<4>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<5>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[6] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<6>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[7] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info<7>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<4>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<5>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[6] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<6>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[7] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info<7>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	}
 	for (int i = 0; i < 8; i++) {
 		if (m_tilemap[i])
@@ -344,8 +344,8 @@ void FDP::create_tilemaps(bool extend)
 			m_pf_data[i] = &m_pfram[(0x1000 * i) / 2];
 	}
 	
-	m_vram_layer = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_pixel_layer = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(FDP::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_vram_layer = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pixel_layer = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0630fdp_device::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
 	std::fill_n(m_textram_row_usage, 64, 0);
@@ -368,22 +368,22 @@ void FDP::create_tilemaps(bool extend)
 
 /******************************************************************************/
 
-u16 FDP::spriteram_r(offs_t offset)
+u16 tc0630fdp_device::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-void FDP::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-u16 FDP::pfram_r(offs_t offset)
+u16 tc0630fdp_device::pfram_r(offs_t offset)
 {
 	return m_pfram[offset];
 }
 
-void FDP::pfram_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::pfram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// [.ttt yyyy yxxx xxa|h] non-extend
 	// [.tty yyyy xxxx xxa|h] extend
@@ -409,12 +409,12 @@ void FDP::pfram_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-u16 FDP::textram_r(offs_t offset)
+u16 tc0630fdp_device::textram_r(offs_t offset)
 {
 	return m_textram[offset];
 }
 
-void FDP::textram_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::textram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const u8 prev_tile = BIT(m_textram[offset], 0, 8);
 
@@ -440,44 +440,44 @@ void FDP::textram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_pixel_layer->mark_tile_dirty(col_off);
 }
 
-u16 FDP::charram_r(offs_t offset)
+u16 tc0630fdp_device::charram_r(offs_t offset)
 {
 	return m_charram[offset];
 }
 
-void FDP::charram_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::charram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_charram[offset]);
 	gfx(0)->mark_dirty(offset >> 4);
 }
 
-u16 FDP::lineram_r(offs_t offset)
+u16 tc0630fdp_device::lineram_r(offs_t offset)
 {
 	return m_lineram[offset];
 }
 
-void FDP::lineram_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_lineram[offset]);
 }
 
-u16 FDP::pivotram_r(offs_t offset)
+u16 tc0630fdp_device::pivotram_r(offs_t offset)
 {
 	return m_pivotram[offset];
 }
 
-void FDP::pivotram_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::pivotram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pivotram[offset]);
 	gfx(1)->mark_dirty(offset >> 4);
 }
 
-void FDP::control_0_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::control_0_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_control_0[offset]);
 }
 
-void FDP::control_1_w(offs_t offset, u16 data, u16 mem_mask)
+void tc0630fdp_device::control_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_control_1[offset]);
 }
@@ -486,7 +486,7 @@ void FDP::control_1_w(offs_t offset, u16 data, u16 mem_mask)
 
 // line: [latched] line info from previous call, will modify in-place
 // y should be called 0->255 for non-flipscreen, 255->0 for flipscreen
-void FDP::read_line_ram(f3_line_inf &line, int y)
+void tc0630fdp_device::read_line_ram(f3_line_inf &line, int y)
 {
 	const auto latched_addr =
 		[this, y] (u8 section, u8 subsection) -> offs_t {
@@ -654,7 +654,7 @@ void FDP::read_line_ram(f3_line_inf &line, int y)
 	}
 }
 
-void FDP::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
+void tc0630fdp_device::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 {
 	// x: iiii iiii iiFF FFFF
 	// y: iiii iiii ifff ffff
@@ -692,8 +692,8 @@ void FDP::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 }
 
 template<typename Mix>
-std::vector<FDP::clip_plane_inf>
-FDP::calc_clip(
+std::vector<tc0630fdp_device::clip_plane_inf>
+tc0630fdp_device::calc_clip(
 		const clip_plane_inf (&clip)[NUM_CLIPPLANES],
 		const Mix &layer)
 {
@@ -759,45 +759,45 @@ static int mosaic(int x, u8 sample)
 	return x - (x_count % sample);
 }
 
-inline bool FDP::mixable::layer_enable() const
+inline bool tc0630fdp_device::mixable::layer_enable() const
 {
 	return (mix_value & 0x2000) && blend_mode != 0b11;
 }
-inline int FDP::mixable::x_index(int x) const
+inline int tc0630fdp_device::mixable::x_index(int x) const
 {
 	return x;
 }
-inline int FDP::mixable::y_index(int y) const
+inline int tc0630fdp_device::mixable::y_index(int y) const
 {
 	return y;
 }
-inline bool FDP::sprite_inf::layer_enable() const
+inline bool tc0630fdp_device::sprite_inf::layer_enable() const
 {
 	return (mix_value & 0x2000) && blend_mode != 0b00;
 }
-inline u16 FDP::playfield_inf::palette_adjust(u16 pal) const
+inline u16 tc0630fdp_device::playfield_inf::palette_adjust(u16 pal) const
 {
 	return pal + pal_add;
 }
-inline int FDP::playfield_inf::x_index(int x) const
+inline int tc0630fdp_device::playfield_inf::x_index(int x) const
 {
 	return (((reg_fx_x + (x - H_START) * x_scale)>>8) + H_START) & width_mask;
 }
-inline int FDP::playfield_inf::y_index(int y) const
+inline int tc0630fdp_device::playfield_inf::y_index(int y) const
 {
 	return ((reg_fx_y >> 8) + colscroll) & 0x1ff;
 }
-inline int FDP::pivot_inf::x_index(int x) const
+inline int tc0630fdp_device::pivot_inf::x_index(int x) const
 {
 	return (x + reg_sx) & 0x1ff;
 }
-inline int FDP::pivot_inf::y_index(int y) const
+inline int tc0630fdp_device::pivot_inf::y_index(int y) const
 {
 	return (reg_sy + y) & (use_pix() ? 0xff : 0x1ff);
 }
 
 template<typename Mix>
-bool FDP::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_inf &line, const clip_plane_inf &range)
+bool tc0630fdp_device::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_inf &line, const clip_plane_inf &range)
 {
 	const int y = layer.y_index(line.y);
 	const u16 *src = &layer.bitmap.src->pix(y);
@@ -886,7 +886,7 @@ bool FDP::mix_line(const Mix &layer, mix_pix &z, pri_mode &pri, const f3_line_in
 	return false; // TODO: determine when we can stop drawing?
 }
 
-void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z, const fda_settings &fda)
+void tc0630fdp_device::render_line(pen_t *RESTRICT dst, const mix_pix &z, const fda_settings &fda)
 {
 	const pen_t *clut = (fda.palette_12bit ? m_palette_12bit : m_palette)->pens();
 	for (unsigned int x = H_START; x < H_START + H_VIS; x++) {
@@ -930,22 +930,22 @@ void FDP::render_line(pen_t *RESTRICT dst, const mix_pix &z, const fda_settings 
 	}
 }
 
-inline bool FDP::used(const pivot_inf &layer, int y) const
+inline bool tc0630fdp_device::used(const pivot_inf &layer, int y) const
 {
 	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
 	return layer.use_pix() || (m_textram_row_usage[y_adj >> 3] > 0);
 }
-inline bool FDP::used(const sprite_inf &layer, int y) const
+inline bool tc0630fdp_device::used(const sprite_inf &layer, int y) const
 {
 	return m_sprite_pri_row_usage[y] & (1 << layer.index);
 }
-inline bool FDP::used(const playfield_inf &layer, int y) const
+inline bool tc0630fdp_device::used(const playfield_inf &layer, int y) const
 {
 	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
 	return m_tilemap_row_usage[y_adj >> 4][layer.index + (2 * layer.alt_tilemap)] > 0;
 }
 
-void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void tc0630fdp_device::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	auto prio = [] (const auto &obj) -> u8 { return obj->prio; };
 
@@ -1056,7 +1056,7 @@ void FDP::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 /******************************************************************************/
 
-inline void FDP::f3_drawgfx(const tempsprite &sprite)
+inline void tc0630fdp_device::f3_drawgfx(const tempsprite &sprite)
 {
 	bitmap_ind16 &dest_bmp = m_sprite_framebuffer;
 
@@ -1099,7 +1099,7 @@ inline void FDP::f3_drawgfx(const tempsprite &sprite)
 	}
 }
 
-void FDP::read_sprite_info()
+void tc0630fdp_device::read_sprite_info()
 {
 	const u16 *spriteram16_ptr = m_spriteram.target();
 
@@ -1240,7 +1240,7 @@ void FDP::read_sprite_info()
 }
 
 
-void FDP::draw_sprites()
+void tc0630fdp_device::draw_sprites()
 {
 	if (!m_sprite_trails) {
 		std::fill_n(m_sprite_pri_row_usage, 256, 0);

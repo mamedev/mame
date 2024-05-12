@@ -85,7 +85,7 @@ protected:
 	void f3_map(address_map &map);
 
 private:
-	required_device<FDP> m_fdp;
+	required_device<tc0630fdp_device> m_fdp;
 	optional_device<taito_en_device> m_taito_en;
 	optional_device<okim6295_device> m_oki;
 

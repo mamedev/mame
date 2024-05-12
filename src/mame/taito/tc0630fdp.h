@@ -8,12 +8,10 @@
 
 #include <bitset>
 
-#define FDP tc0630fdp_device
-
-class FDP : public device_t, public device_gfx_interface
+class tc0630fdp_device : public device_t, public device_gfx_interface
 {
 public:
-	FDP(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0630fdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	
 	void device_add_mconfig(machine_config &config) override;
 	
@@ -311,6 +309,6 @@ protected:
 private:
 };
 
-DECLARE_DEVICE_TYPE(TC0630FDP, FDP)
+DECLARE_DEVICE_TYPE(TC0630FDP, tc0630fdp_device)
 
 #endif // MAME_TAITO_TC0630FDP_H
