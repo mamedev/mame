@@ -132,14 +132,15 @@ namespace bx
 		m_userData = _userData;
 		m_stackSize = _stackSize;
 
-        if (NULL != _name)
-        {
-            strCopy(m_name, sizeof(m_name), _name);
-        }
-        else
-        {
-            m_name[0] = '\0';
-        }
+		if (NULL != _name)
+		{
+			BX_WARN(strLen(_name) < BX_COUNTOF(m_name)-1, "Truncating thread name.");
+			strCopy(m_name, BX_COUNTOF(m_name), _name);
+		}
+		else
+		{
+			m_name[0] = '\0';
+		}
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
