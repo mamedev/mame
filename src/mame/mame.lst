@@ -46304,6 +46304,10 @@ mu500
 mu1000
 mu2000
 
+@source:yamaha/ymqs300.cpp
+qs300
+eosb900
+
 @source:yamaha/ympcs30.cpp
 pcs30                           // 1984
 
