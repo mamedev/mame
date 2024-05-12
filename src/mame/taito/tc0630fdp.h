@@ -41,19 +41,19 @@ public:
 protected:
 	using fixed8 = s32;
 
-	static inline constexpr int H_TOTAL = 432;
-	static inline constexpr int H_START = 46;
-	static inline constexpr int H_VIS   = 320;
-	static inline constexpr int H_END   = H_START+H_VIS;
-	static inline constexpr int V_TOTAL = 262;
-	static inline constexpr int V_START = 24;
-	static inline constexpr int V_VIS   = 232;
-	static inline constexpr int V_END   = V_START+V_VIS;
+	static constexpr int H_TOTAL = 432;
+	static constexpr int H_START = 46;
+	static constexpr int H_VIS   = 320;
+	static constexpr int H_END   = H_START+H_VIS;
+	static constexpr int V_TOTAL = 262;
+	static constexpr int V_START = 24;
+	static constexpr int V_VIS   = 232;
+	static constexpr int V_END   = V_START+V_VIS;
 
-	static inline constexpr int NUM_PLAYFIELDS = 4;
-	static inline constexpr int NUM_TILEMAPS = 5;
-	static inline constexpr int NUM_SPRITEGROUPS = 4; // high 2 bits of color
-	static inline constexpr int NUM_CLIPPLANES = 4;
+	static constexpr int NUM_PLAYFIELDS = 4;
+	static constexpr int NUM_TILEMAPS = 5;
+	static constexpr int NUM_SPRITEGROUPS = 4; // high 2 bits of color
+	static constexpr int NUM_CLIPPLANES = 4;
 
 	memory_share_creator<u16> m_spriteram;
 	memory_share_creator<u16> m_pfram;

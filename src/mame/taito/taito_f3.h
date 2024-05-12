@@ -53,7 +53,7 @@ public:
 
 protected:
 	// should be 30.47618_MHz_XTAL / 2
-	static inline constexpr XTAL F3_MAIN_CLK = 30.47618_MHz_XTAL / 2;
+	static constexpr XTAL F3_MAIN_CLK = 30.47618_MHz_XTAL / 2;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
