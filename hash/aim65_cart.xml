@@ -90,6 +90,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="basicpc100">
+		<description>Siemens PC100 BASIC</description>
+		<year>1978</year>
+		<publisher>Siemens/Microsoft</publisher>
+		<info name="usage" value="Load in &quot;cart1&quot;, &quot;cart2&quot; and &quot;cart3&quot;, then press N to start"/>
+
+		<part name="z26" interface="aim65_z26_cart">
+			<dataarea name="z26" size="4096">
+				<rom name="pc100_basic.z26" size="4096" crc="36a61f39" sha1="f5ce0126cb594a565e730973fd140d03c298cefa"/>
+			</dataarea>
+		</part>
+		<part name="z25" interface="aim65_z25_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="pc100_basic.z25" size="4096" crc="00326f73" sha1="b84922f459482ddfc9a412998a4fb9048719c412"/>
+			</dataarea>
+		</part>
+		<part name="z24" interface="aim65_z24_cart">
+			<dataarea name="z24" size="4096">
+				<rom name="pc100_basic.z24" size="4096" crc="0878b399" sha1="483e92b57d64be51643a9f6490521a8572aa2f68"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="forth13">
 		<description>AIM 65 FORTH v1.3</description>
 		<year>1981</year>
