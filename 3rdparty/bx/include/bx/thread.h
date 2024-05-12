@@ -72,6 +72,7 @@ namespace bx
 		uint32_t  m_stackSize;
 		int32_t   m_exitCode;
 		bool      m_running;
+		char      m_name[32];
 	};
 
 	///
