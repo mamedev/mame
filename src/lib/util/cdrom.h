@@ -24,6 +24,7 @@ public:
 	static constexpr uint32_t MAX_TRACKS       = 99;        /* AFAIK the theoretical limit */
 	static constexpr uint32_t MAX_SECTOR_DATA  = 2352;
 	static constexpr uint32_t MAX_SUBCODE_DATA = 96;
+	static constexpr uint32_t MAX_INDEX        = 99;
 
 	static constexpr uint32_t FRAME_SIZE       = MAX_SECTOR_DATA + MAX_SUBCODE_DATA;
 	static constexpr uint32_t FRAMES_PER_HUNK  = 8;
@@ -53,25 +54,43 @@ public:
 
 	enum
 	{
-		CD_FLAG_GDROM   = 0x00000001,  // disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
-		CD_FLAG_GDROMLE = 0x00000002  // legacy GD-ROM, with little-endian CDDA data
+		CD_FLAG_GDROM        = 0x00000001,  // disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
+		CD_FLAG_GDROMLE      = 0x00000002,  // legacy GD-ROM, with little-endian CDDA data
+		CD_FLAG_MULTISESSION = 0x00000004,  // multisession CD-ROM
+	};
+
+	enum
+	{
+		CD_FLAG_CONTROL_PREEMPHASIS = 1,
+		CD_FLAG_CONTROL_DIGITAL_COPY_PERMITTED = 2,
+		CD_FLAG_CONTROL_DATA_TRACK = 4,
+		CD_FLAG_CONTROL_4CH = 8,
+	};
+
+	enum
+	{
+		CD_FLAG_ADR_START_TIME = 1,
+		CD_FLAG_ADR_CATALOG_CODE,
+		CD_FLAG_ADR_ISRC_CODE,
 	};
 
 	struct track_info
 	{
 		/* fields used by CHDMAN and in MAME */
-		uint32_t trktype;     /* track type */
-		uint32_t subtype;     /* subcode data type */
-		uint32_t datasize;    /* size of data in each sector of this track */
-		uint32_t subsize;     /* size of subchannel data in each sector of this track */
-		uint32_t frames;      /* number of frames in this track */
-		uint32_t extraframes; /* number of "spillage" frames in this track */
-		uint32_t pregap;      /* number of pregap frames */
-		uint32_t postgap;     /* number of postgap frames */
-		uint32_t pgtype;      /* type of sectors in pregap */
-		uint32_t pgsub;       /* type of subchannel data in pregap */
-		uint32_t pgdatasize;  /* size of data in each sector of the pregap */
-		uint32_t pgsubsize;   /* size of subchannel data in each sector of the pregap */
+		uint32_t trktype;       /* track type */
+		uint32_t subtype;       /* subcode data type */
+		uint32_t datasize;      /* size of data in each sector of this track */
+		uint32_t subsize;       /* size of subchannel data in each sector of this track */
+		uint32_t frames;        /* number of frames in this track */
+		uint32_t extraframes;   /* number of "spillage" frames in this track */
+		uint32_t pregap;        /* number of pregap frames */
+		uint32_t postgap;       /* number of postgap frames */
+		uint32_t pgtype;        /* type of sectors in pregap */
+		uint32_t pgsub;         /* type of subchannel data in pregap */
+		uint32_t pgdatasize;    /* size of data in each sector of the pregap */
+		uint32_t pgsubsize;     /* size of subchannel data in each sector of the pregap */
+		uint32_t control_flags; /* metadata flags associated with each track */
+		uint32_t session;       /* session number */
 
 		/* fields used in CHDMAN only */
 		uint32_t padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
@@ -91,6 +110,7 @@ public:
 	struct toc
 	{
 		uint32_t numtrks;     /* number of tracks */
+		uint32_t numsessions; /* number of sessions */
 		uint32_t flags;       /* see FLAG_ above */
 		track_info tracks[MAX_TRACKS + 1];
 	};
@@ -98,13 +118,13 @@ public:
 	struct track_input_entry
 	{
 		track_input_entry() { reset(); }
-		void reset() { fname.clear(); offset = idx0offs = idx1offs = 0; swap = false; }
+		void reset() { fname.clear(); offset = 0; leadin = leadout = -1; swap = false; std::fill(std::begin(idx), std::end(idx), -1); }
 
 		std::string fname;      // filename for each track
 		uint32_t offset;      // offset in the data file for each track
 		bool swap;          // data needs to be byte swapped
-		uint32_t idx0offs;
-		uint32_t idx1offs;
+		int32_t idx[MAX_INDEX + 1];
+		int32_t leadin, leadout; // TODO: these should probably be their own tracks entirely
 	};
 
 	struct track_input_info
@@ -128,6 +148,7 @@ public:
 	uint32_t get_track(uint32_t frame) const;
 	uint32_t get_track_start(uint32_t track) const {return cdtoc.tracks[track == 0xaa ? cdtoc.numtrks : track].logframeofs; }
 	uint32_t get_track_start_phys(uint32_t track) const { return cdtoc.tracks[track == 0xaa ? cdtoc.numtrks : track].physframeofs; }
+	uint32_t get_track_index(uint32_t frame) const;
 
 	/* TOC utilities */
 	static std::error_condition parse_nero(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
@@ -136,8 +157,16 @@ public:
 	static std::error_condition parse_cue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	static bool is_gdicue(std::string_view tocfname);
 	static std::error_condition parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	int get_last_session() const { return cdtoc.numsessions ? cdtoc.numsessions : 1; }
 	int get_last_track() const { return cdtoc.numtrks; }
-	int get_adr_control(int track) const { return track == 0xaa || cdtoc.tracks[track].trktype == CD_TRACK_AUDIO ? 0x10 : 0x14; }
+	int get_adr_control(int track) const {
+		if (track == 0xaa)
+			track = get_last_track() - 1; // use last track's flags
+		int adrctl = (CD_FLAG_ADR_START_TIME << 4) | (cdtoc.tracks[track].control_flags & 0x0f);
+		if (cdtoc.tracks[track].trktype != CD_TRACK_AUDIO)
+			adrctl |= CD_FLAG_CONTROL_DATA_TRACK;
+		return adrctl;
+	}
 	int get_track_type(int track) const { return cdtoc.tracks[track].trktype; }
 	const toc &get_toc() const { return cdtoc; }
 

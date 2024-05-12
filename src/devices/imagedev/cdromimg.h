@@ -59,7 +59,9 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "cdrm"; }
 
 	int get_last_track() const;
+	int get_last_session() const;
 	uint32_t get_track(uint32_t frame) const;
+	uint32_t get_track_index(uint32_t frame) const;
 	uint32_t get_track_start(uint32_t track) const;
 	bool read_data(uint32_t lbasector, void *buffer, uint32_t datatype, bool phys=false);
 	bool read_subcode(uint32_t lbasector, void *buffer, bool phys=false);
