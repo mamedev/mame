@@ -6,8 +6,6 @@
 
 **************************************************************************/
 
-#define MIDZEUS_VIDEO_CLOCK     XTAL(66'666'700)
-
 #include "machine/timekpr.h"
 #include "emupal.h"
 #include "screen.h"
@@ -67,105 +65,61 @@ class midzeus_state : public driver_device
 public:
 	midzeus_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_nvram(*this, "nvram"),
-		m_ram_base(*this, "ram_base"),
-		m_tms32031_control(*this, "tms32031_ctl"),
 		m_zeusbase(*this, "zeusbase"),
-		m_m48t35(*this, "m48t35"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "ANALOG%u", 0U),
-		m_io_gun_x(*this, "GUNX%u", 1U),
-		m_io_gun_y(*this, "GUNY%u", 1U),
-		m_io_trackx(*this, "TRACKX1"),
-		m_io_tracky(*this, "TRACKY1"),
-		m_io_49way_x(*this, "49WAYX"),
-		m_io_49way_y(*this, "49WAYY"),
-		m_io_keypad(*this, "KEYPAD"),
-		m_digits(*this, "digit%u", 0U)
+		m_ram_base(*this, "ram_base"),
+		m_nvram(*this, "nvram"),
+		m_tms32032_control(*this, "tms32032_ctl"),
+		m_mainbank(*this, "mainbank")
 	{ }
 
-	// turn on for hardcoded video debugging inputs
-	static constexpr bool DEBUG_KEYS = false;
-
-	//static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
-	static constexpr int BEAM_DY = 3;
-	static constexpr int BEAM_DX = 3;
-	static constexpr int BEAM_XOFFS = 40; // table in the code indicates an offset of 20 with a beam height of 7
-
-	required_shared_ptr<uint32_t> m_nvram;
-	required_shared_ptr<uint32_t> m_ram_base;
-	required_shared_ptr<uint32_t> m_tms32031_control;
-	optional_shared_ptr<uint32_t> m_zeusbase;
-
-	void cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t cmos_r(offs_t offset);
-	void cmos_protect_w(uint32_t data);
-	uint32_t zpram_r(offs_t offset);
-	void zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t disk_asic_jr_r(offs_t offset);
-	void disk_asic_jr_w(offs_t offset, uint32_t data);
-	uint32_t tms32031_control_r(offs_t offset);
-	void tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void keypad_select_w(offs_t offset, uint32_t data);
-	uint32_t analog_r(offs_t offset);
-	void analog_w(uint32_t data);
-	void invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t invasn_gun_r();
-	uint32_t zeus_r(offs_t offset);
-	void zeus_w(offs_t offset, uint32_t data);
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
-	uint32_t grid_keypad_r(offs_t offset);
-	uint32_t trackball_r(offs_t offset);
-	void init_invasn();
-	void init_mk4();
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(display_irq);
-	TIMER_CALLBACK_MEMBER(display_irq_off);
-	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
-	void midzeus(machine_config &config);
-	void invasn(machine_config &config);
 	void mk4(machine_config &config);
-	void zeus_map(address_map &map);
+
+	optional_shared_ptr<uint32_t> m_zeusbase;
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	optional_device<timekeeper_device> m_m48t35;
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	required_device<midway_ioasic_device> m_ioasic;
-	optional_ioport_array<4> m_io_analog;
-	optional_ioport_array<2> m_io_gun_x;
-	optional_ioport_array<2> m_io_gun_y;
-	optional_ioport m_io_trackx;
-	optional_ioport m_io_tracky;
-	optional_ioport m_io_49way_x;
-	optional_ioport m_io_49way_y;
-	optional_ioport m_io_keypad;
-	output_finder<7> m_digits;
+	void cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cmos_r(offs_t offset);
+	void cmos_protect_w(uint32_t data);
+	uint32_t disk_asic_jr_r(offs_t offset);
+	void disk_asic_jr_w(offs_t offset, uint32_t data);
+	uint32_t tms32032_control_r(offs_t offset);
+	void tms32032_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t zeus_r(offs_t offset);
+	void zeus_w(offs_t offset, uint32_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(display_irq);
+	TIMER_CALLBACK_MEMBER(display_irq_off);
+
+	void zeus_map(address_map &map);
+	void midzeus(machine_config &config);
 
 	emu_timer *     m_display_irq_off_timer = nullptr;
-	uint8_t         m_crusnexo_leds_select = 0;
 	uint32_t        m_disk_asic_jr[0x10]{};
 
 	uint8_t         m_cmos_protected = 0;
 
 	emu_timer *     m_timer[2]{};
 
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+	required_device<midway_ioasic_device> m_ioasic;
+	required_shared_ptr<uint32_t> m_ram_base;
+	required_shared_ptr<uint32_t> m_nvram;
+	required_shared_ptr<uint32_t> m_tms32032_control;
+	optional_memory_bank m_mainbank;
+
 private:
-	uint32_t        m_gun_control = 0;
-	uint8_t         m_gun_irq_state = 0;
-	emu_timer *     m_gun_timer[2]{};
-	int32_t         m_gun_x[2]{}, m_gun_y[2]{};
-	uint8_t         m_keypad_select = 0;
+	static constexpr XTAL MIDZEUS_VIDEO_CLOCK = XTAL(66'666'700);
 
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
@@ -177,7 +131,6 @@ private:
 
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void log_waveram(uint32_t length_and_base);
-	void update_gun_irq();
 
 	void *waveram0_ptr_from_block_addr(uint32_t addr);
 	void *waveram0_ptr_from_expanded_addr(uint32_t addr);
@@ -207,4 +160,36 @@ private:
 	int         m_yoffs = 0;
 	int         m_texel_width = 0;
 	int         m_is_mk4b = 0;
+};
+
+class invasnab_state : public midzeus_state
+{
+public:
+	invasnab_state(const machine_config &mconfig, device_type type, const char *tag) :
+		midzeus_state(mconfig, type, tag),
+		m_io_gun_x(*this, "GUNX%u", 1U),
+		m_io_gun_y(*this, "GUNY%u", 1U)
+	{ }
+
+	void invasn(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t invasn_gun_r();
+
+	void update_gun_irq();
+	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
+
+	void invasnab_map(address_map &map);
+
+	uint32_t        m_gun_control = 0;
+	uint8_t         m_gun_irq_state = 0;
+	emu_timer *     m_gun_timer[2]{};
+	int32_t         m_gun_x[2]{}, m_gun_y[2]{};
+
+	required_ioport_array<2> m_io_gun_x;
+	required_ioport_array<2> m_io_gun_y;
 };
