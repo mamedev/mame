@@ -196,7 +196,7 @@ void qs300_state::qs300(machine_config &config)
 	m_subcpu->read_adc<0>().set_constant(0);     // Aftertouch
 	m_subcpu->read_adc<1>().set_constant(0);     // Pitch bend
 	m_subcpu->read_adc<2>().set_constant(0);     // Modulation wheel
-	m_subcpu->read_adc<3>().set_constant(0x3ff); // CC ?  Wired to +5V
+	m_subcpu->read_adc<3>().set_constant(0x3ff); // Generic continuous controller, wired to +5V
 	m_subcpu->read_adc<4>().set_constant(0);     // Foot control
 	m_subcpu->read_adc<5>().set_constant(0);     // Foot volume
 	m_subcpu->read_adc<6>().set_constant(0x3ff); // Unconnected
