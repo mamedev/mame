@@ -355,7 +355,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="lamp_162_1" defstate="0" inputtag="AUX2" inputmask="0x80">
+	<element name="lamp_162_1" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -535,7 +535,7 @@
 			<color red="0.06" green="0.06" blue="0.12"/>
 		</rect>
 	</element>
-	<element name="lamp_48_1" defstate="0" inputtag="BLACK2" inputmask="0x20">
+	<element name="lamp_48_1" defstate="0">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00"/>
 		</rect>
@@ -1575,7 +1575,7 @@
 			<color red="0.12" green="0.12" blue="0.06"/>
 		</rect>
 	</element>
-	<element name="lamp_22_1" defstate="0" inputtag="BLACK2" inputmask="0x80">
+	<element name="lamp_22_1" defstate="0">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.50"/>
 		</rect>
@@ -3151,7 +3151,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_196" inputtag="BLACK1" inputmask="0x01">
+	<element name="colour_button_196">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3179,7 +3179,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_197" inputtag="BLACK2" inputmask="0x02">
+	<element name="colour_button_197">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3203,7 +3203,7 @@
 			<color red="0.12" green="0.06" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_198" inputtag="BLACK2" inputmask="0x01">
+	<element name="colour_button_198">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.00"/>
 		</rect>
@@ -3223,7 +3223,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_199" inputtag="BLACK2" inputmask="0x04">
+	<element name="colour_button_199">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3247,7 +3247,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_200" inputtag="BLACK2" inputmask="0x08">
+	<element name="colour_button_200">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3271,7 +3271,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_201" inputtag="BLACK2" inputmask="0x10">
+	<element name="colour_button_201">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3315,7 +3315,7 @@
 			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_203" inputtag="BLACK2" inputmask="0x40">
+	<element name="colour_button_203">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
@@ -3732,7 +3732,7 @@
 		<element name="lamp162" ref="lamp_162_1_border" state="0">
 			<bounds x="732" y="3" width="56" height="24"/>
 		</element>
-		<element name="lamp162" ref="lamp_162_1" state="0">
+		<element name="lamp162" ref="lamp_162_1" state="0" inputtag="AUX2" inputmask="0x80">
 			<bounds x="734" y="5" width="52" height="20"/>
 		</element>
 		<element name="lamp156" ref="lamp_156_1_border" state="0">
@@ -3786,7 +3786,7 @@
 		<element name="lamp48" ref="lamp_48_1_border" state="0">
 			<bounds x="153" y="533" width="64" height="32"/>
 		</element>
-		<element name="lamp48" ref="lamp_48_1" state="0">
+		<element name="lamp48" ref="lamp_48_1" state="0" inputtag="BLACK2" inputmask="0x20">
 			<bounds x="155" y="535" width="60" height="28"/>
 		</element>
 		<element name="lamp204" ref="lamp_204_1_border" state="0">
@@ -4074,7 +4074,7 @@
 		<element name="lamp22" ref="lamp_22_1_border" state="0">
 			<bounds x="103" y="347" width="56" height="32"/>
 		</element>
-		<element name="lamp22" ref="lamp_22_1" state="0">
+		<element name="lamp22" ref="lamp_22_1" state="0" inputtag="BLACK2" inputmask="0x80">
 			<bounds x="105" y="349" width="52" height="28"/>
 		</element>
 		<element name="lamp123" ref="lamp_123_1_border" state="0">

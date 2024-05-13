@@ -5,73 +5,6 @@ authors:hap, Carl
 -->
 <mamelayout version="2">
 
-	<script><![CDATA[
-		-- add support for placing wall pieces by clicking between buttons
-		file:set_resolve_tags_callback(
-				function ()
-					local walls = { {  7.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
-									{ 17.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
-									{ 27.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
-									{ 37.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
-									{ 47.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
-									{ 57.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
-									{ 67.5, { 0, 10, 20, 30, 40, 50, 60, 70 } } }
-
-					for num, col in pairs(walls) do
-						for num2, wall in pairs(col[2]) do
-							machine.output:set_indexed_value("colwall", (num * 10) + num2, 0)
-						end
-					end
-					for num, row in pairs(walls) do
-						for num2, wall in pairs(row[2]) do
-							machine.output:set_indexed_value("rowwall", (num * 10) + num2, 0)
-						end
-					end
-
-					local view = file.views["Internal Layout"]
-					local boundsref = view.items["boundsref"]
-					local transform
-
-					view:set_recomputed_callback(
-							function ()
-								transform = boundsref.bounds
-							end)
-
-					view:set_pointer_updated_callback(
-							function (pointertype, id, device, x, y, buttons, pressed, released, clicks)
-								if ((pressed & 0x1) ~= 0) and (1 == buttons) then
-									-- convert to layout units
-									x = (x - transform.x0) / transform.width
-									y = (y - transform.y0) / transform.height
-
-									for num, col in pairs(walls) do
-										if col[1] < x and (col[1] + 2.5) > x then
-											for num2, wall in pairs(col[2]) do
-												if wall < y and (wall + 7.5) > y then
-													local state = machine.output:get_indexed_value("colwall", (num * 10) + num2)
-													machine.output:set_indexed_value("colwall", (num * 10) + num2, (~state) & 1)
-													return
-												end
-											end
-										end
-									end
-									for num, row in pairs(walls) do
-										if row[1] < y and (row[1] + 2.5) > y then
-											for num2, wall in pairs(row[2]) do
-												if wall < x and (wall + 7.5) > x then
-													local state = machine.output:get_indexed_value("rowwall", (num * 10) + num2)
-													machine.output:set_indexed_value("rowwall", (num * 10) + num2, (~state) & 1)
-													return
-												end
-											end
-										end
-									end
-								end
-							end)
-				end)
-	]]></script>
-
-
 <!-- define elements -->
 
 	<element name="empty" />
@@ -387,4 +320,71 @@ authors:hap, Carl
 		<element ref="hl" inputtag="IN.8" inputmask="0x08"><bounds x="-12.5" y="70" width="7.5" height="7.5" /><color alpha="0.2" /></element>
 
 	</view>
+
+
+	<script><![CDATA[
+		-- add support for placing wall pieces by clicking between buttons
+		file:set_resolve_tags_callback(
+				function ()
+					local walls = { {  7.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 17.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 27.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 37.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 47.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 57.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
+									{ 67.5, { 0, 10, 20, 30, 40, 50, 60, 70 } } }
+
+					for num, col in pairs(walls) do
+						for num2, wall in pairs(col[2]) do
+							machine.output:set_indexed_value("colwall", (num * 10) + num2, 0)
+						end
+					end
+					for num, row in pairs(walls) do
+						for num2, wall in pairs(row[2]) do
+							machine.output:set_indexed_value("rowwall", (num * 10) + num2, 0)
+						end
+					end
+
+					local view = file.views["Internal Layout"]
+					local boundsref = view.items["boundsref"]
+					local transform
+
+					view:set_recomputed_callback(
+							function ()
+								transform = boundsref.bounds
+							end)
+
+					view:set_pointer_updated_callback(
+							function (pointertype, id, device, x, y, buttons, pressed, released, clicks)
+								if ((pressed & 0x1) ~= 0) and (1 == buttons) then
+									-- convert to layout units
+									x = (x - transform.x0) / transform.width
+									y = (y - transform.y0) / transform.height
+
+									for num, col in pairs(walls) do
+										if col[1] < x and (col[1] + 2.5) > x then
+											for num2, wall in pairs(col[2]) do
+												if wall < y and (wall + 7.5) > y then
+													local state = machine.output:get_indexed_value("colwall", (num * 10) + num2)
+													machine.output:set_indexed_value("colwall", (num * 10) + num2, (~state) & 1)
+													return
+												end
+											end
+										end
+									end
+									for num, row in pairs(walls) do
+										if row[1] < y and (row[1] + 2.5) > y then
+											for num2, wall in pairs(row[2]) do
+												if wall < x and (wall + 7.5) > x then
+													local state = machine.output:get_indexed_value("rowwall", (num * 10) + num2)
+													machine.output:set_indexed_value("rowwall", (num * 10) + num2, (~state) & 1)
+													return
+												end
+											end
+										end
+									end
+								end
+							end)
+				end)
+	]]></script>
 </mamelayout>
