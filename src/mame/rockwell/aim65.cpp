@@ -395,8 +395,8 @@ ROM_START( drac1 )
 	ROM_REGION(0x0800, "cr120d", 0) // CR-120D expansion board: EPROM Programmer Module
 	ROM_LOAD("cr120_crosaim_v-b_120_ve-c_7000.bin",     0x0000, 0x0800, CRC(09840652) SHA1(ad9ae4cbdcb86e749d8a385ec6334e97d37ef0d4))
 
-	ROM_REGION(0x0800, "cr125", 0) // CR-120D expansion board: Floppy Control Card
-	ROM_LOAD("cr125_v94_800.bin",                       0x0000, 0x0800, CRC(09840652) SHA1(ad9ae4cbdcb86e749d8a385ec6334e97d37ef0d4))
+	ROM_REGION(0x0800, "cr125", 0) // CR-125 expansion board: Floppy Control Card
+	ROM_LOAD("cr125_v94_800.bin",                       0x0000, 0x0800, CRC(f0fddc5a) SHA1(d7e927c5f177977a7032b8dddeb17a217fcb3fdd))
 ROM_END
 
 
