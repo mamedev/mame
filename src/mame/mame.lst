@@ -42507,6 +42507,9 @@ uvw1800                         // 199? Sony Betacam-SP UVW-1800
 @source:sony/bvm.cpp
 bvm20f1e                        //
 
+@source:sony/clie_db.cpp
+t650c                           //
+
 @source:sony/dfs500.cpp
 dfs500                          // 1994 Sony DFS-500 Video Mixer
 

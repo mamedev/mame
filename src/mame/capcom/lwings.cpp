@@ -1685,7 +1685,7 @@ For the Trojan sets, Capcom labeled all program ROMs as TB 04, TB 05 & TB 06.  S
 
 */
 
-ROM_START( trojan ) // One of these sets is rev A - need to verify
+ROM_START( trojan ) // This set is likely rev A - need to verify
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "tb_04.10n", 0x00000, 0x8000, CRC(c1bbeb4e) SHA1(248ae4184d25b642b282ef44ac729c0f7952834d) )
 	ROM_LOAD( "tb_06.13n", 0x10000, 0x8000, CRC(d49592ef) SHA1(b538bac3c73f35474cc6745a4e4dc3ab6217eaac) )
@@ -1732,7 +1732,7 @@ ROM_START( trojan ) // One of these sets is rev A - need to verify
 	ROM_LOAD( "tbb-1.1e",  0x0100, 0x0100, CRC(5052fa9d) SHA1(8cd240f4795a7ae76499573c09069dba37182be2) ) /* priority (not used) */
 ROM_END
 
-ROM_START( trojana ) // One of these sets is rev A - need to verify
+ROM_START( trojana )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "tb_04.10n", 0x00000, 0x8000, CRC(0113a551) SHA1(933ebaf73fb70772fc2cf2b9143bf00757505772) ) // SLDH
 	ROM_LOAD( "tb_06.13n", 0x10000, 0x8000, CRC(aa127a5b) SHA1(0b7115c2ffe8456ef463e22d68e03a2e396abf92) ) // SLDH
