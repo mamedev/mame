@@ -38535,6 +38535,7 @@ z9001                           //
 
 @source:rockwell/aim65.cpp
 aim65                           // Rockwell AIM65
+drac1                           // Comelta DRAC-1
 
 @source:rockwell/aim65_40.cpp
 aim65_40                        // Rockwell AIM65/40
