@@ -59,6 +59,8 @@ public:
 
 	void chloe(machine_config &config);
 
+	INPUT_CHANGED_MEMBER(on_divmmc_nmi);
+
 protected:
 	static const u8 BASIC48_ROM = 0x01;
 
@@ -417,6 +419,12 @@ void chloe_state::raster_irq_adjust()
 		m_irq_raster_on_timer->reset();
 }
 
+INPUT_CHANGED_MEMBER(chloe_state::on_divmmc_nmi)
+{
+	if ((newval & 1) && (~m_io_line[0]->read() & 0x8000))
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
 TIMER_CALLBACK_MEMBER(chloe_state::raster_irq_on)
 {
 	m_screen->update_now();
@@ -723,6 +731,9 @@ INPUT_PORTS_START(chloe)
 	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("* (SS+KEY)")       PORT_CODE(KEYCODE_8)
 	PORT_BIT(0xef20, IP_ACTIVE_LOW, IPT_UNUSED)
 
+	PORT_START("NMI")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI (SS+KEY)") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, chloe_state, on_divmmc_nmi, 0)
+
 
 	PORT_START("JOY1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON1)
@@ -737,7 +748,6 @@ INPUT_PORTS_START(chloe)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON1)
-
 
 	PORT_START("mouse_input1")
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
