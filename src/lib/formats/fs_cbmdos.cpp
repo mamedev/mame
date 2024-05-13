@@ -33,6 +33,8 @@ namespace {
 
 class impl : public filesystem_t {
 public:
+	static constexpr u8 SECTOR_DIRECTORY_COUNT = 8;
+
 	struct cbmdos_dirent
 	{
 		u8      m_next_directory_track;
@@ -55,7 +57,7 @@ public:
 		block_iterator(const impl &fs, u8 first_track, u8 first_sector);
 		bool next();
 		const void *data() const;
-		const std::array<cbmdos_dirent, 4> &dirent_data() const;
+		const std::array<cbmdos_dirent, SECTOR_DIRECTORY_COUNT> &dirent_data() const;
 		u8 size() const;
 
 	private:
@@ -458,9 +460,9 @@ const void *impl::block_iterator::data() const
 //  impl::block_iterator::dirent_data
 //-------------------------------------------------
 
-const std::array<impl::cbmdos_dirent, 4> &impl::block_iterator::dirent_data() const
+const std::array<impl::cbmdos_dirent, impl::SECTOR_DIRECTORY_COUNT> &impl::block_iterator::dirent_data() const
 {
-	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, 4> *>(m_block.rodata());
+	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, SECTOR_DIRECTORY_COUNT> *>(m_block.rodata());
 }
 
 
