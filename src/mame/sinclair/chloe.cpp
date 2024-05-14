@@ -540,7 +540,7 @@ void chloe_state::map_regs(address_map &map)
 {
 	map(0x00, 0xff).lrw8(NAME([this](offs_t offset)
 	{
-		if (machine().side_effects_disabled())
+		if (!machine().side_effects_disabled())
 			LOGIO("rREG %02x\n", offset);
 		return m_uno_regs_data[offset];
 	}), NAME([this](offs_t offset, u8 data)
