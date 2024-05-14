@@ -40,8 +40,6 @@ protected:
 	void irq_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void flipscreen_x_w(int state);
-	void flipscreen_y_w(int state);
 	void video_enable_w(int state);
 
 	// bagman
