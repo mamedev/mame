@@ -44026,6 +44026,9 @@ speedspn                        // (c) 1994
 topdrive                        // (c) 1995
 
 @source:tch/wheelfir.cpp
+kongball						// (c) 199? TCH
+pwball							// (c) 199? TCH
+radendur						// (c) 199? TCH
 wheelfir                        // (c) 199? TCH
 
 @source:teamconcepts/comquest.cpp
