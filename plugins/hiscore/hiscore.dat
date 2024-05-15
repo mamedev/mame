@@ -18866,3 +18866,11 @@ jackrabts:
 @:maincpu,program,60fe,1,ff,ff
 
 
+
+;
+; Tandy/Radio Shack Color Computer
+;
+
+;Zonx (The Rainbow)
+coco3,zonx:
+@:maincpu,program,3e57,5,0,0
