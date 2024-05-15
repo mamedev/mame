@@ -246,34 +246,24 @@ void mj4simai_state::machine_start()
 
 uint16_t mj4simai_state::mj4simai_p1_r()
 {
-	switch (m_keyboard_row)
-	{
-		case 0x01: return m_p1_key[0]->read();
-		case 0x02: return m_p1_key[1]->read();
-		case 0x04: return m_p1_key[2]->read();
-		case 0x08: return m_p1_key[3]->read();
-		case 0x10: return m_p1_key[4]->read();
-		default:
-			if (!machine().side_effects_disabled())
-				LOGIO("p1_r with keyboard_row = %02x\n", m_keyboard_row);
-			return 0xffff;
-	}
+	uint16_t result = 0xffff;
+	if (BIT(m_keyboard_row, 0)) result &= m_p1_key[0]->read();
+	if (BIT(m_keyboard_row, 1)) result &= m_p1_key[1]->read();
+	if (BIT(m_keyboard_row, 2)) result &= m_p1_key[2]->read();
+	if (BIT(m_keyboard_row, 3)) result &= m_p1_key[3]->read();
+	if (BIT(m_keyboard_row, 4)) result &= m_p1_key[4]->read();
+	return result;
 }
 
 uint16_t mj4simai_state::mj4simai_p2_r()
 {
-	switch (m_keyboard_row)
-	{
-		case 0x01: return m_p2_key[0]->read();
-		case 0x02: return m_p2_key[1]->read();
-		case 0x04: return m_p2_key[2]->read();
-		case 0x08: return m_p2_key[3]->read();
-		case 0x10: return m_p2_key[4]->read();
-		default:
-			if (!machine().side_effects_disabled())
-				LOGIO("p2_r with keyboard_row = %02x\n", m_keyboard_row);
-			return 0xffff;
-	}
+	uint16_t result = 0xffff;
+	if (BIT(m_keyboard_row, 0)) result &= m_p2_key[0]->read();
+	if (BIT(m_keyboard_row, 1)) result &= m_p2_key[1]->read();
+	if (BIT(m_keyboard_row, 2)) result &= m_p2_key[2]->read();
+	if (BIT(m_keyboard_row, 3)) result &= m_p2_key[3]->read();
+	if (BIT(m_keyboard_row, 4)) result &= m_p2_key[4]->read();
+	return result;
 }
 
 void mj4simai_state::mj4simai_map(address_map &map)
