@@ -201,7 +201,7 @@ ROM_END
   |________________________________________________________________________|
 
 */
-ROM_START( tairyouda ) // 大漁太鼓337拍子
+ROM_START( tairyoda ) // 大漁太鼓337拍子
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "t3b1_prg0.5f",   0x00000, 0x80000, CRC(d09dcb0c) SHA1(dbb66f5d548079f19b06dd98d3a44ee6b42b470a) )
 
@@ -212,5 +212,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, sweetld4,  0, sweetland4, sweetld4,  sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000, tairyouda, 0, tairyouda,  tairyouda, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2004, sweetld4, 0, sweetland4, sweetld4,  sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000, tairyoda, 0, tairyouda,  tairyouda, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_IS_SKELETON_MECHANICAL )
