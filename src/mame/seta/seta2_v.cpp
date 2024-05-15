@@ -308,7 +308,20 @@ void seta2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, bool flipx, bool flipy, int base_sx, uint32_t xzoom, bool use_shadow, int screenline, int line, bool opaque)
+inline void seta2_state::drawgfx_line(
+		bitmap_ind16 &bitmap,
+		const rectangle &cliprect,
+		int which_gfx,
+		uint8_t const *const addr,
+		uint32_t realcolor,
+		bool flipx,
+		bool flipy,
+		int base_sx,
+		uint32_t xzoom,
+		bool use_shadow,
+		int screenline,
+		int line,
+		bool opaque)
 {
 	struct drawmodes
 	{
@@ -426,10 +439,11 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 
 // takes an x/y pixel position in the virtual tilemap and returns the code + attributes etc. for it
 inline void seta2_state::get_tile(
-		uint16_t *spriteram,
+		uint16_t const *const spriteram,
 		bool is_16x16,
 		int x,
-		int y, int page,
+		int y,
+		int page,
 		int &code,
 		int &attr,
 		bool &flipx,
@@ -662,7 +676,9 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						int code, attr, color;
 						bool flipx, flipy;
 						// tilemap data is NOT buffered?
-						get_tile(m_spriteram, is_16x16, x * 8, sourceline, page, code, attr, flipx, flipy, color);
+						get_tile(
+								m_spriteram, is_16x16, x * 8, sourceline, page,
+								code, attr, flipx, flipy, color);
 
 						const int tileline = sourceline & 0x07;
 						const int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
@@ -675,7 +691,16 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 							uint32_t realsx = dst_x;
 							realsx -= usedxoffset >> 16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
 							realsx = realsx * usedxzoom;
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, tileline, opaque);
+							drawgfx_line(
+									bitmap, cliprect,
+									which_gfx,
+									m_spritegfx->get_data(m_realtilenumber[code]),
+									color << 4,
+									flipx, flipy,
+									realsx,
+									usedxzoom, use_shadow,
+									realscanline, tileline,
+									opaque);
 						}
 					}
 				}
@@ -757,7 +782,16 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						uint32_t realsx = (sx + x * 8);
 						realsx -= usedxoffset >> 16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
 						realsx = realsx * usedxzoom;
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
+						drawgfx_line(
+								bitmap, cliprect,
+								which_gfx,
+								m_spritegfx->get_data(m_realtilenumber[realcode]),
+								color << 4,
+								flipx, flipy,
+								realsx,
+								usedxzoom, use_shadow,
+								realscanline, line,
+								opaque);
 					}
 
 				}

@@ -82,16 +82,16 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	// video-related
 	tilemap_t   *m_tilemap[3] = {nullptr, nullptr, nullptr};
 
-	template<unsigned Which> TILE_GET_INFO_MEMBER(get_tile_info);
-
 	int       m_oki_bank = 0;
 	uint16_t  m_gfx_control = 0;
+
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	template <unsigned Which> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void tilemap1_scrollx_w(uint16_t data);
@@ -101,7 +101,7 @@ private:
 };
 
 
-template<unsigned Which>
+template <unsigned Which>
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile_info)
 {
 	tileinfo.set(Which,
@@ -294,10 +294,10 @@ static INPUT_PORTS_START( casanova )
 
 	PORT_MODIFY("DSW01") // Do NOT trust "DIP INFO" for correct settings! At least Coinage is WRONG!
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) ) // Dip info shows 2 Coins / Credit
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) ) // DIP switch info shows 2 Coins / Credit
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) ) // Dip info shows 3 Coins / Credit
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) ) // Dip info shows 5 Coins / Credit
+	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) ) // DIP switch info shows 3 Coins / Credit
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) ) // DIP switch info shows 5 Coins / Credit
 	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )

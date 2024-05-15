@@ -119,7 +119,7 @@ protected:
 	optional_memory_bank m_mainbank;
 
 private:
-	static constexpr XTAL MIDZEUS_VIDEO_CLOCK = XTAL(66'666'700);
+	static inline constexpr XTAL MIDZEUS_VIDEO_CLOCK = 66.6667_MHz_XTAL;
 
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);

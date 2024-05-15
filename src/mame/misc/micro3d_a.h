@@ -27,7 +27,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	enum dac_registers {
+	enum dac_registers
+	{
 		VCF,
 		VCQ,
 		VCA,

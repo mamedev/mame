@@ -12,35 +12,44 @@
 
 #include "screen.h"
 #include "speaker.h"
+
 #include "utf8.h"
+
+namespace {
 
 class qs300_state : public driver_device {
 public:
-	qs300_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_subcpu(*this, "subcpu"),
-		  m_swp00(*this, "swp00"),
-		  m_lcdc(*this, "vs254300"),
-		  m_nvram(*this, "ram"),
-		  m_inputs(*this, "DR%u", 0U),
-		  m_is_eos(false)
-
-	{ }
+	qs300_state(const machine_config &mconfig, device_type type, const char *tag) :
+		qs300_state(mconfig, type, tag, false)
+	{
+	}
 
 	void qs300(machine_config &config);
 
 protected:
+	qs300_state(const machine_config &mconfig, device_type type, const char *tag, bool is_eos) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_swp00(*this, "swp00"),
+		m_lcdc(*this, "vs254300"),
+		m_nvram(*this, "ram"),
+		m_inputs(*this, "DR%u", 0U),
+		m_is_eos(is_eos)
+	{
+	}
+
 	required_device<h83002_device> m_maincpu;
 	required_device<h83002_device> m_subcpu;
 	required_device<swp00_device> m_swp00;
 	required_device<t6963c_device> m_lcdc;
 	required_device<nvram_device> m_nvram;
 	required_ioport_array<7> m_inputs;
-	//	required_ioport m_sustain;
-	//	required_ioport m_pitch_bend;
+	//required_ioport m_sustain;
+	//required_ioport m_pitch_bend;
 
-	bool m_is_eos;
+	bool const m_is_eos;
+
 	u8 m_mlatch, m_slatch;
 	bool m_mlatch_full, m_slatch_full;
 
@@ -73,10 +82,9 @@ protected:
 class eos_b900_state : public qs300_state
 {
 public:
-	eos_b900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: qs300_state(mconfig, type, tag)
+	eos_b900_state(const machine_config &mconfig, device_type type, const char *tag) :
+		qs300_state(mconfig, type, tag, true)
 	{
-		m_is_eos = true;
 	}
 };
 
@@ -369,6 +377,8 @@ ROM_START( eosb900 )
 	ROM_LOAD("t6963c_0101.bin", 0x000, 0x400, CRC(547d118b) SHA1(0dd3e3acd3d47e6ece644c98c390fc86587373e9))
 	// This t6963c_0101 internal CG ROM is similar to lm24014w_0101.bin which may be used as a replacement
 ROM_END
+
+} // anonymous namespace
 
 SYST( 1999, qs300,       0, 0, qs300, qs300, qs300_state,    empty_init, "Yamaha", "QS300",    MACHINE_NOT_WORKING )
 SYST( 1999, eosb900, qs300, 0, qs300, qs300, eos_b900_state, empty_init, "Yamaha", "EOS B900", MACHINE_NOT_WORKING )

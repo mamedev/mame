@@ -61,7 +61,7 @@ gundamex:
 - slowdowns, music tempo is incorrect
 
 mj4simai:
-- test mode doesn't work correctly, the grid is ok but when you press a key to go to the
+- test mode doesn't work correctly, the grid is OK but when you press a key to go to the
   next screen (input test) it stays up a second and then drops back into the game
 
 myangel:
@@ -177,22 +177,22 @@ void seta2_state::grdians_lockout_w(uint8_t data)
 
 void seta2_state::grdians_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x304000, 0x30ffff).ram();                             // ? seems tile data
-	map(0x600000, 0x600001).portr("DSW1");               // DSW 1
-	map(0x600002, 0x600003).portr("DSW2");               // DSW 2
-	map(0x700000, 0x700001).portr("P1");                 // P1
-	map(0x700002, 0x700003).portr("P2");                 // P2
-	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
+	map(0x000000, 0x1fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x304000, 0x30ffff).ram();                                                                 // ? seems tile data
+	map(0x600000, 0x600001).portr("DSW1");                                                         // DSW 1
+	map(0x600002, 0x600003).portr("DSW2");                                                         // DSW 2
+	map(0x700000, 0x700001).portr("P1");                                                           // P1
+	map(0x700002, 0x700003).portr("P2");                                                           // P2
+	map(0x700004, 0x700005).portr("SYSTEM");                                                       // Coins
 	map(0x70000c, 0x70000d).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x800001, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
-	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().w(FUNC(seta2_state::spriteram_w)).share("spriteram");    // Sprites
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(seta2_state::spriteram_w)).share(m_spriteram);            // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
-	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xc50000, 0xc5ffff).ram();                                                                 // cleared
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
 }
 
 /***************************************************************************
@@ -213,24 +213,24 @@ void seta2_state::gundamex_eeprom_w(uint16_t data)
 
 void seta2_state::gundamex_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x500000, 0x57ffff).rom();                             // ROM
-	map(0x600000, 0x600001).portr("DSW1");               // DSW 1
-	map(0x600002, 0x600003).portr("DSW2");               // DSW 2
-	map(0x700000, 0x700001).portr("P1");                 // P1
-	map(0x700002, 0x700003).portr("P2");                 // P2
-	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
-	map(0x700008, 0x700009).portr("IN0");                // P1
-	map(0x70000a, 0x70000b).portr("IN1");                // P2
+	map(0x000000, 0x1fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x500000, 0x57ffff).rom();                                                                 // ROM
+	map(0x600000, 0x600001).portr("DSW1");                                                         // DSW 1
+	map(0x600002, 0x600003).portr("DSW2");                                                         // DSW 2
+	map(0x700000, 0x700001).portr("P1");                                                           // P1
+	map(0x700002, 0x700003).portr("P2");                                                           // P2
+	map(0x700004, 0x700005).portr("SYSTEM");                                                       // Coins
+	map(0x700008, 0x700009).portr("IN0");                                                          // P1
+	map(0x70000a, 0x70000b).portr("IN1");                                                          // P2
 	map(0x70000c, 0x70000d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
-	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
+	map(0xc00000, 0xc3ffff).ram().share(m_spriteram);                                              // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
-	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
+	map(0xc50000, 0xc5ffff).ram();                                                                 // cleared
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
 }
 
 
@@ -244,45 +244,35 @@ void mj4simai_state::machine_start()
 	save_item(NAME(m_keyboard_row));
 }
 
-uint16_t mj4simai_state::mj4simai_p1_r()
+template <unsigned Which>
+uint16_t mj4simai_state::mj4simai_key_r()
 {
 	uint16_t result = 0xffff;
-	if (BIT(m_keyboard_row, 0)) result &= m_p1_key[0]->read();
-	if (BIT(m_keyboard_row, 1)) result &= m_p1_key[1]->read();
-	if (BIT(m_keyboard_row, 2)) result &= m_p1_key[2]->read();
-	if (BIT(m_keyboard_row, 3)) result &= m_p1_key[3]->read();
-	if (BIT(m_keyboard_row, 4)) result &= m_p1_key[4]->read();
-	return result;
-}
-
-uint16_t mj4simai_state::mj4simai_p2_r()
-{
-	uint16_t result = 0xffff;
-	if (BIT(m_keyboard_row, 0)) result &= m_p2_key[0]->read();
-	if (BIT(m_keyboard_row, 1)) result &= m_p2_key[1]->read();
-	if (BIT(m_keyboard_row, 2)) result &= m_p2_key[2]->read();
-	if (BIT(m_keyboard_row, 3)) result &= m_p2_key[3]->read();
-	if (BIT(m_keyboard_row, 4)) result &= m_p2_key[4]->read();
+	if (BIT(m_keyboard_row, 0)) result &= m_keys[Which][0]->read();
+	if (BIT(m_keyboard_row, 1)) result &= m_keys[Which][1]->read();
+	if (BIT(m_keyboard_row, 2)) result &= m_keys[Which][2]->read();
+	if (BIT(m_keyboard_row, 3)) result &= m_keys[Which][3]->read();
+	if (BIT(m_keyboard_row, 4)) result &= m_keys[Which][4]->read();
 	return result;
 }
 
 void mj4simai_state::mj4simai_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x600000, 0x600001).r(FUNC(mj4simai_state::mj4simai_p1_r));             // P1
-	map(0x600002, 0x600003).r(FUNC(mj4simai_state::mj4simai_p2_r));             // P2
-	map(0x600005, 0x600005).lw8(NAME([this] (u8 data){ m_keyboard_row = data; }));      // select keyboard row to read
+	map(0x000000, 0x1fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x600000, 0x600001).r(FUNC(mj4simai_state::mj4simai_key_r<0>));                            // P1
+	map(0x600002, 0x600003).r(FUNC(mj4simai_state::mj4simai_key_r<1>));                            // P2
+	map(0x600005, 0x600005).lw8(NAME([this] (u8 data) { m_keyboard_row = data; }));                // select keyboard row to read
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x600100, 0x600101).portr("SYSTEM");             //
-	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
-	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
-	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
-	map(0x600300, 0x60030f).w(FUNC(mj4simai_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
-	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
+	map(0x600100, 0x600101).portr("SYSTEM");
+	map(0x600200, 0x600201).nopw();                                                                // LEDs? Coins?
+	map(0x600300, 0x600301).portr("DSW1");                                                         // DSW 1
+	map(0x600302, 0x600303).portr("DSW2");                                                         // DSW 2
+	map(0x600300, 0x60030f).w(FUNC(mj4simai_state::sound_bank_w)).umask16(0x00ff);                 // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
+	map(0xc00000, 0xc3ffff).ram().share(m_spriteram);                                              // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).ram().w(FUNC(mj4simai_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(mj4simai_state::vregs_w)).share(m_vregs);                 // Video Registers
 }
 
 
@@ -292,20 +282,20 @@ void mj4simai_state::mj4simai_map(address_map &map)
 
 void seta2_state::myangel_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x700000, 0x700001).portr("P1");                 // P1
-	map(0x700002, 0x700003).portr("P2");                 // P2
-	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
+	map(0x000000, 0x1fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x700000, 0x700001).portr("P1");                                                           // P1
+	map(0x700002, 0x700003).portr("P2");                                                           // P2
+	map(0x700004, 0x700005).portr("SYSTEM");                                                       // Coins
 	map(0x700006, 0x700007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x700200, 0x700201).nopw();                        // Leds? Coins?
-	map(0x700300, 0x700301).portr("DSW1");               // DSW 1
-	map(0x700302, 0x700303).portr("DSW2");               // DSW 2
-	map(0x700310, 0x70031f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
-	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0x700200, 0x700201).nopw();                                                                // LEDs? Coins?
+	map(0x700300, 0x700301).portr("DSW1");                                                         // DSW 1
+	map(0x700302, 0x700303).portr("DSW2");                                                         // DSW 2
+	map(0x700310, 0x70031f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
+	map(0xc00000, 0xc3ffff).ram().share(m_spriteram);                                              // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
 }
 
 
@@ -315,20 +305,20 @@ void seta2_state::myangel_map(address_map &map)
 
 void seta2_state::myangel2_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x600000, 0x600001).portr("P1");                 // P1
-	map(0x600002, 0x600003).portr("P2");                 // P2
-	map(0x600004, 0x600005).portr("SYSTEM");             // Coins
+	map(0x000000, 0x1fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x600000, 0x600001).portr("P1");                                                           // P1
+	map(0x600002, 0x600003).portr("P2");                                                           // P2
+	map(0x600004, 0x600005).portr("SYSTEM");                                                       // Coins
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
-	map(0x600300, 0x600301).portr("DSW1");               // DSW 1
-	map(0x600302, 0x600303).portr("DSW2");               // DSW 2
-	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
-	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xd00000, 0xd3ffff).ram().share("spriteram");       // Sprites
+	map(0x600200, 0x600201).nopw();                                                                // LEDs? Coins?
+	map(0x600300, 0x600301).portr("DSW1");                                                         // DSW 1
+	map(0x600302, 0x600303).portr("DSW2");                                                         // DSW 2
+	map(0x600300, 0x60030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
+	map(0xd00000, 0xd3ffff).ram().share(m_spriteram);                                              // Sprites
 	map(0xd40000, 0xd4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xd60000, 0xd6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
+	map(0xd60000, 0xd6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
 }
 
 
@@ -357,20 +347,20 @@ void seta2_state::pzlbowl_coin_counter_w(uint8_t data)
 
 void seta2_state::pzlbowl_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                 // ROM
-	map(0x200000, 0x20ffff).ram();                                 // RAM
-	map(0x400300, 0x400301).portr("DSW1");                   // DSW 1
-	map(0x400302, 0x400303).portr("DSW2");                   // DSW 2
-	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);           // Samples Banks
-	map(0x500000, 0x500001).portr("P1");                     // P1
-	map(0x500002, 0x500003).portr("P2");                     // P2
+	map(0x000000, 0x0fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x400300, 0x400301).portr("DSW1");                                                         // DSW 1
+	map(0x400302, 0x400303).portr("DSW2");                                                         // DSW 2
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
+	map(0x500000, 0x500001).portr("P1");                                                           // P1
+	map(0x500002, 0x500003).portr("P2");                                                           // P2
 	map(0x500005, 0x500005).rw(FUNC(seta2_state::pzlbowl_coins_r), FUNC(seta2_state::pzlbowl_coin_counter_w));   // Coins + Protection?
 	map(0x500006, 0x500007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x700000, 0x700001).r(FUNC(seta2_state::pzlbowl_protection_r));          // Protection
-	map(0x800000, 0x83ffff).ram().share("spriteram");       // Sprites
+	map(0x700000, 0x700001).r(FUNC(seta2_state::pzlbowl_protection_r));                            // Protection
+	map(0x800000, 0x83ffff).ram().share(m_spriteram);                                              // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
-	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
+	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
 }
 
 
@@ -402,7 +392,7 @@ void seta2_state::penbros_map(address_map &map)
 	map(0x500300, 0x500301).portr("DSW1");
 	map(0x500302, 0x500303).portr("DSW2");
 	map(0x500300, 0x50030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);
-	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);
 }
 
 void seta2_state::ablastb_map(address_map &map)
@@ -453,21 +443,21 @@ void seta2_state::reelquak_coin_w(uint8_t data)
 
 void seta2_state::reelquak_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0x300000, 0x303fff).ram().share("nvram");           // NVRAM (Battery Backed)
-	map(0x400000, 0x400001).portr("P1");                 // P1
-	map(0x400002, 0x400003).portr("TICKET");             // Tickets
-	map(0x400004, 0x400005).portr("SYSTEM");             // Coins
+	map(0x000000, 0x0fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x300000, 0x303fff).ram().share("nvram");                                                  // NVRAM (Battery Backed)
+	map(0x400000, 0x400001).portr("P1");                                                           // P1
+	map(0x400002, 0x400003).portr("TICKET");                                                       // Tickets
+	map(0x400004, 0x400005).portr("SYSTEM");                                                       // Coins
 	map(0x400006, 0x400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x400201, 0x400201).w(FUNC(seta2_state::reelquak_coin_w));          // Coin Counters / IRQ Ack
-	map(0x400300, 0x400301).portr("DSW1");               // DSW 1
-	map(0x400302, 0x400303).portr("DSW2");               // DSW 2
-	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
-	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0x400201, 0x400201).w(FUNC(seta2_state::reelquak_coin_w));                                 // Coin Counters / IRQ Ack
+	map(0x400300, 0x400301).portr("DSW1");                                                         // DSW 1
+	map(0x400302, 0x400303).portr("DSW2");                                                         // DSW 2
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
+	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
+	map(0xc00000, 0xc3ffff).ram().share(m_spriteram);                                              // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
 }
 
 
@@ -478,10 +468,10 @@ void seta2_state::reelquak_map(address_map &map)
 // To be done:
 void seta2_state::namcostr_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                             // ROM
-	map(0x200000, 0x20ffff).ram();                             // RAM
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
-	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0x000000, 0x07ffff).rom();                                              // ROM
+	map(0x200000, 0x20ffff).ram();                                              // RAM
+	map(0xc00000, 0xc3ffff).ram().share(m_spriteram);                           // Sprites
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs); // Video Registers
 }
 
 
@@ -506,25 +496,25 @@ void seta2_state::samshoot_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x30ffff).ram().share("nvram");
 
-	map(0x400000, 0x400001).portr("DSW1");             // DSW 1
-	map(0x400002, 0x400003).portr("BUTTONS");          // Buttons
+	map(0x400000, 0x400001).portr("DSW1");                                                         // DSW 1
+	map(0x400002, 0x400003).portr("BUTTONS");                                                      // Buttons
 
-	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);    // Samples Banks
+	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
 
-	map(0x500000, 0x500001).portr("GUN1");             // P1
-	map(0x580000, 0x580001).portr("GUN2");             // P2
+	map(0x500000, 0x500001).portr("GUN1");                                                         // P1
+	map(0x580000, 0x580001).portr("GUN2");                                                         // P2
 
-	map(0x700000, 0x700001).portr("TRIGGER");          // Trigger
-	map(0x700002, 0x700003).portr("PUMP");             // Pump
-	map(0x700004, 0x700005).portr("COIN");  // Coins
-	map(0x700005, 0x700005).w(FUNC(seta2_state::samshoot_coin_w));  // Coins
-	map(0x700006, 0x700007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog?
+	map(0x700000, 0x700001).portr("TRIGGER");                                                      // Trigger
+	map(0x700002, 0x700003).portr("PUMP");                                                         // Pump
+	map(0x700004, 0x700005).portr("COIN");                                                         // Coins
+	map(0x700005, 0x700005).w(FUNC(seta2_state::samshoot_coin_w));                                 // Coins
+	map(0x700006, 0x700007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));                 // Watchdog?
 
-	map(0x800000, 0x83ffff).ram().share("spriteram"); // Sprites
-	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
-	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
+	map(0x800000, 0x83ffff).ram().share(m_spriteram);                                              // Sprites
+	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
 
-	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
 }
 
 
@@ -617,7 +607,7 @@ void staraudi_state::staraudi_map(address_map &map)
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).ram().w(FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(staraudi_state::vregs_w)).share(m_vregs);  // Video Registers
 }
 
 
@@ -657,25 +647,25 @@ void seta2_state::telpacfl_lockout_w(uint8_t data)
 
 void seta2_state::telpacfl_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                              // ROM
-	map(0x200000, 0x20ffff).ram();                              // RAM
-	map(0x300000, 0x303fff).ram().share("nvram");            // NVRAM (Battery Backed)
-	map(0x600000, 0x600001).portr("DSW1");                // DSW 1
-	map(0x600002, 0x600003).portr("DSW2");                // DSW 2
-	map(0x700000, 0x700001).portr("COIN");                // Coin
-	map(0x700002, 0x700003).portr("P1");                  // P1 + Dispenser
-	map(0x700004, 0x700005).portr("SERVICE");             // Service
-	map(0x700006, 0x700007).portr("UNKNOWN");             // (unused?)
-	map(0x700009, 0x700009).w(FUNC(seta2_state::telpacfl_lamp1_w));          // Lamps
-	map(0x70000d, 0x70000d).w(FUNC(seta2_state::telpacfl_lamp2_w));          // ""
-	map(0x800001, 0x800001).w(FUNC(seta2_state::telpacfl_lockout_w));        // Coin Blockers
-	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xb00000, 0xb3ffff).ram().share("spriteram");        // Sprites
+	map(0x000000, 0x0fffff).rom();                                                                 // ROM
+	map(0x200000, 0x20ffff).ram();                                                                 // RAM
+	map(0x300000, 0x303fff).ram().share("nvram");                                                  // NVRAM (Battery Backed)
+	map(0x600000, 0x600001).portr("DSW1");                                                         // DSW 1
+	map(0x600002, 0x600003).portr("DSW2");                                                         // DSW 2
+	map(0x700000, 0x700001).portr("COIN");                                                         // Coin
+	map(0x700002, 0x700003).portr("P1");                                                           // P1 + Dispenser
+	map(0x700004, 0x700005).portr("SERVICE");                                                      // Service
+	map(0x700006, 0x700007).portr("UNKNOWN");                                                      // (unused?)
+	map(0x700009, 0x700009).w(FUNC(seta2_state::telpacfl_lamp1_w));                                // Lamps
+	map(0x70000d, 0x70000d).w(FUNC(seta2_state::telpacfl_lamp2_w));                                // ""
+	map(0x800001, 0x800001).w(FUNC(seta2_state::telpacfl_lockout_w));                              // Coin Blockers
+	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w)); // Sound
+	map(0xb00000, 0xb3ffff).ram().share(m_spriteram);                                              // Sprites
 	map(0xb40000, 0xb4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
+	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                    // Video Registers
 	map(0xd00006, 0xd00007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  map(0xe00000, 0xe00001).w(FUNC(seta2_state::));
-	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);              // Samples Banks
+	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);                    // Samples Banks
 }
 
 

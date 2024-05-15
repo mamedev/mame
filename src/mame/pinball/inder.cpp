@@ -1709,4 +1709,4 @@ GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder",
 GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder",    "250 CC",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // Unknown sound hardware, unknown machine (using 'larana' inputs until proper ones are figured out).
-GAME(1991, indunkgam, 0, inder, larana, inder_state, init_0, ROT0, "Inder", "Unknown gambling game on Inder pinball hardware", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991, indunkgam, 0, inder, larana, inder_state, init_0, ROT0, "Inder", "unknown gambling game on Inder pinball hardware", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

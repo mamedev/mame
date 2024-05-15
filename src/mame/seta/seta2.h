@@ -133,8 +133,8 @@ protected:
 	std::unique_ptr<uint16_t[]> m_private_spriteram;
 
 private:
-	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint8_t* const addr, const uint32_t realcolor, bool flipx, bool flipy, int base_sx, uint32_t xzoom, bool shadow, int screenline, int line, bool opaque);
-	inline void get_tile(uint16_t *spriteram, bool is_16x16, int x, int y, int page, int &code, int &attr, bool &flipx, bool &flipy, int &color);
+	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint8_t const *const addr, uint32_t realcolor, bool flipx, bool flipy, int base_sx, uint32_t xzoom, bool shadow, int screenline, int line, bool opaque);
+	inline void get_tile(uint16_t const *spriteram, bool is_16x16, int x, int y, int page, int &code, int &attr, bool &flipx, bool &flipy, int &color);
 
 	TIMER_CALLBACK_MEMBER(raster_timer_done);
 
@@ -152,8 +152,7 @@ class mj4simai_state : public seta2_state
 public:
 	mj4simai_state(const machine_config &mconfig, device_type type, const char *tag) :
 		seta2_state(mconfig, type, tag),
-		m_p1_key(*this, "P1_KEY%u", 0U),
-		m_p2_key(*this, "P2_KEY%u", 0U)
+		m_keys{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 	{ }
 
 	void mj4simai(machine_config &config);
@@ -162,13 +161,11 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	uint16_t mj4simai_p1_r();
-	uint16_t mj4simai_p2_r();
+	template <unsigned Which> uint16_t mj4simai_key_r();
 
 	void mj4simai_map(address_map &map);
 
-	required_ioport_array<5> m_p1_key;
-	required_ioport_array<5> m_p2_key;
+	required_ioport_array<5> m_keys[2];
 
 	uint8_t m_keyboard_row = 0;
 };
