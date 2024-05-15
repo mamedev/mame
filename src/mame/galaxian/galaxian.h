@@ -279,6 +279,7 @@ public:
 	void turtles(machine_config &config);
 	void fantastc(machine_config &config);
 	void jumpbug(machine_config &config);
+	void jumpbugbrf(machine_config &config);
 	void checkmaj(machine_config &config);
 	void pacmanbl(machine_config &config);
 	void quaak(machine_config &config);
@@ -367,6 +368,7 @@ protected:
 	void galaxian_map_discrete(address_map &map);
 	void highroll_map(address_map &map);
 	void jumpbug_map(address_map &map);
+	void jumpbugbrf_map(address_map &map);
 	void jungsub_map(address_map &map);
 	void jungsub_io_map(address_map &map);
 	void konami_sound_map(address_map &map);
