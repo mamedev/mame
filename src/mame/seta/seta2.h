@@ -134,14 +134,15 @@ protected:
 
 private:
 	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint8_t* const addr, const uint32_t realcolor, bool flipx, bool flipy, int base_sx, uint32_t xzoom, bool shadow, int screenline, int line, bool opaque);
-	inline void get_tile(uint16_t* spriteram, bool is_16x16, int x, int y, int page, int& code, int& attr, bool& flipx, bool& flipy, int& color);
+	inline void get_tile(uint16_t *spriteram, bool is_16x16, int x, int y, int page, int &code, int &attr, bool &flipx, bool &flipy, int &color);
+
+	TIMER_CALLBACK_MEMBER(raster_timer_done);
 
 	std::unique_ptr<uint32_t[]> m_realtilenumber;
 	gfx_element *m_spritegfx;
 
 	uint16_t m_rasterposition = 0;
 	uint16_t m_rasterenabled = 0;
-	TIMER_CALLBACK_MEMBER(raster_timer_done);
 	emu_timer *m_raster_timer = nullptr;
 };
 
@@ -149,10 +150,10 @@ private:
 class mj4simai_state : public seta2_state
 {
 public:
-	mj4simai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seta2_state(mconfig, type, tag)
-		, m_p1_key(*this, "P1_KEY%u", 0U)
-		, m_p2_key(*this, "P2_KEY%u", 0U)
+	mj4simai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta2_state(mconfig, type, tag),
+		m_p1_key(*this, "P1_KEY%u", 0U),
+		m_p2_key(*this, "P2_KEY%u", 0U)
 	{ }
 
 	void mj4simai(machine_config &config);
@@ -176,12 +177,12 @@ private:
 class funcube_state : public seta2_state
 {
 public:
-	funcube_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seta2_state(mconfig, type, tag)
-		, m_nvram(*this, "nvram", 0x180, ENDIANNESS_BIG)
-		, m_in_debug(*this, "DEBUG")
-		, m_in_switch(*this, "SWITCH")
-		, m_in_battery(*this, "BATTERY")
+	funcube_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta2_state(mconfig, type, tag),
+		m_nvram(*this, "nvram", 0x180, ENDIANNESS_BIG),
+		m_in_debug(*this, "DEBUG"),
+		m_in_switch(*this, "SWITCH"),
+		m_in_battery(*this, "BATTERY")
 	{ }
 
 	void funcube(machine_config &config);
