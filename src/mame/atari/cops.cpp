@@ -22,9 +22,6 @@
     However, the Vision Quest Laserdisc for the USA is slightly different, with 
     Revelations specific data seemingly replaced with black level.
 
-    The UK version COPS appears to want to communicate with the LDP in a
-    different way, passing illegal commands, need to verify this is the same
-    player/hardware, or whether it's a different baud rate.
 
     This should be similar hardware for Street Viper if we get a dump.
 ***************************************************************************/
@@ -40,6 +37,9 @@
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
 #include "machine/watchdog.h"
+
+#include "machine/bacta_datalogger.h"
+#include "machine/meters.h"
 
 #include "speaker.h"
 
@@ -70,20 +70,12 @@ public:
 		, m_sn(*this, "snsnd")
 		, m_ld(*this, "laserdisc")
 		, m_dacia(*this, "dacia")
-		// , m_watchdog(*this, "watchdog")
+		, m_watchdog(*this, "watchdog")
+		, m_meters(*this, "meters")
 		, m_switches(*this, "SW%u", 0U)
 		, m_steer(*this, "STEER")
 		, m_digits(*this, "digit%u", 0U)
-		, m_offroad_right_lamp(*this, "Offroad Right %u Lamp", 1U)
-		, m_offroad_left_lamp(*this, "Offroad Left %u Lamp", 1U)
-		, m_damage_lamp(*this, "Damage Lamp")
-		, m_stop_lamp(*this, "Stop Lamp")
-		, m_gun_active_right_lamp(*this, "Gun Active Right Lamp")
-		, m_gun_active_left_lamp(*this, "Gun Active Left Lamp")
-		, m_vest_hit_lamp(*this, "Vest Hit %u Lamp", 1U)
-		, m_flash_red_lamp(*this, "Flash Red Lamp")
-		, m_flash_blue_lamp(*this, "Flash Blue Lamp")
-		, m_bullet_lamp(*this, "Bullet Lamp %u", 1U)
+		, m_lamps(*this, "lamp%u", 0U)
 		, m_irq(0)
 		, m_acia1_irq(0)
 		, m_acia2_irq(0)
@@ -111,21 +103,13 @@ private:
 	required_device<sn76489_device> m_sn;
 	required_device<sony_ldp1450hle_device> m_ld;
    	required_device<r65c52_device> m_dacia;
-    // required_device<watchdog_timer_device> m_watchdog;
+    required_device<watchdog_timer_device> m_watchdog;
+	optional_device<meters_device> m_meters;
+
 	required_ioport_array<3> m_switches;
 	optional_ioport m_steer;
 	output_finder<16> m_digits;
-	output_finder<4> m_offroad_right_lamp;
-	output_finder<4> m_offroad_left_lamp;
-	output_finder<> m_damage_lamp;
-	output_finder<> m_stop_lamp;
-	output_finder<> m_gun_active_right_lamp;
-	output_finder<> m_gun_active_left_lamp;
-	output_finder<3> m_vest_hit_lamp;
-	output_finder<> m_flash_red_lamp;
-	output_finder<> m_flash_blue_lamp;
-	output_finder<6> m_bullet_lamp;
-
+	output_finder<23> m_lamps;
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -141,6 +125,7 @@ private:
 	void via1_irq(int state);
 	void via2_irq(int state);
 	void via1_a_w(uint8_t data);
+	void via1_a_revlatns_w(uint8_t data);
 	void via1_b_w(uint8_t data);
 	void via1_cb1_w(uint8_t data);
 	void cdrom_data_w(uint8_t data);
@@ -296,18 +281,18 @@ void cops_state::io1_cops_w(offs_t offset, uint8_t data)
 			break;
 		case 0x04: /* WOP4 */
 			for (int i = 3; i >= 0; i--)
-				m_offroad_right_lamp[i] = BIT(data, i + 4);
+				m_lamps[i + 0x4] = BIT(data, i + 4); //Offroad right 1 - 4
 			for (int i = 3; i >= 0; i--)
-				m_offroad_left_lamp[i] = BIT(data, i);
+				m_lamps[i] = BIT(data, i); // Offroad left 1 - 4
 			break;
 		case 0x05: /* WOP5 */
-			m_damage_lamp = BIT(data, 7);
-			m_stop_lamp = BIT(data, 6);
-			m_gun_active_right_lamp = BIT(data, 5);
-			m_vest_hit_lamp[1] = BIT(data, 4);
-			m_vest_hit_lamp[2] = BIT(data, 2);
-			m_gun_active_left_lamp = BIT(data, 1);
-			m_vest_hit_lamp[0] = BIT(data, 0);
+			m_lamps[0xe] = BIT(data, 7); // Damage
+			m_lamps[0xd] = BIT(data, 6); // Stop
+			m_lamps[0xc] = BIT(data, 5); // Gun active right
+			m_lamps[0x9] = BIT(data, 4); // Vest 2
+			m_lamps[0xa] = BIT(data, 2); // Vest 3
+			m_lamps[0xb] = BIT(data, 1); // Gun active left
+			m_lamps[0x8] = BIT(data, 0); // Vest 1
 			break;
 		case 0x06: /* WOP6 */
 			logerror("WOP6: data = %02x\n", data);
@@ -356,20 +341,6 @@ void cops_state::io1_w(offs_t offset, uint8_t data)
 			break;
 		case 0x04: /* WOP4 */
 			/*
-			0 A lamp
-			1 B lamp
-			2 Collect lamp
-			3 Cash in Meter
-			4 C lamp
-			5 Continue lamp
-			6 Cash out meter
-			7 Unused
-			*/
-
-//			logerror("WOP4 (lamps): data = %02x\n", data);
-			break;
-		case 0x05: /* WOP5 */
-			/*
 			0 20p
 			1 40p
 			2 £1
@@ -380,13 +351,43 @@ void cops_state::io1_w(offs_t offset, uint8_t data)
 			7 Win lamp
 			*/
 
+			for (int i = 0; i < 8; i++)
+				m_lamps[i] = BIT(data, i);
+
+			break;
+		case 0x05: /* WOP5 */
+
+			m_lamps[0x8] = BIT(data, 0); // A
+			m_lamps[0x9] = BIT(data, 1); // B
+			m_lamps[0xa] = BIT(data, 2); // Collect
+
+			m_meters->update(0, BIT(data, 3));
+
+			m_lamps[0xb] = BIT(data, 4); // C
+			m_lamps[0xc] = BIT(data, 5); // Continue
+
+			m_meters->update(1, BIT(data, 6));
+
+			m_lamps[0xd] = BIT(data, 7); // *
+
+			/*
+			0 A lamp
+			1 B lamp
+			2 Collect lamp
+			3 Cash in Meter
+			4 C lamp
+			5 Continue lamp
+			6 Cash out meter
+			7 * lamp
+			*/
+
 			// logerror("WOP5 (lamps): data = %02x\n", data);
 			break;
 		case 0x06: /* WOP6 - Not connected in Revelations, at least*/
 			logerror("WOP6: data = %02x\n", data);
 			break;
 		case 0x07: /* WOP7 - watchdog*/
-			// m_watchdog->reset_w(data);
+			m_watchdog->reset_w(data);
 			break;
 		default:
 			logerror("Unknown io1_w, offset = %03x, data = %02x\n", offset, data);
@@ -411,13 +412,13 @@ void cops_state::io2_w(offs_t offset, uint8_t data)
 	switch( offset & 0x0f )
 	{
 		case 0x02:
-			m_flash_red_lamp = BIT(data, 0);
-			m_flash_blue_lamp = BIT(data, 7);
+			m_lamps[0xf] = BIT(data, 0); // Flash red
+			m_lamps[0x10] = BIT(data, 7); // Flash blue
 //			if ( data & ~0x91 ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 		case 0x04:
 			for (int i = 5; i >= 0; i--)
-				m_bullet_lamp[i] = BIT(data, i);
+				m_lamps[0x11 + i] = BIT(data, i); // bullet
 			// if ( data & ~0x3f ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 		default:
@@ -457,10 +458,13 @@ void cops_state::via1_irq(int state)
 void cops_state::via1_a_w(uint8_t data)
 {
 
-	logerror("via1_w, data = %02x\n", data);
+//	logerror("via1_w, data = %02x\n", data);
 
-// D7 seems to set line A13 on the System Rom, which will effectively add to the perceived address
+}
 
+void cops_state::via1_a_revlatns_w(uint8_t data)
+{
+	// logerror("vol, data = %02x\n", data & 0x70);
 }
 
 void cops_state::via1_b_w(uint8_t data)
@@ -562,21 +566,21 @@ static INPUT_PORTS_START( revlatns )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("COLLECT")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN5 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN5 ) //COIN5
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_IMPULSE(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) // COIN6
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Continue")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
 
 	PORT_START("SW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("20P LEVEL") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  // 20p level
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("*")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Back Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("100P LEVEL") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) // £1 level
 
 	PORT_START("SW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("50p")
@@ -592,16 +596,7 @@ INPUT_PORTS_END
 void cops_state::machine_start()
 {
 	m_digits.resolve();
-	m_offroad_right_lamp.resolve();
-	m_offroad_left_lamp.resolve();
-	m_damage_lamp.resolve();
-	m_stop_lamp.resolve();
-	m_gun_active_right_lamp.resolve();
-	m_gun_active_left_lamp.resolve();
-	m_vest_hit_lamp.resolve();
-	m_flash_red_lamp.resolve();
-	m_flash_blue_lamp.resolve();
-	m_bullet_lamp.resolve();
+	m_lamps.resolve();
 }
 
 void cops_state::machine_reset()
@@ -628,22 +623,19 @@ void cops_state::base(machine_config &config)
 	SONY_LDP1450HLE(config, m_ld, 0);
 	m_ld->set_screen("screen");
 	m_ld->set_overlay(256, 256, FUNC(cops_state::screen_update));
-	m_ld->add_route(0, "mono", 0.50);
-	m_ld->add_route(1, "mono", 0.50);
+	m_ld->add_route(0, "lspeaker", 0.50);
+	m_ld->add_route(1, "rspeaker", 0.50);
 	m_ld->set_baud(9600);
 	m_ld->add_ntsc_screen(config, "screen");
 	m_ld->serial_tx().set("dacia", FUNC(r65c52_device::write_rxd1));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* via */
-	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/2));
-	via1.irq_handler().set(FUNC(cops_state::via1_irq));
-	via1.writepa_handler().set(FUNC(cops_state::via1_a_w));
-	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
-	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
+	SPEAKER(config, "lspeaker").front_left();
 
-	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "mspeaker").front_center();
+
+	SPEAKER(config, "rspeaker").front_right();
 
 	R65C52(config, m_dacia, DACIA_CLOCK);
 	m_dacia->txd1_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
@@ -651,9 +643,9 @@ void cops_state::base(machine_config &config)
 	m_dacia->irq2_handler().set(FUNC(cops_state::acia2_irq));
 
 	SN76489(config, m_sn, MAIN_CLOCK/2);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_sn->add_route(ALL_OUTPUTS, "mspeaker", 0.30);
 
-	// WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1600));
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1600));
 }
 
 void cops_state::cops(machine_config &config)
@@ -662,10 +654,17 @@ void cops_state::cops(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
-	via6522_device &via2(MOS6522(config, "via6522_2", MAIN_CLOCK/2));
+	/* via */
+	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/4));
+	via1.irq_handler().set(FUNC(cops_state::via1_irq));
+	via1.writepa_handler().set(FUNC(cops_state::via1_a_w));
+	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
+	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
+
+	via6522_device &via2(MOS6522(config, "via6522_2", MAIN_CLOCK/4));
 	via2.irq_handler().set(FUNC(cops_state::via2_irq));
 
-	via6522_device &via3(MOS6522(config, "via6522_3", MAIN_CLOCK/2));
+	via6522_device &via3(MOS6522(config, "via6522_3", MAIN_CLOCK/4));
 	via3.readpa_handler().set(FUNC(cops_state::cdrom_data_r));
 	via3.writepa_handler().set(FUNC(cops_state::cdrom_data_w));
 	via3.writepb_handler().set(FUNC(cops_state::cdrom_ctrl_w));
@@ -676,6 +675,23 @@ void cops_state::revlatns(machine_config &config)
 	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::revlatns_map);
+
+
+	/* via */
+	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/4));
+	via1.irq_handler().set(FUNC(cops_state::via1_irq));
+	via1.writepa_handler().set(FUNC(cops_state::via1_a_revlatns_w));
+	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
+	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
+
+	METERS(config, m_meters, 0).set_number(2);
+
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+
+	m_dacia->txd1_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
+	m_dacia->txd2_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
+
+	bacta.rxd_handler().set("dacia", FUNC(r65c52_device::write_rxd2));
 
 	MSM6242(config, "rtc", XTAL(32'768));
 }
@@ -722,7 +738,7 @@ ROM_START( revlatns )
 	ROM_LOAD( "revelations_sys.u17", 0x0000, 0x8000, CRC(43e5e3ec) SHA1(fa44b102b5aa7ad2421c575abdc67f1c29f23bc1) ) //u17
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "revlatns", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "nova dp1-3a", 0, NO_DUMP )
 ROM_END
 
 } // Anonymous namespace

@@ -60,7 +60,6 @@
 DEFINE_DEVICE_TYPE(SONY_LDP1450HLE, sony_ldp1450hle_device, "ldp1450hle", "Sony LDP-1450 HLE")
 
 
-
 //-------------------------------------------------
 //  sony_ldp1450hle_device - constructor
 //-------------------------------------------------
@@ -563,7 +562,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 					uint32_t frame_val = m_curr_frame;
 					for (uint8_t i = 0; i < 5; i++)
 					{
-						frame_buffer[5 - i] = frame_val%10;
+						frame_buffer[4 - i] = frame_val%10 + 30;
 						frame_val /= 10;
 					}
 					for (uint8_t i = 0; i < 5; i++)
@@ -617,7 +616,8 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 				}
 			}
 		}
-		LOGMASKED(LOG_SEARCHES, "Command %d\n", command);
+		printf("Command %x\n", command);
+		LOGMASKED(LOG_SEARCHES, "Command %x\n", command);
 		}
 	}
 }
