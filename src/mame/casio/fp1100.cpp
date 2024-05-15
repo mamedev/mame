@@ -714,7 +714,8 @@ ROM_START( fp1100 )
 	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
 ROM_END
 
-// FP1000 has less memory than FP1100, using the same PCB, but with unpopulated sockets from RAM9 to RAM24 (only RAM1 to RAM8 are populated).
+/* FP1000 has less memory than FP1100, using the same PCB, but with unpopulated sockets from RAM9 to RAM24 (only RAM1 to RAM8 are populated).
+   The dumped PCB has the uPD7801G socket labeled as "uPD7801G-101", but the chip seems like a newer revision, silkscreened as "D7108G-118". */
 ROM_START( fp1000 )
 	ROM_REGION( 0x9000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "2l_a10_kkk_fp1000_basic.c1", 0x0000, 0x1000, CRC(9322dedd) SHA1(40a00684ced2b7ead53ca15a915d98f3fe00d3ba))
