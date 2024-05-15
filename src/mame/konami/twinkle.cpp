@@ -1088,7 +1088,7 @@ void twinkle_state::scsi_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int3
 	m_dma_offset = n_address;
 	m_dma_size = n_size * 4;
 	m_dma_is_write = false;
-	m_dma_timer->adjust(attotime::from_usec(10));
+	m_dma_timer->adjust(attotime::zero);
 }
 
 void twinkle_state::scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
@@ -1097,7 +1097,7 @@ void twinkle_state::scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int
 	m_dma_offset = n_address;
 	m_dma_size = n_size * 4;
 	m_dma_is_write = true;
-	m_dma_timer->adjust(attotime::from_usec(10));
+	m_dma_timer->adjust(attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(twinkle_state::scsi_dma_transfer)
@@ -1114,13 +1114,13 @@ TIMER_CALLBACK_MEMBER(twinkle_state::scsi_dma_transfer)
 	}
 
 	if (m_dma_requested && m_dma_size > 0)
-		m_dma_timer->adjust(attotime::from_usec(10));
+		m_dma_timer->adjust(attotime::zero);
 }
 
 void twinkle_state::scsi_drq(int state)
 {
 	if (!m_dma_requested && state)
-		m_dma_timer->adjust(attotime::from_usec(10));
+		m_dma_timer->adjust(attotime::zero);
 
 	m_dma_requested = state;
 }
