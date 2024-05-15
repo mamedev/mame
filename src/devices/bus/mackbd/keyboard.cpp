@@ -189,6 +189,7 @@
     * M0110 (U.S. - ANSI)
     * M0110B (British - ISO)
     * M0110F (French - ISO)
+    * M0110J (Japanese - ANSI)
     * M0110T (Italian - ISO)
     * M0120 (keypad - English)
     * M0120P (keypad - European)
@@ -197,9 +198,6 @@
     text for Backspace, Tab, Caps Lock, Shift, Return, Shift, Option,
     Enter and Clear (all variants use icons for command and the cursor
     arrows).
-
-    Also known to exist:
-    * Japanese - ANSI (U.S. with different key caps)
 
     TODO:
     * Determine whether P00 or P01 actually feeds the keypad watchdog
