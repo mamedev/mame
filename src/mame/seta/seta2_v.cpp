@@ -397,7 +397,9 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 				if (pen || opaque)
 				{
 					if (!shadow)
+					{
 						dest[realsx] = (realcolor + pen) & 0x7fff;
+					}
 					else
 					{
 						const int pen_shift = 15 - shadow;
@@ -423,7 +425,16 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 
 
 // takes an x/y pixel position in the virtual tilemap and returns the code + attributes etc. for it
-inline void seta2_state::get_tile(uint16_t* spriteram, bool is_16x16, int x, int y, int page, int& code, int& attr, bool& flipx, bool& flipy, int& color)
+inline void seta2_state::get_tile(
+		uint16_t *spriteram,
+		bool is_16x16,
+		int x,
+		int y, int page,
+		int &code,
+		int &attr,
+		bool &flipx,
+		bool &flipy,
+		int &color)
 {
 	const int xtile = x >> (is_16x16 ? 4 : 3);
 	int ytile = y >> (is_16x16 ? 4 : 3);
@@ -431,7 +442,7 @@ inline void seta2_state::get_tile(uint16_t* spriteram, bool is_16x16, int x, int
 	// yes the tilemap in RAM is flipped?!
 	ytile ^= 0x1f;
 
-	const uint16_t *s3 = &spriteram[2 * ((page * 0x2000 / 4) + ((ytile & 0x1f) << 6) + (xtile & 0x03f))];
+	uint16_t const *const s3 = &spriteram[2 * ((page * 0x2000 / 4) + ((ytile & 0x1f) << 6) + (xtile & 0x03f))];
 	attr = s3[0];
 	code = s3[1] + ((attr & 0x0007) << 16);
 	flipx = BIT(attr, 4);
@@ -525,8 +536,8 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		const int sprite = s1[3];
 
 		// Single-sprite address
-		const uint16_t *s2 = &m_spriteram[(sprite & 0x7fff) * 4];
-		const uint16_t *end = &m_spriteram[m_spriteram.bytes() / 2];
+		uint16_t const *s2 = &m_spriteram[(sprite & 0x7fff) * 4];
+		uint16_t const *const end = &m_spriteram[m_spriteram.bytes() / 2];
 
 		// Single-sprite size
 		const int global_sizex = xoffs & 0xfc00;
@@ -703,8 +714,8 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					// if the sprite doesn't cover this scanline, bail now
 					if (endline >= firstline)
 					{
-						if (firstline > usedscanline)    continue;
-						if (endline < usedscanline)    continue;
+						if ((firstline > usedscanline) || (endline < usedscanline))
+							continue;
 					}
 					else
 					{
