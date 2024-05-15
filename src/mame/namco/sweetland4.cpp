@@ -163,7 +163,7 @@ ROM_START( sweetld4 )
 	ROM_LOAD( "swb 1 snd0.19d", 0x000000, 0x200000, CRC(39294dc7) SHA1(6094a53f10f220d1df8c3e35df11e0566e9c099c) ) // 11xxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
-/* Tairyou-Daiko 337 Byoshi (大漁太鼓337拍子, https://bandainamco-am.co.jp/am/english/aa/tairyodaiko337byoshi/) runs on Namco M151 PCB:
+/* Tairyo-Daiko 337 Byoshi (大漁太鼓337拍子, https://bandainamco-am.co.jp/am/english/aa/tairyodaiko337byoshi/) runs on Namco M151 PCB:
    _________________________________________________________________________
   |   ___                                    ___        NAMCO              |
   |  |··|     ______        ____            |  |        M151 MAIN          |
@@ -213,4 +213,4 @@ ROM_END
 
 
 GAME( 2004, sweetld4,  0, sweetland4, sweetld4,  sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000, tairyouda, 0, tairyouda,  tairyouda, sweetland4_state, empty_init, ROT0, "Namco", "Tairyou-Daiko 337 Byoshi",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000, tairyouda, 0, tairyouda,  tairyouda, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_IS_SKELETON_MECHANICAL )

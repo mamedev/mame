@@ -62,8 +62,8 @@ FRONT CONTROL PANEL (o=LED, SW=switch)
 
 BACK PANEL
  -RS-232
- -AUXILIARY (DB15)
- -SENSOR 1 (DB9)
+ -AUXILIARY (DA15)
+ -SENSOR 1 (DE9)
 
 ************************************************************************************************************/
 
