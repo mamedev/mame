@@ -19410,15 +19410,12 @@ h8                              //
 
 @source:heathzenith/h19.cpp
 h19                             // Heath H19
-z19                             // Zenith Z-19
 
 @source:heathzenith/h89.cpp
 h89                             // Heath H89 (WH89)
 h88                             // Heath H88 (with cassette tape)
 h89_sigmasoft                   // H89 with the SigmaSoft IGC card
-z89                             // Zenith Z-89
 z90                             // Zenith Z-90
-z90_sigmasoft                   // Z-90 with the SigmaSoft IGC card
 
 @source:heathzenith/mdt60.cpp
 mdt60                           //
