@@ -106,7 +106,7 @@ license:CC0-1.0
 	</element>
 
 	<element name="L11" defstate="0">
-		<rect STATE="1">
+		<rect state="1">
 			<color red="0.80" green="0.80" blue="0.0" />
 		</rect>
 	</element>

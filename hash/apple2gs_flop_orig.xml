@@ -9,7 +9,7 @@ license:CC0-1.0
 	<software name="rastan">
 		<description>Rastan</description>
 		<year>1990</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="John Brooks" />
 		<info name="usage" value="Requires a 1MB Apple IIgs. (Music requires 1.25MB.)" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -64,7 +64,7 @@ license:CC0-1.0
 	<software name="qix">
 		<description>Qix</description>
 		<year>1990</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="Ryan Ridges and John Lund" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -774,7 +774,7 @@ license:CC0-1.0
 	<software name="arknoid2">
 		<description>Arkanoid II: Revenge of Doh</description>
 		<year>1989</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="Ryan Ridges and John Lund" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -1038,7 +1038,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnwld">
+	<software name="carmwrld">
 		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
@@ -1588,7 +1588,7 @@ license:CC0-1.0
 	<software name="arkanoid">
 		<description>Arkanoid</description>
 		<year>1988</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="Ryan Ridges and John Lund" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -1656,7 +1656,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnusa">
+	<software name="carmusa">
 		<description>Where in the U.S.A. is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>

@@ -276,6 +276,77 @@ or the view can be disabled using the ``disable`` method.  A disabled
 view can be re-enabled at any time.
 
 
+.. _3.5:
+
+3.5 Bus contention handling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some specific CPUs have be upgraded to be interruptible which allows
+to add bus contention and wait states capabitilites.  Being
+interruptible means, in practice, that an instruction can be
+interrupted at any time and the execute_run method of the core exited.
+Other devices can then run, then eventually controls returns to the
+core and the instruction continues from the point it was started.
+Importantly, this can be triggered from a handler and even be used to
+interrupt just before the access that is currently done
+(e.g. continuation will redo the access).
+
+The CPUs supporting that declare their capability by overriding the
+method ``cpu_is_interruptible`` to return true.
+
+Three intermediate contention handlers can be added to accesses:
+
+* ``before_delay``: wait a number of cycles before doing the access.
+* ``after_delay``: wait a number of cycles after doing the access.
+* ``before_time``: wait for a given time before doing the access.
+
+For the delay handlers, a method or lambda is called which returns the
+number of cycles to wait (as a u32).
+
+The ``before_time`` is special.  First, the time is compared to the
+current value of cpu->total_cycles().  That value is the number of
+cycles elapsed since the last reset of the cpu. It is passed as a
+parameter to the method as a u64 and must return the earliest time as
+a u64 when the access can be done, which can be equal to the passed-in
+time.  From there two things can happen: either the running cpu has
+enough cycles left to consume to reach that time.  In that case, the
+necessary number of cycles is consumed, and the access is done.
+Otherwise, when there isn't enough, the remaining cycles are consumed,
+the access aborted, scheduling happens, and eventually the access is
+redone.  In that case the method is called again with the new current
+time, and must return the (probably same) earliest time again.  This
+will happen until enough cycles to consume are available to directly
+do the access.
+
+This approach allows to for instance handle consecutive DMAs.  A first
+DMA grabs the bus for a transfer.  This shows up as the method
+answering for the earliest time for access the time of the end of the
+dma.  If no timer happens until that time the access will then happen
+just after the dma finishes.  But if a timer elapses before that and
+as a consequence another dma is queued while the first is running, the
+cycle will be aborted for lack of remaining time, and the method will
+eventually be called again.  It will then give the time of when the
+second dma will finish, and all will be well.
+
+It can also allow to reduce said earlier time when circonstances
+require it.  For instance a PIO latch that waits up to 64 cycles that
+data arrives can indicate that current time + 64 as a target (which
+will trigger a bus error for instance) but if a timer elapses and
+fills the latch meanwhile the method will be called again and that
+time can just return the current time to let the access pass though.
+Beware that if the timer elapsing did not fill the latch then the
+method must return the time it returned previously, e.g. the initial
+access time + 64, otherwise irrelevant timers happening or simply
+scheduling quantum effects will delay the timeout, possibly to
+infinity if the quantum is small enough.
+
+Contention handlers on the same address are taken into account in the
+``before_time``, ``before_delay`` then ``after_delay`` order.
+Contention handlers of the same type on the same address at
+last-one-wins.  Installing any non-contention handler on a range where
+a contention handler was removes it.
+
+
 4. Address maps API
 -------------------
 
@@ -292,13 +363,14 @@ The general syntax for entries uses method chaining:
 
 .. code-block:: C++
 
-    map(start, end).handler(...).handler_qualifier(...).range_qualifier();
+    map(start, end).handler(...).handler_qualifier(...).range_qualifier().contention();
 
 The values start and end define the range, the handler() block
 determines how the access is handled, the handler_qualifier() block
-specifies some aspects of the handler (memory sharing for instance) and
-the range_qualifier() block refines the range (mirroring, masking, lane
-selection, etc.).
+specifies some aspects of the handler (memory sharing for instance)
+and the range_qualifier() block refines the range (mirroring, masking,
+lane selection, etc.).  The contention methods handle bus contention
+and wait states for cpus supporting them.
 
 The map follows a “last one wins” principle, where the handler specified
 last is selected when multiple handlers match a given address.
@@ -607,7 +679,20 @@ behaviour.  An example of use the i960 which marks burstable zones
 that way (they have a specific hardware-level support).
 
 
-4.5 View setup
+4.5 Contention
+~~~~~~~~~~~~~~
+
+.. code-block:: C++
+
+    (...).before_time(method).(...)
+    (...).before_delay(method).(...)
+    (...).after_delay(method).(...)
+
+These three methods allow to add the contention methods to a handler.
+See section `3.5`_.  Multiple methods can be handler to one handler.
+
+
+4.6 View setup
 ~~~~~~~~~~~~~~
 
 .. code-block:: C++
@@ -639,6 +724,7 @@ of type ``memory_view::memory_view_entry &``.
 A view can be installed in another view, but don’t forget that a view
 can be installed only once.  A view can also be part of “what was there
 before”.
+
 
 
 5. Address space dynamic mapping API
@@ -803,8 +889,32 @@ with an optional mirror and flags.
 Install a device address with an address map in a space.  The
 ``unitmask``, ``cswidth`` and ``flags`` arguments are optional.
 
-5.9 View installation
-~~~~~~~~~~~~~~~~~~~~~
+5.9 Contention
+~~~~~~~~~~~~~~
+
+.. code-block:: C++
+
+    using ws_time_delegate  = device_delegate<u64 (offs_t, u64)>;
+    using ws_delay_delegate = device_delegate<u32 (offs_t)>;
+
+    space.install_read_before_time(addrstart, addrend, addrmirror, ws_time_delegate)
+    space.install_write_before_time(addrstart, addrend, addrmirror, ws_time_delegate)
+    space.install_readwrite_before_time(addrstart, addrend, addrmirror, ws_time_delegate)
+
+    space.install_read_before_delay(addrstart, addrend, addrmirror, ws_delay_delegate)
+    space.install_write_before_delay(addrstart, addrend, addrmirror, ws_delay_delegate)
+    space.install_readwrite_before_delay(addrstart, addrend, addrmirror, ws_delay_delegate)
+
+    space.install_read_after_delay(addrstart, addrend, addrmirror, ws_delay_delegate)
+    space.install_write_after_delay(addrstart, addrend, addrmirror, ws_delay_delegate)
+    space.install_readwrite_after_delay(addrstart, addrend, addrmirror, ws_delay_delegate)
+
+Install a contention handler in the decode path.  The addrmirror
+parameter is optional.
+
+
+5.10 View installation
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: C++
 
@@ -820,3 +930,35 @@ by indexing to call a dynamic mapping method on it.
 
 A view can be installed into a variant of another view without issues,
 with only the usual constraint of single installation.
+
+5.11 Taps
+~~~~~~~~~
+
+.. code-block:: C++
+
+    using tap = std::function<void (offs_t offset, uNN &data, uNN mem_mask)
+
+    memory_passthrough_handler mph = space.install_read_tap(addrstart, addrend, name, read_tap, &mph);
+    memory_passthrough_handler mph = space.install_write_tap(addrstart, addrend, name, write_tap, &mph);
+    memory_passthrough_handler mph = space.install_readwrite_tap(addrstart, addrend, name, read_tap, write_tap, &mph);
+
+    mph.remove();
+
+A tap is a method that is be called when a specific range of addresses
+is accessed without overriding the actual access.  Taps can change the
+data passed around.  A write tap happens before the access, and can
+change the value to be written.  A read tap happens after the access,
+and can change the value returned.
+
+Taps must be of the same width and alignement than the bus.  Multiple
+taps can act over the same addresses.
+
+The ``memory_passthrough_handler`` object collates a number of taps
+and allow to remove them all in one call.  The ``mph`` parameter is
+optional and a new one will be created if absent.
+
+Taps are lost when a new handler is installed at the same addresses
+(under the usual principle of last one wins).  If they need to be
+preserved, one should install a change notifier on the address space,
+and remove + reinstall the taps when notified.
+

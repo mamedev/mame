@@ -958,12 +958,12 @@ void menu_select_launch::rotate_focus(int dir)
 	case focused_menu::MAIN:
 		if (selected_index() >= m_available_items)
 		{
-			if ((0 > dir) || (m_panels_status == HIDE_BOTH))
+			if ((m_panels_status == HIDE_BOTH) || ((0 > dir) && m_available_items))
 				select_prev();
-			else if (m_panels_status == HIDE_LEFT_PANEL)
-				set_focus(focused_menu::RIGHTTOP);
+			else if (0 > dir)
+				set_focus((m_panels_status == HIDE_RIGHT_PANEL) ? focused_menu::LEFT : focused_menu::RIGHTBOTTOM);
 			else
-				set_focus(focused_menu::LEFT);
+				set_focus((m_panels_status == HIDE_LEFT_PANEL) ? focused_menu::RIGHTTOP : focused_menu::LEFT);
 		}
 		else if (m_skip_main_items || (m_panels_status != HIDE_BOTH))
 		{

@@ -1639,6 +1639,7 @@ atetrisb3                       // (bootleg)
 atetrisb4                       // (bootleg)
 atetrisb5                       // (bootleg)
 atetb3482                       // (bootleg, with UM3482)
+atetb5205                       // (bootleg, with OKI M5205)
 atetrisbp                       //
 atetrisc                        // 136066           (c) 1989
 atetrisc2                       // 136066           (c) 1989
@@ -15854,7 +15855,7 @@ buraiken                        // 2/1987 (c) 1987 (Japan)
 buraikenb                       // 2/1987 (c) 1987 (Japan)
 fball                           //
 lwings                          // 11/1986 (c) 1986
-lwings2                         // 11/1986 (c) 1986
+lwingsa                         // 11/1986 (c) 1986
 lwingsb                         // 11/1986 (c) 1986 (bootleg)
 lwingsj                         // 11/1986 (c) 1986
 lwingsja                        // 11/1986 (c) 1986
@@ -15867,6 +15868,7 @@ trojanj                         // 4/1986 (c) 1986 (Japan)
 trojanjo                        // 4/1986 (c) 1986 (Japan)
 trojanlt                        // location test
 trojanr                         // 4/1986 (c) 1986 + Romstar
+trojanra                        // 4/1986 (c) 1986 + Romstar
 
 @source:capcom/mitchell.cpp
 7toitsu                         // (c) 1988 Yuga
@@ -16010,6 +16012,7 @@ sz1                             // 1985 Casio
 fp200                           //
 
 @source:casio/fp1100.cpp
+fp1000                          //
 fp1100                          //
 
 @source:casio/fp6000.cpp
@@ -16953,6 +16956,7 @@ wexpressb3                      // bootleg
 @source:dataeast/ffantasy_ms.cpp
 drgninjam                       //
 ffantasym                       //
+secretagm                       //
 
 @source:dataeast/firetrap.cpp
 firetrap                        // (c) 1986 Data East USA (US)
@@ -18491,7 +18495,7 @@ blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
 bmxstunts                       // (c) 1985 Jetsoft
 bomber                          //
 bongo                           // (c) 1983 Jetsoft
-bongoa                          // (c) 1983 Jetsoft
+bongog                          // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago
 catacomb                        // 1982 MTM Games
 checkman                        // (c) 1982 Zilec-Zenitone
@@ -18573,6 +18577,7 @@ guttangts3                      //
 highroll                        //
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
+jumpbugbrf                      // bootleg
 jungsub                         // bootleg
 kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
 kamikazesp                      // bootleg (Euromatic S.A.)
@@ -18776,6 +18781,7 @@ scramblb                        // bootleg
 scrambleo                       // bootleg
 scrambler                       // bootleg
 spcwarp                         // 1983 Century Electronics UK LTD
+superbikg                       // bootleg
 tazzmang                        // bootleg
 tazzmang2                       // bootleg
 trvchlng                        // [1985] Joyland (Senko license)
@@ -18791,6 +18797,7 @@ hustlerb2                       // bootleg
 hustlerb4                       // bootleg
 hustlerb5                       // bootleg
 hustlerb6                       // bootleg
+hustlerb7                       // bootleg
 hustlerd                        // GX343 (c) 1981 Konami + Dynamo Games license
 mimonkeyug                      // (c) 1983 bootleg
 minefld                         // (c) 1983 Stern
@@ -31545,21 +31552,6 @@ rcorsair                        // (c) 1984 Nakasawa
 bs94                            // (c) 1994 Entretenimientos GEMINIS
 re900                           // (c) 1993 Entretenimientos GEMINIS
 
-@source:misc/rf51w14cg.cpp
-rf51w14cg                       // (c) 2003 Recreativos Franco
-
-@source:misc/rfslots8085.cpp
-bbombo                          // (c) 198? Recreativos Franco
-bformula2                       // (c) 1988 Recreativos Franco
-
-@source:misc/rfslotsmcs48.cpp
-ajofrin                         // (c) 1981 Recreativos Franco
-babyfrts                        // (c) 198? Recreativos Franco
-babyfrts25                      // (c) 198? recreativos Franco
-
-@source:misc/rfslotspcpent.cpp
-rfsantafeg                      // (c) 2014 Recreativos Franco
-
 @source:misc/rgum.cpp
 rgum                            //
 
@@ -33310,7 +33302,7 @@ sweetlnd                        //
 
 @source:namco/sweetland4.cpp
 sweetld4                        //
-tairyouda                       // (c) 2000 Namco
+tairyodk                        // (c) 2000 Namco
 
 @source:namco/tankbatt.cpp
 tankbatt                        // (c) 1980 Namco
@@ -34903,6 +34895,9 @@ mm1m6                           //
 mm1m6g                          //
 mm1m7                           //
 mm1m7g                          //
+
+@source:nokia/mikromikko2.cpp
+mm2m35d                         //
 
 @source:nokia/nokia_3310.cpp
 noki3210                        //
@@ -36761,6 +36756,7 @@ brvteam                         //
 canasta                         //
 corsario                        //
 ind250cc                        //
+indunkgam                       //
 lapbylap                        //
 larana                          //
 mundial                         //
@@ -38471,6 +38467,24 @@ visicom                         //
 @source:rca/vip.cpp
 vip                             // 1977 Cosmac VIP VP-711
 vp111                           // 1977 Cosmac VIP VP-111
+
+@source:recfranco/rf51w14cg.cpp
+rf51w14cg                       // (c) 2003 Recreativos Franco
+
+@source:recfranco/rfjailbrk.cpp
+rfjailbrk                       // (c) 2000 Recreativos Franco
+
+@source:recfranco/rfslots8085.cpp
+bbombo                          // (c) 198? Recreativos Franco
+bformula2                       // (c) 1988 Recreativos Franco
+
+@source:recfranco/rfslotsmcs48.cpp
+ajofrin                         // (c) 1981 Recreativos Franco
+babyfrts                        // (c) 198? Recreativos Franco
+babyfrts25                      // (c) 198? recreativos Franco
+
+@source:recfranco/rfslotspcpent.cpp
+rfsantafeg                      // (c) 2014 Recreativos Franco
 
 @source:regnecentralen/rc702.cpp
 rc702                           // 1979 RC702
@@ -41725,6 +41739,10 @@ cp1                             //
 @source:skeleton/ct909e_segadvd.cpp
 megatrix
 
+@source:skeleton/cubieboard4.cpp
+cubieboard4                     //
+monkeyjmp                       // (c) 20?? Falgas
+
 @source:skeleton/cxhumax.cpp
 hxhdci2k                        //
 
@@ -42495,6 +42513,9 @@ uvw1800                         // 199? Sony Betacam-SP UVW-1800
 @source:sony/bvm.cpp
 bvm20f1e                        //
 
+@source:sony/clie_db.cpp
+t650c                           //
+
 @source:sony/dfs500.cpp
 dfs500                          // 1994 Sony DFS-500 Video Mixer
 
@@ -42738,6 +42759,7 @@ lastfght                        // (c) 2000 Subsino
 crsbingo                        // (c) 1991 Subsino
 dinofmly                        // (c) 1994 Subsino
 dinofmlya                       // (c) 1995 Subsino (Tangasoft license or hack?)
+luckyseven                      // bootleg
 mtrainnv                        // (c) 1996 Subsino
 ndongmul                        // (c) 1998 Hyoja Game
 newhunter                       // (c) 1992 Karam
@@ -44010,6 +44032,9 @@ speedspn                        // (c) 1994
 topdrive                        // (c) 1995
 
 @source:tch/wheelfir.cpp
+kongball						// (c) 199? TCH
+pwball							// (c) 199? TCH
+radendur						// (c) 199? TCH
 wheelfir                        // (c) 199? TCH
 
 @source:teamconcepts/comquest.cpp
@@ -46290,6 +46315,10 @@ mu128
 mu500
 mu1000
 mu2000
+
+@source:yamaha/ymqs300.cpp
+qs300
+eosb900
 
 @source:yamaha/ympcs30.cpp
 pcs30                           // 1984

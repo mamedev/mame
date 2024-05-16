@@ -43,18 +43,18 @@ protected:
 	// construction/destruction
 	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
@@ -62,7 +62,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// inline data
@@ -75,12 +75,12 @@ private:
 	{
 		bool s1, s0, c, z, ov1, ov0;
 
-		inline operator unsigned() const
+		operator unsigned() const
 		{
-			return (s1 << 5) + (s0 << 4) + (c << 3) + (z << 2) + (ov1 << 1) + (ov0 << 0);
+			return (s1 << 5) | (s0 << 4) | (c << 3) | (z << 2) | (ov1 << 1) | (ov0 << 0);
 		}
 
-		inline unsigned operator=(unsigned d)
+		unsigned operator=(unsigned d)
 		{
 			s1 = d & 0x20; s0 = d & 0x10; c = d & 0x08; z = d & 0x04; ov1 = d & 0x02; ov0 = d & 0x01;
 			return d;
@@ -91,14 +91,14 @@ private:
 	{
 		bool rqm, usf1, usf0, drs, dma, drc, soc, sic, ei, p1, p0;
 
-		inline operator unsigned() const
+		operator unsigned() const
 		{
-			return (rqm << 15) + (usf1 << 14) + (usf0 << 13) + (drs << 12)
-				+ (dma << 11) + (drc  << 10) + (soc  <<  9) + (sic <<  8)
-				+ (ei  <<  7) + (p1   <<  1) + (p0   <<  0);
+			return (rqm << 15) | (usf1 << 14) | (usf0 << 13) | (drs << 12)
+				| (dma << 11) | (drc  << 10) | (soc  <<  9) | (sic <<  8)
+				| (ei  <<  7) | (p1   <<  1) | (p0   <<  0);
 		}
 
-		inline unsigned operator=(unsigned d)
+		unsigned operator=(unsigned d)
 		{
 			rqm = d & 0x8000; usf1 = d & 0x4000; usf0 = d & 0x2000; drs = d & 0x1000;
 			dma = d & 0x0800; drc  = d & 0x0400; soc  = d & 0x0200; sic = d & 0x0100;
@@ -175,8 +175,8 @@ public:
 	// construction/destruction
 	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint16_t dataram_r(uint16_t addr) { return dataRAM[addr]; }
-	void dataram_w(uint16_t addr, uint16_t data) { dataRAM[addr] = data; }
+	uint16_t dataram_r(uint16_t addr) { return dataRAM[addr & 0x07ff]; }
+	void dataram_w(uint16_t addr, uint16_t data) { dataRAM[addr & 0x07ff] = data; }
 };
 
 // device type definition

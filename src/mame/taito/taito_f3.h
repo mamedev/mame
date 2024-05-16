@@ -242,10 +242,10 @@ protected:
 	};
 
 	struct mix_pix { // per-pixel information for the blending circuit
-		u16 src_pal{0};
-		u16 dst_pal{0};
-		u8  src_blend{0x00};
-		u8  dst_blend{0xff};
+		u16 src_pal[H_TOTAL];
+		u16 dst_pal[H_TOTAL];
+		u8  src_blend[H_TOTAL];
+		u8  dst_blend[H_TOTAL];
 	};
 
 	struct f3_line_inf;
@@ -255,16 +255,17 @@ protected:
 		bool x_sample_enable{false};
 		u16 mix_value{0};
 		u8 prio{0};
+		u8 blend_mode;
 
-		u8 debug_index{0};
+		u8 index{0};
 
-		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; }
-		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; }
+		void set_mix(u16 v) { mix_value = v; prio = v & 0xf; blend_mode = BIT(mix_value, 14, 2); };
+		void set_prio(u8 p) { mix_value = (mix_value & 0xfff0) | p; prio = p; };
+		void set_blend(u8 b) { mix_value = (mix_value & 0x3fff) | (b << 14); blend_mode = b; };
 		auto clip_inv() const { return std::bitset<4>(mix_value >> 4); }
 		auto clip_enable() const { return std::bitset<4>(mix_value >> 8); }
 		bool clip_inv_mode() const { return mix_value & 0x1000; }
 		bool layer_enable() const;
-		u8 blend_mask() const { return BIT(mix_value, 14, 2); }
 		bool blend_a() const { return mix_value & 0x4000; }
 		bool blend_b() const { return mix_value & 0x8000; }
 
@@ -275,8 +276,8 @@ protected:
 		int y_index(int y) const;
 		int x_index(int x) const;
 		bool blend_select(const u8 *line_flags, int x) const { return false; }
+		bool inactive_group(u16 color) const { return false; }
 
-		bool used(int y) const { return true; }
 		static const char *debug_name() { return "MX"; }
 	};
 
@@ -290,8 +291,8 @@ protected:
 
 		bool blend_select(const u8 *line_flags, int x) const { return blend_select_v; }
 		bool layer_enable() const;
+		bool inactive_group(u16 color) const { return BIT(color, 10, 2) != index; }
 
-		bool used(int y) const { return BIT((*sprite_pri_usage)[y], debug_index); }
 		static const char *debug_name() { return "SP"; };
 	};
 
@@ -337,16 +338,16 @@ protected:
 	};
 
 	struct pri_mode {
-		u8 src_prio{0};
-		u8 dst_prio{0};
-		u8 src_blendmode{0xff};
-		u8 dst_blendmode{0xff};
+		u8 src_prio[H_TOTAL]{};
+		u8 dst_prio[H_TOTAL]{};
+		u8 src_blendmode[H_TOTAL]{};
+		u8 dst_blendmode[H_TOTAL]{};
 	};
 
 	struct f3_line_inf {
 		int y{0};
 		int screen_y{0};
-		pri_mode pri_alp[432]{};
+		pri_mode pri_alp{};
 		// 5000/4000
 		clip_plane_inf clip[NUM_CLIPPLANES];
 		// 6000 - pivot_control, sprite alpha
@@ -376,16 +377,18 @@ protected:
 	bool m_sprite_trails = false;
 	u16 *m_pf_data[8]{};
 	int m_sprite_lag = 0;
+	u8 m_textram_row_usage[64]{};
 	u8 m_sprite_pri_row_usage[256]{};
+	u8 m_tilemap_row_usage[32][8]{};
 	bitmap_ind8 m_pri_alp_bitmap;
-	bitmap_ind16 m_sprite_framebuffers[NUM_SPRITEGROUPS]{};
+	bitmap_ind16 m_sprite_framebuffer{};
 	u16 m_width_mask = 0;
 	u8 m_twidth_mask = 0;
 	u8 m_twidth_mask_bit = 0;
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
 	bool m_sprite_bank = 0;
-	//f3_line_inf m_line_inf;
+	//f3_line_inf m_line_data{};
 	const F3config *m_game_config = nullptr;
 
 	u16 spriteram_r(offs_t offset);
@@ -421,12 +424,15 @@ protected:
 	void draw_sprites(const rectangle &cliprect);
 	void get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy);
 	void read_line_ram(f3_line_inf &line, int y);
-	void render_line(pen_t *dst, const mix_pix (&z)[432]);
+	void render_line(pen_t *dst, const mix_pix &z);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template<typename Mix>
-	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix line);
+	std::vector<clip_plane_inf> calc_clip(const clip_plane_inf (&clip)[NUM_CLIPPLANES], const Mix &layer);
+	inline bool used(const pivot_inf &layer, int y) const;
+	inline bool used(const sprite_inf &layer, int y) const;
+	inline bool used(const playfield_inf &layer, int y) const;
 	template<typename Mix>
-	bool mix_line(Mix &gfx, mix_pix *z, pri_mode *pri, const f3_line_inf &line, const clip_plane_inf &range);
+	bool mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f3_line_inf &line, const clip_plane_inf &range);
 
 private:
 	optional_device<taito_en_device> m_taito_en;

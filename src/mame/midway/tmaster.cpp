@@ -90,6 +90,9 @@ Chips:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "microtouchlayout.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/ds1204.h"
 #include "machine/mc68681.h"
@@ -99,6 +102,7 @@ Chips:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -410,11 +414,14 @@ void tmaster_state::tm(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, m_oki, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* 1.5Mhz? clock frequency & pin 7 not verified */
+
+	config.set_default_layout(layout_microtouch);
 }
 
 void tmaster_state::tmds1204(machine_config &config)
 {
 	tm(config);
+
 	DS1204(config, "ds1204", 0);
 }
 

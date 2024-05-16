@@ -11377,8 +11377,280 @@ license:CC0-1.0
 
 	<!-- Unlicensed 3rd party -->
 
-	<!-- the exact same roms were put on bootleg MVS carts, despite having no MVS mode in the code and running as an AES game with menu and no coins required -->
+	<software name="etyphoon">
+		<description>The Eye of Typhoon (Tsunami Edition, beta 7)</description>
+		<year>2022</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="ver Jul 31 2022" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="teot-p1.bin" offset="0x000000" size="0x100000" crc="c0ae0a56" sha1="d5817755641c5b105c1191b3a1f0dbca64060878" />
+				<rom loadflag="load16_word_swap" name="teot-p2.bin" offset="0x100000" size="0x800000" crc="68dc7463" sha1="e304187c3343d6a3f4dcad05ab68a1e73434079c" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="teot-s1.bin" offset="0x000000" size="0x20000" crc="6d05f74b" sha1="1643bcf32249d3d90c230ccac09c8026dbd62960" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x10000">
+				<rom name="teot-m1.bin" offset="0x000000" size="0x10000" crc="0c17ccac" sha1="39b33f6e6dc96012161cdb452a162495355dd73c" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="teot-v1.bin" offset="0x000000" size="0x800000" crc="d2911e9c" sha1="ca53ebda1ae2a339dfceda509c334bc4be24d7a2" />
+				<rom name="teot-v2.bin" offset="0x800000" size="0x800000" crc="49e3afe6" sha1="0c37f171035baa4392b28df5de3261f084727a47" />
+			</dataarea>
+			<dataarea name="sprites" size="33554432">
+				<rom loadflag="load16_byte" name="teot-c1.bin" offset="0x0000000" size="0x1000000" crc="2fdbfbef" sha1="3bc2f207538893f71a7f14800dc9f11f1788c5bf" />
+				<rom loadflag="load16_byte" name="teot-c2.bin" offset="0x0000001" size="0x1000000" crc="4b953a79" sha1="4851352e7f499f3cef20415072a0df7dc0c53bed" />
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="etyphoon_b6" cloneof="etyphoon">
+		<description>The Eye of Typhoon (Tsunami Edition, beta 6)</description>
+		<year>2022</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="ver Jul 6 2022" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="9437184">
+				<rom loadflag="load16_word_swap" name="teot-b6-p1.bin" offset="0x000000" size="1048576" crc="49b25c64" sha1="91d2d27952818c40ad288af90df606a75ca7f824" />
+				<rom loadflag="load16_word_swap" name="teot-p2.bin" offset="0x100000" size="0x800000" crc="68dc7463" sha1="e304187c3343d6a3f4dcad05ab68a1e73434079c" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="teot-s1.bin" offset="0x000000" size="0x20000" crc="6d05f74b" sha1="1643bcf32249d3d90c230ccac09c8026dbd62960" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x10000">
+				<rom name="teot-b6-m1.bin" offset="0x000000" size="0x10000" crc="16f81e41" sha1="25a8f098254e3addc2040111c7c388e2285da445" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="teot-v1.bin" offset="0x000000" size="0x800000" crc="d2911e9c" sha1="ca53ebda1ae2a339dfceda509c334bc4be24d7a2" />
+				<rom name="teot-v2.bin" offset="0x800000" size="0x800000" crc="49e3afe6" sha1="0c37f171035baa4392b28df5de3261f084727a47" />
+			</dataarea>
+			<dataarea name="sprites" size="33554432">
+				<rom loadflag="load16_byte" name="teot-c1.bin" offset="0x0000000" size="0x1000000" crc="2fdbfbef" sha1="3bc2f207538893f71a7f14800dc9f11f1788c5bf" />
+				<rom loadflag="load16_byte" name="teot-c2.bin" offset="0x0000001" size="0x1000000" crc="4b953a79" sha1="4851352e7f499f3cef20415072a0df7dc0c53bed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etyphoon_b5" cloneof="etyphoon">
+		<description>The Eye of Typhoon (Tsunami Edition, beta 5)</description>
+		<year>2022</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="ver May 7 2022" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="9437184">
+				<rom loadflag="load16_word_swap" name="teot-b5-p1.bin" offset="0x000000" size="1048576" crc="fdb9a8d4" sha1="7e0d43ebe7b3841948a0de311b521b3eaa1c91d7" />
+				<rom loadflag="load16_word_swap" name="teot-b5-p2.bin" offset="0x100000" size="0x800000" crc="02dd52ed" sha1="71a310cf48fe719726f60aa11e87e11bb217ac5c" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="teot-s1.bin" offset="0x000000" size="0x20000" crc="6d05f74b" sha1="1643bcf32249d3d90c230ccac09c8026dbd62960" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x10000">
+				<rom name="teot-b5-m1.bin" offset="0x000000" size="0x10000" crc="16f81e41" sha1="25a8f098254e3addc2040111c7c388e2285da445" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="teot-v1.bin" offset="0x000000" size="0x800000" crc="d2911e9c" sha1="ca53ebda1ae2a339dfceda509c334bc4be24d7a2" />
+				<rom name="teot-v2.bin" offset="0x800000" size="0x800000" crc="49e3afe6" sha1="0c37f171035baa4392b28df5de3261f084727a47" />
+			</dataarea>
+			<dataarea name="sprites" size="33554432">
+				<rom loadflag="load16_byte" name="teot-b5-c1.bin" offset="0x0000000" size="0x1000000" crc="66f0afa6" sha1="3ee249703bf4710d4ae7ac6b9928f81dcb679654" />
+				<rom loadflag="load16_byte" name="teot-b5-c2.bin" offset="0x0000001" size="0x1000000" crc="e773037f" sha1="ac3d07091fc8f25f01b9f21f5a0abff750af8208" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etyphoon_b4" cloneof="etyphoon">
+		<description>The Eye of Typhoon (Tsunami Edition, beta 4)</description>
+		<year>2022</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="ver Mar 12 2022" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="9437184">
+				<rom loadflag="load16_word_swap" name="teot-b4-p1.bin" offset="0x000000" size="1048576" crc="2af068c0" sha1="82f5885fbfdef47c0e9416cf9bd9accf8e5a739d" />
+				<rom loadflag="load16_word_swap" name="teot-b4-p2.bin" offset="0x100000" size="0x800000" crc="3ddc321d" sha1="496573202a417d40894f69c2044ef408d3a0f01b" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="teot-b4-s1.bin" offset="0x000000" size="0x20000" crc="52895190" sha1="d11385c51591b685c533a9f27c4fd3aa62927bef" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x10000">
+				<rom name="teot-b4-m1.bin" offset="0x000000" size="0x10000" crc="5edaa24d" sha1="90209de31a87da4118600be64869b36067d76c4b" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="teot-b4-v1.bin" offset="0x000000" size="0x800000" crc="70042574" sha1="368e85d38a94238b61969ee564f94bef143b808d" />
+				<rom name="teot-b4-v2.bin" offset="0x800000" size="0x800000" crc="d84d05b2" sha1="7ad3914b5e95572d3fc9dadc6ad0e23463983118" />
+			</dataarea>
+			<dataarea name="sprites" size="33554432">
+				<rom loadflag="load16_byte" name="teot-b4-c1.bin" offset="0x0000000" size="0x1000000" crc="360e5362" sha1="a86a5eea49218669c5e00a6b286a7d2d6f02ab3c" />
+				<rom loadflag="load16_byte" name="teot-b4-c2.bin" offset="0x0000001" size="0x1000000" crc="1fdff0ce" sha1="4ef77f3e01d58612e9b730426adb81d87ccb5572" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etyphoon_b3" cloneof="etyphoon">
+		<description>The Eye of Typhoon (Tsunami Edition, beta 3)</description>
+		<year>2022</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="ver Jan 29 2022" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="teot-b3-p1.bin" offset="0x000000" size="0x100000" crc="0d5763ae" sha1="53dc53f9945cd7daeb7ab1e121f3aed132c75d0a" />
+				<rom loadflag="load16_word_swap" name="teot-b3-p2.bin" offset="0x100000" size="0x800000" crc="bee21724" sha1="0c37bb950568932493a1806cd1038e5935a5bddf" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="teot-b3-s1.bin" offset="0x000000" size="0x20000" crc="52895190" sha1="d11385c51591b685c533a9f27c4fd3aa62927bef" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x10000">
+				<rom name="teot-b3-m1.bin" offset="0x000000" size="0x10000" crc="583db6a5" sha1="4f6e15a50b2074aa1d2eb5d1b91bead0639be963" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="teot-b3-v1.bin" offset="0x000000" size="0x800000" crc="d88114d4" sha1="981f151c2b7e63e876f350169426759e0e73cdd1" />
+				<rom name="teot-b3-v2.bin" offset="0x800000" size="0x800000" crc="6fccb0d0" sha1="386f7f054d1d988cca904c03ca52023236b22813" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="teot-b3-c1.bin" offset="0x0000000" size="0x1000000" crc="f183c0a2" sha1="d28055f79d56f915a803ab1c1b08f08b3eaaf1fe" />
+				<rom loadflag="load16_byte" name="teot-b3-c2.bin" offset="0x0000001" size="0x1000000" crc="93f47c21" sha1="9bb37e45fac53d6be67f6f6e1c9c662d73f7556e" />
+			</dataarea>	
+		</part>
+	</software>
+
+	<software name="etyphoon_b2" cloneof="etyphoon">
+		<description>The Eye of Typhoon (Tsunami Edition, beta 2)</description>
+		<year>2022</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="ver Jan 21 2022" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="teot-b2-p1.bin" offset="0x000000" size="0x100000" crc="4525725e" sha1="484bf2d7e7128744a315803fd57f0f6e9c8fb4a6" />
+				<rom loadflag="load16_word_swap" name="teot-b2-p2.bin" offset="0x100000" size="0x800000" crc="1c13c469" sha1="1d255a44a3684fb12117781c5d5ba3fb439a60bf" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom name="teot-b2-s1.bin" offset="0x000000" size="0x020000" crc="52895190" sha1="d11385c51591b685c533a9f27c4fd3aa62927bef" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom name="teot-b2-m1.bin" offset="0x000000" size="0x010000" crc="698ee1cf" sha1="3a1bb3a660afb05d9ee321d532190cd39a4ba799" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="teot-b2-v1.bin" offset="0x000000" size="0x800000" crc="5948197c" sha1="2b54eb55cb01e30c4b0d50f5a7d2d99f5185d707" />
+				<rom name="teot-b2-v2.bin" offset="0x800000" size="0x800000" crc="7597aa1b" sha1="bd764c59fd045877874733d2838a9578217e7c30" />
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<rom loadflag="load16_byte" name="teot-b2-c1.bin" offset="0x0000000" size="0x1000000" crc="99fa961d" sha1="783a2f016fbebcfba5c287878a0512c402776234" />
+				<rom loadflag="load16_byte" name="teot-b2-c2.bin" offset="0x0000001" size="0x1000000" crc="66330fd9" sha1="e8e3af7b826703a3e2240ad753b8ff0a51b48750" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etyphoon_b1" cloneof="etyphoon">
+		<description>The Eye of Typhoon (Tsunami Edition, beta 1)</description>
+		<year>2022</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="ver Jan 5 2022" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="202-p1.bin" offset="0x000000" size="0x100000" crc="603fac98" sha1="b5d4caf9162cac28d153fe33169cfc8acb679f84" />
+				<rom loadflag="load16_word_swap" name="202-p2.bin" offset="0x100000" size="0x800000" crc="5f557ad5" sha1="9983d3b913f0d3bb315b696cd77f2ad7d04fbcd3" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="202-s1.bin" offset="0x000000" size="0x20000" crc="aba8f74c" sha1="c8d12f535099ce0232bb637e04ac7b79569e15fe" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x10000">
+				<rom name="202-m1.bin" offset="0x000000" size="0x10000" crc="dc29f33b" sha1="cb1f45e93b19b00b901c5992a2646db652755d6e" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="202-v1.bin" offset="0x000000" size="0x800000" crc="91b3deed" sha1="6408ad38bcbe2712a11e30efecb47b027cabd49a" />
+				<rom name="202-v2.bin" offset="0x800000" size="0x800000" crc="985e6f6b" sha1="b3e92d6ab08ad42347b622dbb72a7589a7dbe885" />
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<rom loadflag="load16_byte" name="202-c1.bin" offset="0x0000000" size="0x1000000" crc="7919ea09" sha1="bb8e058346ebc02b7e20f324411c6455271a837b" />
+				<rom loadflag="load16_byte" name="202-c2.bin" offset="0x0000001" size="0x1000000" crc="62aa59a8" sha1="dc4b7dc87d43b2c61bea799d2de5344d1c1999b9" />
+				<rom loadflag="load16_byte" name="202-c3.bin" offset="0x2000000" size="0x1000000" crc="7919ea09" sha1="bb8e058346ebc02b7e20f324411c6455271a837b" />
+				<rom loadflag="load16_byte" name="202-c4.bin" offset="0x2000001" size="0x1000000" crc="62aa59a8" sha1="dc4b7dc87d43b2c61bea799d2de5344d1c1999b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etyphoon_a" cloneof="etyphoon">
+		<description>The Eye of Typhoon (alpha)</description>
+		<year>2018</year>
+		<publisher>Balek</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="alpha" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="202a-p1.bin" offset="0x000000" size="0x100000" crc="9038ff78" sha1="33f0ce3874e24c366177c89824c4b0cd1d30dfce" />
+				<rom loadflag="load16_word_swap" name="202a-p2.bin" offset="0x100000" size="0x800000" crc="fe363160" sha1="e503dd9cefa2b7d69ea2aaff60c63c00b83c158d" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="202a-s1.bin" offset="0x000000" size="0x20000" crc="a545b593" sha1="09077b63595eebb7dddd55e041e7786164df0ead" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x10000">
+				<rom name="202a-m1.bin" offset="0x000000" size="0x10000" crc="31b05f06" sha1="da1f984af58bcc7d4d496382bcb938fa7aff5ab1" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="202a-v1.bin" offset="0x000000" size="0x800000" crc="299d84cf" sha1="da0bb20b8faeaf0d78f987afc775abaadcc59dfa" />
+				<rom name="202a-v2.bin" offset="0x800000" size="0x800000" crc="aced6c72" sha1="8dc481445dbcc717c6dccb27dff446c5f05080f0" />
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<rom loadflag="load16_byte" name="202a-c1.bin" offset="0x0000000" size="0x1000000" crc="28872e1f" sha1="420d68ed2d417e1edfbd351619ff144fb7eacd9b" />
+				<rom loadflag="load16_byte" name="202a-c2.bin" offset="0x0000001" size="0x1000000" crc="fe31d1fc" sha1="947d4cc47905308d03423640d863e60007b2309a" />
+				<rom loadflag="load16_byte" name="202a-c3.bin" offset="0x2000000" size="0x1000000" crc="28872e1f" sha1="420d68ed2d417e1edfbd351619ff144fb7eacd9b" />
+				<rom loadflag="load16_byte" name="202a-c4.bin" offset="0x2000001" size="0x1000000" crc="fe31d1fc" sha1="947d4cc47905308d03423640d863e60007b2309a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gladmort">
+		<description>Gladmort (demo)</description>
+		<year>2024</year>
+		<publisher>PixelHeart</publisher>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x80000">
+				<rom loadflag="load16_word_swap" name="dod-p1.bin" offset="0x000000" size="0x080000" crc="e0ceafec" sha1="f147fdb7c0fee02e8ae1923bf0ef3aff954588ae" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="dod-s1.bin" crc="8304be52" sha1="fbeaee12553709e54e7f5134dfd2ff96df5fdee0" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="dod-m1.bin" crc="fb945087" sha1="a2bae6907bf02c93068f9ee23409506277c8a027" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="dod-v1.bin" offset="0x000000" size="0x400000" crc="8ab79ed9" sha1="8b1d2ade7494a81b9fa79763aaa54bbf7f4cf394" /> 
+				<rom name="dod-v2.bin" offset="0x400000" size="0x400000" crc="9aae5145" sha1="b218b47eafe8a5d25cbfadbd685de1b291c23af2" /> 
+				<rom name="dod-v3.bin" offset="0x800000" size="0x400000" crc="9ad3e804" sha1="8f309e64b8582aad0f9f3258dee0d96f2c04f7e4" /> 
+				<rom name="dod-v4.bin" offset="0xc00000" size="0x400000" crc="9ad3e804" sha1="8f309e64b8582aad0f9f3258dee0d96f2c04f7e4" /> 
+			</dataarea>
+			<dataarea name="sprites" size="0x2800000">
+				<rom loadflag="load16_byte" name="dod-c1.bin" offset="0x000000" size="0x1400000" crc="050ee046" sha1="ca5a02ba92f7bdbedbb7c0c881eb3cf454140918" />
+				<rom loadflag="load16_byte" name="dod-c2.bin" offset="0x000001" size="0x1400000" crc="eff26754" sha1="d846093dd2c30daeba4e17ac7946155e62ca25a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the exact same roms were put on bootleg MVS carts, despite having no MVS mode in the code and running as an AES game with menu and no coins required -->
 	<software name="lasthope">
 		<description>Last Hope</description>
 		<year>2005</year>
@@ -11526,6 +11798,46 @@ Four player adapter not supported
 				<rom loadflag="load16_byte" name="neotris-c4.bin" offset="0x800001" size="0x400000" crc="9091e795" sha1="59e7a751633ce8f3db138fc818e50003da4582dc" />
 				<rom loadflag="load16_byte" name="neotris-c5.bin" offset="0x1000000" size="0x400000" crc="bf278afe" sha1="e7f84cb325dd4535accd44d84f61c53cb4bab312" />
 				<rom loadflag="load16_byte" name="neotris-c6.bin" offset="0x1000001" size="0x400000" crc="8eb17e24" sha1="7977475bf19073b8bc38fcb88be9226453c7d6e4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nblktiger">
+		<description>NeoBlack Tiger (demo)</description>
+		<year>2020</year>
+		<publisher>OzzyOuzo</publisher>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="202-p1.bin" offset="0x000000" size="0x100000" crc="18f34200" sha1="78b3b9ef20ddf780a81e644d996d56dd5c0e6d10" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="202-s1.bin" offset="0x000000" size="0x20000" crc="a545b593" sha1="09077b63595eebb7dddd55e041e7786164df0ead" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x100000">
+				<rom name="202-m1.bin" offset="0x000000" size="0x100000" crc="2037dc19" sha1="c88588d07fc63aeed828a87f0f633c7badafeb3e" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x900000">
+				<rom name="202-v1.bin" offset="0x000000" size="0x100000" crc="3ac066e1" sha1="cab7f04fbce0db685f5fa0d22923f7b7ca37a804" />
+				<rom name="202-v2.bin" offset="0x100000" size="0x100000" crc="c5a12987" sha1="71236afffdb69aa3ba8ebc345e1e7b1830db437e" />
+				<rom name="202-v3.bin" offset="0x200000" size="0x100000" crc="3c623679" sha1="5fa98eacb612be496aa7937a9678398ba16f2a13" />
+				<rom name="202-v4.bin" offset="0x300000" size="0x100000" crc="fbf00c96" sha1="4083f8efbcf748dba31f0030b82487e0ea56980b" />
+				<rom name="202-v5.bin" offset="0x400000" size="0x100000" crc="9b2031d4" sha1="15c8f5cb26af29b8dca53f1c1c49384a1b73b820" />
+				<rom name="202-v6.bin" offset="0x500000" size="0x100000" crc="107cfc89" sha1="c4ced7dfab24ff42c6fc2424b18cf199ba30cbfa" />
+				<rom name="202-v7.bin" offset="0x600000" size="0x100000" crc="0703b761" sha1="7d586b69bb9578d550871eda884cd6b32d86a01f" />
+				<rom name="202-v8.bin" offset="0x700000" size="0x100000" crc="8d525588" sha1="297871c1e8888d9adab3781fb6c2c27ecf50ca45" />
+				<rom name="202-v9.bin" offset="0x800000" size="0x100000" crc="97f073b6" sha1="02a4cce3f0cdb9421350ee5af49af13d7dcd16c2" />
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<rom loadflag="load16_byte" name="202-c1.bin" offset="0x0000000" size="0x800000" crc="aa469494" sha1="fd98b7445c85174ccb745c74cb9e852b08353324" />
+				<rom loadflag="load16_byte" name="202-c2.bin" offset="0x0000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
+				<rom loadflag="load16_byte" name="202-c3.bin" offset="0x1000000" size="0x800000" crc="aa469494" sha1="fd98b7445c85174ccb745c74cb9e852b08353324" />
+				<rom loadflag="load16_byte" name="202-c4.bin" offset="0x1000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
+				<rom loadflag="load16_byte" name="202-c5.bin" offset="0x2000000" size="0x800000" crc="aa469494" sha1="fd98b7445c85174ccb745c74cb9e852b08353324" />
+				<rom loadflag="load16_byte" name="202-c6.bin" offset="0x2000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
+				<rom loadflag="load16_byte" name="202-c7.bin" offset="0x3000000" size="0x800000" crc="aa469494" sha1="fd98b7445c85174ccb745c74cb9e852b08353324" />
+				<rom loadflag="load16_byte" name="202-c8.bin" offset="0x3000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
 			</dataarea>
 		</part>
 	</software>

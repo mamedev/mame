@@ -4199,6 +4199,37 @@ ROM_START( sevenlnd )
 	ROM_LOAD( "palce20v8h.bin", 0x000, 0x157, NO_DUMP )
 ROM_END
 
+/* Lucky Seven. String "KAM 1.2" on program ROM.
+   Same PCB as "sevenlnd", but with a PAL soldered to SW0 dip switches bank (this socket is empty on "sevenlnd").
+   Bad graphics on title screen, but happens also on real hardware. Mismatched program and tile ROMs,
+   a poor effort at a hack, or a buggy development version?
+   There's a gray stripe on the title screen that isn't present on the real hardware.
+   Recording from real hardware: https://youtu.be/By7Xi5jf2Qc
+*/
+ROM_START( luckyseven )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m27c512.u12",         0x00000, 0x10000, CRC(7abaca14) SHA1(48e4eb4ef7df09f29a382167291ee6385279d1f5) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "m27c2001.u30",        0x00000, 0x40000, CRC(7fe8562c) SHA1(dec6d1bf4026a0cc5afb34838a5a5d7e480d2e9d) )
+	ROM_LOAD( "tms27c020.u29",       0x40000, 0x40000, CRC(61208b5b) SHA1(148c1e639245169b7ebfd0f2b75de4f179cdfc54) )
+	ROM_LOAD( "m27c2001.u28",        0x80000, 0x40000, CRC(0eef9939) SHA1(50268863df7602fe5264867eb9b65f00e78f424a) )
+	ROM_LOAD( "am27c020.u27",        0xc0000, 0x40000, CRC(1502d4c7) SHA1(a5b7897004d70aa1b69a547e8c6a1756bd83ccb6) )
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "tms27c010a.u25",      0x00000, 0x20000, CRC(4f28aeb0) SHA1(686d003d674186d95eeda8139d89f2a39a703b41) )
+	ROM_LOAD( "am27c010.u24",        0x20000, 0x20000, CRC(4f28aeb0) SHA1(686d003d674186d95eeda8139d89f2a39a703b41) ) // Same content as U25
+	ROM_LOAD( "m27c1001.u23",        0x40000, 0x20000, CRC(fdea6687) SHA1(7d352b1675380a8bb61af2a73ac3b85ce5ac433c) )
+	ROM_LOAD( "am27c010.u22",        0x60000, 0x20000, CRC(c8b90af5) SHA1(ff1bf2c6d2b8d0f2926127bc74bc4488c7771cdd) )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "palce16v8h-25.u1",    0x00000, 0x00117, CRC(57e44e7e) SHA1(ca92a40f2781ac11ffcfd9a7ef1e852b719fe35c) )
+	ROM_LOAD( "palce16v8h-25.u2",    0x00000, 0x00117, CRC(8272668f) SHA1(9037f0d9c7625d05d2087e6f2d159dece934a945) )
+	ROM_LOAD( "palce16v8h-25.u18",   0x00000, 0x00117, CRC(d88c5718) SHA1(80914932b3fd5b200ffb5fb8ac30b8636cfa72de) )
+	ROM_LOAD( "palce16v8h-25.u43",   0x00000, 0x00117, CRC(cca094fd) SHA1(9c6b10e0c831b7ab5fd0c91bd357be38bc3df020) )
+	ROM_LOAD( "palce20v8h-25pc.u55", 0x00000, 0x00157, CRC(c6c6fa81) SHA1(05fbd86db3624f67f766817d18f8b7d386d67b74) )
+	ROM_LOAD( "palce16v8h-25.sw0",   0x00000, 0x00117, CRC(92bb58d6) SHA1(73e0626354738f74d1624d5a430a00b3e6e227d7) ) // Soldered to dip switches bank SW0
+ROM_END
 
 ROM_START( dinofmly ) // very similar PCB to the smoto set, but instead of 3 PROMs it has a RAMDAC.
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4440,6 +4471,7 @@ GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tes
 GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
 GAMEL( 1995, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, luckyseven,  stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Lucky Seven",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?

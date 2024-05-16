@@ -89,6 +89,22 @@
 #include "emu.h"
 #include "seta2.h"
 
+#define LOG_VREG    (1U << 1)
+#define LOG_VIDEO   (1U << 2)
+#define LOG_SPRITE  (1U << 3)
+#define LOG_OFFSET  (1U << 4)
+
+#define LOG_ALL     (LOG_IO)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGVREG(...)   LOGMASKED(LOG_VREG, __VA_ARGS__)
+#define LOGVIDEO(...)  LOGMASKED(LOG_VIDEO, __VA_ARGS__)
+#define LOGSPRITE(...) LOGMASKED(LOG_SPRITE, __VA_ARGS__)
+#define LOGOFFSET(...) LOGMASKED(LOG_OFFSET, __VA_ARGS__)
+
+
 /***************************************************************************
 
                                 Video Registers
@@ -170,35 +186,34 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	           grdians =  019a
 	*/
 
-	uint16_t olddata = m_vregs[offset];
+	const uint16_t olddata = m_vregs[offset];
 
 	COMBINE_DATA(&m_vregs[offset]);
 
-
 	if (m_vregs[offset] != olddata)
-		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
+		LOGVREG("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
 
 	switch (offset * 2)
 	{
 	case 0x1a:
-		logerror("%s: Register 1a write (vertical offset?) %04X (%04x)\n", machine().describe_context(), data, mem_mask);
+		LOGVREG("%s: Register 1a write (vertical offset?) %04X (%04x)\n", machine().describe_context(), data, mem_mask);
 		break;
 
 	case 0x1c:  // FLIP SCREEN (myangel)    <- this is actually zoom
-		flip_screen_set(data & 1);
-		if (data & ~1)  logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n", m_maincpu->pc(), data);
+		flip_screen_set(BIT(data, 0));
+		if (data & ~1)  LOGVREG("CPU #0 PC %06X: flip screen unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 	case 0x2a:  // FLIP X (pzlbowl)
-		flip_screen_x_set(data & 1);
-		if (data & ~1)  logerror("CPU #0 PC %06X: flipx unknown bits %04X\n", m_maincpu->pc(), data);
+		flip_screen_x_set(BIT(data, 0));
+		if (data & ~1)  LOGVREG("CPU #0 PC %06X: flipx unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 	case 0x2c:  // FLIP Y (pzlbowl)
-		flip_screen_y_set(data & 1);
-		if (data & ~1)  logerror("CPU #0 PC %06X: flipy unknown bits %04X\n", m_maincpu->pc(), data);
+		flip_screen_y_set(BIT(data, 0));
+		if (data & ~1)  LOGVREG("CPU #0 PC %06X: flipy unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 
 	case 0x30:  // BLANK SCREEN (pzlbowl, myangel)
-		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n", m_maincpu->pc(), data);
+		if (data & ~1)  LOGVREG("CPU #0 PC %06X: blank unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 
 	case 0x24: // funcube3 and staraudi write here instead, why? mirror or different meaning?
@@ -218,12 +233,12 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_private_spriteram[i + 1] = m_spriteram[(0x3000 / 2) + i + 1];
 				m_private_spriteram[i + 2] = m_spriteram[(0x3000 / 2) + i + 2];
 
-				int sprite = m_spriteram[(0x3000 / 2) + i + 3];
+				const int sprite = m_spriteram[(0x3000 / 2) + i + 3];
 				m_private_spriteram[i + 3] = ((current_sprite_entry / 4) & 0x7fff) | (sprite & 0x8000);
 
-				int list2addr = (sprite & 0x7fff) * 4;
+				const int list2addr = (sprite & 0x7fff) * 4;
 
-				num &=0xff;
+				num &= 0xff;
 
 				for (int j = 0; j <= num; j++)
 				{
@@ -237,14 +252,12 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					}
 				}
 
-				if (m_private_spriteram[i + 0] & 0x8000) // end of list marker, mj4simai must draw the sprite this covers for the company logo, title screen etc.
+				if (BIT(m_private_spriteram[i + 0], 15)) // end of list marker, mj4simai must draw the sprite this covers for the company logo, title screen etc.
 				{
 					// HACK: however penbros has a dummy sprite entry there which points to 0x0000 as the tile source, and causes garbage with the rearranged format,
 					// so change it to something that's invalid where we can filter it later.  This strongly indicates that the current approach is incorrect however.
 					if (sprite == 0x00)
-					{
 						m_private_spriteram[i + 3] |= 0x4000;
-					}
 
 					break;
 				}
@@ -254,24 +267,24 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 
 	case 0x3c: // Raster IRQ related
-		//logerror("%s: Register 3c write (raster enable?) current vpos is %d  :   %04X (%04x)\n",machine().describe_context(),m_screen->vpos(), data, mem_mask);
+		//LOGVREG("%s: Register 3c write (raster enable?) current vpos is %d  :   %04X (%04x)\n",machine().describe_context(),m_screen->vpos(), data, mem_mask);
 		COMBINE_DATA(&m_rasterenabled);
 
-		//if (m_rasterenabled & 1)
+		//if (BIT(m_rasterenabled, 0))
 		{
 			int hpos = 0;
-			int vpos = m_rasterposition;
+			const int vpos = m_rasterposition;
 
 			// in the vblank it specifies line 0, the first raster interrupt then specifies line 0 again before the subsequent ones use the real line numbers?
 			// It seems more likely that the raster IRQ stays asserted for the entire line, thus triggering a second interrupt unless the line number is changed?
 			if (m_rasterposition == m_screen->vpos()) hpos = m_screen->hpos() + 0x100;
-			//logerror("setting raster to %d %d\n", vpos, hpos);
+			//LOGVREG("setting raster to %d %d\n", vpos, hpos);
 			m_raster_timer->adjust(m_screen->time_until_pos(vpos, hpos), 0);
 		}
 		break;
 
 	case 0x3e: // Raster IRQ related
-		//logerror("%s: Register 3e write (raster position?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
+		//LOGVREG("%s: Register 3e write (raster position?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
 		COMBINE_DATA(&m_rasterposition);
 		break;
 	}
@@ -295,7 +308,20 @@ void seta2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int use_shadow, int screenline, int line, int opaque)
+inline void seta2_state::drawgfx_line(
+		bitmap_ind16 &bitmap,
+		const rectangle &cliprect,
+		int which_gfx,
+		uint8_t const *const addr,
+		uint32_t realcolor,
+		bool flipx,
+		bool flipy,
+		int base_sx,
+		uint32_t xzoom,
+		bool use_shadow,
+		int screenline,
+		int line,
+		bool opaque)
 {
 	struct drawmodes
 	{
@@ -317,21 +343,21 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 	};
 
 	int shadow = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].shadow;
-	int gfx_mask = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_mask;
-	int gfx_shift = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_shift;
+	const int gfx_mask = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_mask;
+	const int gfx_shift = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_shift;
 
 	if (!use_shadow)
 		shadow = 0;
 
 	uint16_t *const dest = &bitmap.pix(screenline);
 
-	int minx = cliprect.min_x << 16;
-	int maxx = (cliprect.max_x + 1) << 16;
+	const int minx = cliprect.min_x << 16;
+	const int maxx = (cliprect.max_x + 1) << 16;
 
 	if (xzoom < 0x10000) // shrink
 	{
-		int x0 = flipx ? (base_sx + (8 * xzoom) - xzoom) : (base_sx);
-		int x1 = flipx ? (base_sx - xzoom) : (x0 + (8 * xzoom));
+		const int x0 = flipx ? (base_sx + (8 * xzoom) - xzoom) : (base_sx);
+		const int x1 = flipx ? (base_sx - xzoom) : (x0 + (8 * xzoom));
 		const int dx = flipx ? (-xzoom) : (xzoom);
 
 		const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
@@ -339,23 +365,20 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 
 		for (int sx = x0; sx != x1; sx += dx)
 		{
-			uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
-
+			const uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
 
 			if (sx >= minx && sx < maxx)
 			{
-				int realsx = sx >> 16;
+				const int realsx = sx >> 16;
 
 				if (pen || opaque)
 				{
 					if (!shadow)
-					{
 						dest[realsx] = (realcolor + pen) & 0x7fff;
-					}
 					else
 					{
-						int pen_shift = 15 - shadow;
-						int pen_mask = (1 << pen_shift) - 1;
+						const int pen_shift = 15 - shadow;
+						const int pen_mask = (1 << pen_shift) - 1;
 						dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
 					}
 				}
@@ -366,27 +389,23 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 	{
 		const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
 
-		int x0 = (base_sx);
-		int x1 = (x0 + (8 * xzoom));
+		const int x0 = (base_sx);
+		const int x1 = (x0 + (8 * xzoom));
 
 		int column;
 		if (!flipx)
-		{
 			column = 0;
-		}
 		else
-		{
 			column = 7;
-		}
 
 		uint32_t countx = 0;
 		for (int sx = x0; sx < x1; sx += 0x10000)
 		{
-			uint8_t pen = (source[column] & gfx_mask) >> gfx_shift;
+			const uint8_t pen = (source[column] & gfx_mask) >> gfx_shift;
 
 			if (sx >= minx && sx < maxx)
 			{
-				int realsx = sx >> 16;
+				const int realsx = sx >> 16;
 
 				if (pen || opaque)
 				{
@@ -396,8 +415,8 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 					}
 					else
 					{
-						int pen_shift = 15 - shadow;
-						int pen_mask = (1 << pen_shift) - 1;
+						const int pen_shift = 15 - shadow;
+						const int pen_mask = (1 << pen_shift) - 1;
 						dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
 					}
 				}
@@ -407,13 +426,9 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 			if (countx >= xzoom)
 			{
 				if (!flipx)
-				{
 					column++;
-				}
 				else
-				{
 					column--;
-				}
 
 				countx -= xzoom;
 			}
@@ -423,19 +438,29 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 
 
 // takes an x/y pixel position in the virtual tilemap and returns the code + attributes etc. for it
-inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int y, int page, int& code, int& attr, int& flipx, int& flipy, int& color)
+inline void seta2_state::get_tile(
+		uint16_t const *const spriteram,
+		bool is_16x16,
+		int x,
+		int y,
+		int page,
+		int &code,
+		int &attr,
+		bool &flipx,
+		bool &flipy,
+		int &color)
 {
-	int xtile = x >> (is_16x16 ? 4 : 3);
+	const int xtile = x >> (is_16x16 ? 4 : 3);
 	int ytile = y >> (is_16x16 ? 4 : 3);
 
 	// yes the tilemap in RAM is flipped?!
 	ytile ^= 0x1f;
 
-	uint16_t *s3 = &spriteram[2 * ((page * 0x2000 / 4) + ((ytile & 0x1f) << 6) + ((xtile) & 0x03f))];
+	uint16_t const *const s3 = &spriteram[2 * ((page * 0x2000 / 4) + ((ytile & 0x1f) << 6) + (xtile & 0x03f))];
 	attr = s3[0];
 	code = s3[1] + ((attr & 0x0007) << 16);
-	flipx = (attr & 0x0010);
-	flipy = (attr & 0x0008);
+	flipx = BIT(attr, 4);
+	flipy = BIT(attr, 3);
 	color = (attr & 0xffe0) >> 5;
 	if (is_16x16)
 	{
@@ -443,37 +468,29 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 
 		if (!flipx)
 		{
-			if (x & 8)
-			{
+			if (BIT(x, 3))
 				code += 1;
-			}
 		}
 		else
 		{
-			if (!(x & 8))
-			{
+			if (BIT(~x, 3))
 				code += 1;
-			}
 		}
 
 		if (!flipy)
 		{
-			if (y & 8)
-			{
+			if (BIT(y, 3))
 				code += 2;
-			}
 		}
 		else
 		{
-			if (!(y & 8))
-			{
+			if (BIT(~y, 3))
 				code += 2;
-			}
 		}
 	}
 }
 
-int seta2_state::calculate_global_xoffset(int nozoom_fixedpalette_fixedposition)
+int seta2_state::calculate_global_xoffset(bool nozoom_fixedpalette_fixedposition)
 {
 	/*
 	int global_xoffset = (m_vregs[0x12/2] & 0x7ff); // and 0x10/2 for low bits
@@ -501,7 +518,7 @@ int seta2_state::calculate_global_xoffset(int nozoom_fixedpalette_fixedposition)
 	return global_xoffset;
 }
 
-int seta2_state::calculate_global_yoffset(int nozoom_fixedpalette_fixedposition)
+int seta2_state::calculate_global_yoffset(bool nozoom_fixedpalette_fixedposition)
 {
 	// Sprites list
 	//int global_yoffset = (m_vregs[0x1a / 2] & 0x7ff); // and 0x18/2 for low bits
@@ -520,51 +537,46 @@ int seta2_state::calculate_global_yoffset(int nozoom_fixedpalette_fixedposition)
 
 void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, int xoffset, uint32_t xzoom, bool xzoominverted)
 {
-	uint16_t* spriteram = m_spriteram;
-
-	uint16_t *s1 = m_private_spriteram.get();
+	const uint16_t *s1 = m_private_spriteram.get();
 
 	int sprite_debug_count = 0;
 
-	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4,sprite_debug_count++)
+	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4, sprite_debug_count++)
 	{
 		int num = s1[0];
 
 		int xoffs = s1[1];
 		int yoffs = s1[2];
-		int sprite = s1[3];
+		const int sprite = s1[3];
 
 		// Single-sprite address
-		uint16_t *s2 = &spriteram[(sprite & 0x7fff) * 4];
-		uint16_t *end = &spriteram[m_spriteram.bytes() / 2];
+		uint16_t const *s2 = &m_spriteram[(sprite & 0x7fff) * 4];
+		uint16_t const *const end = &m_spriteram[m_spriteram.bytes() / 2];
 
 		// Single-sprite size
-		int global_sizex = xoffs & 0xfc00;
-		int global_sizey = yoffs & 0xfc00;
+		const int global_sizex = xoffs & 0xfc00;
+		const int global_sizey = yoffs & 0xfc00;
 
-
-		int nozoom_fixedpalette_fixedposition = num & 0x4000; // ignore various things including global offsets, zoom.  different palette selection too?
-		bool opaque = num & 0x2000;
-		int use_global_size = num & 0x1000;
-		int use_shadow = num & 0x0800;
-		int which_gfx = num & 0x0700;
+		const bool nozoom_fixedpalette_fixedposition = BIT(num, 14); // ignore various things including global offsets, zoom.  different palette selection too?
+		const bool opaque = BIT(num, 13);
+		const bool use_global_size = BIT(num, 12);
+		bool use_shadow = BIT(num, 11);
+		const int which_gfx = num & 0x0700;
 		xoffs &= 0x3ff;
 		yoffs &= 0x3ff;
-
-
 
 		if (yoffs & 0x200)
 			yoffs -= 0x400;
 
-		int global_xoffset = calculate_global_xoffset(nozoom_fixedpalette_fixedposition);
-		int global_yoffset = calculate_global_yoffset(nozoom_fixedpalette_fixedposition);
+		const int global_xoffset = calculate_global_xoffset(nozoom_fixedpalette_fixedposition);
+		const int global_yoffset = calculate_global_yoffset(nozoom_fixedpalette_fixedposition);
 		int usedscanline;
 		int usedxoffset;
 		uint32_t usedxzoom;
 
 		if (nozoom_fixedpalette_fixedposition)
 		{
-			use_shadow = 0;
+			use_shadow = false;
 			//which_gfx = 4 << 8;
 			usedscanline = realscanline; // no zooming?
 			usedxzoom = 0x10000;
@@ -581,15 +593,14 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		num = (num & 0x00ff) + 1;
 
 		// all sprites, except invalid ones should have a pointer <0x3000 in the reformatted list
-		if ((sprite&0x7fff) < 0x3000 / 2 / 4)
+		if ((sprite & 0x7fff) < 0x3000 / 2 / 4)
 		{
 			for (; num > 0; num--, s2 += 4)
 			{
 				if (s2 >= end)  break;
 
-				if (sprite & 0x8000)
+				if (BIT(sprite, 15))
 				{
-
 					// "floating tilemap" sprite
 					// the 'floating tilemap sprites' are just a window into the tilemap, the position of the sprite does not change the scroll values
 
@@ -600,7 +611,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					if (sy & 0x200)
 						sy -= 0x400;
 
-					int local_sizey = s2[1] & 0xfc00;
+					const int local_sizey = s2[1] & 0xfc00;
 
 					int height = use_global_size ? global_sizey : local_sizey;
 					height = ((height & 0xfc00) >> 10) + 1;
@@ -631,7 +642,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 					// get everything we need to calculate if sprite is actually within the x co-ordinates of the screen
 					int sx = s2[0];
-					int local_sizex = sx & 0xfc00;
+					const int local_sizex = sx & 0xfc00;
 					sx &= 0x3ff;
 					sx -= global_xoffset;
 
@@ -642,43 +653,54 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 					int firstcolumn = (sx + xoffs);
 					firstcolumn = (firstcolumn & 0x1ff) - (firstcolumn & 0x200);
-					int lastcolumn = firstcolumn + width * 0x10 - 1;
+					const int lastcolumn = firstcolumn + width * 0x10 - 1;
 
 					// if the sprite isn't within the x-coordinates of the screen, bail
 					if (firstcolumn > cliprect.max_x)    continue;
 					if (lastcolumn < cliprect.min_x)    continue;
 
-
 					// otherwise get the rest of the things we need to draw
 					int scrolly = s2[3];
 					scrolly &= 0x1ff;
 					scrolly += global_yoffset;
-					int sourceline = (usedscanline - scrolly) & 0x1ff;
+					const int sourceline = (usedscanline - scrolly) & 0x1ff;
 
 					int scrollx = s2[2];
-					int is_16x16 = (scrollx & 0x8000) >> 15;
-					int page = (scrollx & 0x7c00) >> 10;
+					const bool is_16x16 = BIT(scrollx, 15);
+					const int page = (scrollx & 0x7c00) >> 10;
 					scrollx &= 0x3ff;
 
 					// we treat 16x16 tiles as 4 8x8 tiles, so while the tilemap is 0x40 tiles wide in memory, that becomes 0x80 tiles in 16x16 mode, with the data wrapping in 8x8 mode
 					for (int x = 0; x < 0x80; x++)
 					{
-						int code, attr, flipx, flipy, color;
+						int code, attr, color;
+						bool flipx, flipy;
 						// tilemap data is NOT buffered?
-						get_tile(spriteram, is_16x16, x * 8, sourceline, page, code, attr, flipx, flipy, color);
+						get_tile(
+								m_spriteram, is_16x16, x * 8, sourceline, page,
+								code, attr, flipx, flipy, color);
 
-						int tileline = sourceline & 0x07;
-						int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
-						int px = (((dx + x * 8) + 0x10) & 0x3ff) - 0x10;
+						const int tileline = sourceline & 0x07;
+						const int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
+						const int px = (((dx + x * 8) + 0x10) & 0x3ff) - 0x10;
 						int dst_x = px & 0x3ff;
 						dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
 
 						if ((dst_x >= firstcolumn - 8) && (dst_x <= lastcolumn)) // reelnquak reels are heavily glitched without this check
 						{
 							uint32_t realsx = dst_x;
-							realsx -= usedxoffset>>16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
+							realsx -= usedxoffset >> 16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
 							realsx = realsx * usedxzoom;
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, tileline, opaque);
+							drawgfx_line(
+									bitmap, cliprect,
+									which_gfx,
+									m_spritegfx->get_data(m_realtilenumber[code]),
+									color << 4,
+									flipx, flipy,
+									realsx,
+									usedxzoom, use_shadow,
+									realscanline, tileline,
+									opaque);
 						}
 					}
 				}
@@ -693,10 +715,9 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					sy += global_yoffset;
 					sy &= 0x3ff;
 
-
 					if (realscanline == 128)
 					{
-					//  printf("%04x %02x %d %d\n", sprite_debug_count, num, yoffs, sy);
+						//LOGSPRITE("%04x %02x %d %d\n", sprite_debug_count, num, yoffs, sy);
 					}
 
 					int sizey = use_global_size ? global_sizey : s2[1] & 0xfc00;
@@ -715,12 +736,11 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					if (endline & 0x200)
 						endline -= 0x400;
 
-
 					// if the sprite doesn't cover this scanline, bail now
 					if (endline >= firstline)
 					{
-						if (firstline > usedscanline)    continue;
-						if (endline < usedscanline)    continue;
+						if ((firstline > usedscanline) || (endline < usedscanline))
+							continue;
 					}
 					else
 					{
@@ -730,10 +750,10 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					}
 
 					// otherwise get the rest of the things we need to draw
-					int attr = s2[2];
+					const int attr = s2[2];
 					int code = s2[3] + ((attr & 0x0007) << 16);
-					int flipx = (attr & 0x0010);
-					int flipy = (attr & 0x0008);
+					const bool flipx = BIT(attr, 4);
+					const bool flipy = BIT(attr, 3);
 					int color = (attr & 0xffe0) >> 5;
 
 					int sx = s2[0];
@@ -744,11 +764,10 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					sx = (sx & 0x1ff) - (sx & 0x200);
 					sx -= global_xoffset;
 
-					int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
-
+					const int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
 
 					int line = usedscanline - firstline;
-					int y = (line >> 3);
+					const int y = (line >> 3);
 					line &= 0x7;
 
 					if (nozoom_fixedpalette_fixedposition)
@@ -759,17 +778,26 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 					for (int x = 0; x <= sizex; x++)
 					{
-						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
+						const int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
 						uint32_t realsx = (sx + x * 8);
-						realsx -= usedxoffset>>16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
+						realsx -= usedxoffset >> 16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
 						realsx = realsx * usedxzoom;
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
+						drawgfx_line(
+								bitmap, cliprect,
+								which_gfx,
+								m_spritegfx->get_data(m_realtilenumber[realcode]),
+								color << 4,
+								flipx, flipy,
+								realsx,
+								usedxzoom, use_shadow,
+								realscanline, line,
+								opaque);
 					}
 
 				}
 			}
 		}
-		if (s1[0] & 0x8000) break;  // end of list marker
+		if (BIT(s1[0], 15)) break;  // end of list marker
 	}   // sprite list
 }
 
@@ -779,10 +807,10 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 	auto *tmp68301 = dynamic_cast<tmp68301_device *>(m_maincpu.target());
 	if (tmp68301)
 	{
-		if (m_rasterenabled & 1)
+		if (BIT(m_rasterenabled, 0))
 		{
 			tmp68301->set_input_line(1, HOLD_LINE);
-			logerror("external int (vpos is %d)\n", m_screen->vpos());
+			LOGVIDEO("external int (vpos is %d)\n", m_screen->vpos());
 			m_screen->update_partial(m_screen->vpos() - 1);
 		}
 	}
@@ -791,7 +819,7 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 
 void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
+	//LOGOFFSET("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
 	uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
 	yoffset &= 0x07ffffff;
@@ -807,7 +835,6 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 		yzoom = 0x8000000 - yzoom;
 		yzoominverted = true;
 	}
-
 
 	int xoffset = (m_vregs[0x12 / 2] << 16) | m_vregs[0x10 / 2];
 	xoffset &= 0x07ffffff;
@@ -825,15 +852,14 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 		xzoominverted = true;
 	}
 
-
 	if (!xzoom)
 		return;
 
-	uint64_t inc = 0x100000000ULL;
+	const uint64_t inc = 0x100000000ULL;
 
-	uint32_t inc2 = inc / xzoom;
+	const uint32_t inc2 = inc / xzoom;
 
-	//printf("xinc is %04x xoom %04x xoffset is %4x\n", inc2, xzoom, xoffset);
+	//LOGOFFSET("xinc is %04x xoom %04x xoffset is %4x\n", inc2, xzoom, xoffset);
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -844,9 +870,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 		int yy;
 
 		if (!yzoominverted)
-		{
 			yy = y; // not handled yet (this is using negative yzoom to do flipscreen...)
-		}
 		else
 		{
 			yy = y * yzoom;
@@ -854,11 +878,10 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 			yy &= 0x07ffffff;
 			yy >>= 16;
 
-			//printf("line %04x yline requested %04x\n", y, yy);
+			//LOGOFFSET("line %04x yline requested %04x\n", y, yy);
 
 			if (yy & 0x400)
 				yy -= 0x800;
-
 		}
 
 		draw_sprites_line(bitmap, tempcliprect, yy, y, xoffset, inc2, xzoominverted);
@@ -885,9 +908,7 @@ void seta2_state::video_start()
 
 	m_spritegfx = m_gfxdecode->gfx(0);
 	for (int i = 0; i < 0x80000; i++)
-	{
 		m_realtilenumber[i] = i % m_spritegfx->elements();
-	}
 
 	m_raster_timer = timer_alloc(FUNC(seta2_state::raster_timer_done), this);
 
@@ -899,7 +920,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// Black or pen 0?
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if ((m_vregs[0x30/2] & 1) == 0)   // 1 = BLANK SCREEN
+	if (BIT(~m_vregs[0x30/2], 0))   // 1 = BLANK SCREEN
 		draw_sprites(bitmap, cliprect);
 
 	return 0;
@@ -907,7 +928,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void seta2_state::screen_vblank(int state)
 {
-	//popmessage("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
+	//LOGVIDEO("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2], m_vregs[0x18/2], m_vregs[0x1e/2], m_vregs[0x1c/2], m_vregs[0x12/2], m_vregs[0x10/2], m_vregs[0x16/2], m_vregs[0x14/2]);
 }
 
 // staraudi
@@ -920,12 +941,13 @@ void staraudi_state::draw_rgbram(bitmap_ind16 &bitmap)
 	{
 		for (int x = 0; x < 0x200; ++x)
 		{
-			int offs = x * 2/2 + y * 0x400/2;
-			uint32_t data = ((m_rgbram[offs + 0x40000/2] & 0xff) << 16) | m_rgbram[offs];
+			const int offs = x * 2/2 + y * 0x400/2;
+			const uint32_t data = ((m_rgbram[offs + 0x40000/2] & 0xff) << 16) | m_rgbram[offs];
 			bitmap.pix(y, x) = (data & 0x7fff);
 		}
 	}
 }
+
 uint32_t staraudi_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update(screen, bitmap, cliprect);

@@ -37,12 +37,12 @@ public:
 		m_x1_bank(*this, "x1_bank_%u", 1U),
 		m_spriteram(*this, "spriteram", 0x40000, ENDIANNESS_BIG),
 		m_vregs(*this, "vregs", 0x40, ENDIANNESS_BIG),
+
+		m_in_system(*this, "SYSTEM"),
 		m_leds(*this, "led%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void seta2(machine_config &config);
-	void seta2_32m(machine_config &config);
 	void grdians(machine_config &config);
 	void grdiansa(machine_config &config);
 	void myangel(machine_config &config);
@@ -63,9 +63,6 @@ protected:
 	virtual void video_start() override;
 
 	void grdians_lockout_w(uint8_t data);
-
-	uint16_t mj4simai_p1_r();
-	uint16_t mj4simai_p2_r();
 
 	uint16_t pzlbowl_protection_r(address_space &space);
 	uint8_t pzlbowl_coins_r();
@@ -88,8 +85,8 @@ protected:
 	uint16_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	int calculate_global_xoffset(int nozoom_fixedpalette_fixedposition);
-	int calculate_global_yoffset(int nozoom_fixedpalette_fixedposition);
+	int calculate_global_xoffset(bool nozoom_fixedpalette_fixedposition);
+	int calculate_global_yoffset(bool nozoom_fixedpalette_fixedposition);
 	void draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, int xoffset, uint32_t xzoom, bool xzoominverted);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -101,7 +98,6 @@ protected:
 	void ablastb_map(address_map &map);
 	void grdians_map(address_map &map);
 	void gundamex_map(address_map &map);
-	void mj4simai_map(address_map &map);
 	void myangel2_map(address_map &map);
 	void myangel_map(address_map &map);
 	void namcostr_map(address_map &map);
@@ -112,6 +108,9 @@ protected:
 	void samshoot_map(address_map &map);
 	void telpacfl_map(address_map &map);
 	void x1_map(address_map &map);
+
+	void seta2(machine_config &config);
+	void seta2_32m(machine_config &config);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<h83007_device> m_sub;
@@ -127,57 +126,70 @@ protected:
 	optional_memory_bank_array<8> m_x1_bank;
 	memory_share_creator<uint16_t> m_spriteram;
 	memory_share_creator<uint16_t> m_vregs;
+	optional_ioport m_in_system;
 	output_finder<7> m_leds;
 	output_finder<11> m_lamps;
 
-	int m_keyboard_row;
 	std::unique_ptr<uint16_t[]> m_private_spriteram;
 
 private:
-	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int shadow, int screenline, int line, int opaque);
-	inline void get_tile(uint16_t* spriteram, int is_16x16, int x, int y, int page, int& code, int& attr, int& flipx, int& flipy, int& color);
+	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint8_t const *const addr, uint32_t realcolor, bool flipx, bool flipy, int base_sx, uint32_t xzoom, bool shadow, int screenline, int line, bool opaque);
+	inline void get_tile(uint16_t const *spriteram, bool is_16x16, int x, int y, int page, int &code, int &attr, bool &flipx, bool &flipy, int &color);
+
+	TIMER_CALLBACK_MEMBER(raster_timer_done);
 
 	std::unique_ptr<uint32_t[]> m_realtilenumber;
 	gfx_element *m_spritegfx;
 
-	uint16_t m_rasterposition;
-	uint16_t m_rasterenabled;
-	TIMER_CALLBACK_MEMBER(raster_timer_done);
-	emu_timer *m_raster_timer;
+	uint16_t m_rasterposition = 0;
+	uint16_t m_rasterenabled = 0;
+	emu_timer *m_raster_timer = nullptr;
 };
 
 
 class mj4simai_state : public seta2_state
 {
 public:
-	mj4simai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seta2_state(mconfig, type, tag)
+	mj4simai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta2_state(mconfig, type, tag),
+		m_keys{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 	{ }
+
+	void mj4simai(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+
+private:
+	template <unsigned Which> uint16_t mj4simai_key_r();
+
+	void mj4simai_map(address_map &map);
+
+	required_ioport_array<5> m_keys[2];
+
+	uint8_t m_keyboard_row = 0;
 };
 
 
 class funcube_state : public seta2_state
 {
 public:
-	funcube_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seta2_state(mconfig, type, tag)
-		, m_nvram(*this, "nvram", 0x180, ENDIANNESS_BIG)
+	funcube_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta2_state(mconfig, type, tag),
+		m_nvram(*this, "nvram", 0x180, ENDIANNESS_BIG),
+		m_in_debug(*this, "DEBUG"),
+		m_in_switch(*this, "SWITCH"),
+		m_in_battery(*this, "BATTERY")
 	{ }
 
 	void funcube(machine_config &config);
-	void funcube3(machine_config &config);
 	void funcube2(machine_config &config);
 
-	void init_funcube3();
 	void init_funcube();
 	void init_funcube2();
+	void init_funcube3();
 
 private:
-	memory_share_creator<uint8_t> m_nvram;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -199,7 +211,13 @@ private:
 
 	void funcube_debug_outputs();
 
-	uint8_t m_outputs, m_funcube_leds;
+	memory_share_creator<uint8_t> m_nvram;
+
+	required_ioport m_in_debug;
+	required_ioport m_in_switch;
+	required_ioport m_in_battery;
+
+	uint8_t m_outputs = 0, m_funcube_leds = 0;
 	uint64_t m_coin_start_cycles = 0;
 	uint8_t m_hopper_motor = 0;
 };

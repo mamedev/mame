@@ -43,7 +43,7 @@ authors:hap
 		<element name="LED4" ref="led"><bounds x="104" y="18" width="4" height="4" /></element>
 		<element name="LED5" ref="led"><bounds x="113" y="18" width="4" height="4" /></element>
 
-// mu-plg1-plg2-plg3
+		<!-- mu-plg1-plg2-plg3 -->
 		<element name="LED6" ref="ledr"><bounds x="103" y="26" width="3" height="1" /></element>
 		<element name="LED7" ref="ledr"><bounds x="107" y="26" width="3" height="1" /></element>
 		<element name="LED8" ref="ledr"><bounds x="111" y="26" width="3" height="1" /></element>

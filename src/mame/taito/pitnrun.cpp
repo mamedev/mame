@@ -137,8 +137,6 @@ private:
 	tilemap_t *m_fg = nullptr;
 
 	void nmi_enable_w(int state);
-	void hflip_w(int state);
-	void vflip_w(int state);
 	uint8_t inputs_watchdog_r();
 	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
 	void char_bank_select_w(int state);
@@ -654,16 +652,6 @@ void pitnrun_state::nmi_enable_w(int state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void pitnrun_state::hflip_w(int state)
-{
-	flip_screen_x_set(state);
-}
-
-void pitnrun_state::vflip_w(int state)
-{
-	flip_screen_y_set(state);
-}
-
 uint8_t pitnrun_state::inputs_r()
 {
 	return ~m_inputmux->output_r();
@@ -850,9 +838,9 @@ void pitnrun_state::pitnrun(machine_config &config)
 	mainlatch.q_out_cb<1>().set(FUNC(pitnrun_state::color_select_w));
 	mainlatch.q_out_cb<4>().set_nop(); // COLOR SEL 2 - not used ?
 	mainlatch.q_out_cb<5>().set(FUNC(pitnrun_state::char_bank_select_w));
-	mainlatch.q_out_cb<6>().set(FUNC(pitnrun_state::hflip_w)); // HFLIP
+	mainlatch.q_out_cb<6>().set(FUNC(pitnrun_state::flip_screen_x_set)); // HFLIP
 	mainlatch.q_out_cb<6>().append(m_inputmux, FUNC(ls157_x2_device::select_w));
-	mainlatch.q_out_cb<7>().set(FUNC(pitnrun_state::vflip_w)); // VFLIP
+	mainlatch.q_out_cb<7>().set(FUNC(pitnrun_state::flip_screen_y_set)); // VFLIP
 
 	LS157_X2(config, m_inputmux); // 2F (0-3) & 2H (4-7)
 	m_inputmux->a_in_callback().set_ioport("INPUTS");
