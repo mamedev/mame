@@ -16012,6 +16012,7 @@ sz1                             // 1985 Casio
 fp200                           //
 
 @source:casio/fp1100.cpp
+fp1000                          //
 fp1100                          //
 
 @source:casio/fp6000.cpp
