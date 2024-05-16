@@ -69,8 +69,6 @@ private:
 	tilemap_t* m_tilemap = nullptr;
 	int m_nmi = 0;
 
-	void flip_screen_x_w(int state);
-	void flip_screen_y_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void coin_counter_w(int state);
@@ -90,16 +88,6 @@ private:
 void skyarmy_state::machine_start()
 {
 	save_item(NAME(m_nmi));
-}
-
-void skyarmy_state::flip_screen_x_w(int state)
-{
-	flip_screen_x_set(state);
-}
-
-void skyarmy_state::flip_screen_y_w(int state)
-{
-	flip_screen_y_set(state);
 }
 
 TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
@@ -334,8 +322,8 @@ void skyarmy_state::skyarmy(machine_config &config)
 	ls259_device &latch(LS259(config, "latch")); // 11C
 	latch.q_out_cb<0>().set(FUNC(skyarmy_state::coin_counter_w));
 	latch.q_out_cb<4>().set(FUNC(skyarmy_state::nmi_enable_w)); // ???
-	latch.q_out_cb<5>().set(FUNC(skyarmy_state::flip_screen_x_w));
-	latch.q_out_cb<6>().set(FUNC(skyarmy_state::flip_screen_y_w));
+	latch.q_out_cb<5>().set(FUNC(skyarmy_state::flip_screen_x_set));
+	latch.q_out_cb<6>().set(FUNC(skyarmy_state::flip_screen_y_set));
 	latch.q_out_cb<7>().set_nop(); // video RAM buffering?
 
 	/* video hardware */

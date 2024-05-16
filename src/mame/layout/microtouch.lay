@@ -17,6 +17,12 @@ license:CC0-1.0
 				local btn_field = tsdev:ioport('TOUCH'):field(0x01)
 				local x_field = tsdev:ioport('TOUCH_X'):field(0x3fff)
 				local y_field = tsdev:ioport('TOUCH_Y'):field(0x3fff)
+				local set_field_value = btn_field.set_value
+				local clear_field_value = btn_field.clear_value
+				local x_min = x_field.minvalue
+				local x_max = x_field.maxvalue
+				local y_min = y_field.minvalue
+				local y_max = y_field.maxvalue
 
 				-- for mapping coordinates
 				local view = file.views['Touch-Enabled']
@@ -30,9 +36,9 @@ license:CC0-1.0
 				local inside = false
 
 				local function release_touch()
-					btn_field:clear_value()
-					x_field:clear_value()
-					y_field:clear_value()
+					clear_field_value(btn_field)
+					clear_field_value(x_field)
+					clear_field_value(y_field)
 				end
 
 				local function recomputed()
@@ -41,16 +47,28 @@ license:CC0-1.0
 					r = bounds.x1
 					t = bounds.y0
 					b = bounds.y1
-					x_scale = 0x3fff / bounds.width
-					y_scale = 0x3fff / bounds.height
+					x_scale = (x_max - x_min + 1) / bounds.width
+					y_scale = (y_max - y_min + 1) / bounds.height
 				end
 
 				local function check_pointer(x, y)
 					if (x >= l) and (x < r) and (y >= t) and (y < b) then
 						inside = true
-						btn_field:set_value(1)
-						x_field:set_value(floor(0.5 + ((x - l) * x_scale)))
-						y_field:set_value(floor(0.5 + ((y - t) * y_scale)))
+						local ix = x_min + floor(0.0001 + ((x - l) * x_scale))
+						if ix < x_min then
+							ix = x_min
+						elseif ix > x_max then
+							ix = x_max
+						end
+						local iy = y_min + floor(0.0001 + ((y - t) * y_scale))
+						if iy < y_min then
+							iy = y_min
+						elseif iy > y_max then
+							iy = y_max
+						end
+						set_field_value(btn_field, 1)
+						set_field_value(x_field, ix)
+						set_field_value(y_field, iy)
 					elseif inside then
 						inside = false
 						release_touch()

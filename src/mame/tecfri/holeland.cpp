@@ -70,8 +70,6 @@ protected:
 	void colorram_w(offs_t offset, uint8_t data);
 	void pal_offs_w(uint8_t data);
 	void scroll_w(uint8_t data);
-	void flipscreen_x_w(int state);
-	void flipscreen_y_w(int state);
 
 	void io_map(address_map &map);
 };
@@ -198,16 +196,6 @@ void base_state::pal_offs_w(uint8_t data)
 void base_state::scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
-}
-
-void base_state::flipscreen_x_w(int state)
-{
-	flip_screen_x_set(state);
-}
-
-void base_state::flipscreen_y_w(int state)
-{
-	flip_screen_y_set(state);
 }
 
 
@@ -560,8 +548,8 @@ void holeland_state::holeland(machine_config &config)
 	LS259(config, m_latch); // 3J
 	m_latch->parallel_out_cb().set(FUNC(holeland_state::pal_offs_w)).mask(0x03);
 	m_latch->q_out_cb<5>().set(FUNC(holeland_state::coin_counter_w));
-	m_latch->q_out_cb<6>().set(FUNC(holeland_state::flipscreen_x_w));
-	m_latch->q_out_cb<7>().set(FUNC(holeland_state::flipscreen_y_w));
+	m_latch->q_out_cb<6>().set(FUNC(holeland_state::flip_screen_x_set));
+	m_latch->q_out_cb<7>().set(FUNC(holeland_state::flip_screen_y_set));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
