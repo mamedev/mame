@@ -6,28 +6,31 @@
 
     Info found at various sites:
 
-    Casio FP1000 and FP1100 are "pre-PC" personal computers, with Cassette,
-    Floppy Disk, Printer and 2 cart/expansion slots. They had 32K ROM, 64K
-    main RAM, 80x25 text display, 320x200, 640x200, 640x400 graphics display.
-    Floppy disk is 2x 5 1/4.
+    Casio FP-1000 and FP-1100 are "pre-PC" personal computers, with
+    Cassette, Floppy Disk, Printer and two cartridge/expansion slots.  They
+    had 32K ROM, 64K main RAM, 80x25 text display, 320x200, 640x200, 640x400
+    graphics display.  Floppy disk is 2x 5 1/4.
 
-    The FP1000 had 16K videoram and monochrome only. The monitor had a switch
-    to invert the display (swap foreground and background colours).
+    The FP-1000 had 16K videoram and monochrome only.  The monitor had a
+    switch to invert the display (swap foreground and background colours).
 
-    The FP1100 had 48K videoram and 8 colours.
+    The FP-1100 had 48K videoram and 8 colours.
 
     Processors: Z80 @ 4MHz, uPD7801G @ 2MHz
 
-    Came with BASIC built in, and you could run CP/M 2.2 from the floppy disk.
+    Came with BASIC built in, and you could run CP/M 2.2 from the floppy
+    disk.
 
-    The keyboard is a separate unit. It contains a beeper.
+    The keyboard is a separate unit.  It contains a beeper.
 
     TODO:
-    - unimplemented instruction PER triggered (can be ignored)
-    - Display can be interlaced or non-interlaced. Interlaced not emulated.
-    - Cassette Load is quite complex, using 6 pins of the sub-CPU. Not done.
-    - subcpu is supposed to be in WAIT except in horizontal blanking period.
-      WAIT is not emulated in our cpu.
+    - Memory maps and machine configuration for FP-1000 with reduced VRAM.
+    - Unimplemented instruction PER triggered (can be ignored)
+    - Display can be interlaced or non-interlaced.  Interlaced not emulated.
+    - Cassette Load is quite complex, using 6 pins of the sub-CPU.  Not
+      done.
+    - Sub CPU is supposed to be in WAIT except in horizontal blanking
+      period.  WAIT is not emulated in our cpu.
     - Keyboard not working.
     - FDC not done.
 
@@ -128,7 +131,7 @@ private:
 		u8 portc = 0;
 	}m_upd7801;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<upd7801_device> m_subcpu;
 	required_device<mc6845_device> m_crtc;
 	required_region_ptr<u8> m_ipl;
 	required_shared_ptr<u8> m_wram;
@@ -141,20 +144,21 @@ private:
 
 MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 *p = &bitmap.pix(y);
 
 	if (BIT(m_upd7801.porta, 4))
 	{ // green screen
 		for (u16 x = 0; x < x_count; x++)
 		{
-			u16 mem = (((ma+x)<<3) + ra) & 0x3fff;
-			u8 g = m_videoram[mem];
+			u16 const mem = (((ma + x) << 3) + ra) & 0x3fff;
+			u8 const g = m_videoram[mem];
 			for (u8 i = 0; i < 8; i++)
 			{
 				u8 col = BIT(g, i);
-				if (x == cursor_x) col ^= 1;
-				*p++ = palette[col<<1];
+				if (x == cursor_x)
+					col ^= 1;
+				*p++ = palette[col << 1];
 			}
 		}
 	}
@@ -162,14 +166,15 @@ MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 	{ // RGB screen
 		for (u16 x = 0; x < x_count; x++)
 		{
-			u16 mem = (((ma+x)<<3) + ra) & 0x3fff;
-			u8 b = m_videoram[mem];
-			u8 r = m_videoram[mem+0x4000];
-			u8 g = m_videoram[mem+0x8000];
+			u16 const mem = (((ma + x) << 3) + ra) & 0x3fff;
+			u8 const b = m_videoram[mem];
+			u8 const r = m_videoram[mem + 0x4000];
+			u8 const g = m_videoram[mem + 0x8000];
 			for (u8 i = 0; i < 8; i++)
 			{
-				u8 col = BIT(r, i) + (BIT(g, i) << 1) + (BIT(b, i) << 2);
-				if (x == cursor_x) col = m_col_cursor;
+				u8 col = BIT(r, i) | (BIT(g, i) << 1) | (BIT(b, i) << 2);
+				if (x == cursor_x)
+					col = m_col_cursor;
 				*p++ = palette[col];
 			}
 		}
@@ -199,8 +204,7 @@ void fp1100_state::irq_mask_w(u8 data)
 		LOG("%s: Sub IRQ asserted\n",machine().describe_context());
 		m_sub_irq_status = true;
 	}
-	else
-	if (!BIT(data, 7) && m_sub_irq_status)
+	else if (!BIT(data, 7) && m_sub_irq_status)
 	{
 		m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
 		LOG("%s: Sub IRQ cleared\n",machine().describe_context());
@@ -341,7 +345,7 @@ d6 - Centronics strobe
 */
 void fp1100_state::portc_w(u8 data)
 {
-	u8 bits = data ^ m_upd7801.portc;
+	u8 const bits = data ^ m_upd7801.portc;
 	m_upd7801.portc = data;
 
 	if (BIT(bits, 3))
