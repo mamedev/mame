@@ -2107,21 +2107,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="qix">
-		<description>Qix</description>
-		<year>1989</year>
-		<publisher>Taito America</publisher>
-		<info name="usage" value="Requires a 128K Apple //e, //c, or IIgs." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-08-05 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233475">
-				<rom name="qix.woz" size="233475" crc="50acf331" sha1="9cbbe0b29761aa9e19a7e965932e9bf694f97825" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="radwarr">
 		<description>Rad Warrior</description>
 		<year>1987</year>
@@ -3220,59 +3205,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnusa">
-		<description>Where in the USA is Carmen Sandiego?</description>
-		<year>1986</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Runs on any Apple II with 64K." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-10-01 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="240205">
-				<rom name="where in the usa is carmen sandiego side a.woz" size="240205" crc="a1cfee60" sha1="fcc406c480127a71e4d186939e9671c0c0bf7c14" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="233549">
-				<rom name="where in the usa is carmen sandiego side b.woz" size="233549" crc="1ac6f62d" sha1="7940fad2b4b52615180cf51ce2348efe10e8e780" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carmntime">
-		<description>Where in Time is Carmen Sandiego? (v1.1)</description>
-		<year>1990</year>
-		<publisher>Brøderbund Software</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side A" />
-			<dataarea name="flop" size="233672">
-				<rom name="where in time is carmen sandiego v1.1 - side a.woz" size="233672" crc="ea58dd13" sha1="a872d51b3352b3a1c5a6817ec10ed0ea0d1b3ed7" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side B" />
-			<dataarea name="flop" size="240328">
-				<rom name="where in time is carmen sandiego v1.1 - side b.woz" size="240328" crc="d91930ff" sha1="746cbb0f837fe28651f2bf2f19efc815f7c316d9" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side C" />
-			<dataarea name="flop" size="240328">
-				<rom name="where in time is carmen sandiego v1.1 - side c.woz" size="240328" crc="e720deac" sha1="2951a75612d58f001096f5daa4cb6c768098acea" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side D" />
-			<dataarea name="flop" size="233672">
-				<rom name="where in time is carmen sandiego v1.1 - side d.woz" size="233672" crc="20c6a3f7" sha1="7f9832c7e6ce06a3731ba0ca04c04ddd6cd0b929" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wof">
 		<description>Wings of Fury</description>
 		<year>1987</year>
@@ -3826,28 +3758,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnwld">
-		<description>Where in the World is Carmen Sandiego?</description>
-		<year>1985</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Runs on any Apple II with 64K." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-03-16 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="332120">
-				<rom name="where in the world is carmen sandiego side a.woz" size="332120" crc="9e9bc183" sha1="bfcf9c5156a3bd57384f14656d7da9adfe546d2e" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234840">
-				<rom name="where in the world is carmen sandiego side b.woz" size="234840" crc="771e61bd" sha1="672a843e9d7b927b8f2d14d0ea3679913add4175" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="labyrnth">
 		<description>Labyrinth</description>
 		<year>1982</year>
@@ -4116,21 +4026,6 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 
-	</software>
-
-	<software name="arkanoid">
-		<description>Arkanoid</description>
-		<year>1988</year>
-		<publisher>Taito America</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-04 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233449">
-				<rom name="arkanoid.woz" size="233449" crc="ed2ce549" sha1="421e17ac0441f3a513846eda613b234b4b1d756f" />
-			</dataarea>
-		</part>
 	</software>
 
 	<software name="fantvisn">
@@ -4585,28 +4480,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmneur">
-		<description>Where in Europe is Carmen Sandiego?</description>
-		<year>1988</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-28 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="233533">
-				<rom name="where in europe is carmen sandiego side a.woz" size="233533" crc="aa41e758" sha1="cccfae850e791d3eeae13097d4fbefd85f3543a6" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="233533">
-				<rom name="where in europe is carmen sandiego side b.woz" size="233533" crc="32e8e026" sha1="701d0a865e3a567c663d214b03edc57472ca585a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wishbr68">
 		<description>Wishbringer (Release 68 / 850501)</description>
 		<year>1985</year>
@@ -4975,28 +4848,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234735">
 				<rom name="ultima i - the beginning.woz" size="234735" crc="d06b8c18" sha1="9d909f6e098f23935854a9e63f7b2d7b8efc8dfc" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="renegade">
-		<description>Renegade</description>
-		<year>1989</year>
-		<publisher>Taito America</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-05-25 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234755">
-				<rom name="renegade side a.woz" size="234755" crc="040575e3" sha1="be136b6986f712453d1ffa826cf704fd35e95c49" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234755">
-				<rom name="renegade side b.woz" size="234755" crc="d245d5ae" sha1="7113632f3d6b9933402ee0e9ab612a2d8a460d92" />
 			</dataarea>
 		</part>
 	</software>
@@ -6204,21 +6055,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="242144">
 				<rom name="times of lore side b.woz" size="242144" crc="37142802" sha1="59bbdacf4ead58dde5a04e0fa9ff4e8764aa86d7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bchead">
-		<description>Beach-Head</description>
-		<year>1985</year>
-		<publisher>Access Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-08-03 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="235525">
-				<rom name="beach-head.woz" size="235525" crc="45f55dbd" sha1="c805e8bd5463b15e7e7326620b5abc186bd4714e" />
 			</dataarea>
 		</part>
 	</software>
@@ -9660,21 +9496,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ochess70">
-		<description>Chess (Odesta) (version 7.0)</description>
-		<year>1982</year>
-		<publisher>Odesta Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-01-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234821">
-				<rom name="chess v7.0 (odesta).woz" size="234821" crc="dea3482d" sha1="40d127ba91d83be331a266e4f7d9727baeb78711" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rambop2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1985</year>
@@ -10981,434 +10802,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241427">
 				<rom name="rescue on fractalus.woz" size="241427" crc="3dceafc7" sha1="9295da82b1fa5e213c70ed11cfa2963e4662f1c7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcarmen">
-		<description>Where in North Dakota is Carmen Sandiego?</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-09 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234963">
-				<rom name="where in north dakota is carmen sandiego side a.woz" size="234963" crc="482c92f4" sha1="e59481a41d75aca6e670cf9ea87c6f0a1b14646a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234963">
-				<rom name="where in north dakota is carmen sandiego side b.woz" size="234963" crc="cf47fe0c" sha1="25c5bbbdf0f4265e0a63de456c3a4258d87afc95" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cndalman">
-		<description>Carmen's North Dakota Almanac Database (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-11 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234788">
-				<rom name="carmen's north dakota almanac database.woz" size="234788" crc="757d3e67" sha1="618423e72b222f16e6624750d80e09aecf6f4656" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcrmn98">
-		<description>Where in North Dakota is Carmen Sandiego? (version 0.98 beta)</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-12 -->
-		<!-- This is v0.98 beta, labeled as "for workshops and demonstrations
-		only." It is not copy protected. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="235025">
-				<rom name="where in north dakota is carmen sandiego v0.98 beta side a.woz" size="235025" crc="ce6d7066" sha1="d690a7dfbe00b1f43fce826356995a7fdfa39fe8" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="235025">
-				<rom name="where in north dakota is carmen sandiego v0.98 beta side b.woz" size="235025" crc="3c638e67" sha1="3d6f235b01a80644ff37e22ed4f51a7a642c8dcb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcrmnb1">
-		<description>Where in North Dakota is Carmen Sandiego? (version 1.0 final beta)</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234980">
-				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side a.woz" size="234980" crc="1fc431b1" sha1="e1bf54f99059247657d72ef67e7196c9fc592120" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234980">
-				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side b.woz" size="234980" crc="f9412d0b" sha1="e611506a904841cf644ffb58d24705d68fe70429" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gaflndd">
-		<description>Governors and First Ladies of North Dakota Database (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234813">
-				<rom name="governors and first ladies of north dakota database.woz" size="234813" crc="9fddb019" sha1="2be825d65d27591e49654873de30086b496af70d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndagridb">
-		<description>North Dakota Agriculture Database (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234795">
-				<rom name="north dakota agriculture database.woz" size="234795" crc="7dfea486" sha1="b0504bc333ffc3b2ff70bea46b3607e62a7ef2cd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcity16">
-		<description>North Dakota Cities (version 1.6)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234766">
-				<rom name="north dakota cities v1.6 side a.woz" size="234766" crc="01172d62" sha1="7fe5771d7d99a7cc4ebe3ad1cb479ee60d6b1fa9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234766">
-				<rom name="north dakota cities v1.6 side b.woz" size="234766" crc="afbbd59d" sha1="1841f97fd13834b83bb02954b5ecf8d5aba054da" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndc500b">
-		<description>North Dakota Cities with Population Under 500 (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234807">
-				<rom name="north dakota cities with population under 500 database.woz" size="234807" crc="26fd3aae" sha1="6065680920edb68a51f5b8babb6e7dcc38630403" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndc500u">
-		<description>North Dakota Cities with Population 500 and Above (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234811">
-				<rom name="north dakota cities with population 500 and above database.woz" size="234811" crc="c5ca75ae" sha1="81fc62349dd3afdecc1db519ebb700404f71058d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcnty">
-		<description>North Dakota Counties (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234783">
-				<rom name="north dakota counties database.woz" size="234783" crc="d6df23a4" sha1="ef48c731e1e245b3b2f12ca13cde757703924015" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndexplor">
-		<description>North Dakota Explorers (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234784">
-				<rom name="north dakota explorers database.woz" size="234784" crc="84f60ca6" sha1="bf064dc7c8a3eda897d4794f361336431681d6fb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndindtrb">
-		<description>North Dakota Indian Tribes (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234788">
-				<rom name="north dakota indian tribes.woz" size="234788" crc="0c8540c3" sha1="2e0e93a04b9002f9732d3a92086e4958b57aac9a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndminrls">
-		<description>Minerals of North Dakota (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234786">
-				<rom name="minerals of north dakota.woz" size="234786" crc="16c550e4" sha1="1221551a2df3a59e5b81e328863ab0c672107605" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndnotper">
-		<description>Notable People of North Dakota (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234792">
-				<rom name="notable people of north dakota.woz" size="234792" crc="73752e7c" sha1="b3b24917dc6c21636ac676ecf81d4616546e5aa9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndprkhs">
-		<description>North Dakota Parks and Historical Sites (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234801">
-				<rom name="north dakota parks and historical sites.woz" size="234801" crc="e4648f2b" sha1="3c2cfef269ed387988705717f8b369bd502d2505" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndplants">
-		<description>North Dakota Plants (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234781">
-				<rom name="north dakota plants.woz" size="234781" crc="6c978fc3" sha1="ad24084bf410dff2aaa584367dc26b83b2f0c88b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndsymbls">
-		<description>North Dakota Symbols (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234782">
-				<rom name="north dakota symbols.woz" size="234782" crc="4e904c78" sha1="e8f19de16437067e1aea7256a0983f79229873d4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndsenrep">
-		<description>North Dakota U.S. Senators and Representatives (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234808">
-				<rom name="north dakota u.s. senators and representatives.woz" size="234808" crc="e7c06937" sha1="c81e2fb70ff021b203db05b43a974a8e8145fc57" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndwildlf">
-		<description>North Dakota Wildlife (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234783">
-				<rom name="north dakota wildlife.woz" size="234783" crc="39e62a9b" sha1="bbffd66cdef57839e6c15e3fd72f0e6526c39e64" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndpride">
-		<description>North Dakota Pride (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234780">
-				<rom name="north dakota pride.woz" size="234780" crc="436ed557" sha1="2067daae9ae657f2df24a556a2d7cef724598a30" />
 			</dataarea>
 		</part>
 	</software>
@@ -15978,22 +15371,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crmneu35">
-		<description>Where in Europe is Carmen Sandiego? (800K 3.5")</description>
-		<year>1988</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-07-06 redumped: 2021-12-14 to fix incorrect header information -->
-		<!--"Where in Europe is Carmen Sandiego?" is a 1988 educational game developed by Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens, and distributed by Brøderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296763">
-				<rom name="where in europe is carmen sandiego 800k.woz" size="1296763" crc="549ffd83" sha1="d6350738f600af581e5dc598aa8a90f8ee47bcf1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="playroom35">
 		<description>The Playroom (version 1.0) (800K 3.5")</description>
 		<year>1989</year>
@@ -20163,29 +19540,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wcleaderb">
-		<description>World Class Leader Board</description>
-		<year>1987</year>
-		<publisher>Access Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-04-01 -->
-		<!--"World Class Leader Board" is a 1987 sports game developed by Bruce and Roger Carver, ported to the Apple II by Vance Cook, and distributed by Access Software. It requires a 64K Apple ][+ or later. This archive also includes "World Class Famous Course Disk Volume 1", originally sold separately.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234815">
-				<rom name="world class leader board side a.woz" size="234815" crc="ac7104f3" sha1="b913bbcab30a3dad52cb28556bdeb4d34e67a4b4" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="241471">
-				<rom name="world class leader board side b.woz" size="241471" crc="14e4bd7c" sha1="ee2fa7be8a79549f07f62925c1635b2ed6768ffd" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="column2e">
 		<description>Columns //e (version 2.01)</description>
 		<year>1991</year>
@@ -22544,38 +21898,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296273">
 				<rom name="vocabulary science and health 800k.woz" size="1296273" crc="26f62b7f" sha1="3aeaa6a076e7da6c0679ca11c37cf5c4fd4e8c2e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmusa35">
-		<description>Where in the USA is Carmen Sandiego? (800K 3.5")</description>
-		<year>1990</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-09-11 -->
-		<!--"Where in the USA is Carmen Sandiego" is a 1990 educational program developed by Ken Bull, Gene Portwood, and Lauren Elliot, and distributed by Brøderbund Software. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296119">
-				<rom name="where in the usa is carmen sandiego 800k.woz" size="1296119" crc="c7075c63" sha1="bbc102ed01fb20393fecd3655d5bc0c523d57e50" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmtime35">
-		<description>Where in Time is Carmen Sandiego? (800K 3.5")</description>
-		<year>1990</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-09-11 -->
-		<!--"Where in Time is Carmen Sandiego" is a 1990 educational program developed by Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichting, Tom Rettig, and Claire Curtin, and distributed by Brøderbund Software. This is version 1.1. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296281">
-				<rom name="where in time is carmen sandiego 800k.woz" size="1296281" crc="8d38e3cd" sha1="9b96556dcb289a7c3b36762b64372f2c4a747951" />
 			</dataarea>
 		</part>
 	</software>
@@ -26177,6 +25499,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="aceyduec">
+		<description>Acey-Deucey</description>
+		<year>1982</year>
+		<publisher>L &amp; S Computerware</publisher>
+		<info name="programmer" value="Larry Sherman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-28-->
+		<!--card game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="61652">
+				<rom name="acey-deucey.woz" size="61652" crc="6a372c08" sha1="f3c467cfe38e27b94edb353e566ccf9a8a417119" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advbwalk">
+		<description>Advance to Boardwalk</description>
+		<year>1990</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="GameTek" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234734">
+				<rom name="advance to boardwalk.woz" size="234734" crc="a7b89d2d" sha1="8cb709d0f8b0f3b6c7a1b6b3c074b944207dda19" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advfrac10">
 		<description>Adventures with Fractions (A-774 version 1.0)</description>
 		<year>1983</year>
@@ -26353,6 +25707,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="arkanoid">
+		<description>Arkanoid</description>
+		<year>1988</year>
+		<publisher>Taito America</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later. Works with Apple II Mouse Card in slot 4: -sl4 mouse." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-04-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233449">
+				<rom name="arkanoid.woz" size="233449" crc="ed2ce549" sha1="421e17ac0441f3a513846eda613b234b4b1d756f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="awawhale">
 		<description>Audubon Wildlife Adventures: Whales! (version 2.1)</description>
 		<year>1990</year>
@@ -26524,6 +25893,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bchead">
+		<description>Beach-Head</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Brent Erickson, Bruce Carver, and Bryan Brandenburg" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-08-03-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235525">
+				<rom name="beach-head.woz" size="235525" crc="45f55dbd" sha1="c805e8bd5463b15e7e7326620b5abc186bd4714e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bchead2">
+		<description>Beach-Head II</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Peter Adams" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234760">
+				<rom name="beach-head ii.woz" size="234760" crc="b28bb733" sha1="58b13942ffd570223f755f867cf9ba76fc3c689d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blkbeltr1">
 		<description>Black Belt (revision 1)</description>
 		<year>1984</year>
@@ -26555,6 +25956,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234869">
 				<rom name="bluegrass bluff.woz" size="234869" crc="ccef05ca" sha1="4cf9cbf571e3de33af0cb70101f099f3aa55aa4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bublbobl">
+		<description>Bubble Bobble</description>
+		<year>1988</year>
+		<publisher>Taito America</publisher>
+		<info name="developer" value="NovaLogic" />
+		<info name="programmer" value="Chris Eisnaugle" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234789">
+				<rom name="bubble bobble side a.woz" size="234789" crc="e3123378" sha1="ad715935ba02fe2f3f01e8846a8398a612921810" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234789">
+				<rom name="bubble bobble side b.woz" size="234789" crc="6e0b4873" sha1="fe1e318170aa05a853020c838e94ff7948551a9a" />
 			</dataarea>
 		</part>
 	</software>
@@ -26649,6 +26074,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="crdshark">
+		<description>Card Sharks</description>
+		<year>1988</year>
+		<publisher>ShareData</publisher>
+		<info name="developer" value="ShareData" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234727">
+				<rom name="card sharks side a.woz" size="234727" crc="a31ae17b" sha1="7972b37a2b5f39a82f22ff7acea72c7f359c2acf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234727">
+				<rom name="card sharks side b.woz" size="234727" crc="1db21d62" sha1="c667a7496e95f5b5881e0712734ecab11551d4a2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cseffwmih">
 		<description>Cause and Effect: What Makes It Happen</description>
 		<year>1988</year>
@@ -26679,6 +26127,41 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241539">
 				<rom name="cavity busters.woz" size="241539" crc="6cd640b3" sha1="fb7432c0dd5a894c7daef8811acdb8ba74be0b42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkers">
+		<description>Checkers (version 2.1)</description>
+		<year>1981</year>
+		<publisher>Odesta Software</publisher>
+		<info name="developer" value="The Alpha-Beta Software Group" />
+		<info name="programmer" value="David Slate" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="48408">
+				<rom name="checkers v2.1.woz" size="48408" crc="3b3c7d82" sha1="cc6a3bd158b0ec2dad094955b13336b8883f0286" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chesso">
+		<description>Chess (Odesta Software) (version 7.0)</description>
+		<year>1982</year>
+		<publisher>Odesta Software</publisher>
+		<info name="programmer" value="Larry Atkin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="7.0" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-01-14-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="chess v7.0 (odesta).woz" size="234821" crc="dea3482d" sha1="40d127ba91d83be331a266e4f7d9727baeb78711" />
 			</dataarea>
 		</part>
 	</software>
@@ -28211,6 +27694,326 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dqcarmndalm">
+		<description>Dataquest: Carmen's North Dakota Almanac Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-11-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="carmen's north dakota almanac database.woz" size="234788" crc="757d3e67" sha1="618423e72b222f16e6624750d80e09aecf6f4656" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqgovflnd">
+		<description>Dataquest: Governors and First Ladies of North Dakota Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="governors and first ladies of north dakota database.woz" size="234813" crc="9fddb019" sha1="2be825d65d27591e49654873de30086b496af70d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqminnd">
+		<description>Dataquest: Minerals of North Dakota Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="minerals of north dakota.woz" size="234786" crc="16c550e4" sha1="1221551a2df3a59e5b81e328863ab0c672107605" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndagr">
+		<description>Dataquest: North Dakota Agriculture Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="north dakota agriculture database.woz" size="234795" crc="7dfea486" sha1="b0504bc333ffc3b2ff70bea46b3607e62a7ef2cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcpopu500">
+		<description>Dataquest: North Dakota Cities with Population Under 500 (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="north dakota cities with population under 500 database.woz" size="234807" crc="26fd3aae" sha1="6065680920edb68a51f5b8babb6e7dcc38630403" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcpop500a">
+		<description>Dataquest: North Dakota Cities with Population 500 and Above (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234811">
+				<rom name="north dakota cities with population 500 and above database.woz" size="234811" crc="c5ca75ae" sha1="81fc62349dd3afdecc1db519ebb700404f71058d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcount">
+		<description>Dataquest: North Dakota Counties (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="north dakota counties database.woz" size="234783" crc="d6df23a4" sha1="ef48c731e1e245b3b2f12ca13cde757703924015" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndexp">
+		<description>Dataquest: North Dakota Explorers (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="north dakota explorers database.woz" size="234784" crc="84f60ca6" sha1="bf064dc7c8a3eda897d4794f361336431681d6fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndindtr">
+		<description>Dataquest: North Dakota Indian Tribes (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="north dakota indian tribes.woz" size="234788" crc="0c8540c3" sha1="2e0e93a04b9002f9732d3a92086e4958b57aac9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndparkhs">
+		<description>Dataquest: North Dakota Parks and Historical Sites (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="north dakota parks and historical sites.woz" size="234801" crc="e4648f2b" sha1="3c2cfef269ed387988705717f8b369bd502d2505" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndplant">
+		<description>Dataquest: North Dakota Plants (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="north dakota plants.woz" size="234781" crc="6c978fc3" sha1="ad24084bf410dff2aaa584367dc26b83b2f0c88b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndpride">
+		<description>Dataquest: North Dakota Pride (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="north dakota pride.woz" size="234780" crc="436ed557" sha1="2067daae9ae657f2df24a556a2d7cef724598a30" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndsymb">
+		<description>Dataquest: North Dakota Symbols (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234782">
+				<rom name="north dakota symbols.woz" size="234782" crc="4e904c78" sha1="e8f19de16437067e1aea7256a0983f79229873d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndsenrep">
+		<description>Dataquest: North Dakota U.S. Senators and Representatives (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="north dakota u.s. senators and representatives.woz" size="234808" crc="e7c06937" sha1="c81e2fb70ff021b203db05b43a974a8e8145fc57" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndwildlf">
+		<description>Dataquest: North Dakota Wildlife (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="north dakota wildlife.woz" size="234783" crc="39e62a9b" sha1="bbffd66cdef57839e6c15e3fd72f0e6526c39e64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqnpeopnd">
+		<description>Dataquest: Notable People of North Dakota (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="notable people of north dakota.woz" size="234792" crc="73752e7c" sha1="b3b24917dc6c21636ac676ecf81d4616546e5aa9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dqsample">
 		<description>Dataquest: Sampler (A-173 version 1.0)</description>
 		<year>1986</year>
@@ -28386,6 +28189,58 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="earlwvbb">
+		<description>Earl Weaver Baseball</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Eddie Dombrower, Larry Rice, Mark Whittlesey, and John Heitmann" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234829">
+				<rom name="earl weaver baseball side a.woz" size="234829" crc="ea49d284" sha1="81f0147a9894e7fb0e6396b08b0b8f9f519e5118" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234829">
+				<rom name="earl weaver baseball side b.woz" size="234829" crc="d241c453" sha1="a5431f0a35ad9ea1388c3e472f30575c37a15b04" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Stat Disk" />
+			<dataarea name="flop" size="234829">
+				<rom name="earl weaver baseball 1988 baseball stat disk.woz" size="234829" crc="5318c670" sha1="d27dab23ec3962c6a3e4f5defea2e06fc6a4054f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="echelon">
+		<description>Echelon</description>
+		<year>1988</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Brent Erickson, Roger Carver, Bruce Carver, and Doug Vandegrift" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-28-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234803">
+				<rom name="echelon side a.woz" size="234803" crc="82cec901" sha1="d561cfbc16d2396d37716507a7d5fc4e596f3063" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234803">
+				<rom name="echelon side b.woz" size="234803" crc="1bcbb636" sha1="1dd68769e670d7404877cdc8972cc6df3e381b78" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eerievlib_525" cloneof="eerievlib">
 		<description>Eerieville Library (A-304 version 1.0)</description>
 		<year>1993</year>
@@ -28505,6 +28360,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="95026">
 				<rom name="essential data duplicator 4 plus v4.1.woz" size="95026" crc="1e3718ff" sha1="46e7db7d52a25133db8665a4a98bdbef1a56a759" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15streag">
+		<description>F-15 Strike Eagle (version 1.4)</description>
+		<year>1985</year>
+		<publisher>Microprose Software</publisher>
+		<info name="programmer" value="Sid Meier and Jim Synoski" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228179">
+				<rom name="f-15 strike eagle v1.4.woz" size="228179" crc="9dfd7e1d" sha1="784ff404399e282836ca53b6ce29e3467bd5a3fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -28650,6 +28522,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="226887">
 				<rom name="hard hat mack.woz" size="226887" crc="82a26a65" sha1="7fe8fa5f6c0a303221f6f6c4fd542feaec2c84e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hresfbal">
+		<description>Hi-Res Football</description>
+		<year>1980</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="programmer" value="Jay Sullivan and Ken Williams" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68405">
+				<rom name="hi-res football.woz" size="68405" crc="5eee5ba3" sha1="d46fb8bb288c177c09ed11bf6811532f8dcede44" />
 			</dataarea>
 		</part>
 	</software>
@@ -29581,6 +29469,33 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ndcity">
+		<description>North Dakota Cities Database (version 1.6)</description>
+		<year>1989</year>
+		<publisher>North Dakota Centennial Project</publisher>
+		<info name="programmer" value="David McCormack" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<info name="version" value="1.6" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234766">
+				<rom name="north dakota cities v1.6 side a.woz" size="234766" crc="01172d62" sha1="7fe5771d7d99a7cc4ebe3ad1cb479ee60d6b1fa9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234766">
+				<rom name="north dakota cities v1.6 side b.woz" size="234766" crc="afbbd59d" sha1="1841f97fd13834b83bb02954b5ecf8d5aba054da" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="numbball">
 		<description>Numberball</description>
 		<year>1994</year>
@@ -29633,6 +29548,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234793">
 				<rom name="polls and politics v1.0.woz" size="234793" crc="a9c32849" sha1="e5c63d30087975a550b75610690e91c30580c7ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pressylk">
+		<description>Press Your Luck</description>
+		<year>1988</year>
+		<publisher>GameTek</publisher>
+		<info name="programmer" value="Michael Robert Hausman" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234796">
+				<rom name="press your luck side a.woz" size="234796" crc="c3454f0b" sha1="9b095b16a22c5da0bd5dc8467e13e4eed251c562" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234796">
+				<rom name="press your luck side b.woz" size="234796" crc="7f400b08" sha1="0f45957be53ff84c9e43ae854d8997c9e8569194" />
 			</dataarea>
 		</part>
 	</software>
@@ -29714,6 +29652,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side 6" />
 			<dataarea name="flop" size="234967">
 				<rom name="questmaster i- the prism of heheutotol - side 6.woz" size="234967" crc="52038971" sha1="c334883cbbd31bb88239f558bcd1fdef73b77078" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qix">
+		<description>Qix</description>
+		<year>1989</year>
+		<publisher>Taito America</publisher>
+		<info name="developer" value="Alien Technology Group" />
+		<info name="usage" value="Requires a 128K Apple //e, //c, or IIgs." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-08-05-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233475">
+				<rom name="qix.woz" size="233475" crc="50acf331" sha1="9cbbe0b29761aa9e19a7e965932e9bf694f97825" />
 			</dataarea>
 		</part>
 	</software>
@@ -29926,6 +29880,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="renegade">
+		<description>Renegade</description>
+		<year>1989</year>
+		<publisher>Taito America</publisher>
+		<info name="programmer" value="Kyle Freeman" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-05-25-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234755">
+				<rom name="renegade side a.woz" size="234755" crc="040575e3" sha1="be136b6986f712453d1ffa826cf704fd35e95c49" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234755">
+				<rom name="renegade side b.woz" size="234755" crc="d245d5ae" sha1="7113632f3d6b9933402ee0e9ab612a2d8a460d92" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="runforit">
 		<description>Run For It</description>
 		<year>1984</year>
@@ -29987,6 +29964,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234774">
 				<rom name="shapes and patterns.woz" size="234774" crc="d716cc89" sha1="a055cff882adc289c45d60a89b81971898f0eb88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sitcrit">
+		<description>Situation: Critical</description>
+		<year>1984</year>
+		<publisher>Prism Software</publisher>
+		<info name="programmer" value="Alex Stern, Peter Rokitski, and Greg George" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="181562">
+				<rom name="situation- critical.woz" size="181562" crc="22b69582" sha1="a5775c0a6a2cb88d72f1421163300839cd99039c" />
 			</dataarea>
 		</part>
 	</software>
@@ -30573,6 +30566,75 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spasswrd">
+		<description>Super Password</description>
+		<year>1988</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234751">
+				<rom name="super password side a.woz" size="234751" crc="3e4870ce" sha1="582cd10f8d6d067539681c56a3bf08d64a6bad2d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234751">
+				<rom name="super password side b.woz" size="234751" crc="e36f3d4e" sha1="79e28db9bfc105bb2bb132ad549e47c862234f95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssicehock">
+		<description>Superstar Ice Hockey</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Jim Karaganis and Jerry Karaganis" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234812">
+				<rom name="superstar ice hockey side a.woz" size="234812" crc="bdac7f8c" sha1="e2e80a8a6acdc205b687cd34db49d8ae373b7f2a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234812">
+				<rom name="superstar ice hockey side b.woz" size="234812" crc="e5c84010" sha1="c485bca929a78a6a30a3a8cbfd437aa837c58328" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anfamfeud">
+		<description>The All New Family Feud</description>
+		<year>1989</year>
+		<publisher>ShareData</publisher>
+		<info name="programmer" value="John Dunn" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234790">
+				<rom name="the all new family feud side a.woz" size="234790" crc="9acd30bb" sha1="af43fba11df5547da39caaea5bb3804487b888ba" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234790">
+				<rom name="the all new family feud side b.woz" size="234790" crc="dd370ce7" sha1="20ae959e3583d0a3ff37d5044cb41751eb7521ce" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="banksim">
 		<description>The Banking Simulation</description>
 		<year>1986</year>
@@ -30802,6 +30864,316 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="war">
+		<description>War</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="developer" value="Adventure International" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234765">
+				<rom name="war (adventure international).woz" size="234765" crc="79dbdd18" sha1="059f29a61f8d47a45a16b66c4634eed837860805" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmneur_525" cloneof="carmeur">
+		<description>Where in Europe is Carmen Sandiego?</description>
+		<year>1988</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-28-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="233533">
+				<rom name="where in europe is carmen sandiego side a.woz" size="233533" crc="aa41e758" sha1="cccfae850e791d3eeae13097d4fbefd85f3543a6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="233533">
+				<rom name="where in europe is carmen sandiego side b.woz" size="233533" crc="32e8e026" sha1="701d0a865e3a567c663d214b03edc57472ca585a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmeur">
+		<description>Where in Europe is Carmen Sandiego? (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-07-06. Redumped: 2021-12-14 to fix incorrect header information-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296763">
+				<rom name="where in europe is carmen sandiego 800k.woz" size="1296763" crc="549ffd83" sha1="d6350738f600af581e5dc598aa8a90f8ee47bcf1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmndv98b" cloneof="carmnd">
+		<description>Where in North Dakota is Carmen Sandiego? (version 0.98 beta)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Ken Bull, Katherine Bird, Janese Freed, Leila Bronstein, Rick Incrocci, Michelle McBride, Roseann Mitchell, Arturo Sinclair, Diane Wilcox, and Louis Ewens" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="0.98 beta" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-12-->
+		<!--This is v0.98 beta, labeled as "for workshops and demonstrations only." It is not copy protected.-->
+		<!--educational game-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="235025">
+				<rom name="where in north dakota is carmen sandiego v0.98 beta side a.woz" size="235025" crc="ce6d7066" sha1="d690a7dfbe00b1f43fce826356995a7fdfa39fe8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="235025">
+				<rom name="where in north dakota is carmen sandiego v0.98 beta side b.woz" size="235025" crc="3c638e67" sha1="3d6f235b01a80644ff37e22ed4f51a7a642c8dcb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmndv10fb" cloneof="carmnd">
+		<description>Where in North Dakota is Carmen Sandiego? (version 1.0 final beta)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Ken Bull, Katherine Bird, Janese Freed, Leila Bronstein, Rick Incrocci, Michelle McBride, Roseann Mitchell, Arturo Sinclair, Diane Wilcox, and Louis Ewens" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0 final beta" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--This is v0.98 beta, labeled as "for workshops and demonstrations only." It is not copy protected.-->
+		<!--educational game-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234980">
+				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side a.woz" size="234980" crc="1fc431b1" sha1="e1bf54f99059247657d72ef67e7196c9fc592120" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234980">
+				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side b.woz" size="234980" crc="f9412d0b" sha1="e611506a904841cf644ffb58d24705d68fe70429" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmnd">
+		<description>Where in North Dakota is Carmen Sandiego? (version 1.0)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Ken Bull, Katherine Bird, Janese Freed, Leila Bronstein, Rick Incrocci, Michelle McBride, Roseann Mitchell, Arturo Sinclair, Diane Wilcox, and Louis Ewens" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-09-->
+		<!--educational game-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234963">
+				<rom name="where in north dakota is carmen sandiego side a.woz" size="234963" crc="482c92f4" sha1="e59481a41d75aca6e670cf9ea87c6f0a1b14646a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234963">
+				<rom name="where in north dakota is carmen sandiego side b.woz" size="234963" crc="cf47fe0c" sha1="25c5bbbdf0f4265e0a63de456c3a4258d87afc95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmtime_525" cloneof="carmtime">
+		<description>Where in Time is Carmen Sandiego? (verson 1.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichtinng, and Tom Rettig" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-02-05-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A" />
+			<dataarea name="flop" size="233672">
+				<rom name="where in time is carmen sandiego v1.1 - side a.woz" size="233672" crc="ea58dd13" sha1="a872d51b3352b3a1c5a6817ec10ed0ea0d1b3ed7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B" />
+			<dataarea name="flop" size="240328">
+				<rom name="where in time is carmen sandiego v1.1 - side b.woz" size="240328" crc="d91930ff" sha1="746cbb0f837fe28651f2bf2f19efc815f7c316d9" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side C" />
+			<dataarea name="flop" size="240328">
+				<rom name="where in time is carmen sandiego v1.1 - side c.woz" size="240328" crc="e720deac" sha1="2951a75612d58f001096f5daa4cb6c768098acea" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side D" />
+			<dataarea name="flop" size="233672">
+				<rom name="where in time is carmen sandiego v1.1 - side d.woz" size="233672" crc="20c6a3f7" sha1="7f9832c7e6ce06a3731ba0ca04c04ddd6cd0b929" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmtime">
+		<description>Where in Time is Carmen Sandiego? (version 1.1) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichtinng, and Tom Rettig" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-09-11-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296281">
+				<rom name="where in time is carmen sandiego 800k.woz" size="1296281" crc="8d38e3cd" sha1="9b96556dcb289a7c3b36762b64372f2c4a747951" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmusa86" cloneof="carmusa">
+		<description>Where in the USA is Carmen Sandiego? (version 1.0 1986)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 64K Apple ][ or later." />
+		<info name="version" value="1.0 1986" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-01-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="240205">
+				<rom name="where in the usa is carmen sandiego side a.woz" size="240205" crc="a1cfee60" sha1="fcc406c480127a71e4d186939e9671c0c0bf7c14" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="233549">
+				<rom name="where in the usa is carmen sandiego side b.woz" size="233549" crc="1ac6f62d" sha1="7940fad2b4b52615180cf51ce2348efe10e8e780" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmusa90" cloneof="carmusa">
+		<description>Where in the USA is Carmen Sandiego? (version 1990) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1990" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-09-11-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296119">
+				<rom name="where in the usa is carmen sandiego 800k.woz" size="1296119" crc="c7075c63" sha1="bbc102ed01fb20393fecd3655d5bc0c523d57e50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmusa">
+		<description>Where in the USA is Carmen Sandiego? (version 2.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234876">
+				<rom name="where in the usa is carmen sandiego v2.1 side a.woz" size="234876" crc="e15c7cbd" sha1="2295a661fdf08ffee4b45159808f51fd81cb4fb6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234845">
+				<rom name="where in the usa is carmen sandiego v2.1 side b.woz" size="234845" crc="b8296122" sha1="c6471bbc24e0ee9556e660c425fb7f2153215fab" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C" />
+			<dataarea name="flop" size="234845">
+				<rom name="where in the usa is carmen sandiego v2.1 side c.woz" size="234845" crc="8006d0d5" sha1="e9064ada0a2e1151a3d1e305c12ff87e213c416f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmwrld85" cloneof="carmwrld">
+		<description>Where in the World is Carmen Sandiego? (version 1985)</description>
+		<year>1985</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Dane Bigham, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 64K Apple ][ or later." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-03-16-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="332120">
+				<rom name="where in the world is carmen sandiego side a.woz" size="332120" crc="9e9bc183" sha1="bfcf9c5156a3bd57384f14656d7da9adfe546d2e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234840">
+				<rom name="where in the world is carmen sandiego side b.woz" size="234840" crc="771e61bd" sha1="672a843e9d7b927b8f2d14d0ea3679913add4175" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmwrld">
+		<description>Where in the World is Carmen Sandiego? (version 2.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Dane Bigham, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="234890">
+				<rom name="where in the world is carmen sandiego v2.1 side a.woz" size="234890" crc="ebb9b426" sha1="a96cc5bef8344c02c5d39115cae165cd69ca9666" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="234890">
+				<rom name="where in the world is carmen sandiego v2.1 side b.woz" size="234890" crc="e66e7010" sha1="afaf0ca540bca34c7c8e53a86ca3c4302441d3f3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wwmathl4">
 		<description>Wild West Math Level 4</description>
 		<year>1990</year>
@@ -30860,6 +31232,75 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="winlosdr">
+		<description>Win, Lose or Draw</description>
+		<year>1988</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-21-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234766">
+				<rom name="win, lose or draw side a.woz" size="234766" crc="220e6ab7" sha1="0eebde3fb99c11c589a40116e86bae785024193a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234766">
+				<rom name="win, lose or draw side b.woz" size="234766" crc="6846a7f9" sha1="86faf856fdd217e10fce1287612d578acb73ef83" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winlosdrjr">
+		<description>Win, Lose or Draw Junior</description>
+		<year>1989</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-21-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234789">
+				<rom name="win, lose or draw junior side a.woz" size="234789" crc="533877f3" sha1="d16345f294829b2969c3285805918efc43df78c3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234789">
+				<rom name="win, lose or draw junior side b.woz" size="234789" crc="05d6051c" sha1="515e6350a6e18d04a36dc3b37e42cbfd398de219" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winlosdr2">
+		<description>Win, Lose or Draw Second Edition</description>
+		<year>1989</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-21-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234781">
+				<rom name="win lose or draw second edition side a.woz" size="234781" crc="db3e9410" sha1="da3a24b7d52512a241ffefcd5d21e7cccb45bf59" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234781">
+				<rom name="win lose or draw second edition side b.woz" size="234781" crc="f27f2fc2" sha1="b0cab71c34e69eb746c119a76ce16148d7d0e588" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wingsshad">
 		<description>Wings Out of Shadow</description>
 		<year>1983</year>
@@ -30872,6 +31313,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234892">
 				<rom name="wings out of shadow.woz" size="234892" crc="3dd30c72" sha1="22ac1989ce534d437c29e35f061b89b5a7f8266a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wipeout">
+		<description>Wipeout</description>
+		<year>1988</year>
+		<publisher>ShareData</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234746">
+				<rom name="wipeout side a.woz" size="234746" crc="49a9104d" sha1="929abe88093db5fab3aaa247ca1213b93c6f9944" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234746">
+				<rom name="wipeout side b.woz" size="234746" crc="15b916fc" sha1="26831d8e420c4bbccd57594546ef44fac03848ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -30952,6 +31416,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234907">
 				<rom name="wizimore - the scarlet brotherhood of hsi ho.woz" size="234907" crc="c52237ac" sha1="aec32fb58baebb34cb1e0578189781fe958ed9bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcleaderb">
+		<description>World Class Leader Board</description>
+		<year>1987</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Bruce Carver, Roger Carver, and Vance Cook" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-04-01-->
+		<!--sports game-->
+		<!--This archive also includes "World Class Famous Course Disk Volume 1", originally sold separately.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234815">
+				<rom name="world class leader board side a.woz" size="234815" crc="ac7104f3" sha1="b913bbcab30a3dad52cb28556bdeb4d34e67a4b4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="241471">
+				<rom name="world class leader board side b.woz" size="241471" crc="14e4bd7c" sha1="ee2fa7be8a79549f07f62925c1635b2ed6768ffd" />
 			</dataarea>
 		</part>
 	</software>
