@@ -231,7 +231,7 @@ void fp1100_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).r(FUNC(fp1100_state::memory_r));
-	map(0x0000, 0xffff).writeonly().share("wram"); // always write to ram
+	map(0x0000, 0xffff).writeonly().share(m_wram); // always write to ram
 }
 
 void fp1100_state::io_map(address_map &map)
@@ -281,7 +281,7 @@ void fp1100_state::kbd_row_w(u8 data)
 void fp1100_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("sub_ipl", 0x0000);
-	map(0x2000, 0xdfff).ram().share("videoram"); //vram B/R/G
+	map(0x2000, 0xdfff).ram().share(m_videoram); //vram B/R/G
 	map(0xe000, 0xe000).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe400, 0xe400).mirror(0x3ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
@@ -654,14 +654,14 @@ void fp1100_state::fp1100(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fp1100_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fp1100_state::vblank_irq));
 
-	upd7801_device &sub(UPD7801(config, m_subcpu, MAIN_CLOCK/4));
-	sub.set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
-	sub.pa_out_cb().set(FUNC(fp1100_state::porta_w));
-	sub.pb_in_cb().set(FUNC(fp1100_state::portb_r));
-	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::write));
-	sub.pc_in_cb().set(FUNC(fp1100_state::portc_r));
-	sub.pc_out_cb().set(FUNC(fp1100_state::portc_w));
-	sub.txd_func().set([this] (bool state) { m_cassbit = state; });
+	UPD7801(config, m_subcpu, MAIN_CLOCK/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
+	m_subcpu->pa_out_cb().set(FUNC(fp1100_state::porta_w));
+	m_subcpu->pb_in_cb().set(FUNC(fp1100_state::portb_r));
+	m_subcpu->pb_out_cb().set("cent_data_out", FUNC(output_latch_device::write));
+	m_subcpu->pc_in_cb().set(FUNC(fp1100_state::portc_r));
+	m_subcpu->pc_out_cb().set(FUNC(fp1100_state::portc_w));
+	m_subcpu->txd_func().set([this] (bool state) { m_cassbit = state; });
 
 	GENERIC_LATCH_8(config, "main2sub");
 	GENERIC_LATCH_8(config, "sub2main");
@@ -682,7 +682,7 @@ void fp1100_state::fp1100(machine_config &config)
 			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
 	// CRTC
-	MC6845(config, m_crtc, MAIN_CLOCK/8);   // unknown variant; hand tuned to get ~60 fps
+	HD6845S(config, m_crtc, MAIN_CLOCK/8);   // hand tuned to get ~60 fps
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -714,8 +714,8 @@ ROM_START( fp1100 )
 	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
 ROM_END
 
-/* FP1000 has less memory than FP1100, using the same PCB, but with unpopulated sockets from RAM9 to RAM24 (only RAM1 to RAM8 are populated).
-   The dumped PCB has the uPD7801G socket labeled as "uPD7801G-101", but the chip seems like a newer revision, silkscreened as "D7108G-118". */
+/* FP-1000 has video RAM locations RAM9 to RAM24 unpopulated (only RAM1 to RAM8 are populated) - needs its own machine configuration.
+   PCB parts overlay silkscreen for sub-CPU shows "µPD7801G-101", but all examples seen have chips silksreened "D7108G 118". */
 ROM_START( fp1000 )
 	ROM_REGION( 0x9000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "2l_a10_kkk_fp1000_basic.c1", 0x0000, 0x1000, CRC(9322dedd) SHA1(40a00684ced2b7ead53ca15a915d98f3fe00d3ba))
