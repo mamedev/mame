@@ -104,7 +104,7 @@ INPUT_PORTS_END
 
 void mx3210_state::mx3210(machine_config &config)
 {
-	M68020(config, m_maincpu, 40_MHz_XTAL);
+	M68020(config, m_maincpu, 40_MHz_XTAL/2);
 
 	WD37C65C(config, m_fdc, 10_MHz_XTAL, 10_MHz_XTAL); // FDC37C65CLJ-P, unknown clock
 	//FLOPPY_CONNECTOR(...)
