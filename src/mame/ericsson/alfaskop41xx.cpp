@@ -22,16 +22,18 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
-#include "machine/6850acia.h"
 #include "machine/6821pia.h"
-#include "machine/mc6854.h"
+#include "machine/6850acia.h"
+#include "machine/input_merger.h"
 #include "machine/mc6844.h"
+#include "machine/mc6854.h"
+#include "machine/output_latch.h"
 #include "machine/pla.h"
 #include "video/mc6845.h"
+
 #include "screen.h"
-#include "machine/input_merger.h"
-#include "machine/output_latch.h"
 
 //#include "bus/rs232/rs232.h"
 //#include "machine/clock.h"
