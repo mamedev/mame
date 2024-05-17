@@ -229,7 +229,9 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 				x = spriteram[offs + 2];
 
 				if (!m_sprite_bitmap.valid())
+				{
 					colour = m_col_cb(x, BIT(y, 15));
+				}
 				else
 				{
 					colour = (x >> 9) & 0x7f;
@@ -247,18 +249,17 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 				int tempwidth = 0;
 
 				if (m_is_bootleg && (m_bootleg_type == 1))  // puzzlove
-				{
-					tempwidth = (y & 0x1000) >> 12;
-					tempwidth |= (y & 0x0200) >> 8;
-				}
+					tempwidth |= bitswap<2>(y, 9, 12);
 				else
-					tempwidth |= (y & 0x0600) >> 9;
+					tempwidth |= bitswap<2>(y, 10, 9);
 
 				multi = (1 << (tempwidth)) - 1; // 1x, 2x, 4x, 8x height
 
 				// bootleg support (misc/esd16.cpp)
-				if (flipscreen) x = ((x & 0x1ff) - m_x_offset) & 0x1ff;
-				else x = ((x & 0x1ff) + m_x_offset) & 0x1ff;
+				if (flipscreen)
+					x = ((x & 0x1ff) - m_x_offset) & 0x1ff;
+				else
+					x = ((x & 0x1ff) + m_x_offset) & 0x1ff;
 				y = ((y & 0x1ff) + m_y_offset) & 0x1ff;
 
 				if (cliprect.right() > 256)
@@ -304,12 +305,12 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 
 					if (flipscreen ^ m_flipallx)
 					{
-						if (cliprect.right()>256)
+						if (cliprect.right() > 256)
 							x = 304 - x;
 						else
 							x = 240 - x;
 
-						if (fx) fx = 0; else fx = 1;
+						fx = fx ? 0 : 1;
 					}
 
 					mult2 = multi + 1;
@@ -347,14 +348,14 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 												(sprite - multi * inc) - mult2,
 												colour,
 												fx, fy,
-												!flipscreen ? x - 16 : x + 16, ypos,
+												!flipscreen ? (x - 16) : (x + 16), ypos,
 												screen().priority(), pri, m_transpen);
 									else
 										gfx(0)->transpen(bitmap, cliprect,
 												(sprite - multi * inc) - mult2,
 												colour,
 												fx, fy,
-												!flipscreen ? x - 16 : x + 16, ypos,
+												!flipscreen ? (x - 16) : (x + 16), ypos,
 												m_transpen);
 								}
 							}
@@ -373,7 +374,7 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 										(sprite - multi * inc) - mult2,
 										colour << m_raw_shift,
 										fx, fy,
-										!flipscreen ? x - 16 : x + 16, ypos,
+										!flipscreen ? (x - 16) : (x + 16), ypos,
 										m_transpen);
 								}
 
@@ -413,29 +414,24 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 				{
 					x = x & 0x01ff;
 					y = y & 0x01ff;
-					if (x > 0x180) x = -(0x200 - x);
-					if (y > 0x180) y = -(0x200 - y);
+					if (x > 0x180) x -= 512;
+					if (y > 0x180) y -= 512;
 
 					if (fx) { mult = -16; x += 16 * w; } else { mult = 16; x -= 16; }
 					if (fy) { mult2 = -16; y += 16 * h; } else { mult2 = 16; y -= 16; }
 				}
 				else
 				{
-					if (fx) fx = 0; else fx = 1;
-					if (fy) fy = 0; else fy = 1;
+					fx = fx ? 0 : 1;
+					fy = fy ? 0 : 1;
 
-					x = x & 0x01ff;
-					y = y & 0x01ff;
-					if (x & 0x100) x = -(0x100 - (x & 0xff));
-					if (y & 0x100) y = -(0x100 - (y & 0xff));
-					x = 304 - x;
-					y = 240 - y;
+					x = 304 - util::sext(x, 9);
+					y = 240 - util::sext(y, 9);
 					if (x >= 432) x -= 512;
 					if (y >= 384) y -= 512;
 					if (fx) { mult = -16; x += 16; } else { mult = 16; x -= 16 * w; }
 					if (fy) { mult2 = -16; y += 16; } else { mult2 = 16; y -= 16 * h; }
 				}
-				int ypos;
 
 				for (int xx = 0; xx < w; xx++)
 				{
@@ -445,7 +441,7 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 						{
 							if (!m_pri_cb.isnull())
 							{
-								ypos = y + mult2 * (h - yy);
+								int ypos = y + mult2 * (h - yy);
 
 								if ((ypos <= cliprect.bottom()) && (ypos >= (cliprect.top()) - 16))
 								{
@@ -472,7 +468,7 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 							}
 							else
 							{
-								ypos = y + mult2 * (h - yy);
+								int ypos = y + mult2 * (h - yy);
 
 								if ((ypos <= cliprect.bottom()) && (ypos >= (cliprect.top()) - 16))
 								{
@@ -499,7 +495,7 @@ void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &c
 						}
 						else
 						{
-							ypos = y + mult2 * (h - yy);
+							int ypos = y + mult2 * (h - yy);
 
 							if ((ypos <= cliprect.bottom()) && (ypos >= (cliprect.top()) - 16))
 							{
