@@ -67,6 +67,7 @@ LED->o      ___________   ___________   ___________    ___________   ___________
      |                                                                                                         |
      |    BATT       _______   Xtal   ________   ___________   ___   ___________    : :                        |
      |              |CA82C52|   ??   |CA82C54|  |_74HCT259N| 93C06N |_74F5074N_|    : :                        |
+     |              |_______|        |_______|                                                                 |
      |____________________________________________________________________________                           __|_
                                                                                   |        ________          |   |
                                                                                   |       MC145406P          |___|
@@ -74,8 +75,12 @@ LED->o      ___________   ___________   ___________    ___________   ___________
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68020.h"
+
+#include "machine/am79c90.h"
 #include "machine/upd765.h"
+
 //#include "imagedev/floppy.h"
 
 namespace {
@@ -108,6 +113,9 @@ void mx3210_state::mx3210(machine_config &config)
 
 	WD37C65C(config, m_fdc, 10_MHz_XTAL, 10_MHz_XTAL); // FDC37C65CLJ-P, unknown clock
 	//FLOPPY_CONNECTOR(...)
+
+	AM7990(config, "lance1", 0); // AMD AM7990PC/80
+	AM7990(config, "lance1", 0); // AMD AM7990PC/80
 }
 
 ROM_START(mx3210)
