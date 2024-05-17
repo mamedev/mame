@@ -379,6 +379,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
+
 #include "speaker.h"
 
 #include <algorithm>
@@ -707,7 +708,7 @@ void dragngun_state::lockloadu_sound_map(address_map &map)
 u16 deco32_state::ioprot_r(offs_t offset)
 {
 	const offs_t real_address = 0 + (offset * 2);
-	const offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	const offs_t deco146_addr = (BIT(real_address, 14, 4) << 11) | BIT(real_address, 0, 11); // NC 31-18, 13-11
 	u8 cs = 0;
 
 	return m_ioprot->read_data(deco146_addr, cs);
@@ -716,10 +717,10 @@ u16 deco32_state::ioprot_r(offs_t offset)
 void deco32_state::ioprot_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const offs_t real_address = 0 + (offset * 2);
-	const offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	const offs_t deco146_addr = (BIT(real_address, 14, 4) << 11) | BIT(real_address, 0, 11); // NC 31-18, 13-11
 	u8 cs = 0;
 
-	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data(deco146_addr, data, mem_mask, cs);
 }
 
 
@@ -731,7 +732,7 @@ void deco32_state::volume_w(u8 data)
 {
 	// TODO: assume linear with a 0.0-1.0 dB scale for now
 	const u8 raw_vol = 0xff - data;
-	const float vol_output = ((float)raw_vol) / 255.0f;
+	const float vol_output = float(raw_vol) / 255.0f;
 
 	m_ym2151->set_output_gain(ALL_OUTPUTS, vol_output);
 	m_oki[0]->set_output_gain(ALL_OUTPUTS, vol_output);
