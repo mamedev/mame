@@ -93,22 +93,19 @@
 #include "sound/ymopm.h"
 #include "speaker.h"
 
-#define MAIN_XTAL XTAL(28'000'000)
-#define SOUND_XTAL XTAL(32'220'000)
-
-uint16_t boogwing_state::boogwing_protection_region_0_104_r(offs_t offset)
+uint16_t boogwing_state::ioprot_r(offs_t offset)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, cs );
+	uint16_t const data = m_deco104->read_data( deco146_addr, cs );
 	return data;
 }
 
-void boogwing_state::boogwing_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void boogwing_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
@@ -135,7 +132,7 @@ void boogwing_state::boogwing_map(address_map &map)
 //  map(0x24e6c0, 0x24e6c1).portr("DSW");
 //  map(0x24e138, 0x24e139).portr("SYSTEM");
 //  map(0x24e344, 0x24e345).portr("INPUTS");
-	map(0x24e000, 0x24efff).rw(FUNC(boogwing_state::boogwing_protection_region_0_104_r), FUNC(boogwing_state::boogwing_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x24e000, 0x24efff).rw(FUNC(boogwing_state::ioprot_r), FUNC(boogwing_state::ioprot_w)).share("prot16ram"); /* Protection device */
 
 	map(0x260000, 0x26000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
 	map(0x264000, 0x265fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
@@ -290,7 +287,13 @@ static GFXDECODE_START( gfx_boogwing )
 	GFXDECODE_ENTRY( "tiles1",   0, tile_8x8_layout,        0x800, 16 ) /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "tiles2",   0, tile_16x16_layout_5bpp, 0x100, 16 ) /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "tiles3",   0, tile_16x16_layout,      0x300, 32 ) /* Tiles (16x16) */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_boogwing_spr1 )
 	GFXDECODE_ENTRY( "sprites1", 0, tile_16x16_layout,      0x500, 32 ) /* Sprites (16x16) */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_boogwing_spr2 )
 	GFXDECODE_ENTRY( "sprites2", 0, tile_16x16_layout,      0x700, 16 ) /* Sprites (16x16) */
 GFXDECODE_END
 
@@ -324,6 +327,9 @@ DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 
 void boogwing_state::boogwing(machine_config &config)
 {
+	constexpr XTAL MAIN_XTAL = XTAL(28'000'000);
+	constexpr XTAL SOUND_XTAL = XTAL(32'220'000);
+
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MAIN_XTAL/2);   /* DE102 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &boogwing_state::boogwing_map);
@@ -373,13 +379,8 @@ void boogwing_state::boogwing(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO_SPRITE(config, m_sprgen[1], 0);
-	m_sprgen[1]->set_gfx_region(4);
-	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen[0], 0, m_deco_ace, gfx_boogwing_spr1);
+	DECO_SPRITE(config, m_sprgen[1], 0, m_deco_ace, gfx_boogwing_spr2);
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
@@ -441,7 +442,7 @@ ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
 	ROM_LOAD( "mbd-07.18b",    0x200000, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "tiles2_hi", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -485,7 +486,7 @@ ROM_START( boogwingu ) /* VER 1.7 USA 92.12.14 */
 	ROM_LOAD( "mbd-07.18b",    0x200000, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "tiles2_hi", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -529,7 +530,7 @@ ROM_START( boogwinga ) /* VER 1.5 ASA 92.12.07 */
 	ROM_LOAD( "mbd-07.18b",    0x200000, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "tiles2_hi", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -573,7 +574,7 @@ ROM_START( ragtime ) /* VER 1.5 JPN 92.12.07 */
 	ROM_LOAD( "mbd-07.18b",    0x200000, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "tiles2_hi", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -617,7 +618,7 @@ ROM_START( ragtimea ) /* VER 1.3 JPN 92.11.26 */
 	ROM_LOAD( "mbd-07.18b",    0x200000, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
 	ROM_LOAD( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
 
-	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
+	ROM_REGION( 0x0100000, "tiles2_hi", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
@@ -632,13 +633,13 @@ ROM_END
 
 void boogwing_state::init_boogwing()
 {
-	const uint8_t* src = memregion("gfx6")->base();
+	const uint8_t* src = memregion("tiles2_hi")->base();
 	uint8_t* dst = memregion("tiles2")->base() + 0x200000;
 
 	deco56_decrypt_gfx(machine(), "tiles1");
 	deco56_decrypt_gfx(machine(), "tiles2");
 	deco56_decrypt_gfx(machine(), "tiles3");
-	deco56_remap_gfx(machine(), "gfx6");
+	deco56_remap_gfx(machine(), "tiles2_hi");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x100000, 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
 }

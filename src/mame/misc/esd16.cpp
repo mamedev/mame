@@ -108,7 +108,7 @@ void esd16_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void esd16_state::hedpanic_platform_w(u16 data)
 {
-	int offsets = m_headpanic_platform_x[0] + 0x40 * m_headpanic_platform_y[0];
+	int const offsets = m_headpanic_platform_x[0] + 0x40 * m_headpanic_platform_y[0];
 
 	m_vram[1][offsets] = data;
 	m_tilemap[1]->mark_tile_dirty(offsets);
@@ -657,15 +657,21 @@ static const gfx_layout hedpanic_layout_16x16x8 =
 
 
 static GFXDECODE_START( gfx_esd16 )
-	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 )      // [0] Sprites
 	GFXDECODE_ENTRY( "bgs", 0, gfx_8x8x8_raw,           0x000, 2 )      // [1] Layers
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 2 )      // [1] Layers
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_esd16_spr )
+	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 )      // [0] Sprites
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_jumppop )
-	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,  0x000, 0x40 )   // Sprites 16x16 - has 4bpp sprites, unlike the others
 	GFXDECODE_ENTRY( "bgs", 0, gfx_8x8x8_raw,           0x000, 4 )      // Characters 8x8
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 )      // Tiles 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_jumppop_spr )
+	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,  0x000, 0x40 )   // Sprites 16x16 - has 4bpp sprites, unlike the others
 GFXDECODE_END
 
 
@@ -718,12 +724,10 @@ void esd16_state::esd16_nosound(machine_config &config)
 	screen.set_screen_update(FUNC(esd16_state::screen_update));
 	screen.set_palette("palette");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(0);
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_esd16_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_pri_callback(FUNC(esd16_state::pri_callback));
 	m_sprgen->set_flipallx(1);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_esd16);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
@@ -780,6 +784,7 @@ void esd16_state::jumppop(machine_config &config)
 
 	m_audiocpu->set_clock(XTAL(14'000'000)/4); /* 3.5MHz - Verified */
 
+	m_sprgen->set_info(gfx_jumppop_spr);
 	m_gfxdecode->set_info(gfx_jumppop);
 
 	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(14'000'000)/4); /* 3.5MHz - Verified */

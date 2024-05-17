@@ -206,10 +206,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0,1), STEP8(8*16,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -219,15 +217,16 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(8*16,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
 static GFXDECODE_START( gfx_gotcha )
 	GFXDECODE_ENTRY( "tiles", 0, tilelayout, 0x100, 32 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_gotcha_spr )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x000, 16 )
 GFXDECODE_END
 
@@ -279,11 +278,9 @@ void gotcha_state::gotcha(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gotcha);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 768);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(1);
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_gotcha_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_offsets(5, -1); // aligned to 2nd instruction screen in attract
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
