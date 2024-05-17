@@ -66,6 +66,7 @@ extern char const *const MM768K;
 extern char const *const MM1024K;
 extern char const *const MM2048K ;
 extern char const *const MM4096K;
+extern char const *const MMM;
 extern char const *const MOONSOUND;
 extern char const *const MSXAUD_FSCA1;
 extern char const *const MSXAUD_HXMU900;

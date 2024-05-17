@@ -88,7 +88,6 @@ Not supported memory mappers:
 - MSX Cartridge Shop MegaFlashROM SCC+ SD
 - Padial LPE-4FMB-V8SKP - 4MB memory mapper + MegaRam mode
 - Playsonic - 4MB memory mapper, up to 16MB through extra register
-- Popolon Musical Memory Mapper - 1MB memory mapper + SN76489AN
 - Stichting CODE MCR-025 - 256KB memory mapper + RAM Disk + Printer buffer
 - Stichting CODE MCR-051 - 512KB memory mapper + RAM Disk + Printer buffer
 - Stichting CODE MCR-076 - 768KB memory mapper + RAM Disk + Printer buffer
@@ -100,8 +99,8 @@ Not supported memory mappers:
 #include "slotoptions.h"
 
 #include "bus/msx/slot/cartridge.h"
-
 #include "bus/generic/slot.h"
+#include "sound/sn76496.h"
 
 
 
@@ -115,6 +114,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_768K_MM_RAM,  msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_1024K_MM_RAM, msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_2048K_MM_RAM, msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_4096K_MM_RAM, msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_MMM,          msx_cart_interface)
 
 void msx_cart_ram_register_options(device_slot_interface &device)
 {
@@ -129,6 +129,7 @@ void msx_cart_ram_register_options(device_slot_interface &device)
 	device.option_add(slotoptions::MM1024K, MSX_CART_1024K_MM_RAM);
 	device.option_add(slotoptions::MM2048K, MSX_CART_2048K_MM_RAM);
 	device.option_add(slotoptions::MM4096K, MSX_CART_4096K_MM_RAM);
+	device.option_add(slotoptions::MMM,     MSX_CART_MMM);
 }
 
 namespace {
@@ -244,7 +245,6 @@ protected:
 
 	template <int Bank> void bank_w(u8 data);
 
-private:
 	memory_bank_array_creator<4> m_rambank;
 	u8 m_bank_mask;
 };
@@ -334,6 +334,58 @@ public:
 	{ }
 };
 
+
+class msx_cart_mmm_device : public msx_cart_base_mm_ram_device
+{
+public:
+	msx_cart_mmm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: msx_cart_base_mm_ram_device(mconfig, MSX_CART_MMM, tag, owner, clock, 1024 * 1024)
+		, m_sn76489a(*this, "sn76489a")
+		, m_access_enabled(false)
+		, m_sn76489_enabled(false)
+	{ }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<sn76496_base_device> m_sn76489a;
+	bool m_access_enabled;
+	bool m_sn76489_enabled;
+};
+
+void msx_cart_mmm_device::device_start()
+{
+	msx_cart_base_mm_ram_device::device_start();
+
+	m_access_enabled = false;
+	m_sn76489_enabled = false;
+
+	io_space().install_write_tap(0x3c, 0x3c, "ena_access", [this] (offs_t, u8& data, u8){ this->m_access_enabled = BIT(data, 7); });
+	io_space().install_write_tap(0x3f, 0x3f, "sn76489w", [this] (offs_t, u8& data, u8){ if (m_sn76489_enabled) this->m_sn76489a->write(data); });
+
+	page(2)->install_write_tap(0x803c, 0x803c, "ena_sn76489", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->m_sn76489_enabled |= BIT(data, 6); });
+	page(2)->install_read_tap(0x80fc, 0x80fc, "map00r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[0]->entry(); });
+	page(2)->install_read_tap(0x80fd, 0x80fd, "map40r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[1]->entry(); });
+	page(2)->install_read_tap(0x80fe, 0x80fe, "map80r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[2]->entry(); });
+	page(2)->install_read_tap(0x80ff, 0x80ff, "mapc0r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[3]->entry(); });
+	page(2)->install_write_tap(0x80fc, 0x80fc, "map00w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<0>(data); });
+	page(2)->install_write_tap(0x80fd, 0x80fd, "map40w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<1>(data); });
+	page(2)->install_write_tap(0x80fe, 0x80fe, "map80w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<2>(data); });
+	page(2)->install_write_tap(0x80ff, 0x80ff, "mapc0w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<3>(data); });
+
+	save_item(NAME(m_access_enabled));
+	save_item(NAME(m_sn76489_enabled));
+}
+
+void msx_cart_mmm_device::device_add_mconfig(machine_config &config)
+{
+	SN76489A(config, m_sn76489a, DERIVED_CLOCK(1, 3));
+	if (parent_slot())
+		m_sn76489a->add_route(ALL_OUTPUTS, soundin(), 0.8);
+}
+
 } // anonymous namespace
 
 
@@ -347,3 +399,4 @@ DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_768K_MM_RAM,  msx_cart_interface, msx_cart_7
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_1024K_MM_RAM, msx_cart_interface, msx_cart_1024k_mm_ram_device, "msx_cart_1024k_mm_ram", "Generic MSX 1024K MM RAM Expansion")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_2048K_MM_RAM, msx_cart_interface, msx_cart_2048k_mm_ram_device, "msx_cart_2048k_mm_ram", "Generic MSX 2048K MM RAM Expansion")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_4096K_MM_RAM, msx_cart_interface, msx_cart_4096k_mm_ram_device, "msx_cart_4096k_mm_ram", "Generic MSX 4096K MM RAM Expansion")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_MMM,          msx_cart_interface, msx_cart_mmm_device,          "msx_cart_mmm",          "Popolon Musical Memory Mapper")
