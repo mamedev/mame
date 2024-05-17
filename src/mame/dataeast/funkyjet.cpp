@@ -95,11 +95,11 @@ Notes:
 
 #include "deco146.h"
 #include "deco16ic.h"
+#include "decocrpt.h"
 #include "decospr.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m68000/m68000.h"
-#include "decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -187,10 +187,10 @@ uint16_t funkyjet_state::ioprot_r(offs_t offset)
 {
 //  uint16_t realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
 
-	int const real_address = 0 + (offset *2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */      10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = (BIT(real_address, 14, 4) << 11) | BIT(real_address, 0, 11); // NC 31-18, 13-11 note, same bitswap as fghthist
 	uint8_t cs = 0;
-	uint16_t const data = m_deco146->read_data( deco146_addr, cs );
+	uint16_t const data = m_deco146->read_data(deco146_addr, cs);
 
 //  if ((realdat & mem_mask) != (data & mem_mask))
 //      printf("returned %04x instead of %04x (real address %08x swapped addr %08x)\n", data, realdat, real_address, deco146_addr);
@@ -203,9 +203,9 @@ void funkyjet_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  deco16_146_funkyjet_prot_w(space,offset&0x3ff,data,mem_mask);
 
 	int const real_address = 0 + (offset *2);
-	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, same bitswap as fghthist */       10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
+	int const deco146_addr = (BIT(real_address, 14, 4) << 11) | BIT(real_address, 0, 11); // NC 31-18, 13-11 note, same bitswap as fghthist
 	uint8_t cs = 0;
-	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
+	m_deco146->write_data(deco146_addr, data, mem_mask, cs);
 }
 
 
