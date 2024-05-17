@@ -47,27 +47,11 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	required_shared_ptr<uint8_t> m_bgram;
-	required_shared_ptr<uint8_t> m_fgram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_memory_bank m_subbank;
-
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_status = 0;
-	uint8_t m_xscroll = 0;
-	uint8_t m_yscroll = 0;
-	uint8_t m_flipscreen = 0;
-
 	void bank_sel_w(uint8_t data);
 	void status_m_w(uint8_t data);
 	void status_s_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
+	void fgram_w(offs_t offset, uint8_t data);
 	void bgram_w(offs_t offset, uint8_t data);
 	uint8_t bgram_r(offs_t offset);
 	void scroll_x_w(uint8_t data);
@@ -84,8 +68,26 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 
+	void base_map(address_map &map);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_memory_bank m_subbank;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_status = 0;
+	uint8_t m_xscroll = 0;
+	uint8_t m_yscroll = 0;
+	uint8_t m_flipscreen = 0;
 };
 
 
@@ -100,38 +102,45 @@ void xxmissio_state::scroll_y_w(uint8_t data)
 
 void xxmissio_state::flipscreen_w(uint8_t data)
 {
-	m_flipscreen = data & 0x01;
+	m_flipscreen = BIT(data, 0);
 }
 
 void xxmissio_state::bgram_w(offs_t offset, uint8_t data)
 {
-	int x = (offset + (m_xscroll >> 3)) & 0x1f;
+	int const x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
 	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 uint8_t xxmissio_state::bgram_r(offs_t offset)
 {
-	int x = (offset + (m_xscroll >> 3)) & 0x1f;
+	int const x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
 	return m_bgram[offset];
+}
+
+void xxmissio_state::fgram_w(offs_t offset, uint8_t data)
+{
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 /****************************************************************************/
 
 TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
 {
-	int code = ((m_bgram[0x400 | tile_index] & 0xc0) << 2) | m_bgram[0x000 | tile_index];
-	int color =  m_bgram[0x400 | tile_index] & 0x0f;
+	int const code = ((m_bgram[0x400 | tile_index] & 0xc0) << 2) | m_bgram[0x000 | tile_index];
+	int const color =  m_bgram[0x400 | tile_index] & 0x0f;
 
 	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
 {
-	int code = m_fgram[0x000 | tile_index];
-	int color = m_fgram[0x400 | tile_index] & 0x07;
+	int const code = m_fgram[0x000 | tile_index];
+	int const color = m_fgram[0x400 | tile_index] & 0x07;
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -211,7 +220,6 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().tilemap().mark_all_dirty();
 	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	m_bg_tilemap->set_scrollx(0, m_xscroll * 2);
@@ -299,24 +307,31 @@ void xxmissio_state::machine_start()
 
 /****************************************************************************/
 
-void xxmissio_state::main_map(address_map &map)
+void xxmissio_state::base_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-
 	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("STATUS");
-	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_m_w));
 	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
 
-	map(0xc000, 0xc7ff).ram().share(m_fgram);
+	map(0xc000, 0xc7ff).ram().w(FUNC(xxmissio_state::fgram_w)).share(m_fgram);
 	map(0xc800, 0xcfff).rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w)).share(m_bgram);
 	map(0xd000, 0xd7ff).ram().share(m_spriteram);
 
 	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
+
+
+void xxmissio_state::main_map(address_map &map)
+{
+	base_map(map);
+
+	map(0x0000, 0x7fff).rom();
+
+	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_m_w));
 
 	map(0xe000, 0xefff).share("workram1").ram();
 	map(0xf000, 0xffff).share("workram2").ram();
@@ -325,24 +340,14 @@ void xxmissio_state::main_map(address_map &map)
 
 void xxmissio_state::sub_map(address_map &map)
 {
+	base_map(map);
+
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr(m_subbank);
 
-	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x8006, 0x8006).w(FUNC(xxmissio_state::bank_sel_w));
 
-	map(0xa000, 0xa000).portr("P1");
-	map(0xa001, 0xa001).portr("P2");
-	map(0xa002, 0xa002).portr("STATUS");
 	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_s_w));
-	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
-
-	map(0xc000, 0xc7ff).share(m_fgram).ram();
-	map(0xc800, 0xcfff).share(m_bgram).rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w));
-	map(0xd000, 0xd7ff).share(m_spriteram).ram();
-
-	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xe000, 0xefff).share("workram2").ram();
 	map(0xf000, 0xffff).share("workram1").ram();
@@ -429,44 +434,29 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	16,8,   // 16*8 characters
-	2048,   // 2048 characters
+	RGN_FRAC(1,1),   // 2048 characters
 	4,      // 4 bits per pixel
-	{0,1,2,3},
-	{0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60},
-	{64*0, 64*1, 64*2, 64*3, 64*4, 64*5, 64*6, 64*7},
-	64*8
+	{ STEP4(0,1) },
+	{ STEP16(0,4) },
+	{ STEP8(0,4*16) },
+	4*16*8
 };
 
 static const gfx_layout spritelayout =
 {
 	32,16,    // 32*16 characters
-	512,      // 512 sprites
+	RGN_FRAC(1,1),      // 512 sprites
 	4,        // 4 bits per pixel
-	{0,1,2,3},
-	{0,4,8,12,16,20,24,28,
-		32,36,40,44,48,52,56,60,
-		8*64+0,8*64+4,8*64+8,8*64+12,8*64+16,8*64+20,8*64+24,8*64+28,
-		8*64+32,8*64+36,8*64+40,8*64+44,8*64+48,8*64+52,8*64+56,8*64+60},
-	{64*0, 64*1, 64*2, 64*3, 64*4, 64*5, 64*6, 64*7,
-		64*16, 64*17, 64*18, 64*19, 64*20, 64*21, 64*22, 64*23},
+	{ STEP4(0,1) },
+	{ STEP16(0,4), STEP16(4*16*8,4) },
+	{ STEP8(0,4*16), STEP8(4*16*8*2,4*16) },
 	64*8*4
-};
-
-static const gfx_layout bglayout =
-{
-	16,8,   // 16*8 characters
-	1024,   // 1024 characters
-	4,      // 4 bits per pixel
-	{0,1,2,3},
-	{0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60},
-	{64*0, 64*1, 64*2, 64*3, 64*4, 64*5, 64*6, 64*7},
-	64*8
 };
 
 static GFXDECODE_START( gfx_xxmissio )
 	GFXDECODE_ENTRY( "chars_sprites", 0x0000, charlayout,   256,  8 ) // FG
 	GFXDECODE_ENTRY( "chars_sprites", 0x0000, spritelayout,   0,  8 ) // sprite
-	GFXDECODE_ENTRY( "tiles",         0x0000, bglayout,     512, 16 ) // BG
+	GFXDECODE_ENTRY( "tiles",         0x0000, charlayout,   512, 16 ) // BG
 GFXDECODE_END
 
 /****************************************************************************/
