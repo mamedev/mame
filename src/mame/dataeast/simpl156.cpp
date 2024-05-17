@@ -165,12 +165,11 @@ void simpl156_state::eeprom_w(u32 data)
 
 u32 simpl156_state::spriteram_r(offs_t offset)
 {
-	return m_spriteram[offset] ^ 0xffff0000;
+	return m_spriteram[offset] | 0xffff0000;
 }
 
 void simpl156_state::spriteram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&m_spriteram[offset]);
@@ -179,12 +178,11 @@ void simpl156_state::spriteram_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 simpl156_state::mainram_r(offs_t offset)
 {
-	return m_mainram[offset] ^ 0xffff0000;
+	return m_mainram[offset] | 0xffff0000;
 }
 
 void simpl156_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&m_mainram[offset]);
@@ -193,13 +191,12 @@ void simpl156_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 template<unsigned Layer>
 u32 simpl156_state::rowscroll_r(offs_t offset)
 {
-	return m_rowscroll[Layer][offset] ^ 0xffff0000;
+	return m_rowscroll[Layer][offset] | 0xffff0000;
 }
 
 template<unsigned Layer>
 void simpl156_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&m_rowscroll[Layer][offset]);
