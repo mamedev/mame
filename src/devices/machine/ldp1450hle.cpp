@@ -94,14 +94,26 @@ sony_ldp1450hle_device::sony_ldp1450hle_device(const machine_config &mconfig, co
 
 void sony_ldp1450hle_device::queue_reply(uint8_t reply, float delay)
 {
-	m_reply = reply;
+	const uint8_t reply_buffer[5] = {reply, 0, 0, 0, 0};
+	queue_reply_buffer(reply_buffer, delay);
+}
+
+void sony_ldp1450hle_device::queue_reply_buffer(const uint8_t reply[], float delay)
+{
+	uint8_t max_writable = (uint8_t)std::size(m_reply_buffer);
+	for (uint8_t i = 0; i < 5 && reply[i] != 0; i++)
+	{
+		m_reply_buffer[m_reply_write_index] = reply[i];
+		m_reply_write_index = (m_reply_write_index + 1) % max_writable;
+	}
+
 	m_queue_timer->adjust(attotime::from_nsec(delay * 1000000));
 }
 
 TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_queue)
 {
-	LOGMASKED(LOG_REPLY_BYTES, "Sending reply byte: %02x\n", m_reply);
-	transmit_register_setup(m_reply);
+	LOGMASKED(LOG_REPLY_BYTES, "Sending reply byte: %02x\n", (uint8_t)m_reply_buffer[m_reply_read_index]);
+	transmit_register_setup(m_reply_buffer[m_reply_read_index]);
 }
 
 //-------------------------------------------------
@@ -562,30 +574,25 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 					uint32_t frame_val = m_curr_frame;
 					for (uint8_t i = 0; i < 5; i++)
 					{
-						frame_buffer[4 - i] = frame_val%10 + 30;
+						frame_buffer[4 - i] = frame_val%10 + 0x30;
 						frame_val /= 10;
 					}
-					for (uint8_t i = 0; i < 5; i++)
-					{
-						queue_reply(frame_buffer[i], 1.3);
-					}
+					queue_reply_buffer(frame_buffer, 1.3);
 					break;
 				}
 				case CMD_STATUS_INQ:
 				{
-					queue_reply(0x80, 1.3);
-					queue_reply(0x00, 1.3);
-					queue_reply(0x10, 1.3);
-					queue_reply(0x00, 1.3);
+					uint8_t status_buffer[5] = { 0x80, 0x00, 0x10, 0x00, 0xff};
 
 					if (m_mode == MODE_PLAY || m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE)
 					{
-						queue_reply(0x01, 1.3);
+						status_buffer[4] = 0x01;
 					}
 					else if (m_mode == MODE_PAUSE || m_mode == MODE_STILL)
 					{
-						queue_reply(0x20, 1.3);
+						status_buffer[4] = 0x20;
 					}
+					queue_reply_buffer(status_buffer, 1.3);
 					break;
 				}
 				case CMD_USER_INDEX_CTRL:
@@ -616,7 +623,6 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 				}
 			}
 		}
-		printf("Command %x\n", command);
 		LOGMASKED(LOG_SEARCHES, "Command %x\n", command);
 		}
 	}
@@ -744,6 +750,7 @@ void sony_ldp1450hle_device::device_reset()
 	std::fill_n(m_reply_buffer, std::size(m_reply_buffer), 0);
 	m_reply_write_index = 0;
 	m_reply_read_index = 0;
+
 	m_mode = MODE_PARK;
 	m_chapter = 0;
 	m_time = 0;
@@ -982,13 +989,8 @@ void sony_ldp1450hle_device::tra_complete()
 	if (m_reply_read_index != m_reply_write_index)
 	{
 		uint8_t data = (uint8_t)m_reply_buffer[m_reply_read_index];
-		if (data != 0)
-		{
-			LOGMASKED(LOG_REPLY_BYTES, "Sending reply byte: %02x\n", data);
-
-			transmit_register_setup(data);
-
-		}
+		LOGMASKED(LOG_REPLY_BYTES, "Sending reply byte: %02x\n", data);
+		transmit_register_setup(data);
 	}
 }
 

@@ -139,6 +139,7 @@ private:
 
 
 	void queue_reply(uint8_t reply, float delay);
+	void queue_reply_buffer (const uint8_t reply[], float delay);
 
 	static uint32_t bcd_to_literal(uint32_t bcd);
 	static bool is_number(char value);
@@ -154,7 +155,8 @@ private:
 	emu_timer *         m_vbi_fetch;
 	emu_timer *         m_queue_timer;
 	bool                m_cmd_running;
-	char                m_reply_buffer[64];
+	uint8_t             m_reply_buffer[64];
+	
 	uint8_t             m_reply_write_index;
 	uint8_t             m_reply_read_index;
 	uint8_t             m_reply;
