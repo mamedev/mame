@@ -13,15 +13,17 @@
 */
 
 #include "emu.h"
-#include "machine/adc0808.h"
-#include "decocrpt.h"
 #include "deco156_m.h"
+#include "deco16ic.h"
+#include "decocrpt.h"
+#include "decospr.h"
+
+#include "cpu/arm/arm.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
-#include "cpu/arm/arm.h"
-#include "deco16ic.h"
-#include "decospr.h"
+
 #include "emupal.h"
 #include "layout/generic.h"
 #include "screen.h"
