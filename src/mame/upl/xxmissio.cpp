@@ -322,15 +322,13 @@ void xxmissio_state::base_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().share(m_spriteram);
 
 	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-
-	map(0xe000, 0xefff).share("workram1").ram();
-	map(0xf000, 0xffff).share("workram2").ram();
 }
 
 
 void xxmissio_state::main_map(address_map &map)
 {
 	base_map(map);
+
 	map(0x0000, 0x7fff).rom();
 
 	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_m_w));
@@ -343,6 +341,7 @@ void xxmissio_state::main_map(address_map &map)
 void xxmissio_state::sub_map(address_map &map)
 {
 	base_map(map);
+
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr(m_subbank);
 
