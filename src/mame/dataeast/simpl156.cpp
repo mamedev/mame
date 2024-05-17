@@ -1037,8 +1037,8 @@ u32 simpl156_state::joemacr_speedup_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-	if (m_maincpu->pc() == 0x284)
-		m_maincpu->spin_until_time(attotime::from_usec(400));
+		if (m_maincpu->pc() == 0x284)
+			m_maincpu->spin_until_time(attotime::from_usec(400));
 	}
 	return m_systemram[0x18/4];
 }
