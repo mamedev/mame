@@ -16,17 +16,22 @@
 */
 
 #include "emu.h"
-#include "cpu/arm/arm.h"
-#include "decocrpt.h"
 #include "deco156_m.h"
+#include "deco16ic.h"
+#include "decocrpt.h"
+#include "decospr.h"
+
+#include "cpu/arm/arm.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
-#include "deco16ic.h"
-#include "decospr.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class deco156_state : public driver_device
 {
@@ -52,8 +57,8 @@ public:
 
 private:
 	void hvysmsh_eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	template<unsigned Layer> uint32_t pf_rowscroll_r(offs_t offset);
-	template<unsigned Layer> void pf_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <unsigned Layer> uint32_t pf_rowscroll_r(offs_t offset);
+	template <unsigned Layer> void pf_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hvysmsh_oki_0_bank_w(uint32_t data);
@@ -114,12 +119,12 @@ void deco156_state::hvysmsh_oki_0_bank_w(uint32_t data)
 	m_oki1->set_rom_bank(data & 1);
 }
 
-template<unsigned Layer>
-uint32_t deco156_state::pf_rowscroll_r(offs_t offset) { return m_pf_rowscroll[Layer][offset] ^ 0xffff0000; }
-template<unsigned Layer>
-void deco156_state::pf_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[Layer][offset]); }
-uint32_t deco156_state::spriteram_r(offs_t offset) { return m_spriteram[offset] ^ 0xffff0000; }
-void deco156_state::spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask) { data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
+template <unsigned Layer>
+uint32_t deco156_state::pf_rowscroll_r(offs_t offset) { return m_pf_rowscroll[Layer][offset] | 0xffff0000; }
+template <unsigned Layer>
+void deco156_state::pf_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask) { mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[Layer][offset]); }
+uint32_t deco156_state::spriteram_r(offs_t offset) { return m_spriteram[offset] | 0xffff0000; }
+void deco156_state::spriteram_w(offs_t offset, uint32_t data, uint32_t mem_mask) { mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
 void deco156_state::hvysmsh_map(address_map &map)
@@ -675,6 +680,8 @@ void deco156_state::init_wcvol95()
 	deco156_decrypt(machine());
 	descramble_sound("ymz");
 }
+
+} // anonymous namespace
 
 
 /**********************************************************************************/
