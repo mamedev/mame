@@ -19,31 +19,31 @@
 
    used by:
 
-   backfire.cpp
-   boogwing.cpp
-   cbuster.cpp (could probably use pdrawgfx, not m_sprite_bitmap)
-   cninja.cpp
-   darkseal.cpp
-   dassault.cpp
-   dblewing.cpp
-   deco32.cpp
-   deco156.cpp
-   dietgo.cpp
-   funkyjet.cpp
-   lemmings.cpp
-   mirage.cpp (could probably use pdrawgfx, not m_sprite_bitmap)
-   pktgaldx.cpp
-   rohga.cpp
-   simpl156.cpp
-   sshangha.cpp (could probably use pdrawgfx, not m_sprite_bitmap)
-   supbtime.cpp
+   dataeast/backfire.cpp
+   dataeast/boogwing.cpp
+   dataeast/cbuster.cpp (could probably use pdrawgfx, not m_sprite_bitmap)
+   dataeast/cninja.cpp
+   dataeast/darkseal.cpp
+   dataeast/dassault.cpp
+   dataeast/dblewing.cpp
+   dataeast/deco32.cpp
+   dataeast/deco156.cpp
+   dataeast/dietgo.cpp
+   dataeast/funkyjet.cpp
+   dataeast/lemmings.cpp
+   dataeast/mirage.cpp (could probably use pdrawgfx, not m_sprite_bitmap)
+   dataeast/pktgaldx.cpp
+   dataeast/rohga.cpp
+   dataeast/simpl156.cpp
+   dataeast/sshangha.cpp (could probably use pdrawgfx, not m_sprite_bitmap)
+   dataeast/supbtime.cpp
 
-   (bootleg) crospang.cpp
-   (bootleg) esd16.cpp
-   (bootleg) gotcha.cpp
-   (bootleg) nmg5.cpp
-   (bootleg) silvmil.cpp
-   (bootleg) tumbleb.cpp
+   (bootleg) dataeast/tumbleb.cpp
+   (bootleg) f32/crospang.cpp
+   (bootleg) f32/silvmil.cpp
+   (bootleg) misc/esd16.cpp
+   (bootleg) misc/gotcha.cpp
+   (bootleg) yunsung/nmg5.cpp
 
    to convert:
 
