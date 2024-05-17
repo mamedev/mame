@@ -103,8 +103,7 @@ class pktgaldx_state : public base_state
 public:
 	pktgaldx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag),
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_pf_rowscroll(*this, "pf%u_rowscroll", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_deco104(*this, "ioprot104"),
@@ -118,8 +117,7 @@ public:
 
 private:
 	// memory pointers
-	required_shared_ptr<uint16_t> m_pf1_rowscroll;
-	required_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
@@ -131,8 +129,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
-	uint16_t protection_region_f_104_r(offs_t offset);
-	void protection_region_f_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void decrypted_opcodes_map(address_map &map);
 	void prg_map(address_map &map);
@@ -165,12 +163,12 @@ private:
 
 uint32_t pktgaldx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
 
 	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(!BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
 
 	bitmap.fill(0, cliprect); // not confirmed
 	screen.priority().fill(0);
@@ -241,17 +239,17 @@ void base_state::oki_bank_w(uint16_t data)
 
 /**********************************************************************************/
 
-uint16_t pktgaldx_state::protection_region_f_104_r(offs_t offset)
+uint16_t pktgaldx_state::ioprot_r(offs_t offset)
 {
-	int real_address = 0 + (offset * 2);
+	int const real_address = 0 + (offset * 2);
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data(real_address & 0x7fff, cs);
+	uint16_t const data = m_deco104->read_data(real_address & 0x7fff, cs);
 	return data;
 }
 
-void pktgaldx_state::protection_region_f_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pktgaldx_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0 + (offset * 2);
+	int const real_address = 0 + (offset * 2);
 	uint8_t cs = 0;
 	m_deco104->write_data(real_address & 0x7fff, data, mem_mask, cs);
 }
@@ -273,8 +271,8 @@ void pktgaldx_state::prg_map(address_map &map)
 
 	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x102000, 0x102fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x110000, 0x1107ff).ram().share(m_pf1_rowscroll);
-	map(0x112000, 0x1127ff).ram().share(m_pf2_rowscroll);
+	map(0x110000, 0x1107ff).ram().share(m_pf_rowscroll[0]);
+	map(0x112000, 0x1127ff).ram().share(m_pf_rowscroll[1]);
 
 	map(0x120000, 0x1207ff).ram().share(m_spriteram);
 	map(0x130000, 0x130fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -287,7 +285,7 @@ void pktgaldx_state::prg_map(address_map &map)
 	map(0x161800, 0x16180f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
 	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::oki_bank_w));
 	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
-	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::protection_region_f_104_r), FUNC(pktgaldx_state::protection_region_f_104_w)).share("prot16ram");
+	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::ioprot_r), FUNC(pktgaldx_state::ioprot_w)).share("prot16ram");
 
 	map(0x170000, 0x17ffff).ram();
 }
@@ -307,7 +305,8 @@ uint16_t pktgaldxb_state::unknown_r()
 
 uint16_t pktgaldxb_state::protection_r()
 {
-	logerror("protection_r address %06x\n", m_maincpu->pc());
+	if (!machine().side_effects_disabled())
+		logerror("protection_r address %06x\n", m_maincpu->pc());
 	return -1;
 }
 
@@ -442,8 +441,8 @@ static const gfx_layout tile_8x8_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*2) },
 	8*16
 };
 
@@ -453,27 +452,18 @@ static const gfx_layout tile_16x16_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 256,257,258,259,260,261,262,263,0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ STEP8(8*2*16, 1),STEP8(0, 1) },
+	{ STEP16(0, 8*2) },
 	32*16
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 24,8,16,0 },
-	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
-	32*32
 };
 
 static GFXDECODE_START( gfx_pktgaldx )
 	GFXDECODE_ENTRY( "tiles",   0, tile_8x8_layout,     0, 32 )    // 8x8
 	GFXDECODE_ENTRY( "tiles",   0, tile_16x16_layout,   0, 32 )    // 16x16
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,      512, 32 )    // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_pktgaldx_spr )
+	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout, 512, 32 )    // 16x16
 GFXDECODE_END
 
 static const gfx_layout bootleg_spritelayout =
@@ -516,7 +506,7 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	screen.screen_vblank().set(FUNC(pktgaldx_state::vblank_w));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096/4);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pktgaldx);
 
@@ -533,9 +523,7 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_pktgaldx_spr);
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
@@ -544,16 +532,13 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	m_deco104->set_interface_scramble(8,9,  4,5,6,7,    1,0,3,2); // hopefully this is correct, nothing else uses this arrangement!
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH));
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	oki1.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	OKIM6295(config, m_oki2, 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+	m_oki2->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 
@@ -573,21 +558,18 @@ void pktgaldxb_state::pktgaldxb(machine_config &config)
 	screen.screen_vblank().set(FUNC(pktgaldxb_state::vblank_w));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0xc00/4);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bootleg);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 32220000 / 32, okim6295_device::PIN7_HIGH));
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	oki1.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	OKIM6295(config, m_oki2, 32220000 / 16, okim6295_device::PIN7_HIGH);
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+	m_oki2->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 
@@ -599,8 +581,8 @@ ROM_START( pktgaldx )
 	ROM_LOAD( "maz-02.2h", 0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
-	ROM_LOAD16_BYTE( "maz-01.3b", 0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
+	ROM_LOAD( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
+	ROM_LOAD( "maz-01.3b", 0x080000, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )
 	ROM_LOAD( "ke01.14f", 0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
@@ -617,8 +599,8 @@ ROM_START( pktgaldxj )
 	ROM_LOAD( "maz-02.2h", 0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
-	ROM_LOAD16_BYTE( "maz-01.3b", 0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
+	ROM_LOAD( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
+	ROM_LOAD( "maz-01.3b", 0x080000, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )
 	ROM_LOAD( "ke01.14f", 0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
@@ -635,8 +617,8 @@ ROM_START( pktgaldxa )
 	ROM_LOAD( "maz-02.2h", 0x00000, 0x100000, CRC(c9d35a59) SHA1(07b44c7d7d76b668b4d6ca5672bd1c2910228e68) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
-	ROM_LOAD16_BYTE( "maz-01.3b", 0x000001, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
+	ROM_LOAD( "maz-00.1b", 0x000000, 0x080000, CRC(fa3071f4) SHA1(72e7d920e9ca94f8cb166007a9e9e5426a201af8) )
+	ROM_LOAD( "maz-01.3b", 0x080000, 0x080000, CRC(4934fe21) SHA1(b852249f59906d69d32160ebaf9b4781193227e4) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )
 	ROM_LOAD( "ke01.14f", 0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) )
@@ -680,4 +662,4 @@ void pktgaldx_state::driver_init()
 GAME( 1992, pktgaldx,  0,        pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Euro v3.00)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1993, pktgaldxj, pktgaldx, pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pktgaldxa, pktgaldx, pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Asia v3.00)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pktgaldxb, pktgaldx, pktgaldxb, pktgaldx, pktgaldxb_state, empty_init,  ROT0, "bootleg",                                      "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pktgaldxb, pktgaldx, pktgaldxb, pktgaldx, pktgaldxb_state, empty_init,  ROT0, "bootleg (Data West)",                          "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

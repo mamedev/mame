@@ -20,11 +20,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_deco_tilegen(*this, "tilegen"),
 		m_eeprom(*this, "eeprom"),
-		m_okimusic(*this, "okimusic") ,
-		m_mainram(*this, "mainram"),
+		m_okimusic(*this, "okimusic"),
+		m_rowscroll(*this, "rowscroll_%u", 1U, 0x1000U, ENDIANNESS_LITTLE),
+		m_mainram(*this, "mainram", 0x4000U, ENDIANNESS_LITTLE),
 		m_systemram(*this, "systemram"),
 		m_sprgen(*this, "spritegen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram", 0x1000U, ENDIANNESS_LITTLE) { }
 
 	void joemacr(machine_config &config);
 	void magdrop(machine_config &config);
@@ -39,20 +41,10 @@ public:
 	void init_osman();
 	void init_chainrec();
 
+protected:
+	virtual void video_start() override;
+
 private:
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<okim6295_device> m_okimusic;
-	/* memory pointers */
-	std::unique_ptr<u16[]>  m_rowscroll[2];
-	required_shared_ptr<u32> m_mainram;
-	required_shared_ptr<u32> m_systemram;
-	optional_device<decospr_device> m_sprgen;
-	required_device<palette_device> m_palette;
-	std::unique_ptr<u16[]> m_spriteram;
-	size_t m_spriteram_size = 0;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
@@ -69,7 +61,6 @@ private:
 	u32 charlien_speedup_r();
 	u32 osman_speedup_r();
 
-	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_interrupt(int state);
 
@@ -79,4 +70,20 @@ private:
 	void magdrop_map(address_map &map);
 	void magdropp_map(address_map &map);
 	void mitchell156_map(address_map &map);
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<okim6295_device> m_okimusic;
+
+	/* memory pointers */
+	memory_share_array_creator<u16, 2> m_rowscroll;
+	memory_share_creator<u16> m_mainram;
+	required_shared_ptr<u32> m_systemram;
+	required_device<decospr_device> m_sprgen;
+	required_device<palette_device> m_palette;
+	memory_share_creator<u16> m_spriteram;
+
+	size_t m_spriteram_size = 0;
 };
