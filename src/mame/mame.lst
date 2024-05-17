@@ -42322,9 +42322,6 @@ vectrix                         // (c) 19?? Olympia?
 @source:skeleton/vp415.cpp
 vp415                           // (c) 1983 Philips
 
-@source:skeleton/vsmilepro.cpp
-vsmilpro
-
 @source:skeleton/xbase09.cpp
 xbase09                         //
 
@@ -46141,6 +46138,9 @@ vsmilebsw                       //
 vsmilebg                        //
 vsmilebf                        //
 vsmilebfp                       //
+
+@source:vtech/vsmilepro.cpp
+vsmilpro                        //
 
 @source:vtech/vtech1.cpp
 fellow                          // 1983 Salora Fellow
