@@ -111,7 +111,7 @@ void mx3210_state::mx3210(machine_config &config)
 {
 	M68020(config, m_maincpu, 40_MHz_XTAL/2);
 
-	WD37C65C(config, m_fdc, 10_MHz_XTAL, 10_MHz_XTAL); // FDC37C65CLJ-P, unknown clock
+	WD37C65C(config, m_fdc, 20_MHz_XTAL/2, 20_MHz_XTAL/2); // FDC37C65CLJ-P, unknown clock
 	//FLOPPY_CONNECTOR(...)
 
 	AM7990(config, "lance1", 0); // AMD AM7990PC/80
