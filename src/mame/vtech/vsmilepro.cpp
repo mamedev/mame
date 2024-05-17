@@ -19,11 +19,12 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cdrom.h"
+
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "imagedev/cdromimg.h"
+
 #include "softlist.h"
+#include "cdrom.h"
 
 
 namespace {

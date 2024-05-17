@@ -95,11 +95,11 @@ Notes:
 
 #include "deco146.h"
 #include "deco16ic.h"
+#include "decocrpt.h"
 #include "decospr.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m68000/m68000.h"
-#include "decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -144,8 +144,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint16_t protection_region_0_146_r(offs_t offset);
-	void protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void maincpu_map(address_map &map);
 	void sound_map(address_map &map);
 };
@@ -154,7 +154,7 @@ private:
 
 uint32_t funkyjet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// Similar to chinatwn and tumblep, see video/supbtime.cpp
+	// Similar to chinatwn and tumblep, see dataeast/supbtime.cpp
 	//
 	// This causes a 2 pixel gap on the left side of the first stage of all worlds in funkyjet
 	// but allows subsequent stages to be centered and avoids corruption on the world select
@@ -170,7 +170,7 @@ uint32_t funkyjet_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_deco_tilegen->set_scrolldx(1, 0, 1, 1);
 	m_deco_tilegen->set_scrolldx(1, 1, 1, 1);
 
-	uint16_t flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
@@ -183,14 +183,14 @@ uint32_t funkyjet_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-uint16_t funkyjet_state::protection_region_0_146_r(offs_t offset)
+uint16_t funkyjet_state::ioprot_r(offs_t offset)
 {
 //  uint16_t realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
 
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */      10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = (BIT(real_address, 14, 4) << 11) | BIT(real_address, 0, 11); // NC 31-18, 13-11 note, same bitswap as fghthist
 	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, cs );
+	uint16_t const data = m_deco146->read_data(deco146_addr, cs);
 
 //  if ((realdat & mem_mask) != (data & mem_mask))
 //      printf("returned %04x instead of %04x (real address %08x swapped addr %08x)\n", data, realdat, real_address, deco146_addr);
@@ -198,14 +198,14 @@ uint16_t funkyjet_state::protection_region_0_146_r(offs_t offset)
 	return data;
 }
 
-void funkyjet_state::protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void funkyjet_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  deco16_146_funkyjet_prot_w(space,offset&0x3ff,data,mem_mask);
 
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, same bitswap as fghthist */       10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
+	int const real_address = 0 + (offset *2);
+	int const deco146_addr = (BIT(real_address, 14, 4) << 11) | BIT(real_address, 0, 11); // NC 31-18, 13-11 note, same bitswap as fghthist
 	uint8_t cs = 0;
-	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
+	m_deco146->write_data(deco146_addr, data, mem_mask, cs);
 }
 
 
@@ -215,7 +215,7 @@ void funkyjet_state::maincpu_map(address_map &map)
 	map(0x120000, 0x1207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x143fff).ram();
 	map(0x160000, 0x1607ff).ram().share(m_spriteram);
-	map(0x180000, 0x183fff).rw(FUNC(funkyjet_state::protection_region_0_146_r), FUNC(funkyjet_state::protection_region_0_146_w)).share("prot16ram"); // Protection device, unlikely to be cs0 region
+	map(0x180000, 0x183fff).rw(FUNC(funkyjet_state::ioprot_r), FUNC(funkyjet_state::ioprot_w)).share("prot16ram"); // Protection device, unlikely to be cs0 region
 	map(0x184000, 0x184001).nopw();
 	map(0x188000, 0x188001).nopw();
 	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
@@ -388,6 +388,9 @@ static const gfx_layout tile_layout =
 static GFXDECODE_START( gfx_funkyjet )
 	GFXDECODE_ENTRY( "chars", 0, charlayout,  256, 32 )  // Characters 8x8
 	GFXDECODE_ENTRY( "chars", 0, tile_layout, 256, 32 )  // Tiles 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_funkyjet_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tile_layout,   0, 16 )  // Sprites 16x16
 GFXDECODE_END
 
@@ -435,9 +438,7 @@ void funkyjet_state::funkyjet(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_funkyjet_spr);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
