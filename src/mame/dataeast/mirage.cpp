@@ -39,13 +39,15 @@ MR_01-.3A    [a0b758aa]
 ***********************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "decocrpt.h"
-#include "machine/eepromser.h"
 #include "deco16ic.h"
+#include "decocrpt.h"
+#include "decospr.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
-#include "decospr.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -133,16 +135,13 @@ void miragemj_state::mjmux_w(uint16_t data)
 
 uint16_t miragemj_state::mjmux_r()
 {
-	switch (m_mux_data & 0x1f)
+	uint16_t result = 0xffff;
+	for (int i = 0; m_io_key.size() > i; ++i)
 	{
-		case 0x01: return m_io_key[0]->read();
-		case 0x02: return m_io_key[1]->read();
-		case 0x04: return m_io_key[2]->read();
-		case 0x08: return m_io_key[3]->read();
-		case 0x10: return m_io_key[4]->read();
+		if (BIT(m_mux_data, i))
+			result &= m_io_key[i]->read();
 	}
-
-	return 0xffff;
+	return result;
 }
 
 void miragemj_state::okim1_rombank_w(uint16_t data)
