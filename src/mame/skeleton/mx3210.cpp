@@ -115,7 +115,7 @@ void mx3210_state::mx3210(machine_config &config)
 	//FLOPPY_CONNECTOR(...)
 
 	AM7990(config, "lance1", 0); // AMD AM7990PC/80
-	AM7990(config, "lance1", 0); // AMD AM7990PC/80
+	AM7990(config, "lance2", 0); // AMD AM7990PC/80
 }
 
 ROM_START(mx3210)
