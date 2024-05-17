@@ -5,13 +5,17 @@
 */
 
 #include "emu.h"
+
 #include "simpl156.h"
+
 #include "screen.h"
+
 #include <algorithm>
+
 
 void simpl156_state::video_start()
 {
-	std::fill_n(&m_spriteram[0], m_spriteram.length(), 0xff);
+	std::fill_n(&m_spriteram[0], m_spriteram.length(), 0xffff);
 }
 
 u32 simpl156_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
