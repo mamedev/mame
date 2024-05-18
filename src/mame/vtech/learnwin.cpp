@@ -46,7 +46,9 @@ SPR128A-099    -  Learning Window speech cart US (rev 3)
 
 
 #include "emu.h"
+
 #include "sound/sp0256.h"
+
 #include "screen.h"
 #include "speaker.h"
 

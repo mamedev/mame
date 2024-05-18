@@ -378,6 +378,9 @@ static GFXDECODE_START( gfx_cbuster )
 	GFXDECODE_ENTRY( "tiles1",  0, charlayout,     0, 128 )  // Characters 8x8
 	GFXDECODE_ENTRY( "tiles1",  0, tilelayout,     0, 128 )  // Tiles 16x16
 	GFXDECODE_ENTRY( "tiles2",  0, tilelayout,     0, 128 )  // Tiles 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_cbuster_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100,  80 )  // Sprites 16x16
 GFXDECODE_END
 
@@ -450,9 +453,7 @@ void cbuster_state::twocrude(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_cbuster_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -91,8 +91,7 @@ class dblewing_state : public driver_device
 public:
 	dblewing_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_pf_rowscroll(*this, "pf%u_rowscroll", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
@@ -109,8 +108,7 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_pf1_rowscroll;
-	required_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
@@ -123,13 +121,13 @@ private:
 
 	uint8_t irq_latch_r();
 	void soundlatch_irq_w(int state);
-	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	uint16_t wf_protection_region_0_104_r(offs_t offset);
-	void wf_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void dblewing_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
@@ -139,13 +137,13 @@ private:
 };
 
 
-uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dblewing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
 	screen.priority().fill(0);
@@ -156,19 +154,19 @@ uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint16_t dblewing_state::wf_protection_region_0_104_r(offs_t offset)
+uint16_t dblewing_state::ioprot_r(offs_t offset)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset *2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, cs );
+	uint16_t const data = m_deco104->read_data( deco146_addr, cs );
 	return data;
 }
 
-void dblewing_state::wf_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void dblewing_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0 + (offset *2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset *2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
@@ -184,12 +182,11 @@ void dblewing_state::dblewing_map(address_map &map)
 
 	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x102000, 0x102fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x104000, 0x104fff).ram().share("pf1_rowscroll");
-	map(0x106000, 0x106fff).ram().share("pf2_rowscroll");
+	map(0x104000, 0x104fff).ram().share(m_pf_rowscroll[0]);
+	map(0x106000, 0x106fff).ram().share(m_pf_rowscroll[1]);
 
 //  map(0x280000, 0x2807ff).rw("ioprot104", FUNC(deco104_device::dblewing_prot_r), FUNC(deco104_device::dblewing_prot_w)).share("prot16ram");
-	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::wf_protection_region_0_104_r), FUNC(dblewing_state::wf_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
-
+	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::ioprot_r), FUNC(dblewing_state::ioprot_w)).share("prot16ram"); /* Protection device */
 
 	map(0x284000, 0x284001).ram();
 	map(0x288000, 0x288001).ram();
@@ -251,9 +248,12 @@ static const gfx_layout tile_16x16_layout =
 
 
 static GFXDECODE_START( gfx_dblewing )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,   0x000, 32 )    /* Tiles (8x8) */
-	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout, 0x000, 32 )    /* Tiles (16x16) */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_16x16_layout, 0x200, 32 )    /* Sprites (16x16) */
+	GFXDECODE_ENTRY( "tiles", 0, tile_8x8_layout,   0x000, 32 )    /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "tiles", 0, tile_16x16_layout, 0x000, 32 )    /* Tiles (16x16) */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_dblewing_spr )
+	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout, 0x200, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
 static INPUT_PORTS_START( dblewing )
@@ -357,17 +357,16 @@ void dblewing_state::dblewing(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58.443);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(dblewing_state::screen_update_dblewing));
+	screen.set_screen_update(FUNC(dblewing_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 4096);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 2048/2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dblewing);
 
 	DECO16IC(config, m_deco_tilegen, 0);
@@ -383,10 +382,8 @@ void dblewing_state::dblewing(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_dblewing_spr);
 	m_sprgen->set_pri_callback(FUNC(dblewing_state::pri_callback));
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
@@ -416,10 +413,10 @@ ROM_START( dblewing )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound cpu
 	ROM_LOAD( "kp_02-.10h",   0x000000, 0x010000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "mbe-02.8h",    0x000000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "mbe-00.14a",   0x000000, 0x100000, CRC(e33f5c93) SHA1(720904b54d02dace2310ac6bd07d5ed4bc4fd69c) )
 	ROM_LOAD( "mbe-01.16a",   0x100000, 0x100000, CRC(ef452ad7) SHA1(7fe49123b5c2778e46104eaa3a2104ce09e05705) )
 
@@ -441,10 +438,10 @@ ROM_START( dblewinga )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound cpu
 	ROM_LOAD( "kp_02-.10h",   0x000000, 0x010000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "mbe-02.8h",    0x000000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "mbe-00.14a",   0x000000, 0x100000, CRC(e33f5c93) SHA1(720904b54d02dace2310ac6bd07d5ed4bc4fd69c) )
 	ROM_LOAD( "mbe-01.16a",   0x100000, 0x100000, CRC(ef452ad7) SHA1(7fe49123b5c2778e46104eaa3a2104ce09e05705) )
 
@@ -470,10 +467,10 @@ ROM_START( dblewingb )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound cpu
 	ROM_LOAD( "kp_02-.10h",   0x000000, 0x010000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "mbe-02.8h",    0x000000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "mbe-00.14a",   0x000000, 0x100000, CRC(e33f5c93) SHA1(720904b54d02dace2310ac6bd07d5ed4bc4fd69c) )
 	ROM_LOAD( "mbe-01.16a",   0x100000, 0x100000, CRC(ef452ad7) SHA1(7fe49123b5c2778e46104eaa3a2104ce09e05705) )
 
@@ -489,7 +486,7 @@ ROM_END
 
 void dblewing_state::init_dblewing()
 {
-	deco56_decrypt_gfx(machine(), "gfx1");
+	deco56_decrypt_gfx(machine(), "tiles");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
 
 	save_item(NAME(m_soundlatch_pending));

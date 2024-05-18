@@ -76,8 +76,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
-	uint16_t protection_region_0_104_r(offs_t offset);
-	void protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -86,7 +86,7 @@ private:
 
 uint32_t dietgo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
@@ -101,19 +101,19 @@ uint32_t dietgo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-uint16_t dietgo_state::protection_region_0_104_r(offs_t offset)
+uint16_t dietgo_state::ioprot_r(offs_t offset)
 {
-	int real_address = 0 + (offset * 2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data(deco146_addr, cs);
+	uint16_t const data = m_deco104->read_data(deco146_addr, cs);
 	return data;
 }
 
-void dietgo_state::protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void dietgo_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0 + (offset * 2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data(deco146_addr, data, mem_mask, cs);
 }
@@ -129,7 +129,7 @@ void dietgo_state::main_map(address_map &map)
 	map(0x222000, 0x2227ff).writeonly().share(m_pf_rowscroll[1]);
 	map(0x280000, 0x2807ff).ram().share(m_spriteram);
 	map(0x300000, 0x300bff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::protection_region_0_104_r), FUNC(dietgo_state::protection_region_0_104_w)).share("prot16ram"); // Protection device
+	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::ioprot_r), FUNC(dietgo_state::ioprot_w)).share("prot16ram"); // Protection device
 	map(0x380000, 0x38ffff).ram(); // mainram
 }
 
@@ -253,6 +253,9 @@ static const gfx_layout tile_16x16_layout =
 static GFXDECODE_START( gfx_dietgo )
 	GFXDECODE_ENTRY( "tiles",   0, tile_8x8_layout,     0, 32 )    // Tiles (8x8)
 	GFXDECODE_ENTRY( "tiles",   0, tile_16x16_layout,   0, 32 )    // Tiles (16x16)
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_dietgo_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout, 512, 16 )    // Sprites (16x16)
 GFXDECODE_END
 
@@ -299,9 +302,7 @@ void dietgo_state::dietgo(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_dietgo_spr);
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");

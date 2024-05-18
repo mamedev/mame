@@ -8,6 +8,9 @@
 
 #include "emu.h"
 
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68010.h"
 #include "imagedev/floppy.h"
 #include "machine/am79c90.h"
@@ -17,9 +20,6 @@
 #include "machine/nscsi_bus.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80scc.h"
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
-#include "bus/rs232/rs232.h"
 
 #define VERBOSE         (1)
 #include "logmacro.h"

@@ -2263,6 +2263,9 @@ att730x                         //
 @source:att/att4425.cpp
 att4425                         //
 
+@source:att/blit.cpp
+blit
+
 @source:att/unixpc.cpp
 3b1                             // 3B1 "Unix PC"
 
@@ -17756,6 +17759,11 @@ px8                             //
 
 @source:epson/qx10.cpp
 qx10                            //
+
+@source:ericsson/alfaskop41xx.cpp
+alfaskop4110                    //
+alfaskop4120                    //
+alfaskop4101                    //
 
 @source:ericsson/e9161.cpp
 e9161                           //
@@ -36033,6 +36041,9 @@ videopacp                       // 1983 Videopac Plus G7400
 p2000m                          // 1980 P2000M
 p2000t                          // 1980 P2000T
 
+@source:philips/philipsbo.cpp
+pbo                             // (c) 1987 Philips
+
 @source:philips/vg5k.cpp
 vg5k                            // 1984 VG-5000
 
@@ -41622,11 +41633,6 @@ alcat7100                       //
 @source:skeleton/alesis_qs.cpp
 alesqs7                         //
 
-@source:skeleton/alfaskop41xx.cpp
-alfaskop4110                    //
-alfaskop4120                    //
-alfaskop4101                    //
-
 @source:skeleton/alphasma.cpp
 asma2k                          // (c) 1997 Intelligent Peripheral Devices
 asmapro                         // (c) 1995 Intelligent Peripheral Devices
@@ -41664,9 +41670,6 @@ bert                            //
 @source:skeleton/bitgraph.cpp
 bitgrpha                        //
 bitgrphb                        //
-
-@source:skeleton/blit.cpp
-blit
 
 @source:skeleton/bolsaint.cpp
 bolsaint                        // (c) 2000 Sleic/Petaco
@@ -41957,13 +41960,6 @@ kkcount
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
-@source:skeleton/learnwin.cpp
-learnwin                        // 1986 V-Tech
-learnwin2                       //
-learnwin1                       //
-learnwinf                       //
-spielmast                       // Yuvo
-
 @source:skeleton/lee1214.cpp
 lee1214d                        //
 
@@ -42103,9 +42099,6 @@ perq                            //
 
 @source:skeleton/pes.cpp
 pes                             //
-
-@source:skeleton/philipsbo.cpp
-pbo                             // (c) 1987 Philips
 
 @source:skeleton/picno.cpp
 picno                           // Konami Picno (1993)
@@ -42321,9 +42314,6 @@ vectrix                         // (c) 19?? Olympia?
 
 @source:skeleton/vp415.cpp
 vp415                           // (c) 1983 Philips
-
-@source:skeleton/vsmilepro.cpp
-vsmilpro
 
 @source:skeleton/xbase09.cpp
 xbase09                         //
@@ -46069,6 +46059,13 @@ las3000                         // 1983 Laser 3000
 @source:vtech/lcmate2.cpp
 lcmate2                         //
 
+@source:vtech/learnwin.cpp
+learnwin                        // 1986 V-Tech
+learnwin2                       //
+learnwin1                       //
+learnwinf                       //
+spielmast                       // Yuvo
+
 @source:vtech/pc1000.cpp
 misterx                         // 1988 (Yeno) MisterX
 ordisava                        // 1988 Ordisavant (France)
@@ -46141,6 +46138,9 @@ vsmilebsw                       //
 vsmilebg                        //
 vsmilebf                        //
 vsmilebfp                       //
+
+@source:vtech/vsmilepro.cpp
+vsmilpro
 
 @source:vtech/vtech1.cpp
 fellow                          // 1983 Salora Fellow

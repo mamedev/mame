@@ -5,7 +5,7 @@
 
   yet another Data East / Tumble Pop derived hardware
   this one seems similar to (but not identical to)
-  the crospang.cpp hardware from F2 system
+  the f32/crospang.cpp hardware from F2 system
   also very close to gotcha.c, which was also a Para
   board.
 
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
-	tileinfo.set(1, tile + bank, color + 0x20, 0);
+	tileinfo.set(0, tile + bank, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
-	tileinfo.set(1, tile + bank, color + 0x10, 0);
+	tileinfo.set(0, tile + bank, color + 0x10, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(silvmil_state::scan_rows)
@@ -204,10 +204,10 @@ void silvmil_state::mem_map(address_map &map)
 	map(0x100008, 0x100009).w(FUNC(silvmil_state::bg_scrolly_w));
 	map(0x10000e, 0x10000f).w(FUNC(silvmil_state::tilebank_w));
 
-	map(0x120000, 0x120fff).ram().w(FUNC(silvmil_state::fg_videoram_w)).share("fg_videoram");
-	map(0x122000, 0x122fff).ram().w(FUNC(silvmil_state::bg_videoram_w)).share("bg_videoram");
+	map(0x120000, 0x120fff).ram().w(FUNC(silvmil_state::fg_videoram_w)).share(m_fg_videoram);
+	map(0x122000, 0x122fff).ram().w(FUNC(silvmil_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x210000, 0x2107ff).ram().share("spriteram");
+	map(0x210000, 0x2107ff).ram().share(m_spriteram);
 	map(0x270001, 0x270001).w(FUNC(silvmil_state::soundcmd_w));
 	map(0x280000, 0x280001).portr("P1_P2");
 	map(0x280002, 0x280003).portr("COIN");
@@ -389,8 +389,11 @@ static const gfx_layout tlayout_alt =
 
 
 static GFXDECODE_START( gfx_silvmil )
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout_alt,   0, 64 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "tiles", 0, tlayout_alt, 0, 64 )  /* Tiles 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_silvmil_spr )
+	GFXDECODE_ENTRY( "sprites", 0, tlayout, 0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 
@@ -443,11 +446,9 @@ void silvmil_state::silvmil(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_silvmil);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(0);
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_silvmil_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_offsets(5, 7);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -488,7 +489,7 @@ ROM_START( silvmil )
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "d-12_uz1.bin", 0x00000, 0x40000, CRC(a170d8a9) SHA1(77339382570498f9f6eeb80595bfe72fc853fd68))
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "d-16_u41.bin",   0x000000, 0x20000, CRC(ff5ea605) SHA1(38e32f391b211ed280dd7f05eb13301cb9ddf57c) )
 	ROM_CONTINUE ( 0x200000,0x20000 )
 	ROM_CONTINUE ( 0x040000,0x20000 )
@@ -522,7 +523,7 @@ ROM_START( silvmil )
 	ROM_CONTINUE ( 0x1c0000,0x20000)
 	ROM_CONTINUE ( 0x3c0000,0x20000)
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_REGION( 0x200000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "d-17_u53.bin", 0x000000, 0x80000, CRC(4d177bda) SHA1(980205dead92830362095dac61d2e99bf62f0f5d) )
 	ROM_LOAD16_BYTE( "d-18_u54.bin", 0x000001, 0x80000, CRC(218c4471) SHA1(6a64d7a6c18eb078a5848f4f97aa0c65e74ad3d9) )
 	ROM_LOAD16_BYTE( "d-19_u55.bin", 0x100000, 0x80000, CRC(59507521) SHA1(8e0eaf8ecdfcaefccb5657278ecb2fea7489afb3) )
@@ -540,7 +541,7 @@ ROM_START( puzzlove )
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "2.uz11", 0x00000, 0x40000, CRC(4c06ec68) SHA1(3cfca1c98e73c65a45b65d43e012c5529572c057) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "10.u41",   0x000000, 0x20000, CRC(7200f878) SHA1(27c6389f802f6e0af0210e2b01788914c0eb1d04) )
 	ROM_CONTINUE ( 0x080000,0x20000 )
 	ROM_CONTINUE ( 0x040000,0x20000 )
@@ -550,7 +551,7 @@ ROM_START( puzzlove )
 	ROM_CONTINUE ( 0x040001,0x20000 )
 	ROM_CONTINUE ( 0x0c0001,0x20000 )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_REGION( 0x200000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "5.u53", 0x000000, 0x80000, CRC(8707d5a0) SHA1(05480ac34982a4e4768b7f3fccd2e557ca4b2545) )
 	ROM_LOAD16_BYTE( "6.u54", 0x000001, 0x80000, CRC(60a6d614) SHA1(0693c08c51d6b3a05373c9999f01b0b8d23a1c89) )
 	ROM_LOAD16_BYTE( "7.u55", 0x100000, 0x80000, CRC(0f2ea5c4) SHA1(4cb46fc6272e3cc14dfdcd7831157433ee7cf247) )
@@ -568,7 +569,7 @@ ROM_START( puzzlovek )
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "2.uz11", 0x00000, 0x40000, CRC(4c06ec68) SHA1(3cfca1c98e73c65a45b65d43e012c5529572c057) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "10.u41",  0x000000, 0x20000, CRC(3f952c54) SHA1(1f18579ce98305d20ec0f4e216f8170a62b9c68b) ) // sldh
 	ROM_CONTINUE ( 0x080000,0x20000 )
 	ROM_CONTINUE ( 0x040000,0x20000 )
@@ -578,7 +579,7 @@ ROM_START( puzzlovek )
 	ROM_CONTINUE ( 0x040001,0x20000 )
 	ROM_CONTINUE ( 0x0c0001,0x20000 )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_REGION( 0x200000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "5.u53", 0x000000, 0x80000, CRC(c5732995) SHA1(e7faecb19f4bdb103b782e38463d32b357ea63bc) ) // sldh
 	ROM_LOAD16_BYTE( "6.u54", 0x000001, 0x80000, CRC(a3b98fd1) SHA1(2b2b7c9df19882a0565e38504b73f56ea27d71ab) ) // sldh
 	ROM_LOAD16_BYTE( "7.u55", 0x100000, 0x80000, CRC(a4c73b48) SHA1(9f26af7b961c96cfd1c45f85f1d6dc4f364e3541) ) // sldh
