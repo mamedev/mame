@@ -222,7 +222,7 @@ void ninjakd2_state::bg_ctrl(int offset, int data, tilemap_t* tilemap)
 		case 1: scrollx = ((scrollx &  0xff) | (data << 8)); break;
 		case 2: scrolly = ((scrolly & ~0xff) | data);        break;
 		case 3: scrolly = ((scrolly &  0xff) | (data << 8)); break;
-		case 4: tilemap->enable(data & 1); break;
+		case 4: tilemap->enable(BIT(data, 0)); break;
 	}
 
 	tilemap->set_scrollx(0, scrollx);
@@ -249,11 +249,11 @@ void ninjakd2_state::sprite_overdraw_w(uint8_t data)
 
 void ninjakd2_state::draw_sprites(bitmap_ind16 &bitmap)
 {
-	gfx_element* const gfx = m_gfxdecode->gfx(1);
+	gfx_element *const gfx = m_gfxdecode->gfx(1);
 	int const big_xshift = m_robokid_sprites ? 1 : 0;
 	int const big_yshift = m_robokid_sprites ? 0 : 1;
 
-	uint8_t* sprptr = &m_spriteram[11];
+	uint8_t const *sprptr = &m_spriteram[11];
 	int sprites_drawn = 0;
 
 	/* The sprite generator draws exactly 96 16x16 sprites per frame. When big
@@ -272,7 +272,7 @@ void ninjakd2_state::draw_sprites(bitmap_ind16 &bitmap)
 			int sx = sprptr[1] - ((sprptr[2] & 0x01) << 8);
 			int sy = sprptr[0];
 			// Ninja Kid II doesn't use the topmost bit (it has smaller ROMs) so it might not be connected on the board
-			int code = sprptr[3] + ((sprptr[2] & 0xc0) << 2) + ((sprptr[2] & 0x08) << 7);
+			int code = sprptr[3] | (bitswap<3>(sprptr[2], 3, 7, 6) << 8);
 			int flipx = BIT(sprptr[2], 4);
 			int flipy = BIT(sprptr[2], 5);
 			int const color = sprptr[4] & 0x0f;
@@ -301,10 +301,10 @@ void ninjakd2_state::draw_sprites(bitmap_ind16 &bitmap)
 					uint32_t const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
 
 						gfx->transpen(bitmap,bitmap.cliprect(),
-							tile,
-							color,
-							flipx,flipy,
-							sx + 16*x, sy + 16*y, 0xf);
+								tile,
+								color,
+								flipx, flipy,
+								sx + 16*x, sy + 16*y, 0xf);
 
 					++sprites_drawn;
 					if (sprites_drawn >= 96)
@@ -323,11 +323,11 @@ void ninjakd2_state::draw_sprites(bitmap_ind16 &bitmap)
 	}
 }
 
-static bool stencil_ninjakd2( uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static bool stencil_mnight(   uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static bool stencil_arkarea(  uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static bool stencil_robokid(  uint16_t pal ) { return( (pal & 0xf0) <  0xe0 ); }
-static bool stencil_omegaf(   uint16_t pal ) { return( true ); }
+static bool stencil_ninjakd2( uint16_t pal ) { return (pal & 0xf0) == 0xf0; }
+static bool stencil_mnight(   uint16_t pal ) { return (pal & 0xf0) == 0xf0; }
+static bool stencil_arkarea(  uint16_t pal ) { return (pal & 0xf0) == 0xf0; }
+static bool stencil_robokid(  uint16_t pal ) { return (pal & 0xf0) <  0xe0; }
+static bool stencil_omegaf(   uint16_t pal ) { return true; }
 //////            OVERDRAW     STENCIL     UNKNOWN
 //////  NINJAKD2  023459ABCDE  F           1678
 //////    MNIGHT  0134568ABCDE F           279
@@ -343,7 +343,9 @@ void ninjakd2_state::erase_sprites(bitmap_ind16 &bitmap)
 {
 	// if sprite overdraw is disabled, clear the sprite framebuffer
 	if (!m_next_sprite_overdraw_enabled)
+	{
 		m_sprites_bitmap.fill(0xf);
+	}
 	else
 	{
 		for (int y = 0; y < m_sprites_bitmap.height(); ++y)
@@ -351,7 +353,8 @@ void ninjakd2_state::erase_sprites(bitmap_ind16 &bitmap)
 			for (int x = 0; x < m_sprites_bitmap.width(); ++x)
 			{
 				uint16_t *const ptr = &m_sprites_bitmap.pix(y, x);
-				if ( (*m_stencil_compare_function)(*ptr) ) *ptr = 0xf;
+				if ((*m_stencil_compare_function)(*ptr))
+					*ptr = 0xf;
 			}
 		}
 	}
