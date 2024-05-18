@@ -281,7 +281,7 @@ view can be re-enabled at any time.
 3.5 Bus contention handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some specific CPUs have be upgraded to be interruptible which allows
+Some specific CPUs have been upgraded to be interruptible which allows
 to add bus contention and wait states capabitilites.  Being
 interruptible means, in practice, that an instruction can be
 interrupted at any time and the execute_run method of the core exited.
@@ -328,7 +328,7 @@ cycle will be aborted for lack of remaining time, and the method will
 eventually be called again.  It will then give the time of when the
 second dma will finish, and all will be well.
 
-It can also allow to reduce said earlier time when circonstances
+It can also allow to reduce said earlier time when circumstances
 require it.  For instance a PIO latch that waits up to 64 cycles that
 data arrives can indicate that current time + 64 as a target (which
 will trigger a bus error for instance) but if a timer elapses and
