@@ -1598,7 +1598,7 @@ by one place all the intervening bits.
 void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
-	uint8_t* const src = memregion(region)->base();
+	uint8_t *const src = memregion(region)->base();
 	std::vector<uint8_t> temp(length);
 	const int mask = (1 << (bit + 1)) - 1;
 
@@ -1614,8 +1614,8 @@ void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 void ninjakd2_state::gfx_unscramble()
 {
 	lineswap_gfx_roms("chars", 13);     // fg tiles
-	lineswap_gfx_roms("sprites", 14);     // sprites
-	lineswap_gfx_roms("tiles1", 14);     // bg tiles
+	lineswap_gfx_roms("sprites", 14);   // sprites
+	lineswap_gfx_roms("tiles1", 14);    // bg tiles
 }
 
 
