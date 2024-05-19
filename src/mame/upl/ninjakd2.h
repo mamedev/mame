@@ -26,12 +26,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_soundcpu(*this, "soundcpu"),
+		m_spriteram(*this, "spriteram"),
+		m_mainbank(*this, "mainbank"),
 		m_pcm(*this, "pcm"),
 		m_pcm_region(*this, "pcm"),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_mainbank(*this, "mainbank")
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	void ninjakd2b(machine_config &config);
@@ -41,28 +41,17 @@ public:
 	void init_bootleg();
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	void ninjakd2_bgvideoram_w(offs_t offset, uint8_t data);
-	void ninjakd2_fgvideoram_w(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
 	void ninjakd2_bg_ctrl_w(offs_t offset, uint8_t data);
-	void ninjakd2_sprite_overdraw_w(uint8_t data);
+	void sprite_overdraw_w(uint8_t data);
 
-	void ninjakd2_bankselect_w(uint8_t data);
-	void ninjakd2_soundreset_w(uint8_t data);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_bg_videoram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<cpu_device> m_soundcpu;
-
-	uint8_t m_vram_bank_mask = 0;
-	int m_robokid_sprites = 0;
-	bool (*m_stencil_compare_function) (uint16_t pal);
-	int m_sprites_updated = 0;
-	tilemap_t* m_fg_tilemap;
-	tilemap_t* m_bg_tilemap;
-	bitmap_ind16 m_sprites_bitmap;
+	void bankselect_w(uint8_t data);
+	void soundreset_w(uint8_t data);
 
 	void video_init_common();
 
@@ -72,7 +61,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjakd2_get_bg_tile_info);
 	uint32_t screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank_ninjakd2(int state);
+	void screen_vblank(int state);
 
 	void bg_ctrl(int offset, int data, tilemap_t* tilemap);
 	void gfx_unscramble();
@@ -80,32 +69,43 @@ protected:
 
 	void ninjakid_nopcm_sound_cpu(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	void ninjakd2_core(machine_config &config);
 
-private:
-	optional_device<samples_device> m_pcm;
-	optional_memory_region m_pcm_region;
-	required_shared_ptr<uint8_t> m_fg_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	optional_shared_ptr<uint8_t> m_bg_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<cpu_device> m_soundcpu;
 
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_memory_bank m_mainbank;
 
-	std::unique_ptr<int16_t[]> m_sampledata;
-	int m_next_sprite_overdraw_enabled = 0;
-	uint8_t m_rom_bank_mask = 0;
+	uint8_t m_vram_bank_mask = 0;
+	bool m_robokid_sprites = false;
+	bool (*m_stencil_compare_function)(uint16_t pal) = nullptr;
+	bool m_sprites_updated = false;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	bitmap_ind16 m_sprites_bitmap;
 
-	void draw_sprites( bitmap_ind16 &bitmap);
-	void erase_sprites( bitmap_ind16 &bitmap);
+private:
+	void draw_sprites(bitmap_ind16 &bitmap);
+	void erase_sprites(bitmap_ind16 &bitmap);
 	void lineswap_gfx_roms(const char *region, const int bit);
 	void decrypted_opcodes_map(address_map &map);
 	void ninjakd2_main_cpu(address_map &map);
 	void ninjakd2_sound_cpu(address_map &map);
 	void ninjakd2_sound_io(address_map &map);
+
+	optional_device<samples_device> m_pcm;
+	optional_memory_region m_pcm_region;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+
+	std::unique_ptr<int16_t []> m_sampledata;
+	bool m_next_sprite_overdraw_enabled = false;
+	uint8_t m_rom_bank_mask = 0;
 };
 
 class mnight_state : public ninjakd2_state
@@ -141,17 +141,18 @@ public:
 	void init_robokidj();
 
 protected:
-	template<int Layer> uint8_t robokid_bg_videoram_r(offs_t offset);
-	template<int Layer> void robokid_bg_videoram_w(offs_t offset, uint8_t data);
-	template<int Layer> void robokid_bg_ctrl_w(offs_t offset, uint8_t data);
-	template<int Layer> void robokid_bg_bank_w(uint8_t data);
-	tilemap_t* m_robokid_tilemap[3];
+	template <int Layer> uint8_t robokid_bg_videoram_r(offs_t offset);
+	template <int Layer> void robokid_bg_videoram_w(offs_t offset, uint8_t data);
+	template <int Layer> void robokid_bg_ctrl_w(offs_t offset, uint8_t data);
+	template <int Layer> void robokid_bg_bank_w(uint8_t data);
 
 	void video_init_banked(uint32_t vram_alloc_size);
 	TILEMAP_MAPPER_MEMBER(robokid_bg_scan);
-	template<int Layer> TILE_GET_INFO_MEMBER(robokid_get_bg_tile_info);
+	template <int Layer> TILE_GET_INFO_MEMBER(robokid_get_bg_tile_info);
 
 	void robokid_main_cpu(address_map &map);
+
+	tilemap_t *m_robokid_tilemap[3] = { nullptr, nullptr, nullptr };
 
 private:
 	uint8_t motion_error_verbose_r();
@@ -160,8 +161,9 @@ private:
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void motion_error_kludge(uint16_t offset);
+
 	uint8_t m_robokid_bg_bank[3] = { };
-	std::unique_ptr<uint8_t[]> m_robokid_bg_videoram[3];
+	std::unique_ptr<uint8_t []> m_robokid_bg_videoram[3];
 };
 
 class omegaf_state : public robokid_state
@@ -190,15 +192,15 @@ private:
 	TILEMAP_MAPPER_MEMBER(omegaf_bg_scan);
 	uint32_t screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_ioport_array<2> m_dsw_io;
-	required_ioport_array<2> m_pad_io;
-
 	void io_protection_start();
 	void io_protection_reset();
 
+	required_ioport_array<2> m_dsw_io;
+	required_ioport_array<2> m_pad_io;
+
 	uint8_t m_io_protection[3] = { };
 	uint8_t m_io_protection_input = 0;
-	int m_io_protection_tick = 0;
+	uint32_t m_io_protection_tick = 0;
 };
 
 #endif // MAME_UPL_NINJAKD2_H

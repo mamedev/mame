@@ -161,9 +161,6 @@ TODO:
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_12 XTAL(12'000'000)
-#define MAIN_CLOCK_5  XTAL(5'000'000)
-
 
 /*************************************
  *
@@ -261,7 +258,9 @@ uint8_t omegaf_state::io_protection_r(offs_t offset)
 					switch (m_io_protection[0] & 0xe0)
 					{
 						case 0x00:
-							if (++m_io_protection_tick & 1)
+							if (!machine().side_effects_disabled())
+								++m_io_protection_tick;
+							if (m_io_protection_tick & 1)
 							{
 								result = 0x00;
 							}
@@ -347,12 +346,12 @@ void omegaf_state::io_protection_w(offs_t offset, uint8_t data)
 
 /*****************************************************************************/
 
-void ninjakd2_state::ninjakd2_bankselect_w(uint8_t data)
+void ninjakd2_state::bankselect_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & m_rom_bank_mask);
 }
 
-void ninjakd2_state::ninjakd2_soundreset_w(uint8_t data)
+void ninjakd2_state::soundreset_w(uint8_t data)
 {
 	// bit 4 resets sound CPU
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -409,32 +408,32 @@ uint8_t omegaf_state::unk_r()
 void ninjakd2_state::ninjakd2_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc000).portr("KEYCOIN");
 	map(0xc001, 0xc001).portr("PAD1");
 	map(0xc002, 0xc002).portr("PAD2");
 	map(0xc003, 0xc003).portr("DIPSW1");
 	map(0xc004, 0xc004).portr("DIPSW2");
 	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc201, 0xc201).w(FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xc202, 0xc202).w(FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xc203, 0xc203).w(FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xc201, 0xc201).w(FUNC(ninjakd2_state::soundreset_w));
+	map(0xc202, 0xc202).w(FUNC(ninjakd2_state::bankselect_w));
+	map(0xc203, 0xc203).w(FUNC(ninjakd2_state::sprite_overdraw_w));
 	map(0xc208, 0xc20c).w(FUNC(ninjakd2_state::ninjakd2_bg_ctrl_w));
 	map(0xc800, 0xcdff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xd7ff).ram().w(FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(ninjakd2_state::fgvideoram_w)).share("fg_videoram");
 	map(0xd800, 0xdfff).ram().w(FUNC(ninjakd2_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
 	map(0xe000, 0xf9ff).ram();
-	map(0xfa00, 0xffff).ram().share("spriteram");
+	map(0xfa00, 0xffff).ram().share(m_spriteram);
 }
 
 void mnight_state::mnight_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xd9ff).ram();
-	map(0xda00, 0xdfff).ram().share("spriteram");
+	map(0xda00, 0xdfff).ram().share(m_spriteram);
 	map(0xe000, 0xe7ff).ram().w(FUNC(mnight_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
-	map(0xe800, 0xefff).ram().w(FUNC(mnight_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(mnight_state::fgvideoram_w)).share("fg_videoram");
 	map(0xf000, 0xf5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf800).portr("KEYCOIN");
 	map(0xf801, 0xf801).portr("PAD1");
@@ -442,9 +441,9 @@ void mnight_state::mnight_main_cpu(address_map &map)
 	map(0xf803, 0xf803).portr("DIPSW1");
 	map(0xf804, 0xf804).portr("DIPSW2");
 	map(0xfa00, 0xfa00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).w(FUNC(mnight_state::ninjakd2_soundreset_w));
-	map(0xfa02, 0xfa02).w(FUNC(mnight_state::ninjakd2_bankselect_w));
-	map(0xfa03, 0xfa03).w(FUNC(mnight_state::ninjakd2_sprite_overdraw_w));
+	map(0xfa01, 0xfa01).w(FUNC(mnight_state::soundreset_w));
+	map(0xfa02, 0xfa02).w(FUNC(mnight_state::bankselect_w));
+	map(0xfa03, 0xfa03).w(FUNC(mnight_state::sprite_overdraw_w));
 	map(0xfa08, 0xfa0c).w(FUNC(mnight_state::ninjakd2_bg_ctrl_w));
 }
 
@@ -452,16 +451,16 @@ void mnight_state::mnight_main_cpu(address_map &map)
 void robokid_state::robokid_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc800, 0xcfff).ram().w(FUNC(robokid_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(robokid_state::fgvideoram_w)).share("fg_videoram");
 	map(0xd000, 0xd3ff).rw(FUNC(robokid_state::robokid_bg_videoram_r<2>), FUNC(robokid_state::robokid_bg_videoram_w<2>));   // banked
 	map(0xd400, 0xd7ff).rw(FUNC(robokid_state::robokid_bg_videoram_r<1>), FUNC(robokid_state::robokid_bg_videoram_w<1>));   // banked
 	map(0xd800, 0xdbff).rw(FUNC(robokid_state::robokid_bg_videoram_r<0>), FUNC(robokid_state::robokid_bg_videoram_w<0>));   // banked
 	map(0xdc00, 0xdc00).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xdc01, 0xdc01).portr("PAD1").w(FUNC(robokid_state::ninjakd2_soundreset_w));
-	map(0xdc02, 0xdc02).portr("PAD2").w(FUNC(robokid_state::ninjakd2_bankselect_w));
-	map(0xdc03, 0xdc03).portr("DIPSW1").w(FUNC(robokid_state::ninjakd2_sprite_overdraw_w));
+	map(0xdc01, 0xdc01).portr("PAD1").w(FUNC(robokid_state::soundreset_w));
+	map(0xdc02, 0xdc02).portr("PAD2").w(FUNC(robokid_state::bankselect_w));
+	map(0xdc03, 0xdc03).portr("DIPSW1").w(FUNC(robokid_state::sprite_overdraw_w));
 	map(0xdc04, 0xdc04).portr("DIPSW2");
 	map(0xdd00, 0xdd04).w(FUNC(robokid_state::robokid_bg_ctrl_w<0>));
 	map(0xdd05, 0xdd05).w(FUNC(robokid_state::robokid_bg_bank_w<0>));
@@ -470,19 +469,19 @@ void robokid_state::robokid_main_cpu(address_map &map)
 	map(0xdf00, 0xdf04).w(FUNC(robokid_state::robokid_bg_ctrl_w<2>));
 	map(0xdf05, 0xdf05).w(FUNC(robokid_state::robokid_bg_bank_w<2>));
 	map(0xe000, 0xf9ff).ram();
-	map(0xfa00, 0xffff).ram().share("spriteram");
+	map(0xfa00, 0xffff).ram().share(m_spriteram);
 }
 
 
 void omegaf_state::omegaf_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc000).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc001, 0xc003).r(FUNC(omegaf_state::io_protection_r));
-	map(0xc001, 0xc001).w(FUNC(omegaf_state::ninjakd2_soundreset_w));
-	map(0xc002, 0xc002).w(FUNC(omegaf_state::ninjakd2_bankselect_w));
-	map(0xc003, 0xc003).w(FUNC(omegaf_state::ninjakd2_sprite_overdraw_w));
+	map(0xc001, 0xc001).w(FUNC(omegaf_state::soundreset_w));
+	map(0xc002, 0xc002).w(FUNC(omegaf_state::bankselect_w));
+	map(0xc003, 0xc003).w(FUNC(omegaf_state::sprite_overdraw_w));
 	map(0xc004, 0xc006).w(FUNC(omegaf_state::io_protection_w));
 	map(0xc100, 0xc104).w(FUNC(omegaf_state::robokid_bg_ctrl_w<0>));
 	map(0xc105, 0xc105).w(FUNC(omegaf_state::robokid_bg_bank_w<0>));
@@ -494,10 +493,10 @@ void omegaf_state::omegaf_main_cpu(address_map &map)
 	map(0xc400, 0xc7ff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<0>), FUNC(omegaf_state::robokid_bg_videoram_w<0>));   // banked
 	map(0xc800, 0xcbff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<1>), FUNC(omegaf_state::robokid_bg_videoram_w<1>));   // banked
 	map(0xcc00, 0xcfff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<2>), FUNC(omegaf_state::robokid_bg_videoram_w<2>));   // banked
-	map(0xd000, 0xd7ff).ram().w(FUNC(omegaf_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(omegaf_state::fgvideoram_w)).share("fg_videoram");
 	map(0xd800, 0xdfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe000, 0xf9ff).ram();
-	map(0xfa00, 0xffff).ram().share("spriteram");
+	map(0xfa00, 0xffff).ram().share(m_spriteram);
 }
 
 
@@ -521,7 +520,7 @@ void ninjakd2_state::ninjakid_nopcm_sound_cpu(address_map &map)
 
 void ninjakd2_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x7fff).rom().share(m_decrypted_opcodes);
 	map(0x8000, 0xbfff).rom().region("soundcpu", 0x8000);
 }
 
@@ -546,7 +545,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )    /* keep pressed during boot to enter service mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )    // keep pressed during boot to enter service mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -578,7 +577,7 @@ static INPUT_PORTS_START( common_2p )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )    /* keep pressed during boot to enter service mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )    // keep pressed during boot to enter service mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -881,17 +880,17 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( gfx_ninjakd2 )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x200, 16)    // fg
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16)    // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16)    // bg
+	GFXDECODE_ENTRY( "chars",   0, gfx_8x8x4_packed_msb,               0x200, 16)    // fg
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16)    // sprites
+	GFXDECODE_ENTRY( "tiles1",  0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16)    // bg
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_robokid )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x300, 16) // fg
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16) // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg0
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg1
-	GFXDECODE_ENTRY( "gfx5", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg2
+	GFXDECODE_ENTRY( "chars",   0, gfx_8x8x4_packed_msb,               0x300, 16) // fg
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16) // sprites
+	GFXDECODE_ENTRY( "tiles1",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg0
+	GFXDECODE_ENTRY( "tiles2",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg1
+	GFXDECODE_ENTRY( "tiles3",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg2
 GFXDECODE_END
 
 
@@ -903,8 +902,8 @@ GFXDECODE_END
 
 void ninjakd2_state::machine_start()
 {
-	/* initialize main Z80 bank */
-	int num_banks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	// initialize main Z80 bank
+	int const num_banks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	m_mainbank->configure_entries(0, num_banks, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// ...
 
@@ -932,42 +931,45 @@ void omegaf_state::machine_reset()
 
 /*****************************************************************************/
 
+static constexpr XTAL MAIN_CLOCK_12 = XTAL(12'000'000);
+static constexpr XTAL MAIN_CLOCK_5 = XTAL(5'000'000);
+
 void ninjakd2_state::ninjakd2_core(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK_12/2); /* verified */
+	// basic machine hardware
+	Z80(config, m_maincpu, MAIN_CLOCK_12/2); // verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_main_cpu);
 
-	Z80(config, m_soundcpu, MAIN_CLOCK_5);     /* verified */
+	Z80(config, m_soundcpu, MAIN_CLOCK_5);     // verified
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
 	m_soundcpu->set_addrmap(AS_IO, &ninjakd2_state::ninjakd2_sound_io);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.61);    /* verified on pcb */
+	m_screen->set_refresh_hz(59.61);    // verified on pcb
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(ninjakd2_state::screen_update_ninjakd2));
-	m_screen->screen_vblank().set(FUNC(ninjakd2_state::screen_vblank_ninjakd2));
+	m_screen->screen_vblank().set(FUNC(ninjakd2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjakd2);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 0x300);
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym2203_1(YM2203(config, "2203.1", MAIN_CLOCK_12/8)); /* verified */
+	ym2203_device &ym2203_1(YM2203(config, "2203.1", MAIN_CLOCK_12/8)); // verified
 	ym2203_1.irq_handler().set_inputline("soundcpu", 0);
 	ym2203_1.add_route(0, "mono", 0.10);
 	ym2203_1.add_route(1, "mono", 0.10);
 	ym2203_1.add_route(2, "mono", 0.10);
 	ym2203_1.add_route(3, "mono", 0.50);
 
-	ym2203_device &ym2203_2(YM2203(config, "2203.2", MAIN_CLOCK_12/8)); /* verified */
+	ym2203_device &ym2203_2(YM2203(config, "2203.2", MAIN_CLOCK_12/8)); // verified
 	ym2203_2.add_route(0, "mono", 0.10);
 	ym2203_2.add_route(1, "mono", 0.10);
 	ym2203_2.add_route(2, "mono", 0.10);
@@ -982,7 +984,7 @@ void ninjakd2_state::ninjakd2_core(machine_config &config)
 void ninjakd2_state::ninjakd2(machine_config &config)
 {
 	ninjakd2_core(config);
-	MC8123(config.replace(), m_soundcpu, MAIN_CLOCK_5); /* verified */
+	MC8123(config.replace(), m_soundcpu, MAIN_CLOCK_5); // verified
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
 	m_soundcpu->set_addrmap(AS_IO, &ninjakd2_state::ninjakd2_sound_io);
 	m_soundcpu->set_addrmap(AS_OPCODES, &ninjakd2_state::decrypted_opcodes_map);
@@ -999,14 +1001,14 @@ void mnight_state::mnight(machine_config &config)
 {
 	ninjakd2_core(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mnight_state::mnight_main_cpu);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mnight_state::ninjakid_nopcm_sound_cpu);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(mnight_state,mnight)
 
-	/* sound hardware */
+	// sound hardware
 	config.device_remove("pcm");
 }
 
@@ -1014,7 +1016,7 @@ void mnight_state::arkarea(machine_config &config)
 {
 	mnight(config);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(mnight_state,arkarea)
 }
 
@@ -1022,13 +1024,13 @@ void robokid_state::robokid(machine_config &config)
 {
 	mnight(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &robokid_state::robokid_main_cpu);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &robokid_state::ninjakid_nopcm_sound_cpu);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_robokid);
-	m_palette->set_format(palette_device::RGBx_444, 0x400);  // RAM is this large, but still only 0x300 colors used
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);  // RAM is this large, but still only 0x300 colors used
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(robokid_state,robokid)
@@ -1040,12 +1042,12 @@ void omegaf_state::omegaf(machine_config &config)
 {
 	robokid(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &omegaf_state::omegaf_main_cpu);
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &omegaf_state::ninjakid_nopcm_sound_cpu);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(omegaf_state,omegaf)
 
 	m_screen->set_screen_update(FUNC(omegaf_state::screen_update_omegaf));
@@ -1070,17 +1072,17 @@ ROM_START( ninjakd2 )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
 	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
-	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
 	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x20000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
@@ -1100,14 +1102,14 @@ ROM_START( ninjakd2a )
 	ROM_LOAD( "nk2_06.bin", 0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) ) // decrypted opcodes
 	ROM_CONTINUE(           0x00000, 0x8000 )                                                               // decrypted data
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
 	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x20000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
@@ -1127,14 +1129,14 @@ ROM_START( ninjakd2b )
 	ROM_LOAD( "nk2_06.bin", 0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) ) // 6.3g  decrypted opcodes
 	ROM_CONTINUE(           0x00000, 0x8000 )                                                               // decrypted data
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
 	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x20000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
@@ -1153,17 +1155,17 @@ ROM_START( ninjakd2c )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
 	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
-	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
 	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x20000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
@@ -1182,17 +1184,17 @@ ROM_START( rdaction )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
 	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
-	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(0936b365) SHA1(3705f42b76ab474357e77c1a9b8e3755c7ab2c0c) ) // sldh - this rom contains the new title / license
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
 	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x20000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
@@ -1213,17 +1215,17 @@ ROM_START( jt104 )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
 	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
-	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(c038fadb) SHA1(59e9b125ead3e9bdc9d66de75dffd58956eb922e) )  // sldh - this rom contains the new title / license
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
 	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x20000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
@@ -1243,15 +1245,15 @@ ROM_START( mnight )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "6.j7",   0x00000, 0x10000, CRC(a0782a31) SHA1(8abd2f0b0c2c2eb876f324f7a095a5cdc773c187) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "13.b10", 0x00000, 0x08000, CRC(8c177a19) SHA1(328df41b5bacd1999f97d99781c6ef8afc9989a3) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x30000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "9.e11",  0x00000, 0x10000, CRC(4883059c) SHA1(53d4b9b0f0725c25e302ee1549a306778ec74d85) )
 	ROM_LOAD( "8.e12",  0x10000, 0x10000, CRC(02b91445) SHA1(f0cf85f9e17c40248de16bca8df6d745e359b92d) )
 	ROM_LOAD( "7.e14",  0x20000, 0x10000, CRC(9f08d160) SHA1(1a0041ad138e7e6598d4d03d7cbd52a7244557ac) )
 
-	ROM_REGION( 0x30000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x30000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "12.b20", 0x00000, 0x10000, CRC(4d37e0f4) SHA1(a6d9aaccd97769197622cda45474e223c2ee1d98) )
 	ROM_LOAD( "11.b22", 0x10000, 0x10000, CRC(b22cbbd3) SHA1(70984f1051fd236730d97011bc87dacb3ca38594) )
 	ROM_LOAD( "10.b23", 0x20000, 0x10000, CRC(65714070) SHA1(48f3c130c97d00e8f0535904dc2237277067c475) )
@@ -1268,15 +1270,15 @@ ROM_START( mnightj )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "6.j7",   0x00000, 0x10000, CRC(a0782a31) SHA1(8abd2f0b0c2c2eb876f324f7a095a5cdc773c187) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "13.b10", 0x00000, 0x08000, CRC(37b8221f) SHA1(ac86e0ae8039fd30a028a893d08ce099f7765615) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x30000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "9.e11",  0x00000, 0x10000, CRC(4883059c) SHA1(53d4b9b0f0725c25e302ee1549a306778ec74d85) )
 	ROM_LOAD( "8.e12",  0x10000, 0x10000, CRC(02b91445) SHA1(f0cf85f9e17c40248de16bca8df6d745e359b92d) )
 	ROM_LOAD( "7.e14",  0x20000, 0x10000, CRC(9f08d160) SHA1(1a0041ad138e7e6598d4d03d7cbd52a7244557ac) )
 
-	ROM_REGION( 0x30000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x30000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "12.b20", 0x00000, 0x10000, CRC(4d37e0f4) SHA1(a6d9aaccd97769197622cda45474e223c2ee1d98) )
 	ROM_LOAD( "11.b22", 0x10000, 0x10000, CRC(b22cbbd3) SHA1(70984f1051fd236730d97011bc87dacb3ca38594) )
 	ROM_LOAD( "10.b23", 0x20000, 0x10000, CRC(65714070) SHA1(48f3c130c97d00e8f0535904dc2237277067c475) )
@@ -1293,15 +1295,15 @@ ROM_START( arkarea )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "arkarea.013",  0x00000, 0x8000, CRC(2d409d58) SHA1(6344b43db5459691728c3f843b643c84ea71dd8e) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles (need lineswapping)
 	ROM_LOAD( "arkarea.004",  0x00000, 0x08000, CRC(69e36af2) SHA1(2bccef8f396dcb5261af0140af04c95ee8ecae11) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_REGION( 0x30000, "sprites", 0 )    // sprites (need lineswapping)
 	ROM_LOAD( "arkarea.007",  0x00000, 0x10000, CRC(d5684a27) SHA1(4961e8a5df2510afb1ef3e937d0a5d52e91893a3) )
 	ROM_LOAD( "arkarea.006",  0x10000, 0x10000, CRC(2c0567d6) SHA1(f36a2a3ff487660f89470516617482331f008da0) )
 	ROM_LOAD( "arkarea.005",  0x20000, 0x10000, CRC(9886004d) SHA1(4050756af5c00ab1a368780fe091460fd9e2cb05) )
 
-	ROM_REGION( 0x30000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_REGION( 0x30000, "tiles1", 0 )    // bg tiles (need lineswapping)
 	ROM_LOAD( "arkarea.003",  0x00000, 0x10000, CRC(6f45a308) SHA1(b6994fe1f50d5e9cf38d3efbd69a2c5f76f33c56) )
 	ROM_LOAD( "arkarea.002",  0x10000, 0x10000, CRC(051d3482) SHA1(3ebef1a7280f52df6d5ee34e3d4e7567aac0c165) )
 	ROM_LOAD( "arkarea.001",  0x20000, 0x10000, CRC(09d11ab7) SHA1(14f68e93e7173069f790493eafe9e1adc1a074cc) )
@@ -1325,16 +1327,16 @@ ROM_START( robokid )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
 	ROM_LOAD( "robokid.b9",   0x00000, 0x08000, CRC(fac59c3f) SHA1(1b202ad5c12982512129d9e097267dd31b984ae8) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    // sprite tiles
+	ROM_REGION( 0x40000, "sprites", 0 )    // sprite tiles
 	ROM_LOAD( "robokid.15f",  0x00000, 0x10000, CRC(ba61f5ab) SHA1(8433ddd55f0184cd5e8bb4a94a1c2336b2f8ff05) )
 	ROM_LOAD( "robokid.16f",  0x10000, 0x10000, CRC(d9b399ce) SHA1(70755c9cae27187f183ae6d61bedb95c420756f4) )
 	ROM_LOAD( "robokid.17f",  0x20000, 0x10000, CRC(afe432b9) SHA1(1ec7954ccf112eddf0ffcb8b5aec6cbc5cba7a7a) )
 	ROM_LOAD( "robokid.18f",  0x30000, 0x10000, CRC(a0aa2a84) SHA1(4d46c169429cd285644336c7d47e393b33bd8770) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    // bg0 tiles
+	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
 	ROM_LOAD( "robokid.19c",  0x00000, 0x10000, CRC(02220421) SHA1(f533e9c6cea1dccbb60e0528c470f3cb5e8fc44e) )
 	ROM_LOAD( "robokid.20c",  0x10000, 0x10000, CRC(02d59bc2) SHA1(031acbb14145f9f4623de8868c6207fb9f8e8207) )
 	ROM_LOAD( "robokid.17d",  0x20000, 0x10000, CRC(2fa29b99) SHA1(13dce7932e2e9c03a139a4293584838aa3d9f1c3) )
@@ -1343,7 +1345,7 @@ ROM_START( robokid )
 	ROM_LOAD( "robokid.20d",  0x50000, 0x10000, CRC(b0b395ed) SHA1(31ec07634053793a701bbfd601b029f7da66e9d7) )
 	ROM_LOAD( "robokid.19f",  0x60000, 0x10000, CRC(0f9071c6) SHA1(8bf0c35189eda98a9bc150788890e136870cb5b2) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )    // bg1 tiles
+	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
 	ROM_LOAD( "robokid.12c",  0x00000, 0x10000, CRC(0ab45f94) SHA1(d8274263068d998c89a1b247dde7f814037cc15b) )
 	ROM_LOAD( "robokid.14c",  0x10000, 0x10000, CRC(029bbd4a) SHA1(8e078cdafe608fc6cde827be85c5267ade4ecca6) )
 	ROM_LOAD( "robokid.15c",  0x20000, 0x10000, CRC(7de67ebb) SHA1(2fe92e50e2894dd363e69b053db96bdb66a273eb) )
@@ -1353,7 +1355,7 @@ ROM_START( robokid )
 	ROM_LOAD( "robokid.15d",  0x60000, 0x10000, CRC(cd632a4d) SHA1(a537d9ced45fdac490097e9162ac4d09a470be79) )
 	ROM_LOAD( "robokid.16d",  0x70000, 0x10000, CRC(18d92b2b) SHA1(e6d20ea8f0fac8bd4824a3b279a0fd8a1d6c26f5) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )    // bg2 tiles
+	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
 	ROM_LOAD( "robokid.12a",  0x00000, 0x10000, CRC(e64d1c10) SHA1(d1073c80c9788aba65410f88691747a37b2a9d4a) )
 	ROM_LOAD( "robokid.14a",  0x10000, 0x10000, CRC(8f9371e4) SHA1(0ea06d62bf4673ebda49a849cead832a24e5b886) )
 	ROM_LOAD( "robokid.15a",  0x20000, 0x10000, CRC(469204e7) SHA1(8c2e94635b2b304e7dfa2e6ad58ba526dcf02453) )
@@ -1379,16 +1381,16 @@ ROM_START( robokidj3 )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
 	ROM_LOAD( "robokid.b9",   0x00000, 0x08000, CRC(fac59c3f) SHA1(1b202ad5c12982512129d9e097267dd31b984ae8) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    // sprite tiles
+	ROM_REGION( 0x40000, "sprites", 0 )    // sprite tiles
 	ROM_LOAD( "robokid.15f",  0x00000, 0x10000, CRC(ba61f5ab) SHA1(8433ddd55f0184cd5e8bb4a94a1c2336b2f8ff05) )
 	ROM_LOAD( "robokid.16f",  0x10000, 0x10000, CRC(d9b399ce) SHA1(70755c9cae27187f183ae6d61bedb95c420756f4) )
 	ROM_LOAD( "robokid.17f",  0x20000, 0x10000, CRC(afe432b9) SHA1(1ec7954ccf112eddf0ffcb8b5aec6cbc5cba7a7a) )
 	ROM_LOAD( "robokid.18f",  0x30000, 0x10000, CRC(a0aa2a84) SHA1(4d46c169429cd285644336c7d47e393b33bd8770) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    // bg0 tiles
+	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
 	ROM_LOAD( "robokid.19c",  0x00000, 0x10000, CRC(02220421) SHA1(f533e9c6cea1dccbb60e0528c470f3cb5e8fc44e) )
 	ROM_LOAD( "robokid.20c",  0x10000, 0x10000, CRC(02d59bc2) SHA1(031acbb14145f9f4623de8868c6207fb9f8e8207) )
 	ROM_LOAD( "robokid.17d",  0x20000, 0x10000, CRC(2fa29b99) SHA1(13dce7932e2e9c03a139a4293584838aa3d9f1c3) )
@@ -1397,7 +1399,7 @@ ROM_START( robokidj3 )
 	ROM_LOAD( "robokid.20d",  0x50000, 0x10000, CRC(b0b395ed) SHA1(31ec07634053793a701bbfd601b029f7da66e9d7) )
 	ROM_LOAD( "robokid.19f",  0x60000, 0x10000, CRC(0f9071c6) SHA1(8bf0c35189eda98a9bc150788890e136870cb5b2) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )    // bg1 tiles
+	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
 	ROM_LOAD( "robokid.12c",  0x00000, 0x10000, CRC(0ab45f94) SHA1(d8274263068d998c89a1b247dde7f814037cc15b) )
 	ROM_LOAD( "robokid.14c",  0x10000, 0x10000, CRC(029bbd4a) SHA1(8e078cdafe608fc6cde827be85c5267ade4ecca6) )
 	ROM_LOAD( "robokid.15c",  0x20000, 0x10000, CRC(7de67ebb) SHA1(2fe92e50e2894dd363e69b053db96bdb66a273eb) )
@@ -1407,7 +1409,7 @@ ROM_START( robokidj3 )
 	ROM_LOAD( "robokid.15d",  0x60000, 0x10000, CRC(cd632a4d) SHA1(a537d9ced45fdac490097e9162ac4d09a470be79) )
 	ROM_LOAD( "robokid.16d",  0x70000, 0x10000, CRC(18d92b2b) SHA1(e6d20ea8f0fac8bd4824a3b279a0fd8a1d6c26f5) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )    // bg2 tiles
+	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
 	ROM_LOAD( "robokid.12a",  0x00000, 0x10000, CRC(e64d1c10) SHA1(d1073c80c9788aba65410f88691747a37b2a9d4a) )
 	ROM_LOAD( "robokid.14a",  0x10000, 0x10000, CRC(8f9371e4) SHA1(0ea06d62bf4673ebda49a849cead832a24e5b886) )
 	ROM_LOAD( "robokid.15a",  0x20000, 0x10000, CRC(469204e7) SHA1(8c2e94635b2b304e7dfa2e6ad58ba526dcf02453) )
@@ -1433,16 +1435,16 @@ ROM_START( robokidj )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
 	ROM_LOAD( "robokid.b9",   0x00000, 0x08000, CRC(fac59c3f) SHA1(1b202ad5c12982512129d9e097267dd31b984ae8) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    // sprite tiles
+	ROM_REGION( 0x40000, "sprites", 0 )    // sprite tiles
 	ROM_LOAD( "robokid.15f",  0x00000, 0x10000, CRC(ba61f5ab) SHA1(8433ddd55f0184cd5e8bb4a94a1c2336b2f8ff05) )
 	ROM_LOAD( "robokid.16f",  0x10000, 0x10000, CRC(d9b399ce) SHA1(70755c9cae27187f183ae6d61bedb95c420756f4) )
 	ROM_LOAD( "robokid.17f",  0x20000, 0x10000, CRC(afe432b9) SHA1(1ec7954ccf112eddf0ffcb8b5aec6cbc5cba7a7a) )
 	ROM_LOAD( "robokid.18f",  0x30000, 0x10000, CRC(a0aa2a84) SHA1(4d46c169429cd285644336c7d47e393b33bd8770) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    // bg0 tiles
+	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
 	ROM_LOAD( "robokid.19c",  0x00000, 0x10000, CRC(02220421) SHA1(f533e9c6cea1dccbb60e0528c470f3cb5e8fc44e) )
 	ROM_LOAD( "robokid.20c",  0x10000, 0x10000, CRC(02d59bc2) SHA1(031acbb14145f9f4623de8868c6207fb9f8e8207) )
 	ROM_LOAD( "robokid.17d",  0x20000, 0x10000, CRC(2fa29b99) SHA1(13dce7932e2e9c03a139a4293584838aa3d9f1c3) )
@@ -1451,7 +1453,7 @@ ROM_START( robokidj )
 	ROM_LOAD( "robokid.20d",  0x50000, 0x10000, CRC(b0b395ed) SHA1(31ec07634053793a701bbfd601b029f7da66e9d7) )
 	ROM_LOAD( "robokid.19f",  0x60000, 0x10000, CRC(0f9071c6) SHA1(8bf0c35189eda98a9bc150788890e136870cb5b2) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )    // bg1 tiles
+	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
 	ROM_LOAD( "robokid.12c",  0x00000, 0x10000, CRC(0ab45f94) SHA1(d8274263068d998c89a1b247dde7f814037cc15b) )
 	ROM_LOAD( "robokid.14c",  0x10000, 0x10000, CRC(029bbd4a) SHA1(8e078cdafe608fc6cde827be85c5267ade4ecca6) )
 	ROM_LOAD( "robokid.15c",  0x20000, 0x10000, CRC(7de67ebb) SHA1(2fe92e50e2894dd363e69b053db96bdb66a273eb) )
@@ -1461,7 +1463,7 @@ ROM_START( robokidj )
 	ROM_LOAD( "robokid.15d",  0x60000, 0x10000, CRC(cd632a4d) SHA1(a537d9ced45fdac490097e9162ac4d09a470be79) )
 	ROM_LOAD( "robokid.16d",  0x70000, 0x10000, CRC(18d92b2b) SHA1(e6d20ea8f0fac8bd4824a3b279a0fd8a1d6c26f5) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )    // bg2 tiles
+	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
 	ROM_LOAD( "robokid.12a",  0x00000, 0x10000, CRC(e64d1c10) SHA1(d1073c80c9788aba65410f88691747a37b2a9d4a) )
 	ROM_LOAD( "robokid.14a",  0x10000, 0x10000, CRC(8f9371e4) SHA1(0ea06d62bf4673ebda49a849cead832a24e5b886) )
 	ROM_LOAD( "robokid.15a",  0x20000, 0x10000, CRC(469204e7) SHA1(8c2e94635b2b304e7dfa2e6ad58ba526dcf02453) )
@@ -1486,16 +1488,16 @@ ROM_START( robokidj2 )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
 	ROM_LOAD( "robokid.b9",   0x00000, 0x08000, CRC(fac59c3f) SHA1(1b202ad5c12982512129d9e097267dd31b984ae8) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    // sprite tiles
+	ROM_REGION( 0x40000, "sprites", 0 )    // sprite tiles
 	ROM_LOAD( "robokid.15f",  0x00000, 0x10000, CRC(ba61f5ab) SHA1(8433ddd55f0184cd5e8bb4a94a1c2336b2f8ff05) )
 	ROM_LOAD( "robokid.16f",  0x10000, 0x10000, CRC(d9b399ce) SHA1(70755c9cae27187f183ae6d61bedb95c420756f4) )
 	ROM_LOAD( "robokid.17f",  0x20000, 0x10000, CRC(afe432b9) SHA1(1ec7954ccf112eddf0ffcb8b5aec6cbc5cba7a7a) )
 	ROM_LOAD( "robokid.18f",  0x30000, 0x10000, CRC(a0aa2a84) SHA1(4d46c169429cd285644336c7d47e393b33bd8770) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    // bg0 tiles
+	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
 	ROM_LOAD( "robokid.19c",  0x00000, 0x10000, CRC(02220421) SHA1(f533e9c6cea1dccbb60e0528c470f3cb5e8fc44e) )
 	ROM_LOAD( "robokid.20c",  0x10000, 0x10000, CRC(02d59bc2) SHA1(031acbb14145f9f4623de8868c6207fb9f8e8207) )
 	ROM_LOAD( "robokid.17d",  0x20000, 0x10000, CRC(2fa29b99) SHA1(13dce7932e2e9c03a139a4293584838aa3d9f1c3) )
@@ -1504,7 +1506,7 @@ ROM_START( robokidj2 )
 	ROM_LOAD( "robokid.20d",  0x50000, 0x10000, CRC(b0b395ed) SHA1(31ec07634053793a701bbfd601b029f7da66e9d7) )
 	ROM_LOAD( "robokid.19f",  0x60000, 0x10000, CRC(0f9071c6) SHA1(8bf0c35189eda98a9bc150788890e136870cb5b2) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )    // bg1 tiles
+	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
 	ROM_LOAD( "robokid.12c",  0x00000, 0x10000, CRC(0ab45f94) SHA1(d8274263068d998c89a1b247dde7f814037cc15b) )
 	ROM_LOAD( "robokid.14c",  0x10000, 0x10000, CRC(029bbd4a) SHA1(8e078cdafe608fc6cde827be85c5267ade4ecca6) )
 	ROM_LOAD( "robokid.15c",  0x20000, 0x10000, CRC(7de67ebb) SHA1(2fe92e50e2894dd363e69b053db96bdb66a273eb) )
@@ -1514,7 +1516,7 @@ ROM_START( robokidj2 )
 	ROM_LOAD( "robokid.15d",  0x60000, 0x10000, CRC(cd632a4d) SHA1(a537d9ced45fdac490097e9162ac4d09a470be79) )
 	ROM_LOAD( "robokid.16d",  0x70000, 0x10000, CRC(18d92b2b) SHA1(e6d20ea8f0fac8bd4824a3b279a0fd8a1d6c26f5) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )    // bg2 tiles
+	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
 	ROM_LOAD( "robokid.12a",  0x00000, 0x10000, CRC(e64d1c10) SHA1(d1073c80c9788aba65410f88691747a37b2a9d4a) )
 	ROM_LOAD( "robokid.14a",  0x10000, 0x10000, CRC(8f9371e4) SHA1(0ea06d62bf4673ebda49a849cead832a24e5b886) )
 	ROM_LOAD( "robokid.15a",  0x20000, 0x10000, CRC(469204e7) SHA1(8c2e94635b2b304e7dfa2e6ad58ba526dcf02453) )
@@ -1533,19 +1535,19 @@ ROM_START( omegaf )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "7.7m",         0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
 	ROM_LOAD( "4.18h",        0x00000, 0x08000, CRC(9e2d8152) SHA1(4b50557d171d1b03a870db5891ae67d70858ad37) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprite tiles
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprite tiles
 	ROM_LOAD( "8.23m",        0x00000, 0x20000, CRC(0bd2a5d1) SHA1(ef84f1a5554e891fc38d17314e3952ea5c9d2731) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    // bg0 tiles
+	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
 	ROM_LOAD( "2back1.27b",   0x00000, 0x80000, CRC(21f8a32e) SHA1(26582e06e7381e09443fa99f24ca9edd0b4a2937) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )    // bg1 tiles
+	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
 	ROM_LOAD( "1back2.15b",   0x00000, 0x80000, CRC(6210ddcc) SHA1(89c091eeafcc92750d0ea303fcde8a8dc3eeba89) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )    // bg2 tiles
+	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
 	ROM_LOAD( "3back3.5f",    0x00000, 0x80000, CRC(c31cae56) SHA1(4cc2d0d70990ca04b0e3abd15e5afe183e98e4ab) )
 ROM_END
 
@@ -1559,19 +1561,19 @@ ROM_START( omegafs )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "7.7m",         0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles
+	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
 	ROM_LOAD( "4.18h",        0x00000, 0x08000, CRC(9e2d8152) SHA1(4b50557d171d1b03a870db5891ae67d70858ad37) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    // sprite tiles
+	ROM_REGION( 0x20000, "sprites", 0 )    // sprite tiles
 	ROM_LOAD( "8.23m",        0x00000, 0x20000, CRC(0bd2a5d1) SHA1(ef84f1a5554e891fc38d17314e3952ea5c9d2731) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )    // bg0 tiles
+	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
 	ROM_LOAD( "2back1.27b",   0x00000, 0x80000, CRC(21f8a32e) SHA1(26582e06e7381e09443fa99f24ca9edd0b4a2937) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )    // bg1 tiles
+	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
 	ROM_LOAD( "1back2.15b",   0x00000, 0x80000, CRC(6210ddcc) SHA1(89c091eeafcc92750d0ea303fcde8a8dc3eeba89) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )    // bg2 tiles
+	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
 	ROM_LOAD( "3back3.5f",    0x00000, 0x80000, CRC(c31cae56) SHA1(4cc2d0d70990ca04b0e3abd15e5afe183e98e4ab) )
 ROM_END
 
@@ -1596,7 +1598,7 @@ by one place all the intervening bits.
 void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
-	uint8_t* const src = memregion(region)->base();
+	uint8_t *const src = memregion(region)->base();
 	std::vector<uint8_t> temp(length);
 	const int mask = (1 << (bit + 1)) - 1;
 
@@ -1611,9 +1613,9 @@ void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 
 void ninjakd2_state::gfx_unscramble()
 {
-	lineswap_gfx_roms("gfx1", 13);     // fg tiles
-	lineswap_gfx_roms("gfx2", 14);     // sprites
-	lineswap_gfx_roms("gfx3", 14);     // bg tiles
+	lineswap_gfx_roms("chars", 13);     // fg tiles
+	lineswap_gfx_roms("sprites", 14);   // sprites
+	lineswap_gfx_roms("tiles1", 14);    // bg tiles
 }
 
 
@@ -1640,8 +1642,11 @@ void mnight_state::init_mnight()
 
 uint8_t robokid_state::motion_error_verbose_r()
 {
-	popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
-	logerror("maincpu %04x MOTION ERROR\n", m_maincpu->pc());
+	if (!machine().side_effects_disabled())
+	{
+		popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
+		logerror("maincpu %04x MOTION ERROR\n", m_maincpu->pc());
+	}
 	return 0xe6;
 }
 
@@ -1681,22 +1686,22 @@ void robokid_state::init_robokidj()
  *************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,   INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjakd2,  0,        ninjakd2,  ninjakd2, ninjakd2_state, init_ninjakd2, ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2,  0,        ninjakd2,  ninjakd2, ninjakd2_state, init_ninjakd2, ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, init_bootleg,  ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
-GAME( 1987, rdaction,  ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (United Amusements license)", "JT 104 / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)",           MACHINE_SUPPORTS_SAVE ) // close to set 3
+GAME( 1987, rdaction,  ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (United Amusements license)", "JT 104 / NinjaKun Ashura no Shou",                         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, mnight,    0,        mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mnightj,   mnight,   mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnight,    0,        mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL",                             "Mutant Night",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnightj,   mnight,   mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL (Kawakus license)",           "Mutant Night (Japan)",                                     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, arkarea,   0,        arkarea,   arkarea,  mnight_state,   init_mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, arkarea,   0,        arkarea,   arkarea,  mnight_state,   init_mnight,   ROT0,   "UPL",                             "Ark Area",                                                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, robokid,   0,        robokid,   robokid,  robokid_state,  init_robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
-GAME( 1988, robokidj,  robokid,  robokid,   robokidj, robokid_state,  init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj2, robokid,  robokid,   robokidj, robokid_state,  init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj3, robokid,  robokid,   robokidj, robokid_state,  empty_init,    ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokid,   0,        robokid,   robokid,  robokid_state,  init_robokid,  ROT0,   "UPL",                             "Atomic Robo-kid (World, Type-2)",                          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
+GAME( 1988, robokidj,  robokid,  robokid,   robokidj, robokid_state,  init_robokidj, ROT0,   "UPL",                             "Atomic Robo-kid (Japan, Type-2, set 1)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj2, robokid,  robokid,   robokidj, robokid_state,  init_robokidj, ROT0,   "UPL",                             "Atomic Robo-kid (Japan, Type-2, set 2)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj3, robokid,  robokid,   robokidj, robokid_state,  empty_init,    ROT0,   "UPL",                             "Atomic Robo-kid (Japan)",                                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1989, omegaf,    0,        omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, omegafs,   omegaf,   omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegaf,    0,        omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL",                             "Omega Fighter",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegafs,   omegaf,   omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL",                             "Omega Fighter Special",                                    MACHINE_SUPPORTS_SAVE )
