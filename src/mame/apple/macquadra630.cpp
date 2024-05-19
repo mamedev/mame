@@ -162,7 +162,7 @@ void quadra630_state::macqd630(machine_config &config)
 	m_primetimeii->set_maincpu_tag("maincpu");
 	m_primetimeii->set_scsi_tag("f108:scsi:7:ncr53c96");
 
-	valkyrie_device &valkyrie(VALKYRIE(config, m_video, C32M));
+	VALKYRIE(config, m_video, C32M);
 	m_video->write_irq().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x40>));
 
 	MACADB(config, m_macadb, C15M);
@@ -182,10 +182,10 @@ void quadra630_state::macqd630(machine_config &config)
 	sda_merger.output_handler().append(m_cuda, FUNC(cuda_device::set_iic_sda));
 
 	m_cuda->iic_sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<0>));
-	m_cuda->iic_sda_callback().append(valkyrie, FUNC(valkyrie_device::sda_write));
-	m_cuda->iic_scl_callback().set(valkyrie, FUNC(valkyrie_device::scl_write));
+	m_cuda->iic_sda_callback().append(m_video, FUNC(valkyrie_device::sda_write));
+	m_cuda->iic_scl_callback().set(m_video, FUNC(valkyrie_device::scl_write));
 
-	valkyrie.sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
+	m_video->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
 
 	m_primetimeii->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	m_primetimeii->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
