@@ -5,13 +5,8 @@
 
 #pragma once
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> dimm_spd_device
-
-class dimm_spd_device :  public device_t
+#include "machine/i2chle.h"
+class dimm_spd_device :  public device_t, public i2c_hle_interface
 {
 public:
 	// construction/destruction
@@ -21,16 +16,6 @@ public:
 	}
 
 	dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// inline configuration helpers
-	void set_address(u16 address) { m_address = address; }
-
-	auto sda_callback() { return write_sda.bind(); }
-
-	void sda_write(int state);
-	void scl_write(int state);
-
-	devcb_write_line write_sda;
 
 	typedef enum
 	{
@@ -47,20 +32,14 @@ public:
 	void set_dimm_size(dimm_size_t size);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	// i2c_hle_interface overrides
+	virtual u8 read_data(u16 offset) override;
+	virtual const char *get_tag() override { return tag(); }
 
 private:
 	u8 m_data[256];
-	u8 m_latch;
-	u8 m_bit;
-	u16 m_address;
-	u16 m_last_address;
-	int m_sda, m_scl;
-	u32 m_state, m_state_next;
-	u16 m_data_offset;
-	bool m_just_acked;
 	dimm_size_t m_size;
 };
 

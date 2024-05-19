@@ -1,12 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-    Apple "Valkyrie" - very low-cost video framebuffer
-    Emulation by R. Belmont
+	Apple "Valkyrie" - very low-cost video framebuffer
+	Emulation by R. Belmont
 
-    This was the bonus awfulness in the infamous Quadra 630/LC 580 machines.  Only
-    a few monitor types are supported and the video mode timings appear to be hardcoded
-    into the chip.
+	This was the bonus awfulness in the Quadra 630/LC 580 machines.  While the
+	ROM software and MacOS don't support many monitor types, the Linux driver indicates
+	that's more of a software problem.
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/video/fbdev/valkyriefb.c?h=v6.2.10
+
+	Also valkyrie.c in the Marathon Infinity open source release from Bungie.  (They use Valkyrie's video upscaler
+	to only have to render 320x240!)
+
+	TODO:
+		- YUV video-in support
+		- Determine if the I2C clock is internal or external
+
+	Video in buffer 0 is at 0xf9300000
+	Video in buffer 1 is at 0xf9340000
+	Both buffers are 320x240 with a stride of 1024 bytes, data is 16 bits per pixel (YUV?)
+
 */
 
 #include "emu.h"
@@ -15,6 +29,7 @@
 #define LOG_MODE        (1U << 1)
 #define LOG_MONSENSE    (1U << 2)
 #define LOG_RAMDAC      (1U << 3)
+#define LOG_CLOCKGEN	(1U << 4)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -35,6 +50,7 @@ void valkyrie_device::map(address_map &map)
 
 valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VALKYRIE, tag, owner, clock),
+	i2c_hle_interface(mconfig, *this, 0x28),
 	m_vram_size(0x100000),
 	m_pixel_clock(31334400),
 	m_pal_address(0), m_pal_idx(0), m_mode(0),
@@ -43,8 +59,9 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 	m_monitor_config(*this, "monitor"),
 	m_irq(*this),
 	m_vram_offset(0), m_monitor_id(0),
-	m_base(0), m_stride(1024), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
-	m_config(0)
+	m_base(0), m_stride(1024), m_video_timing(0x80), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
+	m_config(0),
+	m_M(1), m_N(1), m_P(1)
 {
 }
 
@@ -55,6 +72,7 @@ void valkyrie_device::device_start()
 	m_vbl_timer = timer_alloc(FUNC(valkyrie_device::vbl_tick), this);
 	m_vbl_timer->adjust(attotime::never);
 
+	save_item(NAME(m_video_timing));
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_monitor_id));
@@ -69,6 +87,9 @@ void valkyrie_device::device_start()
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_config));
 	save_item(NAME(m_int_status));
+	save_item(NAME(m_M));
+	save_item(NAME(m_N));
+	save_item(NAME(m_P));
 	save_pointer(NAME(m_vram), m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(valkyrie_device::recalc_mode), this));
@@ -76,7 +97,15 @@ void valkyrie_device::device_start()
 
 void valkyrie_device::device_reset()
 {
-	m_enable = false;
+	m_video_timing = 0x80;
+
+	// clear the MAME default palette so we don't get a weird red screen on initial startup
+	for (int i = 0; i < 256; i++)
+	{
+		m_palette->set_pen_red_level(i, 0);
+		m_palette->set_pen_green_level(i, 0);
+		m_palette->set_pen_blue_level(i, 0);
+	}
 }
 
 void valkyrie_device::device_add_mconfig(machine_config &config)
@@ -98,9 +127,10 @@ static INPUT_PORTS_START(monitor_config)
 	PORT_START("monitor")
 	PORT_CONFNAME(0x7f, 6, "Monitor type")
 	PORT_CONFSETTING(0x02, u8"Mac RGB Display (12\" 512\u00d7384)")             // "Rubik" (modified IIgs AppleColor RGB)
-	PORT_CONFSETTING(0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")       // "High Res"
-	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")
+	PORT_CONFSETTING(0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")       // "High Res" 640x480 @ 67 Hz
+	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")								// VGA 640x480 @ 60 Hz
 	PORT_CONFSETTING(ext(2, 3, 1), "832x624 16\" RGB")                          // "Goldfish" or "16 inch RGB"
+
 INPUT_PORTS_END
 
 ioport_constructor valkyrie_device::device_input_ports() const
@@ -113,7 +143,7 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]) + 0x1000;
 	const pen_t *pens = m_palette->pens();
 
-	if (!m_enable)
+	if (m_video_timing & 0x80)
 	{
 		return 0;
 	}
@@ -209,7 +239,6 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 u8 valkyrie_device::regs_r(offs_t offset)
 {
-//  printf("Read regs @ %x\n", offset);
 	switch (offset)
 	{
 		case 0:
@@ -263,8 +292,12 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-		case 0: // video timing select (apparently from hardcoded values!)
-			m_video_timing = data;
+		case 0: // video mode.  hardcoded!
+			m_video_timing = data & 0xff;
+			if (!(data & 0x80))
+			{
+				recalc_mode();
+			}
 			break;
 
 		case 4: // video depth: 0=1bpp, 1=2bpp, 2=4bpp, 3=8bpp, 4=16bpp
@@ -272,7 +305,7 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			m_mode = data & 7;
 			break;
 
-		case 0xc:   // written to lock in the video timing from register 0
+		case 0xc:   // subsystem configuration register
 			if (data == 0x1)
 			{
 				recalc_mode();
@@ -293,15 +326,6 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			// if the Video Startup extension is installed, it later sets this to 0x02.
 			if ((data & 0x80) || (data == 0x02))
 			{
-				m_enable = true;
-			}
-			else
-			{
-				m_enable = false;
-			}
-			// start VBL interrupts when the screen is enabled
-			if (m_enable)
-			{
 				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
 			}
 			else
@@ -313,6 +337,33 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 		case 0x1c: // drive monitor sense lines. 1 = drive, 0 = tri-state
 			m_monitor_id = (data & 0x7);
 			LOGMASKED(LOG_MONSENSE, "%x to sense drive\n", data & 0xf);
+			break;
+
+		case 0x20: // video in control
+			break;
+
+		case 0x60: // video window X position
+		case 0x61:
+			break;
+
+		case 0x64: // video window Y position
+		case 0x65:
+			break;
+
+		case 0x70: // video window width
+		case 0x71:
+			break;
+
+		case 0x74: // video window height
+		case 0x75:
+			break;
+
+		case 0x80: // video field starting X pixel
+		case 0x81:
+			break;
+
+		case 0x84: // video field starting Y pixel
+		case 0x85:
 			break;
 
 		default:
@@ -396,48 +447,59 @@ void valkyrie_device::ramdac_w(offs_t offset, u32 data)
 void valkyrie_device::recalc_mode()
 {
 	// mode parameters taken from the Quadra 630 Developer Note
-	switch (m_video_timing)
-	{
-		case 0x01: // default
-		case 0x86: // 13" 640x480
-			m_hres = 640;
-			m_vres = 480;
-			m_htotal = 864;
-			m_vtotal = 525;
-			m_pixel_clock = 30240000;
-			m_stride = 80;
-			break;
+	// m_video_timing numbers:
+	//  2 =  512x384, 60 Hz ("Rubik")
+	//  6 =  640x480, 72 Hz (Mac 13")
+	//  9 =  832x624, 75 Hz (Mac 16")
+	// 11 =  640x480, 60 Hz (VGA)
+	// 12 =  800x600, 60 Hz (SVGA)
+	// 13 =  800x600, 72 Hz (SVGA)
+	// 14 = 1024x768, 60 Hz (SVGA)
+	// 15 = 1024x768, 72 Hz (SVGA)
 
-		case 0x82: // Rubik 512x384
+	if (m_video_timing & 0x80)
+	{
+		return;
+	}
+
+	switch (m_video_timing & 0x7f)
+	{
+		case 2:	// Rubik 512x384
 			m_hres = 512;
 			m_vres = 384;
 			m_htotal = 640;
 			m_vtotal = 407;
-			m_pixel_clock = 15670000;
 			m_stride = 64;
 			break;
 
-		case 0x8b: // VGA 640x480
+		case 6: // 13" 640x480
 			m_hres = 640;
 			m_vres = 480;
-			m_htotal = 800;
+			m_htotal = 864;
 			m_vtotal = 525;
-			m_pixel_clock = 25180000;
 			m_stride = 80;
 			break;
 
-		case 0x89: // 16" RGB 832x624?
+		case 9: // 16" RGB 832x624?
 			m_hres = 832;
 			m_vres = 624;
 			m_htotal = 1072;
 			m_vtotal = 690;
-			m_pixel_clock = 50000000;
 			m_stride = 104;
+			break;
+
+		case 11: // VGA 640x480
+			m_hres = 640;
+			m_vres = 480;
+			m_htotal = 800;
+			m_vtotal = 525;
+			m_stride = 80;
 			break;
 	}
 
 	const double refresh = (double)m_pixel_clock / (double)(m_htotal * m_vtotal);
 	LOGMASKED(LOG_MODE, "hres %d vres %d htotal %d vtotal %d refresh %f stride %d mode %d\n", m_hres, m_vres, m_htotal, m_vtotal, refresh, m_stride, m_mode);
+
 	if ((m_hres != 0) && (m_vres != 0))
 	{
 		rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
@@ -473,4 +535,39 @@ TIMER_CALLBACK_MEMBER(valkyrie_device::vbl_tick)
 	recalc_ints();
 
 	m_vbl_timer->adjust(m_screen->time_until_pos(480, 0), 0);
+}
+
+void valkyrie_device::write_data(u16 offset, u8 data)
+{
+	switch (offset)
+	{
+		case 0:
+			return;
+
+		case 1:
+			m_M = data;
+			break;
+
+		case 2:
+			m_N = data;
+			break;
+
+		case 3:
+			m_P = data;
+			break;
+	}
+
+	const double clock = (3986400.0f * (double)(1 << m_P) * (double)m_N) / (double)m_M;
+	m_pixel_clock = (u32)clock;
+
+	// TODO: Apple documents these machines as supporting the 512x384 monitor, but selecting it
+	// programs garbage to the clock generator.  Allow that configuration to work until we determine
+	// if the Apple developer note is lying.
+	if ((m_M == 0) && (m_N == 0) && (m_P = 98))
+	{
+		m_pixel_clock = 15670000;
+	}
+
+	LOGMASKED(LOG_CLOCKGEN, "Valkyrie: M = %d %02x, N = %d %02x P = %d, pixel clock %d\n", m_M, m_M, m_N, m_N, m_P, m_pixel_clock);
+	recalc_mode();
 }
