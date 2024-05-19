@@ -11815,8 +11815,8 @@ Four player adapter not supported
 			<dataarea name="fixed" size="0x20000">
 				<rom name="202-s1.bin" offset="0x000000" size="0x20000" crc="a545b593" sha1="09077b63595eebb7dddd55e041e7786164df0ead" />
 			</dataarea>
-			<dataarea name="audiocpu" size="0x100000">
-				<rom name="202-m1.bin" offset="0x000000" size="0x100000" crc="2037dc19" sha1="c88588d07fc63aeed828a87f0f633c7badafeb3e" />
+			<dataarea name="audiocpu" size="0x010000">
+				<rom name="202-m1.bin" offset="0x000000" size="0x010000" crc="2037dc19" sha1="c88588d07fc63aeed828a87f0f633c7badafeb3e" />
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x900000">
 				<rom name="202-v1.bin" offset="0x000000" size="0x100000" crc="3ac066e1" sha1="cab7f04fbce0db685f5fa0d22923f7b7ca37a804" />

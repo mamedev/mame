@@ -23,7 +23,7 @@ public:
 		m_okimusic(*this, "okimusic"),
 		m_sprgen(*this, "spritegen"),
 		m_palette(*this, "palette"),
-		m_rowscroll(*this, "rowscroll_%u", 1U, 0x800U, ENDIANNESS_LITTLE),
+		m_rowscroll(*this, "rowscroll_%u", 1U, 0x1000U, ENDIANNESS_LITTLE),
 		m_mainram(*this, "mainram", 0x4000U, ENDIANNESS_LITTLE),
 		m_systemram(*this, "systemram"),
 		m_spriteram(*this, "spriteram", 0x1000U, ENDIANNESS_LITTLE)
