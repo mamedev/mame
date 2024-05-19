@@ -18880,6 +18880,12 @@ gnw_dkjr:
 ; Tandy/Radio Shack Color Computer
 ; --------------------------------
 
+;Zaxxon (Datasoft)
+; *** wait 5 sec after splash screen appears. TOP score will be updated when you start game ***
+coco3,zaxxon:
+@:maincpu,program,0000,6,0,0
+@delay=20
+
 ;Zonx (The Rainbow)
 coco3,zonx:
 @:maincpu,program,3e57,5,0,0
