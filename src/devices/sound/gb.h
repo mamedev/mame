@@ -9,9 +9,11 @@ class gameboy_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // incorrect sound pitch
+
 	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	u8 sound_r(offs_t offset);
+	virtual u8 sound_r(offs_t offset);
 	virtual u8 wave_r(offs_t offset) = 0;
 	virtual void sound_w(offs_t offset, u8 data) = 0;
 	virtual void wave_w(offs_t offset, u8 data) = 0;
@@ -107,6 +109,8 @@ protected:
 		uint8_t  sweep_time;
 		uint8_t  sweep_count;
 		/* Mode 3 */
+		uint8_t size; // AGB specific
+		uint8_t bank; // AGB specific
 		uint8_t  level;
 		uint8_t  offset;
 		uint32_t duty_count;
@@ -140,6 +144,7 @@ protected:
 	} m_snd_control;
 
 	uint8_t m_snd_regs[0x30];
+	uint8_t m_wave_ram[2][0x10]; // 16 bytes, 2 banks for AGB
 	attotime m_last_updated;
 	emu_timer *m_timer;
 
@@ -187,15 +192,33 @@ public:
 	virtual void sound_w(offs_t offset, u8 data) override;
 
 protected:
+	cgb04_apu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_reset() override;
 	virtual void apu_power_off() override;
 	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
 };
 
+class agb_apu_device : public cgb04_apu_device
+{
+public:
+	agb_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual u8 sound_r(offs_t offset) override;
+	virtual u8 wave_r(offs_t offset) override;
+	virtual void wave_w(offs_t offset, u8 data) override;
+
+protected:
+	agb_apu_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_reset() override;
+	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
+};
 
 DECLARE_DEVICE_TYPE(DMG_APU, dmg_apu_device)
 //DECLARE_DEVICE_TYPE(CGB02_APU, cgb02_apu_device)
 DECLARE_DEVICE_TYPE(CGB04_APU, cgb04_apu_device)
 //DECLARE_DEVICE_TYPE(CGB05_APU, cgb05_apu_device)
+DECLARE_DEVICE_TYPE(AGB_APU, agb_apu_device)
 
 #endif // MAME_SOUND_GB_H

@@ -43,6 +43,7 @@
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
 #include "cpu/m68000/m68040.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 
@@ -176,6 +177,15 @@ void quadra630_state::macqd630(machine_config &config)
 	m_cuda->via_data_callback().set(m_primetimeii, FUNC(primetime_device::cb2_w));
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
+
+	input_merger_device &sda_merger(INPUT_MERGER_ALL_HIGH(config, "sda"));
+	sda_merger.output_handler().append(m_cuda, FUNC(cuda_device::set_iic_sda));
+
+	m_cuda->iic_sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<0>));
+	m_cuda->iic_sda_callback().append(m_video, FUNC(valkyrie_device::sda_write));
+	m_cuda->iic_scl_callback().set(m_video, FUNC(valkyrie_device::scl_write));
+
+	m_video->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
 
 	m_primetimeii->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	m_primetimeii->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
