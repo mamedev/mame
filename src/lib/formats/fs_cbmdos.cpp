@@ -16,6 +16,7 @@ Current limitations:
 ***************************************************************************/
 
 #include "fs_cbmdos.h"
+
 #include "d64_dsk.h"
 #include "fsblk.h"
 
@@ -29,6 +30,7 @@ Current limitations:
 #include <set>
 #include <string_view>
 #include <tuple>
+
 
 namespace fs {
 	const cbmdos_image CBMDOS;
@@ -390,7 +392,7 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 	if (!result)
 	{
 		// Claim a next directory sector
-		auto [err, new_sector] = claim_track_sector(DIRECTORY_TRACK);
+		auto const [err, new_sector] = claim_track_sector(DIRECTORY_TRACK);
 		if (err != ERR_OK)
 			return err;
 		auto new_block = read_sector(DIRECTORY_TRACK, new_sector);
@@ -409,7 +411,7 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 		sector = new_sector;
 	}
 
-	auto [err, file_track, file_sector] = claim_sector();
+	auto const [err, file_track, file_sector] = claim_sector();
 	if (err != ERR_OK)
 		return err;
 
@@ -441,7 +443,7 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 	u8 dir_track = 0;
 	u8 dir_sector = 0;
 	u8 dir_file_index = 0;
-	auto callback = [&result, &dir_track, &dir_sector, &dir_file_index, path_part](u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)
+	auto const callback = [&result, &dir_track, &dir_sector, &dir_file_index, path_part] (u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)
 	{
 		bool found = strtrimright_cbm(dirent.m_file_name) == path_part;
 		if (found)
@@ -499,7 +501,7 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 
 				while (track_to_free != CHAIN_END)
 				{
-					err_t err = free_sector(track_to_free, sector_to_free);
+					err_t const err = free_sector(track_to_free, sector_to_free);
 					if (err != ERR_OK)
 						return err;
 					datablk = read_sector(track_to_free, sector_to_free);
@@ -593,7 +595,7 @@ std::tuple<err_t, u8, u8> impl::claim_sector() const
 {
 	for (int track = 0; track < m_max_track - 1; track++)
 	{
-		auto [err, sector] = claim_track_sector(s_data_track_order[track]);
+		auto const [err, sector] = claim_track_sector(s_data_track_order[track]);
 		if (err == ERR_OK)
 			return std::make_tuple(ERR_OK, s_data_track_order[track], sector);
 		if (err != ERR_NO_SPACE)
@@ -643,13 +645,13 @@ fsblk_t::block_t impl::read_sector(int track, int sector) const
 std::optional<impl::cbmdos_dirent> impl::dirent_from_path(const std::vector<std::string> &path) const
 {
 	if (path.size() != 1)
-		return { };
+		return std::nullopt;
 	std::string_view path_part = path[0];
 
 	std::optional<cbmdos_dirent> result;
-	auto callback = [&result, path_part](u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)
+	auto const callback = [&result, path_part] (u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)
 	{
-		bool found = strtrimright_cbm(dirent.m_file_name) == path_part;
+		bool const found = strtrimright_cbm(dirent.m_file_name) == path_part;
 		if (found)
 			result = dirent;
 		return found;
@@ -670,7 +672,8 @@ void impl::iterate_directory_entries(const std::function<bool(u8 track, u8 secto
 	{
 		auto entries = iter.dirent_data();
 
-		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++) {
+		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++)
+		{
 			if (entries[file_index].m_file_type != 0x00)
 			{
 				if (callback(iter.track(), iter.sector(), file_index, entries[file_index]))
@@ -687,7 +690,8 @@ void impl::iterate_all_directory_entries(const std::function<bool(u8 track, u8 s
 	{
 		auto entries = iter.dirent_data();
 
-		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++) {
+		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++)
+		{
 			if (callback(iter.track(), iter.sector(), file_index, entries[file_index]))
 				return;
 		}
@@ -811,7 +815,7 @@ const std::array<impl::cbmdos_dirent, impl::SECTOR_DIRECTORY_COUNT> &impl::block
 
 u8 impl::block_iterator::size() const
 {
-	return m_track != CHAIN_END ? SECTOR_DATA_BYTES : m_sector - 1;
+	return (m_track != CHAIN_END) ? SECTOR_DATA_BYTES : (m_sector - 1);
 }
 
 } // anonymous namespace

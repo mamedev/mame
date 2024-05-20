@@ -37,6 +37,7 @@ Known carts:
 		<description>J-Pop Blue</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップブルー" />
 		<info name="serial" value="2315998" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -46,9 +47,10 @@ Known carts:
 	</software>
 
 	<software name="aikatsu" supported="no">
-		<description>Aikatsu Ver. Best</description>
+		<description>Aikatsu! Idol Katsudō!</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="アイカツ！アイドルカツドウ！" />
 		<info name="serial" value="2315999" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x800000">
@@ -61,6 +63,7 @@ Known carts:
 		<description>J-Pop - Strawberry</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップストロベリー" />
 		<info name="serial" value="2316073" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -73,6 +76,7 @@ Known carts:
 		<description>J-Pop - Green</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップグリーン" />
 		<info name="serial" value="2316095" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -85,6 +89,7 @@ Known carts:
 		<description>J-Pop - Pink</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップピンク" />
 		<info name="serial" value="2316096" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -97,6 +102,7 @@ Known carts:
 		<description>Kid's Pop - Lemon Yellow</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="キッズポップレモンイエロー" />
 		<info name="serial" value="2316097" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -160,6 +166,7 @@ Known carts:
 		<description>Kid's Pop - Red</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="キッズポップレッド" />
 		<info name="serial" value="2333253" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -184,6 +191,7 @@ Known carts:
 		<description>Kid's Pop - Apple Green</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="キッズポップアップルグリーン" />
 		<info name="serial" value="2336074" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -196,6 +204,7 @@ Known carts:
 		<description>J-Pop - Grapefruit</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップグレープフルーツ" />
 		<info name="serial" value="2336075" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -209,6 +218,7 @@ Known carts:
 		<year>2015</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="2336076" />
+		<info name="alt_title" value="ディズニードリームヒットソング" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="Disney_mx25l6406e_c22017.BIN" size="0x800000" crc="777a37de" sha1="27116702adbaed782677b3f64215c4f0f022fa65" />
@@ -220,6 +230,7 @@ Known carts:
 		<description>J-Pop - Mint</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ジェイポップミント" />
 		<info name="serial" value="2350534" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">
@@ -232,6 +243,7 @@ Known carts:
 		<description>Best Hit Song</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ベストヒットソング" />
 		<info name="serial" value="2350535" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x400000">

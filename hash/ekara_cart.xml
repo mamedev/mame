@@ -315,7 +315,7 @@ license:CC0-1.0
 	Japanese cart listing (by M code) (M-x on cartridge / box, MC in cart identifier code)
 
 	M-1  *MC0001-ATM  Artist Mini Volume 1 (Aya Matsuura)
-	M-2  *MC0002-ATM  Artist Mini Volume 2 (PIKA☆NCHI, A・RA・SHI／他)
+	M-2  *MC0002-ATM  Artist Mini Volume 2 (PIKA☆NCHI, A·RA·SHI, etc.)
 	M-3  *MC0003-ATM  Artist Mini Volume 3 (Morning Musume)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
 	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
@@ -324,7 +324,7 @@ license:CC0-1.0
 	M-8  *MC0008-KSM  Kids Song Mini Volume 3
 	M-9  *MC0009-JPM  J-Pop Mix Mini Volume 1
 	M-10 *MC0010-ATM  Artist Mini Volume 6 (Utada Hikaru)
-	M-11 *MC0011-KSM  Kids Song Mini Volume 4 (Fantastic)
+	M-11 *MC0011-KSM  Kids Song Mini Volume 4 (Micky Mouse March, Hoshi ni Negai O, etc.)
 	M-12 *MC0012-ATM  Artist Mini Volume 7 (Ayumi Hamasaki)
 	M-13 *MC0013-KSM  Kids Song Mini Volume 5
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
@@ -371,7 +371,7 @@ license:CC0-1.0
 	S-14 *SC0014-SAI  Saiten Cartridge Challenge Idol vol.4
 	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Vol.2
 	S-16 *SC0016-SAI  Saiten Cartridge Nesshō vol. 5
-	S-17 *SC0017-SAI  Kids' Challenge Vol.2
+	S-17 *SC0017-SAI  Kids' Challenge Vol.2 (Te o Tsunagō, Anpanman no March, etc.)
 	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki)
 	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
 	S-20 *SC0020-SAI  Saiten Cartridge Challenge Idol vol.5
@@ -419,7 +419,7 @@ license:CC0-1.0
 
 	*KR-1      Kirarin Revolution (comes in kira kara Starter Set bundled with Kirarin Revolution microphone) (inside cart is marked AC0009-KIR)
 	*BX01-MOR  Morning Musume Special (sticker inside cart is marked CS019-004A)
-	*PR-01 MNG  (c)2002   Morning Musume - I'm Here! (single song 'not for sale' cartridge)
+	*PR-01 MNG  (c)2002   Premium Cartridge Koko ni Iru Zee! Morning Musume (single song 'not for sale' cartridge)
 	 PR-02 AYY  (c)2003   Aya Matsuura - Prairies Man (single song 'not for sale' cartridge)
 	*PR-06     Misora Hibari (inside cart is marked AC0009)
 
@@ -1791,9 +1791,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="dc0004">
-		<description>Dream Cartridge: TV Pop Junior Vol.8 (Japan) (DC0004-TPJ)</description>
+		<description>Dream Cartridge: TV Pop Junior Vol.8 (Happy Lucky - Onegai Mirmo, mini-moni - Telephone! Ring Ring Ring, etc.) (Japan) (DC0004-TPJ)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア Vol.8 (ハッピー♥ラッキー～お願いミルモ～／ミニモニ。テレフォン！リンリンリン／他)"/> <!-- from cover art -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
@@ -1849,10 +1850,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="dc0009">
-		<description>Dream Cartridge: TV Pop Junior Vol.10 (Japan) (DC0009-TPJ)</description>
+		<description>Dream Cartridge: TV Pop Junior Vol.10 (Bon Voyage!, Kimi to Yakusoku Shita Yasashī Ano Basho Made, etc.) (Japan) (DC0009-TPJ)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア"/> <!-- from cover art -->
+		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア (BON VOYAGE!／君と約束した優しいあの場所まで／他)"/> <!-- from cover art -->
 		<info name="alt_title" value="TV POPジュニアvol.10"/> <!-- shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
 		<part name="cart" interface="ekara_cart">
@@ -2297,9 +2298,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0002">
-		<description>Artist Mini Volume 2 (PIKA☆NCHI, A・RA・SHI／他) (Japan) (MC0002-ATM)</description>
+		<description>Artist Mini Volume 2 (PIKA☆NCHI, A·RA·SHI, etc.) (Japan) (MC0002-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.2 (PIKA☆NCHI／A·RA·SHI／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
@@ -2413,9 +2415,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0011">
-		<description>Kids Song Mini Volume 4 (Fantastic) (Japan) (MC0011-KSM)</description>
+		<description>Kids Song Mini Volume 4 (Micky Mouse March, Hoshi ni Negai O, etc.) (Japan) (MC0011-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストミニ mini vol.4 (ミッキーマウス・マーチ／星に願いを／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
@@ -2722,9 +2725,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="sc0013">
-		<description>Saiten Cartridge Nesshō vol. 4 (Japan) (SC0013-SAI)</description>
+		<description>Saiten Cartridge Nesshō vol. 4 (Naminori Johnny, Kanashimi wa Yuki no Yō Ni, etc.) (Japan) (SC0013-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 4 (波乗りジョニー／悲しみは雪のように／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -2773,9 +2777,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="sc0017">
-		<description>Kids' Challenge Vol.2 (Japan) (SC0017-SAI)</description>
+		<description>Kids' Challenge Vol.2 (Te o Tsunagō, Anpanman no March, etc.) (Japan) (SC0017-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ キッズチャレンジ Vol.2 (てをつなごう／アンパンマンのマーチ／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -2952,9 +2957,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="pr01">
-		<description>PR-01 Morning Musume - I'm Here! (Not for Sale, Japan)</description>
+		<description>PR-01 Premium Cartridge Koko ni Iru Zee! Morning Musume (Not for Sale, Japan)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="プレミアムカートリッジ ここにいるぜえ！ モーニング娘。" />
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x80000">
@@ -2993,10 +2999,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="gs1">
-		<description>Natsukashi no Meikyoku-shū (Japan)</description>
+		<description>Natsukashi no Meikyoku-shū (Akatonbo, Haru ga Kita, etc.) (Japan)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="懐かしの名曲集" />
+		<info name="alt_title" value="懐かしの名曲集 (赤蜻蛉／春が来た／他)" />
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">

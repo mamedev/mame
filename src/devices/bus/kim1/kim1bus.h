@@ -42,9 +42,9 @@
            /CS9  19
            /CSA  20
 
-  Comelta DRAC-1 expansion modules use a 64-pin edge connector with an
-  external manual reset input and more power rails, but without some
-  control signals:
+  Comelta DRAC-1 expansion modules use a 96-pin Eurocard connector with row
+  b unused.  Has an external manual reset input and more power rails, but
+  omits some control signals:
 
                    +25V  a  1 c  +25V
   external manual reset  a  2 c  reserved
