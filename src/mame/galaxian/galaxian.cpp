@@ -3315,7 +3315,7 @@ static INPUT_PORTS_START( luctoday )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( catacomb )
+static INPUT_PORTS_START( b )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN0")
@@ -10597,13 +10597,13 @@ ROM_START( chewing )
 ROM_END
 
 // This set can also be found with ROMs "u" and "v" combined together on a 2532, with CRC(87b5d7c1) SHA1(c8466faf05223ab90f1d1732c8a1699a97c12dcf)
-ROM_START( catacomb )
+ROM_START( b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "catacomb.u", 0x0000, 0x0800, CRC(35cc28d2) SHA1(e1dbd75fc21ec88b8119bf9508c87d78e1d5c4f6) )
-	ROM_LOAD( "catacomb.v", 0x0800, 0x0800, CRC(1d1ce133) SHA1(e22a169003a2238004bdf6c2558198216c2353b7) )
-	ROM_LOAD( "catacomb.w", 0x1000, 0x0800, CRC(479bbde7) SHA1(9981662cb6351de7c1730de45f645fb0e26ea467) )
+	ROM_LOAD( "b.u", 0x0000, 0x0800, CRC(35cc28d2) SHA1(e1dbd75fc21ec88b8119bf9508c87d78e1d5c4f6) )
+	ROM_LOAD( "b.v", 0x0800, 0x0800, CRC(1d1ce133) SHA1(e22a169003a2238004bdf6c2558198216c2353b7) )
+	ROM_LOAD( "b.w", 0x1000, 0x0800, CRC(479bbde7) SHA1(9981662cb6351de7c1730de45f645fb0e26ea467) )
 	// no .x
-	ROM_LOAD( "catacomb.y", 0x2000, 0x0800, CRC(5e3da534) SHA1(a9b960ae96c8ef0b2d590bc58b711aad949025e2) )
+	ROM_LOAD( "b.y", 0x2000, 0x0800, CRC(5e3da534) SHA1(a9b960ae96c8ef0b2d590bc58b711aad949025e2) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "cat-gfx1",   0x0000, 0x0800, CRC(e871e65c) SHA1(0b528dfab0f57153db9406798848cdedee0323a0) )
@@ -16511,7 +16511,7 @@ GAME( 1981, blkhole,     0,        galaxian,   blkhole,    galaxian_state, init_
 GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, init_galaxian,   ROT270, "Comsoft (Signatron USA license)", "Orbitron",         MACHINE_SUPPORTS_SAVE ) // there's a Comsoft copyright in one of the roms, and the gameplay is the same as Victory below
 GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, init_galaxian,   ROT270, "Sigma",                           "Lucky Today",      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, init_galaxian,   ROT90,  "<unknown>",                       "Chewing Gum",      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, init_galaxian,   ROT90,  "MTM Games",                       "Catacomb",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, init_galaxian,   ROT90,  "MTM Games",                       "Catacomb",         MACHINE_SUPPORTS_SAVE ) // Unverified colors
 GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, init_galaxian,   ROT270, "bootleg?",                        "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, highroll,    0,        highroll,   highroll,   galaxian_state, init_highroll,   ROT90,  "bootleg?",                        "High Roller",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // auto starts game after inserting coin, bad cards GFX, bad inputs response, not all inputs are mapped
 GAME( 1982, guttangt,    locomotn, guttangt,   guttangt,   guttangt_state, init_guttangt,   ROT90,  "bootleg (Recreativos Franco?)",   "Guttang Gottong (bootleg on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
