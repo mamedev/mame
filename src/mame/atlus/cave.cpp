@@ -21,6 +21,7 @@ Other        :  93C46 EEPROM
 Year + Game               License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
 94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
+95 Jumbo Godzilla         Toho          N-42 EM     038 9345E7008   013 9442WX002
 94 Power Instinct 2       Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Jumbo Godzilla         Toho          N-42 EM     038 9345E7008   013 9442WX002
 95 Gogetsuji Legends      Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
