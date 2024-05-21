@@ -285,22 +285,22 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	COMBINE_DATA(&m_blitter_data[offset]);
 
-	if(!ACCESSING_BITS_8_15 && offset==0x6)  //LSB only!
+	if (!ACCESSING_BITS_8_15 && offset == 0x6)  //LSB only!
 	{
-		int direct_width=m_direct_write_x1-m_direct_write_x0+1;
-		int direct_height=m_direct_write_y1-m_direct_write_y0+1;
+		int direct_width = m_direct_write_x1 - m_direct_write_x0 + 1;
+		int direct_height = m_direct_write_y1 - m_direct_write_y0 + 1;
 
-		int sixdat = data&0xff;
+		int sixdat = data & 0xff;
 
-		if(direct_width>0 && direct_height>0)
+		if (direct_width > 0 && direct_height > 0)
 		{
 			int x = m_direct_write_idx % direct_width;
 			int y = (m_direct_write_idx / direct_width) % direct_height;
 
-			x+=m_direct_write_x0;
-			y+=m_direct_write_y0;
+			x += m_direct_write_x0;
+			y += m_direct_write_y0;
 
-			if(x<512 && y <512)
+			if (x < 512 && y < 512)
 			{
 				m_tmp_bitmap[LAYER_BG]->pix(y, x) = sixdat;
 			}
@@ -311,31 +311,31 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		return;
 	}
 
-	if(offset==0xf && data==0xffff)
+	if (offset == 0xf && data == 0xffff)
 	{
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-		uint8_t const *const rom = memregion("gfx1")->base();
+		uint8_t const* const rom = memregion("gfx1")->base();
 
-		int width = m_screen->width();
-		int height = m_screen->height();
+		int src_x0 = (m_blitter_data[0] >> 8) + ((m_blitter_data[6] & 0x100) ? 256 : 0);
+		int src_y0 = (m_blitter_data[2] >> 8) + ((m_blitter_data[6] & 0x200) ? 256 : 0);
 
-		int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
-		int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);
+		int dst_x0 = (m_blitter_data[0] & 0xff) + ((m_blitter_data[7] & 0x40) ? 256 : 0);
+		int dst_y0 = (m_blitter_data[2] & 0xff) + ((m_blitter_data[7] & 0x80) ? 256 : 0);
 
-		int dst_x0=(m_blitter_data[0]&0xff)+((m_blitter_data[7]&0x40)?256:0);
-		int dst_y0=(m_blitter_data[2]&0xff)+((m_blitter_data[7]&0x80)?256:0);
+		int dst_x1 = (m_blitter_data[1] & 0xff) + ((m_blitter_data[9] & 4) ? 256 : 0);
+		int dst_y1 = (m_blitter_data[3] & 0xff) + ((m_blitter_data[9] & 8) ? 256 : 0);
 
-		int dst_x1=(m_blitter_data[1]&0xff)+((m_blitter_data[9]&4)?256:0);
-		int dst_y1=(m_blitter_data[3]&0xff)+((m_blitter_data[9]&8)?256:0);
+		bool flipx = (m_blitter_data[7] & 0x1);
+		bool flipy = (m_blitter_data[7] & 0x2);
 
-		int x_dst_step=(m_blitter_data[7]&0x1)?1:-1;
-		int y_dst_step=(m_blitter_data[7]&0x2)?1:-1;
+		int x_dst_step = flipx ? 1 : -1;
+		int y_dst_step = flipy ? 1 : -1;
 
-		int x_src_step=(m_blitter_data[8]&0x4000)?1:-1;
-		int y_src_step=(m_blitter_data[8]&0x8000)?1:-1;
+		int x_src_step = (m_blitter_data[8] & 0x4000) ? 1 : -1;
+		int y_src_step = (m_blitter_data[8] & 0x8000) ? 1 : -1;
 
-		int page=((m_blitter_data[6])>>10)*0x40000;
+		int page = ((m_blitter_data[6]) >> 10) * 0x40000;
 
 
 		if (!m_is_pwball)
@@ -350,76 +350,70 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			}
 		}
 
-		if(x_dst_step<0)
-		{
-			if(dst_x0<=dst_x1)
-			{
-				return;
-			}
 
-		}
+
+		if (flipy)
+			dst_y0 -= 1;
 		else
-		{
-			if(dst_x0>=dst_x1)
-			{
-				return;
-			}
+			dst_y0 += 1;
 
-		}
-
-		if(y_dst_step<0)
-		{
-			if(dst_y0<=dst_y1)
-			{
-				return;
-			}
-		}
+		if (flipy)
+			dst_y1 += 1;
 		else
+			dst_y1 -= 1;
+
+		dst_x0 &= 0x1ff;
+		dst_x1 &= 0x1ff;
+		dst_y0 &= 0x1ff;	
+		dst_y1 &= 0x1ff;
+
+		int vpage = (m_blitter_data[0x7] & 0x10) ? LAYER_BG : LAYER_FG;
+
+		if (vpage == LAYER_FG)
 		{
-			if(dst_y0>=dst_y1)
-			{
-				return;
-			}
+			dst_y0 &= 0xff;
+			dst_y1 &= 0xff;
+		 }
 
-		}
-
+		//if (m_blitter_data[0x7] & 0x10)
+		//	printf("blit with dst_x0 %d dst_x1 %d | dst_x0 %d dst_x1 %d\n", dst_x0, dst_x1, dst_y0, dst_y1);
 
 		//additional checks
 
 		int d1, d2, hflag, dflag, index;
 
-		d1=((m_blitter_data[0x0a]&0x1f00)>>8);
+		d1 = ((m_blitter_data[0x0a] & 0x1f00) >> 8);
 
-		d2=((m_blitter_data[0x0b]&0x1f00)>>8);
-
-
-		d1|=((m_blitter_data[0x8]&0x100)>>3);
-		d2|=((m_blitter_data[0x8]&0x400)>>5);
-		hflag=(m_blitter_data[0x9]&0x1)?1:0;
-		dflag=(m_blitter_data[0x8]&0x1000)?1:0;
-		index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
-
-		const float scale_x=get_scale(index);
+		d2 = ((m_blitter_data[0x0b] & 0x1f00) >> 8);
 
 
-		d1=((m_blitter_data[0x0b]&0xc000)>>14) |
-			((m_blitter_data[0x0c]&0xc000)>>12) |
-			((m_blitter_data[0x0a]&0x4000)>>10);
+		d1 |= ((m_blitter_data[0x8] & 0x100) >> 3);
+		d2 |= ((m_blitter_data[0x8] & 0x400) >> 5);
+		hflag = (m_blitter_data[0x9] & 0x1) ? 1 : 0;
+		dflag = (m_blitter_data[0x8] & 0x1000) ? 1 : 0;
+		index = d1 | (d2 << 6) | (hflag << 12) | (dflag << 13);
 
-		d2=((m_blitter_data[0x0c]&0x1f00)>>8);
-
-
-		d1|=((m_blitter_data[0x8]&0x200)>>4);
-		d2|=((m_blitter_data[0x8]&0x800)>>6);
-
-		hflag=(m_blitter_data[0x9]&0x2)?1:0;
-		dflag=(m_blitter_data[0x8]&0x2000)?1:0;
-		index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
-
-		const float scale_y=get_scale(index);
+		const float scale_x = get_scale(index);
 
 
-		if(scale_x==0 || scale_y==0) return;
+		d1 = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
+			((m_blitter_data[0x0c] & 0xc000) >> 12) |
+			((m_blitter_data[0x0a] & 0x4000) >> 10);
+
+		d2 = ((m_blitter_data[0x0c] & 0x1f00) >> 8);
+
+
+		d1 |= ((m_blitter_data[0x8] & 0x200) >> 4);
+		d2 |= ((m_blitter_data[0x8] & 0x800) >> 6);
+
+		hflag = (m_blitter_data[0x9] & 0x2) ? 1 : 0;
+		dflag = (m_blitter_data[0x8] & 0x2000) ? 1 : 0;
+		index = d1 | (d2 << 6) | (hflag << 12) | (dflag << 13);
+
+		const float scale_y = get_scale(index);
+
+
+		if (scale_x == 0 || scale_y == 0) return;
 
 
 		float scale_x_step = 100.f / scale_x;
@@ -431,71 +425,49 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			scale_y_step = 1.0f;
 		}
 
-		int vpage=LAYER_FG;
-		if(m_blitter_data[0x7]&0x10)
-		{
-			vpage=LAYER_BG;
-/*
-            printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
 
-            for(int i=0;i<16;++i)
-            {
-                printf("%x = %.4x\n",i,m_blitter_data[i]);
-            }
 
-            printf("\n");
-*/
-		}
-
-		bool endx=false;
-		bool endy=false;
-
-		if(m_blitter_data[0x7]&0x0c)
+		if (m_blitter_data[0x7] & 0x0c)
 		{
 			//???
 		}
 
-		float idx_x = 0;
-		for(int x=dst_x0; !endx; x+=x_dst_step, idx_x+=scale_x_step)
+		int y = dst_y0;
+		float idx_y = 0;
+
+		do
 		{
-			endy=false;
-			float idx_y = 0;
-			for(int y=dst_y0; !endy; y+=y_dst_step, idx_y+=scale_y_step)
+			int x = dst_x0;
+			float idx_x = 0;
+
+			int yy = src_y0 + y_src_step * idx_y;
+
+			do
 			{
-				endx=(x==(dst_x1+1));
-				endy=(y==(dst_y1+1));
+				int xx = src_x0 + x_src_step * idx_x;
 
+				int address = page + yy * 512 + xx;
 
-				int xx=src_x0+x_src_step*idx_x;
-				int yy=src_y0+y_src_step*idx_y;
+				int pix = rom[address & (0x1000000 - 1)];
 
-				int address=page+yy*512+xx;
+				int screen_y = y;
 
-				int pix = rom[address&(0x1000000-1)];
-
-				int screen_x=x;
-				int screen_y=y;
-
-
-				if ((page>=0x400000) && (!m_is_pwball))
+				if (pix && x >= 0 && screen_y >= 0 && x < 512 && screen_y < 512)
 				{
-					//hack for clear
-					if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
-					{
-				//      m_tmp_bitmap[vpage]->pix(screen_y , screen_x ) =0;
-					}
+					m_tmp_bitmap[vpage]->pix(y, x) = pix;
 				}
 
-				{
-					if (vpage == LAYER_FG) screen_y&=0xff;
+				x += x_dst_step;
+				x &= 0x1ff;
+				idx_x += scale_x_step;
 
-					if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
-					{
-						m_tmp_bitmap[vpage]->pix(screen_y, screen_x) = pix;
-					}
-				}
-			}
-		}
+			} while (x != dst_x1);
+
+			y += y_dst_step;
+			y &= 0x1ff;
+			idx_y += scale_y_step;
+
+		} while (y != dst_y1);
 	}
 }
 
@@ -509,22 +481,23 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 
-	for(int y=cliprect.min_y; y < cliprect.max_y; y++)
+	for(int y=cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(( (m_scanlines[y].y)&511));
+		int scrollyreg = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+		int scrolly = (256 + 8 + y + scrollyreg) & 511;
+		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
 		uint16_t *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			dest[x] = source[(x + m_scanlines[y].x) & 511];
+			int sourcex = x;
+			sourcex += m_scanlines[y].x;
+			sourcex &= 0x1ff;
+			dest[x] = source[sourcex];
 		}
 	}
-
+	            
 	copybitmap_trans(bitmap, *m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
-
-/*
-    m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
-*/
 
 	return 0;
 }
@@ -794,6 +767,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(336, NUM_SCANLINES+NUM_VBLANK_LINES);
 	m_screen->set_visarea(0,335, 0, NUM_SCANLINES-1);
+
 	m_screen->set_screen_update(FUNC(wheelfir_state::screen_update_wheelfir));
 	m_screen->screen_vblank().set(FUNC(wheelfir_state::screen_vblank_wheelfir));
 	m_screen->set_palette(m_palette);
