@@ -67,6 +67,7 @@ public:
 	void esprade(machine_config &config);
 	void gaia(machine_config &config);
 	void guwange(machine_config &config);
+	void jumbogod(machine_config &config);
 	void korokoro(machine_config &config);
 	void paccarn(machine_config &config);
 	void paceight(machine_config &config);
@@ -197,6 +198,7 @@ protected:
 	void gaia_coin_w(u8 data);
 	u16 donpachi_videoregs_r(offs_t offset);
 	template<int Chip> void videoregs_w(offs_t offset, u16 data, u16 mem_mask);
+	void jumbogod_leds_w(u8 data);
 	void korokoro_leds_w(offs_t offset, u16 data, u16 mem_mask);
 	void tjumpman_leds_w(u8 data);
 	void pacslot_leds_w(u8 data);
@@ -243,6 +245,7 @@ protected:
 	void esprade_map(address_map &map);
 	void gaia_map(address_map &map);
 	void guwange_map(address_map &map);
+	void jumbogod_map(address_map &map);
 	void korokoro_map(address_map &map);
 	void paccarn_map(address_map &map);
 	void paceight_map(address_map &map);
