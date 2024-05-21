@@ -42143,6 +42143,9 @@ qmsirius                        //
 @source:skeleton/qtsbc.cpp
 qtsbc                           //
 
+@source:skeleton/ramstar.cpp
+ramstar                         //
+
 @source:skeleton/rd100.cpp
 rd100                           //
 
@@ -44022,9 +44025,9 @@ speedspn                        // (c) 1994
 topdrive                        // (c) 1995
 
 @source:tch/wheelfir.cpp
-kongball						// (c) 199? TCH
-pwball							// (c) 199? TCH
-radendur						// (c) 199? TCH
+kongball                        // (c) 199? TCH
+pwball                          // (c) 199? TCH
+radendur                        // (c) 199? TCH
 wheelfir                        // (c) 199? TCH
 
 @source:teamconcepts/comquest.cpp
