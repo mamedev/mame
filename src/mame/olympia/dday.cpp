@@ -73,7 +73,7 @@ public:
 		m_textvideoram(*this, "textvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_colorram(*this, "colorram"),
+		m_colorram(*this, "colorram", 0x400 >> 5, ENDIANNESS_LITTLE),
 		m_sl_map(*this, "sl_map"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -93,7 +93,7 @@ private:
 	required_shared_ptr<uint8_t> m_textvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bgvideoram;
-	required_shared_ptr<uint8_t> m_colorram;
+	memory_share_creator<uint8_t> m_colorram;
 	required_region_ptr<uint8_t> m_sl_map;
 
 	required_device<cpu_device> m_maincpu;
@@ -273,8 +273,8 @@ TILE_GET_INFO_MEMBER(dday_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
 {
-	int const flipx = m_colorram[tile_index & 0x03e0] & 0x01;
-	int const code = m_fgvideoram[flipx ? tile_index ^ 0x1f : tile_index];
+	int const flipx = m_colorram[tile_index >> 5] & 0x01;
+	int const code = m_fgvideoram[flipx ? (tile_index ^ 0x1f) : tile_index];
 	tileinfo.set(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
 }
 
@@ -288,8 +288,8 @@ TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
 {
 	uint8_t *sl_map = &m_sl_map[(m_sl_image & 0x07) * 0x0200];
 
-	int const flipx = (tile_index >> 4) & 0x01;
-	int const sl_flipx = (m_sl_image >> 3) & 0x01;
+	int const flipx = BIT(tile_index, 4);
+	int const sl_flipx = BIT(m_sl_image, 3);
 
 	// bit 4 is really a flip indicator.  Need to shift bits 5-9 to the right by 1
 	tile_index = ((tile_index & 0x03e0) >> 1) | (tile_index & 0x0f);
@@ -351,7 +351,7 @@ void dday_state::colorram_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03e0;
 
-	m_colorram[offset & 0x3e0] = data;
+	m_colorram[offset >> 5] = data;
 
 	for (int i = 0; i < 0x20; i++)
 		m_fg_tilemap->mark_tile_dirty(offset + i);
@@ -359,7 +359,7 @@ void dday_state::colorram_w(offs_t offset, uint8_t data)
 
 uint8_t dday_state::colorram_r(offs_t offset)
 {
-	return m_colorram[offset & 0x03e0];
+	return m_colorram[offset >> 5];
 }
 
 
@@ -438,7 +438,7 @@ void dday_state::program_map(address_map &map)
 	map(0x5000, 0x53ff).ram().w(FUNC(dday_state::textvideoram_w)).share(m_textvideoram);
 	map(0x5400, 0x57ff).ram().w(FUNC(dday_state::fgvideoram_w)).share(m_fgvideoram);
 	map(0x5800, 0x5bff).ram().w(FUNC(dday_state::bgvideoram_w)).share(m_bgvideoram);
-	map(0x5c00, 0x5fff).rw(FUNC(dday_state::colorram_r), FUNC(dday_state::colorram_w)).share(m_colorram);
+	map(0x5c00, 0x5fff).rw(FUNC(dday_state::colorram_r), FUNC(dday_state::colorram_w));
 	map(0x6000, 0x63ff).ram();
 	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8912_device::address_data_w));
 	map(0x6800, 0x6801).w("ay2", FUNC(ay8912_device::address_data_w));

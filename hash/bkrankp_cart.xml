@@ -217,8 +217,8 @@ Known carts:
 		<description>Disney Dream Hit Song</description>
 		<year>2015</year>
 		<publisher>Bandai</publisher>
-		<info name="serial" value="2336076" />
 		<info name="alt_title" value="ディズニードリームヒットソング" />
+		<info name="serial" value="2336076" />
 		<part name="cart" interface="bkrankp_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="Disney_mx25l6406e_c22017.BIN" size="0x800000" crc="777a37de" sha1="27116702adbaed782677b3f64215c4f0f022fa65" />

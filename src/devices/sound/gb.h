@@ -199,6 +199,7 @@ protected:
 	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
 };
 
+
 class agb_apu_device : public cgb04_apu_device
 {
 public:
@@ -214,6 +215,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
 };
+
 
 DECLARE_DEVICE_TYPE(DMG_APU, dmg_apu_device)
 //DECLARE_DEVICE_TYPE(CGB02_APU, cgb02_apu_device)

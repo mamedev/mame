@@ -1453,7 +1453,7 @@ static void gba_cart(device_slot_interface &device)
 
 void gba_state::gbadv(machine_config &config)
 {
-	ARM7(config, m_maincpu, XTAL(4'194'304) * 4); // 4.194304MHz * 4
+	ARM7(config, m_maincpu, 4.194304_MHz_XTAL * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gba_state::gba_map);
 
 	gba_lcd_device &lcd(GBA_LCD(config, "lcd", 0));
@@ -1465,7 +1465,7 @@ void gba_state::gbadv(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	AGB_APU(config, m_gbsound, XTAL(4'194'304));
+	AGB_APU(config, m_gbsound, 4.194304_MHz_XTAL);
 	m_gbsound->add_route(0, "lspeaker", 0.5);
 	m_gbsound->add_route(1, "rspeaker", 0.5);
 
