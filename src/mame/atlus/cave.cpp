@@ -21,7 +21,6 @@ Other        :  93C46 EEPROM
 Year + Game               License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
 94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
-95 Jumbo Godzilla         Toho          N-42 EM     038 9345E7008   013 9442WX002
 94 Power Instinct 2       Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Jumbo Godzilla         Toho          N-42 EM     038 9345E7008   013 9442WX002
 95 Gogetsuji Legends      Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
@@ -1281,6 +1280,7 @@ void cave_state::jumbogod_leds_w(u8 data)
 void cave_state::jumbogod_map(address_map &map)
 {
 	pacslot_map(map);
+
 	map(0x900001, 0x900001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
 	map(0xc00001, 0xc00001).w(FUNC(cave_state::jumbogod_leds_w));                                    // Leds
 }
@@ -2565,18 +2565,21 @@ void cave_state::pacslot(machine_config &config)
 void cave_state::paceight(machine_config &config)
 {
 	pacslot(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paceight_map);
 }
 
 void cave_state::paccarn(machine_config &config)
 {
 	pacslot(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paccarn_map);
 }
 
 void cave_state::jumbogod(machine_config &config)
 {
 	pacslot(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::jumbogod_map);
 }
 
