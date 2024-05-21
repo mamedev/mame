@@ -68,7 +68,7 @@ Blitter data foramt ( offset in words, offset in bytes, offset inside ram data t
 
 0  0  0
         --------76543210    dest_x0 bits 0-7
-        76543210--------    src_x0  bits 0-7
+        76543210--------    src_u0  bits 0-7
 
 1  2  2
         --------76543210    dest_x1 bits 0-7
@@ -77,7 +77,7 @@ Blitter data foramt ( offset in words, offset in bytes, offset inside ram data t
 
 2  4  4
         --------76543210    dest_y0 bits 0-7
-        76543210--------    src_y0  bits 0-7
+        76543210--------    src_v0  bits 0-7
 3  6  6
         --------76543210    dest_y1 bits 0-7
 
@@ -86,8 +86,8 @@ Blitter data foramt ( offset in words, offset in bytes, offset inside ram data t
 6  c  8
         ??------????????    image flags (directly copied from image info table, page and ?)
         --3210----------    image page
-        -------8--------    src_x0 bit 8
-        ------8---------    src_y0 bit 8
+        -------8--------    src_u0 bit 8
+        ------8---------    src_v0 bit 8
 7  e  a
         ????????--?-----    flags
         ---------------X    X direction (src?)
@@ -282,8 +282,8 @@ void wheelfir_state::do_blit()
 
 	uint8_t const* const rom = m_tilepages;
 
-	const int src_x0 = (m_blitter_data[0] >> 8) + ((m_blitter_data[6] & 0x100) ? 256 : 0);
-	const int src_y0 = (m_blitter_data[2] >> 8) + ((m_blitter_data[6] & 0x200) ? 256 : 0);
+	const int src_u0 = (m_blitter_data[0] >> 8) + ((m_blitter_data[6] & 0x100) ? 256 : 0);
+	const int src_v0 = (m_blitter_data[2] >> 8) + ((m_blitter_data[6] & 0x200) ? 256 : 0);
 
 	int dst_x0 = (m_blitter_data[0] & 0xff) + ((m_blitter_data[7] & 0x40) ? 256 : 0);
 	int dst_y0 = (m_blitter_data[2] & 0xff) + ((m_blitter_data[7] & 0x80) ? 256 : 0);
@@ -297,8 +297,8 @@ void wheelfir_state::do_blit()
 	const int x_dst_step = flipx ? 1 : -1;
 	const int y_dst_step = flipy ? 1 : -1;
 
-	const int x_src_step = (m_blitter_data[8] & 0x4000) ? 1 : -1;
-	const int y_src_step = (m_blitter_data[8] & 0x8000) ? 1 : -1;
+	const int u_src_step = (m_blitter_data[8] & 0x4000) ? 1 : -1;
+	const int v_src_step = (m_blitter_data[8] & 0x8000) ? 1 : -1;
 
 	const int page = ((m_blitter_data[6]) >> 10) * 0x40000;
 
@@ -339,58 +339,58 @@ void wheelfir_state::do_blit()
 		dst_y1 &= 0xff;
 	}
 
-	float scale_x_step;
-	float scale_y_step;
+	float scale_u_step;
+	float scale_v_step;
 
 	if (m_is_pwball)
 	{
-		scale_x_step = 1.0f;
-		scale_y_step = 1.0f;
+		scale_u_step = 1.0f;
+		scale_v_step = 1.0f;
 	}
 	else
 	{
-		// calculate x zoom
-		const int d1x = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
+		// calculate u zoom (horizontal source scale)
+		const int d1u = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
 						((m_blitter_data[0x08] & 0x0100) >> 3);
-		const int d2x = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
+		const int d2u = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
 						((m_blitter_data[0x08] & 0x0400) >> 5);
-		const int hflagx = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
-		const int dflagx = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
-		const int indexx = d1x | (d2x << 6) | (hflagx << 12) | (dflagx << 13);
-		const float scale_x = get_scale(indexx);
+		const int hflagu = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
+		const int dflagu = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
+		const int indexu = d1u | (d2u << 6) | (hflagu << 12) | (dflagu << 13);
+		const float scale_u = get_scale(indexu);
 
-		// calculate y zoom
-		const int d1y = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
+		// calculate v zoom (vertical source scale)
+		const int d1v = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
 						((m_blitter_data[0x0c] & 0xc000) >> 12) |
 						((m_blitter_data[0x0a] & 0x4000) >> 10) |
 						((m_blitter_data[0x08] & 0x0200) >> 4);
 
-		const int d2y = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
+		const int d2v = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
 						((m_blitter_data[0x08] & 0x0800) >> 6);
-		const int hflagy = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
-		const int dflagy = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
-		const int indexy = d1y | (d2y << 6) | (hflagy << 12) | (dflagy << 13);
-		const float scale_y = get_scale(indexy);
+		const int hflagv = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
+		const int dflagv = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
+		const int indexv = d1v | (d2v << 6) | (hflagv << 12) | (dflagv << 13);
+		const float scale_v = get_scale(indexv);
 
-		if (scale_x == 0 || scale_y == 0) return;
+		if (scale_u == 0 || scale_v == 0) return;
 
-		scale_x_step = 100.f / scale_x;
-		scale_y_step = 100.f / scale_y;
+		scale_u_step = 100.f / scale_u;
+		scale_v_step = 100.f / scale_v;
 	}
 
 	// do the draw
 	int y = dst_y0;
-	float idx_y = 0;
+	float idx_v = 0;
 	do
 	{
 		int x = dst_x0;
-		float idx_x = 0;
+		float idx_u = 0;
 
-		int yy = src_y0 + y_src_step * idx_y;
+		int yy = src_v0 + v_src_step * idx_v;
 
 		do
 		{
-			int xx = src_x0 + x_src_step * idx_x;
+			int xx = src_u0 + u_src_step * idx_u;
 
 			int address = page + yy * 512 + xx;
 
@@ -405,13 +405,13 @@ void wheelfir_state::do_blit()
 
 			x += x_dst_step;
 			x &= 0x1ff;
-			idx_x += scale_x_step;
+			idx_u += scale_u_step;
 
 		} while (x != dst_x1);
 
 		y += y_dst_step;
 		y &= 0x1ff;
-		idx_y += scale_y_step;
+		idx_v += scale_v_step;
 
 	} while (y != dst_y1);
 }
@@ -440,6 +440,33 @@ void wheelfir_state::do_direct_write(uint8_t sixdat)
 
 void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	/*
+
+	we use u/v to refer to the x/y co-ordinates in the source page
+
+	for most things see comment at end of like
+	Z vals in table are currently being used for horizontal source zoom in wheelfir (other games unhappy with it)
+	z vals in table are currently being used for vertical source zoom ^^
+
+	00 uuuu uuuu xxxx xxxx  (u = horizontal src page co-ordinate, x = horizontal destination start)
+	01 ---- ---- XXXX XXXX  (X = horizontal destination end)
+	02 vvvv vvvv yyyy yyyy  (v = vertical src page co-ordinate, y = vertical destination start)
+	03 ---- ---- YYYY YYYY  (Y = vertical destination end)
+	04 ---- ---- ---- ----
+	05 ---- ---- ---- ----
+	06 pppp ppvu DDDD DDDD  (p = source page, u = horizontal src page co-ordinate high bit, v = vertical src page co-ordinate high bit, D = direct framebuffer write port)
+	07 ---- ---- yx-- --ff  (x = horizontal destination start high bit, y = vertical destination start high bit, ff = flipy;flipx)
+	08 FFzZ zZzZ ---- ----  (FF = vu source flip)
+	09 ---- ---- ---- YXzZ  (X = horizontal destination end high bit, Y = vertical destination end high bit)
+	0a -z-Z ZZZZ ---- ----
+	0b zz-Z ZZZZ ---- ----
+	0c zz-z zzzz ---- ----
+	0d ---- ---- ---- ----
+	0e ---- ---- ---- ----
+	0f SSSS SSSS SSSS SSSS  S = start blit trigger (write 0xffff, also writes of 0x0000 happen)
+
+	*/
+
 	m_screen->update_partial(m_screen->vpos() - 1);
 	//uint16_t oldval = m_blitter_data[offset];
 	COMBINE_DATA(&m_blitter_data[offset]);
@@ -737,7 +764,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	M68000(config, m_subcpu, 32000000 / 2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_sub);
 
-	//config.set_maximum_quantum(attotime::from_hz(12000));
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	adc0808_device& adc(ADC0808(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
