@@ -41855,6 +41855,9 @@ fs3216                          //
 @source:skeleton/ft68m.cpp
 ft68m                           //
 
+@source:skeleton/ganbaremo.cpp
+ganbaremo                       // (c) ???? Shoken
+
 @source:skeleton/gem_rp.cpp
 rp200
 
