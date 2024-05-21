@@ -301,16 +301,14 @@ void wheelfir_state::do_blit()
 
 	const int page = ((m_blitter_data[6]) >> 10) * 0x40000;
 
-	if (!m_is_pwball)
+	if (page >= 0x700000) /* src set to  unav. page before direct write to the framebuffer */
 	{
-		if (page >= 0x400000) /* src set to  unav. page before direct write to the framebuffer */
-		{
-			m_direct_write_x0 = dst_x0;
-			m_direct_write_x1 = dst_x1;
-			m_direct_write_y0 = dst_y0;
-			m_direct_write_y1 = dst_y1;
-			m_direct_write_idx = 0;
-		}
+		// wheelfir sets 0xfc0000 and 0xf00000, both of which are out of range of any GFX ROM
+		m_direct_write_x0 = dst_x0;
+		m_direct_write_x1 = dst_x1;
+		m_direct_write_y0 = dst_y0;
+		m_direct_write_y1 = dst_y1;
+		m_direct_write_idx = 0;
 	}
 
 	if (flipy)
