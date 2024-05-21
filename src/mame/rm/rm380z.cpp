@@ -249,7 +249,7 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void rm380z_state::configure(machine_config &config, bool bFDS)
+void rm380z_state::base_configure(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
@@ -268,28 +268,27 @@ void rm380z_state::configure(machine_config &config, bool bFDS)
 	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	if (bFDS)
-	{
-		// FDS drives require a 2 MHz square wave clock frequency
-		FD1771(config, m_fdc, 16_MHz_XTAL / 8);
-		FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "fds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
-		FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "fds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
-	}
-	else
-	{
-		FD1771(config, m_fdc, 16_MHz_XTAL / 16);
-		FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
-		FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
-	}
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
+	FLOPPY_CONNECTOR(config, m_floppy0, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, rm380z_floppies, "mds", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 
-void rm380z_state_cos34::rm380z34e(machine_config &config, bool bFDS)
+void rm380z_state::fds_configure()
 {
-	configure(config, bFDS);
+	// FDS drives require a 2 MHz square wave clock frequency
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / 8);
+	// change media type for floppy connectors
+	m_floppy0->set_default_option("fds");
+	m_floppy1->set_default_option("fds");
+}
+
+void rm380z_state_cos34::rm380z34e(machine_config &config)
+{
+	base_configure(config);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -303,18 +302,18 @@ void rm380z_state_cos34::rm380z34e(machine_config &config, bool bFDS)
 	m_rocg->set_palette(m_palette);
 }
 
-void rm380z_state_cos40::rm380z(machine_config &config, bool bFDS)
+void rm380z_state_cos40::rm380z(machine_config &config)
 {
-	configure(config, bFDS);
+	base_configure(config);
 
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 }
 
-void rm380z_state_cos40_hrg::rm380zhrg(machine_config &config, bool bFDS)
+void rm380z_state_cos40_hrg::rm380zhrg(machine_config &config)
 {
-	rm380z(config, bFDS);
+	rm380z(config);
 
 	m_palette->set_init(FUNC(rm380z_state_cos40_hrg::palette_init)).set_entries(19);
 }

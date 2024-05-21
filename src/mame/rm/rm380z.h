@@ -52,7 +52,8 @@ protected:
 	static inline constexpr int RM380Z_SCREENROWS = 24;
 	static inline constexpr int RM380Z_SCREENCOLS = 40;
 
-	void configure(machine_config &config, bool bFDS);
+	void base_configure(machine_config &config);
+	void fds_configure();
 
 	void machine_reset() override;
 
@@ -110,8 +111,8 @@ public:
 	{
 	}
 
-	void rm380z34e(machine_config &config, bool bFDS = false);
-	void rm380z34d(machine_config &config) { rm380z34e(config, true); }
+	void rm380z34e(machine_config &config);
+	void rm380z34d(machine_config &config) { rm380z34e(config); fds_configure(); }
 
 protected:
 	void machine_reset() override;
@@ -155,8 +156,8 @@ public:
 	{
 	}
 
-	void rm380z(machine_config &config, bool bFDS = false);
-	void rm380zf(machine_config &config) { rm380z(config, true); }
+	void rm380z(machine_config &config);
+	void rm380zf(machine_config &config) { rm380z(config); fds_configure(); }
 
 protected:
 	template <int ROWS, int COLS>
@@ -220,8 +221,8 @@ public:
 	{
 	}
 
-	void rm380zhrg(machine_config &config, bool bFDS = false);
-	void rm380zfhrg(machine_config &config) { rm380zhrg(config, true); }
+	void rm380zhrg(machine_config &config);
+	void rm380zfhrg(machine_config &config) { rm380zhrg(config); fds_configure(); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
