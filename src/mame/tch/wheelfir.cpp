@@ -251,6 +251,7 @@ private:
 		return 0;
 	}
 	void wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void do_direct_write(uint8_t sixdat);
 	void do_blit();
 	void wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wheelfir_7c0000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -303,7 +304,9 @@ void wheelfir_state::do_blit()
 
 	if (page >= 0x700000) /* src set to  unav. page before direct write to the framebuffer */
 	{
+		logerror("%s: page set to above ROM %08x - direct write enable?\n", machine().describe_context(), page);
 		// wheelfir sets 0xfc0000 and 0xf00000, both of which are out of range of any GFX ROM
+		// kongball sets 0xfc0000 but only on startup
 		m_direct_write_x0 = dst_x0;
 		m_direct_write_x1 = dst_x1;
 		m_direct_write_y0 = dst_y0;
@@ -413,40 +416,56 @@ void wheelfir_state::do_blit()
 	} while (y != dst_y1);
 }
 
+void wheelfir_state::do_direct_write(uint8_t sixdat)
+{
+	const int direct_width = m_direct_write_x1 - m_direct_write_x0 + 1;
+	const int direct_height = m_direct_write_y1 - m_direct_write_y0 + 1;
+
+	if (direct_width > 0 && direct_height > 0)
+	{
+		int x = m_direct_write_idx % direct_width;
+		int y = (m_direct_write_idx / direct_width) % direct_height;
+
+		x += m_direct_write_x0;
+		y += m_direct_write_y0;
+
+		if (x < 512 && y < 512)
+		{
+			m_tmp_bitmap[LAYER_BG]->pix(y, x) = sixdat;
+		}
+	}
+
+	++m_direct_write_idx;
+}
+
 void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos() - 1);
 	//uint16_t oldval = m_blitter_data[offset];
 	COMBINE_DATA(&m_blitter_data[offset]);
 
-	if (!ACCESSING_BITS_8_15 && offset == 0x6)  //LSB only!
+	if (offset == 0x6)
 	{
-		const int direct_width = m_direct_write_x1 - m_direct_write_x0 + 1;
-		const int direct_height = m_direct_write_y1 - m_direct_write_y0 + 1;
-		const int sixdat = data & 0xff;
-
-		if (direct_width > 0 && direct_height > 0)
+		if (!ACCESSING_BITS_8_15)  //LSB only!
 		{
-			int x = m_direct_write_idx % direct_width;
-			int y = (m_direct_write_idx / direct_width) % direct_height;
-
-			x += m_direct_write_x0;
-			y += m_direct_write_y0;
-
-			if (x < 512 && y < 512)
-			{
-				m_tmp_bitmap[LAYER_BG]->pix(y, x) = sixdat;
-			}
+			do_direct_write(data & 0xff);
+			return;
 		}
-
-		++m_direct_write_idx;
-		return;
 	}
 
-	if (offset == 0xf && data == 0xffff)
+	if (offset == 0xf)
 	{
-		do_blit();
+		if (data == 0xffff)
+		{
+			do_blit();
+		}
+		else
+		{
+			// writes 0x0000 before filling in some of the other params then sending 0xffff above
+			logerror("%s: write to offset 0xf (blit start) but with data %04x\n", machine().describe_context(), data);
+		}
 	}
+
 }
 
 void wheelfir_state::video_start()
