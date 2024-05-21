@@ -233,7 +233,6 @@ private:
 
 	int16_t m_scanline_cnt = 0;
 
-
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[2]{};
 
 	int32_t get_scale(int32_t index)
@@ -266,23 +265,21 @@ private:
 	bool m_disable_raster_irq;
 };
 
-
 void wheelfir_state::wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scanline_cnt);
 }
 
-
 void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	m_screen->update_partial(m_screen->vpos()-1);
 	COMBINE_DATA(&m_blitter_data[offset]);
 
 	if (!ACCESSING_BITS_8_15 && offset == 0x6)  //LSB only!
 	{
-		int direct_width = m_direct_write_x1 - m_direct_write_x0 + 1;
-		int direct_height = m_direct_write_y1 - m_direct_write_y0 + 1;
-
-		int sixdat = data & 0xff;
+		const int direct_width = m_direct_write_x1 - m_direct_write_x0 + 1;
+		const int direct_height = m_direct_write_y1 - m_direct_write_y0 + 1;
+		const int sixdat = data & 0xff;
 
 		if (direct_width > 0 && direct_height > 0)
 		{
@@ -299,7 +296,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		}
 
 		++m_direct_write_idx;
-
 		return;
 	}
 
@@ -354,58 +350,42 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 		dst_x0 &= 0x1ff;
 		dst_x1 &= 0x1ff;
-		dst_y0 &= 0x1ff;	
+		dst_y0 &= 0x1ff;
 		dst_y1 &= 0x1ff;
 
 		int vpage = (m_blitter_data[0x7] & 0x10) ? LAYER_BG : LAYER_FG;
 
+		// ?? prevents some sprite flickering in pwball and wheelfir
 		if (vpage == LAYER_FG)
 		{
 			dst_y0 &= 0xff;
 			dst_y1 &= 0xff;
 		 }
 
+		// calculate x zoom
+		const int d1x = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
+						((m_blitter_data[0x08] & 0x0100) >> 3);
+		const int d2x = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
+						((m_blitter_data[0x08] & 0x0400) >> 5);
+		const int hflagx = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
+		const int dflagx = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
+		const int indexx = d1x | (d2x << 6) | (hflagx << 12) | (dflagx << 13);
+		const float scale_x = get_scale(indexx);
 
-		//if (m_blitter_data[0x7] & 0x10)
-		//	printf("blit with dst_x0 %d dst_x1 %d | dst_x0 %d dst_x1 %d\n", dst_x0, dst_x1, dst_y0, dst_y1);
+		// calculate y zoom
+		const int d1y = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
+						((m_blitter_data[0x0c] & 0xc000) >> 12) |
+						((m_blitter_data[0x0a] & 0x4000) >> 10) |
+						((m_blitter_data[0x08] & 0x0200) >> 4);
 
-		//additional checks
-
-		int d1, d2, hflag, dflag, index;
-
-		d1 = ((m_blitter_data[0x0a] & 0x1f00) >> 8);
-
-		d2 = ((m_blitter_data[0x0b] & 0x1f00) >> 8);
-
-
-		d1 |= ((m_blitter_data[0x8] & 0x100) >> 3);
-		d2 |= ((m_blitter_data[0x8] & 0x400) >> 5);
-		hflag = (m_blitter_data[0x9] & 0x1) ? 1 : 0;
-		dflag = (m_blitter_data[0x8] & 0x1000) ? 1 : 0;
-		index = d1 | (d2 << 6) | (hflag << 12) | (dflag << 13);
-
-		const float scale_x = get_scale(index);
-
-
-		d1 = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
-			((m_blitter_data[0x0c] & 0xc000) >> 12) |
-			((m_blitter_data[0x0a] & 0x4000) >> 10);
-
-		d2 = ((m_blitter_data[0x0c] & 0x1f00) >> 8);
-
-
-		d1 |= ((m_blitter_data[0x8] & 0x200) >> 4);
-		d2 |= ((m_blitter_data[0x8] & 0x800) >> 6);
-
-		hflag = (m_blitter_data[0x9] & 0x2) ? 1 : 0;
-		dflag = (m_blitter_data[0x8] & 0x2000) ? 1 : 0;
-		index = d1 | (d2 << 6) | (hflag << 12) | (dflag << 13);
-
-		const float scale_y = get_scale(index);
-
+		const int d2y = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
+						((m_blitter_data[0x08] & 0x0800) >> 6);
+		const int hflagy = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
+		const int dflagy = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
+		const int indexy = d1y | (d2y << 6) | (hflagy << 12) | (dflagy << 13);
+		const float scale_y = get_scale(indexy);
 
 		if (scale_x == 0 || scale_y == 0) return;
-
 
 		float scale_x_step = 100.f / scale_x;
 		float scale_y_step = 100.f / scale_y;
@@ -416,8 +396,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			scale_y_step = 1.0f;
 		}
 
-
-
 		if (m_blitter_data[0x7] & 0x0c)
 		{
 			//???
@@ -425,7 +403,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 		int y = dst_y0;
 		float idx_y = 0;
-
 		do
 		{
 			int x = dst_x0;
@@ -480,16 +457,15 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
 		uint16_t *const dest = &bitmap.pix(y);
 
-		int xscroll = (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int sourcex = x;
-			sourcex += xscroll;
+			sourcex += (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
 			sourcex &= 0x1ff;
 			dest[x] = source[sourcex];
 		}
 	}
-	            
+
 	copybitmap_trans(bitmap, *m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
@@ -651,7 +627,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 		{
 			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
-		m_screen->update_partial(param);
 
 		if ((param == 224) && m_is_pwball)
 		{
@@ -896,6 +871,7 @@ void wheelfir_state::init_kongball()
 GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init,    ROT0,  "TCH", "Wheels & Fire", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, pwball,      0, wheelfir,    pwball,   wheelfir_state, init_pwball,   ROT0,  "TCH", "Power Ball (prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // mostly complete
 
-// these might not be fully functional games
+// can get in-game on PCB
 GAME( 199?, kongball,    0, kongball,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH", "Kong Ball (early prototype)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // can't get ingame?
+// crashes when selecting track on PCB (sometimes gets to gameplay in MAME right now)
 GAME( 199?, radendur,    0, wheelfir,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // can get ingame if you overclock CPUs significantly (IRQ problems?)
