@@ -1863,7 +1863,7 @@ void galaxold_state::superbikg(machine_config &config)
 {
 	galaxold_base(config);
 
-	s2650_device &s2650(S2650(config.replace(), m_maincpu, PIXEL_CLOCK / 4));
+	s2650_device &s2650(S2650(config.replace(), m_maincpu, 1'500'000)); // 1.53292 MHz measured with logic analyzer
 	s2650.set_addrmap(AS_PROGRAM, &galaxold_state::superbikg_map);
 	s2650.set_addrmap(AS_IO, &galaxold_state::superbikg_io);
 	s2650.set_addrmap(AS_DATA, &galaxold_state::superbikg_data);
