@@ -529,7 +529,7 @@ void wheelfir_state::coin_cnt_w(uint16_t data)
 void wheelfir_state::wheelfir_main(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x200000, 0x20ffff).ram();
+	map(0x200000, 0x20ffff).ram().mirror(0x010000); // kongball either needs the mirror (or has more ram?)
 
 	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w));
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
