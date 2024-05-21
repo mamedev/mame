@@ -183,16 +183,10 @@ namespace {
 
 static const int ZOOM_TABLE_SIZE=1<<14;
 static const int NUM_SCANLINES=256-8;
-static const int NUM_VBLANK_LINES=8;
+static const int NUM_VBLANK_LINES=64; // unknown, too low and sprites at top of screen on power ball flicker
 static const int LAYER_BG=0;
 static const int LAYER_FG=1;
 static const int NUM_COLORS=256;
-
-struct scroll_info
-{
-		int32_t x = 0, y = 0, unkbits = 0;
-};
-
 
 class wheelfir_state : public driver_device
 {
@@ -230,8 +224,6 @@ private:
 
 	std::unique_ptr<int32_t[]> m_zoom_table;
 	std::unique_ptr<uint16_t[]> m_blitter_data;
-
-	std::unique_ptr<scroll_info[]> m_scanlines;
 
 	int32_t m_direct_write_x0 = 0;
 	int32_t m_direct_write_x1 = 0;
@@ -313,6 +305,7 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 	if (offset == 0xf && data == 0xffff)
 	{
+		// blitter irq? should be timed?
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
 		uint8_t const* const rom = memregion("gfx1")->base();
@@ -337,7 +330,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 		int page = ((m_blitter_data[6]) >> 10) * 0x40000;
 
-
 		if (!m_is_pwball)
 		{
 			if (page >= 0x400000) /* src set to  unav. page before direct write to the framebuffer */
@@ -349,8 +341,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 				m_direct_write_idx = 0;
 			}
 		}
-
-
 
 		if (flipy)
 			dst_y0 -= 1;
@@ -374,6 +364,7 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			dst_y0 &= 0xff;
 			dst_y1 &= 0xff;
 		 }
+
 
 		//if (m_blitter_data[0x7] & 0x10)
 		//	printf("blit with dst_x0 %d dst_x1 %d | dst_x0 %d dst_x1 %d\n", dst_x0, dst_x1, dst_y0, dst_y1);
@@ -483,15 +474,17 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 
 	for(int y=cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int scrollyreg = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
-		int scrolly = (256 + 8 + y + scrollyreg) & 511;
+		int scrolly = y;
+		scrolly += (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+		scrolly &= 0x1ff;
 		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
 		uint16_t *const dest = &bitmap.pix(y);
 
+		int xscroll = (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int sourcex = x;
-			sourcex += m_scanlines[y].x;
+			sourcex += xscroll;
 			sourcex &= 0x1ff;
 			dest[x] = source[sourcex];
 		}
@@ -651,16 +644,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
 	if(param<NUM_SCANLINES)
 	{
-		//copy scanline offset
-		int xscroll = (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
-		int yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
-
-		m_scanlines[param].x = xscroll;
-		m_scanlines[param].y = yscroll;
-		m_scanlines[param].unkbits = m_blitter_data[0x8] & 0xff;
-
-		m_blitter_data[0xb]++;
-
 		//visible scanline
 		m_scanline_cnt--;
 
@@ -668,10 +651,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 		{
 			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
-		//m_screen->update_partial(param);
+		m_screen->update_partial(param);
 
-		if ((param == 0) && m_is_pwball)
+		if ((param == 224) && m_is_pwball)
 		{
+			// why, this is the blitter irq? won't boot otherwise though
 			m_maincpu->set_input_line(1, HOLD_LINE);
 		}
 	}
@@ -691,9 +675,6 @@ void wheelfir_state::machine_start()
 {
 	m_zoom_table = std::make_unique<int32_t[]>(ZOOM_TABLE_SIZE);
 	m_blitter_data = std::make_unique<uint16_t[]>(16);
-
-	m_scanlines = std::make_unique<scroll_info[]>(NUM_SCANLINES+NUM_VBLANK_LINES);
-
 
 	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
 	{
@@ -767,6 +748,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(336, NUM_SCANLINES+NUM_VBLANK_LINES);
 	m_screen->set_visarea(0,335, 0, NUM_SCANLINES-1);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3000));
 
 	m_screen->set_screen_update(FUNC(wheelfir_state::screen_update_wheelfir));
 	m_screen->screen_vblank().set(FUNC(wheelfir_state::screen_vblank_wheelfir));
