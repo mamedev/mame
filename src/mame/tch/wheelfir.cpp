@@ -181,23 +181,25 @@ BIT N - ( scale < 50% ) ? 1 : 0
 
 namespace {
 
-static const int ZOOM_TABLE_SIZE=1<<14;
-static const int NUM_SCANLINES=256-8;
-static const int NUM_VBLANK_LINES=64; // unknown, too low and sprites at top of screen on power ball flicker
-static const int LAYER_BG=0;
-static const int LAYER_FG=1;
-static const int NUM_COLORS=256;
+static const int ZOOM_TABLE_SIZE = 1 << 14;
+static const int NUM_SCANLINES = 256 - 8;
+static const int NUM_VBLANK_LINES = 64; // unknown, too low and sprites at top of screen on power ball flicker
+static const int LAYER_BG = 0;
+static const int LAYER_FG = 1;
+static const int NUM_COLORS = 256;
 
 class wheelfir_state : public driver_device
 {
 public:
-	wheelfir_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wheelfir_state(const machine_config &mconfig, device_type type, const char* tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_blitter_data(*this, "blitram"),
+		m_tilepages(*this, "gfx1"),
 		m_adc_eoc(0),
 		m_is_pwball(false),
 		m_disable_raster_irq(false)
@@ -223,7 +225,8 @@ private:
 	required_device<palette_device> m_palette;
 
 	std::unique_ptr<int32_t[]> m_zoom_table;
-	std::unique_ptr<uint16_t[]> m_blitter_data;
+	required_shared_ptr<uint16_t> m_blitter_data;
+	required_region_ptr<uint8_t> m_tilepages;
 
 	int32_t m_direct_write_x0 = 0;
 	int32_t m_direct_write_x1 = 0;
@@ -237,9 +240,9 @@ private:
 
 	int32_t get_scale(int32_t index)
 	{
-		while(index<ZOOM_TABLE_SIZE)
+		while (index < ZOOM_TABLE_SIZE)
 		{
-			if(m_zoom_table[index]>=0)
+			if (m_zoom_table[index] >= 0)
 			{
 				return m_zoom_table[index];
 			}
@@ -248,12 +251,13 @@ private:
 		return 0;
 	}
 	void wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void do_blit();
 	void wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wheelfir_7c0000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t wheelfir_7c0000_r(offs_t offset, uint16_t mem_mask = ~0);
 	void coin_cnt_w(uint16_t data);
 	void adc_eoc_w(int state);
-	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
 	void screen_vblank_wheelfir(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 	void ramdac_map(address_map &map);
@@ -270,9 +274,151 @@ void wheelfir_state::wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint1
 	COMBINE_DATA(&m_scanline_cnt);
 }
 
+void wheelfir_state::do_blit()
+{
+	// blitter irq? should be timed?
+	m_maincpu->set_input_line(1, HOLD_LINE);
+
+	uint8_t const* const rom = m_tilepages;
+
+	const int src_x0 = (m_blitter_data[0] >> 8) + ((m_blitter_data[6] & 0x100) ? 256 : 0);
+	const int src_y0 = (m_blitter_data[2] >> 8) + ((m_blitter_data[6] & 0x200) ? 256 : 0);
+
+	int dst_x0 = (m_blitter_data[0] & 0xff) + ((m_blitter_data[7] & 0x40) ? 256 : 0);
+	int dst_y0 = (m_blitter_data[2] & 0xff) + ((m_blitter_data[7] & 0x80) ? 256 : 0);
+
+	int dst_x1 = (m_blitter_data[1] & 0xff) + ((m_blitter_data[9] & 4) ? 256 : 0);
+	int dst_y1 = (m_blitter_data[3] & 0xff) + ((m_blitter_data[9] & 8) ? 256 : 0);
+
+	const bool flipx = (m_blitter_data[7] & 0x1);
+	const bool flipy = (m_blitter_data[7] & 0x2);
+
+	const int x_dst_step = flipx ? 1 : -1;
+	const int y_dst_step = flipy ? 1 : -1;
+
+	const int x_src_step = (m_blitter_data[8] & 0x4000) ? 1 : -1;
+	const int y_src_step = (m_blitter_data[8] & 0x8000) ? 1 : -1;
+
+	const int page = ((m_blitter_data[6]) >> 10) * 0x40000;
+
+	if (!m_is_pwball)
+	{
+		if (page >= 0x400000) /* src set to  unav. page before direct write to the framebuffer */
+		{
+			m_direct_write_x0 = dst_x0;
+			m_direct_write_x1 = dst_x1;
+			m_direct_write_y0 = dst_y0;
+			m_direct_write_y1 = dst_y1;
+			m_direct_write_idx = 0;
+		}
+	}
+
+	if (flipy)
+		dst_y0 -= 1;
+	else
+		dst_y0 += 1;
+
+	if (flipy)
+		dst_y1 += 1;
+	else
+		dst_y1 -= 1;
+
+	dst_x0 &= 0x1ff;
+	dst_x1 &= 0x1ff;
+	dst_y0 &= 0x1ff;
+	dst_y1 &= 0x1ff;
+
+	int vpage = (m_blitter_data[0x7] & 0x10) ? LAYER_BG : LAYER_FG;
+
+
+	// ?? prevents some sprite flickering in pwball and wheelfir
+	if (vpage == LAYER_FG)
+	{
+		dst_y0 &= 0xff;
+		dst_y1 &= 0xff;
+	}
+
+	float scale_x_step;
+	float scale_y_step;
+
+	if (m_is_pwball)
+	{
+		scale_x_step = 1.0f;
+		scale_y_step = 1.0f;
+	}
+	else
+	{
+		// calculate x zoom
+		const int d1x = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
+						((m_blitter_data[0x08] & 0x0100) >> 3);
+		const int d2x = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
+						((m_blitter_data[0x08] & 0x0400) >> 5);
+		const int hflagx = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
+		const int dflagx = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
+		const int indexx = d1x | (d2x << 6) | (hflagx << 12) | (dflagx << 13);
+		const float scale_x = get_scale(indexx);
+
+		// calculate y zoom
+		const int d1y = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
+						((m_blitter_data[0x0c] & 0xc000) >> 12) |
+						((m_blitter_data[0x0a] & 0x4000) >> 10) |
+						((m_blitter_data[0x08] & 0x0200) >> 4);
+
+		const int d2y = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
+						((m_blitter_data[0x08] & 0x0800) >> 6);
+		const int hflagy = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
+		const int dflagy = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
+		const int indexy = d1y | (d2y << 6) | (hflagy << 12) | (dflagy << 13);
+		const float scale_y = get_scale(indexy);
+
+		if (scale_x == 0 || scale_y == 0) return;
+
+		scale_x_step = 100.f / scale_x;
+		scale_y_step = 100.f / scale_y;
+	}
+
+	// do the draw
+	int y = dst_y0;
+	float idx_y = 0;
+	do
+	{
+		int x = dst_x0;
+		float idx_x = 0;
+
+		int yy = src_y0 + y_src_step * idx_y;
+
+		do
+		{
+			int xx = src_x0 + x_src_step * idx_x;
+
+			int address = page + yy * 512 + xx;
+
+			int pix = rom[address & (0x1000000 - 1)];
+
+			int screen_y = y;
+
+			if (pix && x >= 0 && screen_y >= 0 && x < 512 && screen_y < 512)
+			{
+				m_tmp_bitmap[vpage]->pix(y, x) = pix;
+			}
+
+			x += x_dst_step;
+			x &= 0x1ff;
+			idx_x += scale_x_step;
+
+		} while (x != dst_x1);
+
+		y += y_dst_step;
+		y &= 0x1ff;
+		idx_y += scale_y_step;
+
+	} while (y != dst_y1);
+}
+
 void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_screen->update_partial(m_screen->vpos()-1);
+	m_screen->update_partial(m_screen->vpos() - 1);
+	//uint16_t oldval = m_blitter_data[offset];
 	COMBINE_DATA(&m_blitter_data[offset]);
 
 	if (!ACCESSING_BITS_8_15 && offset == 0x6)  //LSB only!
@@ -301,141 +447,7 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 	if (offset == 0xf && data == 0xffff)
 	{
-		// blitter irq? should be timed?
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-		uint8_t const* const rom = memregion("gfx1")->base();
-
-		int src_x0 = (m_blitter_data[0] >> 8) + ((m_blitter_data[6] & 0x100) ? 256 : 0);
-		int src_y0 = (m_blitter_data[2] >> 8) + ((m_blitter_data[6] & 0x200) ? 256 : 0);
-
-		int dst_x0 = (m_blitter_data[0] & 0xff) + ((m_blitter_data[7] & 0x40) ? 256 : 0);
-		int dst_y0 = (m_blitter_data[2] & 0xff) + ((m_blitter_data[7] & 0x80) ? 256 : 0);
-
-		int dst_x1 = (m_blitter_data[1] & 0xff) + ((m_blitter_data[9] & 4) ? 256 : 0);
-		int dst_y1 = (m_blitter_data[3] & 0xff) + ((m_blitter_data[9] & 8) ? 256 : 0);
-
-		bool flipx = (m_blitter_data[7] & 0x1);
-		bool flipy = (m_blitter_data[7] & 0x2);
-
-		int x_dst_step = flipx ? 1 : -1;
-		int y_dst_step = flipy ? 1 : -1;
-
-		int x_src_step = (m_blitter_data[8] & 0x4000) ? 1 : -1;
-		int y_src_step = (m_blitter_data[8] & 0x8000) ? 1 : -1;
-
-		int page = ((m_blitter_data[6]) >> 10) * 0x40000;
-
-		if (!m_is_pwball)
-		{
-			if (page >= 0x400000) /* src set to  unav. page before direct write to the framebuffer */
-			{
-				m_direct_write_x0 = dst_x0;
-				m_direct_write_x1 = dst_x1;
-				m_direct_write_y0 = dst_y0;
-				m_direct_write_y1 = dst_y1;
-				m_direct_write_idx = 0;
-			}
-		}
-
-		if (flipy)
-			dst_y0 -= 1;
-		else
-			dst_y0 += 1;
-
-		if (flipy)
-			dst_y1 += 1;
-		else
-			dst_y1 -= 1;
-
-		dst_x0 &= 0x1ff;
-		dst_x1 &= 0x1ff;
-		dst_y0 &= 0x1ff;
-		dst_y1 &= 0x1ff;
-
-		int vpage = (m_blitter_data[0x7] & 0x10) ? LAYER_BG : LAYER_FG;
-
-		// ?? prevents some sprite flickering in pwball and wheelfir
-		if (vpage == LAYER_FG)
-		{
-			dst_y0 &= 0xff;
-			dst_y1 &= 0xff;
-		 }
-
-		// calculate x zoom
-		const int d1x = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
-						((m_blitter_data[0x08] & 0x0100) >> 3);
-		const int d2x = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
-						((m_blitter_data[0x08] & 0x0400) >> 5);
-		const int hflagx = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
-		const int dflagx = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
-		const int indexx = d1x | (d2x << 6) | (hflagx << 12) | (dflagx << 13);
-		const float scale_x = get_scale(indexx);
-
-		// calculate y zoom
-		const int d1y = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
-						((m_blitter_data[0x0c] & 0xc000) >> 12) |
-						((m_blitter_data[0x0a] & 0x4000) >> 10) |
-						((m_blitter_data[0x08] & 0x0200) >> 4);
-
-		const int d2y = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
-						((m_blitter_data[0x08] & 0x0800) >> 6);
-		const int hflagy = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
-		const int dflagy = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
-		const int indexy = d1y | (d2y << 6) | (hflagy << 12) | (dflagy << 13);
-		const float scale_y = get_scale(indexy);
-
-		if (scale_x == 0 || scale_y == 0) return;
-
-		float scale_x_step = 100.f / scale_x;
-		float scale_y_step = 100.f / scale_y;
-
-		if (m_is_pwball)
-		{
-			scale_x_step = 1.0f;
-			scale_y_step = 1.0f;
-		}
-
-		if (m_blitter_data[0x7] & 0x0c)
-		{
-			//???
-		}
-
-		int y = dst_y0;
-		float idx_y = 0;
-		do
-		{
-			int x = dst_x0;
-			float idx_x = 0;
-
-			int yy = src_y0 + y_src_step * idx_y;
-
-			do
-			{
-				int xx = src_x0 + x_src_step * idx_x;
-
-				int address = page + yy * 512 + xx;
-
-				int pix = rom[address & (0x1000000 - 1)];
-
-				int screen_y = y;
-
-				if (pix && x >= 0 && screen_y >= 0 && x < 512 && screen_y < 512)
-				{
-					m_tmp_bitmap[vpage]->pix(y, x) = pix;
-				}
-
-				x += x_dst_step;
-				x &= 0x1ff;
-				idx_x += scale_x_step;
-
-			} while (x != dst_x1);
-
-			y += y_dst_step;
-			y &= 0x1ff;
-			idx_y += scale_y_step;
-
-		} while (y != dst_y1);
+		do_blit();
 	}
 }
 
@@ -449,13 +461,13 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 
-	for(int y=cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int scrolly = y;
 		scrolly += (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
 		scrolly &= 0x1ff;
-		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
-		uint16_t *const dest = &bitmap.pix(y);
+		uint16_t const* const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
+		uint16_t* const dest = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -531,7 +543,7 @@ void wheelfir_state::wheelfir_main(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram().mirror(0x010000); // kongball either needs the mirror (or has more ram?)
 
-	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w));
+	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w)).share(m_blitter_data);
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x720003, 0x720003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x720005, 0x720005).w("ramdac", FUNC(ramdac_device::mask_w)); // word write?
@@ -618,12 +630,12 @@ void wheelfir_state::adc_eoc_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
-	if(param<NUM_SCANLINES)
+	if (param < NUM_SCANLINES)
 	{
 		//visible scanline
 		m_scanline_cnt--;
 
-		if ((m_scanline_cnt==0) && (!m_disable_raster_irq))
+		if ((m_scanline_cnt == 0) && (!m_disable_raster_irq))
 		{
 			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
@@ -636,7 +648,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 	}
 	else
 	{
-		if(param==NUM_SCANLINES) /* vblank */
+		if (param == NUM_SCANLINES) /* vblank */
 		{
 			m_maincpu->set_input_line(3, HOLD_LINE);
 		}
@@ -649,29 +661,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 void wheelfir_state::machine_start()
 {
 	m_zoom_table = std::make_unique<int32_t[]>(ZOOM_TABLE_SIZE);
-	m_blitter_data = std::make_unique<uint16_t[]>(16);
 
-	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
+	for (int i = 0; i < (ZOOM_TABLE_SIZE); ++i)
 	{
-		m_zoom_table[i]=-1;
+		m_zoom_table[i] = -1;
 	}
 
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
 
-	for(int j=0;j<400;++j)
+	for (int j = 0; j < 400; ++j)
 	{
-		int i=j<<3;
-		int d1=ROM[0x200+i]&0x1f;
-		int d0=(ROM[0x200+i]>>8)&0x1f;
+		int i = j << 3;
+		int d1 = ROM[0x200 + i] & 0x1f;
+		int d0 = (ROM[0x200 + i] >> 8) & 0x1f;
 
-		d0|=(ROM[0x200+1+i]&1)?0x20:0;
-		d1|=(ROM[0x200+1+i]&4)?0x20:0;
+		d0 |= (ROM[0x200 + 1 + i] & 1) ? 0x20 : 0;
+		d1 |= (ROM[0x200 + 1 + i] & 4) ? 0x20 : 0;
 
-		int hflag=(ROM[0x200+2+i]&0x100)?1:0;
-		int dflag=(ROM[0x200+1+i]&0x10)?1:0;
+		int hflag = (ROM[0x200 + 2 + i] & 0x100) ? 1 : 0;
+		int dflag = (ROM[0x200 + 1 + i] & 0x10) ? 1 : 0;
 
-		int index=d0|(d1<<6)|(hflag<<12)|(dflag<<13);
-		m_zoom_table[index]=j;
+		int index = d0 | (d1 << 6) | (hflag << 12) | (dflag << 13);
+		m_zoom_table[index] = j;
 	}
 }
 
@@ -703,15 +714,15 @@ GFXDECODE_END
 
 void wheelfir_state::wheelfir(machine_config &config)
 {
-	M68000(config, m_maincpu, 32000000/2);
+	M68000(config, m_maincpu, 32000000 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_main);
 
-	M68000(config, m_subcpu, 32000000/2);
+	M68000(config, m_subcpu, 32000000 / 2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_sub);
 
 	//config.set_maximum_quantum(attotime::from_hz(12000));
 
-	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
+	adc0808_device& adc(ADC0808(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
 	adc.in_callback<0>().set_ioport("STEERING");
 	adc.in_callback<1>().set_ioport("ACCELERATOR");
@@ -721,8 +732,8 @@ void wheelfir_state::wheelfir(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(336, NUM_SCANLINES+NUM_VBLANK_LINES);
-	m_screen->set_visarea(0,335, 0, NUM_SCANLINES-1);
+	m_screen->set_size(336, NUM_SCANLINES + NUM_VBLANK_LINES);
+	m_screen->set_visarea(0, 335, 0, NUM_SCANLINES - 1);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3000));
 
 	m_screen->set_screen_update(FUNC(wheelfir_state::screen_update_wheelfir));
