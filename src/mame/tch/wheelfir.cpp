@@ -196,7 +196,6 @@ private:
 	int m_adc_eoc;
 
 	bool m_force_extra_irq1;
-	bool m_allow_zoom;
 	bool m_disable_raster_irq;
 
 	int m_current_yscroll;
@@ -451,9 +450,6 @@ void wheelfir_state::video_start()
 
 uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	int yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
-//	printf("partial update on scanline %d with yscroll %d\n", m_screen->vpos(), yscroll);
-
 	bitmap.fill(0, cliprect);
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
