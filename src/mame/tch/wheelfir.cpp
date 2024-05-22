@@ -127,9 +127,9 @@ public:
 		m_palette(*this, "palette"),
 		m_blitter_data(*this, "blitram"),
 		m_tilepages(*this, "gfx1"),
+		m_maincpurom(*this, "maincpu"),
 		m_adc_eoc(0),
 		m_force_extra_irq1(false),
-		m_allow_zoom(true),
 		m_disable_raster_irq(false)
 	{ }
 
@@ -140,7 +140,6 @@ public:
 
 	void init_pwball();
 	void init_kongball();
-	void init_radendur();
 
 protected:
 	virtual void machine_start() override;
@@ -156,6 +155,7 @@ private:
 	std::unique_ptr<int32_t[]> m_zoom_table;
 	required_shared_ptr<uint16_t> m_blitter_data;
 	required_region_ptr<uint8_t> m_tilepages;
+	required_region_ptr<uint16_t> m_maincpurom;
 
 	int32_t m_direct_write_x0 = 0;
 	int32_t m_direct_write_x1 = 0;
@@ -272,45 +272,35 @@ void wheelfir_state::do_blit()
 
 	float scale_u_step;
 	float scale_v_step;
+	
+	// calculate u zoom (horizontal source scale)
+	const int d1u = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
+					((m_blitter_data[0x08] & 0x0100) >> 3);
+	const int d2u = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
+					((m_blitter_data[0x08] & 0x0400) >> 5);
+	const int hflagu = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
+	const int dflagu = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
+	const int indexu = d1u | (d2u << 6) | (hflagu << 12) | (dflagu << 13);
+	const float scale_u = get_scale(indexu);
 
-	// it possible/likely these games just set some of the zoom bits to change how the
-	// blit co-ordinates work, but not in a way that should cause zooming as it currently
-	// does (assuming custom chips are programmed in the same way between games)
-	if (!m_allow_zoom)
-	{
-		scale_u_step = 1.0f;
-		scale_v_step = 1.0f;
-	}
-	else
-	{
-		// calculate u zoom (horizontal source scale)
-		const int d1u = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
-						((m_blitter_data[0x08] & 0x0100) >> 3);
-		const int d2u = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
-						((m_blitter_data[0x08] & 0x0400) >> 5);
-		const int hflagu = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
-		const int dflagu = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
-		const int indexu = d1u | (d2u << 6) | (hflagu << 12) | (dflagu << 13);
-		const float scale_u = get_scale(indexu);
+	// calculate v zoom (vertical source scale)
+	const int d1v = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
+					((m_blitter_data[0x0c] & 0xc000) >> 12) |
+					((m_blitter_data[0x0a] & 0x4000) >> 10) |
+					((m_blitter_data[0x08] & 0x0200) >> 4);
 
-		// calculate v zoom (vertical source scale)
-		const int d1v = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
-						((m_blitter_data[0x0c] & 0xc000) >> 12) |
-						((m_blitter_data[0x0a] & 0x4000) >> 10) |
-						((m_blitter_data[0x08] & 0x0200) >> 4);
+	const int d2v = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
+					((m_blitter_data[0x08] & 0x0800) >> 6);
+	const int hflagv = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
+	const int dflagv = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
+	const int indexv = d1v | (d2v << 6) | (hflagv << 12) | (dflagv << 13);
+	const float scale_v = get_scale(indexv);
 
-		const int d2v = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
-						((m_blitter_data[0x08] & 0x0800) >> 6);
-		const int hflagv = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
-		const int dflagv = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
-		const int indexv = d1v | (d2v << 6) | (hflagv << 12) | (dflagv << 13);
-		const float scale_v = get_scale(indexv);
+	if (scale_u == 0 || scale_v == 0) return;
 
-		if (scale_u == 0 || scale_v == 0) return;
-
-		scale_u_step = 100.f / scale_u;
-		scale_v_step = 100.f / scale_v;
-	}
+	scale_u_step = 100.f / scale_u;
+	scale_v_step = 100.f / scale_v;
+	
 
 	// do the draw
 	int y = dst_y0;
@@ -663,6 +653,53 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 	m_subcpu->set_input_line(1, HOLD_LINE);
 }
 
+// see code below that is used to calculate this for wheelfir set
+// as the other game ROMs are structured differently it's easier
+// to just have this table here; the zooming code could be significantly
+// refactored however
+static const uint16_t zoom_index[400] =
+{
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1801, 0x1ea1, 0x1ba1, 0x1f61, 0x19e1,
+	0x19a1, 0x1961, 0x1961, 0x1921, 0x1fe2, 0x1d62, 0x1ba2, 0x1aa2, 0x1a22, 0x1ea3,
+	0x1804, 0x1fe4, 0x1d64, 0x1fe5, 0x1ae4, 0x1d66, 0x1fe9, 0x1fec, 0x1eac, 0x181f,
+	0x0801, 0x0fe1, 0x0ea1, 0x0ca1, 0x0ba1, 0x0ae1, 0x0f61, 0x0a21, 0x09e1, 0x09e1,
+	0x09a1, 0x09a1, 0x0961, 0x0961, 0x0961, 0x0802, 0x0921, 0x0921, 0x0fe2, 0x0fa2,
+	0x0d62, 0x0c22, 0x0ba2, 0x0b22, 0x0aa2, 0x08e1, 0x0a22, 0x0fe3, 0x0ea3, 0x0d23,
+	0x0804, 0x0ba3, 0x0fe4, 0x0f24, 0x0d64, 0x0fe5, 0x0fe5, 0x0e25, 0x0ae4, 0x0fe7,
+	0x0d66, 0x0ea7, 0x0fe9, 0x0fe9, 0x0fec, 0x0ce9, 0x0eac, 0x0ff4, 0x081f, 0x0fff,
+	0x0000, 0x0fff, 0x07e0, 0x0bb6, 0x06a0, 0x0560, 0x0bbf, 0x0aba, 0x09a9, 0x0abf,
+	0x0a7f, 0x0a3f, 0x09ae, 0x09ff, 0x09b3, 0x09b7, 0x09bd, 0x09bf, 0x09bf, 0x0974,
+	0x01a0, 0x097e, 0x097f, 0x097f, 0x092d, 0x0160, 0x0931, 0x0934, 0x0938, 0x093e,
+	0x093f, 0x093f, 0x093f, 0x08a2, 0x0120, 0x08e9, 0x08ea, 0x08eb, 0x08ec, 0x08ed,
+	0x08ee, 0x08f0, 0x08f2, 0x08f4, 0x08f8, 0x08fd, 0x08ff, 0x08ff, 0x08ff, 0x08ff,
+	0x00e0, 0x00e0, 0x00e0, 0x00e0, 0x00e0, 0x00e0, 0x08a4, 0x08a4, 0x08a4, 0x08a4,
+	0x08a4, 0x08a4, 0x08a4, 0x08a4, 0x08a5, 0x08a5, 0x08a5, 0x08a5, 0x08a5, 0x08a6,
+	0x08a6, 0x08a6, 0x08a6, 0x08a6, 0x08a7, 0x08a7, 0x08a7, 0x08a8, 0x08a8, 0x08a9,
+	0x08a9, 0x08aa, 0x08aa, 0x08ab, 0x08ac, 0x08ad, 0x08ad, 0x08ae, 0x08b0, 0x08b1,
+	0x08b3, 0x08b5, 0x08b8, 0x08bc, 0x08bf, 0x08bf, 0x08bf, 0x08bf, 0x08bf, 0x00a0,
+	0x00a0, 0x2000, 0x2fff, 0x2fff, 0x27e0, 0x27e0, 0x2bb6, 0x2bb6, 0x26a0, 0x26a0,
+	0x2560, 0x2560, 0x2bbf, 0x2bbf, 0x2aba, 0x2aba, 0x29a9, 0x29a9, 0x2abf, 0x2abf,
+	0x2a7f, 0x2a7f, 0x2a3f, 0x2a3f, 0x29ae, 0x29ae, 0x29ff, 0x29ff, 0x29b3, 0x29b3,
+	0x29b7, 0x29b7, 0x29bd, 0x29bd, 0x29bf, 0x29bf, 0x29bf, 0x29bf, 0x2974, 0x2974,
+	0x21a0, 0x21a0, 0x297e, 0x297e, 0x297f, 0x297f, 0x297f, 0x297f, 0x292d, 0x292d,
+	0x2160, 0x2160, 0x2931, 0x2931, 0x2934, 0x2934, 0x2938, 0x2938, 0x293e, 0x293e,
+	0x293f, 0x293f, 0x293f, 0x293f, 0x293f, 0x293f, 0x28a2, 0x28a2, 0x2120, 0x2120,
+	0x28e9, 0x28e9, 0x28ea, 0x28ea, 0x28eb, 0x28eb, 0x28ec, 0x28ec, 0x28ed, 0x28ed,
+	0x28ee, 0x28ee, 0x28f0, 0x28f0, 0x28f2, 0x28f2, 0x28f4, 0x28f4, 0x28f8, 0x28f8,
+	0x28fd, 0x28fd, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff,
+	0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0,
+	0x20e0, 0x20e0, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4,
+	0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a5, 0x28a5,
+	0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a6, 0x28a6,
+	0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a7, 0x28a7,
+	0x28a7, 0x28a7, 0x28a7, 0x28a7, 0x28a8, 0x28a8, 0x28a8, 0x28a8, 0x28a9, 0x28a9,
+	0x28a9, 0x28a9, 0x28aa, 0x28aa, 0x28aa, 0x28aa, 0x28ab, 0x28ab, 0x28ac, 0x28ac,
+	0x28ad, 0x28ad, 0x28ad, 0x28ad, 0x28ae, 0x28ae, 0x28b0, 0x28b0, 0x28b1, 0x28b1,
+	0x28b3, 0x28b3, 0x28b5, 0x28b5, 0x28b8, 0x28b8, 0x28bc, 0x28bc, 0x28bf, 0x28bf,
+	0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x20a0, 0x20a0
+};
 
 void wheelfir_state::machine_start()
 {
@@ -673,10 +710,11 @@ void wheelfir_state::machine_start()
 		m_zoom_table[i] = -1;
 	}
 
-	uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
-
 	for (int j = 0; j < 400; ++j)
 	{
+		/*
+		// calculate index for zoom
+		uint16_t* ROM = (uint16_t*)m_maincpurom;
 		int i = j << 3;
 		int d1 = ROM[0x200 + i] & 0x1f;
 		int d0 = (ROM[0x200 + i] >> 8) & 0x1f;
@@ -688,7 +726,8 @@ void wheelfir_state::machine_start()
 		int dflag = (ROM[0x200 + 1 + i] & 0x10) ? 1 : 0;
 
 		int index = d0 | (d1 << 6) | (hflag << 12) | (dflag << 13);
-		m_zoom_table[index] = j;
+		*/
+		m_zoom_table[zoom_index[j]] = j;
 	}
 }
 
@@ -874,9 +913,7 @@ ROM_END
 
 void wheelfir_state::init_pwball()
 {
-	// temp hacks as pwball doesn't like zooming and other things (maybe different FPGA programming?)
 	m_force_extra_irq1 = true;
-	m_allow_zoom = false;
 }
 
 void wheelfir_state::init_kongball()
@@ -884,14 +921,6 @@ void wheelfir_state::init_kongball()
 	m_force_extra_irq1 = true;
 	m_disable_raster_irq = true; // the raster interrupt points outside of code
 }
-
-void wheelfir_state::init_radendur()
-{
-	m_force_extra_irq1 = true;
-	m_allow_zoom = false;
-	m_disable_raster_irq = true;
-}
-
 
 GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init,    ROT0,  "TCH", "Wheels & Fire", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, pwball,      0, wheelfir,    pwball,   wheelfir_state, init_pwball,   ROT0,  "TCH", "Power Ball (prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // mostly complete
@@ -901,4 +930,4 @@ GAME( 1997, kongball,    0, kongball,    pwball,   wheelfir_state, init_kongball
 
 // crashes (always?) when selecting track on PCB
 // some courses get to gameplay in MAME right now, but crash quickly, Medium 1 is seems to work better than most others
-GAME( 199?, radendur,    0, wheelfir,    pwball,   wheelfir_state, init_radendur, ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // can get ingame if you overclock CPUs significantly (IRQ problems?)
+GAME( 199?, radendur,    0, wheelfir,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // can get ingame if you overclock CPUs significantly (IRQ problems?)
