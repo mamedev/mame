@@ -250,7 +250,7 @@ void psr540_state::map(address_map &map)
 	map(0x00400000, 0x007fffff).rom().region("program_rom", 0);
 
 	// c00000-ffffff: cs3 space, 8 bits, cs assert extension, 3 wait states
-	map(0x00c00000, 0x00c00fff).m(m_swx00, FUNC(swx00_sound_device::map));
+	map(0x00c00000, 0x00c007ff).m(m_swx00, FUNC(swx00_sound_device::map));
 
 	// Dedicated dram space, ras precharge = 1.5, ras-cas delay 2, cas-before-ras 2.5, dram write 4, read 3, idle 0, burst, ras down, 16bits, 9-bit address
 	// Automatic refresh every 436 cycles, cas-before-ras
