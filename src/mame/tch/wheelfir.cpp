@@ -128,7 +128,8 @@ public:
 		m_blitter_data(*this, "blitram"),
 		m_tilepages(*this, "gfx1"),
 		m_adc_eoc(0),
-		m_is_pwball(false),
+		m_force_extra_irq1(false),
+		m_allow_zoom(true),
 		m_disable_raster_irq(false)
 	{ }
 
@@ -139,6 +140,7 @@ public:
 
 	void init_pwball();
 	void init_kongball();
+	void init_radendur();
 
 protected:
 	virtual void machine_start() override;
@@ -193,13 +195,15 @@ private:
 	void wheelfir_sub(address_map &map);
 	int m_adc_eoc;
 
-	bool m_is_pwball;
+	bool m_force_extra_irq1;
+	bool m_allow_zoom;
 	bool m_disable_raster_irq;
 };
 
 void wheelfir_state::wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scanline_cnt);
+	//logerror("%d: set scanline counter to %d\n", machine().describe_context(), m_scanline_cnt);
 }
 
 void wheelfir_state::do_blit()
@@ -269,7 +273,10 @@ void wheelfir_state::do_blit()
 	float scale_u_step;
 	float scale_v_step;
 
-	if (m_is_pwball)
+	// it possible/likely these games just set some of the zoom bits to change how the
+	// blit co-ordinates work, but not in a way that should cause zooming as it currently
+	// does (assuming custom chips are programmed in the same way between games)
+	if (!m_allow_zoom)
 	{
 		scale_u_step = 1.0f;
 		scale_v_step = 1.0f;
@@ -610,19 +617,38 @@ void wheelfir_state::adc_eoc_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
-	if (param < NUM_SCANLINES)
+	if (param < NUM_SCANLINES) //visible scanline
 	{
-		//visible scanline
-		m_scanline_cnt--;
+		// raster IRQ, changes scroll values for road
 
-		if ((m_scanline_cnt == 0) && (!m_disable_raster_irq))
+		// kongball has no valid raster IRQ function, and never sets the register
+		// radendur also does't appear to have a proper piece of IRQ code, but sets it to 1
+		// hack is needed to disable it in these cases, is there a proper way to disable it?
+
+		// Does the actual raster line depend on something else like the bg scroll value
+		// and trigger when the hardware reads the framebuffer for that line, rather than the
+		// screen line? The older logic worked better for Wheels and Fire, but was buffering
+		// values in a strange way rather than using partial updates.
+		//
+		// the current handling causes the intro graphics on wheelfir to be squashed as it's
+		// triggering raster IRQs that adjust the vscroll on every line
+		// the titlescreen raster rowscroll suggests that irqs should be triggered on every line
+		// but the scroll values still end up incorrect
+		if (m_scanline_cnt > 0)
 		{
-			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
+			m_scanline_cnt--;
+
+			if (m_scanline_cnt == 0)
+			{
+				if (!m_disable_raster_irq)
+					m_maincpu->set_input_line(5, HOLD_LINE); 
+			}
 		}
 
-		if ((param == 224) && m_is_pwball)
+		if ((param == 224) && m_force_extra_irq1)
 		{
-			// why, this is the blitter irq? won't boot otherwise though
+			// why, this is the blitter irq?
+			// pwball and radendur won't boot otherwise though
 			m_maincpu->set_input_line(1, HOLD_LINE);
 		}
 	}
@@ -848,14 +874,22 @@ ROM_END
 
 void wheelfir_state::init_pwball()
 {
-	// temp hack as pwball doesn't like zooming and other things (maybe different FPGA programming?)
-	m_is_pwball = true;
+	// temp hacks as pwball doesn't like zooming and other things (maybe different FPGA programming?)
+	m_force_extra_irq1 = true;
+	m_allow_zoom = false;
 }
 
 void wheelfir_state::init_kongball()
 {
-	init_pwball();
+	m_force_extra_irq1 = true;
 	m_disable_raster_irq = true; // the raster interrupt points outside of code
+}
+
+void wheelfir_state::init_radendur()
+{
+	m_force_extra_irq1 = true;
+	m_allow_zoom = false;
+	m_disable_raster_irq = true;
 }
 
 
@@ -864,5 +898,7 @@ GAME( 199?, pwball,      0, wheelfir,    pwball,   wheelfir_state, init_pwball, 
 
 // sound ROMs were missing on PCB, so sound emulation is not possible at this point in time
 GAME( 1997, kongball,    0, kongball,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH / Digital Dreams Multimedia", "Kong Ball (prototype)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // can't get ingame?
-// crashes when selecting track on PCB (sometimes gets to gameplay in MAME right now)
-GAME( 199?, radendur,    0, wheelfir,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // can get ingame if you overclock CPUs significantly (IRQ problems?)
+
+// crashes (always?) when selecting track on PCB
+// some courses get to gameplay in MAME right now, but crash quickly, Medium 1 is seems to work better than most others
+GAME( 199?, radendur,    0, wheelfir,    pwball,   wheelfir_state, init_radendur, ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // can get ingame if you overclock CPUs significantly (IRQ problems?)
