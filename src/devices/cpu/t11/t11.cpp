@@ -42,12 +42,14 @@ DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
 k1801vm1_device::k1801vm1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM1, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
 {
 	c_insn_set = IS_LEIS | IS_MXPS | IS_VM1;
 }
 
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM2, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
 {
 	c_insn_set = IS_LEIS | IS_EIS | IS_MXPS | IS_VM2;
 }
@@ -258,6 +260,7 @@ void k1801vm1_device::t11_check_irqs()
 	// 8. external HALT (nIRQ1 pin); PSW11, PSW10
 	else if (m_hlt_active)
 	{
+		m_hlt_active = 0;
 		m_mcir = MCIR_HALT;
 		m_vsel = VM1_HALT;
 	}
@@ -277,7 +280,8 @@ void k1801vm1_device::t11_check_irqs()
 	// 12. nVIRQ pin; PSW7, PSW10
 	else if (m_vec_active && !GET_I)
 	{
-		int vec = m_in_iack_func(0);
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		int vec = (intf != nullptr) ? intf->z80daisy_irq_ack() : m_in_iack_func(0);
 		if (vec == -1 || vec == 0)
 		{
 			m_vec_active = 0;

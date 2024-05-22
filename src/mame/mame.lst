@@ -2197,6 +2197,7 @@ gaia                            // (c) 1999 Noise Factory
 guwange                         // (c) 1999 Atlus/Cave
 guwanges                        // (c) 1999 Atlus/Cave
 hotdogst                        // (c) 1996 Marble
+jumbogod                        // (c) 1995 Namco / Toho
 korokoro                        // (c) 1999 Takumi
 mazinger                        // (c) 1994 Banpresto (country is in EEPROM)
 mazingerj                       // (c) 1994 Banpresto (country is in EEPROM)
@@ -41855,6 +41856,9 @@ fs3216                          //
 @source:skeleton/ft68m.cpp
 ft68m                           //
 
+@source:skeleton/ganbaremo.cpp
+ganbaremo                       // (c) ???? Shoken
+
 @source:skeleton/gem_rp.cpp
 rp200
 
@@ -42142,6 +42146,9 @@ qmsirius                        //
 
 @source:skeleton/qtsbc.cpp
 qtsbc                           //
+
+@source:skeleton/ramstar.cpp
+ramstar                         //
 
 @source:skeleton/rd100.cpp
 rd100                           //
@@ -44022,9 +44029,9 @@ speedspn                        // (c) 1994
 topdrive                        // (c) 1995
 
 @source:tch/wheelfir.cpp
-kongball						// (c) 199? TCH
-pwball							// (c) 199? TCH
-radendur						// (c) 199? TCH
+kongball                        // (c) 199? TCH
+pwball                          // (c) 199? TCH
+radendur                        // (c) 199? TCH
 wheelfir                        // (c) 199? TCH
 
 @source:teamconcepts/comquest.cpp

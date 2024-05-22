@@ -260,7 +260,7 @@ u8 st0016_cpu_device::vregs_r(offs_t offset)
 	/*
 	    $0, $1 = max scanline(including vblank)/timer? ($3e7)
 
-	    $8-$40 = bg tilemaps  (8 bytes each) :
+	    $8-$3F = bg tilemaps  (8 bytes each) :
 	               0 - ? = usually 0/20/ba*
 	               1 - 0 = disabled , !zero = address of tilemap in spriteram /$1000  (for example: 3 -> tilemap at $3000 )
 	               2 - ? = usually ff/1f/af*
@@ -270,7 +270,7 @@ u8 st0016_cpu_device::vregs_r(offs_t offset)
 	               6 - ? = 0
 	               7 - ? =$20/$10/$12*
 
-	    $40-$60 = scroll registers , X.w, Y.w
+	    $40-$5F = scroll registers , X.w, Y.w
 	*/
 
 	switch (offset)
@@ -299,27 +299,44 @@ void st0016_cpu_device::vregs_w(offs_t offset, u8 data)
 
 	   I/O ports:
 
-	    $74 x--- ---- global flip screen
-	        -xx- ---- individual flip screen x/y
-	        i.e. Mayjinsen sets 0x80, other ST0016 games 0x60.
-	        TODO: Might also be paired with $70 & $75 (setted up by Mayjinsen).
+		$60 \
+		$61 - H sync start?
+		$62 \
+		$63 - H visible start?
+		$64 \
+		$65 - H visible end >> 1?
+		$66 \
+		$67 - H total
+		$68 \
+		$69 - V sync start?
+		$6a \
+		$6b - V visible start?
+		$6c \
+		$6d - V visible end?
+		$6e \
+		$6f - V total
 
-	    $a0 \
-	    $a1 - source address >> 1
-	    $a2 /
+		$74 x--- ---- global flip screen
+			-xx- ---- individual flip screen x/y
+			i.e. Mayjinsen sets 0x80, other ST0016 games 0x60.
+			TODO: Might also be paired with $70 & $75 (setted up by Mayjinsen).
 
-	    $a3 \
-	    $a4 - destination address >> 1  (inside character ram)
-	    $a5 /
+		$a0 \
+		$a1 - source address >> 1
+		$a2 /
 
-	    $a6 \
-	    &a7 - (length inbytes - 1 ) >> 1
+		$a3 \
+		$a4 - destination address >> 1  (inside character ram)
+		$a5 /
 
-	    $a8 - 76543210
-	          ??faaaaa
+		$a6 \
+		&a7 - (length inbytes - 1 ) >> 1
 
-	          a - most sign. bits of length
-	          f - DMA start latch
+		$a8 - 76543210
+			  ??faaaaa
+
+			  a - most sign. bits of length
+			  f - DMA start latch
 
 	*/
 

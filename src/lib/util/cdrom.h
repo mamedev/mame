@@ -16,6 +16,12 @@
 #include "ioprocs.h"
 #include "osdcore.h"
 
+#include <algorithm>
+#include <string>
+#include <string_view>
+#include <system_error>
+
+
 class cdrom_file {
 public:
 	// tracks are padded to a multiple of this many frames
@@ -159,7 +165,8 @@ public:
 	static std::error_condition parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	int get_last_session() const { return cdtoc.numsessions ? cdtoc.numsessions : 1; }
 	int get_last_track() const { return cdtoc.numtrks; }
-	int get_adr_control(int track) const {
+	int get_adr_control(int track) const
+	{
 		if (track == 0xaa)
 			track = get_last_track() - 1; // use last track's flags
 		int adrctl = (CD_FLAG_ADR_START_TIME << 4) | (cdtoc.tracks[track].control_flags & 0x0f);
@@ -282,8 +289,8 @@ private:
 
 	static std::string get_file_path(std::string &path);
 	static uint64_t get_file_size(std::string_view filename);
-	static int tokenize( const char *linebuffer, int i, int linebuffersize, char *token, int tokensize );
-	static int msf_to_frames( char *token );
+	static int tokenize(const char *linebuffer, int i, int linebuffersize, char *token, int tokensize);
+	static int msf_to_frames(const char *token);
 	static uint32_t parse_wav_sample(std::string_view filename, uint32_t *dataoffs);
 	static uint16_t read_uint16(FILE *infile);
 	static uint32_t read_uint32(FILE *infile);
