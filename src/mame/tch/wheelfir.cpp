@@ -386,13 +386,13 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 	   d    DDDDDDDD   D = direct bitmap/framebuffer write port
 	7  e    --------
 	   f    yx-L??ff   y = dest_y0 bit 8 , x = dest_x0 bit 8 , L = dest layer, ?? = used but unknown, ff = Y/X direction (src?)
-	8 10    FFZzZzZz   FF = Y direction/X direction (dest), Z = y scale >200% z = x scale >200%, Z = y scala data2 bit 5, z = x scale data2 bit 5, Z = y scale data1 bit 5, z = x scale data1 bit 5
+	8 10    FFZzZzZz   FF = Y direction/X direction (dest), Z = y scale >200% z = x scale >200%, Z = y scale data2 bit 5, z = x scale data2 bit 5, Z = y scale data1 bit 5, z = x scale data1 bit 5
 	  11    Ss?-----   s = scroll x of back layer bit 8, S = scroll y of back layer bit 8, ? = set on road
 	9 12    --------
 	  13    ----YXZz   Y = dest_y1 bit 8, X = dest_x1 bit 8, Z = y scale < 50%, z = x scale < 50%
 	a 14    -Z-zzzzz   Z = y scale data1 bit 4, z = x scale data1 bits 0-4,
 	  15    ssssssss   s = scroll x of back layer
-	b 16    ZZ-zzzzz   Z = y scale data1 bits 0-1, z scale data2 bits 0-4
+	b 16    ZZ-zzzzz   Z = y scale data1 bits 0-1, z = x scale data2 bits 0-4
 	  17    SSSSSSSS   S = scroll y of back layer
 	c 18    ZZ-ZZZZZ   Z = y scale data1 bits 2-3, Z = y scale data2 bits 0-4
 	  19    --------
@@ -403,7 +403,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 	f 1e    TTTTTTTT
 	  1f    TTTTTTTT    T = start blit / trigger blit (with write of 0xffff, also writes 0x0000 before filling in some params)
 	*/
-
 
 	m_screen->update_partial(m_screen->vpos() - 1);
 	//uint16_t oldval = m_blitter_data[offset];
