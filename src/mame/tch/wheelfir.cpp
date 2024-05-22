@@ -198,6 +198,8 @@ private:
 	bool m_force_extra_irq1;
 	bool m_allow_zoom;
 	bool m_disable_raster_irq;
+
+	int m_current_yscroll;
 };
 
 void wheelfir_state::wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -414,6 +416,19 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		}
 	}
 
+	if (offset == 0xa)
+	{
+		if (!ACCESSING_BITS_8_15)  //LSB only!
+		{
+			// if the scroll value is written during the active frame, it must take into account
+			// the current yposition?? (seems to be the only way for wheelfir rasters to work?)
+			m_current_yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+			m_current_yscroll -= m_screen->vpos();
+			return;
+		}
+	}
+
+
 	if (offset == 0xf)
 	{
 		if (data == 0xffff)
@@ -436,12 +451,15 @@ void wheelfir_state::video_start()
 
 uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+//	int yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+//	printf("partial update on scanline %d with yscroll %d\n", m_screen->vpos(), yscroll);
+
 	bitmap.fill(0, cliprect);
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int scrolly = y;
-		scrolly += (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+		scrolly += m_current_yscroll;//
 		scrolly &= 0x1ff;
 		uint16_t const* const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
 		uint16_t* const dest = &bitmap.pix(y);
@@ -466,6 +484,9 @@ void wheelfir_state::screen_vblank_wheelfir(int state)
 	if (state)
 	{
 		m_tmp_bitmap[LAYER_FG]->fill(0, m_screen->visible_area());
+	}
+	else
+	{
 	}
 }
 
@@ -607,6 +628,12 @@ void wheelfir_state::adc_eoc_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
+	if (param == 0)
+	{
+		// latch the current scroll value at the top of the screen?
+		m_current_yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+	}
+
 	if (param < NUM_SCANLINES) //visible scanline
 	{
 		// raster IRQ, changes scroll values for road
@@ -620,10 +647,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 		// screen line? The older logic worked better for Wheels and Fire, but was buffering
 		// values in a strange way rather than using partial updates.
 		//
-		// the current handling causes the intro graphics on wheelfir to be squashed as it's
-		// triggering raster IRQs that adjust the vscroll on every line
-		// the titlescreen raster rowscroll suggests that irqs should be triggered on every line
-		// but the scroll values still end up incorrect
+		// currently we latch the scroll value at the start of a frame, and if it is written
+		// during a frame, we take into account the current vpos when updating it; this ALMOST
+		// seems ok the road in wheelfir, but not the background so much
+
 		if (m_scanline_cnt > 0)
 		{
 			m_scanline_cnt--;
@@ -631,7 +658,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 			if (m_scanline_cnt == 0)
 			{
 				if (!m_disable_raster_irq)
-					m_maincpu->set_input_line(5, HOLD_LINE); 
+				{
+					m_maincpu->set_input_line(5, HOLD_LINE);
+				}
 			}
 		}
 
@@ -914,6 +943,7 @@ ROM_END
 void wheelfir_state::init_pwball()
 {
 	m_force_extra_irq1 = true;
+//	m_disable_raster_irq = true;
 }
 
 void wheelfir_state::init_kongball()
