@@ -61,79 +61,6 @@ level 3 interrupt = vblank interrupt
 level 1 interrupt = blitter interrupt
 
 
-Blitter data foramt ( offset in words, offset in bytes, offset inside ram data table )
-
-
-        fedcba9876543210
-
-0  0  0
-        --------76543210    dest_x0 bits 0-7
-        76543210--------    src_u0  bits 0-7
-
-1  2  2
-        --------76543210    dest_x1 bits 0-7
-
-
-
-2  4  4
-        --------76543210    dest_y0 bits 0-7
-        76543210--------    src_v0  bits 0-7
-3  6  6
-        --------76543210    dest_y1 bits 0-7
-
-4  8
-5  a
-6  c  8
-        ??------????????    image flags (directly copied from image info table, page and ?)
-        --3210----------    image page
-        -------8--------    src_u0 bit 8
-        ------8---------    src_v0 bit 8
-7  e  a
-        ????????--?-----    flags
-        ---------------X    X direction (src?)
-        --------------Y-    Y direction (src?)
-        ---------8------    dest_x0 bit 8
-        --------8-------    dest_y0 bit 8
-        -----------L----    dest layer
-        ------------??--    unknown bits, set usually when rendering target = bitmap layer
-
-
-8 10  c
-        -------5--------    x scale data1 bit 5
-        ------5---------    y scale data1 bit 5
-        -----5----------    x scale data2 bit 5
-        ----5-----------    y scala data2 bit 5
-        ---D------------    x scale >200%
-        --D-------------    y scale >200%
-        -x--------------    X direction (dest?)
-        Y---------------    Y direction (dest?)
-        ---------8------    scroll x bit 8
-        --------8-------    scroll y bit 8
-        ----------?-----    set for road ? buffer num (is there double buffering ? or two bitmap layers?)
-
-9 12  e
-        ---------------H    x scale < 50%
-        --------------H-    y scale < 50%
-        -------------8--    dest_x1 bit 8
-        ------------8---    dest_y1 bit 8
-
-
-a 14 10
-        ---43210--------    x scale data1 bits 0-4
-        -4--------------    y scale data1 bit 4
-        --------76543210    scroll x of bitmap layer
-
-b 16 12
-        ---43210--------    x scale data2 bits 0-4
-        10--------------    y scale data1 bits 0-1
-        --------76543210    scroll y of bitmap layer
-c 18 14
-        ---43210--------    y scale data2 bits 0-4
-        32--------------    y scale data1 bits 2-3
-d 1a
-e 1c
-f 1e
-
 
 
 
@@ -441,31 +368,42 @@ void wheelfir_state::do_direct_write(uint8_t sixdat)
 void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
+	Blitter data format ( offset in words, offset in bytes )
 
-	we use u/v to refer to the x/y co-ordinates in the source page
-
-	for most things see comment at end of like
-	Z vals in table are currently being used for horizontal source zoom in wheelfir (other games unhappy with it)
-	z vals in table are currently being used for vertical source zoom ^^
-
-	00 uuuu uuuu xxxx xxxx  (u = horizontal src page co-ordinate, x = horizontal destination start)
-	01 ---- ---- XXXX XXXX  (X = horizontal destination end)
-	02 vvvv vvvv yyyy yyyy  (v = vertical src page co-ordinate, y = vertical destination start)
-	03 ---- ---- YYYY YYYY  (Y = vertical destination end)
-	04 ---- ---- ---- ----
-	05 ---- ---- ---- ----
-	06 pppp ppvu DDDD DDDD  (p = source page, u = horizontal src page co-ordinate high bit, v = vertical src page co-ordinate high bit, D = direct framebuffer write port)
-	07 ---- ---- yx-- --ff  (x = horizontal destination start high bit, y = vertical destination start high bit, ff = flipy;flipx)
-	08 FFzZ zZzZ ---- ----  (FF = vu source flip)
-	09 ---- ---- ---- YXzZ  (X = horizontal destination end high bit, Y = vertical destination end high bit)
-	0a -z-Z ZZZZ ---- ----
-	0b zz-Z ZZZZ ---- ----
-	0c zz-z zzzz ---- ----
-	0d ---- ---- ---- ----
-	0e ---- ---- ---- ----
-	0f SSSS SSSS SSSS SSSS  S = start blit trigger (write 0xffff, also writes of 0x0000 happen)
-
+	0  0    uuuuuuuu   u = src_u0 bits 0-7
+	   1    xxxxxxxx   x = dest_x0 bits 0-7
+	1  2    --------
+	   3    XXXXXXXX   X = dest_x1 bits 0-7
+	2  4    vvvvvvvv   v = src_v0 bits 0-7
+	   5    yyyyyyyy   y = dest_y0 bits 0-7
+	3  6    --------
+	   7    YYYYYYYY   Y = dest_y1 bits 0-7
+	4  8    --------
+	   9    --------
+	5  a    --------
+	   b    --------
+	6  c    --ppppvu   p = page, v = src_v0 bit 8, u = src_u0 bit 8
+	   d    DDDDDDDD   D = direct bitmap/framebuffer write port
+	7  e    --------
+	   f    yx-L??ff   y = dest_y0 bit 8 , x = dest_x0 bit 8 , L = dest layer, ?? = used but unknown, ff = Y/X direction (src?)
+	8 10    FFZzZzZz   FF = Y direction/X direction (dest), Z = y scale >200% z = x scale >200%, Z = y scala data2 bit 5, z = x scale data2 bit 5, Z = y scale data1 bit 5, z = x scale data1 bit 5
+	  11    Ss?-----   s = scroll x of back layer bit 8, S = scroll y of back layer bit 8, ? = set on road
+	9 12    --------
+	  13    ----YXZz   Y = dest_y1 bit 8, X = dest_x1 bit 8, Z = y scale < 50%, z = x scale < 50%
+	a 14    -Z-zzzzz   Z = y scale data1 bit 4, z = x scale data1 bits 0-4,
+	  15    ssssssss   s = scroll x of back layer
+	b 16    ZZ-zzzzz   Z = y scale data1 bits 0-1, z scale data2 bits 0-4
+	  17    SSSSSSSS   S = scroll y of back layer
+	c 18    ZZ-ZZZZZ   Z = y scale data1 bits 2-3, Z = y scale data2 bits 0-4
+	  19    --------
+	d 1a    --------
+	  1b    --------
+	e 1c    --------
+	  1d    --------
+	f 1e    TTTTTTTT
+	  1f    TTTTTTTT    T = start blit / trigger blit (with write of 0xffff, also writes 0x0000 before filling in some params)
 	*/
+
 
 	m_screen->update_partial(m_screen->vpos() - 1);
 	//uint16_t oldval = m_blitter_data[offset];
@@ -492,7 +430,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			logerror("%s: write to offset 0xf (blit start) but with data %04x\n", machine().describe_context(), data);
 		}
 	}
-
 }
 
 void wheelfir_state::video_start()
