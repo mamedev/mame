@@ -15831,12 +15831,12 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 
 	<!-- Game crashes MAME immediately -->
 	<software name="ininjap" supported="no">
-		<description>I-Ninja (Prototype)</description>
+		<description>I-Ninja (prototype)</description>
 		<year>2003</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="52428800">
-				<rom name="i-ninja! (unlabeled prototype) (gameboy advance, unreleased).gba" size="52428800" crc="e0cf48d9" sha1="431f9cd0c2b5976bd3362844369e6377dfda77a8"/>
+				<rom name="i-ninja (unlabeled prototype) (gameboy advance, unreleased).gba" size="52428800" crc="e0cf48d9" sha1="431f9cd0c2b5976bd3362844369e6377dfda77a8"/>
 			</dataarea>
 		</part>
 	</software>
