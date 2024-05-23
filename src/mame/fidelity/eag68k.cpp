@@ -934,28 +934,28 @@ ROM_START( feagv5 )
 	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
 ROM_END
 
-ROM_START( feagv7 ) // dumped from a repro pcb - checksum FCA0 6969
+ROM_START( feagv7 ) // also seen on a V9 - checksum F702 6863
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("6117_e3_yellow.u22", 0x00000, 0x10000, CRC(60523199) SHA1(a308eb6b782732af1ab2fd0ed8b046de7a8dd24b) )
+	ROM_LOAD16_BYTE("6117_o3_red.u19",    0x00001, 0x10000, CRC(44fbb3b0) SHA1(8bf5c7ac5801f5a656ae710c1a61b693f5314b8c) )
+ROM_END
+
+ROM_START( feagv7a ) // dumped from a repro pcb - checksum FCA0 6969
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(f2f68b63) SHA1(621e5073e9c5083ac9a9b467f3ef8aa29beac5ac) )
 	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(506b688f) SHA1(0a091c35d0f01166b57f964b111cde51c5720d58) )
 ROM_END
 
-ROM_START( feagv7a ) // PCB label 510.1136A01, dumped from a V6 - checksum 005D 6AB7
+ROM_START( feagv7b ) // PCB label 510.1136A01, dumped from a V6 - checksum 005D 6AB7
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(2fa692a9) SHA1(357fd47e97f823462e372c7b4d0730c1fa35c364) )
 	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(bceb99f0) SHA1(601869be5fb9724fe75f14d4dac58471eed6e0f4) )
 ROM_END
 
-ROM_START( feagv7b ) // checksum 00D5 6939
+ROM_START( feagv7c ) // checksum 00D5 6939
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e1_yellow.u22", 0x00000, 0x10000, CRC(44baefbf) SHA1(dbc24340d7e3013cc8f111ebb2a59169c5dcb8e8) )
 	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(951a7857) SHA1(dad21b049fd4f411a79d4faefb922c1277569c0e) )
-ROM_END
-
-ROM_START( feagv9 ) // checksum F702 6863
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("eag-v9b", 0x00000, 0x10000, CRC(60523199) SHA1(a308eb6b782732af1ab2fd0ed8b046de7a8dd24b) )
-	ROM_LOAD16_BYTE("eag-v9a", 0x00001, 0x10000, CRC(44fbb3b0) SHA1(8bf5c7ac5801f5a656ae710c1a61b693f5314b8c) )
 ROM_END
 
 ROM_START( feagv10 ) // checksum F40C 38B9
@@ -1005,7 +1005,7 @@ SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init
 SYST( 1989, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv7a,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv7b,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, feagv9,    feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-9)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv7c,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 4)", MACHINE_SUPPORTS_SAVE )
 SYST( 1990, feagv10,   feagv4,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity International", "Elite Avant Garde 2325 (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 SYST( 2001, feagv11,   feagv4,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde 2325 (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
