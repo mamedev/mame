@@ -227,8 +227,8 @@ void ganbaremo_state::ganbaremo(machine_config &config)
 	ppi2.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI2 port C out %02x\n", machine().describe_context(), data); }); // written
 
 	i8255_device &ppi3(I8255A(config, "ppi3")); // NEC D8255AC-2, DSW
-	ppi3.in_pa_callback().set([this] () { LOGPORTS("%s: PPI3 port A in\n", machine().describe_context()); return machine().rand(); });
-	ppi3.in_pb_callback().set([this] () { LOGPORTS("%s: PPI3 port B in\n", machine().describe_context()); return machine().rand(); });
+	ppi3.in_pa_callback().set([this] () { LOGPORTS("%s: PPI3 port A in\n", machine().describe_context()); return ioport("DSW0")->read(); });
+	ppi3.in_pb_callback().set([this] () { LOGPORTS("%s: PPI3 port B in\n", machine().describe_context()); return ioport("DSW1")->read(); });
 	ppi3.in_pc_callback().set([this] () { LOGPORTS("%s: PPI3 port C in\n", machine().describe_context()); return uint8_t(0); }); // doesn't seem to be read
 	ppi3.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI3 port A out %02x\n", machine().describe_context(), data); }); // doesn't seem to be written
 	ppi3.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI3 port B out %02x\n", machine().describe_context(), data); }); // doesn't seem to be written
