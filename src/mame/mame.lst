@@ -35776,6 +35776,9 @@ onlinertp                       // (c) 200? Comatel / Atata Systems
 @source:pc/ct486.cpp
 ct486                           // 1993? 486 with CS4031
 
+@source:pc/cuttherope.cpp
+cuttherope                      // (c) 2003 ICE
+
 @source:pc/dawg.cpp
 dawg
 
