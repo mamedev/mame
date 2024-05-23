@@ -924,6 +924,7 @@ ROM_START( feagv4a ) // dumped from a V2 - checksum FD5C 49AC
 	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
 ROM_END
 
+
 ROM_START( feagv5 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01 - checksum 0140 9CF2
 	ROM_LOAD16_BYTE("master_e", 0x00000, 0x10000, CRC(e424bddc) SHA1(ff03656addfe5c47f06df2efb4602f43a9e19d96) )
@@ -933,6 +934,7 @@ ROM_START( feagv5 )
 	ROM_LOAD16_BYTE("slave_e", 0x00000, 0x08000, CRC(eea4de52) SHA1(a64ca8a44b431e2fa7f00e44cab7e6aa2d4a9403) )
 	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
 ROM_END
+
 
 ROM_START( feagv7 ) // also seen on a V9 - checksum F702 6863
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -958,6 +960,13 @@ ROM_START( feagv7c ) // checksum 00D5 6939
 	ROM_LOAD16_BYTE("o1_red.u19",    0x00001, 0x10000, CRC(951a7857) SHA1(dad21b049fd4f411a79d4faefb922c1277569c0e) )
 ROM_END
 
+// feagv9 has same ROMs as feagv7
+#define rom_feagv9 rom_feagv7
+#define rom_feagv9a rom_feagv7a
+#define rom_feagv9b rom_feagv7b
+#define rom_feagv9c rom_feagv7c
+
+
 ROM_START( feagv10 ) // checksum F40C 38B9
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD32_BYTE("16", 0x00000, 0x08000, CRC(8375d61f) SHA1(e042f6f01480c59ee09a458cf34f135664479824) ) // 27c256
@@ -973,6 +982,7 @@ ROM_START( feagv11 ) // checksum F40C 38B9
 	ROM_LOAD32_BYTE("18", 0x00002, 0x08000, CRC(9341dcaf) SHA1(686bd4799e89ffaf11a813d4cf5a2aedd4c2d97a) ) // "
 	ROM_LOAD32_BYTE("19", 0x00003, 0x08000, CRC(a70c5468) SHA1(7f6b4f46577d5cfdaa84d387c7ce35d941e5bbc7) ) // "
 ROM_END
+
 
 ROM_START( premiere ) // model 6131, PCB label 510.1157A01 - checksum (2265 only) F667 4B06
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
@@ -1002,10 +1012,17 @@ SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empt
 SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-5)", MACHINE_SUPPORTS_SAVE )
+
 SYST( 1989, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv7a,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv7b,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 3)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv7c,   feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 4)", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1989, feagv9,    feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-9, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv9a,   feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-9, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv9b,   feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-9, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv9c,   feagv4,  0,      eagv9,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-9, set 4)", MACHINE_SUPPORTS_SAVE )
+
 SYST( 1990, feagv10,   feagv4,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity International", "Elite Avant Garde 2325 (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 SYST( 2001, feagv11,   feagv4,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde 2325 (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
