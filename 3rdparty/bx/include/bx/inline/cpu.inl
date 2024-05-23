@@ -70,7 +70,7 @@ namespace bx
 #if BX_COMPILER_MSVC
 		_ReadBarrier();
 #else
-		asm volatile("":::"memory");
+		__atomic_thread_fence(__ATOMIC_RELEASE);
 #endif // BX_COMPILER_*
 	}
 
@@ -79,7 +79,7 @@ namespace bx
 #if BX_COMPILER_MSVC
 		_WriteBarrier();
 #else
-		asm volatile("":::"memory");
+		__atomic_thread_fence(__ATOMIC_ACQUIRE);
 #endif // BX_COMPILER_*
 	}
 
@@ -88,7 +88,7 @@ namespace bx
 #if BX_COMPILER_MSVC
 		_ReadWriteBarrier();
 #else
-		asm volatile("":::"memory");
+		__atomic_thread_fence(__ATOMIC_ACQ_REL);
 #endif // BX_COMPILER_*
 	}
 
