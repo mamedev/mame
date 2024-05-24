@@ -476,6 +476,7 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 			return;
 
 		cycles = (snd.cycles_left >> 1);
+		snd.cycles_left &= 1;
 		uint16_t distance = 0x800 - snd.frequency_counter;
 		const uint8_t level = snd.level & 3;
 		if (cycles >= distance)
