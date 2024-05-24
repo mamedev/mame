@@ -476,6 +476,7 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 			return;
 
 		cycles = (snd.cycles_left >> 1);
+		snd.cycles_left &= 1;
 		uint16_t distance = 0x800 - snd.frequency_counter;
 		const uint8_t level = snd.level & 3;
 		if (cycles >= distance)
@@ -512,32 +513,15 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	{
 		constexpr uint8_t level_table[8] = { 0, 4, 2, 1, 3, 3, 3, 3 };
 
-		// compensate for leftover cycles
-		if (snd.cycles_left > 0)
-		{
-			if (cycles <= snd.cycles_left)
-			{
-				// Emit samples
-				snd.cycles_left -= cycles;
-				cycles = 0;
-			}
-			else
-			{
-				// Emit samples
-				cycles -= snd.cycles_left;
-				snd.cycles_left = 0;
-			}
-		}
+		// compensate for left over cycles
+		snd.cycles_left += cycles;
+		if (snd.cycles_left <= 0)
+			return;
 
-		if (cycles & 1)
-		{
-			snd.cycles_left = 1;
-		}
-		cycles >>= 1;
-		uint16_t distance = 0x800 - snd.frequency_counter;
-		const uint8_t level = level_table[snd.level];
+		cycles = (snd.cycles_left >> 1);
 		snd.cycles_left &= 1;
-
+		uint16_t      distance = 0x800 - snd.frequency_counter;
+		const uint8_t level = level_table[snd.level];
 		if (cycles >= distance)
 		{
 			cycles -= distance;
@@ -719,6 +703,9 @@ u8 agb_apu_device::wave_r(offs_t offset)
 
 u8 gameboy_sound_device::sound_r(offs_t offset)
 {
+	if ((offset >= AUD3W0) && (offset <= AUD3WF))
+		return wave_r(offset - AUD3W0);
+
 	static const uint8_t read_mask[0x40] =
 	{
 		0x80,0x3f,0x00,0xff,0xbf,0xff,0x3f,0x00,0xff,0xbf,0x7f,0xff,0x9f,0xff,0xbf,0xff,
