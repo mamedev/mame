@@ -17970,6 +17970,45 @@ ROM_START( cmtetrisd ) // this set uses a standard Z80 + PLDs
 	ROM_LOAD( "82s129.u43", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+// Korean clone PCB with Z80B, 12MHz XTAL, JFC95101G (AY clone), 5 8-DIP banks, Lattice M4A5-192/96
+// TODO: proper machine_config() without I8255s, after GFX are fixed
+ROM_START( cmtetriskr )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	// this set has the opcodes in the first half and the data in the second half.
+	// moreover, it has a simple address line swap (all taken care of in init_cmtetriskr())
+	ROM_LOAD( "tms27c010a.u2", 0x00000, 0x20000, CRC(1ccb03bd) SHA1(e0d914c4721576324da0d5f93cc152155ff40c31) )
+
+	// TODO: GFX are packed differently (interleaved if compared to other sets), need correct decoding
+	ROM_REGION( 0x200000, "graphics", 0 )
+	// these ROMs are 0xff filled but for the 0x60000 - 0x6ffff range
+	ROM_LOAD( "m27c4002.1.u59", 0x000000, 0x80000, CRC(701e81b1) SHA1(a15b660f405588559b57778fbcb908a1b9d6fba1) )
+	ROM_LOAD( "m27c4002.2.u59", 0x080000, 0x80000, CRC(ddd3b249) SHA1(ed25fe7abb83c322aba8e17c9194799d95899aa4) )
+	// these ROMs are 0xff filled but for the 0x78000 - 0x7ffff range
+	ROM_LOAD( "hn27c4096.u57",  0x100000, 0x80000, CRC(ecfbe168) SHA1(8f71fb9db2496b5663e7abcc391edabb9d360792) )
+	ROM_LOAD( "m27c4002.u58",   0x180000, 0x80000, CRC(e9edc65c) SHA1(009c814d81d22774557c0d12c4d160e57f44ceb6) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x60000, 0x00000, 0x10000 )
+	ROM_COPY( "graphics", 0xe0000, 0x10000, 0x10000 )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x178000, 0x0000, 0x8000 )
+	ROM_COPY( "graphics", 0x1f8000, 0x8000, 0x8000 )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "tms27c010a.u54", 0x0000, 0x10000, CRC(24a8b6c5) SHA1(f5b2343b1626cfe181c7b356f88c82bee57ca973) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_IGNORE(                         0x10000 )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	// not actually a PROM but it seems to contain color data. 0x00 filled but for the 0x000 - 0x3ff range,
+	// which has the same data repeated 4 times, with only one byte changed.
+	ROM_LOAD( "w27c512-45.u103", 0x0000, 0x0400, CRC(ed864ee3) SHA1(c440fd7c6f290f6c68f3cf74d2cbf0995e38d285) )
+	ROM_IGNORE(                          0xfc00 )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "palce20v8h-25pc.u65", 0x0000, 0x0157, CRC(06de0d06) SHA1(97d27f4cd8c5e0557de6217f2cbfca07b4e25ca0) )
+ROM_END
+
 
 /********************** Flaming 7, from Cyberdyne Systems, Inc. ***********************
 
@@ -19398,6 +19437,26 @@ void cmaster_state::init_cmtetrisd()
 	init_cm();
 }
 
+void cmaster_state::init_cmtetriskr()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x20000);
+
+	memcpy(&buffer[0], rom, 0x20000);
+
+	for (int i = 0; i < 0x20000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+
+	// some massaging to avoid adding yet more methods
+	for (int i = 0; i < 0x10000; i++)
+		m_decrypted_opcodes[i] = rom[i];
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] = rom[i + 0x10000];
+
+	init_cm();
+}
+
 void cmaster_state::init_ll3() // verified with ICE dump
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -20420,8 +20479,8 @@ GAME(  1991, animalhs,   0,        animalhs, animalhs, cmaster_state,  init_anim
 GAME(  1991, animalhsa,  animalhs, animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
 
 // looks like a hack of Cherry Bonus 3
-GAME(  1994, chryangl,   ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
-GAME(  1994, chryanglb,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg",           "Cherry Angel (set 2)",                                MACHINE_NOT_WORKING ) // ANGEL TL+YF 1.00 string, decrypted but hangs when betting
+GAME(  1994, chryangl,   ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                        MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
+GAME(  1994, chryanglb,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg",           "Cherry Angel (set 2)",                        MACHINE_NOT_WORKING ) // ANGEL TL+YF 1.00 string, decrypted but hangs when betting
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
@@ -20641,6 +20700,7 @@ GAMEL( 198?, cmtetris,   0,        cm,        cmtetris, cmaster_state,  init_cm,
 GAMEL( 198?, cmtetrisa,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, unencrypted, set 2)",              0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetrisb,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (+K, Canada Version, encrypted)",                   MACHINE_NOT_WORKING,                            layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
 GAMEL( 198?, cmtetrisc,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisc, ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
+GAMEL( 198?, cmtetriskr, cmtetris, chryangl,  cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, Korean bootleg)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_cmpacman ) // needs correct GFX / palette decode, then testing
 GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisd, ROT0, "bootleg (Aidonis Games)", "Tetris + Cherry Master (Aidonis Games bootleg)",                           0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
 GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )

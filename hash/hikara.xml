@@ -64,11 +64,11 @@ license:CC0-1.0
 	-->
 
 	<!-- this one has some songs programmed into it:
-	    キューティーハニー      倖田來未            Cutie Honey                 Kōda Kumi
-	    KissHug                 aiko                KissHug                     aiko
-	    さくらんぼ              大塚愛              Sakuranbo                   Ōtsuka Ai
-	    Dream Fighter           Perfume             Dream Fighter               Perfume
-	    ポリリズム              Perfume             Polyrhythm                  Perfume -->
+	    キューティーハニー              倖田來未                Cutie Honey                 Kōda Kumi
+	    KissHug                         aiko                    KissHug                     aiko
+	    さくらんぼ                      大塚愛                  Sakuranbo                   Ōtsuka Ai
+	    Dream Fighter                   Perfume                 Dream Fighter               Perfume
+	    ポリリズム                      Perfume                 Polyrhythm                  Perfume -->
 	<software name="user5" supported="no">
 		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
 		<year>2008</year>
@@ -80,6 +80,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- this one has some songs programmed into it:
+	    崖の上のポニョ                  藤岡藤巻と大橋のぞみ    Gake no Ue no Ponyo         Fujioka Fujimaki & Ōhashi Nozomi
+	    タンタンターン！                MilkyWay                Tan Tan Tān!                MilkyWay
+	    ハートのエースが出てこない      キャンディーズ          Heart no Ace ga Detekonai   Candies
+	    プリキュア5、スマイル go go!    工藤真由                PreCure 5, Smile Go Go!     Kudō Mari -->
 	<software name="user5a" cloneof="user5" supported="no">
 		<description>Hi-kara 5-song capacity user cartridge (used, with 4 songs) (Japan)</description>
 		<year>2008</year>
@@ -232,9 +237,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokemon" supported="no">
-		<description>Pocket Monsters Special</description>
+		<description>Utatte Asonde! Best Hit Pokémon</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="うたってあそんで！ベストヒットポケモン"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="r-08b0541.u1" size="0x200000" crc="8b6a6d4b" sha1="5f264bff2deedbd61d844c4f8ba4421ac598636c"/>
@@ -243,9 +249,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="ciao" supported="no">
-		<description>Ciao Special</description>
+		<description>Ciao Best Hit Cartridge</description>
 		<year>2009</year>
 		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ちゃお ベストヒットカートリッジ"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>

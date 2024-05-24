@@ -13,7 +13,7 @@
 
     In particular
     - It uses a LSI Zevio 1020 CPU + peripherals which comprises ARM926EJ-S CPU,
-      ZSP400 DPS, 3D graphics processor & 2D graphics processor
+      ZSP400 DSP, 3D graphics processor & 2D graphics processor
     - The CD controller is a Sony CXD3059AR
 
 ****************************************************************************/
@@ -23,8 +23,8 @@
 #include "cpu/arm7/arm7.h"
 #include "imagedev/cdromimg.h"
 
-#include "softlist.h"
 #include "cdrom.h"
+#include "softlist.h"
 
 
 namespace {
@@ -51,13 +51,13 @@ void vsmilpro_state::vsmilpro_map(address_map &map)
 }
 
 
-/* Input ports */
+// Input ports
 static INPUT_PORTS_START( vsmilpro )
 INPUT_PORTS_END
 
 void vsmilpro_state::vsmilpro(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	ARM9(config, m_maincpu, 150000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsmilpro_state::vsmilpro_map);
 
@@ -66,7 +66,7 @@ void vsmilpro_state::vsmilpro(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("vsmile_cd");
 }
 
-/* ROM definition */
+// ROM definition
 ROM_START( vsmilpro )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "70004.bin", 0x000000, 0x200000, CRC(b9161eac) SHA1(8d75fdeda8c4e228a0b1efd35011f9f667f9fb23) )
@@ -75,7 +75,7 @@ ROM_END
 } // anonymous namespace
 
 
-/* Driver */
+// Driver
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
-COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_IS_SKELETON )

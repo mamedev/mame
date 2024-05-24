@@ -510,8 +510,9 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
-		const uint8_t level_table[8] = {0, 4, 2, 1, 3, 3, 3, 3};
-		// compensate for left over cycles
+		constexpr uint8_t level_table[8] = { 0, 4, 2, 1, 3, 3, 3, 3 };
+
+		// compensate for leftover cycles
 		if (snd.cycles_left > 0)
 		{
 			if (cycles <= snd.cycles_left)
@@ -523,7 +524,6 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 			else
 			{
 				// Emit samples
-
 				cycles -= snd.cycles_left;
 				snd.cycles_left = 0;
 			}
@@ -553,10 +553,10 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 				snd.current_sample >>= 4;
 			}
 			snd.current_sample = (snd.current_sample & 0x0f) - 8;
-			snd.signal = level ? (snd.current_sample * level) / 4 : 0;
+			snd.signal = level ? ((snd.current_sample * level) / 4) : 0;
 
 			cycles %= distance;
-			snd.sample_reading = cycles ? false : true;
+			snd.sample_reading = !cycles;
 
 			snd.frequency_counter = snd.frequency + cycles;
 		}
@@ -750,12 +750,11 @@ u8 agb_apu_device::sound_r(offs_t offset)
 	if ((offset >= AUD3W0) && (offset <= AUD3WF))
 		return wave_r(offset - AUD3W0);
 
-	static const uint8_t read_mask[0x40] =
-		{
+	static constexpr uint8_t read_mask[0x40] = {
 			0x80, 0x3f, 0x00, 0xff, 0xbf, 0xff, 0x3f, 0x00, 0xff, 0xbf, 0x1f, 0xff, 0x1f, 0xff, 0xbf, 0xff,
 			0xff, 0x00, 0x00, 0xbf, 0x00, 0x00, 0x70, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// Make sure we are up to date.
 	m_channel->update();

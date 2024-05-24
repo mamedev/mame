@@ -2197,6 +2197,7 @@ gaia                            // (c) 1999 Noise Factory
 guwange                         // (c) 1999 Atlus/Cave
 guwanges                        // (c) 1999 Atlus/Cave
 hotdogst                        // (c) 1996 Marble
+jumbogod                        // (c) 1995 Namco / Toho
 korokoro                        // (c) 1999 Takumi
 mazinger                        // (c) 1994 Banpresto (country is in EEPROM)
 mazingerj                       // (c) 1994 Banpresto (country is in EEPROM)
@@ -18019,7 +18020,11 @@ feagv5                          //
 feagv7                          //
 feagv7a                         //
 feagv7b                         //
+feagv7c                         //
 feagv9                          //
+feagv9a                         //
+feagv9b                         //
+feagv9c                         //
 fex68k                          //
 fex68ka                         //
 fex68kb                         //
@@ -19961,6 +19966,7 @@ cmtetrisa                       //
 cmtetrisb                       //
 cmtetrisc                       //
 cmtetrisd                       //
+cmtetriskr                      //
 cmv4                            // (c) 1992 Dyna Electronics
 cmv4a                           // (c) 1992 Dyna Electronics
 cmv801                          // (c) 198? Corsica
@@ -38504,10 +38510,12 @@ rc702                           // 1979 RC702
 rc759                           // 1984 RC759
 
 @source:rm/rm380z.cpp
-rm380z                          // 1978 RM380z with COS 4.0 firmware
-rm380zhrg                       // 1978 RM380z with COS 4.0 and HRG
-rm380z34d                       // 1978 RM380z with COS 3.4 firmware and casette
-rm380z34e                       // 1978 RM380z with COS 3.4 firmware and casette
+rm380z                          // 1978 RM380z with COS 4.0/M firmware
+rm380zhrg                       // 1978 RM380z with COS 4.0/M and HRG
+rm380zf                         // 1978 RM380z with COS 4.0/F firmware
+rm380zfhrg                      // 1978 RM380z with COS 4.0/F and HRG
+rm380z34d                       // 1978 RM380z with COS 3.4/F firmware and casette
+rm380z34e                       // 1978 RM380z with COS 3.4/M firmware and casette
 rm480z                          // 1981 RM480z
 rm480za                         // 1981 RM480z
 
@@ -41855,6 +41863,9 @@ fs3216                          //
 @source:skeleton/ft68m.cpp
 ft68m                           //
 
+@source:skeleton/ganbaremo.cpp
+ganbaremo                       // (c) ???? Shoken
+
 @source:skeleton/gem_rp.cpp
 rp200
 
@@ -42142,6 +42153,9 @@ qmsirius                        //
 
 @source:skeleton/qtsbc.cpp
 qtsbc                           //
+
+@source:skeleton/ramstar.cpp
+ramstar                         //
 
 @source:skeleton/rd100.cpp
 rd100                           //
@@ -44022,9 +44036,9 @@ speedspn                        // (c) 1994
 topdrive                        // (c) 1995
 
 @source:tch/wheelfir.cpp
-kongball						// (c) 199? TCH
-pwball							// (c) 199? TCH
-radendur						// (c) 199? TCH
+kongball                        // (c) 199? TCH
+pwball                          // (c) 199? TCH
+radendur                        // (c) 199? TCH
 wheelfir                        // (c) 199? TCH
 
 @source:teamconcepts/comquest.cpp

@@ -34,13 +34,25 @@ license:CC0-1.0
 	</software>
 
 	<software name="egr2" cloneof="egr">
-		<description>Endgame ROM (ver. 2)</description>
+		<description>Endgame ROM (ver. 2, set 1)</description>
 		<year>1988</year>
 		<publisher>Saitek</publisher>
 		<sharedfeat name="compatibility" value="egr2"/>
 		<part name="extrom" interface="saitek_egr">
 			<dataarea name="rom" size="0x8000">
 				<rom name="egrii_707_u4" size="0x8000" crc="9f751516" sha1="c46053b0af55856f2a6871d4aa65b3bd0e7d865f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="egr2a" cloneof="egr">
+		<description>Endgame ROM (ver. 2, set 2)</description>
+		<year>1988</year>
+		<publisher>Saitek</publisher>
+		<sharedfeat name="compatibility" value="egr2"/>
+		<part name="extrom" interface="saitek_egr">
+			<dataarea name="rom" size="0x8000">
+				<rom name="egrii_a20" size="0x8000" crc="502ebf3e" sha1="e0662f76f2f3d62fed3087de3c673b37426049bf" />
 			</dataarea>
 		</part>
 	</software>

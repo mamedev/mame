@@ -182,7 +182,7 @@ u8 sci4_device::reset_r(offs_t slot)
 
 void sci4_device::target_w(u8 data)
 {
-	if(data == 0x11 and m_targets == 0x07)
+	if(data == 0x11 && m_targets == 0x07)
 		machine().debug_break();
 	m_targets = data;
 	u8 rx = ((((m_rx[6] << 3) | (m_rx[5] << 2) | (m_rx[4] << 1) | m_rx[3]) | ~(m_targets >> 4)) & 0xf) == 0xf;
