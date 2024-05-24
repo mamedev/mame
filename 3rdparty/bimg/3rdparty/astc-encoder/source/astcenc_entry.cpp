@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2011-2023 Arm Limited
+// Copyright 2011-2024 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -217,11 +217,13 @@ static astcenc_error validate_block_size(
 /**
  * @brief Validate flags.
  *
- * @param flags   The flags to check.
+ * @param profile   The profile to check.
+ * @param flags     The flags to check.
  *
  * @return Return @c ASTCENC_SUCCESS if validated, otherwise an error on failure.
  */
 static astcenc_error validate_flags(
+	astcenc_profile profile,
 	unsigned int flags
 ) {
 	// Flags field must not contain any unknown flag bits
@@ -237,6 +239,14 @@ static astcenc_error validate_flags(
 	if (popcount(flags & exMask) > 1)
 	{
 		return ASTCENC_ERR_BAD_FLAGS;
+	}
+
+	// Decode_unorm8 must only be used with an LDR profile
+	bool is_unorm8 = flags & ASTCENC_FLG_USE_DECODE_UNORM8;
+	bool is_hdr = (profile == ASTCENC_PRF_HDR) || (profile == ASTCENC_PRF_HDR_RGB_LDR_A);
+	if (is_unorm8 && is_hdr)
+	{
+		return ASTCENC_ERR_BAD_DECODE_MODE;
 	}
 
 	return ASTCENC_SUCCESS;
@@ -364,7 +374,7 @@ static astcenc_error validate_config(
 		return status;
 	}
 
-	status = validate_flags(config.flags);
+	status = validate_flags(config.profile, config.flags);
 	if (status != ASTCENC_SUCCESS)
 	{
 		return status;
@@ -591,7 +601,7 @@ astcenc_error astcenc_config_init(
 	}
 
 	// Flags field must not contain any unknown flag bits
-	status = validate_flags(flags);
+	status = validate_flags(profile, flags);
 	if (status != ASTCENC_SUCCESS)
 	{
 		return status;
@@ -689,6 +699,12 @@ astcenc_error astcenc_context_alloc(
 	}
 
 	ctx->bsd = aligned_malloc<block_size_descriptor>(sizeof(block_size_descriptor), ASTCENC_VECALIGN);
+	if (!ctx->bsd)
+	{
+		delete ctxo;
+		return ASTCENC_ERR_OUT_OF_MEM;
+	}
+
 	bool can_omit_modes = static_cast<bool>(config.flags & ASTCENC_FLG_SELF_DECOMPRESS_ONLY);
 	init_block_size_descriptor(config.block_x, config.block_y, config.block_z,
 	                           can_omit_modes,
@@ -698,7 +714,7 @@ astcenc_error astcenc_context_alloc(
 
 #if !defined(ASTCENC_DECOMPRESS_ONLY)
 	// Do setup only needed by compression
-	if (!(status & ASTCENC_FLG_DECOMPRESS_ONLY))
+	if (!(ctx->config.flags & ASTCENC_FLG_DECOMPRESS_ONLY))
 	{
 		// Turn a dB limit into a per-texel error for faster use later
 		if ((ctx->config.profile == ASTCENC_PRF_LDR) || (ctx->config.profile == ASTCENC_PRF_LDR_SRGB))
@@ -712,7 +728,7 @@ astcenc_error astcenc_context_alloc(
 
 		size_t worksize = sizeof(compression_working_buffers) * thread_count;
 		ctx->working_buffers = aligned_malloc<compression_working_buffers>(worksize, ASTCENC_VECALIGN);
-		static_assert((sizeof(compression_working_buffers) % ASTCENC_VECALIGN) == 0,
+		static_assert((ASTCENC_VECALIGN == 0) || ((sizeof(compression_working_buffers) % ASTCENC_VECALIGN) == 0),
 		              "compression_working_buffers size must be multiple of vector alignment");
 		if (!ctx->working_buffers)
 		{
@@ -802,6 +818,8 @@ static void compress_image(
 	int row_blocks = xblocks;
 	int plane_blocks = xblocks * yblocks;
 
+	blk.decode_unorm8 = ctxo.context.config.flags & ASTCENC_FLG_USE_DECODE_UNORM8;
+
 	// Populate the block channel weights
 	blk.channel_weight = vfloat4(ctx.config.cw_r_weight,
 	                             ctx.config.cw_g_weight,
@@ -812,7 +830,7 @@ static void compress_image(
 	auto& temp_buffers = ctx.working_buffers[thread_index];
 
 	// Only the first thread actually runs the initializer
-	ctxo.manage_compress.init(block_count);
+	ctxo.manage_compress.init(block_count, ctx.config.progress_callback);
 
 	// Determine if we can use an optimized load function
 	bool needs_swz = (swizzle.r != ASTCENC_SWZ_R) || (swizzle.g != ASTCENC_SWZ_G) ||
@@ -1137,6 +1155,7 @@ astcenc_error astcenc_decompress_image(
 	unsigned int xblocks = (image_out.dim_x + block_x - 1) / block_x;
 	unsigned int yblocks = (image_out.dim_y + block_y - 1) / block_y;
 	unsigned int zblocks = (image_out.dim_z + block_z - 1) / block_z;
+	unsigned int block_count = zblocks * yblocks * xblocks;
 
 	int row_blocks = xblocks;
 	int plane_blocks = xblocks * yblocks;
@@ -1148,8 +1167,11 @@ astcenc_error astcenc_decompress_image(
 		return ASTCENC_ERR_OUT_OF_MEM;
 	}
 
-	image_block blk;
+	image_block blk {};
 	blk.texel_count = static_cast<uint8_t>(block_x * block_y * block_z);
+
+	// Decode mode inferred from the output data type
+	blk.decode_unorm8 = image_out.data_type == ASTCENC_TYPE_U8;
 
 	// If context thread count is one then implicitly reset
 	if (ctx->thread_count == 1)
@@ -1158,7 +1180,7 @@ astcenc_error astcenc_decompress_image(
 	}
 
 	// Only the first thread actually runs the initializer
-	ctxo->manage_decompress.init(zblocks * yblocks * xblocks);
+	ctxo->manage_decompress.init(block_count, nullptr);
 
 	// All threads run this processing loop until there is no work remaining
 	while (true)
@@ -1356,6 +1378,8 @@ const char* astcenc_get_error_string(
 		return "ASTCENC_ERR_BAD_CONTEXT";
 	case ASTCENC_ERR_NOT_IMPLEMENTED:
 		return "ASTCENC_ERR_NOT_IMPLEMENTED";
+	case ASTCENC_ERR_BAD_DECODE_MODE:
+		return "ASTCENC_ERR_BAD_DECODE_MODE";
 #if defined(ASTCENC_DIAGNOSTICS)
 	case ASTCENC_ERR_DTRACE_FAILURE:
 		return "ASTCENC_ERR_DTRACE_FAILURE";

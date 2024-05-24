@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2019-2022 Arm Limited
+// Copyright 2019-2024 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -1170,7 +1170,7 @@ ASTCENC_SIMD_INLINE void store_lanes_masked(uint8_t* base, vint8 data, vmask8 ma
  */
 ASTCENC_SIMD_INLINE void print(vint8 a)
 {
-	alignas(ASTCENC_VECALIGN) int v[8];
+	alignas(32) int v[8];
 	storea(a, v);
 	printf("v8_i32:\n  %8d %8d %8d %8d %8d %8d %8d %8d\n",
 	       v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
@@ -1181,7 +1181,7 @@ ASTCENC_SIMD_INLINE void print(vint8 a)
  */
 ASTCENC_SIMD_INLINE void printx(vint8 a)
 {
-	alignas(ASTCENC_VECALIGN) int v[8];
+	alignas(32) int v[8];
 	storea(a, v);
 	printf("v8_i32:\n  %08x %08x %08x %08x %08x %08x %08x %08x\n",
 	       v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
@@ -1192,7 +1192,7 @@ ASTCENC_SIMD_INLINE void printx(vint8 a)
  */
 ASTCENC_SIMD_INLINE void print(vfloat8 a)
 {
-	alignas(ASTCENC_VECALIGN) float v[8];
+	alignas(32) float v[8];
 	storea(a, v);
 	printf("v8_f32:\n  %0.4f %0.4f %0.4f %0.4f %0.4f %0.4f %0.4f %0.4f\n",
 	       static_cast<double>(v[0]), static_cast<double>(v[1]),

@@ -359,9 +359,9 @@ struct vmask4
 	/**
 	 * @brief Get the scalar from a single lane.
 	 */
-	template <int32_t l> ASTCENC_SIMD_INLINE uint32_t lane() const
+	template <int32_t l> ASTCENC_SIMD_INLINE bool lane() const
 	{
-		return vgetq_lane_u32(m, l);
+		return vgetq_lane_u32(m, l) != 0;
 	}
 
 	/**

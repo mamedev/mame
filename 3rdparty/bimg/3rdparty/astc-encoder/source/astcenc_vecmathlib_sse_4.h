@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2019-2022 Arm Limited
+// Copyright 2019-2023 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -379,9 +379,9 @@ struct vmask4
 	/**
 	 * @brief Get the scalar value of a single lane.
 	 */
-	template <int l> ASTCENC_SIMD_INLINE float lane() const
+	template <int l> ASTCENC_SIMD_INLINE bool lane() const
 	{
-		return _mm_cvtss_f32(_mm_shuffle_ps(m, m, l));
+		return _mm_cvtss_f32(_mm_shuffle_ps(m, m, l)) != 0.0f;
 	}
 
 	/**
