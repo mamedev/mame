@@ -190,6 +190,7 @@ public:
 	void init_cmpacmanb();
 	void init_cmtetrisc();
 	void init_cmtetrisd();
+	void init_cmtetriskr();
 	void init_ll3();
 	void init_cmfb55();
 	void init_hamhouse();
