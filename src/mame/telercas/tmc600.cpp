@@ -100,13 +100,13 @@ Notes:
 
     TODO
 
-	- screen update is too fast
-	- cursor on text should blink as dark blue
-	- PRWNOISE and PRBEEP return wrong values
-	- CDP1869 white noise
+    - screen update is too fast
+    - cursor on text should blink as dark blue
+    - PRWNOISE and PRBEEP return wrong values
+    - CDP1869 white noise
     - connect expansion bus
-	- series I ROMs
-	- DOS ROMs
+    - series I ROMs
+    - DOS ROMs
 
 */
 
@@ -184,7 +184,7 @@ QUICKLOAD_LOAD_MEMBER(tmc600_state::quickload_cb)
 	image.fseek(0x5, SEEK_SET);
 	image.fread(program.get_write_ptr(0x6181), 4); // DEFUS and EOP
 	image.fread(program.get_write_ptr(0x6192), 4); // STRING and ARRAY
-	
+
 	image.fseek(0x9, SEEK_SET);
 	image.fread(program.get_write_ptr(0x6199), 2); // EOD
 

@@ -37,21 +37,21 @@
     RST6.5  8212 INT
     RST7.5  DMA EOP
 
-	Models:
+    Models:
 
-	M1: 1x 160KB floppy
-	M2: 2x 160KB floppy
-	M3: 1x 320KB floppy (96 tpi, single sided)
-	M4: 2x 320KB floppy
-	M5: 1x 640KB floppy (96 tpi, double sided)
-	M6: 2x 640KB floppy
-	M7: 1x 640KB floppy + 5MB hard disk
-	M4G: 2x 320KB floppy + GDC
-	M6G: 2x 640KB floppy + GDC
-	M7G: 1x 640KB floppy + 5MB hard disk + GDC
+    M1: 1x 160KB floppy
+    M2: 2x 160KB floppy
+    M3: 1x 320KB floppy (96 tpi, single sided)
+    M4: 2x 320KB floppy
+    M5: 1x 640KB floppy (96 tpi, double sided)
+    M6: 2x 640KB floppy
+    M7: 1x 640KB floppy + 5MB hard disk
+    M4G: 2x 320KB floppy + GDC
+    M6G: 2x 640KB floppy + GDC
+    M7G: 1x 640KB floppy + 5MB hard disk + GDC
 
 
-	./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
+    ./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
 
 */
 
@@ -59,7 +59,7 @@
 
     TODO:
 
-	- M7 boot floppy
+    - M7 boot floppy
     - accurate video timing
     - PCB layouts
     - NEC uPD7201 MPSC
@@ -214,7 +214,7 @@ uint8_t mm1_state::sasi_status_r(offs_t offset)
 	data |= m_sasi->cd_r() << 3;
 	data |= m_sasi->req_r() << 4;
 	data |= m_sasi->io_r() << 5;
-	
+
 	//LOG("%s SASI STATUS %02x\n",machine().describe_context(),data);
 
 	return data;
@@ -271,7 +271,7 @@ uint8_t mm1_state::sasi_ior3_r(offs_t offset)
 	{
 		data = m_fdc->dma_r();
 	}
-	
+
 	return data;
 }
 
@@ -298,7 +298,7 @@ void mm1_state::sasi_bsy_w(int state)
 void mm1_state::sasi_req_w(int state)
 {
 	if (!state)
-	{		
+	{
 		m_sasi->ack_w(0);
 	}
 

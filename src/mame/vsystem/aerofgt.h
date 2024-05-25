@@ -82,7 +82,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device_array<vsystem_spr2_device, 2> m_spr_old;
-	
+
 	// memory pointers
 	optional_shared_ptr_array<uint16_t, 2> m_vram;
 	optional_shared_ptr<uint16_t> m_rasterram;

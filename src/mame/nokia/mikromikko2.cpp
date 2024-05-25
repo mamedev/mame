@@ -2,32 +2,32 @@
 // copyright-holders:Curt Coder
 /*
 
-	Models:
+    Models:
 
-	M13A: Floppy drive 5.25", 320 KB + memory 128 KB
-	M13B: Floppy drive 5.25", 320 KB + memory 256 KB
-	M13C: Floppy drive 5.25", 320 KB + memory 512 KB
-	M13D: Floppy drive 5.25", 320 KB + memory 768 KB
-	M14A: 2 floppy drives 5.25", 320 KB + memory 128 KB
-	M14B: 2 floppy drives 5.25", 320 KB + memory 256 KB
-	M14C: 2 floppy drives 5.25", 320 KB + memory 512 KB
-	M14D: 2 floppy drives 5.25", 320 KB + memory 768 KB
-	M15A: Floppy drive 5.25", 640 KB + memory 128 KB
-	M15B: Floppy drive 5.25", 640 KB + memory 256 KB
-	M15C: Floppy drive 5.25", 640 KB + memory 512 KB
-	M15D: Floppy drive 5.25", 640 KB + memory 768 KB
-	M16A: 2 floppy drives 5.25", 640 KB + memory 128 KB
-	M16B: 2 floppy drives 5.25", 640 KB + memory 256 KB
-	M16C: 2 floppy drives 5.25", 640 KB + memory 512 KB
-	M16D: 2 floppy drives 5.25", 640 KB + memory 768 KB
-	M25B: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 5 MB + memory 256 KB
-	M25C: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 5 MB + memory 512 KB
-	M25D: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 5 MB + memory 768 KB
-	M35B: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 256 KB
-	M35C: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 512 KB
-	M35D: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 768 KB
+    M13A: Floppy drive 5.25", 320 KB + memory 128 KB
+    M13B: Floppy drive 5.25", 320 KB + memory 256 KB
+    M13C: Floppy drive 5.25", 320 KB + memory 512 KB
+    M13D: Floppy drive 5.25", 320 KB + memory 768 KB
+    M14A: 2 floppy drives 5.25", 320 KB + memory 128 KB
+    M14B: 2 floppy drives 5.25", 320 KB + memory 256 KB
+    M14C: 2 floppy drives 5.25", 320 KB + memory 512 KB
+    M14D: 2 floppy drives 5.25", 320 KB + memory 768 KB
+    M15A: Floppy drive 5.25", 640 KB + memory 128 KB
+    M15B: Floppy drive 5.25", 640 KB + memory 256 KB
+    M15C: Floppy drive 5.25", 640 KB + memory 512 KB
+    M15D: Floppy drive 5.25", 640 KB + memory 768 KB
+    M16A: 2 floppy drives 5.25", 640 KB + memory 128 KB
+    M16B: 2 floppy drives 5.25", 640 KB + memory 256 KB
+    M16C: 2 floppy drives 5.25", 640 KB + memory 512 KB
+    M16D: 2 floppy drives 5.25", 640 KB + memory 768 KB
+    M25B: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 5 MB + memory 256 KB
+    M25C: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 5 MB + memory 512 KB
+    M25D: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 5 MB + memory 768 KB
+    M35B: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 256 KB
+    M35C: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 512 KB
+    M35D: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 768 KB
 
-	./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
+    ./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
 
 */
 
@@ -155,7 +155,7 @@ void mm2_state::mm2(machine_config &config)
 	PIC8259(config, m_pic);
 
 	PIT8253(config, m_pit);
-	
+
 	I8274(config, m_mpsc, 16_MHz_XTAL/4);
 
 	X2212(config, m_novram);
@@ -213,10 +213,10 @@ ROM_START( mm2m35d )
 
 	ROM_REGION( 0x2000, "attr", 0 )
 	ROM_LOAD( "9026a.ic26", 0x0000, 0x2000, CRC(fe1da600) SHA1(3a5512b08d8f7bb5a0ff3f50bcf33de649a0489d) )
-	
+
 	ROM_REGION( 0x100, "timing", 0 )
 	ROM_LOAD( "739025b.ic8", 0x000, 0x100, CRC(c538b10a) SHA1(9810732a52ee6b8313d27462b27acc7e4d5badeb) )
-	
+
 	ROM_REGION( 0x400, "keyboard", 0 )
 	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
 ROM_END

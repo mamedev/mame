@@ -7346,7 +7346,7 @@ ROM_START( theglobpa )
 	ROM_LOAD( "63s141.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
 	ROM_LOAD( "63s141.3m",    0x0100, 0x0100, CRC(2ee34ade) SHA1(7cd43283b9648feb9a15466212b7a480fad20a39) ) // Timing - not used
 
-        ROM_REGION( 0x0800, "extra", 0 )
+	ROM_REGION( 0x0800, "extra", 0 )
 	ROM_LOAD( "top-2716.bin", 0x0000, 0x0800, CRC(25e74cd5) SHA1(dcee1fda9abe7fdeac3a87ef7897afda946efcb2) ) // EPROM on a subboard configured to replace a BPROM
 ROM_END
 

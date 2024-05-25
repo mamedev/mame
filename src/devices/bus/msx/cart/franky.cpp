@@ -61,7 +61,7 @@ void msx_cart_franky_device::device_add_mconfig(machine_config &config)
 	m_vdp->set_is_pal(false);
 	m_vdp->n_int().set(*this, FUNC(msx_cart_franky_device::irq_out));
 	// There is no NMI signal on the cartridge slot, so no way to hook this up
-//	m_vdp->n_nmi().set_inputline(maincpu, INPUT_LINE_NMI);
+	//m_vdp->n_nmi().set_inputline(maincpu, INPUT_LINE_NMI);
 	m_vdp->add_route(ALL_OUTPUTS, "franky", 1.00);
 }
 

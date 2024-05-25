@@ -4,16 +4,16 @@
     I2C HLE mix-in
     by R. Belmont
 
-	A mix-in to allow devices to speak I2C without reimplementing
-	the protocol themselves.
+    A mix-in to allow devices to speak I2C without reimplementing
+    the protocol themselves.
 
-	If the device returns data over I2C, override read_data.
-	If the device is written data over I2C, override write_data.
-	If you want the mix-in's logging to show your device name, override
-	get_tag() with something that just returns your tag().
+    If the device returns data over I2C, override read_data.
+    If the device is written data over I2C, override write_data.
+    If you want the mix-in's logging to show your device name, override
+    get_tag() with something that just returns your tag().
 
-	This mix-in will auto-increment the address on repeated reads/writes,
-	it's up to your class that consumes this mix-in
+    This mix-in will auto-increment the address on repeated reads/writes,
+    it's up to your class that consumes this mix-in
 */
 
 #include "emu.h"

@@ -1631,7 +1631,7 @@ tests: $(REGTESTS)
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
 ifeq (posix,$(SHELLTYPE))
-	$(SILENT) find src \( \
+	$(SILENT)- find src \( \
 		-name \*.c -o -name \*.cpp -o \
 		-name \*.h -o -name \*.hpp -o -name \*.hxx -o \
 		-name \*.ipp -o \
@@ -1639,10 +1639,10 @@ ifeq (posix,$(SHELLTYPE))
 		-name \*.lay -o \
 		-name \*.lst \
 		\) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT) find hash    \( -name \*.hsi -o -name \*.xml  \) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT) find bgfx    \( -name \*.json                 \) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT) find plugins \( -name \*.lua -o -name \*.json \) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT) find scripts \( -name \*.lua                  \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find hash    \( -name \*.hsi -o -name \*.xml  \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find bgfx    \( -name \*.json                 \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find plugins \( -name \*.lua -o -name \*.json \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find scripts \( -name \*.lua                  \) -print0 | xargs -0 -n 20 ./srcclean >&2
 else
 	$(shell for /r src     %%i in (*.c, *.cpp, *.h, *.hpp, *.hxx, *.ipp, *.mm, *.lay, *.lst) do srcclean %%i >&2 )
 	$(shell for /r hash    %%i in (*.hsi, *.xml)  do srcclean %%i >&2 )

@@ -25,7 +25,7 @@
 #include "video/crt9212.h"
 
 #define I80186_TAG      "maincpu"
-#define UPD765_TAG	    "upd765"
+#define UPD765_TAG      "upd765"
 #define SCREEN_TAG      "screen"
 
 class mm2_state : public driver_device

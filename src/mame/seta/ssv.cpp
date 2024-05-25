@@ -402,11 +402,11 @@ uint16_t ssv_state::fake_r(offs_t offset) { return m_scroll[offset]; }
 
 void ssv_state::ssv_map(address_map &map, u32 rom)
 {
-	map(0x000000, 0x00ffff).ram().share(m_mainram);                                                                  //  RAM    
+	map(0x000000, 0x00ffff).ram().share(m_mainram);                                                                  //  RAM
 	map(0x100000, 0x13ffff).ram().share(m_spriteram);                                                                //  Sprites
 	map(0x140000, 0x15ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                      //  Palette
-	map(0x160000, 0x17ffff).ram();                                                                                   //         
-	map(0x1c0000, 0x1c007f).ram().w(FUNC(ssv_state::scroll_w)).share(m_scroll);                                      //  Scroll 
+	map(0x160000, 0x17ffff).ram();                                                                                   //
+	map(0x1c0000, 0x1c007f).ram().w(FUNC(ssv_state::scroll_w)).share(m_scroll);                                      //  Scroll
 	map(0x1c0000, 0x1c0001).r(FUNC(ssv_state::vblank_r));                                                            //  Vblank?
 	map(0x210002, 0x210003).portr("DSW1");
 	map(0x210004, 0x210005).portr("DSW2");
@@ -417,9 +417,9 @@ void ssv_state::ssv_map(address_map &map, u32 rom)
 	map(0x210010, 0x210011).nopw();
 	map(0x230000, 0x230071).writeonly().share(m_irq_vectors);                                                        //  IRQ Vec
 	map(0x240000, 0x240071).w(FUNC(ssv_state::irq_ack_w));                                                           //  IRQ Ack
-	map(0x260000, 0x260001).w(FUNC(ssv_state::irq_enable_w));                                                        //  IRQ En 
-	map(0x300000, 0x30007f).rw(m_ensoniq, FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);    //  Sound  
-	map(rom, 0xffffff).rom().region("maincpu", 0);                                                                   //  ROM    
+	map(0x260000, 0x260001).w(FUNC(ssv_state::irq_enable_w));                                                        //  IRQ En
+	map(0x300000, 0x30007f).rw(m_ensoniq, FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);    //  Sound
+	map(rom, 0xffffff).rom().region("maincpu", 0);                                                                   //  ROM
 }
 
 /***************************************************************************
@@ -3416,7 +3416,7 @@ ROM_START( janjans2 )
 	ROM_LOAD16_BYTE( "jan2-proh.u27", 0x200001, 0x080000, CRC(fcd5da62) SHA1(e0243e41e4ec25e82b0316f1189ed069c369e7b1) )
 	ROM_RELOAD(                       0x300001, 0x080000)
 
-	ROM_REGION( 0x2000000, "sprites", 0 )  
+	ROM_REGION( 0x2000000, "sprites", 0 )
 	ROM_LOAD( "jan2-a0.u13", 0x0000000, 0x400000, CRC(37869bea) SHA1(6259e8584775ca702ef4e9e460c6d874980ffecb) )
 	ROM_LOAD( "jan2-a1.u14", 0x0400000, 0x400000, CRC(8189e74f) SHA1(ea083a7ef0858dac59e14a77f10a9900b20447f3) )
 
@@ -3528,7 +3528,7 @@ ROM_START( keithlcy )
 	ROM_LOAD16_BYTE( "kl-p0l.u26",   0x100000, 0x080000, CRC(d7b177fb) SHA1(2a3533b952a7b2404720916662743c144e870c0b) )
 	ROM_LOAD16_BYTE( "kl-p0h.u27",   0x100001, 0x080000, CRC(9de7add4) SHA1(16f4405b12734cb6a83cff8be21d03bb3c2e2266) )
 
-	ROM_REGION( 0x800000, "sprites", 0 ) 
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "vg002-01.u13", 0x000000, 0x200000, CRC(b44d85b2) SHA1(cf78d46f9f2594a23af08a898afbf5dd609abcec) )
 	ROM_LOAD( "vg002-02.u16", 0x200000, 0x200000, CRC(aa05fd14) SHA1(9144e9668788fcd45bd6c8464f9b4f865397f783) )
 	ROM_LOAD( "vg002-03.u21", 0x400000, 0x200000, CRC(299a8a7d) SHA1(b24d8ffba01d345f48f47f92e58e9b2a9ec62526) )
@@ -3657,7 +3657,7 @@ ROM_START( meosism )
 	ROM_LOAD16_BYTE( "s15-2-2.u47", 0x000000, 0x080000, CRC(2ab0373f) SHA1(826aec3b9698ec5db5d7a72c3a24b1ef779fb227) )
 	ROM_LOAD16_BYTE( "s15-2-1.u46", 0x000001, 0x080000, CRC(a4bce148) SHA1(17ec4d91e215bd38258329b1a71e7f135c5733ad) )
 
-	ROM_REGION( 0x800000, "sprites", 0 ) 
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "s15-1-7.u7", 0x000000, 0x200000, CRC(ec5023cb) SHA1(3406f5143a40c8dcd2d45b44ea91c737810ab05b) )
 	ROM_LOAD( "s15-1-8.u6", 0x200000, 0x200000, CRC(f04b0836) SHA1(83678427cd0ed0d68ff770baa2693226b391f6c8) )
 	ROM_LOAD( "s15-1-5.u9", 0x400000, 0x200000, CRC(c0414b97) SHA1(3ca8423e04f606981d158065e38431f2509e1daa) )
@@ -3706,7 +3706,7 @@ ROM_START( mslider )
 	ROM_LOAD16_BYTE( "ms-pl.bin", 0x000000, 0x080000, CRC(70b2a05d) SHA1(387cf67e3e505c4cc1b5cd0b6c9fb3bc27d07e24) )
 	ROM_LOAD16_BYTE( "ms-ph.bin", 0x000001, 0x080000, CRC(34a64e9f) SHA1(acf3d8490f3ec99b6171e71328a991fcc9c5a8b1) )
 
-	ROM_REGION( 0xa00000, "sprites", ROMREGION_ERASE00 ) 
+	ROM_REGION( 0xa00000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "ms-a0.bin", 0x000000, 0x200000, CRC(7ed38ccc) SHA1(9c584a5f6b3aad8646d155a56e4070cfed4af540) )
 	ROM_LOAD( "ms-a1.bin", 0x200000, 0x080000, CRC(83f5995f) SHA1(33ae99a96702d4aba422eaf454b86c96aaf88426) )
 

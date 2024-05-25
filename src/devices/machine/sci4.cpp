@@ -203,7 +203,7 @@ void sci4_device::tx_set(int chan, int state)
 		for(u32 i=0; i != 4; i++)
 			if((m_targets & (1<<i)))
 				m_tx[i+3](state);
-		
+
 }
 
 void sci4_device::fifo_w(int chan, u8 data)

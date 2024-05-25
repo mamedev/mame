@@ -24171,7 +24171,7 @@ Bombs: An amusing little desktop game.
 		<description>Electronics Principles 3.0</description>
 		<year>1997</year>
 		<publisher>EPT Educational Software</publisher>
-		
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="effbf2c7" sha1="3462a6fbc29dd0b5059c58e503cae3b0c2c75169"/>
@@ -24201,19 +24201,19 @@ Bombs: An amusing little desktop game.
 		<description>HP DeskJet -kirjoitinohjelmisto DeskJet 600- ja 660C -kirjoittimille (Fin)</description>
 		<year>1995</year>
 		<publisher>Hewlett-Packard</publisher>
-		
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="c2184-10016.img" size="1474560" crc="601c263d" sha1="d7e8d4892a519aad964dd5f3b08fe73a9ebc066a"/>
 			</dataarea>
 		</part>
-		
+
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="c2184-10017.img" size="1474560" crc="6d69fd64" sha1="a3b11e36a0e5345a50ecebe15f0fa372bb5baf0d"/>
 			</dataarea>
 		</part>
-		
+
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="c2184-10018.img" size="1474560" crc="3e99bc78" sha1="2a9aa6bea9ca7f6197d53aa9c2cf2546c8c2e1ab"/>

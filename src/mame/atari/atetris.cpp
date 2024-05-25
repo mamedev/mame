@@ -217,16 +217,16 @@ protected:
 class atetris_m5205_state : public atetris_mcu_state
 {
 public:
-    atetris_m5205_state(const machine_config &mconfig, device_type type, const char *tag) :
-        atetris_mcu_state(mconfig, type, tag),
-        m_msm(*this, "msm")
-    {
-    }
+	atetris_m5205_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atetris_mcu_state(mconfig, type, tag),
+		m_msm(*this, "msm")
+	{
+	}
 
-    void atetb5205(machine_config &config);
+	void atetb5205(machine_config &config);
 
 private:
-    required_device<msm5205_device> m_msm;
+	required_device<msm5205_device> m_msm;
 };
 
 
@@ -920,7 +920,7 @@ The OKI M5205 is on a separate subboard connected on the "ROM B" socket of the m
   | ________________   __________                 |
   || 27C512        |  |MC14040BCP                 |
   ||               |     ____         _______     |
-  ||_______________|    400 Osc      |MC1741CP1   |       
+  ||_______________|    400 Osc      |MC1741CP1   |
   | ________________   __________                 |
   || 27C512        |  |OKI M5205|                 |
   ||               |                              |

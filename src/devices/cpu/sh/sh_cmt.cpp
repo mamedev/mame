@@ -171,7 +171,7 @@ void sh_cmt_device::cor_w(int reg, u16 data, u16 mem_mask)
 
 void sh_cmt_device::clock_start(int clk)
 {
-	//	logerror("start clock %d %dHz\n", clk, (m_cpu->clock() >> (3 + 2*BIT(m_csr[clk], 0, 2))) / (m_cor[clk] + 1));
+	//logerror("start clock %d %dHz\n", clk, (m_cpu->clock() >> (3 + 2*BIT(m_csr[clk], 0, 2))) / (m_cor[clk] + 1));
 	compute_next_event(clk);
 }
 

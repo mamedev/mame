@@ -11523,7 +11523,7 @@ license:CC0-1.0
 			<dataarea name="sprites" size="0x2000000">
 				<rom loadflag="load16_byte" name="teot-b3-c1.bin" offset="0x0000000" size="0x1000000" crc="f183c0a2" sha1="d28055f79d56f915a803ab1c1b08f08b3eaaf1fe" />
 				<rom loadflag="load16_byte" name="teot-b3-c2.bin" offset="0x0000001" size="0x1000000" crc="93f47c21" sha1="9bb37e45fac53d6be67f6f6e1c9c662d73f7556e" />
-			</dataarea>	
+			</dataarea>
 		</part>
 	</software>
 
@@ -11638,10 +11638,10 @@ license:CC0-1.0
 				<rom offset="0x000000" size="0x010000" name="dod-m1.bin" crc="fb945087" sha1="a2bae6907bf02c93068f9ee23409506277c8a027" />
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x1000000">
-				<rom name="dod-v1.bin" offset="0x000000" size="0x400000" crc="8ab79ed9" sha1="8b1d2ade7494a81b9fa79763aaa54bbf7f4cf394" /> 
-				<rom name="dod-v2.bin" offset="0x400000" size="0x400000" crc="9aae5145" sha1="b218b47eafe8a5d25cbfadbd685de1b291c23af2" /> 
-				<rom name="dod-v3.bin" offset="0x800000" size="0x400000" crc="9ad3e804" sha1="8f309e64b8582aad0f9f3258dee0d96f2c04f7e4" /> 
-				<rom name="dod-v4.bin" offset="0xc00000" size="0x400000" crc="9ad3e804" sha1="8f309e64b8582aad0f9f3258dee0d96f2c04f7e4" /> 
+				<rom name="dod-v1.bin" offset="0x000000" size="0x400000" crc="8ab79ed9" sha1="8b1d2ade7494a81b9fa79763aaa54bbf7f4cf394" />
+				<rom name="dod-v2.bin" offset="0x400000" size="0x400000" crc="9aae5145" sha1="b218b47eafe8a5d25cbfadbd685de1b291c23af2" />
+				<rom name="dod-v3.bin" offset="0x800000" size="0x400000" crc="9ad3e804" sha1="8f309e64b8582aad0f9f3258dee0d96f2c04f7e4" />
+				<rom name="dod-v4.bin" offset="0xc00000" size="0x400000" crc="9ad3e804" sha1="8f309e64b8582aad0f9f3258dee0d96f2c04f7e4" />
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="dod-c1.bin" offset="0x000000" size="0x1400000" crc="050ee046" sha1="ca5a02ba92f7bdbedbb7c0c881eb3cf454140918" />

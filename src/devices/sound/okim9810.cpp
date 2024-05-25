@@ -664,7 +664,7 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 			if (m_phrase_count > 0)
 			{
 				offs_t startAddr, endAddr;
-				uint8_t	startFlags = rom.read_byte(m_phrase_offset++);
+				uint8_t startFlags = rom.read_byte(m_phrase_offset++);
 				m_phrase_count--;
 				if (!BIT(startFlags, 7))
 				{

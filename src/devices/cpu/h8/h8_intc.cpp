@@ -297,7 +297,7 @@ u8 h8h_intc_device::isr_r()
 void h8h_intc_device::isr_w(u8 data)
 {
 	m_isr &= data; // edge/level
-	//	logerror("isr = %02x / %02x\n", data, m_isr);
+	//logerror("isr = %02x / %02x\n", data, m_isr);
 	check_level_irqs(false);
 	update_irq_state();
 }

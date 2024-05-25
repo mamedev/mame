@@ -1829,7 +1829,7 @@ static INPUT_PORTS_START( jumbogod )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2   ) PORT_NAME( "Nissen Kougeki (Atomic Breath) 1" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4   ) PORT_NAME( "Nissen Kougeki (Atomic Breath) 2" )
 	PORT_BIT( 0xC0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END 
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppsatan )
 	PORT_START("SYSTEM")   // $200000
@@ -5574,7 +5574,7 @@ GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_z80_state, init_pwrin
 GAME( 1994, mazinger,   0,        mazinger, cave,     cave_z80_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE ) // 1994/06/27 08:00
 GAME( 1994, mazingerj,  mazinger, mazinger, cave,     cave_z80_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE ) // 1994/06/27 08:00
 
-GAME( 1995, jumbogod,   0,        jumbogod, jumbogod, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Jumbo Godzilla", MACHINE_SUPPORTS_SAVE ) 
+GAME( 1995, jumbogod,   0,        jumbogod, jumbogod, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Jumbo Godzilla", MACHINE_SUPPORTS_SAVE )
 
 // Version/Date string is stored at 68000 ROM 0x400-0x41f
 GAME( 1995, donpachi,   0,        donpachi, cave,     cave_state,     init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",                     MACHINE_SUPPORTS_SAVE ) // Ver.1.12 1995/05/2x XXXXX

@@ -299,44 +299,44 @@ void st0016_cpu_device::vregs_w(offs_t offset, u8 data)
 
 	   I/O ports:
 
-		$60 \
-		$61 - H sync start?
-		$62 \
-		$63 - H visible start?
-		$64 \
-		$65 - H visible end >> 1?
-		$66 \
-		$67 - H total
-		$68 \
-		$69 - V sync start?
-		$6a \
-		$6b - V visible start?
-		$6c \
-		$6d - V visible end?
-		$6e \
-		$6f - V total
+	    $60 \
+	    $61 - H sync start?
+	    $62 \
+	    $63 - H visible start?
+	    $64 \
+	    $65 - H visible end >> 1?
+	    $66 \
+	    $67 - H total
+	    $68 \
+	    $69 - V sync start?
+	    $6a \
+	    $6b - V visible start?
+	    $6c \
+	    $6d - V visible end?
+	    $6e \
+	    $6f - V total
 
-		$74 x--- ---- global flip screen
-			-xx- ---- individual flip screen x/y
-			i.e. Mayjinsen sets 0x80, other ST0016 games 0x60.
-			TODO: Might also be paired with $70 & $75 (setted up by Mayjinsen).
+	    $74 x--- ---- global flip screen
+	        -xx- ---- individual flip screen x/y
+	        i.e. Mayjinsen sets 0x80, other ST0016 games 0x60.
+	        TODO: Might also be paired with $70 & $75 (setted up by Mayjinsen).
 
-		$a0 \
-		$a1 - source address >> 1
-		$a2 /
+	    $a0 \
+	    $a1 - source address >> 1
+	    $a2 /
 
-		$a3 \
-		$a4 - destination address >> 1  (inside character ram)
-		$a5 /
+	    $a3 \
+	    $a4 - destination address >> 1  (inside character ram)
+	    $a5 /
 
-		$a6 \
-		&a7 - (length inbytes - 1 ) >> 1
+	    $a6 \
+	    &a7 - (length inbytes - 1 ) >> 1
 
-		$a8 - 76543210
-			  ??faaaaa
+	    $a8 - 76543210
+	          ??faaaaa
 
-			  a - most sign. bits of length
-			  f - DMA start latch
+	          a - most sign. bits of length
+	          f - DMA start latch
 
 	*/
 
