@@ -52,20 +52,12 @@ void fromanc2_base_state::portselect_w(uint16_t data)
 
 uint16_t fromanc2_base_state::keymatrix_r()
 {
-	uint16_t ret;
+	uint16_t ret = 0xffff;
 
-	switch (m_portselect)
-	{
-		case 0x01:  ret = m_in_key[0]->read(); break;
-		case 0x02:  ret = m_in_key[1]->read(); break;
-		case 0x04:  ret = m_in_key[2]->read(); break;
-		case 0x08:  ret = m_in_key[3]->read(); break;
-		default:
-			ret = 0xffff;
-			if (!machine().side_effects_disabled())
-				logerror("PC:%08X unknown %02X\n", m_maincpu->pc(), m_portselect);
-			break;
-	}
+	if BIT(m_portselect, 0) ret &= m_in_key[0]->read(); break;
+	if BIT(m_portselect, 1) ret &= m_in_key[1]->read(); break;
+	if BIT(m_portselect, 2) ret &= m_in_key[2]->read(); break;
+	if BIT(m_portselect, 3) ret &= m_in_key[3]->read(); break;
 
 	return ret;
 }
