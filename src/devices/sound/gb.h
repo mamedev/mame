@@ -121,10 +121,10 @@ protected:
 		uint16_t noise_lfsr;
 	};
 
-	struct SOUND  m_snd_1;
-	struct SOUND  m_snd_2;
-	struct SOUND  m_snd_3;
-	struct SOUND  m_snd_4;
+	SOUND  m_snd_1;
+	SOUND  m_snd_2;
+	SOUND  m_snd_3;
+	SOUND  m_snd_4;
 
 	struct
 	{
@@ -150,16 +150,16 @@ protected:
 
 	virtual void apu_power_off() = 0;
 	void sound_w_internal(int offset, uint8_t data);
-	void update_square_channel(struct SOUND &snd, uint64_t cycles);
-	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) = 0;
-	void update_noise_channel(struct SOUND &snd, uint64_t cycles);
-	int32_t calculate_next_sweep(struct SOUND &snd);
-	void apply_next_sweep(struct SOUND &snd);
-	void tick_length(struct SOUND &snd);
-	void tick_sweep(struct SOUND &snd);
-	void tick_envelope(struct SOUND &snd);
+	void update_square_channel(SOUND &snd, uint64_t cycles);
+	virtual void update_wave_channel(SOUND &snd, uint64_t cycles) = 0;
+	void update_noise_channel(SOUND &snd, uint64_t cycles);
+	int32_t calculate_next_sweep(SOUND &snd);
+	void apply_next_sweep(SOUND &snd);
+	void tick_length(SOUND &snd);
+	void tick_sweep(SOUND &snd);
+	void tick_envelope(SOUND &snd);
 	void update_state();
-	bool dac_enabled(struct SOUND &snd);
+	bool dac_enabled(SOUND &snd);
 	virtual void corrupt_wave_ram() { }
 	uint64_t noise_period_cycles();
 	TIMER_CALLBACK_MEMBER(timer_callback);
@@ -178,7 +178,7 @@ public:
 protected:
 	virtual void apu_power_off() override;
 	virtual void corrupt_wave_ram() override;
-	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
+	virtual void update_wave_channel(SOUND &snd, uint64_t cycles) override;
 };
 
 
@@ -196,7 +196,7 @@ protected:
 
 	virtual void device_reset() override;
 	virtual void apu_power_off() override;
-	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
+	virtual void update_wave_channel(SOUND &snd, uint64_t cycles) override;
 };
 
 
@@ -213,7 +213,7 @@ protected:
 	agb_apu_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_reset() override;
-	virtual void update_wave_channel(struct SOUND &snd, uint64_t cycles) override;
+	virtual void update_wave_channel(SOUND &snd, uint64_t cycles) override;
 };
 
 

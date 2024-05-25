@@ -54,10 +54,10 @@ uint16_t fromanc2_base_state::keymatrix_r()
 {
 	uint16_t ret = 0xffff;
 
-	if BIT(m_portselect, 0) ret &= m_in_key[0]->read(); break;
-	if BIT(m_portselect, 1) ret &= m_in_key[1]->read(); break;
-	if BIT(m_portselect, 2) ret &= m_in_key[2]->read(); break;
-	if BIT(m_portselect, 3) ret &= m_in_key[3]->read(); break;
+	if (BIT(m_portselect, 0)) ret &= m_in_key[0]->read();
+	if (BIT(m_portselect, 1)) ret &= m_in_key[1]->read();
+	if (BIT(m_portselect, 2)) ret &= m_in_key[2]->read();
+	if (BIT(m_portselect, 3)) ret &= m_in_key[3]->read();
 
 	return ret;
 }

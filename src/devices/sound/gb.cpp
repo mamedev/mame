@@ -305,7 +305,7 @@ TIMER_CALLBACK_MEMBER(gameboy_sound_device::timer_callback)
 }
 
 
-void gameboy_sound_device::tick_length(struct SOUND &snd)
+void gameboy_sound_device::tick_length(SOUND &snd)
 {
 	if (snd.length_enabled)
 	{
@@ -319,7 +319,7 @@ void gameboy_sound_device::tick_length(struct SOUND &snd)
 }
 
 
-int32_t gameboy_sound_device::calculate_next_sweep(struct SOUND &snd)
+int32_t gameboy_sound_device::calculate_next_sweep(SOUND &snd)
 {
 	snd.sweep_neg_mode_used = (snd.sweep_direction < 0);
 	int32_t new_frequency = snd.frequency + snd.sweep_direction * (snd.frequency >> snd.sweep_shift);
@@ -333,7 +333,7 @@ int32_t gameboy_sound_device::calculate_next_sweep(struct SOUND &snd)
 }
 
 
-void gameboy_sound_device::apply_next_sweep(struct SOUND &snd)
+void gameboy_sound_device::apply_next_sweep(SOUND &snd)
 {
 	int32_t new_frequency = calculate_next_sweep(snd);
 
@@ -345,7 +345,7 @@ void gameboy_sound_device::apply_next_sweep(struct SOUND &snd)
 }
 
 
-void gameboy_sound_device::tick_sweep(struct SOUND &snd)
+void gameboy_sound_device::tick_sweep(SOUND &snd)
 {
 	snd.sweep_count = (snd.sweep_count - 1) & 0x07;
 	if (snd.sweep_count == 0)
@@ -361,7 +361,7 @@ void gameboy_sound_device::tick_sweep(struct SOUND &snd)
 }
 
 
-void gameboy_sound_device::tick_envelope(struct SOUND &snd)
+void gameboy_sound_device::tick_envelope(SOUND &snd)
 {
 	if (snd.envelope_enabled)
 	{
@@ -389,13 +389,13 @@ void gameboy_sound_device::tick_envelope(struct SOUND &snd)
 }
 
 
-bool gameboy_sound_device::dac_enabled(struct SOUND &snd)
+bool gameboy_sound_device::dac_enabled(SOUND &snd)
 {
-	return (snd.channel != 3) ? snd.reg[2] & 0xf8 : snd.reg[0] & 0x80;
+	return (snd.channel != 3) ? (snd.reg[2] & 0xf8) : (snd.reg[0] & 0x80);
 }
 
 
-void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cycles)
+void gameboy_sound_device::update_square_channel(SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
@@ -406,7 +406,7 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cyc
 
 		cycles = snd.cycles_left >> 2;
 		snd.cycles_left &= 3;
-		uint16_t    distance = 0x800 - snd.frequency_counter;
+		uint16_t distance = 0x800 - snd.frequency_counter;
 		if (cycles >= distance)
 		{
 			cycles -= distance;
@@ -426,7 +426,7 @@ void gameboy_sound_device::update_square_channel(struct SOUND &snd, uint64_t cyc
 }
 
 
-void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
+void dmg_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
@@ -456,7 +456,7 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 				}
 				snd.current_sample = (snd.current_sample & 0x0f) - 8;
 
-				snd.signal = level ? snd.current_sample / (1 << (level - 1)) : 0;
+				snd.signal = level ? (snd.current_sample >> (level - 1)) : 0;
 
 				// Reload frequency counter
 				snd.frequency_counter = snd.frequency;
@@ -466,7 +466,7 @@ void dmg_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 }
 
 
-void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
+void cgb04_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
@@ -475,7 +475,7 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 		if (snd.cycles_left <= 0)
 			return;
 
-		cycles = (snd.cycles_left >> 1);
+		cycles = snd.cycles_left >> 1;
 		snd.cycles_left &= 1;
 		uint16_t distance = 0x800 - snd.frequency_counter;
 		const uint8_t level = snd.level & 3;
@@ -493,10 +493,10 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 				snd.current_sample >>= 4;
 			}
 			snd.current_sample = (snd.current_sample & 0x0f) - 8;
-			snd.signal = level ? snd.current_sample / (1 << (level - 1)) : 0;
+			snd.signal = level ? (snd.current_sample >> (level - 1)) : 0;
 
 			cycles %= distance;
-			snd.sample_reading = cycles ? false : true;
+			snd.sample_reading = !cycles;
 
 			snd.frequency_counter = snd.frequency + cycles;
 		}
@@ -507,7 +507,7 @@ void cgb04_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	}
 }
 
-void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
+void agb_apu_device::update_wave_channel(SOUND &snd, uint64_t cycles)
 {
 	if (snd.on)
 	{
@@ -551,7 +551,7 @@ void agb_apu_device::update_wave_channel(struct SOUND &snd, uint64_t cycles)
 	}
 }
 
-void gameboy_sound_device::update_noise_channel(struct SOUND &snd, uint64_t cycles)
+void gameboy_sound_device::update_noise_channel(SOUND &snd, uint64_t cycles)
 {
 	snd.cycles_left += cycles;
 	uint64_t period = noise_period_cycles();
@@ -722,7 +722,7 @@ u8 gameboy_sound_device::sound_r(offs_t offset)
 	{
 		if (offset == NR52)
 		{
-			return (m_snd_regs[NR52]&0xf0) | (m_snd_1.on ? 1 : 0) | (m_snd_2.on ? 2 : 0) | (m_snd_3.on ? 4 : 0) | (m_snd_4.on ? 8 : 0) | 0x70;
+			return (m_snd_regs[NR52] & 0xf0) | (m_snd_1.on ? 1 : 0) | (m_snd_2.on ? 2 : 0) | (m_snd_3.on ? 4 : 0) | (m_snd_4.on ? 8 : 0) | 0x70;
 		}
 		return m_snd_regs[offset] | read_mask[offset & 0x3f];
 	}
