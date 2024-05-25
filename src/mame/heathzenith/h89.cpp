@@ -926,7 +926,6 @@ void h89_sigmasoft_state::h89_sigmasoft(machine_config & config)
 }
 
 
-// ROM definition
 ROM_START( h88 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 
@@ -935,20 +934,19 @@ ROM_START( h88 )
 	ROM_LOAD("2716_444-40_mtr88.u518",    0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
 ROM_END
 
-// ROM definition
 ROM_START( h89 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
 	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
-	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
+	ROM_SYSTEM_BIOS(0, "mtr90", "Zenith Data Systems MTR-90 (444-142)")
 	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "mtr89", "MTR-89 (444-62)")
+	ROM_SYSTEM_BIOS(1, "mtr89", "Heath MTR-89 (444-62)")
 	ROMX_LOAD("2716_444-62_mtr89.u518",   0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "mms84b", "MMS 444-84B")
+	ROM_SYSTEM_BIOS(2, "mms84b", "Magnolia MicroSystems 444-84B")
 	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
@@ -957,10 +955,10 @@ ROM_START( h89 )
 	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth 4k ROM")
 	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
 
-	ROM_SYSTEM_BIOS(5, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
+	ROM_SYSTEM_BIOS(5, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)")
 	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
 
-	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
+	ROM_SYSTEM_BIOS(6, "mms84a", "Magnolia MicroSystems 444-84A (Superseded by MMS 444-84B)")
 	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
 
 	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
@@ -973,35 +971,61 @@ ROM_START( h89_sigmasoft )
 
 	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
-	ROM_SYSTEM_BIOS(0, "mtr90", "MTR-90 (444-142)")
+	ROM_SYSTEM_BIOS(0, "mtr90", "Zenith Data Systems MTR-90 (444-142)")
 	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "mtr89", "MTR-89 (444-62)")
+	ROM_SYSTEM_BIOS(1, "mtr89", "Heath MTR-89 (444-62)")
 	ROMX_LOAD("2716_444-62_mtr89.u518",   0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "mms84b", "MMS 444-84B")
+	ROM_SYSTEM_BIOS(2, "mms84b", "Magnolia MicroSystems 444-84B")
 	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
 	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth ROM")
+	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth 4k ROM")
 	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
 
-	ROM_SYSTEM_BIOS(5, "mtr90-84", "Heath's MTR-90 (444-84 - Superseded by 444-142)")
+	ROM_SYSTEM_BIOS(5, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)")
 	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
 
-	ROM_SYSTEM_BIOS(6, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
+	ROM_SYSTEM_BIOS(6, "mms84a", "Magnolia MicroSystems 444-84A (Superseded by MMS 444-84B)")
 	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
 
 	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
 	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
 ROM_END
 
+ROM_START( z90 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("mtr90")
+
+	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+
+	ROM_SYSTEM_BIOS(0, "mtr90", "Zenith Data Systems MTR-90 (444-142)")
+	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "mms84b", "Magnolia MicroSystems 444-84B")
+	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "kmr-100", "Kres KMR-100 V3.a.02")
+	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "mtrhex_4k", "Ultimeth 4k ROM")
+	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(4, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)")
+	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(5, "mms84a", "Magnolia MicroSystems 444-84A (Superseded by MMS 444-84B)")
+	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(5))
+ROM_END
+
 } // anonymous namespace
 
 
-//    year  name           parent compat  machine        input class                init        company          fullname                           flags
-COMP( 1979, h88,           h89,   0,      h88,           h88,  h88_state,           empty_init, "Heath Company", "Heathkit H88",                    MACHINE_SUPPORTS_SAVE)
-COMP( 1979, h89,           0,     0,      h89,           h89,  h89_state,           empty_init, "Heath Company", "Heathkit H89",                    MACHINE_SUPPORTS_SAVE)
-COMP( 1984, h89_sigmasoft, h89,   0,      h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company", "Heathkit H89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)
+//    year  name           parent compat machine        input class                init        company                fullname                   flags
+COMP( 1979, h88,           h89,   0,     h88,           h88,  h88_state,           empty_init, "Heath Company",       "H-88",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state,           empty_init, "Heath Company",       "H-89",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1981, z90,           h89,   0,     h89,           h89,  h89_state,           empty_init, "Zenith Data Systems", "Z-90",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company",       "H-89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)

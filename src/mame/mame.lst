@@ -19423,19 +19423,32 @@ wildfire                        // Parker Bros
 @source:hds/hds200.cpp
 hds200                          // (c) Human Designed Systems
 
-@source:heathkit/et3400.cpp
+@source:heathzenith/et3400.cpp
 et3400                          //
 
-@source:heathkit/h8.cpp
+@source:heathzenith/h8.cpp
 h8                              //
 
-@source:heathkit/h19.cpp
-h19                             // Heath H19 (Zenith Z-19)
+@source:heathzenith/h19.cpp
+h19                             // Heath H19
 
-@source:heathkit/h89.cpp
-h89                             // Heath H89 (WH89, Zenith Z-89, Z-90)
+@source:heathzenith/h89.cpp
+h89                             // Heath H89 (WH89)
 h88                             // Heath H88 (with cassette tape)
 h89_sigmasoft                   // H89 with the SigmaSoft IGC card
+z90                             // Zenith Z-90
+
+@source:heathzenith/mdt60.cpp
+mdt60                           //
+
+@source:heathzenith/z22.cpp
+z22                             //
+
+@source:heathzenith/z29.cpp
+z29                             //
+
+@source:heathzenith/z100.cpp
+z100                            //
 
 @source:hec2hrp/hec2hrp.cpp
 hec2hr                          //
@@ -46485,18 +46498,6 @@ jackrabt2                       // (c) 1984
 jackrabts                       // (c) 1984
 monymony                        // (c) 1983
 monymony2                       // (c) 1983
-
-@source:zenith/mdt60.cpp
-mdt60                           //
-
-@source:zenith/z22.cpp
-z22                             //
-
-@source:zenith/z29.cpp
-z29                             //
-
-@source:zenith/z100.cpp
-z100                            //
 
 @source:zpa/iq151.cpp
 iq151                           //
