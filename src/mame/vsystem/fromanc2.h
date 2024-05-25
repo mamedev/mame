@@ -11,6 +11,7 @@
 #include "emupal.h"
 #include "tilemap.h"
 
+
 class fromanc2_base_state : public driver_device
 {
 public:
@@ -38,7 +39,7 @@ protected:
 	uint16_t keymatrix_r();
 	uint8_t sndcpu_nmi_clr();
 
-	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromancr_get_tile_info);
+	template <int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromancr_get_tile_info);
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -69,8 +70,8 @@ protected:
 	// misc
 	uint16_t m_portselect = 0U;
 	uint8_t  m_sndcpu_nmi_flag = 0U;
-
 };
+
 
 class fromanc2_state : public fromanc2_base_state
 {
@@ -124,8 +125,8 @@ private:
 	DECLARE_VIDEO_START(fromanc2);
 	DECLARE_VIDEO_START(fromancr);
 
-	inline void fromanc2_dispvram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int vram, int layer);
-	inline void fromancr_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
+	void fromanc2_dispvram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int vram, int layer);
+	void fromancr_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer);
 	void fromancr_gfxbank_w(int data);
 
 	void fromanc2_main_map(address_map &map);
@@ -149,6 +150,7 @@ private:
 	uint8_t    m_datalatch_2l = 0U;
 };
 
+
 class fromanc4_state : public fromanc2_base_state
 {
 public:
@@ -171,7 +173,7 @@ protected:
 	void fromanc4_gfxreg_1_w(offs_t offset, uint16_t data);
 	void fromanc4_gfxreg_2_w(offs_t offset, uint16_t data);
 
-	inline void fromanc4_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
+	void fromanc4_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer);
 
 	void fromanc4_main_map(address_map &map);
 
