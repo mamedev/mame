@@ -2000,12 +2000,23 @@ ROM_END
 void lufykzku_state::init_lufykzku()
 {
 	m_vblank_vector = 0xfa; // nop
-	m_timer0_vector = 0xfc; // write coin counters/lockout, drive hopper
+	m_timer0_vector = 0xfc; // write coin counters/lockout, drive hopper. TODO: should fire at 100Hz for Rockman EXE
 	m_timer1_vector = 0xfe; // read inputs and hopper sensor, handle coin in
 
 	m_gfxdecode->gfx(1)->set_granularity(16);
 }
 
+// Banpresto BPSC-2001M-A PCB, same as lufykzku
+ROM_START( mnrockman )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ka-108_p1_ver1.02.ic1", 0x000000, 0x020000, CRC(727edf2f) SHA1(51a5f89a9ba64e16a1f46cc1145efa792ebb6401) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "ka-108_g1_ver1.00.ic3", 0x000000, 0x200000, CRC(ef79a6de) SHA1(50cbe7665e80b58a6bb0b20bae2deeca2e29c9da) )
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "ka-108_s1_ver1.00.ic2", 0x000000, 0x080000, CRC(828dd3bd) SHA1(9788a30199d81f6db54f5409fcb146098a29e6aa) )
+ROM_END
 
 /***************************************************************************
 
@@ -2297,6 +2308,7 @@ GAME( 1997, ucytokyu, 0,        sigmab98, sigma_js, sigmab98_state, init_ucytoky
 GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             MACHINE_NOT_WORKING ) // 1999 in the rom
 // Banpresto Medal Games
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
+GAME( 2002, mnrockman,0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Capcom / Shogakukan / ShoPro / TV Tokyo", "Medal Network: Rockman EXE", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_TIMING )
 // Sammy Medal Games:
 GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System BIOS",         MACHINE_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
