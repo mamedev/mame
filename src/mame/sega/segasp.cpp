@@ -37,7 +37,7 @@ todo: make this actually readable, we don't support unicode source files
 
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
 100&Medal Kazaaan!!                         834-15052                 ROM  JP     253-5508-0626J  AAFE-xxxxxxxxxxx
-100&Medal Gekikazaaan!!                     834-15148      MDA-C0098B no          ???-????-????   AAFE-xxxxxxxxxxx
+100&Medal Gekikazaaan!!                     834-15148      MDA-C0098D CF   JP     253-5508-0637J  AAFE-xxxxxxxxxxx
 Aminosan (satellite)                        837-15041    F*           ROM  JP     253-5508-0613J  AAFG-01A40195003, Medal
 Arabian Jewel (main)                        834-15011                 ROM  JP     253-5508-616J   AAFE-xxxxxxxxxxx
 Arabian Jewel (satellite)                   837-15019                 ROM  JP     not used        AAFE-xxxxxxxxxxx
