@@ -216,7 +216,7 @@ TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
 
 	code |= m_bgbank[bank] << 9;
 
-	tileinfo.set(1, code, col, 0);
+	tileinfo.set(0, code, col, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)
@@ -548,8 +548,11 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_taotaido )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0x000, 256 )
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_16x16x4_packed_lsb, 0x300, 256 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_taotaido_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0x000, 256 )
 GFXDECODE_END
 
 
@@ -593,10 +596,8 @@ void taotaido_state::taotaido(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr, 0, "palette", gfx_taotaido_spr);
 	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback));
-	m_spr->set_gfx_region(0);
-	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

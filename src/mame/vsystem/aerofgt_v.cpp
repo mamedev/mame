@@ -146,6 +146,11 @@ uint32_t aerofgt_state::tile_callback(uint32_t code)
 	return m_sprlookupram[0][code&0x7fff];
 }
 
+uint32_t aerofgt_state::pri_callback(uint32_t color)
+{
+	return BIT(color, 5) ? 0 : GFX_PMASK_2;
+}
+
 
 // old hw type
 uint32_t aerofgt_base_state::aerofgt_old_tile_callback(uint32_t code)
@@ -273,8 +278,8 @@ uint32_t aerofgt_base_state::screen_update_pspikes(screen_device &screen, bitmap
 	screen.priority().fill(0, cliprect);
 
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 	return 0;
 }
 
@@ -292,11 +297,11 @@ uint32_t aerofgt_sound_cpu_state::screen_update_karatblz(screen_device &screen, 
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	// we use the priority buffer so sprites are drawn front to back
-	m_spr_old[1]->turbofrc_draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[1]->turbofrc_draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 
 	return 0;
 }
@@ -317,11 +322,11 @@ uint32_t aerofgt_banked_sound_state::screen_update_spinlbrk(screen_device &scree
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
 
 	// we use the priority buffer so sprites are drawn front to back
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
 
-	m_spr_old[1]->turbofrc_draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
-	m_spr_old[1]->turbofrc_draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
 
 	return 0;
 }
@@ -343,11 +348,11 @@ uint32_t aerofgt_banked_sound_state::screen_update_turbofrc(screen_device &scree
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
 
 	// we use the priority buffer so sprites are drawn front to back
-	m_spr_old[1]->turbofrc_draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //ship
-	m_spr_old[1]->turbofrc_draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //intro
+	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //ship
+	m_spr_old[1]->draw_sprites(m_spriteram+0x200,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //intro
 
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //enemy
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //enemy
+	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //enemy
+	m_spr_old[0]->draw_sprites(m_spriteram+0x000,m_spriteram.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //enemy
 
 	return 0;
 }
@@ -361,15 +366,10 @@ uint32_t aerofgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	screen.priority().fill(0, cliprect);
 
-	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
 
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x00);
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x01);
-
-	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x02);
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x03);
+	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -774,7 +774,7 @@ uint32_t wbbc97_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
-	m_spr_old[0]->turbofrc_draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old[0]->draw_sprites(m_spriteram,m_spriteram.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 	return 0;
 }
