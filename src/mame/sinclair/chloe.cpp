@@ -160,10 +160,7 @@ void chloe_state::update_memory()
 		{
 			if (divmmc_rom_active)
 			{
-				if (!mapram_mode || conmem)
-					pg = 24;
-				else
-					pg = 35;
+				pg = (!mapram_mode || conmem) ? 24 : 35;
 			}
 			else
 			{
@@ -180,12 +177,16 @@ void chloe_state::update_memory()
 				if (!mapram_mode || conmem)
 				{
 					if (!divmmc_sram_page_is_valid)
+					{
 						m_bank1_view.select(0);
+					}
 				}
 				else
 				{
 					if ((mapram_mode && (divmmc_sram_page == 3)) || !divmmc_sram_page_is_valid)
+					{
 						m_bank1_view.select(0);
+					}
 				}
 			}
 			else
@@ -203,11 +204,17 @@ void chloe_state::update_memory()
 		else
 		{
 			if (i < 4)
+			{
 				pg = 5;
+			}
 			else if (i < 6)
+			{
 				pg = 2;
+			}
 			else
+			{
 				pg = m_port_7ffd_data & 0x07;
+			}
 
 			m_bank_ram[i]->set_entry((pg << 1) + (i & 1));
 		}
@@ -231,7 +238,9 @@ u32 chloe_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 void chloe_state::port_7ffd_w(u8 data)
 {
 	if (m_port_7ffd_data & 0x20)
+	{
 		return;
+	}
 
 	m_port_7ffd_data = data;
 	update_memory();
@@ -254,25 +263,35 @@ void chloe_state::port_f4_w(u8 data)
 void chloe_state::port_e3_w(u8 data)
 {
 	if (m_divmmc_ctrl & 0x40)
+	{
 		m_divmmc_ctrl = data | 0x40;
+	}
 	else
+	{
 		m_divmmc_ctrl = data;
+	}
 	update_memory();
 }
 
 void chloe_state::ay_address_w(u8 data)
 {
 	if ((data & 0xfe) == 0xfe)
+	{
 		m_ay_selected = data & 1;
+	}
 	else
+	{
 		m_ay[m_ay_selected]->address_w(data);
+	}
 }
 
 u8 chloe_state::spi_data_r()
 {
 	u8 din = m_spi_miso_dat;
 	if (!machine().side_effects_disabled())
+	{
 		spi_data_w(0xff);
+	}
 
 	return din;
 }
@@ -411,7 +430,8 @@ void chloe_state::dma_reg_w(offs_t offset, u8 data)
 
 void chloe_state::raster_irq_adjust()
 {
-	if (BIT(m_uno_regs_data[0x0d], 1)) {
+	if (BIT(m_uno_regs_data[0x0d], 1))
+	{
 		u16 line = (BIT(m_uno_regs_data[0x0d], 0) << 8) | m_uno_regs_data[0x0c];
 		m_irq_raster_on_timer->adjust(m_screen->time_until_pos((SCR_256x192.top() + line) % m_screen->height()));
 	}
@@ -422,7 +442,9 @@ void chloe_state::raster_irq_adjust()
 INPUT_CHANGED_MEMBER(chloe_state::on_divmmc_nmi)
 {
 	if ((newval & 1) && (~m_io_line[0]->read() & 0x8000))
+	{
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(chloe_state::raster_irq_on)
@@ -505,7 +527,9 @@ void chloe_state::map_io(address_map &map)
 	{
 		m_palpen_selected = data;
 		if ((data & 0xc0) == 0x40)
+		{
 			port_ff_w(data);
+		}
 	}));
 	map(0xff3b, 0xff3b).lrw8(NAME([this]()
 	{
@@ -514,9 +538,13 @@ void chloe_state::map_io(address_map &map)
 	}), NAME([this](u8 data)
 		{
 			if (m_palpen_selected < 64)
+			{
 				m_palette->set_pen_color(0xc0 | m_palpen_selected, rgbexpand<3,3,3>((data << 1) | (((data >> 1) | data) & 1), 3, 6, 0));
+			}
 			else if ((m_palpen_selected & 0xc0) == 0x40)
+			{
 				m_ula->ulap_en_w(data & 1);
+			}
 		}));
 	map(0xfc3b, 0xfc3b).lrw8(NAME([this]() { return m_reg_selected; })
 		, NAME([this](u8 data) { m_dma_hilo = 0; m_reg_selected = data; }));
@@ -541,7 +569,9 @@ void chloe_state::map_regs(address_map &map)
 	map(0x00, 0xff).lrw8(NAME([this](offs_t offset)
 	{
 		if (!machine().side_effects_disabled())
+		{
 			LOGIO("rREG %02x\n", offset);
+		}
 		return m_uno_regs_data[offset];
 	}), NAME([this](offs_t offset, u8 data)
 	{
@@ -578,7 +608,9 @@ u8 chloe_state::kbd_fe_r(offs_t offset)
 		u16 line_data = m_io_line[i]->read();
 		shifts &= line_data;
 		if ((oi & 1) == 0)
+		{
 			data &= line_data;
+		}
 	}
 
 	bool shift_hold = ~m_io_line[0]->read() & 0x8000;
@@ -589,15 +621,22 @@ u8 chloe_state::kbd_fe_r(offs_t offset)
 	}
 
 	if (((offset & 0x0100) == 0) && BIT(~shifts, 6))
+	{
 		data &= ~0x01; // CS
+	}
 
 	if (((offset & 0x8000) == 0) && BIT(~shifts, 7))
+	{
 		data &= ~0x02; // SS
+	}
 
 	data |= 0xe0;
+
 	/* cassette input from wav */
 	if (m_cassette->input() > 0.0038 )
+	{
 		data &= ~0x40;
+	}
 
 	return data;
 }
