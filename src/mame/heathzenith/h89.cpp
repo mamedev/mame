@@ -45,6 +45,7 @@
 
 #include "h_88_cass.h"
 #include "intr_cntrl.h"
+#include "mms77316_fdc.h"
 #include "sigmasoft_parallel_port.h"
 #include "tlb.h"
 #include "z37_fdc.h"
@@ -221,6 +222,44 @@ protected:
 };
 
 
+/**
+ * Heathkit H89 with MMS hardware
+ *  - MMS 77316 - DD controller
+ *
+ * Functionality already implemented/Same as Heath options
+ *  - MMS 77311 - 16k RAM
+ *  - MMS 77312 - ORG-0 CP/M Mod
+ *
+ * Hardware currently planned to be implemented:
+ *  - MMS 77318 - 128k RAM board
+ *  - MMS 77319 - Video Output
+ *  - MMS 77320 - SASI board
+ *  - MMS 77322 - Network Controller
+ *
+ * Other hardware MMS offered
+ *  - MMS 77314 - Remex H47 / IMI(Corvus) / 3 serial port
+ *  - MMS 77315 - Cameo I/o
+ *  - MMS 77317 - ACT/XCOMP I/O
+ *
+ */
+class h89_mms_state : public h89_base_state
+{
+public:
+	h89_mms_state(const machine_config &mconfig, device_type type, const char *tag):
+		h89_base_state(mconfig, type, tag),
+		m_mms(*this, "mms_fdc")
+	{
+	}
+
+	void h89_mms(machine_config &config);
+
+protected:
+	required_device<mms77316_fdc_device> m_mms;
+
+	void h89_mms_io(address_map &map);
+};
+
+
 /*
   The H89 supported 16K, 32K, 48K, or 64K of RAM. The first 8K of address space
   is reserved for the monitor ROM, floppy ROM, and scratch pad RAM. For 16k-48K
@@ -327,8 +366,8 @@ u8 h89_base_state::m1_r(offs_t offset)
     DCE Serial I/O           | EO-E7 | 340-347
     Console I/O              | E8-EF | 350-357
     NMI                      | F0-F1 | 360-361
-    General purpose port     | F2    | 362
-    Cassette I/O(MTR-88)     | F8-F9 | 370-371
+    General purpose port     |    F2 |     362
+    Cassette I/O(MTR-88 only)| F8-F9 | 370-371
     NMI                      | FA-FB | 372-373
 
     Disk I/O #1 - 0170-0173 (0x78-0x7b)
@@ -391,6 +430,43 @@ void h89_sigmasoft_state::h89_sigmasoft_io(address_map &map)
 
 	// Add SigmaSoft parallel port board, required for IGC graphics
 	map(0x08,0x0f).rw(m_sigma_parallel, FUNC(sigmasoft_parallel_port::read), FUNC(sigmasoft_parallel_port::write));
+}
+
+/*
+    Memory Map for MMS 444-61C PROM
+
+                                  PORT
+    Use                        |  Hex  |
+   ----------------------------+-------+
+    Not specified, available   |  0-37 |
+    MMS 77316                  | 38-3F |
+    MMS Internal test fixtures | 40-47 |
+    MMS 77317 ACT/XCOMP I/O    | 48-4F |
+    MMS 77315 CAMEO I/O        | 50-56 |
+    Unused                     |    57 |
+    MMS 77314 Corvus I/O       | 58-59 |
+    MMS 77314 REMEX I/O        | 5A-5B |
+    MMS 77314,15,17 Conf Port  |    5C |
+    Unused                     | 5D-77 |
+    Disk I/O #1                | 78-7B |
+    Disk I/O #2                | 7C-7F |
+    HDOS reserved              | 80-CF |
+    DCE Serial I/O             | D0-D7 |
+    DTE Serial I/O             | D8-DF |
+    DCE Serial I/O             | EO-E7 |
+    Console I/O                | E8-EF |
+    NMI                        | F0-F1 |
+    General purpose port       |    F2 |
+    Unused                     | F8-F9 |
+    NMI                        | FA-FB |
+    Unused                     | FC-FF |
+ */
+void h89_mms_state::h89_mms_io(address_map &map)
+{
+	h89_base_state::h89_base_io(map);
+
+	// Add MMS 77316 Double Density Controller
+	map(0x38,0x3f).rw(m_mms, FUNC(mms77316_fdc_device::read), FUNC(mms77316_fdc_device::write));
 }
 
 
@@ -835,6 +911,7 @@ static void intr_ctrl_options(device_slot_interface &device)
 {
 	device.option_add("original", HEATH_INTR_CNTRL);
 	device.option_add("h37",      HEATH_Z37_INTR_CNTRL);
+	device.option_add("mms",      HEATH_MMS_INTR_CNTRL);
 }
 
 void h89_base_state::h89_base(machine_config &config)
@@ -907,7 +984,7 @@ void h89_state::h89(machine_config &config)
 	m_h37->block_interrupt_cb().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
 }
 
-void h89_sigmasoft_state::h89_sigmasoft(machine_config & config)
+void h89_sigmasoft_state::h89_sigmasoft(machine_config &config)
 {
 	h89(config);
 	m_maincpu->set_addrmap(AS_IO, &h89_sigmasoft_state::h89_sigmasoft_io);
@@ -923,6 +1000,19 @@ void h89_sigmasoft_state::h89_sigmasoft(machine_config & config)
 	m_sigma_parallel->window_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
 	m_sigma_parallel->window_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
 	m_sigma_parallel->ctrl_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_w));
+}
+
+void h89_mms_state::h89_mms(machine_config &config)
+{
+	h89_base(config);
+	m_maincpu->set_addrmap(AS_IO, &h89_mms_state::h89_mms_io);
+
+	m_intr_socket->set_default_option("mms");
+	m_intr_socket->set_fixed(true);
+
+	MMS77316_FDC(config, m_mms);
+	m_mms->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
+	m_mms->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
 }
 
 
@@ -996,6 +1086,28 @@ ROM_START( h89_sigmasoft )
 	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
 ROM_END
 
+ROM_START( h89_mms )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("mms84b")
+
+	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+
+	ROM_SYSTEM_BIOS(0, "mms84b", "MMS 444-84B")
+	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "kmr-100", "Kres KMR-100 V3.a.02")
+	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "mtrhex_4k", "Ultimeth 4k ROM")
+	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
+	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(4, "mtrhex", "Ultimeth 2k ROM")
+	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(4))
+ROM_END
+
 ROM_START( z90 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
@@ -1027,5 +1139,6 @@ ROM_END
 //    year  name           parent compat machine        input class                init        company                fullname                   flags
 COMP( 1979, h88,           h89,   0,     h88,           h88,  h88_state,           empty_init, "Heath Company",       "H-88",                    MACHINE_SUPPORTS_SAVE)
 COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state,           empty_init, "Heath Company",       "H-89",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1981, h89_mms,       h89,   0,     h89_mms,       h89,  h89_mms_state,       empty_init, "Heath Company",       "H-89 with MMS Equipment", MACHINE_SUPPORTS_SAVE)
 COMP( 1981, z90,           h89,   0,     h89,           h89,  h89_state,           empty_init, "Zenith Data Systems", "Z-90",                    MACHINE_SUPPORTS_SAVE)
 COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company",       "H-89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)

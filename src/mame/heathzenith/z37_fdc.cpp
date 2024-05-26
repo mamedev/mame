@@ -229,7 +229,7 @@ void heath_z37_fdc_device::set_irq(int state)
 
 void heath_z37_fdc_device::set_drq(int state)
 {
-	LOGLINES("set drq, allowed: %d state: %d\n", m_irq_allowed, state);
+	LOGLINES("set drq, allowed: %d state: %d\n", m_drq_allowed, state);
 
 	m_drq_cb(m_drq_allowed ? state : CLEAR_LINE);
 }
