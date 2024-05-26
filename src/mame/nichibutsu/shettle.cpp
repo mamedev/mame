@@ -451,9 +451,9 @@ ROM_START( shettle )
 	ROM_LOAD( "e.bin", 0x0000, 0x2000, CRC(a3cef381) SHA1(ed511f5b695f0abdbaea8414d9de260f696f5318) )
 
 	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "prom-4.2f",  0x0000, 0x0020, CRC(befab139) SHA1(748c49437067d2d0a99b359bb5d53841a22b4760) ) // MMI 6331 - palette. Only 16 colors?
-	ROM_LOAD( "prom-6.4h",  0x0020, 0x0100, CRC(1abbc864) SHA1(a28d35cb2492f74f847858475aef669c38c3574a) ) // char lookup table? (near 0.5d ROM)
-	ROM_LOAD( "prom-5.3r",  0x0120, 0x0100, CRC(0f64edb9) SHA1(e1bc4acc0778ca13a3a2b8caa653bbf54a3507f9) ) // sprite lookup table? (next to e.4r ROM)
+	ROM_LOAD( "prom-4.2f",  0x0000, 0x0020, CRC(befab139) SHA1(748c49437067d2d0a99b359bb5d53841a22b4760) ) // MMI 6331 - palette
+	ROM_LOAD( "prom-6.4h",  0x0020, 0x0100, CRC(1abbc864) SHA1(a28d35cb2492f74f847858475aef669c38c3574a) ) // char lookup table (near 0.5d ROM)
+	ROM_LOAD( "prom-5.3r",  0x0120, 0x0100, CRC(0f64edb9) SHA1(e1bc4acc0778ca13a3a2b8caa653bbf54a3507f9) ) // sprite lookup table (next to e.4r ROM)
 	ROM_LOAD( "prom-7.7b",  0x0220, 0x0100, CRC(9e824f74) SHA1(03fcde2546b87286038ef93a6939c1c325f74998) ) // unknown (almost identical to clshroad.g10 in clshroad.cpp)
 	ROM_LOAD( "prom-1.bin", 0x0320, 0x0020, CRC(1afc04f0) SHA1(38207cf3e15bac7034ac06469b95708d22b57da4) ) // MMI 6331 - timing? (same as clashrd.g4 in clshroad.cpp)
 
@@ -468,4 +468,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, shettle, 0,      shettle, shettle, shettle_state, empty_init, ROT90, "New Digimatic", "Alone Shettle Crew", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, shettle, 0,      shettle, shettle, shettle_state, empty_init, ROT90, "New Digimatic", "Alone Shettle Crew", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
