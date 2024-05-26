@@ -80974,8 +80974,8 @@ be better to redump them properly. -->
 	</software>
 
 	<!-- Hangs when selecting a game from the game list screen -->
-	<software name="mc_150scc" supported="no">
-		<description>150 Super Cool Cards</description>
+	<software name="mc_150cbhk" supported="no">
+		<description>150 Chāojí Bàng Hé Kǎ</description> <!-- 150 Super Cool Cards -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="150 超級棒合卡"/>
