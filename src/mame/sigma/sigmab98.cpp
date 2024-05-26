@@ -253,7 +253,9 @@ public:
 	}
 
 	void init_lufykzku();
+	void init_rockman();
 	void lufykzku(machine_config &config);
+	void rockman(machine_config& config);
 
 private:
 	required_device<mb3773_device> m_watchdog;
@@ -269,6 +271,7 @@ private:
 	void lufykzku_watchdog_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(rockman_timer_irq);
 
 	void lufykzku_io_map(address_map &map);
 	void lufykzku_mem_map(address_map &map);
@@ -1484,11 +1487,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
+	{
+		if (m_vblank_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
+	}
 	else if (scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
+	{
+		if (m_timer0_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
+	}
 	else if ((scanline % 8) == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80 - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+	{
+		if (m_timer1_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80 - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::rockman_timer_irq)
+{
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 }
 
 void lufykzku_state::lufykzku(machine_config &config)
@@ -1536,6 +1550,11 @@ void lufykzku_state::lufykzku(machine_config &config)
 	oki.add_route(1, "rspeaker", 0.80);
 }
 
+void lufykzku_state::rockman(machine_config& config)
+{
+	lufykzku(config);
+	TIMER(config, "unktimer").configure_periodic(FUNC(lufykzku_state::rockman_timer_irq), attotime::from_hz(100));
+}
 
 /***************************************************************************
                              Sammy Medal Games
@@ -2000,8 +2019,17 @@ ROM_END
 void lufykzku_state::init_lufykzku()
 {
 	m_vblank_vector = 0xfa; // nop
-	m_timer0_vector = 0xfc; // write coin counters/lockout, drive hopper. TODO: should fire at 100Hz for Rockman EXE
+	m_timer0_vector = 0xfc; // write coin counters/lockout, drive hopper
 	m_timer1_vector = 0xfe; // read inputs and hopper sensor, handle coin in
+
+	m_gfxdecode->gfx(1)->set_granularity(16);
+}
+
+void lufykzku_state::init_rockman()
+{
+	m_vblank_vector = 0xfa; // nop
+	m_timer0_vector = 0;
+	m_timer1_vector = 0xfe;
 
 	m_gfxdecode->gfx(1)->set_granularity(16);
 }
@@ -2308,7 +2336,7 @@ GAME( 1997, ucytokyu, 0,        sigmab98, sigma_js, sigmab98_state, init_ucytoky
 GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             MACHINE_NOT_WORKING ) // 1999 in the rom
 // Banpresto Medal Games
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
-GAME( 2002, mnrockman,0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Capcom / Shogakukan / ShoPro / TV Tokyo", "Medal Network: Rockman EXE", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_TIMING )
+GAME( 2002, mnrockman,0,        rockman,  lufykzku, lufykzku_state, init_rockman,  ROT0, "Banpresto / Capcom / Shogakukan / ShoPro / TV Tokyo", "Medal Network: Rockman EXE", 0 )
 // Sammy Medal Games:
 GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System BIOS",         MACHINE_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
