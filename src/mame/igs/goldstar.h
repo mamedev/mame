@@ -140,6 +140,7 @@ protected:
 	uint8_t m_cm_enable_reg = 0U;
 	uint8_t m_cm_girl_scroll = 0U;
 	uint8_t m_reel_bank = 0U;
+	uint8_t m_tile_bank = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device_array<i8255_device, 3> m_ppi;
@@ -208,6 +209,7 @@ public:
 	void cm97(machine_config &config);
 	void cmast91(machine_config &config);
 	void cmast92(machine_config &config);
+	void cmtetriskr(machine_config &config);
 	void eldoradd(machine_config &config);
 	void cmasterc(machine_config &config);
 	void amcoe1a(machine_config &config);
@@ -228,6 +230,7 @@ public:
 	void cmast91_portmap(address_map &map);
 	void cmast92_map(address_map &map);
 	void cmast92_portmap(address_map &map);
+	void cmtetriskr_portmap(address_map &map);
 	void eldoraddoa_portmap(address_map &map);
 	void super7_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
@@ -300,8 +303,6 @@ private:
 
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
-
-	uint8_t m_tile_bank = 0U;
 
 	void nd8lines_map(address_map &map);
 };

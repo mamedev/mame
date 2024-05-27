@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 	int const attr = m_fg_atrram[tile_index];
 
 	tileinfo.set(0,
-			code | (attr & 0x0f) << 8,
+			code | (attr & 0x0f) << 8 | m_tile_bank << 13,
 			(attr & 0xf0) >> 4,
 			0);
 }

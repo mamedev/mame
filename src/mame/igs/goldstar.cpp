@@ -904,6 +904,7 @@ void cmaster_state::super7_portmap(address_map &map)
 void cmaster_state::cm97_portmap(address_map &map) // TODO: other reads/writes
 {
 	map.global_mask(0xff);
+	map(0x01, 0x01).lw8(NAME([this] (uint8_t data) { m_tile_bank = BIT(data, 3); if (data & 0xf7) logerror("unk tile bank w: %02x\n", data); }));
 	map(0x09, 0x09).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x0a, 0x0b).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x0c, 0x0c).portr("DSW1");
@@ -912,6 +913,24 @@ void cmaster_state::cm97_portmap(address_map &map) // TODO: other reads/writes
 	map(0x10, 0x10).portr("IN0");
 	map(0x11, 0x11).portr("IN1");
 	map(0x12, 0x12).portr("IN2").w(FUNC(cmaster_state::outport0_w));
+}
+
+void cmaster_state::cmtetriskr_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x04).portr("IN0");
+	map(0x05, 0x05).portr("IN1");
+	map(0x06, 0x06).portr("IN2");
+	map(0x08, 0x08).portr("DSW1");
+	map(0x09, 0x09).portr("DSW2");
+	map(0x0a, 0x0a).portr("DSW3");
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
+	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
 void cmaster_state::ss2001_portmap(address_map &map) // TODO: everything but ay
@@ -9188,6 +9207,16 @@ void cmaster_state::chryangl(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
 }
 
+void cmaster_state::cmtetriskr(machine_config &config)
+{
+	chryangl(config);
+
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cmtetriskr_portmap);
+
+	config.device_remove("ppi8255_0");
+	config.device_remove("ppi8255_1");
+}
+
 void cmaster_state::super7(machine_config &config)
 {
 	chryangl(config);
@@ -16752,6 +16781,18 @@ ROM_START( cmast97 )
 	ROM_LOAD( "82s135.c9",  0x100, 0x100, CRC(85883486) SHA1(adcee60f6fc1e8a75c529951df9e5e1ee277e131) )
 ROM_END
 
+ROM_START( cmast97i ) // D9503 DYNA
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "c97_14i.f10", 0x00000, 0x10000, CRC(db5132ba) SHA1(5635bf0fc959cbc9b305de31fdd004458338dae7) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "c97_2i.d9", 0x00000, 0x80000, CRC(ce8276d8) SHA1(e2181907a4dce158dfab4c2a435b500cde5f22c5) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s135.c8", 0x000, 0x100, CRC(8d0b0246) SHA1(0b86f2ab62f93568e2d8fde19d6ef824cb4c07ea) )
+	ROM_LOAD( "82s135.c9", 0x100, 0x100, CRC(191ebb09) SHA1(6a2a10baa3efec0ced95f8a43eabdf9988c7cdc7) )
+ROM_END
+
 /* DYNA D9106C PCB:
     -Zilog Z0840006.
     -DYNA DC4000.
@@ -17987,23 +18028,23 @@ ROM_START( cmtetriskr )
 	ROM_LOAD( "hn27c4096.u57",  0x100000, 0x80000, CRC(ecfbe168) SHA1(8f71fb9db2496b5663e7abcc391edabb9d360792) )
 	ROM_LOAD( "m27c4002.u58",   0x180000, 0x80000, CRC(e9edc65c) SHA1(009c814d81d22774557c0d12c4d160e57f44ceb6) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_COPY( "graphics", 0x60000, 0x00000, 0x10000 )
-	ROM_COPY( "graphics", 0xe0000, 0x10000, 0x10000 )
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_ERASE00 )
+	// filled by init_cmtetriskr()
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_COPY( "graphics", 0x178000, 0x0000, 0x8000 )
-	ROM_COPY( "graphics", 0x1f8000, 0x8000, 0x8000 )
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASE00 )
+	// filled by init_cmtetriskr()
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "tms27c010a.u54", 0x0000, 0x10000, CRC(24a8b6c5) SHA1(f5b2343b1626cfe181c7b356f88c82bee57ca973) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_IGNORE(                         0x10000 )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	// not actually a PROM but it seems to contain color data. 0x00 filled but for the 0x000 - 0x3ff range,
+	ROM_REGION( 0x10000, "palette_rom", 0 )
+	// not actually a PROM but it contains the color data. 0x00 filled but for the 0x000 - 0x3ff range,
 	// which has the same data repeated 4 times, with only one byte changed.
-	ROM_LOAD( "w27c512-45.u103", 0x0000, 0x0400, CRC(ed864ee3) SHA1(c440fd7c6f290f6c68f3cf74d2cbf0995e38d285) )
-	ROM_IGNORE(                          0xfc00 )
+	ROM_LOAD( "w27c512-45.u103", 0x00000, 0x10000, CRC(ed864ee3) SHA1(c440fd7c6f290f6c68f3cf74d2cbf0995e38d285) )
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	// filled by init_cmtetriskr()
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "palce20v8h-25pc.u65", 0x0000, 0x0157, CRC(06de0d06) SHA1(97d27f4cd8c5e0557de6217f2cbfca07b4e25ca0) )
@@ -19454,7 +19495,43 @@ void cmaster_state::init_cmtetriskr()
 	for (int i = 0; i < 0x10000; i++)
 		rom[i] = rom[i + 0x10000];
 
-	init_cm();
+	// rearrange GFX data to what MAME expects. TODO: awful, can this be done by adjusting GFX decode?
+	uint8_t *graphics = memregion("graphics")->base();
+	uint8_t *gfx1 = memregion("gfx1")->base();
+	uint8_t *gfx2 = memregion("gfx2")->base();
+
+	for (int i = 0; i < 0x10000; i += 2)
+	{
+		gfx1[i / 2] = graphics[i | 0x60000];
+		gfx1[(i / 2) | 0x8000] = graphics[(i + 1) | 0x60000];
+		gfx1[(i / 2) | 0x10000] = graphics[(i + 1) | 0xe0000];
+	}
+
+	for (int i = 0; i < 0x4000; i += 2)
+	{
+		gfx2[i / 2] = graphics[(i + 1) | 0x1f8000];
+		gfx2[(i / 2) | 0x2000] = graphics[i | 0x1f8000];
+		gfx2[(i / 2) | 0x4000] = graphics[i | 0x178000];
+		gfx2[(i / 2) | 0x6000] = graphics[(i + 1) | 0x178000];
+	}
+
+	// palette is in a ROM with different format, adapt to what MAME expects
+	uint8_t *palette_rom = memregion("palette_rom")->base();
+	uint8_t *proms = memregion("proms")->base();
+
+	for (int i = 0x000; i < 0x100; i++)
+	{
+		proms[i] = (palette_rom[i] & 0xf0) >> 4;
+		proms[i + 0x100] = palette_rom[i] & 0x0f;
+	}
+
+	std::vector<uint8_t> proms_buffer(0x200);
+	memcpy(&proms_buffer[0], proms, 0x200);
+
+	for (int i = 0x000; i < 0x200; i++)
+		proms[i] = proms_buffer[bitswap<9>(i, 8, 7, 6, 5, 3, 4, 2, 1, 0)];
+
+	m_palette->update();
 }
 
 void cmaster_state::init_ll3() // verified with ICE dump
@@ -20530,7 +20607,8 @@ GAME(  1992, cmast92,    0,        eldoradd, cmast91,  cmaster_state,  init_cmas
 GAME(  1992, cmast92a,   cmast92,  eldoradd, cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '92 (V1.1D)",                   MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
 GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
 GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // different GFX hw?
-GAME(  1996, cmast97,    0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING ) // fix prom decode, reels
+GAME(  1996, cmast97,    0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7)",                    MACHINE_NOT_WORKING ) // fix prom decode, reels
+GAME(  1996, cmast97i,   cmast97,  cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     MACHINE_NOT_WORKING ) // fix prom decode, reels
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
@@ -20700,7 +20778,7 @@ GAMEL( 198?, cmtetris,   0,        cm,        cmtetris, cmaster_state,  init_cm,
 GAMEL( 198?, cmtetrisa,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, unencrypted, set 2)",              0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetrisb,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (+K, Canada Version, encrypted)",                   MACHINE_NOT_WORKING,                            layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
 GAMEL( 198?, cmtetrisc,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisc, ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
-GAMEL( 198?, cmtetriskr, cmtetris, chryangl,  cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, Korean bootleg)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_cmpacman ) // needs correct GFX / palette decode, then testing
+GAMEL( 198?, cmtetriskr, cmtetris, cmtetriskr,cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Global Money Fever (Corsica, v8.01, Korean bootleg)",             MACHINE_NOT_WORKING,                            layout_cmpacman ) // starts with coins already inserted in Tetris mode, need to press K/L to switch between games...
 GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisd, ROT0, "bootleg (Aidonis Games)", "Tetris + Cherry Master (Aidonis Games bootleg)",                           0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
 GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
