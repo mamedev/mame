@@ -210,7 +210,7 @@ void z37_intr_cntrl::block_interrupts(u8 data)
  *
  */
 mms_intr_cntrl::mms_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	ss_intr_cntrl(mconfig, HEATH_Z37_INTR_CNTRL, tag, owner, clock)
+	ss_intr_cntrl(mconfig, HEATH_MMS_INTR_CNTRL, tag, owner, clock)
 {
 }
 
