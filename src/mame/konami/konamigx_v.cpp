@@ -1473,7 +1473,7 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 	{
 		pen_t const *const paldata = m_palette->pens();
 
-		// hack, draw the roz tilemap if W is held
+		// draw the roz tilemap if W is held
 		if ( machine().input().code_pressed(KEYCODE_W) )
 		{
 			// make it flicker, to compare positioning
