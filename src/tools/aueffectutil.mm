@@ -628,25 +628,24 @@ static void UpdateChangeCountCallback(
 		return nil;
 	}
 
-	NSString *errDesc = nil;
-	NSData *const data = [NSPropertyListSerialization dataFromPropertyList:desc
+	NSError *errDesc = nil;
+	NSData *const data = [NSPropertyListSerialization dataWithPropertyList:desc
 																	format:NSPropertyListXMLFormat_v1_0
-														  errorDescription:&errDesc];
+																   options:0
+																	 error:&errDesc];
 	if (!data || errDesc)
 	{
 		if (error)
 		{
 			NSString *message;
 			if (errDesc)
-				message = [NSString stringWithFormat:@"Error serialising effect settings: %@", errDesc];
+				message = [NSString stringWithFormat:@"Error serialising effect settings: %@", [errDesc localizedDescription]];
 			else
 				message = @"Error serialising effect settings";
 			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,  NSLocalizedDescriptionKey,
 																				  nil];
 			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		}
-		if (errDesc)
-			[errDesc release];
 		return nil;
 	}
 	return data;
@@ -891,17 +890,18 @@ static void UpdateChangeCountCallback(
 																		  subtypeValue,         ComponentSubTypeKey,
 																		  manufacturerValue,    ComponentManufacturerKey,
 																		  nil];
-	NSString *errDesc = nil;
-	NSData *const data = [NSPropertyListSerialization dataFromPropertyList:desc
+	NSError *errDesc = nil;
+	NSData *const data = [NSPropertyListSerialization dataWithPropertyList:desc
 																	format:NSPropertyListXMLFormat_v1_0
-														  errorDescription:&errDesc];
+																   options:0
+																	 error:&errDesc];
 	if (!data || errDesc)
 	{
 		NSAlert *const alert = [[NSAlert alloc] init];
 		[alert setAlertStyle:NSAlertStyleWarning];
 		[alert setMessageText:@"Error serialising properties for new effect"];
 		if (errDesc)
-			[alert setInformativeText:[errDesc autorelease]];
+			[alert setInformativeText:[errDesc localizedDescription]];
 		[alert addButtonWithTitle:@"OK"];
 		[alert runModal];
 		[alert release];
@@ -1008,7 +1008,7 @@ static void UpdateChangeCountCallback(
 															 (unsigned long)failed.size(),
 															 ((1U == failed.size()) ? "" : "s")];
 		NSMutableString *const detail = [NSMutableString stringWithCapacity:(16 * failed.size())];
-		std::vector<std::pair<Component, OSStatus> >::const_iterator it = failed.begin();
+		std::vector<std::pair<AudioComponent, OSStatus> >::const_iterator it = failed.begin();
 		[detail appendFormat:@"%lu (%ld)", (unsigned long)it->first, (long)it->second];
 		++it;
 		while (failed.end() != it)
