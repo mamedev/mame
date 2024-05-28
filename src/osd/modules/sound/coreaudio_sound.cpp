@@ -905,24 +905,6 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 	if (!url)
 		return nullptr;
 
-	CFNumberRef size_prop = nullptr;
-	if (!CFURLCopyResourcePropertyForKey(url, kCFURLFileSizeKey, &size_prop, nullptr))
-	{
-		CFRelease(url);
-		osd_printf_error("Error getting size of file %s\n", name);
-		return nullptr;
-	}
-
-	CFIndex size = 0;
-	Boolean const status = CFNumberGetValue(size_prop, kCFNumberCFIndexType, &size);
-	CFRelease(size_prop);
-	if (!status)
-	{
-		CFRelease(url);
-		osd_printf_error("Error getting size of file %s\n", name);
-		return nullptr;
-	}
-
 	CFReadStreamRef const stream = CFReadStreamCreateWithFile(nullptr, url);
 	CFRelease(url);
 	if (!stream)
@@ -937,51 +919,16 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 		return nullptr;
 	}
 
-	CFMutableDataRef const data = CFDataCreateMutable(nullptr, size);
-	if (!data)
-	{
-		CFRelease(stream);
-		osd_printf_error("Error allocating data to read %s\n", name);
-		return nullptr;
-	}
-	CFDataSetLength(data, size);
-	UInt8 *const bytes = CFDataGetMutableBytePtr(data);
-
-	for (CFIndex read = 0; size > read; )
-	{
-		CFIndex const chunk = CFReadStreamRead(stream, bytes + read, size - read);
-		if (0 >= chunk)
-		{
-			CFReadStreamClose(stream);
-			CFRelease(stream);
-			CFRelease(data);
-			if (0 > chunk)
-			{
-				osd_printf_error("Error reading file %s\n", name);
-			}
-			else
-			{
-				osd_printf_error(
-						"Expected %d bytes but got %d when reading file %s\n",
-						size,
-						read,
-						name);
-			}
-			return nullptr;
-		}
-		read += chunk;
-	}
-	CFReadStreamClose(stream);
-	CFRelease(stream);
-
 	CFErrorRef msg = nullptr;
-	CFPropertyListRef const result = CFPropertyListCreateWithData(
+	CFPropertyListRef const result = CFPropertyListCreateWithStream(
 			nullptr,
-			data,
+			stream,
+			0,
 			kCFPropertyListImmutable,
 			nullptr,
 			&msg);
-	CFRelease(data);
+	CFReadStreamClose(stream);
+	CFRelease(stream);
 	if (!result || msg)
 	{
 		CFStringRef const desc = msg ? CFErrorCopyDescription(msg) : nullptr;
