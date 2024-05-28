@@ -1,4 +1,3 @@
-
 /*============================================================================
 
 This C header file is part of the SoftFloat IEEE Floating-Point Arithmetic
@@ -33,45 +32,37 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
-#
-/*----------------------------------------------------------------------------
-Softfloat 3 MAME modifications
-*----------------------------------------------------------------------------*/
-#ifdef LSB_FIRST
-#define LITTLEENDIAN 1
-#else
-#define LITTLEENDIAN 0
+
+#ifndef softfloat_extra_h
+#define softfloat_extra_h 1
+
+#include "../source/include/internals.h"
+
+// ======= floatx80 ======= //
+
+inline bool extF80_isUnsupported(extFloat80_t a)
+{
+	return ((a.signExp & 0x7FFF) && !(a.signif & uint64_t(0x8000000000000000)));
+}
+
+inline bool extF80_sign(extFloat80_t a)
+{
+	return signExtF80UI64(a.signExp);
+}
+
+inline int16_t extF80_exp(extFloat80_t a)
+{
+	return expExtF80UI64(a.signExp);
+}
+
+inline uint64_t extF80_fraction(extFloat80_t a)
+{
+	return a.signif;
+}
+
+extFloat80_t &floatx80_chs(extFloat80_t &reg);
+
+extFloat80_t packToExtF80(uint16_t signExp, uint64_t sig);
+extFloat80_t packToExtF80(bool sign, uint16_t exp, uint64_t sig);
+
 #endif
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-#define INLINE static inline
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-#if defined(_MSC_VER) && !defined(__clang__)
-
-#define _INC_MALLOC 0
-#include <intrin.h>
-
-// MSVC has __lzcnt16 as well, but opts-GCC.h expects __lzcnt for uint16_t and uint32_t
-#if defined(_M_IX86) || defined(_M_AMD64)
-#define __builtin_clz __lzcnt
-#endif // defined(_M_IX86) || defined(_M_AMD64)
-#if defined(_M_AMD64)
-#define SOFTFLOAT_BUILTIN_CLZ 1
-#define __builtin_clzll __lzcnt64
-#endif // defined(_M_AMD64)
-
-#else // defined(_MSC_VER)
-
-// true for GCC and Clang on Intel and ARM, and MSVC on Intel.
-#define SOFTFLOAT_BUILTIN_CLZ 1
-#if defined(PTR64)
-#define SOFTFLOAT_INTRINSIC_INT128 1
-#endif // defined(PTR64)
-
-#endif // defined(_MSC_VER)
-
-#include "../../source/include/opts-GCC.h"
