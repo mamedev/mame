@@ -902,30 +902,77 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 			(UInt8 const *)name,
 			strlen(name),
 			false);
-	if (nullptr == url)
+	if (!url)
+		return nullptr;
+
+	CFNumberRef size_prop = nullptr;
+	if (!CFURLCopyResourcePropertyForKey(url, kCFURLFileSizeKey, &size_prop, nullptr))
 	{
+		CFRelease(url);
+		osd_printf_error("Error getting size of file %s\n", name);
 		return nullptr;
 	}
 
-	CFDataRef data = nullptr;
-	SInt32 err;
-	Boolean const status = CFURLCreateDataAndPropertiesFromResource(
-			nullptr,
-			url,
-			&data,
-			nullptr,
-			nullptr,
-			&err);
-	CFRelease(url);
+	CFIndex size = 0;
+	Boolean const status = CFNumberGetValue(size_prop, kCFNumberCFIndexType, &size);
+	CFRelease(size_prop);
 	if (!status)
 	{
-		osd_printf_error(
-				"Error reading data from %s (%ld)\n",
-				name,
-				(long)err);
-		if (nullptr != data) CFRelease(data);
+		CFRelease(url);
+		osd_printf_error("Error getting size of file %s\n", name);
 		return nullptr;
 	}
+
+	CFReadStreamRef const stream = CFReadStreamCreateWithFile(nullptr, url);
+	CFRelease(url);
+	if (!stream)
+	{
+		osd_printf_error("Error opening file %s\n", name);
+		return nullptr;
+	}
+	if (!CFReadStreamOpen(stream))
+	{
+		CFRelease(stream);
+		osd_printf_error("Error opening file %s\n", name);
+		return nullptr;
+	}
+
+	CFMutableDataRef const data = CFDataCreateMutable(nullptr, size);
+	if (!data)
+	{
+		CFRelease(stream);
+		osd_printf_error("Error allocating data to read %s\n", name);
+		return nullptr;
+	}
+	CFDataSetLength(data, size);
+	UInt8 *const bytes = CFDataGetMutableBytePtr(data);
+
+	for (CFIndex read = 0; size > read; )
+	{
+		CFIndex const chunk = CFReadStreamRead(stream, bytes + read, size - read);
+		if (0 >= chunk)
+		{
+			CFReadStreamClose(stream);
+			CFRelease(stream);
+			CFRelease(data);
+			if (0 > chunk)
+			{
+				osd_printf_error("Error reading file %s\n", name);
+			}
+			else
+			{
+				osd_printf_error(
+						"Expected %d bytes but got %d when reading file %s\n",
+						size,
+						read,
+						name);
+			}
+			return nullptr;
+		}
+		read += chunk;
+	}
+	CFReadStreamClose(stream);
+	CFRelease(stream);
 
 	CFErrorRef msg = nullptr;
 	CFPropertyListRef const result = CFPropertyListCreateWithData(
@@ -935,10 +982,13 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 			nullptr,
 			&msg);
 	CFRelease(data);
-	if ((nullptr == result) || (nullptr != msg))
+	if (!result || msg)
 	{
-		std::unique_ptr<char []> const buf = (nullptr != msg) ? convert_cfstring_to_utf8(CFErrorCopyDescription(msg)) : nullptr;
-		if (nullptr != msg)
+		CFStringRef const desc = msg ? CFErrorCopyDescription(msg) : nullptr;
+		std::unique_ptr<char []> const buf = desc ? convert_cfstring_to_utf8(desc) : nullptr;
+		if (desc)
+			CFRelease(desc);
+		if (msg)
 			CFRelease(msg);
 
 		if (buf)
@@ -954,7 +1004,8 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 					"Error creating property list from %s\n",
 					name);
 		}
-		if (nullptr != result) CFRelease(result);
+		if (result)
+			CFRelease(result);
 		return nullptr;
 	}
 

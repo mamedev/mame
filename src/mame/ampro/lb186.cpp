@@ -21,6 +21,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "fdc")
+		, m_floppies(*this, "fdc:%u", 0U)
 		, m_scsi(*this, "scsibus:7:ncr5380")
 	{
 	}
@@ -37,6 +38,7 @@ private:
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppies;
 	required_device<ncr5380_device> m_scsi;
 };
 
@@ -50,8 +52,6 @@ void lb186_state::drive_sel_w(uint8_t data)
 {
 	m_fdc->dden_w(BIT(data, 5));
 
-	floppy_image_device *floppy;
-	char devname[8];
 	unsigned int drive = data & 0xf;
 	switch(drive)
 	{
@@ -74,8 +74,7 @@ void lb186_state::drive_sel_w(uint8_t data)
 			return;
 	}
 
-	sprintf(devname, "%d", drive);
-	floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
+	floppy_image_device *const floppy = m_floppies[drive]->get_device();
 	m_fdc->set_floppy(floppy);
 	floppy->ss_w(BIT(data, 4));
 }
@@ -141,10 +140,10 @@ void lb186_state::lb186(machine_config &config)
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[0], lb186_floppies, "525dd", lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[2], lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[3], lb186_floppies, nullptr, lb186_state::floppy_formats);
 
 	NSCSI_BUS(config, "scsibus");
 	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, "harddisk");

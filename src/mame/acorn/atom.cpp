@@ -585,11 +585,8 @@ void atom_state::atom_8271_interrupt_callback(int state)
 
 void atom_state::motor_w(int state)
 {
-	for (u8 i = 0; i < 2; i++)
+	for (auto &con : m_floppies)
 	{
-		char devname[8];
-		sprintf(devname, "%d", i);
-		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
 		if (con)
 			con->get_device()->mon_w(!state);
 	}
@@ -765,8 +762,8 @@ void atom_state::atom(machine_config &config)
 	I8271(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
 	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
-	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[0], atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 
 	QUICKLOAD(config, "quickload", "atm", attotime::from_seconds(2)).set_load_callback(FUNC(atom_state::quickload_cb));
 
