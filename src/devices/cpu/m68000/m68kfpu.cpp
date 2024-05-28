@@ -19,7 +19,7 @@
 #define LOG_INSTRUCTIONS_VERBOSE    (1U << 3)
 #define LOG_LOADSTORE               (1U << 4)
 
-#define VERBOSE (LOG_GENERAL | LOG_INSTRUCTIONS | LOG_INSTRUCTIONS_VERBOSE | LOG_LOADSTORE)
+#define VERBOSE (0)
 
 #define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
@@ -1883,6 +1883,14 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 		case 3: // (PC) + (Xn) + d8
 			address = EA_PCIX_32();
 			break;
+
+		case 4: // #<data>
+		{
+			if (regsel & 4) m_fpcr = READ_EA_32(ea);
+			else if (regsel & 2) m_fpsr = READ_EA_32(ea);
+			else if (regsel & 1) m_fpiar = READ_EA_32(ea);
+			return;
+		}
 
 		default:
 			fatalerror("M68kFPU: fmove_fpcr: unhandled mode %d, reg %d at %08X\n", mode, reg, m_pc);
