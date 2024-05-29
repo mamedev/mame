@@ -11331,7 +11331,7 @@ GAME( 1991, rezono,    rezon,    rezon,     rezon,     seta_state,     empty_ini
 
 GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
-GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena",                    "Pairs Love", 0 )
+GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena / Nihon System",                    "Pairs Love", 0 ) // Non-explicit Nihon System credit on title screen thru logo
 
 GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )

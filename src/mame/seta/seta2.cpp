@@ -4418,7 +4418,7 @@ GAME( 1999, endrichsa, endrichs, reelquak, endrichs, seta2_state,    empty_init,
 
 GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs flipscreen hooking up properly with new code to function at all
 
-GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                           MACHINE_NO_COCKTAIL )
+GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "Nihon System / MOSS",   "Puzzle De Bowling (Japan)",                           MACHINE_NO_COCKTAIL )
 
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                            MACHINE_NO_COCKTAIL )
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",                     MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
