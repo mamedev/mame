@@ -121,19 +121,22 @@ void shettle_state::palette_init(palette_device &palette) const
 	{
 		int bit0, bit1, bit2;
 
+		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const g = combine_weights(gweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
+		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
-		int const b = combine_weights(bweights, bit0, bit1);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
-		bit0 = BIT(color_prom[i], 5);
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const r = combine_weights(rweights, bit0, bit1, bit2);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
