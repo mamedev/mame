@@ -96,19 +96,19 @@ void h83217_device::map(address_map &map)
 	map(0xffac, 0xffac).rw(m_port[0], FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 	map(0xffad, 0xffad).rw(m_port[1], FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 	map(0xffae, 0xffae).rw(m_port[2], FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
-	map(0xffb0, 0xffb0).w(m_port[0], FUNC(h8_port_device::ddr_w));
-	map(0xffb1, 0xffb1).w(m_port[1], FUNC(h8_port_device::ddr_w));
+	map(0xffb0, 0xffb0).rw(m_port[0], FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xffb1, 0xffb1).rw(m_port[1], FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffb2, 0xffb2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffb3, 0xffb3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffb4, 0xffb4).w(m_port[2], FUNC(h8_port_device::ddr_w));
-	map(0xffb5, 0xffb5).w(m_port[3], FUNC(h8_port_device::ddr_w));
+	map(0xffb4, 0xffb4).rw(m_port[2], FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xffb5, 0xffb5).rw(m_port[3], FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffb6, 0xffb6).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffb7, 0xffb7).rw(m_port[3], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffb8, 0xffb8).w(m_port[4], FUNC(h8_port_device::ddr_w));
-	map(0xffb9, 0xffb9).w(m_port[5], FUNC(h8_port_device::ddr_w));
+	map(0xffb8, 0xffb8).rw(m_port[4], FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xffb9, 0xffb9).rw(m_port[5], FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffba, 0xffba).rw(m_port[4], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffbb, 0xffbb).rw(m_port[5], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffbc, 0xffbc).w(m_port[6], FUNC(h8_port_device::ddr_w));
+	map(0xffbc, 0xffbc).rw(m_port[6], FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffbe, 0xffbe).rw(m_port[6], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 
 	map(0xffc2, 0xffc2).lw8(NAME([this](u8 data) { logerror("wscr = %02x\n", data); }));

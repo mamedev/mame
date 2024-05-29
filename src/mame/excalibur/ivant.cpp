@@ -17,7 +17,8 @@ Hardware notes:
 
 The MCU used here is a HD6433256A33P from Excalibur Mirage, the internal ROM
 is disabled. There's also a newer version on a H8/3216. The first version was
-produced in a CXG factory.
+produced in a factory owned by Eric White's company (ex-CXG). The LCD is the
+same as the one in CXG Sphinx Legend and Krypton Challenge/Regency.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
