@@ -64,6 +64,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE 1
 #include "logmacro.h"
 
 namespace {
@@ -81,7 +82,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "scsi:7:ncr5385"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "maincpu"),
+		m_prom(*this, "maincpu"),			// why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -125,6 +126,10 @@ private:
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<input_merger_all_high_device> m_vint;
+
+// I am guessing we need some target scsi device that reads/writes a filesystem
+//	required_device<nscsi_harddisk_device> m_scsidrive;
+
 
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
@@ -219,6 +224,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 	if (offset < 0x300000 && offset >= 0x100000 && !machine().side_effects_disabled())
 	{
+		LOG("bus error: read: %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(offset0 << 1, 1, m_maincpu->get_fc());
@@ -234,6 +240,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 	if (offset < 0x300000 && offset >= 0x100000 && !machine().side_effects_disabled())
 	{
+		LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -321,7 +328,7 @@ void tek440x_state::logical_map(address_map &map)
 
 void tek440x_state::physical_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).ram().share("mainram");
+	map(0x000000, 0x1fffff).ram().share("mainram");		// 2MB option
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
@@ -384,7 +391,7 @@ INPUT_PORTS_END
 
 static void scsi_devices(device_slot_interface &device)
 {
-	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("scsi_harddisk", NSCSI_HARDDISK);
 	device.option_add("tek_msu_fdc", TEK_MSU_FDC);
 }
 
@@ -419,7 +426,7 @@ void tek440x_state::tek4404(machine_config &config)
 	screen.set_screen_update(FUNC(tek440x_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	mos6551_device &aica(MOS6551(config, "aica", 40_MHz_XTAL / 4 / 10));
 	aica.set_xtal(1.8432_MHz_XTAL);
@@ -443,7 +450,7 @@ void tek440x_state::tek4404(machine_config &config)
 	NSCSI_BUS(config, "scsi");
 	// hard disk is a Micropolis 1304 (https://www.micropolis.com/support/hard-drives/1304)
 	// with a Xebec 1401 SASI adapter inside the Mass Storage Unit
-	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "scsi_harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "tek_msu_fdc");
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
