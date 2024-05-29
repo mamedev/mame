@@ -106,15 +106,15 @@ private:
 void shettle_state::palette_init(palette_device &palette) const
 {
 	const u8 *color_prom = memregion("proms")->base();
-	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
-	static constexpr int resistances_b [2] = { 470, 220 };
+	static constexpr int resistances_rb[3] = { 1000, 470, 220 };
+	static constexpr int resistances_g [2] = { 470, 220 };
 
 	// compute the color output resistor weights
-	double rweights[3], gweights[3], bweights[2];
+	double rweights[3], gweights[2], bweights[3];
 	compute_resistor_weights(0, 255, -1.0,
-			3, &resistances_rg[0], rweights, 470, 0,
-			3, &resistances_rg[0], gweights, 470, 0,
-			2, &resistances_b[0],  bweights, 470, 0);
+			3, &resistances_rb[0], rweights, 470, 0,
+			2, &resistances_g[0], gweights, 470, 0,
+			3, &resistances_rb[0],  bweights, 470, 0);
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x20; i++)
@@ -124,16 +124,16 @@ void shettle_state::palette_init(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const g = combine_weights(gweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
-		int const b = combine_weights(bweights, bit0, bit1);
+		int const g = combine_weights(gweights, bit0, bit1);
 
 		bit0 = BIT(color_prom[i], 5);
 		bit1 = BIT(color_prom[i], 6);
 		bit2 = BIT(color_prom[i], 7);
-		int const r = combine_weights(rweights, bit0, bit1, bit2);
+		int const b = combine_weights(bweights, bit0, bit1, bit2);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
