@@ -3743,6 +3743,13 @@ static INPUT_PORTS_START( dolmen )
 	PORT_DIPSETTING(      0x0000, "Credits Don't Register" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dolmenk )
+	PORT_INCLUDE( dolmen )
+
+	PORT_MODIFY("IN1")  // $080002.w
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Tested at boot
+	PORT_BIT(  0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Tested at boot
+INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_tharrier )
 	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) // color 0x000-0x0ff
@@ -8829,6 +8836,30 @@ ROM_START( dolmen ) // Original source of the caveman concept for Bubble 2000 / 
 	ROM_LOAD( "afega3.su13", 0x040000, 0x40000, CRC(d3531018) SHA1(940067a8634339258666c89319cb0e1b43f2af56) )
 ROM_END
 
+ROM_START( dolmenk )
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
+	ROM_LOAD16_BYTE( "afega_6.uj3", 0x00000, 0x20000, CRC(834cc396) SHA1(c811e655f7058360409a961c0efe810a83266662) ) // 1xxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_BYTE( "afega_5.uj2", 0x00001, 0x20000, CRC(38491cad) SHA1(09aaaf05e77876978a623789c79e4267ca88e1d5) ) // 1xxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     // Z80 code
+	ROM_LOAD( "afega_1.su6", 0x00000, 0x10000, CRC(3d52d5f4) SHA1(cdb2ca923bca83fe0281a4f49c6b65f16c5abdd2) ) // 1ST AND 2ND HALF IDENTICAL, identical to the World version if split
+
+	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
+	ROM_LOAD16_BYTE( "afega_7.ub11", 0x00000, 0x80000, CRC(f32554d4) SHA1(3199b14b9b2792fdffcbf03e15637d975fe9e585) )
+	ROM_LOAD16_BYTE( "afega_8.ub13", 0x00001, 0x80000, CRC(65f85cfe) SHA1(267960e1a1cc3bf9e9dee8d2c0d03825cead4302) )
+
+	ROM_REGION( 0x80000, "bgtile", 0 )    // Layer 0, 16x16x8
+	ROM_LOAD( "afega_9.ui20", 0x00000, 0x80000, CRC(b3fa7be6) SHA1(7ef8d902bd954960fbae727aae02dce9750f740e) )
+	// second empty socket
+
+	ROM_REGION( 0x20000, "fgtile", 0 )    // Layer 1, 8x8x4
+	ROM_LOAD( "afega_4.uj11", 0x00000, 0x20000, CRC(13fa4415) SHA1(193524ebccbaae6b8c00893c42399c38cafdbd79) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )   // Samples
+	ROM_LOAD( "afega_2.su12", 0x000000, 0x20000, CRC(1a2ce1c2) SHA1(ae6991fbfe57d35f32b541367d3b31244456713e) )
+	ROM_RELOAD(               0x020000, 0x20000 )
+	ROM_LOAD( "afega_3.su13", 0x040000, 0x40000, CRC(d3531018) SHA1(940067a8634339258666c89319cb0e1b43f2af56) )
+ROM_END
 
 /***************************************************************************
 
@@ -9181,6 +9212,7 @@ GAME( 1996, airattcka,  airattck, ssmissin,     airattck,     nmk16_state, init_
 GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Twin Action", 0 ) // hacked from USSAF Mustang
 
 GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Dolmen", 0 )
+GAME( 1995, dolmenk,    dolmen,   twinactn,     dolmenk,      nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Goindol (Afega)", 0 )
 
 GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )
