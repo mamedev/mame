@@ -16146,6 +16146,9 @@ cncchess2
 @source:chess/conic_cchess3.cpp
 cncchess3
 
+@source:chess/krypton_regency.cpp
+regency
+
 @source:chess/regence.cpp
 regence
 
