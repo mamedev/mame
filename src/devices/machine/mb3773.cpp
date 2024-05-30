@@ -58,7 +58,7 @@ void mb3773_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(mb3773_device::watchdog_expired)
 {
-	logerror("Reset caused by watchdog\n");
+	logerror("watchdog_reset issued\n");
 
 #if WATCHDOG_DEBUG
 	machine().debug_break();
