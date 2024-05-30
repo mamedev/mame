@@ -301,6 +301,15 @@ protected:
 	u8 m_m1_cycles;
 	u8 m_memrq_cycles;
 	u8 m_iorq_cycles;
+
+	static std::unique_ptr<u8[]> SZ;       // zero and sign flags
+	static std::unique_ptr<u8[]> SZ_BIT;   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+	static std::unique_ptr<u8[]> SZP;      // zero, sign and parity flags
+	static std::unique_ptr<u8[]> SZHV_inc; // zero, sign, half carry and overflow flags INC r8
+	static std::unique_ptr<u8[]> SZHV_dec; // zero, sign, half carry and overflow flags DEC r8
+
+	static std::unique_ptr<u8[]> SZHVC_add;
+	static std::unique_ptr<u8[]> SZHVC_sub;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

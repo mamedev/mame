@@ -193,14 +193,14 @@
 
 
 static bool tables_initialised = false;
-static u8 SZ[256];       // zero and sign flags
-static u8 SZ_BIT[256];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-static u8 SZP[256];      // zero, sign and parity flags
-static u8 SZHV_inc[256]; // zero, sign, half carry and overflow flags INC r8
-static u8 SZHV_dec[256]; // zero, sign, half carry and overflow flags DEC r8
+std::unique_ptr<u8[]> z80_device::SZ = std::make_unique<u8[]>(0x100);       // zero and sign flags
+std::unique_ptr<u8[]> z80_device::SZ_BIT = std::make_unique<u8[]>(0x100);   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+std::unique_ptr<u8[]> z80_device::SZP = std::make_unique<u8[]>(0x100);      // zero, sign and parity flags
+std::unique_ptr<u8[]> z80_device::SZHV_inc = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags INC r8
+std::unique_ptr<u8[]> z80_device::SZHV_dec = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags DEC r8
 
-static u8 SZHVC_add[2*256*256];
-static u8 SZHVC_sub[2*256*256];
+std::unique_ptr<u8[]> z80_device::SZHVC_add = std::make_unique<u8[]>(2 * 0x100 * 0x100);
+std::unique_ptr<u8[]> z80_device::SZHVC_sub = std::make_unique<u8[]>(2 * 0x100 * 0x100);
 
 
 /***************************************************************
