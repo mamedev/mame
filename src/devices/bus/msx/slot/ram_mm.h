@@ -15,6 +15,9 @@ public:
 	msx_slot_ram_mm_device &set_total_size(u32 total_size) { m_total_size = total_size; return *this; }
 	msx_slot_ram_mm_device &set_unused_bits(u8 unused_bits) { m_unused_bits = unused_bits; return *this; }
 
+	// Backdoor for the Turbo-R firmware/internal mapper to access internal RAM.
+	std::vector<u8> &get_ram() { return m_ram; }
+
 protected:
 	virtual void device_start() override;
 

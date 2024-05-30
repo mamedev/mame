@@ -1957,6 +1957,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/slot/music.h",
 		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08.cpp",
 		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08.h",
+		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08r.cpp",
+		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08r.h",
 		MAME_DIR .. "src/devices/bus/msx/slot/rom.cpp",
 		MAME_DIR .. "src/devices/bus/msx/slot/rom.h",
 		MAME_DIR .. "src/devices/bus/msx/slot/ram.cpp",

@@ -15,7 +15,7 @@ pages; and multiple pieces of rom/ram/components can occur in a single slot.
 
 #pragma once
 
-class msx_internal_slot_interface
+class msx_internal_slot_interface : public device_interface
 {
 public:
 	msx_internal_slot_interface(const msx_internal_slot_interface &device) = delete;
