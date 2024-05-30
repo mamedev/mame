@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria,Pierpaolo Prazzoli,Tomasz Slanina,Mariusz Wojcieszek
+// copyright-holders: Nicola Salmoria, Pierpaolo Prazzoli, Tomasz Slanina, Mariusz Wojcieszek
+
 /*
 
   Greyhound Electronics Inc. hardware
@@ -119,11 +120,13 @@ NOTE: Trivia Question ROM names are the internal names used. IE: read from the f
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -162,11 +165,15 @@ public:
 	void init_bank8k();
 	void init_geimulti();
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void gei_drawctrl_w(offs_t offset, uint8_t data);
-	void gei_bitmap_w(offs_t offset, uint8_t data);
+	void drawctrl_w(offs_t offset, uint8_t data);
+	void bitmap_w(offs_t offset, uint8_t data);
 	uint8_t catchall(offs_t offset);
 	template <unsigned N> void banksel_w(uint8_t data) { m_rombank->set_entry(N); }
 	void geimulti_bank_w(offs_t offset, uint8_t data);
@@ -178,7 +185,7 @@ private:
 	void sound2_w(uint8_t data);
 	void lamps2_w(uint8_t data);
 	void nmi_w(uint8_t data);
-	uint8_t portC_r();
+	uint8_t portc_r();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -192,17 +199,14 @@ private:
 	void sprtauth_map(address_map &map);
 	void suprpokr_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-
 	bitmap_ind16 m_bitmap;
 
 	uint8_t m_drawctrl[3];
 	uint8_t m_color[8];
-	int m_prevoffset;
+	uint16_t m_prevoffset;
 	int m_yadd;
-	int m_signature_answer;
-	int m_signature_pos;
+	uint8_t m_signature_answer;
+	uint8_t m_signature_pos;
 	uint8_t m_nmi_mask;
 
 	required_device<cpu_device> m_maincpu;
@@ -216,7 +220,7 @@ private:
 };
 
 
-void gei_state::gei_drawctrl_w(offs_t offset, uint8_t data)
+void gei_state::drawctrl_w(offs_t offset, uint8_t data)
 {
 	m_drawctrl[offset] = data;
 
@@ -227,12 +231,12 @@ void gei_state::gei_drawctrl_w(offs_t offset, uint8_t data)
 	}
 }
 
-void gei_state::gei_bitmap_w(offs_t offset, uint8_t data)
+void gei_state::bitmap_w(offs_t offset, uint8_t data)
 {
 	m_yadd = (offset == m_prevoffset) ? (m_yadd + 1) : 0;
 	m_prevoffset = offset;
 
-	int sx = 8 * (offset % 64);
+	int const sx = 8 * (offset % 64);
 	int sy = offset / 64;
 	sy = (sy + m_yadd) & 0xff;
 
@@ -266,7 +270,7 @@ uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void gei_state::lamps_w(uint8_t data)
 {
-	/* 5 button lamps */
+	// 5 button lamps
 	m_lamps[0] = BIT(data, 0);
 	m_lamps[1] = BIT(data, 1);
 	m_lamps[2] = BIT(data, 2);
@@ -282,24 +286,24 @@ void gei_state::lamps_w(uint8_t data)
 
 void gei_state::sound_w(uint8_t data)
 {
-	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
+	// bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 3));
 	m_lamps[9] = BIT(data, 3);
 
-	/* bit 5 - ticket out in trivia games */
+	// bit 5 - ticket out in trivia games
 	if (m_ticket.found())
 		m_ticket->motor_w(BIT(data, 5));
 
-	/* bit 6 enables NMI */
+	// bit 6 enables NMI
 	m_nmi_mask = data & 0x40;
 
-	/* bit 7 goes directly to the sound amplifier */
+	// bit 7 goes directly to the sound amplifier
 	m_dac->write(BIT(data, 7));
 }
 
 void gei_state::sound2_w(uint8_t data)
 {
-	/* bit 3,6 - coin lockout, lamp 10 + 11 in selection test mode */
+	// bit 3,6 - coin lockout, lamp 10 + 11 in selection test mode
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));
 	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 6));
 	m_lamps[9] = BIT(data, 3);
@@ -310,36 +314,36 @@ void gei_state::sound2_w(uint8_t data)
 	m_lamps[11] = BIT(data, 4);
 	m_lamps[12] = BIT(data, 5);
 
-	/* bit 7 goes directly to the sound amplifier */
+	// bit 7 goes directly to the sound amplifier
 	m_dac->write(BIT(data, 7));
 }
 
 void gei_state::lamps2_w(uint8_t data)
 {
-	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
+	// bit 4 - play/raise button lamp, lamp 9 in poker test mode
 	m_lamps[8] = BIT(data, 4);
 }
 
 void gei_state::nmi_w(uint8_t data)
 {
-	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
+	// bit 4 - play/raise button lamp, lamp 9 in selection test mode
 	m_lamps[8] = BIT(data, 4);
 
-	/* bit 6 enables NMI */
+	// bit 6 enables NMI
 	m_nmi_mask = data & 0x40;
 }
 
 uint8_t gei_state::catchall(offs_t offset)
 {
-	int pc = m_maincpu->pc();
+	int const pc = m_maincpu->pc();
 
-	if (pc != 0x3c74 && pc != 0x0364 && pc != 0x036d)   /* weed out spurious blit reads */
-		logerror("%04x: unmapped memory read from %04x\n",pc,offset);
+	if (pc != 0x3c74 && pc != 0x0364 && pc != 0x036d)   // weed out spurious blit reads
+		logerror("%04x: unmapped memory read from %04x\n", pc, offset);
 
 	return 0xff;
 }
 
-uint8_t gei_state::portC_r()
+uint8_t gei_state::portc_r()
 {
 	return 4;
 }
@@ -381,7 +385,7 @@ uint8_t gei_state::banksel_r()
 	return 0x03;
 }
 
-/* This signature is used to validate the ROMs in sportauth. Simple protection check? */
+// This signature is used to validate the ROMs in some sets. Simple protection check?
 
 uint8_t gei_state::signature_r()
 {
@@ -396,14 +400,14 @@ void gei_state::signature_w(uint8_t data)
 	{
 		m_signature_answer = m_signature[m_signature_pos++];
 
-		m_signature_pos &= 7;   /* safety; shouldn't happen */
+		m_signature_pos &= 7;   // safety; shouldn't happen
 	}
 }
 
 void gei_state::getrivia_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x2000, 0x3fff).bankr(m_rombank);
 	map(0x4000, 0x47ff).ram().share("nvram");
 	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -417,16 +421,16 @@ void gei_state::getrivia_map(address_map &map)
 	map(0x609b, 0x609b).w(FUNC(gei_state::banksel_w<5>));
 	map(0x609d, 0x609d).w(FUNC(gei_state::banksel_w<3>));
 	map(0x609e, 0x609e).w(FUNC(gei_state::banksel_w<1>));
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0x8000, 0x9fff).rom(); /* space for diagnostic ROM? */
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0x8000, 0x9fff).rom(); // space for diagnostic ROM?
 	map(0xa000, 0xbfff).rom();
-	map(0xc000, 0xffff).ram().w(FUNC(gei_state::gei_bitmap_w));
+	map(0xc000, 0xffff).ram().w(FUNC(gei_state::bitmap_w));
 }
 
 void gei_state::gselect_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x2000, 0x3fff).bankr(m_rombank);
 	map(0x4000, 0x40ff).ram().share("nvram");
 	map(0x4400, 0x4400).w(FUNC(gei_state::banksel_w<0>));
 	map(0x4401, 0x4401).w(FUNC(gei_state::banksel_w<1>));
@@ -434,15 +438,15 @@ void gei_state::gselect_map(address_map &map)
 	map(0x4403, 0x4403).w(FUNC(gei_state::banksel_w<3>));
 	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0xc000, 0xffff).ram().w(FUNC(gei_state::gei_bitmap_w));
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0xc000, 0xffff).ram().w(FUNC(gei_state::bitmap_w));
 }
 
 // TODO: where are mapped the lower 0x2000 bytes of the banks?
 void gei_state::amuse_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x2000, 0x3fff).bankr(m_rombank);
 	map(0x4000, 0x47ff).ram().share("nvram");
 	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -451,15 +455,15 @@ void gei_state::amuse_map(address_map &map)
 	map(0x607b, 0x607b).w(FUNC(gei_state::banksel_w<4>));
 	map(0x607d, 0x607d).w(FUNC(gei_state::banksel_w<2>));
 	map(0x607e, 0x607e).w(FUNC(gei_state::banksel_w<0>));
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
 	map(0x8000, 0xbfff).rom();
-	map(0xc000, 0xffff).ram().w(FUNC(gei_state::gei_bitmap_w));
+	map(0xc000, 0xffff).ram().w(FUNC(gei_state::bitmap_w));
 }
 
 void gei_state::gepoker_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x2000, 0x3fff).bankr(m_rombank);
 	map(0x4000, 0x47ff).ram().share("nvram");
 	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -468,16 +472,16 @@ void gei_state::gepoker_map(address_map &map)
 	map(0x60fb, 0x60fb).w(FUNC(gei_state::banksel_w<2>));
 	map(0x60fd, 0x60fd).w(FUNC(gei_state::banksel_w<1>));
 	map(0x60fe, 0x60fe).w(FUNC(gei_state::banksel_w<0>));
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0x8000, 0xbfff).rom(); /* space for diagnostic ROM? */
-	map(0xc000, 0xffff).ram().w(FUNC(gei_state::gei_bitmap_w));
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0x8000, 0xbfff).rom(); // space for diagnostic ROM?
+	map(0xc000, 0xffff).ram().w(FUNC(gei_state::bitmap_w));
 	map(0xe000, 0xffff).rom();
 }
 
 void gei_state::amuse1_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x2000, 0x3fff).bankr(m_rombank);
 	map(0x4000, 0x43ff).ram().share("nvram");
 	map(0x4400, 0x4400).w(FUNC(gei_state::banksel_w<0>));
 	map(0x4401, 0x4401).w(FUNC(gei_state::banksel_w<2>));
@@ -486,9 +490,9 @@ void gei_state::amuse1_map(address_map &map)
 	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5800, 0x5fff).rom();
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0x8000, 0xbfff).rom(); /* space for diagnostic ROM? */
-	map(0xc000, 0xffff).ram().w(FUNC(gei_state::gei_bitmap_w));
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0x8000, 0xbfff).rom(); // space for diagnostic ROM?
+	map(0xc000, 0xffff).ram().w(FUNC(gei_state::bitmap_w));
 	map(0xe000, 0xffff).rom();
 }
 
@@ -499,7 +503,7 @@ void gei_state::findout_map(address_map &map)
 	map(0x4000, 0x47ff).ram().share("nvram");
 	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
-	/* banked ROMs are enabled by low 6 bits of the address */
+	// banked ROMs are enabled by low 6 bits of the address
 	map(0x601f, 0x601f).w(FUNC(gei_state::banksel_w<0>));
 	map(0x602f, 0x602f).w(FUNC(gei_state::banksel_w<5>));
 	map(0x6037, 0x6037).w(FUNC(gei_state::banksel_w<4>));
@@ -508,10 +512,10 @@ void gei_state::findout_map(address_map &map)
 	map(0x603e, 0x603e).w(FUNC(gei_state::banksel_w<1>));
 	map(0x6200, 0x6200).w(FUNC(gei_state::signature_w));
 	map(0x6400, 0x6400).r(FUNC(gei_state::signature_r));
-	map(0x7800, 0x7fff).rom(); /*space for diagnostic ROM?*/
-	map(0x8000, 0xffff).bankr("rombank");
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0xc000, 0xffff).w(FUNC(gei_state::gei_bitmap_w));
+	map(0x7800, 0x7fff).rom(); // space for diagnostic ROM?
+	map(0x8000, 0xffff).bankr(m_rombank);
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0xc000, 0xffff).w(FUNC(gei_state::bitmap_w));
 }
 
 void gei_state::quizvid_map(address_map &map)
@@ -521,16 +525,16 @@ void gei_state::quizvid_map(address_map &map)
 	map(0x4000, 0x47ff).ram().share("nvram");
 	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
-	/* banked ROMs are enabled by low 6 bits of the address */
+	// banked ROMs are enabled by low 6 bits of the address
 	map(0x602f, 0x602f).r(FUNC(gei_state::banksel_r<5>));
 	map(0x6037, 0x6037).r(FUNC(gei_state::banksel_r<4>));
 	map(0x603b, 0x603b).r(FUNC(gei_state::banksel_r<3>));
 	map(0x603d, 0x603d).r(FUNC(gei_state::banksel_r<2>));
 	map(0x603e, 0x603e).r(FUNC(gei_state::banksel_r<1>));
-	map(0x7800, 0x7fff).rom(); /*space for diagnostic ROM?*/
-	map(0x8000, 0xffff).bankr("rombank");
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0xc000, 0xffff).w(FUNC(gei_state::gei_bitmap_w));
+	map(0x7800, 0x7fff).rom(); // space for diagnostic ROM?
+	map(0x8000, 0xffff).bankr(m_rombank);
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0xc000, 0xffff).w(FUNC(gei_state::bitmap_w));
 }
 
 void gei_state::suprpokr_map(address_map &map)
@@ -541,8 +545,8 @@ void gei_state::suprpokr_map(address_map &map)
 	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6200, 0x6200).w(FUNC(gei_state::signature_w));
 	map(0x6400, 0x6400).r(FUNC(gei_state::signature_r));
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0xc000, 0xffff).w(FUNC(gei_state::gei_bitmap_w));
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0xc000, 0xffff).w(FUNC(gei_state::bitmap_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -556,9 +560,9 @@ void gei_state::sprtauth_map(address_map &map)
 	map(0x5800, 0x5800).w(FUNC(gei_state::signature_w));
 	map(0x5a00, 0x5cff).w(FUNC(gei_state::geimulti_bank_w));
 	map(0x6000, 0x7fff).rom();
-	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
-	map(0x8000, 0xffff).bankr("rombank");
-	map(0xc000, 0xffff).w(FUNC(gei_state::gei_bitmap_w));
+	map(0x8000, 0x8002).w(FUNC(gei_state::drawctrl_w));
+	map(0x8000, 0xffff).bankr(m_rombank);
+	map(0xc000, 0xffff).w(FUNC(gei_state::bitmap_w));
 }
 
 static INPUT_PORTS_START(reelfun_standard)
@@ -572,7 +576,7 @@ static INPUT_PORTS_START(reelfun_standard)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")   /* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1 Left A-Z")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2 Right A-Z")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3 Select Letter")
@@ -587,14 +591,14 @@ static INPUT_PORTS_START(trivia_standard)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)       /* ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")   /* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
@@ -650,7 +654,7 @@ static INPUT_PORTS_START( gselect )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_IMPULSE(2) PORT_NAME ("Deal")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_IMPULSE(2) PORT_NAME ("Cancel")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_IMPULSE(2) PORT_NAME ("Stand")
-/*  Button 8, 6, 7 order verified in test mode switch test */
+//  Button 8, 6, 7 order verified in test mode switch test
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -660,8 +664,8 @@ static INPUT_PORTS_START( gepoker )
 	PORT_INCLUDE( gselect )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no coin 2 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no button 12 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no coin 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no button 12
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( getrivia )
@@ -669,7 +673,7 @@ static INPUT_PORTS_START( getrivia )
 	PORT_DIPNAME( 0x03, 0x01, "Questions" )     PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
-/*  PORT_DIPSETTING(    0x02, "5" )*/
+	PORT_DIPSETTING(    0x02, "5 (duplicate)" )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x04, 0x00, "Show Answer" )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
@@ -695,7 +699,7 @@ static INPUT_PORTS_START( getrivia )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, EQUALS, 0x00) PORT_NAME ("Start in no coins mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, EQUALS, 0x40)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSWA", 0x40, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)       /* ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -717,7 +721,7 @@ static INPUT_PORTS_START( sextriv1 )
 	PORT_INCLUDE( getrivia )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no coin 2 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no coin 2
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(suprpokr)
@@ -781,7 +785,7 @@ static INPUT_PORTS_START( reelfun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( findout )
-	PORT_START("DSWA")      /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
@@ -830,7 +834,7 @@ static INPUT_PORTS_START(sexappl)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7") /* Shows Message #1 and "hangs" ??? */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7") // Shows Message #1 and "hangs" ???
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
@@ -872,7 +876,7 @@ static INPUT_PORTS_START(bigjoke)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gt103 )
-	PORT_START("DSWA")      /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x01, "Coinage Multiplier" )    PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, "7" )
 	PORT_DIPSETTING(    0x06, "6" )
@@ -905,17 +909,17 @@ static INPUT_PORTS_START( quiz )
 	PORT_INCLUDE( getrivia )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  /* no tickets */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // no tickets
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no coin 2 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no tickets */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no coin 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no tickets
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gt507uk )
-	PORT_START("DSWA")      /* DSW A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, "If Ram Error" )
 	PORT_DIPSETTING(    0x01, "Freeze" )
 	PORT_DIPSETTING(    0x00, "Play" )
@@ -944,7 +948,7 @@ static INPUT_PORTS_START( gt507uk )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* coin 3, 2, 4 order verified in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) // coin 3, 2, 4 order verified in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
@@ -1028,11 +1032,11 @@ INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 
 void gei_state::getrivia(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000); /* 4 MHz */
+	Z80(config, m_maincpu, 4'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::getrivia_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gei_state::vblank_irq));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -1057,7 +1061,7 @@ void gei_state::getrivia(machine_config &config)
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
@@ -1068,7 +1072,7 @@ void gei_state::findout(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::findout_map);
 
-	m_ppi[1]->in_pc_callback().set(FUNC(gei_state::portC_r));
+	m_ppi[1]->in_pc_callback().set(FUNC(gei_state::portc_r));
 	m_ppi[1]->out_pc_callback().set_nop();
 }
 
@@ -1085,7 +1089,7 @@ void gei_state::gselect(machine_config &config)
 {
 	getrivia(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	config.device_remove("ticket");
 
@@ -1101,7 +1105,7 @@ void gei_state::jokpokera(machine_config &config)
 {
 	getrivia(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	config.device_remove("ticket");
 
@@ -1112,7 +1116,7 @@ void gei_state::amuse(machine_config &config)
 {
 	getrivia(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::amuse_map);
 }
@@ -1121,7 +1125,7 @@ void gei_state::gepoker(machine_config &config)
 {
 	getrivia(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::gepoker_map);
 }
@@ -1149,11 +1153,11 @@ void gei_state::sprtauth(machine_config &config)
 
 
 /***************************************************
-Rom board is UVM-1A
+ROM board is UVM-1A
 
 Contains:
- 3 2732  eproms (Program Code, 1 empty socket)
- 2 X2212P (Ram chips, no battery backup)
+ 3 2732  EPROMs (Program Code, 1 empty socket)
+ 2 X2212P (RAM chips, no battery backup)
  DM7408N
 
 PCB labeled M075
@@ -1162,35 +1166,35 @@ PCB labeled M075
 
 ROM_START( jokpoker )
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "m075.1", 0x00000, 0x1000, CRC(ad42465b) SHA1(3f06847a9aecb0592f99419dba9be5f18005d57b) ) /* rom board UMV-1A */
+	ROM_LOAD( "m075.1", 0x00000, 0x1000, CRC(ad42465b) SHA1(3f06847a9aecb0592f99419dba9be5f18005d57b) ) // ROM board UMV-1A
 	ROM_LOAD( "m075.2", 0x01000, 0x1000, CRC(bd129fc2) SHA1(2e05ba34922c16d127be32941447013efea05bcd) )
 	ROM_LOAD( "m075.3", 0x02000, 0x1000, CRC(45725bc9) SHA1(9e6dcbec955ef8190f2307ddb367b24b7f34338d) )
 ROM_END
 
 
-ROM_START( jokpokera )  /* UMV-7C rom board  */
+ROM_START( jokpokera ) // UMV-7C ROM board
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "jpbiwr930-1.bin", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) )  /* 16.03BI 5-10-85 */
-	ROM_LOAD( "jpbiwr930-2.bin", 0x02000, 0x2000, CRC(824d1aee) SHA1(6eebde351c3b5bbed3796846d8d651b41ed6f84a) )  /* Joker Poker ICB 9-30-86 */
+	ROM_LOAD( "jpbiwr930-1.bin", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) ) // 16.03BI 5-10-85
+	ROM_LOAD( "jpbiwr930-2.bin", 0x02000, 0x2000, CRC(824d1aee) SHA1(6eebde351c3b5bbed3796846d8d651b41ed6f84a) ) // Joker Poker ICB 9-30-86
 ROM_END
 
-ROM_START( jokpokerb ) /* UVM 7S REV A rom board */
+ROM_START( jokpokerb ) // UVM 7S REV A ROM board
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "jp_bi_10-19-88.e1", 0x00000, 0x2000, CRC(d59a78e2) SHA1(d8463675f30a52e0f93c5ea5c2ee663095d3d5ea) )  /* 16.04BI 10-19-88 */
-	ROM_LOAD( "jp_bi_10-19-88.e2", 0x02000, 0x2000, CRC(1a34dc80) SHA1(27dff743e661ae7421fef0b046e3ae205b842603) )  /* Joker Poker ICB 9-30-86 */
+	ROM_LOAD( "jp_bi_10-19-88.e1", 0x00000, 0x2000, CRC(d59a78e2) SHA1(d8463675f30a52e0f93c5ea5c2ee663095d3d5ea) ) // 16.04BI 10-19-88
+	ROM_LOAD( "jp_bi_10-19-88.e2", 0x02000, 0x2000, CRC(1a34dc80) SHA1(27dff743e661ae7421fef0b046e3ae205b842603) ) // Joker Poker ICB 9-30-86
 ROM_END
 
-ROM_START( jokpokerc )  /* UMV-7C rom board */
+ROM_START( jokpokerc ) // UMV-7C ROM board
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "jp_bi_5-10-85.1", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) )  /* 16.03BI 5-10-85 */
-	ROM_LOAD( "jp_bi_5-10-85.2", 0x02000, 0x2000, CRC(9f8bee22) SHA1(8d894d2a07bd18d731b7a54a16bb9b9230c79306) )  /* Poker No Raise ICB 9-30-86 */
+	ROM_LOAD( "jp_bi_5-10-85.1", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) ) // 16.03BI 5-10-85
+	ROM_LOAD( "jp_bi_5-10-85.2", 0x02000, 0x2000, CRC(9f8bee22) SHA1(8d894d2a07bd18d731b7a54a16bb9b9230c79306) ) // Poker No Raise ICB 9-30-86
 ROM_END
 
 /***************************************************
-Rom board is UVM-1B
+ROM board is UVM-1B
 
 Contains:
- 4 2732  eproms (Program Code)
+ 4 2732  EPROMs (Program Code)
  Battery (3.5V lithium battery) backed up NEC 8444XF301
  DM7408N
 
@@ -1198,18 +1202,18 @@ Contains:
 
 ROM_START( superbwl )
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "super_bowl.1", 0x00000, 0x1000, CRC(82edf064) SHA1(8a26377590282f51fb39d013452ba11252e7dd05) ) /* rom board UMV-1B */
+	ROM_LOAD( "super_bowl.1", 0x00000, 0x1000, CRC(82edf064) SHA1(8a26377590282f51fb39d013452ba11252e7dd05) ) // ROM board UMV-1B
 	ROM_LOAD( "super_bowl.2", 0x01000, 0x1000, CRC(2438dd1f) SHA1(26bbd1cb3d0d5b93f61b92ff95948ac9de060715) )
 	ROM_LOAD( "super_bowl.3", 0x02000, 0x1000, CRC(9b111430) SHA1(9aaa755f3e4b369477c1a0525c994a19fe0f6107) )
 	ROM_LOAD( "super_bowl.4", 0x03000, 0x1000, CRC(037cad42) SHA1(d4037a28bb49b31358b5d560e5e028d958ae2bc9) )
 ROM_END
 
 /***************************************************
-Rom board is UVM 10 B
+ROM board is UVM 10 B
 
 Contains:
- 2 2764  eproms (Program Code)
- 5 27128 eproms (Question roms)
+ 2 2764  EPROMs (Program Code)
+ 5 27128 EPROMs (Question ROMs)
  Battery (3V lithium battery) backed up HM6117P-4
  SN74LS374
  MMI PAL10L8
@@ -1218,19 +1222,19 @@ Contains:
 Sets will be listed by "series" - the program code version
  is not as important as maintaining the correct questions
  sets as per known series
-Missing sets will be filled as dumped, as question roms
+Missing sets will be filled as dumped, as question ROMs
  are interchangeable, operators did their own swaps
 
-Note: Question roms that contain "#1" (or 2 ect)
-      are corrected roms (spelling and / or answers)
+Note: Question ROMs that contain "#1" (or 2 ect)
+      are corrected ROMs (spelling and / or answers)
 
 ****************************************************/
 
-ROM_START( gtsers1 ) /* Series 1 (Complete) */
+ROM_START( gtsers1 ) // Series 1 (Complete)
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) /* rom board UMV 10 B */
+	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) // ROM board UMV 10 B
 	ROM_LOAD( "prog101c_left",  0x0a000, 0x2000, CRC(24c0a097) SHA1(b8de58baecb92775e0882cd6eca3b9e07cf7c5a5) )
-	/* Question roms */
+	// Question ROMs
 	ROM_LOAD( "science_@1",    0x10000, 0x4000, CRC(68259e09) SHA1(29e848b4744b767c51ff81a756fba7bf96daefec) )
 	ROM_LOAD( "general_@1",    0x14000, 0x4000, CRC(25a0ef9d) SHA1(793abd779cc237e14933933747bbf27bbcbfcd32) )
 	ROM_LOAD( "sports_@1",     0x18000, 0x4000, CRC(cb1744f5) SHA1(ea3f7bfcecf5c58c26aa0f34908ba5d54f7279ec) )
@@ -1238,23 +1242,23 @@ ROM_START( gtsers1 ) /* Series 1 (Complete) */
 	ROM_LOAD( "movies-tv_@1",  0x20000, 0x4000, CRC(e9a55dad) SHA1(c87682e72bad3507b24eb6a52b4e430e0bfcdab6) )
 ROM_END
 
-ROM_START( gtsers2 ) /* Series 2 (Complete - question roms dated 2/9) */
+ROM_START( gtsers2 ) // Series 2 (Complete - question ROMs dated 2/9)
 	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) /* rom board UMV 10 B */
+	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) // ROM board UMV 10 B
 	ROM_LOAD( "prog101c_left",  0x0a000, 0x2000, CRC(24c0a097) SHA1(b8de58baecb92775e0882cd6eca3b9e07cf7c5a5) )
-	/* Question roms */
+	// Question ROMs
 	ROM_LOAD( "tv_mash",          0x10000, 0x4000, CRC(a86990fc) SHA1(6a11b038d48bb97feb4857546349ed93ea1f9273) )
 	ROM_LOAD( "general_2",        0x14000, 0x4000, CRC(5798f2b3) SHA1(0636017969d9b1eac5d33cfb18cb36f7cf4cba88) )
 	ROM_LOAD( "sports_2_@2",      0x18000, 0x4000, CRC(fb632622) SHA1(c14d8178f5cfc5994e2ab4f829e353fa75b57304) )
 	ROM_LOAD( "comics_@1",        0x1c000, 0x4000, CRC(8c5cd561) SHA1(1ca566acf72ce636b1b34ee6b7cafb9584340bcc) )
-	ROM_LOAD( "entertainment_@1", 0x20000, 0x4000, CRC(cd3ce4c7) SHA1(4bd121fa5899a96b015605f84179ed82be0a25f3) ) /* Correct spelling of "Acapella" */
+	ROM_LOAD( "entertainment_@1", 0x20000, 0x4000, CRC(cd3ce4c7) SHA1(4bd121fa5899a96b015605f84179ed82be0a25f3) ) // Correct spelling of "Acapella"
 ROM_END
 
-ROM_START( gtsers3 ) /* Series 3 (Complete - question roms dated 3/9) */
+ROM_START( gtsers3 ) // Series 3 (Complete - question ROMs dated 3/9)
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog102b_right",   0x00000, 0x2000, CRC(e8391f71) SHA1(a955eff87d622d4fcfd25f6d888c48ff82556879) )
 	ROM_LOAD( "prog102b_left",    0x0a000, 0x2000, CRC(cc7b45a7) SHA1(c708f56feb36c1241358a42bb7dce25b799f1f0b) )
-	/* Question roms */
+	// Question ROMs
 	ROM_LOAD( "beatlemania_@1", 0x10000, 0x4000, CRC(c35ab539) SHA1(aa7c9b532aeb289b71c179e6ff1cc5b63dbe240c) )
 	ROM_LOAD( "general_3",      0x14000, 0x4000, CRC(a60f17a4) SHA1(0d79be9e2e49b9817e94d410e25bb6dcda10aa9e) )
 	ROM_LOAD( "sports_3_@3",    0x18000, 0x4000, CRC(b22cec38) SHA1(a416c3de9749fda3ab5ae5841304da0cef900cbf) )
@@ -1262,71 +1266,82 @@ ROM_START( gtsers3 ) /* Series 3 (Complete - question roms dated 3/9) */
 	ROM_LOAD( "tv_soaps",       0x20000, 0x4000, CRC(26914f3a) SHA1(aec380cea14d6acb71986f3d65c7620b16c174ae) )
 ROM_END
 
-ROM_START( gtsers4 ) /* Series 4 (Incomplete - question roms dated 4/9) */
+ROM_START( gtsers4 ) // Series 4 (Incomplete - question ROMs dated 4/9)
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
-	/* Question roms */
+	// Question ROMs
 	ROM_LOAD( "history-geog",   0x10000, 0x4000, CRC(76d6b026) SHA1(613809b247cb27773631a1bb34af485c2b1bd486) )
 	ROM_LOAD( "star_trek",      0x14000, 0x4000, CRC(19764e00) SHA1(d7ed577dba02776ac58e8f34b833ed07679c0af1) )
 	ROM_LOAD( "television_@1",  0x18000, 0x4000, CRC(0f646389) SHA1(23fefe2e6cc26767d52604e7ab15bb4db99a6e94) )
-	/* Missing "baseball" */
-	/* Missing "hollywood" */
+	// Missing "baseball"
+	// Missing "hollywood"
 ROM_END
 
-ROM_START( gtsers5 ) /* Series 5 (Incomplete - question roms dated 5/9) */
+ROM_START( gtsers5 ) // Series 5 (Incomplete - question ROMs dated 5/9)
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
-	/* Question roms */
+	// Question ROMs
 	ROM_LOAD( "james_bond",    0x10000, 0x4000, CRC(fe9fadfd) SHA1(44b3fee1f14148f47b0b40600aabd5bff9b65e85) )
 	ROM_LOAD( "hockey",        0x14000, 0x4000, CRC(4874a431) SHA1(f3c11dfbf71d101aa1a6cd3622b282a4ebe4664b) )
-	/* Missing "the_states" */
-	/* Missing "wild_west" */
-	/* Missing "elvismania" */
+	// Missing "the_states"
+	// Missing "wild_west"
+	// Missing "elvismania"
 ROM_END
 
-ROM_START( gtsers7 ) /* Series 7 (Incomplete - question roms dated 7/9?) */
+ROM_START( gtsers7 ) // Series 7 (Complete - question ROMs dated 7/9)
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
-	/* Question roms */
-	ROM_LOAD( "general_5",     0x10000, 0x4000, CRC(81bf07c7) SHA1(a53f050b4ef8ffc0499b50224d4bbed4af0ca09c) )
-	ROM_LOAD( "sex_triv",      0x14000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) /* Dated 7/9 - listed as an alternate question set */
-	/* Missing "tv_dallas" */
-	/* Missing "kids_korner" */
-	/* Missing "good_guys" */
-	/* Missing "biblical" */
+	// Question ROMs
+	ROM_LOAD( "t.v._dallas", 0x10000, 0x4000, CRC(7540453b) SHA1(9e215d7504ddf57d32d513b4cf87e7306915d1a4) )
+	ROM_LOAD( "general_v",   0x14000, 0x4000, CRC(81bf07c7) SHA1(a53f050b4ef8ffc0499b50224d4bbed4af0ca09c) )
+	ROM_LOAD( "kids_korner", 0x18000, 0x4000, CRC(66631b79) SHA1(ec534941add7113c9bb96d00f2e09834275e314b) )
+	ROM_LOAD( "good_guys",   0x1c000, 0x4000, CRC(4d638326) SHA1(2d6d00ae7f02d1607f37eb1cefae31c42797b2cf) )
+	ROM_LOAD( "biblical",    0x20000, 0x4000, CRC(3372692d) SHA1(b45a2d22d4d90eb947ed9d3469ef4328640d69a8) )
 ROM_END
 
-ROM_START( gtsersa ) /* alt or older version questions */
+ROM_START( gtsers7a ) // Series 7 (Complete - question ROMs dated 7/9)
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
-	/* Question roms */
-	ROM_LOAD( "sports",               0x10000, 0x4000, CRC(9b4a17b6) SHA1(1b5358b5bc83c2817ecfa4e277fa351a679d5023) ) /* Series 1 question */
-	ROM_LOAD( "entertainment_@1_old", 0x14000, 0x4000, CRC(2bffb3b4) SHA1(5947ebd708df35cefa86608392909c16b25d0710) ) /* Dated 2/9 - Spells "Acapella" as "Cappella" */
-	ROM_LOAD( "sports_2",             0x18000, 0x4000, CRC(e8f8e168) SHA1(d2bc57dc0799dd8817b15857f17c4d7ee4d9f932) ) /* Dated 2/9 */
-	ROM_LOAD( "comics",               0x1c000, 0x4000, CRC(7efdfe8f) SHA1(ec255777c61677ca32c49b9da5e85e07c0647e5f) ) /* Dated 2/9 */
-	ROM_LOAD( "entertainment",        0x20000, 0x4000, CRC(b670b9e8) SHA1(0d2246fcc6c753694bc9bd1fc05ac439f24059ef) ) /* Dated 2/9 */
+	// Question ROMs
+	ROM_LOAD( "t.v._dallas", 0x10000, 0x4000, CRC(7540453b) SHA1(9e215d7504ddf57d32d513b4cf87e7306915d1a4) )
+	ROM_LOAD( "general_v",   0x14000, 0x4000, CRC(81bf07c7) SHA1(a53f050b4ef8ffc0499b50224d4bbed4af0ca09c) )
+	ROM_LOAD( "kids_korner", 0x18000, 0x4000, CRC(66631b79) SHA1(ec534941add7113c9bb96d00f2e09834275e314b) )
+	ROM_LOAD( "good_guys",   0x1c000, 0x4000, CRC(4d638326) SHA1(2d6d00ae7f02d1607f37eb1cefae31c42797b2cf) )
+	ROM_LOAD( "sex_triv.",   0x20000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) // Listed as an alternate question set
 ROM_END
 
-ROM_START( gtsersb ) /* alt or older version questions */
+ROM_START( gtsersa ) // alt or older version questions
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
-	/* Question roms */
-	ROM_LOAD( "beatlemania_old", 0x10000, 0x4000, CRC(cb241960) SHA1(e560b776b2cb5fd29d1663fffdf68f4427d674a9) ) /* Dated 3/9 */
-	ROM_LOAD( "sports_3_old",    0x14000, 0x4000, CRC(5986996c) SHA1(56432c15a3b0204ed527c18e24716f17bb52dc4e) ) /* Dated 3/9 */
-	ROM_LOAD( "television_old",  0x18000, 0x4000, CRC(413f34c8) SHA1(318f6b464449bf3f0c43c4210a667190c774eb67) ) /* Dated 4/9 */
-	ROM_LOAD( "facts_of_life",   0x1c000, 0x4000, CRC(1668c7bf) SHA1(6bf43de26f8a626560579ab75fd0890fe00f99dd) ) /* Unknown series question set */
+	// Question ROMs
+	ROM_LOAD( "sports",               0x10000, 0x4000, CRC(9b4a17b6) SHA1(1b5358b5bc83c2817ecfa4e277fa351a679d5023) ) // Series 1 question
+	ROM_LOAD( "entertainment_@1_old", 0x14000, 0x4000, CRC(2bffb3b4) SHA1(5947ebd708df35cefa86608392909c16b25d0710) ) // Dated 2/9 - Spells "Acapella" as "Cappella"
+	ROM_LOAD( "sports_2",             0x18000, 0x4000, CRC(e8f8e168) SHA1(d2bc57dc0799dd8817b15857f17c4d7ee4d9f932) ) // Dated 2/9
+	ROM_LOAD( "comics",               0x1c000, 0x4000, CRC(7efdfe8f) SHA1(ec255777c61677ca32c49b9da5e85e07c0647e5f) ) // Dated 2/9
+	ROM_LOAD( "entertainment",        0x20000, 0x4000, CRC(b670b9e8) SHA1(0d2246fcc6c753694bc9bd1fc05ac439f24059ef) ) // Dated 2/9
+ROM_END
+
+ROM_START( gtsersb ) // alt or older version questions
+	ROM_REGION( 0x24000, "maincpu", 0 )
+	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
+	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
+	// Question ROMs
+	ROM_LOAD( "beatlemania_old", 0x10000, 0x4000, CRC(cb241960) SHA1(e560b776b2cb5fd29d1663fffdf68f4427d674a9) ) // Dated 3/9
+	ROM_LOAD( "sports_3_old",    0x14000, 0x4000, CRC(5986996c) SHA1(56432c15a3b0204ed527c18e24716f17bb52dc4e) ) // Dated 3/9
+	ROM_LOAD( "television_old",  0x18000, 0x4000, CRC(413f34c8) SHA1(318f6b464449bf3f0c43c4210a667190c774eb67) ) // Dated 4/9
+	ROM_LOAD( "facts_of_life",   0x1c000, 0x4000, CRC(1668c7bf) SHA1(6bf43de26f8a626560579ab75fd0890fe00f99dd) ) // Unknown series question set
 ROM_END
 
 ROM_START( sextriv1 )
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog1_right",   0x00000, 0x2000, CRC(73abcd12) SHA1(3b985f25a11507878cef6d11420e215065fb0906) )
 	ROM_LOAD( "prog1_left",    0x0a000, 0x2000, CRC(04ee6ecd) SHA1(28342fcdcf36b34fa93f1a985163ca5aab03defe) )
-	/* Question roms */
+	// Question ROMs
 	ROM_LOAD( "adult_sex",    0x10000, 0x4000, CRC(509a8183) SHA1(635c784860e423b22aaea94abc53c1d9477cb1df) )
 	ROM_LOAD( "arousing_sex", 0x14000, 0x4000, CRC(1dbf4578) SHA1(51a548d5fe59739e62b5f0e9e6ebc7deb8656210) )
 	ROM_LOAD( "intimate_sex", 0x18000, 0x4000, CRC(1f46b626) SHA1(04aa5306c69d130e0f84fa390a773e73c06e5e9b) )
@@ -1338,20 +1353,20 @@ ROM_START( sextriv2 )
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "prog1_right",     0x00000, 0x2000, CRC(73abcd12) SHA1(3b985f25a11507878cef6d11420e215065fb0906) )
 	ROM_LOAD( "prog1_left",      0x0a000, 0x2000, CRC(04ee6ecd) SHA1(28342fcdcf36b34fa93f1a985163ca5aab03defe) )
-	/* Question roms */
+	// Question ROMs
 	ROM_LOAD( "sex_triv",        0x10000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) )
 	ROM_LOAD( "general_sex",     0x14000, 0x4000, CRC(36fed946) SHA1(25d445ab6cb4b6f41a1dd7104ee1141e597b2e9e) )
 	ROM_LOAD( "educational_sex", 0x18000, 0x4000, CRC(281cbe03) SHA1(9c3900cd2535f942a5cbae7edd46ac0170e04c52) )
 ROM_END
 
 /***************************************************
-Rom board is UVM-4B
+ROM board is UVM-4B
 
-Contains 5 2764 eproms, MMI PAL16R4CN
+Contains 5 2764 EPROMs, MMI PAL16R4CN
 
 Battery (3V lithium battery) backed up HM6117P-4
 
-Roms labeled as:
+ROMs labeled as:
 
 4/1  at spot 1
 BLJK at spot 2
@@ -1367,14 +1382,14 @@ sets as the alt set also included that name on the labels
 To clear remaining credits:
   Press STAND, DEAL and 3rd DISCARD buttons at the same time.
   Hold all 3 buttons down for 5 seconds.  The screen will
-   turn RED indicating a successful "CLEAR" occurrred
+   turn RED indicating a successful "CLEAR" occurred
 
 ****************************************************/
 
 ROM_START( gs4002 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "4-1.1",          0x00000, 0x2000, CRC(a456e456) SHA1(f36b96ac31ce0f128ecb94f94d1dbdd88ee03c77) ) /* V16M 5-4-84 */
-	/* Banked roms */
+	ROM_LOAD( "4-1.1",          0x00000, 0x2000, CRC(a456e456) SHA1(f36b96ac31ce0f128ecb94f94d1dbdd88ee03c77) ) // V16M 5-4-84
+	// Banked ROMs
 	ROM_LOAD( "bljk_3-16-84.2", 0x10000, 0x2000, CRC(c3785523) SHA1(090f324fc7adb0a36b189cf04086f0e050895ee4) )
 	ROM_LOAD( "pokr_5-16-84.3", 0x12000, 0x2000, CRC(f0e99cc5) SHA1(02fdc95974e503b6627930918fcc3c029a7a4612) )
 	ROM_LOAD( "sprd_1-24-84.4", 0x14000, 0x2000, CRC(5fe90ed4) SHA1(38db69567d9c38f78127e581fdf924aca4926378) )
@@ -1383,8 +1398,8 @@ ROM_END
 
 ROM_START( gs4002a )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "4-1.1",          0x00000, 0x2000, CRC(a456e456) SHA1(f36b96ac31ce0f128ecb94f94d1dbdd88ee03c77) ) /* V16M 5-4-84 */
-	/* Banked roms */
+	ROM_LOAD( "4-1.1",          0x00000, 0x2000, CRC(a456e456) SHA1(f36b96ac31ce0f128ecb94f94d1dbdd88ee03c77) ) // V16M 5-4-84
+	// Banked ROMs
 	ROM_LOAD( "bljk_3-16-84.2", 0x10000, 0x2000, CRC(c3785523) SHA1(090f324fc7adb0a36b189cf04086f0e050895ee4) )
 	ROM_LOAD( "pokr_5-16-84.3", 0x12000, 0x2000, CRC(f0e99cc5) SHA1(02fdc95974e503b6627930918fcc3c029a7a4612) )
 	ROM_LOAD( "bone_5-16-84.4", 0x14000, 0x2000, CRC(eccd2fb0) SHA1(2683e432ffcca4280c31f57b2596e4389bc59b7b) )
@@ -1397,23 +1412,23 @@ Greyhound Poker board...
 
 Standard Greyhound Electronics Inc UV-1B mainboard.
 
-Rom board UVM 10 B or UMV 10 C
+ROM board UVM 10 B or UMV 10 C
 
-Battery backed up NEC D449C ram
+Battery backed up NEC D449C RAM
 PAL16R4
 74L374
 
-Roms in this order on the UMV 10 C board:
+ROMs in this order on the UMV 10 C board:
 
 Label        Normally in the slot
 --------------------------------
 High
 Control
-rom1         Joker Poker
-rom2         Black jack
-rom3         Rolling Bones
-rom4         Casino Slots
-rom5         Horse Race
+ROM1         Joker Poker
+ROM2         Black jack
+ROM3         Rolling Bones
+ROM4         Casino Slots
+ROM5         Horse Race
 
 For UMV 10 B: 1C, 2C, 1, 2, 3, 4, & 5
 
@@ -1421,8 +1436,8 @@ There looks to be several types and combos for these, some are "ICB" or "IAM"
 It also looks like operators mixed & matched to upgrade (some times incorrectly)
 their boards.  Sets will be filled in as found and dumped.
 
-There are some versions, like, the ICB sets that use 2764 roms for all roms. While the IAM set uses
-27128 roms for all roms.  These roms are the correct size, but it's currently not known if the rom
+There are some versions, like, the ICB sets that use 2764 ROMs for all ROMs. While the IAM set uses
+27128 ROMs for all ROMs.  These ROMs are the correct size, but it's currently not known if the ROM
 board (UVM 10 B/C) "sees" them as 27128 or the standard size of 2764.
 
 Dumped, but not known to be supported by any High/Control combo:
@@ -1432,11 +1447,11 @@ The ICB set is known as the M105 set as some label sets included that name.
 
 */
 
-ROM_START( gepoker ) /* v50.02 with most roms for ICB dated 8-16-84 */
+ROM_START( gepoker ) // v50.02 with most ROMs for ICB dated 8-16-84
 	ROM_REGION( 0x1b000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_icb_8-16",    0x00000, 0x2000, CRC(0103963d) SHA1(9bc646e721048b84111e0686eaca23bc24eee3e2) )
 	ROM_LOAD( "high_icb_6-25-85-5",  0x0e000, 0x2000, CRC(dfb6592e) SHA1(d68de9f537d3c14279dc576424d195bb266e3897) )
-	/* Banked roms */
+	// Banked ROMs
 	ROM_LOAD( "jokerpoker_icb_8-16-84",    0x10000, 0x2000, CRC(0834a1e6) SHA1(663e6f4e0586eb9b84d3098aef8c596585c27304) )
 	ROM_LOAD( "blackjack_icb_8-16-84",     0x12000, 0x2000, CRC(cff27ffd) SHA1(fd85b54400b2f22ae92042b01a2c162e64d2d066) )
 	ROM_LOAD( "rollingbones_icb_8-16-84",  0x14000, 0x2000, CRC(52d66cb6) SHA1(57db34906fcafd37f3a361df209dafe080aeac16) )
@@ -1444,57 +1459,57 @@ ROM_START( gepoker ) /* v50.02 with most roms for ICB dated 8-16-84 */
 	ROM_LOAD( "horserace_icb_3-19-85",     0x18000, 0x2000, CRC(f1e6e61e) SHA1(944b1ab4af911e5ed136f1fca3c44219726eeebb) )
 ROM_END
 
-ROM_START( gepoker1 ) /* v50.02 with roms for ICB dated 9-30-86 */
+ROM_START( gepoker1 ) // v50.02 with ROMs for ICB dated 9-30-86
 	ROM_REGION( 0x1b000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_icb_9-30",    0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
 	ROM_LOAD( "high_icb_6-25-85-5a", 0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
-	/* Banked roms */
+	// Banked ROMs
 	ROM_LOAD( "jokerpoker_icb_9-30-86",    0x10000, 0x2000, CRC(a1473367) SHA1(9b37ccafc02704e8f1d61150326494e86148d84e) )
 	ROM_LOAD( "blackjack_icb_9-30-86",     0x12000, 0x2000, CRC(82804184) SHA1(2e2e6a80c99c8eb226dc54c1d32d0bf24de300a4) )
 	ROM_LOAD( "casinoslots_icb_9-30-86",   0x14000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
 	ROM_LOAD( "beatthespread_icb_9-30-86", 0x16000, 0x2000, CRC(93654d2a) SHA1(3aa5a54b91867c03182e93a7f1607545503a33f7) )
-	ROM_LOAD( "instantbingo_t24_10-07-86", 0x18000, 0x2000, CRC(de87ed0a) SHA1(4a26d93368c1a39dd38aabe450c34203101f0ef7) ) /* Found with this set, is it compatible or an operator swap? */
+	ROM_LOAD( "instantbingo_t24_10-07-86", 0x18000, 0x2000, CRC(de87ed0a) SHA1(4a26d93368c1a39dd38aabe450c34203101f0ef7) ) // Found with this set, is it compatible or an operator swap?
 ROM_END
 
-ROM_START( gepoker2 ) /* v50.02 with control dated 9-30-84 */
+ROM_START( gepoker2 ) // v50.02 with control dated 9-30-84
 	ROM_REGION( 0x1b000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_icb_9-30",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
 	ROM_LOAD( "high_icb_6-25a",    0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
-	/* Banked roms */
+	// Banked ROMs
 	ROM_LOAD( "jokerpoker_cb_10-19-88",    0x10000, 0x2000, CRC(a590af75) SHA1(63bc64fbc9ac0c489b1f4894d77a4be13d7251e7) )
 	ROM_LOAD( "horserace_icb_1-1-87",      0x12000, 0x2000, CRC(6d5092e3) SHA1(ef99d1b858aef3c438c61c2b17e371dc6aca6623) )
 ROM_END
 
-ROM_START( gepoker3 ) /* v50.02 with control dated 9-30-84 */
+ROM_START( gepoker3 ) // v50.02 with control dated 9-30-84
 	ROM_REGION( 0x1b000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "cont_9-30_m105_pts.2c",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
 	ROM_LOAD( "hrom_6-25_m105_pts.1c",  0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
-	/* Banked roms */
-	ROM_LOAD( "pokr_chig_2-12_m105.1",  0x10000, 0x2000, CRC(a1cbf67b) SHA1(a6cd081bbb19b2dd1a84b7750eac8a5258a663eb) )//not original sticker, twice the size of a regular rom, but still don't match
-	ROM_CONTINUE( 0x10000, 0x2000) /* Discarding 1nd half, 0xff filled*/
+	// Banked ROMs
+	ROM_LOAD( "pokr_chig_2-12_m105.1",  0x10000, 0x2000, CRC(a1cbf67b) SHA1(a6cd081bbb19b2dd1a84b7750eac8a5258a663eb) )//not original sticker, twice the size of a regular ROM, but still don't match
+	ROM_CONTINUE( 0x10000, 0x2000) // Discarding 1nd half, 0xff filled
 	ROM_LOAD( "bljk_9-30_m105_pts.2",   0x12000, 0x2000, CRC(82804184) SHA1(2e2e6a80c99c8eb226dc54c1d32d0bf24de300a4) )
 	ROM_LOAD( "bone_8-16_m105_pts.3",   0x14000, 0x2000, CRC(52d66cb6) SHA1(57db34906fcafd37f3a361df209dafe080aeac16) )
 	ROM_LOAD( "slot_9-30_m105_pts.4",   0x16000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
 	ROM_LOAD( "bingo_8-16_m105.5",      0x18000, 0x2000, CRC(de87ed0a) SHA1(4a26d93368c1a39dd38aabe450c34203101f0ef7) ) //not original sticker selftest report 10-7-86 date!!
 ROM_END
 
-ROM_START( amuse ) /* v50.08 with most roms for IAM dated 8-16-84 */
+ROM_START( amuse ) // v50.08 with most ROMs for IAM dated 8-16-84
 	ROM_REGION( 0x24000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "control_iam_8-16",  0x00000, 0x4000, CRC(345434b9) SHA1(ec880f6f5e90aa971937e0270701e323f6a83671) ) /* all roms were 27128, twice the size of other sets */
-	ROM_LOAD( "high_iam_8-16",     0x08000, 0x4000, CRC(57000fb7) SHA1(144723eb528c4816b9aa4b0ba77d2723c6442546) ) /* Is only the 1st half used by the board / program? */
-	/* Banked roms */
-	ROM_LOAD( "jokerpoker_iam_8-16-84",    0x10000, 0x4000, CRC(33794a87) SHA1(2b46809623713582746d9f817db33077f15a3684) ) /* This set is verified correct by 3 different sets checked */
+	ROM_LOAD( "control_iam_8-16",  0x00000, 0x4000, CRC(345434b9) SHA1(ec880f6f5e90aa971937e0270701e323f6a83671) ) // all ROMs were 27128, twice the size of other sets
+	ROM_LOAD( "high_iam_8-16",     0x08000, 0x4000, CRC(57000fb7) SHA1(144723eb528c4816b9aa4b0ba77d2723c6442546) ) // Is only the 1st half used by the board / program?
+	// Banked ROMs
+	ROM_LOAD( "jokerpoker_iam_8-16-84",    0x10000, 0x4000, CRC(33794a87) SHA1(2b46809623713582746d9f817db33077f15a3684) ) // This set is verified correct by 3 different sets checked
 	ROM_LOAD( "blackjack_iam_8-16-84",     0x14000, 0x4000, CRC(6e10b5b8) SHA1(5dc294b4a562193a99b0d307323fcc084a053426) )
 	ROM_LOAD( "rollingbones_iam_8-16-84",  0x18000, 0x4000, CRC(26949774) SHA1(20571b955521ec3929430249aa651cee8a97043d) )
 	ROM_LOAD( "casinoslots_iam_8-16-84",   0x1c000, 0x4000, CRC(c5a1eec6) SHA1(43d31bfe4cbbb6b86f52f675f513050866443176) )
 	ROM_LOAD( "horserace_iam_3-19-84",     0x20000, 0x4000, CRC(7b9e75cb) SHA1(0db8da6f5f59f57886766bec96102d43796567ef) )
 ROM_END
 
-ROM_START( amuse1 ) /* V30.08  Rom board UMV8-B */
+ROM_START( amuse1 ) // V30.08  ROM board UMV8-B
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m108_control_5-16-84",  0x00000, 0x4000, CRC(9dda922f) SHA1(ded42adda8376452e0ac4f771ebb42fd86811dc5) )
 	ROM_LOAD( "m108_hcon_5-16-84",     0x05800, 0x1000, CRC(ade5c42d) SHA1(d3e32ecaeb21a4e5eedd243c42d5914b03f572bd) )
-	/* Banked roms */
+	// Banked ROMs
 	ROM_LOAD( "jokerpoker_amba_5-16-84",   0x10000, 0x4000, CRC(530b22d7) SHA1(418d41820429d0f8e054d383c502f4d75505ddca) )
 	ROM_LOAD( "rollingbones_am_5-16-84",   0x14000, 0x4000, CRC(60496f5a) SHA1(9f9fd4191eaaa12350dbcc9d414306454b2adfba) )
 	ROM_LOAD( "beatthespread_am2p_3-16-84",0x18000, 0x4000, CRC(40997230) SHA1(49e92a9f371a9839c94aa923aa5883284dae9dc2) )
@@ -1502,13 +1517,13 @@ ROM_END
 
 /*
 
-Rom board is "GEI, inc UVM-8B" with a date code of "8339"
+ROM board is "GEI, inc UVM-8B" with a date code of "8339"
 
-Contains 1 AM2732A eprom, 5 HN4827128G eproms, 1 MMI PAL16R4CN, 1 7474N
+Contains 1 AM2732A EPROM, 5 HN4827128G EPROMs, 1 MMI PAL16R4CN, 1 7474N
 
 Battery (3V lithium battery) backed up HM6117P-4
 
-Roms labeled as:
+ROMs labeled as:
 
 HCON M108 9/30 at spot C (AM2732A-DC)
 CONT M108 9/26 at spot 1 (HN4827128G-25)
@@ -1523,7 +1538,7 @@ ROM_START( amuse1a )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cont m108 9_26.1", 0x00000, 0x4000, CRC(122d235b) SHA1(5647e7f50cc4c18d98e8f0517ca2f0dacf57cae7) )
 	ROM_LOAD( "hcon m108 9_30.c", 0x05800, 0x1000, CRC(5beb3d8b) SHA1(40a9458444f6a8e763a0374ab74e745500f4bf8a) )
-	/* Banked roms */
+	// Banked ROMs
 	ROM_LOAD( "pokr m108 9_26.2", 0x10000, 0x4000, CRC(eafa1e22) SHA1(714b82ce2034c88b79d45a691dd71c975f91078c) )
 	ROM_LOAD( "bljk m108 9_26.3", 0x14000, 0x4000, CRC(c31a8b89) SHA1(487a3be9b5f3db3388de03ebc5f4a3f1572df19b) )
 	ROM_LOAD( "bone m108 9_26.4", 0x18000, 0x4000, CRC(40307a55) SHA1(3b276aa3ee6e8b25d1840d131db8d5dca34fe856) )
@@ -1531,7 +1546,7 @@ ROM_START( amuse1a )
 ROM_END
 
 
-ROM_START( suprpokr )  /* Super Poker Version 10.19S BOBC. Rom board UMV-7C */
+ROM_START( suprpokr ) // Super Poker Version 10.19S BOBC. ROM board UMV-7C
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "supr_pokr_10.19s_@1", 0x00000, 0x4000, CRC(50662b4d) SHA1(967161a755db43d2cfd5ce92e14c5284f1f1f8ad) )
 	ROM_LOAD( "supr_pokr_10.19s_@2", 0x08000, 0x4000, CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) )
@@ -1544,7 +1559,7 @@ ROM_START( suprpokr )  /* Super Poker Version 10.19S BOBC. Rom board UMV-7C */
 	ROM_LOAD( "suprpokr.sig",   0x0000, 0x0008, CRC(8f622afe) SHA1(8c1c8cee444c88211760a0f5c3adcfd887da5bb7) )
 ROM_END
 
-ROM_START( suprpokra )  /* Super Poker Version 10.15S BOBC. Rom board UMV-7C */
+ROM_START( suprpokra ) // Super Poker Version 10.15S BOBC. ROM board UMV-7C
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "supr_pokr_10.15s_@1", 0x00000, 0x4000, CRC(5cc7c1e0) SHA1(1cdca32c4df7227dab77574abe344b291741139e) )
 	ROM_LOAD( "supr_pokr_10.15s_@2", 0x08000, 0x4000, CRC(e47d6e2a) SHA1(9cabc42275dad8be6cd5b167e381ddb5bf08276d) )
@@ -1557,7 +1572,7 @@ ROM_START( suprpokra )  /* Super Poker Version 10.15S BOBC. Rom board UMV-7C */
 	ROM_LOAD( "suprpokr.sig",   0x0000, 0x0008, CRC(8f622afe) SHA1(8c1c8cee444c88211760a0f5c3adcfd887da5bb7) )
 ROM_END
 
-ROM_START( suprpokrb )  /* Super Poker Version 10.10 BOBC. Rom board UMV-7C */
+ROM_START( suprpokrb ) // Super Poker Version 10.10 BOBC. ROM board UMV-7C
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "supr_pokr_10.10_@1", 0x00000, 0x4000, CRC(8324471f) SHA1(c38b7a735ef06feea3e8d4ba6dd963e24d38c792) )
 	ROM_LOAD( "supr_pokr_10.10_@2", 0x08000, 0x4000, CRC(a82ca9c5) SHA1(3b0f4ad7d53370dc1f00dec696e993359147a496) )
@@ -1571,75 +1586,75 @@ ROM_START( suprpokrb )  /* Super Poker Version 10.10 BOBC. Rom board UMV-7C */
 ROM_END
 
 
-ROM_START( reelfun ) /* v7.03, From a TRIV3D romboard - T4 question ROMs */
+ROM_START( reelfun ) // v7.03, From a TRIV3D ROM board - T4 question ROMs
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "reelfun_v7.03.cnt",    0x00000, 0x4000, CRC(ce42e0ea) SHA1(87f703b14aa819c54e54b42e639448521c01f76b) )
-	ROM_LOAD( "reelfun_v7.01.prg",    0x08000, 0x2000, CRC(615d846a) SHA1(ffa1c47393f4f364aa34d14cf3ac2f56d9eaecb0) )   /* banked */
-	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) )   /* banked ROMs for solution data */
+	ROM_LOAD( "reelfun_v7.01.prg",    0x08000, 0x2000, CRC(615d846a) SHA1(ffa1c47393f4f364aa34d14cf3ac2f56d9eaecb0) ) // banked
+	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) ) // banked ROMs for solution data
 	ROM_LOAD( "reelfun-2-place",      0x18000, 0x8000, CRC(a0066bfd) SHA1(b6f031ab50eb396be79e79e06f2101400683ec3e) )
 	ROM_LOAD( "reelfun-3-phrase",     0x20000, 0x8000, CRC(199e36b0) SHA1(d9dfe39c9a4fca1169150f8941f8ebc499dfbaf5) )
 	ROM_LOAD( "reelfun-4-person",     0x28000, 0x8000, CRC(49b0710b) SHA1(a38b3251bcb8683d43bdb903036970140a9735e6) )
 	ROM_LOAD( "reelfun-5-song_title", 0x30000, 0x8000, CRC(cce01c45) SHA1(c484f5828928edf39335cedf21acab0b9e2a6881) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "reelfun.nvram",   0x0000, 0x0800, CRC(fbb791ce) SHA1(0db77cbc42b5362b3d2ecde46a4289619e8f59a6) ) /* Defaults */
+	ROM_LOAD( "reelfun.nvram",   0x0000, 0x0800, CRC(fbb791ce) SHA1(0db77cbc42b5362b3d2ecde46a4289619e8f59a6) ) // Defaults
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
-	ROM_LOAD( "reelfun.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) /* Same signature for all T4 ROM sets? */
+	ROM_LOAD( "reelfun.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) // Same signature for all T4 ROM sets?
 ROM_END
 
-ROM_START( reelfun1 ) /* v7.01, From a TRIV3D romboard - T4 question ROMs */
+ROM_START( reelfun1 ) // v7.01, From a TRIV3D ROM board - T4 question ROMs
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "reelfun_v7.01.cnt",    0x00000, 0x4000, CRC(d9d1e92b) SHA1(337f66a37b3734d565b3ff3d912e0f690fd7c445) )
-	ROM_LOAD( "reelfun_v7.01.prg",    0x08000, 0x2000, CRC(615d846a) SHA1(ffa1c47393f4f364aa34d14cf3ac2f56d9eaecb0) )   /* banked */
-	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) )   /* banked ROMs for solution data */
+	ROM_LOAD( "reelfun_v7.01.prg",    0x08000, 0x2000, CRC(615d846a) SHA1(ffa1c47393f4f364aa34d14cf3ac2f56d9eaecb0) ) // banked
+	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) ) // banked ROMs for solution data
 	ROM_LOAD( "reelfun-2-place",      0x18000, 0x8000, CRC(a0066bfd) SHA1(b6f031ab50eb396be79e79e06f2101400683ec3e) )
 	ROM_LOAD( "reelfun-3-phrase",     0x20000, 0x8000, CRC(199e36b0) SHA1(d9dfe39c9a4fca1169150f8941f8ebc499dfbaf5) )
 	ROM_LOAD( "reelfun-4-person",     0x28000, 0x8000, CRC(49b0710b) SHA1(a38b3251bcb8683d43bdb903036970140a9735e6) )
 	ROM_LOAD( "reelfun-5-song_title", 0x30000, 0x8000, CRC(cce01c45) SHA1(c484f5828928edf39335cedf21acab0b9e2a6881) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "reelfun.nvram",   0x0000, 0x0800, CRC(fbb791ce) SHA1(0db77cbc42b5362b3d2ecde46a4289619e8f59a6) ) /* Defaults */
+	ROM_LOAD( "reelfun.nvram",   0x0000, 0x0800, CRC(fbb791ce) SHA1(0db77cbc42b5362b3d2ecde46a4289619e8f59a6) ) // Defaults
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
-	ROM_LOAD( "reelfun.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) /* Same signature for all T4 ROM sets? */
+	ROM_LOAD( "reelfun.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) // Same signature for all T4 ROM sets?
 ROM_END
 
-ROM_START( reelfun0 ) /* v7.00, From a TRIV3D romboard - T4 question ROMs */
+ROM_START( reelfun0 ) // v7.00, From a TRIV3D ROM board - T4 question ROMs
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "reelfun_v7.00.cnt",    0x00000, 0x4000, CRC(5d3e87e5) SHA1(bdc0b980011d1b92fd27b03dbe31301dffdcc7f6) )
-	ROM_LOAD( "reelfun_v7.00.prg",    0x08000, 0x2000, CRC(09c23777) SHA1(d46ac6df7d64bdf917821e4a1b7a135bc3459b71) )   /* banked */
-	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) )   /* banked ROMs for solution data */
+	ROM_LOAD( "reelfun_v7.00.prg",    0x08000, 0x2000, CRC(09c23777) SHA1(d46ac6df7d64bdf917821e4a1b7a135bc3459b71) ) // banked
+	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) ) // banked ROMs for solution data
 	ROM_LOAD( "reelfun-2-place",      0x18000, 0x8000, CRC(a0066bfd) SHA1(b6f031ab50eb396be79e79e06f2101400683ec3e) )
 	ROM_LOAD( "reelfun-3-phrase",     0x20000, 0x8000, CRC(199e36b0) SHA1(d9dfe39c9a4fca1169150f8941f8ebc499dfbaf5) )
 	ROM_LOAD( "reelfun-4-person",     0x28000, 0x8000, CRC(49b0710b) SHA1(a38b3251bcb8683d43bdb903036970140a9735e6) )
 	ROM_LOAD( "reelfun-5-song_title", 0x30000, 0x8000, CRC(cce01c45) SHA1(c484f5828928edf39335cedf21acab0b9e2a6881) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "reelfun.nvram",   0x0000, 0x0800, CRC(fbb791ce) SHA1(0db77cbc42b5362b3d2ecde46a4289619e8f59a6) ) /* Defaults */
+	ROM_LOAD( "reelfun.nvram",   0x0000, 0x0800, CRC(fbb791ce) SHA1(0db77cbc42b5362b3d2ecde46a4289619e8f59a6) ) // Defaults
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
-	ROM_LOAD( "reelfun.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) /* Same signature for all T4 ROM sets? */
+	ROM_LOAD( "reelfun.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) // Same signature for all T4 ROM sets?
 ROM_END
 
-ROM_START( findout ) /* From a TRIV3D romboard - T4 question ROMs */
+ROM_START( findout ) // From a TRIV3D ROM board - T4 question ROMs
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "12.bin",       0x00000, 0x4000, CRC(21132d4c) SHA1(e3562ee2f46b3f022a852a0e0b1c8fb8164f64a3) )
-	ROM_LOAD( "11.bin",       0x08000, 0x2000, CRC(0014282c) SHA1(c6792f2ff712ba3759ff009950d78750df844d01) )   /* banked */
-	ROM_LOAD( "13.bin",       0x10000, 0x8000, CRC(cea91a13) SHA1(ad3b395ab0362f3decf178824b1feb10b6335bb3) )   /* banked ROMs for solution data */
+	ROM_LOAD( "11.bin",       0x08000, 0x2000, CRC(0014282c) SHA1(c6792f2ff712ba3759ff009950d78750df844d01) ) // banked
+	ROM_LOAD( "13.bin",       0x10000, 0x8000, CRC(cea91a13) SHA1(ad3b395ab0362f3decf178824b1feb10b6335bb3) ) // banked ROMs for solution data
 	ROM_LOAD( "14.bin",       0x18000, 0x8000, CRC(2a433a40) SHA1(4132d81256db940789a40aa1162bf1b3997cb23f) )
 	ROM_LOAD( "15.bin",       0x20000, 0x8000, CRC(d817b31e) SHA1(11e6e1042ee548ce2080127611ce3516a0528ae0) )
 	ROM_LOAD( "16.bin",       0x28000, 0x8000, CRC(143f9ac8) SHA1(4411e8ba853d7d5c032115ce23453362ab82e9bb) )
 	ROM_LOAD( "17.bin",       0x30000, 0x8000, CRC(dd743bc7) SHA1(63f7e01ac5cda76a1d3390b6b83f4429b7d3b781) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",   0x0000, 0x0200, CRC(f3b663bb) SHA1(5a683951c8d3a2baac4b49e379d6e10e35465c8a) )    /* unknown */
+	ROM_LOAD( "82s147.bin",   0x0000, 0x0200, CRC(f3b663bb) SHA1(5a683951c8d3a2baac4b49e379d6e10e35465c8a) ) // unknown
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "findout.nvram",   0x0000, 0x0800, CRC(b6950ffc) SHA1(ecc08904b208fb87c7a47d2f6081652405bf73b4) ) /* Defaults */
+	ROM_LOAD( "findout.nvram",   0x0000, 0x0800, CRC(b6950ffc) SHA1(ecc08904b208fb87c7a47d2f6081652405bf73b4) ) // Defaults
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
-	ROM_LOAD( "findout.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) /* Same signature for all T4 ROM sets? */
+	ROM_LOAD( "findout.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) // Same signature for all T4 ROM sets?
 ROM_END
 
 /*
@@ -1651,17 +1666,17 @@ findouta: 0.bin   0x1bd3:39 & 0x3fff:26
 Changes the copyright year from 1987 to 1989 and balances out the checksum
 
 */
-ROM_START( findouta ) /* PCB marked: 100686A QUIZ 1986 LATO COMP  (copy of a Greyhound PCB) */
+ROM_START( findouta ) // PCB marked: 100686A QUIZ 1986 LATO COMP  (copy of a Greyhound PCB)
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "0",          0x00000, 0x4000, CRC(4d1306a0) SHA1(cc403c280a2cefbe943e6e0e4d7ee42e339a274d) )
-	ROM_LOAD( "rom",        0x08000, 0x2000, CRC(0014282c) SHA1(c6792f2ff712ba3759ff009950d78750df844d01) )   /* banked */
-	ROM_LOAD( "sport.1",    0x10000, 0x2000, CRC(6139b2d7) SHA1(1aa5b25a7807806f6018cedf91f95f9172750867) )   /* banked ROMs for solution data */
-	ROM_LOAD( "basket.2",   0x18000, 0x2000, CRC(7cc369e0) SHA1(b589707c8186a661f6565a5ae164d7169b9493d8) )   /* smaller question ROMs - HH482764G */
+	ROM_LOAD( "rom",        0x08000, 0x2000, CRC(0014282c) SHA1(c6792f2ff712ba3759ff009950d78750df844d01) ) // banked
+	ROM_LOAD( "sport.1",    0x10000, 0x2000, CRC(6139b2d7) SHA1(1aa5b25a7807806f6018cedf91f95f9172750867) ) // banked ROMs for solution data
+	ROM_LOAD( "basket.2",   0x18000, 0x2000, CRC(7cc369e0) SHA1(b589707c8186a661f6565a5ae164d7169b9493d8) ) // smaller question ROMs - HH482764G
 	ROM_LOAD( "cinema.3",   0x20000, 0x2000, CRC(65d78d41) SHA1(200ffb837dce352349842c37e0a3ebd8234ad254) )
 	ROM_LOAD( "musica.4",   0x28000, 0x2000, CRC(a063f7bf) SHA1(15c82b188e730a89eead0d4c74c916a58733be66) )
 	ROM_LOAD( "calcio_a.5", 0x30000, 0x2000, CRC(60839c64) SHA1(5269e76f890b285768417f8e58609162c913c271) )
 
-	ROM_REGION( 0x0e00, "proms", 0 ) /* unknown, all on main PCB */
+	ROM_REGION( 0x0e00, "proms", 0 ) // unknown, all on main PCB
 	ROM_LOAD( "am27s29.6f", 0x0000, 0x0200, CRC(19e3f161) SHA1(52da3c1e50c2329454de14cb9c46149e573e562b) )
 	ROM_LOAD( "am27s13.4g", 0x0200, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) ) // all 6 from here on have identical contents
 	ROM_LOAD( "am27s13.4l", 0x0400, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) )
@@ -1679,66 +1694,66 @@ ROM_START( findouta ) /* PCB marked: 100686A QUIZ 1986 LATO COMP  (copy of a Gre
 	ROM_LOAD( "pal16r8acn",    0x0100, 0x0104, NO_DUMP ) // on ROMs PCB, read protected
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "findouta.nvram", 0x0000, 0x0800, CRC(a0e19083) SHA1(76ebba4627667904e618d9fac71c415e852d7c24) ) /* Defaults */
+	ROM_LOAD( "findouta.nvram", 0x0000, 0x0800, CRC(a0e19083) SHA1(76ebba4627667904e618d9fac71c415e852d7c24) ) // Defaults
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
 	ROM_LOAD( "findouta.sig",  0x0000, 0x0008, CRC(5c126c66) SHA1(12dbda545b2b2bf4ad9152e37e6316c6cd49a4e5) )
 ROM_END
 
-ROM_START( gt507uk ) /* All question ROMs used here are "T3" ROMs */
+ROM_START( gt507uk ) // All question ROMs used here are "T3" ROMs
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "triv_3_2.bin",    0x00000, 0x4000, CRC(2d72a081) SHA1(8aa32acf335d027466799b097e0de66bcf13247f) )
 	ROM_LOAD( "rom_ad.bin",      0x08000, 0x2000, CRC(c81cc847) SHA1(057b7b75a2fe1abf88b23e7b2de230d9f96139f5) )
-	ROM_LOAD( "aerospace",       0x10000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) ) /* Also found in Series #11 set */
+	ROM_LOAD( "aerospace",       0x10000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) ) // Also found in Series #11 set
 	ROM_LOAD( "english_sport_4", 0x18000, 0x8000, CRC(6ae8a63d) SHA1(c6018141d8bbe0ed7619980bf7da89dd91d7fcc2) )
-	ROM_LOAD( "general_facts",   0x20000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) ) /* Also found in Series #11 set */
-	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) ) /* Also found in Series #14 set */
+	ROM_LOAD( "general_facts",   0x20000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) ) // Also found in Series #11 set
+	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) ) // Also found in Series #14 set
 	ROM_LOAD( "pop_music",       0x30000, 0x8000, CRC(884fec7c) SHA1(b389216c17f516df4e15eee46246719dd4acb587) )
 ROM_END
 
-ROM_START( gtsers8 ) /* TRIV-3 PCB, stickered 256 TRIV #8 4/85 */
+ROM_START( gtsers8 ) // TRIV-3 PCB, stickered 256 TRIV #8 4/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "science",         0x10000, 0x8000, CRC(2f940ebd) SHA1(bead4988ac0a97d70f2a3c0b40a05968436de2ed) )
 	ROM_LOAD( "general",         0x18000, 0x8000, CRC(1efa01c3) SHA1(801ef5ab55184e488b08ef99ebd641ea4f7edb24) )
 	ROM_LOAD( "sports",          0x20000, 0x8000, CRC(6bd1ba9a) SHA1(7caac1bd438a9b1d11fb33e11814b5d76951211a) )
-	ROM_LOAD( "entertainment+",  0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) ) /* Labeled as ENTR 2* */
+	ROM_LOAD( "entertainment+",  0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) ) // Labeled as ENTR 2*
 	ROM_LOAD( "adult_sex",       0x30000, 0x8000, CRC(bc8ea9c3) SHA1(6aa4c5468508a50843d3f40b320fc06149fdd292) )
 ROM_END
 
-ROM_START( gtsers8a ) /* TRIV-3 PCB, stickered 256 TRIV #8 4/85 */
+ROM_START( gtsers8a ) // TRIV-3 PCB, stickered 256 TRIV #8 4/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "science",         0x10000, 0x8000, CRC(2f940ebd) SHA1(bead4988ac0a97d70f2a3c0b40a05968436de2ed) )
 	ROM_LOAD( "general",         0x18000, 0x8000, CRC(1efa01c3) SHA1(801ef5ab55184e488b08ef99ebd641ea4f7edb24) )
 	ROM_LOAD( "sports",          0x20000, 0x8000, CRC(6bd1ba9a) SHA1(7caac1bd438a9b1d11fb33e11814b5d76951211a) )
-	ROM_LOAD( "entertainment+",  0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) ) /* Labeled as ENTR 2* */
-	ROM_LOAD( "potpourri",       0x30000, 0x8000, CRC(f2968a28) SHA1(87c08c59dfee71e7bf071f09c3017c750a1c5694) ) /* Listed as an alternate question set */
+	ROM_LOAD( "entertainment+",  0x28000, 0x8000, CRC(07068c9f) SHA1(1aedc78d071281ec8b08488cd82655d41a77cf6b) ) // Labeled as ENTR 2*
+	ROM_LOAD( "potpourri",       0x30000, 0x8000, CRC(f2968a28) SHA1(87c08c59dfee71e7bf071f09c3017c750a1c5694) ) // Listed as an alternate question set
 ROM_END
 
-ROM_START( gtsers9 ) /* TRIV-3 PCB, stickered 256 TRIV #9 7/85 */
+ROM_START( gtsers9 ) // TRIV-3 PCB, stickered 256 TRIV #9 7/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "facts",           0x10000, 0x8000, CRC(21bd6181) SHA1(609ae1097a4011e90d03d4c4f03140fbe84c084a) )
-	ROM_LOAD( "rock-n-roll+",    0x18000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) ) /* Labeled as ROCK-N-ROL* */
-	ROM_LOAD( "television+",     0x20000, 0x8000, CRC(731d4cc0) SHA1(184b6e48edda24f50e377a473a1a4709a218181b) ) /* Labeled as T.V.* */
-	ROM_LOAD( "usa_trivia+",     0x28000, 0x8000, CRC(829543b4) SHA1(deb0a4132852643ad884cf194b0a2e6671aa2b4e) ) /* Labeled as USA TRV* */
-	ROM_LOAD( "adult_sex_2+",    0x30000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* Listed as an alternate question set - Labeled as ADULT SEX 2* */
-	/* Missing "Artists-Athletes" */
+	ROM_LOAD( "rock-n-roll+",    0x18000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) ) // Labeled as ROCK-N-ROL*
+	ROM_LOAD( "television+",     0x20000, 0x8000, CRC(731d4cc0) SHA1(184b6e48edda24f50e377a473a1a4709a218181b) ) // Labeled as T.V.*
+	ROM_LOAD( "usa_trivia+",     0x28000, 0x8000, CRC(829543b4) SHA1(deb0a4132852643ad884cf194b0a2e6671aa2b4e) ) // Labeled as USA TRV*
+	ROM_LOAD( "adult_sex_2+",    0x30000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) // Listed as an alternate question set - Labeled as ADULT SEX 2*
+	// Missing "Artists-Athletes"
 ROM_END
 
-ROM_START( gtsers10 ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
+ROM_START( gtsers10 ) // TRIV-3 PCB, stickered 256 TRIV #10 8/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) ) /* Also found with program v5.03 (not dumped) */
+	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) ) // Also found with program v5.03 (not dumped)
 	ROM_LOAD( "new_general",    0x10000, 0x8000, CRC(ba1f5b92) SHA1(7e94be0ef6904331d3a6b266e5887e9a15c5e7f9) )
 	ROM_LOAD( "new_tv_mash",    0x18000, 0x8000, CRC(f73240c6) SHA1(78020644074da719414133a86a91c1328e5d8929) )
 	ROM_LOAD( "new_entrtnmnt",  0x20000, 0x8000, CRC(0f54340c) SHA1(1ca4c23b542339791a2d8f4a9a857f755feca8a1) )
 	ROM_LOAD( "new_sports",     0x28000, 0x8000, CRC(19eff1a3) SHA1(8e024ae6cc572176c90d819a438ace7b2512dbf2) )
-	ROM_LOAD( "adult_sex_3+",   0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* Listed as an alternate question set - Labeled as ADULT SEX 3* */
-	/* Missing "new_science" */
+	ROM_LOAD( "adult_sex_3+",   0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) // Listed as an alternate question set - Labeled as ADULT SEX 3*
+	// Missing "new_science"
 ROM_END
 
-ROM_START( gtsers11 ) /* TRIV-3 PCB, stickered 256 TRIV #11 8/85 */
+ROM_START( gtsers11 ) // TRIV-3 PCB, stickered 256 TRIV #11 8/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "rich-famous",    0x10000, 0x8000, CRC(39e07e4a) SHA1(6e5a0bcefaa1169f313e8818cf50919108b3e121) )
@@ -1748,56 +1763,56 @@ ROM_START( gtsers11 ) /* TRIV-3 PCB, stickered 256 TRIV #11 8/85 */
 	ROM_LOAD( "general_facts",  0x30000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) )
 ROM_END
 
-ROM_START( gtsers11a ) /* TRIV-3 PCB, stickered 256 TRIV #11 8/85 */
+ROM_START( gtsers11a ) // TRIV-3 PCB, stickered 256 TRIV #11 8/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "rich-famous",    0x10000, 0x8000, CRC(39e07e4a) SHA1(6e5a0bcefaa1169f313e8818cf50919108b3e121) )
 	ROM_LOAD( "cars-women",     0x18000, 0x8000, CRC(4c5dd1df) SHA1(f3e2146eeab07ec71617c7614c6e8f6bc844e6e3) )
 	ROM_LOAD( "aerospace",      0x20000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) )
 	ROM_LOAD( "tv_music",       0x28000, 0x8000, CRC(5138e0fb) SHA1(102146d63752258c2fda95df49289c42b392c838) )
-	ROM_LOAD( "gay_times",      0x30000, 0x8000, CRC(c4f9a8cf) SHA1(9247ecc5708aba263e0365fc43a1a7d0c2b7c391) ) /* Listed as an alternate question set */
+	ROM_LOAD( "gay_times",      0x30000, 0x8000, CRC(c4f9a8cf) SHA1(9247ecc5708aba263e0365fc43a1a7d0c2b7c391) ) // Listed as an alternate question set
 ROM_END
 
 /*
-The question ROM PCB below was labeled a month later than the other series 11 sets. Maybe a "rerelease" to replace the possibly
+The question ROM PCB below was labeled a month later than the other series 11 sets. Maybe a "re-release" to replace the possibly
   less popular Gay Times question ROM with a more popular Adult Sex 3 question ROM.
-NOTE: Adult Sex 3, according to documention is a series 10 question rom, but two ROMs where clearly labeled as: ADLT SEX 3* #11
+NOTE: Adult Sex 3, according to documentation is a series 10 question ROM, but two ROMs were clearly labeled as: ADLT SEX 3* #11
 */
-ROM_START( gtsers11b ) /* TRIV-3 PCB, stickered 256 TRIV #11 9/85 */
+ROM_START( gtsers11b ) // TRIV-3 PCB, stickered 256 TRIV #11 9/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "rich-famous",    0x10000, 0x8000, CRC(39e07e4a) SHA1(6e5a0bcefaa1169f313e8818cf50919108b3e121) )
 	ROM_LOAD( "cars-women",     0x18000, 0x8000, CRC(4c5dd1df) SHA1(f3e2146eeab07ec71617c7614c6e8f6bc844e6e3) )
 	ROM_LOAD( "aerospace",      0x20000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) )
 	ROM_LOAD( "tv_music",       0x28000, 0x8000, CRC(5138e0fb) SHA1(102146d63752258c2fda95df49289c42b392c838) )
-	ROM_LOAD( "adult_sex_3+",   0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* Labeled as ADULT SEX 3* */
+	ROM_LOAD( "adult_sex_3+",   0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) // Labeled as ADULT SEX 3*
 ROM_END
 
-ROM_START( gtsers12 ) /* TRIV-3 PCB */
+ROM_START( gtsers12 ) // TRIV-3 PCB
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "program_v5.03",   0x00000, 0x4000, CRC(888b7d9b) SHA1(e5ed4f22bff99c26cd6ef9a06cb386221e84bbf5) )
-	ROM_LOAD( "new_science_2+",  0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Labeled as NEW SCNE 2* */
-	ROM_LOAD( "cops_+_robbers+", 0x18000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) ) /* Labeled as COPS ROBR* */
+	ROM_LOAD( "new_science_2+",  0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) // Labeled as NEW SCNE 2*
+	ROM_LOAD( "cops_+_robbers+", 0x18000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) ) // Labeled as COPS ROBR*
 	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) )
 	ROM_LOAD( "famous_quotes",   0x28000, 0x8000, CRC(0a27d8ae) SHA1(427e6ae25e47da7f7f7c3e92a37e330d711da90c) )
 	ROM_LOAD( "vices",           0x30000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) )
 ROM_END
 
-ROM_START( gtsers12a ) /* TRIV-3 PCB */
+ROM_START( gtsers12a ) // TRIV-3 PCB
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "program_v5.03",   0x00000, 0x4000, CRC(888b7d9b) SHA1(e5ed4f22bff99c26cd6ef9a06cb386221e84bbf5) )
-	ROM_LOAD( "n.f.l._football", 0x10000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) ) /* undocumented series 12 question ROM */
-	ROM_LOAD( "new_science_2+",  0x18000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Labeled as NEW SCNE 2* */
+	ROM_LOAD( "n.f.l._football", 0x10000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) ) // undocumented series 12 question ROM
+	ROM_LOAD( "new_science_2+",  0x18000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) // Labeled as NEW SCNE 2*
 	ROM_LOAD( "famous_quotes",   0x20000, 0x8000, CRC(0a27d8ae) SHA1(427e6ae25e47da7f7f7c3e92a37e330d711da90c) )
 	ROM_LOAD( "vices",           0x28000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) )
-	ROM_LOAD( "adult_sex_4+",    0x30000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* Listed as an alternate question set - Labeled as ADULT SEX 4* */
+	ROM_LOAD( "adult_sex_4+",    0x30000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) // Listed as an alternate question set - Labeled as ADULT SEX 4*
 ROM_END
 
-/* Trivia: There is no Series 13 question set.  ;-) */
+// Trivia: There is no Series 13 question set.  ;-)
 
-ROM_START( gtsers14 ) /* TRIV-3 PCB, stickered 256 TRIV #14 11/85 */
+ROM_START( gtsers14 ) // TRIV-3 PCB, stickered 256 TRIV #14 11/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "program5",        0x00000, 0x4000, CRC(99ddaaa7) SHA1(c929d7b67367f303dadf07d508bc72af19e9c2ef) ) /* Unknown version, but earlier then the 5.06 for Series #15 */
+	ROM_LOAD( "program5",        0x00000, 0x4000, CRC(99ddaaa7) SHA1(c929d7b67367f303dadf07d508bc72af19e9c2ef) ) // Unknown version, but earlier then the 5.06 for Series #15
 	ROM_LOAD( "famous_couples",  0x10000, 0x8000, CRC(e0618218) SHA1(ff64fcd6dec83a2271b63c3ae64dc932a3954ec5) )
 	ROM_LOAD( "the_sixties",     0x18000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) )
 	ROM_LOAD( "tv_comedies",     0x20000, 0x8000, CRC(992ae38e) SHA1(312780d651a85a1c433f587ff2ede579456d3fd9) )
@@ -1805,35 +1820,35 @@ ROM_START( gtsers14 ) /* TRIV-3 PCB, stickered 256 TRIV #14 11/85 */
 	ROM_LOAD( "war_and_peace",   0x30000, 0x8000, CRC(bc709383) SHA1(2fba4c80773abea7bbd826c39378b821cddaa255) )
 ROM_END
 
-ROM_START( gtsers14a ) /* TRIV-3 PCB, stickered 256 TRIV #14 11/85 */
+ROM_START( gtsers14a ) // TRIV-3 PCB, stickered 256 TRIV #14 11/85
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "program5",        0x00000, 0x4000, CRC(99ddaaa7) SHA1(c929d7b67367f303dadf07d508bc72af19e9c2ef) ) /* Unknown version, but earlier then the 5.06 for Series #15 */
+	ROM_LOAD( "program5",        0x00000, 0x4000, CRC(99ddaaa7) SHA1(c929d7b67367f303dadf07d508bc72af19e9c2ef) ) // Unknown version, but earlier then the 5.06 for Series #15
 	ROM_LOAD( "famous_couples",  0x10000, 0x8000, CRC(e0618218) SHA1(ff64fcd6dec83a2271b63c3ae64dc932a3954ec5) )
 	ROM_LOAD( "the_sixties",     0x18000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) )
 	ROM_LOAD( "tv_comedies",     0x20000, 0x8000, CRC(992ae38e) SHA1(312780d651a85a1c433f587ff2ede579456d3fd9) )
 	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) )
-	ROM_LOAD( "adult_sex_5",     0x30000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) /* Listed as an alternate question set */
+	ROM_LOAD( "adult_sex_5",     0x30000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) // Listed as an alternate question set
 ROM_END
 
-ROM_START( gtsers15 ) /* v5.06, From a TRIV3D romboard */
+ROM_START( gtsers15 ) // v5.06, From a TRIV3D ROM board
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "program_v5.06",   0x00000, 0x4000, CRC(e9d6226c) SHA1(42e62c5cafa3f051bf48c18c8c549ffcd4c766c5) )
 	ROM_LOAD( "entertainment_2", 0x10000, 0x8000, CRC(c75c2331) SHA1(9c5947616a4cba2623c599def6cf3b2b1981b681) )
 	ROM_LOAD( "facts_2",         0x18000, 0x8000, CRC(7836ef31) SHA1(6a84cfa39de392eed46a4b37752e00b6d094bbd6) )
 	ROM_LOAD( "new_science_3",   0x20000, 0x8000, CRC(fcbc3bc3) SHA1(2dbdd39dce9dbf53c0954dec44a4f5109243dc60) )
 	ROM_LOAD( "nfl_football",    0x28000, 0x8000, CRC(42eb2849) SHA1(c24e681a508ef8350f7e5d50aea2c31cf70ce5c9) )
-	ROM_LOAD( "adult_sex_6",     0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) ) /* Listed as an alternate question set */
+	ROM_LOAD( "adult_sex_6",     0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) ) // Listed as an alternate question set
 	/* Missing "the_seventies" */
 
 	ROM_REGION( 0x0400, "pld", 0 ) // probably one of the two GALs provides the "signature"
-	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP )  /* read protected */
-	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP )  /* read protected */
+	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP ) // read protected
+	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
-	ROM_LOAD( "gtsers15.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) /* Same signature for all T4 ROM sets? */
+	ROM_LOAD( "gtsers15.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) // Same signature for all T4 ROM sets?
 ROM_END
 
-ROM_START( gtsers18 ) /* v5.06, From a TRIV3D romboard */
+ROM_START( gtsers18 ) // v5.06, From a TRIV3D ROM board
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "program_v5.06",   0x00000, 0x4000, CRC(e9d6226c) SHA1(42e62c5cafa3f051bf48c18c8c549ffcd4c766c5) )
 	ROM_LOAD( "entertainment_3", 0x10000, 0x8000, CRC(577161c4) SHA1(0bbe5a030aa5b34414346613016e6164cddc7032) )
@@ -1844,23 +1859,23 @@ ROM_START( gtsers18 ) /* v5.06, From a TRIV3D romboard */
 	/* Missing "world_geography" */
 
 	ROM_REGION( 0x0400, "pld", 0 ) // probably one of the two GALs provides the "signature"
-	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP )  /* read protected */
-	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP )  /* read protected */
+	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP ) // read protected
+	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
-	ROM_LOAD( "gtsers18.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) /* Same signature for all T4 ROM sets? */
+	ROM_LOAD( "gtsers18.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) // Same signature for all T4 ROM sets?
 ROM_END
 
-ROM_START( gt103a1 ) /* Need to verify which series or sets these belong to */
+ROM_START( gt103a1 ) // Need to verify which series or sets these belong to
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) )
-	ROM_LOAD( "history-geog",    0x10000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) ) /* T3 question ROM, NOT from series 17 */
-	ROM_LOAD( "soccer",          0x18000, 0x8000, CRC(f821f860) SHA1(b0437ef5d31c507c6499c1fb732d2ba3b9beb151) ) /* T3 question ROM - Likely a UK question ROM */
+	ROM_LOAD( "history-geog",    0x10000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) ) // T3 question ROM, NOT from series 17
+	ROM_LOAD( "soccer",          0x18000, 0x8000, CRC(f821f860) SHA1(b0437ef5d31c507c6499c1fb732d2ba3b9beb151) ) // T3 question ROM - Likely a UK question ROM
 ROM_END
 
-ROM_START( gt103aa ) /* Series 8 questions ROMs. Need to verify proper revision level for most of these.  */
+ROM_START( gt103aa ) // Series 8 questions ROMs. Need to verify proper revision level for most of these.
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
+	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) // "Park" alternate version sets here
 	ROM_LOAD( "entertainment_old", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) )
 	ROM_LOAD( "general_alt",       0x18000, 0x8000, CRC(df34f7f9) SHA1(329d123eea711d5135dc02dd7b89b220ce8ddd28) )
 	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) )
@@ -1870,29 +1885,29 @@ ROM_END
 
 ROM_START( gt103ab )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.bin",       0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
-	ROM_LOAD( "rock-n-roll_old",    0x10000, 0x8000, CRC(1be036b1) SHA1(0b262906044950319dd911b956ac2e0b433f6c7f) ) /* From series 9 - dated 6/85 */
-	ROM_LOAD( "usa_trivia_old",     0x18000, 0x8000, CRC(1ec59636) SHA1(65d63066a7ff500eda32468c8c9fef6cfd32f024) ) /* From series 9 - dated 6/85 */
-	ROM_LOAD( "new_science_2_old",  0x20000, 0x8000, CRC(95836bfb) SHA1(deb546bcd9109efd2b1f405354916e439cd0749b) ) /* From series 12 */
-	ROM_LOAD( "cops_+_robbers_old", 0x28000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) ) /* From series 12 */
+	ROM_LOAD( "t_3a-8_1.bin",       0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) // "Park" alternate version sets here
+	ROM_LOAD( "rock-n-roll_old",    0x10000, 0x8000, CRC(1be036b1) SHA1(0b262906044950319dd911b956ac2e0b433f6c7f) ) // From series 9 - dated 6/85
+	ROM_LOAD( "usa_trivia_old",     0x18000, 0x8000, CRC(1ec59636) SHA1(65d63066a7ff500eda32468c8c9fef6cfd32f024) ) // From series 9 - dated 6/85
+	ROM_LOAD( "new_science_2_old",  0x20000, 0x8000, CRC(95836bfb) SHA1(deb546bcd9109efd2b1f405354916e439cd0749b) ) // From series 12
+	ROM_LOAD( "cops_+_robbers_old", 0x28000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) ) // From series 12
 ROM_END
 
-ROM_START( gt103asx ) /* Was there an all Adult Trivia version? These are just the Adult Sex questions from all the series combined here */
+ROM_START( gt103asx ) // Was there an all Adult Trivia version? These are just the Adult Sex questions from all the series combined here
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin", 0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
-	ROM_LOAD( "adult_sex_2+", 0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* From series 9  - Labeled as ADULT SEX 2* */
-	ROM_LOAD( "adult_sex_3+", 0x18000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* From series 10 - Labeled as ADULT SEX 3* */
-	ROM_LOAD( "adult_sex_4+", 0x20000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* From series 12 - Labeled as ADULT SEX 4* */
-	ROM_LOAD( "adult_sex_5",  0x28000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) /* From series 14 */
-	ROM_LOAD( "adult_sex_6",  0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) ) /* From series 15 */
+	ROM_LOAD( "adult_sex_2+", 0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) // From series 9  - Labeled as ADULT SEX 2*
+	ROM_LOAD( "adult_sex_3+", 0x18000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) // From series 10 - Labeled as ADULT SEX 3*
+	ROM_LOAD( "adult_sex_4+", 0x20000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) // From series 12 - Labeled as ADULT SEX 4*
+	ROM_LOAD( "adult_sex_5",  0x28000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) // From series 14
+	ROM_LOAD( "adult_sex_6",  0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) ) // From series 15
 ROM_END
 
-ROM_START( gt103asxa ) /* Alternate / older versions of the questions */
+ROM_START( gt103asxa ) // Alternate / older versions of the questions
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
-	ROM_LOAD( "adult_sex_2_old", 0x10000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) ) /* From series 9 - dated 6/85 */
-	ROM_LOAD( "adult_sex_3_old", 0x18000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) ) /* From series 10 */
-	ROM_LOAD( "adult_sex_4_old", 0x20000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) ) /* From series 12 */
+	ROM_LOAD( "adult_sex_2_old", 0x10000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) ) // From series 9 - dated 6/85
+	ROM_LOAD( "adult_sex_3_old", 0x18000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) ) // From series 10
+	ROM_LOAD( "adult_sex_4_old", 0x20000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) ) // From series 12
 ROM_END
 
 ROM_START( quiz )
@@ -1904,7 +1919,7 @@ ROM_START( quiz )
 	ROM_LOAD( "5.bin",        0x28000, 0x8000, CRC(e9cdae21) SHA1(4de4a4edf9eccd8f9f7b935f47bee42c10ad606f) )
 	ROM_LOAD( "6.bin",        0x30000, 0x8000, CRC(89e2b7e8) SHA1(e85c66f0cf37418f522c2d6384997d52f2f15117) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) /* unknown */
+	ROM_REGION( 0x0200, "proms", 0 ) // unknown
 	ROM_LOAD( "prom_am27s29pc.bin", 0x0000, 0x0200, CRC(19e3f161) SHA1(52da3c1e50c2329454de14cb9c46149e573e562b) )
 ROM_END
 
@@ -1935,7 +1950,7 @@ ROM_START( quiz211 )
 	ROM_LOAD( "spettacolo.bin", 0x28000, 0x8000, CRC(38b8e37a) SHA1(e6df575f61ac61e825d98eaef99c128647806a75) )
 	ROM_LOAD( "mondiali90.bin", 0x30000, 0x4000, CRC(35622870) SHA1(f2dab64106ca4ef07175a0ad9491470964d8a0d2) )
 
-	ROM_REGION( 0x0e00, "proms", 0 ) /* unknown */
+	ROM_REGION( 0x0e00, "proms", 0 ) // unknown
 	ROM_LOAD( "prom_27s13-1.bin", 0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "prom_27s13-2.bin", 0x0200, 0x0200, NO_DUMP )
 	ROM_LOAD( "prom_27s13-3.bin", 0x0400, 0x0200, NO_DUMP )
@@ -1948,12 +1963,12 @@ ROM_START( quiz211 )
 	ROM_LOAD( "pal10l8cn.bin",   0x0000, 0x002c, CRC(86095226) SHA1(e7496efbd5ca240f0df2dfa5627402342c7f5384) )
 ROM_END
 
-ROM_START( bigjoke )  /* TRIV3D PCB, stickered THE JOKE 11/87 */
+ROM_START( bigjoke ) // TRIV3D PCB, stickered THE JOKE 11/87
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "joke_cont_128",       0x00000, 0x4000, CRC(acb4355f) SHA1(0fc9a218e94fc49297bd11547fb193d1f91ce90c) )
-	ROM_LOAD( "joke_2764",           0x08000, 0x2000, CRC(8a7ac263) SHA1(6f9a18b7f38e83cc2d1f1911e3b01ada7df4d2ba) )   /* banked */
-	ROM_LOAD( "joke_drty_nsty_1012", 0x10000, 0x8000, CRC(e3fcd0e3) SHA1(fae1ddfb244e5c84e9ba6d4b90bd265365a4f662) )   /* banked ROMs for solution data */
-	ROM_LOAD( "joke_fams_folk_1012", 0x18000, 0x8000, CRC(08eb35f2) SHA1(0dba706750a9276dac9976eb07f64ecf4a42e658) )   /* J1 question ROMs */
+	ROM_LOAD( "joke_2764",           0x08000, 0x2000, CRC(8a7ac263) SHA1(6f9a18b7f38e83cc2d1f1911e3b01ada7df4d2ba) ) // banked
+	ROM_LOAD( "joke_drty_nsty_1012", 0x10000, 0x8000, CRC(e3fcd0e3) SHA1(fae1ddfb244e5c84e9ba6d4b90bd265365a4f662) ) // banked ROMs for solution data
+	ROM_LOAD( "joke_fams_folk_1012", 0x18000, 0x8000, CRC(08eb35f2) SHA1(0dba706750a9276dac9976eb07f64ecf4a42e658) ) // J1 question ROMs
 	ROM_LOAD( "joke_jmbl_joke_1012", 0x20000, 0x8000, CRC(26daf757) SHA1(76560bf437b4ee851f075b30e79df563367830cf) )
 	ROM_LOAD( "joke_racl_ethn_1012", 0x28000, 0x8000, CRC(ca814fa9) SHA1(0c2ac15568bd64c282f257089305309ef7f91411) )
 	ROM_LOAD( "joke_wrkg_wrld_1012", 0x30000, 0x8000, CRC(f4b0fa76) SHA1(70b4a29d928729da52948c12e55473ecf83b3daa) )
@@ -1962,29 +1977,29 @@ ROM_START( bigjoke )  /* TRIV3D PCB, stickered THE JOKE 11/87 */
 	ROM_LOAD( "bigjoke.nvram",  0x0000, 0x0800, CRC(89e0e325) SHA1(c2398c64f938e8ed036e72a5ba0b703513f31a6d) )
 
 	ROM_REGION( 0x0400, "pld", 0 ) // probably one of the two GALs provides the "signature"
-	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP )  /* read protected */
-	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP )  /* read protected */
+	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP ) // read protected
+	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
 	ROM_LOAD( "bigjoke.sig",   0x0000, 0x0008, CRC(bfa5388b) SHA1(876bf954116fcc14d0bed017a9bec42038c5f89a) )
 ROM_END
 
-ROM_START( sexappl )  /* TRIV3D PCB, stickered SEX APPL 6.02 5/92 */
+ROM_START( sexappl ) // TRIV3D PCB, stickered SEX APPL 6.02 5/92
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "6.02_cont", 0x00000, 0x4000, CRC(63ad3593) SHA1(fd93a71b82ef04757d79485ca4c7e306b2983c76) )
-	ROM_LOAD( "6.02_kb",   0x08000, 0x2000, CRC(025a5c7e) SHA1(bc935fb5ac081d089f3f9991d04cdf3708fa35c6) )   /* banked */
-	ROM_LOAD( "hot_sex",   0x10000, 0x8000, CRC(f16b3363) SHA1(a05bb2ae6467cd28021321bb526ea2ae3da82361) )   /* banked ROMs for solution data */
-	ROM_LOAD( "wild_sex",  0x18000, 0x8000, CRC(f257a023) SHA1(9c72c18f1acd7b36033a20dd1c8fafc801a3d174) )   /* T6 question ROMs */
+	ROM_LOAD( "6.02_kb",   0x08000, 0x2000, CRC(025a5c7e) SHA1(bc935fb5ac081d089f3f9991d04cdf3708fa35c6) ) // banked
+	ROM_LOAD( "hot_sex",   0x10000, 0x8000, CRC(f16b3363) SHA1(a05bb2ae6467cd28021321bb526ea2ae3da82361) ) // banked ROMs for solution data
+	ROM_LOAD( "wild_sex",  0x18000, 0x8000, CRC(f257a023) SHA1(9c72c18f1acd7b36033a20dd1c8fafc801a3d174) ) // T6 question ROMs
 	ROM_LOAD( "hard_sex",  0x20000, 0x8000, CRC(bdab9ac1) SHA1(e09a5276a5bd346e2b88dd8fa196f204267efe09) )
 	ROM_LOAD( "kinky_sex", 0x28000, 0x8000, CRC(6b4c016d) SHA1(7d0b8af7c5ef384412535ab3e2ed1eb7c4ecd824) )
 	ROM_LOAD( "adult_sex", 0x30000, 0x8000, CRC(05798340) SHA1(8db308bb725112327027a725b2c69299e6da1dad) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "sexappl.nvram",   0x0000, 0x0800, CRC(be65737c) SHA1(5b8a603a9ddecdad4aaef0b9e8ef373885b236c0) ) /* Defaults but with card dispenser OFF! */
+	ROM_LOAD( "sexappl.nvram",   0x0000, 0x0800, CRC(be65737c) SHA1(5b8a603a9ddecdad4aaef0b9e8ef373885b236c0) ) // Defaults but with card dispenser OFF!
 
 	ROM_REGION( 0x0400, "pld", 0 ) // probably one of the two GALs provides the "signature"
-	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP )  /* read protected */
-	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP )  /* read protected */
+	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP ) // read protected
+	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
 	ROM_LOAD( "sexappl.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
@@ -2003,7 +2018,7 @@ Power LED
 
 ST MK48Z02B-20 Zeropower RAM
 
-Control, graphics & 13 banked roms (as labeled):
+Control, graphics & 13 banked ROMs (as labeled):
 
 Cont: R.5 Cont 92
 GRPH: R.5 K.B. 93
@@ -2022,7 +2037,7 @@ Bank 11: adlt sex #1
 Bank 12: nfl #1
 Bank 13: entr #1
 
-All roms are 27C256 type eproms
+All ROMs are 27C256 type EPROMs
 */
 
 ROM_START( geimulti )
@@ -2030,23 +2045,23 @@ ROM_START( geimulti )
 	ROM_LOAD( "cont", 0x00000, 0x8000, CRC(920020df) SHA1(01cb0a58bf863d63bcafe1e198ce5ea10bb8f59e) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
-	ROM_LOAD( "pokr",      0x00000, 0x8000, CRC(1e9651a0) SHA1(23f98633701a9ac01784b29d1283ec9236810baf) ) /* C5 game ROM 4-21-92 */
-	ROM_LOAD( "bljk",      0x08000, 0x8000, CRC(afde21e6) SHA1(4db37ee4ffc72e3513cbfe31d018caa062683adf) ) /* C5 game ROM 4-21-92 */
-	ROM_LOAD( "bone",      0x10000, 0x8000, CRC(6a84fc5d) SHA1(09d5d052a90744e5c6e0b06cabfdbbaa2458bbb5) ) /* C5 game ROM 4-21-92 */
-	ROM_LOAD( "slot",      0x18000, 0x8000, CRC(11b85a71) SHA1(5672f6f796b2743c252d159778bd8746cf1f5f86) ) /* C5 game ROM 4-21-92 */
-	ROM_LOAD( "sprd",      0x20000, 0x8000, CRC(2f067b3d) SHA1(cd7cae3d2def74369b8d015b9f36d5a174bea92c) ) /* C5 game ROM 4-21-92 */
-	ROM_LOAD( "hrse",      0x28000, 0x8000, CRC(ab1d014a) SHA1(aa7a372266decd7b65234de4d866fe7baf71c9bb) ) /* C5 game ROM IAM 07-02-92 */
-	ROM_LOAD( "dogs",      0x30000, 0x8000, CRC(83cd070a) SHA1(ed7ce3ffe030802e99dd27f2310524615fcfc8bf) ) /* C5 game ROM IAM 07-02-92 */
-	ROM_LOAD( "memotest",  0x38000, 0x8000, CRC(8942b98c) SHA1(3f182eb6d00618d9859cd8acdf13c829d4469075) ) /* C5 game ROM 9-30-92 */
-	ROM_LOAD( "reelfun",   0x40000, 0x8000, CRC(b3ede904) SHA1(e77c15e893583572650bb60432d68a1f7bf67d09) ) /* C5 game ROM 9-11-92 */
-	ROM_LOAD( "fact@1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) ) /* T5 question ROM */
-	ROM_LOAD( "adltsex@1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) ) /* T5 question ROM */
-	ROM_LOAD( "nfl@1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) ) /* T5 question ROM */
-	ROM_LOAD( "entr@1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) ) /* T5 question ROM */
-	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) ) /* game graphics */
+	ROM_LOAD( "pokr",      0x00000, 0x8000, CRC(1e9651a0) SHA1(23f98633701a9ac01784b29d1283ec9236810baf) ) // C5 game ROM 4-21-92
+	ROM_LOAD( "bljk",      0x08000, 0x8000, CRC(afde21e6) SHA1(4db37ee4ffc72e3513cbfe31d018caa062683adf) ) // C5 game ROM 4-21-92
+	ROM_LOAD( "bone",      0x10000, 0x8000, CRC(6a84fc5d) SHA1(09d5d052a90744e5c6e0b06cabfdbbaa2458bbb5) ) // C5 game ROM 4-21-92
+	ROM_LOAD( "slot",      0x18000, 0x8000, CRC(11b85a71) SHA1(5672f6f796b2743c252d159778bd8746cf1f5f86) ) // C5 game ROM 4-21-92
+	ROM_LOAD( "sprd",      0x20000, 0x8000, CRC(2f067b3d) SHA1(cd7cae3d2def74369b8d015b9f36d5a174bea92c) ) // C5 game ROM 4-21-92
+	ROM_LOAD( "hrse",      0x28000, 0x8000, CRC(ab1d014a) SHA1(aa7a372266decd7b65234de4d866fe7baf71c9bb) ) // C5 game ROM IAM 07-02-92
+	ROM_LOAD( "dogs",      0x30000, 0x8000, CRC(83cd070a) SHA1(ed7ce3ffe030802e99dd27f2310524615fcfc8bf) ) // C5 game ROM IAM 07-02-92
+	ROM_LOAD( "memotest",  0x38000, 0x8000, CRC(8942b98c) SHA1(3f182eb6d00618d9859cd8acdf13c829d4469075) ) // C5 game ROM 9-30-92
+	ROM_LOAD( "reelfun",   0x40000, 0x8000, CRC(b3ede904) SHA1(e77c15e893583572650bb60432d68a1f7bf67d09) ) // C5 game ROM 9-11-92
+	ROM_LOAD( "fact@1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) ) // T5 question ROM
+	ROM_LOAD( "adltsex@1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) ) // T5 question ROM
+	ROM_LOAD( "nfl@1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) ) // T5 question ROM
+	ROM_LOAD( "entr@1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) ) // T5 question ROM
+	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) ) // game graphics
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "geimulti.nvram",   0x0000, 0x0800, CRC(232bbad1) SHA1(23a4011ad3b322cbda40859a1619dc1f5472fdfc) ) /* Defaults */
+	ROM_LOAD( "geimulti.nvram",   0x0000, 0x0800, CRC(232bbad1) SHA1(23a4011ad3b322cbda40859a1619dc1f5472fdfc) ) // Defaults
 
 	// Only questions ROMs are checked for signatures, not the "game" ROMs
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of the listed question ROMs - to prevent ROM swaps
@@ -2058,7 +2073,7 @@ ROM_START( sprtauth )
 	ROM_LOAD( "sprt-auth-rev3-cont.cont", 0x00000, 0x8000, CRC(1f1c890e) SHA1(570f1e8cdea7ed205aa3c964330bc5a4851c11e4) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
-	ROM_LOAD( "sprt-auth-prem-bsbl.bank1",    0x00000, 0x8000, CRC(ef296636) SHA1(e727fe58bc961f56503788b2b670f5b3b04743f2) ) /* T8 question ROMs */
+	ROM_LOAD( "sprt-auth-prem-bsbl.bank1",    0x00000, 0x8000, CRC(ef296636) SHA1(e727fe58bc961f56503788b2b670f5b3b04743f2) ) // T8 question ROMs
 	ROM_LOAD( "sprt-auth-prem-bskt.bank2",    0x08000, 0x8000, CRC(4649d523) SHA1(fdfa1263cc6b3c45e62af0e3baf79311f243ac5f) )
 	ROM_LOAD( "sprt-auth-prem-foot.bank3",    0x10000, 0x8000, CRC(76076022) SHA1(5014133e7143c4f4ccf4c7d1f05effe286b5a30a) )
 	ROM_LOAD( "sprt-auth-prem-hcky.bank4",    0x18000, 0x8000, CRC(135beec3) SHA1(66fce1c0c0abbbf4971ab0f764d27f1d0849ccdc) )
@@ -2068,10 +2083,10 @@ ROM_START( sprtauth )
 	ROM_LOAD( "sprt-auth-ii-foot-ball.bank8", 0x38000, 0x8000, CRC(c305dec2) SHA1(924e608cd327bf6ffe831225affa270181599cea) )
 	ROM_LOAD( "sprt-auth-supr-bowl.bank9",    0x40000, 0x8000, CRC(3a548fe5) SHA1(6ad35516651a8a878b512cb3eff697952e194dd0) )
 	ROM_LOAD( "sprt-auth-auto-racg.bank10",   0x48000, 0x8000, CRC(7ac1bbd6) SHA1(8635791bf2707b4d028ee8b020199770984b9ef4) )
-	ROM_LOAD( "sprt-auth-rev3-kb.grph",       0x68000, 0x8000, CRC(3c779fe8) SHA1(0a32f408677b3887dbfe505ed45a11fa695b7726) ) /* game graphics */
+	ROM_LOAD( "sprt-auth-rev3-kb.grph",       0x68000, 0x8000, CRC(3c779fe8) SHA1(0a32f408677b3887dbfe505ed45a11fa695b7726) ) // game graphics
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "sprtauth.nvram",   0x0000, 0x0800, CRC(969869f9) SHA1(a5a7b679e99255650dc8ea12d2b36e97e6296aae) ) /* Defaults but with card dispenser OFF! */
+	ROM_LOAD( "sprtauth.nvram",   0x0000, 0x0800, CRC(969869f9) SHA1(a5a7b679e99255650dc8ea12d2b36e97e6296aae) ) // Defaults but with card dispenser OFF!
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
 	ROM_LOAD( "sprtauth.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
@@ -2082,7 +2097,7 @@ ROM_START( sprtauth1 )
 	ROM_LOAD( "sprt-auth-rev1-cont.cont", 0x00000, 0x8000, CRC(19dd0aa6) SHA1(7805d8139ac20061fc782bcaeff2202ed451fa91) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
-	ROM_LOAD( "sprt-auth-prem-bsbl.bank1",    0x00000, 0x8000, CRC(ef296636) SHA1(e727fe58bc961f56503788b2b670f5b3b04743f2) ) /* T8 question ROMs */
+	ROM_LOAD( "sprt-auth-prem-bsbl.bank1",    0x00000, 0x8000, CRC(ef296636) SHA1(e727fe58bc961f56503788b2b670f5b3b04743f2) ) // T8 question ROMs
 	ROM_LOAD( "sprt-auth-prem-bskt.bank2",    0x08000, 0x8000, CRC(4649d523) SHA1(fdfa1263cc6b3c45e62af0e3baf79311f243ac5f) )
 	ROM_LOAD( "sprt-auth-prem-foot.bank3",    0x10000, 0x8000, CRC(76076022) SHA1(5014133e7143c4f4ccf4c7d1f05effe286b5a30a) )
 	ROM_LOAD( "sprt-auth-prem-hcky.bank4",    0x18000, 0x8000, CRC(135beec3) SHA1(66fce1c0c0abbbf4971ab0f764d27f1d0849ccdc) )
@@ -2091,10 +2106,10 @@ ROM_START( sprtauth1 )
 	ROM_LOAD( "sprt-auth-ii-bsbl-ball.bank7", 0x30000, 0x8000, CRC(bad3e6bd) SHA1(e3df34a4d5db7cfbd014a841d224eeefc8386d40) )
 	ROM_LOAD( "sprt-auth-ii-foot-ball.bank8", 0x38000, 0x8000, CRC(c305dec2) SHA1(924e608cd327bf6ffe831225affa270181599cea) )
 	ROM_LOAD( "sprt-auth-supr-bowl.bank9",    0x40000, 0x8000, CRC(3a548fe5) SHA1(6ad35516651a8a878b512cb3eff697952e194dd0) )
-	ROM_LOAD( "sprt-auth-rev1-kb.grph",       0x68000, 0x8000, CRC(c4f734ac) SHA1(028217fe6d7be75f75e9f67b665d465c729d2995) ) /* game graphics */
+	ROM_LOAD( "sprt-auth-rev1-kb.grph",       0x68000, 0x8000, CRC(c4f734ac) SHA1(028217fe6d7be75f75e9f67b665d465c729d2995) ) // game graphics
 
 	ROM_REGION( 0x0800, "nvram", 0 )
-	ROM_LOAD( "sprtauth.nvram",   0x0000, 0x0800, CRC(969869f9) SHA1(a5a7b679e99255650dc8ea12d2b36e97e6296aae) ) /* Defaults but with card dispenser OFF! */
+	ROM_LOAD( "sprtauth.nvram",   0x0000, 0x0800, CRC(969869f9) SHA1(a5a7b679e99255650dc8ea12d2b36e97e6296aae) ) // Defaults but with card dispenser OFF!
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
 	ROM_LOAD( "sprtauth.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
@@ -2150,26 +2165,27 @@ GAME( 1984, gtsers3,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   
 GAME( 1984, gtsers4,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 4)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers5,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 5)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers7,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 7)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers7a,  gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 7, alt question ROM)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsersa,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsersb,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers8,   0,        findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers8a,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers8a,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8, alt question ROM)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers9,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers10,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers11,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers11a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers11b, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers11a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11, alt question ROM, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers11b, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11, alt question ROM, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers12,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers12a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers12a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12, alt question ROM)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers14,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers14a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers14a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14, alt question ROM)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers15,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers18,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 18)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103a1,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103aa,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103ab,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103asx,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gt103asxa, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions, Alt revision questions)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103a1,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Unsorted question ROMs)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103aa,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a, alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103ab,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a, alt questions 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103asx,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a, sex questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103asxa, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a, sex questions, alt revision questions)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, sextriv1,  0,        getrivia,  sextriv1, gei_state, init_bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sextriv2,  sextriv1, getrivia,  sextriv1, gei_state, init_bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
