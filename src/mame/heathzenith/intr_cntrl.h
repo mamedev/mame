@@ -58,17 +58,36 @@ protected:
 	u8 m_intr_lines;
 };
 
+
+/**
+ * Base interrupt controller for multiple soft-sectored controllers.
+ *
+ */
+class ss_intr_cntrl : public heath_intr_cntrl
+{
+public:
+	virtual void set_drq(int state) override;
+	virtual void set_irq(int state) override;
+
+protected:
+	ss_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void device_start() override;
+
+	bool m_drq_raised;
+	bool m_irq_raised;
+};
+
+
 /**
  * Interrupt controller when the Z37 soft-sectored controller is installed.
  *
  */
-class z37_intr_cntrl : public heath_intr_cntrl
+class z37_intr_cntrl : public ss_intr_cntrl
 {
 public:
 	z37_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void set_drq(int state) override;
-	virtual void set_irq(int state) override;
 	virtual void block_interrupts(u8 data) override;
 
 protected:
@@ -77,14 +96,30 @@ protected:
 
 	virtual void device_start() override;
 
-private:
 	bool m_intr_blocked;
-	bool m_drq_raised;
-	bool m_irq_raised;
 };
+
+
+/**
+ * Interrupt controller when the mms soft-sectored controller is installed.
+ *
+ */
+class mms_intr_cntrl : public ss_intr_cntrl
+{
+public:
+	mms_intr_cntrl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual u8 get_instruction() override;
+	virtual void update_intr_line() override;
+
+	virtual void device_start() override;
+};
+
 
 DECLARE_DEVICE_TYPE(HEATH_INTR_CNTRL,     heath_intr_cntrl)
 DECLARE_DEVICE_TYPE(HEATH_Z37_INTR_CNTRL, z37_intr_cntrl)
+DECLARE_DEVICE_TYPE(HEATH_MMS_INTR_CNTRL, mms_intr_cntrl);
 
 
 class heath_intr_socket : public device_t,

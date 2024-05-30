@@ -19435,6 +19435,7 @@ h19                             // Heath H19
 @source:heathzenith/h89.cpp
 h89                             // Heath H89 (WH89)
 h88                             // Heath H88 (with cassette tape)
+h89_mms                         // Heath H89 with Magnolia MicroSystems(MMS) hardware
 h89_sigmasoft                   // H89 with the SigmaSoft IGC card
 z90                             // Zenith Z-90
 
