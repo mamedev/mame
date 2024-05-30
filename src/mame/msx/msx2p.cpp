@@ -741,8 +741,3 @@ COMP(1989, phc70fd2,   0,        0,     phc70fd2,   msx2jp,   msx2p_state, empty
 COMP(1989, phc35j,     0,        0,     phc35j,     msx2jp,   msx2p_state, empty_init, "Sanyo", "PHC-35J / Wavy35 (MSX2+, Japan)", 0)
 COMP(1988, hbf1xdj,    0,        0,     hbf1xdj,    msx2jp,   msx2p_state, empty_init, "Sony", "HB-F1XDJ (MSX2+, Japan)", 0)
 COMP(1989, hbf1xv,     0,        0,     hbf1xv,     msx2jp,   msx2p_state, empty_init, "Sony", "HB-F1XV (MSX2+, Japan)", 0)
-
-/* MSX Turbo-R */
-/* Temporary placeholders, Turbo-R hardware is not supported yet */
-COMP(1991, fsa1gt,     0,        0,     fsa1gt,     msx2jp,   msx2p_state, empty_init, "Panasonic", "FS-A1GT (MSX Turbo-R, Japan)", MACHINE_NOT_WORKING)
-COMP(1991, fsa1st,     0,        0,     fsa1st,     msx2jp,   msx2p_state, empty_init, "Panasonic", "FS-A1ST (MSX Turbo-R, Japan)", MACHINE_NOT_WORKING)
