@@ -321,9 +321,7 @@ void wheelfir_state::do_blit()
 
 			int pix = rom[address & (0x1000000 - 1)];
 
-			int screen_y = y;
-
-			if (pix && x >= 0 && screen_y >= 0 && x < 512 && screen_y < 512)
+			if (pix && x >= 0 && y >= 0 && x < 512 && y < 512)
 			{
 				m_tmp_bitmap[vpage]->pix(y, x) = pix;
 			}
