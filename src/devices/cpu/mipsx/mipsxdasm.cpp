@@ -45,7 +45,7 @@ constexpr int get_compute_compfunc(u32 opcode)
 	return BIT(opcode, 0, 12);
 }
 
-constexpr int get_offset(u32 opcode)
+[[maybe_unused]] constexpr int get_offset(u32 opcode)
 {
 	return BIT(opcode, 0, 17);
 }
