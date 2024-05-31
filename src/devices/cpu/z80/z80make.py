@@ -64,35 +64,11 @@ class Opcode:
             print("\t\t{", file=f)
             print("\t\tcase 0x00:", file=f)
         step = 0
-        cond = 0
-        conditions = [(None, None)]
         for i in range(0, len(self.source)):
             il = self.source[i]
             line = il.line()
             tokens = line.split()
-            if tokens[0] == "if" and tokens[-1][-1] == ":":
-                line = " ".join(tokens[1:]).rstrip(" :")
-                conditions.insert(0, (cond, cond)) # (else, end)
-                il.print("if (!(%s)) goto elif_%s_%s;" % (line, code, cond), f)
-                cond += 1
-            elif tokens[0] == "elif" and tokens[-1][-1] == ":":
-                il.print("goto endif_%s_%s;" % (code, conditions[0][1]), f)
-                print("elif_%s_%s:" % (code, conditions[0][0]), file=f)
-                line = " ".join(tokens[1:]).rstrip(" :")
-                conditions[0] = (cond, conditions[0][1])
-                il.print("if (!(%s)) goto elif_%s_%s;" % (line, code, cond), f)
-                cond += 1
-            elif tokens[0] == "else:":
-                il.print("goto endif_%s_%s;" % (code, conditions[0][1]), f)
-                print("elif_%s_%s:" % (code, conditions[0][0]), file=f)
-                conditions[0] = (None, conditions[0][1])
-            elif tokens[0] == "endif":
-                if conditions[0][0] is not None:
-                    print("elif_%s_%s:" % (code, conditions[0][0]), file=f)
-                if conditions[0][0] != conditions[0][1]:
-                    print("endif_%s_%s:" % (code, conditions[0][1]), file=f)
-                conditions = conditions[1:]
-            elif tokens[0] == '+':
+            if tokens[0] == '+':
                 il.print("m_icount -= %s;" % (" ".join(tokens[1:])), f)
                 step += 1
                 to_step = "0x%s" % (hex(256 + step)[3:])

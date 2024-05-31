@@ -83,14 +83,14 @@ macro   jp
     PCD = TDAT; WZ = PC;
 
 macro   jp_cond
-    if TDAT8:
+    if (TDAT8) {
         call arg16
         PC = TDAT; WZ = PCD;
-    else:
+    } else {
         // implicit do PC += 2
         call arg16
         WZ = TDAT;
-    endif
+    }
 
 macro   jr
     call arg
@@ -99,11 +99,11 @@ macro   jr
     PC += (s8)TDAT8; WZ = PC;
 
 macro   jr_cond
-    if TDAT8:
+    if (TDAT8) {
         call jr
-    else:
+    } else {
         call arg
-    endif
+    }
 
 macro   arg16_call
     call arg16
@@ -114,19 +114,19 @@ macro   arg16_call
     PCD = m_ea;
 
 macro   call_cond
-    if TDAT8:
+    if (TDAT8) {
         call arg16_call
-    else:
+    } else {
         call arg16
         WZ = TDAT;
-    endif
+    }
 
 macro   ret_cond
     call nomreq_ir 1
-    if TDAT8:
+    if (TDAT8) {
         call pop
         PC = TDAT; WZ = PC;
-    endif
+    }
 
 macro   retn
     call pop
@@ -261,67 +261,67 @@ macro   outd
 
 macro   ldir
     call ldi
-    if BC != 0:
+    if (BC != 0) {
         TADR = DE;
         5 * call nomreq_addr
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
-    endif
+    }
 
 macro   cpir
     call cpi
-    if BC != 0 && !(F & ZF):
+    if (BC != 0 && !(F & ZF)) {
         TADR = HL;
         5 * call nomreq_addr
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
-    endif
+    }
 
 macro   inir
     call ini
-    if B != 0:
+    if (B != 0) {
         TADR = HL;
         5 * call nomreq_addr
         PC -= 2; block_io_interrupted_flags();
-    endif
+    }
 
 macro   otir
     call outi
-    if B != 0:
+    if (B != 0) {
         TADR = BC;
         5 * call nomreq_addr
         PC -= 2; block_io_interrupted_flags();
-    endif
+    }
 
 macro   lddr
     call ldd
-    if BC != 0:
+    if (BC != 0) {
         TADR = DE;
         5 * call nomreq_addr
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
-    endif
+    }
 
 macro   cpdr
     call cpd
-    if BC != 0 && !(F & ZF):
+    if (BC != 0 && !(F & ZF)) {
         TADR = HL;
         5 * call nomreq_addr
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
-    endif
+    }
 
 macro   indr
     call ind
-    if B != 0:
+    if (B != 0) {
         TADR = HL;
         5 * call nomreq_addr
         PC -= 2; block_io_interrupted_flags();
-    endif
+    }
 
 macro   otdr
     call outd
-    if B != 0:
+    if (B != 0) {
         TADR = BC;
         5 * call nomreq_addr
         PC -= 2; block_io_interrupted_flags();
-    endif
+    }
 
 macro   jump    %opcode
     m_ref = 0x%opcode00;
@@ -365,7 +365,7 @@ macro   take_interrupt
     // 'interrupt latency' cycles
     + 2
     // Interrupt mode 2. Call [i:databyte]
-    if m_im == 2:
+    if (m_im == 2) {
         // Zilog's datasheet claims that "the least-significant bit must be a zero."
         // However, experiments have confirmed that IM 2 vectors do not have to be
         // even, and all 8 bits will be used; even $FF is handled normally.
@@ -378,7 +378,7 @@ macro   take_interrupt
         call rm16
         PCD = TDAT;
         LOGINT("IM2 [$%04x] = $%04x\n", m_tmp_irq_vector, PCD);
-    elif m_im == 1:
+    } else if (m_im == 1) {
         // Interrupt mode 1. RST 38h
         LOGINT("'%s' IM1 $0038\n", tag());
         // RST $38
@@ -386,39 +386,39 @@ macro   take_interrupt
         TDAT = PC;
         call wm16_sp
         PCD = 0x0038;
-    else:
+    } else {
         /* Interrupt mode 0. We check for CALL and JP instructions,
            if neither of these were found we assume a 1 byte opcode
            was placed on the databus                                */
         LOGINT("IM0 $%04x\n", m_tmp_irq_vector);
 
         // check for nop
-        if m_tmp_irq_vector != 0x00:
-            if (m_tmp_irq_vector & 0xff0000) == 0xcd0000:
+        if (m_tmp_irq_vector != 0x00) {
+            if ((m_tmp_irq_vector & 0xff0000) == 0xcd0000) {
                 // CALL $xxxx cycles
                 + 11
                 TDAT = PC;
                 call wm16_sp
                 PCD = m_tmp_irq_vector & 0xffff;
-            elif (m_tmp_irq_vector & 0xff0000) == 0xc30000:
+            } else if ((m_tmp_irq_vector & 0xff0000) == 0xc30000) {
                 // JP $xxxx cycles
                 + 10
                 PCD = m_tmp_irq_vector & 0xffff;
-            elif m_tmp_irq_vector == 0xfb:
+            } else if (m_tmp_irq_vector == 0xfb) {
                 // rst (or other opcodes?)
                 + 4
                 ei();
-            elif (m_tmp_irq_vector & 0xc7) == 0xc7:
+            } else if ((m_tmp_irq_vector & 0xc7) == 0xc7) {
                 // RST $xx cycles
                 + 5
                 TDAT = PC;
                 call wm16_sp
                 PCD = m_tmp_irq_vector & 0x0038;
-            else:
+            } else {
                 logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", m_tmp_irq_vector);
-            endif
-        endif
-    endif
+            }
+        }
+    }
     WZ = PCD;
     #if HAS_LDAIR_QUIRK
         // reset parity flag after LD A,I or LD A,R
@@ -426,11 +426,11 @@ macro   take_interrupt
     #endif
 
 macro   check_interrupts
-    if m_nmi_pending:
+    if (m_nmi_pending) {
         call take_nmi
-    elif m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei:
+    } else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
         call take_interrupt
-    endif
+    }
 
 macro   nsc800_take_interrupt
     // Check if processor was halted
@@ -439,21 +439,22 @@ macro   nsc800_take_interrupt
     m_iff1 = m_iff2 = 0;
     // 'interrupt latency' cycles
     + 7
-    if m_nsc800_irq_state[NSC800_RSTA]:
+    if (m_nsc800_irq_state[NSC800_RSTA]) {
         TDAT = PC;
         call wm16_sp
         PCD = 0x003c;
-    elif m_nsc800_irq_state[NSC800_RSTB]:
+    } else if (m_nsc800_irq_state[NSC800_RSTB]) {
         TDAT = PC;
         call wm16_sp
         PCD = 0x0034;
-    elif m_nsc800_irq_state[NSC800_RSTC]:
+    } else if (m_nsc800_irq_state[NSC800_RSTC]) {
         TDAT = PC;
         call wm16_sp
         PCD = 0x002c;
-    else:
+    } else {
         + 2 * m_memrq_cycles
-    endif
+        ;
+    }
     WZ = PCD;
     #if HAS_LDAIR_QUIRK
         // reset parity flag after LD A,I or LD A,R
@@ -461,13 +462,13 @@ macro   nsc800_take_interrupt
     #endif
 
 macro   ncs800_check_interrupts
-    if m_nmi_pending:
+    if (m_nmi_pending) {
         call take_nmi
-    elif (m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei:
+    } else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
         call nsc800_take_interrupt
-    elif m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei:
+    } else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
         call take_interrupt
-    endif
+    }
 
 
 ##########################################################
