@@ -54,9 +54,9 @@ protected:
 	void environ_w(u8 data);
 	void timer_w(u8 data);
 	void scsi_id_w(u8 data) { m_scsi_id = data; }
-	template <unsigned Byte> void count_w(u8 data) { m_count &= ~(0xffU << (Byte * 8)); m_count |= u32(data) << (Byte * 8); }
+	template <unsigned Byte> void count_w(u8 data); //{ m_count &= ~(0xffU << (Byte * 8)); m_count |= u32(data) << (Byte * 8); }
 	template <unsigned Register> void int_auth_w(u8 data);
-	void mode_w(u8 data) { m_mode = data; }
+	void mode_w(u8 data);
 	void sync_ctrl_w(u8 data) { m_sync_ctrl = data; }
 	void scsi_ctrl_w(u8 data);
 	void ioport_w(u8 data);

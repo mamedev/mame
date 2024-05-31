@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "dmac_0448.h"
 
-#define VERBOSE 0
+// #define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC_0448, dmac_0448_device, "dmac_0448", "Sony DMA Controller 0448")
@@ -64,10 +64,15 @@ void dmac_0448_device::device_reset()
 
 void dmac_0448_device::set_irq_line(int number, int state)
 {
+	LOG("set irq %d to %d\n", number, state);
 	u8 const mask = 1U << (number * 2);
 
 	if (state)
+	{
 		m_gstat |= mask;
+		// If the channel is enabled and has autopad enabled, the transaction must be terminated at this time
+		m_dma_check->adjust(attotime::zero);
+	}
 	else
 		m_gstat &= ~mask;
 
@@ -80,6 +85,7 @@ void dmac_0448_device::irq_check(s32 param)
 
 	if (out_int_stat != m_out_int_state)
 	{
+		LOG("update irq to %d\n", out_int_stat);
 		m_out_int_state = out_int_stat;
 		m_out_int(m_out_int_state);
 	}
@@ -89,10 +95,13 @@ void dmac_0448_device::set_drq_line(int channel, int state)
 {
 	u8 const mask = 1U << ((channel * 2) + 1);
 
-	if (state)
+	if (state) {
+		LOG("Set DRQ 0x%x\n", mask);
 		m_gstat |= mask;
-	else
+	} else {
+		LOG("Clear DRQ 0x%x\n", mask);
 		m_gstat &= ~mask;
+	}
 
 	if (state)
 		m_dma_check->adjust(attotime::zero);
@@ -100,6 +109,7 @@ void dmac_0448_device::set_drq_line(int channel, int state)
 
 void dmac_0448_device::cctl_w(u8 data)
 {
+	LOG("cctl_w 0x%x\n", data);
 	if ((data & CS_ENABLE) && !(m_channel[m_gsel].cctl & CS_ENABLE))
 	{
 		LOG("transfer started address 0x%08x count 0x%x\n",
@@ -110,6 +120,18 @@ void dmac_0448_device::cctl_w(u8 data)
 	m_dma_check->adjust(attotime::zero);
 }
 
+u8 dmac_0448_device::cstat_r()
+{
+	LOG("cstat_r gsel = 0x%x cstat = 0x%x\n", m_gsel, m_channel[m_gsel].cstat);
+	return m_channel[m_gsel].cstat | (m_channel[m_gsel].cctl & CS_APAD); 
+}
+
+void dmac_0448_device::gsel_w(u8 data)
+{
+	LOG("gsel_w(0x%x)\n", data);
+	m_gsel = data;
+}
+
 void dmac_0448_device::dma_check(s32 param)
 {
 	bool active = false;
@@ -117,40 +139,63 @@ void dmac_0448_device::dma_check(s32 param)
 	for (unsigned channel = 0; channel < 4; channel++)
 	{
 		// check drq active
+		dma_channel &dma = m_channel[channel];
+		if (channel == 0)
+		{
+			LOG("dma_check cctl = 0x%x gstat = 0x%x ctrc = 0x%x\n", dma.cctl, m_gstat, dma.ctrc); 
+		}
+
+		// if (!BIT(m_gstat, (channel * 2) + 1) && !((dma.cctl & 0x10) && (m_gstat & (1 << (2* channel)))) && !((m_gstat & 0x1) && (dma.cctl & 0x10))) // TODO: don't hardcode channel
+		// 	continue;
+		
 		if (!BIT(m_gstat, (channel * 2) + 1))
 			continue;
-
-		dma_channel &dma = m_channel[channel];
 
 		// check channel enabled
 		if (!(dma.cctl & CS_ENABLE))
 			return;
 
 		// check transfer count
-		if (!dma.ctrc)
+		if (!dma.ctrc && !(dma.cctl & 0x10))
 			return;
 
 		// TODO: confirm if this is correct
 		u32 const address = u32(dma.cmap[dma.ctag]) << 12 | dma.cofs;
 
-		// perform dma transfer
-		if (dma.cctl & CS_MODE)
+		if ((m_gstat & (1 << (2* channel))) && (dma.cctl & 0x10)) // autopad
 		{
-			// device to memory
-			u8 const data = m_dma_r[channel]();
-
-			LOG("dma_r data 0x%02x address 0x%08x\n", data, address);
-
-			m_bus->write_byte(address, data);
+			if (dma.cctl & CS_MODE)
+			{
+				// m_bus->write_byte(address, 0x00);
+				// LOG("dma_r data autopad address 0x%08x\n", address);
+			}
+			else
+			{
+				LOG("dma_w data autopad address 0x%08x\n", address);
+				m_dma_w[channel](0x00);
+			}
 		}
 		else
 		{
-			// memory to device
-			u8 const data = m_bus->read_byte(address);
+			// perform dma transfer
+			if (dma.cctl & CS_MODE)
+			{
+				// device to memory
+				u8 const data = m_dma_r[channel]();
 
-			LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
+				// LOG("dma_r data 0x%02x address 0x%08x\n", data, address);
 
-			m_dma_w[channel](data);
+				m_bus->write_byte(address, data);
+			}
+			else
+			{
+				// memory to device
+				u8 const data = m_bus->read_byte(address);
+
+				// LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
+
+				m_dma_w[channel](data);
+			}
 		}
 
 		// increment offset
@@ -164,18 +209,26 @@ void dmac_0448_device::dma_check(s32 param)
 			dma.cofs++;
 
 		// decrement count
-		dma.ctrc--;
+		if (dma.ctrc > 0) {
+			dma.ctrc--;
+		}
+		LOG("ctrc now 0x%x\n", dma.ctrc);
 
 		// set terminal count flag
 		if (!dma.ctrc)
 		{
 			LOG("transfer complete\n");
 			dma.cstat |= CS_TCZ;
-
+			LOG("dma_check channel %d cstat = 0x%x\n", channel, dma.cstat); 
 			// TODO: terminal count interrupt?
 		}
+		else
+		{
+			// LOG("Not done, clearing TCZ for ch %d\n", channel);
+			dma.cstat &= ~CS_TCZ;
+		}
 
-		if (BIT(m_gstat, (channel * 2) + 1))
+		if (BIT(m_gstat, (channel * 2) + 1) || (dma.ctrc && (dma.cctl & 0x10)))
 			active = true;
 	}
 

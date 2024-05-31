@@ -416,8 +416,8 @@ void news_r3k_base_state::int_check()
 
 u32 news_r3k_base_state::bus_error()
 {
-	if (!machine().side_effects_disabled())
-		irq_w<BERR>(ASSERT_LINE);
+	// if (!machine().side_effects_disabled())
+	// 	irq_w<BERR>(ASSERT_LINE);
 
 	return 0;
 }
