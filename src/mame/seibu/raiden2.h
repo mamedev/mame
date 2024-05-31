@@ -7,6 +7,7 @@
 
 #include "seibu_crtc.h"
 #include "seibucop.h"
+#include "sei25x_rise1x_spr.h"
 
 #include "seibusound.h"
 
@@ -29,20 +30,21 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
-		, m_mainbank(*this, "mainbank%u", 1U)
+		, m_spritegen(*this, "spritegen")
+		, m_mainbank(*this, "mainbank")
 		, m_raiden2cop(*this, "raiden2cop")
-
-		, m_sprite_prot_x(0)
-		, m_sprite_prot_y(0)
-		, m_dst1(0)
-		, m_cop_spr_maxx(0)
-		, m_cop_spr_off(0)
 
 		, m_bg_bank(0)
 		, m_fg_bank(0)
 		, m_mid_bank(0)
 		, m_tx_bank(0)
 		, m_tilemap_enable(0)
+
+		, m_sprite_prot_x(0)
+		, m_sprite_prot_y(0)
+		, m_dst1(0)
+		, m_cop_spr_maxx(0)
+		, m_cop_spr_off(0)
 
 		, m_prg_bank(0)
 		, m_cop_bank(0)
@@ -62,20 +64,6 @@ public:
 	void init_raiden2();
 
 protected:
-	std::unique_ptr<u16[]> m_back_data;
-	std::unique_ptr<u16[]> m_fore_data;
-	std::unique_ptr<u16[]> m_mid_data;
-	std::unique_ptr<u16[]> m_text_data; // private buffers, allocated in init
-	std::unique_ptr<u16[]> m_palette_data;
-	required_device<buffered_spriteram16_device> m_spriteram;
-	required_device<cpu_device> m_maincpu;
-	optional_device<seibu_sound_device> m_seibu_sound;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	optional_memory_bank_array<2> m_mainbank;
-	optional_device<raiden2cop_device> m_raiden2cop;
-
 	void sprite_prot_x_w(u16 data);
 	void sprite_prot_y_w(u16 data);
 	void sprite_prot_src_seg_w(u16 data);
@@ -87,9 +75,6 @@ protected:
 	void sprite_prot_dst1_w(u16 data);
 	void sprite_prot_maxx_w(u16 data);
 	void sprite_prot_off_w(u16 data);
-
-	u16 m_sprite_prot_x,m_sprite_prot_y,m_dst1,m_cop_spr_maxx,m_cop_spr_off;
-	u16 m_sprite_prot_src_addr[2];
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void common_save_state();
@@ -105,27 +90,8 @@ protected:
 
 	void bank_reset(int bgbank, int fgbank, int midbank, int txbank);
 
-	static u16 const raiden_blended_colors[];
-	static u16 const xsedae_blended_colors[];
-	static u16 const zeroteam_blended_colors[];
-
-	bool m_blend_active[0x800]; // cfg
-
-	tilemap_t *m_background_layer = nullptr;
-	tilemap_t *m_midground_layer = nullptr;
-	tilemap_t *m_foreground_layer = nullptr;
-	tilemap_t *m_text_layer = nullptr;
-
-	int m_bg_bank, m_fg_bank, m_mid_bank, m_tx_bank;
-	u16 m_tilemap_enable;
-
-	u16 m_scrollvals[6];
-
-	void draw_sprites(const rectangle &cliprect);
-
-	const int *m_cur_spri = nullptr; // cfg
-
 	DECLARE_GFXDECODE_MEMBER(gfx_raiden2);
+	DECLARE_GFXDECODE_MEMBER(gfx_raiden2_spr);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -137,9 +103,49 @@ protected:
 
 	void init_blending(const u16 *table);
 
-	bitmap_ind16 m_tile_bitmap, m_sprite_bitmap;
-
 	void zeroteam_sound_map(address_map &map);
+
+	// devices
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	optional_device<seibu_sound_device> m_seibu_sound;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<sei25x_rise1x_device> m_spritegen;
+	optional_memory_bank m_mainbank;
+	optional_device<raiden2cop_device> m_raiden2cop;
+
+	// video related
+	static u16 const raiden_blended_colors[];
+	static u16 const xsedae_blended_colors[];
+	static u16 const zeroteam_blended_colors[];
+
+	bool m_blend_active[0x800]{}; // cfg
+
+	tilemap_t *m_background_layer = nullptr;
+	tilemap_t *m_midground_layer = nullptr;
+	tilemap_t *m_foreground_layer = nullptr;
+	tilemap_t *m_text_layer = nullptr;
+
+	std::unique_ptr<u16[]> m_back_data;
+	std::unique_ptr<u16[]> m_fore_data;
+	std::unique_ptr<u16[]> m_mid_data;
+	std::unique_ptr<u16[]> m_text_data; // private buffers, allocated in init
+	std::unique_ptr<u16[]> m_palette_data;
+
+	u32 m_bg_bank, m_fg_bank, m_mid_bank, m_tx_bank;
+	u16 m_tilemap_enable;
+
+	u16 m_scrollvals[6];
+
+	const int *m_cur_spri = nullptr; // cfg
+
+	bitmap_ind16 m_tile_bitmap;
+
+	// protection related
+	u16 m_sprite_prot_x, m_sprite_prot_y, m_dst1, m_cop_spr_maxx, m_cop_spr_off;
+	u16 m_sprite_prot_src_addr[2];
 
 private:
 	void raiden2_bank_w(u8 data);
@@ -147,9 +153,6 @@ private:
 	u16 cop_tile_bank_2_r();
 	void cop_tile_bank_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void raidendx_cop_bank_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	uint8_t m_prg_bank;
-	u16 m_cop_bank;
 
 	void sprcpt_val_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sprcpt_val_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -160,12 +163,6 @@ private:
 	void sprcpt_adr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	u32 m_sprcpt_adr = 0, m_sprcpt_idx = 0;
-
-	u32 m_sprcpt_val[2], m_sprcpt_flags1 = 0;
-	u16 m_sprcpt_flags2 = 0;
-	u32 m_sprcpt_data_1[0x100], m_sprcpt_data_2[0x40], m_sprcpt_data_3[6], m_sprcpt_data_4[4];
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(raiden2);
@@ -181,6 +178,18 @@ private:
 	void raidendx_mem(address_map &map);
 	void xsedae_mem(address_map &map);
 	void zeroteam_mem(address_map &map);
+
+	// misc
+	u8 m_prg_bank;
+	u16 m_cop_bank;
+
+	// protection related
+	u32 m_sprcpt_adr = 0, m_sprcpt_idx = 0;
+
+	u32 m_sprcpt_val[2]{}, m_sprcpt_flags1 = 0;
+	u16 m_sprcpt_flags2 = 0;
+	u32 m_sprcpt_data_1[0x100]{}, m_sprcpt_data_2[0x40]{}, m_sprcpt_data_3[6]{}, m_sprcpt_data_4[4]{};
+
 };
 
 #endif // MAME_SEIBU_RAIDEN2_H
