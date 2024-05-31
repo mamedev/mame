@@ -677,7 +677,7 @@ static void UpdateChangeCountCallback(
 		[alert setInformativeText:[NSString stringWithFormat:@"Tried to select preset %ld of %ld",
 															 (long)idx + 1,
 															 (long)total]];
-		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		[alert beginSheetModalForWindow:window completionHandler:nil];
 		return;
 	}
 
@@ -695,7 +695,7 @@ static void UpdateChangeCountCallback(
 		[alert setMessageText:[NSString stringWithFormat:@"Error loading preset %@", preset->presetName]];
 		[alert setInformativeText:[NSString stringWithFormat:@"Error %ld encountered while setting AudioUnit property",
 															 (long)status]];
-		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		[alert beginSheetModalForWindow:window completionHandler:nil];
 		return;
 	}
 
@@ -708,7 +708,7 @@ static void UpdateChangeCountCallback(
 														 preset->presetName]];
 		[alert setInformativeText:[NSString stringWithFormat:@"Error %ld encountered while sending notification",
 															 (long)status]];
-		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		[alert beginSheetModalForWindow:window completionHandler:nil];
 		return;
 	}
 }
