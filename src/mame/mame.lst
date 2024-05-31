@@ -32642,7 +32642,7 @@ phc35j                          // 1989 MSX2+ Japan
 phc70fd                         // 1988 MSX2+ Japan
 phc70fd2                        // 1988 MSX2+ Japan
 
-@source:msx/msx2p.cpp
+@source:msx/msxtr.cpp
 fsa1gt                          //
 fsa1st                          //
 
