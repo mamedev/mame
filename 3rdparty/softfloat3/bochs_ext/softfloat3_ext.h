@@ -4,6 +4,7 @@ int extFloat80_sincos(extFloat80_t a, extFloat80_t *sin_a, extFloat80_t *cos_a);
 int extFloat80_sin(extFloat80_t &a);
 int extFloat80_cos(extFloat80_t &a);
 int extFloat80_tan(extFloat80_t &a);
+int extFloat80_is_nan(extFloat80_t a);
 extFloat80_t extFloat80_atan(extFloat80_t a, extFloat80_t b);
 extFloat80_t extFloat80_68katan(extFloat80_t a);
 extFloat80_t extFloat80_getman(extFloat80_t a);
