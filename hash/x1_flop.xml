@@ -5576,7 +5576,7 @@ Needs [6845] partial updates for first item
 	</software>
 
 	<software name="x1demoa" cloneof="x1tdemo" supported="no">
-		<description>X1 TurboII Demo</description>
+		<description>X1 TurboII Demo (alternate set)</description>
 		<year>1985?</year>
 		<publisher>シャープ (Sharp)</publisher>
 		<notes><![CDATA[
