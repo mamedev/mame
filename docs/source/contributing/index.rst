@@ -143,8 +143,8 @@ to all kinds of changes):
 * When submitting any new non-arcade machine, but especially a machine
   which does not auto-boot and requires some interaction to start up
   and be usable, consider adding usage instructions to the
-  `System-Specific Setup and Information <https://wiki.mamedev.org/index.php/System-Specific_Setup_and_Information>`
-  page of the `MAME Wiki <https://wiki.mamedev.org>`.  Anyone can edit
+  `System-Specific Setup and Information <https://wiki.mamedev.org/index.php/System-Specific_Setup_and_Information>`_
+  page of the `MAME Wiki <https://wiki.mamedev.org>`_.  Anyone can edit
   the wiki after creating an account, and sub-pages for your system
   which discuss technical details of the system are also welcome.
 
