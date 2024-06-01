@@ -287,7 +287,6 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //  m_infotilemap_2->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	//m_txttilemap->mark_all_dirty();
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
