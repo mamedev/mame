@@ -361,6 +361,17 @@ inline void z80_device::rm16(u16 addr, PAIR &r)
 }
 
 /***************************************************************
+ * Read a word from (SP)
+ ***************************************************************/
+inline void z80_device::rm16_sp(PAIR &r)
+{
+	r.b.l = stack_read(SPD);
+	T(m_memrq_cycles);
+	r.b.h = stack_read(SPD + 1);
+	T(m_memrq_cycles);
+}
+
+/***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
 inline void z80_device::data_write(u16 addr, u8 value)
@@ -390,9 +401,11 @@ inline void z80_device::wm16(u16 addr, PAIR &r)
 inline void z80_device::wm16_sp(PAIR &r)
 {
 	SP--;
-	wm(SPD, r.b.h);
+	stack_write(SPD, r.b.h);
+	T(m_memrq_cycles);
 	SP--;
-	wm(SPD, r.b.l);
+	stack_write(SPD, r.b.l);
+	T(m_memrq_cycles);
 }
 
 /***************************************************************
@@ -468,7 +481,7 @@ inline void z80_device::eay()
  ***************************************************************/
 inline void z80_device::pop(PAIR &r)
 {
-	rm16(SPD, r);
+	rm16_sp(r);
 	SP += 2;
 }
 
@@ -488,6 +501,7 @@ inline void z80_device::jp(void)
 {
 	PCD = arg16();
 	WZ = PCD;
+	m_branch_cb(true);
 }
 
 /***************************************************************
@@ -499,6 +513,7 @@ inline void z80_device::jp_cond(bool cond)
 	{
 		PCD = arg16();
 		WZ = PCD;
+		m_branch_cb(true);
 	}
 	else
 		WZ = arg16(); // implicit do PC += 2
@@ -513,6 +528,7 @@ inline void z80_device::jr()
 	nomreq_addr(PCD - 1, 5);
 	PC += a; // so don't do PC += arg()
 	WZ = PC;
+	m_branch_cb(true);
 }
 
 /***************************************************************
@@ -593,6 +609,7 @@ inline void z80_device::reti()
 	pop(m_pc);
 	WZ = PC;
 	m_iff1 = m_iff2;
+	m_reti_cb(true);
 	daisy_call_reti_device();
 }
 
@@ -3195,6 +3212,7 @@ void z80_device::take_interrupt()
 	m_r++;
 
 	// fetch the IRQ vector
+	m_irqfetch_cb(true);
 	device_z80daisy_interface *intf = daisy_get_irq_device();
 	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
 	LOGINT("single INT irq_vector $%02x\n", irq_vector);
@@ -3744,9 +3762,12 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_irqack_cb(*this),
+	m_irqfetch_cb(*this),
+	m_reti_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
 	m_halt_cb(*this),
+	m_branch_cb(*this),
 	m_m1_cycles(4),
 	m_memrq_cycles(3),
 	m_iorq_cycles(4)

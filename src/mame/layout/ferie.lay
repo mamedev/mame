@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="pencursor">
+		<image state="1">
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1" height="1" viewBox="0 0 1 1">
+					<g fill="none" stroke="#6666ff" stroke-width="0.06" stroke-opacity="1">
+						<circle cx="0.5" cy="0.5" r="0.1" />
+						<circle cx="0.5" cy="0.5" r="0.47" />
+						<line x1="0.03" y1="0.5" x2="0.4" y2="0.5" />
+						<line x1="0.6" y1="0.5" x2="0.97" y2="0.5" />
+						<line x1="0.5" y1="0.03" x2="0.5" y2="0.4" />
+						<line x1="0.5" y1="0.6" x2="0.5" y2="0.97" />
+						<line />
+					</g>
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!--
+	    Panel labels:
+
+	    | メニュー | ひらがな |  すうじ  | Ｏ．Ｋ |  ▲  |
+	    |  えいご  | カタカナ | スタソプ | もどる |  ▼  |
+
+	    Panel labels (translated):
+
+	    |  Menu   | Hiragana | Numeral |  OK  |  ▲  |
+	    | English | Katakana |  Stamp  | Back |  ▼  |
+	-->
+	<element name="panel">
+		<!-- background -->
+		<rect><color red="0.06" green="0.12" blue="0.24" /><bounds x="0" y="0" width="15" height="3" /></rect>
+		<!-- borders -->
+		<rect><color red="1" green="1" blue="1" /><bounds x="0" y="1.475" width="15" height="0.05" /></rect>
+		<rect><color red="1" green="1" blue="1" /><bounds x="2.975" y="0.125" width="0.05" height="2.75" /></rect>
+		<rect><color red="1" green="1" blue="1" /><bounds x="5.975" y="0.125" width="0.05" height="2.75" /></rect>
+		<rect><color red="1" green="1" blue="1" /><bounds x="8.975" y="0.125" width="0.05" height="2.75" /></rect>
+		<rect><color red="1" green="1" blue="1" /><bounds x="11.975" y="0.125" width="0.05" height="2.75" /></rect>
+		<!-- 1st row -->
+		<text string="Menu"><color red="1" green="1" blue="1" /><bounds x="0" y="0.375" width="3" height="0.75" /></text>
+		<text string="Hiragana"><color red="1" green="1" blue="1" /><bounds x="3" y="0.375" width="3" height="0.75" /></text>
+		<text string="Numeral"><color red="1" green="1" blue="1" /><bounds x="6" y="0.375" width="3" height="0.75" /></text>
+		<text string="O.K"><color red="1" green="1" blue="1" /><bounds x="9" y="0.375" width="3" height="0.75" /></text>
+		<text string="▲"><color red="1" green="1" blue="1" /><bounds x="12" y="0.375" width="3" height="0.75" /></text>
+		<!-- 2nd row -->
+		<text string="English"><color red="1" green="1" blue="1" /><bounds x="0" y="1.875" width="3" height="0.75" /></text>
+		<text string="Katakana"><color red="1" green="1" blue="1" /><bounds x="3" y="1.875" width="3" height="0.75" /></text>
+		<text string="Stamp"><color red="1" green="1" blue="1" /><bounds x="6" y="1.875" width="3" height="0.75" /></text>
+		<text string="Back"><color red="1" green="1" blue="1" /><bounds x="9" y="1.875" width="3" height="0.75" /></text>
+		<text string="▼"><color red="1" green="1" blue="1" /><bounds x="12" y="1.875" width="3" height="0.75" /></text>
+	</element>
+
+	<view name="Default View">
+		<screen index="0">
+			<bounds x="0" y="0" width="15" height="8" />
+		</screen>
+
+		<element id="panel" ref="panel">
+			<bounds x="0" y="8" width="15" height="3" />
+		</element>
+
+		<element id="pencursor" ref="pencursor">
+			<!-- will be positioned by script -->
+			<bounds x="0" y="8" width="0.2" height="0.2" />
+			<color alpha="0.7" />
+		</element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+				function ()
+					local panel = file.views['Default View'].items['panel']
+
+					-- recompute target pen cursor size and area when necessary
+					local curxoffs, curyoffs, curxscale, curyscale, curwidth, curheight
+					file.views['Default View']:set_recomputed_callback(
+							function ()
+								local bounds = panel.bounds
+								curwidth = bounds.width / 16
+								curheight = bounds.height * 5 / 16
+								curxoffs = bounds.x0 - (curwidth * 0.5)
+								curyoffs = bounds.y0 - (curheight * 0.5)
+								curxscale = bounds.width / 255
+								curyscale = bounds.height / 255
+							end)
+
+					-- animate the position of the pen cursor
+					local penctrl = file.device:ioport('BUTTONS')
+					local penx = file.device:ioport('PEN_X')
+					local peny = file.device:ioport('PEN_Y_RESCALE')
+					file.views['Default View'].items['pencursor']:set_element_state_callback(
+							function ()
+								return (penctrl:read() & 0x80) >> 7
+							end)
+					file.views['Default View'].items['pencursor']:set_bounds_callback(
+							function ()
+								local x = curxoffs + (penx:read() * curxscale)
+								local y = curyoffs + (peny:read() * curyscale)
+								return emu.render_bounds(x, y, x + curwidth, y + curheight)
+							end)
+				end)
+	]]></script>
+</mamelayout>
