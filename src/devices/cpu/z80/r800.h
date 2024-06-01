@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR,Wilbert Pol
+// copyright-holders:AJR,Juergen Buchmueller,Wilbert Pol
 /***************************************************************************
 
     ASCII R800 CPU
