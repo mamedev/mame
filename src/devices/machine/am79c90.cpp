@@ -132,6 +132,7 @@ void am7990_device_base::update_interrupts()
 			// Interrupt changed state, set output pin accordingly
 			m_intr_out_state = !m_intr_out_state;
 			m_intr_out_cb(m_intr_out_state);
+			LOG("interrupt %s\n", (m_csr[0] & CSR0_INTR) > 0 ? "set" : "cleared");
 		}
 	}
 	else
