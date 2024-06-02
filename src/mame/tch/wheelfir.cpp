@@ -178,7 +178,6 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "screen.h"
 #include "speaker.h"
 
-
 namespace {
 
 static const int ZOOM_TABLE_SIZE=1<<14;
@@ -190,7 +189,7 @@ static const int NUM_COLORS=256;
 
 struct scroll_info
 {
-		int32_t x = 0, y = 0, unkbits = 0;
+	int32_t x = 0, y = 0, unkbits = 0;
 };
 
 
@@ -297,10 +296,10 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			int x = m_direct_write_idx % direct_width;
 			int y = (m_direct_write_idx / direct_width) % direct_height;
 
-			x+=m_direct_write_x0;
-			y+=m_direct_write_y0;
+			x += m_direct_write_x0;
+			y += m_direct_write_y0;
 
-			if(x<512 && y <512)
+			if (x<512 && y <512)
 			{
 				m_tmp_bitmap[LAYER_BG]->pix(y, x) = sixdat;
 			}
@@ -317,25 +316,25 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 		uint8_t const *const rom = memregion("gfx1")->base();
 
-		int width = m_screen->width();
-		int height = m_screen->height();
+		const int width = m_screen->width();
+		const int height = m_screen->height();
 
-		int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
-		int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);
+		const int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
+		const int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);
 
-		int dst_x0=(m_blitter_data[0]&0xff)+((m_blitter_data[7]&0x40)?256:0);
-		int dst_y0=(m_blitter_data[2]&0xff)+((m_blitter_data[7]&0x80)?256:0);
+		const int dst_x0=(m_blitter_data[0]&0xff)+((m_blitter_data[7]&0x40)?256:0);
+		const int dst_y0=(m_blitter_data[2]&0xff)+((m_blitter_data[7]&0x80)?256:0);
 
-		int dst_x1=(m_blitter_data[1]&0xff)+((m_blitter_data[9]&4)?256:0);
-		int dst_y1=(m_blitter_data[3]&0xff)+((m_blitter_data[9]&8)?256:0);
+		const int dst_x1=(m_blitter_data[1]&0xff)+((m_blitter_data[9]&4)?256:0);
+		const int dst_y1=(m_blitter_data[3]&0xff)+((m_blitter_data[9]&8)?256:0);
 
-		int x_dst_step=(m_blitter_data[7]&0x1)?1:-1;
-		int y_dst_step=(m_blitter_data[7]&0x2)?1:-1;
+		const int x_dst_step=(m_blitter_data[7]&0x1)?1:-1;
+		const int y_dst_step=(m_blitter_data[7]&0x2)?1:-1;
 
-		int x_src_step=(m_blitter_data[8]&0x4000)?1:-1;
-		int y_src_step=(m_blitter_data[8]&0x8000)?1:-1;
+		const int x_src_step=(m_blitter_data[8]&0x4000)?1:-1;
+		const int y_src_step=(m_blitter_data[8]&0x8000)?1:-1;
 
-		int page=((m_blitter_data[6])>>10)*0x40000;
+		const int page=((m_blitter_data[6])>>10)*0x40000;
 
 
 		if (!m_is_pwball)
@@ -350,9 +349,9 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 			}
 		}
 
-		if(x_dst_step<0)
+		if (x_dst_step<0)
 		{
-			if(dst_x0<=dst_x1)
+			if (dst_x0<=dst_x1)
 			{
 				return;
 			}
@@ -360,23 +359,23 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		}
 		else
 		{
-			if(dst_x0>=dst_x1)
+			if (dst_x0>=dst_x1)
 			{
 				return;
 			}
 
 		}
 
-		if(y_dst_step<0)
+		if (y_dst_step<0)
 		{
-			if(dst_y0<=dst_y1)
+			if (dst_y0<=dst_y1)
 			{
 				return;
 			}
 		}
 		else
 		{
-			if(dst_y0>=dst_y1)
+			if (dst_y0>=dst_y1)
 			{
 				return;
 			}
@@ -419,8 +418,10 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		const float scale_y=get_scale(index);
 
 
-		if(scale_x==0 || scale_y==0) return;
-
+		if (scale_x==0 || scale_y==0)
+		{
+			return;
+		}
 
 		float scale_x_step = 100.f / scale_x;
 		float scale_y_step = 100.f / scale_y;
@@ -450,10 +451,11 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		bool endx=false;
 		bool endy=false;
 
-		if(m_blitter_data[0x7]&0x0c)
-		{
-			//???
-		}
+	/*
+	    if(m_blitter_data[0x7]&0x0c)
+	    {
+	        //???
+	    }*/
 
 		float idx_x = 0;
 		for(int x=dst_x0; !endx; x+=x_dst_step, idx_x+=scale_x_step)
@@ -466,30 +468,33 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 				endy=(y==(dst_y1+1));
 
 
-				int xx=src_x0+x_src_step*idx_x;
-				int yy=src_y0+y_src_step*idx_y;
+				const int xx=src_x0+x_src_step*idx_x;
+				const int yy=src_y0+y_src_step*idx_y;
 
-				int address=page+yy*512+xx;
+				const int address=page+yy*512+xx;
 
-				int pix = rom[address&(0x1000000-1)];
+				const int pix = rom[address&(0x1000000-1)];
 
 				int screen_x=x;
 				int screen_y=y;
 
 
-				if ((page>=0x400000) && (!m_is_pwball))
+			/*  if ((page>=0x400000) && (!m_is_pwball))
+			    {
+			        //hack for clear
+			        if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
+			        {
+			    //      m_tmp_bitmap[vpage]->pix(screen_y , screen_x ) =0;
+			        }
+			    }
+			*/
 				{
-					//hack for clear
-					if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
+					if (vpage == LAYER_FG)
 					{
-				//      m_tmp_bitmap[vpage]->pix(screen_y , screen_x ) =0;
+						screen_y &= 0xff;
 					}
-				}
 
-				{
-					if (vpage == LAYER_FG) screen_y&=0xff;
-
-					if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
+					if (pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 					{
 						m_tmp_bitmap[vpage]->pix(screen_y, screen_x) = pix;
 					}
@@ -509,7 +514,7 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 
-	for(int y=cliprect.min_y; y < cliprect.max_y; y++)
+	for (int y=cliprect.min_y; y < cliprect.max_y; y++)
 	{
 		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(( (m_scanlines[y].y)&511));
 		uint16_t *const dest = &bitmap.pix(y);
@@ -676,11 +681,11 @@ void wheelfir_state::adc_eoc_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
-	if(param<NUM_SCANLINES)
+	if (param < NUM_SCANLINES)
 	{
 		//copy scanline offset
-		int xscroll = (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
-		int yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+		const int xscroll = (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
+		const int yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
 
 		m_scanlines[param].x = xscroll;
 		m_scanlines[param].y = yscroll;
@@ -722,7 +727,7 @@ void wheelfir_state::machine_start()
 	m_scanlines = std::make_unique<scroll_info[]>(NUM_SCANLINES+NUM_VBLANK_LINES);
 
 
-	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
+	for (int i=0;i<(ZOOM_TABLE_SIZE);++i)
 	{
 		m_zoom_table[i]=-1;
 	}
@@ -731,17 +736,17 @@ void wheelfir_state::machine_start()
 
 	for(int j=0;j<400;++j)
 	{
-		int i=j<<3;
+		const int i=j<<3;
 		int d1=ROM[0x200+i]&0x1f;
 		int d0=(ROM[0x200+i]>>8)&0x1f;
 
-		d0|=(ROM[0x200+1+i]&1)?0x20:0;
-		d1|=(ROM[0x200+1+i]&4)?0x20:0;
+		d0 |= (ROM[0x200+1+i]&1)?0x20:0;
+		d1 |= (ROM[0x200+1+i]&4)?0x20:0;
 
-		int hflag=(ROM[0x200+2+i]&0x100)?1:0;
-		int dflag=(ROM[0x200+1+i]&0x10)?1:0;
+		const int hflag=(ROM[0x200+2+i]&0x100)?1:0;
+		const int dflag=(ROM[0x200+1+i]&0x10)?1:0;
 
-		int index=d0|(d1<<6)|(hflag<<12)|(dflag<<13);
+		const int index=d0|(d1<<6)|(hflag<<12)|(dflag<<13);
 		m_zoom_table[index]=j;
 	}
 }
