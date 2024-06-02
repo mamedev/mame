@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "dmac_0448.h"
 
-// #define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC_0448, dmac_0448_device, "dmac_0448", "Sony DMA Controller 0448")
