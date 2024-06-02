@@ -125,19 +125,19 @@ void am7990_device_base::device_reset()
 
 void am7990_device_base::update_interrupts()
 {
-	if (m_csr[0] & CSR0_INEA)
+	if (m_csr[0] & CSR0_INTR)
 	{
-		if (((m_csr[0] & CSR0_INTR) > 0) != !(m_intr_out_state > 0))
+		// assert intr if interrupts are enabled and not asserted
+		if ((m_csr[0] & CSR0_INEA) && m_intr_out_state)
 		{
-			// Interrupt changed state, set output pin accordingly
 			m_intr_out_state = !m_intr_out_state;
 			m_intr_out_cb(m_intr_out_state);
-			LOG("interrupt %s\n", (m_csr[0] & CSR0_INTR) > 0 ? "set" : "cleared");
+			LOG("interrupt asserted\n");
 		}
 	}
 	else
 	{
-		// Interrupts disabled, deassert pin if there is a pending interrupt
+		// deassert intr
 		if (!m_intr_out_state)
 		{
 			m_intr_out_state = !m_intr_out_state;
