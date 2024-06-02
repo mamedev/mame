@@ -99,10 +99,13 @@ void dmac_0448_device::set_drq_line(int channel, int state)
 {
 	u8 const mask = 1U << ((channel * 2) + 1);
 
-	if (state) {
+	if (state)
+	{
 		LOGMASKED(LOG_DRQ, "set DRQ 0x%x\n", mask);
 		m_gstat |= mask;
-	} else {
+	} 
+	else
+	{
 		LOGMASKED(LOG_DRQ, "clear DRQ 0x%x\n", mask);
 		m_gstat &= ~mask;
 	}
@@ -207,7 +210,8 @@ void dmac_0448_device::dma_check(s32 param)
 			dma.cofs++;
 
 		// decrement count
-		if (dma.ctrc > 0) {
+		if (dma.ctrc > 0)
+		{
 			dma.ctrc--;
 		}
 		LOG("ctrc now 0x%x\n", dma.ctrc);
