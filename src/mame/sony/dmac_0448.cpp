@@ -16,7 +16,11 @@
 #include "emu.h"
 #include "dmac_0448.h"
 
-#define VERBOSE 0
+#define LOG_REGISTER (1U << 1)
+#define LOG_DRQ (1U << 2)
+#define LOG_IRQ (1U << 3)
+
+#define VERBOSE 0 // (LOG_GENERAL | LOG_REGISTER | LOG_DRQ | LOG_IRQ)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC_0448, dmac_0448_device, "dmac_0448", "Sony DMA Controller 0448")
@@ -64,7 +68,7 @@ void dmac_0448_device::device_reset()
 
 void dmac_0448_device::set_irq_line(int number, int state)
 {
-	LOG("set irq %d to %d\n", number, state);
+	LOGMASKED(LOG_IRQ, "set irq %d to %d\n", number, state);
 	u8 const mask = 1U << (number * 2);
 
 	if (state)
@@ -85,7 +89,7 @@ void dmac_0448_device::irq_check(s32 param)
 
 	if (out_int_stat != m_out_int_state)
 	{
-		LOG("update irq to %d\n", out_int_stat);
+		LOGMASKED(LOG_IRQ, "update irq to %d\n", out_int_stat);
 		m_out_int_state = out_int_stat;
 		m_out_int(m_out_int_state);
 	}
@@ -96,10 +100,10 @@ void dmac_0448_device::set_drq_line(int channel, int state)
 	u8 const mask = 1U << ((channel * 2) + 1);
 
 	if (state) {
-		LOG("Set DRQ 0x%x\n", mask);
+		LOGMASKED(LOG_DRQ, "set DRQ 0x%x\n", mask);
 		m_gstat |= mask;
 	} else {
-		LOG("Clear DRQ 0x%x\n", mask);
+		LOGMASKED(LOG_DRQ, "clear DRQ 0x%x\n", mask);
 		m_gstat &= ~mask;
 	}
 
@@ -109,7 +113,7 @@ void dmac_0448_device::set_drq_line(int channel, int state)
 
 void dmac_0448_device::cctl_w(u8 data)
 {
-	LOG("cctl_w 0x%x\n", data);
+	LOGMASKED(LOG_REGISTER, "cctl_w 0x%x (%s)\n", data, machine().describe_context());
 	if ((data & CS_ENABLE) && !(m_channel[m_gsel].cctl & CS_ENABLE))
 	{
 		LOG("transfer started address 0x%08x count 0x%x\n",
@@ -120,15 +124,9 @@ void dmac_0448_device::cctl_w(u8 data)
 	m_dma_check->adjust(attotime::zero);
 }
 
-u8 dmac_0448_device::cstat_r()
-{
-	LOG("cstat_r gsel = 0x%x cstat = 0x%x\n", m_gsel, m_channel[m_gsel].cstat);
-	return m_channel[m_gsel].cstat | (m_channel[m_gsel].cctl & CS_APAD); 
-}
-
 void dmac_0448_device::gsel_w(u8 data)
 {
-	LOG("gsel_w(0x%x)\n", data);
+	LOGMASKED(LOG_REGISTER, "gsel_w 0x%x (%s)\n", data, machine().describe_context());
 	m_gsel = data;
 }
 
@@ -166,8 +164,8 @@ void dmac_0448_device::dma_check(s32 param)
 		{
 			if (dma.cctl & CS_MODE)
 			{
-				// m_bus->write_byte(address, 0x00);
-				// LOG("dma_r data autopad address 0x%08x\n", address);
+				LOG("dma_r data autopad address 0x%08x\n", address);
+				m_bus->write_byte(address, 0x00);
 			}
 			else
 			{

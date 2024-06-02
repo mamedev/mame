@@ -31,7 +31,7 @@ protected:
 	void set_irq_line(int number, int state);
 	void set_drq_line(int channel, int state);
 
-	u8 cstat_r();
+	u8 cstat_r() { return m_channel[m_gsel].cstat; }
 	u8 ctrcl_r() { return u8(m_channel[m_gsel].ctrc >> 0); }
 	u8 ctrcm_r() { return u8(m_channel[m_gsel].ctrc >> 8); }
 	u8 ctrch_r() { return u8(m_channel[m_gsel].ctrc >> 16); }
