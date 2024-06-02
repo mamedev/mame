@@ -852,7 +852,7 @@ void cxd1185_device::int_check()
 	}
 
 	// update mirq
-	if (m_int_req[0] || m_int_req[1])
+	if (m_int_req[0] || int_req1)
 	{
 		m_status |= MIRQ;
 
