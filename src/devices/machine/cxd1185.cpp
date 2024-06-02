@@ -261,6 +261,7 @@ void cxd1185_device::command_w(u8 data)
 
 	m_command = data;
 	m_status |= CIP;
+	m_last_dma_direction = DMA_NONE;
 
 	switch (data & (CAT | CMD))
 	{
@@ -304,11 +305,13 @@ void cxd1185_device::command_w(u8 data)
 		LOGMASKED(LOG_CMD, "select target %d without atn\n", (m_scsi_id & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
+		m_last_dma_direction = (m_command & DMA) ? DMA_OUT : DMA_NONE;
 		break;
 	case 0x42:
 		LOGMASKED(LOG_CMD, "select target %d with atn\n", (m_scsi_id & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
+		m_last_dma_direction = (m_command & DMA) ? DMA_OUT : DMA_NONE;
 		break;
 	case 0x43: LOGMASKED(LOG_CMD, "enable selection/reselection\n"); break;
 	case 0x44: LOGMASKED(LOG_CMD, "disable selection/reselection\n"); break;
@@ -325,10 +328,12 @@ void cxd1185_device::command_w(u8 data)
 	case 0xc0:
 		LOGMASKED(LOG_CMD, "transfer information\n");
 		m_state = XFR_INFO;
+		m_last_dma_direction = (m_command & DMA) ? ((scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE;
 		break;
 	case 0xc1:
 		LOGMASKED(LOG_CMD, "transfer pad\n");
 		m_state = XFR_INFO;
+		m_last_dma_direction = (m_command & DMA) ? ((scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE;
 		break;
 	case 0xc2:
 		LOGMASKED(LOG_CMD, "deassert ack\n");
@@ -422,12 +427,6 @@ void cxd1185_device::timer_w(u8 data)
 	}
 }
 
-void cxd1185_device::mode_w(u8 data) 
-{ 
-	LOG("mode_w 0x%x\n", data);
-	m_mode = data; 
-}
-
 template <unsigned Register> void cxd1185_device::int_auth_w(u8 data)
 {
 	LOGMASKED(LOG_REG, "int_auth_w<%d> 0x%02x\n", Register, data);
@@ -435,13 +434,6 @@ template <unsigned Register> void cxd1185_device::int_auth_w(u8 data)
 	m_int_auth[Register] = data;
 
 	int_check();
-}
-
-template <unsigned Byte> void cxd1185_device::count_w(u8 data)
-{
-	LOGMASKED(LOG_REG, "count_w<%d> 0x%02x\n", Byte, data);
-	m_count &= ~(0xffU << (Byte * 8)); m_count |= u32(data) << (Byte * 8);
-	LOGMASKED(LOG_REG, "count_w<%d> count is now 0x%x\n", Byte, m_count);
 }
 
 void cxd1185_device::scsi_ctrl_w(u8 data)
@@ -619,7 +611,7 @@ int cxd1185_device::state_step()
 		if (!m_fifo.full())
 		{
 			u8 const data = ((m_command & CMD) == (CMD_XFR_PAD & CMD)) ? 0 : scsi_bus->data_r();
-			LOGMASKED(LOG_STATE, "transfer in: data 0x%02x, dma %sactive\n", data, (m_command & DMA) ? "" : "not ");
+			LOGMASKED(LOG_STATE, "transfer in: data 0x%02x\n", data);
 
 			m_fifo.enqueue(data);
 			if (m_command & TRBE)
@@ -627,8 +619,11 @@ int cxd1185_device::state_step()
 
 			m_state = XFR_IN_NEXT;
 
-			// assert ACK, and DRQ if needed
+			// assert ACK
 			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+
+			// If this is a DMA command and we have data now, assert DRQ so host can start transferring
+			// (also handles transfers in the case where the counter is not aligned with the expected bytes read)
 			if (m_command & DMA)
 				set_drq(true);
 		}
@@ -664,6 +659,7 @@ int cxd1185_device::state_step()
 			// check if target changed phase
 			if (m_int_req[1] & PHC)
 			{
+				// Lower DRQ unless FIFO still has valid data that the host machine can read out
 				if ((m_command & DMA) && m_fifo.empty())
 					set_drq(false);
 
@@ -846,17 +842,21 @@ void cxd1185_device::int_check()
 {
 	bool irq_asserted = false;
 
-	uint8_t irq2 = m_int_req[1];
-	if ((m_mode & SPHI) && !m_fifo.empty()) {
-		LOGMASKED(LOG_INT, "irq_check suppressing PHC\n"); // TODO: only log this if actually suppressing
-		irq2 &= ~PHC;
+	// When SPHI is set during DMA data in, phase change interrupts are deferred until the DMA transfer is complete
+	// This will be recalculated at that time once the FIFO is empty
+	uint8_t int_req1 = m_int_req[1];
+	if ((m_mode & SPHI) && !m_fifo.empty() && (m_last_dma_direction == DMA_IN) && (int_req1 & PHC))
+	{
+		LOGMASKED(LOG_INT, "SPHI active, suppressing PHC interrupt\n");
+		int_req1 &= ~PHC;
 	}
 
 	// update mirq
 	if (m_int_req[0] || m_int_req[1])
 	{
 		m_status |= MIRQ;
-		irq_asserted = (m_int_req[0] & m_int_auth[0]) || (irq2 & m_int_auth[1]);
+
+		irq_asserted = (m_int_req[0] & m_int_auth[0]) || (int_req1 & m_int_auth[1]);
 	}
 	else
 		m_status &= ~MIRQ;
@@ -864,7 +864,7 @@ void cxd1185_device::int_check()
 	// update irq line
 	if (m_irq_asserted != irq_asserted)
 	{
-		LOGMASKED(LOG_INT, "irq_check interrupt %s  (s0 = 0x%x s1= 0x%x)\n", irq_asserted ? "asserted" : "cleared", m_int_req[0], m_int_req[1]);
+		LOGMASKED(LOG_INT, "irq_check interrupt %s\n", irq_asserted ? "asserted" : "cleared");
 
 		m_irq_asserted = irq_asserted;
 		m_irq_out_cb((m_environ & SIRM) ? !m_irq_asserted : m_irq_asserted);
@@ -904,15 +904,13 @@ void cxd1185_device::dma_w(u8 data)
 
 	m_fifo.enqueue(data);
 
-	// TEMP: this is not very efficient, this is for testing for when the count is just set to an arbitrary high number by NEWS-OS 4
-	// Might only have to run the state timer every time, and only lower DRQ in the if statement or something.
-	// if (m_fifo.full() || m_fifo.queue_length() >= m_count)
-	// {
+	if (m_fifo.full() || m_fifo.queue_length() >= m_count)
+	{
 		set_drq(false);
 
 		if (m_count)
 			m_state_timer->adjust(attotime::zero);
-	// }
+	}
 }
 
 void cxd1185_device::port_w(u8 data)
