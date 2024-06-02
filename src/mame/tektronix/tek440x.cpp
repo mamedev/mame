@@ -82,7 +82,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "scsi:7:ncr5385"),
 		m_vint(*this, "vint"),
-		m_prom(*this, "maincpu"),			// why is the bootrom called 'maincpu'?
+		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
@@ -110,6 +110,7 @@ private:
 	void mapcntl_w(u8 data);
 	void sound_w(u8 data);
 	void diag_w(u8 data);
+	void led_w(u8 data);
 
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
@@ -126,11 +127,6 @@ private:
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<input_merger_all_high_device> m_vint;
-
-// I am guessing we need some target scsi device that reads/writes a filesystem
-//	required_device<nscsi_harddisk_device> m_scsidrive;
-
-
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
 	required_shared_ptr<u16> m_vram;
@@ -143,6 +139,7 @@ private:
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
+	u8 m_leds;
 };
 
 /*************************************
@@ -266,6 +263,7 @@ u8 tek440x_state::mapcntl_r()
 
 void tek440x_state::mapcntl_w(u8 data)
 {
+	LOG("mapcntl_w %d\n", BIT(data, 5));
 	if (BIT(data, 5))
 		m_map_view.select(0);
 	else
@@ -277,6 +275,13 @@ void tek440x_state::sound_w(u8 data)
 {
 	m_snsnd->write(data);
 	m_boot = false;
+}
+
+void tek440x_state::led_w(u8 data)
+{
+
+	m_leds = data;
+	LOG("LED %c%c%c%c\n",m_leds & 8 ? '*' : '-',m_leds & 4 ? '*' : '-',m_leds & 2 ? '*' : '-',m_leds & 1 ? '*' : '-');
 }
 
 void tek440x_state::diag_w(u8 data)
@@ -333,7 +338,7 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 700000-71ffff spare 0
 	// 720000-73ffff spare 1
-	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
+	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0).w(FUNC(tek440x_state::led_w));
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
 	// 780000-79ffff processor board I/O
@@ -391,7 +396,7 @@ INPUT_PORTS_END
 
 static void scsi_devices(device_slot_interface &device)
 {
-	device.option_add("scsi_harddisk", NSCSI_HARDDISK);
+	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("tek_msu_fdc", TEK_MSU_FDC);
 }
 
@@ -450,7 +455,7 @@ void tek440x_state::tek4404(machine_config &config)
 	NSCSI_BUS(config, "scsi");
 	// hard disk is a Micropolis 1304 (https://www.micropolis.com/support/hard-drives/1304)
 	// with a Xebec 1401 SASI adapter inside the Mass Storage Unit
-	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "scsi_harddisk");
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "tek_msu_fdc");
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
@@ -486,8 +491,9 @@ void tek440x_state::tek4404(machine_config &config)
 
 ROM_START( tek4404 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) )
-	ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) )
+	ROM_LOAD( "boot.bin", 0x000000, 0x008000, CRC(bceb9462) SHA1(01960a90eab482957469ad4e7e3dc74f33588779) )
+	//ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) )
+	//ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) )
 
 	ROM_REGION( 0x2000, "scsimfm", 0 )
 	ROM_LOAD( "scsi_mfm.bin", 0x000000, 0x002000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
