@@ -5,8 +5,7 @@
   Emulation of the firmware mapper as found in Panasonic FS-A1ST and FS-A1GT Turbo-R machines.
 
 TODO:
-- SRAM can be 16KB (FS-A1ST) or 32KB (FS-A1GT)
-- SRAM is not accessible at 4000-7fff?
+- FS-A1GT has problems booting, related to this mapper?
 
 Starting at segment
 - 000: firmware.
