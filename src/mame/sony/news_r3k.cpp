@@ -516,6 +516,8 @@ void news_r3k_base_state::common(machine_config &config)
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);
 	// inquiry content for hard disk is "HITACHI DK312C          CS01"
+	// HD CHDs will be treated as MO disks using the inquiry content "SONY    SMO-C501        1.00"
+	// The CHS for converting a raw MO dump for 282MByte per side disks is 18678,1,31 per NEWS-OS 4's disktab file
 	NSCSI_CONNECTOR(config, "scsi:0", news_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", news_scsi_devices, nullptr);
