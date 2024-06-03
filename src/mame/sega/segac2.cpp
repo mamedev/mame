@@ -76,6 +76,7 @@
 
 #include "emu.h"
 #include "segaipt.h"
+#include "m50dass.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
@@ -126,6 +127,7 @@ public:
 
 	void tfrceacjpb(machine_config &config);
 	void ribbit(machine_config &config);
+	void c2m50dass(machine_config &config);
 
 	void init_noprot();
 	void init_columns();
@@ -1850,6 +1852,14 @@ void segac2_state::ribbit(machine_config& config)
 	m_upd7759->set_start_delay(250);
 }
 
+// Games supporting Megalo 50 moving seats (DASS)
+void segac2_state::c2m50dass(machine_config& config)
+{
+	segac2(config);
+
+	MEGALO50_DASS(config, "m50dass");
+}
+
 
 /******************************************************************************
     Rom Definitions
@@ -2040,9 +2050,6 @@ ROM_START( twinsqua ) /* Twin Squash  (c)1991 Sega */
 
 	ROM_REGION( 0x020000, "upd", 0 )
 	ROM_LOAD( "epr-14588.ic4", 0x000000, 0x020000, CRC(5a9b6881) SHA1(d86ec7f569fae5a1ce93a1cf40998cbb13726e0c) )
-
-	ROM_REGION( 0x20000, "megalo50", 0 ) // ROM for MEGALO 50 moving seat
-	ROM_LOAD( "epr-14705.bin", 0x00000, 0x20000, CRC(b863d2c5) SHA1(f6aa309bc8be15c26d91f3cf048ea140a9ca12eb) ) // Strings "MEGALO50  910322", "**  SHUNICHI  **" on ROM
 ROM_END
 
 
@@ -2242,9 +2249,6 @@ ROM_START( puyo ) /* Puyo Puyo  (c)1992 Sega / Compile */
 
 	ROM_REGION( 0x020000, "upd", 0 )
 	ROM_LOAD( "epr-15196.ic4", 0x000000, 0x020000, CRC(79112b3b) SHA1(fc3a202e1e2ff39950d4af689b7fcca86c301805) )
-
-	ROM_REGION( 0x20000, "megalo50", 0 ) // ROM for MEGALO 50 moving seat
-	ROM_LOAD( "epr-14705.bin", 0x00000, 0x20000, CRC(b863d2c5) SHA1(f6aa309bc8be15c26d91f3cf048ea140a9ca12eb) ) // Strings "MEGALO50  910322", "**  SHUNICHI  **" on ROM
 ROM_END
 
 
@@ -2264,9 +2268,6 @@ ROM_START( puyoj ) /* Puyo Puyo (Rev B)  (c)1992 Sega / Compile - 834-9029 (EMP5
 	ROM_LOAD( "315-5394.ic25", 0x0000, 0x0001, NO_DUMP ) /* PALCE16V8H-25PC */
 	ROM_LOAD( "315-5395.ic26", 0x0000, 0x0001, NO_DUMP ) /* PALCE16V8H-25PC */
 	ROM_LOAD( "317-0203.ic27", 0x0000, 0x0001, NO_DUMP ) /* EPM4032DC-25 (Protection Chip) */
-
-	ROM_REGION( 0x20000, "megalo50", 0 ) // ROM for MEGALO 50 moving seat
-	ROM_LOAD( "epr-14705.bin", 0x00000, 0x20000, CRC(b863d2c5) SHA1(f6aa309bc8be15c26d91f3cf048ea140a9ca12eb) ) // Strings "MEGALO50  910322", "**  SHUNICHI  **" on ROM
 ROM_END
 
 
@@ -2286,9 +2287,6 @@ ROM_START( puyoja ) /* Puyo Puyo (Rev A)  (c)1992 Sega / Compile - 834-9029 (EMP
 	ROM_LOAD( "315-5394.ic25", 0x0000, 0x0001, NO_DUMP ) /* PALCE16V8H-25PC */
 	ROM_LOAD( "315-5395.ic26", 0x0000, 0x0001, NO_DUMP ) /* PALCE16V8H-25PC */
 	ROM_LOAD( "317-0203.ic27", 0x0000, 0x0001, NO_DUMP ) /* EPM4032DC-25 (Protection Chip) */
-
-	ROM_REGION( 0x20000, "megalo50", 0 ) // ROM for MEGALO 50 moving seat
-	ROM_LOAD( "epr-14705.bin", 0x00000, 0x20000, CRC(b863d2c5) SHA1(f6aa309bc8be15c26d91f3cf048ea140a9ca12eb) ) // Strings "MEGALO50  910322", "**  SHUNICHI  **" on ROM
 ROM_END
 
 
@@ -2302,9 +2300,6 @@ ROM_START( puyobl ) /* Puyo Puyo  (c)1992 Sega / Compile  Bootleg */
 
 	ROM_REGION( 0x020000, "upd", 0 )
 	ROM_LOAD( "puyopuyb.abo", 0x000000, 0x020000, CRC(79112b3b) SHA1(fc3a202e1e2ff39950d4af689b7fcca86c301805) ) // same as epr-15196.4 from the world set
-
-	ROM_REGION( 0x20000, "megalo50", 0 ) // ROM for MEGALO 50 moving seat
-	ROM_LOAD( "epr-14705.bin", 0x00000, 0x20000, CRC(b863d2c5) SHA1(f6aa309bc8be15c26d91f3cf048ea140a9ca12eb) ) // Strings "MEGALO50  910322", "**  SHUNICHI  **" on ROM
 ROM_END
 
 
@@ -2398,9 +2393,6 @@ ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega - 834-10778 (EMP5032 labeled 31
 
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-16660.ic4", 0x000000, 0x040000, CRC(8251c61c) SHA1(03eef3aa0bdde2c1d93128648f54fd69278d85dd) )
-
-	ROM_REGION( 0x20000, "megalo50", 0 ) // ROM for MEGALO 50 moving seat
-	ROM_LOAD( "epr-14705.bin", 0x00000, 0x20000, CRC(b863d2c5) SHA1(f6aa309bc8be15c26d91f3cf048ea140a9ca12eb) ) // Strings "MEGALO50  910322", "**  SHUNICHI  **" on ROM
 ROM_END
 
 
@@ -2926,7 +2918,7 @@ GAME( 1990, borenchj,   borench,  segac2,     borench,  segac2_state,    init_bo
 GAME( 1991, ribbit,     0,        ribbit,     ribbit,   segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
 GAME( 1991, ribbitj,    ribbit,   ribbit,     ribbitj,  segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
 
-GAME( 1991, twinsqua,   0,        segac2,     twinsqua, segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
+GAME( 1991, twinsqua,   0,        c2m50dass,  twinsqua, segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 
 GAME( 1991, soniccar,   0,        segac2,     soniccar, segac2_state,    init_noprot,   ROT0,   "Sega", "Waku Waku Sonic Patrol Car", 0 )
 
@@ -2934,10 +2926,10 @@ GAME( 1992, ssonicbr,   0,        segac2,     ssonicbr, segac2_state,    init_no
 
 GAME( 1992, ooparts,    0,        segac2,     ooparts,  segac2_state,    init_noprot,   ROT270, "hack", "OOPArts (prototype, joystick hack)", 0 )
 
-GAME( 1992, puyo,       0,        segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
-GAME( 1992, puyobl,     puyo,     segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "bootleg",        "Puyo Puyo (World, bootleg)", 0 )
-GAME( 1992, puyoj,      puyo,     segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev B)", 0 )
-GAME( 1992, puyoja,     puyo,     segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev A)", 0 )
+GAME( 1992, puyo,       0,        c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
+GAME( 1992, puyobl,     puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "bootleg",        "Puyo Puyo (World, bootleg)", 0 )
+GAME( 1992, puyoj,      puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev B)", 0 )
+GAME( 1992, puyoja,     puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev A)", 0 )
 
 GAME( 1992, tantr,      0,        segac2,     ichir,    segac2_state,    init_tantr,    ROT0,   "Sega",    "Puzzle & Action: Tant-R (Japan)", 0 )
 GAME( 1993, tantrkor,   tantr,    segac2,     ichir,    segac2_state,    init_tantrkor, ROT0,   "Sega",    "Puzzle & Action: Tant-R (Korea)", 0 )
@@ -2957,7 +2949,7 @@ GAME( 1993, sonicpop,   0,        segac2,     sonicpop, segac2_state,    init_no
 GAME( 1993, sonicfgt,   0,        segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (World)", 0 )
 GAME( 1993, sonicfgtj,  sonicfgt, segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (Japan)", 0 )
 
-GAME( 1994, potopoto,   0,        segac2,     potopoto, segac2_state,    init_potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
+GAME( 1994, potopoto,   0,        c2m50dass,  potopoto, segac2_state,    init_potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 
 GAME( 1994, stkclmns,   0,        segac2,     stkclmns, segac2_state,    init_stkclmns, ROT0,   "Sega", "Stack Columns (World)", 0 )
 GAME( 1994, stkclmnsj,  stkclmns, segac2,     stkclmns, segac2_state,    init_stkclmnj, ROT0,   "Sega", "Stack Columns (Japan)", 0 )
