@@ -126,8 +126,10 @@ void dmac_0448_device::dma_check(s32 param)
 		if (!(dma.cctl & CS_ENABLE))
 			return;
 
-		// check transfer count
-		if (!dma.ctrc)
+		// check transfer count and autopad
+		// When autopad is enabled, the DMA controller will pad the transaction with 0s
+		// or discard reads until DRQ is lowered
+		if (!dma.ctrc && !(dma.cctl & CS_APAD))
 			return;
 
 		// TODO: confirm if this is correct
@@ -141,12 +143,15 @@ void dmac_0448_device::dma_check(s32 param)
 
 			LOG("dma_r data 0x%02x address 0x%08x\n", data, address);
 
-			m_bus->write_byte(address, data);
+			if (dma.ctrc > 0)
+			{
+				m_bus->write_byte(address, data);
+			}
 		}
 		else
 		{
 			// memory to device
-			u8 const data = m_bus->read_byte(address);
+			u8 const data = dma.ctrc > 0 ? m_bus->read_byte(address) : 0;
 
 			LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
 
@@ -164,7 +169,11 @@ void dmac_0448_device::dma_check(s32 param)
 			dma.cofs++;
 
 		// decrement count
-		dma.ctrc--;
+		// TODO: Presumably, if autopad is active this doesn't underflow? Needs confirmation on-system, because the above logic depends on this being true.
+		if (dma.ctrc > 0)
+		{
+			dma.ctrc--;
+		}
 
 		// set terminal count flag
 		if (!dma.ctrc)

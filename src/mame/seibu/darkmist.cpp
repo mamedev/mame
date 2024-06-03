@@ -63,6 +63,8 @@ public:
 		m_spr_clut(*this, "spr_clut"),
 		m_tx_clut(*this, "tx_clut"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_bg_map(*this, "bg_map"),
+		m_fg_map(*this, "fg_map"),
 		m_rombank(*this, "rombank")
 	{ }
 
@@ -75,28 +77,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<t5182_device> m_t5182;
-	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	required_shared_ptr<uint8_t> m_spritebank;
-	required_shared_ptr<uint8_t> m_scroll;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_region_ptr<uint8_t> m_bg_clut;
-	required_region_ptr<uint8_t> m_fg_clut;
-	required_region_ptr<uint8_t> m_spr_clut;
-	required_region_ptr<uint8_t> m_tx_clut;
-	required_shared_ptr<uint8_t> m_decrypted_opcodes;
-	required_memory_bank m_rombank;
-
-	uint8_t m_hw = 0;
-	tilemap_t *m_bgtilemap = nullptr;
-	tilemap_t *m_fgtilemap = nullptr;
-	tilemap_t *m_txtilemap = nullptr;
-
 	void hw_w(uint8_t data);
 	void tx_vram_w(offs_t offset, uint8_t data);
 
@@ -117,13 +97,37 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void decrypted_opcodes_map(address_map &map);
 	void memmap(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<t5182_device> m_t5182;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_spritebank;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_region_ptr<uint8_t> m_bg_clut;
+	required_region_ptr<uint8_t> m_fg_clut;
+	required_region_ptr<uint8_t> m_spr_clut;
+	required_region_ptr<uint8_t> m_tx_clut;
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_region_ptr<uint8_t> m_bg_map;
+	required_region_ptr<uint8_t> m_fg_map;
+	required_memory_bank m_rombank;
+
+	uint8_t m_hw = 0;
+	tilemap_t *m_bgtilemap = nullptr;
+	tilemap_t *m_fgtilemap = nullptr;
+	tilemap_t *m_txtilemap = nullptr;
 };
 
 
 TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 {
-	int code = memregion("bg_map")->base()[tile_index * 2]; // TTTTTTTT
-	int const attr = memregion("bg_map")->base()[(tile_index * 2) + 1]; // -PPP--TT - FIXED BITS (0xxx00xx)
+	int code = m_bg_map[tile_index * 2]; // TTTTTTTT
+	int const attr = m_bg_map[(tile_index * 2) + 1]; // -PPP--TT - FIXED BITS (0xxx00xx)
 
 	code += (attr & 3) << 8;
 	int const pal = (attr >> 4) & 0xf;
@@ -133,8 +137,8 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 
 TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 {
-	int code = memregion("fg_map")->base()[tile_index * 2]; // TTTTTTTT
-	int const attr = memregion("fg_map")->base()[(tile_index * 2) + 1]; // -PPP--TT - FIXED BITS (0xxx00xx)
+	int code = m_fg_map[tile_index * 2]; // TTTTTTTT
+	int const attr = m_fg_map[(tile_index * 2) + 1]; // -PPP--TT - FIXED BITS (0xxx00xx)
 
 	code += (attr & 3) << 8;
 	int const pal = (attr >> 4) & 0xf;
@@ -202,7 +206,7 @@ void darkmist_state::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 			uint16_t const pix = (src[x] & 0xff);
 			uint16_t const real = clut[pix];
 
-			if (!(real & 0x40))
+			if (BIT(~real, 6))
 				dest[x] = src[x];
 		}
 	}
@@ -224,17 +228,17 @@ void darkmist_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	// fetch from top to bottom
 	for (int i = m_spriteram.bytes() - 32; i >= 0; i -= 32)
 	{
-		int const fy = m_spriteram[i + 1] & 0x40;
-		int const fx = m_spriteram[i + 1] & 0x80;
+		bool const fy = BIT(m_spriteram[i + 1], 6);
+		bool const fx = BIT(m_spriteram[i + 1], 7);
 
 		int tile = m_spriteram[i + 0];
 
-		if (m_spriteram[i + 1] & 0x20)
+		if (BIT(m_spriteram[i + 1], 5))
 			tile += (*m_spritebank << 8);
 
 		int palette = ((m_spriteram[i + 1]) >> 1) & 0xf;
 
-		if (m_spriteram[i + 1] & 0x1)
+		if (BIT(m_spriteram[i + 1], 0))
 			palette = machine().rand() & 15;
 
 		m_gfxdecode->gfx(3)->transpen(
@@ -255,7 +259,7 @@ uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	constexpr int DISPLAY_BG = 4;
 	constexpr int DISPLAY_TXT = 16;
 
-#define DM_GETSCROLL(n) (((m_scroll[(n)] << 1) & 0xff) + ((m_scroll[(n)] & 0x80) ? 1 : 0) +( ((m_scroll[(n) - 1] << 4) | (m_scroll[(n) - 1] << 12)) & 0xff00))
+#define DM_GETSCROLL(n) (((m_scroll[(n)] << 1) & 0xff) + ((m_scroll[(n)] & 0x80) ? 1 : 0) + ( ((m_scroll[(n) - 1] << 4) | (m_scroll[(n) - 1] << 12)) & 0xff00))
 
 	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
 	m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));
@@ -464,7 +468,6 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
@@ -476,8 +479,6 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-
-
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
 			16+0, 16+1, 16+2, 16+3, 24+0, 24+1, 24+2, 24+3 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
@@ -487,9 +488,9 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( gfx_darkmist )
-	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout,  0x300, 16 )
-	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout,  0x000, 16 )
-	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout,  0x100, 16 )
+	GFXDECODE_ENTRY( "tx_gfx",  0, charlayout, 0x300, 16 )
+	GFXDECODE_ENTRY( "bg_gfx",  0, tilelayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "fg_gfx",  0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout, 0x200, 16 )
 GFXDECODE_END
 
@@ -505,7 +506,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 }
 
 
-
 void darkmist_state::darkmist(machine_config &config)
 {
 	// basic machine hardware
@@ -514,7 +514,9 @@ void darkmist_state::darkmist(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &darkmist_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(darkmist_state::scanline), "screen", 0, 1);
 
-	T5182(config, m_t5182, 0);
+	T5182(config, m_t5182, 14'318'180 / 4);
+	m_t5182->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_t5182->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -545,7 +547,7 @@ ROM_START( darkmist )
 
 	ROM_LOAD( "dm_16.rom", 0x10000, 0x08000, CRC(094579d9) SHA1(2449bc9ba38396912ee9b72dd870ea9fcff95776) )
 
-	ROM_REGION( 0x8000, "t5182_z80", 0 ) // Toshiba T5182 external ROM
+	ROM_REGION( 0x8000, "t5182:external", 0 ) // Toshiba T5182 external ROM
 	ROM_LOAD( "dm_17.rom", 0x0000, 0x8000, CRC(7723dcae) SHA1(a0c69e7a7b6fd74f7ed6b9c6419aed94aabcd4b0) )
 
 	ROM_REGION( 0x4000, "tx_gfx", 0 )
@@ -664,7 +666,7 @@ void darkmist_state::decrypt_gfx()
 
 void darkmist_state::decrypt_snd()
 {
-	uint8_t *rom = memregion("t5182_z80")->base();
+	uint8_t *rom = memregion("t5182:external")->base();
 
 	for (int i = 0x0000; i < 0x8000; i++)
 		rom[i] = bitswap<8>(rom[i], 7, 1, 2, 3, 4, 5, 6, 0);

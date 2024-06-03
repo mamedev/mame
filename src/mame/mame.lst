@@ -19811,6 +19811,9 @@ hp9845t_de                      //
 @source:hp/hp9k.cpp
 hp9816                          //
 
+@source:hp/hp98x6.cpp
+hp9816a                         //
+
 @source:hp/hp9k_3xx.cpp
 hp9k310                         //
 hp9k320                         //
@@ -42103,7 +42106,10 @@ mtd1256                         //
 mw4pole                         // (c) 1995 Waldorf Electronics GmbH Germany
 
 @source:skeleton/mx2178.cpp
-mx2178                          //
+mx2178                          // (c) 1984 Memorex
+
+@source:skeleton/mx3210.cpp
+mx3210                          // (c) 1994 Xyplex Inc.
 
 @source:skeleton/mycom.cpp
 mycom                           //
@@ -44837,8 +44843,9 @@ wardnerjb                       // bootleg
 kisssite
 
 @source:tomy/tomy_princ.cpp
-princ                           // Tomy Prin-C (Japan)
-princnt                         // Tomy Prin-C (without touch-pad)
+princnt                         // Tomy Prin-C (Japan) Rev 1
+princnt3                        // Tomy Prin-C (Japan) Rev 3
+princ                           // Tomy Prin-C Tablet (Japan)
 
 @source:tomy/tutor.cpp
 pyuuta                          // 1982 Tomy Pyuuta

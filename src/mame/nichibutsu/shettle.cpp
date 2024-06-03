@@ -97,12 +97,6 @@ private:
 };
 
 
-/***************************************************************************
-
-  Convert the color PROMs into a more useable format.
-
-***************************************************************************/
-
 void shettle_state::palette_init(palette_device &palette) const
 {
 	const u8 *color_prom = memregion("proms")->base();
@@ -471,4 +465,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, shettle, 0,      shettle, shettle, shettle_state, empty_init, ROT90, "New Digimatic", "Alone Shettle Crew", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, shettle, 0,      shettle, shettle, shettle_state, empty_init, ROT90, "New Digimatic", "Alone Shettle Crew", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

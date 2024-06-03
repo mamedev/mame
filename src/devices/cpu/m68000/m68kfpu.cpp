@@ -293,7 +293,7 @@ void m68000_musashi_device::set_condition_codes(extFloat80_t reg)
 	}
 
 	// NaN flag
-	if (extF80_isSignalingNaN(reg))
+	if (extFloat80_is_nan(reg))
 	{
 		m_fpsr |= FPCC_NAN;
 	}
@@ -1418,15 +1418,15 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			default:    fatalerror("fmove_rm_reg: invalid source specifier %x at %08X\n", src, m_pc-4);
 		}
 
-		LOGMASKED(LOG_LOADSTORE, "Load source type %d = %f\n", src, fx80_to_double(source));
+		LOGMASKED(LOG_LOADSTORE, "Load source type %d = %f (PC=%08x)\n", src, fx80_to_double(source), m_ppc);
 	}
 	else
 	{
 		source = m_fpr[src];
-		LOGMASKED(LOG_LOADSTORE, "Load source from FPR %d = %f\n", src, fx80_to_double(source));
+		LOGMASKED(LOG_LOADSTORE, "Load source from FPR %d = %f (PC=%08x)\n", src, fx80_to_double(source), m_ppc);
 	}
 
-	LOGMASKED(LOG_INSTRUCTIONS, "FPU: opmode %02x (PC=%08x)\n", opmode, m_pc);
+	LOGMASKED(LOG_INSTRUCTIONS, "FPU: opmode %02x (PC=%08x)\n", opmode, m_ppc);
 	const extFloat80_t dstCopy = m_fpr[dst];
 	if (opmode != 0)
 	{

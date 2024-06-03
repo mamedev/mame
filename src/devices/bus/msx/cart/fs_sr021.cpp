@@ -124,9 +124,8 @@ std::error_condition msx_cart_fs_sr021_device::initialize_cartridge(std::string 
 	page(1)->install_write_handler(0x7800, 0x7800, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::bank_w<5>))); // a000-bfff
 	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::control_w)));
 
-	// Takes over kanji from base system?
-	io_space().install_write_handler(0xd8, 0xd9, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::kanji_w)));
-	io_space().install_read_handler(0xd9, 0xd9, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr021_device::kanji_r)));
+	io_space().install_write_tap(0xd8, 0xd9, "kanji_w", [this] (offs_t ofs, u8 &data, u8) { this->kanji_w(ofs, data); });
+	io_space().install_read_tap(0xd9, 0xd9, "kanji_r", [this] (offs_t ofs, u8 &data, u8) { data &= this->kanji_r(ofs); });
 
 	return std::error_condition();
 }
@@ -181,7 +180,7 @@ u8 msx_cart_fs_sr021_device::kanji_r(offs_t offset)
 
 void msx_cart_fs_sr021_device::kanji_w(offs_t offset, u8 data)
 {
-	if (offset)
+	if (BIT(offset, 0))
 		m_kanji_latch = (m_kanji_latch & 0x007e0) | ((data & 0x3f) << 11);
 	else
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);

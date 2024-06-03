@@ -453,8 +453,8 @@ void dietgo_state::init_dietgo()
 } // Anonymous namespace
 
 
-GAME( 1992, dietgo,   0,      dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26 v3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoe,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26 v2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoea, dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.08.04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgo,   0,      dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26 v3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoe,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26 v2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoea, dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.08.04)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dietgou,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dietgoj,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)", MACHINE_SUPPORTS_SAVE )
