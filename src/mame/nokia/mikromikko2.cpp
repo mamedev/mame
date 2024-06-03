@@ -67,7 +67,7 @@ void mm2_state::mm2_map(address_map &map)
 	map(0x20000, 0x3ffff).ram(); // DRAM 128 KB (on SBC186)
 	map(0x40000, 0x7ffff).ram(); // DRAM 256 KB (on SBC186 or MEME186)
 	map(0x80000, 0xbffff).ram(); // DRAM 256 KB (on MEME186)
-	map(0xd0000, 0xd7fff).ram(); // video RAM
+	map(0xd0000, 0xd1fff).ram(); // video RAM
 	map(0xd8000, 0xd9fff).rom().region("chargen", 0);
 	map(0xf0000, 0xf01ff).rw(m_novram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0xff00);
 	map(0xf0200, 0xfffff).rom().region(I80186_TAG, 0x200);
@@ -100,13 +100,13 @@ void mm2_state::mm2_io_map(address_map &map)
 	map(0xf980, 0xf9ff).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
 	map(0xf980, 0xf981).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
 	map(0xf982, 0xf983).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
-	//map(0xf9c0, 0xf9c0) COMPL
-	//map(0xf9c2, 0xf9c2) BLANK
-	//map(0xf9c4, 0xf9c4) MODE
-	//map(0xf9c6, 0xf9c6) MODEG
-	//map(0xf9ca, 0xf9ca) C70/50
-	//map(0xf9ce, 0xf9ce) CRU
-	//map(0xf9cc, 0xf9cc) CRB
+	map(0xf9c0, 0xf9c1).w(FUNC(mm2_state::cpl_w));
+	map(0xf9c2, 0xf9c3).w(FUNC(mm2_state::blc_w));
+	map(0xf9c4, 0xf9c5).w(FUNC(mm2_state::mode_w));
+	map(0xf9c6, 0xf9c7).w(FUNC(mm2_state::modeg_w));
+	map(0xf9ca, 0xf9cb).w(FUNC(mm2_state::c70_50_w));
+	map(0xf9cc, 0xf9cd).w(FUNC(mm2_state::crb_w));
+	map(0xf9ce, 0xf9cf).w(FUNC(mm2_state::cru_w));
 
 	// MMC186
 	map(0xfa00, 0xfa1f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
@@ -126,13 +126,82 @@ void mm2_state::vpac_mem(address_map &map)
 static INPUT_PORTS_START( mm2 )
 INPUT_PORTS_END
 
-uint32_t mm2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+static const gfx_layout charlayout =
 {
+	8, 15,
+	RGN_FRAC(1,1),
+	1,
+	{ RGN_FRAC(0,1) },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{  0*16,  1*16,  2*16,  3*16,  4*16,  5*16,  6*16,  7*16,
+		8*16,  9*16, 10*16, 11*16, 12*16, 13*16, 14*16 },
+	16*16
+};
+
+static const gfx_layout gfxlayout =
+{
+	8, 1,
+	RGN_FRAC(1,1),
+	1,
+	{ RGN_FRAC(0,1) },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 15*16 },
+	16*16
+};
+
+static GFXDECODE_START( gfx_mm2 )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0, gfxlayout, 0, 1 )
+GFXDECODE_END
+
+uint32_t mm2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!m_blc)
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
+	uint16_t *vram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(0xd1000);
+	uint16_t *crom = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(0xd8000);
+
+	for (int sy = 0; sy < 24; sy++)
+	{
+		for (int y = 0; y < 12; y++)
+		{
+			for (int sx = 0; sx < 80; sx++)
+			{
+				uint16_t data = vram[(sy * 80) + sx];
+				offs_t char_addr = ((data & 0x1ff) << 4) | y;
+				uint16_t char_data = crom[char_addr];
+
+				for (int bit = 0; bit < 8; bit++)
+				{
+					bool pixel = BIT(char_data, 0) ^ !m_cpl;
+					char_data >>= 1;
+
+					bitmap.pix((sy * 12) + y, (sx * 8) + bit) = pixel;
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
 void mm2_state::machine_start()
 {
+}
+
+void mm2_state::machine_reset()
+{
+	m_cpl = 0;
+	m_blc = 0;
+	m_mode = 0;
+	m_modeg = 0;
+	m_c70_50 = 0;
+	m_cru = 0;
+	m_crb = 0;
 }
 
 void mm2_state::floppy_formats(format_registration &fr)
@@ -153,10 +222,18 @@ void mm2_state::mm2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mm2_state::mm2_io_map);
 
 	PIC8259(config, m_pic);
+	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
 	PIT8253(config, m_pit);
-
+	m_pit->set_clk<0>(16_MHz_XTAL/8);
+	m_pit->set_clk<1>(16_MHz_XTAL/8);
+	m_pit->set_clk<2>(16_MHz_XTAL/8);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	//m_pit->out_handler<1>().set()); MPSC ch B line clock 
+	//m_pit->out_handler<2>().set()); Beep control
+	
 	I8274(config, m_mpsc, 16_MHz_XTAL/4);
+	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	X2212(config, m_novram);
 
@@ -164,12 +241,17 @@ void mm2_state::mm2(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(71);
 	screen.set_screen_update(FUNC(mm2_state::screen_update));
-	screen.set_size(800, 420);
-	screen.set_visarea(0, 800-1, 0, 420-1);
+	screen.set_size(640, 420);
+	screen.set_visarea(0, 640-1, 0, 420-1);
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm2);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	CRT9007(config, m_vpac, 35.4525_MHz_XTAL/8);
 	m_vpac->set_addrmap(0, &mm2_state::vpac_mem);
 	m_vpac->set_character_width(10);
+	m_vpac->int_callback().set(FUNC(mm2_state::vpac_int_w));
 	m_vpac->set_screen(SCREEN_TAG);
 
 	CRT9212(config, m_drb0, 0);
@@ -177,11 +259,14 @@ void mm2_state::mm2(machine_config &config)
 	CRT9212(config, m_drb1, 0);
 
 	I8251(config, m_sio, 16_MHz_XTAL/4);
+	m_sio->rxrdy_handler().set(FUNC(mm2_state::sio_rxrdy_w));
+	m_sio->txrdy_handler().set(FUNC(mm2_state::sio_txrdy_w));
 
 	// MMC186
 	AM9517A(config, m_dmac, 16_MHz_XTAL/4);
 
 	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
+	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm2_floppies, "525qd", mm2_state::floppy_formats).enable_sound(true);
 
@@ -209,7 +294,7 @@ ROM_START( mm2m35d )
 	ROMX_LOAD( "9491c.ic58", 0x8001, 0x4000, CRC(32047735) SHA1(408f03bc2d89257488e4b3336500681bb168cdec), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	ROM_REGION16_LE( 0x4000, "chargen", 0 )
-	ROMX_LOAD( "9067e.ic40", 0x0001, 0x2000, CRC(fa719d92) SHA1(af6cc03a8171b9c95e8548c5e0268816344d7367), ROM_SKIP(1) )
+	ROMX_LOAD( "9067e.ic40", 0x0000, 0x2000, CRC(fa719d92) SHA1(af6cc03a8171b9c95e8548c5e0268816344d7367), ROM_SKIP(1) )
 
 	ROM_REGION( 0x2000, "attr", 0 )
 	ROM_LOAD( "9026a.ic26", 0x0000, 0x2000, CRC(fe1da600) SHA1(3a5512b08d8f7bb5a0ff3f50bcf33de649a0489d) )
@@ -221,4 +306,4 @@ ROM_START( mm2m35d )
 	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
 ROM_END
 
-COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_IS_SKELETON )
+COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_NOT_WORKING )
