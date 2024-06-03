@@ -6,10 +6,8 @@
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopl.h"
-#include "speaker.h"
 
 DECLARE_DEVICE_TYPE(MEGALO50_DASS, m50dass_device)
 
@@ -21,6 +19,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cpu_device> m_maincpu;

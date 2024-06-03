@@ -15,7 +15,10 @@
 
 #include "m50dass.h"
 
-DEFINE_DEVICE_TYPE(MEGALO50_DASS, m50dass_device, "m50dass", "Dual Active Seat System (moving seats on Megalo 50 cabinet)")
+#include "emu.h"
+#include "speaker.h"
+
+DEFINE_DEVICE_TYPE(MEGALO50_DASS, m50dass_device, "m50dass", "Sega DASS")
 
 m50dass_device::m50dass_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MEGALO50_DASS, tag, owner, clock)
@@ -28,7 +31,7 @@ void m50dass_device::device_start()
 {
 }
 
-void m50dass_device::m50dass(machine_config &config)
+void m50dass_device::device_add_mconfig(machine_config &config)
 {
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // Z0840004PSC, divider not verified
 
