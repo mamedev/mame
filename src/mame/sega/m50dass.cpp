@@ -3,7 +3,7 @@
 
 /*******************************************************************************************
 
-    Skeleton driver for Sega DASS (Dual Active Seat System), found on the Megalo 50 cabinet.
+    Skeleton device for Sega DASS (Dual Active Seat System), found on the Megalo 50 cabinet.
     Sega PCB 837-8683:
      -Z0840004PSC Z80 CPU
      -YM-2413
