@@ -2450,7 +2450,7 @@ ROM_START( lifefrce )
 	ROM_LOAD(      "587-k09.11j",    0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
-	ROM_LOAD(      "1_27128.8g",     0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
+	ROM_LOAD(      "587-k08.8g",     0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
 	ROM_LOAD(      "6106.10a",       0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
