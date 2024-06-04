@@ -699,6 +699,7 @@ private:
 	void opcodes_riea7a(u8 operand);
 	void opcodes_rwiea7b(u8 operand);
 	void opcodes_eari7c(u8 operand);
+	void opcodes_rwiea7f(u8 operand);
 
 	void set_irq(int vector, int level);
 	void clear_irq(int vector);
