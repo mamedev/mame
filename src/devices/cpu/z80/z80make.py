@@ -152,11 +152,30 @@ class OpcodeList:
                     if len(ntokens) == 2:
                         inf = Opcode(ntokens[1])
                         if ntokens[0] == self.gen:
-                            self.opcode_info.append(inf)
+                            # Replace in list when already present, otherwise append
+                            found = False
+                            found_index = 0
+                            for i in range(len(self.opcode_info)):
+                                if self.opcode_info[i].code == inf.code:
+                                    found = True
+                                    found_index = i
+                            if found:
+                                self.opcode_info[found_index] = inf
+                            else:
+                                self.opcode_info.append(inf)
                     else:
                         inf = Opcode(ntokens[0])
                         if None == self.gen:
                             self.opcode_info.append(inf)
+                        else:
+                            # Only place in list when not already present
+                            found = False
+                            for i in range(len(self.opcode_info)):
+                                if self.opcode_info[i].code == inf.code:
+                                    found = True
+                            if not found:
+                                self.opcode_info.append(inf)
+
 
     def pre_process(self, iline):
         out = []
