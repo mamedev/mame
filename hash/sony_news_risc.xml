@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="sony_news_risc" description="Sony NEWS RISC software">
+
+	<software name="nwf_672rb" supported="partial">
+		<description>NEWS-OS Release 4.1R Version Up Kit</description>
+		<year>1991</year>
+		<publisher>Sony</publisher>
+		<notes>The floppies can boot on both CISC and RISC systems due to some bootloader magic, but the MO image is only for RISC machines.</notes>
+		
+		<!--
+		The installation floppy and MO disk work, but the format disk hangs after printing a few messages on RISC systems. 
+		Therefore, use of this kit requires use of a pre-formatted hard disk image for now.
+		The disk image loads on the CISC NEWS driver, so it is most likely an emulation issue, not a disk image issue.
+		-->
+
+		<!-- Source: archive.org -->
+		<!-- The "STAMP" file has the build date of 07/23/91 -->
+		<part name="hdd" interface="scsi_hdd">
+			<feature name="part_id" value="NEWS-OS Install Kit NWF672R Vol.1" />
+			<diskarea name="harddriv">
+				<disk name="nwf_672rb_mo" sha1="0000000000000000000000000000000000000000"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Format Program" />
+			<dataarea name="flop">
+				<rom name="nwf_672rb_format_program.img" size="1474560" crc="963126cd" sha1="9e7c6dec4a454e630cb7c40dea3f40206e6b4cfb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Program" />
+			<dataarea name="flop">
+				<rom name="nwf_672rb_installation_program.img" size="1474560" crc="963126cd" sha1="9e7c6dec4a454e630cb7c40dea3f40206e6b4cfb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwf_683rd1" supported="yes">
+		<description>NEWS-OS Release 4.2.1aRD Installation Kit</description>
+		<year>1993</year>
+		<publisher>Sony</publisher>
+		<notes>Bootable and installable only on NWS-5000 series computers. Also contains some netboot kernels for some other RISC and CISC NEWS computers.</notes>
+		<!-- 
+		NWS-3260 driver should be able to read this (but not install it); however, CD-ROM support is not fully working for that driver currently.
+		-->
+
+		<!-- Source: WinWorld -->
+		<!-- The "STAMP" file has the build date of 05/05/93 -->
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="NEWS-OS Install Kit NWF-683RD1 Vol.1" />
+			<diskarea name="cdrom">
+				<disk name="nwf_683rd1" sha1="84ade11109e676eaaf20e999c1aa4b5d48d40555" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
