@@ -123,6 +123,14 @@ macro   arg16_call
     call wm16_sp
     PCD = m_ea;
 
+macro   r800:arg16_call
+    call arg16
+    m_ea = TDAT; TADR = PCD-1;
+    call nomreq_addr
+    WZ = m_ea; TDAT = PC;
+    call wm16_sp
+    PCD = m_ea;
+
 macro   call_cond
     if (TDAT8) {
         call arg16_call
@@ -150,16 +158,28 @@ macro   ld_r_a
     call nomreq_ir 1
     m_r = A; m_r2 = A & 0x80; // keep bit 7 of r
 
+macro   r800:ld_r_a
+    m_r = A; m_r2 = A & 0x80; // keep bit 7 of r
+
 macro   ld_a_r
     call nomreq_ir 1
+    A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+
+macro   r800:ld_a_r
     A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   ld_i_a
     call nomreq_ir 1
     m_i = A;
 
+macro   r800:ld_i_a
+    m_i = A;
+
 macro   ld_a_i
     call nomreq_ir 1
+    A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+
+macro   r800:ld_a_i
     A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   rst     addr
@@ -200,12 +220,21 @@ macro   add16
     call nomreq_ir 7
     { u32 res = TDAT + TDAT2; WZ = TDAT + 1; set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF))); TDAT = (u16)res; }
 
+macro   r800:add16
+    { u32 res = TDAT + TDAT2; WZ = TDAT + 1; set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF))); TDAT = (u16)res; }
+
 macro   adc_hl
     call nomreq_ir 7
     { u32 res = HLD + TDAT + (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
 
+macro   r800:adc_hl
+    { u32 res = HLD + TDAT + (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
+
 macro   sbc_hl
     call nomreq_ir 7
+    { u32 res = HLD - TDAT - (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13)); HL = (u16)res; }
+
+macro   r800:sbc_hl
     { u32 res = HLD - TDAT - (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13)); HL = (u16)res; }
 
 macro   ldi
@@ -216,14 +245,35 @@ macro   ldi
     2 * call nomreq_addr
     set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL++; DE++; BC--; if(BC) F |= VF;
 
+macro   r800:ldi
+    TADR = HL;
+    call rm
+    TADR = DE;
+    call wm
+    call nomreq_addr
+    set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL++; DE++; BC--; if(BC) F |= VF;
+
 macro   cpi
     TADR = HL;
     call rm
     5 * call nomreq_addr
     { u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
+macro   r800:cpi
+    TADR = HL;
+    call rm
+    call nomreq_addr
+    { u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+
 macro   ini
     call nomreq_ir 1
+    TADR = BC;
+    call in
+    WZ = BC + 1; B--; TADR = HL;
+    call wm
+    { HL++; set_f(SZ[B]); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   r800:ini
     TADR = BC;
     call in
     WZ = BC + 1; B--; TADR = HL;
@@ -238,12 +288,27 @@ macro   outi
     call out
     { HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
 
+macro   r800:outi
+    TADR = HL;
+    call rm
+    B--; WZ = BC + 1; TADR = BC;
+    call out
+    { HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
 macro   ldd
     TADR = HL;
     call rm
     TADR = DE;
     call wm
     2 * call nomreq_addr
+    { set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL--; DE--; BC--; if (BC) F |= VF; }
+
+macro   r800:ldd
+    TADR = HL;
+    call rm
+    TADR = DE;
+    call wm
+    call nomreq_addr
     { set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL--; DE--; BC--; if (BC) F |= VF; }
 
 macro   cpd
@@ -253,8 +318,22 @@ macro   cpd
     5 * call nomreq_addr
     { u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
+macro   r800:cpd
+    TADR = HL;
+    call rm
+    TADR = HL;
+    call nomreq_addr
+    { u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+
 macro   ind
     call nomreq_ir 1
+    TADR = BC;
+    call in
+    WZ = BC - 1; B--; TADR = HL;
+    call wm
+    { HL--; set_f(SZ[B]); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   r800:ind
     TADR = BC;
     call in
     WZ = BC - 1; B--; TADR = HL;
@@ -269,11 +348,26 @@ macro   outd
     call out
     { HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
 
+macro   r800:outd
+    TADR = HL;
+    call rm
+    B--; WZ = BC - 1; TADR = BC;
+    call out
+    { HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
 macro   ldir
     call ldi
     if (BC != 0) {
         TADR = DE;
         5 * call nomreq_addr
+        PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+    }
+
+macro   r800:ldir
+    call ldi
+    if (BC != 0) {
+        TADR = DE;
+        call nomreq_addr
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
     }
 
@@ -285,6 +379,14 @@ macro   cpir
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
     }
 
+macro   r800:cpir
+    call cpi
+    call nomreq_addr
+    if (BC != 0 && !(F & ZF)) {
+        TADR = HL;
+        PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+    }
+
 macro   inir
     call ini
     if (B != 0) {
@@ -293,7 +395,26 @@ macro   inir
         PC -= 2; block_io_interrupted_flags();
     }
 
+macro   r800:inir
+    if (B == 1)
+        T(1);
+    call ini
+    if (B != 0) {
+        TADR = HL;
+        PC -= 2; block_io_interrupted_flags();
+    }
+
 macro   otir
+    call outi
+    if (B != 0) {
+        TADR = BC;
+        5 * call nomreq_addr
+        PC -= 2; block_io_interrupted_flags();
+    }
+
+macro   r800:otir
+    if (B == 1)
+        T(1);
     call outi
     if (B != 0) {
         TADR = BC;
@@ -309,11 +430,27 @@ macro   lddr
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
     }
 
+macro   r800:lddr
+    call ldd
+    if (BC != 0) {
+        TADR = DE;
+        call nomreq_addr
+        PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+    }
+
 macro   cpdr
     call cpd
     if (BC != 0 && !(F & ZF)) {
         TADR = HL;
         5 * call nomreq_addr
+        PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+    }
+
+macro   r800:cpdr
+    call cpd
+    call nomreq_addr
+    if (BC != 0 && !(F & ZF)) {
+        TADR = HL;
         PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
     }
 
@@ -325,11 +462,29 @@ macro   indr
         PC -= 2; block_io_interrupted_flags();
     }
 
+macro   r800:indr
+    if (B == 1)
+        T(1);
+    call ind
+    if (B != 0) {
+        TADR = HL;
+        PC -= 2; block_io_interrupted_flags();
+    }
+
 macro   otdr
     call outd
     if (B != 0) {
         TADR = BC;
         5 * call nomreq_addr
+        PC -= 2; block_io_interrupted_flags();
+    }
+
+macro   r800:otdr
+    if (B == 1)
+        T(1);
+    call outd
+    if (B != 0) {
+        TADR = BC;
         PC -= 2; block_io_interrupted_flags();
     }
 
@@ -5457,9 +5612,11 @@ eda1    # CPI
     call cpi
 
 eda2    # INI
+    call nomreq_ir 1
     call ini
 
 eda3    # OUTI
+    call nomreq_ir 1
     call outi
 
 eda4    # DB   ED
@@ -7331,7 +7488,34 @@ r800:fefd    # illegal
 
 r800:feff    # illegal
     illegal_1();
-    
+
+r800:cb30    # SLL  B
+    B = r800_sll(B);
+
+r800:cb31    # SLL  C
+    C = r800_sll(C);
+
+r800:cb32    # SLL  D
+    D = r800_sll(D);
+
+r800:cb33    # SLL  E
+    E = r800_sll(E);
+
+r800:cb34    # SLL  H
+    H = r800_sll(H);
+
+r800:cb35    # SLL  L
+    L = r800_sll(L);
+
+r800:cb36    # SLL  (HL)
+    TADR = HL;
+    call rm_reg
+    TDAT8 = r800_sll(TDAT8);
+    call wm
+
+r800:cb37    # SLL  A
+    A = r800_sll(A);
+
 r800:dd00    # illegal
     illegal_1();
 
