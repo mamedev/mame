@@ -33,7 +33,7 @@ jobs:
       env:
         USE_LIBSDL: 1
         TOOLS: 1
-      run: make -j2
+      run: make -j3
     - name: Validate
       run: ./mame -validate
     - uses: actions/upload-artifact@master
