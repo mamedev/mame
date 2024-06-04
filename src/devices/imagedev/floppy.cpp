@@ -33,6 +33,8 @@
 #include "util/ioprocsfilter.h"
 #include "util/zippath.h"
 
+#include <algorithm>
+
 /*
     Debugging flags. Set to 0 or 1.
 */
@@ -478,14 +480,6 @@ void floppy_image_device::set_sectoring_type(uint32_t sectoring_type)
 	case 0:
 	default:
 		m_phys_sectors = 0;
-	}
-
-	// update index hole position of hard-sectored.
-	if (m_phys_sectors) {
-		m_index_start = ROTATION_POS_MAX - ((ROTATION_POS_MAX / m_phys_sectors) / 2);
-	}
-	else {
-		m_index_start = 0;
 	}
 }
 
@@ -1009,13 +1003,7 @@ attotime floppy_image_device::time_next_index()
 	if(m_revolution_start_time.is_never())
 		return attotime::never;
 
-	attotime next_time = m_revolution_start_time + attotime::from_double(m_index_start/m_angular_speed);
-
-	while (next_time <= machine().time()) {
-		next_time += m_rev_time;
-	}
-
-	return next_time;
+	return m_revolution_start_time + m_rev_time;
 }
 
 /* index pulses at m_rpm/60 Hz, and stays high for ~2ms at 300rpm */
@@ -1036,21 +1024,15 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 		m_revolution_start_time += m_rev_time;
 		m_revolution_count++;
 	}
-	int position = int(delta.as_double() * m_angular_speed + 0.5);
-	int new_idx = (position >= m_index_start) && (position < m_index_start + HOLE_LENGTH);
+	int position = int(delta.as_double()*m_angular_speed + 0.5);
+
+	int new_idx = position < HOLE_LENGTH;
 
 	if(new_idx) {
-		// schedule end of hole
-		attotime index_up_time = attotime::from_double((HOLE_LENGTH + m_index_start) / m_angular_speed);
+		attotime index_up_time = attotime::from_double(HOLE_LENGTH/m_angular_speed);
 		m_index_timer->adjust(index_up_time - delta);
 	} else {
-		// schedule for next hole start
-		if (position > m_index_start) {
-			attotime since_last_hole = attotime::from_double((position - m_index_start) / m_angular_speed);
-			m_index_timer->adjust(m_rev_time - since_last_hole);
-		} else {
-			m_index_timer->adjust(attotime::from_double((m_index_start - position) / m_angular_speed));
-		}
+		m_index_timer->adjust(m_rev_time - delta);
 	}
 
 	if(new_idx != m_idx) {
@@ -1069,7 +1051,7 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 
 TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 {
-	if (m_phys_sectors == 0) {
+	if ((m_phys_sectors == 0) || m_mon) {
 		return;
 	}
 
@@ -1089,6 +1071,7 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 		logerror("sector_hole_resync\n");
 
 	int sector_spacing = ROTATION_POS_MAX / m_phys_sectors;
+	int start_sector_offset = sector_spacing / 2;
 
 	attotime delta = machine().time() - m_revolution_start_time;
 	while (delta >= m_rev_time) {
@@ -1098,10 +1081,11 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::sector_hole_resync)
 	}
 	int position = int(delta.as_double() * m_angular_speed + 0.5);
 
-	int sector_offset = position % sector_spacing;
+	int offset_position = position - start_sector_offset;
+	int sector_offset = offset_position % sector_spacing;
 
 	if (TRACE_SECTORING) {
-		logerror("delta: %s - pos: %d - sector_offset: %d\n", delta.to_string(), position, sector_offset);
+		logerror("delta: %s - pos: %d - offset_pos: %d - sector_offset: %d\n", delta.to_string(), position, offset_position, sector_offset);
 	}
 
 	int new_sector_hole = (sector_offset < HOLE_LENGTH);
@@ -1368,16 +1352,17 @@ void floppy_image_device::cache_fill(const attotime &when)
 	attotime base;
 	uint32_t position = find_position(base, when);
 
-	int index = find_index(position, buf);
+	auto it = std::upper_bound(
+		buf.begin(), buf.end(), position,
+		[](uint32_t a, uint32_t b) {
+			return a < (b & floppy_image::TIME_MASK);
+		}
+	);
 
+	int index = int(it - buf.begin()) - 1;
 	if(index == -1) {
-		// I suspect this should be an abort(), to check...
-		m_cache_start_time = attotime::zero;
-		m_cache_end_time = attotime::never;
-		m_cache_index = 0;
-		m_cache_entry = buf[0];
-		cache_weakness_setup();
-		return;
+		base -= m_rev_time;
+		index = buf.size() - 1;
 	}
 
 	for(;;) {
