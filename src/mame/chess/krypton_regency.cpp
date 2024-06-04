@@ -8,6 +8,8 @@ Krypton Regency (model 933)
 It was manufactured by Timorite, Ltd. (Eric White's company), the chess engine is
 by Gyula Horváth, similar to the one in CXG Sphinx Legend.
 
+To start a new game, keep holding the NEW GAME button until the display says HELLO.
+
 Hardware notes (Systema Challenge fitted with Regency MCU):
 - PCB label: LCD CHESS 938, JAN.1994, REV.1, EB-093801-01
 - Hitachi H8/3256 MCU, 20MHz XTAL

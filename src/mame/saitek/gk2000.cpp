@@ -20,6 +20,7 @@ A13 MCU is used in:
 - Saitek Mephisto Mythos (86142221X34)
 - Tandy (Radio Shack) Mega 2050X (86071221X12)
 - Tandy (Radio Shack) Master 2200X (suspected)
+- Tandy (Radio Shack) Chess Master (suspected)
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
