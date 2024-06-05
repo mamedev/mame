@@ -36,7 +36,8 @@ inline void zn_state::psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, ui
 
 uint8_t zn_state::znsecsel_r(offs_t offset, uint8_t mem_mask)
 {
-	LOG("%s: znsecsel_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOG("%s: znsecsel_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return m_n_znsecsel;
 }
 
@@ -100,7 +101,8 @@ uint8_t zn_state::boardconfig_r()
 
 uint16_t zn_state::unknown_r(offs_t offset, uint16_t mem_mask)
 {
-	logerror("%s: unknown_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
+	if (!machine().side_effects_disabled())
+		logerror("%s: unknown_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -352,7 +354,8 @@ Notes:
 uint16_t capcom_zn_state::kickharness_r(offs_t offset, uint16_t mem_mask)
 {
 	/* required for buttons 4,5&6 */
-	LOG("%s: capcom_kickharness_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOG("%s: capcom_kickharness_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -1131,7 +1134,8 @@ uint16_t primrag2_state::vt83c461_16_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask);
 		return 0xffff;
 	}
 }
@@ -1172,7 +1176,8 @@ uint16_t primrag2_state::vt83c461_32_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror("%s: unhandled 32 bit read %04x %04x\n", machine().describe_context(), offset, mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("%s: unhandled 32 bit read %04x %04x\n", machine().describe_context(), offset, mem_mask);
 		return 0xffff;
 	}
 }
@@ -1536,11 +1541,13 @@ uint16_t bam2_state::mcu_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 	case 0:
-		logerror("BAM2 MCU port 0 read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("BAM2 MCU port 0 read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
 		break;
 
 	case 2:
-		logerror("BAM2 MCU status read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("BAM2 MCU status read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
 
 		switch (m_mcu_command)
 		{
@@ -1810,8 +1817,8 @@ void nbajamex_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	m_curr_rombank[offset] = data;
 
-	uint32_t bankbase0 = ((m_curr_rombank[0] & 0x10) ? 1 : 0) | ((m_curr_rombank[0] & 7) << 1);
-	uint32_t bankbase1 = ((m_curr_rombank[1] & 0x10) ? 0 : 1) | ((m_curr_rombank[1] & 7) << 1);
+	uint32_t const bankbase0 = (BIT(m_curr_rombank[0], 4)) | ((m_curr_rombank[0] & 7) << 1);
+	uint32_t const bankbase1 = (BIT(~m_curr_rombank[1], 4)) | ((m_curr_rombank[1] & 7) << 1);
 
 	if (offset == 0)
 	{
@@ -1850,13 +1857,15 @@ void nbajamex_state::sound_80_w(uint16_t data)
 uint16_t nbajamex_state::sound_08_r(offs_t offset, uint16_t mem_mask)
 {
 	// Sound related
-	logerror("%s: nbajamex_08_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
+	if (!machine().side_effects_disabled())
+		logerror("%s: sound_08_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0x400;
 }
 
 uint16_t nbajamex_state::sound_80_r(offs_t offset, uint16_t mem_mask)
 {
-	logerror("%s: nbajamex_80_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
+	if (!machine().side_effects_disabled())
+		logerror("%s: sound_80_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0xffff;
 }
 
@@ -1952,6 +1961,8 @@ void nbajamex_state::nbajamex(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nbajamex_bankmap").set_map(&nbajamex_state::bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
 	ACCLAIM_RAX(config, m_rax, 0);
+	m_rax->add_route(0, "lspeaker", 1.0);
+	m_rax->add_route(1, "rspeaker", 1.0);
 }
 
 void jdredd_state::jdredd(machine_config &config)
