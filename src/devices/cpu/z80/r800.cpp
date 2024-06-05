@@ -179,6 +179,10 @@ inline void r800_device::muluw(u16 value)
 
 void r800_device::do_op()
 {
+	const bool is_rop = m_ref >= 0xffff00;
 	#include "cpu/z80/r800.hxx"
-	m_ref = 0xffff00;
+	if (!is_rop)
+	{
+		m_ref = 0xffff00;
+	}
 }
