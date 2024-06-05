@@ -36,8 +36,7 @@ Graphics for the H8-based games are stored in either four socketed DIP28 8-bit E
 surface-mounted SSOP70 32-bit ROM. Later H8-based PCBs have a custom QFP device labeled "SG 003" instead of the off-the-shelf
 RAMDAC.
 
-To do:
-
+TODO:
 - Add sound to SS9804/SS9904 games.
 - ptrain: missing scroll in race screens.
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
@@ -45,6 +44,7 @@ To do:
 - xtrain: it runs faster than a video from the real thing. It doesn't use vblank irqs (but reads the vblank bit).
 - mtrain: implement hopper.
 - xplan: starts with 4 credits, no controls to move the aircraft
+- which PCBs have the newer SP006 H8 instead of SS9689?
 
 Protection seems to work the same way on every game in this driver, using a bitbanged Dallas 1-Wire EEPROM. First a Read ROM
 command is issued, and only the first 8 bits returned are examined to determine whether they match the expected device code (0x14).
@@ -3385,7 +3385,7 @@ void subsino2_state::init_humlan()
 
 /***************************************************************************
 
-X-Reel (c) 2001 Subsino & ECM
+X-Reel (c) 2002 Subsino & ECM
 
 Same PCB as bishjan and new2001, but with a 48MHz crystal
 
@@ -3406,7 +3406,7 @@ ROM_START( xreel )
 	ROM_LOAD( "subsino_qb-vi.u9", 0x000000, 0x80000, CRC(aa4edabb) SHA1(b117ad5bba2e410e20b5cbdb606688c6e2112450) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, NO_DUMP )
+	ROM_LOAD( "ds2430a.q3", 0x00, 0x28, CRC(39bbd2c5) SHA1(52eb2fa124e176650015389e7b04eddc49ce6e8e) )
 ROM_END
 
 void subsino2_state::init_xreel()
@@ -4108,7 +4108,7 @@ GAME( 2001, queenbeesa,  queenbee, humlan,   queenbee, subsino2_state, init_quee
 
 GAME( 2001, humlan,      queenbee, humlan,   humlan,   subsino2_state, init_humlan,    ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
-GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, init_xreel,     ROT0, "Subsino (ECM license)",            "X-Reel",                                MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // fails protection check, severe timing issues
+GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, init_xreel,     ROT0, "Subsino (ECM license)",            "X-Reel",                                MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
 GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, init_squeenb,   ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
