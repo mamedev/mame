@@ -139,24 +139,52 @@ class OpcodeList:
                 # New opcode
                 tokens = line.split()
                 if tokens[0] == "macro":
-                    name = tokens[1]
                     arg_name = None
                     if len(tokens) > 2:
                         arg_name = tokens[2]
-                    inf = Macro(name, arg_name)
-                    if name in self.macros:
-                        sys.stderr.write("Replacing macro: %s\n" % name)
-                    self.macros[name] = inf
+                    nnames = tokens[1].split(":")
+                    if len(nnames) == 2:
+                        inf = Macro(nnames[1], arg_name)
+                        if nnames[0] == self.gen:
+                            self.macros[nnames[1]] = inf
+                    else:
+                        inf = Macro(nnames[0], arg_name)
+                        if None == self.gen:
+                            if nnames[0] in self.macros:
+                                sys.stderr.write("Replacing macro: %s\n" % nnames[0])
+                            self.macros[nnames[0]] = inf
+                        else:
+                            if not nnames[0] in self.macros:
+                                self.macros[nnames[0]] = inf
                 else:
                     ntokens = tokens[0].split(":")
                     if len(ntokens) == 2:
                         inf = Opcode(ntokens[1])
                         if ntokens[0] == self.gen:
-                            self.opcode_info.append(inf)
+                            # Replace in list when already present, otherwise append
+                            found = False
+                            found_index = 0
+                            for i in range(len(self.opcode_info)):
+                                if self.opcode_info[i].code == inf.code:
+                                    found = True
+                                    found_index = i
+                            if found:
+                                self.opcode_info[found_index] = inf
+                            else:
+                                self.opcode_info.append(inf)
                     else:
                         inf = Opcode(ntokens[0])
                         if None == self.gen:
                             self.opcode_info.append(inf)
+                        else:
+                            # Only place in list when not already present
+                            found = False
+                            for i in range(len(self.opcode_info)):
+                                if self.opcode_info[i].code == inf.code:
+                                    found = True
+                            if not found:
+                                self.opcode_info.append(inf)
+
 
     def pre_process(self, iline):
         out = []
