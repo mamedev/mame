@@ -461,7 +461,7 @@ macro   nsc800_take_interrupt
         if (m_after_ldair) F &= ~PF;
     #endif
 
-macro   ncs800_check_interrupts
+macro   ncs800:check_interrupts
     if (m_nmi_pending) {
         call take_nmi
     } else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
@@ -474,21 +474,20 @@ macro   ncs800_check_interrupts
 ##########################################################
 # ROP
 ##########################################################
-rop:ffff
+ffff
     call check_interrupts
     m_after_ei = false;
     m_after_ldair = false;
     PRVPC = PCD;
     debugger_instruction_hook(PCD);
     call rop
-
-ncs800rop:ffff
-    call ncs800_check_interrupts
-    m_after_ei = false;
-    m_after_ldair = false;
-    PRVPC = PCD;
-    debugger_instruction_hook(PCD);
-    call rop
+    if (m_halt)
+    {
+        PC--;
+        m_ref = 0xffff00;
+    } else {
+        m_ref = (0x00 << 16) | (TDAT8 << 8);
+    }
 
 
 ##########################################################
