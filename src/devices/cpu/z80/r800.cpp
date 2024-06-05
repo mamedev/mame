@@ -10,7 +10,7 @@ TODO:
 - DMA channels.
 - Interrupt levels.
 - Bits 3 and 5 of the flag register behave differently from the z80.
-- Page break wait states.
+- Page break penalties.
 - Refresh delays.
 
 ***************************************************************************/
