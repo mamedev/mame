@@ -43379,6 +43379,7 @@ pitnrunb                        // PR  (c) 1984 Taito Corporation
 
 @source:taito/pkspirit.cpp
 pkspirit                        // D41
+shun                            // D43
 
 @source:taito/qix.cpp
 complexx                        // CX  (c) 1984 Taito America Corporation
