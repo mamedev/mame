@@ -205,15 +205,14 @@
 #define TDAT_L   m_shared_data.b.l
 #define TDAT8    m_shared_data.b.l // Typically represents values from D0..8 pins. 8bit input or output in steps.
 
-static bool tables_initialised = false;
-std::unique_ptr<u8[]> z80_device::SZ = std::make_unique<u8[]>(0x100);       // zero and sign flags
-std::unique_ptr<u8[]> z80_device::SZ_BIT = std::make_unique<u8[]>(0x100);   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-std::unique_ptr<u8[]> z80_device::SZP = std::make_unique<u8[]>(0x100);      // zero, sign and parity flags
-std::unique_ptr<u8[]> z80_device::SZHV_inc = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags INC r8
-std::unique_ptr<u8[]> z80_device::SZHV_dec = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags DEC r8
-
-std::unique_ptr<u8[]> z80_device::SZHVC_add = std::make_unique<u8[]>(2 * 0x100 * 0x100);
-std::unique_ptr<u8[]> z80_device::SZHVC_sub = std::make_unique<u8[]>(2 * 0x100 * 0x100);
+bool z80_device::tables_initialised = false;
+u8 z80_device::SZ[] = {};       // zero and sign flags
+u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+u8 z80_device::SZP[] = {};      // zero, sign and parity flags
+u8 z80_device::SZHV_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
+u8 z80_device::SZHV_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
+u8 z80_device::SZHVC_add[] = {};
+u8 z80_device::SZHVC_sub[] = {};
 
 
 /***************************************************************
