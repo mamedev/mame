@@ -125,7 +125,7 @@ public:
 	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 /*
@@ -137,7 +137,7 @@ public:
 	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -163,7 +163,7 @@ public:
 	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 /*****************************************************************************
@@ -251,12 +251,13 @@ public:
 	void set_number(int number) { m_slotnumber = number; }
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 private:
 	int get_index_from_tagname();
 	device_ti99_peribox_card_interface *m_card;
+	peribox_device *m_peb;
 	int m_slotnumber;
 	const char* card_name() { return m_card->device().tag(); }
 };

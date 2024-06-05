@@ -34,8 +34,6 @@
 #include "speaker.h"
 
 
-#define OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION true
-
 namespace {
 
 class elwro800_state : public spectrum_state
@@ -48,15 +46,8 @@ public:
 		m_centronics(*this, "centronics"),
 		m_upd765(*this, "upd765"),
 		m_flop(*this, "upd765:%u", 0U),
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-		m_bank1(*this, "bank1"),
-		m_m1bank1(*this, "m1bank1"),
-		m_bank2(*this, "bank2"),
-		m_m1bank2(*this, "m1bank2"),
-#else
 		m_bank1{{*this, "bank1"}, {*this, "m1bank1"}},
 		m_bank2{{*this, "bank2"}, {*this, "m1bank2"}},
-#endif
 		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
 		m_io_line9(*this, "LINE9"),
 		m_io_network_id(*this, "NETWORK_ID")
@@ -89,15 +80,8 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<upd765a_device> m_upd765;
 	required_device_array<floppy_connector, 2> m_flop;
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-	memory_view m_bank1;
-	memory_view m_m1bank1;
-	memory_view m_bank2;
-	memory_view m_m1bank2;
-#else
 	memory_view m_bank1[2];
 	memory_view m_bank2[2];
-#endif
 	required_ioport_array<9> m_io_ports;
 	required_ioport m_io_line9;
 	required_ioport m_io_network_id;
@@ -158,57 +142,32 @@ void elwro800_state::elwro800jr_mmu_w(uint8_t data)
 	if (!BIT(cs,0))
 	{
 		// rom BAS0
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-		m_bank1.select(1);
-		m_m1bank1.select(1);
-#else
 		for (memory_view &bank1 : m_bank1)
 			bank1.select(1);
-#endif
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-		m_bank1.select(2);
-		m_m1bank1.select(2);
-#else
 		for (memory_view &bank1 : m_bank1)
 			bank1.select(2);
-#endif
 	}
 	else
 	{
 		// RAM
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-		m_bank1.select(0);
-		m_m1bank1.select(0);
-#else
 		for (memory_view &bank1 : m_bank1)
 			bank1.select(0);
-#endif
 	}
 
 	cs = prom[((0x2000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,1))
 	{
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-		m_bank2.select(1);
-		m_m1bank2.select(1);
-#else
 		for (memory_view &bank2 : m_bank2)
 			bank2.select(1); // BAS1 ROM
-#endif
 	}
 	else
 	{
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-		m_bank2.select(0);
-		m_m1bank2.select(0);
-#else
 		for (memory_view &bank2 : m_bank2)
 			bank2.select(0); // RAM
-#endif
 	}
 
 	if (BIT(ls175,2))
@@ -401,15 +360,6 @@ void elwro800_state::elwro800jr_io_w(offs_t offset, uint8_t data)
 
 void elwro800_state::elwro800_mem(address_map &map)
 {
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-	map(0x0000, 0x1fff).view(m_bank1);
-	m_bank1[0](0x0000, 0x1fff).bankrw("rambank1");
-	m_bank1[1](0x0000, 0x1fff).rom().region("maincpu", 0x0000).nopw(); // BAS0 ROM
-	m_bank1[2](0x0000, 0x1fff).rom().region("maincpu", 0x4000).nopw(); // BOOT ROM
-	map(0x2000, 0x3fff).view(m_bank2);
-	m_bank2[0](0x2000, 0x3fff).bankrw("rambank2");
-	m_bank2[1](0x2000, 0x3fff).rom().region("maincpu", 0x2000).nopw(); // BAS1 ROM
-#else
 	map(0x0000, 0x1fff).view(m_bank1[0]);
 	m_bank1[0][0](0x0000, 0x1fff).bankrw("rambank1");
 	m_bank1[0][1](0x0000, 0x1fff).rom().region("maincpu", 0x0000).nopw(); // BAS0 ROM
@@ -417,7 +367,6 @@ void elwro800_state::elwro800_mem(address_map &map)
 	map(0x2000, 0x3fff).view(m_bank2[0]);
 	m_bank2[0][0](0x2000, 0x3fff).bankrw("rambank2");
 	m_bank2[0][1](0x2000, 0x3fff).rom().region("maincpu", 0x2000).nopw(); // BAS1 ROM
-#endif
 	map(0x4000, 0xffff).bankrw("rambank3");
 }
 
@@ -428,16 +377,6 @@ void elwro800_state::elwro800_io(address_map &map)
 
 void elwro800_state::elwro800_m1(address_map &map)
 {
-#ifdef OLD_GCC_HAS_BROKEN_LIST_INITIALIZATION
-	map(0x0000, 0x1fff).view(m_m1bank1);
-	m_m1bank1[0](0x0000, 0x1fff).bankrw("rambank1");
-	m_m1bank1[0](0x0066, 0x0066).r(FUNC(elwro800_state::nmi_r));
-	m_m1bank1[1](0x0000, 0x1fff).rom().region("maincpu", 0x0000).nopw(); // BAS0 ROM
-	m_m1bank1[2](0x0000, 0x1fff).rom().region("maincpu", 0x4000).nopw(); // BOOT ROM
-	map(0x2000, 0x3fff).view(m_m1bank2);
-	m_m1bank2[0](0x2000, 0x3fff).bankrw("rambank2");
-	m_m1bank2[1](0x2000, 0x3fff).rom().region("maincpu", 0x2000).nopw(); // BAS1 ROM
-#else
 	map(0x0000, 0x1fff).view(m_bank1[1]);
 	m_bank1[1][0](0x0000, 0x1fff).bankrw("rambank1");
 	m_bank1[1][0](0x0066, 0x0066).r(FUNC(elwro800_state::nmi_r));
@@ -446,7 +385,6 @@ void elwro800_state::elwro800_m1(address_map &map)
 	map(0x2000, 0x3fff).view(m_bank2[1]);
 	m_bank2[1][0](0x2000, 0x3fff).bankrw("rambank2");
 	m_bank2[1][1](0x2000, 0x3fff).rom().region("maincpu", 0x2000).nopw(); // BAS1 ROM
-#endif
 	map(0x4000, 0xffff).bankrw("rambank3");
 }
 

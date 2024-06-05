@@ -23,7 +23,7 @@ authors:Sandro Ronco, hap
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="0.1" green="1.0" blue="0.15" /></disk>
-		<disk state="0"><color red="0.01" green="0.1" blue="0.015" /></disk>
+		<disk state="0"><color red="0.017" green="0.17" blue="0.0255" /></disk>
 	</element>
 
 	<element name="hlr" defstate="0">

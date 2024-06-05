@@ -196,7 +196,7 @@ void odyssey_state::odyssey(machine_config &config)
 	// pci:0f.0 (J4D1) PCI expansion slot 3
 	//PCI_SLOT(config, "pci:3", pci_cards, 15, 0, 1, 2, 3, nullptr);
 
-	// pci:10.0 (J4C1) PCI expansion slot 4 
+	// pci:10.0 (J4C1) PCI expansion slot 4
 	PCI_SLOT(config, "pci:4", pci_cards, 16, 0, 1, 2, 3, nullptr);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc87306", true).set_option_machine_config("pc87306", national_superio_config);

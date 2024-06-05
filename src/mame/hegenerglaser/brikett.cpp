@@ -597,17 +597,17 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       STATE          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, mephisto,   0,         0,      mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, mephisto,   0,         0,      mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, mephisto1x, 0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, mephistoj,  0,         0,      mephistoj,  mephistoj,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // there's also a "Mephisto Junior" from 1990
+SYST( 1981, mephisto1x, 0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, mephistoj,  0,         0,      mephistoj,  mephistoj,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE ) // there's also a "Mephisto Junior" from 1990
 
-SYST( 1981, mephisto2,  0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1981, mephisto2a, mephisto2, 0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, mephisto2,  0,         0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephisto2a, mephisto2, 0,      mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, mephisto2e, 0,         0,      mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, mephisto2e, 0,         0,      mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1983, mephisto3,  0,         0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, mephisto3a, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, mephisto3b, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, mephisto3c, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, mephisto3,  0,         0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3a, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3b, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3c, mephisto3, 0,      mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE )

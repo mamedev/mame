@@ -51,11 +51,11 @@ public:
 	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
 
 protected:
-	void video_start() override;
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(irq_off) override;
+	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
 
@@ -149,14 +149,15 @@ private:
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
-	u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
+	virtual u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
 	u32 get_vpage_offset();
-	rectangle get_screen_area() override;
-	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	void tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual rectangle get_screen_area() override;
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_draw_zx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_draw_txt(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tsconf_palette(palette_device &palette) const;
 	void tsconf_update_video_mode();
 

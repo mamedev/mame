@@ -903,12 +903,20 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh7042.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_adc.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_adc.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_bsc.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_bsc.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_cmt.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_cmt.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_dmac.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_dmac.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_intc.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_intc.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_mtu.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_mtu.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh_port.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh_port.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_sci.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_sci.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_bus.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_bus.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_sci.cpp",
@@ -1467,6 +1475,23 @@ if opt_tool(CPUS, "PIC16C62X") then
 end
 
 --------------------------------------------------
+-- Microchip PIC16x8x
+--@src/devices/cpu/pic16x8x/pic16x8x.h,CPUS["PIC16X8X"] = true
+--------------------------------------------------
+
+if CPUS["PIC16X8X"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.cpp",
+		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.h",
+	}
+end
+
+if opt_tool(CPUS, "PIC16X8X") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16x8x/16x8xdsm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16x8x/16x8xdsm.h")
+end
+
+--------------------------------------------------
 -- Generic PIC16 - Disassembler only
 --@src/devices/cpu/pic16/pic16.h,CPUS["PIC16"] = true
 --------------------------------------------------
@@ -1572,6 +1597,23 @@ end
 if opt_tool(CPUS, "PSX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/psx/psxdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/psx/psxdasm.h")
+end
+
+--------------------------------------------------
+-- MIPS-X
+--@src/devices/cpu/mipsx/mipsx.h,CPUS["MIPSX"] = true
+--------------------------------------------------
+
+if CPUS["MIPSX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mipsx/mipsx.cpp",
+		MAME_DIR .. "src/devices/cpu/mipsx/mipsx.h",
+	}
+end
+
+if opt_tool(CPUS, "MIPSX") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mipsx/mipsxdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mipsx/mipsxdasm.h")
 end
 
 --------------------------------------------------
@@ -2017,6 +2059,8 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/m68008-sip8.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000musashi.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000musashi.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68010.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68010.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68020.h",
@@ -2930,6 +2974,18 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80_rop.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80_ncs800rop.hxx" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 source file...",   PYTHON .. "  $(1) $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80_rop.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 \\(rop\\) source file...",   PYTHON .. " $(1) rop $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80_ncs800rop.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating NSC800 \\(rop\\) source file...",   PYTHON .. " $(1) ncs800rop $(<) $(@)" } },
 	}
 end
 
@@ -3988,4 +4044,21 @@ end
 if opt_tool(CPUS, "C33") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/c33/c33dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/c33/c33dasm.h")
+end
+
+--------------------------------------------------
+-- IBM PALM
+--@src/devices/cpu/palm/palm.h,CPUS["PALM"] = true
+--------------------------------------------------
+
+if CPUS["PALM"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/palm/palm.cpp",
+		MAME_DIR .. "src/devices/cpu/palm/palm.h",
+	}
+end
+
+if opt_tool(CPUS, "PALM") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/palm/palmd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/palm/palmd.h")
 end

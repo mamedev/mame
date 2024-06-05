@@ -130,6 +130,7 @@ private:
 	/* other internal state */
 	uint8_t   m_register_address_latch;
 	uint16_t  m_start_addr_latch;
+	uint8_t   m_preset_row_latch;
 	bool    m_cursor_state; /* 0 = off, 1 = on */
 	uint8_t   m_cursor_blink_count;
 	int     m_hpixels_per_column;       /* number of pixels per video memory address */

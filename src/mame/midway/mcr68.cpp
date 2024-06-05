@@ -58,13 +58,318 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "mcr68.h"
+
+#include "midway.h"
+#include "s11c_bg.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/6840ptm.h"
+#include "machine/adc0844.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+#define VERBOSE 0
+
+
+namespace {
+
+class mcr68_state : public driver_device
+{
+public:
+	mcr68_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_sounds_good(*this, "sg"),
+		m_turbo_cheap_squeak(*this, "tcs"),
+		m_bg(*this, "bg"),
+		m_adc(*this, "adc"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_ptm(*this, "ptm")
+	{ }
+
+	void mcr68(machine_config &config);
+	void intlaser(machine_config &config);
+	void xenophob(machine_config &config);
+	void spyhunt2(machine_config &config);
+	void trisport(machine_config &config);
+	void pigskin(machine_config &config);
+	void archrivl(machine_config &config);
+
+	void init_intlaser();
+	void init_pigskin();
+	void init_blasted();
+	void init_trisport();
+	void init_xenophob();
+	void init_archrivl();
+	void init_spyhunt2();
+	void init_archrivlb();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	optional_device<midway_sounds_good_device> m_sounds_good;
+	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
+	optional_device<s11c_bg_device> m_bg;
+	optional_device<adc0844_device> m_adc;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<ptm6840_device> m_ptm;
+
+	uint16_t m_control_word = 0;
+	uint8_t m_protection_data[5] = { };
+	attotime m_timing_factor;
+	uint8_t m_sprite_clip = 0;
+	int8_t m_sprite_xoffset = 0;
+	emu_timer *m_493_on_timer = nullptr;
+	emu_timer *m_493_off_timer = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blasted_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t spyhunt2_port_0_r();
+	uint16_t spyhunt2_port_1_r();
+	void spyhunt2_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t archrivl_port_1_r();
+	void archrivl_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pigskin_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pigskin_protection_r();
+	uint16_t pigskin_port_1_r();
+	uint16_t pigskin_port_2_r();
+	uint16_t trisport_port_1_r();
+	void mcr68_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t archrivlb_port_1_r();
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	TIMER_CALLBACK_MEMBER(mcr68_493_off_callback);
+	TIMER_CALLBACK_MEMBER(mcr68_493_callback);
+	void mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void mcr68_common_init(int clip, int xoffset);
+	std::unique_ptr<uint8_t[]> m_srcdata0;
+	std::unique_ptr<uint8_t[]> m_srcdata2;
+
+	void mcr68_map(address_map &map);
+	void pigskin_map(address_map &map);
+	void trisport_map(address_map &map);
+};
+
+
+
+/*************************************
+ *
+ *  Generic MCR/68k machine initialization
+ *
+ *************************************/
+
+void mcr68_state::machine_start()
+{
+	m_493_on_timer = timer_alloc(FUNC(mcr68_state::mcr68_493_callback), this);
+	m_493_off_timer = timer_alloc(FUNC(mcr68_state::mcr68_493_off_callback), this);
+}
+
+void mcr68_state::machine_reset()
+{
+	m_493_on_timer->adjust(attotime::never);
+	m_493_off_timer->adjust(attotime::never);
+}
+
+
+
+/*************************************
+ *
+ *  Scanline callback
+ *
+ *************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER( mcr68_state::scanline_cb )
+{
+	// VSYNC
+	if (param == 0)
+	{
+		if (VERBOSE)
+			logerror("--- VBLANK ---\n");
+
+		m_ptm->set_c1(0);
+		m_ptm->set_c1(1);
+
+		/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
+		/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
+		/* VBLANK and 493 using counter 2 */
+		m_493_on_timer->adjust(attotime::from_hz(30) - m_timing_factor);
+	}
+
+	// HSYNC
+	m_ptm->set_c3(0);
+	m_ptm->set_c3(1);
+}
+
+
+
+/*************************************
+ *
+ *  MCR/68k interrupt control
+ *
+ *************************************/
+
+TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_off_callback)
+{
+	m_maincpu->set_input_line(1, CLEAR_LINE);
+}
+
+
+TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
+{
+	m_maincpu->set_input_line(1, ASSERT_LINE);
+	m_493_off_timer->adjust(m_screen->scan_period());
+
+	if (VERBOSE)
+		logerror("--- (INT1) ---\n");
+}
+
+
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
+{
+	int data = (m_videoram[tile_index * 2] & 0xff) | ((m_videoram[tile_index * 2 + 1] & 0xff) << 8);
+	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
+	int color = (~data >> 12) & 3;
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 10));
+	if (m_gfxdecode->gfx(0)->elements() < 0x1000)
+		tileinfo.category = (data >> 15) & 1;
+}
+
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+void mcr68_state::video_start()
+{
+	/* initialize the background tilemap */
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr68_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
+	m_bg_tilemap->set_transparent_pen(0);
+}
+
+
+
+/*************************************
+ *
+ *  Video RAM writes
+ *
+ *************************************/
+
+void mcr68_state::mcr68_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+
+
+/*************************************
+ *
+ *  Sprite update
+ *
+ *************************************/
+
+void mcr68_state::mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+{
+	rectangle sprite_clip = m_screen->visible_area();
+
+	/* adjust for clipping */
+	sprite_clip.min_x += m_sprite_clip;
+	sprite_clip.max_x -= m_sprite_clip;
+	sprite_clip &= cliprect;
+
+	screen.priority().fill(1, sprite_clip);
+
+	/* loop over sprite RAM */
+	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
+	{
+		int code, color, flipx, flipy, x, y, flags;
+
+		flags = m_spriteram[offs + 1] & 0xff;
+		code = (m_spriteram[offs + 2] & 0xff) + 256 * ((flags >> 3) & 0x01) + 512 * ((flags >> 6) & 0x03);
+
+		/* skip if zero */
+		if (code == 0)
+			continue;
+
+		/* also skip if this isn't the priority we're drawing right now */
+		if (((flags >> 2) & 1) != priority)
+			continue;
+
+		/* extract the bits of information */
+		color = ~flags & 0x03;
+		flipx = flags & 0x10;
+		flipy = flags & 0x20;
+		x = (m_spriteram[offs + 3] & 0xff) * 2 + m_sprite_xoffset;
+		y = (241 - (m_spriteram[offs] & 0xff)) * 2;
+
+		/* allow sprites to clip off the left side */
+		if (x > 0x1f0) x -= 0x200;
+
+		/* sprites use color 0 for background pen and 8 for the 'under tile' pen.
+		    The color 8 is used to cover over other sprites. */
+
+		/* first draw the sprite, visible */
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
+				screen.priority(), 0x00, 0x0101);
+
+		/* then draw the mask, behind the background but obscuring following sprites */
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
+				screen.priority(), 0x02, 0xfeff);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  General MCR/68k update
+ *
+ *************************************/
+
+uint32_t mcr68_state::screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* draw the background */
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+
+	/* draw the low-priority sprites */
+	mcr68_update_sprites(screen, bitmap, cliprect, 0);
+
+	/* redraw tiles with priority over sprites */
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+
+	/* draw the high-priority sprites */
+	mcr68_update_sprites(screen, bitmap, cliprect, 1);
+	return 0;
+}
 
 
 
@@ -364,7 +669,6 @@ void mcr68_state::trisport_map(address_map &map)
  *  Port definitions
  *
  *************************************/
-
 
 static INPUT_PORTS_START( xenophob )
 	PORT_START("IN0")
@@ -1654,6 +1958,8 @@ void mcr68_state::init_trisport()
 	   after the 493 */
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * 115;
 }
+
+} // anonymous namespace
 
 
 

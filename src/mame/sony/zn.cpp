@@ -5307,7 +5307,7 @@ ROM_END
 
 /* Capcom ZN1 */
 GAME( 1995, coh1000c,  0,        coh1000c,    zn,       zn1_state,     empty_init, ROT0, "Capcom",          "ZN1",                                                     MACHINE_IS_BIOS_ROOT )
-GAME( 1995, ts2,       coh1000c, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Euro 951124)",                  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, ts2,       coh1000c, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Europe 951124)",                MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2u,      ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)",                   MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2ua,     ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124, 32Mb mask ROMs)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2j,      ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)",                 MACHINE_IMPERFECT_SOUND )
@@ -5316,7 +5316,7 @@ GAME( 1996, starglad,  coh1000c, coh1000c,    zn6b,     zn1_state,     empty_ini
 GAME( 1996, stargladj, starglad, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom",          "Star Gladiator Episode I: Final Crusade (Japan 960627)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracr,   coh1000c, coh1000c,    zn,       glpracr_state, empty_init, ROT0, "Tecmo",           "Gallop Racer (English Ver 10.17.K)",                      MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracrj,  glpracr,  coh1000c,    zn,       glpracr_state, empty_init, ROT0, "Tecmo",           "Gallop Racer (Japanese Ver 9.01.12)",                     MACHINE_IMPERFECT_SOUND )
-GAME( 1996, sfex,      coh1000c, coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Euro 961219)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1996, sfex,      coh1000c, coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Europe 961219)",                       MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexu,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (USA 961219)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexa,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Asia 961219)",                         MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexj,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Japan 961130)",                        MACHINE_IMPERFECT_SOUND )
@@ -5327,12 +5327,12 @@ GAME( 1997, sfexpj1,   sfexp,    coh1002c,    zn6b,     zn1_state,     empty_ini
 
 /* Capcom ZN2 */
 GAME( 1997, coh3002c,  0,        coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "ZN2",                                                      MACHINE_IS_BIOS_ROOT )
-GAME( 1997, rvschool,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Euro 971117)",              MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rvschool,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Europe 971117)",            MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoolu, rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (USA 971117)",               MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoola, rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Asia 971117)",              MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen,   rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971216)", MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen1,  rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Euro 980312)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Europe 980312)",                       MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u1,   sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980312)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2a,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)",                         MACHINE_IMPERFECT_SOUND )
@@ -5342,16 +5342,16 @@ GAME( 1998, plsmaswd,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, R
 GAME( 1998, plsmaswda, plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Plasma Sword: Nightmare of Bilstein (Asia 980316)",        MACHINE_IMPERFECT_SOUND )
 GAME( 1998, stargld2,  plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1998, tgmj,      coh3002c, coh3002c,    tgm,      zn2_state, empty_init, ROT0, "Arika / Capcom", "Tetris: The Grand Master (Japan 980710)",                  MACHINE_IMPERFECT_SOUND )
-GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Euro 980914)",                              MACHINE_IMPERFECT_SOUND )
+GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Europe 980914)",                            MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromnu, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (USA 980914)",                               MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromna, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Asia 980914)",                              MACHINE_IMPERFECT_SOUND )
 GAME( 1998, kikaioh,   techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Choukou Senki Kikaioh (Japan 980914)",                     MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Euro 990611)",                    MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Europe 990611)",                  MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pu,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)",                     MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pa,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)",                    MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2ph,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)",                MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pj,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)",                   MACHINE_IMPERFECT_SOUND )
-GAME( 1999, strider2,  coh3002c, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Euro 991213)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
+GAME( 1999, strider2,  coh3002c, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Europe 991213)",                                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
 GAME( 1999, strider2u, strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (USA 991213)",                                   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, strider2a, strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Asia 991213)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, shiryu2,   strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider Hiryu 2 (Japan 991213)",                           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

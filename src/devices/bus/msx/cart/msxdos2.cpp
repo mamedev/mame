@@ -95,10 +95,7 @@ public:
 	msx_cart_msxdos2j_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: msx_cart_msxdos2_base_device(mconfig, MSX_CART_MSXDOS2J, tag, owner, clock)
 		, m_rambank(*this, "rambank%u", 0)
-		, m_view_page0(*this, "view_page0")
-		, m_view_page1(*this, "view_page1")
-		, m_view_page2(*this, "view_page2")
-		, m_view_page3(*this, "view_page3")
+		, m_view_page{ {*this, "view_page0"}, {*this, "view_page1"}, {*this, "view_page2"}, {*this, "view_page3"} }
 		, m_secondary_slot(0)
 		, m_bank_mask(0)
 	{ }
@@ -114,10 +111,7 @@ private:
 	template <int Bank> void mm_bank_w(u8 data);
 
 	memory_bank_array_creator<4> m_rambank;
-	memory_view m_view_page0;
-	memory_view m_view_page1;
-	memory_view m_view_page2;
-	memory_view m_view_page3;
+	memory_view m_view_page[4];
 	u8 m_secondary_slot;
 	u8 m_bank_mask;
 };
@@ -142,27 +136,23 @@ std::error_condition msx_cart_msxdos2j_device::initialize_cartridge(std::string 
 		return image_error::BADSOFTWARE;
 	}
 
-	page(0)->install_view(0x0000, 0x3fff, m_view_page0);
-	page(1)->install_view(0x4000, 0x7fff, m_view_page1);
-	page(2)->install_view(0x8000, 0xbfff, m_view_page2);
-	page(3)->install_view(0xc000, 0xffff, m_view_page3);
+	for (int pg = 0; pg < 4; pg++)
+		page(pg)->install_view(0x4000 * pg, 0x4000 * pg + 0x3fff, m_view_page[pg]);
 	page(3)->install_readwrite_handler(0xffff, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_msxdos2j_device::secondary_slot_r)), emu::rw_delegate(*this, FUNC(msx_cart_msxdos2j_device::secondary_slot_w)));
 
 	// Make sure all views we can select do exist.
 	for (int subslot = 0; subslot < 4; subslot++)
 	{
-		m_view_page0[subslot];
-		m_view_page1[subslot];
-		m_view_page2[subslot];
-		m_view_page3[subslot];
+		for (int page = 0; page < 4; page++)
+			m_view_page[page][subslot];
 	}
 
 	// Kanji driver
-	m_view_page1[2].install_rom(0x4000, 0x7fff, cart_rom_region()->base() + 0xc000);
+	m_view_page[1][2].install_rom(0x4000, 0x7fff, cart_rom_region()->base() + 0xc000);
 
 	// MSX-DOS2 rom
-	m_view_page1[3].install_read_bank(0x4000, 0x7fff, m_rombank);
-	m_view_page1[3].install_write_handler(m_bank_address, m_bank_address, emu::rw_delegate(*this, FUNC(msx_cart_msxdos2j_device::bank_w)));
+	m_view_page[1][3].install_read_bank(0x4000, 0x7fff, m_rombank);
+	m_view_page[1][3].install_write_handler(m_bank_address, m_bank_address, emu::rw_delegate(*this, FUNC(msx_cart_msxdos2j_device::bank_w)));
 
 	// On-cartridge memory mapper RAM
 	if (ram_size)
@@ -176,10 +166,8 @@ std::error_condition msx_cart_msxdos2j_device::initialize_cartridge(std::string 
 			}
 		);
 
-		m_view_page0[1].install_readwrite_bank(0x0000, 0x3fff, m_rambank[0]);
-		m_view_page1[1].install_readwrite_bank(0x4000, 0x7fff, m_rambank[1]);
-		m_view_page2[1].install_readwrite_bank(0x8000, 0xbfff, m_rambank[2]);
-		m_view_page3[1].install_readwrite_bank(0xc000, 0xffff, m_rambank[3]);
+		for (int pg = 0; pg < 4; pg++)
+			m_view_page[pg][1].install_readwrite_bank(0x4000 * pg, 0x4000 * pg + 0x3fff, m_rambank[pg]);
 
 		io_space().install_write_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ this->mm_bank_w<0>(data); });
 		io_space().install_write_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8& data, u8){ this->mm_bank_w<1>(data); });
@@ -197,10 +185,8 @@ u8 msx_cart_msxdos2j_device::secondary_slot_r()
 
 void msx_cart_msxdos2j_device::secondary_slot_w(u8 data)
 {
-	m_view_page0.select((data >> 0) & 0x03);
-	m_view_page1.select((data >> 2) & 0x03);
-	m_view_page2.select((data >> 4) & 0x03);
-	m_view_page3.select((data >> 6) & 0x03);
+	for (int page = 0; page < 4; page++)
+		m_view_page[page].select((data >> (2 * page)) & 0x03);
 	m_secondary_slot = data;
 }
 

@@ -40,17 +40,24 @@ The Grid         v1.2   10/18/2000
 #include "machine/tsb12lv01a.h"
 #include "video/zeus2.h"
 
+#include "speaker.h"
+
 #include "crusnexo.lh"
+
+static constexpr int BEAM_DY = 3;
+static constexpr int BEAM_DX = 3;
+static constexpr int BEAM_XOFFS = 40; // table in the code indicates an offset of 20 with a beam height of 7
 
 #define LOG_FIREWIRE    (1U << 1)
 #define LOG_DISK        (1U << 2)
 #define LOG_DISK_JR     (1U << 3)
-#define LOG_UNKNOWN     (1U << 4)
+#define LOG_TMS32032    (1U << 4)
+#define LOG_INPUT       (1U << 5)
+#define LOG_CMOS        (1U << 6)
+#define LOG_UNKNOWN     (1U << 7)
 
 #define VERBOSE (LOG_FIREWIRE)
 #include "logmacro.h"
-
-#define CPU_CLOCK       XTAL(60'000'000)
 
 /*************************************************************************
 Driver for Midway Zeus2 games
@@ -58,30 +65,22 @@ Driver for Midway Zeus2 games
 
 class midzeus2_state : public midzeus_state
 {
-public:
+protected:
 	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midzeus_state(mconfig, type, tag)
 		, m_zeus(*this, "zeus2")
+		, m_m48t35(*this, "m48t35")
 		, m_fw_link(*this, "fw_link")
 		, m_fw_phy(*this, "fw_phy")
-		, m_leds(*this, "led%u", 0U)
-		, m_lamps(*this, "lamp%u", 0U)
+		, m_io_keypad(*this, "KEYPAD")
 	{ }
 
-	void thegrid(machine_config &config);
-	void crusnexo(machine_config &config);
-	void midzeus2(machine_config &config);
-
-	void init_crusnexo();
-	void init_thegrid();
-
-private:
 	virtual void machine_start() override
 	{
 		midzeus_state::machine_start();
 
-		m_leds.resolve();
-		m_lamps.resolve();
+		m_mainbank->configure_entries(0, 3, memregion("bankeddata")->base(), 0x400000*4);
+		m_mainbank->set_entry(0);
 
 		save_item(NAME(m_disk_asic));
 		save_item(NAME(m_fw_int_enable));
@@ -99,31 +98,108 @@ private:
 
 	virtual void video_start() override {}
 
-	void zeus2_map(address_map &map);
-
 	uint32_t disk_asic_r(offs_t offset);
 	void disk_asic_w(offs_t offset, uint32_t data);
 
 	void firewire_irq(int state);
 	void zeus_irq(int state);
 
-	uint32_t zeus2_timekeeper_r(offs_t offset);
-	void zeus2_timekeeper_w(offs_t offset, uint32_t data);
-	uint32_t crusnexo_leds_r(offs_t offset);
-	void crusnexo_leds_w(offs_t offset, uint32_t data);
+	uint32_t zpram_r(offs_t offset);
+	void zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t timekeeper_r(offs_t offset);
+	void timekeeper_w(offs_t offset, uint32_t data);
 
 	void update_firewire_irq();
 
-	uint32_t    m_disk_asic[0x10];
+	void zeus2_map(address_map &map);
+	void midzeus2(machine_config &config);
+
+	uint32_t    m_disk_asic[0x10]{};
 	int         m_fw_int_enable = 0;
 	int         m_fw_int = 0;
 
 	required_device<zeus2_device> m_zeus;
+	required_device<timekeeper_device> m_m48t35;
 	required_device<tsb12lv01a_device> m_fw_link;
 	required_device<ibm21s851_device> m_fw_phy;
+
+	required_ioport m_io_keypad;
+};
+
+
+class crusnexo_state : public midzeus2_state
+{
+public:
+	crusnexo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midzeus2_state(mconfig, type, tag)
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_io_analog(*this, "ANALOG%u", 0U)
+	{ }
+
+	void crusnexo(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
+
+protected:
+	virtual void machine_start() override
+	{
+		midzeus2_state::machine_start();
+
+		m_digits.resolve();
+		m_leds.resolve();
+		m_lamps.resolve();
+
+		save_item(NAME(m_keypad_select));
+		save_item(NAME(m_crusnexo_leds_select));
+	}
+
+private:
+	uint32_t crusnexo_leds_r(offs_t offset);
+	void crusnexo_leds_w(offs_t offset, uint32_t data);
+	void keypad_select_w(offs_t offset, uint32_t data);
+	uint32_t analog_r(offs_t offset);
+	void analog_w(uint32_t data);
+
+	void crusnexo_map(address_map &map);
+
+	uint8_t     m_keypad_select = 0;
+	uint8_t     m_crusnexo_leds_select = 0;
+
+	output_finder<7> m_digits;
 	output_finder<32> m_leds;
 	output_finder<8> m_lamps;
+	required_ioport_array<4> m_io_analog;
 };
+
+class thegrid_state : public midzeus2_state
+{
+public:
+	thegrid_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midzeus2_state(mconfig, type, tag)
+		, m_io_49way_x(*this, "49WAYX")
+		, m_io_49way_y(*this, "49WAYY")
+		, m_io_trackx(*this, "TRACKX")
+		, m_io_tracky(*this, "TRACKY")
+	{ }
+
+	void thegrid(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
+
+private:
+	uint32_t trackball_r(offs_t offset);
+	uint32_t grid_keypad_r(offs_t offset);
+
+	void thegrid_map(address_map &map);
+
+	required_ioport m_io_49way_x;
+	required_ioport m_io_49way_y;
+	required_ioport m_io_trackx;
+	required_ioport m_io_tracky;
+};
+
 
 
 
@@ -135,30 +211,32 @@ private:
 
 void midzeus_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	m_gun_timer[0] = timer_alloc(FUNC(midzeus_state::invasn_gun_callback), this);
-	m_gun_timer[1] = timer_alloc(FUNC(midzeus_state::invasn_gun_callback), this);
-
 	m_display_irq_off_timer = timer_alloc(FUNC(midzeus_state::display_irq_off), this);
 
-	save_item(NAME(m_crusnexo_leds_select));
 	save_item(NAME(m_disk_asic_jr));
 	save_item(NAME(m_cmos_protected));
+}
+
+void invasnab_state::machine_start()
+{
+	midzeus_state::machine_start();
+
+	m_gun_timer[0] = timer_alloc(FUNC(invasnab_state::invasn_gun_callback), this);
+	m_gun_timer[1] = timer_alloc(FUNC(invasnab_state::invasn_gun_callback), this);
+
 	save_item(NAME(m_gun_control));
 	save_item(NAME(m_gun_irq_state));
 	save_item(NAME(m_gun_x));
 	save_item(NAME(m_gun_y));
-	save_item(NAME(m_keypad_select));
 }
 
 
 void midzeus_state::machine_reset()
 {
-	memcpy(m_ram_base, memregion("user1")->base(), 0x40000*4);
+	memcpy(m_ram_base, memregion("maindata")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
 	m_maincpu->reset();
 
@@ -203,7 +281,7 @@ void midzeus_state::cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	if (m_disk_asic_jr[2] && !m_cmos_protected)
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", m_maincpu->pc(), m_disk_asic_jr[2], m_cmos_protected);
+		LOGMASKED(LOG_CMOS, "%06X:cmos_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", m_maincpu->pc(), m_disk_asic_jr[2], m_cmos_protected);
 	m_cmos_protected = true;
 }
 
@@ -228,33 +306,33 @@ void midzeus_state::cmos_protect_w(uint32_t data)
  *
  *************************************/
 
-uint32_t midzeus2_state::zeus2_timekeeper_r(offs_t offset)
+uint32_t midzeus2_state::timekeeper_r(offs_t offset)
 {
 	return m_m48t35->read(offset) | 0xffffff00;
 }
 
-void midzeus2_state::zeus2_timekeeper_w(offs_t offset, uint32_t data)
+void midzeus2_state::timekeeper_w(offs_t offset, uint32_t data)
 {
 	if (m_disk_asic_jr[2] && !m_cmos_protected)
 		m_m48t35->write(offset, data);
 	else
-		logerror("%s:zeus2_timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", machine().describe_context(), m_disk_asic_jr[2], m_cmos_protected);
+		LOGMASKED(LOG_CMOS, "%s:timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", machine().describe_context(), m_disk_asic_jr[2], m_cmos_protected);
 	m_cmos_protected = true;
 }
 
 
-uint32_t midzeus_state::zpram_r(offs_t offset)
+uint32_t midzeus2_state::zpram_r(offs_t offset)
 {
 	return m_nvram[offset] | 0xffffff00;
 }
 
 
-void midzeus_state::zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midzeus2_state::zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_disk_asic_jr[2])
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:zpram_w with disk_asic_jr[2] = %d\n", m_maincpu->pc(), m_disk_asic_jr[2]);
+		LOGMASKED(LOG_CMOS, "%06X:zpram_w with disk_asic_jr[2] = %d\n", m_maincpu->pc(), m_disk_asic_jr[2]);
 }
 
 
@@ -368,34 +446,35 @@ uint32_t midzeus_state::disk_asic_jr_r(offs_t offset)
 		case 1:
 			break;
 
-		/* CMOS/ZPRAM write enable; only low bit is used */
+		// CMOS/ZPRAM write enable; only low bit is used
 		case 2:
 			//return m_disk_asic_jr[offset] | ~1;
 			break;
 
-		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
+		// reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup
 		case 3:
 			//return m_disk_asic_jr[offset] | ~1;
 			break;
 
-		/* ROM bank selection on Zeus 2; two bits are used */
+		// ROM bank selection on Zeus 2; two bits are used
 		case 5:
 			//return m_disk_asic_jr[offset] | ~3;
 			break;
 
-		/* disk asic jr id; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
-		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
-		/* thegrid does the same, writing either 0xD4580006 or 0xC4180006 depending */
-		/* this is the value reported as DISK JR ASIC version in thegrid startup test */
+		// disk asic jr id; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects
+		// how the Zeus is used (reg 0x5d is set to 0x54580006)
+		// thegrid does the same, writing either 0xD4580006 or 0xC4180006 depending
+		// this is the value reported as DISK JR ASIC version in thegrid startup test
 		// Set in reset
 		// a0 = Rev3 Athens
 		// 90 = Rev2 Athens
 		case 6:
 			break;
 
-		/* unknown purpose */
+		// unknown purpose
 		default:
-			logerror("%06X:disk_asic_jr_r(%X)\n", m_maincpu->pc(), offset);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_DISK_JR, "%06X:disk_asic_jr_r(%X)\n", m_maincpu->pc(), offset);
 			break;
 	}
 	return retVal;
@@ -409,56 +488,57 @@ void midzeus_state::disk_asic_jr_w(offs_t offset, uint32_t data)
 
 	switch (offset)
 	{
-		/* disk asic jr led; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
+		// disk asic jr led; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1
 		case 0:
 			if (data != 0 && data != 1)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
+				LOGMASKED(LOG_DISK_JR, "%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
-		/* miscellaneous hardware wait states; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
+		// miscellaneous hardware wait states; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3
 		case 1:
 			if (data != 1 && data != 3)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
+				LOGMASKED(LOG_DISK_JR, "%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
-		/* CMOS/ZPRAM write enable; only low bit is used */
+		// CMOS/ZPRAM write enable; only low bit is used
 		case 2:
 			break;
 
-		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
+		// reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup
 		case 3:
 			break;
 
-		/* unknown purpose; invasn writes 2 here at startup */
+		// unknown purpose; invasn writes 2 here at startup
 		case 4:
 			if (data != 2)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
+				LOGMASKED(LOG_DISK_JR, "%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
-		/* ROM bank selection on Zeus 2 */
+		// ROM bank selection on Zeus 2
 		case 5:
-			membank("bank1")->set_entry(m_disk_asic_jr[offset] & 3);
+			if (m_mainbank)
+				m_mainbank->set_entry(m_disk_asic_jr[offset] & 3);
 			break;
 
-		/* zeus2 ws; 0=zeus access 1 wait state, 2=unlock ROMs; crusnexo/thegrid write 1 at startup */
+		// zeus2 ws; 0=zeus access 1 wait state, 2=unlock ROMs; crusnexo/thegrid write 1 at startup
 		case 7:
 			break;
 
-		/* romsize; crusnexo writes 4 at startup; thegrid writes 6 */
+		// romsize; crusnexo writes 4 at startup; thegrid writes 6
 		case 8:
 			if (data != 4 && data != 6)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
+				LOGMASKED(LOG_DISK_JR, "%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
 
-		/* trackball reset; thegrid writes 1 at startup */
+		// trackball reset; thegrid writes 1 at startup
 		case 9:
 			if (data != 1)
-				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
+				LOGMASKED(LOG_DISK_JR, "%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", m_maincpu->pc(), offset, data);
 			break;
-		/* unknown purpose */
+		// unknown purpose
 		default:
 			//if (oldval ^ data)
-				logerror("%06X:disk_asic_jr_w(%X) = %X\n", m_maincpu->pc(), offset, data);
+				LOGMASKED(LOG_DISK_JR, "%06X:disk_asic_jr_w(%X) = %X\n", m_maincpu->pc(), offset, data);
 			break;
 
 	}
@@ -472,40 +552,40 @@ void midzeus_state::disk_asic_jr_w(offs_t offset, uint32_t data)
  *
  *************************************/
 
-uint32_t midzeus2_state::crusnexo_leds_r(offs_t offset)
+uint32_t crusnexo_state::crusnexo_leds_r(offs_t offset)
 {
-	/* reads appear to just be for synchronization */
+	// reads appear to just be for synchronization
 	return ~0;
 }
 
 
-void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
+void crusnexo_state::crusnexo_leds_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{
-		case 0: /* unknown purpose */
+		case 0: // unknown purpose
 			break;
 
-		case 1: /* controls lamps */
+		case 1: // controls lamps
 			for (int bit = 0; bit < 8; bit++)
 				m_lamps[bit] = BIT(data, bit);
 			break;
 
-		case 2: /* sets state of selected LEDs */
+		case 2: // sets state of selected LEDs
 
-			/* selection bits 4-6 select the 3 7-segment LEDs */
+			// selection bits 4-6 select the 3 7-segment LEDs
 			for (int bit = 4; bit < 7; bit++)
 				if ((m_crusnexo_leds_select & (1 << bit)) == 0)
 					m_digits[bit] = ~data & 0xff;
 
-			/* selection bits 0-2 select the tachometer LEDs */
+			// selection bits 0-2 select the tachometer LEDs
 			for (int bit = 0; bit < 3; bit++)
 				if ((m_crusnexo_leds_select & (1 << bit)) == 0)
 					for (int led = 0; led < 8; led++)
 						m_leds[bit * 8 + led] = BIT(~data, led);
 			break;
 
-		case 3: /* selects which set of LEDs we are addressing */
+		case 3: // selects which set of LEDs we are addressing
 			m_crusnexo_leds_select = data;
 			break;
 	}
@@ -539,42 +619,45 @@ void midzeus2_state::update_firewire_irq()
  *
  *************************************/
 
-uint32_t midzeus_state::tms32031_control_r(offs_t offset)
+uint32_t midzeus_state::tms32032_control_r(offs_t offset)
 {
-	/* watch for accesses to the timers */
+	// watch for accesses to the timers
 	if (offset == 0x24 || offset == 0x34)
 	{
-		/* timer is clocked at 100ns */
-		int which = (offset >> 4) & 1;
-		int32_t result = (m_timer[which]->elapsed() * 10000000).as_double();
+		// timer is clocked at 100ns
+		int const which = (offset >> 4) & 1;
+		int32_t const result = (m_timer[which]->elapsed() * 10000000).as_double();
 		return result;
 	}
 
-	/* log anything else except the memory control register */
-	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", m_maincpu->pc(), offset);
+	// log anything else except the memory control register
+	if (!machine().side_effects_disabled())
+	{
+		if (offset != 0x64)
+			LOGMASKED(LOG_TMS32032, "%06X:tms32032_control_r(%02X)\n", m_maincpu->pc(), offset);
+	}
 
-	return m_tms32031_control[offset];
+	return m_tms32032_control[offset];
 }
 
 
-void midzeus_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_tms32031_control[offset]);
+	COMBINE_DATA(&m_tms32032_control[offset]);
 
-	/* ignore changes to the memory control register */
+	// ignore changes to the memory control register
 	if (offset == 0x64)
 		;
 
-	/* watch for accesses to the timers */
+	// watch for accesses to the timers
 	else if (offset == 0x20 || offset == 0x30)
 	{
-		int which = (offset >> 4) & 1;
+		int const which = (offset >> 4) & 1;
 		if (data & 0x40)
 			m_timer[which]->adjust(attotime::never);
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		LOGMASKED(LOG_TMS32032, "%06X:tms32032_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -585,21 +668,21 @@ void midzeus_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t me
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
+CUSTOM_INPUT_MEMBER(thegrid_state::custom_49way_r)
 {
 	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	return (translate49[m_io_49way_y->read() >> 4] << 4) | translate49[m_io_49way_x->read() >> 4];
 }
 
 
-void midzeus_state::keypad_select_w(offs_t offset, uint32_t data)
+void crusnexo_state::keypad_select_w(offs_t offset, uint32_t data)
 {
 	if (offset == 1)
 		m_keypad_select = data;
 }
 
 
-CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
+CUSTOM_INPUT_MEMBER(crusnexo_state::keypad_r)
 {
 	uint32_t bits = m_io_keypad->read();
 	uint8_t select = m_keypad_select;
@@ -611,15 +694,15 @@ CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 	return bits;
 }
 
-uint32_t midzeus_state::grid_keypad_r(offs_t offset)
+uint32_t thegrid_state::grid_keypad_r(offs_t offset)
 {
-	uint32_t bits = (m_io_keypad->read() >> ((offset >> 1) << 2)) & 0xf;
+	uint32_t const bits = (m_io_keypad->read() >> ((offset >> 1) << 2)) & 0xf;
 	return bits;
 }
 
-uint32_t midzeus_state::trackball_r(offs_t offset)
+uint32_t thegrid_state::trackball_r(offs_t offset)
 {
-	if (offset==0)
+	if (offset == 0)
 		return m_io_tracky->read();
 	else
 		return m_io_trackx->read();
@@ -633,17 +716,20 @@ uint32_t midzeus_state::trackball_r(offs_t offset)
  *
  *************************************/
 
-uint32_t midzeus_state::analog_r(offs_t offset)
+uint32_t crusnexo_state::analog_r(offs_t offset)
 {
-	if (offset < 8 || offset > 11)
-		logerror("%06X:analog_r(%X)\n", m_maincpu->pc(), offset);
+	if (!machine().side_effects_disabled())
+	{
+		if (offset < 8 || offset > 11)
+			LOGMASKED(LOG_INPUT, "%06X:analog_r(%X)\n", m_maincpu->pc(), offset);
+	}
 	return m_io_analog[offset & 3]->read();
 }
 
 
-void midzeus_state::analog_w(uint32_t data)
+void crusnexo_state::analog_w(uint32_t data)
 {
-	/* 16 writes to the location before a read */
+	// 16 writes to the location before a read
 }
 
 
@@ -654,9 +740,9 @@ void midzeus_state::analog_w(uint32_t data)
  *
  *************************************/
 
-void midzeus_state::update_gun_irq()
+void invasnab_state::update_gun_irq()
 {
-	/* low 2 bits of gun_control seem to enable IRQs */
+	// low 2 bits of gun_control seem to enable IRQs
 	if (m_gun_irq_state & m_gun_control & 0x03)
 		m_maincpu->set_input_line(TMS3203X_IRQ3, ASSERT_LINE);
 	else
@@ -664,37 +750,36 @@ void midzeus_state::update_gun_irq()
 }
 
 
-TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
+TIMER_CALLBACK_MEMBER(invasnab_state::invasn_gun_callback)
 {
-	int player = param;
+	int const player = param;
 	int beamy = m_screen->vpos();
 
-	/* set the appropriate IRQ in the internal gun control and update */
+	// set the appropriate IRQ in the internal gun control and update
 	m_gun_irq_state |= 0x01 << player;
 	update_gun_irq();
 
-	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
+	// generate another interrupt on the next scanline while we are within the BEAM_DY
 	beamy++;
 	if (beamy <= m_screen->visible_area().max_y && beamy <= m_gun_y[player] + BEAM_DY)
 		m_gun_timer[player]->adjust(m_screen->time_until_pos(beamy, std::max(0, m_gun_x[player] - BEAM_DX)), player);
 }
 
 
-void midzeus_state::invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void invasnab_state::invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t old_control = m_gun_control;
-	int player;
+	uint32_t const old_control = m_gun_control;
 
 	COMBINE_DATA(&m_gun_control);
 
-	/* bits 0-1 enable IRQs (?) */
-	/* bits 2-3 reset IRQ states */
+	// bits 0-1 enable IRQs (?)
+	// bits 2-3 reset IRQ states
 	m_gun_irq_state &= ~((m_gun_control >> 2) & 3);
 	update_gun_irq();
 
-	for (player = 0; player < 2; player++)
+	for (int player = 0; player < 2; player++)
 	{
-		uint8_t pmask = 0x04 << player;
+		uint8_t const pmask = 0x04 << player;
 		if (((old_control ^ m_gun_control) & pmask) != 0 && (m_gun_control & pmask) == 0)
 		{
 			const rectangle &visarea = m_screen->visible_area();
@@ -706,17 +791,16 @@ void midzeus_state::invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask
 }
 
 
-uint32_t midzeus_state::invasn_gun_r()
+uint32_t invasnab_state::invasn_gun_r()
 {
-	int beamx = m_screen->hpos();
-	int beamy = m_screen->vpos();
+	int const beamx = m_screen->hpos();
+	int const beamy = m_screen->vpos();
 	uint32_t result = 0xffff;
-	int player;
 
-	for (player = 0; player < 2; player++)
+	for (int player = 0; player < 2; player++)
 	{
-		int diffx = beamx - m_gun_x[player];
-		int diffy = beamy - m_gun_y[player];
+		int const diffx = beamx - m_gun_x[player];
+		int const diffy = beamy - m_gun_y[player];
 		if (diffx >= -BEAM_DX && diffx <= BEAM_DX && diffy >= -BEAM_DY && diffy <= BEAM_DY)
 			result ^= 0x1000 << player;
 	}
@@ -734,38 +818,58 @@ uint32_t midzeus_state::invasn_gun_r()
 void midzeus_state::zeus_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x03ffff).ram().share("ram_base");
+	map(0x000000, 0x03ffff).ram().share(m_ram_base);
 	map(0x400000, 0x41ffff).ram();
-	map(0x808000, 0x80807f).rw(FUNC(midzeus_state::tms32031_control_r), FUNC(midzeus_state::tms32031_control_w)).share("tms32031_ctl");
-	map(0x880000, 0x8803ff).rw(FUNC(midzeus_state::zeus_r), FUNC(midzeus_state::zeus_w)).share("zeusbase");
+	map(0x808000, 0x80807f).rw(FUNC(midzeus_state::tms32032_control_r), FUNC(midzeus_state::tms32032_control_w)).share(m_tms32032_control);
+	map(0x880000, 0x8803ff).rw(FUNC(midzeus_state::zeus_r), FUNC(midzeus_state::zeus_w)).share(m_zeusbase);
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus_state::disk_asic_jr_r), FUNC(midzeus_state::disk_asic_jr_w));
-	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x990000, 0x99000f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
 	map(0x9e0000, 0x9e0000).nopw();        // watchdog?
-	map(0x9f0000, 0x9f7fff).rw(FUNC(midzeus_state::cmos_r), FUNC(midzeus_state::cmos_w)).share("nvram");
+	map(0x9f0000, 0x9f7fff).rw(FUNC(midzeus_state::cmos_r), FUNC(midzeus_state::cmos_w)).share(m_nvram);
 	map(0x9f8000, 0x9f8000).w(FUNC(midzeus_state::cmos_protect_w));
-	map(0xa00000, 0xffffff).rom().region("user1", 0);
+	map(0xa00000, 0xffffff).rom().region("maindata", 0);
+}
+
+void invasnab_state::invasnab_map(address_map &map)
+{
+	zeus_map(map);
+	map(0x9c0000, 0x9c0000).rw(FUNC(invasnab_state::invasn_gun_r), FUNC(invasnab_state::invasn_gun_w));
 }
 
 
 void midzeus2_state::zeus2_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x03ffff).ram().share("ram_base");
+	map(0x000000, 0x03ffff).ram().share(m_ram_base);
 	map(0x400000, 0x43ffff).ram();
-	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms32031_control_r), FUNC(midzeus2_state::tms32031_control_w)).share("tms32031_ctl");
+	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms32032_control_r), FUNC(midzeus2_state::tms32032_control_w)).share(m_tms32032_control);
 	map(0x880000, 0x88007f).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
 	map(0x8a0000, 0x8a00cf).rw(m_fw_link, FUNC(tsb12lv01a_device::read), FUNC(tsb12lv01a_device::write));
 	//map(0x8a0000, 0x8a00cf).rw(FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus2_state::disk_asic_jr_r), FUNC(midzeus2_state::disk_asic_jr_w));
-	map(0x900000, 0x91ffff).rw(FUNC(midzeus2_state::zpram_r), FUNC(midzeus2_state::zpram_w)).share("nvram").mirror(0x020000);
-	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x9c0000, 0x9c000f).rw(FUNC(midzeus2_state::analog_r), FUNC(midzeus2_state::analog_w));
+	map(0x900000, 0x91ffff).rw(FUNC(midzeus2_state::zpram_r), FUNC(midzeus2_state::zpram_w)).share(m_nvram).mirror(0x020000);
+	map(0x990000, 0x99000f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
 	map(0x9d0000, 0x9d000f).rw(FUNC(midzeus2_state::disk_asic_r), FUNC(midzeus2_state::disk_asic_w));
 	map(0x9e0000, 0x9e0000).nopw();        // watchdog?
-	map(0x9f0000, 0x9f7fff).rw(FUNC(midzeus2_state::zeus2_timekeeper_r), FUNC(midzeus2_state::zeus2_timekeeper_w));
+	map(0x9f0000, 0x9f7fff).rw(FUNC(midzeus2_state::timekeeper_r), FUNC(midzeus2_state::timekeeper_w));
 	map(0x9f8000, 0x9f8000).w(FUNC(midzeus2_state::cmos_protect_w));
-	map(0xa00000, 0xbfffff).rom().region("user1", 0);
-	map(0xc00000, 0xffffff).bankr("bank1");
+	map(0xa00000, 0xbfffff).rom().region("maindata", 0);
+	map(0xc00000, 0xffffff).bankr(m_mainbank);
+}
+
+void crusnexo_state::crusnexo_map(address_map &map)
+{
+	zeus2_map(map);
+	map(0x8d0009, 0x8d000a).w(FUNC(crusnexo_state::keypad_select_w));
+	map(0x9b0004, 0x9b0007).rw(FUNC(crusnexo_state::crusnexo_leds_r), FUNC(crusnexo_state::crusnexo_leds_w));
+	map(0x9c0000, 0x9c000f).rw(FUNC(crusnexo_state::analog_r), FUNC(crusnexo_state::analog_w));
+}
+
+void thegrid_state::thegrid_map(address_map &map)
+{
+	zeus2_map(map);
+	map(0x8c0000, 0x8c0001).r(FUNC(thegrid_state::trackball_r));
+	map(0x9b0000, 0x9b0004).r(FUNC(thegrid_state::grid_keypad_r));
 }
 
 /*
@@ -814,7 +918,7 @@ void midzeus2_state::zeus2_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( mk4 )
-	PORT_START("DIPS")      /* DS1 */
+	PORT_START("DIPS")      // DS1
 	PORT_DIPNAME( 0x0001, 0x0001, "Coinage Source" )
 	PORT_DIPSETTING(      0x0001, "Dipswitch" )
 	PORT_DIPSETTING(      0x0000, "CMOS" )
@@ -837,7 +941,7 @@ static INPUT_PORTS_START( mk4 )
 	PORT_DIPSETTING(      0x0018, "French-4" )
 	PORT_DIPSETTING(      0x0016, "French-ECA" )
 	PORT_DIPSETTING(      0x0030, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  /* Manual lists this dip as Unused */
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  // Manual lists this dip as Unused
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
@@ -849,7 +953,7 @@ static INPUT_PORTS_START( mk4 )
 	PORT_DIPNAME( 0x0200, 0x0200, "Blood" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) /* Manual states that switches 3-7 are Unused */
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) // Manual states that switches 3-7 are Unused
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
@@ -872,7 +976,7 @@ static INPUT_PORTS_START( mk4 )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) // Slam Switch
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -883,7 +987,7 @@ static INPUT_PORTS_START( mk4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )    /* Bill */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )    // Bill
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY
@@ -916,7 +1020,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( invasn )
-	PORT_START("DIPS")      /* DS1 */
+	PORT_START("DIPS")      // DS1
 	PORT_DIPNAME( 0x0001, 0x0001, "Coinage Source" )
 	PORT_DIPSETTING(      0x0001, "Dipswitch" )
 	PORT_DIPSETTING(      0x0000, "CMOS" )
@@ -977,7 +1081,7 @@ static INPUT_PORTS_START( invasn )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) // Slam Switch
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -988,7 +1092,7 @@ static INPUT_PORTS_START( invasn )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )    /* Bill */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )    // Bill
 
 	PORT_START("IN1")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1001,22 +1105,22 @@ static INPUT_PORTS_START( invasn )
 	PORT_START("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("GUNX1")     /* fake analog X */
+	PORT_START("GUNX1")     // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("GUNY1")     /* fake analog Y */
+	PORT_START("GUNY1")     // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("GUNX2")     /* fake analog X */
+	PORT_START("GUNX2")     // fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUNY2")     /* fake analog Y */
+	PORT_START("GUNY2")     // fake analog Y
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( crusnexo )
-	PORT_START("DIPS")      /* DS1 */
+	PORT_START("DIPS")      // DS1
 	PORT_DIPNAME( 0x001f, 0x001f, "Country Code" )
 	PORT_DIPSETTING(      0x001f, DEF_STR( USA ) )
 	PORT_DIPSETTING(      0x001e, "Germany" )
@@ -1039,17 +1143,17 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_DIPSETTING(      0x000a, "Hungary" )
 	PORT_DIPSETTING(      0x0008, "General" )
 	PORT_DIPNAME( 0x0060, 0x0060, "Coin Mode" )
-	PORT_DIPSETTING(      0x0060, "Mode 1" ) /* USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1 */
-	PORT_DIPSETTING(      0x0040, "Mode 2" ) /* USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2 */
-	PORT_DIPSETTING(      0x0020, "Mode 3" ) /* USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3 */
-	PORT_DIPSETTING(      0x0000, "Mode 4" ) /* USA8/GER1/FRA1/SPN1/AUSTRIA1/GEN7 */
+	PORT_DIPSETTING(      0x0060, "Mode 1" ) // USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1
+	PORT_DIPSETTING(      0x0040, "Mode 2" ) // USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2
+	PORT_DIPSETTING(      0x0020, "Mode 3" ) // USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3
+	PORT_DIPSETTING(      0x0000, "Mode 4" ) // USA8/GER1/FRA1/SPN1/AUSTRIA1/GEN7
 	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "Game Type" ) /* Manual states "*DIP 1, Switch 1 MUST be set */
-	PORT_DIPSETTING(      0x0100, "Dedicated" ) /*   to OFF position for proper operation" */
+	PORT_DIPNAME( 0x0100, 0x0100, "Game Type" ) // Manual states "*DIP 1, Switch 1 MUST be set
+	PORT_DIPSETTING(      0x0100, "Dedicated" ) //   to OFF position for proper operation"
 	PORT_DIPSETTING(      0x0000, "Kit" )
-	PORT_DIPNAME( 0x0200, 0x0200, "Seat Motion" )   /* For dedicated Sit Down models with Motion Seat */
+	PORT_DIPNAME( 0x0200, 0x0200, "Seat Motion" )   // For dedicated Sit Down models with Motion Seat
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) )
@@ -1058,7 +1162,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_DIPNAME( 0x0800, 0x0800, "Wheel Invert" )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" ) /* Manual lists this dip as Unused */
+	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" ) // Manual lists this dip as Unused
 	PORT_DIPSETTING(      0x1000, "32M ROM Normal" )
 	PORT_DIPSETTING(      0x0000, "16M ROM Split Active" )
 	PORT_DIPNAME( 0x2000, 0x2000, "Link" )
@@ -1074,7 +1178,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) // Slam Switch
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1087,41 +1191,41 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 
-	PORT_START("IN1")   /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Radio")       /* Radio Switch */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1")      /* View 1 */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2")      /* View 2 */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3")      /* View 3 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 4")     /* View 4 */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1st Gear")    /* Gear 1 */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("2nd Gear")    /* Gear 2 */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("3rd Gear")    /* Gear 3 */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("4th Gear")    /* Gear 4 */
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          /* Not Used */
+	PORT_START("IN1")   // Listed "names" are via the manual's "JAMMA" pinout sheet"
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                          // Not Used
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Radio")       // Radio Switch
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )                          // Not Used
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )                          // Not Used
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1")      // View 1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2")      // View 2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3")      // View 3
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 4")     // View 4
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1st Gear")    // Gear 1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("2nd Gear")    // Gear 2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("3rd Gear")    // Gear 3
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("4th Gear")    // Gear 4
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          // Not Used
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          // Not Used
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                          // Not Used
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(midzeus_state, keypad_r )
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(crusnexo_state, keypad_r )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYPAD")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)   /* keypad 3 */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)   /* keypad 1 */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)   /* keypad 2 */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)   /* keypad 6 */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)   /* keypad 4 */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)   /* keypad 5 */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)   /* keypad 9 */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)   /* keypad 7 */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)   /* keypad 8 */
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)    /* keypad # */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD)   /* keypad * */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)   /* keypad 0 */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)   // keypad 3
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)   // keypad 1
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)   // keypad 2
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)   // keypad 6
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)   // keypad 4
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)   // keypad 5
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)   // keypad 9
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)   // keypad 7
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)   // keypad 8
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)    // keypad #
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD)   // keypad *
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)   // keypad 0
 
 	PORT_START("ANALOG3")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
@@ -1138,7 +1242,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( thegrid )
-	PORT_START("DIPS")      /* DS1 */
+	PORT_START("DIPS")      // DS1
 	PORT_DIPNAME( 0x0100, 0x0100, "Show Blood" )
 	PORT_DIPSETTING(      0x0100, "Show Blood" )
 	PORT_DIPSETTING(      0x0000, "Do not show blood" )
@@ -1179,7 +1283,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_DIPSETTING(      0x0004, "UK-6 ECA" )
 	PORT_DIPSETTING(      0x0002, "UK-7 ECA" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  /* Manual states switches 7 & 8 are Unused */
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  // Manual states switches 7 & 8 are Unused
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Game Mode" )
@@ -1190,7 +1294,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) // Slam Switch
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1201,28 +1305,28 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )    /* Bill */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )    // Bill
 
-	PORT_START("IN1")   /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* Trigger */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* Fire */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* Action */
+	PORT_START("IN1")   // Listed "names" are via the manual's "JAMMA" pinout sheet"
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY // Not Used
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY // Not Used
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY // Not Used
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY // Not Used
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Trigger
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // Fire
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Action
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_8WAY /* No Connection */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_8WAY /* No Connection */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_8WAY /* No Connection */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY /* No Connection */
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* No Connection */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* No Connection */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* No Connection */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_8WAY // No Connection
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_8WAY // No Connection
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_8WAY // No Connection
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY // No Connection
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // No Connection
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // No Connection
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // No Connection
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(midzeus_state, custom_49way_r)
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(thegrid_state, custom_49way_r)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("49WAYX")
@@ -1232,23 +1336,23 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
 	PORT_START("KEYPAD")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)     /* keypad 1 */
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)     /* keypad 4 */
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)     /* keypad 7 */
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_ASTERISK)  /* keypad * */
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)     /* keypad 2 */
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)     /* keypad 5 */
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)     /* keypad 8 */
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)     /* keypad 0 */
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)     /* keypad 3 */
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)     /* keypad 6 */
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)     /* keypad 9 */
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)  /* keypad # */
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)     // keypad 1
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)     // keypad 4
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)     // keypad 7
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_ASTERISK)  // keypad *
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)     // keypad 2
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)     // keypad 5
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)     // keypad 8
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)     // keypad 0
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)     // keypad 3
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)     // keypad 6
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)     // keypad 9
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)  // keypad #
 
-	PORT_START("TRACKX1")
+	PORT_START("TRACKX")
 	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
-	PORT_START("TRACKY1")
+	PORT_START("TRACKY")
 	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_REVERSE PORT_PLAYER(1)
 
 INPUT_PORTS_END
@@ -1261,28 +1365,41 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
+
 void midzeus_state::midzeus(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS32032(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus_state::display_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
-	PALETTE(config, "palette").set_entries(32768);
+	// video hardware
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
 	m_screen->set_screen_update(FUNC(midzeus_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
-	/* sound hardware */
-	DCS2_AUDIO_2104(config, "dcs", 0);
+	// sound hardware
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag("dcs");
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(94);
 }
 
@@ -1293,38 +1410,51 @@ void midzeus_state::mk4(machine_config &config)
 	m_ioasic->set_shuffle_default(1);
 }
 
-void midzeus_state::invasn(machine_config &config)
+void invasnab_state::invasn(machine_config &config)
 {
 	midzeus(config);
-	PIC16C57(config, "pic", 8000000);  /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &invasnab_state::invasnab_map);
+
+	PIC16C57(config, "pic", 8000000);  // ?
 	m_ioasic->set_upper(468/* or 488 */);
 }
 
 void midzeus2_state::midzeus2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS32032(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus2_state::display_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 4, 666, 0, 512, 438, 0, 400);
-	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
+	m_screen->set_raw(ZEUS2_VIDEO_CLOCK / 4, 666, 0, 512, 438, 0, 400);
+	m_screen->set_screen_update(m_zeus, FUNC(zeus2_device::screen_update));
 
 	ZEUS2(config, m_zeus, ZEUS2_VIDEO_CLOCK);
 	m_zeus->irq_callback().set(FUNC(midzeus2_state::zeus_irq));
 
-	/* sound hardware */
-	DCS2_AUDIO_2104(config, "dcs", 0);
+	// sound hardware
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs.set_maincpu_tag(m_maincpu);
+	dcs.add_route(0, "rspeaker", 1.0);
+	dcs.add_route(1, "lspeaker", 1.0);
 
 	M48T35(config, m_m48t35, 0);
 
-	/* I/O hardware */
+	// I/O hardware
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag("dcs");
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
 
@@ -1337,15 +1467,19 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_fw_link->phy_write().set(m_fw_phy, FUNC(ibm21s851_device::write));
 }
 
-void midzeus2_state::crusnexo(machine_config &config)
+void crusnexo_state::crusnexo(machine_config &config)
 {
 	midzeus2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &crusnexo_state::crusnexo_map);
+
 	m_ioasic->set_upper(472/* or 476,477,478,110 */);
 }
 
-void midzeus2_state::thegrid(machine_config &config)
+void thegrid_state::thegrid(machine_config &config)
 {
 	midzeus2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &thegrid_state::thegrid_map);
+
 	PIC16C57(config, "pic", 8000000).set_disable();  // unverified clock, not hooked up
 	m_ioasic->set_upper(474/* or 491 */);
 }
@@ -1368,7 +1502,7 @@ ROM_START( mk4 )
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
 	ROM_LOAD( "461_mortal_k_4_25_u76.u76", 0x0000, 0x2000, CRC(d4432af9) SHA1(44a4b114f9b2075fdc611c011123a37b99458752) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x1800000, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "mk4_l3.u10", 0x0000000, 0x200000, CRC(84efe5a9) SHA1(e2a9bf6fab971691017371a87ab87b1bf66f96d0) ) // ROMs U10 & U11 were labeled as v3.0
 	ROM_LOAD32_WORD( "mk4_l3.u11", 0x0000002, 0x200000, CRC(0c026ccb) SHA1(7531fe81ff8d8dd9ec3cd915acaf14cbe6bdc90a) )
 	ROM_LOAD32_WORD( "mk4_l2.u12", 0x0400000, 0x200000, CRC(7816c07f) SHA1(da94b4391e671f915c61b5eb9bece4acb3382e31) ) // ROMs U12 through U17 were all labeled as v2.0
@@ -1390,7 +1524,7 @@ ROM_START( mk4a )
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
 	ROM_LOAD( "461_mortal_k_4_25_u76.u76", 0x0000, 0x2000, CRC(d4432af9) SHA1(44a4b114f9b2075fdc611c011123a37b99458752) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x1800000, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "mk4_l2.1.u10", 0x0000000, 0x200000, CRC(42d0f1c9) SHA1(5ac0ded8bf6e756319be2691e3b555eac079ebdc) ) // ROMs U10 & U11 were labeled as v2.1
 	ROM_LOAD32_WORD( "mk4_l2.1.u11", 0x0000002, 0x200000, CRC(6e21b243) SHA1(6d4768a5972db05c1409e0d16e79df9eff8918a0) )
 	ROM_LOAD32_WORD( "mk4_l2.u12",   0x0400000, 0x200000, CRC(7816c07f) SHA1(da94b4391e671f915c61b5eb9bece4acb3382e31) ) // ROMs U12 through U17 were all labeled as v2.0
@@ -1412,7 +1546,7 @@ ROM_START( mk4b )
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
 	ROM_LOAD( "461_mortal_k_4_25_u76.u76", 0x0000, 0x2000, CRC(d4432af9) SHA1(44a4b114f9b2075fdc611c011123a37b99458752) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x1800000, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "mk4_l1.u10", 0x0000000, 0x200000, CRC(6fcc86dd) SHA1(b3b2b463daf51450fbcd5d2922ac1b091bd91c4a) ) // All ROMs were labeled as v1.0
 	ROM_LOAD32_WORD( "mk4_l1.u11", 0x0000002, 0x200000, CRC(04895940) SHA1(55d368905f5986587c4e3da236401fdd5e2c269c) )
 	ROM_LOAD32_WORD( "mk4_l1.u12", 0x0400000, 0x200000, CRC(323ddc5c) SHA1(4303c109c68a7cc15ff6fe91b6d34383b6066351) )
@@ -1432,7 +1566,7 @@ ROM_START( invasnab ) // Version 5.0 Program ROMs, v4.0 Graphics ROMs, v2.0 Soun
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, BAD_DUMP CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
 
-	ROM_REGION32_LE( 0x1800000, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "invasion5.u10", 0x0000000, 0x200000, CRC(8c7785d9) SHA1(701602314cd4eba4215c47ea0ae75fd4eddad43b) ) // ROMs U10 & U11 were labeled as v5.0
 	ROM_LOAD32_WORD( "invasion5.u11", 0x0000002, 0x200000, CRC(8ceb1f32) SHA1(82d01f25cba25d77b11c347632e8b72776e12984) )
 	ROM_LOAD32_WORD( "invasion4.u12", 0x0400000, 0x200000, CRC(ce1eb06a) SHA1(ff17690a0cbca6dcccccde70e2c5812ae03db5bb) ) // ROMs U12 through U19 were all labeled as v4.0
@@ -1455,7 +1589,7 @@ ROM_START( invasnab4 ) // Version 4.0 Program ROMs & Graphics ROMs, v2.0 Sound R
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, BAD_DUMP CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
 
-	ROM_REGION32_LE( 0x1800000, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "invasion4.u10", 0x0000000, 0x200000, CRC(b3ce958b) SHA1(ed51c167d85bc5f6155b8046ec056a4f4ad5cf9d) ) // These ROM were all labeled as v4.0
 	ROM_LOAD32_WORD( "invasion4.u11", 0x0000002, 0x200000, CRC(0bd09359) SHA1(f40886bd2e5f5fbf506580e5baa2f733be200852) )
 	ROM_LOAD32_WORD( "invasion4.u12", 0x0400000, 0x200000, CRC(ce1eb06a) SHA1(ff17690a0cbca6dcccccde70e2c5812ae03db5bb) )
@@ -1478,7 +1612,7 @@ ROM_START( invasnab3 ) // Version 3.0 Program ROMs & v2.0 Graphics ROMs, v2.0 So
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, BAD_DUMP CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
 
-	ROM_REGION32_LE( 0x1800000, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "invasion3.u10", 0x0000000, 0x200000, CRC(8404830e) SHA1(808fea45fb09fb7bf60f9f1e195a51d39e9966f5) ) // ROMs U10 through U13 were labeled as v3.0 Dated 8/30
 	ROM_LOAD32_WORD( "invasion3.u11", 0x0000002, 0x200000, CRC(cb893a37) SHA1(c0b8283d9b6b2b1a5fed7f542a8964ed875182b1) )
 	ROM_LOAD32_WORD( "invasion3.u12", 0x0400000, 0x200000, CRC(79bfa881) SHA1(7c68a2f236223506f24a38d21836d132f2e10ac3) )
@@ -1545,13 +1679,13 @@ ROM_START( crusnexo )
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_2.4.u10", 0x0000000, 0x200000, CRC(5e702f7c) SHA1(98c76fb46b304d4d21656d0505d5e5e99c8335bf) ) // Version 2.4  Wed Aug 23, 2000  17:26:53
 	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_2.4.u11", 0x0000002, 0x200000, CRC(5ecb2cbc) SHA1(57283167e48ca96579d0712d9fec23a36fa2b496) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
 	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
@@ -1576,13 +1710,13 @@ ROM_START( crusnexoa )
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_2.0.u10", 0x0000000, 0x200000, CRC(43d80f54) SHA1(25683d835f3ed3dee99da33280ae6e21865801e4) ) // Version 2.0  Fri Apr 07, 2000  17:55:07
 	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_2.0.u11", 0x0000002, 0x200000, CRC(dba26b69) SHA1(4900ac3fe67664a543dcd66e41793874f6cdc07f) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
 	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
@@ -1607,13 +1741,13 @@ ROM_START( crusnexoaa ) // known alternate ROM configuration - The half size U18
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_2.0.u10", 0x0000000, 0x200000, CRC(43d80f54) SHA1(25683d835f3ed3dee99da33280ae6e21865801e4) ) // Version 2.0  Fri Apr 07, 2000  17:55:07
 	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_2.0.u11", 0x0000002, 0x200000, CRC(dba26b69) SHA1(4900ac3fe67664a543dcd66e41793874f6cdc07f) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
 	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
@@ -1639,13 +1773,13 @@ ROM_START( crusnexob )
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_1.6.u10", 0x0000000, 0x200000, CRC(65450140) SHA1(cad41a2cad48426de01feb78d3f71f768e3fc872) ) // Version 1.6  Tue Feb 22, 2000  10:25:01
 	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_1.6.u11", 0x0000002, 0x200000, CRC(e994891f) SHA1(bb088729b665864c7f3b79b97c3c86f9c8f68770) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
 	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
@@ -1670,13 +1804,13 @@ ROM_START( crusnexoc )
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev_1.3.u10", 0x0000000, 0x200000, CRC(ab7f1b5e) SHA1(c0c561e8cb15fd97465278b4b3b15acb27380c5d) ) // Version 1.3  Fri Feb 11, 2000  16:19:13
 	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev_1.3.u11", 0x0000002, 0x200000, CRC(62d3c966) SHA1(9a485892295984a292501424d2c78caafac99a75) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) ) // These 2 ROMs might be labeled as a different version,
 	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) ) // but the data doesn't change. Verified for v1.3 & v1.6
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
@@ -1701,13 +1835,13 @@ ROM_START( crusnexod )
 	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
 	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u10_rev.1.0.u10", 0x0000000, 0x200000, CRC(305fe2c1) SHA1(5d12163da0ae6db7d8d1f64f79c767a3c7df29a0) ) // Version 1.0  Tue Feb 08, 2000  13:22:04
 	ROM_LOAD32_WORD( "cruisn_exotica_u11_rev.1.0.u11", 0x0000002, 0x200000, CRC(50b241ff) SHA1(b8a353d9420009c4e521bb088575d704a7f386b3) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u12_rev.1.0.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u13_rev.1.0.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) )
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
 	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
@@ -1731,13 +1865,13 @@ ROM_START( thegrid ) // Version 1.2 Program ROMs
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
 	ROM_LOAD( "pic16c57.u76", 0x0000, 0x1fff, CRC(8234d466) SHA1(5737e355d3262cd0b13191cdf9b49dd74f69dd15) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "thegrid-12.u10", 0x0000000, 0x100000, CRC(eb6c2d54) SHA1(ddd32757a9be011988b7add3c091e93292a0867c) )
 	ROM_LOAD32_WORD( "thegrid-12.u11", 0x0000002, 0x100000, CRC(b9b5f92b) SHA1(36e16f109af9a5172869344f09b337b67e0b3e11) )
 	ROM_LOAD32_WORD( "thegrid-12.u12", 0x0200000, 0x100000, CRC(2810c207) SHA1(d244eaf85473ed49442a906d437af1a9f91a2f9d) )
 	ROM_LOAD32_WORD( "thegrid-12.u13", 0x0200002, 0x100000, CRC(8b721848) SHA1(d82f39045437ada2061587176e24f558a5e203fe) )
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
 	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
 	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
@@ -1756,13 +1890,13 @@ ROM_START( thegrida ) // Version 1.1 Program ROMs
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
 	ROM_LOAD( "pic16c57.u76", 0x0000, 0x1fff, CRC(8234d466) SHA1(5737e355d3262cd0b13191cdf9b49dd74f69dd15) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "thegrid-11.u10", 0x0000000, 0x100000, CRC(87ea0e9e) SHA1(618de2ca87b7a3e0225d1f7e65f8fc1356de1421) )
 	ROM_LOAD32_WORD( "thegrid-11.u11", 0x0000002, 0x100000, CRC(73d84b1a) SHA1(8dcfcab5ff64f46f8486e6439a10d91ad26fd48a) )
 	ROM_LOAD32_WORD( "thegrid-11.u12", 0x0200000, 0x100000, CRC(78d16ca1) SHA1(7b893ec8af2f44d8bc293861fd8622d68d41ccbe) )
 	ROM_LOAD32_WORD( "thegrid-11.u13", 0x0200002, 0x100000, CRC(8e00b400) SHA1(96581c5da62afc19e6d69b2352b3166665cb9918) )
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
 	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
 	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
@@ -1780,13 +1914,13 @@ ROM_START( thegridb ) // Version 1.01 Program ROMs
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C57
 	ROM_LOAD( "pic16c57.u76", 0x0000, 0x1fff, CRC(8234d466) SHA1(5737e355d3262cd0b13191cdf9b49dd74f69dd15) ) // decapped but not hooked up
 
-	ROM_REGION32_LE( 0x0800000, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_54e6.u10", 0x0000000, 0x100000, CRC(cd0bf7c3) SHA1(8b490955381c078443e048dadd78fa931754bd0f) )
 	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_568d.u11", 0x0000002, 0x100000, CRC(ffea0d0a) SHA1(f0fe36b9f2fe890957a0dcc05bb091a78357cced) )
 	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_a117.u12", 0x0200000, 0x100000, CRC(ad54ad55) SHA1(2c7175bed85c75070357c83009527229e4943fe0) )
 	ROM_LOAD32_WORD( "mpg_the_grid_1-17-00_ver1.01_5694.u13", 0x0200002, 0x100000, CRC(976a3ab8) SHA1(6e521525208358f270a4961cad408ed598a25c88) )
 
-	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
 	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
 	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
 	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
@@ -1799,57 +1933,22 @@ ROM_END
 
 /*************************************
  *
- *  Driver init
- *
- *************************************/
-
-void midzeus_state::init_mk4()
-{
-}
-
-
-void midzeus_state::init_invasn()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9c0000, 0x9c0000, read32smo_delegate(*this, FUNC(midzeus_state::invasn_gun_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9c0000, 0x9c0000, write32s_delegate(*this, FUNC(midzeus_state::invasn_gun_w)));
-}
-
-
-void midzeus2_state::init_crusnexo()
-{
-	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32sm_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_r)), write32sm_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32sm_delegate(*this, FUNC(midzeus_state::keypad_select_w)));
-}
-
-
-void midzeus2_state::init_thegrid()
-{
-	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32sm_delegate(*this, FUNC(midzeus_state::trackball_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32sm_delegate(*this, FUNC(midzeus_state::grid_keypad_r)));
-}
-
-
-
-/*************************************
- *
  *  Game drivers
  *
  *************************************/
 
-GAME(  1997, mk4,        0,        mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4a,       mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4b,       mk4,      mk4,      mk4,      midzeus_state,  init_mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab,   0,        invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab4,  invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab3,  invasnab, invasn,   invasn,   midzeus_state,  init_invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1999, crusnexo,   0,        crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoa,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoaa, crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0, alternate ROM format)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexob,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoc,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexod,  crusnexo, crusnexo, crusnexo, midzeus2_state, init_crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAME(  2000, thegrid,    0,        thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.2)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 10/16/00
-GAME(  2000, thegrida,   thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.1)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/26/00
-GAME(  2000, thegridb,   thegrid,  thegrid,  thegrid,  midzeus2_state, init_thegrid,  ROT0, "Midway", "The Grid (version 1.01)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/17/00
+GAME(  1997, mk4,        0,        mk4,      mk4,      midzeus_state,  empty_init, ROT0, "Midway", "Mortal Kombat 4 (version 3.0)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4a,       mk4,      mk4,      mk4,      midzeus_state,  empty_init, ROT0, "Midway", "Mortal Kombat 4 (version 2.1)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4b,       mk4,      mk4,      mk4,      midzeus_state,  empty_init, ROT0, "Midway", "Mortal Kombat 4 (version 1.0)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab,   0,        invasn,   invasn,   invasnab_state, empty_init, ROT0, "Midway", "Invasion - The Abductors (version 5.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab4,  invasnab, invasn,   invasn,   invasnab_state, empty_init, ROT0, "Midway", "Invasion - The Abductors (version 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab3,  invasnab, invasn,   invasn,   invasnab_state, empty_init, ROT0, "Midway", "Invasion - The Abductors (version 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1999, crusnexo,   0,        crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 2.4)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoa,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 2.0)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoaa, crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 2.0, alternate ROM format)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexob,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.6)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoc,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.3)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexod,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.0)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAME(  2000, thegrid,    0,        thegrid,  thegrid,  thegrid_state,  empty_init, ROT0, "Midway", "The Grid (version 1.2)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 10/16/00
+GAME(  2000, thegrida,   thegrid,  thegrid,  thegrid,  thegrid_state,  empty_init, ROT0, "Midway", "The Grid (version 1.1)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/26/00
+GAME(  2000, thegridb,   thegrid,  thegrid,  thegrid,  thegrid_state,  empty_init, ROT0, "Midway", "The Grid (version 1.01)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/17/00

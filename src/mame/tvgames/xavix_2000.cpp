@@ -286,5 +286,5 @@ CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_sta
 CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
 CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// hangs after starting a game, or after quite a long time in attract mode (first problem could be bad save data read with the eeprom code, 2nd problem might just be how it is, ends up in a dead loop, not executing invalid code, idle timeout / battery saver)
-CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// hangs after starting a game, check why
+CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

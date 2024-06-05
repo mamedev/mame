@@ -548,7 +548,7 @@ void menu_font_ui::recompute_metrics(uint32_t width, uint32_t height, float aspe
 //  perform our special rendering
 //-------------------------------------------------
 
-void menu_font_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_font_ui::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	if (uintptr_t(selectedref) == INFOS_SIZE)
 	{
@@ -670,7 +670,7 @@ void menu_colors_ui::recompute_metrics(uint32_t width, uint32_t height, float as
 //  perform our special rendering
 //-------------------------------------------------
 
-void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_colors_ui::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// get the text for 'UI Select'
 	std::string const bottomtext[] = { util::string_format(_("Double-click or press %1$s to change color"), ui().get_general_input_setting(IPT_UI_SELECT)) };
@@ -963,7 +963,7 @@ void menu_rgb_ui::recompute_metrics(uint32_t width, uint32_t height, float aspec
 //  perform our special rendering
 //-------------------------------------------------
 
-void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_rgb_ui::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float maxwidth = origx2 - origx1;
 

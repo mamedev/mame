@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/uda1344.h"
+#include "uda1344.h"
 
 #define LOG_ADDR            (1U << 1)
 #define LOG_STATUS_REG      (1U << 2)

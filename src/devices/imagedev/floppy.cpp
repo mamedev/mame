@@ -1263,25 +1263,6 @@ uint32_t floppy_image_device::hash32(uint32_t a) const
 	return a;
 }
 
-int floppy_image_device::find_index(uint32_t position, const std::vector<uint32_t> &buf)const
-{
-	int spos = (buf.size() >> 1)-1;
-	int step;
-	for(step=1; step<buf.size()+1; step<<=1) { }
-	step >>= 1;
-
-	for(;;) {
-		if(spos >= int(buf.size()) || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
-			spos -= step;
-			step >>= 1;
-		} else if(spos < 0 || (spos < int(buf.size())-1 && (buf[spos+1] & floppy_image::TIME_MASK) <= position)) {
-			spos += step;
-			step >>= 1;
-		} else
-			return spos;
-	}
-}
-
 uint32_t floppy_image_device::find_position(attotime &base, const attotime &when)
 {
 	base = m_revolution_start_time;
@@ -1360,6 +1341,7 @@ void floppy_image_device::cache_fill(const attotime &when)
 	);
 
 	int index = int(it - buf.begin()) - 1;
+
 	if(index == -1) {
 		base -= m_rev_time;
 		index = buf.size() - 1;

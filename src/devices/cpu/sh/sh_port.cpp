@@ -104,6 +104,6 @@ void sh_port32_device::io_w(offs_t, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_io);
 	m_io &= ~m_mask;
 	if(m_io)
-		m_cpu->do_write_port32(m_index, m_dr & m_io, m_io);	
+		m_cpu->do_write_port32(m_index, m_dr & m_io, m_io);
 }
 

@@ -32,7 +32,7 @@ void mpeg_audio::clear()
 }
 
 bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
-								int &output_samples, int &sample_rate, int &channels)
+								int &output_samples, int &sample_rate, int &channels, int atbl)
 {
 	if(limit - pos < 16)
 		return false;
@@ -44,6 +44,7 @@ bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 
 	current_pos = pos;
 	current_limit = limit;
+	cbr_param_index = atbl;
 	unsigned short sync = do_gb(base, current_pos, 12);
 
 	retry_sync:
@@ -124,15 +125,24 @@ bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 
 void mpeg_audio::read_header_amm(bool layer25)
 {
-	gb(1); // unused
+	int ammsl = gb(1); // 1 = older AMM variant, CBR and constant frame size
 	int full_packets_count = gb(4); // max 12
 	int srate_index = gb(2); // max 2
 	sampling_rate = srate_index + 4 * layer25;
 	int last_packet_frame_id = gb(2); // max 2
-	last_frame_number = 3*full_packets_count + last_packet_frame_id;
 	int stereo_mode = gb(2);
 	int stereo_mode_ext = gb(2);
-	param_index = gb(3);
+	if (ammsl)
+	{
+		last_frame_number = 36;
+		param_index = cbr_param_index; // CBR, param_index came from sample pointer top bits
+		gb(3);
+	}
+	else
+	{
+		last_frame_number = 3*full_packets_count + last_packet_frame_id;
+		param_index = gb(3);
+	}
 	gb(1); // must be zero
 
 	channel_count = stereo_mode != 3 ? 2 : 1;

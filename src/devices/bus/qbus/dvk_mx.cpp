@@ -53,6 +53,38 @@
 DEFINE_DEVICE_TYPE(DVK_MX, dvk_mx_device, "dvk_mx", "DVK MX floppy controller")
 
 
+
+inline dvk_mx_device::floppy_info::floppy_info()
+	: tm(nullptr)
+	, dev(nullptr)
+	, id(0)
+	, main_state(0)
+	, sub_state(0)
+	, dir(0)
+	, counter(0)
+	, live(false)
+	, index(false)
+{
+}
+
+
+inline dvk_mx_device::live_info::live_info()
+	: tm(attotime::never)
+	, state(IDLE)
+	, next_state(-1)
+	, fi(nullptr)
+	, shift_reg(0)
+	, bit_counter(0)
+	, byte_counter(0)
+	, data_separator_phase(false)
+	, data_reg(0)
+	, cksum(0)
+	, pll()
+{
+}
+
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -66,10 +98,6 @@ dvk_mx_device::dvk_mx_device(const machine_config &mconfig, const char *tag, dev
 	, device_qbus_card_interface(mconfig, *this)
 	, m_connectors(*this, "%u", 0U)
 {
-	memset(&cur_live, 0x00, sizeof(cur_live));
-	cur_live.tm = attotime::never;
-	cur_live.state = IDLE;
-	cur_live.next_state = -1;
 }
 
 

@@ -432,15 +432,15 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	NSRange const run = NSMakeRange(0, [text length]);
 	[text addAttribute:NSFontAttributeName value:font range:run];
 	NSPasteboard *const board = [NSPasteboard generalPasteboard];
-	[board declareTypes:[NSArray arrayWithObject:NSRTFPboardType] owner:nil];
-	[board setData:[text RTFFromRange:run documentAttributes:[NSDictionary dictionary]] forType:NSRTFPboardType];
+	[board declareTypes:[NSArray arrayWithObject:NSPasteboardTypeRTF] owner:nil];
+	[board setData:[text RTFFromRange:run documentAttributes:[NSDictionary dictionary]] forType:NSPasteboardTypeRTF];
 	[text deleteCharactersInRange:run];
 }
 
 
 - (IBAction)paste:(id)sender {
 	NSPasteboard *const board = [NSPasteboard generalPasteboard];
-	NSString *const avail = [board availableTypeFromArray:[NSArray arrayWithObject:NSStringPboardType]];
+	NSString *const avail = [board availableTypeFromArray:[NSArray arrayWithObject:NSPasteboardTypeString]];
 	if (avail == nil)
 	{
 		NSBeep();
@@ -921,7 +921,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	if (action == @selector(paste:))
 	{
 		NSPasteboard *const board = [NSPasteboard generalPasteboard];
-		return [board availableTypeFromArray:[NSArray arrayWithObject:NSStringPboardType]] != nil;
+		return [board availableTypeFromArray:[NSArray arrayWithObject:NSPasteboardTypeString]] != nil;
 	}
 	else
 	{

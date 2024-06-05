@@ -15,7 +15,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "machine/w83977tf.h"
+#include "w83977tf.h"
 
 //#include "machine/ds128x.h"
 #include "machine/pckeybrd.h"

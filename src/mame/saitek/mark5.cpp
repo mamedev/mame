@@ -502,5 +502,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, ccmk5, 0,      0,      mark5,   mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, ccmk6, ccmk5,  0,      mark6,   mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, ccmk5, 0,      0,      mark5,   mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, ccmk6, ccmk5,  0,      mark6,   mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE )

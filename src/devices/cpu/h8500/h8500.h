@@ -46,17 +46,15 @@ protected:
 	virtual bool h8_maximum_mode() const noexcept { return m_mode_control == 3 || m_mode_control == 4; } // all except H8/570
 
 private:
-	void ram_map(address_map &map);
 	void debug_set_pc(offs_t pc) noexcept;
 
 	// address spaces
 	address_space_config m_program_config;
-	address_space_config m_ram_config;
 	address_space *m_program;
-	memory_access<11, 1, 0, ENDIANNESS_BIG>::cache m_ram_cache;
 
 	// misc. configuration
 	u8 m_mode_control;
+	[[maybe_unused]] u16 m_ram_size;
 
 	// internal registers
 	u16 m_pc;

@@ -15,6 +15,7 @@
 
 #include "formats/atari_dsk.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdarg>
 
@@ -741,8 +742,8 @@ static const floppy_interface atari_floppy_interface =
 
 DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC")
 
-atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATARI_FDC, tag, owner, clock),
+atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ATARI_FDC, tag, owner, clock),
 	m_floppy(*this, "floppy%u", 0U),
 	m_pokey(*this, "^pokey"),
 	m_pia(*this, "^pia"),
@@ -763,9 +764,10 @@ atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *ta
 
 void atari_fdc_device::device_start()
 {
-	memset(m_serout_buff, 0, sizeof(m_serout_buff));
-	memset(m_serin_buff, 0, sizeof(m_serin_buff));
-	memset(m_drv, 0, sizeof(m_drv));
+	std::fill(std::begin(m_serout_buff), std::end(m_serout_buff), 0);
+	std::fill(std::begin(m_serin_buff), std::end(m_serin_buff), 0);
+	for (auto &drv : m_drv)
+		drv = atari_drive();
 
 	for (auto &floppy : m_floppy)
 		floppy->floppy_install_load_proc(_atari_load_proc);

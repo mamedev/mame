@@ -118,11 +118,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- doesn't boot -->
 	<software name="noexit" supported="no">
 		<description>No Exit</description>
 		<year>1990</year>
 		<publisher>CVS</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="noexit.bin" size="131072" crc="28f64ce1" sha1="270844966810b91529d70f3c68f41e3986646659"/>
@@ -130,8 +132,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- doesn't boot -->
-	<software name="othunder" supported="no">
+	<software name="othunder" supported="yes">
 		<description>Operation Thunderbolt</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
@@ -142,7 +143,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- minor gfx glitch -->
 	<software name="pang">
 		<description>Pang</description>
 		<year>1990</year>
@@ -165,7 +165,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- glitched title screen -->
 	<software name="pinmagic">
 		<description>Pinball Magic</description>
 		<year>1991</year>
@@ -199,11 +198,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- doesn't boot -->
-	<software name="robocop2" supported="no">
+	<software name="robocop2" supported="partial">
 		<description>Robocop 2</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
+		<notes><![CDATA[
+Glitched GFX line on player sprite first life, doesn't occur on any other life during same session (verify)
+]]></notes>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="robocop2.bin" size="131072" crc="426bfabc" sha1="5eb7e056a19cb69c45c3bc575c5ed196e7fbd1f5"/>
@@ -211,11 +212,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- needs light phazer -->
-	<software name="skeetsh">
+	<software name="skeetsh" supported="no">
 		<description>Skeet Shoot</description>
 		<year>1990</year>
 		<publisher>Trojan</publisher>
+		<info name="usage" value="Requires Light Phazer input device"/>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sktshoot.bin" size="131072" crc="24e7334d" sha1="360f2a0538bdaf15c3a69bf8eb82dcb358fbe1d5"/>
@@ -245,11 +246,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- needs light phazer -->
 	<software name="enforcer">
 		<description>The Enforcer</description>
 		<year>1990</year>
 		<publisher>Trojan</publisher>
+		<info name="usage" value="Requires Light Phazer input device"/>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="enforcer.bin" size="131072" crc="69f813a7" sha1="f188716e69c54c8ffed3b56f12aec3bcdb6eabce"/>
@@ -257,11 +258,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- crashes at language select -->
-	<software name="tintin">
+	<software name="tintin" supported="partial">
 		<description>Tintin On The Moon</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Corrupted GFXs transitons around language select screen, [MC6845] abuse?
+]]></notes>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="tintin.bin" size="131072" crc="72320df4" sha1="3b3a1f870dff22fa0952f2da93e3dc90daef90cc"/>
@@ -280,11 +283,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- glitched title screen -->
-	<software name="worldspt">
+	<software name="worldspt" supported="partial">
 		<description>World of Sports</description>
 		<year>1990</year>
 		<publisher>EPYX</publisher>
+		<notes><![CDATA[
+Glitched title screen
+]]></notes>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="wrldsprt.bin" size="131072" crc="5cecc439" sha1="6bc5271370eb1ee92f809874f7ef346c2117f9cd"/>
@@ -292,8 +297,10 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!--                   -->
+	<!-- CPC+ System Carts -->
+	<!--                   -->
 
-<!-- CPC+ System Carts -->
 	<software name="sysuk">
 		<description>Burnin' Rubber + Locomotive BASIC</description>
 		<year>1990</year>
@@ -316,11 +323,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- These need French keyboard to fully work -->
 	<software name="sysfr" supported="partial">
 		<description>Burnin' Rubber + Locomotive BASIC (France)</description>
 		<year>1990</year>
 		<publisher>Amstrad</publisher>
+		<info name="usage" value="Requires French keyboard"/>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="plus_fr.bin" size="131072" crc="26ebc1fe" sha1="8f8031e24440d2f1174d21faabb3b0134266daf2"/>
@@ -328,11 +335,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- This was released in France  to address the Plus range incompatibilities with some software designed for the classic CPC range. -->
 	<software name="sysfrv3" cloneof="sysfr" supported="partial">
 		<description>BASIC Cartouche (France, with OS v3)</description>
 		<year>1990</year>
 		<publisher>Amstrad</publisher>
+		<notes><![CDATA[
+This was released in France to address the Plus range incompatibilities with some software designed for the classic CPC range.
+]]></notes>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="basic (f) (white label).bin" size="65536" crc="37e17647" sha1="c977841fdf09151394b49035a53ee5d049b38891"/>
@@ -351,11 +360,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- These need Spanish keyboard to fully work -->
 	<software name="syses" supported="partial">
 		<description>Burnin' Rubber + Locomotive BASIC (Spain)</description>
 		<year>1990</year>
 		<publisher>Amstrad</publisher>
+		<info name="usage" value="Requires Spanish keyboard"/>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="plus_es.bin" size="131072" crc="5d336a70" sha1="d9f93ed0f4790a078317f7bde8ec6bf838c965e1"/>

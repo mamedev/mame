@@ -52,7 +52,7 @@ AUDIO:
 - IRQ - ?
 - NMI - triggered by main cpu, sound latch read
 - AY-3-8910
-- PPI (8253) - used to sync the audio
+- PIT (8253) - used to sync the audio
 - game works without the sound cpu
 
 +-----------------------------------------------------------------------------------------------------------------------------------+
@@ -341,7 +341,7 @@ void vampire_state::blit_trigger(offs_t offset)
 		const u8 pen = slot[5]; // 0xf is max used
 
 		const int32_t sy = 256 - slot[2]; // pixels
-		const int32_t sx = ((32 - slot[3])) << 3; // bytes (src ROM)
+		const int32_t sx = (32 - slot[3]) << 3; // bytes (src ROM)
 
 		for (int yy = 0; yy < sy; ++yy)
 		{

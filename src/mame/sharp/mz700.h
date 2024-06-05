@@ -3,7 +3,7 @@
 /******************************************************************************
  *  Sharp MZ700
  *
- *  Reference: http://sharpmz.computingmuseum.com
+ *  Reference: https://original.sharpmz.org/
  *
  ******************************************************************************/
 #ifndef MAME_SHARP_MZ700_H

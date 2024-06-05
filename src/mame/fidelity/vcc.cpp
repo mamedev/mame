@@ -445,7 +445,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, vcc,  0,      0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, vcca, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, vcc,  0,      0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, vcca, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, uvc,  vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, uvc,  vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE )

@@ -810,6 +810,6 @@ void rulechan_state::rulechan_init()
 *           Game Driver(s)            *
 **************************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY          FULLNAME                            FLAGS                                                                   LAYOUT
-GAMEL(1991, rulechan, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N322)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK, layout_rulechan)
-GAMEL(1991, rulechab, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N165)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK, layout_rulechan)
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY          FULLNAME                            FLAGS                                       LAYOUT
+GAMEL(1991, rulechan, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N322)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_rulechan)
+GAMEL(1991, rulechab, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N165)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_rulechan)

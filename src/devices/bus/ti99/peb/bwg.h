@@ -39,13 +39,12 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -113,7 +112,7 @@ private:
 	required_device<ram_device> m_buffer_ram;
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Currently selected floppy drive (1-4, 0=none)
 	int m_sel_floppy;

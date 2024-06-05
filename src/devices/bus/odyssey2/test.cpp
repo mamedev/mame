@@ -18,12 +18,34 @@ Hold UP to advance to next test.
 #include "emu.h"
 #include "test.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_TEST, o2_test_device, "o2_test", "Videopac Service Test Cartridge")
-
+namespace {
 
 //-------------------------------------------------
-//  o2_test_device - constructor
+//  initialization
 //-------------------------------------------------
+
+class o2_test_device : public device_t, public device_o2_cart_interface
+{
+public:
+	o2_test_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void cart_init() override;
+
+	virtual u8 read_rom04(offs_t offset) override { return m_rom[offset]; }
+	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset + 0x400]; }
+	virtual void bus_write(u8 data) override { m_bus_data = data; }
+
+	virtual void write_p1(u8 data) override;
+
+private:
+	output_finder<> m_digit_out;
+
+	u8 m_control = 0;
+	u8 m_bus_data = 0;
+};
 
 o2_test_device::o2_test_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_TEST, tag, owner, clock),
@@ -63,3 +85,8 @@ void o2_test_device::write_p1(u8 data)
 
 	m_control = data;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(O2_ROM_TEST, device_o2_cart_interface, o2_test_device, "o2_test", "Videopac Service Test Cartridge")

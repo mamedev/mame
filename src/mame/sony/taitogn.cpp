@@ -332,7 +332,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "emu.h"
 #include "zn.h"
 
-#include "machine/ataflash.h"
+#include "bus/pccard/ataflash.h"
 #include "machine/intelfsh.h"
 #include "machine/rf5c296.h"
 

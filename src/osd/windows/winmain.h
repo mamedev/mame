@@ -30,7 +30,8 @@ enum input_event
 	INPUT_EVENT_RAWINPUT,
 	INPUT_EVENT_ARRIVAL,
 	INPUT_EVENT_REMOVAL,
-	INPUT_EVENT_MOUSE_BUTTON
+	INPUT_EVENT_MOUSE_BUTTON,
+	INPUT_EVENT_MOUSE_WHEEL
 };
 
 struct KeyPressEventArgs
@@ -40,10 +41,12 @@ struct KeyPressEventArgs
 	uint8_t scancode;
 };
 
-struct MouseButtonEventArgs
+struct MouseUpdateEventArgs
 {
-	int button;
-	int keydown;
+	unsigned pressed;
+	unsigned released;
+	int vdelta;
+	int hdelta;
 	int xpos;
 	int ypos;
 };
@@ -77,7 +80,7 @@ public:
 	void extract_video_config();
 
 	// windows OSD specific
-	bool handle_input_event(input_event eventid, void *eventdata) const;
+	bool handle_input_event(input_event eventid, const void *eventdata) const;
 	bool should_hide_mouse() const;
 
 	virtual bool has_focus() const override;
@@ -88,10 +91,6 @@ public:
 	int window_count();
 
 	using osd_common_t::poll_input_modules; // Win32 debugger calls this directly, which it shouldn't
-
-protected:
-	virtual void build_slider_list() override;
-	virtual void update_slider_list() override;
 
 private:
 	void process_events(bool ingame, bool nodispatch);

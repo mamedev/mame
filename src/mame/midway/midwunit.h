@@ -28,7 +28,6 @@ public:
 		, m_video(*this, "video")
 		, m_dcs(*this, "dcs")
 		, m_palette(*this, "palette")
-		, m_gfxrom(*this, "gfxrom")
 		, m_midway_serial_pic(*this, "serial_security_sim")
 		, m_midway_serial_pic_emu(*this, "serial_security")
 		, m_nvram(*this, "nvram")
@@ -55,16 +54,16 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	void midwunit_cmos_enable_w(uint16_t data);
-	void midwunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t midwunit_cmos_r(offs_t offset);
-	void midwunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t midwunit_io_r(offs_t offset);
-	uint16_t midwunit_security_r();
-	void midwunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t midwunit_sound_r();
-	uint16_t midwunit_sound_state_r();
-	void midwunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cmos_enable_w(uint16_t data);
+	void cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cmos_r(offs_t offset);
+	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t io_r(offs_t offset);
+	uint16_t security_r();
+	void security_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sound_r();
+	uint16_t sound_state_r();
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void umk3_palette_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wwfmania_io_0_w(uint16_t data);
 
@@ -75,7 +74,6 @@ private:
 	required_device<midtunit_video_device> m_video;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<palette_device> m_palette;
-	required_memory_region m_gfxrom;
 
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic_emu_device> m_midway_serial_pic_emu;

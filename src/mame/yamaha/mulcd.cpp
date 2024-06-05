@@ -55,9 +55,9 @@ void mulcd_device::set_contrast(u8 contrast)
 	m_contrast = contrast;
 }
 
-void mulcd_device::set_leds(u8 leds)
+void mulcd_device::set_leds(u16 leds)
 {
-	for(int x=0; x != 6; x++)
+	for(int x=0; x != 10; x++)
 		m_led_outputs[x] = (leds >> x) & 1;
 }
 

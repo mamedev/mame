@@ -2711,6 +2711,10 @@ static INPUT_PORTS_START( nghtstru )
 	TAITO_COINAGE_US_LOC(SW A)
 INPUT_PORTS_END
 
+// default all off but Cabinet: Upright according to Jp manual.
+// jp manual also shows a Yoke-like analog test mode, and demo sounds with reversed meaning,
+// (off position -> with sounds), undumped revision?
+// NOTE: setting to Cockpit dip doesn't seem to do anything compared to Upright.
 static INPUT_PORTS_START( aquajack )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
@@ -2778,8 +2782,8 @@ static INPUT_PORTS_START( aquajack )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")   /* what is it ??? */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajckj )

@@ -22,16 +22,18 @@ class midtunit_video_device : public device_t
 {
 public:
 	// construction/destruction
-	template <typename T, typename U, typename V>
-	midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&palette_tag, V &&gfxrom_tag)
+	template <typename T>
+	midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag)
 		: midtunit_video_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_palette.set_tag(std::forward<U>(palette_tag));
-		m_gfxrom.set_tag(std::forward<V>(gfxrom_tag));
+		m_palette.set_tag(std::forward<T>(palette_tag));
 	}
 
 	midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// configuration
+	auto dma_irq_cb() { return m_dma_irq_cb.bind(); }
+	void set_gfx_rom_large(bool gfx_rom_large) { m_gfx_rom_large = gfx_rom_large; }
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
@@ -45,12 +47,10 @@ public:
 	uint16_t midtunit_vram_data_r(offs_t offset);
 	uint16_t midtunit_vram_color_r(offs_t offset);
 
-	uint16_t midtunit_dma_r(offs_t offset);
-	void midtunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void midtunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void set_gfx_rom_large(bool gfx_rom_large) { m_gfx_rom_large = gfx_rom_large; }
 
 	enum op_type_t
 	{
@@ -67,13 +67,12 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(dma_done);
 
-	required_device<tms340x0_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_memory_region m_gfxrom;
+	required_region_ptr<uint8_t> m_gfxrom;
 
 	emu_timer *m_dma_timer;
 
-	/* constants for the DMA chip */
+	// constants for the DMA chip
 	static constexpr uint32_t XPOSMASK = 0x3ff;
 	static constexpr uint32_t YPOSMASK = 0x1ff;
 
@@ -102,49 +101,51 @@ protected:
 		DMA_SCALE_Y,
 		DMA_TOPCLIP,
 		DMA_BOTCLIP,
-		DMA_UNKNOWN_E,  /* MK1/2 never write here; NBA only writes 0 */
+		DMA_UNKNOWN_E,  // MK1/2 never write here; NBA only writes 0
 		DMA_CONFIG,
-		DMA_LEFTCLIP,   /* pseudo-register */
-		DMA_RIGHTCLIP   /* pseudo-register */
+		DMA_LEFTCLIP,   // pseudo-register
+		DMA_RIGHTCLIP   // pseudo-register
 	};
 
-	/* graphics-related variables */
+	// graphics-related variables
 	uint16_t    m_midtunit_control;
 	bool        m_gfx_rom_large;
 
-	/* videoram-related variables */
+	// videoram-related variables
 	uint32_t    m_gfxbank_offset[2];
 	std::unique_ptr<uint16_t[]> m_local_videoram;
 	uint8_t     m_videobank_select;
 
-	/* DMA-related variables */
+	// DMA-related variables
 	uint16_t    m_dma_register[18];
 	struct dma_state
 	{
 		uint8_t *     gfxrom;
 
-		uint32_t      offset;         /* source offset, in bits */
-		int32_t       rowbits;        /* source bits to skip each row */
-		int32_t       xpos;           /* x position, clipped */
-		int32_t       ypos;           /* y position, clipped */
-		int32_t       width;          /* horizontal pixel count */
-		int32_t       height;         /* vertical pixel count */
-		uint16_t      palette;        /* palette base */
-		uint16_t      color;          /* current foreground color with palette */
+		uint32_t      offset;         // source offset, in bits
+		int32_t       rowbits;        // source bits to skip each row
+		int32_t       xpos;           // x position, clipped
+		int32_t       ypos;           // y position, clipped
+		int32_t       width;          // horizontal pixel count
+		int32_t       height;         // vertical pixel count
+		uint16_t      palette;        // palette base
+		uint16_t      color;          // current foreground color with palette
 
-		uint8_t       yflip;          /* yflip? */
-		uint8_t       preskip;        /* preskip scale */
-		uint8_t       postskip;       /* postskip scale */
-		int32_t       topclip;        /* top clipping scanline */
-		int32_t       botclip;        /* bottom clipping scanline */
-		int32_t       leftclip;       /* left clipping column */
-		int32_t       rightclip;      /* right clipping column */
-		int32_t       startskip;      /* pixels to skip at start */
-		int32_t       endskip;        /* pixels to skip at end */
-		uint16_t      xstep;          /* 8.8 fixed number scale x factor */
-		uint16_t      ystep;          /* 8.8 fixed number scale y factor */
+		uint8_t       yflip;          // yflip?
+		uint8_t       preskip;        // preskip scale
+		uint8_t       postskip;       // postskip scale
+		int32_t       topclip;        // top clipping scanline
+		int32_t       botclip;        // bottom clipping scanline
+		int32_t       leftclip;       // left clipping column
+		int32_t       rightclip;      // right clipping column
+		int32_t       startskip;      // pixels to skip at start
+		int32_t       endskip;        // pixels to skip at end
+		uint16_t      xstep;          // 8.8 fixed number scale x factor
+		uint16_t      ystep;          // 8.8 fixed number scale y factor
 	};
 	dma_state   m_dma_state;
+
+	devcb_write_line m_dma_irq_cb;
 
 #if DEBUG_MIDTUNIT_BLITTER
 	virtual void device_reset() override;
@@ -182,13 +183,11 @@ class midwunit_video_device : public midtunit_video_device
 {
 public:
 	// construction/destruction
-	template <typename T, typename U, typename V>
-	midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&palette_tag, V &&gfxrom_tag)
+	template <typename T>
+	midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag)
 		: midwunit_video_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_palette.set_tag(std::forward<U>(palette_tag));
-		m_gfxrom.set_tag(std::forward<V>(gfxrom_tag));
+		m_palette.set_tag(std::forward<T>(palette_tag));
 	}
 	midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -200,7 +199,6 @@ public:
 protected:
 	midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void device_start() override;
 #if DEBUG_MIDTUNIT_BLITTER
 	virtual void device_add_mconfig(machine_config &config) override;
 #endif
@@ -210,13 +208,11 @@ class midxunit_video_device : public midwunit_video_device
 {
 public:
 	// construction/destruction
-	template <typename T, typename U, typename V>
-	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&palette_tag, V &&gfxrom_tag)
+	template <typename T>
+	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag)
 		: midwunit_video_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_palette.set_tag(std::forward<U>(palette_tag));
-		m_gfxrom.set_tag(std::forward<V>(gfxrom_tag));
+		m_palette.set_tag(std::forward<T>(palette_tag));
 	}
 
 	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);

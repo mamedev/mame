@@ -4,7 +4,7 @@
 
     ui/imgcntrl.h
 
-    MESS's clunky built-in file manager
+    MAME's clunky built-in file manager
 
 ***************************************************************************/
 
@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "ui/filesel.h"
 #include "ui/menu.h"
 #include "ui/swlist.h"
 
@@ -33,7 +32,7 @@ protected:
 	{
 		START_FILE, START_OTHER_PART, START_SOFTLIST,
 		SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART,
-		SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, CHECK_CREATE, DO_CREATE, SELECT_SOFTLIST,
+		CREATE_FILE, CREATE_CONFIRM, CHECK_CREATE, DO_CREATE, SELECT_SOFTLIST,
 		LAST_ID
 	};
 
@@ -41,9 +40,7 @@ protected:
 	// results we could get from child menus
 	union
 	{
-		menu_file_selector::result filesel;
 		menu_software_parts::result swparts;
-		menu_select_rw::result rw;
 		int i;
 	} m_submenu_result;
 

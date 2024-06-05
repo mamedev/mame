@@ -26,8 +26,6 @@ public:
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 	void gclock_in(int state) override;
 
-	void insert(int index, ti99_cartridge_device* cart) override;
-	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
 	// We may have a cartridge plugged into the GK
@@ -57,7 +55,7 @@ private:
 
 	bool    m_waddr_LSB;
 
-	ti99_cartridge_device *m_cartridge;     // guest cartridge
+	required_device<ti99_cartridge_device> m_cartridge;
 
 	// Just for proper initialization
 	void gk_install_menu(const char* menutext, int len, int ptr, int next, int start);

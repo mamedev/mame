@@ -2615,7 +2615,7 @@ ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
+#define GAME_FLAGS MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL
 
 //Adder 2
 GAME( 1996, m_tppokr, 0, scorpion1_adder2, toppoker, bfm_sc1_state, init_toppoker, 0, "BFM/ELAM", "Top Poker (Dutch, Game Card 95-750-899)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

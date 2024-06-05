@@ -199,6 +199,18 @@ if (VIDEOS["DP8350"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/video/ds8874.h,VIDEOS["DS8874"] = true
+---------------------------------------------------
+
+if (VIDEOS["DS8874"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ds8874.cpp",
+		MAME_DIR .. "src/devices/video/ds8874.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/video/ef9340_1.h,VIDEOS["EF9340_1"] = true
@@ -892,6 +904,18 @@ if (VIDEOS["PC_VGA_MATROX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga_matrox.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga_matrox.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_mediagx.h,VIDEOS["PC_VGA_MEDIAGX"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_MEDIAGX"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_mediagx.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_mediagx.h",
 	}
 end
 

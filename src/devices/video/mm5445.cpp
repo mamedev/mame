@@ -10,7 +10,7 @@
 */
 
 #include "emu.h"
-#include "video/mm5445.h"
+#include "mm5445.h"
 
 
 DEFINE_DEVICE_TYPE(MM5445, mm5445_device, "mm5445", "MM5445 VFD Driver")

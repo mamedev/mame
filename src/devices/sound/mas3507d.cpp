@@ -80,7 +80,6 @@ void mas3507d_device::device_start()
 	save_item(NAME(i2c_io_count));
 	save_item(NAME(i2c_io_val));
 	save_item(NAME(i2c_sdao_data));
-	save_item(NAME(playback_status));
 
 	save_item(NAME(frame_channels));
 
@@ -95,9 +94,15 @@ void mas3507d_device::device_reset()
 	i2c_bus_address = UNKNOWN;
 	i2c_bus_curbit = -1;
 	i2c_bus_curval = 0;
+	i2c_bytecount = 0;
+	i2c_io_bank = 0;
+	i2c_io_adr = 0;
+	i2c_io_count = 0;
+	i2c_io_val = 0;
+	i2c_sdao_data = 0;
 
 	is_muted = false;
-	gain_ll = gain_rr = 0;
+	gain_ll = gain_rr = 1.0;
 
 	frame_channels = 2;
 
@@ -344,7 +349,8 @@ int mas3507d_device::gain_to_db(double val) {
 	return round(20 * log10((0x100000 - val) / 0x80000));
 }
 
-float mas3507d_device::gain_to_percentage(int val) {
+float mas3507d_device::gain_to_percentage(int val)
+{
 	if(val == 0)
 		return 0; // Special case for muting it seems
 
@@ -362,10 +368,6 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 	case 0x107f8:
 		gain_ll = gain_to_percentage(val);
 		LOGCONFIG("MAS3507D: left->left   gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_ll);
-
-		if(!is_muted) {
-			set_output_gain(0, gain_ll);
-		}
 		break;
 	case 0x107f9:
 		LOGCONFIG("MAS3507D: left->right  gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
@@ -376,10 +378,6 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 	case 0x107fb:
 		gain_rr = gain_to_percentage(val);
 		LOGCONFIG("MAS3507D: right->right gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_rr);
-
-		if(!is_muted) {
-			set_output_gain(1, gain_rr);
-		}
 		break;
 	default: LOGCONFIG("MAS3507D: %d:%04x = %05x\n", bank, adr, val); break;
 	}
@@ -391,8 +389,7 @@ void mas3507d_device::reg_write(uint32_t adr, uint32_t val)
 	case 0x8e: LOGCONFIG("MAS3507D: DCCF = %05x\n", val); break;
 	case 0xaa:
 		LOGCONFIG("MAS3507D: Mute/bypass = %05x\n", val);
-		set_output_gain(0, val == 1 ? 0 : gain_ll);
-		set_output_gain(1, val == 1 ? 0 : gain_rr);
+		is_muted = val == 1;
 		break;
 	case 0xe6: LOGCONFIG("MAS3507D: StartupConfig = %05x\n", val); break;
 	case 0xe7: LOGCONFIG("MAS3507D: Kprescale = %05x\n", val); break;
@@ -437,7 +434,7 @@ void mas3507d_device::fill_buffer()
 			mp3data_count--;
 		}
 
-		cb_demand(mp3data_count < mp3data.size());
+		cb_demand(1); // always request more data when nothing could be decoded to force potentially stale data out of the buffer
 		return;
 	}
 
@@ -454,15 +451,17 @@ void mas3507d_device::fill_buffer()
 
 void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount)
 {
-	int s1 = scount - pos;
-	int bytes_per_sample = std::min(frame_channels, 2); // More than 2 channels is unsupported here
-
-	if(s1 > sample_count)
-		s1 = sample_count;
+	const int bytes_per_sample = std::min(frame_channels, 2); // More than 2 channels is unsupported here
+	const int s1 = std::min(scount - pos, sample_count);
+	const stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	const stream_buffer::sample_t mute_scale = is_muted ? 0.0 : 1.0;
 
 	for(int i = 0; i < s1; i++) {
-		outputs[0].put_int(pos, samples[samples_idx * bytes_per_sample], 32768);
-		outputs[1].put_int(pos, samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)], 32768);
+		const stream_buffer::sample_t lsamp_mixed = stream_buffer::sample_t(samples[samples_idx * bytes_per_sample]) * sample_scale * mute_scale * gain_ll;
+		const stream_buffer::sample_t rsamp_mixed = stream_buffer::sample_t(samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)]) * sample_scale * mute_scale * gain_rr;
+
+		outputs[0].put(pos, lsamp_mixed);
+		outputs[1].put(pos, rsamp_mixed);
 
 		samples_idx++;
 		pos++;

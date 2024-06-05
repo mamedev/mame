@@ -2,7 +2,7 @@
 // ssl/stream.hpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,6 +18,7 @@
 #include "asio/detail/config.hpp"
 
 #include "asio/async_result.hpp"
+#include "asio/buffer.hpp"
 #include "asio/detail/buffer_sequence_adapter.hpp"
 #include "asio/detail/handler_type_requirements.hpp"
 #include "asio/detail/non_const_lvalue.hpp"
@@ -54,7 +55,7 @@ namespace ssl {
  * @code
  * asio::io_context my_context;
  * asio::ssl::context ctx(asio::ssl::context::sslv23);
- * asio::ssl::stream<asio:ip::tcp::socket> sock(my_context, ctx);
+ * asio::ssl::stream<asio::ip::tcp::socket> sock(my_context, ctx);
  * @endcode
  *
  * @par Concepts:
@@ -65,6 +66,13 @@ class stream :
   public stream_base,
   private noncopyable
 {
+private:
+  class initiate_async_handshake;
+  class initiate_async_buffered_handshake;
+  class initiate_async_shutdown;
+  class initiate_async_write_some;
+  class initiate_async_read_some;
+
 public:
   /// The native handle type of the SSL stream.
   typedef SSL* native_handle_type;
@@ -76,7 +84,7 @@ public:
   };
 
   /// The type of the next layer.
-  typedef typename remove_reference<Stream>::type next_layer_type;
+  typedef remove_reference_t<Stream> next_layer_type;
 
   /// The type of the lowest layer.
   typedef typename next_layer_type::lowest_layer_type lowest_layer_type;
@@ -84,7 +92,6 @@ public:
   /// The type of the executor associated with the object.
   typedef typename lowest_layer_type::executor_type executor_type;
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Construct a stream.
   /**
    * This constructor creates a stream and initialises the underlying stream
@@ -96,20 +103,28 @@ public:
    */
   template <typename Arg>
   stream(Arg&& arg, context& ctx)
-    : next_layer_(ASIO_MOVE_CAST(Arg)(arg)),
+    : next_layer_(static_cast<Arg&&>(arg)),
       core_(ctx.native_handle(), next_layer_.lowest_layer().get_executor())
   {
   }
-#else // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
-  template <typename Arg>
-  stream(Arg& arg, context& ctx)
-    : next_layer_(arg),
-      core_(ctx.native_handle(), next_layer_.lowest_layer().get_executor())
-  {
-  }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+  /// Construct a stream from an existing native implementation.
+  /**
+   * This constructor creates a stream and initialises the underlying stream
+   * object. On success, ownership of the native implementation is transferred
+   * to the stream, and it will be cleaned up when the stream is destroyed.
+   *
+   * @param arg The argument to be passed to initialise the underlying stream.
+   *
+   * @param handle An existing native SSL implementation.
+   */
+  template <typename Arg>
+  stream(Arg&& arg, native_handle_type handle)
+    : next_layer_(static_cast<Arg&&>(arg)),
+      core_(handle, next_layer_.lowest_layer().get_executor())
+  {
+  }
+
   /// Move-construct a stream from another.
   /**
    * @param other The other stream object from which the move will occur. Must
@@ -118,8 +133,8 @@ public:
    * operation is destruction, or use as the target of a move assignment.
    */
   stream(stream&& other)
-    : next_layer_(ASIO_MOVE_CAST(Stream)(other.next_layer_)),
-      core_(ASIO_MOVE_CAST(detail::stream_core)(other.core_))
+    : next_layer_(static_cast<Stream&&>(other.next_layer_)),
+      core_(static_cast<detail::stream_core&&>(other.core_))
   {
   }
 
@@ -134,12 +149,11 @@ public:
   {
     if (this != &other)
     {
-      next_layer_ = ASIO_MOVE_CAST(Stream)(other.next_layer_);
-      core_ = ASIO_MOVE_CAST(detail::stream_core)(other.core_);
+      next_layer_ = static_cast<Stream&&>(other.next_layer_);
+      core_ = static_cast<detail::stream_core&&>(other.core_);
     }
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Destructor.
   /**
@@ -157,7 +171,7 @@ public:
    *
    * @return A copy of the executor that stream will use to dispatch handlers.
    */
-  executor_type get_executor() ASIO_NOEXCEPT
+  executor_type get_executor() noexcept
   {
     return next_layer_.lowest_layer().get_executor();
   }
@@ -173,7 +187,7 @@ public:
    * suitable for passing to functions such as @c SSL_get_verify_result and
    * @c SSL_get_peer_certificate:
    * @code
-   * asio::ssl::stream<asio:ip::tcp::socket> sock(my_context, ctx);
+   * asio::ssl::stream<asio::ip::tcp::socket> sock(io_ctx, ctx);
    *
    * // ... establish connection and perform handshake ...
    *
@@ -450,17 +464,27 @@ public:
   /// Start an asynchronous SSL handshake.
   /**
    * This function is used to asynchronously perform an SSL handshake on the
-   * stream. This function call always returns immediately.
+   * stream. It is an initiating function for an @ref asynchronous_operation,
+   * and always returns immediately.
    *
    * @param type The type of handshaking to be performed, i.e. as a client or as
    * a server.
    *
-   * @param handler The handler to be called when the handshake operation
-   * completes. Copies will be made of the handler as required. The equivalent
-   * function signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the handshake completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const asio::error_code& error // Result of operation.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using asio::post().
+   *
+   * @par Completion Signature
+   * @code void(asio::error_code) @endcode
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
@@ -475,23 +499,24 @@ public:
    */
   template <
       ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code))
-        HandshakeHandler
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE(HandshakeHandler,
-      void (asio::error_code))
-  async_handshake(handshake_type type,
-      ASIO_MOVE_ARG(HandshakeHandler) handler
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
+        HandshakeToken = default_completion_token_t<executor_type>>
+  auto async_handshake(handshake_type type,
+      HandshakeToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
+      async_initiate<HandshakeToken,
+        void (asio::error_code)>(
+          declval<initiate_async_handshake>(), token, type))
   {
-    return async_initiate<HandshakeHandler,
+    return async_initiate<HandshakeToken,
       void (asio::error_code)>(
-        initiate_async_handshake(this), handler, type);
+        initiate_async_handshake(this), token, type);
   }
 
   /// Start an asynchronous SSL handshake.
   /**
    * This function is used to asynchronously perform an SSL handshake on the
-   * stream. This function call always returns immediately.
+   * stream. It is an initiating function for an @ref asynchronous_operation,
+   * and always returns immediately.
    *
    * @param type The type of handshaking to be performed, i.e. as a client or as
    * a server.
@@ -499,15 +524,24 @@ public:
    * @param buffers The buffered data to be reused for the handshake. Although
    * the buffers object may be copied as necessary, ownership of the underlying
    * buffers is retained by the caller, which must guarantee that they remain
-   * valid until the handler is called.
+   * valid until the completion handler is called.
    *
-   * @param handler The handler to be called when the handshake operation
-   * completes. Copies will be made of the handler as required. The equivalent
-   * function signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the handshake completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const asio::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Amount of buffers used in handshake.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using asio::post().
+   *
+   * @par Completion Signature
+   * @code void(asio::error_code, std::size_t) @endcode
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
@@ -522,17 +556,22 @@ public:
    */
   template <typename ConstBufferSequence,
       ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) BufferedHandshakeHandler
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE(BufferedHandshakeHandler,
-      void (asio::error_code, std::size_t))
-  async_handshake(handshake_type type, const ConstBufferSequence& buffers,
-      ASIO_MOVE_ARG(BufferedHandshakeHandler) handler
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
+        std::size_t)) BufferedHandshakeToken
+          = default_completion_token_t<executor_type>>
+  auto async_handshake(handshake_type type, const ConstBufferSequence& buffers,
+      BufferedHandshakeToken&& token
+        = default_completion_token_t<executor_type>(),
+      constraint_t<
+        is_const_buffer_sequence<ConstBufferSequence>::value
+      > = 0)
+    -> decltype(
+      async_initiate<BufferedHandshakeToken,
+        void (asio::error_code, std::size_t)>(
+          declval<initiate_async_buffered_handshake>(), token, type, buffers))
   {
-    return async_initiate<BufferedHandshakeHandler,
+    return async_initiate<BufferedHandshakeToken,
       void (asio::error_code, std::size_t)>(
-        initiate_async_buffered_handshake(this), handler, type, buffers);
+        initiate_async_buffered_handshake(this), token, type, buffers);
   }
 
   /// Shut down SSL on the stream.
@@ -564,15 +603,25 @@ public:
 
   /// Asynchronously shut down SSL on the stream.
   /**
-   * This function is used to asynchronously shut down SSL on the stream. This
-   * function call always returns immediately.
+   * This function is used to asynchronously shut down SSL on the stream. It is
+   * an initiating function for an @ref asynchronous_operation, and always
+   * returns immediately.
    *
-   * @param handler The handler to be called when the handshake operation
-   * completes. Copies will be made of the handler as required. The equivalent
-   * function signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the shutdown completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const asio::error_code& error // Result of operation.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using asio::post().
+   *
+   * @par Completion Signature
+   * @code void(asio::error_code) @endcode
    *
    * @par Per-Operation Cancellation
    * This asynchronous operation supports cancellation for the following
@@ -587,17 +636,18 @@ public:
    */
   template <
       ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code))
-        ShutdownHandler
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE(ShutdownHandler,
-      void (asio::error_code))
-  async_shutdown(
-      ASIO_MOVE_ARG(ShutdownHandler) handler
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
+        ShutdownToken
+          = default_completion_token_t<executor_type>>
+  auto async_shutdown(
+      ShutdownToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
+      async_initiate<ShutdownToken,
+        void (asio::error_code)>(
+          declval<initiate_async_shutdown>(), token))
   {
-    return async_initiate<ShutdownHandler,
+    return async_initiate<ShutdownToken,
       void (asio::error_code)>(
-        initiate_async_shutdown(this), handler);
+        initiate_async_shutdown(this), token);
   }
 
   /// Write some data to the stream.
@@ -652,20 +702,30 @@ public:
   /// Start an asynchronous write.
   /**
    * This function is used to asynchronously write one or more bytes of data to
-   * the stream. The function call always returns immediately.
+   * the stream. It is an initiating function for an @ref
+   * asynchronous_operation, and always returns immediately.
    *
    * @param buffers The data to be written to the stream. Although the buffers
    * object may be copied as necessary, ownership of the underlying buffers is
    * retained by the caller, which must guarantee that they remain valid until
-   * the handler is called.
+   * the completion handler is called.
    *
-   * @param handler The handler to be called when the write operation completes.
-   * Copies will be made of the handler as required. The equivalent function
-   * signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the write completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const asio::error_code& error, // Result of operation.
-   *   std::size_t bytes_transferred           // Number of bytes written.
+   *   std::size_t bytes_transferred // Number of bytes written.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using asio::post().
+   *
+   * @par Completion Signature
+   * @code void(asio::error_code, std::size_t) @endcode
    *
    * @note The async_write_some operation may not transmit all of the data to
    * the peer. Consider using the @ref async_write function if you need to
@@ -685,17 +745,17 @@ public:
    */
   template <typename ConstBufferSequence,
       ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) WriteHandler
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (asio::error_code, std::size_t))
-  async_write_some(const ConstBufferSequence& buffers,
-      ASIO_MOVE_ARG(WriteHandler) handler
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
+        std::size_t)) WriteToken = default_completion_token_t<executor_type>>
+  auto async_write_some(const ConstBufferSequence& buffers,
+      WriteToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
+      async_initiate<WriteToken,
+        void (asio::error_code, std::size_t)>(
+          declval<initiate_async_write_some>(), token, buffers))
   {
-    return async_initiate<WriteHandler,
+    return async_initiate<WriteToken,
       void (asio::error_code, std::size_t)>(
-        initiate_async_write_some(this), handler, buffers);
+        initiate_async_write_some(this), token, buffers);
   }
 
   /// Read some data from the stream.
@@ -750,20 +810,30 @@ public:
   /// Start an asynchronous read.
   /**
    * This function is used to asynchronously read one or more bytes of data from
-   * the stream. The function call always returns immediately.
+   * the stream. It is an initiating function for an @ref
+   * asynchronous_operation, and always returns immediately.
    *
    * @param buffers The buffers into which the data will be read. Although the
    * buffers object may be copied as necessary, ownership of the underlying
    * buffers is retained by the caller, which must guarantee that they remain
-   * valid until the handler is called.
+   * valid until the completion handler is called.
    *
-   * @param handler The handler to be called when the read operation completes.
-   * Copies will be made of the handler as required. The equivalent function
-   * signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the read completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const asio::error_code& error, // Result of operation.
-   *   std::size_t bytes_transferred           // Number of bytes read.
+   *   std::size_t bytes_transferred // Number of bytes read.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using asio::post().
+   *
+   * @par Completion Signature
+   * @code void(asio::error_code, std::size_t) @endcode
    *
    * @note The async_read_some operation may not read all of the requested
    * number of bytes. Consider using the @ref async_read function if you need to
@@ -783,17 +853,17 @@ public:
    */
   template <typename MutableBufferSequence,
       ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
-        std::size_t)) ReadHandler
-          ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (asio::error_code, std::size_t))
-  async_read_some(const MutableBufferSequence& buffers,
-      ASIO_MOVE_ARG(ReadHandler) handler
-        ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
+        std::size_t)) ReadToken = default_completion_token_t<executor_type>>
+  auto async_read_some(const MutableBufferSequence& buffers,
+      ReadToken&& token = default_completion_token_t<executor_type>())
+    -> decltype(
+      async_initiate<ReadToken,
+        void (asio::error_code, std::size_t)>(
+          declval<initiate_async_read_some>(), token, buffers))
   {
-    return async_initiate<ReadHandler,
+    return async_initiate<ReadToken,
       void (asio::error_code, std::size_t)>(
-        initiate_async_read_some(this), handler, buffers);
+        initiate_async_read_some(this), token, buffers);
   }
 
 private:
@@ -807,13 +877,13 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename HandshakeHandler>
-    void operator()(ASIO_MOVE_ARG(HandshakeHandler) handler,
+    void operator()(HandshakeHandler&& handler,
         handshake_type type) const
     {
       // If you get an error on the following line it means that your handler
@@ -839,13 +909,13 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename BufferedHandshakeHandler, typename ConstBufferSequence>
-    void operator()(ASIO_MOVE_ARG(BufferedHandshakeHandler) handler,
+    void operator()(BufferedHandshakeHandler&& handler,
         handshake_type type, const ConstBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your
@@ -875,13 +945,13 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename ShutdownHandler>
-    void operator()(ASIO_MOVE_ARG(ShutdownHandler) handler) const
+    void operator()(ShutdownHandler&& handler) const
     {
       // If you get an error on the following line it means that your handler
       // does not meet the documented type requirements for a ShutdownHandler.
@@ -906,13 +976,13 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename WriteHandler, typename ConstBufferSequence>
-    void operator()(ASIO_MOVE_ARG(WriteHandler) handler,
+    void operator()(WriteHandler&& handler,
         const ConstBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your handler
@@ -938,13 +1008,13 @@ private:
     {
     }
 
-    executor_type get_executor() const ASIO_NOEXCEPT
+    executor_type get_executor() const noexcept
     {
       return self_->get_executor();
     }
 
     template <typename ReadHandler, typename MutableBufferSequence>
-    void operator()(ASIO_MOVE_ARG(ReadHandler) handler,
+    void operator()(ReadHandler&& handler,
         const MutableBufferSequence& buffers) const
     {
       // If you get an error on the following line it means that your handler

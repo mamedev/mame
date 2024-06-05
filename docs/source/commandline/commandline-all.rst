@@ -775,24 +775,24 @@ OSD-related Options
     * - **Microsoft Windows**
       - win
       - dwrite
-      - none
       - auto
       -
-      - sdl [#UIFPSDLWindows]_.
+      - sdl [#UIFPSDLWindows]_
+      - none
     * - **macOS**
       -
       -
-      - none
       - auto
       - osx
       - sdl
+      - none
     * - **Linux**
       -
       -
-      - none
       - auto
       -
       - sdl
+      - none
 
 ..  rubric:: Footnotes
 
@@ -816,26 +816,19 @@ Example:
     :stub-columns: 0
 
     * - **Microsoft Windows**
-      - auto [#KBIPAutoWindows]_.
+      - auto [#KBIPAutoWindows]_
       - rawinput
       - dinput
       - win32
+      - sdl [#KBIPSDLWindows]_
       - none
-      - sdl [#KBIPSDLWindows]_.
     * - **SDL (macOS and Linux)**
-      - auto [#KBIPAutoSDL]_.
+      - auto [#KBIPAutoSDL]_
       -
       -
       -
-      - none
       - sdl
-    * - **Linux**
-      - auto [#KBIPAutoSDL]_.
-      -
-      -
-      -
       - none
-      - sdl
 
 ..  rubric:: Footnotes
 
@@ -868,26 +861,19 @@ Example:
     :stub-columns: 0
 
     * - **Microsoft Windows**
-      - auto [#MIPAutoWindows]_.
+      - auto [#MIPAutoWindows]_
       - rawinput
       - dinput
       - win32
+      - sdl [#MIPSDLWindows]_
       - none
-      - sdl [#MIPSDLWindows]_.
     * - **SDL (macOS and Linux)**
-      - auto [#MIPAutoSDL]_.
+      - auto [#MIPAutoSDL]_
       -
       -
       -
-      - none
       - sdl
-    * - **Linux**
-      - auto [#MIPAutoSDL]_.
-      -
-      -
-      -
       - none
-      - sdl
 
 ..  rubric:: Footnotes
 
@@ -916,36 +902,37 @@ Example:
     :stub-columns: 0
 
     * - **Microsoft Windows**
-      - auto [#LGIPAutoWindows]_.
+      - auto [#LGIPAutoWindows]_
       - rawinput
       - win32
+      - sdl [#LGIPSDLWindows]_
+      -
       - none
-      -
-      -
     * - **macOS**
-      - auto [#LGIPAutoSDL]_.
+      - auto [#LGIPAutoSDL]_
       -
+      -
+      - sdl
       -
       - none
-      -
-      -
     * - **Linux**
-      - auto [#LGIPAutoLinux]_.
+      - auto [#LGIPAutoSDL]_
       -
       -
-      - none
-      -
+      - sdl
       - x11
+      - none
 
 ..  rubric:: Footnotes
 
 ..  [#LGIPAutoWindows] On Windows, auto will try ``rawinput`` with fallback to
                        ``win32``, or ``none`` if it doesn't find any.
 
-..  [#LGIPAutoSDL] On non-Linux SDL, ``auto`` will default to ``none``.
+..  [#LGIPSDLWindows] SDL support on Windows requires that you compile MAME with
+                      the support in. By default SDL is not included in Windows
+                      builds of MAME.
 
-..  [#LGIPAutoLinux] On SDL/Linux, ``auto`` will default to ``x11``, or ``none``
-                     if it doesn't find any.
+..  [#LGIPAutoSDL] On SDL, ``auto`` will default to ``sdl``.
 
 Example:
     .. code-block:: bash
@@ -964,15 +951,15 @@ Example:
     :stub-columns: 0
 
     * - **Microsoft Windows**
-      - auto [#JIPAutoWindows]_.
+      - auto [#JIPAutoWindows]_
       - winhybrid
       - dinput
       - xinput
-      - sdlgame
-      - sdljoy
+      - sdlgame [#JIPSDLWindows]_
+      - sdljoy [#JIPSDLWindows]_
       - none
     * - **SDL**
-      - auto [#JIPAutoSDL]_.
+      - auto [#JIPAutoSDL]_
       -
       -
       -
@@ -983,6 +970,10 @@ Example:
 ..  rubric:: Footnotes
 
 ..  [#JIPAutoWindows] On Windows native, auto will default to ``winhybrid``.
+
+..  [#JIPSDLWindows] SDL support on Windows requires that you compile MAME with
+                      the support in. By default SDL is not included in Windows
+                      builds of MAME.
 
 ..  [#JIPAutoSDL] On SDL, auto will default to ``sdlgame``.
 

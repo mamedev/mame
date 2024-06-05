@@ -456,7 +456,7 @@ void h8_adc_2655_device::mode_update()
 
 	m_mode = ACTIVE | (m_adcr & 0x08 ? REPEAT : 0);
 
-	if(m_adcsr & 0x03) {
+	if(m_adcr & 0x03) {
 		m_mode |= BUFFER;
 
 	}
@@ -471,7 +471,6 @@ void h8_adc_2655_device::mode_update()
 			m_end_channel = m_adcsr & 7;
 	} else
 		m_start_channel = m_end_channel = m_adcsr & 7;
-
 }
 
 void h8_adc_2655_device::do_buffering(int buffer)

@@ -126,7 +126,7 @@ void epson_pf10_device::device_reset()
 
 TIMER_CALLBACK_MEMBER( epson_pf10_device::serial_clk_tick )
 {
-	m_cpu->m6801_clock_serial();
+	m_cpu->clock_serial();
 }
 
 

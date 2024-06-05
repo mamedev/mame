@@ -49,19 +49,15 @@ Notes:
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
-#include "bus/pci/rivatnt.h"
 #include "cpu/i386/i386.h"
 #include "machine/8042kbdc.h"
 #include "machine/mc146818.h"
 #include "machine/mediagx_cs5530_bridge.h"
 #include "machine/mediagx_cs5530_ide.h"
+#include "machine/mediagx_cs5530_video.h"
 #include "machine/mediagx_host.h"
 #include "machine/pci.h"
 #include "machine/zfmicro_usb.h"
-
-#include "screen.h"
-
-#define ENABLE_VGA 0
 
 namespace {
 
@@ -129,10 +125,6 @@ void astropc_state::astropc(machine_config &config)
 	MEDIAGX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
 	// TODO: again copied from misc/matrix.cpp, verify usage here
 	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
-#if ENABLE_VGA
-	// NOTE: most MediaGX boards don't even provide an AGP port, at best you get PCI slots.
-	PCI_SLOT(config, "pci:01.0:1", pci_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
-#endif
 
 	// "pci:12.0" or "pci:10.0" depending on pin H26 (readable in bridge thru PCI index $44)
 	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:12.0", 0, "maincpu", "pci:12.2"));
@@ -150,7 +142,7 @@ void astropc_state::astropc(machine_config &config)
 	ide.irq_sec().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq15_w));
 
 	// "pci:12.3" XpressAUDIO
-	// "pci:12.4" XpressVIDEO
+	MEDIAGX_CS5530_VIDEO(config, "pci:12.4", 0);
 
 	ZFMICRO_USB(config, "pci:13.0", 0);
 
@@ -302,15 +294,15 @@ void astropc_state::init_astropc()
 } // anonymous namespace
 
 
-GAME( 2005,  blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", MACHINE_IS_SKELETON )
-GAME( 2005?, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 2)", MACHINE_IS_SKELETON )
-GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 3)", MACHINE_IS_SKELETON )
+GAME( 2005,  blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005?, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_IS_SKELETON )
-GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_IS_SKELETON )
+GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Hawaii (Russia)", MACHINE_IS_SKELETON )
+GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Hawaii (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Olympian Games (Russia)", MACHINE_IS_SKELETON )
+GAME( 2005,  oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Olympian Games (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Ra's Scepter (Russia)", MACHINE_IS_SKELETON )
+GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Ra's Scepter (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

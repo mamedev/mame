@@ -61,10 +61,68 @@ ROM BOARD
 ---------
 MX29F1610MC 16M FlashROM (x7)
 
+
+---
+
+Pump It Up MK-III
+SPACE11_3 board (front plane PCB)
+-----------
+6 pin and 4 pin power connectors (+12V and +5V on both) on back side of PCB
+2x 4 pin power headers on front
+2 pin COMM header on back side
+3 pin PCM header on back side, connects to CN5 on SPACE12_1 board?
+2x HD34PIN header on back side, connects to CN2 and CN3 of SPACE12_1 board
+2x5 pin header on back side
+6 pin Video header (R, G, B, GND, HSYNC, VSYNC) from back side, connecting to VGA header on front side
+HS10PIN labeled 1P on front
+HS10PIN labeled LAMP on front
+HS10PIN labeled 2P on front
+3x HS3PIN on front
+TEST, SERV, CLR buttons on front
+4 pin header unlabeled on front
+CN5 JAMMA(?) connector
+
+
+
+SPACE12_1 board
+-----------
+A40MX04 QFP84 CPLD
+U6 CSI CAT93C46P 1KB eeproom
+U7 Unpopulated 8 pin socket
+U8 KS74HCTLS125N
+U5, U9, U10, U11, U12, U13, U14 HD74LS14P
+U15, U16, U17, U18 ULN2803A
+U19, U20, U21, U22 HD74LS245P
+U23, U26 L9940 LTV847CD
+U24, U25 L9944 LTV847
+U27 Sharp PC817
+U28 Yamaha YMZ280B-F
+U29 Yamaha YAC516
+U31, U32 HA17558
+U101 SN75176BP
+U100 Unpopulated socket
+U102 Unpopulated MAX232
+
+J1 connects to main PCB
+CN1 PCN96, connects to PIU10
+CN2 34 pin connector
+CN3 34 pin connector
+CN5 3 pin connector, audio?
+CN100 2 pin connector
+Unnamed 5 pin connector
+DB25PIN Unpopulated header near A40MX04
+HS3PIN  Unpopulated header near A40MX04
+
+1.8432MHz XTAL near A40MX04
+169NDK19 XTAL (16.9344MHz) near Yamaha YMZ280B-F
+
 **************************************************************************************************/
 
 
 #include "emu.h"
+
+#include "xtom3d_piu10.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -382,6 +440,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pumpitup )
 	PORT_INCLUDE( xtom3d )
 
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Clear")
+
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Top-Left step") PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Top-Right step") PORT_PLAYER(1)
@@ -397,6 +458,9 @@ static INPUT_PORTS_START( pumpitup )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Bottom-Left step") PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Bottom-Right step") PORT_PLAYER(2)
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 ioport_constructor isa16_xtom3d_io_sound::device_input_ports() const
@@ -423,6 +487,7 @@ void isa16_xtom3d_io_sound::io_map(address_map &map)
 {
 	// $2a0-$2a3 sound
 	map(0x00, 0x03).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
+	// map(0x04, 0x07).noprw(); // lights/outputs?
 	map(0x08, 0x09).lr8(
 		NAME([this] (offs_t offset) {
 			return offset & 1 ? m_system->read() : m_in0->read();
@@ -571,6 +636,7 @@ private:
 //  void vblank_assert(int state);
 
 	static void romdisk_config(device_t *device);
+	static void piu10_config(device_t *device);
 //  static void cdrom_config(device_t *device);
 };
 
@@ -586,12 +652,20 @@ void xtom3d_isa_cards(device_slot_interface &device)
 	device.option_add_internal("oksan_lpc", ISA16_OKSAN_LPC);
 	device.option_add_internal("xtom3d_io_sound", ISA16_XTOM3D_IO_SOUND);
 	device.option_add_internal("pumpitup_io_sound", ISA16_PUMPITUP_IO_SOUND);
+	device.option_add_internal("pumpitup_piu10", ISA16_PIU10);
 }
 
 void xtom3d_state::romdisk_config(device_t *device)
 {
 	isa16_oksan_rom_disk &romdisk = *downcast<isa16_oksan_rom_disk *>(device);
 	romdisk.set_rom_tag("game_rom");
+}
+
+void xtom3d_state::piu10_config(device_t *device)
+{
+	isa16_piu10 &piu10 = *downcast<isa16_piu10 *>(device);
+	piu10.add_route(0, ":lmicrophone", 0.25);
+	piu10.add_route(1, ":rmicrophone", 0.25);
 }
 
 // TODO: unverified PCI config space
@@ -671,7 +745,8 @@ void xtom3d_state::pumpitup(machine_config &config)
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
 
-	ISA16_SLOT(config.replace(), "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "pumpitup_io_sound", true);
+	subdevice<isa16_slot_device>("board1")->set_default_option("pumpitup_piu10").set_option_machine_config("pumpitup_piu10", piu10_config);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("pumpitup_io_sound");
 }
 
 ROM_START( xtom3d )
@@ -697,13 +772,16 @@ ROM_END
 #define PUMPITUP_BIOS \
 	ROM_REGION32_LE(0x20000, "pci:07.0", 0) \
 	ROM_LOAD( "bios.u22", 0x000000, 0x020000, CRC(f7c58044) SHA1(fd967d009e0d3c8ed9dd7be852946f2b9dee7671) ) \
-	ROM_REGION32_LE(0x1000000, "board1:game_rom", ROMREGION_ERASEFF ) \
+	ROM_REGION(0x200000, "board1:pumpitup_piu10:flash_u8", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "piu10.u8",  0x000000, 0x200000, CRC(5911e31a)  SHA1(295723b9b7da9e55b5dd5586b23b06355f4837ef) ) \
 	ROM_REGION(0x400000, "isa1:pumpitup_io_sound:ymz", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "piu10.u9",  0x000000, 0x200000, CRC(9c436cfa) SHA1(480ea52e74721d1963ced41be5c482b7b913ccd2) )
 
 ROM_START( pumpitup )
 	PUMPITUP_BIOS
+
+	ROM_REGION( 0x8, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD_OPTIONAL( "cat702.bin", 0x000000, 0x000008, NO_DUMP ) // Dummy entry to make testing later games easier
 ROM_END
 
 ROM_START( pumpit1 )

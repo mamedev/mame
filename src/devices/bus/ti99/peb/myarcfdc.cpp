@@ -64,6 +64,7 @@ myarc_fdc_device::myarc_fdc_device(const machine_config &mconfig, const char *ta
 	  m_buffer_ram(*this, BUFFER_TAG),
 	  m_pal(*this, PAL_TAG),
 	  m_dsrrom(nullptr),
+	  m_floppy(*this, "%u", 0),
 	  m_banksel(false),
 	  m_cardsel(false),
 	  m_selected_drive(0),
@@ -274,8 +275,8 @@ void myarc_fdc_device::fdc_mon_w(int state)
 	// Do not start the motors when no drive is selected. However, motors
 	// can always be stopped.
 	if (m_selected_drive != 0 || state==1)
-		for (int i = 0; i < 4; i++)
-			if (m_floppy[i] != nullptr) m_floppy[i]->mon_w(state);
+		for (auto &flop : m_floppy)
+			if (flop->get_device() != nullptr) flop->get_device()->mon_w(state);
 }
 
 /*
@@ -299,7 +300,7 @@ void myarc_fdc_device::sidsel_w(int state)
 	if (m_selected_drive != 0)
 	{
 		LOGMASKED(LOG_DRIVE, "Set side = %d on DSK%d\n", state, m_selected_drive);
-		m_floppy[m_selected_drive-1]->ss_w(state);
+		m_floppy[m_selected_drive-1]->get_device()->ss_w(state);
 	}
 }
 
@@ -335,12 +336,12 @@ void myarc_fdc_device::drivesel_w(int state)
 	}
 	else
 	{
-		if (m_floppy[driveno-1] != nullptr)
+		if (m_floppy[driveno-1]->get_device() != nullptr)
 		{
 			m_selected_drive = driveno;
 			LOGMASKED(LOG_DRIVE, "Select drive DSK%d\n", driveno);
-			m_wdc->set_floppy(m_floppy[driveno-1]);
-			m_floppy[driveno-1]->ss_w(m_drivelatch->q2_r());
+			m_wdc->set_floppy(m_floppy[driveno-1]->get_device());
+			m_floppy[driveno-1]->get_device()->ss_w(m_drivelatch->q2_r());
 		}
 	}
 }
@@ -356,23 +357,22 @@ void myarc_fdc_device::device_start()
 
 void myarc_fdc_device::device_reset()
 {
+	for (auto &flop : m_floppy)
+	{
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "Connector %d with %s\n", flop->basetag(), flop->get_device()->name());
+		else
+			LOGMASKED(LOG_CONFIG, "Connector %d has no floppy attached\n", flop->basetag());
+	}
+
 	if (ioport("CONTROLLER")->read()==0)
 		m_wdc = m_wd1770;
 	else
 		m_wdc = m_wd1772;
 
 	m_dec_high = (ioport("AMADECODE")->read()!=0);
-}
 
-void myarc_fdc_device::device_config_complete()
-{
-	for (auto & elem : m_floppy)
-		elem = nullptr;
-
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
-	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
+	m_pal->set_board(this);
 }
 
 void myarc_fdc_device::floppy_formats(format_registration &fr)
@@ -459,10 +459,10 @@ void myarc_fdc_device::device_add_mconfig(machine_config& config)
 	DDCC1_PAL(config, PAL_TAG, 0);
 
 	// Floppy drives
-	FLOPPY_CONNECTOR(config, "0", myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "3", myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
 }
 
 ioport_constructor myarc_fdc_device::device_input_ports() const
@@ -510,11 +510,6 @@ bool ddcc1_pal_device::cs251()
 bool ddcc1_pal_device::cs259()
 {
 	return ((m_board->get_address() & 0xff00)==0x1100);
-}
-
-void ddcc1_pal_device::device_config_complete()
-{
-	m_board = static_cast<myarc_fdc_device*>(owner());
 }
 
 } // end namespace bus::ti99::peb

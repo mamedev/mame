@@ -24,7 +24,7 @@ public:
 		m_cpu.set_tag(std::forward<T>(cpu));
 	}
 
-	int interrupt_taken(int vector);
+	void interrupt_taken(int irqline, int vector);
 	void internal_interrupt(int vector);
 	void set_input(int inputnum, int state);
 
@@ -38,14 +38,19 @@ public:
 protected:
 	static const u8 pribit[256];
 
+	std::array<u32, 8> m_pending;
 	std::array<u16, 8> m_ipr;
 
 	u16 m_isr, m_icr;
+
+	u8 m_lines;
 
 	required_device<sh7042_device> m_cpu;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	void update_irq();
 };
 
 DECLARE_DEVICE_TYPE(SH_INTC, sh_intc_device)

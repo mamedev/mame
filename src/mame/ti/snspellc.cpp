@@ -880,9 +880,9 @@ SYST( 1982, snwrite,   snspellc, 0,      snwrite,  snwrite,  snspellc_state, ini
 
 SYST( 1982, mathsmag,  0,        0,      mathsmag, mathsmag, snspellc_state, init_snspellc, "Texas Instruments", "Les Maths Magiques (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-SYST( 1981, tntell,    0,        0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
-SYST( 1980, tntellp,   tntell,   0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-SYST( 1981, tntelluk,  tntell,   0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
-SYST( 1981, tntellfr,  tntell,   0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, tntell,    0,        0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, tntellp,   tntell,   0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1981, tntelluk,  tntell,   0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+SYST( 1981, tntellfr,  tntell,   0,      tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
 
 SYST( 1982, vocaid,    0,        0,      vocaid,   tntell,   tntell_state,   empty_init,    "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )

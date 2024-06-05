@@ -232,7 +232,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "cpu/tms1000/tms0970.h"
 #include "cpu/tms1000/tms0980.h"
 #include "machine/clock.h"
-#include "machine/ds8874.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -245,6 +244,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
 #include "sound/tms5110.h"
+#include "video/ds8874.h"
 #include "video/hlcd0515.h"
 #include "video/pwm.h"
 
@@ -9528,7 +9528,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("CPU") // fake
+	PORT_START("IN.6") // fake
 	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssimon_state, speed_switch, 0)
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
@@ -11550,7 +11550,8 @@ ROM_END
     "Radio Shack-12", but there's no title prefix on the box.
   - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU,
     see hh_cop400.cpp driver
-  - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2495, 28-pin Motorola
+    LSC417570DW, should be 68HC05 family
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
@@ -14016,9 +14017,9 @@ void ti1000_state::write_r(u32 data)
 
 void ti1000_state::write_o(u16 data)
 {
-	// O0-O3,O5(?): input mux
+	// O0-O2,O4,O5: input mux
 	// O0-O7: digit segments
-	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
+	m_inp_mux = (data & 7) | (data >> 1 & 0x18);
 	m_o = bitswap<8>(data,7,4,3,2,1,0,6,5);
 }
 
@@ -14050,7 +14051,7 @@ static INPUT_PORTS_START( ti1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
-	PORT_START("IN.3") // O3 or O4?
+	PORT_START("IN.3") // O4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
@@ -14280,10 +14281,11 @@ ROM_END
 /*******************************************************************************
 
   Texas Instruments WIZ-A-TRON
-  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
+  * TMS0970 MCU label TMC0907NL ZA0379 BSP, DP0907BS (die label: 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
-  The hardware is nearly identical to Little Professor (1976 version).
+  The hardware is nearly identical to Little Professor (1976 version). The same
+  ZA0379 BSP MCU (should be same ROM) was also used in TI Math Magic.
 
 *******************************************************************************/
 
@@ -14306,7 +14308,7 @@ INPUT_PORTS_END
 
 ROM_START( wizatron )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "tmc0907nl_za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
+	ROM_LOAD( "tmc0907nl_za0379_bsp", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
@@ -14366,10 +14368,10 @@ void lilprof_state::write_r(u32 data)
 
 void lilprof_state::write_o(u16 data)
 {
-	// O0-O3,O5(?): input mux
+	// O0-O2,O4,O5: input mux
 	// O0-O6: digit segments A-G
 	// O7: 6th digit
-	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
+	m_inp_mux = (data & 7) | (data >> 1 & 0x18);
 	m_o = data;
 }
 
@@ -14401,7 +14403,7 @@ static INPUT_PORTS_START( lilprof )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
-	PORT_START("IN.3") // O3 or O4?
+	PORT_START("IN.3") // O4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set")
@@ -17287,12 +17289,12 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, matchnum,   0,         0,      matchnum,  matchnum,  matchnum_state,  empty_init, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, matchnum,   0,         0,      matchnum,  matchnum,  matchnum_state,  empty_init, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, arrball,    0,         0,      arrball,   arrball,   arrball_state,   empty_init, "A-One LSI", "Arrange Ball", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, mathmagi,   0,         0,      mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-SYST( 1979, bcheetah,   0,         0,      bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1979, bcheetah,   0,         0,      bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 SYST( 1980, racetime,   0,         0,      racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, tc7atc,     0,         0,      tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, uboat,      0,         0,      uboat,     uboat,     uboat_state,     empty_init, "Bandai", "U-Boat", MACHINE_SUPPORTS_SAVE )
@@ -17302,8 +17304,8 @@ SYST( 1977, palmmd8,    0,         0,      palmmd8,   palmmd8,   palmmd8_state, 
 
 SYST( 1977, cchime,     0,         0,      cchime,    cchime,    cchime_state,    empty_init, "Chromatronics", "Chroma-Chime", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1978, amaztron,   0,         0,      amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
-SYST( 1979, zodiac,     0,         0,      zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac: The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, amaztron,   0,         0,      amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
+SYST( 1979, zodiac,     0,         0,      zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac: The Astrology Computer", MACHINE_SUPPORTS_SAVE )
 SYST( 1978, cqback,     0,         0,      cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, h2hfootb,   0,         0,      h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, h2hbaskb,   0,         0,      h2hbaskb,  h2hbaskb,  h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Basketball (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
@@ -17313,16 +17315,16 @@ SYST( 1981, h2hboxing,  0,         0,      h2hboxing, h2hboxing, h2hboxing_state
 SYST( 1981, quizwizc,   0,         0,      quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
 SYST( 1981, tc4,        0,         0,      tc4,       tc4,       tc4_state,       empty_init, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-SYST( 1978, litelrn,    0,         0,      litelrn,   litelrn,   litelrn_state,   empty_init, "Concept 2000", "Lite 'n Learn: Electronic Organ", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, litelrn,    0,         0,      litelrn,   litelrn,   litelrn_state,   empty_init, "Concept 2000", "Lite 'n Learn: Electronic Organ", MACHINE_SUPPORTS_SAVE )
 SYST( 1978, mrmusical,  0,         0,      mrmusical, mrmusical, mrmusical_state, empty_init, "Concept 2000", "Mr. Mus-I-Cal", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, cnbaskb,    0,         0,      cnbaskb,   cnbaskb,   cnbaskb_state,   empty_init, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, cmsport,    0,         0,      cmsport,   cmsport,   cmsport_state,   empty_init, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1979, cnfball,    0,         0,      cnfball,   cnfball,   cnfball_state,   empty_init, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, cnfball2,   0,         0,      cnfball2,  cnfball2,  cnfball2_state,  empty_init, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
-SYST( 1979, eleciq,     0,         0,      eleciq,    eleciq,    eleciq_state,    empty_init, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, eleciq,     0,         0,      eleciq,    eleciq,    eleciq_state,    empty_init, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, qfire,      0,         0,      qfire,     qfire,     qfire_state,     empty_init, "Electroplay", "Quickfire", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, qfire,      0,         0,      qfire,     qfire,     qfire_state,     empty_init, "Electroplay", "Quickfire", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, esoccer,    0,         0,      esoccer,   esoccer,   esoccer_state,   empty_init, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, ebball,     0,         0,      ebball,    ebball,    ebball_state,    empty_init, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
@@ -17335,7 +17337,7 @@ SYST( 1980, efootb4 ,   0,         0,      efootb4,   efootb4,   efootb4_state, 
 SYST( 1980, ebaskb2 ,   0,         0,      ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, raisedvl,   0,         0,      raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, ebknight,   0,         0,      ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1980, mmarvin,    0,         0,      mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, mmarvin,    0,         0,      mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 SYST( 1979, f2pbball,   0,         0,      f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, f3in1,      0,         0,      f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -17345,50 +17347,50 @@ SYST( 1980, gjackpot,   0,         0,      gjackpot,  gjackpot,  gjackpot_state,
 SYST( 1980, ginv,       0,         0,      ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, ginv1000,   0,         0,      ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, ginv2000,   0,         0,      ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 SYST( 1981, skywriter,  0,         0,      skywriter, skywriter, skywriter_state, empty_init, "Ideal Toy Corporation", "Sky-Writer: The Electronic Message Sender", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1978, starwlb,    0,         0,      starwlb,   starwlb,   starwlb_state,   empty_init, "Kenner", "Star Wars: Electronic Laser Battle Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, starwbc,    0,         0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, starwbcp,   starwbc,   0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, starwlb,    0,         0,      starwlb,   starwlb,   starwlb_state,   empty_init, "Kenner", "Star Wars: Electronic Laser Battle Game", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, starwbc,    0,         0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, starwbcp,   starwbc,   0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game (patent)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, liveafb,    0,         0,      liveafb,   liveafb,   liveafb_state,   empty_init, "Kenner", "Live Action Football", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, astro,      0,         0,      astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-SYST( 1980, strobe,     0,         0,      strobe,    strobe,    strobe_state,    empty_init, "Lakeside", "Strobe", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, strobe,     0,         0,      strobe,    strobe,    strobe_state,    empty_init, "Lakeside", "Strobe", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1978, elecbowl,   0,         0,      elecbowl,  elecbowl,  elecbowl_state,  empty_init, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 
 SYST( 1979, horseran,   0,         0,      horseran,  horseran,  horseran_state,  empty_init, "Mattel Electronics", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1980, mdndclab,   0,         0,      mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons: Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
+SYST( 1980, mdndclab,   0,         0,      mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons: Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
 
-SYST( 1977, comp4,      0,         0,      comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-SYST( 1977, bship,      0,         0,      bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // ***
-SYST( 1978, bshipb,     bship,     0,      bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
-SYST( 1978, simon,      0,         0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, simonf,     simon,     0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (rev. F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, ssimon,     0,         0,      ssimon,    ssimon,    ssimon_state,    empty_init, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1977, comp4,      0,         0,      comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, bship,      0,         0,      bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // ***
+SYST( 1978, bshipb,     bship,     0,      bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
+SYST( 1978, simon,      0,         0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (rev. A)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, simonf,     simon,     0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (rev. F)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ssimon,     0,         0,      ssimon,    ssimon,    ssimon_state,    empty_init, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, bigtrak,    0,         0,      bigtrak,   bigtrak,   bigtrak_state,   empty_init, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
-SYST( 1981, mbdtower,   0,         0,      mbdtower,  mbdtower,  mbdtower_state,  empty_init, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
-SYST( 1983, arcmania,   0,         0,      arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
+SYST( 1981, mbdtower,   0,         0,      mbdtower,  mbdtower,  mbdtower_state,  empty_init, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
+SYST( 1983, arcmania,   0,         0,      arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // ***
 
-SYST( 1977, cnsector,   0,         0,      cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
-SYST( 1978, merlin,     0,         0,      merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin: The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1977, cnsector,   0,         0,      cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
+SYST( 1978, merlin,     0,         0,      merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin: The Electronic Wizard", MACHINE_SUPPORTS_SAVE )
 SYST( 1978, pbmastm,    0,         0,      pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
-SYST( 1979, stopthief,  0,         0,      stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief: Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
-SYST( 1979, stopthiefp, stopthief, 0,      stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief: Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1979, stopthief,  0,         0,      stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief: Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1979, stopthiefp, stopthief, 0,      stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief: Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 SYST( 1980, bankshot,   0,         0,      bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot: Electronic Pool", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, splitsec,   0,         0,      splitsec,  splitsec,  splitsec_state,  empty_init, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, mmerlin,    0,         0,      mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, lostreas,   0,         0,      lostreas,  lostreas,  lostreas_state,  empty_init, "Parker Brothers", "Lost Treasure: The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1982, mmerlin,    0,         0,      mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, lostreas,   0,         0,      lostreas,  lostreas,  lostreas_state,  empty_init, "Parker Brothers", "Lost Treasure: The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE ) // ***
 
 SYST( 1978, alphie,     0,         0,      alphie,    alphie,    alphie_state,    empty_init, "Playskool", "Alphie: The Electronic Robot (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 
 SYST( 1980, tcfball,    0,         0,      tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, tcfballa,   tcfball,   0,      tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, comparc,    0,         0,      comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
+SYST( 1981, comparc,    0,         0,      comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE ) // some of the games: ***
 SYST( 1982, monkeysee,  0,         0,      monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1984, t3in1sa,    0,         0,      t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1984, vclock3,    0,         0,      vclock3,   vclock3,   vclock3_state,   empty_init, "Tandy Corporation", "VoxClock 3", MACHINE_SUPPORTS_SAVE )
@@ -17424,15 +17426,15 @@ SYST( 1979, tithermos,  0,         0,      tithermos, tithermos, tithermos_state
 SYST( 1979, subwars,    0,         0,      subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, playmaker,  0,         0,      playmaker, playmaker, playmaker_state, empty_init, "Tiger Electronics", "Playmaker: Hockey, Soccer, Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1980, dxfootb,    0,         0,      dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
-SYST( 1979, copycat,    0,         0,      copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1989, copycata,   copycat,   0,      copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1981, ditto,      0,         0,      ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1981, fingbowl,   0,         0,      fingbowl,  fingbowl,  fingbowl_state,  empty_init, "Tiger Electronics", "Finger Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
-SYST( 1982, t7in1ss,    0,         0,      t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1979, copycat,    0,         0,      copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, copycata,   copycat,   0,      copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, ditto,      0,         0,      ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, fingbowl,   0,         0,      fingbowl,  fingbowl,  fingbowl_state,  empty_init, "Tiger Electronics", "Finger Bowl", MACHINE_SUPPORTS_SAVE ) // some of the games: ***
+SYST( 1982, t7in1ss,    0,         0,      t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, tmvolleyb,  0,         0,      tmvolleyb, tmvolleyb, tmvolleyb_state, empty_init, "Tomy", "Volleyball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, tmvolleyb,  0,         0,      tmvolleyb, tmvolleyb, tmvolleyb_state, empty_init, "Tomy", "Volleyball (Tomy)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, tbreakup,   0,         0,      tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
-SYST( 1980, phpball,    0,         0,      phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, phpball,    0,         0,      phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1982, tdracula,   0,         0,      tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
 SYST( 1983, slepachi,   0,         0,      slepachi,  slepachi,  slepachi_state,  empty_init, "Tsukuda", "Slot Elepachi", MACHINE_SUPPORTS_SAVE )
@@ -17440,7 +17442,7 @@ SYST( 1983, slepachi,   0,         0,      slepachi,  slepachi,  slepachi_state,
 SYST( 1980, scruiser,   0,         0,      scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games Corporation", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1980, ssports4,   0,         0,      ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games Corporation", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-SYST( 1983, xl25,       0,         0,      xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, xl25,       0,         0,      xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

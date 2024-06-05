@@ -218,7 +218,7 @@ TILE_GET_INFO_MEMBER(crospang_state::get_bg_tile_info)
 	tile = tile + (m_tilebank[tilebank] << 10);
 	int const color = (data >> 12) & 0x0f;
 
-	tileinfo.set(1, tile, color + 0x20, 0);
+	tileinfo.set(0, tile, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
@@ -229,7 +229,7 @@ TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
 	tile = tile + (m_tilebank[tilebank] << 10);
 	int const color = (data >> 12) & 0x0f;
 
-	tileinfo.set(1, tile, color + 0x10, 0);
+	tileinfo.set(0, tile, color + 0x10, 0);
 }
 
 
@@ -635,8 +635,11 @@ static const gfx_layout tlayout_alt =
 
 
 static GFXDECODE_START( gfx_crospang )
-	GFXDECODE_ENTRY( "sprites", 0, tlayout,       0, 64 )  // 16x16
 	GFXDECODE_ENTRY( "tiles",   0, tlayout_alt,   0, 64 )  // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_crospang_spr )
+	GFXDECODE_ENTRY( "sprites", 0, tlayout,       0, 64 )  // 16x16
 GFXDECODE_END
 
 void crospang_state::machine_start()
@@ -678,11 +681,9 @@ void crospang_state::crospang(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_crospang);
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(0);
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_crospang_spr);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_offsets(5, 7);
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

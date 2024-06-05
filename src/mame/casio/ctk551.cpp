@@ -459,8 +459,7 @@ void ctk551_state::ap10(machine_config& config)
 	m_maincpu->write_port2().set_nop();
 	m_maincpu->read_port3().set_constant(0);
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	NVRAM(config, "nvram");
 
@@ -495,8 +494,7 @@ void ctk551_state::ctk530(machine_config& config)
 	m_maincpu->read_port2().set_constant(0);
 	m_maincpu->write_port2().set_nop();
 	m_maincpu->read_port3().set_constant(0);
-	m_maincpu->write_port3().set_nop();
-	m_maincpu->write_port4().set_ioport("PLE");
+	m_maincpu->write_ple().set_ioport("PLE");
 
 	// MIDI
 	auto& mdin(MIDI_PORT(config, "mdin"));
@@ -532,8 +530,7 @@ void ctk551_state::gz70sp(machine_config& config)
 	m_maincpu->write_port2().set_ioport("P2");
 	m_maincpu->read_port3().set_constant(0);
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	// MIDI (sci0 for RS232/422, sci1 for standard MIDI)
 	auto& mdin(MIDI_PORT(config, "mdin"));
@@ -559,8 +556,7 @@ void ctk551_state::ctk601(machine_config& config)
 	m_maincpu->write_port2().set_ioport("P2");
 	m_maincpu->read_port3().set_constant(0); // port 3 pins are shared w/ key matrix
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	// TODO: DSP
 
@@ -604,8 +600,7 @@ void ctk551_state::ctk551(machine_config &config)
 	m_maincpu->write_port2().set_ioport("P2");
 	m_maincpu->read_port3().set_constant(0); // port 3 pins are shared w/ key matrix
 	m_maincpu->write_port3().set_nop();
-	m_maincpu->read_port4().set_constant(0);
-	m_maincpu->write_port4().set_nop();
+	m_maincpu->write_ple().set_nop();
 
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));
@@ -1236,8 +1231,8 @@ void ctk551_state::init_gz70sp()
 
 // models with MACHINE_IMPERFECT_SOUND are missing DSP emulation
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME          FLAGS
-SYST( 1995, ap10,    0,      0,      ap10,    ap10,   ctk551_state, init_ap10,   "Casio", "Celviano AP-10", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-SYST( 1995, ctk530,  0,      0,      ctk530,  ctk530, ctk551_state, init_ctk530, "Casio", "CTK-530",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1995, ap10,    0,      0,      ap10,    ap10,   ctk551_state, init_ap10,   "Casio", "Celviano AP-10", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1995, ctk530,  0,      0,      ctk530,  ctk530, ctk551_state, init_ctk530, "Casio", "CTK-530",        MACHINE_SUPPORTS_SAVE )
 SYST( 1996, gz70sp,  0,      0,      gz70sp,  gz70sp, ctk551_state, init_gz70sp, "Casio", "GZ-70SP",        MACHINE_SUPPORTS_SAVE )
 SYST( 1997, ctk601,  0,      0,      ctk601,  ctk601, ctk551_state, empty_init,  "Casio", "CTK-601",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 SYST( 2000, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init,  "Casio", "CTK-551",        MACHINE_SUPPORTS_SAVE )

@@ -259,4 +259,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, intel02, 0,      0,      intel02, intel02, intel02_state, empty_init, "BREA Research Institute", "Intellect-02", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, intel02, 0,      0,      intel02, intel02, intel02_state, empty_init, "BREA Research Institute", "Intellect-02", MACHINE_SUPPORTS_SAVE )

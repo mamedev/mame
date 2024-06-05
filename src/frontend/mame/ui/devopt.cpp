@@ -368,12 +368,4 @@ void menu_device_config::populate()
 {
 }
 
-bool menu_device_config::handle(event const *ev)
-{
-	if (ev)
-		return handle_key(ev->iptkey);
-	else
-		return false;
-}
-
 } // namespace ui

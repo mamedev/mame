@@ -19,8 +19,8 @@ TODO:
 #include "emu.h"
 
 #include "cpu/cops1/mm5799.h"
-#include "machine/ds8874.h"
 #include "sound/spkrdev.h"
+#include "video/ds8874.h"
 #include "video/pwm.h"
 
 #include "speaker.h"

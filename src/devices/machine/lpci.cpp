@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    machine/lpci.c
+    machine/lpci.cpp
 
     Legacy PCI bus
 
@@ -72,7 +72,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/lpci.h"
+#include "lpci.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

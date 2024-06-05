@@ -457,7 +457,7 @@ uint8_t adam_state::mreq_r(offs_t offset)
 		}
 	}
 
-	data = m_cart->bd_r(offset & 0x7fff, data, cs1, cs2, cs3, cs4);
+	data &= m_cart->read(offset & 0x7fff, cs1, cs2, cs3, cs4);
 	data = m_slot[0]->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
 	data = m_slot[1]->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
 	data = m_slot[2]->bd_r(offset, data, 1, 1, 1, cas1, cas2);
@@ -516,6 +516,7 @@ void adam_state::mreq_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset] = data;
 	}
 
+	// TODO: cartridge slot write
 	m_slot[0]->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
 	m_slot[1]->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
 	m_slot[2]->bd_w(offset, data, 1, 1, 1, cas1, cas2);
@@ -1079,6 +1080,7 @@ void adam_state::adam(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "colec_cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "colec_hb_list").set_original("coleco_homebrew");
 	SOFTWARE_LIST(config, "adam_cart_list").set_original("adam_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("adam_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("adam_flop");

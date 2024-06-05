@@ -72,7 +72,6 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_atni(0),
 	m_atna(0)
 {
-	memset(&cur_live, 0x00, sizeof(cur_live));
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;

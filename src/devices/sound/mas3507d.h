@@ -23,8 +23,6 @@ public:
 
 	void sid_w(uint8_t byte);
 
-	void update_stream() { stream->update(); }
-
 	void reset_playback();
 
 protected:
@@ -89,8 +87,6 @@ private:
 
 	bool is_muted;
 	float gain_ll, gain_rr;
-
-	uint32_t playback_status;
 
 	std::unique_ptr<mp3_audio> mp3dec;
 };

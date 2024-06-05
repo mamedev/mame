@@ -352,4 +352,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1988, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Namco (Data East license)", "Wacky Gator (US)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
+GAME(1988, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Namco (Data East license)", "Wacky Gator (US)", MACHINE_IS_SKELETON_MECHANICAL)

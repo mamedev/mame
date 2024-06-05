@@ -57,7 +57,7 @@ template<unsigned Layer>
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info)
 {
 	const u16 code = m_vram[Layer][tile_index];
-	tileinfo.set(1,
+	tileinfo.set(0,
 			code,
 			m_tilemap_color[Layer],
 			0);
@@ -67,7 +67,7 @@ template<unsigned Layer>
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_16x16)
 {
 	const u16 code = m_vram[Layer][tile_index];
-	tileinfo.set(2,
+	tileinfo.set(1,
 			code,
 			m_tilemap_color[Layer],
 			0);
@@ -80,7 +80,7 @@ void esd16_state::tilemap0_color_w(u16 data)
 	m_tilemap[0]->mark_all_dirty();
 	m_tilemap_16x16[0]->mark_all_dirty();
 
-	bool flip = BIT(data, 7);
+	bool const flip = BIT(data, 7);
 	flip_screen_set(flip);
 	m_sprgen->set_flip_screen(flip);
 }
@@ -91,7 +91,7 @@ void esd16_state::tilemap0_color_jumppop_w(u16 data)
 	m_tilemap_color[0] = 2;
 	m_tilemap_color[1] = 1;
 
-	bool flip = BIT(data, 7);
+	bool const flip = BIT(data, 7);
 	flip_screen_set(flip);
 	m_sprgen->set_flip_screen(flip);
 }

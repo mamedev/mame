@@ -54,9 +54,9 @@ Known issues :
    Yasuhiro Ogawa.
  - Flip screen doesn't work on background layers:
      * 'syvalion': title screen doesn't show up. Also BG tiles are not shown in their proper locations during gameplay
-	 * 'dleague' : title screen doesn't show up. Playfield is not completely shown during gameplay
-	 * 'recordbr': Taito logo doesn't show up during attract mode. Backgrounds don't show up during gameplay
-	 * 'tetristh': title screen doesn't show up. Backgrounds don't show up during gameplay
+     * 'dleague' : title screen doesn't show up. Playfield is not completely shown during gameplay
+     * 'recordbr': Taito logo doesn't show up during attract mode. Backgrounds don't show up during gameplay
+     * 'tetristh': title screen doesn't show up. Backgrounds don't show up during gameplay
 
 
 Stephh's notes (based on the game M68000 code and some tests) :
@@ -75,10 +75,10 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - DSW bit 6 is used to configure TC0160ROM addressing mode to use 1MB JEDEC ROM pinout or 1MB Non-JEDEC 28-pin Mask ROM pinout.
     Main difference between pinouts is the A16 address line and /OE input line are "swapped".
     Enabling or disabling this switch causes different writes to 0x430000.w address, so looks like it's mapped
-	to a control register on TC0160ROM, which is involved in GFX ROM addressing.
-	It writes a 0x2eea value on that address at initializing HW time, only when it's ON (see code at 0x002af8).
-	Another write to this address is done at 0x002a96 with a 0x27ea value (default value?), always at boot up.
-	It's set to "always ON" at the operator manual, because all known PCBs use the 28-pin Mask ROM for GFX data.
+    to a control register on TC0160ROM, which is involved in GFX ROM addressing.
+    It writes a 0x2eea value on that address at initializing HW time, only when it's ON (see code at 0x002af8).
+    Another write to this address is done at 0x002a96 with a 0x27ea value (default value?), always at boot up.
+    It's set to "always ON" at the operator manual, because all known PCBs use the 28-pin Mask ROM for GFX data.
 
 
 2) 'recordbr' and 'gogold'

@@ -916,17 +916,17 @@ uint8_t expro02_state::comad_okim6295_r()
 
 void expro02_state::expro02(machine_config &config)
 {
+    static constexpr XTAL CPU_CLOCK = XTAL(12'000'000);
+    static constexpr XTAL VDP_CLOCK = XTAL(16'000'000);
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL);
+	M68000(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::expro02_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(expro02_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
+    m_screen->set_raw(VDP_CLOCK / 3, 341, 0, 256, 262, 0, 224); // ~60 Hz
 	m_screen->set_screen_update(FUNC(expro02_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -952,7 +952,7 @@ void expro02_state::expro02(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 12000000/6, okim6295_device::PIN7_LOW));
+	okim6295_device &oki(OKIM6295(config, "oki", CPU_CLOCK / 6, okim6295_device::PIN7_LOW));
 	oki.set_addrmap(0, &expro02_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -971,7 +971,8 @@ void expro02_state::comad(machine_config &config)
 	m_view2->set_invert_flip(1);
 	m_view2->set_offset(-256, -216, 256, 224);
 
-	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
+    // FIXME: can't be 0 seconds
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));
 }
 
 void expro02_state::comad_noview2(machine_config &config)

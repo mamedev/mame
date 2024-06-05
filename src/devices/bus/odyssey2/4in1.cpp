@@ -15,12 +15,33 @@ Used in:
 #include "emu.h"
 #include "4in1.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_4IN1, o2_4in1_device, "o2_4in1", "Videopac 40 Cartridge")
-
+namespace {
 
 //-------------------------------------------------
-//  o2_4in1_device - constructor
+//  initialization
 //-------------------------------------------------
+
+class o2_4in1_device : public device_t, public device_o2_cart_interface
+{
+public:
+	o2_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void cart_init() override;
+
+	virtual u8 read_rom04(offs_t offset) override { return m_rom[offset + 0x400]; }
+	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset + 0xc00]; }
+
+	virtual void write_p1(u8 data) override { m_control = data; }
+	virtual void write_p2(u8 data) override { m_bank = data; }
+	virtual u8 io_read(offs_t offset) override;
+
+private:
+	u8 m_control = 0;
+	u8 m_bank = 0;
+};
 
 o2_4in1_device::o2_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, O2_ROM_4IN1, tag, owner, clock),
@@ -51,3 +72,8 @@ u8 o2_4in1_device::io_read(offs_t offset)
 	else
 		return 0xff;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(O2_ROM_4IN1, device_o2_cart_interface, o2_4in1_device, "o2_4in1", "Videopac 40 Cartridge")

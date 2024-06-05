@@ -41,6 +41,7 @@ function layout.startplugin()
 				print_info = emu.print_info,
 				print_debug = emu.print_debug },
 			file = file,
+			math = math,
 			print = print,
 			pairs = pairs,
 			ipairs = ipairs,
@@ -50,7 +51,7 @@ function layout.startplugin()
 			table = table }
 		local script, err = load(script, script, "t", env)
 		if not script then
-			emu.print_verbose("error loading layout script " .. err)
+			emu.print_warning("error loading layout script " .. err)
 			return
 		end
 		local hooks = script()

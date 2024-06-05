@@ -5739,8 +5739,8 @@ GAME( 1986, raflesiau,  raflesia, sys1ppi,           raflesia,  system1_state, e
 
 /* PIO-based System 1 */
 GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE ) // 1984/05/24
-GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE ) // 1984/05/24
-GAME( 1984, flickyb,    flicky,   sys1piox_315_5051, flickyb,   system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms, newer)", MACHINE_SUPPORTS_SAVE ) // 1984/10/07
+GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger ROMs)", MACHINE_SUPPORTS_SAVE ) // 1984/05/24
+GAME( 1984, flickyb,    flicky,   sys1piox_315_5051, flickyb,   system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger ROMs, newer)", MACHINE_SUPPORTS_SAVE ) // 1984/10/07
 GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, spatter,    0,        sys1piosx_315_5096,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Spatter (315-5096)", MACHINE_SUPPORTS_SAVE )

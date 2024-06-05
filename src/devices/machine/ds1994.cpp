@@ -12,7 +12,7 @@
 // FIXME: convert to device_rtc_interface and remove <ctime>
 
 #include "emu.h"
-#include "machine/ds1994.h"
+#include "ds1994.h"
 
 #include <ctime>
 #include <tuple>

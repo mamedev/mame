@@ -869,7 +869,7 @@ void drcbe_x64::reset()
 	a.bind(a.newNamedLabel("entry_point"));
 
 	FuncDetail entry_point;
-	entry_point.init(FuncSignatureT<uint32_t, uint8_t *, x86code *>(CallConvId::kHost), Environment::host());
+	entry_point.init(FuncSignature::build<uint32_t, uint8_t *, x86code *>(CallConvId::kHost), Environment::host());
 
 	FuncFrame frame;
 	frame.init(entry_point);
@@ -1036,7 +1036,7 @@ void drcbe_x64::get_info(drcbe_info &info)
 
 void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param, std::function<bool(Assembler &a, Operand const &dst, be_parameter const &src)> optimize)
 {
-	bool const is64 = dst.size() == 8;
+	bool const is64 = dst.x86RmSize() == 8;
 
 	if (param.is_immediate())
 	{

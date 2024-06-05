@@ -33,8 +33,7 @@ public:
 	auto write_port2() { return m_write_port[PORT_2].bind(); }
 	auto read_port3()  { return m_read_port [PORT_3].bind(); }
 	auto write_port3() { return m_write_port[PORT_3].bind(); }
-	auto read_port4()  { return m_read_port [PORT_4].bind(); }
-	auto write_port4() { return m_write_port[PORT_4].bind(); }
+	auto write_ple()   { return m_write_ple.bind(); }
 
 	void uart_rate_w(u8 data);
 	void uart_control_w(offs_t offset, u8 data);
@@ -91,6 +90,7 @@ protected:
 
 	address_space_config m_data_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_data;
+	devcb_write16 m_write_ple;
 	u16 m_banknum;
 	u8 m_syscr;
 

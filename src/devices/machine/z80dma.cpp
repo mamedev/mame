@@ -45,36 +45,13 @@ enum
 	INT_MATCH_END_OF_BLOCK
 };
 
-constexpr int COMMAND_RESET                         = 0xc3;
-constexpr int COMMAND_RESET_PORT_A_TIMING           = 0xc7;
-constexpr int COMMAND_RESET_PORT_B_TIMING           = 0xcb;
-constexpr int COMMAND_LOAD                          = 0xcf;
-constexpr int COMMAND_CONTINUE                      = 0xd3;
-constexpr int COMMAND_DISABLE_INTERRUPTS            = 0xaf;
-constexpr int COMMAND_ENABLE_INTERRUPTS             = 0xab;
-constexpr int COMMAND_RESET_AND_DISABLE_INTERRUPTS  = 0xa3;
-constexpr int COMMAND_ENABLE_AFTER_RETI             = 0xb7;
-constexpr int COMMAND_READ_STATUS_BYTE              = 0xbf;
-constexpr int COMMAND_REINITIALIZE_STATUS_BYTE      = 0x8b;
-constexpr int COMMAND_INITIATE_READ_SEQUENCE        = 0xa7;
-constexpr int COMMAND_FORCE_READY                   = 0xb3;
-constexpr int COMMAND_ENABLE_DMA                    = 0x87;
-constexpr int COMMAND_DISABLE_DMA                   = 0x83;
-constexpr int COMMAND_READ_MASK_FOLLOWS             = 0xbb;
-
-constexpr int TM_TRANSFER           = 0x01;
-constexpr int TM_SEARCH             = 0x02;
-constexpr int TM_SEARCH_TRANSFER    = 0x03;
-
 
 
 //**************************************************************************
 //  MACROS
 //**************************************************************************
 
-#define REGNUM(_m, _s)          (((_m)<<3) + (_s))
 #define GET_REGNUM(_r)          (&(_r) - &(WR0))
-#define REG(_m, _s)             m_regs[REGNUM(_m,_s)]
 #define WR0                     REG(0, 0)
 #define WR1                     REG(1, 0)
 #define WR2                     REG(2, 0)
@@ -149,7 +126,12 @@ DEFINE_DEVICE_TYPE(Z80DMA, z80dma_device, "z80dma", "Z80 DMA Controller")
 //-------------------------------------------------
 
 z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, Z80DMA, tag, owner, clock)
+	: z80dma_device(mconfig, Z80DMA, tag, owner, clock)
+{
+}
+
+z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_out_busreq_cb(*this)
 	, m_out_int_cb(*this)

@@ -101,6 +101,8 @@ private:
 	};
 
 	struct floppy_info {
+		floppy_info();
+
 		emu_timer *tm;
 		floppy_image_device *dev;
 		int id;
@@ -110,6 +112,8 @@ private:
 	};
 
 	struct live_info {
+		live_info();
+
 		attotime tm;
 		int state, next_state;
 		floppy_info *fi;

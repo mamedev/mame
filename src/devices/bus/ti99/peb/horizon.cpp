@@ -134,6 +134,7 @@
 #define LOG_ORAM        (1U << 6)   // outside of RAM chips
 #define LOG_CRU         (1U << 7)   // CRU
 #define LOG_PAGE        (1U << 8)   // Page access
+#define LOG_LINE        (1U << 9)   // Control lines (like RESET)
 
 #define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 
@@ -167,6 +168,7 @@ horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, co
 	m_phoenix_split(false),
 	m_hideswitch(false),
 	m_rambo_supported(false),
+	m_reset_in(false),
 	m_modified(false),
 	m_page(0),
 	m_bank(0),
@@ -392,6 +394,20 @@ void horizon_ramdisk_device::get_address_prefix()
 	}
 }
 
+void horizon_ramdisk_device::reset_in(int state)
+{
+	m_reset_in = (state==ASSERT_LINE);
+
+	// While the hideswitch is on, the /RESET line is pulled down
+	if (!m_hideswitch)
+	{
+		LOGMASKED(LOG_LINE, "RESET line=%d\n", m_reset_in);
+		// Reset the 259 latches
+		m_crulatch_u3->clear(m_reset_in);
+		m_crulatch_u4->clear(m_reset_in);
+	}
+}
+
 void horizon_ramdisk_device::device_start(void)
 {
 	machine().save().register_postload(save_prepost_delegate(FUNC(horizon_ramdisk_device::get_address_prefix),this));
@@ -420,6 +436,11 @@ INPUT_CHANGED_MEMBER( horizon_ramdisk_device::hs_changed )
 	{
 		LOGMASKED(LOG_CONFIG, "Hideswitch changed to %d\n", newval);
 		m_hideswitch = (newval!=0);
+		if (!m_reset_in)
+		{
+			m_crulatch_u3->clear(m_hideswitch);
+			m_crulatch_u4->clear(m_hideswitch);
+		}
 	}
 	else
 	{

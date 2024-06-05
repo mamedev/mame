@@ -1346,6 +1346,12 @@ void tms99xx_device::service_interrupt()
 
 		m_reset = false;
 		LOG("** RESET triggered\n");
+
+		// RESET could occur during a data derivation sequence, so we have to
+		// prevent the execution loop to return into that sequence by
+		// clearing the return index. This fixes a bug that leads to undefined
+		// behaviour in that situation.
+		m_caller_index = NOPRG;
 	}
 	else
 	{

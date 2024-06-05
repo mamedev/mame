@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  drawd3d.c - Win32 Direct3D HLSL-specific header
+//  drawd3d.h - Win32 Direct3D HLSL-specific header
 //
 //============================================================
 
@@ -457,7 +457,7 @@ private:
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options
-	static char             last_system_name[16];       // last used system
+	static char             last_system_name[MAX_DRIVER_NAME_CHARS + 1]; // last used system
 
 	osd::dynamic_module::ptr d3dx9_dll;
 	d3dx_create_effect_from_file_fn d3dx_create_effect_from_file_ptr;

@@ -3132,6 +3132,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gemitas">
+		<description>Gemitas</description>
+		<year>2018</year>
+		<publisher>Cyttorak</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="gemitas.sms" size="65536" offset="0x00000" crc="d0f12c3e" sha1="43d3f47a23fbe407da03b52c8f49d0bf65960f31" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="gerald" cloneof="teddyboy">
@@ -3942,8 +3952,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="jewelstn">
-		<description>Jewel Stone (demo)</description>
+	<software name="jeweljon">
+		<description>Jewel Jones (demo)</description>
 		<year>2019</year>
 		<publisher>ichigobankai &amp; Vingazole</publisher>
 		<info name="version" value="demo 17 Aug 2019" />
@@ -7323,6 +7333,17 @@ license:CC0-1.0
 			<feature name="ic1" value="MPR-12584" />
 			<dataarea name="rom" size="32768">
 				<rom name="mpr-12584.ic1" size="32768" crc="914514e3" sha1="67787f3f29a5b5e74b5f6a636428da4517a0f992" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sydneyhr">
+		<description>Sydney Hunter and the Sacred Tribe</description>
+		<year>2019</year>
+		<publisher>CollectorVision</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="Sydney Hunter - The Sacred Tribe (World).sms" size="131072" offset="0x00000" crc="e3060500" sha1="e10253c75026b686435a2bd44ceba5b1eef1e6a2" />
 			</dataarea>
 		</part>
 	</software>

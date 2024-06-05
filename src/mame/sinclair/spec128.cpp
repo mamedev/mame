@@ -353,9 +353,9 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	spectrum(config);
 
 	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 10);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_128_state::spectrum_128_mem);
-	m_maincpu->set_addrmap(AS_IO, &spectrum_128_state::spectrum_128_io);
-	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_128_state::spectrum_128_fetch);
+	m_maincpu->set_memory_map(&spectrum_128_state::spectrum_128_mem);
+	m_maincpu->set_io_map(&spectrum_128_state::spectrum_128_io);
+	m_maincpu->set_m1_map(&spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
 

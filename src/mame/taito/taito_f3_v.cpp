@@ -1,23 +1,26 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, David Haywood
+// copyright-holders:Bryan McPhail, ywy, 12Me21
 /***************************************************************************
 
-   Taito F3 Video emulation - Bryan McPhail, mish@tendril.co.uk
+   Taito F3 Video emulation
+   Thanks to original driver and research by Bryan McPhail (2001)
+   and additional information from David Haywood and others
+
+   (2024) major rewrite and updates by ywy and 12
 
 ****************************************************************************
 
 Brief overview:
 
-    4 scrolling layers (512x512 or 1024x512) of 4/5/6 bpp tiles.
+    4 scrolling layers (512x512 or 1024x512) of 4, 5, or 6 bpp tiles.
     1 scrolling text layer (512x512, characters generated in vram), 4bpp chars.
     1 scrolling pixel layer (512x256 pixels generated in pivot ram), 4bpp pixels.
     2 sprite banks (for double buffering of sprites)
     Sprites can be 4, 5 or 6 bpp
     Sprite scaling.
-    Rowscroll on all playfields
-    Line by line zoom on all playfields
-    Column scroll on all playfields
-    Line by line sprite and playfield priority mixing
+    Line by line effects on all playfields
+    Line by line control of priority/mixing on sprites and text/pixel layer
+    2 of the 4 playfields have (line by line) access to alternate tilemaps
 
 Notes:
     All special effects are controlled by an area in 'line ram'.  Typically
@@ -27,14 +30,13 @@ Notes:
     is the scale control for that line in the destination bitmap (screen).
     Therefore each line can have a different zoom value for special effects.
 
-    This also applies to playfield priority, rowscroll, column scroll, sprite
-    priority and VRAM/pivot layers.
+    This also applies to playfield priority, rowscroll, column scroll, clipping,
+    palette interpretation, sprite priority, VRAM/pivot layers, and so on...
 
     However - at the start of line ram there are also sets of 256 values
-    controlling each effect - effects can be selectively applied to individual
-    playfields or only certain lines out of the 256 can be active - in which
-    case the last allowed value can be latched (typically used so a game can
-    use one zoom or row value over the whole playfield).
+    with bits controlling each effect subsection, which cause the last allowed
+    value to be latched (typically used so a game can use one zoom or row value
+    over the whole playfield).
 
     The programmers of some of these games made strange use of flipscreen -
     some games have all their graphics flipped in ROM, and use the flipscreen
@@ -49,153 +51,199 @@ Line ram memory map:
 
     Here 'playfield 1' refers to the first playfield in memory, etc
 
-    0x0000: Column line control ram (256 lines)
-        100x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
-    0x0200: Line control ram for 0x5000 section.
-    0x0400: Line control ram for 0x6000 section.
-        180x:   Where bit 0 of x latches sprite alpha value
-                Where bit 1 of x latches tilemap alpha value
-    0x0600: Sprite control ram
-        1c0x:   Where x enables sprite control word for that line
-    0x0800: Zoom line control ram (256 lines)
-        200x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
-    0x0a00: Palette add line control ram (256 lines)
-    0x0c00: Rowscroll line control ram (256 lines)
-        280x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
-    0x0e00: Priority line control ram (256 lines)
-        2c0x:   Where bit 0 of x enables effect on playfield 1
-                Where bit 1 of x enables effect on playfield 2
-                Where bit 2 of x enables effect on playfield 3
-                Where bit 3 of x enables effect on playfield 4
+  Line set ram: (one word per line, 256 lines per section)
+    Each enable bit corresponds to a subsection, e.g. bit 0 sets/latches
+    a line in 0x...000-1fe, bit 1 latches a line in 0x...200-3fe, etc.
+    In rare cases (e.g. bubblem), the second set of subsections
+    is latched on using bits 4,5,6,7 for ..800,a00,c00,e00, respectively.
 
+    0x0000: Line set ram for 4000 (column scroll, alt tilemap, clip) section
+        10xx
+    0x0200: Line set ram for 5000 (clip planes) section
+        14xx
+    0x0400: Line set ram for 6000 (blending) section
+        18xx
+    0x0600: Line set ram for 7000 (pivot and sprite layer mixing) section
+        1cxx
+    0x0800: Line set ram for 8000 (zoom) section
+        20xx
+    0x0a00: Line set ram for 9000 (palette add) section
+        24xx
+    0x0c00: Line set ram for a000 (row scroll) section
+        28xx
+    0x0e00: Line set ram for b000 (playfield mixing info) section
+        2cxx
+
+  "Pivot port" (0x1000-2fff) has only one known used address.
     0x1000: Unknown control word?
         (usually 0x00f0; gseeker, spcinvdj, twinqix, puchicar set 0x0000)
 
-    0x4000: Column scroll & clipping info
+
+  Line data ram (8 sections, 4 normal and 4 alt subsections of 256 lines each):
+
+    0x4000: Column scroll (playfield 3/4) & clipping
       4400 Bits: RLrl --Ts ssss ssss
-        s = playfield 3 column scroll (0-511)
-        T = use alternate tilemap (+0x2000) - kirameki, kaiserkn, hthero
-        - = unused?
-        l = clip 0 left high bit
-        r = clip 0 right high bit
-        L = clip 1 left high bit
-        R = clip 1 right high bit
+          s = playfield 3 column scroll (0-511)
+          T = use alternate tilemap (+0x2000) - kirameki, kaiserkn, hthero
+          - = unused?
+          l = clip 0 left high bit
+          r = clip 0 right high bit
+          L = clip 1 left high bit
+          R = clip 1 right high bit
       4600: as 4400, for playfield 4 / clip plane 2 and 3
 
     0x5000: Clip plane 0 (low bits (high in 4400))
-    0x5200: Clip plane 1 (low bits (high in 4400))
-    0x5400: Clip plane 2 (low bits (high in 4600))
-    0x5600: Clip plane 3 (low bits (high in 4600))
+      5200: Clip plane 1 (low bits (high in 4400))
+      5400: Clip plane 2 (low bits (high in 4600))
+      5600: Clip plane 3 (low bits (high in 4600))
+        Bits:  rrrr rrrr llll llll
 
     0x6000: Sync register
-    0x6004: Sprite alpha control
+    0x6004: Sprite alpha control  (+ pivot-related bits?)
         0xff00: VRAM/Pixel layer control
-            0xa000 enables pixel layer for this line (Disables VRAM layer)
-            0x2000 enables garbage pixels for this line (maybe another pixel bank?) [unemulated]
-            0x0800 seems to set the vram layer to be opaque [unemulated]
-            Effect of other bits is unknown.
-        0x00c0: Alpha mode for sprites with pri value 0x00
-        0x0030: Alpha mode for sprites with pri value 0x00
-        0x000c: Alpha mode for sprites with pri value 0x00
-        0x0003: Alpha mode for sprites with pri value 0x00
-    0x6200: Alpha blending control
+          Bits: B?p? o?A?
+            A = alpha blend value select
+            o = ?
+              "0x0800 seems to set the vram layer to be opaque [unemulated]"
+            p = enable pixel layer
+              "0x2000 enables garbage pixels for this line (maybe another pixel bank?) [unemulated]"
+            B = pixel bank ?
+            ? = unknown
+        0x00ff: Bits: DdCc BbAa
+            Dd = Alpha mode for sprites with pri value 0xc0
+            Cc = Alpha mode for sprites with pri value 0x80
+            Bb = Alpha mode for sprites with pri value 0x40
+            Aa = Alpha mode for sprites with pri value 0x00
 
-    0x6400 - controls X zoom of tile - each tile collapses to 16 single colour lines
-        xxx1 - affects bottom playfield
-        xxx2 -
-        xxx4 -
-        xxx8 - affects top playfield
-        xxfx - x zoom - 0 = 1st pixel 16 times
-                        1 = 1st pixel 8, then 2nd 8
-                        8 = 2 per pixel
+    0x6200: Alpha blend values
+        Bits: BBBB AAAA bbbb aaaa
+            A = contribution (alpha) value A for SOURCE when alpha mode is not reversed
+            B = contribution (alpha) value B for SOURCE when alpha mode is not reversed
+            a = contribution (alpha) value A for DEST when alpha mode is not reversed
+            b = contribution (alpha) value B for DEST when alpha mode is not reversed
 
-        (these effects only known to be used on spcinvdj title screen and riding fight - not emulated)
+    0x6400: forward repeat and palette
+        0x03ff: x repeat / mosaic - each tile collapses to 16 single colour lines
+          Bits: ??ps mmmm 4321
+            4321 = enable effect for respective playfield
+            mmmm = x repeat - 0 = repeat 1st pixel 16 times (sample every 16)
+                              1 = repeat 1st pixel 15 times (sample every 15)
+                              f = repeat 1st pixel  1 times (sample every pixel)
+               s = enable effect for sprites
+               p = enable effect for pivot layer
+            (spcinvdj title screen, riding fight, command war)
 
-        1xxx = interpret palette ram for this playfield line as 15 bit and bilinear filter framebuffer(??)
-        3xxx = interpret palette ram for this playfield line as 15 bit
-        7xxx = interpret palette ram for this playfield line as 24 bit palette
-        8xxx = interpret palette ram for this playfield line as 21 bit palette
+          x4xx = ??? seems to display garbage pixels on the pivot layer (unused?)
+          x8xx = ??? seems to affect the palette of a single layer(??) (gunlock)
 
-        (effect not emulated)
+       0xf000: palette ram format? [unemulated]
+         Bits: ?wBu
+           ? = ? possibly "interpret palette ram for this as 21-bit palette"
+           w = 1 = interpret palette entries as 12-bit RGB
+           B = 0 = enable horizontal forward blur (1 = don't blur)
+           u = ??? (normally 1)
 
     0x6600: Background - background palette entry (under all tilemaps) (takes part in alpha blending)
 
-        (effect not emulated)
-
-    0x7000: Pivot/vram layer enable
-    0x7200: Cram layer priority
-    0x7400: Sprite clipping (like playfield priority clip bits but shifted)
+    0x7000: ? [unemulated]
+        "Pivot/vram layer enable" ?
+    0x7200: VRAM layer mixing info (incl. priority)
+        Bits: BAEI cccc iiii pppp  (see 0xb000)
+    0x7400: Sprite mixing info (without priority, like playfield priority clip bits but shifted)
+        Bits: AAAA ??EI cccc iiii
+                   | ^^ ^^^^ ^^^^ line enable/clip/inverse clip (see 0xb000)
+                   ^ 0x0800 set by arabianm, bubsymph, bubblem, cleopatr, commandw, cupfinal, gseeker, spcinv95, twinqix, kirameki...
+              A = Alpha blend value select for sprites with pri value 0xc0/80/40/00
     0x7600: Sprite priority values
         0xf000: Relative priority for sprites with pri value 0xc0
         0x0f00: Relative priority for sprites with pri value 0x80
         0x00f0: Relative priority for sprites with pri value 0x40
         0x000f: Relative priority for sprites with pri value 0x00
 
-    0x8000: Playfield 1 scale (1 word per line, 256 lines, 0x80 = default no scale)
+    0x8000: Playfield 1 scale (1 word per line, 256 lines, 0x0080 = default no scale)
     0x8200: Playfield 2/4 scale
     0x8400: Playfield 3 scale
     0x8600: Playfield 2/4 scale
         0x00ff = Y scale (0x80 = no scale, > 0x80 is zoom in, < 0x80 is zoom out [0xc0 is half height of 0x80])
-        0xff00 = X scale (0 = no scale, > 0 = zoom in, [0x8000 would be double length])
+                 source pixels per screen pixel in fixed1.7
+        0xff00 = X scale (0 = no scale, > 0 = zoom in, [0x8000 = double length, i.e., 0.5 src step per screen px])
+                 1.0 − fixed0.8 source pixels per screen pixel?
 
         Playfield 2 & 4 registers seem to be interleaved, playfield 2 Y zoom is stored where you would
         expect playfield 4 y zoom to be and vice versa.
 
-    0x9000: Palette add (can affect opacity)
+    0x9000: Palette add (can affect blend output)
+      9200: Playfield 2 palette add
+      9400: Playfield 3 palette add
+      9600: Playfield 4 palette add
 
     0xa000: Playfield 1 rowscroll (1 word per line, 256 lines)
-    0xa200: Playfield 2 rowscroll
-    0xa400: Playfield 3 rowscroll
-    0xa600: Playfield 4 rowscroll
+      a200: Playfield 2 rowscroll
+      a400: Playfield 3 rowscroll
+      a600: Playfield 4 rowscroll
 
-    0xb000: Playfield 1 priority (1 word per line, 256 lines)
-    0xb200: Playfield 2 priority
-    0xb400: Playfield 3 priority
-    0xb600: Playfield 4 priority
-        0x000f = Layer priority
-        0x0010 = Clip inverse mode for plane 0
-        0x0020 = Clip inverse mode for plane 1
-        0x0040 = Clip inverse mode for plane 2
-        0x0080 = Clip inverse mode for plane 3
-        0x0100 = If set enable clip plane 0
-        0x0200 = If set enable clip plane 1
-        0x0400 = If set enable clip plane 2
-        0x0800 = If set enable clip plane 3
-        0x1000 = Affects interpretation of inverse mode bits. If on, 1 = invert. if off, 0 = invert.
-        0xe000 = Blend mode, 0x3000 = Normal, 0x7000 = Alpha A, 0xb000 = Alpha B, others disable line
+    0xb000: Playfield 1 mixing info (layer compositing information)
+      b200: Playfield 2 mixing info
+      b400: Playfield 3 mixing info
+      b600: Playfield 4 mixing info
+        Bits: BAEI cccc iiii pppp
+          p = Layer priority
+          i = Clip inverse mode for corresponding plane
+          c = If set, enable corresponding clip plane
+          I = Affects interpretation of inverse mode bits. if on, 1 = invert. if off, 0 = invert.
+          E = Enable line
+          A = Alpha mode A - alpha enable
+          B = Alpha mode B - alpha with reversed source/destination contribution
 
     0xc000 - 0xffff: Unused.
-
-    When sprite priority==playfield priority sprite takes precedence (Bubble Symph title)
 
 ****************************************************************************
 
     F3 sprite format:
 
-    Word 0: 0xffff      Tile number (LSB)
-    Word 1: 0xff00      X zoom
-            0x00ff      Y zoom
-    Word 2: 0x03ff      X position
-    Word 3: 0x03ff      Y position
-    Word 4: 0xf000      Sprite block controls
-            0x0800      Sprite block start
-            0x0400      Use same colour on this sprite as block start
-            0x0200      Y flip
-            0x0100      X flip
-            0x00ff      Colour
-    Word 5: 0xffff      Tile number (MSB), probably only low bits used
-    Word 6: 0x8000      If set, jump to sprite location in low bits
-            0x03ff      Location to jump to.
-    Word 7: 0xffff      Unused?  Always zero?
+    word 0: [tttt tttt tttt tttt]
+     t: lower 16 bits of tile number
+
+    word 1: [yyyy yyyy xxxx xxxx]
+     y: y zoom (scale factor is: (256-zoom)/256)
+     x: x zoom
+
+    word 2: [iiss xxxx xxxx xxxx]
+     i: ignore global/subglobal scroll
+     s: set global/subglobal scroll
+     x: x position (signed 12 bits)
+
+    word 3: [c.BA yyyy yyyy yyyy]
+     c: special command (parameters are in word 5)
+     B: ? set by gseeker on a special command (also sets word 3 to FFEE: probably a position overflow again)
+     A: ? set by ridingf on ACTUAL SPRITES during gameplay - probably just the position overflowing
+     y: y position (signed 12 bits)
+     (???) ridingf sets this word to 0x9000 at 0x3710, and 0x9001 at 0xB710
+
+    word 4: [bbbb mlyx cccc cccc]
+     b: block position controls
+     m: "multi" - set to 0 on the sprite before a new sprite block
+     l: "lock" - reuse palette from previous sprite
+     y: y flip
+     x: x flip
+     c: color palette
+
+    word 5: [.... .... .... ...h] (normal sprite)
+     h: upper bit of tile number
+    word 5: [..fA ..pp ..?? ..tb] (if special command bit set)
+     f: enable flipscreen
+     A: ??? set by ridingf
+     p: enable extra planes (00 = 4bpp, 01 = 5bpp, 11 = 6bpp)
+     t: enable sprite trails (don't clear framebuffer)
+     b: sprite bank to switch to
+     (???) ridingf sets this word to 1000/1001 at 0x3710 and 0xB710
+
+    word 6: [j... ..ii iiii iiii]
+     j: jump command if set
+     i: index to jump to (0-1023)
+
+    word 7: [.... .... .... ....]
+     (unused)
 
 ****************************************************************************
 
@@ -215,32 +263,56 @@ Playfield tile info:
     0xc000 0000 - X/Y Flip
     0x3000 ffff - Tile index
     0x0c00 0000 - Extra planes enable (00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp)
-    0x0200 0000 - Alpha blend mode
+    0x0200 0000 - Blend value select
     0x01ff 0000 - Colour
+
+
+***************************************************************************
+    blending seems to work something like:
+    Blend values:
+     Bits: [BBBB AAAA bbbb aaaa]
+     opacity is (15-N)/8, clamped to (0, 1.0)
+
+    each layer (each playfield, each sprite priority group, and pivot):
+     1) blend enable bit ("blend mode A" historically)
+     2) reverse blend enable bit ("blend mode B" historically)
+        always grouped together, usually with other mixing-related bits
+        - these select between the a/b and A/B blend value pairs
+        - when both 0 or both 1 (sprites), the layer is opaque.
+          opaque layers use two contribution values. (e.g. A*x + a*x)
+
+     3) blend value select bit ("blend select")
+        per-line for pivot and sprite groups, per-tile for playfields
+        this selects between the two sets of blend contribution values.
+
+     a lower priority non-blank pixel with *different* blend mode from source:
+       is combined by saturating addition in the blending circuit using
+       a contribution amount according to the opposite of the source blend mode,
+       and according to its own blend select bit
+
+     -  should only be (up to) 2 contributing layers to each final pixel (?)
+     -  there's a HW "feature" (bug?) when layers have a prio conflict.
+          in this case, for a given pixel, it seems like the second layer
+          can reset part of the state... (dariusg stage V' clouds)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "taito_f3.h"
-#include "render.h"
 
 #include <algorithm>
+#include <variant>
 
-#define VERBOSE 0
-#define DARIUSG_KLUDGE
-#define TAITOF3_VIDEO_DEBUG 0
-
+constexpr int TAITOF3_VIDEO_DEBUG = 0;
 
 // Game specific data - some of this can be removed when the software values are figured out
-struct taito_f3_state::F3config
-{
+struct taito_f3_state::F3config {
 	int name;
 	int extend;     // playfield control 0x1F bit 7
 	int sprite_lag;
 };
 
-const taito_f3_state::F3config taito_f3_state::f3_config_table[] =
-{
+const taito_f3_state::F3config taito_f3_state::f3_config_table[] = {
 	/* Name    Extend  Lag */
 	{ RINGRAGE,  0,     2 },
 	{ ARABIANM,  0,     2 },
@@ -278,68 +350,29 @@ const taito_f3_state::F3config taito_f3_state::f3_config_table[] =
 	{0}
 };
 
-
-/*
-alpha_mode
----- --xx    0:disable 1:nomal 2:alpha 7000 3:alpha b000
----1 ----    alpha level a
---1- ----    alpha level b
-1--------    opaque line
-*/
-
-
-/*
-pri_alp_bitmap
----- ---1    sprite priority 0
----- --1-    sprite priority 1
----- -1--    sprite priority 2
----- 1---    sprite priority 3
----1 ----    alpha level a 7000
---1- ----    alpha level b 7000
--1-- ----    alpha level a b000
-1--- ----    alpha level b b000
-1111 1111    opaque pixel
-*/
-
-
 void taito_f3_state::device_post_load()
 {
-	/* force a reread of the dynamic tiles in the pixel layer */
+	// force a reread of the dynamic tiles in the pixel layer
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 	m_gfxdecode->gfx(1)->mark_all_dirty();
-}
 
-/******************************************************************************/
-
-void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
-{
-#if (TAITOF3_VIDEO_DEBUG)
-	const u16 *line_ram = m_line_ram;
-	popmessage("%04X %04X %04X %04X %04X %04X %04X %04X\n"
-			   "%04X %04X %04X %04X %04X %04X %04X %04X\n"
-			   "%04X %04X %04X %04X %04X %04X %04X %04X\n"
-			   "Ctr1: %04x %04x %04x %04x\n"
-			   "Ctr2: %04x %04x %04x %04x\n"
-			   "Colm: %04x %04x %04x %04x\n"
-			   "Clip: %04x %04x %04x %04x\n"
-			   "Sprt: %04x %04x %04x %04x\n"
-			   "Pivt: %04x %04x %04x %04x\n"
-			   "Zoom: %04x %04x %04x %04x\n"
-			   "Line: %04x %04x %04x %04x\n"
-			   "Pri : %04x %04x %04x %04x\n",
-			   m_spriteram16_buffered[0], m_spriteram16_buffered[1], m_spriteram16_buffered[2], m_spriteram16_buffered[3], m_spriteram16_buffered[4], m_spriteram16_buffered[5], m_spriteram16_buffered[6], m_spriteram16_buffered[7],
-			   m_spriteram16_buffered[8], m_spriteram16_buffered[9], m_spriteram16_buffered[10], m_spriteram16_buffered[11], m_spriteram16_buffered[12], m_spriteram16_buffered[13], m_spriteram16_buffered[14], m_spriteram16_buffered[15],
-			   m_spriteram16_buffered[16], m_spriteram16_buffered[17], m_spriteram16_buffered[18], m_spriteram16_buffered[19], m_spriteram16_buffered[20], m_spriteram16_buffered[21], m_spriteram16_buffered[22], m_spriteram16_buffered[23],
-			   line_ram[0x0100/2] & 0xffff, line_ram[0x0300/2] & 0xffff, line_ram[0x0500/2] & 0xffff, line_ram[0x0700/2] & 0xffff,
-			   line_ram[0x0900/2] & 0xffff, line_ram[0x0b00/2] & 0xffff, line_ram[0x0d00/2] & 0xffff, line_ram[0x0f00/2] & 0xffff,
-			   line_ram[0x4180/2] & 0xffff, line_ram[0x4380/2] & 0xffff, line_ram[0x4580/2] & 0xffff, line_ram[0x4780/2] & 0xffff,
-			   line_ram[0x5180/2] & 0xffff, line_ram[0x5380/2] & 0xffff, line_ram[0x5580/2] & 0xffff, line_ram[0x5780/2] & 0xffff,
-			   line_ram[0x6180/2] & 0xffff, line_ram[0x6380/2] & 0xffff, line_ram[0x6580/2] & 0xffff, line_ram[0x6780/2] & 0xffff,
-			   line_ram[0x7180/2] & 0xffff, line_ram[0x7380/2] & 0xffff, line_ram[0x7580/2] & 0xffff, line_ram[0x7780/2] & 0xffff,
-			   line_ram[0x8180/2] & 0xffff, line_ram[0x8380/2] & 0xffff, line_ram[0x8580/2] & 0xffff, line_ram[0x8780/2] & 0xffff,
-			   line_ram[0xa180/2] & 0xffff, line_ram[0xa380/2] & 0xffff, line_ram[0xa580/2] & 0xffff, line_ram[0xa780/2] & 0xffff,
-			   line_ram[0xb180/2] & 0xffff, line_ram[0xb380/2] & 0xffff, line_ram[0xb580/2] & 0xffff, line_ram[0xb780/2] & 0xffff)
-#endif
+	// refresh tile usage indexes
+	std::fill_n(*m_tilemap_row_usage, 32 * 8, 0);
+	std::fill_n(m_textram_row_usage, 64, 0);
+	// playfield blank tiles
+	for (int offset = 1; offset < 0x4000; offset += 2) {
+		const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
+		const int tmap = m_extend ? offset >> 12 : offset >> 11;
+		if (m_pf_ram[offset] != 0)
+			m_tilemap_row_usage[row][tmap] += 1;
+	}
+	// textram blank tiles
+	for (int offset = 0; offset < 0x1000; offset++) {
+		const u8 tile = BIT(m_textram[offset], 0, 8);
+		const int row  = BIT(offset, 6, 6);
+		if (tile != 0)
+			m_textram_row_usage[row] += 1;
+	}
 }
 
 /******************************************************************************/
@@ -347,17 +380,25 @@ void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
 template<unsigned Layer>
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 {
-	const u32 tile = (m_pf_data[Layer][tile_index * 2 + 0] << 16) | (m_pf_data[Layer][tile_index * 2 + 1] & 0xffff);
-	const u16 palette_code = BIT(tile, 16, 9);
-	const u8 abtype        = BIT(tile, 25, 1);
-	const u8 extra_planes  = BIT(tile, 26, 2); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
+	u16 *tilep = &m_pf_data[Layer][tile_index * 2];
+	// tile info:
+	// [yx?? ddac cccc cccc]
+	// yx: x/y flip
+	// ?: upper bits of tile number?
+	// d: bpp
+	// a: blend select
+	// c: color
+
+	const u16 palette_code = BIT(tilep[0],  0, 9);
+	const u8 blend_sel     = BIT(tilep[0],  9, 1);
+	const u8 extra_planes  = BIT(tilep[0], 10, 2); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
 	tileinfo.set(3,
-			tile & 0xffff,
+			tilep[1],
 			palette_code,
-			TILE_FLIPYX(BIT(tile, 30, 2)));
+			TILE_FLIPYX(BIT(tilep[0], 14, 2)));
 
-	tileinfo.category = abtype & 1; // alpha blending type
+	tileinfo.category = blend_sel; // blend value select
 	// gfx extra planes and palette code set the same bits of color address
 	// we need to account for tilemap.h combining using "+" instead of "|"
 	tileinfo.pen_mask = ((extra_planes & ~palette_code) << 4) | 0x0f;
@@ -366,131 +407,75 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 {
+	const u16 vram_tile = m_textram[tile_index];
+	// text tile info:
+	// [yccc cccx tttt tttt]
+	// y: y flip
+	// c: palette
+	// x: x flip
+	// t: tile number
+
 	u8 flags = 0;
-
-	const u16 vram_tile = (m_textram[tile_index] & 0xffff);
-
-	if (vram_tile & 0x0100) flags |= TILE_FLIPX;
-	if (vram_tile & 0x8000) flags |= TILE_FLIPY;
+	if (BIT(vram_tile,  8)) flags |= TILE_FLIPX;
+	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
 	tileinfo.set(0,
 			vram_tile & 0xff,
-			(vram_tile >> 9) & 0x3f,
+			BIT(vram_tile, 9, 6),
 			flags);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 {
-	int col_off;
+	/* attributes are shared with VRAM layer */
+	// convert the index:
+	// pixel: [0xxxxxxyyyyy]
+	//  text: [?yyyyyxxxxxx]
+	const int x = BIT(tile_index, 5, 6);
+	int y = BIT(tile_index, 0, 5);
+	// HACK: [legacy implementation of scroll offset check for pixel palette mirroring]
+	// the pixel layer is 256px high, but uses the palette from the text layer which is twice as long
+	// so normally it only uses the first half of textram, BUT if you scroll down, you get
+	//   an alternate version of the pixel layer which gets its palette data from the second half of textram.
+	// we simulate this using a hack, checking scroll offset to determine which version of the pixel layer is visible.
+	// this means we SHOULD dirty parts of the pixel layer, if the scroll or flipscreen changes.. but we don't.
+	// (really we should just apply the palette during rendering instead of this ?)
+	int y_offs = y * 8 + m_control_1[5];
+	if (m_flipscreen)
+		y_offs += 0x100; // this could just as easily be ^= 0x100 or -= 0x100
+	if ((y_offs & 0x1ff) >= 256)
+		y += 32;
+
+	const u16 vram_tile = m_textram[y << 6 | x];
+
+	const int tile = tile_index;
+	const u8 palette = BIT(vram_tile, 9, 6);
 	u8 flags = 0;
-	int y_offs = (m_control_1[5] & 0x1ff);
-	if (m_flipscreen) y_offs += 0x100;
+	if (BIT(vram_tile, 8))  flags |= TILE_FLIPX;
+	if (BIT(vram_tile, 15)) flags |= TILE_FLIPY;
 
-	/* Colour is shared with VRAM layer */
-	if ((((tile_index & 0x1f) * 8 + y_offs) & 0x1ff) > 0xff)
-		col_off = 0x800 + ((tile_index & 0x1f) << 6) + ((tile_index & 0xfe0) >> 5);
-	else
-		col_off = ((tile_index & 0x1f) << 6) + ((tile_index & 0xfe0) >> 5);
-
-	const u16 vram_tile = (m_textram[col_off] & 0xffff);
-
-	if (vram_tile & 0x0100) flags |= TILE_FLIPX;
-	if (vram_tile & 0x8000) flags |= TILE_FLIPY;
-
-	tileinfo.set(1,
-			tile_index,
-			(vram_tile >> 9) & 0x3f,
-			flags);
+	tileinfo.set(1, tile, palette, flags);
 }
 
 /******************************************************************************/
 
 void taito_f3_state::screen_vblank(int state)
 {
-	// rising edge
-	if (state)
-	{
-		if (m_sprite_lag==2)
-		{
-			if (machine().video().skip_this_frame() == 0)
-			{
-				get_sprite_info(m_spriteram16_buffered.get());
-			}
-			memcpy(m_spriteram16_buffered.get(), m_spriteram.target(), 0x10000);
-		}
-		else if (m_sprite_lag == 1)
-		{
-			if (machine().video().skip_this_frame() == 0)
-			{
-				get_sprite_info(m_spriteram.target());
-			}
-		}
+	if (state) {
+		//get_sprite_info();
 	}
 }
 
-void taito_f3_state::video_start()
+void taito_f3_state::create_tilemaps(bool extend)
 {
-	const F3config *pCFG = &f3_config_table[0];
-
-	m_alpha_level_2as = 127;
-	m_alpha_level_2ad = 127;
-	m_alpha_level_3as = 127;
-	m_alpha_level_3ad = 127;
-	m_alpha_level_2bs = 127;
-	m_alpha_level_2bd = 127;
-	m_alpha_level_3bs = 127;
-	m_alpha_level_3bd = 127;
-	m_alpha_level_last = -1;
-
-	m_pdest_2a = 0x10;
-	m_pdest_2b = 0x20;
-	m_tr_2a = 0;
-	m_tr_2b = 1;
-	m_pdest_3a = 0x40;
-	m_pdest_3b = 0x80;
-	m_tr_3a = 0;
-	m_tr_3b = 1;
-
-	m_spritelist = nullptr;
-	m_spriteram16_buffered = nullptr;
-	m_pf_line_inf = nullptr;
-	m_tile_opaque_sp = nullptr;
-
-	/* Setup individual game */
-	do {
-		if (pCFG->name == m_game)
-		{
-			break;
-		}
-		pCFG++;
-	} while (pCFG->name);
-
-	m_game_config=pCFG;
-
-	if (m_game_config->extend)
-	{
+	m_extend = extend;
+	if (m_extend) {
 		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[4] = m_tilemap[5] = m_tilemap[6] = m_tilemap[7] = nullptr;
-
-		m_pf_data[0] = m_pf_ram + (0x0000 / 2);
-		m_pf_data[1] = m_pf_ram + (0x2000 / 2);
-		m_pf_data[2] = m_pf_ram + (0x4000 / 2);
-		m_pf_data[3] = m_pf_ram + (0x6000 / 2);
-
-		m_width_mask = 0x3ff;
-		m_twidth_mask = 0x7f;
-		m_twidth_mask_bit = 7;
-
-		m_tilemap[0]->set_transparent_pen(0);
-		m_tilemap[1]->set_transparent_pen(0);
-		m_tilemap[2]->set_transparent_pen(0);
-		m_tilemap[3]->set_transparent_pen(0);
-	}
-	else
-	{
+	} else {
 		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 		m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -499,41 +484,49 @@ void taito_f3_state::video_start()
 		m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<5>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 		m_tilemap[6] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<6>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 		m_tilemap[7] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<7>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-
-		m_pf_data[0] = m_pf_ram + (0x0000 / 2);
-		m_pf_data[1] = m_pf_ram + (0x1000 / 2);
-		m_pf_data[2] = m_pf_ram + (0x2000 / 2);
-		m_pf_data[3] = m_pf_ram + (0x3000 / 2);
-		m_pf_data[4] = m_pf_ram + (0x4000 / 2);
-		m_pf_data[5] = m_pf_ram + (0x5000 / 2);
-		m_pf_data[6] = m_pf_ram + (0x6000 / 2);
-		m_pf_data[7] = m_pf_ram + (0x7000 / 2);
-
-		m_width_mask = 0x1ff;
-		m_twidth_mask = 0x3f;
-		m_twidth_mask_bit = 6;
-
-		m_tilemap[0]->set_transparent_pen(0);
-		m_tilemap[1]->set_transparent_pen(0);
-		m_tilemap[2]->set_transparent_pen(0);
-		m_tilemap[3]->set_transparent_pen(0);
-		m_tilemap[4]->set_transparent_pen(0);
-		m_tilemap[5]->set_transparent_pen(0);
-		m_tilemap[6]->set_transparent_pen(0);
-		m_tilemap[7]->set_transparent_pen(0);
 	}
+	for (int i = 0; i < 8; i++) {
+		if (m_tilemap[i])
+			m_tilemap[i]->set_transparent_pen(0);
+	}
+	std::fill_n(*m_tilemap_row_usage, 32 * 8, 0);
 
-	m_spriteram16_buffered = std::make_unique<u16[]>(0x10000 / 2);
+	if (m_extend) {
+		m_width_mask = 0x3ff; // 10 bits
+		for (int i = 0; i < 4; i++)
+			m_pf_data[i] = &m_pf_ram[(0x2000 * i) / 2];
+	} else {
+		m_width_mask = 0x1ff; // 9 bits
+		for (int i = 0; i < 8; i++)
+			m_pf_data[i] = &m_pf_ram[(0x1000 * i) / 2];
+	}
+}
+
+void taito_f3_state::video_start()
+{
+	const F3config *pCFG = &f3_config_table[0];
+
+	m_spritelist = nullptr;
+
+	/* Setup individual game */
+	do {
+		if (pCFG->name == m_game) {
+			break;
+		}
+		pCFG++;
+	} while (pCFG->name);
+
+	m_game_config = pCFG;
+
+	create_tilemaps(m_game_config->extend);
+
 	m_spritelist = std::make_unique<tempsprite[]>(0x400);
 	m_sprite_end = &m_spritelist[0];
 	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
-	m_pf_line_inf = std::make_unique<f3_playfield_line_inf[]>(5);
-	m_sa_line_inf = std::make_unique<f3_spritealpha_line_inf[]>(1);
-	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
-	m_tile_opaque_sp = std::make_unique<u8[]>(m_gfxdecode->gfx(2)->elements());
-	for (int i = 0; i < 8; i++)
-		m_tile_opaque_pf[i] = std::make_unique<u8[]>(m_gfxdecode->gfx(3)->elements());
+	std::fill_n(m_textram_row_usage, 64, 0);
+
+	m_screen->register_screen_bitmap(m_sprite_framebuffer);
 
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
@@ -543,67 +536,17 @@ void taito_f3_state::video_start()
 	m_gfxdecode->gfx(3)->set_granularity(16);
 
 	m_flipscreen = false;
-	memset(m_spriteram16_buffered.get(), 0, 0x10000);
+	m_sprite_bank = false;
+	m_sprite_trails = false;
 	memset(&m_spriteram[0], 0, 0x10000);
 
 	save_item(NAME(m_control_0));
 	save_item(NAME(m_control_1));
 
-	m_gfxdecode->gfx(0)->set_source((u8 *)m_charram.target());
-	m_gfxdecode->gfx(1)->set_source((u8 *)m_pivot_ram.target());
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_charram.target()));
+	m_gfxdecode->gfx(1)->set_source(reinterpret_cast<u8 *>(m_pivot_ram.target()));
 
 	m_sprite_lag = m_game_config->sprite_lag;
-
-	init_alpha_blend_func();
-
-	{
-		gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
-
-		for (int c = 0; c < sprite_gfx->elements(); c++)
-		{
-			int chk_trans_or_opa = 0;
-			const u8 *dp = sprite_gfx->get_data(c);
-			for (int y = 0; y < sprite_gfx->height(); y++)
-			{
-				for (int x = 0; x < sprite_gfx->width(); x++)
-				{
-					if (!dp[x]) chk_trans_or_opa |= 2;
-					else        chk_trans_or_opa |= 1;
-				}
-				dp += sprite_gfx->rowbytes();
-			}
-			if (chk_trans_or_opa == 1) m_tile_opaque_sp[c] = 1;
-			else                       m_tile_opaque_sp[c] = 0;
-		}
-	}
-
-	{
-		gfx_element *pf_gfx = m_gfxdecode->gfx(3);
-
-		for (int c = 0; c < pf_gfx->elements(); c++)
-		{
-			for (int extra_planes = 0; extra_planes < 4; extra_planes++)
-			{
-				int chk_trans_or_opa = 0;
-				/* 0 = 4bpp, 1=5bpp, 2=?, 3=6bpp */
-				const u8 extra_mask = ((extra_planes << 4) | 0x0f);
-				const u8 *dp = pf_gfx->get_data(c);
-
-				for (int y = 0; y < pf_gfx->height(); y++)
-				{
-					for (int x = 0; x < pf_gfx->width(); x++)
-					{
-						if (!(dp[x] & extra_mask))
-							chk_trans_or_opa |= 2;
-						else
-							chk_trans_or_opa |= 1;
-					}
-					dp += pf_gfx->rowbytes();
-				}
-				m_tile_opaque_pf[extra_planes][c] = chk_trans_or_opa;
-			}
-		}
-	}
 }
 
 /******************************************************************************/
@@ -615,17 +558,27 @@ u16 taito_f3_state::pf_ram_r(offs_t offset)
 
 void taito_f3_state::pf_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	// [.ttt yyyy yxxx xxa|h] non-extend
+	// [.tty yyyy xxxx xxa|h] extend
+	const u16 prev_tile = m_pf_ram[offset];
+
 	COMBINE_DATA(&m_pf_ram[offset]);
 
-	if (m_game_config->extend)
-	{
-		if (offset < 0x4000)
+	if (offset < 0x4000) {
+		if (offset & 1) {
+			const int row  = m_extend ? BIT(offset, 7, 5) : BIT(offset, 6, 5);
+			const int tmap = m_extend ? offset >> 12 : offset >> 11;
+			if ((prev_tile == 0) && (m_pf_ram[offset] != 0))
+				m_tilemap_row_usage[row][tmap] += 1;
+			else if ((prev_tile != 0) && (m_pf_ram[offset] == 0))
+				m_tilemap_row_usage[row][tmap] -= 1;
+		}
+
+		if (m_game_config->extend) {
 			m_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
-	}
-	else
-	{
-		if (offset < 0x4000)
+		} else {
 			m_tilemap[offset >> 11]->mark_tile_dirty((offset & 0x7ff) >> 1);
+		}
 	}
 }
 
@@ -656,20 +609,29 @@ u16 taito_f3_state::textram_r(offs_t offset)
 
 void taito_f3_state::textram_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	const u8 prev_tile = BIT(m_textram[offset], 0, 8);
+
 	COMBINE_DATA(&m_textram[offset]);
 
+	const int row = BIT(offset, 6, 6);
+	const u8 tile = BIT(m_textram[offset], 0, 8);
+	if (prev_tile == 0 && tile != 0)
+		m_textram_row_usage[row] += 1;
+	else if (prev_tile != 0 && tile == 0)
+		m_textram_row_usage[row] -= 1;
+
 	m_vram_layer->mark_tile_dirty(offset);
-	//m_vram_layer->mark_tile_dirty(offset + 1);
 
-	if (offset > 0x7ff) offset -= 0x800;
-
-	const int tile = offset;
-	const int col_off = ((tile & 0x3f) << 5) + ((tile & 0xfc0) >> 6);
+	// dirty the pixel layer too, since it uses palette etc. from text layer
+	// convert the position (x and y are swapped, and the upper bit of y is ignored)
+	//  text: [Yyyyyyxxxxxx]
+	// pixel: [0xxxxxxyyyyy]
+	const int y = BIT(offset, 6, 5);
+	const int x = BIT(offset, 0, 6);
+	const int col_off = x << 5 | y;
 
 	m_pixel_layer->mark_tile_dirty(col_off);
-	//m_pixel_layer->mark_tile_dirty(col_off+32);
 }
-
 
 u16 taito_f3_state::charram_r(offs_t offset)
 {
@@ -700,2153 +662,809 @@ u16 taito_f3_state::lineram_r(offs_t offset)
 
 void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-#if 0
-	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
-	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
-	values.  I'm not sure what the real machine would do with these values, and this
-	emulation certainly doesn't like it, so I've chosen to catch the bug here, and prevent
-	the trashing of priority ram.  If anyone has information on what the real machine does,
-	please let me know! */
-	/* Update: this doesn't seem to occur anymore, I'll leave this snippet in but commented out.
-	 *         fwiw PC=0x1768a0/0x1768a4 is where the game clears lineram in round D, which is a
-	 *         move.w Dn, (An,D7.w*2) , a kind of opcode that could've been bugged back then.
-	 */
-	if (m_game == DARIUSG)
-	{
-		if (m_f3_skip_this_frame)
-			return;
-		if (offset == 0xb000 / 2 && data == 0x003f)
-		{
-			m_f3_skip_this_frame = 1;
-			return;
-		}
-	}
-#endif
-
 	COMBINE_DATA(&m_line_ram[offset]);
 }
 
 void taito_f3_state::palette_24bit_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	int r, g, b;
-
 	COMBINE_DATA(&m_paletteram32[offset]);
+	const u32 color = m_paletteram32[offset];
+	rgb_t rgb;
 
-	/* 12 bit palette games - there has to be a palette select bit somewhere */
-	if (m_game == SPCINVDX || m_game == RIDINGF || m_game == ARABIANM || m_game == RINGRAGE)
-	{
-		b = 15 * ((m_paletteram32[offset] >> 4) & 0xf);
-		g = 15 * ((m_paletteram32[offset] >> 8) & 0xf);
-		r = 15 * ((m_paletteram32[offset] >> 12) & 0xf);
+	/* TODO: 12 bit palette games - seems to be selected on a line basis by 6400? */
+	if (m_game == SPCINVDX || m_game == RIDINGF || m_game == ARABIANM || m_game == RINGRAGE) {
+		// .... .... .... .... RRRR GGGG BBBB ....
+		// .... .... RRRR rrrr GGGG gggg BBBB bbbb
+		rgb = rgb_t(BIT(color, 12, 4) * 16, BIT(color, 8, 4) * 16, BIT(color, 4, 4) * 16);
+	} else {
+		rgb = rgb_t(color).set_a(255);
 	}
 
-	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
-	else if (m_game == CLEOPATR)
-	{
-		if (offset < 0x100 || offset > 0x1000)
-		{
-			r = ((m_paletteram32[offset] >> 16) & 0x7f) << 1;
-			g = ((m_paletteram32[offset] >> 8) & 0x7f) << 1;
-			b = ((m_paletteram32[offset] >> 0) & 0x7f) << 1;
-		}
-		else
-		{
-			r = (m_paletteram32[offset] >> 16) & 0xff;
-			g = (m_paletteram32[offset] >> 8) & 0xff;
-			b = (m_paletteram32[offset] >> 0) & 0xff;
-		}
-	}
-
-	/* Another weird couple - perhaps this is alpha blending related? */
-	else if (m_game == TWINQIX || m_game == RECALH)
-	{
-		if (offset > 0x1c00)
-		{
-			r = ((m_paletteram32[offset] >> 16) & 0x7f) << 1;
-			g = ((m_paletteram32[offset] >> 8) & 0x7f) << 1;
-			b = ((m_paletteram32[offset] >> 0) & 0x7f) << 1;
-		}
-		else
-		{
-			r = (m_paletteram32[offset] >> 16) & 0xff;
-			g = (m_paletteram32[offset] >> 8) & 0xff;
-			b = (m_paletteram32[offset] >> 0) & 0xff;
-		}
-	}
-
-	/* All other games - standard 24 bit palette */
-	else
-	{
-		r = (m_paletteram32[offset] >> 16) & 0xff;
-		g = (m_paletteram32[offset] >> 8) & 0xff;
-		b = (m_paletteram32[offset] >> 0) & 0xff;
-	}
-
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb);
 }
 
 /******************************************************************************/
 
-/*============================================================================*/
-
-inline void taito_f3_state::alpha_set_level()
+// line: [latched] line info from previous call, will modify in-place
+// y should be called 0->255 for non-flipscreen, 255->0 for flipscreen
+void taito_f3_state::read_line_ram(f3_line_inf &line, int y)
 {
-	const auto set_alpha_level = [](int &d, const u8 s)
-	{
-		if (s == 0)
-		{
-			d = 0;
+	const auto latched_addr =
+		[this, y] (u8 section, u8 subsection) -> offs_t {
+			const u16 latches = m_line_ram[(section * 0x200)/2 + y];
+			// NOTE: this may actually be computed from the upper byte? i.e.:
+			//offs_t base = 0x400 * BIT(latches, 8, 8) + 0x200 * subsection;
+			const offs_t base = 0x4000 + 0x1000 * section + 0x200 * subsection;
+			if (BIT(latches, subsection + 4))
+				return (base + 0x800) / 2 + y;
+			else if (BIT(latches, subsection))
+				return (base) / 2 + y;
+			return 0;
+		};
+
+	// 4000 **********************************
+	for (const int i : { 2, 3 }) {
+		if (const offs_t where = latched_addr(0, i)) {
+			const u16 colscroll = m_line_ram[where];
+			line.pf[i].colscroll   = colscroll & 0x1ff;
+			line.pf[i].alt_tilemap = !m_extend && colscroll & 0x200;
+			line.clip[2*(i-2) + 0].set_upper(BIT(colscroll, 12), BIT(colscroll, 13));
+			line.clip[2*(i-2) + 1].set_upper(BIT(colscroll, 14), BIT(colscroll, 15));
 		}
-		else
-		{
-			d = s + 1;
+	}
+
+	// 5000 **********************************
+	// renderer needs to adjust clip by -48
+	for (const int i : { 0, 1, 2, 3 }) {
+		if (const offs_t where = latched_addr(1, i)) {
+			const u16 clip_lows = m_line_ram[where];
+			line.clip[i].set_lower(BIT(clip_lows, 0, 8), BIT(clip_lows, 8, 8));
 		}
-	};
-
-//  set_alpha_level(m_alpha_s_1_1, m_alpha_level_2ad);
-	set_alpha_level(m_alpha_s_1_1, 255 - m_alpha_level_2as);
-//  set_alpha_level(m_alpha_s_1_2, m_alpha_level_2bd);
-	set_alpha_level(m_alpha_s_1_2, 255 - m_alpha_level_2bs);
-	set_alpha_level(m_alpha_s_1_4, m_alpha_level_3ad);
-//  set_alpha_level(m_alpha_s_1_5, m_alpha_level_3ad*m_alpha_level_2ad / 255);
-	set_alpha_level(m_alpha_s_1_5, m_alpha_level_3ad * (255 - m_alpha_level_2as) / 255);
-//  set_alpha_level(m_alpha_s_1_6, m_alpha_level_3ad*m_alpha_level_2bd / 255);
-	set_alpha_level(m_alpha_s_1_6, m_alpha_level_3ad * (255 - m_alpha_level_2bs) / 255);
-	set_alpha_level(m_alpha_s_1_8, m_alpha_level_3bd);
-//  set_alpha_level(m_alpha_s_1_9, m_alpha_level_3bd*m_alpha_level_2ad / 255);
-	set_alpha_level(m_alpha_s_1_9, m_alpha_level_3bd * (255 - m_alpha_level_2as) / 255);
-//  set_alpha_level(m_alpha_s_1_a, m_alpha_level_3bd*m_alpha_level_2bd / 255);
-	set_alpha_level(m_alpha_s_1_a, m_alpha_level_3bd * (255 - m_alpha_level_2bs) / 255);
-
-	set_alpha_level(m_alpha_s_2a_0, m_alpha_level_2as);
-	set_alpha_level(m_alpha_s_2a_4, m_alpha_level_2as * m_alpha_level_3ad / 255);
-	set_alpha_level(m_alpha_s_2a_8, m_alpha_level_2as * m_alpha_level_3bd / 255);
-
-	set_alpha_level(m_alpha_s_2b_0, m_alpha_level_2bs);
-	set_alpha_level(m_alpha_s_2b_4, m_alpha_level_2bs * m_alpha_level_3ad / 255);
-	set_alpha_level(m_alpha_s_2b_8, m_alpha_level_2bs * m_alpha_level_3bd / 255);
-
-	set_alpha_level(m_alpha_s_3a_0, m_alpha_level_3as);
-	set_alpha_level(m_alpha_s_3a_1, m_alpha_level_3as * m_alpha_level_2ad / 255);
-	set_alpha_level(m_alpha_s_3a_2, m_alpha_level_3as * m_alpha_level_2bd / 255);
-
-	set_alpha_level(m_alpha_s_3b_0, m_alpha_level_3bs);
-	set_alpha_level(m_alpha_s_3b_1, m_alpha_level_3bs * m_alpha_level_2ad / 255);
-	set_alpha_level(m_alpha_s_3b_2, m_alpha_level_3bs * m_alpha_level_2bd / 255);
-}
-
-/*============================================================================*/
-
-#define COLOR1 BYTE4_XOR_LE(0)
-#define COLOR2 BYTE4_XOR_LE(1)
-#define COLOR3 BYTE4_XOR_LE(2)
-
-inline void taito_f3_state::alpha_blend32_s(int alphas, u32 s)
-{
-	u8 *sc = (u8 *)&s;
-	u8 *dc = (u8 *)&m_dval;
-	dc[COLOR1] = (alphas * sc[COLOR1]) >> 8;
-	dc[COLOR2] = (alphas * sc[COLOR2]) >> 8;
-	dc[COLOR3] = (alphas * sc[COLOR3]) >> 8;
-}
-
-inline void taito_f3_state::alpha_blend32_d(int alphas, u32 s)
-{
-	u8 *sc = (u8 *)&s;
-	u8 *dc = (u8 *)&m_dval;
-	dc[COLOR1] = std::min<unsigned>(dc[COLOR1] + ((alphas * sc[COLOR1]) >> 8), 255U);
-	dc[COLOR2] = std::min<unsigned>(dc[COLOR2] + ((alphas * sc[COLOR2]) >> 8), 255U);
-	dc[COLOR3] = std::min<unsigned>(dc[COLOR3] + ((alphas * sc[COLOR3]) >> 8), 255U);
-}
-
-/*============================================================================*/
-
-inline void taito_f3_state::alpha_blend_1_1(u32 s) { alpha_blend32_d(m_alpha_s_1_1, s); }
-inline void taito_f3_state::alpha_blend_1_2(u32 s) { alpha_blend32_d(m_alpha_s_1_2, s); }
-inline void taito_f3_state::alpha_blend_1_4(u32 s) { alpha_blend32_d(m_alpha_s_1_4, s); }
-inline void taito_f3_state::alpha_blend_1_5(u32 s) { alpha_blend32_d(m_alpha_s_1_5, s); }
-inline void taito_f3_state::alpha_blend_1_6(u32 s) { alpha_blend32_d(m_alpha_s_1_6, s); }
-inline void taito_f3_state::alpha_blend_1_8(u32 s) { alpha_blend32_d(m_alpha_s_1_8, s); }
-inline void taito_f3_state::alpha_blend_1_9(u32 s) { alpha_blend32_d(m_alpha_s_1_9, s); }
-inline void taito_f3_state::alpha_blend_1_a(u32 s) { alpha_blend32_d(m_alpha_s_1_a, s); }
-
-inline void taito_f3_state::alpha_blend_2a_0(u32 s) { alpha_blend32_s(m_alpha_s_2a_0, s); }
-inline void taito_f3_state::alpha_blend_2a_4(u32 s) { alpha_blend32_d(m_alpha_s_2a_4, s); }
-inline void taito_f3_state::alpha_blend_2a_8(u32 s) { alpha_blend32_d(m_alpha_s_2a_8, s); }
-
-inline void taito_f3_state::alpha_blend_2b_0(u32 s) { alpha_blend32_s(m_alpha_s_2b_0, s); }
-inline void taito_f3_state::alpha_blend_2b_4(u32 s) { alpha_blend32_d(m_alpha_s_2b_4, s); }
-inline void taito_f3_state::alpha_blend_2b_8(u32 s) { alpha_blend32_d(m_alpha_s_2b_8, s); }
-
-inline void taito_f3_state::alpha_blend_3a_0(u32 s) { alpha_blend32_s(m_alpha_s_3a_0, s); }
-inline void taito_f3_state::alpha_blend_3a_1(u32 s) { alpha_blend32_d(m_alpha_s_3a_1, s); }
-inline void taito_f3_state::alpha_blend_3a_2(u32 s) { alpha_blend32_d(m_alpha_s_3a_2, s); }
-
-inline void taito_f3_state::alpha_blend_3b_0(u32 s) { alpha_blend32_s(m_alpha_s_3b_0, s); }
-inline void taito_f3_state::alpha_blend_3b_1(u32 s) { alpha_blend32_d(m_alpha_s_3b_1, s); }
-inline void taito_f3_state::alpha_blend_3b_2(u32 s) { alpha_blend32_d(m_alpha_s_3b_2, s); }
-
-/*============================================================================*/
-
-inline bool taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return true; }
-inline bool taito_f3_state::dpix_ret1(u32 s_pix) { return true; }
-inline bool taito_f3_state::dpix_ret0(u32 s_pix) { return false; }
-inline bool taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return true; }
-inline bool taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return true; }
-inline bool taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return true; }
-inline bool taito_f3_state::dpix_1_5(u32 s_pix) { if (s_pix) alpha_blend_1_5(s_pix); return true; }
-inline bool taito_f3_state::dpix_1_6(u32 s_pix) { if (s_pix) alpha_blend_1_6(s_pix); return true; }
-inline bool taito_f3_state::dpix_1_8(u32 s_pix) { if (s_pix) alpha_blend_1_8(s_pix); return true; }
-inline bool taito_f3_state::dpix_1_9(u32 s_pix) { if (s_pix) alpha_blend_1_9(s_pix); return true; }
-inline bool taito_f3_state::dpix_1_a(u32 s_pix) { if (s_pix) alpha_blend_1_a(s_pix); return true; }
-
-bool taito_f3_state::dpix_2a_0(u32 s_pix)
-{
-	if (s_pix) alpha_blend_2a_0(s_pix);
-	else      m_dval = 0;
-	if (m_pdest_2a) { m_pval |= m_pdest_2a; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_2a_4(u32 s_pix)
-{
-	if (s_pix) alpha_blend_2a_4(s_pix);
-	if (m_pdest_2a) { m_pval |= m_pdest_2a; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_2a_8(u32 s_pix)
-{
-	if (s_pix) alpha_blend_2a_8(s_pix);
-	if (m_pdest_2a) { m_pval |= m_pdest_2a; return false; }
-	return true;
-}
-
-bool taito_f3_state::dpix_3a_0(u32 s_pix)
-{
-	if (s_pix) alpha_blend_3a_0(s_pix);
-	else      m_dval = 0;
-	if (m_pdest_3a) { m_pval |= m_pdest_3a; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_3a_1(u32 s_pix)
-{
-	if (s_pix) alpha_blend_3a_1(s_pix);
-	if (m_pdest_3a) { m_pval |= m_pdest_3a; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_3a_2(u32 s_pix)
-{
-	if (s_pix) alpha_blend_3a_2(s_pix);
-	if (m_pdest_3a) { m_pval |= m_pdest_3a; return false; }
-	return true;
-}
-
-bool taito_f3_state::dpix_2b_0(u32 s_pix)
-{
-	if (s_pix) alpha_blend_2b_0(s_pix);
-	else      m_dval = 0;
-	if (m_pdest_2b) { m_pval |= m_pdest_2b; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_2b_4(u32 s_pix)
-{
-	if (s_pix) alpha_blend_2b_4(s_pix);
-	if (m_pdest_2b) { m_pval |= m_pdest_2b; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_2b_8(u32 s_pix)
-{
-	if (s_pix) alpha_blend_2b_8(s_pix);
-	if (m_pdest_2b) { m_pval |= m_pdest_2b; return false; }
-	return true;
-}
-
-bool taito_f3_state::dpix_3b_0(u32 s_pix)
-{
-	if (s_pix) alpha_blend_3b_0(s_pix);
-	else      m_dval = 0;
-	if (m_pdest_3b) { m_pval |= m_pdest_3b; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_3b_1(u32 s_pix)
-{
-	if (s_pix) alpha_blend_3b_1(s_pix);
-	if (m_pdest_3b) { m_pval |= m_pdest_3b; return false; }
-	return true;
-}
-bool taito_f3_state::dpix_3b_2(u32 s_pix)
-{
-	if (s_pix) alpha_blend_3b_2(s_pix);
-	if (m_pdest_3b) { m_pval |= m_pdest_3b; return false; }
-	return true;
-}
-
-bool taito_f3_state::dpix_2_0(u32 s_pix)
-{
-	const u8 tr2 = m_tval & 1;
-	if (s_pix)
-	{
-		if (tr2 == m_tr_2b)      { alpha_blend_2b_0(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
-		else if (tr2 == m_tr_2a) { alpha_blend_2a_0(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
 	}
-	else
-	{
-		if (tr2 == m_tr_2b)      { m_dval = 0; if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
-		else if (tr2 == m_tr_2a) { m_dval = 0; if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
+
+	// 6000 **********************************
+	if (const offs_t where = latched_addr(2, 0)) { // sprite blend modes, pivot blend select, ?
+		// old code called first value "sync register", is special handling necessary?
+		const u16 line_6000 = m_line_ram[where];
+
+		line.pivot.blend_select_v = BIT(line_6000, 9);
+		line.pivot.pivot_control = BIT(line_6000, 8, 8);
+		if (TAITOF3_VIDEO_DEBUG == 1) {
+			// arabianm: 0a, scfinals: a2, busymph: a2, recalh: 0c, bubblem: 03/f0
+			if (line.pivot.pivot_control & 0b01011101) // check if unknown pivot control bits set
+				logerror("unknown 6000 pivot ctrl bits: %02x__ at %04x\n", line.pivot.pivot_control, 0x6000 + y*2);
+		}
+
+		for (int sp_group = 0; sp_group < NUM_SPRITEGROUPS; sp_group++) {
+			line.sp[sp_group].set_blend(BIT(line_6000, sp_group * 2, 2));
+		}
 	}
-	return false;
-}
-bool taito_f3_state::dpix_2_4(u32 s_pix)
-{
-	const u8 tr2 = m_tval & 1;
-	if (s_pix)
-	{
-		if (tr2 == m_tr_2b)      { alpha_blend_2b_4(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
-		else if (tr2 == m_tr_2a) { alpha_blend_2a_4(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
+	if (const offs_t where = latched_addr(2, 1)) { // blend values
+		const u16 blend_vals = m_line_ram[where];
+		for (int idx = 0; idx < 4; idx++) {
+			const u8 alpha = BIT(blend_vals, 4 * idx, 4);
+			line.blend[idx] = std::min(8, (0xf - alpha));
+		}
 	}
-	else
-	{
-		if (tr2 == m_tr_2b)      { if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
-		else if (tr2 == m_tr_2a) { if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
+	if (const offs_t where = latched_addr(2, 2)) { // mosaic, palette depth effects
+		const u16 x_mosaic = m_line_ram[where];
+
+		line.x_sample = 16 - BIT(x_mosaic, 4, 4);
+
+		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; pf_num++) {
+			line.pf[pf_num].x_sample_enable = BIT(x_mosaic, pf_num);
+		}
+
+		for (auto &sp : line.sp) {
+			sp.x_sample_enable = BIT(x_mosaic, 8);
+		}
+		line.pivot.x_sample_enable = BIT(x_mosaic, 9);
+
+		line.fx_6400 = (x_mosaic & 0xfc00) >> 8; // palette interpretation [unimplemented]
+		if (TAITOF3_VIDEO_DEBUG == 1) {
+			// gseeker(intro):40, ringrage/arabianm:30/33, ridingf:30/31, spcinvdj:30, gunlock:78
+			if (line.fx_6400 && line.fx_6400 != 0x70) // check if unknown effect bits set
+				logerror("unknown 6400 fx bits: %02x__ at %04x\n", line.fx_6400, 0x6400 + y*2);
+		}
 	}
-	return false;
-}
-bool taito_f3_state::dpix_2_8(u32 s_pix)
-{
-	const u8 tr2 = m_tval & 1;
-	if (s_pix)
-	{
-		if (tr2 == m_tr_2b)      { alpha_blend_2b_8(s_pix); if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
-		else if (tr2 == m_tr_2a) { alpha_blend_2a_8(s_pix); if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
+	if (const offs_t where = latched_addr(2, 3)) { // bg palette? [unimplemented]
+		line.bg_palette = m_line_ram[where];
+		if (TAITOF3_VIDEO_DEBUG == 1) {
+			// gunlock: 0000
+			if (line.bg_palette) // check if unknown effect bits set
+				logerror("unknown 6600 bg palette: %04x at %04x\n", line.bg_palette, 0x6600 + y*2);
+		}
 	}
-	else
-	{
-		if (tr2 == m_tr_2b)      { if (m_pdest_2b) m_pval |= m_pdest_2b; else return true; }
-		else if (tr2 == m_tr_2a) { if (m_pdest_2a) m_pval |= m_pdest_2a; else return true; }
+
+	// 7000 **********************************
+	if (const offs_t where = latched_addr(3, 0)) { // ? [unimplemented]
+		const u16 line_7000 = m_line_ram[where];
+		line.pivot.pivot_enable = line_7000;
+		if (TAITOF3_VIDEO_DEBUG == 1) {
+			// ridingf/commandw/trstar: c000, gunlock: 0000, recalh: 4000, quizhuhu: 00ff
+			// puchicar/ktiger2/gekiridn: 0001, dariusg: 0001 on zone H boss pool effect lines
+			if (line_7000) // check if confusing pivot enable bits are set
+				logerror("unknown 7000 'pivot enable' bits: %04x at %04x\n", line_7000, 0x7000 + y*2);
+		}
 	}
-	return false;
-}
-
-bool taito_f3_state::dpix_3_0(u32 s_pix)
-{
-	const u8 tr2 = m_tval & 1;
-	if (s_pix)
-	{
-		if (tr2 == m_tr_3b)      { alpha_blend_3b_0(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
-		else if (tr2 == m_tr_3a) { alpha_blend_3a_0(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
+	if (const offs_t where = latched_addr(3, 1)) { // pivot layer mix info word
+		line.pivot.set_mix(m_line_ram[where]);
 	}
-	else
-	{
-		if (tr2 == m_tr_3b)      { m_dval = 0; if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
-		else if (tr2 == m_tr_3a) { m_dval = 0; if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
+	if (const offs_t where = latched_addr(3, 2)) { // sprite clip info, blend select
+		const u16 sprite_mix = m_line_ram[where];
+
+		if (TAITOF3_VIDEO_DEBUG == 1) {
+			// many: _8__, exceptions: pbobble3/puchicar/pbobble4/gunlock
+			const u16 unknown = BIT(sprite_mix, 10, 2);
+			if (unknown)
+				logerror("unknown sprite mix bits: _%01x__ at %04x\n", unknown << 2, 0x7400 + y*2);
+		}
+
+		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
+			line.sp[group].set_mix((line.sp[group].mix_value & 0xc00f)
+								   | BIT(sprite_mix, 0, 10) << 4);
+			line.sp[group].blend_select_v = BIT(sprite_mix, 12 + group, 1);
+		}
 	}
-	return false;
-}
-bool taito_f3_state::dpix_3_1(u32 s_pix)
-{
-	const u8 tr2 = m_tval & 1;
-	if (s_pix)
-	{
-		if (tr2 == m_tr_3b)      { alpha_blend_3b_1(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
-		else if (tr2 == m_tr_3a) { alpha_blend_3a_1(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
+	if (const offs_t where = latched_addr(3, 3)) { // sprite priority
+		const u16 sprite_prio = m_line_ram[where];
+		for (int group = 0; group < NUM_SPRITEGROUPS; group++) {
+			line.sp[group].set_prio(BIT(sprite_prio, group * 4, 4));
+		}
 	}
-	else
-	{
-		if (tr2 == m_tr_3b)      { if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
-		else if (tr2 == m_tr_3a) { if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
+
+	// 8000 **********************************
+	for (const int i : { 0, 1, 2, 3 }) { // playfield zoom
+		if (const offs_t where = latched_addr(4, i)) {
+			const u16 pf_scale = m_line_ram[where];
+			// y zooms are interleaved
+			const int FIX_Y[] = { 0, 3, 2, 1 };
+			line.pf[i].x_scale = 256 - BIT(pf_scale, 8, 8);
+			line.pf[FIX_Y[i]].y_scale = BIT(pf_scale, 0, 8)<<1;
+		}
 	}
-	return false;
-}
-bool taito_f3_state::dpix_3_2(u32 s_pix)
-{
-	const u8 tr2 = m_tval & 1;
-	if (s_pix)
-	{
-		if (tr2 == m_tr_3b)      { alpha_blend_3b_2(s_pix); if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
-		else if (tr2 == m_tr_3a) { alpha_blend_3a_2(s_pix); if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
+
+	// 9000 **********************************
+	for (const int i : { 0, 1, 2, 3 }) { // playfield palette addition
+		if (const offs_t where = latched_addr(5, i)) {
+			const u16 pf_pal_add = m_line_ram[where];
+			line.pf[i].pal_add = pf_pal_add * 16;
+		}
 	}
-	else
-	{
-		if (tr2 == m_tr_3b)      { if (m_pdest_3b) m_pval |= m_pdest_3b; else return true; }
-		else if (tr2 == m_tr_3a) { if (m_pdest_3a) m_pval |= m_pdest_3a; else return true; }
+
+	// A000 **********************************
+	// iiii iiii iiff ffff
+	// fractional part is negative (allegedly). i wonder if it's supposed to be inverted instead?
+	// and then we just subtract (1<<8) to get almost the same value..
+	for (const int i : { 0, 1, 2, 3 }) { // playfield rowscroll
+		if (const offs_t where = latched_addr(6, i)) {
+			const fixed8 rowscroll = m_line_ram[where] << (8-6);
+			line.pf[i].rowscroll = (rowscroll & 0xffffff00) - (rowscroll & 0x000000ff);
+			// ((i ^ 0b111111) - 0b111111) << (8-6);
+		}
 	}
-	return false;
-}
 
-inline void taito_f3_state::dpix_1_sprite(u32 s_pix)
-{
-	if (s_pix)
-	{
-		const u8 p1 = m_pval & 0xf0;
-		if      (p1 == 0x10) alpha_blend_1_1(s_pix);
-		else if (p1 == 0x20) alpha_blend_1_2(s_pix);
-		else if (p1 == 0x40) alpha_blend_1_4(s_pix);
-		else if (p1 == 0x50) alpha_blend_1_5(s_pix);
-		else if (p1 == 0x60) alpha_blend_1_6(s_pix);
-		else if (p1 == 0x80) alpha_blend_1_8(s_pix);
-		else if (p1 == 0x90) alpha_blend_1_9(s_pix);
-		else if (p1 == 0xa0) alpha_blend_1_a(s_pix);
-	}
-}
-
-inline void taito_f3_state::dpix_bg(u32 bgcolor)
-{
-	const u8 p1 = m_pval & 0xf0;
-	if (!p1)         m_dval = bgcolor;
-	else if (p1 == 0x10) alpha_blend_1_1(bgcolor);
-	else if (p1 == 0x20) alpha_blend_1_2(bgcolor);
-	else if (p1 == 0x40) alpha_blend_1_4(bgcolor);
-	else if (p1 == 0x50) alpha_blend_1_5(bgcolor);
-	else if (p1 == 0x60) alpha_blend_1_6(bgcolor);
-	else if (p1 == 0x80) alpha_blend_1_8(bgcolor);
-	else if (p1 == 0x90) alpha_blend_1_9(bgcolor);
-	else if (p1 == 0xa0) alpha_blend_1_a(bgcolor);
-}
-
-/******************************************************************************/
-
-void taito_f3_state::init_alpha_blend_func()
-{
-	m_dpix_n[0][0x0] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x1] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x2] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x3] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x4] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x5] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x6] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x7] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x8] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0x9] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0xa] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0xb] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0xc] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0xd] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0xe] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[0][0xf] = &taito_f3_state::dpix_1_noalpha;
-
-	m_dpix_n[1][0x0] = &taito_f3_state::dpix_1_noalpha;
-	m_dpix_n[1][0x1] = &taito_f3_state::dpix_1_1;
-	m_dpix_n[1][0x2] = &taito_f3_state::dpix_1_2;
-	m_dpix_n[1][0x3] = &taito_f3_state::dpix_ret1;
-	m_dpix_n[1][0x4] = &taito_f3_state::dpix_1_4;
-	m_dpix_n[1][0x5] = &taito_f3_state::dpix_1_5;
-	m_dpix_n[1][0x6] = &taito_f3_state::dpix_1_6;
-	m_dpix_n[1][0x7] = &taito_f3_state::dpix_ret1;
-	m_dpix_n[1][0x8] = &taito_f3_state::dpix_1_8;
-	m_dpix_n[1][0x9] = &taito_f3_state::dpix_1_9;
-	m_dpix_n[1][0xa] = &taito_f3_state::dpix_1_a;
-	m_dpix_n[1][0xb] = &taito_f3_state::dpix_ret1;
-	m_dpix_n[1][0xc] = &taito_f3_state::dpix_ret1;
-	m_dpix_n[1][0xd] = &taito_f3_state::dpix_ret1;
-	m_dpix_n[1][0xe] = &taito_f3_state::dpix_ret1;
-	m_dpix_n[1][0xf] = &taito_f3_state::dpix_ret1;
-
-	m_dpix_n[2][0x0] = &taito_f3_state::dpix_2a_0;
-	m_dpix_n[2][0x1] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0x2] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0x3] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0x4] = &taito_f3_state::dpix_2a_4;
-	m_dpix_n[2][0x5] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0x6] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0x7] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0x8] = &taito_f3_state::dpix_2a_8;
-	m_dpix_n[2][0x9] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0xa] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0xb] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0xc] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0xd] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0xe] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[2][0xf] = &taito_f3_state::dpix_ret0;
-
-	m_dpix_n[3][0x0] = &taito_f3_state::dpix_3a_0;
-	m_dpix_n[3][0x1] = &taito_f3_state::dpix_3a_1;
-	m_dpix_n[3][0x2] = &taito_f3_state::dpix_3a_2;
-	m_dpix_n[3][0x3] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0x4] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0x5] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0x6] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0x7] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0x8] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0x9] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0xa] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0xb] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0xc] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0xd] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0xe] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[3][0xf] = &taito_f3_state::dpix_ret0;
-
-	m_dpix_n[4][0x0] = &taito_f3_state::dpix_2b_0;
-	m_dpix_n[4][0x1] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0x2] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0x3] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0x4] = &taito_f3_state::dpix_2b_4;
-	m_dpix_n[4][0x5] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0x6] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0x7] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0x8] = &taito_f3_state::dpix_2b_8;
-	m_dpix_n[4][0x9] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0xa] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0xb] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0xc] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0xd] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0xe] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[4][0xf] = &taito_f3_state::dpix_ret0;
-
-	m_dpix_n[5][0x0] = &taito_f3_state::dpix_3b_0;
-	m_dpix_n[5][0x1] = &taito_f3_state::dpix_3b_1;
-	m_dpix_n[5][0x2] = &taito_f3_state::dpix_3b_2;
-	m_dpix_n[5][0x3] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0x4] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0x5] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0x6] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0x7] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0x8] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0x9] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0xa] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0xb] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0xc] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0xd] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0xe] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[5][0xf] = &taito_f3_state::dpix_ret0;
-
-	m_dpix_n[6][0x0] = &taito_f3_state::dpix_2_0;
-	m_dpix_n[6][0x1] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0x2] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0x3] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0x4] = &taito_f3_state::dpix_2_4;
-	m_dpix_n[6][0x5] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0x6] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0x7] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0x8] = &taito_f3_state::dpix_2_8;
-	m_dpix_n[6][0x9] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0xa] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0xb] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0xc] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0xd] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0xe] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[6][0xf] = &taito_f3_state::dpix_ret0;
-
-	m_dpix_n[7][0x0] = &taito_f3_state::dpix_3_0;
-	m_dpix_n[7][0x1] = &taito_f3_state::dpix_3_1;
-	m_dpix_n[7][0x2] = &taito_f3_state::dpix_3_2;
-	m_dpix_n[7][0x3] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0x4] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0x5] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0x6] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0x7] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0x8] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0x9] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0xa] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0xb] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0xc] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0xd] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0xe] = &taito_f3_state::dpix_ret0;
-	m_dpix_n[7][0xf] = &taito_f3_state::dpix_ret0;
-}
-
-/******************************************************************************/
-
-void taito_f3_state::get_pixmap_pointer(int skip_layer_num, const f3_playfield_line_inf **line_t, int y)
-{
-	for (int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
-	{
-		const f3_playfield_line_inf *line_tmp = line_t[pf_num];
-		m_src[pf_num] = line_tmp->src[y];
-		m_src_s[pf_num] = line_tmp->src_s[y];
-		m_src_e[pf_num] = line_tmp->src_e[y];
-		m_tsrc[pf_num] = line_tmp->tsrc[y];
-		m_tsrc_s[pf_num] = line_tmp->tsrc_s[y];
-		m_x_count[pf_num] = line_tmp->x_count[y];
-		m_x_zoom[pf_num] = line_tmp->x_zoom[y];
-		m_clip_al[pf_num] = line_tmp->clip_in[y] & 0xffff;
-		m_clip_ar[pf_num] = line_tmp->clip_in[y] >> 16;
-		m_clip_bl[pf_num] = line_tmp->clip_ex[y] & 0xffff;
-		m_clip_br[pf_num] = line_tmp->clip_ex[y] >> 16;
-		m_pal_add[pf_num] = line_tmp->pal_add[y];
-	}
-}
-
-void taito_f3_state::culc_pixmap_pointer(int skip_layer_num)
-{
-	for (int pf_num = skip_layer_num; pf_num < 5; ++pf_num)
-	{
-		m_x_count[pf_num] += m_x_zoom[pf_num];
-		if (m_x_count[pf_num] >> 16)
-		{
-			m_x_count[pf_num] &= 0xffff;
-			m_src[pf_num]++;
-			m_tsrc[pf_num]++;
-			if (m_src[pf_num] == m_src_e[pf_num])
-			{
-				m_src[pf_num] = m_src_s[pf_num];
-				m_tsrc[pf_num] = m_tsrc_s[pf_num];
-			}
+	// B000 **********************************
+	for (const int i : { 0, 1, 2, 3 }) { // playfield mix info
+		if (const offs_t where = latched_addr(7, i)) {
+			line.pf[i].set_mix(m_line_ram[where]);
 		}
 	}
 }
 
-#define UPDATE_PIXMAP_SP(pf_num) \
-	if (cx >= clip_als && cx < clip_ars && !(cx >= clip_bls && cx < clip_brs)) \
-	{ \
-		sprite_pri = sprite[pf_num] & m_pval; \
-		if (sprite_pri) \
-		{ \
-			if (sprite[pf_num] & 0x100) break; \
-			if (!m_dpix_sp[sprite_pri]) \
-			{ \
-				if (!(m_pval & 0xf0)) break; \
-				else { dpix_1_sprite(*dsti); *dsti = m_dval; break; } \
-			} \
-			if ((this->*m_dpix_sp[sprite_pri][m_pval >> 4])(*dsti)) { *dsti = m_dval; break; } \
-		} \
-	}
-
-#define UPDATE_PIXMAP_LP(pf_num) \
-	if (cx >= m_clip_al[pf_num] && cx < m_clip_ar[pf_num] && !(cx >= m_clip_bl[pf_num] && cx < m_clip_br[pf_num])) \
-	{ \
-		m_tval = *m_tsrc[pf_num]; \
-		if (m_tval & 0xf0) \
-			if ((this->*m_dpix_lp[pf_num][m_pval >> 4])(clut[(*m_src[pf_num] + m_pal_add[pf_num]) & 0x1fff])) { *dsti = m_dval; break; } \
-	}
-
-
-/*============================================================================*/
-
-inline void taito_f3_state::draw_scanlines(
-							bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num,
-							const f3_playfield_line_inf **line_t,
-							const u8 *sprite,
-							u32 orient,
-							int skip_layer_num)
+void taito_f3_state::get_pf_scroll(int pf_num, fixed8 &reg_sx, fixed8 &reg_sy)
 {
-	const pen_t *clut = &m_palette->pen(0);
-	const u32 bgcolor = clut[0];
+	// x: iiii iiii iiFF FFFF
+	// y: iiii iiii ifff ffff
 
-	const int x = 46;
+	// x scroll is stored as fixed10.6, with fractional bits inverted.
+	// we convert this to regular fixed24.8
 
-	u16 clip_als = 0, clip_ars = 0, clip_bls = 0, clip_brs = 0;
+	s16 sx_raw = m_control_0[pf_num];
+	s16 sy_raw = m_control_0[pf_num + 4];
 
-	int yadv = bitmap.rowpixels();
-	int yadvp = m_pri_alp_bitmap.rowpixels();
-	int i = 0, y = draw_line_num[0];
-	int ty = y;
+	// why don't we need to do the 24 adjustment for pf 1 and 2 ?
+	sy_raw += (1 << 7); // 9.7
 
-	if (orient & ORIENTATION_FLIP_Y)
-	{
-		ty = bitmap.height() - 1 - ty;
-		yadv = -yadv;
-		yadvp = -yadvp;
+	if (m_flipscreen) {
+		sx_raw += 320 << 6; // 10.6
+		sx_raw += (512 + 192) << 6; // 10.6
+
+		sy_raw = -sy_raw;
 	}
 
-	u8 *dstp0 = &m_pri_alp_bitmap.pix(ty, x);
+	sx_raw += (40 - 4*pf_num) << 6; // 10.6
 
-	m_pdest_2a = m_alpha_level_2ad ? 0x10 : 0;
-	m_pdest_2b = m_alpha_level_2bd ? 0x20 : 0;
-	m_tr_2a =(m_alpha_level_2as == 0 && m_alpha_level_2ad == 255) ? -1 : 0;
-	m_tr_2b =(m_alpha_level_2bs == 0 && m_alpha_level_2bd == 255) ? -1 : 1;
-	m_pdest_3a = m_alpha_level_3ad ? 0x40 : 0;
-	m_pdest_3b = m_alpha_level_3bd ? 0x80 : 0;
-	m_tr_3a =(m_alpha_level_3as == 0 && m_alpha_level_3ad == 255) ? -1 : 0;
-	m_tr_3b =(m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) ? -1 : 1;
-
-	{
-		u32 *dsti0 = &bitmap.pix(ty, x);
-		while (1)
-		{
-			int cx = 0;
-
-			clip_als = m_sa_line_inf[0].sprite_clip_in[y] & 0xffff;
-			clip_ars = m_sa_line_inf[0].sprite_clip_in[y] >> 16;
-			clip_bls = m_sa_line_inf[0].sprite_clip_ex[y] & 0xffff;
-			clip_brs = m_sa_line_inf[0].sprite_clip_ex[y] >> 16;
-
-			int length = xsize;
-			u32 *dsti = dsti0;
-			u8 *dstp = dstp0;
-
-			get_pixmap_pointer(skip_layer_num, line_t, y);
-
-			while (1)
-			{
-				m_pval = *dstp;
-				if (m_pval != 0xff)
-				{
-					u8 sprite_pri;
-					switch (skip_layer_num)
-					{
-						case 0: UPDATE_PIXMAP_SP(0) UPDATE_PIXMAP_LP(0) [[fallthrough]];
-						case 1: UPDATE_PIXMAP_SP(1) UPDATE_PIXMAP_LP(1) [[fallthrough]];
-						case 2: UPDATE_PIXMAP_SP(2) UPDATE_PIXMAP_LP(2) [[fallthrough]];
-						case 3: UPDATE_PIXMAP_SP(3) UPDATE_PIXMAP_LP(3) [[fallthrough]];
-						case 4: UPDATE_PIXMAP_SP(4) UPDATE_PIXMAP_LP(4) [[fallthrough]];
-						case 5: UPDATE_PIXMAP_SP(5)
-								if (!bgcolor) { if (!(m_pval & 0xf0)) { *dsti = 0; break; } }
-								else dpix_bg(bgcolor);
-								*dsti = m_dval;
-					}
-				}
-
-				if (!(--length)) break;
-				dsti++;
-				dstp++;
-				cx++;
-
-				culc_pixmap_pointer(skip_layer_num);
-			}
-
-			i++;
-			if (draw_line_num[i] < 0) break;
-			if (draw_line_num[i] == y + 1)
-			{
-				dsti0 += yadv;
-				dstp0 += yadvp;
-				y++;
-				continue;
-			}
-			else
-			{
-				dsti0 += (draw_line_num[i] - y) * yadv;
-				dstp0 += (draw_line_num[i] - y) * yadvp;
-				y = draw_line_num[i];
-			}
-		}
+	fixed8 sx = sx_raw << (8-6); // 10.6 to 24.8
+	fixed8 sy = sy_raw << (8-7); // 9.7 to 24.8
+	sx ^= 0b1111'1100;
+	if (m_flipscreen) {
+		sx = sx - (H_START << 8);
+		sy = -sy;
+	} else {
+		sx = sx - (H_START << 8);
 	}
+
+	reg_sx = sx;
+	reg_sy = sy;
 }
 
-/******************************************************************************/
-
-void taito_f3_state::visible_tile_check(
-						f3_playfield_line_inf *line_t,
-						int line,
-						u32 x_index_fx,u32 y_index,
-						const u16 *pf_data_n)
+template<typename Mix>
+std::vector<taito_f3_state::clip_plane_inf>
+taito_f3_state::calc_clip(
+		const clip_plane_inf (&clip)[NUM_CLIPPLANES],
+		const Mix &layer)
 {
-	const u8 alpha_mode = line_t->alpha_mode[line];
-	if (!alpha_mode)
-		return;
+	constexpr s16 INF_L = H_START;
+	constexpr s16 INF_R = H_START + H_VIS;
 
-	const u32 total_elements = m_gfxdecode->gfx(3)->elements();
-
-	int tile_index = x_index_fx >> 16;
-	const int tile_num = (((line_t->x_zoom[line] * 320 + (x_index_fx & 0xffff) + 0xffff) >> 16) + (tile_index & 0xf) + 15) >> 4;
-	tile_index >>= 4;
-
-	const u16 *pf_base;
-	if (m_flipscreen)
-	{
-		pf_base = pf_data_n + ((31 - (y_index >> 4)) << m_twidth_mask_bit);
-		tile_index = (m_twidth_mask - tile_index) - tile_num + 1;
-	}
-	else pf_base = pf_data_n + ((y_index >> 4) << m_twidth_mask_bit);
-
-	bool trans_all = true;
-	bool opaque_all = true;
-	u8 alpha_type = 0;
-	for (int i = 0; i < tile_num; i++)
-	{
-		const u32 tile = (pf_base[(tile_index * 2 + 0) & m_twidth_mask] << 16) | (pf_base[(tile_index * 2 + 1) & m_twidth_mask]);
-		const u8  extra_planes = (tile >> (16 + 10)) & 3;
-		if (tile & 0xffff)
-		{
-			trans_all = false;
-			if (opaque_all)
-			{
-				if (m_tile_opaque_pf[extra_planes][(tile & 0xffff) % total_elements] != 1) opaque_all = false;
-			}
-
-			if (alpha_mode == 1)
-			{
-				if (!opaque_all) return;
-			}
-			else
-			{
-				if (alpha_type != 3)
-				{
-					if ((tile >> (16 + 9)) & 1) alpha_type |= 2;
-					else                        alpha_type |= 1;
-				}
-				else if (!opaque_all) break;
-			}
-		}
-		else if (opaque_all) opaque_all = false;
-
-		tile_index++;
-	}
-
-	if (trans_all) { line_t->alpha_mode[line] = 0; return; }
-
-	if (alpha_mode > 1)
-	{
-		line_t->alpha_mode[line] |= alpha_type << 4;
-	}
-
-	if (opaque_all)
-		line_t->alpha_mode[line] |= 0x80;
-}
-
-/******************************************************************************/
-
-void taito_f3_state::calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, u8 &line_enable)
-{
-	const f3_spritealpha_line_inf *sa_line = &m_sa_line_inf[0];
-
-	/* landmakr and quizhuhu use clip planes 2 and 3,
-	   commandw enables all clip planes.
-	   only up to 2 valid clips ever used in existing games? */
-	u16 normal_planes = (pri >> 8) & (pri >> 4);
-	u16 invert_planes = (pri >> 8) & ~(pri >> 4);
-	// when bit 0x1000 set, invert bit ON is normal clip, OFF is inverted
-	if (pri & 0x1000)
+	std::bitset<4> normal_planes = layer.clip_enable() & ~layer.clip_inv();
+	std::bitset<4> invert_planes = layer.clip_enable() & layer.clip_inv();
+	if (!layer.clip_inv_mode())
 		std::swap(normal_planes, invert_planes);
 
-	s16 clipl = 0, clipr = 0x7fff;
+	// start with a visible region spanning the entire space
+	std::vector<clip_plane_inf> ranges{1, clip_plane_inf{INF_L, INF_R}};
+	std::vector<clip_plane_inf> new_ranges;
+	for (int plane = 0; plane < NUM_CLIPPLANES; plane++) {
+		const s16 clip_l = clip[plane].l - 1;
+		const s16 clip_r = clip[plane].r - 2;
 
-	const auto calc_clip =
-		[&sa_line, y, &clipl, &clipr] (unsigned p)
-		{
-			clipl = std::max(sa_line->clip_l[p][y], clipl);
-			clipr = std::min(sa_line->clip_r[p][y], clipr);
-		};
-	const auto calc_clip_inv =
-		[&sa_line, y, &clipl, &clipr]
-		(unsigned p)
-		{
-			clipl = std::min(sa_line->clip_l[p][y], clipl);
-			clipr = std::max(sa_line->clip_r[p][y], clipr);
-		};
-
-	if (normal_planes & 0b0001) { calc_clip(0); };
-	if (normal_planes & 0b0010) { calc_clip(1); };
-	if (normal_planes & 0b0100) { calc_clip(2); };
-	if (normal_planes & 0b1000) { calc_clip(3); };
-	if (clipl > clipr)
-		line_enable = 0;
-	else
-		clip_in = clipl | (clipr << 16);
-
-	// reset temp clip sides for the inverted/excluded window
-	clipl = 0x7fff; clipr = 0;
-	if (invert_planes & 0b0001) { calc_clip_inv(0); };
-	if (invert_planes & 0b0010) { calc_clip_inv(1); };
-	if (invert_planes & 0b0100) { calc_clip_inv(2); };
-	if (invert_planes & 0b1000) { calc_clip_inv(3); };
-	if (clipl > clipr)
-		clip_ex = 0;
-	else
-		clip_ex = clipl | (clipr << 16);
-}
-
-void taito_f3_state::get_spritealphaclip_info()
-{
-	f3_spritealpha_line_inf *line_t = &m_sa_line_inf[0];
-
-	int y, y_end, y_inc;
-
-	int spri_base, clip_base_low, clip_base_high, inc;
-
-	u16 spri = 0;
-	u16 sprite_clip = 0;
-	u16 clip0_low = 0, clip0_high = 0, clip1_low = 0;
-	u16 clip2_low = 0, clip2_high = 0, clip3_low = 0;
-	u16 alpha_level = 0;
-	u16 sprite_alpha = 0;
-
-	if (m_flipscreen)
-	{
-		spri_base = 0x77fe;
-		clip_base_low = 0x51fe;
-		clip_base_high = 0x45fe;
-		inc = -2;
-		y = 255;
-		y_end = -1;
-		y_inc = -1;
-
-	}
-	else
-	{
-		spri_base = 0x7600;
-		clip_base_low = 0x5000;
-		clip_base_high = 0x4400;
-		inc = 2;
-		y = 0;
-		y_end = 256;
-		y_inc = 1;
-	}
-
-	while (y != y_end)
-	{
-		/* The zoom, column and row values can latch according to control ram */
-		{
-			if (m_line_ram[0x100 + y] & 1) // 5000 control playfield 1
-				clip0_low = (m_line_ram[clip_base_low / 2] >> 0) & 0xffff;
-			if (m_line_ram[0x000 + y] & 4) // 4000 control
-				clip0_high = (m_line_ram[clip_base_high / 2] >> 0) & 0xffff;
-			if (m_line_ram[0x100 + y] & 2) // 5000 control playfield 2
-				clip1_low = (m_line_ram[(clip_base_low + 0x200) / 2] >> 0) & 0xffff;
-
-			if (m_line_ram[0x100 + y] & 4) // 5000 control playfield 3
-				clip2_low = (m_line_ram[(clip_base_low + 0x400) / 2] >> 0) & 0xffff;
-			if (m_line_ram[0x000 + y] & 8) // 4000 control
-				clip2_high = (m_line_ram[(clip_base_high + 0x200) / 2] >> 0) & 0xffff;
-			if (m_line_ram[0x100 + y] & 8) // 5000 control playfield 4
-				clip3_low = (m_line_ram[(clip_base_low + 0x600) / 2] >> 0) & 0xffff;
-
-			if (m_line_ram[(0x0600 / 2) + y] & 0x8)
-				spri = m_line_ram[spri_base / 2] & 0xffff;
-			if (m_line_ram[(0x0600 / 2) + y] & 0x4)
-				sprite_clip = m_line_ram[(spri_base-0x200) / 2] & 0xffff;
-			if (m_line_ram[(0x0400 / 2) + y] & 0x1)
-				sprite_alpha = m_line_ram[(spri_base-0x1600) / 2] & 0xffff;
-			if (m_line_ram[(0x0400 / 2) + y] & 0x2)
-				alpha_level = m_line_ram[(spri_base-0x1400) / 2] & 0xffff;
-		}
-
-
-		line_t->alpha_level[y] = alpha_level;
-		line_t->spri[y] = spri;
-		line_t->sprite_alpha[y] = sprite_alpha;
-		line_t->clip_l[0][y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 47;
-		line_t->clip_r[0][y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 48;
-		line_t->clip_l[1][y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 47;
-		line_t->clip_r[1][y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 48;
-		line_t->clip_l[2][y] = ((clip2_low & 0xff) | ((clip2_high & 0x1000) >> 4)) - 47;
-		line_t->clip_r[2][y] = (((clip2_low & 0xff00) >> 8) | ((clip2_high & 0x2000) >> 5)) - 48;
-		line_t->clip_l[3][y] = ((clip3_low & 0xff) | ((clip2_high & 0x4000) >> 6)) - 47;
-		line_t->clip_r[3][y] = (((clip3_low & 0xff00) >> 8) | ((clip2_high & 0x8000) >> 7)) - 48;
-		if (line_t->clip_l[0][y] < 0) line_t->clip_l[0][y] = 0;
-		if (line_t->clip_r[0][y] < 0) line_t->clip_r[0][y] = 0;
-		if (line_t->clip_l[1][y] < 0) line_t->clip_l[1][y] = 0;
-		if (line_t->clip_r[1][y] < 0) line_t->clip_r[1][y] = 0;
-		if (line_t->clip_l[2][y] < 0) line_t->clip_l[2][y] = 0;
-		if (line_t->clip_r[2][y] < 0) line_t->clip_r[2][y] = 0;
-		if (line_t->clip_l[3][y] < 0) line_t->clip_l[3][y] = 0;
-		if (line_t->clip_r[3][y] < 0) line_t->clip_r[3][y] = 0;
-
-		/* Evaluate sprite clipping */
-		if (sprite_clip & 0xf0)
-		{
-			u8 line_enable = 1;
-			calculate_clip(y, ((sprite_clip & 0x1ff) << 4), line_t->sprite_clip_in[y], line_t->sprite_clip_ex[y], line_enable);
-			if (line_enable == 0)
-				line_t->sprite_clip_in[y] = 0x7fff7fff;
-		}
-		else
-		{
-			line_t->sprite_clip_in[y] = 0x7fff0000;
-			line_t->sprite_clip_ex[y] = 0;
-		}
-
-		spri_base += inc;
-		clip_base_low += inc;
-		clip_base_high += inc;
-		y += y_inc;
-	}
-}
-
-/* sx and sy are 16.16 fixed point numbers */
-void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, const u16 *pf_data_n)
-{
-	f3_playfield_line_inf *line_t = &m_pf_line_inf[pos];
-
-	int y_start, y_end, y_inc;
-	int y_index_fx;
-
-	u16 colscroll = 0;
-	u16 _colscroll[256];
-	int x_offset = 0;
-	u32 _x_offset[256];
-	u8 line_zoom_x = 0, line_zoom_y = 0;
-	u8 _y_zoom[256];
-	u16 pri = 0, pal_add = 0;
-
-	sx += ((46 << 16));
-
-	if (m_flipscreen)
-	{
-		y_start = 255;
-		y_end = -1;
-		y_inc = -1;
-
-		 /* Adjust for flipped scroll position */
-		if (m_game_config->extend)
-			sx = -sx + (((188 - 512) & 0xffff) << 16);
-		else
-			sx = -sx + (188 << 16);
-
-		y_index_fx = -sy - (256 << 16); /* Adjust for flipped scroll position */
-	}
-	else
-	{
-		y_start = 0;
-		y_end = 256;
-		y_inc = 1;
-
-		y_index_fx = sy;
-	}
-
-	int y = y_start;
-
-	while (y != y_end)
-	{
-		const u16 col_base = (0x4000 + (pos << 9)) / 2;
-		const u16 zoom_base = 0x8000 / 2;
-		const u16 pal_add_base = (0x9000 + (pos << 9)) / 2;
-		const u16 line_base = (0xa000 + (pos << 9)) / 2;
-		const u16 pri_base = (0xb000 + (pos << 9)) / 2;
-
-		const u8 bit_select = 1 << pos;
-
-		/* The zoom, column and row values can latch according to control ram */
-		{
-			if (m_line_ram[0x600 + y] & bit_select)
-				x_offset = m_line_ram[line_base + y] << 10;
-			if (m_line_ram[0x700 + y] & bit_select)
-				pri = m_line_ram[pri_base + y];
-
-			// Zoom for playfields 1 & 3 is interleaved, as is the latch select
-			switch (pos)
-			{
-			case 0:
-				if (m_line_ram[0x400 + y] & bit_select)
-				{
-					line_zoom_x = m_line_ram[zoom_base + y + 0x000 / 2] >> 8;
-					line_zoom_y = m_line_ram[zoom_base + y + 0x000 / 2] & 0xff;
+		if (normal_planes[plane]) {
+			// check and clip all existing ranges
+			for (auto it = ranges.begin(); it != ranges.end(); ) {
+				// if this clip is <1 px wide, clip entire line
+				// remove ranges outside normal clip intersection
+				if (clip_l > clip_r || it->r < clip_l || it->l > clip_r) {
+					it = ranges.erase(it);
+				} else { // otherwise intersect normally
+					it->l = std::max(it->l, clip_l);
+					it->r = std::min(it->r, clip_r);
+					++it;
 				}
-				break;
-			case 1:
-				if (m_line_ram[0x400 + y] & 0x2)
-					line_zoom_x = m_line_ram[zoom_base + y + 0x200 / 2] >> 8;
-				if (m_line_ram[0x400 + y] & 0x8)
-					line_zoom_y = m_line_ram[zoom_base + y + 0x600 / 2] & 0xff;
-				break;
-			case 2:
-				if (m_line_ram[0x400 + y] & bit_select)
-				{
-					line_zoom_x = m_line_ram[zoom_base + y + 0x400 / 2] >> 8;
-					line_zoom_y = m_line_ram[zoom_base + y + 0x400 / 2] & 0xff;
-				}
-				break;
-			case 3:
-				if (m_line_ram[0x400 + y] & 0x8)
-					line_zoom_x = m_line_ram[zoom_base + y + 0x600 / 2] >> 8;
-				if (m_line_ram[0x400 + y] & 0x2)
-					line_zoom_y = m_line_ram[zoom_base + y + 0x200 / 2] & 0xff;
-				break;
-			default:
-				break;
 			}
+		} else if (invert_planes[plane] && (clip_l <= clip_r)) {
+			// ASSUMING: only up to two clip settings legal at a time,
+			// can get up to 3 ranges; figure out which one it *isn't* later
+			new_ranges.reserve(2 * ranges.size());
+			new_ranges.insert(new_ranges.end(), ranges.size(), clip_plane_inf{INF_L, clip_l});
+			new_ranges.insert(new_ranges.end(), ranges.size(), clip_plane_inf{clip_r, INF_R});
 
-			// Column scroll only affects playfields 2 & 3
-			if (pos >= 2 && m_line_ram[0x000 + y] & bit_select)
-				colscroll = (m_line_ram[col_base + y] >> 0) & 0x3ff;
-
-			if (m_line_ram[0x500 + y] & bit_select)
-				pal_add = (m_line_ram[pal_add_base + y] & 0x1ff) * 16;
-		}
-
-		u8 line_enable;
-
-		if (!pri || (!m_flipscreen && y < 24) || (m_flipscreen && y > 231) ||
-			(pri & 0xc000) == 0xc000 || !(pri & 0x2000)/**/)
-			line_enable = 0;
-		else if (pri & 0x4000) //alpha1
-			line_enable = 2;
-		else if (pri & 0x8000) //alpha2
-			line_enable = 3;
-		else
-			line_enable = 1;
-
-		_colscroll[y] = colscroll;
-		_x_offset[y] = (x_offset & 0xffff0000) - (x_offset & 0x0000ffff);
-		_y_zoom[y] = line_zoom_y;
-
-		/* Evaluate clipping */
-		if (pri & 0x0f00)
-		{
-			//fast path todo - remove line enable
-			calculate_clip(y, pri & 0x1ff0, line_t->clip_in[y], line_t->clip_ex[y], line_enable);
-		}
-		else
-		{
-			/* No clipping */
-			line_t->clip_in[y] = 0x7fff0000;
-			line_t->clip_ex[y] = 0;
-		}
-
-		line_t->x_zoom[y] = 0x10000 - (line_zoom_x << 8);
-		line_t->alpha_mode[y] = line_enable;
-		line_t->pri[y] = pri;
-		line_t->pal_add[y] = pal_add;
-
-		// zoom_base += inc;
-		y += y_inc;
-	}
-	// ignore the first zoom value from ram and use the default
-	_y_zoom[y_start] = 0;
-	line_t->x_zoom[y_start] = 0x10000;
-
-	tilemap_t* tm = tmap;
-	const u16* pfdata = pf_data_n;
-
-	y = y_start;
-	while (y != y_end)
-	{
-		u32 x_index_fx;
-		u32 y_index;
-
-		/* lines with 0x0200 set in column scroll look up in alternate tilemaps
-		   playfield 3 2000 -> 4000, playfield 4 3000 -> 5000 (non-extended only?)
-		   used by kaiserkn (high scores), kirameki, football games (crowd, goals)
-
-		   there's some seemingly unrelated issue with the timing of y scrolling,
-		   causing the pitch to scroll ahead of crowd areas
-		*/
-		const u16 cs = _colscroll[y];
-		if (cs & 0x200)
-		{
-			if (m_tilemap[4] && m_tilemap[5])
-			{
-				if (tmap == m_tilemap[2])
-				{
-					tmap = m_tilemap[4];
-					pf_data_n = m_pf_data[4];
+			for (auto it = new_ranges.begin(); it != new_ranges.end(); ) {
+				auto n = std::next(it);
+				for (const auto &range : ranges) {
+					it->l = std::max(range.l, it->l);
+					it->r = std::max(range.l, it->r);
+					if (it->l >= it->r) {
+						n = new_ranges.erase(it);
+						break; // goto...
+					}
 				}
-				else if (tmap == m_tilemap[3])
-				{
-					tmap = m_tilemap[5];
-					pf_data_n = m_pf_data[5];
+				it = n;
+			}
+			ranges = std::move(new_ranges);
+			new_ranges.clear();
+		}
+	}
+	return ranges;
+}
+
+static int mosaic(int x, u8 sample)
+{
+	int x_count = x - 46 + 114;
+	// hw quirk: the counter resets 2 px from the right edge...
+	x_count = (x_count >= 432) ? (x_count - 432) : x_count;
+	return x - (x_count % sample);
+}
+
+inline bool taito_f3_state::mixable::layer_enable() const
+{
+	return (mix_value & 0x2000) && blend_mode != 0b11;
+}
+inline int taito_f3_state::mixable::x_index(int x) const
+{
+	return x;
+}
+inline int taito_f3_state::mixable::y_index(int y) const
+{
+	return y;
+}
+inline bool taito_f3_state::sprite_inf::layer_enable() const
+{
+	return (mix_value & 0x2000) && blend_mode != 0b00;
+}
+inline u16 taito_f3_state::playfield_inf::palette_adjust(u16 pal) const
+{
+	return pal + pal_add;
+}
+inline int taito_f3_state::playfield_inf::x_index(int x) const
+{
+	return (((reg_fx_x + (x - H_START) * x_scale)>>8) + H_START) & width_mask;
+}
+inline int taito_f3_state::playfield_inf::y_index(int y) const
+{
+	return ((reg_fx_y >> 8) + colscroll) & 0x1ff;
+}
+inline int taito_f3_state::pivot_inf::x_index(int x) const
+{
+	return (x + reg_sx) & 0x1FF;
+}
+inline int taito_f3_state::pivot_inf::y_index(int y) const
+{
+	return (reg_sy + y) & (use_pix() ? 0xff : 0x1ff);
+}
+
+template<typename Mix>
+bool taito_f3_state::mix_line(const Mix &gfx, mix_pix &z, pri_mode &pri, const f3_line_inf &line, const clip_plane_inf &range)
+{
+	const int y = gfx.y_index(line.y);
+	const u16 *src = &gfx.bitmap.src->pix(y);
+	const u8 *flags = gfx.bitmap.flags ? &gfx.bitmap.flags->pix(y) : nullptr;
+
+	for (int x = range.l; x < range.r; x++) {
+		if (gfx.blend_mode == pri.src_blendmode[x])
+			continue; // note that layers cannot blend against the same blend mode
+
+		const int real_x = gfx.x_sample_enable ? mosaic(x, line.x_sample) : x;
+		const int gfx_x = gfx.x_index(real_x);
+
+		// this check is for ensuring sprite group draw ordering
+		// (benchmarked: do not combine with color 0 check)
+		const u16 color = src[gfx_x];
+		if (gfx.inactive_group(color))
+			continue;
+
+		// tilemap transparent flag
+		if (flags && !(flags[gfx_x] & 0xf0))
+			continue;
+
+		if (gfx.prio > pri.src_prio[x]) {
+			// submit src pix
+			if (color) {
+				const u16 pal = gfx.palette_adjust(color);
+				// could be pulled out of loop for pivot and sprite
+				u8 sel = gfx.blend_select(flags, gfx_x);
+
+				switch (gfx.blend_mode) {
+				case 0b01: // normal blend
+					sel = 2 + sel;
+					[[fallthrough]];
+				case 0b10: // reverse blend
+					if (line.blend[sel] == 0)
+						continue; // could be early return for pivot and sprite
+					z.src_blend[x] = line.blend[sel];
+					break;
+				case 0b00: case 0b11: default: // opaque layer
+					if (line.blend[sel] + line.blend[2 + sel] == 0)
+						continue; // could be early return for pivot and sprite
+					z.src_blend[x] = line.blend[2 + sel];
+					z.dst_blend[x] = line.blend[sel];
+					pri.dst_prio[x] = gfx.prio;
+					z.dst_pal[x] = pal;
+					break;
+				}
+				// lock in source color for blending and update the prio test buffer
+				z.src_pal[x] = pal;
+				pri.src_blendmode[x] = gfx.blend_mode;
+				pri.src_prio[x] = gfx.prio;
+			}
+		} else if (gfx.prio >= pri.dst_prio[x]) {
+			// submit dest pix
+			if (color) {
+				const u16 pal = gfx.palette_adjust(color);
+				if (gfx.prio != pri.dst_prio[x])
+					z.dst_pal[x] = pal;
+				else // prio conflict = color line conflict? (dariusg, bubblem)
+					z.dst_pal[x] = 0;
+				pri.dst_prio[x] = gfx.prio;
+				const bool sel = gfx.blend_select(flags, gfx_x);
+				switch (pri.src_blendmode[x]) {
+				case 0b01:
+					z.dst_blend[x] = line.blend[sel];
+					break;
+				case 0b10: case 0b00: case 0b11: default:
+					z.dst_blend[x] = line.blend[2 + sel];
+					break;
 				}
 			}
 		}
-		else
-		{
-			tmap = tm;
-			pf_data_n = pfdata;
-		}
-
-		/* set pixmap pointer */
-		bitmap_ind16 &srcbitmap = tmap->pixmap();
-		bitmap_ind8 &flagsbitmap = tmap->flagsmap();
-
-		if (line_t->alpha_mode[y] != 0)
-		{
-			u16 *src_s;
-			u8 *tsrc_s;
-
-			x_index_fx = (sx+_x_offset[y]-(10*0x10000) + (10*line_t->x_zoom[y]))&((m_width_mask << 16)|0xffff);
-			y_index = ((y_index_fx >> 16)+_colscroll[y]) & 0x1ff;
-
-			/* check tile status */
-			visible_tile_check(line_t, y, x_index_fx, y_index, pf_data_n);
-
-			/* If clipping enabled for this line have to disable 'all opaque' optimisation */
-			if (line_t->clip_in[y] != 0x7fff0000 || line_t->clip_ex[y] != 0)
-				line_t->alpha_mode[y] &= ~0x80;
-
-			/* set pixmap index */
-			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
-			line_t->src_s[y] = src_s = &srcbitmap.pix(y_index);
-			line_t->src_e[y] = &src_s[m_width_mask + 1];
-			line_t->src[y] = &src_s[x_index_fx >> 16];
-
-			line_t->tsrc_s[y]=tsrc_s = &flagsbitmap.pix(y_index);
-			line_t->tsrc[y] = &tsrc_s[x_index_fx >> 16];
-		}
-
-		y_index_fx += _y_zoom[y] << 9;
-		y += y_inc;
 	}
+
+	constexpr int DEBUG_X = 50 + H_START;
+	constexpr int DEBUG_Y = 180 + V_START;
+	if (TAITOF3_VIDEO_DEBUG && line.y == DEBUG_Y) {
+		logerror("[%X] %s%d: %d,%d (%d)\n   {pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
+				 gfx.prio, gfx.debug_name(), gfx.index,
+				 gfx.blend_b(), gfx.blend_a(), gfx.blend_select(flags, 82),
+				 z.src_pal[DEBUG_X], z.dst_pal[DEBUG_X],
+				 z.src_blend[DEBUG_X], z.dst_blend[DEBUG_X],
+				 pri.src_prio[DEBUG_X], pri.dst_prio[DEBUG_X]);
+	}
+
+	return false; // TODO: determine when we can stop drawing?
 }
 
-void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy)
+void taito_f3_state::render_line(pen_t *RESTRICT dst, const mix_pix &z)
 {
-	const f3_spritealpha_line_inf *sprite_alpha_line_t = &m_sa_line_inf[0];
-	f3_playfield_line_inf *line_t = &m_pf_line_inf[4];
+	const pen_t *clut = m_palette->pens();
+	for (unsigned int x = H_START; x < H_START + H_VIS; x++) {
+		rgb_t s_rgb = clut[z.src_pal[x]];
+		rgb_t d_rgb = clut[z.dst_pal[x]];
 
-	int y_start, y_end, y_inc;
-	int pri_base, inc;
+		// source_color * src_blend + dest_color * dst_blend
+		u16 r1 = s_rgb.r();
+		u16 g1 = s_rgb.g();
+		u16 b1 = s_rgb.b();
+		u16 r2 = d_rgb.r();
+		u16 g2 = d_rgb.g();
+		u16 b2 = d_rgb.b();
+		r1 *= z.src_blend[x]; // these blend contributions have fixed3 precision
+		g1 *= z.src_blend[x]; // i.e. 0 (b0'000) to 8 (b1'000) represents 0.0 to 1.0
+		b1 *= z.src_blend[x];
+		r2 *= z.dst_blend[x];
+		g2 *= z.dst_blend[x];
+		b2 *= z.dst_blend[x];
+		r1 += r2;
+		g1 += g2;
+		b1 += b2;
 
-	u8 line_enable;
+		r1 >>= 3;
+		g1 >>= 3;
+		b1 >>= 3;
+		r1 = std::min<u16>(r1, 255);
+		g1 = std::min<u16>(g1, 255);
+		b1 = std::min<u16>(b1, 255);
 
-	u16 pri = 0;
-
-	const u16 vram_width_mask = 0x1ff;
-
-	if (m_flipscreen)
-	{
-		pri_base = 0x73fe;
-		inc = -2;
-		y_start = 255;
-		y_end = -1;
-		y_inc = -1;
-	}
-	else
-	{
-		pri_base = 0x7200;
-		inc = 2;
-		y_start = 0;
-		y_end = 256;
-		y_inc = 1;
-
-	}
-
-	int y = y_start;
-	while (y != y_end)
-	{
-		/* The zoom, column and row values can latch according to control ram */
-		{
-			if (m_line_ram[(0x0600 / 2) + y] & 0x2)
-				pri = (m_line_ram[pri_base / 2] & 0xffff);
-		}
-
-		if (!pri || (!m_flipscreen && y < 24) || (m_flipscreen && y > 231) ||
-			(pri & 0xc000) == 0xc000 || !(pri & 0x2000)/**/)
-			line_enable = 0;
-		else if (pri & 0x4000) //alpha1
-			line_enable = 2;
-		else if (pri & 0x8000) //alpha2
-			line_enable = 3;
-		else
-			line_enable = 1;
-
-		line_t->pri[y] = pri;
-
-		/* Evaluate clipping */
-		if (pri & 0x0f00)
-		{
-			//fast path todo - remove line enable
-			calculate_clip(y, pri & 0x1ff0, line_t->clip_in[y], line_t->clip_ex[y], line_enable);
-		}
-		else
-		{
-			/* No clipping */
-			line_t->clip_in[y] = 0x7fff0000;
-			line_t->clip_ex[y] = 0;
-		}
-
-		line_t->x_zoom[y] = 0x10000;
-		line_t->alpha_mode[y] = line_enable;
-		if (line_t->alpha_mode[y] > 1)
-			line_t->alpha_mode[y] |= 0x10;
-
-		pri_base += inc;
-		y += y_inc;
-	}
-
-	sx &= 0x1ff;
-
-	/* set pixmap pointer */
-	bitmap_ind16 &srcbitmap_pixel = pixel_tilemap->pixmap();
-	bitmap_ind8 &flagsbitmap_pixel = pixel_tilemap->flagsmap();
-	bitmap_ind16 &srcbitmap_vram = vram_tilemap->pixmap();
-	bitmap_ind8 &flagsbitmap_vram = vram_tilemap->flagsmap();
-
-	y = y_start;
-	while (y != y_end)
-	{
-		if (line_t->alpha_mode[y] != 0)
-		{
-			u16 *src_s;
-			u8 *tsrc_s;
-
-			// These bits in control ram indicate whether the line is taken from
-			// the VRAM tilemap layer or pixel layer.
-			const bool usePixelLayer = ((sprite_alpha_line_t->sprite_alpha[y] & 0xa000) == 0xa000);
-
-			/* set pixmap index */
-			line_t->x_count[y] = 0xffff;
-			if (usePixelLayer)
-				line_t->src_s[y] = src_s = &srcbitmap_pixel.pix(sy & 0xff);
-			else
-				line_t->src_s[y] = src_s = &srcbitmap_vram.pix(sy & 0x1ff);
-			line_t->src_e[y] = &src_s[vram_width_mask + 1];
-			line_t->src[y] = &src_s[sx];
-
-			if (usePixelLayer)
-				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_pixel.pix(sy & 0xff);
-			else
-				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_vram.pix(sy & 0x1ff);
-			line_t->tsrc[y] = &tsrc_s[sx];
-		}
-
-		sy++;
-		y += y_inc;
+		dst[x] = rgb_t(r1, g1, b1);
 	}
 }
 
-/******************************************************************************/
+
+inline bool taito_f3_state::used(const pivot_inf &layer, int y) const
+{
+	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
+	return layer.use_pix() || (m_textram_row_usage[y_adj >> 3] > 0);
+}
+inline bool taito_f3_state::used(const sprite_inf &layer, int y) const
+{
+	return m_sprite_pri_row_usage[y] & (1 << layer.index);
+}
+inline bool taito_f3_state::used(const playfield_inf &layer, int y) const
+{
+	const int y_adj = m_flipscreen ? 0x1ff - layer.y_index(y) : layer.y_index(y);
+	return m_tilemap_row_usage[y_adj >> 4][layer.index + (2 * layer.alt_tilemap)] > 0;
+}
 
 void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, ys, ye;
-	int y_start, y_end, y_start_next, y_end_next;
-	u8 draw_line[256] = {};
-	s16 draw_line_num[256];
+	auto prio = [] (const auto &obj) -> u8 { return obj->prio; };
 
-	u32 rot = 0;
-
-	if (m_flipscreen)
-	{
-		rot = ORIENTATION_FLIP_Y;
-		ys = 0;
-		ye = 232;
+	// acquire sprite rendering layers, playfield tilemaps, playfield scroll
+	f3_line_inf line_data{};
+	for (int i=0; i < NUM_SPRITEGROUPS; i++) {
+		line_data.sp[i].bitmap = draw_source(&m_sprite_framebuffer);
+		line_data.sp[i].index = i;
 	}
-	else
-	{
-		ys = 24;
-		ye = 256;
+	for (int pf = 0; pf < NUM_PLAYFIELDS; ++pf) {
+		get_pf_scroll(pf, line_data.pf[pf].reg_sx, line_data.pf[pf].reg_sy);
+
+		line_data.pf[pf].reg_fx_y = line_data.pf[pf].reg_sy;
+		line_data.pf[pf].width_mask = m_width_mask;
+		line_data.pf[pf].index = pf;
+	}
+	if (m_flipscreen) {
+		line_data.pivot.reg_sx = m_control_1[4] - 12;
+		line_data.pivot.reg_sy = m_control_1[5];
+	} else {
+		line_data.pivot.reg_sx = -m_control_1[4] - 5;
+		line_data.pivot.reg_sy = -m_control_1[5];
 	}
 
-	y_start = ys;
-	y_end = ye;
+	for (unsigned int screen_y = 0; screen_y != 256; screen_y += 1) {
+		const int y = m_flipscreen ? (255 - screen_y) : screen_y;
+		read_line_ram(line_data, y);
+		line_data.y = screen_y;
 
-	while (1)
-	{
-		u8 alpha_mode_flag[5];
-		u8 sprite_alpha_check;
-		u8 sprite_alpha_all_2a;
-		f3_playfield_line_inf *pf_line_inf = m_pf_line_inf.get();
-		f3_spritealpha_line_inf *sa_line_inf = m_sa_line_inf.get();
-		u8 sprite[6] = {};
-		const f3_playfield_line_inf *line_t[5];
-
-		/* find same status of scanlines */
-		u16 pri[5];
-		pri[0] = pf_line_inf[0].pri[y_start];
-		pri[1] = pf_line_inf[1].pri[y_start];
-		pri[2] = pf_line_inf[2].pri[y_start];
-		pri[3] = pf_line_inf[3].pri[y_start];
-		pri[4] = pf_line_inf[4].pri[y_start];
-
-		u8 alpha_mode[5];
-		alpha_mode[0] = pf_line_inf[0].alpha_mode[y_start];
-		alpha_mode[1] = pf_line_inf[1].alpha_mode[y_start];
-		alpha_mode[2] = pf_line_inf[2].alpha_mode[y_start];
-		alpha_mode[3] = pf_line_inf[3].alpha_mode[y_start];
-		alpha_mode[4] = pf_line_inf[4].alpha_mode[y_start];
-		const u16 alpha_level = sa_line_inf[0].alpha_level[y_start];
-		const u16 spri = sa_line_inf[0].spri[y_start];
-		const u16 sprite_alpha = sa_line_inf[0].sprite_alpha[y_start];
-
-		draw_line[y_start] = 1;
-		draw_line_num[i = 0] = y_start;
-		y_start_next = -1;
-		y_end_next = -1;
-		for (int y = y_start + 1; y < y_end; y++)
-		{
-			if (!draw_line[y])
-			{
-				if (pri[0] != pf_line_inf[0].pri[y]) y_end_next = y + 1;
-				else if (pri[1] != pf_line_inf[1].pri[y]) y_end_next = y + 1;
-				else if (pri[2] != pf_line_inf[2].pri[y]) y_end_next = y + 1;
-				else if (pri[3] != pf_line_inf[3].pri[y]) y_end_next = y + 1;
-				else if (pri[4] != pf_line_inf[4].pri[y]) y_end_next = y + 1;
-				else if (alpha_mode[0] != pf_line_inf[0].alpha_mode[y]) y_end_next = y + 1;
-				else if (alpha_mode[1] != pf_line_inf[1].alpha_mode[y]) y_end_next = y + 1;
-				else if (alpha_mode[2] != pf_line_inf[2].alpha_mode[y]) y_end_next = y + 1;
-				else if (alpha_mode[3] != pf_line_inf[3].alpha_mode[y]) y_end_next = y + 1;
-				else if (alpha_mode[4] != pf_line_inf[4].alpha_mode[y]) y_end_next = y + 1;
-				else if (alpha_level!=sa_line_inf[0].alpha_level[y]) y_end_next = y + 1;
-				else if (spri!=sa_line_inf[0].spri[y]) y_end_next = y + 1;
-				else if (sprite_alpha!=sa_line_inf[0].sprite_alpha[y]) y_end_next = y + 1;
-				else
-				{
-					draw_line[y] = 1;
-					draw_line_num[++i] = y;
-					continue;
-				}
-
-				if (y_start_next < 0) y_start_next = y;
-			}
+		// some tilemap source selection depends on current line data
+		for (int pf_num = 0; pf_num < NUM_PLAYFIELDS; ++pf_num) {
+			auto &pf = line_data.pf[pf_num];
+			int tmap_number = pf_num;
+			if (!m_extend && pf.alt_tilemap)
+				tmap_number += 2;
+			pf.bitmap = draw_source(m_tilemap[tmap_number]);
+			// what is with this calculation...
+			pf.reg_fx_x = pf.reg_sx + pf.rowscroll;
+			pf.reg_fx_x += 10 * ((pf.x_scale) - (1<<8));
 		}
-		y_end = y_end_next;
-		y_start = y_start_next;
-		draw_line_num[++i] = -1;
+		if (line_data.pivot.use_pix()) {
+			line_data.pivot.bitmap = draw_source(m_pixel_layer);
+		} else {
+			line_data.pivot.bitmap = draw_source(m_vram_layer);
+		}
 
-		/* alpha blend */
-		alpha_mode_flag[0] = alpha_mode[0] & ~3;
-		alpha_mode_flag[1] = alpha_mode[1] & ~3;
-		alpha_mode_flag[2] = alpha_mode[2] & ~3;
-		alpha_mode_flag[3] = alpha_mode[3] & ~3;
-		alpha_mode_flag[4] = alpha_mode[4] & ~3;
-		alpha_mode[0] &= 3;
-		alpha_mode[1] &= 3;
-		alpha_mode[2] &= 3;
-		alpha_mode[3] &= 3;
-		alpha_mode[4] &= 3;
-		if (alpha_mode[0] > 1 ||
-			alpha_mode[1] > 1 ||
-			alpha_mode[2] > 1 ||
-			alpha_mode[3] > 1 ||
-			alpha_mode[4] > 1 ||
-			(sprite_alpha & 0xff) != 0xff)
-		{
-			/* set alpha level */
-			if (alpha_level != m_alpha_level_last)
-			{
-				const u8 a = BIT(alpha_level, 12, 4);
-				const u8 b = BIT(alpha_level,  8, 4);
-				const u8 c = BIT(alpha_level,  4, 4);
-				const u8 d = BIT(alpha_level,  0, 4);
+		// set up line blend pixel and priority buffers
+		mix_pix line_buf{};
+		pri_mode line_pri{};
+		// background palette -- what contributions should this default to?
+		std::fill_n(line_buf.dst_pal, H_TOTAL, line_data.bg_palette);
+		std::fill_n(line_buf.dst_blend, H_TOTAL, 8); // 100%
+		// set an invalid blend mode as it affects mixing
+		std::fill_n(line_pri.src_blendmode, H_TOTAL, 0xff);
+		std::fill_n(line_pri.dst_blendmode, H_TOTAL, 0xff);
 
-				/* b000 7000 */
-				u8 al_s = std::min(255, ((15 - d) * 256) / 8);
-				u8 al_d = std::min(255, ((15 - b) * 256) / 8);
-				m_alpha_level_3as = al_s;
-				m_alpha_level_3ad = al_d;
-				m_alpha_level_2as = al_d;
-				m_alpha_level_2ad = al_s;
+		// sort layers
+		std::array<std::variant<pivot_inf*, sprite_inf*, playfield_inf*>,
+				NUM_SPRITEGROUPS + NUM_PLAYFIELDS + 1> layers = {
+			&line_data.pivot, // this order seems ok for dariusg/gseeker/bubblem conflicts?
+			&line_data.sp[0], &line_data.pf[0],
+			&line_data.sp[3], &line_data.pf[3],
+			&line_data.sp[2], &line_data.pf[2],
+			&line_data.sp[1], &line_data.pf[1]
+		};
+		std::stable_sort(layers.begin(), layers.end(),
+				[prio] (auto a, auto b) -> bool {
+					return std::visit(prio, a) > std::visit(prio, b);
+				});
 
-				al_s = std::min(255, ((15 - c) * 256) / 8);
-				al_d = std::min(255, ((15 - a) * 256) / 8);
-				m_alpha_level_3bs = al_s;
-				m_alpha_level_3bd = al_d;
-				m_alpha_level_2bs = al_d;
-				m_alpha_level_2bd = al_s;
-
-				alpha_set_level();
-				m_alpha_level_last = alpha_level;
-			}
-
-			/* set sprite alpha mode */
-			sprite_alpha_check = 0;
-			sprite_alpha_all_2a = 1;
-			m_dpix_sp[1] = nullptr;
-			m_dpix_sp[2] = nullptr;
-			m_dpix_sp[4] = nullptr;
-			m_dpix_sp[8] = nullptr;
-			for (i = 0; i < 4; i++)    /* i = sprite priority offset */
-			{
-				const u8 sprite_alpha_mode = (sprite_alpha >> (i * 2)) & 3;
-				const u8 sftbit = 1 << i;
-				if (m_sprite_pri_usage & sftbit)
-				{
-					if (sprite_alpha_mode == 1)
-					{
-						if (m_alpha_level_2as == 0 && m_alpha_level_2ad == 255)
-							m_sprite_pri_usage &= ~sftbit;  // Disable sprite priority block
-						else
-						{
-							m_dpix_sp[sftbit] = m_dpix_n[2];
-							sprite_alpha_check |= sftbit;
-						}
-					}
-					else if (sprite_alpha_mode == 2)
-					{
-						if (sprite_alpha & 0xff00)
-						{
-							if (m_alpha_level_3as == 0 && m_alpha_level_3ad == 255) m_sprite_pri_usage &= ~sftbit;
-							else
-							{
-								m_dpix_sp[sftbit] = m_dpix_n[3];
-								sprite_alpha_check |= sftbit;
-								sprite_alpha_all_2a = 0;
+		// draw layers to framebuffer (currently top to bottom)
+		if (screen_y >= cliprect.min_y && screen_y <= cliprect.max_y) {
+			for (auto gfx : layers) {
+				std::visit(
+						[this, &line_data, &line_buf, &line_pri] (auto &&arg) {
+							const auto &layer = *arg;
+							if (layer.layer_enable() && used(layer, line_data.y)) {
+								const auto clip_ranges = calc_clip(line_data.clip, layer);
+								for (const auto &clip : clip_ranges) {
+									mix_line(layer, line_buf, line_pri, line_data, clip);
+								}
 							}
-						}
-						else
-						{
-							if (m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) m_sprite_pri_usage &= ~sftbit;
-							else
-							{
-								m_dpix_sp[sftbit] = m_dpix_n[5];
-								sprite_alpha_check |= sftbit;
-								sprite_alpha_all_2a = 0;
-							}
-						}
-					}
+						},
+						gfx);
+			}
+			if (TAITOF3_VIDEO_DEBUG == 1) {
+				if (y == 100) {
+					logerror("{pal: %x/%x, blend: %x/%x, prio: %x/%x}\n",
+							 line_buf.src_pal[180], line_buf.dst_pal[180],
+							 line_buf.src_blend[180], line_buf.dst_blend[180],
+							 line_pri.src_prio[180], line_pri.dst_prio[180]);
+					logerror("-' [%hhu,%hhu,%hhu,%hhu] '------------------------- 100\n", line_data.blend[0],
+							 line_data.blend[1], line_data.blend[2], line_data.blend[3]);
 				}
 			}
 
-			/* check alpha level */
-			for (i = 0; i < 5; i++)    /* i = playfield num (pos) */
-			{
-				const u8 alpha_type = (alpha_mode_flag[i] >> 4) & 3;
-
-				if (alpha_mode[i] == 2)
-				{
-					if (alpha_type == 1)
-					{
-						/* if (m_alpha_level_2as == 0   && m_alpha_level_2ad == 255)
-						 *     alpha_mode[i]=3; alpha_mode_flag[i] |= 0x80; }
-						 * will display continue screen in gseeker (mt 00026) */
-						if      (m_alpha_level_2as == 0   && m_alpha_level_2ad == 255) alpha_mode[i] = 0;
-						else if (m_alpha_level_2as == 255 && m_alpha_level_2ad ==   0) alpha_mode[i] = 1;
-					}
-					else if (alpha_type == 2)
-					{
-						if      (m_alpha_level_2bs == 0   && m_alpha_level_2bd == 255) alpha_mode[i] = 0;
-						else if (m_alpha_level_2as == 255 && m_alpha_level_2ad ==   0 &&
-								 m_alpha_level_2bs == 255 && m_alpha_level_2bd ==   0) alpha_mode[i] = 1;
-					}
-					else if (alpha_type == 3)
-					{
-						if      (m_alpha_level_2as == 0   && m_alpha_level_2ad == 255 &&
-								 m_alpha_level_2bs == 0   && m_alpha_level_2bd == 255) alpha_mode[i] = 0;
-						else if (m_alpha_level_2as == 255 && m_alpha_level_2ad ==   0 &&
-								 m_alpha_level_2bs == 255 && m_alpha_level_2bd ==   0) alpha_mode[i] = 1;
-					}
-				}
-				else if (alpha_mode[i] == 3)
-				{
-					if (alpha_type == 1)
-					{
-						if      (m_alpha_level_3as == 0   && m_alpha_level_3ad == 255) alpha_mode[i] = 0;
-						else if (m_alpha_level_3as == 255 && m_alpha_level_3ad ==   0) alpha_mode[i] = 1;
-					}
-					else if (alpha_type == 2)
-					{
-						if      (m_alpha_level_3bs == 0   && m_alpha_level_3bd == 255) alpha_mode[i] = 0;
-						else if (m_alpha_level_3as == 255 && m_alpha_level_3ad ==   0 &&
-								 m_alpha_level_3bs == 255 && m_alpha_level_3bd ==   0) alpha_mode[i] = 1;
-					}
-					else if (alpha_type == 3)
-					{
-						if      (m_alpha_level_3as == 0   && m_alpha_level_3ad == 255 &&
-								 m_alpha_level_3bs == 0   && m_alpha_level_3bd == 255) alpha_mode[i] = 0;
-						else if (m_alpha_level_3as == 255 && m_alpha_level_3ad ==   0 &&
-								 m_alpha_level_3bs == 255 && m_alpha_level_3bd ==   0) alpha_mode[i] = 1;
-					}
-				}
-			}
-
-			if ((alpha_mode[0] == 1 || alpha_mode[0] == 2 || !alpha_mode[0]) &&
-				(alpha_mode[1] == 1 || alpha_mode[1] == 2 || !alpha_mode[1]) &&
-				(alpha_mode[2] == 1 || alpha_mode[2] == 2 || !alpha_mode[2]) &&
-				(alpha_mode[3] == 1 || alpha_mode[3] == 2 || !alpha_mode[3]) &&
-				(alpha_mode[4] == 1 || alpha_mode[4] == 2 || !alpha_mode[4]) &&
-				sprite_alpha_all_2a)
-			{
-				const u8 alpha_type = (alpha_mode_flag[0] | alpha_mode_flag[1] | alpha_mode_flag[2] | alpha_mode_flag[3]) & 0x30;
-				if ((alpha_type == 0x10 && m_alpha_level_2as == 255) ||
-					(alpha_type == 0x20 && m_alpha_level_2as == 255 && m_alpha_level_2bs == 255) ||
-					(alpha_type == 0x30 && m_alpha_level_2as == 255 && m_alpha_level_2bs == 255))
-				{
-					if (alpha_mode[0] > 1) alpha_mode[0] = 1;
-					if (alpha_mode[1] > 1) alpha_mode[1] = 1;
-					if (alpha_mode[2] > 1) alpha_mode[2] = 1;
-					if (alpha_mode[3] > 1) alpha_mode[3] = 1;
-					if (alpha_mode[4] > 1) alpha_mode[4] = 1;
-					sprite_alpha_check = 0;
-					m_dpix_sp[1] = nullptr;
-					m_dpix_sp[2] = nullptr;
-					m_dpix_sp[4] = nullptr;
-					m_dpix_sp[8] = nullptr;
-				}
-			}
-		}
-		else
-		{
-			sprite_alpha_check = 0;
-			m_dpix_sp[1] = nullptr;
-			m_dpix_sp[2] = nullptr;
-			m_dpix_sp[4] = nullptr;
-			m_dpix_sp[8] = nullptr;
+			render_line(&bitmap.pix(screen_y), line_buf);
 		}
 
-		/* set scanline priority */
-		u8 layer_tmp[5];
-		int count_skip_layer = 0;
-		{
-			int pri_max_opa = -1;
-			for (i = 0; i < 5; i++)    /* i = playfield num (pos) */
-			{
-				const u16 p0 = pri[i];
-				const u8 pri_sl1 = p0 & 0x0f;
-
-				layer_tmp[i] = i + (pri_sl1 << 3);
-
-				if (!alpha_mode[i])
-				{
-					layer_tmp[i] |= 0x80;
-					count_skip_layer++;
-				}
-				else if (alpha_mode[i] == 1 && (alpha_mode_flag[i] & 0x80))
-				{
-					if (layer_tmp[i] > pri_max_opa) pri_max_opa = layer_tmp[i];
-				}
-			}
-
-			if (pri_max_opa != -1)
-			{
-				if (pri_max_opa > layer_tmp[0]) { layer_tmp[0] |= 0x80; count_skip_layer++; }
-				if (pri_max_opa > layer_tmp[1]) { layer_tmp[1] |= 0x80; count_skip_layer++; }
-				if (pri_max_opa > layer_tmp[2]) { layer_tmp[2] |= 0x80; count_skip_layer++; }
-				if (pri_max_opa > layer_tmp[3]) { layer_tmp[3] |= 0x80; count_skip_layer++; }
-				if (pri_max_opa > layer_tmp[4]) { layer_tmp[4] |= 0x80; count_skip_layer++; }
+		if (screen_y != 0) {
+			// update registers
+			for (auto &pf : line_data.pf) {
+				pf.reg_fx_y += pf.y_scale;
 			}
 		}
-
-		/* sort layer_tmp */
-		std::sort(std::begin(layer_tmp), std::end(layer_tmp), std::greater<u8>());
-
-		/* check sprite & layer priority */
-		{
-			u8 pri_sp[5];
-
-			const u8 l0 = layer_tmp[0] >> 3;
-			const u8 l1 = layer_tmp[1] >> 3;
-			const u8 l2 = layer_tmp[2] >> 3;
-			const u8 l3 = layer_tmp[3] >> 3;
-			const u8 l4 = layer_tmp[4] >> 3;
-
-			pri_sp[0] =  spri & 0xf;
-			pri_sp[1] = (spri >> 4) & 0xf;
-			pri_sp[2] = (spri >> 8) & 0xf;
-			pri_sp[3] =  spri >> 12;
-
-			for (i = 0; i < 4; i++)    /* i = sprite priority offset */
-			{
-				const u8 sflg = 1 << i;
-				if (!(m_sprite_pri_usage & sflg)) continue;
-				u8 sp = pri_sp[i];
-
-				/*
-				    sprite priority==playfield priority
-				        GSEEKER (plane leaving hangar) --> sprite
-				        BUBSYMPH (title)       ---> sprite
-				        DARIUSG (ZONE V' BOSS) ---> playfield
-				*/
-
-				if (m_game == BUBSYMPH) sp++;        //BUBSYMPH (title)
-				if (m_game == GSEEKER) sp++;     //GSEEKER (plane leaving hangar)
-
-				if      (            sp > l0) sprite[0] |= sflg;
-				else if (sp <= l0 && sp > l1) sprite[1] |= sflg;
-				else if (sp <= l1 && sp > l2) sprite[2] |= sflg;
-				else if (sp <= l2 && sp > l3) sprite[3] |= sflg;
-				else if (sp <= l3 && sp > l4) sprite[4] |= sflg;
-				else if (sp <= l4           ) sprite[5] |= sflg;
-			}
-		}
-
-
-		/* draw scanlines */
-		bool alpha = false;
-		for (i = count_skip_layer; i < 5; i++)
-		{
-			const u8 pos = layer_tmp[i] & 7;
-			line_t[i] = &pf_line_inf[pos];
-
-			if (sprite[i] & sprite_alpha_check) alpha = true;
-			else if (!alpha) sprite[i] |= 0x100;
-
-			if (alpha_mode[pos] > 1)
-			{
-				const u8 alpha_type = (((alpha_mode_flag[pos] >> 4) & 3) - 1) * 2;
-				m_dpix_lp[i] = m_dpix_n[alpha_mode[pos]+alpha_type];
-				alpha = true;
-			}
-			else
-			{
-				if (alpha) m_dpix_lp[i] = m_dpix_n[1];
-				else       m_dpix_lp[i] = m_dpix_n[0];
-			}
-		}
-		if (sprite[5] & sprite_alpha_check) alpha = true;
-		else if (!alpha) sprite[5] |= 0x100;
-
-		draw_scanlines(bitmap, 320, draw_line_num, line_t, sprite, rot, count_skip_layer);
-		if (y_start < 0) break;
 	}
 }
 
 /******************************************************************************/
 
-inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &clip,
-		gfx_element *gfx,
-		int code,
-		u8 color,
-		bool flipx, bool flipy,
-		int sx, int sy,
-		u16 scalex, u16 scaley,
-		u8 pri_dst)
+inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle &cliprect)
 {
-	rectangle myclip;
+	bitmap_ind16 &dest_bmp = m_sprite_framebuffer;
 
-	pri_dst = 1 << pri_dst;
+	gfx_element *gfx = m_gfxdecode->gfx(2);
+	const u8 *code_base = gfx->get_data(sprite.code % gfx->elements());
 
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	myclip = clip;
-	myclip &= dest_bmp.cliprect();
+	const u8 flipx = sprite.flip_x ? 0xF : 0;
+	const u8 flipy = sprite.flip_y ? 0xF : 0;
 
-	if (gfx)
-	{
-		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-		const u8 *code_base = gfx->get_data(code % gfx->elements());
+	fixed8 dy8 = (sprite.y);
+	if (!m_flipscreen)
+		dy8 += 255; // round up in non-flipscreen mode?
+	// maybe flipscreen coordinate adjustments should be done after all this math, during final rendering?
+	// y scaling testcases: elvactr mission # text (!flip), kaiserknj attract text (flip)
 
-		{
-			/* compute sprite increment per screen pixel */
-			int dx = (16 << 16) / scalex;
-			int dy = (16 << 16) / scaley;
+	for (u8 y = 0; y < 16; y++) {
+		const int dy = dy8 >> 8;
+		dy8 += sprite.scale_y;
+		if (dy < cliprect.min_y || dy > cliprect.max_y)
+			continue;
+		u16 *dest = &dest_bmp.pix(dy);
+		auto &usage = m_sprite_pri_row_usage[dy];
+		const u8 *src = &code_base[(y ^ flipy) * 16];
 
-			int ex = sx + scalex;
-			int ey = sy + scaley;
-
-			int x_index_base;
-			int y_index;
-
-			if (flipx)
-			{
-				x_index_base = (scalex - 1) * dx;
-				dx = -dx;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
-
-			if (flipy)
-			{
-				y_index = (scaley - 1) * dy;
-				dy = -dy;
-			}
-			else
-			{
-				y_index = 0;
-			}
-
-			if (sx < myclip.min_x)
-			{ /* clip left */
-				int pixels = myclip.min_x - sx;
-				sx += pixels;
-				x_index_base += pixels * dx;
-			}
-			if (sy < myclip.min_y)
-			{ /* clip top */
-				int pixels = myclip.min_y - sy;
-				sy += pixels;
-				y_index += pixels * dy;
-			}
-			/* NS 980211 - fixed incorrect clipping */
-			if (ex > myclip.max_x + 1)
-			{ /* clip right */
-				int pixels = ex - myclip.max_x - 1;
-				ex -= pixels;
-			}
-			if (ey > myclip.max_y + 1)
-			{ /* clip bottom */
-				int pixels = ey - myclip.max_y - 1;
-				ey -= pixels;
-			}
-
-			if (ex > sx)
-			{ /* skip if inner loop doesn't draw anything */
-//              if (dest_bmp.bpp == 32)
-				{
-					for (int y = sy; y < ey; y++)
-					{
-						const u8 *source = code_base + (y_index >> 16) * 16;
-						u32 *dest = &dest_bmp.pix(y);
-						u8 *pri = &m_pri_alp_bitmap.pix(y);
-
-						int x_index = x_index_base;
-						for (int x = sx; x < ex; x++)
-						{
-							int c = source[x_index >> 16] & m_sprite_pen_mask;
-							if (c)
-							{
-								const u8 p = pri[x];
-								if (p == 0 || p == 0xff)
-								{
-									dest[x] = pal[c];
-									pri[x] = pri_dst;
-								}
-							}
-							x_index += dx;
-						}
-						y_index += dy;
-					}
-				}
+		fixed8 dx8 = (sprite.x) + 128; // 128 is ½ in fixed.8
+		for (u8 x = 0; x < 16; x++) {
+			const int dx = dx8 >> 8;
+			dx8 += sprite.scale_x;
+			// is this necessary with the large margins outside visarea?
+			if (dx < cliprect.min_x || dx > cliprect.max_x)
+				continue;
+			if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
+				continue;
+			const u8 c = src[(x ^ flipx)] & m_sprite_pen_mask;
+			if (c && !dest[dx]) {
+				dest[dx] = gfx->colorbase() + (sprite.color<<4 | c);
+				usage |= 1<<sprite.pri;
 			}
 		}
 	}
 }
 
-void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
+void taito_f3_state::get_sprite_info()
 {
-	const auto calc_zoom = [](u16 &addition, u8 &addition_left, u8 block_zoom)
-	{
-		addition = 0x100 - block_zoom + addition_left;
-		addition_left = addition & 0xf;
-		addition = addition >> 4;
-		// zoom = addition << 12;
-	};
+	const u16 *spriteram16_ptr = m_spriteram.target();
 
-	const rectangle &visarea = m_screen->visible_area();
-	const int min_x = visarea.min_x, max_x = visarea.max_x;
-	const int min_y = visarea.min_y, max_y = visarea.max_y;
-	s16 global_x = 0, global_y = 0, subglobal_x = 0, subglobal_y = 0; // 12-bit signed values, extended to 16 bits
-	s16 block_x = 0, block_y = 0;
-	s16 last_x = 0, last_y = 0;
-	u8 block_zoom_x = 0, block_zoom_y = 0;
-	s16 this_x, this_y; // 12-bit signed values, extended to 16 bits
-	u16 y_addition = 16, x_addition = 16;
+	struct sprite_axis {
+		fixed8 block_scale = 1 << 8;
+		fixed8 pos = 0, block_pos = 0;
+		s16 global = 0, subglobal = 0;
+		void update(u8 scroll, u16 posw, bool multi, u8 block_ctrl, u8 new_zoom)
+		{
+			s16 new_pos = util::sext(posw, 12);
+			// set scroll offsets
+			if (BIT(scroll, 0))
+				subglobal = new_pos;
+			if (BIT(scroll, 1))
+				global = new_pos;
+			// add scroll offsets
+			if (!BIT(scroll, 3)) {
+				new_pos += global;
+				if (!BIT(scroll, 2))
+					new_pos += subglobal;
+			}
+
+
+			switch (block_ctrl) {
+			case 0b00:
+				if (!multi) {
+					block_pos = new_pos << 8;
+					block_scale = (0x100 - new_zoom);
+				}
+				[[fallthrough]];
+			case 0b10:
+				pos = block_pos;
+				break;
+			case 0b11:
+				pos += block_scale * 16;
+				break;
+			}
+		}
+	};
+	sprite_axis x, y;
+	u8 color = 0;
 	bool multi = false;
 
-	u8 x_addition_left = 8, y_addition_left = 8;
+	const rectangle &visarea = m_screen->visible_area();
 
 	tempsprite *sprite_ptr = &m_spritelist[0];
-
 	int total_sprites = 0;
 
-	u8 color = 0, last_color = 0;
-	bool flipx = 0, flipy = 0;
-	//int old_x = 0;
-	s16 y = 0, x = 0;
+	for (int offs = 0; offs < 0x400 && (total_sprites < 0x400); offs++) {
+		total_sprites++; // prevent infinite loops
+		const int bank = m_sprite_bank ? 0x4000 : 0;
+		const u16 *spr = &spriteram16_ptr[bank + (offs * 8)];
 
-	u16 sprite_top = 0x2000;
-	for (int offs = 0; offs < sprite_top && (total_sprites < 0x400); offs += 8)
-	{
-		const int current_offs = offs; /* Offs can change during loop, current_offs cannot */
+		// Check if special command bit is set
+		if (BIT(spr[3], 15)) {
+			const u16 cntrl = spr[5];
+			m_flipscreen = BIT(cntrl, 13);
 
-		/* Check if the sprite list jump command bit is set */
-		if ((spriteram16_ptr[current_offs + 6 + 0]) & 0x8000)
-		{
-			const u32 jump = (spriteram16_ptr[current_offs + 6 + 0]) & 0x3ff;
+			/*
+			    ??f? ??dd ???? ??tb
 
-			const u32 new_offs = ((offs & 0x4000) | ((jump << 4) / 2));
-			if (new_offs == offs)
-				break;
-			offs = new_offs - 8;
-		}
-
-		/* Check if special command bit is set */
-		if (spriteram16_ptr[current_offs + 2 + 1] & 0x8000)
-		{
-			const u16 cntrl = spriteram16_ptr[current_offs + 4 + 1];
-			m_flipscreen = cntrl & 0x2000;
-
-			/*  cntrl & 0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
-			    cntrl & 0x0010 = ???
-			    cntrl & 0x0020 = ???
-			    cntrl & 0x0002 = enabled when Darius Gaiden sprite trail effect should occur (MT #1922)
-			                     Notice that sprites also completely disappear due of a bug/missing feature in the
-			             alpha routines.
+			    cntrl bit 12(0x1000) = disabled?  (From F2 driver, doesn't seem used anywhere)
+			    cntrl bit 4 (0x0010) = ???
+			    cntrl bit 5 (0x0020) = ???
 			*/
 
-			m_sprite_extra_planes = (cntrl & 0x0300) >> 8;   // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
+			m_sprite_extra_planes = BIT(cntrl, 8, 2); // 00 = 4bpp, 01 = 5bpp, 10 = nonsense, 11 = 6bpp
 			m_sprite_pen_mask = (m_sprite_extra_planes << 4) | 0x0f;
+			m_sprite_trails = BIT(cntrl, 1);
 
-			/* Sprite bank select */
-			if (cntrl & 1)
-			{
-				offs = offs | 0x4000;
-				sprite_top = sprite_top | 0x4000;
+			if (cntrl & 0b1101'1100'1111'1100) {
+				logerror("unknown sprite command bits: %4x\n", cntrl);
+			}
+
+			// Sprite bank select
+			m_sprite_bank = BIT(cntrl, 0);
+		} else {
+			if (spr[5] >> 1) {
+				logerror("unknown word 5 bits: %4x\n", spr[5]);
 			}
 		}
 
-		/* Set global sprite scroll */
-		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0xa000)
-		{
-			global_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			global_x = util::sext(global_x, 12);
-			global_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			global_y = util::sext(global_y, 12);
+		if (spr[3] & 0b0110'0000'0000'0000) {
+			logerror("unknown sprite y upper bits: %4x\n", spr[3]);
+		}
+		if (spr[6] & 0b0111'1100'0000'0000) {
+			// landmakrj: 8BFF ?
+			logerror("unknown sprite jump bits: %4x\n", spr[6]);
+		}
+		if (spr[7] != 0) {
+			logerror("unknown sprite word 7: %4x\n", spr[7]);
 		}
 
-		/* And sub-global sprite scroll */
-		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0x5000)
-		{
-			subglobal_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			subglobal_x = util::sext(subglobal_x, 12);
-			subglobal_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			subglobal_y = util::sext(subglobal_y, 12);
+		// Check if the sprite list jump bit is set
+		// we have to check this AFTER processing sprite commands because recalh uses a sprite command and jump in the same sprite
+		// i wonder if this should go after other sprite processsing as well?  can a regular sprite have a jump ?
+		if (BIT(spr[6], 15)) {
+			const int new_offs = BIT(spr[6], 0, 10);
+			if (new_offs == offs) // could this be ≤ ? -- NO! RECALH USES BACKWARDS JUMPS!!
+				break; // optimization, edge cases to watch for: looped sprite block commands?
+
+			offs = new_offs - 1; // subtract because we increment in the for loop
 		}
 
-		if (((spriteram16_ptr[current_offs + 2 + 0]) & 0xf000) == 0xb000)
-		{
-			subglobal_x = (spriteram16_ptr[current_offs + 2 + 0]) & 0xfff;
-			subglobal_x = util::sext(subglobal_x, 12);
-			subglobal_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			subglobal_y = util::sext(subglobal_y, 12);
-			global_y = subglobal_y;
-			global_x = subglobal_x;
-		}
+		const u8 spritecont = spr[4] >> 8;
+		const bool lock = BIT(spritecont, 2);
+		if (!lock)
+			color = spr[4] & 0xFF;
+		const u8 scroll_mode = BIT(spr[2], 12, 4);
+		const u16 zooms = spr[1];
+		x.update(scroll_mode, spr[2] & 0xFFF, multi, BIT(spritecont, 4 + 2, 2), zooms & 0xFF);
+		y.update(scroll_mode, spr[3] & 0xFFF, multi, BIT(spritecont, 4 + 0, 2), zooms >> 8);
+		multi = BIT(spritecont, 3);
 
-		/* A real sprite to process! */
-		const int sprite = (spriteram16_ptr[current_offs + 0 + 0]) | ((spriteram16_ptr[current_offs + 4 + 1] & 1) << 16);
-		const u8 spritecont = spriteram16_ptr[current_offs + 4 + 0] >> 8;
+		const int tile = spr[0] | (BIT(spr[5], 0) << 16);
+		if (!tile)
+			continue; // todo: is this the correct way to tell if a sprite exists?
 
-/* These games either don't set the XY control bits properly (68020 bug?), or
-    have some different mode from the others */
-#ifdef DARIUSG_KLUDGE
-		if (m_game == DARIUSG || m_game == GEKIRIDO || m_game == CLEOPATR || m_game == RECALH)
-			multi = spritecont & 0xf0;
-#endif
+		const fixed8 tx = m_flipscreen ? (512<<8) - x.block_scale*16 - x.pos : x.pos;
+		const fixed8 ty = m_flipscreen ? (256<<8) - y.block_scale*16 - y.pos : y.pos;
 
-		/* Check if this sprite is part of a continued block */
-		if (multi)
-		{
-			/* Bit 0x4 is 'use previous colour' for this block part */
-			if (spritecont & 0x4) color = last_color;
-			else color = (spriteram16_ptr[current_offs + 4 + 0]) & 0xff;
+		if (tx + x.block_scale*16 <= visarea.min_x<<8 || tx > visarea.max_x<<8 || ty + y.block_scale*16 <= visarea.min_y<<8 || ty > visarea.max_y<<8)
+			continue;
 
-#ifdef DARIUSG_KLUDGE
-			if (m_game == DARIUSG || m_game == GEKIRIDO || m_game == CLEOPATR || m_game == RECALH)
-			{
-				/* Adjust X Position */
-				if ((spritecont & 0x40) == 0)
-				{
-					if (spritecont & 0x4)
-						x = block_x;
-					else
-					{
-						this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
-						this_x = util::sext(this_x, 12);
+		const bool flip_x = BIT(spritecont, 0);
+		const bool flip_y = BIT(spritecont, 1);
 
-						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
-							this_x += 0;
-						else if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x4000) /* Ignore subglobal (but apply global) */
-							this_x += global_x;
-						else /* Apply both scroll offsets */
-							this_x += global_x + subglobal_x;
-
-						block_x = this_x;
-						x = this_x;
-					}
-					x_addition_left = 8;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-				else if ((spritecont & 0x80) != 0)
-				{
-					x = last_x + x_addition;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-
-				/* Adjust Y Position */
-				if ((spritecont & 0x10) == 0)
-				{
-					if (spritecont & 0x4)
-						y = block_y;
-					else
-					{
-						this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-						this_y = util::sext(this_y, 12);
-
-						if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
-							this_y += 0;
-						else if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x4000) /* Ignore subglobal (but apply global) */
-							this_y += global_y;
-						else /* Apply both scroll offsets */
-							this_y += global_y + subglobal_y;
-
-						block_y = this_y;
-						y = this_y;
-					}
-					y_addition_left = 8;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-				else if ((spritecont & 0x20) != 0)
-				{
-					y = last_y + y_addition;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-			}
-			else
-#endif
-			{
-				/* Adjust X Position */
-				if ((spritecont & 0x40) == 0)
-				{
-					x = block_x;
-					x_addition_left = 8;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-				else if ((spritecont & 0x80) != 0)
-				{
-					x = last_x + x_addition;
-					calc_zoom(x_addition, x_addition_left, block_zoom_x);
-				}
-				/* Adjust Y Position */
-				if ((spritecont & 0x10) == 0)
-				{
-					y = block_y;
-					y_addition_left = 8;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-				else if ((spritecont & 0x20) != 0)
-				{
-					y = last_y + y_addition;
-					calc_zoom(y_addition, y_addition_left, block_zoom_y);
-				}
-				/* Both zero = reread block latch? */
-			}
-		}
-		/* Else this sprite is the possible start of a block */
-		else
-		{
-			color = (spriteram16_ptr[current_offs + 4 + 0]) & 0xff;
-			last_color = color;
-
-			/* Sprite positioning */
-			this_x = spriteram16_ptr[current_offs + 2 + 0] & 0xfff;
-			this_y = spriteram16_ptr[current_offs + 2 + 1] & 0xfff;
-			this_x = util::sext(this_x, 12);
-			this_y = util::sext(this_y, 12);
-
-			/* Ignore both scroll offsets for this block */
-			if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x8000)
-			{
-				this_x += 0;
-				this_y += 0;
-			}
-			else if ((spriteram16_ptr[current_offs + 2 + 0]) & 0x4000) /* Ignore subglobal (but apply global) */
-			{
-				this_x += global_x;
-				this_y += global_y;
-			}
-			else /* Apply both scroll offsets */
-			{
-				this_x += global_x + subglobal_x;
-				this_y += global_y + subglobal_y;
-			}
-
-			y = this_y;
-			block_y = this_y;
-			x = this_x;
-			block_x = this_x;
-
-			block_zoom_x = spriteram16_ptr[current_offs + 0 + 1];
-			block_zoom_y = spriteram16_ptr[current_offs + 0 + 1] >> 8;
-
-			x_addition_left = 8;
-			calc_zoom(x_addition, x_addition_left, block_zoom_x);
-
-			y_addition_left = 8;
-			calc_zoom(y_addition, y_addition_left, block_zoom_y);
-		}
-
-		/* These features are common to sprite and block parts */
-		flipx = spritecont & 0x1;
-		flipy = spritecont & 0x2;
-		multi = spritecont & 0x8;
-		last_x = x;
-		last_y = y;
-
-		if (!sprite) continue;
-		if (!x_addition || !y_addition) continue;
-
-		if (m_flipscreen)
-		{
-			const int tx = 512 - x_addition - x;
-			const int ty = 256 - y_addition - y;
-
-			if (tx + x_addition <= min_x || tx > max_x || ty + y_addition <= min_y || ty > max_y) continue;
-			sprite_ptr->x = tx;
-			sprite_ptr->y = ty;
-			sprite_ptr->flipx = !flipx;
-			sprite_ptr->flipy = !flipy;
-		}
-		else
-		{
-			if (x + x_addition <= min_x || x > max_x || y + y_addition <= min_y || y > max_y) continue;
-			sprite_ptr->x = x;
-			sprite_ptr->y = y;
-			sprite_ptr->flipx = flipx;
-			sprite_ptr->flipy = flipy;
-		}
-
-		sprite_ptr->code = sprite;
+		sprite_ptr->x = tx;
+		sprite_ptr->y = ty;
+		sprite_ptr->flip_x = m_flipscreen ? !flip_x : flip_x;
+		sprite_ptr->flip_y = m_flipscreen ? !flip_y : flip_y;
+		sprite_ptr->code = tile;
 		sprite_ptr->color = color;
-		sprite_ptr->zoomx = x_addition;
-		sprite_ptr->zoomy = y_addition;
-		sprite_ptr->pri = (color & 0xc0) >> 6;
+		sprite_ptr->scale_x = x.block_scale;
+		sprite_ptr->scale_y = y.block_scale;
+		sprite_ptr->pri = BIT(color, 6, 2);
 		sprite_ptr++;
-		total_sprites++;
 	}
 	m_sprite_end = sprite_ptr;
 }
 
-void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+
+void taito_f3_state::draw_sprites(const rectangle &cliprect)
 {
-	const tempsprite *sprite_ptr;
-	gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
+	if (!m_sprite_trails) {
+		std::fill_n(m_sprite_pri_row_usage, 256, 0);
+		m_sprite_framebuffer.fill(0);
+	}
 
-	sprite_ptr = m_sprite_end;
-	m_sprite_pri_usage = 0;
-
-	// if sprites use more than 4bpp, the bottom bits of the color code must be masked out.
-	// This fixes (at least) stage 1 battle ships and attract mode explosions in Ray Force.
-
-	while (sprite_ptr != &m_spritelist[0])
-	{
-		sprite_ptr--;
-
-		const u8 pri = sprite_ptr->pri;
-		m_sprite_pri_usage |= 1 << pri;
-
-		f3_drawgfx(
-				bitmap, cliprect, sprite_gfx,
-				sprite_ptr->code,
-				sprite_ptr->color & (~m_sprite_extra_planes),
-				sprite_ptr->flipx, sprite_ptr->flipy,
-				sprite_ptr->x, sprite_ptr->y,
-				sprite_ptr->zoomx, sprite_ptr->zoomy,
-				pri);
+	for (const auto *spr = m_sprite_end; spr-- != &m_spritelist[0]; ) {
+		f3_drawgfx(*spr, cliprect);
 	}
 }
 
 /******************************************************************************/
-
 u32 taito_f3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u32 sy_fix[5], sx_fix[5];
-
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	/* Setup scroll */
-	sy_fix[0] = ((m_control_0[4] & 0xffff) <<  9) + (1 << 16);
-	sy_fix[1] = ((m_control_0[5] & 0xffff) <<  9) + (1 << 16);
-	sy_fix[2] = ((m_control_0[6] & 0xffff) <<  9) + (1 << 16);
-	sy_fix[3] = ((m_control_0[7] & 0xffff) <<  9) + (1 << 16);
-	sx_fix[0] = ((m_control_0[0] & 0xffc0) << 10) - (6 << 16);
-	sx_fix[1] = ((m_control_0[1] & 0xffc0) << 10) - (10 << 16);
-	sx_fix[2] = ((m_control_0[2] & 0xffc0) << 10) - (14 << 16);
-	sx_fix[3] = ((m_control_0[3] & 0xffc0) << 10) - (18 << 16);
-	sx_fix[4] = -(m_control_1[4]) + 41;
-	sy_fix[4] = -(m_control_1[5] & 0x1ff);
+	bitmap.fill(0, cliprect);
 
-	sx_fix[0]-=((m_control_0[0] & 0x003f) << 10) + 0x0400 - 0x10000;
-	sx_fix[1]-=((m_control_0[1] & 0x003f) << 10) + 0x0400 - 0x10000;
-	sx_fix[2]-=((m_control_0[2] & 0x003f) << 10) + 0x0400 - 0x10000;
-	sx_fix[3]-=((m_control_0[3] & 0x003f) << 10) + 0x0400 - 0x10000;
-
-	if (m_flipscreen)
-	{
-		sy_fix[0] =  0x3000000 - sy_fix[0];
-		sy_fix[1] =  0x3000000 - sy_fix[1];
-		sy_fix[2] =  0x3000000 - sy_fix[2];
-		sy_fix[3] =  0x3000000 - sy_fix[3];
-		sx_fix[0] = -0x1a00000 - sx_fix[0];
-		sx_fix[1] = -0x1a00000 - sx_fix[1];
-		sx_fix[2] = -0x1a00000 - sx_fix[2];
-		sx_fix[3] = -0x1a00000 - sx_fix[3];
-		sx_fix[4] = -sx_fix[4] + 75;
-		sy_fix[4] = -sy_fix[4];
+	// TODO: presumably "sprite lag" is timing of sprite ram/framebuffer access.
+	if (m_sprite_lag == 0) {
+		get_sprite_info();
+		draw_sprites(cliprect);
+		scanline_draw(bitmap, cliprect);
+	} else if (m_sprite_lag == 1) {
+		scanline_draw(bitmap, cliprect);
+		get_sprite_info();
+		draw_sprites(cliprect);
+	} else { // 2
+		scanline_draw(bitmap, cliprect);
+		draw_sprites(cliprect);
+		get_sprite_info();
 	}
 
-	m_pri_alp_bitmap.fill(0, cliprect);
-
-	/* sprites */
-	if (m_sprite_lag == 0)
-		get_sprite_info(m_spriteram.target());
-
-	/* Update sprite buffer */
-	draw_sprites(bitmap, cliprect);
-
-	/* Parse sprite, alpha & clipping parts of lineram */
-	get_spritealphaclip_info();
-
-	/* Parse playfield effects */
-	get_line_ram_info(m_tilemap[0], sx_fix[0], sy_fix[0], 0, m_pf_data[0]);
-	get_line_ram_info(m_tilemap[1], sx_fix[1], sy_fix[1], 1, m_pf_data[1]);
-	get_line_ram_info(m_tilemap[2], sx_fix[2], sy_fix[2], 2, m_pf_data[2]);
-	get_line_ram_info(m_tilemap[3], sx_fix[3], sy_fix[3], 3, m_pf_data[3]);
-	get_vram_info(m_vram_layer, m_pixel_layer, sx_fix[4], sy_fix[4]);
-
-	/* Draw final framebuffer */
-	scanline_draw(bitmap, cliprect);
-
-	if (VERBOSE)
-		print_debug_info(bitmap);
 	return 0;
 }

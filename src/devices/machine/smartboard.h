@@ -43,7 +43,7 @@ private:
 
 	void update_output();
 	bool piece_available(u8 id);
-	void init_cb(int state);
+	void init_cb(u8 data);
 	u8 spawn_cb(offs_t offset);
 
 	// i/o lines

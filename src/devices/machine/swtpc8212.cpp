@@ -136,8 +136,10 @@ swtp|ct8212|southwest technical products ct8212,
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/swtpc8212.h"
+#include "swtpc8212.h"
+
 #include "machine/input_merger.h"
+
 #include "screen.h"
 #include "speaker.h"
 

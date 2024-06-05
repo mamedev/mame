@@ -342,7 +342,7 @@ S1: is on some carts directly connected to VCC
 	</software>
 
 	<software name="mc_4v06" supported="partial">
-		<description>4 in 1 - Three Battles + Light Sword + Risker + Metal Deform (512KB cartridge)</description>
+		<description>4 in 1 - Three Battles + Light Sword + Risker + Metal Deform (512KB cartridge, set 1)</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
@@ -353,6 +353,17 @@ S1: is on some carts directly connected to VCC
 	</software>
 
 	<software name="mc_4v06a" cloneof="mc_4v06" supported="partial">
+		<description>4 in 1 - Three Battles + Light Sword + Risker + Metal Deform (512KB cartridge, set 2)</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="gk_4in1_threebattles_lightsword_risker_metaldeform_512kb_set2.bin" size="0x080000" crc="6becf602" sha1="02f90d5d4609fe7005e2f357bb76d84ea50c9100"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v06b" cloneof="mc_4v06" supported="partial">
 		<description>4 in 1 - Three Battles + Light Sword + Risker + Metal Deform (1MB cartridge)</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>

@@ -6,25 +6,6 @@ thanks-to:Franz Huber
 -->
 <mamelayout version="2">
 
-<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
-
-	<script><![CDATA[
-		local layout = {}
-		local prev_state = 0
-
-		function layout.frame()
-			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
-			if cur_state ~= prev_state then
-				machine.ioport.ports[":RESET"]:field(0x01):set_value(cur_state)
-				machine.ioport.ports[":RESET"]:field(0x02):set_value(cur_state)
-			end
-			prev_state = cur_state
-		end
-
-		return layout
-	]]></script>
-
-
 <!-- define elements -->
 
 	<element name="led" defstate="0">
@@ -512,9 +493,10 @@ thanks-to:Franz Huber
 		<element ref="keys" inputtag="KEY.1" inputmask="0x10"><bounds x="89" y="98" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="keys" inputtag="KEY.1" inputmask="0x20"><bounds x="94" y="98" width="4" height="4" /><color alpha="0.25" /></element>
 
-		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="69" y="103" width="4" height="4" /></element>
-		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="74" y="103" width="4" height="4" /></element>
+		<element ref="nothing" inputtag="RESET" inputmask="0x02" clickthrough="yes"><bounds x="69" y="103" width="4" height="4" /></element>
 		<element ref="keys" inputtag="RESET" inputmask="0x01"><bounds x="69" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+
+		<element ref="nothing" inputtag="RESET" inputmask="0x01" clickthrough="yes"><bounds x="74" y="103" width="4" height="4" /></element>
 		<element ref="keys" inputtag="RESET" inputmask="0x02"><bounds x="74" y="103" width="4" height="4" /><color alpha="0.25" /></element>
 
 		<element ref="keys" inputtag="KEY.0" inputmask="0x40"><bounds x="79" y="103" width="4" height="4" /><color alpha="0.25" /></element>

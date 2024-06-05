@@ -12,7 +12,7 @@
  */
 
 #include "emu.h"
-#include "machine/x76f100.h"
+#include "x76f100.h"
 
 #include <cstdarg>
 #include <tuple>

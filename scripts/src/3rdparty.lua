@@ -285,6 +285,7 @@ project "softfloat3"
 		MAME_DIR .. "3rdparty/softfloat3/source",
 		MAME_DIR .. "3rdparty/softfloat3/source/include",
 		MAME_DIR .. "3rdparty/softfloat3/source/8086",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext"
 	}
 
 	configuration { "gmake or ninja" }
@@ -313,6 +314,11 @@ end
 		"SOFTFLOAT_FAST_INT64"
 	}
 
+if _OPTIONS["BIGENDIAN"]~="1" then
+	defines {
+		"LITTLEENDIAN=1"
+	}
+end
 	files {
 		MAME_DIR .. "3rdparty/softfloat3/source/s_eq128.c",
 		MAME_DIR .. "3rdparty/softfloat3/source/s_le128.c",
@@ -615,6 +621,13 @@ end
 		MAME_DIR .. "3rdparty/softfloat3/source/f128M_eq_signaling.c",
 		MAME_DIR .. "3rdparty/softfloat3/source/f128M_le_quiet.c",
 		MAME_DIR .. "3rdparty/softfloat3/source/f128M_lt_quiet.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/f2xm1.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fpatan.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fprem.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fsincos.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fyl2x.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/poly.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/extF80_scale.c",
 	}
 
 
@@ -1558,6 +1571,9 @@ end
 			defines {
 				"WL_EGL_PLATFORM=1",
 			}
+			buildoptions {
+				backtick(pkgconfigcmd() .. " --cflags wayland-egl-backend"),
+			}
 		end
 	end
 
@@ -1967,11 +1983,11 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64operand.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64rapass.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64rapass_p.h",
-		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/a64utils.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armformatter.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armformatter_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armglobals.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armoperand.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/arm/armutils.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/api-build_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/api-config.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/archcommons.h",
@@ -1981,6 +1997,7 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/assembler.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/builder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/builder.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/builder_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codebuffer.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codeholder.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/codeholder.h",
@@ -2014,6 +2031,8 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/globals.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/inst.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/inst.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/instdb.cpp",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/instdb_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/jitallocator.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/jitallocator.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/jitruntime.cpp",
@@ -2039,6 +2058,7 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/string.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/support.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/support.h",
+		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/support_p.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/target.cpp",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/target.h",
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/core/type.cpp",

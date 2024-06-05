@@ -6,14 +6,15 @@
 // which will fixup the relocations
 
 #include "emu.h"
+
+#include "bus/isa/isa.h"
+#include "bus/rs232/rs232.h"
+#include "bus/scsi/scsi.h"
 #include "cpu/i86/i186.h"
 #include "imagedev/floppy.h"
 #include "machine/74259.h"
-#include "machine/wd_fdc.h"
 #include "machine/mc68681.h"
-#include "bus/rs232/rs232.h"
-#include "bus/isa/isa.h"
-#include "bus/scsi/scsi.h"
+#include "machine/wd_fdc.h"
 
 
 namespace {
@@ -24,6 +25,7 @@ public:
 	slicer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_fdc(*this, "fdc"),
+		m_floppies(*this, "fdc:%u", 0U),
 		m_sasi(*this, "sasi")
 	{
 	}
@@ -33,42 +35,34 @@ public:
 private:
 	void sio_out_w(uint8_t data);
 	void drive_size_w(int state);
-	template<unsigned int drive> void drive_sel_w(int state);
+	template <unsigned Drive> void drive_sel_w(int state);
 
 	void slicer_io(address_map &map);
 	void slicer_map(address_map &map);
 
 	required_device<fd1797_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppies;
 	required_device<scsi_port_device> m_sasi;
 };
 
 void slicer_state::sio_out_w(uint8_t data)
 {
-	floppy_image_device *floppy;
-	int state = (data & 0x80) ? 0 : 1;
-	char devname[8];
+	const int state = (data & 0x80) ? 0 : 1;
 
-	for(int i = 0; i < 4; i++)
+	for (auto &floppy : m_floppies)
 	{
-		sprintf(devname, "%d", i);
-		floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
-		if(floppy)
-			floppy->mon_w(state);
+		if (floppy->get_device())
+			floppy->get_device()->mon_w(state);
 	}
 }
 
-template<unsigned int drive>
+template <unsigned Drive>
 void slicer_state::drive_sel_w(int state)
 {
-	floppy_image_device *floppy;
-	char devname[8];
-
 	if (!state)
 		return;
 
-	sprintf(devname, "%d", drive);
-	floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
-	m_fdc->set_floppy(floppy);
+	m_fdc->set_floppy(m_floppies[Drive]->get_device());
 }
 
 void slicer_state::drive_size_w(int state)
@@ -121,20 +115,20 @@ void slicer_state::slicer(machine_config &config)
 	FD1797(config, m_fdc, 16_MHz_XTAL / 2 / 8);
 	m_fdc->intrq_wr_callback().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 	m_fdc->drq_wr_callback().set("maincpu", FUNC(i80186_cpu_device::drq0_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", slicer_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", slicer_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", slicer_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", slicer_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[0], slicer_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], slicer_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[2], slicer_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[3], slicer_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	ls259_device &drivelatch(LS259(config, "drivelatch")); // U29
-	drivelatch.q_out_cb<0>().set("sasi", FUNC(scsi_port_device::write_sel));
-	drivelatch.q_out_cb<1>().set("sasi", FUNC(scsi_port_device::write_rst));
+	drivelatch.q_out_cb<0>().set(m_sasi, FUNC(scsi_port_device::write_sel));
+	drivelatch.q_out_cb<1>().set(m_sasi, FUNC(scsi_port_device::write_rst));
 	drivelatch.q_out_cb<2>().set(FUNC(slicer_state::drive_sel_w<3>));
 	drivelatch.q_out_cb<3>().set(FUNC(slicer_state::drive_sel_w<2>));
 	drivelatch.q_out_cb<4>().set(FUNC(slicer_state::drive_sel_w<1>));
 	drivelatch.q_out_cb<5>().set(FUNC(slicer_state::drive_sel_w<0>));
 	drivelatch.q_out_cb<6>().set(FUNC(slicer_state::drive_size_w));
-	drivelatch.q_out_cb<7>().set("fdc", FUNC(fd1797_device::dden_w));
+	drivelatch.q_out_cb<7>().set(m_fdc, FUNC(fd1797_device::dden_w));
 
 	SCSI_PORT(config, m_sasi, 0);
 	m_sasi->set_data_input_buffer("sasi_data_in");

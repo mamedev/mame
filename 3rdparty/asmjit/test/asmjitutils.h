@@ -8,7 +8,10 @@
 
 #include <asmjit/core.h>
 
-static const char* asmjitArchAsString(asmjit::Arch arch) noexcept {
+namespace {
+
+ASMJIT_MAYBE_UNUSED
+static inline const char* asmjitArchAsString(asmjit::Arch arch) noexcept {
   switch (arch) {
     case asmjit::Arch::kX86       : return "X86";
     case asmjit::Arch::kX64       : return "X64";
@@ -34,5 +37,24 @@ static const char* asmjitArchAsString(asmjit::Arch arch) noexcept {
       return "<Unknown>";
   }
 }
+
+ASMJIT_MAYBE_UNUSED
+static inline void printIndented(const char* str, size_t indent) noexcept {
+  const char* start = str;
+  while (*str) {
+    if (*str == '\n') {
+      size_t size = (size_t)(str - start);
+      printf("%*s%.*s\n", size ? int(indent) : 0, "", int(size), start);
+      start = str + 1;
+    }
+    str++;
+  }
+
+  size_t size = (size_t)(str - start);
+  if (size)
+    printf("%*s%.*s\n", int(indent), "", int(size), start);
+}
+
+} // {anonymous}
 
 #endif // ASMJITUTILS_H_INCLUDED

@@ -130,7 +130,7 @@ license:CC0-1.0
 			<bounds x="303" y="34" width="45" height="28" />
 		</element>
 
-		<element nmae="data_entry_yes_1" ref="data_entry">
+		<element name="data_entry_yes_1" ref="data_entry">
 			<bounds left="350" right="399" top="0" bottom="15" />
 		</element>
 		<element name="data_entry_yes_2" ref="yes">

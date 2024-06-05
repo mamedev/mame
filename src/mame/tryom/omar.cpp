@@ -67,7 +67,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<5> m_inputs;
 
 	u8 m_inp_mux = 0;
@@ -89,6 +89,7 @@ void omar_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 }
+
 
 // Omar II
 
@@ -377,5 +378,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, omar1, 0,      0,      omar1,   omar,  omar_state,  empty_init, "Tryom", "Omar I", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, omar2, 0,      0,      omar2,   omar,  omar2_state, empty_init, "Tryom", "Omar II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, omar1, 0,      0,      omar1,   omar,  omar_state,  empty_init, "Tryom", "Omar I", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, omar2, 0,      0,      omar2,   omar,  omar2_state, empty_init, "Tryom", "Omar II", MACHINE_SUPPORTS_SAVE )

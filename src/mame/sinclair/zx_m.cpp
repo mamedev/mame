@@ -248,6 +248,8 @@ void zx_state::zx80_io_w(offs_t offset, uint8_t data)
 
 	if (offs == 0xff)
 		m_cassette->output(-1.0);
+
+	drop_sync();
 }
 
 void zx_state::zx81_io_w(offs_t offset, uint8_t data)

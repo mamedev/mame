@@ -170,12 +170,13 @@ Not all regional versions are available for each Megatouch series
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
   - megat5a: has jmp $0000 in the initialization code causing infinite loop - Dump verified on 4 different sets. (watchdog issue???)
- */
+*/
 
 #include "emu.h"
 
+#include "microtouchlayout.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
 #include "machine/ds1204.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
@@ -183,6 +184,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
@@ -196,20 +198,20 @@ class meritm_state : public driver_device
 {
 public:
 	meritm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_z80pio(*this, "z80pio%u", 0U),
-			m_ds1204(*this, "ds1204"),
-			m_ppi(*this, "ppi8255"),
-			m_v9938(*this, "v9938_%u", 0U),
-			m_microtouch(*this, "microtouch") ,
-			m_uart(*this, "ns16550"),
-			m_maincpu(*this, "maincpu"),
-			m_banks(*this, "bank%u", 0U),
-			m_region_maincpu(*this, "maincpu"),
-			m_region_extra(*this, "extra"),
-			m_p1_disc_lamp(*this, "P1 DISC %u LAMP", 1U),
-			m_p1_play_lamp(*this, "P1 PLAY LAMP"),
-			m_p1_cancel_lamp(*this, "P1 CANCEL LAMP")
+		: driver_device(mconfig, type, tag)
+		, m_z80pio(*this, "z80pio%u", 0U)
+		, m_ds1204(*this, "ds1204")
+		, m_ppi(*this, "ppi8255")
+		, m_v9938(*this, "v9938_%u", 0U)
+		, m_microtouch(*this, "microtouch")
+		, m_uart(*this, "ns16550")
+		, m_maincpu(*this, "maincpu")
+		, m_banks(*this, "bank%u", 0U)
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_extra(*this, "extra")
+		, m_p1_disc_lamp(*this, "P1 DISC %u LAMP", 1U)
+		, m_p1_play_lamp(*this, "P1 PLAY LAMP")
+		, m_p1_cancel_lamp(*this, "P1 CANCEL LAMP")
 	{ }
 
 	void init_megat3te();
@@ -298,8 +300,8 @@ private:
 
 int meritm_state::touch_coord_transform(int *touch_x, int *touch_y)
 {
-	int xscr = (int)((double)(*touch_x)/0x4000*544);
-	int yscr = (int)((double)(*touch_y)/0x4000*480);
+	int xscr = int(double(*touch_x)/0x4000*544);
+	int yscr = int(double(*touch_y)/0x4000*480);
 
 	if( (xscr < 16) ||
 		(xscr > 544-16) ||
@@ -314,9 +316,9 @@ int meritm_state::touch_coord_transform(int *touch_x, int *touch_y)
 	}
 	else
 	{
-		*touch_y = (int)((double)(yscr - 16)*0x4000/(480-16-63));
+		*touch_y = int(double(yscr - 16)*0x4000/(480-16-63));
 	}
-	*touch_x = (int)((double)(xscr - 16)*0x4000/(544-16-16));
+	*touch_x = int(double(xscr - 16)*0x4000/(544-16-16));
 
 	return 1;
 }
@@ -1172,6 +1174,8 @@ void meritm_state::crt250_crt252_crt258(machine_config &config)
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
 	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
+
+	config.set_default_layout(layout_microtouch);
 }
 
 void meritm_state::crt260(machine_config &config)
@@ -1191,6 +1195,8 @@ void meritm_state::crt260(machine_config &config)
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
 	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
+
+	config.set_default_layout(layout_microtouch);
 }
 
 

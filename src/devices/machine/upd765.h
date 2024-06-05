@@ -245,7 +245,7 @@ protected:
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;
 	bool fifo_write;
-	uint8_t dor, dsr, msr, fifo[16], command[16], result[16];
+	uint8_t dor, dsr, fifo[16], command[16], result[16];
 	uint8_t st1, st2, st3;
 	uint8_t fifocfg;
 	uint8_t precomp;

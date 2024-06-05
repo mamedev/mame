@@ -429,7 +429,7 @@ void p1_state::video_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	m_video.videoram_base = std::make_unique<uint8_t[]>(0x8000);
 	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;

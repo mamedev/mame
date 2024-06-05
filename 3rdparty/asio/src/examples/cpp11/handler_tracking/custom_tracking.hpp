@@ -2,7 +2,7 @@
 // custom_tracking.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -187,7 +187,7 @@ struct custom_tracking
 
   // Record a reactor-based operation that is associated with a handler.
   static void reactor_operation(const tracked_handler& h,
-      const char* op_name, const asio::error_code& ec)
+      const char* op_name, const std::error_code& ec)
   {
     std::printf(
         "Performed operation %s.%s for native_handle = %" PRIuMAX
@@ -197,7 +197,7 @@ struct custom_tracking
 
   // Record a reactor-based operation that is associated with a handler.
   static void reactor_operation(const tracked_handler& h,
-      const char* op_name, const asio::error_code& ec,
+      const char* op_name, const std::error_code& ec,
       std::size_t bytes_transferred)
   {
     std::printf(

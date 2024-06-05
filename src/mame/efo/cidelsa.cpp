@@ -561,8 +561,8 @@ ROM_END
 
 // Game Drivers
 
-GAME( 1980, destryer,  0,        destryer,  destryer, cidelsa_state, empty_init, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, destryera, destryer, destryera, destryer, cidelsa_state, empty_init, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, altair,    0,        altair,    altair,   cidelsa_state, empty_init, ROT90, "Cidelsa", "Altair",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, altair2,   0,        altair,    altair,   cidelsa_state, empty_init, ROT90, "Cidelsa", "Altair II",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, draco,     0,        draco,     draco,    draco_state,   empty_init, ROT90, "Cidelsa", "Draco",                       MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, destryer,  0,        destryer,  destryer, cidelsa_state, empty_init, ROT90, "Cidelsa", "Destroyer (Cidelsa, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, destryera, destryer, destryera, destryer, cidelsa_state, empty_init, ROT90, "Cidelsa", "Destroyer (Cidelsa, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, altair,    0,        altair,    altair,   cidelsa_state, empty_init, ROT90, "Cidelsa", "Altair",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, altair2,   0,        altair,    altair,   cidelsa_state, empty_init, ROT90, "Cidelsa", "Altair II",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, draco,     0,        draco,     draco,    draco_state,   empty_init, ROT90, "Cidelsa", "Draco",                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

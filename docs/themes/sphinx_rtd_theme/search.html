@@ -16,9 +16,7 @@
     <script src="{{ pathto('_static/language_data.js', 1) }}"></script>
 {%- endblock %}
 {% block footer %}
-  <script>
-    jQuery(function() { Search.loadIndex("{{ pathto('searchindex.js', 1) }}"); });
-  </script>
+  <script src="searchindex.js" defer></script>
   {# this is used when loading the search index using $.ajax fails,
      such as on Chrome for documents on localhost #}
   <script id="searchindexloader"></script>

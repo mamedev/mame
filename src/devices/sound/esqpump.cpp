@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/esqpump.h"
+#include "esqpump.h"
 
 DEFINE_DEVICE_TYPE(ESQ_5505_5510_PUMP, esq_5505_5510_pump_device, "esq_5505_5510_pump", "Ensoniq 5505/5506 to 5510 interface")
 

@@ -109,7 +109,7 @@ void pci_card_device::irq_pin_w(offs_t line, int state)
 void pci_cards(device_slot_interface &device)
 {
 	// 0x00 - backward compatible pre-class code
-//	device.option_add("voodoo1",        VOODOO_1_PCI);
+//  device.option_add("voodoo1",        VOODOO_1_PCI);
 	device.option_add("vision864",      VISION864_PCI);
 	device.option_add("vision964",      VISION964_PCI);
 
