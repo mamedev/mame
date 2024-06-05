@@ -31,7 +31,7 @@
         0 = Unused
 
     MMU info:
-        Map control register (location unk): bit 15 = VM enable, bits 10-8 = process ID
+        Map control register (location 0x780000): bit 6 = Wenable, bit 5 = VMenable, bits3-0 process ID
 
         Map entries:
             bit 15 = dirty
@@ -79,6 +79,7 @@ public:
 		m_duart(*this, "duart"),
 		m_keyboard(*this, "keyboard"),
 		m_snsnd(*this, "snsnd"),
+		m_timer(*this, "timer"),
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "scsi:7:ncr5385"),
 		m_vint(*this, "vint"),
@@ -106,11 +107,15 @@ private:
 	void memory_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 map_r(offs_t offset);
 	void map_w(offs_t offset, u16 data, u16 mem_mask);
+	u8 nomem_r(offs_t offset);
 	u8 mapcntl_r();
 	void mapcntl_w(u8 data);
 	void sound_w(u8 data);
+	u8 diag_r();
 	void diag_w(u8 data);
 	void led_w(u8 data);
+	u8 videocntl_r();
+	void videocntl_w(u8 data);
 
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
@@ -124,6 +129,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<tek410x_keyboard_device> m_keyboard;
 	required_device<sn76496_device> m_snsnd;
+	required_device<am9513_device> m_timer;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<input_merger_all_high_device> m_vint;
@@ -140,6 +146,8 @@ private:
 	bool m_kb_rclamp;
 	bool m_kb_loop;
 	u8 m_leds;
+	u8 m_videocntl;
+	u8 m_diag;
 };
 
 /*************************************
@@ -210,6 +218,15 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
  *  CPU memory handlers
  *
  *************************************/
+u8 tek440x_state::nomem_r(offs_t offset)
+{
+		LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		m_maincpu->set_buserror_details(offset << 1, 0, m_maincpu->get_fc());
+		
+		return 0;
+}
 
 u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 {
@@ -217,9 +234,9 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		return m_prom[offset & 0x3fff];
 
 	const offs_t offset0 = offset;
-	if (BIT(m_map_control, 4))
+	if (BIT(m_map_control, 5))
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
-	if (offset < 0x300000 && offset >= 0x100000 && !machine().side_effects_disabled())
+	if (offset < 0x300000 && offset >= 0x200000)				// && !machine().side_effects_disabled())
 	{
 		LOG("bus error: read: %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -233,9 +250,9 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const offs_t offset0 = offset;
-	if (BIT(m_map_control, 4))
+	if (BIT(m_map_control, 5))
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
-	if (offset < 0x300000 && offset >= 0x100000 && !machine().side_effects_disabled())
+	if (offset < 0x300000 && offset >= 0x200000 && !machine().side_effects_disabled())
 	{
 		LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -248,31 +265,68 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 tek440x_state::map_r(offs_t offset)
 {
+	LOG("map_r 0x%08x => %08x\n",offset, m_map[offset >> 11] );
+
 	return m_map[offset >> 11];
 }
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	LOG("map_w 0x%08x %04x mask(%04x)\n",offset, data, mem_mask);
+
 	COMBINE_DATA(&m_map[offset >> 11]);
 }
 
 u8 tek440x_state::mapcntl_r()
 {
+	// TODO: need to mask in: cpuWr, BlockAccess.  Is this controled by current FC?
 	return m_map_control;
 }
 
 void tek440x_state::mapcntl_w(u8 data)
 {
-	LOG("mapcntl_w %d\n", BIT(data, 5));
+	LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, 5));
+	LOG("mapcntl_w write_enable %2d\n", BIT(data, 6));
+	LOG("mapcntl_w pte PID    0x%02x\n", data );
+	
 	if (BIT(data, 5))
 		m_map_view.select(0);
 	else
 		m_map_view.disable();
-	m_map_control = data & 0x1f;
+
+	if (BIT(data, 6))
+		data &= 0xf7;
+
+	m_map_control = data;
+	
 }
+
+u8 tek440x_state::videocntl_r()
+{
+	m_videocntl |= 8;
+//	(m_videocntl & -16) | ((m_videocntl + 1) & 15);
+	
+	return m_videocntl;	// this is what its looking for, what does it mean?
+}
+
+void tek440x_state::videocntl_w(u8 data)
+{
+	m_videocntl = data;
+	LOG("m_videocntl %02x\n", data);
+	LOG("m_videocntl VBenable   %2d\n", BIT(data, 6));
+	LOG("m_videocntl ScreenOn   %2d\n", BIT(data, 5));
+	LOG("m_videocntl ScreenInv  %2d\n", BIT(data, 4));
+	LOG("m_videocntl ScreenPan  %2d\n", data & 15);
+	
+	m_vint->in_w<0>(BIT(data, 6));
+}
+
 
 void tek440x_state::sound_w(u8 data)
 {
+	if (m_boot)
+		LOG("BOOT PROM disabled\n");
+	
 	m_snsnd->write(data);
 	m_boot = false;
 }
@@ -284,12 +338,18 @@ void tek440x_state::led_w(u8 data)
 	LOG("LED %c%c%c%c\n",m_leds & 8 ? '*' : '-',m_leds & 4 ? '*' : '-',m_leds & 2 ? '*' : '-',m_leds & 1 ? '*' : '-');
 }
 
+u8 tek440x_state::diag_r()
+{
+	return m_diag;
+}
+
 void tek440x_state::diag_w(u8 data)
 {
 	if (!m_kb_rclamp && m_kb_loop != BIT(data, 7))
 		m_keyboard->kdo_w(!BIT(data, 7) || m_kb_tdata);
 
 	m_kb_loop = BIT(data, 7);
+	m_diag = data;
 }
 
 void tek440x_state::kb_rdata_w(int state)
@@ -333,7 +393,8 @@ void tek440x_state::logical_map(address_map &map)
 
 void tek440x_state::physical_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).ram().share("mainram");		// 2MB option
+	map(0x000000, 0x1fffff).ram().share("mainram");						// +1MB RAM option;
+	map(0x200000, 0x5fffff).r(FUNC(tek440x_state::nomem_r));	// sizing installed memory requires generating buserr
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
@@ -345,11 +406,7 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x780000, 0x780000).rw(FUNC(tek440x_state::mapcntl_r), FUNC(tek440x_state::mapcntl_w));
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
-	map(0x784000, 0x784000).lw8(
-		[this](u8 data)
-		{
-			m_vint->in_w<0>(BIT(data, 6));
-		}, "vcbpr_w");
+	map(0x784000, 0x784000).rw(FUNC(tek440x_state::videocntl_r),FUNC(tek440x_state::videocntl_w));
 	// 786000-787fff: spare
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
 	// 78a000-78bfff: NS32081 FPU
@@ -358,12 +415,12 @@ void tek440x_state::physical_map(address_map &map)
 
 	// 7a0000-7bffff peripheral board I/O
 	// 7a0000-7affff: reserved
-	map(0x7b0000, 0x7b0000).w(FUNC(tek440x_state::diag_w));
+	map(0x7b0000, 0x7b0000).rw(FUNC(tek440x_state::diag_r),FUNC(tek440x_state::diag_w));
 	// 7b1000-7b1fff: diagnostic registers
 	// 7b2000-7b3fff: Centronics printer data
 	map(0x7b4000, 0x7b401f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
 	// 7b6000-7b7fff: Mouse
-	map(0x7b8000, 0x7b8003).mirror(0x100).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0x7b8000, 0x7b8003).mirror(0x100).rw(m_timer, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	// 7ba000-7bbfff: MC146818 RTC
 	map(0x7bc000, 0x7bc000).lw8(
 		[this](u8 data)
