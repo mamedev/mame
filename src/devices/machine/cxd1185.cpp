@@ -261,6 +261,7 @@ void cxd1185_device::command_w(u8 data)
 
 	m_command = data;
 	m_status |= CIP;
+	m_last_dma_direction = DMA_NONE;
 
 	switch (data & (CAT | CMD))
 	{
@@ -304,11 +305,13 @@ void cxd1185_device::command_w(u8 data)
 		LOGMASKED(LOG_CMD, "select target %d without atn\n", (m_scsi_id & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
+		m_last_dma_direction = (m_command & DMA) ? DMA_OUT : DMA_NONE;
 		break;
 	case 0x42:
 		LOGMASKED(LOG_CMD, "select target %d with atn\n", (m_scsi_id & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
+		m_last_dma_direction = (m_command & DMA) ? DMA_OUT : DMA_NONE;
 		break;
 	case 0x43: LOGMASKED(LOG_CMD, "enable selection/reselection\n"); break;
 	case 0x44: LOGMASKED(LOG_CMD, "disable selection/reselection\n"); break;
@@ -325,10 +328,12 @@ void cxd1185_device::command_w(u8 data)
 	case 0xc0:
 		LOGMASKED(LOG_CMD, "transfer information\n");
 		m_state = XFR_INFO;
+		m_last_dma_direction = (m_command & DMA) ? ((scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE;
 		break;
 	case 0xc1:
 		LOGMASKED(LOG_CMD, "transfer pad\n");
 		m_state = XFR_INFO;
+		m_last_dma_direction = (m_command & DMA) ? ((scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE;
 		break;
 	case 0xc2:
 		LOGMASKED(LOG_CMD, "deassert ack\n");
@@ -616,6 +621,11 @@ int cxd1185_device::state_step()
 
 			// assert ACK
 			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+
+			// If this is a DMA command and we have data now, assert DRQ so host can start transferring
+			// (also handles transfers in the case where the counter is not aligned with the expected bytes read)
+			if (m_command & DMA)
+				set_drq(true);
 		}
 		else
 		{
@@ -649,7 +659,8 @@ int cxd1185_device::state_step()
 			// check if target changed phase
 			if (m_int_req[1] & PHC)
 			{
-				if (m_command & DMA)
+				// Lower DRQ unless FIFO still has valid data that the host machine can read out
+				if ((m_command & DMA) && m_fifo.empty())
 					set_drq(false);
 
 				m_state = XFR_INFO_DONE;
@@ -831,12 +842,21 @@ void cxd1185_device::int_check()
 {
 	bool irq_asserted = false;
 
+	// When SPHI is set during DMA data in, phase change interrupts are deferred until the DMA transfer is complete
+	// This will be recalculated at that time once the FIFO is empty
+	uint8_t int_req1 = m_int_req[1];
+	if ((m_mode & SPHI) && !m_fifo.empty() && (m_last_dma_direction == DMA_IN) && (int_req1 & PHC))
+	{
+		LOGMASKED(LOG_INT, "SPHI active, suppressing PHC interrupt\n");
+		int_req1 &= ~PHC;
+	}
+
 	// update mirq
-	if (m_int_req[0] || m_int_req[1])
+	if (m_int_req[0] || int_req1)
 	{
 		m_status |= MIRQ;
 
-		irq_asserted = (m_int_req[0] & m_int_auth[0]) || (m_int_req[1] & m_int_auth[1]);
+		irq_asserted = (m_int_req[0] & m_int_auth[0]) || (int_req1 & m_int_auth[1]);
 	}
 	else
 		m_status &= ~MIRQ;

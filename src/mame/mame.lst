@@ -19808,6 +19808,9 @@ hp9845b_de                      //
 hp9845c_de                      //
 hp9845t_de                      //
 
+@source:hp/hp98x6.cpp
+hp9816a                         //
+
 @source:hp/hp9k.cpp
 hp9816                          //
 
@@ -24441,6 +24444,7 @@ nyanpani                        // GX712 (c) 1988 (Japan)
 rf2                             // GX561 (c) 1985
 salamand                        // GX587 (c) 1986
 salamandj                       // GX587 (c) 1986
+salamandt                       // GX597 (c) 1986 (Tecfri)
 twinbee                         // GX412 (c) 1985
 twinbeeb                        // Bubble System
 
@@ -42254,6 +42258,9 @@ squale                          //
 @source:skeleton/sterz80.cpp
 tongzi
 
+@source:skeleton/swunktarot.cpp
+unktarot
+
 @source:skeleton/swyft.cpp
 swyft                           //
 
@@ -42848,6 +42855,7 @@ treamary
 wtrnymph                        // (c) 1996 Subsino
 xiaoao
 xplan                           // (c) 2006 Subsino
+xreel
 xtrain                          // (c) 1999 Subsino
 
 @source:sun/sun1.cpp
@@ -44838,8 +44846,9 @@ wardnerjb                       // bootleg
 kisssite
 
 @source:tomy/tomy_princ.cpp
-princ                           // Tomy Prin-C (Japan)
-princnt                         // Tomy Prin-C (without touch-pad)
+princnt                         // Tomy Prin-C (Japan) Rev 1
+princnt3                        // Tomy Prin-C (Japan) Rev 3
+princ                           // Tomy Prin-C Tablet (Japan)
 
 @source:tomy/tutor.cpp
 pyuuta                          // 1982 Tomy Pyuuta

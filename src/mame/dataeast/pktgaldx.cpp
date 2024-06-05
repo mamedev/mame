@@ -659,7 +659,7 @@ void pktgaldx_state::driver_init()
 } // anonymous namespace
 
 
-GAME( 1992, pktgaldx,  0,        pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Euro v3.00)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1993, pktgaldxj, pktgaldx, pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pktgaldxa, pktgaldx, pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Asia v3.00)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1993, pktgaldxb, pktgaldx, pktgaldxb, pktgaldx, pktgaldxb_state, empty_init,  ROT0, "bootleg (Data West)",                          "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldx,  0,        pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Europe v3.00)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pktgaldxj, pktgaldx, pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldxa, pktgaldx, pktgaldx,  pktgaldx, pktgaldx_state,  driver_init, ROT0, "Data East Corporation",                        "Pocket Gal Deluxe (Asia v3.00)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pktgaldxb, pktgaldx, pktgaldxb, pktgaldx, pktgaldxb_state, empty_init,  ROT0, "bootleg (Data West)",                          "Pocket Gal Deluxe (Europe v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -557,10 +557,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::scanline_cb)
 
     // all games but bullfgtr have both valid
     // bullfgtr definitely expects to vblank from 2, reversing will make it to run at half speed.
-	if(scanline == 232) // vblank-out irq
+	if(scanline == 232) // vblank-in irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 24) // vblank-in irq or sprite DMA done
+	if(scanline == 24) // vblank-out irq or sprite DMA done
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 

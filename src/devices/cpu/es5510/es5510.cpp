@@ -2,10 +2,10 @@
 // copyright-holders:Christian Brunschen
 /***************************************************************************************
  *
- *   es5510.c - Ensoniq ES5510 (ESP) emulation
+ *   es5510.cpp - Ensoniq ES5510 (ESP) emulation
  *   by Christian Brunschen
  *
- *   TODO
+ *   TODO:
  *      gunlock and clones: Glitch sound after game over once (MT #07861)
  *      DRAM Size isn't verified, differs per machines?
  *

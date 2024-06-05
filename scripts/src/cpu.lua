@@ -1475,6 +1475,23 @@ if opt_tool(CPUS, "PIC16C62X") then
 end
 
 --------------------------------------------------
+-- Microchip PIC16x8x
+--@src/devices/cpu/pic16x8x/pic16x8x.h,CPUS["PIC16X8X"] = true
+--------------------------------------------------
+
+if CPUS["PIC16X8X"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.cpp",
+		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.h",
+	}
+end
+
+if opt_tool(CPUS, "PIC16X8X") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16x8x/16x8xdsm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16x8x/16x8xdsm.h")
+end
+
+--------------------------------------------------
 -- Generic PIC16 - Disassembler only
 --@src/devices/cpu/pic16/pic16.h,CPUS["PIC16"] = true
 --------------------------------------------------
@@ -2957,6 +2974,18 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80_rop.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80_ncs800rop.hxx" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 source file...",   PYTHON .. "  $(1) $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80_rop.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 \\(rop\\) source file...",   PYTHON .. " $(1) rop $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80_ncs800rop.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating NSC800 \\(rop\\) source file...",   PYTHON .. " $(1) ncs800rop $(<) $(@)" } },
 	}
 end
 

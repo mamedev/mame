@@ -66,7 +66,7 @@ private:
 	address_space *m_program;
 
 	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmp16aux;
-	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_prefix;
+	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_tmp8aux, m_shifted_carry, m_prefix;
 	u32 m_acc, m_temp, m_tmp32, m_tmpea;
 	s32 m_icount;
 	bool m_prefix_valid;
@@ -348,7 +348,7 @@ private:
 
 	inline u8 doSUB_8(u8 lhs, u8 rhs)
 	{
-		u16 tmp16 = lhs - rhs;
+		u16 tmp16 = u16(lhs) - u16(rhs);
 		setNZ_8(tmp16 & 0xff);
 		m_ps &= ~(F_C|F_V);
 		if (tmp16 & 0x100)
@@ -364,7 +364,7 @@ private:
 	}
 	inline u16 doSUB_16(u16 lhs, u16 rhs)
 	{
-		u32 tmp32 = lhs - rhs;
+		u32 tmp32 = u32(lhs) - u32(rhs);
 		setNZ_16(tmp32 & 0xffff);
 		m_ps &= ~(F_C|F_V);
 		if (tmp32 & 0x10000)
@@ -380,7 +380,7 @@ private:
 	}
 	inline u32 doSUB_32(u32 lhs, u32 rhs)
 	{
-		u64 tmp64 = lhs - rhs;
+		u64 tmp64 = u64(lhs) - u64(rhs);
 		setNZ_32(tmp64 & 0xffffffff);
 		m_ps &= ~(F_C|F_V);
 		if (tmp64 & 0x100000000)
@@ -394,6 +394,56 @@ private:
 
 		return tmp64 & 0xffffffff;
 	}
+
+	inline u8 doSUBC_8(u8 lhs, u8 rhs)
+	{
+		u16 tmp16 = u16(lhs) - u16(rhs) - u16((m_ps & F_C) ? 1 : 0);
+		setNZ_8(tmp16 & 0xff);
+		m_ps &= ~(F_C|F_V);
+		if (tmp16 & 0x100)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (tmp16 & 0xff)) & 0x80)
+		{
+			m_ps |= F_V;
+		}
+
+		return tmp16 & 0xff;
+	}
+	inline u16 doSUBC_16(u16 lhs, u16 rhs)
+	{
+		u32 tmp32 = u32(lhs) - u32(rhs) - u32((m_ps & F_C) ? 1 : 0);
+		setNZ_16(tmp32 & 0xffff);
+		m_ps &= ~(F_C|F_V);
+		if (tmp32 & 0x10000)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (tmp32 & 0xffff)) & 0x8000)
+		{
+			m_ps |= F_V;
+		}
+
+		return tmp32 & 0xffff;
+	}
+	inline u32 doSUBC_32(u32 lhs, u32 rhs)
+	{
+		u64 tmp64 = u64(lhs) - u64(rhs) - u64((m_ps & F_C) ? 1 : 0);
+		setNZ_32(tmp64 & 0xffffffff);
+		m_ps &= ~(F_C|F_V);
+		if (tmp64 & 0x100000000)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (tmp64 & 0xffffffff)) & 0x80000000)
+		{
+			m_ps |= F_V;
+		}
+
+		return tmp64 & 0xffffffff;
+	}
+
 	inline u8 doADD_8(u8 lhs, u8 rhs)
 	{
 		u16 tmp16 = lhs + rhs;
@@ -429,6 +479,55 @@ private:
 	inline u32 doADD_32(u32 lhs, u32 rhs)
 	{
 		u64 tmp64 = lhs + rhs;
+		m_ps &= ~(F_C|F_V);
+		if ((tmp64 ^ lhs) & (tmp64 ^ rhs) & 0x80000000)
+		{
+			m_ps |= F_V;
+		}
+		if (tmp64 > 0xffffffff)
+		{
+			m_ps |= F_C;
+		}
+		setNZ_32(tmp64 & 0xffffffff);
+
+		return tmp64 & 0xffffffff;
+	}
+
+	inline u8 doADDC_8(u8 lhs, u8 rhs)
+	{
+		u16 tmp16 = lhs + rhs + ((m_ps & F_C) ? 1 : 0);
+		m_ps &= ~(F_C|F_V);
+		if ((tmp16 ^ lhs) & (tmp16 ^ rhs) & 0x80)
+		{
+			m_ps |= F_V;
+		}
+		if (tmp16 > 0xff)
+		{
+			m_ps |= F_C;
+		}
+		setNZ_8(tmp16 & 0xff);
+
+		return tmp16 & 0xff;
+	}
+	inline u16 doADDC_16(u16 lhs, u16 rhs)
+	{
+		u32 tmp32 = lhs + rhs + ((m_ps & F_C) ? 1 : 0);
+		m_ps &= ~(F_C|F_V);
+		if ((tmp32 ^ lhs) & (tmp32 ^ rhs) & 0x8000)
+		{
+			m_ps |= F_V;
+		}
+		if (tmp32 > 0xffff)
+		{
+			m_ps |= F_C;
+		}
+		setNZ_16(tmp32 & 0xffff);
+
+		return tmp32 & 0xffff;
+	}
+	inline u32 doADDC_32(u32 lhs, u32 rhs)
+	{
+		u64 tmp64 = lhs + rhs + ((m_ps & F_C) ? 1 : 0);
 		m_ps &= ~(F_C|F_V);
 		if ((tmp64 ^ lhs) & (tmp64 ^ rhs) & 0x80000000)
 		{
@@ -518,6 +617,73 @@ private:
 		m_icount -= 4;
 	}
 
+	inline void movsi(u8 dst, u8 src)
+	{
+		if (read_rwX(0) > 0)
+		{
+			m_icount -= 4;
+			while (read_rwX(0) > 0)
+			{
+				u16 al = (m_acc & 0xffff);
+				u16 ah = (m_acc >> 16) & 0xffff;
+				m_tmp8 = read_8((src<<16) | al);
+				write_8((dst<<16) | ah, m_tmp8);
+				al++;
+				ah++;
+				m_acc = (ah<<16) | al;
+				write_rwX(0, read_rwX(0) - 1);
+				m_icount -= 8;
+			}
+		}
+		else
+		{
+			m_icount -= 5;
+		}
+		m_pc += 2;
+	}
+
+	inline void movswi(u8 dst, u8 src)
+	{
+		if (read_rwX(0) > 0)
+		{
+			m_icount -= 4;
+			while (read_rwX(0) > 0)
+			{
+				u16 al = (m_acc & 0xffff);
+				u16 ah = (m_acc >> 16) & 0xffff;
+				m_tmp16 = read_16((src<<16) | al);
+				write_16((dst<<16) | ah, m_tmp16);
+				al += 2;
+				ah += 2;
+				m_acc = (ah<<16) | al;
+				write_rwX(0, read_rwX(0) - 1);
+				m_icount -= 8;
+			}
+		}
+		else
+		{
+			m_icount -= 5;
+		}
+		m_pc += 2;
+	}
+
+	inline void filsi(u8 dst)
+	{
+		m_icount -= 6;
+		while (read_rwX(0) > 0)
+		{
+			u16 al = (m_acc & 0xffff);
+			u16 ah = (m_acc >> 16) & 0xffff;
+			write_8((dst<<16) | ah, al & 0xff);
+			ah++;
+			m_acc = (ah<<16) | al;
+			write_rwX(0, read_rwX(0) - 1);
+			setNZ_8(m_acc & 0xff);
+			m_icount -= 6;
+		}
+		m_pc += 2;
+	}
+
 	void opcodes_bo6c(u8 operand);
 	void opcodes_str6e(u8 operand);
 	void opcodes_2b6f(u8 operand);
@@ -530,8 +696,10 @@ private:
 	void opcodes_ea76(u8 operand);
 	void opcodes_ea77(u8 operand);
 	void opcodes_ea78(u8 operand);
-	void opcodes_rwi7a(u8 operand);
-	void opcodes_rwi7b(u8 operand);
+	void opcodes_riea7a(u8 operand);
+	void opcodes_rwiea7b(u8 operand);
+	void opcodes_eari7c(u8 operand);
+	void opcodes_rwiea7f(u8 operand);
 
 	void set_irq(int vector, int level);
 	void clear_irq(int vector);

@@ -352,7 +352,7 @@ authors:hap
 	<element name="text_b7a"><text string="MOVE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_b8a"><text string="SOUND"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_b9"><text string="LEVEL"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_b10"><text string="ON/OFF"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_b10"><text string="ON / OFF"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_b1b"><text string="CLEAR BOARD"><color red="0.86" green="0.8" blue="0.1" /></text></element>
 	<element name="text_b2b"><text string="FEATURES"><color red="0.86" green="0.8" blue="0.1" /></text></element>
@@ -423,23 +423,23 @@ authors:hap
 		<element ref="butd" inputtag="IN.0" inputmask="0x01"><bounds xc="13.75" y="25.25" width="3" height="3" /></element>
 		<element ref="butd" inputtag="IN.0" inputmask="0x80"><bounds xc="20.0" y="25.25" width="3" height="3" /></element>
 
-		<element ref="text_b1a"><bounds x="12.8" y="30.7" width="12" height="1.35" /></element>
-		<element ref="text_b1b"><bounds x="12.8" y="32.45" width="12" height="1.35" /></element>
-		<element ref="text_b2a"><bounds x="12.8" y="35.2" width="12" height="1.35" /></element>
-		<element ref="text_b2b"><bounds x="12.8" y="36.95" width="12" height="1.35" /></element>
-		<element ref="text_b3a"><bounds x="12.8" y="39.7" width="12" height="1.35" /></element>
-		<element ref="text_b3b"><bounds x="12.8" y="41.45" width="12" height="1.35" /></element>
-		<element ref="text_b4a"><bounds x="12.8" y="44.2" width="12" height="1.35" /></element>
-		<element ref="text_b4b"><bounds x="12.8" y="45.95" width="12" height="1.35" /></element>
-		<element ref="text_b7a"><bounds x="12.8" y="57.7" width="12" height="1.35" /></element>
-		<element ref="text_b7b"><bounds x="12.8" y="59.45" width="12" height="1.35" /></element>
-		<element ref="text_b8a"><bounds x="12.8" y="62.2" width="12" height="1.35" /></element>
-		<element ref="text_b8b"><bounds x="12.8" y="63.95" width="12" height="1.35" /></element>
+		<element ref="text_b1a"><bounds x="13" y="30.7" width="12" height="1.35" /></element>
+		<element ref="text_b1b"><bounds x="13" y="32.45" width="12" height="1.35" /></element>
+		<element ref="text_b2a"><bounds x="13" y="35.2" width="12" height="1.35" /></element>
+		<element ref="text_b2b"><bounds x="13" y="36.95" width="12" height="1.35" /></element>
+		<element ref="text_b3a"><bounds x="13" y="39.7" width="12" height="1.35" /></element>
+		<element ref="text_b3b"><bounds x="13" y="41.45" width="12" height="1.35" /></element>
+		<element ref="text_b4a"><bounds x="13" y="44.2" width="12" height="1.35" /></element>
+		<element ref="text_b4b"><bounds x="13" y="45.95" width="12" height="1.35" /></element>
+		<element ref="text_b7a"><bounds x="13" y="57.7" width="12" height="1.35" /></element>
+		<element ref="text_b7b"><bounds x="13" y="59.45" width="12" height="1.35" /></element>
+		<element ref="text_b8a"><bounds x="13" y="62.2" width="12" height="1.35" /></element>
+		<element ref="text_b8b"><bounds x="13" y="63.95" width="12" height="1.35" /></element>
 
 		<element ref="text_b5"><bounds x="15.1" y="49.575" width="12" height="1.35" /></element>
 		<element ref="text_b6"><bounds x="15.1" y="54.075" width="12" height="1.35" /></element>
-		<element ref="text_b9"><bounds x="12.8" y="67.575" width="12" height="1.35" /></element>
-		<element ref="text_b10"><bounds x="12.8" y="72.075" width="12" height="1.35" /></element>
+		<element ref="text_b9"><bounds x="13" y="67.575" width="12" height="1.35" /></element>
+		<element ref="text_b10"><bounds x="13" y="72.075" width="12" height="1.35" /></element>
 
 		<element ref="but" inputtag="IN.1" inputmask="0x80"><bounds x="6" y="31.5" width="8.5" height="1.5" /></element>
 		<element ref="but" inputtag="IN.0" inputmask="0x04"><bounds x="6" y="36.0" width="8.5" height="1.5" /></element>

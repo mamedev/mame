@@ -13,93 +13,40 @@
 #include "bk.h"
 
 
-TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
-{
-	uint8_t code, i, j;
-
-	for(i = 1; i < 12; i++)
-	{
-		code = m_io_keyboard[i]->read();
-		if (code != 0)
-		{
-			for(j = 0; j < 8; j++)
-			{
-				if (code == (1 << j))
-				{
-					m_key_code = j + i*8;
-					break;
-				}
-			}
-			if (BIT(m_io_keyboard[0]->read(), 2))
-			{
-				if (i==6 || i==7)
-					m_key_code -= 16;
-				else
-				if (i>=8 && i<=11)
-					m_key_code += 32;
-			}
-			m_key_pressed = 0x40;
-
-			if (!BIT(m_io_keyboard[0]->read(), 1))
-				m_key_irq_vector = 0x30;
-			else
-				m_key_irq_vector = 0xBC;
-
-			m_maincpu->set_input_line(0, ASSERT_LINE);
-			break;
-		}
-	}
-}
-
-
 void bk_state::machine_start()
 {
 	save_item(NAME(m_scroll));
-	save_item(NAME(m_kbd_state));
-	save_item(NAME(m_key_code));
-	save_item(NAME(m_key_pressed));
-	save_item(NAME(m_key_irq_vector));
+	save_item(NAME(m_sel1));
 	save_item(NAME(m_drive));
-
-	m_maincpu->set_input_line(t11_device::VEC_LINE, ASSERT_LINE);
-
-	m_kbd_timer = timer_alloc(FUNC(bk_state::keyboard_callback), this);
-	m_kbd_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
-}
-
-uint8_t bk_state::irq_callback(offs_t offset)
-{
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	return m_key_irq_vector;
 }
 
 void bk_state::machine_reset()
 {
-	m_kbd_state = 0;
+	m_sel1 = SEL1_KEYDOWN | SEL1_MOTOR;
 	m_scroll = 01330;
 }
 
-uint16_t bk_state::key_state_r()
+void bk_state::reset_w(int state)
 {
-	return m_kbd_state;
+	if (state == ASSERT_LINE)
+	{
+		m_kbd->reset();
+		m_qbus->init_w();
+	}
 }
-uint16_t bk_state::key_code_r()
-{
-	m_kbd_state &= ~0x80; // mark reading done
-	m_key_pressed = 0;
-	return m_key_code;
-}
+
 uint16_t bk_state::vid_scroll_r()
 {
 	return m_scroll;
 }
 
-uint16_t bk_state::key_press_r()
+uint16_t bk_state::sel1_r()
 {
 	double level = m_cassette->input();
-	uint16_t cas = (level < 0) ? 0 : 0x20;
+	uint16_t data = 0100000 | m_sel1 | ((level < 0) ? 0 : SEL1_RX_CAS);
+	m_sel1 &= ~SEL1_UPDATED;
 
-	return 0x8080 | m_key_pressed | cas;
+	return data;
 }
 
 uint16_t bk_state::trap_r()
@@ -109,18 +56,14 @@ uint16_t bk_state::trap_r()
 	return ~0;
 }
 
-void bk_state::key_state_w(uint16_t data)
-{
-	m_kbd_state = (m_kbd_state & ~0x40) | (data & 0x40);
-}
-
 void bk_state::vid_scroll_w(uint16_t data)
 {
-	m_scroll = data;
+	m_scroll = data & 01377;
 }
 
-void bk_state::key_press_w(uint16_t data)
+void bk_state::sel1_w(uint16_t data)
 {
+	m_sel1 |= SEL1_UPDATED;
 	m_dac->write(BIT(data, 6));
 	m_cassette->output(BIT(data, 6) ? 1.0 : -1.0);
 	m_cassette->change_state((BIT(data, 7)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
