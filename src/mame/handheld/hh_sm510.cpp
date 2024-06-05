@@ -4860,11 +4860,12 @@ ROM_END
   * Sharp SM510 under epoxy (die label CMS54C, KMS584)
   * lcd screen with custom segments, 1-bit sound
 
-  BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
-  may show 2 balls at the same time. It's the same on the real handheld.
-  BTANB: players flicker (increasing LCD delay won't improve it much)
-  Another BTANB? If a period is over at the same time a defender on the
-  2nd column grabs the ball, his arm won't be erased until it's redrawn.
+  BTANB:
+  - At the basket, the ball goes missing sometimes for 1 frame, or may show 2 balls
+    at the same time. It's the same on the real handheld.
+  - players flicker (increasing LCD delay won't improve it much)
+  - If a period is over at the same time a defender on the 2nd column grabs the ball,
+    his arm won't be erased until it's redrawn (BTANB not verified).
 
 *******************************************************************************/
 
@@ -9995,6 +9996,10 @@ ROM_END
   Tiger Operation: Aliens (model 78-552) (licensed from Twentieth Century Fox)
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
+
+  TODO or BTANB?: Energy and weapon power bars are swapped. Not verified on the
+  handheld. The manual does show them correctly, but looking at the LCD segment
+  ID groupings, the SVG is not wrong.
 
 *******************************************************************************/
 

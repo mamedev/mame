@@ -105,9 +105,6 @@ Dip sw.2
 
 namespace {
 
-#define littlerb_printf logerror
-#define littlerb_alt_printf logerror
-
 class littlerb_state : public driver_device
 {
 public:

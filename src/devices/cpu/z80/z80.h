@@ -113,7 +113,6 @@ protected:
 	void set_f(u8 f);
 	void block_io_interrupted_flags();
 
-	virtual void do_rop();
 	virtual void do_op();
 	bool check_icount(u8 to_step, int icount_saved, bool redonable);
 
@@ -207,7 +206,7 @@ protected:
 	virtual u32 execute_input_lines() const noexcept override { return 7; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual void do_rop() override;
+	virtual void do_op() override;
 	u8 m_nsc800_irq_state[4]; // state of NSC800 restart interrupts A, B, C
 };
 

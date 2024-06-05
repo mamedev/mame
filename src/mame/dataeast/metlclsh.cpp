@@ -742,4 +742,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, empty_init, ROT0, "Data East", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, empty_init, ROT0, "Data East Corporation", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -905,20 +905,24 @@ bool z80_device::check_icount(u8 to_step, int icount_saved, bool redonable)
 	return false;
 }
 
-void z80_device::do_rop()
-{
-	#include "cpu/z80/z80_rop.hxx"
-}
-
 void z80_device::do_op()
 {
+	const bool is_rop = m_ref >= 0xffff00;
 	#include "cpu/z80/z80.hxx"
-	m_ref = 0xffff00;
+	if (!is_rop)
+	{
+		m_ref = 0xffff00;
+	}
 }
 
-void nsc800_device::do_rop()
+void nsc800_device::do_op()
 {
-	#include "cpu/z80/z80_ncs800rop.hxx"
+	const bool is_rop = m_ref >= 0xffff00;
+	#include "cpu/z80/z80_ncs800.hxx"
+	if (!is_rop)
+	{
+		m_ref = 0xffff00;
+	}
 }
 
 /****************************************************************************
@@ -935,25 +939,7 @@ void z80_device::execute_run()
 	m_redone = false;
 	while (m_icount > 0 && !m_redone)
 	{
-		if (m_ref >= 0xffff00)
-		{
-			do_rop();
-			if (m_icount > 0 && !m_redone)
-			{
-				if (m_halt)
-				{
-					PC--;
-					m_ref = 0xffff00;
-				} else {
-					m_ref = (0x00 << 16) | (TDAT8 << 8);
-					do_op();
-				}
-			}
-		}
-		else
-		{
-			do_op();
-		}
+		do_op();
 	}
 }
 

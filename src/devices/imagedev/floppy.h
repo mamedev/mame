@@ -256,7 +256,6 @@ protected:
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
-	int find_index(uint32_t position, const std::vector<uint32_t> &buf) const;
 	attotime position_to_time(const attotime &base, int position) const;
 
 	void commit_image();
