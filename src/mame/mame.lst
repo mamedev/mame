@@ -9220,11 +9220,11 @@ ad5crsce                        //
 ad5crscf                        //
 ad5crscg                        //
 ad5crsch                        //
-ad5dnd                          // Deal Or No Deal (Bellfruit) (AD5)
+ad5dnd                          // Deal or No Deal (Bellfruit) (AD5)
 ad5dnda                         //
 ad5dndb                         //
 ad5dndc                         //
-ad5dndcl                        // Deal Or No Deal Club (Bellfruit) (AD5)
+ad5dndcl                        // Deal or No Deal Club (Bellfruit) (AD5)
 ad5dndcla                       //
 ad5dndclb                       //
 ad5dndclc                       //
@@ -9233,7 +9233,7 @@ ad5dndcle                       //
 ad5dndclf                       //
 ad5dndclg                       //
 ad5dndd                         //
-ad5dnddd                        // Deal Or No Deal Double Deal Or No Deal (Bellfruit) (AD5)
+ad5dnddd                        // Deal or No Deal Double Deal or No Deal (Bellfruit) (AD5)
 ad5dnddda                       //
 ad5dnde                         //
 ad5dndf                         //
@@ -9247,11 +9247,11 @@ ad5dndm                         //
 ad5dndn                         //
 ad5dndo                         //
 ad5dndp                         //
-ad5dndpg                        // Deal Or No Deal The Perfect Game (Bellfruit)
+ad5dndpg                        // Deal or No Deal The Perfect Game (Bellfruit)
 ad5dndpga                       //
 ad5dndpgb                       //
 ad5dndpgc                       //
-ad5dndpl                        // Deal Or No Deal Platinum (Bellfruit)
+ad5dndpl                        // Deal or No Deal Platinum (Bellfruit)
 ad5dndpla                       //
 ad5dndplb                       //
 ad5dndplc                       //
@@ -11038,10 +11038,10 @@ sc4dmineb                       //
 sc4dminec                       //
 sc4dmined                       //
 sc4dminee                       //
-sc4dnd                          // Deal Or No Deal (Bellfruit)
+sc4dnd                          // Deal or No Deal (Bellfruit)
 sc4dnda                         //
 sc4dndb                         //
-sc4dndbb                        // Deal Or No Deal Break The Bank (Bellfruit)
+sc4dndbb                        // Deal or No Deal Break The Bank (Bellfruit)
 sc4dndbba                       //
 sc4dndbbb                       //
 sc4dndbbc                       //
@@ -11051,15 +11051,15 @@ sc4dndbbf                       //
 sc4dndbbg                       //
 sc4dndbbh                       //
 sc4dndbbi                       //
-sc4dndbc                        // Deal Or No Deal Box Clever (Bellfruit)
+sc4dndbc                        // Deal or No Deal Box Clever (Bellfruit)
 sc4dndbca                       //
-sc4dndbd                        // Deal Or No Deal The Big Deal (Bellfruit)
+sc4dndbd                        // Deal or No Deal The Big Deal (Bellfruit)
 sc4dndbda                       //
 sc4dndbdb                       //
 sc4dndbdc                       //
 sc4dndbdd                       //
 sc4dndbde                       //
-sc4dndbe                        // Deal Or No Deal Beat The Banker (Bellfruit)
+sc4dndbe                        // Deal or No Deal Beat The Banker (Bellfruit)
 sc4dndbeb                       //
 sc4dndbec                       //
 sc4dndbed                       //
@@ -11073,7 +11073,7 @@ sc4dndbek                       //
 sc4dndbel                       //
 sc4dndbem                       //
 sc4dndben                       //
-sc4dndbr                        // Deal Or No Deal The Big Reds (Bellfruit)
+sc4dndbr                        // Deal or No Deal The Big Reds (Bellfruit)
 sc4dndbra                       //
 sc4dndbrb                       //
 sc4dndbrc                       //
@@ -11082,14 +11082,14 @@ sc4dndbre                       //
 sc4dndbrf                       //
 sc4dndbrg                       //
 sc4dndc                         //
-sc4dndcc                        // Deal Or No Deal The Crazy Chair (Bellfruit)
+sc4dndcc                        // Deal or No Deal The Crazy Chair (Bellfruit)
 sc4dndcca                       //
 sc4dndccb                       //
 sc4dndccc                       //
 sc4dndccd                       //
 sc4dndcce                       //
 sc4dndccf                       //
-sc4dndcl                        // Deal Or No Deal Club (Bellfruit)
+sc4dndcl                        // Deal or No Deal Club (Bellfruit)
 sc4dndcla                       //
 sc4dndclb                       //
 sc4dndclc                       //
@@ -11097,18 +11097,18 @@ sc4dndcld                       //
 sc4dndcle                       //
 sc4dndclf                       //
 sc4dndclg                       //
-sc4dndcs                        // Deal Or No Deal Classic (Bellfruit)
+sc4dndcs                        // Deal or No Deal Classic (Bellfruit)
 sc4dndcsa                       //
 sc4dndcsb                       //
 sc4dndcsc                       //
 sc4dndcsd                       //
 sc4dndcse                       //
-sc4dndcw                        // Deal Or No Deal The Walk Of Wealth Classic (Bellfruit)
+sc4dndcw                        // Deal or No Deal The Walk Of Wealth Classic (Bellfruit)
 sc4dndcwa                       //
 sc4dndcwb                       //
 sc4dndcwc                       //
 sc4dndd                         //
-sc4dnddd                        // Deal Or No Deal Double Deal Or No Deal (Bellfruit)
+sc4dnddd                        // Deal or No Deal Double Deal or No Deal (Bellfruit)
 sc4dnddda                       //
 sc4dndddb                       //
 sc4dndddc                       //
@@ -11116,13 +11116,13 @@ sc4dndddd                       //
 sc4dnddde                       //
 sc4dndddf                       //
 sc4dndddg                       //
-sc4dnddf                        // Deal Or No Deal The Dream Factory (Bellfruit)
+sc4dnddf                        // Deal or No Deal The Dream Factory (Bellfruit)
 sc4dnddfa                       //
 sc4dnddfb                       //
 sc4dnddfc                       //
 sc4dnddfd                       //
 sc4dnddfe                       //
-sc4dnddw                        // Deal Or No Deal The Deal Wheel (Bellfruit)
+sc4dnddw                        // Deal or No Deal The Deal Wheel (Bellfruit)
 sc4dnddwa                       //
 sc4dnddwb                       //
 sc4dnddwc                       //
@@ -11134,7 +11134,7 @@ sc4dnde                         //
 sc4dndf                         //
 sc4dndg                         //
 sc4dndh                         //
-sc4dndhf                        // Deal Or No Deal Hall Of Fame (Bellfruit)
+sc4dndhf                        // Deal or No Deal Hall Of Fame (Bellfruit)
 sc4dndhfa                       //
 sc4dndhfb                       //
 sc4dndhfc                       //
@@ -11151,7 +11151,7 @@ sc4dndi                         //
 sc4dndj                         //
 sc4dndk                         //
 sc4dndl                         //
-sc4dndlp                        // Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit)
+sc4dndlp                        // Deal or No Deal Let's Play Deal or No Deal (Bellfruit)
 sc4dndlpa                       //
 sc4dndlpb                       //
 sc4dndlpc                       //
@@ -11160,19 +11160,19 @@ sc4dndlpe                       //
 sc4dndm                         //
 sc4dndn                         //
 sc4dndo                         //
-sc4dndpg                        // Deal Or No Deal The Perfect Game (Bellfruit)
+sc4dndpg                        // Deal or No Deal The Perfect Game (Bellfruit)
 sc4dndpga                       //
 sc4dndpgb                       //
 sc4dndpgc                       //
 sc4dndpgd                       //
 sc4dndpge                       //
-sc4dndra                        // Deal Or No Deal Red Alert (Bellfruit)
+sc4dndra                        // Deal or No Deal Red Alert (Bellfruit)
 sc4dndraa                       //
 sc4dndrab                       //
 sc4dndrac                       //
 sc4dndrad                       //
 sc4dndrae                       //
-sc4dndtp                        // Deal Or No Deal The Power (Bellfruit)
+sc4dndtp                        // Deal or No Deal The Power (Bellfruit)
 sc4dndtpa                       //
 sc4dndtpb                       //
 sc4dndtpc                       //
@@ -11186,9 +11186,9 @@ sc4dndtpj                       //
 sc4dndtpk                       //
 sc4dndtpl                       //
 sc4dndtpm                       //
-sc4dndtr                        // Deal Or No Deal Think Red (Bellfruit)
+sc4dndtr                        // Deal or No Deal Think Red (Bellfruit)
 sc4dndtra                       //
-sc4dndwb                        // Deal Or No Deal What's In Your Box (Bellfruit)
+sc4dndwb                        // Deal or No Deal What's In Your Box (Bellfruit)
 sc4dndwba                       //
 sc4dndwbb                       //
 sc4dndwbc                       //
@@ -11196,13 +11196,13 @@ sc4dndwbd                       //
 sc4dndwbe                       //
 sc4dndwbf                       //
 sc4dndwbg                       //
-sc4dndww                        // Deal Or No Deal The Walk Of Wealth (Bellfruit)
+sc4dndww                        // Deal or No Deal The Walk Of Wealth (Bellfruit)
 sc4dndwwa                       //
 sc4dndwwb                       //
 sc4dndwwc                       //
 sc4dndwwd                       //
 sc4dndwwe                       //
-sc4dndys                        // Deal Or No Deal It's Your Show (Bellfruit)
+sc4dndys                        // Deal or No Deal It's Your Show (Bellfruit)
 sc4dndysa                       //
 sc4dndysb                       //
 sc4dndysc                       //
@@ -13678,9 +13678,9 @@ sc5ddbbcf                       //
 sc5ddbbcg                       //
 sc5ddosh                        // Doctor Dosh (Bellfruit)
 sc5ddosha                       //
-sc5ddply                        // Deal Or No Deal Player's Choice (Bellfruit)
+sc5ddply                        // Deal or No Deal Player's Choice (Bellfruit)
 sc5ddplya                       //
-sc5ddptg                        // Deal Or No Deal Play The Game (Bellfruit)
+sc5ddptg                        // Deal or No Deal Play The Game (Bellfruit)
 sc5ddptga                       //
 sc5ddptgb                       //
 sc5ddptgc                       //
@@ -13709,10 +13709,10 @@ sc5dminei                       //
 sc5dminej                       //
 sc5dminek                       //
 sc5dminel                       //
-sc5dnd                          // Deal Or No Deal (Bellfruit)
+sc5dnd                          // Deal or No Deal (Bellfruit)
 sc5dnda                         //
 sc5dndb                         //
-sc5dndbb                        // Deal Or No Deal Break The Bank (Bellfruit)
+sc5dndbb                        // Deal or No Deal Break The Bank (Bellfruit)
 sc5dndbba                       //
 sc5dndbbb                       //
 sc5dndbbc                       //
@@ -13720,7 +13720,7 @@ sc5dndbbd                       //
 sc5dndbbe                       //
 sc5dndbbf                       //
 sc5dndbbg                       //
-sc5dndbc                        // Deal Or No Deal Box Clever (Bellfruit)
+sc5dndbc                        // Deal or No Deal Box Clever (Bellfruit)
 sc5dndbca                       //
 sc5dndbcb                       //
 sc5dndbcc                       //
@@ -13732,7 +13732,7 @@ sc5dndbch                       //
 sc5dndbci                       //
 sc5dndbcj                       //
 sc5dndbck                       //
-sc5dndbd                        // Deal Or No Deal The Big Deal (Bellfruit)
+sc5dndbd                        // Deal or No Deal The Big Deal (Bellfruit)
 sc5dndbda                       //
 sc5dndbdb                       //
 sc5dndbdc                       //
@@ -13742,7 +13742,7 @@ sc5dndbdf                       //
 sc5dndbdg                       //
 sc5dndbdh                       //
 sc5dndbdi                       //
-sc5dndbe                        // Deal Or No Deal Beat The Banker (Bellfruit)
+sc5dndbe                        // Deal or No Deal Beat The Banker (Bellfruit)
 sc5dndbea                       //
 sc5dndbeb                       //
 sc5dndbec                       //
@@ -13757,7 +13757,7 @@ sc5dndbek                       //
 sc5dndbel                       //
 sc5dndbem                       //
 sc5dndben                       //
-sc5dndbl                        // Deal Or No Deal Beat The Banker Club (Bellfruit)
+sc5dndbl                        // Deal or No Deal Beat The Banker Club (Bellfruit)
 sc5dndbla                       //
 sc5dndblb                       //
 sc5dndblc                       //
@@ -13777,7 +13777,7 @@ sc5dndblp                       //
 sc5dndblq                       //
 sc5dndblr                       //
 sc5dndbls                       //
-sc5dndbo                        // Deal Or No Deal Banker's Bonus (Bellfruit)
+sc5dndbo                        // Deal or No Deal Banker's Bonus (Bellfruit)
 sc5dndboa                       //
 sc5dndbob                       //
 sc5dndboc                       //
@@ -13791,13 +13791,13 @@ sc5dndboj                       //
 sc5dndbok                       //
 sc5dndbol                       //
 sc5dndbom                       //
-sc5dndbq                        // Deal Or No Deal Beat The Banker (Qps)
+sc5dndbq                        // Deal or No Deal Beat The Banker (Qps)
 sc5dndbqa                       //
 sc5dndbqb                       //
 sc5dndbqc                       //
 sc5dndbqd                       //
 sc5dndbqe                       //
-sc5dndbr                        // Deal Or No Deal The Big Reds (Bellfruit)
+sc5dndbr                        // Deal or No Deal The Big Reds (Bellfruit)
 sc5dndbra                       //
 sc5dndbrb                       //
 sc5dndbrc                       //
@@ -13858,7 +13858,7 @@ sc5dndcad                       //
 sc5dndcae                       //
 sc5dndcb                        //
 sc5dndcba                       //
-sc5dndcc                        // Deal Or No Deal The Crazy Chair (Bellfruit)
+sc5dndcc                        // Deal or No Deal The Crazy Chair (Bellfruit)
 sc5dndcca                       //
 sc5dndccb                       //
 sc5dndccc                       //
@@ -13877,9 +13877,9 @@ sc5dndcco                       //
 sc5dndccp                       //
 sc5dndccq                       //
 sc5dndccr                       //
-sc5dndcl                        // Deal Or No Deal Club (Bellfruit)
+sc5dndcl                        // Deal or No Deal Club (Bellfruit)
 sc5dndcla                       //
-sc5dndcr                        // Deal Or No Deal Cops 'n' Robbers (Bellfruit)
+sc5dndcr                        // Deal or No Deal Cops 'n' Robbers (Bellfruit)
 sc5dndcra                       //
 sc5dndcrb                       //
 sc5dndcrc                       //
@@ -13900,7 +13900,7 @@ sc5dndcsk                       //
 sc5dndcsl                       //
 sc5dndcsm                       //
 sc5dndd                         //
-sc5dnddd                        // Deal Or No Deal Double Deal Or No Deal (Bellfruit)
+sc5dnddd                        // Deal or No Deal Double Deal or No Deal (Bellfruit)
 sc5dnddda                       //
 sc5dndddb                       //
 sc5dndddc                       //
@@ -13910,7 +13910,7 @@ sc5dndddf                       //
 sc5dndddg                       //
 sc5dndddh                       //
 sc5dndddi                       //
-sc5dndde                        // Deal Or No Deal Desert Island Deal (Bellfruit)
+sc5dndde                        // Deal or No Deal Desert Island Deal (Bellfruit)
 sc5dnddea                       //
 sc5dnddeb                       //
 sc5dnddec                       //
@@ -13918,7 +13918,7 @@ sc5dndded                       //
 sc5dnddee                       //
 sc5dnddef                       //
 sc5dnddeg                       //
-sc5dnddf                        // Deal Or No Deal The Dream Factory (Bellfruit)
+sc5dnddf                        // Deal or No Deal The Dream Factory (Bellfruit)
 sc5dnddfa                       //
 sc5dnddfb                       //
 sc5dnddfc                       //
@@ -13933,22 +13933,22 @@ sc5dnddfk                       //
 sc5dnddfl                       //
 sc5dnddfm                       //
 sc5dnddfn                       //
-sc5dnddi                        // Deal Or No Deal Diamond (Bellfruit)
+sc5dnddi                        // Deal or No Deal Diamond (Bellfruit)
 sc5dnddia                       //
 sc5dnddib                       //
 sc5dnddic                       //
-sc5dnddo                        // Deal Or No Deal Dream Offer (Bellfruit)
+sc5dnddo                        // Deal or No Deal Dream Offer (Bellfruit)
 sc5dnddoa                       //
 sc5dnddob                       //
 sc5dnddoc                       //
-sc5dnddt                        // Deal Or No Deal Double Take (Bellfruit)
+sc5dnddt                        // Deal or No Deal Double Take (Bellfruit)
 sc5dnddta                       //
 sc5dnddtb                       //
 sc5dnddtc                       //
 sc5dnddtd                       //
 sc5dnddte                       //
 sc5dnddtf                       //
-sc5dnddw                        // Deal Or No Deal The Deal Wheel (Bellfruit)
+sc5dnddw                        // Deal or No Deal The Deal Wheel (Bellfruit)
 sc5dnddwa                       //
 sc5dnddwb                       //
 sc5dnddwc                       //
@@ -13961,14 +13961,14 @@ sc5dnddwi                       //
 sc5dnddwj                       //
 sc5dnde                         //
 sc5dndf                         //
-sc5dndfl                        // Deal Or No Deal Feeling Lucky (Bellfruit)
+sc5dndfl                        // Deal or No Deal Feeling Lucky (Bellfruit)
 sc5dndfla                       //
 sc5dndflb                       //
 sc5dndflc                       //
 sc5dndfld                       //
 sc5dndfle                       //
 sc5dndg                         //
-sc5dndgl                        // Deal Or No Deal Gold (Bellfruit)
+sc5dndgl                        // Deal or No Deal Gold (Bellfruit)
 sc5dndgla                       //
 sc5dndglb                       //
 sc5dndglc                       //
@@ -13980,10 +13980,10 @@ sc5dndglh                       //
 sc5dndgli                       //
 sc5dndglj                       //
 sc5dndglk                       //
-sc5dndgo                        // Deal Or No Deal Game On (Bellfruit)
+sc5dndgo                        // Deal or No Deal Game On (Bellfruit)
 sc5dndgoa                       //
 sc5dndh                         //
-sc5dndhf                        // Deal Or No Deal Hall Of Fame (Bellfruit)
+sc5dndhf                        // Deal or No Deal Hall Of Fame (Bellfruit)
 sc5dndhfa                       //
 sc5dndhfb                       //
 sc5dndhfc                       //
@@ -14009,11 +14009,11 @@ sc5dndi                         //
 sc5dndj                         //
 sc5dndk                         //
 sc5dndl                         //
-sc5dndld                        // Deal Or No Deal Live The Dream (Bellfruit)
+sc5dndld                        // Deal or No Deal Live The Dream (Bellfruit)
 sc5dndlda                       //
 sc5dndldb                       //
 sc5dndldc                       //
-sc5dndlp                        // Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit)
+sc5dndlp                        // Deal or No Deal Let's Play Deal or No Deal (Bellfruit)
 sc5dndlpa                       //
 sc5dndlpb                       //
 sc5dndlpc                       //
@@ -14036,7 +14036,7 @@ sc5dndlps                       //
 sc5dndlpt                       //
 sc5dndlpu                       //
 sc5dndm                         //
-sc5dndmb                        // Deal Or No Deal Make Or Break (Bellfruit)
+sc5dndmb                        // Deal or No Deal Make Or Break (Bellfruit)
 sc5dndmba                       //
 sc5dndmbb                       //
 sc5dndmbc                       //
@@ -14048,7 +14048,7 @@ sc5dndmbh                       //
 sc5dndmbi                       //
 sc5dndmbj                       //
 sc5dndmbk                       //
-sc5dndmd                        // Deal Or No Deal Mega Deal Or No Deal (Bellfruit)
+sc5dndmd                        // Deal or No Deal Mega Deal or No Deal (Bellfruit)
 sc5dndmda                       //
 sc5dndmdb                       //
 sc5dndmdc                       //
@@ -14063,19 +14063,19 @@ sc5dndmdk                       //
 sc5dndn                         //
 sc5dndo                         //
 sc5dndp                         //
-sc5dndpa                        // Deal Or No Deal Play It Again (Bellfruit)
+sc5dndpa                        // Deal or No Deal Play It Again (Bellfruit)
 sc5dndpaa                       //
 sc5dndpab                       //
 sc5dndpac                       //
-sc5dndpc                        // Deal Or No Deal The Players Choice (Bellfruit)
+sc5dndpc                        // Deal or No Deal The Players Choice (Bellfruit)
 sc5dndpca                       //
-sc5dndpd                        // Deal Or No Deal The Perfect Deal (Bellfruit)
+sc5dndpd                        // Deal or No Deal The Perfect Deal (Bellfruit)
 sc5dndpda                       //
 sc5dndpdb                       //
 sc5dndpdc                       //
 sc5dndpdd                       //
 sc5dndpde                       //
-sc5dndpg                        // Deal Or No Deal The Perfect Game (Bellfruit)
+sc5dndpg                        // Deal or No Deal The Perfect Game (Bellfruit)
 sc5dndpga                       //
 sc5dndpgb                       //
 sc5dndpgc                       //
@@ -14099,13 +14099,13 @@ sc5dndpgt                       //
 sc5dndpgu                       //
 sc5dndpgv                       //
 sc5dndpgw                       //
-sc5dndpl                        // Deal Or No Deal The Perfect Game Classic (Bellfruit)
+sc5dndpl                        // Deal or No Deal The Perfect Game Classic (Bellfruit)
 sc5dndpla                       //
 sc5dndplb                       //
 sc5dndplc                       //
 sc5dndq                         //
 sc5dndr                         //
-sc5dndra                        // Deal Or No Deal Red Alert (Bellfruit)
+sc5dndra                        // Deal or No Deal Red Alert (Bellfruit)
 sc5dndraa                       //
 sc5dndrab                       //
 sc5dndrac                       //
@@ -14117,28 +14117,28 @@ sc5dndrah                       //
 sc5dndrai                       //
 sc5dndraj                       //
 sc5dndrak                       //
-sc5dndrr                        // Deal Or No Deal Road To Riches (Bellfruit)
+sc5dndrr                        // Deal or No Deal Road To Riches (Bellfruit)
 sc5dndrra                       //
 sc5dndrrb                       //
 sc5dndrrc                       //
 sc5dndrrd                       //
 sc5dndrre                       //
-sc5dndrt                        // Deal Or No Deal The Banker Rings Twice (Bellfruit)
+sc5dndrt                        // Deal or No Deal The Banker Rings Twice (Bellfruit)
 sc5dndrta                       //
 sc5dndrtb                       //
 sc5dndrtc                       //
 sc5dndrtd                       //
 sc5dndrte                       //
 sc5dnds                         //
-sc5dndsi                        // Deal Or No Deal Simply Deal Or No Deal (Bellfruit)
+sc5dndsi                        // Deal or No Deal Simply Deal or No Deal (Bellfruit)
 sc5dndsia                       //
 sc5dndsib                       //
 sc5dndsic                       //
 sc5dndsid                       //
 sc5dndt                         //
-sc5dndtb                        // Deal Or No Deal Think Big (Bellfruit)
+sc5dndtb                        // Deal or No Deal Think Big (Bellfruit)
 sc5dndtba                       //
-sc5dndtp                        // Deal Or No Deal The Power (Bellfruit)
+sc5dndtp                        // Deal or No Deal The Power (Bellfruit)
 sc5dndtpa                       //
 sc5dndtpb                       //
 sc5dndtpc                       //
@@ -14161,7 +14161,7 @@ sc5dndtps                       //
 sc5dndtpt                       //
 sc5dndtpu                       //
 sc5dndtpv                       //
-sc5dndtr                        // Deal Or No Deal Think Red (Bellfruit)
+sc5dndtr                        // Deal or No Deal Think Red (Bellfruit)
 sc5dndtra                       //
 sc5dndtrb                       //
 sc5dndtrc                       //
@@ -14173,7 +14173,7 @@ sc5dndtrh                       //
 sc5dndtri                       //
 sc5dndtrj                       //
 sc5dndtrk                       //
-sc5dndwb                        // Deal Or No Deal What's In Your Box (Bellfruit)
+sc5dndwb                        // Deal or No Deal What's In Your Box (Bellfruit)
 sc5dndwba                       //
 sc5dndwbb                       //
 sc5dndwbc                       //
@@ -14201,7 +14201,7 @@ sc5dndwcd                       //
 sc5dndwce                       //
 sc5dndwcf                       //
 sc5dndwcg                       //
-sc5dndwi                        // Deal Or No Deal What's In Your Box Casino (Bellfruit)
+sc5dndwi                        // Deal or No Deal What's In Your Box Casino (Bellfruit)
 sc5dndwia                       //
 sc5dndwib                       //
 sc5dndwic                       //
@@ -14209,7 +14209,7 @@ sc5dndwid                       //
 sc5dndwie                       //
 sc5dndwif                       //
 sc5dndwig                       //
-sc5dndww                        // Deal Or No Deal The Walk Of Wealth (Bellfruit)
+sc5dndww                        // Deal or No Deal The Walk Of Wealth (Bellfruit)
 sc5dndwwa                       //
 sc5dndwwb                       //
 sc5dndwwc                       //
@@ -14229,7 +14229,7 @@ sc5dndwwp                       //
 sc5dndwwq                       //
 sc5dndwwr                       //
 sc5dndwws                       //
-sc5dndys                        // Deal Or No Deal It's Your Show (Bellfruit)
+sc5dndys                        // Deal or No Deal It's Your Show (Bellfruit)
 sc5dndysa                       //
 sc5dndysb                       //
 sc5dndysc                       //
