@@ -31,7 +31,7 @@
         0 = Unused
 
     MMU info:
-        Map control register (location 0x780000): bit 6 = Wenable, bit 5 = VMenable, bits3-0 process ID
+        Map control register (location 0x780000): bit 5 = Wenable, bit 4 = VMenable, bits3-0 process ID
 
         Map entries:
             bit 15 = dirty
@@ -67,6 +67,13 @@
 #define VERBOSE 1
 #include "logmacro.h"
 
+// mapcntl bits
+#define MAP_VM_ENABLE 4
+#define MAP_SYS_WR_ENABLE 5
+#define MAP_BLOCK_ACCESS 6
+#define MAP_CPU_WR 7
+
+
 namespace {
 
 class tek440x_state : public driver_device
@@ -83,6 +90,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "scsi:7:ncr5385"),
 		m_vint(*this, "vint"),
+		m_screen(*this, "screen"),
 		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
@@ -132,6 +140,7 @@ private:
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
 	required_device<input_merger_all_high_device> m_vint;
+	required_device<screen_device> m_screen;
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
 	required_shared_ptr<u16> m_vram;
@@ -223,8 +232,20 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		return m_prom[offset & 0x3fff];
 
 	const offs_t offset0 = offset;
-	if (BIT(m_map_control, 5))
+	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
+		if (BIT(m_map[offset >> 11], 11, 3) != m_maincpu->get_fc())
+		{
+			m_map_control |= (1 << MAP_CPU_WR);
+
+			LOG("bus error: read: PID %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
+
+			mem_mask = 0;
+		}
+		
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 	}
 
@@ -243,21 +264,36 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const offs_t offset0 = offset;
-	if (BIT(m_map_control, 5))
+	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
+		// write-enabled?
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
-			LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			m_map_control |= (1 << MAP_BLOCK_ACCESS);
+
+			LOG("bus error: BlockAccess %08x fc=%d\n",  offset, m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
 			
-			m_map_control |= 0x40;	// BlockAccess
-			m_map_control |= 0x80;	// cpuWr
-			return;
+			mem_mask = 0;
+		}
+
+		if (BIT(m_map[offset >> 11], 11, 3) != (m_maincpu->get_fc() & 0x1))
+		{
+			m_map_control |= (1 << MAP_CPU_WR);
+
+			LOG("bus error: PID %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
+			
+			mem_mask = 0;
 		}
 
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
+		
+		// mark page dirty
 		m_map[offset >> 11] |= 0x8000;
 	}
 
@@ -284,7 +320,10 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("map_w 0x%08x %04x mask(%04x)\n",offset, data, mem_mask);
 
-	COMBINE_DATA(&m_map[offset >> 11]);
+	if (BIT(m_map_control, MAP_VM_ENABLE))
+	{
+		COMBINE_DATA(&m_map[offset >> 11]);
+	}
 }
 
 u8 tek440x_state::mapcntl_r()
@@ -295,17 +334,14 @@ u8 tek440x_state::mapcntl_r()
 
 void tek440x_state::mapcntl_w(u8 data)
 {
-	LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, 5));
-	LOG("mapcntl_w write_enable %2d\n", BIT(data, 6));
+	LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, MAP_VM_ENABLE));
+	LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
 	LOG("mapcntl_w pte PID    0x%02x\n", data );
 	
-	if (BIT(data, 5))
+	if (BIT(data, MAP_VM_ENABLE))
 		m_map_view.select(0);
 	else
 		m_map_view.disable();
-
-	if (BIT(data, 6))
-		data &= 0xf7;
 
 	m_map_control = data;
 	
@@ -313,10 +349,14 @@ void tek440x_state::mapcntl_w(u8 data)
 
 u8 tek440x_state::videocntl_r()
 {
-	m_videocntl |= 8;
-//	(m_videocntl & -16) | ((m_videocntl + 1) & 15);
+	int ans = m_videocntl;
 	
-	return m_videocntl;	// this is what its looking for, what does it mean?
+	if (m_screen->vblank())
+		ans |= 0x10;					// pretty sure this is VBL indicator; selftest looks for turning on and off within 2^15 cycles
+	else
+		ans |= 0x40 + 0x20;		// no idea what these are; selftest looks for turning on and off within 0x200000 cycles
+	
+	return ans;
 }
 
 void tek440x_state::videocntl_w(u8 data)
@@ -491,12 +531,13 @@ void tek440x_state::tek4404(machine_config &config)
 	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
-	screen.set_screen_update(FUNC(tek440x_state::screen_update));
-	screen.set_palette("palette");
-	screen.screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
+	//screen_device &m_screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
+	m_screen->set_screen_update(FUNC(tek440x_state::screen_update));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	mos6551_device &aica(MOS6551(config, "aica", 40_MHz_XTAL / 4 / 10));
