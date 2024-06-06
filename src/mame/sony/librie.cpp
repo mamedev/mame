@@ -41,6 +41,8 @@ Skeleton driver for Sony Librie e-Books.
                                                       | |FLASH |   |_______|   |
                                                       | |______|               |
                                                       |________________________|
+
+   CXD3452GA is the MS I/F CONTROLLER, according to the PRS-500 Service Manual (also uses this chip).
 */
 
 #include "emu.h"
@@ -95,7 +97,6 @@ void librie_state::ebx5003(machine_config &config)
 	// TODO: Apollo 1.18 T6TW8XBG-001 e-Ink screen controller
 
 	SPEAKER(config, "speaker").front_center();
-	// TODO: Is CXD3452GA the audio chip?
 
 	H83002(config, m_mcu, 66'000'000); // Actually an Hitachi H8/3802 HD6473802FP. Unknown clock
 }
