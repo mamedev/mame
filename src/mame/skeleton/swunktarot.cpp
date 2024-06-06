@@ -102,6 +102,8 @@ private:
 
 	void data_bank_w(offs_t offset, u8 data);
 
+	INTERRUPT_GEN_MEMBER(vblank_irq_cb);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -148,9 +150,10 @@ void anoworld_state::main_program_map(address_map &map)
 void anoworld_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map.unmap_value_high();
 
 	//map(0x00, 0x03).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // TODO: maybe
-	//map(0x10, 0x13).rw ???
+	//map(0x10, 0x13).rw <unlisted> irq controller?
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	// map(0x30, 0x33).rw // ppi 0
 	// map(0x40, 0x43).rw // ppi 1
@@ -247,14 +250,26 @@ void anoworld_state::machine_start()
 	m_audiobank->set_entry(1);
 }
 
+/*
+ * Irq table:
+ * $+10 writes to $9e61
+ * $+20 likely ctc0
+ * $+22 likely ctc1
+ * $+24 writes to $86a9
+ * $+26 writes to $9e65
+ */
+INTERRUPT_GEN_MEMBER(anoworld_state::vblank_irq_cb)
+{
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x24);
+}
+
 
 void anoworld_state::unktarot(machine_config &config)
 {
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &anoworld_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &anoworld_state::main_io_map);
-	// FIXME: nope, runs in IM 2
-	//m_maincpu->set_vblank_int("screen", FUNC(anoworld_state::irq0_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(anoworld_state::vblank_irq_cb));
 
 	// TODO: how does this work? does it use the same ROM as the main CPU?
 	Z80(config, "subcpu", 4_MHz_XTAL).set_disable();
