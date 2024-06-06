@@ -107,7 +107,6 @@ private:
 	void memory_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 map_r(offs_t offset);
 	void map_w(offs_t offset, u16 data, u16 mem_mask);
-	u8 nomem_r(offs_t offset);
 	u8 mapcntl_r();
 	void mapcntl_w(u8 data);
 	void sound_w(u8 data);
@@ -218,16 +217,6 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
  *  CPU memory handlers
  *
  *************************************/
-u8 tek440x_state::nomem_r(offs_t offset)
-{
-		LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_maincpu->set_buserror_details(offset << 1, 0, m_maincpu->get_fc());
-		
-		return 0;
-}
-
 u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 {
 	if (m_boot)
@@ -235,8 +224,12 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 	const offs_t offset0 = offset;
 	if (BIT(m_map_control, 5))
+	{
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
-	if (offset < 0x300000 && offset >= 0x200000)				// && !machine().side_effects_disabled())
+	}
+
+	// NB byte memory limit, offset is *word* offset
+	if (offset < (0x300000>>1) && offset >= (0x200000>>1) && !machine().side_effects_disabled())
 	{
 		LOG("bus error: read: %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -251,8 +244,25 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const offs_t offset0 = offset;
 	if (BIT(m_map_control, 5))
+	{
+		if (BIT(m_map[offset >> 11], 14) == 0)
+		{
+			LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
+			
+			m_map_control |= 0x40;	// BlockAccess
+			m_map_control |= 0x80;	// cpuWr
+			return;
+		}
+
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
-	if (offset < 0x300000 && offset >= 0x200000 && !machine().side_effects_disabled())
+		m_map[offset >> 11] |= 0x8000;
+	}
+
+	// NB byte memory limit, offset is *word* offset
+	if (offset < (0x300000>>1) && offset >= (0x200000>>1) && !machine().side_effects_disabled())
 	{
 		LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -394,7 +404,6 @@ void tek440x_state::logical_map(address_map &map)
 void tek440x_state::physical_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).ram().share("mainram");						// +1MB RAM option;
-	map(0x200000, 0x5fffff).r(FUNC(tek440x_state::nomem_r));	// sizing installed memory requires generating buserr
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
