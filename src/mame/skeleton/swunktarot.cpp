@@ -33,6 +33,10 @@ video output
 18 MHz osc
 
 TODO:
+- Identify irq sources ($24 vblank irq, $20 or $22 CTC?);
+- Identify how sub CPU is supposed to run;
+- Data ROM bank;
+
 */
 
 #include "emu.h"
@@ -114,14 +118,8 @@ void swunktarot_state::main_program_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xafff).ram();
-	map(0xb000, 0xbfff).ram();
-}
-
-void swunktarot_state::audio_program_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x47ff).ram();
-	map(0xc000, 0xffff).bankr(m_audiobank);
+	map(0xb000, 0xbfff).ram(); // interleaved video tilemap + palette words (RGB444)? Or banked thru port $42 bit 4?
+	map(0xc000, 0xffff).rom().region("data", 0x0c0000);
 }
 
 void swunktarot_state::main_io_map(address_map &map)
@@ -129,11 +127,20 @@ void swunktarot_state::main_io_map(address_map &map)
 	map.global_mask(0xff);
 
 	//map(0x00, 0x03).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // TODO: maybe
-	//map(0x10, 0x13).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // TODO: maybe
+	//map(0x10, 0x13).rw ???
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	// map(0x31, 0x31).w //??
-	// map(0x33, 0x33).w //??
-	// map(0x40, 0x43).w //??
+	// map(0x30, 0x33).rw // ppi 0
+	// map(0x40, 0x43).rw // ppi 1?
+    // map(0x40, 0x40).w data ROM bank at least
+	// map(0x50, 0x50).r bits 4 and 5 checked in service routines $20 and $22
+    // map(0x60, 0x60).r
+}
+
+void swunktarot_state::audio_program_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0xc000, 0xffff).bankr(m_audiobank);
 }
 
 void swunktarot_state::audio_io_map(address_map &map)
@@ -212,11 +219,13 @@ void swunktarot_state::unktarot(machine_config &config)
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &swunktarot_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &swunktarot_state::main_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(swunktarot_state::irq0_line_hold));
+	// FIXME: nope, runs in IM 2
+	//m_maincpu->set_vblank_int("screen", FUNC(swunktarot_state::irq0_line_hold));
 
-	Z80(config, "subcpu", 4_MHz_XTAL).set_disable(); // TODO: how does this work? does it use the same ROM as the main CPU?
+	// TODO: how does this work? does it use the same ROM as the main CPU?
+	Z80(config, "subcpu", 4_MHz_XTAL).set_disable();
 
-	Z80(config, m_audiocpu, 4_MHz_XTAL);
+	Z80(config, m_audiocpu, 4_MHz_XTAL).set_disable();
 	m_audiocpu->set_addrmap(AS_PROGRAM, &swunktarot_state::audio_program_map);
 	m_audiocpu->set_addrmap(AS_IO, &swunktarot_state::audio_io_map);
 
@@ -305,4 +314,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?, unktarot, 0, unktarot, unktarot, swunktarot_state, empty_init, ROT0, "Sunwise", "unknown Sunwise tarot card game", MACHINE_IS_SKELETON )
+GAME( 1989, unktarot, 0, unktarot, unktarot, swunktarot_state, empty_init, ROT0, "Sunwise", "Another World (Japan)", MACHINE_IS_SKELETON ) // title screen GFXs in region 1 at 0x3051 onward
