@@ -45,6 +45,7 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/msm6242.h"
 #include "machine/z80ctc.h"
+#include "machine/z80dma.h"
 #include "sound/ymopl.h"
 
 #include "emupal.h"
@@ -55,13 +56,15 @@ TODO:
 
 // configurable logging
 #define LOG_PORTS     (1U << 1)
+#define LOG_DMA       (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+//#define VERBOSE (LOG_GENERAL | LOG_PORTS | LOG_DMA)
 #define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 
 #define LOGPORTS(...)     LOGMASKED(LOG_PORTS,     __VA_ARGS__)
+#define LOGDMA(...)       LOGMASKED(LOG_DMA,       __VA_ARGS__)
 
 
 namespace {
@@ -73,6 +76,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
+		, m_dma(*this, "dma")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_databank(*this, "databank")
@@ -86,8 +90,9 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<z80dma_device> m_dma;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -102,7 +107,11 @@ private:
 
 	void data_bank_w(offs_t offset, u8 data);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq_cb);
+	void dma_busreq_w(int state);
+	u8 dma_memory_r(offs_t offset);
+	void dma_memory_w(offs_t offset, u8 data);
+	u8 dma_io_r(offs_t offset);
+	void dma_io_w(offs_t offset, u8 data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -120,6 +129,38 @@ void anoworld_state::data_bank_w(offs_t offset, u8 data)
 	// guess, also bit 6 actively used
 	m_databank->set_entry(data & 0x3f);
 	LOG("data_bank_w: %02x\n", data);
+}
+
+void anoworld_state::dma_busreq_w(int state)
+{
+	// HACK: grant bus request immediately
+	LOGDMA("dma_busreq_w %d\n", state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dma->bai_w(state);
+}
+
+u8 anoworld_state::dma_memory_r(offs_t offset)
+{
+	LOGDMA("dma_memory_r %04X\n", offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+void anoworld_state::dma_memory_w(offs_t offset, u8 data)
+{
+	LOGDMA("dma_memory_w %04X <- %02X\n", offset, data);
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+u8 anoworld_state::dma_io_r(offs_t offset)
+{
+	LOGDMA("dma_io_r %04X\n", offset);
+	return m_maincpu->space(AS_IO).read_byte(offset);
+}
+
+void anoworld_state::dma_io_w(offs_t offset, u8 data)
+{
+	LOGDMA("dma_io_w %04X <- %02X\n", offset, data);
+	m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
 void anoworld_state::main_program_map(address_map &map)
@@ -152,15 +193,21 @@ void anoworld_state::main_io_map(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	//map(0x00, 0x03).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // TODO: maybe
-	//map(0x10, 0x13).rw <unlisted> irq controller?
+	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x10, 0x13).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	// map(0x30, 0x33).rw // ppi 0
-	// map(0x40, 0x43).rw // ppi 1
-	map(0x40, 0x40).w(FUNC(anoworld_state::data_bank_w));
-	// map(0x50, 0x50).r bits 4 and 5 checked in service routines $20 and $22
-	// map(0x60, 0x60).r
+	map(0x30, 0x33).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50, 0x50).noprw(); // ? (bits 4 and 5 checked in service routines $20 and $22)
+	map(0x60, 0x60).noprw(); // ?
 }
+
+static const z80_daisy_config main_daisy_chain[] =
+{
+	{ "dma" },
+	{ "ctc0" },
+	{ nullptr }
+};
 
 void anoworld_state::audio_program_map(address_map &map)
 {
@@ -252,16 +299,12 @@ void anoworld_state::machine_start()
 
 /*
  * Irq table:
- * $+10 writes to $9e61
- * $+20 likely ctc0
- * $+22 likely ctc1
- * $+24 writes to $86a9
- * $+26 writes to $9e65
+ * $+10 (DMA) writes to $9e61
+ * $+20 (CTC ch0, counter mode) increments or decrements $9e88
+ * $+22 (CTC ch1, counter mode) increments or decrements $9e8a
+ * $+24 (CTC ch2, timer mode) writes to $86a9
+ * $+26 (CTC ch3, counter mode) writes to $9e65
  */
-INTERRUPT_GEN_MEMBER(anoworld_state::vblank_irq_cb)
-{
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x24);
-}
 
 
 void anoworld_state::unktarot(machine_config &config)
@@ -269,7 +312,7 @@ void anoworld_state::unktarot(machine_config &config)
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &anoworld_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &anoworld_state::main_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(anoworld_state::vblank_irq_cb));
+	m_maincpu->set_daisy_config(main_daisy_chain);
 
 	// TODO: how does this work? does it use the same ROM as the main CPU?
 	Z80(config, "subcpu", 4_MHz_XTAL).set_disable();
@@ -279,10 +322,15 @@ void anoworld_state::unktarot(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &anoworld_state::audio_io_map);
 
 	z80ctc_device &ctc0(Z80CTC(config, "ctc0", 4_MHz_XTAL));
-	ctc0.intr_callback().set([this] (int state) { LOGPORTS("%s: CTC0 INTR handler %d\n", machine().describe_context(), state); });
-	ctc0.zc_callback<0>().set([this] (int state) { LOGPORTS("%s: CTC0 ZC0 handler %d\n", machine().describe_context(), state); });
-	ctc0.zc_callback<1>().set([this] (int state) { LOGPORTS("%s: CTC0 ZC1 handler %d\n", machine().describe_context(), state); });
-	ctc0.zc_callback<2>().set([this] (int state) { LOGPORTS("%s: CTC0 ZC2 handler %d\n", machine().describe_context(), state); });
+	ctc0.intr_callback().set_inputline("maincpu", 0);
+
+	Z80DMA(config, m_dma, 4_MHz_XTAL);
+	m_dma->out_busreq_callback().set(FUNC(anoworld_state::dma_busreq_w));
+	m_dma->out_int_callback().set_inputline("maincpu", 0);
+	m_dma->in_mreq_callback().set(FUNC(anoworld_state::dma_memory_r));
+	m_dma->out_mreq_callback().set(FUNC(anoworld_state::dma_memory_w));
+	m_dma->in_iorq_callback().set(FUNC(anoworld_state::dma_io_r));
+	m_dma->out_iorq_callback().set(FUNC(anoworld_state::dma_io_w));
 
 	z80ctc_device &ctc1(Z80CTC(config, "ctc1", 4_MHz_XTAL));
 	ctc1.intr_callback().set([this] (int state) { LOGPORTS("%s: CTC1 INTR handler %d\n", machine().describe_context(), state); });
@@ -299,15 +347,12 @@ void anoworld_state::unktarot(machine_config &config)
 	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
 
 	i8255_device &ppi1(I8255A(config, "ppi1")); // NEC D8255AC-2
-	ppi1.in_pa_callback().set([this] () { LOGPORTS("%s: PPI1 port A in\n", machine().describe_context()); return uint8_t(0); });
-	ppi1.in_pb_callback().set([this] () { LOGPORTS("%s: PPI1 port B in\n", machine().describe_context()); return uint8_t(0); });
-	ppi1.in_pc_callback().set([this] () { LOGPORTS("%s: PPI1 port C in\n", machine().describe_context()); return uint8_t(0); });
-	ppi1.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port A out %02x\n", machine().describe_context(), data); });
+	ppi1.out_pa_callback().set(FUNC(anoworld_state::data_bank_w));
 	ppi1.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port B out %02x\n", machine().describe_context(), data); });
 	ppi1.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port C out %02x\n", machine().describe_context(), data); });
 
 	msm6242_device &rtc(MSM6242(config, "rtc", 32.768_kHz_XTAL));
-	rtc.out_int_handler().set([this] (int state) { LOGPORTS("%s: RTC INT handler %d\n", machine().describe_context(), state); });
+	rtc.out_int_handler().set("ctc0", FUNC(z80ctc_device::trg3)); // source guessed
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
