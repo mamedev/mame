@@ -834,11 +834,11 @@ void wheelfir_state::kongball(machine_config& config)
 
 
 ROM_START( wheelfir )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tch1.u19", 0x00001, 0x80000, CRC(33bbbc67) SHA1(c2ecc0ab522ee442076ea7b9536aee6e1fad0540) )
 	ROM_LOAD16_BYTE( "tch2.u21", 0x00000, 0x80000, CRC(ed6b9e8a) SHA1(214c5aaf55963a219db33dd5d530492e09ad5e07) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	ROM_LOAD16_BYTE( "tch3.u83",  0x00001, 0x80000, CRC(43c014a6) SHA1(6c01a08dda204f36e8768795dd5d405576a49140) )
 	ROM_LOAD16_BYTE( "tch11.u65", 0x00000, 0x80000, CRC(fc894b2e) SHA1(ebe6d1adf889731fb6f53b4ce5f09c60e2aefb97) )
 
@@ -854,15 +854,21 @@ ROM_START( wheelfir )
 
 	ROM_REGION16_BE(0x80, "eeprom", 0)
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "1_gal22v10.u24", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "2_gal22v10.u23", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
 
 ROM_START( pwball )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "pball.u19", 0x00001, 0x80000, CRC(52f433ce) SHA1(f25c43188c320636d69fec2de2605303ef79a2f8) )
 	ROM_LOAD16_BYTE( "pball.u21", 0x00000, 0x80000, CRC(c0250bc8) SHA1(c7ad2dd0e7fde337a638b09fd325c0cfe1b0b966) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	ROM_LOAD16_BYTE( "pball.u63", 0x00001, 0x80000, CRC(ab8bba31) SHA1(cc89d1c8b5998b712161dda4283856acd8d91723) )
 	ROM_LOAD16_BYTE( "pball.u65", 0x00000, 0x80000, CRC(f2583796) SHA1(f044a575ae3dafaac8ad05aee6d4b672166af969) )
 
@@ -881,14 +887,21 @@ ROM_START( pwball )
 	ROM_LOAD( "pball.u203",0x580000, 0x80000, CRC(89605b33) SHA1(6fb4ebacfd686266142317b3f864705d90ce97ca) )
 	ROM_LOAD( "pball.u204",0x600000, 0x80000, CRC(efddd379) SHA1(903a931a7012f16df516b3cbec8b689a4fc0ba9c) )
 	// u205 is empty (missing or unused?)
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "1_gal22v10.u24", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "2_gal22v10.u23", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
+
 ROM_START( kongball )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "kong.u19", 0x00001, 0x80000, CRC(0283df0a) SHA1(559b547127728c78ba66191278bba4b4cce37eba) )
 	ROM_LOAD16_BYTE( "kong.u21", 0x00000, 0x80000, CRC(ca6ad0da) SHA1(d5e07d7827587263b8d3028ab006dc0be454a7c7) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	// these were not present on the PCB (empty sockets) was sound never programmed, or were they removed at some point?
 	ROM_LOAD16_BYTE( "kong.u63", 0x00001, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "kong.u65", 0x00000, 0x80000, NO_DUMP )
@@ -903,15 +916,21 @@ ROM_START( kongball )
 	ROM_LOAD( "kong.u58", 0x300000, 0x80000, CRC(17818ee8) SHA1(7e857f7c5c146cfcdaa9b1077c63bbee1d143438) )
 	ROM_LOAD( "kong.u59", 0x380000, 0x80000, CRC(6d35e911) SHA1(d37bc2d364ced0d828598af9b2fe7abf6ffb4f82) )
 	ROM_LOAD( "kong.u200",0x400000, 0x80000, CRC(ec552e97) SHA1(7a9a06ff77ef7fc51782caa4d4514864bf8099e7) )
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "1_gal22v10.u24", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "2_gal22v10.u23", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "kongball_mump3_275f_palce16v8h.u40", 0x000, 0x117, CRC(c6cf0b71) SHA1(c6581f87a4a97c1aeef91f6444c90fc5f4a32e57) )
+	// There's no PLD at U73 on Kong Ball
 ROM_END
 
 
 ROM_START( radendur )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "endu.u19", 0x00001, 0x80000, CRC(d24ca61c) SHA1(64d2648959579d35fbf4c8479c0ff75781d28146) )
 	ROM_LOAD16_BYTE( "endu.u21", 0x00000, 0x80000, CRC(45244675) SHA1(69be2eca3548644f97b9f6956bb3ff979740b1e4) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	ROM_LOAD16_BYTE( "endu.u63", 0x00001, 0x80000, CRC(43c35368) SHA1(62167a434bfe00825f2f97ecadd0af3e2d2b63f2) )
 	ROM_LOAD16_BYTE( "endu.u65", 0x00000, 0x80000, CRC(25259894) SHA1(b260324760dba1595ab8bd53e1bbc20c04b640dd) )
 
@@ -930,6 +949,12 @@ ROM_START( radendur )
 	ROM_LOAD( "endu.u203",0x580000, 0x80000, CRC(e6361a27) SHA1(826be3b326e68c3b7c0f5c3d84993a971b32f84e) )
 	ROM_LOAD( "endu.u204",0x600000, 0x80000, CRC(0db97872) SHA1(56e38a9034082c3ceb78c0f3aba6125ce6fabd49) )
 	ROM_LOAD( "endu.u205",0x680000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) ) // blank ROM (intentional)
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "radenduro_2_d579_gal22v10.u24", 0x000, 0x2e5, CRC(ebe162d0) SHA1(910e3733df70db4df704f3e105ed27eaa4c32ae6) ) // Checksum does not match chip label, buf verified OK
+	ROM_LOAD( "radenduro_gal22v10b.u23",       0x000, 0x2e5, CRC(f1b0b2b7) SHA1(f85c87c7956813fe78f399694dc999877b1dcb60) )
+	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
