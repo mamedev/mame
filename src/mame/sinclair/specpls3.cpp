@@ -312,6 +312,7 @@ void specpls3_state::video_start()
 	spectrum_128_state::video_start();
 	m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
 	m_contention_offset = 1;
+	m_border4t_render_at = 5;
 }
 
 /* ports are not decoded full.
