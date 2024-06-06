@@ -57,6 +57,7 @@ TODO:
 #define LOG_PORTS     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 
@@ -65,14 +66,16 @@ TODO:
 
 namespace {
 
-class swunktarot_state : public driver_device
+class anoworld_state : public driver_device
 {
 public:
-	swunktarot_state(const machine_config &mconfig, device_type type, const char *tag)
+	anoworld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
+		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_databank(*this, "databank")
 		, m_audiobank(*this, "audiobank")
 	{
 	}
@@ -85,44 +88,64 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	required_memory_bank m_databank;
 	required_memory_bank m_audiobank;
+	std::unique_ptr<uint8_t[]> m_paletteram;
 
 	void main_program_map(address_map &map) ATTR_COLD;
 	void audio_program_map(address_map &map) ATTR_COLD;
 	void main_io_map(address_map &map) ATTR_COLD;
 	void audio_io_map(address_map &map) ATTR_COLD;
 
+	void data_bank_w(offs_t offset, u8 data);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
-uint32_t swunktarot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t anoworld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 
 	return 0;
 }
 
-
-void swunktarot_state::machine_start()
+void anoworld_state::data_bank_w(offs_t offset, u8 data)
 {
-	m_audiobank->configure_entries(0, 32, memregion("audiocpu")->base(), 0x4000);
-	m_audiobank->set_entry(1);
+	// guess, also bit 6 actively used
+	m_databank->set_entry(data & 0x3f);
+	LOG("data_bank_w: %02x\n", data);
 }
 
-
-void swunktarot_state::main_program_map(address_map &map)
+void anoworld_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xafff).ram();
-	map(0xb000, 0xbfff).ram(); // interleaved video tilemap + palette words (RGB444)? Or banked thru port $42 bit 4?
-	map(0xc000, 0xffff).rom().region("data", 0x0c0000);
+//  map(0xb000, 0xbfff).ram(); // interleaved video tilemap + palette words (RGB444)? Or banked thru port $42 bit 4?
+	map(0xb000, 0xbfff).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_paletteram[bitswap<12>(offset ^ 2, 1, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0)];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			const u16 pal_offset = bitswap<12>(offset ^ 2, 1, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0);
+			m_paletteram[pal_offset] = data;
+			const u16 datax = m_paletteram[pal_offset & ~1] | (m_paletteram[pal_offset | 1] << 8);
+			const u8 r = (datax >> 0) & 0xf;
+			const u8 g = (datax >> 4) & 0xf;
+			const u8 b = (datax >> 8) & 0xf;
+
+			m_palette->set_pen_color(pal_offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
+		})
+	);
+
+	map(0xc000, 0xffff).bankr(m_databank);
 }
 
-void swunktarot_state::main_io_map(address_map &map)
+void anoworld_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
@@ -130,20 +153,20 @@ void swunktarot_state::main_io_map(address_map &map)
 	//map(0x10, 0x13).rw ???
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	// map(0x30, 0x33).rw // ppi 0
-	// map(0x40, 0x43).rw // ppi 1?
-    // map(0x40, 0x40).w data ROM bank at least
+	// map(0x40, 0x43).rw // ppi 1
+	map(0x40, 0x40).w(FUNC(anoworld_state::data_bank_w));
 	// map(0x50, 0x50).r bits 4 and 5 checked in service routines $20 and $22
-    // map(0x60, 0x60).r
+	// map(0x60, 0x60).r
 }
 
-void swunktarot_state::audio_program_map(address_map &map)
+void anoworld_state::audio_program_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0xc000, 0xffff).bankr(m_audiobank);
 }
 
-void swunktarot_state::audio_io_map(address_map &map)
+void anoworld_state::audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
@@ -210,24 +233,35 @@ const gfx_layout gfx_8x8x4 =
 };
 
 static GFXDECODE_START( gfx_unktarot )
-	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x1, 0, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4, 0, 16 )
+	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x1, 0, 16 ) // TODO: identify how it gathers palette
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4, 0, 16 * 8 )
 GFXDECODE_END
 
-void swunktarot_state::unktarot(machine_config &config)
+void anoworld_state::machine_start()
+{
+	m_paletteram = make_unique_clear<uint8_t[]>(0x1000);
+
+	m_databank->configure_entries(0, 0x40, memregion("data")->base(), 0x4000);
+	m_databank->set_entry(0);
+	m_audiobank->configure_entries(0, 32, memregion("audiocpu")->base(), 0x4000);
+	m_audiobank->set_entry(1);
+}
+
+
+void anoworld_state::unktarot(machine_config &config)
 {
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &swunktarot_state::main_program_map);
-	m_maincpu->set_addrmap(AS_IO, &swunktarot_state::main_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &anoworld_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &anoworld_state::main_io_map);
 	// FIXME: nope, runs in IM 2
-	//m_maincpu->set_vblank_int("screen", FUNC(swunktarot_state::irq0_line_hold));
+	//m_maincpu->set_vblank_int("screen", FUNC(anoworld_state::irq0_line_hold));
 
 	// TODO: how does this work? does it use the same ROM as the main CPU?
 	Z80(config, "subcpu", 4_MHz_XTAL).set_disable();
 
 	Z80(config, m_audiocpu, 4_MHz_XTAL).set_disable();
-	m_audiocpu->set_addrmap(AS_PROGRAM, &swunktarot_state::audio_program_map);
-	m_audiocpu->set_addrmap(AS_IO, &swunktarot_state::audio_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &anoworld_state::audio_program_map);
+	m_audiocpu->set_addrmap(AS_IO, &anoworld_state::audio_io_map);
 
 	z80ctc_device &ctc0(Z80CTC(config, "ctc0", 4_MHz_XTAL));
 	ctc0.intr_callback().set([this] (int state) { LOGPORTS("%s: CTC0 INTR handler %d\n", machine().describe_context(), state); });
@@ -265,11 +299,11 @@ void swunktarot_state::unktarot(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(swunktarot_state::screen_update));
+	screen.set_screen_update(FUNC(anoworld_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_unktarot);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unktarot);
 
-	PALETTE(config, "palette").set_entries(0x100); // TODO
+	PALETTE(config, m_palette).set_entries(0x800); //.set_format(palette_device::xRGB_444, 0x800);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -314,4 +348,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, unktarot, 0, unktarot, unktarot, swunktarot_state, empty_init, ROT0, "Sunwise", "Another World (Japan)", MACHINE_IS_SKELETON ) // title screen GFXs in region 1 at 0x3051 onward
+GAME( 1989, unktarot, 0, unktarot, unktarot, anoworld_state, empty_init, ROT0, "Sunwise", "Another World (Japan)", MACHINE_IS_SKELETON ) // title screen GFXs in region 1 at 0x3051 onward
