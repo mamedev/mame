@@ -38,10 +38,11 @@ private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 	u8 p5_r();
 	void p5_w(u8 data);
+	u8 sci_ssr0_r();
 
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mb90641_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 
 	u8 m_p5;
@@ -72,12 +73,17 @@ void dpsv55_state::p5_w(u8 data)
 	m_p5 = data;
 }
 
+u8 dpsv55_state::sci_ssr0_r()
+{
+	return 0x18;
+}
+
 
 void dpsv55_state::mem_map(address_map &map)
 {
-	map(0x000001, 0x000001).rw(m_lcdc, FUNC(hd44780_device::db_r), FUNC(hd44780_device::db_w));
-	map(0x000005, 0x000005).rw(FUNC(dpsv55_state::p5_r), FUNC(dpsv55_state::p5_w));
-	map(0x000023, 0x000023).nopr();
+	map(0x000011, 0x000011).nopw();
+	map(0x000022, 0x000022).noprw();
+	map(0x000023, 0x000023).r(FUNC(dpsv55_state::sci_ssr0_r));
 	map(0xfc0000, 0xfc7fff).mirror(0x18000).ram().share("nvram"); // CS1
 	map(0xfe0000, 0xffffff).rom().region("eprom", 0); // CS0
 }
@@ -90,6 +96,10 @@ void dpsv55_state::dpsv55(machine_config &config)
 {
 	MB90641A(config, m_maincpu, 4_MHz_XTAL); // MB90641APF-G-105BND
 	m_maincpu->set_addrmap(AS_PROGRAM, &dpsv55_state::mem_map);
+	m_maincpu->read_pdr1().set(m_lcdc, FUNC(hd44780_device::db_r));
+	m_maincpu->write_pdr1().set(m_lcdc, FUNC(hd44780_device::db_w));
+	m_maincpu->read_pdr5().set(FUNC(dpsv55_state::p5_r));
+	m_maincpu->write_pdr5().set(FUNC(dpsv55_state::p5_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CY62256LL-70SNC-T2 + 3V lithium battery + M62021FP-600C reset generator + M5239L voltage detector
 

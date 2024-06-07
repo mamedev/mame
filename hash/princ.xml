@@ -4,22 +4,30 @@
 license:CC0-1.0
 
 Known undumped titles:
-New Kazoku de Nengajou
+- New Kazoku de Nengajou (https://www.youtube.com/watch?v=1eZ72yNZrqc)
+
+Most (all?) carts share PCB markings: Prin-C E100-T002-11.
+
+PCBs have surface mount pads for two chips, but only one of them is populated:
+- Mask ROM carts use U1;
+- Memory Cassette uses U2 with flash ROM (Fujitsu 29F002T-90);
 -->
 
 <softwarelist name="princ" description="Tomy Prin-C cartridges">
-	<software name="bbmaru" supported="no">
+	<software name="bbmaru" supported="yes">
 		<description>Bad Badtz-Maru</description>
 		<year>1996</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="IRC #02"/>
 		<part name="rom" interface="princ_cart">
+			<feature name="u1" value="TC534000CF" />
 			<dataarea name="rom" size="0x80000">
 				<rom name="01.bin" size="0x80000" crc="b91a4cb6" sha1="21fcfd16a821796fdf38fe0a23dca93b85fd3339"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="doraemon" supported="no">
+	<software name="doraemon" supported="yes">
 		<description>Doraemon</description> <!-- Character Rom Cassette EX series -->
 		<year>1998</year>
 		<publisher>Tomy</publisher>
@@ -30,58 +38,68 @@ New Kazoku de Nengajou
 		</part>
 	</software>
 
-	<software name="hkitty" supported="no">
+	<software name="hkitty" supported="yes">
 		<description>Hello Kitty</description>
 		<year>1997</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="IRC #04"/>
 		<part name="rom" interface="princ_cart">
+			<feature name="u1" value="TC534000CF" />
 			<dataarea name="rom" size="0x80000">
 				<rom name="01.bin" size="0x80000" crc="4f39e051" sha1="4b21bb88797d4edabcdde7c66933f275e85f3dbc"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="hobik" supported="no">
+	<software name="hobik" supported="yes">
 		<description>Hobby Club</description>
-		<year>1996</year>
+		<year>1997</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ホビークラブ"/>
+		<info name="serial" value="IRC #06"/>
 		<part name="rom" interface="princ_cart">
+			<feature name="u1" value="TC534000CF" />
 			<dataarea name="rom" size="0x80000">
 				<rom name="01.bin" size="0x80000" crc="ee9f4328" sha1="0a1bb00e261a1076f38cbb2a1337cc146990ed5b"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kdn" supported="no">
+	<software name="kdn" supported="yes">
 		<description>Kazoku de Nengajou</description>
-		<year>1996</year>
+		<year>1997</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="家族で年賀状"/>
+		<info name="serial" value="IRC #05"/>
 		<part name="rom" interface="princ_cart">
+			<feature name="u1" value="TC534000CF" />
 			<dataarea name="rom" size="0x80000">
 				<rom name="01.bin" size="0x80000" crc="c6c8f28b" sha1="e182f066084f483f49452f9a8c3b5aa21e404274"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kno" supported="no">
+	<software name="kno" supported="yes">
 		<description>Kodomo no Omocha</description>
 		<year>1996</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="こどものおもちゃ"/>
+		<info name="serial" value="IRC #03"/>
 		<part name="rom" interface="princ_cart">
+			<feature name="u1" value="TC534000CF" />
 			<dataarea name="rom" size="0x80000">
 				<rom name="01.bin" size="0x80000" crc="353d4690" sha1="03e7da042a403e7496ea22c11d9f404cf1b7545c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pochacco" supported="no">
+	<software name="pochacco" supported="yes">
 		<description>Pochacco</description>
 		<year>1996</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="IRC #01"/>
 		<part name="rom" interface="princ_cart">
+			<feature name="u1" value="TC534000CF" />
 			<dataarea name="rom" size="0x80000">
 				<rom name="01.bin" size="0x80000" crc="8cac047a" sha1="bfd26093ff30781f915eca2d61c6025ce4bb7652"/>
 			</dataarea>

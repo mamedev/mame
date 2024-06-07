@@ -136,7 +136,7 @@ void leland_80186_sound_device::i80186_tmr1_w(int state)
 			}
 		}
 	}
-	set_clock_line(7, state);
+	set_clock_line(3, state);
 }
 
 void leland_80186_sound_device::device_add_mconfig(machine_config &config)

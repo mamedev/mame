@@ -1641,10 +1641,22 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(larana)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("inder_sa_mod_la_rana_0_050790.bin", 0x0000, 0x2000, CRC(ba94618f) SHA1(0fd6ffe9a6ef514c1dbf8856b881a54bf184e863))
+	ROM_LOAD("inder_sa_mod_la_rana_0_050790.bin", 0x00000, 0x02000, CRC(ba94618f) SHA1(0fd6ffe9a6ef514c1dbf8856b881a54bf184e863))
 
 	ROM_REGION(0x2000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x0000, 0x2000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
+	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x00000, 0x02000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
+
+	ROM_REGION(0x10000, "audiorom", ROMREGION_ERASEFF)
+	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
+ROM_END
+
+// This sets gives, by default, 2 launches per coin. Other changes are unknown.
+ROM_START(larana2)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("larana_alt.bin",                    0x00000, 0x02000, CRC(81a6c8c3) SHA1(e3678e18704d0be0a1e9ece178babec7d728e510))
+
+	ROM_REGION(0x2000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x00000, 0x02000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
 
 	ROM_REGION(0x10000, "audiorom", ROMREGION_ERASEFF)
 	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
@@ -1700,13 +1712,14 @@ GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "In
 GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // new CPU board, sound board with msm5205
-GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_0, ROT0, "Inder",    "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder",    "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder",    "Corsario",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder",    "Mundial 90",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder",    "Atleta",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder",    "La Rana",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder",    "250 CC",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  pinmoonl, 0,      inder, pinmoonl, inder_state, init_0, ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  pinclown, 0,      inder, pinclown, inder_state, init_1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  corsario, 0,      inder, corsario, inder_state, init_1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  mundial,  0,      inder, mundial,  inder_state, init_1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  atleta,   0,      inder, atleta,   inder_state, init_1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  larana,   0,      inder, larana,   inder_state, init_0, ROT0, "Inder", "La Rana (set 1)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  larana2,  larana, inder, larana,   inder_state, init_0, ROT0, "Inder", "La Rana (set 2)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  ind250cc, 0,      inder, ind250cc, inder_state, init_1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // Unknown sound hardware, unknown machine (using 'larana' inputs until proper ones are figured out).
 GAME(1991, indunkgam, 0, inder, larana, inder_state, init_0, ROT0, "Inder", "unknown gambling game on Inder pinball hardware", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

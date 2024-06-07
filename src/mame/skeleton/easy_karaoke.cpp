@@ -282,6 +282,20 @@ ROM_START( karatvst )
 ROM_END
 
 /*
+
+song list is unknown for the Japanese version as the titles aren't stored as ASCII in the flash ROM
+
+*/
+
+ROM_START( bkarast )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "sst37vf010.u9", 0x000000, 0x20000, CRC(a7c69fbb) SHA1(28ef698e63e76d9461b71649e4ee9c8f252f82e2) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_withspare.u8", 0x000000, 0x840000, CRC(7770996a) SHA1(cb6df756f88c1f5ff4bd202e7758586c03aff00e) )
+ROM_END
+
+/*
 The 'easykara' set has the following 10 songs built in.
 
 One Step Closer                             S Club Juniors
@@ -367,9 +381,12 @@ ROM_END
 // This is the original US release, there's no cartridge slot, but it has a NAND Flash inside, and in addition to 50 built-in songs, advertises
 // use of a (now defunct) www.onkeysongs.com service for downloading additional songs to the microphone via bundled PC software.
 CONS( 2002, karatvst,      0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_IS_SKELETON )
+// Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
+CONS( 2002, bkarast,       karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
+
+
 // There is also a 35 song US version
 // The "Memorex Star Singer Karaoke / MKS4001" is also made by IVL and boasts 50 built in songs, the casing is different, so it could differ from the standard version.
-// There is a Japanese version, KaraokeStation, put out by Bandai in 2002 with similar internals to the US version ( http://www.akihito.spawn.jp/20021026.karaokestation/ )
 
 // The European releases take cartridges rather than relying on a download service
 CONS( 2004, easykara,      karatvst,       0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )

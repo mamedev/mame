@@ -23,8 +23,8 @@ Battery
 
 Games :
 
-Parent Jack (おやジャック ) (C) 1989 Taito.
-Eibise                 (C) 1990 Taito.
+Parent Jack (ペアレントジャック) (C) 1989 Taito.
+Eibise (エイビス)                (C) 1990 Taito.
 
 
 TODO:

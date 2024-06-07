@@ -1106,7 +1106,7 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 //  FPR23718   - 2.06 factory only, most common version of NAOMI Net-DIMMs, have stock 2.03, IC label need verification
 //  ?            2.13 factory or update (NAOMI VF4)
 //  ?            2.17 factory or update (NAOMI VF4 Evolution)
-//  ?          - 3.01 added network boot support, supports Triforce and Chihiro
+//  FPR23905C  - 3.01 factory, added network boot support, supports Triforce and Chihiro
 //  FPR23905   - 3.03 factory or update (NAOMI WCCF)
 //  ?            3.12 factory only
 //  ?            3.17 latest known 3.xx version, factory or update (NAOMI VF4 Final Tuned or statndalone disks for Chihiro and Triforce)
@@ -1139,12 +1139,14 @@ ROM_START( dimm )
 	ROMX_LOAD( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "217_203.bin", "BIOS 4")
 	ROMX_LOAD( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "fpr23905.ic36", "BIOS 5")
-	ROMX_LOAD( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "317_312.bin", "BIOS 6")
-	ROMX_LOAD( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "401_203.bin", "BIOS 7")
-	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(5, "3.01", "BIOS 5")
+	ROMX_LOAD( "fpr23905c.ic36",  0x000000, 0x200000, CRC(ffffffff) SHA1(972b3b73aa1eabb1091e9096b57a7e5e1d0436d8), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "3.03", "BIOS 6")
+	ROMX_LOAD( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "317_312.bin", "BIOS 7")
+	ROMX_LOAD( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(8, "401_203.bin", "BIOS 8")
+	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(8))
 
 	// dynamically filled with data
 	ROM_REGION(0x1000, "pic", ROMREGION_ERASE00)

@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /************************************************************************************************
 
-    Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
+Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
 
-    Both systems don't interact at all, according to info on the net they just share the
-    same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
+Both systems don't interact at all, according to info on the net they just share the
+same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
 
-    TODO:
-    - Find 100% trusted info about it.
-    - inherit pce_state into x1twin_state
-    - Needs video mods
+TODO:
+- Find 100% trusted info about it.
+- Work out this to really be a middleground for both pce_state & x1twin_state
+- Needs video mods
 
 ************************************************************************************************/
 
@@ -443,8 +443,6 @@ void x1twin_state::x1twin(machine_config &config)
 	ppi.out_pa_callback().set(FUNC(x1_state::x1_porta_w));
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
-
-	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);

@@ -189,6 +189,7 @@
 
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "cpu/pic16x8x/pic16x8x.h"
 #include "machine/ds1207.h"
 #include "machine/ds2401.h"
 #include "machine/i2cmem.h"
@@ -552,6 +553,7 @@ void hotslots_state::hotslots_map_base(address_map &map)
 	map(0x00416001, 0x00416001).w("ssg", FUNC(ymz284_device::data_w));
 	map(0x00417001, 0x00417001).w("ssg", FUNC(ymz284_device::address_w));
 	map(0x00418000, 0x00418020).rw("rtc", FUNC(rtc72421_device::read), FUNC(rtc72421_device::write)).umask16(0x00ff);
+	map(0x0041a000, 0x0041a001).nopw(); // supervisor?
 }
 
 void hotslots_state::hotslots_map(address_map &map)
@@ -1100,6 +1102,11 @@ void hotslots_state::hotslots_pic54(machine_config &config)
 void hotslots_state::magicle(machine_config &config)
 {
 	hotslots_base(config);
+
+	pic16f84_device &pic(PIC16F84(config, "pic16f84", 4000000)); 
+	pic.set_config(0x3ffa); // No protect - No Watchdog - HS Clock
+	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
+	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 
 	I2C_24C04(config, m_i2cmem).set_e0(1);
 }
@@ -1650,6 +1657,9 @@ ROM_START( quingo )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("quingo_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
+	
+	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // borrowed from magicle to avoid I2C bus error
+	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, BAD_DUMP CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 ROM_END
 
 /*
@@ -1737,6 +1747,9 @@ ROM_START( bigdeal0 )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("big_deal_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
+	
+	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // borrowed from magicle to avoid I2C bus error
+	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, BAD_DUMP CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 ROM_END
 
 /*
@@ -1824,6 +1837,9 @@ ROM_START( belslots )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("bel_slots_exp_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) )  // all AA & 55
+	
+	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // borrowed from magicle to avoid I2C bus error
+	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, BAD_DUMP CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 ROM_END
 
 /*

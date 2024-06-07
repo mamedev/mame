@@ -60,7 +60,7 @@ V3: 512KB DRAM
 V4: 1MB DRAM
 V5: 128KB+16KB DRAM, dual-CPU! (2*68K @ 16MHz)
 
-V2/V3/V4 have the same program, older versions can be run by decreasing the
+V2/V3/V4 have the same program, V2/V3 versions can be run by decreasing the
 RAM size (-ramsize option). It's not verified if V1 has the same program, but
 it probably does.
 
@@ -118,7 +118,7 @@ V9: 68030, 1MB h.RAM
 V10: 68040, 1MB h.RAM
 V11: 68060, high speed, 2MB h.RAM (half unused?)
 
-V6 has the same program as V7, it can be run by decreasing the RAM size. V11
+V6/V7/V9 have the same program, V6 can be run by decreasing the RAM size. V11
 supposedly has the same program as V10.
 
 V7 Hardware info:
@@ -814,6 +814,8 @@ void eag_state::eagv9(machine_config &config)
 	M68030(config.replace(), m_maincpu, 32_MHz_XTAL); // also seen with 40MHz XTAL
 	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
+
+	m_ram->set_extra_options("1M");
 }
 
 void eag_state::eagv10(machine_config &config)

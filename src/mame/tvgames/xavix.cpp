@@ -1637,7 +1637,7 @@ void xavix_hikara_state::machine_reset()
 		for (int j = 0; j < 5; j++)
 		{
 			constexpr u8 searchfor[5] = { 0x29, 0x80, 0xd0, 0x14, 0xad };
-	
+
 			if (ROM[i + j] == searchfor[j])
 				matchcount++;
 		}

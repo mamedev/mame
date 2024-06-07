@@ -76,6 +76,14 @@ protected:
 
 	enum
 	{
+		SEQ_STOP = 0,
+		SEQ_ACTIVE = 1,
+		SEQ_PLAY = 2,
+		SEQ_PAUSE = 3
+	};
+
+	enum
+	{
 		OUTPUT_TO_DIRECT_DAC = 0,
 		OUTPUT_TO_VOLTAGE_FOLLOWER = 1
 	};
@@ -119,6 +127,10 @@ protected:
 
 		bool    m_playing;          // playback state
 		uint32_t  m_sample;           // current sample number
+		uint32_t  m_phrase_offset;
+		int32_t   m_phrase_count;
+		int32_t   m_phrase_wait_cnt;
+		uint8_t   m_phrase_state;
 
 		uint8_t   m_channel_volume;   // volume index set with the CVOL command
 		uint8_t   m_pan_volume_left;  // volume index set with the PAN command

@@ -368,11 +368,11 @@ u8 z80ctc_channel_device::read()
 		if(!m_timer->remaining().is_never())
 			return u8((m_timer->remaining().as_double() / period.as_double()) + 1.0);
 		else
-        {
-            // value read-back is required by x1turbo for YM internal board detection.
-            // cfr. x1turbo40 argus wpiset 0x704,1,rw
+		{
+			// value read-back is required by x1turbo for YM internal board detection.
+			// cfr. x1turbo40 argus wpiset 0x704,1,rw
 			return m_down;
-        }
+		}
 	}
 }
 

@@ -385,7 +385,7 @@ protected:
 	TILE_GET_INFO_MEMBER(bg_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	void draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void unpack_block(const char *region, int offset, int size);
@@ -551,15 +551,17 @@ uint32_t equites_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 /******************************************************************************/
 // Interrupt Handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(equites_state::scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(equites_state::scanline_cb)
 {
 	int scanline = param;
 
-	if(scanline == 232) // vblank-out irq
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-	if(scanline == 24) // vblank-in irq
+    // all games but bullfgtr have both valid
+    // bullfgtr definitely expects to vblank from 2, reversing will make it to run at half speed.
+	if(scanline == 232) // vblank-in irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
+
+	if(scanline == 24) // vblank-out irq or sprite DMA done
+		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 
@@ -912,7 +914,7 @@ void equites_state::equites(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL/4); // 68000P8 running at 3mhz! verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &equites_state::equites_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::scanline_cb), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_set));

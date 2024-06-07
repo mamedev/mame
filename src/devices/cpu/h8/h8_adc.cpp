@@ -471,7 +471,6 @@ void h8_adc_2655_device::mode_update()
 			m_end_channel = m_adcsr & 7;
 	} else
 		m_start_channel = m_end_channel = m_adcsr & 7;
-
 }
 
 void h8_adc_2655_device::do_buffering(int buffer)

@@ -43,14 +43,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/pit8253.h"
+
 #include "315_5296.h"
 #include "315_5338a.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/pit8253.h"
 #include "machine/timer.h"
 #include "sound/upd7759.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
+
+#include <iomanip>
+#include <sstream>
 
 // the layouts are very similar to eachother
 #include "newufo.lh"
@@ -184,18 +190,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 	// 2 Z: 000 = up,     100 = down
 	// 3 C: 000 = closed, 100 = open
 	for (int p = 0; p < 2; p++)
+	{
 		for (int m = 0; m < 4; m++)
 			m_counters[(p << 2) | m] = uint8_t(m_player[p].motor[m].position * 100);
+	}
 
 #if 0
-	char msg1[0x100] = {0};
-	char msg2[0x100] = {0};
+	std::ostringstream msg;
+	msg << std::hex << std::setfill('0');
 	for (int i = 0; i < 8; i++)
-	{
-		sprintf(msg2, "%02X ", m_io2->debug_peek_output(i));
-		strcat(msg1, msg2);
-	}
-	popmessage("%s", msg1);
+		msg << std::setw(2) << m_io2->debug_peek_output(i);
+	popmessage("%s", std::move(msg).str());
 #endif
 }
 

@@ -414,9 +414,9 @@ uint16_t amerdart_state::amerdart_trackball_r(offs_t offset)
 		m_result = (m_lastresult | 0x00ff);
 
 		m_newx[1] = m_in_xaxis[0]->read();   // Trackball 1  Left - Right
-		m_newy[1] = m_in_yaxis[0]->read();   // Trackball 1   Up  - Down 
+		m_newy[1] = m_in_yaxis[0]->read();   // Trackball 1   Up  - Down
 		m_newx[2] = m_in_xaxis[1]->read();   // Trackball 2  Left - Right
-		m_newy[2] = m_in_yaxis[1]->read();   // Trackball 2   Up  - Down 
+		m_newy[2] = m_in_yaxis[1]->read();   // Trackball 2   Up  - Down
 
 		m_dx[1] = (int8_t)(m_newx[1] - m_oldx[1]);
 		m_dy[1] = (int8_t)(m_newy[1] - m_oldy[1]);
@@ -881,7 +881,7 @@ ROM_START( amerdart ) // You need to check the sum16 values listed on the labels
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 6016", 0x080001, 0x10000, CRC(f620f935) SHA1(bf891fce1f04f3ad5b8b72d43d041ceacb0b65bc) ) // Different then set 2 or 3
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 48af", 0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) ) // Different then set 2 or 3
 
-	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code 
+	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) // Passes internal checksum routine
 
 	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS32015 audio sample data
@@ -916,7 +916,7 @@ ROM_START( amerdart2 ) // You need to check the sum16 values listed on the label
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 1a0c", 0x080001, 0x10000, CRC(8a70f849) SHA1(dfd4cf90de2ab8cbeff458f0fd20110c1ed009e9) ) // Different then set 1 or 3
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 0d81", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) ) // Different then set 1 or 3
 
-	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code 
+	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) // Passes internal checksum routine
 
 	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS32015 audio sample data
@@ -951,7 +951,7 @@ ROM_START( amerdart3 ) // You need to check the sum16 values listed on the label
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 4cac", 0x080001, 0x10000, CRC(2d653c7b) SHA1(0feebe6440aabe844049013aa063ed0259b7bec4) ) // Different then set 2 or 3
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 729e", 0x080000, 0x10000, CRC(8cef479a) SHA1(80002e215416a11ff071523ee67218a1aabe155b) ) // Different then set 2 or 3
 
-	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code 
+	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) // Passes internal checksum routine
 
 	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS32015 audio sample data

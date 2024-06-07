@@ -92,7 +92,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void lastfght(machine_config &config);
 
@@ -164,8 +164,7 @@ private:
 
 void lastfght_state::video_start()
 {
-	int i;
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_bitmap[i]);
 
 	save_item(NAME(m_bitmap[0]));

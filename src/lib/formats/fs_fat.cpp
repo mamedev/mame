@@ -669,13 +669,13 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 bool impl::is_valid_short_filename(std::string const &filename)
 {
 	/*
-		Valid characters in DOS file names:
-		- Upper case letters A-Z
-		- Numbers 0-9
-		- Space (though there is no way to identify a trailing space)
-		- ! # $ % & ( ) - @ ^ _ ` { } ~
-		- Characters 128-255, except e5 (though the code page is indeterminate)
-		We currently do not check for characters 128-255.
+	    Valid characters in DOS file names:
+	    - Upper case letters A-Z
+	    - Numbers 0-9
+	    - Space (though there is no way to identify a trailing space)
+	    - ! # $ % & ( ) - @ ^ _ ` { } ~
+	    - Characters 128-255, except e5 (though the code page is indeterminate)
+	    We currently do not check for characters 128-255.
 	*/
 	std::regex filename_regex("([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,8})(\\.([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,3}))?");
 	return std::regex_match(filename, filename_regex);

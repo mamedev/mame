@@ -4133,7 +4133,7 @@ ROM_END
 ROM_START( deerhuntc ) // These rom labels break label conventions but is correct & verified. Version in program code is listed as 0.00
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "as_0937_e01.u06", 0x000000, 0x100000, CRC(8d74088e) SHA1(cb11ffaf4c0267cc8cbe01accc3daeed910a3af3) ) // SUM16 = C2CD - same as version dated 2000.5.31?
-	ROM_LOAD16_BYTE( "as_0938_e01.u07", 0x000001, 0x100000, CRC(c7657889) SHA1(4cc707c8abbc0862457375a9a910d3c338859193) ) // SUM16 = 27D7 - same as version dated 2000.5.31? 
+	ROM_LOAD16_BYTE( "as_0938_e01.u07", 0x000001, 0x100000, CRC(c7657889) SHA1(4cc707c8abbc0862457375a9a910d3c338859193) ) // SUM16 = 27D7 - same as version dated 2000.5.31?
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -4272,7 +4272,7 @@ ROM_START( trophyht ) // V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
 	ROM_LOAD( "lh28f016sat.u20", 0x0000000, 0x200000, NO_DUMP ) // None of the 28F016 flash ROMs are dumped
-	ROM_LOAD( "lh28f016sat.u21", 0x0200000, 0x200000, NO_DUMP ) // The correct loading order is unknown   
+	ROM_LOAD( "lh28f016sat.u21", 0x0200000, 0x200000, NO_DUMP ) // The correct loading order is unknown
 	ROM_LOAD( "lh28f016sat.u22", 0x0400000, 0x200000, NO_DUMP )
 	ROM_LOAD( "lh28f016sat.u23", 0x0600000, 0x200000, NO_DUMP )
 	ROM_LOAD( "lh28f016sat.u24", 0x0800000, 0x200000, NO_DUMP )
@@ -4418,7 +4418,7 @@ GAME( 1999, endrichsa, endrichs, reelquak, endrichs, seta2_state,    empty_init,
 
 GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs flipscreen hooking up properly with new code to function at all
 
-GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                           MACHINE_NO_COCKTAIL )
+GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "Nihon System / MOSS",   "Puzzle De Bowling (Japan)",                           MACHINE_NO_COCKTAIL )
 
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                            MACHINE_NO_COCKTAIL )
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",                     MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
