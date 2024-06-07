@@ -9,20 +9,20 @@ TOP BOARD (S-8808A)
 ROMs 1-12
 main:
 Z80 CTC-D
-Z80A
-Z80
+LH0083A Z80A-DMA
+Z0840004PSC Z80 CPU
 D8255AC-2
 6116 RAM
+Oki M6242
+32.768 kHz osc
 
 sound:
 Z80 CTC-D
 D8255AC-2
-Z80
+Z0840004PSC Z80 CPU
 YM3812
 5816 RAM
 4 MHz osc
-Oki M6242
-32.768 kHz osc
 
 LOWER BOARD (S-8809A)
 ==========
@@ -33,8 +33,7 @@ video output
 18 MHz osc
 
 TODO:
-- Identify irq sources ($24 vblank irq, $20 or $22 CTC?);
-- Identify how sub CPU is supposed to run;
+- Identify irq sources ($24 timer, $26 VBLANK?, $20 or $22 quadrature encoder);
 - Data ROM bank;
 
 */
@@ -313,9 +312,6 @@ void anoworld_state::unktarot(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &anoworld_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &anoworld_state::main_io_map);
 	m_maincpu->set_daisy_config(main_daisy_chain);
-
-	// TODO: how does this work? does it use the same ROM as the main CPU?
-	Z80(config, "subcpu", 4_MHz_XTAL).set_disable();
 
 	Z80(config, m_audiocpu, 4_MHz_XTAL).set_disable();
 	m_audiocpu->set_addrmap(AS_PROGRAM, &anoworld_state::audio_program_map);
