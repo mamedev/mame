@@ -22,6 +22,11 @@ static const char *const s_mnemonic[] =
 	"retn","rl"  ,"rla" ,"rlc" ,"rlca","rld" ,"rr"  ,"rra" ,
 	"rrc" ,"rrca","rrd" ,"rst" ,"sbc" ,"scf" ,"set" ,"sla" ,
 	"sll" ,"sra" ,"srl" ,"sub" ,"xor "
+	// z80n
+	                                  ,"swap","mirr","test",
+	"bsla","bsra","bsrl","bsrf","brlc","mul" ,"otib","nreg",
+	"pxdn","pxad","stae","ldix","ldws","lddx","lirx","lprx",
+	"ldrx"
 };
 
 const u32 z80_disassembler::s_flags[] =
@@ -35,6 +40,11 @@ const u32 z80_disassembler::s_flags[] =
 	STEP_OUT ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,0        ,0
+	// z80n
+	                                                 ,0    ,0        ,0        ,
+	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
+	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
+	0
 };
 
 const z80_disassembler::z80dasm z80_disassembler::mnemonic_xx_cb[256] =
@@ -215,13 +225,13 @@ const z80_disassembler::z80dasm z80_disassembler::mnemonic_ed[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDI,nullptr},       {zCPI,nullptr},       {zINI,nullptr},       {zOUTI,nullptr},
+	{zLDI,nullptr}, {zCPI,nullptr}, {zINI,nullptr}, {zOUTI,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDD,nullptr},       {zCPD,nullptr},       {zIND,nullptr},       {zOUTD,nullptr},
+	{zLDD,nullptr}, {zCPD,nullptr}, {zIND,nullptr}, {zOUTD,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDIR,nullptr},      {zCPIR,nullptr},      {zINIR,nullptr},      {zOTIR,nullptr},
+	{zLDIR,nullptr},{zCPIR,nullptr},{zINIR,nullptr},{zOTIR,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDDR,nullptr},      {zCPDR,nullptr},      {zINDR,nullptr},      {zOTDR,nullptr},
+	{zLDDR,nullptr},{zCPDR,nullptr},{zINDR,nullptr},{zOTDR,nullptr},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -414,7 +424,7 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		d = &mnemonic_cb[op];
 		break;
 	case 0xed:
-		d = &mnemonic_ed[opcodes.r8(pos++)];
+		d = &get_mnemonic_ed(opcodes.r8(pos++));
 		if (d->mnemonic == zDB)
 			pos--;
 		break;
