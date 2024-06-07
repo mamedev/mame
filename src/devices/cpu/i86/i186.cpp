@@ -1243,7 +1243,7 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 	int which = param;
 	timer_state *t = &m_timer[which];
 
-	LOGMASKED(LOG_TIMER, "Hit interrupt callback for timer %d", which);
+	LOGMASKED(LOG_TIMER, "Hit interrupt callback for timer %d\n", which);
 
 	/* set the max count bit */
 	t->control |= 0x0020;
@@ -1253,7 +1253,7 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 	{
 		m_intr.status |= 0x01 << which;
 		update_interrupt_state();
-		LOGMASKED(LOG_TIMER, "  Generating timer interrupt");
+		LOGMASKED(LOG_TIMER, "  Generating timer interrupt\n");
 	}
 
 	if (which == 2)
@@ -1294,7 +1294,7 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 			t->control &= ~0x1000;
 
 		restart_timer(which);
-		LOGMASKED(LOG_TIMER, "  Repriming interrupt");
+		LOGMASKED(LOG_TIMER, "  Repriming interrupt\n");
 	}
 	else
 	{
@@ -1345,7 +1345,7 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 	timer_state *t = &m_timer[which];
 	bool update_int_timer = false;
 
-	LOGMASKED(LOG_TIMER, "internal_timer_update: %d, new_count=%d, new_maxA=%d, new_maxB=%d, new_control=%d", which, new_count, new_maxA, new_maxB, new_control);
+	LOGMASKED(LOG_TIMER, "internal_timer_update: %d, new_count=%d, new_maxA=%d, new_maxB=%d, new_control=%d\n", which, new_count, new_maxA, new_maxB, new_control);
 
 	/* if we have a new count and we're on, update things */
 	if (new_count != -1)
