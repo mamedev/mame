@@ -30625,6 +30625,7 @@ jokrwild                        // (c) 1988 Sigma
 
 @source:misc/joystand.cpp
 joystand                        // 1997 Yuvo
+x180                            // 1997 Yuvo
 x180ii                          // 1997 Yuvo
 
 @source:misc/jubilee.cpp
@@ -36137,6 +36138,7 @@ pleiadbl                        // bootleg
 pleiadce                        // (c) 1981 Centuri + Tehkan
 pleiads                         // (c) 1981 Tehkan
 pleiadsb2                       // bootleg
+pleiadsgmp                      // bootleg
 pleiadsi                        // bootleg (Irecsa)
 pleiadsia                       // bootleg (Irecsa)
 pleiadsn                        // bootleg (Niemer S.A.)
