@@ -67,12 +67,20 @@ public:
 protected:
 	virtual void video_start() override;
 
+	void common_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_okibank;
 
-	void common_map(address_map &map);
-
 private:
+	void okibank_w(uint8_t data);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+	void oki_map(address_map &map);
+
 	// devices
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -86,13 +94,6 @@ private:
 	// video-related
 	tilemap_t *m_tilemap[2]{};
 
-	void okibank_w(uint8_t data);
-	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-
-	void oki_map(address_map &map);
 };
 
 class blmbycar_state : public base_state
@@ -114,19 +115,19 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_ioport m_pot_wheel_io;
-	required_ioport m_opt_wheel_io;
-
-	// input-related
-	uint8_t m_pot_wheel = 0;
-	uint8_t m_old_val = 0;
-
 	void pot_wheel_reset_w(uint8_t data);
 	void pot_wheel_shift_w(uint8_t data);
 	uint16_t pot_wheel_r();
 	uint16_t opt_wheel_r();
 
 	void prg_map(address_map &map);
+
+	required_ioport m_pot_wheel_io;
+	required_ioport m_opt_wheel_io;
+
+	// input-related
+	uint8_t m_pot_wheel = 0;
+	uint8_t m_old_val = 0;
 };
 
 class watrball_state : public base_state
@@ -144,11 +145,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t m_retvalue = 0;
-
 	uint16_t unk_r();
 
 	void prg_map(address_map &map);
+
+	uint8_t m_retvalue = 0;
 };
 
 
@@ -206,7 +207,7 @@ TILE_GET_INFO_MEMBER(base_state::get_tile_info)
 			attr & 0x1f,
 			TILE_FLIPYX((attr >> 6) & 3));
 
-	tileinfo.category = (attr >> 5) & 1;
+	tileinfo.category = BIT(attr, 5);
 }
 
 /***************************************************************************
@@ -292,7 +293,7 @@ void blmbycar_state::pot_wheel_reset_w(uint8_t data)
 
 void blmbycar_state::pot_wheel_shift_w(uint8_t data)
 {
-	if ( ((m_old_val) == 0xff) && ((data) == 0) )
+	if ((m_old_val == 0xff) && (data == 0))
 		m_pot_wheel <<= 1;
 	m_old_val = data;
 }
@@ -370,7 +371,8 @@ void blmbycar_state::prg_map(address_map &map)
 
 uint16_t watrball_state::unk_r()
 {
-	m_retvalue ^= 0x0008; // must toggle.. but not vblank?
+	if (!machine().side_effects_disabled())
+		m_retvalue ^= 0x0008; // must toggle.. but not vblank?
 	return m_retvalue;
 }
 
@@ -446,7 +448,7 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P1_P2") /* $700002.w */
+	PORT_START("P1_P2") // $700002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN   ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
@@ -606,9 +608,8 @@ void base_state::base(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2000);
 
-	BLMBYCAR_SPRITES(config, m_sprites, 0);
-	m_sprites->set_gfxdecode_tag("gfxdecode");
-	m_sprites->set_screen_tag("screen");
+	BLMBYCAR_SPRITES(config, m_sprites, 0, m_palette, gfx_blmbycar);
+	m_sprites->set_screen("screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -688,7 +689,7 @@ ROM_START( blmbycar )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
 	ROM_LOAD( "bc_rom10",  0x180000, 0x080000, CRC(5458917e) SHA1(c8dd5a391cc20a573e27a140b185893a8c04859e) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // 8 bit ADPCM (banked)
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM (banked)
 	ROM_LOAD( "bc_rom1",     0x000000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
 	ROM_LOAD( "bc_rom2",     0x080000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
 ROM_END
@@ -704,7 +705,7 @@ ROM_START( blmbycaru )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
 	ROM_LOAD( "bc_rom10",  0x180000, 0x080000, CRC(5458917e) SHA1(c8dd5a391cc20a573e27a140b185893a8c04859e) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // 8 bit ADPCM (banked)
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM (banked)
 	ROM_LOAD( "bc_rom1",     0x000000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
 	ROM_LOAD( "bc_rom2",     0x080000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
 ROM_END
@@ -736,7 +737,7 @@ ROM_START( watrball )
 	ROM_LOAD( "rom9.bin",   0x100000, 0x080000, CRC(122cc0ad) SHA1(27cdb19fa082089e47c5cdb44742cfd93aa23a00) )
 	ROM_LOAD( "rom10.bin",  0x180000, 0x080000, CRC(22a2a706) SHA1(c7350a94a857e0007d7fc0076b44a3d62693cb6c) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // 8 bit ADPCM (banked)
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM (banked)
 	ROM_LOAD( "rom1.bin",     0x000000, 0x080000, CRC(7f88dee7) SHA1(d493b961fa4631185a33faee7f61786430707209))
 //  ROM_LOAD( "rom2.bin",     0x080000, 0x080000, // not populated for this game
 ROM_END
