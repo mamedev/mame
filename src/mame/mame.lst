@@ -41542,6 +41542,9 @@ atm                             //
 atmtb2                          //
 atmtb2plus                      //
 
+@source:sinclair/chloe.cpp
+chloe                           // 1999 Chloe Corporation
+
 @source:sinclair/elwro800.cpp
 elwro800                        //
 
