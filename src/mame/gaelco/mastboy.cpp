@@ -439,15 +439,20 @@
 */
 
 #include "emu.h"
+
 #include "cpu/z180/hd647180x.h"
+
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
+
 #include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/eeprompar.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include <algorithm>
 
@@ -467,7 +472,6 @@ public:
 		, m_bank_c000(*this, "bank_c000")
 		, m_workram(*this, "workram")
 		, m_tileram(*this, "tileram")
-		, m_colram(*this, "colram")
 		, m_vram(*this, "vram")
 	{ }
 
@@ -479,6 +483,25 @@ protected:
 	virtual void video_start() override;
 
 private:
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void tileram_w(offs_t offset, uint8_t data);
+	void bank_w(uint8_t data);
+	void msm5205_data_w(uint8_t data);
+	void irq0_ack_w(int state);
+	uint8_t port_38_read();
+	uint8_t nmi_read();
+	void adpcm_int(int state);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void vblank_irq(int state);
+	void bank_c000_map(address_map &map);
+	void mastboy_io_map(address_map &map);
+	void mastboy_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<ls259_device> m_outlatch;
@@ -489,77 +512,36 @@ private:
 
 	required_shared_ptr<uint8_t> m_workram;
 	required_shared_ptr<uint8_t> m_tileram;
-	required_shared_ptr<uint8_t> m_colram;
 	required_shared_ptr<uint8_t> m_vram;
 
-	int m_irq0_ack = 0;
-	int m_m5205_next = 0;
-	int m_m5205_part = 0;
+	// video related
+	tilemap_t *m_tilemap = nullptr;
 
-	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint8_t data);
-	void bank_w(uint8_t data);
-	void msm5205_data_w(uint8_t data);
-	void irq0_ack_w(int state);
-	uint8_t port_38_read();
-	uint8_t nmi_read();
-	void adpcm_int(int state);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void vblank_irq(int state);
-	void bank_c000_map(address_map &map);
-	void mastboy_io_map(address_map &map);
-	void mastboy_map(address_map &map);
+	//int m_irq0_ack = 0;
+	uint8_t m_m5205_next = 0;
+	bool m_m5205_part = false;
 };
 
 
 // VIDEO EMULATION
+TILE_GET_INFO_MEMBER(mastboy_state::get_tile_info)
+{
+	// bytes 0 and 3 seem to be unused for rendering , they appear to contain data the game uses internally
+	uint32_t const tileno = (m_tileram[(tile_index << 2) | 1] | (m_tileram[(tile_index << 2) | 2] << 8)) & 0xfff;
+	uint32_t const attr = (m_tileram[(tile_index << 2) | 2] & 0xf0) >> 4;
+
+	tileinfo.set((tileno & 0x800) ? 1 : 0, tileno & 0x7ff, attr, 0);
+}
+
 
 void mastboy_state::video_start()
 {
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mastboy_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y,x,i;
-	int count = 0x000;
-
-	for (i=0;i<0x200;i+=2)
-	{
-		int coldat = m_colram[i+1] |  (m_colram[i+0]<<8);
-
-		m_palette->set_pen_color(i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
-	}
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			// bytes 0 and 3 seem to be unused for rendering , they appear to contain data the game uses internally
-			int tileno = (m_tileram[count+1]|(m_tileram[count+2]<<8))&0xfff;
-			int attr = (m_tileram[count+2]&0xf0)>>4;
-			gfx_element *gfx;
-
-			if (tileno&0x800)
-			{
-				gfx = m_gfxdecode->gfx(1);
-				tileno &=0x7ff;
-			}
-			else
-			{
-				gfx = m_gfxdecode->gfx(0);
-			}
-
-
-			gfx->opaque(bitmap,cliprect,tileno,attr,0,0,x*8,y*8);
-
-			count+=4;
-
-		}
-
-	}
-
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -569,16 +551,23 @@ uint32_t mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 uint8_t mastboy_state::vram_r(offs_t offset)
 {
 	// we have to invert the data for the GFX decode
-	return m_vram[offset]^0xff;
+	return m_vram[offset] ^ 0xff;
 }
 
 void mastboy_state::vram_w(offs_t offset, uint8_t data)
 {
 	// we have to invert the data for the GFX decode
-	m_vram[offset] = data^0xff;
+	m_vram[offset] = data ^ 0xff;
 
 	// Decode the new tile
 	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
+}
+
+void mastboy_state::tileram_w(offs_t offset, uint8_t data)
+{
+	m_tileram[offset] = data;
+	if (((offset & 3) == 1) || ((offset & 3) == 2)) // see above
+		m_tilemap->mark_tile_dirty(offset >> 2);
 }
 
 void mastboy_state::bank_w(uint8_t data)
@@ -591,7 +580,7 @@ void mastboy_state::bank_w(uint8_t data)
 
 void mastboy_state::msm5205_data_w(uint8_t data)
 {
-	m_m5205_part = 0;
+	m_m5205_part = false;
 	m_m5205_next = data;
 }
 
@@ -600,7 +589,7 @@ void mastboy_state::adpcm_int(int state)
 	m_msm->data_w(m_m5205_next);
 	m_m5205_next >>= 4;
 
-	m_m5205_part ^= 1;
+	m_m5205_part = !m_m5205_part;
 	if(!m_m5205_part)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
@@ -626,11 +615,11 @@ void mastboy_state::mastboy_map(address_map &map)
 {
 	map(0x4000, 0x7fff).rom(); // External ROM
 
-	map(0x8000, 0x8fff).ram().share("workram"); // Work RAM
-	map(0x9000, 0x9fff).ram().share("tileram"); // Tilemap RAM
-	map(0xa000, 0xa1ff).ram().share("colram").mirror(0x0e00);  // Colour RAM
+	map(0x8000, 0x8fff).ram().share(m_workram); // Work RAM
+	map(0x9000, 0x9fff).ram().w(FUNC(mastboy_state::tileram_w)).share(m_tileram); // Tilemap RAM
+	map(0xa000, 0xa1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette").mirror(0x0e00);  // Colour RAM
 
-	map(0xc000, 0xffff).m("bank_c000", FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).m(m_bank_c000, FUNC(address_map_bank_device::amap8));
 
 	map(0xff000, 0xff7ff).rw(m_earom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 
@@ -648,7 +637,7 @@ void mastboy_state::mastboy_map(address_map &map)
 // TODO : banked map is mirrored?
 void mastboy_state::bank_c000_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
+	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share(m_vram);
 	map(0x010000, 0x01ffff).mirror(0x1e0000).rom().region("vrom", 0);
 	map(0x200000, 0x3fffff).rom().region("bankedrom", 0);
 }
@@ -763,9 +752,9 @@ static const gfx_layout tiles8x8_layout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0, 1) },
 	{ 24,28,16,20,8,12,0,4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0, 32) },
 	32*8
 };
 
@@ -779,7 +768,7 @@ GFXDECODE_END
 
 void mastboy_state::machine_start()
 {
-	save_item(NAME(m_irq0_ack));
+	//save_item(NAME(m_irq0_ack));
 	save_item(NAME(m_m5205_next));
 	save_item(NAME(m_m5205_part));
 }
@@ -789,7 +778,6 @@ void mastboy_state::machine_reset()
 	// clear some RAM
 	std::fill(&m_workram[0], &m_workram[m_workram.bytes()], 0);
 	std::fill(&m_tileram[0], &m_tileram[m_tileram.bytes()], 0);
-	std::fill(&m_colram[0],  &m_colram[m_colram.bytes()],   0);
 	std::fill(&m_vram[0],    &m_vram[m_vram.bytes()],       0);
 }
 
@@ -808,7 +796,7 @@ void mastboy_state::mastboy(machine_config &config)
 	m_outlatch->q_out_cb<3>().set("msm", FUNC(msm5205_device::reset_w));
 	m_outlatch->q_out_cb<4>().set("earom", FUNC(eeprom_parallel_28xx_device::oe_w));
 
-	ADDRESS_MAP_BANK(config, "bank_c000").set_map(&mastboy_state::bank_c000_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
+	ADDRESS_MAP_BANK(config, m_bank_c000).set_map(&mastboy_state::bank_c000_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -821,7 +809,8 @@ void mastboy_state::mastboy(machine_config &config)
 	screen.screen_vblank().set(FUNC(mastboy_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mastboy);
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette).set_format(palette_device::GRBx_444, 0x100);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
