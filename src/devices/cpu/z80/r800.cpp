@@ -41,8 +41,6 @@ DEFINE_DEVICE_TYPE(R800, r800_device, "r800", "ASCII R800")
 //  DEVICE IMPLEMENTATION
 //**************************************************************************
 
-#define HAS_LDAIR_QUIRK  0
-
 //-------------------------------------------------
 //  r800_device - constructor
 //-------------------------------------------------
@@ -66,6 +64,8 @@ void r800_device::device_validity_check(validity_checker &valid) const
 }
 
 
+
+#define HAS_LDAIR_QUIRK  0
 
 /****************************************************************************
  * The Z80 registers. halt is set to 1 when the CPU is halted, the refresh
@@ -151,29 +151,28 @@ void r800_device::device_validity_check(validity_checker &valid) const
  ***************************************************************/
 u8 r800_device::r800_sll(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x80) ? CF : 0;
-	res = (res << 1) & 0xff;
+	const u8 c = (value & 0x80) ? CF : 0;
+	const u8 res = u8(value << 1);
 	set_f(SZP[res] | c);
 	return res;
 }
 
-inline void r800_device::mulub(u8 value)
+void r800_device::mulub(u8 value)
 {
-    u16 res = A * value;
-    HL = res;
-	unsigned c = (res & 0xff00) ? CF : 0;
-    unsigned z = (res) ? 0 : ZF;
+	const u16 res = A * value;
+	HL = res;
+	const u8 c = (H) ? CF : 0;
+	const u8 z = (res) ? 0 : ZF;
 	set_f((F & (HF|NF)) | z | c);
 }
 
-inline void r800_device::muluw(u16 value)
+void r800_device::muluw(u16 value)
 {
-    u32 res = HL * value;
-    DE = res >> 16;
-    HL = res & 0xffff;
-	unsigned c = (res & 0xffff0000) ? CF : 0;
-    unsigned z = (res) ? 0 : ZF;
+	const u32 res = HL * value;
+	DE = res >> 16;
+	HL = res & 0xffff;
+	const u8 c = (DE) ? CF : 0;
+	const u8 z = (res) ? 0 : ZF;
 	set_f((F & (HF|NF)) | z | c);
 }
 
