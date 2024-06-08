@@ -279,7 +279,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			mem_mask = 0;
 		}
 
-		if (BIT(m_map[offset >> 11], 11, 3) != (m_maincpu->get_fc() & 0x1))
+		if (BIT(m_map[offset >> 11], 11, 3) != (m_maincpu->get_fc()))
 		{
 			m_map_control |= (1 << MAP_CPU_WR);
 
@@ -313,6 +313,15 @@ u16 tek440x_state::map_r(offs_t offset)
 {
 	LOG("map_r 0x%08x => %08x\n",offset, m_map[offset >> 11] );
 
+	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
+	{
+			LOG("bus error: map_r: PID %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+			m_maincpu->set_buserror_details(offset, 0, m_maincpu->get_fc());
+			return 0;
+	}
+
 	return m_map[offset >> 11];
 }
 
@@ -320,7 +329,7 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("map_w 0x%08x %04x mask(%04x)\n",offset, data, mem_mask);
 
-	if (BIT(m_map_control, MAP_VM_ENABLE))
+	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
 		COMBINE_DATA(&m_map[offset >> 11]);
 	}
