@@ -205,8 +205,15 @@
 #define TDAT_L   m_shared_data.b.l
 #define TDAT8    m_shared_data.b.l // Typically represents values from D0..8 pins. 8bit input or output in steps.
 
+bool z80_device::tables_initialised = false;
+u8 z80_device::SZ[] = {};       // zero and sign flags
+u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+u8 z80_device::SZP[] = {};      // zero, sign and parity flags
+u8 z80_device::SZHV_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
+u8 z80_device::SZHV_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
+u8 z80_device::SZHVC_add[] = {};
+u8 z80_device::SZHVC_sub[] = {};
 
-#include "z80_flag_tables.inc"
 
 /***************************************************************
  * Enter halt state; write 1 to callback on first execution
@@ -657,6 +664,81 @@ void z80_device::device_validity_check(validity_checker &valid) const
 
 void z80_device::device_start()
 {
+	if (!tables_initialised)
+	{
+		u8 *padd = &SZHVC_add[  0*256];
+		u8 *padc = &SZHVC_add[256*256];
+		u8 *psub = &SZHVC_sub[  0*256];
+		u8 *psbc = &SZHVC_sub[256*256];
+		for (int oldval = 0; oldval < 256; oldval++)
+		{
+			for (int newval = 0; newval < 256; newval++)
+			{
+				// add or adc w/o carry set
+				int val = newval - oldval;
+				*padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
+				*padd |= (newval & (YF | XF));  // undocumented flag bits 5+3
+				if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
+				if( newval < oldval ) *padd |= CF;
+				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padd |= VF;
+				padd++;
+
+				// adc with carry set
+				val = newval - oldval - 1;
+				*padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
+				*padc |= (newval & (YF | XF));  // undocumented flag bits 5+3
+				if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
+				if( newval <= oldval ) *padc |= CF;
+				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
+				padc++;
+
+				// cp, sub or sbc w/o carry set
+				val = oldval - newval;
+				*psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
+				*psub |= (newval & (YF | XF));  // undocumented flag bits 5+3
+				if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
+				if( newval > oldval ) *psub |= CF;
+				if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
+				psub++;
+
+				// sbc with carry set
+				val = oldval - newval - 1;
+				*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
+				*psbc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
+				if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
+				if( newval >= oldval ) *psbc |= CF;
+				if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
+				psbc++;
+			}
+		}
+
+		for (int i = 0; i < 256; i++)
+		{
+			int p = 0;
+			if( i&0x01 ) ++p;
+			if( i&0x02 ) ++p;
+			if( i&0x04 ) ++p;
+			if( i&0x08 ) ++p;
+			if( i&0x10 ) ++p;
+			if( i&0x20 ) ++p;
+			if( i&0x40 ) ++p;
+			if( i&0x80 ) ++p;
+			SZ[i] = i ? i & SF : ZF;
+			SZ[i] |= (i & (YF | XF));         // undocumented flag bits 5+3
+			SZ_BIT[i] = i ? i & SF : ZF | PF;
+			SZ_BIT[i] |= (i & (YF | XF));     // undocumented flag bits 5+3
+			SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
+			SZHV_inc[i] = SZ[i];
+			if( i == 0x80 ) SZHV_inc[i] |= VF;
+			if( (i & 0x0f) == 0x00 ) SZHV_inc[i] |= HF;
+			SZHV_dec[i] = SZ[i] | NF;
+			if( i == 0x7f ) SZHV_dec[i] |= VF;
+			if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
+		}
+
+		tables_initialised = true;
+	}
+
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(PC));
 	save_item(NAME(SP));

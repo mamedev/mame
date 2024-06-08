@@ -180,14 +180,15 @@ protected:
 	u8 m_memrq_cycles;
 	u8 m_iorq_cycles;
 
-	static const u8 SZ[0x100];       // zero and sign flags
-	static const u8 SZ_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-	static const u8 SZP[0x100];      // zero, sign and parity flags
-	static const u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
-	static const u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
+	static bool tables_initialised;
+	static u8 SZ[0x100];       // zero and sign flags
+	static u8 SZ_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+	static u8 SZP[0x100];      // zero, sign and parity flags
+	static u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
+	static u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
 
-	static const u8 SZHVC_add[2 * 0x100 * 0x100];
-	static const u8 SZHVC_sub[2 * 0x100 * 0x100];
+	static u8 SZHVC_add[2 * 0x100 * 0x100];
+	static u8 SZHVC_sub[2 * 0x100 * 0x100];
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
