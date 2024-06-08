@@ -42571,6 +42571,9 @@ dfs500                          // 1994 Sony DFS-500 Video Mixer
 @source:sony/dpsv55.cpp
 dpsv55                          //
 
+@source:sony/librie.cpp
+librie                          // Sony Librie EBR 1000
+
 @source:sony/news_38xx.cpp
 nws3860                         // Sony NEWS NWS-3860
 
