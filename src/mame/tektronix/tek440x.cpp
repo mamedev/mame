@@ -73,6 +73,8 @@
 #define MAP_BLOCK_ACCESS 6
 #define MAP_CPU_WR 7
 
+#define MAXRAM 0x200000	// +1MB
+//#define MAXRAM 0x400000	// +3MB (which was never a Thing)
 
 namespace {
 
@@ -250,7 +252,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	}
 
 	// NB byte memory limit, offset is *word* offset
-	if (offset < (0x300000>>1) && offset >= (0x200000>>1) && !machine().side_effects_disabled())
+	if (offset < (0x600000>>1) && offset >= (MAXRAM>>1) && !machine().side_effects_disabled())
 	{
 		LOG("bus error: read: %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -298,7 +300,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 
 	// NB byte memory limit, offset is *word* offset
-	if (offset < (0x300000>>1) && offset >= (0x200000>>1) && !machine().side_effects_disabled())
+	if (offset < (0x600000>>1) && offset >= (MAXRAM>>1) && !machine().side_effects_disabled())
 	{
 		LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -452,7 +454,7 @@ void tek440x_state::logical_map(address_map &map)
 
 void tek440x_state::physical_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).ram().share("mainram");						// +1MB RAM option;
+	map(0x000000, MAXRAM-1).ram().share("mainram");						// +1MB RAM option;
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
