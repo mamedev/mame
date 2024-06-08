@@ -16950,7 +16950,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="f1wcup" cloneof="f1wc">
-		<description>F1 - World Championship Edition (US, prototype)</description>
+		<description>F1 - World Championship Edition (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="megadriv_cart">
