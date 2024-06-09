@@ -8091,7 +8091,7 @@ yosakdona:
 ballbomb:
 lupin3:
 @:maincpu,program,20dc,03,00,00
-
+@delay=0.25
 
 invrvnge:
 invrvngea:
