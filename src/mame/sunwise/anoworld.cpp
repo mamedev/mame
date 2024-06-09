@@ -85,6 +85,7 @@ public:
 		, m_video_view(*this, "video_view")
 		, m_databank(*this, "databank")
 		, m_audiobank(*this, "audiobank")
+		, m_videoram(*this, "videoram")
 	{
 	}
 
@@ -93,6 +94,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -104,6 +106,7 @@ private:
 	memory_view m_video_view;
 	required_memory_bank m_databank;
 	required_memory_bank m_audiobank;
+	required_shared_ptr<uint8_t> m_videoram;
 	std::unique_ptr<uint8_t[]> m_paletteram;
 
 	void main_program_map(address_map &map) ATTR_COLD;
@@ -123,10 +126,40 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+void anoworld_state::video_start()
+{
+	// TODO: conversion to tilemap
+}
 
 uint32_t anoworld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	u16 tile, color;
 	bitmap.fill(rgb_t::black(), cliprect);
+
+	for (int offs = 0; offs < m_videoram.bytes(); offs += 4)
+	{
+		int const sx = ((offs >> 2) % 32);
+		int const sy = (offs >> 2) / 32;
+
+		if (0)
+		{
+			tile = (m_videoram[offs + 2] | (m_videoram[offs + 3] << 8)) & 0x3fff;
+			// TODO: not enough bits for the full color banking, more view select?
+			color = (m_videoram[offs + 3] >> 6) & 0x3;
+			m_gfxdecode->gfx(1)->opaque(bitmap, cliprect,
+					tile, color,
+					0, 0,
+					8 * sx, 8 * sy);
+		}
+
+		tile = (m_videoram[offs] | (m_videoram[offs + 1] << 8)) & 0xfff;
+		// TODO: definitely requires a 1bpp conversion (native RGB?)
+		color = (m_videoram[offs + 1] >> 4) & 0xf;
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+				tile, color,
+				0, 0,
+				8 * sx, 8 * sy, 0);
+	}
 
 	return 0;
 }
@@ -141,7 +174,9 @@ void anoworld_state::data_bank_w(offs_t offset, u8 data)
 void anoworld_state::video_bank_w(offs_t offset, u8 data)
 {
 	m_video_view.select(BIT(data, 4));
-	LOG("PPI port C video_bank_w: %02x\n", data);
+	// bit 2 used, video enable?
+	if (data != 0x14)
+		LOG("PPI port C video_bank_w: %02x\n", data);
 }
 
 void anoworld_state::dma_busreq_w(int state)
@@ -197,7 +232,7 @@ void anoworld_state::main_program_map(address_map &map)
 			m_palette->set_pen_color(pal_offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
 		})
 	);
-	m_video_view[1](0xb000, 0xbfff).ram();
+	m_video_view[1](0xb000, 0xbfff).ram().share("videoram");
 
 	map(0xc000, 0xffff).bankr(m_databank);
 }
@@ -212,8 +247,9 @@ void anoworld_state::main_io_map(address_map &map)
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x30, 0x33).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x43).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x50, 0x50).portr("IN0"); // ? (bits 4 and 5 checked in service routines $20 and $22)
-	map(0x60, 0x60).portr("IN1"); // ?
+    // writes goes to outputs, cfr. second item in Test Mode
+	map(0x50, 0x50).portr("IN0").nopw();
+	map(0x60, 0x60).portr("IN1").nopw();
 }
 
 static const z80_daisy_config main_daisy_chain[] =
@@ -241,84 +277,43 @@ void anoworld_state::audio_io_map(address_map &map)
 }
 
 
+// TODO: Test Mode shows abbreviated forms, identify them all
 static INPUT_PORTS_START( anoworld )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // C0?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // C1?
+	PORT_DIPNAME( 0x0004, 0x0000, "IN0" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PE?") // Paper Empty?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PB?") // Paper Busy?
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // SS = Service Switch, hold to enter test mode
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) // SU = Service Up?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) // SD = Service Down?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS?") // Paper Strobe?
+	PORT_DIPNAME( 0x0010, 0x0000, "IN1" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -403,9 +398,15 @@ void anoworld_state::anoworld(machine_config &config)
 	ctc1.zc_callback<2>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC2 handler %d\n", machine().describe_context(), state); });
 
 	i8255_device &ppi0(I8255A(config, "ppi0")); // NEC D8255AC-2
+	// PA (input) / PB (output): sound latches
 	ppi0.in_pa_callback().set([this] () { LOGPORTS("%s: PPI0 port A in\n", machine().describe_context()); return uint8_t(0); });
 	ppi0.in_pb_callback().set([this] () { LOGPORTS("%s: PPI0 port B in\n", machine().describe_context()); return uint8_t(0); });
-	ppi0.in_pc_callback().set([this] () { LOGPORTS("%s: PPI0 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.in_pc_callback().set([this] () {
+		// punts to an insert coin screen if this is 0xff,
+		// reacts to D0-D7 signals in test mode.
+		//LOGPORTS("%s: PPI0 port C in\n", machine().describe_context());
+		return uint8_t(0);
+	});
 	ppi0.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port A out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port B out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
@@ -421,8 +422,8 @@ void anoworld_state::anoworld(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(anoworld_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_anoworld);
@@ -472,4 +473,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, anoworld, 0, anoworld, anoworld, anoworld_state, empty_init, ROT0, "Sunwise", "Another World (Japan)", MACHINE_IS_SKELETON ) // title screen GFXs in region 1 at 0x3051 onward
+GAME( 1989, anoworld, 0, anoworld, anoworld, anoworld_state, empty_init, ROT0, "Sunwise", "Another World (Japan, V1.8)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // title screen GFXs in region 1 at 0x3051 onward
