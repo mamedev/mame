@@ -96,6 +96,7 @@ public:
 		m_scsi(*this, "scsi:7:ncr5385"),
 		m_vint(*this, "vint"),
 		m_screen(*this, "screen"),
+		m_acia(*this, "acia"),
 		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
@@ -128,7 +129,7 @@ private:
 	void sound_w(u8 data);
 	u8 diag_r();
 	void diag_w(u8 data);
-	u8 mouse_r();
+	u8 mouse_r(offs_t offset);
 	void mouse_w(u8 data);
 	void led_w(u8 data);
 	u8 videoaddr_r(offs_t offset);
@@ -153,6 +154,8 @@ private:
 	required_device<ncr5385_device> m_scsi;
 	required_device<input_merger_all_high_device> m_vint;
 	required_device<screen_device> m_screen;
+	required_device<mos6551_device> m_acia;
+
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
 	required_shared_ptr<u16> m_vram;
@@ -207,6 +210,11 @@ void tek440x_state::machine_reset()
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
+	
+	// want to simulate a connection so we can get debug output
+	//m_acia->write_dsr(0);
+	//m_acia->write_dcd(0);
+
 }
 
 
@@ -253,9 +261,12 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	if ((m_maincpu->get_fc() & 4) == 0)
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
-		if ((BIT(m_map[offset >> 11], 11, 3) & 4) != (m_maincpu->get_fc() & 4))
+		// selftest expects fail if page.pid != map_control.pid
+		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
+		
+//		if ((BIT(m_map[offset >> 11], 11, 3) & 4) != (m_maincpu->get_fc() & 4))
 		{
-			m_map_control |= (1 << MAP_CPU_WR);
+			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 
 			LOG("memory_r: bus error: PID wrong %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -289,7 +300,8 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		// write-enabled?
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
-			m_map_control |= (1 << MAP_BLOCK_ACCESS);
+// VM test #12 fails
+//			m_map_control |= (1 << MAP_CPU_WR);
 
 			LOG("memory_w: bus error: BlockAccess %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -302,7 +314,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		// matching pid?
 		if ((BIT(m_map[offset >> 11], 11, 3) & 4) != (m_maincpu->get_fc() & 4))
 		{
-			m_map_control |= (1 << MAP_CPU_WR);
+			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 
 			LOG("memory_w: bus error: PID wrong %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -370,14 +382,15 @@ void tek440x_state::mapcntl_w(u8 data)
 	LOG("mapcntl_w pte PID    0x%02x\n", data & 15);
 	
 #if 0
+	// think this is just wrong
 	if (BIT(data, MAP_VM_ENABLE))
 		m_map_view.select(0);
 	else
 		m_map_view.disable();
 #endif
 
-	// NB bit 3 is not used
-	m_map_control = data;
+	// NB bit 3 & 7 is not used
+	m_map_control = data & 0x7f;
 	
 }
 
@@ -450,14 +463,29 @@ void tek440x_state::diag_w(u8 data)
 	m_diag = data;
 }
 
-u8 tek440x_state::mouse_r()
+u8 tek440x_state::mouse_r(offs_t offset)
 {
-	return m_mouse ? mousex->read() : mousey->read();
+	switch(offset)
+	{
+		case 0:
+			return mousex->read();
+		case 2:
+			return mousey->read();
+		case 4:
+			return mousebtn->read();
+		case 6:
+			return 0;	// reset counters
+
+		default:
+			LOG("mouse_r %d\n", offset);
+			return 0;
+	}
 }
 
 void tek440x_state::mouse_w(u8 data)
 {
 	m_mouse = data;
+	LOG("mouse select(%x)\n", m_mouse);
 }
 
 void tek440x_state::kb_rdata_w(int state)
@@ -522,7 +550,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 786000-787fff: spare
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
 	// 78a000-78bfff: NS32081 FPU
-	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
+	map(0x78c000, 0x78c007).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 78e000-78ffff: spare
 
 	// 7a0000-7bffff peripheral board I/O
@@ -615,10 +643,14 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	mos6551_device &aica(MOS6551(config, "aica", 40_MHz_XTAL / 4 / 10));
-	aica.set_xtal(1.8432_MHz_XTAL);
-	aica.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	aica.irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
+	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
+
+	// pretend we are connected
+	m_acia->write_dsr(0);
+	m_acia->write_dcd(0);
 
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
@@ -653,10 +685,10 @@ void tek440x_state::tek4404(machine_config &config)
 		});
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set("aica", FUNC(mos6551_device::write_rxd));
-	rs232.dcd_handler().set("aica", FUNC(mos6551_device::write_dcd));
-	rs232.dsr_handler().set("aica", FUNC(mos6551_device::write_dsr));
-	rs232.cts_handler().set("aica", FUNC(mos6551_device::write_cts));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
 	SPEAKER(config, "mono").front_center();
 
