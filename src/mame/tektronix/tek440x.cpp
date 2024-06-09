@@ -73,6 +73,9 @@
 #define MAP_BLOCK_ACCESS 6
 #define MAP_CPU_WR 7
 
+#define OFF8_TO_OFF16(A)	((A)>>1)
+#define OFF16_TO_OFF8(A)	((A)<<1)
+
 #define MAXRAM 0x200000	// +1MB
 //#define MAXRAM 0x400000	// +3MB (which was never a Thing)
 
@@ -98,6 +101,9 @@ public:
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
 		m_map_view(*this, "map"),
+		mousex(*this, "mousex"),
+		mousey(*this, "mousey"),
+		mousebtn(*this, "mousebtn"),
 		m_boot(false),
 		m_map_control(0),
 		m_kb_rdata(true),
@@ -122,7 +128,11 @@ private:
 	void sound_w(u8 data);
 	u8 diag_r();
 	void diag_w(u8 data);
+	u8 mouse_r();
+	void mouse_w(u8 data);
 	void led_w(u8 data);
+	u8 videoaddr_r(offs_t offset);
+	void videoaddr_w(offs_t offset, u8 data);
 	u8 videocntl_r();
 	void videocntl_w(u8 data);
 
@@ -149,6 +159,10 @@ private:
 	memory_share_creator<u16> m_map;
 	memory_view m_map_view;
 
+	required_ioport mousex;
+	required_ioport mousey;
+	required_ioport mousebtn;
+	
 	bool m_boot;
 	u8 m_map_control;
 	bool m_kb_rdata;
@@ -156,8 +170,10 @@ private:
 	bool m_kb_rclamp;
 	bool m_kb_loop;
 	u8 m_leds;
+	u8 m_videoaddr[4];
 	u8 m_videocntl;
 	u8 m_diag;
+	u8 m_mouse;
 };
 
 /*************************************
@@ -234,13 +250,14 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		return m_prom[offset & 0x3fff];
 
 	const offs_t offset0 = offset;
+	if ((m_maincpu->get_fc() & 4) == 0)
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
-		if (BIT(m_map[offset >> 11], 11, 3) != m_maincpu->get_fc())
+		if ((BIT(m_map[offset >> 11], 11, 3) & 4) != (m_maincpu->get_fc() & 4))
 		{
 			m_map_control |= (1 << MAP_CPU_WR);
 
-			LOG("bus error: read: PID %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			LOG("memory_r: bus error: PID wrong %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -252,9 +269,9 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	}
 
 	// NB byte memory limit, offset is *word* offset
-	if (offset < (0x600000>>1) && offset >= (MAXRAM>>1) && !machine().side_effects_disabled())
+	if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM) && !machine().side_effects_disabled())
 	{
-		LOG("bus error: read: %08x fc=%d\n",  offset, m_maincpu->get_fc());
+		LOG("memory_r: bus error: %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(offset0 << 1, 1, m_maincpu->get_fc());
@@ -266,6 +283,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const offs_t offset0 = offset;
+	if ((m_maincpu->get_fc() & 4) == 0)
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
 		// write-enabled?
@@ -273,7 +291,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		{
 			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 
-			LOG("bus error: BlockAccess %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			LOG("memory_w: bus error: BlockAccess %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -281,11 +299,12 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			mem_mask = 0;
 		}
 
-		if (BIT(m_map[offset >> 11], 11, 3) != (m_maincpu->get_fc()))
+		// matching pid?
+		if ((BIT(m_map[offset >> 11], 11, 3) & 4) != (m_maincpu->get_fc() & 4))
 		{
 			m_map_control |= (1 << MAP_CPU_WR);
 
-			LOG("bus error: PID %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			LOG("memory_w: bus error: PID wrong %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -300,9 +319,9 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 
 	// NB byte memory limit, offset is *word* offset
-	if (offset < (0x600000>>1) && offset >= (MAXRAM>>1) && !machine().side_effects_disabled())
+	if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM) && !machine().side_effects_disabled())
 	{
-		LOG("bus error: write %08x fc=%d\n",  offset, m_maincpu->get_fc());
+		LOG("memory_w: bus error: %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -313,11 +332,12 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 tek440x_state::map_r(offs_t offset)
 {
-	LOG("map_r 0x%08x => %08x\n",offset, m_map[offset >> 11] );
+	LOG("map_r 0x%08x => %08x\n",offset>>11, m_map[offset >> 11] );
 
+	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
-			LOG("bus error: map_r: PID %08x fc=%d\n",  offset, m_maincpu->get_fc());
+			LOG("map_r: bus error: PID %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset, 0, m_maincpu->get_fc());
@@ -329,7 +349,7 @@ u16 tek440x_state::map_r(offs_t offset)
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOG("map_w 0x%08x %04x mask(%04x)\n",offset, data, mem_mask);
+	LOG("map_w 0x%08x %04x mask(%04x)\n",offset>>11, data, mem_mask);
 
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
@@ -347,15 +367,31 @@ void tek440x_state::mapcntl_w(u8 data)
 {
 	LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, MAP_VM_ENABLE));
 	LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
-	LOG("mapcntl_w pte PID    0x%02x\n", data );
+	LOG("mapcntl_w pte PID    0x%02x\n", data & 15);
 	
+#if 0
 	if (BIT(data, MAP_VM_ENABLE))
 		m_map_view.select(0);
 	else
 		m_map_view.disable();
+#endif
 
+	// NB bit 3 is not used
 	m_map_control = data;
 	
+}
+
+u8 tek440x_state::videoaddr_r(offs_t offset)
+{
+	LOG("videoaddr_r %08x\n", offset);
+
+	return m_videoaddr[offset];
+}
+
+void tek440x_state::videoaddr_w(offs_t offset, u8 data)
+{
+//	LOG("videoaddr_w %08x %04x\n", offset, data);
+	m_videoaddr[offset] = data;
 }
 
 u8 tek440x_state::videocntl_r()
@@ -373,12 +409,13 @@ u8 tek440x_state::videocntl_r()
 void tek440x_state::videocntl_w(u8 data)
 {
 	m_videocntl = data;
+#if 0
 	LOG("m_videocntl %02x\n", data);
 	LOG("m_videocntl VBenable   %2d\n", BIT(data, 6));
 	LOG("m_videocntl ScreenOn   %2d\n", BIT(data, 5));
 	LOG("m_videocntl ScreenInv  %2d\n", BIT(data, 4));
 	LOG("m_videocntl ScreenPan  %2d\n", data & 15);
-	
+#endif
 	m_vint->in_w<0>(BIT(data, 6));
 }
 
@@ -411,6 +448,16 @@ void tek440x_state::diag_w(u8 data)
 
 	m_kb_loop = BIT(data, 7);
 	m_diag = data;
+}
+
+u8 tek440x_state::mouse_r()
+{
+	return m_mouse ? mousex->read() : mousey->read();
+}
+
+void tek440x_state::mouse_w(u8 data)
+{
+	m_mouse = data;
 }
 
 void tek440x_state::kb_rdata_w(int state)
@@ -448,8 +495,12 @@ void tek440x_state::kb_tdata_w(int state)
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
+#if 0
 	map(0x800000, 0xffffff).view(m_map_view);
 	m_map_view[0](0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
+#else
+	map(0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
+#endif
 }
 
 void tek440x_state::physical_map(address_map &map)
@@ -465,6 +516,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 780000-79ffff processor board I/O
 	map(0x780000, 0x780000).rw(FUNC(tek440x_state::mapcntl_r), FUNC(tek440x_state::mapcntl_w));
 	// 782000-783fff: video address registers
+	map(0x782000, 0x782000).rw(FUNC(tek440x_state::videoaddr_r),FUNC(tek440x_state::videoaddr_w));
 	// 784000-785fff: video control registers
 	map(0x784000, 0x784000).rw(FUNC(tek440x_state::videocntl_r),FUNC(tek440x_state::videocntl_w));
 	// 786000-787fff: spare
@@ -480,6 +532,8 @@ void tek440x_state::physical_map(address_map &map)
 	// 7b2000-7b3fff: Centronics printer data
 	map(0x7b4000, 0x7b401f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
 	// 7b6000-7b7fff: Mouse
+	map(0x7b6000, 0x7b6fff).rw(FUNC(tek440x_state::mouse_r),FUNC(tek440x_state::mouse_w));
+
 	map(0x7b8000, 0x7b8003).mirror(0x100).rw(m_timer, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	// 7ba000-7bbfff: MC146818 RTC
 	map(0x7bc000, 0x7bc000).lw8(
@@ -503,6 +557,16 @@ void tek440x_state::physical_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( tek4404 )
+	PORT_START("mousex")
+	PORT_BIT( 0x00ff, 0, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START("mousey")
+	PORT_BIT( 0x00ff, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START("mousebtn")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+
 INPUT_PORTS_END
 
 /*************************************
