@@ -371,13 +371,12 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 					const int ex = xflip ? (xsize - 1 - x) : x;
 					const int ey = yflip ? (ysize - 1 - y) : y;
 
-					// normal sprite, pen 0 transparent
 					if (!color_effect)
-					{
+					{ // normal sprite, pen 0 transparent
 							gfx->transpen(bitmap,cliprect, number,
-							color, xflip, yflip,
-							((sx + ex * 16) & 0x3ff) + spr_x_adjust,
-							((sy + ey * 16) & 0x1ff), 0);
+									color, xflip, yflip,
+									((sx + ex * 16) & 0x3ff) + spr_x_adjust,
+									((sy + ey * 16) & 0x1ff), 0);
 					}
 					else
 					{ // last palette entry is reserved for shadows and highlights
@@ -399,7 +398,8 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 							{
 								// get current pixel
 								const int xpos = (((sx + ex * 16 + px) & 0x3ff) + spr_x_adjust) & 0x3ff;
-								if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
+								if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x))
+									continue;
 
 								const int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
 
@@ -448,8 +448,8 @@ u32 gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	// set x linescroll registers
 	for (int i = 0; i < 512; i++)
 	{
-		m_pant[0]->set_scrollx(i & 0x1ff, BIT(m_vregs[0], 15) ? (m_videoram[(0x2000 / 2) + i] + xoff0) & 0x3ff : scroll0x & 0x3ff);
-		m_pant[1]->set_scrollx(i & 0x1ff, BIT(m_vregs[1], 15) ? (m_videoram[(0x2400 / 2) + i] + xoff1) & 0x3ff : scroll1x & 0x3ff);
+		m_pant[0]->set_scrollx(i & 0x1ff, (BIT(m_vregs[0], 15) ? (m_videoram[(0x2000 / 2) + i] + xoff0) : scroll0x) & 0x3ff);
+		m_pant[1]->set_scrollx(i & 0x1ff, (BIT(m_vregs[1], 15) ? (m_videoram[(0x2400 / 2) + i] + xoff1) : scroll1x) & 0x3ff);
 	}
 
 	// draw screen
@@ -617,8 +617,8 @@ u32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	// set x linescroll registers
 	for (int i = 0; i < 512; i++)
 	{
-		m_pant[0]->set_scrollx(i & 0x1ff, BIT(m_vregs[0], 15) ? (m_videoram[(0x2000 / 2) + i] + xoff0) & 0x3ff : scroll0x & 0x3ff);
-		m_pant[1]->set_scrollx(i & 0x1ff, BIT(m_vregs[1], 15) ? (m_videoram[(0x2400 / 2) + i] + xoff1) & 0x3ff : scroll1x & 0x3ff);
+		m_pant[0]->set_scrollx(i & 0x1ff, (BIT(m_vregs[0], 15) ? (m_videoram[(0x2000 / 2) + i] + xoff0) : scroll0x) & 0x3ff);
+		m_pant[1]->set_scrollx(i & 0x1ff, (BIT(m_vregs[1], 15) ? (m_videoram[(0x2400 / 2) + i] + xoff1) : scroll1x) & 0x3ff);
 	}
 
 	// draw screen
