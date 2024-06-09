@@ -1,8 +1,16 @@
-// license:BSD-3-Clause
-// copyright-holders:
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese, AJR
+/***************************************************************************************************
 
-/*
-unknown Sunwise tarot card game
+Another World (c) 1989 Sunwise
+
+TODO:
+- Identify irq sources ($24 timer, $26 VBLANK?, $20 or $22 quadrature encoder);
+- Z80DMA never sends a ready signal, workaround by forcing is_ready fn to 1;
+- Verify data ROM bank;
+- Sound;
+
+====================================================================================================
 
 TOP BOARD (S-8808A)
 =========
@@ -32,11 +40,7 @@ video output
 5x 5816 RAM
 18 MHz osc
 
-TODO:
-- Identify irq sources ($24 timer, $26 VBLANK?, $20 or $22 quadrature encoder);
-- Data ROM bank;
-
-*/
+***************************************************************************************************/
 
 #include "emu.h"
 
@@ -58,7 +62,7 @@ TODO:
 #define LOG_DMA       (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_PORTS | LOG_DMA)
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_PORTS)
 
 #include "logmacro.h"
 
@@ -78,6 +82,7 @@ public:
 		, m_dma(*this, "dma")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_video_view(*this, "video_view")
 		, m_databank(*this, "databank")
 		, m_audiobank(*this, "audiobank")
 	{
@@ -87,6 +92,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -95,6 +101,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	memory_view m_video_view;
 	required_memory_bank m_databank;
 	required_memory_bank m_audiobank;
 	std::unique_ptr<uint8_t[]> m_paletteram;
@@ -105,6 +112,7 @@ private:
 	void audio_io_map(address_map &map) ATTR_COLD;
 
 	void data_bank_w(offs_t offset, u8 data);
+	void video_bank_w(offs_t offset, u8 data);
 
 	void dma_busreq_w(int state);
 	u8 dma_memory_r(offs_t offset);
@@ -127,7 +135,13 @@ void anoworld_state::data_bank_w(offs_t offset, u8 data)
 {
 	// guess, also bit 6 actively used
 	m_databank->set_entry(data & 0x3f);
-	LOG("data_bank_w: %02x\n", data);
+	LOG("PPI port A data_bank_w: %02x\n", data);
+}
+
+void anoworld_state::video_bank_w(offs_t offset, u8 data)
+{
+	m_video_view.select(BIT(data, 4));
+	LOG("PPI port C video_bank_w: %02x\n", data);
 }
 
 void anoworld_state::dma_busreq_w(int state)
@@ -167,8 +181,8 @@ void anoworld_state::main_program_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xafff).ram();
-//  map(0xb000, 0xbfff).ram(); // interleaved video tilemap + palette words (RGB444)? Or banked thru port $42 bit 4?
-	map(0xb000, 0xbfff).lrw8(
+	map(0xb000, 0xbfff).view(m_video_view);
+	m_video_view[0](0xb000, 0xbfff).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_paletteram[bitswap<12>(offset ^ 2, 1, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0)];
 		}),
@@ -183,6 +197,7 @@ void anoworld_state::main_program_map(address_map &map)
 			m_palette->set_pen_color(pal_offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
 		})
 	);
+	m_video_view[1](0xb000, 0xbfff).ram();
 
 	map(0xc000, 0xffff).bankr(m_databank);
 }
@@ -197,8 +212,8 @@ void anoworld_state::main_io_map(address_map &map)
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x30, 0x33).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x43).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x50, 0x50).noprw(); // ? (bits 4 and 5 checked in service routines $20 and $22)
-	map(0x60, 0x60).noprw(); // ?
+	map(0x50, 0x50).portr("IN0"); // ? (bits 4 and 5 checked in service routines $20 and $22)
+	map(0x60, 0x60).portr("IN1"); // ?
 }
 
 static const z80_daisy_config main_daisy_chain[] =
@@ -228,34 +243,82 @@ void anoworld_state::audio_io_map(address_map &map)
 
 static INPUT_PORTS_START( unktarot )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW:8")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -294,6 +357,11 @@ void anoworld_state::machine_start()
 	m_databank->set_entry(0);
 	m_audiobank->configure_entries(0, 32, memregion("audiocpu")->base(), 0x4000);
 	m_audiobank->set_entry(1);
+}
+
+void anoworld_state::machine_reset()
+{
+	m_video_view.select(0);
 }
 
 /*
@@ -345,7 +413,7 @@ void anoworld_state::unktarot(machine_config &config)
 	i8255_device &ppi1(I8255A(config, "ppi1")); // NEC D8255AC-2
 	ppi1.out_pa_callback().set(FUNC(anoworld_state::data_bank_w));
 	ppi1.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port B out %02x\n", machine().describe_context(), data); });
-	ppi1.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port C out %02x\n", machine().describe_context(), data); });
+	ppi1.out_pc_callback().set(FUNC(anoworld_state::video_bank_w));
 
 	msm6242_device &rtc(MSM6242(config, "rtc", 32.768_kHz_XTAL));
 	rtc.out_int_handler().set("ctc0", FUNC(z80ctc_device::trg3)); // source guessed
