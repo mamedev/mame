@@ -996,9 +996,33 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	}
 }
 
-void powervr2_device::startrender_w(address_space &space, uint32_t data)
+void powervr2_device::startrender_w(address_space& space, uint32_t data)
 {
+	if (m_render_request)
+	{
+		int result;
+		do
+		{
+			result = osd_work_item_wait(m_render_request, 1000);
+			//printf("waiting\n");
+
+		} while (result == 0);
+		osd_work_item_release(m_render_request);
+	}
+
+	m_render_request = osd_work_item_queue(m_work_queue, blit_request_callback, (void*)this, 0);
+
 	dc_state *state = machine().driver_data<dc_state>();
+
+	// hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
+	int sanitycount = 1500;
+    endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 2000000));   // hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
+}
+
+
+void powervr2_device::startrender_real_w(address_space &space)
+{
+	//dc_state *state = machine().driver_data<dc_state>();
 	auto profile = g_profiler.start(PROFILER_USER1);
 
 	LOGTACMD("Start render, region=%08x, params=%08x\n", region_base, param_base);
@@ -1014,7 +1038,7 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			grab[a].fbwsof1 = fb_w_sof1;
 			grab[a].fbwsof2 = fb_w_sof2;
 
-			rectangle clip(0, 1023, 0, 1023);
+			rectangle clip(0, 640, 0, 480);
 
 			// we've got a request to draw, so, draw to the accumulation buffer!
 			// this should really be done for each tile!
@@ -1074,16 +1098,26 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			// vbl-in and expect that it completes after some time that vbl-out kicks in,
 			// in order to have enough time to execute logic stuff in the meantime.
 //          const u64 isp_completion = sanitycount * 25 + 500000;
-			const u64 isp_completion = sanitycount * 25 + 2000000;
-			LOGIRQ("[%d] ISP end of render start %d in %d cycles\n",
-				screen().frame_number(), screen().vpos(), isp_completion
-			);
-			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(isp_completion));
+			//const u64 isp_completion = sanitycount * 25 + 2000000;
+			//LOGIRQ("[%d] ISP end of render start %d in %d cycles\n",
+			//	screen().frame_number(), screen().vpos(), isp_completion
+			//);
+			//endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(isp_completion));
 			break;
 		}
 	}
 }
 
+void *powervr2_device::blit_request_callback(void *param, int threadid)
+{
+	powervr2_device *object = reinterpret_cast<powervr2_device *>(param);
+
+	dc_state *state = object->machine().driver_data<dc_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+
+	object->startrender_real_w(space);
+	return nullptr;
+}
 
 uint32_t powervr2_device::param_base_r()
 {
@@ -4049,6 +4083,9 @@ void powervr2_device::device_start()
 	save_pointer(NAME(tafifo_buff),32);
 	save_item(NAME(scanline));
 	save_item(NAME(next_y));
+
+	m_work_queue = nullptr;
+	m_render_request = nullptr;
 }
 
 void powervr2_device::device_reset()
@@ -4086,6 +4123,8 @@ void powervr2_device::device_reset()
 	dc_state *state = machine().driver_data<dc_state>();
 	dc_texture_ram = state->dc_texture_ram.target();
 	dc_framebuffer_ram = state->dc_framebuffer_ram.target();
+
+	m_work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 }
 
 /* called by TIMER_ADD_PERIODIC, in driver sections (controlled by SPG, that's a PVR sub-device) */
