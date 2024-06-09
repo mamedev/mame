@@ -30617,9 +30617,6 @@ jackpota
 @source:misc/jaminator.cpp
 jaminator                       // 1990 Noise Toys Inc.
 
-@source:misc/jankenmn.cpp
-jankenmn                        // (c) 1985 Sunwise
-
 @source:misc/jokrwild.cpp
 jokrwild                        // (c) 1988 Sigma
 
@@ -42264,9 +42261,6 @@ squale                          //
 @source:skeleton/sterz80.cpp
 tongzi
 
-@source:skeleton/swunktarot.cpp
-unktarot
-
 @source:skeleton/swyft.cpp
 swyft                           //
 
@@ -43012,6 +43006,12 @@ shanghaij                       // (c) 1988 Sunsoft (Sun Electronics)
 
 @source:sunelectronics/tonton.cpp
 tonton                          // (c) 199? Success / Taiyo Jidoki.
+
+@source:sunwise/anoworld.cpp
+anoworld
+
+@source:sunwise/jankenmn.cpp
+jankenmn                        // (c) 1985 Sunwise
 
 @source:svi/svi318.cpp
 svi318                          // SVI-318 (PAL)

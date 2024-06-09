@@ -88,7 +88,7 @@ public:
 	{
 	}
 
-	void unktarot(machine_config &config) ATTR_COLD;
+	void anoworld(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -241,7 +241,7 @@ void anoworld_state::audio_io_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( unktarot )
+static INPUT_PORTS_START( anoworld )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -344,7 +344,7 @@ const gfx_layout gfx_8x8x4 =
 	8*8
 };
 
-static GFXDECODE_START( gfx_unktarot )
+static GFXDECODE_START( gfx_anoworld )
 	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x1, 0, 16 ) // TODO: identify how it gathers palette
 	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4, 0, 16 * 8 )
 GFXDECODE_END
@@ -374,7 +374,7 @@ void anoworld_state::machine_reset()
  */
 
 
-void anoworld_state::unktarot(machine_config &config)
+void anoworld_state::anoworld(machine_config &config)
 {
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &anoworld_state::main_program_map);
@@ -425,7 +425,7 @@ void anoworld_state::unktarot(machine_config &config)
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(anoworld_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unktarot);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_anoworld);
 
 	PALETTE(config, m_palette).set_entries(0x800); //.set_format(palette_device::xRGB_444, 0x800);
 
@@ -437,7 +437,7 @@ void anoworld_state::unktarot(machine_config &config)
 }
 
 
-ROM_START( unktarot )
+ROM_START( anoworld )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "1.u5", 0x00000, 0x08000, CRC(eaf339d1) SHA1(8325046d2059ad890204e0373bcfbe1221e12bdf) )
 
@@ -472,4 +472,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, unktarot, 0, unktarot, unktarot, anoworld_state, empty_init, ROT0, "Sunwise", "Another World (Japan)", MACHINE_IS_SKELETON ) // title screen GFXs in region 1 at 0x3051 onward
+GAME( 1989, anoworld, 0, anoworld, anoworld, anoworld_state, empty_init, ROT0, "Sunwise", "Another World (Japan)", MACHINE_IS_SKELETON ) // title screen GFXs in region 1 at 0x3051 onward
