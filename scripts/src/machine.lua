@@ -5337,3 +5337,15 @@ if (MACHINES["SCI4"]~=null) then
 		MAME_DIR .. "src/devices/machine/sci4.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/generic_dual_coin_sensor.h,MACHINES["GEN_DUAL_COIN_IN"] = true
+---------------------------------------------------
+
+if (MACHINES["GEN_DUAL_COIN_IN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/generic_dual_coin_sensor.cpp",
+		MAME_DIR .. "src/devices/machine/generic_dual_coin_sensor.h",
+	}
+end
