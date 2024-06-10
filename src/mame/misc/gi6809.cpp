@@ -70,8 +70,7 @@
   ------
 
   - Discover the proper way to tie PIA's signals to Microprocessor's IRQs.
-  - Coin In device support.
-
+  
 
 ****************************************************************************************/
 
@@ -83,6 +82,7 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/generic_io_opto_coin_device.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -112,6 +112,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_input(*this, "IN0-%u", 0U),
 		m_hopper(*this, "hopper"),
+		m_coin_butt(*this, "CoinKey"),
+		m_opto(*this, "opto"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_sound_bit0(*this, "sound_nl:bit0"),
 		m_sound_bit1(*this, "sound_nl:bit1"),
@@ -151,6 +153,8 @@ private:
 	required_shared_ptr<u8> m_colorram;
 	required_ioport_array<4> m_input;
 	required_device<ticket_dispenser_device> m_hopper;
+	required_ioport m_coin_butt;
+	required_device<generic_io_opto_coin_device> m_opto;
 	output_finder<8> m_lamps;
 
 	// Audio triggers
@@ -446,9 +450,10 @@ static INPUT_PORTS_START( glck6809 )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("D-UP - Menu Back")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )  // Coin Upper Sensor - to be implemented
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )       PORT_READ_LINE_DEVICE_MEMBER("opto", generic_io_opto_coin_device, opto_h_r) PORT_NAME("Coin Upper Sensor")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )  // Coin Lower Sensor - to be implemented
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )       PORT_READ_LINE_DEVICE_MEMBER("opto", generic_io_opto_coin_device, opto_l_r) PORT_NAME("Coin Lower Sensor")
+
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -483,6 +488,8 @@ static INPUT_PORTS_START( glck6809 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("CoinKey")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )  PORT_WRITE_LINE_DEVICE_MEMBER("opto", generic_io_opto_coin_device, coin_sense_w)
 INPUT_PORTS_END
 
 
@@ -635,6 +642,8 @@ void gi6809_state::gi6809_base(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:bit3", "PA3.IN", 0);
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 
+	GENERIC_IO_OPTO_COIN_DEVICE(config, m_opto, 0);
+
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 
@@ -657,8 +666,8 @@ void gi6809_state::glck6809(machine_config &config)
 	PIA6821(config, m_pia[0], 0);  // controlled by slave
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
-	m_pia[0]->ca2_handler().set_nop();
-	m_pia[0]->cb2_handler().set_nop();
+	m_pia[0]->ca2_handler().set([](int state) {});
+	m_pia[0]->cb2_handler().set([](int state) {});
 
 	PIA6821(config, m_pia[1], 0);  // controlled by master
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
@@ -666,8 +675,8 @@ void gi6809_state::glck6809(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
 	m_pia[1]->readcb1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	m_pia[1]->ca2_handler().set_nop();
-	m_pia[1]->cb2_handler().set_nop();
+	m_pia[1]->ca2_handler().set([](int state) {});
+	m_pia[1]->cb2_handler().set([](int state) {});
 }
 
 
@@ -692,18 +701,18 @@ void gi6809_state::castawayt(machine_config &config)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps8_w));
 	m_pia[0]->readca1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
-	m_pia[0]->ca2_handler().set_nop();
+	m_pia[0]->ca2_handler().set([](int state) {});
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3h_w));
 
-	//m_pia[1]->readca1_handler() coin in upper opto to be implemented
-	//m_pia[1]->readca2_handler() coin in lower opto to be implemented
+	m_pia[1]->readca1_handler().set(m_opto, FUNC(generic_io_opto_coin_device::opto_h_r));  // coin in upper opto
+	m_pia[1]->readca2_handler().set(m_opto, FUNC(generic_io_opto_coin_device::opto_l_r));  // coin in lower opto
 
 	m_pia[1]->readcb1_handler().set(m_crtc, FUNC(mc6845_device::vsync_r));
-	m_pia[1]->cb2_handler().set_nop();
+	m_pia[1]->cb2_handler().set([](int state) {});
 	m_pia[1]->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 }
@@ -731,19 +740,21 @@ void gi6809_state::jesterch(machine_config &config)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
 	m_pia[0]->irqa_handler().set_inputline(m_slavecpu, M6809_IRQ_LINE);
-	m_pia[0]->ca2_handler().set_nop();
-	m_pia[0]->cb2_handler().set_nop();
+	m_pia[0]->ca2_handler().set([](int state) {});
+	m_pia[0]->cb2_handler().set([](int state) {});
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::gi6809_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
 
-	//m_pia[1]->readca1_handler() coin in upper opto to be implemented
-	//m_pia[1]->readca2_handler() coin in lower opto to be implemented
+	m_pia[1]->readca1_handler().set(m_opto, FUNC(generic_io_opto_coin_device::opto_h_r));  // coin in upper opto
 
-	m_pia[1]->ca2_handler().set_nop();
-	m_pia[1]->cb2_handler().set_nop();
+	m_pia[1]->readca2_handler().set(m_opto, FUNC(generic_io_opto_coin_device::opto_l_r));  // coin in lower opto
+
+
+	m_pia[1]->ca2_handler().set([](int state) {});
+	m_pia[1]->cb2_handler().set([](int state) {});
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_pia[1]->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 }

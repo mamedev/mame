@@ -5337,3 +5337,15 @@ if (MACHINES["SCI4"]~=null) then
 		MAME_DIR .. "src/devices/machine/sci4.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/generic_io_opto_coin_device.h,MACHINES["GENERIC_IO_OPTO_COIN_DEVICE"] = true
+---------------------------------------------------
+
+if (MACHINES["GENERIC_IO_OPTO_COIN_DEVICE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/generic_io_opto_coin_device.cpp",
+		MAME_DIR .. "src/devices/machine/generic_io_opto_coin_device.h",
+	}
+end
