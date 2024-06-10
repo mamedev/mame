@@ -282,6 +282,45 @@ ROM_START( karatvst )
 ROM_END
 
 /*
+The 'karatvsta' set has the following 25 songs built in, there don't appear to be any downloaded songs in this NAND dump
+These are a subset of the songs in the 50 song unit, and while the box advertises 35 songs, 10 of those are via a download voucher
+
+Always On My Mind                           Elvis Presley (R)
+Brick House                                 Commodores, The
+Dancing Queen                               Abba
+Don't Let Me Get Me                         Pink
+Drive (For Daddy Gene)                      Alan Jackson
+Fallin'                                     Alicia Keys
+Goodbye Earl                                Dixie Chicks
+Heard It Through The Grapevine              Marvin Gaye
+I Should Be Sleeping                        Emerson Drive
+Lady Marmalade                              Christina Aguilera
+Love Shack                                  B52's
+Me And Bobby Mcgee                          Janis Joplin
+My Girl                                     Temptations
+My Guy                                      Mary Wells
+New York New York                           Frank Sinatra
+No More Drama                               Mary J.Blige
+Over The Rainbow                            Judy Garland
+Stand By Your Man                           Tammy Wynette
+That's The Way (I Like It)                  KC And The Sunshine Band
+The Greatest Love Of All                    Whitney Houston
+The Loco-Motion                             Kylie Minogue
+There Is No Arizona                         Jamie O'neal
+What's Going On                             Marvin Gaye
+Wild Thing                                  Troggs
+Wrapped Around                              Brad Paisley
+*/
+
+ROM_START( karatvsta )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "tvstarkaraoke_sst37vf010_bfc5.bin", 0x000000, 0x20000, CRC(fbac56e9) SHA1(bae393ce86de108b6ddc603770863ced885280b6) ) // bootloader, only final bytes differ from karatvsta, serial number?
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tvstarkaraoke_tc58v64aft_98e6a59a.bin", 0x000000, 0x840000, CRC(207f2c6b) SHA1(a8853b792ba23bdead913c8d5ad0c75c39a48c99) )
+ROM_END
+
+/*
 
 song list is unknown for the Japanese version as the titles aren't stored as ASCII in the flash ROM
 
@@ -381,6 +420,8 @@ ROM_END
 // This is the original US release, there's no cartridge slot, but it has a NAND Flash inside, and in addition to 50 built-in songs, advertises
 // use of a (now defunct) www.onkeysongs.com service for downloading additional songs to the microphone via bundled PC software.
 CONS( 2002, karatvst,      0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_IS_SKELETON )
+CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 25 songs, 'FREE 35 Hit Songs / $35 value' packaging)", MACHINE_IS_SKELETON ) // 25 songs on unit, download code for 10 songs
+
 // Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
 CONS( 2002, bkarast,       karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
 
