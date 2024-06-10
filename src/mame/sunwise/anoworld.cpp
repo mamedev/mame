@@ -405,6 +405,7 @@ void anoworld_state::anoworld(machine_config &config)
 		// punts to an insert coin screen if this is 0xff,
 		// reacts to D0-D7 signals in test mode.
 		//LOGPORTS("%s: PPI0 port C in\n", machine().describe_context());
+		(void)this;
 		return uint8_t(0);
 	});
 	ppi0.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port A out %02x\n", machine().describe_context(), data); });
