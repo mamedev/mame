@@ -35307,6 +35307,8 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmane                       // bootleg
+mspacmane2                      // bootleg
 mspacmanhnc                     // hack
 mspacmanlai                     // bootleg
 mspacmat                        // hack
@@ -35331,6 +35333,7 @@ pacman                          // (c) 1980 Midway
 pacmanf                         // hack
 pacmanfm                        // bootleg (FAMARE S.A.)
 pacmanjpm                       // bootleg
+pacmanmr                        // bootleg
 pacmanpe                        //
 pacmanso                        //
 pacmansp                        // hack (Video Game SA)
