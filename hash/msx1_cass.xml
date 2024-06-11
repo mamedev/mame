@@ -1880,7 +1880,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="UXK 001"/>
-		<info name="isbn" value="4787561001"/>
+		<info name="barcode" value="4787561001"/> <!-- Not a valid ISBN-10 code -->
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
