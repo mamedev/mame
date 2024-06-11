@@ -883,18 +883,14 @@ void nsc800_device::device_reset()
 	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
 }
 
-bool z80_device::check_icount(u8 to_step, int icount_saved, bool redonable)
+bool z80_device::check_icount(u8 to_step, int icount_saved, bool redoable)
 {
-	if ((m_icount < 0) && redonable && access_to_be_redone())
+	if ((m_icount < 0) && redoable && access_to_be_redone())
 	{
 		m_icount = icount_saved;
 		m_ref = (m_ref & 0xffff00) | (to_step - 1);
 		m_redone = true;
 		return true;
-	}
-	if (m_wait_state)
-	{
-		m_icount = 0;
 	}
 	if (m_icount <= 0)
 	{
