@@ -580,7 +580,7 @@ void maciifx_state::maciifx(machine_config &config)
 	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));
 	swimpic.pwr_callback().set(m_fdc, FUNC(applefdintf_device::write));
 	swimpic.hint_callback().set(FUNC(maciifx_state::oss_interrupt<6>));
-	swimpic.gpout0_callback().set(m_macadb, FUNC(macadb_device::adb_data_w));
+	swimpic.gpout0_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w)).invert();
 	swimpic.gpin_callback().set(FUNC(maciifx_state::adbin_r));
 
 	m_fdc->dat1byte_cb().set("swimpic", FUNC(applepic_device::reqa_w));
