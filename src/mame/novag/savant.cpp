@@ -21,9 +21,6 @@ Hardware overview:
 The display (both the LCD and the sensors) didn't last long, probably none exist
 anymore in original working order.
 
-TODO:
-- get rid of m_wait_in hack when Z80 core accurately emulates WAIT pin
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -68,6 +65,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
@@ -82,7 +80,7 @@ private:
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_inputs;
 
-	bool m_wait_in = false;
+	bool m_z80_wait = false;
 	u8 m_inp_mux = 0;
 	u8 m_databus = 0;
 	u8 m_control = 0;
@@ -115,11 +113,16 @@ private:
 void savant_state::machine_start()
 {
 	// register for savestates
-	save_item(NAME(m_wait_in));
+	save_item(NAME(m_z80_wait));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_databus));
 	save_item(NAME(m_control));
 	save_item(NAME(m_lcd_data));
+}
+
+void savant_state::machine_reset()
+{
+	m_z80_wait = false;
 }
 
 
@@ -144,22 +147,24 @@ u8 savant_state::nvram_r(offs_t offset)
 void savant_state::stall_w(offs_t offset, u8 data)
 {
 	// any access to port C0 puts the Z80 into WAIT, sets BUSRQ, and sets MCU EXT INT
-	m_databus = offset >> 8;
-	m_psu->ext_int_w(1);
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+	if (!m_z80_wait)
+	{
+		m_databus = offset >> 8;
+		m_psu->ext_int_w(1);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+		m_maincpu->defer_access();
+	}
+
+	m_z80_wait = !m_z80_wait;
 }
 
 u8 savant_state::stall_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
-	{
-		m_wait_in = true;
 		stall_w(offset);
-	}
 
-	// return value is databus (see control_w)
-	return 0;
+	return m_databus;
 }
 
 u8 savant_state::mcustatus_r()
@@ -206,13 +211,6 @@ void savant_state::control_w(u8 data)
 	{
 		m_psu->ext_int_w(0);
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-
-		// hack to set Z80 A after IN A,($C0)
-		if (m_wait_in)
-		{
-			m_maincpu->set_state_int(Z80_A, m_databus);
-			m_wait_in = false;
-		}
 	}
 
 	// d1: clear Z80 BUSRQ
