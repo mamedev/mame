@@ -137,6 +137,10 @@ private:
 	u8 videocntl_r();
 	void videocntl_w(u8 data);
 
+	// fake output of serial
+	void write_txd(int state);
+	
+	
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
 	void kb_rclamp_w(int state);
@@ -214,7 +218,9 @@ void tek440x_state::machine_reset()
 	// want to simulate a connection so we can get debug output
 	//m_acia->write_dsr(0);
 	//m_acia->write_dcd(0);
-
+	
+	m_acia->write(4, 0);
+	
 }
 
 
@@ -258,17 +264,19 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		return m_prom[offset & 0x3fff];
 
 	const offs_t offset0 = offset;
-	if ((m_maincpu->get_fc() & 4) == 0)
+	if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
 		// selftest expects fail if page.pid != map_control.pid
 		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
-		
-//		if ((BIT(m_map[offset >> 11], 11, 3) & 4) != (m_maincpu->get_fc() & 4))
 		{
-			m_map_control |= (1 << MAP_BLOCK_ACCESS);
+			// is !cpuWr
+			m_map_control &= ~(1 << MAP_CPU_WR);
 
-			LOG("memory_r: bus error: PID wrong %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			m_map_control |= (1 << MAP_BLOCK_ACCESS);
+			LOG("memory_r: m_map_control(%02x)\n", m_map_control);
+
+			LOG("memory_r: bus error: PID(%d) wrong %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -282,7 +290,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	// NB byte memory limit, offset is *word* offset
 	if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM) && !machine().side_effects_disabled())
 	{
-		LOG("memory_r: bus error: %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+		LOG("memory_r: bus error: %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(offset0 << 1, 1, m_maincpu->get_fc());
@@ -297,13 +305,37 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	if ((m_maincpu->get_fc() & 4) == 0)
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
-		// write-enabled?
+		LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
+	
+		// matching pid?
+		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
+		{
+			// is cpuWr
+			m_map_control |= (1 << MAP_CPU_WR);
+				
+			m_map_control |= (1 << MAP_BLOCK_ACCESS);
+			LOG("memory_w: m_map_control(%02x)\n", m_map_control);
+
+			LOG("memory_w: bus error: PID(%d) wrong %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
+			
+			mem_mask = 0;
+		}
+		else
+		{
+			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+		}
+
+		// write-enabled page?
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
-// VM test #12 fails
-//			m_map_control |= (1 << MAP_CPU_WR);
+			// is cpuWr
+			m_map_control |= (1 << MAP_CPU_WR);
+			LOG("memory_w: m_map_control(%02x)\n", m_map_control);
 
-			LOG("memory_w: bus error: BlockAccess %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			LOG("memory_w: bus error: READONLY %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -311,29 +343,20 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			mem_mask = 0;
 		}
 
-		// matching pid?
-		if ((BIT(m_map[offset >> 11], 11, 3) & 4) != (m_maincpu->get_fc() & 4))
+		// mark page dirty (NB before we overwrite offset)
+		if (mem_mask)
 		{
-			m_map_control |= (1 << MAP_BLOCK_ACCESS);
-
-			LOG("memory_w: bus error: PID wrong %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
-			
-			mem_mask = 0;
+			m_map[offset >> 11] |= 0x8000;
+			LOG("memory_w: DIRTY m_map(0x%04x) m_map_control(%02x)\n", m_map[offset >> 11], m_map_control);
 		}
-
-		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 		
-		// mark page dirty
-		m_map[offset >> 11] |= 0x8000;
+		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 	}
 
 	// NB byte memory limit, offset is *word* offset
 	if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM) && !machine().side_effects_disabled())
 	{
-		LOG("memory_w: bus error: %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+		LOG("memory_w: bus error: %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -344,12 +367,12 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 tek440x_state::map_r(offs_t offset)
 {
-	LOG("map_r 0x%08x => %08x\n",offset>>11, m_map[offset >> 11] );
+	LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
 
 	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
-			LOG("map_r: bus error: PID %08x fc=%d\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			LOG("map_r: bus error: PID(%d) %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset, 0, m_maincpu->get_fc());
@@ -361,8 +384,11 @@ u16 tek440x_state::map_r(offs_t offset)
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOG("map_w 0x%08x %04x mask(%04x)\n",offset>>11, data, mem_mask);
+	LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
 
+	// does writing clear these?
+	//m_map_control &= ~(1 << MAP_CPU_WR);
+	
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
 		COMBINE_DATA(&m_map[offset >> 11]);
@@ -371,8 +397,22 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 
 u8 tek440x_state::mapcntl_r()
 {
-	// TODO: need to mask in: cpuWr, BlockAccess.  Is this controled by current FC?
-	return m_map_control;
+	LOG("mapcntl_r(%02x)\n", m_map_control);
+	
+	// mask out 'SysWrEn' (presumed it was the same as 'Write En. Map Table' when writing..)
+
+	u8 ans = m_map_control;
+	
+	// VM selftest fail #12 if bit 5 not cleared (expects 0x57, gets 0x77)
+	
+	// VM selftest fail #16 if bit 6 not cleared (expects 0x97, gets 0xd7)
+
+	// VM selftest fail #20 (expects 0xf7, gets 0xd7)
+
+	if ((ans & 0xc0) != 0xc0)
+		ans &= 0xdf;
+
+	return ans;
 }
 
 void tek440x_state::mapcntl_w(u8 data)
@@ -389,8 +429,8 @@ void tek440x_state::mapcntl_w(u8 data)
 		m_map_view.disable();
 #endif
 
-	// NB bit 3 & 7 is not used
-	m_map_control = data & 0x7f;
+	// NB bit 6 & 7 is not used
+	m_map_control = data & 0x3f;
 	
 }
 
@@ -486,6 +526,11 @@ void tek440x_state::mouse_w(u8 data)
 {
 	m_mouse = data;
 	LOG("mouse select(%x)\n", m_mouse);
+}
+
+void tek440x_state::write_txd(int state)
+{
+	LOG("mouse write_txd(%x)\n", state);
 }
 
 void tek440x_state::kb_rdata_w(int state)
@@ -647,10 +692,6 @@ void tek440x_state::tek4404(machine_config &config)
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
-
-	// pretend we are connected
-	m_acia->write_dsr(0);
-	m_acia->write_dcd(0);
 
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
