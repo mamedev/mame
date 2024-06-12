@@ -285,6 +285,7 @@ project "softfloat3"
 		MAME_DIR .. "3rdparty/softfloat3/source",
 		MAME_DIR .. "3rdparty/softfloat3/source/include",
 		MAME_DIR .. "3rdparty/softfloat3/source/8086",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext"
 	}
 
 	configuration { "gmake or ninja" }
@@ -313,6 +314,11 @@ end
 		"SOFTFLOAT_FAST_INT64"
 	}
 
+if _OPTIONS["BIGENDIAN"]~="1" then
+	defines {
+		"LITTLEENDIAN=1"
+	}
+end
 	files {
 		MAME_DIR .. "3rdparty/softfloat3/source/s_eq128.c",
 		MAME_DIR .. "3rdparty/softfloat3/source/s_le128.c",
@@ -615,6 +621,13 @@ end
 		MAME_DIR .. "3rdparty/softfloat3/source/f128M_eq_signaling.c",
 		MAME_DIR .. "3rdparty/softfloat3/source/f128M_le_quiet.c",
 		MAME_DIR .. "3rdparty/softfloat3/source/f128M_lt_quiet.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/f2xm1.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fpatan.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fprem.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fsincos.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fyl2x.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/poly.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/extF80_scale.c",
 	}
 
 

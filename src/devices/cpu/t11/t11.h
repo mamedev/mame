@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "machine/z80daisy.h"
+
 
 enum
 {
@@ -1194,7 +1196,7 @@ protected:
 	void sub_ixd_ixd(uint16_t op);
 };
 
-class k1801vm1_device : public t11_device
+class k1801vm1_device : public t11_device, public z80_daisy_chain_interface
 {
 public:
 	// construction/destruction
@@ -1212,7 +1214,7 @@ protected:
 };
 
 
-class k1801vm2_device : public t11_device
+class k1801vm2_device : public t11_device, public z80_daisy_chain_interface
 {
 public:
 	// construction/destruction

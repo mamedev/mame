@@ -42,7 +42,7 @@ void ata_flash_pccard_device::device_reset()
 		m_cis[8] = 0x01; // Size of Fields Byte (2:TPCC_RFSZ 4:TPCC_RMSZ 2:TPCC_RASZ)
 		m_cis[9] = 0x03; // TPCC_LAST (2:RFU 6:Last Index) (count of 0x1b?)
 		m_cis[10] = 0x00; // TPCC_RADR
-		m_cis[11] = 0x02; // TPCC_RADR 
+		m_cis[11] = 0x02; // TPCC_RADR
 		m_cis[12] = 0x0f; // TPCC_RMSK
 		m_cis[13] = 0x21; // CISTPL_FUNCID
 		m_cis[14] = 0x02; // TPL_LINK

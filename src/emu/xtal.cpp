@@ -431,6 +431,7 @@ const double XTAL::known_xtals[] = {
 	 34'000'000, /* 34_MHz_XTAL            Gaelco PCBs */
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
+	 35'452'500, /* 35.4525_MHz_XTAL       Nokia MikroMikko 2 */
 	 35'469'000, /* 35.469_MHz_XTAL        ZX Spectrum +2/+3 (~8x PAL subcarrier) */
 	 35'640'000, /* 35.640_MHz_XTAL        HDS200 132-column display clock */
 	 35'834'400, /* 35.8344_MHz_XTAL       Tab Products E-22 132-column display clock */
@@ -474,6 +475,7 @@ const double XTAL::known_xtals[] = {
 	 51'200'000, /* 51.2_MHz_XTAL          Namco Super System 22 video clock */
 	 52'000'000, /* 52_MHz_XTAL            Cojag */
 	 52'832'000, /* 52.832_MHz_XTAL        Wang PC TIG video controller */
+	 52'867'000, /* 52.867_MHz_XTAL        Atlus Print Club (Sega C2 PCB) */
 	 53'203'424, /* 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier) */
 	 53'693'175, /* 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
 	 54'000'000, /* 54_MHz_XTAL            Taito JC */

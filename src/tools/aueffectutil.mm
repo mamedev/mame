@@ -16,29 +16,12 @@
 #include <cstdlib>
 
 
-#ifdef MAC_OS_X_VERSION_MAX_ALLOWED
-
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
-
-typedef ComponentDescription AudioComponentDescription;
-
-@protocol NSApplicationDelegate <NSObject>
-@end
-
-@protocol NSWindowDelegate <NSObject>
-@end
-
-#endif // MAC_OS_X_VERSION_MAX_ALLOWED < 1060
-
-#endif // MAC_OS_X_VERSION_MAX_ALLOWED
-
-
 struct EffectInfo
 {
-	Component   component;
-	OSType      type;
-	OSType      subtype;
-	OSType      manufacturer;
+	AudioComponent  component;
+	OSType          type;
+	OSType          subtype;
+	OSType          manufacturer;
 };
 
 
@@ -173,7 +156,7 @@ static void UpdateChangeCountCallback(
 	if (!customViewValid)
 	{
 		forceGenericView = YES;
-		[genericViewButton setState:NSOnState];
+		[genericViewButton setState:NSControlStateValueOn];
 	}
 
 	CFIndex const presetCount = (NULL != presets) ? CFArrayGetCount(presets) : 0;
@@ -256,11 +239,11 @@ static void UpdateChangeCountCallback(
 - (void)makeWindowControllers {
 	genericViewButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 18)];
 	[genericViewButton setAutoresizingMask:NSViewNotSizable];
-	[[genericViewButton cell] setControlSize:NSSmallControlSize];
-	[genericViewButton setButtonType:NSSwitchButton];
+	[[genericViewButton cell] setControlSize:NSControlSizeSmall];
+	[genericViewButton setButtonType:NSButtonTypeSwitch];
 	[genericViewButton setBordered:NO];
 	[genericViewButton setAllowsMixedState:NO];
-	[genericViewButton setState:(forceGenericView ? NSOnState : NSOffState)];
+	[genericViewButton setState:(forceGenericView ? NSControlStateValueOn : NSControlStateValueOff)];
 	[genericViewButton setTitle:@"Use generic editor view"];
 	[genericViewButton setAction:@selector(toggleGenericView:)];
 	[genericViewButton setTarget:self];
@@ -268,8 +251,8 @@ static void UpdateChangeCountCallback(
 
 	presetButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 22) pullsDown:YES];
 	[presetButton setAutoresizingMask:NSViewNotSizable];
-	[[presetButton cell] setControlSize:NSSmallControlSize];
-	[[presetButton cell] setFont:[NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSSmallControlSize]]];
+	[[presetButton cell] setControlSize:NSControlSizeSmall];
+	[[presetButton cell] setFont:[NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSControlSizeSmall]]];
 	[presetButton setTitle:@"Load preset"];
 	[[[presetButton menu] addItemWithTitle:@"Load preset" action:NULL keyEquivalent:@""] setHidden:YES];
 	[presetButton sizeToFit];
@@ -297,9 +280,9 @@ static void UpdateChangeCountCallback(
 	[presetButton release];
 
 	window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, headerSize.width, headerSize.height)
-										 styleMask:(NSTitledWindowMask |
-													NSClosableWindowMask |
-													NSMiniaturizableWindowMask)
+										 styleMask:(NSWindowStyleMaskTitled |
+													NSWindowStyleMaskClosable |
+													NSWindowStyleMaskMiniaturizable)
 										   backing:NSBackingStoreBuffered
 											 defer:YES];
 	[window setReleasedWhenClosed:NO];
@@ -346,22 +329,20 @@ static void UpdateChangeCountCallback(
 		return NO;
 	}
 
-	NSString *errDesc = nil;
-	id const desc = [NSPropertyListSerialization propertyListFromData:data
-													 mutabilityOption:0
+	NSError *errDesc = nil;
+	id const desc = [NSPropertyListSerialization propertyListWithData:data
+															  options:NSPropertyListImmutable
 															   format:NULL
-													 errorDescription:&errDesc];
+																error:&errDesc];
 	if (!desc || ![desc isKindOfClass:[NSDictionary class]] || errDesc)
 	{
 		if (error)
 		{
-			NSString *const message = [NSString stringWithFormat:@"Error in file format (%@)", errDesc];
+			NSString *const message = [NSString stringWithFormat:@"Error in file format (%@)", [errDesc localizedDescription]];
 			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,  NSLocalizedDescriptionKey,
 																				  nil];
 			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		}
-		if (errDesc)
-			[errDesc release];
 		return NO;
 	}
 
@@ -579,7 +560,7 @@ static void UpdateChangeCountCallback(
 		 && [[desc objectForKey:ForceGenericViewKey] respondsToSelector:@selector(boolValue)])
 		{
 			forceGenericView = [[desc objectForKey:ForceGenericViewKey] boolValue];
-			[genericViewButton setState:(forceGenericView ? NSOnState : NSOffState)];
+			[genericViewButton setState:(forceGenericView ? NSControlStateValueOn : NSControlStateValueOff)];
 		}
 		if ([desc objectForKey:WindowFrameKey]
 		 && [[desc objectForKey:WindowFrameKey] isKindOfClass:[NSString class]])
@@ -647,32 +628,31 @@ static void UpdateChangeCountCallback(
 		return nil;
 	}
 
-	NSString *errDesc = nil;
-	NSData *const data = [NSPropertyListSerialization dataFromPropertyList:desc
+	NSError *errDesc = nil;
+	NSData *const data = [NSPropertyListSerialization dataWithPropertyList:desc
 																	format:NSPropertyListXMLFormat_v1_0
-														  errorDescription:&errDesc];
+																   options:0
+																	 error:&errDesc];
 	if (!data || errDesc)
 	{
 		if (error)
 		{
 			NSString *message;
 			if (errDesc)
-				message = [NSString stringWithFormat:@"Error serialising effect settings: %@", errDesc];
+				message = [NSString stringWithFormat:@"Error serialising effect settings: %@", [errDesc localizedDescription]];
 			else
 				message = @"Error serialising effect settings";
 			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,  NSLocalizedDescriptionKey,
 																				  nil];
 			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		}
-		if (errDesc)
-			[errDesc release];
 		return nil;
 	}
 	return data;
 }
 
 - (IBAction)toggleGenericView:(id)sender {
-	forceGenericView = (NSOnState == [sender state]);
+	forceGenericView = (NSControlStateValueOn == [sender state]);
 	if (view)
 	{
 		[[NSNotificationCenter defaultCenter] removeObserver:self
@@ -697,7 +677,7 @@ static void UpdateChangeCountCallback(
 		[alert setInformativeText:[NSString stringWithFormat:@"Tried to select preset %ld of %ld",
 															 (long)idx + 1,
 															 (long)total]];
-		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		[alert beginSheetModalForWindow:window completionHandler:nil];
 		return;
 	}
 
@@ -715,7 +695,7 @@ static void UpdateChangeCountCallback(
 		[alert setMessageText:[NSString stringWithFormat:@"Error loading preset %@", preset->presetName]];
 		[alert setInformativeText:[NSString stringWithFormat:@"Error %ld encountered while setting AudioUnit property",
 															 (long)status]];
-		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		[alert beginSheetModalForWindow:window completionHandler:nil];
 		return;
 	}
 
@@ -728,7 +708,7 @@ static void UpdateChangeCountCallback(
 														 preset->presetName]];
 		[alert setInformativeText:[NSString stringWithFormat:@"Error %ld encountered while sending notification",
 															 (long)status]];
-		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		[alert beginSheetModalForWindow:window completionHandler:nil];
 		return;
 	}
 }
@@ -793,7 +773,7 @@ static void UpdateChangeCountCallback(
 
 	item = [menu addItemWithTitle:[NSString stringWithFormat:@"Hide %@", appName] action:@selector(hide:) keyEquivalent:@"h"];
 	item = [menu addItemWithTitle:@"Hide Others" action:@selector(hideOtherApplications:) keyEquivalent:@"h"];
-	[item setKeyEquivalentModifierMask:NSCommandKeyMask | NSAlternateKeyMask];
+	[item setKeyEquivalentModifierMask:NSEventModifierFlagCommand | NSEventModifierFlagOption];
 	item = [menu addItemWithTitle:@"Show All" action:@selector(unhideAllApplications:) keyEquivalent:@""];
 
 	[menu addItem:[NSMenuItem separatorItem]];
@@ -895,7 +875,7 @@ static void UpdateChangeCountCallback(
 	if ((0 > index) || (0 == effects[index].component))
 	{
 		NSAlert *const alert = [[NSAlert alloc] init];
-		[alert setAlertStyle:NSWarningAlertStyle];
+		[alert setAlertStyle:NSAlertStyleWarning];
 		[alert setMessageText:@"Invalid effect component"];
 		[alert addButtonWithTitle:@"OK"];
 		[alert runModal];
@@ -910,17 +890,18 @@ static void UpdateChangeCountCallback(
 																		  subtypeValue,         ComponentSubTypeKey,
 																		  manufacturerValue,    ComponentManufacturerKey,
 																		  nil];
-	NSString *errDesc = nil;
-	NSData *const data = [NSPropertyListSerialization dataFromPropertyList:desc
+	NSError *errDesc = nil;
+	NSData *const data = [NSPropertyListSerialization dataWithPropertyList:desc
 																	format:NSPropertyListXMLFormat_v1_0
-														  errorDescription:&errDesc];
+																   options:0
+																	 error:&errDesc];
 	if (!data || errDesc)
 	{
 		NSAlert *const alert = [[NSAlert alloc] init];
-		[alert setAlertStyle:NSWarningAlertStyle];
+		[alert setAlertStyle:NSAlertStyleWarning];
 		[alert setMessageText:@"Error serialising properties for new effect"];
 		if (errDesc)
-			[alert setInformativeText:[errDesc autorelease]];
+			[alert setInformativeText:[errDesc localizedDescription]];
 		[alert addButtonWithTitle:@"OK"];
 		[alert runModal];
 		[alert release];
@@ -939,7 +920,7 @@ static void UpdateChangeCountCallback(
 		else
 		{
 			NSAlert *const alert = [[NSAlert alloc] init];
-			[alert setAlertStyle:NSWarningAlertStyle];
+			[alert setAlertStyle:NSAlertStyleWarning];
 			[alert setMessageText:@"Error creating new effect document"];
 			[alert addButtonWithTitle:@"OK"];
 			[alert runModal];
@@ -978,38 +959,35 @@ static void UpdateChangeCountCallback(
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
-	ComponentDescription effectFilter = { kAudioUnitType_Effect, 0, 0, 0, 0 };
-	long const count = CountComponents(&effectFilter);
+	AudioComponentDescription effectFilter = { kAudioUnitType_Effect, 0, 0, 0, 0 };
+	long const count = AudioComponentCount(&effectFilter);
 	if (0 == count)
 	{
 		NSAlert *const alert = [[NSAlert alloc] init];
-		[alert setAlertStyle:NSWarningAlertStyle];
+		[alert setAlertStyle:NSAlertStyleWarning];
 		[alert setMessageText:@"No AudioUnit effects found"];
 		[alert addButtonWithTitle:@"OK"];
 		[alert runModal];
 		[alert release];
 	}
 
-	std::vector<std::pair<Component, OSStatus> > failed;
+	std::vector<std::pair<AudioComponent, OSStatus> > failed;
 	effects = (EffectInfo *)malloc(count * sizeof(*effects));
-	Component effect = FindNextComponent(0, &effectFilter);
-	for (long i = 0; (i < count) && (effect != 0); i++, effect = FindNextComponent(effect, &effectFilter))
+	AudioComponent effect = AudioComponentFindNext(nullptr, &effectFilter);
+	for (long i = 0; (i < count) && effect; i++, effect = AudioComponentFindNext(effect, &effectFilter))
 	{
-		ComponentDescription effectDesc;
-		Handle const nameHandle = NewHandle(4);
-		OSStatus const err = GetComponentInfo(effect, &effectDesc, nameHandle, NULL, NULL);
+		OSStatus err;
+		AudioComponentDescription effectDesc;
+		CFStringRef name = nullptr;
+		err = AudioComponentGetDescription(effect, &effectDesc);
+		if (noErr == err)
+			err = AudioComponentCopyName(effect, &name);
 		if (noErr == err)
 		{
 			effects[i].component = effect;
 			effects[i].type = effectDesc.componentType;
 			effects[i].subtype = effectDesc.componentSubType;
 			effects[i].manufacturer = effectDesc.componentManufacturer;
-			HLock(nameHandle);
-			CFStringRef const name = CFStringCreateWithPascalString(
-					NULL,
-					(unsigned char const *)*nameHandle,
-					kCFStringEncodingMacRoman);
-			HUnlock(nameHandle);
 			NSMenuItem *const item = [newEffectMenu addItemWithTitle:(NSString *)name
 															  action:@selector(newEffect:)
 													   keyEquivalent:@""];
@@ -1020,9 +998,8 @@ static void UpdateChangeCountCallback(
 		else
 		{
 			effects[i].component = 0;
-			failed.push_back(std::make_pair(effect, err));
+			failed.emplace_back(effect, err);
 		}
-		DisposeHandle(nameHandle);
 	}
 
 	if (!failed.empty())
@@ -1031,7 +1008,7 @@ static void UpdateChangeCountCallback(
 															 (unsigned long)failed.size(),
 															 ((1U == failed.size()) ? "" : "s")];
 		NSMutableString *const detail = [NSMutableString stringWithCapacity:(16 * failed.size())];
-		std::vector<std::pair<Component, OSStatus> >::const_iterator it = failed.begin();
+		std::vector<std::pair<AudioComponent, OSStatus> >::const_iterator it = failed.begin();
 		[detail appendFormat:@"%lu (%ld)", (unsigned long)it->first, (long)it->second];
 		++it;
 		while (failed.end() != it)
@@ -1040,7 +1017,7 @@ static void UpdateChangeCountCallback(
 			++it;
 		}
 		NSAlert *const alert = [[NSAlert alloc] init];
-		[alert setAlertStyle:NSWarningAlertStyle];
+		[alert setAlertStyle:NSAlertStyleWarning];
 		[alert setMessageText:message];
 		[alert setInformativeText:[NSString stringWithString:detail]];
 		[alert addButtonWithTitle:@"OK"];

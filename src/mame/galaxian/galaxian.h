@@ -279,6 +279,7 @@ public:
 	void turtles(machine_config &config);
 	void fantastc(machine_config &config);
 	void jumpbug(machine_config &config);
+	void jumpbugbrf(machine_config &config);
 	void checkmaj(machine_config &config);
 	void pacmanbl(machine_config &config);
 	void quaak(machine_config &config);
@@ -312,7 +313,7 @@ public:
 	void thepitm(machine_config &config);
 	void kong(machine_config &config);
 	void bongo(machine_config &config);
-	void bongoa(machine_config &config);
+	void bongog(machine_config &config);
 	void scorpnmc(machine_config &config);
 	void ckongg(machine_config &config);
 	void ckongmc(machine_config &config);
@@ -342,7 +343,7 @@ protected:
 	void astroamb_map(address_map &map);
 	void bigkonggx_map(address_map &map);
 	void bongo_map(address_map &map);
-	void bongoa_map(address_map &map);
+	void bongog_map(address_map &map);
 	void bongo_io_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);
@@ -367,6 +368,7 @@ protected:
 	void galaxian_map_discrete(address_map &map);
 	void highroll_map(address_map &map);
 	void jumpbug_map(address_map &map);
+	void jumpbugbrf_map(address_map &map);
 	void jungsub_map(address_map &map);
 	void jungsub_io_map(address_map &map);
 	void konami_sound_map(address_map &map);

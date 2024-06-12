@@ -739,7 +739,8 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 
 	// build parameters for printf
 	std::vector<std::string_view> printf_params(params);
-	printf_params.insert(printf_params.begin(), format.str());
+	auto const format_str = format.str(); // HACK: workaround for pre-C++20 str()
+	printf_params.insert(printf_params.begin(), format_str);
 
 	// then do a printf
 	std::ostringstream buffer;

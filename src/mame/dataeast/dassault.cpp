@@ -705,7 +705,13 @@ static GFXDECODE_START( gfx_dassault )
 	GFXDECODE_ENTRY( "tiles1",   0, charlayout,     0,  32 )      // 8x8
 	GFXDECODE_ENTRY( "tiles1",   0, tilelayout,     0,  32 )      // 16x16
 	GFXDECODE_ENTRY( "tiles2",   0, tilelayout,   512,  32 )      // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_dassault_spr1 )
 	GFXDECODE_ENTRY( "sprites1", 0, tilelayout,  0/*1024*/,  64 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_dassault_spr2 )
 	GFXDECODE_ENTRY( "sprites2", 0, tilelayout,  0/*2048*/,  64 ) // 16x16
 GFXDECODE_END
 
@@ -789,13 +795,8 @@ void dassault_state::dassault(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO_SPRITE(config, m_sprgen[1], 0);
-	m_sprgen[1]->set_gfx_region(4);
-	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_dassault_spr1);
+	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_dassault_spr2);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

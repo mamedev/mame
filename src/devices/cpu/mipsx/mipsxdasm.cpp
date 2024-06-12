@@ -4,75 +4,85 @@
 #include "emu.h"
 #include "mipsxdasm.h"
 
-static const bool SHOW_R0_AS_0 = false;
+namespace {
 
-u32 mipsx_disassembler::opcode_alignment() const
-{
-	return 4;
-}
+constexpr bool SHOW_R0_AS_0 = false;
 
-int mipsx_disassembler::get_ty(u32 opcode)
+char const *const REGNAMES[32] = {
+		"r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
+		"r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"
+		"r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
+		"r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31" };
+
+
+constexpr int get_ty(u32 opcode)
 {
 	return BIT(opcode, 30, 2);
 }
 
-int mipsx_disassembler::get_op(u32 opcode)
+constexpr int get_op(u32 opcode)
 {
 	return BIT(opcode, 27, 3);
 }
 
-int mipsx_disassembler::get_src1(u32 opcode)
+constexpr int get_src1(u32 opcode)
 {
 	return BIT(opcode, 22, 5);
 }
 
-int mipsx_disassembler::get_src2_dest(u32 opcode)
+constexpr int get_src2_dest(u32 opcode)
 {
 	return BIT(opcode, 17, 5);
 }
 
-int mipsx_disassembler::get_compute_dest(u32 opcode)
+constexpr int get_compute_dest(u32 opcode)
 {
 	return BIT(opcode, 12, 5);
 }
 
-int mipsx_disassembler::get_compute_compfunc(u32 opcode)
+constexpr int get_compute_compfunc(u32 opcode)
 {
 	return BIT(opcode, 0, 12);
 }
 
-int mipsx_disassembler::get_offset(u32 opcode)
+[[maybe_unused]] constexpr int get_offset(u32 opcode)
 {
 	return BIT(opcode, 0, 17);
 }
 
-int mipsx_disassembler::get_sq(u32 opcode)
+constexpr int get_sq(u32 opcode)
 {
 	return BIT(opcode, 16, 1);
 }
 
-int mipsx_disassembler::get_asr_amount(int shift)
+constexpr int get_asr_amount(int shift)
 {
 	// TODO
 	return shift;
 }
 
-int mipsx_disassembler::get_sh_amount(int shift)
+constexpr int get_sh_amount(int shift)
 {
 	// TODO
 	return shift;
 }
 
-static const char *regnames[32] = { "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",  "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"
-								    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31" };
 
-const char *mipsx_disassembler::get_regname(u8 reg)
+const char *get_regname(u8 reg)
 {
 	// general purpose register 0 just acts as a constant 0, it can't be changed, if desired simply show it as a non-canonical 0 for readability
 	if ((reg == 0) && (SHOW_R0_AS_0))
 		return "#0";
 
-	return regnames[reg];
+	return REGNAMES[reg];
+}
+
+} // anonymous namespace
+
+
+u32 mipsx_disassembler::opcode_alignment() const
+{
+	return 4;
 }
 
 offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const data_buffer& opcodes, const data_buffer& params)
@@ -89,7 +99,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		const u32 basepc = pc + 8;
 		const int src1 = get_src1(opcode);
 		const int src2 = get_src2_dest(opcode);
-		const std::string squash = get_sq(opcode) ? "sq" : "";
+		const std::string_view squash = get_sq(opcode) ? "sq" : "";
 
 		switch (op)
 		{

@@ -5,7 +5,7 @@
 
 Saitek Kasparov GK 2000
 
-the chess engine is by Frans Morsch. According to schematics, GK 2100 is on the
+The chess engine is by Frans Morsch. According to schematics, GK 2100 is on the
 same hardware.
 
 Hardware notes:
@@ -16,10 +16,12 @@ Hardware notes:
 A13 MCU is used in:
 - Saitek GK 2000 (86071220X12)
 - Saitek Travel Champion 2080 (86071220X12)
+- Saitek Barracuda (suspected)
 - Saitek Mephisto Champion (suspected)
 - Saitek Mephisto Mythos (86142221X34)
 - Tandy (Radio Shack) Mega 2050X (86071221X12)
 - Tandy (Radio Shack) Master 2200X (suspected)
+- Tandy (Radio Shack) Chess Master (suspected)
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
@@ -258,7 +260,7 @@ void gk2000_state::gk2000(machine_config &config)
 	// basic machine hardware
 	H8323(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8323_device::nvram_set_battery));
 	m_maincpu->standby_cb().append(FUNC(gk2000_state::standby));
 	m_maincpu->write_port1().set(FUNC(gk2000_state::lcd_segs_w<0>));
 	m_maincpu->write_port2().set(FUNC(gk2000_state::p2_w));

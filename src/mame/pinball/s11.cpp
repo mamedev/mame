@@ -602,6 +602,22 @@ ROM_START(grand_l3)
 	ROM_LOAD("lzrd_u4.l1", 0x0000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
 ROM_END
 
+ROM_START(grand_l1)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u26.l1", 0x4000, 0x2000, CRC(540c80c3) SHA1(9da1f9683be5bc6b82cd5fb53dd9e74010a6c92b))
+	ROM_RELOAD(             0x6000, 0x2000)
+	ROM_LOAD("lzrd_u27.l1", 0x8000, 0x8000, CRC(63072df5) SHA1(57f39f8b80e71cc3df0d5a186d7227af3c0ed4cc))
+
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u21.l1", 0xc000, 0x4000, CRC(98859d37) SHA1(08429b9e6a3b3007815373dc280b985e3441aa9f))
+	ROM_RELOAD( 0x8000, 0x4000)
+	ROM_LOAD("lzrd_u22.l1", 0x4000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
+	ROM_RELOAD( 0x0000, 0x4000)
+
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x0000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+ROM_END
+
 /*-------------------------
 / High Speed 01/86 (#541)
 /--------------------------*/
@@ -693,6 +709,7 @@ ROM_END
 // Pinball
 GAME( 1986, grand_l4, 0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, grand_l3, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grand_l1, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-1)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hs_l4,    0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hs_l3,    hs_l4,    s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rdkng_l4, 0,        s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

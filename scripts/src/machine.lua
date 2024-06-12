@@ -1561,6 +1561,17 @@ if (MACHINES["1MB5"]~=null) then
 end
 
 ---------------------------------------------------
+--@src/devices/machine/i2cmem.h,MACHINES["I2CHLE"] = true
+---------------------------------------------------
+
+if (MACHINES["I2CHLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i2chle.cpp",
+		MAME_DIR .. "src/devices/machine/i2chle.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/machine/i2cmem.h,MACHINES["I2CMEM"] = true
 ---------------------------------------------------

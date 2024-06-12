@@ -902,43 +902,40 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 			(UInt8 const *)name,
 			strlen(name),
 			false);
-	if (nullptr == url)
+	if (!url)
+		return nullptr;
+
+	CFReadStreamRef const stream = CFReadStreamCreateWithFile(nullptr, url);
+	CFRelease(url);
+	if (!stream)
 	{
+		osd_printf_error("Error opening file %s\n", name);
 		return nullptr;
 	}
-
-	CFDataRef data = nullptr;
-	SInt32 err;
-	Boolean const status = CFURLCreateDataAndPropertiesFromResource(
-			nullptr,
-			url,
-			&data,
-			nullptr,
-			nullptr,
-			&err);
-	CFRelease(url);
-	if (!status)
+	if (!CFReadStreamOpen(stream))
 	{
-		osd_printf_error(
-				"Error reading data from %s (%ld)\n",
-				name,
-				(long)err);
-		if (nullptr != data) CFRelease(data);
+		CFRelease(stream);
+		osd_printf_error("Error opening file %s\n", name);
 		return nullptr;
 	}
 
 	CFErrorRef msg = nullptr;
-	CFPropertyListRef const result = CFPropertyListCreateWithData(
+	CFPropertyListRef const result = CFPropertyListCreateWithStream(
 			nullptr,
-			data,
+			stream,
+			0,
 			kCFPropertyListImmutable,
 			nullptr,
 			&msg);
-	CFRelease(data);
-	if ((nullptr == result) || (nullptr != msg))
+	CFReadStreamClose(stream);
+	CFRelease(stream);
+	if (!result || msg)
 	{
-		std::unique_ptr<char []> const buf = (nullptr != msg) ? convert_cfstring_to_utf8(CFErrorCopyDescription(msg)) : nullptr;
-		if (nullptr != msg)
+		CFStringRef const desc = msg ? CFErrorCopyDescription(msg) : nullptr;
+		std::unique_ptr<char []> const buf = desc ? convert_cfstring_to_utf8(desc) : nullptr;
+		if (desc)
+			CFRelease(desc);
+		if (msg)
 			CFRelease(msg);
 
 		if (buf)
@@ -954,7 +951,8 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 					"Error creating property list from %s\n",
 					name);
 		}
-		if (nullptr != result) CFRelease(result);
+		if (result)
+			CFRelease(result);
 		return nullptr;
 	}
 

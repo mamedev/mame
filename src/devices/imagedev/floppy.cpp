@@ -33,6 +33,8 @@
 #include "util/ioprocsfilter.h"
 #include "util/zippath.h"
 
+#include <algorithm>
+
 /*
     Debugging flags. Set to 0 or 1.
 */
@@ -1081,25 +1083,6 @@ uint32_t floppy_image_device::hash32(uint32_t a) const
 	return a;
 }
 
-int floppy_image_device::find_index(uint32_t position, const std::vector<uint32_t> &buf)const
-{
-	int spos = (buf.size() >> 1)-1;
-	int step;
-	for(step=1; step<buf.size()+1; step<<=1) { }
-	step >>= 1;
-
-	for(;;) {
-		if(spos >= int(buf.size()) || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
-			spos -= step;
-			step >>= 1;
-		} else if(spos < 0 || (spos < int(buf.size())-1 && (buf[spos+1] & floppy_image::TIME_MASK) <= position)) {
-			spos += step;
-			step >>= 1;
-		} else
-			return spos;
-	}
-}
-
 uint32_t floppy_image_device::find_position(attotime &base, const attotime &when)
 {
 	base = m_revolution_start_time;
@@ -1170,16 +1153,18 @@ void floppy_image_device::cache_fill(const attotime &when)
 	attotime base;
 	uint32_t position = find_position(base, when);
 
-	int index = find_index(position, buf);
+	auto it = std::upper_bound(
+		buf.begin(), buf.end(), position,
+		[](uint32_t a, uint32_t b) {
+			return a < (b & floppy_image::TIME_MASK);
+		}
+	);
+
+	int index = int(it - buf.begin()) - 1;
 
 	if(index == -1) {
-		// I suspect this should be an abort(), to check...
-		m_cache_start_time = attotime::zero;
-		m_cache_end_time = attotime::never;
-		m_cache_index = 0;
-		m_cache_entry = buf[0];
-		cache_weakness_setup();
-		return;
+		base -= m_rev_time;
+		index = buf.size() - 1;
 	}
 
 	for(;;) {
@@ -1654,6 +1639,9 @@ void floppy_sound_device::step(int zone)
 						}
 					}
 				}
+
+				// Start the new seek sound from the beginning.
+				m_seek_samplepos = 0;
 			}
 
 			// Changing the pitch does not always sound convincing

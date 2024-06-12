@@ -5,12 +5,18 @@
     Driver for Midway Zeus games
 
 **************************************************************************/
+#ifndef MAME_MIDWAY_MIDZEUS_H
+#define MAME_MIDWAY_MIDZEUS_H
+
+#pragma once
+
+#include "midwayic.h"
 
 #include "machine/timekpr.h"
+#include "video/poly.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "midwayic.h"
-#include "video/poly.h"
 
 /*************************************
  *
@@ -119,7 +125,7 @@ protected:
 	optional_memory_bank m_mainbank;
 
 private:
-	static constexpr XTAL MIDZEUS_VIDEO_CLOCK = XTAL(66'666'700);
+	static inline constexpr XTAL MIDZEUS_VIDEO_CLOCK = 66.6667_MHz_XTAL;
 
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
@@ -193,3 +199,5 @@ private:
 	required_ioport_array<2> m_io_gun_x;
 	required_ioport_array<2> m_io_gun_y;
 };
+
+#endif // MAME_MIDWAY_MIDZEUS_H

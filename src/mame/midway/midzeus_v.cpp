@@ -346,26 +346,26 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t midzeus_state::zeus_r(offs_t offset)
 {
-	bool logit = ((!machine().side_effects_disabled()) && (offset < 0xb0 || offset > 0xb7));
+	bool logit = !machine().side_effects_disabled() && ((offset < 0xb0) || (offset > 0xb7));
 	uint32_t result = m_zeusbase[offset & ~1];
 
 	switch (offset & ~1)
 	{
 		case 0xf0:
 			result = m_screen->hpos();
-			logit = 0;
+			logit = false;
 			break;
 
 		case 0xf2:
 			result = m_screen->vpos();
-			logit = 0;
+			logit = false;
 			break;
 
 		case 0xf4:
 			result = 6;
 			if (m_screen->vblank())
 				result |= 0x800;
-			logit = 0;
+			logit = false;
 			break;
 
 		case 0xf6:      // status -- they wait for this & 9 == 0
@@ -373,13 +373,13 @@ uint32_t midzeus_state::zeus_r(offs_t offset)
 			result = 0x9600;
 			if (m_zeusbase[0xb6] == 0x80040000)
 				result |= 1;
-			logit = 0;
+			logit = false;
 			break;
 	}
 
-	// 32-bit mode
 	if (m_zeusbase[0x80] & 0x00020000)
 	{
+		// 32-bit mode
 		if (offset & 1)
 			result >>= 16;
 		if (logit)
@@ -392,10 +392,9 @@ uint32_t midzeus_state::zeus_r(offs_t offset)
 				LOGZEUS("%06X:zeus32_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		}
 	}
-
-	// 16-bit mode
 	else
 	{
+		// 16-bit mode
 		if (offset & 1)
 			result >>= 16;
 		else
@@ -421,13 +420,10 @@ void midzeus_state::zeus_w(offs_t offset, uint32_t data)
 	if (logit)
 		LOGZEUS("%06X:zeus_w", m_maincpu->pc());
 
-	// 32-bit mode
 	if (m_zeusbase[0x80] & 0x00020000)
-		zeus_register32_w(offset, data, logit);
-
-	// 16-bit mode
+		zeus_register32_w(offset, data, logit); // 32-bit mode
 	else
-		zeus_register16_w(offset, data, logit);
+		zeus_register16_w(offset, data, logit); // 16-bit mode
 }
 
 

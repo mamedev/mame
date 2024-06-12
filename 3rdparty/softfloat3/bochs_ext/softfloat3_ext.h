@@ -1,0 +1,18 @@
+int extFloat80_ieee754_remainder(extFloat80_t a, extFloat80_t b, extFloat80_t &r, uint64_t &q);
+int extFloat80_remainder(extFloat80_t a, extFloat80_t b, extFloat80_t &r, uint64_t &q);
+int extFloat80_sincos(extFloat80_t a, extFloat80_t *sin_a, extFloat80_t *cos_a);
+int extFloat80_sin(extFloat80_t &a);
+int extFloat80_cos(extFloat80_t &a);
+int extFloat80_tan(extFloat80_t &a);
+int extFloat80_is_nan(extFloat80_t a);
+extFloat80_t extFloat80_atan(extFloat80_t a, extFloat80_t b);
+extFloat80_t extFloat80_68katan(extFloat80_t a);
+extFloat80_t extFloat80_getman(extFloat80_t a);
+extFloat80_t extFloat80_fyl2x(extFloat80_t a, extFloat80_t b);
+extFloat80_t extFloat80_fyl2xp1(extFloat80_t a, extFloat80_t b);
+extFloat80_t extFloat80_2xm1(extFloat80_t a);
+extFloat80_t extFloat80_lognp1(extFloat80_t a);
+extFloat80_t extFloat80_logn(extFloat80_t a);
+extFloat80_t extFloat80_log2(extFloat80_t a);
+extFloat80_t extFloat80_log10(extFloat80_t a);
+extFloat80_t extFloat80_scale(extFloat80_t a, extFloat80_t b);

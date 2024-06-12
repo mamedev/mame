@@ -317,6 +317,9 @@ static const gfx_layout tile_16x16_layout =
 static GFXDECODE_START( gfx_supbtime )
 	GFXDECODE_ENTRY( "tiles",   0, tile_8x8_layout,   256, 32 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",   0, tile_16x16_layout, 256, 32 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_supbtime_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout,   0, 16 ) // 16x16
 GFXDECODE_END
 
@@ -355,9 +358,7 @@ void supbtime_state::supbtime(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_supbtime_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

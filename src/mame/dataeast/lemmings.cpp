@@ -119,7 +119,7 @@ TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
 {
 	uint16_t const tile = m_vram_data[tile_index];
 
-	tileinfo.set(2,
+	tileinfo.set(0,
 			tile & 0x7ff,
 			(tile >> 12) & 0xf,
 			0);
@@ -133,7 +133,7 @@ void lemmings_state::video_start()
 	m_bitmap0.fill(0x100);
 
 	m_vram_buffer = make_unique_clear<uint8_t[]>(2048 * 64); // 64 bytes per VRAM character
-	m_gfxdecode->gfx(2)->set_source(m_vram_buffer.get());
+	m_gfxdecode->gfx(0)->set_source(m_vram_buffer.get());
 
 	m_sprgen[0]->alloc_sprite_bitmap();
 	m_sprgen[1]->alloc_sprite_bitmap();
@@ -189,7 +189,7 @@ void lemmings_state::pixel_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	// Copy pixel to buffer for easier decoding later
 	int const tile = ((sx / 8) * 32) + (sy / 8);
-	m_gfxdecode->gfx(2)->mark_dirty(tile);
+	m_gfxdecode->gfx(0)->mark_dirty(tile);
 	m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 8) & 0xf;
 
 	sx += 1; // Update both pixels in the word
@@ -279,7 +279,7 @@ uint16_t lemmings_state::protection_region_0_146_r(offs_t offset)
 	int const real_address = 0 + (offset *2);
 	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data(deco146_addr, cs);
+	uint16_t const data = m_deco146->read_data(deco146_addr, cs);
 	return data;
 }
 
@@ -433,9 +433,15 @@ static const gfx_layout sprite_layout =
 };
 
 static GFXDECODE_START( gfx_lemmings )
-	GFXDECODE_ENTRY( "sprites1", 0, sprite_layout,  512, 16 ) // Sprites 16x16
-	GFXDECODE_ENTRY( "sprites2", 0, sprite_layout,  768, 16 ) // Sprites 16x16
 	GFXDECODE_ENTRY( nullptr,    0, charlayout,     0,   16 ) // Dynamically modified
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_lemmings_spr1 )
+	GFXDECODE_ENTRY( "sprites1", 0, sprite_layout,  512, 16 ) // Sprites 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_lemmings_spr2 )
+	GFXDECODE_ENTRY( "sprites2", 0, sprite_layout,  768, 16 ) // Sprites 16x16
 GFXDECODE_END
 
 /******************************************************************************/
@@ -465,13 +471,8 @@ void lemmings_state::lemmings(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lemmings);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(1);
-	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
-
-	DECO_SPRITE(config, m_sprgen[1], 0);
-	m_sprgen[1]->set_gfx_region(0);
-	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_lemmings_spr2);
+	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_lemmings_spr1);
 
 	DECO146PROT(config, m_deco146, 0);
 	m_deco146->port_a_cb().set_ioport("INPUTS");

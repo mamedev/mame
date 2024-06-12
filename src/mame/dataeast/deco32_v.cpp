@@ -61,12 +61,12 @@ void nslasher_state::tilemap_color_bank_w(u8 data)
 
 void nslasher_state::sprite1_color_bank_w(u8 data)
 {
-	m_gfxdecode->gfx(3)->set_colorbase((data & 7) << 8);
+	m_sprgen[0]->gfx(0)->set_colorbase((data & 7) << 8);
 }
 
 void nslasher_state::sprite2_color_bank_w(u8 data)
 {
-	m_gfxdecode->gfx(4)->set_colorbase((data & 7) << 8);
+	m_sprgen[1]->gfx(0)->set_colorbase((data & 7) << 8);
 }
 
 /******************************************************************************/
@@ -170,7 +170,6 @@ u32 captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 
-	m_sprgen[0]->set_alt_format(true);
 	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram16_buffered[0].get(), 0x400); // only low half of sprite ram is used?
 
 	return 0;
@@ -501,7 +500,7 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 		}
 	}
 
-	mix_nslasher(screen, bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), alphaTilemap);
+	mix_nslasher(screen, bitmap, cliprect, m_sprgen[0]->gfx(0), m_sprgen[1]->gfx(0), alphaTilemap);
 
 	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -703,7 +702,7 @@ u32 tattass_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bi
 		}
 	}
 
-	mix_tattass(screen, bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), alphaTilemap);
+	mix_tattass(screen, bitmap, cliprect, m_sprgen[0]->gfx(0), m_sprgen[1]->gfx(0), alphaTilemap);
 
 	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

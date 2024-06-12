@@ -3625,6 +3625,37 @@ ROM_END
 
 ROM_START( gtmr2u )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "m2p0a2.u8",  0x000000, 0x080000, CRC(1a008ea4) SHA1(970ae4787117a388223e19d72eb920ea2264ce7f) )
+	ROM_LOAD16_BYTE( "m2p1a2.u7",  0x000001, 0x080000, CRC(bbf8b43e) SHA1(03a01153e46d0003efa798b211e786ca15321202) )
+
+	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code? */
+	ROM_LOAD16_WORD_SWAP( "m2d0x0.u31",        0x000000, 0x020000, CRC(2e1a06ff) SHA1(475a7555653eefac84307492a385895b839cab0d) )
+
+	ROM_REGION( 0x800000, "kan_spr", 0 )   /* Sprites */
+	ROM_LOAD( "m2-200-0.u49",      0x000000, 0x400000, CRC(93aafc53) SHA1(1d28b6e3bd61ce9c938fc5303aeabcdefa549852) )
+	ROM_LOAD( "m2-201-0.u50",      0x400000, 0x200000, CRC(39b60a83) SHA1(aa7b37c7c92bbcf685f4fec84cc6d8a77d26433c) )
+	ROM_LOAD( "m2-202-0.u51",      0x600000, 0x200000, CRC(fd06b339) SHA1(5de0af7d23147f6eb403700eabd66794198f3641) )
+	ROM_LOAD16_BYTE( "m2s0a1.u32", 0x700000, 0x080000, CRC(98977171) SHA1(5b69462e07778b5bd1f5119cae6b63ede38cd642) )
+	ROM_LOAD16_BYTE( "m2s1a1.u33", 0x700001, 0x080000, CRC(c69a732e) SHA1(810b333f442c0714f4cb8b4a73136d0b44443277) )
+
+	ROM_REGION( 0x440000, "view2_0", 0 )   /* Tiles */
+	ROM_LOAD( "m2-300-0.u89",      0x000000, 0x200000, CRC(4dc42fbb) SHA1(f14c287bc60f561eb9a57db4e3390aae9a81c392) )
+	ROM_LOAD( "m2-301-0.u90",      0x200000, 0x200000, CRC(f4e894f2) SHA1(1f983a1d93845fe298afba60d4dacdd1a10cab7f) )
+	ROM_LOAD16_BYTE( "m2b0x0.u93", 0x400000, 0x020000, CRC(e023d51b) SHA1(3c9f591f3ca2ee8e1100b83ae8eb593e11e6eac7) )
+	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
+
+	ROM_REGION( 0x440000, "view2_1", 0 )   /* Tiles */
+	ROM_COPY("view2_0",0x000000,0,0x440000) // it isn't on the board twice.
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
+
+	ROM_REGION( 0x080000, "oki2", 0 )   /* Samples */
+	ROM_LOAD( "m2w1a1.u47",        0x000000, 0x080000, CRC(15f25342) SHA1(9947e66575738700345c12c104701b812c62ce03) )
+ROM_END
+
+ROM_START( gtmr2ua )
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "m2p0a1.u8",  0x000000, 0x080000, CRC(813e1d5e) SHA1(602df02933dc7b77be311113af1d1edad2751cc9) )
 	ROM_LOAD16_BYTE( "m2p1a1.u7",  0x000001, 0x080000, CRC(bee63666) SHA1(07585a63f901f50f2a2314eb4dc4307e7028ded7) )
 
@@ -4465,7 +4496,8 @@ GAME( 1994, gtmre,      gtmr,     gtmre,    gtmr,      kaneko16_gtmr_state,     
 GAME( 1994, gtmrusa,    gtmr,     gtmre,    gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", MACHINE_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
 GAME( 1995, gtmr2,      0,        gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gtmr2a,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/07/11)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2ua,    gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, brapboys,   0,        brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)",                MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.xxx.06 string at 0x270
 GAME( 1992, brapboysp,  brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World, newer)", MACHINE_SUPPORTS_SAVE ) // KANEKO Be Rap Boys.000.08 string at 0x270

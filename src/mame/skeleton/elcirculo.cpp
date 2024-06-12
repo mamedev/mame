@@ -50,7 +50,9 @@ LD15 (_)                                                                        
 ****************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6504.h"
+
 #include "speaker.h"
 
 namespace {
@@ -69,9 +71,40 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	INTERRUPT_GEN_MEMBER(irq_gen);
+
+	void program_map(address_map &map);
 };
 
+INTERRUPT_GEN_MEMBER(elcirculo_state::irq_gen)
+{
+	m_maincpu->set_input_line(M6504_IRQ_LINE, HOLD_LINE);
+}
+
+void elcirculo_state::program_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x0200).portr("IN0");
+	map(0x0201, 0x0201).portr("DSW1");
+	// map(0x0400, 0x0401).w();
+	// map(0x0600, 0x0601).w();
+	map(0x1000, 0x17ff).mirror(0x800).rom().region("maincpu", 0);
+}
+
 INPUT_PORTS_START(elcirculo)
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
@@ -86,15 +119,17 @@ INPUT_PORTS_END
 void elcirculo_state::elcirculo(machine_config &config)
 {
 	M6504(config, m_maincpu, 1'000'000); // R6504P, internal clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &elcirculo_state::program_map);
+	m_maincpu->set_periodic_int(FUNC(elcirculo_state::irq_gen), attotime::from_hz(60)); // TODO: source of this
 
 	SPEAKER(config, "mono").front_center();
 }
 
-ROM_START(elcirculo)
-	ROM_REGION(0x800, "maincpu", 0)
-	ROM_LOAD("tms2716c.ic2", 0x000, 0x800, CRC(7b5ae97f) SHA1(e7276d5d97328628889d216beac0b04216bf82c7))
+ROM_START( elcirculo )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "tms2716c.ic2", 0x000, 0x800, CRC(7b5ae97f) SHA1(e7276d5d97328628889d216beac0b04216bf82c7) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 GAME(1980, elcirculo, 0, elcirculo, elcirculo, elcirculo_state, empty_init, ROT0, "Inder", "El Circulo", MACHINE_IS_SKELETON)

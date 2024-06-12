@@ -445,8 +445,8 @@ int sol_lua_push(sol::types<screen_type_enum>, lua_State *L, screen_type_enum &&
 	case SCREEN_TYPE_INVALID:   return sol::stack::push(L, "invalid");
 	case SCREEN_TYPE_RASTER:    return sol::stack::push(L, "raster");
 	case SCREEN_TYPE_VECTOR:    return sol::stack::push(L, "vector");
-	case SCREEN_TYPE_LCD:       return sol::stack::push(L, "svg");
-	case SCREEN_TYPE_SVG:       return sol::stack::push(L, "none");
+	case SCREEN_TYPE_LCD:       return sol::stack::push(L, "lcd");
+	case SCREEN_TYPE_SVG:       return sol::stack::push(L, "svg");
 	}
 	return sol::stack::push(L, "unknown");
 }

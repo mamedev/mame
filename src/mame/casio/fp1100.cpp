@@ -6,28 +6,31 @@
 
     Info found at various sites:
 
-    Casio FP1000 and FP1100 are "pre-PC" personal computers, with Cassette,
-    Floppy Disk, Printer and 2 cart/expansion slots. They had 32K ROM, 64K
-    main RAM, 80x25 text display, 320x200, 640x200, 640x400 graphics display.
-    Floppy disk is 2x 5 1/4.
+    Casio FP-1000 and FP-1100 are "pre-PC" personal computers, with
+    Cassette, Floppy Disk, Printer and two cartridge/expansion slots.  They
+    had 32K ROM, 64K main RAM, 80x25 text display, 320x200, 640x200, 640x400
+    graphics display.  Floppy disk is 2x 5 1/4.
 
-    The FP1000 had 16K videoram and monochrome only. The monitor had a switch
-    to invert the display (swap foreground and background colours).
+    The FP-1000 had 16K videoram and monochrome only.  The monitor had a
+    switch to invert the display (swap foreground and background colours).
 
-    The FP1100 had 48K videoram and 8 colours.
+    The FP-1100 had 48K videoram and 8 colours.
 
     Processors: Z80 @ 4MHz, uPD7801G @ 2MHz
 
-    Came with BASIC built in, and you could run CP/M 2.2 from the floppy disk.
+    Came with BASIC built in, and you could run CP/M 2.2 from the floppy
+    disk.
 
-    The keyboard is a separate unit. It contains a beeper.
+    The keyboard is a separate unit.  It contains a beeper.
 
     TODO:
-    - unimplemented instruction PER triggered (can be ignored)
-    - Display can be interlaced or non-interlaced. Interlaced not emulated.
-    - Cassette Load is quite complex, using 6 pins of the sub-cpu. Not done.
-    - subcpu is supposed to be in WAIT except in horizontal blanking period.
-      WAIT is not emulated in our cpu.
+    - Memory maps and machine configuration for FP-1000 with reduced VRAM.
+    - Unimplemented instruction PER triggered (can be ignored)
+    - Display can be interlaced or non-interlaced.  Interlaced not emulated.
+    - Cassette Load is quite complex, using 6 pins of the sub-CPU.  Not
+      done.
+    - Sub CPU is supposed to be in WAIT except in horizontal blanking
+      period.  WAIT is not emulated in our cpu.
     - Keyboard not working.
     - FDC not done.
 
@@ -128,7 +131,7 @@ private:
 		u8 portc = 0;
 	}m_upd7801;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<upd7801_device> m_subcpu;
 	required_device<mc6845_device> m_crtc;
 	required_region_ptr<u8> m_ipl;
 	required_shared_ptr<u8> m_wram;
@@ -141,20 +144,21 @@ private:
 
 MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 *p = &bitmap.pix(y);
 
 	if (BIT(m_upd7801.porta, 4))
 	{ // green screen
 		for (u16 x = 0; x < x_count; x++)
 		{
-			u16 mem = (((ma+x)<<3) + ra) & 0x3fff;
-			u8 g = m_videoram[mem];
+			u16 const mem = (((ma + x) << 3) + ra) & 0x3fff;
+			u8 const g = m_videoram[mem];
 			for (u8 i = 0; i < 8; i++)
 			{
 				u8 col = BIT(g, i);
-				if (x == cursor_x) col ^= 1;
-				*p++ = palette[col<<1];
+				if (x == cursor_x)
+					col ^= 1;
+				*p++ = palette[col << 1];
 			}
 		}
 	}
@@ -162,14 +166,15 @@ MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 	{ // RGB screen
 		for (u16 x = 0; x < x_count; x++)
 		{
-			u16 mem = (((ma+x)<<3) + ra) & 0x3fff;
-			u8 b = m_videoram[mem];
-			u8 r = m_videoram[mem+0x4000];
-			u8 g = m_videoram[mem+0x8000];
+			u16 const mem = (((ma + x) << 3) + ra) & 0x3fff;
+			u8 const b = m_videoram[mem];
+			u8 const r = m_videoram[mem + 0x4000];
+			u8 const g = m_videoram[mem + 0x8000];
 			for (u8 i = 0; i < 8; i++)
 			{
-				u8 col = BIT(r, i) + (BIT(g, i) << 1) + (BIT(b, i) << 2);
-				if (x == cursor_x) col = m_col_cursor;
+				u8 col = BIT(r, i) | (BIT(g, i) << 1) | (BIT(b, i) << 2);
+				if (x == cursor_x)
+					col = m_col_cursor;
 				*p++ = palette[col];
 			}
 		}
@@ -199,8 +204,7 @@ void fp1100_state::irq_mask_w(u8 data)
 		LOG("%s: Sub IRQ asserted\n",machine().describe_context());
 		m_sub_irq_status = true;
 	}
-	else
-	if (!BIT(data, 7) && m_sub_irq_status)
+	else if (!BIT(data, 7) && m_sub_irq_status)
 	{
 		m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
 		LOG("%s: Sub IRQ cleared\n",machine().describe_context());
@@ -233,7 +237,7 @@ void fp1100_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).r(FUNC(fp1100_state::memory_r));
-	map(0x0000, 0xffff).writeonly().share("wram"); // always write to ram
+	map(0x0000, 0xffff).writeonly().share(m_wram); // always write to ram
 }
 
 void fp1100_state::io_map(address_map &map)
@@ -283,7 +287,7 @@ void fp1100_state::kbd_row_w(u8 data)
 void fp1100_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("sub_ipl", 0x0000);
-	map(0x2000, 0xdfff).ram().share("videoram"); //vram B/R/G
+	map(0x2000, 0xdfff).ram().share(m_videoram); //vram B/R/G
 	map(0xe000, 0xe000).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe400, 0xe400).mirror(0x3ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
@@ -341,7 +345,7 @@ d6 - Centronics strobe
 */
 void fp1100_state::portc_w(u8 data)
 {
-	u8 bits = data ^ m_upd7801.portc;
+	u8 const bits = data ^ m_upd7801.portc;
 	m_upd7801.portc = data;
 
 	if (BIT(bits, 3))
@@ -379,7 +383,7 @@ void fp1100_state::handle_int_to_main()
 	}
 }
 
-/* Input ports */
+// Input ports
 static INPUT_PORTS_START( fp1100 )
 	PORT_START("KEY.0")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -650,61 +654,62 @@ void fp1100_state::machine_reset()
 
 void fp1100_state::fp1100(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fp1100_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &fp1100_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fp1100_state::vblank_irq));
 
-	upd7801_device &sub(UPD7801(config, m_subcpu, MAIN_CLOCK/4));
-	sub.set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
-	sub.pa_out_cb().set(FUNC(fp1100_state::porta_w));
-	sub.pb_in_cb().set(FUNC(fp1100_state::portb_r));
-	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::write));
-	sub.pc_in_cb().set(FUNC(fp1100_state::portc_r));
-	sub.pc_out_cb().set(FUNC(fp1100_state::portc_w));
-	sub.txd_func().set([this] (bool state) { m_cassbit = state; });
+	UPD7801(config, m_subcpu, MAIN_CLOCK/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
+	m_subcpu->pa_out_cb().set(FUNC(fp1100_state::porta_w));
+	m_subcpu->pb_in_cb().set(FUNC(fp1100_state::portb_r));
+	m_subcpu->pb_out_cb().set("cent_data_out", FUNC(output_latch_device::write));
+	m_subcpu->pc_in_cb().set(FUNC(fp1100_state::portc_r));
+	m_subcpu->pc_out_cb().set(FUNC(fp1100_state::portc_w));
+	m_subcpu->txd_func().set([this] (bool state) { m_cassbit = state; });
 
 	GENERIC_LATCH_8(config, "main2sub");
 	GENERIC_LATCH_8(config, "sub2main");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(640, 480);
 	screen.set_visarea_full();
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette).set_entries(8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_fp1100);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 950) // guess
 			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
-	/* CRTC */
-	MC6845(config, m_crtc, MAIN_CLOCK/8);   /* unknown variant; hand tuned to get ~60 fps */
+	// CRTC
+	HD6845S(config, m_crtc, MAIN_CLOCK/8);   // hand tuned to get ~60 fps
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row));
 
-	/* Printer */
+	// Printer
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(fp1100_state::centronics_busy_w));
 
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(latch);
 
-	/* Cassette */
+	// Cassette
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(fp1100_state::kansas_w), attotime::from_hz(4800)); // cass write
 }
 
-/* ROM definition */
+// ROM definitions
+
 ROM_START( fp1100 )
 	ROM_REGION( 0x9000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "basic.rom", 0x0000, 0x9000, BAD_DUMP CRC(7c7dd17c) SHA1(985757b9c62abd17b0bd77db751d7782f2710ec3))
@@ -715,10 +720,22 @@ ROM_START( fp1100 )
 	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
 ROM_END
 
+/* FP-1000 has video RAM locations RAM9 to RAM24 unpopulated (only RAM1 to RAM8 are populated) - needs its own machine configuration.
+   PCB parts overlay silkscreen for sub-CPU shows "µPD7801G-101", but all examples seen have chips silksreened "D7108G 118". */
+ROM_START( fp1000 )
+	ROM_REGION( 0x9000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "2l_a10_kkk_fp1000_basic.c1", 0x0000, 0x1000, CRC(9322dedd) SHA1(40a00684ced2b7ead53ca15a915d98f3fe00d3ba))
+
+	ROM_REGION( 0x3000, "sub_ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "jka_fp1000.e8",    0x0000, 0x1000, CRC(2aefa4e4) SHA1(b3cc5484426c19a7266d17ea5c4d55441b4e3be8))
+	ROM_LOAD( "jkc_fp1000.e21",   0x1000, 0x1000, CRC(67a668a9) SHA1(37fb9308505b47db36f8c341144ca3fe3fec64af))
+	ROM_LOAD( "upd7801g_118.bin", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672)) // Not dumped, borrowed from 'fp1100'
+ROM_END
+
 } // anonymous namespace
 
 
-/* Driver */
+// Drivers
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
-COMP( 1983, fp1100, 0,      0,      fp1100,  fp1100, fp1100_state, empty_init, "Casio", "FP-1100", MACHINE_NOT_WORKING)
+COMP( 1983, fp1100, 0,      0, fp1100, fp1100, fp1100_state, empty_init, "Casio", "FP-1100", MACHINE_NOT_WORKING)
+COMP( 1982, fp1000, 0, fp1100, fp1100, fp1100, fp1100_state, empty_init, "Casio", "FP-1000", MACHINE_NOT_WORKING)

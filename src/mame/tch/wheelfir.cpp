@@ -61,79 +61,6 @@ level 3 interrupt = vblank interrupt
 level 1 interrupt = blitter interrupt
 
 
-Blitter data foramt ( offset in words, offset in bytes, offset inside ram data table )
-
-
-        fedcba9876543210
-
-0  0  0
-        --------76543210    dest_x0 bits 0-7
-        76543210--------    src_x0  bits 0-7
-
-1  2  2
-        --------76543210    dest_x1 bits 0-7
-
-
-
-2  4  4
-        --------76543210    dest_y0 bits 0-7
-        76543210--------    src_y0  bits 0-7
-3  6  6
-        --------76543210    dest_y1 bits 0-7
-
-4  8
-5  a
-6  c  8
-        ??------????????    image flags (directly copied from image info table, page and ?)
-        --3210----------    image page
-        -------8--------    src_x0 bit 8
-        ------8---------    src_y0 bit 8
-7  e  a
-        ????????--?-----    flags
-        ---------------X    X direction (src?)
-        --------------Y-    Y direction (src?)
-        ---------8------    dest_x0 bit 8
-        --------8-------    dest_y0 bit 8
-        -----------L----    dest layer
-        ------------??--    unknown bits, set usually when rendering target = bitmap layer
-
-
-8 10  c
-        -------5--------    x scale data1 bit 5
-        ------5---------    y scale data1 bit 5
-        -----5----------    x scale data2 bit 5
-        ----5-----------    y scala data2 bit 5
-        ---D------------    x scale >200%
-        --D-------------    y scale >200%
-        -x--------------    X direction (dest?)
-        Y---------------    Y direction (dest?)
-        ---------8------    scroll x bit 8
-        --------8-------    scroll y bit 8
-        ----------?-----    set for road ? buffer num (is there double buffering ? or two bitmap layers?)
-
-9 12  e
-        ---------------H    x scale < 50%
-        --------------H-    y scale < 50%
-        -------------8--    dest_x1 bit 8
-        ------------8---    dest_y1 bit 8
-
-
-a 14 10
-        ---43210--------    x scale data1 bits 0-4
-        -4--------------    y scale data1 bit 4
-        --------76543210    scroll x of bitmap layer
-
-b 16 12
-        ---43210--------    x scale data2 bits 0-4
-        10--------------    y scale data1 bits 0-1
-        --------76543210    scroll y of bitmap layer
-c 18 14
-        ---43210--------    y scale data2 bits 0-4
-        32--------------    y scale data1 bits 2-3
-d 1a
-e 1c
-f 1e
-
 
 
 
@@ -181,31 +108,28 @@ BIT N - ( scale < 50% ) ? 1 : 0
 
 namespace {
 
-static const int ZOOM_TABLE_SIZE=1<<14;
-static const int NUM_SCANLINES=256-8;
-static const int NUM_VBLANK_LINES=8;
-static const int LAYER_BG=0;
-static const int LAYER_FG=1;
-static const int NUM_COLORS=256;
-
-struct scroll_info
-{
-		int32_t x = 0, y = 0, unkbits = 0;
-};
-
+static const int ZOOM_TABLE_SIZE = 1 << 14;
+static const int NUM_SCANLINES = 256 - 8;
+static const int NUM_VBLANK_LINES = 64; // unknown, too low and sprites at top of screen on power ball flicker
+static const int LAYER_BG = 0;
+static const int LAYER_FG = 1;
+static const int NUM_COLORS = 256;
 
 class wheelfir_state : public driver_device
 {
 public:
-	wheelfir_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wheelfir_state(const machine_config &mconfig, device_type type, const char* tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_blitter_data(*this, "blitram"),
+		m_tilepages(*this, "gfx1"),
+		m_maincpurom(*this, "maincpu"),
 		m_adc_eoc(0),
-		m_is_pwball(false),
+		m_force_extra_irq1(false),
 		m_disable_raster_irq(false)
 	{ }
 
@@ -229,9 +153,9 @@ private:
 	required_device<palette_device> m_palette;
 
 	std::unique_ptr<int32_t[]> m_zoom_table;
-	std::unique_ptr<uint16_t[]> m_blitter_data;
-
-	std::unique_ptr<scroll_info[]> m_scanlines;
+	required_shared_ptr<uint16_t> m_blitter_data;
+	required_region_ptr<uint8_t> m_tilepages;
+	required_region_ptr<uint16_t> m_maincpurom;
 
 	int32_t m_direct_write_x0 = 0;
 	int32_t m_direct_write_x1 = 0;
@@ -241,14 +165,13 @@ private:
 
 	int16_t m_scanline_cnt = 0;
 
-
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[2]{};
 
 	int32_t get_scale(int32_t index)
 	{
-		while(index<ZOOM_TABLE_SIZE)
+		while (index < ZOOM_TABLE_SIZE)
 		{
-			if(m_zoom_table[index]>=0)
+			if (m_zoom_table[index] >= 0)
 			{
 				return m_zoom_table[index];
 			}
@@ -257,12 +180,14 @@ private:
 		return 0;
 	}
 	void wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void do_direct_write(uint8_t sixdat);
+	void do_blit();
 	void wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wheelfir_7c0000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t wheelfir_7c0000_r(offs_t offset, uint16_t mem_mask = ~0);
 	void coin_cnt_w(uint16_t data);
 	void adc_eoc_w(int state);
-	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
 	void screen_vblank_wheelfir(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 	void ramdac_map(address_map &map);
@@ -270,231 +195,247 @@ private:
 	void wheelfir_sub(address_map &map);
 	int m_adc_eoc;
 
-	bool m_is_pwball;
+	bool m_force_extra_irq1;
 	bool m_disable_raster_irq;
-};
 
+	int m_current_yscroll;
+};
 
 void wheelfir_state::wheelfir_scanline_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scanline_cnt);
+	//logerror("%d: set scanline counter to %d\n", machine().describe_context(), m_scanline_cnt);
 }
 
+void wheelfir_state::do_blit()
+{
+	// blitter irq? should be timed?
+	m_maincpu->set_input_line(1, HOLD_LINE);
+
+	uint8_t const* const rom = m_tilepages;
+
+	const int src_u0 = (m_blitter_data[0] >> 8) + ((m_blitter_data[6] & 0x100) ? 256 : 0);
+	const int src_v0 = (m_blitter_data[2] >> 8) + ((m_blitter_data[6] & 0x200) ? 256 : 0);
+
+	int dst_x0 = (m_blitter_data[0] & 0xff) + ((m_blitter_data[7] & 0x40) ? 256 : 0);
+	int dst_y0 = (m_blitter_data[2] & 0xff) + ((m_blitter_data[7] & 0x80) ? 256 : 0);
+
+	int dst_x1 = (m_blitter_data[1] & 0xff) + ((m_blitter_data[9] & 4) ? 256 : 0);
+	int dst_y1 = (m_blitter_data[3] & 0xff) + ((m_blitter_data[9] & 8) ? 256 : 0);
+
+	const bool flipx = (m_blitter_data[7] & 0x1);
+	const bool flipy = (m_blitter_data[7] & 0x2);
+
+	const int x_dst_step = flipx ? 1 : -1;
+	const int y_dst_step = flipy ? 1 : -1;
+
+	const int u_src_step = (m_blitter_data[8] & 0x4000) ? 1 : -1;
+	const int v_src_step = (m_blitter_data[8] & 0x8000) ? 1 : -1;
+
+	const int page = ((m_blitter_data[6]) >> 10) * 0x40000;
+
+	if (page >= 0x700000) /* src set to  unav. page before direct write to the framebuffer */
+	{
+		logerror("%s: page set to above ROM %08x - direct write enable?\n", machine().describe_context(), page);
+		// wheelfir sets 0xfc0000 and 0xf00000, both of which are out of range of any GFX ROM
+		// kongball sets 0xfc0000 but only on startup
+		m_direct_write_x0 = dst_x0;
+		m_direct_write_x1 = dst_x1;
+		m_direct_write_y0 = dst_y0;
+		m_direct_write_y1 = dst_y1;
+		m_direct_write_idx = 0;
+	}
+
+	if (flipy)
+		dst_y0 -= 1;
+	else
+		dst_y0 += 1;
+
+	if (flipy)
+		dst_y1 += 1;
+	else
+		dst_y1 -= 1;
+
+	dst_x0 &= 0x1ff;
+	dst_x1 &= 0x1ff;
+	dst_y0 &= 0x1ff;
+	dst_y1 &= 0x1ff;
+
+	int vpage = (m_blitter_data[0x7] & 0x10) ? LAYER_BG : LAYER_FG;
+
+
+	// ?? prevents some sprite flickering in pwball and wheelfir
+	if (vpage == LAYER_FG)
+	{
+		dst_y0 &= 0xff;
+		dst_y1 &= 0xff;
+	}
+
+	float scale_u_step;
+	float scale_v_step;
+	
+	// calculate u zoom (horizontal source scale)
+	const int d1u = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
+					((m_blitter_data[0x08] & 0x0100) >> 3);
+	const int d2u = ((m_blitter_data[0x0b] & 0x1f00) >> 8) |
+					((m_blitter_data[0x08] & 0x0400) >> 5);
+	const int hflagu = (m_blitter_data[0x09] & 0x0001) ? 1 : 0;
+	const int dflagu = (m_blitter_data[0x08] & 0x1000) ? 1 : 0;
+	const int indexu = d1u | (d2u << 6) | (hflagu << 12) | (dflagu << 13);
+	const float scale_u = get_scale(indexu);
+
+	// calculate v zoom (vertical source scale)
+	const int d1v = ((m_blitter_data[0x0b] & 0xc000) >> 14) |
+					((m_blitter_data[0x0c] & 0xc000) >> 12) |
+					((m_blitter_data[0x0a] & 0x4000) >> 10) |
+					((m_blitter_data[0x08] & 0x0200) >> 4);
+
+	const int d2v = ((m_blitter_data[0x0c] & 0x1f00) >> 8) |
+					((m_blitter_data[0x08] & 0x0800) >> 6);
+	const int hflagv = (m_blitter_data[0x09] & 0x0002) ? 1 : 0;
+	const int dflagv = (m_blitter_data[0x08] & 0x2000) ? 1 : 0;
+	const int indexv = d1v | (d2v << 6) | (hflagv << 12) | (dflagv << 13);
+	const float scale_v = get_scale(indexv);
+
+	if (scale_u == 0 || scale_v == 0) return;
+
+	scale_u_step = 100.f / scale_u;
+	scale_v_step = 100.f / scale_v;
+	
+
+	// do the draw
+	int y = dst_y0;
+	float idx_v = 0;
+	do
+	{
+		int x = dst_x0;
+		float idx_u = 0;
+
+		int yy = src_v0 + v_src_step * idx_v;
+
+		do
+		{
+			int xx = src_u0 + u_src_step * idx_u;
+
+			int address = page + yy * 512 + xx;
+
+			int pix = rom[address & (0x1000000 - 1)];
+
+			if (pix && x >= 0 && y >= 0 && x < 512 && y < 512)
+			{
+				m_tmp_bitmap[vpage]->pix(y, x) = pix;
+			}
+
+			x += x_dst_step;
+			x &= 0x1ff;
+			idx_u += scale_u_step;
+
+		} while (x != dst_x1);
+
+		y += y_dst_step;
+		y &= 0x1ff;
+		idx_v += scale_v_step;
+
+	} while (y != dst_y1);
+}
+
+void wheelfir_state::do_direct_write(uint8_t sixdat)
+{
+	const int direct_width = m_direct_write_x1 - m_direct_write_x0 + 1;
+	const int direct_height = m_direct_write_y1 - m_direct_write_y0 + 1;
+
+	if (direct_width > 0 && direct_height > 0)
+	{
+		int x = m_direct_write_idx % direct_width;
+		int y = (m_direct_write_idx / direct_width) % direct_height;
+
+		x += m_direct_write_x0;
+		y += m_direct_write_y0;
+
+		if (x < 512 && y < 512)
+		{
+			m_tmp_bitmap[LAYER_BG]->pix(y, x) = sixdat;
+		}
+	}
+
+	++m_direct_write_idx;
+}
 
 void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	/*
+	Blitter data format ( offset in words, offset in bytes )
+
+	0  0    uuuuuuuu   u = src_u0 bits 0-7
+	   1    xxxxxxxx   x = dest_x0 bits 0-7
+	1  2    --------
+	   3    XXXXXXXX   X = dest_x1 bits 0-7
+	2  4    vvvvvvvv   v = src_v0 bits 0-7
+	   5    yyyyyyyy   y = dest_y0 bits 0-7
+	3  6    --------
+	   7    YYYYYYYY   Y = dest_y1 bits 0-7
+	4  8    --------
+	   9    --------
+	5  a    --------
+	   b    --------
+	6  c    --ppppvu   p = page, v = src_v0 bit 8, u = src_u0 bit 8
+	   d    DDDDDDDD   D = direct bitmap/framebuffer write port
+	7  e    --------
+	   f    yx-L??ff   y = dest_y0 bit 8 , x = dest_x0 bit 8 , L = dest layer, ?? = used but unknown, ff = Y/X direction (src?)
+	8 10    FFZzZzZz   FF = Y direction/X direction (dest), Z = y scale >200% z = x scale >200%, Z = y scale data2 bit 5, z = x scale data2 bit 5, Z = y scale data1 bit 5, z = x scale data1 bit 5
+	  11    Ss?-----   s = scroll x of back layer bit 8, S = scroll y of back layer bit 8, ? = set on road
+	9 12    --------
+	  13    ----YXZz   Y = dest_y1 bit 8, X = dest_x1 bit 8, Z = y scale < 50%, z = x scale < 50%
+	a 14    -Z-zzzzz   Z = y scale data1 bit 4, z = x scale data1 bits 0-4,
+	  15    ssssssss   s = scroll x of back layer
+	b 16    ZZ-zzzzz   Z = y scale data1 bits 0-1, z = x scale data2 bits 0-4
+	  17    SSSSSSSS   S = scroll y of back layer
+	c 18    ZZ-ZZZZZ   Z = y scale data1 bits 2-3, Z = y scale data2 bits 0-4
+	  19    --------
+	d 1a    --------
+	  1b    --------
+	e 1c    --------
+	  1d    --------
+	f 1e    TTTTTTTT
+	  1f    TTTTTTTT    T = start blit / trigger blit (with write of 0xffff, also writes 0x0000 before filling in some params)
+	*/
+
+	m_screen->update_partial(m_screen->vpos() - 1);
+	//uint16_t oldval = m_blitter_data[offset];
 	COMBINE_DATA(&m_blitter_data[offset]);
 
-	if(!ACCESSING_BITS_8_15 && offset==0x6)  //LSB only!
+	if (offset == 0x6)
 	{
-		int direct_width=m_direct_write_x1-m_direct_write_x0+1;
-		int direct_height=m_direct_write_y1-m_direct_write_y0+1;
-
-		int sixdat = data&0xff;
-
-		if(direct_width>0 && direct_height>0)
+		if (!ACCESSING_BITS_8_15)  //LSB only!
 		{
-			int x = m_direct_write_idx % direct_width;
-			int y = (m_direct_write_idx / direct_width) % direct_height;
-
-			x+=m_direct_write_x0;
-			y+=m_direct_write_y0;
-
-			if(x<512 && y <512)
-			{
-				m_tmp_bitmap[LAYER_BG]->pix(y, x) = sixdat;
-			}
+			do_direct_write(data & 0xff);
+			return;
 		}
-
-		++m_direct_write_idx;
-
-		return;
 	}
 
-	if(offset==0xf && data==0xffff)
+	if (offset == 0xa)
 	{
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-		uint8_t const *const rom = memregion("gfx1")->base();
-
-		int width = m_screen->width();
-		int height = m_screen->height();
-
-		int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
-		int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);
-
-		int dst_x0=(m_blitter_data[0]&0xff)+((m_blitter_data[7]&0x40)?256:0);
-		int dst_y0=(m_blitter_data[2]&0xff)+((m_blitter_data[7]&0x80)?256:0);
-
-		int dst_x1=(m_blitter_data[1]&0xff)+((m_blitter_data[9]&4)?256:0);
-		int dst_y1=(m_blitter_data[3]&0xff)+((m_blitter_data[9]&8)?256:0);
-
-		int x_dst_step=(m_blitter_data[7]&0x1)?1:-1;
-		int y_dst_step=(m_blitter_data[7]&0x2)?1:-1;
-
-		int x_src_step=(m_blitter_data[8]&0x4000)?1:-1;
-		int y_src_step=(m_blitter_data[8]&0x8000)?1:-1;
-
-		int page=((m_blitter_data[6])>>10)*0x40000;
-
-
-		if (!m_is_pwball)
+		if (!ACCESSING_BITS_8_15)  //LSB only!
 		{
-			if (page >= 0x400000) /* src set to  unav. page before direct write to the framebuffer */
-			{
-				m_direct_write_x0 = dst_x0;
-				m_direct_write_x1 = dst_x1;
-				m_direct_write_y0 = dst_y0;
-				m_direct_write_y1 = dst_y1;
-				m_direct_write_idx = 0;
-			}
+			// if the scroll value is written during the active frame, it must take into account
+			// the current yposition?? (seems to be the only way for wheelfir rasters to work?)
+			m_current_yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+			m_current_yscroll -= m_screen->vpos();
+			return;
 		}
+	}
 
-		if(x_dst_step<0)
+
+	if (offset == 0xf)
+	{
+		if (data == 0xffff)
 		{
-			if(dst_x0<=dst_x1)
-			{
-				return;
-			}
-
+			do_blit();
 		}
 		else
 		{
-			if(dst_x0>=dst_x1)
-			{
-				return;
-			}
-
-		}
-
-		if(y_dst_step<0)
-		{
-			if(dst_y0<=dst_y1)
-			{
-				return;
-			}
-		}
-		else
-		{
-			if(dst_y0>=dst_y1)
-			{
-				return;
-			}
-
-		}
-
-
-		//additional checks
-
-		int d1, d2, hflag, dflag, index;
-
-		d1=((m_blitter_data[0x0a]&0x1f00)>>8);
-
-		d2=((m_blitter_data[0x0b]&0x1f00)>>8);
-
-
-		d1|=((m_blitter_data[0x8]&0x100)>>3);
-		d2|=((m_blitter_data[0x8]&0x400)>>5);
-		hflag=(m_blitter_data[0x9]&0x1)?1:0;
-		dflag=(m_blitter_data[0x8]&0x1000)?1:0;
-		index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
-
-		const float scale_x=get_scale(index);
-
-
-		d1=((m_blitter_data[0x0b]&0xc000)>>14) |
-			((m_blitter_data[0x0c]&0xc000)>>12) |
-			((m_blitter_data[0x0a]&0x4000)>>10);
-
-		d2=((m_blitter_data[0x0c]&0x1f00)>>8);
-
-
-		d1|=((m_blitter_data[0x8]&0x200)>>4);
-		d2|=((m_blitter_data[0x8]&0x800)>>6);
-
-		hflag=(m_blitter_data[0x9]&0x2)?1:0;
-		dflag=(m_blitter_data[0x8]&0x2000)?1:0;
-		index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
-
-		const float scale_y=get_scale(index);
-
-
-		if(scale_x==0 || scale_y==0) return;
-
-
-		float scale_x_step = 100.f / scale_x;
-		float scale_y_step = 100.f / scale_y;
-
-		if (m_is_pwball)
-		{
-			scale_x_step = 1.0f;
-			scale_y_step = 1.0f;
-		}
-
-		int vpage=LAYER_FG;
-		if(m_blitter_data[0x7]&0x10)
-		{
-			vpage=LAYER_BG;
-/*
-            printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
-
-            for(int i=0;i<16;++i)
-            {
-                printf("%x = %.4x\n",i,m_blitter_data[i]);
-            }
-
-            printf("\n");
-*/
-		}
-
-		bool endx=false;
-		bool endy=false;
-
-		if(m_blitter_data[0x7]&0x0c)
-		{
-			//???
-		}
-
-		float idx_x = 0;
-		for(int x=dst_x0; !endx; x+=x_dst_step, idx_x+=scale_x_step)
-		{
-			endy=false;
-			float idx_y = 0;
-			for(int y=dst_y0; !endy; y+=y_dst_step, idx_y+=scale_y_step)
-			{
-				endx=(x==(dst_x1+1));
-				endy=(y==(dst_y1+1));
-
-
-				int xx=src_x0+x_src_step*idx_x;
-				int yy=src_y0+y_src_step*idx_y;
-
-				int address=page+yy*512+xx;
-
-				int pix = rom[address&(0x1000000-1)];
-
-				int screen_x=x;
-				int screen_y=y;
-
-
-				if ((page>=0x400000) && (!m_is_pwball))
-				{
-					//hack for clear
-					if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
-					{
-				//      m_tmp_bitmap[vpage]->pix(screen_y , screen_x ) =0;
-					}
-				}
-
-				{
-					if (vpage == LAYER_FG) screen_y&=0xff;
-
-					if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
-					{
-						m_tmp_bitmap[vpage]->pix(screen_y, screen_x) = pix;
-					}
-				}
-			}
+			// writes 0x0000 before filling in some of the other params then sending 0xffff above
+			logerror("%s: write to offset 0xf (blit start) but with data %04x\n", machine().describe_context(), data);
 		}
 	}
 }
@@ -509,22 +450,24 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 
-	for(int y=cliprect.min_y; y < cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(( (m_scanlines[y].y)&511));
-		uint16_t *const dest = &bitmap.pix(y);
+		int scrolly = y;
+		scrolly += m_current_yscroll;//
+		scrolly &= 0x1ff;
+		uint16_t const* const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
+		uint16_t* const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			dest[x] = source[(x + m_scanlines[y].x) & 511];
+			int sourcex = x;
+			sourcex += (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
+			sourcex &= 0x1ff;
+			dest[x] = source[sourcex];
 		}
 	}
 
 	copybitmap_trans(bitmap, *m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
-
-/*
-    m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
-*/
 
 	return 0;
 }
@@ -535,6 +478,9 @@ void wheelfir_state::screen_vblank_wheelfir(int state)
 	if (state)
 	{
 		m_tmp_bitmap[LAYER_FG]->fill(0, m_screen->visible_area());
+	}
+	else
+	{
 	}
 }
 
@@ -587,9 +533,9 @@ void wheelfir_state::coin_cnt_w(uint16_t data)
 void wheelfir_state::wheelfir_main(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x200000, 0x20ffff).ram();
+	map(0x200000, 0x20ffff).ram().mirror(0x010000); // kongball either needs the mirror (or has more ram?)
 
-	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w));
+	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w)).share(m_blitter_data);
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x720003, 0x720003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x720005, 0x720005).w("ramdac", FUNC(ramdac_device::mask_w)); // word write?
@@ -676,35 +622,52 @@ void wheelfir_state::adc_eoc_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
-	if(param<NUM_SCANLINES)
+	if (param == 0)
 	{
-		//copy scanline offset
-		int xscroll = (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;
-		int yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+		// latch the current scroll value at the top of the screen?
+		m_current_yscroll = (m_blitter_data[0xb] & 0x00ff) | (m_blitter_data[0x8] & 0x0080) << 1;
+	}
 
-		m_scanlines[param].x = xscroll;
-		m_scanlines[param].y = yscroll;
-		m_scanlines[param].unkbits = m_blitter_data[0x8] & 0xff;
+	if (param < NUM_SCANLINES) //visible scanline
+	{
+		// raster IRQ, changes scroll values for road
 
-		m_blitter_data[0xb]++;
+		// kongball has no valid raster IRQ function, and never sets the register
+		// radendur also does't appear to have a proper piece of IRQ code, but sets it to 1
+		// hack is needed to disable it in these cases, is there a proper way to disable it?
 
-		//visible scanline
-		m_scanline_cnt--;
+		// Does the actual raster line depend on something else like the bg scroll value
+		// and trigger when the hardware reads the framebuffer for that line, rather than the
+		// screen line? The older logic worked better for Wheels and Fire, but was buffering
+		// values in a strange way rather than using partial updates.
+		//
+		// currently we latch the scroll value at the start of a frame, and if it is written
+		// during a frame, we take into account the current vpos when updating it; this ALMOST
+		// seems ok the road in wheelfir, but not the background so much
 
-		if ((m_scanline_cnt==0) && (!m_disable_raster_irq))
+		if (m_scanline_cnt > 0)
 		{
-			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
+			m_scanline_cnt--;
+
+			if (m_scanline_cnt == 0)
+			{
+				if (!m_disable_raster_irq)
+				{
+					m_maincpu->set_input_line(5, HOLD_LINE);
+				}
+			}
 		}
-		//m_screen->update_partial(param);
 
-		if ((param == 0) && m_is_pwball)
+		if ((param == 224) && m_force_extra_irq1)
 		{
+			// why, this is the blitter irq?
+			// pwball and radendur won't boot otherwise though
 			m_maincpu->set_input_line(1, HOLD_LINE);
 		}
 	}
 	else
 	{
-		if(param==NUM_SCANLINES) /* vblank */
+		if (param == NUM_SCANLINES) /* vblank */
 		{
 			m_maincpu->set_input_line(3, HOLD_LINE);
 		}
@@ -713,36 +676,81 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 	m_subcpu->set_input_line(1, HOLD_LINE);
 }
 
+// see code below that is used to calculate this for wheelfir set
+// as the other game ROMs are structured differently it's easier
+// to just have this table here; the zooming code could be significantly
+// refactored however
+static const uint16_t zoom_index[400] =
+{
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1801, 0x1ea1, 0x1ba1, 0x1f61, 0x19e1,
+	0x19a1, 0x1961, 0x1961, 0x1921, 0x1fe2, 0x1d62, 0x1ba2, 0x1aa2, 0x1a22, 0x1ea3,
+	0x1804, 0x1fe4, 0x1d64, 0x1fe5, 0x1ae4, 0x1d66, 0x1fe9, 0x1fec, 0x1eac, 0x181f,
+	0x0801, 0x0fe1, 0x0ea1, 0x0ca1, 0x0ba1, 0x0ae1, 0x0f61, 0x0a21, 0x09e1, 0x09e1,
+	0x09a1, 0x09a1, 0x0961, 0x0961, 0x0961, 0x0802, 0x0921, 0x0921, 0x0fe2, 0x0fa2,
+	0x0d62, 0x0c22, 0x0ba2, 0x0b22, 0x0aa2, 0x08e1, 0x0a22, 0x0fe3, 0x0ea3, 0x0d23,
+	0x0804, 0x0ba3, 0x0fe4, 0x0f24, 0x0d64, 0x0fe5, 0x0fe5, 0x0e25, 0x0ae4, 0x0fe7,
+	0x0d66, 0x0ea7, 0x0fe9, 0x0fe9, 0x0fec, 0x0ce9, 0x0eac, 0x0ff4, 0x081f, 0x0fff,
+	0x0000, 0x0fff, 0x07e0, 0x0bb6, 0x06a0, 0x0560, 0x0bbf, 0x0aba, 0x09a9, 0x0abf,
+	0x0a7f, 0x0a3f, 0x09ae, 0x09ff, 0x09b3, 0x09b7, 0x09bd, 0x09bf, 0x09bf, 0x0974,
+	0x01a0, 0x097e, 0x097f, 0x097f, 0x092d, 0x0160, 0x0931, 0x0934, 0x0938, 0x093e,
+	0x093f, 0x093f, 0x093f, 0x08a2, 0x0120, 0x08e9, 0x08ea, 0x08eb, 0x08ec, 0x08ed,
+	0x08ee, 0x08f0, 0x08f2, 0x08f4, 0x08f8, 0x08fd, 0x08ff, 0x08ff, 0x08ff, 0x08ff,
+	0x00e0, 0x00e0, 0x00e0, 0x00e0, 0x00e0, 0x00e0, 0x08a4, 0x08a4, 0x08a4, 0x08a4,
+	0x08a4, 0x08a4, 0x08a4, 0x08a4, 0x08a5, 0x08a5, 0x08a5, 0x08a5, 0x08a5, 0x08a6,
+	0x08a6, 0x08a6, 0x08a6, 0x08a6, 0x08a7, 0x08a7, 0x08a7, 0x08a8, 0x08a8, 0x08a9,
+	0x08a9, 0x08aa, 0x08aa, 0x08ab, 0x08ac, 0x08ad, 0x08ad, 0x08ae, 0x08b0, 0x08b1,
+	0x08b3, 0x08b5, 0x08b8, 0x08bc, 0x08bf, 0x08bf, 0x08bf, 0x08bf, 0x08bf, 0x00a0,
+	0x00a0, 0x2000, 0x2fff, 0x2fff, 0x27e0, 0x27e0, 0x2bb6, 0x2bb6, 0x26a0, 0x26a0,
+	0x2560, 0x2560, 0x2bbf, 0x2bbf, 0x2aba, 0x2aba, 0x29a9, 0x29a9, 0x2abf, 0x2abf,
+	0x2a7f, 0x2a7f, 0x2a3f, 0x2a3f, 0x29ae, 0x29ae, 0x29ff, 0x29ff, 0x29b3, 0x29b3,
+	0x29b7, 0x29b7, 0x29bd, 0x29bd, 0x29bf, 0x29bf, 0x29bf, 0x29bf, 0x2974, 0x2974,
+	0x21a0, 0x21a0, 0x297e, 0x297e, 0x297f, 0x297f, 0x297f, 0x297f, 0x292d, 0x292d,
+	0x2160, 0x2160, 0x2931, 0x2931, 0x2934, 0x2934, 0x2938, 0x2938, 0x293e, 0x293e,
+	0x293f, 0x293f, 0x293f, 0x293f, 0x293f, 0x293f, 0x28a2, 0x28a2, 0x2120, 0x2120,
+	0x28e9, 0x28e9, 0x28ea, 0x28ea, 0x28eb, 0x28eb, 0x28ec, 0x28ec, 0x28ed, 0x28ed,
+	0x28ee, 0x28ee, 0x28f0, 0x28f0, 0x28f2, 0x28f2, 0x28f4, 0x28f4, 0x28f8, 0x28f8,
+	0x28fd, 0x28fd, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff, 0x28ff,
+	0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0, 0x20e0,
+	0x20e0, 0x20e0, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4,
+	0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a4, 0x28a5, 0x28a5,
+	0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a5, 0x28a6, 0x28a6,
+	0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a6, 0x28a7, 0x28a7,
+	0x28a7, 0x28a7, 0x28a7, 0x28a7, 0x28a8, 0x28a8, 0x28a8, 0x28a8, 0x28a9, 0x28a9,
+	0x28a9, 0x28a9, 0x28aa, 0x28aa, 0x28aa, 0x28aa, 0x28ab, 0x28ab, 0x28ac, 0x28ac,
+	0x28ad, 0x28ad, 0x28ad, 0x28ad, 0x28ae, 0x28ae, 0x28b0, 0x28b0, 0x28b1, 0x28b1,
+	0x28b3, 0x28b3, 0x28b5, 0x28b5, 0x28b8, 0x28b8, 0x28bc, 0x28bc, 0x28bf, 0x28bf,
+	0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x28bf, 0x20a0, 0x20a0
+};
 
 void wheelfir_state::machine_start()
 {
 	m_zoom_table = std::make_unique<int32_t[]>(ZOOM_TABLE_SIZE);
-	m_blitter_data = std::make_unique<uint16_t[]>(16);
 
-	m_scanlines = std::make_unique<scroll_info[]>(NUM_SCANLINES+NUM_VBLANK_LINES);
-
-
-	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
+	for (int i = 0; i < (ZOOM_TABLE_SIZE); ++i)
 	{
-		m_zoom_table[i]=-1;
+		m_zoom_table[i] = -1;
 	}
 
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	for(int j=0;j<400;++j)
+	for (int j = 0; j < 400; ++j)
 	{
-		int i=j<<3;
-		int d1=ROM[0x200+i]&0x1f;
-		int d0=(ROM[0x200+i]>>8)&0x1f;
+		/*
+		// calculate index for zoom
+		uint16_t* ROM = (uint16_t*)m_maincpurom;
+		int i = j << 3;
+		int d1 = ROM[0x200 + i] & 0x1f;
+		int d0 = (ROM[0x200 + i] >> 8) & 0x1f;
 
-		d0|=(ROM[0x200+1+i]&1)?0x20:0;
-		d1|=(ROM[0x200+1+i]&4)?0x20:0;
+		d0 |= (ROM[0x200 + 1 + i] & 1) ? 0x20 : 0;
+		d1 |= (ROM[0x200 + 1 + i] & 4) ? 0x20 : 0;
 
-		int hflag=(ROM[0x200+2+i]&0x100)?1:0;
-		int dflag=(ROM[0x200+1+i]&0x10)?1:0;
+		int hflag = (ROM[0x200 + 2 + i] & 0x100) ? 1 : 0;
+		int dflag = (ROM[0x200 + 1 + i] & 0x10) ? 1 : 0;
 
-		int index=d0|(d1<<6)|(hflag<<12)|(dflag<<13);
-		m_zoom_table[index]=j;
+		int index = d0 | (d1 << 6) | (hflag << 12) | (dflag << 13);
+		*/
+		m_zoom_table[zoom_index[j]] = j;
 	}
 }
 
@@ -774,15 +782,15 @@ GFXDECODE_END
 
 void wheelfir_state::wheelfir(machine_config &config)
 {
-	M68000(config, m_maincpu, 32000000/2);
+	M68000(config, m_maincpu, 32000000 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_main);
 
-	M68000(config, m_subcpu, 32000000/2);
+	M68000(config, m_subcpu, 32000000 / 2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_sub);
 
-	//config.set_maximum_quantum(attotime::from_hz(12000));
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
+	adc0808_device& adc(ADC0808(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
 	adc.in_callback<0>().set_ioport("STEERING");
 	adc.in_callback<1>().set_ioport("ACCELERATOR");
@@ -792,8 +800,10 @@ void wheelfir_state::wheelfir(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(336, NUM_SCANLINES+NUM_VBLANK_LINES);
-	m_screen->set_visarea(0,335, 0, NUM_SCANLINES-1);
+	m_screen->set_size(336, NUM_SCANLINES + NUM_VBLANK_LINES);
+	m_screen->set_visarea(0, 335, 0, NUM_SCANLINES - 1);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3000));
+
 	m_screen->set_screen_update(FUNC(wheelfir_state::screen_update_wheelfir));
 	m_screen->screen_vblank().set(FUNC(wheelfir_state::screen_vblank_wheelfir));
 	m_screen->set_palette(m_palette);
@@ -824,11 +834,11 @@ void wheelfir_state::kongball(machine_config& config)
 
 
 ROM_START( wheelfir )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tch1.u19", 0x00001, 0x80000, CRC(33bbbc67) SHA1(c2ecc0ab522ee442076ea7b9536aee6e1fad0540) )
 	ROM_LOAD16_BYTE( "tch2.u21", 0x00000, 0x80000, CRC(ed6b9e8a) SHA1(214c5aaf55963a219db33dd5d530492e09ad5e07) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	ROM_LOAD16_BYTE( "tch3.u83",  0x00001, 0x80000, CRC(43c014a6) SHA1(6c01a08dda204f36e8768795dd5d405576a49140) )
 	ROM_LOAD16_BYTE( "tch11.u65", 0x00000, 0x80000, CRC(fc894b2e) SHA1(ebe6d1adf889731fb6f53b4ce5f09c60e2aefb97) )
 
@@ -844,15 +854,21 @@ ROM_START( wheelfir )
 
 	ROM_REGION16_BE(0x80, "eeprom", 0)
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "1_gal22v10.u24", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "2_gal22v10.u23", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
 
 ROM_START( pwball )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "pball.u19", 0x00001, 0x80000, CRC(52f433ce) SHA1(f25c43188c320636d69fec2de2605303ef79a2f8) )
 	ROM_LOAD16_BYTE( "pball.u21", 0x00000, 0x80000, CRC(c0250bc8) SHA1(c7ad2dd0e7fde337a638b09fd325c0cfe1b0b966) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	ROM_LOAD16_BYTE( "pball.u63", 0x00001, 0x80000, CRC(ab8bba31) SHA1(cc89d1c8b5998b712161dda4283856acd8d91723) )
 	ROM_LOAD16_BYTE( "pball.u65", 0x00000, 0x80000, CRC(f2583796) SHA1(f044a575ae3dafaac8ad05aee6d4b672166af969) )
 
@@ -871,14 +887,21 @@ ROM_START( pwball )
 	ROM_LOAD( "pball.u203",0x580000, 0x80000, CRC(89605b33) SHA1(6fb4ebacfd686266142317b3f864705d90ce97ca) )
 	ROM_LOAD( "pball.u204",0x600000, 0x80000, CRC(efddd379) SHA1(903a931a7012f16df516b3cbec8b689a4fc0ba9c) )
 	// u205 is empty (missing or unused?)
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "1_gal22v10.u24", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "2_gal22v10.u23", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
+
 ROM_START( kongball )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "kong.u19", 0x00001, 0x80000, CRC(0283df0a) SHA1(559b547127728c78ba66191278bba4b4cce37eba) )
 	ROM_LOAD16_BYTE( "kong.u21", 0x00000, 0x80000, CRC(ca6ad0da) SHA1(d5e07d7827587263b8d3028ab006dc0be454a7c7) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	// these were not present on the PCB (empty sockets) was sound never programmed, or were they removed at some point?
 	ROM_LOAD16_BYTE( "kong.u63", 0x00001, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "kong.u65", 0x00000, 0x80000, NO_DUMP )
@@ -893,15 +916,21 @@ ROM_START( kongball )
 	ROM_LOAD( "kong.u58", 0x300000, 0x80000, CRC(17818ee8) SHA1(7e857f7c5c146cfcdaa9b1077c63bbee1d143438) )
 	ROM_LOAD( "kong.u59", 0x380000, 0x80000, CRC(6d35e911) SHA1(d37bc2d364ced0d828598af9b2fe7abf6ffb4f82) )
 	ROM_LOAD( "kong.u200",0x400000, 0x80000, CRC(ec552e97) SHA1(7a9a06ff77ef7fc51782caa4d4514864bf8099e7) )
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "1_gal22v10.u24", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "2_gal22v10.u23", 0x000, 0x2e5, NO_DUMP )
+	ROM_LOAD( "kongball_mump3_275f_palce16v8h.u40", 0x000, 0x117, CRC(c6cf0b71) SHA1(c6581f87a4a97c1aeef91f6444c90fc5f4a32e57) )
+	// There's no PLD at U73 on Kong Ball
 ROM_END
 
 
 ROM_START( radendur )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "endu.u19", 0x00001, 0x80000, CRC(d24ca61c) SHA1(64d2648959579d35fbf4c8479c0ff75781d28146) )
 	ROM_LOAD16_BYTE( "endu.u21", 0x00000, 0x80000, CRC(45244675) SHA1(69be2eca3548644f97b9f6956bb3ff979740b1e4) )
 
-	ROM_REGION( 0x100000, "subcpu", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
 	ROM_LOAD16_BYTE( "endu.u63", 0x00001, 0x80000, CRC(43c35368) SHA1(62167a434bfe00825f2f97ecadd0af3e2d2b63f2) )
 	ROM_LOAD16_BYTE( "endu.u65", 0x00000, 0x80000, CRC(25259894) SHA1(b260324760dba1595ab8bd53e1bbc20c04b640dd) )
 
@@ -920,26 +949,34 @@ ROM_START( radendur )
 	ROM_LOAD( "endu.u203",0x580000, 0x80000, CRC(e6361a27) SHA1(826be3b326e68c3b7c0f5c3d84993a971b32f84e) )
 	ROM_LOAD( "endu.u204",0x600000, 0x80000, CRC(0db97872) SHA1(56e38a9034082c3ceb78c0f3aba6125ce6fabd49) )
 	ROM_LOAD( "endu.u205",0x680000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) ) // blank ROM (intentional)
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "radenduro_2_d579_gal22v10.u24", 0x000, 0x2e5, CRC(ebe162d0) SHA1(910e3733df70db4df704f3e105ed27eaa4c32ae6) ) // Checksum does not match chip label, buf verified OK
+	ROM_LOAD( "radenduro_gal22v10b.u23",       0x000, 0x2e5, CRC(f1b0b2b7) SHA1(f85c87c7956813fe78f399694dc999877b1dcb60) )
+	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
 
 void wheelfir_state::init_pwball()
 {
-	// temp hack as pwball doesn't like zooming and other things (maybe different FPGA programming?)
-	m_is_pwball = true;
+	m_force_extra_irq1 = true;
+//	m_disable_raster_irq = true;
 }
 
 void wheelfir_state::init_kongball()
 {
-	init_pwball();
+	m_force_extra_irq1 = true;
 	m_disable_raster_irq = true; // the raster interrupt points outside of code
 }
-
 
 GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init,    ROT0,  "TCH", "Wheels & Fire", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, pwball,      0, wheelfir,    pwball,   wheelfir_state, init_pwball,   ROT0,  "TCH", "Power Ball (prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // mostly complete
 
-// these might not be fully functional games
-GAME( 199?, kongball,    0, kongball,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH", "Kong Ball (early prototype)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // can't get ingame?
+// sound ROMs were missing on PCB, so sound emulation is not possible at this point in time
+GAME( 1997, kongball,    0, kongball,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH / Digital Dreams Multimedia", "Kong Ball (prototype)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // can't get ingame?
+
+// crashes (always?) when selecting track on PCB
+// some courses get to gameplay in MAME right now, but crash quickly, Medium 1 is seems to work better than most others
 GAME( 199?, radendur,    0, wheelfir,    pwball,   wheelfir_state, init_kongball, ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // can get ingame if you overclock CPUs significantly (IRQ problems?)

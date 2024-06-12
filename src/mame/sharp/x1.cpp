@@ -37,20 +37,10 @@ TODO:
     - specific x1turboz features?
 
 per-game/program specific TODO (to be moved to hash file):
-- CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
-- Chack'n Pop: game is too fast, presumably missing wait states;
-- Dragon Buster: it crashed to me once with a obj flag hang;
-- The Goonies (x1 only): goes offsync with the PCG beam positions;
-- Graphtol: sets up x1turboz paletteram, graphic garbage due of it;
-- Gyajiko2: hangs when it's supposed to load the character selection screen, FDC bug?
-- Hydlide 3: can't get the user disk to work properly, could be a bad dump;
-- Lupin the 3rd: don't know neither how to "data load" nor how to "create a character" ... does the game hangs?
 - Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
-- "newtype": trips a z80dma assert, worked around for now;
 - Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
 - Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
 - Trivia-Q: dunno what to do on the selection screen, missing inputs?
-- X1F Demo ("New X1 Demo"): needs partial updates, but they doesn't cope well with current video system;
 - Ys 2: crashes after the disclaimer screen;
 - Ys 3: missing user disk, to hack it (and play with x1turboz features): bp 81ca,pc += 2
 - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
@@ -1066,6 +1056,7 @@ void x1_state::ex_gfxram_w(offs_t offset, uint8_t data)
 */
 void x1_state::scrn_w(uint8_t data)
 {
+	m_scrn_reg.video_mode = data & 0xc7;
 	m_scrn_reg.pcg_mode = BIT(data, 5);
 	m_bitmapbank->set_entry(BIT(data, 4));
 	m_scrn_reg.disp_bank = BIT(data, 3);
@@ -2075,7 +2066,7 @@ TIMER_CALLBACK_MEMBER(x1_state::rtc_tick_cb)
 	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //roll over
 }
 
-MACHINE_RESET_MEMBER(x1_state,x1)
+void x1_state::machine_reset()
 {
 	//uint8_t *ROM = memregion("x1_cpu")->base();
 	int i;
@@ -2125,9 +2116,9 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 	m_fdc->dden_w(0);
 }
 
-MACHINE_RESET_MEMBER(x1_state,x1turbo)
+void x1turbo_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER( x1 );
+	x1_state::machine_reset();
 	m_is_turbo = 1;
 	m_ex_bank = 0x10;
 
@@ -2171,6 +2162,7 @@ void x1_state::machine_start()
 	save_pointer(NAME(m_work_ram), 0x10000*0x10);
 	save_pointer(NAME(m_emm_ram), 0x1000000);
 	save_pointer(NAME(m_pcg_ram), 0x1800);
+	save_item(STRUCT_MEMBER(m_scrn_reg, video_mode));
 
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
@@ -2214,8 +2206,6 @@ void x1_state::x1(machine_config &config)
 	ppi.out_pa_callback().set(FUNC(x1_state::x1_porta_w));
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
-
-	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2273,8 +2263,6 @@ void x1turbo_state::x1turbo(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &x1turbo_state::x1turbo_mem);
 	m_maincpu->set_daisy_config(x1turbo_daisy);
-
-	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
 	m_iobank->set_map(&x1turbo_state::x1turbo_io_banks);
 

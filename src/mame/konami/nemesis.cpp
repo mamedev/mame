@@ -2415,6 +2415,30 @@ ROM_START( salamandj )
 	ROM_LOAD(      "587-c01.10a",      0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
 ROM_END
 
+// Original Konami PCBs PWB (B) 201012A GX587 + GX400PWD(A)200204C
+ROM_START( salamandt )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Same program ROMs content as 'salamand', but with smaller ROMs
+	ROM_LOAD16_BYTE( "5_27512.18b",  0x00000, 0x10000, CRC(a42297f9) SHA1(7c974779e438eae649b39b36f6f6d24847099a6e) )
+	ROM_LOAD16_BYTE( "6_27512.18c",  0x00001, 0x10000, CRC(f9130b0a) SHA1(925ea65c13fc87fc59f893cc0ead2c82fd0bed6f) )
+	ROM_LOAD16_BYTE( "10_27512.17b", 0x40000, 0x10000, CRC(b83e8724) SHA1(69707a98ac3e15f240b24812ff639cafd99c306d) )
+	ROM_LOAD16_BYTE( "4_27512.17c",  0x40001, 0x10000, CRC(a6ef6dc4) SHA1(639113b506fce4318d4b79efd8717232c31dd748) )
+	ROM_LOAD16_BYTE( "9_27512.17b",  0x60000, 0x10000, CRC(b4d2fec9) SHA1(b095e003d86f6d5f486a1d9a4cf02572ff20edeb) )
+	ROM_LOAD16_BYTE( "3_27512.17c",  0x60001, 0x10000, CRC(6ea59643) SHA1(cb2ba819a601eb417eb67d50568126269fa613a4) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 64k for sound
+	ROM_LOAD( "2_tmm24256ap.11j",    0x00000, 0x08000, CRC(7eb8bb88) SHA1(8eb3063b0f4b0775b80f25cc6588661c0e61227d) ) // Unique for this set
+
+	ROM_REGION( 0x04000, "vlm", 0 )      // VLM5030 data
+	ROM_LOAD( "1_27128.8g",          0x00000, 0x04000, CRC(f9ac6b82) SHA1(3370fc3a7f82e922e19d54afb3bca7b07fa4aa9a) )
+
+	ROM_REGION( 0x20000, "k007232", 0 )  // 007232 data
+	ROM_LOAD( "8_27512.10a",         0x00000, 0x10000, CRC(cf477da4) SHA1(92867b3488228a802f0176139040c4eaf2b92700) )
+	ROM_LOAD( "7_27512.10a",         0x10000, 0x10000, CRC(52384e79) SHA1(06d7003d8746287d95710dc6b52556aa642ccc83) )
+
+	ROM_REGION( 0x20, "pld", 0 )
+	ROM_LOAD( "007366_pal8l14a.19d", 0x00000, 0x00020, CRC(77304735) SHA1(1f9dc7b78d4f7a40e7886d106d07b6349abaaa57) )
+ROM_END
+
 ROM_START( lifefrce )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "587-l02.18b",  0x00000, 0x10000, CRC(4a44da18) SHA1(8e76bc2b9c48bfc65664fb6ee4d1d33622ee1eb8) )
@@ -2671,24 +2695,25 @@ ROM_END
 
 
 
-GAME(  1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME(  1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAMEL( 1985, konamigt,  0,         konamigt,   konamigt, nemesis_state, empty_init, ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME(  1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state, empty_init, ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
-GAME(  1985, twinbee,   0,         gx400,      twinbee,  nemesis_state, empty_init, ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state, empty_init, ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gwarrior,  0,         gx400,      gwarrior, nemesis_state, empty_init, ROT0,   "Konami", "Galactic Warriors",              MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamand,  0,         salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version D)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamandj, salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version J)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1986, lifefrce,  salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (US)",                 MACHINE_SUPPORTS_SAVE )
-GAME(  1987, lifefrcej, salamand,  salamand,   lifefrcj, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME(  1987, blkpnthr,  0,         blkpnthr,   blkpnthr, nemesis_state, empty_init, ROT0,   "Konami", "Black Panther",                  MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybomb,  0,         citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (World)",            MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybombj, citybomb,  citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrash,    0,         hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version D)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrashc,   hcrash,    hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version C)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1988, kittenk,   0,         nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Kitten Kaboodle",                MACHINE_SUPPORTS_SAVE )
-GAME(  1988, nyanpani,  kittenk,   nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Nyan Nyan Panic (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesis,   0,        nemesis,   nemesis,  nemesis_state, empty_init, ROT0,   "Konami",                  "Nemesis (ROM version)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesisuk, nemesis,  nemesis,   nemesuk,  nemesis_state, empty_init, ROT0,   "Konami",                  "Nemesis (World?, ROM version)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, konamigt,  0,        konamigt,  konamigt, nemesis_state, empty_init, ROT0,   "Konami",                  "Konami GT",                     MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAME(  1985, rf2,       konamigt, rf2_gx400, rf2,      nemesis_state, empty_init, ROT0,   "Konami",                  "Konami RF2 - Red Fighter",      MACHINE_SUPPORTS_SAVE )
+GAME(  1985, twinbee,   0,        gx400,     twinbee,  nemesis_state, empty_init, ROT90,  "Konami",                  "TwinBee (ROM version)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gradius,   nemesis,  gx400,     gradius,  nemesis_state, empty_init, ROT0,   "Konami",                  "Gradius (Japan, ROM version)",  MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gwarrior,  0,        gx400,     gwarrior, nemesis_state, empty_init, ROT0,   "Konami",                  "Galactic Warriors",             MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamand,  0,        salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami",                  "Salamander (version D)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamandj, salamand, salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami",                  "Salamander (version J)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamandt, salamand, salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami (Tecfri license)", "Salamander (Tecfri license)",   MACHINE_SUPPORTS_SAVE )
+GAME(  1986, lifefrce,  salamand, salamand,  salamand, nemesis_state, empty_init, ROT0,   "Konami",                  "Lifeforce (US)",                MACHINE_SUPPORTS_SAVE )
+GAME(  1987, lifefrcej, salamand, salamand,  lifefrcj, nemesis_state, empty_init, ROT0,   "Konami",                  "Lifeforce (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME(  1987, blkpnthr,  0,        blkpnthr,  blkpnthr, nemesis_state, empty_init, ROT0,   "Konami",                  "Black Panther",                 MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybomb,  0,        citybomb,  citybomb, nemesis_state, empty_init, ROT270, "Konami",                  "City Bomber (World)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybombj, citybomb, citybomb,  citybomb, nemesis_state, empty_init, ROT270, "Konami",                  "City Bomber (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrash,    0,        hcrash,    hcrash,   nemesis_state, empty_init, ROT0,   "Konami",                  "Hyper Crash (version D)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrashc,   hcrash,   hcrash,    hcrash,   nemesis_state, empty_init, ROT0,   "Konami",                  "Hyper Crash (version C)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1988, kittenk,   0,        nyanpani,  nyanpani, nemesis_state, empty_init, ROT0,   "Konami",                  "Kitten Kaboodle",               MACHINE_SUPPORTS_SAVE )
+GAME(  1988, nyanpani,  kittenk,  nyanpani,  nyanpani, nemesis_state, empty_init, ROT0,   "Konami",                  "Nyan Nyan Panic (Japan)",       MACHINE_SUPPORTS_SAVE )
 
 /*
 

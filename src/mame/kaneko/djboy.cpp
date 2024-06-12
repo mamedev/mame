@@ -163,13 +163,6 @@ class djboy_state : public driver_device
 public:
 	djboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_videoram(*this, "videoram")
-		, m_paletteram(*this, "paletteram")
-		, m_masterbank(*this, "master_bank%u", 0U)
-		, m_slavebank(*this, "slave_bank")
-		, m_soundbank(*this, "sound_bank")
-		, m_port_in(*this, "IN%u", 0)
-		, m_port_dsw(*this, "DSW%u", 1)
 		, m_mastercpu(*this, "mastercpu")
 		, m_slavecpu(*this, "slavecpu")
 		, m_soundcpu(*this, "soundcpu")
@@ -180,6 +173,12 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_slavelatch(*this, "slavelatch")
 		, m_beastlatch(*this, "beastlatch")
+		, m_videoram(*this, "videoram")
+		, m_masterbank(*this, "master_bank%u", 0U)
+		, m_slavebank(*this, "slave_bank")
+		, m_soundbank(*this, "sound_bank")
+		, m_port_in(*this, "IN%u", 0)
+		, m_port_dsw(*this, "DSW%u", 1)
 	{
 	}
 
@@ -194,42 +193,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	static constexpr unsigned PROT_OUTPUT_BUFFER_SIZE = 8;
-
-	// memory pointers
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_paletteram;
-
-	// ROM banking
-	uint8_t m_bankxor;
-
-	required_memory_bank_array<2> m_masterbank;
-	required_memory_bank m_slavebank;
-	required_memory_bank m_soundbank;
-
-	required_ioport_array<3> m_port_in;
-	required_ioport_array<2> m_port_dsw;
-
-	// video-related
-	tilemap_t *m_background = nullptr;
-	uint8_t m_videoreg = 0;
-	uint8_t m_scrollx = 0;
-	uint8_t m_scrolly = 0;
-
-	// Kaneko BEAST state
-	uint8_t m_beast_p[4]{};
-
-	// devices
-	required_device<cpu_device> m_mastercpu;
-	required_device<cpu_device> m_slavecpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<i80c51_device> m_beast;
-	required_device<kaneko_pandora_device> m_pandora;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_slavelatch;
-	required_device<generic_latch_8_device> m_beastlatch;
+	//static constexpr unsigned PROT_OUTPUT_BUFFER_SIZE = 8;
 
 	uint8_t beast_status_r();
 	void trigger_nmi_on_mastercpu(uint8_t data);
@@ -248,7 +212,6 @@ private:
 	void scrollx_w(uint8_t data);
 	void scrolly_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
-	void paletteram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
@@ -259,6 +222,40 @@ private:
 	void slavecpu_port_am(address_map &map);
 	void soundcpu_am(address_map &map);
 	void soundcpu_port_am(address_map &map);
+
+	// devices
+	required_device<cpu_device> m_mastercpu;
+	required_device<cpu_device> m_slavecpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<i80c51_device> m_beast;
+	required_device<kaneko_pandora_device> m_pandora;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_slavelatch;
+	required_device<generic_latch_8_device> m_beastlatch;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+
+	// ROM banking
+	required_memory_bank_array<2> m_masterbank;
+	required_memory_bank m_slavebank;
+	required_memory_bank m_soundbank;
+
+	required_ioport_array<3> m_port_in;
+	required_ioport_array<2> m_port_dsw;
+
+	uint8_t m_bankxor;
+
+	// video-related
+	tilemap_t *m_background = nullptr;
+	uint8_t m_videoreg = 0;
+	uint8_t m_scrollx = 0;
+	uint8_t m_scrolly = 0;
+
+	// Kaneko BEAST state
+	uint8_t m_beast_p[4]{};
 };
 
 
@@ -293,15 +290,6 @@ void djboy_state::videoram_w(offs_t offset, uint8_t data)
 void djboy_state::video_start()
 {
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(djboy_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-}
-
-void djboy_state::paletteram_w(offs_t offset, uint8_t data)
-{
-	m_paletteram[offset] = data;
-	offset &= ~1;
-	int const val = (m_paletteram[offset] << 8) | m_paletteram[offset + 1];
-
-	m_palette->set_pen_color(offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
 }
 
 uint32_t djboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -409,7 +397,7 @@ void djboy_state::slavecpu_am(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr(m_slavebank);
 	map(0xc000, 0xcfff).ram().w(FUNC(djboy_state::videoram_w)).share(m_videoram);
-	map(0xd000, 0xd3ff).ram().w(FUNC(djboy_state::paletteram_w)).share(m_paletteram);
+	map(0xd000, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd400, 0xd8ff).ram();
 	map(0xe000, 0xffff).ram().share("master_slave");
 }
@@ -461,7 +449,7 @@ void djboy_state::beast_p0_w(uint8_t data)
 		m_slavelatch->write(m_beast_p[1]);
 	}
 
-	if (BIT(data, 0) == 0)
+	if (BIT(~data, 0))
 		m_beastlatch->acknowledge_w();
 
 	m_beast_p[0] = data;
@@ -469,7 +457,7 @@ void djboy_state::beast_p0_w(uint8_t data)
 
 uint8_t djboy_state::beast_p1_r()
 {
-	if (BIT(m_beast_p[0], 0) == 0)
+	if (BIT(~m_beast_p[0], 0))
 		return m_beastlatch->read();
 	else
 		return 0; // ?
@@ -499,8 +487,8 @@ void djboy_state::beast_p2_w(uint8_t data)
 uint8_t djboy_state::beast_p3_r()
 {
 	uint8_t dsw = 0;
-	uint8_t dsw1 = ~m_port_dsw[0]->read();
-	uint8_t dsw2 = ~m_port_dsw[1]->read();
+	uint8_t const dsw1 = ~m_port_dsw[0]->read();
+	uint8_t const dsw2 = ~m_port_dsw[1]->read();
 
 	switch ((m_beast_p[0] >> 5) & 3)
 	{
@@ -515,7 +503,7 @@ uint8_t djboy_state::beast_p3_r()
 void djboy_state::beast_p3_w(uint8_t data)
 {
 	m_beast_p[3] = data;
-	m_slavecpu->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_slavecpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 // Program / data maps are defined in the 8051 core
 
@@ -696,7 +684,8 @@ void djboy_state::djboy(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djboy);
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x200);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_djboy_spr);
 

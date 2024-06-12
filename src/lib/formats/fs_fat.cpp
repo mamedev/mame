@@ -150,6 +150,8 @@
 
 #include <optional>
 #include <regex>
+#include <string_view>
+
 
 using namespace fs;
 
@@ -287,9 +289,9 @@ private:
 	std::optional<directory_entry> find_entity(const std::vector<std::string> &path) const;
 	directory_span::ptr find_directory(std::vector<std::string>::const_iterator path_begin, std::vector<std::string>::const_iterator path_end) const;
 	std::optional<directory_entry> find_child(const directory_span &current_dir, std::string_view target) const;
-	void iterate_directory_entries(const directory_span &dir, const std::function<bool(const directory_entry &dirent)> &callback) const;
-	bool is_valid_short_filename(std::string &filename);
-	err_t build_direntry_filename(std::string &filename, std::string &fname);
+	template <typename T> void iterate_directory_entries(const directory_span &dir, T &&callback) const;
+	bool is_valid_short_filename(std::string const &filename);
+	err_t build_direntry_filename(std::string const &filename, std::string &fname);
 	err_t file_create_root(std::string &fname, u8 attributes = 0);
 	err_t file_create_directory(directory_entry &dirent, std::string &fname, u8 attributes = 0);
 	err_t file_create_sector(u32 sector, std::string &fname, u8 attributes);
@@ -350,7 +352,7 @@ private:
 namespace {
 bool validate_filename(std::string_view name)
 {
-	auto is_invalid_filename_char = [](char ch)
+	auto const is_invalid_filename_char = [] (char ch)
 	{
 		return ch == '\0' || strchr("\\/:*?\"<>|", ch);
 	};
@@ -450,8 +452,8 @@ char fs::fat_image::directory_separator() const
 std::vector<meta_description> fs::fat_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_name::name, "UNTITLED",   false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "Volume name");
-	results.emplace_back(meta_name::oem_name, "",       false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "OEM name, up to 8 characters");
+	results.emplace_back(meta_name::name, "UNTITLED",   false, [] (const meta_value &m) { return validate_filename(m.as_string()); }, "Volume name");
+	results.emplace_back(meta_name::oem_name, "",       false, [] (const meta_value &m) { return m.as_string().size() <= 8; }, "OEM name, up to 8 characters");
 	return results;
 }
 
@@ -463,7 +465,7 @@ std::vector<meta_description> fs::fat_image::volume_meta_description() const
 std::vector<meta_description> fs::fat_image::file_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name");
+	results.emplace_back(meta_name::name, "", false, [] (const meta_value &m) { return validate_filename(m.as_string()); }, "File name");
 	results.emplace_back(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time");
 	results.emplace_back(meta_name::modification_date, util::arbitrary_datetime::now(), false, nullptr, "Modification time");
 	results.emplace_back(meta_name::length, 0, true, nullptr, "Size of the file in bytes");
@@ -478,7 +480,7 @@ std::vector<meta_description> fs::fat_image::file_meta_description() const
 std::vector<meta_description> fs::fat_image::directory_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name");
+	results.emplace_back(meta_name::name, "", false, [] (const meta_value &m) { return validate_filename(m.as_string()); }, "File name");
 	results.emplace_back(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time");
 	results.emplace_back(meta_name::modification_date, util::arbitrary_datetime::now(), false, nullptr, "Modification time");
 	return results;
@@ -577,7 +579,7 @@ meta_data impl::volume_metadata()
 
 	// Get the volume label from the root directory, not the extended BPB (whose name field may not be kept up-to-date even when it exists)
 	meta_data results;
-	auto callback = [&results](const directory_entry &dirent)
+	auto const callback = [&results] (const directory_entry &dirent)
 	{
 		if (dirent.is_volume_label())
 		{
@@ -620,7 +622,7 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 		return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>());
 
 	std::vector<dir_entry> results;
-	auto callback = [&results](const directory_entry &dirent)
+	auto const callback = [&results] (const directory_entry &dirent)
 	{
 		if (!dirent.is_volume_label())
 		{
@@ -664,23 +666,23 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 }
 
 
-bool impl::is_valid_short_filename(std::string &filename)
+bool impl::is_valid_short_filename(std::string const &filename)
 {
 	/*
-		Valid characters in DOS file names:
-		- Upper case letters A-Z
-		- Numbers 0-9
-		- Space (though there is no way to identify a trailing space)
-		- ! # $ % & ( ) - @ ^ _ ` { } ~
-		- Characters 128-255, except e5 (though the code page is indeterminate)
-		We currently do not check for characters 128-255.
+	    Valid characters in DOS file names:
+	    - Upper case letters A-Z
+	    - Numbers 0-9
+	    - Space (though there is no way to identify a trailing space)
+	    - ! # $ % & ( ) - @ ^ _ ` { } ~
+	    - Characters 128-255, except e5 (though the code page is indeterminate)
+	    We currently do not check for characters 128-255.
 	*/
 	std::regex filename_regex("([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,8})(\\.([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,3}))?");
 	return std::regex_match(filename, filename_regex);
 }
 
 
-err_t impl::build_direntry_filename(std::string &filename, std::string &fname)
+err_t impl::build_direntry_filename(std::string const &filename, std::string &fname)
 {
 	std::regex filename_regex("([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,8})(\\.([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,3}))?");
 	std::smatch smatch;
@@ -712,14 +714,16 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 	if (path.empty())
 	{
 		return file_create_root(fname);
-	} else {
+	}
+	else
+	{
 		// Make sure that all parts of the path exist, creating the path parts as needed.
 		std::optional<directory_entry> dirent = find_entity(path);
 		if (!dirent)
 		{
 			std::vector<std::string> partial_path;
-			std::optional<directory_entry> parent_entry = { };
-			for (auto path_part : path)
+			std::optional<directory_entry> parent_entry;
+			for (auto const &path_part : path)
 			{
 				partial_path.emplace_back(path_part);
 				std::optional<directory_entry> dir_entry = find_entity(partial_path);
@@ -733,8 +737,8 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 					if (err != ERR_OK)
 						return err;
 					err = !parent_entry ?
-						file_create_root(part_fname, directory_entry::ATTR_DIRECTORY) :
-						file_create_directory(parent_entry.value(), part_fname, directory_entry::ATTR_DIRECTORY);
+							file_create_root(part_fname, directory_entry::ATTR_DIRECTORY) :
+							file_create_directory(parent_entry.value(), part_fname, directory_entry::ATTR_DIRECTORY);
 					if (err != ERR_OK)
 						return err;
 
@@ -759,7 +763,7 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 				return ERR_INVALID;
 		}
 
-		return file_create_directory(dirent.value(), fname);
+		return file_create_directory(*dirent, fname);
 	}
 }
 
@@ -825,7 +829,8 @@ err_t impl::file_create_directory(directory_entry &dirent, std::string &fname, u
 	u32 current_cluster = dirent.start_cluster();
 	do {
 		const u32 first_sector = first_cluster_sector(current_cluster);
-		for (int i = 0; i < m_sectors_per_cluster; i++) {
+		for (int i = 0; i < m_sectors_per_cluster; i++)
+		{
 			err_t err = file_create_sector(first_sector + i, fname, attributes);
 			if (err != ERR_NOT_FOUND)
 				return err;
@@ -833,7 +838,8 @@ err_t impl::file_create_directory(directory_entry &dirent, std::string &fname, u
 
 		// File could not be created yet. Move to next cluster, allocating a new cluster when needed.
 		u32 next_cluster = get_next_cluster(current_cluster);
-		if (next_cluster >= m_last_valid_cluster) {
+		if (next_cluster >= m_last_valid_cluster)
+		{
 			next_cluster = find_free_cluster();
 			if (next_cluster == 0)
 				return ERR_NO_SPACE;
@@ -861,7 +867,8 @@ u32 impl::first_cluster_sector(u32 cluster)
 void impl::clear_cluster_sectors(u32 cluster, u8 fill_byte)
 {
 	const u32 sector = first_cluster_sector(cluster);
-	for (int i = 0; i < m_sectors_per_cluster; i++) {
+	for (int i = 0; i < m_sectors_per_cluster; i++)
+	{
 		auto dirblk = m_blockdev.get(sector + i);
 		for (int offset = 0; offset < m_bytes_per_sector; offset++)
 			dirblk.w8(offset, fill_byte);
@@ -1095,7 +1102,8 @@ void impl::set_next_cluster(u32 cluster, u32 next_cluster)
 			next_cluster = next_cluster >> bit_count;
 			current_bit += bit_count;
 			// Write back to backing blocks
-			for (int i = 0; i < m_fat_count; i++) {
+			for (int i = 0; i < m_fat_count; i++)
+			{
 				u32 fat_sector = m_fat_start_sector + (i * m_fat_sector_count) + (byte_pos / m_bytes_per_sector);
 				auto fatblk = m_blockdev.get(fat_sector);
 				fatblk.w8(byte_pos % m_bytes_per_sector, m_file_allocation_table[byte_pos]);
@@ -1113,7 +1121,8 @@ u32 impl::find_free_cluster()
 	u32 data_starting_sector = m_starting_sector + m_reserved_sector_count + fat_sector_count + root_directory_sector_count;
 	u32 data_cluster_count = (m_sector_count - data_starting_sector) / m_sectors_per_cluster;
 
-	for (u32 cluster = FIRST_VALID_CLUSTER; cluster < (data_cluster_count + 2); cluster++) {
+	for (u32 cluster = FIRST_VALID_CLUSTER; cluster < (data_cluster_count + 2); cluster++)
+	{
 		u32 entry_bit_position = cluster * m_bits_per_fat_entry;
 
 		if (entry_bit_position + m_bits_per_fat_entry <= m_file_allocation_table.size() * 8)
@@ -1191,7 +1200,7 @@ directory_span::ptr impl::find_directory(std::vector<std::string>::const_iterato
 std::optional<directory_entry> impl::find_child(const directory_span &current_dir, std::string_view target) const
 {
 	std::optional<directory_entry> result;
-	auto callback = [&result, target](const directory_entry &dirent)
+	auto const callback = [&result, target] (const directory_entry &dirent)
 	{
 		bool found = dirent.name() == target;
 		if (found)
@@ -1207,7 +1216,8 @@ std::optional<directory_entry> impl::find_child(const directory_span &current_di
 //  impl::iterate_directory_entries
 //-------------------------------------------------
 
-void impl::iterate_directory_entries(const directory_span &dir, const std::function<bool(const directory_entry &dirent)> &callback) const
+template <typename T>
+void impl::iterate_directory_entries(const directory_span &dir, T &&callback) const
 {
 	std::vector<u32> sectors = dir.get_directory_sectors();
 	for (u32 sector : sectors)

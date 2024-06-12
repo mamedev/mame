@@ -89,8 +89,8 @@ void h8s2321_device::map_2321(address_map &map)
 {
 	h8s2319_device::map(map);
 
-	map(0xfffeb4, 0xfffeb4).w(m_port5, FUNC(h8_port_device::ddr_w));
-	map(0xfffeb5, 0xfffeb5).w(m_port6, FUNC(h8_port_device::ddr_w));
+	map(0xfffeb4, 0xfffeb4).rw(m_port5, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffeb5, 0xfffeb5).rw(m_port6, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 
 	map(0xffff30, 0xffff35).rw(m_dtc, FUNC(h8_dtc_device::dtcer_r), FUNC(h8_dtc_device::dtcer_w));
 

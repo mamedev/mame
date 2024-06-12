@@ -181,7 +181,7 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 			track.logframeofs = track.pregap;
 		}
 
-		if ((cdtoc.flags & CD_FLAG_MULTISESSION) && cdtrack_info.track[i].leadin != -1)
+		if ((cdtoc.flags & CD_FLAG_MULTISESSION) && (cdtrack_info.track[i].leadin != -1))
 			logofs += cdtrack_info.track[i].leadin;
 
 		track.physframeofs = physofs;
@@ -199,24 +199,26 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 			logofs += cdtrack_info.track[i].leadout;
 
 		if (EXTRA_VERBOSE)
+		{
 			printf("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
-				track.session+1,
-				i+1,
-				track.trktype,
-				track.subtype,
-				track.datasize,
-				track.subsize,
-				track.frames,
-				track.extraframes,
-				track.pregap,
-				track.pgtype,
-				track.pgdatasize,
-				track.postgap,
-				track.logframeofs,
-				track.physframeofs,
-				track.chdframeofs,
-				track.logframes,
-				track.padframes);
+					track.session + 1,
+					i + 1,
+					track.trktype,
+					track.subtype,
+					track.datasize,
+					track.subsize,
+					track.frames,
+					track.extraframes,
+					track.pregap,
+					track.pgtype,
+					track.pgdatasize,
+					track.postgap,
+					track.logframeofs,
+					track.physframeofs,
+					track.chdframeofs,
+					track.logframes,
+					track.padframes);
+		}
 	}
 
 	// fill out dummy entries for the last track to help our search
@@ -299,24 +301,26 @@ cdrom_file::cdrom_file(chd_file *_chd)
 		logofs  += track.frames;
 
 		if (EXTRA_VERBOSE)
+		{
 			printf("session %d track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d pad %d\n",
-				track.session+1,
-				i+1,
-				track.trktype,
-				track.subtype,
-				track.datasize,
-				track.subsize,
-				track.frames,
-				track.extraframes,
-				track.pregap,
-				track.pgtype,
-				track.pgdatasize,
-				track.postgap,
-				track.logframeofs,
-				track.physframeofs,
-				track.chdframeofs,
-				track.logframes,
-				track.padframes);
+					track.session + 1,
+					i + 1,
+					track.trktype,
+					track.subtype,
+					track.datasize,
+					track.subsize,
+					track.frames,
+					track.extraframes,
+					track.pregap,
+					track.pgtype,
+					track.pgdatasize,
+					track.postgap,
+					track.logframeofs,
+					track.physframeofs,
+					track.chdframeofs,
+					track.logframes,
+					track.padframes);
+		}
 	}
 
 	// fill out dummy entries for the last track to help our search
@@ -916,7 +920,7 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 		std::fill(std::begin(pgtype), std::end(pgtype), 0);
 		std::fill(std::begin(pgsub), std::end(pgsub), 0);
 
-		/* fetch the metadata for this track */
+		// fetch the metadata for this track
 		if (!chd->read_metadata(CDROM_TRACK_METADATA_TAG, toc.numtrks, metadata))
 		{
 			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
@@ -929,11 +933,10 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 		}
 		else
 		{
-			/* fall through to GD-ROM detection */
+			// fall through to GD-ROM detection
 			err = chd->read_metadata(GDROM_OLD_METADATA_TAG, toc.numtrks, metadata);
 			if (!err)
-				/* legacy GDROM track was detected */
-				toc.flags |= CD_FLAG_GDROMLE;
+				toc.flags |= CD_FLAG_GDROMLE; // legacy GDROM track was detected
 			else
 				err = chd->read_metadata(GDROM_TRACK_METADATA_TAG, toc.numtrks, metadata);
 
@@ -951,25 +954,25 @@ std::error_condition cdrom_file::parse_metadata(chd_file *chd, toc &toc)
 
 		track = &toc.tracks[tracknum - 1];
 
-		/* extract the track type and determine the data size */
+		// extract the track type and determine the data size
 		track->trktype = CD_TRACK_MODE1;
 		track->datasize = 0;
 		convert_type_string_to_track_info(type, track);
 		if (track->datasize == 0)
 			return chd_file::error::INVALID_DATA;
 
-		/* extract the subtype and determine the subcode data size */
+		// extract the subtype and determine the subcode data size
 		track->subtype = CD_SUB_NONE;
 		track->subsize = 0;
 		convert_subtype_string_to_track_info(subtype, track);
 
-		/* set the frames and extra frames data */
+		// set the frames and extra frames data
 		track->frames = frames;
 		track->padframes = padframes;
 		int padded = (frames + TRACK_PADDING - 1) / TRACK_PADDING;
 		track->extraframes = padded * TRACK_PADDING - frames;
 
-		/* set the pregap info */
+		// set the pregap info
 		track->pregap = pregap;
 		track->pgtype = CD_TRACK_MODE1;
 		track->pgsub = CD_SUB_NONE;
@@ -1515,7 +1518,7 @@ uint64_t cdrom_file::get_file_size(std::string_view filename)
  * @return  An int.
  */
 
-int cdrom_file::tokenize( const char *linebuffer, int i, int linebuffersize, char *token, int tokensize )
+int cdrom_file::tokenize(const char *linebuffer, int i, int linebuffersize, char *token, int tokensize)
 {
 	int j = 0;
 	bool singlequote = false;
@@ -1569,19 +1572,19 @@ int cdrom_file::tokenize( const char *linebuffer, int i, int linebuffersize, cha
  * @return  An int.
  */
 
-int cdrom_file::msf_to_frames( char *token )
+int cdrom_file::msf_to_frames(const char *token)
 {
 	int m = 0;
 	int s = 0;
 	int f = 0;
 
-	if( sscanf( token, "%d:%d:%d", &m, &s, &f ) == 1 )
+	if (sscanf(token, "%d:%d:%d", &m, &s, &f ) == 1)
 	{
 		f = m;
 	}
 	else
 	{
-		/* convert to just frames */
+		// convert to just frames
 		s += (m * 60);
 		f += (s * 75);
 	}
@@ -2318,7 +2321,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 					/* get pregap time */
 					TOKENIZE
-					session_pregap = msf_to_frames( token );
+					session_pregap = msf_to_frames(token);
 				}
 				else if (!strncmp(linebuffer+i, "LEAD-OUT", 8))
 				{
@@ -2332,7 +2335,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 					/* get lead-out time */
 					TOKENIZE
-					int leadout_offset = msf_to_frames( token );
+					int leadout_offset = msf_to_frames(token);
 					outinfo.track[trknum].leadout = leadout_offset;
 				}
 				else if (!strncmp(linebuffer+i, "LEAD-IN", 7))
@@ -2345,7 +2348,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 					/* get lead-in time */
 					TOKENIZE
-					leadin = msf_to_frames( token );
+					leadin = msf_to_frames(token);
 				}
 				else if (is_gdrom && !strncmp(linebuffer+i, "SINGLE-DENSITY AREA", 19))
 				{
@@ -2479,7 +2482,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 				/* get index */
 				TOKENIZE
-				frames = msf_to_frames( token );
+				frames = msf_to_frames(token);
 
 				if (idx < 0 || idx > MAX_INDEX)
 				{
@@ -2509,7 +2512,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 				/* get index */
 				TOKENIZE
-				frames = msf_to_frames( token );
+				frames = msf_to_frames(token);
 
 				outtoc.tracks[trknum].pregap = frames;
 			}
@@ -2519,7 +2522,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 
 				/* get index */
 				TOKENIZE
-				frames = msf_to_frames( token );
+				frames = msf_to_frames(token);
 
 				outtoc.tracks[trknum].postgap = frames;
 			}
@@ -2719,24 +2722,26 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	}
 
 	if (EXTRA_VERBOSE)
+	{
 		for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 		{
 			printf("session %d trk %d: %d frames @ offset %d, pad=%d, split=%d, area=%d, phys=%d, pregap=%d, pgtype=%d, pgdatasize=%d, idx0=%d, idx1=%d, dataframes=%d\n",
-				outtoc.tracks[trknum].session+1,
-				trknum+1,
-				outtoc.tracks[trknum].frames,
-				outinfo.track[trknum].offset,
-				outtoc.tracks[trknum].padframes,
-				outtoc.tracks[trknum].splitframes,
-				outtoc.tracks[trknum].multicuearea,
-				outtoc.tracks[trknum].physframeofs,
-				outtoc.tracks[trknum].pregap,
-				outtoc.tracks[trknum].pgtype,
-				outtoc.tracks[trknum].pgdatasize,
-				outinfo.track[trknum].idx[0],
-				outinfo.track[trknum].idx[1],
-				outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
+					outtoc.tracks[trknum].session + 1,
+					trknum + 1,
+					outtoc.tracks[trknum].frames,
+					outinfo.track[trknum].offset,
+					outtoc.tracks[trknum].padframes,
+					outtoc.tracks[trknum].splitframes,
+					outtoc.tracks[trknum].multicuearea,
+					outtoc.tracks[trknum].physframeofs,
+					outtoc.tracks[trknum].pregap,
+					outtoc.tracks[trknum].pgtype,
+					outtoc.tracks[trknum].pgdatasize,
+					outinfo.track[trknum].idx[0],
+					outinfo.track[trknum].idx[1],
+					outtoc.tracks[trknum].frames - outtoc.tracks[trknum].padframes);
 		}
+	}
 
 	return std::error_condition();
 }
@@ -2913,7 +2918,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 				else if (isdigit((uint8_t)token[0]))
 				{
 					/* convert the time to an offset */
-					f = msf_to_frames( token );
+					f = msf_to_frames(token);
 
 					f *= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 				}
@@ -2929,7 +2934,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 				if (isdigit((uint8_t)token[0]))
 				{
 					// this could be the length or an offset from the previous field.
-					f = msf_to_frames( token );
+					f = msf_to_frames(token);
 
 					TOKENIZE
 
@@ -2941,7 +2946,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 						outinfo.track[trknum].offset += f;
 
 						// this is the length.
-						f = msf_to_frames( token );
+						f = msf_to_frames(token);
 					}
 				}
 				else if( trknum == 0 && outinfo.track[trknum].offset != 0 )
@@ -2991,7 +2996,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 
 				/* get index */
 				TOKENIZE
-				frames = msf_to_frames( token );
+				frames = msf_to_frames(token);
 
 				outtoc.tracks[trknum].pregap = frames;
 			}

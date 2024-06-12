@@ -47,7 +47,7 @@ public:
 	{}
 
 	void sweetland4(machine_config &config);
-	void tairyouda(machine_config &config);
+	void tairyodk(machine_config &config);
 
 private:
 	required_device<h8h_device> m_maincpu;
@@ -110,7 +110,7 @@ static INPUT_PORTS_START( sweetld4 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tairyouda )
+static INPUT_PORTS_START( tairyodk )
 	PORT_START("DSW1") // only one bank of 4 dip switches on PCB
 	PORT_DIPNAME( 0x01, 0x01, "DSW1-01" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -142,7 +142,7 @@ void sweetland4_state::sweetland4(machine_config &config)
 	oki.add_route(1, "rspeaker", 1.00);
 }
 
-void sweetland4_state::tairyouda(machine_config &config)
+void sweetland4_state::tairyodk(machine_config &config)
 {
 	H83002(config, m_maincpu, 14.746_MHz_XTAL); // H8/3002 6413002F17
 
@@ -201,7 +201,7 @@ ROM_END
   |________________________________________________________________________|
 
 */
-ROM_START( tairyouda ) // 大漁太鼓337拍子
+ROM_START( tairyodk ) // 大漁太鼓337拍子
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "t3b1_prg0.5f",   0x00000, 0x80000, CRC(d09dcb0c) SHA1(dbb66f5d548079f19b06dd98d3a44ee6b42b470a) )
 
@@ -212,5 +212,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, sweetld4,  0, sweetland4, sweetld4,  sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000, tairyouda, 0, tairyouda,  tairyouda, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2004, sweetld4,  0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000, tairyodk,  0, tairyodk,   tairyodk, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_IS_SKELETON_MECHANICAL )

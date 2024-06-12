@@ -62,17 +62,17 @@ void h8s2245_device::map(address_map &map)
 {
 	map(m_ram_start, 0xfffbff).ram();
 
-	map(0xfffeb0, 0xfffeb0).w(m_port1, FUNC(h8_port_device::ddr_w));
-	map(0xfffeb1, 0xfffeb1).w(m_port2, FUNC(h8_port_device::ddr_w));
-	map(0xfffeb2, 0xfffeb2).w(m_port3, FUNC(h8_port_device::ddr_w));
-	map(0xfffeb4, 0xfffeb4).w(m_port5, FUNC(h8_port_device::ddr_w));
-	map(0xfffeb9, 0xfffeb9).w(m_porta, FUNC(h8_port_device::ddr_w));
-	map(0xfffeba, 0xfffeba).w(m_portb, FUNC(h8_port_device::ddr_w));
-	map(0xfffebb, 0xfffebb).w(m_portc, FUNC(h8_port_device::ddr_w));
-	map(0xfffebc, 0xfffebc).w(m_portd, FUNC(h8_port_device::ddr_w));
-	map(0xfffebd, 0xfffebd).w(m_porte, FUNC(h8_port_device::ddr_w));
-	map(0xfffebe, 0xfffebe).w(m_portf, FUNC(h8_port_device::ddr_w));
-	map(0xfffebf, 0xfffebf).w(m_portg, FUNC(h8_port_device::ddr_w));
+	map(0xfffeb0, 0xfffeb0).rw(m_port1, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffeb1, 0xfffeb1).rw(m_port2, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffeb2, 0xfffeb2).rw(m_port3, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffeb4, 0xfffeb4).rw(m_port5, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffeb9, 0xfffeb9).rw(m_porta, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffeba, 0xfffeba).rw(m_portb, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffebb, 0xfffebb).rw(m_portc, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffebc, 0xfffebc).rw(m_portd, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffebd, 0xfffebd).rw(m_porte, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffebe, 0xfffebe).rw(m_portf, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(0xfffebf, 0xfffebf).rw(m_portg, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xfffec0, 0xfffec2).rw(m_intc, FUNC(h8s_intc_device::icr_r), FUNC(h8s_intc_device::icr_w));
 	map(0xffff2c, 0xffff2c).rw(m_intc, FUNC(h8s_intc_device::iscrh_r), FUNC(h8s_intc_device::iscrh_w));
 	map(0xffff2d, 0xffff2d).rw(m_intc, FUNC(h8s_intc_device::iscrl_r), FUNC(h8s_intc_device::iscrl_w));

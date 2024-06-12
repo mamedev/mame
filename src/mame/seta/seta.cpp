@@ -11331,7 +11331,7 @@ GAME( 1991, rezono,    rezon,    rezon,     rezon,     seta_state,     empty_ini
 
 GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
-GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena",                    "Pairs Love", 0 )
+GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena / Nihon System",     "Pairs Love", 0 ) // Non-explicit Nihon System credit on title screen thru logo
 
 GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
@@ -11341,9 +11341,9 @@ GAME( 1992, blockcarb, blockcar, blockcarb, blockcar,  seta_state,     empty_ini
 
 GAME( 1992, qzkklogy,  0,        qzkklogy,  qzkklogy,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology", 0 )
 
-GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_init,     ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
+GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_init,     ROT270, "Banpresto",                 "SD Gundam Neo Battling (Japan)", 0 )
 
-GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
+GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
 GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip (World) / Zhen Zhen Ji Pao (China?)", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
 GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
@@ -11363,7 +11363,7 @@ GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_ini
 GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
+GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 GAME( 1993, madsharkbl,madshark, madsharkbl,madshark,  seta_state,     init_madsharkbl,ROT270, "bootleg",                   "Mad Shark (bootleg)", MACHINE_IMPERFECT_SOUND ) // no BGM. Wrong Oki banking?
@@ -11379,7 +11379,7 @@ GAME( 1993, triplfunk, oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_ini
 
 GAME( 1993, qzkklgy2,  0,        qzkklgy2,  qzkklgy2,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology 2", 0 )
 
-GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
+GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Ultra Toukon Densetsu (Japan)", 0 )
 
 GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_init,     ROT270, "Yang Cheng",                "War of Aero - Project MEIOU", 0 )
 
@@ -11403,6 +11403,6 @@ GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     empty_ini
 
 GAME( 1995, zombraid,  0,        zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
 GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries",          "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  crazyfgt_state, empty_init,     ROT0,   "Subsino",                   "Crazy Fight", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

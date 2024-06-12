@@ -30,9 +30,9 @@ TODO.
 ~~~~~~~~~~~~~~
 
 An interruptible CPU is defined as a core which is able to suspend the
-execution of a instruction at any time, exit execute_run, then at the
-next call of ``execute_run`` keep going from where it was.  This
-includes begin able to abort an issued memory access, quit
+execution of one instruction at any time, exit execute_run, then at
+the next call of ``execute_run`` keep going from where it was.  This
+includes being able to abort an issued memory access, quit
 execute_run, then upon the next call of execute_run reissue the exact
 same access.
 

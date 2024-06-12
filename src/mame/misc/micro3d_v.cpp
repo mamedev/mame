@@ -297,8 +297,9 @@ void micro3d_state::draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2
 
 	if (x2 < x1)
 	{
-		std::swap<uint32_t>(x1, x2);
-		std::swap<uint32_t>(y1, y2);
+		using std::swap;
+		swap(x1, x2);
+		swap(y1, y2);
 	}
 
 	dx = x2 - x1;

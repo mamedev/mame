@@ -1475,6 +1475,23 @@ if opt_tool(CPUS, "PIC16C62X") then
 end
 
 --------------------------------------------------
+-- Microchip PIC16x8x
+--@src/devices/cpu/pic16x8x/pic16x8x.h,CPUS["PIC16X8X"] = true
+--------------------------------------------------
+
+if CPUS["PIC16X8X"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.cpp",
+		MAME_DIR .. "src/devices/cpu/pic16x8x/pic16x8x.h",
+	}
+end
+
+if opt_tool(CPUS, "PIC16X8X") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16x8x/16x8xdsm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16x8x/16x8xdsm.h")
+end
+
+--------------------------------------------------
 -- Generic PIC16 - Disassembler only
 --@src/devices/cpu/pic16/pic16.h,CPUS["PIC16"] = true
 --------------------------------------------------
@@ -2933,13 +2950,14 @@ end
 --------------------------------------------------
 -- Zilog Z80
 --@src/devices/cpu/z80/z80.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/z80n.h,CPUS["Z80N"] = true
 --@src/devices/cpu/z80/kc82.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a12.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a16.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/ky80.h,CPUS["KC80"] = true
 --------------------------------------------------
 
-if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
+if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
@@ -2957,6 +2975,31 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/ncs800.hxx" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 source file...",   PYTHON .. "  $(1) $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/ncs800.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating NSC800 source file...",   PYTHON .. " $(1) ncs800 $(<) $(@)" } },
+	}
+end
+
+if CPUS["Z80N"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/z80/z80n.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/z80n.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80n.cpp", GEN_DIR .. "emu/cpu/z80/z80n.hxx" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80n.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80N source file...",   PYTHON .. "  $(1) z80n $(<) $(@)" } },
 	}
 end
 
@@ -2987,6 +3030,12 @@ if want_disasm_z80 or want_disasm_kc80 then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/r800dasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.h")
+end
+
+if opt_tool(CPUS, "Z80N") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.h")
 end
 
 --------------------------------------------------

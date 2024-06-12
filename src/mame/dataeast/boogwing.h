@@ -61,8 +61,8 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint16_t boogwing_protection_region_0_104_r(offs_t offset);
-	void boogwing_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_callback2);
