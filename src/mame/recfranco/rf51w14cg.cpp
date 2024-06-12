@@ -2,7 +2,7 @@
 // copyright-holders:
 /*******************************************************************************************
 
-    Skeleton driver for Recreativos Franco "RF51W14-CG" and other games on smiliar hardware.
+    Skeleton driver for Recreativos Franco "RF51W14-CG" and other games on similar hardware.
     "RF51W14-CG" is the legal registry name, the game commercial name is unknown.
 
     TODO:
@@ -135,12 +135,12 @@ void rf51w14cg_state::rf51w14cg(machine_config &config)
 {
 	I80188(config, m_maincpu, 32_MHz_XTAL / 2); // Intel N80C188XL-20, guess divisor
 
-	I8255A(config, "pia1"); // OKI M82C55A
-	I8255A(config, "pia2"); // OKI M82C55A
-	I8255A(config, "pia3"); // OKI M82C55A
-	I8255A(config, "pia4"); // OKI M82C55A
-	I8255A(config, "pia5"); // OKI M82C55A
-	I8255A(config, "pia6"); // OKI M82C55A
+	I8255A(config, "ppi1"); // OKI M82C55A
+	I8255A(config, "ppi2"); // OKI M82C55A
+	I8255A(config, "ppi3"); // OKI M82C55A
+	I8255A(config, "ppi4"); // OKI M82C55A
+	I8255A(config, "ppi5"); // OKI M82C55A
+	I8255A(config, "ppi6"); // OKI M82C55A
 
 	SPEAKER(config, "mono").front_center();
 
@@ -151,18 +151,18 @@ void rf51w14cg_state::rfsantafem(machine_config &config)
 {
 	I80188(config, m_maincpu, 32_MHz_XTAL / 2); // N80C188XL20
 
-	// PIAs on CPU PCB
-	I8255A(config, "pia1");
-	I8255A(config, "pia2");
-	I8255A(config, "pia3");
+	// CPU PCB
+	I8255A(config, "ppi1");
+	I8255A(config, "ppi2");
+	I8255A(config, "ppi3");
 
-	// PIA on PIAs PCB
-	I8255A(config, "pia4");
+	// PIAs PCB
+	I8255A(config, "ppi4");
 
 	SPEAKER(config, "mono").front_center();
 
 	// Sound PCB
-	OKIM6376(config, m_okim6376, XTAL(9'830'400)/64).add_route(ALL_OUTPUTS, "mono", 1.0); // Guessed frequency and divisor, the Sound PCB has no xtal.
+	OKIM6376(config, m_okim6376, 153600).add_route(ALL_OUTPUTS, "mono", 1.0); // RC OSC, guessed frequency
 
 	// Reels PCB
 	PIC16C57(config, "pic_reels", 20_MHz_XTAL / 2); // PIC16C57-HS, guessed divisor
