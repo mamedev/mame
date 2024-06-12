@@ -712,7 +712,10 @@ void tek440x_state::tek4404(machine_config &config)
 	m_keyboard->tdata_callback().set(FUNC(tek440x_state::kb_tdata_w));
 	m_keyboard->rdata_callback().set(FUNC(tek440x_state::kb_rdata_w));
 
-	AM9513(config, "timer", 40_MHz_XTAL / 4 / 10); // from CPU E output
+	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10); // from CPU E output
+	m_timer->out1_cb().set_inputline(m_maincpu, M68K_IRQ_1);
+	m_timer->out2_cb().set_inputline(m_maincpu, M68K_IRQ_1);
+
 
 	MC146818(config, m_rtc, 32.768_MHz_XTAL);
 
