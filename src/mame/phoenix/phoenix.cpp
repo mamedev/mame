@@ -1515,6 +1515,7 @@ ROM_START( pleiadce )
 	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
 ROM_END
 
+// TIM-8001 + TIM-8002 PCBs. Sound section seems more similar to Phoenix (MM6221AA instead of TMS3615, etc)
 ROM_START( pleiadsgmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic45",   0x0000, 0x0800, CRC(6a6dcabf) SHA1(cec3669674feb1ea86248d181f83f60a6affe68d) )
