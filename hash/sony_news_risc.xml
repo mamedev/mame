@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="sony_news_risc" description="Sony NEWS RISC software">
+<softwarelist name="sony_news_risc" description="Sony NEWS RISC (MIPS) software">
 
 	<software name="nwf_672rb" supported="partial">
 		<description>NEWS-OS Release 4.1R Version Up Kit</description>
