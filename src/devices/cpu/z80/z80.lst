@@ -135,13 +135,10 @@ macro   retn
 macro   z80n:retn
     m_out_retn_seen_cb(0);
     call pop
-    if (m_stackless)
-    {
+    if (m_stackless) {
         m_pc.b.l = m_in_nextreg_cb(0xc2);
         m_pc.b.h = m_in_nextreg_cb(0xc3);
-    }
-    else
-    {
+    } else {
         PC = TDAT;
     }
     LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
@@ -501,14 +498,17 @@ macro   ncs800:check_interrupts
 # ROP
 ##########################################################
 ffff
+    if (m_busrq_state) {
+        m_icount = 0;
+        return;
+    }
     call check_interrupts
     m_after_ei = false;
     m_after_ldair = false;
     PRVPC = PCD;
     debugger_instruction_hook(PCD);
     call rop
-    if (m_halt)
-    {
+    if (m_halt) {
         PC--;
         m_ref = 0xffff00;
         return;
