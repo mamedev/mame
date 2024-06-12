@@ -801,7 +801,7 @@ void z80_device::do_op()
 
 void nsc800_device::do_op()
 {
-	#include "cpu/z80/z80_ncs800.hxx"
+	#include "cpu/z80/ncs800.hxx"
 }
 
 /****************************************************************************
