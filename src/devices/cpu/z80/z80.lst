@@ -132,6 +132,20 @@ macro   retn
     call pop
     PC = TDAT; LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
 
+macro   z80n:retn
+    m_out_retn_seen_cb(0);
+    call pop
+    if (m_stackless)
+    {
+        m_pc.b.l = m_in_nextreg_cb(0xc2);
+        m_pc.b.h = m_in_nextreg_cb(0xc3);
+    }
+    else
+    {
+        PC = TDAT;
+    }
+    LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+
 macro   reti
     call pop
     PC = TDAT; WZ = PC; m_iff1 = m_iff2; daisy_call_reti_device();
@@ -427,6 +441,18 @@ macro   take_interrupt
 
 macro   check_interrupts
     if (m_nmi_pending) {
+        call take_nmi
+    } else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
+        call take_interrupt
+    }
+
+macro   z80n:check_interrupts
+    if (m_nmi_pending) {
+        if (m_stackless) {
+            // on take_nmi
+            m_out_nextreg_cb(0xc2, m_pc.b.l);
+            m_out_nextreg_cb(0xc3, m_pc.b.h);
+        }
         call take_nmi
     } else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
         call take_interrupt
@@ -6644,3 +6670,165 @@ edff    # DB   ED
 
 00ff    # RST  7
     call rst 0x38
+
+
+##########################################################
+# Z80N
+##########################################################
+macro   ldix
+    {
+        TADR = HL;
+        call rm
+        if (TDAT8 != A) {
+            TADR = DE;
+            call wm
+            ;
+        }
+        HL++;
+        DE++;
+        BC--;
+    }
+
+macro   lddx
+    {
+        TADR = HL;
+        call rm
+        if (TDAT8 != A) {
+            TADR = DE;
+            call wm
+            ;
+        }
+        DE++;
+        HL--;
+        BC--;
+    }
+
+z80n:ed23    # swapnib
+    A = (A << 4) | (A >> 4);
+
+z80n:ed24    # mirror a
+    A = bitswap<8>(A, 0, 1, 2, 3, 4, 5, 6, 7);
+
+z80n:ed27    # test *
+    TDAT_H = A;
+    call arg
+    and_a(TDAT8);
+    A = TDAT_H;
+
+z80n:ed28    # bsla de,b
+    DE <<= std::min(B & 31, 16);
+
+z80n:ed29    # bsra de,b
+    {
+        const u16 fill = (DE & 0x8000) ? ~u16(0) : u16(0);
+        DE = (DE >> std::min(B & 31, 16)) | (fill << (16 - std::min(B & 31, 16)));
+    }
+
+z80n:ed2a    # bsrl de,b
+    DE >>= std::min(B & 31, 16);
+
+z80n:ed2b    # bsrf de,b
+    DE = (DE >> std::min(B & 31, 16)) | (~u16(0) << (16 - std::min(B & 31, 16)));
+
+z80n:ed2c    # brlc de,b
+    DE = (DE << (B & 15)) | (DE >> (16 - (B & 15)));
+
+z80n:ed30    # mul d,e
+    DE = D * E;
+
+z80n:ed31    # add hl,a
+    HL += A;
+
+z80n:ed32    # add de,a
+    DE += A;
+
+z80n:ed33    # add bc,a
+    BC += A;
+
+z80n:ed34    # add hl,**
+    call arg16
+    HL += TDAT;
+
+z80n:ed35    # add de,**
+    call arg16
+    DE += TDAT;
+
+z80n:ed36    # add bc,**
+    call arg16
+    BC += TDAT;
+
+z80n:ed8a    # push **
+    call arg16
+    using std::swap; swap(TDAT_H, TDAT_L);
+    call push
+
+z80n:ed90    # outinb
+    TADR = HL;
+    call rm
+    TADR = BC;
+    call out
+    HL++;
+
+z80n:ed91    # nextreg *,*
+    call arg16
+    m_out_nextreg_cb(TDAT_L, TDAT_H);
+
+z80n:ed92    # nextreg *,a
+    call arg
+    m_out_nextreg_cb(TDAT8, A);
+
+z80n:ed93    # pixeldn
+    if (0x07 != (H & 0x07))
+        HL = HL + 0x100;
+    else if (0xe0 != (L & 0xe0))
+        HL = (HL & 0xf8ff) + 0x20;
+    else
+        HL = (HL & 0xf81f) + 0x800;
+
+z80n:ed94    # pixelad
+    HL = 0x4000 + ((D & 0xc0) << 5) + ((D & 0x07) << 8) + ((D & 0x38) << 2) + (E >> 3);
+
+z80n:ed95    # setae
+    A = 0x80 >> (E & 7);
+
+z80n:ed98    # jp (c)
+    TADR = BC;
+    call in
+    PCD = (PCD & 0xc000) + (TDAT8 << 6);
+
+z80n:eda4    # ldix
+    call ldix
+
+z80n:eda5    # ldws
+    TADR = HL;
+    call rm
+    TADR = DE;
+    call wm
+    L++;
+    inc(D);
+
+z80n:edac    # lddx
+    call lddx
+
+z80n:edb4    # ldirx
+    call ldix
+    if (BC != 0)
+        PC -= 2;
+
+z80n:edb7    # ldpirx
+    TADR = (HL & 0xfff8) + (E & 7);
+    call rm
+    if (TDAT8 != A) {
+        TADR = DE;
+        call wm
+        ;
+    }
+    DE++;
+    BC--;
+    if (BC != 0)
+        PC -= 2;
+
+z80n:edbc    # lddrx
+    call lddx
+    if (BC != 0)
+        PC -= 2;
