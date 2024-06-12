@@ -267,11 +267,13 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
+	
+		// is !cpuWr
+		m_map_control &= ~(1 << MAP_CPU_WR);
+
 		// selftest expects fail if page.pid != map_control.pid
 		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 		{
-			// is !cpuWr
-			m_map_control &= ~(1 << MAP_CPU_WR);
 
 			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 			LOG("memory_r: m_map_control(%02x)\n", m_map_control);
@@ -307,13 +309,13 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 		LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
 	
+		// is cpuWr
+		m_map_control |= (1 << MAP_CPU_WR);
+				
 		// matching pid?
 		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 		{
-			// is cpuWr
-			m_map_control |= (1 << MAP_CPU_WR);
-				
-			m_map_control |= (1 << MAP_BLOCK_ACCESS);
+			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 			LOG("memory_w: m_map_control(%02x)\n", m_map_control);
 
 			LOG("memory_w: bus error: PID(%d) wrong %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
@@ -325,14 +327,13 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		}
 		else
 		{
-			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 		}
 
 		// write-enabled page?
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
-			// is cpuWr
-			m_map_control |= (1 << MAP_CPU_WR);
+			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 			LOG("memory_w: m_map_control(%02x)\n", m_map_control);
 
 			LOG("memory_w: bus error: READONLY %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
@@ -362,6 +363,8 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
 	}
 
+	//LOG("memory_w: %08x <= %04x\n",  OFF16_TO_OFF8(offset), data);
+
 	m_vm->write16(offset, data, mem_mask);
 }
 
@@ -386,9 +389,6 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
 
-	// does writing clear these?
-	//m_map_control &= ~(1 << MAP_CPU_WR);
-	
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
 		COMBINE_DATA(&m_map[offset >> 11]);
@@ -397,21 +397,19 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 
 u8 tek440x_state::mapcntl_r()
 {
+	// page 2.1-54 implies that this can only be read in user mode
+
+
 	LOG("mapcntl_r(%02x)\n", m_map_control);
-	
-	// mask out 'SysWrEn' (presumed it was the same as 'Write En. Map Table' when writing..)
 
 	u8 ans = m_map_control;
 	
-	// VM selftest fail #12 if bit 5 not cleared (expects 0x57, gets 0x77)
-	
-	// VM selftest fail #16 if bit 6 not cleared (expects 0x97, gets 0xd7)
-
-	// VM selftest fail #20 (expects 0xf7, gets 0xd7)
-
+	// mask out 'SysWrEn'
 	if ((ans & 0xc0) != 0xc0)
-		ans &= 0xdf;
-
+		ans &= ~0x20;
+	else
+		ans |= 0x20;
+		
 	return ans;
 }
 
