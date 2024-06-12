@@ -27,12 +27,7 @@ z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_
 
 void z80n_device::do_op()
 {
-	const bool is_rop = m_ref >= 0xffff00;
 	#include "cpu/z80/z80n.hxx"
-	if (!is_rop)
-	{
-		m_ref = 0xffff00;
-	}
 }
 
 void z80n_device::device_start()

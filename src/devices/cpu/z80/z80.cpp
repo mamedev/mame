@@ -794,42 +794,14 @@ void nsc800_device::device_reset()
 	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
 }
 
-bool z80_device::check_icount(u8 to_step, int icount_saved, bool redoable)
-{
-	if ((m_icount < 0) && redoable && access_to_be_redone())
-	{
-		m_icount = icount_saved;
-		m_ref = (m_ref & 0xffff00) | (to_step - 1);
-		m_redone = true;
-		return true;
-	}
-	if (m_icount <= 0)
-	{
-		m_ref = (m_ref & 0xffff00) | to_step;
-		return true;
-	}
-
-	return false;
-}
-
 void z80_device::do_op()
 {
-	const bool is_rop = m_ref >= 0xffff00;
 	#include "cpu/z80/z80.hxx"
-	if (!is_rop)
-	{
-		m_ref = 0xffff00;
-	}
 }
 
 void nsc800_device::do_op()
 {
-	const bool is_rop = m_ref >= 0xffff00;
-	#include "cpu/z80/ncs800.hxx"
-	if (!is_rop)
-	{
-		m_ref = 0xffff00;
-	}
+	#include "cpu/z80/z80_ncs800.hxx"
 }
 
 /****************************************************************************
@@ -843,8 +815,7 @@ void z80_device::execute_run()
 		return;
 	}
 
-	m_redone = false;
-	while (m_icount > 0 && !m_redone)
+	while (m_icount > 0)
 	{
 		do_op();
 	}

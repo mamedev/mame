@@ -114,7 +114,6 @@ protected:
 	void block_io_interrupted_flags();
 
 	virtual void do_op();
-	bool check_icount(u8 to_step, int icount_saved, bool redoable);
 
 	virtual u8 data_read(u16 addr);
 	virtual void data_write(u16 addr, u8 value);
@@ -174,7 +173,6 @@ protected:
 	PAIR16       m_shared_data2;
 	u8           m_rtemp;
 
-	bool m_redone;
 	u32 m_ref;
 	u8 m_m1_cycles;
 	u8 m_memrq_cycles;

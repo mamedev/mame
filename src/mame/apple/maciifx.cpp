@@ -170,6 +170,8 @@ void maciifx_state::machine_reset()
 	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 	m_overlay = true;
+
+	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 }
 
 uint32_t maciifx_state::rom_switch_r(offs_t offset)

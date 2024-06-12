@@ -5573,11 +5573,11 @@ ROM_START( pacmanmr ) // PCB is marked "PAC/M" on component side
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "pacm.8h", 0x0000, 0x0020, CRC(2c3cc909) SHA1(32d68d4cfdf9f3e7351353428d268c763e809c63) )
-	ROM_LOAD( "pacm.4a", 0x0020, 0x0100, CRC(4c8e83a4) SHA1(e522cbc6c14bc481f2e97f1a7224c66bb283f553) )
+	ROM_LOAD( "pacm.4a", 0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
-	ROM_LOAD( "pacm.1m", 0x0000, 0x0100, CRC(4e8b3b74) SHA1(aa427aa45373e9a1e6a1155b4bc7bbd97f74f3d8) )
-	ROM_LOAD( "pacm.3m", 0x0100, 0x0100, CRC(05197026) SHA1(9b71fb175331bbc12e43441ecfad75b633e2f953) )  // Timing - not used
+	ROM_LOAD( "pacm.1m", 0x0000, 0x0100, CRC(3cb61034) SHA1(2f24b88839aee107a0ac1064f8bc4853933f5205) )
+	ROM_LOAD( "pacm.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  // Timing - not used
 ROM_END
 
 // this bootleg on Pacman hardware has half as many tiles as the original and some gfx / animations
@@ -6432,11 +6432,11 @@ ROM_START( mspacmane )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "8h",    0x0000, 0x0020, CRC(2c3cc909) SHA1(32d68d4cfdf9f3e7351353428d268c763e809c63) )
-	ROM_LOAD( "4a",    0x0020, 0x0100, CRC(4c8e83a4) SHA1(e522cbc6c14bc481f2e97f1a7224c66bb283f553) )
+	ROM_LOAD( "4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    // Sound PROMs
-	ROM_LOAD( "1m",    0x0000, 0x0100, CRC(7b1f9b71) SHA1(5ef72bbdfb72db3eb1175fed652a761938eeb6cd) )
-	ROM_LOAD( "3m",    0x0100, 0x0100, CRC(05197026) SHA1(9b71fb175331bbc12e43441ecfad75b633e2f953) )    // Timing - not used
+	ROM_LOAD( "1m",    0x0000, 0x0100, CRC(0922b031) SHA1(1eb9e1f8e6b027ca80a0ee0b391d4e904e9ea49b) )
+	ROM_LOAD( "3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
 ROM_START( mspacmane2 ) // G-GA-2 + G-GB-2 PCBs
