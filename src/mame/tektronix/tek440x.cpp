@@ -373,6 +373,7 @@ u16 tek440x_state::map_r(offs_t offset)
 	LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
 
 	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
+	if ((m_maincpu->get_fc() & 4) == 0)
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
 			LOG("map_r: bus error: PID(%d) %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
