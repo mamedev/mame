@@ -102,9 +102,9 @@ public:
 		m_vram(*this, "vram"),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
 		m_map_view(*this, "map"),
-		mousex(*this, "mousex"),
-		mousey(*this, "mousey"),
-		mousebtn(*this, "mousebtn"),
+		m_mousex(*this, "mousex"),
+		m_mousey(*this, "mousey"),
+		m_mousebtn(*this, "mousebtn"),
 		m_boot(false),
 		m_map_control(0),
 		m_kb_rdata(true),
@@ -166,9 +166,9 @@ private:
 	memory_share_creator<u16> m_map;
 	memory_view m_map_view;
 
-	required_ioport mousex;
-	required_ioport mousey;
-	required_ioport mousebtn;
+	required_ioport m_mousex;
+	required_ioport m_mousey;
+	required_ioport m_mousebtn;
 	
 	bool m_boot;
 	u8 m_map_control;
@@ -219,7 +219,7 @@ void tek440x_state::machine_reset()
 	//m_acia->write_dsr(0);
 	//m_acia->write_dcd(0);
 	
-	m_acia->write(4, 0);
+	m_acia->write(4, 0x10);
 	
 }
 
@@ -503,21 +503,30 @@ void tek440x_state::diag_w(u8 data)
 
 u8 tek440x_state::mouse_r(offs_t offset)
 {
+	u8 ans = 0;
+	
 	switch(offset)
 	{
 		case 0:
-			return mousex->read();
+			ans = m_mousex->read();
+			break;
 		case 2:
-			return mousey->read();
+			ans = m_mousey->read();
+			break;
 		case 4:
-			return mousebtn->read();
+			ans = m_mousebtn->read();
+			break;
 		case 6:
-			return 0;	// reset counters
+			ans = m_mousebtn->read();
+			break;
 
 		default:
-			LOG("mouse_r %d\n", offset);
-			return 0;
+			break;
 	}
+
+	LOG("mouse_r %04x => %04x\n", offset, ans);
+	
+	return ans;
 }
 
 void tek440x_state::mouse_w(u8 data)
@@ -635,8 +644,9 @@ static INPUT_PORTS_START( tek4404 )
 	PORT_BIT( 0x00ff, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
 	PORT_START("mousebtn")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
