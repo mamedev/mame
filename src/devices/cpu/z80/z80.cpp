@@ -10,7 +10,6 @@
  *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
  *      was set before this instruction (implemented, but not enabled: we need
  *      document Z80 types first, see below)
- *    - WAIT only stalls between instructions now, it should stall immediately.
  *    - Ideally, the tiny differences between Z80 types should be supported,
  *      currently known differences:
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
@@ -679,6 +678,7 @@ void z80_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_busrq_state));
+	save_item(NAME(m_busack_state));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
 	save_item(NAME(m_ref));
@@ -714,6 +714,7 @@ void z80_device::device_start()
 	m_irq_state = 0;
 	m_wait_state = 0;
 	m_busrq_state = 0;
+	m_busack_state = 0;
 	m_after_ei = 0;
 	m_after_ldair = 0;
 	m_ea = 0;
@@ -955,6 +956,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
 	m_halt_cb(*this),
+	m_busack_cb(*this),
 	m_m1_cycles(4),
 	m_memrq_cycles(3),
 	m_iorq_cycles(4)

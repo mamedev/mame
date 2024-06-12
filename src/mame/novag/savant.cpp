@@ -21,9 +21,6 @@ Hardware overview:
 The display (both the LCD and the sensors) didn't last long, probably none exist
 anymore in original working order.
 
-TODO:
-- hard locks MAME, suspect issue with access_to_be_redone in z80.cpp
-
 *******************************************************************************/
 
 #include "emu.h"

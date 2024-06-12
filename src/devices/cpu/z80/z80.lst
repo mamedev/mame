@@ -499,9 +499,18 @@ macro   ncs800:check_interrupts
 ##########################################################
 ffff
     if (m_busrq_state) {
-        m_icount = 0;
+        if (!m_busack_state) {
+			m_busack_state = 1;
+			m_busack_cb(1);
+		}
+		if (m_icount > 0)
+			m_icount = 0;
         return;
     }
+	else if (m_busack_state) {
+		m_busack_state = 0;
+		m_busack_cb(0);
+	}
     call check_interrupts
     m_after_ei = false;
     m_after_ldair = false;
