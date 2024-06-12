@@ -501,6 +501,11 @@ macro   ncs800:check_interrupts
 # ROP
 ##########################################################
 ffff
+    if (m_busrq_state)
+    {
+        m_icount = 0;
+        return;
+    }
     call check_interrupts
     m_after_ei = false;
     m_after_ldair = false;

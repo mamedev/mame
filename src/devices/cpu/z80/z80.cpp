@@ -809,7 +809,7 @@ void nsc800_device::do_op()
  ****************************************************************************/
 void z80_device::execute_run()
 {
-	if (m_wait_state || m_busrq_state)
+	if (m_wait_state)
 	{
 		m_icount = 0; // stalled
 		return;
