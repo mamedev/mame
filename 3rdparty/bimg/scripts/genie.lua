@@ -18,6 +18,11 @@ newoption {
 	description = "Enable building tools.",
 }
 
+newoption {
+	trigger = "with-libheif",
+	description = "Enable building with libheif HEIF and AVIF file format decoder.",
+}
+
 solution "bimg"
 	configurations {
 		"Debug",

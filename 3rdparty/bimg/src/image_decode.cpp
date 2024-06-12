@@ -34,6 +34,10 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4334) // warning C4334: '<<' : result of 32 - 
 #include <lodepng/lodepng.cpp>
 BX_PRAGMA_DIAGNOSTIC_POP();
 
+#if BIMG_DECODE_HEIF
+#	include <libheif/heif.h>
+#endif // BIMG_DECODE_HEIF
+
 void* lodepng_malloc(size_t _size)
 {
 	return ::malloc(_size);
@@ -632,7 +636,6 @@ namespace bimg
 			output->m_hasAlpha = hasAlpha;
 		}
 
-
 		return output;
 	}
 
@@ -679,8 +682,8 @@ namespace bimg
 
 		ImageContainer* output = imageAlloc(_allocator
 			, format
-			, uint16_t(width)
-			, uint16_t(height)
+			, bx::narrowCast<uint16_t>(width)
+			, bx::narrowCast<uint16_t>(height)
 			, 0
 			, 1
 			, false
@@ -828,6 +831,54 @@ namespace bimg
 		return image;
 	}
 
+	static ImageContainer* imageParseLibHeif(bx::AllocatorI* _allocator, const void* _data, uint32_t _size, bx::Error* _err)
+	{
+#if BIMG_DECODE_HEIF
+		heif_context* ctx = heif_context_alloc();
+
+		heif_context_read_from_memory_without_copy(ctx, _data, _size, NULL);
+
+		heif_image_handle* handle;
+		heif_context_get_primary_image_handle(ctx, &handle);
+
+		heif_image* image;
+		heif_decode_image(handle, &image, heif_colorspace_RGB, heif_chroma_interleaved_RGBA, NULL);
+
+		int32_t stride;
+		const uint8_t* data = heif_image_get_plane_readonly(image, heif_channel_interleaved, &stride);
+
+		ImageContainer* output = NULL;
+		if (NULL != data)
+		{
+			const bimg::TextureFormat::Enum format = bimg::TextureFormat::RGBA8;
+			const int32_t width  = heif_image_handle_get_width(handle);
+			const int32_t height = heif_image_handle_get_height(handle);
+
+			output = imageAlloc(_allocator
+				, format
+				, bx::narrowCast<uint16_t>(width)
+				, bx::narrowCast<uint16_t>(height)
+				, 0
+				, 1
+				, false
+				, false
+				, data
+				);
+		}
+
+		heif_image_release(image);
+		heif_image_handle_release(handle);
+
+		heif_context_free(ctx);
+
+		BX_UNUSED(_err);
+		return output;
+#else
+		BX_UNUSED(_allocator, _data, _size, _err);
+		return NULL;
+#endif // BIMG_DECODE_HEIF
+	}
+
 	ImageContainer* imageParse(bx::AllocatorI* _allocator, const void* _data, uint32_t _size, TextureFormat::Enum _dstFormat, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -840,6 +891,7 @@ namespace bimg
 		input = NULL == input ? imageParseTinyExr (_allocator, _data, _size, _err) : input;
 		input = NULL == input ? imageParseJpeg    (_allocator, _data, _size, _err) : input;
 		input = NULL == input ? imageParseStbImage(_allocator, _data, _size, _err) : input;
+		input = NULL == input ? imageParseLibHeif (_allocator, _data, _size, _err) : input;
 
 		if (NULL == input)
 		{

@@ -17,6 +17,12 @@ project "bimg_decode"
 		path.join(BIMG_DIR, "src/image_decode.*"),
 	}
 
+	if _OPTIONS["with-libheif"] then
+		defines {
+			"BIMG_DECODE_HEIF=1",
+		}
+	end
+
 	using_bx()
 
 	configuration { "linux-*" }
