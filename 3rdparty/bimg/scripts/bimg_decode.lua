@@ -3,6 +3,16 @@
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
+if _OPTIONS["with-libheif"] then
+	print('\n')
+	print('\tWARNING!')
+	print('')
+	print('\t*** LICENSE INCOMPATIBILITY WARNING!')
+	print('\t*** LibHeif is licensed under LGPL! See:')
+	print('\t*** https://github.com/strukturag/libheif/blob/master/COPYING')
+	print('\n')
+end
+
 project "bimg_decode"
 	kind "StaticLib"
 
