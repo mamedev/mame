@@ -134,7 +134,7 @@ namespace bx
 
 		if (NULL != _name)
 		{
-			BX_WARN(strLen(_name) < BX_COUNTOF(m_name)-1, "Truncating thread name.");
+			BX_WARN(strLen(_name) < int32_t(BX_COUNTOF(m_name) )-1, "Truncating thread name.");
 			strCopy(m_name, BX_COUNTOF(m_name), _name);
 		}
 		else
