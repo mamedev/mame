@@ -20,7 +20,7 @@ license:CC0-1.0
 		<!-- Source: archive.org -->
 		<!-- The "STAMP" file has the build date of 07/23/91 -->
 		<part name="hdd" interface="scsi_hdd">
-			<feature name="part_id" value="NEWS-OS Install Kit NWF672R Vol.1" />
+			<feature name="part_id" value="NEWS-OS Install Kit NWF-672R Vol.1" />
 			<diskarea name="harddriv">
 				<disk name="nwf_672rb_mo" sha1="b1c3b2e28d5695385b88f7415ce1e53d647333e4" />
 			</diskarea>
