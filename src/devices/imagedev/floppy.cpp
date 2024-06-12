@@ -1639,6 +1639,9 @@ void floppy_sound_device::step(int zone)
 						}
 					}
 				}
+
+				// Start the new seek sound from the beginning.
+				m_seek_samplepos = 0;
 			}
 
 			// Changing the pitch does not always sound convincing

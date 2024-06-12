@@ -114,7 +114,7 @@ protected:
 	void block_io_interrupted_flags();
 
 	virtual void do_op();
-	bool check_icount(u8 to_step, int icount_saved, bool redonable);
+	bool check_icount(u8 to_step, int icount_saved, bool redoable);
 
 	virtual u8 data_read(u16 addr);
 	virtual void data_write(u16 addr, u8 value);

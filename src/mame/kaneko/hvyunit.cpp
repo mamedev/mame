@@ -98,44 +98,19 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_mermaidlatch(*this, "mermaidlatch")
 		, m_slavelatch(*this, "slavelatch")
+		, m_videoram(*this, "videoram")
+		, m_colorram(*this, "colorram")
 		, m_masterbank(*this, "master_bank")
 		, m_slavebank(*this, "slave_bank")
 		, m_soundbank(*this, "sound_bank")
-		, m_videoram(*this, "videoram")
-		, m_colorram(*this, "colorram")
+		, m_port_in(*this, "IN%u", 0U)
+		, m_port_dsw(*this, "DSW%u", 1U)
 	{
 	}
 
 	void hvyunit(machine_config &config);
 
 private:
-	/* Devices */
-	required_device<cpu_device> m_mastercpu;
-	required_device<cpu_device> m_slavecpu;
-	required_device<i80c51_device> m_mermaid;
-	required_device<cpu_device> m_soundcpu;
-	required_device<kaneko_pandora_device> m_pandora;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_mermaidlatch;
-	required_device<generic_latch_8_device> m_slavelatch;
-
-	required_memory_bank m_masterbank;
-	required_memory_bank m_slavebank;
-	required_memory_bank m_soundbank;
-
-	/* Video */
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t       *m_bg_tilemap;
-	uint16_t          m_scrollx;
-	uint16_t          m_scrolly;
-	uint16_t          m_port0_data;
-
-	/* Mermaid */
-	uint8_t           m_mermaid_p[4];
-
 	void trigger_nmi_on_slave_cpu(uint8_t data);
 	void master_bankswitch_w(uint8_t data);
 	uint8_t mermaid_status_r();
@@ -170,6 +145,40 @@ private:
 	void slave_memory(address_map &map);
 	void sound_io(address_map &map);
 	void sound_memory(address_map &map);
+
+	// Devices
+	required_device<cpu_device> m_mastercpu;
+	required_device<cpu_device> m_slavecpu;
+	required_device<i80c51_device> m_mermaid;
+	required_device<cpu_device> m_soundcpu;
+	required_device<kaneko_pandora_device> m_pandora;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_mermaidlatch;
+	required_device<generic_latch_8_device> m_slavelatch;
+
+	// Memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	required_memory_bank m_masterbank;
+	required_memory_bank m_slavebank;
+	required_memory_bank m_soundbank;
+
+	// Ports
+	required_ioport_array<3> m_port_in;
+	required_ioport_array<2> m_port_dsw;
+
+	// Video
+	tilemap_t       *m_bg_tilemap = nullptr;
+	uint16_t          m_scrollx = 0;
+	uint16_t          m_scrolly = 0;
+	uint16_t          m_port0_data = 0;
+
+	// Mermaid
+	uint8_t           m_mermaid_p[4]{};
+
 };
 
 
@@ -202,9 +211,9 @@ void hvyunit_state::machine_reset()
 
 TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 {
-	int attr = m_colorram[tile_index];
-	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
-	int color = (attr >> 4);
+	uint32_t const attr = m_colorram[tile_index];
+	uint32_t const code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
+	uint32_t const color = (attr >> 4);
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -355,9 +364,9 @@ uint8_t hvyunit_state::mermaid_p2_r()
 {
 	switch ((m_mermaid_p[0] >> 2) & 3)
 	{
-		case 0: return ioport("IN1")->read();
-		case 1: return ioport("IN2")->read();
-		case 2: return ioport("IN0")->read();
+		case 0: return m_port_in[1]->read();
+		case 1: return m_port_in[2]->read();
+		case 2: return m_port_in[0]->read();
 		default: return 0xff;
 	}
 }
@@ -370,8 +379,8 @@ void hvyunit_state::mermaid_p2_w(uint8_t data)
 uint8_t hvyunit_state::mermaid_p3_r()
 {
 	uint8_t dsw = 0;
-	uint8_t dsw1 = ioport("DSW1")->read();
-	uint8_t dsw2 = ioport("DSW2")->read();
+	uint8_t const dsw1 = m_port_dsw[0]->read();
+	uint8_t const dsw2 = m_port_dsw[1]->read();
 
 	switch ((m_mermaid_p[0] >> 5) & 3)
 	{
@@ -387,7 +396,7 @@ uint8_t hvyunit_state::mermaid_p3_r()
 void hvyunit_state::mermaid_p3_w(uint8_t data)
 {
 	m_mermaid_p[3] = data;
-	m_slavecpu->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_slavecpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -400,10 +409,10 @@ void hvyunit_state::mermaid_p3_w(uint8_t data)
 void hvyunit_state::master_memory(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("master_bank");
+	map(0x8000, 0xbfff).bankr(m_masterbank);
 	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
 	map(0xd000, 0xdfff).ram();
-	map(0xe000, 0xffff).ram().share("share1");
+	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void hvyunit_state::master_io(address_map &map)
@@ -418,14 +427,14 @@ void hvyunit_state::master_io(address_map &map)
 void hvyunit_state::slave_memory(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("slave_bank");
-	map(0xc000, 0xc3ff).ram().w(FUNC(hvyunit_state::videoram_w)).share("videoram");
-	map(0xc400, 0xc7ff).ram().w(FUNC(hvyunit_state::colorram_w)).share("colorram");
+	map(0x8000, 0xbfff).bankr(m_slavebank);
+	map(0xc000, 0xc3ff).ram().w(FUNC(hvyunit_state::videoram_w)).share(m_videoram);
+	map(0xc400, 0xc7ff).ram().w(FUNC(hvyunit_state::colorram_w)).share(m_colorram);
 	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xd200, 0xd7ff).ram();
 	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xda00, 0xdfff).ram();
-	map(0xe000, 0xffff).ram().share("share1");
+	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void hvyunit_state::slave_io(address_map &map)
@@ -448,7 +457,7 @@ void hvyunit_state::slave_io(address_map &map)
 void hvyunit_state::sound_memory(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("sound_bank");
+	map(0x8000, 0xbfff).bankr(m_soundbank);
 	map(0xc000, 0xc7ff).ram();
 }
 
@@ -578,11 +587,11 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( gfx_hvyunit )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) /* background tiles */
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) // background tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_hvyunit_spr )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) /* sprite bank */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) // sprite bank
 GFXDECODE_END
 
 
@@ -592,7 +601,7 @@ GFXDECODE_END
  *
  *************************************/
 
-/* Main Z80 uses IM2 */
+// Main Z80 uses IM2
 TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 {
 	int scanline = param;
@@ -600,7 +609,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 	if(scanline == 240) // vblank-out irq
 		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 
-	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
+	// Pandora "sprite end dma" irq? TODO: timing is likely off
 	if(scanline == 64)
 		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -613,21 +622,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 
 void hvyunit_state::hvyunit(machine_config &config)
 {
-	Z80(config, m_mastercpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	Z80(config, m_mastercpu, XTAL(12'000'000)/2); // 6MHz verified on PCB
 	m_mastercpu->set_addrmap(AS_PROGRAM, &hvyunit_state::master_memory);
 	m_mastercpu->set_addrmap(AS_IO, &hvyunit_state::master_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hvyunit_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_slavecpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	Z80(config, m_slavecpu, XTAL(12'000'000)/2); // 6MHz verified on PCB
 	m_slavecpu->set_addrmap(AS_PROGRAM, &hvyunit_state::slave_memory);
 	m_slavecpu->set_addrmap(AS_IO, &hvyunit_state::slave_io);
 	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_assert));
 
-	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	Z80(config, m_soundcpu, XTAL(12'000'000)/2); // 6MHz verified on PCB
 	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
 	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
 
-	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	I80C51(config, m_mermaid, XTAL(12'000'000)/2); // 6MHz verified on PCB
 	m_mermaid->port_out_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_w));
 	m_mermaid->port_in_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_r));
 	m_mermaid->port_out_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_w));
@@ -657,7 +666,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 
 	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_hvyunit_spr);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -676,7 +685,7 @@ void hvyunit_state::hvyunit(machine_config &config)
  *
  *************************************/
 
-/* There is likely a World version using the newer (B73_25 - B73_28) graphics ROMs with a program ROM labeled B73_29 */
+// There is likely a World version using the newer (B73_25 - B73_28) graphics ROMs with a program ROM labeled B73_29
 
 ROM_START( hvyunit )
 	ROM_REGION( 0x20000, "master", 0 )
@@ -691,19 +700,19 @@ ROM_START( hvyunit )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
 	ROM_LOAD( "b73_07.2c",  0x100000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
 	ROM_LOAD( "b73_06.2b",  0x120000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
 	ROM_LOAD( "b73_01.1b",  0x140000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
 	ROM_LOAD( "b73_02.1c",  0x160000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73_03.1d",  0x180000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
-	/*                      0x190000, 0x010000  no data */
+	//                      0x190000, 0x010000  no data
 	ROM_LOAD( "b73_04.1f",  0x1a0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
-	/*                      0x1b0000, 0x010000  no data */
+	//                      0x1b0000, 0x010000  no data
 	ROM_LOAD( "b73_05.1h",  0x1c0000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
@@ -720,14 +729,14 @@ ROM_START( hvyunitj )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) /* == b73_22.2c, despite the different label */
-	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) /* == b73_21.2b, despite the different label */
-	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* == b73_15.0b, despite the different label */
-	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_16.0c, despite the different label */
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) // == b73_22.2c, despite the different label
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) // == b73_21.2b, despite the different label
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) // == b73_15.0b, despite the different label
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) // == b73_16.0c, despite the different label
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
@@ -744,18 +753,18 @@ ROM_START( hvyunitja )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* The data in first half of b73_15.0b actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
+	ROM_REGION( 0x200000, "sprites", 0 ) // The data in first half of b73_15.0b actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles
 	ROM_LOAD( "b73_22.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) // == b73_28.2c, despite the different label - M5M27C101P mask ROM
 	ROM_LOAD( "b73_21.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) // == b73_27.2b, despite the different label - M5M27C101P mask ROM
 	ROM_LOAD( "b73_15.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) // == b73_25.0b, despite the different label - M5M27C101P mask ROM
 	ROM_LOAD( "b73_16.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) // == b73_26.0c, despite the different label - HN27512P mask ROM
-	/* The data below is moved from 0x000000-0x080000 to 0x180000-0x200000 compared to other sets */
+	// The data below is moved from 0x000000-0x080000 to 0x180000-0x200000 compared to other sets
 	ROM_LOAD( "b73_17.0d",  0x180000, 0x020000, CRC(a8ec5309) SHA1(55418711fd9ca38f1c41c8c7dd7984920702c5e9) ) // == 1/4 b73_08.2f - M5M27C101P mask ROM
 	ROM_LOAD( "b73_18.0f",  0x1a0000, 0x020000, CRC(dc955a69) SHA1(f476f449c1a6b1d0212e16827c121713451c1918) ) // == 2/4 b73_08.2f - M5M27C101P mask ROM
 	ROM_LOAD( "b73_19.0h",  0x1c0000, 0x020000, CRC(2fb1b3e3) SHA1(f25e8a432721a772b62eff52a0b97e89f56d79af) ) // == 3/4 b73_08.2f - M5M27C101P mask ROM
 	ROM_LOAD( "b73_20.0k",  0x1e0000, 0x020000, CRC(0662d0dd) SHA1(323b3f1d8fc034e22e8ac8dcc17b080ecaeaf3ed) ) // == 4/4 b73_08.2f - M5M27C101P mask ROM
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "b73_23.2p",  0x000000, 0x080000, NO_DUMP )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
@@ -773,19 +782,19 @@ ROM_START( hvyunitjo )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
 	ROM_LOAD( "b73_07.2c",  0x100000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
 	ROM_LOAD( "b73_06.2b",  0x120000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
 	ROM_LOAD( "b73_01.1b",  0x140000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
 	ROM_LOAD( "b73_02.1c",  0x160000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73_03.1d",  0x180000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
-	/*                      0x190000, 0x010000  no data */
+	//                      0x190000, 0x010000  no data
 	ROM_LOAD( "b73_04.1f",  0x1a0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
-	/*                      0x1b0000, 0x010000  no data */
+	//                      0x1b0000, 0x010000  no data
 	ROM_LOAD( "b73_05.1h",  0x1c0000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
@@ -802,14 +811,14 @@ ROM_START( hvyunitu )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) /* == b73_22.2c, despite the different label */
-	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) /* == b73_21.2b, despite the different label */
-	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* == b73_15.0b, despite the different label */
-	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_16.0c, despite the different label */
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) // == b73_22.2c, despite the different label
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) // == b73_21.2b, despite the different label
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) // == b73_15.0b, despite the different label
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) // == b73_16.0c, despite the different label
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 

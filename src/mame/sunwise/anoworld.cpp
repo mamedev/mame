@@ -1,28 +1,36 @@
-// license:BSD-3-Clause
-// copyright-holders:
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese, AJR
+/***************************************************************************************************
 
-/*
-unknown Sunwise tarot card game
+Another World (c) 1989 Sunwise
+
+TODO:
+- Identify irq sources ($24 timer, $26 VBLANK?, $20 or $22 quadrature encoder);
+- Z80DMA never sends a ready signal, workaround by forcing is_ready fn to 1;
+- Verify data ROM bank;
+- Sound;
+
+====================================================================================================
 
 TOP BOARD (S-8808A)
 =========
 ROMs 1-12
 main:
 Z80 CTC-D
-Z80A
-Z80
+LH0083A Z80A-DMA
+Z0840004PSC Z80 CPU
 D8255AC-2
 6116 RAM
+Oki M6242
+32.768 kHz osc
 
 sound:
 Z80 CTC-D
 D8255AC-2
-Z80
+Z0840004PSC Z80 CPU
 YM3812
 5816 RAM
 4 MHz osc
-Oki M6242
-32.768 kHz osc
 
 LOWER BOARD (S-8809A)
 ==========
@@ -32,12 +40,7 @@ video output
 5x 5816 RAM
 18 MHz osc
 
-TODO:
-- Identify irq sources ($24 vblank irq, $20 or $22 CTC?);
-- Identify how sub CPU is supposed to run;
-- Data ROM bank;
-
-*/
+***************************************************************************************************/
 
 #include "emu.h"
 
@@ -59,7 +62,7 @@ TODO:
 #define LOG_DMA       (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_PORTS | LOG_DMA)
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_PORTS)
 
 #include "logmacro.h"
 
@@ -79,15 +82,19 @@ public:
 		, m_dma(*this, "dma")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_video_view(*this, "video_view")
 		, m_databank(*this, "databank")
 		, m_audiobank(*this, "audiobank")
+		, m_videoram(*this, "videoram")
 	{
 	}
 
-	void unktarot(machine_config &config) ATTR_COLD;
+	void anoworld(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -96,8 +103,10 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	memory_view m_video_view;
 	required_memory_bank m_databank;
 	required_memory_bank m_audiobank;
+	required_shared_ptr<uint8_t> m_videoram;
 	std::unique_ptr<uint8_t[]> m_paletteram;
 
 	void main_program_map(address_map &map) ATTR_COLD;
@@ -106,6 +115,7 @@ private:
 	void audio_io_map(address_map &map) ATTR_COLD;
 
 	void data_bank_w(offs_t offset, u8 data);
+	void video_bank_w(offs_t offset, u8 data);
 
 	void dma_busreq_w(int state);
 	u8 dma_memory_r(offs_t offset);
@@ -116,10 +126,40 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+void anoworld_state::video_start()
+{
+	// TODO: conversion to tilemap
+}
 
 uint32_t anoworld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	u16 tile, color;
 	bitmap.fill(rgb_t::black(), cliprect);
+
+	for (int offs = 0; offs < m_videoram.bytes(); offs += 4)
+	{
+		int const sx = ((offs >> 2) % 32);
+		int const sy = (offs >> 2) / 32;
+
+		if (0)
+		{
+			tile = (m_videoram[offs + 2] | (m_videoram[offs + 3] << 8)) & 0x3fff;
+			// TODO: not enough bits for the full color banking, more view select?
+			color = (m_videoram[offs + 3] >> 6) & 0x3;
+			m_gfxdecode->gfx(1)->opaque(bitmap, cliprect,
+					tile, color,
+					0, 0,
+					8 * sx, 8 * sy);
+		}
+
+		tile = (m_videoram[offs] | (m_videoram[offs + 1] << 8)) & 0xfff;
+		// TODO: definitely requires a 1bpp conversion (native RGB?)
+		color = (m_videoram[offs + 1] >> 4) & 0xf;
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+				tile, color,
+				0, 0,
+				8 * sx, 8 * sy, 0);
+	}
 
 	return 0;
 }
@@ -128,7 +168,15 @@ void anoworld_state::data_bank_w(offs_t offset, u8 data)
 {
 	// guess, also bit 6 actively used
 	m_databank->set_entry(data & 0x3f);
-	LOG("data_bank_w: %02x\n", data);
+	LOG("PPI port A data_bank_w: %02x\n", data);
+}
+
+void anoworld_state::video_bank_w(offs_t offset, u8 data)
+{
+	m_video_view.select(BIT(data, 4));
+	// bit 2 used, video enable?
+	if (data != 0x14)
+		LOG("PPI port C video_bank_w: %02x\n", data);
 }
 
 void anoworld_state::dma_busreq_w(int state)
@@ -168,8 +216,8 @@ void anoworld_state::main_program_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xafff).ram();
-//  map(0xb000, 0xbfff).ram(); // interleaved video tilemap + palette words (RGB444)? Or banked thru port $42 bit 4?
-	map(0xb000, 0xbfff).lrw8(
+	map(0xb000, 0xbfff).view(m_video_view);
+	m_video_view[0](0xb000, 0xbfff).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_paletteram[bitswap<12>(offset ^ 2, 1, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0)];
 		}),
@@ -184,6 +232,7 @@ void anoworld_state::main_program_map(address_map &map)
 			m_palette->set_pen_color(pal_offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
 		})
 	);
+	m_video_view[1](0xb000, 0xbfff).ram().share("videoram");
 
 	map(0xc000, 0xffff).bankr(m_databank);
 }
@@ -198,8 +247,9 @@ void anoworld_state::main_io_map(address_map &map)
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x30, 0x33).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x43).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x50, 0x50).noprw(); // ? (bits 4 and 5 checked in service routines $20 and $22)
-	map(0x60, 0x60).noprw(); // ?
+    // writes goes to outputs, cfr. second item in Test Mode
+	map(0x50, 0x50).portr("IN0").nopw();
+	map(0x60, 0x60).portr("IN1").nopw();
 }
 
 static const z80_daisy_config main_daisy_chain[] =
@@ -227,36 +277,43 @@ void anoworld_state::audio_io_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( unktarot )
+// TODO: Test Mode shows abbreviated forms, identify them all
+static INPUT_PORTS_START( anoworld )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // C0?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // C1?
+	PORT_DIPNAME( 0x0004, 0x0000, "IN0" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PE?") // Paper Empty?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PB?") // Paper Busy?
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)
-
-	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW:8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // SS = Service Switch, hold to enter test mode
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) // SU = Service Up?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) // SD = Service Down?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS?") // Paper Strobe?
+	PORT_DIPNAME( 0x0010, 0x0000, "IN1" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -282,7 +339,7 @@ const gfx_layout gfx_8x8x4 =
 	8*8
 };
 
-static GFXDECODE_START( gfx_unktarot )
+static GFXDECODE_START( gfx_anoworld )
 	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x1, 0, 16 ) // TODO: identify how it gathers palette
 	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4, 0, 16 * 8 )
 GFXDECODE_END
@@ -297,6 +354,11 @@ void anoworld_state::machine_start()
 	m_audiobank->set_entry(1);
 }
 
+void anoworld_state::machine_reset()
+{
+	m_video_view.select(0);
+}
+
 /*
  * Irq table:
  * $+10 (DMA) writes to $9e61
@@ -307,15 +369,12 @@ void anoworld_state::machine_start()
  */
 
 
-void anoworld_state::unktarot(machine_config &config)
+void anoworld_state::anoworld(machine_config &config)
 {
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &anoworld_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &anoworld_state::main_io_map);
 	m_maincpu->set_daisy_config(main_daisy_chain);
-
-	// TODO: how does this work? does it use the same ROM as the main CPU?
-	Z80(config, "subcpu", 4_MHz_XTAL).set_disable();
 
 	Z80(config, m_audiocpu, 4_MHz_XTAL).set_disable();
 	m_audiocpu->set_addrmap(AS_PROGRAM, &anoworld_state::audio_program_map);
@@ -339,9 +398,16 @@ void anoworld_state::unktarot(machine_config &config)
 	ctc1.zc_callback<2>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC2 handler %d\n", machine().describe_context(), state); });
 
 	i8255_device &ppi0(I8255A(config, "ppi0")); // NEC D8255AC-2
+	// PA (input) / PB (output): sound latches
 	ppi0.in_pa_callback().set([this] () { LOGPORTS("%s: PPI0 port A in\n", machine().describe_context()); return uint8_t(0); });
 	ppi0.in_pb_callback().set([this] () { LOGPORTS("%s: PPI0 port B in\n", machine().describe_context()); return uint8_t(0); });
-	ppi0.in_pc_callback().set([this] () { LOGPORTS("%s: PPI0 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.in_pc_callback().set([this] () {
+		// punts to an insert coin screen if this is 0xff,
+		// reacts to D0-D7 signals in test mode.
+		//LOGPORTS("%s: PPI0 port C in\n", machine().describe_context());
+		(void)this;
+		return uint8_t(0);
+	});
 	ppi0.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port A out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port B out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
@@ -349,7 +415,7 @@ void anoworld_state::unktarot(machine_config &config)
 	i8255_device &ppi1(I8255A(config, "ppi1")); // NEC D8255AC-2
 	ppi1.out_pa_callback().set(FUNC(anoworld_state::data_bank_w));
 	ppi1.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port B out %02x\n", machine().describe_context(), data); });
-	ppi1.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port C out %02x\n", machine().describe_context(), data); });
+	ppi1.out_pc_callback().set(FUNC(anoworld_state::video_bank_w));
 
 	msm6242_device &rtc(MSM6242(config, "rtc", 32.768_kHz_XTAL));
 	rtc.out_int_handler().set("ctc0", FUNC(z80ctc_device::trg3)); // source guessed
@@ -357,11 +423,11 @@ void anoworld_state::unktarot(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(anoworld_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unktarot);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_anoworld);
 
 	PALETTE(config, m_palette).set_entries(0x800); //.set_format(palette_device::xRGB_444, 0x800);
 
@@ -373,7 +439,7 @@ void anoworld_state::unktarot(machine_config &config)
 }
 
 
-ROM_START( unktarot )
+ROM_START( anoworld )
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "1.u5", 0x00000, 0x08000, CRC(eaf339d1) SHA1(8325046d2059ad890204e0373bcfbe1221e12bdf) )
 
@@ -408,4 +474,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, unktarot, 0, unktarot, unktarot, anoworld_state, empty_init, ROT0, "Sunwise", "Another World (Japan)", MACHINE_IS_SKELETON ) // title screen GFXs in region 1 at 0x3051 onward
+GAME( 1989, anoworld, 0, anoworld, anoworld, anoworld_state, empty_init, ROT0, "Sunwise", "Another World (Japan, V1.8)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // title screen GFXs in region 1 at 0x3051 onward

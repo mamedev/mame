@@ -30617,9 +30617,6 @@ jackpota
 @source:misc/jaminator.cpp
 jaminator                       // 1990 Noise Toys Inc.
 
-@source:misc/jankenmn.cpp
-jankenmn                        // (c) 1985 Sunwise
-
 @source:misc/jokrwild.cpp
 jokrwild                        // (c) 1988 Sigma
 
@@ -34907,6 +34904,7 @@ hpierrot                        // NTC / NMK
 omatsuri                        // NMK
 pldoraemon                      // NMK
 plpittashi                      // NMK
+sluster2                        // NMK
 sweethrt                        // NMK
 trocana                         // NTC / NMK
 
@@ -35309,6 +35307,8 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmane                       // bootleg
+mspacmane2                      // bootleg
 mspacmanhnc                     // hack
 mspacmanlai                     // bootleg
 mspacmat                        // hack
@@ -35333,6 +35333,7 @@ pacman                          // (c) 1980 Midway
 pacmanf                         // hack
 pacmanfm                        // bootleg (FAMARE S.A.)
 pacmanjpm                       // bootleg
+pacmanmr                        // bootleg
 pacmanpe                        //
 pacmanso                        //
 pacmansp                        // hack (Video Game SA)
@@ -42267,9 +42268,6 @@ squale                          //
 @source:skeleton/sterz80.cpp
 tongzi
 
-@source:skeleton/swunktarot.cpp
-unktarot
-
 @source:skeleton/swyft.cpp
 swyft                           //
 
@@ -42573,6 +42571,9 @@ dfs500                          // 1994 Sony DFS-500 Video Mixer
 
 @source:sony/dpsv55.cpp
 dpsv55                          //
+
+@source:sony/librie.cpp
+librie                          // Sony Librie EBR 1000
 
 @source:sony/news_38xx.cpp
 nws3860                         // Sony NEWS NWS-3860
@@ -43012,6 +43013,12 @@ shanghaij                       // (c) 1988 Sunsoft (Sun Electronics)
 
 @source:sunelectronics/tonton.cpp
 tonton                          // (c) 199? Success / Taiyo Jidoki.
+
+@source:sunwise/anoworld.cpp
+anoworld
+
+@source:sunwise/jankenmn.cpp
+jankenmn                        // (c) 1985 Sunwise
 
 @source:svi/svi318.cpp
 svi318                          // SVI-318 (PAL)

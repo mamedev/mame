@@ -198,6 +198,12 @@ palette_device &palette_device::set_format(rgbx_444_t, u32 entries)
 	return *this;
 }
 
+palette_device &palette_device::set_format(grbx_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 8,12,4>, entries);
+	return *this;
+}
+
 palette_device &palette_device::set_format(gbrx_444_t, u32 entries)
 {
 	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 4,12,8>, entries);
