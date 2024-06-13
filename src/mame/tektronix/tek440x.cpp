@@ -139,7 +139,14 @@ private:
 
 	// fake output of serial
 	void write_txd(int state);
-	
+
+	// need to handle bit 8 reset
+	void timer_w(offs_t offset, u16 data);
+
+	// need to handle loopback mode
+	u8 duart_r(offs_t offset);
+	void duart_w(offs_t offset, u8 data);
+
 	
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
@@ -373,7 +380,6 @@ u16 tek440x_state::map_r(offs_t offset)
 	LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
 
 	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
-	if ((m_maincpu->get_fc() & 4) == 0)
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
 			LOG("map_r: bus error: PID(%d) %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
@@ -573,6 +579,33 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
+// to handle offset 0x1xx writes resetting TPInt...
+void tek440x_state::timer_w(offs_t offset, u16 data)
+{
+	LOG("timer_w %08x %04x\n", offset, data);
+	m_timer->write16(offset, data);
+}
+
+u8 tek440x_state::duart_r(offs_t offset)
+{
+	return m_duart->read(offset);
+}
+
+void tek440x_state::duart_w(offs_t offset, u8 data)
+{
+	// Transmit Buffer?
+	if (offset == 3)
+	{
+		if (m_diag & 0x80)
+		{
+			LOG("LOOPBACK\n");
+			m_duart->write(0x0, 0x80);
+		}
+	}
+
+	m_duart->write(offset, data);
+}
+
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
@@ -611,11 +644,14 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x7b0000, 0x7b0000).rw(FUNC(tek440x_state::diag_r),FUNC(tek440x_state::diag_w));
 	// 7b1000-7b1fff: diagnostic registers
 	// 7b2000-7b3fff: Centronics printer data
-	map(0x7b4000, 0x7b401f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
+	map(0x7b4000, 0x7b401f).rw(FUNC(tek440x_state::duart_r), FUNC(tek440x_state::duart_w)).umask16(0xff00);
 	// 7b6000-7b7fff: Mouse
 	map(0x7b6000, 0x7b6fff).rw(FUNC(tek440x_state::mouse_r),FUNC(tek440x_state::mouse_w));
 
 	map(0x7b8000, 0x7b8003).mirror(0x100).rw(m_timer, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	// FIXME: writes 0x1xx should reset timer/printer interrupt latch..
+//	map(0x7b8100, 0x7b8103).w("irq1", FUNC(input_merger_device::in_clear<0>));
+	
 	// 7ba000-7bbfff: MC146818 RTC
 	map(0x7bc000, 0x7bc000).lw8(
 		[this](u8 data)
@@ -688,7 +724,6 @@ void tek440x_state::tek4404(machine_config &config)
 	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	/* video hardware */
-	//screen_device &m_screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
@@ -713,9 +748,13 @@ void tek440x_state::tek4404(machine_config &config)
 	m_keyboard->rdata_callback().set(FUNC(tek440x_state::kb_rdata_w));
 
 	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10); // from CPU E output
-	m_timer->out1_cb().set_inputline(m_maincpu, M68K_IRQ_1);
-	m_timer->out2_cb().set_inputline(m_maincpu, M68K_IRQ_1);
+//	m_timer->out1_cb().set_inputline(m_maincpu, M68K_IRQ_1);
+//	m_timer->out2_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
+	// see diagram page 2.2-6
+	m_timer->out1_cb().set("irq1", FUNC(input_merger_device::in_w<0>));
+	m_timer->out2_cb().set("irq1", FUNC(input_merger_device::in_w<1>));
+	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	MC146818(config, m_rtc, 32.768_MHz_XTAL);
 
