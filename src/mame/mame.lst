@@ -30617,14 +30617,12 @@ jackpota
 @source:misc/jaminator.cpp
 jaminator                       // 1990 Noise Toys Inc.
 
-@source:misc/jankenmn.cpp
-jankenmn                        // (c) 1985 Sunwise
-
 @source:misc/jokrwild.cpp
 jokrwild                        // (c) 1988 Sigma
 
 @source:misc/joystand.cpp
 joystand                        // 1997 Yuvo
+x180                            // 1997 Yuvo
 x180ii                          // 1997 Yuvo
 
 @source:misc/jubilee.cpp
@@ -34908,6 +34906,7 @@ hpierrot                        // NTC / NMK
 omatsuri                        // NMK
 pldoraemon                      // NMK
 plpittashi                      // NMK
+sluster2                        // NMK
 sweethrt                        // NMK
 trocana                         // NTC / NMK
 
@@ -35310,6 +35309,8 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmane                       // bootleg
+mspacmane2                      // bootleg
 mspacmanhnc                     // hack
 mspacmanlai                     // bootleg
 mspacmat                        // hack
@@ -35334,6 +35335,7 @@ pacman                          // (c) 1980 Midway
 pacmanf                         // hack
 pacmanfm                        // bootleg (FAMARE S.A.)
 pacmanjpm                       // bootleg
+pacmanmr                        // bootleg
 pacmanpe                        //
 pacmanso                        //
 pacmansp                        // hack (Video Game SA)
@@ -36139,6 +36141,7 @@ pleiadbl                        // bootleg
 pleiadce                        // (c) 1981 Centuri + Tehkan
 pleiads                         // (c) 1981 Tehkan
 pleiadsb2                       // bootleg
+pleiadsgmp                      // bootleg
 pleiadsi                        // bootleg (Irecsa)
 pleiadsia                       // bootleg (Irecsa)
 pleiadsn                        // bootleg (Niemer S.A.)
@@ -38822,6 +38825,9 @@ tstar432
 tstar432a
 tstar432b
 
+@source:saitek/tatrain.cpp
+tatrain
+
 @source:saitek/turbo16k.cpp
 compan3
 conquist
@@ -39762,6 +39768,7 @@ ooparts                         // (c) 1992 Success
 pclubj                          //
 pclubjv2                        //
 pclub                           //
+pclubjv3                        //
 pclubjv4                        //
 pclubjv5                        //
 potopoto                        // (c) 1994 Sega
@@ -41543,6 +41550,9 @@ atm                             //
 atmtb2                          //
 atmtb2plus                      //
 
+@source:sinclair/chloe.cpp
+chloe                           // 1999 Chloe Corporation
+
 @source:sinclair/elwro800.cpp
 elwro800                        //
 
@@ -41647,6 +41657,9 @@ ts1500                          // Timex Sinclair 1500
 zx80                            // 1980 Sinclair ZX-80
 zx81                            // 1981 Sinclair ZX-81
 zx97                            //
+
+@source:sinclair/specnext.cpp
+tbblue                          // ZX Spectrum Next: TBBlue
 
 @source:skeleton/600cat.cpp
 600cat                          //
@@ -42260,9 +42273,6 @@ squale                          //
 @source:skeleton/sterz80.cpp
 tongzi
 
-@source:skeleton/swunktarot.cpp
-unktarot
-
 @source:skeleton/swyft.cpp
 swyft                           //
 
@@ -42566,6 +42576,9 @@ dfs500                          // 1994 Sony DFS-500 Video Mixer
 
 @source:sony/dpsv55.cpp
 dpsv55                          //
+
+@source:sony/librie.cpp
+librie                          // Sony Librie EBR 1000
 
 @source:sony/news_38xx.cpp
 nws3860                         // Sony NEWS NWS-3860
@@ -43005,6 +43018,12 @@ shanghaij                       // (c) 1988 Sunsoft (Sun Electronics)
 
 @source:sunelectronics/tonton.cpp
 tonton                          // (c) 199? Success / Taiyo Jidoki.
+
+@source:sunwise/anoworld.cpp
+anoworld
+
+@source:sunwise/jankenmn.cpp
+jankenmn                        // (c) 1985 Sunwise
 
 @source:svi/svi318.cpp
 svi318                          // SVI-318 (PAL)

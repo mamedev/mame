@@ -18,6 +18,7 @@ Hardware notes (Systema Challenge fitted with Regency MCU):
 
 A26 MCU was used in:
 - Krypton Regency (with or without LEDs)
+- Excalibur Avenger (suspected, Excalibur brand Comet, with newer MCU)
 - Excalibur Legend III (suspected, Excalibur brand Regency)
 - Systema Challenge (1996 version)
 

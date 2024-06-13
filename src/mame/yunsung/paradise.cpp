@@ -1823,9 +1823,9 @@ GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, init_parad
 GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise 2 Deluxe",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
 GAME( 1996,  tgtbal96, 0,         tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball '96",             MACHINE_SUPPORTS_SAVE ) // With nudity
 GAME( 1995,  tgtball,  tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball (With Nudity)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball (with nudity)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Penky",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, init_tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, init_torus,    ROT90, "Yun Sung",                      "Torus",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball V2.0",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball V2.0 (With Nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0, with nudity)", MACHINE_SUPPORTS_SAVE )

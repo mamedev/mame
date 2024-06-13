@@ -776,6 +776,28 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( x180 ) // YUVO PCC180C PCB + JSR-1A REV.B riser PCB. Similar to the joystand one, even most IC locations match. It has 2x D71055C.
+	ROM_REGION( 0x100000, "maincpu", 0 ) // on riser PCB
+	ROM_LOAD16_BYTE( "msvol1a.even.u5", 0x00000, 0x80000, CRC(f79c476c) SHA1(c49a8ccbe494d39635fda58ba379cea6714a1ec2) )
+	ROM_LOAD16_BYTE( "msvol1b.odd.u6",  0x00001, 0x80000, CRC(dd46fd51) SHA1(60832cb90d5335cd55422e56c8482ac7c88f70ff) )
+
+	ROM_REGION( 0x600000, "tiles", 0 ) // on riser PCB
+	ROM_LOAD( "e28f016sa.u1", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "e28f016sa.u2", 0x200000, 0x200000, NO_DUMP )
+	ROM_LOAD( "e28f016sa.u3", 0x400000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "x180-sej1.ver1.00.ic14", 0x00000, 0x80000, CRC(86a0801b) SHA1(a252ed786bf51b963feb6ff253303ea3b67d8fcf) )
+	ROM_LOAD( "x180-sej2.ver1.00.ic13", 0x80000, 0x80000, CRC(92f73edb) SHA1(541a671d0e1648d8ddb42abe0e851ea9c68c718f) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "93c46-x16.ic16", 0x00, 0x80, NO_DUMP )
+
+	ROM_REGION( 0x117, "pld", 0 )
+	ROM_LOAD( "map.ic4", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "xct.ic5", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 ROM_START( x180ii ) // YUVO PCC180C PCB. Similar to the joystand one, even most IC locations match. It has 2x D71055C.
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "x180ii-mpj-e.ver1.00.ic3",  0x00000, 0x80000, CRC(20343837) SHA1(44306e93d3c333f9e418c42d44433fe5654cad40) )
@@ -801,5 +823,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private",           MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, x180ii,   0, x180ii,   joystand, joystand_state, empty_init, ROT0, "Yuvo", "unknown Yuvo Joy Stand game", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // has Joy Stand sample in Oki ROMs
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private",                   MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, x180,     0, x180ii,   joystand, joystand_state, empty_init, ROT0, "Yuvo", "unknown Yuvo Joy Stand game (set 1)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // has Joy Stand sample in Oki ROMs
+GAME( 1997, x180ii,   0, x180ii,   joystand, joystand_state, empty_init, ROT0, "Yuvo", "unknown Yuvo Joy Stand game (set 2)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // has Joy Stand sample in Oki ROMs

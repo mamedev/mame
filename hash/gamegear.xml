@@ -9122,7 +9122,7 @@ a certain item) -->
 	</software>
 
 	<software name="stetris">
-		<description>Super Tetris (Kor, SMS mode?)</description>
+		<description>Super Tetris (Korea, SMS mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">

@@ -475,6 +475,7 @@ const double XTAL::known_xtals[] = {
 	 51'200'000, /* 51.2_MHz_XTAL          Namco Super System 22 video clock */
 	 52'000'000, /* 52_MHz_XTAL            Cojag */
 	 52'832'000, /* 52.832_MHz_XTAL        Wang PC TIG video controller */
+	 52'867'000, /* 52.867_MHz_XTAL        Atlus Print Club (Sega C2 PCB) */
 	 53'203'424, /* 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier) */
 	 53'693'175, /* 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
 	 54'000'000, /* 54_MHz_XTAL            Taito JC */

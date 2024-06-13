@@ -60,8 +60,6 @@ namespace {
 #define MAC_H_TOTAL (704)  // (512+192)
 #define MAC_V_TOTAL (370) // (342+28)
 
-#define MACII_USE_ADBMODEM (0)
-
 // Mac driver data
 
 class mac_state:public driver_device
@@ -212,7 +210,6 @@ private:
 
 	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
-	void mac_adb_via_out_cb2(int state);
 	uint8_t mac_via_in_a();
 	uint8_t mac_via_in_b();
 	void mac_via_out_a(uint8_t data);
@@ -537,17 +534,6 @@ void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_maincpu->adjust_icount(-5);
 }
 
-void mac_state::mac_adb_via_out_cb2(int state)
-{
-	// printf("VIA OUT CB2 = %x\n", state);
-#if !MACII_USE_ADBMODEM
-	if (m_macadb)
-	{
-		m_macadb->adb_data_w(state);
-	}
-#endif
-}
-
 /* *************************************************************************
  * VIA
  * *************************************************************************
@@ -610,10 +596,6 @@ uint8_t mac_state::mac_via_in_b()
 {
 	int val = 0;
 
-#if !MACII_USE_ADBMODEM
-	val |= m_macadb->get_adb_state() << 4;
-#endif
-
 	if (!m_adb_irq_pending)
 	{
 		val |= 0x08;
@@ -651,11 +633,7 @@ void mac_state::mac_via_out_b(uint8_t data)
 		}
 	}
 
-#if MACII_USE_ADBMODEM
 	m_adbmodem->set_via_state((data & 0x30) >> 4);
-#else
-	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
-#endif
 
 	m_rtc->ce_w((data & 0x04) >> 2);
 	m_rtc->data_w(data & 0x01);
@@ -1113,7 +1091,6 @@ void mac_state::macii(machine_config &config)
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
 	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
 	R65NC22(config, m_via2, C7M/10);
@@ -1123,7 +1100,6 @@ void mac_state::macii(machine_config &config)
 	m_via2->writepb_handler().set(FUNC(mac_state::mac_via2_out_b));
 	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
 
-#if MACII_USE_ADBMODEM
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
@@ -1131,17 +1107,9 @@ void mac_state::macii(machine_config &config)
 	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
 	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	config.set_perfect_quantum(m_maincpu);
-#endif
 
 	MACADB(config, m_macadb, C15M);
-#if !MACII_USE_ADBMODEM
-	m_macadb->set_mcu_mode(false);
-	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
-#else
 	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
-#endif
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");

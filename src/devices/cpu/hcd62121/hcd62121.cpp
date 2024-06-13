@@ -42,7 +42,7 @@ enum
 	HCD62121_R70, HCD62121_R74, HCD62121_R78, HCD62121_R7C
 };
 
-// TODO - Max value stored with "movb reg,f" is 0x3f, is bit 5 set in other instructions?
+constexpr u8 FLAG_INPUT = 0x20;
 constexpr u8 FLAG_CL = 0x10;
 constexpr u8 FLAG_Z = 0x08;
 constexpr u8 FLAG_C = 0x04;
@@ -80,6 +80,7 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_opt_cb(*this)
 	, m_ki_cb(*this, 0)
 	, m_in0_cb(*this, 0)
+	, m_input_flag_cb(*this, 0)
 {
 }
 
@@ -639,6 +640,15 @@ inline void hcd62121_cpu_device::set_cl_flag(bool is_cl)
 }
 
 
+void hcd62121_cpu_device::set_input_flag(bool is_input_set)
+{
+	if (is_input_set)
+		m_f |= FLAG_INPUT;
+	else
+		m_f &= ~FLAG_INPUT;
+}
+
+
 inline void hcd62121_cpu_device::op_msk(int size)
 {
 	bool zero_high = true;
@@ -888,7 +898,13 @@ void hcd62121_cpu_device::execute_run()
 			m_cycles_until_timeout = 0;
 			m_is_infinite_timeout = false;
 		}
-		else if (m_is_infinite_timeout)
+
+		if (m_input_flag_cb() != 0)
+		{
+			set_input_flag(false);
+		}
+
+		if (m_is_infinite_timeout)
 		{
 			m_icount = 0;
 		}
@@ -2180,6 +2196,8 @@ void hcd62121_cpu_device::execute_run()
 						// Approximately 209.34ms
 						m_cycles_until_timeout = 0x400 * TIMER_STATE_READ_CYCLES;
 						break;
+					case 0x09:
+					case 0x0b:
 					case 0x49:
 					case 0x4b:
 					case 0xc9:

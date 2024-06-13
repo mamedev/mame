@@ -47,7 +47,7 @@ void adbmodem_device::adbmodem_map(address_map &map)
 
 void adbmodem_device::device_add_mconfig(machine_config &config)
 {
-	PIC1654S(config, m_maincpu, 15.6672_MHz_XTAL/4);
+	PIC1654S(config, m_maincpu, 3.6864_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &adbmodem_device::adbmodem_map);
 	m_maincpu->read_a().set(FUNC(adbmodem_device::porta_r));
 	m_maincpu->write_a().set(FUNC(adbmodem_device::porta_w));
