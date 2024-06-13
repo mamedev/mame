@@ -193,6 +193,11 @@ macro   ld_a_i
 macro   r800:ld_a_i
 	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
 
+macro   rst	 addr
+	TDAT = PC;
+	call push
+	PC = addr; WZ = PC;
+
 macro   rrd
 	TADR = HL;
 	call rm
